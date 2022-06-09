@@ -462,7 +462,7 @@ In more advanced search systems, the the cosine similarity of embeddings can be 
 
 Recommendations are quite similar to search, except that instead of a free-form text query, the inputs are items in a set. And instead of using pairs of doc-query models, you can use a single symmetric similarity model (e.g., `text-similarity-curie-001`).
 
-An example of how to use embeddings for recommendations is shown in [Recommendations.ipynb](examples/Recommendations.ipynb).
+An example of how to use embeddings for recommendations is shown in [Recommendation_using_embeddings.ipynb](examples/Recommendation_using_embeddings.ipynb).
 
 Similar to search, these cosine similarity scores can either be used on their own to rank items or as features in larger ranking algorithms.
 

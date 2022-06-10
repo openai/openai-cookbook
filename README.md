@@ -431,7 +431,7 @@ Tips for translation:
 
 When it comes to translation, large language models particularly shine at combining other instructions alongside translation. For example, you can ask GPT-3 to translate Slovenian to English but keep all LaTeX typesetting commands unchanged. The following notebook details how we translated a Slovenian math book into English:
 
-[Translation of a Slovenian math book into English](book_translation/translate_latex_book.ipynb)
+[Translation of a Slovenian math book into English](examples/book_translation/translate_latex_book.ipynb)
 
 ### 4. Compare text
 
@@ -448,13 +448,13 @@ The simplest way to use embeddings for search is as follows:
 * Before the search (precompute):
   * Split your text corpus into chunks smaller than the token limit (e.g., ~2,000 tokens)
   * Embed each chunk using a 'doc' model (e.g., `text-search-curie-doc-001`)
-  * Store those embeddings in your own database or in a vector search provider like [pinecone.io](pinecone.io) or [weaviate](weaviate.io)
+  * Store those embeddings in your own database or in a vector search provider like [Pinecone](https://www.pinecone.io) or [Weaviate](https://weaviate.io)
 * At the time of the search (live compute):
   * Embed the search query using the correponding 'query' model (e.g. `text-search-curie-query-001`)
   * Find the closest embeddings in your database
   * Return the top results, ranked by cosine similarity
 
-An example of how to use embeddings for search is shown in [Semantic_search.ipynb](examples/Semantic_search.ipynb).
+An example of how to use embeddings for search is shown in [Semantic_text_search_using_embeddings.ipynb](examples/Semantic_text_search_using_embeddings.ipynb).
 
 In more advanced search systems, the the cosine similarity of embeddings can be used as one feature among many in ranking search results.
 

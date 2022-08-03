@@ -1,8 +1,8 @@
 # OpenAI Cookbook
 
-This repository shares example code and example prompts for accomplishing common tasks with the [OpenAI API](https://openai.com/api/).
+This repository shares example code and example prompts for accomplishing common tasks with the [OpenAI API].
 
-To try these examples yourself, you’ll need an OpenAI account. [Create a free account to get started.](https://beta.openai.com/signup)
+To try these examples yourself, you’ll need an OpenAI account. [Create a free account to get started.][API Signup]
 
 Most code examples are written in Python, though the concepts can be applied in any language.
 
@@ -10,13 +10,13 @@ In the same way that a cookbook's recipes don't span all possible meals or techn
 
 ## Related resources
 
-Beyond the code examples here, you can also learn about the [OpenAI API](https://openai.com/api/) from the following resources:
+Beyond the code examples here, you can also learn about the [OpenAI API] from the following resources:
 
-* Try out GPT-3 in the [OpenAI Playground](https://beta.openai.com/playground)
-* Read about the API in the [OpenAI Documentation](https://beta.openai.com/docs/introduction)
-* Discuss the API in the [OpenAI Community Forum](https://community.openai.com/top?period=monthly)
-* Look for help in the [OpenAI Help Center](https://help.openai.com/en/)
-* See example prompts in the [OpenAI Examples](https://beta.openai.com/examples)
+* Try out GPT-3 in the [OpenAI Playground]
+* Read about the API in the [OpenAI Documentation]
+* Discuss the API in the [OpenAI Community Forum]
+* Look for help in the [OpenAI Help Center]
+* See example prompts in the [OpenAI Examples]
 
 ## Examples, organized by capability
 
@@ -87,7 +87,7 @@ Beyond the code examples here, you can also learn about the [OpenAI API](https:/
 
 ## How large language models work
 
-[Large language models](https://openai.com/blog/better-language-models/) are functions that map text to text. Given an input string of text, a large language model tries to predict the text that will come next.
+[Large language models][Large language models Blog Post] are functions that map text to text. Given an input string of text, a large language model tries to predict the text that will come next.
 
 The magic of large language models is that by being trained to minimize this prediction error over vast quantities of text, the models end up learning concepts useful for these predictions. For example, they learn concepts like:
 
@@ -102,7 +102,7 @@ The magic of large language models is that by being trained to minimize this pre
 
 None of these capabilities are explicitly programmed in - they all emerge as a result of training.
 
-GPT-3's capabilities now power [hundreds of different software products](https://openai.com/blog/gpt-3-apps/), including productivity apps, education apps, games, and more.
+GPT-3's capabilities now power [hundreds of different software products][GPT3 Apps Blog Post], including productivity apps, education apps, games, and more.
 
 ## How to control a large language model
 
@@ -182,7 +182,7 @@ Output:
 
 ### Fine-tuned prompt example
 
-With enough training examples, you can [fine-tune](https://beta.openai.com/docs/guides/fine-tuning) a custom model. In this case, instructions become unnecessary, as the model can learn the task from the training data provided. However, it can be helpful to include separator sequences (e.g., `->` or `###` or any string that doesn't commonly appear in your inputs) to tell the model when the prompt has ended and the output should begin. Without separator sequences, there is a risk that the model continues elaborating on the input text rather than starting on the answer you want to see.
+With enough training examples, you can [fine-tune][Fine Tuning Docs] a custom model. In this case, instructions become unnecessary, as the model can learn the task from the training data provided. However, it can be helpful to include separator sequences (e.g., `->` or `###` or any string that doesn't commonly appear in your inputs) to tell the model when the prompt has ended and the output should begin. Without separator sequences, there is a risk that the model continues elaborating on the input text rather than starting on the answer you want to see.
 
 Example fine-tuned prompt (for a model that has been custom trained on similar prompt-completion pairs):
 
@@ -203,7 +203,7 @@ Output:
 
 ### More prompt advice
 
-For more prompt examples, visit [OpenAI Examples](https://beta.openai.com/examples).
+For more prompt examples, visit [OpenAI Examples][OpenAI Examples].
 
 In general, the input prompt is the best lever for improving model outputs. You can try tricks like:
 
@@ -360,7 +360,7 @@ People & titles: William Baxter (Assistant Attorney General), Charles L. Brown (
 
 ### 3. Edit text
 
-In addition to the [completion API endpoint](https://beta.openai.com/docs/api-reference/completions), OpenAI now offers an [edit API endpoint](https://beta.openai.com/docs/api-reference/edits) ([blog post](https://openai.com/blog/gpt-3-edit-insert/)). In contrast to completions, which only take a single text input, edits take two text inputs: the instruction and the text to be modified.
+In addition to the [completion API endpoint][Completion API Docs], OpenAI now offers an [edit API endpoint][Edit API Docs] ([blog post][GPT3 Edit Blog Post]). In contrast to completions, which only take a single text input, edits take two text inputs: the instruction and the text to be modified.
 
 An example edit prompt:
 
@@ -435,7 +435,7 @@ When it comes to translation, large language models particularly shine at combin
 
 ### 4. Compare text
 
-The [OpenAI API embeddings endpoint](https://beta.openai.com/docs/guides/embeddings) can be used to measure similarity between pieces of text ([blog post](https://openai.com/blog/introducing-text-and-code-embeddings/)). By leveraging GPT-3's understanding of text, these embeddings [achieved state-of-the-art results](https://arxiv.org/abs/2201.10005) on benchmarks in both unsupervised learning and transfer learning settings.
+The [OpenAI API embeddings endpoint][Embeddings Docs] can be used to measure similarity between pieces of text ([blog post][Embeddings Blog Post]). By leveraging GPT-3's understanding of text, these embeddings [achieved state-of-the-art results](https://arxiv.org/abs/2201.10005) on benchmarks in both unsupervised learning and transfer learning settings.
 
 Embeddings can be used for semantic search, recommendations, cluster analysis, near-duplicate detection, and more.
 
@@ -476,11 +476,11 @@ In the following notebook, we provide an example method for customizing your emb
 
 ## Code Capabilities
 
-Large language models aren't only great at text - they can be great at code too. OpenAI's specialized code model is called [Codex](https://openai.com/blog/openai-codex/).
+Large language models aren't only great at text - they can be great at code too. OpenAI's specialized code model is called [Codex].
 
-Codex powers [more than 70 products](https://openai.com/blog/codex-apps/), including:
+Codex powers [more than 70 products][Codex Apps Blog Post], including:
 
-* [GitHub Copilot](https://copilot.github.com/) (autocompletes code in VS Code and other IDEs)
+* [GitHub Copilot] (autocompletes code in VS Code and other IDEs)
 * [Pygma](https://pygma.app/) (turns Figma designs into code)
 * [Replit](https://replit.com/) (has an 'Explain code' button and other features)
 * [Warp](https://www.warp.dev/) (a smart terminal with AI command search)
@@ -618,9 +618,9 @@ As you can see, `code-davinci-edit-001` was able to successfully reduce the func
 
 The OpenAI API also features code search embeddings, which can measure the relevance of a section of code to a text query, or the similarity between two sections of code.
 
-OpenAI code search embeddings significantly improved the state-of-the-art on the [CodeSearchNet](https://github.com/github/CodeSearchNet) evaluation suite, scoring 93.5% versus the previous record of 77.4%.
+OpenAI code search embeddings significantly improved the state-of-the-art on the [CodeSearchNet] evaluation suite, scoring 93.5% versus the previous record of 77.4%.
 
-Read more about OpenAI's code embeddings in the [blog post announcement](https://openai.com/blog/introducing-text-and-code-embeddings/) or [documentation](https://beta.openai.com/docs/guides/embeddings).
+Read more about OpenAI's code embeddings in the [blog post announcement][Embeddings Blog Post] or [documentation][Embeddings Docs].
 
 Code embeddings can be useful for use cases such as:
 
@@ -630,3 +630,24 @@ Code embeddings can be useful for use cases such as:
 An example of code search is shown in [Code_search.ipynb](examples/Code_search.ipynb).
 
 We haven't written an example of code clustering, but the idea is the same as the text clustering in [Clustering.ipynb](examples/Clustering.ipynb).
+
+
+[OpenAI API]: https://openai.com/api/
+[Embeddings Docs]: https://beta.openai.com/docs/guides/embeddings
+[Edit API Docs]: https://beta.openai.com/docs/api-reference/edits
+[Completion API Docs]: https://beta.openai.com/docs/api-reference/completions
+[Fine Tuning Docs]: https://beta.openai.com/docs/guides/fine-tuning
+[CodeSearchNet]: https://github.com/github/CodeSearchNet
+[Embeddings Blog Post]: https://openai.com/blog/introducing-text-and-code-embeddings/
+[Codex Apps Blog Post]: https://openai.com/blog/codex-apps/
+[GPT3 Edit Blog Post]: https://openai.com/blog/gpt-3-edit-insert/
+[Large language models Blog Post]: https://openai.com/blog/better-language-models/
+[GitHub Copilot]: https://copilot.github.com/
+[Codex]: https://openai.com/blog/openai-codex/
+[API Signup]: https://beta.openai.com/signup
+[GPT3 Apps Blog Post]: https://openai.com/blog/gpt-3-apps/
+[OpenAI Playground]: https://beta.openai.com/playground
+[OpenAI Documentation]: https://beta.openai.com/docs/introduction
+[OpenAI Community Forum]: https://community.openai.com/top?period=monthly
+[OpenAI Help Center]: https://help.openai.com/en/
+[OpenAI Examples]: https://beta.openai.com/examples

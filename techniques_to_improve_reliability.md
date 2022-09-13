@@ -226,7 +226,8 @@ Question: Can I claim a federal tax credit for my Toyota Prius Prime bought in 2
 Solution:
 
 (1) For each criterion, determine whether it is met by the vehicle purchase
--```
+-
+```
 
 ```text-davinci-002
  Does the vehicle have at least four wheels? Let's think step by step. The Toyota Prius Prime has four wheels, so the answer is yes.

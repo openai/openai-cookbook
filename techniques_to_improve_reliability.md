@@ -226,11 +226,11 @@ Question: Can I claim a federal tax credit for my Toyota Prius Prime bought in 2
 Solution:
 
 (1) For each criterion, determine whether it is met by the vehicle purchase
--
+- Does the vehicle have at least four wheels? Let's think step by step.
 ```
 
 ```text-davinci-002
- Does the vehicle have at least four wheels? Let's think step by step. The Toyota Prius Prime has four wheels, so the answer is yes.
+ The Toyota Prius Prime has four wheels, so the answer is yes.
 - Does the vehicle weigh less than 14,000 pounds? Let's think step by step. The Toyota Prius Prime weighs less than 14,000 pounds, so the answer is yes.
 - Does the vehicle draw energy from a battery with at least 4 kilowatt hours that may be recharged from an external source? Let's think step by step. The Toyota Prius Prime has a battery with at least 4 kilowatt hours that may be recharged from an external source, so the answer is yes.
 - Was the vehicle purchased in a year before 2022? Let's think step by step. The Toyota Prius Prime was purchased in 2021, which is before 2022, so the answer is yes.

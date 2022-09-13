@@ -44,7 +44,7 @@ Of course, it's hard to tell from only a single example whether this `Let's thin
 
 ## Model capabilities depend on context
 
-One of biggest conceptual mistakes you can make when learning to work with GPT-3 is to believe that its capabilities are fixed across all contexts. E.g., if GPT-3 gets a simple logic question wrong, then it must be incapable of simple logic.
+When learning to work with GPT-3, one common conceptual mistake is to believe that its capabilities are fixed across all contexts. E.g., if GPT-3 gets a simple logic question wrong, then it must be incapable of simple logic.
 
 But as the `Let's think step by step` example illustrates, apparent failures of GPT-3 can sometimes be remedied with a better prompt that helps the model steer itself toward the correct output.
 
@@ -52,10 +52,11 @@ But as the `Let's think step by step` example illustrates, apparent failures of 
 
 The rest of this article shares techniques for improving reliability of large language models on complex tasks. Although some of the techniques are specific to certain types of problems, many of them are built upon general principles that can be applied to a wide range of tasks, e.g.:
 
+- Give clearer instructions
 - Split complex tasks into simpler subtasks
 - Structure the instruction to keep the model on task
 - Prompt the model to explain before answering
-- Ask for justifiations of many possible answers, and then synthesize
+- Ask for justifications of many possible answers, and then synthesize
 - Generate many outputs, and then use the model to pick the best one
 - Fine-tune custom models to maximize performance
 
@@ -133,6 +134,44 @@ Clue 3 and Clue 5 both say that the person with the candlestick was in the obser
  
 By giving the model more time and space to think, and guiding it along a reasoning plan, it's able to figure out the correct answer of (a) Yes.
 
+Another benefit of splitting complex instructions into smaller subtasks is that it can help keep the model focused on each subtask.
+
+For example, if we ask `text-davinci-002` to summarize a text in its original language, the model can lapse back into English:
+
+```text-davinci-002
+Summarize the text using the original language of the text. The summary should be one sentence long.
+
+Text:
+"""
+La estadística (la forma femenina del término alemán Statistik, derivado a su vez del italiano statista, "hombre de Estado")​ es una ciencia que estudia la variabilidad, colección, organización, análisis, interpretación, y presentación de los datos, así como el proceso aleatorio que los genera siguiendo las leyes de la probabilidad.​ La estadística es una ciencia formal deductiva, con un conocimiento propio, dinámico y en continuo desarrollo obtenido a través del método científico formal. En ocasiones, las ciencias fácticas necesitan utilizar técnicas estadísticas durante su proceso de investigación factual, con el fin de obtener nuevos conocimientos basados en la experimentación y en la observación. En estos casos, la aplicación de la estadística permite el análisis de datos provenientes de una muestra representativa, que busca explicar las correlaciones y dependencias de un fenómeno físico o natural, de ocurrencia en forma aleatoria o condicional.
+"""
+
+Summary:
+```
+
+```text-davinci-002
+The text explains that statistics is a science that studies the variability, collection, organization, analysis, interpretation, and presentation of data, as well as the random process that generates them following the laws of probability.
+ ```
+
+ However, if we first ask the model to identify the language of the text, and then summarize the text, it becomes more reliable:
+
+```text-davinci-002
+First, identify the language of the text. Second, summarize the text using the original language of the text. The summary should be one sentence long.
+
+Text:
+"""
+La estadística (la forma femenina del término alemán Statistik, derivado a su vez del italiano statista, "hombre de Estado")​ es una ciencia que estudia la variabilidad, colección, organización, análisis, interpretación, y presentación de los datos, así como el proceso aleatorio que los genera siguiendo las leyes de la probabilidad.​ La estadística es una ciencia formal deductiva, con un conocimiento propio, dinámico y en continuo desarrollo obtenido a través del método científico formal. En ocasiones, las ciencias fácticas necesitan utilizar técnicas estadísticas durante su proceso de investigación factual, con el fin de obtener nuevos conocimientos basados en la experimentación y en la observación. En estos casos, la aplicación de la estadística permite el análisis de datos provenientes de una muestra representativa, que busca explicar las correlaciones y dependencias de un fenómeno físico o natural, de ocurrencia en forma aleatoria o condicional.
+"""
+
+Language:
+```
+
+```text-davinci-002
+Spanish
+
+La estadística es una ciencia que estudia la variabilidad, colección, organización, análisis, interpretación, y presentación de los datos, así como el proceso aleatorio que los genera siguiendo las leyes de la probabilidad.
+```
+
 ## Prompt the model to explain before answering
 
 Another powerful technique for improving the reliability of answers is to prompt the model to gradually reason out the answer rather than jumping immediately to the final answer. By 'thinking aloud' the model can be far more likely to arrive at the correct answer.
@@ -155,12 +194,52 @@ Applying this simple trick to the MultiArith math dataset, the authors found `Le
 
 #### Implications
 
-Although this trick works well on math problems, it's not effective for all tasks. The authors found that it was most helpful for multi-step arithmetic problems, symbolic reasoning problems, strategy problems, and other reasoning problems. It didn't help with simple math problems or common sense questions, and presumably wouldn't help with many other non-reasoning tasks either.
+Although the `Let's think step by step` trick works well on math problems, it's not effective on all tasks. The authors found that it was most helpful for multi-step arithmetic problems, symbolic reasoning problems, strategy problems, and other reasoning problems. It didn't help with simple math problems or common sense questions, and presumably wouldn't help with many other non-reasoning tasks either.
 
 [![zero-shot reasoning example](images/zero-shot_reasoners_tab1.png)
 <br>Source: *Large Language Models are Zero-Shot Reasoners* by Takeshi Kojima et al. (2022).](https://arxiv.org/abs/2205.11916)
 
 To learn more, read the [full paper](https://arxiv.org/abs/2205.11916).
+
+If you apply this technique to your own tasks, don't be afraid to experiment with customizing the instruction. `Let's think step by step` is rather generic, so you may find better performance with instructions that hew to a stricter format customized to your use case. For example, if you were  you can try more structured variants like `First, think step by step about why X might be true. Second, think step by step about why Y might be true. Third, think step by step about whether X or Y makes more sense.`. And you can even give the model an example format to help keep it on track, e.g.:
+
+```text-davinci-002
+Using the IRS guidance below, answer the following questions using this format:
+(1) For each criterion, determine whether it is met by the vehicle purchase
+- {Criterion} Let's think step by step. {explanation} {yes or no, or if the question does not apply then N/A}.
+(2) After considering each criterion in turn, phrase the final answer as "Because of {reasons}, the answer is likely {yes or no}."
+
+IRS guidance:
+"""
+You may be eligible for a federal tax credit under Section 30D if you purchased a car or truck that meets the following criteria:
+- Does the vehicle have at least four wheels?
+- Does the vehicle weigh less than 14,000 pounds?
+- Does the vehicle draw energy from a battery with at least 4 kilowatt hours that may be recharged from an external source?
+- Was the vehicle purchased in a year before 2022?
+  - If so, has the manufacturer sold less than 200,000 qualifying vehicles? (Tesla and GM have sold more than 200,000 qualifying vehicles.)
+- Was the vehicle purchased in a year after 2022?
+  - If so, is the vehicle present in the following list of North American-assembled vehicles? (The only electric vehicles assembled in North America are the Audi Q5, BMW 330e, BMW X5, Chevrolet Bolt EUV, Chevrolet Bolt EV, Chrysler Pacifica PHEV, Ford Escape PHEV, Ford F Series, Ford Mustang MACH E, Ford Transit Van, GMC Hummer Pickup, GMC Hummer SUV, Jeep Grand Cherokee PHEV, Jeep Wrangler PHEV, Lincoln Aviator PHEV, Lincoln Corsair Plug-in, Lucid Air, Nissan Leaf, Rivian EDV, Rivian R1S, Rivian R1T, Tesla Model 3, Tesla Model S, Tesla Model X, Tesla Model Y, Volvo S60, BMW 330e, Bolt EV, Cadillac Lyriq, Mercedes EQS SUV, and Nissan Leaf.)
+"""
+
+Question: Can I claim a federal tax credit for my Toyota Prius Prime bought in 2021?
+
+Solution:
+
+(1) For each criterion, determine whether it is met by the vehicle purchase
+-```
+
+```text-davinci-002
+ Does the vehicle have at least four wheels? Let's think step by step. The Toyota Prius Prime has four wheels, so the answer is yes.
+- Does the vehicle weigh less than 14,000 pounds? Let's think step by step. The Toyota Prius Prime weighs less than 14,000 pounds, so the answer is yes.
+- Does the vehicle draw energy from a battery with at least 4 kilowatt hours that may be recharged from an external source? Let's think step by step. The Toyota Prius Prime has a battery with at least 4 kilowatt hours that may be recharged from an external source, so the answer is yes.
+- Was the vehicle purchased in a year before 2022? Let's think step by step. The Toyota Prius Prime was purchased in 2021, which is before 2022, so the answer is yes.
+- Was the vehicle purchased in a year after 2022? N/A
+- If so, is the vehicle present in the following list of North American-assembled vehicles? N/A
+
+(2) After considering each criterion in turn, phrase the final answer as "Because of {reasons}, the answer is likely {yes or no}."
+
+Because the Toyota Prius Prime meets all of the criteria for a federal tax credit, the answer is likely yes.
+```
 
 ### Few-shot examples
 
@@ -190,9 +269,11 @@ In addition to math problems, chain of thought prompting also lifted performance
 [![chain of thought example](images/chain_of_thought_fig11.png)
 <br>Source: *Chain of Thought Prompting Elicits Reasoning in Large Language Models* Jason Wei and Denny Zhou et al. (2022)](https://ai.googleblog.com/2022/05/language-models-perform-reasoning-via.html)
 
+To learn more, read the [full paper](https://arxiv.org/abs/2201.11903).
+
 #### Implications
 
-To learn more, read the [full paper](https://arxiv.org/abs/2201.11903).
+One advantage of the few-shot example-based approach relative to the `Let's think step by step` technique is that you can more easily specify the format, length, and style of reasoning that you want the model to perform before landing on its final answer. This can be be particularly helpful in cases where the model isn't initially reasoning in the right way or depth.
 
 ### Fine-tuned
 
@@ -214,9 +295,11 @@ When the authors applied this technique to a Common Sense Q&A dataset, they foun
 [![STaR results](images/star_tab1.png)
 <br>Source: *STaR: Bootstrapping Reasoning With Reasoning* by Eric Zelikman and Yujuai Wu et al. (2022)](https://arxiv.org/abs/2203.14465)
 
+To learn more, read the [full paper](https://arxiv.org/abs/2203.14465).
+
 #### Implications
 
-To learn more, read the [full paper](https://arxiv.org/abs/2203.14465).
+Using a few-shot prompt to extend or modify a fine-tuning dataset is an idea that can be generalized beyond explanation writing. For example, if you have large quantities of unstructured text that you want to train on, you may find opportunities to use a prompt to extract a structured dataset from your unstructured text, and then fine-tune a custom model on that structured dataset.
 
 ## Extensions to chain-of-thought prompting
 
@@ -301,7 +384,7 @@ This paper illustrates a number of helpful lessons for improving the reliability
 
 - Split complex tasks into smaller, more reliable subtasks
 - Generate your answer in a step-by-step fashion, evaluating it along the way
-- Generate many possible answers and use a value function to pick the ones that look best
+- Generate many possible answers and use another model or function to pick the ones that look best
 - Reduce hallucination by constraining what the model can say (e.g., by using sentence labels instead of sentences)
 - Maximize performance of models by fine-tuning them on specialized tasks
 
@@ -320,7 +403,7 @@ Least-to-most prompting is another technique that splits up reasoning tasks into
 
 #### Results
 
-When applied to benchmarks involving long reasoning chains using `code-davinci-002` , the authors measured gains as large as 16% -> 99.7%!
+When applied to benchmarks involving long reasoning chains using `code-davinci-002` (which is optimized for code but can still understand text), the authors measured gains as large as 16% -> 99.7%!
 
 [
 ![Least-to-most prompting results on last-letter-concatenation task](images/least-to-most_tab4.png)
@@ -372,7 +455,7 @@ The method is complicated, and works as follows:
 
 #### Implications
 
-Beyond the complexity, one limitation of this method is that it only appears to apply to questions that can be posed in multiple-choice.
+Beyond the complexity, one limitation of this method is that it appears to only apply to questions that can be posed as multiple-choice.
 
 To learn more, read the [full paper](https://arxiv.org/abs/2205.11822).
 
@@ -398,7 +481,7 @@ This technique lifted accuracies by anywhere from 1 to 24 percentage points on a
 
 Although this technique is simple to implement, it can be costly. Generating a set of 10 answers will increase your costs by 10x.
 
-Also, as with many of these techniques, it applies only to tasks with a limited set of answers. For open-ended tasks where each answer is unique (such as writing a poem), it's not obvious what it would mean to to pick the most common answer.
+Also, as with many of these techniques, it applies only to tasks with a limited set of answers. For open-ended tasks where each answer is unique (such as writing a poem), it's not obvious what it would mean to pick the most common answer.
 
 Lastly, this technique ought to be most beneficial when there are multiple paths or phrasings to reach an answer; if there's only one path, then the technique may not help at all. An extreme example: If the task was to generate a single token answer, then taking the most common token from 100 generations would be no different than taking the token with the highest logprobs (which you can get with a single generation at temperature=0).
 
@@ -408,7 +491,7 @@ Another key technique for improving task performance is to train a verifier or d
 
 #### Method
 
-In 2021, OpenAI researchers applied this technique to gradeschool math problems, using the following procedure:
+In 2021, OpenAI researchers applied this technique to grade school math problems, using the following procedure:
 
 - First, they fine-tuned a model on questions and solutions
 - For each problem in the training set, they generated 100 solutions
@@ -428,14 +511,14 @@ With a 175B GPT-3 model and 8,000 training examples, this technique substantiall
 
 #### Implications
 
-Like the self-consistency technique, this method can potentially get expensive, as generating 100 solutions per task will roughly increase your costs by 100x.
+Similar to the self-consistency technique, this method can get expensive, as generating, say, 100 solutions per task will increase your costs by roughly ~100x.
 
 ## Theories of reliability
 
 Although the techniques above vary in their approach, they all share the goal of improving reliability on complex tasks. Mainly they do this by:
 
 - decomposing unreliable operations into smaller, more reliable operations (e.g., selection-inference prompting)
-- using multiple steps or multiple relationships to make the system's reliablity greater than any individual component (e.g., maieutic prompting)
+- using multiple steps or multiple relationships to make the system's reliability greater than any individual component (e.g., maieutic prompting)
 
 ### Probabilistic graphical models
 
@@ -465,11 +548,16 @@ In the paper *Language Model Cascades*, David Dohan et al. interpret the above t
 
 #### Implications
 
-Although formulating these techniques as probabalistic graphical models may not be immediately useful for solving any particular problem, the framework may be helpful in selecting, combining, and discovering techniques.
+Although formulating these techniques as probabilistic graphical models may not be immediately useful for solving any particular problem, the framework may be helpful in selecting, combining, and discovering new techniques.
+
+## Closing thoughts
+
+Research into large language models is very active and evolving rapidly. Not only do researchers continue to improve the models, they are also continue to improve our understanding of how to best employ the models. To underscore the pace of these developments, note that all of the papers shared above were published within the past 12 months (as I write in Sep 2022).
+
+In the future, expect better models and better techniques to be published. Even if the specific techniques here are eclipsed by future best practices, the general principles behind them will likely remain a key part of any expert user's toolkit.
 
 ## Bibliography
 
-A summary of the techniques discussed above:
 | Lesson                                                                                                                         | Paper                                                                                                                                     | Date     |
 |--------------------------------------------------------------------------------------------------------------------------------|-------------------------------------------------------------------------------------------------------------------------------------------|----------|
 | Break complex tasks into simpler subtasks (and consider exposing the intermediate outputs to users)                            | [AI Chains: Transparent and Controllable Human-AI Interaction by Chaining Large Language Model Prompts](https://arxiv.org/abs/2110.01691) | 2021 Oct |

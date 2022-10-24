@@ -1,3 +1,9 @@
+"""
+Note: To answer questions based on text documents, we recommend the procedure in 
+[Question Answering using Embeddings](https://github.com/openai/openai-cookbook/blob/main/examples/Question_answering_using_embeddings.ipynb).
+Some of the code below may rely on [deprecated API endpoints](https://github.com/openai/openai-cookbook/tree/main/transition_guides_for_deprecated_API_endpoints).
+"""
+
 import argparse
 
 import openai

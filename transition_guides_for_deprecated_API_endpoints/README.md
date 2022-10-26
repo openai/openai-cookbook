@@ -34,7 +34,7 @@ We've written guides and code examples for transitioning from the deprecated API
 [Guide: How to transition off the Classifications endpoint](https://help.openai.com/en/articles/6272941-classifications-transition-guide)
 
 * Option 1: transition to fine-tuning **(recommended)**
-  * Example code: [Classification.ipynb](../examples/Classification.ipynb)
+  * Example code: [Fine-tuned_classification.ipynb](../examples/Fine-tuned_classification.ipynb)
 * Option 2: transition to embeddings
   * Example code: [Semantic_text_search_using_embeddings.ipynb](../examples/Semantic_text_search_using_embeddings.ipynb)
 * Option 3: reimplement Classifications endpoint functionality

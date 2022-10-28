@@ -133,7 +133,7 @@ def classifications(
     {{ an optional instruction }}
 
     Text: example 1 text
-    Category: example 2 label
+    Category: example 1 label
     ---
     Text: example 1 text
     Category: example 2 label

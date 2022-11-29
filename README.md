@@ -120,7 +120,7 @@ An example of each is shown below.
 
 ### Instruction prompts
 
-Instruction-following models (e.g., `text-davinci-002` or any model beginning with `text-`) are specially designed to follow instructions. Write your instruction at the top of the prompt (or at the bottom, or both), and the model will do its best to follow the instruction and then stop. Instructions can be detailed, so don't be afraid to write a paragraph explicitly detailing the output you want.
+Instruction-following models (e.g., `text-davinci-003` or any model beginning with `text-`) are specially designed to follow instructions. Write your instruction at the top of the prompt (or at the bottom, or both), and the model will do its best to follow the instruction and then stop. Instructions can be detailed, so don't be afraid to write a paragraph explicitly detailing the output you want.
 
 Example instruction prompt:
 
@@ -253,7 +253,7 @@ In general, writing can work with any style of prompt. Experiment to see what wo
 
 |                                                            | Advantages                                                                    | Disadvantages                                                                    |
 | ---------------------------------------------------------- | ----------------------------------------------------------------------------- | -------------------------------------------------------------------------------- |
-| Instruction-following models<br>(e.g., `text-davinci-002`) | Easiest to use                                                                | Less creative; less diverse; harder to control tone, length, etc.                |
+| Instruction-following models<br>(e.g., `text-davinci-003`) | Easiest to use                                                                | Less creative; less diverse; harder to control tone, length, etc.                |
 | Base models<br>(e.g., `davinci`)                           | More creative                                                                 | More expensive (as including examples demonstrations in prompt will cost tokens) |
 | Fine-tuned models                                          | Can train off of many examples; cheaper than including examples in the prompt | Hard to gather training data; training makes iteration slower and more expensive |
 
@@ -301,7 +301,7 @@ Output:
  One
  ```
 
-If the text you wish to ask about is longer than the token limit (~4,000 tokens for `text-davinci-002` and ~2,000 tokens for earlier models), we recommending splitting the text into smaller pieces, ranking them by relevance, and then asking the most-relevant-looking pieces.
+If the text you wish to ask about is longer than the token limit (~4,000 tokens for `text-davinci-003` and ~2,000 tokens for earlier models), we recommending splitting the text into smaller pieces, ranking them by relevance, and then asking the most-relevant-looking pieces.
 
 #### Summarization
 
@@ -486,7 +486,7 @@ Codex powers [more than 70 products][Codex Apps Blog Post], including:
 * [Warp](https://www.warp.dev/) (a smart terminal with AI command search)
 * [Machinet](https://machinet.net/) (writes Java unit test templates)
 
-Note that unlike instruction-following text models (e.g., `text-davinci-002`), Codex is *not* trained to follow instructions. As a result, designing good prompts can take more care.
+Note that unlike instruction-following text models (e.g., `text-davinci-003`), Codex is *not* trained to follow instructions. As a result, designing good prompts can take more care.
 
 ### 1. Write code
 

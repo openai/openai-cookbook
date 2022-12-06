@@ -35,7 +35,7 @@ def get_score(context, query, log_probs, text_offsets) -> float:
 
 def search(query, documents, engine):
 
-    prompts = [construct_context(query, doc) for doc in [""] + docs]
+    prompts = [construct_context(query, doc) for doc in [""] + documents]
 
     resps = openai.Completion.create(
         model=engine,

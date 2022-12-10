@@ -450,7 +450,7 @@ The simplest way to use embeddings for search is as follows:
   * Embed each chunk using a 'doc' model (e.g., `text-search-curie-doc-001`)
   * Store those embeddings in your own database or in a vector search provider like [Pinecone](https://www.pinecone.io) or [Weaviate](https://weaviate.io)
 * At the time of the search (live compute):
-  * Embed the search query using the correponding 'query' model (e.g. `text-search-curie-query-001`)
+  * Embed the search query using the corresponding 'query' model (e.g. `text-search-curie-query-001`)
   * Find the closest embeddings in your database
   * Return the top results, ranked by cosine similarity
 
@@ -470,7 +470,7 @@ Similar to search, these cosine similarity scores can either be used on their ow
 
 Although OpenAI's embedding model weights cannot be fine-tuned, you can still use training data to customize embeddings to your application.
 
-In the following notebook, we provide an example method for customizing your embeddings using training data. The idea of the method is to train a custom matrix to multiply embedding vectors by in order to get new customized embeddings. With good training data, this custom matrix will highlight the features relevant to your training labels and suppress the rest. You can equivalently consider the matrix mulitplication as (a) a modification of the embeddings or (b) a modification of the distance function used to measure the distances between embeddings.
+In the following notebook, we provide an example method for customizing your embeddings using training data. The idea of the method is to train a custom matrix to multiply embedding vectors by in order to get new customized embeddings. With good training data, this custom matrix will highlight the features relevant to your training labels and suppress the rest. You can equivalently consider the matrix multiplication as (a) a modification of the embeddings or (b) a modification of the distance function used to measure the distances between embeddings.
 
 * [Customizing_embeddings.ipynb](examples/Customizing_embeddings.ipynb)
 
@@ -523,7 +523,7 @@ Code explanation can be applied to many use cases:
 * Generating in-code documentation (e.g., Python docstrings, git commit messages)
 * Generating out-of-code documentation (e.g., man pages)
 * In an interactive code exploration tool
-* Communicating program results back to users via a natural langauge interface
+* Communicating program results back to users via a natural language interface
 
 An example prompt for explaining code with `code-davinci-002`:
 

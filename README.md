@@ -446,11 +446,11 @@ Embeddings can be used for search either by themselves or as a feature in a larg
 The simplest way to use embeddings for search is as follows:
 
 * Before the search (precompute):
-  * Split your text corpus into chunks smaller than the token limit (e.g., ~2,000 tokens)
-  * Embed each chunk using a 'doc' model (e.g., `text-search-curie-doc-001`)
+  * Split your text corpus into chunks smaller than the token limit (e.g., <8,000 tokens)
+  * Embed each chunk
   * Store those embeddings in your own database or in a vector search provider like [Pinecone](https://www.pinecone.io) or [Weaviate](https://weaviate.io)
 * At the time of the search (live compute):
-  * Embed the search query using the corresponding 'query' model (e.g. `text-search-curie-query-001`)
+  * Embed the search query
   * Find the closest embeddings in your database
   * Return the top results, ranked by cosine similarity
 
@@ -460,7 +460,7 @@ In more advanced search systems, the the cosine similarity of embeddings can be 
 
 #### Recommendations
 
-Recommendations are quite similar to search, except that instead of a free-form text query, the inputs are items in a set. And instead of using pairs of doc-query models, you can use a single symmetric similarity model (e.g., `text-similarity-curie-001`).
+Recommendations are quite similar to search, except that instead of a free-form text query, the inputs are items in a set.
 
 An example of how to use embeddings for recommendations is shown in [Recommendation_using_embeddings.ipynb](examples/Recommendation_using_embeddings.ipynb).
 

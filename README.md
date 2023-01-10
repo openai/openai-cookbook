@@ -1,12 +1,9 @@
 # OpenAI Cookbook
 
-This repository shares example code and example prompts for accomplishing common tasks with the [OpenAI API].
-
-To try these examples yourself, you’ll need an OpenAI account. [Create a free account to get started.][API Signup]
-
-Most code examples are written in Python, though the concepts can be applied in any language.
-
-In the same way that a cookbook's recipes don't span all possible meals or techniques, these examples don't span all possible use cases or methods. Use them as starting points upon which to elaborate, discover, and invent.
+- This repository shares example code and example prompts for accomplishing common tasks with the [OpenAI API].
+- To try these examples yourself, you’ll need an OpenAI account. [Create a free account to get started.][API Signup]
+- Most code examples are written in Python, though the concepts can be applied in any language.
+- In the same way that a cookbook's recipes don't span all possible meals or techniques, these examples don't span all possible use cases or methods. Use them as starting points upon which to elaborate, discover, and invent.
 
 ## Related resources
 
@@ -169,7 +166,8 @@ Quote:
 Author: N.K. Jemisin
 
 Quote:
-“Some humans theorize that intelligent species go extinct before they can expand into outer space. If they're correct, then the hush of the night sky is the silence of the graveyard.”
+“Some humans theorize that intelligent species go extinct before they can expand into outer space. 
+If they're correct, then the hush of the night sky is the silence of the graveyard.”
 ― Ted Chiang, Exhalation
 Author:
 ```
@@ -187,11 +185,11 @@ With enough training examples, you can [fine-tune][Fine Tuning Docs] a custom mo
 Example fine-tuned prompt (for a model that has been custom trained on similar prompt-completion pairs):
 
 ```text
-“Some humans theorize that intelligent species go extinct before they can expand into outer space. If they're correct, then the hush of the night sky is the silence of the graveyard.”
+“Some humans theorize that intelligent species go extinct before they can expand into outer space. 
+If they're correct, then the hush of the night sky is the silence of the graveyard.”
 ― Ted Chiang, Exhalation
 
 ###
-
 
 ```
 
@@ -461,9 +459,7 @@ In more advanced search systems, the the cosine similarity of embeddings can be 
 #### Recommendations
 
 Recommendations are quite similar to search, except that instead of a free-form text query, the inputs are items in a set.
-
 An example of how to use embeddings for recommendations is shown in [Recommendation_using_embeddings.ipynb](examples/Recommendation_using_embeddings.ipynb).
-
 Similar to search, these cosine similarity scores can either be used on their own to rank items or as features in larger ranking algorithms.
 
 #### Customizing Embeddings

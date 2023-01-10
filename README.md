@@ -139,7 +139,7 @@ Ted Chiang
 
 ### Completion prompt example
 
-Completion-style prompts take advantage of how large language models try to write text they think is mostly likely to come next. To steer the model, try beginning a pattern or sentence that will be completed by the output you want to see. Relative to direct instructions, this mode of steering large language models can take more care and experimentation. In addition, the models won't necessarily know where to stop, so you will often need stop sequences or post-processing to cut off text generated beyond the desired output.
+Completion-style prompts take advantage of how large language models try to write text they think is most likely to come next. To steer the model, try beginning a pattern or sentence that will be completed by the output you want to see. Relative to direct instructions, this mode of steering large language models can take more care and experimentation. In addition, the models won't necessarily know where to stop, so you will often need stop sequences or post-processing to cut off text generated beyond the desired output.
 
 Example completion prompt:
 
@@ -207,7 +207,7 @@ For more prompt examples, visit [OpenAI Examples][OpenAI Examples].
 
 In general, the input prompt is the best lever for improving model outputs. You can try tricks like:
 
-* **Give more explicit instructions.** E.g., if you want the output to be a comma separated list, ask it to return a comma separated list. If you want it to say "I don't know" when the it doesn't know the answer, tell it 'Say "I don't know" if you do not know the answer.'
+* **Give more explicit instructions.** E.g., if you want the output to be a comma separated list, ask it to return a comma separated list. If you want it to say "I don't know" when it doesn't know the answer, tell it 'Say "I don't know" if you do not know the answer.'
 * **Supply better examples.** If you're demonstrating examples in your prompt, make sure that your examples are diverse and high quality.
 * **Ask the model to answer as if it was an expert.** Explicitly asking the model to produce high quality output or output as if it was written by an expert can induce the model to give higher quality answers that it thinks an expert would write. E.g., "The following answer is correct, high-quality, and written by an expert."
 * **Prompt the model to write down the series of steps explaining its reasoning.** E.g., prepend your answer with something like "[Let's think step by step](https://arxiv.org/pdf/2205.11916v1.pdf)." Prompting the model to give an explanation of its reasoning before its final answer can increase the likelihood that its final answer is consistent and correct.
@@ -262,7 +262,7 @@ In general, writing can work with any style of prompt. Experiment to see what wo
 One capability of large language models is distilling information from a piece of text. This can include:
 
 * Answering questions about a piece of text, e.g.:
-  * Querying an knowledge base to help people look up things they don't know
+  * Querying a knowledge base to help people look up things they don't know
   * Querying an unfamiliar document to understand what it contains
   * Querying a document with structured questions in order to extract tags, classes, entities, etc.
 * Summarizing text, e.g.:
@@ -301,7 +301,7 @@ Output:
  One
  ```
 
-If the text you wish to ask about is longer than the token limit (~4,000 tokens for `text-davinci-003` and ~2,000 tokens for earlier models), we recommending splitting the text into smaller pieces, ranking them by relevance, and then asking the most-relevant-looking pieces.
+If the text you wish to ask about is longer than the token limit (~4,000 tokens for `text-davinci-003` and ~2,000 tokens for earlier models), we recommend splitting the text into smaller pieces, ranking them by relevance, and then asking the most-relevant-looking pieces.
 
 #### Summarization
 
@@ -423,7 +423,7 @@ Output:
 
 Tips for translation:
 
-* Performance is best on the most common languages
+* Performance is best in the most common languages
 * We've seen better performance when the instruction is given in the final language (so if translating into French, give the instruction `Traduire le texte de l'anglais au français.` rather than `Translate the following text from English to French.`)
 * Backtranslation (as described [here](https://arxiv.org/abs/2110.05448)) can also increase performance
 * Text with colons and heavy punctuation can trip up the instruction-following models, especially if the instruction is using colons (e.g., `English: {english text} French:`)
@@ -456,7 +456,7 @@ The simplest way to use embeddings for search is as follows:
 
 An example of how to use embeddings for search is shown in [Semantic_text_search_using_embeddings.ipynb](examples/Semantic_text_search_using_embeddings.ipynb).
 
-In more advanced search systems, the the cosine similarity of embeddings can be used as one feature among many in ranking search results.
+In more advanced search systems, the cosine similarity of embeddings can be used as one feature among many in ranking search results.
 
 #### Recommendations
 

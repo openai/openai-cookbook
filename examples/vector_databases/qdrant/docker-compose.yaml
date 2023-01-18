@@ -1,0 +1,8 @@
+version: '3.4'
+services:
+  qdrant:
+    image: qdrant/qdrant:v0.11.7
+    restart: on-failure
+    ports:
+      - "6333:6333"
+      - "6334:6334"

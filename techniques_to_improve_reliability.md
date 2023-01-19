@@ -349,7 +349,7 @@ First, the authors add a 'halter' model that, after each inference step, is aske
 The halter models brings a couple of advantages:
 
 - it can tell the selection-inference process to stop or keep going, as necessary.
-- if the process never halts, you'll get no answer, which is often preferrable to a hallucinated guess
+- if the process never halts, you'll get no answer, which is often preferable to a hallucinated guess
 
 [![Faithful reasoning](images/faithful-reasoning_fig3.png)
 <br>Source: *Faithful Reasoning Using Large Language Models* by Antonia Creswell et al. (2022)](https://arxiv.org/abs/2208.14271)
@@ -432,7 +432,7 @@ The method is complicated, and works as follows:
 
 - First, build a maieutic tree, where each node is a statement that could be true or false:
   - Start with a multiple-choice question or true/false statement (e.g. `War cannot have a tie`)
-  - For each possible answer to the question, use the model to generate a correponding explanation (with a prompt like `War cannot have a tie? True, because`)
+  - For each possible answer to the question, use the model to generate a corresponding explanation (with a prompt like `War cannot have a tie? True, because`)
   - Then, prompt the model with the question and the generated explanation, and ask it to produce the answer. If reversing the explanation (with a prefix like `It is wrong to say that {explanation}`) reverses the answer, then the explanation is considered 'logically integral.'
   - If an explanation is not logically integral, then repeat the above process recursively, with each explanation turned into a True or False question, and generate more explanations for each new question.
   - After all of the recursive explaining is done, you end up with a tree of explanations, where each leaf on the tree has the property that reversing the explanation reverses the model's answer.
@@ -505,7 +505,7 @@ In 2021, OpenAI researchers applied this technique to grade school math problems
 
 #### Results
 
-With a 175B GPT-3 model and 8,000 training examples, this technique substantially lifted gradeschool math accuracy from ~33% to ~55%.
+With a 175B GPT-3 model and 8,000 training examples, this technique substantially lifted grade school math accuracy from ~33% to ~55%.
 
 [![Verifier results](images/verifiers_fig5.png)
 <br>Source: *Training Verifiers to Solve Math Word Problems* by Karl Cobbe et al. (2021)](https://arxiv.org/abs/2110.14168)

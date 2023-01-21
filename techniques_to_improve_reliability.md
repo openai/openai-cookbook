@@ -92,13 +92,13 @@ Although clues 3 and 5 establish that Colonel Mustard was the only person in the
  
 However, instead of asking for the answer directly, we can split the task into three pieces:
  
-- First, go through the clues one by one and and consider whether the clue is potentially relevant
+- First, go through the clues one by one and consider whether the clue is potentially relevant
 - Second, combine the relevant clues to reason out the answer to the question
 - Third, write the final answer: either (a), (b), or (c)
  
 ```text-davinci-002
 Use the following clues to answer the following multiple-choice question, using the following procedure:
-(1) First, go through the clues one by one and and consider whether the clue is potentially relevant
+(1) First, go through the clues one by one and consider whether the clue is potentially relevant
 (2) Second, combine the relevant clues to reason out the answer to the question
 (3) Third, map the answer to one of the multiple choice answers: either (a), (b), or (c)
  
@@ -115,7 +115,7 @@ Question: Was Colonel Mustard in the observatory with the candlestick?
 (c) Unknown; there is not enough information to determine whether Colonel Mustard was in the observatory with the candlestick
  
 Solution:
-(1) First, go through the clues one by one and and consider whether the clue is potentially relevant:
+(1) First, go through the clues one by one and consider whether the clue is potentially relevant:
 ```
  
 ```text-davinci-002

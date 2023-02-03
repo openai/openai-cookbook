@@ -135,7 +135,7 @@ def crawl(url):
         print(url) # for debugging and to see the progress
 
         # Save text from the url to a <url>.txt file
-        with open('text/'+local_domain+'/'+url[8:].replace("/", "_") + ".txt", "w") as f:
+        with open('text/'+local_domain+'/'+url[8:].replace("/", "_") + ".txt", "w", encoding="utf-8") as f:
 
             # Get the text from the URL using BeautifulSoup
             soup = BeautifulSoup(requests.get(url).text, "html.parser")
@@ -181,7 +181,7 @@ texts=[]
 for file in os.listdir("text/" + domain + "/"):
 
     # Open the file and read the text
-    with open("text/" + domain + "/" + file, "r") as f:
+    with open("text/" + domain + "/" + file, "r", encoding="utf-8") as f:
         text = f.read()
 
         # Omit the first 11 lines and the last 4 lines, then replace -, _, and #update with spaces.

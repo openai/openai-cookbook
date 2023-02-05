@@ -136,7 +136,7 @@ For more prompt examples, visit [OpenAI Examples][OpenAI Examples].
 
 In general, the input prompt is the best lever for improving model outputs. You can try tricks like:
 
-* **Give more explicit instructions.** E.g., if you want the output to be a comma separated list, ask it to return a comma separated list. If you want it to say "I don't know" when the it doesn't know the answer, tell it 'Say "I don't know" if you do not know the answer.'
+* **Give more explicit instructions.** E.g., if you want the output to be a comma separated list, ask it to return a comma separated list. If you want it to say "I don't know" when it doesn't know the answer, tell it 'Say "I don't know" if you do not know the answer.'
 * **Supply better examples.** If you're demonstrating examples in your prompt, make sure that your examples are diverse and high quality.
 * **Ask the model to answer as if it was an expert.** Explicitly asking the model to produce high quality output or output as if it was written by an expert can induce the model to give higher quality answers that it thinks an expert would write. E.g., "The following answer is correct, high-quality, and written by an expert."
 * **Prompt the model to write down the series of steps explaining its reasoning.** E.g., prepend your answer with something like "[Let's think step by step](https://arxiv.org/pdf/2205.11916v1.pdf)." Prompting the model to give an explanation of its reasoning before its final answer can increase the likelihood that its final answer is consistent and correct.

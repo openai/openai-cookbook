@@ -1,0 +1,10 @@
+#!/bin/bash
+set -e
+
+echo "Starting Python server..."
+
+pip3 install virtualenv
+python3 -m virtualenv venv
+source venv/bin/activate
+pip3 install -r requirements.txt
+OPENAI_API_KEY=$1 python3 app.py

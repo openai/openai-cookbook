@@ -7,8 +7,6 @@ tokenizer = GPT2TokenizerFast.from_pretrained("gpt2")
 docs = ["test1", "asdklgjnasdv", "banana", "lord lollipop"]
 query = "apple orang asdansbdausd"
 
-print(openai.Search.create(model="davinci", query=query, documents=docs))
-
 
 def construct_context(query, document):
     return "<|endoftext|>{document}\n\n---\n\nThe above passage is related to: {query}".format(

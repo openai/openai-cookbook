@@ -88,6 +88,15 @@ RediSearch has a distributed cluster version that scales to billions of document
 
 See [RediSearch on Redis Enterprise](https://redis.com/modules/redisearch/) for more information.
 
+### Examples
+
+- [Product Search](https://github.com/RedisVentures/redis-product-search) - eCommerce product search (with image and text)
+- [Product Recommendations with DocArray / Jina](https://github.com/jina-ai/product-recommendation-redis-docarray) - Content-based product recommendations example with Redis and DocArray.
+- [Redis VSS in RecSys](https://github.com/RedisVentures/Redis-Recsys) - 3 end-to-end Redis & NVIDIA Merlin Recommendation System Architectures.
+- [Azure OpenAI Embeddings Q&A](https://github.com/ruoccofabrizio/azure-open-ai-embeddings-qna) - OpenAI and Redis as a Q&A service on Azure.
+- [ArXiv Paper Search](https://github.com/RedisVentures/redis-arXiv-search) - Semantic search over arXiv scholarly papers
+
+
 ### More Resources
 
 For more information on how to use Redis as a vector database, check out the following resources:

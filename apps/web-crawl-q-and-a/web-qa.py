@@ -281,6 +281,9 @@ df.n_tokens.hist()
 ### Step 10
 ################################################################################
 
+# Note that you may run into rate limit issues depending on how many files you try to embed
+# Please check out our rate limit guide to learn more on how to handle this: https://platform.openai.com/docs/guides/rate-limits
+
 df['embeddings'] = df.text.apply(lambda x: openai.Embedding.create(input=x, engine='text-embedding-ada-002')['data'][0]['embedding'])
 df.to_csv('processed/embeddings.csv')
 df.head()

@@ -108,14 +108,11 @@ function FileQandAArea(props: FileQandAAreaProps) {
           className="mb-8"
         >
           {/* answer from files */}
-          {answer && (
+          {answer ? (
             <div className="">
               <ReactMarkdown className="prose" linkTarget="_blank">
                 {answer}
               </ReactMarkdown>
-            </div>
-          )}
-
           <Transition
             show={
               props.files.filter((file) =>
@@ -138,6 +135,12 @@ function FileQandAArea(props: FileQandAAreaProps) {
               listExpanded={true}
             />
           </Transition>
+            </div>
+          ) : (
+            <div className="">
+               I did not receive an answer!
+            </div>
+          )}
         </Transition>
       </div>
     </div>

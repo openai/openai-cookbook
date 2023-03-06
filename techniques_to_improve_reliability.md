@@ -330,9 +330,9 @@ To learn more, read the [full paper](https://arxiv.org/abs/2205.09712).
 
 A few months after publishing the selection-inference prompting technique, the authors extended the technique in a follow-up paper, with ideas for:
 
-- figuring out when the selection-inference cycle should stop or continue
-- adding a value function to help search over multiple reasoning paths
-- reducing hallucination of fake facts by fine-tuning a model to reason about sentence labels (e.g., sen1) rather than writing out the sentences themselves
+- Figuring out when the selection-inference cycle should stop or continue
+- Adding a value function to help search over multiple reasoning paths
+- Reducing hallucination of fake facts by fine-tuning a model to reason about sentence labels (e.g., sen1) rather than writing out the sentences themselves
 
 #### Method
 
@@ -344,8 +344,8 @@ First, the authors add a 'halter' model that, after each inference step, is aske
 
 The halter models brings a couple of advantages:
 
-- it can tell the selection-inference process to stop or keep going, as necessary.
-- if the process never halts, you'll get no answer, which is often preferable to a hallucinated guess
+- It can tell the selection-inference process to stop or keep going, as necessary.
+- If the process never halts, you'll get no answer, which is often preferable to a hallucinated guess
 
 [![Faithful reasoning](images/faithful-reasoning_fig3.png)
 <br>Source: *Faithful Reasoning Using Large Language Models* by Antonia Creswell et al. (2022)](https://arxiv.org/abs/2208.14271)
@@ -514,8 +514,8 @@ Similar to the self-consistency technique, this method can get expensive, as gen
 
 Although the techniques above vary in their approach, they all share the goal of improving reliability on complex tasks. Mainly they do this by:
 
-- decomposing unreliable operations into smaller, more reliable operations (e.g., selection-inference prompting)
-- using multiple steps or multiple relationships to make the system's reliability greater than any individual component (e.g., maieutic prompting)
+- Decomposing unreliable operations into smaller, more reliable operations (e.g., selection-inference prompting)
+- Using multiple steps or multiple relationships to make the system's reliability greater than any individual component (e.g., maieutic prompting)
 
 ### Probabilistic graphical models
 

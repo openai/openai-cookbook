@@ -1,0 +1,4 @@
+{
+    "appService.defaultWebAppToDeploy": "/subscriptions/5f16db95-4bb9-4164-a15b-d6dd19e8461e/resourceGroups/appsvc_linux_centralus/providers/Microsoft.Web/sites/TCDFILEAI",
+    "appService.deploySubpath": "."
+}

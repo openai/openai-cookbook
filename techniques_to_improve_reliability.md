@@ -18,7 +18,11 @@ As an example, if you ask `text-davinci-002` the following math problem about ju
 
 ```text-davinci-002
 Q: A juggler has 16 balls. Half of the balls are golf balls and half of the golf balls are blue. How many blue golf balls are there?
-A: There are 8 blue golf balls.
+A:
+```
+
+```text-davinci-002
+There are 8 blue golf balls.
 ```
 
 Does this mean that GPT-3 cannot do simple math problems? No; in fact, it turns out that by prompting the model with `Let's think step by step`, the model solves the problem reliably:

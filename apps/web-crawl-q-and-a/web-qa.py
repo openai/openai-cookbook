@@ -22,7 +22,7 @@ HTTP_URL_PATTERN = r'^http[s]*://.+'
 
 # Define root domain to crawl
 domain = "openai.com"
-full_url = "https://openai.com/"
+full_url = "http://openai.com/"
 
 # Create a class to parse the HTML and get the hyperlinks
 class HyperlinkParser(HTMLParser):

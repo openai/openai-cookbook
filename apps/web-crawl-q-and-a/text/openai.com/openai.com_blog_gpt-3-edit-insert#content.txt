@@ -1,0 +1,371 @@
+
+
+
+New GPT-3 capabilities: Edit & insert
+
+
+
+
+
+
+
+
+
+
+
+CloseSearch Submit Skip to main contentSite NavigationResearchOverviewIndexProductOverviewCustomer storiesSafety standardsPricingSafetyCompanyAboutCareersBlogCharterSearchMenu Mobile Navigation CloseSite NavigationResearchProductSafetyCompanySearch Submit New GPT-3 capabilities: Edit & insertWeâve released new versions of GPT-3 and CodexÂ which can edit or insert content into existing text, rather than just completing existing text.Ruby ChenMarch 15, 2022AuthorsMohammad BavarianAngela JiangHeewoo JunHenrique PondÃ©ProductWeâve released new versions ofÂ GPT-3Â andÂ CodexÂ which can edit or insert content into existing text, rather than just completing existing text. These new capabilities make it practical to use theÂ OpenAI APIÂ to revise existing content, such as rewriting a paragraph of text or refactoring code. This unlocks new use cases and improves existing ones; for example, insertion is already being piloted inÂ GitHub CopilotÂ with promising earlyÂ results.Read edit docsRead insert docsÂ def___
+fib(10)Â def fib(n):
+    if n <= 1:
+        return 1
+    return fib(n-1) + fib(n-2)
+fib(10)Â def fib(n):
+    if n <= 1:
+        return 1
+    return fib(n-1) + fib(n-2)
+fib(10)Improvedef fib(n):
+    if n <= 1:
+        return 1
+    return fib(n-1) + fib(n-2)
+fib(10)Improve thedef fib(n):
+    if n <= 1:
+        return 1
+    return fib(n-1) + fib(n-2)
+fib(10) Improve the runtime def fib(n):
+    if n <= 1:
+        return 1
+    return fib(n-1) + fib(n-2)
+fib(10) Improve the runtime complexity def fib(n):
+    if n <= 1:
+        return 1
+    return fib(n-1) + fib(n-2)
+fib(10) Improve the runtime complexity of the def fib(n):
+    if n <= 1:
+        return 1
+    return fib(n-1) + fib(n-2)
+fib(10) Improve the runtime complexity of the function def fib(n):
+    if n <= 1:
+        return 1
+    return fib(n-1) + fib(n-2)
+fib(10) Improve the runtime complexity of the function def fib(n, memo={}):
+    if n in memo:
+        return memo[n]
+    if n <= 1:
+        f = 1
+    else:
+        f = fib(n-1, memo) + fib(n-2, memo)
+    memo[n] = f
+    return fÂ def fib(n, memo={}):
+    if n in memo:
+        return memo[n]
+    if n <= 1:
+        f = 1
+    else:
+        f = fib(n-1, memo) + fib(n-2, memo)
+    memo[n] = f
+    return fTranslatedef fib(n, memo={}):
+    if n in memo:
+        return memo[n]
+    if n <= 1:
+        f = 1
+    else:
+        f = fib(n-1, memo) + fib(n-2, memo)
+    memo[n] = f
+    return fTranslate todef fib(n, memo={}):
+    if n in memo:
+        return memo[n]
+    if n <= 1:
+        f = 1
+    else:
+        f = fib(n-1, memo) + fib(n-2, memo)
+    memo[n] = f
+    return f Translate to JavaScript def fib(n, memo={}):
+    if n in memo:
+        return memo[n]
+    if n <= 1:
+        f = 1
+    else:
+        f = fib(n-1, memo) + fib(n-2, memo)
+    memo[n] = f
+    return f Translate to JavaScript function fibonacci(n) {
+    var memo = {};
+    return (function fib(n, memo) {
+        if (n in memo) return memo[n];
+        var f;
+        if (n <= 1) f = 1;
+        else
+            f = fib(n-1, memo) + fib(n-2, memo);
+        memo[n] = f;
+        return f;
+    })(n, memo);
+}Â function fibonacci(n) {
+    var memo = {};
+    return (function fib(n, memo) {
+        if (n in memo) return memo[n];
+        var f;
+        if (n <= 1) f = 1;
+        else
+            f = fib(n-1, memo) + fib(n-2, memo);
+        memo[n] = f;
+        return f;
+    })(n, memo);
+}Writefunction fibonacci(n) {
+    var memo = {};
+    return (function fib(n, memo) {
+        if (n in memo) return memo[n];
+        var f;
+        if (n <= 1) f = 1;
+        else
+            f = fib(n-1, memo) + fib(n-2, memo);
+        memo[n] = f;
+        return f;
+    })(n, memo);
+}Write thisfunction fibonacci(n) {
+    var memo = {};
+    return (function fib(n, memo) {
+        if (n in memo) return memo[n];
+        var f;
+        if (n <= 1) f = 1;
+        else
+            f = fib(n-1, memo) + fib(n-2, memo);
+        memo[n] = f;
+        return f;
+    })(n, memo);
+}Write this asfunction fibonacci(n) {
+    var memo = {};
+    return (function fib(n, memo) {
+        if (n in memo) return memo[n];
+        var f;
+        if (n <= 1) f = 1;
+        else
+            f = fib(n-1, memo) + fib(n-2, memo);
+        memo[n] = f;
+        return f;
+    })(n, memo);
+}Write this as afunction fibonacci(n) {
+    var memo = {};
+    return (function fib(n, memo) {
+        if (n in memo) return memo[n];
+        var f;
+        if (n <= 1) f = 1;
+        else
+            f = fib(n-1, memo) + fib(n-2, memo);
+        memo[n] = f;
+        return f;
+    })(n, memo);
+} Write this as a one function fibonacci(n) {
+    var memo = {};
+    return (function fib(n, memo) {
+        if (n in memo) return memo[n];
+        var f;
+        if (n <= 1) f = 1;
+        else
+            f = fib(n-1, memo) + fib(n-2, memo);
+        memo[n] = f;
+        return f;
+    })(n, memo);
+} Write this as a one-liner function fibonacci(n) {
+    var memo = {};
+    return (function fib(n, memo) {
+        if (n in memo) return memo[n];
+        var f;
+        if (n <= 1) f = 1;
+        else
+            f = fib(n-1, memo) + fib(n-2, memo);
+        memo[n] = f;
+        return f;
+    })(n, memo);
+} Write this as a one-liner function fibonacci(n) {
+    var memo = {};
+    return (function fib(n, memo) {
+        return n in memo ? memo[n] : (memo[n] = n <= 1 ? 1 : fib(n-1, memo) + fib(n-2, memo));
+    })(n, memo);
+}Â function fibonacci(n) {
+    var memo = {};
+    return (function fib(n, memo) {
+        return n in memo ? memo[n] : (memo[n] = n <= 1 ? 1 : fib(n-1, memo) + fib(n-2, memo));
+    })(n, memo);
+}Â /
+function fibonacci(n) {
+    var memo = {};
+    return (function fib(n, memo) {
+        return n in memo ? memo[n] : (memo[n] = n <= 1 ? 1 : fib(n-1, memo) + fib(n-2, memo));
+    })(n, memo);
+}Â /**
+function fibonacci(n) {
+    var memo = {};
+    return (function fib(n, memo) {
+        return n in memo ? memo[n] : (memo[n] = n <= 1 ? 1 : fib(n-1, memo) + fib(n-2, memo));
+    })(n, memo);
+}Â /**___
+function fibonacci(n) {
+    var memo = {};
+    return (function fib(n, memo) {
+        return n in memo ? memo[n] : (memo[n] = n <= 1 ? 1 : fib(n-1, memo) + fib(n-2, memo));
+    })(n, memo);
+}Â /**â
+ * Recursive Fibonacci function with memoization.
+ * @param {number} n
+ * @returns {number}
+ */
+function fibonacci(n) {
+    var memo = {};
+    return (function fib(n, memo) {
+        return n in memo ? memo[n] : (memo[n] = n <= 1 ? 1 : fib(n-1, memo) + fib(n-2, memo));
+    })(n, memo);
+}GPT-3 and Codex have traditionally added text to the end of existing content, based on the text that came before. Whether working with text or code, writing is more than just appendingâitâs an iterative process where existing text is revised. GPT-3 and Codex can now edit text, changing whatâs currently there or adding text to the middle ofÂ content.Inserting into the middle of textThe newÂ insertÂ capabilityÂ adds contextually relevant text in the middle of existing content. Providing future context to the model can improve the quality of completions for applications such as writing long-form text, transitioning between paragraphs, following an outline, or guiding the model toward anÂ ending. Section 1. High school graduation Today's the big day!___ Section 1. High school graduation Today's the big day! Congratulations to all our high school graduates! We hope you enjoy your graduation ceremonies and wish you the best of luck in your future endeavors. Section 1. High school graduation Today's the big day! Congratulations to all our high school graduates! We hope you enjoy your graduation ceremonies and wish you the best of luck in your future endeavors.Section  Section 1. High school graduation Today's the big day! Congratulations to all our high school graduates! We hope you enjoy your graduation ceremonies and wish you the best of luck in your future endeavors.Section 2.  Section 1. High school graduation Today's the big day! Congratulations to all our high school graduates! We hope you enjoy your graduation ceremonies and wish you the best of luck in your future endeavors.Section 2. Moving  Section 1. High school graduation Today's the big day! Congratulations to all our high school graduates! We hope you enjoy your graduation ceremonies and wish you the best of luck in your future endeavors.Section 2. Moving to  Section 1. High school graduation Today's the big day! Congratulations to all our high school graduates! We hope you enjoy your graduation ceremonies and wish you the best of luck in your future endeavors.Section 2. Moving to San Francisco  Section 1. High school graduation Today's the big day! I'm graduating from high school. I'm so excited. I'm going to move to San Francisco and start a new life. I can't wait to get there.Section 2. Moving to San Francisco  Section 1. High school graduation Today's the big day! I'm graduating from high school. I'm so excited. I'm going to move to San Francisco and start a new life. I can't wait to get there.Section 2. Moving to  Section 1. High school graduation Today's the big day! I'm graduating from high school. I'm so excited. I'm going to move to San Francisco and start a new life. I can't wait to get there.Section 2. Moving to Istanbul  Section 1. High school graduation Today's the big day! I'm graduating from high school. I'm so excited to be moving on to the next chapter of my life. I'm going to Istanbul!Section 2. Moving to Istanbul  Section 1. High school graduation Today's the big day! I'm graduating from high school. I'm so excited to be moving on to the next chapter of my life. I'm going to Istanbul!Section 2. Moving to  Section 1. High school graduation Today's the big day! I'm graduating from high school. I'm so excited to be moving on to the next chapter of my life. I'm going to Istanbul!Section 2. Moving to the  Section 1. High school graduation Today's the big day! I'm graduating from high school. I'm so excited to be moving on to the next chapter of my life. I'm going to Istanbul!Section 2. Moving to the farm  Section 1. High school graduation Today's the big day! My high school graduation! I'm so excited! I can't wait to leave the city and move to the farm. I want to live a simple, quiet life. I want to get up in the morning, milk the cows, feed the horses, then sit and watch the sunrise. I want to spend the rest of my days traveling the world, reading and writing. I'm so tired of this city life.Section 2. Moving to the farm In the example above, the desire is to fill-in text between two section headers of an outline. Without the context of future sections, the model generates a completion that isnât relevant to the second section. When the context of future sections are accounted for, the model generates a completion that ties the two sectionsÂ together.def get_files(path: str, size: int):
+    def___
+    for (dirp, _, files) in os.walk(path):
+        yield from prune(dirp, files)def get_files(path: str, size: int):
+    def prune(dirp, files):
+        for file in files:
+            file = os.path.join(dirp, file)
+            if os.path.getsize(file) > size:
+                yield file
+    for (dirp, _, files) in os.walk(path):
+        yield from prune(dirp, files)def get_files(path: str, size: int):
+    def prune(dirp, files):
+        for file in files:
+            file = os.path.join(dirp, file)
+            if os.path.getsize(file) > size:
+                yield file
+    for (dirp, _, files) in os.walk(path):
+        yield from prune(dirp, files)___
+def get_files(path: str, size: int):
+    def prune(dirp, files):
+        for file in files:
+            file = os.path.join(dirp, file)
+            if os.path.getsize(file) > size:
+                yield file
+    for (dirp, _, files) in os.walk(path):
+        yield from prune(dirp, files)import os
+def get_files(path: str, size: int):
+    def prune(dirp, files):
+        for file in files:
+            file = os.path.join(dirp, file)
+            if os.path.getsize(file) > size:
+                yield file
+    for (dirp, _, files) in os.walk(path):
+        yield from prune(dirp, files)import os
+def get_files(path: str, size: int):
+    """
+    def prune(dirp, files):
+        for file in files:
+            file = os.path.join(dirp, file)
+            if os.path.getsize(file) > size:
+                yield file
+    for (dirp, _, files) in os.walk(path):
+        yield from prune(dirp, files)import os
+def get_files(path: str, size: int):
+    """___
+    def prune(dirp, files):
+        for file in files:
+            file = os.path.join(dirp, file)
+            if os.path.getsize(file) > size:
+                yield file
+    for (dirp, _, files) in os.walk(path):
+        yield from prune(dirp, files)import os
+def get_files(path: str, size: int):
+    """___"""
+    def prune(dirp, files):
+        for file in files:
+            file = os.path.join(dirp, file)
+            if os.path.getsize(file) > size:
+                yield file
+    for (dirp, _, files) in os.walk(path):
+        yield from prune(dirp, files)import os
+def get_files(path: str, size: int):
+    """Yields files in the path tree of min size"""
+    def prune(dirp, files):
+        for file in files:
+            file = os.path.join(dirp, file)
+            if os.path.getsize(file) > size:
+                yield file
+    for (dirp, _, files) in os.walk(path):
+        yield from prune(dirp, files)Insert is particularly useful for writing code. In fact, Codex was our original motivation for developing this capability, since in software development we typically add code to the middle of an existing file where code is present before and after the completion. In the example above, the model successfully completes the missing functionÂ prune, while connecting to code already written. We also add a docstring and missing imports, which is not possible without knowing the code that comes after. In GitHub Copilot, Insert is currently being piloted with early promisingÂ results.The insert capability is available in the API today in beta, as part of theÂ completions endpointÂ and via a new interface inÂ Playground. The capability can be used with the latest versions of GPT-3 and Codex,Â text-davinci-002Â andÂ code-davinci-002.Â PricingÂ is the same as previous versions ofÂ Davinci.Editing existing textA meaningful part of writing text and code is spent editing existing content. Weâve released a new endpoint in beta calledÂ editsÂ that changes existing text via an instruction, instead of completingÂ it.Â AddAdd aAdd a short poemAdd a short poem about Add a short poem about GPT-3  Add a short poem about GPT-3  GPT-3 is a very nice AI That's pretty good at writing replies When it's asked a question It gives its suggestion This is a poem it made that rhymes Â GPT-3 is a very nice AI That's pretty good at writing replies When it's asked a question It gives its suggestion This is a poem it made that rhymesMakeGPT-3 is a very nice AI That's pretty good at writing replies When it's asked a question It gives its suggestion This is a poem it made that rhymesMake thisGPT-3 is a very nice AI That's pretty good at writing replies When it's asked a question It gives its suggestion This is a poem it made that rhymesMake this in theGPT-3 is a very nice AI That's pretty good at writing replies When it's asked a question It gives its suggestion This is a poem it made that rhymes Make this in the voice GPT-3 is a very nice AI That's pretty good at writing replies When it's asked a question It gives its suggestion This is a poem it made that rhymes Make this in the voice of GPT-3 GPT-3 is a very nice AI That's pretty good at writing replies When it's asked a question It gives its suggestion This is a poem it made that rhymes Make this in the voice of GPT-3  I am a very nice AI I am pretty good at writing replies When I am asked a question I give my suggestion This is a poem it made that rhymes Â I am a very nice AI I am pretty good at writing replies When I am asked a question I give my suggestion This is a poem it made that rhymesFormatI am a very nice AI I am pretty good at writing replies When I am asked a question I give my suggestion This is a poem it made that rhymesFormat thisI am a very nice AI I am pretty good at writing replies When I am asked a question I give my suggestion This is a poem it made that rhymesFormat this like aI am a very nice AI I am pretty good at writing replies When I am asked a question I give my suggestion This is a poem it made that rhymes Format this like a letter I am a very nice AI I am pretty good at writing replies When I am asked a question I give my suggestion This is a poem it made that rhymes Format this like a letter and sign I am a very nice AI I am pretty good at writing replies When I am asked a question I give my suggestion This is a poem it made that rhymes Format this like a letter and sign from GPT-3 I am a very nice AI I am pretty good at writing replies When I am asked a question I give my suggestion This is a poem it made that rhymes Format this like a letter and sign from GPT-3  Dear Human, I am very nice AI I am pretty good at writing replies When I am asked a question I give my suggestion This is a poem I made that rhymes Kind regards, GPT-3 Editing works by specifying existing text as a prompt and an instruction on how to modify it. The edits endpoint can be used to change the tone or structure of text, or make targeted changes like fixing spelling. Weâve also observed edits to work well on empty prompts, thus enabling text generation similar to theÂ completions endpoint. In the example above, we use edits to (1) add a poem, (2) change the poem to be in first-person, (3) transform the poem into a letter, with the appropriate salutation andÂ signature.Â The three US cities with the worst traffic are:
+1. Boston, MA (164 hours)
+2. Washington, DC (155 hours)
+3. Chicago, IL (138 hours)ConvertThe three US cities with the worst traffic are:
+1. Boston, MA (164 hours)
+2. Washington, DC (155 hours)
+3. Chicago, IL (138 hours)Convert the listThe three US cities with the worst traffic are:
+1. Boston, MA (164 hours)
+2. Washington, DC (155 hours)
+3. Chicago, IL (138 hours) Convert the list to JSONL file The three US cities with the worst traffic are:
+1. Boston, MA (164 hours)
+2. Washington, DC (155 hours)
+3. Chicago, IL (138 hours) Convert the list to JSONL file with rank The three US cities with the worst traffic are:
+1. Boston, MA (164 hours)
+2. Washington, DC (155 hours)
+3. Chicago, IL (138 hours) Convert the list to JSONL file with rank, city The three US cities with the worst traffic are:
+1. Boston, MA (164 hours)
+2. Washington, DC (155 hours)
+3. Chicago, IL (138 hours) Convert the list to JSONL file with rank, city, state The three US cities with the worst traffic are:
+1. Boston, MA (164 hours)
+2. Washington, DC (155 hours)
+3. Chicago, IL (138 hours) Convert the list to JSONL file with rank, city, state, and hours The three US cities with the worst traffic are:
+1. Boston, MA (164 hours)
+2. Washington, DC (155 hours)
+3. Chicago, IL (138 hours) Convert the list to JSONL file with rank, city, state, and hours [
+  {"rank": 1, "city": "Boston", "state": "MA", "hours": 164},
+  {"rank": 2, "city": "Washington DC", "state": "DC", "hours": 155},
+  {"rank": 3, "city": "Chicago", "state": "IL", "hours": 138}
+]Â [
+  {"rank": 1, "city": "Boston", "state": "MA", "hours": 164},
+  {"rank": 2, "city": "Washington DC", "state": "DC", "hours": 155},
+  {"rank": 3, "city": "Chicago", "state": "IL", "hours": 138}
+]Remove[
+  {"rank": 1, "city": "Boston", "state": "MA", "hours": 164},
+  {"rank": 2, "city": "Washington DC", "state": "DC", "hours": 155},
+  {"rank": 3, "city": "Chicago", "state": "IL", "hours": 138}
+]Remove rank[
+  {"rank": 1, "city": "Boston", "state": "MA", "hours": 164},
+  {"rank": 2, "city": "Washington DC", "state": "DC", "hours": 155},
+  {"rank": 3, "city": "Chicago", "state": "IL", "hours": 138}
+] Remove rank and write out [
+  {"rank": 1, "city": "Boston", "state": "MA", "hours": 164},
+  {"rank": 2, "city": "Washington DC", "state": "DC", "hours": 155},
+  {"rank": 3, "city": "Chicago", "state": "IL", "hours": 138}
+] Remove rank and write out full state names [
+  {"rank": 1, "city": "Boston", "state": "MA", "hours": 164},
+  {"rank": 2, "city": "Washington DC", "state": "DC", "hours": 155},
+  {"rank": 3, "city": "Chicago", "state": "IL", "hours": 138}
+] Remove rank and write out full state names [
+  {"city": "Boston", "state": "Massachusetts", "hours": 164},
+  {"city": "Washington DC", "state": "District of Columbia", "hours": 155},
+  {"city": "Chicago", "state": "Illinois", "hours": 138}
+]Â [
+  {"city": "Boston", "state": "Massachusetts", "hours": 164},
+  {"city": "Washington DC", "state": "District of Columbia", "hours": 155},
+  {"city": "Chicago", "state": "Illinois", "hours": 138}
+]Turn[
+  {"city": "Boston", "state": "Massachusetts", "hours": 164},
+  {"city": "Washington DC", "state": "District of Columbia", "hours": 155},
+  {"city": "Chicago", "state": "Illinois", "hours": 138}
+]Turn into YAML[
+  {"city": "Boston", "state": "Massachusetts", "hours": 164},
+  {"city": "Washington DC", "state": "District of Columbia", "hours": 155},
+  {"city": "Chicago", "state": "Illinois", "hours": 138}
+] Turn into YAML and return [
+  {"city": "Boston", "state": "Massachusetts", "hours": 164},
+  {"city": "Washington DC", "state": "District of Columbia", "hours": 155},
+  {"city": "Chicago", "state": "Illinois", "hours": 138}
+] Turn into YAML and return from a function [
+  {"city": "Boston", "state": "Massachusetts", "hours": 164},
+  {"city": "Washington DC", "state": "District of Columbia", "hours": 155},
+  {"city": "Chicago", "state": "Illinois", "hours": 138}
+] Turn into YAML and return from a function called get_yaml [
+  {"city": "Boston", "state": "Massachusetts", "hours": 164},
+  {"city": "Washington DC", "state": "District of Columbia", "hours": 155},
+  {"city": "Chicago", "state": "Illinois", "hours": 138}
+] Turn into YAML and return from a function called get_yaml def get_yaml():
+    return """
+    - city: Boston
+      state: Massachusetts
+      hours: 164
+    - city: Washington DC
+      state: District of Columbia
+      hours: 155
+    - city: Chicago
+      state: Illinois
+      hours: 138
+    """The edits endpoint is particularly useful for writing code. It works well for tasks like refactoring, adding documentation, translating between programming languages, and changing coding style. The example above starts with JSON input containing cities ranked by population. With our first edit, Codex removes the rank field from the JSON, and changes the state abbreviations into full names. The second edit converts the JSON file into YAML returned from aÂ function.Editing is available as aÂ specialized endpoint in the APIÂ and through a new interface inÂ Playground. It is supported by modelsÂ text-davinci-edit-001Â andÂ code-davinci-edit-001. The edits endpoint is currentlyÂ free to useÂ and publicly available as aÂ beta.Read edit docsRead insert docsAuthorsMohammad BavarianView all articlesAngela JiangView all articlesHeewoo JunView all articlesHenrique PondÃ©View all articlesResearchOverviewIndexProductOverviewCustomer storiesSafety standardsPricingSafetyOverviewCompanyAboutCareersBlogCharterOpenAI Â© 2015âââ2023Terms & policiesSocialTwitterYouTubeGitHubSoundCloudLinkedInBack to top

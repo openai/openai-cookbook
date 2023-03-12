@@ -1,0 +1,11 @@
+
+
+
+Software Engineer, Full-Stack - AI Scientist team
+
+
+
+
+
+
+CloseSearch Submit Skip to main contentSite NavigationResearchOverviewIndexProductOverviewCustomer storiesSafety standardsPricingSafetyCompanyAboutCareersBlogCharterSearchMenu Mobile Navigation CloseSite NavigationResearchProductSafetyCompanySearch Submit Software Engineer, Full-Stack - AI Scientist teamSan Francisco, California, United States â Code GenerationApply nowAbout the TeamOur Codegen team is responsible for the research that brought you Copilot.We are looking for a software engineer with full-stack, web product development experience to join our Codegen research team and improve future versions of our Codex model.Â About the RoleAs a Software Engineer on the Codegen team, you will closely collaborate with our world-class research teams to build and deploy powerful AI systems and products that can perform previously impossible tasks and achieve unprecedented levels of performance.A glance at a couple of the upcoming development projects:Â Design and develop the tools & Â dashboards required for a variety of cutting-edge AI research and consumer projects, particularly Codex and Copilot.Build UI's and web interfaces to collect data from human users to improve our AI models through reinforcement learning. Â We expect you to:Â Have strong web development skills creating UI's and user dashboardsHave proficiency in JavaScript, React for front-end developmentHave some Python experience and using one of Flask/Django/TornadoHave experience driving large-scale projects in a fast-paced and highly collaborative environmentBe interested in and thoughtful about the impacts of AI technology (see our CharterÂ for examples of our goals)OpenAI US Applicant Privacy PolicyÂ We are committed to providing reasonable accommodations to applicants with disabilities, and requests can be made via this link.Apply nowResearchOverviewIndexProductOverviewCustomer storiesSafety standardsPricingSafetyOverviewCompanyAboutCareersBlogCharterOpenAI Â© 2015âââ2023Terms & policiesSocialTwitterYouTubeGitHubSoundCloudLinkedInBack to top

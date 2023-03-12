@@ -1,0 +1,16 @@
+
+
+
+Safety standards
+
+
+
+
+
+
+
+
+
+
+
+CloseSearch Submit Skip to main contentSite NavigationResearchOverviewIndexProductOverviewCustomer storiesSafety standardsPricingSafetyCompanyAboutCareersBlogCharterSearchMenu Mobile Navigation CloseSite NavigationResearchProductSafetyCompanySearch Submit Product safety standardsAs part of our mission to ensure AI benefits all of humanity, we strive to ensure responsible development, deployment, and use of our models.Quick linksView usage policiesIn a society where access to generative AI tools will become as essential to access to the internet, we must balance our obligation to mitigate serious risks with allowing diverse values to flourish.Dave WillnerTrust & Safety at OpenAISafety in deploymentWe monitor the use of our tools and update safety mitigations based on what we learn about model risks and capabilities, reflecting our leadership in commercial AI deployment.Learn about safetyNew AI classifier for indicating AI-written textJan 31, 2023January 31, 2023Reducing bias and improving safety in DALLÂ·E 2Jul 18, 2022July 18, 2022New and improved content moderation toolingAug 10, 2022August 10, 2022DALLÂ·E 2 pre-training mitigationsJun 28, 2022June 28, 2022Our principlesMinimize harmWe will build safety into our AI tools where possible, and work hard to aggressively reduce harms posed by the misuse or abuse of our AI tools.Build trustAlongside our user and developer community, weâll share the responsibility with of supporting safe, beneficial applications of our technology.Learn and iterateWe will observe and analyze how our models behave and are used and seek input on our approach to safety in order to improve our systems over time.Be a pioneer in trust and safetyWe will support research into the unique trust and safety challenges posed by generative AI, to help improve safety beyond our ecosystem.Documents and policiesWeâve created and compiled resources about our safety practices. Hereâs how you can uphold trust and safety as you engage with our products.Usage policiesBy following our usage policies, you'll help us make sure that our technology is used for good.ModerationThe moderation endpoint is a tool you can use to check whether content complies with OpenAI's content policy.Safety best practicesRead about how to build with safety in mind.Educator considerations for ChatGPTLearn more about the capabilities, limitations, and considerations for using ChatGPT for teaching and learning.ResearchOverviewIndexProductOverviewCustomer storiesSafety standardsPricingSafetyOverviewCompanyAboutCareersBlogCharterOpenAI Â© 2015âââ2023Terms & policiesSocialTwitterYouTubeGitHubSoundCloudLinkedInBack to top

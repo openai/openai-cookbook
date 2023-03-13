@@ -43,6 +43,7 @@ export function chunkText({
       currentChunk
     ) {
       // The piece is just right, so we save it and start a new one
+      currentChunk += `${trimmedSentence === "." ? "" : " "}${trimmedSentence}`;
       // We remove any periods or spaces from the beginning of the piece and trim any whitespace
       currentChunk = currentChunk.replace(/^[. ]+/, "").trim();
       // We only push the piece if it is not empty

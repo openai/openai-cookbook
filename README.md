@@ -53,7 +53,7 @@ Most code examples are written in Python, though the concepts can be applied in 
   - [How to get completions from Azure OpenAI](examples/azure/completions.ipynb)
   - [How to get embeddings from Azure OpenAI](examples/azure/embeddings.ipynb)
   - [How to fine-tune GPT-3 with Azure OpenAI](examples/azure/finetuning.ipynb)
-  - [How to Dall-E with Azure OpenAI](examples/azure/dalle.ipynb)
+  - [How to use Dall-E image generation with Azure OpenAI](examples/azure/dalle.ipynb)
 - Apps
   - [File Q and A](apps/file-q-and-a/)
   - [Web Crawl Q and A](apps/web-crawl-q-and-a)

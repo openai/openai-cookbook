@@ -50,6 +50,7 @@ Most code examples are written in Python, though the concepts can be applied in 
 - DALL-E
   - [How to generate and edit images with DALL-E](examples/dalle/Image_generations_edits_and_variations_with_DALL-E.ipynb)
 - Azure OpenAI (alternative API from Microsoft Azure)
+  - [How to use ChatGPT with Azure OpenAI](examples/azure/chat.ipynb)
   - [How to get completions from Azure OpenAI](examples/azure/completions.ipynb)
   - [How to get embeddings from Azure OpenAI](examples/azure/embeddings.ipynb)
   - [How to fine-tune GPT-3 with Azure OpenAI](examples/azure/finetuning.ipynb)

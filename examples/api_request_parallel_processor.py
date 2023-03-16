@@ -341,7 +341,7 @@ def num_tokens_consumed_from_request(
             return num_tokens
         elif isinstance(prompt, list):  # multiple prompts
             prompt_tokens = sum([len(encoding.encode(p)) for p in prompt])
-            num_tokens = prompt_tokens + completion_tokens
+            num_tokens = prompt_tokens + completion_tokens * len(prompt)
             return num_tokens
         else:
             raise TypeError('Expecting either string or list of strings for "prompt" field in completion request')

@@ -9,15 +9,6 @@ from config import *
 
 from utils import get_embeddings, get_pinecone_id_for_file_chunk
 
-# Set up logging
-logging.basicConfig(
-    level=logging.INFO,
-    format="%(asctime)s [%(levelname)s] %(message)s",
-    handlers=[
-        logging.FileHandler("debug.log"),
-        logging.StreamHandler(sys.stdout)
-    ]
-)
 
 # Handle a file by extracting its text, creating embeddings, and upserting them to Pinecone
 def handle_file(file, session_id, pinecone_index, tokenizer):

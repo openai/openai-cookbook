@@ -10,27 +10,11 @@ import logging
 from flask import Flask, jsonify
 from flask_cors import CORS, cross_origin
 from flask import request
+from flask.logging import default_handler
 
 from handle_file import handle_file
 from answer_question import get_answer_from_files
 
-logging.basicConfig(
-    level=logging.INFO,
-    format="%(asctime)s [%(levelname)s] %(message)s",
-    handlers=[
-        logging.FileHandler("debug.log"),
-        logging.StreamHandler(sys.stdout)
-    ]
-)
-
-logging.basicConfig(
-    level=logging.INFO,
-    format="%(asctime)s [%(levelname)s] %(message)s",
-    handlers=[
-        logging.FileHandler("debug.log"),
-        logging.StreamHandler(sys.stdout)
-    ]
-)
 
 def load_pinecone_index() -> pinecone.Index:
     """
@@ -97,4 +81,8 @@ def healthcheck():
     return "OK"
 
 if __name__ == "__main__":
+    root = logging.getLogger()
+    root.setLevel(logging.INFO)
+    # add flask's logging handler to the root logger
+    root.addHandler(default_handler)
     app.run(debug=True, port=SERVER_PORT, threaded=True)

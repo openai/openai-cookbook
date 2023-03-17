@@ -1,3 +1,4 @@
+import logging
 from utils import get_embedding
 from flask import jsonify
 from config import *

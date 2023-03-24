@@ -8,6 +8,6 @@
 
 This folder contains examples of using Pinecone and OpenAI together. More will be added over time so check back for updates!
 
-| Name | Description | lanugage | Google Colab |
-| --- | --- | --- | --- |
-| [Generative Question-Answering](./Gen_QA.ipynb) | A simple walkthrough demonstrating the use of Generative Question-Answering | 
+| Name | Description | Google Colab |
+| --- | --- | --- |
+| [Generative Question-Answering](./Gen_QA.ipynb) | A simple walkthrough demonstrating the use of Generative Question-Answering | [![Open In Colab](https://colab.research.google.com/assets/colab-badge.svg)](https://colab.research.google.com/github/openai/openai-cookbook/blob/master/examples/vector_databases/pinecone/Gen_QA.ipynb) |

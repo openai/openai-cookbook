@@ -10,4 +10,6 @@ This folder contains examples of using Pinecone and OpenAI together. More will b
 
 | Name | Description | Google Colab |
 | --- | --- | --- |
+| [GPT-4 Retrieval Augmentation](./GPT4_Retrieval_Augmentation.ipynb) | How to supercharge GPT-4 with retrieval augmentation | [![Open In Colab](https://colab.research.google.com/assets/colab-badge.svg)](https://colab.research.google.com/github/openai/openai-cookbook/blob/master/examples/vector_databases/pinecone/GPT4_Retrieval_Augmentation.ipynb) |
 | [Generative Question-Answering](./Gen_QA.ipynb) | A simple walkthrough demonstrating the use of Generative Question-Answering | [![Open In Colab](https://colab.research.google.com/assets/colab-badge.svg)](https://colab.research.google.com/github/openai/openai-cookbook/blob/master/examples/vector_databases/pinecone/Gen_QA.ipynb) |
+| [Semantic Search](./Semantic_Search.ipynb) | A guide to building a simple semantic search process | [![Open In Colab](https://colab.research.google.com/assets/colab-badge.svg)](https://colab.research.google.com/github/openai/openai-cookbook/blob/master/examples/vector_databases/pinecone/Semantic_Search.ipynb) |

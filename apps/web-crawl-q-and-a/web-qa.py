@@ -17,7 +17,7 @@ import numpy as np
 from openai.embeddings_utils import distances_from_embeddings, cosine_similarity
 
 # Regex pattern to match a URL
-HTTP_URL_PATTERN = r'^http[s]*://.+'
+HTTP_URL_PATTERN = r'^http[s]{0,1}://.+$'
 
 # Define root domain to crawl
 domain = "openai.com"

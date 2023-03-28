@@ -28,7 +28,7 @@ The simplest way to use embeddings for search is as follows:
 
 An example of how to use embeddings for search is shown in [Semantic_text_search_using_embeddings.ipynb](examples/Semantic_text_search_using_embeddings.ipynb).
 
-In more advanced search systems, the the cosine similarity of embeddings can be used as one feature among many in ranking search results.
+In more advanced search systems, the cosine similarity of embeddings can be used as one feature among many in ranking search results.
 
 ## Question answering
 

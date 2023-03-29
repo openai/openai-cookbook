@@ -3,7 +3,7 @@
 Large language models are useful for distilling information from long texts. Applications include:
 
 * Answering questions about a piece of text, e.g.:
-  * Querying an knowledge base to help people look up things they don't know
+  * Querying a knowledge base to help people look up things they don't know
   * Querying an unfamiliar document to understand what it contains
   * Querying a document with structured questions in order to extract tags, classes, entities, etc.
 * Summarizing text, e.g.:
@@ -78,9 +78,9 @@ The triple quotation marks `"""` used in these example prompts aren't special; G
 
 If you want to classify the text, the best approach depends on whether the classes are known in advance.
 
-If your classes _are_ known in advance, classification is often best done with a fine-tuned model, as demonstrated in [Fine-tuned_classification.ipynb](examples/Fine-tuned_classification.ipynb).
+If your classes _`are`_ known in advance, classification is often best done with a fine-tuned model, as demonstrated in [Fine-tuned_classification.ipynb](examples/Fine-tuned_classification.ipynb).
 
-If your classes are not known in advance (e.g., they are set by a user or generated on the fly), you can try zero-shot classification by either giving an instruction containing the classes or even by using embeddings to see which class label (or other classified texts) are most similar to the text (as demonstrated in [Zero-shot_classification.ipynb](examples/Zero-shot_classification_with_embeddings.ipynb)).
+If your classes _`are not`_ known in advance (e.g., they are set by a user or generated on the fly), you can try zero-shot classification by either giving an instruction containing the classes or even by using embeddings to see which class label (or other classified texts) is most similar to the text (as demonstrated in [Zero-shot_classification.ipynb](examples/Zero-shot_classification_with_embeddings.ipynb)).
 
 ## Entity extraction
 

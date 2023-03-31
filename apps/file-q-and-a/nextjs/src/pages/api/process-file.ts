@@ -5,7 +5,19 @@ import { TextEmbedding } from "../../types/file";
 import extractTextFromFile from "../../services/extractTextFromFile";
 import { createEmbeddings } from "../../services/createEmbeddings";
 
-// Disable the default body parser to handle file uploads
+
+//insteade of disabling the default body parser we can define the fix sizelimit to :30mb   
+export const config = {
+    api: {
+        bodyParser: {
+            sizeLimit: '30mb',
+        }
+    }
+};
+
+
+
+
 export const config = { api: { bodyParser: false } };
 
 type Data = {

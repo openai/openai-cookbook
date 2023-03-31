@@ -16,10 +16,6 @@ export const config = {
 };
 
 
-
-
-export const config = { api: { bodyParser: false } };
-
 type Data = {
   text?: string;
   meanEmbedding?: number[];

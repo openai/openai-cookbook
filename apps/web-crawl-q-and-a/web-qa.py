@@ -305,7 +305,7 @@ df.head()
 ################################################################################
 
 def create_context(
-    question, df, max_len=1800, size="ada"
+    question, df, max_len=1800
 ):
     """
     Create a context for a question by finding the most similar context from the dataframe
@@ -342,7 +342,6 @@ def answer_question(
     model="text-davinci-003",
     question="Am I allowed to publish model outputs to Twitter, without a human review?",
     max_len=1800,
-    size="ada",
     debug=False,
     max_tokens=150,
     stop_sequence=None
@@ -353,8 +352,7 @@ def answer_question(
     context = create_context(
         question,
         df,
-        max_len=max_len,
-        size=size,
+        max_len=max_len
     )
     # If debug, print the raw model response
     if debug:

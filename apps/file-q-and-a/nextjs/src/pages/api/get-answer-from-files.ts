@@ -40,8 +40,6 @@ export default async function handler(
       .join("\n")
       .slice(0, MAX_FILES_LENGTH);
 
-    console.log(filesString);
-
     const prompt =
       `Given a question, try to answer it using the content of the file extracts below, and if you cannot answer, or find a relevant file, just output \"I couldn't find the answer to that question in your files.\".\n\n` +
       `If the answer is not contained in the files or if there are no file extracts, respond with \"I couldn't find the answer to that question in your files.\" If the question is not actually a question, respond with \"That's not a valid question.\"\n\n` +
@@ -53,7 +51,6 @@ export default async function handler(
 
     const stream = completionStream({
       prompt,
-      model: "text-davinci-003",
     });
 
     // Set the response headers for streaming

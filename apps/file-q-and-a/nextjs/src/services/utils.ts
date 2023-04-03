@@ -1,6 +1,11 @@
 // A function that takes a file name and a string and returns true if the file name is contained in the string
 // after removing punctuation and whitespace from both
 export const isFileNameInString = (fileName: string, str: string) => {
+  // Check if the input string is null or undefined
+  if (!str) {
+    return false;
+  }
+
   // Convert both to lowercase and remove punctuation and whitespace
   const normalizedFileName = fileName
     .toLowerCase()

@@ -27,6 +27,8 @@ export default async function handler(
 
   // Create a formidable instance to parse the request as a multipart form
   const form = new formidable.IncomingForm();
+  form.maxFileSize = 30 * 1024 * 1024; // Set the max file size to 30MB
+
   try {
     const { fields, files } = await new Promise<{
       fields: Fields;

@@ -8,7 +8,7 @@ SERVER_PORT: "8080"
 
 # ---- OPENAI CONFIG -----
 EMBEDDINGS_MODEL: "text-embedding-ada-002"
-GENERATIVE_MODEL: "text-davinci-003"
+GENERATIVE_MODEL: "gpt-3.5-turbo" # use gpt-4 for better results
 EMBEDDING_DIMENSIONS: 1536
 TEXT_EMBEDDING_CHUNK_SIZE: 200
 # This is the minimum cosine similarity score that a file must have with the search query to be considered relevant

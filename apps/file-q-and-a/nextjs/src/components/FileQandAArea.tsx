@@ -55,6 +55,8 @@ function FileQandAArea(props: FileQandAAreaProps) {
 
       if (searchResultsResponse.status === 200) {
         results = searchResultsResponse.data.searchResults;
+      } else if (searchResultsResponse.status === 500) {
+        setAnswerError("Internal server error. Please try again later.");
       } else {
         setAnswerError("Sorry, something went wrong!");
       }
@@ -74,6 +76,13 @@ function FileQandAArea(props: FileQandAAreaProps) {
         fileChunks: results,
       }),
     });
+
+    if (res.status === 500) {
+      setAnswerError("Internal server error. Please try again later.");
+      setAnswerLoading(false);
+      return;
+    }
+
     const reader = res.body!.getReader();
 
     while (true) {

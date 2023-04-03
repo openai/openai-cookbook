@@ -42,6 +42,7 @@ def get_answer_from_files(question, session_id, pinecone_index):
                 break
             files_string += file_string
         
+        # Note: this is not the proper way to use the ChatGPT conversational format, but it works for now
         messages = [
             {
                 "role": "system",
@@ -69,7 +70,7 @@ def get_answer_from_files(question, session_id, pinecone_index):
 
         choices = response["choices"]  # type: ignore
         answer = choices[0].message.content.strip()
-        
+
         logging.info(f"[get_answer_from_files] answer: {answer}")
 
         return jsonify({"answer": answer})

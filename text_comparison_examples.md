@@ -11,6 +11,8 @@ For more information, read OpenAI's blog post announcements:
 * [Introducing Text and Code Embeddings (Jan 2022)](https://openai.com/blog/introducing-text-and-code-embeddings/)
 * [New and Improved Embedding Model (Dec 2022)](https://openai.com/blog/new-and-improved-embedding-model/)
 
+For comparison with other embedding models, see [Massive Text Embedding Benchmark (MTEB) Leaderboard](https://huggingface.co/spaces/mteb/leaderboard)
+
 ## Semantic search
 
 Embeddings can be used for search either by themselves or as a feature in a larger system.

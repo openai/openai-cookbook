@@ -10,6 +10,7 @@ Most code examples are written in Python, though the concepts can be applied in 
 
 ## Recently added 🆕 ✨
 
+- [Powering your products with ChatGPT and your own data](apps/chatbot-kickstarter/powering_your_products_with_chatgpt_and_your_data.ipynb) [Mar 10th, 2023]
 - [How to format inputs to ChatGPT models](examples/How_to_format_inputs_to_ChatGPT_models.ipynb) [Mar 1st, 2023]
 - [Using Vector Databases for Embeddings Search with Redis](https://github.com/openai/openai-cookbook/tree/main/examples/vector_databases/redis) [Feb 15th, 2023]
 - [Website Q&A with Embeddings](https://github.com/openai/openai-cookbook/tree/main/apps/web-crawl-q-and-a) [Feb 11th, 2023]
@@ -27,6 +28,7 @@ Most code examples are written in Python, though the concepts can be applied in 
   - [How to stream completions](examples/How_to_stream_completions.ipynb)
 - ChatGPT
   - [How to format inputs to ChatGPT models](examples/How_to_format_inputs_to_ChatGPT_models.ipynb)
+  - [Powering your products with ChatGPT and your own data](apps/chatbot-kickstarter/powering_your_products_with_chatgpt_and_your_data.ipynb)
 - GPT-3
   - [Guide: How to work with large language models](how_to_work_with_large_language_models.md)
   - [Guide: Techniques to improve reliability](techniques_to_improve_reliability.md)

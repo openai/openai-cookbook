@@ -1,12 +1,12 @@
-# Techniques to improve reliability
+# 信頼性向上のためのテクニック
 
-When GPT-3 fails on a task, what should you do?
+あるタスクでGPT-3が失敗した場合、どうすればいいのでしょうか？
 
-- Search for a better prompt that elicits more reliable answers?
-- Invest in thousands of examples to fine-tune a custom model?
-- Assume the model is incapable of the task, and move on?
+- より信頼性の高い回答を引き出す、より良いプロンプトをお探しですか？
+- カスタムモデルをファインチューンするために、何千ものサンプルに投資するか？
+- モデルがタスクを処理できないと仮定し、次に進むのか？
 
-There is no simple answer - it depends. However, if your task involves logical reasoning or complexity, consider trying the techniques in this article to build more reliable, high-performing prompts.
+単純な答えはありません。それは、その時々の状況によるものです。しかし、タスクに論理的な推論や複雑さが含まれる場合は、この記事のテクニックを試して、より信頼性が高く、パフォーマンスの高いプロンプトを構築することを検討してください。
 
 ## Why GPT-3 fails on complex tasks
 

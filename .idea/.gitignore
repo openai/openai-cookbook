@@ -1,0 +1,8 @@
+# デフォルトの無視対象ファイル
+/shelf/
+/workspace.xml
+# エディターベースの HTTP クライアントリクエスト
+/httpRequests/
+# Datasource local storage ignored files
+/dataSources/
+/dataSources.local.xml

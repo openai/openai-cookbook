@@ -1,74 +1,74 @@
 # OpenAI Cookbook
 
-The OpenAI Cookbook shares example code for accomplishing common tasks with the [OpenAI API].
+OpenAI Cookbookでは、[OpenAI API]を使用して一般的なタスクを実行するためのコード例を共有しています。
 
-To run these examples, you'll need an OpenAI account and API key ([create a free account][api signup]).
+これらの例を実行するには、OpenAIアカウントとAPIキーが必要です（[無料アカウントを作成][api signup]）。
 
-Most code examples are written in Python, though the concepts can be applied in any language.
+ほとんどのコード例はPythonで書かれていますが、どの言語でも概念を適用することができます。
 
-[![Open in GitHub Codespaces](https://github.com/codespaces/badge.svg)](https://github.com/codespaces/new?hide_repo_select=true&ref=main&repo=468576060&machine=basicLinux32gb&location=EastUs)
+[![GitHub Codespacesで開く](https://github.com/codespaces/badge.svg)](https://github.com/codespaces/new?hide_repo_select=true&ref=main&repo=468576060&machine=basicLinux32gb&location=EastUs)
 
-## Recently added or updated 🆕 ✨
+## 最近追加または更新されたもの 🆕 ✨
 
-- [Question answering using embeddings](examples/Question_answering_using_embeddings.ipynb) [Apr 14th, 2023]
-- [Using vector databases for embeddings search](examples/vector_databases/) [various dates]
-- [Powering your products with ChatGPT and your own data](apps/chatbot-kickstarter/powering_your_products_with_chatgpt_and_your_data.ipynb) [Mar 10th, 2023]
-- [How to format inputs to ChatGPT models](examples/How_to_format_inputs_to_ChatGPT_models.ipynb) [Mar 1st, 2023]
+- [埋め込みを使用した質問応答](examples/Question_answering_using_embeddings.ipynb) [2023年4月14日]
+- [ベクターデータベースを使った埋め込み検索](examples/vector_databases/) [様々な日付]
+- [ChatGPTと独自のデータを使って製品を強化する方法](apps/chatbot-kickstarter/powering_your_products_with_chatgpt_and_your_data.ipynb) [2023年3月10日]
+- [ChatGPTモデルへの入力のフォーマット方法](examples/How_to_format_inputs_to_ChatGPT_models.ipynb) [2023年3月1日]
 
 
-## Guides & examples
+## ガイドと例
 
-- API usage
-  - [How to handle rate limits](examples/How_to_handle_rate_limits.ipynb)
-    - [Example parallel processing script that avoids hitting rate limits](examples/api_request_parallel_processor.py)
-  - [How to count tokens with tiktoken](examples/How_to_count_tokens_with_tiktoken.ipynb)
-  - [How to stream completions](examples/How_to_stream_completions.ipynb)
+- APIの使用法
+  - [レート制限の対処方法](examples/How_to_handle_rate_limits.ipynb)
+    - [レート制限に達しない並列処理スクリプトの例](examples/api_request_parallel_processor.py)
+  - [tiktokenを使ってトークンをカウントする方法](examples/How_to_count_tokens_with_tiktoken.ipynb)
+  - [コンプリーションのストリーミング方法](examples/How_to_stream_completions.ipynb)
 - ChatGPT
-  - [How to format inputs to ChatGPT models](examples/How_to_format_inputs_to_ChatGPT_models.ipynb)
-  - [Powering your products with ChatGPT and your own data](apps/chatbot-kickstarter/powering_your_products_with_chatgpt_and_your_data.ipynb)
+  - [ChatGPTモデルへの入力のフォーマット方法](examples/How_to_format_inputs_to_ChatGPT_models.ipynb)
+  - [ChatGPTと独自のデータを使って製品を強化する方法](apps/chatbot-kickstarter/powering_your_products_with_chatgpt_and_your_data.ipynb)
 - GPT
-  - [Guide: How to work with large language models](how_to_work_with_large_language_models.md)
-  - [Guide: Techniques to improve reliability](techniques_to_improve_reliability.md)
-  - [How to use a multi-step prompt to write unit tests](examples/Unit_test_writing_using_a_multi-step_prompt.ipynb)
-- Embeddings
-  - [Text comparison examples](text_comparison_examples.md)
-  - [How to get embeddings](examples/Get_embeddings.ipynb)
-  - [Question answering using embeddings](examples/Question_answering_using_embeddings.ipynb)
-  - [Using vector databases for embeddings search](examples/vector_databases/Using_vector_databases_for_embeddings_search.ipynb)
-  - [Semantic search using embeddings](examples/Semantic_text_search_using_embeddings.ipynb)
-  - [Recommendations using embeddings](examples/Recommendation_using_embeddings.ipynb)
-  - [Clustering embeddings](examples/Clustering.ipynb)
-  - [Visualizing embeddings in 2D](examples/Visualizing_embeddings_in_2D.ipynb) or [3D](examples/Visualizing_embeddings_in_3D.ipynb)
-  - [Embedding long texts](examples/Embedding_long_inputs.ipynb)
-- Fine-tuning GPT-3
-  - [Guide: best practices for fine-tuning GPT-3 to classify text](https://docs.google.com/document/d/1rqj7dkuvl7Byd5KQPUJRxc19BJt8wo0yHNwK84KfU3Q/edit)
-  - [Fine-tuned classification](examples/Fine-tuned_classification.ipynb)
+  - [ガイド: 大規模言語モデルの取り扱い方法](how_to_work_with_large_language_models.md)
+  - [ガイド: 信頼性を向上させる技術](techniques_to_improve_reliability.md)
+  - [マルチステッププロンプトを使ってユニットテストを書く方法](examples/Unit_test_writing_using_a_multi-step_prompt.ipynb)
+- エンベディング
+  - [テキスト比較の例](text_comparison_examples.md)
+  - [エンベディングの取得方法](examples/Get_embeddings.ipynb)
+  - [エンベディングを使った質問応答](examples/Question_answering_using_embeddings.ipynb)
+  - [エンベディング検索のためのベクターデータベースの使用](examples/vector_databases/Using_vector_databases_for_embeddings_search.ipynb)
+  - [エンベディングを使ったセマンティックテキスト検索](examples/Semantic_text_search_using_embeddings.ipynb)
+  - [エンベディングを使ったレコメンデーション](examples/Recommendation_using_embeddings.ipynb)
+  - [エンベディングのクラスタリング](examples/Clustering.ipynb)
+  - [2Dでのエンベディングの可視化](examples/Visualizing_embeddings_in_2D.ipynb) または [3D](examples/Visualizing_embeddings_in_3D.ipynb)
+  - [長いテキストのエンベディング](examples/Embedding_long_inputs.ipynb)
+- GPT-3のファインチューニング
+  - [ガイド: GPT-3をテキスト分類にファインチューニングするためのベストプラクティス](https://docs.google.com/document/d/1rqj7dkuvl7Byd5KQPUJRxc19BJt8wo0yHNwK84KfU3Q/edit)
+  - [ファインチューニングされた分類](examples/Fine-tuned_classification.ipynb)
 - DALL-E
-  - [How to generate and edit images with DALL-E](examples/dalle/Image_generations_edits_and_variations_with_DALL-E.ipynb)
-- Azure OpenAI (alternative API from Microsoft Azure)
-  - [How to use ChatGPT with Azure OpenAI](examples/azure/chat.ipynb)
-  - [How to get completions from Azure OpenAI](examples/azure/completions.ipynb)
-  - [How to get embeddings from Azure OpenAI](examples/azure/embeddings.ipynb)
-  - [How to fine-tune GPT-3 with Azure OpenAI](examples/azure/finetuning.ipynb)
-- Apps
-  - [File Q and A](apps/file-q-and-a/)
-  - [Web Crawl Q and A](apps/web-crawl-q-and-a)
+  - [DALL-Eで画像を生成・編集する方法](examples/dalle/Image_generations_edits_and_variations_with_DALL-E.ipynb)
+- Azure OpenAI (Microsoft Azureからの代替API)
+  - [Azure OpenAIでChatGPTを使う方法](examples/azure/chat.ipynb)
+  - [Azure OpenAIからコンプリーションを取得する方法](examples/azure/completions.ipynb)
+  - [Azure OpenAIからエンベディングを取得する方法](examples/azure/embeddings.ipynb)
+  - [Azure OpenAIでGPT-3をファインチューニングする方法](examples/azure/finetuning.ipynb)
+- アプリ
+  - [ファイルQ&A](apps/file-q-and-a/)
+  - [WebクロールQ&A](apps/web-crawl-q-and-a)
 
-## Related resources
+## 関連リソース
 
-Beyond the code examples here, you can learn about the [OpenAI API] from the following resources:
+ここで紹介したコードサンプル以外にも、[OpenAI API]に関する情報は以下のリソースから学ぶことができます。
 
-- Experiment with [ChatGPT]
-- Try out the API in the [OpenAI Playground]
-- Read about the API in the [OpenAI Documentation]
-- Discuss the API in the [OpenAI Community Forum]
-- Look for help in the [OpenAI Help Center]
-- See example prompts in the [OpenAI Examples]
-- Stay up to date with the [OpenAI Blog]
+- [ChatGPT]で実験する
+- [OpenAI Playground]でAPIを試す
+- [OpenAI Documentation]でAPIについて読む
+- [OpenAI Community Forum]でAPIについて議論する
+- [OpenAI Help Center]でヘルプを探す
+- [OpenAI Examples]でサンプルを見る
+- [OpenAI Blog]で最新情報を入手する
 
-## Contributing
+## 貢献
 
-If there are examples or guides you'd like to see, feel free to suggest them on the [issues page].
+もし、見たいサンプルやガイドがあれば、[issues page]で提案してください。
 
 [chatgpt]: https://chat.openai.com/
 [openai api]: https://openai.com/api/

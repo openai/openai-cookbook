@@ -2,15 +2,16 @@
 import ast
 import code  # used for detecting whether generated Python code is valid
 import openai  # used for calling the OpenAI API
-
+from get_functions import import_all_modules
 
 # example of a function that uses a multi-step prompt to write unit tests
 def unit_test_from_function(
     function_to_test: str,  # Python function to test, as a string
     unit_test_package: str = "pytest",  # unit testing package; use the name as it appears in the import statement
-    approx_min_cases_to_cover: int = 7,  # minimum number of test case categories to cover (approximate)
+    approx_min_cases_to_cover: int = 1,  # minimum number of test case categories to cover (approximate)
     print_text: bool = False,  # optionally prints text; helpful for understanding the function & debugging
     engine: str = "GPT4",  # engine used to generate text plans in steps 1, 2, and 2b
+    model="gpt-4",
     max_tokens: int = 1000,  # can set this high, as generations should be stopped earlier by stop sequences
     temperature: float = 0.4,  # temperature = 0 can sometimes get stuck in repetitive loops, so we use 0.4
     reruns_if_fail: int = 1,  # if the output code cannot be parsed, this will re-run the function up to N times
@@ -38,14 +39,15 @@ Before writing any unit tests, let's review what each element of the function is
     # send the prompt to the API, using \n\n as a stop sequence to stop at the end of the bullet list
     explanation_response = openai.ChatCompletion.create(
         engine=engine,
+        model=model,
         messages=[{
             "role":"system",
             "content": prompt_to_explain_the_function
         }],
         # stop=["\n\n", "\n\t\n", "\n    \n"],
-        # max_tokens=max_tokens,
-        # temperature=temperature,
-        # stream=True,
+        max_tokens=max_tokens,
+        temperature=temperature,
+        stream=False,
     )
     # explanation_completion = ""
     if print_text:
@@ -81,14 +83,15 @@ For this particular function, we'll want our unit tests to handle the following 
     # send the prompt to the API, using \n\n as a stop sequence to stop at the end of the bullet list
     plan_response = openai.ChatCompletion.create(
         engine=engine,
+        model=model,
         messages=[{
             "role":"system",
             "content": full_plan_prompt
         }],
         # stop=["\n\n", "\n\t\n", "\n    \n"],
-        # max_tokens=max_tokens,
-        # temperature=temperature,
-        # stream=True,
+        max_tokens=max_tokens,
+        temperature=temperature,
+        stream=False,
     )
     # plan_completion = ""
     if print_text:
@@ -102,6 +105,7 @@ For this particular function, we'll want our unit tests to handle the following 
     elaboration_needed = (
         plan_completion.count("\n-") + 1 < approx_min_cases_to_cover
     )  # adds 1 because the first bullet is not counted
+    elaboration_needed=False
     if elaboration_needed:
         prompt_to_elaborate_on_the_plan = f"""
 
@@ -117,14 +121,15 @@ In addition to the scenarios above, we'll also want to make sure we don't forget
         # send the prompt to the API, using \n\n as a stop sequence to stop at the end of the bullet list
         elaboration_response = openai.ChatCompletion.create(
             engine=engine,
+            model=model,
             messages=[{
                 "role":"system",
                 "content": full_elaboration_prompt
             }],
             # stop=["\n\n", "\n\t\n", "\n    \n"],
-            # max_tokens=max_tokens,
-            # temperature=temperature,
-            # stream=True,
+            max_tokens=max_tokens,
+            temperature=temperature,
+            stream=False,
         )
         # elaboration_completion = ""
         if print_text:
@@ -148,7 +153,8 @@ Before going into the individual tests, let's first look at the complete suite o
 import {unit_test_package}  # used for our unit tests
 
 {function_to_test}
-
+if you need any config or import, the tree of the repo is this, do it yourself.
+tree
 #{starter_comment}"""
     if print_text:
         print(text_color_prefix + prompt_to_generate_the_unit_test, end="")
@@ -163,14 +169,15 @@ import {unit_test_package}  # used for our unit tests
     # send the prompt to the API, using ``` as a stop sequence to stop at the end of the code block
     unit_test_response = openai.ChatCompletion.create(
         engine=engine,
+        model=model,
         messages=[{
             "role":"system",
             "content": full_unit_test_prompt
         }],
         # stop="```",
-        # max_tokens=max_tokens,
-        # temperature=temperature,
-        # stream=True,
+        max_tokens=max_tokens,
+        temperature=temperature,
+        stream=False,
     )
     # unit_test_completion = ""
     if print_text:
@@ -208,18 +215,16 @@ if __name__ == "__main__":
     from dotenv import load_dotenv
 
     load_dotenv()
-
-    openai.api_version = "2023-03-15-preview"
-    openai.api_base = "https://aoaihackathon.openai.azure.com/"
+    import os
+    import openai
     openai.api_type = "azure"
+    openai.api_base = "https://aoaihackathon.openai.azure.com/"
+    openai.api_version = "2023-03-15-preview"
     openai.api_key = os.getenv("OPENAI_API_KEY")
-
     engine = "GPT4"
-    # model = "gpt-4"
-
-    functions_file = "dq_check_short.py"
-    with open(functions_file) as f:
-        codes = f.read()
+    model = "gpt-4"
+    output_dict={}
+    output_dict=import_all_modules("test_code/to_test",output_dict)
 
     # response = openai.ChatCompletion.create(
     #     engine=engine,
@@ -228,12 +233,16 @@ if __name__ == "__main__":
     # )
 
     # print(response.choices[0].message)
+    for key, value in output_dict.items():
+        unit_test_code = unit_test_from_function(
+            function_to_test=value,
+            print_text=True,
+            engine=engine,
+            model=model,
+            config='.'
+        )
 
-    unit_test_code = unit_test_from_function(
-        function_to_test=codes,
-        print_text=True,
-        engine=engine
-    )
-
-    with open(f"test_{functions_file}","w") as test_f:
-        test_f.write(unit_test_code)
+        with open(f"test_{key}","w") as test_f:
+            test_f.write(unit_test_code)
+        break
+        print('done')

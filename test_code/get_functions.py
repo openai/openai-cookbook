@@ -23,16 +23,27 @@ def import_all_modules(directory: str,output_dict) -> None:
     :return: None
     """
     
-    for file in os.listdir(directory):
+    for current_file in os.listdir(directory):
         
-        filepath = os.path.join(directory, file)
+        filepath = os.path.join(directory, current_file)
         if os.path.isdir(filepath):
             # Recursively call the function for subdirectories
             import_all_modules(filepath,output_dict)
-        elif file.endswith(".py") and file != '__init__.py':
-            print(file)
-            module_name = file[:-3]
-            spec = importlib.util.spec_from_file_location(module_name, os.path.join(directory, file))
+        elif current_file.endswith(".py") and current_file != '__init__.py':
+            import ast
+
+            with open(filepath, 'r') as f:
+                code = f.read()
+
+            tree = ast.parse(code)
+            import_str = ''
+            for node in tree.body:
+                if isinstance(node, ast.Import):
+                    import_str+=f"import {', '.join([alias.name for alias in node.names])}"
+                elif isinstance(node, ast.ImportFrom):
+                    import_str+=f"from {node.module} import {', '.join([alias.name for alias in node.names])}"
+            module_name = current_file[:-3]
+            spec = importlib.util.spec_from_file_location(module_name, os.path.join(directory, current_file))
             module = importlib.util.module_from_spec(spec)
             spec.loader.exec_module(module)
             members = getmembers(module, inspect.isfunction)
@@ -41,7 +52,7 @@ def import_all_modules(directory: str,output_dict) -> None:
                     # print(f"Function name: {member[0]}")
                     # print(f"Function definition: {inspect.getsource(member[1])}")
                     # print("------------")
-                    output_dict[member[0]]=inspect.getsource(member[1])
+                    output_dict[member[0]] = import_str + inspect.getsource(member[1])
                 # else:
                     # print(f"Skipping imported function: {member[0]}")
             classes = [m[1] for m in getmembers(module, inspect.isclass)]
@@ -52,7 +63,7 @@ def import_all_modules(directory: str,output_dict) -> None:
                         # print(f"Method name: {member[0]}")
                         # print(f"Method definition: {inspect.getsource(member[1])}")
                         # print("------------")
-                        output_dict[member[0]]=inspect.getsource(member[1])
+                        output_dict[member[0]] = import_str + inspect.getsource(member[1])
                     # else:
                         # print(f"Skipping imported method: {member[0]}")
     return output_dict

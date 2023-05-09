@@ -36,7 +36,8 @@ MANIFEST
 # Installer logs
 pip-log.txt
 pip-delete-this-directory.txt
-
+*.csv
+*.json
 # Unit test / coverage reports
 htmlcov/
 .tox/
@@ -132,4 +133,3 @@ dmypy.json
 *transactions*.jsonl
 /examples/data/transactions*
 *.DS_Store
-test_code/try.ipynb

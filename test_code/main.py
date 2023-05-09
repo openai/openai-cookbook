@@ -3,7 +3,8 @@ import ast
 import code  # used for detecting whether generated Python code is valid
 import openai  # used for calling the OpenAI API
 from get_functions import import_all_modules
-
+import re
+import subprocess
 # example of a function that uses a multi-step prompt to write unit tests
 def unit_test_from_function(
     function_to_test: str,  # Python function to test, as a string
@@ -17,7 +18,7 @@ def unit_test_from_function(
     reruns_if_fail: int = 1,  # if the output code cannot be parsed, this will re-run the function up to N times
 ) -> str:
     """Outputs a unit test for a given Python function, using a 3-step GPT-3 prompt."""
-
+    function_to_test = function_to_test + f"if you need any config or import, the tree of the repo is this, find it and give the path.{subprocess.run(['tree', 'test_code/unit_test/'], capture_output=True, text=True)}"
     # Step 1: Generate an explanation of the function
 
     # create a markdown-formatted prompt that asks GPT-3 to complete an explanation of the function, formatted as a bullet list
@@ -153,8 +154,6 @@ Before going into the individual tests, let's first look at the complete suite o
 import {unit_test_package}  # used for our unit tests
 
 {function_to_test}
-if you need any config or import, the tree of the repo is this, do it yourself.
-tree
 #{starter_comment}"""
     if print_text:
         print(text_color_prefix + prompt_to_generate_the_unit_test, end="")
@@ -205,10 +204,19 @@ tree
                 temperature=temperature,
                 reruns_if_fail=reruns_if_fail - 1,  # decrement rerun counter when calling again
             )
+    unit_test_completion_comment_stripped = extract_all_python_code(unit_test_completion)
+    return unit_test_completion_comment_stripped
 
-    # return the unit test as a string
-    return unit_test_completion
 
+
+def extract_all_python_code(string):
+    start_marker = '```python'
+    end_marker = '```'
+    pattern = re.compile(f'{start_marker}(.*?)({end_marker})', re.DOTALL)
+    matches = pattern.findall(string)
+    if not matches:
+        return None
+    return ''.join([match[0].strip() for match in matches])
 
 if __name__ == "__main__":
     import os
@@ -239,10 +247,40 @@ if __name__ == "__main__":
             print_text=True,
             engine=engine,
             model=model,
-            config='.'
         )
-
-        with open(f"test_{key}","w") as test_f:
+        current_test_path = f'test_code/unit_test/test_{key}.py'
+        with open(current_test_path,"w") as test_f:
             test_f.write(unit_test_code)
+        MAX_RETRIES = 3
+        retry_count = 0
+        fixed = False
+
+        # while not fixed and retry_count < MAX_RETRIES:
+        #     try:
+        #         # Attempt to run the python file here
+        #         exec(open(current_test_path).read())
+        #         fixed = True
+        #     except Exception as e:
+        #         # Send the code and error to the chat_gpt api to fix it
+        #         elaboration_response = openai.ChatCompletion.create(
+        #         engine=engine,
+        #         model=model,
+        #         messages=[{
+        #             "role":"system",
+        #             "content": open(current_test_path).read()
+        #         }],
+        #         # stop=["\n\n", "\n\t\n", "\n    \n"],
+        #         max_tokens=1000,
+        #         temperature=0.4,
+        #         stream=False,
+        #         )
+
+        #         # Print the response from the chat_gpt api
+        #         print(response.json())
+                
+        #         retry_count += 1
+
+        # if not fixed:
+        #     print(f"Could not fix the issue after {MAX_RETRIES} retries.")
         break
-        print('done')
+        # print('done')

@@ -8,4 +8,4 @@ This folder contains examples of using SingleStoreDB and OpenAI together. We wil
 
 | Name | Description |
 | --- | --- |
-| [OpenAI wikipedia semantic search](./OpenAI_wikipedia_semantic_search.ipynb) | Improve GPT response accuracy by storing and running semantinc search over vectors from wikipedia pages |
+| [OpenAI wikipedia semantic search](./OpenAI_wikipedia_semantic_search.ipynb) | Improve ChatGPT accuracy through SingleStoreDB semantic Search in QA |

@@ -2,7 +2,7 @@
 
 SingleStoreDB supports vectors and vector similarity search using dot_product (for cosine similarity) and euclidean_distance functions. These functions are used by our customers for applications including face recognition, visual product photo search and text-based semantic search. With the explosion of generative AI technology, these capabilities form a firm foundation for text-based AI chatbots.
 
-But remember, SingleStoreDB is a high-performance, scalable, modern SQL DBMS that supports multiple data models including structured data, semi-structured data based on JSON, time-series, full text, spatial, key-value and of course vector data.
+But remember, SingleStoreDB is a high-performance, scalable, modern SQL DBMS that supports multiple data models including structured data, semi-structured data based on JSON, time-series, full text, spatial, key-value and of course vector data. Start powering your next intelligent application with SingleStoreDB today!
 
 ![SingleStore Open AI](https://user-images.githubusercontent.com/8846480/236985121-48980956-fdc5-49c8-b006-f3a412142676.png)
 

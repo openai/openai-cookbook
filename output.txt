@@ -1,0 +1,196 @@
+============================= test session starts ==============================
+platform linux -- Python 3.10.9, pytest-7.2.2, pluggy-1.0.0
+rootdir: /home/ubuntu/openai-cookbook
+plugins: anyio-3.6.2, typeguard-2.13.3
+collected 1 item
+
+test_code/unit_test/test___init__.py F                                   [100%]
+
+=================================== FAILURES ===================================
+_____________________________ test_datacheck_init ______________________________
+
+func = <bound method ClientCreator._create_api_method.<locals>._api_call of <aiobotocore.client.S3 object at 0x7f457eca31c0>>
+
+    async def _error_wrapper(func, *, args=(), kwargs=None, retries):
+        if kwargs is None:
+            kwargs = {}
+        for i in range(retries):
+            try:
+>               return await func(*args, **kwargs)
+
+../anaconda3/envs/mathnesium/lib/python3.10/site-packages/s3fs/core.py:113: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+self = <aiobotocore.client.S3 object at 0x7f457eca31c0>
+operation_name = 'HeadObject'
+api_params = {'Bucket': 'az-ca-data-lake-prd', 'Key': 'pcoe/resources/dq_rules/bioscript/az_ca_pcoe_dq_rules_bioscript.csv'}
+
+    async def _make_api_call(self, operation_name, api_params):
+        operation_model = self._service_model.operation_model(operation_name)
+        service_name = self._service_model.service_name
+        history_recorder.record(
+            'API_CALL',
+            {
+                'service': service_name,
+                'operation': operation_name,
+                'params': api_params,
+            },
+        )
+        if operation_model.deprecated:
+            logger.debug(
+                'Warning: %s.%s() is deprecated', service_name, operation_name
+            )
+        request_context = {
+            'client_region': self.meta.region_name,
+            'client_config': self.meta.config,
+            'has_streaming_input': operation_model.has_streaming_input,
+            'auth_type': operation_model.auth_type,
+        }
+        endpoint_url, additional_headers = await self._resolve_endpoint_ruleset(  # noqa: BLK100
+            operation_model, api_params, request_context
+        )
+        request_dict = await self._convert_to_request_dict(
+            api_params=api_params,
+            operation_model=operation_model,
+            endpoint_url=endpoint_url,
+            context=request_context,
+            headers=additional_headers,
+        )
+        resolve_checksum_context(request_dict, operation_model, api_params)
+    
+        service_id = self._service_model.service_id.hyphenize()
+        handler, event_response = await self.meta.events.emit_until_response(
+            'before-call.{service_id}.{operation_name}'.format(
+                service_id=service_id, operation_name=operation_name
+            ),
+            model=operation_model,
+            params=request_dict,
+            request_signer=self._request_signer,
+            context=request_context,
+        )
+    
+        if event_response is not None:
+            http, parsed_response = event_response
+        else:
+            apply_request_checksum(request_dict)
+            http, parsed_response = await self._make_request(
+                operation_model, request_dict, request_context
+            )
+    
+        await self.meta.events.emit(
+            'after-call.{service_id}.{operation_name}'.format(
+                service_id=service_id, operation_name=operation_name
+            ),
+            http_response=http,
+            parsed=parsed_response,
+            model=operation_model,
+            context=request_context,
+        )
+    
+        if http.status_code >= 300:
+            error_code = parsed_response.get("Error", {}).get("Code")
+            error_class = self.exceptions.from_code(error_code)
+>           raise error_class(parsed_response, operation_name)
+E           botocore.exceptions.ClientError: An error occurred (403) when calling the HeadObject operation: Forbidden
+
+../anaconda3/envs/mathnesium/lib/python3.10/site-packages/aiobotocore/client.py:371: ClientError
+
+The above exception was the direct cause of the following exception:
+
+    def test_datacheck_init():
+        # Initialize DataCheck instance
+>       data_check = DataCheck(
+            source_df=test_source_df,
+            spark_context=test_spark_context,
+            config_path=test_config_path,
+            file_name=test_file_name,
+            src_system=test_src_system
+        )
+
+test_code/unit_test/test___init__.py:15: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+dq_utility.py:69: in __init__
+    self.rule_df = pd.read_csv(dq_rule_path, index_col="column_name")
+../anaconda3/envs/mathnesium/lib/python3.10/site-packages/pandas/util/_decorators.py:211: in wrapper
+    return func(*args, **kwargs)
+../anaconda3/envs/mathnesium/lib/python3.10/site-packages/pandas/util/_decorators.py:331: in wrapper
+    return func(*args, **kwargs)
+../anaconda3/envs/mathnesium/lib/python3.10/site-packages/pandas/io/parsers/readers.py:950: in read_csv
+    return _read(filepath_or_buffer, kwds)
+../anaconda3/envs/mathnesium/lib/python3.10/site-packages/pandas/io/parsers/readers.py:605: in _read
+    parser = TextFileReader(filepath_or_buffer, **kwds)
+../anaconda3/envs/mathnesium/lib/python3.10/site-packages/pandas/io/parsers/readers.py:1442: in __init__
+    self._engine = self._make_engine(f, self.engine)
+../anaconda3/envs/mathnesium/lib/python3.10/site-packages/pandas/io/parsers/readers.py:1735: in _make_engine
+    self.handles = get_handle(
+../anaconda3/envs/mathnesium/lib/python3.10/site-packages/pandas/io/common.py:713: in get_handle
+    ioargs = _get_filepath_or_buffer(
+../anaconda3/envs/mathnesium/lib/python3.10/site-packages/pandas/io/common.py:422: in _get_filepath_or_buffer
+    ).open()
+../anaconda3/envs/mathnesium/lib/python3.10/site-packages/fsspec/core.py:134: in open
+    return self.__enter__()
+../anaconda3/envs/mathnesium/lib/python3.10/site-packages/fsspec/core.py:102: in __enter__
+    f = self.fs.open(self.path, mode=mode)
+../anaconda3/envs/mathnesium/lib/python3.10/site-packages/fsspec/spec.py:1199: in open
+    f = self._open(
+../anaconda3/envs/mathnesium/lib/python3.10/site-packages/s3fs/core.py:659: in _open
+    return S3File(
+../anaconda3/envs/mathnesium/lib/python3.10/site-packages/s3fs/core.py:2043: in __init__
+    super().__init__(
+../anaconda3/envs/mathnesium/lib/python3.10/site-packages/fsspec/spec.py:1555: in __init__
+    self.size = self.details["size"]
+../anaconda3/envs/mathnesium/lib/python3.10/site-packages/fsspec/spec.py:1568: in details
+    self._details = self.fs.info(self.path)
+../anaconda3/envs/mathnesium/lib/python3.10/site-packages/fsspec/asyn.py:115: in wrapper
+    return sync(self.loop, func, *args, **kwargs)
+../anaconda3/envs/mathnesium/lib/python3.10/site-packages/fsspec/asyn.py:100: in sync
+    raise return_result
+../anaconda3/envs/mathnesium/lib/python3.10/site-packages/fsspec/asyn.py:55: in _runner
+    result[0] = await coro
+../anaconda3/envs/mathnesium/lib/python3.10/site-packages/s3fs/core.py:1248: in _info
+    out = await self._call_s3(
+../anaconda3/envs/mathnesium/lib/python3.10/site-packages/s3fs/core.py:348: in _call_s3
+    return await _error_wrapper(
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+func = <bound method ClientCreator._create_api_method.<locals>._api_call of <aiobotocore.client.S3 object at 0x7f457eca31c0>>
+
+    async def _error_wrapper(func, *, args=(), kwargs=None, retries):
+        if kwargs is None:
+            kwargs = {}
+        for i in range(retries):
+            try:
+                return await func(*args, **kwargs)
+            except S3_RETRYABLE_ERRORS as e:
+                err = e
+                logger.debug("Retryable error: %s", e)
+                await asyncio.sleep(min(1.7**i * 0.1, 15))
+            except ClientError as e:
+                logger.debug("Client error (maybe retryable): %s", e)
+                err = e
+                if "SlowDown" in str(e):
+                    await asyncio.sleep(min(1.7**i * 0.1, 15))
+                else:
+                    break
+            except Exception as e:
+                logger.debug("Nonretryable error: %s", e)
+                err = e
+                break
+    
+        if "'coroutine'" in str(err):
+            # aiobotocore internal error - fetch original botocore error
+            tb = err.__traceback__
+            while tb.tb_next:
+                tb = tb.tb_next
+            try:
+                await tb.tb_frame.f_locals["response"]
+            except Exception as e:
+                err = e
+        err = translate_boto_error(err)
+>       raise err
+E       PermissionError: Forbidden
+
+../anaconda3/envs/mathnesium/lib/python3.10/site-packages/s3fs/core.py:140: PermissionError
+=========================== short test summary info ============================
+FAILED test_code/unit_test/test___init__.py::test_datacheck_init - Permission...
+============================== 1 failed in 7.74s ===============================

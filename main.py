@@ -10,39 +10,16 @@ import inspect
 
 
 def unit_test_from_function(
-    function_to_test: str,  # Python function to test, as a string
-    # unit testing package; use the name as it appears in the import statement
     unit_test_package: str = "pytest",
-    # minimum number of test case categories to cover (approximate)
-    approx_min_cases_to_cover: int = 1,
-    # optionally prints text; helpful for understanding the function & debugging
-    print_text: bool = False,
-    directory_dict=None,
-    function_name=None,
-    __init__function=None,
     input_messages=[],
-    engine: str = "GPT4",  # engine used to generate text plans in steps 1, 2, and 2b
+    engine: str = "GPT4",
     model="gpt-4",
-    # can set this high, as generations should be stopped earlier by stop sequences
     max_tokens: int = 1000,
-    # temperature = 0 can sometimes get stuck in repetitive loops, so we use 0.4
     temperature: float = 0.4,
-    # if the output code cannot be parsed, this will re-run the function up to N times
     reruns_if_fail: int = 0,
 ) -> str:
     """Outputs a unit test for a given Python function, using a 3-step GPT-3 prompt."""
-    if __init__function:
-        init_str=f'the __init__ function for this class is: {__init__function}'
-    # tree_output = 'if you need any config or import, the tree of the repo is this, find it and give the path.' + \
-    #     subprocess.run(['tree', 'test_code/'],
-    #                    capture_output=True, text=True).stdout
-    # create a markdown-formatted prompt that asks GPT-3 to complete an explanation of the function, formatted as a bullet list
-    prompt_to_explain_the_function = f" provide unit test for the function `{function_name}`.\
-```python\
-{function_to_test} \
-```\
-and the path of the function is {function_to_test[1]}\
-"
+    
 # the init function for this classs is\
 # {init_str}\
 
@@ -50,16 +27,10 @@ and the path of the function is {function_to_test[1]}\
         engine=engine,
         model=model,
         messages=input_messages,
-        # stop=["\n\n", "\n\t\n", "\n    \n"],
         max_tokens=max_tokens,
         temperature=temperature,
         stream=False,
     )
-
-    # append this unit test prompt to the results from step 3he_unit_test
-
-    # send the prompt to the API, using ``` as a stop sequence to stop at the end of the code block
-    # unit_test_completion = ""
     unit_test_completion = plan_response.choices[0].message.content
     input_messages.append( {"role": "assistant", "content":plan_response.choices[0].message.content })
     # check the output for errors
@@ -71,10 +42,8 @@ and the path of the function is {function_to_test[1]}\
         if reruns_if_fail > 0:
             print("Rerunning...")
             return unit_test_from_function(
-                function_to_test=function_to_test,
                 unit_test_package=unit_test_package,
-                approx_min_cases_to_cover=approx_min_cases_to_cover,
-                print_text=print_text,
+                messages=input_messages,
                 engine=engine,
                 max_tokens=max_tokens,
                 temperature=temperature,
@@ -114,12 +83,15 @@ if __name__ == "__main__":
     unit_test_package = 'pytest'
     platform = "python 3.9"
     user_input = "This repo uses the dq_utility to check the data quality based on different sources given in\
-        csv files like az_ca_pcoe_dq_rules_innomar, it will generate a csv output of the lines with errors in a csv file, use:\
+        csv files like az_ca_pcoe_dq_rules_innomar, it will generate a csv output of the lines with errors in a csv file, to use the repo u can:\
         from dq_utility import DataCheck\
+        from pyspark.sql import SparkSession\
+        spark = SparkSession.builder.getOrCreate()\
+        df=spark.read.parquet('test_data.parquet')\
         Datacheck(source_df=df,\
-        spark_context= SparkSession.builder.getOrCreate(),\
-        config_path=config.json,\
-        file_name=az_ca_pcoe_dq_rules_bioscript.csv,\
+        spark_context= spark,\
+        config_path=s3://config-path-for-chat-gpt-unit-test/config.json,\
+        file_name=az_ca_pcoe_dq_rules_innomar.csv,\
         src_system=bioscript)"
     repo_explanation = f"you are providing unit test using {unit_test_package}` and Python 3.9\
         {user_input}. to give details about the structure of the repo look at the dictionary below, it includes all files\
@@ -132,17 +104,23 @@ if __name__ == "__main__":
                 if obj_value:
                     if type(obj_value)==dict:
                         for class_method_name,class_method in obj_value.items():
-                            if '__init__' in str(class_method).split(' at ')[0].replace('<','').replace('.','_').replace(' ','_'):
-                                init_str = inspect.getsource(class_method)
-                                continue
+                            # if '__init__' in str(class_method).split(' at ')[0].replace('<','').replace('.','_').replace(' ','_'):
+                            #     init_str = inspect.getsource(class_method)
+                            #     continue
+                            # if __init__function:
+                            #     init_str=f'the __init__ function for this class is: {__init__function}'\
+                            class_name = str(class_method).split('.')[0].split(' ')[1]
+                            function_name = str(class_method).split('.')[1].split(' ')[0]
+                            function_to_test= inspect.getsource(class_method)
+                            prompt_to_explain_the_function = f" provide unit test for the function `{function_name} in {class_name}`.\
+                                ```python\
+                                {function_to_test} \
+                                ```\
+                                and the path of the function is {file_path}\
+                                "
+                            messages.append({"role": "user","content":prompt_to_explain_the_function})
                             unit_test_code,messages = unit_test_from_function(
-                            function_to_test= inspect.getsource(class_method),
-                            function_name = str(class_method).split(' at ')[0].replace('<','').replace('.','_').replace(' ','_'),
-                            __init__function=init_str,
-                            file_path=file_path
-                            directory_dict=directory_dict,
                             input_messages=messages,
-                            print_text=True,
                             engine=engine,
                             model=model,
                         )
@@ -150,11 +128,8 @@ if __name__ == "__main__":
                             with open(current_test_path, "w") as test_f:
                                 test_f.write(unit_test_code)
                     else:
-                        unit_test_code = unit_test_from_function(
-                            function_to_test= inspect.getsource(obj_value),
-                            function_name = str(obj_value).split(' at ')[0].replace('<',''),
-                            directory_dict=directory_dict,
-                            print_text=True,
+                        unit_test_code, messages = unit_test_from_function(
+                            input_messages=messages,
                             engine=engine,
                             model=model,
                         )

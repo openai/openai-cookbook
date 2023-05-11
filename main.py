@@ -67,17 +67,25 @@ def get_changed_py_files_after_commit():
     # Get the list of changed files
     output = subprocess.check_output(['git', 'diff', '--name-status', 'HEAD^', 'HEAD'])
 
+    # for file in output.splitlines():
+    #     status, filename = file.split('\t')
+    #     print(f"Status: {status}, Filename: {filename}")
     # Filter for only Python files
     python_files = [f for f in output.decode().split('\n') if f.endswith('.py')]
 
     # Get the type of change for each Python file
     changes = {}
     for file in python_files:
-        status, filename = file.split('\t')
-        changes[filename] = status
+        print(file)
+        try:
+            status, filename = file.split('\t')
+            print(f"Status: {status}, Filename: {filename}")
+            changes[filename] = status
+        except ValueError:
+            print(f"Skipping invalid line: {file}")
 
     return changes
-    
+
 
 
 if __name__ == "__main__":

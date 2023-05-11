@@ -65,11 +65,8 @@ def extract_all_python_code(string):
 
 def get_changed_py_files_after_commit():
     # Get the list of changed files
-    output = subprocess.check_output(['git', 'diff', '--name-status', 'HEAD^', 'HEAD'])
+    output = subprocess.check_output(['git', 'diff', '--name-status', '@{upstream}..HEAD'])
 
-    # for file in output.splitlines():
-    #     status, filename = file.split('\t')
-    #     print(f"Status: {status}, Filename: {filename}")
     # Filter for only Python files
     python_files = [f for f in output.decode().split('\n') if f.endswith('.py')]
 

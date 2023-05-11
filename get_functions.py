@@ -119,4 +119,3 @@ if __name__ == "__main__":
     directory_dict = {}
     output_dict, directory_dict = import_all_modules("test_code", output_dict, directory_dict)
     print(directory_dict)
-    print('test')

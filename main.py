@@ -82,98 +82,98 @@ def get_changed_py_files_after_commit():
             print(f"Status: {status}, Filename: {filename}")
             changes[filename] = status
         except ValueError:
-            print(f"Skipping invalid line: {file}")
+            print(f"Skipping invalid line: {file}. Most likely it is due to renaming the file.")
 
     return changes
 
 
 
 if __name__ == "__main__":
-    # import os
-    # from dotenv import load_dotenv
+    import os
+    from dotenv import load_dotenv
 
-    # load_dotenv()
-    # import os
-    # import openai
+    load_dotenv()
+    import os
+    import openai
 
-    # openai.api_type = "azure"
-    # openai.api_base = "https://aoaihackathon.openai.azure.com/"
-    # openai.api_version = "2023-03-15-preview"
-    # openai.api_key = os.getenv("OPENAI_API_KEY")
-    # engine = "GPT4"
-    # model = "gpt-4"
-    # object_dict = {}
-    # directory_dict = {}
-    # object_dict, directory_dict = import_all_modules(
-    #     "test_code", object_dict=object_dict, directory_dict=directory_dict
-    # )
-    # i = 0
-    # messages = []
-    # unit_test_package = "pytest"
-    # platform = "python 3.9"
-    # user_input = "This repo uses the dq_utility to check the data quality based on different sources given in\
-    #     csv files like az_ca_pcoe_dq_rules_innomar, it will generate a csv output of the lines with errors in a csv file, to use the repo u can:\
-    #     from dq_utility import DataCheck\
-    #     from pyspark.sql import SparkSession\
-    #     spark = SparkSession.builder.getOrCreate()\
-    #     df=spark.read.parquet('test_data.parquet')\
-    #     Datacheck(source_df=df,\
-    #     spark_context= spark,\
-    #     config_path=s3://config-path-for-chat-gpt-unit-test/config.json,\
-    #     file_name=az_ca_pcoe_dq_rules_innomar.csv,\
-    #     src_system=bioscript)"
-    # repo_explanation = f"you are providing unit test using {unit_test_package}` and Python 3.9\
-    #     {user_input}. to give details about the structure of the repo look at the dictionary below, it includes all files\
-    #     and if python, all function and calsses, if json first and second level keys and if csv, the column names :{directory_dict}"
-    # messages.append({"role": "system", "content": repo_explanation})
-    # for file_path, objects in object_dict.items():
-    #     if "objects" in objects:
-    #         for obj_key, obj_value in objects["objects"].items():
-    #             if obj_value:
-    #                 if type(obj_value) == dict:
-    #                     for class_method_name, class_method in obj_value.items():
-    #                         # if '__init__' in str(class_method).split(' at ')[0].replace('<','').replace('.','_').replace(' ','_'):
-    #                         #     init_str = inspect.getsource(class_method)
-    #                         #     continue
-    #                         # if __init__function:
-    #                         #     init_str=f'the __init__ function for this class is: {__init__function}'\
-    #                         class_name = str(class_method).split(".")[0].split(" ")[1]
-    #                         function_name = str(class_method).split(".")[1].split(" ")[0]
-    #                         function_to_test = inspect.getsource(class_method)
-    #                         prompt_to_explain_the_function = f" provide unit test for the function `{function_name} in {class_name}`.\
-    #                             ```python\
-    #                             {function_to_test} \
-    #                             ```\
-    #                             and the path of the function is {file_path}\
-    #                             "
-    #                         messages.append({"role": "user", "content": prompt_to_explain_the_function})
-    #                         unit_test_code, messages = unit_test_from_function(
-    #                             input_messages=messages,
-    #                             engine=engine,
-    #                             model=model,
-    #                         )
-    #                         current_test_path = f"test_code/unit_test/test_{class_method_name}.py"
-    #                         with open(current_test_path, "w") as test_f:
-    #                             test_f.write(unit_test_code)
-    #                 else:
-    #                     # TODO: add the prompt explain....
-    #                     unit_test_code, messages = unit_test_from_function(
-    #                         input_messages=messages,
-    #                         engine=engine,
-    #                         model=model,
-    #                     )
-    #                     current_test_path = (
-    #                         f"test_code/unit_test/test_{str(obj_value).split(' at ')[0].replace('<','')}.py"
-    #                     )
-    #                     with open(current_test_path, "w") as test_f:
-    #                         test_f.write(unit_test_code)
-    #                 MAX_RETRIES = 3
-    #                 retry_count = 0
-    #                 fixed = False
-    #                 i += 1
-    #                 if i > 3:
-    #                     break
+    openai.api_type = "azure"
+    openai.api_base = "https://aoaihackathon.openai.azure.com/"
+    openai.api_version = "2023-03-15-preview"
+    openai.api_key = os.getenv("OPENAI_API_KEY")
+    engine = "GPT4"
+    model = "gpt-4"
+    object_dict = {}
+    directory_dict = {}
+    object_dict, directory_dict = import_all_modules(
+        "test_code", object_dict=object_dict, directory_dict=directory_dict
+    )
+    i = 0
+    messages = []
+    unit_test_package = "pytest"
+    platform = "python 3.9"
+    user_input = "This repo uses the dq_utility to check the data quality based on different sources given in\
+        csv files like az_ca_pcoe_dq_rules_innomar, it will generate a csv output of the lines with errors in a csv file, to use the repo u can:\
+        from dq_utility import DataCheck\
+        from pyspark.sql import SparkSession\
+        spark = SparkSession.builder.getOrCreate()\
+        df=spark.read.parquet('test_data.parquet')\
+        Datacheck(source_df=df,\
+        spark_context= spark,\
+        config_path=s3://config-path-for-chat-gpt-unit-test/config.json,\
+        file_name=az_ca_pcoe_dq_rules_innomar.csv,\
+        src_system=bioscript)"
+    repo_explanation = f"you are providing unit test using {unit_test_package}` and Python 3.9\
+        {user_input}. to give details about the structure of the repo look at the dictionary below, it includes all files\
+        and if python, all function and calsses, if json first and second level keys and if csv, the column names :{directory_dict}"
+    messages.append({"role": "system", "content": repo_explanation})
+    for file_path, objects in object_dict.items():
+        if "objects" in objects:
+            for obj_key, obj_value in objects["objects"].items():
+                if obj_value:
+                    if type(obj_value) == dict:
+                        for class_method_name, class_method in obj_value.items():
+                            # if '__init__' in str(class_method).split(' at ')[0].replace('<','').replace('.','_').replace(' ','_'):
+                            #     init_str = inspect.getsource(class_method)
+                            #     continue
+                            # if __init__function:
+                            #     init_str=f'the __init__ function for this class is: {__init__function}'\
+                            class_name = str(class_method).split(".")[0].split(" ")[1]
+                            function_name = str(class_method).split(".")[1].split(" ")[0]
+                            function_to_test = inspect.getsource(class_method)
+                            prompt_to_explain_the_function = f" provide unit test for the function `{function_name} in {class_name}`.\
+                                ```python\
+                                {function_to_test} \
+                                ```\
+                                and the path of the function is {file_path}\
+                                "
+                            messages.append({"role": "user", "content": prompt_to_explain_the_function})
+                            unit_test_code, messages = unit_test_from_function(
+                                input_messages=messages,
+                                engine=engine,
+                                model=model,
+                            )
+                            current_test_path = f"test_code/unit_test/test_{class_method_name}.py"
+                            with open(current_test_path, "w") as test_f:
+                                test_f.write(unit_test_code)
+                    else:
+                        # TODO: add the prompt explain....
+                        unit_test_code, messages = unit_test_from_function(
+                            input_messages=messages,
+                            engine=engine,
+                            model=model,
+                        )
+                        current_test_path = (
+                            f"test_code/unit_test/test_{str(obj_value).split(' at ')[0].replace('<','')}.py"
+                        )
+                        with open(current_test_path, "w") as test_f:
+                            test_f.write(unit_test_code)
+                    MAX_RETRIES = 3
+                    retry_count = 0
+                    fixed = False
+                    i += 1
+                    if i > 3:
+                        break
 
         # print('done')
 
-    print(get_changed_py_files_after_commit())
+    # print(get_changed_py_files_after_commit())

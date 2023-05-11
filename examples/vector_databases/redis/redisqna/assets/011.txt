@@ -1,0 +1,60 @@
+Embattled Crypto Exchange FTX Files for Bankruptcy
+
+Nov. 11, 2022
+On Monday, Sam Bankman-Fried, the chief executive of the cryptocurrency exchange FTX, took to Twitter to reassure his customers: “FTX is fine,” he wrote. “Assets are fine.”
+
+On Friday, FTX announced that it was filing for bankruptcy, capping an extraordinary week of corporate drama that has upended crypto markets, sent shock waves through an industry struggling to gain mainstream credibility and sparked government investigations that could lead to more damaging revelations or even criminal charges.
+
+In a statement on Twitter, the company said that Mr. Bankman-Fried had resigned, with John J. Ray III, a corporate turnaround specialist, taking over as chief executive.
+
+The speed of FTX’s downfall has left crypto insiders stunned. Just days ago, Mr. Bankman-Fried was considered one of the smartest leaders in the crypto industry, an influential figure in Washington who was lobbying to shape regulations. And FTX was widely viewed as one of the most stable and responsible companies in the freewheeling, loosely regulated crypto industry.
+
+“Here we are, with one of the richest people in the world, his net worth dropping to zero, his business dropping to zero,” said Jared Ellias, a bankruptcy professor at Harvard Law School. “The velocity of this failure is just unbelievable.”
+
+Now, the bankruptcy has set up a rush among investors and customers to salvage funds from what remains of FTX. A surge of customers tried to withdraw funds from the platform this week, and the company couldn’t meet the demand. The exchange owes as much as $8 billion, according to people familiar with its finances.
+
+FTX’s collapse has destabilized the crypto industry, which was already reeling from a crash in the spring that drained $1 trillion from the market. The prices of the leading cryptocurrencies, Bitcoin and Ether, have plummeted. The crypto lender BlockFi, which was closely entangled with FTX, announced on Thursday that it was suspending operations as a result of FTX’s collapse.
+
+Mr. Bankman-Fried was backed by some of the highest-profile venture capital investors in Silicon Valley, including Sequoia Capital and Lightspeed Venture Partners. Some of those investors, facing questions about how closely they scrutinized FTX before they put money into it, have said that their nine-figure investments in the crypto exchange are now essentially worthless.
+
+The company’s demise has also set off a reckoning over risky practices that have become pervasive in crypto, an industry that was founded partly as a corrective to the type of dangerous financial engineering that caused the 2008 economic crisis.
+
+“I’m really sorry, again, that we ended up here,” Mr. Bankman-Fried said on Twitter on Friday. “Hopefully this can bring some amount of transparency, trust, and governance.”
+
+The bankruptcy filing marks the start of what will probably be months or even years of legal fallout, as lawyers try to work out whether the exchange can ever continue to operate in some form and customers demand compensation. FTX is already the target of investigations by the Securities and Exchange Commission and the Justice Department, with investigators focused on whether the company improperly used customer funds to prop up Alameda Research, a trading firm that Mr. Bankman-Fried also founded.
+
+The bankruptcy filing included FTX, its U.S. arm and Alameda. According to a bare-bones legal filing in U.S. Bankruptcy Court in Delaware, FTX has assets valued between $10 billion and $50 billion, with the size of its liabilities in the same range. The company has more than 100,000 creditors, the filing said.
+
+The bankruptcy is a stunning fall from grace for the 30-year-old Mr. Bankman-Fried, who cultivated a reputation as a boy genius with a host of endearing quirks, including a habit of sleeping on a beanbag at the office. At one point, he was one of the richest people in the industry, with an estimated fortune of $24 billion. He hobnobbed with actors, professional athletes and former world leaders.
+
+Mr. Bankman-Fried’s crypto empire had an elaborate structure. The bankruptcy filing lists more than 130 corporate entities affiliated with FTX and Alameda. But as of June, FTX had only about 300 employees, a point of pride for Mr. Bankman-Fried, who said he had resisted calls from venture investors to hire more staff.
+
+“We told them additional employees added too quickly were net negative,” Mr. Bankman-Fried said on Twitter in June. “They could take it or leave it.”
+
+Unusually for a major start-up, none of FTX’s investors had seats on the board, which instead consisted of Mr. Bankman-Fried, another FTX executive and a lawyer in Antigua and Barbuda.
+
+FTX and Alameda were based in the Bahamas, where Mr. Bankman-Fried and a small circle of top executives called most of the shots and lived together in a luxury resort. Officially, Alameda was run by Caroline Ellison, a former trader for the hedge fund Jane Street, but Mr. Bankman-Fried was heavily involved, contributing to the decision-making on big trades, according to a person familiar with the matter.
+
+In addition to Mr. Bankman-Fried and Ms. Ellison, the circle of executives running FTX included Nishad Singh, FTX’s director of engineering, and Gary Wang, the chief technology officer. Few others had visibility into how the company was run: When the firm collapsed this week, lower-ranking employees were left confused and blindsided, according to people familiar with the matter. Mr. Singh and Ms. Ellison did not respond to requests for comment; Mr. Wang could not immediately be reached.
+
+As a crypto exchange, FTX provided a marketplace for customers to buy, sell and store a wide range of digital currencies. Most of its revenue stemmed from a risky type of trade — in which crypto investors borrowed money to make huge bets on the future prices of cryptocurrencies — that remains illegal in the United States. But Mr. Bankman-Fried also ran a smaller U.S. affiliate that offered more basic trading options.
+
+Mr. Bankman-Fried’s problems started over the weekend, when the chief executive of Binance, the largest crypto exchange, suggested publicly that FTX might be on shaky financial footing. A rush of customers tried to withdraw their crypto holdings from the platform, and FTX was unable to meet the demand.
+
+On Tuesday, Mr. Bankman-Fried said he had struck a deal to sell FTX to Binance. But after reviewing the company’s financial documents, Binance’s chief executive, Changpeng Zhao, pulled out of the agreement, leaving Mr. Bankman-Fried with limited options.
+
+In calls with investors and messages to employees this week, he apologized repeatedly and stressed that he was working hard to raise money and resolve the situation. But the hole was ultimately too big to fill.
+
+FTX’s bankruptcy is the latest — and by far the biggest — in a series of bankruptcies that have shaken the crypto world this year. After a market crash in the spring, two crypto lending companies, Celsius Network and Voyager Digital, filed for bankruptcy, kicking off months of legal maneuvering over how their remaining assets should be divided. In an ironic twist, FTX had recently won an auction to buy Voyager’s remaining assets.
+
+As it enters its own bankruptcy process, FTX will be led by Mr. Ray, who has ample experience managing distressed situations. He helped manage Enron after the collapse of its business in an accounting fraud scandal in 2001. And he helped liquidate the trust of the subprime mortgage company ResCap after its 2012 bankruptcy.
+
+The bankruptcy proceedings may be only the beginning of Mr. Bankman-Fried’s legal troubles. Federal investigators are examining the relationship between FTX and Alameda, and customers are likely to file lawsuits.
+
+Mr. Bankman-Fried’s old allies have quickly abandoned him. On Thursday night, the team running the FTX Future Fund, a charitable group that Mr. Bankman-Fried bankrolled, announced that they were resigning.
+
+“We were shocked and immensely saddened to learn of the recent events at FTX,” they wrote in a statement. “We have fundamental questions about the legitimacy and integrity of the business operations that were funding the FTX Foundation and the Future Fund.”
+
+Not long ago, Mr. Bankman-Fried was performing a comedy routine onstage at a conference with Anthony Scaramucci, the former White House communications director and a business partner of FTX.
+
+“I’m disappointed,” Mr. Scaramucci said in an interview on CNBC on Friday. “Duped, I guess, is the right word.”

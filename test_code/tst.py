@@ -1,2 +1,0 @@
-def tst():
-    return None

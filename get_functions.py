@@ -31,12 +31,12 @@ def getmembers(item: Any, predicate=None) -> List[Tuple[str, Any]]:
     return inspect.getmembers(item, predicate)
 
 
-def import_all_modules(directory: str, object_dict, directory_dict) -> None:
+def import_all_modules(directory: str, object_dict, directory_dict) -> Tuple[dict, dict]:
     """
     Import all modules from a directory.
 
     :param directory: The directory to import modules from.
-    :return: None
+    :return: list
     """
 
     for current_file in os.listdir(directory):
@@ -117,5 +117,16 @@ def import_all_modules(directory: str, object_dict, directory_dict) -> None:
 if __name__ == "__main__":
     output_dict = {}
     directory_dict = {}
-    output_dict, directory_dict = import_all_modules("test_code", output_dict, directory_dict)
-    print(directory_dict)
+    output_dict, directory_dict = import_all_modules(".", output_dict, directory_dict)
+    print("output_dict: ",output_dict,"\ndirectory_dict :",directory_dict)
+    # dict = {
+    #     # 'test_code/__init__.py': {
+    #     #     'key1': 'value1',
+    #     #     'key2': 'value2',
+    #     #     'key3': 'value3'
+    #     # },
+    #     # 'test_code/tst.py': {},
+    #     'main.py': 'M',
+    #     'main': ['M'],
+    # }
+    # print(recursive_items(dict))

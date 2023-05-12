@@ -1,1 +1,2 @@
 pytest
+urllib3<2

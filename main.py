@@ -6,6 +6,7 @@ from get_functions import import_all_modules
 import re
 import subprocess
 import inspect
+from typing import Any, Tuple, List # type: ignore
 
 # example of a function that uses a multi-step prompt to write unit tests
 
@@ -18,7 +19,7 @@ def unit_test_from_function(
     max_tokens: int = 1000,
     temperature: float = 0.4,
     reruns_if_fail: int = 0,
-) -> str:
+) -> Tuple[Any, List]:
     """Outputs a unit test for a given Python function, using a 3-step GPT-3 prompt."""
 
     # the init function for this classs is\
@@ -44,7 +45,7 @@ def unit_test_from_function(
             print("Rerunning...")
             return unit_test_from_function(
                 unit_test_package=unit_test_package,
-                messages=input_messages,
+                input_messages=input_messages,
                 engine=engine,
                 max_tokens=max_tokens,
                 temperature=temperature,
@@ -65,17 +66,17 @@ def extract_all_python_code(string):
 
 def get_changed_py_files_after_commit():
     # Get the list of changed files
-    output = subprocess.check_output(['git', 'diff', '--name-status', '@{upstream}..HEAD'])
+    output = subprocess.check_output(["git", "diff", "--name-status", "@{upstream}..HEAD"])
 
     # Filter for only Python files
-    python_files = [f for f in output.decode().split('\n') if f.endswith('.py')]
+    python_files = [f for f in output.decode().split("\n") if f.endswith(".py")]
 
     # Get the type of change for each Python file
     changes = {}
     for file in python_files:
         print(file)
         try:
-            status, filename = file.split('\t')
+            status, filename = file.split("\t")
             print(f"Status: {status}, Filename: {filename}")
             changes[filename] = status
         except ValueError:
@@ -84,21 +85,120 @@ def get_changed_py_files_after_commit():
     return changes
 
 
+def generate_unit_test(
+    directory: str,  # path to the entire repo folder
+    repo_explanation: str,  # explanation of the project repo - got from documentation
+    unit_test_package: str = "pytest",
+    platform: str = "Python 3.9",
+    engine: str = "GPT4",
+    model="gpt-4",
+    max_tokens: int = 1000,
+    temperature: float = 0.4
+):
+    object_dict = {}
+    directory_dict = {}
+    object_dict, directory_dict = import_all_modules(
+        directory=directory, object_dict=object_dict, directory_dict=directory_dict
+    )
+
+    i = 0
+    messages = []
+
+    full_prompt = f"you are providing unit test using {unit_test_package}` and {platform}\
+        {repo_explanation}. to give details about the structure of the repo look at the dictionary below, it includes all files\
+        and if python, all function and classes, if json first and second level keys and if csv, the column names :{directory_dict}"
+    messages.append({"role": "system", "content": full_prompt})
+    for file_path, objects in object_dict.items():
+        generated_unit_test = ""
+        if "objects" in objects:
+            for obj_key, obj_value in objects["objects"].items():
+                if obj_value:
+                    if type(obj_value) == dict:
+                        for class_method_name, class_method in obj_value.items():
+                            class_name = str(class_method).split(".")[0].split(" ")[1]
+                            function_name = str(class_method).split(".")[1].split(" ")[0]
+                            function_to_test = inspect.getsource(class_method)
+                            prompt_to_explain_the_function = f" provide unit test for the function `{function_name} in {class_name}`.\
+                                ```python\
+                                {function_to_test} \
+                                ```\
+                                and the path of the function is {file_path}\
+                                "
+                            messages.append({"role": "user", "content": prompt_to_explain_the_function})
+                            unit_test_code, messages = unit_test_from_function(
+                                input_messages=messages,
+                                engine=engine,
+                                model=model,
+                                max_tokens=max_tokens,
+                                temperature=temperature
+                            )
+                            generated_unit_test += f"\n\n#Test function `{function_name} in class {class_name}`\n{unit_test_code}"
+                            # current_test_path = f"test_code/unit_test/test_{class_method_name}.py"
+                            # with open(current_test_path, "w") as test_f:
+                            #     test_f.write(unit_test_code)
+                    else:
+                        function_name = obj_key
+                        function_to_test = inspect.getsource(obj_value)
+                        prompt_to_explain_the_function = f" provide unit test for the function `{function_name}`.\
+                            ```python\
+                            {function_to_test} \
+                            ```\
+                            and the path of the function is {file_path}\
+                            "
+                        messages.append({"role": "user", "content": prompt_to_explain_the_function})
+                        unit_test_code, messages = unit_test_from_function(
+                            input_messages=messages,
+                            engine=engine,
+                            model=model,
+                            max_tokens=max_tokens,
+                            temperature=temperature
+                        )
+                        generated_unit_test += f"\n\n#Test function `{function_name}`\n{unit_test_code}"
+                        # current_test_path = (
+                        #     f"test_code/unit_test/test_{str(obj_value).split(' at ')[0].replace('<','')}.py"
+                        # )
+                        # with open(current_test_path, "w") as test_f:
+                        #     test_f.write(unit_test_code)
+            unit_test_path = file_path[::-1].replace('\\','/test_',1)[::-1]
+            with open(unit_test_path, "w") as test_f:
+                test_f.write(generated_unit_test)
+                    # MAX_RETRIES = 3
+                    # retry_count = 0
+                    # fixed = False
+                    # i += 1
+                    # if i > 3:
+                    #     break
+
 
 if __name__ == "__main__":
-    # import os
-    # from dotenv import load_dotenv
+    import os
+    from dotenv import load_dotenv
 
-    # load_dotenv()
-    # import os
-    # import openai
+    load_dotenv()
+    import os
+    import openai
 
-    # openai.api_type = "azure"
-    # openai.api_base = "https://aoaihackathon.openai.azure.com/"
-    # openai.api_version = "2023-03-15-preview"
-    # openai.api_key = os.getenv("OPENAI_API_KEY")
-    # engine = "GPT4"
-    # model = "gpt-4"
+    openai.api_type = "azure"
+    openai.api_base = "https://aoaihackathon.openai.azure.com/"
+    openai.api_version = "2023-03-15-preview"
+    openai.api_key = os.getenv("OPENAI_API_KEY")
+    engine = "GPT4"
+    model = "gpt-4"
+
+    generate_unit_test(
+        directory="test_code",
+        repo_explanation="This repo uses the dq_utility to check the data quality based on different sources given in\
+            csv files like az_ca_pcoe_dq_rules_innomar, it will generate a csv output of the lines with errors in a csv file, to use the repo u can:\
+            from dq_utility import DataCheck\
+            from pyspark.sql import SparkSession\
+            spark = SparkSession.builder.getOrCreate()\
+            df=spark.read.parquet('test_data.parquet')\
+            Datacheck(source_df=df,\
+            spark_context= spark,\
+            config_path=s3://config-path-for-chat-gpt-unit-test/config.json,\
+            file_name=az_ca_pcoe_dq_rules_innomar.csv,\
+            src_system=bioscript)",
+        )
     # object_dict = {}
     # directory_dict = {}
     # object_dict, directory_dict = import_all_modules(
@@ -173,4 +273,4 @@ if __name__ == "__main__":
 
     #     # print('done')
 
-    print(get_changed_py_files_after_commit())
+    # print(get_changed_py_files_after_commit())

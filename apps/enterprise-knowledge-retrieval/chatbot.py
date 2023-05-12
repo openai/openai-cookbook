@@ -4,7 +4,12 @@ import streamlit as st
 from streamlit_chat import message
 
 from database import get_redis_connection
-from assistant import answer_user_question, initiate_agent, answer_question_hyde
+from assistant import (
+    answer_user_question,
+    initiate_agent,
+    answer_question_hyde,
+    ask_gpt,
+)
 
 # Initialise database
 
@@ -36,7 +41,12 @@ tools = [
         if add_selectbox == "Standard vector search"
         else answer_question_hyde,
         description="Useful for when you need to answer general knowledge questions. Input should be a fully formed question.",
-    )
+    ),
+    Tool(
+        name="Ask",
+        func=ask_gpt,
+        description="Useful if the question is not general knowledge. Input should be a fully formed question.",
+    ),
 ]
 
 if "generated" not in st.session_state:

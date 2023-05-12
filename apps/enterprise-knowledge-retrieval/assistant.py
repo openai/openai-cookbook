@@ -167,3 +167,17 @@ def initiate_agent(tools):
     )
 
     return agent_executor
+
+
+def ask_gpt(query):
+    response = openai.ChatCompletion.create(
+        model=CHAT_MODEL,
+        messages=[
+            {
+                "role": "user",
+                "content": "Please answer my question.\nQuestion: {}".format(query),
+            }
+        ],
+        temperature=0,
+    )
+    return response["choices"][0]["message"]["content"]

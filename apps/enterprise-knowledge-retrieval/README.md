@@ -1,9 +1,9 @@
 # Enterprise Knowledge Retrieval
 
-This repo is a deep dive on Enterprise Knowledge Retrieval, which aims to take some unstructured text documents and create a usable knowledge base application with it.
+This app is a deep dive on Enterprise Knowledge Retrieval, which aims to take some unstructured text documents and create a usable knowledge base application with it.
 
 This repo contains a notebook and a basic Streamlit app:
-- `enterprise_knowledge_retrieval.ipynb`: A notebook containing a step by step process of tokenising, chunking and embedding your data in a vector database, building a chat agent on top and running a basic evaluation of its performance
+- `enterprise_knowledge_retrieval.ipynb`: A notebook containing a step by step process of tokenising, chunking and embedding your data in a vector database, building a chat agent on top and running a basic evaluation of its performance.
 - `chatbot.py`: A Streamlit app providing simple Q&A via a search bar to query your knowledge base.
 
 To run the app, please follow the instructions below in the ```App``` section
@@ -21,16 +21,16 @@ Once you've run the notebook through to the Search stage, you should have what y
 
 ## App
 
-We've rolled in a basic Streamlit app that you can interact with to test your retrieval service using either standard semantic search or Hyde retrievals.
+We've rolled in a basic Streamlit app that you can interact with to test your retrieval service using either standard semantic search or [HyDE](https://arxiv.org/abs/2212.10496) retrievals.
 
-You can use it by:
-- Ensuring you followed the Setup and Storage steps from the notebook to populate a vector database with searchable content.
-- Setting up a virtual environment with pip by running ```virtualenv venv``` (ensure ```virtualenv``` is installed).
+To use it:
+- Ensure you followed the Setup and Storage steps from the notebook to populate a vector database with searchable content.
+- Set up a virtual environment with pip by running ```virtualenv venv``` (ensure ```virtualenv``` is installed).
 - Activate the environment by running ```source venv/bin/activate```.
 - Install requirements by running ```pip install -r requirements.txt```.
-- Run ```streamlit run chatbot.py``` to fire up the Streamlit app in your browser
+- Run ```streamlit run chatbot.py``` to fire up the Streamlit app in your browser.
 
 ## Limitations
 
 - This app uses Redis as a vector database, but there are many other options highlighted `../examples/vector_databases` depending on your need.
-- We introduce many areas you may optimize in the notebook, but we'll deep dive on these in separate offerings in the coming weeks.
+- We introduce many areas you may optimize in the notebook, but we'll deep dive on these in subsequent cookbooks.

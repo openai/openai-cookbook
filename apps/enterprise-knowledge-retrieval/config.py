@@ -1,5 +1,5 @@
 REDIS_HOST = "localhost"
-REDIS_PORT = "6380"
+REDIS_PORT = "6379"
 REDIS_DB = "0"
 INDEX_NAME = "wiki-index"
 VECTOR_FIELD_NAME = "content_vector"

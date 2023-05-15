@@ -24,7 +24,7 @@ s3_client = boto3.client("s3")
 s3_client = boto3.client("s3")
 s3_resource = boto3.resource("s3")
 
-
+#test
 class DataCheck:
     def __init__(
         self,
@@ -74,7 +74,7 @@ class DataCheck:
         # self.spark.conf.set("spark.sql.legacy.timeParserPolicy", "CORRECTED")
         self.spark.conf.set("spark.sql.adaptive.enabled", True)
         self.spark.conf.set("spark.sql.adaptive.coalescePartitions.enabled", True)
-    
+
     def read_s3_file(self, file_path) -> bytes:
         file_res = urlparse(file_path)
         try:
@@ -127,7 +127,7 @@ class DataCheck:
     def add_error_col(self, error_msg: str, condition: Column, error_col_name: str) -> None:
         """
         Adds an error column to the source DataFrame in the DataCheck class with a specified error message and condition.
-    
+
         :param error_msg: The error message to be displayed when the condition is met.
         :type error_msg: str
         :param condition: A PySpark Column object representing the condition for displaying the error message.

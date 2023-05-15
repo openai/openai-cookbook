@@ -8,11 +8,14 @@ import inspect
 from typing import Any, Tuple, List  # type: ignore
 
 class CodeToolbox:
-    def __init__(self,repo_explanation:str, **kwargs):
+    def __init__(self, **kwargs):
         """
         Initialize the CodeToolbox instance.
 
         Available configuration parameters:
+        
+        - platform (str, optional): code language/version or platforms that need to generate unit test. Defaults to "Python 3.9".
+        - unit_test_package (str): package/ library used for unit testing, i.e. `pytest`, `unittest`, etc. Defaults to "pytest"
         - document (bool): Whether to generate documentation. Default is True.
         - unit_test (bool): Whether to run unit tests. Default is True.
         - conversion (bool): Whether to perform language conversion. Default is True.
@@ -34,7 +37,8 @@ class CodeToolbox:
             'model': 'gpt-4',
             'engine': 'GPT4',
             'unit_test_package':'pytest',
-            'doc_pcakage':'sphinx'
+            'doc_package':'sphinx',
+            'platform':'python3.9'
         }
         self.config.update(kwargs)
     def chat_gpt_wrapper(self,input_messages=[]) -> Tuple[Any, List]:
@@ -105,14 +109,12 @@ class CodeToolbox:
                 print(f"Skipping invalid line: {file}. Most likely it is due to renaming the file.")
 
         return changes
-    def method_function_processor(self,is_class_method=True,class_name=None,function_name='',func_str=''):
-        if is_class_method:
-            doc_messages.append({"role":"user","content":f"provide documentation for {func_str} in class {class_name} that can be used in {self.config['doc_package']}"})
-        else:
-            doc_messages.append({"role":"user","content":f"provide documentation for {func_str} that can be used in {self.config['doc_package']}"})
-        doc_code,doc_messages = self.chat_gpt_wrapper(input_messages=doc_messages)
-        if len(doc_messages)>4:
-            doc_messages = doc_messages[:1] + doc_messages[-4:]
+    def method_function_processor(self,class_name=None,function_name='',func_str=''):
+        class_part = 'in class '+ class_name if class_name else None
+        self.doc_messages.append({"role":"user","content":f"provide documentation for {func_str} {class_part} that can be used in {self.config['doc_package']}"})
+        doc_code,self.doc_messages = self.chat_gpt_wrapper(input_messages=self.doc_messages)
+        if len(self.doc_messages)>4:
+            self.doc_messages = self.doc_messages[:1] + self.doc_messages[-4:]
         # Open the file in read mode and read its content
         with open(self.file_path, 'r') as file:
             file_content = file.read()
@@ -126,78 +128,32 @@ class CodeToolbox:
         # Open the file in write mode and write the new content to it
         with open(self.file_path, 'w') as file:
             file.write(new_content)
-        if is_class_method:
                 
-            request_for_unit_test = f" provide unit test for the function `{function_name} in {class_name}`.\
-                ```python\
-                {func_str} \
-                ```\
-                and the path of the function is {self.file_path}\
-                "
-        else: 
-        messages.append({"role": "user", "content": request_for_unit_test})
-        unit_test_code, messages = self.chat_gpt_wrapper(input_messages=messages)
-        if len(doc_messages)>4:
+        request_for_unit_test = f" provide unit test for the function `{function_name} {class_part}`.\
+            ```python\
+            {func_str} \
+            ```\
+            and the path of the function is {self.file_path}\
+            "
+        self.unit_test_messages.append({"role": "user", "content": request_for_unit_test})
+        unit_test_code, self.unit_test_messages = self.chat_gpt_wrapper(input_messages=self.unit_test_messages)
+        if len(self.unit_test_messages)>4:
             doc_code = doc_code[:1] + doc_code[-4:]
-        generated_unit_test += f"{function_name} in class {class_name}`\n{unit_test_code}"
+        # generated_unit_test = f"{function_name} in class {class_name}`\n{unit_test_code}"
         current_test_path = f"test_code/unit_test/test_{class_name}_{function_name}.py"
         with open(current_test_path, "w") as test_f:
             test_f.write(unit_test_code)
-        pass
     def object_processor(self, obj_key, obj_value):
         if type(obj_value) == dict:
             for class_method_name, class_method in obj_value.items():
                 class_name = str(class_method).split(".")[0].split(" ")[1]
                 function_name = str(class_method).split(".")[1].split(" ")[0]
                 function_to_test = inspect.getsource(class_method)
-                doc_messages.append({"role":"user","content":f"provide documentation for {function_to_test} in class {class_name} that can be used in {doc_package}"})
-                doc_code,doc_messages = self.chat_gpt_wrapper(input_messages=doc_messages)
-                if len(doc_messages)>4:
-                    doc_messages = doc_messages[:1] + doc_messages[-4:]
-                # Open the file in read mode and read its content
-                with open(self.file_path, 'r') as file:
-                    file_content = file.read()
-                if doc_code.startswith('class'):
-                    doc_code='\n'.join(doc_code.split('\n')[1:])
-                else:
-                    doc_code='    '+doc_code.replace('\n','\n    ')
-                # Replace a specific string in the file content
-                new_content = file_content.replace(function_to_test, doc_code)
-
-                # Open the file in write mode and write the new content to it
-                with open(self.file_path, 'w') as file:
-                    file.write(new_content)
-
-                request_for_unit_test = f" provide unit test for the function `{function_name} in {class_name}`.\
-                    ```python\
-                    {function_to_test} \
-                    ```\
-                    and the path of the function is {self.file_path}\
-                    "
-
-                messages.append({"role": "user", "content": request_for_unit_test})
-                unit_test_code, messages = self.chat_gpt_wrapper(input_messages=messages)
-                if len(doc_messages)>4:
-                    doc_code = doc_code[:1] + doc_code[-4:]
-                generated_unit_test += f"{function_name} in class {class_name}`\n{unit_test_code}"
-                current_test_path = f"test_code/unit_test/test_{class_name}_{function_name}.py"
-                with open(current_test_path, "w") as test_f:
-                    test_f.write(unit_test_code)
+                self.method_function_processor(class_name=class_name,function_name=function_name,func_str=function_to_test)
         else:
             function_name = obj_key
             function_to_test = inspect.getsource(obj_value)
-            prompt_to_explain_the_function = f" provide unit test for the function `{function_name}`.\
-                ```python\
-                {function_to_test} \
-                ```\
-                and the path of the function is {self.file_path}\
-                "
-            messages.append({"role": "user", "content": prompt_to_explain_the_function})
-            unit_test_code, messages = self.chat_gpt_wrapper(input_messages=messages)
-            generated_unit_test += f"{function_name}`\n{unit_test_code}"
-            current_test_path = f"test_code/unit_test/test_{class_name}_{function_name}.py"
-            with open(current_test_path, "w") as test_f:
-                    test_f.write(unit_test_code)
+            self.method_function_processor(class_name=None,function_name=function_name,func_str=function_to_test)
 
     def main_pipeline(self,
         directory: str,  # path to the entire repo folder
@@ -206,6 +162,23 @@ class CodeToolbox:
         doc_package:str="sphinx",
         platform: str = "Python 3.9",
     ):
+        """pipeline to generate unit test for all code files that contain modules in a directory
+
+    Args:
+        directory (str): path to the entire repo folder
+        repo_explanation (str): high level explanation of what the project does and what needs to have unit test generated
+            1. Indicate which code files/ classes/ functions need to generate unit test
+            2. List all dependencies (custom attribute values that OpenAI cannot generate randomly) needed to the run the codes (
+                if there's any config file, testing path (S3), schema of the dataframe, clearly state in this explanation as well)
+            For example, in the DQ check project, repo explanation is as below:
+                - This project is run mainly by file `dq_utility.py` file. This file is packaged to be used as library
+                - This `dq_utility.py` includes `DataCheck` class along with its methods to check the data quality of a dataframe.
+                It will generate a csv output of the lines with errors in a csv file
+                - Some needed info for dependencies are as below (class attributes):
+                    * rules files (csv) that can provide the schema (columns) of DF - config_path (S3 path where hold the config csv file in this case)
+                    * name of the file to have data quality check (proper file name included in the config csv rules file) - file_name attribute
+                    * the source (vendor) of the file to have data quality check - src_system attribute
+    """
         #TODO: in current way, you cannot do java or something else with python. change platform and unit_test_package maybe.
         object_dict = {}
         directory_dict = {}
@@ -214,7 +187,7 @@ class CodeToolbox:
         )
 
         i = 0
-        messages = []
+        
         doc_prompt = f"""you are providing documentation and typing (type hints) of code to be used in {doc_package}, as an example for the function 
         ```python
         def read_s3_file(self, file_path):
@@ -246,14 +219,16 @@ class CodeToolbox:
             raise FileNotFoundError(f"File cannot be found in S3 given path file_path")
         ```
         """
-        full_prompt = f"you are providing unit test using {unit_test_package}` and {platform}\
+        self.doc_messages=[]
+        self.doc_messages.append({"role":"system","content": doc_prompt})
+        unit_test_prompt = f"you are providing unit test using {unit_test_package}` and {platform}\
             {repo_explanation}. to give details about the structure of the repo look at the dictionary below, it includes all files\
             and if python, all function and classes, if json first and second level keys and if csv, the column names :{directory_dict},"
-        messages.append({"role": "system", "content": full_prompt})
-        doc_messages=[]
-        doc_messages.append({"role":"system","content": doc_prompt})
-        conversion_messages=[]
-        conversion_prompt= "your task is to convert the code into {target_conversion}"
+        self.unit_test_messages = []
+        self.unit_test_messages.append({"role": "system", "content": unit_test_prompt})
+        # TODO: conversion
+        # conversion_messages=[]
+        # conversion_prompt= f"your task is to convert the code into {target_conversion}"
         for self.file_path, objects in object_dict.items():
             generated_unit_test = ""
             if "objects" in objects:
@@ -281,7 +256,7 @@ if __name__ == "__main__":
     model = "gpt-4"
     code_toolbox = CodeToolbox()
 
-    code_toolbox.generate_unit_test(
+    code_toolbox.main_pipeline(
         directory="test_code",
         repo_explanation="This repo uses the dq_utility to check the data quality based on different sources given in\
             csv files like az_ca_pcoe_dq_rules_innomar, it will generate a csv output of the lines with errors in a csv file, to use the repo u can:\

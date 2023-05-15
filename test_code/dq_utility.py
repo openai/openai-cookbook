@@ -125,23 +125,6 @@ class DataCheck:
         return self.rule_df[(self.rule_df[criteria]).notna()].index
 
     def add_error_col(self, error_msg: str, condition: Column, error_col_name: str) -> None:
-        """
-        Adds an error column to the source DataFrame in the DataCheck class with a specified error message and condition.
-
-        :param error_msg: The error message to be displayed when the condition is met.
-        :type error_msg: str
-        :param condition: A PySpark Column object representing the condition for displaying the error message.
-        :type condition: pyspark.sql.Column
-        :param error_col_name: The name of the error column to be added to the source DataFrame.
-        :type error_col_name: str
-        :return: None
-        :Example:
-        data_check = DataCheck(source_df)
-        error_msg = "Value is negative"
-        condition = f.col("value") < 0
-        error_col_name = "error_negative_value"
-        data_check.add_error_col(error_msg, condition, error_col_name)
-        """
         if condition is not None and error_col_name and error_msg:
             col_condition = f.when(condition, f.lit(error_msg)).otherwise(f.lit(None))
             error_col_name = error_col_name + str(self.error_counter)
@@ -341,6 +324,7 @@ class DataCheck:
         logger.info(f"[{input_col}] duplicate check is done.")
 
     def main_pipeline(self):
+        
         columns_to_check_dict = {}
         columns_to_check_dict[self.data_type_check] = self.columns_to_check("type")
         columns_to_check_dict[self.null_check] = self.rule_df[(self.rule_df["nullable"]).isna()].index

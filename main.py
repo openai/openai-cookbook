@@ -90,6 +90,7 @@ def get_modified_code_files() -> dict:
 def generate_unit_test(
     directory: str,
     repo_explanation: str,  # explanation of the project repo - got from documentation.
+    functions: List = [],
     unit_test_package: str = "pytest",
     doc_package: str = "sphinx",
     platform: str = "Python 3.9",
@@ -114,6 +115,7 @@ def generate_unit_test(
                     * rules files (csv) that can provide the schema (columns) of DF - config_path (S3 path where hold the config csv file in this case)
                     * name of the file to have data quality check (proper file name included in the config csv rules file) - file_name attribute
                     * the source (vendor) of the file to have data quality check - src_system attribute
+        functions (List): list of functions specifically need to generate unit test. Default to [], meaning all functions are to generate unit tests.
         unit_test_package (str): package/ library used for unit testing, i.e. `pytest`, `unittest`, etc. Defaults to "pytest"
         platform (str, optional): code language/version or platforms that need to generate unit test. Defaults to "Python 3.9".
         engine (str, optional): OpenAI engine used to generate unit tests. Defaults to "GPT4".
@@ -175,45 +177,46 @@ def generate_unit_test(
                         for class_method_name, class_method in obj_value.items():
                             class_name = str(class_method).split(".")[0].split(" ")[1]
                             function_name = str(class_method).split(".")[1].split(" ")[0]
-                            function_to_test = inspect.getsource(class_method)
-                            doc_messages.append(
-                                {
-                                    "role": "user",
-                                    "content": f"provide documentation for {function_to_test} in class {class_name} that can be used in {doc_package}",
-                                }
-                            )
-                            doc_code, doc_messages = chat_gpt_wrapper(input_messages=doc_messages)
-                            if len(doc_messages) > 4:
-                                doc_messages = doc_messages[:1] + doc_messages[-4:]
-                            # Open the file in read mode and read its content
-                            with open(file_path, "r") as file:
-                                file_content = file.read()
-                            if doc_code.startswith("class"):
-                                doc_code = "\n".join(doc_code.split("\n")[1:])
-                            else:
-                                doc_code = "    " + doc_code.replace("\n", "\n    ")
-                            # Replace a specific string in the file content
-                            new_content = file_content.replace(function_to_test, doc_code)
+                            if (len(functions) > 0 and function_name in functions) or (len(functions) == 0):
+                                function_to_test = inspect.getsource(class_method)
+                                doc_messages.append(
+                                    {
+                                        "role": "user",
+                                        "content": f"provide documentation for {function_to_test} in class {class_name} that can be used in {doc_package}",
+                                    }
+                                )
+                                doc_code, doc_messages = chat_gpt_wrapper(input_messages=doc_messages)
+                                if len(doc_messages) > 4:
+                                    doc_messages = doc_messages[:1] + doc_messages[-4:]
+                                # Open the file in read mode and read its content
+                                with open(file_path, "r") as file:
+                                    file_content = file.read()
+                                if doc_code.startswith("class"):
+                                    doc_code = "\n".join(doc_code.split("\n")[1:])
+                                else:
+                                    doc_code = "    " + doc_code.replace("\n", "\n    ")
+                                # Replace a specific string in the file content
+                                new_content = file_content.replace(function_to_test, doc_code)
 
-                            # Open the file in write mode and write the new content to it
-                            with open(file_path, "w") as file:
-                                file.write(new_content)
+                                # Open the file in write mode and write the new content to it
+                                with open(file_path, "w") as file:
+                                    file.write(new_content)
 
-                            request_for_unit_test = f" provide unit test for the function `{function_name} in {class_name}`.\
-                                ```python\
-                                {function_to_test} \
-                                ```\
-                                and the path of the function is {file_path}\
-                                "
+                                request_for_unit_test = f" provide unit test for the function `{function_name} in {class_name}`.\
+                                    ```python\
+                                    {function_to_test} \
+                                    ```\
+                                    and the path of the function is {file_path}\
+                                    "
 
-                            messages.append({"role": "user", "content": request_for_unit_test})
-                            unit_test_code, messages = chat_gpt_wrapper(input_messages=messages)
-                            if len(doc_messages) > 4:
-                                doc_code = doc_code[:1] + doc_code[-4:]
-                            generated_unit_test += f"{function_name} in class {class_name}`\n{unit_test_code}"
-                            current_test_path = f"test_code/unit_test/test_{class_name}_{function_name}.py"
-                            with open(current_test_path, "w") as test_f:
-                                test_f.write(unit_test_code)
+                                messages.append({"role": "user", "content": request_for_unit_test})
+                                unit_test_code, messages = chat_gpt_wrapper(input_messages=messages)
+                                if len(doc_messages) > 4:
+                                    doc_code = doc_code[:1] + doc_code[-4:]
+                                generated_unit_test += f"{function_name} in class {class_name}`\n{unit_test_code}"
+                                current_test_path = f"test_code/unit_test/test_{class_name}_{function_name}.py"
+                                with open(current_test_path, "w") as test_f:
+                                    test_f.write(unit_test_code)
                     else:
                         function_name = obj_key
                         function_to_test = inspect.getsource(obj_value)
@@ -246,6 +249,62 @@ def generate_unit_test(
                 #     break
 
 
+def trigger_unit_tests():
+    modified_code_files = get_modified_code_files()
+
+    print(modified_code_files)
+
+    if len(modified_code_files) != 0:
+        for file_path, status in modified_code_files.items():
+            file_extension = os.path.splitext(file_path)[1]
+            unit_test_path = file_path[::-1].replace("\\", "/test_", 1)[::-1]
+            if status == "D":
+                # delete unit test files
+                if os.path.exists(unit_test_path):
+                    os.remove(unit_test_path)
+            else:
+                # object_dict = {}
+                # directory_dict = {}
+                # object_dict, directory_dict = import_modules_from_file(
+                #     filepath=file_path, extension=file_extension, object_dict=object_dict, directory_dict=directory_dict
+                # )
+                # use git diff to get the content of the file from the previous remote commit
+                git_diff_output = subprocess.check_output(["git", "diff", "@{upstream}..HEAD", file_path])
+                # decode the bytes to a string
+                git_diff_output = git_diff_output.decode("utf-8")
+                # split the output into lines
+                git_diff_lines = git_diff_output.split("\n")
+
+                # loop through the diff output to find the modified function name
+                added_funcs = []
+                deleted_funcs = []
+                for line in git_diff_lines:
+                    if line.startswith("+def "):
+                        added_func_name = line[5:].split("(")[0]
+                        added_funcs.append(added_func_name)
+                    elif line.startswith("-def "):
+                        deleted_func_name = line[5:].split("(")[0]
+                        deleted_funcs.append(deleted_func_name)
+
+                # add unit test for added functions
+                generate_unit_test(
+                    directory="test_code",
+                    repo_explanation="This repo uses the dq_utility to check the data quality based on different sources given in\
+            csv files like az_ca_pcoe_dq_rules_innomar, it will generate a csv output of the lines with errors in a csv file, to use the repo u can:\
+            from dq_utility import DataCheck\
+            from pyspark.sql import SparkSession\
+            spark = SparkSession.builder.getOrCreate()\
+            df=spark.read.parquet('test_data.parquet')\
+            Datacheck(source_df=df,\
+            spark_context= spark,\
+            config_path=s3://config-path-for-chat-gpt-unit-test/config.json,\
+            file_name=az_ca_pcoe_dq_rules_innomar.csv,\
+            src_system=bioscript)",
+                    functions=[added_funcs]
+                )
+                # TODO: delete existing unit test (if applicable) for deleted functions
+
+
 if __name__ == "__main__":
     import os
     from dotenv import load_dotenv
@@ -275,33 +334,3 @@ if __name__ == "__main__":
     #         file_name=az_ca_pcoe_dq_rules_innomar.csv,\
     #         src_system=bioscript)",
     #     )
-
-    modified_code_files = get_modified_code_files()
-
-    print(modified_code_files)
-
-    if len(modified_code_files) != 0:
-        for file_path, status in modified_code_files.items():
-            file_extension = os.path.splitext(file_path)[1]
-            unit_test_path = file_path[::-1].replace("\\", "/test_", 1)[::-1]
-            if status == "D":
-                # delete unit test files
-                if os.path.exists(unit_test_path):
-                    os.remove(unit_test_path)
-            else:
-                # object_dict = {}
-                # directory_dict = {}
-                # object_dict, directory_dict = import_modules_from_file(
-                #     filepath=file_path, extension=file_extension, object_dict=object_dict, directory_dict=directory_dict
-                # )
-                # use git diff to get the content of the file from the previous remote commit
-                git_diff_output = subprocess.check_output(['git', 'diff', '@{upstream}..HEAD', file_path])
-                # decode the bytes to a string
-                git_diff_output = git_diff_output.decode('utf-8')
-                # split the output into lines
-                git_diff_lines = git_diff_output.split('\n')
-
-                # loop through the diff output to find the lines that start with either '+' or '-'
-                for line in git_diff_lines:
-                    if line.startswith('+ def') or line.startswith("- def"):
-                        print(line)

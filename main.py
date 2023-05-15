@@ -1,7 +1,8 @@
 # imports needed to run the code in this notebook
+import json
 import ast
 import openai  # used for calling the OpenAI API
-from get_functions import import_all_modules, import_modules_from_file
+from get_functions import import_all_modules
 import re
 import subprocess
 import inspect
@@ -13,7 +14,7 @@ class CodeToolbox:
         Initialize the CodeToolbox instance.
 
         Available configuration parameters:
-        
+
         - platform (str, optional): code language/version or platforms that need to generate unit test. Defaults to "Python 3.9".
         - unit_test_package (str): package/ library used for unit testing, i.e. `pytest`, `unittest`, etc. Defaults to "pytest"
         - document (bool): Whether to generate documentation. Default is True.
@@ -56,7 +57,7 @@ class CodeToolbox:
             stream=False,
         )
         unit_test_completion = plan_response.choices[0].message.content
-        input_messages.append({"role": "assistant", "content": plan_response.choices[0].message.content})
+        input_messages.append({"role": "assistant", "content": unit_test_completion})
         # check the output for errors
         code_output = self.extract_all_python_code(unit_test_completion)
         try:
@@ -65,12 +66,9 @@ class CodeToolbox:
             print(f"Syntax error in generated code: {e}")
             if self.config['reruns_if_fail'] > 0:
                 print("Rerunning...")
+                self.config['reruns_if_fail'] -= 1 # decrement rerun counter when calling again
                 return self.chat_gpt_wrapper(
-                    input_messages=input_messages,
-                    engine=engine,
-                    max_tokens=self.config['max_tokens'],
-                    temperature=self.config['temperature'],
-                    reruns_if_fail=self.config['reruns_if_fail'] - 1,  # decrement rerun counter when calling again
+                    input_messages=input_messages
                 )
         return code_output, input_messages
     @staticmethod
@@ -84,7 +82,7 @@ class CodeToolbox:
         return "".join([match[0].strip() for match in matches])
     @staticmethod
     def get_modified_code_files() -> dict:
-        """Get a dictionary of all the code files that are added/ modified/ deleted
+        """Get a dictionary of all the code files in certain allowed extensions that are added/ modified/ deleted
 
         Returns:
             dict: dictionary of all the code files that are added/ modified/ deleted along with its status
@@ -128,7 +126,7 @@ class CodeToolbox:
         # Open the file in write mode and write the new content to it
         with open(self.file_path, 'w') as file:
             file.write(new_content)
-                
+
         request_for_unit_test = f" provide unit test for the function `{function_name} {class_part}`.\
             ```python\
             {func_str} \
@@ -180,15 +178,23 @@ class CodeToolbox:
                     * the source (vendor) of the file to have data quality check - src_system attribute
     """
         #TODO: in current way, you cannot do java or something else with python. change platform and unit_test_package maybe.
+
         object_dict = {}
         directory_dict = {}
         object_dict, directory_dict = import_all_modules(
             directory=directory, object_dict=object_dict, directory_dict=directory_dict
         )
+        # Save the current state to current_modules.json
+        with open("current_modules.json", "w") as file:
+            json.dump(object_dict, file)
 
-        i = 0
-        
-        doc_prompt = f"""you are providing documentation and typing (type hints) of code to be used in {doc_package}, as an example for the function 
+        if os.path.exists("previous_modules.json"):
+            #TODO: compare with the "current_modules.json" and detect the different modules, then regenerare or delete unit tests where needed
+            return
+
+        # i = 0
+
+        doc_prompt = f"""you are providing documentation and typing (type hints) of code to be used in {doc_package}, as an example for the function
         ```python
         def read_s3_file(self, file_path):
             file_res = urlparse(file_path)
@@ -230,7 +236,7 @@ class CodeToolbox:
         # conversion_messages=[]
         # conversion_prompt= f"your task is to convert the code into {target_conversion}"
         for self.file_path, objects in object_dict.items():
-            generated_unit_test = ""
+            # generated_unit_test = ""
             if "objects" in objects:
                 for obj_key, obj_value in objects["objects"].items():
                     if obj_value:

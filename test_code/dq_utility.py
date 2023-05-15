@@ -125,12 +125,13 @@ class DataCheck:
         return self.rule_df[(self.rule_df[criteria]).notna()].index
 
     def add_error_col(self, error_msg: str, condition: Column, error_col_name: str) -> None:
-        if condition is not None and error_col_name and error_msg:
-            col_condition = f.when(condition, f.lit(error_msg)).otherwise(f.lit(None))
-            error_col_name = error_col_name + str(self.error_counter)
-            self.source_df = self.source_df.withColumn(error_col_name, col_condition)
-            self.error_columns.append(f.col(error_col_name))
-            self.error_counter += 1
+        # if condition is not None and error_col_name and error_msg:
+        #     col_condition = f.when(condition, f.lit(error_msg)).otherwise(f.lit(None))
+        #     error_col_name = error_col_name + str(self.error_counter)
+        #     self.source_df = self.source_df.withColumn(error_col_name, col_condition)
+        #     self.error_columns.append(f.col(error_col_name))
+        #     self.error_counter += 1
+        return None
     def data_type_check(self, input_col):
         print("start data type check")
         dtype_key = self.rule_df.loc[input_col, "type"]
@@ -324,7 +325,7 @@ class DataCheck:
         logger.info(f"[{input_col}] duplicate check is done.")
 
     def main_pipeline(self):
-        
+
         columns_to_check_dict = {}
         columns_to_check_dict[self.data_type_check] = self.columns_to_check("type")
         columns_to_check_dict[self.null_check] = self.rule_df[(self.rule_df["nullable"]).isna()].index

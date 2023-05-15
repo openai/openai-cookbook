@@ -1,11 +1,11 @@
 # imports needed to run the code in this notebook
 import ast
 import openai  # used for calling the OpenAI API
-from get_functions import import_all_modules
+from get_functions import import_all_modules, import_modules_from_file
 import re
 import subprocess
 import inspect
-from typing import Any, Tuple, List # type: ignore
+from typing import Any, Tuple, List  # type: ignore
 
 
 def chat_gpt_wrapper(
@@ -70,7 +70,7 @@ def get_modified_code_files() -> dict:
     output = subprocess.check_output(["git", "diff", "--name-status", "@{upstream}..HEAD"])
 
     # Filter for only code files
-    allowed_extensions = ['.py', '.cpp','.java', '.js', '.scala', '.sas']
+    allowed_extensions = [".py", ".cpp", ".java", ".js", ".scala", ".sas", ".json", ".csv"]
     code_files = [f for f in output.decode().split("\n") if os.path.splitext(f)[1] in allowed_extensions]
 
     # Get the type of change for each code file
@@ -91,12 +91,12 @@ def generate_unit_test(
     directory: str,
     repo_explanation: str,  # explanation of the project repo - got from documentation.
     unit_test_package: str = "pytest",
-    doc_package:str="sphinx",
+    doc_package: str = "sphinx",
     platform: str = "Python 3.9",
     engine: str = "GPT4",
     model="gpt-4",
     max_tokens: int = 1000,
-    temperature: float = 0.4
+    temperature: float = 0.4,
 ):
     """pipeline to generate unit test for all code files that contain modules in a directory
 
@@ -164,8 +164,8 @@ def generate_unit_test(
         {repo_explanation}. to give details about the structure of the repo look at the dictionary below, it includes all files\
         and if python, all function and classes, if json first and second level keys and if csv, the column names :{directory_dict},"
     messages.append({"role": "system", "content": full_prompt})
-    doc_messages=[]
-    doc_messages.append({"role":"system","content": doc_prompt})
+    doc_messages = []
+    doc_messages.append({"role": "system", "content": doc_prompt})
     for file_path, objects in object_dict.items():
         generated_unit_test = ""
         if "objects" in objects:
@@ -176,22 +176,27 @@ def generate_unit_test(
                             class_name = str(class_method).split(".")[0].split(" ")[1]
                             function_name = str(class_method).split(".")[1].split(" ")[0]
                             function_to_test = inspect.getsource(class_method)
-                            doc_messages.append({"role":"user","content":f"provide documentation for {function_to_test} in class {class_name} that can be used in {doc_package}"})
-                            doc_code,doc_messages = chat_gpt_wrapper(input_messages=doc_messages)
-                            if len(doc_messages)>4:
+                            doc_messages.append(
+                                {
+                                    "role": "user",
+                                    "content": f"provide documentation for {function_to_test} in class {class_name} that can be used in {doc_package}",
+                                }
+                            )
+                            doc_code, doc_messages = chat_gpt_wrapper(input_messages=doc_messages)
+                            if len(doc_messages) > 4:
                                 doc_messages = doc_messages[:1] + doc_messages[-4:]
                             # Open the file in read mode and read its content
-                            with open(file_path, 'r') as file:
+                            with open(file_path, "r") as file:
                                 file_content = file.read()
-                            if doc_code.startswith('class'):
-                                doc_code='\n'.join(doc_code.split('\n')[1:])
+                            if doc_code.startswith("class"):
+                                doc_code = "\n".join(doc_code.split("\n")[1:])
                             else:
-                                doc_code='    '+doc_code.replace('\n','\n    ')
+                                doc_code = "    " + doc_code.replace("\n", "\n    ")
                             # Replace a specific string in the file content
                             new_content = file_content.replace(function_to_test, doc_code)
 
                             # Open the file in write mode and write the new content to it
-                            with open(file_path, 'w') as file:
+                            with open(file_path, "w") as file:
                                 file.write(new_content)
 
                             request_for_unit_test = f" provide unit test for the function `{function_name} in {class_name}`.\
@@ -203,7 +208,7 @@ def generate_unit_test(
 
                             messages.append({"role": "user", "content": request_for_unit_test})
                             unit_test_code, messages = chat_gpt_wrapper(input_messages=messages)
-                            if len(doc_messages)>4:
+                            if len(doc_messages) > 4:
                                 doc_code = doc_code[:1] + doc_code[-4:]
                             generated_unit_test += f"{function_name} in class {class_name}`\n{unit_test_code}"
                             current_test_path = f"test_code/unit_test/test_{class_name}_{function_name}.py"
@@ -224,21 +229,21 @@ def generate_unit_test(
                             engine=engine,
                             model=model,
                             max_tokens=max_tokens,
-                            temperature=temperature
+                            temperature=temperature,
                         )
                         generated_unit_test += f"{function_name}`\n{unit_test_code}"
                         current_test_path = f"test_code/unit_test/test_{class_name}_{function_name}.py"
                         with open(current_test_path, "w") as test_f:
-                                test_f.write(unit_test_code)
-            unit_test_path = file_path[::-1].replace('\\','/test_',1)[::-1]
+                            test_f.write(unit_test_code)
+            unit_test_path = file_path[::-1].replace("\\", "/test_", 1)[::-1]
             with open(unit_test_path, "w") as test_f:
                 test_f.write(generated_unit_test)
-                    # MAX_RETRIES = 3
-                    # retry_count = 0
-                    # fixed = False
-                    # i += 1
-                    # if i > 3:
-                    #     break
+                # MAX_RETRIES = 3
+                # retry_count = 0
+                # fixed = False
+                # i += 1
+                # if i > 3:
+                #     break
 
 
 if __name__ == "__main__":
@@ -274,8 +279,29 @@ if __name__ == "__main__":
     modified_code_files = get_modified_code_files()
 
     print(modified_code_files)
+
     if len(modified_code_files) != 0:
-        # for file, status in modified_code_files.items():
-        #     if status == 'D':
-        #         #delete unit test files
-        #         with open(f"test_{file}")
+        for file_path, status in modified_code_files.items():
+            file_extension = os.path.splitext(file_path)[1]
+            unit_test_path = file_path[::-1].replace("\\", "/test_", 1)[::-1]
+            if status == "D":
+                # delete unit test files
+                if os.path.exists(unit_test_path):
+                    os.remove(unit_test_path)
+            else:
+                # object_dict = {}
+                # directory_dict = {}
+                # object_dict, directory_dict = import_modules_from_file(
+                #     filepath=file_path, extension=file_extension, object_dict=object_dict, directory_dict=directory_dict
+                # )
+                # use git diff to get the content of the file from the previous remote commit
+                git_diff_output = subprocess.check_output(['git', 'diff', '@{upstream}..HEAD', file_path])
+                # decode the bytes to a string
+                git_diff_output = git_diff_output.decode('utf-8')
+                # split the output into lines
+                git_diff_lines = git_diff_output.split('\n')
+
+                # loop through the diff output to find the lines that start with either '+' or '-'
+                for line in git_diff_lines:
+                    if line.startswith('+ def') or line.startswith("- def"):
+                        print(line)

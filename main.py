@@ -7,8 +7,6 @@ import subprocess
 import inspect
 from typing import Any, Tuple, List # type: ignore
 
-# example of a function that uses a multi-step prompt to write unit tests
-
 
 def chat_gpt_wrapper(
     input_messages=[],
@@ -61,16 +59,23 @@ def extract_all_python_code(string):
     return "".join([match[0].strip() for match in matches])
 
 
-def get_changed_py_files_after_commit():
+def get_modified_code_files() -> dict:
+    """Get a dictionary of all the code files that are added/ modified/ deleted
+
+    Returns:
+        dict: dictionary of all the code files that are added/ modified/ deleted along with its status
+    """
+
     # Get the list of changed files
     output = subprocess.check_output(["git", "diff", "--name-status", "@{upstream}..HEAD"])
 
-    # Filter for only Python files
-    python_files = [f for f in output.decode().split("\n") if f.endswith(".py")]
+    # Filter for only code files
+    allowed_extensions = ['.py', '.cpp','.java', '.js', '.scala', '.sas']
+    code_files = [f for f in output.decode().split("\n") if os.path.splitext(f)[1] in allowed_extensions]
 
-    # Get the type of change for each Python file
+    # Get the type of change for each code file
     changes = {}
-    for file in python_files:
+    for file in code_files:
         print(file)
         try:
             status, filename = file.split("\t")
@@ -124,7 +129,7 @@ def generate_unit_test(
 
     i = 0
     messages = []
-    doc_prompt = f"""you are providing documentation and typing (type hints) of code to be used in {doc_package}, as an example for the function 
+    doc_prompt = f"""you are providing documentation and typing (type hints) of code to be used in {doc_package}, as an example for the function
     ```python
     def read_s3_file(self, file_path):
         file_res = urlparse(file_path)
@@ -235,7 +240,7 @@ def generate_unit_test(
                     # if i > 3:
                     #     break
 
-        
+
 if __name__ == "__main__":
     import os
     from dotenv import load_dotenv
@@ -251,17 +256,26 @@ if __name__ == "__main__":
     engine = "GPT4"
     model = "gpt-4"
 
-    generate_unit_test(
-        directory="test_code",
-        repo_explanation="This repo uses the dq_utility to check the data quality based on different sources given in\
-            csv files like az_ca_pcoe_dq_rules_innomar, it will generate a csv output of the lines with errors in a csv file, to use the repo u can:\
-            from dq_utility import DataCheck\
-            from pyspark.sql import SparkSession\
-            spark = SparkSession.builder.getOrCreate()\
-            df=spark.read.parquet('test_data.parquet')\
-            Datacheck(source_df=df,\
-            spark_context= spark,\
-            config_path=s3://config-path-for-chat-gpt-unit-test/config.json,\
-            file_name=az_ca_pcoe_dq_rules_innomar.csv,\
-            src_system=bioscript)",
-        )
+    # generate_unit_test(
+    #     directory="test_code",
+    #     repo_explanation="This repo uses the dq_utility to check the data quality based on different sources given in\
+    #         csv files like az_ca_pcoe_dq_rules_innomar, it will generate a csv output of the lines with errors in a csv file, to use the repo u can:\
+    #         from dq_utility import DataCheck\
+    #         from pyspark.sql import SparkSession\
+    #         spark = SparkSession.builder.getOrCreate()\
+    #         df=spark.read.parquet('test_data.parquet')\
+    #         Datacheck(source_df=df,\
+    #         spark_context= spark,\
+    #         config_path=s3://config-path-for-chat-gpt-unit-test/config.json,\
+    #         file_name=az_ca_pcoe_dq_rules_innomar.csv,\
+    #         src_system=bioscript)",
+    #     )
+
+    modified_code_files = get_modified_code_files()
+
+    print(modified_code_files)
+    if len(modified_code_files) != 0:
+        # for file, status in modified_code_files.items():
+        #     if status == 'D':
+        #         #delete unit test files
+        #         with open(f"test_{file}")

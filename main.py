@@ -11,13 +11,12 @@ from typing import Any, Tuple, List # type: ignore
 # example of a function that uses a multi-step prompt to write unit tests
 
 
-def unit_test_from_function(
-    unit_test_package: str = "pytest",
+def chat_gpt_wrapper(
     input_messages=[],
     engine: str = "GPT4",
     model="gpt-4",
     max_tokens: int = 1000,
-    temperature: float = 0.4,
+    temperature: float = 0.2,
     reruns_if_fail: int = 0,
 ) -> Tuple[Any, List]:
     """Outputs a unit test for a given Python function, using a 3-step GPT-3 prompt."""
@@ -43,8 +42,7 @@ def unit_test_from_function(
         print(f"Syntax error in generated code: {e}")
         if reruns_if_fail > 0:
             print("Rerunning...")
-            return unit_test_from_function(
-                unit_test_package=unit_test_package,
+            return chat_gpt_wrapper(
                 input_messages=input_messages,
                 engine=engine,
                 max_tokens=max_tokens,
@@ -89,6 +87,7 @@ def generate_unit_test(
     directory: str,  # path to the entire repo folder
     repo_explanation: str,  # explanation of the project repo - got from documentation
     unit_test_package: str = "pytest",
+    doc_package:str="sphinx",
     platform: str = "Python 3.9",
     engine: str = "GPT4",
     model="gpt-4",
@@ -103,11 +102,43 @@ def generate_unit_test(
 
     i = 0
     messages = []
-
+    doc_prompt = f"""you are providing documentation and typing (type hints) of code to be used in {doc_package}, as an example for the function 
+    ```python
+    def read_s3_file(self, file_path):
+        file_res = urlparse(file_path)
+        try:
+            file_obj = s3_resource.Object(file_res.netloc, file_res.path.lstrip("/"))
+            return file_obj.get()["Body"].read()
+        except ClientError:
+            raise FileNotFoundError(f"File cannot be found in S3 given path file_path"):
+    ```
+    this is a proper response:
+    ```python
+    def read_s3_file(self, file_path:str)->str:
+    \"\"\"
+    Reads the contents of a file from an S3 bucket.
+    :param file_path: The S3 URI of the file to read, e.g. "s3://my-bucket/my-file.txt".
+    :type file_path: str
+    :return: The contents of the file as a byte string.
+    :rtype: bytes
+    :raises FileNotFoundError: If the file cannot be found in the specified S3 bucket.
+    :Example:
+    (some examples)
+    \"\"\"
+    file_res = urlparse(file_path)
+    try:
+        file_obj = s3_resource.Object(file_res.netloc, file_res.path.lstrip("/"))
+        return file_obj.get()["Body"].read()
+    except ClientError:
+        raise FileNotFoundError(f"File cannot be found in S3 given path file_path")
+    ```
+    """
     full_prompt = f"you are providing unit test using {unit_test_package}` and {platform}\
         {repo_explanation}. to give details about the structure of the repo look at the dictionary below, it includes all files\
-        and if python, all function and classes, if json first and second level keys and if csv, the column names :{directory_dict}"
+        and if python, all function and classes, if json first and second level keys and if csv, the column names :{directory_dict},"
     messages.append({"role": "system", "content": full_prompt})
+    doc_messages=[]
+    doc_messages.append({"role":"system","content": doc_prompt})
     for file_path, objects in object_dict.items():
         generated_unit_test = ""
         if "objects" in objects:
@@ -118,24 +149,39 @@ def generate_unit_test(
                             class_name = str(class_method).split(".")[0].split(" ")[1]
                             function_name = str(class_method).split(".")[1].split(" ")[0]
                             function_to_test = inspect.getsource(class_method)
-                            prompt_to_explain_the_function = f" provide unit test for the function `{function_name} in {class_name}`.\
+                            doc_messages.append({"role":"user","content":f"provide documentation for {function_to_test} in class {class_name} that can be used in {doc_package}"})
+                            doc_code,doc_messages = chat_gpt_wrapper(input_messages=doc_messages)
+                            if len(doc_messages)>4:
+                                doc_messages = doc_messages[:1] + doc_messages[-4:]
+                            # Open the file in read mode and read its content
+                            with open(file_path, 'r') as file:
+                                file_content = file.read()
+                            if doc_code.startswith('class'):
+                                doc_code='\n'.join(doc_code.split('\n')[1:])
+                            else:
+                                doc_code='    '+doc_code.replace('\n','\n    ')
+                            # Replace a specific string in the file content
+                            new_content = file_content.replace(function_to_test, doc_code)
+
+                            # Open the file in write mode and write the new content to it
+                            with open(file_path, 'w') as file:
+                                file.write(new_content)
+
+                            request_for_unit_test = f" provide unit test for the function `{function_name} in {class_name}`.\
                                 ```python\
                                 {function_to_test} \
                                 ```\
                                 and the path of the function is {file_path}\
                                 "
-                            messages.append({"role": "user", "content": prompt_to_explain_the_function})
-                            unit_test_code, messages = unit_test_from_function(
-                                input_messages=messages,
-                                engine=engine,
-                                model=model,
-                                max_tokens=max_tokens,
-                                temperature=temperature
-                            )
-                            generated_unit_test += f"\n\n#Test function `{function_name} in class {class_name}`\n{unit_test_code}"
-                            # current_test_path = f"test_code/unit_test/test_{class_method_name}.py"
-                            # with open(current_test_path, "w") as test_f:
-                            #     test_f.write(unit_test_code)
+
+                            messages.append({"role": "user", "content": request_for_unit_test})
+                            unit_test_code, messages = chat_gpt_wrapper(input_messages=messages)
+                            if len(doc_messages)>4:
+                                doc_code = doc_code[:1] + doc_code[-4:]
+                            generated_unit_test += f"{function_name} in class {class_name}`\n{unit_test_code}"
+                            current_test_path = f"test_code/unit_test/test_{class_name}_{function_name}.py"
+                            with open(current_test_path, "w") as test_f:
+                                test_f.write(unit_test_code)
                     else:
                         function_name = obj_key
                         function_to_test = inspect.getsource(obj_value)
@@ -146,19 +192,17 @@ def generate_unit_test(
                             and the path of the function is {file_path}\
                             "
                         messages.append({"role": "user", "content": prompt_to_explain_the_function})
-                        unit_test_code, messages = unit_test_from_function(
+                        unit_test_code, messages = chat_gpt_wrapper(
                             input_messages=messages,
                             engine=engine,
                             model=model,
                             max_tokens=max_tokens,
                             temperature=temperature
                         )
-                        generated_unit_test += f"\n\n#Test function `{function_name}`\n{unit_test_code}"
-                        # current_test_path = (
-                        #     f"test_code/unit_test/test_{str(obj_value).split(' at ')[0].replace('<','')}.py"
-                        # )
-                        # with open(current_test_path, "w") as test_f:
-                        #     test_f.write(unit_test_code)
+                        generated_unit_test += f"{function_name}`\n{unit_test_code}"
+                        current_test_path = f"test_code/unit_test/test_{class_name}_{function_name}.py"
+                        with open(current_test_path, "w") as test_f:
+                                test_f.write(unit_test_code)
             unit_test_path = file_path[::-1].replace('\\','/test_',1)[::-1]
             with open(unit_test_path, "w") as test_f:
                 test_f.write(generated_unit_test)
@@ -169,7 +213,7 @@ def generate_unit_test(
                     # if i > 3:
                     #     break
 
-
+        
 if __name__ == "__main__":
     import os
     from dotenv import load_dotenv
@@ -199,78 +243,3 @@ if __name__ == "__main__":
             file_name=az_ca_pcoe_dq_rules_innomar.csv,\
             src_system=bioscript)",
         )
-    # object_dict = {}
-    # directory_dict = {}
-    # object_dict, directory_dict = import_all_modules(
-    #     "test_code", object_dict=object_dict, directory_dict=directory_dict
-    # )
-    # i = 0
-    # messages = []
-    # unit_test_package = "pytest"
-    # platform = "python 3.9"
-    # user_input = "This repo uses the dq_utility to check the data quality based on different sources given in\
-    #     csv files like az_ca_pcoe_dq_rules_innomar, it will generate a csv output of the lines with errors in a csv file, to use the repo u can:\
-    #     from dq_utility import DataCheck\
-    #     from pyspark.sql import SparkSession\
-    #     spark = SparkSession.builder.getOrCreate()\
-    #     df=spark.read.parquet('test_data.parquet')\
-    #     Datacheck(source_df=df,\
-    #     spark_context= spark,\
-    #     config_path=s3://config-path-for-chat-gpt-unit-test/config.json,\
-    #     file_name=az_ca_pcoe_dq_rules_innomar.csv,\
-    #     src_system=bioscript)"
-    # repo_explanation = f"you are providing unit test using {unit_test_package}` and Python 3.9\
-    #     {user_input}. to give details about the structure of the repo look at the dictionary below, it includes all files\
-    #     and if python, all function and calsses, if json first and second level keys and if csv, the column names :{directory_dict}"
-    # messages.append({"role": "system", "content": repo_explanation})
-    # for file_path, objects in object_dict.items():
-    #     if "objects" in objects:
-    #         for obj_key, obj_value in objects["objects"].items():
-    #             if obj_value:
-    #                 if type(obj_value) == dict:
-    #                     for class_method_name, class_method in obj_value.items():
-    #                         # if '__init__' in str(class_method).split(' at ')[0].replace('<','').replace('.','_').replace(' ','_'):
-    #                         #     init_str = inspect.getsource(class_method)
-    #                         #     continue
-    #                         # if __init__function:
-    #                         #     init_str=f'the __init__ function for this class is: {__init__function}'\
-    #                         class_name = str(class_method).split(".")[0].split(" ")[1]
-    #                         function_name = str(class_method).split(".")[1].split(" ")[0]
-    #                         function_to_test = inspect.getsource(class_method)
-    #                         prompt_to_explain_the_function = f" provide unit test for the function `{function_name} in {class_name}`.\
-    #                             ```python\
-    #                             {function_to_test} \
-    #                             ```\
-    #                             and the path of the function is {file_path}\
-    #                             "
-    #                         messages.append({"role": "user", "content": prompt_to_explain_the_function})
-    #                         unit_test_code, messages = unit_test_from_function(
-    #                             input_messages=messages,
-    #                             engine=engine,
-    #                             model=model,
-    #                         )
-    #                         current_test_path = f"test_code/unit_test/test_{class_method_name}.py"
-    #                         with open(current_test_path, "w") as test_f:
-    #                             test_f.write(unit_test_code)
-    #                 else:
-    #                     # TODO: add the prompt explain....
-    #                     unit_test_code, messages = unit_test_from_function(
-    #                         input_messages=messages,
-    #                         engine=engine,
-    #                         model=model,
-    #                     )
-    #                     current_test_path = (
-    #                         f"test_code/unit_test/test_{str(obj_value).split(' at ')[0].replace('<','')}.py"
-    #                     )
-    #                     with open(current_test_path, "w") as test_f:
-    #                         test_f.write(unit_test_code)
-    #                 MAX_RETRIES = 3
-    #                 retry_count = 0
-    #                 fixed = False
-    #                 i += 1
-    #                 if i > 3:
-    #                     break
-
-    #     # print('done')
-
-    # print(get_changed_py_files_after_commit())

@@ -1,6 +1,5 @@
 # imports needed to run the code in this notebook
 import ast
-import code  # used for detecting whether generated Python code is valid
 import openai  # used for calling the OpenAI API
 from get_functions import import_all_modules
 import re
@@ -86,8 +85,8 @@ def get_changed_py_files_after_commit():
 
 
 def generate_unit_test(
-    directory: str,  # path to the entire repo folder
-    repo_explanation: str,  # explanation of the project repo - got from documentation
+    directory: str,
+    repo_explanation: str,  # explanation of the project repo - got from documentation.
     unit_test_package: str = "pytest",
     platform: str = "Python 3.9",
     engine: str = "GPT4",
@@ -95,6 +94,29 @@ def generate_unit_test(
     max_tokens: int = 1000,
     temperature: float = 0.4
 ):
+    """pipeline to generate unit test for all code files that contain modules in a directory
+
+    Args:
+        directory (str): path to the entire repo folder
+        repo_explanation (str): high level explanation of what the project does and what needs to have unit test generated
+            1. Indicate which code files/ classes/ functions need to generate unit test
+            2. List all dependencies (custom attribute values that OpenAI cannot generate randomly) needed to the run the codes (
+                if there's any config file, testing path (S3), schema of the dataframe, clearly state in this explanation as well)
+            For example, in the DQ check project, repo explanation is as below:
+                - This project is run mainly by file `dq_utility.py` file. This file is packaged to be used as library
+                - This `dq_utility.py` includes `DataCheck` class along with its methods to check the data quality of a dataframe.
+                It will generate a csv output of the lines with errors in a csv file
+                - Some needed info for dependencies are as below (class attributes):
+                    * rules files (csv) that can provide the schema (columns) of DF - config_path (S3 path where hold the config csv file in this case)
+                    * name of the file to have data quality check (proper file name included in the config csv rules file) - file_name attribute
+                    * the source (vendor) of the file to have data quality check - src_system attribute
+        unit_test_package (str): package/ library used for unit testing, i.e. `pytest`, `unittest`, etc. Defaults to "pytest"
+        platform (str, optional): code language/version or platforms that need to generate unit test. Defaults to "Python 3.9".
+        engine (str, optional): OpenAI engine used to generate unit tests. Defaults to "GPT4".
+        model (str, optional): OpenAI model used to generate unit tests. Defaults to "gpt-4".
+        max_tokens (int, optional): maximum tokens used by OpenAI API. temperature = 0 can sometimes get stuck in repetitive loops. Defaults to 1000.
+        temperature (float, optional): temperature setting used by OpenAI API. Defaults to 0.4.
+    """
     object_dict = {}
     directory_dict = {}
     object_dict, directory_dict = import_all_modules(

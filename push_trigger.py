@@ -24,8 +24,8 @@ def has_function_changed(current_file, previous_file, function_name):
     current_data = json.load(current_file)
     previous_data = json.load(previous_file)
 
-    current_function = current_data[function_name]
-    previous_function = previous_data[function_name]
+    current_function = current_data['test_code\\dq_utility.py']['objects']["<class \'test_code\\dq_utility.DataCheck\'>"][function_name]
+    previous_function = previous_data['test_code\\dq_utility.py']['objects']["<class \'test_code\\dq_utility.DataCheck\'>"][function_name]
 
     return current_function != previous_function
 
@@ -43,7 +43,7 @@ with open("current_modules.json", "w") as file:
 
 # Load current and previous versions of the file
 with open('current_modules.json', 'r') as current_file, open('previous_modules.json', 'r') as previous_file:
-    function_name = 'test_code\\dq_utility.py.objects[<class \'test_code\\dq_utility.DataCheck\'>].add_error_col'
+    function_name = 'add_error_col'
     function_changed = has_function_changed(current_file, previous_file, function_name)
 
 if function_changed:

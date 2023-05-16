@@ -135,3 +135,4 @@ dmypy.json
 *.DS_Store
 *.parquet
 scala/
+*/unit_test/

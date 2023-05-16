@@ -257,7 +257,7 @@ class CodeToolbox:
         import_matches = []
         self.class_part = 'in class '+ class_name if class_name else None
         # self.documenter(func_str=func_str)
-        # self.unit_tester(func_str=func_str,function_name=function_name)
+        self.unit_tester(func_str=func_str,function_name=function_name)
         self.converter(func_str=func_str)
         
     def object_processor(self, obj_key, obj_value):
@@ -294,12 +294,13 @@ class CodeToolbox:
                         * name of the file to have data quality check (proper file name included in the config csv rules file) - file_name attribute
                         * the source (vendor) of the file to have data quality check - src_system attribute
         """
+        self.repo_explanation=repo_explanation
         # TODO: in current way, you cannot do java or something else with python. change platform and unit_test_package maybe.
 
         object_dict = {}
-        directory_dict = {}
-        object_dict, directory_dict = import_all_modules(
-            directory=directory, object_dict=object_dict, directory_dict=directory_dict
+        self.directory_dict = {}
+        object_dict, self.directory_dict = import_all_modules(
+            directory=directory, object_dict=object_dict, directory_dict=self.directory_dict
         )
 
         # i = 0
@@ -339,7 +340,7 @@ class CodeToolbox:
         self.doc_messages.append({"role": "system", "content": doc_prompt})
         unit_test_prompt = f"you are providing unit test using {unit_test_package}` and {platform}\
             {repo_explanation}. to give details about the structure of the repo look at the dictionary below, it includes all files\
-            and if python, all function and classes, if json first and second level keys and if csv, the column names :{directory_dict},"
+            and if python, all function and classes, if json first and second level keys and if csv, the column names :{self.directory_dict},"
         self.unit_test_messages = []
         self.unit_test_messages.append({"role": "system", "content": unit_test_prompt})
         # TODO: conversion
@@ -352,6 +353,8 @@ class CodeToolbox:
         if os.path.exists("previous_modules.json"):
             with open("previous_modules.json", "r") as previous_file:
                 self.previous_data = json.load(previous_file)
+        else:
+            self.previous_data=None
 
         # loop through all files in the current repo
         for self.file_path, objects in object_dict.items():
@@ -478,18 +481,18 @@ if __name__ == "__main__":
     model = "gpt-4"
     code_toolbox = CodeToolbox()
 
-    # code_toolbox.main_pipeline(
-    #     directory="test_code",
-    #     repo_explanation="This repo uses the dq_utility to check the data quality based on different sources given in\
-    #         csv files like az_ca_pcoe_dq_rules_innomar, it will generate a csv output of the lines with errors in a csv file, to use the repo u can:\
-    #         from dq_utility import DataCheck\
-    #         from pyspark.sql import SparkSession\
-    #         spark = SparkSession.builder.getOrCreate()\
-    #         df=spark.read.parquet('test_data.parquet')\
-    #         Datacheck(source_df=df,\
-    #         spark_context= spark,\
-    #         config_path=s3://config-path-for-chat-gpt-unit-test/config.json,\
-    #         file_name=az_ca_pcoe_dq_rules_innomar.csv,\
-    #         src_system=bioscript)",
-    # )
-    print(code_toolbox.changed_code_files)
+    code_toolbox.main_pipeline(
+        directory="test_code",
+        repo_explanation="This repo uses the dq_utility to check the data quality based on different sources given in\
+            csv files like az_ca_pcoe_dq_rules_innomar, it will generate a csv output of the lines with errors in a csv file, to use the repo u can:\
+            from dq_utility import DataCheck\
+            from pyspark.sql import SparkSession\
+            spark = SparkSession.builder.getOrCreate()\
+            df=spark.read.parquet('test_data.parquet')\
+            Datacheck(source_df=df,\
+            spark_context= spark,\
+            config_path=s3://config-path-for-chat-gpt-unit-test/config.json,\
+            file_name=az_ca_pcoe_dq_rules_innomar.csv,\
+            src_system=bioscript)",
+    )
+    # print(code_toolbox.main_pipeline())

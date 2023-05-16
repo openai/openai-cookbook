@@ -1,4 +1,5 @@
 import json
+import hashlib
 from get_functions import import_all_modules
 
 def convert_keys_to_str(dictionary):
@@ -11,7 +12,7 @@ def convert_keys_to_str(dictionary):
         if isinstance(value, dict):
             new_dict[new_key] = convert_keys_to_str(value)  # Recursively convert nested dictionaries
         elif callable(value):
-            new_dict[new_key] = value.__qualname__  # Convert function object to qualified name
+            new_dict[new_key] = str(value)  # Convert function object to string
         else:
             new_dict[new_key] = value
     return new_dict
@@ -27,7 +28,10 @@ def has_function_changed(current_file, previous_file, function_name):
     current_function = current_data['test_code\\dq_utility.py']['objects']["<class \'test_code\\dq_utility.DataCheck\'>"][function_name]
     previous_function = previous_data['test_code\\dq_utility.py']['objects']["<class \'test_code\\dq_utility.DataCheck\'>"][function_name]
 
-    return current_function != previous_function
+    current_hash = hashlib.md5(current_function.encode()).hexdigest()
+    previous_hash = hashlib.md5(previous_function.encode()).hexdigest()
+
+    return current_hash != previous_hash
 
 
 object_dict = {}

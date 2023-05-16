@@ -1,6 +1,5 @@
 import json
 import hashlib
-import inspect
 from get_functions import import_all_modules
 
 def convert_keys_to_str(dictionary):
@@ -11,20 +10,13 @@ def convert_keys_to_str(dictionary):
     for key, value in dictionary.items():
         new_key = str(key)  # Convert key to string
         if isinstance(value, dict):
-            new_dict[new_key] = get_function_source(value)  # Recursively convert nested dictionaries
+            new_dict[new_key] = convert_keys_to_str(value)  # Recursively convert nested dictionaries
         elif callable(value):
-            new_dict[new_key] = str(value)  # Convert function object to string
+            new_dict[new_key] = value.__qualname__  # Convert function object to qualified name
         else:
             new_dict[new_key] = value
     return new_dict
 
-def get_function_source(func):
-    """
-    Get the source code of a function as a string.
-    """
-    source_lines, _ = inspect.getsourcelines(func)
-    source_code = ''.join(source_lines)
-    return source_code
 
 def has_function_changed(current_file, previous_file, function_name):
     """
@@ -33,8 +25,8 @@ def has_function_changed(current_file, previous_file, function_name):
     current_data = json.load(current_file)
     previous_data = json.load(previous_file)
 
-    current_function = current_data['test_code\\dq_utility.py']['objects']["<class \'test_code\\dq_utility.DataCheck\'>"][function_name]
-    previous_function = previous_data['test_code\\dq_utility.py']['objects']["<class \'test_code\\dq_utility.DataCheck\'>"][function_name]
+    current_function = eval(current_data['test_code\\dq_utility.py']['objects']["<class \'test_code\\dq_utility.DataCheck\'>"][function_name])
+    previous_function = eval(previous_data['test_code\\dq_utility.py']['objects']["<class \'test_code\\dq_utility.DataCheck\'>"][function_name])
 
     current_hash = hashlib.md5(current_function.encode()).hexdigest()
     previous_hash = hashlib.md5(previous_function.encode()).hexdigest()
@@ -55,7 +47,7 @@ with open("current_modules.json", "w") as file:
 
 # Load current and previous versions of the file
 with open('current_modules.json', 'r') as current_file, open('previous_modules.json', 'r') as previous_file:
-    function_name = 'null_cond_syntax'
+    function_name = 'add_error_col'
     function_changed = has_function_changed(current_file, previous_file, function_name)
 
 if function_changed:

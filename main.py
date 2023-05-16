@@ -29,32 +29,33 @@ class CodeToolbox:
         - reruns_if_fail (int): Number of reruns if a process fails. Default is 0.
         - model (str): The GPT model to use. Default is 'gpt-4'.
         - engine (str): The ChatGPT engine to use. Default is 'GPT4'.
-        """
-        self.config = {
-            "document": True,
-            "unit_test": True,
-            "conversion": True,
-            "conversion_target": "scala",
-            "max_tokens": 1000,
-            "temperature": 0.2,
-            "reruns_if_fail": 0,
-            "model": "gpt-4",
-            "engine": "GPT4",
-            "unit_test_package": "pytest",
-            "doc_package": "sphinx",
-            "platform": "python3.9",
-        }
-        self.config.update(kwargs)
 
-    def chat_gpt_wrapper(self, input_messages=[]) -> Tuple[Any, List]:
+        """ 
+        self.config = {
+            'document': True,
+            'unit_test': True,
+            'conversion': True,
+            'conversion_target': 'scala',
+            'max_tokens': 1000,
+            'temperature': 0,
+            'reruns_if_fail': 0,
+            'model': 'gpt-4',
+            'engine': 'GPT4',
+            'unit_test_package':'pytest',
+            'doc_package':'sphinx',
+            'platform':'python3.9'
+        }
+        self.language='python'
+        self.config.update(kwargs)
+    def chat_gpt_wrapper(self,input_messages=[],fail_rerun=2) -> Tuple[Any, List]:
         """Outputs a unit test for a given Python function, using a 3-step GPT-3 prompt."""
 
         # the init function for this classs is\
         # {init_str}\
 
         plan_response = openai.ChatCompletion.create(
-            engine=engine,
-            model=model,
+            engine=self.config["engine"],
+            model=self.config["model"],
             messages=input_messages,
             max_tokens=self.config["max_tokens"],
             temperature=self.config["temperature"],
@@ -63,44 +64,30 @@ class CodeToolbox:
         unit_test_completion = plan_response.choices[0].message.content
         input_messages.append({"role": "assistant", "content": unit_test_completion})
         # check the output for errors
-        code_output = self.extract_all_python_code(unit_test_completion)
+        code_output = self.extract_all_code(unit_test_completion,self.language)
         try:
-            ast.parse(code_output)
+            if code_output:
+                ast.parse(code_output)
+            else:
+                return self.chat_gpt_wrapper(input_messages=input_messages,fail_rerun=fail_rerun-1)
+
+
         except SyntaxError as e:
             print(f"Syntax error in generated code: {e}")
             if self.config["reruns_if_fail"] > 0:
                 print("Rerunning...")
-                self.config["reruns_if_fail"] -= 1  # decrement rerun counter when calling again
-                return self.chat_gpt_wrapper(input_messages=input_messages)
+                return self.chat_gpt_wrapper(input_messages=input_messages,fail_rerun=fail_rerun-1)
         return code_output, input_messages
 
     @staticmethod
-    def extract_all_python_code(string):
-        start_marker = "```python"
+    def extract_all_code(string,language='python'):
+        start_marker = f"```{language}"
         end_marker = "```"
         pattern = re.compile(f"{start_marker}(.*?)({end_marker})", re.DOTALL)
         matches = pattern.findall(string)
         if not matches:
             return None
         return "".join([match[0].strip() for match in matches])
-
-    @staticmethod
-    def convert_keys_to_str(dictionary):
-        """
-        Recursively convert dictionary keys to strings.
-        """
-        new_dict = {}
-        for key, value in dictionary.items():
-            new_key = str(key)  # Convert key to string
-            if isinstance(value, dict):
-                new_dict[new_key] = convert_keys_to_str(value)  # Recursively convert nested dictionaries
-            elif callable(value):
-                # new_dict[new_key] = value.__qualname__  # Convert function object to qualified name
-                new_dict[new_key] = inspect.getsource(value)  # Convert function object to qualified name
-            else:
-                new_dict[new_key] = value
-        return new_dict
-
     @staticmethod
     def has_function_changed(current_data, previous_data, file_key, function_name, class_name=None):
         """
@@ -139,32 +126,120 @@ class CodeToolbox:
             function_name = obj_key
             self.delete_unit_test_file_for_each_function(class_name, function_name)
 
-    def method_function_processor(self, class_name=None, function_name="", func_str=""):
-        class_part = "in class " + class_name if class_name else None
-        self.doc_messages.append(
-            {
-                "role": "user",
-                "content": f"provide documentation for {func_str} {class_part} that can be used in {self.config['doc_package']}",
-            }
-        )
-        doc_code, self.doc_messages = self.chat_gpt_wrapper(input_messages=self.doc_messages)
-        if len(self.doc_messages) > 4:
-            self.doc_messages = self.doc_messages[:1] + self.doc_messages[-4:]
+    def method_function_processor(self,class_name=None,function_name='',func_str=''):
+        import_matches = []
+        self.class_part = 'in class '+ class_name if class_name else None
+        # self.documenter(func_str=func_str)
+        # self.unit_tester(func_str=func_str,function_name=function_name)
+        self.converter(func_str=func_str)
+    def documenter(self,func_str):
+        doc_prompt = f"""you are providing documentation and typing (type hints) of \
+            code to be used in {self.config['doc_package']},\
+            provide the typing imports in different code snippet, as an example for this request         
+        ```python
+        def sum(a,b):
+            if not isinstance(a, (int, float)) or not isinstance(b, (int, float)):
+                raise TypeError("Both parameters must be numeric values.")
+            return a+b
+        ```
+        this is a proper response:
+        ```python
+        from typing import Union
+        def sum(a: Union[int, float], b: Union[int, float]) -> Union[int, float]:
+            \"\"\"
+            Returns the sum of two numbers.
+            Args:
+                a (int or float): The first number.
+                b (int or float): The second number.
+            Returns:
+                int or float: The sum of `a` and `b`.
+            Raises:
+                TypeError: If `a` or `b` is not a numeric value.
+            Examples:
+                >>> sum(2, 3)
+                5
+                >>> sum(4.5, 2.5)
+                7.0
+            \"\"\"
+            if not isinstance(a, (int, float)) or not isinstance(b, (int, float)):
+                raise TypeError("Both parameters must be numeric values.")
+            return a + b
+        ```
+        """
+        self.doc_messages=[]
+        self.doc_messages.append({"role":"system","content": doc_prompt})
+        self.doc_messages.append({"role":"user","content":f"provide {self.config['doc_package']} docstring documentation and typehints for {func_str} in {class_part}, do not provide any other imports that are not used in typing and do not provide multiple options, just one code, if it is a method in a class, do not provide any other code but the method itself and imports"})
+        doc_code,self.doc_messages = self.chat_gpt_wrapper(input_messages=self.doc_messages)
+
         # Open the file in read mode and read its content
-        with open(self.file_path, "r") as file:
+        with open(self.file_path, 'r') as file:
             file_content = file.read()
-        if doc_code.startswith("class"):
-            doc_code = "\n".join(doc_code.split("\n")[1:])
+        import_pattern = r"(?m)^((?:from|import)\s+.+)$"
+        if 'import' in self.doc_messages[-1]['content']:
+            # Find all matches of the pattern in the code string
+            import_matches = re.findall(import_pattern, doc_code)
+            doc_code= re.sub(import_pattern, '', doc_code)
+        doc_code = doc_code.lstrip('\n')
+        if doc_code.startswith('class'):
+            doc_code='\n'.join(doc_code.split('\n')[1:])+ '\n'
         else:
-            doc_code = "    " + doc_code.replace("\n", "\n    ")
-        # Replace a specific string in the file content
+            doc_code='    '+doc_code.replace('\n','\n    ') + '\n'
         new_content = file_content.replace(func_str, doc_code)
-
-        # Open the file in write mode and write the new content to it
-        with open(self.file_path, "w") as file:
+        all_imports = re.findall(import_pattern, new_content)
+        for import_str in import_matches:
+            if import_str not in all_imports:
+                new_content = import_str + '\n' + new_content
+        new_content = re.sub(r"\n{2,}", "\n\n", new_content)
+        with open(self.file_path, 'w') as file:
             file.write(new_content)
-
-        request_for_unit_test = f" provide unit test for the function `{function_name} {class_part}`.\
+        
+        command = ['autoflake', '--in-place', '--remove-all-unused-imports', self.file_path]
+        subprocess.run(command, check=True)
+        command = ['isort', self.file_path]
+        subprocess.run(command, check=True)
+        if len(self.doc_messages)>1:
+            self.doc_messages = self.doc_messages[:1]
+    def create_code_file(self,code, target):
+        file_extension = {
+            'python': 'py',
+            'scala': 'scala',
+            'c++': 'cpp'
+            # Add more mappings as needed
+        }
+        folder_name = target.lower()
+        if not os.path.exists(folder_name):
+            os.makedirs(folder_name)
+        
+        suggested_file_name = f"converted_code.{file_extension.get(target, 'txt')}"
+        suggested_file_path = os.path.join(folder_name, suggested_file_name)
+        
+        file_mode = 'a' if os.path.exists(suggested_file_path) else 'w'
+        with open(suggested_file_path, file_mode) as file:
+            file.write(code)
+        
+        if file_mode == 'w':
+            print(f"Code successfully saved to '{suggested_file_path}'")
+        else:
+            print(f"Code successfully appended to '{suggested_file_path}'")
+    def converter(self,func_str):
+        conv_prompt = f"you are providing conversion to {self.config['conversion_target']} of the codes you are given {self.repo_explanation}"
+        self.conv_messages = []
+        self.conv_messages.append({"role": "system", "content": conv_prompt})
+        self.conv_messages.append({"role":"user","content":f"convert the following code to {self.config['conversion_target']}\
+                                     {self.class_part},{func_str} "})
+        self.language = self.config['conversion_target']
+        conv_code,self.conv_messages = self.chat_gpt_wrapper(input_messages=self.conv_messages)
+        self.language = 'python'
+        # Open the file in read mode and read its content
+        self.create_code_file(conv_code,self.config['conversion_target'])
+    def unit_tester(self,class_name='',func_str='',function_name=''):
+        unit_test_prompt = f"you are providing unit test using {self.config['unit_test_package']}` and\
+            {self.config['platform']} {self.repo_explanation}. to give details about the structure of\
+            the repo look at the dictionary below, it includes all files and if python, all function\
+            and classes, if json first and second level keys and if csv, the column names :{self.directory_dict},"
+        self.unit_test_messages = []
+        self.unit_test_messages.append({"role": "system", "content": unit_test_prompt})
+        request_for_unit_test = f" provide unit test for the function `{self.class_part}`.\
             ```python\
             {func_str} \
             ```\
@@ -178,20 +253,21 @@ class CodeToolbox:
         current_test_path = f"test_code/unit_test/test_{class_name}_{function_name}.py"
         with open(current_test_path, "w") as test_f:
             test_f.write(unit_test_code)
-
+    def method_function_processor(self,class_name=None,function_name='',func_str=''):
+        import_matches = []
+        self.class_part = 'in class '+ class_name if class_name else None
+        # self.documenter(func_str=func_str)
+        # self.unit_tester(func_str=func_str,function_name=function_name)
+        self.converter(func_str=func_str)
+        
     def object_processor(self, obj_key, obj_value):
         if type(obj_value) == dict:
-            for class_method_name, class_method in obj_value.items():
+            for method_name, class_method in obj_value.items():
                 class_name = str(class_method).split(".")[0].split(" ")[1]
-                function_name = str(class_method).split(".")[1].split(" ")[0]
-                function_to_test = inspect.getsource(class_method)
-                self.method_function_processor(
-                    class_name=class_name, function_name=function_name, func_str=function_to_test
-                )
+                self.method_function_processor(class_name=class_name,function_name=method_name,func_str=class_method)
         else:
             function_name = obj_key
-            function_to_test = inspect.getsource(obj_value)
-            self.method_function_processor(class_name=None, function_name=function_name, func_str=function_to_test)
+            self.method_function_processor(class_name=None,function_name=function_name,func_str=obj_value)
 
     def main_pipeline(
         self,
@@ -382,9 +458,8 @@ class CodeToolbox:
                                 self.object_deleter(obj_key, obj_value)
 
         # Save the current state to `current_modules.json`
-        converted_object_dict = self.convert_keys_to_str(object_dict)
         with open("current_modules.json", "w") as file:
-            json.dump(converted_object_dict, file, indent=4)
+            json.dump(object_dict, file, indent=4)
 
 
 if __name__ == "__main__":

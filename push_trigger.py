@@ -27,8 +27,12 @@ def has_function_changed(current_file, previous_file, function_name):
     current_data = json.load(current_file)
     previous_data = json.load(previous_file)
 
-    current_function = eval(current_data['test_code\\dq_utility.py']['objects']["<class \'test_code\\dq_utility.DataCheck\'>"][function_name])
-    previous_function = eval(previous_data['test_code\\dq_utility.py']['objects']["<class \'test_code\\dq_utility.DataCheck\'>"][function_name])
+    current_class = "<class \'test_code\\dq_utility.DataCheck\'>"
+    current_function_str = current_data['test_code\\dq_utility.py']['objects']["<class \'test_code\\dq_utility.DataCheck\'>"][function_name]
+    previous_function_str = previous_data['test_code\\dq_utility.py']['objects']["<class \'test_code\\dq_utility.DataCheck\'>"][function_name]
+
+    current_function = getattr(eval(current_class), current_function_str)
+    previous_function = getattr(eval(current_class), previous_function_str)
 
     # current_hash = hashlib.md5(current_function.encode()).hexdigest()
     # previous_hash = hashlib.md5(previous_function.encode()).hexdigest()

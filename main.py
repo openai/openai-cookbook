@@ -364,7 +364,7 @@ class CodeToolbox:
                                                         )
             else:
                 print("no files have been changed. No actions needed")
-                return
+                # return
 
         # Save the current state to `current_modules.json`
         converted_object_dict = self.convert_keys_to_str(object_dict)

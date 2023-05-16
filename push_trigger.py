@@ -1,4 +1,4 @@
-import dill
+import os
 import json
 import inspect
 from get_functions import import_all_modules
@@ -105,14 +105,15 @@ with open("current_modules.json", "w") as file:
     json.dump(converted_object_dict, file, indent=4)
 
 # Load current and previous versions of the file
-with open('current_modules.json', 'r') as current_file, open('previous_modules.json', 'r') as previous_file:
-    function_name = 'add_error_col'
-    function_changed = has_function_changed(current_file, previous_file, function_name)
+if os.path.exists('previous_modules.json'):
+    with open('current_modules.json', 'r') as current_file, open('previous_modules.json', 'r') as previous_file:
+        function_name = 'add_error_col'
+        function_changed = has_function_changed(current_file, previous_file, function_name)
+    if function_changed:
+        print(f"The function {function_name} has changed.")
+    else:
+        print(f"The function {function_name} has not changed.")
 
-if function_changed:
-    print(f"The function {function_name} has changed.")
-else:
-    print(f"The function {function_name} has not changed.")
 
 # with open('current_modules.json', 'r') as current_file, open('previous_modules.json', 'r') as previous_file:
     # current_data = json.load(current_file)

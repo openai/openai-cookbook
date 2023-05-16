@@ -1,3 +1,4 @@
+from lib2to3.pytree import convert
 import os
 import importlib
 import inspect
@@ -137,13 +138,28 @@ def import_all_modules(directory: str, object_dict, directory_dict) -> Tuple[dic
 
 if __name__ == "__main__":
     import json
+    def convert_keys_to_str(dictionary):
+        """
+        Recursively convert dictionary keys to strings.
+        """
+        new_dict = {}
+        for key, value in dictionary.items():
+            new_key = str(key)  # Convert key to string
+            if isinstance(value, dict):
+                new_dict[new_key] = convert_keys_to_str(value)  # Recursively convert nested dictionaries
+            else:
+                new_dict[new_key] = value
+        return new_dict
+
     output_dict = {}
     directory_dict = {}
     output_dict, directory_dict = import_all_modules("test_code", output_dict, directory_dict)
-    print(output_dict)
+    # print(output_dict)
+    converted_dict = convert_keys_to_str(output_dict)
+    # print(converted_dict)
     # print("output_dict: ", output_dict, "\ndirectory_dict :", directory_dict)
-    # with open('modules.json', 'w') as f:
-    #     json.dump(output_dict, f)
+    with open('modules.json', 'w') as f:
+        json.dump(converted_dict, f)
 
     # dict = {
     #     # 'test_code/__init__.py': {

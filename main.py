@@ -388,17 +388,18 @@ if __name__ == "__main__":
     model = "gpt-4"
     code_toolbox = CodeToolbox()
 
-    code_toolbox.main_pipeline(
-        directory="test_code",
-        repo_explanation="This repo uses the dq_utility to check the data quality based on different sources given in\
-            csv files like az_ca_pcoe_dq_rules_innomar, it will generate a csv output of the lines with errors in a csv file, to use the repo u can:\
-            from dq_utility import DataCheck\
-            from pyspark.sql import SparkSession\
-            spark = SparkSession.builder.getOrCreate()\
-            df=spark.read.parquet('test_data.parquet')\
-            Datacheck(source_df=df,\
-            spark_context= spark,\
-            config_path=s3://config-path-for-chat-gpt-unit-test/config.json,\
-            file_name=az_ca_pcoe_dq_rules_innomar.csv,\
-            src_system=bioscript)",
-    )
+    # code_toolbox.main_pipeline(
+    #     directory="test_code",
+    #     repo_explanation="This repo uses the dq_utility to check the data quality based on different sources given in\
+    #         csv files like az_ca_pcoe_dq_rules_innomar, it will generate a csv output of the lines with errors in a csv file, to use the repo u can:\
+    #         from dq_utility import DataCheck\
+    #         from pyspark.sql import SparkSession\
+    #         spark = SparkSession.builder.getOrCreate()\
+    #         df=spark.read.parquet('test_data.parquet')\
+    #         Datacheck(source_df=df,\
+    #         spark_context= spark,\
+    #         config_path=s3://config-path-for-chat-gpt-unit-test/config.json,\
+    #         file_name=az_ca_pcoe_dq_rules_innomar.csv,\
+    #         src_system=bioscript)",
+    # )
+    print(code_toolbox.changed_code_files)

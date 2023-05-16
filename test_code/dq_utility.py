@@ -34,6 +34,20 @@ class DataCheck:
         file_name: str,
         src_system: str,
     ):
+        """
+        Initializes the DataCheck class with the necessary parameters.
+
+        :param source_df: The input DataFrame to be checked.
+        :type source_df: DataFrame
+        :param spark_context: The SparkSession context to be used for processing.
+        :type spark_context: SparkSession.builder.getOrCreate
+        :param config_path: The path to the configuration file.
+        :type config_path: str
+        :param file_name: The name of the file to be checked.
+        :type file_name: str
+        :param src_system: The source system identifier.
+        :type src_system: str
+        """
         self.spark = spark_context
         self.source_df = source_df
         self.error_df = None
@@ -74,7 +88,6 @@ class DataCheck:
         # self.spark.conf.set("spark.sql.legacy.timeParserPolicy", "CORRECTED")
         self.spark.conf.set("spark.sql.adaptive.enabled", True)
         self.spark.conf.set("spark.sql.adaptive.coalescePartitions.enabled", True)
-
     def read_s3_file(self, file_path) -> bytes:
         file_res = urlparse(file_path)
         try:
@@ -105,7 +118,28 @@ class DataCheck:
         except ValueError:
             return False
 
-    def limit_finder(self, input_col, rule_value):
+    # ...
+    # ...
+    # ...
+    def limit_finder(self, input_col: str, rule_value: Union[str, float]) -> Union[float, Column, None]:
+        """
+        Finds the limit for a given input column and rule value.
+
+        This method checks if the rule value is a float or a string. If it is a float, it returns the float value.
+        If it is a string, it checks if the string is a valid column name in the input columns. If it is, it returns
+        a Column object corresponding to the column name. If the rule value is neither a float nor a valid column name,
+        it returns None.
+
+        :param input_col: The input column name.
+        :type input_col: str
+        :param rule_value: The rule value to be checked.
+        :type rule_value: Union[str, float]
+        :return: The limit value as a float, a Column object, or None if the limit cannot be found.
+        :rtype: Union[float, Column, None]
+        :raises ValueError: If the rule value is not a float or a valid column name.
+        :Example:
+        limit = data_check.limit_finder("column_name", rule_value)
+        """
         if self.is_float(rule_value):
             rule_value = float(rule_value)
             if math.isnan(rule_value):
@@ -120,7 +154,7 @@ class DataCheck:
                 )
                 return None
             return f.col(rule_value)
-
+    # ...    # ...    # ...
     def columns_to_check(self, criteria):
         return self.rule_df[(self.rule_df[criteria]).notna()].index
 
@@ -131,8 +165,23 @@ class DataCheck:
             self.source_df = self.source_df.withColumn(error_col_name, col_condition)
             self.error_columns.append(f.col(error_col_name))
             self.error_counter += 1
-        # return None
-    def data_type_check(self, input_col):
+        
+    # ...
+    def data_type_check(self, input_col: str) -> None:
+        """
+        Performs a data type check on the given input column.
+
+        This method checks the data type of the input column according to the rule dataframe. If the data type is
+        "DateType", it converts the column to a date format specified in the rule dataframe. For other data types,
+        it casts the column to the corresponding data type using the schema dictionary. It then creates a data type
+        condition and adds an error column to the source dataframe with the error message and the data type condition.
+
+        :param input_col: The input column name.
+        :type input_col: str
+        :return: None
+        :Example:
+        data_check.data_type_check("column_name")
+        """
         print("start data type check")
         dtype_key = self.rule_df.loc[input_col, "type"]
         if dtype_key == "DateType":
@@ -147,11 +196,25 @@ class DataCheck:
         type_error_msg = f"data_type_FAIL: Column [{input_col}] should be {dtype_key}"
         self.add_error_col(error_msg=type_error_msg, condition=dtype_cond, error_col_name=input_col + " type_check")
         logger.info(f"[{input_col}] dtype check is done.")
-
+    # ...
     def null_cond_syntax(self, input_col: str) -> Column:
         return (f.col(input_col) == "") | (f.col(input_col).isNull())
 
+    # ...
     def null_check(self, input_col: str) -> None:
+        """
+        Performs a null check on the given input column.
+
+        This method checks if the input column is nullable according to the rule dataframe. If it is not nullable,
+        it creates a null condition using the null_cond_syntax method and adds an error column to the source dataframe
+        with the error message and the null condition.
+
+        :param input_col: The input column name.
+        :type input_col: str
+        :return: None
+        :Example:
+        data_check.null_check("column_name")
+        """
         print("start null_check")
         if not math.isnan(self.rule_df.loc[input_col, "nullable"]):
             return
@@ -159,7 +222,7 @@ class DataCheck:
         null_error_msg = f"null_FAIL: Column [{input_col}] cannot be null"
         self.add_error_col(error_msg=null_error_msg, condition=null_condition, error_col_name=input_col + " null_check")
         logger.info(f"[{input_col}] null check is done.")
-
+    # ...
     def sum_check_syntax(self, input_col1, input_col2, syntax_value):
         return ~(f.col(input_col1) + f.col(input_col2) != syntax_value)
 
@@ -242,7 +305,17 @@ class DataCheck:
         )
         logger.info(f"[{input_col}] range check is done.")
 
-    def file_check(self, input_col):
+    # ...
+    def file_check(self, input_col: str) -> Tuple[Union[Column, None], Union[str, None]]:
+        """
+        Performs a file check on the given input column.
+
+        :param input_col: The input column name.
+        :type input_col: str
+        :return: A tuple containing the file check condition as a Column object and the error message as a string,
+                 or None for both if the check cannot be performed.
+        :rtype: Tuple[Union[Column, None], Union[str, None]]
+        """
         # finding source side columns
         source_df_columns_list = [input_col]
         reference_columns_str = self.rule_df.loc[input_col, "reference_columns"]
@@ -285,7 +358,7 @@ class DataCheck:
             f"{file_check_type}_FAIL: Column [{source_df_columns_list}] did not pass the {file_check_type}."
         )
         return file_cond, file_error_msg
-
+    # ...
     def category_check(self, input_col: str) -> None:
         print("start category check")
         valuelist_type = self.rule_df.loc[input_col, "reference_valuelist"].upper()

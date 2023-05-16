@@ -81,21 +81,21 @@ def import_modules_from_file(filepath: str, extension: str, object_dict, directo
                 object_dict[filepath]["import_str"] = import_str
                 directory_dict[filepath]["functions"] = []
             if member[1].__module__ == module.__name__:
-                object_dict[filepath]["objects"][member[0]] = member[1]
+                object_dict[filepath]["objects"][member[0]] = inspect.getsource(member[1])
                 directory_dict[filepath]["functions"].append(member[0])
         classes = [m[1] for m in getmembers(module, inspect.isclass)]
 
         for class_ in classes:
+            if class_.__module__!=module.__name__:
+                continue
             object_dict[filepath]["objects"][class_] = {}
             directory_dict[filepath]["objects"][class_] = []
             members = getmembers(class_, inspect.isfunction)
             for member in members:
-                if member[1].__module__ == module.__name__:
-                    if object_dict[filepath]:
-                        if not "import_str" in object_dict[filepath]:
-                            object_dict[filepath]["import_str"] = import_str
-                        directory_dict[filepath]["objects"][class_].append(member[0])
-                        object_dict[filepath]["objects"][class_][member[0]] = member[1]
+                if not "import_str" in object_dict[filepath]:
+                    object_dict[filepath]["import_str"] = import_str
+                directory_dict[filepath]["objects"][class_].append(member[0])
+                object_dict[filepath]["objects"][class_][member[0]] = inspect.getsource(member[1])
 
                 # else:
                 # print(f"Skipping imported method: {member[0]}")
@@ -111,6 +111,8 @@ def import_all_modules(directory: str, object_dict, directory_dict) -> Tuple[dic
     """
 
     for current_file in os.listdir(directory):
+        if current_file =='docs':
+            continue
         filepath = os.path.join(directory, current_file)
         if os.path.isdir(filepath):
             # Recursively call the function for subdirectories

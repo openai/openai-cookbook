@@ -1,5 +1,6 @@
 import json
 import hashlib
+import inspect
 from get_functions import import_all_modules
 
 def convert_keys_to_str(dictionary):
@@ -10,13 +11,20 @@ def convert_keys_to_str(dictionary):
     for key, value in dictionary.items():
         new_key = str(key)  # Convert key to string
         if isinstance(value, dict):
-            new_dict[new_key] = convert_keys_to_str(value)  # Recursively convert nested dictionaries
+            new_dict[new_key] = get_function_source(value)  # Recursively convert nested dictionaries
         elif callable(value):
             new_dict[new_key] = str(value)  # Convert function object to string
         else:
             new_dict[new_key] = value
     return new_dict
 
+def get_function_source(func):
+    """
+    Get the source code of a function as a string.
+    """
+    source_lines, _ = inspect.getsourcelines(func)
+    source_code = ''.join(source_lines)
+    return source_code
 
 def has_function_changed(current_file, previous_file, function_name):
     """
@@ -47,7 +55,7 @@ with open("current_modules.json", "w") as file:
 
 # Load current and previous versions of the file
 with open('current_modules.json', 'r') as current_file, open('previous_modules.json', 'r') as previous_file:
-    function_name = 'add_error_col'
+    function_name = 'null_cond_syntax'
     function_changed = has_function_changed(current_file, previous_file, function_name)
 
 if function_changed:

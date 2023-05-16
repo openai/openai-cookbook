@@ -45,7 +45,6 @@ class CodeToolbox:
             "platform": "python3.9",
         }
         self.config.update(kwargs)
-        self.changed_code_files = sys.argv[1:]
 
     def chat_gpt_wrapper(self, input_messages=[]) -> Tuple[Any, List]:
         """Outputs a unit test for a given Python function, using a 3-step GPT-3 prompt."""
@@ -103,12 +102,10 @@ class CodeToolbox:
         return new_dict
 
     @staticmethod
-    def has_function_changed(current_file, previous_file, file_key, function_name, class_name=None):
+    def has_function_changed(current_data, previous_data, file_key, function_name, class_name=None):
         """
         Check if a function has changed between current and previous versions of the file.
         """
-        current_data = json.load(current_file)
-        previous_data = json.load(previous_file)
         if class_name:
             current_function = current_data[file_key]["objects"][class_name][function_name]
             previous_function = previous_data[file_key]["objects"][class_name][function_name]
@@ -116,6 +113,31 @@ class CodeToolbox:
             current_function = current_data[file_key]["objects"][function_name]
             previous_function = previous_data[file_key]["objects"][function_name]
         return current_function != previous_function
+
+    @staticmethod
+    def delete_unit_test_file_for_each_function(class_name=None, function_name=""):
+        unit_test_file = (
+            f"test_code/unit_test/test_{class_name}_{function_name}.py"
+        )
+        if os.path.exists(unit_test_file):
+            try:
+                # Delete the file
+                os.remove(unit_test_file)
+                print("File deleted successfully!")
+            except OSError as e:
+                # Handle the case where the file does not exist or cannot be deleted
+                print(f"Error deleting the file: {e}")
+
+    def object_deleter(self, obj_key, obj_value):
+        if type(obj_value) == dict:
+            for class_method_name, class_method in obj_value.items():
+                class_name = str(class_method).split(".")[0].split(" ")[1]
+                function_name = str(class_method).split(".")[1].split(" ")[0]
+                self.delete_unit_test_file_for_each_function(class_name, function_name)
+        else:
+            class_name = None
+            function_name = obj_key
+            self.delete_unit_test_file_for_each_function(class_name, function_name)
 
     def method_function_processor(self, class_name=None, function_name="", func_str=""):
         class_part = "in class " + class_name if class_name else None
@@ -247,124 +269,117 @@ class CodeToolbox:
         # TODO: conversion
         # conversion_messages=[]
         # conversion_prompt= f"your task is to convert the code into {target_conversion}"
-        if not os.path.exists(
-            "current_modules.json"
-        ):  # this is the first push, so all unit tests need to be generated (no modification/ deletion)
-            for self.file_path, objects in object_dict.items():
-                # generated_unit_test = ""
-                if "objects" in objects:
+        if os.path.exists("current_modules.json"):
+            with open("current_modules.json", "r") as current_file:
+                self.current_data = json.load(current_file)
+
+        if os.path.exists("previous_modules.json"):
+            with open("previous_modules.json", "r") as previous_file:
+                self.previous_data = json.load(previous_file)
+
+        # loop through all files in the current repo
+        for self.file_path, objects in object_dict.items():
+            # generated_unit_test = ""
+            if "objects" in objects:
+                if not os.path.exists(
+                    "current_modules.json"
+                ):  # this is the first push, so all unit tests need to be generated (no modification/ deletion)
                     for obj_key, obj_value in objects["objects"].items():
                         if obj_value:
                             self.object_processor(obj_key, obj_value)
-                    # TODO: merge all unit test into one file
-                    # unit_test_path = file_path[::-1].replace('\\','/test_',1)[::-1]
-                    # with open(unit_test_path, "w") as test_f:
-                    #     test_f.write(generated_unit_test)
-        else:  # detect the change files/ functions and regenerate/ delete unit tests based on that
-            if len(self.changed_code_files) > 0:
-                print("there're changed files")
-                for file in self.changed_code_files:
-                    print(file)  # test_code/dq_utility.py
-                    file_key = file.replace("/", "\\")  # test_code\\dq_utility.py
-                    if os.path.exists("previous_modules.json"):
-                        # compare with the "current_modules.json" and detect the different modules, then regenerare or delete unit tests where needed
-                        with open("current_modules.json", "r") as current_file, open(
-                            "previous_modules.json", "r"
-                        ) as previous_file:
-                            current_data = json.load(current_file)
-                            previous_data = json.load(previous_file)
-                            if file_key not in current_data:
-                                if file_key in previous_data:  # meaning file is deleted after push
-                                    # delete unit test for all functions in this file
-                                    if "objects" in previous_data[file_key]:
-                                        for obj_key, obj_value in previous_data[file_key]["objects"].items():
-                                            if obj_value:
-                                                class_name = None
-                                                function_name = ""
-                                                if type(obj_value) == dict:
-                                                    for class_method_name, class_method in obj_value.items():
-                                                        class_name = str(class_method).split(".")[0].split(" ")[1]
-                                                        function_name = str(class_method).split(".")[1].split(" ")[0]
-                                                        unit_test_file = (
-                                                            f"test_code/unit_test/test_{class_name}_{function_name}.py"
-                                                        )
-                                                        if os.path.exists(unit_test_file):
-                                                            try:
-                                                                # Delete the file
-                                                                os.remove(unit_test_file)
-                                                                print("File deleted successfully!")
-                                                            except OSError as e:
-                                                                # Handle the case where the file does not exist or cannot be deleted
-                                                                print(f"Error deleting the file: {e}")
-                                                else:
-                                                    function_name = obj_key
-                                                    unit_test_file = (
-                                                        f"test_code/unit_test/test_{class_name}_{function_name}.py"
-                                                    )
-                                                    if os.path.exists(unit_test_file):
-                                                        try:
-                                                            # Delete the file
-                                                            os.remove(unit_test_file)
-                                                            print("File deleted successfully!")
-                                                        except OSError as e:
-                                                            # Handle the case where the file does not exist or cannot be deleted
-                                                            print(f"Error deleting the file: {e}")
-                            elif file_key not in previous_data:
-                                if file_key in current_data:  # meaning file is just added after push
-                                    # generate unit tests for all functions in this file
-                                    if "objects" in current_data[file_key]:
-                                        for obj_key, obj_value in current_data[file_key]["objects"].items():
-                                            if obj_value:
-                                                self.object_processor(obj_key, obj_value)
-                            elif (
-                                file_key in current_data and file_key in previous_data
-                            ):  # meaning file has some modifications in content
-                                # detect the class/ function that got modified and regenerate unit test
-                                if "objects" in previous_data[file_key]:
-                                    for obj_key, obj_value in previous_data[file_key]["objects"].items():
-                                        if obj_value:
-                                            class_name = None
-                                            function_name = ""
-                                            if type(obj_value) == dict:
+                elif os.path.exists("previous_modules.json"):  # check if file already exists before push
+                    if self.file_path not in self.previous_data:  # file does not exist previous, meaning this file is newly created so whole new unit tests need to be generated
+                        for obj_key, obj_value in objects["objects"].items():
+                            if obj_value:
+                                self.object_processor(obj_key, obj_value)
+                    else:
+                        # if file exists previously, meaning file has some modifications in content
+                        # detect the class/ function that got modified and regenerate unit test
+                        for obj_key, obj_value in objects["objects"].items(): #loop through all objects in file to detect the changes
+                            if obj_value:
+                                class_name = None
+                                function_name = ""
+                                if type(obj_value) == dict: #file has class and functions
+                                    for class_method_name, class_method in obj_value.items():
+                                        class_name = str(class_method).split(".")[0].split(" ")[1]
+                                        function_name = str(class_method).split(".")[1].split(" ")[0]
+                                        function_changed = self.has_function_changed(
+                                            self.current_data,
+                                            self.previous_data,
+                                            self.file_path,
+                                            class_name,
+                                            function_name,
+                                        )
+                                        if function_changed:
+                                            self.method_function_processor(
+                                                class_name=class_name,
+                                                function_name=function_name,
+                                                func_str=self.current_data[self.file_path]["objects"][class_name][
+                                                    function_name
+                                                ],
+                                            )
+                                else: #file only has functions
+                                    function_name = obj_key
+                                    function_changed = self.has_function_changed(
+                                        self.current_data, self.previous_data, self.file_path, class_name, function_name
+                                    )
+                                    if function_changed:
+                                        self.method_function_processor(
+                                            class_name=None,
+                                            function_name=function_name,
+                                            func_str=self.current_data[self.file_path]["objects"][function_name],
+                                        )
+                else: #when `current_modules.json` exist but `previous_modules.json` doesn't exist
+                    # `current_modules.json` exist when `main.py` is already executed -> not the first push -> need to do comparision
+                    # `previous_modules.json` doesn't exist when `main.py` is executed without pushing (because every push will make `previous_modules.json`)
+                    print('no action needed')
+
+                # TODO: merge all unit test into one file
+                # unit_test_path = file_path[::-1].replace('\\','/test_',1)[::-1]
+                # with open(unit_test_path, "w") as test_f:
+                #     test_f.write(generated_unit_test)
+
+        # loop through all files in the previous repo
+        if self.previous_data:
+            for self.previous_file_path, objects in self.previous_data.items():
+                if self.previous_file_path in self.current_data:
+                    if "objects" in objects:
+                        #loop through objects to delete certain object
+                        if "objects" in self.current_data[self.previous_file_path]:
+                            for obj_key, obj_value in objects["objects"].items():
+                                if obj_value:
+                                    if obj_key in self.current_data[self.previous_file_path]["objects"]:
+                                        if type(obj_value) == dict:
+                                            if type(self.current_data[self.previous_file_path]["objects"][obj_key]) == dict:
                                                 for class_method_name, class_method in obj_value.items():
                                                     class_name = str(class_method).split(".")[0].split(" ")[1]
                                                     function_name = str(class_method).split(".")[1].split(" ")[0]
-                                                    with open("current_modules.json", "r") as current_file, open(
-                                                        "previous_modules.json", "r"
-                                                    ) as previous_file:
-                                                        function_changed = self.has_function_changed(
-                                                            current_file,
-                                                            previous_file,
-                                                            file_key,
-                                                            class_name,
-                                                            function_name,
-                                                        )
-                                                        if function_changed:
-                                                            self.method_function_processor(
-                                                                class_name=class_name,
-                                                                function_name=function_name,
-                                                                func_str=current_data[file_key]["objects"][class_name][
-                                                                    function_name
-                                                                ],
-                                                            )
-
+                                                    if class_method_name not in self.current_data[self.previous_file_path]["objects"][obj_key][obj_value]:
+                                                        self.delete_unit_test_file_for_each_function(class_name, function_name)
+                                                    else:
+                                                        if class_method not in self.current_data[self.previous_file_path]["objects"][obj_key][obj_value][class_method_name]:
+                                                            self.delete_unit_test_file_for_each_function(class_name, function_name)
                                             else:
+                                                for class_method_name, class_method in obj_value.items():
+                                                    class_name = str(class_method).split(".")[0].split(" ")[1]
+                                                    function_name = str(class_method).split(".")[1].split(" ")[0]
+                                                    self.delete_unit_test_file_for_each_function(class_name, function_name)
+                                        else:
+                                            if obj_value in self.current_data[self.previous_file_path]["objects"][obj_key]:
+                                                class_name = None
                                                 function_name = obj_key
-                                                with open("current_modules.json", "r") as current_file, open(
-                                                    "previous_modules.json", "r"
-                                                ) as previous_file:
-                                                    function_changed = self.has_function_changed(
-                                                        current_file, previous_file, file_key, class_name, function_name
-                                                    )
-                                                    if function_changed:
-                                                        self.method_function_processor(
-                                                            class_name=None,
-                                                            function_name=function_name,
-                                                            func_str=current_data[file_key]["objects"][function_name],
-                                                        )
-            else:
-                print("no files have been changed. No actions needed")
-                # return
+                                                self.delete_unit_test_file_for_each_function(class_name, function_name)
+                                    else:
+                                        self.object_deleter(obj_key, obj_value)
+                        else:
+                            for obj_key, obj_value in objects["objects"].items():
+                                if obj_value:
+                                    self.object_deleter(obj_key, obj_value)
+                else:
+                    if "objects" in objects:
+                        for obj_key, obj_value in objects["objects"].items():
+                            if obj_value:
+                                self.object_deleter(obj_key, obj_value)
 
         # Save the current state to `current_modules.json`
         converted_object_dict = self.convert_keys_to_str(object_dict)

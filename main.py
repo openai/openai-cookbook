@@ -84,8 +84,8 @@ class CodeToolbox:
             return None
         return "".join([match[0].strip() for match in matches])
 
-    @staticmethod
-    def convert_keys_to_str(dictionary):
+
+    def convert_keys_to_str(self,dictionary):
         """
         Recursively convert dictionary keys to strings.
         """
@@ -93,7 +93,7 @@ class CodeToolbox:
         for key, value in dictionary.items():
             new_key = str(key)  # Convert key to string
             if isinstance(value, dict):
-                new_dict[new_key] = convert_keys_to_str(value)  # Recursively convert nested dictionaries
+                new_dict[new_key] = self.convert_keys_to_str(value)  # Recursively convert nested dictionaries
             elif callable(value):
                 # new_dict[new_key] = value.__qualname__  # Convert function object to qualified name
                 new_dict[new_key] = inspect.getsource(value)  # Convert function object to qualified name
@@ -293,7 +293,7 @@ class CodeToolbox:
                             if obj_value:
                                 self.object_processor(obj_key, obj_value)
                     else:
-                        # if file exists previously, meaning file has some modifications in content
+                        # if file exists previously
                         # detect the class/ function that got modified and regenerate unit test
                         for obj_key, obj_value in objects["objects"].items(): #loop through all objects in file to detect the changes
                             if obj_value:
@@ -417,4 +417,3 @@ if __name__ == "__main__":
     #         file_name=az_ca_pcoe_dq_rules_innomar.csv,\
     #         src_system=bioscript)",
     # )
-    print(code_toolbox.changed_code_files)

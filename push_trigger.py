@@ -12,7 +12,8 @@ def convert_keys_to_str(dictionary):
         if isinstance(value, dict):
             new_dict[new_key] = convert_keys_to_str(value)  # Recursively convert nested dictionaries
         elif callable(value):
-            new_dict[new_key] = value.__qualname__  # Convert function object to qualified name
+            # new_dict[new_key] = value.__qualname__  # Convert function object to qualified name
+            new_dict[new_key] = str(value)  # Convert function object to qualified name
         else:
             new_dict[new_key] = value
     return new_dict

@@ -1,5 +1,6 @@
 import json
 import hashlib
+import inspect
 from get_functions import import_all_modules
 
 def convert_keys_to_str(dictionary):
@@ -29,8 +30,10 @@ def has_function_changed(current_file, previous_file, function_name):
     current_function = eval(current_data['test_code\\dq_utility.py']['objects']["<class \'test_code\\dq_utility.DataCheck\'>"][function_name])
     previous_function = eval(previous_data['test_code\\dq_utility.py']['objects']["<class \'test_code\\dq_utility.DataCheck\'>"][function_name])
 
-    current_hash = hashlib.md5(current_function.encode()).hexdigest()
-    previous_hash = hashlib.md5(previous_function.encode()).hexdigest()
+    # current_hash = hashlib.md5(current_function.encode()).hexdigest()
+    # previous_hash = hashlib.md5(previous_function.encode()).hexdigest()
+    current_hash = inspect.getsource(current_function)
+    previous_hash = inspect.getsource(previous_function)
 
     return current_hash != previous_hash
 

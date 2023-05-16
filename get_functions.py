@@ -136,10 +136,14 @@ def import_all_modules(directory: str, object_dict, directory_dict) -> Tuple[dic
 
 
 if __name__ == "__main__":
+    import json
     output_dict = {}
     directory_dict = {}
     output_dict, directory_dict = import_all_modules("test_code", output_dict, directory_dict)
-    print("output_dict: ", output_dict, "\ndirectory_dict :", directory_dict)
+    print(output_dict)
+    # print("output_dict: ", output_dict, "\ndirectory_dict :", directory_dict)
+    # with open('modules.json', 'w') as f:
+    #     json.dump(output_dict, f)
 
     # dict = {
     #     # 'test_code/__init__.py': {

@@ -491,7 +491,7 @@ if __name__ == "__main__":
     code_toolbox = CodeToolbox()
 
     code_toolbox.main_pipeline(
-        directory="test_code",
+        directory="test_code/data_quality_package",
         repo_explanation="This repo uses the dq_utility to check the data quality based on different sources given in\
             csv files like az_ca_pcoe_dq_rules_innomar, it will generate a csv output of the lines with errors in a csv file, to use the repo u can:\
             from dq_utility import DataCheck\

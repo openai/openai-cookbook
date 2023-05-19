@@ -41,13 +41,14 @@ class CodeToolbox:
             'reruns_if_fail': 0,
             'model': 'gpt-4',
             'engine': 'GPT4',
-            'unit_test_package':'pytest',
-            'doc_package':'sphinx',
-            'platform':'python3.9'
+            'unit_test_package': 'pytest',
+            'doc_package': 'sphinx',
+            'platform': 'python3.9'
         }
-        self.language='python'
+        self.language = 'python'
         self.config.update(kwargs)
-    def chat_gpt_wrapper(self,input_messages=[],fail_rerun=2) -> Tuple[Any, List]:
+
+    def chat_gpt_wrapper(self, input_messages=[], fail_rerun=2) -> Tuple[Any, List]:
         """Outputs a unit test for a given Python function, using a 3-step GPT-3 prompt."""
 
         # the init function for this classs is\
@@ -62,25 +63,26 @@ class CodeToolbox:
             stream=False,
         )
         unit_test_completion = plan_response.choices[0].message.content
-        input_messages.append({"role": "assistant", "content": unit_test_completion})
+        input_messages.append(
+            {"role": "assistant", "content": unit_test_completion})
         # check the output for errors
-        code_output = self.extract_all_code(unit_test_completion,self.language)
+        code_output = self.extract_all_code(
+            unit_test_completion, self.language)
         try:
             if code_output:
                 ast.parse(code_output)
             else:
-                return self.chat_gpt_wrapper(input_messages=input_messages,fail_rerun=fail_rerun-1)
-
+                return self.chat_gpt_wrapper(input_messages=input_messages, fail_rerun=fail_rerun-1)
 
         except SyntaxError as e:
             print(f"Syntax error in generated code: {e}")
             if self.config["reruns_if_fail"] > 0:
                 print("Rerunning...")
-                return self.chat_gpt_wrapper(input_messages=input_messages,fail_rerun=fail_rerun-1)
+                return self.chat_gpt_wrapper(input_messages=input_messages, fail_rerun=fail_rerun-1)
         return code_output, input_messages
 
     @staticmethod
-    def extract_all_code(string,language='python'):
+    def extract_all_code(string, language='python'):
         start_marker = f"```{language}"
         end_marker = "```"
         pattern = re.compile(f"{start_marker}(.*?)({end_marker})", re.DOTALL)
@@ -132,11 +134,13 @@ class CodeToolbox:
             for class_method_name, class_method in obj_value.items():
                 class_name = str(class_method).split(".")[0].split(" ")[1]
                 function_name = str(class_method).split(".")[1].split(" ")[0]
-                self.delete_unit_test_file_for_each_function(class_name, function_name)
+                self.delete_unit_test_file_for_each_function(
+                    class_name, function_name)
         else:
             class_name = None
             function_name = obj_key
-            self.delete_unit_test_file_for_each_function(class_name, function_name)
+            self.delete_unit_test_file_for_each_function(
+                class_name, function_name)
 
     def documenter(self,func_str):
         doc_prompt = f"""you are providing documentation and typing (type hints) of \
@@ -172,10 +176,12 @@ class CodeToolbox:
             return a + b
         ```
         """
-        self.doc_messages=[]
-        self.doc_messages.append({"role":"system","content": doc_prompt})
-        self.doc_messages.append({"role":"user","content":f"provide {self.config['doc_package']} docstring documentation and typehints for {func_str} in {class_part}, do not provide any other imports that are not used in typing and do not provide multiple options, just one code, if it is a method in a class, do not provide any other code but the method itself and imports"})
-        doc_code,self.doc_messages = self.chat_gpt_wrapper(input_messages=self.doc_messages)
+        self.doc_messages = []
+        self.doc_messages.append({"role": "system", "content": doc_prompt})
+        self.doc_messages.append(
+            {"role": "user", "content": f"provide {self.config['doc_package']} docstring documentation and typehints for {func_str} in {class_part}, do not provide any other imports that are not used in typing and do not provide multiple options, just one code, if it is a method in a class, do not provide any other code but the method itself and imports"})
+        doc_code, self.doc_messages = self.chat_gpt_wrapper(
+            input_messages=self.doc_messages)
 
         # Open the file in read mode and read its content
         with open(self.file_path, 'r') as file:
@@ -185,12 +191,12 @@ class CodeToolbox:
         if 'import' in self.doc_messages[-1]['content']:
             # Find all matches of the pattern in the code string
             import_matches = re.findall(import_pattern, doc_code)
-            doc_code= re.sub(import_pattern, '', doc_code)
+            doc_code = re.sub(import_pattern, '', doc_code)
         doc_code = doc_code.lstrip('\n')
         if doc_code.startswith('class'):
-            doc_code='\n'.join(doc_code.split('\n')[1:])+ '\n'
+            doc_code = '\n'.join(doc_code.split('\n')[1:]) + '\n'
         else:
-            doc_code='    '+doc_code.replace('\n','\n    ') + '\n'
+            doc_code = '    '+doc_code.replace('\n', '\n    ') + '\n'
         new_content = file_content.replace(func_str, doc_code)
         all_imports = re.findall(import_pattern, new_content)
         for import_str in import_matches:
@@ -204,9 +210,10 @@ class CodeToolbox:
         subprocess.run(command, check=True)
         command = ['isort', self.file_path]
         subprocess.run(command, check=True)
-        if len(self.doc_messages)>1:
+        if len(self.doc_messages) > 1:
             self.doc_messages = self.doc_messages[:1]
-    def create_code_file(self,code, target):
+
+    def create_code_file(self, code, target):
         file_extension = {
             'python': 'py',
             'scala': 'scala',
@@ -228,24 +235,28 @@ class CodeToolbox:
             print(f"Code successfully saved to '{suggested_file_path}'")
         else:
             print(f"Code successfully appended to '{suggested_file_path}'")
-    def converter(self,func_str):
+
+    def converter(self, func_str):
         conv_prompt = f"you are providing conversion to {self.config['conversion_target']} of the codes you are given {self.repo_explanation}"
         self.conv_messages = []
         self.conv_messages.append({"role": "system", "content": conv_prompt})
-        self.conv_messages.append({"role":"user","content":f"convert the following code to {self.config['conversion_target']}\
+        self.conv_messages.append({"role": "user", "content": f"convert the following code to {self.config['conversion_target']}\
                                      {self.class_part},{func_str} "})
         self.language = self.config['conversion_target']
-        conv_code,self.conv_messages = self.chat_gpt_wrapper(input_messages=self.conv_messages)
+        conv_code, self.conv_messages = self.chat_gpt_wrapper(
+            input_messages=self.conv_messages)
         self.language = 'python'
         # Open the file in read mode and read its content
-        self.create_code_file(conv_code,self.config['conversion_target'])
-    def unit_tester(self,class_name='',func_str='',function_name=''):
+        self.create_code_file(conv_code, self.config['conversion_target'])
+
+    def unit_tester(self, class_name='', func_str='', function_name=''):
         unit_test_prompt = f"you are providing unit test using {self.config['unit_test_package']}` and\
             {self.config['platform']} {self.repo_explanation}. to give details about the structure of\
             the repo look at the dictionary below, it includes all files and if python, all function\
             and classes, if json first and second level keys and if csv, the column names :{self.directory_dict},"
         self.unit_test_messages = []
-        self.unit_test_messages.append({"role": "system", "content": unit_test_prompt})
+        self.unit_test_messages.append(
+            {"role": "system", "content": unit_test_prompt})
         request_for_unit_test = f" provide unit test for the function `{self.class_part}`.\
             ```python\
             {func_str} \
@@ -261,21 +272,23 @@ class CodeToolbox:
         with open(current_test_path, "w") as test_f:
             test_f.write(unit_test_code)
 
-    def method_function_processor(self,class_name=None,function_name='',func_str=''):
-        # import_matches = []
-        self.class_part = 'in class '+ class_name if class_name else None
+    def method_function_processor(self, class_name=None, function_name='', func_str=''):
+        import_matches = []
+        self.class_part = 'in class ' + class_name if class_name else None
         # self.documenter(func_str=func_str)
-        self.unit_tester(func_str=func_str,function_name=function_name)
+        self.unit_tester(func_str=func_str, function_name=function_name)
         self.converter(func_str=func_str)
 
     def object_processor(self, obj_key, obj_value):
         if type(obj_value) == dict:
             for method_name, class_method in obj_value.items():
                 class_name = str(class_method).split(".")[0].split(" ")[1]
-                self.method_function_processor(class_name=class_name,function_name=method_name,func_str=class_method)
+                self.method_function_processor(
+                    class_name=class_name, function_name=method_name, func_str=class_method)
         else:
             function_name = obj_key
-            self.method_function_processor(class_name=None,function_name=function_name,func_str=obj_value)
+            self.method_function_processor(
+                class_name=None, function_name=function_name, func_str=obj_value)
 
     def main_pipeline(
         self,
@@ -302,7 +315,7 @@ class CodeToolbox:
                         * name of the file to have data quality check (proper file name included in the config csv rules file) - file_name attribute
                         * the source (vendor) of the file to have data quality check - src_system attribute
         """
-        self.repo_explanation=repo_explanation
+        self.repo_explanation = repo_explanation
         # TODO: in current way, you cannot do java or something else with python. change platform and unit_test_package maybe.
 
         object_dict = {}
@@ -350,7 +363,8 @@ class CodeToolbox:
             {repo_explanation}. to give details about the structure of the repo look at the dictionary below, it includes all files\
             and if python, all function and classes, if json first and second level keys and if csv, the column names :{self.directory_dict},"
         self.unit_test_messages = []
-        self.unit_test_messages.append({"role": "system", "content": unit_test_prompt})
+        self.unit_test_messages.append(
+            {"role": "system", "content": unit_test_prompt})
         # TODO: conversion
         # conversion_messages=[]
         # conversion_prompt= f"your task is to convert the code into {target_conversion}"
@@ -362,7 +376,7 @@ class CodeToolbox:
             with open("previous_modules.json", "r") as previous_file:
                 self.previous_data = json.load(previous_file)
         else:
-            self.previous_data=None
+            self.previous_data = None
 
         # loop through all files in the current repo
         for self.file_path, objects in object_dict.items():
@@ -374,22 +388,27 @@ class CodeToolbox:
                     for obj_key, obj_value in objects["objects"].items():
                         if obj_value:
                             self.object_processor(obj_key, obj_value)
-                elif os.path.exists("previous_modules.json"):  # check if file already exists before push
-                    if self.file_path not in self.previous_data:  # file does not exist previous, meaning this file is newly created so whole new unit tests need to be generated
+                # check if file already exists before push
+                elif os.path.exists("previous_modules.json"):
+                    # file does not exist previous, meaning this file is newly created so whole new unit tests need to be generated
+                    if self.file_path not in self.previous_data:
                         for obj_key, obj_value in objects["objects"].items():
                             if obj_value:
                                 self.object_processor(obj_key, obj_value)
                     else:
                         # if file exists previously
                         # detect the class/ function that got modified and regenerate unit test
-                        for obj_key, obj_value in objects["objects"].items(): #loop through all objects in file to detect the changes
+                        # loop through all objects in file to detect the changes
+                        for obj_key, obj_value in objects["objects"].items():
                             if obj_value:
                                 class_name = None
                                 function_name = ""
-                                if type(obj_value) == dict: #file has class and functions
+                                if type(obj_value) == dict:  # file has class and functions
                                     for class_method_name, class_method in obj_value.items():
-                                        class_name = str(class_method).split(".")[0].split(" ")[1]
-                                        function_name = str(class_method).split(".")[1].split(" ")[0]
+                                        class_name = str(class_method).split(".")[
+                                            0].split(" ")[1]
+                                        function_name = str(class_method).split(".")[
+                                            1].split(" ")[0]
                                         function_changed = self.has_function_changed(
                                             self.current_data,
                                             self.previous_data,
@@ -405,7 +424,7 @@ class CodeToolbox:
                                                     function_name
                                                 ],
                                             )
-                                else: #file only has functions
+                                else:  # file only has functions
                                     function_name = obj_key
                                     function_changed = self.has_function_changed(
                                         self.current_data, self.previous_data, self.file_path, class_name, function_name
@@ -416,7 +435,7 @@ class CodeToolbox:
                                             function_name=function_name,
                                             func_str=self.current_data[self.file_path]["objects"][function_name],
                                         )
-                else: #when `current_modules.json` exist but `previous_modules.json` doesn't exist
+                else:  # when `current_modules.json` exist but `previous_modules.json` doesn't exist
                     # `current_modules.json` exist when `main.py` is already executed -> not the first push -> need to do comparision
                     # `previous_modules.json` doesn't exist when `main.py` is executed without pushing (because every push will make `previous_modules.json`)
                     print('no action needed')
@@ -431,7 +450,7 @@ class CodeToolbox:
             for self.previous_file_path, objects in self.previous_data.items():
                 if self.previous_file_path in self.current_data:
                     if "objects" in objects:
-                        #loop through objects to delete certain object
+                        # loop through objects to delete certain object
                         if "objects" in self.current_data[self.previous_file_path]:
                             for obj_key, obj_value in objects["objects"].items():
                                 if obj_value:
@@ -439,23 +458,31 @@ class CodeToolbox:
                                         if type(obj_value) == dict:
                                             if type(self.current_data[self.previous_file_path]["objects"][obj_key]) == dict:
                                                 for class_method_name, class_method in obj_value.items():
-                                                    class_name = str(class_method).split(".")[0].split(" ")[1]
-                                                    function_name = str(class_method).split(".")[1].split(" ")[0]
+                                                    class_name = str(class_method).split(".")[
+                                                        0].split(" ")[1]
+                                                    function_name = str(class_method).split(".")[
+                                                        1].split(" ")[0]
                                                     if class_method_name not in self.current_data[self.previous_file_path]["objects"][obj_key][obj_value]:
-                                                        self.delete_unit_test_file_for_each_function(class_name, function_name)
+                                                        self.delete_unit_test_file_for_each_function(
+                                                            class_name, function_name)
                                                     else:
                                                         if class_method not in self.current_data[self.previous_file_path]["objects"][obj_key][obj_value][class_method_name]:
-                                                            self.delete_unit_test_file_for_each_function(class_name, function_name)
+                                                            self.delete_unit_test_file_for_each_function(
+                                                                class_name, function_name)
                                             else:
                                                 for class_method_name, class_method in obj_value.items():
-                                                    class_name = str(class_method).split(".")[0].split(" ")[1]
-                                                    function_name = str(class_method).split(".")[1].split(" ")[0]
-                                                    self.delete_unit_test_file_for_each_function(class_name, function_name)
+                                                    class_name = str(class_method).split(".")[
+                                                        0].split(" ")[1]
+                                                    function_name = str(class_method).split(".")[
+                                                        1].split(" ")[0]
+                                                    self.delete_unit_test_file_for_each_function(
+                                                        class_name, function_name)
                                         else:
                                             if obj_value in self.current_data[self.previous_file_path]["objects"][obj_key]:
                                                 class_name = None
                                                 function_name = obj_key
-                                                self.delete_unit_test_file_for_each_function(class_name, function_name)
+                                                self.delete_unit_test_file_for_each_function(
+                                                    class_name, function_name)
                                     else:
                                         self.object_deleter(obj_key, obj_value)
                         else:
@@ -494,14 +521,14 @@ if __name__ == "__main__":
         directory="test_code/data_quality_package",
         repo_explanation="This repo uses the dq_utility to check the data quality based on different sources given in\
             csv files like az_ca_pcoe_dq_rules_innomar, it will generate a csv output of the lines with errors in a csv file, to use the repo u can:\
-            from dq_utility import DataCheck\
+            from ..dq_utility import DataCheck\
             from pyspark.sql import SparkSession\
             spark = SparkSession.builder.getOrCreate()\
             df=spark.read.parquet('test_data.parquet')\
-            Datacheck(source_df=df,\
+            DataCheck(source_df=df,\
             spark_context= spark,\
-            config_path=s3://config-path-for-chat-gpt-unit-test/config.json,\
-            file_name=az_ca_pcoe_dq_rules_innomar.csv,\
-            src_system=bioscript)",
+            config_path='s3://config-path-for-chat-gpt-unit-test/config.json',\
+            file_name='AstraZeneca PA Report',\
+            src_system='bioscript')",
     )
     # print(code_toolbox.main_pipeline())

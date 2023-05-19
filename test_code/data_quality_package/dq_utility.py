@@ -28,9 +28,6 @@ logger = logging.getLogger(__name__)
 logger.setLevel(logging.INFO)
 
 # Define boto3 APIs
-s3_client = boto3.client("s3")
-s3_client = boto3.client("s3")
-s3_resource = boto3.resource("s3")
 class DataCheck:
     def __init__(
         self,
@@ -76,6 +73,8 @@ class DataCheck:
             "FloatType": FloatType,
             "DoubleType": DoubleType,
         }
+        self.s3_client = boto3.client("s3")
+        self.s3_resource = boto3.resource("s3")
 
         # Initial configuration
         config_content = self.read_s3_file(config_path).decode()
@@ -118,10 +117,9 @@ class DataCheck:
         Raises:
             FileNotFoundError: If the file cannot be found in S3 given the path.
         """
-        s3_resource: Union[ServiceResource, Any] = ...
         file_res = urlparse(file_path)
         try:
-            file_obj = s3_resource.Object(file_res.netloc, file_res.path.lstrip("/"))
+            file_obj = self.s3_resource.Object(file_res.netloc, file_res.path.lstrip("/"))
             return file_obj.get()["Body"].read()
         except ClientError:
             raise FileNotFoundError(f"File cannot be found in S3 given path '{file_path}'")

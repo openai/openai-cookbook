@@ -34,7 +34,7 @@ class CodeToolbox:
         self.config = {
             'document': True,
             'unit_test': True,
-            'conversion': True,
+            'conversion': False,
             'conversion_target': 'scala',
             'max_tokens': 1000,
             'temperature': 0,
@@ -264,9 +264,11 @@ class CodeToolbox:
     def method_function_processor(self,class_name=None,function_name='',func_str=''):
         # import_matches = []
         self.class_part = 'in class '+ class_name if class_name else None
-        # self.documenter(func_str=func_str)
+        if self.config['document']:
+            self.documenter(func_str=func_str)
         self.unit_tester(func_str=func_str,function_name=function_name)
-        self.converter(func_str=func_str)
+        if self.config['conversion']:
+            self.converter(func_str=func_str)
 
     def object_processor(self, obj_key, obj_value):
         if type(obj_value) == dict:
@@ -370,10 +372,12 @@ class CodeToolbox:
             if "objects" in objects:
                 if not os.path.exists(
                     "current_modules.json"
-                ):  # this is the first push, so all unit tests need to be generated (no modification/ deletion)
+                ):  # this is the first push, so all unit tests, documents need to be generated (no modification/ deletion)
+                    self.config['document'] = True
                     for obj_key, obj_value in objects["objects"].items():
                         if obj_value:
                             self.object_processor(obj_key, obj_value)
+                    self.config['document'] = False
                 elif os.path.exists("previous_modules.json"):  # check if file already exists before push
                     if self.file_path not in self.previous_data:  # file does not exist previous, meaning this file is newly created so whole new unit tests need to be generated
                         for obj_key, obj_value in objects["objects"].items():

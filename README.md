@@ -10,6 +10,7 @@ Most code examples are written in Python, though the concepts can be applied in 
 
 ## Recently added or updated 🆕 ✨
 
+- [How to create dynamic masks with DALL·E and Segment Anything](examples/dalle/How_to_create_dynamic_masks_with_DALL-E_and_Segment_Anything.ipynb) [May 19th, 2021]
 - [Question answering using embeddings](examples/Question_answering_using_embeddings.ipynb) [Apr 14th, 2023]
 - [Using vector databases for embeddings search](examples/vector_databases/) [various dates]
 - [Powering your products with ChatGPT and your own data](apps/chatbot-kickstarter/powering_your_products_with_chatgpt_and_your_data.ipynb) [Mar 10th, 2023]
@@ -44,7 +45,8 @@ Most code examples are written in Python, though the concepts can be applied in 
   - [Guide: best practices for fine-tuning GPT-3 to classify text](https://docs.google.com/document/d/1rqj7dkuvl7Byd5KQPUJRxc19BJt8wo0yHNwK84KfU3Q/edit)
   - [Fine-tuned classification](examples/Fine-tuned_classification.ipynb)
 - DALL-E
-  - [How to generate and edit images with DALL-E](examples/dalle/Image_generations_edits_and_variations_with_DALL-E.ipynb)
+  - [How to generate and edit images with DALL·E](examples/dalle/Image_generations_edits_and_variations_with_DALL-E.ipynb)
+  - [How to create dynamic masks with DALL·E and Segment Anything](examples/dalle/How_to_create_dynamic_masks_with_DALL-E_and_Segment_Anything.ipynb)
 - Azure OpenAI (alternative API from Microsoft Azure)
   - [How to use ChatGPT with Azure OpenAI](examples/azure/chat.ipynb)
   - [How to get completions from Azure OpenAI](examples/azure/completions.ipynb)

@@ -136,3 +136,5 @@ dmypy.json
 *.parquet
 scala/
 */unit_test/
+*/.aws
+hold_tests/

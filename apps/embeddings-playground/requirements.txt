@@ -1,0 +1,6 @@
+altair
+openai
+pandas
+scipy
+streamlit
+tenacity

@@ -10,6 +10,7 @@ Most code examples are written in Python, though the concepts can be applied in 
 
 ## Recently added/updated 🆕 ✨
 
+- [Embeddings playground (streamlit app)](apps/embeddings-playground/README.md) [May 19th, 2023]
 - [How to use a multi-step prompt to write unit tests](examples/Unit_test_writing_using_a_multi-step_prompt.ipynb) [May 19, 2023]
 - [How to create dynamic masks with DALL·E and Segment Anything](examples/dalle/How_to_create_dynamic_masks_with_DALL-E_and_Segment_Anything.ipynb) [May 19th, 2023]
 - [Question answering using embeddings](examples/Question_answering_using_embeddings.ipynb) [Apr 14th, 2023]
@@ -36,6 +37,7 @@ Most code examples are written in Python, though the concepts can be applied in 
   - [Clustering embeddings](examples/Clustering.ipynb)
   - [Visualizing embeddings in 2D](examples/Visualizing_embeddings_in_2D.ipynb) or [3D](examples/Visualizing_embeddings_in_3D.ipynb)
   - [Embedding long texts](examples/Embedding_long_inputs.ipynb)
+  - [Embeddings playground (streamlit app)](apps/embeddings-playground/README.md) [May 19th, 2023]
 - Apps
   - [File Q&A](apps/file-q-and-a/)
   - [Web Crawl Q&A](apps/web-crawl-q-and-a)

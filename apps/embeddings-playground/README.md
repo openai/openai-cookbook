@@ -6,7 +6,7 @@
 
 Before running, install required dependencies with:
 
-`pip install -r examples/apps/embeddings_playground/requirements.txt`
+`pip install -r apps/embeddings-playground/requirements.txt`
 
 (You may need to change the path to match your local path.)
 
@@ -16,7 +16,7 @@ Verify installation of streamlit with `streamlit hello`.
 
 Run the script with:
 
-`streamlit run examples/apps/embeddings_playground.py`
+`streamlit run apps/embeddings-playground/embeddings_playground.py`
 
 (Again, you may need to change the path to match your local path.)
 

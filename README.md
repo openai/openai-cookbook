@@ -37,7 +37,7 @@ Most code examples are written in Python, though the concepts can be applied in 
   - [Clustering embeddings](examples/Clustering.ipynb)
   - [Visualizing embeddings in 2D](examples/Visualizing_embeddings_in_2D.ipynb) or [3D](examples/Visualizing_embeddings_in_3D.ipynb)
   - [Embedding long texts](examples/Embedding_long_inputs.ipynb)
-  - [Embeddings playground (streamlit app)](apps/embeddings-playground/README.md) [May 19th, 2023]
+  - [Embeddings playground (streamlit app)](apps/embeddings-playground/README.md)
 - Apps
   - [File Q&A](apps/file-q-and-a/)
   - [Web Crawl Q&A](apps/web-crawl-q-and-a)

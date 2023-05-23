@@ -101,7 +101,7 @@ import os  # for reading API key
 import re  # for matching endpoint from request URL
 import tiktoken  # for counting tokens
 import time  # for sleeping after rate limit is hit
-from dataclasses import dataclass  # for storing API inputs, outputs, and metadata
+from dataclasses import dataclass, field  # for storing API inputs, outputs, and metadata
 
 
 async def process_api_requests_from_file(
@@ -258,7 +258,7 @@ class APIRequest:
     request_json: dict
     token_consumption: int
     attempts_left: int
-    result = []
+    result: list = field(default_factory=list)
 
     async def call_api(
         self,

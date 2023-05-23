@@ -1,4 +1,4 @@
-{"model": "text-embedding-ada-002", "input": "0\n"}
+{"model": "text-embedding-ada-002", "input": "0\n", "metadata": {"row_id": 1}}
 {"model": "text-embedding-ada-002", "input": "1\n"}
 {"model": "text-embedding-ada-002", "input": "2\n"}
 {"model": "text-embedding-ada-002", "input": "3\n"}

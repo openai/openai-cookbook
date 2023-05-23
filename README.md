@@ -62,7 +62,7 @@ Beyond the code examples here, you can learn about the [OpenAI API] from the fol
 - Try out the API in the [OpenAI Playground]
 - Read about the API in the [OpenAI Documentation]
 - Discuss the API in the [OpenAI Community Forum]
-- Look for help in the [OpenAI Help Center]
+- Get help in the [OpenAI Help Center]
 - See example prompts in the [OpenAI Examples]
 - Stay up to date with the [OpenAI Blog]
 

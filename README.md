@@ -53,7 +53,6 @@ Most code examples are written in Python, though the concepts can be applied in 
   - [How to use ChatGPT with Azure OpenAI](examples/azure/chat.ipynb)
   - [How to get completions from Azure OpenAI](examples/azure/completions.ipynb)
   - [How to get embeddings from Azure OpenAI](examples/azure/embeddings.ipynb)
-  - [How to fine-tune GPT-3 with Azure OpenAI](examples/azure/finetuning.ipynb)
 
 ## Related OpenAI resources
 
@@ -110,7 +109,7 @@ People are writing great tools and papers for improving outputs from GPT. Here a
 - [Reflexion: an autonomous agent with dynamic memory and self-reflection (2023)](https://arxiv.org/abs/2303.11366): Retrying tasks with memory of prior failures improves subsequent performance.
 - [Demonstrate-Search-Predict: Composing retrieval and language models for knowledge-intensive NLP (2023)](https://arxiv.org/abs/2212.14024): Models augmented with knowledge via a "retrieve-then-read" can be improved with multi-hop chains of searches.
 
- 
+
 ## Contributing
 
 If there are examples or guides you'd like to see, feel free to suggest them on the [issues page]. We are also happy to accept high quality pull requests, as long as they fit the scope of the repo.

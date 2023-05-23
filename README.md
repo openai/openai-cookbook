@@ -8,13 +8,12 @@ Most code examples are written in Python, though the concepts can be applied in 
 
 [![Open in GitHub Codespaces](https://github.com/codespaces/badge.svg)](https://github.com/codespaces/new?hide_repo_select=true&ref=main&repo=468576060&machine=basicLinux32gb&location=EastUs)
 
-## Recently added or updated 🆕 ✨
+## Recently added/updated 🆕 ✨
 
+- [Embeddings playground (streamlit app)](apps/embeddings-playground/README.md) [May 19th, 2023]
+- [How to use a multi-step prompt to write unit tests](examples/Unit_test_writing_using_a_multi-step_prompt.ipynb) [May 19, 2023]
+- [How to create dynamic masks with DALL·E and Segment Anything](examples/dalle/How_to_create_dynamic_masks_with_DALL-E_and_Segment_Anything.ipynb) [May 19th, 2023]
 - [Question answering using embeddings](examples/Question_answering_using_embeddings.ipynb) [Apr 14th, 2023]
-- [Using vector databases for embeddings search](examples/vector_databases/) [various dates]
-- [Powering your products with ChatGPT and your own data](apps/chatbot-kickstarter/powering_your_products_with_chatgpt_and_your_data.ipynb) [Mar 10th, 2023]
-- [How to format inputs to ChatGPT models](examples/How_to_format_inputs_to_ChatGPT_models.ipynb) [Mar 1st, 2023]
-
 
 ## Guides & examples
 
@@ -22,14 +21,12 @@ Most code examples are written in Python, though the concepts can be applied in 
   - [How to handle rate limits](examples/How_to_handle_rate_limits.ipynb)
     - [Example parallel processing script that avoids hitting rate limits](examples/api_request_parallel_processor.py)
   - [How to count tokens with tiktoken](examples/How_to_count_tokens_with_tiktoken.ipynb)
-  - [How to stream completions](examples/How_to_stream_completions.ipynb)
-- ChatGPT
-  - [How to format inputs to ChatGPT models](examples/How_to_format_inputs_to_ChatGPT_models.ipynb)
-  - [Powering your products with ChatGPT and your own data](apps/chatbot-kickstarter/powering_your_products_with_chatgpt_and_your_data.ipynb)
 - GPT
+  - [How to format inputs to ChatGPT models](examples/How_to_format_inputs_to_ChatGPT_models.ipynb)
+  - [How to stream completions](examples/How_to_stream_completions.ipynb)
+  - [How to use a multi-step prompt to write unit tests](examples/Unit_test_writing_using_a_multi-step_prompt.ipynb)
   - [Guide: How to work with large language models](how_to_work_with_large_language_models.md)
   - [Guide: Techniques to improve reliability](techniques_to_improve_reliability.md)
-  - [How to use a multi-step prompt to write unit tests](examples/Unit_test_writing_using_a_multi-step_prompt.ipynb)
 - Embeddings
   - [Text comparison examples](text_comparison_examples.md)
   - [How to get embeddings](examples/Get_embeddings.ipynb)
@@ -40,19 +37,22 @@ Most code examples are written in Python, though the concepts can be applied in 
   - [Clustering embeddings](examples/Clustering.ipynb)
   - [Visualizing embeddings in 2D](examples/Visualizing_embeddings_in_2D.ipynb) or [3D](examples/Visualizing_embeddings_in_3D.ipynb)
   - [Embedding long texts](examples/Embedding_long_inputs.ipynb)
+  - [Embeddings playground (streamlit app)](apps/embeddings-playground/README.md)
+- Apps
+  - [File Q&A](apps/file-q-and-a/)
+  - [Web Crawl Q&A](apps/web-crawl-q-and-a)
+  - [Powering your products with ChatGPT and your own data](apps/chatbot-kickstarter/powering_your_products_with_chatgpt_and_your_data.ipynb)
 - Fine-tuning GPT-3
   - [Guide: best practices for fine-tuning GPT-3 to classify text](https://docs.google.com/document/d/1rqj7dkuvl7Byd5KQPUJRxc19BJt8wo0yHNwK84KfU3Q/edit)
   - [Fine-tuned classification](examples/Fine-tuned_classification.ipynb)
 - DALL-E
-  - [How to generate and edit images with DALL-E](examples/dalle/Image_generations_edits_and_variations_with_DALL-E.ipynb)
+  - [How to generate and edit images with DALL·E](examples/dalle/Image_generations_edits_and_variations_with_DALL-E.ipynb)
+  - [How to create dynamic masks with DALL·E and Segment Anything](examples/dalle/How_to_create_dynamic_masks_with_DALL-E_and_Segment_Anything.ipynb)
 - Azure OpenAI (alternative API from Microsoft Azure)
   - [How to use ChatGPT with Azure OpenAI](examples/azure/chat.ipynb)
   - [How to get completions from Azure OpenAI](examples/azure/completions.ipynb)
   - [How to get embeddings from Azure OpenAI](examples/azure/embeddings.ipynb)
   - [How to fine-tune GPT-3 with Azure OpenAI](examples/azure/finetuning.ipynb)
-- Apps
-  - [File Q and A](apps/file-q-and-a/)
-  - [Web Crawl Q and A](apps/web-crawl-q-and-a)
 
 ## Related resources
 

@@ -82,6 +82,7 @@ People are writing great tools and papers for improving outputs from GPT. Here a
 - [Scale Spellbook](https://scale.com/spellbook): A paid product for building, comparing, and shipping language model apps.
 - [PromptPerfect](https://promptperfect.jina.ai/prompts): A paid product for testing and improving prompts.
 - [Weights & Biases](https://wandb.ai/site/solutions/llmops): A paid product for tracking model training and prompt engineering experiments.
+- [OpenAI Evals](https://github.com/openai/evals): An open-source library for evaluating task performance of language models and prompts.
 
 ### Prompting guides
 
@@ -97,7 +98,6 @@ People are writing great tools and papers for improving outputs from GPT. Here a
 - [Andrej Karpathy's Let's build GPT](https://www.youtube.com/watch?v=kCc8FmEb1nY): A detailed dive into the machine learning underlying GPT.
 - [Prompt Engineering by DAIR.AI](https://www.youtube.com/watch?v=dOxUroR57xs): A one-hour video on various prompt engineering techniques.
 
-
 ### Papers on advanced prompting to improve reasoning
 
 - [Chain-of-Thought Prompting Elicits Reasoning in Large Language Models (2022)](https://arxiv.org/abs/2201.11903): Using few-shot prompts to ask models to think step by step improves their reasoning. PaLM's score on math word problems (GSM8K) go from 18% to 57%.
@@ -110,7 +110,6 @@ People are writing great tools and papers for improving outputs from GPT. Here a
 - [ReAct: Synergizing Reasoning and Acting in Language Models (2023)](https://arxiv.org/abs/2210.03629): For tasks with tools or an environment, chain of thought works better you prescriptively alternate between **Re**asoning steps (thinking about what to do) and **Act**ing (getting information from a tool or environment).
 - [Reflexion: an autonomous agent with dynamic memory and self-reflection (2023)](https://arxiv.org/abs/2303.11366): Retrying tasks with memory of prior failures improves subsequent performance.
 - [Demonstrate-Search-Predict: Composing retrieval and language models for knowledge-intensive NLP (2023)](https://arxiv.org/abs/2212.14024): Models augmented with knowledge via a "retrieve-then-read" can be improved with multi-hop chains of searches.
-
 
 ## Contributing
 

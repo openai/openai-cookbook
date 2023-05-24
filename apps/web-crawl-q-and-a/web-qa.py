@@ -329,8 +329,7 @@ def create_context(
     for i, row in df.sort_values('distances', ascending=True).iterrows():
         
         # Add the length of the text to the current length
-        cur_len += row['n_tokens'] + 4
-        
+        cur_len += len(row['text']) + 4
         # If the context is too long, break
         if cur_len > max_len:
             break

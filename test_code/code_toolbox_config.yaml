@@ -1,0 +1,81 @@
+document: true
+unit_test: true
+conversion: false
+conversion_target: 
+  python: py
+  scala: scala
+  c++: cpp
+max_tokens: 1000
+temperature: 0
+reruns_if_fail: 0
+model: gpt-4
+engine: GPT4
+unit_test_package: pytest
+doc_package: sphinx
+platform: python3.9
+test_failure_retry: 1
+test_path: 'data_quality_package/unit_test'
+test_command: "sudo -S bash test_code/docker_test.sh "
+directory: "data_quality_package"
+repo_explanation: 'the self.rule_df contains the data quality roles is given as:
+# Column names
+column_names = [
+    "src_file_name", "src_sheet_name", "file_name", "column_name", "nullable", "type", "date_format",
+    "unique", "min", "max", "reference_valuelist", "reference_columns", "conditional_valuelist",
+    "conditional_columns", "conditional_column_value"
+]
+
+# Content
+content = [
+    ("sample_src_file_name", "Payer Report - Reimb History", "fasenra_astrazeneca_detailed_reports_payer_report_reimb_history",
+     "Patient Number", "FALSE", "StringType", "null", "FALSE", "null", "null", "null", "null", "null", "null", "null"),
+     ...
+]
+the columns of data to check the data quality on is given as:
+columns:
+"Patient Number", "Current Patient Status", "Current Patient Sub Status", "Plan Type", "Plan Priority",
+                "Payer Name", "Final Outcome Date", "Days From First Call to Insurer To Final Outcome Date",
+                "Coverage %", "Co Payment %", "Plan Max Amount", "Submitted To MD Date", "Received From MD Date",
+                "Submitted To Insurer Date", "Result Date", "Expiry Date"
+
+use the following piece of code when needed:
+# Create DataFrame
+from data_quality_package.dq_utility import DataCheck\
+from pyspark.sql import SparkSession\
+@pytest.fixture\
+df = spark.read.parquet("data/test_data.parquet")
+def datacheck_instance():\
+    config_path = "s3://config-path-for-chat-gpt-unit-test/config.json"\
+    file_name = "FSN001 - Fasenra (AstraZeneca) Detailed Reports"
+    src_system = "innomar"
+    data_check = DataCheck(df, spark, config_path, file_name, src_system)
+    return DataCheck(source_df=df, spark_context=spark, config_path="config.json", file_name="az_ca_pcoe_dq_rules_innomar.csv", src_system="bioscript")'
+doc_example: ' ```python\
+        def sum(a,b):
+            if not isinstance(a, (int, float)) or not isinstance(b, (int, float)):
+                raise TypeError("Both parameters must be numeric values.")
+            return a+b
+        ```
+        this is a proper response:
+        ```python
+        from typing import Union
+        def sum(a: Union[int, float], b: Union[int, float]) -> Union[int, float]:
+            \"\"\"
+            Returns the sum of two numbers.
+            Args:
+                a (int or float): The first number.
+                b (int or float): The second number.
+            Returns:
+                int or float: The sum of `a` and `b`.
+            Raises:
+                TypeError: If `a` or `b` is not a numeric value.
+            Examples:
+                >>> sum(2, 3)
+                5
+                >>> sum(4.5, 2.5)
+                7.0
+            \"\"\"
+            if not isinstance(a, (int, float)) or not isinstance(b, (int, float)):
+                raise TypeError("Both parameters must be numeric values.")
+            return a + b'
+  

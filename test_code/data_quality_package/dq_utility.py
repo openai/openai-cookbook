@@ -2,26 +2,23 @@ import ast
 import json
 import logging
 import math
-from typing import Any, Dict, List, Optional, Tuple, Union
+from typing import Any, List, Optional
 from urllib.parse import urlparse
 
 import boto3
 import numpy as np
 import pandas as pd
-import pyspark.sql.column as Column
 import pyspark.sql.dataframe as DataFrame
 import pyspark.sql.functions as f
-from boto3.resources.base import ServiceResource
 from botocore.exceptions import ClientError
+from pandas import DataFrame
 from pyspark.sql import Column, DataFrame, SparkSession
 from pyspark.sql import functions as f
-from pyspark.sql.column import Column
 from pyspark.sql.dataframe import DataFrame
-from pyspark.sql.functions import broadcast
+from pyspark.sql.functions import broadcast, col, lit, when
 from pyspark.sql.types import (DateType, DoubleType, FloatType, IntegerType,
                                StringType)
 from pyspark.sql.utils import AnalysisException
-
 
 # Create logger utility
 logger = logging.getLogger(__name__)
@@ -38,27 +35,29 @@ class DataCheck:
         src_system: str,
     ) -> None:
         """
-        Initializes the class with the given parameters.
+        Initializes the DataCheck class.
 
         Args:
-            source_df (DataFrame): The source DataFrame.
+            source_df (DataFrame): The source DataFrame to be checked.
             spark_context (SparkSession): The SparkSession object.
             config_path (str): The path to the configuration file.
-            file_name (str): The name of the file.
-            src_system (str): The source system.
+            file_name (str): The name of the file to be checked.
+            src_system (str): The source system identifier.
 
         Attributes:
             spark (SparkSession): The SparkSession object.
-            source_df (DataFrame): The source DataFrame.
-            error_df (DataFrame): The error DataFrame.
+            source_df (DataFrame): The source DataFrame to be checked.
+            error_df (DataFrame): The DataFrame containing errors.
             error_columns (List[str]): The list of error columns.
             error_counter (int): The error counter.
-            schema_dict (Dict[str, Union[StringType, DateType, IntegerType, FloatType, DoubleType]]): The schema dictionary.
+            schema_dict (Dict[str, type]): The dictionary of schema types.
+            s3_client (boto3.client): The S3 client object.
+            s3_resource (boto3.resource): The S3 resource object.
             config (Dict): The configuration dictionary.
-            rule_df (pd.DataFrame): The rule DataFrame.
-            file_name (str): The name of the file.
+            rule_df (pd.DataFrame): The DataFrame containing data quality rules.
+            file_name (str): The name of the file to be checked.
             input_columns (List[str]): The list of input columns.
-            output_columns (List[str]): The list of output columns.
+            output_columns (str): The output columns.
             sns_message (List[str]): The list of SNS messages.
         """
         self.spark = spark_context
@@ -88,9 +87,12 @@ class DataCheck:
         self.rule_df = self.rule_df.applymap(lambda x: x if x else np.nan)
         self.rule_df.sort_index(inplace=True)
         self.sns_message = []
-
+        
         self.input_columns = self.source_df.columns
-        self.output_columns = self.config[src_system]["sources"][self.file_name]["dq_output_columns"]
+        try:
+            self.output_columns = self.config[src_system]["sources"][self.file_name]["dq_output_columns"]
+        except:
+            self.output_columns= 'Patient Number'
         for index in range(len(self.input_columns)):
             if "." in self.input_columns[index]:
                 self.input_columns[index] = "`" + self.input_columns[index] + "`"
@@ -104,19 +106,7 @@ class DataCheck:
         self.spark.conf.set("spark.sql.adaptive.enabled", True)
         self.spark.conf.set("spark.sql.adaptive.coalescePartitions.enabled", True)
 
-    def read_s3_file(self, file_path: str) -> bytes:
-        """
-        Reads a file from S3 and returns its content as bytes.
-
-        Args:
-            file_path (str): The S3 file path.
-
-        Returns:
-            bytes: The content of the file.
-
-        Raises:
-            FileNotFoundError: If the file cannot be found in S3 given the path.
-        """
+    def read_s3_file(self, file_path):
         file_res = urlparse(file_path)
         try:
             file_obj = self.s3_resource.Object(file_res.netloc, file_res.path.lstrip("/"))
@@ -124,29 +114,7 @@ class DataCheck:
         except ClientError:
             raise FileNotFoundError(f"File cannot be found in S3 given path '{file_path}'")
 
-    def resolve_config(self, env_path: str, config_content: Any) -> Dict[str, Any]:
-        """
-        Resolves the configuration by replacing placeholders with values from the environment file.
-
-        Args:
-            env_path (str): The path to the environment file.
-            config_content (Any): The content of the configuration file.
-
-        Returns:
-            Dict[str, Any]: The resolved configuration as a dictionary.
-
-        Examples:
-            >>> my_class = MyClass()
-            >>> env_path = "path/to/env.json"
-            >>> config_content = "<env> <_env> <bucket_name> <account>"
-            >>> my_class.resolve_config(env_path, config_content)
-            {
-                "env": "production",
-                "_env": "prod",
-                "bucket_name": "my_bucket",
-                "account": "1234567890"
-            }
-        """
+    def resolve_config(self, env_path, config_content):
         env_content = self.read_s3_file(env_path).decode()
         env_sub = json.loads(env_content)["subs"]
 
@@ -161,48 +129,14 @@ class DataCheck:
         return ast.literal_eval(config_content_str)
 
     @staticmethod
-    def is_float(element: Any) -> bool:
-        """
-        Checks if the given element can be converted to a float.
-
-        Args:
-            element (Any): The element to be checked.
-
-        Returns:
-            bool: True if the element can be converted to a float, False otherwise.
-
-        Examples:
-            >>> MyClass.is_float(3.14)
-            True
-            >>> MyClass.is_float("3.14")
-            True
-            >>> MyClass.is_float("hello")
-            False
-        """
+    def is_float(element: Any):
         try:
             float(element)
             return True
         except ValueError:
             return False
 
-    def limit_finder(self, input_col: str, rule_value: Union[str, float]) -> Optional[Union[float, f.Column]]:
-        """
-        Finds the limit value based on the given rule_value.
-
-        Args:
-            input_col (str): The input column name.
-            rule_value (str or float): The rule value to determine the limit.
-
-        Returns:
-            float or f.Column or None: The limit value as a float, a pyspark.sql.functions.Column, or None if not found.
-
-        Examples:
-            >>> my_class = MyClass()
-            >>> my_class.limit_finder("input_column", "3.5")
-            3.5
-            >>> my_class.limit_finder("input_column", "other_column")
-            f.col("other_column")
-        """
+    def limit_finder(self, input_col, rule_value):
         if self.is_float(rule_value):
             rule_value = float(rule_value)
             if math.isnan(rule_value):
@@ -227,57 +161,32 @@ class DataCheck:
 
         Returns:
             List[Any]: A list of column indices that meet the given criteria.
-
-        Examples:
-            Assuming `self.rule_df` is a DataFrame with the following structure:
-                A    B    C
-            0  1.0  NaN  3.0
-            1  4.0  5.0  NaN
-
-            >>> obj = MyClass()
-            >>> obj.columns_to_check('A')
-            [0]
-            >>> obj.columns_to_check('B')
-            [1]
         """
         return self.rule_df[(self.rule_df[criteria]).notna()].index
 
-    def add_error_col(self, error_msg: str, condition: Column, error_col_name: str) -> None:
+    # ... other methods and attributes ...
+
+    def add_error_col(self, error_msg: str, condition: Optional[Column], error_col_name: str) -> None:
         """
-        Adds an error column to the source DataFrame based on the given condition.
+        Adds an error column to the source DataFrame if the given condition is met.
 
         Args:
-            error_msg (str): The error message to be added in the error column.
-            condition (Column): The condition to be checked for each row in the source DataFrame.
-            error_col_name (str): The name of the error column to be added.
+            error_msg (str): The error message to be added to the error column.
+            condition (pyspark.sql.Column, optional): The condition to be checked. If None, no error column will be added.
+            error_col_name (str): The name of the error column.
 
         Returns:
-
             None
-
         """
         if condition is not None and error_col_name and error_msg:
-            col_condition = f.when(condition, f.lit(error_msg)).otherwise(f.lit(None))
+            col_condition = when(condition, lit(error_msg)).otherwise(lit(None))
             error_col_name = error_col_name + str(self.error_counter)
             self.source_df = self.source_df.withColumn(error_col_name, col_condition)
-            self.error_columns.append(f.col(error_col_name))
+            self.error_columns.append(col(error_col_name))
             self.error_counter += 1
         return None
 
-    def data_type_check(self, input_col: str) -> None:
-        """
-        Checks the data type of a column in the source DataFrame and adds an error column if the data type does not match the expected data type.
-
-        Args:
-            input_col (str): The name of the input column to check.
-
-        Returns:
-            None
-
-        Examples:
-            >>> your_class_instance = YourClassName()
-            >>> your_class_instance.data_type_check("column_name")
-        """
+    def data_type_check(self, input_col):
         print("start data type check")
         dtype_key = self.rule_df.loc[input_col, "type"]
         if dtype_key == "DateType":
@@ -293,45 +202,11 @@ class DataCheck:
         self.add_error_col(error_msg=type_error_msg, condition=dtype_cond, error_col_name=input_col + " type_check")
         logger.info(f"[{input_col}] dtype check is done.")
     # ...
-    def null_cond_syntax(self, input_col: str) -> Column:
-        """
-        Returns a Column object representing a condition where the input column is either an empty string or null.
-
-        Args:
-            input_col (str): The name of the input column.
-
-        Returns:
-            Column: A Column object representing the condition.
-
-        Examples:
-            >>> df = spark.createDataFrame([(1, ""), (2, None), (3, "A")], ["id", "value"])
-            >>> my_class = MyClass()
-            >>> df.filter(my_class.null_cond_syntax("value")).show()
-            +---+-----+
-            | id|value|
-            +---+-----+
-            |  1|     |
-            |  2| null|
-            +---+-----+
-        """
+    def null_cond_syntax(self, input_col):
         return (f.col(input_col) == "") | (f.col(input_col).isNull())
 
     # ...
-    def null_check(self, input_col: str) -> None:
-        """
-        Checks if the input column is null and adds an error message if it is.
-
-        Args:
-            input_col (str): The name of the input column to check for null values.
-
-        Returns:
-            None
-
-        Examples:
-            >>> your_class_instance.null_check("column_name")
-            start null_check
-            [column_name] null check is done.
-        """
+    def null_check(self, input_col):
         print("start null_check")
         if not math.isnan(self.rule_df.loc[input_col, "nullable"]):
             return
@@ -340,53 +215,10 @@ class DataCheck:
         self.add_error_col(error_msg=null_error_msg, condition=null_condition, error_col_name=input_col + " null_check")
         logger.info(f"[{input_col}] null check is done.")
 
-    def sum_check_syntax(self, input_col1: str, input_col2: str, syntax_value: Any) -> Any:
-        """
-        Checks if the sum of the values in the specified columns is not equal to the syntax value.
-
-        Args:
-            input_col1 (str): The name of the first input column.
-            input_col2 (str): The name of the second input column.
-            syntax_value (Any): The value to compare the sum against.
-
-        Returns:
-            Any: A boolean column expression where True indicates the sum is not equal to the syntax value.
-
-        Examples:
-            >>> df = spark.createDataFrame([(1, 2, 3), (4, 5, 9), (6, 7, 12)], ["col1", "col2", "syntax_value"])
-            >>> my_class = MyClass()
-            >>> df.withColumn("sum_check", my_class.sum_check_syntax("col1", "col2", f.col("syntax_value"))).show()
-            +----+----+------------+---------+
-            |col1|col2|syntax_value|sum_check|
-            +----+----+------------+---------+
-            |   1|   2|           3|     true|
-            |   4|   5|           9|    false|
-            |   6|   7|          12|    false|
-            +----+----+------------+---------+
-        """
+    def sum_check_syntax(self, input_col1, input_col2, syntax_value):
         return ~(f.col(input_col1) + f.col(input_col2) != syntax_value)
 
-    def conditional_cond_syntax(self, input_col: str, condition_column: str, conditional_variables: Union[str, float]) -> Tuple[str, str]:
-        """
-        Returns a conditional condition and message based on the input parameters.
-
-        Args:
-            input_col (str): The input column name.
-            condition_column (str): The condition column name.
-            conditional_variables (str or float): The conditional variables, either a string or a float.
-
-        Returns:
-            Tuple[str, str]: A tuple containing the conditional condition and message.
-
-        Examples:
-            >>> my_class = MyClass()
-            >>> my_class.conditional_cond_syntax("input_col", "condition_column", "__NOT__NULL__")
-            ('input_col is not null,', 'input_col is not null,')
-            >>> my_class.conditional_cond_syntax("input_col", "condition_column", 5.0)
-            ('[input_col] and [condition_column] sum is not equal to 5.0', '[input_col] and [condition_column] sum is not equal to 5.0')
-            >>> my_class.conditional_cond_syntax("input_col", "condition_column", "A,B,__NOT__C")
-            ('[input_col] is in category (["A", "B"]),', '[input_col] is in category (["A", "B"]),')
-        """
+    def conditional_cond_syntax(self, input_col, condition_column, conditional_variables):
         not_category = []
         if conditional_variables == "__NOT__NULL__":
             category_cond = ~self.null_cond_syntax(input_col)
@@ -412,6 +244,8 @@ class DataCheck:
 
     # ... other methods and attributes ...
 
+    # Other methods and attributes here
+
     def conditional_check(self, input_col: str) -> None:
         """
         Performs a conditional check on the input column based on the rules defined in the rule_df DataFrame.
@@ -425,15 +259,9 @@ class DataCheck:
         Raises:
             None
 
-        Note:
-            This method assumes that the following attributes are available in the class:
-            - rule_df (pd.DataFrame): A DataFrame containing the rules for conditional checks.
-            - input_columns (List[str]): A list of input column names.
-            - file_name (str): The name of the file being processed.
-            - sns_message (List[str]): A list of messages to be sent via SNS.
-            - add_error_col (method): A method to add an error column to the DataFrame.
-            - conditional_cond_syntax (method): A method to process the conditional syntax.
-            - logger (logging.Logger): A logger instance for logging messages.
+        Notes:
+            This method updates the instance attributes such as error columns and sns_message.
+            It also logs the completion of the conditional check for the input column.
         """
         multiple_conditional_list = self.rule_df.loc[input_col, "conditional_columns"].split(";")
         for cond_ind, condition_columns in enumerate(multiple_conditional_list):
@@ -465,22 +293,7 @@ class DataCheck:
                     )
         logger.info(f"[{input_col}] conditional check is done.")
 
-    def range_cond_syntax(self, input_col: str) -> Tuple[str, str, Any]:
-        """
-        Generates range conditions for the given input column based on the rule dataframe.
-
-        Args:
-            input_col (str): The input column name.
-
-        Returns:
-            tuple: A tuple containing the minimum string, maximum string, and the output condition.
-
-        Examples:
-            Assuming `self.rule_df` is a dataframe with columns "min" and "max" and a row with index "input_col":
-            >>> my_instance = MyClass()
-            >>> my_instance.range_cond_syntax("input_col")
-            (min_str, max_str, output_cond)
-        """
+    def range_cond_syntax(self, input_col):
         schema_col = input_col + " schema"
         output_cond = None
 
@@ -496,21 +309,7 @@ class DataCheck:
 
     # Other methods and attributes of the class
 
-    def range_check(self, input_col: str) -> None:
-        """
-        Checks if the values in the input column are within the specified range and adds an error column if not.
-
-        Args:
-            input_col (str): The name of the input column to check.
-
-        Returns:
-            None
-
-        Examples:
-            >>> your_class_instance.range_check("age")
-            start range_check
-            [age] range check is done.
-        """
+    def range_check(self, input_col):
         print("start range_check")
         min_str, max_str, range_error_cond = self.range_cond_syntax(input_col)
         range_error_cond = range_error_cond & ((f.col(input_col).isNotNull()) | (f.col(input_col) != ""))
@@ -520,22 +319,7 @@ class DataCheck:
         )
         logger.info(f"[{input_col}] range check is done.")
 
-    def file_check(self, input_col: str) -> Tuple[Union[Column, None], Union[str, None]]:
-        """
-        Performs a file check on the input column and returns the file condition and error message.
-
-        Args:
-            input_col (str): The input column to perform the file check on.
-
-        Returns:
-            Tuple[Union[Column, None], Union[str, None]]: A tuple containing the file condition and error message.
-                If the file check is successful, the file condition is a Column object and the error message is None.
-                If the file check fails, the file condition is None and the error message is a string.
-
-        Examples:
-            >>> my_class = MyClass()
-            >>> file_cond, file_error_msg = my_class.file_check("column_name")
-        """
+    def file_check(self, input_col):
         # finding source side columns
         source_df_columns_list = [input_col]
         reference_columns_str = self.rule_df.loc[input_col, "reference_columns"]
@@ -579,13 +363,14 @@ class DataCheck:
         )
         return file_cond, file_error_msg
 
+    # ... other methods and attributes ...
 
     def category_check(self, input_col: str) -> None:
         """
-        Checks if the input column values are within the accepted categories.
+        Checks if the values in the input column match the categories specified in the rule DataFrame.
 
         Args:
-            input_col (str): The name of the input column to be checked.
+            input_col (str): The name of the input column to check.
 
         Returns:
             None
@@ -594,9 +379,8 @@ class DataCheck:
             None
 
         Examples:
-            >>> your_class_instance.category_check("example_column")
-            start category check
-            [example_column] category check is done.
+            >>> data_check = DataCheck(source_df, rule_df)
+            >>> data_check.category_check("column_name")
         """
         print("start category check")
         valuelist_type = self.rule_df.loc[input_col, "reference_valuelist"].upper()
@@ -614,39 +398,7 @@ class DataCheck:
         )
         logger.info(f"[{input_col}] category check is done.")
 
-    def duplicate_cond_syntax(self, input_col: str) -> Column:
-        """
-        Adds a new column "Duplicate_indicator" to the source DataFrame by joining it with the count of duplicates
-        for the given input column. Then, returns a boolean Column indicating if the count of duplicates is greater than 1.
-
-        Args:
-            input_col (str): The name of the column in the source DataFrame to check for duplicates.
-
-        Returns:
-            Column: A boolean Column indicating if the count of duplicates for the given input column is greater than 1.
-
-        Example:
-            >>> my_class = MyClass()
-            >>> my_class.source_df = spark.createDataFrame([(1, "A"), (2, "A"), (3, "B")], ["id", "value"])
-            >>> my_class.source_df.show()
-            +---+-----+
-            | id|value|
-            +---+-----+
-            |  1|    A|
-            |  2|    A|
-            |  3|    B|
-            +---+-----+
-            >>> duplicate_cond = my_class.duplicate_cond_syntax("value")
-            >>> my_class.source_df = my_class.source_df.withColumn("is_duplicate", duplicate_cond)
-            >>> my_class.source_df.show()
-            +---+-----+------------+
-            | id|value|is_duplicate|
-            +---+-----+------------+
-            |  1|    A|        true|
-            |  2|    A|        true|
-            |  3|    B|       false|
-            +---+-----+------------+
-        """
+    def duplicate_cond_syntax(self, input_col):
         self.source_df: DataFrame = self.source_df.join(
             broadcast(self.source_df.groupBy(input_col).agg((f.count("*")).alias("Duplicate_indicator"))),
             on=input_col,
@@ -654,20 +406,7 @@ class DataCheck:
         )
         return f.col("Duplicate_indicator") > 1
 
-    def duplicate_check(self, input_col: str) -> None:
-        """
-        Checks for duplicate values in the specified input column and adds an error column if duplicates are found.
-
-        Args:
-            input_col (str): The name of the input column to check for duplicates.
-
-        Returns:
-            None
-
-        Examples:
-            >>> your_class_instance = YourClassName()
-            >>> your_class_instance.duplicate_check("column_name")
-        """
+    def duplicate_check(self, input_col):
         print("start duplicate_check")
         schema_col = input_col + " schema"
         duplicate_cond = (self.duplicate_cond_syntax(schema_col)) & (

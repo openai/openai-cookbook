@@ -134,7 +134,6 @@ dmypy.json
 /examples/data/transactions*
 *.DS_Store
 *.parquet
-scala/
 */unit_test/
 */.aws
 hold_tests/

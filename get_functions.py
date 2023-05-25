@@ -1,14 +1,25 @@
-from lib2to3.pytree import convert
-import os
-import importlib
 import inspect
-from typing import List, Tuple, Any
 import json
+import os
+from typing import Any, Callable, Dict, List, Optional, Tuple, Union
 import ast
+import importlib
 import csv
 
+def recursive_items(dictionary: Dict[str, Union[str, Dict[str, Any]]]) -> Union[str, Tuple[str, Union[str, Dict[str, Any]]]]:
+    """
+    Recursively iterates through a dictionary and returns the key-value pairs.
 
-def recursive_items(dictionary):
+    Args:
+        dictionary (Dict[str, Union[str, Dict[str, Any]]]): The input dictionary.
+
+    Returns:
+        Union[str, Tuple[str, Union[str, Dict[str, Any]]]]: The key-value pairs found in the dictionary.
+
+    Examples:
+        >>> recursive_items({"a": 1, "b": {"c": 2, "d": 3}})
+        ('a', 1), ('b', {'c': 2, 'd': 3})
+    """
     for key, value in dictionary.items():
         if type(value) is dict:
             if value:
@@ -18,21 +29,40 @@ def recursive_items(dictionary):
         else:
             return (key, value)
 
-
-def getmembers(item: Any, predicate=None) -> List[Tuple[str, Any]]:
+def getmembers(item: Any, predicate: Optional[Callable] = None) -> List[Tuple[str, Any]]:
     """
     Get all members of an object.
 
-    :param item: An object to get the members of.
-    :param predicate: A callable used to filter the members.
-    :return: A list of tuples containing the name and value of each member.
+    Args:
+        item (Any): An object to get the members of.
+        predicate (Callable, optional): A callable used to filter the members. Defaults to None.
+
+    Returns:
+        List[Tuple[str, Any]]: A list of tuples containing the name and value of each member.
     """
     if predicate is None:
         predicate = inspect.ismemberdescriptor
     return inspect.getmembers(item, predicate)
 
+def import_modules_from_file(filepath: str, extension: str, object_dict: Dict[str, Any], directory_dict: Dict[str, Any]) -> Tuple[Dict[str, Any], Dict[str, Any]]:
+    """
+    Imports modules from a file and updates the object_dict and directory_dict with the imported data.
 
-def import_modules_from_file(filepath: str, extension: str, object_dict, directory_dict) -> Tuple[dict, dict]:
+    Args:
+        filepath (str): The path to the file.
+        extension (str): The file extension (e.g., ".json", ".csv", ".py").
+        object_dict (dict): A dictionary to store the imported objects.
+        directory_dict (dict): A dictionary to store the directory information.
+
+    Returns:
+        Tuple[dict, dict]: A tuple containing the updated object_dict and directory_dict.
+
+    Examples:
+        >>> object_dict = {}
+        >>> directory_dict = {}
+        >>> import_modules_from_file("example.py", ".py", object_dict, directory_dict)
+        ({'example.py': {'objects': {...}, 'import_str': '...'}}, {'example.py': {'objects': {...}, 'functions': [...]}})
+    """
     if extension == ".json":
         with open(filepath, "r") as f:
             data = json.load(f)
@@ -102,17 +132,24 @@ def import_modules_from_file(filepath: str, extension: str, object_dict, directo
                 # print(f"Skipping imported method: {member[0]}")
     return object_dict, directory_dict
 
-
-def import_all_modules(directory: str, object_dict, directory_dict) -> Tuple[dict, dict]:
+def import_all_modules(directory: str, object_dict: Dict, directory_dict: Dict) -> Tuple[Dict, Dict]:
     """
     Import all modules from a directory.
 
-    :param directory: The directory to import modules from.
-    :return: list
+    Args:
+        directory (str): The directory to import modules from.
+        object_dict (Dict): The dictionary to store imported objects.
+        directory_dict (Dict): The dictionary to store imported directories.
+
+    Returns:
+        Tuple[Dict, Dict]: A tuple containing the updated object_dict and directory_dict.
+
+    Examples:
+        >>> object_dict, directory_dict = import_all_modules("my_directory", {}, {})
     """
 
     for current_file in os.listdir(directory):
-        if current_file =='docs':
+        if current_file == 'docs':
             continue
         filepath = os.path.join(directory, current_file)
         if os.path.isdir(filepath):
@@ -134,7 +171,6 @@ def import_all_modules(directory: str, object_dict, directory_dict) -> Tuple[dic
             )
 
     return object_dict, directory_dict
-
 
 if __name__ == "__main__":
     import json

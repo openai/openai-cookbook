@@ -51,7 +51,7 @@ def query(question):
     response = st.session_state['chat'].ask_assistant(question)
     return response
 
-prompt = st.text_input("What do you want to know: ","", key="input")
+prompt = st.text_input(f"What do you want to know: ", key="input")
 
 if st.button('Submit', key='generationSubmit'):
 

@@ -37,8 +37,8 @@ def get_embeddings(text_array, engine):
 
 # Split a text into smaller chunks of size n, preferably ending at the end of a sentence
 def chunks(text, n, tokenizer):
-    tokens = tokenizer.encode(text)
     """Yield successive n-sized chunks from text."""
+    tokens = tokenizer.encode(text)
     i = 0
     while i < len(tokens):
         # Find the nearest end of sentence within a range of 0.5 * n and 1.5 * n tokens
@@ -58,22 +58,37 @@ def chunks(text, n, tokenizer):
 def get_unique_id_for_file_chunk(filename, chunk_index):
     return str(filename+"-!"+str(chunk_index))
 
-def handle_file_string(file,tokenizer,redis_conn, text_embedding_field,index_name):
+def handle_file_string(file, tokenizer, redis_conn, text_embedding_field, index_name):
+    """
+    Handle a file string by cleaning it up, creating embeddings, and uploading them to Redis.
+
+    Args:
+        file (tuple): A tuple containing the filename and file body string.
+        tokenizer: The tokenizer object to use for encoding and decoding text.
+        redis_conn: The Redis connection object.
+        text_embedding_field (str): The field in Redis where the text embeddings will be stored.
+        index_name: The name of the index or identifier for the embeddings.
+
+    Returns:
+        None
+
+    Raises:
+        Exception: If there is an error creating embeddings or uploading to Redis.
+
+    """
     filename = file[0]
     file_body_string = file[1]
 
-    # Clean up the file string by replacing newlines and double spaces and semi-colons
-    clean_file_body_string = file_body_string.replace("  ", " ").replace("\n", "; ").replace(';',' ')
-    #
+    # Clean up the file string by replacing newlines, double spaces, and semi-colons
+    clean_file_body_string = file_body_string.replace("  ", " ").replace("\n", "; ").replace(';', ' ')
+    
     # Add the filename to the text to embed
-    text_to_embed = "Filename is: {}; {}".format(
-        filename, clean_file_body_string)
+    text_to_embed = "Filename is: {}; {}".format(filename, clean_file_body_string)
 
-    # Create embeddings for the text
     try:
-        text_embeddings, average_embedding = create_embeddings_for_text(
-            text_to_embed, tokenizer)
-        #print("[handle_file_string] Created embedding for {}".format(filename))
+        # Create embeddings for the text
+        text_embeddings, average_embedding = create_embeddings_for_text(text_to_embed, tokenizer)
+        # print("[handle_file_string] Created embedding for {}".format(filename))
     except Exception as e:
         print("[handle_file_string] Error creating embedding: {}".format(e))
 
@@ -82,16 +97,16 @@ def handle_file_string(file,tokenizer,redis_conn, text_embedding_field,index_nam
     vectors = []
     for i, (text_chunk, embedding) in enumerate(text_embeddings):
         id = get_unique_id_for_file_chunk(filename, i)
-        vectors.append(({'id': id
-                         , "vector": embedding, 'metadata': {"filename": filename
-                                                              , "text_chunk": text_chunk
-                                                              , "file_chunk_index": i}}))
+        vectors.append({'id': id, "vector": embedding, 'metadata': {"filename": filename,
+                                                                    "text_chunk": text_chunk,
+                                                                    "file_chunk_index": i}})
 
     try:
-        load_vectors(redis_conn, vectors,text_embedding_field)
-
+        # Load vectors into Redis
+        load_vectors(redis_conn, vectors, text_embedding_field)
     except Exception as e:
         print(f'Ran into a problem uploading to Redis: {e}')
+
 
 # Make a class to generate batches for insertion
 class BatchGenerator:

@@ -86,6 +86,7 @@ People are writing great tools and papers for improving outputs from GPT. Here a
 - [OpenAI Evals](https://github.com/openai/evals): An open-source library for evaluating task performance of language models and prompts.
 - [LlamaIndex](https://github.com/jerryjliu/llama_index): A Python library for augmenting LLM apps with data.
 - [Arthur Shield](https://www.arthur.ai/get-started): A paid product for detecting toxicity, hallucination, prompt injection, etc.
+- [LMQL](https://lmql.ai): A programming language for LLM interaction with support for typed prompting, control flow, constraints, and tools. 
 
 ### Prompting guides
 

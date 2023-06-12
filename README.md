@@ -53,6 +53,7 @@ Most code examples are written in Python, though the concepts can be applied in 
   - [How to use ChatGPT with Azure OpenAI](examples/azure/chat.ipynb)
   - [How to get completions from Azure OpenAI](examples/azure/completions.ipynb)
   - [How to get embeddings from Azure OpenAI](examples/azure/embeddings.ipynb)
+  - [How to generate images with DALL·E fom Azure OpenAI](exmples/azure/DALL-E.ipynb)
 
 ## Related OpenAI resources
 

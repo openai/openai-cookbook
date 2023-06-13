@@ -10,11 +10,11 @@ Most code examples are written in Python, though the concepts can be applied in 
 
 ## Recently added/updated 🆕 ✨
 
+- [How to call functions with Chat models](https://github.com/openai/openai-cookbook/blob/main/examples/How_to_call_functions_with_Chat_models.ipynb) [June 13th, 2023]
 - [Related resources from around the web](https://github.com/openai/openai-cookbook#related-resources-from-around-the-web) [May 22, 2023]
 - [Embeddings playground (streamlit app)](apps/embeddings-playground/README.md) [May 19, 2023]
 - [How to use a multi-step prompt to write unit tests](examples/Unit_test_writing_using_a_multi-step_prompt.ipynb) [May 19, 2023]
 - [How to create dynamic masks with DALL·E and Segment Anything](examples/dalle/How_to_create_dynamic_masks_with_DALL-E_and_Segment_Anything.ipynb) [May 19, 2023]
-- [Question answering using embeddings](examples/Question_answering_using_embeddings.ipynb) [Apr 14, 2023]
 
 ## Guides & examples
 

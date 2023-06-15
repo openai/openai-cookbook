@@ -34,18 +34,18 @@ In more advanced search systems, the cosine similarity of embeddings can be used
 
 ## Question answering
 
-The best way to get reliably honest answers from GPT-3 is to give it source documents in which it can locate correct answers. Using the semantic search procedure above, you can cheaply search a corpus of documents for relevant information and then give that information to GPT-3, via the prompt, to answer a question. We demonstrate in [Question_answering_using_embeddings.ipynb](examples/Question_answering_using_embeddings.ipynb).
+The best way to get reliably honest answers from GPT-3 is to give it source documents that can help it locate correct answers. Using the semantic search procedure above, you can cheaply search through a corpus of documents for relevant information and then give that information to GPT-3 via the prompt to answer a question. We demonstrate this in [Question_answering_using_embeddings.ipynb](examples/Question_answering_using_embeddings.ipynb).
 
 ## Recommendations
 
 Recommendations are quite similar to search, except that instead of a free-form text query, the inputs are items in a set.
 
-An example of how to use embeddings for recommendations is shown in [Recommendation_using_embeddings.ipynb](examples/Recommendation_using_embeddings.ipynb).
+An example of this is in [Recommendation_using_embeddings.ipynb](examples/Recommendation_using_embeddings.ipynb). Check it out to learn how to use embeddings for recommendations.
 
-Similar to search, these cosine similarity scores can either be used on their own to rank items or as features in larger ranking algorithms.
+Another similiarity is that these cosine similarity scores can either be used on their own to rank items or as features in larger ranking algorithms.
 
 ## Customizing Embeddings
 
-Although OpenAI's embedding model weights cannot be fine-tuned, you can nevertheless use training data to customize embeddings to your application.
+Although OpenAI's embedding model weights cannot be fine-tuned, you can still use training data to customize embeddings to your application.
 
 In [Customizing_embeddings.ipynb](examples/Customizing_embeddings.ipynb), we provide an example method for customizing your embeddings using training data. The idea of the method is to train a custom matrix to multiply embedding vectors by in order to get new customized embeddings. With good training data, this custom matrix will help emphasize the features relevant to your training labels. You can equivalently consider the matrix multiplication as (a) a modification of the embeddings or (b) a modification of the distance function used to measure the distances between embeddings.

@@ -10,7 +10,7 @@ Most code examples are written in Python, though the concepts can be applied in 
 
 ## Recently added/updated 🆕 ✨
 
-- [Question answering using a search API and re-ranking](https://github.com/openai/openai-cookbook/blob/main/examples/Question_answering_using_a_search_API.ipynb.ipynb) [June 16th, 2023]
+- [Question answering using a search API and re-ranking](https://github.com/openai/openai-cookbook/blob/main/examples/Question_answering_using_a_search_API.ipynb) [June 16th, 2023]
 - [How to call functions with Chat models](https://github.com/openai/openai-cookbook/blob/main/examples/How_to_call_functions_with_chat_models.ipynb) [June 13th, 2023]
 - [Related resources from around the web](https://github.com/openai/openai-cookbook#related-resources-from-around-the-web) [May 22, 2023]
 - [Embeddings playground (streamlit app)](apps/embeddings-playground/README.md) [May 19, 2023]

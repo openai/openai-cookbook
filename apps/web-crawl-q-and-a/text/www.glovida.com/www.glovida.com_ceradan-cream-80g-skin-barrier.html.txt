@@ -1,0 +1,21 @@
+
+
+
+Server error
+
+
+
+
+
+
+
+
+Server error
+An error occurred in the application and your page could not be served. If you are the application owner, check your logs for details.
+
+
+Nuxt
+
+
+
+

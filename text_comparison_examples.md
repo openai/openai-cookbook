@@ -2,7 +2,7 @@
 
 The [OpenAI API embeddings endpoint](https://beta.openai.com/docs/guides/embeddings) can be used to measure relatedness or similarity between pieces of text.
 
-By leveraging GPT-3's understanding of text, these embeddings [achieved state-of-the-art results](https://arxiv.org/abs/2201.10005) on benchmarks in unsupervised learning and transfer learning settings.
+By leveraging GPT-3's understanding of a text, these embeddings [achieved state-of-the-art results](https://arxiv.org/abs/2201.10005) on benchmarks in unsupervised learning and transfer learning settings.
 
 Embeddings can be used for semantic search, recommendations, cluster analysis, near-duplicate detection, and more.
 
@@ -40,12 +40,12 @@ The best way to get reliably honest answers from GPT-3 is to give it source docu
 
 Recommendations are quite similar to search, except that instead of a free-form text query, the inputs are items in a set.
 
-An example of this is in [Recommendation_using_embeddings.ipynb](examples/Recommendation_using_embeddings.ipynb). Check it out to learn how to use embeddings for recommendations.
+An example of how to use embeddings for recommendations is shown in [Recommendation_using_embeddings.ipynb](examples/Recommendation_using_embeddings.ipynb).
 
-Another similiarity is that these cosine similarity scores can either be used on their own to rank items or as features in larger ranking algorithms.
+Similar to search, these cosine similarity scores can either be used on their own to rank items or as features in larger ranking algorithms.
 
 ## Customizing Embeddings
 
-Although OpenAI's embedding model weights cannot be fine-tuned, you can still use training data to customize embeddings to your application.
+Although OpenAI's embedding model weights cannot be fine-tuned, you can nevertheless use training data to customize embeddings to your application.
 
 In [Customizing_embeddings.ipynb](examples/Customizing_embeddings.ipynb), we provide an example method for customizing your embeddings using training data. The idea of the method is to train a custom matrix to multiply embedding vectors by in order to get new customized embeddings. With good training data, this custom matrix will help emphasize the features relevant to your training labels. You can equivalently consider the matrix multiplication as (a) a modification of the embeddings or (b) a modification of the distance function used to measure the distances between embeddings.

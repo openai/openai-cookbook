@@ -23,7 +23,7 @@ def download_wikipedia_data(
         else:
             print("File not found, downloading now...")
             # Download the data
-            wget.download(data_url, out=download_path, bar=True)
+            wget.download(data_url, out=download_path)
 
         # Unzip the data
         with zipfile.ZipFile(zip_file_path, 'r') as zip_ref:

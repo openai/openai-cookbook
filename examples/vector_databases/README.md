@@ -1,10 +1,10 @@
 # Vector Databases
 
-This section of the cookbook showcases many of the vector databases available to support your semantic search use cases. 
+This section of the OpenAI Cookbook showcases many of the vector databases available to support your semantic search use cases. 
 
-Vector databases can be a great accompaniment for knowledge retrieval applications, which reduce hallucinations by providing the LLM with the relevant context to answer their questions.
+Vector databases can be a great accompaniment for knowledge retrieval applications, which reduce hallucinations by providing the LLM with the relevant context to answer questions.
 
-This directory is structured to give a standard introduction notebook for each vector database so you have a common point of comparison. Each provider is then welcome to add further deep dives in their own named folder.
+Each provider has their own named directory, with a standard notebook to introduce you to using our API with their product, and any supplementary notebooks they choose to add to showcase their functionality.
 
 ## Guides & deep dives
 - [AnalyticDB](https://www.alibabacloud.com/help/en/analyticdb-for-postgresql/latest/get-started-with-analyticdb-for-postgresql)

@@ -92,6 +92,7 @@ People are writing great tools and papers for improving outputs from GPT. Here a
 - [LlamaIndex](https://github.com/jerryjliu/llama_index): A Python library for augmenting LLM apps with data.
 - [Arthur Shield](https://www.arthur.ai/get-started): A paid product for detecting toxicity, hallucination, prompt injection, etc.
 - [LMQL](https://lmql.ai): A programming language for LLM interaction with support for typed prompting, control flow, constraints, and tools.
+- [LaraChain](https://larachain.io): A Laravel/PHP install inspired by LangChain to help others use (or learn how to use) OpenAi easily with their data. 
 
 ### Prompting guides
 

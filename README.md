@@ -9,9 +9,9 @@ Most code examples are written in Python, though the concepts can be applied in 
 [![Open in GitHub Codespaces](https://github.com/codespaces/badge.svg)](https://github.com/codespaces/new?hide_repo_select=true&ref=main&repo=468576060&machine=basicLinux32gb&location=EastUs)
 
 ## Recently added/updated 🆕 ✨
-
-- [Question answering using a search API and re-ranking](https://github.com/openai/openai-cookbook/blob/main/examples/Question_answering_using_a_search_API.ipynb) [June 16th, 2023]
-- [How to call functions with Chat models](https://github.com/openai/openai-cookbook/blob/main/examples/How_to_call_functions_with_chat_models.ipynb) [June 13th, 2023]
+- [Whisper prompting guide](examples/Whisper_prompting_guide.ipynb) [June 27, 2023]
+- [Question answering using a search API and re-ranking](https://github.com/openai/openai-cookbook/blob/main/examples/Question_answering_using_a_search_API.ipynb) [June 16, 2023]
+- [How to call functions with Chat models](https://github.com/openai/openai-cookbook/blob/main/examples/How_to_call_functions_with_chat_models.ipynb) [June 13, 2023]
 - [Related resources from around the web](https://github.com/openai/openai-cookbook#related-resources-from-around-the-web) [May 22, 2023]
 - [Embeddings playground (streamlit app)](apps/embeddings-playground/README.md) [May 19, 2023]
 - [How to use a multi-step prompt to write unit tests](examples/Unit_test_writing_using_a_multi-step_prompt.ipynb) [May 19, 2023]
@@ -40,6 +40,7 @@ Most code examples are written in Python, though the concepts can be applied in 
   - [Visualizing embeddings in 2D](examples/Visualizing_embeddings_in_2D.ipynb) or [3D](examples/Visualizing_embeddings_in_3D.ipynb)
   - [Embedding long texts](examples/Embedding_long_inputs.ipynb)
   - [Embeddings playground (streamlit app)](apps/embeddings-playground/README.md)
+  - [Search reranking with cross-encoders](examples/Search_reranking_with_cross-encoders.ipynb)
 - Apps
   - [File Q&A](apps/file-q-and-a/)
   - [Web Crawl Q&A](apps/web-crawl-q-and-a)
@@ -50,6 +51,8 @@ Most code examples are written in Python, though the concepts can be applied in 
 - DALL-E
   - [How to generate and edit images with DALL·E](examples/dalle/Image_generations_edits_and_variations_with_DALL-E.ipynb)
   - [How to create dynamic masks with DALL·E and Segment Anything](examples/dalle/How_to_create_dynamic_masks_with_DALL-E_and_Segment_Anything.ipynb)
+- Whisper
+  - [Whisper prompting guide](examples/Whisper_prompting_guide.ipynb)
 - Azure OpenAI (alternative API from Microsoft Azure)
   - [How to use ChatGPT with Azure OpenAI](examples/azure/chat.ipynb)
   - [How to get completions from Azure OpenAI](examples/azure/completions.ipynb)

@@ -1,0 +1,15 @@
+{
+    "name": "vectordb-example-js-openai",
+    "version": "1.0.0",
+    "description": "",
+    "main": "Getting_started_with_LanceDB_and_OpenAI.js",
+    "scripts": {
+        "test": "echo \"Error: no test specified\" && exit 1"
+    },
+    "author": "dev@lance",
+    "license": "Apache-2.0",
+    "dependencies": {
+        "openai": "^3.3.0",
+        "vectordb": "^0.1.8"
+    }
+}

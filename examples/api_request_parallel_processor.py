@@ -342,7 +342,7 @@ def num_tokens_consumed_from_request(
     token_encoding_name: str,
 ):
     """Count the number of tokens in the request. Only supports completion and embedding requests."""
-    encoding = tiktoken.get_encoding(token_encoding_name)
+    
     # if completions request, tokens = prompt + n * max_tokens
     if api_endpoint.endswith("completions"):
         max_tokens = request_json.get("max_tokens", 15)
@@ -351,6 +351,7 @@ def num_tokens_consumed_from_request(
 
         # chat completions
         if api_endpoint.startswith("chat/"):
+            encoding = tiktoken.encoding_for_model(token_encoding_name)
             num_tokens = 0
             for message in request_json["messages"]:
                 num_tokens += 4  # every message follows <im_start>{role/name}\n{content}<im_end>\n
@@ -362,6 +363,7 @@ def num_tokens_consumed_from_request(
             return num_tokens + completion_tokens
         # normal completions
         else:
+            encoding = tiktoken.get_encoding(token_encoding_name)
             prompt = request_json["prompt"]
             if isinstance(prompt, str):  # single prompt
                 prompt_tokens = len(encoding.encode(prompt))
@@ -375,6 +377,7 @@ def num_tokens_consumed_from_request(
                 raise TypeError('Expecting either string or list of strings for "prompt" field in completion request')
     # if embeddings request, tokens = input tokens
     elif api_endpoint == "embeddings":
+        encoding = tiktoken.get_encoding(token_encoding_name)
         input = request_json["input"]
         if isinstance(input, str):  # single input
             num_tokens = len(encoding.encode(input))

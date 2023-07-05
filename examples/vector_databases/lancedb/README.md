@@ -4,6 +4,11 @@ This Q&A bot will allow you to search through youtube transcripts using natural 
 Colab walkthrough - <a href="https://colab.research.google.com/github/lancedb/vectordb-recipes/blob/main/examples/Youtube-Search-QA-Bot/main.ipynb"><img src="https://colab.research.google.com/assets/colab-badge.svg" alt="Open In Colab"></a>
 
 ### Python
+Install dependencies
+```bash
+pip install -r requirements.txt
+```
+
 Run the script 
 ```python
 python Getting_started_with_LanceDB_and_OpenAI.py --query "what is a vectordb?"
@@ -20,6 +25,11 @@ default query = `Which training method should I use for sentence transformers wh
 | model | `text-embedding-ada-002` | OpenAI model to use |
 
 ### Javascript
+Install dependencies
+```bash
+npm install
+```
+
 Run the script
 ```bash
 wget -c https://eto-public.s3.us-west-2.amazonaws.com/datasets/youtube_transcript/youtube-transcriptions_sample.jsonl

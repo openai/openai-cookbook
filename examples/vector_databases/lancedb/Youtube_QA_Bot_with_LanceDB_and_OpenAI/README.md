@@ -1,5 +1,4 @@
-# Getting started with LanceDB and OpenAI
-## Youtube Transcript Search QA Bot
+## Youtube Transcript Search QA Bot with LanceDB and OpenAI
 This Q&A bot will allow you to search through youtube transcripts using natural language with LanceDB and OpenAI! By going through this notebook, we'll introduce how you can use LanceDB to store and manage your data easily.
 Colab walkthrough - <a href="https://colab.research.google.com/github/lancedb/vectordb-recipes/blob/main/examples/Youtube-Search-QA-Bot/main.ipynb"><img src="https://colab.research.google.com/assets/colab-badge.svg" alt="Open In Colab"></a>
 
@@ -11,7 +10,7 @@ pip install -r requirements.txt
 
 Run the script 
 ```python
-python Getting_started_with_LanceDB_and_OpenAI.py --query "what is a vectordb?"
+python main.py --query "what is a vectordb?"
 ```
 default query = `Which training method should I use for sentence transformers when I only have pairs of related sentences?`
 
@@ -36,5 +35,5 @@ wget -c https://eto-public.s3.us-west-2.amazonaws.com/datasets/youtube_transcrip
 ```
 
 ```javascript
-OPENAI_API_KEY=... node Getting_started_with_LanceDB_and_OpenAI.js
+OPENAI_API_KEY=... node index.js
 ```

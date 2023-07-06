@@ -1,0 +1,5 @@
+lancedb
+openai
+wget
+pandas
+numpy

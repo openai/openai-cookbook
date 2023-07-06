@@ -11,6 +11,7 @@ Each provider has their own named directory, with a standard notebook to introdu
 - [Chroma](https://docs.trychroma.com/getting-started)
 - [Hologres](https://www.alibabacloud.com/help/en/hologres/latest/procedure-to-use-hologres)
 - [Kusto](https://learn.microsoft.com/en-us/azure/data-explorer/web-query-data)
+- [LanceDB](https://lancedb.github.io/lancedb/basic/)
 - [Milvus](https://milvus.io/docs/example_code.md)
 - [MyScale](https://docs.myscale.com/en/quickstart/)
 - [Pinecone](https://docs.pinecone.io/docs/quickstart)

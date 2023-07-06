@@ -1,0 +1,17 @@
+{
+  "name": "using_lancedb_for_embeddings_search",
+  "version": "1.0.0",
+  "description": "This example takes you through a simple flow to download some data, embed it, and then index and search it using a selection of vector databases. This is a common requirement for customers who want to store and search our embeddings with their own data in a secure environment to support production use cases such as chatbots, topic modelling and more.",
+  "main": "index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "author": "",
+  "license": "ISC",
+  "dependencies": {
+    "convert-csv-to-json": "^2.0.0",
+    "openai": "^3.3.0",
+    "papaparse": "^5.4.1",
+    "vectordb": "^0.1.8"
+  }
+}

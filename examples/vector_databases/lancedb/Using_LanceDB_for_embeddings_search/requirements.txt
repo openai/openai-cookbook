@@ -3,3 +3,4 @@ openai
 wget
 pandas
 numpy
+argparse

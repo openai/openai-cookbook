@@ -6,67 +6,66 @@ const Papa = require('papaparse');
 
 
 (async () => {
-    // Parse csv
-    const fileData = fs.createReadStream('../data/vector_database_wikipedia_articles_embedded.csv');
-    Papa.parsePromise = function(file) {
-      return new Promise(function(complete, error) {
+  // You need to provide an OpenAI API key, here we read it from the OPENAI_API_KEY environment variable
+  const apiKey = process.env.OPENAI_API_KEY
+
+  const embedFunction = new lancedb.OpenAIEmbeddingFunction('id', apiKey)
+
+  // // Connect to LanceDB
+  const uri = 'data/sample-lancedb'
+  const db = await lancedb.connect(uri)
+
+  // create table with articles
+  const tableName = 'wikipedia'
+  let tbl
+  if (!((await db.tableNames()).includes(tableName))) {
+    // // Parse csv
+    const fileData = fs.createReadStream('data/vector_database_wikipedia_articles_embedded.csv');
+    Papa.parsePromise = function (file) {
+      return new Promise(function (complete, error) {
         Papa.parse(file, { header: true, complete, error });
       });
     }
     const results = await Papa.parsePromise(fileData);
-
-    // Access the parsed data
+    
+    // // Access the parsed data
     let articles = results.data;
-
-
+    
+    
+    // We only need the title vector
     articles = articles.map(article => {
       article.vector = JSON.parse(article.title_vector)
-      article.title_vector = null
-      if (article.vector.length != 1536) {
-        console.log(article.vector)
-      }
-      article.content_vector = JSON.parse(article.content_vector)
-      return article 
+      delete article.title_vector
+      delete article.content_vector
+      return article
     })
-
-    // console.log(Object.articles[0])
-
-    // You need to provide an OpenAI API key, here we read it from the OPENAI_API_KEY environment variable
-    const apiKey = process.env.OPENAI_API_KEY
-
-    const embedFunction = new lancedb.OpenAIEmbeddingFunction('id', apiKey)
-
-    // Connect to LanceDB
-    const uri = "data/sample-lancedb"
-    const db = await lancedb.connect(uri)
-  
-    console.log(articles[0])
-    // create table with articles
-    let tbl = await db.createTable("wikipedia", data=[articles[0]])
-
-    // open table so that embeddings are generated for queries
-    // tbl = await db.openTable("wikipedia", embedFunction)
     
-    const rl = readline.createInterface({ input, output })
+    tbl = await db.createTable(tableName, data=articles)
+  }
+  
+  tbl = await db.openTable(tableName, embeddings=embedFunction)
+  
+  const rl = readline.createInterface({ input, output })
 
-    try {
-      while (true) {
-        // Ask for queries
-        const query = await rl.question('Query: ')
-        const topk = await rl.question('Number of results to show: ')
+  try {
+    while (true) {
+      // Ask for queries
+      const query = await rl.question('Query: ')
+      const topk = await rl.question('Number of results to show: ')
 
-        // Query
-        const results = await tbl
-          .search(query)
-          .limit(parseInt(topk))
-          .execute()
+      // Query
+      const results = await tbl
+        .search(query)
+        .select(['title'])
+        .limit(parseInt(topk))
+        .execute()
 
-        console.log(results)
-      }
-    } catch (err) {
-      console.log('Error: ', err)
-    } finally {
-      rl.close()
+      console.log(results.map(result => result.title))
     }
-    process.exit(1)
+  } catch (err) {
+    console.log('Error: ', err)
+  } finally {
+    rl.close()
+  }
+  process.exit(1)
 })();

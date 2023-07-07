@@ -17,7 +17,7 @@ The demo flow is:
 - **Load data**: Load a dataset and embed it using OpenAI embeddings
 - **LanceDB**
     - *Setup*: Here we'll set up the Python client for LanceDB. For more details go [here](https://lancedb.github.io/lancedb/basic/)
-    - *Index Data*: We'll create a table and index it for __titles__
+    - *Index Data*: We'll create a table and index it for __titles__. For `main.py` and `index.js` this will only occur on the first run.
     - *Search Data*: Run a few example queries with various goals in mind.
 
 Once you've run through this example you should have a basic understanding of how to setup and use vector databases, and can move on to more complex use cases making use of our embeddings.
@@ -51,7 +51,7 @@ npm install
 Run the script
 ```bash
 wget -c https://cdn.openai.com/API/examples/data/vector_database_wikipedia_articles_embedded.zip
-unzip vector_database_wikipedia_articles_embedded.zip -d ../data/
+unzip vector_database_wikipedia_articles_embedded.zip -d data/
 ```
 
 ```javascript

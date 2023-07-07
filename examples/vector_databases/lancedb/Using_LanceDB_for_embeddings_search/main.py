@@ -13,7 +13,7 @@ import argparse
 import lancedb
 
 def arg_parse():
-    default_query = "Which training method should I use for sentence transformers when I only have pairs of related sentences?"
+    default_query = "Important battles related to the American Revolutionary War"
     global EMBEDDING_MODEL
 
     parser = argparse.ArgumentParser(description='Embeddings Search')
@@ -47,29 +47,35 @@ def query_article(query, tbl, top_k=5):
 
 if __name__ == "__main__":
     args = arg_parse()
-    warnings.filterwarnings(action="ignore", message="unclosed", category=ResourceWarning)
-    warnings.filterwarnings("ignore", category=DeprecationWarning) 
-    embeddings_url = 'https://cdn.openai.com/API/examples/data/vector_database_wikipedia_articles_embedded.zip'
-
-    wget.download(embeddings_url)
-
-    with zipfile.ZipFile("vector_database_wikipedia_articles_embedded.zip","r") as zip_ref:
-        zip_ref.extractall("../data")
-
-    article_df = pd.read_csv('../data/vector_database_wikipedia_articles_embedded.csv')
-
-    article_df['title_vector'] = article_df.title_vector.apply(literal_eval)
-    article_df['content_vector'] = article_df.content_vector.apply(literal_eval)
-    article_df['vector_id'] = article_df['vector_id'].apply(str)
-    article_df.info(show_counts=True)
 
     uri = "data/sample-lancedb"
     db = lancedb.connect(uri)
 
-    article_df.rename(columns={"title_vector":"vector"}, inplace=True)
+    table_name = "wikipedia"
 
-    tbl = db.create_table("wikipedia", data=article_df)
+    if table_name not in db.table_names():
+        warnings.filterwarnings(action="ignore", message="unclosed", category=ResourceWarning)
+        warnings.filterwarnings("ignore", category=DeprecationWarning) 
+        embeddings_url = 'https://cdn.openai.com/API/examples/data/vector_database_wikipedia_articles_embedded.zip'
+
+        wget.download(embeddings_url)
+
+        with zipfile.ZipFile("vector_database_wikipedia_articles_embedded.zip","r") as zip_ref:
+            zip_ref.extractall("data")
+
+        article_df = pd.read_csv('data/vector_database_wikipedia_articles_embedded.csv')
+
+        article_df['title_vector'] = article_df.title_vector.apply(literal_eval)
+        article_df['content_vector'] = article_df.content_vector.apply(literal_eval)
+        article_df['vector_id'] = article_df['vector_id'].apply(str)
+        article_df.info(show_counts=True)
+
+        article_df.rename(columns={"title_vector":"vector"}, inplace=True)
+
+        tbl = db.create_table(table_name, data=article_df)
+    else:
+        tbl = db.open_table(table_name)
 
     results = query_article(args.query, tbl, args.top_k)
 
-    print(results)
+    print(results["title"])

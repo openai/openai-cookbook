@@ -23,7 +23,7 @@ The demo flow is:
     - *Search Data*: Run a few example queries with various goals in mind.
 
 Once you've run through this example you should have a basic understanding of how to setup and use vector databases, and can move on to more complex use cases making use of our embeddings.
-Colab walkthrough - <a href="https://colab.research.google.com/github/lancedb/vectordb-recipes/blob/main/examples/Using_LanceDB_for_embeddings_search/main.ipynb"><img src="https://colab.research.google.com/assets/colab-badge.svg" alt="Open In Colab"></a>
+Colab walkthrough - <a href="https://colab.research.google.com/github/openai/openai-cookbook/blob/main/examples/vector_databases/lancedb/Using_LanceDB_for_embeddings_search/main.ipynb"><img src="https://colab.research.google.com/assets/colab-badge.svg" alt="Open In Colab"></a>
 
 ### Python
 Install dependencies

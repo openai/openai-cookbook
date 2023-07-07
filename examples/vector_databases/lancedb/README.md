@@ -1,7 +1,7 @@
 # LanceDB Examples
 
 ## What is LanceDB?
-LanceDB is an serverless vector database that makes data management for LLMs frictionless, with multi-modal search, native Python and JS support, and many ecosystem integrations. Learn more about LanceDB [here](https://lancedb.com).
+LanceDB is an serverless vector database that makes data management for LLMs frictionless. It has multi-modal search, native Python and JS support, and many ecosystem integrations. Learn more about LanceDB [here](https://lancedb.com).
 
 | Example | Interactive Envs | Scripts  |
 |-------- | ---------------- | ------   |

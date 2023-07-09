@@ -8,7 +8,12 @@ Most code examples are written in Python, though the concepts can be applied in 
 
 [![Open in GitHub Codespaces](https://github.com/codespaces/badge.svg)](https://github.com/codespaces/new?hide_repo_select=true&ref=main&repo=468576060&machine=basicLinux32gb&location=EastUs)
 
+# Description
+
+I just cloned this project for tutorial.
+
 ## Recently added/updated 🆕 ✨
+
 - [Whisper prompting guide](examples/Whisper_prompting_guide.ipynb) [June 27, 2023]
 - [Question answering using a search API and re-ranking](https://github.com/openai/openai-cookbook/blob/main/examples/Question_answering_using_a_search_API.ipynb) [June 16, 2023]
 - [How to call functions with Chat models](https://github.com/openai/openai-cookbook/blob/main/examples/How_to_call_functions_with_chat_models.ipynb) [June 13, 2023]

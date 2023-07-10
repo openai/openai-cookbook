@@ -33,7 +33,7 @@ Most code examples are written in Python, though the concepts can be applied in 
   - [Text comparison examples](text_comparison_examples.md)
   - [How to get embeddings](examples/Get_embeddings.ipynb)
   - [Question answering using embeddings](examples/Question_answering_using_embeddings.ipynb)
-  - [Using vector databases for embeddings search](examples/vector_databases/Using_vector_databases_for_embeddings_search.ipynb)
+  - [Using vector databases for embeddings search](examples/vector_databases)
   - [Semantic search using embeddings](examples/Semantic_text_search_using_embeddings.ipynb)
   - [Recommendations using embeddings](examples/Recommendation_using_embeddings.ipynb)
   - [Clustering embeddings](examples/Clustering.ipynb)

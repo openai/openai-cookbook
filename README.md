@@ -7,6 +7,9 @@ To run these examples, you'll need an OpenAI account and API key ([create a free
 Most code examples are written in Python, though the concepts can be applied in any language.
 
 [![Open in GitHub Codespaces](https://github.com/codespaces/badge.svg)](https://github.com/codespaces/new?hide_repo_select=true&ref=main&repo=468576060&machine=basicLinux32gb&location=EastUs)
+# Description
+
+I just cloned this project for tutorials
 
 ## Recently added/updated 🆕 ✨
 - [Whisper prompting guide](examples/Whisper_prompting_guide.ipynb) [June 27, 2023]

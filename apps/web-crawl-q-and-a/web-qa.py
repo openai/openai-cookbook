@@ -164,10 +164,10 @@ crawl(full_url)
 ################################################################################
 
 def remove_newlines(serie):
-    serie = serie.str.replace('\n', ' ')
-    serie = serie.str.replace('\\n', ' ')
-    serie = serie.str.replace('  ', ' ')
-    serie = serie.str.replace('  ', ' ')
+    serie = serie.str.replace('\n', ' ', regex=True)
+    serie = serie.str.replace('\\n', ' ', regex=True)
+    serie = serie.str.replace('  ', ' ', regex=True)
+    serie = serie.str.replace('  ', ' ', regex=True)
     return serie
 
 

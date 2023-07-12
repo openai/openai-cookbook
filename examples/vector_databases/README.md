@@ -14,8 +14,10 @@ Each provider has their own named directory, with a standard notebook to introdu
 - [Milvus](https://milvus.io/docs/example_code.md)
 - [MyScale](https://docs.myscale.com/en/quickstart/)
 - [Pinecone](https://docs.pinecone.io/docs/quickstart)
+- [PolarDB](https://www.alibabacloud.com/help/en/polardb/latest/quick-start)
 - [Qdrant](https://qdrant.tech/documentation/quick-start/)
 - [Redis](https://github.com/RedisVentures/simple-vecsim-intro)
 - [SingleStoreDB](https://www.singlestore.com/blog/how-to-get-started-with-singlestore/)
 - [Typesense](https://typesense.org/docs/guide/)
-- [Weaviate](https://weaviate.io/developers/weaviate/quickstart)
+- [Weaviate](https://weaviate.io/developers/weaviate/quickstart
+- [Zilliz](https://docs.zilliz.com/docs/quick-start-1)

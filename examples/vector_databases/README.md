@@ -19,5 +19,5 @@ Each provider has their own named directory, with a standard notebook to introdu
 - [Redis](https://github.com/RedisVentures/simple-vecsim-intro)
 - [SingleStoreDB](https://www.singlestore.com/blog/how-to-get-started-with-singlestore/)
 - [Typesense](https://typesense.org/docs/guide/)
-- [Weaviate](https://weaviate.io/developers/weaviate/quickstart
+- [Weaviate](https://weaviate.io/developers/weaviate/quickstart)
 - [Zilliz](https://docs.zilliz.com/docs/quick-start-1)

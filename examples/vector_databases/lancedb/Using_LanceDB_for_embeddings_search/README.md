@@ -11,7 +11,7 @@ A vector database is a database made to store, manage and search embedding vecto
 Vector databases enable enterprises to take many of the embeddings use cases we've shared in this repo (question and answering, chatbot and recommendation services, for example), and make use of them in a secure, scalable environment. Many of our customers make embeddings solve their problems at small scale but performance and security hold them back from going into production - we see vector databases as a key component in solving that, and in this guide we'll walk through the basics of embedding text data, storing it in a vector database and using it for semantic search.
 
 ### What is LanceDB?
-LanceDB is an serverless vector database that makes data management for LLMs frictionless. It has multi-modal search, native Python and JS support, and many ecosystem integrations. Learn more about LanceDB [here](https://lancedb.com).
+LanceDB is a serverless vector database that makes data management for LLMs frictionless. It has multi-modal search, native Python and JS support, and many ecosystem integrations. Learn more about LanceDB [here](https://lancedb.com).
 
 ### Demo Flow
 The demo flow is:

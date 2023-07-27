@@ -1,1 +1,21 @@
-
+name: Build & Deploy
+on:
+  push:
+    branches: [master]
+    
+jobs:
+  deploy:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Deploy NodeJS app
+        uses: appleboy/ssh-action@v0.1.2
+        with:
+        host: ${{secrets.SSH_HOST}}
+        key: ${{secrets.SSH_KEY}}
+        username: ${{secrets.SSH_USERNAME}}
+        
+        script: |
+          mkdir test #deploy folder
+          cd test #enter or cd into the folder
+          git clone git@github.com:Mulubwa17/ci-cd-to-digitalocean-with-github-actions.git #clone the repository into the folder
+          echo 'Deployment succesful into digital ocean'

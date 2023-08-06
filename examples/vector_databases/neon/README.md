@@ -8,11 +8,11 @@ Neon supports vector search through the [pg_embedding](https://neon.tech/docs/ex
 
 ## pg_embedding
 
-The pg_embedding extension, developed and maintained by Neon, enables storing vector embeddings and graph-based vector similarity search in Postgres using the Hierarchical Navigable Small World (HNSW) algorithm. It supports HNSW indexes, which enable new levels of efficiency in high-dimensional similarity search, allowing you to scale your AI applications to millions of rows. Supported distance metrics include L2 (`<->`), cosine (`<=>`), and Manhattan (`<~>`). For more information, see [The pg_embedding extension](https://neon.tech/docs/extensions/pg_embedding).
+The `pg_embedding` extension, developed and maintained by Neon, enables storing vector embeddings and graph-based vector similarity search in Postgres using the Hierarchical Navigable Small World (HNSW) algorithm. It supports HNSW indexes, which enable new levels of efficiency in high-dimensional similarity search, allowing you to scale your AI applications to millions of rows. Supported distance metrics include L2 (`<->`), cosine (`<=>`), and Manhattan (`<~>`). For more information, see [The pg_embedding extension](https://neon.tech/docs/extensions/pg_embedding).
 
 ## pgvector
 
-The pgvector extension enables storing vector embeddings and vector similarity search in Postgres. It supports `ivfflat` indexes. For more information, see [The pgvector extension](https://neon.tech/docs/extensions/pgvector). Supported distance metrics include L2 (`<->`), inner product (`<#>`), and cosine (`<=>`).
+The `pgvector` extension enables storing vector embeddings and vector similarity search in Postgres. It supports `ivfflat` indexes. For more information, see [The pgvector extension](https://neon.tech/docs/extensions/pgvector). Supported distance metrics include L2 (`<->`), inner product (`<#>`), and cosine (`<=>`).
 
 ## Scaling Support
 

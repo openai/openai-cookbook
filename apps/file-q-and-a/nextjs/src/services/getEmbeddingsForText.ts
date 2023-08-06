@@ -6,7 +6,7 @@ import { embedding } from "./openai";
 const MAX_CHAR_LENGTH = 250 * 4;
 
 // This function takes a text and returns an array of embeddings for each chunk of the text
-// The text is split into chunks of a given maximum charcter length
+// The text is split into chunks of a given maximum character length
 // The embeddings are computed in batches of a given size
 export async function getEmbeddingsForText({
   text,

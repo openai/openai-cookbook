@@ -15,6 +15,7 @@ import tiktoken
 import openai
 import numpy as np
 from openai.embeddings_utils import distances_from_embeddings, cosine_similarity
+from ast import literal_eval
 
 # Regex pattern to match a URL
 HTTP_URL_PATTERN = r'^http[s]{0,1}://.+$'
@@ -300,7 +301,7 @@ df.head()
 ################################################################################
 
 df=pd.read_csv('processed/embeddings.csv', index_col=0)
-df['embeddings'] = df['embeddings'].apply(eval).apply(np.array)
+df['embeddings'] = df['embeddings'].apply(literal_eval).apply(np.array)
 
 df.head()
 

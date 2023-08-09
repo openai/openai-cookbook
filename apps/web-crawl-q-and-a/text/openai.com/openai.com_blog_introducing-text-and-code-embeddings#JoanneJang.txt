@@ -1,0 +1,55 @@
+
+
+
+Introducing text and code embeddings
+
+
+
+
+
+
+
+
+
+
+
+
+
+CloseSearch Submit Skip to main contentSite NavigationResearchOverviewIndexProductOverviewChatGPTGPT-4DALLÂ·E 2Customer storiesSafety standardsAPI data privacyPricingDevelopersOverviewDocumentationAPI referenceExamplesSafetyCompanyAboutBlogCareersCharterSecuritySearch Navigation quick links Log inSign upMenu Mobile Navigation CloseSite NavigationResearchProductDevelopersSafetyCompany Quick Links Log inSign upSearch Submit Introducing text and code embeddingsWe are introducing embeddings, a new endpoint in the OpenAI API that makes it easy to perform natural language and code tasks like semantic search, clustering, topic modeling, and classification.Quick linksRead documentationRead paperIllustration: Ruby ChenJanuary 25, 2022AuthorsArvind NeelakantanLilian WengBoris PowerJoanne JangProduct,Â AnnouncementsEmbeddings are numerical representations of concepts converted to number sequences, which make it easy for computers to understand the relationships between those concepts. Our embeddings outperform top models in 3 standard benchmarks, including a 20% relative improvement in codeÂ search.Embeddings are useful for working with natural language and code, because they can be readily consumed and compared by other machine learning models and algorithms like clustering orÂ search.Embeddings that are numerically similar are also semantically similar. For example, the embedding vector of âcanine companions sayâ will be more similar to the embedding vector of âwoofâ than that ofÂ âmeow.âThe new endpoint uses neural network models, which are descendants of GPT-3, to map text and code to a vector representationââembeddingâ them in a high-dimensional space. Each dimension captures some aspect of theÂ input.The newÂ /embeddingsÂ endpoint in theÂ OpenAI APIÂ provides text and code embeddings with a few lines ofÂ code:    import openai
+response = openai.Embedding.create(
+    input="canine companions say",
+    engine="text-similarity-davinci-001")
+import openai
+response = openai.Embedding.create(
+    input="canine companions say",
+    engine="text-similarity-davinci-001")
+
+print(response)
+{
+  "data": [
+    {
+      "embedding": [
+        0.000108064,
+        0.005860855,
+        -0.012656143,
+        ...
+        -0.006642727,
+        0.002583989,
+        -0.012567150
+      ],
+      "index": 0,
+      "object": "embedding"
+    }
+  ],
+  "model": "text-similarity-davinci-001",
+  "object": "list"
+}Print responseWeâre releasing three families of embedding models, each tuned to perform well on different functionalities: text similarity, text search, and code search. The models take either text or code as input and return an embeddingÂ vector.ModelsUse CasesText similarity:Â Captures semantic similarity between pieces of text.text-similarity-{ada, babbage, curie, davinci}-001Clustering, regression, anomaly detection, visualizationText search:Â Semantic information retrieval over documents.text-search-{ada, babbage, curie, davinci}-{query, doc}-001Search, context relevance, information retrievalCode search:Â Find relevant code with a query in natural language.code-search-{ada, babbage}-{code, text}-001Code search and relevanceText similarity modelsText similarity models provide embeddings that capture the semantic similarity of pieces of text. These models are useful for many tasks includingÂ clustering,Â data visualization, andÂ classification.The following interactive visualization shows embeddings of text samples from the DBpediaÂ dataset: Drag to pan, scroll or pinch to zoom animalathletefilmtransportationvillage Embeddings from the text-similarity-babbage-001 model, applied to the DBpedia dataset. We randomly selected 100 samples from the dataset covering 5 categories, and computed the embeddings via the /embeddings endpoint. The different categories show up as 5 clear clusters in the embedding space. To visualize the embedding space, we reduced the embedding dimensionality from 2048 to 3 using PCA. The code for how to visualize embedding space in 3D dimension is available here. To compare the similarity of two pieces of text, you simply use theÂ dot productÂ on the text embeddings. The result is a âsimilarity scoreâ, sometimes called âcosine similarity,â between â1 and 1, where a higher number means more similarity. In most applications, the embeddings can be pre-computed, and then the dot product comparison is extremely fast to carryÂ out.import openai, numpy as np
+
+resp = openai.Embedding.create(
+    input=["feline friends say", "meow"],
+    engine="text-similarity-davinci-001")
+
+embedding_a = resp['data'][0]['embedding']
+embedding_b = resp['data'][1]['embedding']
+
+similarity_score = np.dot(embedding_a, embedding_b)nullOne popular use of embeddings is to use them as features in machine learning tasks, such as classification. In machine learning literature, when using a linear classifier, this classification task is called a âlinear probe.â Our text similarity models achieve new state-of-the-art results on linear probe classification inÂ SentEvalÂ (Conneau et al., 2018), a commonly used benchmark for evaluating embeddingÂ quality.Linear probe classification over 7 datasetsPrevious SOTA (Gao et al. 2021)90.2%text-similarity-davinci-00192.2% Show more Text search modelsText search models provide embeddings that enable large-scale search tasks, like finding a relevant document among a collection of documents given a text query. Embedding for the documents and query are produced separately, and then cosine similarity is used to compare the similarity between the query and eachÂ document.Embedding-based search can generalize better than word overlap techniques used in classical keyword search, because it captures the semantic meaning of text and is less sensitive to exact phrases or words. We evaluate the text search modelâs performance on theÂ BEIRÂ (Thakur, et al. 2021) search evaluation suite and obtain better search performance than previous methods. OurÂ text search guideÂ provides more details on using embeddings for searchÂ tasks.Average accuracy over 11 search tasks in BEIRPrevious SOTA (Izacard, et al. 2021)50.2%text-search-davinci-{doc, query}-00152.8% Show more Code search modelsCode search models provide code and text embeddings for code search tasks. Given a collection of code blocks, the task is to find the relevant code block for a natural language query. We evaluate the code search models on theÂ CodeSearchNetÂ (Husain et al., 2019) evaluation suite where our embeddings achieve significantly better results than prior methods. Check out theÂ code search guideÂ to use embeddings for codeÂ search.Average accuracy over 6 programming languagesPrevious SOTA (Guo, et al. 2021)77.4%code-search-babbage-{doc, query}-00193.5% Show more Examples of the embeddings API in actionJetBrains ResearchJetBrains ResearchâsÂ Astroparticle Physics LabÂ analyzes data likeÂ The Astronomerâs TelegramÂ and NASAâsÂ GCN Circulars, which are reports that contain astronomical events that canât be parsed by traditionalÂ algorithms.Powered by OpenAIâs embeddings of these astronomical reports, researchers are now able to search for events like âcrab pulsar burstsâ across multiple databases and publications. Embeddings also achieved 99.85% accuracy on data source classification through k-meansÂ clustering.FineTune LearningFineTune LearningÂ is a company building hybrid human-AI solutions for learning, likeÂ adaptive learning loopsÂ that help students reach academicÂ standards.OpenAIâs embeddings significantly improved the task of finding textbook content based on learning objectives. Achieving a top-5 accuracy of 89.1%, OpenAIâs text-search-curie embeddings model outperformed previous approaches like Sentence-BERT (64.5%). While human experts are still better, the FineTune team is now able to label entire textbooks in a matter of seconds, in contrast to the hours that it took theÂ experts.FabiusFabiusÂ helps companies turn customer conversations into structured insights that inform planning and prioritization. OpenAIâs embeddings allow companies to more easily find and tag customer call transcripts with featureÂ requests.For instance, customers might use words like âautomatedâ or âeasy to useâ to ask for a better self-service platform. Previously, Fabius was using fuzzy keyword search to attempt to tag those transcripts with the self-service platform label. With OpenAIâs embeddings, theyâre now able to find 2x more examples in general, and 6xâ10x more examples for features with abstract use cases that donât have a clear keyword customers mightÂ use.All API customers can get started with theÂ embeddings documentationÂ for using embeddings in theirÂ applications.Read documentationAuthorsArvind NeelakantanView all articlesLilian WengView all articlesBoris PowerView all articlesJoanne JangView all articlesResearchOverviewIndexProductOverviewChatGPTGPT-4DALLÂ·E 2Customer storiesSafety standardsAPI data privacyPricingSafetyOverviewCompanyAboutBlogCareersCharterSecurityOpenAI Â© 2015âââ2023Terms & policiesPrivacy policyBrand guidelinesSocialTwitterYouTubeGitHubSoundCloudLinkedInBack to top

@@ -1,0 +1,18 @@
+
+
+
+Reducing bias and improving safety in DALL·E 2
+
+
+
+
+
+
+
+
+
+
+
+
+
+CloseSearch Submit Skip to main contentSite NavigationResearchOverviewIndexProductOverviewChatGPTGPT-4DALLÂ·E 2Customer storiesSafety standardsAPI data privacyPricingDevelopersOverviewDocumentationAPI referenceExamplesSafetyCompanyAboutBlogCareersCharterSecuritySearch Navigation quick links Log inSign upMenu Mobile Navigation CloseSite NavigationResearchProductDevelopersSafetyCompany Quick Links Log inSign upSearch Submit Reducing bias and improving safety in DALLÂ·E 2Today, we are implementing a new technique so that DALLÂ·E generates images of people that more accurately reflect the diversity of the worldâs population.Illustration: Ruby Chen Ã DALLÂ·EJuly 18, 2022AuthorsOpenAI AnnouncementsToday, we are implementing a new technique so that DALLÂ·E generates images of people that more accurately reflect the diversity of the worldâs population. This technique is applied at the system level when DALLÂ·E is given a prompt describing a person that does not specify race or gender, likeÂ âfirefighter.âBased on our internal evaluation, users were 12x more likely to say that DALLÂ·E images included people of diverse backgrounds after the technique was applied. We plan to improve this technique over time as we gather more data andÂ feedback.CEOWomanFirefighterTeacherSoftware engineerA photo of a CEOGenerateBefore mitigationAfter mitigationIn April, we started previewing the DALLÂ·E 2 research to a limited number of people, which has allowed us to better understand the systemâs capabilities and limitations and improve our safetyÂ systems.During this preview phase, early users have flagged sensitive and biased images which have helped inform and evaluate this newÂ mitigation.We are continuing to research how AI systems, like DALLÂ·E, might reflect biases in its training data and different ways we can addressÂ them.During the research preview we have taken other steps to improve our safety systems,Â including:Minimizing the risk of DALLÂ·E being misused to create deceptive content by rejecting image uploads containing realistic faces and attempts to create the likeness of public figures, including celebrities and prominent politicalÂ figures.Making our content filters more accurate so that they are more effective at blocking prompts and image uploads that violate ourÂ content policyÂ while still allowing creativeÂ expression.Refining automated and human monitoring systems to guard againstÂ misuse.These improvements have helped us gain confidence in the ability to invite more users to experienceÂ DALLÂ·E.Expanding access is an important part of ourÂ deploying AI systems responsiblyÂ because it allows us to learn more about real-world use and continue to iterate on our safetyÂ systems.AuthorsOpenAI View all articlesResearchOverviewIndexProductOverviewChatGPTGPT-4DALLÂ·E 2Customer storiesSafety standardsAPI data privacyPricingSafetyOverviewCompanyAboutBlogCareersCharterSecurityOpenAI Â© 2015âââ2023Terms & policiesPrivacy policyBrand guidelinesSocialTwitterYouTubeGitHubSoundCloudLinkedInBack to top

@@ -1,0 +1,1748 @@
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+Customer stories · GitHub
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+Skip to content
+
+
+
+
+
+
+
+Toggle navigation
+
+
+
+
+
+
+
+
+
+
+            Sign up
+          
+
+
+ 
+
+
+
+
+
+
+
+
+
+
+
+
+
+        Product
+        
+
+
+
+
+
+
+
+
+
+
+
+
+Actions
+        Automate any workflow
+      
+
+
+
+
+
+
+
+Packages
+        Host and manage packages
+      
+
+
+
+
+
+
+
+Security
+        Find and fix vulnerabilities
+      
+
+
+
+
+
+
+
+Codespaces
+        Instant dev environments
+      
+
+
+
+
+
+
+
+Copilot
+        Write better code with AI
+      
+
+
+
+
+
+
+
+Code review
+        Manage code changes
+      
+
+
+
+
+
+
+
+Issues
+        Plan and track work
+      
+
+
+
+
+
+
+
+Discussions
+        Collaborate outside of code
+      
+
+
+
+
+Explore
+
+
+
+      All features
+
+    
+
+
+
+      Documentation
+
+    
+
+
+
+
+
+      GitHub Skills
+
+    
+
+
+
+
+
+      Blog
+
+    
+
+
+
+
+
+
+
+
+
+        Solutions
+        
+
+
+
+
+
+For
+
+
+
+      Enterprise
+
+    
+
+
+
+      Teams
+
+    
+
+
+
+      Startups
+
+    
+
+
+
+      Education
+
+    
+
+
+
+
+
+
+By Solution
+
+
+
+      CI/CD & Automation
+
+    
+
+
+
+      DevOps
+
+    
+
+
+
+
+
+      DevSecOps
+
+    
+
+
+
+
+
+
+Resources
+
+
+
+      Customer Stories
+
+    
+
+
+
+      White papers, Ebooks, Webinars
+
+    
+
+
+
+
+
+      Partners
+
+    
+
+
+
+
+
+
+
+
+
+        Open Source
+        
+
+
+
+
+
+
+
+
+
+GitHub Sponsors
+        Fund open source developers
+      
+
+
+
+
+
+
+
+
+The ReadME Project
+        GitHub community articles
+      
+
+
+
+
+Repositories
+
+
+
+      Topics
+
+    
+
+
+
+      Trending
+
+    
+
+
+
+      Collections
+
+    
+
+
+
+
+
+
+Pricing
+
+
+
+
+
+
+
+
+
+
+
+
+Search or jump to...
+
+
+
+
+
+
+
+Search code, repositories, users, issues, pull requests...
+
+ 
+
+
+
+
+        Search
+      
+
+
+
+
+
+
+
+
+
+
+
+
+
+Clear
+ 
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+              Search syntax tips
+ 
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+        Provide feedback
+      
+
+
+
+
+
+
+
+
+ 
+We read every piece of feedback, and take your input very seriously.
+
+
+Include my email address so I can be contacted
+
+     Cancel
+
+    Submit feedback
+
+
+
+
+
+
+
+
+
+
+        Saved searches
+      
+Use saved searches to filter your results more quickly
+
+
+
+
+
+
+
+
+ 
+
+
+
+
+
+Name
+
+
+
+
+
+
+Query
+
+
+
+            To see all available qualifiers, see our documentation.
+          
+ 
+
+
+
+
+     Cancel
+
+    Create saved search
+
+
+
+
+
+
+
+
+              Sign in
+            
+
+
+              Sign up
+            
+
+
+
+
+
+
+
+
+
+You signed in with another tab or window. Reload to refresh your session.
+You signed out in another tab or window. Reload to refresh your session.
+You switched accounts on another tab or window. Reload to refresh your session.
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+Customer Stories
+
+Enterprise
+Team
+All stories
+
+
+
+  Start a free trial
+  
+  
+
+
+
+
+
+
+
+
+Meet the companies who build with GitHub
+
+
+
+    See all stories 
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+Philips builds and deploys digital health technology faster with innersource on GitHub 
+Read the story 
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+Shopify keeps pushing eCommerce forward with help from GitHub tools.
+Read the story 
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+Automotive excellence at Mercedes-Benz is powered by a seamless developer experience on GitHub.
+Read the story 
+
+
+
+
+The world's largest developer platform
+Leading organizations choose GitHub to plan, build, secure and ship software.
+
+
+
+100M+
+Developers
+
+
+90%
+Fortune 100
+
+
+4M+
+Organizations
+
+
+Businesses that utilize GitHub Enterprise:
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+ 
+
+
+
+
+GitHub Enterprise provides an end-to-end developer platform to accelerate businesses.
+
+
+
+    Industry
+
+
+
+ 
+All
+Advertising & Marketing
+Automotive
+Education
+Energy & Utilities
+Financial services
+Food & Beverage
+Government
+Healthcare & Life Sciences
+Manufacturing
+Media & Entertainment
+Nonprofit
+Professional services
+Real Estate
+Retail & ecommerce
+Social & Messaging
+Software, Hardware & Technology
+Telecommunications
+Transportation & Logistics
+Travel & Hospitality
+
+
+
+
+    Feature
+
+
+
+ 
+All
+GitHub Actions
+GitHub Advanced Security
+GitHub Codespaces
+GitHub Copilot
+GitHub Discussions
+GitHub Enterprise
+GitHub Expert Services
+GitHub Issues
+GitHub Packages
+GitHub Team
+
+
+
+
+    Region
+
+
+
+ 
+All
+Americas
+Asia Pacific
+Europe
+Middle East & Africa
+
+
+
+
+    Size
+
+
+
+ 
+Startup
+Growth
+Enterprise
+
+
+
+
+
+
+    Learn more about Enterprise 
+
+
+    View Enterprise stories 
+
+
+
+
+
+
+Read more about ZibaSec's customer story
+
+
+
+
+
+
+
+
+
+
+ ZibaSec
+ZibaSec achieves great feats with a small team to protect federal organizations from phishing attacks.
+
+      Read story 
+
+
+
+
+
+Read more about Zendesk's customer story
+
+
+
+
+
+
+
+
+
+
+ Zendesk
+Zendesk and GitHub: Building best-in-class tools for a decade—and counting
+
+      Read story 
+
+
+
+
+
+Read more about Zalando's customer story
+
+
+
+
+
+
+
+
+
+
+ Zalando
+Zalando uses GitHub to facilitate collaboration and prioritize open source contributions.
+
+      Read story 
+
+
+
+
+
+Read more about XING's customer story
+
+
+
+
+
+
+
+
+
+
+ XING
+XING integrates open and closed source code to build collaborative workflows everyone can use—from project planning to QA.
+
+      Read story 
+
+
+
+
+
+Read more about White Label: International Retailer's customer story
+
+
+
+
+
+
+
+
+
+ White Label: International Retailer
+The world’s third largest retailer partners with GitHub to drive innovation through open source best practices.
+
+      Read story 
+
+
+
+
+
+Read more about Wayfair's customer story
+
+
+
+
+
+
+
+
+
+
+ Wayfair
+By balancing cloud and on-premises management, Wayfair creates a customer experience that edges out the competition
+
+      Read story 
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+        GitHub Enterprise
+      
+Duolingo empowers its engineers to be force multipliers for expertise with GitHub Copilot, Codespaces.
+
+Read more about Duolingo and GitHub's story
+Read story 
+
+
+
+
+25%
+              increase in developer speed with GitHub Copilot
+            
+
+1m
+              set-up time for largest repo with Codespaces
+            
+
+67%
+              decrease in median code review turnaround time
+            
+
+70%
+              increase in pull requests
+            
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+        Problem
+      
+
+Inconsistent standards and workflows limited developer mobility and efficiency, limiting Duolingo’s ability to expand its content and deliver on its core mission. 
+
+
+
+
+
+
+
+
+        Solution
+      
+
+GitHub Copilot, Codespaces, and custom API integrations enforce code consistency, accelerate developer speed, and remove the barriers to using engineering as a force multiplier for expertise.
+
+
+
+
+
+
+
+      Products
+    
+
+
+
+
+
+
+GitHub Enterprise
+
+
+
+
+
+GitHub Codespaces
+
+
+
+
+
+GitHub Copilot
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+Discover how high-growth companies innovate faster with GitHub Team.
+
+
+
+    Industry
+
+
+
+ 
+All
+Advertising & Marketing
+Automotive
+Education
+Energy & Utilities
+Financial services
+Food & Beverage
+Government
+Healthcare & Life Sciences
+Manufacturing
+Media & Entertainment
+Nonprofit
+Professional services
+Real Estate
+Retail & ecommerce
+Social & Messaging
+Software, Hardware & Technology
+Telecommunications
+Transportation & Logistics
+Travel & Hospitality
+
+
+
+
+    Feature
+
+
+
+ 
+All
+GitHub Actions
+GitHub Advanced Security
+GitHub Codespaces
+GitHub Copilot
+GitHub Discussions
+GitHub Enterprise
+GitHub Expert Services
+GitHub Issues
+GitHub Packages
+GitHub Team
+
+
+
+
+    Region
+
+
+
+ 
+All
+Americas
+Asia Pacific
+Europe
+Middle East & Africa
+
+
+
+
+    Size
+
+
+
+ 
+Startup
+Growth
+Enterprise
+
+
+
+
+
+
+    Learn more about Team 
+
+
+    View Team stories 
+
+
+
+
+
+
+Read more about Buffer's customer story
+
+
+
+
+
+
+
+
+
+
+ Buffer
+Buffer goes from siloed to synced for better production releases.
+
+      Read story 
+
+
+
+
+
+Read more about Cesium's customer story
+
+
+
+
+
+
+
+
+
+
+ Cesium
+Cesium leverages an open source community to support the development of 3D geospatial applications.
+
+      Read story 
+
+
+
+
+
+Read more about Front's customer story
+
+
+
+
+
+
+
+
+
+
+ Front
+Front takes the work out of their workflows with GitHub Team.
+
+      Read story 
+
+
+
+
+
+Read more about Knock's customer story
+
+
+
+
+
+
+
+
+
+
+ Knock
+Knock pivots to new products, with the help of GitHub’s fast, flexible developer workflows.
+
+      Read story 
+
+
+
+
+
+Read more about Modsy's customer story
+
+
+
+
+
+
+
+
+
+
+ Modsy
+Modsy leverages GitHub Team to make interior design easy and accessible for all.
+
+      Read story 
+
+
+
+
+
+Read more about Netdata's customer story
+
+
+
+
+
+
+
+
+
+
+ Netdata
+Netdata accelerates their developer workflow with built-in security and open source.
+
+      Read story 
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+          Here's what software leaders have to say about GitHub
+          Testimonials from our developers.
+
+
+          1 / 5
+        
+
+
+
+ 
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+“
+
+        GitHub's endless plug-ins, beautiful UI, and optimized workflows make devs happy. Happy and empowered engineers write the best code, make better decisions, and have more time to innovate. 
+      
+
+
+
+
+          Jen Peck
+        
+
+
+        Senior Director of Engineering
+          @ Redfin
+      
+
+
+
+
+
+
+
+
+
+
+
+
+
+“
+
+        GitHub Copilot will bring huge benefits to our engineering teams by reducing the amount of time spent on boilerplate code, keeping the teams in their flow state, allowing them to ship high-quality products to market faster.
+      
+
+
+
+
+          Santosh Lolyeker
+        
+
+
+        VP, Engineering Fellow
+          @ Veritas
+      
+
+
+
+
+
+
+
+
+
+
+
+
+
+“
+
+        At Uber, we continuously strive to improve our developer experience. We migrated code hosting and review to GitHub and are adopting GitHub Copilot to boost overall developer productivity. 
+      
+
+
+
+
+          Ali-Reza Adl-Tabatabai 
+        
+
+
+        Senior Director of Engineering
+          @ Uber
+      
+
+
+
+
+
+
+
+
+
+
+
+
+
+“
+
+        With GitHub Enterprise, we have alleviated engineering overhead at Costco, enabling our engineers to focus on innovating.
+      
+
+
+
+
+          Avdesh Rai
+        
+
+
+        Enterprise Solutions Engineer
+          @ Costco
+      
+
+
+
+
+
+
+
+
+
+
+
+
+
+“
+
+        GitHub is a critical service for developers—our community relies on it.
+      
+
+
+
+
+          Dominik Kundel
+        
+
+
+        Principal Product Manager—Developer Experience
+          @ Twilio
+      
+
+
+
+
+
+ 
+
+
+ 
+
+
+
+
+
+
+
+
+
+
+
+
+What will your story be?
+Start collaborating with your team on GitHub
+
+
+
+Free
+The basics for individuals and organizations
+$0 per month
+
+  Create a free organization
+  
+  
+
+
+
+
+
+Team
+Advanced collaboration for individuals and organizations
+$4 per month
+
+  Continue with Team
+  
+  
+
+
+
+
+
+Enterprise
+Security, compliance, and flexible deployment
+$21 per month
+
+  Enterprise
+  
+  
+
+
+
+
+
+    Want to use GitHub on your own?
+    
+
+      Check out our plans for individuals
+ 
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+Subscribe to The GitHub Insider
+Discover tips, technical guides, and best practices in our monthly newsletter for developers.
+
+  Subscribe
+  
+  
+
+
+
+
+
+          Product
+        
+
+
+Features
+
+
+Security
+
+
+Team
+
+
+Enterprise
+
+
+Customer stories
+
+
+The ReadME Project
+
+
+Pricing
+
+
+Resources
+
+
+Roadmap
+
+
+Compare GitHub
+
+
+
+
+
+          Platform
+        
+
+
+Developer API
+
+
+Partners
+
+
+Electron
+
+
+GitHub Desktop
+
+
+
+
+
+          Support
+        
+
+
+Docs
+
+
+Community Forum
+
+
+Professional Services
+
+
+Premium Support
+
+
+Skills
+
+
+Status
+
+
+Contact GitHub
+
+
+
+
+
+          Company
+        
+
+
+About
+
+
+Blog
+
+
+Careers
+
+
+Press
+
+
+Inclusion
+
+
+Social Impact
+
+
+Shop
+
+
+
+
+
+
+
+
+
+
+
+GitHub on Twitter
+
+
+
+
+
+GitHub on Facebook
+
+
+
+
+
+GitHub on LinkedIn
+
+
+
+
+
+GitHub on YouTube
+
+
+
+
+
+GitHub on Twitch
+
+
+
+
+
+GitHub on TikTok
+
+
+
+
+
+GitHub’s organization on GitHub
+
+
+
+
+
+          © 2023 GitHub, Inc.
+        
+
+Terms
+
+
+Privacy
+          (Updated 08/2022)
+        
+
+Sitemap
+
+
+What is Git?
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+    You can’t perform that action at this time.
+  
+
+
+
+
+
+
+
+
+
+
+

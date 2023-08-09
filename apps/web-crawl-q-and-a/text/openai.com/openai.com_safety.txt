@@ -1,0 +1,17 @@
+
+
+
+Safety & responsibility
+
+
+
+
+
+
+
+
+
+
+
+
+CloseSearch Submit Skip to main contentSite NavigationResearchOverviewIndexProductOverviewChatGPTGPT-4DALLÂ·E 2Customer storiesSafety standardsAPI data privacyPricingDevelopersOverviewDocumentationAPI referenceExamplesSafetyCompanyAboutBlogCareersCharterSecuritySearch Navigation quick links Log inSign upMenu Mobile Navigation CloseSite NavigationResearchProductDevelopersSafetyCompany Quick Links Log inSign upSearch Submit Developing safe & responsible AIArtificial general intelligence has the potential to benefit nearly every aspect of our livesâso it must be developed and deployed responsibly.Play videoA focus on safetyAI technology comes with tremendous benefits, along with serious risk of misuse. Our Charter guides every aspect of our work to ensure that we prioritize the development of safe and beneficial AI.null linksRead our CharterRead our approach to alignment researchSharing our expertiseWe collaborate with industry leaders and policymakers to ensure that AI systems are developed in a trustworthy manner.Forecasting potential misuses of language models for disinformation campaigns and how to reduce riskJan 11, 2023January 11, 2023Best practices for deploying language modelsJun 2, 2022June 2, 2022Lessons learned on language model safety and misuseMar 3, 2022March 3, 2022Why responsible AI development needs cooperation on safetyJul 10, 2019July 10, 2019Safety in practiceWe develop risk mitigation tools, best practices for responsible use, and monitor our platforms for misuse.View product safety standardsNew AI classifier for indicating AI-written textJan 31, 2023January 31, 2023New and improved content moderation toolingAug 10, 2022August 10, 2022DALLÂ·E 2 pre-training mitigationsJun 28, 2022June 28, 2022ResearchOverviewIndexProductOverviewChatGPTGPT-4DALLÂ·E 2Customer storiesSafety standardsAPI data privacyPricingSafetyOverviewCompanyAboutBlogCareersCharterSecurityOpenAI Â© 2015âââ2023Terms & policiesPrivacy policyBrand guidelinesSocialTwitterYouTubeGitHubSoundCloudLinkedInBack to top

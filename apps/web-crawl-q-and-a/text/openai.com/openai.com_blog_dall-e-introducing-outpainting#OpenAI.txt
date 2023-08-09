@@ -1,0 +1,17 @@
+
+
+
+DALL·E: Introducing outpainting
+
+
+
+
+
+
+
+
+
+
+
+
+CloseSearch Submit Skip to main contentSite NavigationResearchOverviewIndexProductOverviewChatGPTGPT-4DALLÂ·E 2Customer storiesSafety standardsAPI data privacyPricingDevelopersOverviewDocumentationAPI referenceExamplesSafetyCompanyAboutBlogCareersCharterSecuritySearch Navigation quick links Log inSign upMenu Mobile Navigation CloseSite NavigationResearchProductDevelopersSafetyCompany Quick Links Log inSign upSearch Submit DALLÂ·E: Introducing outpaintingExtend creativity and tell a bigger story with DALLÂ·E images of anyÂ size.Illustration: August Kamp Ã DALLÂ·E, outpainted from Girl with a Pearl Earring by Johannes VermeerAugust 31, 2022AuthorsOpenAI Product,Â AnnouncementsToday weâre introducing Outpainting, a new feature which helps users extend their creativity by continuing an image beyond its original bordersâadding visual elements in the same style, or taking a story in new directionsâsimply by using a natural languageÂ description.End resultTimelapse Original: Girl with a Pearl Earring by Johannes Vermeer Outpainting: August Kamp Ã DALLÂ·E DALLÂ·Eâs Edit feature already enables changes within a generated or uploaded image, a capability known as Inpainting. Now, with Outpainting, users can extend the original image, creating large-scale images in any aspect ratio. Outpainting takes into account the imageâs existing visual elementsâincluding shadows, reflections, and texturesâto maintain the context of the originalÂ image.More than one million people are using DALLÂ·E, the AI system that generates original images and artwork from a natural language description, as a creative tool today. Artists have already created remarkable images with the new Outpainting feature, and helped us better understand its capabilities in theÂ process.Tyna Eloundou Ã DALLÂ·E, original outpaintingOpenAI Ã DALLÂ·E, original outpaintingDavid Schnurr Ã DALLÂ·E, original outpaintingSonia Levesque Ã DALLÂ·E, original outpaintingDanielle Baskin Ã DALLÂ·E, original outpaintingDanielle Baskin Ã DALLÂ·E, original outpaintingChad Nelson Ã DALLÂ·E, original outpaintingEmma Catnip Ã DALLÂ·E, original outpaintingnull NavigationGo to slide 1Go to slide 2Go to slide 3Go to slide 4Go to slide 5Go to slide 6Go to slide 7Go to slide 8Outpainting is now available to all DALLÂ·E users on desktop. To discover new realms of creativity, visit labs.openai.com or join theÂ waitlist.AuthorsOpenAI View all articlesAcknowledgmentsFeatured artistsAugust KampSonia LevesqueDanielle BaskinChad NelsonEmma CatnipResearchOverviewIndexProductOverviewChatGPTGPT-4DALLÂ·E 2Customer storiesSafety standardsAPI data privacyPricingSafetyOverviewCompanyAboutBlogCareersCharterSecurityOpenAI Â© 2015âââ2023Terms & policiesPrivacy policyBrand guidelinesSocialTwitterYouTubeGitHubSoundCloudLinkedInBack to top

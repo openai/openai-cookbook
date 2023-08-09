@@ -1,0 +1,17 @@
+
+
+
+OpenAI and Microsoft extend partnership
+
+
+
+
+
+
+
+
+
+
+
+
+CloseSearch Submit Skip to main contentSite NavigationResearchOverviewIndexProductOverviewChatGPTGPT-4DALLÂ·E 2Customer storiesSafety standardsAPI data privacyPricingDevelopersOverviewDocumentationAPI referenceExamplesSafetyCompanyAboutBlogCareersCharterSecuritySearch Navigation quick links Log inSign upMenu Mobile Navigation CloseSite NavigationResearchProductDevelopersSafetyCompany Quick Links Log inSign upSearch Submit OpenAI and Microsoft extend partnershipWeâre happy to announce that OpenAI andÂ MicrosoftÂ are extending ourÂ partnership.Illustration: Justin Jay WangJanuary 23, 2023AnnouncementsThis multi-year, multi-billion dollar investment from Microsoft follows their previous investments in 2019 and 2021, and will allow us to continue our independent research and develop AI that is increasingly safe, useful, andÂ powerful.In pursuit of our mission to ensure advanced AI benefits all of humanity, OpenAI remains aÂ capped-profit companyÂ and is governed by the OpenAI non-profit. This structure allows us to raise the capital we need to fulfill our mission without sacrificing our core beliefs about broadly sharing benefits and the need to prioritizeÂ safety.Microsoft shares this vision and our values, and our partnership is instrumental to ourÂ progress.Weâve worked together to build multiple supercomputing systems powered by Azure, which we use to train all of our models. Azureâs unique architecture design has been crucial in delivering best-in-class performance and scale for our AI training and inference workloads. Microsoft will increase their investment in these systems to accelerate our independent research and Azure will remain the exclusive cloud provider for all OpenAI workloads across our research, API andÂ products.Learning from real-world useâand incorporating those lessonsâis a critical part of developing powerful AI systems that are safe and useful. Scaling that use also ensures AIâs benefits can be distributed broadly. So, weâve partnered with Microsoft to deploy our technology through our API and theÂ Azure OpenAI Serviceâenabling enterprise and developers to build on top of GPT, DALLÂ·E, and Codex. Weâve also worked together to build OpenAIâs technology into apps like GitHub Copilot and MicrosoftÂ Designer.In an effort to build and deploy safe AI systems, our teams regularly collaborate to review and synthesize shared lessonsâand use them to inform iterative updates to our systems, future research, and best practices for use of these powerful AI systems across theÂ industry.We look forward to continued collaboration and advancing this progress withÂ Microsoft.ResearchOverviewIndexProductOverviewChatGPTGPT-4DALLÂ·E 2Customer storiesSafety standardsAPI data privacyPricingSafetyOverviewCompanyAboutBlogCareersCharterSecurityOpenAI Â© 2015âââ2023Terms & policiesPrivacy policyBrand guidelinesSocialTwitterYouTubeGitHubSoundCloudLinkedInBack to top

@@ -1,0 +1,49 @@
+
+
+
+Forecasting potential misuses of language models for disinformation campaigns and how to reduce risk
+
+
+
+
+
+
+
+
+
+
+
+
+CloseSearch Submit Skip to main contentSite NavigationResearchOverviewIndexProductOverviewChatGPTGPT-4DALLÂ·E 2Customer storiesSafety standardsAPI data privacyPricingDevelopersOverviewDocumentationAPI referenceExamplesSafetyCompanyAboutBlogCareersCharterSecuritySearch Navigation quick links Log inSign upMenu Mobile Navigation CloseSite NavigationResearchProductDevelopersSafetyCompany Quick Links Log inSign upSearch Submit Forecasting potential misuses of language models for disinformation campaigns and how to reduce riskIllustration: Justin Jay WangOpenAI researchers collaborated with Georgetown Universityâs Center for Security and Emerging Technology and the Stanford Internet Observatory to investigate how large language models might be misused for disinformation purposes. The collaboration included an October 2021 workshop bringing together 30 disinformation researchers, machine learning experts, and policy analysts, and culminated in a co-authored report building on more than a year of research. This report outlines the threats that language models pose to the information environment if used to augment disinformation campaigns and introduces a framework for analyzing potential mitigations. Read the full reportÂ here.January 11, 2023More resourcesRead paperSafety & Alignment,Â Language,Â PublicationAs generative language models improve, they open up new possibilities in fields as diverse as healthcare, law, education and science. But, as with any new technology, it is worth considering how they can be misused. Against the backdrop of recurring online influence operationsâcovert or deceptive efforts to influence the opinions of a target audienceâthe paperÂ asks:How might language models change influence operations, and what steps can be taken to mitigate thisÂ threat?Our work brought together different backgrounds and expertiseâresearchers with grounding in the tactics, techniques, and procedures of online disinformation campaigns, as well as machine learning experts in the generative artificial intelligence fieldâto base our analysis on trends in both domains.We believe that it is critical to analyze the threat of AI-enabled influence operations and outline steps that can be takenÂ beforeÂ language models are used for influence operations at scale. We hope our research will inform policymakers that are new to the AI or disinformation fields, and spur in-depth research into potential mitigation strategies for AI developers, policymakers, and disinformation researchers.How Could AI Affect Influence Operations?When researchers evaluate influence operations, they consider theÂ actors, behaviors, and content. The widespread availability of technology powered by language models has the potential to impact all threeÂ facets:Actors: Language models could drive down the cost of running influence operations, placing them within reach of new actors and actor types. Likewise, propagandists-for-hire that automate production of text may gain new competitiveÂ advantages.Behavior: Influence operations with language models will become easier to scale, and tactics that are currently expensive (e.g., generating personalized content) may become cheaper. Language models may also enable new tactics to emergeâlike real-time content generation inÂ chatbots.Content: Text creation tools powered by language models may generate more impactful or persuasive messaging compared to propagandists, especially those who lack requisite linguistic or cultural knowledge of their target. They may also make influence operations less discoverable, since they repeatedly create new content without needing to resort to copy-pasting and other noticeable time-savingÂ behaviors.Our bottom-line judgment is that language models will be useful for propagandists and will likely transform online influence operations. Even if the most advanced models are kept private or controlled through application programming interface (API) access, propagandists will likely gravitate towards open-source alternatives and nation states may invest in the technologyÂ themselves.Critical UnknownsMany factors impact whether, and the extent to which, language models will be used in influence operations. Our report dives into many of these considerations. ForÂ example:What new capabilities for influence will emerge as a side effect of well-intentioned research or commercial investment? Which actors will make significant investments in languageÂ models?When will easy-to-use tools to generate text become publicly available? Will it be more effective to engineer specific language models for influence operations, rather than apply genericÂ ones?Will norms develop that disincentivize actors who wage AI-enabled influence operations? How will actor intentionsÂ develop?While we expect to see diffusion of the technology as well as improvements in the usability, reliability, and efficiency of language models, many questions about the future remain unanswered. Because these are critical possibilities that can change how language models may impact influence operations, additional research to reduce uncertainty is highlyÂ valuable.A Framework for MitigationsTo chart a path forward, the report lays out key stages in the language model-to-influence operation pipeline. Each of these stages is a point for potential mitigations.To successfully wage an influence operation leveraging a language model, propagandists would require that: (1) a model exists, (2) they can reliably access it, (3) they can disseminate content from the model, and (4) an end user is affected. Many possible mitigation strategies fall along these four steps, as shownÂ below.
+
+
+Stage in the pipeline
+1. Model Construction
+2. Model Access
+3. Content Dissemination
+4. Belief Formation
+
+
+Illustrative Mitigations
+AI developers build models that are more fact-sensitive.
+AI providers impose stricter usage restrictions on language models.
+Platforms and AI providers coordinate to identify AI content.
+Institutions engage in media literacy campaigns.
+
+
+Developers spread radioactive data to make generative models detectable.
+AI providers develop new norms around model release.
+Platforms require âproof of personhoodâ to post.
+Developers provide consumer focused AI tools.
+
+
+Governments impose restrictions on data collection.
+AI providers close security vulnerabilities.
+Entities that rely on public input take steps to reduce their exposure to misleading AI content.
+
+
+Governments impose access controls on AI hardware.
+Digital provenance standards are widely adopted.
+
+
+If a Mitigation Exists, is it Desirable?Just because a mitigation could reduce the threat of AI-enabled influence operations does not mean that it should be put into place. Some mitigations carry their own downside risks. Others may not be feasible. While we do not explicitly endorse or rate mitigations, the paper provides a set of guiding questions for policymakers and others toÂ consider:Technical Feasibility: Is the proposed mitigation technically feasible? Does it require significant changes to technicalÂ infrastructure?Social Feasibility: Is the mitigation feasible from a political, legal, and institutional perspective? Does it require costly coordination, are key actors incentivized to implement it, and is it actionable under existing law, regulation, and industryÂ standards?Downside Risk: What are the potential negative impacts of the mitigation, and how significant areÂ they?Impact: How effective would a proposed mitigation be at reducing theÂ threat?We hope this framework will spur ideas for other mitigation strategies, and that the guiding questions will help relevant institutions begin to consider whether various mitigations are worthÂ pursuing.This report is far from the final word on AI and the future of influence operations. Our aim is to define the present environment and to help set an agenda for future research. We encourage anyone interested in collaborating or discussing relevant projects to connect with us. For more, read the full reportÂ here.AcknowledgmentsReport authorsJosh A. Goldstein (Georgetown Universityâs Center for Security and Emerging Technology)Girish Sastry (OpenAI)Micah Musser (Center for Security and Emerging Technology)RenÃ©e DiResta (Stanford Internet Observatory)Matthew Gentzel (Longview Philanthropy) (work done at OpenAI)Katerina Sedova (US Department of State) (work done at Center for Security and Emerging Technology prior to government service)ResearchOverviewIndexProductOverviewChatGPTGPT-4DALLÂ·E 2Customer storiesSafety standardsAPI data privacyPricingSafetyOverviewCompanyAboutBlogCareersCharterSecurityOpenAI Â© 2015âââ2023Terms & policiesPrivacy policyBrand guidelinesSocialTwitterYouTubeGitHubSoundCloudLinkedInBack to top

@@ -1,0 +1,62 @@
+
+
+
+Introducing ChatGPT and Whisper APIs
+
+
+
+
+
+
+
+
+
+
+
+
+CloseSearch Submit Skip to main contentSite NavigationResearchOverviewIndexProductOverviewChatGPTGPT-4DALLÂ·E 2Customer storiesSafety standardsAPI data privacyPricingDevelopersOverviewDocumentationAPI referenceExamplesSafetyCompanyAboutBlogCareersCharterSecuritySearch Navigation quick links Log inSign upMenu Mobile Navigation CloseSite NavigationResearchProductDevelopersSafetyCompany Quick Links Log inSign upSearch Submit Introducing ChatGPT and Whisper APIsDevelopers can now integrate ChatGPT and Whisper models into their apps and products through our API.Illustration: Ruby ChenMarch 1, 2023AuthorsGreg BrockmanAtty EletiElie GeorgesJoanne JangLogan KilpatrickRachel LimLuke MillerMichelle PokrassProduct,Â AnnouncementsChatGPT and Whisper models are now available on our API, giving developers access to cutting-edge language (not just chat!) and speech-to-text capabilities. Through a series of system-wide optimizations, weâve achieved 90% cost reduction for ChatGPT since December; weâre now passing through those savings to API users. Developers can now use our open-source Whisper large-v2 model in the API with much faster and cost-effective results. ChatGPT API users can expect continuous model improvements and the option to choose dedicated capacity for deeper control over the models. Weâve also listened closely to feedback from our developers and refined our API terms of service to better meet their needs.Get startedEarly users of ChatGPT and Whisper APIsSnap Inc., the creator of Snapchat, introduced My AI for Snapchat+ this week. The experimental feature is running on ChatGPT API. My AI offers Snapchatters a friendly, customizable chatbot at their fingertips that offers recommendations, and can even write a haiku for friends in seconds. Snapchat, where communication and messaging is a daily behavior, has 750 million monthly Snapchatters:Play videoMy AI for Snapchat+Quizlet is a global learning platform with more than 60 million students using it to study, practice and master whatever theyâre learning. Quizlet has worked with OpenAI for the last three years, leveraging GPT-3 across multiple use cases, including vocabulary learning and practice tests. With the launch of ChatGPT API, Quizlet is introducing Q-Chat, a fully-adaptive AI tutor that engages students with adaptive questions based on relevant study materials delivered through a fun chat experience:Play videoQuizlet Q-ChatInstacart is augmenting the Instacart app to enable customers to ask about food and get inspirational, shoppable answers. This uses ChatGPT alongside Instacartâs own AI and product data from their 75,000+ retail partner store locations to help customers discover ideas for open-ended shopping goals, such as âHow do I make great fish tacos?â or âWhatâs a healthy lunch for my kids?â Instacart plans to launch âAsk Instacartâ later this year:Play videoInstacartâs Ask InstacartShop, Shopifyâs consumer app, is used by 100 million shoppers to find and engage with the products and brands they love. ChatGPT API is used to power Shopâs new shopping assistant. When shoppers search for products, the shopping assistant makes personalized recommendations based on their requests. Shopâs new AI-powered shopping assistant will streamline in-app shopping by scanning millions of products to quickly find what buyers are looking forâor help them discover something new:Play videoShopifyâs Shop appSpeak is an AI-powered language learning app focused on building the best path to spoken fluency. Theyâre the fastest-growing English app in South Korea, and are already using the Whisper API to power a new AI speaking companion product, and rapidly bring it to the rest of the globe. Whisperâs human-level accuracy for language learners of every level unlocks true open-ended conversational practice and highly accurate feedback:Play videoThe Speak appChatGPT APIModel: The ChatGPT model family we are releasing today, gpt-3.5-turbo, is the same model used in the ChatGPT product. It is priced at $0.002 per 1k tokens, which is 10x cheaper than our existing GPT-3.5 models. Itâs also our best model for many non-chat use casesâweâve seen early testers migrate from text-davinci-003 to gpt-3.5-turbo with only a small amount of adjustment needed to their prompts.API: Traditionally, GPT models consume unstructured text, which is represented to the model as a sequence of âtokens.â ChatGPT models instead consume a sequence of messages together with metadata. (For the curious: under the hood, the input is still rendered to the model as a sequence of âtokensâ for the model to consume; the raw format used by the model is a new format called Chat Markup Language (âChatMLâ).)Weâve created a new endpoint to interact with our ChatGPT models:RequestResponsePython bindingscurl https://api.openai.com/v1/chat/completions \
+ -H "Authorization: Bearer $OPENAI_API_KEY" \
+ -H "Content-Type: application/json" \
+ -d '{
+ "model": "gpt-3.5-turbo",
+ "messages": [{"role": "user", "content": "What is the OpenAI mission?"}] 
+ }'{
+  "id": "chatcmpl-6p5FEv1JHictSSnDZsGU4KvbuBsbu",
+  "object": "messages",
+  "created": 1677693600,
+  "model": "gpt-3.5-turbo",
+  "choices": [
+    {
+      "index": 0,
+      "finish_reason": "stop",
+      "message": {
+        "role": "assistant",
+        "content": "OpenAI's mission is to ensure that artificial general intelligence benefits all of humanity."
+      }
+    }
+  ],
+  "usage": {
+    "prompt_tokens": 20,
+    "completion_tokens": 18,
+    "total_tokens": 38
+  }
+}import openai
+
+completion = openai.ChatCompletion.create(
+  model="gpt-3.5-turbo", 
+  messages=[{"role": "user", "content": "What is the OpenAI mission?"}]
+)
+
+print(completion)To learn more about the ChatGPT API, visit our Chat guide.ChatGPT upgradesWe are constantly improving our ChatGPT models, and want to make these enhancements available to developers as well. Developers who use the gpt-3.5-turbo model will always get our recommended stable model, while still having the flexibility to opt for a specific model version. For example, today weâre releasing gpt-3.5-turbo-0301, which will be supported through at least June 1st, and weâll update gpt-3.5-turbo to a new stable release in April. The models page will provide switchover updates.Dedicated instancesWe are also now offering dedicated instances for users who want deeper control over the specific model version and system performance. By default, requests are run on compute infrastructure shared with other users, who pay per request. Our API runs on Azure, and with dedicated instances, developers will pay by time period for an allocation of compute infrastructure thatâs reserved for serving their requests.Developers get full control over the instanceâs load (higher load improves throughput but makes each request slower), the option to enable features such as longer context limits, and the ability to pin the model snapshot.Dedicated instances can make economic sense for developers running beyond ~450M tokens per day. Additionally, it enablesÂ directly optimizing a developerâs workload againstÂ hardware performance, which can dramatically reduce costs relative to shared infrastructure. For dedicated instance inquiries, contact us.Whisper APIWhisper, the speech-to-text model we open-sourced in September 2022, has received immense praise from the developer community butÂ can also be hard to run. Weâve now made the large-v2 model available through our API, which gives convenient on-demand access priced at $0.006 / minute. In addition, our highly-optimized serving stack ensures faster performance compared to other services.Whisper API is available through our transcriptions (transcribes in source language) or translations (transcribes into English) endpoints, and accepts a variety of formats (m4a, mp3, mp4, mpeg, mpga, wav, webm):RequestResponsePython bindingscurl https://api.openai.com/v1/audio/transcriptions \
+  -H "Authorization: Bearer $OPENAI_API_KEY" \
+  -H "Content-Type: multipart/form-data" \
+  -F model="whisper-1" \
+  -F file="@/path/to/file/openai.mp3"{
+  "text": "Imagine the wildest idea that you've ever had, and you're curious about how it might scale to something that's a 100, a 1,000 times bigger..."
+}
+import openai
+
+file = open("/path/to/file/openai.mp3", "rb")
+transcription = openai.Audio.transcribe("whisper-1", file)
+
+print(transcription)To learn more about the Whisper API, visit our Speech to Text guide.Developer focusOver the past six months, weâve been collecting feedback from our API customers to understand how we can better serve them. Weâve made concrete changes, such as:Data submitted through the API is no longer used for service improvements (including model training) unless the organization opts inImplementing a default 30-day data retention policy for API users, with options for stricter retention depending on user needs.Removing our pre-launch review (unlocked by improving our automated monitoring)Improving developer documentationSimplifying our Terms of Service and Usage Policies, including terms around data ownership: users own the input and output of the models.For the past two months our uptime has not met our own expectations nor that of our users. Our engineering teamâs top priority is now stability of production use casesâwe know that ensuring AI benefits all of humanity requires being a reliable service provider. Please hold us accountable for improved uptime over the upcoming months!We believe that AI can provide incredible opportunities and economic empowerment to everyone, and the best way to achieve that is to allow everyone to build with it. We hope that the changes we announced today will lead to numerous applications that everyone can benefit from. Start building next-generation apps powered by ChatGPT & Whisper.Get startedAuthorsGreg BrockmanView all articlesAtty EletiView all articlesElie GeorgesView all articlesJoanne JangView all articlesLogan KilpatrickView all articlesRachel LimView all articlesLuke MillerView all articlesMichelle PokrassView all articlesAcknowledgmentsContributorsJeff Belgum, Jake Berdine, Trevor Cai, Alexander Carney, Brooke Chan, Che Chang, Derek Chen, Ruby Chen, Aidan Clark, Thomas Degry, Steve Dowling, Sheila Dunning, Liam Fedus, Vik Goel, Scott Gray, Aurelia Guy, Jeff Harris, Peter Hoeschele, Angela Jiang, Denny Jin, Jong Wook Kim, Yongjik Kim, Michael Lampe, Daniel Levy, Brad Lightcap, Patricia Lue, Bianca Martin, Christine McLeavey, Luke Metz, Andrey Mishchenko, Vinnie Monaco, Evan Morikawa, Mira Murati, Rohan Nuttall, Alex Paino, Ashley Pantuliano, Mikhail Pavlov, Andrew Peng, Henrique Ponde de Oliveira Pinto, Alec Radford, Kendra Rimbach, Aliisa Rosenthal, Nick Ryder, Ted Sanders, Heather Schmidt, John Schulman, Zarina Stanik, Felipe Such, Nick Turley, Carroll Wainwright, Peter Welinder, Clemens Winter, Sherwin Wu, Tao Xu, Qiming Yuan, Barret ZophResearchOverviewIndexProductOverviewChatGPTGPT-4DALLÂ·E 2Customer storiesSafety standardsAPI data privacyPricingSafetyOverviewCompanyAboutBlogCareersCharterSecurityOpenAI Â© 2015âââ2023Terms & policiesPrivacy policyBrand guidelinesSocialTwitterYouTubeGitHubSoundCloudLinkedInBack to top

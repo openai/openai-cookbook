@@ -1,0 +1,16 @@
+
+
+
+Research index
+
+
+
+
+
+
+
+
+
+
+
+CloseSearch Submit Skip to main contentSite NavigationResearchOverviewIndexProductOverviewChatGPTGPT-4DALLÂ·E 2Customer storiesSafety standardsAPI data privacyPricingDevelopersOverviewDocumentationAPI referenceExamplesSafetyCompanyAboutBlogCareersCharterSecuritySearch Navigation quick links Log inSign upMenu Mobile Navigation CloseSite NavigationResearchProductDevelopersSafetyCompany Quick Links Log inSign upSearch Submit Research indexSearch Submit  Filter and sort Research PapersAug 1, 2023August 1, 2023Confidence-Building Measures for Artificial Intelligence: Workshop proceedingsResponsible AI,Â Safety & Alignment,Â CommunityRead paperJul 6, 2023July 6, 2023Frontier AI regulation: Managing emerging risks to public safetySafety & Alignment,Â Responsible AIRead paperMay 31, 2023May 31, 2023Improving mathematical reasoning with process supervisionResearch,Â ReasoningRead paperMay 9, 2023May 9, 2023Language models can explain neurons in language modelsResearch,Â Language,Â Safety & AlignmentRead paperMar 17, 2023March 17, 2023GPTs are GPTs: An early look at the labor market impact potential of large language modelsResponsible AIRead paperMar 14, 2023March 14, 2023GPT-4LanguageRead paperJan 11, 2023January 11, 2023Forecasting potential misuses of language models for disinformation campaigns and how to reduce riskSafety & Alignment,Â LanguageRead paperDec 16, 2022December 16, 2022Point-E: A system for generating 3D point clouds from complex promptsComputer visionRead paperOct 19, 2022October 19, 2022Scaling laws for reward model overoptimizationReinforcement learning,Â Human feedbackRead paperSep 21, 2022September 21, 2022Introducing WhisperSpeech recognition,Â Transformers,Â Open sourceRead paperJul 28, 2022July 28, 2022Efficient training of language models to fill in the middleLanguageRead paperJul 25, 2022July 25, 2022A hazard analysis framework for code synthesis large language modelsLanguage,Â Safety & AlignmentRead paperJun 28, 2022June 28, 2022DALLÂ·E 2 pre-training mitigationsImage generation,Â Responsible AIJun 23, 2022June 23, 2022Learning to play Minecraft with Video PreTrainingGames,Â Representation learning,Â Reinforcement learning,Â CommunityRead paperJun 17, 2022June 17, 2022Evolution through large modelsLanguageRead paperJun 13, 2022June 13, 2022AI-written critiques help humans notice flawsLanguage,Â Human feedback,Â Safety & Alignment,Â SummarizationRead paperJun 9, 2022June 9, 2022Techniques for training large neural networksCompute,Â Software engineeringMay 28, 2022May 28, 2022Teaching models to express their uncertainty in wordsLanguageRead paperApr 13, 2022April 13, 2022Hierarchical text-conditional image generation with CLIP latentsImage generation,Â Transformers,Â Generative modelsRead paperApr 13, 2022April 13, 2022Measuring Goodhartâs lawSafety & Alignment1âââ20 of 164Previous pageNext pageCurrent page:11 2 3 4 5 6 7 8 9 of 9ResearchOverviewIndexProductOverviewChatGPTGPT-4DALLÂ·E 2Customer storiesSafety standardsAPI data privacyPricingSafetyOverviewCompanyAboutBlogCareersCharterSecurityOpenAI Â© 2015âââ2023Terms & policiesPrivacy policyBrand guidelinesSocialTwitterYouTubeGitHubSoundCloudLinkedInBack to top

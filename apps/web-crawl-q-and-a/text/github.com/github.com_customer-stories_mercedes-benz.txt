@@ -1,0 +1,1177 @@
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+Mercedes-Benz · GitHub
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+Skip to content
+
+
+
+
+
+
+
+Toggle navigation
+
+
+
+
+
+
+
+
+
+
+            Sign up
+          
+
+
+ 
+
+
+
+
+
+
+
+
+
+
+
+
+
+        Product
+        
+
+
+
+
+
+
+
+
+
+
+
+
+Actions
+        Automate any workflow
+      
+
+
+
+
+
+
+
+Packages
+        Host and manage packages
+      
+
+
+
+
+
+
+
+Security
+        Find and fix vulnerabilities
+      
+
+
+
+
+
+
+
+Codespaces
+        Instant dev environments
+      
+
+
+
+
+
+
+
+Copilot
+        Write better code with AI
+      
+
+
+
+
+
+
+
+Code review
+        Manage code changes
+      
+
+
+
+
+
+
+
+Issues
+        Plan and track work
+      
+
+
+
+
+
+
+
+Discussions
+        Collaborate outside of code
+      
+
+
+
+
+Explore
+
+
+
+      All features
+
+    
+
+
+
+      Documentation
+
+    
+
+
+
+
+
+      GitHub Skills
+
+    
+
+
+
+
+
+      Blog
+
+    
+
+
+
+
+
+
+
+
+
+        Solutions
+        
+
+
+
+
+
+For
+
+
+
+      Enterprise
+
+    
+
+
+
+      Teams
+
+    
+
+
+
+      Startups
+
+    
+
+
+
+      Education
+
+    
+
+
+
+
+
+
+By Solution
+
+
+
+      CI/CD & Automation
+
+    
+
+
+
+      DevOps
+
+    
+
+
+
+
+
+      DevSecOps
+
+    
+
+
+
+
+
+
+Resources
+
+
+
+      Customer Stories
+
+    
+
+
+
+      White papers, Ebooks, Webinars
+
+    
+
+
+
+
+
+      Partners
+
+    
+
+
+
+
+
+
+
+
+
+        Open Source
+        
+
+
+
+
+
+
+
+
+
+GitHub Sponsors
+        Fund open source developers
+      
+
+
+
+
+
+
+
+
+The ReadME Project
+        GitHub community articles
+      
+
+
+
+
+Repositories
+
+
+
+      Topics
+
+    
+
+
+
+      Trending
+
+    
+
+
+
+      Collections
+
+    
+
+
+
+
+
+
+Pricing
+
+
+
+
+
+
+
+
+
+
+
+
+Search or jump to...
+
+
+
+
+
+
+
+Search code, repositories, users, issues, pull requests...
+
+ 
+
+
+
+
+        Search
+      
+
+
+
+
+
+
+
+
+
+
+
+
+
+Clear
+ 
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+              Search syntax tips
+ 
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+        Provide feedback
+      
+
+
+
+
+
+
+
+
+ 
+We read every piece of feedback, and take your input very seriously.
+
+
+Include my email address so I can be contacted
+
+     Cancel
+
+    Submit feedback
+
+
+
+
+
+
+
+
+
+
+        Saved searches
+      
+Use saved searches to filter your results more quickly
+
+
+
+
+
+
+
+
+ 
+
+
+
+
+
+Name
+
+
+
+
+
+
+Query
+
+
+
+            To see all available qualifiers, see our documentation.
+          
+ 
+
+
+
+
+     Cancel
+
+    Create saved search
+
+
+
+
+
+
+
+
+              Sign in
+            
+
+
+              Sign up
+            
+
+
+
+
+
+
+
+
+
+You signed in with another tab or window. Reload to refresh your session.
+You signed out in another tab or window. Reload to refresh your session.
+You switched accounts on another tab or window. Reload to refresh your session.
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+Customer Stories
+
+Enterprise
+Team
+All stories
+
+
+
+  Start a free trial
+  
+  
+
+
+
+
+
+
+
+
+
+
+GitHub Enterprise
+
+
+      Automotive excellence at Mercedes-Benz is powered by a seamless developer experience on GitHub.
+    
+
+
+
+65,000
+              Repositories
+            
+
+4,100
+              Organizations
+            
+
+90%
+              Source code on GitHub
+            
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+            Play video
+          Data centers on wheels: Mercedes Benz + GitHub
+
+
+
+
+
+
+
+
+
+
+
+Location
+
+                  Stuttgart, Germany
+                
+
+
+Industry
+
+                  Automotive
+                
+
+
+
+Number of Seats
+
+                  23,000+
+                
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+        Problem
+      
+
+Mercedes-Benz' technology stack was scattered across disparate solutions. In order to digitally transform, it needed to accelerate software delivery and collaboration by increasing innersource and open source use across the company.
+
+
+
+
+
+
+
+
+        Solution
+      
+
+By standardizing its source code, automating onboarding, and helping remediate vulnerabilities all on GitHub, this integrated manner of delivering software helps Mercedes-Benz continue to deliver automotive engineering excellence.
+
+
+
+
+
+
+
+
+      Products
+    
+
+
+
+
+
+
+GitHub Enterprise
+
+
+
+
+
+GitHub Actions
+
+
+
+
+
+GitHub Issues
+
+
+
+
+
+
+
+
+
+
+
+
+
+While you might be tempted to compare a modern Mercedes-Benz to a smart living room on wheels, with its multiple screens and entertainment systems, that would be selling the technology short. The Mercedes-Benz EQS, for example, comes with an MBUX (Mercedes-Benz User Experience) Hyperscreen in which multiple displays merge seamlessly to create an impressive curved screen band over 141 cm wide. In the background there are 8 CPU cores, 24 GB RAM, and 46.4 GB per second RAM memory bandwidth working to make MBUX a peerless experience for the customer. This processing power also enables up to 350 sensors to monitor the functions of the EQS and drives features such as infotainment systems, facial recognition and speech processing. “Hey Mercedes” supports 27 languages with Natural Language Understanding (NLU). With million lines of code powering this experience, Mercedes-Benz is much more than a high-end automotive manufacturer, it’s a state of the art technology company. 
+“We are digitally transforming as a company,” explains Mercedes-Benz lead architect Andy Krieger. “We want to be a software-driven car manufacturer, and GitHub helps us on our way forward.” 
+Like many companies going through a digital transformation, however, Mercedes-Benz originally found itself with a technology stack scattered across disparate solutions. As part of its digital transformation strategy, they wanted to accelerate software delivery and collaboration through leveraging innersource and open source. However, the IT department was managing source code with multiple tools. They quickly realized that, in order to successfully implement the strategy, they needed a unified platform. So Mercedes-Benz chose GitHub for enterprise IT, because many of its developers were already familiar with GitHub. 
+Wolfgang Gehring, FOSS Ambassador with Mercedes-Benz Tech Innovation, says that “GitHub is the enabler that opens the door for the open-source world. And we hope that this connection to the open source world will also help us to attract new talent.”
+Having everyone together on the GitHub platform is a great advantage for innersource.
+
+Currently, Mercedes-Benz has moved a majority of the enterprise IT source code its developers have created over the last decade to GitHub. “This helps collaboration between different business units within Mercedes-Benz,” says Gehring. “Having everyone together on the GitHub platform is a great advantage for innersource.” During the last few years, several promising innersource initiatives have emerged from this.
+The migration amounted to 65,000 repositories across 4,100 organizations (September 2022, internal statistics) to a hybrid architecture on GitHub Enterprise, enabling 23,300 of the company’s developers to collaborate across divisions and eliminating silos. With GitHub providing a unified platform, operated by the Developer Experience team at Mercedes-Benz, the company can host its open source and innersource projects, such as an innersource library which provides infrastructure needs that can be reused across the company’s many divisions, in one place. This helps to boost developer efficiency by preventing duplicative code and fosters internal contributions beyond the core developer team. Marketers, sales, HR teams, and developers alike are able to collaborate using GitHub Issues, which assists with project management and running their daily meetings at Mercedes-Benz.
+At the same time, Mercedes-Benz has doubled down on its open source commitment, with recently publishing the company’s FOSS Manifesto, which emphasizes the value of innersource and open source for both the company and its developers. It lays out guiding principles such as encouraging its employees to participate in FOSS activities and the desire to promote visibility in open source communities. One way it promotes visibility is by hosting “FOSS Fridays,” when it spreads awareness internally of the benefits of both innersource and open source. Externally, Mercedes-Benz showcases its open source repositories to the community using e.g. GitHub Pages, which allows developers to quickly stand up full-fledged sites for their projects without ever leaving GitHub. 
+“You can’t develop software anymore these days without doing open source,” says Gehring, pointing to the company’s simultaneous use of and contribution to the Kubernetes open source project. “We want to be good citizens of the open source world. And that means to not just consume and take open source for granted, but also understand that as a large enterprise we have a responsibility to give back and drive open source forward.”
+You can’t develop software anymore these days without doing open source.
+
+As part of Mercedes-Benz’s efforts to give back to open source communities, it also contributes to the GitHub Sponsors program, to help fund open source projects, developers, and maintainers. Gehring says that it’s important to do more than simply benefit from open source software. “Crucial parts of the open source infrastructure are maintained by a few hardworking individuals that often do it for free.” says Gehring. “Mercedes-Benz and many others use this code. Heartbleed and Log4Shell affected tools for example are used by a huge number of people and enterprises. It should be in the interest of all of us that we can rely on the foundational tools. That’s the reason why Mercedes-Benz supports the work of these people.”
+Meanwhile, different teams at Mercedes-Benz have adopted GitHub Actions, which it uses for software testing, deployment, and infrastructure automation with Terraform scripts. Application manager Fabian Faulhaber says that GitHub Actions helps to streamline developer workflows and save time because it unifies everything into one system and its well documented. Faulhaber says: “It helps us onboard new software engineers and get them productive right away. We have all our source code, issues, and pull requests in one place. With GitHub Actions, we can automate and deploy our software. GitHub is a complete platform that frees us from menial tasks and enables us to do our best work.”   From automating onboarding to faster build processes across its 65,000 repositories, this integrated manner of delivering software helps Mercedes-Benz in their daily work and to build the world's most desirable cars.
+
+
+
+
+Interested in bringing GitHub Enterprise to your organization?
+
+
+              Start your
+              
+                free trial
+                of GitHub Enterprise
+              for
+              30 days
+              days and increase your team's collaboration.
+              $21 per user/month after trial expires.
+            
+
+              Curious about
+              
+                other plans?
+                from GitHub
+ 
+
+
+
+
+
+
+
+
+Explore more from GitHub
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+      The ReadME Project
+    
+Stories and voices from the developer community.
+
+      Learn more about The ReadME Project
+
+
+
+
+
+
+
+
+
+
+
+
+
+      GitHub Copilot
+    
+AI pair programmer that helps you write code faster.
+
+      Learn more about GitHub Copilot
+
+
+
+
+
+
+
+
+
+
+
+
+
+      GitHub Actions
+    
+Automate your workflow from idea to production.
+
+      Learn more about GitHub Actions
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+What will your story be?
+Start collaborating with your team on GitHub
+
+
+
+Free
+The basics for individuals and organizations
+$0 per month
+
+  Create a free organization
+  
+  
+
+
+
+
+
+Team
+Advanced collaboration for individuals and organizations
+$4 per month
+
+  Continue with Team
+  
+  
+
+
+
+
+
+Enterprise
+Security, compliance, and flexible deployment
+$21 per month
+
+  Enterprise
+  
+  
+
+
+
+
+
+    Want to use GitHub on your own?
+    
+
+      Check out our plans for individuals
+ 
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+Subscribe to The GitHub Insider
+Discover tips, technical guides, and best practices in our monthly newsletter for developers.
+
+  Subscribe
+  
+  
+
+
+
+
+
+          Product
+        
+
+
+Features
+
+
+Security
+
+
+Team
+
+
+Enterprise
+
+
+Customer stories
+
+
+The ReadME Project
+
+
+Pricing
+
+
+Resources
+
+
+Roadmap
+
+
+Compare GitHub
+
+
+
+
+
+          Platform
+        
+
+
+Developer API
+
+
+Partners
+
+
+Electron
+
+
+GitHub Desktop
+
+
+
+
+
+          Support
+        
+
+
+Docs
+
+
+Community Forum
+
+
+Professional Services
+
+
+Premium Support
+
+
+Skills
+
+
+Status
+
+
+Contact GitHub
+
+
+
+
+
+          Company
+        
+
+
+About
+
+
+Blog
+
+
+Careers
+
+
+Press
+
+
+Inclusion
+
+
+Social Impact
+
+
+Shop
+
+
+
+
+
+
+
+
+
+
+
+GitHub on Twitter
+
+
+
+
+
+GitHub on Facebook
+
+
+
+
+
+GitHub on LinkedIn
+
+
+
+
+
+GitHub on YouTube
+
+
+
+
+
+GitHub on Twitch
+
+
+
+
+
+GitHub on TikTok
+
+
+
+
+
+GitHub’s organization on GitHub
+
+
+
+
+
+          © 2023 GitHub, Inc.
+        
+
+Terms
+
+
+Privacy
+          (Updated 08/2022)
+        
+
+Sitemap
+
+
+What is Git?
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+    You can’t perform that action at this time.
+  
+
+
+
+
+
+
+
+
+
+
+

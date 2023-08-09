@@ -1,0 +1,45 @@
+
+
+
+New and improved embedding model
+
+
+
+
+
+
+
+
+
+
+
+
+
+CloseSearch Submit Skip to main contentSite NavigationResearchOverviewIndexProductOverviewChatGPTGPT-4DALLÂ·E 2Customer storiesSafety standardsAPI data privacyPricingDevelopersOverviewDocumentationAPI referenceExamplesSafetyCompanyAboutBlogCareersCharterSecuritySearch Navigation quick links Log inSign upMenu Mobile Navigation CloseSite NavigationResearchProductDevelopersSafetyCompany Quick Links Log inSign upSearch Submit New and improved embedding modelWe are excited to announce a new embedding model which is significantly more capable, cost effective, and simpler to use.Quick linksRead documentationIllustration: Ruby ChenDecember 15, 2022AuthorsRyan GreeneTed SandersLilian WengArvind NeelakantanProduct,Â AnnouncementsThe new model, text-embedding-ada-002, replaces five separate models for text search, text similarity, and code search, and outperforms our previous most capable model, Davinci, at most tasks, while being priced 99.8% lower.Embeddings are numerical representations of concepts converted to number sequences, which make it easy for computers to understand the relationships between those concepts. Since theÂ initial launchÂ of the OpenAIÂ /embeddingsÂ endpoint, many applications have incorporated embeddings to personalize, recommend, and searchÂ content.You can query theÂ /embeddingsÂ endpoint for the new model with two lines of code using ourÂ OpenAI Python Library, just like you could with previousÂ models:    import openai
+response = openai.Embedding.create(
+  input="porcine pals say",
+  model="text-embedding-ada-002"
+)import openai
+response = openai.Embedding.create(
+  input="porcine pals say",
+  model="text-embedding-ada-002"
+)
+
+print(response)
+{
+  "data": [
+    {
+      "embedding": [
+        -0.0108,
+        -0.0107,
+        0.0323,
+        ...
+        -0.0114
+      ],
+      "index": 0,
+      "object": "embedding"
+    }
+  ],
+  "model": "text-embedding-ada-002",
+  "object": "list"
+}Print responseModel improvementsStronger performance.Â text-embedding-ada-002Â outperforms all the old embedding models on text search, code search, and sentence similarity tasks and gets comparable performance on text classification. For each task category, we evaluate the models on the datasets used inÂ oldÂ embeddings.Text searchCode searchSentence similarityText classificationUnification of capabilities. We have significantly simplified the interface of theÂ /embeddingsÂ endpoint by merging the five separate models shown above (text-similarity,Â text-search-query,Â text-search-doc,Â code-search-textÂ andÂ code-search-code) into a single new model. This single representation performs better than our previous embedding models across a diverse set of text search, sentence similarity, and code searchÂ benchmarks.Longer context.Â The context length of the new model is increased by a factor of four, from 2048 to 8192, making it more convenient to work with longÂ documents.Smaller embedding size.Â The new embeddings have only 1536 dimensions, one-eighth the size ofÂ davinci-001Â embeddings, making the new embeddings more cost effective in working with vectorÂ databases.Reduced price.Â We have reduced the price of new embedding models by 90% compared to old models of the same size. The new model achieves better or similar performance as the old Davinci models at a 99.8% lowerÂ price.Overall, the new embedding model is a much more powerful tool for natural language processing and code tasks. We are excited to see how our customers will use it to create even more capable applications in their respectiveÂ fields.LimitationsThe newÂ text-embedding-ada-002Â model is not outperformingÂ text-similarity-davinci-001Â on the SentEval linear probing classification benchmark. For tasks that require training a light-weighted linear layer on top of embedding vectors for classification prediction, we suggest comparing the new model toÂ text-similarity-davinci-001Â and choosing whichever model gives optimalÂ performance.Check theÂ Limitations & RisksÂ section in the embeddings documentation for general limitations of our embeddingÂ models.Examples of the embeddings API in actionKalendar AIÂ is a sales outreach product that uses embeddings to match the right sales pitch to the right customers out of a dataset containing 340M profiles. This automation relies on similarity between embeddings of customer profiles and sale pitches to rank up most suitable matches, eliminating 40â56% of unwanted targeting compared to their oldÂ approach.Notion, the online workspace company, will use OpenAIâs new embeddings to improve Notion search beyond todayâs keyword matchingÂ systems.Read documentationAuthorsRyan GreeneView all articlesTed SandersView all articlesLilian WengView all articlesArvind NeelakantanView all articlesResearchOverviewIndexProductOverviewChatGPTGPT-4DALLÂ·E 2Customer storiesSafety standardsAPI data privacyPricingSafetyOverviewCompanyAboutBlogCareersCharterSecurityOpenAI Â© 2015âââ2023Terms & policiesPrivacy policyBrand guidelinesSocialTwitterYouTubeGitHubSoundCloudLinkedInBack to top

@@ -1,0 +1,17 @@
+
+
+
+Spam detection in the physical world
+
+
+
+
+
+
+
+
+
+
+
+
+CloseSearch Submit Skip to main contentSite NavigationResearchOverviewIndexProductOverviewChatGPTGPT-4DALLÂ·E 2Customer storiesSafety standardsAPI data privacyPricingDevelopersOverviewDocumentationAPI referenceExamplesSafetyCompanyAboutBlogCareersCharterSecuritySearch Navigation quick links Log inSign upMenu Mobile Navigation CloseSite NavigationResearchProductDevelopersSafetyCompany Quick Links Log inSign upSearch Submit Spam detection in the physical worldWeâve created the worldâs first Spam-detecting AI trained entirely in simulation and deployed on a physical robot.April 1, 2017Sim-to-real,Â Computer vision,Â Domain randomization,Â Robotics,Â ConclusionSim-to-real transferDeep learning-driven robotic systems are bottlenecked by data collection: itâs extremely costly to obtain the hundreds of thousands of images needed to train the perception system alone. Itâs cheap to generate simulated data, but simulations diverge enough from reality that people typically retrain models from scratch when moving to the physicalÂ world.WeâveÂ shownÂ that domain randomization, an existing idea for making detectors trained on simulated images transfer to real images, works well for cluttered scenes. The method is simple: we randomly vary colors, textures, lighting conditions, and camera settings in simulated scenes. The resulting dataset is sufficiently variable to allow a deepÂ neural network trained on it to generalize toÂ reality.Randomly generated scenes. Each frame contains Spam, often hidden among distractor objects. Our Spam model is sourced from the YCB dataset.Our implementationThe detector is a neural network based on theÂ VGG16Â architecture that predicts the precise 3-D location of Spam in simulated images. Though it has only been trained on simulated scenes, the resulting network is able to detect Spam in real images, even in the presence of never-before-seen âdistractorâ items arranged in randomÂ configurations.The video below demonstrates the system inÂ action:Physical spam detection0:57Future workIn the future, we plan to extend this work to detectÂ phishingÂ and to defend againstÂ adversarialÂ Spam.If youâd like to sink your teeth into compelling applied research problems like Spam detection, considerÂ joining usÂ atÂ OpenAI.AuthorsRachel FongJosh TobinJack ClarkAlex RayJonas SchneiderPieter AbbeelWojciech ZarembaResearchOverviewIndexProductOverviewChatGPTGPT-4DALLÂ·E 2Customer storiesSafety standardsAPI data privacyPricingSafetyOverviewCompanyAboutBlogCareersCharterSecurityOpenAI Â© 2015âââ2023Terms & policiesPrivacy policyBrand guidelinesSocialTwitterYouTubeGitHubSoundCloudLinkedInBack to top

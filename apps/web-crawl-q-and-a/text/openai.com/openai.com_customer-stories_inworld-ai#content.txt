@@ -1,0 +1,17 @@
+
+
+
+Inworld AI
+
+
+
+
+
+
+
+
+
+
+
+
+CloseSearch Submit Skip to main contentSite NavigationResearchOverviewIndexProductOverviewChatGPTGPT-4DALLÂ·E 2Customer storiesSafety standardsAPI data privacyPricingDevelopersOverviewDocumentationAPI referenceExamplesSafetyCompanyAboutBlogCareersCharterSecuritySearch Navigation quick links Log inSign upMenu Mobile Navigation CloseSite NavigationResearchProductDevelopersSafetyCompany Quick Links Log inSign upSearch Submit Inworld AIUsing GPT-3 to create the next generation of AI-powered characters.January 1, 2023LanguageInworld is setting a new standard for AI characters by powering the âbrainsâ that inspire their personalities, dialogue, and reactions. Using GPT-3, Inworld is making this next generation of characters more engaging.Powering the âbrainsâ of non-playable charactersBeing transported to another time and space, or simply being a different version of ourselves are some of the many reasons people are drawn to their favorite video games and stories.Rich, nuanced, and well-written characters are core parts of any good story. Using Inworld, creators can bring a non-playable character to life in minutes, commonly known as a NPC, using natural language to describe the characterâs personality. They can also tailor elements of cognition and behavior, including the characterâs goals, motivations, manners of speech, memories, and even voice.D&D Game Master, designed by Gary-ArnesonZeus, designed by Lowkey_LokiQueen of DragonsHowever, thereâs always been a challenge with NPCs, who are limited to a predefined script that is activated based on what the main character says or does. In other words, the rich characters who players befriend or battle are only as complex as the scripts created for them.With GPT-3, we had more time and creative energy to invest in our proprietary technology that powers the next generation of NPCs.Kylan Gibbs, Chief Product Officer and Co-founder of InworldBuilding on strong foundations with GPT-3As a startup with limited resources, building language models from the ground up would have been time consuming and expensive for Inworld. OpenAIâs GPT-3 language model provided them a foundation on which to build their own proprietary tech stack. By leveraging GPT-3 as one of 20 machine learning models, Inworld was able to build out differentiated aspects of charactersâ personalities including emotions, memory, and behaviors.Private Detective, designed byProfMoriartyOcean, designed by AnonAnonDiscord, designed by Garry12ggâ[Using GPT-3] allowed us to focus on other areas because we didnât have to innovate from the ground up,â said Kylan Gibbs, Chief Product Officer and Co-founder of Inworld. âIt allowed us to take advantage of the work and foundational model OpenAI provided to make NPC dialogue and behavior more relevant..ââItâs no secret that startups function with a small and mighty team, so we wanted to make sure our teamâs time was focused on the technology that would help us push the boundaries of storytelling and character personalities,â said Gibbs. âWith GPT-3, we had more time and creative energy to invest in our proprietary technology that powers the next generation of NPCs.âVisit InworldResearchOverviewIndexProductOverviewChatGPTGPT-4DALLÂ·E 2Customer storiesSafety standardsAPI data privacyPricingSafetyOverviewCompanyAboutBlogCareersCharterSecurityOpenAI Â© 2015âââ2023Terms & policiesPrivacy policyBrand guidelinesSocialTwitterYouTubeGitHubSoundCloudLinkedInBack to top

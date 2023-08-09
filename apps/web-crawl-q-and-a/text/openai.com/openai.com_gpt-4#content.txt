@@ -1,0 +1,37 @@
+
+
+
+GPT-4
+
+
+
+
+
+
+
+
+
+
+CloseSearch Submit Skip to main contentSite NavigationResearchOverviewIndexProductOverviewChatGPTGPT-4DALLÂ·E 2Customer storiesSafety standardsAPI data privacyPricingDevelopersOverviewDocumentationAPI referenceExamplesSafetyCompanyAboutBlogCareersCharterSecuritySearch Navigation quick links Log inSign upMenu Mobile Navigation CloseSite NavigationResearchProductDevelopersSafetyCompany Quick Links Log inSign upSearch Submit GPT-4 is OpenAIâs most advanced system, producing safer and more useful responsesQuick linksTry on ChatGPT PlusView GPT-4 researchPlay videoGPT-4 can solve difficult problems with greater accuracy, thanks to its broader general knowledge and problem solving abilities.TabsCreativityVisual inputLonger contextGPT-4 is more creative and collaborative than ever before. It can generate, edit, and iterate with users on creative and technical writing tasks, such as composing songs, writing screenplays, or learning a userâs writing style.InputExplain the plot of Cinderella in a sentence where each word has to begin with the next letter in the alphabet from A to Z, without repeating any letters.OutputA beautiful Cinderella, dwelling eagerly, finally gains happiness; inspiring jealous kin, love magically nurtures opulent prince; quietly rescues, slipper triumphs, uniting very wondrously, xenial youth zealously.GPT-4 can accept images as inputs and generate captions, classifications, and analyses. InputWhat can I make with these ingredients?OutputThere are many options for what you can make with these ingredients! Some possibilities include:
+
+- Pancakes or waffles
+- Crepes
+- French toast
+- Omelette or frittata
+- Quiche
+- Custard or pudding
+- Cake or cupcakes
+- Muffins or bread- Cookies or biscuits
+
+These are just a few examples, but the possibilities are endless!GPT-4 is capable of handling over 25,000 words of text, allowing for use cases like long form content creation, extended conversations, and document search and analysis.Input[Text from: https://en.wikipedia.org/wiki/Rihanna]
+
+Describe her Super Bowl performance and what made it special.OutputRihanna's Super Bowl LVII halftime show performance was special for a number of reasons. For one, it marked her first live performance in over five years, and it was her first time headlining the Super Bowl halftime show. Additionally, she made history by becoming the first person to perform at the Super Bowl while pregnant. The show itself was critically acclaimed, with many praising her high-energy performance and impressive vocals. It also garnered a massive viewership, becoming the second most-watched halftime show in history.GPT-4 surpasses ChatGPT in its advanced reasoning capabilities.ChatGPTInputAndrew is free from 11 am to 3 pm, Joanne is free from noon to 2 pm and then 3:30 pm to 5 pm. Hannah is available at noon for half an hour, and then 4 pm to 6 pm. What are some options for start times for a 30 minute meeting for Andrew, Hannah, and Joanne?OutputHere is a list of their availability:
+- Andrew: 11 am to 3 pm
+- Joanne: noon to 2 pm, and 3:30 pm to 5 pm
+- Hannah: noon to 12:30 pm, and 4 pm to 6 pm
+
+Based on their availability, there is a 30-minute window where all three of them are available, which is from 4 pm to 4:30 pm. So, the meeting can be scheduled at 4 pm.GPT-4InputAndrew is free from 11 am to 3 pm, Joanne is free from noon to 2 pm and then 3:30 pm to 5 pm. Hannah is available at noon for half an hour, and then 4 pm to 6 pm. What are some options for start times for a 30 minute meeting for Andrew, Hannah, and Joanne?OutputAndrew: 11 am - 3 pm
+Joanne: 12 pm - 2 pm, 3:30 pm - 5 pm
+Hannah: 12 pm - 12:30 pm, 4 pm - 6 pm
+
+Common availability for a 30-minute meeting: 12 pm - 12:30 pmGPT-4 outperforms ChatGPT by scoring in higher approximate percentiles among test-takers.Uniform Bar Exam10thChatGPT90thGPT-4Biology Olympiad31stChatGPT99thGPT-4 (with vision)Following the research path from GPT, GPT-2, and GPT-3, our deep learning approach leverages more data and more computation to create increasingly sophisticated and capable language models.We spent 6 months making GPT-4 safer and more aligned. GPT-4 is 82% less likely to respond to requests for disallowed content and 40% more likely to produce factual responses than GPT-3.5 on our internal evaluations.Safety & alignmentTraining with human feedbackWe incorporated more human feedback, including feedback submitted by ChatGPT users, to improve GPT-4âs behavior. We also worked with over 50 experts for early feedback in domains including AI safety and security.Continuous improvement from real-world useWeâve applied lessons from real-world use of our previous models into GPT-4âs safety research and monitoring system. Like ChatGPT, weâll be updating and improving GPT-4 at a regular cadence as more people use it.GPT-4-assisted safety researchGPT-4âs advanced reasoning and instruction-following capabilities expedited our safety work. We used GPT-4 to help create training data for model fine-tuning and iterate on classifiers across training, evaluations, and monitoring.Built with GPT-4Weâve collaborated with organizations building innovative products with GPT-4.DuolingoGPT-4 deepens the conversation on Duolingo.Be My EyesBe My Eyes uses GPT-4 to transform visual accessibility.StripeStripe leverages GPT-4 to streamline user experience and combat fraud.Morgan StanleyMorgan Stanley wealth management deploys GPT-4 to organize its vast knowledge base.Khan AcademyKhan Academy explores the potential for GPT-4 in a limited pilot program.Government of IcelandHow Iceland is using GPT-4 to preserve its language.More on GPT-4ResearchGPT-4 is the latest milestone in OpenAIâs effort in scaling up deep learning.View GPT-4 researchInfrastructureGPT-4 was trained on Microsoft Azure AI supercomputers. Azureâs AI-optimized infrastructure also allows us to deliver GPT-4 to users around the world.LimitationsGPT-4 still has many known limitations that we are working to address, such as social biases, hallucinations, and adversarial prompts. We encourage and facilitate transparency, user education, and wider AI literacy as society adopts these models. We also aim to expand the avenues of input people have in shaping our models.AvailabilityGPT-4 is available on ChatGPT Plus and as an API for developers to build applications and services.Weâre excited to see how people use GPT-4 as we work towards developing technologies that empower everyone.View contributionsTry on ChatGPT PlusView GPT-4 researchResearchOverviewIndexProductOverviewChatGPTGPT-4DALLÂ·E 2Customer storiesSafety standardsAPI data privacyPricingSafetyOverviewCompanyAboutBlogCareersCharterSecurityOpenAI Â© 2015âââ2023Terms & policiesPrivacy policyBrand guidelinesSocialTwitterYouTubeGitHubSoundCloudLinkedInBack to top

@@ -1,0 +1,45 @@
+
+
+
+Customizing GPT-3 for your application
+
+
+
+
+
+
+
+
+
+
+
+
+CloseSearch Submit Skip to main contentSite NavigationResearchOverviewIndexProductOverviewChatGPTGPT-4DALLÂ·E 2Customer storiesSafety standardsAPI data privacyPricingDevelopersOverviewDocumentationAPI referenceExamplesSafetyCompanyAboutBlogCareersCharterSecuritySearch Navigation quick links Log inSign upMenu Mobile Navigation CloseSite NavigationResearchProductDevelopersSafetyCompany Quick Links Log inSign upSearch Submit Customizing GPT-3 for your applicationFine-tune with a singleÂ command.Illustration: Ruby ChenDecember 14, 2021AuthorsRachel LimMichael WuLuke MillerProductDevelopers can now fine-tune GPT-3 on their own data, creating a custom version tailored to their application. Customizing makes GPT-3 reliable for a wider variety of use cases and makes running the model cheaper andÂ faster.You can use an existing dataset of virtually any shape and size, or incrementally add data based on user feedback. With fine-tuning, one API customer was able to increase correct outputs from 83% to 95%. By adding new data from their product each week, another reduced error rates byÂ 50%.To get started, just run a single command in the OpenAI command line tool with a file you provide. Your custom version will start training and then be available immediately in ourÂ API.Read documentationLast year weÂ trained GPT-3Â and made it available inÂ our API. With only a few examples, GPT-3 can perform a wide variety ofÂ natural language tasks, a concept called few-shot learning or prompt design. Customizing GPT-3 can yield even better results because you can provide many more examples than whatâs possible with prompt design. You can customize GPT-3 for your application with one command and use it immediately in our API: openai api fine_tunes.create -tSee howIt takes less than 100 examples to start seeing the benefits of fine-tuning GPT-3 and performance continues to improve as you add more data. InÂ research published last June, we showed how fine-tuning with less than 100 examples can improve GPT-3âs performance on certain tasks. Weâve also found that each doubling of the number of examples tends to improve qualityÂ linearly.With one of our most challenging research datasets,Â grade school math problems, fine-tuning GPT-3 improves accuracy by 2 to 4x over whatâs possible with promptÂ design. Two sizes of GPT-3 models, Curie and Davinci, were fine-tuned on 8,000 examples from one of our most challenging research datasets, Grade School Math problems. We compare the modelsâ ability to solve problems when 10 completions are created. Customizing GPT-3 improves the reliability of output, offering more consistent results that you can count on for production use-cases. One customer found that customizing GPT-3 reduced the frequency of unreliable outputs from 17% to 5%. Since custom versions of GPT-3 are tailored to your application, the prompt can be much shorter, reducing costs and improvingÂ latency.Whether text generation, summarization, classification, or any other natural language task GPT-3 is capable of performing, customizing GPT-3 will improveÂ performance.Apps powered by customized versions of GPT-3Keeper TaxÂ helps independent contractors and freelancers with their taxes. After a customer links their financial accounts, Keeper Tax uses various models to extract text and classify transactions. Using the classified data, Keeper Tax identifies easy-to-miss tax write-offs and helps customers file their taxes directly from the app. By customizing GPT-3, Keeper Tax is able to continuously improve results. Once a week, Keeper Tax adds around 500 new training examples to fine-tune their model, which is leading to about a 1% accuracy improvement each week, increasing accuracy from 85% toÂ 93%.ViableÂ helps companies get insights from their customer feedback. By customizing GPT-3, Viable is able to transform massive amounts of unstructured data into readable natural language reports, highlighting top customer complaints, compliments, requests, and questions. Customizing GPT-3 has increased the reliability of Viableâs reports. By using a customized version of GPT-3, accuracy in summarizing customer feedback has improved from 66% to 90%. The result is tangible, intuitive information that customers need to inform their productÂ decisions.Sana LabsÂ is a global leader in the development and application of AI to learning. The Sana learning platform powers personalized learning experiences for businesses by leveraging the latest ML breakthroughs to tailor the content for each individual. By customizing GPT-3 with their data, Sanaâs question and content generation went from grammatically correct but general responses to highly accurate outputs. This yielded a 60% improvement, enabling fundamentally more personalized and effective experiences for theirÂ learners.ElicitÂ is an AI research assistant that helps people directly answer research questions using findings from academic papers. The tool finds the most relevant abstracts from a large corpus of research papers, then applies a customized version of GPT-3 to generate the claim (if any) that the paper makes about the question. A custom version of GPT-3 outperformed prompt design across three important measures: results were easier to understand (a 24% improvement), more accurate (a 17% improvement), and better overall (a 33%Â improvement).All API customers can customize GPT-3 today. Sign-up and get started with theÂ fine-tuningÂ documentation. How to customize GPT-3 for your application Set up Install the openai python-based client from your terminal: pip install --upgrade openai Set your API key as an environment variable: export OPENAI_API_KEY=<api_key>Train a custom model Fine-tune the Ada model on a demo dataset for translating help messages from Spanish to English. openai api fine_tunes.create -m ada --n_epochs 2 \
+    -t https://cdn.openai.com/API/train-demo.jsonlopenai api fine_tunes.create -m ada --n_epochs 2 \
+    -t https://cdn.openai.com/API/train-demo.jsonl
+
+---
+  
+(Ctrl-C will interrupt the stream, but not cancel the fine-tune)
+[2021-12-08 12:11:30] Created fine-tune: ft-gK9R3N3lDQYQJD0SXqlF8Fnc
+[2021-12-08 12:11:40] Fine-tune costs $0.01
+[2021-12-08 12:11:40] Fine-tune enqueued. Queue number: 0
+[2021-12-08 12:11:45] Fine-tune started
+[2021-12-08 12:12:58] Completed epoch 1/2
+[2021-12-08 12:13:56] Completed epoch 2/2
+[2021-12-08 12:14:26] Uploaded model: ada:ft-org-2021-12-08-20-14-25
+[2021-12-08 12:14:29] Uploaded result file: file-QvY81nzrOhXMenjMS5OlPeBW
+[2021-12-08 12:14:30] Fine-tune succeeded
+
+Job complete! Status: succeeded ð
+Try out your fine-tuned model:
+
+openai api completions.create -m ada:ft-org-2021-12-08-20-14-25 -p <YOUR_PROMPT>Use the custom model Ask your customized model for a translation. openai api completions.create -m <model_ID> \
+  --max-tokens 30 --temperature 0 --stop â###â \
+  -p $'Conecte la PS3 y vaya a ConfiguraciÃ³n>Configuraciones de Red, seleccione la red y escriba sus credenciales.\nEnglish translation:'openai api completions.create -m <model_ID> \
+  --max-tokens 30 --temperature 0 --stop â###â \
+  -p $'Conecte la PS3 y vaya a ConfiguraciÃ³n>Configuraciones de Red, seleccione la red y escriba sus credenciales.\nEnglish translation:'
+
+---
+  
+Conecte la PS3 y vaya a ConfiguraciÃ³n>Configuraciones de Red, seleccione la red y escriba sus credenciales.\nEnglish translation: Connect the PS3 and go to Settings> Accounts Settings, select the network and write your credentials.%AuthorsRachel LimView all articlesMichael WuView all articlesLuke MillerView all articlesResearchOverviewIndexProductOverviewChatGPTGPT-4DALLÂ·E 2Customer storiesSafety standardsAPI data privacyPricingSafetyOverviewCompanyAboutBlogCareersCharterSecurityOpenAI Â© 2015âââ2023Terms & policiesPrivacy policyBrand guidelinesSocialTwitterYouTubeGitHubSoundCloudLinkedInBack to top

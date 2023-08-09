@@ -8,6 +8,7 @@ Each provider has their own named directory, with a standard notebook to introdu
 
 ## Guides & deep dives
 - [AnalyticDB](https://www.alibabacloud.com/help/en/analyticdb-for-postgresql/latest/get-started-with-analyticdb-for-postgresql)
+- [AzureSearch](https://learn.microsoft.com/azure/search/search-get-started-vector)
 - [Chroma](https://docs.trychroma.com/getting-started)
 - [Hologres](https://www.alibabacloud.com/help/en/hologres/latest/procedure-to-use-hologres)
 - [Kusto](https://learn.microsoft.com/en-us/azure/data-explorer/web-query-data)

@@ -187,8 +187,10 @@ for file in os.listdir("text/" + domain + "/"):
     with open("text/" + domain + "/" + file, "r", encoding="UTF-8") as f:
         text = f.read()
 
-        # Omit the first 11 lines and the last 4 lines, then replace -, _, and #update with spaces.
-        texts.append((file[11:-4].replace('-',' ').replace('_', ' ').replace('#update',''), text))
+        # Omit unnecessary characters from the file names, then replace -, _, and #update with spaces.
+        parts = domain.split('.')
+        num_char = len(parts[1])
+        texts.append((file[len(domain)+1:-(num_char+1)].replace('-',' ').replace('_', ' ').replace('#update',''), text))
 
 # Create a dataframe from the list of texts
 df = pd.DataFrame(texts, columns = ['fname', 'text'])

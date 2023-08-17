@@ -94,6 +94,7 @@ People are writing great tools and papers for improving outputs from GPT. Here a
 - [LlamaIndex](https://github.com/jerryjliu/llama_index): A Python library for augmenting LLM apps with data.
 - [Arthur Shield](https://www.arthur.ai/get-started): A paid product for detecting toxicity, hallucination, prompt injection, etc.
 - [LMQL](https://lmql.ai): A programming language for LLM interaction with support for typed prompting, control flow, constraints, and tools.
+- [LLM App](https://github.com/pathwaycom/llm-app): A Python library for building real-time LLM-enabled data pipelines without a vector database.
 
 ### Prompting guides
 

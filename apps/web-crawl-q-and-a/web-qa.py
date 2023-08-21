@@ -135,6 +135,7 @@ def crawl(url):
 
         # Get the next URL from the queue
         url = queue.pop()
+       
         print(url) # for debugging and to see the progress
 
         # Convert special characters to underscores for filename

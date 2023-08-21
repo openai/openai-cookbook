@@ -188,7 +188,17 @@ for file in os.listdir("text/" + domain + "/"):
         text = f.read()
 
         # Omit the first 11 lines and the last 4 lines, then replace -, _, and #update with spaces.
-        texts.append((file[11:-4].replace('-',' ').replace('_', ' ').replace('#update',''), text))
+        # texts.append((file[11:-4].replace('-',' ').replace('_', ' ').replace('#update',''), text))
+        text_dir = os.path.join("text", domain)
+        if not os.path.exists(text_dir):
+            os.makedirs(text_dir)
+        file_path = os.path.join(text_dir, f"{filename}.txt")
+        parts = domain.split('.')
+        number_of_characters_after_dot = len(parts[1])
+
+
+        filename = file[len(domain) + 1: -4 - number_of_characters_after_dot]
+        texts.append((filename.replace('-',' ').replace('_', ' ').replace('#update',''), text))
 
 # Create a dataframe from the list of texts
 df = pd.DataFrame(texts, columns = ['fname', 'text'])

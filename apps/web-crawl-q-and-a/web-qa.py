@@ -137,8 +137,11 @@ def crawl(url):
         url = queue.pop()
         print(url) # for debugging and to see the progress
 
+        # Convert special characters to underscores for filename
+        filename = url[8:].replace("/", "_").replace("?", "_").replace("=", "_")
+
         # Save text from the url to a <url>.txt file
-        with open('text/'+local_domain+'/'+url[8:].replace("/", "_") + ".txt", "w", encoding="UTF-8") as f:
+        with open('text/' + local_domain + '/' + filename + ".txt", "w", encoding="UTF-8") as f:
 
             # Get the text from the URL using BeautifulSoup
             soup = BeautifulSoup(requests.get(url).text, "html.parser")

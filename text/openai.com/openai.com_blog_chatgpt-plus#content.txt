@@ -1,0 +1,17 @@
+
+
+
+Introducing ChatGPT Plus
+
+
+
+
+
+
+
+
+
+
+
+
+CloseSearch Submit Skip to main contentSite NavigationResearchOverviewIndexProductOverviewChatGPTGPT-4DALLÂ·E 2Customer storiesSafety standardsAPI data privacyPricingDevelopersOverviewDocumentationAPI referenceExamplesSafetyCompanyAboutBlogCareersCharterSecuritySearch Navigation quick links Log inSign upMenu Mobile Navigation CloseSite NavigationResearchProductDevelopersSafetyCompany Quick Links Log inSign upSearch Submit Introducing ChatGPT PlusWeâre launching a pilot subscription plan for ChatGPT, a conversational AI that can chat with you, answer follow-up questions, and challenge incorrectÂ assumptions.Quick linksRead about ChatGPTIllustration: Ruby ChenFebruary 1, 2023AuthorsOpenAI Product,Â AnnouncementsThe new subscription plan, ChatGPT Plus, will be available forÂ $20/month, and subscribers will receive a number ofÂ benefits:General access to ChatGPT, even during peakÂ timesFaster responseÂ timesPriority access to new features andÂ improvementsChatGPT Plus is available to customers in the United States and around the world.[^footnote-expansion-update]We love our free users and will continue to offer free access to ChatGPT. By offering this subscription pricing, we will be able to help support free access availability to as many people asÂ possible.Learning from the research previewWe launched ChatGPT as a research preview so we could learn more about the systemâs strengths and weaknesses and gather user feedback to help us improve upon its limitations. Since then, millions of people have given us feedback, weâve made severalÂ important updatesÂ and weâve seen users find value across a range of professional use-cases, including drafting & editing content, brainstorming ideas, programming help, and learning newÂ topics.Our plans for the futureWe plan to refine and expand this offering based on your feedback and needs. Weâll also soon be launching the (ChatGPT API waitlist), and we are actively exploring options for lower-cost plans, business plans, and data packs for moreÂ availability.AuthorsOpenAI View all articlesResearchOverviewIndexProductOverviewChatGPTGPT-4DALLÂ·E 2Customer storiesSafety standardsAPI data privacyPricingSafetyOverviewCompanyAboutBlogCareersCharterSecurityOpenAI Â© 2015âââ2023Terms & policiesPrivacy policyBrand guidelinesSocialTwitterYouTubeGitHubSoundCloudLinkedInBack to top

@@ -1,0 +1,17 @@
+
+
+
+Dota 2
+
+
+
+
+
+
+
+
+
+
+
+
+CloseSearch Submit Skip to main contentSite NavigationResearchOverviewIndexProductOverviewChatGPTGPT-4DALLÂ·E 2Customer storiesSafety standardsAPI data privacyPricingDevelopersOverviewDocumentationAPI referenceExamplesSafetyCompanyAboutBlogCareersCharterSecuritySearch Navigation quick links Log inSign upMenu Mobile Navigation CloseSite NavigationResearchProductDevelopersSafetyCompany Quick Links Log inSign upSearch Submit Dota 2Weâve created a bot which beats the worldâs top professionals at 1v1 matches of Dota 2 under standard tournament rules. The bot learned the game from scratch by self-play, and does not use imitation learning or tree search. This is a step towards building AI systems which accomplish well-defined goals in messy, complicated situations involving real humans.August 11, 2017More resourcesRewatch live eventDota 2,Â Reinforcement learning,Â Self-play,Â Games,Â OpenAI FiveOpenAI + Dota 23:20Today we playedÂ DendiÂ on mainstage atÂ The International, winning a best-of-three match. Over the past week, our bot was undefeated against many top professionals includingÂ SumaiLÂ (top 1v1 player in the world) andÂ ArteezyÂ (top overall player in theÂ world).Dota 1v1 is a complex game with hidden information. Agents must learn to plan, attack, trick, and deceive their opponents. The correlation between player skill and actions-per-minute is not strong, and in fact, our AIâs actions-per-minute are comparable to that of an average humanÂ player.Learned Bot Behaviors1:56Success in Dota requires players to develop intuitions about their opponents and plan accordingly. In the above video you can see that our bot has learnedâentirely via self-playâto predict where other players will move, to improvise in response to unfamiliar situations, and how to influence the other playerâs allied units to help itÂ succeed.The full game of Dota is played by two teams of five. Each player chooses from a hundred heroes and hundreds of items. Our next step is to create a team of Dota 2 bots which can compete and collaborate with the top human teams. If youâd like to work on the next phase of the project, considerÂ joiningÂ OpenAI.AuthorsOpenAI ResearchOverviewIndexProductOverviewChatGPTGPT-4DALLÂ·E 2Customer storiesSafety standardsAPI data privacyPricingSafetyOverviewCompanyAboutBlogCareersCharterSecurityOpenAI Â© 2015âââ2023Terms & policiesPrivacy policyBrand guidelinesSocialTwitterYouTubeGitHubSoundCloudLinkedInBack to top

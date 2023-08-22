@@ -25,3 +25,5 @@ with your local Jupyter engine or as Colab notebooks:
 | Search/generate quotes | Plain Cassandra language | _coming soon_ | _coming soon_ |
 | Search/generate quotes | LangChain | _coming soon_ | _coming soon_ |
 | Search/generate quotes | LlamaIndex | _coming soon_ | _coming soon_ |
+
+![3_vector_space](https://user-images.githubusercontent.com/14221764/262321363-c8c625c1-8be9-450e-8c68-b1ed518f990d.png)

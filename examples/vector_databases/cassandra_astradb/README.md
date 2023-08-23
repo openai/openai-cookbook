@@ -10,7 +10,7 @@ are designed to work equally well on it as soon as the vector capabilities
 get released.
 
 If you want to know more about Astra DB and its Vector Search capabilities,
-head over to [astra.datastax.com](https://astra.datastax.com) or try out one
+head over to [astra.datastax.com](https://docs.datastax.com/en/astra-serverless/docs/vector-search/overview.html) or try out one
 of these hands-on notebooks straight away:
 
 ### Example notebooks
@@ -22,8 +22,10 @@ with your local Jupyter engine or as Colab notebooks:
 | Use case | Framework | Notebook | Google Colab |
 | -------- | --------- | -------- | ------------ |
 | Search/generate quotes | CassIO | [Notebook](./Philosophical_Quotes_cassIO.ipynb) | [![Colab](https://colab.research.google.com/assets/colab-badge.svg)](https://colab.research.google.com/github/hemidactylus/openai-cookbook/blob/SL-cassandra_astra_vector/examples/vector_databases/cassandra_astradb/Philosophical_Quotes_cassIO.ipynb) |
-| Search/generate quotes | Plain Cassandra language | _coming soon_ | _coming soon_ |
+| Search/generate quotes | Plain Cassandra language | [Notebook](./Philosophical_Quotes_CQL.ipynb) | [![Colab](https://colab.research.google.com/assets/colab-badge.svg)](https://colab.research.google.com/github/hemidactylus/openai-cookbook/blob/SL-cassandra_astra_vector/examples/vector_databases/cassandra_astradb/Philosophical_Quotes_CQL.ipynb) |
 | Search/generate quotes | LangChain | _coming soon_ | _coming soon_ |
 | Search/generate quotes | LlamaIndex | _coming soon_ | _coming soon_ |
+
+### Vector similarity, visual representation
 
 ![3_vector_space](https://user-images.githubusercontent.com/14221764/262321363-c8c625c1-8be9-450e-8c68-b1ed518f990d.png)

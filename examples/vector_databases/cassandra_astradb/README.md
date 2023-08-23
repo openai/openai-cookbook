@@ -21,8 +21,8 @@ with your local Jupyter engine or as Colab notebooks:
 
 | Use case | Framework | Notebook | Google Colab |
 | -------- | --------- | -------- | ------------ |
-| Search/generate quotes | CassIO | [Notebook](./Philosophical_Quotes_cassIO.ipynb) | [![Colab](https://colab.research.google.com/assets/colab-badge.svg)](https://colab.research.google.com/github/hemidactylus/openai-cookbook/blob/SL-cassandra_astra_vector/examples/vector_databases/cassandra_astradb/Philosophical_Quotes_cassIO.ipynb) |
-| Search/generate quotes | Plain Cassandra language | [Notebook](./Philosophical_Quotes_CQL.ipynb) | [![Colab](https://colab.research.google.com/assets/colab-badge.svg)](https://colab.research.google.com/github/hemidactylus/openai-cookbook/blob/SL-cassandra_astra_vector/examples/vector_databases/cassandra_astradb/Philosophical_Quotes_CQL.ipynb) |
+| Search/generate quotes | CassIO | [Notebook](./Philosophical_Quotes_cassIO.ipynb) | [![Colab](https://colab.research.google.com/assets/colab-badge.svg)](https://colab.research.google.com/github/openai/openai-cookbook/blob/main/examples/vector_databases/cassandra_astradb/Philosophical_Quotes_cassIO.ipynb) |
+| Search/generate quotes | Plain Cassandra language | [Notebook](./Philosophical_Quotes_CQL.ipynb) | [![Colab](https://colab.research.google.com/assets/colab-badge.svg)](https://colab.research.google.com/github/openai/openai-cookbook/blob/main/examples/vector_databases/cassandra_astradb/Philosophical_Quotes_CQL.ipynb) |
 
 ### Vector similarity, visual representation
 

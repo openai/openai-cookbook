@@ -1,0 +1,7 @@
+streamlit
+jsonlines
+tiktoken
+numpy
+requests
+python-dotenv
+streamlit_extras

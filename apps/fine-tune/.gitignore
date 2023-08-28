@@ -1,0 +1,26 @@
+# Compiled python files
+*.pyc
+*.pyo
+*.egg-info
+*.cache
+output.jsonl
+# Directories
+__pycache__/
+*.venv/
+*.virtualenv/
+build/
+dist/
+bak/
+*.egg-info/
+
+# Spyder project settings
+.spyderproject
+.spyproject
+
+# OS generated files
+.DS_Store
+.DS_Store?
+._*
+.Spotlight-V100
+.Trashes
+.env

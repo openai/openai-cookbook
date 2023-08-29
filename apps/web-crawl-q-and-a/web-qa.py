@@ -16,6 +16,7 @@ import openai
 import numpy as np
 from openai.embeddings_utils import distances_from_embeddings, cosine_similarity
 from ast import literal_eval
+import hashlib
 
 # Regex pattern to match a URL
 HTTP_URL_PATTERN = r'^http[s]{0,1}://.+$'
@@ -138,11 +139,19 @@ def crawl(url):
        
         print(url) # for debugging and to see the progress
 
-        # Convert special characters to underscores for filename
-        filename = url[8:].replace("/", "_").replace("?", "_").replace("=", "_")
+        # Create a hash of the URL
+        hash_object = hashlib.md5(url.encode())
+        hash_hex = hash_object.hexdigest()
+
+        # Create the directories if they don't exist
+        text_dir = os.path.join('text', local_domain)
+        if not os.path.exists(text_dir):
+            os.makedirs(text_dir)
+
 
         # Save text from the url to a <url>.txt file
-        with open('text/' + local_domain + '/' + filename + ".txt", "w", encoding="UTF-8") as f:
+        with open(os.path.join(text_dir, hash_hex + ".txt"), "w", encoding="UTF-8") as f:
+
 
             # Get the text from the URL using BeautifulSoup
             soup = BeautifulSoup(requests.get(url).text, "html.parser")

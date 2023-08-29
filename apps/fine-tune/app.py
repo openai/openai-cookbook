@@ -13,6 +13,7 @@ if os.path.exists('.env'):
 
 else:
     OPENAI_API_KEY = None
+    ORG_ID = None
 
 st.header('Fine-tune OpenAI & test the responses')
 

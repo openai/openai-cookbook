@@ -1,0 +1,2590 @@
+{
+    "source": "Adapted from this Kaggle dataset: https://www.kaggle.com/datasets/mertbozkurt5/quotes-by-philosophers (License: CC BY-NC-SA 4.0)",
+    "quotes": {
+        "aristotle": [
+            {
+                "body": "True happiness comes from gaining insight and growing into your best possible self. Otherwise all you're having is immediate gratification pleasure, which is fleeting and doesn't grow you as a person.",
+                "tags": [
+                    "knowledge"
+                ]
+            },
+            {
+                "body": "The roots of education are bitter, but the fruit is sweet.",
+                "tags": [
+                    "education",
+                    "knowledge"
+                ]
+            },
+            {
+                "body": "Before you heal the body you must first heal the mind",
+                "tags": [
+                    "ethics"
+                ]
+            },
+            {
+                "body": "The proof that you know something is that you are able to teach it",
+                "tags": [
+                    "education",
+                    "knowledge"
+                ]
+            },
+            {
+                "body": "Those who are not angry at the things they should be angry at are thought to be fools, and so are those who are not angry in the right way, at the right time, or with the right persons.",
+                "tags": []
+            },
+            {
+                "body": "Whatever we learn to do, we learn by actually doing it; men come to be builders, for instance, by building, and harp players by playing the harp. In the same way, by doing just acts we come to be just; by doing self-controlled acts, we come to be self-controlled ; and by doing brave acts, we become brave.",
+                "tags": [
+                    "education",
+                    "knowledge"
+                ]
+            },
+            {
+                "body": "The greatest thing by far is to be a master of metaphor; it is the one thing that cannot be learned from others; and it is also a sign of genius, since a good metaphor implies an intuitive perception of the similarity of the dissimilar.",
+                "tags": []
+            },
+            {
+                "body": "The society that loses its grip on the past is in danger, for it produces men who know nothing but the present, and who are not aware that life had been, and could be, different from what it is.",
+                "tags": [
+                    "history",
+                    "ethics",
+                    "knowledge"
+                ]
+            },
+            {
+                "body": "The man who is truly good and wise will bear with dignity whatever fortune sends, and will always make the best of his circumstances.",
+                "tags": [
+                    "knowledge",
+                    "ethics"
+                ]
+            },
+            {
+                "body": "The greatest of all pleasures is the pleasure of learning.",
+                "tags": [
+                    "knowledge",
+                    "education",
+                    "history"
+                ]
+            },
+            {
+                "body": "Fortune favours the bold.",
+                "tags": []
+            },
+            {
+                "body": "You are what you repeatedly do",
+                "tags": []
+            },
+            {
+                "body": "The quality of life is determined by its activities.",
+                "tags": []
+            },
+            {
+                "body": "You are what you do repeatedly.",
+                "tags": []
+            },
+            {
+                "body": "Anyone who has no need of anybody but himself is either a beast or a God.",
+                "tags": []
+            },
+            {
+                "body": "Love is composed of a single soul inhabiting two bodies.",
+                "tags": [
+                    "love"
+                ]
+            },
+            {
+                "body": "Love well, be loved and do something of value.",
+                "tags": [
+                    "love",
+                    "ethics"
+                ]
+            },
+            {
+                "body": "Philosophy begins with wonder.",
+                "tags": []
+            },
+            {
+                "body": "Plato is my friend, but truth is a better friend.",
+                "tags": []
+            },
+            {
+                "body": "At his best, man is the noblest of all animals; separated from law and justice he is the worst.",
+                "tags": [
+                    "ethics"
+                ]
+            },
+            {
+                "body": "A promise made must be a promise kept.",
+                "tags": [
+                    "ethics"
+                ]
+            },
+            {
+                "body": "It is better for a city to be governed by a good man than by good laws.",
+                "tags": [
+                    "politics",
+                    "ethics"
+                ]
+            },
+            {
+                "body": "Men become richer not only by increasing their existing wealth but also by decreasing their expenditure.",
+                "tags": []
+            },
+            {
+                "body": "Consider pleasures as they depart, not as they come.",
+                "tags": [
+                    "ethics"
+                ]
+            },
+            {
+                "body": "Dignity does not consist in possessing honors, but in deserving them.",
+                "tags": [
+                    "ethics"
+                ]
+            },
+            {
+                "body": "He who sees things grow from the beginning will have the best view of them.",
+                "tags": [
+                    "knowledge",
+                    "history",
+                    "ethics",
+                    "education"
+                ]
+            },
+            {
+                "body": "Happiness is the reward of virtue.",
+                "tags": [
+                    "ethics"
+                ]
+            },
+            {
+                "body": "If you would understand anything, observe its beginning and its development",
+                "tags": [
+                    "history",
+                    "knowledge"
+                ]
+            },
+            {
+                "body": "A friend is another I.",
+                "tags": []
+            },
+            {
+                "body": "He who hath many friends hath none.",
+                "tags": [
+                    "ethics"
+                ]
+            },
+            {
+                "body": "The hand is the tool of tools.",
+                "tags": []
+            },
+            {
+                "body": "Good moral character is not something that we can achieve on our own. We need a culture that supports the conditions under which self-love and friendship flourish.",
+                "tags": [
+                    "ethics"
+                ]
+            },
+            {
+                "body": "We give up leisure in order that we may have leisure, just as we go to war in order that we may have peace.",
+                "tags": [
+                    "ethics"
+                ]
+            },
+            {
+                "body": "We must be neither cowardly nor rash but courageous.",
+                "tags": [
+                    "ethics",
+                    "knowledge"
+                ]
+            },
+            {
+                "body": "The true nature of anything is what it becomes at its highest.",
+                "tags": [
+                    "knowledge"
+                ]
+            },
+            {
+                "body": "To give away money is an easy matter and in any man's power. But to decide to whom to give it and how large and when, and for what purpose and how, is neither in every man's power nor an easy matter.",
+                "tags": [
+                    "knowledge",
+                    "ethics",
+                    "politics"
+                ]
+            },
+            {
+                "body": "A man's happiness consists in the free exercise of his highest faculties.",
+                "tags": [
+                    "knowledge",
+                    "ethics",
+                    "education"
+                ]
+            },
+            {
+                "body": "For what is the best choice for each individual is the highest it is possible for him to achieve.",
+                "tags": [
+                    "knowledge",
+                    "ethics",
+                    "education"
+                ]
+            },
+            {
+                "body": "Those who act receive the prizes.",
+                "tags": [
+                    "ethics"
+                ]
+            },
+            {
+                "body": "A man becomes a friend whenever being loved he loves in return.",
+                "tags": [
+                    "love",
+                    "ethics"
+                ]
+            },
+            {
+                "body": "Character is that which reveals moral purpose, exposing the class of things a man chooses and avoids.",
+                "tags": []
+            },
+            {
+                "body": "Bad men are full of repentance.",
+                "tags": [
+                    "ethics"
+                ]
+            },
+            {
+                "body": "For we do not think that we know a thing until we are acquainted with its primary conditions or first principles, and have carried our analysis as far as its simplest elements.",
+                "tags": [
+                    "knowledge"
+                ]
+            },
+            {
+                "body": "Philosophy can make people sick.",
+                "tags": [
+                    "politics"
+                ]
+            },
+            {
+                "body": "Democracy appears to be safer and less liable to revolution than oligarchy. For in oligarchies there is the double danger of the oligarchs falling out among themselves and also with the people; but in democracies there is only the danger of a quarrel with the oligarchs. No dissension worth mentioning arises among the people themselves. And we may further remark that a government which is composed of the middle class more nearly approximates to democracy than to oligarchy, and is the safest of the imperfect forms of government.",
+                "tags": [
+                    "politics",
+                    "knowledge"
+                ]
+            },
+            {
+                "body": "Civil confusions often spring from trifles but decide great issues.",
+                "tags": [
+                    "ethics",
+                    "politics"
+                ]
+            },
+            {
+                "body": "All men by nature desire knowledge.",
+                "tags": [
+                    "knowledge",
+                    "education"
+                ]
+            },
+            {
+                "body": "But is it just then that the few and the wealthy should be the rulers? And what if they, in like manner, rob and plunder the people, - is this just?",
+                "tags": [
+                    "politics",
+                    "ethics"
+                ]
+            },
+            {
+                "body": "Definition of tragedy: A hero destroyed by the excess of his virtues",
+                "tags": []
+            },
+            {
+                "body": "Every rascal is not a thief, but every thief is a rascal.",
+                "tags": []
+            }
+        ],
+        "freud": [
+            {
+                "body": "We are what we are because we have been what we have been.",
+                "tags": [
+                    "history"
+                ]
+            },
+            {
+                "body": "From error to error one discovers the entire truth.",
+                "tags": []
+            },
+            {
+                "body": "Two hallmarks of a healthy life are the abilities to love and to work. Each requires imagination.",
+                "tags": [
+                    "love"
+                ]
+            },
+            {
+                "body": "When someone abuses me I can defend myself, but against praise I am defenceless.",
+                "tags": [
+                    "ethics"
+                ]
+            },
+            {
+                "body": "Not all men are worthy of love.",
+                "tags": []
+            },
+            {
+                "body": "The meager satisfaction that man can extract from reality leaves him starving.",
+                "tags": []
+            },
+            {
+                "body": "It is not attention that the child is seeking, but love.",
+                "tags": [
+                    "love"
+                ]
+            },
+            {
+                "body": "The only unnatural sexual behavior is none at all.",
+                "tags": []
+            },
+            {
+                "body": "A woman should soften but not weaken a man.",
+                "tags": [
+                    "ethics",
+                    "knowledge"
+                ]
+            },
+            {
+                "body": "The psychoanalysis of individual human beings, however, teaches us with quite special insistence that the god of each of them is formed in the likeness of his father, that his personal relation to God depends on his relation to his father in the flesh and oscillates and changes along with that relation, and that at bottom God is nothing other than an exalted father.",
+                "tags": [
+                    "knowledge"
+                ]
+            },
+            {
+                "body": "When a love-relationship is at its height there is no room left for any interest in the environment; a pair of lovers are sufficient to themselves",
+                "tags": [
+                    "love"
+                ]
+            },
+            {
+                "body": "All giving is asking, and all asking is an asking for love.",
+                "tags": [
+                    "love"
+                ]
+            },
+            {
+                "body": "The news that reaches your consciousness is incomplete and often not to be relied on.... Turn your eyes inward, look into your own depths, learn first to know yourself!",
+                "tags": [
+                    "education",
+                    "ethics"
+                ]
+            },
+            {
+                "body": "Perhaps the gods are kind to us, by making life more disagreeable as we grow older. In the end death seems less intolerable than the manifold burdens we carry",
+                "tags": [
+                    "religion"
+                ]
+            },
+            {
+                "body": "Anxiety in children is originally nothing other than an expression of the fact they are feeling the loss of the person they love.",
+                "tags": []
+            },
+            {
+                "body": "I cannot think of any need in childhood as strong as the need for a father's protection.",
+                "tags": []
+            },
+            {
+                "body": "The virtuous man contents himself with dreaming that which the wicked man does in actual life.",
+                "tags": [
+                    "ethics"
+                ]
+            },
+            {
+                "body": "The only shame in masturbation is the shame of not doing it well.",
+                "tags": []
+            },
+            {
+                "body": "Philosophers stretch the meaning of words until they retain scarcely anything of their original sense. They give the name of \"God\" to some vague abstraction which they have created for themselves; having done so they can pose before all the world as deists, as believers of God, and they can even boast that they have recognized a higher, purer concept of God, notwithstanding that their God is not nothing more than an insubstantial shadow and no longer the mighty personality of religious doctrines.",
+                "tags": [
+                    "religion",
+                    "knowledge"
+                ]
+            },
+            {
+                "body": "Religion originates in the child's and young mankind's fears and need for help. It cannot be otherwise.",
+                "tags": [
+                    "religion"
+                ]
+            },
+            {
+                "body": "Whatever fosters the growth of civilization works at the same time against war.",
+                "tags": [
+                    "knowledge",
+                    "ethics"
+                ]
+            },
+            {
+                "body": "The doctor should be opaque to his patients and, like a mirror, should show them nothing but what is shown to him.",
+                "tags": [
+                    "ethics"
+                ]
+            },
+            {
+                "body": "The first human who hurled an insult instead of a stone was the founder of civilization.",
+                "tags": [
+                    "history"
+                ]
+            },
+            {
+                "body": "In mourning it is the world which has become poor and empty; in melancholia it is the ego itself.",
+                "tags": []
+            },
+            {
+                "body": "This transmissibility of taboo is a reflection of the tendency, on which we have already remarked, for the unconscious instinct in the neurosis to shift constantly along associative paths on to new objects.",
+                "tags": []
+            },
+            {
+                "body": "If a man has been his mother's undisputed darling he retains throughout life the triumphant feeling, the confidence in success, which not seldom brings actual success along with it.",
+                "tags": [
+                    "love"
+                ]
+            },
+            {
+                "body": "Religion restricts the play of choice and adaptation, since it imposes equally on everyone its own path to the acquisition of happiness and protection from suffering. Its technique consists in depressing the value of life and distorting the picture of the real world in a delusional manner - which presupposes an intimidation of the intelligence. At this price, by forcibly fixing them in a state of psychical infantilism and by drawing them into a mass-delusion, religion succeeds in sparing many people an individual neurosis. But hardly anything more.",
+                "tags": [
+                    "religion"
+                ]
+            },
+            {
+                "body": "Sometimes a cigar is just a cigar.",
+                "tags": []
+            },
+            {
+                "body": "Where questions of religion are concerned, people are guilty of every possible sort of dishonesty and intellectual misdemeanor.",
+                "tags": [
+                    "religion"
+                ]
+            },
+            {
+                "body": "When we share - that is poetry in the prose of life.",
+                "tags": [
+                    "love"
+                ]
+            },
+            {
+                "body": "Illusions commend themselves to us because they save us pain and allow us to enjoy pleasure instead. We must therefore accept it without complaint when they sometimes collide with a bit of reality against which they are dashed to pieces.",
+                "tags": []
+            },
+            {
+                "body": "The world is no nursery.",
+                "tags": []
+            },
+            {
+                "body": "At bottom God is nothing more than an exalted father.",
+                "tags": [
+                    "religion"
+                ]
+            },
+            {
+                "body": "Analogies, it is true, decide nothing, but they can make one feel more at home.",
+                "tags": []
+            },
+            {
+                "body": "Man has, as it were, become a kind of prosthetic God. When he puts on all his auxiliary organs, he is truly magnificent; but those organs have not grown on him and they still give him much trouble at times.",
+                "tags": []
+            },
+            {
+                "body": "The effect of the consolations of religion may be compared to that of a narcotic.",
+                "tags": [
+                    "religion"
+                ]
+            },
+            {
+                "body": "It is no wonder if, under the pressure of these possibilities of suffering, men are accustomed to moderate their claims to happiness - just as the pleasure principle itself, indeed, under the influence of the external world, changed into the more modest reality principle -, if a man thinks himself happy merely to have escaped unhappiness or to have survived his suffering, and if in general the task of avoiding suffering pushes that of obtaining pleasure into the background.",
+                "tags": [
+                    "knowledge",
+                    "ethics"
+                ]
+            },
+            {
+                "body": "One... gets an impression that civilization is something which was imposed on a resisting majority by a minority which understood how to obtain possession of the means to power and coercion. It is, of course, natural to assume that these difficulties are not inherent in the nature of civilization itself but are determined by the imperfections of the cultural forms which have so far been developed.",
+                "tags": [
+                    "politics"
+                ]
+            },
+            {
+                "body": "[The child receives impressions like] a photographic exposure that can be developed after any interval of time and transformed into a picture.",
+                "tags": []
+            },
+            {
+                "body": "The dream unites the grossest contradictions, permits impossibilities, sets aside the knowledge that influences us by day, and exposes us as ethically and morally obtuse.",
+                "tags": [
+                    "ethics"
+                ]
+            },
+            {
+                "body": "Where such men love they have no desire and where they desire they cannot love",
+                "tags": [
+                    "love",
+                    "ethics"
+                ]
+            },
+            {
+                "body": "I do not in the least underestimate bisexuality... I expect it to provide all further enlightenment.",
+                "tags": [
+                    "knowledge",
+                    "education"
+                ]
+            },
+            {
+                "body": "To endure life remains, when all is said, the first duty of all living being Illusion can have no value if it makes this more difficult for us.",
+                "tags": []
+            },
+            {
+                "body": "There is an intellectual function in us which demands unity, connection and intelligibility from any material, whether of perception or thought, that comes within its grasp; and if, as a result of special circumstances, it is unable to establish a true connection, it does not hesitate to fabricate a false one.",
+                "tags": []
+            },
+            {
+                "body": "A string of reproaches against other people leads one to suspect the existence of a string of self-reproaches with the same content.",
+                "tags": []
+            },
+            {
+                "body": "When a man has once brought himself to accept uncritically all the absurdities that religious doctrines put before him and even to overlook the contradictions between them, we need not be greatly suprised at the weakness of his intellect.",
+                "tags": [
+                    "religion"
+                ]
+            },
+            {
+                "body": "The rest of our enquiry is made easy because this God-Creator is openly called Father. Psycho-analysis concludes that he really is the father, clothed in the grandeur in which he once appeared to the small child.",
+                "tags": [
+                    "knowledge"
+                ]
+            },
+            {
+                "body": "The expectation that every neurotic phenomenon can be cured may, I suspect, be derived from the layman's belief that the neuroses are something quite unnecessary which have no right whatever to exist. Whereas in fact they are severe, constitutionally fixed illnesses, which rarely restrict themselves to only a few attacks but persist as a rule over long periods throughout life.",
+                "tags": []
+            },
+            {
+                "body": "Lead us, Heavenly Father, lead us O'er the world's tempestuous sea; Guard us, guide us, keep us, feed us, For we have no help but Thee.",
+                "tags": [
+                    "religion",
+                    "love",
+                    "knowledge",
+                    "ethics"
+                ]
+            },
+            {
+                "body": "Towards the outside, at any rate, the ego seems to maintain clear and sharp lines of demarcation. There is only one state -- admittedly an unusual state, but not one that can be stigmatized as pathological -- in which it does not do this. At the height of being in love the boundary between ego and object threatens to melt away. Against all the evidence of his senses, a man who is in love declares that \"I\" and \"you\" are one, and is prepared to behave as if it were a fact.",
+                "tags": [
+                    "love"
+                ]
+            }
+        ],
+        "hegel": [
+            {
+                "body": "We learn from history that we do not learn from history",
+                "tags": [
+                    "history",
+                    "knowledge"
+                ]
+            },
+            {
+                "body": "To be independent of public opinion is the first formal condition of achieving anything great.",
+                "tags": [
+                    "ethics",
+                    "education"
+                ]
+            },
+            {
+                "body": "To be aware of limitations is already to be beyond them.",
+                "tags": [
+                    "ethics"
+                ]
+            },
+            {
+                "body": "What history teaches us is that neither nations nor governments ever learn anything from it.",
+                "tags": [
+                    "history"
+                ]
+            },
+            {
+                "body": "The valor that struggles is better than the weakness that endures.",
+                "tags": [
+                    "ethics",
+                    "education"
+                ]
+            },
+            {
+                "body": "The more certain our knowledge the less we know.",
+                "tags": [
+                    "knowledge",
+                    "education",
+                    "ethics",
+                    "history"
+                ]
+            },
+            {
+                "body": "In a true tragedy, both parties must be right.",
+                "tags": [
+                    "politics"
+                ]
+            },
+            {
+                "body": "Before the end of Time will be the end of History. Before the end of History will be the end of Art.",
+                "tags": [
+                    "history"
+                ]
+            },
+            {
+                "body": "Poverty in itself does not make men into a rabble; a rabble is created only when there is joined to poverty a disposition of mind, an inner indignation against the rich, against society, against the government.",
+                "tags": [
+                    "ethics",
+                    "knowledge"
+                ]
+            },
+            {
+                "body": "The learner always begins by finding fault, but the scholar sees the positive merit in everything.",
+                "tags": [
+                    "education",
+                    "knowledge",
+                    "history",
+                    "ethics"
+                ]
+            },
+            {
+                "body": "An idea is always a generalization, and generalization is a property of thinking. To generalize means to think.",
+                "tags": []
+            },
+            {
+                "body": "Genuine tragedy is a case not of right against wrong but of right against right - two equally justified ethical principles embodied in people of unchangeable will.",
+                "tags": []
+            },
+            {
+                "body": "America is therefore the land of the future, where, in the ages that lie before us, the burden of the World's History shall reveal itself.",
+                "tags": [
+                    "knowledge",
+                    "history"
+                ]
+            },
+            {
+                "body": "The history of the world is none other than the progress of the , consciousness of freedom.",
+                "tags": [
+                    "history"
+                ]
+            },
+            {
+                "body": "Beauty is merely the Spiritual making itself known sensuously.",
+                "tags": []
+            },
+            {
+                "body": "All education is the art of making men ethical (sittlich), of transforming the old Adam into the new Adam.",
+                "tags": [
+                    "education",
+                    "ethics",
+                    "knowledge"
+                ]
+            },
+            {
+                "body": "Impatience asks for the impossible, wants to reach the goal without the means of getting there. The length of the journey has to be borne with, for every moment is necessary.",
+                "tags": [
+                    "ethics"
+                ]
+            },
+            {
+                "body": "It is solely by risking life that freedom is obtained; . . . the individual who has not staked his or her life may, no doubt, be recognized as a Person; but he or she has not attained the truth of this recognition as an independent self-consciousness.",
+                "tags": [
+                    "ethics"
+                ]
+            },
+            {
+                "body": "To make abstractions hold in reality is to destroy reality.",
+                "tags": []
+            },
+            {
+                "body": "Philosophy is by its nature something esoteric, neither made for the mob nor capable of being prepared for the mob.",
+                "tags": []
+            },
+            {
+                "body": "We learn from history that man can never learn anything from history.",
+                "tags": [
+                    "history"
+                ]
+            },
+            {
+                "body": "Freedom is the fundamental character of the will, as weight is of matter... That which is free is the will. Will without freedom is an empty word.",
+                "tags": [
+                    "ethics"
+                ]
+            },
+            {
+                "body": "The people are that part of the state that does not know what it wants.",
+                "tags": [
+                    "politics"
+                ]
+            },
+            {
+                "body": "We do not need to be shoemakers to know if our shoes fit, and just as little have we any need to be professionals to acquire knowledge of matters of universal interest.",
+                "tags": [
+                    "knowledge"
+                ]
+            },
+            {
+                "body": "World history is a court of judgment.",
+                "tags": [
+                    "history"
+                ]
+            },
+            {
+                "body": "The length of the journey has to be borne with, for every moment is necessary.",
+                "tags": [
+                    "ethics"
+                ]
+            },
+            {
+                "body": "The True is the whole. But the whole is nothing other than the essence consummating itself through its development. Of the Absolute it must be said that it is essentially a result, that only in the end is it what it truly is; and that precisely in this consists its nature, viz. to be actual, subject, the spontaneous becoming of itself.",
+                "tags": []
+            },
+            {
+                "body": "Regarding History as the slaughter-bench at which the happiness of peoples, the wisdom of States, and the virtue of individuals have been victimized--the question involuntarily arises--to what principle, to what final aim these enormous sacrifices have been offered.",
+                "tags": [
+                    "history"
+                ]
+            },
+            {
+                "body": "The proofs of the existence of God are to such an extent fallen into discredit that they pass for something antiquated, belonging to days gone by.",
+                "tags": [
+                    "history",
+                    "religion"
+                ]
+            },
+            {
+                "body": "The bud disappears when the blossom breaks through, and we might say that the former is refuted by the latter; in the same way when the fruit comes, the blossom may be explained to be a false form of the plant's existence, for the fruit appears as its true nature in place of the blossom.",
+                "tags": []
+            },
+            {
+                "body": "The true courage of civilized nations is readiness for sacrifice in the service of the state, so that the individual counts as only one amongst many. The important thing here is not personal mettle but aligning oneself with the universal.",
+                "tags": [
+                    "ethics",
+                    "politics",
+                    "knowledge"
+                ]
+            },
+            {
+                "body": "The heart-throb for the welfare of humanity therefore passes into the ravings of an insane self-conceit, into the fury of consciousness to preserve itself from destruction; and it does this by expelling from itself the perversion which it is itself, and by striving to look on it and express it as something else.",
+                "tags": []
+            },
+            {
+                "body": "The Catholics had been in the position of oppressors, and the Protestants of the oppressed",
+                "tags": [
+                    "religion",
+                    "politics",
+                    "history",
+                    "ethics"
+                ]
+            },
+            {
+                "body": "To him who looks upon the world rationally, the world in its turn presents a rational aspect. The relation is mutual.",
+                "tags": [
+                    "knowledge",
+                    "ethics"
+                ]
+            },
+            {
+                "body": "Propounding peace and love without practical or institutional engagement is delusion, not virtue.",
+                "tags": []
+            },
+            {
+                "body": "It strikes everyone in beginning to form an acquaintance with the treasures of Indian literature that a land so rich in intellectual products and those of the profoundest order of thought.",
+                "tags": [
+                    "knowledge"
+                ]
+            },
+            {
+                "body": "The people will learn to feel the dignity of man. They will not merely demand their rights, which have been trampled in the dust, but themselves will take them - make them their own.",
+                "tags": [
+                    "knowledge",
+                    "ethics",
+                    "education",
+                    "politics"
+                ]
+            },
+            {
+                "body": "It is easier to discover a deficiency in individuals, in states, and in Providence, than to see their real import and value.",
+                "tags": []
+            },
+            {
+                "body": "Children are potentially free and their life directly embodies nothing save potential freedom. Consequently they are not things and cannot be the property either of their parents or others.",
+                "tags": [
+                    "ethics"
+                ]
+            },
+            {
+                "body": "When liberty is mentioned, we must always be careful to observe whether it is not really the assertion of private interests which is thereby designated.",
+                "tags": []
+            },
+            {
+                "body": "It is because the method of physics does not satisfy the comprehension that we have to go on further.",
+                "tags": []
+            },
+            {
+                "body": "Consequently, the sensuous aspect of art is related only to the two theoretical sensesof sight and hearing, while smell, taste, and touch remain excluded.",
+                "tags": []
+            },
+            {
+                "body": "Once the state has been founded, there can no longer be any heroes. They come on the scene only in uncivilized conditions.",
+                "tags": [
+                    "politics"
+                ]
+            },
+            {
+                "body": "The essence of the modern state is that the universal be bound up with the complete freedom of its particular members and with private well-being, that thus the interests of family and civil society must concentrate themselves on the state. It is only when both these moments subsist in their strength that the state can be regarded as articulated and genuinely organized.",
+                "tags": []
+            },
+            {
+                "body": "Animals are in possession of themselves; their soul is in possession of their body. But they have no right to their life, because they do not will it.",
+                "tags": [
+                    "ethics"
+                ]
+            },
+            {
+                "body": "The State is the Divine idea as it exists on Earth.",
+                "tags": []
+            },
+            {
+                "body": "In the case of various kinds of knowledge, we find that what in former days occupied the energies of men of mature mental ability sinks to the level of information, exercises, and even pastimes for children; and in this educational progress we can see the history of the world's culture delineated in faint outline.",
+                "tags": [
+                    "knowledge",
+                    "education",
+                    "history"
+                ]
+            },
+            {
+                "body": "Every philosophy is complete in itself and, like a genuine work of art, contains the totality. Just as the works of Apelles and Sophocles, if Raphael and Shakespeare had known them, should not have appeared to them as mere preliminary exercises for their own work, but rather as a kindred force of the spirit, so, too reason cannot find in its own earlier forms mere useful preliminary exercises for itself.",
+                "tags": [
+                    "knowledge"
+                ]
+            },
+            {
+                "body": "We assert then that nothing has been accomplished without interest on the part of the actors; and  if interest be called passion, inasmuch as the whole individuality, to the neglect of all other actual or possible interests and claims, is devoted to an object with every fibre of volition, concentrating all its desires and powers upon it  we may affirm absolutely that nothing great in the World has been accomplished without passion.",
+                "tags": [
+                    "love"
+                ]
+            },
+            {
+                "body": "The Few assume to be the deputies, but they are often only the despoilers of the Many.",
+                "tags": [
+                    "politics"
+                ]
+            }
+        ],
+        "kant": [
+            {
+                "body": "Rules for Happiness: something to do, someone to love, something to hope for.",
+                "tags": [
+                    "love"
+                ]
+            },
+            {
+                "body": "Do the right thing because it is right.",
+                "tags": [
+                    "ethics"
+                ]
+            },
+            {
+                "body": "The only thing permanent is change.",
+                "tags": []
+            },
+            {
+                "body": "Give a man everything he wants and at that moment everything is not everything",
+                "tags": [
+                    "ethics"
+                ]
+            },
+            {
+                "body": "Great minds think for themselves.",
+                "tags": [
+                    "knowledge"
+                ]
+            },
+            {
+                "body": "Perpetual Peace is only found in the graveyard.",
+                "tags": []
+            },
+            {
+                "body": "A single line in the Bible has consoled me more than all the books I ever read besides.",
+                "tags": [
+                    "religion",
+                    "love"
+                ]
+            },
+            {
+                "body": "All our knowledge begins with the senses, proceeds then to the understanding, and ends with reason. There is nothing higher than reason.",
+                "tags": [
+                    "knowledge",
+                    "history",
+                    "education"
+                ]
+            },
+            {
+                "body": "If justice perishes, human life on Earth has lost its meaning.",
+                "tags": []
+            },
+            {
+                "body": "Morality is not properly the doctrine of how we may make ourselves happy, but how we may make ourselves worthy of happiness.",
+                "tags": []
+            },
+            {
+                "body": "Out of the crooked timber of humanity, no straight thing was ever made.",
+                "tags": [
+                    "ethics"
+                ]
+            },
+            {
+                "body": "Thoughts without content are empty, intuitions without concepts are blind.",
+                "tags": []
+            },
+            {
+                "body": "Immaturity is the incapacity to use one's intelligence without the guidance of another.",
+                "tags": []
+            },
+            {
+                "body": "The nice thing about living in a small town is that when you don't know what you're doing, someone else does.",
+                "tags": []
+            },
+            {
+                "body": "Two things strike me dumb: the infinite starry heavens, and the sense of right and wrong in man.",
+                "tags": [
+                    "ethics"
+                ]
+            },
+            {
+                "body": "Reason can never prove the existence of God.",
+                "tags": [
+                    "religion"
+                ]
+            },
+            {
+                "body": "All the interests of my reason, speculative as well as practical, combine in the three following questions: 1. What can I know? 2. What ought I to do? 3. What may I hope?",
+                "tags": [
+                    "knowledge"
+                ]
+            },
+            {
+                "body": "By a lie, a man... annihilates his dignity as a man.",
+                "tags": [
+                    "politics",
+                    "ethics"
+                ]
+            },
+            {
+                "body": "Religion is too important a matter to its devotees to be a subject of ridicule. If they indulge in absurdities, they are to be pitied rather than ridiculed.",
+                "tags": [
+                    "religion"
+                ]
+            },
+            {
+                "body": "Enthusiasm is always connected with the senses, whatever be the object that excites it. The true strength of virtue is serenity of mind, combined with a deliberate and steadfast determination to execute her laws. That is the healthful condition of the moral life; on the other hand, enthusiasm, even when excited by representations of goodness, is a brilliant but feverish glow which leaves only exhaustion and languor behind.",
+                "tags": [
+                    "ethics"
+                ]
+            },
+            {
+                "body": "Men will not understand ... that when they fulfil their duties to men, they fulfil thereby God's commandments; that they are consequently always in the service of God, as long as their actions are moral, and that it is absolutely impossible to serve God otherwise.",
+                "tags": [
+                    "ethics",
+                    "religion"
+                ]
+            },
+            {
+                "body": "[A ruler is merely] the trustee of the rights of other men and he must always stand in dread of having in some way violated these rights.",
+                "tags": [
+                    "ethics"
+                ]
+            },
+            {
+                "body": "The death of dogma is the birth of morality.",
+                "tags": [
+                    "ethics"
+                ]
+            },
+            {
+                "body": "Freedom is that faculty that enlarges the usefulness of all other faculties.",
+                "tags": []
+            },
+            {
+                "body": "The sum total of all possible knowledge of God is not possible for a human being, not even through a true revelation. But it is one of the worthiest inquiries to see how far our reason can go in the knowledge of God.",
+                "tags": [
+                    "knowledge"
+                ]
+            },
+            {
+                "body": "Philosophy stands in need of a science which shall determine the possibility, principles, and extent of human knowledge  priori.",
+                "tags": [
+                    "knowledge"
+                ]
+            },
+            {
+                "body": "Thrift is care and scruple in the spending of one's means. It is not a virtue and it requires neither skill nor talent.",
+                "tags": [
+                    "ethics"
+                ]
+            },
+            {
+                "body": "If a man is often the subject of conversation he soon becomes the subject of criticism.",
+                "tags": [
+                    "ethics"
+                ]
+            },
+            {
+                "body": "Enlightenment is man's emergence from his self-incurred immaturity.",
+                "tags": [
+                    "education",
+                    "knowledge"
+                ]
+            },
+            {
+                "body": "Give me matter, and I will construct a world out of it!",
+                "tags": []
+            },
+            {
+                "body": "Even a man's exact imitation of the song of the nightingale displeases us when we discover that it is a mimicry, and not the nightingale.",
+                "tags": [
+                    "ethics",
+                    "knowledge"
+                ]
+            },
+            {
+                "body": "[R]eason is... given to us as a practical faculty, that is, as one that influences the will.",
+                "tags": []
+            },
+            {
+                "body": "The business of philosophy is not to give rules, but to analyze the private judgments of common reason.",
+                "tags": []
+            },
+            {
+                "body": "Moral Teleology supplies the deficiency in physical Teleology , and first establishes a Theology ; because the latter, if it did not borrow from the former without being observed, but were to proceed consistently, could only found a Demonology , which is incapable of any definite concept.",
+                "tags": []
+            },
+            {
+                "body": "There is nothing higher than reason.",
+                "tags": []
+            },
+            {
+                "body": "Time is not an empirical concept. For neither co-existence nor succession would be perceived by us, if the representation of time did not exist as a foundation a priori.",
+                "tags": []
+            },
+            {
+                "body": "Have patience awhile; slanders are not long-lived. Truth is the child of time; erelong she shall appear to vindicate thee.",
+                "tags": [
+                    "knowledge",
+                    "ethics",
+                    "history",
+                    "education"
+                ]
+            },
+            {
+                "body": "But only he who, himself enlightened, is not afraid of shadows.",
+                "tags": [
+                    "knowledge",
+                    "education",
+                    "ethics"
+                ]
+            },
+            {
+                "body": "There is needed, no doubt, a body of servants (ministerium) of the invisible church, but not officials (officiales), in other words, teachers but not dignitaries, because in the rational religion of every individual there does not yet exist a church as a universal union (omnitudo collectiva).",
+                "tags": [
+                    "religion",
+                    "education",
+                    "knowledge"
+                ]
+            },
+            {
+                "body": "Reason must approach nature in order to be taught by it. It must not, however, do so in the character of a pupil who listens to everything that the teacher chooses to say, but of an appointed judge who compels the witness to answer questions which he has himself formulated.",
+                "tags": [
+                    "education",
+                    "knowledge"
+                ]
+            },
+            {
+                "body": "But although all our knowledge begins with experience, it does not follow that it arises from experience.",
+                "tags": [
+                    "knowledge",
+                    "ethics",
+                    "education"
+                ]
+            },
+            {
+                "body": "Enlightenment is the liberation of man from his self-caused state of minority... Supere aude! Dare to use your own understanding!is thus the motto of the Enlightenment.",
+                "tags": [
+                    "knowledge"
+                ]
+            },
+            {
+                "body": "The history of the human race, viewed as a whole, may be regarded as the realization of a hidden plan of nature to bring about a political constitution, internally, and for this purpose, also externally perfect, as the only state in which all the capacities implanted by her in mankind can be fully developed.",
+                "tags": [
+                    "history",
+                    "politics"
+                ]
+            },
+            {
+                "body": "Standing armies shall in time be totally abolished.",
+                "tags": [
+                    "history"
+                ]
+            },
+            {
+                "body": "Criticism alone can sever the root of materialism, fatalism, atheism, free-thinking, fanaticism, and superstition, which can be injurious universally; as well as of idealism and skepticism, which are dangerous chiefly to the Schools, and hardly allow of being handed on to the public.",
+                "tags": [
+                    "education"
+                ]
+            },
+            {
+                "body": "Everything in nature acts in conformity with law.",
+                "tags": []
+            },
+            {
+                "body": "I freely admit that the remembrance of David Hume was the very thing that many years ago first interrupted my dogmatic slumber and gave a completely different direction to my researches in the field of speculative philosophy.",
+                "tags": [
+                    "knowledge",
+                    "history"
+                ]
+            },
+            {
+                "body": "All trades, arts, and handiworks have gained by division of labor... Where the different kinds of work are not distinguished and divided, where everyone is a jack-of-all-trades, there manufactures remain still in the greatest barbarism.",
+                "tags": []
+            },
+            {
+                "body": "Innocence is indeed a glorious thing; but, unfortunately, it does not keep very well and is easily led astray.",
+                "tags": []
+            },
+            {
+                "body": "The schematicism by which our understanding deals with the phenomenal world ... is a skill so deeply hidden in the human soul that we shall hardly guess the secret trick that Nature here employs.",
+                "tags": [
+                    "knowledge"
+                ]
+            }
+        ],
+        "nietzsche": [
+            {
+                "body": "Sometimes people don't want to hear the truth because they don't want their illusions destroyed.",
+                "tags": [
+                    "ethics",
+                    "education",
+                    "politics"
+                ]
+            },
+            {
+                "body": "To live is to suffer, to survive is to find some meaning in the suffering.",
+                "tags": [
+                    "ethics"
+                ]
+            },
+            {
+                "body": "Whoever fights monsters should see to it that in the process he does not become a monster. And if you gaze long enough into an abyss, the abyss will gaze back into you.",
+                "tags": [
+                    "ethics"
+                ]
+            },
+            {
+                "body": "No price is too high to pay for the privilege of owning yourself.",
+                "tags": [
+                    "knowledge",
+                    "ethics"
+                ]
+            },
+            {
+                "body": "Insanity in individuals is something rare - but in groups, parties, nations and epochs, it is the rule.",
+                "tags": [
+                    "politics"
+                ]
+            },
+            {
+                "body": "Everything the State says is a lie, and everything it has it has stolen.",
+                "tags": [
+                    "politics",
+                    "knowledge"
+                ]
+            },
+            {
+                "body": "The snake which cannot cast its skin has to die. As well the minds which are prevented from changing their opinions; they cease to be mind.",
+                "tags": [
+                    "ethics"
+                ]
+            },
+            {
+                "body": "Man is the only animal that must be encouraged to live.",
+                "tags": [
+                    "ethics"
+                ]
+            },
+            {
+                "body": "The secret of reaping the greatest fruitfulness and the greatest enjoyment from life is to live dangerously.",
+                "tags": []
+            },
+            {
+                "body": "It is not a lack of love, but a lack of friendship that makes unhappy marriages.",
+                "tags": []
+            },
+            {
+                "body": "To predict the behavior of ordinary people in advance, you only have to assume that they will always try to escape a disagreeable situation with the smallest possible expenditure of intelligence.",
+                "tags": [
+                    "knowledge"
+                ]
+            },
+            {
+                "body": "The Great Man... is colder, harder, less hesitating, and without fear of 'opinion'; he lacks the virtues that accompany respect and 'respectability,' and altogether everything that is the 'virtue of the herd.' If he cannot lead, he goes alone... He knows he is incommunicable: he finds it tasteless to be familiar... When not speaking to himself, he wears a mask. There is a solitude within him that is inaccessible to praise or blame.",
+                "tags": [
+                    "knowledge",
+                    "ethics",
+                    "politics",
+                    "education"
+                ]
+            },
+            {
+                "body": "The world is beautiful, but has a disease called man.",
+                "tags": []
+            },
+            {
+                "body": "Solitude makes us tougher towards ourselves and tenderer towards others. In both ways it improves our character.",
+                "tags": [
+                    "ethics"
+                ]
+            },
+            {
+                "body": "Young people love what is interesting and odd, no matter how true or false it is. More mature minds love what is interesting and odd about truth. Fully mature intellects, finally, love truth, even when it appears plain and simple, boring to the ordinary person; for they have noticed that truth tends to reveal its highest wisdom in the guise of simplicity.",
+                "tags": [
+                    "knowledge",
+                    "love"
+                ]
+            },
+            {
+                "body": "The real question is: How much truth can I stand?",
+                "tags": [
+                    "ethics"
+                ]
+            },
+            {
+                "body": "The true man wants two things: danger and play. For that reason he wants woman, as the most dangerous plaything.",
+                "tags": []
+            },
+            {
+                "body": "There are no beautiful surfaces without a terrible depth.",
+                "tags": []
+            },
+            {
+                "body": "There is always some madness in love. But there is also always some reason in madness.",
+                "tags": [
+                    "love"
+                ]
+            },
+            {
+                "body": "There are horrible people who, instead of solving a problem, tangle it up and make it harder to solve for anyone who wants to deal with it. Whoever does not know how to hit the nail on the head should be asked not to hit it at all.",
+                "tags": []
+            },
+            {
+                "body": "What is the truth, but a lie agreed upon.",
+                "tags": []
+            },
+            {
+                "body": "You know a moment is important when it is making your mind go numb with beauty.",
+                "tags": [
+                    "knowledge",
+                    "love"
+                ]
+            },
+            {
+                "body": "Invisible threads are the strongest ties.",
+                "tags": [
+                    "ethics"
+                ]
+            },
+            {
+                "body": "The most spiritual men, as the strongest, find their happiness where others would find their destruction: in the labyrinth, in hardness against themselves and others, in experiments. Their joy is self-conquest: asceticism becomes in them nature, need, and instinct. Difficult tasks are a privilege to them; to play with burdens that crush others, a recreation. Knowledge-a form of asceticism. They are the most venerable kind of man: that does not preclude their being the most cheerful and the kindliest.",
+                "tags": [
+                    "knowledge"
+                ]
+            },
+            {
+                "body": "To learn to see- to accustom the eye to calmness, to patience, and to allow things to come up to it; to defer judgment, and to acquire the habit of approaching and grasping an individual case from all sides. This is the first preparatory schooling of intellectuality. One must not respond immediately to a stimulus; one must acquire a command of the obstructing and isolating instincts.",
+                "tags": [
+                    "education",
+                    "knowledge"
+                ]
+            },
+            {
+                "body": "For what purpose humanity is there should not even concern us: why you are here, that you should ask yourself: and if you have no ready answer, then set for yourself goals, high and noble goals, and perish in pursuit of them!",
+                "tags": [
+                    "ethics",
+                    "knowledge"
+                ]
+            },
+            {
+                "body": "He who obeys, does not listen to himself!",
+                "tags": [
+                    "ethics"
+                ]
+            },
+            {
+                "body": "No journey is too great,",
+                "tags": [
+                    "ethics"
+                ]
+            },
+            {
+                "body": "In revenge and in love, woman is more barbarous than man.",
+                "tags": []
+            },
+            {
+                "body": "People are always angry at anyone who chooses very individual standards for his life; because of the extraordinary treatment which that man grants to himself, they feel degraded, like ordinary beings.",
+                "tags": [
+                    "ethics"
+                ]
+            },
+            {
+                "body": "Today as always, men fall into two groups: slaves and free men. Whoever does not have two-thirds of his day for himself, is a slave, whatever he may be: a statesman, a businessman, an official, or a scholar.",
+                "tags": [
+                    "politics",
+                    "knowledge",
+                    "ethics"
+                ]
+            },
+            {
+                "body": "Without music, life would be a mistake.",
+                "tags": []
+            },
+            {
+                "body": "All I need is a sheet of paper and something to write with, and then I can turn the world upside down.",
+                "tags": []
+            },
+            {
+                "body": "Ultimately, it is the desire, not the desired, that we love.",
+                "tags": [
+                    "love",
+                    "ethics"
+                ]
+            },
+            {
+                "body": "What is evil?-Whatever springs from weakness.",
+                "tags": []
+            },
+            {
+                "body": "Beware of spitting against the wind!",
+                "tags": [
+                    "ethics"
+                ]
+            },
+            {
+                "body": "Deception, flattering, lying, deluding, talking behind the back, putting up a false front, living in borrowed splendor, wearing a mask, hiding behind convention, playing a role for others and for oneself -- in short, a continuous fluttering around the solitary flame of vanity -- is so much the rule and the law among men that there is almost nothing which is less comprehensible than how an honest and pure drive for truth could have arisen among them.",
+                "tags": []
+            },
+            {
+                "body": "the voice of beauty speaks softly; it creeps only into the most fully awakened souls",
+                "tags": [
+                    "love",
+                    "education"
+                ]
+            },
+            {
+                "body": "Everyone needs a sense of shame, but no one needs to feel ashamed.",
+                "tags": [
+                    "ethics"
+                ]
+            },
+            {
+                "body": "There exists above the \"productive\" man a yet higher species.",
+                "tags": [
+                    "ethics",
+                    "knowledge"
+                ]
+            },
+            {
+                "body": "For a tree to become tall it must grow tough roots among the rocks.",
+                "tags": []
+            },
+            {
+                "body": "The man of knowledge must be able not only to love his enemies but also to hate his friends.",
+                "tags": [
+                    "knowledge",
+                    "ethics",
+                    "education"
+                ]
+            },
+            {
+                "body": "The growth of wisdom may be gauged exactly by the diminution of ill-temper.",
+                "tags": [
+                    "knowledge"
+                ]
+            },
+            {
+                "body": "Most people are too stupid to act in their own interest",
+                "tags": []
+            },
+            {
+                "body": "The visionary lies to himself, the liar only to others.",
+                "tags": []
+            },
+            {
+                "body": "It is the business of the very few to be independent; it is a privilege of the strong.",
+                "tags": [
+                    "ethics",
+                    "knowledge",
+                    "politics"
+                ]
+            },
+            {
+                "body": "A moral system valid for all is basically immoral.",
+                "tags": []
+            },
+            {
+                "body": "Marriage was contrived for ordinary people, for people who are capable of neither great love nor great friendship, which is to say, for most people--but also for those exceptionally rare ones who are capable of love as well as of friendship.",
+                "tags": []
+            },
+            {
+                "body": "Shared joys make a friend, not shared sufferings.",
+                "tags": [
+                    "ethics"
+                ]
+            },
+            {
+                "body": "What makes us heroic?--Confronting simultaneously our supreme suffering and our supreme hope.",
+                "tags": []
+            }
+        ],
+        "plato": [
+            {
+                "body": "No one is more hated than he who speaks the truth.",
+                "tags": [
+                    "ethics",
+                    "knowledge"
+                ]
+            },
+            {
+                "body": "A wise man speaks because he has something to say; a fool because he has to say something.",
+                "tags": [
+                    "ethics"
+                ]
+            },
+            {
+                "body": "Be kind. Every person you meet",
+                "tags": [
+                    "ethics"
+                ]
+            },
+            {
+                "body": "Better to complete a small task well, than to do much imperfectly.",
+                "tags": [
+                    "ethics",
+                    "knowledge"
+                ]
+            },
+            {
+                "body": "The right question is usually more important than the right answer.",
+                "tags": [
+                    "ethics"
+                ]
+            },
+            {
+                "body": "Ignorance is the root cause of all difficulties.",
+                "tags": []
+            },
+            {
+                "body": "Someday, in the distant future, our grand-children' s grand-children will develop a new equivalent of our classrooms. They will spend many hours in front of boxes with fires glowing within. May they have the wisdom to know the difference between light and knowledge.",
+                "tags": []
+            },
+            {
+                "body": "I am the wisest man alive, for I know one thing, and that is that I know nothing.",
+                "tags": [
+                    "knowledge",
+                    "ethics",
+                    "education"
+                ]
+            },
+            {
+                "body": "Good people do not need laws to tell them to act responsibly, while bad people will find a way around the laws.",
+                "tags": [
+                    "ethics",
+                    "knowledge"
+                ]
+            },
+            {
+                "body": "The one who learns and learns and doesn't practice is like the one who plows and plows and never plants.",
+                "tags": [
+                    "ethics"
+                ]
+            },
+            {
+                "body": "The measure of a man is what he does with power.",
+                "tags": [
+                    "politics"
+                ]
+            },
+            {
+                "body": "Wisest is he who knows what he does not know.",
+                "tags": [
+                    "knowledge",
+                    "ethics",
+                    "education"
+                ]
+            },
+            {
+                "body": "Enjoy life. There's plenty of time to be dead. Be kind, for everyone you meet is fighting a harder battle.",
+                "tags": [
+                    "ethics"
+                ]
+            },
+            {
+                "body": "Those who tell the stories rule society.",
+                "tags": [
+                    "history"
+                ]
+            },
+            {
+                "body": "The worst of all deceptions is self-deception.",
+                "tags": []
+            },
+            {
+                "body": "You should not honor men more than truth.",
+                "tags": [
+                    "ethics"
+                ]
+            },
+            {
+                "body": "One cannot make a slave of a free person, for a free person is free even in a prison.",
+                "tags": [
+                    "ethics",
+                    "knowledge"
+                ]
+            },
+            {
+                "body": "False words are not only evil in themselves, but they infect the soul with evil.",
+                "tags": [
+                    "ethics"
+                ]
+            },
+            {
+                "body": "There is nothing so delightful as the hearing, or the speaking of truth. For this reason, there is no conversation so agreeable as that of the man of integrity, who hears without any intention to betray, and speaks without any intention to deceive.",
+                "tags": [
+                    "ethics",
+                    "knowledge"
+                ]
+            },
+            {
+                "body": "Poverty doesn't come because of the decrease of wealth but because of the increase of desires.",
+                "tags": []
+            },
+            {
+                "body": "Never discourage anyone who continually makes progress, no matter how slow... even if that someone is yourself!",
+                "tags": [
+                    "ethics",
+                    "knowledge"
+                ]
+            },
+            {
+                "body": "Every heart sings a song, incomplete, until another heart whispers back.",
+                "tags": [
+                    "love"
+                ]
+            },
+            {
+                "body": "A true artist is someone who gives birth to a new reality.",
+                "tags": []
+            },
+            {
+                "body": "The souls of people, on their way to Earth-life, pass through a room full of lights; each takes a taper - often only a spark - to guide it in the dim country of this world. But some souls, by rare fortune, are detained longer - have time to grasp a handful of tapers, which they weave into a torch. These are the torch-bearers of humanity - its poets, seers and saints, who lead and lift the race out of darkness, toward the light. They are the law-givers and saviors, the light-bringers, way-showers and truth-tellers, and without them, humanity would lose its way in the dark.",
+                "tags": []
+            },
+            {
+                "body": "We become what we contemplate.",
+                "tags": [
+                    "knowledge",
+                    "ethics"
+                ]
+            },
+            {
+                "body": "He who does not desire power is fit to hold it.",
+                "tags": [
+                    "politics",
+                    "ethics"
+                ]
+            },
+            {
+                "body": "The three wishes of every man: to be healthy, to be rich by honest means, and to be beautiful.",
+                "tags": []
+            },
+            {
+                "body": "Do not train children to learning by force and harshness, but direct them to it by what amuses their minds.",
+                "tags": [
+                    "ethics"
+                ]
+            },
+            {
+                "body": "How can you prove whether at this moment we are sleeping, and all our thoughts are a dream; or whether we are awake, and talking to one another in the waking state?",
+                "tags": []
+            },
+            {
+                "body": "The philosopher is in love with truth, that is, not with the changing world of sensation, which is the object of opinion, but with the unchanging reality which is the object of knowledge.",
+                "tags": [
+                    "knowledge"
+                ]
+            },
+            {
+                "body": "He who is only an athlete is too crude, too vulgar, too much a savage. He who is a scholar only is too soft, to effeminate. The ideal citizen is the scholar athlete, the man of thought and the man of action.",
+                "tags": [
+                    "ethics"
+                ]
+            },
+            {
+                "body": "I know not how I may seem to others, but to myself I am but a small child wandering upon the vast shores of knowledge, every now and then finding a small bright pebble to content myself with",
+                "tags": [
+                    "education",
+                    "knowledge"
+                ]
+            },
+            {
+                "body": "He who love touches walks not in darkness.",
+                "tags": [
+                    "love",
+                    "ethics",
+                    "knowledge"
+                ]
+            },
+            {
+                "body": "Pleasure is the bait of sin",
+                "tags": []
+            },
+            {
+                "body": "A good decision is based on knowledge, and not on numbers.",
+                "tags": [
+                    "knowledge",
+                    "education"
+                ]
+            },
+            {
+                "body": "When man is not properly trained, he is the most savage animal on the face of the globe.",
+                "tags": [
+                    "ethics"
+                ]
+            },
+            {
+                "body": "Happiness springs from doing good and helping others.",
+                "tags": [
+                    "ethics"
+                ]
+            },
+            {
+                "body": "One of the penalties for refusing to participate in politics is that you end up being governed by your inferiors.",
+                "tags": [
+                    "politics"
+                ]
+            },
+            {
+                "body": "The blame is his who chooses: God is blameless.",
+                "tags": [
+                    "religion",
+                    "ethics",
+                    "knowledge"
+                ]
+            },
+            {
+                "body": "Harmony sinks deep into the recesses of the soul and takes its strongest hold there, bringing grace also to the body & mind as well. Music is a moral law. It gives a soul to the universe, wings to the mind, flight to the imagination, a charm to sadness, and life to everything. It is the essence of order.",
+                "tags": []
+            },
+            {
+                "body": "Do not expect justice where might is right.",
+                "tags": []
+            },
+            {
+                "body": "When you feel grateful, you become great, and eventually attract great things.",
+                "tags": [
+                    "ethics",
+                    "knowledge"
+                ]
+            },
+            {
+                "body": "If we are to have any hope for the future, those who have lanterns must pass them on to others.",
+                "tags": [
+                    "ethics"
+                ]
+            },
+            {
+                "body": "We see many instances of cities going down like sinking ships to their destruction. There have been such wrecks in the past and there surely will be others in the future, caused by the wickedness of captains and crews alike. For these are guilty men, whose sin is supreme ignorance of what matters most.",
+                "tags": []
+            },
+            {
+                "body": "Mankind will never see an end of trouble until lovers of wisdom come to hold political power, or the holders of power become lovers of wisdom",
+                "tags": [
+                    "politics",
+                    "knowledge"
+                ]
+            },
+            {
+                "body": "Those who are too smart to engage in politics are punished by being governed by those who are dumber.",
+                "tags": [
+                    "politics",
+                    "knowledge"
+                ]
+            },
+            {
+                "body": "A dog has the soul of a philosopher.",
+                "tags": [
+                    "ethics"
+                ]
+            },
+            {
+                "body": "Thinking is the soul talking to itself.",
+                "tags": []
+            },
+            {
+                "body": "midwife to the awakening of the Soul in another person.",
+                "tags": [
+                    "love",
+                    "knowledge"
+                ]
+            },
+            {
+                "body": "All wars are fought for the sake of getting money.",
+                "tags": []
+            }
+        ],
+        "sartre": [
+            {
+                "body": "He who asks a question is a fool for a minute; he who does not remains a fool forever.",
+                "tags": [
+                    "ethics",
+                    "education"
+                ]
+            },
+            {
+                "body": "I can always choose, but I ought to know that if I do not choose, I",
+                "tags": [
+                    "knowledge",
+                    "ethics",
+                    "education"
+                ]
+            },
+            {
+                "body": "am still choosing.",
+                "tags": [
+                    "ethics"
+                ]
+            },
+            {
+                "body": "I hate victims who respect their executioners.",
+                "tags": []
+            },
+            {
+                "body": "Everything has been figured out, except how to live.",
+                "tags": [
+                    "knowledge"
+                ]
+            },
+            {
+                "body": "your judgement judges you and defines you",
+                "tags": []
+            },
+            {
+                "body": "slipped out of the world, somewhere else like the soul of a dead man. Perhaps he was only a dream...God is dead.",
+                "tags": []
+            },
+            {
+                "body": "Nothingness haunts Being.",
+                "tags": []
+            },
+            {
+                "body": "To choose not to choose is still to act.",
+                "tags": [
+                    "ethics"
+                ]
+            },
+            {
+                "body": "Death is a continuation of my life without me.",
+                "tags": [
+                    "history"
+                ]
+            },
+            {
+                "body": "In a word, man must create his own essence: it is in throwing himself into the world, suffering there, struggling there, that he gradually defines himself.",
+                "tags": [
+                    "ethics"
+                ]
+            },
+            {
+                "body": "Imagination is not an empirical or superadded power of consciousness, it is the whole of consciousness as it realizes its freedom.",
+                "tags": []
+            },
+            {
+                "body": "I am no longer sure of anything. If I satiate my desires, I sin but I deliver myself from them; if I refuse to satisfy them, they infect the whole soul.",
+                "tags": [
+                    "ethics"
+                ]
+            },
+            {
+                "body": "To believe is to know you believe, and to know you believe is not to believe.",
+                "tags": [
+                    "knowledge",
+                    "ethics"
+                ]
+            },
+            {
+                "body": "The more one is absorbed in fighting evil, the less one is tempted to place the good in question.",
+                "tags": [
+                    "ethics"
+                ]
+            },
+            {
+                "body": "My thought is me: that's why I can't stop. I exist because I think",
+                "tags": [
+                    "ethics",
+                    "knowledge",
+                    "history"
+                ]
+            },
+            {
+                "body": "Acting is a question of absorbing other people's personalities and adding some of your own experience.",
+                "tags": []
+            },
+            {
+                "body": "She believed in nothing; only her skepticism kept her from being an atheist.",
+                "tags": []
+            },
+            {
+                "body": "and without resignation either. He stares at death with passionate attention and this fascination liberates him. He experiences the divine irresponsibility of the condemned man.",
+                "tags": [
+                    "ethics",
+                    "knowledge"
+                ]
+            },
+            {
+                "body": "It disturbs me no more to find men base, unjust, or selfish than to see apes mischievous, wolves savage, or the vulture ravenous.",
+                "tags": []
+            },
+            {
+                "body": "Every human endeavor, however singular it seems, involves the whole human race.",
+                "tags": []
+            },
+            {
+                "body": "Thats what existence means: draining ones own self dry without the sense of thirst.",
+                "tags": []
+            },
+            {
+                "body": "If all I asked was not a great deal, that's my problem!",
+                "tags": [
+                    "ethics",
+                    "education"
+                ]
+            },
+            {
+                "body": "A madman's ravings are absurd in relation to the situation in which he finds himself, but not in relation to his madness.",
+                "tags": []
+            },
+            {
+                "body": "The viable jewels of life remain untouched when man forgets his vocation of searching for the truth of his existence.",
+                "tags": [
+                    "knowledge",
+                    "ethics"
+                ]
+            },
+            {
+                "body": "Photographs are not ideas. They give us ideas.",
+                "tags": []
+            },
+            {
+                "body": "Smooth and smiling faces everywhere, but ruin in their eyes.",
+                "tags": [
+                    "politics"
+                ]
+            },
+            {
+                "body": "Be quiet! Anyone can spit in my face, and call me a criminal and a prostitute. But no one has the right to judge my remorse.",
+                "tags": [
+                    "ethics",
+                    "knowledge",
+                    "politics"
+                ]
+            },
+            {
+                "body": "I found the human heart empty and insipid everywhere except in books.",
+                "tags": [
+                    "knowledge"
+                ]
+            },
+            {
+                "body": "I wanted pure love: foolishness; to love one another is to hate a common enemy: I will thus espouse your hatred. I wanted Good: nonsense; on this earth and in these times, Good and Bad are inseparable: I accept to be evil in order to become good.",
+                "tags": [
+                    "love",
+                    "politics"
+                ]
+            },
+            {
+                "body": "As for the square at Meknes, where I used to go every day, it's even simpler: I do not see it at all anymore. All that remains is the vague feeling that it was charming, and these five words that are indivisibly bound together: a charming square at Meknes. ... I don't see anything any more: I can search the past in vain, I can only find these scraps of images and I am not sure what they represent, whether they are memories or just fiction.",
+                "tags": [
+                    "history"
+                ]
+            },
+            {
+                "body": "I think that is the big danger in keeping a diary: you exaggerate everything.",
+                "tags": []
+            },
+            {
+                "body": "To keep hope alive one must, in spite of all mistakes, horrors, and crimes, recognize the obvious superiority of the socialist camp.",
+                "tags": [
+                    "politics",
+                    "knowledge"
+                ]
+            },
+            {
+                "body": "I have such a desire to sleep and am so much behind my sleep. A good night, one good night and all this nonsense will be swept away.",
+                "tags": []
+            },
+            {
+                "body": "Acting is happy agony.",
+                "tags": []
+            },
+            {
+                "body": "Being is. Being is in-itself. Being is what it is.",
+                "tags": [
+                    "history",
+                    "knowledge",
+                    "ethics"
+                ]
+            },
+            {
+                "body": "Generosity is nothing else than a craze to possess. All which I abandon, all which I give, I enjoy in a higher manner through the fact that I give it away. To give is to enjoy possessively the object which one gives.",
+                "tags": [
+                    "ethics",
+                    "knowledge"
+                ]
+            },
+            {
+                "body": "Take [Stphane] Mallarme. I hold him to be the greatest of French poets, and I have taken some time to understand him !",
+                "tags": [
+                    "knowledge"
+                ]
+            },
+            {
+                "body": "I am neither virgin nor priest enough to play with the inner life.",
+                "tags": [
+                    "ethics"
+                ]
+            },
+            {
+                "body": "To think new thoughts you have to break the bones in your head",
+                "tags": []
+            },
+            {
+                "body": "I needed to justify my existence, and I had made an absolute of literature. It took me thirty years to get rid of this state of mind.",
+                "tags": []
+            },
+            {
+                "body": "Fear? If I have gained anything by damning myself, it is that I no longer have anything to fear.",
+                "tags": [
+                    "knowledge",
+                    "ethics"
+                ]
+            },
+            {
+                "body": "as not-bound to life.",
+                "tags": []
+            },
+            {
+                "body": "One could only damage oneself through the harm one did to others. One could never get directly at oneself.",
+                "tags": [
+                    "ethics"
+                ]
+            },
+            {
+                "body": "Absurd, irreducible; nothing  not even a profound and secret delirium of nature  could explain it. Obviously I did not know everything, I had not seen the seeds sprout, or the tree grow. But faced with this great wrinkled paw, neither ignorance nor knowledge was important: the world of explanations and reasons is not the world of existence. A circle is not absurd, it is clearly explained by the rotation of a straight segment around one of its extremities. But neither does a circle exist. This root, on the other hand, existed in such a way that I could not explain it.",
+                "tags": []
+            },
+            {
+                "body": "I am not recommending \"popular\" literature which aims at the lowest.",
+                "tags": []
+            },
+            {
+                "body": "Men equally honest, equally devoted to their fatherland, are momentarily separated by different conceptions of their duty.",
+                "tags": [
+                    "ethics"
+                ]
+            },
+            {
+                "body": "Better to have beasts that let themselves be killed than men who run away.",
+                "tags": [
+                    "ethics"
+                ]
+            },
+            {
+                "body": "Render a kiss or blow",
+                "tags": [
+                    "love"
+                ]
+            },
+            {
+                "body": "Offer all the hatred in your heart",
+                "tags": []
+            }
+        ],
+        "schopenhauer": [
+            {
+                "body": "It is difficult to find happiness within oneself, but it is impossible to find it anywhere else.",
+                "tags": []
+            },
+            {
+                "body": "A high degree of intellect tends to make a man unsocial.",
+                "tags": [
+                    "knowledge"
+                ]
+            },
+            {
+                "body": "It is difficult to keep quiet if you have nothing to do",
+                "tags": [
+                    "ethics"
+                ]
+            },
+            {
+                "body": "The assumption that animals are without rights, and the illusion that our treatment of them has no moral significance, is a positively outrageous example of Western crudity and barbarity. Universal compassion is the only guarantee of morality.",
+                "tags": []
+            },
+            {
+                "body": "I observed once to Goethe that when a friend is with us we do not think the same of him as when he is away. He replied, \"Yes! because the absent friend is yourself, and he exists only in your head; whereas the friend who is present has an individuality of his own, and moves according to laws of his own, which cannot always be in accordance with those which you form for yourself.",
+                "tags": [
+                    "knowledge",
+                    "ethics"
+                ]
+            },
+            {
+                "body": "Every man takes the limits of his own field of vision for the limits of the world.",
+                "tags": [
+                    "ethics",
+                    "knowledge"
+                ]
+            },
+            {
+                "body": "Thus, the task is not so much to see what no one yet has seen, but to think what nobody yet has thought about that which everybody sees.",
+                "tags": [
+                    "knowledge"
+                ]
+            },
+            {
+                "body": "Pleasure is never as pleasant as we expected it to be and pain is always more painful. The pain in the world always outweighs the pleasure. If you don't believe it, compare the respective feelings of two animals, one of which is eating the other.",
+                "tags": []
+            },
+            {
+                "body": "at the death of every friendly soul",
+                "tags": [
+                    "history"
+                ]
+            },
+            {
+                "body": "arises from the feeling that there is",
+                "tags": []
+            },
+            {
+                "body": "To be alone is the fate of all great mindsa fate deplored at times, but still always chosen as the less grievous of two evils.",
+                "tags": [
+                    "knowledge",
+                    "ethics"
+                ]
+            },
+            {
+                "body": "However, for the man who studies to gain insight, books and studies are merely rungs of the ladder on which he climbs to the summit of knowledge. As soon as a rung has raised him up one step, he leaves it behind. On the other hand, the many who study in order to fill their memory do not use the rungs of the ladder for climbing, but take them off and load themselves with them to take away, rejoicing at the increasing weight of the burden. They remain below forever, because they bear what should have bourne them.",
+                "tags": [
+                    "knowledge",
+                    "education"
+                ]
+            },
+            {
+                "body": "There is not a grain of dust, not an atom that can become nothing, yet man believes that death is the annhilation of his being.",
+                "tags": [
+                    "ethics",
+                    "religion"
+                ]
+            },
+            {
+                "body": "Human life, like all inferior goods, is covered on the outside with a false glitter; what suffers always conceals itself.",
+                "tags": [
+                    "ethics"
+                ]
+            },
+            {
+                "body": "Just as one spoils the stomach by overfeeding and thereby impairs the whole body, so can one overload and choke the mind by giving it too much nourishment. For the more one reads the fewer are the traces left of what one has read; the mind is like a tablet that has been written over and over. Hence it is impossible to reflect; and it is only by reflection that one can assimilate what one has read. If one reads straight ahead without pondering over it later, what has been read does not take root, but is for the most part lost.",
+                "tags": [
+                    "knowledge",
+                    "ethics"
+                ]
+            },
+            {
+                "body": "The highest, most varied and lasting pleasures are those of the mind.",
+                "tags": []
+            },
+            {
+                "body": "We seldom speak of what we have but often of what we lack.",
+                "tags": [
+                    "knowledge",
+                    "ethics"
+                ]
+            },
+            {
+                "body": "Patriotism is the passion of fools and the most foolish of passions.",
+                "tags": []
+            },
+            {
+                "body": "Truth that is naked is the most beautiful, and the simpler its expression the deeper is the impression it makes.",
+                "tags": [
+                    "ethics",
+                    "education"
+                ]
+            },
+            {
+                "body": "Restlessness is the hallmark of existence.",
+                "tags": []
+            },
+            {
+                "body": "Men best show their character in trifles, where they are not on their guard. It is in the simplest habits, that we often see the boundless egotism which pays no regard to the feelings of others and denies nothing to itself.",
+                "tags": []
+            },
+            {
+                "body": "Because Christian morality leaves animals out of account, they are at once outlawed in philosophical morals; they are mere 'things,' mere means to any ends whatsoever. They can therefore be used for vivisection, hunting, coursing, bullfights, and horse racing, and can be whipped to death as they struggle along with heavy carts of stone. Shame on such a morality that is worthy of pariahs, and that fails to recognize the eternal essence that exists in every living thing, and shines forth with inscrutable significance from all eyes that see the sun!",
+                "tags": []
+            },
+            {
+                "body": "Whoever wants his judgment to be believed, should express it coolly and dispassionately; for all vehemence springs from the will. And so the judgment might be attributed to the will and not to knowledge, which by its nature is cold.",
+                "tags": [
+                    "ethics"
+                ]
+            },
+            {
+                "body": "Our moral virtues benefit mainly other people; intellectual virtues, on the other hand, benefit primarily ourselves; therefore the former make us universally popular, the latter unpopular.",
+                "tags": [
+                    "ethics"
+                ]
+            },
+            {
+                "body": "The difficulty is to try and teach the multitude that something can be true and untrue at the same time.",
+                "tags": [
+                    "education",
+                    "ethics"
+                ]
+            },
+            {
+                "body": "Life to the great majority is only a constant struggle for mere existence, with the certainty of losing it at last.",
+                "tags": []
+            },
+            {
+                "body": "The scenes and events of long ago, and the persons who took part in them, wear a charming aspect to the eye of memory, which sees only the outlines and takes no note of disagreeable details. The present enjoys no such advantage, and so it always seems defective.",
+                "tags": [
+                    "history",
+                    "knowledge"
+                ]
+            },
+            {
+                "body": "The effect of music is so very much more powerful and penetrating than is that of the other arts, for these others speak only of the shadow, but music of the essence.",
+                "tags": []
+            },
+            {
+                "body": "To become indignant at [people's] conduct is as foolish as to be angry with a stone because it rolls into your path. And with many people the wisest thing you can do, is to resolve to make use of those whom you cannot alter.",
+                "tags": [
+                    "knowledge",
+                    "ethics"
+                ]
+            },
+            {
+                "body": "Necessity is the constant scourge of the lower classes, ennui of the higher ones.",
+                "tags": []
+            },
+            {
+                "body": "It is most important to allow the brain the full measure of sleep which is required to restore it; for sleep is to a man's whole nature what winding up is to a clock.",
+                "tags": [
+                    "ethics",
+                    "knowledge"
+                ]
+            },
+            {
+                "body": "It is with trifles, and when he is off guard, that a man best reveals his character.",
+                "tags": []
+            },
+            {
+                "body": "A man of business will often deceive you without the slightest scruple, but he will absolutely refuse to commit a theft.",
+                "tags": []
+            },
+            {
+                "body": "The ultimate foundation of honor is the conviction that moral character is unalterable: a single bad action implies that future actions of the same kind will, under similar circumstances, also be bad.",
+                "tags": [
+                    "ethics"
+                ]
+            },
+            {
+                "body": "I've never known any trouble than an hour's reading didn't assuage.",
+                "tags": []
+            },
+            {
+                "body": "What makes people hard-hearted is this, that each man has, or fancies he has, as much as he can bear in his own troubles.",
+                "tags": [
+                    "ethics"
+                ]
+            },
+            {
+                "body": "A good supply of resignation is of the first importance in providing for the journey of life.",
+                "tags": [
+                    "ethics"
+                ]
+            },
+            {
+                "body": "To desire immortality for the individual is really the same as wanting to perpetuate an error forever.",
+                "tags": [
+                    "ethics"
+                ]
+            },
+            {
+                "body": "The cause of laughter is simply the sudden perception of the incongruity between a concept and the real project.",
+                "tags": []
+            },
+            {
+                "body": "He who can see truly in the midst of general infatuation is like a man whose watch keeps good time, when all clocks in the town in which he lives are wrong. He alone knows the right time; what use is that to him?",
+                "tags": [
+                    "knowledge",
+                    "love"
+                ]
+            },
+            {
+                "body": "If a person is stupid, we excuse him by saying that he cannot help it; but if we attempted to excuse in precisely the same way the person who is bad, we should be laughed at.",
+                "tags": [
+                    "ethics"
+                ]
+            },
+            {
+                "body": "My body and my will are one.",
+                "tags": []
+            },
+            {
+                "body": "The ordinary method of education is to imprint ideas and opinions, in the strict sense of the word, prejudices, on the mind of the child, before it has had any but a very few particular observations. It is thus that he afterwards comes to view the world and gather experience through the medium of those ready-made ideas, rather than to let his ideas be formed for him out of his own experience of life, as they ought to be.",
+                "tags": [
+                    "education"
+                ]
+            },
+            {
+                "body": "One can never read too little of bad, or too much of good books: bad books are intellectual poison; they destroy the mind. In order to read what is good one must make it a condition never to read what is bad; for life is short, and both time and strength limited.",
+                "tags": [
+                    "knowledge",
+                    "ethics",
+                    "education"
+                ]
+            },
+            {
+                "body": "Many undoubtedly owe their good fortune to the circumstance that they possess a pleasing smile with which they win hearts. Yet these hearts would do better to beware and to learn from Hamlet's tables that one may smile, and smile, and be a villain.",
+                "tags": [
+                    "knowledge",
+                    "education",
+                    "ethics"
+                ]
+            },
+            {
+                "body": "In the blessings as well as in the ills of life, less depends upon what befalls us than upon the way in which it is met.",
+                "tags": [
+                    "knowledge",
+                    "ethics"
+                ]
+            },
+            {
+                "body": "It is only a man's own fundamental thoughts that have truth and life in them. For it is these that he really and completely understands. To read the thoughts of others is like taking the remains of someone else's meal, like putting on the discarded clothes of a stranger.",
+                "tags": [
+                    "knowledge",
+                    "ethics",
+                    "education",
+                    "history",
+                    "love"
+                ]
+            },
+            {
+                "body": "There is no absurdity so palpable but that it may be firmly planted in the human head if you only begin to inculcate it before the age of five, by constantly repeating it with an air of great solemnity.",
+                "tags": []
+            },
+            {
+                "body": "Thus also every keen pleasure is an error and an illusion, for no attained wish can give lasting satisfaction.",
+                "tags": [
+                    "ethics"
+                ]
+            },
+            {
+                "body": "It is a clumsy experiment to make; for it involves the destruction of the very consciousness which puts the question and awaits the answer.",
+                "tags": []
+            }
+        ],
+        "spinoza": [
+            {
+                "body": "Nothing in nature is by chance... Something appears to be chance only because of our lack of knowledge.",
+                "tags": []
+            },
+            {
+                "body": "When a man is prey to his emotions, he is not his own master.",
+                "tags": [
+                    "ethics"
+                ]
+            },
+            {
+                "body": "The more clearly you understand yourself and your emotions, the more you become a lover of what is.",
+                "tags": [
+                    "love",
+                    "knowledge",
+                    "education"
+                ]
+            },
+            {
+                "body": "He who seeks equality between unequals seeks an absurdity.",
+                "tags": [
+                    "politics"
+                ]
+            },
+            {
+                "body": "Academies that are founded at public expense are instituted not so much to cultivate men's natural abilities as to restrain them.",
+                "tags": [
+                    "education",
+                    "knowledge"
+                ]
+            },
+            {
+                "body": "Hatred is increased by being reciprocated, and can on the other hand be destroyed by love.",
+                "tags": [
+                    "love"
+                ]
+            },
+            {
+                "body": "Big fish eat small fish with as much right as they have power.",
+                "tags": [
+                    "politics"
+                ]
+            },
+            {
+                "body": "Indulge yourself in pleasures only in so far as they are necessary for the preservation of health.",
+                "tags": [
+                    "ethics"
+                ]
+            },
+            {
+                "body": "[Believers] are but triflers who, when they cannot explain a thing, run back to the will of God; this is, truly, a ridiculous way of expressing ignorance.",
+                "tags": [
+                    "religion"
+                ]
+            },
+            {
+                "body": "Let unswerving integrity be your watchword.",
+                "tags": [
+                    "ethics"
+                ]
+            },
+            {
+                "body": "I have made a ceaseless effort not to ridicule, not to bewail, not to scorn human actions, but to understand them.",
+                "tags": [
+                    "knowledge",
+                    "education",
+                    "ethics"
+                ]
+            },
+            {
+                "body": "Sadness diminishes a man's powers",
+                "tags": []
+            },
+            {
+                "body": "What everyone wants from life is continuous and genuine happiness.",
+                "tags": []
+            },
+            {
+                "body": "Nature is satisfied with little; and if she is, I am also.",
+                "tags": [
+                    "ethics"
+                ]
+            },
+            {
+                "body": "He who loves God cannot endeavor that God should love him in return.",
+                "tags": [
+                    "ethics",
+                    "religion",
+                    "love",
+                    "knowledge"
+                ]
+            },
+            {
+                "body": "Laws which prescribe what everyone must believe, and forbid men to say or write anything against this or that opinion, are often passed to gratify, or rather to appease the anger of those who cannot abide independent minds.",
+                "tags": [
+                    "politics"
+                ]
+            },
+            {
+                "body": "Further conceive, I beg, that a stone, while continuing in motion, should be capable of thinking and knowing, that it is endeavoring, as far as it can, to continue to move. Such a stone, being conscious merely of its own endeavor and not at all indifferent, would believe itself to be completely free, and would think that it continued in motion solely because of its own wish. This is that human freedom, which all boast that they possess, and which consists solely in the fact, that men are conscious of their own desire, but are ignorant of the causes whereby that desire has been determined.",
+                "tags": []
+            },
+            {
+                "body": "The supreme mystery of despotism, its prop and stay, is to keep men in a state of deception, and with the specious title of religion to cloak the fear by which they must be held in check, so that they will fight for their servitude as if for salvation.",
+                "tags": [
+                    "religion"
+                ]
+            },
+            {
+                "body": "the ultimate aim of government is not to rule, or restrain by fear, nor to exact obedience, but to free every man from fear that he may live in all possible security... In fact the true aim of government is liberty.",
+                "tags": [
+                    "ethics",
+                    "knowledge"
+                ]
+            },
+            {
+                "body": "Everything excellent is as difficult as it is rare.",
+                "tags": []
+            },
+            {
+                "body": "Everything in nature is a cause from which there flows some effect.",
+                "tags": []
+            },
+            {
+                "body": "Blessed are the weak who think that they are good because they have no claws.",
+                "tags": []
+            },
+            {
+                "body": "God is the indwelling and not the transient cause of all things.",
+                "tags": [
+                    "religion"
+                ]
+            },
+            {
+                "body": "The greatest secret of monarchic rule...is to keep men deceived and to cloak in the specious name of religion the fear by which they must be checked, so that they will fight for slavery as they would for salvation, and will think it not shameful, but a most honorable achievement, to give their life and blood that one man may have a ground for boasting.",
+                "tags": [
+                    "politics"
+                ]
+            },
+            {
+                "body": "All is One (Nature, God)",
+                "tags": []
+            },
+            {
+                "body": "Faith is nothing but obedience and piety.",
+                "tags": [
+                    "religion"
+                ]
+            },
+            {
+                "body": "The more intelligible a thing is, the more easily it is retained in the memory, and counterwise, the less intelligible it is, the more easily we forget it.",
+                "tags": [
+                    "knowledge",
+                    "education",
+                    "history",
+                    "ethics"
+                ]
+            },
+            {
+                "body": "Those who wish to seek out the cause of miracles and to understand the things of nature as philosophers, and not to stare at them in astonishment like fools, are soon considered heretical and impious, and proclaimed as such by those whom the mob adores as the interpreters of nature and the gods.",
+                "tags": []
+            },
+            {
+                "body": "It is usually the case with most men that their nature is so constituted that they pity those who fare badly and envy those who fare well.",
+                "tags": []
+            },
+            {
+                "body": "Fame has also this great drawback, that if we pursue it, we must direct our lives so as to please the fancy of men.",
+                "tags": []
+            },
+            {
+                "body": "In the mind there is no absolute or free will.",
+                "tags": []
+            },
+            {
+                "body": "None are more taken in by flattery than the proud, who wish to be the first and are not.",
+                "tags": []
+            },
+            {
+                "body": "I have tried sedulously not to laugh at the acts of man, nor to lament them, nor to detest them, but to understand them.",
+                "tags": [
+                    "knowledge",
+                    "education",
+                    "ethics"
+                ]
+            },
+            {
+                "body": "Nothing in the universe is contingent, but all things are conditioned to exist and operate in a particular manner by the necessity of the divine nature.",
+                "tags": [
+                    "religion",
+                    "knowledge",
+                    "ethics"
+                ]
+            },
+            {
+                "body": "If men were born free, they would, so long as they remained free, form no conception of good and evil.",
+                "tags": [
+                    "ethics"
+                ]
+            },
+            {
+                "body": "In so far as the mind sees things in their eternal aspect, it participates in eternity.",
+                "tags": [
+                    "knowledge",
+                    "ethics"
+                ]
+            },
+            {
+                "body": "them.",
+                "tags": [
+                    "knowledge",
+                    "ethics"
+                ]
+            },
+            {
+                "body": "Many errors, of a truth, consist merely in the application of the wrong names of things.",
+                "tags": []
+            },
+            {
+                "body": ".... we are a part of nature as a whole, whose order we follow.",
+                "tags": []
+            },
+            {
+                "body": "Men will find that they can ... avoid far more easily the perils which beset them on all sides by united action.",
+                "tags": [
+                    "ethics",
+                    "politics",
+                    "knowledge"
+                ]
+            },
+            {
+                "body": "The order and connection of ideas is the same as the order and connection of things.",
+                "tags": []
+            },
+            {
+                "body": "Desire is the essence of a man.",
+                "tags": []
+            },
+            {
+                "body": "Love is pleasure accompanied by the idea of an external cause, and hatred pain accompanied by the idea of an external cause.",
+                "tags": [
+                    "love"
+                ]
+            },
+            {
+                "body": "He that can carp in the most eloquent or acute manner at the weakness of the human mind is held by his fellows as almost divine.",
+                "tags": []
+            },
+            {
+                "body": "Emotion, which is suffering, ceases to be suffering as soon as we form a clear and precise picture of it.",
+                "tags": []
+            },
+            {
+                "body": "Better that right counsels be known to enemies than that the evil secrets of tyrants should be concealed from the citizens. They who can treat secretly of the affairs of a nation have it absolutely under their authority; and as they plot against the enemy in time of war, so do they against the citizens in time of peace.",
+                "tags": [
+                    "knowledge",
+                    "ethics",
+                    "politics"
+                ]
+            },
+            {
+                "body": "A man is as much affected pleasurably or painfully by the image of a thing past or future as by the image of a thing present.",
+                "tags": [
+                    "history"
+                ]
+            },
+            {
+                "body": "Love or hatred towards a thing, which we conceive to be free, must, other things being similar, be greater than if it were felt towards a thing acting by necessity.",
+                "tags": [
+                    "ethics"
+                ]
+            },
+            {
+                "body": "Only that thing is free which exists by the necessities of its own nature, and is determined in its actions by itself alone.",
+                "tags": [
+                    "ethics"
+                ]
+            },
+            {
+                "body": "Men would never be superstitious, if they could govern all their circumstances by set rules, or if they were always favoured by fortune: but being frequently driven into straits where rules are useless, and being often kept fluctuating pitiably between hope and fear by the uncertainty of fortune's greedily coveted favours, they are consequently for the most part, very prone to credulity.",
+                "tags": []
+            }
+        ]
+    }
+}

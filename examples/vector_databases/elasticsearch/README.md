@@ -1,6 +1,7 @@
 # Elasticsearch
 
-Elasticsearch is the [world's most downloaded vector database](https://www.elastic.co/elasticsearch/vector-database). Elasticsearch offers an efficient way to create, store, and search vector embeddings at scale.
+Elasticsearch is a popular search/analytics engine and [vector database](https://www.elastic.co/elasticsearch/vector-database).
+Elasticsearch offers an efficient way to create, store, and search vector embeddings at scale.
 
 For technical details, refer to the [Elasticsearch documentation](https://www.elastic.co/guide/en/elasticsearch/reference/current/knn-search.html).
 

@@ -80,7 +80,7 @@ People are writing great tools and papers for improving outputs from GPT. Here a
 - [FLAML (A Fast Library for Automated Machine Learning & Tuning)](https://microsoft.github.io/FLAML/docs/Getting-Started/): A Python library for automating selection of models, hyperparameters, and other tunable choices.
 - [Chainlit](https://docs.chainlit.io/overview): A Python library for making chatbot interfaces.
 - [Guardrails.ai](https://shreyar.github.io/guardrails/): A Python library for validating outputs and retrying failures. Still in alpha, so expect sharp edges and bugs.
-- [Semantic Kernel](https://devblogs.microsoft.com/semantic-kernel/): A Python/C# library from Microsoft that supports prompt templating, function chaining, vectorized memory, and intelligent planning.
+- [Semantic Kernel](https://github.com/microsoft/semantic-kernel): A Python/C# library from Microsoft that supports prompt templating, function chaining, vectorized memory, and intelligent planning.
 - [Prompttools](https://github.com/hegelai/prompttools): Open-source Python tools for testing and evaluating models, vector DBs, and prompts.
 - [Outlines](https://github.com/normal-computing/outlines): A Python library that provides a domain-specific language to simplify prompting and constrain generation.
 - [Promptify](https://github.com/promptslab/Promptify): A small Python library for using language models to perform NLP tasks.

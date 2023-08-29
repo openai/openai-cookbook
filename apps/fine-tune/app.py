@@ -91,10 +91,10 @@ if st.session_state.show_help:
     )
 
 # Get prompts from the user
-prompt_text = st.text_area('Enter your question? Human:', height=200)
-ideal_generated_text = st.text_area('Enter your ideal AI generated response:', height=200)
 system_message_default = 'You are a helpful and friendly assistant.'
 system_message = st.text_area('Enter your custom system message:', value=system_message_default)
+prompt_text = st.text_area('Enter your question? Human:', height=200)
+ideal_generated_text = st.text_area('Enter your ideal AI generated response:', height=200)
 
 
 if st.button('Append to output.jsonl'):

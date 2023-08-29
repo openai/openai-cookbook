@@ -132,3 +132,4 @@ dmypy.json
 *transactions*.jsonl
 /examples/data/transactions*
 *.DS_Store
+tmp_*

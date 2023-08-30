@@ -1,3 +1,4 @@
+import openai
 import streamlit as st
 import jsonlines
 import subprocess
@@ -168,20 +169,57 @@ if st.button('Create fine-tuning job'):
 
 
 
-# Chat window to test the fine-tuned model
-st.subheader("Test Fine-tuned Model")
-user_message_chat = st.text_area('User Message:')
-if st.button('Get Response', disabled=not id):
+# Set OpenAI API key directly if available
+if OPENAI_API_KEY:
+    openai.api_key = OPENAI_API_KEY
+else:
+    api_key_input = st.sidebar.text_input('Enter your OpenAI API Key:')
+    if api_key_input:
+        openai.api_key = api_key_input
+
+
+
+
+# Additional features for fine-tuning jobs and models
+
+# Create a sidebar for additional operations
+st.sidebar.title("Additional Operations")
+
+# Option to list 10 fine-tuning jobs
+if st.sidebar.button('List 10 Fine-Tuning Jobs', key='ListJobsButton'):
+    try:
+        fine_tuning_jobs = openai.FineTuningJob.list(limit=10)
+        st.write("### Fine-Tuning Jobs (Limited to 10)")
+        st.write(fine_tuning_jobs)
+    except Exception as e:
+        st.write(f"Error: {e}")
+
+
+# Input to specify the model for testing
+# Use session state for storing the model ID
+    if 'model_to_test' not in st.session_state:
+        st.session_state.model_to_test = ""
+    model_to_test = st.text_input("Enter the Model ID to Test:", value=st.session_state.model_to_test)
+    st.session_state.model_to_test = model_to_test.strip('"')  # Strip quotes and update session state
+
+# Get user message
+user_message_chat = st.text_input("Enter your message:")
+
+# Button to trigger the API call and get the response
+if st.button('Get Response', key='GetResponseButton'):
     headers = {
         "Content-Type": "application/json",
         "Authorization": f"Bearer {OPENAI_API_KEY}"
     }
     data = {
-        "model": f"ft:gpt-3.5-turbo:{ORG_ID}",
+        "model": model_to_test.strip('"'),
         "messages": [
             {"role": "user", "content": user_message_chat},
         ]
     }
-    response = requests.post("https://api.openai.com/v1/chat/completions", headers=headers, json=data)
-    assistant_message = response.json().get("choices", [{}])[0].get("message", {}).get("content", "")
-    st.text_area('Assistant Response:', assistant_message)
+    try:
+        response = requests.post("https://api.openai.com/v1/chat/completions", headers=headers, json=data)
+        assistant_message = response.json().get("choices", [{}])[0].get("message", {}).get("content", "")
+        st.text_area('Assistant Response:', assistant_message)
+    except Exception as e:
+        st.write(f"Error: {e}")

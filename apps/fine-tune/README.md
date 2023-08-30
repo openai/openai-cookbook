@@ -16,13 +16,16 @@ data = {
 
 ## Features
 
-1. **User Prompts**: Enter a question under the label "Enter your question? Human:".
-2. **AI Response**: Provide your ideal AI-generated response.
-3. **Custom System Message**: Add a custom system message or stick with the default message "You are a helpful and friendly assistant.".
-4. **Data Saving**: Upon pressing the "Accept Inputs" button, the provided data gets formatted and appended to an `output.jsonl` file.
-5. **TRAINING_FILE_ID Input**: Users can input their TRAINING_FILE_ID required for fine-tuning.
-6. **Fine-Tuning**: A button to send the `output.jsonl` file to OpenAI for fine-tuning.
-7. **Chat Window**: Test the fine-tuned model by sending messages and viewing the model's response.
+- **Fine-tune OpenAI & test the responses**: Provides an interface to fine-tune OpenAI models and test their responses.
+- **Enter your OpenAI API Key:**: Allows you to enter your OpenAI API key.
+- **Enter your message:**: Lets you enter a message to test the fine-tuned model.
+- **Upload to OpenAI**: Allows you to upload fine-tuning data to OpenAI.
+- **Append to output.jsonl**: Allows you to append data to a JSONL file.
+- **Create fine-tuning job**: Lets you create a fine-tuning job with OpenAI.
+- **Your OpenAI API key is not found in a .env file.**: Provides an option to save your API key securely in a .env file.
+- **Enter your ORG_ID:**: Allows you to enter your OpenAI Organization ID.
+- **Please provide your ORG_ID below to save it securely in a .env file.**: Provides an option to save your Organization ID securely in a .env file.
+
 
 
 ## Setup & Run
@@ -45,7 +48,7 @@ data = {
    ```
 
 ## Dependencies
-
+- openai 
 - streamlit
 - jsonlines
 - tiktoken

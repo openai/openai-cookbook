@@ -208,9 +208,9 @@ if st.sidebar.button('Retrieve Fine-Tune State', key='RetrieveFineTuneButton'):
 if st.sidebar.button('Cancel Fine-Tune Job', key='CancelFineTuneButton'):
     try:
         openai.FineTuningJob.cancel(st.session_state.ft_model_id)
-        st.write("### Job Cancelled")
+        st.sidebar.write("### Job Cancelled")
     except Exception as e:
-        st.write(f"Error: {e}")
+        st.sidebar.write(f"Error: {e}")
 
 # List events from a fine-tuning job
 if st.sidebar.button('List Fine-Tune Events', key='ListFineTuneEventsButton'):
@@ -219,12 +219,12 @@ if st.sidebar.button('List Fine-Tune Events', key='ListFineTuneEventsButton'):
         st.write("### Fine-Tune Events (Limited to 10)")
         st.write(fine_tune_events)
     except Exception as e:
-        st.write(f"Error: {e}")
+        st.sidebar.write(f"Error: {e}")
 
 # Delete a fine-tuned model
 if st.sidebar.button('Delete Fine-Tuned Model', key='DeleteFineTunedModelButton'):
     try:
         openai.Model.delete(st.session_state.ft_model_id)
-        st.write("### Fine-Tuned Model Deleted")
+        st.sidebar.write("### Fine-Tuned Model Deleted")
     except Exception as e:
-        st.write(f"Error: {e}")
+        st.sidebar.write(f"Error: {e}")

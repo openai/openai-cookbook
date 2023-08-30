@@ -38,9 +38,7 @@ if not ORG_ID:
         st.success('Your ORG_ID has been saved to .env file!')
         ORG_ID = user_org_id
 
-
 # Toggle visibility of the Help section using session state
-
 if 'show_help' not in st.session_state:
     st.session_state.show_help = False
 
@@ -97,7 +95,6 @@ system_message = st.text_area('Enter your custom system message:', value=system_
 prompt_text = st.text_area('Enter your question? Human:', height=200)
 ideal_generated_text = st.text_area('Enter your ideal AI generated response:', height=200)
 
-
 if st.button('Append to output.jsonl'):
     # Format and save data to jsonl
     data = {
@@ -110,7 +107,6 @@ if st.button('Append to output.jsonl'):
     with jsonlines.open('output.jsonl', mode='a') as writer:
         writer.write(data)
     st.success('Data has been appended to JSONL file!')
-
 
 if st.button('Validate your data', key="check_data_btn_2"):
     result = subprocess.run(['python', 'openaicheck.py'], capture_output=True, text=True)
@@ -137,19 +133,15 @@ if uploaded_file:
         }
         
         response = requests.post(url, headers=headers, files=files)
-
         response_dict = response.json()
         st.session_state.file_id = response_dict["id"]
-
         if response.status_code == 200:
             st.success("File successfully uploaded to OpenAI!")
         else:
             st.error("Failed to upload file. Please check the API key and file format.")
 
-
-
 # Input for TRAINING_FILE_ID
-train_id = st.text_input('your TRAINING_FILE_ID', value=st.session_state.file_id)
+train_id =  value=st.session_state.file_id
 
 if st.button('Create fine-tuning job'):
     if not train_id:
@@ -167,8 +159,6 @@ if st.button('Create fine-tuning job'):
         response = requests.post("https://api.openai.com/v1/fine_tuning/jobs", headers=headers, json=data)
         st.write(response.json())
 
-
-
 # Set OpenAI API key directly if available
 if OPENAI_API_KEY:
     openai.api_key = OPENAI_API_KEY
@@ -177,11 +167,17 @@ else:
     if api_key_input:
         openai.api_key = api_key_input
 
-
 # Additional features for fine-tuning jobs and models
-
 # Create a sidebar for additional operations
 st.sidebar.title("Additional Operations")
+
+# Input for Fine-Tuning Model ID
+if 'ft_model_id' not in st.session_state:
+    st.session_state.ft_model_id = ""
+
+ft_model_id_raw = st.sidebar.text_input("Enter Fine-Tuning Model ID:", value=st.session_state.ft_model_id)
+ft_model_id = ft_model_id_raw.strip("\"")
+st.session_state.ft_model_id = ft_model_id
 
 # Option to list 10 fine-tuning jobs
 if st.sidebar.button('List 10 Fine-Tuning Jobs', key='ListJobsButton'):
@@ -192,11 +188,43 @@ if st.sidebar.button('List 10 Fine-Tuning Jobs', key='ListJobsButton'):
     except Exception as e:
         st.write(f"Error: {e}")
 
-
-
 # Button to trigger the API call and get the response
-if st.button('Use the OpenAI Playground for test', key='GetResponseButton'):
+if st.sidebar.button('Use the OpenAI Playground for test', key='GetResponseButton'):
     try:
-        st.markdown("[Go to OpenAI Playground](https://platform.openai.com/playground)")
+        st.sidebar.markdown("[Go to OpenAI Playground](https://platform.openai.com/playground)")
+    except Exception as e:
+        st.sidebar.write(f"Error: {e}")
+
+# Retrieve the state of a fine-tune
+if st.sidebar.button('Retrieve Fine-Tune State', key='RetrieveFineTuneButton'):
+    try:
+        fine_tune_state = openai.FineTuningJob.retrieve(st.session_state.ft_model_id)
+        st.write("### Fine-Tune State")
+        st.write(fine_tune_state)
+    except Exception as e:
+        st.write(f"Error: {e}")
+
+# Cancel a job
+if st.sidebar.button('Cancel Fine-Tune Job', key='CancelFineTuneButton'):
+    try:
+        openai.FineTuningJob.cancel(st.session_state.ft_model_id)
+        st.write("### Job Cancelled")
+    except Exception as e:
+        st.write(f"Error: {e}")
+
+# List events from a fine-tuning job
+if st.sidebar.button('List Fine-Tune Events', key='ListFineTuneEventsButton'):
+    try:
+        fine_tune_events = openai.FineTuningJob.list_events(id=st.session_state.ft_model_id, limit=10)
+        st.write("### Fine-Tune Events (Limited to 10)")
+        st.write(fine_tune_events)
+    except Exception as e:
+        st.write(f"Error: {e}")
+
+# Delete a fine-tuned model
+if st.sidebar.button('Delete Fine-Tuned Model', key='DeleteFineTunedModelButton'):
+    try:
+        openai.Model.delete(st.session_state.ft_model_id)
+        st.write("### Fine-Tuned Model Deleted")
     except Exception as e:
         st.write(f"Error: {e}")

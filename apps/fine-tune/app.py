@@ -178,8 +178,6 @@ else:
         openai.api_key = api_key_input
 
 
-
-
 # Additional features for fine-tuning jobs and models
 
 # Create a sidebar for additional operations
@@ -195,31 +193,10 @@ if st.sidebar.button('List 10 Fine-Tuning Jobs', key='ListJobsButton'):
         st.write(f"Error: {e}")
 
 
-# Input to specify the model for testing
-# Use session state for storing the model ID
-    if 'model_to_test' not in st.session_state:
-        st.session_state.model_to_test = ""
-    model_to_test = st.text_input("Enter the Model ID to Test:", value=st.session_state.model_to_test)
-    st.session_state.model_to_test = model_to_test.strip('"')  # Strip quotes and update session state
-
-# Get user message
-user_message_chat = st.text_input("Enter your message:")
 
 # Button to trigger the API call and get the response
-if st.button('Get Response', key='GetResponseButton'):
-    headers = {
-        "Content-Type": "application/json",
-        "Authorization": f"Bearer {OPENAI_API_KEY}"
-    }
-    data = {
-        "model": model_to_test.strip('"'),
-        "messages": [
-            {"role": "user", "content": user_message_chat},
-        ]
-    }
+if st.button('Use the OpenAI Playground for test', key='GetResponseButton'):
     try:
-        response = requests.post("https://api.openai.com/v1/chat/completions", headers=headers, json=data)
-        assistant_message = response.json().get("choices", [{}])[0].get("message", {}).get("content", "")
-        st.text_area('Assistant Response:', assistant_message)
+        st.markdown("[Go to OpenAI Playground](https://platform.openai.com/playground)")
     except Exception as e:
         st.write(f"Error: {e}")

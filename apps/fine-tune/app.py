@@ -115,6 +115,9 @@ if st.button('Validate your data', key="check_data_btn_2"):
     result = subprocess.run(['python', 'openaicheck.py'], capture_output=True, text=True)
     st.write(result.stdout)
 
+# Initialize session state
+if 'file_id' not in st.session_state:
+    st.session_state.file_id = ""
 
 # Upload to OpenAI
 uploaded_file = st.file_uploader("Choose an output.jsonl file", type="jsonl")
@@ -133,18 +136,22 @@ if uploaded_file:
         }
         
         response = requests.post(url, headers=headers, files=files)
-        
+
+        response_dict = response.json()
+        st.session_state.file_id = response_dict["id"]
+
         if response.status_code == 200:
             st.success("File successfully uploaded to OpenAI!")
         else:
             st.error("Failed to upload file. Please check the API key and file format.")
 
 
+
 # Input for TRAINING_FILE_ID
-training_file_id = st.text_input('Enter your TRAINING_FILE_ID:* wait until you get an email from OpenAI with your ID')
+train_id = st.text_input('your TRAINING_FILE_ID', value=st.session_state.file_id)
 
 if st.button('Create fine-tuning job'):
-    if not training_file_id:
+    if not train_id:
         st.warning("Please enter a TRAINING_FILE_ID before sending for fine tuning.")
     else:
         # Send the output.jsonl for fine tuning
@@ -153,16 +160,18 @@ if st.button('Create fine-tuning job'):
             "Authorization": f"Bearer {OPENAI_API_KEY}"
         }
         data = {
-            "training_file": training_file_id,
+            "training_file": train_id,
             "model": "gpt-3.5-turbo-0613"
         }
         response = requests.post("https://api.openai.com/v1/fine_tuning/jobs", headers=headers, json=data)
         st.write(response.json())
 
+
+
 # Chat window to test the fine-tuned model
 st.subheader("Test Fine-tuned Model")
 user_message_chat = st.text_area('User Message:')
-if st.button('Get Response', disabled=not training_file_id):
+if st.button('Get Response', disabled=not id):
     headers = {
         "Content-Type": "application/json",
         "Authorization": f"Bearer {OPENAI_API_KEY}"

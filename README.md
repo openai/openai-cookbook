@@ -9,13 +9,11 @@ Most code examples are written in Python, though the concepts can be applied in 
 [![Open in GitHub Codespaces](https://github.com/codespaces/badge.svg)](https://github.com/codespaces/new?hide_repo_select=true&ref=main&repo=468576060&machine=basicLinux32gb&location=EastUs)
 
 ## Recently added/updated 🆕 ✨
+- [How to fine-tune chat models](https://github.com/openai/openai-cookbook/blob/main/examples/How_to_finetune_chat_models.ipynb) [Aug 22, 2023]
+- [How to evaluate abstractive summarization](examples/evaluation/How_to_eval_abstractive_summarization.ipynb) [Aug 16, 2023]
 - [Whisper prompting guide](examples/Whisper_prompting_guide.ipynb) [June 27, 2023]
 - [Question answering using a search API and re-ranking](https://github.com/openai/openai-cookbook/blob/main/examples/Question_answering_using_a_search_API.ipynb) [June 16, 2023]
 - [How to call functions with Chat models](https://github.com/openai/openai-cookbook/blob/main/examples/How_to_call_functions_with_chat_models.ipynb) [June 13, 2023]
-- [Related resources from around the web](https://github.com/openai/openai-cookbook#related-resources-from-around-the-web) [May 22, 2023]
-- [Embeddings playground (streamlit app)](apps/embeddings-playground/README.md) [May 19, 2023]
-- [How to use a multi-step prompt to write unit tests](examples/Unit_test_writing_using_a_multi-step_prompt.ipynb) [May 19, 2023]
-- [How to create dynamic masks with DALL·E and Segment Anything](examples/dalle/How_to_create_dynamic_masks_with_DALL-E_and_Segment_Anything.ipynb) [May 19, 2023]
 
 ## Guides & examples
 
@@ -82,7 +80,7 @@ People are writing great tools and papers for improving outputs from GPT. Here a
 - [FLAML (A Fast Library for Automated Machine Learning & Tuning)](https://microsoft.github.io/FLAML/docs/Getting-Started/): A Python library for automating selection of models, hyperparameters, and other tunable choices.
 - [Chainlit](https://docs.chainlit.io/overview): A Python library for making chatbot interfaces.
 - [Guardrails.ai](https://shreyar.github.io/guardrails/): A Python library for validating outputs and retrying failures. Still in alpha, so expect sharp edges and bugs.
-- [Semantic Kernel](https://devblogs.microsoft.com/semantic-kernel/): A Python/C# library from Microsoft that supports prompt templating, function chaining, vectorized memory, and intelligent planning.
+- [Semantic Kernel](https://github.com/microsoft/semantic-kernel): A Python/C# library from Microsoft that supports prompt templating, function chaining, vectorized memory, and intelligent planning.
 - [Prompttools](https://github.com/hegelai/prompttools): Open-source Python tools for testing and evaluating models, vector DBs, and prompts.
 - [Outlines](https://github.com/normal-computing/outlines): A Python library that provides a domain-specific language to simplify prompting and constrain generation.
 - [Promptify](https://github.com/promptslab/Promptify): A small Python library for using language models to perform NLP tasks.

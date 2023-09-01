@@ -34,7 +34,7 @@ In more advanced search systems, the cosine similarity of embeddings can be used
 
 ## Question answering
 
-The best way to get reliably honest answers from GPT-3 is to give it source documents in which it can locate correct answers. Using the semantic search procedure above, you can cheaply search a corpus of documents for relevant information and then give that information to GPT-3, via the prompt, to answer a question. We demonstrate in [Question_answering_using_embeddings.ipynb](examples/Question_answering_using_embeddings.ipynb).
+The best way to get reliably honest answers from GPT-3 is to give it source documents in which it can locate correct answers. Using the semantic search procedure above, you can cheaply search through a corpus of documents for relevant information and then give that information to GPT-3 via the prompt to answer a question. We demonstrate this in [Question_answering_using_embeddings.ipynb](examples/Question_answering_using_embeddings.ipynb).
 
 ## Recommendations
 

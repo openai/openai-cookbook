@@ -32,11 +32,11 @@ data = {
 
 1. Clone the repository using:
    ```
-   git clone https://github.com/raymondbernard/finetuneopenai.git
+   git clone https://github.com/openai/openai-cookbook.git
    ```
 2. Navigate to the repository directory:
    ```
-   cd finetuneopenai
+   cd openai-cookbook/app/fine=tune 
    ```
 3. Install the required packages using:
    ```

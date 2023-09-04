@@ -36,7 +36,7 @@ data = {
    ```
 2. Navigate to the repository directory:
    ```
-   cd openai-cookbook/app/fine=tune 
+   cd openai-cookbook\app\fine-tune 
    ```
 3. Install the required packages using:
    ```

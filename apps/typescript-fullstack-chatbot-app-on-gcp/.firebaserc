@@ -1,0 +1,14 @@
+{
+  "projects": {
+    "default": "skeet-next"
+  },
+  "targets": {
+    "skeet-next": {
+      "hosting": {
+        "skeet-next": [
+          "skeet-next"
+        ]
+      }
+    }
+  }
+}

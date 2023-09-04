@@ -1,0 +1,43 @@
+{
+  "name": "functions",
+  "scripts": {
+    "lint": "eslint --ext .ts,.js --fix .",
+    "update:packages": "ncu -u && yarn",
+    "dev": "nodemon",
+    "fb:login": "npx ts-node -r tsconfig-paths/register --transpile-only src/lib/login.ts",
+    "build": "npx ts-node build.ts",
+    "serve": "firebase emulators:start",
+    "shell": "yarn build && firebase functions:shell",
+    "start": "node dist/index.js",
+    "deploy": "firebase deploy --only functions",
+    "nodemon": "npx ts-node devBuild.ts && node ./dist/index.js",
+    "logs": "firebase functions:log",
+    "db": "npx ts-node -r tsconfig-paths/register --transpile-only src/models/chatRoom.ts",
+    "open": "npx ts-node -r tsconfig-paths/register --transpile-only src/lib/openai/openAi.ts"
+  },
+  "engines": {
+    "node": "18"
+  },
+  "main": "dist/index.js",
+  "dependencies": {
+    "@skeet-framework/ai": "1.5.0",
+    "@skeet-framework/firestore": "2.1.1",
+    "@skeet-framework/utils": "1.2.1",
+    "firebase-admin": "11.10.1",
+    "firebase-functions": "4.4.1"
+  },
+  "devDependencies": {
+    "@typescript-eslint/eslint-plugin": "6.4.0",
+    "@typescript-eslint/parser": "6.4.0",
+    "esbuild": "0.19.2",
+    "eslint": "8.47.0",
+    "eslint-config-google": "0.14.0",
+    "eslint-plugin-import": "2.28.0",
+    "firebase": "10.1.0",
+    "nodemon": "3.0.1",
+    "npm-check-updates": "16.11.1",
+    "prettier": "3.0.1",
+    "typescript": "5.1.6"
+  },
+  "private": true
+}

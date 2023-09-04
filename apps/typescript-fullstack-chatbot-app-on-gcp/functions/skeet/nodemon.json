@@ -1,0 +1,7 @@
+{
+  "watch": ["src"],
+  "ignore": ["src/**/*.test.ts", "node_modules"],
+  "ext": "ts,mjs,js,json",
+  "exec": "yarn nodemon",
+  "legacyWatch": true
+}

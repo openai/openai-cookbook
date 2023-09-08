@@ -24,9 +24,9 @@ def with_clear_container(submit_clicked):
             st.experimental_rerun()
         else:
             set_dirty_state(DirtyState.NOT_DIRTY)
-    
+
     if submit_clicked or get_dirty_state() == DirtyState.UNHANDLED_SUBMIT:
         set_dirty_state(DirtyState.DIRTY)
         return True
-    
+
     return False

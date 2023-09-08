@@ -16,6 +16,9 @@ from langchain.memory.chat_message_histories import StreamlitChatMessageHistory
 from langchain.prompts import BaseChatPromptTemplate
 from langchain.schema import AgentAction, AgentFinish, HumanMessage
 
+# Initialise database
+
+## Initialise Redis connection
 redis_client = get_redis_connection()
 
 
@@ -61,7 +64,7 @@ def answer_question_hyde(query):
             }
         ],
     )["choices"][0]["message"]["content"]
-    # st.write(hypothetical_answer)
+
     results = get_redis_results(redis_client, hypothetical_answer, INDEX_NAME)
 
     results.to_csv("results.csv")
@@ -112,7 +115,7 @@ class CustomPromptTemplate(BaseChatPromptTemplate):
 class CustomOutputParser(AgentOutputParser):
     def parse(self, llm_output: str) -> Union[AgentAction, AgentFinish]:
         # Check if agent should finish
-        if "Final Answer:"  in llm_output:
+        if "Final Answer:" in llm_output:
             return AgentFinish(
                 # Return values is generally always a dictionary with a single `output` key
                 # It is not recommended to try anything else at the moment :)
@@ -153,17 +156,6 @@ def initiate_agent(tools):
     )
 
     output_parser = CustomOutputParser()
-
-    if not openai.api_key and not os.environ.get("OPENAI_API_KEY"):
-        warning = st.sidebar.warning("""
-        No API key provided. You can set your API key in code using 'openai.api_key = <API-KEY>', or you can set the environment variable OPENAI_API_KEY=<API-KEY>). 
-        
-        Else, please set your API key below.
-        """)
-        
-        openai.api_key = st.sidebar.text_input("OpenAI API key", type="password")
-        if openai.api_key is not None:
-            warning.empty()
 
     llm = ChatOpenAI(
         temperature=0,

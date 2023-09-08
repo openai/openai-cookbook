@@ -1,35 +1,28 @@
-import sys
+import os
 import re
-from langchain.agents import Tool
+import sys
+
+import openai
 import pandas as pd
 import streamlit as st
-from streamlit_chat import message
-
+from assistant import (answer_question_hyde, answer_user_question, ask_gpt,
+                       initiate_agent)
 from database import get_redis_connection
-from assistant import (
-    answer_user_question,
-    initiate_agent,
-    answer_question_hyde,
-    ask_gpt,
-)
+from langchain.agents import Tool
+from langchain.callbacks import StreamlitCallbackHandler
+from langchain.memory.chat_message_histories import StreamlitChatMessageHistory
+from openai.error import AuthenticationError, InvalidRequestError
 
-class StreamlitOutput:
-    def __init__(self):
-        self.buffer = ""
 
-    def write(self, s):
-        self.buffer += s
-
-    def flush(self):
-        pass
-
-def clean_ansi_codes(s):
-    ansi_escape = re.compile(r'(\x9B|\x1B\[)[0-?]*[ -/]*[@-~]')
-    return ansi_escape.sub('', s)
-
-original_stdout = sys.stdout
-streamlit_stdout = StreamlitOutput()
-sys.stdout = streamlit_stdout
+def clear_history(token_count):
+    msgs.clear()
+    if token_count > 4097:
+        msgs.add_ai_message(
+        f"This model's maximum context length is 4097 tokens. However, your messages resulted in {token_count} tokens. Resetting chat history, please try again."
+    )
+    else:
+        msgs.add_ai_message("How can I help you?")
+    st.session_state.steps = {}
 
 redis_client = get_redis_connection()
 
@@ -44,6 +37,38 @@ st.subheader("Learn things - random things!")
 add_selectbox = st.sidebar.selectbox(
     "What kind of search?", ("Standard vector search", "HyDE")
 )
+
+if not openai.api_key and "OPENAI_API_KEY" not in os.environ:
+    warning = st.sidebar.warning("""
+    No API key provided. You can set your API key in code using 'openai.api_key = <API-KEY>', or you can set the environment variable OPENAI_API_KEY=<API-KEY>). 
+    
+    Else, please set your API key below.
+    """)
+    
+    openai.api_key = st.sidebar.text_input("OpenAI API key", type="password")
+    if openai.api_key:
+        warning.empty()
+
+msgs = StreamlitChatMessageHistory()
+token_count = sum(len(str(i)) for i in msgs.messages)
+
+if len(msgs.messages) == 0 or st.sidebar.button("Reset chat history") or token_count > 4097:
+    clear_history(token_count)
+
+avatars = {"human": "user", "ai": "assistant"}
+
+for idx, msg in enumerate(msgs.messages):
+    with st.chat_message(avatars[msg.type]):
+        # Render intermediate steps if any were saved
+        for step in st.session_state.steps.get(str(idx), []):
+            if step[0].tool == "_Exception":
+                continue
+            with st.status(
+                f"**{step[0].tool}**: {step[0].tool_input}", state="complete"
+            ):
+                st.write(step[0].log)
+                st.write(step[1])
+        st.write(msg.content)
 
 tools = [
     Tool(
@@ -60,39 +85,20 @@ tools = [
     ),
 ]
 
-if "generated" not in st.session_state:
-    st.session_state["generated"] = []
 
-if "past" not in st.session_state:
-    st.session_state["past"] = []
+if prompt := st.chat_input("What is light made of?"):
+    st.chat_message("user").write(prompt)
 
-def query(question):
-    response = st.session_state["chat"].ask_assistant(question)
-    return response
+    executor = initiate_agent(tools)
 
-prompt = st.chat_input("What do you want to know:")
-
-if prompt:
-    with st.spinner("Thinking..."):
-        if "agent" not in st.session_state:
-            st.session_state["agent"] = initiate_agent(tools)
-
-        response = st.session_state["agent"].run(prompt)
-
-        st.session_state.past.append(prompt)
-        st.session_state.generated.append(response)
-
-cleaned_output = clean_ansi_codes(streamlit_stdout.buffer)
-cleaned_output = '\n'.join([line for line in cleaned_output.split('\n') if line.strip()])
-
-if cleaned_output:  # Only show expander if there's content to display
-    with st.expander("✨ Check :rainbow[Chain of Thought]"):
-        st.code(cleaned_output)
-
-if len(st.session_state["generated"]) > 0:
-    for i in range(len(st.session_state["generated"]) - 1, -1, -1):
-        with st.chat_message("user"):
-            st.write(st.session_state["past"][i])
-        with st.chat_message("assistant"):
-            st.write(st.session_state["generated"][i])
-
+    with st.chat_message("assistant"):
+        st_cb = StreamlitCallbackHandler(st.container(), max_thought_containers=1)
+        try:
+            response = executor(prompt, callbacks=[st_cb])
+        except InvalidRequestError as e:
+            clear_history(token_count)
+            st.experimental_rerun()
+        st.write(response["output"])
+        st.session_state.steps[str(len(msgs.messages) - 1)] = response[
+            "intermediate_steps"
+        ]

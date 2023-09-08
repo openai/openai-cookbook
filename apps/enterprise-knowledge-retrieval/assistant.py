@@ -1,22 +1,20 @@
-from langchain.agents import (
-    Tool,
-    AgentExecutor,
-    LLMSingleActionAgent,
-    AgentOutputParser,
-)
-from langchain.prompts import BaseChatPromptTemplate
-from langchain import SerpAPIWrapper, LLMChain
-from langchain.chat_models import ChatOpenAI
-from typing import List, Union
-from langchain.schema import AgentAction, AgentFinish, HumanMessage
-from langchain.memory import ConversationBufferWindowMemory
-import openai
+import os
 import re
+from typing import List, Union
+
+import openai
 import streamlit as st
-
-from database import get_redis_results, get_redis_connection
-from config import RETRIEVAL_PROMPT, CHAT_MODEL, INDEX_NAME, SYSTEM_PROMPT
-
+from config import CHAT_MODEL, INDEX_NAME, RETRIEVAL_PROMPT, SYSTEM_PROMPT
+from database import get_redis_connection, get_redis_results
+from langchain import LLMChain, SerpAPIWrapper
+from langchain.agents import (AgentExecutor, AgentOutputParser, AgentType,
+                              LLMSingleActionAgent, Tool)
+from langchain.chat_models import ChatOpenAI
+from langchain.memory import (ConversationBufferMemory,
+                              ConversationBufferWindowMemory)
+from langchain.memory.chat_message_histories import StreamlitChatMessageHistory
+from langchain.prompts import BaseChatPromptTemplate
+from langchain.schema import AgentAction, AgentFinish, HumanMessage
 
 redis_client = get_redis_connection()
 
@@ -114,7 +112,7 @@ class CustomPromptTemplate(BaseChatPromptTemplate):
 class CustomOutputParser(AgentOutputParser):
     def parse(self, llm_output: str) -> Union[AgentAction, AgentFinish]:
         # Check if agent should finish
-        if "Final Answer:" in llm_output:
+        if "Final Answer:"  in llm_output:
             return AgentFinish(
                 # Return values is generally always a dictionary with a single `output` key
                 # It is not recommended to try anything else at the moment :)
@@ -125,7 +123,7 @@ class CustomOutputParser(AgentOutputParser):
         regex = r"Action\s*\d*\s*:(.*?)\nAction\s*\d*\s*Input\s*\d*\s*:[\s]*(.*)"
         match = re.search(regex, llm_output, re.DOTALL)
         if not match:
-            raise ValueError(f"Could not parse LLM output: `{llm_output}`")
+            return AgentAction(tool="Ask", tool_input=llm_output, log=llm_output)
         action = match.group(1).strip()
         action_input = match.group(2)
         # Return the action and action input
@@ -145,11 +143,32 @@ def initiate_agent(tools):
 
     # Initiate the memory with k=2 to keep the last two turns
     # Provide the memory to the agent
-    memory = ConversationBufferWindowMemory(k=2)
+    # memory = ConversationBufferWindowMemory(k=2)
+    msgs = StreamlitChatMessageHistory()
+    memory = ConversationBufferMemory(
+        chat_memory=msgs,
+        return_messages=True,
+        memory_key="history",
+        output_key="output",
+    )
 
     output_parser = CustomOutputParser()
 
-    llm = ChatOpenAI(temperature=0)
+    if not openai.api_key and not os.environ.get("OPENAI_API_KEY"):
+        warning = st.sidebar.warning("""
+        No API key provided. You can set your API key in code using 'openai.api_key = <API-KEY>', or you can set the environment variable OPENAI_API_KEY=<API-KEY>). 
+        
+        Else, please set your API key below.
+        """)
+        
+        openai.api_key = st.sidebar.text_input("OpenAI API key", type="password")
+        if openai.api_key is not None:
+            warning.empty()
+
+    llm = ChatOpenAI(
+        temperature=0,
+        openai_api_key=openai.api_key,
+    )
 
     # LLM chain consisting of the LLM and a prompt
     llm_chain = LLMChain(llm=llm, prompt=prompt)
@@ -163,7 +182,14 @@ def initiate_agent(tools):
     )
 
     agent_executor = AgentExecutor.from_agent_and_tools(
-        agent=agent, tools=tools, verbose=True, memory=memory
+        agent=agent,
+        tools=tools,
+        memory=memory,
+        return_intermediate_steps=True,
+        handle_parsing_errors=True,
+        max_iterations=10,
+        verbose=True,
+        max_execution_time=60,
     )
 
     return agent_executor

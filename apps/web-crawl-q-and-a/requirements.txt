@@ -68,7 +68,7 @@ tenacity==8.1.0
 threadpoolctl==3.1.0
 tiktoken==0.1.2
 tokenizers==0.13.2
-tornado==6.3.2
+tornado==6.3.3
 tqdm==4.64.1
 traitlets==5.8.1
 transformers==4.25.1

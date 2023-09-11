@@ -51,7 +51,7 @@ psutil==5.9.4
 ptyprocess==0.7.0
 pure-eval==0.2.2
 pycryptodomex==3.17
-Pygments==2.14.0
+Pygments==2.15.0
 pyparsing==3.0.9
 python-dateutil==2.8.2
 pytz==2022.7.1

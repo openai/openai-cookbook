@@ -58,7 +58,7 @@ pytz==2022.7.1
 PyYAML==6.0
 pyzmq==24.0.1
 regex==2022.10.31
-requests==2.28.1
+requests==2.31.0
 scikit-learn==1.2.0
 scipy==1.10.0
 six==1.16.0

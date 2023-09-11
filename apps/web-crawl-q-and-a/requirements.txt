@@ -71,7 +71,7 @@ tokenizers==0.13.2
 tornado==6.3.3
 tqdm==4.64.1
 traitlets==5.8.1
-transformers==4.25.1
+transformers==4.30.0
 typing_extensions==4.4.0
 urllib3==1.26.13
 wcwidth==0.2.5

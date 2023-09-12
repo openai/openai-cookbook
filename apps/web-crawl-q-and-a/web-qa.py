@@ -20,6 +20,9 @@ from ast import literal_eval
 # Regex pattern to match a URL
 HTTP_URL_PATTERN = r'^http[s]{0,1}://.+$'
 
+# Define OpenAI api_key
+# openai.api_key = '<Your API Key>'
+
 # Define root domain to crawl
 domain = "openai.com"
 full_url = "https://openai.com/"
@@ -136,22 +139,26 @@ def crawl(url):
         # Get the next URL from the queue
         url = queue.pop()
         print(url) # for debugging and to see the progress
+        
+        # Try extracting the text from the link, if failed proceed with the next item in the queue
+        try:
+            # Save text from the url to a <url>.txt file
+            with open('text/'+local_domain+'/'+url[8:].replace("/", "_") + ".txt", "w", encoding="UTF-8") as f:
 
-        # Save text from the url to a <url>.txt file
-        with open('text/'+local_domain+'/'+url[8:].replace("/", "_") + ".txt", "w", encoding="UTF-8") as f:
+                # Get the text from the URL using BeautifulSoup
+                soup = BeautifulSoup(requests.get(url).text, "html.parser")
 
-            # Get the text from the URL using BeautifulSoup
-            soup = BeautifulSoup(requests.get(url).text, "html.parser")
+                # Get the text but remove the tags
+                text = soup.get_text()
 
-            # Get the text but remove the tags
-            text = soup.get_text()
-
-            # If the crawler gets to a page that requires JavaScript, it will stop the crawl
-            if ("You need to enable JavaScript to run this app." in text):
-                print("Unable to parse page " + url + " due to JavaScript being required")
+                # If the crawler gets to a page that requires JavaScript, it will stop the crawl
+                if ("You need to enable JavaScript to run this app." in text):
+                    print("Unable to parse page " + url + " due to JavaScript being required")
             
-            # Otherwise, write the text to the file in the text directory
-            f.write(text)
+                # Otherwise, write the text to the file in the text directory
+                f.write(text)
+        except Exception as e:
+            print("Unable to parse page " + url)
 
         # Get the hyperlinks from the URL and add them to the queue
         for link in get_domain_hyperlinks(local_domain, url):

@@ -133,3 +133,4 @@ dmypy.json
 /examples/data/transactions*
 *.DS_Store
 tmp_*
+examples/fine-tuned_qa/local_cache/*

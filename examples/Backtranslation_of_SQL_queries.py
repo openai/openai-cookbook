@@ -41,11 +41,11 @@ def get_candidates(
 
 def rindex(lst: List, value: str) -> int:
     """
-    Return the index of the last occurence of a value in a list.
+    Return the index of the last occurrence of a value in a list.
 
     :param lst: The list to search in.
     :param value: The value to search for.
-    :return: The index of the last occurence of the value.
+    :return: The index of the last occurrence of the value.
     """
     try:
         return len(lst) - lst[::-1].index(value) - 1

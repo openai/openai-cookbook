@@ -1,0 +1,7 @@
+langchain==0.0.158
+numpy==1.24.2
+openai==0.27.4
+pandas==2.0.0
+redis==4.5.4
+streamlit==1.22.0
+streamlit_chat==0.0.2.2

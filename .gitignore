@@ -110,7 +110,7 @@ ENV/
 env.bak/
 venv.bak/
 pyvenv.cfg
-share
+share/
 bin/
 
 # Spyder project settings

@@ -10,6 +10,7 @@ People are writing great tools and papers for improving outputs from GPT. Here a
 - [Chainlit](https://docs.chainlit.io/overview): A Python library for making chatbot interfaces.
 - [Guardrails.ai](https://shreyar.github.io/guardrails/): A Python library for validating outputs and retrying failures. Still in alpha, so expect sharp edges and bugs.
 - [Semantic Kernel](https://github.com/microsoft/semantic-kernel): A Python/C#/Java library from Microsoft that supports prompt templating, function chaining, vectorized memory, and intelligent planning.
+- [YiVal](https://github.com/YiVal/YiVal): An open-source GenAI-Ops tool for tuning and evaluating prompts, retrieval configurations, and model parameters using customizable datasets, evaluation methods, and evolution strategies.
 - [Prompttools](https://github.com/hegelai/prompttools): Open-source Python tools for testing and evaluating models, vector DBs, and prompts.
 - [Outlines](https://github.com/normal-computing/outlines): A Python library that provides a domain-specific language to simplify prompting and constrain generation.
 - [Promptify](https://github.com/promptslab/Promptify): A small Python library for using language models to perform NLP tasks.

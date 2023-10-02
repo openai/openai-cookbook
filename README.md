@@ -15,10 +15,11 @@ Most code examples are written in Python, though the concepts can be applied in 
 
 For other useful tools, guides and courses, check out these [related resources from around the web](https://cookbook.openai.com/related_resources).
 
-
 ## Contributing
 
-The contents of this repo are automatically rendered into [cookbook.openai.com](https://cookbook.openai.com). If there are examples or guides you'd like to see, feel free to suggest them on the [issues page](https://github.com/openai/openai-cookbook/issues). We are also happy to accept high quality pull requests, as long as they fit the scope of the cookbook.
+If there are examples or guides you'd like to see, feel free to suggest them on the [issues page](https://github.com/openai/openai-cookbook/issues). We are also happy to accept high quality pull requests, as long as they fit the scope of the cookbook.
+
+The contents of this repo are automatically rendered into [cookbook.openai.com](https://cookbook.openai.com) based on [registry.yaml](/registry.yaml). When contributing a new example, make sure to add a new entry for it in [registry.yaml](/registry.yaml) so that it renders on the website.
 
 Refer to our guide on [what makes documentation good](https://cookbook.openai.com/what_makes_documentation_good) for guidance on how to make high quality contributions.
 

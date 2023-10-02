@@ -33,4 +33,6 @@ Why are these changes necessary? How do they improve the cookbook?
   - Styling and formatting align with existing documentation.
   - Consistent use of punctuation and case.
 
+When contributing a new example, make sure to add a new entry for it in [registry.yaml](/registry.yaml) to render it on the cookbook website.
+
 **Note:** For additional guidelines on writing good documentation, check out [What Makes Documentation Good](https://cookbook.openai.com/what_makes_documentation_good).

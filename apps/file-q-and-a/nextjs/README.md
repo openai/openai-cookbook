@@ -10,6 +10,8 @@ To run the app, you need an OpenAI API key. You can create a new API key [here](
 
 If you don't have Node.js and npm already, install them from [https://nodejs.org/en/download/](https://nodejs.org/en/download/).
 
+Otherwise you can run the project inside a [Dev Container](https://code.visualstudio.com/docs/devcontainers/containers). If you are using VS Code, open the Command Pallette (ctrl+shift+p on Windows / cmd+shift+p on Mac), and run the command `Dev Containers: Open Folder in Container`. Then select the folder `apps/file-q-and-a/nextjs`, and VS Code will take care of booting a container with Node.js and npm ready to go. You may need to install the [Dev Containers](https://marketplace.visualstudio.com/items?itemName=ms-vscode-remote.remote-containers) extension.
+
 In your terminal, navigate to the `nextjs` directory of this example app, and then install dependencies:
 
 ```

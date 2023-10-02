@@ -1,5 +1,9 @@
 # yaml-language-server: $schema=./registry_schema.json
 
+# This file is used to generate cookbook.openai.com. It specifies which paths we
+# should build pages for, and indicates metadata such as tags, creation date and
+# authors for each page.
+
 - title: Data preparation and analysis for chat model fine-tuning
   path: examples/Chat_finetuning_data_prep.ipynb
   date: 2023-08-22

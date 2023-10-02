@@ -991,7 +991,7 @@
     - completions
     - embeddings
 
-- title: Neon Vector Database
+- title: Neon as a vector database
   path: examples/vector_databases/neon/README.md
   date: 2023-09-28
   authors:

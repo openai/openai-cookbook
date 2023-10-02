@@ -73,7 +73,7 @@ tqdm==4.64.1
 traitlets==5.8.1
 transformers==4.30.0
 typing_extensions==4.4.0
-urllib3==1.26.13
+urllib3==1.26.17
 wcwidth==0.2.5
 yarg==0.1.9
 yarl==1.8.2

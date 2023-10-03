@@ -1014,3 +1014,12 @@
     - FayazRahman
   tags:
     - embeddings
+
+- title: How to Automatic Filter and Search with Function Calling
+  path: examples/How_to_automatic_filter_and_search_with_function_calling.ipynb
+  date: 2023-10-02
+  authors:
+    - AlexZhangji
+  tags:
+    - completions
+    - embeddings

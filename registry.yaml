@@ -451,18 +451,6 @@
     - embeddings
     - completions
 
-- title: >-
-    Fine-Tuning OpenAI Models for Retrieval Augmented Generation (RAG) with
-    Qdrant and Few-Shot Learning
-  path: examples/fine-tuned_qa/ft_retrieval_augmented_generation_qdrant.ipynb
-  date: 2023-09-12
-  authors:
-    - NirantK
-  tags:
-    - completions
-    - embeddings
-    - tiktoken
-
 - title: Fine-Tuned Q&A - Collect Data
   path: examples/fine-tuned_qa/olympics-1-collect-data.ipynb
   date: 2022-03-10

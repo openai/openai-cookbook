@@ -11,7 +11,7 @@ People are writing great tools and papers for improving outputs from GPT. Here a
 - [Guidance](https://github.com/microsoft/guidance): A handy looking Python library from Microsoft that uses Handlebars templating to interleave generation, prompting, and logical control.
 - [Haystack](https://github.com/deepset-ai/haystack): Open-source LLM orchestration framework to build customizable, production-ready LLM applications in Python.
 - [LangChain](https://github.com/hwchase17/langchain): A popular Python/JavaScript library for chaining sequences of language model prompts.
-- [🚅 LiteLLM](https://github.com/BerriAI/litellm): Easily call Anthropic/Huggingface/etc. using the OpenAI format 
+- [LiteLLM](https://github.com/BerriAI/litellm): Easily call Anthropic/Huggingface/etc. using the OpenAI format 
 - [LlamaIndex](https://github.com/jerryjliu/llama_index): A Python library for augmenting LLM apps with data.
 - [LMQL](https://lmql.ai): A programming language for LLM interaction with support for typed prompting, control flow, constraints, and tools.
 - [OpenAI Evals](https://github.com/openai/evals): An open-source library for evaluating task performance of language models and prompts.

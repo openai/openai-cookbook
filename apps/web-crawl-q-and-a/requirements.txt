@@ -42,7 +42,7 @@ pandas==1.5.2
 parso==0.8.3
 pexpect==4.8.0
 pickleshare==0.7.5
-Pillow==9.4.0
+Pillow==10.0.1
 pipreqs==0.4.12
 platformdirs==2.6.2
 plotly==5.12.0

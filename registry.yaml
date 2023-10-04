@@ -999,6 +999,24 @@
   path: examples/vector_databases/deeplake/deeplake_langchain_qa.ipynb
   date: 2023-09-30
   authors:
-    - FayazRahman
+    - ash0ts
   tags:
     - embeddings
+
+- title: How to Finetune ChatGPT-3.5 and/or GPT-4 with Weights & Biases
+  path: examples/third_party_examples/GPT_finetuning_with_wandb.ipynb
+  date: 2023-10-04
+  authors:
+    - ash0ts
+  tags:
+    - tiktoken
+    - completions
+
+- title: OpenAI API Monitoring with W&B Weave
+  path: examples/third_party_examples/Openai_monitoring_with_wandb_weave.ipynb
+  date: 2023-10-04
+  authors:
+    - ash0ts
+  tags:
+    - tiktoken
+    - completions

@@ -1,4 +1,4 @@
-# Build an AI agent with OpenAI functions and the Node SDK
+# Build an AI agent with OpenAI functions and the Node.js SDK
 
 OpenAI functions enable your app to take action based on user inputs. This means that it can, e.g., search the web, send emails, or book tickets on behalf of your users, making it more powerful than a regular chatbot.
 

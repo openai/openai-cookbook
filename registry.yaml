@@ -1002,3 +1002,21 @@
     - FayazRahman
   tags:
     - embeddings
+
+- title: Fine-tuning GPT with Weights & Biases
+  path: examples/third_party_examples/GPT_finetuning_with_wandb.ipynb
+  date: 2023-10-04
+  authors:
+    - ash0ts
+  tags:
+    - tiktoken
+    - completions
+
+- title: OpenAI API Monitoring with Weights & Biases Weave
+  path: examples/third_party_examples/Openai_monitoring_with_wandb_weave.ipynb
+  date: 2023-10-04
+  authors:
+    - ash0ts
+  tags:
+    - tiktoken
+    - completions

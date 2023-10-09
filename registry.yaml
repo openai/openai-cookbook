@@ -1021,6 +1021,14 @@
     - tiktoken
     - completions
 
+- title: Named Entity Recognition with ChatCompletion
+  path: examples/Named_Entity_Recognition.ipynb
+  date: 2023-10-09
+  authors:
+    - dcarpintero
+  tags:
+    - completions
+
 - title: What makes documentation good
   path: what_makes_documentation_good.md
   date: 2023-09-01

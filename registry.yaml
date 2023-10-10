@@ -1029,3 +1029,10 @@
   tags:
     - tiktoken
     - completions
+
+- title: What makes documentation good
+  path: what_makes_documentation_good.md
+  date: 2023-09-01
+  authors:
+    - ted-at-openai
+  tags: []

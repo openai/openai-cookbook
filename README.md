@@ -9,7 +9,7 @@
  
 > ✨ Navigate at [cookbook.openai.com](https://cookbook.openai.com)
 
-Example code and guides for accomplishing common tasks with the [OpenAI API](https://openai.com/api/). To run these examples, you'll need an OpenAI account and associated API key ([create a free account here](https://beta.openai.com/signup)).
+Example code and guides for accomplishing common tasks with the [OpenAI API](https://platform.openai.com/). To run these examples, you'll need an OpenAI account and associated API key ([create a free account here](https://beta.openai.com/signup)).
 
 Most code examples are written in Python, though the concepts can be applied in any language.
 

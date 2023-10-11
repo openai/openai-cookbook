@@ -1,0 +1,1029 @@
+# yaml-language-server: $schema=./registry_schema.json
+
+# This file is used to generate cookbook.openai.com. It specifies which paths we
+# should build pages for, and indicates metadata such as tags, creation date and
+# authors for each page.
+
+- title: Data preparation and analysis for chat model fine-tuning
+  path: examples/Chat_finetuning_data_prep.ipynb
+  date: 2023-08-22
+  authors:
+    - mwu1993
+    - simonpfish
+  tags:
+    - completions
+    - tiktoken
+
+- title: Classification using embeddings
+  path: examples/Classification_using_embeddings.ipynb
+  date: 2022-07-11
+  authors:
+    - ted-at-openai
+    - logankilpatrick
+  tags:
+    - embeddings
+
+- title: Clustering
+  path: examples/Clustering.ipynb
+  date: 2022-03-10
+  authors:
+    - BorisPower
+    - ted-at-openai
+    - logankilpatrick
+  tags:
+    - embeddings
+
+- title: Clustering for Transaction Classification
+  path: examples/Clustering_for_transaction_classification.ipynb
+  date: 2022-10-20
+  authors:
+    - colin-jarvis
+    - ted-at-openai
+  tags:
+    - embeddings
+    - completions
+
+- title: Code search
+  path: examples/Code_search.ipynb
+  date: 2022-03-10
+  authors:
+    - BorisPower
+    - logankilpatrick
+    - eli64s
+  tags:
+    - embeddings
+
+- title: Customizing embeddings
+  path: examples/Customizing_embeddings.ipynb
+  date: 2022-03-10
+  authors:
+    - ted-at-openai
+    - BorisPower
+  tags:
+    - embeddings
+
+- title: Embedding Wikipedia articles for search
+  path: examples/Embedding_Wikipedia_articles_for_search.ipynb
+  date: 2023-04-14
+  authors:
+    - ted-at-openai
+  tags:
+    - embeddings
+    - completions
+
+- title: Embedding texts that are longer than the model's maximum context length
+  path: examples/Embedding_long_inputs.ipynb
+  date: 2023-01-18
+  authors:
+    - filipeabperes
+  tags:
+    - embeddings
+    - tiktoken
+
+- title: Long Document Content Extraction
+  path: examples/Entity_extraction_for_long_documents.ipynb
+  date: 2023-02-20
+  authors:
+    - colin-openai
+  tags:
+    - completions
+
+- title: Fine tuning classification example
+  path: examples/Fine-tuned_classification.ipynb
+  date: 2022-03-10
+  authors:
+    - BorisPower
+  tags:
+    - completions
+
+- title: >-
+    Function calling for nearby places: Leveraging the Google Places API and
+    customer profiles
+  path: examples/Function_calling_finding_nearby_places.ipynb
+  date: 2023-08-11
+  authors:
+    - prestontuggle
+  tags:
+    - completions
+
+- title: Get embeddings
+  path: examples/Get_embeddings.ipynb
+  date: 2022-03-10
+  authors:
+    - BorisPower
+    - ted-at-openai
+    - logankilpatrick
+  tags:
+    - embeddings
+
+- title: How to build a tool-using agent with LangChain
+  path: examples/How_to_build_a_tool-using_agent_with_Langchain.ipynb
+  date: 2023-05-02
+  authors:
+    - colin-openai
+  tags:
+    - completions
+    - embeddings
+
+- title: How to use functions with a knowledge base
+  path: examples/How_to_call_functions_for_knowledge_retrieval.ipynb
+  date: 2023-06-14
+  authors:
+    - joe-at-openai
+  tags:
+    - completions
+
+- title: How to call functions with chat models
+  path: examples/How_to_call_functions_with_chat_models.ipynb
+  date: 2023-06-13
+  authors:
+    - colin-openai
+    - joe-at-openai
+  tags:
+    - completions
+
+- title: How to count tokens with tiktoken
+  path: examples/How_to_count_tokens_with_tiktoken.ipynb
+  date: 2022-12-16
+  authors:
+    - ted-at-openai
+  tags:
+    - tiktoken
+    - completions
+
+- title: How to fine-tune chat models
+  path: examples/How_to_finetune_chat_models.ipynb
+  date: 2023-08-22
+  authors:
+    - simonpfish
+  tags:
+    - completions
+
+- title: How to format inputs to ChatGPT models
+  path: examples/How_to_format_inputs_to_ChatGPT_models.ipynb
+  date: 2023-03-01
+  authors:
+    - ted-at-openai
+  tags:
+    - completions
+    - tiktoken
+
+- title: How to handle rate limits
+  path: examples/How_to_handle_rate_limits.ipynb
+  date: 2022-09-10
+  authors:
+    - ted-at-openai
+  tags:
+    - completions
+    - embeddings
+
+- title: How to stream completions
+  path: examples/How_to_stream_completions.ipynb
+  date: 2022-09-02
+  authors:
+    - ted-at-openai
+  tags:
+    - completions
+    - tiktoken
+
+- title: Multiclass Classification for Transactions
+  path: examples/Multiclass_classification_for_transactions.ipynb
+  date: 2022-10-20
+  authors:
+    - colin-jarvis
+  tags:
+    - embeddings
+    - completions
+
+- title: Get embeddings from dataset
+  path: examples/Get_embeddings_from_dataset.ipynb
+  date: 2022-03-10
+  authors:
+    - BorisPower
+    - ted-at-openai
+  tags:
+    - embeddings
+
+- title: Question answering using a search API and re-ranking
+  path: examples/Question_answering_using_a_search_API.ipynb
+  date: 2023-06-16
+  authors:
+    - simonpfish
+    - ted-at-openai
+  tags:
+    - embeddings
+    - completions
+
+- title: Question answering using embeddings-based search
+  path: examples/Question_answering_using_embeddings.ipynb
+  date: 2022-06-10
+  authors:
+    - ted-at-openai
+    - MikeHeaton
+  tags:
+    - embeddings
+    - completions
+
+- title: Recommendation using embeddings and nearest neighbor search
+  path: examples/Recommendation_using_embeddings.ipynb
+  date: 2022-03-10
+  authors:
+    - ted-at-openai
+    - BorisPower
+    - logankilpatrick
+  tags:
+    - embeddings
+
+- title: Regression using the embeddings
+  path: examples/Regression_using_embeddings.ipynb
+  date: 2022-03-10
+  authors:
+    - BorisPower
+    - ted-at-openai
+    - logankilpatrick
+  tags:
+    - embeddings
+
+- title: Search reranking with cross-encoders
+  path: examples/Search_reranking_with_cross-encoders.ipynb
+  date: 2023-06-28
+  authors:
+    - colin-openai
+  tags:
+    - embeddings
+    - completions
+
+- title: Semantic text search using embeddings
+  path: examples/Semantic_text_search_using_embeddings.ipynb
+  date: 2022-03-10
+  authors:
+    - BorisPower
+    - ted-at-openai
+    - logankilpatrick
+  tags:
+    - embeddings
+
+- title: Unit test writing using a multi-step prompt
+  path: examples/Unit_test_writing_using_a_multi-step_prompt.ipynb
+  date: 2022-11-15
+  authors:
+    - ted-at-openai
+  tags:
+    - completions
+
+- title: Unit test writing using a multi-step prompt (with the older API)
+  path: >-
+    examples/Unit_test_writing_using_a_multi-step_prompt_with_older_completions_API.ipynb
+  date: 2023-05-19
+  authors:
+    - ted-at-openai
+  tags:
+    - completions
+
+- title: User and product embeddings
+  path: examples/User_and_product_embeddings.ipynb
+  date: 2022-03-10
+  authors:
+    - BorisPower
+  tags:
+    - embeddings
+
+- title: Visualizing the embeddings in 2D
+  path: examples/Visualizing_embeddings_in_2D.ipynb
+  date: 2022-03-10
+  authors:
+    - BorisPower
+    - ted-at-openai
+  tags:
+    - embeddings
+
+- title: Visualizing embeddings in 3D
+  path: examples/Visualizing_embeddings_in_3D.ipynb
+  date: 2022-03-10
+  authors:
+    - BorisPower
+    - ted-at-openai
+  tags:
+    - embeddings
+
+- title: Visualizing the embeddings in W&B
+  path: examples/Visualizing_embeddings_in_W&B.ipynb
+  date: 2023-02-01
+  authors:
+    - scottire
+  tags:
+    - embeddings
+
+- title: Visualizing Open AI Embeddings in Atlas
+  path: examples/Visualizing_embeddings_with_Atlas.ipynb
+  date: 2023-03-28
+  authors:
+    - AndriyMulyar
+    - TDulka
+  tags:
+    - embeddings
+
+- title: "Addressing transcription misspellings: prompt vs post-processing"
+  path: examples/Whisper_correct_misspelling.ipynb
+  date: 2023-08-11
+  authors:
+    - prestontuggle
+  tags:
+    - whisper
+    - completions
+
+- title: "Enhancing Whisper transcriptions: pre- & post-processing techniques"
+  path: examples/Whisper_processing_guide.ipynb
+  date: 2023-08-11
+  authors:
+    - prestontuggle
+  tags:
+    - whisper
+
+- title: Whisper prompting guide
+  path: examples/Whisper_prompting_guide.ipynb
+  date: 2023-06-27
+  authors:
+    - prestontuggle
+  tags:
+    - whisper
+    - completions
+
+- title: Zero-shot classification with embeddings
+  path: examples/Zero-shot_classification_with_embeddings.ipynb
+  date: 2022-03-10
+  authors:
+    - BorisPower
+    - ted-at-openai
+    - logankilpatrick
+  tags:
+    - embeddings
+
+- title: Azure DALL·E image generation example
+  path: examples/azure/DALL-E.ipynb
+  date: 2023-06-12
+  authors:
+    - glecaros
+  tags:
+    - dall-e
+
+- title: Azure chat completions example (preview)
+  path: examples/azure/chat.ipynb
+  date: 2023-03-28
+  authors:
+    - cmurtz-msft
+    - glecaros
+    - kristapratico
+  tags:
+    - completions
+
+- title: Azure chat completion models with your own data (preview)
+  path: examples/azure/chat_with_your_own_data.ipynb
+  date: 2023-09-11
+  authors:
+    - kristapratico
+  tags:
+    - completions
+
+- title: Azure completions example
+  path: examples/azure/completions.ipynb
+  date: 2022-12-16
+  authors:
+    - cmurtz-msft
+    - glecaros
+    - kristapratico
+  tags:
+    - embeddings
+    - completions
+
+- title: Azure embeddings example
+  path: examples/azure/embeddings.ipynb
+  date: 2022-07-12
+  authors:
+    - ted-at-openai
+    - cmurtz-msft
+    - glecaros
+    - kristapratico
+  tags:
+    - embeddings
+
+- title: Azure functions example
+  path: examples/azure/functions.ipynb
+  date: 2023-07-21
+  authors:
+    - kristapratico
+  tags:
+    - completions
+
+- title: Translate a book writen in LaTeX from Slovenian into English
+  path: examples/book_translation/translate_latex_book.ipynb
+  date: 2022-03-10
+  authors:
+    - BorisPower
+  tags:
+    - completions
+    - tiktoken
+
+- title: How to create dynamic masks with DALL·E and Segment Anything
+  path: >-
+    examples/dalle/How_to_create_dynamic_masks_with_DALL-E_and_Segment_Anything.ipynb
+  date: 2023-05-19
+  authors:
+    - colin-openai
+  tags:
+    - dall-e
+
+- title: How to use the DALL·E API
+  path: examples/dalle/Image_generations_edits_and_variations_with_DALL-E.ipynb
+  date: 2022-11-04
+  authors:
+    - ted-at-openai
+  tags:
+    - dall-e
+
+- title: Evaluating Abstractive Summarization
+  path: examples/evaluation/How_to_eval_abstractive_summarization.ipynb
+  date: 2023-08-16
+  authors:
+    - shyamal-anadkat
+    - simonpfish
+  tags:
+    - embeddings
+    - completions
+
+- title: Fine-Tuned Q&A - Collect Data
+  path: examples/fine-tuned_qa/olympics-1-collect-data.ipynb
+  date: 2022-03-10
+  authors:
+    - ted-at-openai
+    - BorisPower
+  tags:
+    - embeddings
+    - completions
+
+- title: Fine-Tuned Q&A - Create Q&A
+  path: examples/fine-tuned_qa/olympics-2-create-qa.ipynb
+  date: 2022-03-10
+  authors:
+    - ted-at-openai
+    - BorisPower
+  tags:
+    - embeddings
+    - completions
+
+- title: Fine-Tuned Q&A - Train
+  path: examples/fine-tuned_qa/olympics-3-train-qa.ipynb
+  date: 2022-03-10
+  authors:
+    - ted-at-openai
+    - BorisPower
+  tags:
+    - completions
+    - embeddings
+
+- title: Visualizing the embeddings in Kangas
+  path: examples/third_party_examples/Visualizing_embeddings_in_Kangas.ipynb
+  date: 2023-07-11
+  authors:
+    - dsblank
+  tags:
+    - embeddings
+
+- title: Financial Document Analysis with LlamaIndex
+  path: >-
+    examples/third_party_examples/financial_document_analysis_with_llamaindex.ipynb
+  date: 2023-06-22
+  authors:
+    - Disiok
+  tags:
+    - embeddings
+    - completions
+
+- title: Vector Databases
+  path: examples/vector_databases/README.md
+  date: 2023-06-28
+  authors:
+    - colin-openai
+    - moizsajid
+  tags:
+    - embeddings
+
+- title: Using PolarDB-PG as a vector database for OpenAI embeddings
+  path: >-
+    examples/vector_databases/PolarDB/Getting_started_with_PolarDB_and_OpenAI.ipynb
+  date: 2023-07-11
+  authors:
+    - liuchengshan-lcs
+  tags:
+    - embeddings
+
+- title: Semantic search with SingleStoreDB
+  path: >-
+    examples/vector_databases/SingleStoreDB/OpenAI_wikipedia_semantic_search.ipynb
+  date: 2023-05-22
+  authors:
+    - arno756
+  tags:
+    - completions
+    - embeddings
+
+- title: SingleStoreDB
+  path: examples/vector_databases/SingleStoreDB/README.md
+  date: 2023-05-22
+  authors:
+    - arno756
+  tags:
+    - embeddings
+    - completions
+
+- title: Using AnalyticDB as a vector database for OpenAI embeddings
+  path: >-
+    examples/vector_databases/analyticdb/Getting_started_with_AnalyticDB_and_OpenAI.ipynb
+  date: 2023-04-06
+  authors:
+    - wangxuqi
+  tags:
+    - embeddings
+
+- title: Question Answering with Langchain, AnalyticDB and OpenAI
+  path: >-
+    examples/vector_databases/analyticdb/QA_with_Langchain_AnalyticDB_and_OpenAI.ipynb
+  date: 2023-05-05
+  authors:
+    - wangxuqi
+  tags:
+    - embeddings
+    - tiktoken
+
+- title: Azure Cognitive Search as a vector database for OpenAI embeddings
+  path: >-
+    examples/vector_databases/azuresearch/Getting_started_with_azure_cognitive_search_and_openai.ipynb
+  date: 2023-09-11
+  authors:
+    - farzad528
+  tags:
+    - embeddings
+
+- title: Philosophy with Vector Embeddings, OpenAI and Cassandra / Astra DB
+  path: examples/vector_databases/cassandra_astradb/Philosophical_Quotes_CQL.ipynb
+  date: 2023-08-29
+  authors:
+    - hemidactylus
+  tags:
+    - embeddings
+    - completions
+
+- title: Philosophy with Vector Embeddings, OpenAI and Cassandra / Astra DB
+  path: >-
+    examples/vector_databases/cassandra_astradb/Philosophical_Quotes_cassIO.ipynb
+  date: 2023-08-29
+  authors:
+    - hemidactylus
+  tags:
+    - embeddings
+    - completions
+
+- title: Cassandra / Astra DB
+  path: examples/vector_databases/cassandra_astradb/README.md
+  date: 2023-08-29
+  authors:
+    - hemidactylus
+  tags:
+    - embeddings
+
+- title: Using Chroma for Embeddings Search
+  path: examples/vector_databases/chroma/Using_Chroma_for_embeddings_search.ipynb
+  date: 2023-06-28
+  authors:
+    - colin-openai
+    - atroyn
+  tags:
+    - embeddings
+
+- title: Robust Question Answering with Chroma and OpenAI
+  path: examples/vector_databases/chroma/hyde-with-chroma-and-openai.ipynb
+  date: 2023-04-06
+  authors:
+    - atroyn
+  tags:
+    - embeddings
+    - completions
+
+- title: Elasticsearch
+  path: examples/vector_databases/elasticsearch/README.md
+  date: 2023-08-29
+  authors:
+    - leemthompo
+  tags:
+    - embeddings
+    - completions
+
+- title: Retrieval augmented generation using Elasticsearch and OpenAI
+  path: >-
+    examples/vector_databases/elasticsearch/elasticsearch-retrieval-augmented-generation.ipynb
+  date: 2023-08-29
+  authors:
+    - leemthompo
+  tags:
+    - embeddings
+    - completions
+
+- title: Semantic search using Elasticsearch and OpenAI
+  path: examples/vector_databases/elasticsearch/elasticsearch-semantic-search.ipynb
+  date: 2023-08-29
+  authors:
+    - leemthompo
+  tags:
+    - embeddings
+    - completions
+
+- title: Using Hologres as a vector database for OpenAI embeddings
+  path: >-
+    examples/vector_databases/hologres/Getting_started_with_Hologres_and_OpenAI.ipynb
+  date: 2023-05-19
+  authors:
+    - zcgeng
+  tags:
+    - embeddings
+
+- title: Kusto as a Vector database for AI embeddings
+  path: >-
+    examples/vector_databases/kusto/Getting_started_with_kusto_and_openai_embeddings.ipynb
+  date: 2023-05-10
+  authors:
+    - Anshul Sharma
+  tags:
+    - embeddings
+
+- title: Kusto as a Vector database
+  path: examples/vector_databases/kusto/README.md
+  date: 2023-05-10
+  authors:
+    - Anshul Sharma
+  tags:
+    - embeddings
+
+- title: Filtered Search with Milvus and OpenAI
+  path: >-
+    examples/vector_databases/milvus/Filtered_search_with_Milvus_and_OpenAI.ipynb
+  date: 2023-03-28
+  authors:
+    - filip-halt
+  tags:
+    - embeddings
+
+- title: Getting Started with Milvus and OpenAI
+  path: >-
+    examples/vector_databases/milvus/Getting_started_with_Milvus_and_OpenAI.ipynb
+  date: 2023-03-28
+  authors:
+    - filip-halt
+  tags:
+    - embeddings
+
+- title: Using MyScale as a vector database for OpenAI embeddings
+  path: >-
+    examples/vector_databases/myscale/Getting_started_with_MyScale_and_OpenAI.ipynb
+  date: 2023-05-01
+  authors:
+    - melovy
+  tags:
+    - embeddings
+
+- title: Using MyScale for Embeddings Search
+  path: examples/vector_databases/myscale/Using_MyScale_for_embeddings_search.ipynb
+  date: 2023-06-28
+  authors:
+    - colin-openai
+  tags:
+    - embeddings
+
+- title: Retrieval Augmentation for GPT-4 using Pinecone
+  path: examples/vector_databases/pinecone/GPT4_Retrieval_Augmentation.ipynb
+  date: 2023-03-24
+  authors:
+    - jamescalam
+  tags:
+    - embeddings
+    - completions
+    - tiktoken
+
+- title: Retrieval Augmented Generative Question Answering with Pinecone
+  path: examples/vector_databases/pinecone/Gen_QA.ipynb
+  date: 2023-02-07
+  authors:
+    - jamescalam
+  tags:
+    - embeddings
+    - completions
+
+- title: Pinecone Vector Database
+  path: examples/vector_databases/pinecone/README.md
+  date: 2023-03-24
+  authors:
+    - jamescalam
+  tags:
+    - embeddings
+    - completions
+
+- title: Semantic Search with Pinecone and OpenAI
+  path: examples/vector_databases/pinecone/Semantic_Search.ipynb
+  date: 2023-03-24
+  authors:
+    - jamescalam
+  tags:
+    - embeddings
+
+- title: Using Pinecone for Embeddings Search
+  path: >-
+    examples/vector_databases/pinecone/Using_Pinecone_for_embeddings_search.ipynb
+  date: 2023-06-28
+  authors:
+    - colin-openai
+  tags:
+    - embeddings
+
+- title: Using Qdrant as a vector database for OpenAI embeddings
+  path: >-
+    examples/vector_databases/qdrant/Getting_started_with_Qdrant_and_OpenAI.ipynb
+  date: 2023-02-16
+  authors:
+    - kacperlukawski
+  tags:
+    - embeddings
+
+- title: Question Answering with Langchain, Qdrant and OpenAI
+  path: examples/vector_databases/qdrant/QA_with_Langchain_Qdrant_and_OpenAI.ipynb
+  date: 2023-02-16
+  authors:
+    - kacperlukawski
+  tags:
+    - embeddings
+
+- title: Using Qdrant for Embeddings Search
+  path: examples/vector_databases/qdrant/Using_Qdrant_for_embeddings_search.ipynb
+  date: 2023-06-28
+  authors:
+    - colin-openai
+    - kacperlukawski
+  tags:
+    - embeddings
+
+- title: Redis
+  path: examples/vector_databases/redis/README.md
+  date: 2023-02-13
+  authors:
+    - Spartee
+  tags:
+    - embeddings
+    - completions
+
+- title: Using Redis for Embeddings Search
+  path: examples/vector_databases/redis/Using_Redis_for_embeddings_search.ipynb
+  date: 2023-06-28
+  authors:
+    - colin-openai
+  tags:
+    - embeddings
+
+- title: Using Redis as a Vector Database with OpenAI
+  path: examples/vector_databases/redis/getting-started-with-redis-and-openai.ipynb
+  date: 2023-02-13
+  authors:
+    - Spartee
+  tags:
+    - embeddings
+
+- title: Running Hybrid VSS Queries with Redis and OpenAI
+  path: examples/vector_databases/redis/redis-hybrid-query-examples.ipynb
+  date: 2023-05-11
+  authors:
+    - Michael Yuan
+  tags:
+    - embeddings
+
+- title: Redis Vectors as JSON with OpenAI
+  path: examples/vector_databases/redis/redisjson/redisjson.ipynb
+  date: 2023-05-10
+  authors:
+    - Michael Yuan
+  tags:
+    - embeddings
+
+- title: Redis as a Context Store with OpenAI Chat
+  path: examples/vector_databases/redis/redisqna/redisqna.ipynb
+  date: 2023-05-11
+  authors:
+    - Michael Yuan
+  tags:
+    - completions
+    - embeddings
+
+- title: Using Tair as a vector database for OpenAI embeddings
+  path: examples/vector_databases/tair/Getting_started_with_Tair_and_OpenAI.ipynb
+  date: 2023-09-11
+  authors:
+    - dongqqcom
+  tags:
+    - embeddings
+
+- title: Question Answering with Langchain, Tair and OpenAI
+  path: examples/vector_databases/tair/QA_with_Langchain_Tair_and_OpenAI.ipynb
+  date: 2023-09-11
+  authors:
+    - dongqqcom
+  tags:
+    - embeddings
+    - tiktoken
+    - completions
+
+- title: Typesense
+  path: examples/vector_databases/typesense/README.md
+  date: 2023-04-13
+  authors:
+    - jasonbosco
+  tags:
+    - embeddings
+
+- title: Using Typesense for Embeddings Search
+  path: >-
+    examples/vector_databases/typesense/Using_Typesense_for_embeddings_search.ipynb
+  date: 2023-06-28
+  authors:
+    - colin-openai
+  tags:
+    - embeddings
+
+- title: Weaviate <> OpenAI
+  path: examples/vector_databases/weaviate/README.md
+  date: 2023-02-13
+  authors:
+    - colin-openai
+  tags:
+    - embeddings
+
+- title: Using Weaviate for Embeddings Search
+  path: >-
+    examples/vector_databases/weaviate/Using_Weaviate_for_embeddings_search.ipynb
+  date: 2023-06-28
+  authors:
+    - colin-openai
+  tags:
+    - embeddings
+
+- title: Using Weaviate with Generative OpenAI module for Generative Search
+  path: >-
+    examples/vector_databases/weaviate/generative-search-with-weaviate-and-openai.ipynb
+  date: 2023-05-22
+  authors:
+    - sebawita
+  tags:
+    - embeddings
+    - completions
+
+- title: Using Weaviate with OpenAI vectorize module for Embeddings Search
+  path: >-
+    examples/vector_databases/weaviate/getting-started-with-weaviate-and-openai.ipynb
+  date: 2023-02-13
+  authors:
+    - colin-openai
+  tags:
+    - embeddings
+
+- title: Using Weaviate with OpenAI vectorize module for Hybrid Search
+  path: >-
+    examples/vector_databases/weaviate/hybrid-search-with-weaviate-and-openai.ipynb
+  date: 2023-02-13
+  authors:
+    - colin-openai
+  tags:
+    - embeddings
+
+- title: Question Answering in Weaviate with OpenAI Q&A module
+  path: >-
+    examples/vector_databases/weaviate/question-answering-with-weaviate-and-openai.ipynb
+  date: 2023-02-13
+  authors:
+    - colin-openai
+  tags:
+    - embeddings
+    - completions
+
+- title: Filtered Search with Zilliz and OpenAI
+  path: >-
+    examples/vector_databases/zilliz/Filtered_search_with_Zilliz_and_OpenAI.ipynb
+  date: 2023-03-28
+  authors:
+    - filip-halt
+  tags:
+    - embeddings
+
+- title: Getting Started with Zilliz and OpenAI
+  path: >-
+    examples/vector_databases/zilliz/Getting_started_with_Zilliz_and_OpenAI.ipynb
+  date: 2023-03-28
+  authors:
+    - filip-halt
+  tags:
+    - embeddings
+
+- title: Techniques to improve reliability
+  path: techniques_to_improve_reliability.md
+  date: 2022-09-12
+  authors:
+    - ted-at-openai
+  tags:
+    - completions
+
+- title: How to work with large language models
+  path: how_to_work_with_large_language_models.md
+  date: 2023-01-20
+  authors:
+    - ted-at-openai
+  tags:
+    - completions
+
+- title: Use cases for embeddings
+  path: text_comparison_examples.md
+  date: 2023-01-20
+  authors:
+    - ted-at-openai
+  tags:
+    - embeddings
+
+- title: Related resources from around the web
+  path: related_resources.md
+  date: 2023-01-20
+  authors:
+    - ted-at-openai
+    - simonpfish
+  tags:
+    - completions
+    - embeddings
+
+- title: Fine-Tuning for Retrieval Augmented Generation (RAG) with Qdrant
+  path: examples/fine-tuned_qa/ft_retrieval_augmented_generation_qdrant.ipynb
+  date: 2023-09-04
+  authors:
+    - NirantK
+  tags:
+    - completions
+    - embeddings
+
+- title: How to automate AWS tasks with function-calling
+  path: examples/third_party_examples/How_to_automate_S3_storage_with_functions.ipynb
+  date: 2023-09-27
+  authors:
+    - Barqawiz
+  tags:
+    - completions
+    - embeddings
+
+- title: Neon as a vector database
+  path: examples/vector_databases/neon/README.md
+  date: 2023-09-28
+  authors:
+    - Barqawiz
+  tags:
+    - embeddings
+
+- title: Vector similarity search using Neon Postgres
+  path: examples/vector_databases/neon/neon-postgres-vector-search-pgvector.ipynb
+  date: 2023-09-28
+  authors:
+    - danieltprice
+  tags:
+    - embeddings
+
+- title: Question Answering with LangChain, Deep Lake, & OpenAI
+  path: examples/vector_databases/deeplake/deeplake_langchain_qa.ipynb
+  date: 2023-09-30
+  authors:
+    - FayazRahman
+  tags:
+    - embeddings
+
+- title: Fine-tuning GPT with Weights & Biases
+  path: examples/third_party_examples/GPT_finetuning_with_wandb.ipynb
+  date: 2023-10-04
+  authors:
+    - ash0ts
+  tags:
+    - tiktoken
+    - completions
+
+- title: OpenAI API Monitoring with Weights & Biases Weave
+  path: examples/third_party_examples/Openai_monitoring_with_wandb_weave.ipynb
+  date: 2023-10-04
+  authors:
+    - ash0ts
+  tags:
+    - tiktoken
+    - completions
+
+- title: What makes documentation good
+  path: what_makes_documentation_good.md
+  date: 2023-09-01
+  authors:
+    - ted-at-openai
+  tags: []

@@ -1,0 +1,14 @@
+name: Rebuild Cookbook Website
+
+on:
+  push:
+    branches:
+      - main
+
+jobs:
+  deploy:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Call Deploy Hook
+        run: curl -X POST ${{ secrets.WEBSITE_DEPLOY_HOOK_URL }}

@@ -1,0 +1,27 @@
+# This workflow will improvise current file with AI genereated documentation and Create new PR
+
+name: Snorkell.ai - Revolutionizing Documentation on GitHub
+
+on:
+  push:
+    branches: ["main"]
+  workflow_dispatch:
+
+jobs:
+  Documentation:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Extract branch name
+        shell: bash
+        run: echo "BRANCH_NAME=${GITHUB_REF#refs/heads/}" >> $GITHUB_ENV
+      - name: Run Script
+        shell: bash
+        run: |
+          echo "Commit Message: ${{ github.event.head_commit.message }}"
+          echo "Repository: ${{ github.repository }}"
+          echo "Branch Name: ${{ env.BRANCH_NAME}}"
+          echo "Commit SHA: ${{ github.sha}}"
+          curl -X POST -H 'api-key: ${{ secrets.SNORKELL_API_KEY }}' -H 'Content-Type: application/json' \
+          -d '{"installation_id": "${{ secrets.SNORKELL_CLIENT_ID }}", "full_repo_name": "${{ github.repository }}", "base_branch": "${{ env.BRANCH_NAME }}", "commit_sha": "${{ github.sha }}", "commit_message": "${{ github.event.head_commit.message }}"}' \
+          https://production-gateway.snorkell.ai/api/app/github/generate/documentation

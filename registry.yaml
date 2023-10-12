@@ -307,15 +307,15 @@
     - embeddings
 
 - title: Visualizing embeddings in Weights and Biases
-  path: examples/third-party/Visualizing_embeddings_in_wandb.ipynb
+  path: examples/third_party/Visualizing_embeddings_in_wandb.ipynb
   date: 2023-02-01
   authors:
     - scottire
   tags:
     - embeddings
 
-- title: Visualizing Open AI Embeddings in Atlas
-  path: examples/third-party/Visualizing_embeddings_with_Atlas.ipynb
+- title: Visualizing embeddings in Atlas
+  path: examples/third_party/Visualizing_embeddings_with_Atlas.ipynb
   date: 2023-03-28
   authors:
     - AndriyMulyar

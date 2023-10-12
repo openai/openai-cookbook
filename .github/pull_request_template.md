@@ -18,7 +18,7 @@ When contributing new content, make sure to read through our [contributions rubr
   - [ ] Uniqueness: I have searched for related examples in the OpenAI Cookbook, and verified that my content offers new insights or unique information compared to existing documentation.
   - [ ] Spelling and Grammar: I have checked for spelling or grammatical mistakes.
   - [ ] Clarity and Comprehensibility: I have done a final read-through and verified that the content is easy to understand.
-  - [ ] Accuracy and Correctness: The information I include is correct, appropiately cited, and all of my code executes successfully.
+  - [ ] Accuracy and Correctness: The information I include is correct, appropriately cited, and all of my code executes successfully.
   - [ ] Usability: I have verified that the content and code is well organized and easy to navigate and use.
   - [ ] Completeness: I have verified that my content thorough and detailed, and I have explained everything fully.
 

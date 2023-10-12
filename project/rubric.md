@@ -2,9 +2,19 @@
 
 This rubric provides a systematic method for assessing the quality of submissions to the OpenAI Cookbook. Each area is rated on a scale from 1 to 5, with 1 being the lowest and 5 being the highest. In general, we will reject contributions that score lower than a 3 in any of the areas.
 
----
+| Criteria                      | Score | Comments |
+| ----------------------------- | ----- | -------- |
+| Relevance                     |       |          |
+| Uniqueness                    |       |          |
+| Spelling and Grammar          |       |          |
+| Clarity and Comprehensibility |       |          |
+| Accuracy and Correctness      |       |          |
+| Usability                     |       |          |
+| Completeness                  |       |          |
 
-**1. Relevance**
+### Criteria breakdown
+
+#### Relevance
 
 Is the content related to building with the OpenAI API?
 
@@ -16,7 +26,7 @@ Is the content related to building with the OpenAI API?
 | 4     | Well-aligned, mostly meets audience needs.          |
 | 5     | Perfectly aligned with the audience's expectations. |
 
-**2. Uniqueness**
+#### Uniqueness
 
 Does the content offer new insights or unique information compared to existing documentation?
 
@@ -28,7 +38,7 @@ Does the content offer new insights or unique information compared to existing d
 | 4     | Mostly unique content, minor overlaps.                 |
 | 5     | Completely unique, fresh insights or new information.  |
 
-**3. Spelling and Grammar**
+#### Spelling and Grammar
 
 Are there spelling or grammatical errors present?
 
@@ -40,7 +50,7 @@ Are there spelling or grammatical errors present?
 | 4     | Almost entirely free of spelling and grammatical errors.        |
 | 5     | Completely free of spelling and grammatical errors.             |
 
-**4. Clarity and Comprehensibility**
+#### Clarity and Comprehensibility
 
 Is the content easy to understand? Are things well-explained?
 
@@ -52,7 +62,7 @@ Is the content easy to understand? Are things well-explained?
 | 4     | Clear language, minimal confusion.                  |
 | 5     | Exceptionally clear and concise.                    |
 
-**5. Accuracy and Correctness**
+#### Accuracy and Correctness
 
 Are the facts, code snippets, and examples correct and reliable? Does everything execute correctly? Is the information included up to date?
 
@@ -64,7 +74,7 @@ Are the facts, code snippets, and examples correct and reliable? Does everything
 | 4     | Highly accurate, slight improvements needed. |
 | 5     | Completely accurate and thoroughly vetted.   |
 
-**6. Usability**
+#### Usability
 
 Is the content well organized and easy to navigate? Is the code easy to run?
 
@@ -76,7 +86,7 @@ Is the content well organized and easy to navigate? Is the code easy to run?
 | 4     | Highly usable, well-structured.            |
 | 5     | Extremely user-friendly and intuitive.     |
 
-**7. Completeness**
+#### Completeness
 
 Is the content thorough and detailed? Are there things that weren’t explained fully?
 

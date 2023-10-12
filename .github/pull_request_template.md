@@ -13,7 +13,7 @@ Why are these changes necessary? How do they improve the cookbook?
 When contributing new content, make sure to read through our [contributions rubric](/project/rubric.md) before submitting, and complete the following action items:
 
 - [ ] I have added a new entry in [registry.yaml](/registry.yaml) so that my content renders on the cookbook website.
-- [ ] I have conducted a self-review of my content
+- [ ] I have conducted a self-review of my content based on the [contributions rubric](/project/rubric.md):
   - [ ] Relevance: This content is related to building with the OpenAI API.
   - [ ] Uniqueness: I have searched for related examples in the OpenAI Cookbook, and verified that my content offers new insights or unique information compared to existing documentation.
   - [ ] Spelling and Grammar: I have checked for spelling or grammatical mistakes.

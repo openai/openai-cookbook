@@ -307,7 +307,7 @@
     - embeddings
 
 - title: Visualizing embeddings in Weights and Biases
-  path: examples/Visualizing_embeddings_in_wandb.ipynb
+  path: examples/third-party/Visualizing_embeddings_in_wandb.ipynb
   date: 2023-02-01
   authors:
     - scottire
@@ -315,7 +315,7 @@
     - embeddings
 
 - title: Visualizing Open AI Embeddings in Atlas
-  path: examples/Visualizing_embeddings_with_Atlas.ipynb
+  path: examples/third-party/Visualizing_embeddings_with_Atlas.ipynb
   date: 2023-03-28
   authors:
     - AndriyMulyar
@@ -482,7 +482,7 @@
     - embeddings
 
 - title: Visualizing the embeddings in Kangas
-  path: examples/third_party_examples/Visualizing_embeddings_in_Kangas.ipynb
+  path: examples/third_party/Visualizing_embeddings_in_Kangas.ipynb
   date: 2023-07-11
   authors:
     - dsblank
@@ -491,7 +491,7 @@
 
 - title: Financial Document Analysis with LlamaIndex
   path: >-
-    examples/third_party_examples/financial_document_analysis_with_llamaindex.ipynb
+    examples/third_party/financial_document_analysis_with_llamaindex.ipynb
   date: 2023-06-22
   authors:
     - Disiok
@@ -979,7 +979,7 @@
     - embeddings
 
 - title: How to automate AWS tasks with function-calling
-  path: examples/third_party_examples/How_to_automate_S3_storage_with_functions.ipynb
+  path: examples/third_party/How_to_automate_S3_storage_with_functions.ipynb
   date: 2023-09-27
   authors:
     - Barqawiz
@@ -1012,7 +1012,7 @@
     - embeddings
 
 - title: Fine-tuning GPT with Weights & Biases
-  path: examples/third_party_examples/GPT_finetuning_with_wandb.ipynb
+  path: examples/third_party/GPT_finetuning_with_wandb.ipynb
   date: 2023-10-04
   authors:
     - ash0ts
@@ -1021,7 +1021,7 @@
     - completions
 
 - title: OpenAI API Monitoring with Weights & Biases Weave
-  path: examples/third_party_examples/Openai_monitoring_with_wandb_weave.ipynb
+  path: examples/third_party/Openai_monitoring_with_wandb_weave.ipynb
   date: 2023-10-04
   authors:
     - ash0ts

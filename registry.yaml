@@ -177,6 +177,15 @@
     - completions
     - embeddings
 
+- title: "API Request Parallel Processor"
+  path: "examples/api_request_parallel_processor.py"
+  date: 2023-01-20
+  authors: 
+    - "ted-at-openai"
+  tags:
+    - "completions"
+    - "embeddings"
+
 - title: How to stream completions
   path: examples/How_to_stream_completions.ipynb
   date: 2022-09-02

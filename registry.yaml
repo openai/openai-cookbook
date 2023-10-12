@@ -1,4 +1,4 @@
-# yaml-language-server: $schema=./registry_schema.json
+# yaml-language-server: $schema=./admin/registry_schema.json
 
 # This file is used to generate cookbook.openai.com. It specifies which paths we
 # should build pages for, and indicates metadata such as tags, creation date and

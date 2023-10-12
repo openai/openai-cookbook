@@ -6,6 +6,8 @@ Each area is rated on a scale from 1 to 5, with 1 being the lowest and 5 being t
 
 We encourage contributors to familiarize themselves with this rubric before writing content. Understanding the criteria not only increases the chances of your contribution being accepted, but also helps in creating a resource that is comprehensive, clear, and beneficial for all users.
 
+For additional guidelines on writing good documentation, refer to [What Makes Documentation Good](https://cookbook.openai.com/what_makes_documentation_good).
+
 ## Template
 
 | Criteria                      | Score |
@@ -58,7 +60,7 @@ Are there spelling or grammatical errors present?
 
 #### Clarity and Comprehensibility
 
-Is the content easy to understand? Are things well-explained?
+Is the language easy to understand? Are things well-explained?
 
 | Score | Description                                         |
 | ----- | --------------------------------------------------- |

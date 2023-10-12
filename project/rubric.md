@@ -1,6 +1,6 @@
 # Rubric
 
-This rubric provides a systematic method for assessing the quality of submissions to the OpenAI Cookbook. Each area is rated on a scale from 1 to 5, with 1 being the lowest and 5 being the highest. The purpose of this rating system is to ensure that all contributions maintain a high standard of quality, relevance, and uniqueness.
+This rubric provides a method for assessing the quality of submissions to the OpenAI Cookbook. Each area is rated on a scale from 1 to 5, with 1 being the lowest and 5 being the highest. The purpose of this rating system is to ensure that all contributions maintain a high standard of quality, relevance, and uniqueness.
 
 In general, we will reject contributions that score lower than a 3 in any of the areas. We believe that by maintaining a high standard for submissions, we can provide a better learning experience for everyone who uses the OpenAI Cookbook.
 

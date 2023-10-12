@@ -1,18 +1,24 @@
-# OpenAI Cookbook Rubric
+# Rubric
 
-This rubric provides a systematic method for assessing the quality of submissions to the OpenAI Cookbook. Each area is rated on a scale from 1 to 5, with 1 being the lowest and 5 being the highest. In general, we will reject contributions that score lower than a 3 in any of the areas.
+This rubric provides a systematic method for assessing the quality of submissions to the OpenAI Cookbook. Each area is rated on a scale from 1 to 5, with 1 being the lowest and 5 being the highest. The purpose of this rating system is to ensure that all contributions maintain a high standard of quality, relevance, and uniqueness.
 
-| Criteria                      | Score | Comments |
-| ----------------------------- | ----- | -------- |
-| Relevance                     |       |          |
-| Uniqueness                    |       |          |
-| Spelling and Grammar          |       |          |
-| Clarity and Comprehensibility |       |          |
-| Accuracy and Correctness      |       |          |
-| Usability                     |       |          |
-| Completeness                  |       |          |
+In general, we will reject contributions that score lower than a 3 in any of the areas. We believe that by maintaining a high standard for submissions, we can provide a better learning experience for everyone who uses the OpenAI Cookbook.
 
-### Criteria breakdown
+We encourage contributors to familiarize themselves with the rubric before writing an example. This not only increases the chances of your contribution being accepted, but also helps in creating a resource that is comprehensive, clear, and beneficial for all users. Remember, the goal is not just to share knowledge, but to do so in a way that is accessible, engaging, and enriching for the community.
+
+## Template
+
+| Criteria                      | Score |
+| ----------------------------- | ----- |
+| Relevance                     |       |
+| Uniqueness                    |       |
+| Spelling and Grammar          |       |
+| Clarity and Comprehensibility |       |
+| Accuracy and Correctness      |       |
+| Usability                     |       |
+| Completeness                  |       |
+
+## Breakdown
 
 #### Relevance
 

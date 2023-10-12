@@ -306,8 +306,8 @@
   tags:
     - embeddings
 
-- title: Visualizing the embeddings in W&B
-  path: examples/Visualizing_embeddings_in_W&B.ipynb
+- title: Visualizing embeddings in Weights and Biases
+  path: examples/Visualizing_embeddings_in_wandb.ipynb
   date: 2023-02-01
   authors:
     - scottire

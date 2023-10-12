@@ -1,4 +1,4 @@
-# Rubric
+# Welcome, AI Chef
 
 The OpenAI Cookbook is a community-driven resource aimed at sharing knowledge in a way that is accessible, engaging, and enriching for everyone. To ensure the quality of submissions, we have established a rubric that assesses each contribution on various areas.
 
@@ -8,7 +8,7 @@ We encourage contributors to familiarize themselves with this rubric before writ
 
 For additional guidelines on writing good documentation, refer to [What Makes Documentation Good](https://cookbook.openai.com/what_makes_documentation_good).
 
-## Template
+## Rubric
 
 | Criteria                      | Score |
 | ----------------------------- | ----- |
@@ -20,7 +20,7 @@ For additional guidelines on writing good documentation, refer to [What Makes Do
 | Usability                     |       |
 | Completeness                  |       |
 
-## Breakdown
+### Breakdown
 
 #### Relevance
 

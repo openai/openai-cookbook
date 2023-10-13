@@ -17,10 +17,14 @@ For other useful tools, guides and courses, check out these [related resources f
 
 ## Contributing
 
-If there are examples or guides you'd like to see, feel free to suggest them on the [issues page](https://github.com/openai/openai-cookbook/issues). We are also happy to accept high quality pull requests, as long as they fit the scope of the cookbook.
+The OpenAI Cookbook is a community-driven resource. Whether you're submitting an idea, fixing a typo, adding a new guide, or improving an existing one, your contributions are greatly appreciated!
 
-The contents of this repo are automatically rendered into [cookbook.openai.com](https://cookbook.openai.com) based on [registry.yaml](/registry.yaml). When contributing a new example, make sure to add a new entry for it in [registry.yaml](/registry.yaml) so that it renders on the website.
+Before contributing, read through the existing issues and pull requests to see if someone else is already working on something similar. That way you can avoid duplicating efforts.
 
-Refer to our guide on [what makes documentation good](https://cookbook.openai.com/what_makes_documentation_good) for guidance on how to make high quality contributions.
+If there are examples or guides you'd like to see, feel free to suggest them on the [issues page](https://github.com/openai/openai-cookbook/issues).
+
+If you'd like to contribute new content, make sure to read through our [contribution guidelines](/CONTRIBUTING.md). We welcome high-quality submissions of new examples and guides, as long as they meet our criteria and fit within the scope of the cookbook.
+
+The contents of this repo are automatically rendered into [cookbook.openai.com](https://cookbook.openai.com) based on [registry.yaml](/registry.yaml).
 
 [![Open in GitHub Codespaces](https://github.com/codespaces/badge.svg)](https://github.com/codespaces/new?hide_repo_select=true&ref=main&repo=468576060&machine=basicLinux32gb&location=EastUs)

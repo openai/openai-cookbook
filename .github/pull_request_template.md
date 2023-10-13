@@ -8,7 +8,7 @@ Why are these changes necessary? How do they improve the cookbook?
 
 ---
 
-## For contributions of new content
+## For new content
 
 When contributing new content, make sure to read through our [contributions rubric](/project/rubric.md) before submitting, and complete the following action items:
 

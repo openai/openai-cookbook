@@ -11,7 +11,7 @@ If you prefer watching screencasts over reading, then you can check out [this sc
 ## What you will build
 
 Our app is a simple agent that helps you find activities in your area.
-It has access two functions, `getLocation()` and `getCurrentWeather()`,
+It has access to two functions, `getLocation()` and `getCurrentWeather()`,
 which means it can figure out where you’re located and what the weather
 is at the moment. 
 
@@ -40,7 +40,7 @@ We also need to set `dangerouslyAllowBrowser: true`, as OpenAI won't let us send
 
 ## Creating our two functions
 
-Next we'll create the two functions. The first one - `getLocation` -
+Next, we'll create the two functions. The first one - `getLocation` -
 uses the [IP API](https://ipapi.co/) to get the location of the
 user.
 
@@ -107,7 +107,7 @@ const functionDefinitions = [
 
 We also need to define a `messages` array. This will keep track of all of the messages back and forth between our app and OpenAI. 
 
-The first object in the array should always have the `role` property set to `"system"`, which tells OpenAI that this is how we want our it to behave.
+The first object in the array should always have the `role` property set to `"system"`, which tells OpenAI that this is how we want it to behave.
 ``` js
 const messages = [{
     role: "system",
@@ -123,14 +123,7 @@ We are now ready to build the logic of our app, which lives in the
 `agent` function. It is asynchronous and takes one argument: the
 `userInput`.
 
-In the body of the function, we start by defining a `messages` array.
-This will keep track of all of the messages back and forth between our
-app and OpenAI. It currently has two items:
-
-1.  The first object in the array has `role` property set to `"system"`,
-    which tells OpenAI that this is how we want our it to behave.
-2.  The second object has `role` set to `"user"` , meaning it is where
-    we should add the `userInput` .
+We start by pushing the `userInput` to the messages array. This time, we set the `role` to `"user"`, so that OpenAI knows that this is the input from the user.
 
 ``` js
 async function agent(userInput) {
@@ -147,7 +140,7 @@ async function agent(userInput) {
 }
 ```
 
-Next we'll send a request to the Chat completions endpoint via the
+Next, we'll send a request to the Chat completions endpoint via the
 `chat.completions.create()` method in the Node SDK. This method takes a
 configuration object as an argument. In it, we'll specify three
 properties:
@@ -163,8 +156,7 @@ properties:
 
 ## Running our app with a simple input
 
-Let's try to run the `agent` with an input that requires a function call
-in order to give a suitable reply.
+Let's try to run the `agent` with an input that requires a function call to give a suitable reply.
 
 ``` js
 agent("Where am I located right now?");
@@ -242,7 +234,7 @@ However, we won't need any arguments for this first function call.
 
 
 If we run the code again with the same input
-(`"Where am I located right now?"`), well see that `functionResponse`
+(`"Where am I located right now?"`), we'll see that `functionResponse`
 is an object filled with location about where the user is located right
 now. In my case, that is Oslo, Norway.
 
@@ -263,7 +255,7 @@ messages.push({
 ```
 
 Notice that the `role` is set to `"function"`. This tells OpenAI
-that the `content` parameter contains the result of the function call,
+that the `content` parameter contains the result of the function call
 and not the input from the user.
 
 At this point, we need to send a new request to OpenAI with this updated

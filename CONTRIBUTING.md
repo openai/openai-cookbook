@@ -35,56 +35,11 @@ For additional advice on writing good documentation, refer to [What Makes Docume
 
 ### Breakdown
 
-#### Relevance
-
-| Score | Description                           |
-| ----- | ------------------------------------- |
-| 1     | Not relevant to AI or the OpenAI API. |
-| 2     | Only tangentially relevant.           |
-| 3     | Relevant, but not very useful.        |
-| 4     | Relevant and useful.                  |
-
-#### Uniqueness
-
-| Score | Description                                                   |
-| ----- | ------------------------------------------------------------- |
-| 1     | There are many other guides and examples like this.           |
-| 2     | Siginifcant overlap with others, but has some unique aspects. |
-| 3     | Unique with some minor overlaps.                              |
-| 4     | Completely unique, fresh insights or new information.         |
-
-#### Clarity
-
-| Score | Description                                      |
-| ----- | ------------------------------------------------ |
-| 1     | Confusing and unclear.                           |
-| 2     | Some sections are confusing and unclear.         |
-| 3     | Clear language, but structure is hard to follow. |
-| 4     | Clear language and structure.                    |
-
-#### Correctness
-
-| Score | Description                                |
-| ----- | ------------------------------------------ |
-| 1     | Many errors, code doesn't execute.         |
-| 2     | Few errors and warnings.                   |
-| 3     | All code works, minor improvements needed. |
-| 4     | Completely error free.                     |
-
-#### Completeness
-
-| Score | Description                                   |
-| ----- | --------------------------------------------- |
-| 1     | Missing significant details and explanations. |
-| 2     | Lacks some essential information.             |
-| 3     | Mostly complete, slight additions needed.     |
-| 4     | Complete and detailed.                        |
-
-#### Grammar
-
-| Score | Description                                         |
-| ----- | --------------------------------------------------- |
-| 1     | Numerous spelling and grammatical errors.           |
-| 2     | Some grammatical and spelling errors.               |
-| 3     | Grammar is correct, but there are a few typos.      |
-| 4     | Completely free of spelling and grammatical errors. |
+| Criteria     | 1                                     | 2                                             | 3                                        | 4                                      |
+| ------------ | ------------------------------------- | --------------------------------------------- | ---------------------------------------- | -------------------------------------- |
+| Relevance    | Not relevant to AI or OpenAI API.     | Tangentially relevant.                        | Relevant but not very useful.            | Relevant and useful.                   |
+| Uniqueness   | Many similar guides/examples.         | Some unique aspects, but significant overlap. | Unique with minor overlaps.              | Completely unique with fresh insights. |
+| Clarity      | Confusing and unclear.                | Some sections unclear.                        | Clear language, unclear structure.       | Clear language and structure.          |
+| Correctness  | Many errors, code doesn't execute.    | Few errors and warnings.                      | Code works, minor improvements needed.   | Completely error free.                 |
+| Completeness | Missing significant portions.         | Lacks some explanations.                      | Mostly complete, minor additions needed. | Complete and detailed.                 |
+| Grammar      | Numerous spelling/grammatical errors. | Some spelling/grammatical errors.             | Correct grammar, few typos.              | Perfect grammar.                       |

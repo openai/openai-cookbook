@@ -1022,7 +1022,7 @@
     - completions
   
 - title: How to build an agent with OpenAI function-calling and the Node.js SDK
-  path: examples/third_party_examples/ai_agent_functions_node
+  path: examples/third_party/ai_agent_functions_node
   date: 2023-10-05
   authors:
     - perborgen

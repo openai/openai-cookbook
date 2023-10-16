@@ -2,7 +2,7 @@
 
 OpenAI functions enable your app to take action based on user inputs. This means that it can, e.g., search the web, send emails, or book tickets on behalf of your users, making it more powerful than a regular chatbot.
 
-In this tutorial, you will build an app that uses OpenAI functions along with the latest version of the Node.js SDK. The app runs in the browser, so you only need a code editor and, e.g., VS Code Live Server to follow along locally. Alternatively, write your code directly in the browser via [this code playground.](https://scrimba.com/scrim/c6r3LkU9)
+In this tutorial, you will build an app that uses OpenAI functions along with the latest version of the Node.js SDK. The app runs in the browser, so you only need a code editor and, e.g., VS Code Live Server to follow along locally. Alternatively, write your code directly in the browser via [this code playground at Scrimba.](https://scrimba.com/scrim/c6r3LkU9)
 
 If you prefer watching screencasts over reading, then you can check out [this scrim, which walks through the code line-by-line:](https://scrimba.com/scrim/co0044b2d9b9b7f5bf16e0391)
 
@@ -36,7 +36,7 @@ const openai = new OpenAI({
 });
 ```
 
-We also need to set `dangerouslyAllowBrowser: true`, as OpenAI won't let us send requests to their API from a browser unless we have confirmed that we are aware of the risks involved with that.
+Since we're running our code in a browser environment at Scrimba, we also need to set `dangerouslyAllowBrowser: true` to confirm we understand the risks involved with client-side API requests. Please note that you should move these requests over to a Node server in a production app.
 
 ## Creating our two functions
 

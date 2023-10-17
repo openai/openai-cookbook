@@ -9,21 +9,21 @@
  
 > ✨ Navigate at [cookbook.openai.com](https://cookbook.openai.com)
 
-Example code and guides for accomplishing common tasks with the [OpenAI API](https://platform.openai.com/docs/introduction). To run these examples, you'll need an OpenAI account and associated API key ([create a free account here](https://beta.openai.com/signup)).
+Example code and guides for accomplishing everyday tasks with the [OpenAI API](https://platform.openai.com/docs/introduction). To run these examples, you'll need an OpenAI account and associated API key ([create a free account here](https://beta.openai.com/signup)).
 
-Most code examples are written in Python, though the concepts can be applied in any language.
+Most code examples are in Python, though the concepts can be applied in any language.
 
-For other useful tools, guides and courses, check out these [related resources from around the web](https://cookbook.openai.com/related_resources).
+For other useful tools, guides, and courses, check out these [related resources from around the web](https://cookbook.openai.com/related_resources).
 
 ## Contributing
 
-The OpenAI Cookbook is a community-driven resource. Whether you're submitting an idea, fixing a typo, adding a new guide, or improving an existing one, your contributions are greatly appreciated!
+The OpenAI Cookbook is a community-driven resource. Whether submitting an idea, fixing a typo, adding a new guide, or improving an existing one, your contributions are greatly appreciated!
 
-Before contributing, read through the existing issues and pull requests to see if someone else is already working on something similar. That way you can avoid duplicating efforts.
+Before contributing, read through the existing issues and pull requests to see if someone else is working on something similar. That way, you can avoid duplicating efforts.
 
 If there are examples or guides you'd like to see, feel free to suggest them on the [issues page](https://github.com/openai/openai-cookbook/issues).
 
-If you'd like to contribute new content, make sure to read through our [contribution guidelines](/CONTRIBUTING.md). We welcome high-quality submissions of new examples and guides, as long as they meet our criteria and fit within the scope of the cookbook.
+If you'd like to contribute new content, make sure to read through our [contribution guidelines](/CONTRIBUTING.md). We welcome high-quality submissions of recent examples and guides as long as they meet our criteria and fit within the scope of the cookbook.
 
 The contents of this repo are automatically rendered into [cookbook.openai.com](https://cookbook.openai.com) based on [registry.yaml](/registry.yaml).
 

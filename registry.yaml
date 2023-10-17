@@ -43,8 +43,8 @@
     - embeddings
     - completions
 
-- title: Code search
-  path: examples/Code_search.ipynb
+- title: Code search using embeddings
+  path: examples/Code_search_using_embeddings
   date: 2022-03-10
   authors:
     - BorisPower
@@ -107,8 +107,8 @@
     - completions
     - functions
 
-- title: Get embeddings
-  path: examples/Get_embeddings.ipynb
+- title: Using embeddings
+  path: examples/Using_embeddings.ipynb
   date: 2022-03-10
   authors:
     - BorisPower
@@ -445,7 +445,7 @@
   tags:
     - dall-e
 
-- title: Evaluating Abstractive Summarization
+- title: How to evaluate a summarization task
   path: examples/evaluation/How_to_eval_abstractive_summarization.ipynb
   date: 2023-08-16
   authors:

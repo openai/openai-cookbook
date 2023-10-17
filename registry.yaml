@@ -1029,6 +1029,14 @@
     - tiktoken
     - completions
 
+- title: How to build an agent with the Node.js SDK and function-calling
+  path: examples/How_to_build_an_agent_with_the_node_sdk.md
+  date: 2023-10-05
+  authors:
+    - perborgen
+  tags:
+    - completions
+
 - title: What makes documentation good
   path: articles/what_makes_documentation_good.md
   redirects:

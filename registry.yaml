@@ -1,4 +1,4 @@
-# yaml-language-server: $schema=./registry_schema.json
+# yaml-language-server: $schema=./.github/registry_schema.json
 
 # This file is used to generate cookbook.openai.com. It specifies which paths we
 # should build pages for, and indicates metadata such as tags, creation date and
@@ -306,16 +306,16 @@
   tags:
     - embeddings
 
-- title: Visualizing the embeddings in W&B
-  path: examples/Visualizing_embeddings_in_W&B.ipynb
+- title: Visualizing embeddings in Weights and Biases
+  path: examples/third_party/Visualizing_embeddings_in_wandb.ipynb
   date: 2023-02-01
   authors:
     - scottire
   tags:
     - embeddings
 
-- title: Visualizing Open AI Embeddings in Atlas
-  path: examples/Visualizing_embeddings_with_Atlas.ipynb
+- title: Visualizing embeddings in Atlas
+  path: examples/third_party/Visualizing_embeddings_with_Atlas.ipynb
   date: 2023-03-28
   authors:
     - AndriyMulyar
@@ -482,7 +482,7 @@
     - embeddings
 
 - title: Visualizing the embeddings in Kangas
-  path: examples/third_party_examples/Visualizing_embeddings_in_Kangas.ipynb
+  path: examples/third_party/Visualizing_embeddings_in_Kangas.ipynb
   date: 2023-07-11
   authors:
     - dsblank
@@ -491,7 +491,7 @@
 
 - title: Financial Document Analysis with LlamaIndex
   path: >-
-    examples/third_party_examples/financial_document_analysis_with_llamaindex.ipynb
+    examples/third_party/financial_document_analysis_with_llamaindex.ipynb
   date: 2023-06-22
   authors:
     - Disiok
@@ -928,7 +928,9 @@
     - embeddings
 
 - title: Techniques to improve reliability
-  path: techniques_to_improve_reliability.md
+  path: articles/techniques_to_improve_reliability.md
+  redirects:
+    - techniques_to_improve_reliability
   date: 2022-09-12
   authors:
     - ted-at-openai
@@ -936,7 +938,9 @@
     - completions
 
 - title: How to work with large language models
-  path: how_to_work_with_large_language_models.md
+  path: articles/how_to_work_with_large_language_models.md
+  redirects:
+    - how_to_work_with_large_language_models
   date: 2023-01-20
   authors:
     - ted-at-openai
@@ -944,7 +948,9 @@
     - completions
 
 - title: Use cases for embeddings
-  path: text_comparison_examples.md
+  path: articles/text_comparison_examples.md
+  redirects:
+    - text_comparison_examples
   date: 2023-01-20
   authors:
     - ted-at-openai
@@ -952,7 +958,9 @@
     - embeddings
 
 - title: Related resources from around the web
-  path: related_resources.md
+  path: articles/related_resources.md
+  redirects:
+    - related_resources
   date: 2023-01-20
   authors:
     - ted-at-openai
@@ -971,7 +979,7 @@
     - embeddings
 
 - title: How to automate AWS tasks with function-calling
-  path: examples/third_party_examples/How_to_automate_S3_storage_with_functions.ipynb
+  path: examples/third_party/How_to_automate_S3_storage_with_functions.ipynb
   date: 2023-09-27
   authors:
     - Barqawiz
@@ -1013,7 +1021,7 @@
     - embeddings
 
 - title: Fine-tuning GPT with Weights & Biases
-  path: examples/third_party_examples/GPT_finetuning_with_wandb.ipynb
+  path: examples/third_party/GPT_finetuning_with_wandb.ipynb
   date: 2023-10-04
   authors:
     - ash0ts
@@ -1022,7 +1030,7 @@
     - completions
 
 - title: OpenAI API Monitoring with Weights & Biases Weave
-  path: examples/third_party_examples/Openai_monitoring_with_wandb_weave.ipynb
+  path: examples/third_party/Openai_monitoring_with_wandb_weave.ipynb
   date: 2023-10-04
   authors:
     - ash0ts
@@ -1030,8 +1038,18 @@
     - tiktoken
     - completions
 
+- title: How to build an agent with the Node.js SDK and function-calling
+  path: examples/How_to_build_an_agent_with_the_node_sdk.md
+  date: 2023-10-05
+  authors:
+    - perborgen
+  tags:
+    - completions
+
 - title: What makes documentation good
-  path: what_makes_documentation_good.md
+  path: articles/what_makes_documentation_good.md
+  redirects:
+    - what_makes_documentation_good
   date: 2023-09-01
   authors:
     - ted-at-openai

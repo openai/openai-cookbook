@@ -17,13 +17,13 @@ For other useful tools, guides and courses, check out these [related resources f
 
 ## Contributing
 
-The OpenAI Cookbook is a community-driven resource. Whether you're submitting an idea, fixing a typo, adding a new guide, or improving an existing one, your contributions are greatly appreciated!
+The OpenAI Cookbook is a community-driven resource.  Your efforts are much valued, whether you're proposing an idea, correcting a typo, creating a new guide, or upgrading an already existing one.
 
-Before contributing, read through the existing issues and pull requests to see if someone else is already working on something similar. That way you can avoid duplicating efforts.
+Read through the current problems and pull requests before making a contribution to determine whether anything comparable is currently being worked on by someone else. By doing so, you can prevent effort duplication.
 
-If there are examples or guides you'd like to see, feel free to suggest them on the [issues page](https://github.com/openai/openai-cookbook/issues).
+Please feel free to make suggestions on the  [issues page](https://github.com/openai/openai-cookbook/issues) for any examples or directions for use that you'd want to see.
 
-If you'd like to contribute new content, make sure to read through our [contribution guidelines](/CONTRIBUTING.md). We welcome high-quality submissions of new examples and guides, as long as they meet our criteria and fit within the scope of the cookbook.
+Make sure to read our [contribution guidelines](/CONTRIBUTING.md) if you want to add new content. As long as they adhere to our standards and are within the cookbook's purview, we encourage the contribution of fresh, high-caliber examples and instructions.
 
 The contents of this repo are automatically rendered into [cookbook.openai.com](https://cookbook.openai.com) based on [registry.yaml](/registry.yaml).
 

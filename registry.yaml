@@ -105,6 +105,7 @@
     - prestontuggle
   tags:
     - completions
+    - functions
 
 - title: Get embeddings
   path: examples/Get_embeddings.ipynb
@@ -132,6 +133,7 @@
     - joe-at-openai
   tags:
     - completions
+    - functions
 
 - title: How to call functions with chat models
   path: examples/How_to_call_functions_with_chat_models.ipynb
@@ -141,6 +143,7 @@
     - joe-at-openai
   tags:
     - completions
+    - functions
 
 - title: How to count tokens with tiktoken
   path: examples/How_to_count_tokens_with_tiktoken.ipynb
@@ -414,6 +417,7 @@
     - kristapratico
   tags:
     - completions
+    - functions
 
 - title: Translate a book writen in LaTeX from Slovenian into English
   path: examples/book_translation/translate_latex_book.ipynb
@@ -986,6 +990,7 @@
   tags:
     - completions
     - embeddings
+    - functions
 
 - title: Neon as a vector database
   path: examples/vector_databases/neon/README.md
@@ -1029,13 +1034,14 @@
     - tiktoken
     - completions
 
-- title: How to build an agent with the Node.js SDK and function-calling
+- title: How to build an agent with the Node.js SDK
   path: examples/How_to_build_an_agent_with_the_node_sdk.md
   date: 2023-10-05
   authors:
     - perborgen
   tags:
     - completions
+    - functions
 
 - title: What makes documentation good
   path: articles/what_makes_documentation_good.md

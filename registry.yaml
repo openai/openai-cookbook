@@ -44,7 +44,7 @@
     - completions
 
 - title: Code search using embeddings
-  path: examples/Code_search_using_embeddings
+  path: examples/Code_search_using_embeddings.ipynb
   date: 2022-03-10
   authors:
     - BorisPower

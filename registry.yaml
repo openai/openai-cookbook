@@ -1052,7 +1052,7 @@
     - ted-at-openai
   tags: []
 
-- title: Chained Function Calling with OpenAPI Spec
+- title: Function-calling with an OpenAPI specification
   path: examples/Function_calling_with_an_OpenAPI_spec.ipynb
   date: 2023-10-15
   authors:

@@ -1051,3 +1051,12 @@
   authors:
     - ted-at-openai
   tags: []
+
+- title: Chained Function Calling with OpenAPI Spec
+  path: examples/Chained_functions_using_OpenAPIspec.ipynb
+  date: 2023-10-15
+  authors:
+    - shyamal-anadkat
+  tags:
+    - completions
+    - functions

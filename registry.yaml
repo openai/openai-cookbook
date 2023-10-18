@@ -1053,7 +1053,7 @@
   tags: []
 
 - title: Chained Function Calling with OpenAPI Spec
-  path: examples/Chained_functions_using_OpenAPIspec.ipynb
+  path: examples/Chained_function_calling_with_OpenAPI_spec.ipynb
   date: 2023-10-15
   authors:
     - shyamal-anadkat

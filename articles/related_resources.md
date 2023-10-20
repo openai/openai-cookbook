@@ -17,6 +17,7 @@ People are writing great tools and papers for improving outputs from GPT. Here a
 - [OpenAI Evals](https://github.com/openai/evals): An open-source library for evaluating task performance of language models and prompts.
 - [Outlines](https://github.com/normal-computing/outlines): A Python library that provides a domain-specific language to simplify prompting and constrain generation.
 - [Parea AI](https://www.parea.ai): A platform for debugging, testing, and monitoring LLM apps.
+- [Portkey](https://portkey.ai/): A platform for observability, model management, evals, and security for LLM apps.
 - [Promptify](https://github.com/promptslab/Promptify): A small Python library for using language models to perform NLP tasks.
 - [PromptPerfect](https://promptperfect.jina.ai/prompts): A paid product for testing and improving prompts.
 - [Prompttools](https://github.com/hegelai/prompttools): Open-source Python tools for testing and evaluating models, vector DBs, and prompts.

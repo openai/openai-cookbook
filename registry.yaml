@@ -43,8 +43,8 @@
     - embeddings
     - completions
 
-- title: Code search
-  path: examples/Code_search.ipynb
+- title: Code search using embeddings
+  path: examples/Code_search_using_embeddings.ipynb
   date: 2022-03-10
   authors:
     - BorisPower
@@ -105,9 +105,10 @@
     - prestontuggle
   tags:
     - completions
+    - functions
 
-- title: Get embeddings
-  path: examples/Get_embeddings.ipynb
+- title: Using embeddings
+  path: examples/Using_embeddings.ipynb
   date: 2022-03-10
   authors:
     - BorisPower
@@ -132,6 +133,7 @@
     - joe-at-openai
   tags:
     - completions
+    - functions
 
 - title: How to call functions with chat models
   path: examples/How_to_call_functions_with_chat_models.ipynb
@@ -141,6 +143,7 @@
     - joe-at-openai
   tags:
     - completions
+    - functions
 
 - title: How to count tokens with tiktoken
   path: examples/How_to_count_tokens_with_tiktoken.ipynb
@@ -422,6 +425,7 @@
     - kristapratico
   tags:
     - completions
+    - functions
 
 - title: Translate a book writen in LaTeX from Slovenian into English
   path: examples/book_translation/translate_latex_book.ipynb
@@ -449,7 +453,7 @@
   tags:
     - dall-e
 
-- title: Evaluating Abstractive Summarization
+- title: How to evaluate a summarization task
   path: examples/evaluation/How_to_eval_abstractive_summarization.ipynb
   date: 2023-08-16
   authors:
@@ -994,6 +998,7 @@
   tags:
     - completions
     - embeddings
+    - functions
 
 - title: Neon as a vector database
   path: examples/vector_databases/neon/README.md
@@ -1037,13 +1042,14 @@
     - tiktoken
     - completions
 
-- title: How to build an agent with the Node.js SDK and function-calling
-  path: examples/How_to_build_an_agent_with_the_node_sdk.md
+- title: How to build an agent with the Node.js SDK
+  path: examples/How_to_build_an_agent_with_the_node_sdk.mdx
   date: 2023-10-05
   authors:
     - perborgen
   tags:
     - completions
+    - functions
 
 - title: What makes documentation good
   path: articles/what_makes_documentation_good.md
@@ -1053,3 +1059,13 @@
   authors:
     - ted-at-openai
   tags: []
+
+- title: Function-calling with an OpenAPI specification
+  path: examples/Function_calling_with_an_OpenAPI_spec.ipynb
+  date: 2023-10-15
+  authors:
+    - shyamal-anadkat
+    - simonpfish
+  tags:
+    - completions
+    - functions

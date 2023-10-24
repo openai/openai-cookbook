@@ -132,6 +132,9 @@ async def process_api_requests_from_file(
     # infer API endpoint and construct request header
     api_endpoint = api_endpoint_from_url(request_url)
     request_header = {"Authorization": f"Bearer {api_key}"}
+    # use api-key header for Azure deployments
+    if '/deployments' in request_url:
+        request_header = {"api-key": f"{api_key}"}
 
     # initialize trackers
     queue_of_requests_to_retry = asyncio.Queue()
@@ -366,6 +369,9 @@ class APIRequest:
 def api_endpoint_from_url(request_url):
     """Extract the API endpoint from the request URL."""
     match = re.search("^https://[^/]+/v\\d+/(.+)$", request_url)
+    if match is None:
+        # for Azure OpenAI deployment urls
+        match = re.search(r"^https://[^/]+/openai/deployments/[^/]+/(.+?)(\?|$)", request_url)
     return match[1]
 
 

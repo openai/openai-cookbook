@@ -1061,3 +1061,12 @@
   tags:
     - completions
     - functions
+
+- title: Fine tuning for function-calling
+  path: examples/Fine_tuning_for_function_calling.ipynb
+  date: 2023-10-27
+  authors:
+    - jhills20
+  tags:
+    - completions
+    - functions

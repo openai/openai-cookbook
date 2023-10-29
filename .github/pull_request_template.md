@@ -14,7 +14,7 @@ When contributing new content, read through our [contribution guidelines](/CONTR
 
 - [ ] I have added a new entry in [registry.yaml](/registry.yaml) so that my content renders on the cookbook website.
 - [ ] I have conducted a self-review of my content based on the [c](/CONTRIBUTING.md#rubric):
-  - [ ] Relevance: This content is related to building with OpenAI technlogies and is useful to others.
+  - [ ] Relevance: This content is related to building with OpenAI technologies and is useful to others.
   - [ ] Uniqueness: I have searched for related examples in the OpenAI Cookbook, and verified that my content offers new insights or unique information compared to existing documentation.
   - [ ] Spelling and Grammar: I have checked for spelling or grammatical mistakes.
   - [ ] Clarity: I have done a final read-through and verified that my submission is well-organized and easy to understand.

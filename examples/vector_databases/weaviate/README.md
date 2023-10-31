@@ -12,7 +12,7 @@ You can run Weaviate (including the OpenAI modules if desired) in three ways:
 
 This folder contains a variety of Weaviate and OpenAI examples. 
 
-| Name | Description | lanugage | Google Colab |
+| Name | Description | language | Google Colab |
 | --- | --- | --- | --- |
 | [Getting Started with Weaviate and OpenAI](./getting-started-with-weaviate-and-openai.ipynb) | A simple getting started for *semantic vector search* using the OpenAI vectorization module in Weaviate (`text2vec-openai`) | Python Notebook | [link](https://colab.research.google.com/drive/1RxpDE_ruCnoBB3TfwAZqdjYgHJhtdwhK) |
 | [Hybrid Search with Weaviate and OpenAI](./hybrid-search-with-weaviate-and-openai.ipynb) | A simple getting started for *hybrid search* using the OpenAI vectorization module in Weaviate (`text2vec-openai`) | Python Notebook | [link](https://colab.research.google.com/drive/1E75BALWoKrOjvUhaznJKQO0A-B1QUPZ4) |

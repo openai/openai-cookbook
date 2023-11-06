@@ -1071,3 +1071,13 @@
     - completions
     - vision
     - speech
+
+- title: What's new with DALL·E-3?
+  path: examples/GPT_with_vision_for_video_understanding.ipynb
+  date: 2023-11-06
+  authors:
+    - cathykc
+  tags:
+    - completions
+    - vision
+    - speech

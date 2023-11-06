@@ -1061,3 +1061,13 @@
   tags:
     - completions
     - functions
+
+- title: Processing and narrating a video with GPT's visual capabilities and the TTS API
+  path: examples/GPT_with_vision_for_video_understanding.ipynb
+  date: 2023-11-06
+  authors:
+    - cathykc
+  tags:
+    - completions
+    - vision
+    - speech

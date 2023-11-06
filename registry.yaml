@@ -1088,7 +1088,7 @@
   tags:
     - dall-e
 
-- title: What's new with DALL·E-3?
+- title: How to make your completions outputs consistent with the new seed parameter
   path: examples/Deterministic_outputs_with_the_seed_parameter.ipynb
   date: 2023-11-06
   authors:

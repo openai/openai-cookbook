@@ -1061,3 +1061,29 @@
   tags:
     - completions
     - functions
+
+- title: Processing and narrating a video with GPT's visual capabilities and the TTS API
+  path: examples/GPT_with_vision_for_video_understanding.ipynb
+  date: 2023-11-06
+  authors:
+    - cathykc
+  tags:
+    - completions
+    - vision
+    - speech
+
+- title: What's new with DALL·E-3?
+  path: articles/what_is_new_with_dalle_3.mdx
+  date: 2023-11-06
+  authors:
+    - 0hq
+  tags:
+    - dall-e
+
+- title: What's new with DALL·E-3?
+  path: examples/Deterministic_outputs_with_the_seed_parameter.ipynb
+  date: 2023-11-06
+  authors:
+    - shyamal-anadkat
+  tags:
+    - completions

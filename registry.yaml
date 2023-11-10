@@ -1062,6 +1062,16 @@
     - completions
     - functions
 
+- title: Fine tuning for function-calling
+  path: examples/Fine_tuning_for_function_calling.ipynb
+  date: 2023-11-07
+  authors:
+    - jhills20
+    - ibigio
+  tags:
+    - completions
+    - functions
+    
 - title: Processing and narrating a video with GPT's visual capabilities and the TTS API
   path: examples/GPT_with_vision_for_video_understanding.ipynb
   date: 2023-11-06

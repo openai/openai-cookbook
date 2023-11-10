@@ -1071,7 +1071,7 @@
   tags:
     - completions
     - functions
-    
+
 - title: Processing and narrating a video with GPT's visual capabilities and the TTS API
   path: examples/GPT_with_vision_for_video_understanding.ipynb
   date: 2023-11-06
@@ -1097,3 +1097,12 @@
     - shyamal-anadkat
   tags:
     - completions
+
+- title: Assistants API Overview with the Python SDK
+  path: examples/Assistants_API_overview_python.ipynb
+  date: 2023-11-10
+  authors:
+    - ibigio
+  tags:
+    - assistants
+    - functions

@@ -1098,8 +1098,8 @@
   tags:
     - completions
 
-- title: Assistants API Overview
-  path: examples/assistants_api_overview.ipynb
+- title: Assistants API Overview with the Python SDK
+  path: examples/Assistants_API_overview_python.ipynb
   date: 2023-11-10
   authors:
     - ibigio

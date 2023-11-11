@@ -1,0 +1,49 @@
+# yaml-language-server: $schema=./.github/authors_schema.json
+
+# You can optionally customize how your information shows up cookbook.openai.com over here.
+# If your information is not present here, it will be pulled from your GitHub profile.
+
+0hq:
+  name: "Will Depue"
+  website: "http://depue.design"
+  avatar: "https://pbs.twimg.com/profile_images/1619879636057595904/NdjEAqPm_400x400.jpg"
+
+cathykc:
+  name: "Kai Chen"
+  website: "https://twitter.com/cathykaic"
+  avatar: "https://pbs.twimg.com/profile_images/1657816900817272832/ioGq5O0t_400x400.jpg"
+
+shyamal-anadkat:
+  name: "Shyamal Anadkat"
+  website: "https://twitter.com/shyamalanadkat"
+  avatar: "https://pbs.twimg.com/profile_images/1590564338682560512/3bbZJqxZ_400x400.jpg"
+
+simonpfish:
+  name: "Simón Fishman"
+  website: "https://twitter.com/simonpfish"
+  avatar: "https://pbs.twimg.com/profile_images/1687643030243901441/61DpxNfc_400x400.jpg"
+
+joe-at-openai:
+  name: "Joe Palermo"
+  website: "https://www.linkedin.com/in/joe-palermo-99219237"
+  avatar: "https://media.licdn.com/dms/image/C4E03AQF_tsi7Kom0rg/profile-displayphoto-shrink_800_800/0/1630002100665?e=1704931200&v=beta&t=z3HKO9FmGHJIxhes9TXRzw-8iY-CBsEZYZc8zTogiLU"
+
+mwu1993:
+  name: "Michael Wu"
+  website: "https://www.linkedin.com/in/michael-wu-77440977/"
+  avatar: "https://media.licdn.com/dms/image/C5603AQFhQfx0I-raUg/profile-displayphoto-shrink_800_800/0/1527451059977?e=1704931200&v=beta&t=wkFOj0Rigp6e9wm7aZdziOQ6jHARyXj3EoK1K8jaaas"
+
+ibigio:
+  name: "Ilan Bigio"
+  website: "https://twitter.com/ilanbigio"
+  avatar: "https://pbs.twimg.com/profile_images/1688302223250378752/z-99TOMH_400x400.jpg"
+  
+jhills20:
+  name: "James Hills"
+  website: "https://twitter.com/jimmerhills"
+  avatar: "https://pbs.twimg.com/profile_images/1722092156691902464/44FGj7VT_400x400.jpg"
+
+colin-openai:
+  name: "Colin Jarvis"
+  website: "https://twitter.com/colintjarvis"
+  avatar: "https://pbs.twimg.com/profile_images/1647875178947387393/aUc7D9m-_400x400.jpg"

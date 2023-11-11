@@ -1106,3 +1106,11 @@
   tags:
     - assistants
     - functions
+
+- title: How to Use the Assistants API to Build a Math Chatbot with a Code Interpreter
+  path: examples/assistants/how_to_use_assistants_api_with_code_interpreter.ipynb
+  date: 2023-11-11
+  authors:
+    - jakelin
+  tags:
+    - assistants

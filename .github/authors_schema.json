@@ -1,0 +1,25 @@
+{
+  "$schema": "http://json-schema.org/draft-07/schema#",
+  "type": "object",
+  "patternProperties": {
+    "^.*$": {
+      "type": "object",
+      "properties": {
+        "name": {
+          "type": "string"
+        },
+        "website": {
+          "type": "string",
+          "format": "uri"
+        },
+        "avatar": {
+          "type": "string",
+          "format": "uri"
+        }
+      },
+      "required": ["name", "website", "avatar"],
+      "additionalProperties": false
+    }
+  },
+  "additionalProperties": false
+}

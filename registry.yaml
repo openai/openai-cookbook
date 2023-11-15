@@ -4,6 +4,17 @@
 # should build pages for, and indicates metadata such as tags, creation date and
 # authors for each page.
 
+
+- title: Creating slides with the Assistants API and DALL-E3
+  path: examples/Creating_slides_with_Assistants_API_and_DALL-E3.ipynb
+  date: 2023-11-15
+  authors:
+    - jhills20
+  tags:
+    - assistants
+    - dall-e
+    - vision
+
 - title: Data preparation and analysis for chat model fine-tuning
   path: examples/Chat_finetuning_data_prep.ipynb
   date: 2023-08-22
@@ -1071,7 +1082,7 @@
   tags:
     - completions
     - functions
-    
+
 - title: Processing and narrating a video with GPT's visual capabilities and the TTS API
   path: examples/GPT_with_vision_for_video_understanding.ipynb
   date: 2023-11-06

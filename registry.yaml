@@ -1054,6 +1054,15 @@
     - completions
     - functions
 
+- title: Named Entity Recognition to Enrich Text
+  path: examples/Named_Entity_Recognition_to_enrich_text.ipynb
+  date: 2023-10-20
+  authors:
+    - dcarpintero
+  tags:
+    - completions
+    - functions
+
 - title: What makes documentation good
   path: articles/what_makes_documentation_good.md
   redirects:
@@ -1108,3 +1117,12 @@
     - shyamal-anadkat
   tags:
     - completions
+
+- title: Assistants API Overview (Python SDK)
+  path: examples/Assistants_API_overview_python.ipynb
+  date: 2023-11-10
+  authors:
+    - ibigio
+  tags:
+    - assistants
+    - functions

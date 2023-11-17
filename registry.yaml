@@ -1122,5 +1122,5 @@
   authors:
     - Ravi Theja
   tags:
-    - RAG
-    - Evaluation
+    - embeddings
+    - completions

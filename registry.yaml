@@ -1115,3 +1115,12 @@
   tags:
     - assistants
     - functions
+
+- title: Fine tuning for function-calling
+  path: examples/Fine_tuning_for_function_calling.ipynb
+  date: 2023-11-22
+  authors:
+    - dpirad007
+  tags:
+    - completions
+    - functions

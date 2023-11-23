@@ -4,6 +4,15 @@
 # should build pages for, and indicates metadata such as tags, creation date and
 # authors for each page.
 
+- title: GPT-4 vision image token calculation using TikToken
+  path: examples/How_to_count_tokens_with_tiktoken.ipynb 
+  date: 2023-11-23
+  authors:
+    - RamishRasool14
+  tags:
+    - completions
+    - tiktoken
+
 - title: Data preparation and analysis for chat model fine-tuning
   path: examples/Chat_finetuning_data_prep.ipynb
   date: 2023-08-22

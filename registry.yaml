@@ -1126,3 +1126,12 @@
   tags:
     - assistants
     - functions
+
+- title: Evaluate RAG with LlamaIndex
+  path: examples/evaluation/Evaluate_RAG_with_LlamaIndex.ipynb
+  date: 2023-11-06
+  authors:
+    - Ravi Theja
+  tags:
+    - embeddings
+    - completions

@@ -87,7 +87,7 @@ The script is structured as follows:
         - api_endpoint_from_url (extracts API endpoint from request URL)
         - append_to_jsonl (writes to results file)
         - num_tokens_consumed_from_request (bigger function to infer token usage from request)
-        - task_id_generator_function (yields 1, 2, 3, ...)
+        - task_id_generator_function (yields 0, 1, 2, ...)
     - Run main()
 """
 
@@ -140,7 +140,7 @@ async def process_api_requests_from_file(
     queue_of_requests_to_retry = asyncio.Queue()
     task_id_generator = (
         task_id_generator_function()
-    )  # generates integer IDs of 1, 2, 3, ...
+    )  # generates integer IDs of 0, 1, 2, ...
     status_tracker = (
         StatusTracker()
     )  # single instance to track a collection of variables

@@ -1124,3 +1124,12 @@
   tags:
     - embeddings
     - completions
+
+- title: 
+  path: examples/third_party/multimodal_maestro_gpt_4_vision.ipynb
+  date: 2023-11-06
+  authors:
+    - Piotr Skalski
+    - James Gallagher
+  tags:
+    - completions

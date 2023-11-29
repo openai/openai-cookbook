@@ -47,3 +47,13 @@ colin-openai:
   name: "Colin Jarvis"
   website: "https://twitter.com/colintjarvis"
   avatar: "https://pbs.twimg.com/profile_images/1647875178947387393/aUc7D9m-_400x400.jpg"
+
+skalskip:
+  name: "Piotr Skalski"
+  website: "https://github.com/SkalskiP"
+  avatar: "https://avatars.githubusercontent.com/u/26109316?v=4"
+
+capjamesg:
+  name: "James Gallagher"
+  website: "https://jamesg.blog"
+  avatar: "https://jamesg.blog/assets/coffeeshop.jpg"

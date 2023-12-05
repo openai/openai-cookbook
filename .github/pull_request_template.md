@@ -12,7 +12,7 @@ Why are these changes necessary? How do they improve the cookbook?
 
 When contributing new content, read through our [contribution guidelines](https://github.com/openai/openai-cookbook/blob/main/CONTRIBUTING.md), and mark the following action items as completed:
 
-- [ ] I have added a new entry in [registry.yaml](/registry.yaml) (and, optionally, in [authors.yaml](/authors.yaml)) so that my content renders on the cookbook website.
+- [ ] I have added a new entry in [registry.yaml](https://github.com/openai/openai-cookbook/blob/main/registry.yaml) (and, optionally, in [authors.yaml](https://github.com/openai/openai-cookbook/blob/main/authors.yaml)) so that my content renders on the cookbook website.
 - [ ] I have conducted a self-review of my content based on the [contribution guidelines](https://github.com/openai/openai-cookbook/blob/main/CONTRIBUTING.md#rubric):
   - [ ] Relevance: This content is related to building with OpenAI technologies and is useful to others.
   - [ ] Uniqueness: I have searched for related examples in the OpenAI Cookbook, and verified that my content offers new insights or unique information compared to existing documentation.

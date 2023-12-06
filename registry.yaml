@@ -1147,7 +1147,7 @@
   path: examples/vector_databases/supabase/README.md
   date: 2023-12-04
   authors:
-    - Greg Richardson
+    - ggrn
   tags:
     - embeddings
 
@@ -1155,6 +1155,6 @@
   path: examples/vector_databases/supabase/semantic-search.mdx
   date: 2023-12-04
   authors:
-    - Greg Richardson
+    - ggrn
   tags:
     - embeddings

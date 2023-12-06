@@ -326,7 +326,7 @@
   tags:
     - embeddings
 
-- title: "Addressing transcription misspellings: prompt vs post-processing"
+- title: 'Addressing transcription misspellings: prompt vs post-processing'
   path: examples/Whisper_correct_misspelling.ipynb
   date: 2023-08-11
   authors:
@@ -335,7 +335,7 @@
     - whisper
     - completions
 
-- title: "Enhancing Whisper transcriptions: pre- & post-processing techniques"
+- title: 'Enhancing Whisper transcriptions: pre- & post-processing techniques'
   path: examples/Whisper_processing_guide.ipynb
   date: 2023-08-11
   authors:
@@ -1143,3 +1143,18 @@
     - embeddings
     - completions
 
+- title: Supabase Vector Database
+  path: examples/vector_databases/supabase/README.md
+  date: 2023-12-04
+  authors:
+    - Greg Richardson
+  tags:
+    - embeddings
+
+- title: Semantic search using Supabase Vector
+  path: examples/vector_databases/supabase/semantic-search.mdx
+  date: 2023-12-04
+  authors:
+    - Greg Richardson
+  tags:
+    - embeddings

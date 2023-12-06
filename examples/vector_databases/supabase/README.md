@@ -19,9 +19,9 @@ We can use these services alongside pgvector to store and query embeddings withi
 
 Below are guides and resources that walk you through how to use OpenAI embedding models with Supabase Vector.
 
-| Guide                                                  | Description                                                |
-| ------------------------------------------------------ | ---------------------------------------------------------- |
-| [Semantic search](./GPT4_Retrieval_Augmentation.ipynb) | Store, index, and query embeddings at scale using pgvector |
+| Guide                                    | Description                                                |
+| ---------------------------------------- | ---------------------------------------------------------- |
+| [Semantic search](./semantic-search.mdx) | Store, index, and query embeddings at scale using pgvector |
 
 ## Additional resources
 

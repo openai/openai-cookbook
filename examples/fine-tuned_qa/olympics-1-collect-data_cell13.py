@@ -1,0 +1,1 @@
+df.title.str.contains('Summer').value_counts()

@@ -1,0 +1,1 @@
+lyft_engine = lyft_index.as_query_engine(similarity_top_k=3)

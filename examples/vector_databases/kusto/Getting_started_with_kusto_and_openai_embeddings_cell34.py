@@ -1,0 +1,1 @@
+KUSTO_CLIENT = KustoClient(KCSB)

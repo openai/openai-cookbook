@@ -1,0 +1,1 @@
+!pip show openai | grep Version

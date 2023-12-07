@@ -1,0 +1,1 @@
+! pip install openai qdrant-client "langchain==0.0.100" wget

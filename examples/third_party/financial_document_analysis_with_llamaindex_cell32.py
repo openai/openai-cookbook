@@ -1,0 +1,1 @@
+response = await s_engine.aquery('Compare and contrast the customer segments and geographies that grew the fastest')

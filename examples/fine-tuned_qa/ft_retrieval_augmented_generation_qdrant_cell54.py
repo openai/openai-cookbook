@@ -1,0 +1,2 @@
+df["ft_generated_answer_few_shot"] = df.progress_apply(answer_question, model=model_id, prompt_func=get_few_shot_prompt, axis=1)
+df.to_json("local_cache/100_val_ft_few_shot.json", orient="records", lines=True)

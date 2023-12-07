@@ -1,0 +1,1 @@
+!pip install --quiet "astrapy>=0.6.0" "openai>=1.0.0" datasets

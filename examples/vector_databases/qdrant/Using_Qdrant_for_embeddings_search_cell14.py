@@ -1,0 +1,1 @@
+qdrant.get_collections()

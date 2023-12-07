@@ -1,0 +1,1 @@
+content_query_output = query_article("Famous battles in Scottish history",'content')

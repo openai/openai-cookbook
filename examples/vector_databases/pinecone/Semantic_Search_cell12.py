@@ -1,0 +1,1 @@
+len(embeds[0])

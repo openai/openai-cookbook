@@ -1,0 +1,1 @@
+! pip install openai redis tair pandas wget

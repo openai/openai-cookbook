@@ -1,0 +1,1 @@
+! pip install openai clickhouse-connect wget pandas

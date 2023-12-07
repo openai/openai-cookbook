@@ -1,0 +1,1 @@
+df.to_csv('olympics-data/olympics_qa.csv', index=False)

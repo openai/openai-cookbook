@@ -1,0 +1,1 @@
+article_df.info(show_counts=True)

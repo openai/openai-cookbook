@@ -1,0 +1,1 @@
+print(sports_dataset['data'][0])

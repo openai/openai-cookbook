@@ -1,0 +1,1 @@
+!pip install -qU openai pinecone-client datasets

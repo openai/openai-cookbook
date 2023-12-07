@@ -1,0 +1,1 @@
+training_examples_unformatted = create_commands(input_objects)

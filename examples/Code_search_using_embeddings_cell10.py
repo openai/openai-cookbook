@@ -1,0 +1,1 @@
+res = search_functions(df, 'find common suffix', n=2, n_lines=10)

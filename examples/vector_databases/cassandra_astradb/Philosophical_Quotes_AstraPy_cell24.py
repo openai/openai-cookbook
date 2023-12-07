@@ -1,0 +1,1 @@
+philo_dataset = load_dataset("datastax/philosopher-quotes")["train"]

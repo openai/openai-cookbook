@@ -1,0 +1,1 @@
+dataset_path = 'wikipedia-embeddings-deeplake'

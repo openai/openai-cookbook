@@ -1,0 +1,1 @@
+query_output = query_article('modern art in Europe','title')

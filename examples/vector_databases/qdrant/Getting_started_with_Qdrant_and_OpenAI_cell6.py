@@ -1,0 +1,1 @@
+! pip install openai qdrant-client pandas wget

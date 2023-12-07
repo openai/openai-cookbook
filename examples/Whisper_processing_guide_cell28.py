@@ -1,0 +1,1 @@
+print(punctuated_transcript)

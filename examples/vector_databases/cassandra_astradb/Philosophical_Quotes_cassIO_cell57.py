@@ -1,0 +1,1 @@
+v_table_partitioned = ClusteredMetadataVectorCassandraTable(table="philosophers_cassio_partitioned", vector_dimension=1536)

@@ -1,0 +1,1 @@
+! pip install openai psycopg2 pandas wget python-dotenv

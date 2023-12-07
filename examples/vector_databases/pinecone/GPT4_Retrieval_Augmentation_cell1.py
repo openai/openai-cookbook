@@ -1,0 +1,1 @@
+!pip install -qU bs4 tiktoken openai langchain pinecone-client[grpc]

@@ -1,0 +1,2 @@
+from llama_index.evaluation import FaithfulnessEvaluator
+faithfulness_gpt4 = FaithfulnessEvaluator(service_context=service_context_gpt4)

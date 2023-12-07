@@ -1,0 +1,1 @@
+v_table = MetadataVectorCassandraTable(table="philosophers_cassio", vector_dimension=1536)

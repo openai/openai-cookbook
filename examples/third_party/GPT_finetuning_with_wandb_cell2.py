@@ -1,0 +1,1 @@
+!pip install -Uq openai tiktoken datasets tenacity wandb

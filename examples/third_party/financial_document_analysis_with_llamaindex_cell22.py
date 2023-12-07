@@ -1,0 +1,1 @@
+uber_engine = uber_index.as_query_engine(similarity_top_k=3)

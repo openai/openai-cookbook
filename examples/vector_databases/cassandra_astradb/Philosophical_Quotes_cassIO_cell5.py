@@ -1,0 +1,1 @@
+!pip install --quiet "cassio>=0.1.3" "openai>=1.0.0" datasets

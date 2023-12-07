@@ -1,0 +1,1 @@
+%pip install -qU openai chromadb pandas

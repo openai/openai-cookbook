@@ -1,0 +1,1 @@
+transcribe(up_first_filepath, prompt=prompt)

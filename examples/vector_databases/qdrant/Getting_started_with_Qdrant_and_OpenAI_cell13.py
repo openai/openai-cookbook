@@ -1,0 +1,1 @@
+client.get_collections()

@@ -1,0 +1,1 @@
+df.context.str.contains('->').sum()

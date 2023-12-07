@@ -1,0 +1,1 @@
+response_vector = query_engine.query("What did the author do growing up?")

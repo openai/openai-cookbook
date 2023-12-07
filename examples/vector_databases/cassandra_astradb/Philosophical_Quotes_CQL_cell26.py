@@ -1,0 +1,1 @@
+OPENAI_API_KEY = getpass("Please enter your OpenAI API Key: ")

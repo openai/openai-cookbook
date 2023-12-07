@@ -1,0 +1,1 @@
+!openai api fine_tunes.results -i ft-2zaA7qi0rxJduWQpdvOvmGn3 > result.csv

@@ -1,0 +1,1 @@
+print(questions[0])

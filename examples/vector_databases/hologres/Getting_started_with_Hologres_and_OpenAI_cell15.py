@@ -1,0 +1,2 @@
+!unzip -n vector_database_wikipedia_articles_embedded.zip
+!ls -lh vector_database_wikipedia_articles_embedded.csv

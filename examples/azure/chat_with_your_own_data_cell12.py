@@ -1,0 +1,1 @@
+! pip install "azure-identity>=1.15.0"

@@ -1,1 +1,0 @@
-query('Book about a k-9 from europe')

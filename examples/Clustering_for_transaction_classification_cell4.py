@@ -1,1 +1,0 @@
-df = pd.read_csv(embedding_path)

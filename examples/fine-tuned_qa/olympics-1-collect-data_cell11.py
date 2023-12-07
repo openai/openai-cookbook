@@ -1,1 +1,0 @@
-df.title.value_counts().head()

@@ -1,1 +1,0 @@
-find_quote_and_author_p("We struggle all our life for nothing", 2, author="nietzsche")

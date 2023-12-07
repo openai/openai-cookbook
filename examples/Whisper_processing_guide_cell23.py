@@ -1,1 +1,0 @@
-print(full_transcript)

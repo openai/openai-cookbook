@@ -1,1 +1,0 @@
-query_engine = vector_index.as_query_engine()

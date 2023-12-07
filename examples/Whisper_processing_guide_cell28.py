@@ -1,1 +1,0 @@
-print(punctuated_transcript)

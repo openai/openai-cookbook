@@ -1,1 +1,0 @@
-qdrant = qdrant_client.QdrantClient(host='localhost', prefer_grpc=True)

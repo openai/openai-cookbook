@@ -1,1 +1,0 @@
-dg.show(group="Score", sort="Score", rows=5, select="Score,embedding")

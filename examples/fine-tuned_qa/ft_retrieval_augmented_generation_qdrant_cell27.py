@@ -1,1 +1,0 @@
-df["ft_generated_answer"] = df.progress_apply(answer_question, model=model_id, axis=1)

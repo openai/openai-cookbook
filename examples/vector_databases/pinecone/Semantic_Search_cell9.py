@@ -1,1 +1,0 @@
-print(f"vector 0: {len(res['data'][0]['embedding'])}\nvector 1: {len(res['data'][1]['embedding'])}")

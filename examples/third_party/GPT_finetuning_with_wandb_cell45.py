@@ -1,1 +1,0 @@
-!openai wandb sync --help

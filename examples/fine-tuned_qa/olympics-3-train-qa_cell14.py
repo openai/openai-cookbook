@@ -1,1 +1,0 @@
-!openai api fine_tunes.create -t "olympics-data/qa_train.jsonl" -v "olympics-data/qa_test.jsonl" --batch_size 16

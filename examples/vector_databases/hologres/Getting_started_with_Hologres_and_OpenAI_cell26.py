@@ -1,1 +1,0 @@
-cursor.execute('vacuum articles;')

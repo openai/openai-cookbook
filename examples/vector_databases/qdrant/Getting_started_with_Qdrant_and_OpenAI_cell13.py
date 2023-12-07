@@ -1,1 +1,0 @@
-client.get_collections()

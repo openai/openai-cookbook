@@ -1,1 +1,0 @@
-from cassio.table import ClusteredMetadataVectorCassandraTable

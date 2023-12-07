@@ -1,1 +1,0 @@
-print(questions[0])

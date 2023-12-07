@@ -1,1 +1,0 @@
-astra_db.delete_collection(coll_name)

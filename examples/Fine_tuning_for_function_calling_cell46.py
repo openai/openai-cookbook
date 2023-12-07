@@ -1,1 +1,0 @@
-training_list_total = training_examples+reject_training_list

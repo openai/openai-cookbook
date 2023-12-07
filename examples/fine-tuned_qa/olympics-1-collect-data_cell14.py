@@ -1,1 +1,0 @@
-df.title.str.contains('Winter').value_counts()

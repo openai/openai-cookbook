@@ -1,2 +1,0 @@
-# adding the correct spelling of the product name helps
-transcribe(product_names_filepath, prompt="QuirkQuid Quill Inc, P3-Quattro, O3-Omni, B3-BondX, E3-Equity, W3-WrapZ, O2-Outlier, U3-UniFund, M3-Mover")

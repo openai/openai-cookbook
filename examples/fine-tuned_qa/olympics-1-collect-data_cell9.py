@@ -1,1 +1,0 @@
-df.to_csv('olympics-data/olympics_sections.csv', index=False)

@@ -1,2 +1,0 @@
-hallucinated_query_result = scifact_corpus_collection.query(query_texts=hallucinated_evidence, include=['documents', 'distances'], n_results=3)
-filtered_hallucinated_query_result = filter_query_result(hallucinated_query_result)

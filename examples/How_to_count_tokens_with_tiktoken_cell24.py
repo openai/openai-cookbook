@@ -1,1 +1,0 @@
-compare_encodings("antidisestablishmentarianism")

@@ -1,1 +1,0 @@
-!pip install --quiet "cassandra-driver>=0.28.0" "openai>=1.0.0" datasets

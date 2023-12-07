@@ -1,1 +1,0 @@
-len(data), data[0:2]

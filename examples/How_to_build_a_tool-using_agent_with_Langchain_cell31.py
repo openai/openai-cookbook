@@ -1,1 +1,0 @@
-query_docs = retriever.get_relevant_documents("can you live without a bank account")

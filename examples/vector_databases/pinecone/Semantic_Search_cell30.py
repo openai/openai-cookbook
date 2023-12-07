@@ -1,1 +1,0 @@
-pinecone.delete_index(index_name)

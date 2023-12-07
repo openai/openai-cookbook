@@ -1,2 +1,0 @@
-ATLAS_VECTOR_SEARCH_INDEX_NAME = "default"
-EMBEDDING_FIELD_NAME = "embedding_openai_nov19_23"

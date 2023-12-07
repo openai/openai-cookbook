@@ -1,1 +1,0 @@
-use_azure_active_directory = False

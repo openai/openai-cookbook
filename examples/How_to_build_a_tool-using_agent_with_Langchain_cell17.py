@@ -1,1 +1,0 @@
-agent_executor.run("How many in 2022?")

@@ -1,1 +1,0 @@
-res = search_functions(df, 'Command line interface for fine-tuning', n=1, n_lines=20)

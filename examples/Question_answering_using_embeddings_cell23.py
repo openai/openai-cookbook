@@ -1,1 +1,0 @@
-ask('Which athletes won the gold medal in curling at the 2022 Winter Olympics?')

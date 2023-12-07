@@ -1,1 +1,0 @@
-!pip install deeplake langchain openai tiktoken

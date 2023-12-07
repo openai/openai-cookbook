@@ -1,1 +1,0 @@
-retriever = docsearch.as_retriever()

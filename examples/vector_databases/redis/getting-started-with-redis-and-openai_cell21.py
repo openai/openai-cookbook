@@ -1,1 +1,0 @@
-results = search_redis(redis_client, 'Famous battles in Scottish history', vector_field='content_vector', k=10)

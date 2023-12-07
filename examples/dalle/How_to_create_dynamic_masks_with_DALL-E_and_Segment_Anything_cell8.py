@@ -1,1 +1,0 @@
-filepaths = process_dalle_images(generation_response, "generation", base_image_dir)

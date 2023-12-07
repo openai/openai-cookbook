@@ -1,1 +1,0 @@
-article_df.head()

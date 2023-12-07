@@ -1,1 +1,0 @@
-df.to_json("sport2.jsonl", orient='records', lines=True)

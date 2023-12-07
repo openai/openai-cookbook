@@ -1,1 +1,0 @@
-hallucinated_evidence = hallucinate_evidence(claims)

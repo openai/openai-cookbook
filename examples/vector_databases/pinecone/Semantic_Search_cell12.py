@@ -1,1 +1,0 @@
-len(embeds[0])

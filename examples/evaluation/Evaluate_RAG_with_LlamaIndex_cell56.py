@@ -1,3 +1,0 @@
-from llama_index.evaluation import RelevancyEvaluator
-
-relevancy_gpt4 = RelevancyEvaluator(service_context=service_context_gpt4)

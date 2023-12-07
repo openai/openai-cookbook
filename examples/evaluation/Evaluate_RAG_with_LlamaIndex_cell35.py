@@ -1,1 +1,0 @@
-display_results("OpenAI Embedding Retriever", eval_results)

@@ -1,1 +1,0 @@
-pinecone.list_indexes()

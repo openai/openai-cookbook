@@ -9,7 +9,6 @@ import matplotlib.pyplot as plt
 import os
 from ast import literal_eval
 
-openai.api_key = os.getenv("OPENAI_API_KEY")
 COMPLETIONS_MODEL = "text-davinci-003"
 
 # This path leads to a file with data and precomputed embeddings

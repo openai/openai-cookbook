@@ -1,6 +1,8 @@
 # imports needed to run the code in this notebook
 import ast  # used for detecting whether generated Python code is valid
-import openai  # used for calling the OpenAI API
+from openai import OpenAI
+
+client = OpenAI()  # used for calling the OpenAI API
 
 # example of a function that uses a multi-step prompt to write unit tests
 def unit_test_from_function(
@@ -33,14 +35,12 @@ Before writing any unit tests, let's review what each element of the function is
         print(text_color_prefix + prompt_to_explain_the_function, end="")  # end='' prevents a newline from being printed
 
     # send the prompt to the API, using \n\n as a stop sequence to stop at the end of the bullet list
-    explanation_response = openai.Completion.create(
-        model=text_model,
-        prompt=prompt_to_explain_the_function,
-        stop=["\n\n", "\n\t\n", "\n    \n"],
-        max_tokens=max_tokens,
-        temperature=temperature,
-        stream=True,
-    )
+    explanation_response = client.completions.create(model=text_model,
+    prompt=prompt_to_explain_the_function,
+    stop=["\n\n", "\n\t\n", "\n    \n"],
+    max_tokens=max_tokens,
+    temperature=temperature,
+    stream=True)
     explanation_completion = ""
     if print_text:
         completion_color_prefix = "\033[92m"  # green
@@ -75,14 +75,12 @@ For this particular function, we'll want our unit tests to handle the following 
     full_plan_prompt = prior_text + prompt_to_explain_a_plan
 
     # send the prompt to the API, using \n\n as a stop sequence to stop at the end of the bullet list
-    plan_response = openai.Completion.create(
-        model=text_model,
-        prompt=full_plan_prompt,
-        stop=["\n\n", "\n\t\n", "\n    \n"],
-        max_tokens=max_tokens,
-        temperature=temperature,
-        stream=True,
-    )
+    plan_response = client.completions.create(model=text_model,
+    prompt=full_plan_prompt,
+    stop=["\n\n", "\n\t\n", "\n    \n"],
+    max_tokens=max_tokens,
+    temperature=temperature,
+    stream=True)
     plan_completion = ""
     if print_text:
         print(completion_color_prefix, end="")
@@ -108,14 +106,12 @@ In addition to the scenarios above, we'll also want to make sure we don't forget
         full_elaboration_prompt = prior_text + prompt_to_elaborate_on_the_plan
 
         # send the prompt to the API, using \n\n as a stop sequence to stop at the end of the bullet list
-        elaboration_response = openai.Completion.create(
-            model=text_model,
-            prompt=full_elaboration_prompt,
-            stop=["\n\n", "\n\t\n", "\n    \n"],
-            max_tokens=max_tokens,
-            temperature=temperature,
-            stream=True,
-        )
+        elaboration_response = client.completions.create(model=text_model,
+        prompt=full_elaboration_prompt,
+        stop=["\n\n", "\n\t\n", "\n    \n"],
+        max_tokens=max_tokens,
+        temperature=temperature,
+        stream=True)
         elaboration_completion = ""
         if print_text:
             print(completion_color_prefix, end="")
@@ -151,14 +147,12 @@ import {unit_test_package}  # used for our unit tests
     full_unit_test_prompt = prior_text + prompt_to_generate_the_unit_test
 
     # send the prompt to the API, using ``` as a stop sequence to stop at the end of the code block
-    unit_test_response = openai.Completion.create(
-        model=code_model,
-        prompt=full_unit_test_prompt,
-        stop="```",
-        max_tokens=max_tokens,
-        temperature=temperature,
-        stream=True
-    )
+    unit_test_response = client.completions.create(model=code_model,
+    prompt=full_unit_test_prompt,
+    stop="```",
+    max_tokens=max_tokens,
+    temperature=temperature,
+    stream=True)
     unit_test_completion = ""
     if print_text:
         print(completion_color_prefix, end="")

@@ -1,13 +1,14 @@
-import openai
+from openai import OpenAI
+
+client = OpenAI(api_key=os.getenv("OPENAI_API_KEY"))
 import os
 from dotenv import load_dotenv
 
 load_dotenv()
-openai.api_key = os.getenv("OPENAI_API_KEY")
 
 def get_vector(text, model="text-embedding-ada-002"):
     text = text.replace("\n", " ")
-    return openai.Embedding.create(input = [text], model = model)['data'][0]['embedding']
+    return client.embeddings.create(input = [text], model = model)['data'][0]['embedding']
 
 text_1 = """Japan narrowly escapes recession
 

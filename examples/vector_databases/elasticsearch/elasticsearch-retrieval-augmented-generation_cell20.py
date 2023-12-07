@@ -2,7 +2,6 @@
 OPENAI_API_KEY = getpass("Enter OpenAI API key")
 
 # Set API key
-openai.api_key = OPENAI_API_KEY
 
 # Define model
 EMBEDDING_MODEL = "text-embedding-ada-002"

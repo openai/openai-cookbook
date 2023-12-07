@@ -20,4 +20,5 @@ class TokenRefresh(requests.auth.AuthBase):
 session = requests.Session()
 session.auth = TokenRefresh(default_credential, ["https://cognitiveservices.azure.com/.default"])
 
-openai.requestssession = session
+# TODO: The 'openai.requestssession' option isn't read in the client API. You will need to pass it when you instantiate the client, e.g. 'OpenAI(requestssession=session)'
+# openai.requestssession = session

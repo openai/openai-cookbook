@@ -1,5 +1,2 @@
-openai.api_type = "azure"
-openai.api_base = "YOUR_AZURE_OPENAI_ENDPOINT"
-openai.api_version = "2023-05-15"
-openai.api_key = "YOUR_AZURE_OPENAI_KEY"
+
 model: str = "text-embedding-ada-002"

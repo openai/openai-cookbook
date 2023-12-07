@@ -1,4 +1,6 @@
-import openai
+from openai import OpenAI
+
+client = OpenAI()
 
 # Reading a review which belong to each group.
 rev_per_cluster = 5
@@ -13,15 +15,13 @@ for i in range(n_clusters):
         .sample(rev_per_cluster, random_state=42)
         .values
     )
-    response = openai.Completion.create(
-        engine="text-davinci-003",
-        prompt=f'What do the following customer reviews have in common?\n\nCustomer reviews:\n"""\n{reviews}\n"""\n\nTheme:',
-        temperature=0,
-        max_tokens=64,
-        top_p=1,
-        frequency_penalty=0,
-        presence_penalty=0,
-    )
+    response = client.completions.create(engine="text-davinci-003",
+    prompt=f'What do the following customer reviews have in common?\n\nCustomer reviews:\n"""\n{reviews}\n"""\n\nTheme:',
+    temperature=0,
+    max_tokens=64,
+    top_p=1,
+    frequency_penalty=0,
+    presence_penalty=0)
     print(response["choices"][0]["text"].replace("\n", ""))
 
     sample_cluster_rows = df[df.Cluster == i].sample(rev_per_cluster, random_state=42)

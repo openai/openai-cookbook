@@ -6,7 +6,9 @@ Some of the code below may rely on [deprecated API endpoints](https://github.com
 
 import argparse
 
-import openai
+from openai import OpenAI
+
+client = OpenAI()
 
 
 def create_context(
@@ -80,16 +82,14 @@ def answer_question(
             and fine_tuned_qa_model.split(":")[1].startswith("ft")
             else {"engine": fine_tuned_qa_model}
         )
-        response = openai.Completion.create(
-            prompt=f"Answer the question based on the context below\n\nText: {context}\n\n---\n\nQuestion: {question}\nAnswer:",
-            temperature=0,
-            max_tokens=max_tokens,
-            top_p=1,
-            frequency_penalty=0,
-            presence_penalty=0,
-            stop=stop_sequence,
-            **model_param,
-        )
+        response = client.completions.create(prompt=f"Answer the question based on the context below\n\nText: {context}\n\n---\n\nQuestion: {question}\nAnswer:",
+        temperature=0,
+        max_tokens=max_tokens,
+        top_p=1,
+        frequency_penalty=0,
+        presence_penalty=0,
+        stop=stop_sequence,
+        **model_param)
         return response["choices"][0]["text"]
     except Exception as e:
         print(e)

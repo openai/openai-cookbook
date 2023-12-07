@@ -1,6 +1,6 @@
-import openai
+from openai import OpenAI
 
-embedding = openai.Embedding.create(
-    input="Your text goes here", model="text-embedding-ada-002"
-)["data"][0]["embedding"]
+client = OpenAI()
+
+embedding = client.embeddings.create(input="Your text goes here", model="text-embedding-ada-002")["data"][0]["embedding"]
 len(embedding)

@@ -1,12 +1,12 @@
-import openai
+from openai import OpenAI
+
+client = OpenAI()
 
 query = "Famous battles in Scottish history"
 
 # creates embedding vector from user query
-embed = openai.Embedding.create(
-    input=query,
-    model="text-embedding-ada-002",
-)["data"][0]["embedding"]
+embed = client.embeddings.create(input=query,
+model="text-embedding-ada-002")["data"][0]["embedding"]
 
 # query the database to find the top K similar content to the given query
 top_k = 10

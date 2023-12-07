@@ -1,7 +1,6 @@
 def query_typesense(query, field='title', top_k=20):
 
     # Creates embedding vector from user query
-    openai.api_key = os.getenv("OPENAI_API_KEY", "sk-xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx")
     embedded_query = openai.Embedding.create(
         input=query,
         model=EMBEDDING_MODEL,

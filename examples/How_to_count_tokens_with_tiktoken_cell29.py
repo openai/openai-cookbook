@@ -1,6 +1,8 @@
 # let's verify the function above matches the OpenAI API response
 
-import openai
+from openai import OpenAI
+
+client = OpenAI()
 
 example_messages = [
     {
@@ -45,11 +47,9 @@ for model in [
     # example token count from the function defined above
     print(f"{num_tokens_from_messages(example_messages, model)} prompt tokens counted by num_tokens_from_messages().")
     # example token count from the OpenAI API
-    response = openai.ChatCompletion.create(
-        model=model,
-        messages=example_messages,
-        temperature=0,
-        max_tokens=1,  # we're only counting input tokens here, so let's not waste tokens on the output
-    )
+    response = client.chat.completions.create(model=model,
+    messages=example_messages,
+    temperature=0,
+    max_tokens=1)
     print(f'{response["usage"]["prompt_tokens"]} prompt tokens counted by the OpenAI API.')
     print()

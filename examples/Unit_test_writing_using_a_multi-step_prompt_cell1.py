@@ -1,6 +1,8 @@
 # imports needed to run the code in this notebook
 import ast  # used for detecting whether generated Python code is valid
-import openai  # used for calling the OpenAI API
+from openai import OpenAI
+
+client = OpenAI()  # used for calling the OpenAI API
 
 color_prefix_by_role = {
     "system": "\033[0m",  # gray
@@ -64,12 +66,10 @@ def unit_tests_from_function(
     if print_text:
         print_messages(explain_messages)
 
-    explanation_response = openai.ChatCompletion.create(
-        model=explain_model,
-        messages=explain_messages,
-        temperature=temperature,
-        stream=True,
-    )
+    explanation_response = client.chat.completions.create(model=explain_model,
+    messages=explain_messages,
+    temperature=temperature,
+    stream=True)
     explanation = ""
     for chunk in explanation_response:
         delta = chunk["choices"][0]["delta"]
@@ -101,12 +101,10 @@ To help unit test the function above, list diverse scenarios that the function s
     ]
     if print_text:
         print_messages([plan_user_message])
-    plan_response = openai.ChatCompletion.create(
-        model=plan_model,
-        messages=plan_messages,
-        temperature=temperature,
-        stream=True,
-    )
+    plan_response = client.chat.completions.create(model=plan_model,
+    messages=plan_messages,
+    temperature=temperature,
+    stream=True)
     plan = ""
     for chunk in plan_response:
         delta = chunk["choices"][0]["delta"]
@@ -135,12 +133,10 @@ To help unit test the function above, list diverse scenarios that the function s
         ]
         if print_text:
             print_messages([elaboration_user_message])
-        elaboration_response = openai.ChatCompletion.create(
-            model=plan_model,
-            messages=elaboration_messages,
-            temperature=temperature,
-            stream=True,
-        )
+        elaboration_response = client.chat.completions.create(model=plan_model,
+        messages=elaboration_messages,
+        temperature=temperature,
+        stream=True)
         elaboration = ""
         for chunk in elaboration_response:
             delta = chunk["choices"][0]["delta"]
@@ -190,12 +186,10 @@ import {unit_test_package}  # used for our unit tests
     if print_text:
         print_messages([execute_system_message, execute_user_message])
 
-    execute_response = openai.ChatCompletion.create(
-        model=execute_model,
-        messages=execute_messages,
-        temperature=temperature,
-        stream=True,
-    )
+    execute_response = client.chat.completions.create(model=execute_model,
+    messages=execute_messages,
+    temperature=temperature,
+    stream=True)
     execution = ""
     for chunk in execute_response:
         delta = chunk["choices"][0]["delta"]

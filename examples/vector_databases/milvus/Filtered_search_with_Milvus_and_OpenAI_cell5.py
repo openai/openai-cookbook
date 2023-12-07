@@ -5,7 +5,6 @@ PORT = 19530
 COLLECTION_NAME = 'movie_search'
 DIMENSION = 1536
 OPENAI_ENGINE = 'text-embedding-ada-002'
-openai.api_key = 'sk-your_key'
 
 INDEX_PARAM = {
     'metric_type':'L2',

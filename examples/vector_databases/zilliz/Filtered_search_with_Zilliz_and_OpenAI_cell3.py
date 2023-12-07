@@ -5,7 +5,6 @@ TOKEN = 'your_token' # TOKEN == user:password or api_key
 COLLECTION_NAME = 'book_search'
 DIMENSION = 1536
 OPENAI_ENGINE = 'text-embedding-ada-002'
-openai.api_key = 'sk-your_key'
 
 INDEX_PARAM = {
     'metric_type':'L2',

@@ -9,4 +9,3 @@ from rouge import Rouge
 # BERTScore leverages the pre-trained contextual embeddings from BERT and matches words in candidate and reference sentences by cosine similarity.
 from bert_score import BERTScorer
 
-openai.api_key = os.environ.get("OPENAI_API_KEY")

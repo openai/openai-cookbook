@@ -1,7 +1,6 @@
-openai.api_version = '2022-12-01'
-openai.api_base = '' # Please add your endpoint here
-openai.api_type = 'azure'
-openai.api_key = ''  # Please add your api key here
+
+ # Please add your endpoint here
+  # Please add your api key here
 
 def embed(query):
     # Creates embedding vector from user query

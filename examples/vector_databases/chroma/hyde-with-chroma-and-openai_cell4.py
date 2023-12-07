@@ -6,6 +6,5 @@ import os
 if os.getenv("OPENAI_API_KEY") is not None:
     print("OPENAI_API_KEY is ready")
     import openai
-    openai.api_key = os.getenv("OPENAI_API_KEY")
 else:
     print("OPENAI_API_KEY environment variable not found")

@@ -25,4 +25,5 @@ def setup_byod(deployment_id: str) -> None:
     if use_azure_active_directory:
         session.auth = TokenRefresh(default_credential, ["https://cognitiveservices.azure.com/.default"])
 
-    openai.requestssession = session
+    # TODO: The 'openai.requestssession' option isn't read in the client API. You will need to pass it when you instantiate the client, e.g. 'OpenAI(requestssession=session)'
+    # openai.requestssession = session

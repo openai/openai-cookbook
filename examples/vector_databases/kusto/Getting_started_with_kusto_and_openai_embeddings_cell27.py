@@ -1,4 +1,4 @@
-openai.api_key = ""
+
 
 
 def embed(query):

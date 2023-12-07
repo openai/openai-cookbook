@@ -2,7 +2,9 @@ from typing import List, Union
 
 from smokey import Smokey
 
-import openai
+from openai import OpenAI
+
+client = OpenAI()
 
 
 def get_candidates(
@@ -24,17 +26,15 @@ def get_candidates(
     :param n: The number of completions to generate.
     :return: A list of completions.
     """
-    response = openai.Completion.create(
-        engine=engine,
-        prompt=prompt,
-        temperature=temperature,
-        max_tokens=150,
-        top_p=1,
-        frequency_penalty=0,
-        presence_penalty=0,
-        stop=stop,
-        n=n,
-    )
+    response = client.completions.create(engine=engine,
+    prompt=prompt,
+    temperature=temperature,
+    max_tokens=150,
+    top_p=1,
+    frequency_penalty=0,
+    presence_penalty=0,
+    stop=stop,
+    n=n)
     responses = [priming_prefix + choice.text for choice in response.choices]
     return responses
 
@@ -72,17 +72,15 @@ def eval_candidate(
     :param engine: The engine to use for the evaluation.
     :return: The evaluation of the candidate answer.
     """
-    response = openai.Completion.create(
-        engine=engine,
-        prompt=eval_template.format(candidate_answer, original_instruction),
-        temperature=0,
-        max_tokens=0,
-        top_p=1,
-        frequency_penalty=0,
-        presence_penalty=0,
-        logprobs=1,
-        echo=True,
-    )
+    response = client.completions.create(engine=engine,
+    prompt=eval_template.format(candidate_answer, original_instruction),
+    temperature=0,
+    max_tokens=0,
+    top_p=1,
+    frequency_penalty=0,
+    presence_penalty=0,
+    logprobs=1,
+    echo=True)
 
     answer_start = rindex(
         response["choices"][0]["logprobs"]["tokens"], answer_start_token

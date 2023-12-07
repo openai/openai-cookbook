@@ -1,4 +1,4 @@
-openai.api_key = 'OPENAI API KEY'
+
 
 response = openai.ChatCompletion.create(
   model=GPT_MODEL,

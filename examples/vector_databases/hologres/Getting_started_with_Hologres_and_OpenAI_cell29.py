@@ -1,11 +1,11 @@
-import openai
+from openai import OpenAI
+
+client = OpenAI()
 def query_knn(query, table_name, vector_name="title_vector", top_k=20):
 
     # Creates embedding vector from user query
-    embedded_query = openai.Embedding.create(
-        input=query,
-        model="text-embedding-ada-002",
-    )["data"][0]["embedding"]
+    embedded_query = client.embeddings.create(input=query,
+    model="text-embedding-ada-002")["data"][0]["embedding"]
 
     # Convert the embedded_query to PostgreSQL compatible format
     embedded_query_pg = "{" + ",".join(map(str, embedded_query)) + "}"

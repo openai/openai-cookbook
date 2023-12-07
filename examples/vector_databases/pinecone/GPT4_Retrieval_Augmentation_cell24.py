@@ -1,13 +1,13 @@
-import openai
+from openai import OpenAI
+
+client = OpenAI(api_key="sk-...")
 
 # initialize openai API key
-openai.api_key = "sk-..."  #platform.openai.com
+  #platform.openai.com
 
 embed_model = "text-embedding-ada-002"
 
-res = openai.Embedding.create(
-    input=[
-        "Sample document text goes here",
-        "there will be several phrases in each batch"
-    ], engine=embed_model
-)
+res = client.embeddings.create(input=[
+    "Sample document text goes here",
+    "there will be several phrases in each batch"
+], engine=embed_model)

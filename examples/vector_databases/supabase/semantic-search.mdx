@@ -46,10 +46,10 @@ The important piece to understand is the `vector` data type, which is a new data
 Let's go ahead and create a vector index on this table so that future queries remain performant as the table grows:
 
 ```sql
-create index on documents using hnsw (embedding vector_cosine_ops);
+create index on documents using hnsw (embedding vector_ip_ops);
 ```
 
-This index uses the [HNSW](https://supabase.com/docs/guides/ai/vector-indexes/hnsw-indexes) algorithm to index vectors stored in the `embedding` column, and specifically when using the cosine distance operator (`<=>`). We'll explain more about this operator later when we implement our match function.
+This index uses the [HNSW](https://supabase.com/docs/guides/ai/vector-indexes/hnsw-indexes) algorithm to index vectors stored in the `embedding` column, and specifically when using the inner product operator (`<#>`). We'll explain more about this operator later when we implement our match function.
 
 Let's also follow security best practices by enabling row level security on the table:
 
@@ -223,8 +223,8 @@ begin
   return query
   select *
   from documents
-  where documents.embedding <=> query_embedding < 1 - match_threshold
-  order by documents.embedding <=> query_embedding;
+  where documents.embedding <#> query_embedding < -match_threshold
+  order by documents.embedding <#> query_embedding;
 end;
 $$;
 ```
@@ -233,8 +233,10 @@ This function accepts a `query_embedding` which represents the embedding generat
 
 Inside the function we implement the query which does two things:
 
-- Filters the documents to only include those who's embeddings match within the above `match_threshold`. Since the `<=>` operator performs cosine distance (not cosine similarity), we subtract the similarity threshold from 1 to convert it into distance before comparing. This means a `match_threshold` of 1 is most similar, and -1 is most dissimilar.
-- Orders the documents by cosine distance (`<=>`) ascending. This allows us to retrieve documents that match closest first.
+- Filters the documents to only include those who's embeddings match within the above `match_threshold`. Since the `<#>` operator performs the negative inner product (versus positive inner product), we negate the similarity threshold before comparing. This means a `match_threshold` of 1 is most similar, and -1 is most dissimilar.
+- Orders the documents by negative inner product (`<#>`) ascending. This allows us to retrieve documents that match closest first.
+
+> Since OpenAI embeddings are normalized, we opted to use inner product (`<#>`) because it is slightly more performant than other operators like cosine distance (`<=>`). It is important to note though this only works because the embeddings are normalized - if they weren't, cosine distance should be used.
 
 Now we can call this function from our application using the `supabase.rpc()` method:
 

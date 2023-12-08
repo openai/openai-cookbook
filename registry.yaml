@@ -1143,3 +1143,11 @@
     - embeddings
     - completions
 
+- title: RAG with a Graph database
+  path: examples/RAG_with_graph_db.ipynb
+  date: 2023-12-08
+  authors:
+    - katia-openai
+  tags:
+    - embeddings
+    - completions

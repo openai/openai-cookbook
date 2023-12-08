@@ -23,6 +23,7 @@ def create_context(
     :param max_rerank: The maximum number of reranking
     :return: The context
     """
+    # TODO: openai.Engine(search_model) is deprecated
     results = openai.Engine(search_model).search(
         search_model=search_model,
         query=question,

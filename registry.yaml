@@ -4,6 +4,15 @@
 # should build pages for, and indicates metadata such as tags, creation date and
 # authors for each page.
 
+- title: GPTs for Business 
+  path: articles/GPTs_for_Business.md
+  date: 2023-12-10
+  authors:
+    - sabrina-de
+  tags:
+    - ChatGPT
+    - Actions
+    - GPTs
 
 - title: Creating slides with the Assistants API and DALL-E3
   path: examples/Creating_slides_with_Assistants_API_and_DALL-E3.ipynb

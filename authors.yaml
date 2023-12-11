@@ -37,13 +37,18 @@ ibigio:
   name: "Ilan Bigio"
   website: "https://twitter.com/ilanbigio"
   avatar: "https://pbs.twimg.com/profile_images/1688302223250378752/z-99TOMH_400x400.jpg"
-  
+
 jhills20:
   name: "James Hills"
-  website: "https://twitter.com/jimmerhills"
+  website: "https://twitter.com/jamesmhills"
   avatar: "https://pbs.twimg.com/profile_images/1722092156691902464/44FGj7VT_400x400.jpg"
 
 colin-openai:
   name: "Colin Jarvis"
   website: "https://twitter.com/colintjarvis"
   avatar: "https://pbs.twimg.com/profile_images/1647875178947387393/aUc7D9m-_400x400.jpg"
+
+prakul:
+  name: "Prakul Agarwal"
+  website: "https://www.linkedin.com/in/prakulagarwal"
+  avatar: "https://media.licdn.com/dms/image/D5603AQEUug83qKgRBg/profile-displayphoto-shrink_800_800/0/1675384960197?e=1706140800&v=beta&t=qxkDbBr-Bk2ASpcwbR5JVPD6yS-vzmIwNHAa8ApyDq4"

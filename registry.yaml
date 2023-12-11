@@ -4,6 +4,16 @@
 # should build pages for, and indicates metadata such as tags, creation date and
 # authors for each page.
 
+
+- title: Creating slides with the Assistants API and DALL-E3
+  path: examples/Creating_slides_with_Assistants_API_and_DALL-E3.ipynb
+  date: 2023-12-08
+  authors:
+    - jhills20
+  tags:
+    - assistants
+    - dall-e
+
 - title: Data preparation and analysis for chat model fine-tuning
   path: examples/Chat_finetuning_data_prep.ipynb
   date: 2023-08-22
@@ -1116,6 +1126,24 @@
     - assistants
     - functions
 
+- title: MongoDB Atlas Vector Search
+  path: examples/vector_databases/mongodb_atlas/README.md
+  date: 2023-11-21
+  authors:
+    - prakul
+  tags:
+    - embeddings
+    - completions
+
+- title: Semantic search using MongoDB Atlas Vector Search and OpenAI
+  path: examples/vector_databases/mongodb_atlas/semantic_search_using_mongodb_atlas_vector_search.ipynb
+  date: 2023-11-21
+  authors:
+    - prakul
+  tags:
+    - embeddings
+    - completions
+
 - title: Evaluate RAG with LlamaIndex
   path: examples/evaluation/Evaluate_RAG_with_LlamaIndex.ipynb
   date: 2023-11-06
@@ -1124,3 +1152,4 @@
   tags:
     - embeddings
     - completions
+

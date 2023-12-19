@@ -1168,3 +1168,11 @@
     - ggrn
   tags:
     - embeddings
+
+- title: How to implement LLM guardrails
+  path: examples/how_to_use_guardrails.ipynb
+  date: 2023-12-19
+  authors:
+    - colin-jarvis
+  tags:
+    - guardrails

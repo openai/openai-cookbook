@@ -143,7 +143,7 @@ GPT-4 powers [numerous innovative products][OpenAI Customer Stories], including:
 
 * [GitHub Copilot] (autocompletes code in Visual Studio and other IDEs)
 * [Replit](https://replit.com/) (can complete, explain, edit and generate code)
-* [Viable](https://www.askviable.com/) uses GPT-4 to analyze qualitative data at a revolutionary scale with unparalleled accuracy.
+* [Cursor](https://cursor.sh/) (build software faster in an editor designed for pair-programming with AI)
 
 GPT-4 is more advanced than previous models like `text-davinci-002`. But, to get the best out of GPT-4 for coding tasks, it's still important to give clear and specific instructions. As a result, designing good prompts can take more care.
 

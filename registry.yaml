@@ -5,6 +5,14 @@
 # authors for each page.
 
 
+- title: Using logprobs
+  path: examples/using_logprobs.ipynb
+  date: 2023-12-19
+  authors:
+    - jhills20
+  tags:
+    - completions
+
 - title: Creating slides with the Assistants API and DALL-E3
   path: examples/Creating_slides_with_Assistants_API_and_DALL-E3.ipynb
   date: 2023-12-08

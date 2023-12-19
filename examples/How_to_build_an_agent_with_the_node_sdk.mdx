@@ -129,12 +129,10 @@ We start by pushing the `userInput` to the messages array. This time, we set the
 
 ```js
 async function agent(userInput) {
-  messages.push([
-    {
-      role: "user",
-      content: userInput,
-    },
-  ]);
+  messages.push({
+    role: "user",
+    content: userInput,
+  });
   const response = await openai.chat.completions.create({
     model: "gpt-4",
     messages: messages,

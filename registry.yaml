@@ -1153,3 +1153,18 @@
     - embeddings
     - completions
 
+- title: Supabase Vector Database
+  path: examples/vector_databases/supabase/README.md
+  date: 2023-12-04
+  authors:
+    - ggrn
+  tags:
+    - embeddings
+
+- title: Semantic search using Supabase Vector
+  path: examples/vector_databases/supabase/semantic-search.mdx
+  date: 2023-12-04
+  authors:
+    - ggrn
+  tags:
+    - embeddings

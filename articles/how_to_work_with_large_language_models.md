@@ -74,7 +74,7 @@ Output:
 
 ### Scenario prompt example
 
-Giving the model a scenario to follow or role to play out can be helpful for complex queries or when seeking imaginative responses. When using a hypothetical prompt, you essentially set up a situation, problem, or story, and then ask the model to respond as if it were a character in that scenario or an expert on the topic.
+Giving the model a scenario to follow or role to play out can be helpful for complex queries or when seeking imaginative responses. When using a hypothetical prompt, you set up a situation, problem, or story, and then ask the model to respond as if it were a character in that scenario or an expert on the topic.
 
 Example scenario prompt:
 ```text

@@ -6,8 +6,8 @@
 
 
 - title: Using logprobs
-  path: examples/using_logprobs.ipynb
-  date: 2023-12-19
+  path: examples/Using_logprobs.ipynb
+  date: 2023-12-20
   authors:
     - jhills20
     - shyamal-anadkat

@@ -83,7 +83,7 @@ def answer_question(
             and fine_tuned_qa_model.split(":")[1].startswith("ft")
             else {"engine": fine_tuned_qa_model}
         )
-        response = client.completions.create(prompt=f"Answer the question based on the context below\n\nText: {context}\n\n---\n\nQuestion: {question}\nAnswer:",
+        response = client.chat.completions.create(prompt=f"Answer the question based on the context below\n\nText: {context}\n\n---\n\nQuestion: {question}\nAnswer:",
         temperature=0,
         max_tokens=max_tokens,
         top_p=1,

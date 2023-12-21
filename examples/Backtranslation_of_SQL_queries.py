@@ -26,7 +26,7 @@ def get_candidates(
     :param n: The number of completions to generate.
     :return: A list of completions.
     """
-    response = client.completions.create(engine=engine,
+    response = client.chat.completions.create(model=engine,
     prompt=prompt,
     temperature=temperature,
     max_tokens=150,
@@ -72,7 +72,7 @@ def eval_candidate(
     :param engine: The engine to use for the evaluation.
     :return: The evaluation of the candidate answer.
     """
-    response = client.completions.create(engine=engine,
+    response = client.chat.completions.create(model=engine,
     prompt=eval_template.format(candidate_answer, original_instruction),
     temperature=0,
     max_tokens=0,

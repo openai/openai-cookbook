@@ -46,7 +46,7 @@ jhills20:
 colin-openai:
   name: "Colin Jarvis"
   website: "https://twitter.com/colintjarvis"
-  avatar: "https://pbs.twimg.com/profile_images/1647875178947387393/aUc7D9m-_400x400.jpg"
+  avatar: "https://pbs.twimg.com/profile_images/1727207339034345472/IM8v8tlC_400x400.jpg"
 
 prakul:
   name: "Prakul Agarwal"
@@ -57,3 +57,12 @@ gaborcselle:
   name: "Gabor Cselle"
   website: "https://www.linkedin.com/in/gaborcselle"
   avatar: "https://avatars.githubusercontent.com/u/54096?s=96&v=4"
+
+nghiauet:
+  name: "Nghia Pham"
+  website: "https://www.linkedin.com/in/deptraicucmanh/"
+  avatar: "https://media.licdn.com/dms/image/D5603AQFpoi0l1lRQ7g/profile-displayphoto-shrink_200_200/0/1680006955681?e=1707350400&v=beta&t=1J1DAVRGXL7LgFUBnIooI-fsDRkdzFzCDwwxMze9N8c"
+
+  name: "Greg Richardson"
+  website: "https://twitter.com/ggrdson"
+  avatar: "https://pbs.twimg.com/profile_images/1371549909820657664/ZG-HDNlI_400x400.jpg"

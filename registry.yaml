@@ -1194,3 +1194,14 @@
     - colin-jarvis
   tags:
     - guardrails
+
+- title: Courses and paper on prompt patterns
+  path: articles/related_resources.md
+  redirects:
+    - related_resources
+  date: 2023-12-21
+  authors:
+    - quchenfu
+  tags:
+    - promptpattern
+    - chatGPT

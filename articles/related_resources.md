@@ -44,7 +44,7 @@ People are writing great tools and papers for improving outputs from GPT. Here a
 - [Prompt Engineering by DAIR.AI](https://www.youtube.com/watch?v=dOxUroR57xs): A one-hour video on various prompt engineering techniques.
 - [Scrimba course about Assistants API](https://scrimba.com/learn/openaiassistants): A 30-minute interactive course about the Assistants API.
 - [LinkedIn course: Introduction to Prompt Engineering: How to talk to the AIs](https://www.linkedin.com/learning/prompt-engineering-how-to-talk-to-the-ais/talking-to-the-ais?u=0): Short video introduction to prompt engineering
-- [Coursera course: Prompt Engineering Specialization](https://www.coursera.org/specializations/prompt-engineering): A 3-course specialization on prompt engineering.
+- [Coursera specialization: Prompt Engineering Specialization](https://www.coursera.org/specializations/prompt-engineering): A 3-course specialization on prompt engineering.
 
 ## Papers on advanced prompting to improve reasoning
 

@@ -44,7 +44,7 @@ People are writing great tools and papers for improving outputs from GPT. Here a
 - [Prompt Engineering by DAIR.AI](https://www.youtube.com/watch?v=dOxUroR57xs): A one-hour video on various prompt engineering techniques.
 - [Scrimba course about Assistants API](https://scrimba.com/learn/openaiassistants): A 30-minute interactive course about the Assistants API.
 - [LinkedIn course: Introduction to Prompt Engineering: How to talk to the AIs](https://www.linkedin.com/learning/prompt-engineering-how-to-talk-to-the-ais/talking-to-the-ais?u=0): Short video introduction to prompt engineering
-
+- [Coursera course: Prompt Engineering Specialization](https://www.coursera.org/specializations/prompt-engineering): A 3-course specialization on prompt engineering.
 
 ## Papers on advanced prompting to improve reasoning
 
@@ -60,3 +60,4 @@ People are writing great tools and papers for improving outputs from GPT. Here a
 - [Reflexion: an autonomous agent with dynamic memory and self-reflection (2023)](https://arxiv.org/abs/2303.11366): Retrying tasks with memory of prior failures improves subsequent performance.
 - [Demonstrate-Search-Predict: Composing retrieval and language models for knowledge-intensive NLP (2023)](https://arxiv.org/abs/2212.14024): Models augmented with knowledge via a "retrieve-then-read" can be improved with multi-hop chains of searches.
 - [Improving Factuality and Reasoning in Language Models through Multiagent Debate (2023)](https://arxiv.org/abs/2305.14325): Generating debates between a few ChatGPT agents over a few rounds improves scores on various benchmarks. Math word problem scores rise from 77% to 85%.
+- [A Prompt Pattern Catalog to Enhance Prompt Engineering with ChatGPT (2023)](https://arxiv.org/abs/2302.11382): Detailed framework for prompt engineering with ChatGPT, introducing a catalog of reusable prompt patterns. These patterns, akin to software design patterns, offer structured strategies to enhance the efficiency and effectiveness of Large Language Models in various applications, including software development.

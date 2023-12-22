@@ -73,14 +73,14 @@ def eval_candidate(
     :return: The evaluation of the candidate answer.
     """
     response = client.chat.completions.create(model=engine,
-    prompt=eval_template.format(candidate_answer, original_instruction),
-    temperature=0,
-    max_tokens=0,
-    top_p=1,
-    frequency_penalty=0,
-    presence_penalty=0,
-    logprobs=1,
-    echo=True)
+        prompt=eval_template.format(candidate_answer, original_instruction),
+        temperature=0,
+        max_tokens=0,
+        top_p=1,
+        frequency_penalty=0,
+        presence_penalty=0,
+        logprobs=1,
+        echo=True)
 
     answer_start = rindex(
         response["choices"][0]["logprobs"]["tokens"], answer_start_token
@@ -100,7 +100,7 @@ def backtranslation(
     n: int = 5,
     temperature: float = 0.5,
     return_all_results: bool = False,
-    engine: str = "davinci-codex",
+    model: str = "davinci-codex",
 ) -> Union[str, List[str, float]]:
     """
     Generate a number of SQL queries given a natural language instruction,
@@ -129,7 +129,7 @@ def backtranslation(
 
     candidates = []
     responses = get_candidates(
-        prompt_template, stop1, temperature, priming_prefix, engine=engine, n=n
+        prompt_template, stop1, temperature, priming_prefix, engine=model, n=n
     )
     for i in range(n):
         quality = eval_candidate(
@@ -137,7 +137,7 @@ def backtranslation(
             instruction,
             eval_template,
             answer_start_token,
-            engine=engine,
+            engine=model,
         )
         candidates.append((responses[i], quality))
 
@@ -178,7 +178,7 @@ def main(
         priming_prefix="SELECT",
         temperature=temperature,
         n=n,
-        engine=engine,
+        model=engine,
     )
     print(result)
 

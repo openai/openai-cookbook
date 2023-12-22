@@ -1,4 +1,5 @@
 """
+TODO: This example is deprecated.
 Note: To answer questions based on text documents, we recommend the procedure in 
 [Question Answering using Embeddings](https://github.com/openai/openai-cookbook/blob/main/examples/Question_answering_using_embeddings.ipynb).
 Some of the code below may rely on [deprecated API endpoints](https://github.com/openai/openai-cookbook/tree/main/transition_guides_for_deprecated_API_endpoints).
@@ -24,7 +25,7 @@ def create_context(
     :return: The context
     """
     # TODO: openai.Engine(search_model) is deprecated
-    results = openai.Engine(search_model).search(
+    results = client.Engine(search_model).search(
         search_model=search_model,
         query=question,
         max_rerank=max_rerank,

@@ -8,8 +8,9 @@ Some of the code below may rely on [deprecated API endpoints](https://github.com
 import argparse
 
 from openai import OpenAI
+import os
 
-client = OpenAI()
+client = OpenAI(api_key=os.environ.get("OPENAI_API_KEY", "<your OpenAI API key if not set as env var>"))
 
 
 def create_context(

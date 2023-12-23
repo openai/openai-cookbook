@@ -3,8 +3,9 @@ from typing import List, Union
 from smokey import Smokey
 
 from openai import OpenAI
+import os
 
-client = OpenAI()
+client = OpenAI(api_key=os.environ.get("OPENAI_API_KEY", "<your OpenAI API key if not set as env var>"))
 
 
 def get_candidates(
@@ -35,7 +36,7 @@ def get_candidates(
     presence_penalty=0,
     stop=stop,
     n=n)
-    responses = [priming_prefix + choice.text for choice in response.choices]
+    responses = [priming_prefix + choice.message.content for choice in response.choices]
     return responses
 
 
@@ -100,7 +101,7 @@ def backtranslation(
     n: int = 5,
     temperature: float = 0.5,
     return_all_results: bool = False,
-    model: str = "davinci-codex",
+    model: str = "gpt-4", # used to be davinci-codex
 ) -> Union[str, List[str, float]]:
     """
     Generate a number of SQL queries given a natural language instruction,

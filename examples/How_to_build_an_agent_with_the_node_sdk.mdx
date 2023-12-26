@@ -4,10 +4,6 @@ OpenAI functions enable your app to take action based on user inputs. This means
 
 In this tutorial, you will build an app that uses OpenAI functions along with the latest version of the Node.js SDK. The app runs in the browser, so you only need a code editor and, e.g., VS Code Live Server to follow along locally. Alternatively, write your code directly in the browser via [this code playground at Scrimba.](https://scrimba.com/scrim/c6r3LkU9)
 
-If you prefer watching screencasts over reading, then you can check out [this scrim, which walks through the code line-by-line:](https://scrimba.com/scrim/co0044b2d9b9b7f5bf16e0391)
-
-<ScrimPlayer scrimId="co0044b2d9b9b7f5bf16e0391" />
-
 ## What you will build
 
 Our app is a simple agent that helps you find activities in your area.
@@ -71,34 +67,41 @@ async function getCurrentWeather(latitude, longitude) {
 
 For OpenAI to understand the purpose of these functions, we need to
 describe them using a specific schema. We'll create an array called
-`functionDefinitions` that contains one object per function. Each object
-will have three keys: `name`, `description`, and `parameters`.
+`tools` that contains one object per function. Each object
+will have two keys: `type`, `function`, and the `function` key has 
+three subkeys: `name`, `description`, and `parameters`.
 
 ```js
-const functionDefinitions = [
+const tools = [
   {
-    name: "getCurrentWeather",
-    description: "Get the current weather in a given location",
-    parameters: {
-      type: "object",
-      properties: {
-        longitude: {
-          type: "string",
+    type: "function",
+    function: {
+      name: "getCurrentWeather",
+      description: "Get the current weather in a given location",
+      parameters: {
+        type: "object",
+        properties: {
+          latitude: {
+            type: "string",
+          },
+          longitude: {
+            type: "string",
+          },
         },
-        latitude: {
-          type: "string",
-        },
+        required: ["longitude", "latitude"],
       },
-      required: ["longitude", "latitude"],
-    },
+    }
   },
   {
-    name: "getLocation",
-    description: "Get the user's location based on their IP address",
-    parameters: {
-      type: "object",
-      properties: {},
-    },
+    type: "function",
+    function: {
+      name: "getLocation",
+      description: "Get the user's location based on their IP address",
+      parameters: {
+        type: "object",
+        properties: {},
+      },
+    }
   },
 ];
 ```
@@ -129,16 +132,14 @@ We start by pushing the `userInput` to the messages array. This time, we set the
 
 ```js
 async function agent(userInput) {
-  messages.push([
-    {
-      role: "user",
-      content: userInput,
-    },
-  ]);
+  messages.push({
+    role: "user",
+    content: userInput,
+  });
   const response = await openai.chat.completions.create({
     model: "gpt-4",
     messages: messages,
-    functions: functionDefinitions,
+    tools: tools,
   });
   console.log(response);
 }
@@ -153,9 +154,9 @@ properties:
   GPT-4).
 - `messages` - The entire history of messages between the user and the
   AI up until this point.
-- `functions` - A description of the functions our app has access to.
-  Here, we'll we use the `functionDefinitions` array we created
-  earlier.
+- `tools` - A list of tools the model may call. Currently, only 
+  functions are supported as a tool., we'll we use the `tools` array we 
+  created earlier.
 
 ## Running our app with a simple input
 
@@ -179,35 +180,41 @@ to the console like this:
         message: {
             role: "assistant",
             content: null,
-            function_call: {
-                name: "getLocation", // The function OpenAI wants us to call
+            tool_calls: [
+              id: "call_CBwbo9qoXUn1kTR5pPuv6vR1",
+              type: "function",
+              function: {
+                name: "getLocation",
                 arguments: "{}"
-            }
+              }
+            ]
         },
-        finish_reason: "function_call" // OpenAI wants us to call a function
+        logprobs: null,
+        finish_reason: "tool_calls" // OpenAI wants us to call a function
     }],
     usage: {
         prompt_tokens: 134,
         completion_tokens: 6,
         total_tokens: 140
     }
+     system_fingerprint: null
 }
 ```
 
-This response tells us that we should call one of our functions, as it contains the following key: `finish:_reason: "function_call"`.
+This response tells us that we should call one of our functions, as it contains the following key: `finish_reason: "tool_calls"`.
 
 The name of the function can be found in the
-`response.choices[0].message.function_call.name` key, which is set to
+`response.choices[0].message.tool_calls[0].function.name` key, which is set to
 `"getLocation"`.
 
 ## Turning the OpenAI response into a function call
 
 Now that we have the name of the function as a string, we'll need to
 translate that into a function call. To help us with that, we'll gather
-both of our functions in an object called `availableFunctions`:
+both of our functions in an object called `availableTools`:
 
 ```js
-const availableFunctions = {
+const availableTools = {
   getCurrentWeather,
   getLocation,
 };
@@ -215,15 +222,15 @@ const availableFunctions = {
 
 This is handy because we'll be able to access the `getLocation` function
 via bracket notation and the string we got back from OpenAI, like this:
-`availableFunctions["getLocation"]`.
+`availableTools["getLocation"]`.
 
 ```js
 const { finish_reason, message } = response.choices[0];
 
-if (finish_reason === "function_call") {
-  const functionName = message.function_call.name;
-  const functionToCall = availableFunctions[functionName];
-  const functionArgs = JSON.parse(message.function_call.arguments);
+if (finish_reason === "tool_calls" && message.tool_calls) {
+  const functionName = message.tool_calls[0].function.name;
+  const functionToCall = availableTools[functionName];
+  const functionArgs = JSON.parse(message.tool_calls[0].function.arguments);
   const functionArgsArr = Object.values(functionArgs);
   const functionResponse = await functionToCall.apply(null, functionArgsArr);
   console.log(functionResponse);
@@ -231,7 +238,7 @@ if (finish_reason === "function_call") {
 ```
 
 We're also grabbing ahold of any arguments OpenAI wants us to pass into
-the function: `message.function_call.arguments`.
+the function: `message.tool_calls[0].function.arguments`.
 However, we won't need any arguments for this first function call.
 
 If we run the code again with the same input
@@ -275,7 +282,7 @@ simplicity.
 At the top of the `agent` function, we'll create a loop that lets us run
 the entire procedure up to five times.
 
-If we get back `finish_reason: "function_call"` from GPT, we'll just
+If we get back `finish_reason: "tool_calls"` from GPT, we'll just
 push the result of the function call to the `messages` array and jump to
 the next iteration of the loop, triggering a new request.
 
@@ -287,14 +294,14 @@ for (let i = 0; i < 5; i++) {
   const response = await openai.chat.completions.create({
     model: "gpt-4",
     messages: messages,
-    functions: functionDefinitions,
+    tools: tools,
   });
   const { finish_reason, message } = response.choices[0];
 
-  if (finish_reason === "function_call") {
-    const functionName = message.function_call.name;
-    const functionToCall = availableFunctions[functionName];
-    const functionArgs = JSON.parse(message.function_call.arguments);
+  if (finish_reason === "tool_calls" && message.tool_calls) {
+    const functionName = message.tool_calls[0].function.name;
+    const functionToCall = availableTools[functionName];
+    const functionArgs = JSON.parse(message.tool_calls[0].function.arguments);
     const functionArgsArr = Object.values(functionArgs);
     const functionResponse = await functionToCall.apply(null, functionArgsArr);
 
@@ -356,8 +363,8 @@ to call the `getCurrentWeather` function with
 arguments. This is data it got back from the first function call we did.
 
 ```js
-{role: "assistant", content: null, function_call: {name: "getLocation", arguments: "{}"}}
-{role: "assistant", content: null, function_call: {name: "getCurrentWeather", arguments: " { "longitude": "10.859", "latitude": "59.955" }"}}
+{"role":"assistant","content":null,"tool_calls":[{"id":"call_Cn1KH8mtHQ2AMbyNwNJTweEP","type":"function","function":{"name":"getLocation","arguments":"{}"}}]}
+{"role":"assistant","content":null,"tool_calls":[{"id":"call_uc1oozJfGTvYEfIzzcsfXfOl","type":"function","function":{"name":"getCurrentWeather","arguments":"{\n\"latitude\": \"10.859\",\n\"longitude\": \"59.955\"\n}"}}]}
 ```
 
 You've now built an AI agent using OpenAI functions and the Node.js SDK! If you're looking for an extra challenge, consider enhancing this app. For example, you could add a function that fetches up-to-date information on events and activities in the user's location.
@@ -388,35 +395,40 @@ async function getCurrentWeather(latitude, longitude) {
   return weatherData;
 }
 
-const functionDefinitions = [
+const tools = [
   {
-    name: "getCurrentWeather",
-    description:
-      "Get the current weather in a given location given in latitude and longitude",
-    parameters: {
-      type: "object",
-      properties: {
-        latitude: {
-          type: "string",
+    type: "function",
+    function: {
+      name: "getCurrentWeather",
+      description: "Get the current weather in a given location",
+      parameters: {
+        type: "object",
+        properties: {
+          latitude: {
+            type: "string",
+          },
+          longitude: {
+            type: "string",
+          },
         },
-        longitude: {
-          type: "string",
-        },
+        required: ["longitude", "latitude"],
       },
-      required: ["longitude", "latitude"],
-    },
+    }
   },
   {
-    name: "getLocation",
-    description: "Get the user's location based on their IP address",
-    parameters: {
-      type: "object",
-      properties: {},
-    },
+    type: "function",
+    function: {
+      name: "getLocation",
+      description: "Get the user's location based on their IP address",
+      parameters: {
+        type: "object",
+        properties: {},
+      },
+    }
   },
 ];
 
-const availableFunctions = {
+const availableTools = {
   getCurrentWeather,
   getLocation,
 };
@@ -438,15 +450,15 @@ async function agent(userInput) {
     const response = await openai.chat.completions.create({
       model: "gpt-4",
       messages: messages,
-      functions: functionDefinitions,
+      tools: tools,
     });
 
     const { finish_reason, message } = response.choices[0];
 
-    if (finish_reason === "function_call") {
-      const functionName = message.function_call.name;
-      const functionToCall = availableFunctions[functionName];
-      const functionArgs = JSON.parse(message.function_call.arguments);
+    if (finish_reason === "tool_calls" && message.tool_calls) {
+      const functionName = message.tool_calls[0].function.name;
+      const functionToCall = availableTools[functionName];
+      const functionArgs = JSON.parse(message.tool_calls[0].function.arguments);
       const functionArgsArr = Object.values(functionArgs);
       const functionResponse = await functionToCall.apply(
         null,

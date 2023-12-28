@@ -1194,3 +1194,12 @@
     - colin-jarvis
   tags:
     - guardrails
+
+- title: Semantic layer with a Graph Database
+  path: examples/Semantic_layer_with_graph_db.ipynb
+  date: 2023-12-28
+  authors:
+    - tomasonjo
+  tags:
+    - functions
+    - completions

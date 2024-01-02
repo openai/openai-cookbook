@@ -1,0 +1,16 @@
+version: "3.6"
+
+services:
+  postgres-pgvector:
+    image: ankane/pgvector:latest
+    container_name: postgres-pgvector
+    restart: always
+    volumes:
+      - postgres_pgvector_volume:/var/lib/postgresql/data
+    ports:
+      - 5432:5432
+    environment:
+      POSTGRES_USER: postgres
+      POSTGRES_PASSWORD: password
+volumes:
+  postgres_pgvector_volume:

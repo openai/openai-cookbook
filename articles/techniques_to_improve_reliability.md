@@ -182,7 +182,7 @@ Another powerful technique for improving the reliability of answers is to prompt
 
 Published by [Takeshi Kojima et al. in 2022](https://arxiv.org/abs/2205.11916), the easiest way to prompt a model to reason out the answer is to simply prepend answers with `Let's think step by step.` Figure 2 illustrates an example:
 
-[![zero-shot reasoning example](/images/zero-shot_reasoners_fig2.png)
+[![](/images/zero-shot_reasoners_fig2.png)
 <br>Source: _Large Language Models are Zero-Shot Reasoners_ by Takeshi Kojima et al. (2022).](https://arxiv.org/abs/2205.11916)
 
 #### Results

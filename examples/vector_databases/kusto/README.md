@@ -9,7 +9,7 @@ Kusto also supports in-built function [series_cosine_similarity_fl](https://lear
 
 [Get started](https://aka.ms/kustofree) with Kusto for free. 
 
-![](./images/kusto_vector_db.png)
+![Graphic representation of vector data storage in Kusto database.](./images/kusto_vector_db.png "Kusto Vector Database Illustration")
 
 
 
@@ -17,9 +17,9 @@ Kusto also supports in-built function [series_cosine_similarity_fl](https://lear
 
 ### Demo Scenario
 
-![Wiki_embeddings](./images/wiki_embeddings.png)
+![Diagram showing the process of embedding Wikipedia data using OpenAI and storing in Kusto.](./images/wiki_embeddings.png "Wikipedia to Kusto Embedding Process")
 
-![semantic_search_flow](./images/semantic_search_user_flow.png)
+![Flowchart illustrating the semantic search process using Kusto and vector embeddings.](./images/semantic_search_user_flow.png "Semantic Search User Flow")
 
 If you’d like to try this demo, please follow the instructions in the [Notebook](Getting_started_with_kusto_and_openai_embeddings.ipynb).
 

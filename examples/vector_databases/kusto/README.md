@@ -9,7 +9,7 @@ Kusto also supports in-built function [series_cosine_similarity_fl](https://lear
 
 [Get started](https://aka.ms/kustofree) with Kusto for free. 
 
-![Kusto_Vector](./images/kusto_vector_db.png)
+![](./images/kusto_vector_db.png)
 
 
 

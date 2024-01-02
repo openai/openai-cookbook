@@ -182,21 +182,21 @@ Another powerful technique for improving the reliability of answers is to prompt
 
 Published by [Takeshi Kojima et al. in 2022](https://arxiv.org/abs/2205.11916), the easiest way to prompt a model to reason out the answer is to simply prepend answers with `Let's think step by step.` Figure 2 illustrates an example:
 
-[![](/images/zero-shot_reasoners_fig2.png)
+[![Diagram showing the full pipeline of Zero-shot-CoT with reasoning extraction followed by answer extraction.](/images/zero-shot_reasoners_fig2.png "Zero-shot Chain of Thought Reasoning Pipeline")
 <br>Source: _Large Language Models are Zero-Shot Reasoners_ by Takeshi Kojima et al. (2022).](https://arxiv.org/abs/2205.11916)
 
 #### Results
 
 Applying this simple trick to the MultiArith math dataset, the authors found `Let's think step by step` quadrupled the accuracy, from 18% to 79%!
 
-[![zero-shot reasoning example](/images/zero-shot_reasoners_tab5.png)
+[![Table comparing accuracy of different prompting templates on the MultiArith dataset.](/images/zero-shot_reasoners_tab5.png "Zero-shot Reasoning Accuracy Comparison")
 <br>Source: _Large Language Models are Zero-Shot Reasoners_ by Takeshi Kojima et al. (2022).](https://arxiv.org/abs/2205.11916)
 
 #### Implications
 
 Although the `Let's think step by step` trick works well on math problems, it's not effective on all tasks. The authors found that it was most helpful for multi-step arithmetic problems, symbolic reasoning problems, strategy problems, and other reasoning problems. It didn't help with simple math problems or common sense questions, and presumably wouldn't help with many other non-reasoning tasks either.
 
-[![zero-shot reasoning example](/images/zero-shot_reasoners_tab1.png)
+[![Table showing accuracy comparison of Zero-shot-CoT on various reasoning tasks.](/images/zero-shot_reasoners_tab1.png "Zero-shot Reasoning Task Performance")
 <br>Source: _Large Language Models are Zero-Shot Reasoners_ by Takeshi Kojima et al. (2022).](https://arxiv.org/abs/2205.11916)
 
 To learn more, read the [full paper](https://arxiv.org/abs/2205.11916).
@@ -248,12 +248,12 @@ Because the Toyota Prius Prime meets all of the criteria for a federal tax credi
 
 Prompting the model to reason out its answers can be done in many ways. One way is to demonstrate with a few examples ('few-shot'), as studied by [Jason Wei and Denny Zhou et al. from Google](https://ai.googleblog.com/2022/05/language-models-perform-reasoning-via.html). Here's an example few-shot chain-of-thought prompt:
 
-[![chain of thought example](/images/chain_of_thought_fig1.png)
+[![Illustration of chain of thought prompting with input, reasoning, and output for math problems.](/images/chain_of_thought_fig1.png "Chain of Thought Prompting Example")
 <br>Source: _Chain of Thought Prompting Elicits Reasoning in Large Language Models_ Jason Wei and Denny Zhou et al. (2022)](https://ai.googleblog.com/2022/05/language-models-perform-reasoning-via.html)
 
 More demonstrations of reasoning chains written by human labelers:
 
-[![chain of thought example](/images/chain_of_thought_fig3.png)
+[![Examples of input, chain of thought, and output for various reasoning benchmarks.](/images/chain_of_thought_fig3.png "Chain of Thought Reasoning Examples")
 <br>Source: _Chain of Thought Prompting Elicits Reasoning in Large Language Models_ Jason Wei and Denny Zhou et al. (2022)](https://ai.googleblog.com/2022/05/language-models-perform-reasoning-via.html)
 
 [(Note that it has been called into question whether pears actually float)](https://twitter.com/Meaningness/status/1561062170074370048?s=20&t=mpHt8f3RRboztXxdhLFnWQ)
@@ -262,12 +262,12 @@ More demonstrations of reasoning chains written by human labelers:
 
 Testing on grade school math problems, the authors found that chain of thought prompting tripled the solve rate, from 18% to 57%.
 
-[![chain of thought example](/images/chain_of_thought_fig5.png)
+[![Graph showing the improvement of chain of thought prompting over standard prompting.](/images/chain_of_thought_fig5.png "Chain of Thought Prompting Solve Rate")
 <br>Source: _Chain of Thought Prompting Elicits Reasoning in Large Language Models_ Jason Wei and Denny Zhou et al. (2022)](https://ai.googleblog.com/2022/05/language-models-perform-reasoning-via.html)
 
 In addition to math problems, chain of thought prompting also lifted performance on questions related to sports understanding, coin flip tracking, and last letter concatenation. In most cases, not many examples were need to saturate the performance gains (less than 8 or so).
 
-[![chain of thought example](/images/chain_of_thought_fig11.png)
+[![Graph showing the solve rate improvement of chain of thought prompting with varying numbers of few-shot examples.](/images/chain_of_thought_fig11.png "Chain of Thought Prompting with Few-shot Examples")
 <br>Source: _Chain of Thought Prompting Elicits Reasoning in Large Language Models_ Jason Wei and Denny Zhou et al. (2022)](https://ai.googleblog.com/2022/05/language-models-perform-reasoning-via.html)
 
 To learn more, read the [full paper](https://arxiv.org/abs/2201.11903).
@@ -284,7 +284,7 @@ In general, to eke out maximum performance on a task, you'll need to fine-tune a
 
 In 2022, Eric Zelikman and Yuhuai Wu et al. published a clever procedure for using a few-shot prompt to generate a dataset of explanations that could be used to fine-tune a model. The idea is to use a few-shot prompt to generate candidate explanations, and only keep the explanations that produce the correct answer. Then, to get additional explanations for some of the incorrect answers, retry the few-shot prompt but with correct answers given as part of the question. The authors called their procedure STaR (Self-taught Reasoner):
 
-[![STaR procedure](/images/star_fig1.png)
+[![Overview of the STaR procedure for bootstrapping reasoning with reasoning.](/images/star_fig1.png "STaR Procedure Overview")
 <br>Source: _STaR: Bootstrapping Reasoning With Reasoning_ by Eric Zelikman and Yujuai Wu et al. (2022)](https://arxiv.org/abs/2203.14465)
 
 With this technique, you can combine the benefits of fine-tuning with the benefits of chain-of-thought prompting without needing to write thousands of example explanations.
@@ -293,7 +293,7 @@ With this technique, you can combine the benefits of fine-tuning with the benefi
 
 When the authors applied this technique to a Common Sense Q&A dataset, they found that STaR outperformed both chain-of-thought prompting alone (73% > 37%) and fine-tuning alone (73% > 60%):
 
-[![STaR results](/images/star_tab1.png)
+[![Table showing STaR outperforming chain-of-thought prompting and fine-tuning alone on Common Sense Q&A dataset.](/images/star_tab1.png "STaR Results on Common Sense Q&A")
 <br>Source: _STaR: Bootstrapping Reasoning With Reasoning_ by Eric Zelikman and Yujuai Wu et al. (2022)](https://arxiv.org/abs/2203.14465)
 
 To learn more, read the [full paper](https://arxiv.org/abs/2203.14465).
@@ -312,14 +312,14 @@ A number of extensions of chain-of-thought prompting have been published as well
 
 Published by Antonia Creswell et al., one extension of the chain-of-thought technique is to split the single prompt for generating explanations and answers into smaller parts. First, a prompt selects a relevant subset of facts from the text ('selection prompt'). Then, a second prompt infers a conclusion from the selected facts ('inference prompt'). These prompts are then alternated in a loop to generate multiple steps of reasoning and eventually land on a final answer. The authors illustrate the idea in the following figure:
 
-[![Selection-inference prompting](/images/selection-inference_fig1.png)
+[![Diagram comparing the Selection-Inference framework with vanilla and Chain-of-Thought approaches.](/images/selection-inference_fig1.png "Selection-Inference Prompting Framework")
 <br>Source: _Selection-Inference: Exploiting Large Language Models for Interpretable Logical Reasoning_ by Antonia Creswell et al. (2022)](https://arxiv.org/abs/2205.09712)
 
 #### Results
 
 When applied to a 7B-parameter model, the authors found that selection-inference prompting substantially improved performance relative to chain-of-thought prompting on the bAbi and Proof Writer benchmark tasks (both of which require longer sequences of reasoning steps). The best performance they achieved combined both selection-inference prompting with fine-tuning.
 
-[![Selection-inference prompting](/images/selection-inference_fig4.png)
+[![Graphs showing quantitative results for the Selection-Inference framework on various tasks.](/images/selection-inference_fig4.png "Selection-Inference Prompting Results")
 <br>Source: _Selection-Inference: Exploiting Large Language Models for Interpretable Logical Reasoning_ by Antonia Creswell et al. (2022)](https://arxiv.org/abs/2205.09712)
 
 #### Implications
@@ -351,32 +351,32 @@ The halter models brings a couple of advantages:
 - it can tell the selection-inference process to stop or keep going, as necessary.
 - if the process never halts, you'll get no answer, which is often preferable to a hallucinated guess
 
-[![Faithful reasoning](/images/faithful-reasoning_fig3.png)
+[![Diagram of the Faithful Reasoning architecture with selection, inference, and halter components.](/images/faithful-reasoning_fig3.png "Faithful Reasoning Architecture")
 <br>Source: _Faithful Reasoning Using Large Language Models_ by Antonia Creswell et al. (2022)](https://arxiv.org/abs/2208.14271)
 
-[![Faithful reasoning](/images/faithful-reasoning_fig5.png)
+[![Illustration of the two-stage halter process in the Faithful Reasoning architecture.](/images/faithful-reasoning_fig5.png "Faithful Reasoning Halter Process")
 <br>Source: _Faithful Reasoning Using Large Language Models_ by Antonia Creswell et al. (2022)](https://arxiv.org/abs/2208.14271)
 
 Second, the authors add a value function, which is used to assess the quality of reasoning steps and search over multiple reasoning trajectories. This echoes a common theme for increasing reliability; instead of generating a single answer from the model, generate a set of answers and then use some type of value function / discriminator / verifier model to pick the best one.
 
-[![Faithful reasoning](/images/faithful-reasoning_fig7.png)
+[![Diagram showing the value function predicting the log probability that the current reasoning step is correct.](/images/faithful-reasoning_fig7.png "Faithful Reasoning Value Function")
 <br>Source: _Faithful Reasoning Using Large Language Models_ by Antonia Creswell et al. (2022)](https://arxiv.org/abs/2208.14271)
 
 In addition to these two extensions, the authors also use a trick to reduce hallucination of fake facts. Rather than asking the model to write out factual sentences, they fine-tune a model to work with sentence labels (e.g., sen1) instead. This helps prevent the model from hallucinating fake facts not mentioned in the prompt context.
 
-[![Faithful reasoning](/images/faithful-reasoning_fig4.png)
+[![Diagram showing the selection model selecting statements from context to feed the inference model.](/images/faithful-reasoning_fig4.png "Faithful Reasoning Selection Model")
 <br>Source: _Faithful Reasoning Using Large Language Models_ by Antonia Creswell et al. (2022)](https://arxiv.org/abs/2208.14271)
 
 #### Results
 
 The authors evaluated their technique on two benchmarks: the ProofWriter task (not shown) and [EntailmentBankQA](https://allenai.org/data/entailmentbank) (shown). The technique increased accuracy substantially, especially on harder reasoning problems.
 
-![Faithful reasoning](/images/faithful-reasoning_tab2.png)
+![Table showing the performance of various models on the EntailmentBankQA benchmark.](/images/faithful-reasoning_tab2.png "Faithful Reasoning Results on EntailmentBankQA")
 <br>Source: _Faithful Reasoning Using Large Language Models_ by Antonia Creswell et al. (2022)](https://arxiv.org/abs/2208.14271)
 
 In addition, their sentence label manipulation trick essentially eliminated hallucination!
 
-![Faithful reasoning](/images/faithful-reasoning_tab5.png)
+![Table showing the proportion of problems where models avoided making up facts not in the context.](/images/faithful-reasoning_tab5.png "Reduction of Hallucination in Faithful Reasoning")
 <br>Source: _Faithful Reasoning Using Large Language Models_ by Antonia Creswell et al. (2022)](https://arxiv.org/abs/2208.14271)
 
 #### Implications
@@ -399,7 +399,7 @@ In addition to doing poorly on long reasoning chains (where selection-inference 
 
 Least-to-most prompting is another technique that splits up reasoning tasks into smaller, more reliable subtasks. The idea is to elicit a subtask from the model by prompting it with something like `To solve {question}, we need to first solve: "`. Then, with that subtask in hand, the model can generate a solution. The solution is appended to the original question and the process is repeated until a final answer is produced.
 
-[![Least-to-most prompting](/images/least-to-most_fig1.png)
+[![Diagram illustrating the least-to-most prompting method for solving a math word problem.](/images/least-to-most_fig1.png "Least-to-Most Prompting for Math Word Problems")
 <br>Source: _Least-to-most Prompting Enables Complex Reasoning in Large Language Models_ by Denny Zhou et al. (2022)](https://arxiv.org/abs/2205.10625)
 
 #### Results
@@ -407,9 +407,9 @@ Least-to-most prompting is another technique that splits up reasoning tasks into
 When applied to benchmarks involving long reasoning chains using `code-davinci-002` (which is optimized for code but can still understand text), the authors measured gains as large as 16% -> 99.7%!
 
 [
-![Least-to-most prompting results on last-letter-concatenation task](/images/least-to-most_tab4.png)
-![Least-to-most prompting results on SCAN](/images/least-to-most_tab9.png)
-![Least-to-most prompting results on DROP numerical reasoning](/images/least-to-most_tab11.png)
+![Table showing accuracies of different prompting methods on the last-letter-concatenation task.](/images/least-to-most_tab4.png "Least-to-Most Prompting Results on Last-Letter-Concatenation Task")
+![Table showing accuracies of different prompting methods on the SCAN task.](/images/least-to-most_tab9.png "Least-to-Most Prompting Results on SCAN")
+![Table showing accuracies of zero-shot and prompting methods on the numerical reasoning subset of DROP.](/images/least-to-most_tab11.png "Least-to-Most Prompting Results on DROP Numerical Reasoning")
 <br>Source: _Least-to-most Prompting Enables Complex Reasoning in Large Language Models_ by Denny Zhou et al. (2022)](https://arxiv.org/abs/2205.10625)
 
 #### Implications
@@ -444,13 +444,13 @@ The method is complicated, and works as follows:
   - Use a solver to the find the most self-consistent set of beliefs, and take those as true
 
 [
-![Maieutic prompting](/images/maieutic_fig2.png)
-![Maieutic prompting](/images/maieutic_fig6.png)
+![Overview of MAIEUTIC PROMPTING with maieutic tree generation, defining relations, and MAX-SAT inference.](/images/maieutic_fig2.png "Maieutic Prompting Overview")
+![Examples of MAIEUTIC PROMPTING showing the generated explanations and MAX-SAT results.](/images/maieutic_fig6.png "Maieutic Prompting Examples")
 <br>Source: _Maieutic Prompting: Logically Consistent Reasoning with Recursive Explanations_ by Jaehun Jung et al. (2022)](https://arxiv.org/abs/2205.11822)
 
 #### Results
 
-[![Maieutic prompting results](/images/maieutic_tab1.png)
+[![Table showing experimental results of MAIEUTIC PROMPTING and baseline methods on benchmark datasets.](/images/maieutic_tab1.png "Maieutic Prompting Results")
 <br>Source: _Maieutic Prompting: Logically Consistent Reasoning with Recursive Explanations_ by Jaehun Jung et al. (2022)](https://arxiv.org/abs/2205.11822)
 
 #### Implications
@@ -467,14 +467,14 @@ To learn more, read the [full paper](https://arxiv.org/abs/2205.11822).
 
 For tasks with a discrete set of answers, one simple way to improve reliability is to sample multiple explanations & answers from the model (using a positive temperature) and then pick the final answer that appears most often.
 
-[![Self-consistency method](/images/self-consistency_fig1.png)
+[![Diagram illustrating the self-consistency method with example chains of thought and majority vote.](/images/self-consistency_fig1.png "Self-Consistency Method")
 <br>Source: _Self-Consistency Improves Chain of Thought Reasoning in Language Models_ by Xuezhi Wang et al. (2022)](https://arxiv.org/abs/2203.11171)
 
 #### Results
 
 This technique lifted accuracies by anywhere from 1 to 24 percentage points on a suite of math and reasoning benchmarks. (Plotted below are results from Google's LaMDA model; using Google's larger PaLM model, the baselines were higher but the gains were a bit smaller.)
 
-[![Self-consistency results](/images/self-consistency_fig3.png)
+[![Graphs showing how self-consistency improves accuracy across various arithmetic and commonsense reasoning tasks.](/images/self-consistency_fig3.png "Self-Consistency Results")
 <br>Source: _Self-Consistency Improves Chain of Thought Reasoning in Language Models_ by Xuezhi Wang et al. (2022)](https://arxiv.org/abs/2203.11171)
 
 #### Implications
@@ -499,14 +499,14 @@ In 2021, OpenAI researchers applied this technique to grade school math problems
 - Using those solutions, with some labeled correct and some labeled incorrect, they fine-tuned a verifier model to classify whether a question and candidate solution was correct or incorrect
 - Finally, at test time, the generative model creates 100 solutions to each problem, and the one with the highest score according to the verifier model is picked as the final answer
 
-[![Verifier method](/images/verifiers_fig3.png)
+[![Diagram of the verification training pipeline with generator and verifier models.](/images/verifiers_fig3.png "Verifier Training Pipeline")
 <br>Source: _Training Verifiers to Solve Math Word Problems_ by Karl Cobbe et al. (2021)](https://arxiv.org/abs/2110.14168)
 
 #### Results
 
 With a 175B GPT-3 model and 8,000 training examples, this technique substantially lifted grade school math accuracy from ~33% to ~55%.
 
-[![Verifier results](/images/verifiers_fig5.png)
+[![Graph comparing fine-tuning and verification using different model sizes on math problems.](/images/verifiers_fig5.png "Verifier Results")
 <br>Source: _Training Verifiers to Solve Math Word Problems_ by Karl Cobbe et al. (2021)](https://arxiv.org/abs/2110.14168)
 
 #### Implications
@@ -528,22 +528,22 @@ In the paper _Language Model Cascades_, David Dohan et al. interpret the above t
 
 #### Chain of thought prompting
 
-[![graphical model of chain of thought prompting](/images/lm_cascades_fig1.png)
+[![Graphical model representation of chain of thought prompting.](/images/lm_cascades_fig1.png "Graphical Model of Chain of Thought Prompting")
 <br>Source: _Language Model Cascades_ by David Dohan et al. (2022)](https://arxiv.org/abs/2207.10342)
 
 #### Fine-tuned chain of thought prompting / Self-taught reasoner
 
-[![graphical model of fine-tuned chain of thought prompting](/images/lm_cascades_fig3.png)
+[![Graphical model representation of fine-tuned chain of thought prompting.](/images/lm_cascades_fig3.png "Graphical Model of Fine-Tuned Chain of Thought Prompting")
 <br>Source: _Language Model Cascades_ by David Dohan et al. (2022)](https://arxiv.org/abs/2207.10342)
 
 #### Selection-inference prompting
 
-[![graphical model of selection-inference prompting](/images/lm_cascades_fig4.png)
+[![Graphical model representation of selection-inference prompting.](/images/lm_cascades_fig4.png "Graphical Model of Selection-Inference Prompting")
 <br>Source: _Language Model Cascades_ by David Dohan et al. (2022)](https://arxiv.org/abs/2207.10342)
 
 #### Verifiers
 
-[![graphical model of verifiers](/images/lm_cascades_fig5.png)
+[![Graphical model representation of verifiers in the context of large language models.](/images/lm_cascades_fig5.png "Graphical Model of Verifiers")
 <br>Source: _Language Model Cascades_ by David Dohan et al. (2022)](https://arxiv.org/abs/2207.10342)
 
 #### Implications

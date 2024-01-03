@@ -13,7 +13,7 @@ If you prefer watching screencasts instead of reading, you can [check out this s
 The first thing we need to do is to set up our Assistant. This is done by invoking the `openai.beta.assistants.create()` method and passing in an object where we specify its name, how it should behave, which tools it should have access to, and what model we'll use:
 
 ```js
-await openai.beta.assistants.create({
+const newAssistant = await openai.beta.assistants.create({
 	instructions: "You are a travel guide. When asked questions, you can use any of the provided tools to get to an answer.",
 	name: "Travel Guide",
 	model: "gpt-4-1106-preview",
@@ -29,10 +29,10 @@ Let's copy the `id` of our Assistant and store it in a variable, and then use th
 
 ```js
 const assistantId = "asst_asFsPljnaX10LcwG8tndwK99";
-const assistant = openai.beta.assistants.retrieve(assistantId')
+const assistant = openai.beta.assistants.retrieve(assistantId);
 ```
 
-Since Assistants are typically only created once, you will likely use the `assistants.retrieve()` method more frequently than `assistants.create()` in your app.
+Please note that you can also get access to the id of our Assistant via `newAssistant.id`, as the API returns an object with data about your Assistant when you run `assistants.create()`. Or you could simply call `assistants.list()`, as that returns data about all of the Assistants you have created.
 
 ## Setting up a Thread
 

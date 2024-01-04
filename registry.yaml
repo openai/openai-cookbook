@@ -4,6 +4,25 @@
 # should build pages for, and indicates metadata such as tags, creation date and
 # authors for each page.
 
+
+- title: Using logprobs
+  path: examples/Using_logprobs.ipynb
+  date: 2023-12-20
+  authors:
+    - jhills20
+    - shyamal-anadkat
+  tags:
+    - completions
+
+- title: Creating slides with the Assistants API and DALL-E3
+  path: examples/Creating_slides_with_Assistants_API_and_DALL-E3.ipynb
+  date: 2023-12-08
+  authors:
+    - jhills20
+  tags:
+    - assistants
+    - dall-e
+
 - title: Data preparation and analysis for chat model fine-tuning
   path: examples/Chat_finetuning_data_prep.ipynb
   date: 2023-08-22
@@ -1100,7 +1119,7 @@
     - dall-e
 
 - title: How to make your completions outputs consistent with the new seed parameter
-  path: examples/Deterministic_outputs_with_the_seed_parameter.ipynb
+  path: examples/Reproducible_outputs_with_the_seed_parameter.ipynb
   date: 2023-11-06
   authors:
     - shyamal-anadkat
@@ -1115,3 +1134,63 @@
   tags:
     - assistants
     - functions
+
+- title: MongoDB Atlas Vector Search
+  path: examples/vector_databases/mongodb_atlas/README.md
+  date: 2023-11-21
+  authors:
+    - prakul
+  tags:
+    - embeddings
+    - completions
+
+- title: Semantic search using MongoDB Atlas Vector Search and OpenAI
+  path: examples/vector_databases/mongodb_atlas/semantic_search_using_mongodb_atlas_vector_search.ipynb
+  date: 2023-11-21
+  authors:
+    - prakul
+  tags:
+    - embeddings
+    - completions
+
+- title: Evaluate RAG with LlamaIndex
+  path: examples/evaluation/Evaluate_RAG_with_LlamaIndex.ipynb
+  date: 2023-11-06
+  authors:
+    - Ravi Theja
+  tags:
+    - embeddings
+    - completions
+
+- title: RAG with a Graph database
+  path: examples/RAG_with_graph_db.ipynb
+  date: 2023-12-08
+  authors:
+    - katia-openai
+  tags:
+    - embeddings
+    - completions
+
+- title: Supabase Vector Database
+  path: examples/vector_databases/supabase/README.md
+  date: 2023-12-04
+  authors:
+    - ggrn
+  tags:
+    - embeddings
+
+- title: Semantic search using Supabase Vector
+  path: examples/vector_databases/supabase/semantic-search.mdx
+  date: 2023-12-04
+  authors:
+    - ggrn
+  tags:
+    - embeddings
+
+- title: How to implement LLM guardrails
+  path: examples/how_to_use_guardrails.ipynb
+  date: 2023-12-19
+  authors:
+    - colin-jarvis
+  tags:
+    - guardrails

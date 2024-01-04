@@ -975,7 +975,7 @@
 
 - title: Fine-Tuning for Retrieval Augmented Generation (RAG) with Qdrant
   path: examples/fine-tuned_qa/ft_retrieval_augmented_generation_qdrant.ipynb
-  date: 2023-09-04
+  date: 2024-01-04
   authors:
     - NirantK
   tags:

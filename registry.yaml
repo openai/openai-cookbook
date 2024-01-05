@@ -4,7 +4,6 @@
 # should build pages for, and indicates metadata such as tags, creation date and
 # authors for each page.
 
-
 - title: Using logprobs
   path: examples/Using_logprobs.ipynb
   date: 2023-12-20
@@ -763,6 +762,15 @@
   date: 2023-06-28
   authors:
     - colin-openai
+  tags:
+    - embeddings
+
+- title: PostgreSQL as a Vector Database
+  path: >-
+    examples/vector_databases/postgresql/README.md
+  date: 2024-01-04
+  authors:
+    - dmagda
   tags:
     - embeddings
 

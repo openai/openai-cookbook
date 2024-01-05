@@ -20,6 +20,7 @@ Each provider has their own named directory, with a standard notebook to introdu
 - [Neon Postgres](https://neon.tech/docs/ai/ai-intro)
 - [Pinecone](https://docs.pinecone.io/docs/quickstart)
 - [PolarDB](https://www.alibabacloud.com/help/en/polardb/latest/quick-start)
+- [PostgreSQL](postgresql/README.md)
 - [Qdrant](https://qdrant.tech/documentation/quick-start/)
 - [Redis](https://github.com/RedisVentures/simple-vecsim-intro)
 - [SingleStoreDB](https://www.singlestore.com/blog/how-to-get-started-with-singlestore/)

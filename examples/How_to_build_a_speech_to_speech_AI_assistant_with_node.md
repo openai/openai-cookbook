@@ -188,7 +188,7 @@ await fs.promises.writeFile("./speech.mp3", buffer);
 
 If everything worked properly, we should have our speech saved in an audio file called `speech.mp3`, where we can then handle it accordingly.
 
-![Slide 1](../images/speech_to_speech_slide_1.png)
+![Slide 1](../images/speech_to_speech_slide_4.png)
 
 ## Conclusion
 

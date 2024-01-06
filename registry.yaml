@@ -42,6 +42,16 @@
   tags:
     - embeddings
 
+- title: How to build a speech to speech AI assistant with Node.js
+  path: examples/How_to_build_a_speech_to_speech_AI_assistant_with_node.md
+  date: 2024-01-06
+  authors:
+    - johnathanchriest
+  tags:
+    - completions
+    - speech
+    - whisper
+
 - title: Clustering
   path: examples/Clustering.ipynb
   date: 2022-03-10

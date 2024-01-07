@@ -1,8 +1,8 @@
-# How to build a speech-to-speech AI assistant with Node.js
+# How to build a voice assistant with Node.js
 
 ![Slide 1](../images/speech_to_speech_slide_4.png)
 
-This article will walk you through how to build a speech to speech AI assistant with Node.js. We will turn a user's audio prompt into text with Whisper. Then send that prompt to ChatGPT 4 and, when you get a response back, turn it back into audio with text-to-speech (TTS). We will do all of this using Node.js and the OpenAI API. 
+This article will teach you how to build a speech-to-speech AI assistant using OpenAI's Node.js SDK. We will convert a user's audio prompt into text with Whisper, then send that prompt to ChatGPT-4. When we receive a response, we'll convert it back into audio using text-to-speech (TTS).
 
 To supplement this article I have created an [interactive screencast](https://scrimba.com/scrim/cZ2QLwTG) (scrim) to walk you through the steps. I also suggest looking through the [OpenAI API Reference](https://platform.openai.com/docs/api-reference/introduction) to get a better understanding of the tools we will be using.
 

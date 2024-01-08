@@ -1,4 +1,4 @@
-# Welcome, AI Chef
+# Welcome, AI 요리사
 
 The OpenAI Cookbook is a community-driven resource aimed at sharing knowledge in a way that is accessible, engaging, and enriching for all AI builders.
 

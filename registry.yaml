@@ -438,7 +438,7 @@
     - completions
     - functions
 
-- title: Translate a book writen in LaTeX from Slovenian into English
+- title: Translate a book written in LaTeX from Slovenian into English
   path: examples/book_translation/translate_latex_book.ipynb
   date: 2022-03-10
   authors:

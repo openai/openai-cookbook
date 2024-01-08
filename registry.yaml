@@ -1194,3 +1194,12 @@
     - colin-jarvis
   tags:
     - guardrails
+
+- title: How to build an agent with the Node.js SDK
+  path: examples/How_to_build_an_agent_with_the_node_sdk.mdx
+  date: 2024-01-08
+  authors:
+    - arsalabangash
+  tags:
+    - completions
+    - functions

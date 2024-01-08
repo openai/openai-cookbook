@@ -1188,7 +1188,7 @@
     - embeddings
 
 - title: How to implement LLM guardrails
-  path: examples/how_to_use_guardrails.ipynb
+  path: examples/How_to_use_guardrails.ipynb
   date: 2023-12-19
   authors:
     - colin-jarvis

@@ -24,6 +24,7 @@ Each provider has their own named directory, with a standard notebook to introdu
 - [Redis](https://github.com/RedisVentures/simple-vecsim-intro)
 - [SingleStoreDB](https://www.singlestore.com/blog/how-to-get-started-with-singlestore/)
 - [Supabase](https://supabase.com/docs/guides/ai)
+- [Tembo](https://tembo.io/docs/tembo-stacks/vector-db)
 - [Typesense](https://typesense.org/docs/guide/)
 - [Weaviate](https://weaviate.io/developers/weaviate/quickstart)
 - [Zilliz](https://docs.zilliz.com/docs/quick-start-1)

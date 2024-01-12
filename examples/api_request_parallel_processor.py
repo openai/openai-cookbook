@@ -117,6 +117,7 @@ async def process_api_requests_from_file(
     token_encoding_name: str,
     max_attempts: int,
     logging_level: int,
+    sort_results: bool,
 ):
     """Processes API requests in parallel, throttling to stay under rate limits."""
     # constants
@@ -256,8 +257,12 @@ async def process_api_requests_from_file(
                     logging.warn(
                         f"Pausing to cool down until {time.ctime(status_tracker.time_of_last_rate_limit_error + seconds_to_pause_after_rate_limit_error)}"
                     )
+        
+        # after finishing, sort results based on task_id and remove task_id
+        if sort_results:
+            sort_newly_appended_rows_by_taskid(save_filepath, status_tracker.num_tasks_started)
+        remove_task_ids(save_filepath) # removes task ids from lines
 
-        # after finishing, log final status
         logging.info(
             f"""Parallel processing complete. Results saved to {save_filepath}"""
         )
@@ -344,18 +349,18 @@ class APIRequest:
                     f"Request {self.request_json} failed after all attempts. Saving errors: {self.result}"
                 )
                 data = (
-                    [self.request_json, [str(e) for e in self.result], self.metadata]
+                    [self.request_json, [str(e) for e in self.result], self.metadata, self.task_id] # task_id for sorting, is removed later
                     if self.metadata
-                    else [self.request_json, [str(e) for e in self.result]]
+                    else [self.request_json, [str(e) for e in self.result], self.task_id]
                 )
                 append_to_jsonl(data, save_filepath)
                 status_tracker.num_tasks_in_progress -= 1
                 status_tracker.num_tasks_failed += 1
         else:
             data = (
-                [self.request_json, response, self.metadata]
+                [self.request_json, response, self.metadata, self.task_id]
                 if self.metadata
-                else [self.request_json, response]
+                else [self.request_json, response, self.task_id]
             )
             append_to_jsonl(data, save_filepath)
             status_tracker.num_tasks_in_progress -= 1
@@ -449,6 +454,30 @@ def task_id_generator_function():
         task_id += 1
 
 
+def sort_newly_appended_rows_by_taskid(jsonl_file, n_rows):
+    """Sorts a jsonl file based on the last element (task_id) of each line.
+    Only sorts the rows that were appended in the current run."""
+    with open(jsonl_file, 'r') as f:
+        lines = [json.loads(line) for line in f]
+    lines_to_not_sort = lines[:-n_rows] # these lines are from previous runs
+    lines_to_sort = lines[-n_rows:]
+    lines_to_sort.sort(key=lambda x: x[-1])
+    lines_out = lines_to_not_sort + lines_to_sort
+    with open(jsonl_file, 'w') as f:
+        for line in lines_out:
+            f.write(json.dumps(line) + '\n')
+    
+
+def remove_task_ids(jsonl_file):
+    """Removes the last element (task_id used for sorting) of each line from the jsonl file."""
+    with open(jsonl_file, 'r') as f:
+        lines = [json.loads(line) for line in f]
+    lines = [line[:-1] if isinstance(line[-1], int) else line for line in lines]
+    with open(jsonl_file, 'w') as f:
+        for line in lines:
+            f.write(json.dumps(line) + '\n')
+
+
 # run script
 
 
@@ -464,6 +493,7 @@ if __name__ == "__main__":
     parser.add_argument("--token_encoding_name", default="cl100k_base")
     parser.add_argument("--max_attempts", type=int, default=5)
     parser.add_argument("--logging_level", default=logging.INFO)
+    parser.add_argument("--sort_results", action='store_true')
     args = parser.parse_args()
 
     if args.save_filepath is None:
@@ -481,6 +511,7 @@ if __name__ == "__main__":
             token_encoding_name=args.token_encoding_name,
             max_attempts=int(args.max_attempts),
             logging_level=int(args.logging_level),
+            sort_results=args.sort_results,
         )
     )
 

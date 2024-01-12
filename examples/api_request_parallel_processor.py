@@ -263,9 +263,15 @@ async def process_api_requests_from_file(
             sort_newly_appended_rows_by_taskid(save_filepath, status_tracker.num_tasks_started)
         remove_task_ids(save_filepath) # removes task ids from lines
 
-        logging.info(
-            f"""Parallel processing complete. Results saved to {save_filepath}"""
-        )
+        if not sort_results:
+            logging.info(
+                f"Parallel processing complete. Results saved to {save_filepath}. Note that the order may differ from input, use --sort_results flag to sort."
+            )
+        else:
+            logging.info(
+                f"Parallel processing complete. Results sorted and saved to {save_filepath}."
+            )
+        
         if status_tracker.num_tasks_failed > 0:
             logging.warning(
                 f"{status_tracker.num_tasks_failed} / {status_tracker.num_tasks_started} requests failed. Errors logged to {save_filepath}."

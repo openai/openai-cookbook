@@ -2,7 +2,13 @@
 
 Documentation puts useful information inside other people’s heads. Follow these tips to write better documentation.
 
-### Make docs easy to skim
+## Table of contents
+  * [Make docs easy to skim](#make-docs-easy-to-skim)
+  * [Write well](#write-well)
+  * [Be broadly helpful](#be-broadly-helpful)
+  * [Break these rules when you have a good reason](#break-these-rules-when-you-have-a-good-reason)
+
+## Make docs easy to skim
 
 Few readers read linearly from top to bottom. They’ll jump around, trying to assess which bit solves their problem, if any. To reduce their search time and increase their odds of success, make docs easy to skim.
 
@@ -24,7 +30,7 @@ Few readers read linearly from top to bottom. They’ll jump around, trying to a
 
 **Bold important text.** Don’t be afraid to bold important text to help readers find it.
 
-### Write well
+## Write well
 
 Badly written text is taxing to read. Minimize the tax on readers by writing well.
 
@@ -40,7 +46,7 @@ Badly written text is taxing to read. Minimize the tax on readers by writing wel
 
 **Don’t tell readers what they think or what to do.** Avoid sentences like “Now you probably want to understand how to call a function” or “Next, you’ll need to learn to call a function.” Both examples presume a reader’s state of mind, which may annoy them or burn our credibility. Use phrases that avoid presuming the reader’s state. E.g., “To call a function, …”
 
-### Be broadly helpful
+## Be broadly helpful
 
 People come to documentation with varying levels of knowledge, language proficiency, and patience. Even if we target experienced developers, we should try to write docs helpful to everyone.
 
@@ -60,6 +66,6 @@ People come to documentation with varying levels of knowledge, language proficie
 
 **Introduce topics with a broad opening.** For example, if explaining how to program a good recommender, consider opening by briefly mentioning that recommendations are widespread across the web, from YouTube videos to Amazon items to Wikipedia. Grounding a narrow topic with a broad opening can help people feel more secure before jumping into uncertain territory. And if the text is well-written, those who already know it may still enjoy it.
 
-### Break these rules when you have a good reason
+## Break these rules when you have a good reason
 
 Ultimately, do what you think is best. Documentation is an exercise in empathy. Put yourself in the reader’s position, and do what you think will help them the most.

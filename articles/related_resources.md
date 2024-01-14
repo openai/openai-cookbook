@@ -2,6 +2,12 @@
 
 People are writing great tools and papers for improving outputs from GPT. Here are some cool ones we've seen:
 
+## Table of contents
+  * [Prompting libraries & tools (in alphabetical order)](#prompting-libraries-&-tools-(in-alphabetical-order))
+  * [Prompting guides](#prompting-guides)
+  * [Video courses](#video-courses)
+  * [Papers on advanced prompting to improve reasoning](#papers-on-advanced-prompting-to-improve-reasoning)
+
 ## Prompting libraries & tools (in alphabetical order)
 
 - [Arthur Shield](https://www.arthur.ai/get-started): A paid product for detecting toxicity, hallucination, prompt injection, etc.

@@ -1194,3 +1194,12 @@
     - colin-jarvis
   tags:
     - guardrails
+
+- title: How to evaluate LLMs for SQL generation
+  path: examples/evaluation/How_to_evaluate_LLMs_for_SQL_generation.ipynb
+  date: 2024-01-23
+  authors:
+    - colin-jarvis
+  tags:
+    - guardrails
+

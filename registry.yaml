@@ -1194,3 +1194,43 @@
     - colin-jarvis
   tags:
     - guardrails
+
+- title: KDB.AI Vector Database RM
+  path: examples/vector_databases/kdb.ai/README.md
+  date: 2024-01-24
+  authors:
+    - asinghkx
+  tags:
+    - embeddings
+
+- title: KDB.AI Vector Database Req
+  path: examples/vector_databases/kdb.ai/requirements.txt
+  date: 2024-01-24
+  authors:
+    - asinghkx
+  tags:
+    - embeddings
+
+- title: KDB.AI Vector Database Semantic Search and QA
+  path: examples/vector_databases/kdb.ai/Semantic_Search_and_QA_with_KDB.AI_OpenAI.ipynb
+  date: 2024-01-24
+  authors:
+    - asinghkx
+  tags:
+    - embeddings
+
+- title: KDB.AI Vector Database RP
+  path: examples/vector_databases/kdb.ai/data/research_paper.pdf
+  date: 2024-01-24
+  authors:
+    - asinghkx
+  tags:
+    - embeddings
+
+- title: KDB.AI Vector Database CSV
+  path: examples/vector_databases/kdb.ai/data/openai_embedded_data.csv
+  date: 2024-01-24
+  authors:
+    - asinghkx
+  tags:
+    - embeddings

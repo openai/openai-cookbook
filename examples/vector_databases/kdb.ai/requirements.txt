@@ -1,0 +1,11 @@
+gensim >= 4.3
+jupyter >= 1.0
+kdbai_client >= 0.1.2
+matplotlib >= 3.7
+openai >= 0.28
+pypdf >= 3.0
+sentence-transformers >= 2.2
+tensorflow >= 2.10
+tiktoken >= 0.5
+umap-learn >= 0.5
+git+https://github.com/KxSystems/langchain.git@KDB.AI#subdirectory=libs/langchain

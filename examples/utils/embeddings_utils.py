@@ -7,18 +7,15 @@ from scipy import spatial
 from sklearn.decomposition import PCA
 from sklearn.manifold import TSNE
 from sklearn.metrics import average_precision_score, precision_recall_curve
-from tenacity import retry, stop_after_attempt, wait_random_exponential
 
 from openai import OpenAI
 import numpy as np
 import pandas as pd
-import os
 
-client = OpenAI()
+client = OpenAI(max_retries=5)
 
-@retry(wait=wait_random_exponential(min=1, max=20), stop=stop_after_attempt(6))
-def get_embedding(text: str, model="text-embedding-ada-002", **kwargs) -> List[float]:
 
+def get_embedding(text: str, model="text-embedding-3-small", **kwargs) -> List[float]:
     # replace newlines, which can negatively affect performance.
     text = text.replace("\n", " ")
 
@@ -27,20 +24,19 @@ def get_embedding(text: str, model="text-embedding-ada-002", **kwargs) -> List[f
     return response.data[0].embedding
 
 
-@retry(wait=wait_random_exponential(min=1, max=20), stop=stop_after_attempt(6))
 async def aget_embedding(
-    text: str, model="text-embedding-ada-002", **kwargs
+    text: str, model="text-embedding-3-small", **kwargs
 ) -> List[float]:
-
     # replace newlines, which can negatively affect performance.
     text = text.replace("\n", " ")
 
-    return (await client.embeddings.create(input=[text], model=model, **kwargs)).data[0].embedding
+    return (await client.embeddings.create(input=[text], model=model, **kwargs))[
+        "data"
+    ][0]["embedding"]
 
 
-@retry(wait=wait_random_exponential(min=1, max=20), stop=stop_after_attempt(6))
 def get_embeddings(
-    list_of_text: List[str], model="text-embedding-ada-002", **kwargs
+    list_of_text: List[str], model="text-embedding-3-small", **kwargs
 ) -> List[List[float]]:
     assert len(list_of_text) <= 2048, "The batch size should not be larger than 2048."
 
@@ -51,16 +47,17 @@ def get_embeddings(
     return [d.embedding for d in data]
 
 
-@retry(wait=wait_random_exponential(min=1, max=20), stop=stop_after_attempt(6))
 async def aget_embeddings(
-    list_of_text: List[str], model="text-embedding-ada-002", **kwargs
+    list_of_text: List[str], model="text-embedding-3-small", **kwargs
 ) -> List[List[float]]:
     assert len(list_of_text) <= 2048, "The batch size should not be larger than 2048."
 
     # replace newlines, which can negatively affect performance.
     list_of_text = [text.replace("\n", " ") for text in list_of_text]
 
-    data = (await client.embeddings.create(input=list_of_text, model=model, **kwargs)).data
+    data = (
+        await client.embeddings.create(input=list_of_text, model=model, **kwargs)
+    ).data
     return [d.embedding for d in data]
 
 

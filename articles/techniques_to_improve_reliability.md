@@ -14,25 +14,25 @@ If you were asked to multiply 13 by 17, would the answer pop immediately into yo
 
 Similarly, if you give GPT-3 a task that's too complex to do in the time it takes to calculate its next token, it may confabulate an incorrect guess. Yet, akin to humans, that doesn't necessarily mean the model is incapable of the task. With some time and space to reason things out, the model still may be able to answer reliably.
 
-As an example, if you ask `text-davinci-002` the following math problem about juggling balls, it answers incorrectly:
+As an example, if you ask `gpt-3.5-turbo-instruct` the following math problem about juggling balls, it answers incorrectly:
 
-```text-davinci-002
+```gpt-3.5-turbo-instruct
 Q: A juggler has 16 balls. Half of the balls are golf balls and half of the golf balls are blue. How many blue golf balls are there?
 A:
 ```
 
-```text-davinci-002
+```gpt-3.5-turbo-instruct
 There are 8 blue golf balls.
 ```
 
 Does this mean that GPT-3 cannot do simple math problems? No; in fact, it turns out that by prompting the model with `Let's think step by step`, the model solves the problem reliably:
 
-```text-davinci-002
+```gpt-3.5-turbo-instruct
 Q: A juggler has 16 balls. Half of the balls are golf balls and half of the golf balls are blue. How many blue golf balls are there?
 A: Let's think step by step.
 ```
 
-```text-davinci-002
+```gpt-3.5-turbo-instruct
 There are 16 balls in total.
 Half of the balls are golf balls.
 That means that there are 8 golf balls.
@@ -64,9 +64,9 @@ The rest of this article shares techniques for improving reliability of large la
 
 One way to give a model more time and space to think is to break tasks into simpler pieces.
 
-As an example, consider a task where we ask the model a multiple-choice question about some text - in this case, a game of Clue. When asked directly, `text-davinci-002` isn't able to put clues 3 & 5 together, and answers incorrectly:
+As an example, consider a task where we ask the model a multiple-choice question about some text - in this case, a game of Clue. When asked directly, `gpt-3.5-turbo-instruct` isn't able to put clues 3 & 5 together, and answers incorrectly:
 
-```text-davinci-002
+```gpt-3.5-turbo-instruct
 Use the following clues to answer the following multiple-choice question.
 
 Clues:
@@ -84,7 +84,7 @@ Question: Was Colonel Mustard in the observatory with the candlestick?
 Solution:
 ```
 
-```text-davinci-002
+```gpt-3.5-turbo-instruct
 (c) Unknown; there is not enough information to determine whether Colonel Mustard was in the observatory with the candlestick
 ```
 
@@ -96,7 +96,7 @@ However, instead of asking for the answer directly, we can split the task into t
 - Second, combine the relevant clues to reason out the answer to the question
 - Third, write the final answer: either (a), (b), or (c)
 
-```text-davinci-002
+```gpt-3.5-turbo-instruct
 Use the following clues to answer the following multiple-choice question, using the following procedure:
 (1) First, go through the clues one by one and consider whether the clue is potentially relevant
 (2) Second, combine the relevant clues to reason out the answer to the question
@@ -118,7 +118,7 @@ Solution:
 (1) First, go through the clues one by one and consider whether the clue is potentially relevant:
 ```
 
-```text-davinci-002
+```gpt-3.5-turbo-instruct
 Clue 1: Miss Scarlett was the only person in the lounge. This clue is not relevant.
 Clue 2: The person with the pipe was in the kitchen. This clue is not relevant.
 Clue 3: Colonel Mustard was the only person in the observatory. This clue is relevant.
@@ -136,9 +136,9 @@ By giving the model more time and space to think, and guiding it along a reasoni
 
 Another benefit of splitting complex instructions into smaller subtasks is that it can help keep the model focused on each subtask.
 
-For example, if we ask `text-davinci-002` to summarize a text in its original language, the model can lapse back into English:
+For example, if we ask `gpt-3.5-turbo-instruct` to summarize a text in its original language, the model can lapse back into English:
 
-```text-davinci-002
+```gpt-3.5-turbo-instruct
 Summarize the text using the original language of the text. The summary should be one sentence long.
 
 Text:
@@ -149,13 +149,13 @@ La estadística (la forma femenina del término alemán Statistik, derivado a su
 Summary:
 ```
 
-```text-davinci-002
+```gpt-3.5-turbo-instruct
 The text explains that statistics is a science that studies the variability, collection, organization, analysis, interpretation, and presentation of data, as well as the random process that generates them following the laws of probability.
 ```
 
 However, if we first ask the model to identify the language of the text, and then summarize the text, it becomes more reliable:
 
-```text-davinci-002
+```gpt-3.5-turbo-instruct
 First, identify the language of the text. Second, summarize the text using the original language of the text. The summary should be one sentence long.
 
 Text:
@@ -166,7 +166,7 @@ La estadística (la forma femenina del término alemán Statistik, derivado a su
 Language:
 ```
 
-```text-davinci-002
+```gpt-3.5-turbo-instruct
 Spanish
 
 La estadística es una ciencia que estudia la variabilidad, colección, organización, análisis, interpretación, y presentación de los datos, así como el proceso aleatorio que los genera siguiendo las leyes de la probabilidad.
@@ -203,7 +203,7 @@ To learn more, read the [full paper](https://arxiv.org/abs/2205.11916).
 
 If you apply this technique to your own tasks, don't be afraid to experiment with customizing the instruction. `Let's think step by step` is rather generic, so you may find better performance with instructions that hew to a stricter format customized to your use case. For example, you can try more structured variants like `First, think step by step about why X might be true. Second, think step by step about why Y might be true. Third, think step by step about whether X or Y makes more sense.`. And you can even give the model an example format to help keep it on track, e.g.:
 
-```text-davinci-002
+```gpt-3.5-turbo-instruct
 Using the IRS guidance below, answer the following questions using this format:
 (1) For each criterion, determine whether it is met by the vehicle purchase
 - {Criterion} Let's think step by step. {explanation} {yes or no, or if the question does not apply then N/A}.
@@ -229,7 +229,7 @@ Solution:
 - Does the vehicle have at least four wheels? Let's think step by step.
 ```
 
-```text-davinci-002
+```gpt-3.5-turbo-instruct
  The Toyota Prius Prime has four wheels, so the answer is yes.
 - Does the vehicle weigh less than 14,000 pounds? Let's think step by step. The Toyota Prius Prime weighs less than 14,000 pounds, so the answer is yes.
 - Does the vehicle draw energy from a battery with at least 4 kilowatt hours that may be recharged from an external source? Let's think step by step. The Toyota Prius Prime has a battery with at least 4 kilowatt hours that may be recharged from an external source, so the answer is yes.

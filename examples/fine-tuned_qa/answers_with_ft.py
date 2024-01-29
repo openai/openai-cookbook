@@ -1,4 +1,5 @@
 """
+TODO: This example is deprecated.
 Note: To answer questions based on text documents, we recommend the procedure in 
 [Question Answering using Embeddings](https://github.com/openai/openai-cookbook/blob/main/examples/Question_answering_using_embeddings.ipynb).
 Some of the code below may rely on [deprecated API endpoints](https://github.com/openai/openai-cookbook/tree/main/transition_guides_for_deprecated_API_endpoints).
@@ -6,7 +7,10 @@ Some of the code below may rely on [deprecated API endpoints](https://github.com
 
 import argparse
 
-import openai
+from openai import OpenAI
+import os
+
+client = OpenAI(api_key=os.environ.get("OPENAI_API_KEY", "<your OpenAI API key if not set as env var>"))
 
 
 def create_context(
@@ -21,7 +25,8 @@ def create_context(
     :param max_rerank: The maximum number of reranking
     :return: The context
     """
-    results = openai.Engine(search_model).search(
+    # TODO: openai.Engine(search_model) is deprecated
+    results = client.Engine(search_model).search(
         search_model=search_model,
         query=question,
         max_rerank=max_rerank,
@@ -80,16 +85,14 @@ def answer_question(
             and fine_tuned_qa_model.split(":")[1].startswith("ft")
             else {"engine": fine_tuned_qa_model}
         )
-        response = openai.Completion.create(
-            prompt=f"Answer the question based on the context below\n\nText: {context}\n\n---\n\nQuestion: {question}\nAnswer:",
-            temperature=0,
-            max_tokens=max_tokens,
-            top_p=1,
-            frequency_penalty=0,
-            presence_penalty=0,
-            stop=stop_sequence,
-            **model_param,
-        )
+        response = client.chat.completions.create(prompt=f"Answer the question based on the context below\n\nText: {context}\n\n---\n\nQuestion: {question}\nAnswer:",
+        temperature=0,
+        max_tokens=max_tokens,
+        top_p=1,
+        frequency_penalty=0,
+        presence_penalty=0,
+        stop=stop_sequence,
+        **model_param)
         return response["choices"][0]["text"]
     except Exception as e:
         print(e)

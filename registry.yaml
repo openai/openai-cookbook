@@ -149,7 +149,7 @@
   path: examples/How_to_call_functions_for_knowledge_retrieval.ipynb
   date: 2023-06-14
   authors:
-    - joe-at-openai
+    - colin-openai
   tags:
     - completions
     - functions

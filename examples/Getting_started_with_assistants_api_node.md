@@ -52,7 +52,7 @@ const thread = await openai.beta.threads.create();
 console.log(thread);
 ```
 
-If we log out out the `thread` variable, we’ll see the following in our console:
+If we log out the `thread` variable, we’ll see the following in our console:
 
 ```js
 {

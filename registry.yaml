@@ -1194,3 +1194,12 @@
     - colin-jarvis
   tags:
     - guardrails
+
+- title: Using OpenAI Latest Embeddings In A RAG System With MongoDB
+  path: examples/vector_databases/mongodb_atlas/rag_system_with_text_embedding_3.ipynb
+  date: 2024-01-30
+  authors:
+    - richmond
+  tags:
+    - embeddings
+    - rag

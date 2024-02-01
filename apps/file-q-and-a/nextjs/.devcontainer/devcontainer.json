@@ -1,5 +1,0 @@
-{
-    "name": "openai-cookbook file-q-and-a",
-    "dockerFile": "Dockerfile",
-    "forwardPorts": [3000]
-}

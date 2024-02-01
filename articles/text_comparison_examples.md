@@ -8,8 +8,8 @@ Embeddings can be used for semantic search, recommendations, cluster analysis, n
 
 For more information, read OpenAI's blog post announcements:
 
-* [Introducing Text and Code Embeddings (Jan 2022)](https://openai.com/blog/introducing-text-and-code-embeddings/)
-* [New and Improved Embedding Model (Dec 2022)](https://openai.com/blog/new-and-improved-embedding-model/)
+- [Introducing Text and Code Embeddings (Jan 2022)](https://openai.com/blog/introducing-text-and-code-embeddings/)
+- [New and Improved Embedding Model (Dec 2022)](https://openai.com/blog/new-and-improved-embedding-model/)
 
 For comparison with other embedding models, see [Massive Text Embedding Benchmark (MTEB) Leaderboard](https://huggingface.co/spaces/mteb/leaderboard)
 
@@ -19,14 +19,14 @@ Embeddings can be used for search either by themselves or as a feature in a larg
 
 The simplest way to use embeddings for search is as follows:
 
-* Before the search (precompute):
-  * Split your text corpus into chunks smaller than the token limit (8,191 tokens for `text-embedding-ada-002`)
-  * Embed each chunk of text
-  * Store those embeddings in your own database or in a vector search provider like [Pinecone](https://www.pinecone.io), [Weaviate](https://weaviate.io) or [Qdrant](https://qdrant.tech)
-* At the time of the search (live compute):
-  * Embed the search query
-  * Find the closest embeddings in your database
-  * Return the top results
+- Before the search (precompute):
+  - Split your text corpus into chunks smaller than the token limit (8,191 tokens for `text-embedding-3-small`)
+  - Embed each chunk of text
+  - Store those embeddings in your own database or in a vector search provider like [Pinecone](https://www.pinecone.io), [Weaviate](https://weaviate.io) or [Qdrant](https://qdrant.tech)
+- At the time of the search (live compute):
+  - Embed the search query
+  - Find the closest embeddings in your database
+  - Return the top results
 
 An example of how to use embeddings for search is shown in [Semantic_text_search_using_embeddings.ipynb](../examples/Semantic_text_search_using_embeddings.ipynb).
 

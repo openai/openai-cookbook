@@ -32,14 +32,14 @@ Inputs:
 - requests_filepath : str
     - path to the file containing the requests to be processed
     - file should be a jsonl file, where each line is a json object with API parameters and an optional metadata field
-    - e.g., {"model": "text-embedding-ada-002", "input": "embed me", "metadata": {"row_id": 1}}
+    - e.g., {"model": "text-embedding-3-small", "input": "embed me", "metadata": {"row_id": 1}}
     - as with all jsonl files, take care that newlines in the content are properly escaped (json.dumps does this automatically)
     - an example file is provided at examples/data/example_requests_to_parallel_process.jsonl
     - the code to generate the example file is appended to the bottom of this script
 - save_filepath : str, optional
     - path to the file where the results will be saved
     - file will be a jsonl file, where each line is an array with the original request plus the API response
-    - e.g., [{"model": "text-embedding-ada-002", "input": "embed me"}, {...}]
+    - e.g., [{"model": "text-embedding-3-small", "input": "embed me"}, {...}]
     - if omitted, results will be saved to {requests_filename}_results.jsonl
 - request_url : str, optional
     - URL of the API endpoint to call
@@ -58,7 +58,7 @@ Inputs:
     - if omitted, will default to 125,000
 - token_encoding_name : str, optional
     - name of the token encoding used, as defined in the `tiktoken` package
-    - if omitted, will default to "cl100k_base" (used by `text-embedding-ada-002`)
+    - if omitted, will default to "cl100k_base" (used by `text-embedding-3-small`)
 - max_attempts : int, optional
     - number of times to retry a failed request before giving up
     - if omitted, will default to 5
@@ -133,7 +133,7 @@ async def process_api_requests_from_file(
     api_endpoint = api_endpoint_from_url(request_url)
     request_header = {"Authorization": f"Bearer {api_key}"}
     # use api-key header for Azure deployments
-    if '/deployments' in request_url:
+    if "/deployments" in request_url:
         request_header = {"api-key": f"{api_key}"}
 
     # initialize trackers
@@ -371,7 +371,9 @@ def api_endpoint_from_url(request_url):
     match = re.search("^https://[^/]+/v\\d+/(.+)$", request_url)
     if match is None:
         # for Azure OpenAI deployment urls
-        match = re.search(r"^https://[^/]+/openai/deployments/[^/]+/(.+?)(\?|$)", request_url)
+        match = re.search(
+            r"^https://[^/]+/openai/deployments/[^/]+/(.+?)(\?|$)", request_url
+        )
     return match[1]
 
 
@@ -488,7 +490,7 @@ if __name__ == "__main__":
 """
 APPENDIX
 
-The example requests file at openai-cookbook/examples/data/example_requests_to_parallel_process.jsonl contains 10,000 requests to text-embedding-ada-002.
+The example requests file at openai-cookbook/examples/data/example_requests_to_parallel_process.jsonl contains 10,000 requests to text-embedding-3-small.
 
 It was generated with the following code:
 
@@ -497,7 +499,7 @@ import json
 
 filename = "data/example_requests_to_parallel_process.jsonl"
 n_requests = 10_000
-jobs = [{"model": "text-embedding-ada-002", "input": str(x) + "\n"} for x in range(n_requests)]
+jobs = [{"model": "text-embedding-3-small", "input": str(x) + "\n"} for x in range(n_requests)]
 with open(filename, "w") as f:
     for job in jobs:
         json_string = json.dumps(job)

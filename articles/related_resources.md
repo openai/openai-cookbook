@@ -8,7 +8,7 @@ People are writing great tools and papers for improving outputs from GPT. Here a
 - [Chainlit](https://docs.chainlit.io/overview): A Python library for making chatbot interfaces.
 - [Embedchain](https://github.com/embedchain/embedchain): A Python library for managing and syncing unstructured data with LLMs.
 - [FLAML (A Fast Library for Automated Machine Learning & Tuning)](https://microsoft.github.io/FLAML/docs/Getting-Started/): A Python library for automating selection of models, hyperparameters, and other tunable choices.
-- [Giskard](https://www.giskard.ai/ml-testing-library): An open-source testing library to scan LLMs for hallucinations, harmful contents, prompt injections, etc.
+- [Giskard](https://www.giskard.ai/ml-testing-library): An open-source testing library to scan LLMs for hallucinations, harmful contents, and prompt injections.
 - [Guardrails.ai](https://shreyar.github.io/guardrails/): A Python library for validating outputs and retrying failures. Still in alpha, so expect sharp edges and bugs.
 - [Guidance](https://github.com/microsoft/guidance): A handy looking Python library from Microsoft that uses Handlebars templating to interleave generation, prompting, and logical control.
 - [Haystack](https://github.com/deepset-ai/haystack): Open-source LLM orchestration framework to build customizable, production-ready LLM applications in Python.

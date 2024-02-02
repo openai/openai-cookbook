@@ -5,6 +5,16 @@
 # authors for each page.
 
 
+- title: Integrating Sensor Tracking Data with GPT's Visual and Leveraging GPT-3 Instruct with a Multimodal Chatbot Experience
+  path: examples/nfl_vision.ipynb
+  date: 2024-02-02
+  authors:
+    - kush-trivedi
+  tags:
+    - vision
+    - tiktoken
+    - completions
+
 - title: Using logprobs
   path: examples/Using_logprobs.ipynb
   date: 2023-12-20

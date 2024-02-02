@@ -578,9 +578,9 @@
     - embeddings
     - tiktoken
 
-- title: Azure Cognitive Search as a vector database for OpenAI embeddings
+- title: Azure AI Search as a vector database for OpenAI embeddings
   path: >-
-    examples/vector_databases/azuresearch/Getting_started_with_azure_cognitive_search_and_openai.ipynb
+    examples/vector_databases/azuresearch/Getting_started_with_azure_ai_search_and_openai.ipynb
   date: 2023-09-11
   authors:
     - farzad528

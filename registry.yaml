@@ -660,6 +660,26 @@
     - embeddings
     - completions
 
+- title: OpenSearch
+  path: examples/vector_databases/opensearch/README.md
+  date: 2024-02-05
+  authors:
+    - ftisiot
+  tags:
+    - embeddings
+    - completions
+    - search
+
+- title: Semantic search using OpenSearch and OpenAI
+  path: examples/vector_databases/opensearch/aiven-opensearch-vector-search.ipynb
+  date: 2024-02-05
+  authors:
+    - ftisiot
+  tags:
+    - embeddings
+    - completions
+    - search
+
 - title: Using Hologres as a vector database for OpenAI embeddings
   path: >-
     examples/vector_databases/hologres/Getting_started_with_Hologres_and_OpenAI.ipynb

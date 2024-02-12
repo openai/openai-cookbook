@@ -4,7 +4,7 @@
    "cell_type": "markdown",
    "metadata": {},
    "source": [
-    "# How to combine GPTV with RAG - Create a Clothing Matchmaker App\n",
+    "# How to combine GPTV with RAG - Create an Outfit Assistant\n",
     "\n",
     "Welcome to the Clothing Matchmaker App Jupyter Notebook! This project demonstrates the power of the GPT-4-vision model in analyzing images of clothing items and extracting key features such as color, style, and type. The core of our app relies on this advanced image analysis model developed by OpenAI, which enables us to accurately identify the characteristics of the input clothing item.\n",
     "\n",

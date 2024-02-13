@@ -9,7 +9,7 @@ Each provider has their own named directory, with a standard notebook to introdu
 ## Guides & deep dives
 - [AnalyticDB](https://www.alibabacloud.com/help/en/analyticdb-for-postgresql/latest/get-started-with-analyticdb-for-postgresql)
 - [Cassandra/Astra DB](https://docs.datastax.com/en/astra-serverless/docs/vector-search/qandasimsearch-quickstart.html)
-- [AzureSearch](https://learn.microsoft.com/azure/search/search-get-started-vector)
+- [Azure AI Search](https://learn.microsoft.com/azure/search/search-get-started-vector)
 - [Chroma](https://docs.trychroma.com/getting-started)
 - [Elasticsearch](https://www.elastic.co/guide/en/elasticsearch/reference/current/knn-search.html)
 - [Hologres](https://www.alibabacloud.com/help/en/hologres/latest/procedure-to-use-hologres)
@@ -24,6 +24,7 @@ Each provider has their own named directory, with a standard notebook to introdu
 - [Redis](https://github.com/RedisVentures/simple-vecsim-intro)
 - [SingleStoreDB](https://www.singlestore.com/blog/how-to-get-started-with-singlestore/)
 - [Supabase](https://supabase.com/docs/guides/ai)
+- [Tembo](https://tembo.io/docs/tembo-stacks/vector-db)
 - [Typesense](https://typesense.org/docs/guide/)
 - [Weaviate](https://weaviate.io/developers/weaviate/quickstart)
 - [Zilliz](https://docs.zilliz.com/docs/quick-start-1)

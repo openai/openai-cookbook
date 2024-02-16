@@ -164,7 +164,7 @@
     - completions
     - functions
 
-- title: How to combine GPTV with RAG - Create a Clothing Matchmaker App
+- title: How to combine GPTV with RAG Create a Clothing Matchmaker App
   path: examples/How_to_Combine_GPTv_with_RAG_Outfit_Assistant.ipynb
   date: 2024-02-16
   authors:

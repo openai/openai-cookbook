@@ -26,5 +26,6 @@ Each provider has their own named directory, with a standard notebook to introdu
 - [Supabase](https://supabase.com/docs/guides/ai)
 - [Tembo](https://tembo.io/docs/tembo-stacks/vector-db)
 - [Typesense](https://typesense.org/docs/guide/)
+- [Vespa AI](https://vespa.ai/)
 - [Weaviate](https://weaviate.io/developers/weaviate/quickstart)
 - [Zilliz](https://docs.zilliz.com/docs/quick-start-1)

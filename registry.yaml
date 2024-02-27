@@ -164,15 +164,6 @@
     - completions
     - functions
 
-- title: How to combine GPTV with RAG Create a Clothing Matchmaker App
-  path: examples/How_to_Combine_GPTv_with_RAG_Outfit_Assistant.ipynb
-  date: 2024-02-16
-  authors:
-    - teomusatoiu
-  tags:
-    - vision
-    - embeddings
-
 - title: How to count tokens with tiktoken
   path: examples/How_to_count_tokens_with_tiktoken.ipynb
   date: 2022-12-16
@@ -1203,3 +1194,12 @@
     - colin-jarvis
   tags:
     - guardrails
+
+- title: How to combine GPT-V with RAG to create a clothing matchmaker app
+  path: examples/How_to_Combine_GPTv_with_RAG_Outfit_Assistant.ipynb
+  date: 2024-02-16
+  authors:
+    - teomusatoiu
+  tags:
+    - vision
+    - embeddings

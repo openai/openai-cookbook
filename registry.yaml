@@ -1175,7 +1175,7 @@
   path: examples/RAG_with_graph_db.ipynb
   date: 2023-12-08
   authors:
-    - katia-openai
+    - katiagg
   tags:
     - embeddings
     - completions
@@ -1203,3 +1203,14 @@
     - colin-jarvis
   tags:
     - guardrails
+
+- title: Parsing PDF documents for RAG applications
+  path: examples/Parse_PDF_docs_for_RAG.ipynb
+  date: 2024-03-28
+  authors:
+    - katiagg
+  tags:
+    - completions
+    - vision
+    - embeddings
+

@@ -1186,7 +1186,11 @@
   path: examples/RAG_with_graph_db.ipynb
   date: 2023-12-08
   authors:
+<<<<<<< HEAD
+    - katia-openai
+=======
     - katiagg
+>>>>>>> e92df85ad4da5a9b74e65b6b7390977d297aa7fa
   tags:
     - embeddings
     - completions
@@ -1224,8 +1228,19 @@
     - vision
     - embeddings
 
+
 - title: How to parse PDF docs for RAG
   path: examples/Parse_PDF_docs_for_RAG.ipynb
+  date: 2024-02-28
+  authors:
+    - katiagg
+  tags:
+    - vision
+    - embeddings
+
+
+- title: Using GPT-4V to tag & caption images
+  path: examples/Tag_caption_images_with_GPT4V.ipynb
   date: 2024-02-28
   authors:
     - katiagg

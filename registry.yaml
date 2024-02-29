@@ -1203,3 +1203,12 @@
   tags:
     - vision
     - embeddings
+
+- title: Using GPT-4V to tag & caption images
+  path: examples/Tag_caption_images_with_GPT4V.ipynb
+  date: 2024-02-28
+  authors:
+    - katiagg
+  tags:
+    - vision
+    - embeddings

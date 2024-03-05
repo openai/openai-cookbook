@@ -1204,7 +1204,7 @@
     - vision
     - embeddings
 
-    
+
 - title: How to parse PDF docs for RAG
   path: examples/Parse_PDF_docs_for_RAG.ipynb
   date: 2024-02-28
@@ -1223,7 +1223,8 @@
   tags:
     - vision
     - embeddings
-    
+
+
 - title: How to use the moderation API
   path: examples/How_to_use_moderation.ipynb
   date: 2024-03-05

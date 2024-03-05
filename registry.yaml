@@ -14,7 +14,7 @@
   tags:
     - completions
 
-- title: Creating slides with the Assistants API and DALL-E3
+- title: Creating slides with the Assistants API and DALL·E 3
   path: examples/Creating_slides_with_Assistants_API_and_DALL-E3.ipynb
   date: 2023-12-08
   authors:
@@ -52,7 +52,7 @@
   tags:
     - embeddings
 
-- title: Clustering for Transaction Classification
+- title: Clustering for transaction classification
   path: examples/Clustering_for_transaction_classification.ipynb
   date: 2022-10-20
   authors:
@@ -99,7 +99,7 @@
     - embeddings
     - tiktoken
 
-- title: Long Document Content Extraction
+- title: Long document content extraction
   path: examples/Entity_extraction_for_long_documents.ipynb
   date: 2023-02-20
   authors:
@@ -164,7 +164,7 @@
     - completions
     - functions
 
-- title: How to count tokens with tiktoken
+- title: How to count tokens with Tiktoken
   path: examples/How_to_count_tokens_with_tiktoken.ipynb
   date: 2022-12-16
   authors:
@@ -293,7 +293,7 @@
   tags:
     - completions
 
-- title: Unit test writing using a multi-step prompt (with the older API)
+- title: Unit test writing using a multi-step prompt with legacy Completions
   path: >-
     examples/Unit_test_writing_using_a_multi-step_prompt_with_older_completions_API.ipynb
   date: 2023-05-19
@@ -389,7 +389,7 @@
   tags:
     - dall-e
 
-- title: Azure chat completions example (preview)
+- title: Azure Chat Completions example (preview)
   path: examples/azure/chat.ipynb
   date: 2023-03-28
   authors:
@@ -399,7 +399,7 @@
   tags:
     - completions
 
-- title: Azure chat completion models with your own data (preview)
+- title: Azure Chat Completion models with your own data (preview)
   path: examples/azure/chat_with_your_own_data.ipynb
   date: 2023-09-11
   authors:
@@ -474,7 +474,7 @@
     - embeddings
     - completions
 
-- title: Fine-Tuned Q&A - Collect Data
+- title: Fine-Tuned Q&A - collect data
   path: examples/fine-tuned_qa/olympics-1-collect-data.ipynb
   date: 2022-03-10
   authors:
@@ -484,7 +484,7 @@
     - embeddings
     - completions
 
-- title: Fine-Tuned Q&A - Create Q&A
+- title: Fine-Tuned Q&A - create Q&A
   path: examples/fine-tuned_qa/olympics-2-create-qa.ipynb
   date: 2022-03-10
   authors:
@@ -494,7 +494,7 @@
     - embeddings
     - completions
 
-- title: Fine-Tuned Q&A - Train
+- title: Fine-Tuned Q&A - train
   path: examples/fine-tuned_qa/olympics-3-train-qa.ipynb
   date: 2022-03-10
   authors:
@@ -512,7 +512,7 @@
   tags:
     - embeddings
 
-- title: Financial Document Analysis with LlamaIndex
+- title: Financial document analysis with LlamaIndex
   path: >-
     examples/third_party/financial_document_analysis_with_llamaindex.ipynb
   date: 2023-06-22
@@ -522,7 +522,7 @@
     - embeddings
     - completions
 
-- title: Vector Databases
+- title: Vector databases
   path: examples/vector_databases/README.md
   date: 2023-06-28
   authors:
@@ -568,7 +568,7 @@
   tags:
     - embeddings
 
-- title: Question Answering with Langchain, AnalyticDB and OpenAI
+- title: Question answering with Langchain, AnalyticDB and OpenAI
   path: >-
     examples/vector_databases/analyticdb/QA_with_Langchain_AnalyticDB_and_OpenAI.ipynb
   date: 2023-05-05
@@ -587,7 +587,7 @@
   tags:
     - embeddings
 
-- title: Philosophy with Vector Embeddings, OpenAI and Cassandra / Astra DB
+- title: Philosophy with vector embeddings, OpenAI and Cassandra / Astra DB
   path: examples/vector_databases/cassandra_astradb/Philosophical_Quotes_CQL.ipynb
   date: 2023-08-29
   authors:
@@ -596,7 +596,7 @@
     - embeddings
     - completions
 
-- title: Philosophy with Vector Embeddings, OpenAI and Cassandra / Astra DB
+- title: Philosophy with vector embeddings, OpenAI and Cassandra / Astra DB
   path: >-
     examples/vector_databases/cassandra_astradb/Philosophical_Quotes_cassIO.ipynb
   date: 2023-08-29
@@ -614,7 +614,7 @@
   tags:
     - embeddings
 
-- title: Using Chroma for Embeddings Search
+- title: Using Chroma for embeddings search
   path: examples/vector_databases/chroma/Using_Chroma_for_embeddings_search.ipynb
   date: 2023-06-28
   authors:
@@ -623,7 +623,7 @@
   tags:
     - embeddings
 
-- title: Robust Question Answering with Chroma and OpenAI
+- title: Robust question answering with Chroma and OpenAI
   path: examples/vector_databases/chroma/hyde-with-chroma-and-openai.ipynb
   date: 2023-04-06
   authors:
@@ -669,7 +669,7 @@
   tags:
     - embeddings
 
-- title: Kusto as a Vector database for AI embeddings
+- title: Kusto as a vector database for embeddings
   path: >-
     examples/vector_databases/kusto/Getting_started_with_kusto_and_openai_embeddings.ipynb
   date: 2023-05-10
@@ -678,7 +678,7 @@
   tags:
     - embeddings
 
-- title: Kusto as a Vector database
+- title: Kusto as a vector database
   path: examples/vector_databases/kusto/README.md
   date: 2023-05-10
   authors:
@@ -686,7 +686,7 @@
   tags:
     - embeddings
 
-- title: Filtered Search with Milvus and OpenAI
+- title: Filtered search with Milvus and OpenAI
   path: >-
     examples/vector_databases/milvus/Filtered_search_with_Milvus_and_OpenAI.ipynb
   date: 2023-03-28
@@ -695,7 +695,7 @@
   tags:
     - embeddings
 
-- title: Getting Started with Milvus and OpenAI
+- title: Getting started with Milvus and OpenAI
   path: >-
     examples/vector_databases/milvus/Getting_started_with_Milvus_and_OpenAI.ipynb
   date: 2023-03-28
@@ -713,7 +713,7 @@
   tags:
     - embeddings
 
-- title: Using MyScale for Embeddings Search
+- title: Using MyScale for embeddings search
   path: examples/vector_databases/myscale/Using_MyScale_for_embeddings_search.ipynb
   date: 2023-06-28
   authors:
@@ -721,7 +721,7 @@
   tags:
     - embeddings
 
-- title: Retrieval Augmentation for GPT-4 using Pinecone
+- title: Retrieval augmentation for GPT-4 using Pinecone
   path: examples/vector_databases/pinecone/GPT4_Retrieval_Augmentation.ipynb
   date: 2023-03-24
   authors:
@@ -731,7 +731,7 @@
     - completions
     - tiktoken
 
-- title: Retrieval Augmented Generative Question Answering with Pinecone
+- title: Retrieval augmented generative question answering with Pinecone
   path: examples/vector_databases/pinecone/Gen_QA.ipynb
   date: 2023-02-07
   authors:
@@ -740,7 +740,7 @@
     - embeddings
     - completions
 
-- title: Pinecone Vector Database
+- title: Pinecone vector database
   path: examples/vector_databases/pinecone/README.md
   date: 2023-03-24
   authors:
@@ -749,7 +749,7 @@
     - embeddings
     - completions
 
-- title: Semantic Search with Pinecone and OpenAI
+- title: Semantic search with Pinecone and OpenAI
   path: examples/vector_databases/pinecone/Semantic_Search.ipynb
   date: 2023-03-24
   authors:
@@ -757,7 +757,7 @@
   tags:
     - embeddings
 
-- title: Using Pinecone for Embeddings Search
+- title: Using Pinecone for embeddings search
   path: >-
     examples/vector_databases/pinecone/Using_Pinecone_for_embeddings_search.ipynb
   date: 2023-06-28
@@ -775,7 +775,7 @@
   tags:
     - embeddings
 
-- title: Question Answering with Langchain, Qdrant and OpenAI
+- title: Question answering with Langchain, Qdrant and OpenAI
   path: examples/vector_databases/qdrant/QA_with_Langchain_Qdrant_and_OpenAI.ipynb
   date: 2023-02-16
   authors:
@@ -783,7 +783,7 @@
   tags:
     - embeddings
 
-- title: Using Qdrant for Embeddings Search
+- title: Using Qdrant for embeddings search
   path: examples/vector_databases/qdrant/Using_Qdrant_for_embeddings_search.ipynb
   date: 2023-06-28
   authors:
@@ -801,7 +801,7 @@
     - embeddings
     - completions
 
-- title: Using Redis for Embeddings Search
+- title: Using Redis for embeddings search
   path: examples/vector_databases/redis/Using_Redis_for_embeddings_search.ipynb
   date: 2023-06-28
   authors:
@@ -809,7 +809,7 @@
   tags:
     - embeddings
 
-- title: Using Redis as a Vector Database with OpenAI
+- title: Using Redis as a vector database with OpenAI
   path: examples/vector_databases/redis/getting-started-with-redis-and-openai.ipynb
   date: 2023-02-13
   authors:
@@ -817,7 +817,7 @@
   tags:
     - embeddings
 
-- title: Running Hybrid VSS Queries with Redis and OpenAI
+- title: Running hybrid VSS queries with Redis and OpenAI
   path: examples/vector_databases/redis/redis-hybrid-query-examples.ipynb
   date: 2023-05-11
   authors:
@@ -825,7 +825,7 @@
   tags:
     - embeddings
 
-- title: Redis Vectors as JSON with OpenAI
+- title: Redis vectors as JSON with OpenAI
   path: examples/vector_databases/redis/redisjson/redisjson.ipynb
   date: 2023-05-10
   authors:
@@ -833,7 +833,7 @@
   tags:
     - embeddings
 
-- title: Redis as a Context Store with OpenAI Chat
+- title: Redis as a context store with Chat Completions
   path: examples/vector_databases/redis/redisqna/redisqna.ipynb
   date: 2023-05-11
   authors:
@@ -850,7 +850,7 @@
   tags:
     - embeddings
 
-- title: Question Answering with Langchain, Tair and OpenAI
+- title: Question answering with Langchain, Tair and OpenAI
   path: examples/vector_databases/tair/QA_with_Langchain_Tair_and_OpenAI.ipynb
   date: 2023-09-11
   authors:
@@ -868,7 +868,7 @@
   tags:
     - embeddings
 
-- title: Using Typesense for Embeddings Search
+- title: Using Typesense for embeddings search
   path: >-
     examples/vector_databases/typesense/Using_Typesense_for_embeddings_search.ipynb
   date: 2023-06-28
@@ -885,7 +885,7 @@
   tags:
     - embeddings
 
-- title: Using Weaviate for Embeddings Search
+- title: Using Weaviate for embeddings search
   path: >-
     examples/vector_databases/weaviate/Using_Weaviate_for_embeddings_search.ipynb
   date: 2023-06-28
@@ -894,7 +894,7 @@
   tags:
     - embeddings
 
-- title: Using Weaviate with Generative OpenAI module for Generative Search
+- title: Using Weaviate with generative OpenAI module for generative search
   path: >-
     examples/vector_databases/weaviate/generative-search-with-weaviate-and-openai.ipynb
   date: 2023-05-22
@@ -904,7 +904,7 @@
     - embeddings
     - completions
 
-- title: Using Weaviate with OpenAI vectorize module for Embeddings Search
+- title: Using Weaviate with OpenAI vectorize module for embeddings search
   path: >-
     examples/vector_databases/weaviate/getting-started-with-weaviate-and-openai.ipynb
   date: 2023-02-13
@@ -913,7 +913,7 @@
   tags:
     - embeddings
 
-- title: Using Weaviate with OpenAI vectorize module for Hybrid Search
+- title: Using Weaviate with OpenAI vectorize module for hybrid search
   path: >-
     examples/vector_databases/weaviate/hybrid-search-with-weaviate-and-openai.ipynb
   date: 2023-02-13
@@ -992,7 +992,7 @@
     - completions
     - embeddings
 
-- title: Fine-Tuning for Retrieval Augmented Generation (RAG) with Qdrant
+- title: Fine-Tuning for retrieval augmented generation (RAG) with Qdrant
   path: examples/fine-tuned_qa/ft_retrieval_augmented_generation_qdrant.ipynb
   date: 2023-09-04
   authors:
@@ -1001,7 +1001,7 @@
     - completions
     - embeddings
 
-- title: How to automate AWS tasks with function-calling
+- title: How to automate AWS tasks with function calling
   path: examples/third_party/How_to_automate_S3_storage_with_functions.ipynb
   date: 2023-09-27
   authors:
@@ -1027,7 +1027,7 @@
   tags:
     - embeddings
 
-- title: Question Answering with LangChain, Deep Lake, & OpenAI
+- title: Question answering with LangChain, Deep Lake, & OpenAI
   path: examples/vector_databases/deeplake/deeplake_langchain_qa.ipynb
   date: 2023-09-30
   authors:
@@ -1035,7 +1035,7 @@
   tags:
     - embeddings
 
-- title: Fine-tuning GPT with Weights & Biases
+- title: Fine-tuning OpenAI models with Weights & Biases
   path: examples/third_party/GPT_finetuning_with_wandb.ipynb
   date: 2023-10-04
   authors:
@@ -1053,7 +1053,7 @@
     - tiktoken
     - completions
 
-- title: How to build an agent with the Node.js SDK
+- title: How to build an agent with the OpenAI Node.js SDK
   path: examples/How_to_build_an_agent_with_the_node_sdk.mdx
   date: 2023-10-05
   authors:
@@ -1080,7 +1080,7 @@
     - ted-at-openai
   tags: []
 
-- title: Function-calling with an OpenAPI specification
+- title: Function calling with an OpenAPI specification
   path: examples/Function_calling_with_an_OpenAPI_spec.ipynb
   date: 2023-10-15
   authors:
@@ -1090,7 +1090,7 @@
     - completions
     - functions
 
-- title: Fine tuning for function-calling
+- title: Fine tuning for function calling
   path: examples/Fine_tuning_for_function_calling.ipynb
   date: 2023-11-07
   authors:
@@ -1110,7 +1110,7 @@
     - vision
     - speech
 
-- title: What's new with DALL·E-3?
+- title: What's new with DALL·E 3?
   path: articles/what_is_new_with_dalle_3.mdx
   date: 2023-11-06
   authors:
@@ -1166,7 +1166,7 @@
   path: examples/RAG_with_graph_db.ipynb
   date: 2023-12-08
   authors:
-    - katia-openai
+    - katiagg
   tags:
     - embeddings
     - completions
@@ -1195,11 +1195,31 @@
   tags:
     - guardrails
 
-- title: How to combine GPT-V with RAG to create a clothing matchmaker app
+- title: How to combine GPTv with RAG to create a clothing matchmaker app
   path: examples/How_to_Combine_GPTv_with_RAG_Outfit_Assistant.ipynb
   date: 2024-02-16
   authors:
     - teomusatoiu
+  tags:
+    - vision
+    - embeddings
+
+
+- title: How to parse PDF docs for RAG
+  path: examples/Parse_PDF_docs_for_RAG.ipynb
+  date: 2024-02-28
+  authors:
+    - katiagg
+  tags:
+    - vision
+    - embeddings
+
+
+- title: Using GPT4 with Vision to tag and caption images
+  path: examples/Tag_caption_images_with_GPT4V.ipynb
+  date: 2024-02-28
+  authors:
+    - katiagg
   tags:
     - vision
     - embeddings

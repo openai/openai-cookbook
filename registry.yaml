@@ -1196,8 +1196,8 @@
   tags:
     - guardrails
 
-- title: How to combine GPTv with RAG to create a clothing matchmaker app
-  path: examples/How_to_combine_GPTv_with_RAG_Outfit_Assistant.ipynb
+- title: How to combine GPT4 with vision with RAG to create a clothing matchmaker app
+  path: examples/How_to_combine_GPT4v_with_RAG_Outfit_Assistant.ipynb
   date: 2024-02-16
   authors:
     - teomusatoiu

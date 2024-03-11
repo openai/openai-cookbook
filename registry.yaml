@@ -1224,3 +1224,12 @@
   tags:
     - vision
     - embeddings
+
+
+- title: How to use the moderation API
+  path: examples/How_to_use_moderation.ipynb
+  date: 2024-03-05
+  authors:
+    - teomusatoiu
+  tags:
+    - moderation

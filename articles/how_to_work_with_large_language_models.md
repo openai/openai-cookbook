@@ -1,5 +1,16 @@
 # How to work with large language models
 
+## Table of contents
+  * [How large language models work](#how-large-language-models-work)
+  * [How to control a large language model](#how-to-control-a-large-language-model)
+    * [Instruction prompts](#instruction-prompts)
+    * [Completion prompt example](#completion-prompt-example)
+    * [Scenario prompt example](#scenario-prompt-example)
+    * [Demonstration prompt example (few-shot learning)](#demonstration-prompt-example-(few-shot-learning))
+    * [Fine-tuned prompt example](#fine-tuned-prompt-example)
+  * [Code Capabilities](#code-capabilities)
+    * [More prompt advice](#more-prompt-advice)
+
 ## How large language models work
 
 [Large language models][Large language models Blog Post] are functions that map text to text. Given an input string of text, a large language model predicts the text that should come next.

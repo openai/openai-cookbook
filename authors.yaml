@@ -3,6 +3,11 @@
 # You can optionally customize how your information shows up cookbook.openai.com over here.
 # If your information is not present here, it will be pulled from your GitHub profile.
 
+kush-trivedi:
+  name: "Kush Trivedi"
+  website: "https://www.linkedin.com/in/kush-trivedi/"
+  avatar: "https://media.licdn.com/dms/image/C5603AQFCHfwUsXHnDg/profile-displayphoto-shrink_800_800/0/1582459162045?e=1712188800&v=beta&t=PUbber3pPJIKTDCZqrF84Ng3HD0S1E5wYvAPgMINOY8"
+
 0hq:
   name: "Will Depue"
   website: "http://depue.design"

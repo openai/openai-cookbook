@@ -81,7 +81,5 @@ after_rag_chain = (
     | StrOutputParser()
 )
 print(after_rag_chain.invoke("What is the code of the document about '" + 
-                             "In the public and private sectors or they may be self-employed. Trademark " +
-                             "agents are employed by law firms and legal departments throughout the " +
-                             "public and private sectors, trademark development and search firms or they " +
-                             "may be self-employed.'"))
+                             "Program officers unique to government are primarily concerned with the " + "administration and operation of government institutions, such as Parliament,  " + "and activities unique to the operations of government, such as international " +
+                             "relations, federal-provincial affairs, elections and tribunals.'"))

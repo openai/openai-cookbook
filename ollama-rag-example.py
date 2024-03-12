@@ -6,6 +6,33 @@ from langchain_core.runnables import RunnablePassthrough
 from langchain_core.output_parsers import StrOutputParser
 from langchain_core.prompts import ChatPromptTemplate
 from langchain.text_splitter import CharacterTextSplitter
+from langchain.docstore.document import Document
+import csv
+
+noc_data = []
+
+with open('data/noc.csv', newline='') as csvfile:
+    reader = csv.DictReader(csvfile)
+    for row in reader:
+        record = {
+            'code': row['Code - NOC 2021 V1.0'], 
+            'title': row['Class title'],
+            'definition': row['Class definition']
+        }
+        noc_data.append(record)
+
+def to_page_content(page):
+    return 'code="' + page['code'] + '" title="' + page['title'] + '" definition="' + page['definition'] + '"'
+
+docs = [Document(page_content=to_page_content(page)) for page in noc_data]
+
+def find_noc_records(code):
+    return filter(lambda r: r['code'].startswith(code), noc_data)
+
+print(docs)
+
+exit(0)
+
 
 # Sources
 # https://www.youtube.com/watch?v=jENqvjpkwmw

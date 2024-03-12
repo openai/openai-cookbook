@@ -4,6 +4,13 @@
 # should build pages for, and indicates metadata such as tags, creation date and
 # authors for each page.
 
+- title: Getting started with the Assistants API using Node.js
+  path: examples/Getting_started_with_assistants_api_node.md
+  date: 2023-12-15
+  authors:
+    - perborgen
+  tags:
+    - assistants
 
 - title: Using logprobs
   path: examples/Using_logprobs.ipynb

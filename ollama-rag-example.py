@@ -21,15 +21,17 @@ with open('data/noc.csv', newline='') as csvfile:
         }
         noc_data.append(record)
 
+def include_page(page):
+    return page['code'].startswith('42')
+
 def to_page_content(page):
     return 'code="' + page['code'] + '" title="' + page['title'] + '" definition="' + page['definition'] + '"'
 
-docs = [Document(page_content=to_page_content(page)) for page in noc_data]
-
-def find_noc_records(code):
-    return filter(lambda r: r['code'].startswith(code), noc_data)
+docs = [Document(page_content=to_page_content(page)) for page in noc_data if include_page(page)]
 
 print(docs)
+
+print('total documents included = ', len(docs))
 
 exit(0)
 

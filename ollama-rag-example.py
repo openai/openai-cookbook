@@ -27,7 +27,7 @@ def include_page(page):
 def to_page_content(page):
     return 'code="' + page['code'] + '" title="' + page['title'] + '" definition="' + page['definition'] + '"'
 
-# docs = [Document(page_content=to_page_content(page)) for page in noc_data if include_page(page)]
+docs = [[Document(page_content=to_page_content(page)) for page in noc_data if include_page(page)]]
 
 
 
@@ -43,7 +43,7 @@ urls = [
     "https://ollama.com/blog/openai-compatibility",
 ]
 
-docs = [WebBaseLoader(url).load() for url in urls];
+# docs = [WebBaseLoader(url).load() for url in urls];
 
 docs_list = [item for sublist in docs for item in sublist]
 print(docs_list)
@@ -65,7 +65,7 @@ print("Before RAG\n")
 before_rag_template = "What is {topic}"
 before_rag_prompt = ChatPromptTemplate.from_template(before_rag_template)
 before_rag_chain = before_rag_prompt | model_local | StrOutputParser()
-print(before_rag_chain.invoke({"topic" : "Ollama"}))
+print(before_rag_chain.invoke({"topic" : "trademark agents"}))
 
 # 4. After rAG
 print("\n###########\nAfter RAG")
@@ -80,4 +80,8 @@ after_rag_chain = (
     | model_local
     | StrOutputParser()
 )
-print(after_rag_chain.invoke("What is Ollama?"))
+print(after_rag_chain.invoke("What is the code of the document about '" + 
+                             "In the public and private sectors or they may be self-employed. Trademark " +
+                             "agents are employed by law firms and legal departments throughout the " +
+                             "public and private sectors, trademark development and search firms or they " +
+                             "may be self-employed.'"))

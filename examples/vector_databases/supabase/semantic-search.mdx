@@ -41,7 +41,7 @@ create table documents (
 
 Since Supabase is built on Postgres, we're just using regular SQL here. You can modify this table however you like to better fit your application. If you have existing database tables, you can simply add a new `vector` column to the appropriate table.
 
-The important piece to understand is the `vector` data type, which is a new data type that became available when we enabled the pgvector extension earlier. The size of the vector (1536 here) represents the number of dimensions in the embedding. Since we're using OpenAI's `text-embedding-ada-002` model in this example, we set the vector size to 1536.
+The important piece to understand is the `vector` data type, which is a new data type that became available when we enabled the pgvector extension earlier. The size of the vector (1536 here) represents the number of dimensions in the embedding. Since we're using OpenAI's `text-embedding-3-small` model in this example, we set the vector size to 1536.
 
 Let's go ahead and create a vector index on this table so that future queries remain performant as the table grows:
 
@@ -74,27 +74,27 @@ npm install openai
 then import it:
 
 ```js
-import OpenAI from 'openai';
+import OpenAI from "openai";
 ```
 
 If you're using Deno or Supabase Edge Functions, you can import `openai` directly from a URL:
 
 ```js
-import OpenAI from 'https://esm.sh/openai@4';
+import OpenAI from "https://esm.sh/openai@4";
 ```
 
 > In this example we import from https://esm.sh which is a CDN that automatically fetches the respective NPM module for you and serves it over HTTP.
 
-Next we'll generate an OpenAI embedding using [`text-embedding-ada-002`](https://platform.openai.com/docs/guides/embeddings/embedding-models):
+Next we'll generate an OpenAI embedding using [`text-embedding-3-small`](https://platform.openai.com/docs/guides/embeddings/embedding-models):
 
 ```js
 const openai = new OpenAI();
 
-const input = 'The cat chases the mouse';
+const input = "The cat chases the mouse";
 
 const result = await openai.embeddings.create({
   input,
-  model: 'text-embedding-ada-002',
+  model: "text-embedding-3-small",
 });
 
 const [{ embedding }] = result.data;
@@ -104,7 +104,7 @@ Remember that you will need an [OpenAI API key](https://platform.openai.com/api-
 
 ```js
 const openai = new OpenAI({
-  apiKey: '<openai-api-key>',
+  apiKey: "<openai-api-key>",
 });
 ```
 
@@ -125,13 +125,13 @@ npm install @supabase/supabase-js
 then import it:
 
 ```js
-import { createClient } from '@supabase/supabase-js';
+import { createClient } from "@supabase/supabase-js";
 ```
 
 If you're using Deno or Supabase Edge Functions, you can import `@supabase/supabase-js` directly from a URL:
 
 ```js
-import { createClient } from 'https://esm.sh/@supabase/supabase-js@2';
+import { createClient } from "https://esm.sh/@supabase/supabase-js@2";
 ```
 
 Next we'll instantiate our Supabase client and configure it so that it points to your Supabase project. In this guide we'll store a reference to your Supabase URL and key in a `.env` file, but feel free to modify this based on how your application handles configuration.
@@ -158,32 +158,32 @@ npm install dotenv
 And retrieve the environment variables from `process.env`:
 
 ```js
-import { config } from 'dotenv';
+import { config } from "dotenv";
 
 // Load .env file
 config();
 
-const supabaseUrl = process.env['SUPABASE_URL'];
-const supabaseServiceRoleKey = process.env['SUPABASE_SERVICE_ROLE_KEY'];
+const supabaseUrl = process.env["SUPABASE_URL"];
+const supabaseServiceRoleKey = process.env["SUPABASE_SERVICE_ROLE_KEY"];
 ```
 
 In Deno, load the `.env` file using the `dotenv` standard library:
 
 ```js
-import { load } from 'https://deno.land/std@0.208.0/dotenv/mod.ts';
+import { load } from "https://deno.land/std@0.208.0/dotenv/mod.ts";
 
 // Load .env file
 const env = await load();
 
-const supabaseUrl = env['SUPABASE_URL'];
-const supabaseServiceRoleKey = env['SUPABASE_SERVICE_ROLE_KEY'];
+const supabaseUrl = env["SUPABASE_URL"];
+const supabaseServiceRoleKey = env["SUPABASE_SERVICE_ROLE_KEY"];
 ```
 
 In Supabase Edge Functions, simply load the injected environment variables directly:
 
 ```js
-const supabaseUrl = Deno.env.get('SUPABASE_URL');
-const supabaseServiceRoleKey = Deno.env.get('SUPABASE_SERVICE_ROLE_KEY');
+const supabaseUrl = Deno.env.get("SUPABASE_URL");
+const supabaseServiceRoleKey = Deno.env.get("SUPABASE_SERVICE_ROLE_KEY");
 ```
 
 Next let's instantiate our `supabase` client:
@@ -197,7 +197,7 @@ const supabase = createClient(supabaseUrl, supabaseServiceRoleKey, {
 From here we use the `supabase` client to insert our text and embedding (generated earlier) into the database:
 
 ```js
-const { error } = await supabase.from('documents').insert({
+const { error } = await supabase.from("documents").insert({
   content: input,
   embedding,
 });
@@ -241,23 +241,23 @@ Inside the function we implement the query which does two things:
 Now we can call this function from our application using the `supabase.rpc()` method:
 
 ```js
-const query = 'What does the cat chase?';
+const query = "What does the cat chase?";
 
 // First create an embedding on the query itself
 const result = await openai.embeddings.create({
   input: query,
-  model: 'text-embedding-ada-002',
+  model: "text-embedding-3-small",
 });
 
 const [{ embedding }] = result.data;
 
 // Then use this embedding to search for matches
 const { data: documents, error: matchError } = await supabase
-  .rpc('match_documents', {
+  .rpc("match_documents", {
     query_embedding: embedding,
     match_threshold: 0.8,
   })
-  .select('content')
+  .select("content")
   .limit(5);
 ```
 

@@ -53,6 +53,11 @@ prakul:
   website: "https://www.linkedin.com/in/prakulagarwal"
   avatar: "https://media.licdn.com/dms/image/D5603AQEUug83qKgRBg/profile-displayphoto-shrink_800_800/0/1675384960197?e=1706140800&v=beta&t=qxkDbBr-Bk2ASpcwbR5JVPD6yS-vzmIwNHAa8ApyDq4"
 
+gaborcselle:
+  name: "Gabor Cselle"
+  website: "https://www.linkedin.com/in/gaborcselle"
+  avatar: "https://avatars.githubusercontent.com/u/54096?s=96&v=4"
+
 nghiauet:
   name: "Nghia Pham"
   website: "https://www.linkedin.com/in/deptraicucmanh/"
@@ -62,3 +67,18 @@ ggrn:
   name: "Greg Richardson"
   website: "https://twitter.com/ggrdson"
   avatar: "https://pbs.twimg.com/profile_images/1371549909820657664/ZG-HDNlI_400x400.jpg"
+
+teomusatoiu:
+  name: "Teodora Musatoiu"
+  website: "https://www.linkedin.com/in/teodora-musatoiu/"
+  avatar: "https://avatars.githubusercontent.com/u/156829031?s=400&u=af40fe04d9255139eb3bbf8dc83422cc694e862b&v=4"
+
+katiagg:
+  name: "Katia Gil Guzman"
+  website: "https://katia.gg"
+  avatar: "https://avatars.githubusercontent.com/u/16519462?v=4"
+
+jbeutler-openai:
+  name: "Joe Beutler"
+  website: "https://joebeutler.com"
+  avatar: "https://avatars.githubusercontent.com/u/156261485?v=4"

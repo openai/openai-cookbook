@@ -22,7 +22,7 @@ with open('data/noc.csv', newline='') as csvfile:
         noc_data.append(record)
 
 def include_page(page):
-    return page['code'].startswith('4')
+    return True # page['code'].startswith('5')
 
 def to_page_content(page):
     return 'code="' + page['code'] + '" title="' + page['title'] + '" definition="' + page['definition'] + '"'
@@ -80,6 +80,11 @@ after_rag_chain = (
     | model_local
     | StrOutputParser()
 )
-print(after_rag_chain.invoke("What is the code of the document about '" + 
-                             "Program officers unique to government are primarily concerned with the " + "administration and operation of government institutions, such as Parliament,  " + "and activities unique to the operations of government, such as international " +
-                             "relations, federal-provincial affairs, elections and tribunals.'"))
+print(after_rag_chain.invoke("What is the title and code of the document that most closely matches this job description: '" + 
+                             "As an Administrative Assistant in the film industry, you will play a pivotal  " + 
+                             "role in supporting the administrative and organizational functions of film " +
+                             "production companies, studios, or related entities. You will be responsible for " +
+                             " providing comprehensive administrative support to ensure smooth operations and " +
+                             " facilitate the execution of various projects within the dynamic and fast-paced " +
+                             " environment of the film industry.'"))
+

@@ -27,13 +27,8 @@ def include_page(page):
 def to_page_content(page):
     return 'code="' + page['code'] + '" title="' + page['title'] + '" definition="' + page['definition'] + '"'
 
-docs = [Document(page_content=to_page_content(page)) for page in noc_data if include_page(page)]
+# docs = [Document(page_content=to_page_content(page)) for page in noc_data if include_page(page)]
 
-print(docs)
-
-print('total documents included = ', len(docs))
-
-exit(0)
 
 
 # Sources
@@ -47,8 +42,12 @@ urls = [
     "https://ollama.com/blog/windows-preview",
     "https://ollama.com/blog/openai-compatibility",
 ]
+
 docs = [WebBaseLoader(url).load() for url in urls];
+
 docs_list = [item for sublist in docs for item in sublist]
+print(docs_list)
+print('total documents included = ', len(docs_list))
 text_splitter = CharacterTextSplitter.from_tiktoken_encoder(chunk_size=7500, chunk_overlap=100)
 doc_splits = text_splitter.split_documents(docs_list)
 

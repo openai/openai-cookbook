@@ -26,7 +26,7 @@ with open('data/noc.csv', newline='') as csvfile:
 
 
 def include_page(page):
-    return page['code'].startswith('2')
+    return True # page['code'].startswith('2')
 
 def to_page_content(page):
     return 'code="' + page['code'] + '" title="' + page['title'] + '" definition="' + page['definition'] + '"'
@@ -136,4 +136,4 @@ Responsibilities:
 8. **Data Analysis:** Analyze geological data collected from field surveys, laboratory tests, and remote sensing""")
 
 
-print(after_rag_chain.invoke("What are the three documents that most closely match this job description: '" + geological_engineer_jd + "'. Answer in JSON format with the top level identifier 'results', and attributes code, title, definition, score and comment for each matching document, where score is a number between 0 and 1 indicating how close the match is to the job description, with 1 meaning really close, and comment explains why this particular documents was selected as a good match."))
+print(after_rag_chain.invoke("What are the three documents that most closely match this job description: '" + geological_engineer_jd + "'. Answer in JSON format with the top level identifier 'results', and attributes code, title, definition, score and comment for each matching document, where score is a number between 0 and 1 indicating how close the match is to the job description, with 1 meaning really close, and comment explains why each documents was selected as a good match."))

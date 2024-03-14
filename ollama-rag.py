@@ -9,6 +9,7 @@ from langchain.text_splitter import CharacterTextSplitter
 from langchain.docstore.document import Document
 import csv
 import json
+import time
 # langchain UI tool
 
 noc_data = []
@@ -45,19 +46,21 @@ model_local = ChatOllama(model="mistral")
 flattened_docs = [item for sublist in docs for item in sublist]
 # print(flattened_docs)
 print('total documents included = ', len(flattened_docs))
-# TODO chunck by rows, so one row is one cunck, build a JSON blob for each chunmkc so we get the 
-# structure of the different fields
-text_splitter = CharacterTextSplitter.from_tiktoken_encoder(chunk_size=7500, chunk_overlap=100)
-doc_splits = text_splitter.split_documents(flattened_docs)
 
 # TODO don't build the vectors each time, store in a vector database, this needs to be persisted, maybe local redis
 
-# 2. Convert documents to Embeddings and store them
+ts = time.time()
+
+# 2. Convert documents to Embeddings and store them, this takes about 30 seconds
 vectorstore = Chroma.from_documents(
-    documents=doc_splits,
+    documents=flattened_docs,
     collection_name="rag-chroma",
     embedding=embeddings.ollama.OllamaEmbeddings(model='nomic-embed-text')
 )
+
+ts1 = time.time()
+
+print("vector store takes " + str(ts1 - ts) + " seconds")
 
 retriever = vectorstore.as_retriever()
 

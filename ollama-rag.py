@@ -28,13 +28,15 @@ with open('data/noc.csv', newline='') as csvfile:
 # with 105 docs: nice -n 19 python3 ollama-rag-example.py  3.17s user 2.18s system 8% cpu 1:00.42 total
 
 def include_page(page):
-    return True # page['code'].startswith('2')
+    return str(page['code']) not in ['11', '1', '0', '14', '12', '13', '10' ]
 
 def to_page_content(page):
     return json.dumps(page)
 
+filtered_noc_data = [page for page in noc_data if include_page(page)]
+
 # Processing documents from reading file to here takes 0.01 seconds
-docs = [[Document(page_content=to_page_content(page)) for page in noc_data if include_page(page)]]
+docs = [[Document(page_content=to_page_content(page)) for page in filtered_noc_data]]
 
 # Sources
 # https://www.youtube.com/watch?v=jENqvjpkwmw

@@ -8,6 +8,7 @@ from langchain_core.prompts import ChatPromptTemplate
 from langchain.text_splitter import CharacterTextSplitter
 from langchain.docstore.document import Document
 import csv
+import json
 # langchain UI tool
 
 noc_data = []
@@ -25,13 +26,12 @@ with open('data/noc.csv', newline='') as csvfile:
 # with 822 docs nice -n 19 python3 ollama-rag-example.py  7.96s user 1.58s system 13% cpu 1:12.98 total
 # with 105 docs: nice -n 19 python3 ollama-rag-example.py  3.17s user 2.18s system 8% cpu 1:00.42 total
 
-
 def include_page(page):
-    return page['code'].startswith('22')
+    return True # page['code'].startswith('2')
 
 def to_page_content(page):
     # TODO build JSON here, maybe stick it into Mongo, (or use punctuation, \n or something)
-    return 'code="' + page['code'] + '" title="' + page['title'] + '" definition="' + page['definition'] + '"'
+    return json.dumps(page)
 
 docs = [[Document(page_content=to_page_content(page)) for page in noc_data if include_page(page)]]
 

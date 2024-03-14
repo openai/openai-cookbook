@@ -30,12 +30,10 @@ def include_page(page):
     return True # page['code'].startswith('2')
 
 def to_page_content(page):
-    # TODO build JSON here, maybe stick it into Mongo, (or use punctuation, \n or something)
     return json.dumps(page)
 
+# Processing documents from reading file to here takes 0.01 seconds
 docs = [[Document(page_content=to_page_content(page)) for page in noc_data if include_page(page)]]
-
-
 
 # Sources
 # https://www.youtube.com/watch?v=jENqvjpkwmw
@@ -43,16 +41,9 @@ docs = [[Document(page_content=to_page_content(page)) for page in noc_data if in
 model_local = ChatOllama(model="mistral")
 
 # 1. Split data into chucks
-urls = [
-    "https://ollama.com",
-    "https://ollama.com/blog/windows-preview",
-    "https://ollama.com/blog/openai-compatibility",
-]
-
-# docs = [WebBaseLoader(url).load() for url in urls];
 
 flattened_docs = [item for sublist in docs for item in sublist]
-print(flattened_docs)
+# print(flattened_docs)
 print('total documents included = ', len(flattened_docs))
 # TODO chunck by rows, so one row is one cunck, build a JSON blob for each chunmkc so we get the 
 # structure of the different fields

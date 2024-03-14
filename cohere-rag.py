@@ -32,7 +32,7 @@ admin_assistant_js = ("As an Administrative Assistant in the film industry, you 
                            " facilitate the execution of various projects within the dynamic and fast-paced " +
                            " environment of the film industry.'");
 
-hopital_chef_jd = ("Title: Hospital Chef\n" +
+hospital_chef_jd = ("Title: Hospital Chef\n" +
 "Job Summary:\n" +
 "As a Hospital Chef, you will play a vital role in ensuring the provision of high-quality, nutritious meals for patients, \n" +
 "staff, and visitors in a healthcare setting. Working closely with dietitians, nutritionists, and culinary staff, you\n" +
@@ -61,7 +61,7 @@ hopital_chef_jd = ("Title: Hospital Chef\n" +
 
 result = co.chat(
   model='command',
-  message='Which of the provided documents most closely match this job description: "' + hopital_chef_jd + '", include the corresponding ids in the response',
+  message='Which of the provided documents most closely match this job description: "' + hospital_chef_jd + '", include the corresponding ids in the response',
   documents=selected_documents)
 
 print(40*'*')

@@ -8,6 +8,7 @@ from langchain_core.prompts import ChatPromptTemplate
 from langchain.text_splitter import CharacterTextSplitter
 from langchain.docstore.document import Document
 import csv
+# langchain UI tool
 
 noc_data = []
 
@@ -26,9 +27,10 @@ with open('data/noc.csv', newline='') as csvfile:
 
 
 def include_page(page):
-    return True # page['code'].startswith('2')
+    return page['code'].startswith('22')
 
 def to_page_content(page):
+    # TODO build JSON here, maybe stick it into Mongo, (or use punctuation, \n or something)
     return 'code="' + page['code'] + '" title="' + page['title'] + '" definition="' + page['definition'] + '"'
 
 docs = [[Document(page_content=to_page_content(page)) for page in noc_data if include_page(page)]]
@@ -52,8 +54,12 @@ urls = [
 flattened_docs = [item for sublist in docs for item in sublist]
 print(flattened_docs)
 print('total documents included = ', len(flattened_docs))
+# TODO chunck by rows, so one row is one cunck, build a JSON blob for each chunmkc so we get the 
+# structure of the different fields
 text_splitter = CharacterTextSplitter.from_tiktoken_encoder(chunk_size=7500, chunk_overlap=100)
 doc_splits = text_splitter.split_documents(flattened_docs)
+
+# TODO don't build the vectors each time, store in a vector database, this needs to be persisted, maybe local redis
 
 # 2. Convert documents to Embeddings and store them
 vectorstore = Chroma.from_documents(
@@ -136,4 +142,5 @@ Responsibilities:
 8. **Data Analysis:** Analyze geological data collected from field surveys, laboratory tests, and remote sensing""")
 
 
+# TODO make system prompt and user prompt
 print(after_rag_chain.invoke("What are the three documents that most closely match this job description: '" + geological_engineer_jd + "'. Answer in JSON format with the top level identifier 'results', and attributes code, title, definition, score and comment for each matching document, where score is a number between 0 and 1 indicating how close the match is to the job description, with 1 meaning really close, and comment explains why each documents was selected as a good match."))

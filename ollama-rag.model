@@ -3,8 +3,5 @@ FROM mistral
 PARAMETER temperature 0.1
 
 SYSTEM """
-return the three best matching documents, in valid JSON format, including all attributes of each document,
-and including a score and comment attributes. The score is a number representing how well each document matches, this
-be determined based on the number of keywords that are present in both the job description and document. The
-comment is an explanation of why each document is considered a close match.
+return the three best matching documents, in valid JSON format, including all attributes of each document.
 """

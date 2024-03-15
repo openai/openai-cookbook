@@ -7,9 +7,12 @@ from langchain_core.output_parsers import StrOutputParser
 from langchain_core.prompts import ChatPromptTemplate
 from langchain.text_splitter import CharacterTextSplitter
 from langchain.docstore.document import Document
+from chromadb.utils import embedding_functions
 import csv
 import json
 import time
+import os.path
+
 # langchain UI tool
 
 noc_data = []
@@ -54,11 +57,37 @@ print('total documents included = ', len(flattened_docs))
 ts = time.time()
 
 # 2. Convert documents to Embeddings and store them, this takes about 30 seconds
-vectorstore = Chroma.from_documents(
-    documents=flattened_docs,
-    collection_name="rag-chroma",
-    embedding=embeddings.ollama.OllamaEmbeddings(model='nomic-embed-text')
-)
+# vectorstore = Chroma.from_documents(
+    # documents=flattened_docs,
+    # collection_name="rag-chroma",
+    # embedding=embeddings.ollama.OllamaEmbeddings(model='nomic-embed-text'),
+    # persist_directory="./chroma_db"
+# )
+
+def vectors_from_disk():
+    return Chroma(
+        # embedding=embeddings.ollama.OllamaEmbeddings(model='nomic-embed-text'),
+        embedding_function=embedding_functions.DefaultEmbeddingFunction,
+        persist_directory="./chroma_db"
+    )
+
+def compute_vectors():
+    return Chroma.from_documents(
+        documents=flattened_docs,
+        collection_name="rag-chroma",
+        # embedding=embeddings.ollama.OllamaEmbeddings(model='nomic-embed-text'),
+        embedding_function=embedding_functions.DefaultEmbeddingFunction,
+        persist_directory="./chroma_db"
+    )
+
+def get_vectors():
+    if os.path.isfile("./chroma_db/chroma.sqlite3"):
+        return vectors_from_disk()
+    return compute_vectors()
+
+vectorstore = get_vectors()
+
+
 
 ts1 = time.time()
 

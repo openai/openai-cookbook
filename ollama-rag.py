@@ -14,6 +14,7 @@ import os.path
 
 # langchain UI tool
 
+t1 = time.time()
 noc_codes = []
 
 with open('data/noc.csv', newline='') as csvfile:
@@ -64,7 +65,14 @@ def load_or_compute_embeddings():
 
 embeddings = load_or_compute_embeddings()
 
+t2 = time.time()
+print('Documents loaded in ' + str(t2 - t1) + ' seconds')
+
+t1 = time.time()
+
 retriever = embeddings.as_retriever()
+
+print('H1: ' + str(time.time() - t1) + ' seconds')
 
 after_rag_template = """Answer the question based only on the following context:
 {context}
@@ -77,6 +85,8 @@ after_rag_chain = (
     | model_local
     | StrOutputParser()
 )
+
+print('H2: ' + str(time.time() - t1) + ' seconds')
 
 admin_assistant_js = ("As an Administrative Assistant in the film industry, you will play a pivotal  " + 
                              "role in supporting the administrative and organizational functions of film " +
@@ -127,6 +137,9 @@ Responsibilities:
 7. **Project Planning:** Provide geological input and expertise during the planning and design phases of engineering projects, including site selection, foundation design, and construction techniques, to optimize project outcomes and minimize geological risks.
 8. **Data Analysis:** Analyze geological data collected from field surveys, laboratory tests, and remote sensing""")
 
+print('H3: ' + str(time.time() - t1) + ' seconds')
 
 # TODO make system prompt and user prompt
 print(after_rag_chain.invoke("What are the three documents that most closely match this job description: '" + geological_engineer_jd + "'. Answer in JSON format with the top level identifier 'results', and attributes code, title, definition, score and comment for each matching document, where score is a number between 0 and 1 indicating how close the match is to the job description, with 1 meaning really close, and comment explains why each documents was selected as a good match."))
+
+print('Results ready in ' + str(time.time() - t1) + ' seconds')

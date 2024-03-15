@@ -92,7 +92,7 @@ def read_job_description(job):
     with open('./jobdescriptions/' + job + '.txt', 'r') as file:
         return file.read()
 
-jd = read_job_description('hospital_chef')
+jd = read_job_description('geological_engineer')
 
 prompt = ("What are the three documents that most closely match this job description: '" + jd)
 

@@ -1,12 +1,10 @@
 FROM mistral
 
-PARAMETER temperature 1.0
+PARAMETER temperature 0.1
 
 SYSTEM """
-Your purpose is to identify the documents that most closely match the input. Respond with a JSON structure,
-including the matching documents in full, adding two attributes, the score and the comment. The score is a 
-number between 0 and 1, where a number close to 1 means the match of that document is very close. The 
-comment explains why each document was selected as a good match.
-
-Given a job description in the prompt, find the tree documents that most closely match.
+return the three best matching documents, in valid JSON format, including all attributes of each document,
+and including a score and comment attributes. The score is a number representing how well each document matches, this
+be determined based on the number of keywords that are present in both the job description and document. The
+comment is an explanation of why each document is considered a close match.
 """

@@ -31,13 +31,17 @@ filtered_noc_codes = [code for code in noc_codes if include_code(code)]
 def to_page_content(code):
     return json.dumps(code)
 
-documents = [Document(page_content=to_page_content(code)) for code in filtered_noc_codes]
+documents = [Document(
+        page_content=to_page_content(code), 
+        metadata={'code': code['code']}
+    ) for code in filtered_noc_codes]
 print('total documents included = ', len(documents))
 
 # Sources
 # https://www.youtube.com/watch?v=jENqvjpkwmw
 
-model_local = ChatOllama(model="mistral")
+# try out different models
+model_local = ChatOllama(model="noc_master")
 
 # TODO don't build the vectors each time, store in a vector database, this needs to be persisted, maybe local redis
 
@@ -137,6 +141,8 @@ Responsibilities:
 print('H3: ' + str(time.time() - t1) + ' seconds')
 
 # TODO make system prompt and user prompt
-print(after_rag_chain.invoke("What are the three documents that most closely match this job description: '" + geological_engineer_jd + "'. Answer in JSON format with the top level identifier 'results', and attributes code, title, definition, score and comment for each matching document, where score is a number between 0 and 1 indicating how close the match is to the job description, with 1 meaning really close, and comment explains why each documents was selected as a good match."))
+prompt = ("What are the three documents that most closely match this job description: '" + geological_engineer_jd)
+
+print(after_rag_chain.invoke(prompt))
 
 print('Results ready in ' + str(time.time() - t1) + ' seconds')

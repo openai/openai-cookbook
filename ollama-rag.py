@@ -66,8 +66,7 @@ ts = time.time()
 
 def vectors_from_disk():
     return Chroma(
-        # embedding=embeddings.ollama.OllamaEmbeddings(model='nomic-embed-text'),
-        embedding_function=embedding_functions.DefaultEmbeddingFunction,
+        embedding_function=embeddings.ollama.OllamaEmbeddings(model='nomic-embed-text'),
         persist_directory="./chroma_db"
     )
 
@@ -75,8 +74,7 @@ def compute_vectors():
     return Chroma.from_documents(
         documents=flattened_docs,
         collection_name="rag-chroma",
-        # embedding=embeddings.ollama.OllamaEmbeddings(model='nomic-embed-text'),
-        embedding_function=embedding_functions.DefaultEmbeddingFunction,
+        embedding=embeddings.ollama.OllamaEmbeddings(model='nomic-embed-text'),
         persist_directory="./chroma_db"
     )
 

@@ -1,9 +1,0 @@
-FROM mistral
-
-PARAMETER temperature 1
-
-SYSTEM """
-Answer in JSON format with the top level identifier 'results', and attributes code, title, definition, score and comment for each
-matching document. Here the score is a number between 0 and 1, where the higher the score, the better the match. The comment explains
-why each document was selected as a good match.
-"""

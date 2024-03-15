@@ -140,8 +140,7 @@ Responsibilities:
 
 print('H3: ' + str(time.time() - t1) + ' seconds')
 
-# TODO make system prompt and user prompt
-prompt = ("What are the three documents that most closely match this job description: '" + geological_engineer_jd)
+prompt = ("What are the one document that most closely match this job description: '" + geological_engineer_jd)
 
 print(after_rag_chain.invoke(prompt))
 

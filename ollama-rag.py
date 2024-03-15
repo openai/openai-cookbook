@@ -7,7 +7,6 @@ from langchain_core.output_parsers import StrOutputParser
 from langchain_core.prompts import ChatPromptTemplate
 from langchain.text_splitter import CharacterTextSplitter
 from langchain.docstore.document import Document
-from chromadb.utils import embedding_functions
 import csv
 import json
 import time
@@ -17,15 +16,12 @@ import os.path
 
 noc_data = []
 
+
 with open('data/noc.csv', newline='') as csvfile:
-    reader = csv.DictReader(csvfile)
-    for row in reader:
-        record = {
-            'code': row['Code - NOC 2021 V1.0'], 
-            'title': row['Class title'],
-            'definition': row['Class definition']
-        }
-        noc_data.append(record)
+    noc_data = [
+        { 'code': row['Code - NOC 2021 V1.0'], 'title': row['Class title'], 'definition': row['Class definition'] } 
+        for row in csv.DictReader(csvfile)
+    ]
 
 # with 822 docs nice -n 19 python3 ollama-rag-example.py  7.96s user 1.58s system 13% cpu 1:12.98 total
 # with 105 docs: nice -n 19 python3 ollama-rag-example.py  3.17s user 2.18s system 8% cpu 1:00.42 total

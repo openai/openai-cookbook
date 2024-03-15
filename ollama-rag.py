@@ -66,6 +66,7 @@ ts = time.time()
 
 def vectors_from_disk():
     return Chroma(
+        collection_name="rag-chroma",
         embedding_function=embeddings.ollama.OllamaEmbeddings(model='nomic-embed-text'),
         persist_directory="./chroma_db"
     )

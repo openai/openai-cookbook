@@ -14,17 +14,13 @@ import os.path
 
 # langchain UI tool
 
-noc_data = []
-
+noc_codes = []
 
 with open('data/noc.csv', newline='') as csvfile:
-    noc_data = [
+    noc_codes = [
         { 'code': row['Code - NOC 2021 V1.0'], 'title': row['Class title'], 'definition': row['Class definition'] } 
         for row in csv.DictReader(csvfile)
     ]
-
-# with 822 docs nice -n 19 python3 ollama-rag-example.py  7.96s user 1.58s system 13% cpu 1:12.98 total
-# with 105 docs: nice -n 19 python3 ollama-rag-example.py  3.17s user 2.18s system 8% cpu 1:00.42 total
 
 def include_page(page):
     return str(page['code']) not in ['11', '1', '0', '14', '12', '13', '10' ]
@@ -32,42 +28,28 @@ def include_page(page):
 def to_page_content(page):
     return json.dumps(page)
 
-filtered_noc_data = [page for page in noc_data if include_page(page)]
+filtered_noc_codes = [page for page in noc_codes if include_page(page)]
 
-# Processing documents from reading file to here takes 0.01 seconds
-docs = [[Document(page_content=to_page_content(page)) for page in filtered_noc_data]]
+nested_docs = [[Document(page_content=to_page_content(page)) for page in filtered_noc_codes]]
 
 # Sources
 # https://www.youtube.com/watch?v=jENqvjpkwmw
 
 model_local = ChatOllama(model="mistral")
 
-# 1. Split data into chucks
-
-flattened_docs = [item for sublist in docs for item in sublist]
-# print(flattened_docs)
+flattened_docs = [doc for sublist in nested_docs for doc in sublist]
 print('total documents included = ', len(flattened_docs))
 
 # TODO don't build the vectors each time, store in a vector database, this needs to be persisted, maybe local redis
 
-ts = time.time()
-
-# 2. Convert documents to Embeddings and store them, this takes about 30 seconds
-# vectorstore = Chroma.from_documents(
-    # documents=flattened_docs,
-    # collection_name="rag-chroma",
-    # embedding=embeddings.ollama.OllamaEmbeddings(model='nomic-embed-text'),
-    # persist_directory="./chroma_db"
-# )
-
-def vectors_from_disk():
+def load_embeddings():
     return Chroma(
         collection_name="rag-chroma",
         embedding_function=embeddings.ollama.OllamaEmbeddings(model='nomic-embed-text'),
         persist_directory="./chroma_db"
     )
 
-def compute_vectors():
+def compute_embeddings():
     return Chroma.from_documents(
         documents=flattened_docs,
         collection_name="rag-chroma",
@@ -75,31 +57,15 @@ def compute_vectors():
         persist_directory="./chroma_db"
     )
 
-def get_vectors():
+def load_or_compute_embeddings():
     if os.path.isfile("./chroma_db/chroma.sqlite3"):
-        return vectors_from_disk()
-    return compute_vectors()
+        return load_embeddings()
+    return compute_embeddings()
 
-vectorstore = get_vectors()
+embeddings = load_or_compute_embeddings()
 
+retriever = embeddings.as_retriever()
 
-
-ts1 = time.time()
-
-print("vector store takes " + str(ts1 - ts) + " seconds")
-
-retriever = vectorstore.as_retriever()
-
-# 3. Before RAG
-if False:
-    print("Before RAG\n")
-    before_rag_template = "What is {topic}"
-    before_rag_prompt = ChatPromptTemplate.from_template(before_rag_template)
-    before_rag_chain = before_rag_prompt | model_local | StrOutputParser()
-    print(before_rag_chain.invoke({"topic" : "trademark agents"}))
-
-# 4. After rAG
-print("\n###########\nAfter RAG")
 after_rag_template = """Answer the question based only on the following context:
 {context}
 Question: {question}

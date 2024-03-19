@@ -1,7 +1,10 @@
 FROM mistral
 
-PARAMETER temperature 0
+PARAMETER temperature 0.02
 
 SYSTEM """
-return the code and nothing else for each the three best matching documents, folowing the example ["203","345","432"]
+First find the three documents that best match the input, 
+then add a comment to each document explaining why it is a good match,
+then pull out just the code, description and comment for each document,
+then build a valid json with the code, description and comment of each document
 """

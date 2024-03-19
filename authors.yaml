@@ -82,3 +82,8 @@ jbeutler-openai:
   name: "Joe Beutler"
   website: "https://joebeutler.com"
   avatar: "https://avatars.githubusercontent.com/u/156261485?v=4"
+
+dylanra-openai:
+  name: "Dylan Royan Almeida"
+  website: "https://www.linkedin.com/in/dylan-almeida-604522167/"
+  avatar: "https://avatars.githubusercontent.com/u/149511600?v=4"

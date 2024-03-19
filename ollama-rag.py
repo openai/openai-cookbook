@@ -23,6 +23,8 @@ with open('data/noc.csv', newline='') as csvfile:
     ]
 
 
+print('Read the noc codes doc in ' + str(time.time() - t1) + ' seconds')
+
 # Filter out duplicate codes
 def include_code(row):
     return row['code'] not in ['11', '1', '0', '14', '12', '13', '10' ]
@@ -37,6 +39,8 @@ documents = [Document(
         metadata={'code': code['code']}
     ) for code in filtered_noc_codes]
 print('total documents included = ', len(documents))
+
+print('Documents built in ' + str(time.time() - t1) + ' seconds')
 
 # Sources
 # https://www.youtube.com/watch?v=jENqvjpkwmw
@@ -67,14 +71,11 @@ def load_or_compute_embeddings():
 
 embeddings = load_or_compute_embeddings()
 
-t2 = time.time()
-print('Documents loaded in ' + str(t2 - t1) + ' seconds')
-
-t1 = time.time()
+print('Embeddings built in ' + str(time.time() - t1) + ' seconds')
 
 retriever = embeddings.as_retriever()
 
-print('H1: ' + str(time.time() - t1) + ' seconds')
+print('Retriever thing done in ' + str(time.time() - t1) + ' seconds')
 
 after_rag_template = """Answer the question based only on the following context:
 {context}
@@ -96,4 +97,8 @@ jd = read_job_description('geological_engineer')
 
 prompt = ("What are the three documents that most closely match this job description: '" + jd)
 
+print('Ready for invoking chain ' + str(time.time() - t1) + ' seconds')
+
 print(after_rag_chain.invoke(prompt))
+
+print('Done in ' + str(time.time() - t1) + ' seconds')

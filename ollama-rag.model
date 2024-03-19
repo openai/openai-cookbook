@@ -1,7 +1,7 @@
 FROM mistral
 
-PARAMETER temperature 0.1
+PARAMETER temperature 0
 
 SYSTEM """
-return the three best matching documents, in valid JSON format, including all attributes of each document.
+return the code and nothing else for each the three best matching documents, folowing the example ["203","345","432"]
 """

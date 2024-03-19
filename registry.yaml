@@ -1233,3 +1233,11 @@
     - teomusatoiu
   tags:
     - moderation
+
+- title: Synthetic data generation (Part 1)
+  path: examples/SDG1.ipynb
+  date: 2024-03-19
+  authors:
+    - dylanra-openai
+  tags:
+    - synthetic data generation

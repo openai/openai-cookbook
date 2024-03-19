@@ -303,6 +303,15 @@
   tags:
     - completions
 
+- title: Detecting insecure code
+  path: >-
+    examples/Detecting_insecure_code.ipynb
+  date: 2024-03-19
+  authors:
+    - mhbuehler
+  tags:
+    - completions
+
 - title: User and product embeddings
   path: examples/User_and_product_embeddings.ipynb
   date: 2022-03-10

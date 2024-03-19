@@ -95,7 +95,7 @@ def read_job_description(job):
 
 jd = read_job_description('nutritionist')
 
-prompt = ("What are the three documents that most closely match this job description: '" + jd)
+prompt = ("job description: '" + jd)
 
 print('Ready for invoking chain ' + str(time.time() - t1) + ' seconds')
 

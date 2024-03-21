@@ -1,7 +1,7 @@
 from langchain_community.document_loaders import WebBaseLoader
 from langchain_community.vectorstores import Chroma
-from langchain_community import embeddings
 from langchain_community.chat_models import ChatOllama
+from langchain_community.embeddings import OllamaEmbeddings
 from langchain_core.runnables import RunnablePassthrough
 from langchain_core.output_parsers import StrOutputParser
 from langchain_core.prompts import ChatPromptTemplate
@@ -53,7 +53,7 @@ model_local = ChatOllama(model="noc_master")
 def load_embeddings():
     return Chroma(
         collection_name="rag-chroma",
-        embedding_function=embeddings.ollama.OllamaEmbeddings(model='nomic-embed-text'),
+        embedding_function=OllamaEmbeddings(model='nomic-embed-text'),
         persist_directory="./chroma_db"
     )
 
@@ -61,7 +61,7 @@ def compute_embeddings():
     return Chroma.from_documents(
         documents=documents,
         collection_name="rag-chroma",
-        embedding=embeddings.ollama.OllamaEmbeddings(model='nomic-embed-text'),
+        embedding=OllamaEmbeddings(model='nomic-embed-text'),
         persist_directory="./chroma_db"
     )
 

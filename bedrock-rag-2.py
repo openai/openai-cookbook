@@ -2,12 +2,11 @@ import boto3
 import os.path
 import json
 import csv
-from langchain.embeddings import HuggingFaceEmbeddings
-from langchain.vectorstores import Chroma
-from langchain.llms import Bedrock
+from langchain_community.vectorstores import Chroma
+from langchain_community.llms import Bedrock
 from langchain.memory import ConversationBufferMemory
 from langchain.chains import ConversationalRetrievalChain
-from langchain_community import embeddings
+from langchain_community.embeddings import OllamaEmbeddings
 from langchain.docstore.document import Document
 
 def get_bedrock_client():
@@ -19,20 +18,11 @@ def get_bedrock_client():
     return bedrock_client_internal
 
 
-
-noc_codes = []
-
-with open('data/noc.csv', newline='') as csvfile:
-    noc_codes = [
-        { 'code': row['Code - NOC 2021 V1.0'], 'title': row['Class title'], 'definition': row['Class definition'] } 
-        for row in csv.DictReader(csvfile)
-    ]
-
 def load_embeddings():
     return Chroma(
         collection_name="rag-chroma",
-        embedding_function=embeddings.ollama.OllamaEmbeddings(model='nomic-embed-text'),
-        persist_directory="./chroma_db"
+        embedding_function=OllamaEmbeddings(model='nomic-embed-text'),
+        persist_directory="./chroma_db_bedrock"
     )
 
 # Filter out duplicate codes
@@ -43,6 +33,12 @@ def to_page_content(code):
     return json.dumps(code)
 
 def compute_embeddings():
+    noc_codes = []
+    with open('data/noc.csv', newline='') as csvfile:
+        noc_codes = [
+            { 'code': row['Code - NOC 2021 V1.0'], 'title': row['Class title'], 'definition': row['Class definition'] } 
+            for row in csv.DictReader(csvfile)
+        ]
     filtered_noc_codes = [code for code in noc_codes if include_code(code)]
     documents = [Document(
         page_content=to_page_content(code), 
@@ -53,8 +49,8 @@ def compute_embeddings():
     return Chroma.from_documents(
         documents=documents,
         collection_name="rag-chroma",
-        embedding=embeddings.ollama.OllamaEmbeddings(model='nomic-embed-text'),
-        persist_directory="./chroma_db"
+        embedding=OllamaEmbeddings(model='nomic-embed-text'),
+        persist_directory="./chroma_db_bedrock"
     )
 
 def load_or_compute_embeddings():
@@ -64,27 +60,27 @@ def load_or_compute_embeddings():
 
 
 
-
-def create_vector_db_chroma_index(chroma_db_path: str):
-    #replace the document path here for pdf ingestion
-    loader = PyPDFLoader(os.path.join("./", "data", "Doc2.pdf"))
-    doc = loader.load()
-    text_splitter = CharacterTextSplitter(chunk_size=2000, separator="\n")
-    chunks = text_splitter.split_documents(doc)
-    emb_model = "sentence-transformers/all-MiniLM-L6-v2"
-    embeddings = HuggingFaceEmbeddings(
-        model_name=emb_model,
-        cache_folder="./cache/"
-    )
-    db = Chroma.from_documents(chunks,
-                               embedding=embeddings,
-                               persist_directory=chroma_db_path)
-    db.persist()
-    return db
+#### not used ####
+# def create_vector_db_chroma_index(chroma_db_path: str):
+    # #replace the document path here for pdf ingestion
+    # loader = PyPDFLoader(os.path.join("./", "data", "Doc2.pdf"))
+    # doc = loader.load()
+    # text_splitter = CharacterTextSplitter(chunk_size=2000, separator="\n")
+    # chunks = text_splitter.split_documents(doc)
+    # emb_model = "sentence-transformers/all-MiniLM-L6-v2"
+    # embeddings = HuggingFaceEmbeddings(
+        # model_name=emb_model,
+        # cache_folder="./cache/"
+    # )
+    # db = Chroma.from_documents(chunks,
+                               # embedding=embeddings,
+                               # persist_directory=chroma_db_path)
+    # db.persist()
+    # return db
 
 def doit():
     bedrock_boto3_client = get_bedrock_client()
-    chroma_db = create_vector_db_chroma_index("./chroma_db")
+    chroma_db = load_or_compute_embeddings()
     retriever = chroma_db.as_retriever()
     llm = Bedrock(
         model_id="anthropic.claude-instant-v1", 

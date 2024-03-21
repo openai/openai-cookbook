@@ -9,11 +9,13 @@ boto_client = boto3.client(service_name='bedrock-runtime',
                    aws_secret_access_key=os.getenv('AWS_SECRET_ACCESS_KEY'))
 
 body = json.dumps({
-    # "prompt": "\n\nHuman: explain black holes to 8th graders\n\nAssistant:",
-    "prompt": "What are the three primary colours and three secondary colours",
+    "prompt": "\n\nHuman: explain black holes to 8th graders\n\nAssistant:",
+    "maxTokens": 300,
     "temperature": 0.1,
+    # "topP": 0.9,
 })
 
+# https://docs.aws.amazon.com/bedrock/latest/userguide/model-parameters-jurassic2.html
 modelId = 'ai21.j2-ultra-v1'
 accept = 'application/json'
 contentType = 'application/json'
@@ -22,4 +24,4 @@ response = boto_client.invoke_model(body=body, modelId=modelId, accept=accept, c
 
 response_body = json.loads(response.get('body').read())
 
-print(response_body['completions'][0]['data']['text'])
+print(response_body['completions'][0].get('data').get('text'))

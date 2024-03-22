@@ -1233,3 +1233,13 @@
     - teomusatoiu
   tags:
     - moderation
+
+
+- title: How to perform Cost Efficient NLP
+  path: examples/Cost_efficient_NLP.ipynb
+  date: 2024-03-22
+  authors:
+    - FareedKhan-dev
+  tags:
+    - nlp
+    - text analytics

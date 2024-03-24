@@ -1205,7 +1205,7 @@
   tags:
     - guardrails
 
-- title: How to combine GPT4 with vision with RAG to create a clothing matchmaker app
+- title: How to combine GPT4 with Vision with RAG to create a clothing matchmaker app
   path: examples/How_to_combine_GPT4v_with_RAG_Outfit_Assistant.ipynb
   date: 2024-02-16
   authors:
@@ -1233,3 +1233,12 @@
   tags:
     - vision
     - embeddings
+
+
+- title: How to use the moderation API
+  path: examples/How_to_use_moderation.ipynb
+  date: 2024-03-05
+  authors:
+    - teomusatoiu
+  tags:
+    - moderation

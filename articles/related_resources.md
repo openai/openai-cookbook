@@ -4,6 +4,7 @@ People are writing great tools and papers for improving outputs from GPT. Here a
 
 ## Prompting libraries & tools (in alphabetical order)
 
+- [16x Prompt](https://prompt.16x.engineer/): A paid product for augmenting prompt with source code and formatting instructions for coding tasks.
 - [Arthur Shield](https://www.arthur.ai/get-started): A paid product for detecting toxicity, hallucination, prompt injection, etc.
 - [Chainlit](https://docs.chainlit.io/overview): A Python library for making chatbot interfaces.
 - [Embedchain](https://github.com/embedchain/embedchain): A Python library for managing and syncing unstructured data with LLMs.

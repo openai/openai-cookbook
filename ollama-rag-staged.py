@@ -17,6 +17,13 @@ def read_job_description(job):
     with open('./jobdescriptions/' + job + '.txt', 'r') as file:
         return file.read()
 
+def compute_embeddings(documents):
+    return Chroma.from_documents(
+        documents=documents,
+        collection_name="rag-chroma",
+        embedding=OllamaEmbeddings(model='nomic-embed-text'),
+    )
+
 # 1 Load NOC codes, top level codes, TEER codes, JD
 
 noc_codes = []
@@ -50,45 +57,53 @@ with open('data/NOC-2021-v1.0/Top level codes.csv') as top_level_noc_file:
 # 2 Do a RAG with the top level codes to identify the top level code that matches the JD
 
 top_level_noc_code_documents = [Document(page_content=json.dumps(code)) for code in top_level_noc_codes]
-
-def compute_embeddings(documents):
-    return Chroma.from_documents(
-        documents=documents,
-        collection_name="rag-chroma",
-        embedding=OllamaEmbeddings(model='nomic-embed-text'),
-    )
-
-embeddings = compute_embeddings(top_level_noc_code_documents)
-retriever = embeddings.as_retriever()
+top_level_noc_embeddings = compute_embeddings(top_level_noc_code_documents)
+top_level_noc_retriever = top_level_noc_embeddings.as_retriever()
 after_rag_template = """Answer the question based only on the following context:
 {context}
 Question: {question}
 """
-after_rag_prompt = ChatPromptTemplate.from_template(after_rag_template)
-# model_local = ChatOllama(model="gemma")
-model_local = ChatOllama(model="mistral")
+top_level_noc_after_rag_prompt = ChatPromptTemplate.from_template(after_rag_template)
+mistral_model = ChatOllama(model="mistral")
 
-after_rag_chain = (
-    {"context": retriever, "question": RunnablePassthrough()}
-    | after_rag_prompt
-    | model_local
+top_level_noc_after_rag_chain = (
+    {"context": top_level_noc_retriever, "question": RunnablePassthrough()}
+    | top_level_noc_after_rag_prompt
+    | mistral_model
     | StrOutputParser()
 )
 
 job_description = read_job_description('nutritionist')
-# TODO try with the 2 or three closest matches
-prompt = ("First pick up to three documents that match the given job description, " +
+top_level_noc_prompt = ("First pick up to three documents that match the given job description, " +
           "then return just the noc_code from each of those documents, " +
-          # "then build a valid json with the NOC Code in a field with name 'noc_code', " +
           "this is the job description: '" + job_description + "'")
 if False:
-    result = after_rag_chain.invoke(prompt)
+    result = top_level_noc_after_rag_chain.invoke(top_level_noc_prompt)
     print(json.dumps(result))
     exit()
 
 # 3 Do a RAG with the TEER codes to identify the TEER code that matches the JD
 
+print(json.dumps(teer_codes))
 
+teer_documents = [Document(page_content=json.dumps(doc)) for doc in teer_codes]
+teer_embeddings = compute_embeddings(teer_documents)
+teer_retriever = teer_embeddings.as_retriever()
+teer_prompt = ChatPromptTemplate.from_template(after_rag_template)
+teer_rag_chain = (
+    {"context": teer_retriever, "question": RunnablePassthrough()}
+    | teer_prompt
+    | mistral_model
+    | StrOutputParser()
+)
+teer_prompt = ("First pick up to three documents that match the given job description, " +
+               "this is the job description: " + job_description + "")
+
+if True:
+    result = teer_rag_chain.invoke(teer_prompt)
+    print(json.dumps(result))
+    exit()
+    
 
 # 4 Select the NOC codes that match the top level code and TEER code
 
@@ -126,7 +141,7 @@ print('Documents built in ' + str(time.time() - t1) + ' seconds')
 # https://www.youtube.com/watch?v=jENqvjpkwmw
 
 # try out different models
-model_local = ChatOllama(model="noc_master")
+mistral_model = ChatOllama(model="noc_master")
 
 # TODO don't build the vectors each time, store in a vector database, this needs to be persisted, maybe local redis
 
@@ -149,11 +164,11 @@ def load_or_compute_embeddings():
     embeddings_exist = os.path.isfile("./chroma_db/chroma.sqlite3")
     return load_embeddings() if embeddings_exist else compute_embeddings()
 
-embeddings = load_or_compute_embeddings()
+top_level_noc_embeddings = load_or_compute_embeddings()
 
 print('Embeddings built in ' + str(time.time() - t1) + ' seconds')
 
-retriever = embeddings.as_retriever()
+top_level_noc_retriever = top_level_noc_embeddings.as_retriever()
 
 print('Retriever thing done in ' + str(time.time() - t1) + ' seconds')
 
@@ -161,11 +176,11 @@ after_rag_template = """Answer the question based only on the following context:
 {context}
 Question: {question}
 """
-after_rag_prompt = ChatPromptTemplate.from_template(after_rag_template)
-after_rag_chain = (
-    {"context": retriever, "question": RunnablePassthrough()}
-    | after_rag_prompt
-    | model_local
+top_level_noc_after_rag_prompt = ChatPromptTemplate.from_template(after_rag_template)
+top_level_noc_after_rag_chain = (
+    {"context": top_level_noc_retriever, "question": RunnablePassthrough()}
+    | top_level_noc_after_rag_prompt
+    | mistral_model
     | StrOutputParser()
 )
 
@@ -175,10 +190,10 @@ def read_job_description(job):
 
 job_description = read_job_description('nutritionist')
 
-prompt = ("job description: '" + job_description)
+top_level_noc_prompt = ("job description: '" + job_description)
 
 print('Ready for invoking chain ' + str(time.time() - t1) + ' seconds')
 
-print(json.dumps(after_rag_chain.invoke(prompt)))
+print(json.dumps(top_level_noc_after_rag_chain.invoke(top_level_noc_prompt)))
 
 print('Done in ' + str(time.time() - t1) + ' seconds')

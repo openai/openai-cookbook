@@ -51,15 +51,14 @@ with open('data/NOC-2021-v1.0/Top level codes.csv') as top_level_noc_file:
 
 top_level_noc_code_documents = [Document(page_content=json.dumps(code)) for code in top_level_noc_codes]
 
-
-def compute_embeddings():
+def compute_embeddings(documents):
     return Chroma.from_documents(
-        documents=top_level_noc_code_documents,
+        documents=documents,
         collection_name="rag-chroma",
         embedding=OllamaEmbeddings(model='nomic-embed-text'),
     )
 
-embeddings = compute_embeddings()
+embeddings = compute_embeddings(top_level_noc_code_documents)
 retriever = embeddings.as_retriever()
 after_rag_template = """Answer the question based only on the following context:
 {context}
@@ -82,13 +81,15 @@ prompt = ("First pick up to three documents that match the given job description
           "then return just the noc_code from each of those documents, " +
           # "then build a valid json with the NOC Code in a field with name 'noc_code', " +
           "this is the job description: '" + job_description + "'")
-result = after_rag_chain.invoke(prompt)
-
-print(json.dumps(result))
-
-exit()
+if False:
+    result = after_rag_chain.invoke(prompt)
+    print(json.dumps(result))
+    exit()
 
 # 3 Do a RAG with the TEER codes to identify the TEER code that matches the JD
+
+
+
 # 4 Select the NOC codes that match the top level code and TEER code
 
 

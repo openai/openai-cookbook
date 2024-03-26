@@ -11,7 +11,7 @@ import json
 import time
 import os.path
 
-# langchain UI tool
+# TOTO convert to Javascript https://ollama.com/blog/python-javascript-libraries
 
 t1 = time.time()
 noc_codes = []
@@ -99,6 +99,6 @@ prompt = ("job description: '" + jd)
 
 print('Ready for invoking chain ' + str(time.time() - t1) + ' seconds')
 
-print(after_rag_chain.invoke(prompt))
+print(json.dumps(after_rag_chain.invoke(prompt)))
 
 print('Done in ' + str(time.time() - t1) + ' seconds')

@@ -9,7 +9,6 @@ from langchain.docstore.document import Document
 import csv
 import json
 import time
-import os.path
 
 # 0 Utility functions
 def read_job_description(job):
@@ -31,7 +30,18 @@ def get_single_digit(prompt):
         else:
             print("Invalid input. Please enter a single digit.")
 
-# 1 Load NOC codes, top level codes, TEER codes, JD
+# Load the three models
+
+# Commands to create the models
+# ollama create ollama-rag-staged-top-level-noc -f ollama-rag-staged-top-level-noc.model
+# ollama create ollama-rag-staged-teer          -f ollama-rag-staged-teer.model
+# ollama create ollama-rag-staged-noc           -f ollama-rag-staged-noc.model
+
+ollama_rag_staged_top_level_noc_model = ChatOllama(model="ollama-rag-staged-top-level-noc")
+mollama_rag_staged_teer_model = ChatOllama(model="ollama-rag-staged-teer")
+ollama_rag_staged_noc_model = ChatOllama(model="ollama-rag-staged-noc")
+
+# 1 Load NOC codes, top level codes, TEER codes
 noc_codes = []
 with open('data/NOC-2021-v1.0/NOCs without TEER.csv') as noc_file:
     noc_codes = [
@@ -69,22 +79,21 @@ after_rag_template = """Answer the question based only on the following context:
 Question: {question}
 """
 top_level_noc_after_rag_prompt = ChatPromptTemplate.from_template(after_rag_template)
-mistral_model = ChatOllama(model="mistral")
 
 top_level_noc_after_rag_chain = (
     {"context": top_level_noc_retriever, "question": RunnablePassthrough()}
     | top_level_noc_after_rag_prompt
-    | mistral_model
+    | ollama_rag_staged_top_level_noc_model
     | StrOutputParser()
 )
 
-job_description = read_job_description('nutritionist')
-top_level_noc_prompt = ("First pick up to three documents that match the given job description, " +
-          "then return just the noc_code from each of those documents, " +
-          "this is the job description: '" + job_description + "'")
-if True:
-    result = top_level_noc_after_rag_chain.invoke(top_level_noc_prompt)
+job_description = read_job_description('administrative_assistant_film_industry')
+top_level_noc_prompt = ("This is the job description: '" + job_description + "'")
+if False:
+    prompt = ("job description: '" + job_description)
+    result = top_level_noc_after_rag_chain.invoke(prompt)
     print(json.dumps(result))
+    exit(0)
 
 user_top_level_noc_code = get_single_digit("Enter the top level NOC Code: ")
 
@@ -97,14 +106,14 @@ teer_prompt = ChatPromptTemplate.from_template(after_rag_template)
 teer_rag_chain = (
     {"context": teer_retriever, "question": RunnablePassthrough()}
     | teer_prompt
-    | mistral_model
+    | mollama_rag_staged_teer_model
     | StrOutputParser()
 )
-teer_prompt = ("First pick one document that matches the given job description, " +
-               "this is the job description: '" + job_description + "'")
+teer_prompt = ("This is the job description: '" + job_description + "'")
 
 if True:
-    result = teer_rag_chain.invoke(teer_prompt)
+    prompt = ("job description: '" + job_description)
+    result = teer_rag_chain.invoke(prompt)
     print(json.dumps(result))
 
 user_teer_code = get_single_digit("Enter the TEER code: ")
@@ -112,7 +121,10 @@ user_teer_code = get_single_digit("Enter the TEER code: ")
 # 4 Select the NOC codes that match the top level code and TEER code
 noc_prefix = str(user_top_level_noc_code) + str(user_teer_code)
 filtered_noc_codes = [code for code in noc_codes if code['noc_code'].startswith(noc_prefix)]
-filtered_noc_codes = noc_codes
+
+if True:
+    # don't filter out the top level codes
+    filtered_noc_codes = noc_codes
 
 def include_code(row):
     return row['noc_code'] not in ['11', '1', '0', '14', '12', '13', '10' ]
@@ -128,14 +140,15 @@ noc_prompt = ChatPromptTemplate.from_template(after_rag_template)
 noc_rag_chain = (
     {"context": noc_retriever, "question": RunnablePassthrough()}
     | noc_prompt
-    | mistral_model
+    | ollama_rag_staged_noc_model
     | StrOutputParser()
 )
 noc_prompt = ("First pick one document that matches the given job description, " +
                 "this is the job description: '" + job_description + "'")
 
 if True:
-    result = noc_rag_chain.invoke(noc_prompt)
+    prompt = ("job description: '" + job_description)
+    result = noc_rag_chain.invoke(prompt)
     print(json.dumps(result))
 
 exit()

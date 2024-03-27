@@ -137,3 +137,6 @@ dmypy.json
 *.DS_Store
 tmp_*
 examples/fine-tuned_qa/local_cache/*
+
+# PyCharm files
+.idea/

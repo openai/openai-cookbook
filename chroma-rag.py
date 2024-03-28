@@ -7,7 +7,7 @@ from chromadb.utils import embedding_functions
 
 CHROMA_DATA_PATH = "./data/chroma.db/"
 EMBED_MODEL = "all-MiniLM-L6-v2"
-COLLECTION_NAME = "demo_docs"
+COLLECTION_NAME = "noc_data"
 
 def read_noc_data():
     filename = 'data/NOC-2021-v1.0/NOCs without TEER.csv'
@@ -20,6 +20,9 @@ def read_noc_data():
             } for row in csv.DictReader(noc_file)
         ]
 
+def read_job_description(job):
+    with open("./data/jobdescriptions/" + job + ".txt") as file:
+        return file.read()
 
 db_exists = os.path.exists(CHROMA_DATA_PATH)
 
@@ -37,17 +40,25 @@ if not db_exists:
     valid_noc_codes = [code for code in all_noc_codes 
                         if code['noc_code'] not in ['11', '1', '0', '14', '12', '13', '10']]
 
+    print('loading a total of ' + str(len(valid_noc_codes)) + ' documents')
+
     documents = ['NOC Code ' + code['noc_code'] + ': ' + code['title'] + ': ' + code['definition'] for code in valid_noc_codes]
     ids = [code['noc_code'] for code in valid_noc_codes]
-    metadatas = [{'title': code['title'], 'code': code['noc_code']} for code in valid_noc_codes]
+    metadatas = [{
+        'title': code['title'], 
+        'code': code['noc_code'],
+        'top_level_code': code['noc_code'][0],
+        'teer_code': code['noc_code'][1] if len(code['noc_code']) >= 2 else 'n/a',
+        } for code in valid_noc_codes]
 
-    print('loading a total of ' + str(len(documents)) + ' documents')
     cosine_collection.add(documents=documents, ids=ids, metadatas=metadatas)
 
-query_results = cosine_collection.query( query_texts=["I need new tires on my pick up truck"], n_results=5,)
+job_description = read_job_description('nutritionist')
+query_results = cosine_collection.query( query_texts=[job_description], n_results=3)
 
 print(query_results.keys())
 print(query_results["documents"])
 print(query_results["ids"])
+# distances can be used to help rank the results and distinguish really close from not so close results
 print(query_results["distances"])
 print(query_results["metadatas"])

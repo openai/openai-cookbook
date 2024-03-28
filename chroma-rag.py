@@ -23,12 +23,12 @@ def read_noc_data():
 
 db_exists = os.path.exists(CHROMA_DATA_PATH)
 
-client = chromadb.PersistentClient(path=CHROMA_DATA_PATH)
-embedding_func = embedding_functions.SentenceTransformerEmbeddingFunction(model_name=EMBED_MODEL)
+persistent_client = chromadb.PersistentClient(path=CHROMA_DATA_PATH)
+sentence_transformer_embedding_func = embedding_functions.SentenceTransformerEmbeddingFunction(model_name=EMBED_MODEL)
 
-cosine_collection = client.get_or_create_collection(
+cosine_collection = persistent_client.get_or_create_collection(
     name=COLLECTION_NAME,
-    embedding_function=embedding_func,
+    embedding_function=sentence_transformer_embedding_func,
     metadata={"hnsw:space": "cosine"},
 )
 
@@ -42,22 +42,12 @@ if not db_exists:
     metadatas = [{'title': code['title'], 'code': code['noc_code']} for code in valid_noc_codes]
 
     print('loading a total of ' + str(len(documents)) + ' documents')
-
     cosine_collection.add(documents=documents, ids=ids, metadatas=metadatas)
 
 query_results = cosine_collection.query( query_texts=["I need new tires on my pick up truck"], n_results=5,)
 
-query_results.keys()
-
-
+print(query_results.keys())
 print(query_results["documents"])
-
-
 print(query_results["ids"])
-
-
 print(query_results["distances"])
-
-
 print(query_results["metadatas"])
-

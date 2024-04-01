@@ -1242,3 +1242,12 @@
     - teomusatoiu
   tags:
     - moderation
+
+
+- title: Summarizing with controllable detail
+  path: examples/Summarizing_with_controllable_detail.ipynb
+  date: 2024-04-01
+  authors:
+    - joe-at-openai
+  tags:
+    - chat

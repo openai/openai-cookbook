@@ -9,15 +9,16 @@ load_dotenv()
 ZILLIZ_ENDPOINT = os.getenv('ZILLIZ_ENDPOINT')
 ZILLIZ_API_KEY = os.getenv('ZILLIZ_API_KEY')
 COLLECTION_NAME = 'noc_data_cosine_all_MiniLM_L6_v2_with_384_dimensions'
+EMBED_MODEL = "all-MiniLM-L6-v2"
+JOB_DESCRIPTION_FOLDER = "./data/jobdescriptions/"
 
 def read_job_description(job):
-    with open("./data/jobdescriptions/" + job + ".txt") as file:
+    with open(JOB_DESCRIPTION_FOLDER + job + ".txt") as file:
         return file.read()
 
-EMBED_MODEL = "all-MiniLM-L6-v2"
-embedding_func = embedding_functions.SentenceTransformerEmbeddingFunction(model_name=EMBED_MODEL)
-
 job_description = read_job_description(sys.argv[1])
+
+embedding_func = embedding_functions.SentenceTransformerEmbeddingFunction(model_name=EMBED_MODEL)
 
 job_description_vector = embedding_func(input=[job_description])[0]
 
@@ -37,4 +38,8 @@ headers = {
 
 response = requests.post(url, data=data, headers=headers)
 
-print(response.json())
+result = response.json()['data']
+
+print('xxxxxxxxxxxxx')
+print(json.dumps(result[0:10], indent=4, sort_keys=True))
+print('xxxxxxxxxxxxx')

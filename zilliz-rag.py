@@ -1,4 +1,6 @@
 import os
+import time
+import random
 from dotenv import load_dotenv
 from pymilvus import MilvusClient, FieldSchema, CollectionSchema, DataType, Collection, utility
 
@@ -8,13 +10,17 @@ ZILLIZ_ENDPOINT = os.getenv('ZILLIZ_ENDPOINT')
 ZILLIZ_USER = os.getenv('ZILLIZ_USER')
 ZILLIZ_PASSWORD = os.getenv('ZILLIZ_PASSWORD')
 COLLECTION_NAME = 'test_collection'
+DIM = 768
 
 client = MilvusClient(uri=ZILLIZ_ENDPOINT, token=ZILLIZ_USER+':'+ZILLIZ_PASSWORD)
+
+#if utility.has_collection(COLLECTION_NAME):
+#    utility.drop_collection(COLLECTION_NAME)
 
 fields = [
     FieldSchema(name="id", dtype=DataType.INT64, is_primary=True),
     FieldSchema(name="title", dtype=DataType.VARCHAR, max_length=512),   
-    FieldSchema(name="title_vector", dtype=DataType.FLOAT_VECTOR, dim=768),
+    FieldSchema(name="title_vector", dtype=DataType.FLOAT_VECTOR, dim=DIM),
     FieldSchema(name="link", dtype=DataType.VARCHAR, max_length=512),
     FieldSchema(name="reading_time", dtype=DataType.INT64),
     FieldSchema(name="publication", dtype=DataType.VARCHAR, max_length=512),
@@ -28,45 +34,62 @@ schema = CollectionSchema(
     enable_dynamic_field=False
 )
 
+client.create_collection(collection_name=COLLECTION_NAME, dimension=5, schema=schema)
 
-collection = Collection(
-    name=COLLECTION_NAME, 
-    description="Medium articles published between Jan and August in 2020 in prominent publications",
-    schema=schema
-)
+# collection = client.get_collection(COLLECTION_NAME)
+
+# collection = Collection( name=COLLECTION_NAME, description="this is my collection", schema=schema, dimemsion=5)
 
 index_params = {
-    "index_type": "AUTOINDEX",
-    "metric_type": "L2",
-    "params": {}
+    # Always set this to AUTOINDEX
+    "index_type": "AUTOINDEX", 
+    # This is the only parameter you should think about.
+    "metric_type": "COSINE",
+    # Leave this empty for AUTOINDEX to work 
+    "params": {"a": 16384, 'b': 64}
 }
 
-collection.create_index(
+client.create_index(
+    collection_name=COLLECTION_NAME,
     field_name="title_vector", 
-    index_params=index_params,
-    index_name='title_vector_index' # Optional
+    index_params=[index_params],
+    # index_name='title_vector_index' # Optional
 )
 
-collection.load()
+def create_random_vector(n):
+    vector = [random.random() for _ in range(n)]
+    return vector
 
-progress = utility.loading_progress(COLLECTION_NAME)
+res = client.insert(
+    collection_name=COLLECTION_NAME, 
+    data=[{
+        'id': 1234, 
+        'title': 'this is the title',
+        'title_vector': create_random_vector(DIM), 
+        'link': 'the link', 
+        'reading_time': 5, 
+        'publication': 'the publication', 
+        'claps': 10, 
+        'responses': 5
+    },
+    {
+        'id': 1235,
+        'title': 'this is the second title',
+        'title_vector': create_random_vector(DIM),
+        'link': 'the other link',
+        'reading_time': 6,
+        'publication': 'the next publication',
+        'claps': 12,
+        'responses': 6
+    }
+])
 
-res = collection.insert([{
-    'id': 1234, 
-    'title': 'this is the title',
-    'title_vector': [], 
-    'link': 'the link', 
-    'reading_time': 5, 
-    'publication': 'the publication', 
-    'claps': 10, 
-    'responses': 5
-}])
+print(res)
 
-print(res.insert_count)
+# client.flush()
+# client.release()
 
-collection.flush()
-collection.release()
-
+time.sleep(10)
 exit()
 
 # client.create_collection(collection_name=COLLECTION_NAME, dimension=5, schema=schema)
@@ -74,7 +97,9 @@ exit()
 
 # client.create_index(field_name="title_vector", index_params=index_params, index_name='title_vector_index')
 
-res = client.insert(collection_name=COLLECTION_NAME, data={ 'id': 1234, 'title': 'the title', 'link': 'the link'})
+res = client.insert(
+    collection_name=COLLECTION_NAME, 
+    data={ 'id': 1234, 'title': 'the title', 'link': 'the link'})
 
 print('result from insert')
 print(res)

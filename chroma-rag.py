@@ -60,6 +60,9 @@ cosine_collection = persistent_client.get_or_create_collection(
     metadata={"hnsw:space": "cosine"},
 )
 
+print('sentence_transformer_embedding_func: ')
+print(sentence_transformer_embedding_func(input="hello world"))
+
 if not db_exists:
     all_noc_codes = read_noc_data()
     # Remove weird NOC codes that have duplicate ids
@@ -81,12 +84,18 @@ if not db_exists:
 
 # Find NOC codes closely related to the job description
 
-job_description = read_job_description('nutritionist')
-query_results = cosine_collection.query(query_texts=[job_description], n_results=5)
+job_description1 = read_job_description('nutritionist')
+job_description2 = read_job_description('geological_engineer')
+query_results = cosine_collection.query(query_texts=[job_description1, job_description2], n_results=5)
 
+print('keys:')
 print(query_results.keys())
+print('documents:')
 print(query_results["documents"])
+print('ids:')
 print(query_results["ids"])
 # distances can be used to help rank the results and distinguish really close from not so close results
+print('distances:')
 print(query_results["distances"])
+print('metadatas:')
 print(query_results["metadatas"])

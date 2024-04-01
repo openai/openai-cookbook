@@ -8,7 +8,7 @@ def generate_random_values(n):
 
 # longest title is 141, round up to 256
 # longest definition is 1658, round up to 2048
-# vector dimension is 384
+# vector dimension is 384 for all-MiniLM-L6-v2 and 768 for multi-qa-mpnet-base-dot-v1
 
 key = 0
 def next_key():
@@ -16,7 +16,8 @@ def next_key():
     key += 1
     return key
 
-EMBED_MODEL = "all-MiniLM-L6-v2"
+# EMBED_MODEL = "all-MiniLM-L6-v2"
+EMBED_MODEL = "multi-qa-mpnet-base-dot-v1"
 embedding_func = embedding_functions.SentenceTransformerEmbeddingFunction(model_name=EMBED_MODEL)
 
 def compute_embedding(row):
@@ -43,3 +44,5 @@ valid_noc_codes = [code for code in noc_codes
 
 with open('noc_data.json', 'w') as json_file:
     json.dump(valid_noc_codes, json_file, indent=4)
+
+print('embedding vector length is ' + str(len(valid_noc_codes[0]['vector'])))

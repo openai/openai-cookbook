@@ -36,7 +36,7 @@ embedding_func = embedding_functions.SentenceTransformerEmbeddingFunction(model_
 
 job_description_vector = embedding_func(input=[job_description])[0]
 
-url = ZILLIZ_ENDPOINT + '/v1/vector/search'
+url = f'{ZILLIZ_ENDPOINT}/v1/vector/search'
 
 data = json.dumps({
     'collectionName': collection_name,
@@ -55,4 +55,4 @@ response = requests.post(url, data=data, headers=headers)
 
 result = response.json()['data']
 
-print(json.dumps(result[0:10], indent=4, sort_keys=True))
+print(json.dumps(result, indent=4, sort_keys=True))

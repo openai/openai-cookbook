@@ -17,7 +17,7 @@ embedding = embedding_func(input=[job_description])[0]
 with open("embedding.json", "w") as file:
     file.write(json.dumps(embedding, indent=4))
 
-
 print(json.dumps(embedding, indent=4))
 
 pyperclip.copy(json.dumps(embedding, indent=4))
+print("Embedding copied to clipboard")

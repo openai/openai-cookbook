@@ -20,7 +20,7 @@ EMBED_MODEL = "all-MiniLM-L6-v2"
 embedding_func = embedding_functions.SentenceTransformerEmbeddingFunction(model_name=EMBED_MODEL)
 
 def compute_embedding(row):
-    text = row['Code - NOC 2021 V1.0 as number'] + ': ' + row['Class title'] + ': ' + row['Class definition']
+    text = row['Class title'] + ': ' + row['Class definition']
     return embedding_func(input=[text])[0]
 
 def read_noc_data():
@@ -43,13 +43,3 @@ valid_noc_codes = [code for code in noc_codes
 
 with open('noc_data.json', 'w') as json_file:
     json.dump(valid_noc_codes, json_file, indent=4)
-
-def read_job_description(job):
-    with open("./data/jobdescriptions/" + job + ".txt") as file:
-        return file.read()
-
-job_description1 = read_job_description('nutritionist')
-job_description2 = read_job_description('geological_engineer')
-
-job_description_embedding = embedding_func(input=[job_description1])[0]
-print(json.dumps(job_description_embedding, indent=4))

@@ -41,7 +41,8 @@ url = ZILLIZ_ENDPOINT + '/v1/vector/search'
 data = json.dumps({
     'collectionName': collection_name,
     'vector': job_description_vector,
-    'outputFields': ['noc_code', 'title', 'definition']
+    'outputFields': ['noc_code', 'title', 'definition'],
+    'limit': 10
 })
 
 headers = {
@@ -54,6 +55,4 @@ response = requests.post(url, data=data, headers=headers)
 
 result = response.json()['data']
 
-print('xxxxxxxxxxxxx')
 print(json.dumps(result[0:10], indent=4, sort_keys=True))
-print('xxxxxxxxxxxxx')

@@ -1,6 +1,6 @@
 import os
 from dotenv import load_dotenv
-from pymilvus import MilvusClient, FieldSchema, CollectionSchema, DataType, Collection
+from pymilvus import MilvusClient, FieldSchema, CollectionSchema, DataType, Collection, utility
 
 
 load_dotenv()
@@ -11,15 +11,28 @@ COLLECTION_NAME = 'test_collection'
 
 client = MilvusClient(uri=ZILLIZ_ENDPOINT, token=ZILLIZ_USER+':'+ZILLIZ_PASSWORD)
 
+fields = [
+    FieldSchema(name="id", dtype=DataType.INT64, is_primary=True),
+    FieldSchema(name="title", dtype=DataType.VARCHAR, max_length=512),   
+    FieldSchema(name="title_vector", dtype=DataType.FLOAT_VECTOR, dim=768),
+    FieldSchema(name="link", dtype=DataType.VARCHAR, max_length=512),
+    FieldSchema(name="reading_time", dtype=DataType.INT64),
+    FieldSchema(name="publication", dtype=DataType.VARCHAR, max_length=512),
+    FieldSchema(name="claps", dtype=DataType.INT64),
+    FieldSchema(name="responses", dtype=DataType.INT64)
+]
+
 schema = CollectionSchema(
-    fields=[
-        FieldSchema(name='id', dtype=DataType.INT64, is_primary=True),
-        FieldSchema(name='title', dtype=DataType.VARCHAR, max_length=512),
-        FieldSchema(name='link', dtype=DataType.VARCHAR, max_length=512),
-    ],
-    description="A series of articles from medium.com",
-    auto_id=False,
-    enable_dynamic_field=True
+    fields=fields,
+    description="Schema of Medium articles",
+    enable_dynamic_field=False
+)
+
+
+collection = Collection(
+    name=COLLECTION_NAME, 
+    description="Medium articles published between Jan and August in 2020 in prominent publications",
+    schema=schema
 )
 
 index_params = {
@@ -28,7 +41,35 @@ index_params = {
     "params": {}
 }
 
-client.create_collection(collection_name=COLLECTION_NAME, dimension=5, schema=schema)
+collection.create_index(
+    field_name="title_vector", 
+    index_params=index_params,
+    index_name='title_vector_index' # Optional
+)
+
+collection.load()
+
+progress = utility.loading_progress(COLLECTION_NAME)
+
+res = collection.insert([{
+    'id': 1234, 
+    'title': 'this is the title',
+    'title_vector': [], 
+    'link': 'the link', 
+    'reading_time': 5, 
+    'publication': 'the publication', 
+    'claps': 10, 
+    'responses': 5
+}])
+
+print(res.insert_count)
+
+collection.flush()
+collection.release()
+
+exit()
+
+# client.create_collection(collection_name=COLLECTION_NAME, dimension=5, schema=schema)
 
 
 # client.create_index(field_name="title_vector", index_params=index_params, index_name='title_vector_index')

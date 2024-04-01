@@ -1,12 +1,14 @@
 import csv
 import json
 import random
+from chromadb.utils import embedding_functions
 
 def generate_random_values(n):
     return [random.uniform(-1, 1) for _ in range(n)]
 
 # longest title is 141, round up to 256
 # longest definition is 1658, round up to 2048
+# vector dimension is 384
 
 key = 0
 def next_key():
@@ -14,6 +16,13 @@ def next_key():
     key += 1
     return key
 
+EMBED_MODEL = "all-MiniLM-L6-v2"
+sentence_transformer_embedding_func = embedding_functions.SentenceTransformerEmbeddingFunction(model_name=EMBED_MODEL)
+vector = sentence_transformer_embedding_func(input=["hello world", "hi planet", "cabbage"])
+
+def compute_embedding(row):
+    text = row['Code - NOC 2021 V1.0 as number'] + ': ' + row['Class title'] + ': ' + row['Class definition']
+    return sentence_transformer_embedding_func(input=[text])[0]
 
 def read_noc_data():
     filename = 'data/NOC-2021-v1.0/NOCs without TEER.csv'
@@ -24,7 +33,7 @@ def read_noc_data():
                 'noc_code': int(row['Code - NOC 2021 V1.0 as number']),
                 'title': row['Class title'],
                 'definition': row['Class definition'],
-                'vector': generate_random_values(128)
+                'vector': compute_embedding(row)
             } for row in csv.DictReader(noc_file)
         ]
 
@@ -36,8 +45,3 @@ valid_noc_codes = [code for code in noc_codes
 with open('noc_data.json', 'w') as json_file:
     json.dump(valid_noc_codes, json_file, indent=4)
 
-l = max(len(code['title']) for code in noc_codes)
-print("Length of the longest title:", l)
-
-l = max(len(code['definition']) for code in noc_codes)
-print("Length of the longest definition:", l)

@@ -1,29 +1,63 @@
 const { DefaultEmbeddingFunction } = require('chromadb');
-const json = require('json');
 const fs = require('fs');
+const dotenv = require('dotenv');
 
+dotenv.config();
+const ZILLIZ_ENDPOINT = process.env.ZILLIZ_ENDPOINT;
+const ZILLIZ_API_KEY = process.env.ZILLIZ_API_KEY;
 const JOB_DESCRIPTION_FOLDER = './data/jobdescriptions/';
 
 function readJobDescription(job) {
     return fs.readFileSync(JOB_DESCRIPTION_FOLDER + job + '.txt', 'utf8');
 }
 
-const job_description = readJobDescription(process.argv[2]);
-
-async function doIt() {
-    console.log('hello0');
-    const embedder = new DefaultEmbeddingFunction('all-MiniLM-L6-v2');
-    console.log('hello1');
-    return embedder.generate([job_description]).then((result) => {
-        console.log('hello2');
-        console.log(result);
-        console.log('hello3');
-        return result;
-    });
+function validateModelArgument(arg) {
+    if (!['all-MiniLM-L6-v2', 'multi-qa-mpnet-base-dot-v1'].includes(arg)) {
+        console.log(
+            'Invalid model argument. Use either "all-MiniLM-L6-v2" or "multi-qa-mpnet-base-dot-v1"'
+        );
+        process.exit(1);
+    }
+    return arg;
 }
 
-doIt().then((result) => {
-    console.log('hello4');
-    console.log(json.stringify(result));
-    console.log('hello5');
+function getCollectionForModel(model) {
+    if (model === 'all-MiniLM-L6-v2') {
+        return 'noc_data_cosine_all_MiniLM_L6_v2_with_384_dimensions';
+    } else if (model === 'multi-qa-mpnet-base-dot-v1') {
+        return 'noc_data_cosine_multi_qa_mpnet_base_dot_v1_with_768_dimensions';
+    }
+}
+
+const job_description = readJobDescription(process.argv[2]);
+const model_name = validateModelArgument(process.argv[3]);
+const collectionName = getCollectionForModel(model_name);
+
+async function main() {
+    const embedder = new DefaultEmbeddingFunction(model_name);
+    return embedder.generate([job_description]).
+        then((embedding) => {
+            const url = `${ZILLIZ_ENDPOINT}/v1/vector/search`;
+            const headers = {
+                Authorization: `Bearer ${ZILLIZ_API_KEY}`,
+                Accept: 'application/json',
+                'Content-Type': 'application/json',
+            };
+            const body = JSON.stringify({
+                collectionName: collectionName,
+                vector: embedding[0],
+                outputFields: ['noc_code', 'title', 'definition'],
+                limit: 10,
+            });
+            return fetch(url, {
+                method: 'POST',
+                headers: headers,
+                body: body,
+            }).
+            then((response) => response.json());
+        });
+}
+
+main().then((result) => {
+    console.log(result);
 });

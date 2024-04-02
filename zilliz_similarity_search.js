@@ -1,7 +1,6 @@
-const fetch = require('node-fetch');
+const { DefaultEmbeddingFunction } = require('chromadb');
 const fs = require('fs');
 const dotenv = require('dotenv');
-const { exit } = require('process');
 
 dotenv.config();
 const ZILLIZ_ENDPOINT = process.env.ZILLIZ_ENDPOINT;
@@ -12,7 +11,7 @@ function readJobDescription(job) {
     return fs.readFileSync(JOB_DESCRIPTION_FOLDER + job + '.txt', 'utf8');
 }
 
-function validateModelArg(arg) {
+function validateModelArgument(arg) {
     if (!['all-MiniLM-L6-v2', 'multi-qa-mpnet-base-dot-v1'].includes(arg)) {
         console.log(
             'Invalid model argument. Use either "all-MiniLM-L6-v2" or "multi-qa-mpnet-base-dot-v1"'
@@ -22,7 +21,7 @@ function validateModelArg(arg) {
     return arg;
 }
 
-function getCollection(model) {
+function getCollectionForModel(model) {
     if (model === 'all-MiniLM-L6-v2') {
         return 'noc_data_cosine_all_MiniLM_L6_v2_with_384_dimensions';
     } else if (model === 'multi-qa-mpnet-base-dot-v1') {
@@ -30,55 +29,40 @@ function getCollection(model) {
     }
 }
 
-const job_description = readJobDescription(process.argv[2]);
+const jobDescription = readJobDescription(process.argv[2]);
+const modelName = validateModelArgument(process.argv[3]);
+const collectionName = getCollectionForModel(modelName);
 
-const model_name = validateModelArg(process.argv[3]);
-
-const collection_name = getCollection(model_name);
-
-const url = `${ZILLIZ_ENDPOINT}/v1/vector/search`;
+console.log('collectionName:', collectionName);
+console.log('modelName:', modelName);
 
 async function main() {
-    const model_name = validateModelArg(process.argv[2]);
-    const embedder = new DefaultEmbeddingFunction(model_name);
+    const embedder = new DefaultEmbeddingFunction(modelName);
+    return embedder.generate([jobDescription]).
+        then((embedding) => {
+            console.log('embedding size:', embedding[0].length);
 
-    return embedder.generate([job_description]).then((embedding) => {
-        const body = JSON.stringify({
-            collectionName: collection_name,
-            vector: embedding,
-            outputFields: ['noc_code', 'title', 'definition'],
-            limit: 10,
-        });
-        const headers = {
-            Authorization: `Bearer ${ZILLIZ_API_KEY}`,
-            Accept: 'application/json',
-            'Content-Type': 'application/json',
-        };
-        return fetch(url, {
-            method: 'POST',
-            headers: headers,
-            body: body,
-        })
-            .then((response) => response.json())
-            .then((result) => {
-                console.log(JSON.stringify(result, null, 4));
-            })
-            .catch((error) => {
-                console.error(error);
+            const url = `${ZILLIZ_ENDPOINT}/v1/vector/search`;
+            const headers = {
+                Authorization: `Bearer ${ZILLIZ_API_KEY}`,
+                Accept: 'application/json',
+                'Content-Type': 'application/json',
+            };
+            const body = JSON.stringify({
+                collectionName: collectionName,
+                vector: embedding[0],
+                outputFields: ['noc_code', 'title', 'definition'],
+                limit: 10,
             });
-    });
+            return fetch(url, {
+                method: 'POST',
+                headers: headers,
+                body: body,
+            }).
+            then((response) => response.json());
+        });
 }
-/*
-fetch(url, {
-    method: 'POST',
-    headers: headers,
-    body: body,
-})
-    .then((response) => response.json())
-    .then((result) => {
-        console.log(JSON.stringify(result, null, 4));
-    })
-    .catch((error) => {
-        console.error(error);
-    });
-*/
+
+main().then((result) => {
+    console.log(result);
+});

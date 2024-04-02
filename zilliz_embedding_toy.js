@@ -33,10 +33,15 @@ const jobDescription = readJobDescription(process.argv[2]);
 const modelName = validateModelArgument(process.argv[3]);
 const collectionName = getCollectionForModel(modelName);
 
+console.log('collectionName:', collectionName);
+console.log('modelName:', modelName);
+
 async function main() {
     const embedder = new DefaultEmbeddingFunction(modelName);
     return embedder.generate([jobDescription]).
         then((embedding) => {
+            console.log('embedding size:', embedding[0].length);
+
             const url = `${ZILLIZ_ENDPOINT}/v1/vector/search`;
             const headers = {
                 Authorization: `Bearer ${ZILLIZ_API_KEY}`,

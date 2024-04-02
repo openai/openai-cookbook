@@ -1,7 +1,7 @@
 const fetch = require('node-fetch');
 const fs = require('fs');
 const dotenv = require('dotenv');
-const embeddingFunctions = require('chromadb/utils/embedding_functions');
+const { exit } = require('process');
 
 dotenv.config();
 const ZILLIZ_ENDPOINT = process.env.ZILLIZ_ENDPOINT;
@@ -14,7 +14,9 @@ function readJobDescription(job) {
 
 function validateModelArg(arg) {
     if (!['all-MiniLM-L6-v2', 'multi-qa-mpnet-base-dot-v1'].includes(arg)) {
-        console.log('Invalid model argument. Use either "all-MiniLM-L6-v2" or "multi-qa-mpnet-base-dot-v1"');
+        console.log(
+            'Invalid model argument. Use either "all-MiniLM-L6-v2" or "multi-qa-mpnet-base-dot-v1"'
+        );
         process.exit(1);
     }
     return arg;
@@ -28,40 +30,55 @@ function getCollection(model) {
     }
 }
 
-const model_name = validateModelArg(process.argv[2]);
+const job_description = readJobDescription(process.argv[2]);
+
+const model_name = validateModelArg(process.argv[3]);
 
 const collection_name = getCollection(model_name);
 
-const job_description = readJobDescription(process.argv[1]);
-
-const embedding_func = new embeddingFunctions.SentenceTransformerEmbeddingFunction({ model_name });
-
-const job_description_vector = embedding_func.embed([job_description])[0];
-
 const url = `${ZILLIZ_ENDPOINT}/v1/vector/search`;
 
-const data = JSON.stringify({
-    collectionName: collection_name,
-    vector: job_description_vector,
-    outputFields: ['noc_code', 'title', 'definition'],
-    limit: 10
-});
+async function main() {
+    const model_name = validateModelArg(process.argv[2]);
+    const embedder = new DefaultEmbeddingFunction(model_name);
 
-const headers = {
-    'Authorization': `Bearer ${ZILLIZ_API_KEY}`,
-    'Accept': 'application/json',
-    'Content-Type': 'application/json'
-};
-
+    return embedder.generate([job_description]).then((embedding) => {
+        const body = JSON.stringify({
+            collectionName: collection_name,
+            vector: embedding,
+            outputFields: ['noc_code', 'title', 'definition'],
+            limit: 10,
+        });
+        const headers = {
+            Authorization: `Bearer ${ZILLIZ_API_KEY}`,
+            Accept: 'application/json',
+            'Content-Type': 'application/json',
+        };
+        return fetch(url, {
+            method: 'POST',
+            headers: headers,
+            body: body,
+        })
+            .then((response) => response.json())
+            .then((result) => {
+                console.log(JSON.stringify(result, null, 4));
+            })
+            .catch((error) => {
+                console.error(error);
+            });
+    });
+}
+/*
 fetch(url, {
     method: 'POST',
     headers: headers,
-    body: data
+    body: body,
 })
-    .then(response => response.json())
-    .then(result => {
+    .then((response) => response.json())
+    .then((result) => {
         console.log(JSON.stringify(result, null, 4));
     })
-    .catch(error => {
+    .catch((error) => {
         console.error(error);
     });
+*/

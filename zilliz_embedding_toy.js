@@ -29,13 +29,13 @@ function getCollectionForModel(model) {
     }
 }
 
-const job_description = readJobDescription(process.argv[2]);
-const model_name = validateModelArgument(process.argv[3]);
-const collectionName = getCollectionForModel(model_name);
+const jobDescription = readJobDescription(process.argv[2]);
+const modelName = validateModelArgument(process.argv[3]);
+const collectionName = getCollectionForModel(modelName);
 
 async function main() {
-    const embedder = new DefaultEmbeddingFunction(model_name);
-    return embedder.generate([job_description]).
+    const embedder = new DefaultEmbeddingFunction(modelName);
+    return embedder.generate([jobDescription]).
         then((embedding) => {
             const url = `${ZILLIZ_ENDPOINT}/v1/vector/search`;
             const headers = {

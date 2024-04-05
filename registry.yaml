@@ -4,7 +4,6 @@
 # should build pages for, and indicates metadata such as tags, creation date and
 # authors for each page.
 
-
 - title: Using logprobs
   path: examples/Using_logprobs.ipynb
   date: 2023-12-20
@@ -1214,7 +1213,6 @@
     - vision
     - embeddings
 
-
 - title: How to parse PDF docs for RAG
   path: examples/Parse_PDF_docs_for_RAG.ipynb
   date: 2024-02-28
@@ -1223,7 +1221,6 @@
   tags:
     - vision
     - embeddings
-
 
 - title: Using GPT4 with Vision to tag and caption images
   path: examples/Tag_caption_images_with_GPT4V.ipynb
@@ -1234,7 +1231,6 @@
     - vision
     - embeddings
 
-
 - title: How to use the moderation API
   path: examples/How_to_use_moderation.ipynb
   date: 2024-03-05
@@ -1242,3 +1238,19 @@
     - teomusatoiu
   tags:
     - moderation
+
+- title: Nhost Vector Database
+  path: examples/vector_databases/nhost/README.md
+  date: 2024-04-05
+  authors:
+    - nunopato
+  tags:
+    - embeddings
+
+- title: Semantic search using Nhost Vector
+  path: examples/vector_databases/nhost/semantic-search.mdx
+  date: 2024-04-05
+  authors:
+    - nunopato
+  tags:
+    - embeddings

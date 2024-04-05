@@ -1247,7 +1247,7 @@
   tags:
     - embeddings
 
-- title: Semantic search using Nhost Vector
+- title: Semantic search with Nhost Postgres and OpenAI
   path: examples/vector_databases/nhost/semantic-search.mdx
   date: 2024-04-05
   authors:

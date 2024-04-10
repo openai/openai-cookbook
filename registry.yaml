@@ -1272,6 +1272,14 @@
   tags:
     - chat
 
+- title: Using GPT4 Vision with Function Calling
+  path: examples/multimodal/Using_GPT4_Vision_With_Function_Calling.ipynb
+  date: 2024-04-09
+  authors:
+    - shyamal-anadkat
+  tags:
+    - chat
+    - vision
 
 - title: Synthetic data generation (Part 1)
   path: examples/SDG1.ipynb
@@ -1290,4 +1298,3 @@
   tags:
     - vision
     - embeddings
-    

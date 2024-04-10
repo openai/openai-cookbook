@@ -1245,7 +1245,7 @@
 
 - title: CLIP embeddings to improve multimodal RAG with GPT-4 Vision
   path: examples/custom_image_embedding_search.ipynb
-  date: 2024-03-19
+  date: 2024-04-10
   authors:
     - dylanra-openai
   tags:

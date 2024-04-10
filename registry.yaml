@@ -1240,4 +1240,4 @@
   authors:
     - dylanra-openai
   tags:
-    - synthetic data generation
+    - completions

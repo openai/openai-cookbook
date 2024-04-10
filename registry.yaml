@@ -475,6 +475,15 @@
     - embeddings
     - completions
 
+- title: Getting Started with OpenAI Evals
+  path: examples/evaluation/Getting_Started_with_OpenAI_Evals.ipynb
+  date: 2024-03-21
+  authors:
+    - royziv11
+    - shyamal-anadkat
+  tags:
+    - completions
+
 - title: Fine-Tuned Q&A - collect data
   path: examples/fine-tuned_qa/olympics-1-collect-data.ipynb
   date: 2022-03-10
@@ -1233,6 +1242,16 @@
     - teomusatoiu
   tags:
     - moderation
+  
+  
+- title: Summarizing with controllable detail
+  path: examples/Summarizing_with_controllable_detail.ipynb
+  date: 2024-04-01
+  authors:
+    - joe-at-openai
+  tags:
+    - chat
+
 
 - title: Synthetic data generation (Part 1)
   path: examples/SDG1.ipynb
@@ -1241,3 +1260,14 @@
     - dylanra-openai
   tags:
     - completions
+
+
+- title: CLIP embeddings to improve multimodal RAG with GPT-4 Vision
+  path: examples/custom_image_embedding_search.ipynb
+  date: 2024-04-10
+  authors:
+    - dylanra-openai
+  tags:
+    - vision
+    - embeddings
+    

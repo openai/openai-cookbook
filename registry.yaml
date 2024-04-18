@@ -1278,3 +1278,11 @@
   tags:
     - vision
     - embeddings
+
+- title: Cleaning inconsistently formatted user input data with function calling
+  path: examples/Clean_user_input_data_with_functions.ipynb
+  date: 2024-04-18
+  authors:
+    - FardinAhsan146
+  tags:
+    - functions

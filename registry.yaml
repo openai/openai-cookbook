@@ -1238,6 +1238,41 @@
     - teomusatoiu
   tags:
     - moderation
+  
+- title: Summarizing Long Documents
+  path: examples/Summarizing_long_documents.ipynb
+  date: 2024-04-19
+  authors:
+    - joe-at-openai
+  tags:
+    - chat
+
+- title: Using GPT4 Vision with Function Calling
+  path: examples/multimodal/Using_GPT4_Vision_With_Function_Calling.ipynb
+  date: 2024-04-09
+  authors:
+    - shyamal-anadkat
+  tags:
+    - chat
+    - vision
+
+- title: Synthetic data generation (Part 1)
+  path: examples/SDG1.ipynb
+  date: 2024-04-10
+  authors:
+    - dylanra-openai
+  tags:
+    - completions
+
+
+- title: CLIP embeddings to improve multimodal RAG with GPT-4 Vision
+  path: examples/custom_image_embedding_search.ipynb
+  date: 2024-04-10
+  authors:
+    - dylanra-openai
+  tags:
+    - vision
+    - embeddings
 
 - title: Nhost Vector Database
   path: examples/vector_databases/nhost/README.md

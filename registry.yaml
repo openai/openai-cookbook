@@ -1298,3 +1298,12 @@
   tags:
     - vision
     - embeddings
+
+- title: Batch processing with the Batch API
+  path: examples/batch_processing.ipynb
+  date: 2024-04-24
+  authors:
+    - katiagg
+  tags:
+    - batch
+    - completions

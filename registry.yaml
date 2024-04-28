@@ -1244,9 +1244,9 @@
     - moderation
   
   
-- title: Summarizing with controllable detail
-  path: examples/Summarizing_with_controllable_detail.ipynb
-  date: 2024-04-01
+- title: Summarizing Long Documents
+  path: examples/Summarizing_long_documents.ipynb
+  date: 2024-04-19
   authors:
     - joe-at-openai
   tags:
@@ -1287,3 +1287,12 @@
   tags:
     - functions
     
+- title: Batch processing with the Batch API
+  path: examples/batch_processing.ipynb
+  date: 2024-04-24
+  authors:
+    - katiagg
+  tags:
+    - batch
+    - completions
+

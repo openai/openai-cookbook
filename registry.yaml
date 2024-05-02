@@ -56,7 +56,7 @@
   path: examples/Clustering_for_transaction_classification.ipynb
   date: 2022-10-20
   authors:
-    - colin-jarvis
+    - colin-openai
     - ted-at-openai
   tags:
     - embeddings
@@ -213,7 +213,7 @@
   path: examples/Multiclass_classification_for_transactions.ipynb
   date: 2022-10-20
   authors:
-    - colin-jarvis
+    - colin-openai
   tags:
     - embeddings
     - completions
@@ -1221,7 +1221,7 @@
   path: examples/How_to_use_guardrails.ipynb
   date: 2023-12-19
   authors:
-    - colin-jarvis
+    - colin-openai
   tags:
     - guardrails
 
@@ -1307,3 +1307,12 @@
   tags:
     - batch
     - completions
+
+- title: Using tool required for customer service
+  path: examples/Using_tool_required_for_customer_service.ipynb
+  date: 2024-05-01
+  authors:
+    - colin-openai
+  tags:
+    - completions
+    - functions

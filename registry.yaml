@@ -207,7 +207,6 @@
     - ted-at-openai
   tags:
     - completions
-    - tiktoken
 
 - title: Multiclass Classification for Transactions
   path: examples/Multiclass_classification_for_transactions.ipynb

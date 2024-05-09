@@ -14,6 +14,7 @@ Each provider has their own named directory, with a standard notebook to introdu
 - [Chroma](https://docs.trychroma.com/getting-started)
 - [Elasticsearch](https://www.elastic.co/guide/en/elasticsearch/reference/current/knn-search.html)
 - [Hologres](https://www.alibabacloud.com/help/en/hologres/latest/procedure-to-use-hologres)
+- [KDBAI](https://code.kx.com/kdbai/gettingStarted/quickstart.html)
 - [Kusto](https://learn.microsoft.com/en-us/azure/data-explorer/web-query-data)
 - [Milvus](https://milvus.io/docs/example_code.md)
 - [MyScale](https://docs.myscale.com/en/quickstart/)

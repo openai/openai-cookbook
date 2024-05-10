@@ -1295,3 +1295,11 @@
   tags:
     - completions
     - functions
+
+- title: OpenSearch as a vector database
+  path: examples/vector_databases/opensearch/README.md
+  date: 2024-05-10
+  authors:
+    - ftisiot
+  tags:
+    - embeddings

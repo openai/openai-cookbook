@@ -56,7 +56,7 @@
   path: examples/Clustering_for_transaction_classification.ipynb
   date: 2022-10-20
   authors:
-    - colin-jarvis
+    - colin-openai
     - ted-at-openai
   tags:
     - embeddings
@@ -207,13 +207,12 @@
     - ted-at-openai
   tags:
     - completions
-    - tiktoken
 
 - title: Multiclass Classification for Transactions
   path: examples/Multiclass_classification_for_transactions.ipynb
   date: 2022-10-20
   authors:
-    - colin-jarvis
+    - colin-openai
   tags:
     - embeddings
     - completions
@@ -1201,7 +1200,7 @@
   path: examples/How_to_use_guardrails.ipynb
   date: 2023-12-19
   authors:
-    - colin-jarvis
+    - colin-openai
   tags:
     - guardrails
 
@@ -1244,9 +1243,9 @@
     - moderation
   
   
-- title: Summarizing with controllable detail
-  path: examples/Summarizing_with_controllable_detail.ipynb
-  date: 2024-04-01
+- title: Summarizing Long Documents
+  path: examples/Summarizing_long_documents.ipynb
+  date: 2024-04-19
   authors:
     - joe-at-openai
   tags:
@@ -1278,3 +1277,21 @@
   tags:
     - vision
     - embeddings
+
+- title: Batch processing with the Batch API
+  path: examples/batch_processing.ipynb
+  date: 2024-04-24
+  authors:
+    - katiagg
+  tags:
+    - batch
+    - completions
+
+- title: Using tool required for customer service
+  path: examples/Using_tool_required_for_customer_service.ipynb
+  date: 2024-05-01
+  authors:
+    - colin-openai
+  tags:
+    - completions
+    - functions

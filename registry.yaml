@@ -1306,6 +1306,7 @@
     - vision
     - whisper
 
+    
 - title: KDB.AI Vector Database RM
   path: examples/vector_databases/kdb.ai/README.md
   date: 2024-01-24

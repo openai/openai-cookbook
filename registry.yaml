@@ -1204,46 +1204,6 @@
   tags:
     - guardrails
 
-- title: KDB.AI Vector Database RM
-  path: examples/vector_databases/kdb.ai/README.md
-  date: 2024-01-24
-  authors:
-    - asinghkx
-  tags:
-    - embeddings
-
-- title: KDB.AI Vector Database Req
-  path: examples/vector_databases/kdb.ai/requirements.txt
-  date: 2024-01-24
-  authors:
-    - asinghkx
-  tags:
-    - embeddings
-
-- title: KDB.AI Vector Database Semantic Search and QA
-  path: examples/vector_databases/kdb.ai/Semantic_Search_and_QA_with_KDB.AI_OpenAI.ipynb
-  date: 2024-01-24
-  authors:
-    - asinghkx
-  tags:
-    - embeddings
-
-- title: KDB.AI Vector Database RP
-  path: examples/vector_databases/kdb.ai/data/research_paper.pdf
-  date: 2024-01-24
-  authors:
-    - asinghkx
-  tags:
-    - embeddings
-
-- title: KDB.AI Vector Database CSV
-  path: examples/vector_databases/kdb.ai/data/openai_embedded_data.csv
-  date: 2024-01-24
-  authors:
-    - asinghkx
-  tags:
-    - embeddings
-
 - title: How to combine GPT4 with Vision with RAG to create a clothing matchmaker app
   path: examples/How_to_combine_GPT4o_with_RAG_Outfit_Assistant.ipynb
   date: 2024-02-16
@@ -1345,3 +1305,43 @@
     - completions
     - vision
     - whisper
+
+- title: KDB.AI Vector Database RM
+  path: examples/vector_databases/kdb.ai/README.md
+  date: 2024-01-24
+  authors:
+    - asinghkx
+  tags:
+    - embeddings
+
+- title: KDB.AI Vector Database Req
+  path: examples/vector_databases/kdb.ai/requirements.txt
+  date: 2024-01-24
+  authors:
+    - asinghkx
+  tags:
+    - embeddings
+
+- title: KDB.AI Vector Database Semantic Search and QA
+  path: examples/vector_databases/kdb.ai/Semantic_Search_and_QA_with_KDB.AI_OpenAI.ipynb
+  date: 2024-01-24
+  authors:
+    - asinghkx
+  tags:
+    - embeddings
+
+- title: KDB.AI Vector Database RP
+  path: examples/vector_databases/kdb.ai/data/research_paper.pdf
+  date: 2024-01-24
+  authors:
+    - asinghkx
+  tags:
+    - embeddings
+
+- title: KDB.AI Vector Database CSV
+  path: examples/vector_databases/kdb.ai/data/openai_embedded_data.csv
+  date: 2024-01-24
+  authors:
+    - asinghkx
+  tags:
+    - embeddings

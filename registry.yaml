@@ -167,9 +167,10 @@
 
 - title: How to count tokens with Tiktoken
   path: examples/How_to_count_tokens_with_tiktoken.ipynb
-  date: 2022-12-16
+  date: 2024-05-14
   authors:
     - ted-at-openai
+    - davi-reis-vieira
   tags:
     - tiktoken
     - completions

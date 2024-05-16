@@ -126,6 +126,17 @@
     - completions
     - functions
 
+- title: >-
+    Dynamic annotating functions for function calling and agents
+    customer profiles
+  path: examples/Dynamically_annotating_functions_python.ipynb
+  date: 2024-05-16
+  authors:
+    - igorcosta
+  tags:
+    - completions
+    - functions
+
 - title: Using embeddings
   path: examples/Using_embeddings.ipynb
   date: 2022-03-10
@@ -958,6 +969,17 @@
     - filip-halt
   tags:
     - embeddings
+
+- title: >-
+    Dynamic annotating functions for function calling and agents
+    customer profiles
+  path: articles/dynamic_annotation_function_calling_and_agents.md
+  date: 2024-05-16
+  authors:
+    - igorcosta
+  tags:
+    - completions
+    - functions
 
 - title: Techniques to improve reliability
   path: articles/techniques_to_improve_reliability.md

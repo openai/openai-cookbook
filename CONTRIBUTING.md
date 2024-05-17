@@ -31,16 +31,18 @@ For additional advice on writing good documentation, refer to [What Makes Docume
 | Uniqueness   | Does the content offer new insights or unique information compared to existing documentation?       |       |
 | Clarity      | Is the language easy to understand? Are things well-explained? Is the title clear?                  |       |
 | Correctness  | Are the facts, code snippets, and examples correct and reliable? Does everything execute correctly? |       |
+| Conciseness  | Is the content concise? Are all details necessary? Can it be made shorter?                          |       |
 | Completeness | Is the content thorough and detailed? Are there things that weren’t explained fully?                |       |
 | Grammar      | Are there grammatical or spelling errors present?                                                   |       |
 
 ### Breakdown
 
-| Criteria     | 4                                      | 3                                        | 2                                             | 1                                     |
-| ------------ | -------------------------------------- | ---------------------------------------- | --------------------------------------------- | ------------------------------------- |
-| Relevance    | Relevant and useful.                   | Relevant but not very useful.            | Tangentially relevant.                        | Not relevant.                         |
-| Uniqueness   | Completely unique with fresh insights. | Unique with minor overlaps.              | Some unique aspects, but significant overlap. | Many similar guides/examples.         |
-| Clarity      | Clear language and structure.          | Clear language, unclear structure.       | Some sections unclear.                        | Confusing and unclear.                |
-| Correctness  | Completely error free.                 | Code works, minor improvements needed.   | Few errors and warnings.                      | Many errors, code doesn't execute.    |
-| Completeness | Complete and detailed.                 | Mostly complete, minor additions needed. | Lacks some explanations.                      | Missing significant portions.         |
-| Grammar      | Perfect grammar.                       | Correct grammar, few typos.              | Some spelling/grammatical errors.             | Numerous spelling/grammatical errors. |
+| Criteria     | 4                                             | 3                                         | 2                                             | 1                                          |
+| ------------ | --------------------------------------------- | ----------------------------------------- | --------------------------------------------- | ------------------------------------------ |
+| Relevance    | Relevant and useful.                          | Relevant but not very useful.             | Tangentially relevant.                        | Not relevant.                              |
+| Uniqueness   | Completely unique with fresh insights.        | Unique with minor overlaps.               | Some unique aspects, but significant overlap. | Many similar guides/examples.              |
+| Clarity      | Clear language and structure.                 | Clear language, unclear structure.        | Some sections unclear.                        | Confusing and unclear.                     |
+| Correctness  | Completely error free.                        | Code works, minor improvements needed.    | Few errors and warnings.                      | Many errors, code doesn't execute.         |
+| Conciseness  | Cannot be reduced in any section, or overall. | Mostly short, but could still be reduced. | Some long sections, and/or long overall.      | Very long sections and overall, redundant. |
+| Completeness | Complete and detailed.                        | Mostly complete, minor additions needed.  | Lacks some explanations.                      | Missing significant portions.              |
+| Grammar      | Perfect grammar.                              | Correct grammar, few typos.               | Some spelling/grammatical errors.             | Numerous spelling/grammatical errors.      |

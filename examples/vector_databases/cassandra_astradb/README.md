@@ -8,8 +8,8 @@ These example notebooks demonstrate implementation of
 the same GenAI standard RAG workload with different libraries and APIs.
 
 To use [Astra DB](https://docs.datastax.com/en/astra/home/astra.html)
-with its HTTP API interface, head to the "AstraPy" notebook (`astrapy`
-is the Python client to interact with the database).
+through its Data API interface, head to the "AstraPy" notebook (`astrapy`
+is the Python client for the Data API).
 
 If you prefer CQL access to the database (either with
 [Astra DB](https://docs.datastax.com/en/astra-serverless/docs/vector-search/overview.html)

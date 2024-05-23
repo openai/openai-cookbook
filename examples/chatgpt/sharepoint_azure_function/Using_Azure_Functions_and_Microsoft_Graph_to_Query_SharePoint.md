@@ -1,5 +1,4 @@
 # Using Azure Functions and Microsoft Graph API to Search O365 / SharePoint from ChatGPT
----
 
 
 

@@ -206,7 +206,7 @@ At this point, you should have a test function created, and you should have save
 
 Now that you have an authenticated Azure Function, we can update the function to search SharePoint / O365
 
-14. Go to your test function and paste in the code here for Solution 1 and here for Solution 2. 
+14. Go to your test function and paste in the code from [this file](./solution_one_file_retrieval.js) for Solution 1 and [this file](./solution_two_preprocessing.js) for Solution 2. 
 >**Note that this code is meant to be directional** - while it should work out of the box, it is designed to be customized to your needs (see examples towards the end of this document). Save the function. 
 
 15. Set up the following env variables by going to the **Configuration** tab on the left under **Settings.** Note that this may be listed directly in **Environment Variables** depending on your Azure UI.

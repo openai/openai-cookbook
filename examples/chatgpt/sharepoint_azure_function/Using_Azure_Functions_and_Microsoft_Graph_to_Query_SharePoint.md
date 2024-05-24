@@ -84,7 +84,8 @@ As you can see from the below architecture diagram, the first three steps are th
 ## Installation Instructions
 
 The below are the instructions for setting up the Azure Function with Authentication. Please make sure to follow these steps before implementing the code. 
->These installation instructions apply to both Solution 1 and Solution 2. We encourage setting both solutions up as separate functions within the same Function App to test which works best for you, as once you set up one function, it takes only a few minutes to set up another function in that same function app.
+> [!NOTE]  
+> These installation instructions apply to both Solution 1 and Solution 2. We encourage setting both solutions up as separate functions within the same Function App to test which works best for you, as once you set up one function, it takes only a few minutes to set up another function in that same function app.
 
 
 ### Installing the app
@@ -101,7 +102,7 @@ See Microsoft’s documentation [here](https://learn.microsoft.com/en-us/azure/a
 
 See the documentation [here](https://learn.microsoft.com/en-us/azure/azure-functions/functions-create-function-app-portal?pivots=programming-language-javascript) for how to deploy using the Azure portal. We’ll walk through an example here step by step.
 
-> _Note: you can use Part 1 - Part 4 below to set up any Azure Function App with Entra Authentication_
+> Note: you can use Part 1 - Part 4 below to set up any Azure Function App with Entra Authentication
 
 
 ##### Part 1: Create Function
@@ -124,7 +125,8 @@ See the documentation [here](https://learn.microsoft.com/en-us/azure/azure-funct
 
 2. After completing the above, you’ll land on the “Deployments” page. Once the deployment completes (which should only take a few minutes) click on **“Go to Resource”** to go back to the Function App
 
-   > You may get an error the first time you attempt this, click create again and it will likely work. 
+  > [!NOTE]  
+  > You may get an error the first time you attempt this, click create again and it will likely work. 
 
 
 ##### Part 2: Set up Auth
@@ -206,12 +208,13 @@ At this point, you should have a test function created, and you should have save
 
 Now that you have an authenticated Azure Function, we can update the function to search SharePoint / O365
 
-14. Go to your test function and paste in the code from [this file](./solution_one_file_retrieval.js) for Solution 1 and [this file](./solution_two_preprocessing.js) for Solution 2. 
->**Note that this code is meant to be directional** - while it should work out of the box, it is designed to be customized to your needs (see examples towards the end of this document). Save the function. 
+14. Go to your test function and paste in the code from [this file](./solution_one_file_retrieval.js) for Solution 1 and [this file](./solution_two_preprocessing.js) for Solution 2.  Save the function. 
+> [!NOTE]  
+> **This code is meant to be directional** - while it should work out of the box, it is designed to be customized to your needs (see examples towards the end of this document).
 
 15. Set up the following env variables by going to the **Configuration** tab on the left under **Settings.** Note that this may be listed directly in **Environment Variables** depending on your Azure UI.
 
-    1. [`TENANT_ID`](about:blank): copied from previous section
+    1. `TENANT_ID`: copied from previous section
 
     2. `CLIENT_ID`: copied from previous section
 

@@ -710,7 +710,7 @@ Below are some potential areas to customize. 
 
 ### Solution 2:
 
-- You could use gpt-4o instead of gpt-3.5 turbo for longer context, but that is more expensive and slightly slower.
+- You could use gpt-4o instead of gpt-3.5 turbo for longer context. This would slightly increase the cost and latency, but you may get higher quality summarizations.
 
 - You can customize the amount of files it searches through within the call to Microsoft Graph.
 

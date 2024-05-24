@@ -18,8 +18,7 @@ The second solution **Solution 2** pre-processes the file within the Azure Funct
 
 ### Solution 1: Returning the file to GPT using the [Returning Files](https://platform.openai.com/docs/actions/getting-started/returning-files) pattern
 
-<div style="position: relative; padding-bottom: calc(50.29585798816568% + 41px); height: 0; width: 100%;"><iframe src="https://demo.arcade.software/ghJOu9zvTMWKSQXA7zo2?embed&show_copy_link=true&autoplay=false" title="ChatGPT - SharePoint File Retrieval Helper" frameborder="0" loading="lazy" webkitallowfullscreen mozallowfullscreen allowfullscreen allow="clipboard-write" style="position: absolute; top: 0; left: 0; width: 100%; height: 100%;color-scheme: light;"></iframe></div>
-
+![](./images/solution_1.gif)
 
 This solution uses a Node.js Azure Function to, based on the logged in user:
 
@@ -37,7 +36,7 @@ This solution uses a Node.js Azure Function to, based on the logged in user:
 
 ### Solution 2: Converting the file to text in the Azure Function
 
-<div style="position: relative; padding-bottom: calc(50.29585798816568% + 41px); height: 0; width: 100%;"><iframe src="https://demo.arcade.software/d4fZrtOMzxPNgKBqKz6O?embed&show_copy_link=true" title="ChatGPT - SharePoint HR Q&amp;A Helper" frameborder="0" loading="lazy" webkitallowfullscreen mozallowfullscreen allowfullscreen allow="clipboard-write" style="position: absolute; top: 0; left: 0; width: 100%; height: 100%;color-scheme: light;"></iframe></div>
+![](./images/solution_2.gif)
 
 
 This solution uses a Node.js Azure Function to, based on the logged in user:

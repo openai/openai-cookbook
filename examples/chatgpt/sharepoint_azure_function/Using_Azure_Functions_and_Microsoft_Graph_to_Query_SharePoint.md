@@ -516,7 +516,7 @@ Be sure to be explicit about what you are searching for at each step.
 In either scenario, try to answer the user's question. If you cannot answer the user's question based on the knowledge you find, let the user know and ask them to go check the HR Docs in SharePoint. 
 ```
 ### Solution 1 Sample OpenAPI Spec
-This expects a response that matches the file retrieval structure in our doc [here](https://platform.openai.com/docs/actions/getting-started/returning-files) and passes in a `searchTerm` parameter to inform the search..
+This expects a response that matches the file retrieval structure in our doc [here](https://platform.openai.com/docs/actions/getting-started/returning-files) and passes in a `searchTerm` parameter to inform the search.
 >Make sure to switch the function app name, function name and code based on link copied in screenshot [here](#part-3-set-up-test-function)
 
 ```yaml
@@ -583,7 +583,7 @@ The below walks through setup instructions and walkthroughs unique to this solut
 
 #### Implementing the Authentication 
 
-This solution follows the same authentication steps as solution 1 above - see [Initializing the Microsoft Graph Client](#initializing-the-microsoft-graph-client) and [Obtaining an On-Behalf-Of (OBO) Token](#obtaining-an-on-behalf-of-obo-token) steps.
+This solution follows the same authentication steps as solution 1 above - see [Initializing the Microsoft Graph Client](#initializing-the-microsoft-graph-client) and [Obtaining an On-Behalf-Of (OBO) Token](#obtaining-an-on-behalf-of-obo-token) sections.
 
 
 #### Retrieving Content from O365 / SharePoint Items

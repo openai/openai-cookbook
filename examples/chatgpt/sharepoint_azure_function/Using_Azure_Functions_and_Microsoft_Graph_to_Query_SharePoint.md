@@ -13,7 +13,7 @@ There are two solutions below, with code for each in the repository. 
 
 The first solution **Solution 1** uses the ability to[ retrieve files in Actions](https://platform.openai.com/docs/actions/getting-started/returning-files) and use them as if you had uploaded them directly to a conversation. The Azure Function returns a base64 string that ChatGPT converts into a file, treated the same way as if you uploaded the file directly to the conversation. This solution can handle more types of files than the other solution below, but does have size volume limitations (see docs [here](https://platform.openai.com/docs/actions/getting-started/returning-files))
 
-The second solution **Solution 2** pre-processes the file within the Azure Function. The Azure Function returns text, instead of the base64 encoded file. Due to the pre-processing and the conversion to text, this solution is best used for large, unstructured documents, and for when you want to analyze more than the amount of files supported in the first solution (currently 10, but see documentation [here](https://platform.openai.com/docs/actions/getting-started/returning-files)).
+The second solution **Solution 2** pre-processes the file within the Azure Function. The Azure Function returns text, instead of the base64 encoded file. Due to the pre-processing and the conversion to text, this solution is best used for large, unstructured documents, and for when you want to analyze more than the amount of files supported in the first solution (see documentation [here](https://platform.openai.com/docs/actions/getting-started/returning-files)).
 
 
 ### Solution 1: Returning the file to GPT using the [Returning Files](https://platform.openai.com/docs/actions/getting-started/returning-files) pattern
@@ -72,7 +72,7 @@ As you can see from the below architecture diagram, the first three steps are th
     3. Then, we can optimize further by summarizing using gpt-3.5-turbo in the function to help with the 100,000 character limit we impose on Actions today. 
 
 
-## Prerequisites:
+## Prerequisites
 
 - Azure Portal with access to create Azure Function Apps and Azure Entra App Registrations
 
@@ -81,7 +81,7 @@ As you can see from the below architecture diagram, the first three steps are th
 - _Solution 2 Only:_ An OpenAI API Key from platform.openai.com
 
 
-## Installation Instructions
+## Solution 1 + Solution 2 Installation Instructions
 
 The below are the instructions for setting up the Azure Function with Authentication. Please make sure to follow these steps before implementing the code. 
 > [!NOTE]  
@@ -273,12 +273,14 @@ Now that you have an authenticated Azure Function, we can update the function to
 26. Test out the GPT and it should work as expected.
 
 
-## Code Walkthrough
+## Solution 1 Detailed Walkthrough: Returning the File to GPT using the [Returning Files](https://platform.openai.com/docs/actions/getting-started/returning-files) Pattern
+
+The below walks through setup instructions and walkthroughs unique to this solution. If you are interested in Solution 2 instead, you can jump [here](#solution-2-converting-the-file-to-text-in-the-azure-function-1). 
+
+### Solution 1 Code Walkthrough
 
 The below walks through the different parts of the function. Before you begin, ensure you have the required packages installed and environment variables set up (see the Installation Steps section).
 
-
-### Solution 1: Returning the file to GPT using the [Returning Files](https://platform.openai.com/docs/actions/getting-started/returning-files) pattern
 
 #### Implementing the Authentication 
 
@@ -460,15 +462,128 @@ module.exports = async function (context, req) {
    }
 };
 ```
+### Solution 1 Customizations
 
-### Solution 2: Converting the file to text in the Azure Function
+Below are some potential areas to customize. 
 
-The below walks through the code for converting the files to text in the Azure Function. To see the entire code, go 
+- You can customize the GPT prompt to search again a certain amount of times if nothing is found.
 
+- You can customize the code to only search through specific SharePoint sites or O365 Drives by customizing the search query. This will help focus the search and improve the retrieval. The function as setup now looks through all files the logged-in user can access.
+
+- You can update the code to only return certain types of files. For example, only return structured data / CSVs. 
+
+- You can customize the amount of files it searches through within the call to Microsoft Graph. Note that you should only put a maximum of 10 files based on the documentation [here](https://platform.openai.com/docs/actions/getting-started). 
+
+### Solution 1 Considerations
+
+Note that all the same limitations of Actions apply here, with regards to returning 100K characters or less and the [45 second timeout](https://platform.openai.com/docs/actions/production/timeouts).
+
+- Make sure you read the documentation here around [returning files](https://platform.openai.com/docs/actions/getting-started/returning-files) and [file uploads](https://help.openai.com/en/articles/8555545-file-uploads-faq), as those limitations apply here.
+
+### Solution 1 Sample GPT Instructions
+
+
+```text
+You are a Q&A helper that helps answer users questions. You have access to a documents repository through your API action. When a user asks a question, you pass in the "searchTerm" a single keyword or term you think you should use for the search.
+
+****
+
+Scenario 1: There are answers
+
+If your action returns results, then you take the results from the action and try to answer the users question. 
+
+****
+
+Scenario 2: No results found
+
+If the response you get from the action is "No results found", stop there and let the user know there were no results and that you are going to try a different search term, and explain why. You must always let the user know before conducting another search.
+
+Example:
+
+****
+
+I found no results for "DEI". I am now going to try [insert term] because [insert explanation]
+
+****
+
+Then, try a different searchTerm that is similar to the one you tried before, with a single word. 
+
+Try this three times. After the third time, then let the user know you did not find any relevant documents to answer the question, and to check SharePoint. 
+Be sure to be explicit about what you are searching for at each step.
+
+****
+
+In either scenario, try to answer the user's question. If you cannot answer the user's question based on the knowledge you find, let the user know and ask them to go check the HR Docs in SharePoint. 
+```
+### Solution 1 Sample OpenAPI Spec
+This expects a response that matches the file retrieval structure in our doc [here](https://platform.openai.com/docs/actions/getting-started/returning-files) and passes in a `searchTerm` parameter to inform the search..
+>Make sure to switch the function app name, function name and code based on link copied in screenshot [here](#part-3-set-up-test-function)
+
+```yaml
+openapi: 3.0.0
+info:
+  title: SharePoint Search API
+  description: API for searching SharePoint documents.
+  version: 1.0.0
+servers:
+  - url: https://{your_function_app_name}.azurewebsites.net/api
+    description: SharePoint Search API server
+paths:
+  /{your_function_name}?code={enter your specific endpoint id here}:
+    post:
+      operationId: searchSharePoint
+      summary: Searches SharePoint for documents matching a query and term.
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                searchTerm:
+                  type: string
+                  description: A specific term to search for within the documents.
+      responses:
+        '200':
+          description: A CSV file of query results encoded in base64.
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  openaiFileResponseData:
+                    type: array
+                    items:
+                      type: object
+                      properties:
+                        name:
+                          type: string
+                          description: The name of the file.
+                        mime_type:
+                          type: string
+                          description: The MIME type of the file.
+                        content:
+                          type: string
+                          format: byte
+                          description: The base64 encoded contents of the file.
+        '400':
+          description: Bad request when the SQL query parameter is missing.
+        '413':
+          description: Payload too large if the response exceeds the size limit.
+        '500':
+          description: Server error when there are issues executing the query or encoding the results.
+
+```
+
+## Solution 2 Detailed Walkthrough: Converting the file to text in the Azure Function
+
+The below walks through setup instructions and walkthroughs unique to this solution of pre-processing the files and extracting summaries in the Azure Function.
+
+### Code Walkthrough
 
 #### Implementing the Authentication 
 
-This solution follows the same authentication steps as above - see [Initializing the Microsoft Graph Client](#initializing-the-microsoft-graph-client) and [Obtaining an On-Behalf-Of (OBO) Token](#obtaining-an-on-behalf-of-obo-token) steps.
+This solution follows the same authentication steps as solution 1 above - see [Initializing the Microsoft Graph Client](#initializing-the-microsoft-graph-client) and [Obtaining an On-Behalf-Of (OBO) Token](#obtaining-an-on-behalf-of-obo-token) steps.
 
 
 #### Retrieving Content from O365 / SharePoint Items
@@ -695,7 +810,7 @@ module.exports = async function (context, req) {
 };
 ```
 
-## Customizations
+### Solution 2 Customizations
 
 Below are some potential areas to customize. 
 
@@ -703,107 +818,23 @@ Below are some potential areas to customize. 
 
 - You can customize the code to only search through specific SharePoint sites or O365 Drives by customizing the search query. This will help focus the search and improve the retrieval. The function as setup now looks through all files the logged-in user can access.
 
-
-### Solution 1: 
-
-- You can update the code to only return certain types of files. For example, only return structured data / CSVs. 
-
-- You can customize the amount of files it searches through within the call to Microsoft Graph. Note that you should only put a maximum of 10 files based on the documentation [here](https://platform.openai.com/docs/actions/getting-started). 
-
-
-### Solution 2:
-
 - You could use gpt-4o instead of gpt-3.5 turbo for longer context. This would slightly increase the cost and latency, but you may get higher quality summarizations.
 
 - You can customize the amount of files it searches through within the call to Microsoft Graph.
 
 
-## Considerations
+### Solution 2 Considerations
 
 Note that all the same limitations of Actions apply here, with regards to returning 100K characters or less and the [45 second timeout](https://platform.openai.com/docs/actions/production/timeouts).
 
-Neither of these solutions support images, audio, or video.
-
-
-### Solution 1: 
-
-- Make sure you read the documentation here around [returning files](https://platform.openai.com/docs/actions/getting-started/returning-files) and [file uploads](https://help.openai.com/en/articles/8555545-file-uploads-faq), as those limitations apply here.
-
-
-### Solution 2:
 
 - This only works for text, not for images. With some additional code in the Azure Function, you could customize this by using GPT-4o to extract summarizations of images.
 
-- This does not work for structured data. We recommend solution 1 if structured data is a major part of your use case.
+- This does not work for structured data. We recommend Solution 1 if structured data is a major part of your use case.
+
+### Solution 2 Sample GPT Instructions
 
 
-## FAQ
-
-- Why are you using the Microsoft Graph API in your code instead of the [SharePoint API](https://learn.microsoft.com/en-us/sharepoint/dev/sp-add-ins/get-to-know-the-sharepoint-rest-service?tabs=csom)?
-
-  - The SharePoint API is legacy - per the Microsoft documentation [here](https://learn.microsoft.com/en-us/sharepoint/dev/apis/sharepoint-rest-graph), “For SharePoint Online, innovation using a REST API against SharePoint is driven via the Microsoft Graph REST API's.” The Graph API gives us more flexibility, and the SharePoint API still runs into the same file issues listed in the [Why is this necessary instead of interacting with the Microsoft Graph API directly?](https://docs.google.com/document/d/18nJss1zvOb2kO62VbfqTkCcULefkCUXRzo6xf4ElBfw/edit#heading=h.xkm3mv548a1h) section.
-
-- What types of files does this support?
-
-  - _Solution 1:_ 
-
-    1. It follows the same guidelines as the documentation [_here_](https://help.openai.com/en/articles/8555545-file-uploads-faq). 
-
-  - _Solution 2:_ 
-
-    1. This supports all files listed in the documentation for the Convert File endpoint [_here_](https://learn.microsoft.com/en-us/graph/api/driveitem-get-content-format?view=graph-rest-1.0\&tabs=http). Specifically, it supports _pdf, doc, docx, odp, ods, odt, pot, potm, potx, pps, ppsx, ppsxm, ppt, pptm, pptx, rtf_.
-
-    2. When a search result returns XLS, XLSX, or CSV, this prompts the user to download the file and re-upload to ask questions using Advanced Data Analysis. As stated above, we recommend solution 1 if structured data is part of your use case.
-
-- Why do I need to request an OBO token?
-
-  - When you try to use the same token to authenticate to the Graph API as the one you use to authenticate into the Azure Function, you get an “invalid audience” token. This is because the audience for the token can only be user\_impersonation.
-
-  - To address this, the function requests a new token scoped to Files.Read.All within the app using the [On Behalf Of flow](https://learn.microsoft.com/en-us/entra/identity-platform/v2-oauth2-on-behalf-of-flow). This will inherit the permissions of the logged in user, meaning this function will only search through files the logged-in user has access to. 
-
-  - We are purposefully requesting a new On Behalf Of token with each request, because Azure Function Apps are meant to be stateless. You could potentially integrate this with Azure Key Vault to store the secret and retrieve programmatically. 
-
-
-## Sample GPT Instructions
-
-There are some subtle differences between these, but you can customize however you’d like!
-
-
-### Solution 1
-```text
-You are a Q&A helper that helps answer users questions. You have access to a documents repository through your API action. When a user asks a question, you pass in the "searchTerm" a single keyword or term you think you should use for the search.
-
-****
-
-Scenario 1: There are answers
-
-If your action returns results, then you take the results from the action and try to answer the users question. 
-
-****
-
-Scenario 2: No results found
-
-If the response you get from the action is "No results found", stop there and let the user know there were no results and that you are going to try a different search term, and explain why. You must always let the user know before conducting another search.
-
-Example:
-
-****
-
-I found no results for "DEI". I am now going to try [insert term] because [insert explanation]
-
-****
-
-Then, try a different searchTerm that is similar to the one you tried before, with a single word. 
-
-Try this three times. After the third time, then let the user know you did not find any relevant documents to answer the question, and to check SharePoint. 
-Be sure to be explicit about what you are searching for at each step.
-
-****
-
-In either scenario, try to answer the user's question. If you cannot answer the user's question based on the knowledge you find, let the user know and ask them to go check the HR Docs in SharePoint. 
-```
-
-### Solution 2
 ```
 You are a Q&A helper that helps answer users questions. You have access to a documents repository through your API action. When a user asks a question, you pass in that question exactly as stated to the "query" parameter, and for the "searchTerm" you use a single keyword or term you think you should use for the search.
 
@@ -835,67 +866,11 @@ Try this three times. After the third time, then let the user know you did not f
 
 In either scenario, try to answer the user's question. If you cannot answer the user's question based on the knowledge you find, let the user know and ask them to go check the HR Docs in SharePoint. If the file is a CSV, XLSX, or XLS, you can tell the user to download the file using the link and re-upload to use Advanced Data Analysis.
 ```
-## Sample OpenAPI Spec
-The below specs differ in that Solution 1 expects a response that matches the file retrieval structure in our doc [here](https://platform.openai.com/docs/actions/getting-started/returning-files) and does not pass in a `query` parameter, while Solution 2 expects a different response and passes in the `query` parameter to inform the pre-processing.
+
+### Solution 2 Sample OpenAPI Spec
+The below spec passes in the `query` parameter to inform the pre-processing and a `searchTerm` to find the right files in Microsoft Graph.
 >Make sure to switch the function app name, function name and code based on link copied in screenshot [here](#part-3-set-up-test-function)
 
-### Solution 1
-```yaml
-openapi: 3.0.0
-info:
-  title: SharePoint Search API
-  description: API for searching SharePoint documents.
-  version: 1.0.0
-servers:
-  - url: https://{your_function_app_name}.azurewebsites.net/api
-    description: SharePoint Search API server
-paths:
-  /{your_function_name}?code={enter your specific endpoint id here}:
-    post:
-      operationId: searchSharePoint
-      summary: Searches SharePoint for documents matching a query and term.
-      requestBody:
-        required: true
-        content:
-          application/json:
-            schema:
-              type: object
-              properties:
-                searchTerm:
-                  type: string
-                  description: A specific term to search for within the documents.
-      responses:
-        '200':
-          description: A CSV file of query results encoded in base64.
-          content:
-            application/json:
-              schema:
-                type: object
-                properties:
-                  openaiFileResponseData:
-                    type: array
-                    items:
-                      type: object
-                      properties:
-                        name:
-                          type: string
-                          description: The name of the file.
-                        mime_type:
-                          type: string
-                          description: The MIME type of the file.
-                        content:
-                          type: string
-                          format: byte
-                          description: The base64 encoded contents of the file.
-        '400':
-          description: Bad request when the SQL query parameter is missing.
-        '413':
-          description: Payload too large if the response exceeds the size limit.
-        '500':
-          description: Server error when there are issues executing the query or encoding the results.
-
-```
-### Solution 2
 ```yaml
 openapi: 3.0.0
 info:
@@ -943,3 +918,34 @@ paths:
                       type: string
                       description: The URL to access the document.
 ```
+
+
+## FAQ
+
+- Why are you using the Microsoft Graph API in your code instead of the [SharePoint API](https://learn.microsoft.com/en-us/sharepoint/dev/sp-add-ins/get-to-know-the-sharepoint-rest-service?tabs=csom)?
+
+  - The SharePoint API is legacy - per the Microsoft documentation [here](https://learn.microsoft.com/en-us/sharepoint/dev/apis/sharepoint-rest-graph), “For SharePoint Online, innovation using a REST API against SharePoint is driven via the Microsoft Graph REST API's.” The Graph API gives us more flexibility, and the SharePoint API still runs into the same file issues listed in the [Why is this necessary instead of interacting with the Microsoft Graph API directly?](#why-is-this-necessary-instead-of-interacting-with-the-microsoft-api-directly) section.
+
+- What types of files does this support?
+
+  - _Solution 1:_ 
+
+    1. It follows the same guidelines as the documentation [here](https://help.openai.com/en/articles/8555545-file-uploads-faq) about file uploads. 
+
+  - _Solution 2:_ 
+
+    1. This supports all files listed in the documentation for the Convert File endpoint [_here_](https://learn.microsoft.com/en-us/graph/api/driveitem-get-content-format?view=graph-rest-1.0\&tabs=http). Specifically, it supports _pdf, doc, docx, odp, ods, odt, pot, potm, potx, pps, ppsx, ppsxm, ppt, pptm, pptx, rtf_.
+
+    2. When a search result returns XLS, XLSX, or CSV, this prompts the user to download the file and re-upload to ask questions using Advanced Data Analysis. As stated above, we recommend solution 1 if structured data is part of your use case.
+
+- Why do I need to request an OBO token?
+
+  - When you try to use the same token to authenticate to the Graph API as the one you use to authenticate into the Azure Function, you get an “invalid audience” token. This is because the audience for the token can only be user\_impersonation.
+
+  - To address this, the function requests a new token scoped to Files.Read.All within the app using the [On Behalf Of flow](https://learn.microsoft.com/en-us/entra/identity-platform/v2-oauth2-on-behalf-of-flow). This will inherit the permissions of the logged in user, meaning this function will only search through files the logged-in user has access to. 
+
+  - We are purposefully requesting a new On Behalf Of token with each request, because Azure Function Apps are meant to be stateless. You could potentially integrate this with Azure Key Vault to store the secret and retrieve programmatically. 
+
+
+
+

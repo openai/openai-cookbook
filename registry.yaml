@@ -482,6 +482,17 @@
     - shyamal-anadkat
   tags:
     - completions
+  
+  - title: Evaluating RAG with RAGAs using GPT-4o
+  path: examples/evaluation/Evaluating_RAG_with_RAGAs_using_GPT-4o.ipynb
+  date: 2024-05-30
+  authors:
+    - PrashantDixit0
+  tags:
+    - embeddings
+    - ragas
+    - gpt-4o
+    - rag
 
 - title: Fine-Tuned Q&A - collect data
   path: examples/fine-tuned_qa/olympics-1-collect-data.ipynb

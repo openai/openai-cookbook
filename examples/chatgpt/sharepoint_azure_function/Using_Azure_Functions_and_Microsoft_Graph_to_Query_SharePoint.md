@@ -277,7 +277,7 @@ Now that you have an authenticated Azure Function, we can update the function to
 
 The below walks through setup instructions and walkthroughs unique to this solution. If you are interested in Solution 2 instead, you can jump [here](#solution-2-converting-the-file-to-text-in-the-azure-function-1). 
 
-### Solution 1 Code Walkthrough
+### Code Walkthrough
 
 The below walks through the different parts of the function. Before you begin, ensure you have the required packages installed and environment variables set up (see the Installation Steps section).
 
@@ -462,7 +462,7 @@ module.exports = async function (context, req) {
    }
 };
 ```
-### Solution 1 Customizations
+### Customizations
 
 Below are some potential areas to customize. 
 
@@ -474,13 +474,13 @@ Below are some potential areas to customize. 
 
 - You can customize the amount of files it searches through within the call to Microsoft Graph. Note that you should only put a maximum of 10 files based on the documentation [here](https://platform.openai.com/docs/actions/getting-started). 
 
-### Solution 1 Considerations
+### Considerations
 
 Note that all the same limitations of Actions apply here, with regards to returning 100K characters or less and the [45 second timeout](https://platform.openai.com/docs/actions/production/timeouts).
 
 - Make sure you read the documentation here around [returning files](https://platform.openai.com/docs/actions/getting-started/returning-files) and [file uploads](https://help.openai.com/en/articles/8555545-file-uploads-faq), as those limitations apply here.
 
-### Solution 1 Sample GPT Instructions
+### Sample GPT Instructions
 
 
 ```text
@@ -515,7 +515,7 @@ Be sure to be explicit about what you are searching for at each step.
 
 In either scenario, try to answer the user's question. If you cannot answer the user's question based on the knowledge you find, let the user know and ask them to go check the HR Docs in SharePoint. 
 ```
-### Solution 1 Sample OpenAPI Spec
+### Sample OpenAPI Spec
 This expects a response that matches the file retrieval structure in our doc [here](https://platform.openai.com/docs/actions/getting-started/returning-files) and passes in a `searchTerm` parameter to inform the search.
 >Make sure to switch the function app name, function name and code based on link copied in screenshot [here](#part-3-set-up-test-function)
 
@@ -810,7 +810,7 @@ module.exports = async function (context, req) {
 };
 ```
 
-### Solution 2 Customizations
+### Customizations
 
 Below are some potential areas to customize. 
 
@@ -823,7 +823,7 @@ Below are some potential areas to customize. 
 - You can customize the amount of files it searches through within the call to Microsoft Graph.
 
 
-### Solution 2 Considerations
+### Considerations
 
 Note that all the same limitations of Actions apply here, with regards to returning 100K characters or less and the [45 second timeout](https://platform.openai.com/docs/actions/production/timeouts).
 
@@ -832,7 +832,7 @@ Note that all the same limitations of Actions apply here, with regards to return
 
 - This does not work for structured data. We recommend Solution 1 if structured data is a major part of your use case.
 
-### Solution 2 Sample GPT Instructions
+### Sample GPT Instructions
 
 
 ```
@@ -867,7 +867,7 @@ Try this three times. After the third time, then let the user know you did not f
 In either scenario, try to answer the user's question. If you cannot answer the user's question based on the knowledge you find, let the user know and ask them to go check the HR Docs in SharePoint. If the file is a CSV, XLSX, or XLS, you can tell the user to download the file using the link and re-upload to use Advanced Data Analysis.
 ```
 
-### Solution 2 Sample OpenAPI Spec
+### Sample OpenAPI Spec
 The below spec passes in the `query` parameter to inform the pre-processing and a `searchTerm` to find the right files in Microsoft Graph.
 >Make sure to switch the function app name, function name and code based on link copied in screenshot [here](#part-3-set-up-test-function)
 

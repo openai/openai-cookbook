@@ -1305,3 +1305,12 @@
     - completions
     - vision
     - whisper
+
+- title: Using Azure Function and the Microsoft Graph Search API to Query Office365 and SharePoint with ChatGPT
+  path: examples/chatgpt/sharepoint_azure_function/Using_Azure_Functions_and_Microsoft_Graph_to_Query_SharePoint.md
+  date: 2024-05-24
+  authors:
+    - maxreid-openai
+  tags:
+    - completions
+    - chatgpt

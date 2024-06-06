@@ -30,11 +30,12 @@ This solution uses a Node.js Azure Function to, based on the logged in user:
 
 4. Return that to ChatGPT. The GPT then can use those files as if you had uploaded it to the conversation.
 
+
 ![](../../../images/solution_1_architecture.png)
 
 
-
 ### Solution 2: Converting the file to text in the Azure Function
+
 
 ![](../../../images/solution_2.gif)
 
@@ -50,6 +51,7 @@ This solution uses a Node.js Azure Function to, based on the logged in user:
 4. Returns that data to ChatGPT. The GPT then uses that information to respond to the user's initial question.
 
 As you can see from the below architecture diagram, the first three steps are the same as Solution 1. The main difference is that this solution converts the file to text instead of a base64 string, and then summarizes that text using GPT 3.5 Turbo.
+
 
 ![](../../../images/solution_2_architecture.png)
 
@@ -106,7 +108,9 @@ See the documentation [here](https://learn.microsoft.com/en-us/azure/azure-funct
 
 ##### Part 1: Create Function
 
+
 ![](../../../images/create_function_app.png)
+
 
 1. Create an [Azure Function app](https://learn.microsoft.com/en-us/azure/azure-functions/functions-overview?pivots=programming-language-csharp). I used the following settings but you can use anything you are comfortable with. Note that not every language / operating system allows for editing the functions in the console directly - the combination I chose below does. For my walkthrough, I left everything as default and made the selections below
 
@@ -124,7 +128,6 @@ See the documentation [here](https://learn.microsoft.com/en-us/azure/azure-funct
 
 2. After completing the above, you’ll land on the “Deployments” page. Once the deployment completes (which should only take a few minutes) click on **“Go to Resource”** to go back to the Function App
 
-  
   > You may get an error the first time you attempt this, click create again and it will likely work. 
 
 
@@ -175,6 +178,7 @@ See the documentation [here](https://learn.microsoft.com/en-us/azure/azure-funct
 
 10. Click on the function you just created (You may need to click refresh to see it). Click on **Get Function URL** and save it to test in Postman. You will also use this when creating the OpenAPI spec later when you put it into the GPT. 
 
+
 ![](../../../images/get_function_url.png)
 
 11. Go back to the function app and click on **Configuration.** Show the value for the `MICROSOFT_PROVIDER_AUTHENTICATION_SECRET` variable, copy it (click advanced edit to copy it), and **save it for later.**  
@@ -207,7 +211,9 @@ At this point, you should have a test function created, and you should have save
 
 Now that you have an authenticated Azure Function, we can update the function to search SharePoint / O365
 
+
 14. Go to your test function and paste in the code from [this file](https://github.com/openai/openai-cookbook/blob/main/examples/chatgpt/sharepoint_azure_function/solution_one_file_retrieval.js) for Solution 1 and [this file](https://github.com/openai/openai-cookbook/blob/main/examples/chatgpt/sharepoint_azure_function/solution_two_preprocessing.js) for Solution 2.  Save the function. 
+
 
 > **This code is meant to be directional** - while it should work out of the box, it is designed to be customized to your needs (see examples towards the end of this document).
 
@@ -273,6 +279,7 @@ Now that you have an authenticated Azure Function, we can update the function to
 
 
 ## Solution 1 Detailed Walkthrough: Returning the File to GPT using the [Returning Files](https://platform.openai.com/docs/actions/getting-started/returning-files) Pattern
+
 
 The below walks through setup instructions and walkthrough unique to this solution. You can find the entire code [here](https://github.com/openai/openai-cookbook/blob/main/examples/chatgpt/sharepoint_azure_function/solution_one_file_retrieval.js). If you are interested in Solution 2 instead, you can jump [here](#solution-2-converting-the-file-to-text-in-the-azure-function-1). 
 
@@ -575,6 +582,7 @@ paths:
 ```
 
 ## Solution 2 Detailed Walkthrough: Converting the file to text in the Azure Function
+
 
 The below walks through setup instructions and walkthrough unique to this solution of pre-processing the files and extracting summaries in the Azure Function. You can find the entire code [here](https://github.com/openai/openai-cookbook/blob/main/examples/chatgpt/sharepoint_azure_function/solution_two_preprocessing.js).
 

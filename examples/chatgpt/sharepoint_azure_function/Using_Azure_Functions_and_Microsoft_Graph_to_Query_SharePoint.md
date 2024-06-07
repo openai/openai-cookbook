@@ -18,7 +18,6 @@ The second solution **Solution 2** pre-processes the file within the Azure Funct
 
 ### Solution 1: Returning the file to GPT using the [Returning Files](https://platform.openai.com/docs/actions/getting-started/returning-files) pattern
 
-
 ![](../../../images/solution_1.gif)
 
 This solution uses a Node.js Azure Function to, based on the logged in user:
@@ -35,13 +34,10 @@ This solution uses a Node.js Azure Function to, based on the logged in user:
 ![](../../../images/solution_1_architecture.png)
 
 
-
-
 ### Solution 2: Converting the file to text in the Azure Function
 
 
 ![](../../../images/solution_2.gif)
-
 
 
 This solution uses a Node.js Azure Function to, based on the logged in user:
@@ -58,7 +54,6 @@ As you can see from the below architecture diagram, the first three steps are th
 
 
 ![](../../../images/solution_2_architecture.png)
-
 
 
 ### Why is this necessary instead of interacting with the Microsoft API directly?
@@ -186,7 +181,6 @@ See the documentation [here](https://learn.microsoft.com/en-us/azure/azure-funct
 
 ![](../../../images/get_function_url.png)
 
-
 11. Go back to the function app and click on **Configuration.** Show the value for the `MICROSOFT_PROVIDER_AUTHENTICATION_SECRET` variable, copy it (click advanced edit to copy it), and **save it for later.**  
 
 At this point, you should have a test function created, and you should have saved a **client id, tenant id, secret, scope, and function URL**. You are now ready to test out the authentication in Postman
@@ -217,7 +211,9 @@ At this point, you should have a test function created, and you should have save
 
 Now that you have an authenticated Azure Function, we can update the function to search SharePoint / O365
 
-14. Go to your test function and paste in the code from [this file](./solution_one_file_retrieval.js) for Solution 1 and [this file](./solution_two_preprocessing.js) for Solution 2.  Save the function. 
+
+14. Go to your test function and paste in the code from [this file](https://github.com/openai/openai-cookbook/blob/main/examples/chatgpt/sharepoint_azure_function/solution_one_file_retrieval.js) for Solution 1 and [this file](https://github.com/openai/openai-cookbook/blob/main/examples/chatgpt/sharepoint_azure_function/solution_two_preprocessing.js) for Solution 2.  Save the function. 
+
 
 > **This code is meant to be directional** - while it should work out of the box, it is designed to be customized to your needs (see examples towards the end of this document).
 
@@ -284,7 +280,8 @@ Now that you have an authenticated Azure Function, we can update the function to
 
 ## Solution 1 Detailed Walkthrough: Returning the File to GPT using the [Returning Files](https://platform.openai.com/docs/actions/getting-started/returning-files) Pattern
 
-The below walks through setup instructions and walkthroughs unique to this solution. If you are interested in Solution 2 instead, you can jump [here](#solution-2-converting-the-file-to-text-in-the-azure-function-1). 
+
+The below walks through setup instructions and walkthrough unique to this solution. You can find the entire code [here](https://github.com/openai/openai-cookbook/blob/main/examples/chatgpt/sharepoint_azure_function/solution_one_file_retrieval.js). If you are interested in Solution 2 instead, you can jump [here](#solution-2-converting-the-file-to-text-in-the-azure-function-1). 
 
 ### Code Walkthrough
 
@@ -586,7 +583,8 @@ paths:
 
 ## Solution 2 Detailed Walkthrough: Converting the file to text in the Azure Function
 
-The below walks through setup instructions and walkthroughs unique to this solution of pre-processing the files and extracting summaries in the Azure Function.
+
+The below walks through setup instructions and walkthrough unique to this solution of pre-processing the files and extracting summaries in the Azure Function. You can find the entire code [here](https://github.com/openai/openai-cookbook/blob/main/examples/chatgpt/sharepoint_azure_function/solution_two_preprocessing.js).
 
 ### Code Walkthrough
 

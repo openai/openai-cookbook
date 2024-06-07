@@ -489,7 +489,7 @@
   authors:
     - royziv11
   tags:
-    - completions
+    - guardrails
 
 - title: Fine-Tuned Q&A - collect data
   path: examples/fine-tuned_qa/olympics-1-collect-data.ipynb

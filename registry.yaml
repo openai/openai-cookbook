@@ -483,6 +483,14 @@
   tags:
     - completions
 
+- title: Developing Hallucination Guardrails
+  path: examples/Developing_hallucination_guardrails.ipynb
+  date: 2024-05-29
+  authors:
+    - royziv11
+  tags:
+    - guardrails
+
 - title: Fine-Tuned Q&A - collect data
   path: examples/fine-tuned_qa/olympics-1-collect-data.ipynb
   date: 2022-03-10

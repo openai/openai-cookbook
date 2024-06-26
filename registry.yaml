@@ -1324,3 +1324,14 @@
   tags:
     - completions
     - chatgpt
+
+- title: How to Count Tokens with tiktoken
+  path: examples/How_to_count_tokens_with_tiktoken.ipynb
+  date: 2024-06-27
+  authors:
+    - jalcantarab
+  tags:
+    - tokenization
+    - tiktoken
+    - GPT-4
+    - GPT-4o

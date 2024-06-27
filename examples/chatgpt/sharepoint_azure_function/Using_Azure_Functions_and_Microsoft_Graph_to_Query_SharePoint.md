@@ -411,7 +411,7 @@ module.exports = async function (context, req) {
    }
    // Initialize the Graph Client using the initGraphClient function defined above
    let client = initGraphClient(accessToken);
-   // this is the search body to be used in the Microsft Graph Search API: https://learn.microsoft.com/en-us/graph/search-concept-files
+   // this is the search body to be used in the Microsoft Graph Search API: https://learn.microsoft.com/en-us/graph/search-concept-files
    const requestBody = {
        requests: [
            {
@@ -719,7 +719,7 @@ module.exports = async function (context, req) {
     }
     // Initialize the Graph Client using the initGraphClient function defined above
     let client = initGraphClient(accessToken);
-    // this is the search body to be used in the Microsft Graph Search API: https://learn.microsoft.com/en-us/graph/search-concept-files
+    // this is the search body to be used in the Microsoft Graph Search API: https://learn.microsoft.com/en-us/graph/search-concept-files
     const requestBody = {
         requests: [
             {

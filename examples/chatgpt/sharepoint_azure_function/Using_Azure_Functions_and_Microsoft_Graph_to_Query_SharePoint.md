@@ -145,7 +145,7 @@ See the documentation [here](https://learn.microsoft.com/en-us/azure/azure-funct
 
    5. Leave all the other settings on this page as the default, but feel free to change based on your internal guidelines.
 
-   6. On the **permissions** tab, click **Add Permission** and add **Files.Read.All**, then **Add.** This allows this application to read files which is important in order to use the Microsoft Graph Search API.
+   6. On the **permissions** tab, click **Add Permission** and add **Files.Read.All** and **Sites.ReadAll**, then **Add.** This allows this application to read files which is important in order to use the Microsoft Graph Search API.
 
 4. Once it is created, **click on the enterprise application you just created** (so, leave the Function App page and land on the Enterprise Application that you just spun up)**.** We are now going to give it one more permission, to execute the Azure Function by impersonating the user logging into the application. See [here](https://learn.microsoft.com/en-us/azure/app-service/configure-authentication-provider-aad?tabs=workforce-tenant) for more details.
 

@@ -1,10 +1,10 @@
 const { Client } = require('@microsoft/microsoft-graph-client');
-const pdfParse = require('pdf-parse');
+// const pdfParse = require('pdf-parse');
 const { Buffer } = require('buffer');
 const path = require('path');
 const axios = require('axios');
 const qs = require('querystring');
-const { OpenAI } = require("openai");
+// const { OpenAI } = require("openai");
 
 //// --------- ENVIRONMENT CONFIGURATION AND INITIALIZATION ---------
 // Function to initialize Microsoft Graph client
@@ -46,42 +46,25 @@ const getOboToken = async (userAccessToken) => {
 };
 //// --------- DOCUMENT PROCESSING ---------
 // Function to fetch drive item content and convert to text
+
 const getDriveItemContent = async (client, driveId, itemId, name) => {
     try {
-        const fileType = path.extname(name).toLowerCase();
+        // const fileType = path.extname(name).toLowerCase();
         // the below files types are the ones that are able to be converted to PDF to extract the text. See https://learn.microsoft.com/en-us/graph/api/driveitem-get-content-format?view=graph-rest-1.0&tabs=http
-        const allowedFileTypes = ['.pdf', '.doc', '.docx', '.odp', '.ods', '.odt', '.pot', '.potm', '.potx', '.pps', '.ppsx', '.ppsxm', '.ppt', '.pptm', '.pptx', '.rtf'];
+        // const allowedFileTypes = ['.pdf', '.doc', '.docx', '.odp', '.ods', '.odt', '.pot', '.potm', '.potx', '.pps', '.ppsx', '.ppsxm', '.ppt', '.pptm', '.pptx', '.rtf'];
         // filePath changes based on file type, adding ?format=pdf to convert non-pdf types to pdf for text extraction, so all files in allowedFileTypes above are converted to pdf
-        const filePath = `/drives/${driveId}/items/${itemId}/content` + ((fileType === '.pdf' || fileType === '.txt' || fileType === '.csv') ? '' : '?format=pdf');
-        if (allowedFileTypes.includes(fileType)) {
-            response = await client.api(filePath).getStream();
-            // The below takes the chunks in response and combines
-            let chunks = [];
-            for await (let chunk of response) {
+        const filePath = `/drives/${driveId}/items/${itemId}`;
+        const downloadPath = filePath + `/content`
+        const fileStream = await client.api(downloadPath).getStream();
+        let chunks = [];
+            for await (let chunk of fileStream) {
                 chunks.push(chunk);
             }
-            let buffer = Buffer.concat(chunks);
-            // the below extracts the text from the PDF.
-            const pdfContents = await pdfParse(buffer);
-            return pdfContents.text;
-        } else if (fileType === '.txt') {
-            // If the type is txt, it does not need to create a stream and instead just grabs the content
-            response = await client.api(filePath).get();
-            return response;
-        }  else if (fileType === '.csv') {
-            response = await client.api(filePath).getStream();
-            let chunks = [];
-            for await (let chunk of response) {
-                chunks.push(chunk);
-            }
-            let buffer = Buffer.concat(chunks);
-            let dataString = buffer.toString('utf-8');
-            return dataString
-            
-    } else {
-        return 'Unsupported File Type';
-    }
-     
+        const base64String = Buffer.concat(chunks).toString('base64');
+        const file = await client.api(filePath).get();
+        const mime_type = file.file.mimeType;
+        const name = file.name;
+        return {"name":name, "mime_type":mime_type, "content":base64String}
     } catch (error) {
         console.error('Error fetching drive content:', error);
         throw new Error(`Failed to fetch content for ${name}: ${error.message}`);
@@ -89,36 +72,36 @@ const getDriveItemContent = async (client, driveId, itemId, name) => {
 };
 
 // Function to get relevant parts of text using gpt-3.5-turbo. 
-const getRelevantParts = async (text, query) => {
-    try {
-        // We use your OpenAI key to initialize the OpenAI client
-        const openAIKey = process.env["OPENAI_API_KEY"];
-        const openai = new OpenAI({
-            apiKey: openAIKey,
-        });
-        const response = await openai.chat.completions.create({
-            // Using gpt-3.5-turbo due to speed to prevent timeouts. You can tweak this prompt as needed
-            model: "gpt-3.5-turbo-0125",
-            messages: [
-                {"role": "system", "content": "You are a helpful assistant that finds relevant content in text based on a query. You only return the relevant sentences, and you return a maximum of 10 sentences"},
-                {"role": "user", "content": `Based on this question: **"${query}"**, get the relevant parts from the following text:*****\n\n${text}*****. If you cannot answer the question based on the text, respond with 'No information provided'`}
-            ],
-            // using temperature of 0 since we want to just extract the relevant content
-            temperature: 0,
-            // using max_tokens of 1000, but you can customize this based on the number of documents you are searching. 
-            max_tokens: 1000
-        });
-        return response.choices[0].message.content;
-    } catch (error) {
-        console.error('Error with OpenAI:', error);
-        return 'Error processing text with OpenAI' + error;
-    }
-};
+// const getRelevantParts = async (text, query) => {
+//     try {
+//         // We use your OpenAI key to initialize the OpenAI client
+//         const openAIKey = process.env["OPENAI_API_KEY"];
+//         const openai = new OpenAI({
+//             apiKey: openAIKey,
+//         });
+//         const response = await openai.chat.completions.create({
+//             // Using gpt-3.5-turbo due to speed to prevent timeouts. You can tweak this prompt as needed
+//             model: "gpt-3.5-turbo-0125",
+//             messages: [
+//                 {"role": "system", "content": "You are a helpful assistant that finds relevant content in text based on a query. You only return the relevant sentences, and you return a maximum of 10 sentences"},
+//                 {"role": "user", "content": `Based on this question: **"${query}"**, get the relevant parts from the following text:*****\n\n${text}*****. If you cannot answer the question based on the text, respond with 'No information provided'`}
+//             ],
+//             // using temperature of 0 since we want to just extract the relevant content
+//             temperature: 0,
+//             // using max_tokens of 1000, but you can customize this based on the number of documents you are searching. 
+//             max_tokens: 1000
+//         });
+//         return response.choices[0].message.content;
+//     } catch (error) {
+//         console.error('Error with OpenAI:', error);
+//         return 'Error processing text with OpenAI' + error;
+//     }
+// };
 
 //// --------- AZURE FUNCTION LOGIC ---------
 // Below is what the Azure Function executes
 module.exports = async function (context, req) {
-    const query = req.query.query || (req.body && req.body.query);
+    // const query = req.query.query || (req.body && req.body.query);
     const searchTerm = req.query.searchTerm || (req.body && req.body.searchTerm);
     if (!req.headers.authorization) {
         context.res = {
@@ -158,24 +141,24 @@ module.exports = async function (context, req) {
 
     try { 
         // Function to tokenize content (e.g., based on words). 
-        const tokenizeContent = (content) => {
-            return content.split(/\s+/);
-        };
+        // const tokenizeContent = (content) => {
+        //     return content.split(/\s+/);
+        // };
 
-        // Function to break tokens into 10k token windows for gpt-3.5-turbo
-        const breakIntoTokenWindows = (tokens) => {
-            const tokenWindows = []
-            const maxWindowTokens = 10000; // 10k tokens
-            let startIndex = 0;
+        // // Function to break tokens into 10k token windows for gpt-3.5-turbo
+        // const breakIntoTokenWindows = (tokens) => {
+        //     const tokenWindows = []
+        //     const maxWindowTokens = 10000; // 10k tokens
+        //     let startIndex = 0;
 
-            while (startIndex < tokens.length) {
-                const window = tokens.slice(startIndex, startIndex + maxWindowTokens);
-                tokenWindows.push(window);
-                startIndex += maxWindowTokens;
-            }
+        //     while (startIndex < tokens.length) {
+        //         const window = tokens.slice(startIndex, startIndex + maxWindowTokens);
+        //         tokenWindows.push(window);
+        //         startIndex += maxWindowTokens;
+        //     }
 
-            return tokenWindows;
-        };
+        //     return tokenWindows;
+        // };
         // This is where we are doing the search
         const list = await client.api('/search/query').post(requestBody);
 
@@ -188,29 +171,30 @@ module.exports = async function (context, req) {
                     if (hit.resource["@odata.type"] === "#microsoft.graph.driveItem") {
                         const { name, id } = hit.resource;
                         // We use the below to grab the URL of the file to include in the response
-                        const webUrl = hit.resource.webUrl.replace(/\s/g, "%20");
+                        // const webUrl = hit.resource.webUrl.replace(/\s/g, "%20");
                         // The Microsoft Graph API ranks the reponses, so we use this to order it
-                        const rank = hit.rank;
+                        // const rank = hit.rank;
                         // The below is where the file lives
                         const driveId = hit.resource.parentReference.driveId;
                         const contents = await getDriveItemContent(client, driveId, id, name);
-                        if (contents !== 'Unsupported File Type') {
-                            // Tokenize content using function defined previously
-                            const tokens = tokenizeContent(contents);
+                        results.push(contents)
+                        // if (contents !== 'Unsupported File Type') {
+                        //     // Tokenize content using function defined previously
+                        //     const tokens = tokenizeContent(contents);
 
-                            // Break tokens into 10k token windows
-                            const tokenWindows = breakIntoTokenWindows(tokens);
+                        //     // Break tokens into 10k token windows
+                        //     const tokenWindows = breakIntoTokenWindows(tokens);
 
-                            // Process each token window and combine results
-                            const relevantPartsPromises = tokenWindows.map(window => getRelevantParts(window.join(' '), query));
-                            const relevantParts = await Promise.all(relevantPartsPromises);
-                            const combinedResults = relevantParts.join('\n'); // Combine results
+                        //     // Process each token window and combine results
+                        //     const relevantPartsPromises = tokenWindows.map(window => getRelevantParts(window.join(' '), query));
+                        //     const relevantParts = await Promise.all(relevantPartsPromises);
+                        //     const combinedResults = relevantParts.join('\n'); // Combine results
 
-                            results.push({ name, webUrl, rank, contents: combinedResults });
-                        } 
-                        else {
-                            results.push({ name, webUrl, rank, contents: 'Unsupported File Type' });
-                        }
+                        //     results.push({ name, webUrl, rank, contents: combinedResults });
+                        // } 
+                        // else {
+                        //     results.push({ name, webUrl, rank, contents: 'Unsupported File Type' });
+                        // }
                     }
                 }
             }));
@@ -224,7 +208,8 @@ module.exports = async function (context, req) {
         } else {
             // If the Microsoft Graph API does return results, then run processList to iterate through.
             results = await processList();
-            results.sort((a, b) => a.rank - b.rank);
+            results = {'openaiFileResponse': results}
+            // results.sort((a, b) => a.rank - b.rank);
         }
         context.res = {
             status: 200,

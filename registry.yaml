@@ -56,7 +56,7 @@
   path: examples/Clustering_for_transaction_classification.ipynb
   date: 2022-10-20
   authors:
-    - colin-jarvis
+    - colin-openai
     - ted-at-openai
   tags:
     - embeddings
@@ -207,13 +207,12 @@
     - ted-at-openai
   tags:
     - completions
-    - tiktoken
 
 - title: Multiclass Classification for Transactions
   path: examples/Multiclass_classification_for_transactions.ipynb
   date: 2022-10-20
   authors:
-    - colin-jarvis
+    - colin-openai
   tags:
     - embeddings
     - completions
@@ -483,6 +482,14 @@
     - shyamal-anadkat
   tags:
     - completions
+
+- title: Developing Hallucination Guardrails
+  path: examples/Developing_hallucination_guardrails.ipynb
+  date: 2024-05-29
+  authors:
+    - royziv11
+  tags:
+    - guardrails
 
 - title: Fine-Tuned Q&A - collect data
   path: examples/fine-tuned_qa/olympics-1-collect-data.ipynb
@@ -1106,6 +1113,8 @@
   authors:
     - jhills20
     - ibigio
+    - shyamal-anadkat
+    - teomusatoiu
   tags:
     - completions
     - functions
@@ -1201,12 +1210,12 @@
   path: examples/How_to_use_guardrails.ipynb
   date: 2023-12-19
   authors:
-    - colin-jarvis
+    - colin-openai
   tags:
     - guardrails
 
 - title: How to combine GPT4 with Vision with RAG to create a clothing matchmaker app
-  path: examples/How_to_combine_GPT4v_with_RAG_Outfit_Assistant.ipynb
+  path: examples/How_to_combine_GPT4o_with_RAG_Outfit_Assistant.ipynb
   date: 2024-02-16
   authors:
     - teomusatoiu
@@ -1287,3 +1296,31 @@
   tags:
     - batch
     - completions
+
+- title: Using tool required for customer service
+  path: examples/Using_tool_required_for_customer_service.ipynb
+  date: 2024-05-01
+  authors:
+    - colin-openai
+  tags:
+    - completions
+    - functions
+
+- title: Introduction to gpt-4o
+  path: examples/gpt4o/introduction_to_gpt4o.ipynb
+  date: 2024-05-13
+  authors:
+    - justonf
+  tags:
+    - completions
+    - vision
+    - whisper
+
+- title: Using Azure Function and the Microsoft Graph Search API to Query Office365 and SharePoint with ChatGPT
+  path: examples/chatgpt/sharepoint_azure_function/Using_Azure_Functions_and_Microsoft_Graph_to_Query_SharePoint.md
+  date: 2024-05-24
+  authors:
+    - maxreid-openai
+  tags:
+    - completions
+    - chatgpt

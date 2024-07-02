@@ -483,6 +483,14 @@
   tags:
     - completions
 
+- title: Developing Hallucination Guardrails
+  path: examples/Developing_hallucination_guardrails.ipynb
+  date: 2024-05-29
+  authors:
+    - royziv11
+  tags:
+    - guardrails
+
 - title: Fine-Tuned Q&A - collect data
   path: examples/fine-tuned_qa/olympics-1-collect-data.ipynb
   date: 2022-03-10
@@ -1105,6 +1113,8 @@
   authors:
     - jhills20
     - ibigio
+    - shyamal-anadkat
+    - teomusatoiu
   tags:
     - completions
     - functions
@@ -1305,3 +1315,12 @@
     - completions
     - vision
     - whisper
+
+- title: Using Azure Function and the Microsoft Graph Search API to Query Office365 and SharePoint with ChatGPT
+  path: examples/chatgpt/sharepoint_azure_function/Using_Azure_Functions_and_Microsoft_Graph_to_Query_SharePoint.md
+  date: 2024-05-24
+  authors:
+    - maxreid-openai
+  tags:
+    - completions
+    - chatgpt

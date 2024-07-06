@@ -1251,8 +1251,8 @@
     - teomusatoiu
   tags:
     - moderation
-  
-  
+
+
 - title: Summarizing Long Documents
   path: examples/Summarizing_long_documents.ipynb
   date: 2024-04-19
@@ -1324,3 +1324,13 @@
   tags:
     - completions
     - chatgpt
+
+- title: Using Whisper API to transcribe text using your Device Microphone
+  path: examples/Whisper_transcribe_device_microphone.ipynb
+  date: 2024-07-06
+  authors:
+    - carlkho-minerva
+  tags:
+    - whisper
+    - audio
+    - transcribe

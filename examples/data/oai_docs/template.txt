@@ -1,0 +1,70 @@
+
+# Tutorial Template
+
+This is a template designed to give guidance on how to create your first or N'th tutorial in the OpenAI docs. We will go over all the important details like how to run the tutorial locally to view the formatting, the review process, and more!
+
+If you run into any issues as you write your tutorial, please post in #api-documentation for support.
+
+## Basic structure
+
+An important question to consider is, "Should what I am working on be a tutorial or does it fit better elsewhere in the docs?". The general rule of thumb is that the tutorials are designed to help people build something from end to end. If you just want to share some best practice or small technique, you are likely to be better suited by adding a section to one of our [existing guides](https://platform.openai.com/docs/guides/).
+
+If what you have is indeed helping people build something end to end, then the basic structure should include a "Getting started" section where you specify the prerequisites to work through the tutorial along with that the expected outcome is. After that, it is up to you to best guide the reader from start to finish.
+
+## Styling
+
+In order to stay up to date on the OpenAI documentation styling, please refer to the [style guide](https://docs.google.com/document/d/1XeVFoG_Guk86VX427ngKYrzHAKrXV7wr3IWsg2OrWqw/edit#) which goes over details like best practices around headings, links, and more.
+
+Where possible, include code blocks, images, and other interactive elements to ensure the whole tutorial is not text. Consider making use of expandable sections to hide optional sections and optimize spacing.
+
+
+    The documentation supports many different visual elements. Consider looking through
+    some of the guides to get a sense of what is possible and then you can refer to the
+    sources files in this repo (`/api/onboard/src/content`) for the required code.
+
+
+```python
+string="This is a sample code block"
+```
+
+
+    <Image
+        png="https://cdn.openai.com/API/docs/images/tutorials/web-qa/DALL-E-woman-turning-a-stack-of-papers-into-numbers-pixel-art.png"
+        webp="https://cdn.openai.com/API/docs/images/tutorials/web-qa/DALL-E-woman-turning-a-stack-of-papers-into-numbers-pixel-art.webp"
+        alt="DALL-E: Woman turning a stack of papers into numbers pixel art"
+        width="1024"
+        height="1024"
+    />
+
+
+
+    This is an example expander!
+
+
+## Review process
+
+Once you have an idea, the best thing to do is share it in #api-documentation. You can also get early feedback there via Google docs. It is suggested to write the Google doc version in markdown syntax for easy porting to the production version.
+
+## Required changes
+
+In order to add a new tutorial, you will need to create a new MDX file in the tutorials folder (`/api/onboard/src/content/tutorials`). To make the tutorial accessible via a URL, import the new MDX file and then add a URL path in the Docs Container (`/api/onboard/src/components/apidocs/DocsContainer.js`) file. After that, simply add a link to the new tutorial on the main tutorials index page (`/api/onboard/src/content/tutorials/index.mdx`).
+
+For example:
+
+```html
+
+    <MarkdownPage
+        key="template"
+        title="template"
+        className="markdown-prompt-blockquote template"
+        scrollParent="{docsBodyRef}"
+        pathPrefix="/docs/tutorials/template"
+    >
+        
+    
+
+```
+
+## Running locally
+
+To run the docs locally, please refer to the README.md file in the `onboard` folder (`/api/onboard/README.md`).

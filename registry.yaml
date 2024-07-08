@@ -1324,3 +1324,14 @@
   tags:
     - completions
     - chatgpt
+
+- title: Azure AI Search with Azure Functions and GPT Actions in ChatGPT
+  path: examples/chatgpt/rag-quickstart/azure/Azure_AI_Search_with_Azure_Functions_and_GPT_Actions_in_ChatGPT.ipynb
+  date: 2024-07-08
+  authors:
+    - maxreid-openai
+  tags:
+    - embeddings
+    - chatgpt
+    - tiktoken
+    - completions

@@ -1344,7 +1344,7 @@
     - chatgpt
 
 - title: Data Extraction and Transformation in ELT Workflows using GPT-4o as an OCR Alternative
-  path:examples/Data_extraction_transformation.ipynb
+  path: examples/Data_extraction_transformation.ipynb
   date: 2024-07-09
   authors:
     - charuj 

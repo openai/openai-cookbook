@@ -1324,3 +1324,21 @@
   tags:
     - completions
     - chatgpt
+
+- title: GPT Actions library - getting started
+  path: examples/chatgpt/gpt_actions_library/.gpt_action_getting_started.ipynb
+  date: 2024-07-09
+  authors:
+    - aaronwilkowitz-openai
+  tags:
+    - gpt-actions-library
+    - chatgpt
+
+- title: GPT Actions library - BigQuery
+  path: examples/chatgpt/gpt_actions_library/gpt_action_bigquery.ipynb
+  date: 2024-07-09
+  authors:
+    - aaronwilkowitz-openai
+  tags:
+    - gpt-actions-library
+    - chatgpt

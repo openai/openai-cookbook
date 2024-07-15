@@ -1,0 +1,86 @@
+{
+  "hotel_information": {
+    "name": "MADISON Hotel GmbH",
+    "address": {
+      "street": "Schaarsteinweg 4",
+      "city": "Hamburg",
+      "country": "Germany",
+      "postal_code": "20459"
+    },
+    "contact": {
+      "phone": "+49.40.37 666-0",
+      "fax": "+49.40.37 666-137",
+      "email": "info@madisonhotel.de",
+      "website": "madisonhotel.de"
+    }
+  },
+  "guest_information": {
+    "company": "APImeiseter Consulting GmbH",
+    "address": "Friedrichstr. 123, 10117 Berlin",
+    "guest_name": "Mr. Jens Walter"
+  },
+  "invoice_information": {
+    "invoice_number": "493304",
+    "reservation_number": null,
+    "date": "2019-03-15",
+    "room_number": "315",
+    "check_in_date": "2019-03-10",
+    "check_out_date": "2019-03-15"
+  },
+  "charges": [
+    {
+      "date": "2019-03-10",
+      "description": "Overnight stay excluding breakfast",
+      "charge": 110.0,
+      "credit": null
+    },
+    {
+      "date": "2019-03-11",
+      "description": "Overnight stay excluding breakfast",
+      "charge": 110.0,
+      "credit": null
+    },
+    {
+      "date": "2019-03-12",
+      "description": "Overnight stay excluding breakfast",
+      "charge": 110.0,
+      "credit": null
+    },
+    {
+      "date": "2019-03-13",
+      "description": "Overnight stay excluding breakfast",
+      "charge": 110.0,
+      "credit": null
+    },
+    {
+      "date": "2019-03-14",
+      "description": "Overnight stay excluding breakfast",
+      "charge": 189.0,
+      "credit": null
+    },
+    {
+      "date": "2019-03-15",
+      "description": "Mastercard IFC",
+      "charge": 629.0,
+      "credit": null
+    }
+  ],
+  "totals_summary": {
+    "currency": "EUR",
+    "total_net": 587.85,
+    "total_tax": 41.15,
+    "total_gross": 629.0,
+    "total_charge": 629.0,
+    "total_credit": 0.0,
+    "balance_due": 0.0
+  },
+  "taxes": [
+    {
+      "tax_type": "VAT",
+      "tax_rate": "7%",
+      "net_amount": 587.85,
+      "tax_amount": 41.15,
+      "gross_amount": 629.0
+    }
+  ]
+}

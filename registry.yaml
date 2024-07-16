@@ -1352,6 +1352,15 @@
     - completions
     - vision
     - ocr 
+
+- title: GPT Actions library - Outlook
+  path: examples/chatgpt/gpt_actions_library/gpt_action_outlook.ipynb
+  date: 2024-07-15
+  authors:
+    - rupert-openai
+  tags:
+    - gpt-actions-library
+    - chatgpt
     
 - title: GPT Actions library - Canvas LMS
   path: examples/chatgpt/gpt_actions_library/gpt_action_canvaslms.ipynb

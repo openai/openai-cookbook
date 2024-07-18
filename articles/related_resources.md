@@ -16,6 +16,7 @@ People are writing great tools and papers for improving outputs from GPT. Here a
 - [LiteLLM](https://github.com/BerriAI/litellm): A minimal Python library for calling LLM APIs with a consistent format.
 - [LlamaIndex](https://github.com/jerryjliu/llama_index): A Python library for augmenting LLM apps with data.
 - [LMQL](https://lmql.ai): A programming language for LLM interaction with support for typed prompting, control flow, constraints, and tools.
+- [Maxim AI](https://www.getmaxim.ai): An enterprise-grade generative AI evaluation and observability platform.
 - [OpenAI Evals](https://github.com/openai/evals): An open-source library for evaluating task performance of language models and prompts.
 - [Outlines](https://github.com/normal-computing/outlines): A Python library that provides a domain-specific language to simplify prompting and constrain generation.
 - [Parea AI](https://www.parea.ai): A platform for debugging, testing, and monitoring LLM apps.

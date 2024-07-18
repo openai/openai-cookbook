@@ -1214,9 +1214,9 @@
   tags:
     - guardrails
 
-- title: How to combine GPT4 with Vision with RAG to create a clothing matchmaker app
+- title: How to combine GPT4o mini with RAG to create a clothing matchmaker app
   path: examples/How_to_combine_GPT4o_with_RAG_Outfit_Assistant.ipynb
-  date: 2024-02-16
+  date: 2024-07-18
   authors:
     - teomusatoiu
   tags:
@@ -1234,9 +1234,9 @@
     - embeddings
 
 
-- title: Using GPT4 with Vision to tag and caption images
+- title: Using GPT4o mini to tag and caption images
   path: examples/Tag_caption_images_with_GPT4V.ipynb
-  date: 2024-02-28
+  date: 2024-07-18
   authors:
     - katiagg
   tags:
@@ -1306,9 +1306,9 @@
     - completions
     - functions
 
-- title: Introduction to gpt-4o
+- title: Introduction to GPT-4o and GPT-4o mini
   path: examples/gpt4o/introduction_to_gpt4o.ipynb
-  date: 2024-05-13
+  date: 2024-07-18
   authors:
     - justonf
   tags:

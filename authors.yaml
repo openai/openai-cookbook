@@ -101,9 +101,15 @@ justonf:
 aaronwilkowitz-openai:
   name: "Aaron Wilkowitz"
   website: "https://www.linkedin.com/in/aaronwilkowitz/"
-  avatar: "https://raw.githubusercontent.com/aaron-wilkowitz/asw_photo/main/asw_623_623.jpg"
+  avatar: "https://avatars.githubusercontent.com/u/157151487"
 
 charuj:
   name: "Charu Jaiswal"
   website: "https://www.linkedin.com/in/charu-j-8a866471"
   avatar: "https://avatars.githubusercontent.com/u/18404643?v=4" 
+
+rupert-openai:
+  name: "Rupert Truman"
+  website: "https://www.linkedin.com/in/rupert-truman/"
+  avatar: "https://avatars.githubusercontent.com/u/171234447"
+  

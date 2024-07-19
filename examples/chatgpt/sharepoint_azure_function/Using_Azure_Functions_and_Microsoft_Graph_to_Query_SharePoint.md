@@ -11,12 +11,12 @@ This solution enables a GPT action to answer a user’s question with the contex
 
 There are two solutions below, with code for each in the repository. 
 
-The first solution **Solution 1** uses the ability to[ retrieve files in Actions](https://platform.openai.com/docs/actions/getting-started/returning-files) and use them as if you had uploaded them directly to a conversation. The Azure Function returns a base64 string that ChatGPT converts into a file, treated the same way as if you uploaded the file directly to the conversation. This solution can handle more types of files than the other solution below, but does have size volume limitations (see docs [here](https://platform.openai.com/docs/actions/getting-started/returning-files))
+The first solution **Solution 1** uses the ability to[ retrieve files in Actions](https://platform.openai.com/docs/actions/sending-files) and use them as if you had uploaded them directly to a conversation. The Azure Function returns a base64 string that ChatGPT converts into a file, treated the same way as if you uploaded the file directly to the conversation. This solution can handle more types of files than the other solution below, but does have size volume limitations (see docs [here](https://platform.openai.com/docs/actions/sending-files))
 
-The second solution **Solution 2** pre-processes the file within the Azure Function. The Azure Function returns text, instead of the base64 encoded file. Due to the pre-processing and the conversion to text, this solution is best used for large, unstructured documents, and for when you want to analyze more than the amount of files supported in the first solution (see documentation [here](https://platform.openai.com/docs/actions/getting-started/returning-files)).
+The second solution **Solution 2** pre-processes the file within the Azure Function. The Azure Function returns text, instead of the base64 encoded file. Due to the pre-processing and the conversion to text, this solution is best used for large, unstructured documents, and for when you want to analyze more than the amount of files supported in the first solution (see documentation [here](https://platform.openai.com/docs/actions/sending-files)).
 
 
-### Solution 1: Returning the file to GPT using the [Returning Files](https://platform.openai.com/docs/actions/getting-started/returning-files) pattern
+### Solution 1: Returning the file to GPT using the [Returning Files](https://platform.openai.com/docs/actions/sending-files) pattern
 
 ![](../../../images/solution_1.gif)
 
@@ -26,7 +26,7 @@ This solution uses a Node.js Azure Function to, based on the logged in user:
 
 2. For each file that is found, convert it to a base64 string.
 
-3. Format the data in the structure ChatGPT is expecting [here](https://platform.openai.com/docs/actions/getting-started/inline-option).
+3. Format the data in the structure ChatGPT is expecting [here](https://platform.openai.com/docs/actions/sending-files/inline-option).
 
 4. Return that to ChatGPT. The GPT then can use those files as if you had uploaded it to the conversation.
 
@@ -278,7 +278,7 @@ Now that you have an authenticated Azure Function, we can update the function to
 26. Test out the GPT and it should work as expected.
 
 
-## Solution 1 Detailed Walkthrough: Returning the File to GPT using the [Returning Files](https://platform.openai.com/docs/actions/getting-started/returning-files) Pattern
+## Solution 1 Detailed Walkthrough: Returning the File to GPT using the [Returning Files](https://platform.openai.com/docs/actions/sending-files) Pattern
 
 
 The below walks through setup instructions and walkthrough unique to this solution. You can find the entire code [here](https://github.com/openai/openai-cookbook/blob/main/examples/chatgpt/sharepoint_azure_function/solution_one_file_retrieval.js). If you are interested in Solution 2 instead, you can jump [here](#solution-2-converting-the-file-to-text-in-the-azure-function-1). 
@@ -484,7 +484,7 @@ Below are some potential areas to customize. 
 
 Note that all the same limitations of Actions apply here, with regards to returning 100K characters or less and the [45 second timeout](https://platform.openai.com/docs/actions/production/timeouts).
 
-- Make sure you read the documentation here around [returning files](https://platform.openai.com/docs/actions/getting-started/returning-files) and [file uploads](https://help.openai.com/en/articles/8555545-file-uploads-faq), as those limitations apply here.
+- Make sure you read the documentation here around [returning files](https://platform.openai.com/docs/actions/sending-files) and [file uploads](https://help.openai.com/en/articles/8555545-file-uploads-faq), as those limitations apply here.
 
 ### Sample GPT Instructions
 
@@ -522,7 +522,7 @@ Be sure to be explicit about what you are searching for at each step.
 In either scenario, try to answer the user's question. If you cannot answer the user's question based on the knowledge you find, let the user know and ask them to go check the HR Docs in SharePoint. 
 ```
 ### Sample OpenAPI Spec
-This expects a response that matches the file retrieval structure in our doc [here](https://platform.openai.com/docs/actions/getting-started/returning-files) and passes in a `searchTerm` parameter to inform the search.
+This expects a response that matches the file retrieval structure in our doc [here](https://platform.openai.com/docs/actions/sending-files) and passes in a `searchTerm` parameter to inform the search.
 >Make sure to switch the function app name, function name and code based on link copied in screenshot [here](#part-3-set-up-test-function)
 
 ```yaml

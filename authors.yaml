@@ -112,6 +112,11 @@ rupert-openai:
   name: "Rupert Truman"
   website: "https://www.linkedin.com/in/rupert-truman/"
   avatar: "https://avatars.githubusercontent.com/u/171234447"
+  
+keelan-openai:
+  name: "Keelan Schule"
+  website: "https://www.linkedin.com/in/keelanschule/"
+  avatar: "https://avatars.githubusercontent.com/u/175734151?v=4"
 
 aa-openai:
   name: "Allison August"

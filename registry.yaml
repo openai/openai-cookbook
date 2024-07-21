@@ -1361,3 +1361,12 @@
   tags:
     - gpt-actions-library
     - chatgpt
+
+- title: GPT Actions library - Salesforce
+  path: examples/chatgpt/gpt_actions_library/gpt_action_salesforce.ipynb
+  date: 2024-07-18
+  authors:
+    - aa-openai
+  tags:
+    - gpt-actions-library
+    - chatgpt

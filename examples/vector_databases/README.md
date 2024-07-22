@@ -9,6 +9,7 @@ Each provider has their own named directory, with a standard notebook to introdu
 ## Guides & deep dives
 - [AnalyticDB](https://www.alibabacloud.com/help/en/analyticdb-for-postgresql/latest/get-started-with-analyticdb-for-postgresql)
 - [Cassandra/Astra DB](https://docs.datastax.com/en/astra-serverless/docs/vector-search/qandasimsearch-quickstart.html)
+- [CrateDB](https://cratedb.com/blog/unlocking-the-power-of-vector-support-and-knn-search-in-cratedb)
 - [Azure AI Search](https://learn.microsoft.com/azure/search/search-get-started-vector)
 - [Azure SQL Database](https://learn.microsoft.com/azure/azure-sql/database/ai-artificial-intelligence-intelligent-applications?view=azuresql)
 - [Chroma](https://docs.trychroma.com/getting-started)

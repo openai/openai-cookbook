@@ -32,6 +32,7 @@
   tags:
     - completions
     - tiktoken
+    - fine-tuning
 
 - title: Classification using embeddings
   path: examples/Classification_using_embeddings.ipynb
@@ -114,6 +115,7 @@
     - BorisPower
   tags:
     - completions
+    - fine-tuning
 
 - title: >-
     Function calling for nearby places: Leveraging the Google Places API and
@@ -182,6 +184,7 @@
     - shyamal-anadkat
   tags:
     - completions
+    - fine-tuning
 
 - title: How to format inputs to ChatGPT models
   path: examples/How_to_format_inputs_to_ChatGPT_models.ipynb
@@ -501,6 +504,7 @@
   tags:
     - embeddings
     - completions
+    - fine-tuning
 
 - title: Fine-Tuned Q&A - create Q&A
   path: examples/fine-tuned_qa/olympics-2-create-qa.ipynb
@@ -511,6 +515,7 @@
   tags:
     - embeddings
     - completions
+    - fine-tuning
 
 - title: Fine-Tuned Q&A - train
   path: examples/fine-tuned_qa/olympics-3-train-qa.ipynb
@@ -521,6 +526,7 @@
   tags:
     - completions
     - embeddings
+    - fine-tuning
 
 - title: Visualizing the embeddings in Kangas
   path: examples/third_party/Visualizing_embeddings_in_Kangas.ipynb
@@ -1018,6 +1024,7 @@
   tags:
     - completions
     - embeddings
+    - fine-tuning
 
 - title: How to automate AWS tasks with function calling
   path: examples/third_party/How_to_automate_S3_storage_with_functions.ipynb
@@ -1061,6 +1068,7 @@
   tags:
     - tiktoken
     - completions
+    - fine-tuning
 
 - title: OpenAI API Monitoring with Weights & Biases Weave
   path: examples/third_party/Openai_monitoring_with_wandb_weave.ipynb
@@ -1119,6 +1127,7 @@
   tags:
     - completions
     - functions
+    - fine-tuning
 
 - title: Processing and narrating a video with GPT's visual capabilities and the TTS API
   path: examples/GPT_with_vision_for_video_understanding.ipynb

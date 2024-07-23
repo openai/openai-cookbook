@@ -1316,14 +1316,14 @@
     - vision
     - whisper
 
-- title: Using Azure Function and the Microsoft Graph Search API to Query Office365 and SharePoint with ChatGPT
-  path: examples/chatgpt/sharepoint_azure_function/Using_Azure_Functions_and_Microsoft_Graph_to_Query_SharePoint.md
-  date: 2024-05-24
-  authors:
-    - maxreid-openai
-  tags:
-    - completions
-    - chatgpt
+# - title: Using Azure Function and the Microsoft Graph Search API to Query Office365 and SharePoint with ChatGPT
+#   path: examples/chatgpt/sharepoint_azure_function/Using_Azure_Functions_and_Microsoft_Graph_to_Query_SharePoint.md
+#   date: 2024-05-24
+#   authors:
+#     - maxreid-openai
+#   tags:
+#     - completions
+#     - chatgpt
 
 - title: GPT Actions library - getting started
   path: examples/chatgpt/gpt_actions_library/.gpt_action_getting_started.ipynb
@@ -1361,6 +1361,33 @@
   tags:
     - gpt-actions-library
     - chatgpt
+
+- title: GPT Actions library - Sharepoint (Return Docs)
+  path: examples/chatgpt/gpt_actions_library/gpt_action_sharepoint_doc.ipynb
+  date: 2024-05-24
+  authors:
+    - maxreid-openai
+  tags:
+    - completions
+    - chatgpt
+
+- title: GPT Actions library - Sharepoint (Return Text)
+  path: examples/chatgpt/gpt_actions_library/gpt_action_sharepoint_text.ipynb
+  date: 2024-05-24
+  authors:
+    - maxreid-openai
+  tags:
+    - completions
+    - chatgpt
+
+- title: GPT Actions library (Middleware) - Azure Functions
+  path: examples/chatgpt/gpt_actions_library/gpt_middleware_azure_function.ipynb
+  date: 2024-05-24
+  authors:
+    - maxreid-openai
+  tags:
+    - completions
+    - chatgpt
     
 - title: GPT Actions library - Canvas LMS
   path: examples/chatgpt/gpt_actions_library/gpt_action_canvaslms.ipynb
@@ -1379,3 +1406,4 @@
   tags:
     - gpt-actions-library
     - chatgpt
+  

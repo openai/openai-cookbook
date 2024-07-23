@@ -1,0 +1,75 @@
+{
+  "hotel_information": {
+    "name": "Motel One Berlin-Hauptbahnhof",
+    "address": {
+      "street": "Invalidenstraße 54",
+      "city": "Berlin",
+      "country": "Germany",
+      "postal_code": "10557"
+    },
+    "contact": {
+      "phone": null,
+      "fax": null,
+      "email": null,
+      "website": null
+    }
+  },
+  "guest_information": {
+    "company": "APImeiseter Consulting GmbH",
+    "address": "Friedrichstrasse 123, 10117 Berlin, Germany",
+    "guest_name": "Walter, Jens"
+  },
+  "invoice_information": {
+    "invoice_number": "534717906",
+    "reservation_number": "534629153/1",
+    "date": "2019-11-18",
+    "room_number": "1011",
+    "check_in_date": "2019-11-18",
+    "check_out_date": "2019-11-19"
+  },
+  "charges": [
+    {
+      "date": "2019-11-18",
+      "description": "Best price with breakfast",
+      "charge": 80.5,
+      "credit": 0.0
+    },
+    {
+      "date": "2019-11-18",
+      "description": "Breakfast",
+      "charge": 11.5,
+      "credit": 0.0
+    },
+    {
+      "date": "2019-11-18",
+      "description": "Lodging",
+      "charge": 69.0,
+      "credit": 0.0
+    }
+  ],
+  "totals_summary": {
+    "currency": "EUR",
+    "total_net": 80.5,
+    "total_tax": 6.35,
+    "total_gross": 86.85,
+    "total_charge": 161.0,
+    "total_credit": 80.5,
+    "balance_due": 0.0
+  },
+  "taxes": [
+    {
+      "tax_type": "19.00% (VAT)",
+      "tax_rate": "19.00%",
+      "net_amount": 9.66,
+      "tax_amount": 1.84,
+      "gross_amount": 11.5
+    },
+    {
+      "tax_type": "7.00% (VAT)",
+      "tax_rate": "7.00%",
+      "net_amount": 64.49,
+      "tax_amount": 4.51,
+      "gross_amount": 69.0
+    }
+  ]
+}

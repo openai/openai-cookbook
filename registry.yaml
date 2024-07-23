@@ -176,9 +176,10 @@
 
 - title: How to fine-tune chat models
   path: examples/How_to_finetune_chat_models.ipynb
-  date: 2023-08-22
+  date: 2024-07-23
   authors:
     - simonpfish
+    - shyamal-anadkat
   tags:
     - completions
 

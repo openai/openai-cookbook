@@ -1,0 +1,100 @@
+{
+  "hotel_information": {
+    "name": "Hampton by Hilton Hamburg City Centre",
+    "address": {
+      "street": "Nordkanalstrasse 18",
+      "city": "Hamburg",
+      "country": "Germany",
+      "postal_code": "20097"
+    },
+    "contact": {
+      "phone": "+49(0)40-302372-0",
+      "fax": "+49(0)40-302372-100",
+      "email": null,
+      "website": null
+    }
+  },
+  "guest_information": {
+    "company": "APIMEISTER CONSULTING GMBH",
+    "address": "FRIEDRICHSR. 123, 10117 BERLIN, GERMANY",
+    "guest_name": "JENS WALTER"
+  },
+  "invoice_information": {
+    "invoice_number": "24361",
+    "reservation_number": "87607957",
+    "date": null,
+    "room_number": "119",
+    "check_in_date": "2019-04-28",
+    "check_out_date": "2019-04-30"
+  },
+  "charges": [
+    {
+      "date": "2019-04-28",
+      "description": "Advance Deposit MC *2828",
+      "charge": null,
+      "credit": 221.0
+    },
+    {
+      "date": "2019-04-28",
+      "description": "ADVANCED DEPOSIT DEBIT",
+      "charge": 221.0,
+      "credit": null
+    },
+    {
+      "date": "2019-04-28",
+      "description": "ADVANCED DEPOSIT CREDIT",
+      "charge": null,
+      "credit": 221.0
+    },
+    {
+      "date": "2019-04-28",
+      "description": "GUEST ROOM",
+      "charge": 97.05,
+      "credit": null
+    },
+    {
+      "date": "2019-04-28",
+      "description": "BREAKFAST",
+      "charge": 14.95,
+      "credit": null
+    },
+    {
+      "date": "2019-04-29",
+      "description": "GUEST ROOM",
+      "charge": 114.05,
+      "credit": null
+    }
+  ],
+  "totals_summary": {
+    "currency": "EUR",
+    "total_net": null,
+    "total_tax": null,
+    "total_gross": null,
+    "total_charge": null,
+    "total_credit": null,
+    "balance_due": null
+  },
+  "taxes": [
+    {
+      "tax_type": "trade_receivable_net_19%",
+      "tax_rate": "19%",
+      "net_amount": 8.32,
+      "tax_amount": 1.58,
+      "gross_amount": 9.9
+    },
+    {
+      "tax_type": "trade_receivable_net_7%",
+      "tax_rate": "7%",
+      "net_amount": 0.0,
+      "tax_amount": 0.0,
+      "gross_amount": 0.0
+    },
+    {
+      "tax_type": "trade_receivable_net_7.00%",
+      "tax_rate": "7%",
+      "net_amount": 197.29,
+      "tax_amount": 13.81,
+      "gross_amount": 211.1
+    }
+  ]
+}

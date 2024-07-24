@@ -1425,3 +1425,12 @@
   tags:
     - gpt-actions-library
     - chatgpt
+    
+- title: GPT Actions library - Jira
+  path: examples/chatgpt/gpt_actions_library/gpt_action_jira.ipynb
+  date: 2024-07-24
+  authors:
+    - rupert-openai
+  tags:
+    - gpt-actions-library
+    - chatgpt

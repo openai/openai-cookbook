@@ -1416,7 +1416,16 @@
   tags:
     - gpt-actions-library
     - chatgpt
-
+  
+- title: GPT Actions library - Gmail
+  path: examples/chatgpt/gpt_actions_library/gpt_action_gmail.ipynb
+  date: 2024-07-24
+  authors:
+    - alwestmo-openai
+  tags:
+    - gpt-actions-library
+    - chatgpt
+    
 - title: GPT Actions library - Jira
   path: examples/chatgpt/gpt_actions_library/gpt_action_jira.ipynb
   date: 2024-07-24

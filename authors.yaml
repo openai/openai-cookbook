@@ -127,3 +127,8 @@ alwestmo-openai:
   name: "Anthony Westmoreland"
   website: "https://www.linkedin.com/in/westmorelandanthony/"
   avatar: "https://avatars2.githubusercontent.com/u/175844346"
+
+dan-openai:
+  name: "Daniel Halpern"
+  website: "https://www.linkedin.com/in/dhalp/"
+  avatar: "https://avatars.githubusercontent.com/u/175367970"

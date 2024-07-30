@@ -1,0 +1,62 @@
+
+# Hackathon support request
+
+Thank you for your interest in having OpenAI support your developer hackathon. This page includes the relevant information about what types of events we support, how to request support, and more.
+
+## Event criteria
+
+We consider many event requests but tend to give priority to those that meet the following criteria:
+
+-   The event is developer-focused
+-   There is a public website for the event with information about the hackathon and a code of conduct displayed
+-   The event begins more than 21 days from the time of requesting support
+-   Post-event, we’d kindly ask for feedback via survey
+
+
+    Due to high demand, we will not be able to support all requests. Please allow our team
+    7 days to review the request.
+
+
+## Request support
+
+In order to submit a request for support of your hackathon, you must be currently signed in via your OpenAI account, then you can use our [hackathon submission bot](#).
+
+To view the status of your hackathon submission, make sure you are logged in and select "Help" in the top right corner of this page. Under "Messages", you will be able to see your hackathon submission. We will notify you as the status of your request changes during the review process.
+
+## Process
+
+After you submit a request, you can expect the following steps to take place:
+
+1. Your request for hackathon support will be reviewed by the team (generally within 7 days).
+2. We will respond to the ticket and specify if and how we are able to support the event.
+    - If you request credits, a speaker, and prize credits, we will respond with which of these we are able to accommodate.
+3. If your request is approved, we will ask for the email and OrgID of the developers attending the event. This is required for us to grant credits.
+4. Once we get this info, we can generally process the credits in 1-2 days.
+
+## Branding guidelines
+
+Once approved, we ask for the ability to review marketing materials that mention OpenAI or our support. We typically do not allow our logo to be used for marketing materials at hackathons.
+
+We do allow hackathons to say that "credits are provided by OpenAI" or "supported by OpenAI" if they are selected to receive support.
+
+## FAQ
+
+#### Is there a limit to the number of people I can have at my event?
+
+No. But for events with more than 1,000 people, we require a discussion with your event organizers so we can determine how best we can accommodate them.
+
+#### Can I say that OpenAI is sponsoring my hackathon?
+
+We reserve the “sponsoring” language for events that we have a sponsorship agreement with. We are okay with you describing our support as follows: "Credits are being provided by OpenAI" or “Supported by OpenAI”.
+
+#### Does OpenAI do cash sponsorships of hackathons?
+
+Not at this time.
+
+#### Can someone from OpenAI speak at my hackathon?
+
+Maybe! We love getting out and connecting with the developer community but have limited bandwidth to attend events.
+
+#### Can my hackathon be virtual?
+
+Yes, we support in-person, virtual, and hybrid hackathon events!

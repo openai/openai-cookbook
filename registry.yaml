@@ -1436,3 +1436,12 @@
   tags:
     - gpt-actions-library
     - chatgpt
+
+- title: GPT Actions library - Notion
+  path: examples/chatgpt/gpt_actions_library/gpt_action_notion.ipynb
+  date: 2024-07-25
+  authors:
+    - dan-openai
+  tags:
+    - gpt-actions-library
+    - chatgpt

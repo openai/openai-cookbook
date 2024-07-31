@@ -1445,3 +1445,12 @@
   tags:
     - gpt-actions-library
     - chatgpt
+
+- title: GPT Actions library - Confluence
+  path: examples/chatgpt/gpt_actions_library/gpt_action_confluence.ipynb
+  date: 2024-07-31
+  authors:
+    - eszuhany-openai
+  tags:
+    - gpt-actions-library
+    - chatgpt

@@ -1454,3 +1454,12 @@
   tags:
     - gpt-actions-library
     - chatgpt
+
+- title: GPT Actions library - AWS Redshift
+  path: examples/chatgpt/gpt_actions_library/gpt_action_redshift.ipynb
+  date: 2024-08-02
+  authors:
+    - pap-openai
+  tags:
+    - gpt-actions-library
+    - chatgpt

@@ -97,8 +97,8 @@ const getRelevantParts = async (text, query) => {
             apiKey: openAIKey,
         });
         const response = await openai.chat.completions.create({
-            // Using got-4o-mini due to speed to prevent timeouts. You can tweak this prompt as needed
-            model: "got-4o-mini",
+            // Using gpt-4o-mini due to speed to prevent timeouts. You can tweak this prompt as needed
+            model: "gpt-4o-mini",
             messages: [
                 {"role": "system", "content": "You are a helpful assistant that finds relevant content in text based on a query. You only return the relevant sentences, and you return a maximum of 10 sentences"},
                 {"role": "user", "content": `Based on this question: **"${query}"**, get the relevant parts from the following text:*****\n\n${text}*****. If you cannot answer the question based on the text, respond with 'No information provided'`}

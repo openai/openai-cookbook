@@ -1454,3 +1454,12 @@
   tags:
     - gpt-actions-library
     - chatgpt
+
+- title: GPT Actions library - SQL Database
+  path: examples/chatgpt/gpt_actions_library/gpt_action_sql_database.ipynb
+  date: 2024-07-31
+  authors:
+    - evanweiss-openai
+  tags:
+    - gpt-actions-library
+    - chatgpt

@@ -1468,7 +1468,7 @@
     - assistants
 
 - title: Introduction to Structured Outputs
-  path: examples/Structured_outputs.ipynb
+  path: examples/Structured_outputs_intro.ipynb
   date: 2024-08-06
   authors:
     - katiagg

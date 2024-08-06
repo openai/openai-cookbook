@@ -4,7 +4,6 @@
 # should build pages for, and indicates metadata such as tags, creation date and
 # authors for each page.
 
-
 - title: Using logprobs
   path: examples/Using_logprobs.ipynb
   date: 2023-12-20
@@ -1233,7 +1232,6 @@
     - vision
     - embeddings
 
-
 - title: How to parse PDF docs for RAG
   path: examples/Parse_PDF_docs_for_RAG.ipynb
   date: 2024-02-28
@@ -1242,7 +1240,6 @@
   tags:
     - vision
     - embeddings
-
 
 - title: Using GPT4o mini to tag and caption images
   path: examples/Tag_caption_images_with_GPT4V.ipynb
@@ -1253,7 +1250,6 @@
     - vision
     - embeddings
 
-
 - title: How to use the moderation API
   path: examples/How_to_use_moderation.ipynb
   date: 2024-03-05
@@ -1261,8 +1257,7 @@
     - teomusatoiu
   tags:
     - moderation
-  
-  
+
 - title: Summarizing Long Documents
   path: examples/Summarizing_long_documents.ipynb
   date: 2024-04-19
@@ -1287,7 +1282,6 @@
     - dylanra-openai
   tags:
     - completions
-
 
 - title: CLIP embeddings to improve multimodal RAG with GPT-4 Vision
   path: examples/custom_image_embedding_search.ipynb
@@ -1359,11 +1353,10 @@
   path: examples/Data_extraction_transformation.ipynb
   date: 2024-07-09
   authors:
-    - charuj 
+    - charuj
   tags:
     - completions
     - vision
-    - ocr 
 
 - title: GPT Actions library - Outlook
   path: examples/chatgpt/gpt_actions_library/gpt_action_outlook.ipynb
@@ -1400,7 +1393,7 @@
   tags:
     - completions
     - chatgpt
-    
+
 - title: GPT Actions library - Canvas LMS
   path: examples/chatgpt/gpt_actions_library/gpt_action_canvaslms.ipynb
   date: 2024-07-17
@@ -1418,7 +1411,7 @@
   tags:
     - gpt-actions-library
     - chatgpt
-  
+
 - title: GPT Actions library - Gmail
   path: examples/chatgpt/gpt_actions_library/gpt_action_gmail.ipynb
   date: 2024-07-24
@@ -1427,7 +1420,7 @@
   tags:
     - gpt-actions-library
     - chatgpt
-    
+
 - title: GPT Actions library - Jira
   path: examples/chatgpt/gpt_actions_library/gpt_action_jira.ipynb
   date: 2024-07-24
@@ -1463,3 +1456,22 @@
   tags:
     - gpt-actions-library
     - chatgpt
+
+- title: Structured Outputs for Multi-Agent Systems
+  path: examples/Structured_outputs_multi_agent.ipynb
+  date: 2024-08-06
+  authors:
+    - dylanra-openai
+  tags:
+    - completions
+    - functions
+    - assistants
+
+- title: Introduction to Structured Outputs
+  path: examples/Structured_outputs.ipynb
+  date: 2024-08-06
+  authors:
+    - katiagg
+  tags:
+    - completions
+    - functions

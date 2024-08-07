@@ -1373,7 +1373,7 @@
   authors:
     - maxreid-openai
   tags:
-    - completions
+    - gpt-actions-library
     - chatgpt
 
 - title: GPT Actions library - Sharepoint (Return Text)
@@ -1382,7 +1382,7 @@
   authors:
     - maxreid-openai
   tags:
-    - completions
+    - gpt-actions-library
     - chatgpt
 
 - title: GPT Actions library (Middleware) - Azure Functions
@@ -1391,7 +1391,7 @@
   authors:
     - maxreid-openai
   tags:
-    - completions
+    - gpt-actions-library
     - chatgpt
 
 - title: GPT Actions library - Canvas LMS

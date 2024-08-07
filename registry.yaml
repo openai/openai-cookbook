@@ -1457,6 +1457,15 @@
     - gpt-actions-library
     - chatgpt
 
+- title: GPT Actions library - Zapier
+  path: examples/chatgpt/gpt_actions_library/gpt_action_zapier.ipynb
+  date: 2024-08-05
+  authors:
+    - dan-openai
+  tags:
+    - gpt-actions-library
+    - chatgpt
+
 - title: Structured Outputs for Multi-Agent Systems
   path: examples/Structured_outputs_multi_agent.ipynb
   date: 2024-08-06

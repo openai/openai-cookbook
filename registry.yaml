@@ -1457,6 +1457,18 @@
     - gpt-actions-library
     - chatgpt
 
+- title: GCP BigQuery Vector Search with GCP Functions and GPT Actions in ChatGPT
+  path: examples/chatgpt/rag-quickstart/gcp/Getting_started_with_bigquery_vector_search_and_openai.ipynb
+  date: 2024-08-02
+  authors:
+    - pap-openai
+    - maxreid-openai
+  tags:
+    - embeddings
+    - chatgpt
+    - tiktoken
+    - completions
+
 - title: GPT Actions library - Zapier
   path: examples/chatgpt/gpt_actions_library/gpt_action_zapier.ipynb
   date: 2024-08-05

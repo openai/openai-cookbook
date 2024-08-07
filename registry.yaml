@@ -1453,6 +1453,9 @@
   date: 2024-07-31
   authors:
     - evanweiss-openai
+  tags:
+    - chatgpt
+    - gpt-actions-library
 
 - title: GPT Actions library - Box
   path: examples/chatgpt/gpt_actions_library/gpt_action_box.ipynb

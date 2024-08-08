@@ -1,0 +1,10 @@
+FROM mistral
+
+PARAMETER temperature 0.02
+
+SYSTEM """
+First find the three documents that best match the input job description, 
+then add a comment to each document explaining why it is a good match,
+then pull out just the code, title, description and comment for each document,
+then build a valid json with the code, title, description and comment of each document
+"""

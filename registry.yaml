@@ -4,7 +4,6 @@
 # should build pages for, and indicates metadata such as tags, creation date and
 # authors for each page.
 
-
 - title: Using logprobs
   path: examples/Using_logprobs.ipynb
   date: 2023-12-20
@@ -32,6 +31,7 @@
   tags:
     - completions
     - tiktoken
+    - fine-tuning
 
 - title: Classification using embeddings
   path: examples/Classification_using_embeddings.ipynb
@@ -114,6 +114,7 @@
     - BorisPower
   tags:
     - completions
+    - fine-tuning
 
 - title: >-
     Function calling for nearby places: Leveraging the Google Places API and
@@ -176,11 +177,13 @@
 
 - title: How to fine-tune chat models
   path: examples/How_to_finetune_chat_models.ipynb
-  date: 2023-08-22
+  date: 2024-07-23
   authors:
     - simonpfish
+    - shyamal-anadkat
   tags:
     - completions
+    - fine-tuning
 
 - title: How to format inputs to ChatGPT models
   path: examples/How_to_format_inputs_to_ChatGPT_models.ipynb
@@ -500,6 +503,7 @@
   tags:
     - embeddings
     - completions
+    - fine-tuning
 
 - title: Fine-Tuned Q&A - create Q&A
   path: examples/fine-tuned_qa/olympics-2-create-qa.ipynb
@@ -510,6 +514,7 @@
   tags:
     - embeddings
     - completions
+    - fine-tuning
 
 - title: Fine-Tuned Q&A - train
   path: examples/fine-tuned_qa/olympics-3-train-qa.ipynb
@@ -520,6 +525,7 @@
   tags:
     - completions
     - embeddings
+    - fine-tuning
 
 - title: Visualizing the embeddings in Kangas
   path: examples/third_party/Visualizing_embeddings_in_Kangas.ipynb
@@ -1017,6 +1023,7 @@
   tags:
     - completions
     - embeddings
+    - fine-tuning
 
 - title: How to automate AWS tasks with function calling
   path: examples/third_party/How_to_automate_S3_storage_with_functions.ipynb
@@ -1060,6 +1067,7 @@
   tags:
     - tiktoken
     - completions
+    - fine-tuning
 
 - title: OpenAI API Monitoring with Weights & Biases Weave
   path: examples/third_party/Openai_monitoring_with_wandb_weave.ipynb
@@ -1113,9 +1121,12 @@
   authors:
     - jhills20
     - ibigio
+    - shyamal-anadkat
+    - teomusatoiu
   tags:
     - completions
     - functions
+    - fine-tuning
 
 - title: Processing and narrating a video with GPT's visual capabilities and the TTS API
   path: examples/GPT_with_vision_for_video_understanding.ipynb
@@ -1212,15 +1223,14 @@
   tags:
     - guardrails
 
-- title: How to combine GPT4 with Vision with RAG to create a clothing matchmaker app
+- title: How to combine GPT4o mini with RAG to create a clothing matchmaker app
   path: examples/How_to_combine_GPT4o_with_RAG_Outfit_Assistant.ipynb
-  date: 2024-02-16
+  date: 2024-07-18
   authors:
     - teomusatoiu
   tags:
     - vision
     - embeddings
-
 
 - title: How to parse PDF docs for RAG
   path: examples/Parse_PDF_docs_for_RAG.ipynb
@@ -1231,16 +1241,14 @@
     - vision
     - embeddings
 
-
-- title: Using GPT4 with Vision to tag and caption images
+- title: Using GPT4o mini to tag and caption images
   path: examples/Tag_caption_images_with_GPT4V.ipynb
-  date: 2024-02-28
+  date: 2024-07-18
   authors:
     - katiagg
   tags:
     - vision
     - embeddings
-
 
 - title: How to use the moderation API
   path: examples/How_to_use_moderation.ipynb
@@ -1249,8 +1257,7 @@
     - teomusatoiu
   tags:
     - moderation
-  
-  
+
 - title: Summarizing Long Documents
   path: examples/Summarizing_long_documents.ipynb
   date: 2024-04-19
@@ -1275,7 +1282,6 @@
     - dylanra-openai
   tags:
     - completions
-
 
 - title: CLIP embeddings to improve multimodal RAG with GPT-4 Vision
   path: examples/custom_image_embedding_search.ipynb
@@ -1304,9 +1310,9 @@
     - completions
     - functions
 
-- title: Introduction to gpt-4o
+- title: Introduction to GPT-4o and GPT-4o mini
   path: examples/gpt4o/introduction_to_gpt4o.ipynb
-  date: 2024-05-13
+  date: 2024-07-18
   authors:
     - justonf
   tags:
@@ -1314,11 +1320,188 @@
     - vision
     - whisper
 
-- title: Using Azure Function and the Microsoft Graph Search API to Query Office365 and SharePoint with ChatGPT
-  path: examples/chatgpt/sharepoint_azure_function/Using_Azure_Functions_and_Microsoft_Graph_to_Query_SharePoint.md
+- title: Azure AI Search with Azure Functions and GPT Actions in ChatGPT
+  path: examples/chatgpt/rag-quickstart/azure/Azure_AI_Search_with_Azure_Functions_and_GPT_Actions_in_ChatGPT.ipynb
+  date: 2024-07-08
+  authors:
+    - maxreid-openai
+  tags:
+    - embeddings
+    - chatgpt
+    - tiktoken
+    - completions
+
+- title: GPT Actions library - getting started
+  path: examples/chatgpt/gpt_actions_library/.gpt_action_getting_started.ipynb
+  date: 2024-07-09
+  authors:
+    - aaronwilkowitz-openai
+  tags:
+    - gpt-actions-library
+    - chatgpt
+
+- title: GPT Actions library - BigQuery
+  path: examples/chatgpt/gpt_actions_library/gpt_action_bigquery.ipynb
+  date: 2024-07-09
+  authors:
+    - aaronwilkowitz-openai
+  tags:
+    - gpt-actions-library
+    - chatgpt
+
+- title: Data Extraction and Transformation in ELT Workflows using GPT-4o as an OCR Alternative
+  path: examples/Data_extraction_transformation.ipynb
+  date: 2024-07-09
+  authors:
+    - charuj
+  tags:
+    - completions
+    - vision
+
+- title: GPT Actions library - Outlook
+  path: examples/chatgpt/gpt_actions_library/gpt_action_outlook.ipynb
+  date: 2024-07-15
+  authors:
+    - rupert-openai
+  tags:
+    - gpt-actions-library
+    - chatgpt
+
+- title: GPT Actions library - Sharepoint (Return Docs)
+  path: examples/chatgpt/gpt_actions_library/gpt_action_sharepoint_doc.ipynb
   date: 2024-05-24
   authors:
     - maxreid-openai
   tags:
-    - completions
+    - gpt-actions-library
     - chatgpt
+
+- title: GPT Actions library - Sharepoint (Return Text)
+  path: examples/chatgpt/gpt_actions_library/gpt_action_sharepoint_text.ipynb
+  date: 2024-05-24
+  authors:
+    - maxreid-openai
+  tags:
+    - gpt-actions-library
+    - chatgpt
+
+- title: GPT Actions library (Middleware) - Azure Functions
+  path: examples/chatgpt/gpt_actions_library/gpt_middleware_azure_function.ipynb
+  date: 2024-05-24
+  authors:
+    - maxreid-openai
+  tags:
+    - gpt-actions-library
+    - chatgpt
+
+- title: GPT Actions library - Canvas LMS
+  path: examples/chatgpt/gpt_actions_library/gpt_action_canvaslms.ipynb
+  date: 2024-07-17
+  authors:
+    - keelan-openai
+  tags:
+    - gpt-actions-library
+    - chatgpt
+
+- title: GPT Actions library - Salesforce
+  path: examples/chatgpt/gpt_actions_library/gpt_action_salesforce.ipynb
+  date: 2024-07-18
+  authors:
+    - aa-openai
+  tags:
+    - gpt-actions-library
+    - chatgpt
+
+- title: GPT Actions library - Gmail
+  path: examples/chatgpt/gpt_actions_library/gpt_action_gmail.ipynb
+  date: 2024-07-24
+  authors:
+    - alwestmo-openai
+  tags:
+    - gpt-actions-library
+    - chatgpt
+
+- title: GPT Actions library - Jira
+  path: examples/chatgpt/gpt_actions_library/gpt_action_jira.ipynb
+  date: 2024-07-24
+  authors:
+    - rupert-openai
+  tags:
+    - gpt-actions-library
+    - chatgpt
+
+- title: GPT Actions library - Notion
+  path: examples/chatgpt/gpt_actions_library/gpt_action_notion.ipynb
+  date: 2024-07-25
+  authors:
+    - dan-openai
+  tags:
+    - gpt-actions-library
+    - chatgpt
+
+- title: GPT Actions library - Confluence
+  path: examples/chatgpt/gpt_actions_library/gpt_action_confluence.ipynb
+  date: 2024-07-31
+  authors:
+    - eszuhany-openai
+  tags:
+    - gpt-actions-library
+    - chatgpt
+
+- title: GPT Actions library - SQL Database
+  path: examples/chatgpt/gpt_actions_library/gpt_action_sql_database.ipynb
+  date: 2024-07-31
+  authors:
+    - evanweiss-openai
+  tags:
+    - chatgpt
+    - gpt-actions-library
+
+- title: GPT Actions library - Box
+  path: examples/chatgpt/gpt_actions_library/gpt_action_box.ipynb
+  date: 2024-08-02
+  authors:
+    - keelan-openai
+  tags:
+    - gpt-actions-library
+    - chatgpt
+
+- title: GCP BigQuery Vector Search with GCP Functions and GPT Actions in ChatGPT
+  path: examples/chatgpt/rag-quickstart/gcp/Getting_started_with_bigquery_vector_search_and_openai.ipynb
+  date: 2024-08-02
+  authors:
+    - pap-openai
+    - maxreid-openai
+  tags:
+    - embeddings
+    - chatgpt
+    - tiktoken
+    - completions
+
+- title: GPT Actions library - Zapier
+  path: examples/chatgpt/gpt_actions_library/gpt_action_zapier.ipynb
+  date: 2024-08-05
+  authors:
+    - dan-openai
+  tags:
+    - gpt-actions-library
+    - chatgpt
+
+- title: Structured Outputs for Multi-Agent Systems
+  path: examples/Structured_outputs_multi_agent.ipynb
+  date: 2024-08-06
+  authors:
+    - dylanra-openai
+  tags:
+    - completions
+    - functions
+    - assistants
+
+- title: Introduction to Structured Outputs
+  path: examples/Structured_Outputs_Intro.ipynb
+  date: 2024-08-06
+  authors:
+    - katiagg
+  tags:
+    - completions
+    - functions

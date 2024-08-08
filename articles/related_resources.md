@@ -23,6 +23,7 @@ People are writing great tools and papers for improving outputs from GPT. Here a
 - [Promptify](https://github.com/promptslab/Promptify): A small Python library for using language models to perform NLP tasks.
 - [PromptPerfect](https://promptperfect.jina.ai/prompts): A paid product for testing and improving prompts.
 - [Prompttools](https://github.com/hegelai/prompttools): Open-source Python tools for testing and evaluating models, vector DBs, and prompts.
+- [Product Manager Prompts for Generative AI](https://github.com/deanpeters/product-manager-prompts): Open-source prompts built on well-known, often-practiced product manager tools, techniques, and templates.
 - [Scale Spellbook](https://scale.com/spellbook): A paid product for building, comparing, and shipping language model apps.
 - [Semantic Kernel](https://github.com/microsoft/semantic-kernel): A Python/C#/Java library from Microsoft that supports prompt templating, function chaining, vectorized memory, and intelligent planning.
 - [Vellum](https://www.vellum.ai/): A paid AI product development platform to experiment with, evaluate, and deploy advanced LLM apps. 

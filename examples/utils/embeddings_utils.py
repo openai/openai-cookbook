@@ -15,7 +15,9 @@ import pandas as pd
 client = OpenAI(max_retries=5)
 
 
-def get_embedding(text: str, model="text-embedding-3-small", **kwargs) -> List[float]:
+def get_embedding(
+    text: str, model="text-embedding-3-small", **kwargs
+) -> List[float]:
     # replace newlines, which can negatively affect performance.
     text = text.replace("\n", " ")
 

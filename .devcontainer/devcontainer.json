@@ -1,0 +1,20 @@
+{
+    "name": "my-project-devcontainer",
+    "image": "mcr.microsoft.com/devcontainers/universal:2",
+    "features": {
+      "ghcr.io/devcontainers-contrib/features/ts-node:1": {},
+      "ghcr.io/devcontainers-contrib/features/bash-command:1": {},
+      "ghcr.io/devcontainers-contrib/features/jshint:2": {},
+      "ghcr.io/devcontainers-contrib/features/json-server:1": {},
+      "ghcr.io/devcontainers-contrib/features/localtunnel-npm:1": {},
+      "ghcr.io/devcontainers-contrib/features/live-server:1": {},
+      "ghcr.io/devcontainers-contrib/features/jest:2": {},
+      "ghcr.io/devcontainers/features/java:1": {},
+      "ghcr.io/devcontainers-contrib/features/npm-package:1": {},
+      "ghcr.io/devcontainers-contrib/features/mypy:2": {},
+      "ghcr.io/devcontainers/features/node:1": {},
+      "ghcr.io/hspaans/devcontainer-features/pymarkdownlnt:1": {},
+      "ghcr.io/devcontainers-contrib/features/ripgrep:1": {},
+      "ghcr.io/devcontainers-contrib/features/qrcode:2": {}
+    }
+}

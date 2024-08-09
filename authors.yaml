@@ -10,7 +10,7 @@
 
 cathykc:
   name: "Kai Chen"
-  website: "https://twitter.com/cathykaic"
+  website: ""
   avatar: "https://pbs.twimg.com/profile_images/1657816900817272832/ioGq5O0t_400x400.jpg"
 
 shyamal-anadkat:
@@ -142,3 +142,8 @@ pap-openai:
   name: "Pierre-Antoine Porte"
   website: "https://www.linkedin.com/in/portepa/"
   avatar: "https://avatars.githubusercontent.com/u/174109416?v=4"
+
+evanweiss-openai:
+  name: "Evan Weiss"
+  website: "https://www.linkedin.com/in/evanpweiss/"
+  avatar: "https://avatars.githubusercontent.com/u/150647345"

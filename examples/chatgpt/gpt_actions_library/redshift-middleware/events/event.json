@@ -1,0 +1,3 @@
+{
+    "body": "{\"sql_statement\": \"select * from customers limit 5;\"}"
+}

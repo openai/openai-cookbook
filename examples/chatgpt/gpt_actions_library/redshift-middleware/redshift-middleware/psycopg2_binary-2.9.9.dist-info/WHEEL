@@ -1,0 +1,6 @@
+Wheel-Version: 1.0
+Generator: bdist_wheel (0.41.2)
+Root-Is-Purelib: false
+Tag: cp39-cp39-manylinux_2_17_x86_64
+Tag: cp39-cp39-manylinux2014_x86_64
+

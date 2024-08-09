@@ -1,0 +1,127 @@
+AWSTemplateFormatVersion: '2010-09-09'
+Transform: AWS::Serverless-2016-10-31
+Description: >
+  redshift-middleware
+
+  Middleware to fetch RedShift data and return it through HTTP as files
+
+Globals:
+  Function:
+    Timeout: 3
+
+Parameters:
+  RedshiftHost:
+    Type: String
+  RedshiftPort:
+    Type: String
+  RedshiftUser:
+    Type: String
+  RedshiftPassword:
+    Type: String
+  RedshiftDb:
+    Type: String
+  SecurityGroupId:
+    Type: String
+  SubnetId1:
+    Type: String
+  SubnetId2:
+    Type: String
+  SubnetId3:
+    Type: String
+  SubnetId4:
+    Type: String
+  SubnetId5:
+    Type: String
+  SubnetId6:
+    Type: String
+  CognitoUserPoolName:
+    Type: String
+    Default: MyCognitoUserPool
+  CognitoUserPoolClientName:
+    Type: String
+    Default: MyCognitoUserPoolClient
+
+Resources:
+  MyCognitoUserPool:
+    Type: AWS::Cognito::UserPool
+    Properties:
+      UserPoolName: !Ref CognitoUserPoolName
+      Policies:
+        PasswordPolicy:
+          MinimumLength: 8
+      UsernameAttributes:
+        - email
+      Schema:
+        - AttributeDataType: String
+          Name: email
+          Required: false
+
+  MyCognitoUserPoolClient:
+    Type: AWS::Cognito::UserPoolClient
+    Properties:
+      UserPoolId: !Ref MyCognitoUserPool
+      ClientName: !Ref CognitoUserPoolClientName
+      GenerateSecret: true
+
+  RedshiftMiddlewareApi:
+    Type: AWS::Serverless::Api
+    Properties:
+      StageName: Prod
+      Cors: "'*'"
+      Auth:
+        DefaultAuthorizer: MyCognitoAuthorizer
+        Authorizers:
+          MyCognitoAuthorizer:
+            AuthorizationScopes:
+              - openid
+              - email
+              - profile
+            UserPoolArn: !GetAtt MyCognitoUserPool.Arn
+        
+  RedshiftMiddlewareFunction:
+    Type: AWS::Serverless::Function
+    Properties:
+      CodeUri: redshift-middleware/
+      Handler: app.lambda_handler
+      Runtime: python3.11
+      Timeout: 45
+      Architectures:
+        - x86_64
+      Events:
+        SqlStatement:
+          Type: Api
+          Properties:
+            Path: /sql_statement
+            Method: post
+            RestApiId: !Ref RedshiftMiddlewareApi
+      Environment:
+        Variables:
+          REDSHIFT_HOST: !Ref RedshiftHost
+          REDSHIFT_PORT: !Ref RedshiftPort
+          REDSHIFT_USER: !Ref RedshiftUser
+          REDSHIFT_PASSWORD: !Ref RedshiftPassword
+          REDSHIFT_DB: !Ref RedshiftDb
+      VpcConfig:
+        SecurityGroupIds:
+          - !Ref SecurityGroupId
+        SubnetIds:
+          - !Ref SubnetId1
+          - !Ref SubnetId2
+          - !Ref SubnetId3
+          - !Ref SubnetId4
+          - !Ref SubnetId5
+          - !Ref SubnetId6
+
+Outputs:
+  RedshiftMiddlewareApi:
+    Description: "API Gateway endpoint URL for Prod stage for SQL Statement function"
+    Value: !Sub "https://${RedshiftMiddlewareApi}.execute-api.${AWS::Region}.amazonaws.com/Prod/sql_statement/"
+  RedshiftMiddlewareFunction:
+    Description: "SQL Statement Lambda Function ARN"
+    Value: !GetAtt RedshiftMiddlewareFunction.Arn
+  RedshiftMiddlewareFunctionIamRole:
+    Description: "Implicit IAM Role created for SQL Statement function"
+    Value: !GetAtt RedshiftMiddlewareFunctionRole.Arn
+  CognitoUserPoolArn:
+    Description: "ARN of the Cognito User Pool"
+    Value: !GetAtt MyCognitoUserPool.Arn

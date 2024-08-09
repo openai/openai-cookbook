@@ -1,1 +1,0 @@
-psycopg2

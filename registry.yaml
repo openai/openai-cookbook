@@ -1505,3 +1505,12 @@
   tags:
     - completions
     - functions
+
+- title: GPT Actions library - Google Drive
+  path: examples/chatgpt/gpt_actions_library/gpt_action_google_drive.ipynb
+  date: 2024-08-11
+  authors:
+    - lxing-oai
+  tags:
+    - gpt-actions-library
+    - chat

@@ -1506,6 +1506,15 @@
     - completions
     - functions
 
+- title: GPT Actions library (Middleware) - Google Cloud Function
+  path: examples/chatgpt/gpt_actions_library/gpt_middleware_google_cloud_function.md
+  date: 2024-08-11
+  authors:
+    - girishd
+  tags:
+    - chatgpt
+    - gpt-actions-library
+
 - title: GPT Actions library - AWS Redshift
   path: examples/chatgpt/gpt_actions_library/gpt_action_redshift.ipynb
   date: 2024-08-09

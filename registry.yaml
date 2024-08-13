@@ -1506,6 +1506,24 @@
     - completions
     - functions
 
+- title: GPT Actions library - AWS Redshift
+  path: examples/chatgpt/gpt_actions_library/gpt_action_redshift.ipynb
+  date: 2024-08-09
+  authors:
+    - pap-openai
+  tags:
+    - gpt-actions-library
+    - chatgpt
+    
+- title: GPT Actions library - AWS Middleware
+  path: examples/chatgpt/gpt_actions_library/gpt_middleware_aws_function.ipynb
+  date: 2024-08-09
+  authors:
+    - pap-openai
+  tags:
+    - gpt-actions-library
+    - chatgpt
+
 - title: GPT Actions library - Google Drive
   path: examples/chatgpt/gpt_actions_library/gpt_action_google_drive.ipynb
   date: 2024-08-11
@@ -1513,4 +1531,4 @@
     - lxing-oai
   tags:
     - gpt-actions-library
-    - chat
+    - chatgpt

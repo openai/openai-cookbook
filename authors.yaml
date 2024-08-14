@@ -10,7 +10,6 @@
 
 cathykc:
   name: "Kai Chen"
-  website: ""
   avatar: "https://pbs.twimg.com/profile_images/1657816900817272832/ioGq5O0t_400x400.jpg"
 
 shyamal-anadkat:
@@ -157,3 +156,7 @@ lxing-oai:
   name: "Luke Xing"
   website: "https://www.linkedin.com/in/lukexing/"
   avatar: "https://avatars.githubusercontent.com/u/176698727"
+
+gladstone-openai:
+  name: "Kevin Gladstone"
+  avatar: "https://avatars.githubusercontent.com/u/149190645"

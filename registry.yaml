@@ -1541,3 +1541,12 @@
   tags:
     - gpt-actions-library
     - chatgpt
+
+- title: GPT Actions library - Snowflake Direct
+  path: examples/chatgpt/gpt_actions_library/gpt_action_snowflake_direct.ipynb
+  date: 2024-08-13
+  authors:
+    - gladstone-openai
+  tags:
+    - gpt-actions-library
+    - chatgpt

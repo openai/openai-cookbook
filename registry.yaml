@@ -486,6 +486,15 @@
   tags:
     - completions
 
+- title: Advanced Evals - Combining LLM-As-Judge and Human Evaluators
+  path: examples/evaluation/Advanced_LLM_Evals_With_Multiple_Evaluators.ipynb
+  date: 2024-08-14
+  authors:
+    - nelsonauner
+  tags:
+    - completions
+    - functions
+
 - title: Developing Hallucination Guardrails
   path: examples/Developing_hallucination_guardrails.ipynb
   date: 2024-05-29

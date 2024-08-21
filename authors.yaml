@@ -10,7 +10,7 @@
 
 cathykc:
   name: "Kai Chen"
-  website: ""
+  website: "https://github.com/cathykc"
   avatar: "https://pbs.twimg.com/profile_images/1657816900817272832/ioGq5O0t_400x400.jpg"
 
 shyamal-anadkat:
@@ -138,7 +138,27 @@ eszuhany-openai:
   website: "https://www.linkedin.com/in/szuhany/"
   avatar: "https://avatars.githubusercontent.com/u/164391912"
 
+pap-openai:
+  name: "Pierre-Antoine Porte"
+  website: "https://www.linkedin.com/in/portepa/"
+  avatar: "https://avatars.githubusercontent.com/u/174109416?v=4"
+
 evanweiss-openai:
   name: "Evan Weiss"
   website: "https://www.linkedin.com/in/evanpweiss/"
   avatar: "https://avatars.githubusercontent.com/u/150647345"
+
+girishd:
+  name: "Girish Dusane"
+  website: "https://www.linkedin.com/in/girishdusane/"
+  avatar: "https://avatars.githubusercontent.com/u/272708"   
+  
+lxing-oai:
+  name: "Luke Xing"
+  website: "https://www.linkedin.com/in/lukexing/"
+  avatar: "https://avatars.githubusercontent.com/u/176698727"
+
+gladstone-openai:
+  name: "Kevin Gladstone"
+  website: "https://github.com/gladstone-openai"
+  avatar: "https://avatars.githubusercontent.com/u/149190645"

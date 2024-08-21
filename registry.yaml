@@ -1515,3 +1515,57 @@
   tags:
     - completions
     - functions
+
+- title: GPT Actions library (Middleware) - Google Cloud Function
+  path: examples/chatgpt/gpt_actions_library/gpt_middleware_google_cloud_function.md
+  date: 2024-08-11
+  authors:
+    - girishd
+  tags:
+    - chatgpt
+    - gpt-actions-library
+
+- title: GPT Actions library - AWS Redshift
+  path: examples/chatgpt/gpt_actions_library/gpt_action_redshift.ipynb
+  date: 2024-08-09
+  authors:
+    - pap-openai
+  tags:
+    - gpt-actions-library
+    - chatgpt
+    
+- title: GPT Actions library - AWS Middleware
+  path: examples/chatgpt/gpt_actions_library/gpt_middleware_aws_function.ipynb
+  date: 2024-08-09
+  authors:
+    - pap-openai
+  tags:
+    - gpt-actions-library
+    - chatgpt
+
+- title: GPT Actions library - Google Drive
+  path: examples/chatgpt/gpt_actions_library/gpt_action_google_drive.ipynb
+  date: 2024-08-11
+  authors:
+    - lxing-oai
+  tags:
+    - gpt-actions-library
+    - chatgpt
+
+- title: GPT Actions library - Snowflake Direct
+  path: examples/chatgpt/gpt_actions_library/gpt_action_snowflake_direct.ipynb
+  date: 2024-08-13
+  authors:
+    - gladstone-openai
+  tags:
+    - gpt-actions-library
+    - chatgpt
+
+- title: GPT Actions library - Snowflake Middleware
+  path: examples/chatgpt/gpt_actions_library/gpt_action_snowflake_middleware.ipynb
+  date: 2024-08-14
+  authors:
+    - gladstone-openai
+  tags:
+    - gpt-actions-library
+    - chatgpt

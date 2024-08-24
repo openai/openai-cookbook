@@ -1,0 +1,110 @@
+{
+  "hotel_information": {
+    "name": "Hampton by Hilton Hamburg City Centre",
+    "address": {
+      "street": "Nordkanalstrasse 18",
+      "city": "Hamburg",
+      "country": "Germany",
+      "postal_code": "20097"
+    },
+    "contact": {
+      "phone": "+49(0)40-302372-0",
+      "fax": "+49(0)40-302372-100",
+      "email": null,
+      "website": null
+    }
+  },
+  "guest_information": {
+    "company": "APIMEISTER CONSULTING GMBH",
+    "address": "FRIEDRICHSTR 123, 10117 BERLIN, GERMANY",
+    "guest_name": "JENS WALTER"
+  },
+  "invoice_information": {
+    "invoice_number": "26846",
+    "reservation_number": "81134041",
+    "date": "2019-08-23",
+    "room_number": "707 /NUDX",
+    "check_in_date": "2019-08-19",
+    "check_out_date": "2019-08-23"
+  },
+  "charges": [
+    {
+      "date": "2019-08-19",
+      "description": "Advance Deposit MC *5052",
+      "charge": null,
+      "credit": -516.0
+    },
+    {
+      "date": "2019-08-19",
+      "description": "ADVANCED DEPOSIT DEBIT",
+      "charge": 516.0,
+      "credit": null
+    },
+    {
+      "date": "2019-08-19",
+      "description": "ADVANCED DEPOSIT CREDIT",
+      "charge": null,
+      "credit": -516.0
+    },
+    {
+      "date": "2019-08-19",
+      "description": "GUEST ROOM",
+      "charge": 124.05,
+      "credit": null
+    },
+    {
+      "date": "2019-08-19",
+      "description": "BREAKFAST",
+      "charge": 4.95,
+      "credit": null
+    },
+    {
+      "date": "2019-08-20",
+      "description": "GUEST ROOM",
+      "charge": 134.05,
+      "credit": null
+    },
+    {
+      "date": "2019-08-20",
+      "description": "BREAKFAST",
+      "charge": 4.95,
+      "credit": null
+    },
+    {
+      "date": "2019-08-21",
+      "description": "GUEST ROOM",
+      "charge": 124.05,
+      "credit": null
+    },
+    {
+      "date": "2019-08-21",
+      "description": "BREAKFAST",
+      "charge": 4.95,
+      "credit": null
+    },
+    {
+      "date": "2019-08-22",
+      "description": "GUEST ROOM",
+      "charge": 114.05,
+      "credit": null
+    }
+  ],
+  "totals_summary": {
+    "currency": "EUR",
+    "total_net": null,
+    "total_tax": null,
+    "total_gross": null,
+    "total_charge": null,
+    "total_credit": null,
+    "balance_due": null
+  },
+  "taxes": [
+    {
+      "tax_type": null,
+      "tax_rate": null,
+      "net_amount": null,
+      "tax_amount": null,
+      "gross_amount": null
+    }
+  ]
+}

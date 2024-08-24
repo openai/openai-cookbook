@@ -4,7 +4,6 @@
 # should build pages for, and indicates metadata such as tags, creation date and
 # authors for each page.
 
-
 - title: Using logprobs
   path: examples/Using_logprobs.ipynb
   date: 2023-12-20
@@ -32,6 +31,7 @@
   tags:
     - completions
     - tiktoken
+    - fine-tuning
 
 - title: Classification using embeddings
   path: examples/Classification_using_embeddings.ipynb
@@ -114,6 +114,7 @@
     - BorisPower
   tags:
     - completions
+    - fine-tuning
 
 - title: >-
     Function calling for nearby places: Leveraging the Google Places API and
@@ -176,11 +177,13 @@
 
 - title: How to fine-tune chat models
   path: examples/How_to_finetune_chat_models.ipynb
-  date: 2023-08-22
+  date: 2024-07-23
   authors:
     - simonpfish
+    - shyamal-anadkat
   tags:
     - completions
+    - fine-tuning
 
 - title: How to format inputs to ChatGPT models
   path: examples/How_to_format_inputs_to_ChatGPT_models.ipynb
@@ -500,6 +503,7 @@
   tags:
     - embeddings
     - completions
+    - fine-tuning
 
 - title: Fine-Tuned Q&A - create Q&A
   path: examples/fine-tuned_qa/olympics-2-create-qa.ipynb
@@ -510,6 +514,7 @@
   tags:
     - embeddings
     - completions
+    - fine-tuning
 
 - title: Fine-Tuned Q&A - train
   path: examples/fine-tuned_qa/olympics-3-train-qa.ipynb
@@ -520,6 +525,7 @@
   tags:
     - completions
     - embeddings
+    - fine-tuning
 
 - title: Visualizing the embeddings in Kangas
   path: examples/third_party/Visualizing_embeddings_in_Kangas.ipynb
@@ -1017,6 +1023,7 @@
   tags:
     - completions
     - embeddings
+    - fine-tuning
 
 - title: How to automate AWS tasks with function calling
   path: examples/third_party/How_to_automate_S3_storage_with_functions.ipynb
@@ -1060,6 +1067,7 @@
   tags:
     - tiktoken
     - completions
+    - fine-tuning
 
 - title: OpenAI API Monitoring with Weights & Biases Weave
   path: examples/third_party/Openai_monitoring_with_wandb_weave.ipynb
@@ -1118,6 +1126,7 @@
   tags:
     - completions
     - functions
+    - fine-tuning
 
 - title: Processing and narrating a video with GPT's visual capabilities and the TTS API
   path: examples/GPT_with_vision_for_video_understanding.ipynb
@@ -1214,15 +1223,14 @@
   tags:
     - guardrails
 
-- title: How to combine GPT4 with Vision with RAG to create a clothing matchmaker app
+- title: How to combine GPT4o mini with RAG to create a clothing matchmaker app
   path: examples/How_to_combine_GPT4o_with_RAG_Outfit_Assistant.ipynb
-  date: 2024-02-16
+  date: 2024-07-18
   authors:
     - teomusatoiu
   tags:
     - vision
     - embeddings
-
 
 - title: How to parse PDF docs for RAG
   path: examples/Parse_PDF_docs_for_RAG.ipynb
@@ -1233,16 +1241,14 @@
     - vision
     - embeddings
 
-
-- title: Using GPT4 with Vision to tag and caption images
+- title: Using GPT4o mini to tag and caption images
   path: examples/Tag_caption_images_with_GPT4V.ipynb
-  date: 2024-02-28
+  date: 2024-07-18
   authors:
     - katiagg
   tags:
     - vision
     - embeddings
-
 
 - title: How to use the moderation API
   path: examples/How_to_use_moderation.ipynb
@@ -1251,79 +1257,6 @@
     - teomusatoiu
   tags:
     - moderation
-
-
-- title: Summarizing Long Documents
-  path: examples/Summarizing_long_documents.ipynb
-  date: 2024-04-19
-  authors:
-    - joe-at-openai
-  tags:
-    - chat
-
-- title: Using GPT4 Vision with Function Calling
-  path: examples/multimodal/Using_GPT4_Vision_With_Function_Calling.ipynb
-  date: 2024-04-09
-  authors:
-    - shyamal-anadkat
-  tags:
-    - chat
-    - vision
-
-- title: Synthetic data generation (Part 1)
-  path: examples/SDG1.ipynb
-  date: 2024-04-10
-  authors:
-    - dylanra-openai
-  tags:
-    - completions
-
-
-- title: CLIP embeddings to improve multimodal RAG with GPT-4 Vision
-  path: examples/custom_image_embedding_search.ipynb
-  date: 2024-04-10
-  authors:
-    - dylanra-openai
-  tags:
-    - vision
-    - embeddings
-
-- title: Batch processing with the Batch API
-  path: examples/batch_processing.ipynb
-  date: 2024-04-24
-  authors:
-    - katiagg
-  tags:
-    - batch
-    - completions
-
-- title: Using tool required for customer service
-  path: examples/Using_tool_required_for_customer_service.ipynb
-  date: 2024-05-01
-  authors:
-    - colin-openai
-  tags:
-    - completions
-    - functions
-
-- title: Introduction to gpt-4o
-  path: examples/gpt4o/introduction_to_gpt4o.ipynb
-  date: 2024-05-13
-  authors:
-    - justonf
-  tags:
-    - completions
-    - vision
-    - whisper
-
-- title: Using Azure Function and the Microsoft Graph Search API to Query Office365 and SharePoint with ChatGPT
-  path: examples/chatgpt/sharepoint_azure_function/Using_Azure_Functions_and_Microsoft_Graph_to_Query_SharePoint.md
-  date: 2024-05-24
-  authors:
-    - maxreid-openai
-  tags:
-    - completions
-    - chatgpt
 
 - title: Summarizing Long Documents
   path: examples/Summarizing_long_documents.ipynb
@@ -1545,10 +1478,7 @@
     - tiktoken
     - completions
 
-It seems that the document contains some sections that were merged incorrectly, including conflict markers (e.g., `<<<<<<<`, `=======`, `>>>>>>>`). This usually happens during a merge conflict in version control systems like Git. I'll clean up the document for you. Here's the revised version:
-
-```yaml
-- title: GPT Actions library - Zapier
+- title: GPT Actions library - 
   path: examples/chatgpt/gpt_actions_library/gpt_action_zapier.ipynb
   date: 2024-08-05
   authors:
@@ -1774,7 +1704,7 @@ It seems that the document contains some sections that were merged incorrectly, 
   tags:
     - gpt-actions-library
     - chatgpt
-
+    
 - title: GPT Actions library - AWS Middleware
   path: examples/chatgpt/gpt_actions_library/gpt_middleware_aws_function.ipynb
   date: 2024-08-09
@@ -1868,6 +1798,14 @@ It seems that the document contains some sections that were merged incorrectly, 
     - aayushg
   tags:
     - completions
-```
-
-I removed the conflict markers and ensured that each entry is cleanly separated. If there are any specific parts of the document that need further refinement or if you need additional changes, feel free to ask!
+    
+- title: Using Whisper API to transcribe text using your Device Microphone
+  path: examples/Whisper_transcribe_device_microphone.ipynb
+  date: 2024-08-24
+  authors:
+    - carlkho
+  tags:
+    - whisper
+    - audio
+    - transcribe
+    - translate

@@ -1,0 +1,20 @@
+#### Tier 5 rate limits
+
+This is a high level summary and there are per-model exceptions to these limits (e.g. some legacy models or models with larger context windows have different rate limits). To view the exact rate limits per model for your account, visit the [limits](/account/rate-limits) section of your account settings.
+
+| Model                    | RPM         | TPM        | Batch Queue Limit |
+| ------------------------ | ----------- | ---------- | ----------------- |
+| `gpt-4o`                 | 10,000      | 12,000,000 | 1,800,000,000     |
+| `gpt-4-turbo`            | 10,000      | 2,000,000  | 300,000,000       |
+| `gpt-4`                  | 10,000      | 300,000    | 45,000,000        |
+| `gpt-3.5-turbo`          | 10,000      | 2,000,000  | 300,000,000       |
+| `text-embedding-3-large` | 10,000      | 10,000,000 | 4,000,000,000     |
+| `text-embedding-3-small` | 10,000      | 10,000,000 | 4,000,000,000     |
+| `text-embedding-ada-002` | 10,000      | 10,000,000 | 4,000,000,000     |
+| `whisper-1`              | 500         | -          | -                 |
+| `tts-1`                  | 500         | -          | -                 |
+| `tts-1-hd`               | 20          | -          | -                 |
+| `dall-e-2`               | 500 img/min | -          | -                 |
+| `dall-e-3`               | 75 img/min  | -          | -                 |
+
+If you need higher rate limits than this, you can request an increase in the [limits](/account/rate-limits) section of your account settings.

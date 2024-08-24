@@ -10,7 +10,7 @@
 
 cathykc:
   name: "Kai Chen"
-  website: "https://twitter.com/cathykaic"
+  website: "https://github.com/cathykc"
   avatar: "https://pbs.twimg.com/profile_images/1657816900817272832/ioGq5O0t_400x400.jpg"
 
 shyamal-anadkat:
@@ -98,7 +98,6 @@ justonf:
   website: "https://www.linkedin.com/in/justonforte/"
   avatar: "https://avatars.githubusercontent.com/u/96567547?s=400&u=08b9757200906ab12e3989b561cff6c4b95a12cb&v=4"
 
-
 aaronwilkowitz-openai:
   name: "Aaron Wilkowitz"
   website: "https://www.linkedin.com/in/aaronwilkowitz/"
@@ -139,32 +138,27 @@ eszuhany-openai:
   website: "https://www.linkedin.com/in/szuhany/"
   avatar: "https://avatars.githubusercontent.com/u/164391912"
 
-pap-openai:
-  name: "Pierre-Antoine Porte"
-  website: "https://www.linkedin.com/in/portepa/"
-  avatar: "https://avatars.githubusercontent.com/u/174109416?v=4"
+papertigers:
+  name: "Karl Moritz Hermann"
+  website: "https://www.linkedin.com/in/kmhermann/"
+  avatar: "https://pbs.twimg.com/profile_images/1249352292081569792/MbZrKr9v_400x400.jpg"
 
-evanweiss-openai:
-  name: "Evan Weiss"
-  website: "https://www.linkedin.com/in/evanpweiss/"
-  avatar: "https://avatars.githubusercontent.com/u/150647345"
+harieki:
+  name: "Harry Jackson"
+  website: "https://www.linkedin.com/in/harry-jackson-b9951317/"
+  avatar: "https://pbs.twimg.com/profile_images/1621193381993125888/0UN2oFYx_400x400.jpg"
 
-girishd:
-  name: "Girish Dusane"
-  website: "https://www.linkedin.com/in/girishdusane/"
-  avatar: "https://avatars.githubusercontent.com/u/272708"
+zlipkin-openai:
+  name: "Zoe Lipkin"
+  website: "https://www.linkedin.com/in/zoelipkin"
+  avatar: "https://pbs.twimg.com/profile_images/1651768911416500224/5mhCRdH2_400x400.jpg"
 
-lxing-oai:
-  name: "Luke Xing"
-  website: "https://www.linkedin.com/in/lukexing/"
-  avatar: "https://avatars.githubusercontent.com/u/176698727"
+iamkobe:
+  name: "Yingning Cheng"
+  website: "https://www.linkedin.com/in/yingningc/"
+  avatar: "https://media.licdn.com/dms/image/D4D03AQEH0XZfnJXb6A/profile-displayphoto-shrink_800_800/0/1697817712538?e=1704931200&v=beta&t=cRLGzAFgnYJw1ZBG8abCQhxNd4di9TyWw-MG5_ZEVgk"
 
-gladstone-openai:
-  name: "Kevin Gladstone"
-  website: "https://github.com/gladstone-openai"
-  avatar: "https://avatars.githubusercontent.com/u/149190645"
-
-carlkho-minerva:
-  name: "Carl Vincent Ladres Kho"
-  website: "https://www.carlkho.com/"
-  avatar: "https://avatars.githubusercontent.com/u/106736711?v=4"
+carl-kho:
+  name: "Carl Kho"
+  website: "https://github.com/carl-kho"
+  avatar: "https://avatars.githubusercontent.com/u/87603121?v=4"

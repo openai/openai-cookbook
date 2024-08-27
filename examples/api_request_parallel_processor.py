@@ -322,7 +322,7 @@ class APIRequest:
                 )
                 status_tracker.num_api_errors += 1
                 error = response
-                if "Rate limit" in response["error"].get("message", ""):
+                if "rate limit" in response["error"].get("message", "").lower():
                     status_tracker.time_of_last_rate_limit_error = time.time()
                     status_tracker.num_rate_limit_errors += 1
                     status_tracker.num_api_errors -= (

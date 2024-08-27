@@ -1,0 +1,86 @@
+{
+  "hotel_information": {
+    "name": "MADISON Hotel GmbH",
+    "address": {
+      "street": "Schaartinsweg 4",
+      "city": "Hamburg",
+      "country": "Germany",
+      "postal_code": "20459"
+    },
+    "contact": {
+      "phone": "+49.40.37 666-0",
+      "fax": "+49.40.37 666-137",
+      "email": "info@madisonhotel.de",
+      "website": "madisonhotel.de"
+    }
+  },
+  "guest_information": {
+    "company": "APMeister Consulting GmbH",
+    "address": "Friedrichstr. 123, 10117 Berlin",
+    "guest_name": "Mr. Jens Walter"
+  },
+  "invoice_information": {
+    "invoice_number": "508873 /",
+    "reservation_number": null,
+    "date": "2019-08-16",
+    "room_number": "407",
+    "check_in_date": "2019-08-11",
+    "check_out_date": "2019-08-16"
+  },
+  "charges": [
+    {
+      "date": "2019-08-11",
+      "description": "Overnight stay excluding breakfast*",
+      "charge": 110.0,
+      "credit": null
+    },
+    {
+      "date": "2019-08-12",
+      "description": "Overnight stay excluding breakfast*",
+      "charge": 110.0,
+      "credit": null
+    },
+    {
+      "date": "2019-08-13",
+      "description": "Overnight stay excluding breakfast*",
+      "charge": 110.0,
+      "credit": null
+    },
+    {
+      "date": "2019-08-14",
+      "description": "Overnight stay excluding breakfast*",
+      "charge": 110.0,
+      "credit": null
+    },
+    {
+      "date": "2019-08-15",
+      "description": "Overnight stay excluding breakfast*",
+      "charge": 110.0,
+      "credit": null
+    },
+    {
+      "date": "2019-08-16",
+      "description": "Mastercard IFC",
+      "charge": 550.0,
+      "credit": null
+    }
+  ],
+  "totals_summary": {
+    "currency": "EUR",
+    "total_net": 514.02,
+    "total_tax": 35.98,
+    "total_gross": 550.0,
+    "total_charge": 550.0,
+    "total_credit": 0.0,
+    "balance_due": 0.0
+  },
+  "taxes": [
+    {
+      "tax_type": "VAT 7%",
+      "tax_rate": "7%",
+      "net_amount": 514.02,
+      "tax_amount": 35.98,
+      "gross_amount": 550.0
+    }
+  ]
+}

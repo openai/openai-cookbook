@@ -1,0 +1,100 @@
+{
+  "hotel_information": {
+    "name": "Citadines Michel Hamburg",
+    "address": {
+      "street": "Ludwig-Erhard-Str. 7",
+      "city": "Hamburg",
+      "country": "Germany",
+      "postal_code": "D-20459"
+    },
+    "contact": {
+      "phone": "+49 (0)40-300618-0",
+      "fax": "+49 (0)40-300618-1999",
+      "email": "hamburg@citadines.com",
+      "website": "www.citadines.com"
+    }
+  },
+  "guest_information": {
+    "company": "APImeisler Consulting GmbH",
+    "address": "Friedrichstrasse 123, 10117 Berlin, Germany",
+    "guest_name": "Herr Jens Walter"
+  },
+  "invoice_information": {
+    "invoice_number": "083-72561",
+    "reservation_number": "1221737070-1",
+    "date": "2019-04-05",
+    "room_number": "420",
+    "check_in_date": "2019-03-31",
+    "check_out_date": "2019-04-05"
+  },
+  "charges": [
+    {
+      "date": "2019-03-31",
+      "description": "Apartment 31/03/19#420",
+      "charge": 92.56,
+      "credit": 0
+    },
+    {
+      "date": "2019-04-01",
+      "description": "Apartment 01/04/19#420",
+      "charge": 197.2,
+      "credit": 0
+    },
+    {
+      "date": "2019-04-02",
+      "description": "Apartment 02/04/19#420",
+      "charge": 254.15,
+      "credit": 0
+    },
+    {
+      "date": "2019-04-03",
+      "description": "Apartment 03/04/19#420",
+      "charge": 215.9,
+      "credit": 0
+    },
+    {
+      "date": "2019-04-04",
+      "description": "Apartment 04/04/19#420",
+      "charge": 143.82,
+      "credit": 0
+    },
+    {
+      "date": "2019-03-31",
+      "description": "Mastercard bnr 8324 SPLIT",
+      "charge": 0,
+      "credit": 903.63
+    }
+  ],
+  "totals_summary": {
+    "currency": "EUR",
+    "total_net": 844.51,
+    "total_tax": 59.12,
+    "total_gross": 903.63,
+    "total_charge": 903.63,
+    "total_credit": 903.63,
+    "balance_due": 0.0
+  },
+  "taxes": [
+    {
+      "tax_type": "VAT",
+      "tax_rate": "19.00%",
+      "net_amount": 0.0,
+      "tax_amount": 0.0,
+      "gross_amount": 0.0
+    },
+    {
+      "tax_type": "VAT",
+      "tax_rate": "7.00%",
+      "net_amount": 844.51,
+      "tax_amount": 59.12,
+      "gross_amount": 903.63
+    },
+    {
+      "tax_type": "VAT",
+      "tax_rate": "0.00%",
+      "net_amount": 0.0,
+      "tax_amount": 0.0,
+      "gross_amount": 0.0
+    }
+  ]
+}

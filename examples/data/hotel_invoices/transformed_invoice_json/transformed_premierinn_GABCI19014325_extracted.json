@@ -1,0 +1,105 @@
+{
+  "hotel_information": {
+    "name": "Hamburg City (Zentrum)",
+    "address": {
+      "street": "Willy-Brandt-Straße 21",
+      "city": "Hamburg",
+      "country": "Germany",
+      "postal_code": "20457"
+    },
+    "contact": {
+      "phone": "+49 (0) 40 3039 379 0",
+      "fax": null,
+      "email": null,
+      "website": null
+    }
+  },
+  "guest_information": {
+    "company": "APIMEISTER CONSULTING GmbH",
+    "address": "Friedrichstr. 123, 10117 Berlin",
+    "guest_name": "Mr. Jens Walter"
+  },
+  "invoice_information": {
+    "invoice_number": "GABC19014325",
+    "reservation_number": "GABC015452127",
+    "date": "2019-09-23",
+    "room_number": "626",
+    "check_in_date": "2019-09-23",
+    "check_out_date": "2019-09-27"
+  },
+  "charges": [
+    {
+      "date": "2019-09-23",
+      "description": "Overnight stay",
+      "charge": 77.0,
+      "credit": null
+    },
+    {
+      "date": "2019-09-24",
+      "description": "Overnight stay",
+      "charge": 135.0,
+      "credit": null
+    },
+    {
+      "date": "2019-09-25",
+      "description": "Overnight stay",
+      "charge": 82.0,
+      "credit": null
+    },
+    {
+      "date": "2019-09-26",
+      "description": "Overnight stay",
+      "charge": 217.0,
+      "credit": null
+    },
+    {
+      "date": "2019-09-24",
+      "description": "Premier Inn breakfast buffet",
+      "charge": 9.9,
+      "credit": null
+    },
+    {
+      "date": "2019-09-25",
+      "description": "Premier Inn breakfast buffet",
+      "charge": 9.9,
+      "credit": null
+    },
+    {
+      "date": "2019-09-26",
+      "description": "Premier Inn breakfast buffet",
+      "charge": 9.9,
+      "credit": null
+    },
+    {
+      "date": "2019-09-27",
+      "description": "Premier Inn breakfast buffet",
+      "charge": 9.9,
+      "credit": null
+    }
+  ],
+  "totals_summary": {
+    "currency": "EUR",
+    "total_net": 510.85,
+    "total_tax": 39.75,
+    "total_gross": 550.6,
+    "total_charge": 550.6,
+    "total_credit": 0.0,
+    "balance_due": 0.0
+  },
+  "taxes": [
+    {
+      "tax_type": "VAT",
+      "tax_rate": "19.0%",
+      "net_amount": 33.28,
+      "tax_amount": 6.32,
+      "gross_amount": 39.6
+    },
+    {
+      "tax_type": "VAT",
+      "tax_rate": "7.0%",
+      "net_amount": 477.57,
+      "tax_amount": 33.43,
+      "gross_amount": 511.0
+    }
+  ]
+}

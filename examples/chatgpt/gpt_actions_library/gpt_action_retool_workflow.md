@@ -53,7 +53,7 @@ Once you've created a Custom GPT, copy the text below in the Actions panel. Have
 ***Note:*** You need to replace the __<WORKFLOW_ID>__ value in the OpenAPI spec below with the ID for your workflow.
 
 
-```
+```yaml
 openapi: 3.1.0
 info:
   title: Retool Workflow API

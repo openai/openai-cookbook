@@ -38,7 +38,8 @@ Below is an example of a basic Retool Workflow. This workflow takes in 2 values 
 
 ***Note:*** Your workflow must be deployed before it will be accessible from your GPT.
 
-<iframe src="https://demo.arcade.software/MG7PcF8fh3RH722eonUb?embed&embed_mobile=tab&embed_desktop=inline&show_copy_link=true" width="100%" height="300" frameborder="0" allowfullscreen></iframe>
+[![Retool API Key](../../../images/retool-workflow-config.png)](https://app.arcade.software/share/MG7PcF8fh3RH722eonUb)
+
 
 ## ChatGPT Steps
 

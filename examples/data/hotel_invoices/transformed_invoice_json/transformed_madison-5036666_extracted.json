@@ -1,0 +1,99 @@
+{
+  "hotel_information": {
+    "name": "THE MADISON HAMBURG",
+    "address": {
+      "street": "Schaarsteinweg 4",
+      "city": "Hamburg",
+      "country": "Germany",
+      "postal_code": "20459"
+    },
+    "contact": {
+      "phone": "+49-40-37 666-0",
+      "fax": "+49-40-37 666-137",
+      "email": "info@madisonhotel.de",
+      "website": "madisonhotel.de"
+    }
+  },
+  "guest_information": {
+    "company": "APMeister Consulting GmbH",
+    "address": "Friedrichstr. 123, 10117 Berlin",
+    "guest_name": "Mr. Jens Walter"
+  },
+  "invoice_information": {
+    "invoice_number": "503666",
+    "reservation_number": null,
+    "date": "2019-06-21",
+    "room_number": "435",
+    "check_in_date": "2019-06-16",
+    "check_out_date": "2019-06-21"
+  },
+  "charges": [
+    {
+      "date": "2019-06-16",
+      "description": "Overnight stay excluding breakfast",
+      "charge": 110.0,
+      "credit": null
+    },
+    {
+      "date": "2019-06-17",
+      "description": "Overnight stay excluding breakfast",
+      "charge": 110.0,
+      "credit": null
+    },
+    {
+      "date": "2019-06-18",
+      "description": "Overnight stay excluding breakfast",
+      "charge": 110.0,
+      "credit": null
+    },
+    {
+      "date": "2019-06-19",
+      "description": "Overnight stay excluding breakfast",
+      "charge": 110.0,
+      "credit": null
+    },
+    {
+      "date": "2019-06-20",
+      "description": "Overnight stay excluding breakfast",
+      "charge": 110.0,
+      "credit": null
+    },
+    {
+      "date": "2019-06-21",
+      "description": "Breakfast",
+      "charge": 20.0,
+      "credit": null
+    },
+    {
+      "date": "2019-06-21",
+      "description": "Mastercard IFC",
+      "charge": 570.0,
+      "credit": null
+    }
+  ],
+  "totals_summary": {
+    "currency": "EUR",
+    "total_net": 530.83,
+    "total_tax": 39.17,
+    "total_gross": 570.0,
+    "total_charge": 570.0,
+    "total_credit": 0.0,
+    "balance_due": 0.0
+  },
+  "taxes": [
+    {
+      "tax_type": "VAT 7%",
+      "tax_rate": "7%",
+      "net_amount": 16.81,
+      "tax_amount": 3.19,
+      "gross_amount": 20.0
+    },
+    {
+      "tax_type": "VAT 19%",
+      "tax_rate": "19%",
+      "net_amount": 514.02,
+      "tax_amount": 35.98,
+      "gross_amount": 550.0
+    }
+  ]
+}

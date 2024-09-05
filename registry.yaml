@@ -1805,3 +1805,12 @@
     - msingh-openai
   tags:
     - completions
+
+- title: Montioring a RAG chain with OpenAI, LangChain, and MLflow
+  path: examples/third_party/monitoring_RAG_with_langchain_and_mlflow.ipynb
+  date: 2024-09-05
+  authors:
+    - daniellok-db
+  tags:
+    - chat
+    - embeddings

@@ -106,13 +106,13 @@ aaronwilkowitz-openai:
 charuj:
   name: "Charu Jaiswal"
   website: "https://www.linkedin.com/in/charu-j-8a866471"
-  avatar: "https://avatars.githubusercontent.com/u/18404643?v=4" 
+  avatar: "https://avatars.githubusercontent.com/u/18404643?v=4"
 
 rupert-openai:
   name: "Rupert Truman"
   website: "https://www.linkedin.com/in/rupert-truman/"
   avatar: "https://avatars.githubusercontent.com/u/171234447"
-  
+
 keelan-openai:
   name: "Keelan Schule"
   website: "https://www.linkedin.com/in/keelanschule/"
@@ -151,8 +151,8 @@ evanweiss-openai:
 girishd:
   name: "Girish Dusane"
   website: "https://www.linkedin.com/in/girishdusane/"
-  avatar: "https://avatars.githubusercontent.com/u/272708"   
-  
+  avatar: "https://avatars.githubusercontent.com/u/272708"
+
 lxing-oai:
   name: "Luke Xing"
   website: "https://www.linkedin.com/in/lukexing/"
@@ -167,3 +167,8 @@ lspacagna-oai:
   name: "Lee Spacagna"
   website: "https://github.com/lspacagna-oai"
   avatar: "https://avatars.githubusercontent.com/u/175367019"
+
+daniellok-db:
+  name: "Daniel Lok"
+  website: "https://github.com/daniellok-db"
+  avatar: "https://avatars.githubusercontent.com/u/148037680"

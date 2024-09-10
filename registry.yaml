@@ -1569,3 +1569,12 @@
   tags:
     - gpt-actions-library
     - chatgpt
+
+- title: GPT Actions library - Retool Workflow
+  path: examples/chatgpt/gpt_actions_library/gpt_action_retool_workflow.md
+  date: 2024-08-28
+  authors:
+    - lspacagna-oai
+  tags:
+    - gpt-actions-library
+    - chatgpt

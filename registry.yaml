@@ -1809,3 +1809,30 @@
     - audio
     - transcribe
     - translate
+    
+- title: GPT Actions library - Retool Workflow
+  path: examples/chatgpt/gpt_actions_library/gpt_action_retool_workflow.md
+  date: 2024-08-28
+  authors:
+    - lspacagna-oai
+  tags:
+    - gpt-actions-library
+    - chatgpt
+
+- title: Using reasoning for data validation
+  path: examples/o1/Using_reasoning_for_data_validation.ipynb
+  date: 2024-09-12
+  authors:
+    - royziv11
+  tags:
+    - completions
+    - reasoning
+
+- title: Using reasoning for routine generation
+  path: examples/o1/Using_reasoning_for_routine_generation.ipynb
+  date: 2024-09-12
+  authors:
+    - royziv11
+  tags:
+    - completions
+    - reasoning

@@ -91,7 +91,7 @@ dylanra-openai:
 royziv11:
   name: "Roy Ziv"
   website: "https://www.linkedin.com/in/roy-ziv-a46001149/"
-  avatar: "https://media.licdn.com/dms/image/D5603AQHkaEOOGZWtbA/profile-displayphoto-shrink_200_200/0/1699500606122?e=1723075200&v=beta&t=2h6JQpVYm0YncvJRCxCHMB-PmGLg2m3UNbfOB0Yc8rM"
+  avatar: "https://avatars.githubusercontent.com/u/103690170?v=4"
 
 justonf:
   name: "Juston Forte"
@@ -138,6 +138,7 @@ eszuhany-openai:
   website: "https://www.linkedin.com/in/szuhany/"
   avatar: "https://avatars.githubusercontent.com/u/164391912"
 
+
 papertigers:
   name: "Karl Moritz Hermann"
   website: "https://www.linkedin.com/in/kmhermann/"
@@ -162,3 +163,32 @@ carlkho:
   name: "Carl Kho"
   website: "http://carlkho.com"
   avatar: "https://avatars.githubusercontent.com/u/106736711?v=4"
+  pap-openai:
+  name: "Pierre-Antoine Porte"
+  website: "https://www.linkedin.com/in/portepa/"
+  avatar: "https://avatars.githubusercontent.com/u/174109416?v=4"
+
+evanweiss-openai:
+  name: "Evan Weiss"
+  website: "https://www.linkedin.com/in/evanpweiss/"
+  avatar: "https://avatars.githubusercontent.com/u/150647345"
+
+girishd:
+  name: "Girish Dusane"
+  website: "https://www.linkedin.com/in/girishdusane/"
+  avatar: "https://avatars.githubusercontent.com/u/272708"   
+  
+lxing-oai:
+  name: "Luke Xing"
+  website: "https://www.linkedin.com/in/lukexing/"
+  avatar: "https://avatars.githubusercontent.com/u/176698727"
+
+gladstone-openai:
+  name: "Kevin Gladstone"
+  website: "https://github.com/gladstone-openai"
+  avatar: "https://avatars.githubusercontent.com/u/149190645"
+
+lspacagna-oai:
+  name: "Lee Spacagna"
+  website: "https://github.com/lspacagna-oai"
+  avatar: "https://avatars.githubusercontent.com/u/175367019"

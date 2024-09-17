@@ -1586,3 +1586,12 @@
   tags:
     - completions
     - reasoning
+
+- title: GPT Actions library - Canvas Learning Management System
+  path: examples/chatgpt/gpt_actions_library/gpt_action_canvas.md
+  date: 2024-09-17
+  authors:
+    - joecasson-openai
+  tags:
+    - gpt-actions-library
+    - chatgpt

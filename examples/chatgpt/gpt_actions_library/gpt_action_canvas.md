@@ -553,8 +553,8 @@ Below is a non-exhaustive list of additional use cases that could be explored us
 
 **API Resources:**
 
-- [**Analytics](https://canvas.instructure.com/doc/api/analytics.html) and [Quiz Statistics](https://canvas.instructure.com/doc/api/quiz_statistics.html):** Retrieve detailed data on student participation, grades, and course-level statistics.
-- [**Quiz Reports](https://canvas.instructure.com/doc/api/quiz_reports.html):** Generate and view various reports to analyze overall class performance and track progress over time.
+- **[Analytics](https://canvas.instructure.com/doc/api/analytics.html) and [Quiz Statistics](https://canvas.instructure.com/doc/api/quiz_statistics.html):** Retrieve detailed data on student participation, grades, and course-level statistics.
+- **[Quiz Reports](https://canvas.instructure.com/doc/api/quiz_reports.html):** Generate and view various reports to analyze overall class performance and track progress over time.
 
 ### **Review and Improvement Guidance for Graded Assignments**
 
@@ -562,11 +562,11 @@ Below is a non-exhaustive list of additional use cases that could be explored us
 
 **API Resources:**
 
-- [**Submissions](https://canvas.instructure.com/doc/api/submissions.html) and [Quiz Submissions](https://canvas.instructure.com/doc/api/quiz_submissions.html):** Retrieve the student’s submissions and associated grades.
-- [**Assignments](https://canvas.instructure.com/doc/api/assignments.html):** Retrieve detailed information about the assignment, including rubrics and grading criteria.
-- [**Rubric Assessments](https://canvas.instructure.com/doc/api/rubrics.html):** Access detailed feedback and rubric assessments
-- [**Modules](https://canvas.instructure.com/doc/api/modules.html):** Suggest additional learning modules that target the student’s weak areas using the List modules API.
-- [**Quizzes](https://canvas.instructure.com/doc/api/quizzes.html):** Recommend practice quizzes to help the student improve on specific knowledge gaps
+- **[Submissions](https://canvas.instructure.com/doc/api/submissions.html) and [Quiz Submissions](https://canvas.instructure.com/doc/api/quiz_submissions.html):** Retrieve the student’s submissions and associated grades.
+- **[Assignments](https://canvas.instructure.com/doc/api/assignments.html):** Retrieve detailed information about the assignment, including rubrics and grading criteria.
+- **[Rubric Assessments](https://canvas.instructure.com/doc/api/rubrics.html):** Access detailed feedback and rubric assessments
+- **[Modules](https://canvas.instructure.com/doc/api/modules.html):** Suggest additional learning modules that target the student’s weak areas using the List modules API.
+- **[Quizzes](https://canvas.instructure.com/doc/api/quizzes.html):** Recommend practice quizzes to help the student improve on specific knowledge gaps
 
 ### Be Mindful While Adding Functionality!
 

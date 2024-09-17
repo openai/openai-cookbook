@@ -37,15 +37,15 @@ https://canvas.instructure.com/doc/api/file.oauth.html#oauth2-flow - Authenticat
     - [User Generated Access Tokens](https://canvas.instructure.com/doc/api/file.oauth.html#manual-token-generation)
         1. Proceed to Account Settings shown here:
             
-            ![Settings Link.png](Canvas%20LMS%20Cookbook%201110e1a24fe54c95b4a40aed59b95be5/Settings_Link.png)
+            ![canvas_lms_settings_link.png](../../../images/canvas_lms_settings_link.png)
             
         2. Scroll down to the List of Tokens shown here:
             
-            ![List of Tokens.png](Canvas%20LMS%20Cookbook%201110e1a24fe54c95b4a40aed59b95be5/List_of_Tokens.png)
+            ![canvas_lms_list_of_tokens.png](../../../images/canvas_lms_list_of_tokens.png)
             
         3. Generate a New Token, and **store this token**. It will not be accessible later.
             
-            ![New Token.png](Canvas%20LMS%20Cookbook%201110e1a24fe54c95b4a40aed59b95be5/New_Token.png)
+            ![canvas_lms_new_token.png](../../../images/canvas_lms_new_token.png)
             
 
 ## Sample Use Case: Student Course Assistant
@@ -588,4 +588,4 @@ Below is a non-exhaustive list of additional use cases that could be explored us
 
 You’ve successfully created a Custom GPT with a working Custom Action using Canvas LMS. You should be able to have a conversation that looks similar to the screenshot below. Great job and keep going!
 
-![Screenshot 2024-09-17 at 9.45.36 AM.png](Canvas%20LMS%20Cookbook%201110e1a24fe54c95b4a40aed59b95be5/Screenshot_2024-09-17_at_9.45.36_AM.png)
+![canvas_lms_sample_conversation.png](../../../images/canvas_lms_sample_conversation.png) 

@@ -1,5 +1,21 @@
 # Canvas LMS Cookbook
 
+### Table of Contents
+
+1. [**General App Information**](#general-app-information)  
+   - Overview of Canvas LMS, its functionality, and the role of ChatGPT's Custom Actions to enhance educational experiences through AI integration.
+
+2. [**Authentication from ChatGPT to Canvas**](#authentication-from-chatgpt-to-canvas)  
+   - Explanation of authentication methods (OAuth and User Generated Access Tokens) for connecting ChatGPT to Canvas, with detailed instructions for setting up each option.
+
+3. [**Sample Use Case: Student Course Assistant**](#sample-use-case-student-course-assistant)  
+   - Detailed example of using ChatGPT to assist students with course navigation, exam preparation, and personalized feedback, including specific API calls and workflows.
+
+4. [**Other Use Cases for Consideration**](#other-use-cases-for-consideration)  
+   - Additional potential integrations using the Canvas API, such as classroom analytics and report generation.
+
+5. [**Congratulations**](#congratulations)  
+
 ## General App Information
 
 Canvas is a widely-used Learning Management System (LMS) designed to support online learning and teaching. It offers a robust set of tools for course management, content delivery, assessments, and student collaboration. Through the [Canvas API](https://canvas.instructure.com/doc/api/all_resources.html), Canvas allows for extensive customization and integration with third-party applications, including AI-powered tools like ChatGPT. 
@@ -553,8 +569,8 @@ Below is a non-exhaustive list of additional use cases that could be explored us
 
 **API Resources:**
 
-- **[Analytics](https://canvas.instructure.com/doc/api/analytics.html) and [Quiz Statistics](https://canvas.instructure.com/doc/api/quiz_statistics.html):** Retrieve detailed data on student participation, grades, and course-level statistics.
-- **[Quiz Reports](https://canvas.instructure.com/doc/api/quiz_reports.html):** Generate and view various reports to analyze overall class performance and track progress over time.
+- [**Analytics](https://canvas.instructure.com/doc/api/analytics.html) and [Quiz Statistics](https://canvas.instructure.com/doc/api/quiz_statistics.html):** Retrieve detailed data on student participation, grades, and course-level statistics.
+- [**Quiz Reports](https://canvas.instructure.com/doc/api/quiz_reports.html):** Generate and view various reports to analyze overall class performance and track progress over time.
 
 ### **Review and Improvement Guidance for Graded Assignments**
 
@@ -562,21 +578,11 @@ Below is a non-exhaustive list of additional use cases that could be explored us
 
 **API Resources:**
 
-- **[Submissions](https://canvas.instructure.com/doc/api/submissions.html) and [Quiz Submissions](https://canvas.instructure.com/doc/api/quiz_submissions.html):** Retrieve the student’s submissions and associated grades.
-- **[Assignments](https://canvas.instructure.com/doc/api/assignments.html):** Retrieve detailed information about the assignment, including rubrics and grading criteria.
-- **[Rubric Assessments](https://canvas.instructure.com/doc/api/rubrics.html):** Access detailed feedback and rubric assessments
-- **[Modules](https://canvas.instructure.com/doc/api/modules.html):** Suggest additional learning modules that target the student’s weak areas using the List modules API.
-- **[Quizzes](https://canvas.instructure.com/doc/api/quizzes.html):** Recommend practice quizzes to help the student improve on specific knowledge gaps
-
-### Be Mindful While Adding Functionality!
-
-If adding functionality to your GPT is creating less consistent behavior, keep in mind the followings:
-
-1. Start with a GPT that is “simple” and singularly focused, adding to it iteratively.
-2. Ensure that your Instructions are following [Prompt Engineering Best Practices](https://platform.openai.com/docs/guides/prompt-engineering)
-3. Remove unnecessary API functionality from your Custom Action
-
-If you follow these three tips, your GPT should be on its way to consistently high quality responses.
+- [**Submissions](https://canvas.instructure.com/doc/api/submissions.html) and [Quiz Submissions](https://canvas.instructure.com/doc/api/quiz_submissions.html):** Retrieve the student’s submissions and associated grades.
+- [**Assignments](https://canvas.instructure.com/doc/api/assignments.html):** Retrieve detailed information about the assignment, including rubrics and grading criteria.
+- [**Rubric Assessments](https://canvas.instructure.com/doc/api/rubrics.html):** Access detailed feedback and rubric assessments
+- [**Modules](https://canvas.instructure.com/doc/api/modules.html):** Suggest additional learning modules that target the student’s weak areas using the List modules API.
+- [**Quizzes](https://canvas.instructure.com/doc/api/quizzes.html):** Recommend practice quizzes to help the student improve on specific knowledge gaps
 
 # Congratulations!
 

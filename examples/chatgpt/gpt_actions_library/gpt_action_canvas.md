@@ -2,17 +2,13 @@
 
 ### Table of Contents
 
-1. [**General App Information**](#general-app-information)  
-   - Overview of Canvas LMS, its functionality, and the role of ChatGPT's Custom Actions to enhance educational experiences through AI integration.
+1. [**General App Information**](#general-app-information) - Overview of Canvas LMS, its functionality, and the role of ChatGPT's Custom Actions to enhance educational experiences through AI integration.
 
-2. [**Authentication from ChatGPT to Canvas**](#authentication-from-chatgpt-to-canvas)  
-   - Explanation of authentication methods (OAuth and User Generated Access Tokens) for connecting ChatGPT to Canvas, with detailed instructions for setting up each option.
+2. [**Authentication from ChatGPT to Canvas**](#authentication-from-chatgpt-to-canvas) - Explanation of authentication methods (OAuth and User Generated Access Tokens) for connecting ChatGPT to Canvas, with detailed instructions for setting up each option.
 
-3. [**Sample Use Case: Student Course Assistant**](#sample-use-case-student-course-assistant)  
-   - Detailed example of using ChatGPT to assist students with course navigation, exam preparation, and personalized feedback, including specific API calls and workflows.
+3. [**Sample Use Case: Student Course Assistant**](#sample-use-case-student-course-assistant) - Detailed example of using ChatGPT to assist students with course navigation, exam preparation, and personalized feedback, including specific API calls and workflows.
 
-4. [**Other Use Cases for Consideration**](#other-use-cases-for-consideration)  
-   - Additional potential integrations using the Canvas API, such as classroom analytics and report generation.
+4. [**Other Use Cases for Consideration**](#other-use-cases-for-consideration) - Additional potential integrations using the Canvas API, such as classroom analytics and report generation.
 
 5. [**Congratulations**](#congratulations)  
 
@@ -33,19 +29,16 @@ https://canvas.instructure.com/doc/api/file.oauth.html#oauth2-flow - Authenticat
 - There are two options for authentication in Canvas: 1) OAuth and 2) User Generated Access Tokens.
 - For large-scale deployments, it is strongly recommended to use OAuth for Action Authentication. Access to Canvas’ Admin settings is required for OAuth in order to retrieve a Client ID and Client Secret.
 - If the user is considering a small-scale deployment or do not have access to Admin Settings, they may consider User Generated Access Tokens. Be aware that any request made by the action will be made using the token you generate, so Canvas will register all requests as your activity and use your permissions to complete them.
-    - [OAuth Documentation](https://canvas.instructure.com/doc/api/file.oauth.html#oauth2-flow)
-    - [User Generated Access Tokens](https://canvas.instructure.com/doc/api/file.oauth.html#manual-token-generation)
-        1. Proceed to Account Settings shown here:
-            
-            ![canvas_lms_settings_link.png](../../../images/canvas_lms_settings_link.png)
-            
-        2. Scroll down to the List of Tokens shown here:
-            
-            ![canvas_lms_list_of_tokens.png](../../../images/canvas_lms_list_of_tokens.png)
-            
-        3. Generate a New Token, and **store this token**. It will not be accessible later.
-            
-            ![canvas_lms_new_token.png](../../../images/canvas_lms_new_token.png)
+
+### Implementing [OAuth Documentation](https://canvas.instructure.com/doc/api/file.oauth.html#oauth2-flow)
+
+### Implementing authentication with [User Generated Access Tokens](https://canvas.instructure.com/doc/api/file.oauth.html#manual-token-generation)
+  1. Proceed to Canvas Account Settings shown here:
+  ![canvas_lms_settings_link.png](../../../images/canvas_lms_settings_link.png)
+  2. Scroll down to the List of Tokens shown here:          
+  ![canvas_lms_list_of_tokens.png](../../../images/canvas_lms_list_of_tokens.png)
+  3. Generate a New Token, and **store this token**. It will not be accessible later.
+  ![canvas_lms_new_token.png](../../../images/canvas_lms_new_token.png)
             
 
 ## Sample Use Case: Student Course Assistant
@@ -92,11 +85,11 @@ There can be multiple ways to write these instructions. [See here](https://platf
 ### OpenAPI Schema
 
 - API Calls Featured
-    - [GET] [listYourCourses](https://canvas.instructure.com/doc/api/courses.html#method.courses.index)
-    - [GET] [getSingleCourse](https://canvas.instructure.com/doc/api/courses.html#method.courses.show)
-    - [GET] [listModules](https://canvas.instructure.com/doc/api/modules.html#method.context_modules_api.index)
-    - [GET] [listModuleItems](https://canvas.instructure.com/doc/api/modules.html#method.context_module_items_api.index)
-    - [GET] [searchCourses](https://canvas.instructure.com/doc/api/search.html#method.search.all_courses)
+  - [GET] [listYourCourses](https://canvas.instructure.com/doc/api/courses.html#method.courses.index)
+  - [GET] [getSingleCourse](https://canvas.instructure.com/doc/api/courses.html#method.courses.show)
+  - [GET] [listModules](https://canvas.instructure.com/doc/api/modules.html#method.context_modules_api.index)
+  - [GET] [listModuleItems](https://canvas.instructure.com/doc/api/modules.html#method.context_module_items_api.index)
+  - [GET] [searchCourses](https://canvas.instructure.com/doc/api/search.html#method.search.all_courses)
 
 Below was generated with a combination of [Canvas API Reference](https://canvas.instructure.com/doc/api/index.html) and the [ActionsGPT](https://chatgpt.com/g/g-TYEliDU6A-actionsgpt).
 
@@ -569,20 +562,20 @@ Below is a non-exhaustive list of additional use cases that could be explored us
 
 **API Resources:**
 
-- [**Analytics](https://canvas.instructure.com/doc/api/analytics.html) and [Quiz Statistics](https://canvas.instructure.com/doc/api/quiz_statistics.html):** Retrieve detailed data on student participation, grades, and course-level statistics.
-- [**Quiz Reports](https://canvas.instructure.com/doc/api/quiz_reports.html):** Generate and view various reports to analyze overall class performance and track progress over time.
+- [**Analytics**](https://canvas.instructure.com/doc/api/analytics.html) and [**Quiz Statistics**](https://canvas.instructure.com/doc/api/quiz_statistics.html): Retrieve detailed data on student participation, grades, and course-level statistics.
+- [**Quiz Reports**](https://canvas.instructure.com/doc/api/quiz_reports.html): Generate and view various reports to analyze overall class performance and track progress over time.
 
-### **Review and Improvement Guidance for Graded Assignments**
+### Review and Improvement Guidance for Graded Assignments
 
 **Use Case:** Provide students with a tool to review their graded assignments, analyze their performance, and receive targeted guidance on how to improve in areas where they have knowledge gaps. The tool can highlight specific questions or sections where the student struggled and suggest additional resources or practice materials to help them improve.
 
 **API Resources:**
 
-- [**Submissions](https://canvas.instructure.com/doc/api/submissions.html) and [Quiz Submissions](https://canvas.instructure.com/doc/api/quiz_submissions.html):** Retrieve the student’s submissions and associated grades.
-- [**Assignments](https://canvas.instructure.com/doc/api/assignments.html):** Retrieve detailed information about the assignment, including rubrics and grading criteria.
-- [**Rubric Assessments](https://canvas.instructure.com/doc/api/rubrics.html):** Access detailed feedback and rubric assessments
-- [**Modules](https://canvas.instructure.com/doc/api/modules.html):** Suggest additional learning modules that target the student’s weak areas using the List modules API.
-- [**Quizzes](https://canvas.instructure.com/doc/api/quizzes.html):** Recommend practice quizzes to help the student improve on specific knowledge gaps
+- [**Submissions**](https://canvas.instructure.com/doc/api/submissions.html) and [**Quiz Submissions**](https://canvas.instructure.com/doc/api/quiz_submissions.html): Retrieve the student’s submissions and associated grades.
+- [**Assignments**](https://canvas.instructure.com/doc/api/assignments.html): Retrieve detailed information about the assignment, including rubrics and grading criteria.
+- [**Rubric Assessments**](https://canvas.instructure.com/doc/api/rubrics.html): Access detailed feedback and rubric assessments
+- [**Modules**](https://canvas.instructure.com/doc/api/modules.html): Suggest additional learning modules that target the student’s weak areas using the List modules API.
+- [**Quizzes**](https://canvas.instructure.com/doc/api/quizzes.html): Recommend practice quizzes to help the student improve on specific knowledge gaps
 
 # Congratulations!
 

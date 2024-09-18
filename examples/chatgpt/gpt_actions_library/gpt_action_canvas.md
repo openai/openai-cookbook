@@ -14,15 +14,9 @@
 
 ## General App Information
 
-Canvas is a widely-used Learning Management System (LMS) designed to support online learning and teaching. It offers a robust set of tools for course management, content delivery, assessments, and student collaboration. Through the [Canvas API](https://canvas.instructure.com/doc/api/all_resources.html), Canvas allows for extensive customization and integration with third-party applications, including AI-powered tools like ChatGPT. 
+Canvas is a widely-used Learning Management System (LMS) designed to support online learning and teaching. It offers a robust set of tools for course management, content delivery, assessments, and student collaboration. Through the [Canvas REST API](https://canvas.instructure.com/doc/api/all_resources.html), Canvas allows for extensive customization and integration with third-party applications, including AI-powered tools like ChatGPT. 
 
-ChatGPT’s Custom Actions with Canvas enable educators to leverage AI to enhance course content, automate tasks, and provide personalized learning journeys for students. Examples include virtual teaching assistants based on active courses, The capabilities are well-suited for pulling information in from Canvas to create an educational dialogue. ChatGPT with Custom Actions is not meant for automating the entire Canvas experience nor act as a replacement to many of its capabilities (like Assignment submission). 
-
-### Key Links
-
-https://canvas.instructure.com/doc/api/all_resources.html - API documentation used in the integration.
-
-https://canvas.instructure.com/doc/api/file.oauth.html#oauth2-flow - Authentication documentation and walkthrough.
+ChatGPT’s Custom Actions with Canvas enable educators to leverage AI to enhance course content, automate tasks, and provide personalized learning journeys for students. Examples include virtual teaching assistants based on active courses, as the capabilities are well-suited for pulling information in from Canvas to create an educational dialogue. ChatGPT with Custom Actions is not meant for automating the entire Canvas experience nor act as a replacement to many of its capabilities better suited for completion in the Canvas app. 
 
 ## Authentication from ChatGPT to Canvas
 

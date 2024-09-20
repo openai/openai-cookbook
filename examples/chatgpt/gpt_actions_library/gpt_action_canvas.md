@@ -28,7 +28,7 @@ There are two options for authentication in Canvas: 1) OAuth and 2) User Generat
 
 ### Implementing OAuth for Canvas
 
-While this Canvas Cookbook does not use OAuth, a production deployment likely will. Here are some things to keep in mind while implementing OAuth in a Canvas Custom Action:
+While this Canvas Cookbook does not use OAuth, any deployment with more than one user must use it. Here are some things to keep in mind while implementing OAuth in a Canvas Custom Action:
 
 -  Access to Canvas’ Admin settings is required for OAuth in order to retrieve a Client ID and Client Secret.
 -  The Authorization URL will look like (make sure to update the Canvas Install URL): https://<canvas-install-url>/login/oauth2/auth
@@ -37,14 +37,16 @@ While this Canvas Cookbook does not use OAuth, a production deployment likely wi
 -  Token Exchange Method is Default (POST Request)
 -  Canvas uses the term `redirect_uri` where ChatGPT uses the term `Callback URL` for URL to complete the redirect process after successful authentication.
 
-### Implementing authentication with [User Generated Access Tokens](https://canvas.instructure.com/doc/api/file.oauth.html#manual-token-generation)
+### Implementing authentication with User Generated Access Tokens
+
+In some cases, it may be appropriate to use [User Generated Access Tokens](https://canvas.instructure.com/doc/api/file.oauth.html#manual-token-generation) for Custom Action authentication with Canvas. Here are the steps to follow to do so:
+
   1. Proceed to Canvas Account Settings shown here:
   ![canvas_lms_settings_link.png](../../../images/canvas_lms_settings_link.png)
   2. Scroll down to the List of Tokens shown here:          
   ![canvas_lms_list_of_tokens.png](../../../images/canvas_lms_list_of_tokens.png)
   3. Generate a New Token, and **store this token**. It will not be accessible later.
   ![canvas_lms_new_token.png](../../../images/canvas_lms_new_token.png)
-            
 
 ## Sample Use Case: Student Course Assistant
 

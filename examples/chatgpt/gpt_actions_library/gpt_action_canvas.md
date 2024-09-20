@@ -20,11 +20,22 @@ ChatGPT’s Custom Actions with Canvas enable educators to leverage AI to enhanc
 
 ## Authentication from ChatGPT to Canvas
 
-- There are two options for authentication in Canvas: 1) OAuth and 2) User Generated Access Tokens.
-- For large-scale deployments, it is strongly recommended to use OAuth for Action Authentication. Access to Canvas’ Admin settings is required for OAuth in order to retrieve a Client ID and Client Secret.
+For a general overview on Authentication in Custom Actions, see the [Action authentication documentation](https://platform.openai.com/docs/actions/authentication).
+
+There are two options for authentication in Canvas: 1) OAuth and 2) User Generated Access Tokens.
+- For large-scale deployments, it is strongly recommended to use OAuth for Action Authentication. See [OAuth for Canvas Documentation](https://canvas.instructure.com/doc/api/file.oauth.html#oauth2-flow) for a detailed walkthrough.
 - If the user is considering a small-scale deployment or do not have access to Admin Settings, they may consider User Generated Access Tokens. Be aware that any request made by the action will be made using the token you generate, so Canvas will register all requests as your activity and use your permissions to complete them.
 
-### Implementing [OAuth Documentation](https://canvas.instructure.com/doc/api/file.oauth.html#oauth2-flow)
+### Implementing OAuth for Canvas
+
+While this Canvas Cookbook does not use OAuth, a production deployment likely will. Here are some things to keep in mind while implementing OAuth in a Canvas Custom Action:
+
+-  Access to Canvas’ Admin settings is required for OAuth in order to retrieve a Client ID and Client Secret.
+-  The Authorization URL will look like (make sure to update the Canvas Install URL): https://<canvas-install-url>/login/oauth2/auth
+-  The Token URL will look like (make sure to update the Canvas Install URL): ttps://<canvas-install-url>/login/oauth2/token
+-  Scopes may not need to be defined in the Custom Action. If the developer key does not require scopes and no scope parameter is specified, the access token will have access to all scopes. If the developer key does require scopes and no scope parameter is specified, Canvas will respond with "invalid_scope." More information on developer keys [here](https://canvas.instructure.com/doc/api/file.developer_keys.html) and endpoints [here](https://canvas.instructure.com/doc/api/file.oauth_endpoints.html#get-login-oauth2-auth).
+-  Token Exchange Method is Default (POST Request)
+-  Canvas uses the term `redirect_uri` where ChatGPT uses the term `Callback URL` for URL to complete the redirect process after successful authentication.
 
 ### Implementing authentication with [User Generated Access Tokens](https://canvas.instructure.com/doc/api/file.oauth.html#manual-token-generation)
   1. Proceed to Canvas Account Settings shown here:

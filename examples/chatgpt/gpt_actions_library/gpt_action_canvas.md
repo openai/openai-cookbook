@@ -23,12 +23,14 @@ ChatGPT’s Custom Actions with Canvas enable educators to leverage AI to enhanc
 For a general overview on Authentication in Custom Actions, see the [Action authentication documentation](https://platform.openai.com/docs/actions/authentication).
 
 There are two options for authentication in Canvas: 1) OAuth and 2) User Generated Access Tokens.
-- For large-scale deployments, it is strongly recommended to use OAuth for Action Authentication. See [OAuth for Canvas Documentation](https://canvas.instructure.com/doc/api/file.oauth.html#oauth2-flow) for a detailed walkthrough.
-- If the user is considering a small-scale deployment or do not have access to Admin Settings, they may consider User Generated Access Tokens. Be aware that any request made by the action will be made using the token you generate, so Canvas will register all requests as your activity and use your permissions to complete them.
+- For large-scale deployments, it is required to use OAuth for Action Authentication.
+- If the user is considering a single-user deployment or does not have access to Admin Settings, they may consider User Generated Access Tokens. Be aware that any request made by the action will be made using the token the user generated, so Canvas will register all requests as the user's activity and use the user's permissions to complete them.
 
 ### Implementing OAuth for Canvas
 
-While this Canvas Cookbook does not use OAuth, any deployment with more than one user must use it. Here are some things to keep in mind while implementing OAuth in a Canvas Custom Action:
+While this Canvas Cookbook does not use OAuth, any deployment with more than one user must use it. See [OAuth for Canvas Documentation](https://canvas.instructure.com/doc/api/file.oauth.html#oauth2-flow) for a detailed walkthrough. 
+
+Here are some things to keep in mind while implementing OAuth in a Canvas Custom Action:
 
 -  Access to Canvas’ Admin settings is required for OAuth in order to retrieve a Client ID and Client Secret.
 -  The Authorization URL will look like (make sure to update the Canvas Install URL): https://<canvas-install-url>/login/oauth2/auth

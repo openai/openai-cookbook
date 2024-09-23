@@ -1340,7 +1340,6 @@
   tags:
     - gpt-actions-library
     - chatgpt
-    - chatgpt-featured
 
 - title: GPT Actions library - BigQuery
   path: examples/chatgpt/gpt_actions_library/gpt_action_bigquery.ipynb
@@ -1560,7 +1559,6 @@
   tags:
     - gpt-actions-library
     - chatgpt
-    - chatgpt-featured
     - chatgpt-productivity
 
 - title: GPT Actions library - Snowflake Direct
@@ -1571,7 +1569,6 @@
   tags:
     - gpt-actions-library
     - chatgpt
-    - chatgpt-featured
     - chatgpt-data
 
 - title: GPT Actions library - Snowflake Middleware
@@ -1583,7 +1580,6 @@
     - gpt-actions-library
     - chatgpt
     - chatgpt-data
-    - chatgpt-middleware
 
 - title: GPT Actions library - Retool Workflow
   path: examples/chatgpt/gpt_actions_library/gpt_action_retool_workflow.md

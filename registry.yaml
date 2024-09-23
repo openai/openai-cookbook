@@ -1587,3 +1587,12 @@
   tags:
     - completions
     - reasoning
+
+- title: Using chained calls for o1 structured outputs
+  path: examples/o1/Using_chained_calls_for_structured_outputs.ipynb
+  date: 2024-09-22
+  authors:
+    - ericning-o
+  tags:
+    - completions
+    - reasoning

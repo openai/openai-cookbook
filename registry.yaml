@@ -1394,11 +1394,12 @@
     - gpt-actions-library
     - chatgpt
 
-- title: GPT Actions library - Canvas LMS
-  path: examples/chatgpt/gpt_actions_library/gpt_action_canvaslms.ipynb
-  date: 2024-07-17
+- title: GPT Actions library - Canvas Learning Management System
+  path: examples/chatgpt/gpt_actions_library/gpt_action_canvas.md
+  date: 2024-09-17
   authors:
     - keelan-openai
+    - joecasson-openai
   tags:
     - gpt-actions-library
     - chatgpt
@@ -1568,6 +1569,24 @@
   tags:
     - gpt-actions-library
     - chatgpt
+
+- title: Using reasoning for data validation
+  path: examples/o1/Using_reasoning_for_data_validation.ipynb
+  date: 2024-09-12
+  authors:
+    - royziv11
+  tags:
+    - completions
+    - reasoning
+
+- title: Using reasoning for routine generation
+  path: examples/o1/Using_reasoning_for_routine_generation.ipynb
+  date: 2024-09-12
+  authors:
+    - royziv11
+  tags:
+    - completions
+    - reasoning
 
 - title: Building a Bring Your Own Browser (BYOB) Tool for Web Browsing and Summarization
   path: examples/third_party/Web_search_with_google_api_bring_your_own_browser_tool.ipynb

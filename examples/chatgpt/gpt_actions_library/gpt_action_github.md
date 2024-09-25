@@ -26,7 +26,7 @@ This GPT Action helps developers evaluate the quality and security of a GitHub P
 ## Demonstration
 
 <video width="600" controls autoplay>
-  <source src="path_to_your_video.mp4" type="video/mp4">
+  <source src="../../../images/gpt_action_github/PR_Reviewer.mov" type="video/mp4">
   Your browser does not support the video tag.
 </video>
 
@@ -209,8 +209,18 @@ In ChatGPT, click on "Authentication" and choose **"Bearer"**. Enter in the info
 
 You are now ready to test out the GPT. You can enter a simple prompt like "Can you review my pull request? owner: <org_name>, repo: <repo_name>, pull request number: <PR_Number>" and expect to see the following:
 
+![Landing Page](../../../images/gpt_action_github/landing_page.png)
+
 1. A summary of changes in the referenced pull request(PR).
+
+![First Interaction](../../../images/gpt_action_github/first_interaction.png)
+
 2. Quality and Security feedback and suggestions to incorporate in the next iteration of the PR.
+
+![First Feedback](../../../images/gpt_action_github/first_feedback.png)
+
 3. An option to iterate on the feedback or accept it and have the GPT post it directly to the PR as a comment from you. 
+
+![First Interaction](../../../images/gpt_action_github/final_result.png)
 
 *Are there integrations that you’d like us to prioritize? Are there errors in our integrations? File a PR or issue in our github, and we’ll take a look.*

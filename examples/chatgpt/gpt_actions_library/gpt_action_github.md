@@ -84,30 +84,112 @@ Once you've created a Custom GPT, copy the text below in the Instructions panel.
 
 Once you've created a Custom GPT, copy the text below in the Actions panel. Have questions? Check out [Getting Started Example](https://platform.openai.com/docs/actions/getting-started) to see how this step works in more detail.
 
-Below is an example of what connecting to this Middlware might look like. You'll need to insert your application's & function's information in this section.
+Below is an example of what connecting to GitHub to GET the Pull Request Diff and POST the Feedback to the Pull Request might look like.
 
 ```javascript
 openapi: 3.1.0
 info:
-  title: {insert title}
-  description: {insert description}
+  title: GitHub Pull Request API
+  description: Retrieve the diff of a pull request and post comments back to it.
   version: 1.0.0
 servers:
-  - url: {url of your Google Cloud Function}
-    description: {insert description}
+  - url: https://api.github.com
+    description: GitHub API
 paths:
-  /{your_function_name}:
+  /repos/{owner}/{repo}/pulls/{pull_number}:
     get:
-      operationId: {create an operationID}
-      summary: {insert summary}
+      operationId: getPullRequestDiff
+      summary: Get the diff of a pull request.
+      parameters:
+        - name: owner
+          in: path
+          required: true
+          schema:
+            type: string
+          description: Owner of the repository.
+        - name: repo
+          in: path
+          required: true
+          schema:
+            type: string
+          description: Name of the repository.
+        - name: pull_number
+          in: path
+          required: true
+          schema:
+            type: integer
+          description: The number of the pull request.
+        - name: Accept
+          in: header
+          required: true
+          schema:
+            type: string
+            enum:
+              - application/vnd.github.v3.diff
+          description: Media type for the diff format.
       responses:
-        '200':
-          description: {insert description}
+        "200":
+          description: Successfully retrieved the pull request diff.
           content:
             text/plain:
               schema:
                 type: string
-                example: {example of response}
+        "404":
+          description: Pull request not found.
+  /repos/{owner}/{repo}/issues/{issue_number}/comments:
+    post:
+      operationId: postPullRequestComment
+      summary: Post a comment to the pull request.
+      parameters:
+        - name: owner
+          in: path
+          required: true
+          schema:
+            type: string
+          description: Owner of the repository.
+        - name: repo
+          in: path
+          required: true
+          schema:
+            type: string
+          description: Name of the repository.
+        - name: issue_number
+          in: path
+          required: true
+          schema:
+            type: integer
+          description: The issue or pull request number.
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                body:
+                  type: string
+                  description: The content of the comment.
+      responses:
+        "201":
+          description: Successfully created a comment.
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  id:
+                    type: integer
+                  body:
+                    type: string
+                  user:
+                    type: object
+                    properties:
+                      login:
+                        type: string
+                      id:
+                        type: integer
+        "404":
+          description: Pull request not found.
 ```
 
 ## Authentication Instructions
@@ -116,22 +198,19 @@ Below are instructions on setting up authentication with this 3rd party applicat
 
 ### In ChatGPT (refer to Step 2 in the Getting Started Example)
 
-In ChatGPT, click on "Authentication" and choose **"Bearer"**. Enter in the information below.
+In ChatGPT, click on "Authentication" and choose **"Bearer"**. Enter in the information below. Ensure your token has the permissions described in Application setup, above.
 
-- **Client ID**: <personal_access_token>
-
-### Back in Google Cloud Console (while referring to Step 4 in the Getting Started Example)
-
-Edit the OAuth 2.0 Client ID you create in Google Cloud earlier and add the callback URL you received after creating your custom action.
-
-![](../../../images/gcp-function-middleware-oauthcallback.png)
+- Authentication Type: API Key
+- Auth Type: Bearer
+- API Key 
+  <personal_access_token>
 
 ### Test the GPT
 
-You are now ready to test out the GPT. You can enter a simple prompt like "Test Integration" and expect to see the following:
+You are now ready to test out the GPT. You can enter a simple prompt like "Can you review my pull request? owner: <org_name>, repo: <repo_name>, pull request number: <PR_Number>" and expect to see the following:
 
-1. Request to sign into Google
-2. Allow request to your Google Function
-3. Response from ChatGPT showing the response from your function - e.g. "You have connected as an authenticated user to Google Functions"
+1. A summary of changes in the referenced pull request(PR).
+2. Quality and Security feedback and suggestions to incorporate in the next iteration of the PR.
+3. An option to iterate on the feedback or accept it and have the GPT post it directly to the PR as a comment from you. 
 
 *Are there integrations that you’d like us to prioritize? Are there errors in our integrations? File a PR or issue in our github, and we’ll take a look.*

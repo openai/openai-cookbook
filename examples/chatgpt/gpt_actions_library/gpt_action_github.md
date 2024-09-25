@@ -1,67 +1,59 @@
-# GPT Action Library: GitHub Pull Requests
+# GPT Action Library: GitHub
 
 ## Introduction
 
-
-This page provides an instruction & guide for developers connecting a GPT Action to GitHub. Before you proceed, make sure to first familiarize yourself with the following information:
+This page provides instructions for developers connecting a GPT Action to GitHub. Before proceeding, familiarize yourself with the following resources:
 - [Introduction to GPT Actions](https://platform.openai.com/docs/actions)
-- [Introduction to GPT Actions Library](https://platform.openai.com/docs/actions/actions-library)
-- [Example of Building a GPT Action from Scratch](https://platform.openai.com/docs/actions/getting-started)
+- [GPT Actions Library](https://platform.openai.com/docs/actions/actions-library)
+- [Building a GPT Action from Scratch](https://platform.openai.com/docs/actions/getting-started)
 
-This GPT Action helps developers evaluate the quality and security of a GitHub Pull Request diff. It provides feedback and suggestions for each domain. Developers can then accept or modify the feedback before automatically submitting it as a comment on the Pull Request.
+This GPT Action helps developers evaluate the quality and security of a GitHub Pull Request diff. It provides feedback and suggestions for each domain, allowing developers to modify or accept the feedback before automatically submitting it as a comment on the Pull Request.
 
-### Value + Example Business Use Cases
+## Value & Example Business Use Cases
 
-**Value**: Users can now leverage ChatGPT's natural language capabilities to assist with GitHub Pull Request reviews.
+### **Value**:
+Users can leverage ChatGPT's natural language capabilities to assist with GitHub Pull Request reviews.
 
-- **For developers**: Quickly analyze code changes and perform high-quality reviews with instant feedback on proposed modifications.
-- **For organizations**: Ensure that diffs comply with best practices and coding standards, or automatically propose refactored alternatives. 
-  - (This would require an additional API request to a "best practices and standards definition.")
-- **Overall**: Boost developer productivity and ensure higher quality, more secure code with this AI-powered Code Review assistant.
+- **For developers**: Analyze code changes and perform high-quality reviews with instant feedback on proposed modifications.
+- **For organizations**: Ensure diffs adhere to best practices and coding standards, or automatically propose refactored alternatives (additional API requests may be required to define best practices).
+- **Overall**: Boost productivity and ensure higher-quality, more secure code with this AI-powered Code Review assistant.
 
-**Example Use Cases**:
-- A user was tagged as a reviewer in a PR and wants a second opinion on the quality and security implications of the proposed change.
-- An organization automatically encourages developers to consider adhering to their best practices and standards.
+### **Example Use Cases**:
+- A reviewer seeks feedback on the quality and security of a proposed code change.
+- An organization encourages adherence to best practices and standards automatically during code review.
 
-**Demonstration Video:**
-
+## Demonstration Video:
 [![Watch the video](https://img.youtube.com/vi/bcjybCh-x-Q/0.jpg)](https://www.youtube.com/watch?v=bcjybCh-x-Q)
 
 ## Application Information
 
-### Application Key Links
+### **Key Links**
+Before starting, explore these resources:
+- [GitHub](https://github.com)
+- [GitHub API Documentation](https://docs.github.com/en/rest/pulls?apiVersion=2022-11-28)
 
-Check out these links from the application before you get started:
-- Application Website: https://github.com
-- Application API Documentation: https://docs.github.com/en/rest/pulls?apiVersion=2022-11-28
-
-### Application Prerequisites
-
-Before you get started, make sure you go through the following steps in your application environment:
-- Select a repository with an open pull request.
-- Ensure your Personal Access Token is approved for use in the Organization. For OSS or individuals your PAT should work automatically. 
+### **Prerequisites**
+Ensure you have a repository with an open pull request.
 
 ## Application Setup
 
-### Select a Pull Request on an Organization or individual Repository
+### **Select a Pull Request**
+1. Navigate to a repository, e.g., [example PR](https://github.com/microsoft/vscode/pull/229241).
+   - Note the owner (e.g., "microsoft"), repository name (e.g., "vscode"), and PR number (e.g., "229241").
+   - If the repository owner is an SSO organization, your token may need [approval](https://docs.github.com/en/organizations/managing-programmatic-access-to-your-organization/managing-requests-for-personal-access-tokens-in-your-organization#managing-fine-grained-personal-access-token-requests).
+2. Review [how to perform a high-quality code review](https://docs.github.com/en/pull-requests/collaborating-with-pull-requests/getting-started/best-practices-for-pull-requests).
 
-*   Navigate to any repository, for example https://github.com/microsoft/vscode/pull/229241.
-  *   Note the Owner: "microsoft", Repository: "vscode" and the PR number: "229241".
-  *   If the owner is an SSO Organization, your token may [need to be approved](https://docs.github.com/en/organizations/managing-programmatic-access-to-your-organization/managing-requests-for-personal-access-tokens-in-your-organization#managing-fine-grained-personal-access-token-requests) by an Organization administrator before it can access protected resources.
-*   Understand [_how_ to perform a high quality Code Review.](https://docs.github.com/en/pull-requests/collaborating-with-pull-requests/getting-started/best-practices-for-pull-requests)
-
-
-##### Generate a GitHub Personal Access Token
-* Log in to GitHub and navigate to "Settings" from your profile dropdown.
-* Go to "Developer settings" and select "Personal access tokens".
-* Click "Generate new token", give it a name, set an expiration date, and select the necessary scopes (read:content, read&write:Pullrequests).
-* Click "Generate token", then copy and save the token securely.
+### **Generate a GitHub Personal Access Token**
+1. Log in to GitHub and go to **Settings**.
+2. Navigate to **Developer settings** > **Personal access tokens**.
+3. Click **Generate new token**, name it, set an expiration date, and select the necessary scopes (e.g., `read:content`, `read&write:pull_requests`).
+4. Copy and securely store the token.
 
 ## ChatGPT Steps
 
-### Custom GPT Instructions
+### **Custom GPT Instructions**
 
-Once you've created a Custom GPT, copy the text below in the Instructions panel. Have questions? Check out [Getting Started Example](https://platform.openai.com/docs/actions/getting-started) to see how this step works in more detail.
+Once you've created a Custom GPT, copy the following into the Instructions panel:
 
 ```
 # **Context:** You support software developers by providing detailed information about their pull request diff content from repositories hosted on GitHub. You help them understand the quality, security and completeness implications of the pull request by providing concise feedback about the code changes based on known best practices. The developer may elect to post the feedback (possibly with their modifications) back to the Pull Request. Assume the developer is familiar with software development.

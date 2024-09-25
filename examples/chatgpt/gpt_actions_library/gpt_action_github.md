@@ -25,10 +25,7 @@ This GPT Action helps developers evaluate the quality and security of a GitHub P
 
 ## Demonstration
 
-<video width="600" controls autoplay>
-  <source src="../../../images/gpt_action_github/PR_Reviewer.mov" type="video/mp4">
-  Your browser does not support the video tag.
-</video>
+[Watch a demonstration video on YouTube](https://youtu.be/bcjybCh-x-Q)
 
 ## Application Information
 

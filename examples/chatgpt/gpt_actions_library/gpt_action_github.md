@@ -23,6 +23,13 @@ This GPT Action helps developers evaluate the quality and security of a GitHub P
 - A user was tagged as a reviewer in a PR and wants a second opinion on the quality and security implications of the proposed change.
 - An organization automatically encourages developers to consider adhering to their best practices and standards.
 
+## Demonstration
+
+<video width="600" controls autoplay>
+  <source src="path_to_your_video.mp4" type="video/mp4">
+  Your browser does not support the video tag.
+</video>
+
 ## Application Information
 
 ### Application Key Links
@@ -39,113 +46,19 @@ Before you get started, make sure you go through the following steps in your app
 
 ## Application Setup
 
-### Select a Pull Request on a Repository
+### Select a Pull Request on an Organization or individual Repository
 
 *   Navigate to any repository, for example https://github.com/microsoft/vscode/pull/229241.
-*   Note the Owner: "microsoft", Repository: "vscode" and the PR number: "229241".
-*   Understand [_how_ to perform a high quality Code Review.](https://docs.github.com/en/pull-requests/collaborating-with-pull-requests/reviewing-changes-in-pull-requests/reviewing-proposed-changes-in-a-pull-request)
-
-You can read up on the supported runtimes [here](https://cloud.google.com/functions/docs/concepts/execution-environment)
-
-#### Option 1: Use IDE (VSCode)
-
-See Google's documentation [here](https://cloud.google.com/functions/docs/create-deploy-ide) for how to deploy using VSCode. If you have familiarity with this approach, feel free to use it.
+  *   Note the Owner: "microsoft", Repository: "vscode" and the PR number: "229241".
+  *   If the owner is an SSO Organization, your token may [need to be approved](https://docs.github.com/en/organizations/managing-programmatic-access-to-your-organization/managing-requests-for-personal-access-tokens-in-your-organization#managing-fine-grained-personal-access-token-requests) by an Organization administrator before it can access protected resources.
+*   Understand [_how_ to perform a high quality Code Review.](https://docs.github.com/en/pull-requests/collaborating-with-pull-requests/getting-started/best-practices-for-pull-requests)
 
 
-#### Option 2: Directly in Google Cloud Console
-
-See the documentation [here](https://cloud.google.com/functions/docs/console-quickstart) for how to deploy using the Google Cloud Console. 
-
-#### Option 3: Use the Google Cloud CLI (`gcloud`)
-
-See the documentation [here](https://cloud.google.com/functions/docs/create-deploy-gcloud) for how to deploy using the Google Cloud Console. We’ll walk through an example here step by step.
-
-
-##### Part 1: Install and initialize Google Cloud CLI (`gcloud`)
-Follow the steps [here](https://cloud.google.com/sdk/docs/install) that are relevant to the OS you are runnning. The last step of this process is for you to run `gcloud init` and sign in to your Google account
-
-##### Part 2: Setup local development environment
-In this example, we will be setting up a Node.js environment.
-
-```
-mkdir <directory_name>
-cd <directory_name>
-```
-
-Initialize the Node.js project
-
-```
-npm init
-```
-Accept the default values for `npm init`
-
-##### Part 3: Create Function
-Create the `index.js` file
-
-```
-const functions = require('@google-cloud/functions-framework');
-const axios = require('axios');
-
-const TOKENINFO_URL = 'https://oauth2.googleapis.com/tokeninfo';
-
-// Register an HTTP function with the Functions Framework that will be executed
-// when you make an HTTP request to the deployed function's endpoint.
-functions.http('executeGCPFunction', async (req, res) => {
-  const authHeader = req.headers.authorization;
-
-  if (!authHeader) {
-    return res.status(401).send('Unauthorized: No token provided');
-  }
-
-  const token = authHeader.split(' ')[1];
-  if (!token) {
-    return res.status(401).send('Unauthorized: No token provided');
-  }
-
-  try {
-    const tokenInfo = await validateAccessToken(token);            
-    res.json("You have connected as an authenticated user to Google Functions");
-  } catch (error) {
-    res.status(401).send('Unauthorized: Invalid token');
-  }  
-});
-
-async function validateAccessToken(token) {
-  try {
-    const response = await axios.get(TOKENINFO_URL, {
-      params: {
-        access_token: token,
-      },
-    });
-    return response.data;
-  } catch (error) {
-    throw new Error('Invalid token');
-  }
-}
-```
-##### Part 4: Deploy Function
-
-This step below will install and add the necessary dependencies in your `package.json` file
-
-```
-npm install @google-cloud/functions-framework
-npm install axios
-```
-
-```
-npx @google-cloud/functions-framework --target=executeGCPFunction
-```
-
-```
-gcloud functions deploy gcp-function-for-chatgpt \
-  --gen2 \
-  --runtime=nodejs20 \
-  --region=us-central1 \
-  --source=. \
-  --entry-point=executeGCPFunction \
-  --trigger-http \
-  --allow-unauthenticated
-```
+##### Generate a GitHub Personal Access Token
+* Log in to GitHub and navigate to "Settings" from your profile dropdown.
+* Go to "Developer settings" and select "Personal access tokens".
+* Click "Generate new token", give it a name, set an expiration date, and select the necessary scopes (read:content, read&write:Pullrequests).
+* Click "Generate token", then copy and save the token securely.
 
 ## ChatGPT Steps
 
@@ -154,7 +67,17 @@ gcloud functions deploy gcp-function-for-chatgpt \
 Once you've created a Custom GPT, copy the text below in the Instructions panel. Have questions? Check out [Getting Started Example](https://platform.openai.com/docs/actions/getting-started) to see how this step works in more detail.
 
 ```
-When the user asks you to test the integration, you will make a call to the custom action and display the results
+# **Context:** You support software developers by providing detailed information about their pull request diff content from repositories hosted on GitHub. You help them understand the quality, security and completeness implications of the pull request by providing concise feedback about the code changes based on known best practices. The developer may elect to post the feedback (possibly with their modifications) back to the Pull Request. Assume the developer is familiar with software development.
+
+# **Instructions:**
+
+## Scenarios
+### - When the user asks for information about a specific pull request, follow this 5 step process:
+1. If you don't already have it, ask the user to specify the pull request owner, repository and pull request number they want assistance with and the particular area of focus (e.g., code performance, security vulnerabilities, and best practices).
+2. Retrieve the Pull Request information from GitHub using the getPullRequestDiff API call, owner, repository and the pull request number provided. 
+3. Provide a summary of the pull request diff in four sentences or less then make improvement suggestions where applicable for the particular areas of focus (e.g., code performance, security vulnerabilities, and best practices).
+4. Ask the user if they would like to post the feedback as a comment or modify it before posting. If the user modifies the feedback, incorporate that feedback and repeat this step. 
+5. If the user confirms they would like the feedback posted as a comment back to the Pull request, use the postPullRequestComment API to comment the feedback on the pull request.
 ```
 
 ### OpenAPI Schema
@@ -191,29 +114,11 @@ paths:
 
 Below are instructions on setting up authentication with this 3rd party application. Have questions? Check out [Getting Started Example](https://platform.openai.com/docs/actions/getting-started) to see how this step works in more detail.
 
-
-### In Google Cloud Console
-In Google Cloud Console, you need to create OAuth client ID credentials. To navigate to the right page search for "Credentials" in Google Cloud Console or enter `https://console.cloud.google.com/apis/credentials?project=<your_project_id>` in your browser. You can read more about it [here](https://developers.google.com/workspace/guides/create-credentials).
-
-Click on "CREATE CREDENTIALS" and select "Oauth client ID". Select "Web Application" for "Application type" and enter the name of your application (see below).
-
-![](../../../images/gcp-function-middleware-oauthclient.png)
-
-In the "OAuth client created" modal dialog, please take note of the
-
-* Client ID
-* Client secret
-
-
 ### In ChatGPT (refer to Step 2 in the Getting Started Example)
 
-In ChatGPT, click on "Authentication" and choose **"OAuth"**. Enter in the information below.
+In ChatGPT, click on "Authentication" and choose **"Bearer"**. Enter in the information below.
 
-- **Client ID**: *see step above*
-- **Client Secret**: *see step above*
-- **Authorization URL**: `https://accounts.google.com/o/oauth2/auth`
-- **Token URL**: `https://oauth2.googleapis.com/token`
-- **Scope**: `https://www.googleapis.com/auth/userinfo.email`
+- **Client ID**: <personal_access_token>
 
 ### Back in Google Cloud Console (while referring to Step 4 in the Getting Started Example)
 

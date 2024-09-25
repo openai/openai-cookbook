@@ -23,9 +23,7 @@ This GPT Action helps developers evaluate the quality and security of a GitHub P
 - A user was tagged as a reviewer in a PR and wants a second opinion on the quality and security implications of the proposed change.
 - An organization automatically encourages developers to consider adhering to their best practices and standards.
 
-## Demonstration
-
-[Watch a demonstration video on YouTube](https://youtu.be/bcjybCh-x-Q)
+<iframe width="560" height="315" src="https://www.youtube.com/embed/bcjybCh-x-Q" frameborder="0" allow="accelerometer; autoplay; encrypted-media; gyroscope; picture-in-picture" allowfullscreen></iframe>
 
 ## Application Information
 

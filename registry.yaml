@@ -384,14 +384,6 @@
   tags:
     - embeddings
 
-- title: Azure DALL·E image generation example
-  path: examples/azure/DALL-E.ipynb
-  date: 2023-06-12
-  authors:
-    - glecaros
-  tags:
-    - dall-e
-
 - title: Azure Chat Completions example (preview)
   path: examples/azure/chat.ipynb
   date: 2023-03-28
@@ -408,17 +400,6 @@
   authors:
     - kristapratico
   tags:
-    - completions
-
-- title: Azure completions example
-  path: examples/azure/completions.ipynb
-  date: 2022-12-16
-  authors:
-    - cmurtz-msft
-    - glecaros
-    - kristapratico
-  tags:
-    - embeddings
     - completions
 
 - title: Azure embeddings example

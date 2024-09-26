@@ -1598,3 +1598,11 @@
   tags:
     - completions
     - reasoning
+
+- title: Building a Bring Your Own Browser (BYOB) Tool for Web Browsing and Summarization
+  path: examples/third_party/Web_search_with_google_api_bring_your_own_browser_tool.ipynb
+  date: 2024-09-26
+  authors:
+    - msingh-openai
+  tags:
+    - web-browsing

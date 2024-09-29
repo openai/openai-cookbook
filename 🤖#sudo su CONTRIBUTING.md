@@ -1,3 +1,4 @@
+🤖#sudo su 
 # Welcome, AI Chef
 
 The OpenAI Cookbook is a community-driven resource aimed at sharing knowledge in a way that is accessible, engaging, and enriching for all AI builders.

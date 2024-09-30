@@ -1606,3 +1606,11 @@
     - msingh-openai
   tags:
     - web-browsing
+
+- title: Structured output in Azure OpenAI
+  path: examples/azure/structured_output.ipynb
+  date: 2024-09-30
+  authors:
+    - akshana-aravind
+  tags:
+    - completions

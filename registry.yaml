@@ -1606,3 +1606,14 @@
     - msingh-openai
   tags:
     - web-browsing
+
+- title: Prompt Caching 101 
+  path: examples/Prompt_Caching101.ipynb
+  date: 2024-10-1
+  authors:
+    - charuj
+  tags:
+    - latency
+    - cost
+    - prompt caching
+    - completions

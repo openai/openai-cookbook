@@ -30,7 +30,7 @@ This tutorial is valuable for developers who want to:
 - Gain hands-on experience with audio streaming and real-time processing in Node.js.
 - Create an interactive experience that takes full advantage of GPT's capabilities for spoken dialogue.
 
-By providing a practical example of connecting and interacting with OpenAI, this tutorial serves as a foundational guide for building real-time AI-driven solutions. This example can be included in the [OpenAI Cookbook](https://github.com/openai/openai-cookbook) to assist developers in quickly setting up a voice-based AI assistant using Node.js.
+By providing a practical example of connecting and interacting with OpenAI, this tutorial serves as a foundational guide for building real-time AI-driven solutions. This example is designed to assist developers in quickly setting up a voice-based AI assistant using Node.js.
 
 ### Step-by-Step Guide for Implementing this Code
 
@@ -63,7 +63,7 @@ By providing a practical example of connecting and interacting with OpenAI, this
    ```
 
 6. **Set Up the Code**
-   - Copy the provided JavaScript code into a file named `app.js` in your project directory.
+   - Copy the provided JavaScript code from audio_stream.mjs into a file named `app.js` in your project directory.
 
 7. **Run the Application**
    - Run the application with Node.js:

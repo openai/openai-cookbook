@@ -1614,3 +1614,11 @@
     - charuj
   tags:
     - completions
+
+- title: Realtime audio streaming to the Realtime platform
+  path: examples/streaming/realtime_audio_stream_with_mac.md
+  date: 2024-10-08
+  authors:
+    - alwell-kevin
+  tags:
+    - realtime

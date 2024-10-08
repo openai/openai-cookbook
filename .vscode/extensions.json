@@ -1,0 +1,6 @@
+{
+  "recommendations": [
+    "ms-azuretools.vscode-azurefunctions",
+    "ms-python.python"
+  ]
+}

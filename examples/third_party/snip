@@ -1,0 +1,113 @@
+/**
+ * This script samples automation of multi-step tasks that can be tedious to manually perform on all tables and
+ * worksheets.
+ *
+ * This sample appends sample data and applies formatting and border edits to all tables in the worksheet,
+ * then freezes the first row and column.
+ *
+ * There needs to be an existing table for this script to run.
+ */
+function main(workbook: ExcelScript.Workbook) {
+  const currentSheet = workbook.getActiveWorksheet();
+
+  // Get the tables.
+  let tables = currentSheet.getTables();
+
+  // Sample data to append.
+  let data = [
+    ["value1", "value2"],
+    ["value3", ""],
+  ];
+
+  // Header font customizations.
+  let headerFontName = "Calibri";
+  let headerFontColor = "white";
+  let headerFontSize = 12;
+  let headerFillColor = "black";
+
+  // Border customizations.
+  const thinWeight = ExcelScript.BorderWeight.thin;
+  const thickWeight = ExcelScript.BorderWeight.thick;
+  const doubleStyle = ExcelScript.BorderLineStyle.double;
+  const continuousStyle = ExcelScript.BorderLineStyle.continuous;
+
+  // Border edge colors.
+  let rightEdgeColor = "blue";
+  let leftEdgeColor = "red";
+
+  // Iterate over each table.
+  tables.forEach((table) => {
+    let lastRow = table.getRange().getRowCount();
+    let columns = table.getHeaderRowRange().getColumnIndex();
+
+    // Append the sample data to the last empty row of the table(s).
+    let range = currentSheet.getRangeByIndexes(
+      lastRow,
+      columns,
+      data.length,
+      data[0].length
+    );
+
+    range.setValues(data);
+
+    // Format and border editing.
+
+    // Get header row and header font.
+    const headerRow = table.getHeaderRowRange().getFormat();
+    const headerRowFont = table.getHeaderRowRange().getFormat().getFont();
+
+    // Format the header row.
+    headerRowFont.setName(headerFontName);
+    headerRowFont.setColor(headerFontColor);
+    headerRowFont.setSize(headerFontSize);
+    headerRow.getFill().setColor(headerFillColor);
+
+    // Get right and left edge border of table.
+    const rightEdge = table
+      .getRange()
+      .getFormat()
+      .getRangeBorder(ExcelScript.BorderIndex.edgeRight);
+    const leftEdge = table
+      .getRange()
+      .getFormat()
+      .getRangeBorder(ExcelScript.BorderIndex.edgeLeft);
+
+    // Format the right and left edge borders.
+    rightEdge.setColor(rightEdgeColor);
+    rightEdge.setStyle(continuousStyle);
+    leftEdge.setColor(leftEdgeColor);
+    leftEdge.setWeight(thickWeight);
+
+    // Get bottom border of a select row.
+    // Change the index number in getRow() to select a specific row.
+    let edgeBottomSelectRow = table
+      .getRangeBetweenHeaderAndTotal()
+      .getRow(0)
+      .getFormat()
+      .getRangeBorder(ExcelScript.BorderIndex.edgeBottom);
+
+    // Get inside vertical border of select row.
+    // Change the index number in getRow() to select a specific row.
+    let insideVerticalSelectRow = table
+      .getRangeBetweenHeaderAndTotal()
+      .getRow(0)
+      .getFormat()
+      .getRangeBorder(ExcelScript.BorderIndex.insideVertical);
+
+    // Set border style for select Row.
+    edgeBottomSelectRow.setStyle(doubleStyle);
+    edgeBottomSelectRow.setWeight(thinWeight);
+    edgeBottomSelectRow.setColor("red");
+    insideVerticalSelectRow.setStyle(continuousStyle);
+    insideVerticalSelectRow.setColor("red");
+    insideVerticalSelectRow.setWeight(thinWeight);
+  });
+
+  // Freeze first row and column.
+  currentSheet.getFreezePanes().freezeRows();
+  currentSheet.getFreezePanes().freezeColumns();
+
+  // Autofit rows and columns.
+  currentSheet.getRange().getFormat().autofitColumns();
+  currentSheet.getRange().getFormat().autofitRows();
+}

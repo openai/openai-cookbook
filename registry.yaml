@@ -610,6 +610,16 @@
     - embeddings
     - completions
 
+- title: Philosophy with Vector Embeddings, OpenAI and Cassandra / Astra DB
+  path: >-
+    examples/vector_databases/cassandra_astradb/Philosophical_Quotes_AstraPy.ipynb
+  date: 2023-11-13
+  authors:
+    - hemidactylus
+  tags:
+    - embeddings
+    - completions
+
 - title: Cassandra / Astra DB
   path: examples/vector_databases/cassandra_astradb/README.md
   date: 2023-08-29

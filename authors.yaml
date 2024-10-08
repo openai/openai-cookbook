@@ -26,12 +26,12 @@ simonpfish:
 joe-at-openai:
   name: "Joe Palermo"
   website: "https://www.linkedin.com/in/joe-palermo-99219237"
-  avatar: "https://media.licdn.com/dms/image/C4E03AQF_tsi7Kom0rg/profile-displayphoto-shrink_800_800/0/1630002100665?e=1704931200&v=beta&t=z3HKO9FmGHJIxhes9TXRzw-8iY-CBsEZYZc8zTogiLU"
+  avatar: "https://avatars.githubusercontent.com/u/117690718?v=4"
 
 mwu1993:
   name: "Michael Wu"
   website: "https://www.linkedin.com/in/michael-wu-77440977/"
-  avatar: "https://media.licdn.com/dms/image/C5603AQFhQfx0I-raUg/profile-displayphoto-shrink_800_800/0/1527451059977?e=1704931200&v=beta&t=wkFOj0Rigp6e9wm7aZdziOQ6jHARyXj3EoK1K8jaaas"
+  avatar: "https://avatars.githubusercontent.com/u/1650674?v=4"
 
 ibigio:
   name: "Ilan Bigio"
@@ -172,3 +172,8 @@ joecasson-openai:
   name: "Joe Casson"
   website: "https://github.com/joecasson-openai"
   avatar: "https://avatars.githubusercontent.com/u/178522625"
+
+ericning-o:
+  name: "Eric Ning"
+  website: "https://github.com/ericning-o"
+  avatar: "https://avatars.githubusercontent.com/u/182030612"

@@ -168,9 +168,9 @@ By providing a practical example of connecting and interacting with OpenAI, this
       });
       ```
 
-### Updated Audio Playback Function
+### Audio Playback Function
 
-The `playAudio()` function has been updated to accommodate the new audio streaming rate and ensure smooth playback:
+The `playAudio()` function uses the `sampleRate` of `24000` to match the recording settings, ensuring that the audio plays back at the correct speed and pitch.
 
 ```javascript
 function playAudio(audioData, callback) {
@@ -207,13 +207,12 @@ function playAudio(audioData, callback) {
 }
 ```
 
-`playAudio()` function uses the `sampleRate` of `24000` to match the recording settings, ensuring that the audio plays back at the correct speed and pitch.
-
 By following these steps, developers new to integrating real-time APIs can easily set up a voice-based assistant that interacts with OpenAI's models, providing an engaging example of real-time conversational AI.
 
 
 ```
     // Fully executable code from realtime_audio_stream_with_mac.md
+    // Your expected experience is to have a live, exchange with the realtime service from your mac, where this code is running. It works on my machine... :D
 
  // Ensure you have installed these dependencies before running the code:
 // npm install ws mic dotenv speaker

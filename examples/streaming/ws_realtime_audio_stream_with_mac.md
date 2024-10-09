@@ -2,7 +2,8 @@
 
 This example will guide you through the process of integrating [the OpenAI Realtime platform](https://platform.openai.com/docs/api-reference/realtime) into a Node.js application that runs locally on mac (or other device) for development. It serves as a gateway for developers looking to interact with OpenAI's GPT models in real-time, using audio input and output to create a conversational assistant.
 
-In this tutorial, developers will learn how to use WebSocket communication to connect to OpenAI's API, stream audio input, and receive responses in real time. This integration provides a way to implement dynamic interactions that utilize GPT's natural language processing capabilities in audio form, making it well suited for conversational AI, live assistant applications, and other real-time use cases.
+In this tutorial, developers will learn how to use a raw WebSocket to connect to OpenAI's API, stream audio input, and receive responses in real time. This integration provides a way to implement dynamic interactions that utilize GPT's natural language processing capabilities in audio form, making it well suited for conversational AI, live assistant applications, and other real-time use cases. There is [a node client](https://github.com/openai/openai-realtime-api-beta/tree/main) that strives to make this easier and is demonstrated in [this example](./npm_client_realtime_audio_stream_with_mac.md).  
+
 
 This code sample is also a great way to create a development environment that allows developers to test their own use cases locally, facilitating rapid prototyping and iteration.
 

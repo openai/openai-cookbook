@@ -1144,6 +1144,15 @@
     - assistants
     - functions
 
+- title: "Orchestrating Agents: Routines and Handoffs"
+  path: examples/Orchestrating_agents.ipynb
+  date: 2024-10-10
+  authors:
+    - ibigio
+  tags:
+    - completions
+    - functions
+
 - title: MongoDB Atlas Vector Search
   path: examples/vector_databases/mongodb_atlas/README.md
   date: 2023-11-21
@@ -1521,7 +1530,7 @@
     - gpt-actions-library
     - chatgpt
     - chatgpt-data
-    
+
 - title: GPT Actions library - AWS Middleware
   path: examples/chatgpt/gpt_actions_library/gpt_middleware_aws_function.ipynb
   date: 2024-08-09
@@ -1607,7 +1616,7 @@
   tags:
     - completions
 
-- title: Prompt Caching 101 
+- title: Prompt Caching 101
   path: examples/Prompt_Caching101.ipynb
   date: 2024-10-01
   authors:

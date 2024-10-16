@@ -1598,7 +1598,6 @@
   tags:
     - completions
     - reasoning
-
 - title: Using chained calls for o1 structured outputs
   path: examples/o1/Using_chained_calls_for_o1_structured_outputs.ipynb
   date: 2024-09-26
@@ -1623,3 +1622,12 @@
     - charuj
   tags:
     - completions
+
+- title: Leveraging model distillation to fine-tune a model
+  path: examples/examples/Leveraging_model_distillation_to_fine-tune_a_model.ipynb
+  date: 2024-10-16
+  authors:
+    - pap-openai
+  tags:
+    - completions
+    - fine-tuning

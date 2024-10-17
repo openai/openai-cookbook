@@ -1,0 +1,35 @@
+{
+    // Use IntelliSense to learn about possible attributes.
+    // Hover to view descriptions of existing attributes.
+    // For more information, visit: https://go.microsoft.com/fwlink/?linkid=830387
+    "version": "0.2.0",
+    "configurations": [
+   {
+    "address": "TCP/IP address of process to be debugged",
+    "localRoot": "${workspaceFolder}",
+    "name": "Attach to Remote",
+    "port": 9229,
+    "remoteRoot": "Absolute path to the remote directory containing the program",
+    "request": "attach",
+    "skipFiles": [
+        "<node_internals>/**"
+    ],
+    "type": "node"
+   },     
+
+        {
+            "name": "Launch Chrome",
+            "request": "launch",
+            "type": "chrome",
+            "url": "http://localhost:8080",
+            "webRoot": "${workspaceFolder}"
+        },
+        {
+            "type": "msedge",
+            "request": "launch",
+            "name": "Launch Edge against localhost",
+            "url": "http://localhost:8080",
+            "webRoot": "${workspaceFolder}"
+        }
+    ]
+}

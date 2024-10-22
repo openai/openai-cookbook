@@ -1633,7 +1633,7 @@
     - fine-tuning
 
 - title: Voice Translation of Audio Files into Different Languages Using Gpt-4o
-  path: examples/voice_solutions/voice_translation_into_different_languages_using_GPT-4o
+  path: examples/voice_solutions/voice_translation_into_different_languages_using_GPT-4o.ipynb
   date: 2024-10-21
   authors:
     - msingh-openai

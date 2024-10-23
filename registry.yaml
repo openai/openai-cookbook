@@ -1616,7 +1616,7 @@
     - completions
 
 - title: Realtime audio streaming to the Realtime platform with websockets
-  path: examples/realtime/ws_realtime_audio_stream_with_mac.md
+  path: examples/realtime/ws_realtime_audio_stream_with_mac.mdx
   date: 2024-10-08
   authors:
     - alwell-kevin
@@ -1624,7 +1624,7 @@
     - realtime
 
 - title: Realtime audio streaming to the Realtime platform with npm module
-  path: examples/realtime/npm_client_realtime_audio_stream_with_mac.md
+  path: examples/realtime/npm_client_realtime_audio_stream_with_mac.mdx
   date: 2024-10-09
   authors:
     - alwell-kevin

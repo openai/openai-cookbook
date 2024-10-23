@@ -146,6 +146,7 @@
   tags:
     - completions
     - embeddings
+    - agents
 
 - title: How to use functions with a knowledge base
   path: examples/How_to_call_functions_for_knowledge_retrieval.ipynb
@@ -384,14 +385,6 @@
   tags:
     - embeddings
 
-- title: Azure DALL·E image generation example
-  path: examples/azure/DALL-E.ipynb
-  date: 2023-06-12
-  authors:
-    - glecaros
-  tags:
-    - dall-e
-
 - title: Azure Chat Completions example (preview)
   path: examples/azure/chat.ipynb
   date: 2023-03-28
@@ -408,17 +401,6 @@
   authors:
     - kristapratico
   tags:
-    - completions
-
-- title: Azure completions example
-  path: examples/azure/completions.ipynb
-  date: 2022-12-16
-  authors:
-    - cmurtz-msft
-    - glecaros
-    - kristapratico
-  tags:
-    - embeddings
     - completions
 
 - title: Azure embeddings example
@@ -1086,6 +1068,7 @@
   tags:
     - completions
     - functions
+    - agents
 
 - title: Named Entity Recognition to Enrich Text
   path: examples/Named_Entity_Recognition_to_enrich_text.ipynb
@@ -1162,6 +1145,16 @@
   tags:
     - assistants
     - functions
+
+- title: "Orchestrating Agents: Routines and Handoffs"
+  path: examples/Orchestrating_agents.ipynb
+  date: 2024-10-10
+  authors:
+    - ibigio
+  tags:
+    - completions
+    - functions
+    - agents
 
 - title: MongoDB Atlas Vector Search
   path: examples/vector_databases/mongodb_atlas/README.md
@@ -1330,6 +1323,7 @@
     - chatgpt
     - tiktoken
     - completions
+    - chatgpt-and-api
 
 - title: GPT Actions library - getting started
   path: examples/chatgpt/gpt_actions_library/.gpt_action_getting_started.ipynb
@@ -1348,6 +1342,7 @@
   tags:
     - gpt-actions-library
     - chatgpt
+    - chatgpt-data
 
 - title: Data Extraction and Transformation in ELT Workflows using GPT-4o as an OCR Alternative
   path: examples/Data_extraction_transformation.ipynb
@@ -1366,6 +1361,7 @@
   tags:
     - gpt-actions-library
     - chatgpt
+    - chatgpt-communication
 
 - title: GPT Actions library - Sharepoint (Return Docs)
   path: examples/chatgpt/gpt_actions_library/gpt_action_sharepoint_doc.ipynb
@@ -1375,6 +1371,7 @@
   tags:
     - gpt-actions-library
     - chatgpt
+    - chatgpt-productivity
 
 - title: GPT Actions library - Sharepoint (Return Text)
   path: examples/chatgpt/gpt_actions_library/gpt_action_sharepoint_text.ipynb
@@ -1384,6 +1381,7 @@
   tags:
     - gpt-actions-library
     - chatgpt
+    - chatgpt-productivity
 
 - title: GPT Actions library (Middleware) - Azure Functions
   path: examples/chatgpt/gpt_actions_library/gpt_middleware_azure_function.ipynb
@@ -1393,6 +1391,7 @@
   tags:
     - gpt-actions-library
     - chatgpt
+    - chatgpt-middleware
 
 - title: GPT Actions library - Canvas Learning Management System
   path: examples/chatgpt/gpt_actions_library/gpt_action_canvas.md
@@ -1421,6 +1420,7 @@
   tags:
     - gpt-actions-library
     - chatgpt
+    - chatgpt-communication
 
 - title: GPT Actions library - Jira
   path: examples/chatgpt/gpt_actions_library/gpt_action_jira.ipynb
@@ -1430,6 +1430,7 @@
   tags:
     - gpt-actions-library
     - chatgpt
+    - chatgpt-productivity
 
 - title: GPT Actions library - Notion
   path: examples/chatgpt/gpt_actions_library/gpt_action_notion.ipynb
@@ -1439,6 +1440,7 @@
   tags:
     - gpt-actions-library
     - chatgpt
+    - chatgpt-productivity
 
 - title: GPT Actions library - Confluence
   path: examples/chatgpt/gpt_actions_library/gpt_action_confluence.ipynb
@@ -1448,6 +1450,7 @@
   tags:
     - gpt-actions-library
     - chatgpt
+    - chatgpt-productivity
 
 - title: GPT Actions library - SQL Database
   path: examples/chatgpt/gpt_actions_library/gpt_action_sql_database.ipynb
@@ -1457,6 +1460,7 @@
   tags:
     - chatgpt
     - gpt-actions-library
+    - chatgpt-data
 
 - title: GPT Actions library - Box
   path: examples/chatgpt/gpt_actions_library/gpt_action_box.ipynb
@@ -1466,6 +1470,7 @@
   tags:
     - gpt-actions-library
     - chatgpt
+    - chatgpt-productivity
 
 - title: GCP BigQuery Vector Search with GCP Functions and GPT Actions in ChatGPT
   path: examples/chatgpt/rag-quickstart/gcp/Getting_started_with_bigquery_vector_search_and_openai.ipynb
@@ -1478,6 +1483,7 @@
     - chatgpt
     - tiktoken
     - completions
+    - chatgpt-and-api
 
 - title: GPT Actions library - Zapier
   path: examples/chatgpt/gpt_actions_library/gpt_action_zapier.ipynb
@@ -1487,6 +1493,7 @@
   tags:
     - gpt-actions-library
     - chatgpt
+    - chatgpt-middleware
 
 - title: Structured Outputs for Multi-Agent Systems
   path: examples/Structured_outputs_multi_agent.ipynb
@@ -1496,7 +1503,7 @@
   tags:
     - completions
     - functions
-    - assistants
+    - agents
 
 - title: Introduction to Structured Outputs
   path: examples/Structured_Outputs_Intro.ipynb
@@ -1515,6 +1522,7 @@
   tags:
     - chatgpt
     - gpt-actions-library
+    - chatgpt-middleware
 
 - title: GPT Actions library - AWS Redshift
   path: examples/chatgpt/gpt_actions_library/gpt_action_redshift.ipynb
@@ -1524,7 +1532,8 @@
   tags:
     - gpt-actions-library
     - chatgpt
-    
+    - chatgpt-data
+
 - title: GPT Actions library - AWS Middleware
   path: examples/chatgpt/gpt_actions_library/gpt_middleware_aws_function.ipynb
   date: 2024-08-09
@@ -1533,6 +1542,7 @@
   tags:
     - gpt-actions-library
     - chatgpt
+    - chatgpt-middleware
 
 - title: GPT Actions library - Google Drive
   path: examples/chatgpt/gpt_actions_library/gpt_action_google_drive.ipynb
@@ -1542,6 +1552,7 @@
   tags:
     - gpt-actions-library
     - chatgpt
+    - chatgpt-productivity
 
 - title: GPT Actions library - Snowflake Direct
   path: examples/chatgpt/gpt_actions_library/gpt_action_snowflake_direct.ipynb
@@ -1551,6 +1562,7 @@
   tags:
     - gpt-actions-library
     - chatgpt
+    - chatgpt-data
 
 - title: GPT Actions library - Snowflake Middleware
   path: examples/chatgpt/gpt_actions_library/gpt_action_snowflake_middleware.ipynb
@@ -1560,6 +1572,7 @@
   tags:
     - gpt-actions-library
     - chatgpt
+    - chatgpt-data
 
 - title: GPT Actions library - Retool Workflow
   path: examples/chatgpt/gpt_actions_library/gpt_action_retool_workflow.md
@@ -1569,6 +1582,7 @@
   tags:
     - gpt-actions-library
     - chatgpt
+    - chatgpt-middleware
 
 - title: Using reasoning for data validation
   path: examples/o1/Using_reasoning_for_data_validation.ipynb
@@ -1587,3 +1601,46 @@
   tags:
     - completions
     - reasoning
+
+- title: Using chained calls for o1 structured outputs
+  path: examples/o1/Using_chained_calls_for_o1_structured_outputs.ipynb
+  date: 2024-09-26
+  authors:
+    - ericning-o
+  tags:
+    - completions
+    - reasoning
+
+- title: Building a Bring Your Own Browser (BYOB) Tool for Web Browsing and Summarization
+  path: examples/third_party/Web_search_with_google_api_bring_your_own_browser_tool.ipynb
+  date: 2024-09-26
+  authors:
+    - msingh-openai
+  tags:
+    - completions
+
+- title: Prompt Caching 101
+  path: examples/Prompt_Caching101.ipynb
+  date: 2024-10-01
+  authors:
+    - charuj
+  tags:
+    - completions
+
+- title: Leveraging model distillation to fine-tune a model
+  path: examples/Leveraging_model_distillation_to_fine-tune_a_model.ipynb
+  date: 2024-10-16
+  authors:
+    - pap-openai
+  tags:
+    - completions
+    - fine-tuning
+
+- title: Voice Translation into Different Languages
+  path: examples/voice_solutions/voice_translation_into_different_languages_using_GPT-4o.ipynb
+  date: 2024-10-21
+  authors:
+    - msingh-openai
+  tags:
+    - completions
+    - audio

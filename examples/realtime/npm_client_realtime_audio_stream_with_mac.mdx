@@ -11,7 +11,7 @@ To successfully run this application, the following machine dependencies are req
 (This guide was developed on a mac for mac users. The machine dependency is mostly related to audio input/output utilities resident on mac. Other components are reusable.)
 
 1. **Node.js** (version 14 or higher): Required to run the JavaScript code.
-2. **npm** (Node Package Manager): To install the necessary Node.js packages (`@openai/realtime-api-beta`, `mic`, `dotenv`, `speaker`).
+2. **npm** (Node Package Manager): To install the necessary Node.js packages (`openai/openai-realtime-api-beta`, `mic`, `dotenv`, `speaker`).
 3. **Sox**: The application uses the `mic` package, which relies on the Sox command line utility (`rec`) to capture audio. Install via Homebrew on macOS:
    ```sh
    brew install sox
@@ -193,6 +193,7 @@ function startAudioStream() {
 function playAudio(audioData) {
   try {
     if (!speaker) {
+      console.log('Creating new speaker instance');
       speaker = new Speaker({
         channels: 1,
         bitDepth: 16,
@@ -220,12 +221,12 @@ function playAudio(audioData) {
       console.log('Speaker closed. Recreating for next playback.');
       speaker = null;
     });
+
   } catch (error) {
     console.error('Error playing audio:', error);
   }
 }
 
-// END MANAGE AUDIO INTERFACES
 ```
 
 ## Conclusion

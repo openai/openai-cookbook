@@ -1644,3 +1644,12 @@
   tags:
     - completions
     - audio
+
+- title: Enhance your prompts with meta prompting
+  path: examples/Enhance_your_prompts_with_meta_prompting.ipynb
+  date: 2024-10-21
+  authors:
+    - teomusatoiu
+  tags:
+    - completions
+    - reasoning

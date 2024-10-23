@@ -349,29 +349,29 @@
     - embeddings
 
 - title: "Addressing transcription misspellings: prompt vs post-processing"
-  path: examples/Whisper_correct_misspelling.ipynb
+  path: examples/audio_correct_misspelling.ipynb
   date: 2023-08-11
   authors:
     - prestontuggle
   tags:
-    - whisper
+    - audio
     - completions
 
-- title: "Enhancing Whisper transcriptions: pre- & post-processing techniques"
-  path: examples/Whisper_processing_guide.ipynb
+- title: "Enhancing audio transcriptions: pre- & post-processing techniques"
+  path: examples/audio_processing_guide.ipynb
   date: 2023-08-11
   authors:
     - prestontuggle
   tags:
-    - whisper
+    - audio
 
-- title: Whisper prompting guide
-  path: examples/Whisper_prompting_guide.ipynb
+- title: audio prompting guide
+  path: examples/audio_prompting_guide.ipynb
   date: 2023-06-27
   authors:
     - prestontuggle
   tags:
-    - whisper
+    - audio
     - completions
 
 - title: Zero-shot classification with embeddings
@@ -1117,7 +1117,7 @@
   tags:
     - completions
     - vision
-    - speech
+    - audio
 
 - title: What's new with DALL·E 3?
   path: articles/what_is_new_with_dalle_3.mdx
@@ -1308,7 +1308,7 @@
   tags:
     - completions
     - vision
-    - whisper
+    - audio
 
 - title: Azure AI Search with Azure Functions and GPT Actions in ChatGPT
   path: examples/chatgpt/rag-quickstart/azure/Azure_AI_Search_with_Azure_Functions_and_GPT_Actions_in_ChatGPT.ipynb
@@ -1632,10 +1632,11 @@
     - completions
     - fine-tuning
 
-- title: Voice Translation of Audio Files into Different Languages Using Gpt-4o
+- title: Voice Translation into Different Languages
   path: examples/voice_solutions/voice_translation_into_different_languages_using_GPT-4o.ipynb
   date: 2024-10-21
   authors:
     - msingh-openai
   tags:
     - completions
+    - audio

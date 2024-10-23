@@ -349,29 +349,29 @@
     - embeddings
 
 - title: "Addressing transcription misspellings: prompt vs post-processing"
-  path: examples/audio_correct_misspelling.ipynb
+  path: examples/Whisper_correct_misspelling.ipynb
   date: 2023-08-11
   authors:
     - prestontuggle
   tags:
-    - audio
+    - whisper
     - completions
 
-- title: "Enhancing audio transcriptions: pre- & post-processing techniques"
-  path: examples/audio_processing_guide.ipynb
+- title: "Enhancing Whisper transcriptions: pre- & post-processing techniques"
+  path: examples/Whisper_processing_guide.ipynb
   date: 2023-08-11
   authors:
     - prestontuggle
   tags:
-    - audio
+    - whisper
 
-- title: audio prompting guide
-  path: examples/audio_prompting_guide.ipynb
+- title: Whisper prompting guide
+  path: examples/Whisper_prompting_guide.ipynb
   date: 2023-06-27
   authors:
     - prestontuggle
   tags:
-    - audio
+    - whisper
     - completions
 
 - title: Zero-shot classification with embeddings
@@ -1117,7 +1117,7 @@
   tags:
     - completions
     - vision
-    - audio
+    - speech
 
 - title: What's new with DALL·E 3?
   path: articles/what_is_new_with_dalle_3.mdx
@@ -1308,7 +1308,7 @@
   tags:
     - completions
     - vision
-    - audio
+    - whisper
 
 - title: Azure AI Search with Azure Functions and GPT Actions in ChatGPT
   path: examples/chatgpt/rag-quickstart/azure/Azure_AI_Search_with_Azure_Functions_and_GPT_Actions_in_ChatGPT.ipynb

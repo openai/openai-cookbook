@@ -1,10 +1,8 @@
 ## OpenAI Realtime API Integration for Node.js
 
-This example will guide you through the process of integrating [the OpenAI Realtime platform](https://platform.openai.com/docs/api-reference/realtime) into a Node.js application that runs locally on mac (or other device) for development. It serves as a gateway for developers looking to interact with OpenAI's GPT models in real-time, using audio input and output to create a conversational assistant.
+The Realtime streaming API enables audio streaming from client applications to the OpenAI platform for Voice to Voice communication. Common usecases for this service include a Voice based IVR, that customers can dial via telephone to speak with an automated support agent or in a drive through window. 
 
-In this tutorial, developers will learn how to use the `@openai/realtime-api-beta` client to connect to OpenAI's API, stream audio input, and receive responses in real time. This integration provides a way to implement dynamic interactions that utilize GPT's natural language processing capabilities in audio form, making it well suited for conversational AI, live assistant applications, and other real-time use cases. If you want an example using a raw websocket, that exists in this same [realtime directory](./ws_realtime_audio_stream_with_mac.md). 
-
-This code sample is also a great way to create a development environment that allows developers to test their own use cases locally, facilitating rapid prototyping and iteration.
+This recipe will guide you through the process of integrating [the OpenAI Realtime platform](https://platform.openai.com/docs/api-reference/realtime) into a Node.js application that runs locally on mac (or other device) for development purposes. It serves as a gateway for developers looking to interact with OpenAI's GPT models in real-time, using audio input and output to create a conversational assistant. This example uses the beta node client for integration. If you want an example using a raw websocket, that exists in this same [realtime directory](./ws_realtime_audio_stream_with_mac.mdx). 
 
 ### Machine Dependencies
 
@@ -25,7 +23,7 @@ To successfully run this application, the following machine dependencies are req
    OPENAI_API_KEY=your_openai_api_key_here
    ```
 7. **Homebrew** (for macOS users): To install system dependencies like Sox.
-8. **Network Connection**: A stable internet connection is required for communication with the OpenAI API.
+8. **Network Connection**: A stable internet connection is required for high quality communication with the OpenAI API.
 
 ### Summary
 
@@ -33,6 +31,7 @@ This tutorial is valuable for developers who want to:
 - Understand how to use [OpenAI’s Realtime API](https://platform.openai.com/docs/api-reference/realtime-client-events) for conversational AI applications.
 - Gain hands-on experience with audio streaming and real-time processing in Node.js using [the latest npm module](https://github.com/openai/openai-realtime-api-beta/tree/main) for ease and simplicity.
 - Create an interactive experience that takes full advantage of GPT's capabilities for spoken dialogue.
+- Copy&paste the code snippet at the bottom to run locally.
 
 By providing a practical example of connecting and interacting with OpenAI, this tutorial serves as a foundational guide for building real-time AI-driven solutions. This example is designed to assist developers in quickly setting up a voice-based AI assistant using Node.js.
 
@@ -229,4 +228,5 @@ function playAudio(audioData) {
 // END MANAGE AUDIO INTERFACES
 ```
 
-By following these steps, developers new to integrating real-time APIs can easily set up a voice-based assistant that interacts with OpenAI's models, providing an engaging example of real-time conversational AI.
+## Conclusion
+By following these steps, developers new to integrating real-time APIs can easily set up a voice-based assistant that interacts with OpenAI's models, providing an engaging example of real-time conversational AI!

@@ -198,7 +198,7 @@ In ChatGPT, click on "Authentication" and choose **"Bearer"**. Enter in the info
 
 You are now ready to test out the GPT. You can enter a simple prompt like "Can you review my pull request? owner: <org_name>, repo: <repo_name>, pull request number: <PR_Number>" and expect to see the following:
 
-![Landing Page](../../images/gpt_action_github/landing_page.png)
+![landing_page.png](../../../images/gpt_action_github/landing_page.png)
 
 1. A summary of changes in the referenced pull request(PR).
 

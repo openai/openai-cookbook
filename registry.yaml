@@ -1363,15 +1363,6 @@
     - chatgpt
     - chatgpt-communication
 
-- title: GPT Actions library - GitHub
-  path: examples/chatgpt/gpt_actions_library/gpt_action_github.md
-  date: 2024-09-25
-  authors:
-    - alwell-kevin
-  tags:
-    - gpt-actions-library
-    - chatgpt
-
 - title: GPT Actions library - Sharepoint (Return Docs)
   path: examples/chatgpt/gpt_actions_library/gpt_action_sharepoint_doc.ipynb
   date: 2024-05-24
@@ -1653,3 +1644,12 @@
   tags:
     - completions
     - audio
+
+- title: GPT Actions library - GitHub
+  path: examples/chatgpt/gpt_actions_library/gpt_action_github.md
+  date: 2024-10-23
+  authors:
+    - alwell-kevin
+  tags:
+    - gpt-actions-library
+    - chatgpt

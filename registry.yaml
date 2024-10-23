@@ -1645,6 +1645,14 @@
     - completions
     - audio
 
+- title: GPT Actions library - GitHub
+  path: examples/chatgpt/gpt_actions_library/gpt_action_github.md
+  date: 2024-10-23
+  authors: 
+    - alwell-kevin
+  tags:
+    - gpt-actions-library
+    - chatgpt
 
 - title: Realtime audio streaming to the Realtime platform with websockets
   path: examples/realtime/ws_realtime_audio_stream_with_mac.mdx
@@ -1652,6 +1660,7 @@
   authors:
     - alwell-kevin
   tags:
+    - audio
     - realtime
 
 - title: Realtime audio streaming to the Realtime platform with npm module
@@ -1660,4 +1669,5 @@
   authors:
     - alwell-kevin
   tags:
+    - audio
     - realtime

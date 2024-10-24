@@ -146,6 +146,7 @@
   tags:
     - completions
     - embeddings
+    - agents
 
 - title: How to use functions with a knowledge base
   path: examples/How_to_call_functions_for_knowledge_retrieval.ipynb
@@ -1067,6 +1068,7 @@
   tags:
     - completions
     - functions
+    - agents
 
 - title: Named Entity Recognition to Enrich Text
   path: examples/Named_Entity_Recognition_to_enrich_text.ipynb
@@ -1152,6 +1154,7 @@
   tags:
     - completions
     - functions
+    - agents
 
 - title: MongoDB Atlas Vector Search
   path: examples/vector_databases/mongodb_atlas/README.md
@@ -1500,7 +1503,7 @@
   tags:
     - completions
     - functions
-    - assistants
+    - agents
 
 - title: Introduction to Structured Outputs
   path: examples/Structured_Outputs_Intro.ipynb
@@ -1598,6 +1601,7 @@
   tags:
     - completions
     - reasoning
+
 - title: Using chained calls for o1 structured outputs
   path: examples/o1/Using_chained_calls_for_o1_structured_outputs.ipynb
   date: 2024-09-26
@@ -1632,10 +1636,20 @@
     - completions
     - fine-tuning
 
-- title: Voice Translation of Audio Files into Different Languages Using Gpt-4o
+- title: Voice Translation into Different Languages
   path: examples/voice_solutions/voice_translation_into_different_languages_using_GPT-4o.ipynb
   date: 2024-10-21
   authors:
     - msingh-openai
   tags:
     - completions
+    - audio
+
+- title: GPT Actions library - GitHub
+  path: examples/chatgpt/gpt_actions_library/gpt_action_github.md
+  date: 2024-10-23
+  authors:
+    - alwell-kevin
+  tags:
+    - gpt-actions-library
+    - chatgpt

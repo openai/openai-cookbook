@@ -1653,3 +1653,22 @@
   tags:
     - completions
     - reasoning
+  
+- title: GPT Actions library - GitHub
+  path: examples/chatgpt/gpt_actions_library/gpt_action_github.md
+  date: 2024-10-23
+  authors:
+    - alwell-kevin
+  tags:
+    - gpt-actions-library
+    - chatgpt
+
+- title: Custom LLM as a Judge to Detect Hallucinations with Braintrust
+  path: examples/Custom-LLM-as-a-Judge.ipynb
+  date: 2024-10-14
+  authors:
+    - ankrgyl
+    - shyamal-anadkat
+  tags:
+    - evals
+    - completions

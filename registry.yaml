@@ -1624,11 +1624,12 @@
   tags:
     - completions
 
-- title: Custom LLM as a Judge
+- title: Custom LLM as a Judge to Detect Hallucinations with Braintrust
   path: examples/Custom-LLM-as-a-Judge.ipynb
   date: 2024-10-14
   authors:
     - ankrgyl
+    - shyamal-anadkat
   tags:
     - evals
-    - llm-as-a-judge
+    - completions

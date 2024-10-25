@@ -146,6 +146,7 @@
   tags:
     - completions
     - embeddings
+    - agents
 
 - title: How to use functions with a knowledge base
   path: examples/How_to_call_functions_for_knowledge_retrieval.ipynb
@@ -1067,6 +1068,7 @@
   tags:
     - completions
     - functions
+    - agents
 
 - title: Named Entity Recognition to Enrich Text
   path: examples/Named_Entity_Recognition_to_enrich_text.ipynb
@@ -1143,6 +1145,16 @@
   tags:
     - assistants
     - functions
+
+- title: "Orchestrating Agents: Routines and Handoffs"
+  path: examples/Orchestrating_agents.ipynb
+  date: 2024-10-10
+  authors:
+    - ibigio
+  tags:
+    - completions
+    - functions
+    - agents
 
 - title: MongoDB Atlas Vector Search
   path: examples/vector_databases/mongodb_atlas/README.md
@@ -1491,7 +1503,7 @@
   tags:
     - completions
     - functions
-    - assistants
+    - agents
 
 - title: Introduction to Structured Outputs
   path: examples/Structured_Outputs_Intro.ipynb
@@ -1521,7 +1533,7 @@
     - gpt-actions-library
     - chatgpt
     - chatgpt-data
-    
+
 - title: GPT Actions library - AWS Middleware
   path: examples/chatgpt/gpt_actions_library/gpt_middleware_aws_function.ipynb
   date: 2024-08-09
@@ -1607,7 +1619,7 @@
   tags:
     - completions
 
-- title: Prompt Caching 101 
+- title: Prompt Caching 101
   path: examples/Prompt_Caching101.ipynb
   date: 2024-10-01
   authors:
@@ -1626,3 +1638,40 @@
     - chatgpt-data
     - chatgpt-productivity
     - chatgpt-middleware
+
+- title: Leveraging model distillation to fine-tune a model
+  path: examples/Leveraging_model_distillation_to_fine-tune_a_model.ipynb
+  date: 2024-10-16
+  authors:
+    - pap-openai
+  tags:
+    - completions
+    - fine-tuning
+
+- title: Voice Translation into Different Languages
+  path: examples/voice_solutions/voice_translation_into_different_languages_using_GPT-4o.ipynb
+  date: 2024-10-21
+  authors:
+    - msingh-openai
+  tags:
+    - completions
+    - audio
+
+- title: GPT Actions library - GitHub
+  path: examples/chatgpt/gpt_actions_library/gpt_action_github.md
+  date: 2024-10-23
+  authors:
+    - alwell-kevin
+  tags:
+    - gpt-actions-library
+    - chatgpt
+
+- title: Custom LLM as a Judge to Detect Hallucinations with Braintrust
+  path: examples/Custom-LLM-as-a-Judge.ipynb
+  date: 2024-10-14
+  authors:
+    - ankrgyl
+    - shyamal-anadkat
+  tags:
+    - evals
+    - completions

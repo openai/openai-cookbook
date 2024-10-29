@@ -1645,6 +1645,15 @@
     - completions
     - audio
 
+- title: Enhance your prompts with meta prompting
+  path: examples/Enhance_your_prompts_with_meta_prompting.ipynb
+  date: 2024-10-23
+  authors:
+    - teomusatoiu
+  tags:
+    - completions
+    - reasoning
+  
 - title: GPT Actions library - GitHub
   path: examples/chatgpt/gpt_actions_library/gpt_action_github.md
   date: 2024-10-23

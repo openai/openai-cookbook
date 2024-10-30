@@ -1625,6 +1625,9 @@
   authors:
     - charuj
   tags:
+    - latency
+    - cost
+    - prompt caching
     - completions
 
 - title: GPT Actions library - Google Ads via Adzviser
@@ -1657,6 +1660,15 @@
     - completions
     - audio
 
+- title: Enhance your prompts with meta prompting
+  path: examples/Enhance_your_prompts_with_meta_prompting.ipynb
+  date: 2024-10-23
+  authors:
+    - teomusatoiu
+  tags:
+    - completions
+    - reasoning
+  
 - title: GPT Actions library - GitHub
   path: examples/chatgpt/gpt_actions_library/gpt_action_github.md
   date: 2024-10-23
@@ -1674,4 +1686,14 @@
     - shyamal-anadkat
   tags:
     - evals
+    - completions
+
+- title: Vision Fine-tuning on GPT-4o for Visual Question Answering on Medical Images
+  path: examples/multimodal/Vision_Fine_tuning_on_GPT4o_for_Visual_Question_Answering_on_Medical_Images.ipynb
+  date: 2024-10-02
+  authors:
+    - danial-openai
+  tags:
+    - vision
+    - fine-tuning
     - completions

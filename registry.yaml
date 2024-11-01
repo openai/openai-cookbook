@@ -1676,12 +1676,20 @@
     - evals
     - completions
 
-- title: Steering Text-to-Speech for more dynamic audio generation
-  path: examples/voice_solutions/steering_tts.ipynb
-  date: 2024-10-21
+- title: Filtered Movie Search with Milvus and OpenAI
+  path: https://github.com/openai/openai-cookbook/blob/main/examples/vector_databases/milvus/Filtered_search_with_Milvus_and_OpenAI.ipynb
+  date: 2024-11-1
   authors:
-    - ericning-o
-    - gbergengruen
+    - jinhonglin-ryan
+    - filip-halt
   tags:
-    - completions
-    - audio
+    - Embeddings
+
+- title: Quickstart with Milvus and OpenAI
+  path: https://github.com/openai/openai-cookbook/blob/main/examples/vector_databases/milvus/Getting_started_with_Milvus_and_OpenAI.ipynb
+  date: 2024-11-1
+  authors:
+    - jinhonglin-ryan
+    - filip-halt
+  tags:
+    - Embeddings

@@ -1675,13 +1675,3 @@
   tags:
     - evals
     - completions
-
-- title: Vision Fine-tuning on GPT-4o for Visual Question Answering on Medical Images
-  path: examples/multimodal/Vision_Fine_tuning_on_GPT4o_for_Visual_Question_Answering_on_Medical_Images.ipynb
-  date: 2024-10-02
-  authors:
-    - danial-openai
-  tags:
-    - vision
-    - fine-tuning
-    - completions

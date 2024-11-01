@@ -1675,3 +1675,13 @@
   tags:
     - evals
     - completions
+
+- title: Steering Text-to-Speech for more dynamic audio generation
+  path: examples/voice_solutions/steering_tts.ipynb
+  date: 2024-10-21
+  authors:
+    - ericning-o
+    - gbergengruen
+  tags:
+    - completions
+    - audio

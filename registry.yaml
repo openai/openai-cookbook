@@ -1625,6 +1625,9 @@
   authors:
     - charuj
   tags:
+    - latency
+    - cost
+    - prompt caching
     - completions
 
 - title: Leveraging model distillation to fine-tune a model
@@ -1645,6 +1648,15 @@
     - completions
     - audio
 
+- title: Enhance your prompts with meta prompting
+  path: examples/Enhance_your_prompts_with_meta_prompting.ipynb
+  date: 2024-10-23
+  authors:
+    - teomusatoiu
+  tags:
+    - completions
+    - reasoning
+  
 - title: GPT Actions library - GitHub
   path: examples/chatgpt/gpt_actions_library/gpt_action_github.md
   date: 2024-10-23
@@ -1663,3 +1675,13 @@
   tags:
     - evals
     - completions
+
+- title: Steering Text-to-Speech for more dynamic audio generation
+  path: examples/voice_solutions/steering_tts.ipynb
+  date: 2024-11-01
+  authors:
+    - ericning-o
+    - gbergengruen
+  tags:
+    - completions
+    - audio

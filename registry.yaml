@@ -153,6 +153,7 @@
   date: 2023-06-14
   authors:
     - colin-openai
+    - ishida-openai
   tags:
     - completions
     - functions

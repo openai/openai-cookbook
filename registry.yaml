@@ -1703,6 +1703,8 @@
   authors:
     - lspacagna-oai
   tags:
+    - gpt-actions-library
     - embeddings
     - chatgpt 
-    - gpt-actions-library
+    - chatgpt-and-api
+    

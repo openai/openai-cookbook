@@ -1696,3 +1696,12 @@
   tags:
     - completions
     - audio
+
+- title: Pinecone Vector Database and Retool Workflow with GPT Actions
+  path: examples/chatgpt/rag-quickstart/pinecone-retool/gpt-action-pinecone-retool-rag.ipynb
+  date: 2024-11-11
+  authors:
+    - lspacagna-oai
+  tags:
+    - embeddings
+    - chatgpt 

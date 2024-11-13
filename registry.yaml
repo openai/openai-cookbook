@@ -1697,7 +1697,7 @@
     - completions
     - audio
 
-- title: Optimizing Retrieval-Augmented Generation with Vision Modality
+- title: Optimizing Retrieval-Augmented Generation using GPT-4o Vision Modality
   path: examples/vector_databases/pinecone/Using_vision_modality_for_RAG_with_Pinecone.ipynb
   date: 2024-11-12
   authors:

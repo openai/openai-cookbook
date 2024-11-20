@@ -1706,3 +1706,12 @@
   tags:
     - completions
     - vision
+
+- title: Question Answering using Embeddings
+  path: examples/Question_answering_using_embeddings.ipynb
+  date: 2024-11-20
+  authors:
+    - shikhar-cyber
+  tags:
+    - embeddings
+    - completions

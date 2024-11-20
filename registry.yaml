@@ -1666,6 +1666,7 @@
   tags:
     - gpt-actions-library
     - chatgpt
+    - chatgpt-productivity
 
 - title: Custom LLM as a Judge to Detect Hallucinations with Braintrust
   path: examples/Custom-LLM-as-a-Judge.ipynb

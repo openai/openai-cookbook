@@ -1710,7 +1710,7 @@
   path: examples/chatgpt/gpt_actions_library/gpt_action_workday.md
   date: 2024-11-20
   authors:
-    - erickgort-openai
+    - erickgort
     - pap-openai
   tags:
     - gpt-actions-library

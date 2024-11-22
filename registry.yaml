@@ -1728,3 +1728,12 @@
     - gpt-actions-library
     - chatgpt-productivity
     - chatgpt
+
+- title: GPT Actions library - Google Calendar
+  path: examples/chatgpt/gpt_actions_library/gpt_action_google_calendar.md
+  date: 2024-11-22
+  authors:
+    - lspacagna-oai
+  tags:
+    - gpt-actions-library
+    - chatgpt

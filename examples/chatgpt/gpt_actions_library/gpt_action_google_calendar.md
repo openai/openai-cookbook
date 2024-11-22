@@ -49,7 +49,7 @@ You now have a Google Cloud Project and are ready to configure the API access to
 
 <!--ARCADE EMBED START--><div style="position: relative; padding-bottom: calc(53.793774319066145% + 41px); height: 0; width: 100%;"><iframe src="https://demo.arcade.software/uEOZVBdf8OZ8sP0DZAld?embed&embed_mobile=tab&embed_desktop=inline&show_copy_link=true" title="Cookbook | Enable Google Calendar API" frameborder="0" loading="lazy" webkitallowfullscreen mozallowfullscreen allowfullscreen allow="clipboard-write" style="position: absolute; top: 0; left: 0; width: 100%; height: 100%; color-scheme: light;" ></iframe></div><!--ARCADE EMBED END-->
 
-## Setting up OAuth Credentials
+## Creating up OAuth Credentials
 
 The next step is to configure the OAuth credentials to allow your GPT Action to access your Google Calendar.
 
@@ -78,7 +78,7 @@ We are now ready to create the OAuth credentials.
 
 <!--ARCADE EMBED START--><div style="position: relative; padding-bottom: calc(53.793774319066145% + 41px); height: 0; width: 100%;"><iframe src="https://demo.arcade.software/OHyS6C3ETFPCc4eqrQ4a?embed&embed_mobile=tab&embed_desktop=inline&show_copy_link=true" title="OAuth overview – Google Auth Platform – cookbook-demo – Google Cloud console" frameborder="0" loading="lazy" webkitallowfullscreen mozallowfullscreen allowfullscreen allow="clipboard-write" style="position: absolute; top: 0; left: 0; width: 100%; height: 100%; color-scheme: light;" ></iframe></div><!--ARCADE EMBED END-->
 
-## Setting up OAuth Scopes
+## Configuring OAuth Scopes
 
 Next, configure the scopes (or services) that the OAuth client ID will have access to. In this case, we’ll configure access to the Google Calendar API.
 
@@ -116,10 +116,6 @@ info:
   title: Google Calendar API
   description: This API allows you to read and create events in a user's Google Calendar.
   version: 1.0.0
-  contact:
-    name: Your Name or Company
-    email: your.email@example.com
-    url: https://www.yourcompany.com
 servers:
   - url: https://www.googleapis.com/calendar/v3
     description: Google Calendar API server
@@ -132,8 +128,6 @@ paths:
       operationId: listEvents
       tags:
         - Calendar
-      security:
-        - oauth2: [https://www.googleapis.com/auth/calendar.readonly]
       parameters:
         - name: timeMin
           in: query
@@ -233,8 +227,6 @@ paths:
       operationId: createEvent
       tags:
         - Calendar
-      security:
-        - oauth2: [https://www.googleapis.com/auth/calendar]
       requestBody:
         description: The event data to create.
         required: true

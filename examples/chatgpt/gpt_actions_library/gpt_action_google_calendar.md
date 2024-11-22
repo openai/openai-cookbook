@@ -349,14 +349,11 @@ Copy this URL and add it to the **Authorized redirect URIs** in the Google Cloud
 
 # Testing the Action
 
-With your action configured, you can now test it in ChatGPT. 
-
-- Start by asking your GPT a test question, for example: `What events do I have today?`
-- If this is the first time you've used the action, you'll be prompted to authorize the action. Click **Sign in with googleapis.com** and follow the prompts to authorize the action. 
+With your action configured, you can now test it in ChatGPT. Start by asking your GPT a test question, for example: `What events do I have today?` If this is the first time you've used the action, you'll be prompted to authorize the action. Click **Sign in with googleapis.com** and follow the prompts to authorize the action. 
 
 <img src="../../../images/google-signin.png" alt="Google Calendar Sign In" width="600"/>
 
-- Once authorized, you should then see the results from your calendar. 
+Once authorized, you should then see the results from your calendar. 
 
 <img src="../../../images/google-calendar-results.png" alt="Google Calendar results" width="600"/>
 

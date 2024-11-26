@@ -11,10 +11,10 @@ This particular GPT Action(s) provides an overview of how to connect to a **Tray
 
 ### Value + Example Business Use Cases
 
-**Value**: Users can now leverage ChatGPT's natural language capability to connect directly to APIs created through API Management in Tray.ai
+**Value**: Users can now leverage ChatGPT's natural language capability to connect directly to APIs created through API Management in Tray.ai.
 
 **Example Use Cases**: 
-- Tray.ai is a middleware that composes workflows, handles workflow execution and scaling, and interfaces with hundreds of 3rd party applications
+- Tray.ai is a middleware that composes workflows, handles workflow action scaling, and interfaces with hundreds of 3rd party APIs
 - You have a custom operation running in Tray.ai workflow(s) that you'd like to incorporate into a GPT. 
 - You would like to govern access to actions for your organization/team  under a single API interface
 
@@ -46,7 +46,7 @@ Once you've created a Custom GPT, you should add Instructions to the GPT providi
 ### OpenAPI Schema 
 
 Once you've created a Custom GPT, download the API specification from your Tray.ai project, copy the contents, and paste it into your Custom GPT action
-schema. Once complete, update the `openapi` version to `3.1.0`.
+schema. Once pasted, update your schema's `openapi` property to version `3.1.0`.
 
 Below are instructions on setting up authentication with this 3rd party application. Have questions? Check out [Getting Started Example](https://platform.openai.com/docs/actions/getting-started) to see how this step works in more detail.
 

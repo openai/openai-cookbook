@@ -20,11 +20,11 @@ def basic_streaming_example():
     )
     
     # Process the stream
-    print("Receiving streamed response:")
+    print("Receiving streamed response:\\n")
     for chunk in completion:
         if chunk.choices[0].delta.content:
             print(chunk.choices[0].delta.content, end="")
-    print("\n")
+    print("\\n")
 
 def advanced_streaming_with_callback():
     """Advanced example showing custom stream handling"""
@@ -61,5 +61,5 @@ if __name__ == "__main__":
     print("Basic Streaming Example:")
     basic_streaming_example()
     
-    print("\nAdvanced Streaming Example:")
+    print("\\nAdvanced Streaming Example:")
     advanced_streaming_with_callback()

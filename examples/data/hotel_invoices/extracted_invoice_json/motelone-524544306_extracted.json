@@ -1,0 +1,88 @@
+[
+    {
+        "Hotel Information": {
+            "Name": "Motel One Berlin-Tiergarten",
+            "Address": "An der Urania 12/14, 10787 Berlin",
+            "Phone": "+49-30-23631250",
+            "Fax": "+49-30-23631250-10",
+            "Email": "berlin-tiergarten@motel-one.com",
+            "Website": "www.motel-one.com"
+        },
+        "Guest Information": {
+            "Name": "Apimeister Consulting GmbH",
+            "Address": "Friedrichstrasse 123, 10117 Berlin, Deutschland"
+        },
+        "Invoice Information": {
+            "Date": "25.02.2019",
+            "Invoice Number": "524454306",
+            "Reservation Number": "524414809/1",
+            "Room Number": "519",
+            "Check-in Date": "25.02.2019",
+            "Check-out Date": "27.02.2019"
+        },
+        "Charges": {
+            "Items": [
+                {
+                    "Description": "Best Public Rate mit Frühstück",
+                    "VAT Rate": "null",
+                    "Quantity": 2,
+                    "Unit Price EUR": 80.5,
+                    "Total Price EUR": 161.0
+                },
+                {
+                    "Description": "Frühstück",
+                    "VAT Rate": "19.00%",
+                    "Quantity": 2,
+                    "Unit Price EUR": 11.5,
+                    "Total Price EUR": 23.0
+                },
+                {
+                    "Description": "Logis",
+                    "VAT Rate": "7.00%",
+                    "Quantity": 2,
+                    "Unit Price EUR": 69.0,
+                    "Total Price EUR": 138.0
+                }
+            ],
+            "Total Services EUR": 161.0
+        },
+        "Payments": {
+            "Date": "25.02.2019",
+            "Payment Method": "Mastercard",
+            "Card Number": "************2825",
+            "Amount EUR": -161.0
+        },
+        "Balance": {
+            "Total Payments EUR": -161.0,
+            "Invoice Amount EUR": 0.0
+        },
+        "Taxes": {
+            "Items": [
+                {
+                    "VAT Rate": "19.00%",
+                    "Net EUR": 19.33,
+                    "Tax EUR": 3.67,
+                    "Gross EUR": 23.0
+                },
+                {
+                    "VAT Rate": "7.00%",
+                    "Net EUR": 128.97,
+                    "Tax EUR": 9.03,
+                    "Gross EUR": 138.0
+                }
+            ]
+        },
+        "WLAN Information": {
+            "Instructions": "Einfach AGB bestätigen und lossurfen!",
+            "Support": {
+                "Germany": "0800-4357526",
+                "Other Countries": "+49-241-70530965"
+            }
+        },
+        "Manager": {
+            "Name": "Sebastian Gahm",
+            "Title": "Front Office Manager"
+        }
+    },
+    {}
+]

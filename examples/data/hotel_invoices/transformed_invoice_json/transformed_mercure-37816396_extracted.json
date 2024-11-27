@@ -1,0 +1,62 @@
+{
+  "hotel_information": {
+    "name": "Mercure Hotel Bochum City",
+    "address": {
+      "street": "Massenbergstrasse 19-21",
+      "city": "Bochum",
+      "country": "Germany",
+      "postal_code": "44787"
+    },
+    "contact": {
+      "phone": "+49 234 9690",
+      "fax": "+49 234 9692222",
+      "email": "H0707@accor.com",
+      "website": "mercure.com | accorhotels.com"
+    }
+  },
+  "guest_information": {
+    "company": "Apimeister Consulting GmbH",
+    "address": "Friedrichstrasse 123, 10117 Berlin, Germany",
+    "guest_name": "Mr. Jens Walter"
+  },
+  "invoice_information": {
+    "invoice_number": "HA007 - 123123 - 37816396",
+    "reservation_number": null,
+    "date": "2019-07-05",
+    "room_number": "1307",
+    "check_in_date": "2019-07-04",
+    "check_out_date": "2019-07-05"
+  },
+  "charges": [
+    {
+      "date": "2019-07-04",
+      "description": "Overnight stay",
+      "charge": 118.0,
+      "credit": null
+    },
+    {
+      "date": "2019-07-05",
+      "description": "Mastercard",
+      "charge": null,
+      "credit": 118.0
+    }
+  ],
+  "totals_summary": {
+    "currency": "EUR",
+    "total_net": 110.28,
+    "total_tax": 7.72,
+    "total_gross": 118.0,
+    "total_charge": 118.0,
+    "total_credit": 118.0,
+    "balance_due": 0.0
+  },
+  "taxes": [
+    {
+      "tax_type": "VAT 7%",
+      "tax_rate": "7%",
+      "net_amount": 110.28,
+      "tax_amount": 7.72,
+      "gross_amount": 118.0
+    }
+  ]
+}

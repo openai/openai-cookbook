@@ -1,0 +1,103 @@
+[
+    {
+        "hotel_information": {
+            "name": "MADISON Hotel GmbH",
+            "address": "Schaartestraße 4, 20459 Hamburg",
+            "contact": {
+                "phone": "+49.40.37 666-0",
+                "fax": "+49.40.37 666-137",
+                "email": "info@madisonhotel.de",
+                "website": "madisonhotel.de"
+            },
+            "managing_directors": "Marlies Head, Thomas Kleinertz",
+            "registration": {
+                "court": "AG Hamburg HRB 47281",
+                "VAT_ID": "DE118 696 407"
+            },
+            "bank_details": {
+                "bank": "HypoVereinsbank",
+                "account_number": "360 27 11",
+                "IBAN": "DE48 2003 0000 0003 6027 11",
+                "BIC": "HYVEDEMM300"
+            }
+        },
+        "guest_information": {
+            "company": "APfmeister Consulting GmbH",
+            "address": "Friedrichstr. 123, 10117 Berlin",
+            "guest_name": "Herr Jens Walter"
+        },
+        "invoice_information": {
+            "invoice_number": "506928",
+            "date": "26.07.19",
+            "room_number": "437",
+            "check_in": "21.07.19",
+            "check_out": "26.07.19",
+            "page": "1 of 1",
+            "user_id": "RF"
+        },
+        "charges": [
+            {
+                "date": "21.07.19",
+                "description": "Übernachtung exklusive Frühstück",
+                "charge": 110.0,
+                "credit": null
+            },
+            {
+                "date": "22.07.19",
+                "description": "Übernachtung exklusive Frühstück",
+                "charge": 110.0,
+                "credit": null
+            },
+            {
+                "date": "23.07.19",
+                "description": "Übernachtung exklusive Frühstück",
+                "charge": 110.0,
+                "credit": null
+            },
+            {
+                "date": "24.07.19",
+                "description": "Übernachtung exklusive Frühstück",
+                "charge": 110.0,
+                "credit": null
+            },
+            {
+                "date": "25.07.19",
+                "description": "Übernachtung exklusive Frühstück",
+                "charge": 110.0,
+                "credit": null
+            },
+            {
+                "date": "26.07.19",
+                "description": "Mastercard IFC",
+                "charge": null,
+                "credit": 550.0
+            }
+        ],
+        "summary": {
+            "total_net": 514.02,
+            "total_vat": 35.98,
+            "total_gross": 550.0,
+            "total": 550.0,
+            "balance_due": 0.0
+        },
+        "payment_information": {
+            "financial_institution": "Finanzamt: Hamburg Mitte",
+            "tax_number": "47/841/01122",
+            "credit_card_details": {
+                "card_number": "XXXXXXXXXXXX0502",
+                "transaction_amount": 550.0,
+                "approval_code": "869152",
+                "terminal_id": "692648593",
+                "approval_date": "26.07.19",
+                "approval_time": "XXXX"
+            },
+            "merchant_details": {
+                "merchant_number": "156489382",
+                "receipt_number": "36856",
+                "transaction_number": "550.00",
+                "approved_amount": 550.0,
+                "approval_code": "869152"
+            }
+        }
+    }
+]

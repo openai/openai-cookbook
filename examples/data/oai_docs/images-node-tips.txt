@@ -1,0 +1,95 @@
+### Using in-memory image data
+
+The Node.js examples in the guide above use the `fs` module to read image data from disk. In some cases, you may have your image data in memory instead. Here's an example API call that uses image data stored in a Node.js `Buffer` object:
+
+```javascript
+
+const openai = new OpenAI();
+
+// This is the Buffer object that contains your image data
+const buffer = [your image data];
+
+// Set a `name` that ends with .png so that the API knows it's a PNG image
+buffer.name = "image.png";
+
+async function main() {
+  const image = await openai.images.createVariation({ model: "dall-e-2", image: buffer, n: 1, size: "1024x1024" });
+  console.log(image.data);
+}
+main();
+
+```
+
+### Working with TypeScript
+
+If you're using TypeScript, you may encounter some quirks with image file arguments. Here's an example of working around the type mismatch by explicitly casting the argument:
+
+```javascript
+
+const openai = new OpenAI();
+
+async function main() {
+  // Cast the ReadStream to `any` to appease the TypeScript compiler
+  const image = await openai.images.createVariation({
+    image: fs.createReadStream("image.png") as any,
+  });
+
+  console.log(image.data);
+}
+main();
+```
+
+And here's a similar example for in-memory image data:
+
+```javascript
+
+const openai = new OpenAI();
+
+// This is the Buffer object that contains your image data
+const buffer: Buffer = [your image data];
+
+// Cast the buffer to `any` so that we can set the `name` property
+const file: any = buffer;
+
+// Set a `name` that ends with .png so that the API knows it's a PNG image
+file.name = "image.png";
+
+async function main() {
+  const image = await openai.images.createVariation({
+    file,
+    1,
+    "1024x1024"
+  });
+  console.log(image.data);
+}
+main();
+```
+
+### Error handling
+
+API requests can potentially return errors due to invalid inputs, rate limits, or other issues. These errors can be handled with a `try...catch` statement, and the error details can be found in either `error.response` or `error.message`:
+
+```javascript
+
+const openai = new OpenAI();
+
+async function main() {
+    try {
+        const image = await openai.images.createVariation({
+            image: fs.createReadStream("image.png"),
+            n: 1,
+            size: "1024x1024",
+        });
+        console.log(image.data);
+    } catch (error) {
+        if (error.response) {
+            console.log(error.response.status);
+            console.log(error.response.data);
+        } else {
+            console.log(error.message);
+        }
+    }
+}
+
+main();
+```

@@ -83,7 +83,7 @@
 
 - title: Embedding Wikipedia articles for search
   path: examples/Embedding_Wikipedia_articles_for_search.ipynb
-  date: 2023-04-14
+  date: 2024-11-26
   authors:
     - ted-at-openai
   tags:

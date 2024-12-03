@@ -83,7 +83,7 @@
 
 - title: Embedding Wikipedia articles for search
   path: examples/Embedding_Wikipedia_articles_for_search.ipynb
-  date: 2023-04-14
+  date: 2024-11-26
   authors:
     - ted-at-openai
   tags:
@@ -146,12 +146,14 @@
   tags:
     - completions
     - embeddings
+    - agents
 
 - title: How to use functions with a knowledge base
   path: examples/How_to_call_functions_for_knowledge_retrieval.ipynb
   date: 2023-06-14
   authors:
     - colin-openai
+    - ishida-openai
   tags:
     - completions
     - functions
@@ -1067,6 +1069,7 @@
   tags:
     - completions
     - functions
+    - agents
 
 - title: Named Entity Recognition to Enrich Text
   path: examples/Named_Entity_Recognition_to_enrich_text.ipynb
@@ -1143,6 +1146,16 @@
   tags:
     - assistants
     - functions
+
+- title: "Orchestrating Agents: Routines and Handoffs"
+  path: examples/Orchestrating_agents.ipynb
+  date: 2024-10-10
+  authors:
+    - ibigio
+  tags:
+    - completions
+    - functions
+    - agents
 
 - title: MongoDB Atlas Vector Search
   path: examples/vector_databases/mongodb_atlas/README.md
@@ -1491,7 +1504,7 @@
   tags:
     - completions
     - functions
-    - assistants
+    - agents
 
 - title: Introduction to Structured Outputs
   path: examples/Structured_Outputs_Intro.ipynb
@@ -1521,7 +1534,7 @@
     - gpt-actions-library
     - chatgpt
     - chatgpt-data
-    
+
 - title: GPT Actions library - AWS Middleware
   path: examples/chatgpt/gpt_actions_library/gpt_middleware_aws_function.ipynb
   date: 2024-08-09
@@ -1605,9 +1618,9 @@
   authors:
     - msingh-openai
   tags:
-    - web-browsing
+    - completions
 
-- title: Prompt Caching 101 
+- title: Prompt Caching 101
   path: examples/Prompt_Caching101.ipynb
   date: 2024-10-01
   authors:
@@ -1617,3 +1630,111 @@
     - cost
     - prompt caching
     - completions
+
+- title: Leveraging model distillation to fine-tune a model
+  path: examples/Leveraging_model_distillation_to_fine-tune_a_model.ipynb
+  date: 2024-10-16
+  authors:
+    - pap-openai
+  tags:
+    - completions
+    - fine-tuning
+
+- title: Voice Translation into Different Languages
+  path: examples/voice_solutions/voice_translation_into_different_languages_using_GPT-4o.ipynb
+  date: 2024-10-21
+  authors:
+    - msingh-openai
+  tags:
+    - completions
+    - audio
+
+- title: Enhance your prompts with meta prompting
+  path: examples/Enhance_your_prompts_with_meta_prompting.ipynb
+  date: 2024-10-23
+  authors:
+    - teomusatoiu
+  tags:
+    - completions
+    - reasoning
+  
+- title: GPT Actions library - GitHub
+  path: examples/chatgpt/gpt_actions_library/gpt_action_github.md
+  date: 2024-10-23
+  authors:
+    - alwell-kevin
+  tags:
+    - gpt-actions-library
+    - chatgpt
+    - chatgpt-productivity
+
+- title: Custom LLM as a Judge to Detect Hallucinations with Braintrust
+  path: examples/Custom-LLM-as-a-Judge.ipynb
+  date: 2024-10-14
+  authors:
+    - ankrgyl
+    - shyamal-anadkat
+  tags:
+    - evals
+    - completions
+
+- title: Vision Fine-tuning on GPT-4o for Visual Question Answering
+  path: examples/multimodal/Vision_Fine_tuning_on_GPT4o_for_Visual_Question_Answering.ipynb
+  date: 2024-11-01
+  authors:
+    - danial-openai
+  tags:
+    - vision
+    - fine-tuning
+    - completions
+
+- title: Steering Text-to-Speech for more dynamic audio generation
+  path: examples/voice_solutions/steering_tts.ipynb
+  date: 2024-11-01
+  authors:
+    - ericning-o
+    - gbergengruen
+  tags:
+    - completions
+    - audio
+
+- title: Pinecone Vector Database and Retool Workflow with GPT Actions
+  path: examples/chatgpt/rag-quickstart/pinecone-retool/gpt-action-pinecone-retool-rag.ipynb
+  date: 2024-11-11
+  authors:
+    - lspacagna-oai
+  tags:
+    - gpt-actions-library
+    - embeddings
+    - chatgpt 
+    - chatgpt-and-api
+    
+- title: Optimizing Retrieval-Augmented Generation using GPT-4o Vision Modality
+  path: examples/vector_databases/pinecone/Using_vision_modality_for_RAG_with_Pinecone.ipynb
+  date: 2024-11-12
+  authors:
+    - msingh-openai
+  tags:
+    - completions
+    - vision
+
+- title: GPT Actions library - Workday
+  path: examples/chatgpt/gpt_actions_library/gpt_action_workday.md
+  date: 2024-11-20
+  authors:
+    - erickgort
+    - pap-openai
+  tags:
+    - gpt-actions-library
+    - chatgpt-productivity
+    - chatgpt
+
+- title: GPT Actions library - Google Calendar
+  path: examples/chatgpt/gpt_actions_library/gpt_action_google_calendar.md
+  date: 2024-11-22
+  authors:
+    - lspacagna-oai
+  tags:
+    - gpt-actions-library
+    - chatgpt
+    - chatgpt-communication

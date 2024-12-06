@@ -1631,6 +1631,18 @@
     - prompt caching
     - completions
 
+- title: GPT Actions library - Google Ads via Adzviser
+  path: examples/chatgpt/gpt_actions_library/gpt_action_googleads_adzviser.ipynb
+  date: 2024-10-10
+  authors:
+    - zeyuangu-adzviser
+  tags:
+    - gpt-actions-library
+    - chatgpt
+    - chatgpt-data
+    - chatgpt-productivity
+    - chatgpt-middleware
+
 - title: Leveraging model distillation to fine-tune a model
   path: examples/Leveraging_model_distillation_to_fine-tune_a_model.ipynb
   date: 2024-10-16

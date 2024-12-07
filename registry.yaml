@@ -1603,6 +1603,16 @@
     - completions
     - reasoning
 
+
+- title: GPT Action Library - MongoDB Atlas Vector Search
+  path: examples/chatgpt/gpt_actions_library/gpt_action_mongodb_vector.md
+  date: 2024-09-23
+  authors:
+    - girishd
+  tags:
+    - chatgpt
+    - gpt-actions-library
+
 - title: Using chained calls for o1 structured outputs
   path: examples/o1/Using_chained_calls_for_o1_structured_outputs.ipynb
   date: 2024-09-26

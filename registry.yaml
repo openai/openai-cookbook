@@ -1750,3 +1750,13 @@
     - gpt-actions-library
     - chatgpt
     - chatgpt-communication
+    
+- title: GPT Actions library - Tray.ai APIM 
+  path: examples/chatgpt/gpt_actions_library/gpt_action_trayai_apim.md
+  date: 2024-11-26
+  authors:
+    - kylecote-tray
+  tags:
+    - gpt-actions-library
+    - chatgpt
+    - chatgpt-middleware

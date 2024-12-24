@@ -1760,3 +1760,13 @@
     - gpt-actions-library
     - chatgpt
     - chatgpt-middleware
+
+- title: Reasoning over Code Quality and Security in GitHub Pull Requests
+  path: examples/third_party/Code_quality_and_security_scan_with_GitHub_Actions.md
+  date: 2024-12-24
+  authors:
+    - alwell-kevin
+  tags:
+    - SDLC
+    - reasoning
+    - completions

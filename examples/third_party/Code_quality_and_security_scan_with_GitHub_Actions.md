@@ -16,14 +16,14 @@ This guide explains how to integrate OpenAI reasoning models into your GitHub Pu
 
 ### 1. Generate an OpenAI “Project Key”
 1. Go to platform.openai.com/api-keys and click to create a new secret key.  
-2. Copy and securely store the token.
+2. Securely store the token in your GitHub repository secrets as OPENAI_API_KEY.
 
 ### 2. Choose Your OpenAI Model
 Use [OpenAI Reasoning Models](https://platform.openai.com/docs/guides/reasoning) for in-depth analysis of code changes. Begin with the most advanced model and refine your prompt as needed.
 
 ### 3. Select a Pull Request
 1. Confirm GitHub Actions is enabled for your repository.  
-2. Ensure you have permissions to configure repository secrets or variables (e.g., for your BEST_PRACTICES variable).
+2. Ensure you have permissions to configure repository secrets or variables (e.g., for your PROMPT, MODELNAME, and BEST_PRACTICES variables).
 
 ### 4. Define Enterprise Coding Standards
 Store your standards as a repository variable (BEST_PRACTICES). These may include:  
@@ -48,13 +48,7 @@ Encourage OpenAI to provide a thorough, line-by-line review with explicit recomm
 
 ## Create Your GitHub Actions Workflow
 
-The workflow below has two jobs, within each job are a number of steps to achieve a workflow that runs on 
-every PR against your main branch, gathers the git diff data (ignoring .json and .png files), and sends it to OpenAI 
-for analysis. OpenAI will return a response that is posted back to the PR as a comment. If there are suggested code 
-fixes, the workflow will include those fixes in the comment. The workflow then evaluates the PR against your 
-enterprise standards and posts the results back to the PR as a markdown table that describes levels of adherence to 
-the standards. We've also allowed for a dynamic definition of the prompt, modelname, and best pracitices so you can 
-easily update the workflow to use your own definitions.
+This GitHub Actions workflow is triggered on every pull request against the main branch and comprises two jobs. The first job gathers a diff of all changed files—excluding .json and .png files—and sends these changes to OpenAI for analysis. Any suggested fixes from OpenAI are included in a comment on the PR. The second job evaluates the PR against your defined enterprise standards and returns a markdown table that summarizes the code’s adherence to those standards. You can easily adjust or refine the workflow by updating variables such as the prompt, model name, and best practices.
 
 ```yaml
 name: PR Quality and Security Check

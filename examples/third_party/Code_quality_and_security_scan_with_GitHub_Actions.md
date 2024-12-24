@@ -2,45 +2,48 @@
 
 ## Introduction
 
-This recipe describes how to integrate OpenAI reasoning models with your CI pipelines to analyze and fortify the quality, security and compliance of code in Pull Requests (PR).
+This recipe describes how to integrate OpenAI reasoning models with your continuous integration (CI) pipelines to analyze and fortify the quality, security and compliance of code in Pull Requests (PR).
 
 Before you begin, familiarize yourself with the following resources:
 - [Introduction to GitHub Actions](https://docs.github.com/en/actions)
 - [OpenAI Reasoning Modles](https://platform.openai.com/docs/guides/reasoning)
 
-Although this is a concrete example of how OpenAI can be integrated in a CI pipeline, there are many other ways to integrate AI into your SDLC to accelerate your delivery velocity and improve code quality and security.
+Although this is a concrete example of how OpenAI can be integrated to drive efficiency and quality gains, there are many other ways to integrate AI into your SDLC to accelerate software delivery and improve software quality.
 
 
 ## Value & Example Business Use Cases
 
 ### **Value**:
+
 Rigorous code reviews, while critical, can often feel time-consuming and tedious for developers. Automating code quality and security scans helps developers focus on meaningful work by reducing manual effort and ensuring consistent feedback on their code. For organizations, this approach saves time and money by addressing issues early, avoiding costly rework, and enforcing best practices across the codebase. Overall, automated code quality and security scans with OpenAI reasoning models enhances productivity, improves code reliability, and fosters a culture of efficiency, benefiting both individual contributors and the broader business.
 
 ### **Example Use Cases**:
+
 - A reviewer seeks feedback on the quality and security of a proposed code change.
 - An organization encourages adherence to best practices and standards automatically during code review.
 
-## Application Information
+## **Prerequisites**
 
-### **Prerequisites**
-Ensure you have a repository with an open pull request.
+##### **Generate an OpenAI "Project Key" to authenticate your OpenAI API requests**
 
-## Application Setup
-
-### **Select a Pull Request**
-1. Navigate to your GitHub repository, e.g., [example PR](https://github.com/alwell-kevin/OpenAI-Forum/pull/6).
-   - Ensure GitHub Actions are enabled for the repository and that you are a Repo Owner, so you can configure [Actions Secrets and Repository Variables](https://docs.github.com/en/actions/writing-workflows/choosing-what-your-workflow-does/store-information-in-variables#creating-configuration-variables-for-a-repository).
-2. Review [how to perform a high-quality code review](https://docs.github.com/en/pull-requests/collaborating-with-pull-requests/getting-started/best-practices-for-pull-requests).
-
-### **Generate an OpenAI "Project Key" to authenticate your OpenAI API requests**
 1. Navigate to platform.openai.com/api-keys.
 2. Click to **[Create a new secret key](https://platform.openai.com/api-keys)**.
    1. You will only need "Completions" write permissions under "Model capabilities".
 3. Copy and securely store the token.
 
-### **Define Enterprise Coding Standards**
+##### **Choose your OpenAI model**
 
-1. If you want to enforce specific coding standards across your organization or repository, you will need to define those standards in plain text. For example:
+Consider leveraging the [OpenAI Reasoning Models](https://platform.openai.com/docs/guides/reasoning) to ensure the model is able to reason through the code and provide the most accurate feedback. Start with the most capable model, and then iterate on the prompt to improve the quality of the feedback. 
+
+
+##### **Select a Pull Request**
+
+Navigate to your GitHub repository, e.g., [example PR](https://github.com/alwell-kevin/OpenAI-Forum/pull/6).
+   - Ensure GitHub Actions are enabled for the repository and that you are a Repo Owner, so you can configure [Actions Secrets and Repository Variables](https://docs.github.com/en/actions/writing-workflows/choosing-what-your-workflow-does/store-information-in-variables#creating-configuration-variables-for-a-repository).
+
+##### **Define Enterprise Coding Standards**
+
+If you want to enforce specific coding standards across your organization or repository, you will need to define those standards in plain text. For example:
 
 ```
 	1.	Code Style & Formatting
@@ -89,156 +92,167 @@ Instruction to LLM:
 	•	When referencing third-party libraries, ensure they are well-established, actively maintained, and meet enterprise security and licensing requirements.
 ```
 
-2. Store the standards in as a repository variable BEST_PRACTICES in your GitHub repository
+Store the standards in as a repository variable BEST_PRACTICES in your GitHub repository
 
-![repository_variables.png](../../../images/repository_variables.png)
+![repository_variables.png](../../images/repository_variables.png)
 
 
-## GitHub Actions Setup
+#### Define your prompt that will be sent to OpenAI
 
-### **Create a GitHub Actions Workflow**
+We leverage [meta-prompt](https://platform.openai.com/docs/guides/reasoning/meta-prompting) best practices to request OpenAI analyzes the code for quality and security issues. 
 
-### OpenAPI Schema
+```
+You are an expert code reviewer specializing in security, quality, and adherence to best practices. Your goal is to methodically analyze the provided code to ensure it meets the highest standards. Approach the review in a structured, step-by-step manner:
 
-Once you've created a Custom GPT, copy the text below in the Actions panel. Have questions? Check out [Getting Started Example](https://platform.openai.com/docs/actions/getting-started) to see how this step works in more detail.
+1. **Code Quality & Standards**:
+   - Validate that the code follows established coding standards, style guides, and naming conventions.
+   - Check for consistent formatting, clear variable and function names, logical code organization, and adherence to language-specific best practices.
 
-Below is an example of what connecting to GitHub to GET the Pull Request Diff and POST the Feedback to the Pull Request might look like.
+2. **Security & Vulnerability Analysis**:
+   - Inspect each code block for common vulnerabilities, including but not limited to:
+     - SQL injection
+     - Cross-Site Scripting (XSS)
+     - Command injection
+     - Insecure cryptographic operations
+   - Verify robust input validation, proper output encoding, principle of least privilege in permissions, and the safe handling of sensitive data.
+   - Identify any libraries or functions known to be insecure, and recommend safer alternatives.
 
-```javascript
-openapi: 3.1.0
-info:
-  title: GitHub Pull Request API
-  description: Retrieve the diff of a pull request and post comments back to it.
-  version: 1.0.0
-servers:
-  - url: https://api.github.com
-    description: GitHub API
-paths:
-  /repos/{owner}/{repo}/pulls/{pull_number}:
-    get:
-      operationId: getPullRequestDiff
-      summary: Get the diff of a pull request.
-      parameters:
-        - name: owner
-          in: path
-          required: true
-          schema:
-            type: string
-          description: Owner of the repository.
-        - name: repo
-          in: path
-          required: true
-          schema:
-            type: string
-          description: Name of the repository.
-        - name: pull_number
-          in: path
-          required: true
-          schema:
-            type: integer
-          description: The number of the pull request.
-        - name: Accept
-          in: header
-          required: true
-          schema:
-            type: string
-            enum:
-              - application/vnd.github.v3.diff
-          description: Media type for the diff format.
-      responses:
-        "200":
-          description: Successfully retrieved the pull request diff.
-          content:
-            text/plain:
-              schema:
-                type: string
-        "404":
-          description: Pull request not found.
-  /repos/{owner}/{repo}/issues/{issue_number}/comments:
-    post:
-      operationId: postPullRequestComment
-      summary: Post a comment to the pull request.
-      parameters:
-        - name: owner
-          in: path
-          required: true
-          schema:
-            type: string
-          description: Owner of the repository.
-        - name: repo
-          in: path
-          required: true
-          schema:
-            type: string
-          description: Name of the repository.
-        - name: issue_number
-          in: path
-          required: true
-          schema:
-            type: integer
-          description: The issue or pull request number.
-      requestBody:
-        required: true
-        content:
-          application/json:
-            schema:
-              type: object
-              properties:
-                body:
-                  type: string
-                  description: The content of the comment.
-      responses:
-        "201":
-          description: Successfully created a comment.
-          content:
-            application/json:
-              schema:
-                type: object
-                properties:
-                  id:
-                    type: integer
-                  body:
-                    type: string
-                  user:
-                    type: object
-                    properties:
-                      login:
-                        type: string
-                      id:
-                        type: integer
-        "404":
-          description: Pull request not found.
+3. **Fault Tolerance & Error Handling**:
+   - Confirm the code gracefully handles errors, exceptions, and unexpected inputs.
+   - Check if proper try/catch blocks or equivalent mechanisms are in place.
+   - Ensure that sensitive error details are not exposed to end users.
+
+4. **Performance & Resource Management**:
+   - Evaluate the code for potential performance bottlenecks, unnecessary computations, or inefficient resource usage.
+   - Suggest improvements to enhance efficiency without compromising readability or security.
+
+5. **Step-by-Step Validation**:
+   - Examine the code incrementally, line by line or function by function.
+   - Document each identified issue and provide explicit recommendations.
+   - If code changes are suggested, present them in Markdown-formatted code blocks. Include straightforward comments and notes that make it easy for developers to understand and implement the improvements.
+
+**Response Guidelines**:
+- Be both comprehensive and succinct in your final summary.
+- If recommendations are made, show sample improvements using Markdown code blocks. For example:
+
+```java
+// Before:
+String userInput = request.getParameter('username');
+String query = 'SELECT * FROM Users WHERE name = '' + userInput + ''';
+// Potentially vulnerable to SQL injection
+
+// After:
+String userInput = request.getParameter("username");
+PreparedStatement stmt = conn.prepareStatement("SELECT * FROM Users WHERE name = ?");
+stmt.setString(1, userInput);
+// Parameterized query prevents SQL injection
 ```
 
-## Authentication Instructions
+##### **Create your GitHub Actions Workflow**
 
-Below are instructions on setting up authentication with this 3rd party application. Have questions? Check out [Getting Started Example](https://platform.openai.com/docs/actions/getting-started) to see how this step works in more detail.
+The workflow created for you has two jobs, within each job are a number of steps to achieve a workflow that runs on every PR against your main branch, gathers the git diff data (ignoring .json and .png files), and sends it to OpenAI for analysis. OpenAI will return a response that is posted back to the PR as a comment. If there are suggested code fixes, the workflow will include those fixes in the comment. The workflow then evaluates the PR against your enterprise standards and posts the results back to the PR as a markdown table that describes levels of adherence to the standards. We've also allowed for a dynamic definition of the prompt, modelname, and best pracitices so you can easily update the workflow to use your own definitions.
 
-### In ChatGPT (refer to Step 2 in the Getting Started Example)
+```yaml
+name: PR Quality and Security Check
 
-In ChatGPT, click on "Authentication" and choose **"Bearer"**. Enter in the information below. Ensure your token has the permissions described in Application setup, above.
+on:
+  pull_request:
+    branches: [main]
 
-- Authentication Type: API Key
-- Auth Type: Bearer
-- API Key 
-  <personal_access_token>
+permissions:
+  contents: read
+  pull-requests: write
 
-### Test the GPT
+jobs:
+  quality-security-analysis:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Check out code
+        uses: actions/checkout@v3
+        with:
+          fetch-depth: 0  # Ensure full history for proper diff
 
-You are now ready to test out the GPT. You can enter a simple prompt like "Can you review my pull request? owner: <org_name>, repo: <repo_name>, pull request number: <PR_Number>" and expect to see the following:
+      - name: Gather Full Code From Changed Files
+        run: |
+          CHANGED_FILES=$(git diff --name-only origin/main...HEAD)
+          echo '{"original files": [' > original_files_temp.json
+          for file in $CHANGED_FILES; do
+            if [[ $file == *.json ]] || [[ $file == *.png ]]; then
+              continue
+            fi
+            if [ -f "$file" ]; then
+              CONTENT=$(jq -Rs . < "$file")
+              echo "{\"filename\": \"$file\", \"content\": $CONTENT}," >> original_files_temp.json
+            fi
+          done
+          sed -i '$ s/,$//' original_files_temp.json
+          echo "]}" >> original_files_temp.json
 
-![landing_page.png](../../../../images/landing_page.png)
+      - name: Display Processed Diff (Debug)
+        run: cat original_files_temp.json
 
-1. A summary of changes in the referenced pull request(PR).
+      - name: Get Diff
+        run: |
+          git diff origin/main...HEAD \
+            | grep '^[+-]' \
+            | grep -Ev '^(---|\+\+\+)' > code_changes_only.txt
+          jq -Rs '{diff: .}' code_changes_only.txt > diff.json
+          if [ -f original_files_temp.json ]; then
+            jq -s '.[0] * .[1]' diff.json original_files_temp.json > combined.json
+            mv combined.json diff.json
 
-![First Interaction](../../../images/first_interaction.png)
+      - name: Display Processed Diff (Debug)
+        run: cat diff.json
 
-2. Quality and Security feedback and suggestions to incorporate in the next iteration of the PR.
+      - name: Analyze with OpenAI
+        env:
+          OPENAI_API_KEY: ${{ secrets.OPENAI_API_KEY }}
+        run: |
+          DIFF_CONTENT=$(jq -r '.diff' diff.json)
+          ORIGINAL_FILES=$(jq -r '."original files"' diff.json)
+          PROMPT="Please review the following code changes for any obvious quality or security issues. Provide a brief report in markdown format:\n\nDIFF:\n${DIFF_CONTENT}\n\nORIGINAL FILES:\n${ORIGINAL_FILES}"
+          jq -n --arg prompt "$PROMPT" '{
+            "model": "gpt-4",
+            "messages": [
+              { "role": "system", "content": "You are a code reviewer." },
+              { "role": "user", "content": $prompt }
+            ]
+          }' > request.json
+          curl -sS https://api.openai.com/v1/chat/completions \
+            -H "Content-Type: application/json" \
+            -H "Authorization: Bearer ${OPENAI_API_KEY}" \
+            -d @request.json > response.json
 
-![First Feedback](../../../images/first_feedback.png)
+      - name: Extract Review Message
+        id: extract_message
+        run: |
+          ASSISTANT_MSG=$(jq -r '.choices[0].message.content' response.json)
+          {
+            echo "message<<EOF"
+            echo "$ASSISTANT_MSG"
+            echo "EOF"
+          } >> $GITHUB_OUTPUT
 
-3. An option to iterate on the feedback or accept it and have the GPT post it directly to the PR as a comment from you. 
+      - name: Post Comment to PR
+        env:
+          COMMENT: ${{ steps.extract_message.outputs.message }}
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          gh api \
+            repos/${{ github.repository }}/issues/${{ github.event.pull_request.number }}/comments \
+            -f body="$COMMENT"
+```
 
-![First Interaction](../../../images/final_result.png)
+### Test the workflow
 
-*Are there integrations that you’d like us to prioritize? Are there errors in our integrations? File a PR or issue in our github, and we’ll take a look.*
+You are now ready to test out the workflow. You commit this workflow to your repository and then create a new PR. You should see the workflow run and post a comment to the PR with the results of the code review.
+
+Public examples of this workflow can be found in the [OpenAI-Forum](https://github.com/alwell-kevin/OpenAI-Forum/blob/main/.github/workflows/pr_quality_and_security_check.yml) repository.
+
+![workflow_check.png](../../images/workflow_check.png)
+
+![pr_quality_and_security_check.png](../../images/pr_quality_and_security_check.png)
+
+
+
+*Are there integrations or cookbooks you’d like us to prioritize? Are there errors in our examples? File a PR or issue in our repository, and we’ll take a look.*

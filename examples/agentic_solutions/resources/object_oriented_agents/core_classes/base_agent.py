@@ -61,8 +61,6 @@ class BaseAgent(ABC):
             messages=self.messages.get_messages(),
             tools=tools,
         )
-        self.logger.debug("Received response from OpenAI.")
-        self.logger.debug(f"Response: {response}")
 
         tool_calls = response.choices[0].message.tool_calls
         if tool_call_enabled and self.tool_manager and tool_calls:

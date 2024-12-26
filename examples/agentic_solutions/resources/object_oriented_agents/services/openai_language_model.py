@@ -39,6 +39,7 @@ class OpenAILanguageModel(LanguageModelInterface):
         try:
             response = self.openai_client.chat.completions.create(**kwargs)
             self.logger.debug("Received response from OpenAI.")
+            self.logger.debug(f"Response: {response}")
             return response
         except Exception as e:
             self.logger.error(f"OpenAI call failed: {str(e)}", exc_info=True)

@@ -1,0 +1,207 @@
+{
+    "messages": [
+        {
+            "role": "system",
+            "content": "Ava is the factual DCART chatbot that is knowledgable and empathetic."
+        },
+        {
+            "role": "user",
+            "content": "How many studio courses can I take in one term?"
+        },
+        {
+            "role": "assistant",
+            "content": "It is strongly recommended that students not exceed three (3) studio courses/term, otherwise, this will affect your other courses due to the amount of out of class time that students put into their assignments."
+        }
+    ]
+}
+{
+    "messages": [
+        {
+            "role": "system",
+            "content": "Ava is the factual DCART chatbot that is knowledgable and empathetic."
+        },
+        {
+            "role": "user",
+            "content": "Can the minor courses go towards the Design Major and the Sustainable Studies Minor, or just the minor? "
+        },
+        {
+            "role": "assistant",
+            "content": "No, your design courses are mandatory (core) courses for your program. Your minor is a separate program attached to your major. However, at the very bottom of your program guide (see my earlier email for the link) you’ll have some outside or free electives to do and some of your minor courses, if applicable, could count in that section or at the very top of the program guide if you are doing 120 credits in your program you could make your minor courses count there but not in the rest."
+        }
+    ]
+}
+{
+    "messages": [
+        {
+            "role": "system",
+            "content": "Ava is the factual DCART chatbot that is knowledgable and empathetic."
+        },
+        {
+            "role": "user",
+            "content": "Can I drop a course and what happens if I do?"
+        },
+        {
+            "role": "assistant",
+            "content": "A student who is struggling in a course may decide to drop the course and this is a good option if you find yourself in this situation and feel the best recourse is to drop the course.  If you drop a course after the DNE deadline and this is called a DISC (Discontinue).  The course name will stay on your student record permanently but will not affect your GPA.  You will still have to pay for this course but can retake it anytime after that."
+        }
+    ]
+}
+{
+    "messages": [
+        {
+            "role": "system",
+            "content": "Ava is the factual DCART chatbot that is knowledgable and empathetic."
+        },
+        {
+            "role": "user",
+            "content": "Will my status change if I drop from 12 credits to 9 credits?"
+        },
+        {
+            "role": "assistant",
+            "content": "Nothing changes in your status. You’re still an active student but if you are receiving government funding then you will be asked to return the money you received so please check with Financial Aid and Awards before you drop your course if this is the situation you have."
+        }
+    ]
+}
+{
+    "messages": [
+        {
+            "role": "system",
+            "content": "Ava is the factual DCART chatbot that is knowledgable and empathetic."
+        },
+        {
+            "role": "user",
+            "content": "I  would like to enrol for a class that requires a department permission. What do I need to do?"
+        },
+        {
+            "role": "assistant",
+            "content": "Each department handles the registration of their courses. If you are looking to take a Fine Arts or Free Elective then you must contact the department to inquiry what the procedure is to be enrolled to that course."
+        }
+    ]
+}
+{
+    "messages": [
+        {
+            "role": "system",
+            "content": "Ava is the factual DCART chatbot that is knowledgable and empathetic."
+        },
+        {
+            "role": "user",
+            "content": "What's the difference between a 'Fine Arts Elective' and a 'General or Free Elective'?"
+        },
+        {
+            "role": "assistant",
+            "content": "Free electives - All programs (excluding Major/Minor combination programs) offer the opportunity to take some free electives of your choosing. Free electives can be chosen from course offerings in any Faculty including additional courses within your own program or other courses from within the Faculty of Fine Arts. Please be aware that although any course can be applied as a free elective, many courses are reserved for students in that program and are therefore not available to students outside of that program. If you wish to take a course from another department that you are blocked from registering into, contact that department to see if special permission can be obtained."
+        }
+    ]
+}
+{
+    "messages": [
+        {
+            "role": "system",
+            "content": "Ava is the factual DCART chatbot that is knowledgable and empathetic."
+        },
+        {
+            "role": "user",
+            "content": "How do I know if an elective will count towards my program?"
+        },
+        {
+            "role": "assistant",
+            "content": "Rather than just give you the answer I will tell you how you can find the answer and this way, you will always be able to verify any course this way. If you go to the Class Schedule on the Concordia website:  https://campus.concordia.ca/psc/pscsprd/EMPLOYEE/SA/c/CU_EXT.CU_CLASS_SEARCH.GBL?&  Then, do a search for a course. For example:  FASS 293. Hit the Search button. Then. if you click on the 'A-LEC' you'll see another screen where you can read the description of the course and any special notes.  It's the 'NOTE' you need to read and verify if the course has any restrictions. If not, you can take the course and have it count in your program.  Any time you see example: 'NOTE: This course if for non-fine arts students' you cannot take the course for your program since you are in Fine Arts."
+        }
+    ]
+}
+{
+    "messages": [
+        {
+            "role": "system",
+            "content": "Ava is the factual DCART chatbot that is knowledgable and empathetic."
+        },
+        {
+            "role": "user",
+            "content": " How do I look for an Elective?"
+        },
+        {
+            "role": "assistant",
+            "content": "If you visit our main website and look at the top of the screen you'll see 'Quick Links'. From there you can find “Study Resources” and click on “Class Schedule”. This brings you to the search engine for looking up classes. The criteria is:
+
+            OPTION #1. Term:	Fall or Winter or Fall/Winter. Course Career:  Undergraduate SUBJECT: DART (Design) or  CART (Computation Arts), Dept. or Faculty:  You can also look up another dept. or faculty here. Scroll down for:  SEARCH. You can change your criteria for days or times that suite your schedule. Once you find a course, if you put your cursor over the LEC and click, this will open up the page to a brief description of the course. 
+
+            OR:
+            OPTION #2: from the Quick Links, go to Undergraduate Calendar, click on Quick Links to Courses. BUT BE CAREFUL:  The descriptions are for ALL OUR COURSES IN OUR CURRICULUM. IT DOES NOT MEAN WE OFFER THAT SPECIFIC COURSE. To see if it's offered, you have to do OPTION #1 ABOVE."
+
+        }
+    ]
+}
+{
+    "messages": [
+        {
+            "role": "system",
+            "content": "Ava is the factual DCART chatbot that is knowledgable and empathetic."
+        },
+        {
+            "role": "user",
+            "content": " What is a prerequisite?"
+        },
+        {
+            "role": "assistant",
+            "content": "A prerequisite is a specific course identified as being one you must have already successfully completed before being allowed to register for another given course. For example, you may enroll in PSYC 305 provided you meet the prerequisite, i.e. you have already completed PSYC 200, in this case. If you do not meet the prerequisites of a course, you will be blocked from registering for that course."
+        }
+    ]
+}
+{
+    "messages": [
+        {
+            "role": "system",
+            "content": "Ava is the factual DCART chatbot that is knowledgable and empathetic."
+        },
+        {
+            "role": "user",
+            "content": "How can I obtain a letter stating I'm a full-time student?"
+        },
+        {
+            "role": "assistant",
+            "content": "Birk's Student Centre offers a variety of attestation letters for that specific purpose. You can look at the types of letters on this website:  https://www.concordia.ca/students/birks/attestation-forms.html 
+You are correct about the number of credits for a Bachelor of Fine Arts. Applicants must complete 90 credits in their program in order to graduate. In the Computation Arts program the core is comprised of 66 credits and 24 electives and the breakdown is like this:
+COMPUTATION ARTS - SPECIALIZATION
+FFAR 250 (6 cr) all F.A. students are obliged to pass.
+60 cr. Computation Arts core and electives
+6 cr. Outside the faculty courses
+18 cr. free electives (any courses in or out of the faculty)
+You can see the details in this document which is your Program Guide: http://www.concordia.ca/content/dam/finearts/docs/program-guides/2016/2017/Program%20Guides%202018/Programguides2019/ProgramGuides/CART-spec-F20.pdf
+Transfer Credits:
+If you read your Offer of Admission you'll see the transfer credits where awarded to you with a code 
+GEN L = general elective: can be placed at the top or bottom as free electives on the program guide
+GFAR = General Fine Arts: can be placed where you have to take a fine arts elective
+SFAR = Studio Fine Arts: can be placed where you take studio fine arts courses or be a course substitute for a course you took in your previous university. This depends on if the course you passed is similar in course content to the course our department is offering. You must also proof this with documentation from the course you took i.e. course outline, assignments, projects etc. This is completed with a SRF (Student Request form — Course Substitution). Students must write a rationale for this request and show documentation (your course outline vs our course description in a Word document) along with attached assignments/projects/etc.
+
+In most cases, student will have GEN L transfer credits which will be applied to “Free Electives” or GFAR (Fine Arts Electives) which are used for Fine Arts electives.  If you have relevant documentation to prove that the course you took in your previous institution is very similar and equal in academic value to one of our core courses, you can request an appointment to meet with the chair of the department via the Department Assistant (designandcoomputationarts@concordia.ca). 
+You should not make an appointment with the chair/UGPD unless you have all your documentation ready (course outline, projects, assignments etc). Our UGPD's can only make an assessment of your request if you provide documentation. Once approved, they will explain the next step in the process.  
+Once you've looked at your Program Guide, you'll be able to see where some of your transfer credits can be applied. We ask our students to use the Program Guide and always update and save it as they move forward in their program. We need this document sent to the department when requesting help with registration so please keep this document handy (computer/phone). It is helpful to you and to us in getting you registered quickly. 
+Undergraduate Program Director - Design, 
+Kevin Lo at:  upd.dart@concordia.ca 
+Undergraduate Program Director — Computation Arts,
+Jonathan Lessard at:  upd.cart@concordia.ca 
+
+First Year Courses:
+In your Offer of Admission, you were provided with a link that would give you the “Recommended Courses” for your first year plus some electives. You also had the choice to take courses as a “full-time” or “part-time” student. http://www.concordia.ca/finearts/students/sas/new-students-advising-registration.html 
+If you have problems with registering you can join the Zoom Meetings that are indicated on this website.
+You now have some of the information and tools to help you navigate our university's system.  Please take the time to read the information on these websites and save as your “favorites” to refer to in the future."
+        }
+    ]
+}
+{
+    "messages": [
+        {
+            "role": "system",
+            "content": "Ava is the factual DCART chatbot that is knowledgable and empathetic."
+        },
+        {
+            "role": "user",
+            "content": "Can I investigate user interface for tech or other relevant areas?"
+        },
+        {
+            "role": "assistant",
+            "content": "In the design major interface studies/experiments take place in courses offered in the third year of the program, however design students may take course electives in our other program Computation Arts where classes emphasize user interface, programming, interactivity (starting in the first year)."
+        }
+    ]
+}

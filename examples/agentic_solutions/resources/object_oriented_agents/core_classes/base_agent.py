@@ -5,6 +5,7 @@ from .chat_messages import ChatMessages
 from .tool_manager import ToolManager
 from ..utils.logger import get_logger
 from ..services.language_model_interface import LanguageModelInterface
+from .agent_signature import AgentSignature
 
 
 class BaseAgent(ABC):
@@ -20,6 +21,7 @@ class BaseAgent(ABC):
             logger=None,
             language_model_interface: LanguageModelInterface = None
     ):
+        self.developer_prompt = developer_prompt
         self.model_name = model_name
         self.messages = ChatMessages(developer_prompt)
         self.tool_manager: Optional[ToolManager] = None
@@ -77,3 +79,17 @@ class BaseAgent(ABC):
         self.messages.add_assistant_message(response_message)
         self.logger.debug("Task completed successfully.")
         return response_message
+
+    def signature(self) -> dict:
+        """
+        Return a dictionary with:
+        - The developer prompt
+        - The model name
+        - The tool definitions (function schemas)
+        """
+        signature_obj = AgentSignature(
+            developer_prompt=self.developer_prompt,
+            model_name=self.model_name,
+            tool_manager=self.tool_manager
+        )
+        return signature_obj.to_dict()

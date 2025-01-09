@@ -1760,3 +1760,12 @@
     - gpt-actions-library
     - chatgpt
     - chatgpt-middleware
+
+- title: Advanced Evals - Combining LLM-As-Judge and Human Evaluators
+  path: examples/evaluation/Advanced_LLM_Evals_With_Multiple_Evaluators.ipynb
+  date: 2025-01-09
+  authors:
+    - ashishsardana
+  tags:
+    - completions
+    - functions

@@ -10,7 +10,7 @@
 
 cathykc:
   name: "Kai Chen"
-  website: "https://twitter.com/cathykaic"
+  website: "https://github.com/cathykc"
   avatar: "https://pbs.twimg.com/profile_images/1657816900817272832/ioGq5O0t_400x400.jpg"
 
 shyamal-anadkat:
@@ -26,12 +26,12 @@ simonpfish:
 joe-at-openai:
   name: "Joe Palermo"
   website: "https://www.linkedin.com/in/joe-palermo-99219237"
-  avatar: "https://media.licdn.com/dms/image/C4E03AQF_tsi7Kom0rg/profile-displayphoto-shrink_800_800/0/1630002100665?e=1704931200&v=beta&t=z3HKO9FmGHJIxhes9TXRzw-8iY-CBsEZYZc8zTogiLU"
+  avatar: "https://avatars.githubusercontent.com/u/117690718?v=4"
 
 mwu1993:
   name: "Michael Wu"
   website: "https://www.linkedin.com/in/michael-wu-77440977/"
-  avatar: "https://media.licdn.com/dms/image/C5603AQFhQfx0I-raUg/profile-displayphoto-shrink_800_800/0/1527451059977?e=1704931200&v=beta&t=wkFOj0Rigp6e9wm7aZdziOQ6jHARyXj3EoK1K8jaaas"
+  avatar: "https://avatars.githubusercontent.com/u/1650674?v=4"
 
 ibigio:
   name: "Ilan Bigio"
@@ -53,6 +53,11 @@ prakul:
   website: "https://www.linkedin.com/in/prakulagarwal"
   avatar: "https://media.licdn.com/dms/image/D5603AQEUug83qKgRBg/profile-displayphoto-shrink_800_800/0/1675384960197?e=1706140800&v=beta&t=qxkDbBr-Bk2ASpcwbR5JVPD6yS-vzmIwNHAa8ApyDq4"
 
+gaborcselle:
+  name: "Gabor Cselle"
+  website: "https://www.linkedin.com/in/gaborcselle"
+  avatar: "https://avatars.githubusercontent.com/u/54096?s=96&v=4"
+
 nghiauet:
   name: "Nghia Pham"
   website: "https://www.linkedin.com/in/deptraicucmanh/"
@@ -62,3 +67,148 @@ ggrn:
   name: "Greg Richardson"
   website: "https://twitter.com/ggrdson"
   avatar: "https://pbs.twimg.com/profile_images/1371549909820657664/ZG-HDNlI_400x400.jpg"
+
+teomusatoiu:
+  name: "Teodora Musatoiu"
+  website: "https://www.linkedin.com/in/teodora-musatoiu/"
+  avatar: "https://avatars.githubusercontent.com/u/156829031?s=400&u=af40fe04d9255139eb3bbf8dc83422cc694e862b&v=4"
+
+katiagg:
+  name: "Katia Gil Guzman"
+  website: "https://katia.gg"
+  avatar: "https://avatars.githubusercontent.com/u/16519462?v=4"
+
+jbeutler-openai:
+  name: "Joe Beutler"
+  website: "https://joebeutler.com"
+  avatar: "https://avatars.githubusercontent.com/u/156261485?v=4"
+
+dylanra-openai:
+  name: "Dylan Royan Almeida"
+  website: "https://www.linkedin.com/in/dylan-almeida-604522167/"
+  avatar: "https://avatars.githubusercontent.com/u/149511600?v=4"
+
+royziv11:
+  name: "Roy Ziv"
+  website: "https://www.linkedin.com/in/roy-ziv-a46001149/"
+  avatar: "https://avatars.githubusercontent.com/u/103690170?v=4"
+
+justonf:
+  name: "Juston Forte"
+  website: "https://www.linkedin.com/in/justonforte/"
+  avatar: "https://avatars.githubusercontent.com/u/96567547?s=400&u=08b9757200906ab12e3989b561cff6c4b95a12cb&v=4"
+
+aaronwilkowitz-openai:
+  name: "Aaron Wilkowitz"
+  website: "https://www.linkedin.com/in/aaronwilkowitz/"
+  avatar: "https://avatars.githubusercontent.com/u/157151487"
+
+charuj:
+  name: "Charu Jaiswal"
+  website: "https://www.linkedin.com/in/charu-j-8a866471"
+  avatar: "https://avatars.githubusercontent.com/u/18404643?v=4" 
+
+rupert-openai:
+  name: "Rupert Truman"
+  website: "https://www.linkedin.com/in/rupert-truman/"
+  avatar: "https://avatars.githubusercontent.com/u/171234447"
+  
+keelan-openai:
+  name: "Keelan Schule"
+  website: "https://www.linkedin.com/in/keelanschule/"
+  avatar: "https://avatars.githubusercontent.com/u/175734151?v=4"
+
+aa-openai:
+  name: "Allison August"
+  website: "https://www.linkedin.com/in/allisonaugust/"
+  avatar: "https://avatars.githubusercontent.com/u/172655668?v=4"
+
+alwestmo-openai:
+  name: "Anthony Westmoreland"
+  website: "https://www.linkedin.com/in/westmorelandanthony/"
+  avatar: "https://avatars2.githubusercontent.com/u/175844346"
+
+dan-openai:
+  name: "Daniel Halpern"
+  website: "https://www.linkedin.com/in/dhalp/"
+  avatar: "https://avatars.githubusercontent.com/u/175367970"
+
+eszuhany-openai:
+  name: "Eric Szuhany"
+  website: "https://www.linkedin.com/in/szuhany/"
+  avatar: "https://avatars.githubusercontent.com/u/164391912"
+
+pap-openai:
+  name: "Pierre-Antoine Porte"
+  website: "https://www.linkedin.com/in/portepa/"
+  avatar: "https://avatars.githubusercontent.com/u/174109416?v=4"
+
+evanweiss-openai:
+  name: "Evan Weiss"
+  website: "https://www.linkedin.com/in/evanpweiss/"
+  avatar: "https://avatars.githubusercontent.com/u/150647345"
+
+girishd:
+  name: "Girish Dusane"
+  website: "https://www.linkedin.com/in/girishdusane/"
+  avatar: "https://avatars.githubusercontent.com/u/272708"   
+  
+lxing-oai:
+  name: "Luke Xing"
+  website: "https://www.linkedin.com/in/lukexing/"
+  avatar: "https://avatars.githubusercontent.com/u/176698727"
+
+gladstone-openai:
+  name: "Kevin Gladstone"
+  website: "https://github.com/gladstone-openai"
+  avatar: "https://avatars.githubusercontent.com/u/149190645"
+
+lspacagna-oai:
+  name: "Lee Spacagna"
+  website: "https://github.com/lspacagna-oai"
+  avatar: "https://avatars.githubusercontent.com/u/175367019"
+
+joecasson-openai:
+  name: "Joe Casson"
+  website: "https://github.com/joecasson-openai"
+  avatar: "https://avatars.githubusercontent.com/u/178522625"
+
+ericning-o:
+  name: "Eric Ning"
+  website: "https://github.com/ericning-o"
+  avatar: "https://avatars.githubusercontent.com/u/182030612"
+
+zeyuangu-adzviser:
+  name: "Zeyuan Gu"
+  website: "https://www.linkedin.com/in/goo/"
+  avatar: "https://avatars.githubusercontent.com/u/25328738"
+
+alwell-kevin:
+  name: "Kevin Alwell"
+  website: "https://github.com/alwell-kevin"
+  avatar: "https://avatars.githubusercontent.com/u/26548363"
+
+danial-openai:
+  name: "Danial Mirza"
+  website: "https://github.com/danial-openai"
+  avatar: "https://avatars.githubusercontent.com/u/178343703"
+
+gbergengruen:
+  name: "Guillermo Bergengruen"
+  website: "https://github.com/gbergengruen"
+  avatar: "https://avatars.githubusercontent.com/u/140010883"
+
+ishida-openai:
+  name: "Shuhei Ishida"
+  website: "https://www.linkedin.com/in/shuhei-i/"
+  avatar: "https://avatars.githubusercontent.com/u/186007001"
+
+erickgort:
+  name: "Erick Gort"
+  website: "https://www.linkedin.com/in/erick-gort-32ab1678/"
+  avatar: "https://avatars.githubusercontent.com/u/189261906?v=4"
+  
+kylecote-tray:
+  name: "Kyle Cote"
+  website: "https://github.com/kylecote-tray"
+  avatar: "https://avatars.githubusercontent.com/u/53836176"

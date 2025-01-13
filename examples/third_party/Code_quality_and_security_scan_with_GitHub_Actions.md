@@ -3,7 +3,7 @@
 ## Introduction
 This guide explains how to integrate OpenAI reasoning models into your GitHub Pull Request (PR) workflow to automatically review code for quality, security, and enterprise standards compliance. By leveraging AI-driven insights early in the development process, you can catch issues sooner, reduce manual effort, and maintain consistent best practices across your codebase.
 
-## Why Integrate OpenAI in PRs?
+## Why Integrate OpenAI Reasoning Models in PRs?
 • Save time during code reviews by automatically detecting code smells, security vulnerabilities, and style inconsistencies.  
 • Enforce coding standards organization-wide for consistent, reliable code.  
 • Provide developers with prompt, AI-guided feedback on potential improvements.

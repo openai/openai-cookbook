@@ -1761,6 +1761,16 @@
     - chatgpt
     - chatgpt-middleware
 
+- title: Reasoning over Code Quality and Security in GitHub Pull Requests
+  path: examples/third_party/Code_quality_and_security_scan_with_GitHub_Actions.md
+  date: 2024-12-24
+  authors:
+    - alwell-kevin
+  tags:
+    - SDLC
+    - reasoning
+    - completions
+
 - title: How to evaluate LLMs for SQL generation
   path: examples/evaluation/How_to_evaluate_LLMs_for_SQL_generation.ipynb
   date: 2024-01-23

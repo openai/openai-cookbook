@@ -1778,3 +1778,12 @@
     - colin-jarvis
   tags:
     - guardrails
+
+- title: How to use the Usage API and Cost API to monitor your OpenAI usage
+  path: examples/completions_usage_api.ipynb
+  date: 2025-01-14
+  authors:
+    - MW-OAI
+  tags:
+    - usage-api
+    - cost-api

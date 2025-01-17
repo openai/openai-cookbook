@@ -201,6 +201,7 @@
   date: 2022-09-10
   authors:
     - ted-at-openai
+    - dwigg-openai
   tags:
     - completions
     - embeddings

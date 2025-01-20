@@ -83,7 +83,7 @@
 
 - title: Embedding Wikipedia articles for search
   path: examples/Embedding_Wikipedia_articles_for_search.ipynb
-  date: 2023-04-14
+  date: 2024-11-26
   authors:
     - ted-at-openai
   tags:
@@ -146,12 +146,14 @@
   tags:
     - completions
     - embeddings
+    - agents
 
 - title: How to use functions with a knowledge base
   path: examples/How_to_call_functions_for_knowledge_retrieval.ipynb
   date: 2023-06-14
   authors:
     - colin-openai
+    - ishida-openai
   tags:
     - completions
     - functions
@@ -384,14 +386,6 @@
   tags:
     - embeddings
 
-- title: Azure DALL·E image generation example
-  path: examples/azure/DALL-E.ipynb
-  date: 2023-06-12
-  authors:
-    - glecaros
-  tags:
-    - dall-e
-
 - title: Azure Chat Completions example (preview)
   path: examples/azure/chat.ipynb
   date: 2023-03-28
@@ -408,17 +402,6 @@
   authors:
     - kristapratico
   tags:
-    - completions
-
-- title: Azure completions example
-  path: examples/azure/completions.ipynb
-  date: 2022-12-16
-  authors:
-    - cmurtz-msft
-    - glecaros
-    - kristapratico
-  tags:
-    - embeddings
     - completions
 
 - title: Azure embeddings example
@@ -1086,6 +1069,7 @@
   tags:
     - completions
     - functions
+    - agents
 
 - title: Named Entity Recognition to Enrich Text
   path: examples/Named_Entity_Recognition_to_enrich_text.ipynb
@@ -1162,6 +1146,16 @@
   tags:
     - assistants
     - functions
+
+- title: "Orchestrating Agents: Routines and Handoffs"
+  path: examples/Orchestrating_agents.ipynb
+  date: 2024-10-10
+  authors:
+    - ibigio
+  tags:
+    - completions
+    - functions
+    - agents
 
 - title: MongoDB Atlas Vector Search
   path: examples/vector_databases/mongodb_atlas/README.md
@@ -1492,11 +1486,8 @@
     - completions
     - chatgpt-and-api
 
-<<<<<<< HEAD
+
 - title: GPT Actions library - Zapier
-=======
-- title: GPT Actions library - 
->>>>>>> 587df2b578e6e55dcbd67324ff0f670bc19ad2f6
   path: examples/chatgpt/gpt_actions_library/gpt_action_zapier.ipynb
   date: 2024-08-05
   authors:
@@ -1516,16 +1507,14 @@
 
 - title: Using Whisper API to transcribe text using your Device Microphone
   path: examples/Whisper_transcribe_device_microphone.ipynb
-  date: 2024-08-24
+  date: 2024-01-19
   authors:
     - carlkho
   tags:
     - whisper
-<<<<<<< HEAD
     - audio
     - transcribe
     - translate
-=======
 
 - title: Azure AI Search with Azure Functions and GPT Actions in ChatGPT
   path: examples/chatgpt/rag-quickstart/azure/Azure_AI_Search_with_Azure_Functions_and_GPT_Actions_in_ChatGPT.ipynb
@@ -1645,6 +1634,8 @@
   tags:
     - gpt-actions-library
     - chatgpt
+    - functions
+    - agents
 
 - title: Introduction to Structured Outputs
   path: examples/Structured_Outputs_Intro.ipynb
@@ -1675,7 +1666,7 @@
     - gpt-actions-library
     - chatgpt
     - chatgpt-data
-    
+
 - title: GPT Actions library - AWS Middleware
   path: examples/chatgpt/gpt_actions_library/gpt_middleware_aws_function.ipynb
   date: 2024-08-09
@@ -1812,4 +1803,188 @@
   tags:
     - completions
     - reasoning
->>>>>>> 587df2b578e6e55dcbd67324ff0f670bc19ad2f6
+
+- title: Using chained calls for o1 structured outputs
+  path: examples/o1/Using_chained_calls_for_o1_structured_outputs.ipynb
+  date: 2024-09-26
+  authors:
+    - ericning-o
+  tags:
+    - completions
+    - reasoning
+
+- title: Building a Bring Your Own Browser (BYOB) Tool for Web Browsing and Summarization
+  path: examples/third_party/Web_search_with_google_api_bring_your_own_browser_tool.ipynb
+  date: 2024-09-26
+  authors:
+    - msingh-openai
+  tags:
+    - completions
+
+- title: Prompt Caching 101
+  path: examples/Prompt_Caching101.ipynb
+  date: 2024-10-01
+  authors:
+    - charuj
+  tags:
+    - latency
+    - cost
+    - prompt caching
+    - completions
+
+- title: GPT Actions library - Google Ads via Adzviser
+  path: examples/chatgpt/gpt_actions_library/gpt_action_googleads_adzviser.ipynb
+  date: 2024-10-10
+  authors:
+    - zeyuangu-adzviser
+  tags:
+    - gpt-actions-library
+    - chatgpt
+    - chatgpt-data
+    - chatgpt-productivity
+    - chatgpt-middleware
+
+- title: Leveraging model distillation to fine-tune a model
+  path: examples/Leveraging_model_distillation_to_fine-tune_a_model.ipynb
+  date: 2024-10-16
+  authors:
+    - pap-openai
+  tags:
+    - completions
+    - fine-tuning
+
+- title: Voice Translation into Different Languages
+  path: examples/voice_solutions/voice_translation_into_different_languages_using_GPT-4o.ipynb
+  date: 2024-10-21
+  authors:
+    - msingh-openai
+  tags:
+    - completions
+    - audio
+
+- title: Enhance your prompts with meta prompting
+  path: examples/Enhance_your_prompts_with_meta_prompting.ipynb
+  date: 2024-10-23
+  authors:
+    - teomusatoiu
+  tags:
+    - completions
+    - reasoning
+  
+- title: GPT Actions library - GitHub
+  path: examples/chatgpt/gpt_actions_library/gpt_action_github.md
+  date: 2024-10-23
+  authors:
+    - alwell-kevin
+  tags:
+    - gpt-actions-library
+    - chatgpt
+    - chatgpt-productivity
+
+- title: Custom LLM as a Judge to Detect Hallucinations with Braintrust
+  path: examples/Custom-LLM-as-a-Judge.ipynb
+  date: 2024-10-14
+  authors:
+    - ankrgyl
+    - shyamal-anadkat
+  tags:
+    - evals
+    - completions
+
+- title: Vision Fine-tuning on GPT-4o for Visual Question Answering
+  path: examples/multimodal/Vision_Fine_tuning_on_GPT4o_for_Visual_Question_Answering.ipynb
+  date: 2024-11-01
+  authors:
+    - danial-openai
+  tags:
+    - vision
+    - fine-tuning
+    - completions
+
+- title: Steering Text-to-Speech for more dynamic audio generation
+  path: examples/voice_solutions/steering_tts.ipynb
+  date: 2024-11-01
+  authors:
+    - ericning-o
+    - gbergengruen
+  tags:
+    - completions
+    - audio
+
+- title: Pinecone Vector Database and Retool Workflow with GPT Actions
+  path: examples/chatgpt/rag-quickstart/pinecone-retool/gpt-action-pinecone-retool-rag.ipynb
+  date: 2024-11-11
+  authors:
+    - lspacagna-oai
+  tags:
+    - gpt-actions-library
+    - embeddings
+    - chatgpt 
+    - chatgpt-and-api
+    
+- title: Optimizing Retrieval-Augmented Generation using GPT-4o Vision Modality
+  path: examples/vector_databases/pinecone/Using_vision_modality_for_RAG_with_Pinecone.ipynb
+  date: 2024-11-12
+  authors:
+    - msingh-openai
+  tags:
+    - completions
+    - vision
+
+- title: GPT Actions library - Workday
+  path: examples/chatgpt/gpt_actions_library/gpt_action_workday.md
+  date: 2024-11-20
+  authors:
+    - erickgort
+    - pap-openai
+  tags:
+    - gpt-actions-library
+    - chatgpt-productivity
+    - chatgpt
+
+- title: GPT Actions library - Google Calendar
+  path: examples/chatgpt/gpt_actions_library/gpt_action_google_calendar.md
+  date: 2024-11-22
+  authors:
+    - lspacagna-oai
+  tags:
+    - gpt-actions-library
+    - chatgpt
+    - chatgpt-communication
+    
+- title: GPT Actions library - Tray.ai APIM 
+  path: examples/chatgpt/gpt_actions_library/gpt_action_trayai_apim.md
+  date: 2024-11-26
+  authors:
+    - kylecote-tray
+  tags:
+    - gpt-actions-library
+    - chatgpt
+    - chatgpt-middleware
+
+- title: Reasoning over Code Quality and Security in GitHub Pull Requests
+  path: examples/third_party/Code_quality_and_security_scan_with_GitHub_Actions.md
+  date: 2024-12-24
+  authors:
+    - alwell-kevin
+  tags:
+    - SDLC
+    - reasoning
+    - completions
+
+- title: How to evaluate LLMs for SQL generation
+  path: examples/evaluation/How_to_evaluate_LLMs_for_SQL_generation.ipynb
+  date: 2024-01-23
+  authors:
+    - colin-jarvis
+  tags:
+    - guardrails
+
+- title: How to use the Usage API and Cost API to monitor your OpenAI usage
+  path: examples/completions_usage_api.ipynb
+  date: 2025-01-14
+  authors:
+    - MW-OAI
+  tags:
+    - usage-api
+    - cost-api

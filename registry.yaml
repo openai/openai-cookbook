@@ -460,15 +460,6 @@
     - embeddings
     - completions
 
-- title: Getting Started with OpenAI Evals
-  path: examples/evaluation/Getting_Started_with_OpenAI_Evals.ipynb
-  date: 2024-03-21
-  authors:
-    - royziv11
-    - shyamal-anadkat
-  tags:
-    - completions
-
 - title: Developing Hallucination Guardrails
   path: examples/Developing_hallucination_guardrails.ipynb
   date: 2024-05-29
@@ -1760,3 +1751,30 @@
     - gpt-actions-library
     - chatgpt
     - chatgpt-middleware
+
+- title: Reasoning over Code Quality and Security in GitHub Pull Requests
+  path: examples/third_party/Code_quality_and_security_scan_with_GitHub_Actions.md
+  date: 2024-12-24
+  authors:
+    - alwell-kevin
+  tags:
+    - SDLC
+    - reasoning
+    - completions
+
+- title: How to evaluate LLMs for SQL generation
+  path: examples/evaluation/How_to_evaluate_LLMs_for_SQL_generation.ipynb
+  date: 2024-01-23
+  authors:
+    - colin-jarvis
+  tags:
+    - guardrails
+
+- title: How to use the Usage API and Cost API to monitor your OpenAI usage
+  path: examples/completions_usage_api.ipynb
+  date: 2025-01-14
+  authors:
+    - MW-OAI
+  tags:
+    - usage-api
+    - cost-api

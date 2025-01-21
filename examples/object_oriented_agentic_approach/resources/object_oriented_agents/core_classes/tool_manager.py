@@ -56,10 +56,10 @@ class ToolManager:
         # We take the first tool call from the model’s response
         first_tool_call = response.choices[0].message.tool_calls[0]
         tool_name = first_tool_call.function.name
-        self.logger.debug(f"Handling tool call: {tool_name}")
+        self.logger.info(f"Handling tool call: {tool_name}")
 
         args = json.loads(first_tool_call.function.arguments)
-        self.logger.debug(f"Tool arguments: {args}")
+        self.logger.info(f"Tool arguments: {args}")
 
         if tool_name not in self.tools:
             error_message = f"Error: The requested tool '{tool_name}' is not registered."
@@ -69,7 +69,7 @@ class ToolManager:
         # 1. Invoke the tool
         self.logger.debug(f"Invoking tool '{tool_name}'")
         tool_response = self.tools[tool_name].run(args)
-        self.logger.debug(f"Tool '{tool_name}' response: {tool_response}")
+        self.logger.info(f"Tool '{tool_name}' response: {tool_response}")
 
         # If returning the tool response "as is," just store and return it
         if return_tool_response_as_is:

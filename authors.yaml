@@ -106,13 +106,13 @@ aaronwilkowitz-openai:
 charuj:
   name: "Charu Jaiswal"
   website: "https://www.linkedin.com/in/charu-j-8a866471"
-  avatar: "https://avatars.githubusercontent.com/u/18404643?v=4" 
+  avatar: "https://avatars.githubusercontent.com/u/18404643?v=4"
 
 rupert-openai:
   name: "Rupert Truman"
   website: "https://www.linkedin.com/in/rupert-truman/"
   avatar: "https://avatars.githubusercontent.com/u/171234447"
-  
+
 keelan-openai:
   name: "Keelan Schule"
   website: "https://www.linkedin.com/in/keelanschule/"
@@ -138,6 +138,31 @@ eszuhany-openai:
   website: "https://www.linkedin.com/in/szuhany/"
   avatar: "https://avatars.githubusercontent.com/u/164391912"
 
+
+papertigers:
+  name: "Karl Moritz Hermann"
+  website: "https://www.linkedin.com/in/kmhermann/"
+  avatar: "https://pbs.twimg.com/profile_images/1249352292081569792/MbZrKr9v_400x400.jpg"
+
+harieki:
+  name: "Harry Jackson"
+  website: "https://www.linkedin.com/in/harry-jackson-b9951317/"
+  avatar: "https://pbs.twimg.com/profile_images/1621193381993125888/0UN2oFYx_400x400.jpg"
+
+zlipkin-openai:
+  name: "Zoe Lipkin"
+  website: "https://www.linkedin.com/in/zoelipkin"
+  avatar: "https://pbs.twimg.com/profile_images/1651768911416500224/5mhCRdH2_400x400.jpg"
+
+iamkobe:
+  name: "Yingning Cheng"
+  website: "https://www.linkedin.com/in/yingningc/"
+  avatar: "https://media.licdn.com/dms/image/D4D03AQEH0XZfnJXb6A/profile-displayphoto-shrink_800_800/0/1697817712538?e=1704931200&v=beta&t=cRLGzAFgnYJw1ZBG8abCQhxNd4di9TyWw-MG5_ZEVgk"
+
+carlkho:
+  name: "Carl Kho"
+  website: "http://carlkho.com"
+  avatar: "https://avatars.githubusercontent.com/u/106736711?v=4"
 pap-openai:
   name: "Pierre-Antoine Porte"
   website: "https://www.linkedin.com/in/portepa/"

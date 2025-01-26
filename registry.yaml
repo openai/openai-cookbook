@@ -1487,6 +1487,7 @@
     - completions
     - chatgpt-and-api
 
+
 - title: GPT Actions library - Zapier
   path: examples/chatgpt/gpt_actions_library/gpt_action_zapier.ipynb
   date: 2024-08-05
@@ -1504,6 +1505,136 @@
     - dylanra-openai
   tags:
     - completions
+
+- title: Using Whisper API to transcribe text using your Device Microphone
+  path: examples/Whisper_transcribe_device_microphone.ipynb
+  date: 2024-01-19
+  authors:
+    - carlkho
+  tags:
+    - whisper
+    - audio
+    - transcribe
+    - translate
+
+- title: Azure AI Search with Azure Functions and GPT Actions in ChatGPT
+  path: examples/chatgpt/rag-quickstart/azure/Azure_AI_Search_with_Azure_Functions_and_GPT_Actions_in_ChatGPT.ipynb
+  date: 2024-07-08
+  authors:
+    - maxreid-openai
+  tags:
+    - embeddings
+    - chatgpt
+    - tiktoken
+    - completions
+
+- title: GPT Actions library - getting started
+  path: examples/chatgpt/gpt_actions_library/.gpt_action_getting_started.ipynb
+  date: 2024-07-09
+  authors:
+    - aaronwilkowitz-openai
+  tags:
+    - gpt-actions-library
+    - chatgpt
+
+- title: GPT Actions library - BigQuery
+  path: examples/chatgpt/gpt_actions_library/gpt_action_bigquery.ipynb
+  date: 2024-07-09
+  authors:
+    - aaronwilkowitz-openai
+  tags:
+    - gpt-actions-library
+    - chatgpt
+
+- title: Data Extraction and Transformation in ELT Workflows using GPT-4o as an OCR Alternative
+  path: examples/Data_extraction_transformation.ipynb
+  date: 2024-07-09
+  authors:
+    - charuj
+  tags:
+    - completions
+    - vision
+
+- title: GPT Actions library - Outlook
+  path: examples/chatgpt/gpt_actions_library/gpt_action_outlook.ipynb
+  date: 2024-07-15
+  authors:
+    - rupert-openai
+  tags:
+    - gpt-actions-library
+    - chatgpt
+
+- title: GPT Actions library - Sharepoint (Return Docs)
+  path: examples/chatgpt/gpt_actions_library/gpt_action_sharepoint_doc.ipynb
+  date: 2024-05-24
+  authors:
+    - maxreid-openai
+  tags:
+    - gpt-actions-library
+    - chatgpt
+
+- title: GPT Actions library - Sharepoint (Return Text)
+  path: examples/chatgpt/gpt_actions_library/gpt_action_sharepoint_text.ipynb
+  date: 2024-05-24
+  authors:
+    - maxreid-openai
+  tags:
+    - gpt-actions-library
+    - chatgpt
+
+- title: GPT Actions library (Middleware) - Azure Functions
+  path: examples/chatgpt/gpt_actions_library/gpt_middleware_azure_function.ipynb
+  date: 2024-05-24
+  authors:
+    - maxreid-openai
+  tags:
+    - gpt-actions-library
+    - chatgpt
+
+- title: GPT Actions library - Canvas LMS
+  path: examples/chatgpt/gpt_actions_library/gpt_action_canvaslms.ipynb
+  date: 2024-07-17
+  authors:
+    - keelan-openai
+  tags:
+    - gpt-actions-library
+    - chatgpt
+
+- title: GPT Actions library - Salesforce
+  path: examples/chatgpt/gpt_actions_library/gpt_action_salesforce.ipynb
+  date: 2024-07-18
+  authors:
+    - aa-openai
+  tags:
+    - gpt-actions-library
+    - chatgpt
+
+- title: GPT Actions library - Gmail
+  path: examples/chatgpt/gpt_actions_library/gpt_action_gmail.ipynb
+  date: 2024-07-24
+  authors:
+    - alwestmo-openai
+  tags:
+    - gpt-actions-library
+    - chatgpt
+
+- title: GPT Actions library - Jira
+  path: examples/chatgpt/gpt_actions_library/gpt_action_jira.ipynb
+  date: 2024-07-24
+  authors:
+    - rupert-openai
+  tags:
+    - gpt-actions-library
+    - chatgpt
+
+- title: GPT Actions library - Notion
+  path: examples/chatgpt/gpt_actions_library/gpt_action_notion.ipynb
+  date: 2024-07-25
+  authors:
+    - dan-openai
+  tags:
+    - gpt-actions-library
+    - chatgpt
     - functions
     - agents
 
@@ -1515,6 +1646,7 @@
   tags:
     - completions
     - functions
+    - assistants
 
 - title: GPT Actions library (Middleware) - Google Cloud Function
   path: examples/chatgpt/gpt_actions_library/gpt_middleware_google_cloud_function.md
@@ -1546,6 +1678,15 @@
     - chatgpt
     - chatgpt-middleware
 
+- title: GPT Actions library - Confluence
+  path: examples/chatgpt/gpt_actions_library/gpt_action_confluence.ipynb
+  date: 2024-07-31
+  authors:
+    - eszuhany-openai
+  tags:
+    - gpt-actions-library
+    - chatgpt
+
 - title: GPT Actions library - Google Drive
   path: examples/chatgpt/gpt_actions_library/gpt_action_google_drive.ipynb
   date: 2024-08-11
@@ -1556,26 +1697,86 @@
     - chatgpt
     - chatgpt-productivity
 
-- title: GPT Actions library - Snowflake Direct
-  path: examples/chatgpt/gpt_actions_library/gpt_action_snowflake_direct.ipynb
-  date: 2024-08-13
+- title: GPT Actions library - SQL Database
+  path: examples/chatgpt/gpt_actions_library/gpt_action_sql_database.ipynb
+  date: 2024-07-31
   authors:
-    - gladstone-openai
+    - evanweiss-openai
+  tags:
+    - chatgpt
+    - gpt-actions-library
+
+- title: GPT Actions library - Box
+  path: examples/chatgpt/gpt_actions_library/gpt_action_box.ipynb
+  date: 2024-08-02
+  authors:
+    - keelan-openai
   tags:
     - gpt-actions-library
     - chatgpt
     - chatgpt-data
 
-- title: GPT Actions library - Snowflake Middleware
-  path: examples/chatgpt/gpt_actions_library/gpt_action_snowflake_middleware.ipynb
-  date: 2024-08-14
+- title: GPT Actions library - OneDrive
+  path: examples/chatgpt/gpt_actions_library/gpt_action_onedrive.ipynb
+  date: 2024-07-10
   authors:
-    - gladstone-openai
+    - girishd-openai
   tags:
     - gpt-actions-library
     - chatgpt
     - chatgpt-data
 
+- title: Using ChatGPT’s Code Interpreter to generate SVG images
+  path: examples/Code_Interpreter_SVG.ipynb
+  date: 2024-07-19
+  authors:
+    - kerens
+  tags:
+    - chatgpt
+    - vision
+    - completions
+    - python
+
+- title: GPT-4o for Speech-to-Text Transcription
+  path: examples/Speech-to-Text_Transcription_GPT4o.ipynb
+  date: 2024-08-05
+  authors:
+    - kerens
+  tags:
+    - chatgpt
+    - completions
+    - functions
+    - python
+    - whisper
+
+- title: GPT Actions library - Quickstart
+  path: examples/chatgpt/gpt_actions_library/gpt_actions_library_quickstart.ipynb
+  date: 2024-07-07
+  authors:
+    - aaronwilkowitz-openai
+  tags:
+    - gpt-actions-library
+    - chatgpt
+
+- title: How to fine-tune GPT-3.5-Turbo
+  path: examples/fine_tuning_gpt_3_5_turbo.ipynb
+  date: 2024-08-11
+  authors:
+    - aayushg
+  tags:
+    - completions
+    
+- title: Using Whisper API to transcribe text using your Device Microphone
+  path: examples/Whisper_transcribe_device_microphone.ipynb
+  date: 2024-08-24
+  authors:
+    - carlkho
+  tags:
+    - whisper
+    - audio
+    - transcribe
+    - translate
+    
 - title: GPT Actions library - Retool Workflow
   path: examples/chatgpt/gpt_actions_library/gpt_action_retool_workflow.md
   date: 2024-08-28

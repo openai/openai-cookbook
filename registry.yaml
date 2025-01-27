@@ -1760,3 +1760,11 @@
     - gpt-actions-library
     - chatgpt
     - chatgpt-middleware
+
+- title: Build Your Own Code Interpreter for Dynamically Generated Tool Calling
+  path: examples/object_oriented_agentic_approach/Secure_code_interpreter_tool_for_LLM_agents.ipynb
+  date: 2025-01-26
+  authors:
+    - msingh-openai
+  tags:
+    - completions

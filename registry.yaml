@@ -1789,7 +1789,16 @@
     - usage-api
     - cost-api
 
-- title: Build Your Own Code Interpreter: Empowering LLM Agents with Dynamic Tool Calling
+- title: How to use the Usage API and Cost API to monitor your OpenAI usage
+  path: examples/completions_usage_api.ipynb
+  date: 2025-01-14
+  authors:
+    - MW-OAI
+  tags:
+    - usage-api
+    - cost-api
+
+- title: Build Your Own Code Interpreter - Empowering LLM Agents with Dynamic Tool Calling
   path: examples/object_oriented_agentic_approach/Secure_code_interpreter_tool_for_LLM_agents.ipynb
   date: 2025-01-26
   authors:

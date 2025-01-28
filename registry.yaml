@@ -201,6 +201,7 @@
   date: 2022-09-10
   authors:
     - ted-at-openai
+    - dwigg-openai
   tags:
     - completions
     - embeddings
@@ -1760,3 +1761,47 @@
     - gpt-actions-library
     - chatgpt
     - chatgpt-middleware
+
+- title: Reasoning over Code Quality and Security in GitHub Pull Requests
+  path: examples/third_party/Code_quality_and_security_scan_with_GitHub_Actions.md
+  date: 2024-12-24
+  authors:
+    - alwell-kevin
+  tags:
+    - SDLC
+    - reasoning
+    - completions
+
+- title: How to evaluate LLMs for SQL generation
+  path: examples/evaluation/How_to_evaluate_LLMs_for_SQL_generation.ipynb
+  date: 2024-01-23
+  authors:
+    - colin-openai
+  tags:
+    - guardrails
+
+- title: How to use the Usage API and Cost API to monitor your OpenAI usage
+  path: examples/completions_usage_api.ipynb
+  date: 2025-01-14
+  authors:
+    - MW-OAI
+  tags:
+    - usage-api
+    - cost-api
+
+- title: How to use the Usage API and Cost API to monitor your OpenAI usage
+  path: examples/completions_usage_api.ipynb
+  date: 2025-01-14
+  authors:
+    - MW-OAI
+  tags:
+    - usage-api
+    - cost-api
+
+- title: Build Your Own Code Interpreter - Empowering LLM Agents with Dynamic Tool Calling
+  path: examples/object_oriented_agentic_approach/Secure_code_interpreter_tool_for_LLM_agents.ipynb
+  date: 2025-01-26
+  authors:
+    - msingh-openai
+  tags:
+    - completions

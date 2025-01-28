@@ -1,0 +1,92 @@
+classDiagram
+
+    %% ==========================
+    %% Abstract Classes
+    %% ==========================
+    class BaseAgent {
+        - model_name: str
+        - messages: ChatMessages
+        - tool_manager: ToolManager
+        - logger: Logger
+        - language_model_interface: LanguageModelInterface
+
+        + __init__(developer_prompt: str, model_name: str)
+        + setup_tools(): void  %% abstract
+        + add_context(content: str): void
+        + add_message(content: str): void
+        + task(user_task: str, tool_call_enabled: bool, return_tool_response_as_is: bool): str
+    }
+
+    class ToolInterface {
+        + get_definition(): Dict[str, Any]
+        + run(arguments: Dict[str, Any]): str
+    }
+
+    class LanguageModelInterface {
+        + generate_completion(
+            model: str, 
+            messages: List<Dict[str, str]], 
+            tools: List[Dict[str, Any]]
+        ): Dict[str, Any]
+    }
+
+
+    %% ==========================
+    %% Concrete Classes
+    %% ==========================
+    class ChatMessages {
+        - messages: List<Dict[str, str]>
+
+        + __init__(developer_prompt: str)
+        + add_developer_message(content: str): void
+        + add_user_message(content: str): void
+        + add_assistant_message(content: str): void
+        + get_messages(): List<Dict[str, str]>
+    }
+
+    class ToolManager {
+        - tools: Dict[str, ToolInterface]
+        - logger: Logger
+        - language_model_interface: LanguageModelInterface
+
+        + __init__()
+        + register_tool(tool: ToolInterface): void
+        + get_tool_definitions(): List<Dict[str, Any]>
+        + handle_tool_call_sequence(
+            response: str, 
+            return_tool_response_as_is: bool, 
+            messages: ChatMessages
+        ): str
+    }
+
+    class OpenAILanguageModel {
+        - openai_client: OpenAI
+        - logger: Logger
+
+        + __init__()
+        + generate_completion(
+            model: str, 
+            messages: List<Dict[str, str]], 
+            tools: List<Dict[str, Any]]
+        ): Dict[str, Any]
+    }
+
+    class OpenAIClientFactory {
+        + create_client(api_key: str): OpenAI
+        - _resolve_api_key(api_key: str): str
+    }
+
+
+    %% ==========================
+    %% Relationships
+    %% ==========================
+    BaseAgent --> ChatMessages : uses
+    BaseAgent --> LanguageModelInterface : uses
+    BaseAgent --> ToolManager : optionally uses
+
+    ToolManager "0..*" --> "1" ToolInterface : manages
+    ToolManager --> ChatMessages : uses
+    ToolManager --> LanguageModelInterface : uses
+
+    LanguageModelInterface <|-- OpenAILanguageModel
+    OpenAILanguageModel --> OpenAIClientFactory : uses

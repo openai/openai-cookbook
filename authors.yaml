@@ -36,7 +36,7 @@ mwu1993:
 ibigio:
   name: "Ilan Bigio"
   website: "https://twitter.com/ilanbigio"
-  avatar: "https://pbs.twimg.com/profile_images/1688302223250378752/z-99TOMH_400x400.jpg"
+  avatar: "https://pbs.twimg.com/profile_images/1841544725654077440/DR3b8DMr_400x400.jpg"
 
 jhills20:
   name: "James Hills"
@@ -227,3 +227,13 @@ msingh-openai:
   name: "Mandeep Singh"
   website: "https://github.com/msingh-openai"
   avatar: "https://avatars.githubusercontent.com/u/168678187?v=4"
+
+ted-at-openai:
+  name: "Ted Sanders"
+  website: "https://github.com/ted-at-openai"
+  avatar: "https://avatars.githubusercontent.com/u/95656834?v=4"
+
+MikeHeaton:
+  name: "Mike Heaton"
+  website: "https://github.com/MikeHeaton"
+  avatar: "https://avatars.githubusercontent.com/u/11911723?v=4"

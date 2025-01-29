@@ -1253,14 +1253,6 @@
   tags:
     - moderation
 
-- title: Image moderation using moderation API
-  path: examples/How_to_image_moderation.ipynb
-  date: 2024-01-28
-  authors:
-    - narenoai
-  tags:
-    - moderation
-
 - title: Summarizing Long Documents
   path: examples/Summarizing_long_documents.ipynb
   date: 2024-04-19

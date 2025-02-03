@@ -1805,3 +1805,13 @@
     - msingh-openai
   tags:
     - completions
+
+    - title: Historical Reference on Metaprompting - Early Community Discussion
+  path: references/metaprompting_community_discussion.md
+  date: 2025-02-03
+  authors:
+    - hatgit
+  tags:
+    - meta-prompting
+    - prompt-engineering
+    - historical-reference

@@ -1,7 +1,7 @@
 # object_oriented_agents/core_classes/tool_manager.py
 
 import json
-from typing import Dict, Any, List
+from typing import Dict, Any, List, Optional
 from .chat_messages import ChatMessages
 from .tool_interface import ToolInterface
 from ..utils.logger import get_logger
@@ -15,7 +15,6 @@ class ToolManager:
       - Invoke the correct tool by name
       - Handle the entire tool call sequence
     """
-
 
     def __init__(self, logger=None, language_model_interface: LanguageModelInterface = None):
         self.tools = {}
@@ -47,7 +46,8 @@ class ToolManager:
         response,
         return_tool_response_as_is: bool,
         messages: ChatMessages,
-        model_name: str
+        model_name: str,
+        reasoning_effort: Optional[str] = None
     ) -> str:
         """
         If the model wants to call a tool, parse the function arguments, invoke the tool,
@@ -90,11 +90,15 @@ class ToolManager:
         complete_payload.append(function_call_result_message)
 
         self.logger.debug("Calling the model again with the tool response to get the final answer.")
-        # Use the injected openai_client here
-        response_after_tool_call = self.language_model_interface.generate_completion(
-            model=model_name,
-            messages=complete_payload
-        )
+        # Build parameter dict and only include reasoning_effort if not None
+        params = {
+            "model": model_name,
+            "messages": complete_payload
+        }
+        if reasoning_effort is not None:
+            params["reasoning_effort"] = reasoning_effort
+
+        response_after_tool_call = self.language_model_interface.generate_completion(**params)
 
         final_message = response_after_tool_call.choices[0].message.content
         self.logger.debug("Received final answer from model after tool call.")

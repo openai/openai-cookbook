@@ -30,13 +30,12 @@ class PythonExecAgent(BaseAgent):
                     2. The user will also supply context, including:
                     - Column names and their descriptions.
                     - Sample data from the CSV (headers and a few rows) to help understand data types.
-                    3. Analyze the provided data using Python machine learning libraries and generate appropriate code to fulfill the user's request.
-                    4. Generate Python code to analyze the data and call the tool `execute_python_code` to run the code inside a Docker container.
-                    5. Execute the code in the container and return the output.
+                    3. Generate Python code to analyze the data and call the tool `execute_python_code` to run the code and get results.
+                    4. You can use Python libraries pandas, numpy, matplotlib, seaborn, and scikit-learn. 
+                    5. Interpret the results of the code execution and provide analysis to the user. 
                     
-                    Note: All files referenced in the prompt are located in `/home/sandboxuser`.
                 """,
-            model_name: str = "o1",
+            model_name: str = "o3-mini",
             logger=myapp_logger,
             language_model_interface = language_model_api_interface
         ):

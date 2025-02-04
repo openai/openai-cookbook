@@ -1805,3 +1805,13 @@
     - msingh-openai
   tags:
     - completions
+
+- title: GPT Actions library - GRID
+  path: examples/chatgpt/gpt_actions_library/gpt_action_grid.md
+  date: 2025-01-21
+  authors:
+    - birkirpalmason
+  tags:
+    - gpt-actions-library
+    - chatgpt-productivity
+    - spreadsheets

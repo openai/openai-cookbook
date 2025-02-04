@@ -16,6 +16,7 @@ myapp_logger = get_logger("MyApp", level=logging.INFO)
 # Create a LanguageModelInterface instance using the OpenAILanguageModel
 language_model_api_interface = OpenAILanguageModel(api_key=os.getenv("OPENAI_API_KEY"), logger=myapp_logger)
 
+
 class PythonExecAgent(BaseAgent):
     """
     An agent specialized in executing Python code in a Docker container.
@@ -33,17 +34,18 @@ class PythonExecAgent(BaseAgent):
                     3. Generate Python code to analyze the data and call the tool `execute_python_code` to run the code and get results.
                     4. You can use Python libraries pandas, numpy, matplotlib, seaborn, and scikit-learn. 
                     5. Interpret the results of the code execution and provide analysis to the user. 
-                    
                 """,
             model_name: str = "o3-mini",
             logger=myapp_logger,
-            language_model_interface = language_model_api_interface
-        ):
+            language_model_interface=language_model_api_interface,
+            reasoning_effort: str = None  # optional; if provided, passed to API calls
+    ):
         super().__init__(
             developer_prompt=developer_prompt,
             model_name=model_name,
             logger=logger,
-            language_model_interface=language_model_interface
+            language_model_interface=language_model_interface,
+            reasoning_effort=reasoning_effort
         )
         self.setup_tools()
 
@@ -52,9 +54,9 @@ class PythonExecAgent(BaseAgent):
         Create a ToolManager, instantiate the PythonExecTool and register it with the ToolManager.
         """
         self.tool_manager = ToolManager(logger=self.logger, language_model_interface=self.language_model_interface)
-        
+
         # Create the Python execution tool
         python_exec_tool = PythonExecTool()
-        
+
         # Register the Python execution tool
         self.tool_manager.register_tool(python_exec_tool)

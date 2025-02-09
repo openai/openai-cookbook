@@ -1798,9 +1798,9 @@
     - usage-api
     - cost-api
 
-- title: Build Your Own Code Interpreter - Empowering LLM Agents with Dynamic Tool Calling
+- title: Build Your Own Code Interpreter - Dynamic Tool Generation and Execution With o3-mini
   path: examples/object_oriented_agentic_approach/Secure_code_interpreter_tool_for_LLM_agents.ipynb
-  date: 2025-01-26
+  date: 2025-02-03
   authors:
     - msingh-openai
   tags:

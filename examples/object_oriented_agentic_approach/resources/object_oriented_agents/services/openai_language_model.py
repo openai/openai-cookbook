@@ -19,10 +19,11 @@ class OpenAILanguageModel(LanguageModelInterface):
         self,
         model: str,
         messages: List[Dict[str, str]],
-        tools: Optional[List[Dict[str, Any]]] = None
+        tools: Optional[List[Dict[str, Any]]] = None,
+        reasoning_effort: Optional[str] = None
     ) -> Dict[str, Any]:
         """
-        Calls the OpenAI API to generate a chat completion using the provided messages and tools.
+        Calls the OpenAI API to generate a chat completion using the provided messages, tools, and optional reasoning_effort.
         """
         kwargs = {
             "model": model,
@@ -33,6 +34,10 @@ class OpenAILanguageModel(LanguageModelInterface):
             # Passing tools directly to the API depends on how the OpenAI implementation expects them.
             # Adjust this as necessary if the API format changes.
             kwargs["tools"] = tools
+
+        # Append reasoning_effort to kwargs if provided
+        if reasoning_effort is not None:
+            kwargs["reasoning_effort"] = reasoning_effort
 
         self.logger.debug("Generating completion with OpenAI model.")
         self.logger.debug(f"Request: {kwargs}")

@@ -1787,6 +1787,7 @@
   date: 2025-01-14
   authors:
     - MW-OAI
+    - thli-openai
   tags:
     - usage-api
     - cost-api

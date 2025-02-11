@@ -1229,9 +1229,10 @@
 
 - title: How to parse PDF docs for RAG
   path: examples/Parse_PDF_docs_for_RAG.ipynb
-  date: 2024-02-28
+  date: 2024-09-29
   authors:
     - katiagg
+    - MW-OAI
   tags:
     - vision
     - embeddings
@@ -1263,9 +1264,10 @@
 
 - title: Using GPT4 Vision with Function Calling
   path: examples/multimodal/Using_GPT4_Vision_With_Function_Calling.ipynb
-  date: 2024-04-09
+  date: 2024-12-13
   authors:
     - shyamal-anadkat
+    - MW-OAI
   tags:
     - chat
     - vision

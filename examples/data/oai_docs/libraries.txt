@@ -154,6 +154,7 @@ Please note that OpenAI does not verify the correctness or security of these pro
 -   [gpts](https://www.npmjs.com/package/gpts) by [thencc](https://github.com/thencc)
 -   [@dalenguyen/openai](https://www.npmjs.com/package/@dalenguyen/openai) by [dalenguyen](https://github.com/dalenguyen)
 -   [tectalic/openai](https://github.com/tectalichq/public-openai-client-js) by [tectalic](https://tectalic.com/)
+-   [abso](https://tectalic.com/) by [Lunary](https://lunary.ai)
 
 ### PHP
 

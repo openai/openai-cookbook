@@ -1,0 +1,78 @@
+
+Runs are asynchronous, which means you'll want to monitor their `status` by polling the Run object until a [terminal status](/docs/assistants/how-it-works/runs-and-run-steps) is reached. For convenience, the 'create and poll' SDK helpers assist both in creating the run and then polling for its completion.
+
+<CodeSample
+    title="Create a Run"
+    defaultLanguage="python"
+    code={{
+        python: `
+run = client.beta.threads.runs.create_and_poll(
+  thread_id=thread.id,
+  assistant_id=assistant.id,
+  instructions="Please address the user as Jane Doe. The user has a premium account."
+)
+`.trim(),
+        "node.js": `
+let run = await openai.beta.threads.runs.createAndPoll(
+  thread.id,
+  { 
+    assistant_id: assistant.id,
+    instructions: "Please address the user as Jane Doe. The user has a premium account."
+  }
+);
+`.trim(),
+        curl: `
+curl https://api.openai.com/v1/threads/thread_abc123/runs \\
+  -H "Authorization: Bearer $OPENAI_API_KEY" \\
+  -H "Content-Type: application/json" \\
+  -H "OpenAI-Beta: assistants=v2" \\
+  -d '{
+    "assistant_id": "asst_abc123",
+    "instructions": "Please address the user as Jane Doe. The user has a premium account."
+  }'
+`.trim(),
+    }}
+/>
+
+Once the Run completes, you can [list the Messages](/docs/api-reference/messages/listMessages) added to the Thread by the Assistant.
+
+<CodeSample
+    defaultLanguage="python"
+    code={{
+        python: `
+if run.status == 'completed': 
+  messages = client.beta.threads.messages.list(
+    thread_id=thread.id
+  )
+  print(messages)
+else:
+  print(run.status)
+`.trim(),
+        "node.js": `
+if (run.status === 'completed') {
+  const messages = await openai.beta.threads.messages.list(
+    run.thread_id
+  );
+  for (const message of messages.data.reverse()) {
+    console.log(\`$\{message.role\} > $\{message.content[0].text.value\}\`);
+  }
+} else {
+  console.log(run.status);
+}
+`.trim(),
+        curl: `
+curl https://api.openai.com/v1/threads/thread_abc123/messages \\
+  -H "Content-Type: application/json" \\
+  -H "Authorization: Bearer $OPENAI_API_KEY" \\
+  -H "OpenAI-Beta: assistants=v2"
+`.trim(),
+    }}
+/>
+
+You may also want to list the [Run Steps](/docs/api-reference/runs/listRunSteps) of this Run if you'd like to look at any tool calls made during this Run.
+
+### Next
+
+1. Dive deeper into [How Assistants work](/docs/assistants/how-it-works)
+2. Learn more about [Tools](/docs/assistants/tools)
+3. Explore the [Assistants playground](/playground?mode=assistant)

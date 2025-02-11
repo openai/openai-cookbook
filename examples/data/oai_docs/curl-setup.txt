@@ -1,0 +1,118 @@
+
+Curl is a popular command line tool used by developers to send HTTP requests to API's. It requires minimal set up time but is less capable than a fully featured programming language like Python or JavaScript.
+
+## Step 1: Set up curl
+
+
+Many operating systems ship curl by default. You can check if you have curl installed by opening your Terminal or Command line, then entering the command:
+
+`curl https://platform.openai.com`
+
+If curl is set up and you are connected to the internet, it will send a HTTP request to fetch the contents of "platform.openai.com".
+
+If you get an error that curl is not found, you can install it by following the instructions on the [curl homepage](https://everything.curl.dev/get).
+
+
+
+## Step 2: Set up your API key
+
+Now that we have curl working, the next step is to set up an API key in your Terminal or Command line. You can optionally skip this step and just include your API key in your request as is talked about in Step 3.
+
+
+
+1. **Open Terminal**: You can find it in the Applications folder or search for it using Spotlight (Command + Space).
+2. **Edit bash profile**: Use the command `nano ~/.bash_profile` or `nano ~/.zshrc` (for newer MacOS versions) to open the profile file in a text editor.
+
+3. **Add environment variable**: In the editor, add the line below, replacing `your-api-key-here` with your actual API key:
+
+```
+export OPENAI_API_KEY='your-api-key-here'
+```
+
+4. **Save and exit**: Press Ctrl+O to write the changes, followed by Ctrl+X to close the editor.
+
+5. **Load your profile**: Use the command `source ~/.bash_profile` or `source ~/.zshrc` to load the updated profile.
+
+6. **Verification**: Verify the setup by typing `echo $OPENAI_API_KEY` in the terminal. It should display your API key.
+
+
+
+
+
+1. **Open Command Prompt**: You can find it by searching "cmd" in the start menu.
+
+2. **Set environment variable in the current session**: To set the environment variable in the current session, use the command below, replacing `your-api-key-here` with your actual API key:
+
+```
+setx OPENAI_API_KEY "your-api-key-here"
+```
+
+    This command will set the OPENAI_API_KEY environment variable for the current session.
+
+3. **Permanent setup**: To make the setup permanent, add the variable through the system properties as follows:
+
+    - Right-click on 'This PC' or 'My Computer' and select 'Properties'.
+    - Click on 'Advanced system settings'.
+    - Click the 'Environment Variables' button.
+    - In the 'System variables' section, click 'New...' and enter OPENAI_API_KEY as the variable name and your API key as the variable value.
+
+4. **Verification**: To verify the setup, reopen the command prompt and type the command below. It should display your API key:
+
+```
+echo %OPENAI_API_KEY%
+```
+
+
+
+## Step 3: Sending your first API request
+
+
+
+Once you have an API key set up, the final step is to send your first API request. To do so, a sample request to the [Chat Completions](/docs/api-reference/chat/create), [Embeddings](/docs/api-reference/embeddings/create), and [Images](/docs/api-reference/images/create) API are included below. Because the API key was set in Step 2, it should be automatically referenced via `$OPENAI_API_KEY` in your terminal or command line. You can also manually replace `$OPENAI_API_KEY` with your API key but be sure to keep the curl command hidden if it includes your API key.
+
+<CodeSample
+    defaultLanguage="ChatCompletions"
+    code={{
+        ChatCompletions: `
+curl https://api.openai.com/v1/chat/completions \
+  -H "Content-Type: application/json" \
+  -H "Authorization: Bearer $OPENAI_API_KEY" \
+  -d '{
+    "model": "gpt-3.5-turbo",
+    "messages": [
+      {
+        "role": "system",
+        "content": "You are a poetic assistant, skilled in explaining complex programming concepts with creative flair."
+      },
+      {
+        "role": "user",
+        "content": "Compose a poem that explains the concept of recursion in programming."
+      }
+    ]
+  }'
+`.trim(),
+        Embeddings: `
+curl https://api.openai.com/v1/embeddings \
+  -H "Authorization: Bearer $OPENAI_API_KEY" \
+  -H "Content-Type: application/json" \
+  -d '{
+    "input": "The food was delicious and the waiter...",
+    "model": "text-embedding-ada-002"
+  }'
+`.trim(),
+        Images: `
+curl https://api.openai.com/v1/images/generations \
+  -H "Content-Type: application/json" \
+  -H "Authorization: Bearer $OPENAI_API_KEY" \
+  -d '{
+    "prompt": "A cute baby sea otter",
+    "n": 2,
+    "size": "1024x1024"
+  }'
+`.trim(),
+    }}
+/>
+
+The [Chat Completions](/docs/api-reference/chat/create) example highlights just one area of strength for our models: creative ability. Explaining recursion (the programming topic) in a well formatted poem is something both the best developers and best poets would struggle with. In this case, `gpt-3.5-turbo` does it effortlessly.
+
+

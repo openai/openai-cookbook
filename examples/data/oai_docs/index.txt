@@ -1,0 +1,71 @@
+
+# Developer quickstart
+
+## Get up and running with the OpenAI API
+
+
+    Looking for ChatGPT? Head to chatgpt.com.
+
+
+The OpenAI API provides a simple interface for developers to create an intelligence layer in their applications, powered by OpenAI's state of the art models. The Chat Completions endpoint powers ChatGPT and provides a simple way to take text as input and use a model like GPT-4o to generate an output.
+
+
+    <IconItem
+        icon={}
+        color="green"
+        title="Want to jump straight to the code?"
+        className="mt-6"
+    >
+        Skip the quickstart and dive into the API reference.
+    
+
+
+
+
+This quickstart is designed to help get your local development environment set up and send your first API request. If you are an experienced developer or want to just dive into using the OpenAI API, the [API reference](/docs/api-reference) of [GPT guide](/docs/guides/text-generation) are a great place to start. Throughout this quickstart, you will learn:
+
+-   How to set up your development environment
+-   How to install the latest SDKs
+-   Some of the basic concepts of the OpenAI API
+-   How to send your first API request
+
+If you run into any challenges or have questions getting started, please join our [developer forum](https://community.openai.com).
+
+## Account setup
+
+First, create an [OpenAI account](/signup) or [sign in](/login). Next, navigate to the [API key page](/account/api-keys) and "Create new secret key", optionally naming the key. Make sure to save this somewhere safe and do not share it with anyone.
+
+## Quickstart language selection
+
+Select the tool or language you want to get started using the OpenAI API with.
+
+<ContentSwitcher
+    options={[
+        {
+            value: "curl",
+            label: "curl",
+            content: ,
+        },
+        {
+            value: "python",
+            label: "Python",
+            content: ,
+        },
+        {
+            value: "node",
+            label: "Node.js",
+            content: ,
+        },
+    ]}
+    initialValue="python"
+/>
+
+## Next steps
+
+Now that you have made you first OpenAI API request, it is time to explore what else is possible:
+
+-   For more detailed information on our models and the API, see our [text generation guide](/docs/guides/text-generation).
+-   Visit the [OpenAI Cookbook](https://cookbook.openai.com/) for in-depth example API use-cases, as well as code snippets for common tasks.
+-   Wondering what OpenAI's models are capable of? Check out our library of [example prompts](/examples).
+-   Want to try the API without writing any code? Start experimenting in the [Playground](/playground).
+-   Keep our [usage policies](https://openai.com/policies/usage-policies) in mind as you start building.

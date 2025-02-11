@@ -1,0 +1,85 @@
+
+You can use the 'create and stream' helpers in the Python and Node SDKs to create a run and stream the response.
+
+<CodeSample
+    title="Create and Stream a Run"
+    defaultLanguage="python"
+    code={{
+        python: `
+from typing_extensions import override
+from openai import AssistantEventHandler
+ 
+# First, we create a EventHandler class to define
+# how we want to handle the events in the response stream.
+ 
+class EventHandler(AssistantEventHandler):    
+  @override
+  def on_text_created(self, text) -> None:
+    print(f"\\nassistant > ", end="", flush=True)
+      
+  @override
+  def on_text_delta(self, delta, snapshot):
+    print(delta.value, end="", flush=True)
+      
+  def on_tool_call_created(self, tool_call):
+    print(f"\\nassistant > {tool_call.type}\\n", flush=True)
+  
+  def on_tool_call_delta(self, delta, snapshot):
+    if delta.type == 'code_interpreter':
+      if delta.code_interpreter.input:
+        print(delta.code_interpreter.input, end="", flush=True)
+      if delta.code_interpreter.outputs:
+        print(f"\\n\\noutput >", flush=True)
+        for output in delta.code_interpreter.outputs:
+          if output.type == "logs":
+            print(f"\\n{output.logs}", flush=True)
+ 
+# Then, we use the \`stream\` SDK helper 
+# with the \`EventHandler\` class to create the Run 
+# and stream the response.
+ 
+with client.beta.threads.runs.stream(
+  thread_id=thread.id,
+  assistant_id=assistant.id,
+  instructions="Please address the user as Jane Doe. The user has a premium account.",
+  event_handler=EventHandler(),
+) as stream:
+  stream.until_done()
+`.trim(),
+        "node.js": `
+// We use the stream SDK helper to create a run with
+// streaming. The SDK provides helpful event listeners to handle 
+// the streamed response.
+ 
+const run = openai.beta.threads.runs.stream(thread.id, {
+    assistant_id: assistant.id
+  })
+    .on('textCreated', (text) => process.stdout.write('\\nassistant > '))
+    .on('textDelta', (textDelta, snapshot) => process.stdout.write(textDelta.value))
+    .on('toolCallCreated', (toolCall) => process.stdout.write(\`\\nassistant > $\{toolCall.type\}\\n\\n\`))
+    .on('toolCallDelta', (toolCallDelta, snapshot) => {
+      if (toolCallDelta.type === 'code_interpreter') {
+        if (toolCallDelta.code_interpreter.input) {
+          process.stdout.write(toolCallDelta.code_interpreter.input);
+        }
+        if (toolCallDelta.code_interpreter.outputs) {
+          process.stdout.write("\\noutput >\\n");
+          toolCallDelta.code_interpreter.outputs.forEach(output => {
+            if (output.type === "logs") {
+              process.stdout.write(\`\\n$\{output.logs\}\\n\`);
+            }
+          });
+        }
+      }
+    });
+`.trim(),
+    }}
+/>
+
+See the full list of Assistants streaming events in our API reference [here](/docs/api-reference/assistants-streaming/events). You can also see a list of SDK event listeners for these events in the [Python](https://github.com/openai/openai-python/blob/main/helpers.md#assistant-events) & [Node](https://github.com/openai/openai-node/blob/master/helpers.md#assistant-events) repository documentation.
+
+### Next
+
+1. Dive deeper into [How Assistants work](/docs/assistants/how-it-works)
+2. Learn more about [Tools](/docs/assistants/tools)
+3. Explore the [Assistants playground](/playground?mode=assistant)

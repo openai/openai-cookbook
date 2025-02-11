@@ -1,0 +1,37 @@
+{
+    "eepl.target.device": {
+        "description": "[Device]",
+        "devManId": 0,
+        "devName": "Select Target",
+        "frameWorkVerA": 0,
+        "frameWorkVerB": 22,
+        "triplet": "thumbv7m-none-none-eabi",
+        "pathToFile": "",
+        "periphInfo": {
+            "aoCount": 3,
+            "relayCount": 6,
+            "uartCount": 8,
+            "uiCount": 11,
+            "flashSize": 262144,
+            "ramSize": 65536,
+            "flashPageSize": 256,
+            "isDesktop": false,
+            "isResourcesInternal": false
+        },
+        "stdlib": "armv7m",
+        "includePaths": [],
+        "stdlibs": [],
+        "runtime": "clang_rt.builtins-armv7m"
+    },
+    "eepl.eflash.parity": "even",
+    "eepl.eflash.isSetDefauls": true,
+    "python.testing.unittestArgs": [
+        "-v",
+        "-s",
+        ".",
+        "-p",
+        "*test.py"
+    ],
+    "python.testing.pytestEnabled": false,
+    "python.testing.unittestEnabled": true
+}

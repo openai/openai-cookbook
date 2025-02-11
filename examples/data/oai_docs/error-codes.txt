@@ -1,0 +1,244 @@
+
+Error codes
+
+This guide includes an overview on error codes you might see from both the [API](/docs/introduction) and our [official Python library](/docs/libraries/python-library). Each error code mentioned in the overview has a dedicated section with further guidance.
+
+## API errors
+
+| Code                                                                              | Overview                                                                                                                                                                                                       |
+| --------------------------------------------------------------------------------- | -------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| 401 - Invalid Authentication                                                      | **Cause:** Invalid Authentication  **Solution:** Ensure the correct [API key](/account/api-keys) and requesting organization are being used.                                                             |
+| 401 - Incorrect API key provided                                                  | **Cause:** The requesting API key is not correct.  **Solution:** Ensure the API key used is correct, clear your browser cache, or [generate a new one](/account/api-keys).                               |
+| 401 - You must be a member of an organization to use the API                      | **Cause:** Your account is not part of an organization.  **Solution:** Contact us to get added to a new organization or ask your organization manager to [invite you to an organization](/account/team). |
+| 403 - Country, region, or territory not supported                                 | **Cause:** You are accessing the API from an unsupported country, region, or territory.  **Solution:** Please see [this page](/docs/supported-countries) for more information.                           |
+| 429 - Rate limit reached for requests                                             | **Cause:** You are sending requests too quickly.  **Solution:** Pace your requests. Read the [Rate limit guide](/docs/guides/rate-limits).                                                               |
+| 429 - You exceeded your current quota, please check your plan and billing details | **Cause:** You have run out of credits or hit your maximum monthly spend.  **Solution:** [Buy more credits](/account/billing) or learn how to [increase your limits](/account/limits).                   |
+| 500 - The server had an error while processing your request                       | **Cause:** Issue on our servers.  **Solution:** Retry your request after a brief wait and contact us if the issue persists. Check the [status page](https://status.openai.com/).                         |
+| 503 - The engine is currently overloaded, please try again later                  | **Cause:** Our servers are experiencing high traffic.  **Solution:** Please retry your requests after a brief wait.                                                                                      |
+
+
+This error message indicates that your authentication credentials are invalid. This could happen for several reasons, such as:
+
+-   You are using a revoked API key.
+-   You are using a different API key than the one assigned to the requesting organization or project.
+-   You are using an API key that does not have the required permissions for the endpoint you are calling.
+
+To resolve this error, please follow these steps:
+
+-   Check that you are using the correct API key and organization ID in your request header. You can find your API key and organization ID in [your account settings](/account/api-keys) or your can find specific project related keys under [General settings](/settings/organization/general) by selecting the desired project.
+-   If you are unsure whether your API key is valid, you can [generate a new one](/account/api-keys). Make sure to replace your old API key with the new one in your requests and follow our [best practices guide](https://help.openai.com/en/articles/5112595-best-practices-for-api-key-safety).
+
+
+
+
+This error message indicates that the API key you are using in your request is not correct. This could happen for several reasons, such as:
+
+-   There is a typo or an extra space in your API key.
+-   You are using an API key that belongs to a different organization or project.
+-   You are using an API key that has been deleted or deactivated.
+-   An old, revoked API key might be cached locally.
+
+To resolve this error, please follow these steps:
+
+-   Try clearing your browser's cache and cookies, then try again.
+-   Check that you are using the correct API key in your request header.
+-   If you are unsure whether your API key is correct, you can [generate a new one](/account/api-keys). Make sure to replace your old API key in your codebase and follow our [best practices guide](https://help.openai.com/en/articles/5112595-best-practices-for-api-key-safety).
+
+
+
+
+This error message indicates that your account is not part of an organization. This could happen for several reasons, such as:
+
+-   You have left or been removed from your previous organization.
+-   You have left or been removed from your previous project.
+-   Your organization has been deleted.
+
+To resolve this error, please follow these steps:
+
+-   If you have left or been removed from your previous organization, you can either request a new organization or get invited to an existing one.
+-   To request a new organization, reach out to us via help.openai.com
+-   Existing organization owners can invite you to join their organization via the [Team page](/account/team) or can create a new project from the [Settings page](settings/organization/general)
+-   If you have left or been removed from a previous project, you can ask your organization or project owner to add you to it, or create a new one.
+
+
+
+
+This error message indicates that you have hit your assigned rate limit for the API. This means that you have submitted too many tokens or requests in a short period of time and have exceeded the number of requests allowed. This could happen for several reasons, such as:
+
+-   You are using a loop or a script that makes frequent or concurrent requests.
+-   You are sharing your API key with other users or applications.
+-   You are using a free plan that has a low rate limit.
+-   You have reached the defined limit on your project
+
+To resolve this error, please follow these steps:
+
+-   Pace your requests and avoid making unnecessary or redundant calls.
+-   If you are using a loop or a script, make sure to implement a backoff mechanism or a retry logic that respects the rate limit and the response headers. You can read more about our rate limiting policy and best practices in our [rate limit guide](/docs/guides/rate-limits).
+-   If you are sharing your organization with other users, note that limits are applied per organization and not per user. It is worth checking on the usage of the rest of your team as this will contribute to the limit.
+-   If you are using a free or low-tier plan, consider upgrading to a pay-as-you-go plan that offers a higher rate limit. You can compare the restrictions of each plan in our [rate limit guide](/docs/guides/rate-limits).
+-   Reach out to your organization owner to increase the rate limits on your project
+
+
+
+
+This error message indicates that you hit your monthly [usage limit](/account/limits) for the API, or for prepaid credits customers that you've consumed all your credits. You can view your maximum usage limit on the [limits page](/account/limits). This could happen for several reasons, such as:
+
+-   You are using a high-volume or complex service that consumes a lot of credits or tokens.
+-   Your monthly budget is set too low for your organization’s usage.
+-   Your monthly budget is set too low for your project's usage.
+
+To resolve this error, please follow these steps:
+
+-   Check your [current usage](/account/usage) of your account, and compare that to your account's [limits](/account/limits).
+-   If you are on a free plan, consider [upgrading to a paid plan](/account/billing) to get higher limits.
+-   Reach out to your organization owner to increase the budgets for your project.
+
+
+
+
+This error message indicates that our servers are experiencing high traffic and are unable to process your request at the moment. This could happen for several reasons, such as:
+
+-   There is a sudden spike or surge in demand for our services.
+-   There is scheduled or unscheduled maintenance or update on our servers.
+-   There is an unexpected or unavoidable outage or incident on our servers.
+
+To resolve this error, please follow these steps:
+
+-   Retry your request after a brief wait. We recommend using an exponential backoff strategy or a retry logic that respects the response headers and the rate limit. You can read more about our rate limit [best practices](https://help.openai.com/en/articles/6891753-rate-limit-advice).
+-   Check our [status page](https://status.openai.com/) for any updates or announcements regarding our services and servers.
+-   If you are still getting this error after a reasonable amount of time, please contact us for further assistance. We apologize for any inconvenience and appreciate your patience and understanding.
+
+
+
+## Python library error types
+
+| Type                     | Overview                                                                                                                                                                                                                                                                                                                                                                                                                             |
+| ------------------------ | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------ |
+| APIConnectionError       | **Cause:** Issue connecting to our services.  **Solution:** Check your network settings, proxy configuration, SSL certificates, or firewall rules.                                                                                                                                                                                                                                                                             |
+| APITimeoutError          | **Cause:** Request timed out.  **Solution:** Retry your request after a brief wait and contact us if the issue persists.                                                                                                                                                                                                                                                                                                       |
+| AuthenticationError      | **Cause:** Your API key or token was invalid, expired, or revoked.  **Solution:** Check your API key or token and make sure it is correct and active. You may need to generate a new one from your account dashboard.                                                                                                                                                                                                          |
+| BadRequestError          | **Cause:** Your request was malformed or missing some required parameters, such as a token or an input.  **Solution:** The error message should advise you on the specific error made. Check the [documentation](/docs/api-reference/) for the specific API method you are calling and make sure you are sending valid and complete parameters. You may also need to check the encoding, format, or size of your request data. |
+| ConflictError            | **Cause:** The resource was updated by another request.  **Solution:** Try to update the resource again and ensure no other requests are trying to update it.                                                                                                                                                                                                                                                                  |
+| InternalServerError      | **Cause:** Issue on our side.  **Solution:** Retry your request after a brief wait and contact us if the issue persists.                                                                                                                                                                                                                                                                                                       |
+| NotFoundError            | **Cause:** Requested resource does not exist.  **Solution:** Ensure you are the correct resource identifier.                                                                                                                                                                                                                                                                                                                   |
+| PermissionDeniedError    | **Cause:** You don't have access to the requested resource.  **Solution:** Ensure you are using the correct API key, organization ID, and resource ID.                                                                                                                                                                                                                                                                         |
+| RateLimitError           | **Cause:** You have hit your assigned rate limit.  **Solution:** Pace your requests. Read more in our [Rate limit guide](/docs/guides/rate-limits).                                                                                                                                                                                                                                                                            |
+| UnprocessableEntityError | **Cause:** Unable to process the request despite the format being correct.  **Solution:** Please try the request again.                                                                                                                                                                                                                                                                                                        |
+
+
+An `APIConnectionError` indicates that your request could not reach our servers or establish a secure connection. This could be due to a network issue, a proxy configuration, an SSL certificate, or a firewall rule.
+
+If you encounter an `APIConnectionError`, please try the following steps:
+
+-   Check your network settings and make sure you have a stable and fast internet connection. You may need to switch to a different network, use a wired connection, or reduce the number of devices or applications using your bandwidth.
+-   Check your proxy configuration and make sure it is compatible with our services. You may need to update your proxy settings, use a different proxy, or bypass the proxy altogether.
+-   Check your SSL certificates and make sure they are valid and up-to-date. You may need to install or renew your certificates, use a different certificate authority, or disable SSL verification.
+-   Check your firewall rules and make sure they are not blocking or filtering our services. You may need to modify your firewall settings.
+-   If appropriate, check that your container has the correct permissions to send and receive traffic.
+-   If the issue persists, check out our persistent errors next steps section.
+
+
+
+
+A `APITimeoutError` error indicates that your request took too long to complete and our server closed the connection. This could be due to a network issue, a heavy load on our services, or a complex request that requires more processing time.
+
+If you encounter a `APITimeoutError` error, please try the following steps:
+
+-   Wait a few seconds and retry your request. Sometimes, the network congestion or the load on our services may be reduced and your request may succeed on the second attempt.
+-   Check your network settings and make sure you have a stable and fast internet connection. You may need to switch to a different network, use a wired connection, or reduce the number of devices or applications using your bandwidth.
+-   If the issue persists, check out our persistent errors next steps section.
+
+
+
+
+An `AuthenticationError` indicates that your API key or token was invalid, expired, or revoked. This could be due to a typo, a formatting error, or a security breach.
+
+If you encounter an `AuthenticationError`, please try the following steps:
+
+-   Check your API key or token and make sure it is correct and active. You may need to generate a new key from the API Key dashboard, ensure there are no extra spaces or characters, or use a different key or token if you have multiple ones.
+-   Ensure that you have followed the correct formatting.
+
+
+
+
+
+An `BadRequestError` (formerly `InvalidRequestError`) indicates that your request was malformed or missing some required parameters, such as a token or an input. This could be due to a typo, a formatting error, or a logic error in your code.
+
+If you encounter an `BadRequestError`, please try the following steps:
+
+-   Read the error message carefully and identify the specific error made. The error message should advise you on what parameter was invalid or missing, and what value or format was expected.
+-   Check the [API Reference](/docs/api-reference/) for the specific API method you were calling and make sure you are sending valid and complete parameters. You may need to review the parameter names, types, values, and formats, and ensure they match the documentation.
+-   Check the encoding, format, or size of your request data and make sure they are compatible with our services. You may need to encode your data in UTF-8, format your data in JSON, or compress your data if it is too large.
+-   Test your request using a tool like Postman or curl and make sure it works as expected. You may need to debug your code and fix any errors or inconsistencies in your request logic.
+-   If the issue persists, check out our persistent errors next steps section.
+
+
+
+
+An `InternalServerError` indicates that something went wrong on our side when processing your request. This could be due to a temporary error, a bug, or a system outage.
+
+We apologize for any inconvenience and we are working hard to resolve any issues as soon as possible. You can [check our system status page](https://status.openai.com/) for more information.
+
+If you encounter an `InternalServerError`, please try the following steps:
+
+-   Wait a few seconds and retry your request. Sometimes, the issue may be resolved quickly and your request may succeed on the second attempt.
+-   Check our status page for any ongoing incidents or maintenance that may affect our services. If there is an active incident, please follow the updates and wait until it is resolved before retrying your request.
+-   If the issue persists, check out our Persistent errors next steps section.
+
+Our support team will investigate the issue and get back to you as soon as possible. Note that our support queue times may be long due to high demand. You can also [post in our Community Forum](https://community.openai.com) but be sure to omit any sensitive information.
+
+
+
+
+A `RateLimitError` indicates that you have hit your assigned rate limit. This means that you have sent too many tokens or requests in a given period of time, and our services have temporarily blocked you from sending more.
+
+We impose rate limits to ensure fair and efficient use of our resources and to prevent abuse or overload of our services.
+
+If you encounter a `RateLimitError`, please try the following steps:
+
+-   Send fewer tokens or requests or slow down. You may need to reduce the frequency or volume of your requests, batch your tokens, or implement exponential backoff. You can read our [Rate limit guide](/docs/guides/rate-limits) for more details.
+-   Wait until your rate limit resets (one minute) and retry your request. The error message should give you a sense of your usage rate and permitted usage.
+-   You can also check your API usage statistics from your account dashboard.
+
+
+
+### Persistent errors
+
+If the issue persists, [contact our support team via chat](https://help.openai.com/en/) and provide them with the following information:
+
+-   The model you were using
+-   The error message and code you received
+-   The request data and headers you sent
+-   The timestamp and timezone of your request
+-   Any other relevant details that may help us diagnose the issue
+
+Our support team will investigate the issue and get back to you as soon as possible. Note that our support queue times may be long due to high demand. You can also [post in our Community Forum](https://community.openai.com) but be sure to omit any sensitive information.
+
+### Handling errors
+
+We advise you to programmatically handle errors returned by the API. To do so, you may want to use a code snippet like below:
+
+```python
+import openai
+from openai import OpenAI
+client = OpenAI()
+
+try:
+  #Make your OpenAI API request here
+  response = client.completions.create(
+    prompt="Hello world",
+    model="gpt-3.5-turbo-instruct"
+  )
+except openai.APIError as e:
+  #Handle API error here, e.g. retry or log
+  print(f"OpenAI API returned an API Error: {e}")
+  pass
+except openai.APIConnectionError as e:
+  #Handle connection error here
+  print(f"Failed to connect to OpenAI API: {e}")
+  pass
+except openai.RateLimitError as e:
+  #Handle rate limit error (we recommend using exponential backoff)
+  print(f"OpenAI API request exceeded rate limit: {e}")
+  pass
+```

@@ -1,0 +1,93 @@
+policy,content
+"Delete Payment Method","How do I delete my payment method?
+Updated over a week ago
+We keep your payment method on file to cover any outstanding charges on your account. To stop charges to your payment method, please follow the steps below.
+
+## ChatGPT 
+You can cancel your ChatGPT Plus subscription to stop further charges at any time:  
+Click on 'My Plan' in the ChatGPT sidebar. 
+Click on 'Manage my subscription' in the pop-up window.
+Select 'Cancel Plan'. 
+Please note that your cancellation will take effect the day after the next billing date, and you can continue using our services until then. To avoid being charged for your next billing period, please cancel your subscription at least 24 hours before your next billing date. 
+
+## API
+We'll need to keep a payment method on file to account for any outstanding usage costs. You're welcome to cancel your pay-as-you-go service, by clicking 'Cancel paid account' in your billing overview. After the current month's invoice has been issued, the current card will no longer be charged. 
+If you'd like to continue using the service, add a new payment method in the billing overview page and select 'Set as default'. You'll then be able to delete the old payment method.
+"
+"Business Associate Agreement","How can I get a Business Associate Agreement (BAA) with OpenAI?
+Information about HIPAA compliance for healthcare companies
+
+The Health Insurance Portability and Accountability Act (HIPAA) is a U.S. federal law that requires privacy and security protections for protected health information (PHI). Our API platform can be a great fit for any covered entity or business associate looking to process protected health information, and we’d be happy to assist you in fulfilling your HIPAA compliance. To use our API platform, you’ll first need a BAA with OpenAI.
+
+
+How do I get started?
+If you require a BAA before you can use our API, email us at baa@openai.com with details about your company and use case.
+
+Our team will respond within 1-2 business days. We review each BAA request on a case-by-case basis and may need additional information. The process is usually completed within a few business days.
+
+
+Can I get a BAA for ChatGPT?
+If you're interested in exploring a BAA for ChatGPT Enterprise, please contact sales.
+ 
+
+What happens if I’m not approved?
+We are able to approve most customers that request BAAs, but occasionally a use case doesn’t pass our team's evaluation. In that case, we’ll give feedback and context as to why that is and give you the opportunity to update your intended use of our API and re-apply.
+
+ 
+Are all API services covered by the BAA?
+No, only endpoints that are eligible for zero retention are covered by the BAA. You can see a list of those endpoints. 
+
+ 
+Is an enterprise agreement requirement to sign a BAA?
+No, an enterprise agreement is not required to sign a BAA.
+"
+"Set up prepaid billing","How can I set up prepaid billing?
+
+How it works
+Prepaid billing allows API users to pre-purchase usage. The credits you've bought will be applied to your monthly invoice. This means that any API usage you incur will first be deducted from the prepaid credits. If your usage exceeds the credits you've purchased, you'll then be billed for the additional amount.
+Prepaid billing helps developers know what they are committing to upfront which can provide more predictability for budgeting and spend management. 
+
+
+Setting up prepaid billing
+If you're on a Monthly Billing plan, you may also choose to switch to prepaid billing and purchase credits upfront for API usage. 
+- Go to your billing overview in your account settings
+- Click ""Start payment plan"" (you may see variations like ""Buy credits"")
+    Note: If you previously had an arrears billing plan, you'll need to cancel this existing payment plan first.
+- Choose the initial amount of credits you want to purchase. The minimum purchase is $5. The maximum purchase will be based on your trust tier.
+- Confirm and purchase your initial amount of credits.
+- Use auto-recharge to set an automatic recharge amount, which is the amount of credits that will be added to your account when your balance falls below a set threshold.
+
+Please note that any purchased credits will expire after 1 year and they are non-refundable. 
+After you’ve purchased credits, you should be able to start using the API. Note that there may be a couple minutes of delay while our systems update to reflect your credit balance.
+
+
+Purchasing additional credits
+Once you’ve consumed all your credits, your API requests will start returning an error letting you know you’ve hit your billing quota. If you’d like to continue your API usage, you can return to the billing portal and use the “Add to balance” button to purchase additional credits.
+
+ 
+Delayed billing
+Due to the complexity of our billing and processing systems, there may be delays in our ability to cut off access after you consume all of your credits. This excess usage may appear as a negative credit balance in your billing dashboard, and will be deducted from your next credit purchase.
+"
+"VAT Exemption request","How do I submit a VAT exemption request?
+Updated over a week ago
+If you are eligible for a tax exemption and would like to apply it to your account, please follow these steps: 
+
+Depending on the state and if required: 
+1. Obtain a current tax exemption certificate from your state or local government and/or your fully completed non-profit sales tax exemption forms. The certificate/forms should include: 
+    Your name and address
+    Tax exemption number
+    Signatures and dates, etc. 
+2. Send us a copy of your certificate using the chat widget in the bottom-right corner. Please include your organization id, invoice number or email address associated with the account, so we can easily find you. Instructions on how to find these items are below.
+
+3. Once we receive your certificate/form, we will review it and apply the tax exemption to your account. You will receive a confirmation email once the exemption has been applied. 
+
+Please note that the tax exemption will only apply to future purchases. We cannot apply VAT exemptions retroactively.
+
+ 
+
+Where to find your account data
+In order to submit a Value Added Tax ('VAT') exemption request you will need the following from your organization Billing preferences:
+    1. Company name
+    2. Billing email
+    3. Primary business address
+    4. Business tax ID"

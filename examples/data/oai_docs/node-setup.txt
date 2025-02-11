@@ -1,0 +1,128 @@
+
+Node.js is a popular JavaScript framework that is commonly used for web development. OpenAI provides a custom [Node.js / TypeScript library](https://github.com/openai/openai-node) which makes working with the OpenAI API in JavaScript simple and efficient.
+
+## Step 1: Setting up Node
+
+
+
+To use the OpenAI Node.js library, you will need to ensure you have Node.js installed.
+
+To download Node.js, head to the [official Node website](https://nodejs.org/en/download) and download the most recent version marked "LTS" (Long Term Support). If you are installing Node.js for the first time, you can follow the [official Node.js usage guide](https://nodejs.org/api/synopsis.html#usage) to get started.
+
+
+
+
+
+Once you have Node.js installed, the OpenAI Node.js library can be installed. From the terminal / command line, run:
+
+```
+npm install --save openai
+# or
+yarn add openai
+```
+
+
+
+## Step 2: Set up your API key
+
+
+
+The main advantage to making your API key accessible for all projects is that our SDK will automatically detect it and use it without having to write any code.
+
+
+
+1. **Open Terminal**: You can find it in the Applications folder or search for it using Spotlight (Command + Space).
+2. **Edit bash profile**: Use the command `nano ~/.bash_profile` or `nano ~/.zshrc` (for newer MacOS versions) to open the profile file in a text editor.
+
+3. **Add Environment Variable**: In the editor, ensure you have set your API key as shown below, replacing `your-api-key-here` with your actual API key:
+
+```
+export OPENAI_API_KEY='your-api-key-here'
+```
+
+4. **Save and exit**: Press Ctrl+O to write the changes, followed by Ctrl+X to close the editor.
+
+5. **Load your profile**: Use the command `source ~/.bash_profile` or `source ~/.zshrc` to load the updated profile.
+
+6. **Verification**: Verify the setup by typing `echo $OPENAI_API_KEY` in the terminal. It should display your API key.
+
+
+
+
+
+1. **Open command prompt**: You can find it by searching "cmd" in the start menu.
+
+2. **Set environment variable in the current session**: To set the environment variable in the current session, use the command below, replacing `your-api-key-here` with your actual API key:
+
+```
+setx OPENAI_API_KEY "your-api-key-here"
+```
+
+    This command will set the OPENAI_API_KEY environment variable for the current session.
+
+3. **Permanent setup**: To make the setup permanent, add the variable through the system properties as follows:
+
+    - Right-click on 'This PC' or 'My Computer' and select 'Properties'.
+    - Click on 'Advanced system settings'.
+    - Click the 'Environment Variables' button.
+    - In the 'System variables' section, click 'New...' and enter OPENAI_API_KEY as the variable name and your API key as the variable value.
+
+4. **Verification**: To verify the setup, reopen the command prompt and type the command below. It should display your API key:
+   `echo %OPENAI_API_KEY%`
+
+
+
+
+
+## Step 3: Sending your first API request
+
+
+
+After you have Node.js configured and set up an API key, the final step is to send a request to the OpenAI API using the Node.js library. To do this, create a file named `openai-test.js` using the terminal or an IDE.
+
+Inside the file, copy and paste one of the examples below:
+
+<CodeSample
+    defaultLanguage="ChatCompletions"
+    code={{
+        ChatCompletions: `
+import OpenAI from "openai";\n
+const openai = new OpenAI();\n
+async function main() {
+  const completion = await openai.chat.completions.create({
+    messages: [{ role: "system", content: "You are a helpful assistant." }],
+    model: "gpt-3.5-turbo",
+  });\n
+  console.log(completion.choices[0]);
+}\n
+main();
+`.trim(),
+        Embeddings: `
+import OpenAI from "openai";\n
+const openai = new OpenAI();\n
+async function main() {
+  const embedding = await openai.embeddings.create({
+    model: "text-embedding-ada-002",
+    input: "The quick brown fox jumped over the lazy dog",
+  });\n
+  console.log(embedding);
+}\n
+main();
+`.trim(),
+        Images: `
+import OpenAI from "openai";\n
+const openai = new OpenAI();\n
+async function main() {
+  const image = await openai.images.generate({ prompt: "A cute baby sea otter" });\n
+  console.log(image.data);
+}
+main();
+`.trim(),
+    }}
+/>
+
+To run the code, enter `node openai-test.js` into the terminal / command line.
+
+The [Chat Completions](/docs/api-reference/chat/create) example highlights just one area of strength for our models: creative ability. Explaining recursion (the programming topic) in a well formatted poem is something both the best developers and best poets would struggle with. In this case, `gpt-3.5-turbo` does it effortlessly.
+
+

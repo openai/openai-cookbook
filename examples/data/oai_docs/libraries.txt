@@ -119,6 +119,7 @@ Please note that OpenAI does not verify the correctness or security of these pro
 
 ### Dart/Flutter
 
+-   [openai](https://pub.dev/packages/openai_dart) by [davidmigloz](https://github.com/davidmigloz)
 -   [openai](https://github.com/anasfik/openai) by [anasfik](https://github.com/anasfik)
 
 ### Delphi

@@ -4,6 +4,14 @@
 # should build pages for, and indicates metadata such as tags, creation date and
 # authors for each page.
 
+- title: Example of AI software development workflow
+  path: examples/End_2_end_ai_sw_dev_workflow.ipynb
+  date: 2024-12-11
+  authors:
+    - unbedded
+  tags:
+    - completions
+
 - title: Using logprobs
   path: examples/Using_logprobs.ipynb
   date: 2023-12-20

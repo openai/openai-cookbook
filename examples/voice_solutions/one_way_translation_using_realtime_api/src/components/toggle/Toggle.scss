@@ -1,0 +1,58 @@
+[data-component='Toggle'] {
+  position: relative;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  margin: 0 auto;
+  gap: 8px;
+  cursor: pointer;
+  overflow: hidden;
+  width: 142px;
+
+  background-color: #ffffff;
+  height: 40px;
+  border-radius: 1000px;
+
+  &:hover {
+    background-color: #d8d8d8;
+  }
+
+  div.label {
+    position: relative;
+    color: #666;
+    transition: color 0.1s ease-in-out;
+    padding: 0px 16px;
+    z-index: 2;
+    user-select: none;
+  }
+
+  div.label.right {
+    margin-left: -8px;
+  }
+
+  .toggle-background {
+    background-color: gray;
+    position: absolute;
+    top: 0px;
+    left: 0px;
+    width: auto;
+    bottom: 0px;
+    z-index: 1;
+    border-radius: 1000px;
+    transition: left 0.1s ease-in-out, width 0.1s ease-in-out;
+  }
+
+  &[data-enabled='true'] {
+    justify-content: center;
+    div.label.right {
+      color: #fff;
+    }
+  }
+
+  &[data-enabled='false'] {
+    justify-content: center;
+    div.label.left {
+      color: #fff;
+    }
+  }
+}

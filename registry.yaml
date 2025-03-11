@@ -1826,3 +1826,4 @@
     - pap-openai
   tags:
     - responses
+    - functions

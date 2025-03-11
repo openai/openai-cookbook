@@ -1808,3 +1808,11 @@
     - msingh-openai
   tags:
     - completions
+
+- title: Doing RAG on PDFs using File Search in the Responses API
+  path: examples/File_Search_Responses.ipynb
+  date: 2025-11-03
+  authors:
+    - pap-openai
+  tags:
+    - responses

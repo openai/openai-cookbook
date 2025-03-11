@@ -9,7 +9,7 @@
   path: examples/responses_api/responses_example.ipynb
   date: 2025-03-11
   authors:
-    - billchen
+    - billchen-openai
   tags:
     - responses
     - web-search

@@ -9,10 +9,11 @@
   path: examples/responses_api/responses_example.ipynb
   date: 2025-03-11
   authors:
-    - billchen
+    - billchen-openai
   tags:
     - responses
     - web-search
+    - functions
 
 - title: Using logprobs
   path: examples/Using_logprobs.ipynb
@@ -1818,3 +1819,12 @@
     - msingh-openai
   tags:
     - completions
+
+- title: Doing RAG on PDFs using File Search in the Responses API
+  path: examples/File_Search_Responses.ipynb
+  date: 2025-03-11
+  authors:
+    - pap-openai
+  tags:
+    - responses
+    - functions

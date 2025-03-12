@@ -3,6 +3,11 @@
 # You can optionally customize how your information shows up cookbook.openai.com over here.
 # If your information is not present here, it will be pulled from your GitHub profile.
 
+billchen-openai:
+  name: "Bill Chen"
+  website: "https://www.linkedin.com/in/billchen99/"
+  avatar: "https://avatars.githubusercontent.com/u/198814448?v=4"
+
 0hq:
   name: "Will Depue"
   website: "http://depue.design"
@@ -242,3 +247,8 @@ MikeHeaton:
   name: "Mike Heaton"
   website: "https://github.com/MikeHeaton"
   avatar: "https://avatars.githubusercontent.com/u/11911723?v=4"
+
+thli-openai:
+  name: "Thomas Li"
+  website: "https://www.linkedin.com/in/thli/"
+  avatar: "https://avatars.githubusercontent.com/u/189043632?v=4"

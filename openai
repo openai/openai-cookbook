@@ -1,0 +1,4 @@
+curl https://api.openai.com/v1/models \
+  -H "Authorization: Bearer $OPENAI_API_KEY" \
+    -H "OpenAI-Organization: org-1cae2teLXv6O9IGon14YT50s" \
+      -H "OpenAI-Project: $PROJECT_ID"

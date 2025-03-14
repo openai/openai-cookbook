@@ -1828,3 +1828,13 @@
   tags:
     - responses
     - functions
+- title: AI-Powered Currency Conversion and Arithmetic with PydanticAI-agents and Openai-llm 
+  path: examples/third_party/PydanticAI_Agents_Tools_OpenAI.ipynb 
+  date: 2025-03-14 
+  authors: - 05satyam 
+  tags: 
+    - pydantic 
+    - functions 
+    - tools 
+    - agents 
+    - openai

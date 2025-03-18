@@ -47,7 +47,7 @@ This project demonstrates how to use the [OpenAI Realtime API](https://platform.
    In another terminal window, navigate to the project directory and run:
 
    ```bash
-   node mirror-server/mirror-server.cjs
+   node mirror-server/mirror-server.mjs
    ```
 
 ### Adding a New Language

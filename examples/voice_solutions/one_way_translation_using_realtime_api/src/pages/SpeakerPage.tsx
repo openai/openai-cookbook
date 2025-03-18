@@ -2,7 +2,6 @@ import React, { useRef, useEffect, useState, useCallback } from 'react';
 import { RealtimeClient } from '@openai/realtime-api-beta';
 import { Button } from '../components/button/Button';
 import { Toggle } from '../components/toggle/Toggle';
-import { ItemType } from '@openai/realtime-api-beta/dist/lib/client.js';
 import { french_instructions, spanish_instructions, tagalog_instructions, english_instructions, mandarin_instructions } from '../utils/translation_prompts.js';
 import { WavRecorder } from '../lib/wavtools/index.js';
 import './Styles.scss';
@@ -10,7 +9,7 @@ import { io, Socket } from 'socket.io-client';
 
 export const OPENAI_API_KEY = process.env.REACT_APP_OPENAI_API_KEY;
 
-export const DEFAULT_REALTIME_MODEL = "gpt-4o-realtime-preview-2024-12-17";
+export const DEFAULT_REALTIME_MODEL = "gpt-4o-realtime-preview-latest";
 export const DEFAULT_REALTIME_VOICE = "coral";
 interface RealtimeEvent {
   time: string;

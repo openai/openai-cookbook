@@ -4,6 +4,15 @@
 # should build pages for, and indicates metadata such as tags, creation date and
 # authors for each page.
 
+- title: Automating Dispute Management with Agents SDK and Stripe API
+  path: examples/agents_sdk/dispute_agent.ipynb
+  date: 2025-03-17
+  authors:
+    - danbell-openai
+  tags:
+    - responses
+    - agents-sdk
+    - functions
 
 - title: Web Search and States with Responses API
   path: examples/responses_api/responses_example.ipynb

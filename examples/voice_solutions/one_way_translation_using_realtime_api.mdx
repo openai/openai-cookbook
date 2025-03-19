@@ -1,8 +1,10 @@
-# Multi-Langugage Translation with the Realtime API
+# Multi-Language Conversational Translation with the Realtime API
 
 One of the most exciting things about the Realtime API is that the emotion, tone and pace of speech are all passed to the model for inference. Traditional cascaded voice systems (involving STT and TTS) introduce an intermediate transcription step, relying on SSML or prompting to approximate prosody, which inherently loses fidelity. The speaker's expressiveness is literally lost in translation. Because it can process raw audio, the Realtime API preserves those audio attributes through inference, minimizing latency and enriching responses with tonal and inflectional cues. Because of this, the Realtime API makes LLM-powered speech translation closer to a live interpreter than ever before. 
 
-This cookbook demonstrates how to use OpenAI's [ Realtime API](https://platform.openai.com/docs/guides/realtime) to build a multi-lingual, one-way translation application with WebSockets. The goal is to demonstrate a broadcast scenario where listeners can subscribe to a speaker via a translated audio stream in their chosen language. It is implemented using the [Realtime + WebSockets integration](https://platform.openai.com/docs/guides/realtime-websocket) and a WebSocket server to mirror the translated audio to a listener application. 
+This cookbook demonstrates how to use OpenAI's [ Realtime API](https://platform.openai.com/docs/guides/realtime) to build a multi-lingual, one-way translation workflow with WebSockets. It is implemented using the [Realtime + WebSockets integration](https://platform.openai.com/docs/guides/realtime-websocket) in a speaker application and a WebSocket server to mirror the translated audio to a listener application. 
+
+A real-world use case for this demo is a multilingual, conversational translation where a speaker talks into the speaker app and listeners hear translations in their selected native language via the listener app. Imagine a conference room with a speaker talking in English and a participant with headphones in choosing to listen to a Tagalog translation. Due to the current turn-based nature of audio models, the speaker must pause briefly to allow the model to process and translate speech. However, as models become faster and more efficient, this latency will decrease significantly and the translation will become more seamless.
 
 
 Let's explore the main functionalities and code snippets that illustrate how the app works. You can find the code in the [accompanying repo](https://github.com/openai/openai-cookbook/tree/main/examples/voice_solutions/one_way_translation_using_realtime_api/README.md
@@ -10,11 +12,11 @@ Let's explore the main functionalities and code snippets that illustrate how the
 
 ### High Level Architecture Overview
 
-This project has a speaker and listener page. The speaker app takes in audio from the browser, forks the audio and creates a unique Realtime session for each language and sends it to the OpenAI Realtime API via WebSocket. Translated audio streams back and is mirrored via a separate WebSocket server to the listener app. The listener app receives all translated audio streams simultaneously, but only the selected language is played. This architecture is designed for a POC and is not intended for a production use case. Let's dive into the workflow!
+This project has two applications - a speaker and listener app. The speaker app takes in audio from the browser, forks the audio and creates a unique Realtime session for each language and sends it to the OpenAI Realtime API via WebSocket. Translated audio streams back and is mirrored via a separate WebSocket server to the listener app. The listener app receives all translated audio streams simultaneously, but only the selected language is played. This architecture is designed for a POC and is not intended for a production use case. Let's dive into the workflow!
 
 ![Architecture](translation_images/Realtime_flow_diagram.png)
 
-### Language & Prompt Setup
+### Step 1: Language & Prompt Setup
 
 We need a unique stream for each language - each language requires a unique prompt and session with the Realtime API. We define these prompts in  `translation_prompts.js`.
 
@@ -33,7 +35,7 @@ const languageConfigs = [
 ];
 ```
 
-## Speaker App 
+## Step 2: Setting up the Speaker App 
 
 ![SpeakerApp](translation_images/SpeakerApp.png) 
 
@@ -92,7 +94,7 @@ const connectConversation = useCallback(async () => {
   };
 ```
 
-### Audio Streaming
+### Step 3: Audio Streaming 
 
 Sending audio with WebSockets requires work to manage the inbound and outbound PCM16 audio streams ([more details on that](https://platform.openai.com/docs/guides/realtime-model-capabilities#handling-audio-with-websockets)). We abstract that using wavtools, a library for both recording and streaming audio data in the browser. Here we use `WavRecorder` for capturing audio in the browser.
 
@@ -112,11 +114,13 @@ const startRecording = async () => {
   };
   ```
 
-### Transcripts
+### Step 4: Showing Transcripts
 
 We listen for `response.audio_transcript.done` events to update the transcripts of the audio. These input transcripts are generated by the Whisper model in parallel to the GPT-4o Realtime inference that is doing the translations on raw audio. 
 
-## Listener App
+We have a Realtime session running simultaneously for every selectable language and so we get transcriptions for every language (regardless of what language is selected in the listener application). Those can be shown by toggling the 'Show Transcripts' button. 
+
+## Step 5: Setting up the Listener App
 
 Listeners can choose from a dropdown menu of translation streams and after connecting, dynamically change languages. The demo application uses French, Spanish, Tagalog, English, and Mandarin but OpenAI supports 57+ languages.
 
@@ -148,10 +152,10 @@ The key function here is `connectServer` that connects to the server and sets up
 
 ### POC to Production
 
-This is a demo and meant for inspiration. We are using WebSockets here as they are easy to set up for local development. However, in a production environment we’d suggest using WebRTC (which is much better for streaming audio quality and lower latency) and connecting to the Realtime API with an [ephemeral API key](https://platform.openai.com/docs/api-reference/realtime-sessions) generated via the OpenAI REST API. 
+This is a demo and meant for inspiration. We are using WebSockets here for easy local development. However, in a production environment we’d suggest using WebRTC (which is much better for streaming audio quality and lower latency) and connecting to the Realtime API with an [ephemeral API key](https://platform.openai.com/docs/api-reference/realtime-sessions) generated via the OpenAI REST API. 
 
-Current Realtime models are turn based - this is best for conversational use cases as opposed to the uninterrupted, UN-style live translation that we really want for a one-directional streaming use case. For this demo, we can capture additional audio from the speaker app as soon as the model returns translated audio (i.e. capturing more input audio while the translated audio played from the listener app), but there is a limit to the length of audio we can capture at a time. 
+Current Realtime models are turn based - this is best for conversational use cases as opposed to the uninterrupted, UN-style live translation that we really want for a one-directional streaming use case. For this demo, we can capture additional audio from the speaker app as soon as the model returns translated audio (i.e. capturing more input audio while the translated audio played from the listener app), but there is a limit to the length of audio we can capture at a time. The speaker needs to pause to let the translation catch up. 
 
 ## Conclusion
 
-In summary, this POC is a demonstration of a one-way translation use of the Realtime API but the idea of forking audio for multiple uses can expand beyond translation. Other workflows might be simultaneous sentiment analysis, live guardrails or generating subtitles.
+In summary, this POC is a demonstration of a one-way translation use of the Realtime API but the idea of forking audio for multiple uses can expand beyond translation. Other workflows might be simultaneous sentiment analysis, live guardrails or generating subtitles. 

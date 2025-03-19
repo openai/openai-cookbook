@@ -192,7 +192,15 @@ body {
   justify-content: center;
   align-items: center;
   flex-direction: column;
+  width: 70%;
+}
+
+
+.transcript-box {
   width: 100%;
-  // margin-top: 20px;
+  background-color: #f0f0f0;
+  border-radius: 8px;
+  padding: 8px;
+  margin: 4px 0;
 }
 

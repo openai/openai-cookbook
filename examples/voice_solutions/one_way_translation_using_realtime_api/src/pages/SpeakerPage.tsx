@@ -9,7 +9,7 @@ import { io, Socket } from 'socket.io-client';
 
 export const OPENAI_API_KEY = process.env.REACT_APP_OPENAI_API_KEY;
 
-export const DEFAULT_REALTIME_MODEL = "gpt-4o-realtime-preview-latest";
+export const DEFAULT_REALTIME_MODEL = "gpt-4o-realtime-preview-2024-12-17";
 export const DEFAULT_REALTIME_VOICE = "coral";
 interface RealtimeEvent {
   time: string;
@@ -27,13 +27,22 @@ const languageConfigs = [
   { code: 'zh', instructions: mandarin_instructions },
 ];
 
+// Map language codes to full names
+const languageNames: Record<string, string> = {
+  fr: 'French',
+  es: 'Spanish',
+  tl: 'Tagalog',
+  en: 'English',
+  zh: 'Mandarin',
+};
+
 // SpeakerPage component handles real-time audio recording and streaming for multiple languages
 export function SpeakerPage() {
   const [realtimeEvents, setRealtimeEvents] = useState<RealtimeEvent[]>([]);
   const [isConnected, setIsConnected] = useState(false);
   const [isRecording, setIsRecording] = useState(false);
   const [canPushToTalk, setCanPushToTalk] = useState(true);
-  const [transcripts, setTranscripts] = useState<string[]>([]);
+  const [transcripts, setTranscripts] = useState<{ transcript: string; language: string }[]>([]);
   const [showTranscripts, setShowTranscripts] = useState<boolean>(false);
   const [isLoading, setIsLoading] = useState(false);
 
@@ -176,7 +185,7 @@ export function SpeakerPage() {
         input_audio_transcription: { model: 'whisper-1' },
       });
 
-      client.on('realtime.event', handleRealtimeEvent);
+      client.on('realtime.event', (ev: RealtimeEvent) => handleRealtimeEvent(ev, code));
       client.on('error', (err: any) => console.error(`${code} client error:`, err));
 
       client.on('conversation.updated', ({ delta }: any) => {
@@ -196,12 +205,12 @@ export function SpeakerPage() {
     };
   }, [french_instructions, spanish_instructions, tagalog_instructions, english_instructions, mandarin_instructions]);
 
-  const handleRealtimeEvent = (ev: RealtimeEvent) => {
-      // Check if the event type is a completed audio transcript
+  const handleRealtimeEvent = (ev: RealtimeEvent, languageCode: string) => {
+    // Check if the event type is a completed audio transcript
     if (ev.event.type == "response.audio_transcript.done") {
       console.log(ev.event.transcript);
-          // Update the transcripts state by adding the new transcript
-      setTranscripts((prev) => [ev.event.transcript, ...prev]);
+      // Update the transcripts state by adding the new transcript with language code
+      setTranscripts((prev) => [{ transcript: ev.event.transcript, language: languageCode }, ...prev]);
     }
 
     setRealtimeEvents((prev) => {
@@ -260,11 +269,18 @@ export function SpeakerPage() {
       <div className="transcript-list">
         <Button label={showTranscripts ? 'Hide Transcripts' : 'Show Transcripts'} onClick={toggleTranscriptsVisibility} />
         {showTranscripts && (
-          <ul>
-            {transcripts.map((transcript, index) => (
-              <li key={index}>{transcript}</li>
-            ))}
-          </ul>
+          <table>
+            <tbody>
+              {transcripts.map(({ transcript, language }, index) => (
+                <tr key={index}>
+                  <td>{languageNames[language]}</td>
+                  <td>
+                    <div className="transcript-box">{transcript}</div>
+                  </td>
+                </tr>
+              ))}
+            </tbody>
+          </table>
         )}
       </div>
     </div>

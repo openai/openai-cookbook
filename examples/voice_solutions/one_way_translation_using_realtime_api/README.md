@@ -1,6 +1,6 @@
 # Translation Demo
 
-This project demonstrates how to use the [OpenAI Realtime API](https://platform.openai.com/docs/guides/realtime) to build a one-way translation application with websockets. It is implemented using the [Realtime + Websockets integration](https://platform.openai.com/docs/guides/realtime-websocket).
+This project demonstrates how to use the [OpenAI Realtime API](https://platform.openai.com/docs/guides/realtime) to build a one-way translation application with websockets. It is implemented using the [Realtime + Websockets integration](https://platform.openai.com/docs/guides/realtime-websocket). A real-world use case for this demo is multilingual, conversational translation—where a speaker talks into the speaker app and listeners hear translations in their selected native languages via the listener app. Imagine a conference room with multiple participants with headphones, listening live to a speaker in their own languages. Due to the current turn-based nature of audio models, the speaker must pause briefly to allow the model to process and translate speech. However, as models become faster and more efficient, this latency will decrease significantly and the translation will become more seamless.
 
 ## How to Use
 
@@ -117,8 +117,10 @@ To add a new language to the codebase, follow these steps:
 
 1. **Connect in the Speaker App:**
 
-   - Click "Connect" and wait for the websocket connections to be established with the Realtime API.
+   - Click "Connect" and wait for the WebSocket connections to be established with the Realtime API.
    - Choose between VAD (Voice Activity Detection) and Manual push-to-talk mode.
+   - the speaker should ensure they pause to allow the translation to catch up - the model is turn based and cannot constantly stream translations. 
+   - The speaker can view live translations in the Speaker App for each language. 
 
 2. **Select Language in the Listener App:**
 

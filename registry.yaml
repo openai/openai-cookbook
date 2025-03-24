@@ -4,6 +4,17 @@
 # should build pages for, and indicates metadata such as tags, creation date and
 # authors for each page.
 
+- title: The Basics of the Agents SDK
+  path: examples/agents_sdk/basics_of_agents_sdk/basics_of_agent_sdk.ipynb
+  date: 2025-03-21
+  authors:
+    - jhall-openai
+  tags:
+    - responses
+    - web-search
+    - file-search
+    - agents-sdk
+  
 - title: Automating Dispute Management with Agents SDK and Stripe API
   path: examples/agents_sdk/dispute_agent.ipynb
   date: 2025-03-17

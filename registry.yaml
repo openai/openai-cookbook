@@ -1837,3 +1837,13 @@
   tags:
     - responses
     - functions
+
+- title: Building a Voice Assistant with the Agents SDK
+  path: examples/agents_sdk/app_assistant_voice_agents.ipynb
+  date: 2025-03-25
+  authors:
+    - rupert-openai
+  tags:
+    - voice
+    - responses
+    - functions

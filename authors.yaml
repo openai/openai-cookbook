@@ -3,6 +3,16 @@
 # You can optionally customize how your information shows up cookbook.openai.com over here.
 # If your information is not present here, it will be pulled from your GitHub profile.
 
+danbell-openai:
+  name: "Dan Bell"
+  website: "https://www.linkedin.com/in/dan-bell-b69721b1/"
+  avatar: "https://avatars.githubusercontent.com/u/201846729?v=4"
+
+billchen-openai:
+  name: "Bill Chen"
+  website: "https://www.linkedin.com/in/billchen99/"
+  avatar: "https://avatars.githubusercontent.com/u/198814448?v=4"
+
 0hq:
   name: "Will Depue"
   website: "http://depue.design"

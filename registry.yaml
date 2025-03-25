@@ -1839,10 +1839,11 @@
     - functions
 
 - title: Multi-Langugage One-Way Translation with the Realtime API
-path: examples/voice_solutions/one_way_translation_using_realtime_api.mdx
-date: 2025-03-24
-authors:
-  - erikakettleson-openai
-tags:
-  - audio
-  - speech
+  path: examples/voice_solutions/one_way_translation_using_realtime_api.mdx
+  date: 2025-03-24
+  authors:
+    - erikakettleson-openai
+  tags:
+    - audio
+    - speech
+

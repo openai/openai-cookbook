@@ -1840,15 +1840,15 @@
 
 - title: Building a Voice Assistant with the Agents SDK
   path: examples/agents_sdk/app_assistant_voice_agents.ipynb
-  date: 2025-03-25
+  date: 2025-03-27
   authors:
     - rupert-openai
   tags:
-    - voice
+    - audio
     - responses
-    - functions
+    - speech
 
-- title: Multi-Language One-Way Translation with the Realtime API
+- title: Multi-Langugage One-Way Translation with the Realtime API
   path: examples/voice_solutions/one_way_translation_using_realtime_api.mdx
   date: 2025-03-24
   authors:

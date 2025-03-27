@@ -8,7 +8,17 @@ on:
 jobs:
   deploy:
     runs-on: ubuntu-latest
+steps:
+  - name: Checkout code  
+      uses: actions/checkout@v4  
 
+        - name: List all files  
+            run: ls -R  
+            
+        - name: Run Python Script
+            run: |
+            cd src  # Change "src" if your script is in another directory
+                      python script.python
     steps:
       - name: Call Deploy Hook
         run: curl -X POST ${{ secrets.WEBSITE_DEPLOY_HOOK_URL }}

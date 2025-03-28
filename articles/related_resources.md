@@ -6,6 +6,7 @@ People are writing great tools and papers for improving outputs from GPT. Here a
 
 - [Arthur Shield](https://www.arthur.ai/get-started): A paid product for detecting toxicity, hallucination, prompt injection, etc.
 - [Baserun](https://baserun.ai/): A paid product for testing, debugging, and monitoring LLM-based apps
+- [ChainForge](https://github.com/ianarawjo/ChainForge): An open-source visual UI for testing and comparing prompts and models, built for rapid-fire prompt engineering.
 - [Chainlit](https://docs.chainlit.io/overview): A Python library for making chatbot interfaces.
 - [Embedchain](https://github.com/embedchain/embedchain): A Python library for managing and syncing unstructured data with LLMs.
 - [FLAML (A Fast Library for Automated Machine Learning & Tuning)](https://microsoft.github.io/FLAML/docs/Getting-Started/): A Python library for automating selection of models, hyperparameters, and other tunable choices.

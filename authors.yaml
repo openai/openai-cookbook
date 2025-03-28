@@ -3,6 +3,11 @@
 # You can optionally customize how your information shows up cookbook.openai.com over here.
 # If your information is not present here, it will be pulled from your GitHub profile.
 
+shikhar-cyber:
+  name: "Shikhar Kwatra"
+  website: "https://www.linkedin.com/in/shikharkwatra/"
+  avatar: "https://avatars.githubusercontent.com/u/189049238?v=4"
+
 danbell-openai:
   name: "Dan Bell"
   website: "https://www.linkedin.com/in/dan-bell-b69721b1/"

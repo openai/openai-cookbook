@@ -4,6 +4,17 @@
 # should build pages for, and indicates metadata such as tags, creation date and
 # authors for each page.
 
+- title: Multi-Tool Orchestration with RAG approach using OpenAI's Responses API
+  path: examples/responses_api/responses_api_tool_orchestration.ipynb
+  date: 2025-03-28
+  authors:
+    - shikhar-cyber
+  tags:
+    - responses
+    - functions
+    - pinecone
+    - web-search
+
 - title: Automating Dispute Management with Agents SDK and Stripe API
   path: examples/agents_sdk/dispute_agent.ipynb
   date: 2025-03-17
@@ -1837,3 +1848,23 @@
   tags:
     - responses
     - functions
+
+- title: Building a Voice Assistant with the Agents SDK
+  path: examples/agents_sdk/app_assistant_voice_agents.ipynb
+  date: 2025-03-27
+  authors:
+    - rupert-openai
+  tags:
+    - audio
+    - responses
+    - speech
+
+- title: Multi-Langugage One-Way Translation with the Realtime API
+  path: examples/voice_solutions/one_way_translation_using_realtime_api.mdx
+  date: 2025-03-24
+  authors:
+    - erikakettleson-openai
+  tags:
+    - audio
+    - speech
+

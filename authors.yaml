@@ -3,6 +3,21 @@
 # You can optionally customize how your information shows up cookbook.openai.com over here.
 # If your information is not present here, it will be pulled from your GitHub profile.
 
+shikhar-cyber:
+  name: "Shikhar Kwatra"
+  website: "https://www.linkedin.com/in/shikharkwatra/"
+  avatar: "https://avatars.githubusercontent.com/u/189049238?v=4"
+
+danbell-openai:
+  name: "Dan Bell"
+  website: "https://www.linkedin.com/in/dan-bell-b69721b1/"
+  avatar: "https://avatars.githubusercontent.com/u/201846729?v=4"
+
+billchen-openai:
+  name: "Bill Chen"
+  website: "https://www.linkedin.com/in/billchen99/"
+  avatar: "https://avatars.githubusercontent.com/u/198814448?v=4"
+
 0hq:
   name: "Will Depue"
   website: "http://depue.design"
@@ -33,10 +48,15 @@ mwu1993:
   website: "https://www.linkedin.com/in/michael-wu-77440977/"
   avatar: "https://avatars.githubusercontent.com/u/1650674?v=4"
 
+narenoai:
+  name: "Naren Sankaran"
+  website: "https://www.linkedin.com/in/snarendran/"
+  avatar: "https://avatars.githubusercontent.com/u/196844623?s=400&u=d669669fd962473d606a97801367ba96fc548287&v=4"
+
 ibigio:
   name: "Ilan Bigio"
   website: "https://twitter.com/ilanbigio"
-  avatar: "https://pbs.twimg.com/profile_images/1688302223250378752/z-99TOMH_400x400.jpg"
+  avatar: "https://pbs.twimg.com/profile_images/1841544725654077440/DR3b8DMr_400x400.jpg"
 
 jhills20:
   name: "James Hills"
@@ -222,3 +242,28 @@ dwigg-openai:
   name: "Danny Wigg"
   website: "https://www.linkedin.com/in/dannywigg/"
   avatar: "https://media.licdn.com/dms/image/v2/C4D03AQEjMSl0pMR_qw/profile-displayphoto-shrink_800_800/profile-displayphoto-shrink_800_800/0/1587647134114?e=1743033600&v=beta&t=XmULCSmk6V6YFmlyBggxj5uJeoYYuaYUKgcByKlS0K0"
+
+msingh-openai:
+  name: "Mandeep Singh"
+  website: "https://github.com/msingh-openai"
+  avatar: "https://avatars.githubusercontent.com/u/168678187?v=4"
+
+ted-at-openai:
+  name: "Ted Sanders"
+  website: "https://github.com/ted-at-openai"
+  avatar: "https://avatars.githubusercontent.com/u/95656834?v=4"
+
+MikeHeaton:
+  name: "Mike Heaton"
+  website: "https://github.com/MikeHeaton"
+  avatar: "https://avatars.githubusercontent.com/u/11911723?v=4"
+
+thli-openai:
+  name: "Thomas Li"
+  website: "https://www.linkedin.com/in/thli/"
+  avatar: "https://avatars.githubusercontent.com/u/189043632?v=4"
+
+erikakettleson-openai:
+  name: "Erika Kettleson"
+  website: "https://www.linkedin.com/in/erika-kettleson-85763196/"
+  avatar: "https://avatars.githubusercontent.com/u/186107044?v=4"

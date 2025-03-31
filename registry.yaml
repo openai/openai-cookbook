@@ -1868,3 +1868,11 @@
     - audio
     - speech
 
+- title: Evaluating OpenAI Agents
+  path: examples/agents_sdk/evaluate_agents.ipynb
+  date: 2025-03-31
+  authors:
+    - jannik-maierhofer
+  tags:
+    - agents
+    - evaluation

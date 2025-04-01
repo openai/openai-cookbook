@@ -1868,3 +1868,15 @@
     - audio
     - speech
 
+- title: Recommended approach to guardrails in Realtime API
+  path: articles/How_to_guardrail_in_Realtime_API.md
+  date: 2025-04-02
+  authors:
+    - phundal-openai
+  tags:
+    - guardrails
+    - realtime-api
+    - speech-to-speech
+    - s2s
+    - audio
+    - speech

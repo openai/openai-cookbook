@@ -4,6 +4,37 @@
 # should build pages for, and indicates metadata such as tags, creation date and
 # authors for each page.
 
+- title: Multi-Tool Orchestration with RAG approach using OpenAI's Responses API
+  path: examples/responses_api/responses_api_tool_orchestration.ipynb
+  date: 2025-03-28
+  authors:
+    - shikhar-cyber
+  tags:
+    - responses
+    - functions
+    - pinecone
+    - web-search
+
+- title: Automating Dispute Management with Agents SDK and Stripe API
+  path: examples/agents_sdk/dispute_agent.ipynb
+  date: 2025-03-17
+  authors:
+    - danbell-openai
+  tags:
+    - responses
+    - agents-sdk
+    - functions
+
+- title: Web Search and States with Responses API
+  path: examples/responses_api/responses_example.ipynb
+  date: 2025-03-11
+  authors:
+    - billchen-openai
+  tags:
+    - responses
+    - web-search
+    - functions
+
 - title: Using logprobs
   path: examples/Using_logprobs.ipynb
   date: 2023-12-20
@@ -1229,9 +1260,10 @@
 
 - title: How to parse PDF docs for RAG
   path: examples/Parse_PDF_docs_for_RAG.ipynb
-  date: 2024-02-28
+  date: 2024-09-29
   authors:
     - katiagg
+    - MW-OAI
   tags:
     - vision
     - embeddings
@@ -1263,9 +1295,10 @@
 
 - title: Using GPT4 Vision with Function Calling
   path: examples/multimodal/Using_GPT4_Vision_With_Function_Calling.ipynb
-  date: 2024-04-09
+  date: 2024-12-13
   authors:
     - shyamal-anadkat
+    - MW-OAI
   tags:
     - chat
     - vision
@@ -1785,6 +1818,7 @@
   date: 2025-01-14
   authors:
     - MW-OAI
+    - thli-openai
   tags:
     - usage-api
     - cost-api
@@ -1805,3 +1839,32 @@
     - msingh-openai
   tags:
     - completions
+
+- title: Doing RAG on PDFs using File Search in the Responses API
+  path: examples/File_Search_Responses.ipynb
+  date: 2025-03-11
+  authors:
+    - pap-openai
+  tags:
+    - responses
+    - functions
+
+- title: Building a Voice Assistant with the Agents SDK
+  path: examples/agents_sdk/app_assistant_voice_agents.ipynb
+  date: 2025-03-27
+  authors:
+    - rupert-openai
+  tags:
+    - audio
+    - responses
+    - speech
+
+- title: Multi-Language One-Way Translation with the Realtime API
+  path: examples/voice_solutions/one_way_translation_using_realtime_api.mdx
+  date: 2025-03-24
+  authors:
+    - erikakettleson-openai
+  tags:
+    - audio
+    - speech
+

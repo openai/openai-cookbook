@@ -1,0 +1,21 @@
+html,
+body {
+  padding: 0px;
+  margin: 0px;
+  position: relative;
+  width: 100%;
+  height: 100%;
+  font-family: 'Roboto Mono', sans-serif;
+  font-optical-sizing: auto;
+  font-weight: 400;
+  font-style: normal;
+  color: #18181b;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+}
+
+#root {
+  position: relative;
+  width: 100%;
+  height: 100%;
+}

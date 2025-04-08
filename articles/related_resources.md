@@ -17,6 +17,7 @@ People are writing great tools and papers for improving outputs from GPT. Here a
 - [LlamaIndex](https://github.com/jerryjliu/llama_index): A Python library for augmenting LLM apps with data.
 - [LLMOps Database](https://www.reddit.com/r/LocalLLaMA/comments/1h4u7au/a_nobs_database_of_how_companies_actually_deploy/): Database of how companies actually deploy LLMs in production.
 - [LMQL](https://lmql.ai): A programming language for LLM interaction with support for typed prompting, control flow, constraints, and tools.
+- [Lunary](https://lunary.ai): An open-source LLM observability platform. It provides a variety of features such as real-time analytics, prompt templates management, PII masking, and comprehensive agent tracing.
 - [OpenAI Evals](https://github.com/openai/evals): An open-source library for evaluating task performance of language models and prompts.
 - [Outlines](https://github.com/normal-computing/outlines): A Python library that provides a domain-specific language to simplify prompting and constrain generation.
 - [Parea AI](https://www.parea.ai): A platform for debugging, testing, and monitoring LLM apps.

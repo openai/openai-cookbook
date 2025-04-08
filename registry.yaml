@@ -4,6 +4,33 @@
 # should build pages for, and indicates metadata such as tags, creation date and
 # authors for each page.
 
+- title: EvalsAPI Use-case - Detecting prompt regressions
+  path: examples/evaluation/use-cases/regression.ipynb
+  date: 2025-04-08
+  authors:
+    - josiah-openai
+  tags:
+    - evalsapi
+    - completions
+
+- title: EvalsAPI Use-case - Bulk model and prompt experimentation
+  path: examples/evaluation/use-cases/bulk-experimentation.ipynb
+  date: 2025-04-08
+  authors:
+    - josiah-openai
+  tags:
+    - evalsapi
+    - completions
+
+- title: EvalsAPI Use-case - Monitoring stored completions
+  path: examples/evaluation/use-cases/completion-monitoring.ipynb
+  date: 2025-04-08
+  authors:
+    - josiah-openai
+  tags:
+    - evalsapi
+    - completions
+
 - title: Multi-Tool Orchestration with RAG approach using OpenAI's Responses API
   path: examples/responses_api/responses_api_tool_orchestration.ipynb
   date: 2025-03-28

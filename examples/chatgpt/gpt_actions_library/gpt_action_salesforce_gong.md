@@ -1,6 +1,6 @@
-#GPT Action Library: Salesforce + Gong
+# GPT Action Library: Salesforce + Gong
 
-##Introduction
+## Introduction
 
 This page provides an instruction & guide for developers building middleware to connect a GPT Action to a specific application. Before you proceed, make sure to first familiarize yourself with the following information:
 
@@ -10,7 +10,7 @@ This page provides an instruction & guide for developers building middleware to 
 
 This particular GPT Action provides an overview of how to build a GPT that retrieves information from Salesforce and Gong. This will include creating multiple custom actions which are documented in existing cookbooks. We will highlight these cookbooks in the next section.
 
-###Value + Example Business Use Cases
+### Value + Example Business Use Cases
 
 **Value**: Users can now leverage ChatGPT's capabilities to:
 
@@ -22,12 +22,12 @@ This particular GPT Action provides an overview of how to build a GPT that retri
 
 A sales rep is preparing for an upcoming customer meeting. Using this integration, they can quickly retrieve relevant account details from Salesforce, access recent Gong call transcripts, and receive AI-generated summaries and insights structured around proven sales methodologies like MEDPICC or SPICED. This empowers the rep with a clear, actionable understanding of the customer's current state and next steps — all in minutes
 
-##Application Information
+## Application Information
 In this example, we are connecting to Salesforce and Gong (via a middleware). We are going to refer to existing cookbooks for basic setup and authentication instructions for Salesforce and creating a middleware. 
 
 ### Salesforce GPT Action
 
-Refer to our cookbook on setitng up a GPT Action for Salesforce. The two sections to pay attention to in that cookbook are:
+Refer to our cookbook on setitng up a GPT Action for Salesforce. The two settings to pay attention to in that cookbook are:
 
 - [Application Information](https://cookbook.openai.com/examples/chatgpt/gpt_actions_library/gpt_action_salesforce#application-information) - this covers the necessary concepts to be familiar with in Salesforce
 - [Authentication Instructions](https://cookbook.openai.com/examples/chatgpt/gpt_actions_library/gpt_action_salesforce#authentication-instructions) - this covers creating a Connected App in Salesforce and configuring OAuth (on both Salesforce and ChatGPT)
@@ -35,7 +35,7 @@ Refer to our cookbook on setitng up a GPT Action for Salesforce. The two section
 ### Middleware GPT Action
 Refer to any one of our cookbooks on creating a middleware:
 
-- [GPT Actions library (Middleware)- AWS](https://cookbook.openai.com/examples/chatgpt/gpt_actions_library/gpt_middleware_aws_function)
+- [GPT Actions library (Middleware) - AWS](https://cookbook.openai.com/examples/chatgpt/gpt_actions_library/gpt_middleware_aws_function)
 - [GPT Actions library (Middleware) - Azure Functions](https://cookbook.openai.com/examples/chatgpt/gpt_actions_library/gpt_middleware_azure_function)
 - [GPT Actions library (Middleware) - Google Cloud Function](https://cookbook.openai.com/examples/chatgpt/gpt_actions_library/gpt_middleware_google_cloud_function)
 
@@ -49,7 +49,7 @@ In addition to the prerequisites in the cookbooks above, please ensure that you 
 
 This serverless function will accept an array of `callIds`, fetch the transcripts from Gong and clean up the response that it sends to ChatGPT. Here is an example of what it looks like on Azure Functions (Javascript)
 
-```
+```javascript
 const { app } = require('@azure/functions');
 const axios = require('axios');
 
@@ -164,11 +164,13 @@ app.http('callTranscripts', {
 
 ```
 
-Here are the dependencies you will need to install
+Here are the dependencies that you would include in your `package.json` file
 
-```
-npm install @azure/functions
-npm install axios
+```javascript
+"dependencies": {
+    "@azure/functions": "^4.0.0",
+    "axios": "^1.7.7"
+  }
 ```
 
 ## ChatGPT Steps
@@ -199,11 +201,46 @@ LIMIT 2
 User says "Summarize call"
 
 # Steps
-<INSERT FORMAT FOR SUMMARY HERE>
+
+Use both the transcripts and provide the following output
+
+## Account Name
+Print out the account name 
+
+## Details of calls
+>Please list the calls for which you retrieved the transcripts along with their dates and attendees in this table format:  
+>>Headers: <Title of Call>, <Date>, <Attendees>, <Gong URL>
+
+## Recommended Meeting Focus Areas: 
+>Analyze the transcripts to identify themes, challenges, and opportunities. Based on this, generate a list of recommended focus areas for the next meeting. These should be actionable and specific to the client’s needs. Explain **why** each item should be a meeting focus.
+
+For each of the following insights, specify **which call and date** you sourced the insight from:
+
+### Metrics
+Quantifiable outcomes the customer is trying to achieve. These could be cost reduction, increased revenue, user growth, efficiency gains, etc. Look for KPIs or success measures mentioned.
+
+### Economic Buyer
+Identify if the true economic decision-maker was mentioned or involved. This includes titles, names, or hints at budget ownership or final authority.
+
+### Decision Criteria
+What are the key factors the customer will use to evaluate solutions? These could include price, performance, support, integrations, ease of use, etc.
+
+### Decision Process
+Describe how the customer plans to make the buying decision: stages, stakeholders involved, approval processes, timelines.
+
+### Paper Process
+Any mention of legal, procurement, compliance, or contract-related steps and timelines should be captured here.
+
+### Identify Pain
+Highlight the core business challenges the customer is facing, ideally in their own words. Understand what’s driving urgency.
+
+### Champion
+Is there someone internally who is championing our solution? Mention names, roles, or behaviors that indicate advocacy (e.g., “I’m pushing this internally”).
+
+### (Optional) Competition
+Mention any competing vendors, internal builds, or alternative solutions discussed.
 ```
 In the above example, replace the query in (3) to retrieves the Gong Call IDs from your custom Salesforce object.
-
-Please replace `<INSERT FORMAT FOR SUMMARY HERE>` with the format you want your summary to be in
 
 You will now create 2 separate actions - one to connect to Salesforce and the other to connect to the middleware that calls the Gong APIs
 
@@ -314,7 +351,7 @@ components:
 ### Authentication instructions for Salesforce custom actions
 Please follow the steps shown in [GPT Actions library - Salesforce](https://cookbook.openai.com/examples/chatgpt/gpt_actions_library/gpt_action_salesforce#in-chatgpt)
 
-### OpenAPI Schema for middleware
+### OpenAPI Schema for the middleware that connects to Gong
 In this example, we are setting this up for an Azure Function that calls the Gong APIs. Replace `url` with your own Middleware URL
 
 ```

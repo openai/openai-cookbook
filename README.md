@@ -1,13 +1,8 @@
-<a href="https://cookbook.openai.com" target="_blank">
-  <picture>
-    <source media="(prefers-color-scheme: dark)" srcset="/images/openai-cookbook-white.png" style="max-width: 100%; width: 400px; margin-bottom: 20px">
-    <img alt="OpenAI Cookbook Logo" src="/images/openai-cookbook.png" width="400px">
-  </picture>
-</a>
+# OpenAI Cookbook
 
-<h3></h3>
- 
-> ✨ Navigate at [cookbook.openai.com](https://cookbook.openai.com)
+[![OpenAI Cookbook Logo - Dark Mode](/images/openai-cookbook-white.png)](https://cookbook.openai.com)
+
+> ✨ Navigate at [cookbook.openai.com](https://cookbook.openai.com)i
 
 Example code and guides for accomplishing common tasks with the [OpenAI API](https://platform.openai.com/docs/introduction). To run these examples, you'll need an OpenAI account and associated API key ([create a free account here](https://beta.openai.com/signup)). Set an environment variable called `OPENAI_API_KEY` with your API key. Alternatively, in most IDEs such as Visual Studio Code, you can create an `.env` file at the root of your repo containing `OPENAI_API_KEY=<your API key>`, which will be picked up by the notebooks.
 

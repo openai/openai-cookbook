@@ -27,7 +27,7 @@ In this example, we are connecting to Salesforce and Gong (via a middleware). We
 
 ### Salesforce GPT Action
 
-Refer to our cookbook on setitng up a GPT Action for Salesforce. The two settings to pay attention to in that cookbook are:
+Refer to our cookbook on setting up a GPT Action for Salesforce. The two settings to pay attention to in that cookbook are:
 
 - [Application Information](https://cookbook.openai.com/examples/chatgpt/gpt_actions_library/gpt_action_salesforce#application-information) - this covers the necessary concepts to be familiar with in Salesforce
 - [Authentication Instructions](https://cookbook.openai.com/examples/chatgpt/gpt_actions_library/gpt_action_salesforce#authentication-instructions) - this covers creating a Connected App in Salesforce and configuring OAuth (on both Salesforce and ChatGPT)

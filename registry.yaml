@@ -1895,3 +1895,13 @@
     - audio
     - speech
 
+- title: GPT Actions library - Salesforce & Gong
+  path: examples/chatgpt/gpt_actions_library/gpt_action_salesforce_gong.md
+  date: 2025-04-07
+  authors:
+    - girishd
+  tags:
+    - chatgpt
+    - gpt-actions-library
+    - chatgpt-productivity    
+

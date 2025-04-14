@@ -1912,3 +1912,6 @@
   authors:
     - nm-openai
     - julian-openai
+  tags:
+    - responses
+    - api

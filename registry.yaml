@@ -1906,3 +1906,9 @@
     - gpt-actions-library
     - chatgpt-productivity    
 
+- title: GPT 4.1 Prompting Guide
+  path: examples/gpt4-1_prompting_guide.ipynb
+  date: 2025-04-14
+  authors:
+    - nm-openai
+    - julian-openai

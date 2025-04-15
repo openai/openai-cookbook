@@ -3,6 +3,21 @@
 # You can optionally customize how your information shows up cookbook.openai.com over here.
 # If your information is not present here, it will be pulled from your GitHub profile.
 
+shikhar-cyber:
+  name: "Shikhar Kwatra"
+  website: "https://www.linkedin.com/in/shikharkwatra/"
+  avatar: "https://avatars.githubusercontent.com/u/189049238?v=4"
+
+danbell-openai:
+  name: "Dan Bell"
+  website: "https://www.linkedin.com/in/dan-bell-b69721b1/"
+  avatar: "https://avatars.githubusercontent.com/u/201846729?v=4"
+
+billchen-openai:
+  name: "Bill Chen"
+  website: "https://www.linkedin.com/in/billchen99/"
+  avatar: "https://avatars.githubusercontent.com/u/198814448?v=4"
+
 0hq:
   name: "Will Depue"
   website: "http://depue.design"
@@ -247,3 +262,28 @@ thli-openai:
   name: "Thomas Li"
   website: "https://www.linkedin.com/in/thli/"
   avatar: "https://avatars.githubusercontent.com/u/189043632?v=4"
+
+erikakettleson-openai:
+  name: "Erika Kettleson"
+  website: "https://www.linkedin.com/in/erika-kettleson-85763196/"
+  avatar: "https://avatars.githubusercontent.com/u/186107044?v=4"
+
+josiah-openai:
+  name: "Josiah Grace"
+  website: "https://www.linkedin.com/in/josiahbgrace"
+  avatar: "https://avatars.githubusercontent.com/u/181146311?v=4"
+
+vishnu-oai:
+  name: "Vishnu Chopra"
+  website: "https://www.linkedin.com/in/vishnu-chopra/"
+  avatar: "https://avatars.githubusercontent.com/u/206769912?v=4"
+
+nm-openai:
+  name: "Noah MacCallum"
+  website: "https://x.com/noahmacca"
+  avatar: "https://avatars.githubusercontent.com/u/171723556"
+
+julian-openai:
+  name: "Julian Lee"
+  website: "https://github.com/julian-openai"
+  avatar: "https://avatars.githubusercontent.com/u/199828632"

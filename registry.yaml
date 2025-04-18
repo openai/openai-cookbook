@@ -4,6 +4,64 @@
 # should build pages for, and indicates metadata such as tags, creation date and
 # authors for each page.
 
+- title: EvalsAPI Use-case - Detecting prompt regressions
+  path: examples/evaluation/use-cases/regression.ipynb
+  date: 2025-04-08
+  authors:
+    - josiah-openai
+  tags:
+    - evalsapi
+    - completions
+
+- title: EvalsAPI Use-case - Bulk model and prompt experimentation
+  path: examples/evaluation/use-cases/bulk-experimentation.ipynb
+  date: 2025-04-08
+  authors:
+    - josiah-openai
+  tags:
+    - evalsapi
+    - completions
+
+- title: EvalsAPI Use-case - Monitoring stored completions
+  path: examples/evaluation/use-cases/completion-monitoring.ipynb
+  date: 2025-04-08
+  authors:
+    - josiah-openai
+  tags:
+    - evalsapi
+    - completions
+
+- title: Multi-Tool Orchestration with RAG approach using OpenAI's Responses API
+  path: examples/responses_api/responses_api_tool_orchestration.ipynb
+  date: 2025-03-28
+  authors:
+    - shikhar-cyber
+  tags:
+    - responses
+    - functions
+    - pinecone
+    - web-search
+
+- title: Automating Dispute Management with Agents SDK and Stripe API
+  path: examples/agents_sdk/dispute_agent.ipynb
+  date: 2025-03-17
+  authors:
+    - danbell-openai
+  tags:
+    - responses
+    - agents-sdk
+    - functions
+
+- title: Web Search and States with Responses API
+  path: examples/responses_api/responses_example.ipynb
+  date: 2025-03-11
+  authors:
+    - billchen-openai
+  tags:
+    - responses
+    - web-search
+    - functions
+
 - title: Using logprobs
   path: examples/Using_logprobs.ipynb
   date: 2023-12-20
@@ -219,6 +277,7 @@
   date: 2022-10-20
   authors:
     - colin-openai
+    - vishnu-oai
   tags:
     - embeddings
     - completions
@@ -1808,3 +1867,51 @@
     - msingh-openai
   tags:
     - completions
+
+- title: Doing RAG on PDFs using File Search in the Responses API
+  path: examples/File_Search_Responses.ipynb
+  date: 2025-03-11
+  authors:
+    - pap-openai
+  tags:
+    - responses
+    - functions
+
+- title: Building a Voice Assistant with the Agents SDK
+  path: examples/agents_sdk/app_assistant_voice_agents.ipynb
+  date: 2025-03-27
+  authors:
+    - rupert-openai
+  tags:
+    - audio
+    - responses
+    - speech
+
+- title: Multi-Language One-Way Translation with the Realtime API
+  path: examples/voice_solutions/one_way_translation_using_realtime_api.mdx
+  date: 2025-03-24
+  authors:
+    - erikakettleson-openai
+  tags:
+    - audio
+    - speech
+
+- title: GPT Actions library - Salesforce & Gong
+  path: examples/chatgpt/gpt_actions_library/gpt_action_salesforce_gong.md
+  date: 2025-04-07
+  authors:
+    - girishd
+  tags:
+    - chatgpt
+    - gpt-actions-library
+    - chatgpt-productivity    
+
+- title: GPT-4.1 Prompting Guide
+  path: examples/gpt4-1_prompting_guide.ipynb
+  date: 2025-04-14
+  authors:
+    - nm-openai
+    - julian-openai
+  tags:
+    - responses
+    - api

@@ -691,9 +691,10 @@
 
 - title: Robust question answering with Chroma and OpenAI
   path: examples/vector_databases/chroma/hyde-with-chroma-and-openai.ipynb
-  date: 2023-04-06
+  date: 2025-04-23
   authors:
     - atroyn
+    - brandonbaker
   tags:
     - embeddings
     - completions

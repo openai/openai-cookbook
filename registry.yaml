@@ -1919,7 +1919,7 @@
     - api
 
 - title: Generate images with GPT Image
-  path: examples/Generate_images_with_GPT_Image.ipynb
+  path: examples/Generate_Images_With_GPT_Image.ipynb
   date: 2025-04-23
   authors:
     - katiagg

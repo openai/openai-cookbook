@@ -1172,7 +1172,7 @@
     - functions
     - fine-tuning
 
-- title: Processing and narrating a video with GPT's visual capabilities and the TTS API
+- title: Processing and narrating a video with GPT-4.1-mini's visual capabilities and GPT-4o TTS API
   path: examples/GPT_with_vision_for_video_understanding.ipynb
   date: 2025-04-22
   authors:

@@ -691,9 +691,10 @@
 
 - title: Robust question answering with Chroma and OpenAI
   path: examples/vector_databases/chroma/hyde-with-chroma-and-openai.ipynb
-  date: 2023-04-06
+  date: 2025-04-23
   authors:
     - atroyn
+    - brandonbaker
   tags:
     - embeddings
     - completions
@@ -1172,13 +1173,14 @@
     - functions
     - fine-tuning
 
-- title: Processing and narrating a video with GPT's visual capabilities and the TTS API
+- title: Processing and narrating a video with GPT-4.1-mini's visual capabilities and GPT-4o TTS API
   path: examples/GPT_with_vision_for_video_understanding.ipynb
-  date: 2023-11-06
+  date: 2025-04-22
   authors:
     - cathykc
+    - rzhao
   tags:
-    - completions
+    - responses
     - vision
     - speech
 
@@ -1917,7 +1919,7 @@
     - api
 
 - title: Generate images with GPT Image
-  path: examples/Generate_images_with_GPT_Image.ipynb
+  path: examples/Generate_Images_With_GPT_Image.ipynb
   date: 2025-04-23
   authors:
     - katiagg

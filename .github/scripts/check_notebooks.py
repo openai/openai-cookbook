@@ -33,7 +33,10 @@ def is_valid_notebook(path: Path) -> bool:
         return False
 
 
-if __name__ == "__main__":
+def main() -> None:
+    """
+    Main function to validate the format of changed notebooks.
+    """
     changed_notebooks = get_changed_notebooks()
     if not changed_notebooks:
         print("No changed .ipynb files to validate.")
@@ -52,3 +55,7 @@ if __name__ == "__main__":
         sys.exit(1)
     else:
         print("All changed notebooks are valid.")
+
+
+if __name__ == "__main__":
+    main()

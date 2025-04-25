@@ -1925,3 +1925,14 @@
     - katiagg
   tags:
     - images
+
+- title: Handling Function Calls with Reasoning Models
+  path: examples/reasoning_function_calls.ipynb
+  date: 2025-04-25
+  authors:
+    - tompakeman-oai
+  tags:
+    - reasoning
+    - functions
+    - responses
+    - api

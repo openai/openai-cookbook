@@ -694,7 +694,7 @@
   date: 2025-04-23
   authors:
     - atroyn
-    - brandonbaker
+    - brandonbaker-openai
   tags:
     - embeddings
     - completions

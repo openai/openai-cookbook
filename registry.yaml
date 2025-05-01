@@ -1936,3 +1936,13 @@
     - functions
     - responses
     - api
+
+- title: Parallel Agents with the OpenAI Agents SDK
+  path: examples/agents_sdk/parallel_agents.ipynb
+  date: 2025-05-01
+  authors:
+    - brandonbaker-openai
+  tags:
+    - agents
+    - agents-sdk
+    - parallel-agents

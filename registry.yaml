@@ -691,9 +691,10 @@
 
 - title: Robust question answering with Chroma and OpenAI
   path: examples/vector_databases/chroma/hyde-with-chroma-and-openai.ipynb
-  date: 2023-04-06
+  date: 2025-04-23
   authors:
     - atroyn
+    - brandonbaker-openai
   tags:
     - embeddings
     - completions
@@ -1172,13 +1173,14 @@
     - functions
     - fine-tuning
 
-- title: Processing and narrating a video with GPT's visual capabilities and the TTS API
+- title: Processing and narrating a video with GPT-4.1-mini's visual capabilities and GPT-4o TTS API
   path: examples/GPT_with_vision_for_video_understanding.ipynb
-  date: 2023-11-06
+  date: 2025-04-22
   authors:
     - cathykc
+    - rzhao-openai
   tags:
-    - completions
+    - responses
     - vision
     - speech
 
@@ -1731,7 +1733,7 @@
   tags:
     - completions
     - reasoning
-  
+
 - title: GPT Actions library - GitHub
   path: examples/chatgpt/gpt_actions_library/gpt_action_github.md
   date: 2024-10-23
@@ -1780,9 +1782,9 @@
   tags:
     - gpt-actions-library
     - embeddings
-    - chatgpt 
+    - chatgpt
     - chatgpt-and-api
-    
+
 - title: Optimizing Retrieval-Augmented Generation using GPT-4o Vision Modality
   path: examples/vector_databases/pinecone/Using_vision_modality_for_RAG_with_Pinecone.ipynb
   date: 2024-11-12
@@ -1812,8 +1814,8 @@
     - gpt-actions-library
     - chatgpt
     - chatgpt-communication
-    
-- title: GPT Actions library - Tray.ai APIM 
+
+- title: GPT Actions library - Tray.ai APIM
   path: examples/chatgpt/gpt_actions_library/gpt_action_trayai_apim.md
   date: 2024-11-26
   authors:
@@ -1904,7 +1906,7 @@
   tags:
     - chatgpt
     - gpt-actions-library
-    - chatgpt-productivity    
+    - chatgpt-productivity
 
 - title: GPT-4.1 Prompting Guide
   path: examples/gpt4-1_prompting_guide.ipynb
@@ -1913,5 +1915,24 @@
     - nm-openai
     - julian-openai
   tags:
+    - responses
+    - api
+
+- title: Generate images with GPT Image
+  path: examples/Generate_Images_With_GPT_Image.ipynb
+  date: 2025-04-23
+  authors:
+    - katiagg
+  tags:
+    - images
+
+- title: Handling Function Calls with Reasoning Models
+  path: examples/reasoning_function_calls.ipynb
+  date: 2025-04-25
+  authors:
+    - tompakeman-oai
+  tags:
+    - reasoning
+    - functions
     - responses
     - api

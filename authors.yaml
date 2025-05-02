@@ -3,6 +3,11 @@
 # You can optionally customize how your information shows up cookbook.openai.com over here.
 # If your information is not present here, it will be pulled from your GitHub profile.
 
+minh-hoque:
+  name: "Minhajul Hoque"
+  website: "https://www.linkedin.com/in/minhajul-hoque-83242b163/"
+  avatar: "https://avatars.githubusercontent.com/u/84698472?v=4"
+
 shikhar-cyber:
   name: "Shikhar Kwatra"
   website: "https://www.linkedin.com/in/shikharkwatra/"
@@ -126,13 +131,13 @@ aaronwilkowitz-openai:
 charuj:
   name: "Charu Jaiswal"
   website: "https://www.linkedin.com/in/charu-j-8a866471"
-  avatar: "https://avatars.githubusercontent.com/u/18404643?v=4" 
+  avatar: "https://avatars.githubusercontent.com/u/18404643?v=4"
 
 rupert-openai:
   name: "Rupert Truman"
   website: "https://www.linkedin.com/in/rupert-truman/"
   avatar: "https://avatars.githubusercontent.com/u/171234447"
-  
+
 keelan-openai:
   name: "Keelan Schule"
   website: "https://www.linkedin.com/in/keelanschule/"
@@ -171,8 +176,8 @@ evanweiss-openai:
 girishd:
   name: "Girish Dusane"
   website: "https://www.linkedin.com/in/girishdusane/"
-  avatar: "https://avatars.githubusercontent.com/u/272708"   
-  
+  avatar: "https://avatars.githubusercontent.com/u/272708"
+
 lxing-oai:
   name: "Luke Xing"
   website: "https://www.linkedin.com/in/lukexing/"
@@ -227,7 +232,7 @@ erickgort:
   name: "Erick Gort"
   website: "https://www.linkedin.com/in/erick-gort-32ab1678/"
   avatar: "https://avatars.githubusercontent.com/u/189261906?v=4"
-  
+
 kylecote-tray:
   name: "Kyle Cote"
   website: "https://github.com/kylecote-tray"
@@ -292,7 +297,7 @@ rzhao-openai:
   name: "Randy Zhao"
   website: "https://www.linkedin.com/in/randy-zhao-27433616b"
   avatar: "https://avatars.githubusercontent.com/u/208724779?v=4"
-  
+
 brandonbaker-openai:
   name: "Brandon Baker"
   website: "https://www.linkedin.com/in/brandonbaker18"

@@ -1057,6 +1057,19 @@
   tags:
     - embeddings
 
+- title: ElatoAI - Realtime Speech AI Agents for ESP32 on Arduino
+  path: examples/voice_solutions/running_realtime_api_speech_on_esp32_arduino_edge_runtime_elatoai.md
+  date: 2025-05-01
+  authors:
+    - akashdeepdeb
+  tags:
+    - realtime-api
+    - speech
+    - audio
+    - esp32
+    - iot
+    - arduino
+
 - title: Related resources from around the web
   path: articles/related_resources.md
   redirects:

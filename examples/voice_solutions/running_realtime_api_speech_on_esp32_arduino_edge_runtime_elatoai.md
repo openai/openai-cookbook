@@ -1,36 +1,22 @@
-<img src="arduino_ai_speech_assets/elato-alien.png" alt="Elato Logo" width="100%">
+![Elato Logo](https://raw.githubusercontent.com/openai/openai-cookbook/refs/heads/main/examples/voice_solutions/arduino_ai_speech_assets/elato-alien.png)
 
-# 👾 ElatoAI: Running OpenAI Realtime API Speech on ESP32 on Arduino with Deno Edge Functions
+## 👾 ElatoAI: Running OpenAI Realtime API Speech on ESP32 on Arduino with Deno Edge Functions
 
 This guide shows how to build a AI voice agent device with Realtime AI Speech powered by OpenAI Realtime API, ESP32, Secure WebSockets, and Deno Edge Functions for >10-minute uninterrupted global conversations.
 
 An active version of this README is available at [ElatoAI](https://github.com/akdeb/ElatoAI).
 
 <div align="center">
-
-[![Discord Follow](https://dcbadge.vercel.app/api/server/KJWxDPBRUj?style=flat)](https://discord.gg/KJWxDPBRUj)
-[![License: MIT](https://img.shields.io/badge/license-MIT-blue)](https://www.gnu.org/licenses/gpl-3.0.en.html)&ensp;&ensp;&ensp;
-![Node.js](https://img.shields.io/badge/Node.js-22.13.0-yellow.svg)
-![Next.js](https://img.shields.io/badge/Next.js-14.2.7-brightgreen.svg)
-![React](https://img.shields.io/badge/React-18.2.0-blue.svg)
-
+    <a href="https://www.youtube.com/watch?v=o1eIAwVll5I" target="_blank">
+    <img src="https://raw.githubusercontent.com/akdeb/ElatoAI/refs/heads/main/assets/thumbnail.png" alt="Elato AI Demo Video" width="100%" style="border-radius:10px" />
+  </a>
 </div>
 
-## Demo Video
-
-https://github.com/user-attachments/assets/aa60e54c-5847-4a68-80b5-5d6b1a5b9328
-
-<div align="center">
-<a href="https://www.youtube.com/watch?v=o1eIAwVll5I">
-  <img src="https://img.shields.io/badge/Watch%20Demo-YouTube-red?style=for-the-badge&logo=youtube" alt="Watch Demo on YouTube">
-</a>
-</div>
-
-## Hardware Design
+## ⚡️ DIY Hardware Design
 
 The reference implementation uses an ESP32-S3 microcontroller with minimal additional components:
 
-<img src="arduino_ai_speech_assets/pcb-design.png" alt="Hardware Setup" width="100%">
+<img src="https://raw.githubusercontent.com/openai/openai-cookbook/refs/heads/main/examples/voice_solutions/arduino_ai_speech_assets/pcb-design.png" alt="Hardware Setup" width="100%">
 
 **Required Components:**
 - ESP32-S3 development board
@@ -40,13 +26,23 @@ The reference implementation uses an ESP32-S3 microcontroller with minimal addit
 - RGB LED for visual feedback
 - Optional: touch sensor for alternative control
 
-**Optional hardware:**
+**Hardware options:**
 A fully assembled PCB and device is available in the [ElatoAI store](https://www.elatoai.com/products).
 
-## 🚀 Quick Start Guide
+## 📱 App Design
+
+Control your ESP32 AI device from your phone with your own webapp.
+
+<img src="https://raw.githubusercontent.com/openai/openai-cookbook/refs/heads/main/examples/voice_solutions/arduino_ai_speech_assets/mockups.png" alt="App Screenshots" width="100%">
+
+| Select from a list of AI characters | Talk to your AI with real-time responses | Create personalized AI characters |
+|:--:|:--:|:--:|
+
+
+## ✨ Quick Start Tutorial
 
 <a href="https://www.youtube.com/watch?v=bXrNRpGOJWw">
-  <img src="https://img.shields.io/badge/Quickstart%20Tutorial-YouTube-yellow?style=for-the-badge&logo=youtube" alt="Watch Demo on YouTube">
+  <img src="https://img.shields.io/badge/Quick%20start%20Tutorial-YouTube-yellow?style=for-the-badge&logo=youtube" alt="Watch Demo on YouTube">
 </a>
 
 1. **Clone the repository**
@@ -192,35 +188,13 @@ We have a [Usecases.md](https://github.com/akdeb/ElatoAI/tree/main/Usecases.md) 
 
 ## 🗺️ High-Level Flow
 
-```mermaid
-flowchart TD
-  User[User Speech] --> ESP32
-  ESP32[ESP32 Device] -->|WebSocket| Edge[Deno Edge Function]
-  Edge -->|OpenAI API| OpenAI[OpenAI Realtime API]
-  OpenAI --> Edge
-  Edge -->|WebSocket| ESP32
-  ESP32 --> User[AI Generated Speech]
-```
+<img src="https://raw.githubusercontent.com/openai/openai-cookbook/refs/heads/main/examples/voice_solutions/arduino_ai_speech_assets/flowchart.png" alt="App Screenshots" width="100%">
 
 ## Project Structure
 
-```mermaid
-graph TD
-  repo[ElatoAI]
-  repo --> frontend[Frontend Vercel NextJS]
-  repo --> deno[Deno Edge Function]
-  repo --> esp32[ESP32 Arduino Client]
-  deno --> supabase[Supabase DB]
+<img src="https://raw.githubusercontent.com/openai/openai-cookbook/refs/heads/main/examples/voice_solutions/arduino_ai_speech_assets/structure.png" alt="App Screenshots" width="100%">
 
-  frontend --> supabase
-  esp32 --> websockets[Secure WebSockets]
-  esp32 --> opus[Opus Codec]
-  esp32 --> audio_tools[arduino-audio-tools]
-  esp32 --> libopus[arduino-libopus]
-  esp32 --> ESPAsyncWebServer[ESPAsyncWebServer]
-```
-
-## ⚙️ PlatformIO Configuration
+## ⚙️ PlatformIO Config
 
 ```ini
 [env:esp32-s3-devkitc-1]
@@ -264,4 +238,4 @@ This project is licensed under the MIT License - see the [LICENSE](LICENSE) file
 
 ---
 
-**If you find this project interesting or useful, drop a GitHub ⭐️ at [ElatoAI](https://github.com/akdeb/ElatoAI). It helps a lot!**
+**This example is part of the [OpenAI Cookbook](https://github.com/openai/openai-cookbook). For the full project and latest updates, check out [ElatoAI](https://github.com/akdeb/ElatoAI) and consider giving it a ⭐️ if you find it useful!**

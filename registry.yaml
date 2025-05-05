@@ -4,7 +4,7 @@
 # should build pages for, and indicates metadata such as tags, creation date and
 # authors for each page.
 
-- title: Multi-Tool Orchestration with RAG approach using OpenAI's Responses API
+- title: Practial Guide for Model Selection for Real‑World Use Cases
   path: examples/partners/model_selection_guide/model_selection_guide.ipynb
   date: 2025-05-05
   authors:

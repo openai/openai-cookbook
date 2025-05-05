@@ -4,6 +4,24 @@
 # should build pages for, and indicates metadata such as tags, creation date and
 # authors for each page.
 
+- title: Practial Guide for Model Selection for Real‑World Use Cases
+  path: examples/partners/model_selection_guide/model_selection_guide.ipynb
+  date: 2025-05-05
+  authors:
+    - shikhar-cyber
+    - kashyapm-tribe
+    - saip-tribe
+    - nharada-tribe
+  tags:
+    - responses
+    - functions
+    - web-search
+    - tool calling
+    - RAG
+    - insurance
+    - legal
+    - pharma
+
 - title: EvalsAPI Use-case - Detecting prompt regressions
   path: examples/evaluation/use-cases/regression.ipynb
   date: 2025-04-08

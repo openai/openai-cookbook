@@ -4,6 +4,16 @@
 # should build pages for, and indicates metadata such as tags, creation date and
 # authors for each page.
 
+- title: Context Summarization with Realtime API
+  path: examples/Context_summarization_with_realtime_api.ipynb
+  date: 2025-05-05
+  authors:
+    - minh-hoque
+  tags:
+    - audio
+    - speech
+    - tiktoken
+
 - title: EvalsAPI Use-case - Detecting prompt regressions
   path: examples/evaluation/use-cases/regression.ipynb
   date: 2025-04-08

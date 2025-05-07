@@ -24,9 +24,9 @@
     - speech
     - agents-sdk
 
-- title: Practial Guide for Model Selection for Real‑World Use Cases
+- title: Practical Guide for Model Selection for Real‑World Use Cases
   path: examples/partners/model_selection_guide/model_selection_guide.ipynb
-  date: 2025-05-05
+  date: 2025-05-07
   authors:
     - shikhar-cyber
     - kashyapm-tribe

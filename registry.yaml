@@ -4,6 +4,16 @@
 # should build pages for, and indicates metadata such as tags, creation date and
 # authors for each page.
 
+- title: Comparing Speech-to-Text Methods with the OpenAI API
+  path: examples/Speech_transcription_methods.ipynb
+  date: 2025-04-29
+  authors:
+    - minh-hoque
+  tags:
+    - audio
+    - speech
+    - agents-sdk
+
 - title: Practial Guide for Model Selection for Real‑World Use Cases
   path: examples/partners/model_selection_guide/model_selection_guide.ipynb
   date: 2025-05-05

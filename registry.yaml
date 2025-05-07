@@ -4,6 +4,24 @@
 # should build pages for, and indicates metadata such as tags, creation date and
 # authors for each page.
 
+- title: Practial Guide for Model Selection for Real‑World Use Cases
+  path: examples/partners/model_selection_guide/model_selection_guide.ipynb
+  date: 2025-05-05
+  authors:
+    - shikhar-cyber
+    - kashyapm-tribe
+    - saip-tribe
+    - nharada-tribe
+  tags:
+    - responses
+    - functions
+    - web-search
+    - tool calling
+    - RAG
+    - insurance
+    - legal
+    - pharma
+
 - title: EvalsAPI Use-case - Detecting prompt regressions
   path: examples/evaluation/use-cases/regression.ipynb
   date: 2025-04-08
@@ -1047,6 +1065,19 @@
   tags:
     - embeddings
 
+- title: ElatoAI - Realtime Speech AI Agents for ESP32 on Arduino
+  path: examples/voice_solutions/running_realtime_api_speech_on_esp32_arduino_edge_runtime_elatoai.md
+  date: 2025-05-01
+  authors:
+    - akashdeepdeb
+  tags:
+    - realtime-api
+    - speech
+    - audio
+    - esp32
+    - iot
+    - arduino
+
 - title: Related resources from around the web
   path: articles/related_resources.md
   redirects:
@@ -1178,7 +1209,7 @@
   date: 2025-04-22
   authors:
     - cathykc
-    - rzhao
+    - rzhao-openai
   tags:
     - responses
     - vision
@@ -1936,3 +1967,13 @@
     - functions
     - responses
     - api
+
+- title: Parallel Agents with the OpenAI Agents SDK
+  path: examples/agents_sdk/parallel_agents.ipynb
+  date: 2025-05-01
+  authors:
+    - brandonbaker-openai
+  tags:
+    - agents
+    - agents-sdk
+    - parallel-agents

@@ -140,6 +140,7 @@ examples/fine-tuned_qa/local_cache/*
 
 # PyCharm files
 .idea/
+.cursorignore
 
 # VS Code files
 .vscode/

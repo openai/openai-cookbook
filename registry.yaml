@@ -4,6 +4,16 @@
 # should build pages for, and indicates metadata such as tags, creation date and
 # authors for each page.
 
+- title: Context Summarization with Realtime API
+  path: examples/Context_summarization_with_realtime_api.ipynb
+  date: 2025-05-10
+  authors:
+    - minh-hoque
+  tags:
+    - audio
+    - speech
+    - tiktoken
+
 - title: Comparing Speech-to-Text Methods with the OpenAI API
   path: examples/Speech_transcription_methods.ipynb
   date: 2025-04-29

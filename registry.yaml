@@ -4,6 +4,16 @@
 # should build pages for, and indicates metadata such as tags, creation date and
 # authors for each page.
 
+
+- title: Better performance from reasoning models using the Responses API
+  path: examples/responses_api/reasoning_items.ipynb
+  date: 2025-05-11
+  authors:
+    - billchen-openai
+  tags:
+    - responses
+    - functions
+
 - title: Context Summarization with Realtime API
   path: examples/Context_summarization_with_realtime_api.ipynb
   date: 2025-05-10

@@ -1,0 +1,9 @@
+```mermaid
+flowchart LR
+    A["Finished audio file<br/>(WAV • MP3 • FLAC • …)"]
+    B["OpenAI STT engine<br/>(gpt-4o-transcribe)"]
+    C["Your application / UI"]
+
+    A -->|HTTP POST<br/>/v1/audio/transcriptions<br/>stream=true| B
+    B -->|chunked HTTP response<br/>partial & final transcripts| C
+```

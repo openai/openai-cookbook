@@ -1,6 +1,6 @@
 # Text comparison examples
 
-The [OpenAI API embeddings endpoint](https://beta.openai.com/docs/guides/embeddings) can be used to measure relatedness or similarity between pieces of text.
+The [OpenAI API embeddings endpoint](https://platform.openai.com/docs/guides/embeddings) can be used to measure relatedness or similarity between pieces of text.
 
 By leveraging GPT-3's understanding of text, these embeddings [achieved state-of-the-art results](https://arxiv.org/abs/2201.10005) on benchmarks in unsupervised learning and transfer learning settings.
 

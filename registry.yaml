@@ -52,32 +52,41 @@
     - legal
     - pharma
 
-- title: EvalsAPI Use-case - Detecting prompt regressions
+- title: Evals API Use-case - Detecting prompt regressions
   path: examples/evaluation/use-cases/regression.ipynb
   date: 2025-04-08
   authors:
     - josiah-openai
   tags:
-    - evalsapi
+    - evals-api
     - completions
 
-- title: EvalsAPI Use-case - Bulk model and prompt experimentation
+- title: Evals API Use-case - Bulk model and prompt experimentation
   path: examples/evaluation/use-cases/bulk-experimentation.ipynb
   date: 2025-04-08
   authors:
     - josiah-openai
   tags:
-    - evalsapi
+    - evals-api
     - completions
 
-- title: EvalsAPI Use-case - Monitoring stored completions
+- title: Evals API Use-case - Monitoring stored completions
   path: examples/evaluation/use-cases/completion-monitoring.ipynb
   date: 2025-04-08
   authors:
     - josiah-openai
   tags:
-    - evalsapi
+    - evals-api
     - completions
+
+- title: Evals API Use-case - Responses Evaluation
+  path: examples/evaluation/use-cases/responses-evaluation.ipynb
+  date: 2025-05-13
+  authors:
+    - willhath-openai
+  tags:
+    - evals-api
+    - responses
 
 - title: Multi-Tool Orchestration with RAG approach using OpenAI's Responses API
   path: examples/responses_api/responses_api_tool_orchestration.ipynb

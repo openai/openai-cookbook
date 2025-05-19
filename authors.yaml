@@ -3,6 +3,11 @@
 # You can optionally customize how your information shows up cookbook.openai.com over here.
 # If your information is not present here, it will be pulled from your GitHub profile.
 
+robert-tinn:
+  name: "Robert Tinn"
+  website: "https://www.linkedin.com/in/robert-tinn/"
+  avatar: "https://avatars.githubusercontent.com/u/208724428?v=4"
+
 minh-hoque:
   name: "Minhajul Hoque"
   website: "https://www.linkedin.com/in/minhajul-hoque-83242b163/"

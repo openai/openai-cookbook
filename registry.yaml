@@ -4,6 +4,15 @@
 # should build pages for, and indicates metadata such as tags, creation date and
 # authors for each page.
 
+
+- title: Guide to Using the MCP Tool in the Responses API 
+  path: examples/mcp/mcp_tool_guide.ipynb
+  date: 2025-05-21
+  authors:
+    - charuj
+  tags:
+    - mcp
+
 - title: Image Understanding with RAG
   path: examples/multimodal/image_understanding_with_rag.ipynb
   date: 2025-05-16

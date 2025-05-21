@@ -5,7 +5,7 @@
 # authors for each page.
 
 
-- title: Guide to Using the MCP Tool in the Responses API 
+- title: Guide to Using the Responses API's MCP Tool 
   path: examples/mcp/mcp_tool_guide.ipynb
   date: 2025-05-21
   authors:

@@ -1,0 +1,555 @@
+{
+ "cells": [
+  {
+   "cell_type": "markdown",
+   "metadata": {},
+   "source": [
+    "# Guide to Using the Responses API's MCP Tool "
+   ]
+  },
+  {
+   "cell_type": "markdown",
+   "metadata": {},
+   "source": [
+    "Building agentic application often requires connecting to external services. Traditionally, this is done through function calling where every action makes a round-trip from the model to your backend, then to an external service, waits for a response, and finally returns the result to the model. This process introduces multiple network hops and significant latency, making it cumbersome to scale and manage.\n",
+    "\n",
+    "The hosted Model Context Protocol (MCP) tool in the Responses API makes this easier. Instead of manually wiring each function call to specific services, you can configure your model once to point to an MCP server (or several!). That server acts as a centralized tool host, exposing standard commands like “search product catalog” or “add item to cart.” This allows for simpler orchestration and centralized management of tools. With MCP, the model interacts directly with the MCP server, reducing latency and eliminating backend coordination."
+   ]
+  },
+  {
+   "cell_type": "markdown",
+   "metadata": {},
+   "source": [
+    "## Use cases simplified by the MCP tool \n",
+    "\n",
+    "MCP significantly reduces the friction of building products that interact with external services, allowing you to tie different services together seamlessly. Here’s a sampler of use cases that once involved friction but are now much simpler since the model can communicate directly with remote MCP servers.\n",
+    "\n",
+    "| **Domain**                 | **Use case unlocked by MCP tool**                                                                                                                                                  | **Previous friction**                                                                                                      |\n",
+    "|---------------------------|------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------|----------------------------------------------------------------------------------------------------------------------------|\n",
+    "| **Commerce / payments**   | - Add an item to a Shopify cart and hand back a checkout URL in one turn — `\"Add the Allbirds Men’s Tree Dasher 2 in size 10\"` → cart link  <br> - Generate a Stripe payment link | Function calling meant you had to write a custom `cart_add` or `create_payment_link` wrapper and host your own relay server. |\n",
+    "| **Dev-ops & code quality**| - Ask Sentry for the latest error in a particular file, then open a GitHub issue with a suggested fix in the same conversation                                                    | Chaining two different third-party APIs inside one assistive loop involved webhook glue and state juggling.                |\n",
+    "| **Messaging / notifications** | - Grab the morning’s top soccer headlines via web-search and have Twilio text the summary to a phone number in a single call                                                 | Required stitching two tool calls in your backend and batching the final SMS payload yourself.                             |\n"
+   ]
+  },
+  {
+   "cell_type": "markdown",
+   "metadata": {},
+   "source": [
+    "## How the tool works\n",
+    "\n",
+    "At a high level, here is how the MCP tool works: \n",
+    "\n",
+    "1. Declare the server: When you add an MCP block to the `tools` array, the Responses API runtime first detects which transport the server speaks, either the newer “streamable HTTP” or the older HTTP-over-SSE variant, and uses that protocol for traffic.\n",
+    "2. Import the tool list: The runtime calls the server’s `tools/list`, passing any headers you provide (API key, OAuth token, etc.). It then writes the result to an `mcp_list_tools` item in the model’s context. While this item is present, the list won’t be fetched again. You can limit what the model sees using `allowed_tools`. \n",
+    "    \n",
+    "    OpenAI discards header values and all but the schema, domain, and subdomains of the MCP `server_url` after each request. Authorization keys and the server URL must be included with every API call. These values won't appear in response objects. Schemas use “strict” mode when possible, otherwise they're loaded as-is.\n",
+    "    \n",
+    "3. Call and approve tools: Once the model knows the available actions, it can invoke one. Each invocation produces an `mcp_tool_call` item and by default the stream pauses for your explicit approval, but you can disable this once you trust the server.\n",
+    "    \n",
+    "    After approval, the runtime executes the call, streams back the result, and the model decides whether to chain another tool or return a final answer."
+   ]
+  },
+  {
+   "cell_type": "markdown",
+   "metadata": {},
+   "source": [
+    "## Best practices when building with MCP\n",
+    "\n",
+    "MCP is still in its early stages, so here are best practices that can improve model performance and behavior as you build. \n",
+    "\n",
+    "### Filter tools to avoid ballooning payloads\n",
+    "\n",
+    "Remote servers often expose numerous tools without considering how models will interpret and use them. By default, this can result in dozens of endpoints being included, each accompanied by verbose definitions like names, descriptions, and JSON schemas that add hundreds of tokens to the model’s context and increase latency. Compounding this, many servers return entire data objects, such as full Stripe invoice records, even when only a few fields are relevant to the model’s task. To optimize for performance in production, use the `allowed_tools` parameter in the Responses API to limit which tools are included from the server’s `mcp_list_tools`. This reduces token overhead, improves response time, and narrows the model’s decision space. You may also want to exclude certain tools altogether, such as those capable of write actions or those that have financial or security implications."
+   ]
+  },
+  {
+   "cell_type": "code",
+   "execution_count": null,
+   "metadata": {
+    "vscode": {
+     "languageId": "plaintext"
+    }
+   },
+   "outputs": [],
+   "source": [
+    "curl https://api.openai.com/v1/responses -i \\\n",
+    "  -H \"Content-Type: application/json\" \\\n",
+    "  -H \"Authorization: Bearer $OPENAI_API_KEY\" \\\n",
+    "  -d '{\n",
+    "    \"model\": \"gpt-4.1\",\n",
+    "    \"tools\": [\n",
+    "        {\n",
+    "            \"type\": \"mcp\",\n",
+    "            \"server_label\": \"gitmcp\",\n",
+    "            \"server_url\": \"https://gitmcp.io/openai/tiktoken\",\n",
+    "            \"allowed_tools\": [\"search_tiktoken_documentation\", \"fetch_tiktoken_documentation\"],\n",
+    "            \"require_approval\": \"never\"\n",
+    "        }\n",
+    "    ],\n",
+    "    \"input\": \"how does tiktoken work?\"\n",
+    "}'"
+   ]
+  },
+  {
+   "cell_type": "markdown",
+   "metadata": {},
+   "source": [
+    "### Reduce latency and tokens via caching and reserve reasoning models for high complexity tasks\n",
+    "\n",
+    "The first time the model connects to a server, a new item of the type `mcp_list_tools` is created for each MCP server you add. As long as this item is present in the model's context, we will not call `tools/list` on the server again. This is akin to caching at the user-conversation level. If `mcp_list_tools` is not present, we import the list of tools from the MCP server again. Passing`previous_response_id` in subsequent API requests is one way of ensuring that the `mcp_list_tools` item is present in the model's context on follow-up turns. Alternatively you can also pass in the items manually to new response. The other lever that will affect latency and the number of output tokens is whether you use a reasoning model, as reasoning models will produce far more output tokens, as well as reasoning tokens. Take for example the following two sample curls that compare the number of tokens produced with and without reasoning models:"
+   ]
+  },
+  {
+   "cell_type": "markdown",
+   "metadata": {},
+   "source": [
+    "Scenario 1: non-reasoning model "
+   ]
+  },
+  {
+   "cell_type": "code",
+   "execution_count": null,
+   "metadata": {
+    "vscode": {
+     "languageId": "plaintext"
+    }
+   },
+   "outputs": [],
+   "source": [
+    "curl https://api.openai.com/v1/responses \\   \n",
+    "  -H \"Content-Type: application/json\" \\\n",
+    "  -H \"Authorization: Bearer $OPENAI_API_KEY\" \\\n",
+    "  -d '{\n",
+    "    \"model\": \"gpt-4.1\",\n",
+    "    \"tools\": [\n",
+    "      {\n",
+    "        \"type\": \"mcp\",\n",
+    "        \"server_label\": \"gitmcp\",\n",
+    "        \"server_url\": \"https://gitmcp.io/openai/tiktoken\",\n",
+    "        \"require_approval\": \"never\"\n",
+    "      }\n",
+    "    ],\n",
+    "    \"input\": \"how does tiktoken work?\" \n",
+    "  }'"
+   ]
+  },
+  {
+   "cell_type": "code",
+   "execution_count": null,
+   "metadata": {
+    "vscode": {
+     "languageId": "plaintext"
+    }
+   },
+   "outputs": [],
+   "source": [
+    "  \"usage\": {\n",
+    "    \"input_tokens\": 280,\n",
+    "    \"input_tokens_details\": {\n",
+    "      \"cached_tokens\": 0\n",
+    "    },\n",
+    "    \"output_tokens\": 665,\n",
+    "    \"output_tokens_details\": {\n",
+    "      \"reasoning_tokens\": 0\n",
+    "    },\n",
+    "    \"total_tokens\": 945\n",
+    "  }"
+   ]
+  },
+  {
+   "cell_type": "markdown",
+   "metadata": {},
+   "source": [
+    "Scenario 2: reasoning model without `previous_response_id`"
+   ]
+  },
+  {
+   "cell_type": "code",
+   "execution_count": null,
+   "metadata": {
+    "vscode": {
+     "languageId": "plaintext"
+    }
+   },
+   "outputs": [],
+   "source": [
+    "curl https://api.openai.com/v1/responses \\\n",
+    "  -H \"Content-Type: application/json\" \\\n",
+    "  -H \"Authorization: Bearer $OPENAI_API_KEY\" \\\n",
+    "  -d '{\n",
+    "    \"model\": \"o4-mini\",\n",
+    "    \"tools\": [\n",
+    "      {\n",
+    "        \"type\": \"mcp\",\n",
+    "        \"server_label\": \"gitmcp\",\n",
+    "        \"server_url\": \"https://gitmcp.io/openai/tiktoken\",\n",
+    "        \"require_approval\": \"never\"\n",
+    "      }\n",
+    "    ],\n",
+    "    \"input\": \"how does tiktoken work?\",\n",
+    "    \"reasoning\": {\n",
+    "      \"effort\": \"medium\",\n",
+    "      \"summary\": \"auto\"\n",
+    "    } \n",
+    "  }'"
+   ]
+  },
+  {
+   "cell_type": "code",
+   "execution_count": null,
+   "metadata": {
+    "vscode": {
+     "languageId": "plaintext"
+    }
+   },
+   "outputs": [],
+   "source": [
+    "  \"usage\": {\n",
+    "    \"input_tokens\": 36436,\n",
+    "    \"input_tokens_details\": {\n",
+    "      \"cached_tokens\": 22964\n",
+    "    },\n",
+    "    \"output_tokens\": 1586,\n",
+    "    \"output_tokens_details\": {\n",
+    "      \"reasoning_tokens\": 576\n",
+    "    },\n",
+    "    \"total_tokens\": 38022 \n",
+    "    }"
+   ]
+  },
+  {
+   "cell_type": "markdown",
+   "metadata": {},
+   "source": [
+    "### Using MCP with other tools\n",
+    "\n",
+    "The MCP tool is just another entry in the tools array, so the model can use it seamlessly with other hosted tools like `code_interpreter`, `web_search_preview,` or `image_generation`, and with any custom tools you define. You can also use multiple remote MCP servers together. \n",
+    "\n",
+    "In this example, we’ll create an agent that is a pricing analyst for a fictional yoga attire store: it first pulls current competitor prices for women’s shorts, yoga pants, and tank tops from the Alo Yoga MCP server, then grabs the price for the same three categories from Uniqlo via the hosted web-search tool. Using Code Interpreter it analyzes last week’s sales from a CSV that was pre-loaded with the Files endpoint, in order to calculate per-item revenue and average order value. Then it measures each item’s price gap versus the newly fetched Uniqlo and Alo Yoga benchmarks. Any product priced 15 percent or more above or below market is flagged, and the agent delivers a concise text report summarizing the discrepancies and key revenue stats."
+   ]
+  },
+  {
+   "cell_type": "code",
+   "execution_count": null,
+   "metadata": {
+    "vscode": {
+     "languageId": "plaintext"
+    }
+   },
+   "outputs": [],
+   "source": [
+    "system_prompt= \"\"\"You are a pricing analyst for my clothing company. Please use the MCP tool \n",
+    "to fetch prices from the Alo Yoga MCP server for the categories of women's \n",
+    "shorts, yoga pants, and  tank tops. Use only the MCP server for Alo yoga data, don't search the web. \n",
+    "\n",
+    "Next, use the web search tool to search for Uniqlo prices for women's shorts, yoga pants, and tank tops. \n",
+    "\n",
+    "In each case for Alo Yoga and Uniqlo, extract the\n",
+    "price for the top result in each category. Also provide the full URLs\n",
+    " \n",
+    "Using the uploaded CSV file of sales data from my store, and with the \n",
+    "code interpreter tool calculate revenue by product item, compute average order-value on a transaction level, and calculate the percentage price gap between the CSV data and Uniqlo/Alo Yoga prices. \n",
+    "Flag products priced 15% or more above or below the market. \n",
+    "Create and output a short report including the findings.\n",
+    "\n",
+    "# Steps\n",
+    "\n",
+    "1. **Fetch Alo Yoga Prices:**\n",
+    "   - Use the Alo Yoga MCP server to fetch prices for the following products:\n",
+    "High-Waist Airlift Legging\n",
+    "Sway Bra Tank\n",
+    " 5\" Airlift Energy Short\n",
+    "\n",
+    "- Ensure you find prices for each. \n",
+    "- Extract the price of the top result for each category.\n",
+    "- include  URL links \n",
+    "\n",
+    "\n",
+    "2. **Query Uniqlo Prices:**\n",
+    "   - Use the Web-Search tool to search non-sale prices for the following Uniqlo products: \n",
+    "Women's AIRism Soft Biker Shorts\n",
+    "Women's AIRism Soft Leggings\n",
+    "Women's AIRism Bra Sleeveless Top\n",
+    "- Ensure you find non-sale prices for each. \n",
+    "- Extract the price for the top result in each category.\n",
+    "- include  URL links \n",
+    "\n",
+    "3. **Sales Data Analysis:**\n",
+    "   - Use the uploaded CSV sales data to calculate revenue across each \n",
+    "   product item.\n",
+    "   - Determine the average order-value on a transaction level.\n",
+    "   - For each SKU, compute the percentage price gap between the \n",
+    "   CSV data and Uniqlo/Alo Yoga prices.\n",
+    "   - Flag products priced ≥ 15% above or below the market.\n",
+    "\n",
+    "4. **Report:**\n",
+    "   - Compile and output a report including the flagging results\n",
+    "\n",
+    "# Output Format\n",
+    "- A short text report explaining:\n",
+    "  - Any products that are priced ≥ 15% above or below the market, \n",
+    "  with specific details. \"\"\""
+   ]
+  },
+  {
+   "cell_type": "markdown",
+   "metadata": {},
+   "source": [
+    "Here's a sample curl with a placeholder for the above system prompt. "
+   ]
+  },
+  {
+   "cell_type": "code",
+   "execution_count": null,
+   "metadata": {
+    "vscode": {
+     "languageId": "plaintext"
+    }
+   },
+   "outputs": [],
+   "source": [
+    "curl https://api.openai.com/v1/responses \\\n",
+    "  -H \"Content-Type: application/json\" \\\n",
+    "  -H \"Authorization: Bearer $OPENAI_API_KEY\" \\\n",
+    "  -d '{\n",
+    "    \"model\": \"gpt-4.1\",\n",
+    "    \"input\": [\n",
+    "      {\n",
+    "        \"role\": \"system\",\n",
+    "        \"content\": [\n",
+    "          {\n",
+    "            \"type\": \"input_text\",\n",
+    "            \"text\": \"ABOVE_SYSTEM_PROMPT\"\n",
+    "          }\n",
+    "        ]\n",
+    "      }\n",
+    "    ],\n",
+    "    \"tools\": [\n",
+    "      {\n",
+    "        \"type\": \"web_search_preview\",\n",
+    "        \"user_location\": {\n",
+    "          \"type\": \"approximate\",\n",
+    "          \"country\": \"US\"\n",
+    "        },\n",
+    "        \"search_context_size\": \"medium\"\n",
+    "      },\n",
+    "      {\n",
+    "        \"type\": \"code_interpreter\",\n",
+    "        \"container\": {\n",
+    "          \"type\": \"auto\",\n",
+    "          \"file_ids\": [\n",
+    "            \"file-WTiyGcZySaU6n218gj4XxR\"\n",
+    "          ]\n",
+    "        }\n",
+    "      },\n",
+    "      {\n",
+    "        \"type\": \"mcp\",\n",
+    "        \"server_url\": \"https://www.aloyoga.com/api/mcp\",\n",
+    "        \"server_label\": \"aloyoga\",\n",
+    "        \"allowed_tools\": [\n",
+    "          \"search_shop_catalog\",\n",
+    "          \"get_product_details\"\n",
+    "        ],\n",
+    "        \"require_approval\": \"never\"\n",
+    "      }\n",
+    "    ],\n",
+    "    \"temperature\": 1,\n",
+    "    \"max_output_tokens\": 2048,\n",
+    "    \"top_p\": 1,\n",
+    "    \"store\": true\n",
+    "  }'\n"
+   ]
+  },
+  {
+   "cell_type": "markdown",
+   "metadata": {},
+   "source": [
+    "The model is able to carry forward it’s results from the MCP tool and web search into the code interpreter steps to produce a report with the following content that is formatted for legibility: \n",
+    "\n",
+    "---\n",
+    "#### **Pricing Comparison and Revenue Analysis Report**\n",
+    "\n",
+    "**Your Store's Sales & Price Analysis**\n",
+    "\n",
+    "- **Revenue by Product:**\n",
+    "    - Shorts: $6,060\n",
+    "    - Tank tops: $6,150\n",
+    "    - Yoga pants: $12,210\n",
+    "- **Average Order Value:** $872.14\n",
+    "- **Your Store's Average Selling Price by Category:**\n",
+    "    - Shorts: $60.00\n",
+    "    - Tank tops: $75.00\n",
+    "    - Yoga pants: $110.00\n",
+    "\n",
+    "#### **Pricing Gaps vs Market**\n",
+    "\n",
+    "| Category | Store Avg Price | vs Alo Yoga Gap (%) | Flagged (≥15%) | vs Uniqlo Gap (%) | Flagged (≥15%) |\n",
+    "| --- | --- | --- | --- | --- | --- |\n",
+    "| Shorts | $60.00 | -31.8% | **YES** | +100.7% | **YES** |\n",
+    "| Tank tops | $75.00 | -14.8% |  | +114.9% | **YES** |\n",
+    "| Yoga pants | $110.00 | -14.1% |  | +267.9% | **YES** |\n",
+    "\n",
+    "#### **Recommendations & Flags**\n",
+    "\n",
+    "**Flagged products (≥15% price gap):**\n",
+    "\n",
+    "- **Shorts:** Priced 31.8% below Alo Yoga, but 100.7% above Uniqlo.\n",
+    "- **Tank tops:** Priced over 114.9% above Uniqlo.\n",
+    "- **Yoga pants:** Priced 267.9% above Uniqlo.\n",
+    "\n",
+    "Shorts are priced significantly below premium competitors (Alo Yoga), but far higher than budget alternatives (Uniqlo). If you want to compete in the premium segment, consider increasing your price. If you want to target budget buyers, a price decrease could be justifiable. Most of your tank tops and yoga pants are similarly positioned—much lower than Alo, but well above Uniqlo.\n",
+    "\n",
+    "___"
+   ]
+  },
+  {
+   "cell_type": "markdown",
+   "metadata": {},
+   "source": [
+    "### Prompting guidelines to improve MCP tool calls\n",
+    "\n",
+    "Depending on your use case you might find that the model invokes many MCP calls, for instance when using catalog-search tools. To avoid endless iterations over large product inventories it’s helpful to instruct the model to limit it’s search to N items and to offer to continue only when the user explicitly asks for more information. This keeps responses focused and snappy.\n",
+    "\n",
+    "If the MCP servers you’re using include exhaustive `mcp_list_tools`, it’s also worth Including some targeted few-shot examples to show the model how  to choose the correct server and to stop once it has what it needs, instead of issuing redundant calls.\n",
+    "\n",
+    "Finally, adding guidance to remind the model that if essential information (size, color, product line, etc.) is missing from the user query, it should ask a follow-up question rather than launching a broad search. This small prompt nudge reduces unnecessary tool calls and improves answer quality. Here’s a sample prompt that shows how these guidelines come together:"
+   ]
+  },
+  {
+   "cell_type": "code",
+   "execution_count": null,
+   "metadata": {
+    "vscode": {
+     "languageId": "plaintext"
+    }
+   },
+   "outputs": [],
+   "source": [
+    "system_prompt= \"\"\"You are an AI assistant that can call the following MCP servers:\n",
+    "\n",
+    "1. allbirds_store\n",
+    "2. gitmcp\n",
+    "\n",
+    "Steps\n",
+    "1. Use the MCP servers above to answer the user query, not every MCP server will relevant for a given query so you can choose which ones to invoke.  \n",
+    "2. If the user’s request lacks essential details (size, color, etc.), ask a follow-up question first rather than guessing and using the MCP server tool prematurely. \n",
+    "3. If searching for products in a catalog, only return 4 results at a time before asking the user whether they want to see more. \n",
+    "\n",
+    "### Few-shot examples\n",
+    "\n",
+    "# EX1 — Direct product search, then fetch variant details\n",
+    "user: Do you have the Allbirds Tree Runner in men’s size 10?  \n",
+    "assistant: {\"name\":\"allbirds_store.search_shop_catalog\",\n",
+    "            \"arguments\":{\"query\":\"Tree Runner\",\n",
+    "                         \"context\":\"Men’s size 10 shoes\"}}\n",
+    "# (assume the search returns product_id \"gid://shopify/Product/987\")  \n",
+    "assistant: {\"name\":\"allbirds_store.get_product_details\",\n",
+    "            \"arguments\":{\"product_id\":\"gid://shopify/Product/987\",\n",
+    "                         \"options\":{\"Size\":\"10\"}}}\n",
+    "\n",
+    "# EX2 — Clarify missing size, then two-step color variant lookup\n",
+    "user: I want the Tree Runner in blue.  \n",
+    "assistant: Sure — what size do you need?  \n",
+    "user: Size 10.  \n",
+    "assistant: {\"name\":\"allbirds_store.search_shop_catalog\",\n",
+    "            \"arguments\":{\"query\":\"Tree Runner\",\n",
+    "                         \"context\":\"Blue variant, size 10\"}}\n",
+    "# (assume the search returns product_id \"gid://shopify/Product/987\")  \n",
+    "assistant: {\"name\":\"allbirds_store.get_product_details\",\n",
+    "            \"arguments\":{\"product_id\":\"gid://shopify/Product/987\",\n",
+    "                         \"options\":{\"Size\":\"10\",\"Color\":\"Blue\"}}}\n",
+    "\n",
+    "# EX3 — Git docs: search then fetch specific file\n",
+    "user: Can you show me how tiktoken does byte-pair encoding?  \n",
+    "assistant: {\"name\":\"gitmcp.search_website_documentation\",\n",
+    "            \"arguments\":{\"query\":\"tiktoken byte-pair encoding\"}}\n",
+    "# (assume the search returns document_id \"docs/ENCODING.md\")  \n",
+    "assistant: {\"name\":\"gitmcp.fetch_website_documentation\",\n",
+    "            \"arguments\":{\"document_id\":\"docs/ENCODING.md\"}} \"\"\"\n"
+   ]
+  },
+  {
+   "cell_type": "code",
+   "execution_count": null,
+   "metadata": {
+    "vscode": {
+     "languageId": "plaintext"
+    }
+   },
+   "outputs": [],
+   "source": [
+    "curl https://api.openai.com/v1/responses \\\n",
+    "  -H \"Content-Type: application/json\" \\\n",
+    "  -H \"Authorization: Bearer $OPENAI_API_KEY\" \\\n",
+    "  -d '{\n",
+    "    \"model\": \"gpt-4.1\",\n",
+    "    \"input\": [\n",
+    "      {\n",
+    "        \"role\": \"system\",\n",
+    "        \"content\": [\n",
+    "          {\n",
+    "            \"type\": \"input_text\",\n",
+    "            \"text\": \"ABOVE_SYSTEM_PROMPT\"\n",
+    "          }\n",
+    "        ]\n",
+    "      },\n",
+    "      {\n",
+    "        \"role\": \"user\",\n",
+    "        \"content\": [\n",
+    "          {\n",
+    "            \"type\": \"input_text\",\n",
+    "            \"text\": \"find me womens tree loungers in size 8\"\n",
+    "          }\n",
+    "        ]\n",
+    "      }\n",
+    "    ],\n",
+    "    \"tools\": [\n",
+    "      {\n",
+    "        \"type\": \"mcp\",\n",
+    "        \"server_url\": \"https://www.allbirds.com/api/mcp\",\n",
+    "        \"server_label\": \"allbirds\",\n",
+    "        \"allowed_tools\": [\n",
+    "          \"search_shop_catalog\",\n",
+    "          \"get_cart\",\n",
+    "          \"update_cart\",\n",
+    "          \"search_shop_policies_and_faqs\",\n",
+    "          \"get_product_details\"\n",
+    "        ],\n",
+    "        \"require_approval\": \"never\"\n",
+    "      },\n",
+    "      {\n",
+    "        \"type\": \"mcp\",\n",
+    "        \"server_label\": \"gitmcp\",\n",
+    "        \"server_url\": \"https://gitmcp.io/openai/tiktoken\",\n",
+    "        \"allowed_tools\": [\n",
+    "          \"fetch_tiktoken_documentation\",\n",
+    "          \"search_tiktoken_documentation\",\n",
+    "          \"search_tiktoken_code\",\n",
+    "          \"fetch_generic_url_content\"\n",
+    "        ],\n",
+    "        \"require_approval\": \"never\"\n",
+    "      }\n",
+    "    ],\n",
+    "    \"temperature\": 1,\n",
+    "    \"max_output_tokens\": 2048\n",
+    "  }'\n"
+   ]
+  },
+  {
+   "cell_type": "markdown",
+   "metadata": {},
+   "source": [
+    "## Conclusion\n",
+    "\n",
+    "The hosted MCP tool in the Responses API turns external-service access from a bespoke plumbing task into a first-class capability of the API. By connecting to a remote server, letting the runtime cache its tool list, and trimming that list with `allowed_tools`, you eliminate the extra network hop, cut token overhead, and give the model a concise, discoverable action set. When combined with built-in tools such as `code_interpreter`, `web_search_preview`, or `image_gen`, MCP unlocks rich, multi-service workflows whether you’re analyzing sales data, triaging production errors, or automating checkout flows."
+   ]
+  }
+ ],
+ "metadata": {
+  "language_info": {
+   "name": "python"
+  }
+ },
+ "nbformat": 4,
+ "nbformat_minor": 2
+}

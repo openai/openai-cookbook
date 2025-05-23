@@ -2026,3 +2026,13 @@
     - agents
     - agents-sdk
     - parallel-agents
+
+- title: Turn Any Article into a Scripted Podcast with GPT-4o-tts
+  path: examples/multimodal/article_to_podcast/article_to_podcast.ipynb
+  date: 2025-05-23
+  authors:
+    - yiren-openai
+  tags:
+    - responses
+    - speech
+    - audio

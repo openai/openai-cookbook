@@ -18,14 +18,10 @@
   path: examples/fine-tuned_qa/reinforcement_finetuning_healthbench.ipynb
   date: 2025-05-21
   authors:
-    - theophile-openai
+    - robert-tinn
   tags:
-    - reinforcement-learning
-    - fine-tuning
     - qa
     - evals
-    - reinforcement
-    - reinforcement-learning-graders
 
 - title: Guide to Using the Responses API's MCP Tool 
   path: examples/mcp/mcp_tool_guide.ipynb

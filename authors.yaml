@@ -3,6 +3,11 @@
 # You can optionally customize how your information shows up cookbook.openai.com over here.
 # If your information is not present here, it will be pulled from your GitHub profile.
 
+theophile-openai:
+  name: "Theophile Sautory"
+  website: "https://www.linkedin.com/in/theophilesautory"
+  avatar: "https://avatars.githubusercontent.com/u/206768658?v=4"
+
 robert-tinn:
   name: "Robert Tinn"
   website: "https://www.linkedin.com/in/robert-tinn/"

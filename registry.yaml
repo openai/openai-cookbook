@@ -4,6 +4,16 @@
 # should build pages for, and indicates metadata such as tags, creation date and
 # authors for each page.
 
+- title: Reinforcement Fine-Tuning on the OpenAI Platform
+  path: examples/Reinforcement_Fine_Tuning.ipynb
+  date: 2025-05-23
+  authors:
+    - theophile-openai
+  tags:
+    - reinforcement-learning
+    - fine-tuning
+    - functions
+    - responses
 
 - title: Guide to Using the Responses API's MCP Tool 
   path: examples/mcp/mcp_tool_guide.ipynb

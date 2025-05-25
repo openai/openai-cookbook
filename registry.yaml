@@ -175,6 +175,7 @@
   tags:
     - assistants
     - dall-e
+  archived: true
 
 - title: Data preparation and analysis for chat model fine-tuning
   path: examples/Chat_finetuning_data_prep.ipynb
@@ -514,6 +515,7 @@
   tags:
     - whisper
     - completions
+  archived: true
 
 - title: "Enhancing Whisper transcriptions: pre- & post-processing techniques"
   path: examples/Whisper_processing_guide.ipynb
@@ -522,6 +524,7 @@
     - prestontuggle
   tags:
     - whisper
+  archived: true
 
 - title: Whisper prompting guide
   path: examples/Whisper_prompting_guide.ipynb
@@ -531,6 +534,7 @@
   tags:
     - whisper
     - completions
+  archived: true
 
 - title: Zero-shot classification with embeddings
   path: examples/Zero-shot_classification_with_embeddings.ipynb
@@ -597,6 +601,7 @@
     - colin-openai
   tags:
     - dall-e
+  archived: true
 
 - title: How to use the DALL·E API
   path: examples/dalle/Image_generations_edits_and_variations_with_DALL-E.ipynb
@@ -605,6 +610,7 @@
     - ted-at-openai
   tags:
     - dall-e
+  archived: true
 
 - title: How to evaluate a summarization task
   path: examples/evaluation/How_to_eval_abstractive_summarization.ipynb
@@ -963,6 +969,7 @@
   tags:
     - embeddings
     - completions
+  archived: true
 
 - title: Using Redis for embeddings search
   path: examples/vector_databases/redis/Using_Redis_for_embeddings_search.ipynb
@@ -1030,6 +1037,7 @@
     - jasonbosco
   tags:
     - embeddings
+  archived: true
 
 - title: Using Typesense for embeddings search
   path: >-
@@ -1039,6 +1047,7 @@
     - colin-openai
   tags:
     - embeddings
+  archived: true
 
 - title: Weaviate <> OpenAI
   path: examples/vector_databases/weaviate/README.md
@@ -1318,6 +1327,7 @@
   tags:
     - assistants
     - functions
+  archived: true
 
 - title: "Orchestrating Agents: Routines and Handoffs"
   path: examples/Orchestrating_agents.ipynb

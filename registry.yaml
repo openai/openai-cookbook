@@ -1300,6 +1300,7 @@
     - 0hq
   tags:
     - dall-e
+  archived: true
 
 - title: How to make your completions outputs consistent with the new seed parameter
   path: examples/Reproducible_outputs_with_the_seed_parameter.ipynb

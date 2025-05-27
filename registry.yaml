@@ -11,9 +11,9 @@
     - billchen-openai
     - prashantmital-openai
   tags:
-    - o3
-    - o4-mini
-    - function-calling
+    - functions
+    - responses
+    - reasoning
 
 - title: Exploring Model Graders for Reinforcement Fine-Tuning
   path: examples/Reinforcement_Fine_Tuning.ipynb

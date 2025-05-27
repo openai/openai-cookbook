@@ -30,6 +30,9 @@ from utils import outputs_dir, output_file
 # ---------------------------------------------------------------------------
 
 OUTPUT_DIR = outputs_dir()
+PROMPT_PATH = Path(__file__).parent / "prompts" / "code_interpreter.md"
+with open(PROMPT_PATH, "r", encoding="utf-8") as f:
+    CODE_INTERPRETER_INSTRUCTIONS = f.read()
 
 # ---------------------------------------------------------------------------
 # Tool implementations
@@ -83,20 +86,7 @@ def run_code_interpreter(request: str, input_files: list[str]) -> str:
             uploaded = client.files.create(file=f, purpose="user_data")
             file_ids.append(uploaded.id)
 
-    instructions = (
-        "You are an expert quantitative developer using OpenAI's Code Interpreter. "
-        "You are called by a Quant agent to generate a specific quantitative analysis that must result in downloadable CSV and/or PNG files. "
-        "You MUST create and save all analysis outputs as downloadable files in the /mnt/data/ directory, and provide direct download links for every file you reference. "
-        "You cannot maintain a session or answer follow-up questions—your response must be complete and self-contained, with all requested analysis and files generated in a single call. "
-        "If the analysis does not make sense or cannot be completed with the provided files, do NOT generate outputs or ask for followups—first, print the column names (schema) of all input files. If a required column is missing, check for common variants (e.g., 'Date', 'date', 'DATE') and use the one that matches. If no suitable column is found, state that the analysis could not be performed, and provide a <reason> tag with a clear explanation for why not, including the available columns. This <reason> will be used as the error message. "
-        "Do NOT attempt to fetch market data or use yfinance; use only the files provided in input_files. "
-        "When generating visuals use distict colors for comparision tasks, not shades of the same color in the same plot."
-        "For visuals, use plt.savefig('/mnt/data/your_filename.png'). For CSVs, use df.to_csv('/mnt/data/your_filename.csv'). "
-        "Example: Files generated:\n- UNH_400C_greeks_may2025.csv (table of Greeks and option parameters)\n- UNH_400C_greeks_summary.png (summary bar chart of Greeks)\n\nYou can download them here:\n- [UNH_400C_greeks_may2025.csv](sandbox:/mnt/data/UNH_400C_greeks_may2025.csv)\n- [UNH_400C_greeks_summary.png](sandbox:/mnt/data/UNH_400C_greeks_summary.png) "
-        "If the analysis cannot be performed, state clearly Why the analysis could not be performed in the reason tags: '<reason></reason>'. "
-        "Summarize your analysis clearly and list all generated files that are able to be downloaded in your output. "
-        "If you need to produce more outputs, you must be called again."
-    )
+    instructions = CODE_INTERPRETER_INSTRUCTIONS
 
     resp = client.responses.create(
         model="gpt-4.1",

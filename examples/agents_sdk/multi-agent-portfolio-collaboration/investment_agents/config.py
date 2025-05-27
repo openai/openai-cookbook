@@ -28,4 +28,3 @@ def build_investment_agents() -> InvestmentAgentsBundle:
         quant=quant,
     )
 
-# The function `run_all_specialists_parallel` has been removed as its functionality is duplicated in `pm.py`.

@@ -10,7 +10,7 @@ Your task is to write a *Quantitative Analysis* section suitable for an investme
 
 **Key Requirements:**
 - Always provide the names of all files (charts, CSVs, etc.) you generate, and reference their contents clearly in your report.
-- You have access to a wide range of data tools , including: historical stock prices, company info, news, dividends/splits, financial statements (annual/quarterly), holder info, option chains, analyst recommendations, and macroeconomic series (FRED).
+- You have access to a wide range of data tools, including: historical stock prices, company info, news, dividends/splits, financial statements (annual/quarterly), holder info, option chains, analyst recommendations, and macroeconomic series (FRED).
 - For each analysis, identify and fetch all types of data that could be relevant (not just historical prices). Justify each data type you fetch.
 - Batch all required data fetches in parallel before analysis. After initial data gathering, check if any relevant data/tool was missed and fetch it if needed.
 

@@ -28,17 +28,4 @@ def build_investment_agents() -> InvestmentAgentsBundle:
         quant=quant,
     )
 
-async def run_all_specialists_parallel(fundamental_tool, macro_tool, quant_tool, input: SpecialistRequestInput):
-    """
-    Runs all three specialist agent tools in parallel and returns their results as a dict.
-    """
-    results = await asyncio.gather(
-        fundamental_tool(input),
-        macro_tool(input),
-        quant_tool(input)
-    )
-    return {
-        "fundamental": results[0],
-        "macro": results[1],
-        "quant": results[2]
-    } 
+# The function `run_all_specialists_parallel` has been removed as its functionality is duplicated in `pm.py`.

@@ -48,6 +48,25 @@ def save_df_to_csv(df, base_name):
     df_clean.to_csv(file_path, index=False)
     return str(file_path), list(df_clean.columns)
 
+def save_json_to_file(data, base_name):
+    file_path = OUTPUTS_DIR / f"{base_name}.json"
+    if file_path.exists():
+        unique_id = uuid.uuid4().hex[:8]
+        file_path = OUTPUTS_DIR / f"{base_name}_{unique_id}.json"
+    with open(file_path, "w") as f:
+        json.dump(data, f, indent=2)
+    # Schema: for dict, top-level keys; for list, type of first element or 'list'; else type
+    if isinstance(data, dict):
+        schema = list(data.keys())
+        preview = {k: data[k] for k in list(data)[:PREVIEW_ROWS]}
+    elif isinstance(data, list):
+        schema = [type(data[0]).__name__] if data else ["list"]
+        preview = data[:PREVIEW_ROWS]
+    else:
+        schema = [type(data).__name__]
+        preview = data
+    return str(file_path), schema, preview
+
 class FinancialType(str, Enum):
     income_stmt = "income_stmt"
     quarterly_income_stmt = "quarterly_income_stmt"
@@ -134,8 +153,13 @@ def get_stock_info_sync(ticker):
         logger.error(f"Company ticker {ticker} not found.")
         return json.dumps({"error": f"Company ticker {ticker} not found."})
     info = company.info
+    file_path, schema, preview = save_json_to_file(info, f"{ticker}_stock_info")
     logger.info(f"Returning stock info for {ticker}")
-    return json.dumps(info)
+    return json.dumps({
+        "file_path": file_path,
+        "schema": schema,
+        "preview": preview
+    })
 
 @yfinance_server.tool(
     name="get_stock_info",
@@ -173,13 +197,18 @@ def get_yahoo_finance_news_sync(ticker):
             description = news_item.get("content", {}).get("description", "")
             url = news_item.get("content", {}).get("canonicalUrl", {}).get("url", "")
             news_list.append(
-                f"Title: {title}\nSummary: {summary}\nDescription: {description}\nURL: {url}"
+                {"title": title, "summary": summary, "description": description, "url": url}
             )
     if not news_list:
         logger.warning(f"No news found for company with ticker {ticker}.")
         return json.dumps({"error": f"No news found for company that searched with {ticker} ticker."})
+    file_path, schema, preview = save_json_to_file(news_list, f"{ticker}_news")
     logger.info(f"Returning news for {ticker}")
-    return json.dumps({"news": news_list})
+    return json.dumps({
+        "file_path": file_path,
+        "schema": schema,
+        "preview": preview
+    })
 
 @yfinance_server.tool(
     name="get_yahoo_finance_news",
@@ -335,8 +364,14 @@ def get_option_expiration_dates_sync(ticker):
     if company.isin is None:
         logger.error(f"Company ticker {ticker} not found.")
         return json.dumps({"error": f"Company ticker {ticker} not found."})
+    dates = list(company.options)
+    file_path, schema, preview = save_json_to_file(dates, f"{ticker}_option_expiration_dates")
     logger.info(f"Returning option expiration dates for {ticker}")
-    return json.dumps(list(company.options))
+    return json.dumps({
+        "file_path": file_path,
+        "schema": schema,
+        "preview": preview
+    })
 
 @yfinance_server.tool(
     name="get_option_expiration_dates",

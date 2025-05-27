@@ -2,6 +2,7 @@
 
 # You can optionally customize how your information shows up cookbook.openai.com over here.
 # If your information is not present here, it will be pulled from your GitHub profile.
+<<<<<<< HEAD
 rajpathak-openai:
   name: "Raj Pathak"
   website: "https://www.linkedin.com/in/rajpathakopenai/"
@@ -11,6 +12,12 @@ chelseahu-openai:
   name: "Chelsea Hu"
   website: "https://www.linkedin.com/in/chelsea-tsaiszuhu/"
   avatar: "https://avatars.githubusercontent.com/u/196863678?v=4"
+=======
+prashantmital-openai:
+  name: "Prashant Mital"
+  website: "https://www.linkedin.com/in/pmital/"
+  avatar: "https://avatars.githubusercontent.com/u/173949238?v=4"
+>>>>>>> origin/main
 
 theophile-openai:
   name: "Theophile Sautory"

@@ -4,6 +4,17 @@
 # should build pages for, and indicates metadata such as tags, creation date and
 # authors for each page.
 
+- title: o3/o4-mini Function Calling Guide
+  path: examples/o-series/o3o4-mini_prompting_guide.ipynb
+  date: 2025-05-26
+  authors:
+    - billchen-openai
+    - prashantmital-openai
+  tags:
+    - functions
+    - responses
+    - reasoning
+
 - title: Exploring Model Graders for Reinforcement Fine-Tuning
   path: examples/Reinforcement_Fine_Tuning.ipynb
   date: 2025-05-23

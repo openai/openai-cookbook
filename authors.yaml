@@ -2,6 +2,10 @@
 
 # You can optionally customize how your information shows up cookbook.openai.com over here.
 # If your information is not present here, it will be pulled from your GitHub profile.
+prashantmital-openai:
+  name: "Prashant Mital"
+  website: "https://www.linkedin.com/in/pmital/"
+  avatar: "https://avatars.githubusercontent.com/u/173949238?v=4"
 
 theophile-openai:
   name: "Theophile Sautory"

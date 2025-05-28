@@ -1,5 +1,5 @@
 from agents import Agent, WebSearchTool, ModelSettings
-from utils import load_prompt, DISCLAIMER
+from utils import load_prompt, DISCLAIMER, repo_path
 from pathlib import Path
 
 default_model = "gpt-4.1"
@@ -11,7 +11,7 @@ def build_fundamental_agent():
     fundamental_prompt = load_prompt("fundamental_base.md", RECENT_DAYS=RECENT_DAYS)
     # Set up the Yahoo Finance MCP server
     from agents.mcp import MCPServerStdio
-    server_path = str(Path(__file__).resolve().parent.parent/"mcp/yahoo_finance_server.py")
+    server_path = str(repo_path("mcp/yahoo_finance_server.py"))
     yahoo_mcp_server = MCPServerStdio(
         params={"command": "python", "args": [server_path]},
         client_session_timeout_seconds=300,

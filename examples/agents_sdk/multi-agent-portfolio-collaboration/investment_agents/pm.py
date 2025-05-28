@@ -60,8 +60,10 @@ def build_head_pm_agent(fundamental, macro, quant, memo_edit_tool):
             load_prompt("pm_base.md") + DISCLAIMER
         ),
         model="gpt-4.1",
+        #Reasoning model
         #model="o4-mini",
         tools=[fundamental_tool, macro_tool, quant_tool, memo_edit_tool, run_all_specialists_tool],
+        # Settings for a reasoning model
         #model_settings=ModelSettings(parallel_tool_calls=True, reasoning={"summary": "auto", "effort": "high"}, tool_choice="auto")
         model_settings=ModelSettings(parallel_tool_calls=True, tool_choice="auto", temperature=0)
     ) 

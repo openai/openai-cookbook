@@ -4,32 +4,139 @@
 # should build pages for, and indicates metadata such as tags, creation date and
 # authors for each page.
 
-- title: EvalsAPI Use-case - Detecting prompt regressions
+- title: o3/o4-mini Function Calling Guide
+  path: examples/o-series/o3o4-mini_prompting_guide.ipynb
+  date: 2025-05-26
+  authors:
+    - billchen-openai
+    - prashantmital-openai
+  tags:
+    - functions
+    - responses
+    - reasoning
+
+- title: Exploring Model Graders for Reinforcement Fine-Tuning
+  path: examples/Reinforcement_Fine_Tuning.ipynb
+  date: 2025-05-23
+  authors:
+    - theophile-oai
+  tags:
+    - reinforcement-learning
+    - fine-tuning
+    - reinforcement-learning-graders
+
+- title: Reinforcement Fine-Tuning for Conversational Reasoning with the OpenAI API
+  path: examples/fine-tuned_qa/reinforcement_finetuning_healthbench.ipynb
+  date: 2025-05-21
+  authors:
+    - robert-tinn
+  tags:
+    - fine-tuning
+    - qa
+    - evals
+    - reinforcement
+
+- title: Guide to Using the Responses API's MCP Tool 
+  path: examples/mcp/mcp_tool_guide.ipynb
+  date: 2025-05-21
+  authors:
+    - charuj
+  tags:
+    - mcp
+
+- title: Image Understanding with RAG
+  path: examples/multimodal/image_understanding_with_rag.ipynb
+  date: 2025-05-16
+  authors:
+    - robert-tinn
+  tags:
+    - responses
+    - images
+    - RAG
+    - vision
+
+- title: Better performance from reasoning models using the Responses API
+  path: examples/responses_api/reasoning_items.ipynb
+  date: 2025-05-11
+  authors:
+    - billchen-openai
+  tags:
+    - responses
+    - functions
+
+- title: Context Summarization with Realtime API
+  path: examples/Context_summarization_with_realtime_api.ipynb
+  date: 2025-05-10
+  authors:
+    - minh-hoque
+  tags:
+    - audio
+    - speech
+    - tiktoken
+
+- title: Comparing Speech-to-Text Methods with the OpenAI API
+  path: examples/Speech_transcription_methods.ipynb
+  date: 2025-04-29
+  authors:
+    - minh-hoque
+  tags:
+    - audio
+    - speech
+    - agents-sdk
+
+- title: Practical Guide for Model Selection for Real‑World Use Cases
+  path: examples/partners/model_selection_guide/model_selection_guide.ipynb
+  date: 2025-05-07
+  authors:
+    - shikhar-cyber
+    - kashyapm-tribe
+    - saip-tribe
+    - nharada-tribe
+  tags:
+    - responses
+    - functions
+    - web-search
+    - tool calling
+    - RAG
+    - insurance
+    - legal
+    - pharma
+
+- title: Evals API Use-case - Detecting prompt regressions
   path: examples/evaluation/use-cases/regression.ipynb
   date: 2025-04-08
   authors:
     - josiah-openai
   tags:
-    - evalsapi
+    - evals-api
     - completions
 
-- title: EvalsAPI Use-case - Bulk model and prompt experimentation
+- title: Evals API Use-case - Bulk model and prompt experimentation
   path: examples/evaluation/use-cases/bulk-experimentation.ipynb
   date: 2025-04-08
   authors:
     - josiah-openai
   tags:
-    - evalsapi
+    - evals-api
     - completions
 
-- title: EvalsAPI Use-case - Monitoring stored completions
+- title: Evals API Use-case - Monitoring stored completions
   path: examples/evaluation/use-cases/completion-monitoring.ipynb
   date: 2025-04-08
   authors:
     - josiah-openai
   tags:
-    - evalsapi
+    - evals-api
     - completions
+
+- title: Evals API Use-case - Responses Evaluation
+  path: examples/evaluation/use-cases/responses-evaluation.ipynb
+  date: 2025-05-13
+  authors:
+    - willhath-openai
+  tags:
+    - evals-api
+    - responses
 
 - title: Multi-Tool Orchestration with RAG approach using OpenAI's Responses API
   path: examples/responses_api/responses_api_tool_orchestration.ipynb
@@ -277,6 +384,7 @@
   date: 2022-10-20
   authors:
     - colin-openai
+    - vishnu-oai
   tags:
     - embeddings
     - completions
@@ -690,9 +798,10 @@
 
 - title: Robust question answering with Chroma and OpenAI
   path: examples/vector_databases/chroma/hyde-with-chroma-and-openai.ipynb
-  date: 2023-04-06
+  date: 2025-04-23
   authors:
     - atroyn
+    - brandonbaker-openai
   tags:
     - embeddings
     - completions
@@ -1045,6 +1154,19 @@
   tags:
     - embeddings
 
+- title: ElatoAI - Realtime Speech AI Agents for ESP32 on Arduino
+  path: examples/voice_solutions/running_realtime_api_speech_on_esp32_arduino_edge_runtime_elatoai.md
+  date: 2025-05-01
+  authors:
+    - akashdeepdeb
+  tags:
+    - realtime-api
+    - speech
+    - audio
+    - esp32
+    - iot
+    - arduino
+
 - title: Related resources from around the web
   path: articles/related_resources.md
   redirects:
@@ -1171,13 +1293,14 @@
     - functions
     - fine-tuning
 
-- title: Processing and narrating a video with GPT's visual capabilities and the TTS API
+- title: Processing and narrating a video with GPT-4.1-mini's visual capabilities and GPT-4o TTS API
   path: examples/GPT_with_vision_for_video_understanding.ipynb
-  date: 2023-11-06
+  date: 2025-04-22
   authors:
     - cathykc
+    - rzhao-openai
   tags:
-    - completions
+    - responses
     - vision
     - speech
 
@@ -1730,7 +1853,7 @@
   tags:
     - completions
     - reasoning
-  
+
 - title: GPT Actions library - GitHub
   path: examples/chatgpt/gpt_actions_library/gpt_action_github.md
   date: 2024-10-23
@@ -1779,9 +1902,9 @@
   tags:
     - gpt-actions-library
     - embeddings
-    - chatgpt 
+    - chatgpt
     - chatgpt-and-api
-    
+
 - title: Optimizing Retrieval-Augmented Generation using GPT-4o Vision Modality
   path: examples/vector_databases/pinecone/Using_vision_modality_for_RAG_with_Pinecone.ipynb
   date: 2024-11-12
@@ -1811,8 +1934,8 @@
     - gpt-actions-library
     - chatgpt
     - chatgpt-communication
-    
-- title: GPT Actions library - Tray.ai APIM 
+
+- title: GPT Actions library - Tray.ai APIM
   path: examples/chatgpt/gpt_actions_library/gpt_action_trayai_apim.md
   date: 2024-11-26
   authors:
@@ -1846,15 +1969,6 @@
   authors:
     - MW-OAI
     - thli-openai
-  tags:
-    - usage-api
-    - cost-api
-
-- title: How to use the Usage API and Cost API to monitor your OpenAI usage
-  path: examples/completions_usage_api.ipynb
-  date: 2025-01-14
-  authors:
-    - MW-OAI
   tags:
     - usage-api
     - cost-api
@@ -1903,3 +2017,52 @@
   tags:
     - agents
     - evaluation
+
+- title: GPT Actions library - Salesforce & Gong
+  path: examples/chatgpt/gpt_actions_library/gpt_action_salesforce_gong.md
+  date: 2025-04-07
+  authors:
+    - girishd
+  tags:
+    - chatgpt
+    - gpt-actions-library
+    - chatgpt-productivity
+
+- title: GPT-4.1 Prompting Guide
+  path: examples/gpt4-1_prompting_guide.ipynb
+  date: 2025-04-14
+  authors:
+    - nm-openai
+    - julian-openai
+  tags:
+    - responses
+    - api
+
+- title: Generate images with GPT Image
+  path: examples/Generate_Images_With_GPT_Image.ipynb
+  date: 2025-04-23
+  authors:
+    - katiagg
+  tags:
+    - images
+
+- title: Handling Function Calls with Reasoning Models
+  path: examples/reasoning_function_calls.ipynb
+  date: 2025-04-25
+  authors:
+    - tompakeman-oai
+  tags:
+    - reasoning
+    - functions
+    - responses
+    - api
+
+- title: Parallel Agents with the OpenAI Agents SDK
+  path: examples/agents_sdk/parallel_agents.ipynb
+  date: 2025-05-01
+  authors:
+    - brandonbaker-openai
+  tags:
+    - agents
+    - agents-sdk
+    - parallel-agents

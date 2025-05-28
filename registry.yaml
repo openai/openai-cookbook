@@ -2009,14 +2009,14 @@
     - audio
     - speech
 
-- title: Evaluating OpenAI Agents
+- title: Evaluating Agents with Langfuse
   path: examples/agents_sdk/evaluate_agents.ipynb
   date: 2025-03-31
   authors:
     - jannik-maierhofer
   tags:
-    - agents
-    - evaluation
+    - evals
+    - agents-sdk
 
 - title: GPT Actions library - Salesforce & Gong
   path: examples/chatgpt/gpt_actions_library/gpt_action_salesforce_gong.md

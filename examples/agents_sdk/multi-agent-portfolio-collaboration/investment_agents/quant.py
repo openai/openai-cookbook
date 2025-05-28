@@ -1,5 +1,5 @@
 from agents import Agent, ModelSettings
-from tools import run_code_interpreter, get_fred_series, read_csv_preview, list_output_files
+from tools import run_code_interpreter, get_fred_series, read_file, list_output_files
 from utils import load_prompt, DISCLAIMER
 from pathlib import Path
 
@@ -21,7 +21,7 @@ def build_quant_agent():
         name="Quantitative Analysis Agent",
         instructions=(quant_prompt + DISCLAIMER + tool_retry_instructions),
         mcp_servers=[yahoo_mcp_server],
-        tools=[run_code_interpreter, get_fred_series, read_csv_preview, list_output_files],
+        tools=[run_code_interpreter, get_fred_series, read_file, list_output_files],
         model=default_model,
         model_settings=ModelSettings(parallel_tool_calls=True, temperature=0),
     ) 

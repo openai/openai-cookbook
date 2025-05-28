@@ -80,7 +80,7 @@ def run_code_interpreter(request: str, input_files: list[str]) -> str:
             raise ValueError(
                 f"File not found: {file_path}. "
                 "Use the list_output_files tool to see which files exist, "
-                "and the read_csv_preview tool to see the contents of CSV files."
+                "and the read_file tool to see the contents of CSV files."
             )
         with abs_path.open("rb") as f:
             uploaded = client.files.create(file=f, purpose="user_data")
@@ -156,34 +156,43 @@ def write_markdown(filename: str, content: str) -> str:
     return json.dumps({"file": filename})
 
 @function_tool
-def read_markdown(filename: str) -> str:
-    """Read a Markdown file from the outputs directory.
-
-    If the caller provides a filename with **no** extension, we assume they meant a Markdown file
-    and append ``.md`` automatically. However, if the caller explicitly provides an extension that
-    is *not* ``.md``, we return an error explaining that only Markdown files are supported.
+def read_file(filename: str, n_rows: int = 10) -> str:
     """
+    Read and preview the contents of a file from the outputs directory.
 
-    # Determine if an explicit, non-Markdown extension was provided
-    suffix = Path(filename).suffix
-    if suffix and suffix.lower() != ".md":
-        return json.dumps({
-            "error": f"Wrong extension. cannot read '{suffix}' files; only .md files are supported",
-            "file": filename,
-        })
+    Supports reading CSV, Markdown (.md), and plain text (.txt) files. For CSV files, returns a preview of the last `n_rows` as a Markdown table. For Markdown and text files, returns the full text content. For unsupported file types, returns an error message.
 
-    # If no extension or already .md, ensure filename ends with .md
-    if not filename.endswith(".md"):
-        filename += ".md"
+    Args:
+        filename: The name of the file to read, relative to the outputs directory. Supported extensions: .csv, .md, .txt.
+        n_rows: The number of rows to preview for CSV files (default: 10).
 
+    Returns:
+        str: A JSON string containing either:
+            - For CSV: {"file": filename, "preview_markdown": "<markdown table>"}
+            - For Markdown/Text: {"file": filename, "content": "<text content>"}
+            - For errors: {"error": "<error message>", "file": filename}
+    """
     path = output_file(filename, make_parents=False)
     if not path.exists():
         return json.dumps({"error": "file not found", "file": filename})
 
-    with open(path, "r", encoding="utf-8") as f:
-        content = f.read()
-
-    return json.dumps({"file": filename, "content": content})
+    suffix = Path(filename).suffix.lower()
+    if suffix == ".csv":
+        try:
+            df = pd.read_csv(path).tail(n_rows)
+            table_md = df.to_markdown(index=False)
+            return json.dumps({"file": filename, "preview_markdown": table_md})
+        except Exception as e:
+            return json.dumps({"error": str(e), "file": filename})
+    elif suffix == ".md" or suffix == ".txt":
+        try:
+            with open(path, "r", encoding="utf-8") as f:
+                content = f.read()
+            return json.dumps({"file": filename, "content": content})
+        except Exception as e:
+            return json.dumps({"error": str(e), "file": filename})
+    else:
+        return json.dumps({"error": f"Unsupported file type: {suffix}", "file": filename})
 
 @function_tool
 def get_fred_series(series_id: str, start_date: str, end_date: str, download_csv: bool = False) -> str:
@@ -254,24 +263,6 @@ def get_fred_series(series_id: str, start_date: str, end_date: str, download_csv
         return json.dumps({"error": str(e), "series_id": series_id})
 
 @function_tool
-def read_csv_preview(filename: str, n_rows: int = 10) -> str:
-    """Return last `n_rows` of a CSV in outputs/ as Markdown table JSON."""
-    if not filename.endswith(".csv"):
-        filename += ".csv"
-
-    path = output_file(filename, make_parents=False)
-    if not path.exists():
-        return json.dumps({"error": "file not found", "file": filename})
-
-    try:
-        df = pd.read_csv(path).tail(n_rows)
-    except Exception as e:
-        return json.dumps({"error": str(e), "file": filename})
-
-    table_md = df.to_markdown(index=False)
-    return json.dumps({"file": filename, "preview_markdown": table_md})
-
-@function_tool
 def list_output_files(extension: str = None) -> str:
     """
     List all files in the outputs directory. Optionally filter by file extension (e.g., 'png', 'csv', 'md').
@@ -289,8 +280,7 @@ def list_output_files(extension: str = None) -> str:
 __all__ = [
     "run_code_interpreter",
     "write_markdown",
-    "read_markdown",
     "get_fred_series",
-    "read_csv_preview",
     "list_output_files",
+    "read_file",
 ] 

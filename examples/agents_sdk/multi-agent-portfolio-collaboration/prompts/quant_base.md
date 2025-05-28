@@ -34,7 +34,7 @@ If you mention a file in your request but do not include it in `input_files`, th
 ---
 
 **Additional Tools Available:**
-- **read_csv_preview**: Use this tool to preview the contents of any CSV file in the outputs directory before running an analysis. This helps you understand the schema, columns, and data quality, it doesn't generate any files.
+- **read_file**: Use this tool to preview the contents of any CSV, Markdown, or text file in the outputs directory before running an analysis. For CSVs, it returns a markdown table preview. This helps you understand the schema, columns, and data quality, it doesn't generate any files.
 - **list_output_files**: Use this tool to list all available files in the outputs directory. This helps you check which files are present and avoid referencing non-existent files. If you get file not found errors use this.
 
 _You may use these tools to inspect available data and plan your analysis more effectively before calling run_code_interpreter._

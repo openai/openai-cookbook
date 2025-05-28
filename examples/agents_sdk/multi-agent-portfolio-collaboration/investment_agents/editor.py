@@ -1,5 +1,5 @@
 from agents import Agent, ModelSettings, function_tool, Runner, RunContextWrapper
-from tools import write_markdown, read_markdown, read_csv_preview, list_output_files
+from tools import write_markdown, read_file, list_output_files
 from utils import load_prompt, DISCLAIMER
 from pydantic import BaseModel
 import json
@@ -19,7 +19,7 @@ def build_editor_agent():
     return Agent(
         name="Memo Editor Agent",
         instructions=(editor_prompt + DISCLAIMER + tool_retry_instructions),
-        tools=[write_markdown, read_markdown, read_csv_preview, list_output_files],
+        tools=[write_markdown, read_file, list_output_files],
         model=default_model,
         model_settings=ModelSettings(temperature=0),
     )

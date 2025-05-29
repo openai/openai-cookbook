@@ -1186,6 +1186,7 @@
     - completions
     - embeddings
     - fine-tuning
+  archived: true
 
 - title: How to automate AWS tasks with function calling
   path: examples/third_party/How_to_automate_S3_storage_with_functions.ipynb

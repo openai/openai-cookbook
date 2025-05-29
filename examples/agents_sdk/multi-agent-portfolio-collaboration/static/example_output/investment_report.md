@@ -48,19 +48,19 @@ Quantitative analysis confirms that GOOGL's direct sensitivity to interest rates
 
 Key charts and images:
 
-![GOOGL Daily Returns](static/example_output/googl_daily_returns.png)
-![GOOGL Moving Averages](static/example_output/googl_moving_averages.png)
-![GOOGL RSI](static/example_output/googl_rsi.png)
-![GOOGL Rolling Volatility](static/example_output/googl_rolling_volatility.png)
-![Cumulative Return Comparison](static/example_output/cumulative_return_comparison.png)
-![Rolling Volatility Comparison](static/example_output/rolling_volatility_comparison.png)
-![Rolling Corr/Reg Daily Fed Funds](static/example_output/rolling_corr_reg_daily_fedfunds.png)
-![Rolling Corr/Reg Daily 10Y](static/example_output/rolling_corr_reg_daily_dgs10.png)
-![Rolling Corr/Reg Weekly Fed Funds](static/example_output/rolling_corr_reg_weekly_fedfunds.png)
-![Rolling Corr/Reg Weekly 10Y](static/example_output/rolling_corr_reg_weekly_dgs10.png)
-![GOOGL Quarterly Trends](static/example_output/GOOGL_quarterly_trends.png)
-![GOOGL Quarterly Margins](static/example_output/GOOGL_quarterly_margins.png)
-![GOOGL Analyst Recommendations Trend](static/example_output/GOOGL_analyst_recommendations_trend.png)
+![GOOGL Daily Returns](../../../images/multi-agent-portfolio-collaboration/example_output/googl_daily_returns.png)
+![GOOGL Moving Averages](../../../images/multi-agent-portfolio-collaboration/example_output/googl_moving_averages.png)
+![GOOGL RSI](../../../images/multi-agent-portfolio-collaboration/example_output/googl_rsi.png)
+![GOOGL Rolling Volatility](../../../images/multi-agent-portfolio-collaboration/example_output/googl_rolling_volatility.png)
+![Cumulative Return Comparison](../../../images/multi-agent-portfolio-collaboration/example_output/cumulative_return_comparison.png)
+![Rolling Volatility Comparison](../../../images/multi-agent-portfolio-collaboration/example_output/rolling_volatility_comparison.png)
+![Rolling Corr/Reg Daily Fed Funds](../../../images/multi-agent-portfolio-collaboration/example_output/rolling_corr_reg_daily_fedfunds.png)
+![Rolling Corr/Reg Daily 10Y](../../../images/multi-agent-portfolio-collaboration/example_output/rolling_corr_reg_daily_dgs10.png)
+![Rolling Corr/Reg Weekly Fed Funds](../../../images/multi-agent-portfolio-collaboration/example_output/rolling_corr_reg_weekly_fedfunds.png)
+![Rolling Corr/Reg Weekly 10Y](../../../images/multi-agent-portfolio-collaboration/example_output/rolling_corr_reg_weekly_dgs10.png)
+![GOOGL Quarterly Trends](../../../images/multi-agent-portfolio-collaboration/example_output/GOOGL_quarterly_trends.png)
+![GOOGL Quarterly Margins](../../../images/multi-agent-portfolio-collaboration/example_output/GOOGL_quarterly_margins.png)
+![GOOGL Analyst Recommendations Trend](../../../images/multi-agent-portfolio-collaboration/example_output/GOOGL_analyst_recommendations_trend.png)
 
 The quantitative view is original in its focus on scenario analysis and the modest rate sensitivity, and is aligned with the firm vision by not simply following consensus. Limitations include the short post-pandemic data window and the fact that GOOGL's price is driven by multiple factors (AI, ad market, regulation) beyond rates.
 

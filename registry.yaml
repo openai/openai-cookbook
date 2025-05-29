@@ -2087,7 +2087,6 @@
     - rkoenig-openai
     - phundal-openai
   tags:
-    - realtime-api
-    - data-intensive
-    - agents-sdk
+    - audio
+    - speech
 

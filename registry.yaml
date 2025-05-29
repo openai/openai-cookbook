@@ -2090,3 +2090,15 @@
     - agents
     - agents-sdk
     - parallel-agents
+
+- title: Practical guide to data-intensive apps with the Realtime API
+  path: examples/Data-intensive-Realtime-apps.ipynb
+  date: 2025-05-29
+  authors:
+    - alistair-openai
+    - rkoenig-openai
+    - phundal-openai
+  tags:
+    - audio
+    - speech
+

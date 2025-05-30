@@ -2,6 +2,25 @@
 
 # You can optionally customize how your information shows up cookbook.openai.com over here.
 # If your information is not present here, it will be pulled from your GitHub profile.
+rajpathak-openai:
+  name: "Raj Pathak"
+  website: "https://www.linkedin.com/in/rajpathakopenai/"
+  avatar: "https://avatars.githubusercontent.com/u/208723614?s=400&u=c852eed3be082f7fbd402b5a45e9b89a0bfed1b8&v=4"
+
+chelseahu-openai:
+  name: "Chelsea Hu"
+  website: "https://www.linkedin.com/in/chelsea-tsaiszuhu/"
+  avatar: "https://avatars.githubusercontent.com/u/196863678?v=4"
+
+prashantmital-openai:
+  name: "Prashant Mital"
+  website: "https://www.linkedin.com/in/pmital/"
+  avatar: "https://avatars.githubusercontent.com/u/173949238?v=4"
+
+theophile-oai:
+  name: "Theophile Sautory"
+  website: "https://www.linkedin.com/in/theophilesautory"
+  avatar: "https://avatars.githubusercontent.com/u/206768658?v=4"
 
 robert-tinn:
   name: "Robert Tinn"
@@ -288,6 +307,11 @@ erikakettleson-openai:
   website: "https://www.linkedin.com/in/erika-kettleson-85763196/"
   avatar: "https://avatars.githubusercontent.com/u/186107044?v=4"
 
+jannik-maierhofer:
+  name: "Jannik Maierhöfer"
+  website: "https://www.linkedin.com/in/maierhoefer/"
+  avatar: "https://avatars.githubusercontent.com/u/48529566?v=4"
+
 josiah-openai:
   name: "Josiah Grace"
   website: "https://www.linkedin.com/in/josiahbgrace"
@@ -323,7 +347,22 @@ tompakeman-oai:
   website: "https://www.linkedin.com/in/tom-pakeman/"
   avatar: "https://avatars.githubusercontent.com/u/204937754"
 
-yiren-openai
+yiren-openai:
   name: Yiren Lu
   website: https://yirenlu.com/
   avatar: https://avatars.githubusercontent.com/u/13631199?v=4
+
+alistair-openai:
+  name: "Alistair Gillespie"
+  website: "https://www.linkedin.com/in/alistair-gillespie/"
+  avatar: "https://avatars.githubusercontent.com/u/210626148"
+
+phundal-openai:
+  name: "Patrick Hundal"
+  website: "https://www.linkedin.com/in/phundal/"
+  avatar: "https://avatars.githubusercontent.com/u/189161955"
+
+rkoenig-openai:
+  name: "Robin Koenig"
+  website: "https://www.linkedin.com/in/robinkoenig/"
+  avatar: "https://media.licdn.com/dms/image/v2/C5603AQEqUVtbts8Huw/profile-displayphoto-shrink_400_400/profile-displayphoto-shrink_400_400/0/1558137883581?e=1753920000&v=beta&t=jcm-qNJfmgVJsS6uNHxHu5T2nQoUWkXivthzxTJMWqA"

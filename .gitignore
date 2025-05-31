@@ -137,6 +137,12 @@ dmypy.json
 *.DS_Store
 tmp_*
 examples/fine-tuned_qa/local_cache/*
+examples/multimodal/.local_cache/*
 
 # PyCharm files
 .idea/
+.cursorignore
+
+# VS Code files
+.vscode/
+.cursorignore

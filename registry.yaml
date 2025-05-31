@@ -2102,8 +2102,8 @@
     - audio
     - speech
 
-- title: Selecting a Model for Stripe Conversion – A Practical Eval for Startups
-  path: examples/stripe_model_eval/selecting_a_model_for_stripe_conversion.ipynb
+- title: Selecting a Model Based on Stripe Conversion – A Practical Eval for Startups
+  path: examples/stripe_model_eval/selecting_a_model_based_on_stripe_conversion.ipynb
   date: 2025-06-02
   authors:
     - joshbickett

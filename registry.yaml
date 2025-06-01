@@ -4,6 +4,17 @@
 # should build pages for, and indicates metadata such as tags, creation date and
 # authors for each page.
 
+- title: Eval Driven System Design from Prototype to Production
+  path: examples/partners/eval_driven_system_design/receipt_inspection.ipynb
+  date: 2025-06-01
+  authors:
+    - shikhar-cyber
+  tags:
+    - evals
+    - responses
+    - functions
+    - tracing
+
 - title: Multi-Agent Portfolio Collaboration with OpenAI Agents SDK
   path: examples/agents_sdk/multi-agent-portfolio-collaboration/multi_agent_portfolio_collaboration.ipynb
   date: 2025-05-28

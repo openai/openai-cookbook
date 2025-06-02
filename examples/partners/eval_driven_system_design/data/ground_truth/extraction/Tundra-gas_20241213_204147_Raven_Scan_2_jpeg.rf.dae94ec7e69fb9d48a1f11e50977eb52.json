@@ -1,0 +1,28 @@
+{
+  "merchant": "CHUKCHANSI CROSSING",
+  "location": {
+    "city": "Coarsegold",
+    "state": "CA",
+    "zipcode": "93614"
+  },
+  "time": "2024-05-17T20:24:00",
+  "items": [
+    {
+      "description": "Regular",
+      "product_code": null,
+      "category": "Fuel",
+      "item_price": "4.899",
+      "sale_price": null,
+      "quantity": "6.446",
+      "total": "31.58"
+    }
+  ],
+  "subtotal": null,
+  "tax": null,
+  "total": "31.58",
+  "handwritten_notes": [
+    "Tundra",
+    "Yos -> home",
+    "557727"
+  ]
+}

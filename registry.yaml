@@ -4,14 +4,14 @@
 # should build pages for, and indicates metadata such as tags, creation date and
 # authors for each page.
 
-- title: Eval Driven System Design from Prototype to Production
+- title: Eval Driven System Design - From Prototype to Production
   path: examples/partners/eval_driven_system_design/receipt_inspection.ipynb
-  date: 2025-06-01
+  date: 2025-06-03
   authors:
     - shikhar-cyber
-    - moredatarequired
-    - tooluser
-    - eddiesiegel
+    - Hugh Wimberly
+    - Joshua Marker
+    - Eddie Siegel
   tags:
     - evals
     - API Flywheel

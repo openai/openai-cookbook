@@ -9,7 +9,6 @@
   date: 2025-06-01
   authors:
     - shikhar-cyber
-<<<<<<< HEAD
     - moredatarequired
     - tooluser
     - eddiesiegel
@@ -17,10 +16,6 @@
     - evals
     - API Flywheel
     - completions
-=======
-  tags:
-    - evals
->>>>>>> origin/main
     - responses
     - functions
     - tracing

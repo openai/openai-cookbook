@@ -9,8 +9,13 @@
   date: 2025-06-01
   authors:
     - shikhar-cyber
+    - moredatarequired
+    - tooluser
+    - eddiesiegel
   tags:
     - evals
+    - API Flywheel
+    - completions
     - responses
     - functions
     - tracing

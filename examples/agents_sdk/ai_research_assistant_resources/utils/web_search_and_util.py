@@ -43,30 +43,32 @@ def search(search_item, api_key, cse_id, search_depth=SEARCH_DEPTH, site_filter=
         'cx': cse_id,
         'num': search_depth
     }
+    
+    if api_key is None or cse_id is None:
+        raise ValueError("API key and CSE ID are required")
 
     try:
         response = requests.get(service_url, params=params)
         response.raise_for_status()
         results = response.json()
 
-        # Check if 'items' exists in the results
-        if 'items' in results:
-            if site_filter is not None:
-                
-                # Filter results to include only those with site_filter in the link
-                filtered_results = [result for result in results['items'] if site_filter in result['link']]
+        # ------------------------------------------------------------------
+        # Robust handling – always return a *list* (never ``None``)
+        # ------------------------------------------------------------------
+        items = results.get("items", [])
 
-                if filtered_results:
-                    return filtered_results
-                else:
-                    print(f"No results with {site_filter} found.")
-                    return []
-            else:
-                if 'items' in results:
-                    return results['items']
-                else:
-                    print("No search results found.")
-                    return []
+        # Optional site filtering
+        if site_filter:
+            items = [itm for itm in items if site_filter in itm.get("link", "")]
+            if not items:
+                print(f"No results with {site_filter} found.")
+
+        # Graceful handling of empty results
+        if not items:
+            print("No search results found.")
+            return []
+
+        return items
 
     except requests.exceptions.RequestException as e:
         print(f"An error occurred during the search: {e}")

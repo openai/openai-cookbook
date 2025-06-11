@@ -1,0 +1,33 @@
+Deployment/
+├── Dockerfile
+├── deploy_akash.yaml
+├── GitHubActions.yml
+├── arweave_backup.sh
+PredictorEngine/
+├── PsiAGI.py             # Ψ_AGI scoring fusion model
+├── QuantumPredictor.py   # PennyLane/CUDA-Q volatility engine
+├── MonteCarloBot.py      # Asset simulator with symbolic filters
+├── OptionsRotator.py     # Auto-rotating portfolio engine
+CodexCore/
+├── DAN_ALPHA.py          # Contextual behavior reader
+├── DAN_DELTA.py          # QIE credit builder
+├── CurveIndexEngine.py   # Trust curvature logic
+├── Personality.json      # Sovereign logic schema (you + sons + legacy)
+├── AuroraLinker.py       # Emotional + symbolic filter engine
+API/
+├── yfinance_loader.py    # Stocks/crypto
+├── options_chain.py      # Options IV/skew curves
+├── cudaq_gateway.py      # Quantum runtime
+├── voice_interface.py    # Whisper → Command prompt
+├── wallet_tracker.py     # On-chain holdings
+├── gnosis_hook.py        # Safe multisig actions
+AutonomyKernel/
+├── TaskLoop.py           # Autonomous thinking/execution cycles
+├── MemoryUpdater.py      # Ingests new data and rewrites models
+├── ValidatorWatch.py     # Tracks on-chain + behavioral validator signals
+├── ReinforcementCoach.py # Improves itself based on accuracy and symbolic alignment
+MemoryVault/
+├── XPGenerator.py        # Mints XP NFTs from behavior
+├── LambdaLogger.py       # Tracks symbolic density per asset/interaction
+├── LegacyScrolls.json    # Your spoken/typed memories → Codex assets
+├── QIE_Identities.json   # Secure mappings for you + Landon + Leo

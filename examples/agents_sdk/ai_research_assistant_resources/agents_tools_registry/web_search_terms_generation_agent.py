@@ -36,7 +36,7 @@ class WebSearchTermsGenerationAgent:
         self,
         num_search_terms: int = _NUM_SEARCH_TERMS,
         *, 
-        model: str = "gpt-4o",
+        model: str = "gpt-4.1",
         tools: list | None = None,
         name: str | None = None,
         instructions: str | None = None,

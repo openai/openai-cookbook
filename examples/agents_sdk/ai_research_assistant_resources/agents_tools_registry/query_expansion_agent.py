@@ -53,7 +53,7 @@ class QueryExpansionAgent:
 
     """
 
-    def __init__(self, *, model: str = "o3-mini", tools: list | None = None, name: str | None = None,
+    def __init__(self, *, model: str = "o4-mini", tools: list | None = None, name: str | None = None,
                  instructions: str | None = None, input_guardrails: list | None = None):
 
         # Initialise the underlying `agents.Agent` with a structured `output_type` so it

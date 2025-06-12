@@ -17,7 +17,7 @@ class WebPageSummaryAgent:
         search_term: str,
         character_limit: int = 1000,
         *,
-        model: str = "gpt-4o",
+        model: str = "gpt-4.1",
         tools: list | None = None,
         name: str | None = None,
         instructions: str | None = None,

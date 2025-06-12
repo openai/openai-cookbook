@@ -16,10 +16,13 @@ from agents import (  # type: ignore  (SDK imports)
 # 1. Tiny classifier agent → “Is this prompt about AI?”
 # ---------------------------------------------------------------------------
 
+
 class TopicCheckOutput(BaseModel):
     """Structured result returned by the classifier."""
-    is_about_ai: bool          # True → prompt is AI-related
-    reasoning: str             # short rationale (useful for logs)
+
+    is_about_ai: bool  # True → prompt is AI-related
+    reasoning: str  # short rationale (useful for logs)
+
 
 topic_guardrail_agent = Agent(
     name="Topic guardrail (AI)",
@@ -30,7 +33,7 @@ topic_guardrail_agent = Agent(
         "policy, or market trends. "
         "Return is_about_ai = false for all other domains (finance, biology, history, etc.)."
     ),
-    model="gpt-4o-mini",           # lightweight, fast
+    model="gpt-4.1-mini",  # lightweight, fast
     output_type=TopicCheckOutput,
 )
 
@@ -38,8 +41,9 @@ topic_guardrail_agent = Agent(
 # 2. Guardrail function (decorated) that wraps the classifier
 # ---------------------------------------------------------------------------
 
+
 @input_guardrail
-async def ai_topic_guardrail(           
+async def ai_topic_guardrail(
     ctx: RunContextWrapper[None],
     agent: Agent,
     input: str | List[TResponseInputItem],
@@ -52,6 +56,7 @@ async def ai_topic_guardrail(
     )
 
     return output
+
 
 # Optional: tidy public surface
 __all__ = ["ai_topic_guardrail", "TopicCheckOutput"]

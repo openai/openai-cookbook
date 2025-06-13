@@ -4,6 +4,14 @@
 # should build pages for, and indicates metadata such as tags, creation date and
 # authors for each page.
 
+- title: Fine-Tuning Techniques - Choosing Between SFT, DPO, and RFT (With a Guide to DPO)
+  path: examples/Fine_tuning_direct_preference_optimisation_guide.ipynb
+  date: 2025-06-13
+  authors:
+    - alexl-oai
+  tags:
+    - fine-tuning
+
 - title: Eval Driven System Design - From Prototype to Production
   path: examples/partners/eval_driven_system_design/receipt_inspection.ipynb
   date: 2025-06-02

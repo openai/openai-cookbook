@@ -861,12 +861,12 @@
 
 - title: Semantic search using Elasticsearch and OpenAI
   path: examples/vector_databases/elasticsearch/elasticsearch-semantic-search.ipynb
-  date: 2023-08-29
+  date: 2025-06-13
   authors:
     - leemthompo
   tags:
     - embeddings
-    - completions
+    - responses
 
 - title: Using Hologres as a vector database for OpenAI embeddings
   path: >-

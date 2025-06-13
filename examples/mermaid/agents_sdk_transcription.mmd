@@ -1,0 +1,8 @@
+```{mermaid}
+graph LR
+    Mic  -- "PCM frames" --> VP["VoicePipeline"]
+    VP   -- "VAD & resample" --> Buf["Sentence buffer"]
+    Buf  --> GPT["gpt-4o-transcribe"]
+    GPT  --> Agent["Agent callbacks"]
+    Agent -- "print / reply" --> App
+```

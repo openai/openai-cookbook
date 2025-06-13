@@ -1,0 +1,13 @@
+```mermaid
+sequenceDiagram
+    participant Mic
+    participant App
+    participant WS as "WebSocket"
+    participant OAI as "Realtime Server"
+
+    Mic ->> App: 20–40 ms PCM frames
+    App ->> WS: Base64-encoded chunks<br/>input_audio_buffer.append
+    WS  ->> OAI: Audio stream
+    OAI -->> WS: JSON transcription events<br/>(partial & complete)
+    WS  -->> App: Transcript updates
+```

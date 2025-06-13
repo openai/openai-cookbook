@@ -4,6 +4,179 @@
 # should build pages for, and indicates metadata such as tags, creation date and
 # authors for each page.
 
+- title: Eval Driven System Design - From Prototype to Production
+  path: examples/partners/eval_driven_system_design/receipt_inspection.ipynb
+  date: 2025-06-02
+  authors:
+    - shikhar-cyber
+    - Hugh Wimberly
+    - Joshua Marker
+    - Eddie Siegel
+  tags:
+    - evals
+    - API Flywheel
+    - completions
+    - responses
+    - functions
+    - tracing
+
+- title: Multi-Agent Portfolio Collaboration with OpenAI Agents SDK
+  path: examples/agents_sdk/multi-agent-portfolio-collaboration/multi_agent_portfolio_collaboration.ipynb
+  date: 2025-05-28
+  authors:
+    - rajpathak-openai
+    - chelseahu-openai
+  tags:
+    - agents-sdk
+    - functions
+    - responses
+    - mutli-agent-collaboration
+
+- title: o3/o4-mini Function Calling Guide
+  path: examples/o-series/o3o4-mini_prompting_guide.ipynb
+  date: 2025-05-26
+  authors:
+    - billchen-openai
+    - prashantmital-openai
+  tags:
+    - functions
+    - responses
+    - reasoning
+
+- title: Exploring Model Graders for Reinforcement Fine-Tuning
+  path: examples/Reinforcement_Fine_Tuning.ipynb
+  date: 2025-05-23
+  authors:
+    - theophile-oai
+  tags:
+    - reinforcement-learning
+    - fine-tuning
+    - reinforcement-learning-graders
+
+- title: Reinforcement Fine-Tuning for Conversational Reasoning with the OpenAI API
+  path: examples/fine-tuned_qa/reinforcement_finetuning_healthbench.ipynb
+  date: 2025-05-21
+  authors:
+    - robert-tinn
+  tags:
+    - fine-tuning
+    - qa
+    - evals
+    - reinforcement
+
+- title: Guide to Using the Responses API's MCP Tool 
+  path: examples/mcp/mcp_tool_guide.ipynb
+  date: 2025-05-21
+  authors:
+    - charuj
+  tags:
+    - mcp
+
+- title: Image Understanding with RAG
+  path: examples/multimodal/image_understanding_with_rag.ipynb
+  date: 2025-05-16
+  authors:
+    - robert-tinn
+  tags:
+    - responses
+    - images
+    - RAG
+    - vision
+
+- title: Better performance from reasoning models using the Responses API
+  path: examples/responses_api/reasoning_items.ipynb
+  date: 2025-05-11
+  authors:
+    - billchen-openai
+  tags:
+    - responses
+    - functions
+
+- title: Context Summarization with Realtime API
+  path: examples/Context_summarization_with_realtime_api.ipynb
+  date: 2025-05-10
+  authors:
+    - minh-hoque
+  tags:
+    - audio
+    - speech
+    - tiktoken
+
+- title: Comparing Speech-to-Text Methods with the OpenAI API
+  path: examples/Speech_transcription_methods.ipynb
+  date: 2025-04-29
+  authors:
+    - minh-hoque
+  tags:
+    - audio
+    - speech
+    - agents-sdk
+
+- title: Practical Guide for Model Selection for Real‑World Use Cases
+  path: examples/partners/model_selection_guide/model_selection_guide.ipynb
+  date: 2025-05-07
+  authors:
+    - shikhar-cyber
+    - kashyapm-tribe
+    - saip-tribe
+    - nharada-tribe
+  tags:
+    - responses
+    - functions
+    - web-search
+    - tool calling
+    - RAG
+    - insurance
+    - legal
+    - pharma
+
+- title: Evals API Use-case - Detecting prompt regressions
+  path: examples/evaluation/use-cases/regression.ipynb
+  date: 2025-04-08
+  authors:
+    - josiah-openai
+  tags:
+    - evals-api
+    - completions
+
+- title: Evals API Use-case - Bulk model and prompt experimentation
+  path: examples/evaluation/use-cases/bulk-experimentation.ipynb
+  date: 2025-04-08
+  authors:
+    - josiah-openai
+  tags:
+    - evals-api
+    - completions
+
+- title: Evals API Use-case - Monitoring stored completions
+  path: examples/evaluation/use-cases/completion-monitoring.ipynb
+  date: 2025-04-08
+  authors:
+    - josiah-openai
+  tags:
+    - evals-api
+    - completions
+
+- title: Evals API Use-case - Responses Evaluation
+  path: examples/evaluation/use-cases/responses-evaluation.ipynb
+  date: 2025-05-13
+  authors:
+    - willhath-openai
+  tags:
+    - evals-api
+    - responses
+
+- title: Multi-Tool Orchestration with RAG approach using OpenAI's Responses API
+  path: examples/responses_api/responses_api_tool_orchestration.ipynb
+  date: 2025-03-28
+  authors:
+    - shikhar-cyber
+  tags:
+    - responses
+    - functions
+    - pinecone
+    - web-search
+
 - title: Automating Dispute Management with Agents SDK and Stripe API
   path: examples/agents_sdk/dispute_agent.ipynb
   date: 2025-03-17
@@ -41,6 +214,7 @@
   tags:
     - assistants
     - dall-e
+  archived: true
 
 - title: Data preparation and analysis for chat model fine-tuning
   path: examples/Chat_finetuning_data_prep.ipynb
@@ -239,6 +413,7 @@
   date: 2022-10-20
   authors:
     - colin-openai
+    - vishnu-oai
   tags:
     - embeddings
     - completions
@@ -379,6 +554,7 @@
   tags:
     - whisper
     - completions
+  archived: true
 
 - title: "Enhancing Whisper transcriptions: pre- & post-processing techniques"
   path: examples/Whisper_processing_guide.ipynb
@@ -387,6 +563,7 @@
     - prestontuggle
   tags:
     - whisper
+  archived: true
 
 - title: Whisper prompting guide
   path: examples/Whisper_prompting_guide.ipynb
@@ -396,6 +573,7 @@
   tags:
     - whisper
     - completions
+  archived: true
 
 - title: Zero-shot classification with embeddings
   path: examples/Zero-shot_classification_with_embeddings.ipynb
@@ -462,6 +640,7 @@
     - colin-openai
   tags:
     - dall-e
+  archived: true
 
 - title: How to use the DALL·E API
   path: examples/dalle/Image_generations_edits_and_variations_with_DALL-E.ipynb
@@ -470,6 +649,7 @@
     - ted-at-openai
   tags:
     - dall-e
+  archived: true
 
 - title: How to evaluate a summarization task
   path: examples/evaluation/How_to_eval_abstractive_summarization.ipynb
@@ -652,9 +832,10 @@
 
 - title: Robust question answering with Chroma and OpenAI
   path: examples/vector_databases/chroma/hyde-with-chroma-and-openai.ipynb
-  date: 2023-04-06
+  date: 2025-04-23
   authors:
     - atroyn
+    - brandonbaker-openai
   tags:
     - embeddings
     - completions
@@ -827,6 +1008,7 @@
   tags:
     - embeddings
     - completions
+  archived: true
 
 - title: Using Redis for embeddings search
   path: examples/vector_databases/redis/Using_Redis_for_embeddings_search.ipynb
@@ -894,6 +1076,7 @@
     - jasonbosco
   tags:
     - embeddings
+  archived: true
 
 - title: Using Typesense for embeddings search
   path: >-
@@ -903,6 +1086,7 @@
     - colin-openai
   tags:
     - embeddings
+  archived: true
 
 - title: Weaviate <> OpenAI
   path: examples/vector_databases/weaviate/README.md
@@ -1007,6 +1191,19 @@
   tags:
     - embeddings
 
+- title: ElatoAI - Realtime Speech AI Agents for ESP32 on Arduino
+  path: examples/voice_solutions/running_realtime_api_speech_on_esp32_arduino_edge_runtime_elatoai.md
+  date: 2025-05-01
+  authors:
+    - akashdeepdeb
+  tags:
+    - realtime-api
+    - speech
+    - audio
+    - esp32
+    - iot
+    - arduino
+
 - title: Related resources from around the web
   path: articles/related_resources.md
   redirects:
@@ -1028,6 +1225,7 @@
     - completions
     - embeddings
     - fine-tuning
+  archived: true
 
 - title: How to automate AWS tasks with function calling
   path: examples/third_party/How_to_automate_S3_storage_with_functions.ipynb
@@ -1133,13 +1331,14 @@
     - functions
     - fine-tuning
 
-- title: Processing and narrating a video with GPT's visual capabilities and the TTS API
+- title: Processing and narrating a video with GPT-4.1-mini's visual capabilities and GPT-4o TTS API
   path: examples/GPT_with_vision_for_video_understanding.ipynb
-  date: 2023-11-06
+  date: 2025-04-22
   authors:
     - cathykc
+    - rzhao-openai
   tags:
-    - completions
+    - responses
     - vision
     - speech
 
@@ -1150,6 +1349,7 @@
     - 0hq
   tags:
     - dall-e
+  archived: true
 
 - title: How to make your completions outputs consistent with the new seed parameter
   path: examples/Reproducible_outputs_with_the_seed_parameter.ipynb
@@ -1167,6 +1367,7 @@
   tags:
     - assistants
     - functions
+  archived: true
 
 - title: "Orchestrating Agents: Routines and Handoffs"
   path: examples/Orchestrating_agents.ipynb
@@ -1692,7 +1893,7 @@
   tags:
     - completions
     - reasoning
-  
+
 - title: GPT Actions library - GitHub
   path: examples/chatgpt/gpt_actions_library/gpt_action_github.md
   date: 2024-10-23
@@ -1741,9 +1942,9 @@
   tags:
     - gpt-actions-library
     - embeddings
-    - chatgpt 
+    - chatgpt
     - chatgpt-and-api
-    
+
 - title: Optimizing Retrieval-Augmented Generation using GPT-4o Vision Modality
   path: examples/vector_databases/pinecone/Using_vision_modality_for_RAG_with_Pinecone.ipynb
   date: 2024-11-12
@@ -1773,8 +1974,8 @@
     - gpt-actions-library
     - chatgpt
     - chatgpt-communication
-    
-- title: GPT Actions library - Tray.ai APIM 
+
+- title: GPT Actions library - Tray.ai APIM
   path: examples/chatgpt/gpt_actions_library/gpt_action_trayai_apim.md
   date: 2024-11-26
   authors:
@@ -1812,15 +2013,6 @@
     - usage-api
     - cost-api
 
-- title: How to use the Usage API and Cost API to monitor your OpenAI usage
-  path: examples/completions_usage_api.ipynb
-  date: 2025-01-14
-  authors:
-    - MW-OAI
-  tags:
-    - usage-api
-    - cost-api
-
 - title: Build Your Own Code Interpreter - Dynamic Tool Generation and Execution With o3-mini
   path: examples/object_oriented_agentic_approach/Secure_code_interpreter_tool_for_LLM_agents.ipynb
   date: 2025-02-03
@@ -1838,7 +2030,17 @@
     - responses
     - functions
 
-- title: Multi-Langugage One-Way Translation with the Realtime API
+- title: Building a Voice Assistant with the Agents SDK
+  path: examples/agents_sdk/app_assistant_voice_agents.ipynb
+  date: 2025-03-27
+  authors:
+    - rupert-openai
+  tags:
+    - audio
+    - responses
+    - speech
+
+- title: Multi-Language One-Way Translation with the Realtime API
   path: examples/voice_solutions/one_way_translation_using_realtime_api.mdx
   date: 2025-03-24
   authors:
@@ -1849,8 +2051,134 @@
 
 - title: Google AlloyDB for PostgreSQL as a vector database
   path: examples/vector_databases/alloydb/alloydb_postgres_vector_search_scann.ipynb
-  date: 2025-03-26
+  date: 2025-06-13
   authors:
     - cornillon-google
   tags:
     - embeddings
+
+- title: Evaluating Agents with Langfuse
+  path: examples/agents_sdk/evaluate_agents.ipynb
+  date: 2025-03-31
+  authors:
+    - jannik-maierhofer
+  tags:
+    - evals
+    - agents-sdk
+
+- title: GPT Actions library - Salesforce & Gong
+  path: examples/chatgpt/gpt_actions_library/gpt_action_salesforce_gong.md
+  date: 2025-04-07
+  authors:
+    - girishd
+  tags:
+    - chatgpt
+    - gpt-actions-library
+    - chatgpt-productivity
+
+- title: GPT-4.1 Prompting Guide
+  path: examples/gpt4-1_prompting_guide.ipynb
+  date: 2025-04-14
+  authors:
+    - nm-openai
+    - julian-openai
+  tags:
+    - responses
+    - api
+
+- title: Generate images with GPT Image
+  path: examples/Generate_Images_With_GPT_Image.ipynb
+  date: 2025-04-23
+  authors:
+    - katiagg
+  tags:
+    - images
+
+- title: Handling Function Calls with Reasoning Models
+  path: examples/reasoning_function_calls.ipynb
+  date: 2025-04-25
+  authors:
+    - tompakeman-oai
+  tags:
+    - reasoning
+    - functions
+    - responses
+    - api
+
+- title: Parallel Agents with the OpenAI Agents SDK
+  path: examples/agents_sdk/parallel_agents.ipynb
+  date: 2025-05-01
+  authors:
+    - brandonbaker-openai
+  tags:
+    - agents
+    - agents-sdk
+    - parallel-agents
+
+- title: Practical guide to data-intensive apps with the Realtime API
+  path: examples/Data-intensive-Realtime-apps.ipynb
+  date: 2025-05-29
+  authors:
+    - alistair-openai
+    - rkoenig-openai
+    - phundal-openai
+  tags:
+    - audio
+    - speech
+
+- title: Selecting a Model Based on Stripe Conversion – A Practical Eval for Startups
+  path: examples/stripe_model_eval/selecting_a_model_based_on_stripe_conversion.ipynb
+  date: 2025-06-02
+  authors:
+    - joshbickett
+    - lupie
+    - shyamal-anadkat
+  tags:
+    - evals
+    - stripe
+    - conversion
+
+- title: Evals API Use-case - MCP Evaluation
+  path: examples/evaluation/use-cases/mcp_eval_notebook.ipynb
+  date: 2025-06-09
+  authors:
+    - josiah-openai
+    - shikhar-cyber
+  tags:
+    - evals-api
+    - responses
+    - evals
+    - mcp
+
+- title: Evals API Use-case - Structured Outputs Evaluation
+  path: examples/evaluation/use-cases/structured-outputs-evaluation.ipynb
+  date: 2025-06-09
+  authors:
+    - josiah-openai
+    - shikhar-cyber
+  tags:
+    - evals-api
+    - responses
+    - evals
+
+- title: Evals API Use-case - Tools Evaluation
+  path: examples/evaluation/use-cases/tools-evaluation.ipynb
+  date: 2025-06-09
+  authors:
+    - josiah-openai
+    - shikhar-cyber
+  tags:
+    - evals-api
+    - responses
+    - evals
+
+- title: Evals API Use-case - Web Search Evaluation
+  path: examples/evaluation/use-cases/web-search-evaluation.ipynb
+  date: 2025-06-09
+  authors:
+    - josiah-openai
+    - shikhar-cyber
+  tags:
+    - evals-api
+    - responses
+    - evals

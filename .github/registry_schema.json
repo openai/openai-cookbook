@@ -31,6 +31,9 @@
       "date": {
         "type": "string",
         "format": "date"
+      },
+      "archived": {
+        "type": "boolean"
       }
     },
     "required": ["title", "path", "tags", "authors"],

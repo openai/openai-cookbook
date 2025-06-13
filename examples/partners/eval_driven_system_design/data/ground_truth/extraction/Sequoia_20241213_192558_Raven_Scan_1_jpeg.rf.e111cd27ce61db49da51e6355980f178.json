@@ -1,0 +1,42 @@
+{
+  "merchant": "sam's club",
+  "location": {
+    "city": "Fresno",
+    "state": "CA",
+    "zipcode": null
+  },
+  "time": "2024-09-27T10:18:00",
+  "items": [
+    {
+      "description": "ZPLC FRZR G",
+      "product_code": "916198",
+      "category": null,
+      "item_price": null,
+      "sale_price": null,
+      "quantity": "1",
+      "total": "15.48"
+    },
+    {
+      "description": "AIRWICK 0+9",
+      "product_code": "984197911",
+      "category": null,
+      "item_price": null,
+      "sale_price": null,
+      "quantity": "1",
+      "total": "17.48"
+    },
+    {
+      "description": "MM SEASLT GF",
+      "product_code": "E 990304379",
+      "category": null,
+      "item_price": null,
+      "sale_price": null,
+      "quantity": "1",
+      "total": "4.98"
+    }
+  ],
+  "subtotal": "37.94",
+  "tax": "2.75",
+  "total": "40.69",
+  "handwritten_notes": []
+}

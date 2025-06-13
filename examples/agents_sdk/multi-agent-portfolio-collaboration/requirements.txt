@@ -1,0 +1,16 @@
+openai
+openai-agents
+fredapi
+yfinance
+pandas
+numpy
+matplotlib
+seaborn
+scipy
+cvxpy
+arch
+mpmath
+tabulate
+requests
+pydantic
+logging

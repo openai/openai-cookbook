@@ -396,6 +396,7 @@
   authors:
     - ted-at-openai
     - dwigg-openai
+    - crayon
   tags:
     - completions
     - embeddings

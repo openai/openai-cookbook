@@ -880,7 +880,6 @@
     - leemthompo
   tags:
     - embeddings
-    - completions
 
 - title: Using Hologres as a vector database for OpenAI embeddings
   path: >-

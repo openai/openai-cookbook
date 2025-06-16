@@ -5,7 +5,7 @@
 # authors for each page.
 
 - title: Fine-Tuning Techniques - Choosing Between SFT, DPO, and RFT (With a Guide to DPO)
-  path: examples/Fine_tuning_direct_preference_optimisation_guide.ipynb
+  path: examples/Fine_tuning_direct_preference_optimization_guide.ipynb
   date: 2025-06-13
   authors:
     - alexl-oai

@@ -4,9 +4,9 @@
 # should build pages for, and indicates metadata such as tags, creation date and
 # authors for each page.
 
-- title: MCP Powered Voice Agents
+- title: MCP-Powered Agentic Voice Framework
   path: examples/partners/mcp_powered_voice_agents/mcp_powered_agents_cookbook.ipynb
-  date: 2025-06-12
+  date: 2025-06-17
   authors:
     - shikhar-cyber
     - Cece Z

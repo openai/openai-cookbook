@@ -4,6 +4,14 @@
 # should build pages for, and indicates metadata such as tags, creation date and
 # authors for each page.
 
+- title: Fine-Tuning Techniques - Choosing Between SFT, DPO, and RFT (With a Guide to DPO)
+  path: examples/Fine_tuning_direct_preference_optimization_guide.ipynb
+  date: 2025-06-18
+  authors:
+    - alexl-oai
+  tags:
+    - fine-tuning
+
 - title: MCP-Powered Agentic Voice Framework
   path: examples/partners/mcp_powered_voice_agents/mcp_powered_agents_cookbook.ipynb
   date: 2025-06-17

@@ -98,6 +98,7 @@ jobs:
           if [ -f original_files_temp.json ]; then
             jq -s '.[0] * .[1]' diff.json original_files_temp.json > combined.json
             mv combined.json diff.json
+          fi
 
       - name: Display Processed Diff (Debug)
         run: cat diff.json
@@ -105,12 +106,13 @@ jobs:
       - name: Analyze with OpenAI
         env:
           OPENAI_API_KEY: ${{ secrets.OPENAI_API_KEY }}
+          MODELNAME: ${{ vars.MODELNAME }}
         run: |
           DIFF_CONTENT=$(jq -r '.diff' diff.json)
           ORIGINAL_FILES=$(jq -r '."original files"' diff.json)
           PROMPT="Please review the following code changes for any obvious quality or security issues. Provide a brief report in markdown format:\n\nDIFF:\n${DIFF_CONTENT}\n\nORIGINAL FILES:\n${ORIGINAL_FILES}"
-          jq -n --arg prompt "$PROMPT" '{
-            "model": "gpt-4",
+          jq -n --arg model "$MODELNAME" --arg prompt "$PROMPT" '{
+            "model": "\($model)",
             "messages": [
               { "role": "system", "content": "You are a code reviewer." },
               { "role": "user", "content": $prompt }

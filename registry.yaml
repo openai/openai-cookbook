@@ -3,6 +3,15 @@
 # This file is used to generate cookbook.openai.com. It specifies which paths we
 # should build pages for, and indicates metadata such as tags, creation date and
 # authors for each page.
+- title: Automate Jira ↔ GitHub with Codex
+  path: examples/codex/jira-github.ipynb
+  date: 2025-06-21
+  authors:
+    - alwell-kevin
+    - narenoai
+  tags:
+    - codex
+    - automation
 
 - title: Fine-Tuning Techniques - Choosing Between SFT, DPO, and RFT (With a Guide to DPO)
   path: examples/Fine_tuning_direct_preference_optimization_guide.ipynb

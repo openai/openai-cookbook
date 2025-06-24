@@ -11,6 +11,7 @@
     - minh-hoque
   tags:
     - prompt
+    - completions
     - responses
 
 - title: Fine-Tuning Techniques - Choosing Between SFT, DPO, and RFT (With a Guide to DPO)

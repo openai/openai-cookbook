@@ -2195,3 +2195,42 @@
     - evals-api
     - responses
     - evals
+
+- title: Introduction to the Deep Research API
+  path: examples/deep_research_api/how_to_use_deep_research_API.ipynb
+  date: 2025-06-25
+  authors:
+    - glojain
+    - alwell-kevin
+  tags:
+    - deep-research-api
+    - responses
+    - mcp
+    - deep-research
+
+- title: Deep Research with the Agents SDK
+  path: examples/deep_research_api/how_to_use_deep_research_API_agents.ipynb
+  date: 2025-06-25
+  authors:
+    - alwell-kevin
+    - glojain
+  tags:
+    - deep-research-api
+    - mcp
+    - deep-research
+    - agents
+    - agents-sdk
+
+- title: Building a Deep Research MCP Server
+  path: examples/deep_research_api/how_to_build_a_deep_research_mcp_server/README.md
+  date: 2025-06-25
+  authors:
+    - alwell-kevin
+    - glojain
+  tags:
+    - mcp
+    - deep-research-api
+    - responses
+    - deep-research
+    - agents
+    - agents-sdk

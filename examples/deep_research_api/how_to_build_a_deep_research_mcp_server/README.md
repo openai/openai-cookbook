@@ -36,34 +36,11 @@ You should now be able to reach your local server from your client.
 
 ## Files
 
-- `main.py`: Main server code
+- `main.py`: [Main server code](https://github.com/openai/openai-cookbook/blob/main/examples/deep_research_api/how_to_build_a_deep_research_mcp_server/main.py)
 
 ## Example Flow diagram for MCP Server
 
-```mermaid
-flowchart TD
-  subgraph Connection_Setup
-    A1[MCP Server starts up<br/>listening on /sse/] --> A2[Client opens SSE connection]
-    A2 --> A3[Server confirms SSE connection]
-  end
-
-  subgraph Tool_Discovery
-    A3 --> B1[Client asks 'What tools do you support?']
-    B1 --> B2[Server replies with Search & Fetch schemas]
-    B2 --> B3[Client stores schemas in context]
-  end
-
-  subgraph Search_Fetch_Loop
-    B3 --> C1[Client issues search call]
-    C1 --> C2[MCP Server routes to Search Tool]
-    C2 --> C3[Search Tool queries Data Store<br/>returns one hit]
-    C3 --> C4[Client issues fetch call]
-    C4 --> C5[MCP Server routes to Fetch Tool]
-    C5 --> C6[Fetch Tool retrieves document text]
-    C6 --> C7[Client refines/repeats search<br/> cost-effectiveness, market revenue…]
-    C7 --> C1
-  end
-```
+![../../../images/mcp_dr.png](../../../images/mcp_dr.png)
 
 ## Example request
 

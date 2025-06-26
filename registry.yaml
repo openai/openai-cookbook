@@ -4,6 +4,16 @@
 # should build pages for, and indicates metadata such as tags, creation date and
 # authors for each page.
 
+- title: Prompt Migration Guide
+  path: examples/Prompt_migration_guide.ipynb
+  date: 2025-06-26
+  authors:
+    - minh-hoque
+  tags:
+    - prompt
+    - completions
+    - responses
+
 - title: Fine-Tuning Techniques - Choosing Between SFT, DPO, and RFT (With a Guide to DPO)
   path: examples/Fine_tuning_direct_preference_optimization_guide.ipynb
   date: 2025-06-18
@@ -86,7 +96,7 @@
     - evals
     - reinforcement
 
-- title: Guide to Using the Responses API's MCP Tool 
+- title: Guide to Using the Responses API's MCP Tool
   path: examples/mcp/mcp_tool_guide.ipynb
   date: 2025-05-21
   authors:

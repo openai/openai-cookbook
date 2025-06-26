@@ -2196,7 +2196,7 @@
     - responses
     - evals
 
-- title: Introduction to the Deep Research API
+- title: Introduction to deep research in the OpenAI API
   path: examples/deep_research_api/introduction_to_deep_research_api.ipynb
   date: 2025-06-25
   authors:
@@ -2208,7 +2208,7 @@
     - mcp
     - deep-research
 
-- title: Deep Research with the Agents SDK
+- title: Deep Research API with the Agents SDK
   path: examples/deep_research_api/introduction_to_deep_research_api_agents.ipynb
   date: 2025-06-25
   authors:

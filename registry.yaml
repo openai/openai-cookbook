@@ -2197,7 +2197,7 @@
     - evals
 
 - title: Introduction to the Deep Research API
-  path: examples/deep_research_api/how_to_use_deep_research_API.ipynb
+  path: examples/deep_research_api/introduction_to_deep_research_api.ipynb
   date: 2025-06-25
   authors:
     - glojain
@@ -2209,7 +2209,7 @@
     - deep-research
 
 - title: Deep Research with the Agents SDK
-  path: examples/deep_research_api/how_to_use_deep_research_API_agents.ipynb
+  path: examples/deep_research_api/introduction_to_deep_research_api_agents.ipynb
   date: 2025-06-25
   authors:
     - alwell-kevin

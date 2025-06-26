@@ -275,7 +275,7 @@ MW-OAI:
 dwigg-openai:
   name: "Danny Wigg"
   website: "https://www.linkedin.com/in/dannywigg/"
-  avatar: "https://media.licdn.com/dms/image/v2/C4D03AQEjMSl0pMR_qw/profile-displayphoto-shrink_800_800/profile-displayphoto-shrink_800_800/0/1587647134114?e=1743033600&v=beta&t=XmULCSmk6V6YFmlyBggxj5uJeoYYuaYUKgcByKlS0K0"
+  avatar: "https://avatars.githubusercontent.com/u/4661060?v=4"
 
 msingh-openai:
   name: "Mandeep Singh"
@@ -376,3 +376,8 @@ alexl-oai:
   name: "Alex Lowden"
   website: "https://www.linkedin.com/in/alex-lowden01/"
   avatar: "https://avatars.githubusercontent.com/u/215167546"
+
+glojain:
+  name: "Glory Jain"
+  website: "https://www.linkedin.com/in/gloryjain/"
+  avatar: "https://media.licdn.com/dms/image/v2/C4E03AQH72n6Sm5q69Q/profile-displayphoto-shrink_400_400/profile-displayphoto-shrink_400_400/0/1557995338725?e=1756339200&v=beta&t=FGTXiCZwTZvqHCY-wd8It15EDf11Rex1oLlBKRGHNtY"

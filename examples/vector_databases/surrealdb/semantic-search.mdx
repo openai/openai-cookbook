@@ -1,6 +1,6 @@
 # Semantic search using SurrealDB
 
-This blog post is a SurrealDB-ified version of [this great post](https://github.com/openai/openai-cookbook/blob/b35868e67bb662fbf294b425920f80aacf5a363c/examples/vector_databases/supabase/semantic-search.mdx) by [Greg Richardson](https://github.com/gregnr) for the [OpenAPI cookbook](https://cookbook.openai.com/). Thanks for the great post!
+This blog post is a SurrealDB-ified version of [this great post](https://github.com/openai/openai-cookbook/blob/b35868e67bb662fbf294b425920f80aacf5a363c/examples/vector_databases/supabase/semantic-search.mdx) by [Greg Richardson](https://github.com/gregnr) for the [OpenAI cookbook](https://cookbook.openai.com/). Thanks for the great post!
 
 ## Intro
 
@@ -104,24 +104,24 @@ At this point, you will need an [OpenAI API key](https://platform.openai.com/api
 Error: invalid_request_error: Incorrect API key provided: blah. You can find your API key at https://platform.openai.com/account/api-keys. (code: invalid_api_key)
 ```
 
-The best way to set the key is as an environment variable, `OPENAPI_API_KEY` in this case. Using a `LazyLock` will let us call it via `std::env::var()` function the first time it is accessed. You can of course simply put it into a `const` for simplicity when first testing, but always remember to never hard-code API keys in your code in production.
+The best way to set the key is as an environment variable, `OPENAI_API_KEY` in this case. Using a `LazyLock` will let us call it via `std::env::var()` function the first time it is accessed. You can of course simply put it into a `const` for simplicity when first testing, but always remember to never hard-code API keys in your code in production.
 
 ```rust
 static KEY: LazyLock<String> = LazyLock::new(|| {
-    std::env::var("OPENAPI_API_KEY").unwrap()
+    std::env::var("OPENAI_API_KEY").unwrap()
 });
 ```
 
 And then run the code like this:
 
 ```bash
-OPENAPI_API_KEY=whateverthekeyis cargo run
+OPENAI_API_KEY=whateverthekeyis cargo run
 ```
 
 Or like this if you are using PowerShell on Windows.
 
 ```powershell
-$env:OPENAPI_API_KEY = "whateverthekeyis"
+$env:OPENAI_API_KEY = "whateverthekeyis"
 cargo run
 ```
 
@@ -150,7 +150,7 @@ The output in your console should show a massive amount of floats, 1536 of them 
 
 ## Store embeddings in database
 
-Now that we have the embedding returned from the OpenAPI client, we can store it in the database. The [response](https://docs.rs/async-openai/0.28.3/async_openai/types/struct.CreateEmbeddingResponse.html) returned from the async-openapi crate looks like this, with a `Vec` of `Embedding` structs that hold a `Vec<f32>`.
+Now that we have the embedding returned from the OpenAI client, we can store it in the database. The [response](https://docs.rs/async-openai/0.28.3/async_openai/types/struct.CreateEmbeddingResponse.html) returned from the async-openai crate looks like this, with a `Vec` of `Embedding` structs that hold a `Vec<f32>`.
 
 ```rust
 pub struct CreateEmbeddingResponse {
@@ -343,7 +343,7 @@ use surrealdb::{
     engine::any::{Any, connect},
 };
 
-static KEY: LazyLock<String> = LazyLock::new(|| std::env::var("OPENAPI_API_KEY").unwrap());
+static KEY: LazyLock<String> = LazyLock::new(|| std::env::var("OPENAI_API_KEY").unwrap());
 
 #[derive(Serialize)]
 struct DocumentInput {

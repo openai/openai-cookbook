@@ -2253,3 +2253,19 @@
     - deep-research
     - agents
     - agents-sdk
+
+- title: SurrealDB
+  path: examples/vector_databases/surrealdb/README.md
+  date: 2025-06-27
+  authors:
+    - dghomon
+  tags:
+    - embeddings
+
+- title: Semantic search using SurrealDB
+  path: examples/vector_databases/surrealdb/semantic-search.mdx
+  date: 2025-06-27
+  authors:
+    - dhghomon
+  tags:
+    - embeddings

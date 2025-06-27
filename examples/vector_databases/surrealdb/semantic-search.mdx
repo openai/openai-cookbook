@@ -1,0 +1,454 @@
+# Semantic search using SurrealDB
+
+This blog post is a SurrealDB-ified version of [this great post](https://github.com/openai/openai-cookbook/blob/b35868e67bb662fbf294b425920f80aacf5a363c/examples/vector_databases/supabase/semantic-search.mdx) by [Greg Richardson](https://github.com/gregnr) for the [OpenAPI cookbook](https://cookbook.openai.com/). Thanks for the great post!
+
+## Intro
+
+The purpose of this guide is to demonstrate how to store OpenAI embeddings as [SurrealDB vectors](/docs/surrealdb/reference-guide/vector-search) via the Rust SDK for the purposes of semantic search.
+
+This guide uses Rust's [async-openai](https://crates.io/crates/async-openai/0.28.3) crate to generate embeddings, but you can modify it to use any [language supported by OpenAI](https://platform.openai.com/docs/libraries).
+
+This guide covers:
+
+- [Semantic search using SurrealDB](#semantic-search-using-surrealdb)
+  - [Intro](#intro)
+  - [Setup](#setup)
+  - [Create a vector table](#create-a-vector-table)
+  - [Generate OpenAI embeddings](#generate-openai-embeddings)
+  - [Store embeddings in database](#store-embeddings-in-database)
+  - [Semantic search](#semantic-search)
+
+## Setup
+
+Setting up an embedded SurrealDB database only takes a few lines of code. After creating a new Cargo project with `cargo new project_name` and going into the project folder, we will then add the following dependencies inside `Cargo.toml`:
+
+```toml
+anyhow = "1.0.98"
+async-openai = "0.28.3"
+serde = "1.0.219"
+surrealdb = { version = "2.3", features = ["kv-mem"] }
+tokio = "1.45.0"
+```
+
+They can also be added on the command line using this command:
+
+```
+cargo add anyhow async-openai serde tokio surrealdb --features surrealdb/kv-mem
+```
+
+Inside `main()`, we can call the `connect` function with `"memory"` to instantiate an embedded database in memory. With the possibility of error types from various sources, using `anyhow` is the easiest way to get started.
+
+```rust
+use anyhow::Error;
+use surrealdb::engine::any::connect;
+
+#[tokio::main]
+async fn main() -> Result<(), Error> {
+    let db = connect("memory").await?;
+    Ok(())
+}
+```
+
+If you have a Cloud or local instance to connect to, you can pass that path into the connect function instead.
+
+```rust
+// Cloud address
+let db = connect("wss://cloud-docs-068rp16e0hsnl62vgooa7omjks.aws-euw1.staging.surrealdb.cloud").await?;
+
+// Local address
+let db = connect("ws://localhost:8000").await?;
+```
+
+After connecting, we will select a namespace and database name, such as `ns` and `db`.
+
+```rust
+db.use_ns("ns").use_db("db").await?;
+```
+
+## Create a vector table
+
+Next we'll create a table to store documents and embeddings, along with an index for the embeddings. The statements look like this:
+
+```surql
+DEFINE TABLE document;
+DEFINE FIELD text ON document TYPE string;
+DEFINE FIELD embedding ON document TYPE array<float>;
+DEFINE INDEX hnsw_embed ON document FIELDS embedding HNSW DIMENSION 1536;
+```
+
+Inside the SDK we can put all four of these inside a single `.query()` call and then add a line to see if there are errors inside any of them.
+
+```rust
+let mut res = db
+    .query(
+        "DEFINE TABLE document;
+DEFINE FIELD text ON document TYPE string;
+DEFINE FIELD embedding ON document TYPE array<float>;
+DEFINE INDEX hnsw_embed ON document FIELDS embedding HNSW DIMENSION 1536;",
+    )
+    .await?;
+for (index, error) in res.take_errors() {
+    println!("Error in query {index}: {error}");
+}
+```
+
+The important piece to understand is the relationship between the `embedding` field, a simple array of floats, and the `hnsw_embed` index. The size of the vector (1536 here) represents the number of dimensions in the embedding. Since OpenAI's `text-embedding-3-small` model in this example uses [1536 as its default length](https://platform.openai.com/docs/guides/embeddings), we set the vector size to 1536.
+
+With the [HNSW index](/docs/surrealdb/reference-guide/vector-search#vector-indexes) set up, we will be able to use the KNN operator (`<||>`) to find an embedding's closest neighbours.
+
+## Generate OpenAI embeddings
+
+At this point, you will need an [OpenAI API key](https://platform.openai.com/api-keys) to interact with the OpenAI API. You can still check the code to see if it works if you don't have a key, and you will get as far as this error message.
+
+```
+Error: invalid_request_error: Incorrect API key provided: blah. You can find your API key at https://platform.openai.com/account/api-keys. (code: invalid_api_key)
+```
+
+The best way to set the key is as an environment variable, `OPENAPI_API_KEY` in this case. Using a `LazyLock` will let us call it via `std::env::var()` function the first time it is accessed. You can of course simply put it into a `const` for simplicity when first testing, but always remember to never hard-code API keys in your code in production.
+
+```rust
+static KEY: LazyLock<String> = LazyLock::new(|| {
+    std::env::var("OPENAPI_API_KEY").unwrap()
+});
+```
+
+And then run the code like this:
+
+```bash
+OPENAPI_API_KEY=whateverthekeyis cargo run
+```
+
+Or like this if you are using PowerShell on Windows.
+
+```powershell
+$env:OPENAPI_API_KEY = "whateverthekeyis"
+cargo run
+```
+
+Inside `main()`, we will then [create a client](https://docs.rs/async-openai/0.28.3/async_openai/struct.Client.html) from the async-openai crate holding this config inside `main()`.
+
+```rust
+let config = OpenAIConfig::new().with_api_key(KEY);
+let client = Client::with_config(config);
+```
+
+We'll use that to generate an OpenAI embedding using [`text-embedding-3-small`](https://platform.openai.com/docs/guides/embeddings/embedding-models), as follows.
+
+```rust
+let input = "What does the cat chase?";
+
+let request = CreateEmbeddingRequestArgs::default()
+        .model("text-embedding-3-small")
+        .input(input)
+        .dimensions(1536u32)
+        .build()?;
+let result = client.embeddings().create(request).await?;
+println!("{result:?}");
+```
+
+The output in your console should show a massive amount of floats, 1536 of them to be precise. That's the embedding for this input!
+
+## Store embeddings in database
+
+Now that we have the embedding returned from the OpenAPI client, we can store it in the database. The [response](https://docs.rs/async-openai/0.28.3/async_openai/types/struct.CreateEmbeddingResponse.html) returned from the async-openapi crate looks like this, with a `Vec` of `Embedding` structs that hold a `Vec<f32>`.
+
+```rust
+pub struct CreateEmbeddingResponse {
+    pub object: String,
+    pub model: String,
+    pub data: Vec<Embedding>,
+    pub usage: EmbeddingUsage,
+}
+
+pub struct Embedding {
+    pub index: u32,
+    pub object: String,
+    pub embedding: Vec<f32>,
+}
+```
+
+We know that our simple request only returned a single embedding, so `.remove(0)` will do the job. In a more complex codebase you would probably opt for a match on `.get(0)` to handle any possible errors.
+
+```rust
+let embeds = result.data.remove(0).embedding;
+```
+
+There are a [number of ways](/docs/sdk/rust/concepts/flexible-typing) to work with or avoid structs when using the Rust SDK, but we'll just go with two basic structs: one to represent the input into a `.create()` statement, which will implement `Serialize`, and another that implements `Deserialize` to show the result.
+
+```rust
+#[derive(Serialize)]
+struct DocumentInput {
+    text: String,
+    embedding: Vec<f32>,
+}
+
+#[derive(Debug, Deserialize)]
+struct Document {
+    id: RecordId,
+    embedding: Vec<f32>,
+    text: String,
+}
+```
+
+Once that is done, we can print out the created documents as a `Document` struct.
+
+```rust
+let in_db = db
+    .create::<Option<Document>>("document")
+    .content(DocumentInput {
+        text: input.into(),
+        embedding: embeds.to_vec()
+    })
+    .await?;
+println!("{in_db:?}");
+```
+
+We should now add some more `document` records. To do this, we'll move the logic to create them inside a function of its own:
+
+```rust
+async fn create_embed(
+    input: &str,
+    db: &Surreal<Any>,
+    client: &Client<OpenAIConfig>,
+) -> Result<(), Error> {
+    let request = CreateEmbeddingRequestArgs::default()
+        .model("text-embedding-3-small")
+        .input(input)
+        .dimensions(1536u32)
+        .build()?;
+    let result = client.embeddings().create(request).await?;
+
+    let embeds = &result.data.get(0).unwrap().embedding;
+
+    let _in_db = db
+        .create::<Option<Document>>("document")
+        .content(DocumentInput {
+            text: input.into(),
+            embedding: embeds.to_vec(),
+        })
+        .await?;
+    Ok(())
+}
+```
+
+And then call it a few times inside `main()`. See if you can guess the answers yourself!
+
+```rust
+for input in [
+    "What does the cat chase?", 
+    "What do Fraggles love to eat?", 
+    "Which planet rotates slowly on its axis?", 
+    "Which Greek general helped Cyrus the Younger?", 
+    "What is the largest inland sea?"] {
+    create_embed(input, &db, &client).await?
+}
+```
+
+## Semantic search
+
+Finally let's perform semantic search over the embeddings in our database. 
+
+With that done, it's time to test the database out. We'll go with this query that uses the KNN operator to return the closest two matches to an embedding.
+
+```surql
+SELECT 
+    text,
+    vector::distance::knn() AS distance FROM document
+    WHERE embedding <|2,COSINE|> $embeds
+    ORDER BY distance;
+```
+
+You can customise this [with other algorithms](/docs/surrealdb/reference-guide/vector-search#computation-on-vectors-vector-package-of-functions) such as Euclidean, Hamming, and so on.
+
+We will then put this into a separate function called `test_embed()` which looks similar `create_embed()`, except that it uses its embedding retrieved from OpenAI to query the database against existing documents instead of creating a new document.
+
+```rust
+async fn test_embed(
+    input: &str,
+    db: &Surreal<Any>,
+    client: &Client<OpenAIConfig>,
+) -> Result<(), Error> {
+    let request = CreateEmbeddingRequestArgs::default()
+        .model("text-embedding-3-small")
+        .input(input)
+        .dimensions(1536u32)
+        .build()?;
+    let mut result = client.embeddings().create(request).await?;
+
+    let embeds = result.data.remove(0).embedding;
+
+    let mut response = db.query("SELECT text, vector::distance::knn() AS distance FROM document WHERE embedding <|2,COSINE|> $embeds ORDER BY distance;").bind(("embeds", embeds)).await?;
+    let as_val: Value = response.take(0)?;
+    println!("{as_val}\n");
+    Ok(())
+}
+```
+
+Finally, we will call this function a few times inside `main()` to confirm that the results are what we expect them to be, printing out the results of each so that we can eyeball them and make sure that they are what we expect them to be.
+
+```rust
+println!("Venus is closest to:");
+test_embed("Venus", &db, &client).await?;
+
+println!("Xenophon is closest to:");
+test_embed("Xenophon", &db, &client).await?;
+
+println!("Mice are closest to:");
+test_embed("mouse", &db, &client).await?;
+
+println!("Radishes are closest to:");
+test_embed("radish", &db, &client).await?;
+
+println!("The Caspian Sea is closest to:");
+test_embed("Caspian Sea", &db, &client).await?;
+```
+
+The output shows that in each case the closest document is returned first:
+
+* "Venus" to "Which planet rotates slowly on its axis?"
+* "Xenophon" to "Which Greek general helped Cyrus the Younger?"
+* "mouse" to "What does the cat chase?"
+* "radish" to "What do Fraggles love to eat?", and
+* "Caspian Sea" to "What is the largest inland sea?"
+
+Success!
+
+```
+Venus is closest to:
+[{ distance: 0.6495068000978139f, text: 'Which planet rotates slowly on its axis?' }, { distance: 0.8388033444017572f, text: 'Which Greek general helped Cyrus the Younger?' }]
+
+Xenophon is closest to:
+[{ distance: 0.4421917772479055f, text: 'Which Greek general helped Cyrus the Younger?' }, { distance: 0.873354690471173f, text: 'What does the cat chase?' }]
+
+Mice are closest to:
+[{ distance: 0.6945913095506092f, text: 'What does the cat chase?' }, { distance: 0.8249335430462937f, text: 'Which planet rotates slowly on its axis?' }]
+
+Radishes are closest to:
+[{ distance: 0.7256996315669555f, text: 'What do Fraggles love to eat?' }, { distance: 0.8812784798259233f, text: 'What does the cat chase?' }]
+
+The Caspian Sea is closest to:
+[{ distance: 0.49966454922547254f, text: 'What is the largest inland sea?' }, { distance: 0.8096568276647603f, text: 'Which Greek general helped Cyrus the Younger?' }]
+```
+
+Finally, here is all of the code for you to run and modify as you wish. Any questions or thoughts about this or semantic search using SurrealDB? Feel free to [drop by our community](/community) to get in touch.
+
+```rust
+use std::sync::LazyLock;
+
+use anyhow::Error;
+use async_openai::{Client, config::OpenAIConfig, types::CreateEmbeddingRequestArgs};
+use serde::{Deserialize, Serialize};
+use surrealdb::{
+    RecordId, Surreal, Value,
+    engine::any::{Any, connect},
+};
+
+static KEY: LazyLock<String> = LazyLock::new(|| std::env::var("OPENAPI_API_KEY").unwrap());
+
+#[derive(Serialize)]
+struct DocumentInput {
+    text: String,
+    embedding: Vec<f32>,
+}
+
+#[derive(Debug, Deserialize)]
+struct Document {
+    id: RecordId,
+    embedding: Vec<f32>,
+    text: String,
+}
+
+async fn create_embed(
+    input: &str,
+    db: &Surreal<Any>,
+    client: &Client<OpenAIConfig>,
+) -> Result<(), Error> {
+    let request = CreateEmbeddingRequestArgs::default()
+        .model("text-embedding-3-small")
+        .input(input)
+        .dimensions(1536u32)
+        .build()?;
+    let mut result = client.embeddings().create(request).await?;
+
+    let embeds = result.data.remove(0).embedding;
+
+    let _in_db = db
+        .create::<Option<Document>>("document")
+        .content(DocumentInput {
+            text: input.into(),
+            embedding: embeds.to_vec(),
+        })
+        .await?;
+    Ok(())
+}
+
+async fn test_embed(
+    input: &str,
+    db: &Surreal<Any>,
+    client: &Client<OpenAIConfig>,
+) -> Result<(), Error> {
+    let request = CreateEmbeddingRequestArgs::default()
+        .model("text-embedding-3-small")
+        .input(input)
+        .dimensions(1536u32)
+        .build()?;
+    let mut result = client.embeddings().create(request).await?;
+
+    let embeds = result.data.remove(0).embedding;
+
+    let mut response = db.query("SELECT text, vector::distance::knn() AS distance FROM document WHERE embedding <|2,COSINE|> $embeds ORDER BY distance;").bind(("embeds", embeds)).await?;
+    let as_val: Value = response.take(0)?;
+    println!("{as_val}\n");
+    Ok(())
+}
+
+#[tokio::main]
+async fn main() -> Result<(), Error> {
+    let db = connect("memory").await?;
+
+    db.use_ns("ns").use_db("db").await?;
+
+    let mut res = db
+        .query(
+            "DEFINE TABLE document;
+             DEFINE FIELD text ON document TYPE string;
+             DEFINE FIELD embedding ON document TYPE array<float>;
+             DEFINE INDEX hnsw_embed ON document FIELDS embedding HNSW DIMENSION 1536;",
+        )
+        .await?;
+    for (index, error) in res.take_errors() {
+        println!("Error in query {index}: {error}");
+    }
+
+    let config = OpenAIConfig::new().with_api_key(&*KEY);
+
+    let client = Client::with_config(config);
+
+    for input in [
+        "What does the cat chase?",
+        "What do Fraggles love to eat?",
+        "Which planet rotates slowly on its axis?",
+        "Which Greek general helped Cyrus the Younger?",
+        "What is the largest inland sea?",
+    ] {
+        create_embed(input, &db, &client).await?
+    }
+
+    println!("Venus is closest to:");
+    test_embed("Venus", &db, &client).await?;
+
+    println!("Xenophon is closest to:");
+    test_embed("Xenophon", &db, &client).await?;
+
+    println!("Mice are closest to:");
+    test_embed("mouse", &db, &client).await?;
+
+    println!("Radishes are closest to:");
+    test_embed("radish", &db, &client).await?;
+
+    println!("The Caspian Sea is closest to:");
+    test_embed("Caspian Sea", &db, &client).await?;
+
+    Ok(())
+}
+```

@@ -2089,6 +2089,14 @@
     - audio
     - speech
 
+- title: Google AlloyDB for PostgreSQL as a vector database
+  path: examples/vector_databases/alloydb/alloydb_postgres_vector_search_scann.ipynb
+  date: 2025-06-13
+  authors:
+    - cornillon-google
+  tags:
+    - embeddings
+
 - title: Evaluating Agents with Langfuse
   path: examples/agents_sdk/evaluate_agents.ipynb
   date: 2025-03-31

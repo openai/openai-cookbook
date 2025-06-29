@@ -1,24 +1,117 @@
-## 🦖 OpenDino: An Open, Realtime-AI Educational Toy on ESP32
+# 🦖 OpenDino – Real‑Time Voice Assistant on ESP32 (No Companion Server)
 
-[OpenDino](https://github.com/RASPIAUDIO/OpenDino) is an open-source project that connects low-cost ESP32 microcontrollers directly to OpenAI's Realtime API via secure WebSockets. It streams microphone audio to GPT-4o mini (or another model) and plays back the model's audio responses, enabling back-and-forth conversations without a local server.
+> **TL;DR**  OpenDino streams 24 kHz PCM audio *directly* from an ESP32 to OpenAI’s GPT‑4o mini Realtime (or any WebSocket‑speaking LLM) and plays the response back, all in < ½ second round‑trip.  No local proxy, no WebRTC.
 
-Unlike the [ElatoAI example](running_realtime_api_speech_on_esp32_arduino_edge_runtime_elatoai.md), which relies on a companion server running on your PC, OpenDino performs the WebSocket communication entirely on the ESP32 board.
-
-### Key features
-
-- Runs on an ESP32 dev board with PSRAM and integrated audio.
-- Real-time, bidirectional audio streaming over WebSocket.
-- Firmware and hardware released under permissive licenses.
-- Provider-agnostic architecture for future models or self-hosting.
-
-### Getting started
-
-The repository includes Arduino/PlatformIO firmware and assembly instructions. Flash the firmware with your own API key and Wi-Fi credentials, then hold the push-to-talk button to chat with the toy. Full details and a demo video are available in the project's README.
-
-### License
-
-OpenDino is released under the MIT license for firmware and CERN OHL for hardware. See the [OpenDino repo](https://github.com/RASPIAUDIO/OpenDino) for the complete documentation and latest updates.
+[![Watch the demo](https://github.com/user-attachments/assets/d8d91100-6057-48ae-99a0-2b17d5463887)](https://www.youtube.com/watch?v=aPcab4P5pzs)
 
 ---
 
-**This article is part of the [OpenAI Cookbook](https://github.com/openai/openai-cookbook). For the full project, visit [OpenDino on GitHub](https://github.com/RASPIAUDIO/OpenDino) and consider starring the repo if you find it useful!**
+## Why this recipe?
+
+* Existing Cookbook examples such as **ElatoAI** off‑load the WebSocket logic to a PC‑side helper server.  **OpenDino** shows the *bare‑metal* path: the microcontroller itself handles authentication, streaming, and JSON‑Schema function calls that move the toy’s motors.
+* Demonstrates how far you can push a commodity ESP32‑WROVER (8 MB PS‑RAM) using only Arduino‑style code and the ArduinoWebsockets library.
+* The same pattern works for any endpoint that accepts bidirectional WebSockets + JSON, making it vendor‑agnostic (Gemini, local LLM, etc.).
+
+---
+
+## Key Features
+
+| Feature | Notes |
+|---------|-------|
+| **Hardware‑only WebSocket stack** | No companion PC or Pi; runs entirely on the ESP32. |
+| **Full‑duplex 24 kHz audio** | Streams `pcm16` up & down simultaneously. |
+| **Push‑to‑talk latency ≈ 400 ms** | Measured on 10 Mbps Wi‑Fi uplink. |
+| **JSON‑Schema function calls** | Lets the model invoke `move(speed, duration)` to wag the tail or walk. |
+| **Permissive licenses** | CERN‑OHL‑P‑2.0 hardware, MIT firmware. |
+| **Child‑friendly privacy model** | No hidden telemetry; users provide their own API key. |
+
+---
+
+## Architecture at a Glance
+
+```mermaid
+sequenceDiagram
+    participant Mic/Speaker as ESP32 (Muse Proto)
+    participant LLM as GPT‑4o mini Realtime
+    Mic/Speaker->>LLM: pcm16/24 kHz → (WebSocket)
+    LLM-->>Mic/Speaker: Delta audio frames (pcm16)
+    LLM-->>Mic/Speaker: JSON {"function_call": "move"}
+    Mic/Speaker->>Motors: PWM via H‑bridge
+```
+
+*Hardware* – [RaspiAudio Muse Proto](https://raspiaudio.com/product/muse-proto/) integrates MEMS mic, class‑D amp, speaker, Li‑ion charger, and exposes pogo‑pins for two motor lines.
+
+---
+
+## Bill of Materials (Prototype)
+
+| Qty | Part | Link |
+|-----|------|------|
+| 1 | RaspiAudio Muse Proto | <https://raspiaudio.com/product/muse-proto/> |
+| 1 | 18650 Li‑ion cell + holder | — |
+| 1 | Donor plush toy with DC motors | — |
+
+Prototype cost ≈ 15 USD (2025 Q2 retail).
+
+---
+
+## Quick‑Start (Arduino IDE ≥ 2.3)
+
+```bash
+# clone
+$ git clone https://github.com/RASPIAUDIO/OpenDino.git
+$ cd OpenDino/firmware
+```
+
+1. Open **`esp32_openai_ptt_realtime.ino`**.
+2. Fill in `OPENAI_KEY`, `WIFI_SSID`, `WIFI_PASS` at the top of the sketch.
+3. In *Tools ▸ Partition Scheme* select **Huge App (3 MB No OTA)** and enable **PSRAM**.
+4. Compile & flash.  Open Serial Monitor @ 921 600 baud.
+5. Hold the push‑to‑talk button (GPIO 19), speak, release—Dino replies and may wag its tail!
+
+> **Latency tip:** You can drop sample‑rate to 16 kHz if your Wi‑Fi is flaky; change both `input_audio_format` and `output_audio_format` accordingly.
+
+---
+
+## Roadmap
+
+| Milestone | Status |
+|-----------|--------|
+| Google Gemini Realtime | 🔄 in progress |
+| LAN‑only inference (local LLM) | ⏳ planned |
+| OTA firmware updates | ⏳ planned |
+| Kid‑safe injection‑moulded enclosure | 🚀 at 1 000 pre‑orders |
+
+Early‑access reservation costs **€1** (refunded if target not met).  Sign‑up: <http://dino.raspiaudio.com/>.
+
+---
+
+## Extending the Recipe
+
+* **Swap the backend** – change the WebSocket URI & auth header; adjust the JSON tool schema if needed.
+* **Custom prompts** – edit `systemPrompt` in the sketch for bedtime‑story mode, educational quizzes, etc.
+* **More actions** – add new entries to the `tools` array (e.g., `dance()`, `blinkEyes()`) and implement them on the ESP32 side.
+
+Feel free to open PRs or issues—latency benchmarks on different Wi‑Fi chips are especially welcome!
+
+---
+
+## License
+
+* Hardware design: **CERN‑OHL‑P‑2.0**  
+* Firmware & docs: **MIT**
+
+See LICENSE files in the repo for full text.
+
+---
+
+## Further Reading
+
+* **ElatoAI Edge Runtime example** – shows a companion‑server approach: `/running_realtime_api_speech_on_esp32_arduino_edge_runtime_elatoai.md` in the Cookbook.
+* **OpenDino Repo** – <https://github.com/RASPIAUDIO/OpenDino>
+* **Pre‑booking page** – <http://dino.raspiaudio.com/>
+
+---
+
+*© 2025 RaspiAudio — Expanding creativity through open audio hardware.*
+

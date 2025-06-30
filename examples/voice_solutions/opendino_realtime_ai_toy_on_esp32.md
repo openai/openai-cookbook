@@ -105,7 +105,7 @@ The reference design uses the **RaspiAudio Muse Proto**: ESP32‑WROVER, PS‑
 ### Schematic
 
 <p align="center">
-  <img src="https://github.com/user-attachments/assets/e982b65f-900c-4e72-82cd-8a69d27b0238" alt="Dino's schematic">
+  <img src="images/open_dino_shematic.png" alt="Dino's schematic">
 </p>
 
 ### Realtime Inference Backend

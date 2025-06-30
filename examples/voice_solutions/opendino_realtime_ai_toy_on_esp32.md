@@ -10,15 +10,16 @@
 
 <p align="center">
   <a href="https://www.youtube.com/watch?v=aPcab4P5pzs">
-    <img src="https://github.com/user-attachments/assets/d8d91100-6057-48ae-99a0-2b17d5463887" alt="Watch the demo">
+    <img src="https://github.com/RASPIAUDIO/openai-cookbook/blob/76f1011a6a70d049a0b7ef959f88e61bc0c7a5e4/images/open_dino_video_preview.png" alt="Watch the demo">
   </a>
 </p>
+
 
 ---
 
 ## Overview
 
-Open Dino is a fully open‑source, microcontroller‑powered voice assistant that runs **GPT‑4o mini Realtime** entirely over **raw WebSockets**—no WebRTC, desktop bridge, or companion server required. A single **ESP32‑WROVER** handles:
+Open Dino is a fully open‑source, microcontroller‑powered voice assistant that runs **GPT‑4o mini Realtime** entirely over **raw WebSockets**—no WebRTC, desktop bridge, or companion server required. A single **ESP32‑WROVER** handles:
 
 - Secure authentication and streaming JSON messages to OpenAI.
 - Full‑duplex 24 kHz PCM16 audio (≈ 400 ms push‑to‑talk latency on 10 Mbps Wi‑Fi).
@@ -36,7 +37,7 @@ Unlike the [ElatoAI example](https://cookbook.openai.com/examples/voice_solution
 
 ---
 
-## Table of Contents
+## Table of Contents
 1. [Motivation](#motivation)
 2. [Key Features](#key-features)
 3. [System Architecture](#system-architecture)
@@ -72,7 +73,7 @@ The project also proves that modern LLM capabilities fit on **sub-\$5**, 520 k
 | Push‑to‑talk latency ≈ 400 ms | Measured on 10 Mbps 802.11n Wi‑Fi. |
 | JSON‑Schema function calls | `move(speed, duration)` controls two DC motors via an H‑bridge. |
 | Captive web portal | Configure Wi‑Fi, API key, and per‑child prompt. |
-| Dual‑core workload split | Core 0: WebSocket + buffer • Core 1: I²S audio + Base64 codec. |
+| Dual‑core workload split | Core 0: WebSocket + buffer • Core 1: I²S audio + Base64 codec. |
 | Permissive licences | MIT firmware, CERN‑OHL‑P hardware. |
 
 ---
@@ -81,8 +82,8 @@ The project also proves that modern LLM capabilities fit on **sub-\$5**, 520 k
 
 ```mermaid
 sequenceDiagram
-    participant Board as ESP32 (Muse Proto)
-    participant LLM as GPT‑4o mini Realtime
+    participant Board as ESP32 (Muse Proto)
+    participant LLM as GPT‑4o mini Realtime
     Board->>LLM: pcm16 / 24 kHz (WebSocket)
     LLM-->>Board: delta audio (pcm16)
     LLM-->>Board: JSON {"function_call":"move"}
@@ -91,7 +92,7 @@ sequenceDiagram
 
 ### Hardware Platform
 
-The reference design uses the **RaspiAudio Muse Proto**: ESP32‑WROVER, PS‑RAM, on‑board MEMS mic, speaker, DAC/amp, and battery management.
+The reference design uses the **RaspiAudio Muse Proto**: ESP32‑WROVER, PS‑RAM, on‑board MEMS mic, speaker, DAC/amp, and battery management.
 
 | Signal     | GPIO | Destination | Notes                                    |
 |------------|------|-------------|------------------------------------------|
@@ -104,7 +105,7 @@ The reference design uses the **RaspiAudio Muse Proto**: ESP32‑WROVER, PS�
 ### Schematic
 
 <p align="center">
-  <img src="https://github.com/user-attachments/assets/e982b65f-900c-4e72-82cd-8a69d27b0238" alt="Dino's schematic">
+  <img src="https://github.com/RASPIAUDIO/openai-cookbook/blob/76f1011a6a70d049a0b7ef959f88e61bc0c7a5e4/images/open_dino_shematic.png" alt="Dino's schematic">
 </p>
 
 ### Realtime Inference Backend
@@ -123,14 +124,14 @@ Switching providers needs only a new WebSocket URI, auth header, and (optionally
 |-----|------|---------|------|
 | 1 | RaspiAudio Muse Proto | ESP32‑WROVER, audio I/O, charger | <https://raspiaudio.com/product/muse-proto/> |
 | 1 | DRV8833 dual H‑bridge | Drives head & leg motors | any retailer |
-| 1 | 18650 Li‑ion + holder | Portable power | — |
+| 1 | 18650 Li‑ion + holder | Portable power | — |
 | 1 | Motorised plush toy | Enclosure & actuators | — |
 
 **Estimated cost (mid‑2025): ≤ 50 USD**
 
 ---
 
-## Quick‑Start Guide (Arduino IDE ≥ 2.3, ESP32 core v3.1.0)
+## Quick‑Start Guide (Arduino IDE ≥ 2.3, ESP32 core v3.1.0)
 
 ```bash
 # Clone the repo
@@ -138,10 +139,10 @@ git clone https://github.com/RASPIAUDIO/OpenDino.git
 cd OpenDino/firmware
 ```
 
-1. Install **ESP32 Arduino core v3.1.0** via *Boards Manager*.
+1. Install **ESP32 Arduino core v3.1.0** via *Boards Manager*.
 2. Open `OpenDino.ino`.
 3. Enter your `OPENAI_KEY`, `WIFI_SSID`, and `WIFI_PASS` (temporary keys supported).
-4. **Tools ▸ Partition Scheme** → **Huge App (3 MB No OTA)**; enable **PSRAM**.
+4. **Tools ▸ Partition Scheme** → **Huge App (3 MB No OTA)**; enable **PSRAM**.
 5. Compile, flash, and open the Serial Monitor @ 921 600 baud.
 6. On first boot, connect to the **captive portal** to set a child‑specific prompt.
 7. Hold **GPIO 19** (PTT), speak, release—Dino answers *and* physically reacts.
@@ -170,4 +171,3 @@ cd OpenDino/firmware
 
 
 ---
-

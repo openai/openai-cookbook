@@ -2253,3 +2253,18 @@
     - deep-research
     - agents
     - agents-sdk
+
+- title: OpenDino - Realtime-AI Toy on ESP32
+  path: examples/voice_solutions/opendino_realtime_ai_toy_on_esp32.mdAdd commentMore actions
+  date: 2025-06-30
+  authors:
+    - Olivier Ros
+    - raspiaudio
+  tags:
+    - realtime-api
+    - speech
+    - audio
+    - esp32
+    - iot
+    - arduino
+    

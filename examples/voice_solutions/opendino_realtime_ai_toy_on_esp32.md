@@ -10,7 +10,7 @@
 
 <p align="center">
   <a href="https://www.youtube.com/watch?v=aPcab4P5pzs">
-    <img src="https://github.com/user-attachments/assets/d8d91100-6057-48ae-99a0-2b17d5463887" alt="Watch the demo">
+    <img src="https://github.com/RASPIAUDIO/openai-cookbook/blob/76f1011a6a70d049a0b7ef959f88e61bc0c7a5e4/images/open_dino_video_preview.png" alt="Watch the demo">
   </a>
 </p>
 

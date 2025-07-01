@@ -4,7 +4,7 @@ This blog post is a SurrealDB-ified version of [this great post](https://github.
 
 ## Intro
 
-The purpose of this guide is to demonstrate how to store OpenAI embeddings as [SurrealDB vectors](/docs/surrealdb/reference-guide/vector-search) via the Rust SDK for the purposes of semantic search.
+The purpose of this guide is to demonstrate how to store OpenAI embeddings as [SurrealDB vectors](https://www.surrealdb.com/docs/surrealdb/reference-guide/vector-search) via the Rust SDK for the purposes of semantic search.
 
 This guide uses Rust's [async-openai](https://crates.io/crates/async-openai/0.28.3) crate to generate embeddings, but you can modify it to use any [language supported by OpenAI](https://platform.openai.com/docs/libraries).
 
@@ -73,7 +73,7 @@ Next we'll create a table to store documents and embeddings, along with an index
 DEFINE TABLE document;
 DEFINE FIELD text ON document TYPE string;
 DEFINE FIELD embedding ON document TYPE array<float>;
-DEFINE INDEX hnsw_embed ON document FIELDS embedding HNSW DIMENSION 1536;
+DEFINE INDEX hnsw_embed ON document FIELDS embedding HNSW DIMENSION 1536 DIST COSINE;
 ```
 
 Inside the SDK we can put all four of these inside a single `.query()` call and then add a line to see if there are errors inside any of them.
@@ -84,7 +84,7 @@ let mut res = db
         "DEFINE TABLE document;
 DEFINE FIELD text ON document TYPE string;
 DEFINE FIELD embedding ON document TYPE array<float>;
-DEFINE INDEX hnsw_embed ON document FIELDS embedding HNSW DIMENSION 1536;",
+DEFINE INDEX hnsw_embed ON document FIELDS embedding HNSW DIMENSION 1536 DIST COSINE;",
     )
     .await?;
 for (index, error) in res.take_errors() {
@@ -94,7 +94,27 @@ for (index, error) in res.take_errors() {
 
 The important piece to understand is the relationship between the `embedding` field, a simple array of floats, and the `hnsw_embed` index. The size of the vector (1536 here) represents the number of dimensions in the embedding. Since OpenAI's `text-embedding-3-small` model in this example uses [1536 as its default length](https://platform.openai.com/docs/guides/embeddings), we set the vector size to 1536.
 
-With the [HNSW index](/docs/surrealdb/reference-guide/vector-search#vector-indexes) set up, we will be able to use the KNN operator (`<||>`) to find an embedding's closest neighbours.
+The [HNSW index](https://www.surrealdb.com/docs/surrealdb/reference-guide/vector-search#vector-indexes) is not strictly necessary to use the KNN operator (`<||>`) to find an embedding's closest neighbours, and for our small sample code we will use the simple [brute force method](https://www.surrealdb.com/docs/surrealql/operators#brute-force-method) which chooses [an algorithm](https://www.surrealdb.com/docs/surrealdb/reference-guide/vector-search#computation-on-vectors-vector-package-of-functions) such as Euclidean, Hamming, and so on. The following is the code that we will use, which uses the cosine of an embedding to find the four closest neighbours.
+
+```surql
+SELECT 
+    text,
+    vector::distance::knn() AS distance FROM document
+    WHERE embedding <|2,COSINE|> $embeds
+    ORDER BY distance;
+```
+
+As the dataset grows, if some loss of accuracy is acceptable then the syntax can be changed to use [the HNSW index](https://www.surrealdb.com/docs/surrealql/operators#hnsw-method), by replacing an algorithm with a number that represents the size of the dynamic candidate list.
+
+```surql
+SELECT 
+    text,
+    vector::distance::knn() AS distance FROM document
+    WHERE embedding <|2,40|> $embeds
+    ORDER BY distance;
+```
+
+Another option is to use the [MTREE](https://www.surrealdb.com/docs/surrealql/operators#mtree-index-method) index method.
 
 ## Generate OpenAI embeddings
 
@@ -173,7 +193,7 @@ We know that our simple request only returned a single embedding, so `.remove(0)
 let embeds = result.data.remove(0).embedding;
 ```
 
-There are a [number of ways](/docs/sdk/rust/concepts/flexible-typing) to work with or avoid structs when using the Rust SDK, but we'll just go with two basic structs: one to represent the input into a `.create()` statement, which will implement `Serialize`, and another that implements `Deserialize` to show the result.
+There are a [number of ways](https://www.surrealdb.com/docs/sdk/rust/concepts/flexible-typing) to work with or avoid structs when using the Rust SDK, but we'll just go with two basic structs: one to represent the input into a `.create()` statement, which will implement `Serialize`, and another that implements `Deserialize` to show the result.
 
 ```rust
 #[derive(Serialize)]
@@ -258,7 +278,7 @@ SELECT
     ORDER BY distance;
 ```
 
-You can customise this [with other algorithms](/docs/surrealdb/reference-guide/vector-search#computation-on-vectors-vector-package-of-functions) such as Euclidean, Hamming, and so on.
+You can customise this [with other algorithms](https://www.surrealdb.com/docs/surrealdb/reference-guide/vector-search#computation-on-vectors-vector-package-of-functions) such as Euclidean, Hamming, and so on.
 
 We will then put this into a separate function called `test_embed()` which looks similar `create_embed()`, except that it uses its embedding retrieved from OpenAI to query the database against existing documents instead of creating a new document.
 
@@ -330,7 +350,7 @@ The Caspian Sea is closest to:
 [{ distance: 0.49966454922547254f, text: 'What is the largest inland sea?' }, { distance: 0.8096568276647603f, text: 'Which Greek general helped Cyrus the Younger?' }]
 ```
 
-Finally, here is all of the code for you to run and modify as you wish. Any questions or thoughts about this or semantic search using SurrealDB? Feel free to [drop by our community](/community) to get in touch.
+Finally, here is all of the code for you to run and modify as you wish. Any questions or thoughts about this or semantic search using SurrealDB? Feel free to [drop by our community](https://www.surrealdb.com/community) to get in touch.
 
 ```rust
 use std::sync::LazyLock;
@@ -413,7 +433,7 @@ async fn main() -> Result<(), Error> {
             "DEFINE TABLE document;
              DEFINE FIELD text ON document TYPE string;
              DEFINE FIELD embedding ON document TYPE array<float>;
-             DEFINE INDEX hnsw_embed ON document FIELDS embedding HNSW DIMENSION 1536;",
+             DEFINE INDEX hnsw_embed ON document FIELDS embedding HNSW DIMENSION 1536 DIST COSINE;",
         )
         .await?;
     for (index, error) in res.take_errors() {

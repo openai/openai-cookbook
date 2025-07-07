@@ -45,6 +45,18 @@
     - functions
     - tracing
 
+- title: Building a Supply-Chain Copilot with OpenAI Agent SDK and Databricks MCP Servers
+  path: examples/mcp/mcp_tool_guide.ipynb
+  date: 2025-07-08
+  authors:
+    - lara-openai
+  tags:
+    - agents
+    - mcp
+    - vector-search
+    - supply-chain
+    - databricks
+
 - title: Eval Driven System Design - From Prototype to Production
   path: examples/partners/eval_driven_system_design/receipt_inspection.ipynb
   date: 2025-06-02

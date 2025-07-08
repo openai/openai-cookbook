@@ -46,7 +46,7 @@
     - tracing
 
 - title: Building a Supply-Chain Copilot with OpenAI Agent SDK and Databricks MCP Servers
-  path: examples/mcp/databricks_mcp_cookbook.ipynb
+  path: examples/mcp/databricks_mcp_cookbook.ipynb 
   date: 2025-07-08
   authors:
     - lara-openai

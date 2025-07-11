@@ -1,0 +1,39 @@
+{
+  "merchant": "ARCO GASOLINE",
+  "location": {
+    "city": "Vista",
+    "state": "CA",
+    "zipcode": null
+  },
+  "time": "2023-01-20T08:45:00",
+  "items": [
+    {
+      "description": "E-85",
+      "product_code": null,
+      "category": "Fuel",
+      "item_price": "2.699",
+      "sale_price": null,
+      "quantity": "13.268",
+      "total": "35.81"
+    },
+    {
+      "description": "debitfee",
+      "product_code": null,
+      "category": "Fee",
+      "item_price": null,
+      "sale_price": null,
+      "quantity": "1",
+      "total": "0.35"
+    }
+  ],
+  "subtotal": null,
+  "tax": null,
+  "total": "36.16",
+  "handwritten_notes": [
+    "vista-> yos",
+    "sequoia",
+    "yos",
+    "206618",
+    "2023"
+  ]
+}

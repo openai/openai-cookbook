@@ -1,0 +1,712 @@
+{
+  "cells": [
+    {
+      "cell_type": "markdown",
+      "metadata": {
+        "id": "PrEXW8RfyIWT"
+      },
+      "source": [
+        "# Introduction to the Deep Research API\n",
+        "\n",
+        "## Background\n",
+        "\n",
+        "The Deep Research API enables you to automate complex research workflows that require reasoning, planning, and synthesis across real-world information. It is designed to take a high-level query and return a structured, citation-rich report by leveraging an agentic model capable of decomposing the task, performing web searches, and synthesizing results.\n",
+        "\n",
+        "Unlike ChatGPT where this process is abstracted away, the API provides direct programmatic access. When you send a request, the model autonomously plans sub-questions, uses tools like web search and code execution, and produces a final structured response. This cookbook will provide a brief introduction to the Deep Research API and how to use it.\n",
+        "\n",
+        "You can access Deep Research via the `responses` endpoint using the following models:\n",
+        "\n",
+        "- `o3-deep-research-2025-06-26`: Optimized for in-depth synthesis and higher-quality output  \n",
+        "- `o4-mini-deep-research-2025-06-26`: Lightweight and faster, ideal for latency-sensitive use cases"
+      ]
+    },
+    {
+      "cell_type": "markdown",
+      "metadata": {
+        "id": "xBNu6irQyIWV"
+      },
+      "source": [
+        "## Setup\n",
+        "\n",
+        "### Install requirements\n",
+        "Install the latest version of the OpenAI Python SDK."
+      ]
+    },
+    {
+      "cell_type": "code",
+      "execution_count": null,
+      "metadata": {
+        "id": "7wLQixR4yIWV"
+      },
+      "outputs": [],
+      "source": [
+        "!pip install --upgrade openai"
+      ]
+    },
+    {
+      "cell_type": "markdown",
+      "metadata": {
+        "id": "9SGiGt_byIWW"
+      },
+      "source": [
+        "### Authenticate\n",
+        "Import the OpenAI client and initialize with your API key."
+      ]
+    },
+    {
+      "cell_type": "code",
+      "execution_count": null,
+      "metadata": {
+        "id": "oStGzoHQyIWW"
+      },
+      "outputs": [],
+      "source": [
+        "from openai import OpenAI\n",
+        "OPENAI_API_KEY=\"\" # YOUR OPENAI_API_KEY\n",
+        "#OPENAI_API_KEY = os.environ.get(\"OPENAI_API_KEY\")\n",
+        "client = OpenAI(api_key=OPENAI_API_KEY)"
+      ]
+    },
+    {
+      "cell_type": "markdown",
+      "metadata": {
+        "id": "BHi7r3PSyIWW"
+      },
+      "source": [
+        "## Getting started\n",
+        "\n",
+        "Let’s walk through an example of a Deep Research API call. Imagine we’re working at a healthcare financial services firm tasked with producing an in-depth report on the economic implications of recent medications used to treat type 2 diabetes and obesity—particularly semaglutide. Our goal is to synthesize clinical outcomes, cost-effectiveness, and regional pricing data into a structured, citation-backed analysis that could inform investment, payer strategy, or policy recommendations.\n",
+        "\n",
+        "To get started, let's:\n",
+        "- Put our role in the system message, outlining what type of report we'd like to generate\n",
+        "- Set the summary paramter to \"auto\" for now for the best available summary. (If you'd like for your report to more detailed, you can set summary to detailed)\n",
+        "- Include the required tool web_search_preview and optionally add code_interpreter.\n",
+        "- Set the background parameter to True. Since a Deep Research task can take several minutes to execute, enabling background mode will allow you to run the request asynchronously without having to worry about timeouts or other connectivity issues."
+      ]
+    },
+    {
+      "cell_type": "code",
+      "execution_count": null,
+      "metadata": {
+        "id": "a2BW00TpyIWX"
+      },
+      "outputs": [],
+      "source": [
+        "system_message = \"\"\"\n",
+        "You are a professional researcher preparing a structured, data-driven report on behalf of a global health economics team. Your task is to analyze the health question the user poses.\n",
+        "\n",
+        "Do:\n",
+        "- Focus on data-rich insights: include specific figures, trends, statistics, and measurable outcomes (e.g., reduction in hospitalization costs, market size, pricing trends, payer adoption).\n",
+        "- When appropriate, summarize data in a way that could be turned into charts or tables, and call this out in the response (e.g., “this would work well as a bar chart comparing per-patient costs across regions”).\n",
+        "- Prioritize reliable, up-to-date sources: peer-reviewed research, health organizations (e.g., WHO, CDC), regulatory agencies, or pharmaceutical earnings reports.\n",
+        "- Include inline citations and return all source metadata.\n",
+        "\n",
+        "Be analytical, avoid generalities, and ensure that each section supports data-backed reasoning that could inform healthcare policy or financial modeling.\n",
+        "\"\"\"\n",
+        "\n",
+        "user_query = \"Research the economic impact of semaglutide on global healthcare systems.\"\n",
+        "\n",
+        "response = client.responses.create(\n",
+        "  model=\"o3-deep-research\",\n",
+        "  input=[\n",
+        "    {\n",
+        "      \"role\": \"developer\",\n",
+        "      \"content\": [\n",
+        "        {\n",
+        "          \"type\": \"input_text\",\n",
+        "          \"text\": system_message,\n",
+        "        }\n",
+        "      ]\n",
+        "    },\n",
+        "    {\n",
+        "      \"role\": \"user\",\n",
+        "      \"content\": [\n",
+        "        {\n",
+        "          \"type\": \"input_text\",\n",
+        "          \"text\": user_query,\n",
+        "        }\n",
+        "      ]\n",
+        "    }\n",
+        "  ],\n",
+        "  reasoning={\n",
+        "    \"summary\": \"auto\"\n",
+        "  },\n",
+        "  tools=[\n",
+        "    {\n",
+        "      \"type\": \"web_search_preview\"\n",
+        "    },\n",
+        "    {\n",
+        "      \"type\": \"code_interpreter\",\n",
+        "      \"container\": {\n",
+        "        \"type\": \"auto\",\n",
+        "        \"file_ids\": []\n",
+        "      }\n",
+        "    }\n",
+        "  ]\n",
+        ")"
+      ]
+    },
+    {
+      "cell_type": "markdown",
+      "metadata": {
+        "id": "ODuaGA3tyIWX"
+      },
+      "source": [
+        "## Parse the Response\n",
+        "\n",
+        "The Deep Research API response includes a structured final answer along with inline citations, summaries of the reasoning steps, and source metadata.\n",
+        "\n",
+        "### Extract the Final Report Output\n",
+        "\n",
+        "Here's the main text output of this report.\n"
+      ]
+    },
+    {
+      "cell_type": "code",
+      "execution_count": null,
+      "metadata": {
+        "id": "q1Yq8iFoyIWX"
+      },
+      "outputs": [],
+      "source": [
+        "# Access the final report from the response object\n",
+        "print(response.output[-1].content[0].text)"
+      ]
+    },
+    {
+      "cell_type": "markdown",
+      "metadata": {
+        "id": "FT9bWGq9yIWX"
+      },
+      "source": [
+        "### Access Inline Citations and Metadata\n",
+        "Inline citations in the response text are annotated and linked to their corresponding source metadata. Each annotation contains:\n",
+        "- start_index and end_index: the character span in the text the citation refers to\n",
+        "- title: a brief title of the source\n",
+        "- url: the full source URL\n",
+        "\n",
+        "This structure will allow you to build a citation list or bibliography, add clickable hyperlinks in downstream apps, and highlight & trace data-backed claims in your report."
+      ]
+    },
+    {
+      "cell_type": "code",
+      "execution_count": null,
+      "metadata": {
+        "id": "hPej_N9CyIWY"
+      },
+      "outputs": [],
+      "source": [
+        "annotations = response.output[-1].content[0].annotations\n",
+        "for i, citation in enumerate(annotations):\n",
+        "    print(f\"Citation {i+1}:\")\n",
+        "    print(f\"  Title: {citation.title}\")\n",
+        "    print(f\"  URL: {citation.url}\")\n",
+        "    print(f\"  Location: chars {citation.start_index}–{citation.end_index}\")\n"
+      ]
+    },
+    {
+      "cell_type": "markdown",
+      "metadata": {
+        "id": "6GxsB5iwyIWY"
+      },
+      "source": [
+        "### Inspect Intermediate Steps\n",
+        "The Deep Research API also exposes all intermediate steps taken by the agent, including reasoning steps, web search calls, and code executions. You can use these to debug, analyze, or visualize how the final answer was constructed.\n",
+        "Each intermediate step is stored in `response.output`, and the `type` field indicates what kind it is.\n",
+        "\n",
+        "#### Reasoning Step\n",
+        "These represent internal summaries or plans generated by the model as it reasons through sub-questions."
+      ]
+    },
+    {
+      "cell_type": "code",
+      "execution_count": null,
+      "metadata": {
+        "id": "Lbv_Ow_yyIWY"
+      },
+      "outputs": [],
+      "source": [
+        "# Find the first reasoning step\n",
+        "reasoning = next(item for item in response.output if item.type == \"reasoning\")\n",
+        "for s in reasoning.summary:\n",
+        "    print(s.text)"
+      ]
+    },
+    {
+      "cell_type": "markdown",
+      "metadata": {
+        "id": "ilzzPiDVyIWY"
+      },
+      "source": [
+        "#### Web Search Call\n",
+        "These show what search queries were executed and can help you trace what information the model retrieved."
+      ]
+    },
+    {
+      "cell_type": "code",
+      "execution_count": null,
+      "metadata": {
+        "id": "4CzHgTgDyIWY"
+      },
+      "outputs": [],
+      "source": [
+        "# Find the first web search step\n",
+        "search = next(item for item in response.output if item.type == \"web_search_call\")\n",
+        "print(\"Query:\", search.action[\"query\"])\n",
+        "print(\"Status:\", search.status)"
+      ]
+    },
+    {
+      "cell_type": "markdown",
+      "metadata": {
+        "id": "r7FBRad0yIWY"
+      },
+      "source": [
+        "#### Code Execution\n",
+        "If the model used the code interpreter (e.g. for parsing data or generating charts), those steps will appear as type \"code_interpreter_call\" or similar."
+      ]
+    },
+    {
+      "cell_type": "code",
+      "execution_count": null,
+      "metadata": {
+        "id": "HPXRm_aeyIWY"
+      },
+      "outputs": [],
+      "source": [
+        "# Find a code execution step (if any)\n",
+        "code_step = next((item for item in response.output if item.type == \"code_interpreter_call\"), None)\n",
+        "if code_step:\n",
+        "    print(code_step.input)\n",
+        "    print(code_step.output)\n",
+        "else:\n",
+        "    print(\"No code execution steps found.\")\n"
+      ]
+    },
+    {
+      "cell_type": "markdown",
+      "metadata": {
+        "id": "VJ2vmC27Hkef"
+      },
+      "source": [
+        "#### Model Context Protocol (MCP)\n",
+        "\n",
+        "Suppose you would like to pull in your own internal documents as part of a Deep Research task. The Deep Research models and the Responses API both support MCP-based tools, so you can extend them to query your private knowledge stores or other 3rd party services.\n",
+        "\n",
+        "In the example below, we configure an MCP tool that lets Deep Research fetch your organizations internal semaglutide studies on demand. The MCP server is a proxy for the OpenAI File Storage service that automagically vectorizes your uploaded files for performant retrieval.\n",
+        "\n",
+        "If you would like to see _how_ we built this simple MCP server, refer to [this related cookbook](https://cookbook.openai.com/examples/deep_research_api/how_to_build_a_deep_research_mcp_server/readme)."
+      ]
+    },
+    {
+      "cell_type": "code",
+      "execution_count": null,
+      "metadata": {
+        "id": "I71wHbNmHlUE"
+      },
+      "outputs": [],
+      "source": [
+        "# system_message includes reference to internal file lookups for MCP.\n",
+        "system_message = \"\"\"\n",
+        "You are a professional researcher preparing a structured, data-driven report on behalf of a global health economics team. Your task is to analyze the health question the user poses.\n",
+        "\n",
+        "Do:\n",
+        "- Focus on data-rich insights: include specific figures, trends, statistics, and measurable outcomes (e.g., reduction in hospitalization costs, market size, pricing trends, payer adoption).\n",
+        "- When appropriate, summarize data in a way that could be turned into charts or tables, and call this out in the response (e.g., “this would work well as a bar chart comparing per-patient costs across regions”).\n",
+        "- Prioritize reliable, up-to-date sources: peer-reviewed research, health organizations (e.g., WHO, CDC), regulatory agencies, or pharmaceutical earnings reports.\n",
+        "- Include an internal file lookup tool to retrieve information from our own internal data sources. If you’ve already retrieved a file, do not call fetch again for that same file. Prioritize inclusion of that data.\n",
+        "- Include inline citations and return all source metadata.\n",
+        "\n",
+        "Be analytical, avoid generalities, and ensure that each section supports data-backed reasoning that could inform healthcare policy or financial modeling.\n",
+        "\"\"\"\n",
+        "\n",
+        "user_query = \"Research the economic impact of semaglutide on global healthcare systems.\"\n",
+        "\n",
+        "response = client.responses.create(\n",
+        "  model=\"o3-deep-research-2025-06-26\",\n",
+        "  input=[\n",
+        "    {\n",
+        "      \"role\": \"developer\",\n",
+        "      \"content\": [\n",
+        "        {\n",
+        "          \"type\": \"input_text\",\n",
+        "          \"text\": system_message,\n",
+        "        }\n",
+        "      ]\n",
+        "    },\n",
+        "    {\n",
+        "      \"role\": \"user\",\n",
+        "      \"content\": [\n",
+        "        {\n",
+        "          \"type\": \"input_text\",\n",
+        "          \"text\": user_query,\n",
+        "        }\n",
+        "      ]\n",
+        "    }\n",
+        "  ],\n",
+        "  reasoning={\n",
+        "    \"summary\": \"auto\"\n",
+        "  },\n",
+        "  tools=[\n",
+        "    {\n",
+        "      \"type\": \"web_search_preview\"\n",
+        "    },\n",
+        "    { # ADD MCP TOOL SUPPORT\n",
+        "      \"type\": \"mcp\",\n",
+        "      \"server_label\": \"internal_file_lookup\",\n",
+        "      \"server_url\": \"https://<your_mcp_server>/sse/\", # Update to the location of *your* MCP server\n",
+        "      \"require_approval\": \"never\"\n",
+        "    }\n",
+        "  ]\n",
+        ")\n"
+      ]
+    },
+    {
+      "cell_type": "markdown",
+      "metadata": {
+        "id": "ufEBTxsEba4R"
+      },
+      "source": [
+        "## Reviewing your response\n",
+        "\n",
+        "First 100 characters of your Research Report, followed by Citations and MCP tool calls. "
+      ]
+    },
+    {
+      "cell_type": "code",
+      "execution_count": null,
+      "metadata": {
+        "id": "DO_IXFt8USPk"
+      },
+      "outputs": [],
+      "source": [
+        "# Grab the full report text once\n",
+        "report_text = response.output[-1].content[0].text\n",
+        "\n",
+        "print(\"REPORT EXCERPT:\")\n",
+        "print(report_text[:100])   # first 100 chars\n",
+        "print(\"--------\")\n",
+        "\n",
+        "annotations = response.output[-1].content[0].annotations\n",
+        "target_url = \"https://platform.openai.com/storage/files\"\n",
+        "\n",
+        "for citation in annotations:\n",
+        "    if citation.url.startswith(target_url):\n",
+        "        start, end = citation.start_index, citation.end_index\n",
+        "\n",
+        "        # extract exactly the cited span\n",
+        "        excerpt       = report_text[start:end]\n",
+        "\n",
+        "        # extract up to 100 chars immediately before the citation\n",
+        "        pre_start     = max(0, start - 100)\n",
+        "        preceding_txt = report_text[pre_start:start]\n",
+        "\n",
+        "        print(\"MCP CITATION SAMPLE:\")\n",
+        "        print(f\"  Title:       {citation.title}\")\n",
+        "        print(f\"  URL:         {citation.url}\")\n",
+        "        print(f\"  Location:    chars {start}–{end}\")\n",
+        "        print(f\"  Preceding:   {preceding_txt!r}\")\n",
+        "        print(f\"  Excerpt:     {excerpt!r}\")\n",
+        "        break\n",
+        "\n",
+        "print(\"--------\")\n",
+        "\n",
+        "\n",
+        "# EXAMPLE MCP CITATION\n",
+        "\n",
+        "# REPORT EXCERPT:\n",
+        "# # Introduction\n",
+        "# Semaglutide – a glucagon-like peptide-1 (GLP-1) analogue – has rapidly become a blo\n",
+        "# --------\n",
+        "# MCP CITATION SAMPLE:\n",
+        "#   Title:       Document file-WqbCdYNqNzGuFfCAeWyZfp\n",
+        "#   URL:         https://platform.openai.com/storage/files/file-WqbCdYNqNzGuFfCAeWyZfp\n",
+        "#   Location:    chars 237–331\n",
+        "#   Preceding:   'and obesity due to its potent clinical efficacy (often inducing ~10–15% body weight loss in trials) '\n",
+        "#   Excerpt:     '([platform.openai.com](https://platform.openai.com/storage/files/file-WqbCdYNqNzGuFfCAeWyZfp))'\n",
+        "\n",
+        "\n",
+        "# print the MCP tool calls\n",
+        "calls = [\n",
+        "    (item.name, item.server_label, item.arguments)\n",
+        "    for item in response.output\n",
+        "    if item.type == \"mcp_call\" and item.arguments\n",
+        "]\n",
+        "for name, server, args in calls:\n",
+        "    print(f\"{name}@{server} → {args}\")\n",
+        "print(\"--------\")"
+      ]
+    },
+    {
+      "cell_type": "markdown",
+      "metadata": {
+        "id": "9wQ3mKWjyIWY"
+      },
+      "source": [
+        "## Clarifying Questions in ChatGPT vs. the Deep Research API\n",
+        "If you’ve used Deep Research in ChatGPT, you may have noticed that it often asks follow-up questions after you submit a query. This is intentional: ChatGPT uses an intermediate model (like gpt-4.1) to help clarify your intent and gather more context (such as your preferences, goals, or constraints) before the research process begins. This extra step helps the system tailor its web searches and return more relevant and targeted results.\n",
+        "\n",
+        "In contrast, the Deep Research API skips this clarification step. As a developer, you can configure this processing step to rewrite the user prompt or ask a set of clarifying questions, since the model expects fully-formed prompts up front and will not ask for additional context or fill in missing information; it simply starts researching based on the input it receives.\n",
+        "\n",
+        "To get strong, reliable outputs from the API, you can use two approaches.\n",
+        "- Use a prompt rewriter using another lightweight model (e.g., gpt-4.1) to expand or specify user queries before passing them to the research model.\n",
+        "- Include all relevant details: desired scope, comparisons, metrics, regions, preferred sources, and expected output format.\n",
+        "\n",
+        "This setup gives developers full control over how research tasks are framed, but also places greater responsibility on the quality of the input prompt. Here's an example of a generic rewriting_prompt to better direct the subsequent deep research query.\n",
+        "\n",
+        "![../../images/intro_dr.png](../../../images/intro_dr.png)\n",
+        "\n",
+        "Here's an example of a rewriting prompt:"
+      ]
+    },
+    {
+      "cell_type": "code",
+      "execution_count": null,
+      "metadata": {
+        "id": "USn2Qmj4yIWY"
+      },
+      "outputs": [],
+      "source": [
+        "suggested_rewriting_prompt = \"\"\"\n",
+        "You will be given a research task by a user. Your job is to produce a set of instructions for a researcher that will complete the task. Do NOT complete the task yourself, just provide instructions on how to complete it.\n",
+        "\n",
+        "GUIDELINES:\n",
+        "1. **Maximize Specificity and Detail**\n",
+        "- Include all known user preferences and explicitly list key attributes or dimensions to consider.\n",
+        "- It is of utmost importance that all details from the user are included in the instructions.\n",
+        "\n",
+        "2. **Fill in Unstated But Necessary Dimensions as Open-Ended**\n",
+        "- If certain attributes are essential for a meaningful output but the user has not provided them, explicitly state that they are open-ended or default to no specific constraint.\n",
+        "\n",
+        "3. **Avoid Unwarranted Assumptions**\n",
+        "- If the user has not provided a particular detail, do not invent one.\n",
+        "- Instead, state the lack of specification and guide the researcher to treat it as flexible or accept all possible options.\n",
+        "\n",
+        "4. **Use the First Person**\n",
+        "- Phrase the request from the perspective of the user.\n",
+        "\n",
+        "5. **Tables**\n",
+        "- If you determine that including a table will help illustrate, organize, or enhance the information in the research output, you must explicitly request that the researcher provide them.\n",
+        "Examples:\n",
+        "- Product Comparison (Consumer): When comparing different smartphone models, request a table listing each model's features, price, and consumer ratings side-by-side.\n",
+        "- Project Tracking (Work): When outlining project deliverables, create a table showing tasks, deadlines, responsible team members, and status updates.\n",
+        "- Budget Planning (Consumer): When creating a personal or household budget, request a table detailing income sources, monthly expenses, and savings goals.\n",
+        "Competitor Analysis (Work): When evaluating competitor products, request a table with key metrics, such as market share, pricing, and main differentiators.\n",
+        "\n",
+        "6. **Headers and Formatting**\n",
+        "- You should include the expected output format in the prompt.\n",
+        "- If the user is asking for content that would be best returned in a structured format (e.g. a report, plan, etc.), ask the researcher to format as a report with the appropriate headers and formatting that ensures clarity and structure.\n",
+        "\n",
+        "7. **Language**\n",
+        "- If the user input is in a language other than English, tell the researcher to respond in this language, unless the user query explicitly asks for the response in a different language.\n",
+        "\n",
+        "8. **Sources**\n",
+        "- If specific sources should be prioritized, specify them in the prompt.\n",
+        "- For product and travel research, prefer linking directly to official or primary websites (e.g., official brand sites, manufacturer pages, or reputable e-commerce platforms like Amazon for user reviews) rather than aggregator sites or SEO-heavy blogs.\n",
+        "- For academic or scientific queries, prefer linking directly to the original paper or official journal publication rather than survey papers or secondary summaries.\n",
+        "- If the query is in a specific language, prioritize sources published in that language.\n",
+        "\"\"\""
+      ]
+    },
+    {
+      "cell_type": "code",
+      "execution_count": null,
+      "metadata": {
+        "id": "GYDGTRDWyIWZ"
+      },
+      "outputs": [],
+      "source": [
+        "response = client.responses.create(\n",
+        "    instructions=suggested_rewriting_prompt,\n",
+        "    model=\"gpt-4.1-2025-04-14\",\n",
+        "    input=\"help me plan a trip to france\",\n",
+        ")"
+      ]
+    },
+    {
+      "cell_type": "code",
+      "execution_count": null,
+      "metadata": {
+        "id": "SViKko1ByIWZ"
+      },
+      "outputs": [],
+      "source": [
+        "new_query = response.output[0].content[0].text\n",
+        "print(new_query)"
+      ]
+    },
+    {
+      "cell_type": "markdown",
+      "metadata": {
+        "id": "7IErtJlHyIWZ"
+      },
+      "source": [
+        "In this instance, a user submitted a generic or open-ended query without specifying key details like travel dates, destination preferences, budget, interests, or travel companions; the rewriting prompt rewrote the query so Deep Research will attempt to generate a broad and inclusive response that anticipates common use cases.\n",
+        "\n",
+        "While this behavior can be helpful in surfacing a wide range of options, it often leads to verbosity, higher latency, and increased token usage, as the model must account for many possible scenarios. This is especially true for queries that trigger complex planning or synthesis tasks (e.g. multi-destination travel itineraries, comparative research, product selection).\n",
+        "\n",
+        "Instead of proceeding immediately with a broad research plan, let's trying using a lighter weight model to gently ask clarification questions from the user before generating a full answer and then using the rewriting prompt for clearer output for the model."
+      ]
+    },
+    {
+      "cell_type": "code",
+      "execution_count": null,
+      "metadata": {
+        "id": "v7zuwZUFyIWZ"
+      },
+      "outputs": [],
+      "source": [
+        "suggested_clariying_prompt = \"\"\"\"\n",
+        "You will be given a research task by a user. Your job is NOT to complete the task yet, but instead to ask clarifying questions that would help you or another researcher produce a more specific, efficient, and relevant answer.\n",
+        "\n",
+        "GUIDELINES:\n",
+        "1. **Maximize Relevance**\n",
+        "- Ask questions that are *directly necessary* to scope the research output.\n",
+        "- Consider what information would change the structure, depth, or direction of the answer.\n",
+        "\n",
+        "2. **Surface Missing but Critical Dimensions**\n",
+        "- Identify essential attributes that were not specified in the user’s request (e.g., preferences, time frame, budget, audience).\n",
+        "- Ask about each one *explicitly*, even if it feels obvious or typical.\n",
+        "\n",
+        "3. **Do Not Invent Preferences**\n",
+        "- If the user did not mention a preference, *do not assume it*. Ask about it clearly and neutrally.\n",
+        "\n",
+        "4. **Use the First Person**\n",
+        "- Phrase your questions from the perspective of the assistant or researcher talking to the user (e.g., “Could you clarify...” or “Do you have a preference for...”)\n",
+        "\n",
+        "5. **Use a Bulleted List if Multiple Questions**\n",
+        "- If there are multiple open questions, list them clearly in bullet format for readability.\n",
+        "\n",
+        "6. **Avoid Overasking**\n",
+        "- Prioritize the 3–6 questions that would most reduce ambiguity or scope creep. You don’t need to ask *everything*, just the most pivotal unknowns.\n",
+        "\n",
+        "7. **Include Examples Where Helpful**\n",
+        "- If asking about preferences (e.g., travel style, report format), briefly list examples to help the user answer.\n",
+        "\n",
+        "8. **Format for Conversational Use**\n",
+        "- The output should sound helpful and conversational—not like a form. Aim for a natural tone while still being precise.\n",
+        "\"\"\"\n",
+        "\n",
+        "\n",
+        "response = client.responses.create(\n",
+        "    instructions=suggested_clariying_prompt,\n",
+        "    model=\"gpt-4.1-2025-04-14\",\n",
+        "    input=\"help me plan a trip to france\",\n",
+        ")\n",
+        "\n",
+        "new_query = response.output[0].content[0].text\n",
+        "print(new_query)"
+      ]
+    },
+    {
+      "cell_type": "code",
+      "execution_count": null,
+      "metadata": {
+        "id": "9gpjXiFDyIWZ"
+      },
+      "outputs": [],
+      "source": [
+        "user_follow_up = \"\"\"I'd like to travel in August. I'd like to visit Paria and Nice. I'd like to keep it under $1500 for a 7 day trip without including flights.\n",
+        "I'm going with my friend. we're both in our mid-twenties. i like history, really good french food and wine, and hiking\n",
+        "\"\"\"\n",
+        "instructions_for_DR = client.responses.create(\n",
+        "    instructions=suggested_rewriting_prompt,\n",
+        "    model=\"gpt-4.1-2025-04-14\",\n",
+        "    input=user_follow_up,\n",
+        ")\n",
+        "instructions_for_deep_research = instructions_for_DR.output[0].content[0].text\n",
+        "print(instructions_for_deep_research)"
+      ]
+    },
+    {
+      "cell_type": "code",
+      "execution_count": null,
+      "metadata": {
+        "id": "sBScr2AWyIWZ"
+      },
+      "outputs": [],
+      "source": [
+        "deep_research_call = client.responses.create(\n",
+        "  model=\"o4-mini-deep-research-2025-06-26\",\n",
+        "  input=[\n",
+        "    {\n",
+        "      \"role\": \"developer\",\n",
+        "      \"content\": [\n",
+        "        {\n",
+        "          \"type\": \"input_text\",\n",
+        "          \"text\": instructions_for_deep_research,\n",
+        "        }\n",
+        "      ]\n",
+        "    },\n",
+        "  ],\n",
+        "  reasoning={\n",
+        "    \"summary\": \"auto\"\n",
+        "  },\n",
+        "  tools=[\n",
+        "    {\n",
+        "      \"type\": \"web_search_preview\"\n",
+        "    },\n",
+        "  ]\n",
+        ")"
+      ]
+    },
+    {
+      "cell_type": "code",
+      "execution_count": null,
+      "metadata": {
+        "id": "cUg83AnbyIWZ"
+      },
+      "outputs": [],
+      "source": [
+        "# Access the final report from the response object\n",
+        "print(deep_research_call.output[-1].content[0].text)"
+      ]
+    },
+    {
+      "cell_type": "markdown",
+      "metadata": {
+        "id": "8Lf3L_u7HGZc"
+      },
+      "source": [
+        "And there you have it! A deep research report crafted for your upcoming trip to France!\n",
+        "\n",
+        "In this notebook, we explored how to use the Deep Research API to automate complex, real-world research tasks, from analyzing the economic impact of semaglutide to planning a trip to France that works for you. Deep Research shines when you need structured, citation-backed answers grounded in real-world evidence. Some standout use cases include:\n",
+        "- Product comparisons and market analyses\n",
+        "- Competitive intelligence and strategy reports\n",
+        "- Technical literature reviews and policy synthesis\n",
+        "\n",
+        "\n",
+        "Whether you're looking to build research agents, generate structured reports, or integrate high-quality synthesis into your workflows, we hope the examples here help you get started.\n",
+        "\n",
+        "What's next? [Deep Research Agents](https://cookbook.openai.com/examples/deep_research_api/introduction_to_deep_research_api_agents)"
+      ]
+    }
+  ],
+  "metadata": {
+    "colab": {
+      "collapsed_sections": [
+        "9wQ3mKWjyIWY"
+      ],
+      "provenance": []
+    },
+    "kernelspec": {
+      "display_name": "openai",
+      "language": "python",
+      "name": "python3"
+    },
+    "language_info": {
+      "codemirror_mode": {
+        "name": "ipython",
+        "version": 3
+      },
+      "file_extension": ".py",
+      "mimetype": "text/x-python",
+      "name": "python",
+      "nbconvert_exporter": "python",
+      "pygments_lexer": "ipython3",
+      "version": "3.11.8"
+    }
+  },
+  "nbformat": 4,
+  "nbformat_minor": 0
+}

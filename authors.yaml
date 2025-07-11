@@ -7,8 +7,22 @@ moustafa-openai:
   name: "Moustafa Elhadary"
   website: "https://www.linkedin.com/in/moustafaelhadary/"
   avatar: "https://avatars.githubusercontent.com/u/198829901?v=4"
+rajpathak-openai:
+  name: "Raj Pathak"
+  website: "https://www.linkedin.com/in/rajpathakopenai/"
+  avatar: "https://avatars.githubusercontent.com/u/208723614?s=400&u=c852eed3be082f7fbd402b5a45e9b89a0bfed1b8&v=4"
 
-theophile-openai:
+chelseahu-openai:
+  name: "Chelsea Hu"
+  website: "https://www.linkedin.com/in/chelsea-tsaiszuhu/"
+  avatar: "https://avatars.githubusercontent.com/u/196863678?v=4"
+
+prashantmital-openai:
+  name: "Prashant Mital"
+  website: "https://www.linkedin.com/in/pmital/"
+  avatar: "https://avatars.githubusercontent.com/u/173949238?v=4"
+
+theophile-oai:
   name: "Theophile Sautory"
   website: "https://www.linkedin.com/in/theophilesautory"
   avatar: "https://avatars.githubusercontent.com/u/206768658?v=4"
@@ -266,7 +280,7 @@ MW-OAI:
 dwigg-openai:
   name: "Danny Wigg"
   website: "https://www.linkedin.com/in/dannywigg/"
-  avatar: "https://media.licdn.com/dms/image/v2/C4D03AQEjMSl0pMR_qw/profile-displayphoto-shrink_800_800/profile-displayphoto-shrink_800_800/0/1587647134114?e=1743033600&v=beta&t=XmULCSmk6V6YFmlyBggxj5uJeoYYuaYUKgcByKlS0K0"
+  avatar: "https://avatars.githubusercontent.com/u/4661060?v=4"
 
 msingh-openai:
   name: "Mandeep Singh"
@@ -297,6 +311,11 @@ erikakettleson-openai:
   name: "Erika Kettleson"
   website: "https://www.linkedin.com/in/erika-kettleson-85763196/"
   avatar: "https://avatars.githubusercontent.com/u/186107044?v=4"
+
+jannik-maierhofer:
+  name: "Jannik Maierhöfer"
+  website: "https://www.linkedin.com/in/maierhoefer/"
+  avatar: "https://avatars.githubusercontent.com/u/48529566?v=4"
 
 josiah-openai:
   name: "Josiah Grace"
@@ -332,3 +351,43 @@ tompakeman-oai:
   name: "Tom Pakeman"
   website: "https://www.linkedin.com/in/tom-pakeman/"
   avatar: "https://avatars.githubusercontent.com/u/204937754"
+
+alistair-openai:
+  name: "Alistair Gillespie"
+  website: "https://www.linkedin.com/in/alistair-gillespie/"
+  avatar: "https://avatars.githubusercontent.com/u/210626148"
+
+phundal-openai:
+  name: "Patrick Hundal"
+  website: "https://www.linkedin.com/in/phundal/"
+  avatar: "https://avatars.githubusercontent.com/u/189161955"
+
+rkoenig-openai:
+  name: "Robin Koenig"
+  website: "https://www.linkedin.com/in/robinkoenig/"
+  avatar: "https://media.licdn.com/dms/image/v2/C5603AQEqUVtbts8Huw/profile-displayphoto-shrink_400_400/profile-displayphoto-shrink_400_400/0/1558137883581?e=1753920000&v=beta&t=jcm-qNJfmgVJsS6uNHxHu5T2nQoUWkXivthzxTJMWqA"
+
+joshbickett:
+  name: "Josh Bickett"
+  website: "https://www.linkedin.com/in/josh-bickett-4219b166/"
+  avatar: "https://avatars.githubusercontent.com/u/42594239"
+
+lupie:
+  name: "Lucie Lozinski"
+  website: "https://twitter.com/thisloops"
+  avatar: "https://avatars.githubusercontent.com/u/6293148"
+
+alexl-oai:
+  name: "Alex Lowden"
+  website: "https://www.linkedin.com/in/alex-lowden01/"
+  avatar: "https://avatars.githubusercontent.com/u/215167546"
+
+lara-openai:
+  name: "Lara Rachidi"
+  website: "https://www.linkedin.com/in/lara-rachidi/"
+  avatar: "https://avatars.githubusercontent.com/u/208707651?v=4"
+
+glojain:
+  name: "Glory Jain"
+  website: "https://www.linkedin.com/in/gloryjain/"
+  avatar: "https://media.licdn.com/dms/image/v2/C4E03AQH72n6Sm5q69Q/profile-displayphoto-shrink_400_400/profile-displayphoto-shrink_400_400/0/1557995338725?e=1756339200&v=beta&t=FGTXiCZwTZvqHCY-wd8It15EDf11Rex1oLlBKRGHNtY"

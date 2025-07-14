@@ -12,12 +12,13 @@
   tags:
     - codex
     - automation
-    
+
 - title: Prompt Migration Guide
   path: examples/Prompt_migration_guide.ipynb
   date: 2025-06-26
   authors:
     - minh-hoque
+    - corwin
   tags:
     - prompt
     - completions

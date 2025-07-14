@@ -11,21 +11,6 @@ A full-stack, Databricks-themed conversational assistant for supply chain querie
 - Example agent logic and tool usage
 - Modern UX, easy local development
 
----
-
-## Project Structure
-```
-/ (root)
-├── main.py                # Example CLI agent runner
-├── api_server.py          # FastAPI backend for chat UI
-├── requirements.txt       # Python dependencies
-├── ui/                    # React frontend (Vite)
-│   ├── src/components/ChatUI.jsx, ChatUI.css, ...
-│   └── ...
-└── README.md              # (this file)
-```
-
----
 
 ## Quickstart
 
@@ -33,7 +18,7 @@ A full-stack, Databricks-themed conversational assistant for supply chain querie
 
 You can kick start your project with Databricks’ Supply-Chain Optimization Solution Accelerator (or any other accelerator if working in a different industry). Clone this accelerator’s GitHub repo into your Databricks workspace and run the bundled notebooks by running notebook 1:
 
-https://github.com/lararachidi/agent-supply-chain/blob/main/README.md
+https://github.com/lara-openai/databricks-supply-chain
 
 These notebooks stand up every asset the Agent will later reach via MCP, from raw enterprise tables and unstructured e-mails to classical ML models and graph workloads.
 
@@ -41,6 +26,7 @@ These notebooks stand up every asset the Agent will later reach via MCP, from ra
 - Python 3.10+
 - Node.js 18+
 - Databricks credentials in `~/.databrickscfg`
+- OpenAI API key 
 - (Optional) Virtualenv/pyenv for Python isolation
 
 ### 2. Install Python Dependencies
@@ -87,11 +73,5 @@ npm run dev
 - To update backend agent logic, modify `api_server.py`.
 - UI styling is in `ui/src/components/ChatUI.css` (Databricks red palette).
 
----
 
-## Credits & References
-- Inspired by [Databricks Supply Chain Solution Accelerator](https://www.databricks.com/solutions/accelerators/supply-chain-distribution-optimization)
-- Uses [openai-agents-python](https://github.com/openai/openai-agents-python)
-- Databricks MCP integration via [databricks.sdk](https://github.com/databricks/databricks-sdk-py)
-- Supply-chain scope enforced by a simple LLM guardrail (see `supply_chain_guardrails.py`)
 

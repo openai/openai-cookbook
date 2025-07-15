@@ -31,6 +31,7 @@
   date: 2025-06-26
   authors:
     - minh-hoque
+    - corwin
   tags:
     - prompt
     - completions
@@ -57,6 +58,18 @@
     - agents-sdk
     - functions
     - tracing
+
+- title: Building a Supply-Chain Copilot with OpenAI Agent SDK and Databricks MCP Servers
+  path: examples/mcp/databricks_mcp_cookbook.ipynb  
+  date: 2025-07-08
+  authors:
+    - lara-openai
+  tags:
+    - agents
+    - mcp
+    - vector-search
+    - supply-chain
+    - databricks
 
 - title: Eval Driven System Design - From Prototype to Production
   path: examples/partners/eval_driven_system_design/receipt_inspection.ipynb

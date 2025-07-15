@@ -4,6 +4,15 @@
 # should build pages for, and indicates metadata such as tags, creation date and
 # authors for each page.
 
+- title: Using Evals API on Image Inputs
+  path: examples/evaluation/use-cases/EvalsAPI_Image_Inputs.ipynb
+  date: 2025-07-15
+  authors:
+    - daisyshe-oai
+  tags:
+    - evals-api
+    - images
+
 - title: Optimize Prompts
   path: examples/Optimize_Prompts.ipynb
   date: 2025-07-14

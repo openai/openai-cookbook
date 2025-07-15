@@ -3,6 +3,19 @@
 # This file is used to generate cookbook.openai.com. It specifies which paths we
 # should build pages for, and indicates metadata such as tags, creation date and
 # authors for each page.
+
+- title: Optimize Prompts
+  path: examples/Optimize_Prompts.ipynb
+  date: 2025-07-14
+  authors:
+    - corwin
+  tags:
+    - prompt
+    - completions
+    - responses
+    - agents-sdk
+    - tracing
+
 - title: Automate Jira ↔ GitHub with Codex
   path: examples/codex/jira-github.ipynb
   date: 2025-06-21
@@ -47,7 +60,7 @@
     - tracing
 
 - title: Building a Supply-Chain Copilot with OpenAI Agent SDK and Databricks MCP Servers
-  path: examples/mcp/databricks_mcp_cookbook.ipynb  
+  path: examples/mcp/databricks_mcp_cookbook.ipynb
   date: 2025-07-08
   authors:
     - lara-openai

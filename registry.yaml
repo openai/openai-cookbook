@@ -12,6 +12,7 @@
   tags:
     - evals-api
     - images
+    - evals
 
 - title: Optimize Prompts
   path: examples/Optimize_Prompts.ipynb

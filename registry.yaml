@@ -3,6 +3,19 @@
 # This file is used to generate cookbook.openai.com. It specifies which paths we
 # should build pages for, and indicates metadata such as tags, creation date and
 # authors for each page.
+
+- title: Optimize Prompts
+  path: examples/Optimize_Prompts.ipynb
+  date: 2025-07-14
+  authors:
+    - corwin
+  tags:
+    - prompt
+    - completions
+    - responses
+    - agents-sdk
+    - tracing
+
 - title: Automate Jira ↔ GitHub with Codex
   path: examples/codex/jira-github.ipynb
   date: 2025-06-21
@@ -18,6 +31,7 @@
   date: 2025-06-26
   authors:
     - minh-hoque
+    - corwin
   tags:
     - prompt
     - completions
@@ -51,11 +65,9 @@
   authors:
     - lara-openai
   tags:
-    - agents
+    - agents-sdk
     - mcp
-    - vector-search
-    - supply-chain
-    - databricks
+    - tracing
 
 - title: Eval Driven System Design - From Prototype to Production
   path: examples/partners/eval_driven_system_design/receipt_inspection.ipynb

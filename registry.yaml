@@ -12,7 +12,7 @@
   tags:
     - codex
     - automation
-    
+
 - title: Prompt Migration Guide
   path: examples/Prompt_migration_guide.ipynb
   date: 2025-06-26
@@ -46,7 +46,7 @@
     - tracing
 
 - title: Building a Supply-Chain Copilot with OpenAI Agent SDK and Databricks MCP Servers
-  path: examples/mcp/databricks_mcp_cookbook.ipynb  
+  path: examples/mcp/databricks_mcp_cookbook.ipynb
   date: 2025-07-08
   authors:
     - lara-openai
@@ -2265,3 +2265,11 @@
     - deep-research
     - agents
     - agents-sdk
+
+- title: Generate images with high input fidelity
+  path: examples/Generate_Images_With_High_Input_Fidelity.ipynb
+  date: 2025-07-16
+  authors:
+    - katiagg
+  tags:
+    - images

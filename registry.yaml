@@ -12,7 +12,6 @@
   tags:
     - evals-api
     - images
-    - evals
 
 - title: Optimize Prompts
   path: examples/Optimize_Prompts.ipynb
@@ -54,6 +53,20 @@
     - alexl-oai
   tags:
     - fine-tuning
+
+- title: MCP-Powered Agentic Voice Framework
+  path: examples/partners/mcp_powered_voice_agents/mcp_powered_agents_cookbook.ipynb
+  date: 2025-06-17
+  authors:
+    - shikhar-cyber
+    - Cece Z
+    - Sibon li
+  tags:
+    - mcp
+    - voice
+    - agents-sdk
+    - functions
+    - tracing
 
 - title: Building a Supply-Chain Copilot with OpenAI Agent SDK and Databricks MCP Servers
   path: examples/mcp/databricks_mcp_cookbook.ipynb

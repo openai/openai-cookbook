@@ -2276,7 +2276,7 @@
 
 - title: Generate images with high input fidelity
   path: examples/Generate_Images_With_High_Input_Fidelity.ipynb
-  date: 2025-07-16
+  date: 2025-07-17
   authors:
     - katiagg
   tags:

@@ -10,7 +10,7 @@
   authors:
     - daisyshe-oai
   tags:
-    - evals-api
+    - evals
     - images
 
 - title: Optimize Prompts
@@ -210,7 +210,7 @@
   authors:
     - josiah-openai
   tags:
-    - evals-api
+    - evals
     - completions
 
 - title: Evals API Use-case - Bulk model and prompt experimentation
@@ -219,7 +219,7 @@
   authors:
     - josiah-openai
   tags:
-    - evals-api
+    - evals
     - completions
 
 - title: Evals API Use-case - Monitoring stored completions
@@ -228,7 +228,7 @@
   authors:
     - josiah-openai
   tags:
-    - evals-api
+    - evals
     - completions
 
 - title: Evals API Use-case - Responses Evaluation
@@ -237,7 +237,7 @@
   authors:
     - willhath-openai
   tags:
-    - evals-api
+    - evals
     - responses
 
 - title: Multi-Tool Orchestration with RAG approach using OpenAI's Responses API

@@ -2309,3 +2309,11 @@
     - katiagg
   tags:
     - images
+
+- title: Running hybrid VSS queries with Dragonfly and OpenAI
+  path: examples/vector_databases/dragonfly/dragonfly-hybrid-query-examples.ipynb
+  date: 2025-07-28
+  authors:
+    - vyavdoshenko
+  tags:
+    - embeddings

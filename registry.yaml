@@ -4,6 +4,111 @@
 # should build pages for, and indicates metadata such as tags, creation date and
 # authors for each page.
 
+- title: Temporal Agents with Knowledge Graphs
+  path: examples/partners/temporal_agents_with_knowledge_graphs/temporal_agents_with_knowledge_graphs.ipynb
+  date: 2025-07-22
+  authors:
+    - shikhar-cyber
+    - dwigg-openai
+    - Alex Heald
+    - Douglas Adams
+    - Rishabh Sagar
+  tags:
+    - knowledge-graphs
+    - temporal-agents
+    - RAG
+
+
+- title: Using Evals API on Image Inputs
+  path: examples/evaluation/use-cases/EvalsAPI_Image_Inputs.ipynb
+  date: 2025-07-15
+  authors:
+    - daisyshe-oai
+  tags:
+    - evals
+    - images
+
+- title: Optimize Prompts
+  path: examples/Optimize_Prompts.ipynb
+  date: 2025-07-14
+  authors:
+    - corwin
+  tags:
+    - prompt
+    - completions
+    - responses
+    - agents-sdk
+    - tracing
+
+- title: Automate Jira ↔ GitHub with Codex
+  path: examples/codex/jira-github.ipynb
+  date: 2025-06-21
+  authors:
+    - alwell-kevin
+    - narenoai
+  tags:
+    - codex
+    - automation
+
+- title: Prompt Migration Guide
+  path: examples/Prompt_migration_guide.ipynb
+  date: 2025-06-26
+  authors:
+    - minh-hoque
+    - corwin
+  tags:
+    - prompt
+    - completions
+    - responses
+
+- title: Fine-Tuning Techniques - Choosing Between SFT, DPO, and RFT (With a Guide to DPO)
+  path: examples/Fine_tuning_direct_preference_optimization_guide.ipynb
+  date: 2025-06-18
+  authors:
+    - alexl-oai
+  tags:
+    - fine-tuning
+
+- title: MCP-Powered Agentic Voice Framework
+  path: examples/partners/mcp_powered_voice_agents/mcp_powered_agents_cookbook.ipynb
+  date: 2025-06-17
+  authors:
+    - shikhar-cyber
+    - Cece Z
+    - Sibon li
+  tags:
+    - mcp
+    - voice
+    - agents-sdk
+    - functions
+    - tracing
+
+- title: Building a Supply-Chain Copilot with OpenAI Agent SDK and Databricks MCP Servers
+  path: examples/mcp/databricks_mcp_cookbook.ipynb
+  date: 2025-07-08
+  authors:
+    - lara-openai
+  tags:
+    - agents-sdk
+    - mcp
+    - tracing
+
+- title: Eval Driven System Design - From Prototype to Production
+  path: examples/partners/eval_driven_system_design/receipt_inspection.ipynb
+  date: 2025-06-02
+  authors:
+    - shikhar-cyber
+    - Hugh Wimberly
+    - Joshua Marker
+    - Eddie Siegel
+  tags:
+    - evals
+    - API Flywheel
+    - completions
+    - responses
+    - functions
+    - tracing
+
 - title: Multi-Agent Portfolio Collaboration with OpenAI Agents SDK
   path: examples/agents_sdk/multi-agent-portfolio-collaboration/multi_agent_portfolio_collaboration.ipynb
   date: 2025-05-28
@@ -48,7 +153,7 @@
     - evals
     - reinforcement
 
-- title: Guide to Using the Responses API's MCP Tool 
+- title: Guide to Using the Responses API's MCP Tool
   path: examples/mcp/mcp_tool_guide.ipynb
   date: 2025-05-21
   authors:
@@ -120,7 +225,7 @@
   authors:
     - josiah-openai
   tags:
-    - evals-api
+    - evals
     - completions
 
 - title: Evals API Use-case - Bulk model and prompt experimentation
@@ -129,7 +234,7 @@
   authors:
     - josiah-openai
   tags:
-    - evals-api
+    - evals
     - completions
 
 - title: Evals API Use-case - Monitoring stored completions
@@ -138,7 +243,7 @@
   authors:
     - josiah-openai
   tags:
-    - evals-api
+    - evals
     - completions
 
 - title: Evals API Use-case - Responses Evaluation
@@ -147,7 +252,7 @@
   authors:
     - willhath-openai
   tags:
-    - evals-api
+    - evals
     - responses
 
 - title: Multi-Tool Orchestration with RAG approach using OpenAI's Responses API
@@ -850,7 +955,6 @@
     - leemthompo
   tags:
     - embeddings
-    - completions
 
 - title: Using Hologres as a vector database for OpenAI embeddings
   path: >-
@@ -2102,3 +2206,106 @@
     - audio
     - speech
 
+- title: Selecting a Model Based on Stripe Conversion – A Practical Eval for Startups
+  path: examples/stripe_model_eval/selecting_a_model_based_on_stripe_conversion.ipynb
+  date: 2025-06-02
+  authors:
+    - joshbickett
+    - lupie
+    - shyamal-anadkat
+  tags:
+    - evals
+    - stripe
+    - conversion
+
+- title: Evals API Use-case - MCP Evaluation
+  path: examples/evaluation/use-cases/mcp_eval_notebook.ipynb
+  date: 2025-06-09
+  authors:
+    - josiah-openai
+    - shikhar-cyber
+  tags:
+    - evals-api
+    - responses
+    - evals
+    - mcp
+
+- title: Evals API Use-case - Structured Outputs Evaluation
+  path: examples/evaluation/use-cases/structured-outputs-evaluation.ipynb
+  date: 2025-06-09
+  authors:
+    - josiah-openai
+    - shikhar-cyber
+  tags:
+    - evals-api
+    - responses
+    - evals
+
+- title: Evals API Use-case - Tools Evaluation
+  path: examples/evaluation/use-cases/tools-evaluation.ipynb
+  date: 2025-06-09
+  authors:
+    - josiah-openai
+    - shikhar-cyber
+  tags:
+    - evals-api
+    - responses
+    - evals
+
+- title: Evals API Use-case - Web Search Evaluation
+  path: examples/evaluation/use-cases/web-search-evaluation.ipynb
+  date: 2025-06-09
+  authors:
+    - josiah-openai
+    - shikhar-cyber
+  tags:
+    - evals-api
+    - responses
+    - evals
+
+- title: Introduction to deep research in the OpenAI API
+  path: examples/deep_research_api/introduction_to_deep_research_api.ipynb
+  date: 2025-06-25
+  authors:
+    - glojain
+    - alwell-kevin
+  tags:
+    - deep-research-api
+    - responses
+    - mcp
+    - deep-research
+
+- title: Deep Research API with the Agents SDK
+  path: examples/deep_research_api/introduction_to_deep_research_api_agents.ipynb
+  date: 2025-06-25
+  authors:
+    - alwell-kevin
+    - glojain
+  tags:
+    - deep-research-api
+    - mcp
+    - deep-research
+    - agents
+    - agents-sdk
+
+- title: Building a Deep Research MCP Server
+  path: examples/deep_research_api/how_to_build_a_deep_research_mcp_server/README.md
+  date: 2025-06-25
+  authors:
+    - alwell-kevin
+    - glojain
+  tags:
+    - mcp
+    - deep-research-api
+    - responses
+    - deep-research
+    - agents
+    - agents-sdk
+
+- title: Generate images with high input fidelity
+  path: examples/Generate_Images_With_High_Input_Fidelity.ipynb
+  date: 2025-07-17
+  authors:
+    - katiagg
+  tags:
+    - images

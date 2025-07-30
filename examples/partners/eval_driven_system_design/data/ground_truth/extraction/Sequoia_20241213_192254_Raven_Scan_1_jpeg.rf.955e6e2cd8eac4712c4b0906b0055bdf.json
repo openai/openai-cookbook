@@ -1,0 +1,29 @@
+{
+  "merchant": "CHUKCHANSI CROSSING",
+  "location": {
+    "city": "Coarsegold",
+    "state": "CA",
+    "zipcode": "93614"
+  },
+  "time": "2024-10-19T22:04:39",
+  "items": [
+    {
+      "description": "STICKER",
+      "product_code": null,
+      "category": "Stationery",
+      "item_price": "3.99",
+      "sale_price": null,
+      "quantity": "2",
+      "total": "7.98"
+    }
+  ],
+  "subtotal": "7.98",
+  "tax": "0.70",
+  "total": "8.68",
+  "handwritten_notes": [
+    "Home -> yos",
+    "Sequoia",
+    "Rizos",
+    "gift Basket"
+  ]
+}

@@ -1,0 +1,28 @@
+{
+  "merchant": "Costco",
+  "location": {
+    "city": "San Juan Capistrano",
+    "state": "CA",
+    "zipcode": null
+  },
+  "time": "2024-11-07T11:18:00",
+  "items": [
+    {
+      "description": "Fuel",
+      "product_code": null,
+      "category": "Fuel",
+      "item_price": "4.399",
+      "sale_price": null,
+      "quantity": "14.350",
+      "total": "63.13"
+    }
+  ],
+  "subtotal": "63.13",
+  "tax": null,
+  "total": "63.13",
+  "handwritten_notes": [
+    "home -> Yos",
+    "Tundra",
+    "558653"
+  ]
+}

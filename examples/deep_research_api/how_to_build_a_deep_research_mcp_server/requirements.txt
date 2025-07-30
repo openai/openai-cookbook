@@ -1,0 +1,15 @@
+# Core dependencies for the Deep Research MCP Server
+fastmcp>=2.9.0
+openai>=1.88.0
+uvicorn>=0.34.3
+
+# Additional dependencies that may be required
+pydantic>=2.0.0
+typing-extensions>=4.0.0
+httpx>=0.23.0
+python-multipart>=0.0.9
+sse-starlette>=1.6.1
+starlette>=0.27.0
+
+# Optional but recommended for production
+python-dotenv>=1.0.0

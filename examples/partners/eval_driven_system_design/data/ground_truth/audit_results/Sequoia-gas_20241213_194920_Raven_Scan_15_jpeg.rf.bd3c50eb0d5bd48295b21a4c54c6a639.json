@@ -1,0 +1,8 @@
+{
+  "not_travel_related": false,
+  "amount_over_limit": false,
+  "math_error": false,
+  "handwritten_x": false,
+  "reasoning": "1. NOT_TRAVEL_RELATED: The receipt is from 'Shell Gasoline' for fuel (E85), which is a travel-related expense. Therefore, this criterion is not violated (FALSE).  \n2. AMOUNT_OVER_LIMIT: The total amount on the receipt is $40.19, which does not exceed the $50 limit. This criterion is not violated (FALSE).  \n3. MATH_ERROR: The total of the item listed ($40.19) matches the provided total; hence, there are no math errors. This criterion is not violated (FALSE). \n4. HANDWRITTEN_X: There is no 'X' noted in the handwritten notes. This criterion is not violated (FALSE). \n\nSince no criteria were violated, the receipt does not need auditing.",
+  "needs_audit": false
+}

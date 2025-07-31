@@ -146,3 +146,6 @@ examples/multimodal/.local_cache/*
 # VS Code files
 .vscode/
 .cursorignore
+
+# Analysis output reports
+tools/outputs/

@@ -4,6 +4,15 @@
 # should build pages for, and indicates metadata such as tags, creation date and
 # authors for each page.
 
+- title: Using NVIDIA TensorRT-LLM to run the 20B model
+  path: examples/articles/run-nvidia.ipynb
+  date: 2025-08-05
+  authors:
+    - jayrodge
+  tags:
+    - nvidia
+    - tensorrt-llm
+
 - title: Temporal Agents with Knowledge Graphs
   path: examples/partners/temporal_agents_with_knowledge_graphs/temporal_agents_with_knowledge_graphs.ipynb
   date: 2025-07-22

@@ -11,6 +11,9 @@
     - edbeeching
     - qgallouedec
     - lewtun
+  tags:
+    - open-models
+    - gpt-oss
 
 - title: How to handle the raw chain of thought in gpt-oss
   path: articles/gpt-oss/handle-raw-cot.md

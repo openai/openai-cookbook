@@ -396,3 +396,23 @@ daisyshe-oai:
   name: "Daisy Sheng"
   website: "https://www.linkedin.com/in/daisysheng/"
   avatar: "https://avatars.githubusercontent.com/u/212609991?v=4"
+
+dkundel-openai:
+  name: "Dominik Kundel"
+  website: "https://www.linkedin.com/in/dominik-kundel/"
+  avatar: "https://avatars.githubusercontent.com/u/200841172?v=4"
+
+edbeeching:
+  name: "Edward Beeching"
+  website: "https://huggingface.co/edbeeching"
+  avatar: "https://cdn-avatars.huggingface.co/v1/production/uploads/1644220542819-noauth.jpeg"
+
+qgallouedec:
+  name: "Quentin Gallouédec"
+  website: "https://huggingface.co/qgallouedec"
+  avatar: "https://cdn-avatars.huggingface.co/v1/production/uploads/1677431596830-631ce4b244503b72277fc89f.jpeg"
+
+lewtun:
+  name: "Lewis Tunstall"
+  website: "https://huggingface.co/lewtun"
+  avatar: "https://cdn-avatars.huggingface.co/v1/production/uploads/1594651707950-noauth.jpeg"

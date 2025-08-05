@@ -4,8 +4,7 @@
 # should build pages for, and indicates metadata such as tags, creation date and
 # authors for each page.
 
-
-- title: Using NVIDIA TensorRT-LLM to run the 20B model
+- title: Using NVIDIA TensorRT-LLM to run gpt-oss-20b
   path: articles/run-nvidia.ipynb
   date: 2025-08-05
   authors:

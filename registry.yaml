@@ -6,7 +6,7 @@
 
 
 - title: Using NVIDIA TensorRT-LLM to run the 20B model
-  path: examples/articles/run-nvidia.ipynb
+  path: examples/run-nvidia.ipynb
   date: 2025-08-05
   authors:
     - jayrodge

@@ -43,7 +43,7 @@ Ready to talk to the model? You can fire up a chat in the app or the terminal:
 ollama run gpt-oss:20b
 ```
 
-Ollama applies a **chat template** out of the box that mimics the [OpenAI harmony format](https://example.com/harmony-docs). Type your message and start the conversation.
+Ollama applies a **chat template** out of the box that mimics the [OpenAI harmony format](https://cookbook.openai.com/articles/openai-harmony). Type your message and start the conversation.
 
 ## Use the API
 

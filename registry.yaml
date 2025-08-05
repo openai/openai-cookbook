@@ -10,8 +10,8 @@
   authors:
     - jayrodge
   tags:
-    - nvidia
-    - tensorrt-llm
+    - gpt-oss
+    - open-models
 
 - title: Temporal Agents with Knowledge Graphs
   path: examples/partners/temporal_agents_with_knowledge_graphs/temporal_agents_with_knowledge_graphs.ipynb

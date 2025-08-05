@@ -97,7 +97,7 @@ developer_message = (
 convo = Conversation.from_messages(
     [
         Message.from_role_and_content(Role.SYSTEM, system_message),
-        Message.from_role_and_content(Role.DEVELOPER, system_message),
+        Message.from_role_and_content(Role.DEVELOPER, developer_message),
         Message.from_role_and_content(Role.USER, "What is the weather in Tokyo?"),
         Message.from_role_and_content(
             Role.ASSISTANT,

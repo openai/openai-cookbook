@@ -197,7 +197,7 @@ convo = Conversation.from_messages(
 prefill_ids = encoding.render_conversation_for_completion(convo, Role.ASSISTANT)
 
 # Harmony stop tokens (pass to sampler so they won't be included in output)
-stop_token_ids = encoding.stop_tokens_for_assistant_action()
+stop_token_ids = encoding.stop_tokens_for_assistant_actions()
 
 # --- 2) Run vLLM with prefill ---
 llm = LLM(

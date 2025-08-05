@@ -5,7 +5,7 @@
 # authors for each page.
 
 - title: Using NVIDIA TensorRT-LLM to run gpt-oss-20b
-  path: examples/articles/run-nvidia.ipynb
+  path: articles/run-nvidia.ipynb
   date: 2025-08-05
   authors:
     - jayrodge

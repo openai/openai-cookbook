@@ -2,6 +2,11 @@
 
 # You can optionally customize how your information shows up cookbook.openai.com over here.
 # If your information is not present here, it will be pulled from your GitHub profile.
+jayrodge:
+  name: "Jay Rodge"
+  website: "https://www.linkedin.com/in/jayrodge/"
+  avatar: "https://developer-blogs.nvidia.com/wp-content/uploads/2024/05/Jay-Rodge.png"
+
 rajpathak-openai:
   name: "Raj Pathak"
   website: "https://www.linkedin.com/in/rajpathakopenai/"

@@ -4,6 +4,63 @@
 # should build pages for, and indicates metadata such as tags, creation date and
 # authors for each page.
 
+- title: Fine-tuning with gpt-oss and Hugging Face Transformers
+  path: articles/gpt-oss/fine-tune-transfomers.ipynb
+  date: 2025-08-05
+  authors:
+    - edbeeching
+    - qgallouedec
+    - lewtun
+  tags:
+    - open-models
+    - gpt-oss
+
+- title: How to handle the raw chain of thought in gpt-oss
+  path: articles/gpt-oss/handle-raw-cot.md
+  date: 2025-08-05
+  authors:
+    - dkundel-openai
+  tags:
+    - open-models
+    - gpt-oss
+
+- title: How to run gpt-oss with Transformers
+  path: articles/gpt-oss/run-transformers.md
+  date: 2025-08-05
+  authors:
+    - dkundel-openai
+  tags:
+    - open-models
+    - gpt-oss
+
+- title: How to run gpt-oss with vLLM
+  path: articles/gpt-oss/run-vllm.md
+  date: 2025-08-05
+  authors:
+    - dkundel-openai
+  tags:
+    - open-models
+    - gpt-oss
+
+- title: How to run gpt-oss locally with Ollama
+  path: articles/gpt-oss/run-locally-ollama.md
+  date: 2025-08-05
+  authors:
+    - dkundel-openai
+  tags:
+    - open-models
+    - gpt-oss
+
+- title: OpenAI Harmony Response Format
+  path: articles/openai-harmony.md
+  date: 2025-08-05
+  authors:
+    - dkundel-openai
+  tags:
+    - open-models
+    - gpt-oss
+    - harmony
+
 - title: Temporal Agents with Knowledge Graphs
   path: examples/partners/temporal_agents_with_knowledge_graphs/temporal_agents_with_knowledge_graphs.ipynb
   date: 2025-07-22
@@ -17,7 +74,6 @@
     - knowledge-graphs
     - temporal-agents
     - RAG
-
 
 - title: Using Evals API on Image Inputs
   path: examples/evaluation/use-cases/EvalsAPI_Image_Inputs.ipynb

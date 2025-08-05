@@ -26,7 +26,10 @@ Both models are **MXFP4 quantized** out of the box.
 ```shell
 uv venv --python 3.12 --seed
 source .venv/bin/activate
-uv pip install vllm --torch-backend=auto
+uv pip install --pre vllm==0.10.1+gptoss \
+    --extra-index-url https://wheels.vllm.ai/gpt-oss/ \
+    --extra-index-url https://download.pytorch.org/whl/nightly/cu128 \
+    --index-strategy unsafe-best-match
 ```
 
 2. **Start up a server and download the model**  

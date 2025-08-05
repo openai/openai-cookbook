@@ -97,7 +97,7 @@ developer_message = (
 convo = Conversation.from_messages(
     [
         Message.from_role_and_content(Role.SYSTEM, system_message),
-        Message.from_role_and_content(Role.DEVELOPER, system_message),
+        Message.from_role_and_content(Role.DEVELOPER, developer_message),
         Message.from_role_and_content(Role.USER, "What is the weather in Tokyo?"),
         Message.from_role_and_content(
             Role.ASSISTANT,
@@ -567,7 +567,7 @@ When you send a message containing Python code to python, it will be executed in
 # Valid channels: analysis, commentary, final. Channel must be included for every message.<|end|>
 ```
 
-If the model decides to call actions in the browser it will use the same format as for [function calls](#function-calling) with two notable exceptions:
+If the model decides to execute Python code it will use the same format as for [function calls](#function-calling) with two notable exceptions:
 
 3. Requests will be made to the `analysis` channel
 4. The recipient will always be `python`

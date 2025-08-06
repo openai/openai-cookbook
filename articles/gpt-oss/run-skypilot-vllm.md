@@ -1,6 +1,6 @@
 # How to run gpt-oss with SkyPilot and vLLM
 
-[SkyPilot](https://skypilot.readthedocs.io/) is an open-source framework that lets you run AI workloads on any cloud infrastructure with unified execution and high GPU availability. Combined with [vLLM](https://docs.vllm.ai/en/latest/), you can deploy **gpt-oss-20b** or **gpt-oss-120b** models across 16+ cloud providers and on-prem GPU workstations to Kubernetes clusters, with automatic failover and cost optimization.
+[SkyPilot](https://skypilot.readthedocs.io/) is an open-source system that lets you run AI workloads on any infrastructure, cloud or K8s, with unified execution and high GPU availability. Combined with [vLLM](https://docs.vllm.ai/en/latest/), you can deploy **gpt-oss-20b** or **gpt-oss-120b** models across 16+ cloud providers and on-prem GPU workstations to Kubernetes clusters, with automatic failover and cost optimization.
 
 This guide shows you how to leverage SkyPilot's multi-cloud capabilities to serve gpt-oss models at scale, building on top of the vLLM serving infrastructure covered in [our vLLM guide](https://cookbook.openai.com/articles/gpt-oss/run-vllm).
 
@@ -9,10 +9,12 @@ This guide shows you how to leverage SkyPilot's multi-cloud capabilities to serv
 Using SkyPilot with vLLM provides several advantages:
 
 - **Multi-cloud deployment**: Run on AWS, GCP, Azure, Lambda Labs, RunPod, and 10+ other clouds
-- **Automatic GPU provisioning**: SkyPilot finds available GPUs across clouds
-- **Cost optimization**: Automatically chooses the cheapest cloud/region for your workload
-- **Built-in autoscaling**: SkyServe provides production-ready scaling and load balancing
-- **Spot instance support**: Save up to 70% with automatic failover
+- **On-premises and Kubernetes support**: Deploy on your own GPU workstations or existing K8s clusters
+- **Reserved GPU optimization**: Efficiently utilize your pre-allocated cloud resources and reserved instances
+- **Automatic GPU provisioning**: SkyPilot finds available GPUs across clouds and on-prem infrastructure
+- **Cost optimization**: Automatically chooses the cheapest cloud/region or uses your existing hardware
+- **Built-in autoscaling**: SkyServe provides production-ready scaling and load balancing across hybrid environments
+- **Spot instance support**: Save up to 70% with automatic failover between spot, on-demand, and on-prem resources
 
 ## Prerequisites
 

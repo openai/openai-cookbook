@@ -52,6 +52,17 @@
     - open-models
     - gpt-oss
 
+- title: How to run gpt-oss with SkyPilot and vLLM
+  path: articles/gpt-oss/run-skypilot-vllm.md
+  date: 2025-08-06
+  authors:
+    - alex000kim
+  tags:
+    - open-models
+    - gpt-oss
+    - deployment
+    - cloud
+
 - title: How to run gpt-oss locally with Ollama
   path: articles/gpt-oss/run-locally-ollama.md
   date: 2025-08-05

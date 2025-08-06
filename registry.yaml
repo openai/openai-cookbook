@@ -4,6 +4,17 @@
 # should build pages for, and indicates metadata such as tags, creation date and
 # authors for each page.
 
+- title: How to run gpt-oss with SkyPilot and vLLM
+  path: articles/gpt-oss/run-skypilot-vllm.md
+  date: 2025-08-06
+  authors:
+    - alex000kim
+  tags:
+    - open-models
+    - gpt-oss
+    - deployment
+    - cloud
+
 - title: How to run gpt-oss-20b on Google Colab
   path: articles/gpt-oss/run-colab.ipynb
   date: 2025-08-06

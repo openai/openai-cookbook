@@ -29,7 +29,11 @@ If you use `bfloat16` instead of MXFP4, memory consumption will be larger (\~48 
    It’s recommended to create a fresh Python environment. Install transformers, accelerate, as well as the Triton kernels for MXFP4 compatibility:
 
 ```bash
-pip install -U transformers accelerate torch triton kernelspip install git+https://github.com/triton-lang/triton.git@main#subdirectory=python/triton_kernels
+pip install -U transformers accelerate torch triton kernels
+```
+
+```bash
+pip install git+https://github.com/triton-lang/triton.git@main#subdirectory=python/triton_kernels
 ```
 
 2. **(Optional) Enable multi-GPU**  

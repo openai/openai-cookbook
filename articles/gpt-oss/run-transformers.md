@@ -195,7 +195,7 @@ convo = Conversation.from_messages([
 
 # Render prompt
 prefill_ids = encoding.render_conversation_for_completion(convo, Role.ASSISTANT)
-stop_token_ids = encoding.stop_tokens_for_assistant_action()
+stop_token_ids = encoding.stop_tokens_for_assistant_actions()
 
 # Load model
 model_name = "openai/gpt-oss-20b"

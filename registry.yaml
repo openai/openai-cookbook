@@ -4,6 +4,16 @@
 # should build pages for, and indicates metadata such as tags, creation date and
 # authors for each page.
 
+- title: How to run gpt-oss-20b on Google Colab
+  path: articles/gpt-oss/run-colab.ipynb
+  date: 2025-08-06
+  authors:
+    - pcuenca
+    - Vaibhavs10
+  tags:
+    - gpt-oss
+    - open-models
+
 - title: Using NVIDIA TensorRT-LLM to run gpt-oss-20b
   path: articles/run-nvidia.ipynb
   date: 2025-08-05

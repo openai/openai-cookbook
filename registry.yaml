@@ -5,7 +5,7 @@
 # authors for each page.
 
 - title: GPT-5 Prompt Migration and Improvement Using the New Optimizer
-  path: examples/gpt-5/prompt-optimization-cookbook/prompt-optimization-cookbook.ipynb
+  path: examples/gpt-5/prompt-optimization-cookbook.ipynb
   date: 2025-08-07
   authors:
     - rajpathak-openai

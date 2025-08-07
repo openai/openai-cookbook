@@ -4,6 +4,14 @@
 # should build pages for, and indicates metadata such as tags, creation date and
 # authors for each page.
 
+- title: How to run gpt-oss locally with LM Studio
+  path: articles/run-locally-lmstudio.md
+  date: 2025-08-07
+  authors:
+    - yagil
+  tags:
+    - gpt-oss
+    - open-models
 - title: GPT-5 Prompt Migration and Improvement Using the New Optimizer
   path: examples/gpt-5/prompt-optimization-cookbook.ipynb
   date: 2025-08-07

@@ -4,6 +4,18 @@
 # should build pages for, and indicates metadata such as tags, creation date and
 # authors for each page.
 
+- title: GPT-5 Prompt Migration and Improvement using the new prompt optimizer
+  path: examples/gpt-5/prompt-optimization-cookbook/prompt-optimization-cookbook.ipynb
+  date: 2025-08-07
+  authors:
+    - rajpathak-openai
+    - corwin
+  tags:
+    - gpt-5
+    - responses
+    - reasoning
+    - prompt-optimization
+
 - title: GPT-5 prompting guide
   path: examples/gpt-5/gpt-5_prompting_guide.ipynb
   date: 2025-08-07

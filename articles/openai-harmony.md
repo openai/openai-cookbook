@@ -126,7 +126,9 @@ Additionally the openai_harmony library also includes a StreamableParser for par
 ```py
 from openai_harmony import (
     load_harmony_encoding,
-    StreamableParser
+    Role,
+    StreamableParser,
+    HarmonyEncodingName
 )
 
 encoding = load_harmony_encoding(HarmonyEncodingName.HARMONY_GPT_OSS)

@@ -16,7 +16,7 @@
     - gpt-5
 
 - title: Frontend coding with GPT-5
-  path: examples/gpt-5/frontend_cookbook.ipynb
+  path: examples/gpt-5/gpt-5_frontend_cookbook.ipynb
   date: 2025-08-07
   authors:
     - WJPBProjects

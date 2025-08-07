@@ -12,6 +12,51 @@
   tags:
     - gpt-oss
     - open-models
+- title: GPT-5 Prompt Migration and Improvement Using the New Optimizer
+  path: examples/gpt-5/prompt-optimization-cookbook.ipynb
+  date: 2025-08-07
+  authors:
+    - rajpathak-openai
+    - corwin
+  tags:
+    - gpt-5
+    - responses
+    - reasoning
+    - prompt-optimization
+
+- title: GPT-5 prompting guide
+  path: examples/gpt-5/gpt-5_prompting_guide.ipynb
+  date: 2025-08-07
+  authors:
+    - anoop-openai
+    - julian-openai
+    - ericzakariasson
+    - erinkav-openai
+  tags:
+    - gpt-5
+    - responses
+    - reasoning
+
+- title: Frontend coding with GPT-5
+  path: examples/gpt-5/gpt-5_frontend.ipynb
+  date: 2025-08-07
+  authors:
+    - WJPBProjects
+    - anoop-openai
+  tags:
+    - gpt-5
+    - responses
+    - reasoning
+
+- title: GPT-5 New Params and Tools
+  path: examples/gpt-5/gpt-5_new_params_and_tools.ipynb
+  date: 2025-08-07
+  authors:
+    - msingh-openai
+  tags:
+    - gpt-5
+    - functions
+    - reasoning
 
 - title: How to run gpt-oss-20b on Google Colab
   path: articles/gpt-oss/run-colab.ipynb
@@ -31,7 +76,6 @@
   tags:
     - gpt-oss
     - open-models
-
 
 - title: Fine-tuning with gpt-oss and Hugging Face Transformers
   path: articles/gpt-oss/fine-tune-transfomers.ipynb
@@ -89,7 +133,6 @@
     - open-models
     - gpt-oss
     - harmony
-
 
 - title: Temporal Agents with Knowledge Graphs
   path: examples/partners/temporal_agents_with_knowledge_graphs/temporal_agents_with_knowledge_graphs.ipynb

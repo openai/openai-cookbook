@@ -91,7 +91,6 @@ developer_message = (
                 ),
             ]
         )
-	)
 )
 
 convo = Conversation.from_messages(

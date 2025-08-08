@@ -5,7 +5,7 @@
 # authors for each page.
 
 - title: How to run gpt-oss locally with LM Studio
-  path: articles/run-locally-lmstudio.md
+  path: articles/gpt-oss/run-locally-lmstudio.md
   date: 2025-08-07
   authors:
     - yagil

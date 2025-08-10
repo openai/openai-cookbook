@@ -117,6 +117,7 @@ tokens = encoding.render_conversation_for_completion(convo, Role.ASSISTANT)
 
 # After receiving a token response
 # Do not pass in the stop token
+new_tokens = tokens[:-2]
 parsed_response = encoding.parse_messages_from_completion_tokens(new_tokens, Role.ASSISTANT)
 ```
 

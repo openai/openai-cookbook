@@ -6,7 +6,7 @@ The [`gpt-oss` models](https://openai.com/open-models) were trained on the harmo
 
 ### Roles
 
-Every message that the model processes has a role associated with it. The model knows about three types of roles:
+Every message that the model processes has a role associated with it. The model knows about five types of roles:
 
 | Role        | Purpose                                                                                                                                                                                 |
 | :---------- | :-------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |

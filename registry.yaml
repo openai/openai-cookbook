@@ -4,6 +4,15 @@
 # should build pages for, and indicates metadata such as tags, creation date and
 # authors for each page.
 
+- tile: Verifying gpt-oss implementations
+  path: articles/gpt-oss/verifying-implementations.md
+  date: 2025-08-11
+  authors:
+    - dkundel-openai
+  tags:
+    - gpt-oss
+    - open-models
+
 - title: How to run gpt-oss locally with LM Studio
   path: articles/gpt-oss/run-locally-lmstudio.md
   date: 2025-08-07

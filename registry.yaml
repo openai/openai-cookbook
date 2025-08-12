@@ -8,15 +8,16 @@
   path: examples/partners/temporal_agents_with_knowledge_graphs/temporal_agents_with_knowledge_graphs.ipynb
   date: 2025-07-22
   authors:
-    - shikhar-cyber
     - dwigg-openai
+    - shikhar-cyber
     - Alex Heald
     - Douglas Adams
     - Rishabh Sagar
   tags:
     - knowledge-graphs
-    - temporal-agents
-    - RAG
+    - retrieval
+    - functions
+    - responses
 
 
 - title: Using Evals API on Image Inputs

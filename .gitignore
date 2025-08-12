@@ -152,3 +152,6 @@ tools/outputs/
 
 # Ignore nested repo until converted to proper submodule
 confluence-mcp-server/
+
+# Ignore generated outputs globally
+**/outputs/**

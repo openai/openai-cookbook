@@ -91,7 +91,6 @@ developer_message = (
                 ),
             ]
         )
-	)
 )
 
 convo = Conversation.from_messages(
@@ -126,7 +125,9 @@ Additionally the openai_harmony library also includes a StreamableParser for par
 ```py
 from openai_harmony import (
     load_harmony_encoding,
-    StreamableParser
+    Role,
+    StreamableParser,
+    HarmonyEncodingName
 )
 
 encoding = load_harmony_encoding(HarmonyEncodingName.HARMONY_GPT_OSS)
@@ -220,6 +221,18 @@ For the best performance stick to this format as closely as possible.
 #### Example system message
 
 The most basic system message you should use is the following:
+
+```
+<|start|>system<|message|>You are ChatGPT, a large language model trained by OpenAI.
+Knowledge cutoff: 2024-06
+Current date: 2025-06-28
+
+Reasoning: high
+
+# Valid channels: analysis, commentary, final. Channel must be included for every message.<|end|>
+```
+
+If functions calls are present in the developer message section, use:
 
 ```
 <|start|>system<|message|>You are ChatGPT, a large language model trained by OpenAI.

@@ -2,6 +2,31 @@
 
 # You can optionally customize how your information shows up cookbook.openai.com over here.
 # If your information is not present here, it will be pulled from your GitHub profile.
+WJPBProjects:
+  name: "Wulfie Bain"
+  website: "https://www.linkedin.com/in/wulfie-bain/"
+  avatar: "https://avatars.githubusercontent.com/u/76624567?v=4"
+
+anoop-openai:
+  name: "Anoop Kotha"
+  website: "https://x.com/anoopkotha"
+  avatar: "https://pbs.twimg.com/profile_images/1953388055190224896/vHZ5CVPs_400x400.jpg"
+
+erinkav-openai:
+  name: "Erin Kavanaugh"
+  website: "https://www.linkedin.com/in/erinkavanaugh/"
+  avatar: "https://media.licdn.com/dms/image/v2/D5603AQFBeFl_GBWRww/profile-displayphoto-scale_400_400/B56ZiCtx6zHcAg-/0/1754539697289?e=1757548800&v=beta&t=e3znvOjyDV9MBdp2AABxGtvdCx1LzyrBR75cjOSh5h8"
+
+ericzakariasson:
+  name: "Eric Zakariasson"
+  website: "https://x.com/ericzakariasson"
+  avatar: "https://pbs.twimg.com/profile_images/1841151626456801283/HnXqy3TQ_400x400.jpg"
+
+jayrodge:
+  name: "Jay Rodge"
+  website: "https://www.linkedin.com/in/jayrodge/"
+  avatar: "https://developer-blogs.nvidia.com/wp-content/uploads/2024/05/Jay-Rodge.png"
+
 rajpathak-openai:
   name: "Raj Pathak"
   website: "https://www.linkedin.com/in/rajpathakopenai/"
@@ -396,3 +421,38 @@ daisyshe-oai:
   name: "Daisy Sheng"
   website: "https://www.linkedin.com/in/daisysheng/"
   avatar: "https://avatars.githubusercontent.com/u/212609991?v=4"
+
+dkundel-openai:
+  name: "Dominik Kundel"
+  website: "https://www.linkedin.com/in/dominik-kundel/"
+  avatar: "https://avatars.githubusercontent.com/u/200841172?v=4"
+
+edbeeching:
+  name: "Edward Beeching"
+  website: "https://huggingface.co/edbeeching"
+  avatar: "https://cdn-avatars.huggingface.co/v1/production/uploads/1644220542819-noauth.jpeg"
+
+qgallouedec:
+  name: "Quentin Gallouédec"
+  website: "https://huggingface.co/qgallouedec"
+  avatar: "https://cdn-avatars.huggingface.co/v1/production/uploads/1677431596830-631ce4b244503b72277fc89f.jpeg"
+
+lewtun:
+  name: "Lewis Tunstall"
+  website: "https://huggingface.co/lewtun"
+  avatar: "https://cdn-avatars.huggingface.co/v1/production/uploads/1594651707950-noauth.jpeg"
+
+pcuenca:
+  name: "Pedro Cuenca"
+  website: "https://huggingface.co/pcuenq"
+  avatar: "https://cdn-avatars.huggingface.co/v1/production/uploads/1617264212503-603d25b75f9d390ab190b777.jpeg"
+
+Vaibhavs10:
+  name: "vb"
+  website: "https://huggingface.co/reach-vb"
+  avatar: "https://cdn-avatars.huggingface.co/v1/production/uploads/1655385361868-61b85ce86eb1f2c5e6233736.jpeg"
+
+yagil:
+  name: "Yagil Burowski"
+  website: "https://x.com/yagilb"
+  avatar: "https://avatars.lmstudio.com/profile-images/yagil"

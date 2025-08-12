@@ -149,3 +149,6 @@ examples/multimodal/.local_cache/*
 
 # Analysis output reports
 tools/outputs/
+
+# Ignore nested repo until converted to proper submodule
+confluence-mcp-server/

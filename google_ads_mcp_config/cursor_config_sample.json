@@ -1,0 +1,18 @@
+{
+  "mcpServers": {
+    "google-ads": {
+      "command": "/Users/virulana/openai-cookbook/google_ads_mcp_env/bin/python",
+      "args": ["-m", "mcp_google_ads"],
+      "env": {
+        "GOOGLE_ADS_DEVELOPER_TOKEN": "${GOOGLE_ADS_DEVELOPER_TOKEN}",
+        "GOOGLE_ADS_AUTH_TYPE": "oauth",
+        "GOOGLE_ADS_CLIENT_ID": "${GOOGLE_ADS_CLIENT_ID}",
+        "GOOGLE_ADS_CLIENT_SECRET": "${GOOGLE_ADS_CLIENT_SECRET}",
+        "GOOGLE_ADS_REFRESH_TOKEN": "${GOOGLE_ADS_REFRESH_TOKEN}",
+        "GOOGLE_ADS_CUSTOMER_ID": "${GOOGLE_ADS_CUSTOMER_ID}"
+      }
+    }
+  }
+}
+
+

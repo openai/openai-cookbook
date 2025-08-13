@@ -1,0 +1,23 @@
+# HubSpot Owner IDs and Names 
+# Collected from May 2025 Deals
+
+| Owner ID    | Full Name               | Team           |
+|-------------|-------------------------|----------------|
+| 103406387   | Karina Lorena Russo    | Accountant Channel |
+| 1571181342  | Rocio Luque             | Closers        |
+| 672724138   | Pablo Ezcurra           | Accountant Channel |
+| 78535701    | Estefania Sol Arregui   | Closers        |
+| 79369461    | Unknown (Most active in May) | Unknown    |
+| 213456770   | Unknown                 | Unknown        |
+| 206527914   | Rodrigo Ferreiro        | General Sales  |
+| 612003866   | Romina Herrera          | Accountant Channel |
+| 688875036   | Javier Decurnex         | Account Management |
+| 151388545   | Agustín Baserga         | Support        |
+| 166611631   | Roberto Egoszcue        | Customer Success |
+| 509292821   | Flavio Aguilera         | Accounting     |
+| 1587023252  | Eliana Delpiero         | Closers        |
+| 1718788346  | Ivo Salvador Gassner    | Closers        |
+
+# Note: This list is based on information found in the README_HUBSPOT_CONFIGURATION.md file
+# and the recent deals created in May 2025. Some owner names couldn't be confirmed 
+# through the API directly due to permission limitations. 

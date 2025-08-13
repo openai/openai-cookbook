@@ -1,0 +1,16 @@
+# Core requirements for CUIT web scraping
+requests>=2.28.0
+beautifulsoup4>=4.11.0
+lxml>=4.9.0
+
+# Optional: Selenium for JavaScript-heavy pages
+selenium>=4.10.0
+
+# Optional: Playwright for modern web automation
+playwright>=1.35.0
+
+# GUI requirements (optional)
+# tkinter is usually included with Python
+
+# For data export
+pandas>=1.5.0

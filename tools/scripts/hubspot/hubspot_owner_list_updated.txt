@@ -1,0 +1,154 @@
+# HubSpot Owner IDs and Names
+# Retrieved using direct API method
+
+| Owner ID | Full Name | Email | Team | May 2025 Deals |
+|----------|-----------|-------|------|---------------|
+| 103103434 | Axel Concha | axel.concha@nubox.com | Unknown | No |
+| 103406387 | Karina Lorena Russo | karina.russo@colppy.com | Accountant Channel | Yes |
+| 1280444080 | Franco Alvarez | franco.alvarez@colppy.com | Marketing | No |
+| 1305651215 | Estefanía Rodríguez | estefania.rodriguez@colppy.com | Unknown | No |
+| 1468911418 | Natalia Silva | natalia.silva@colppy.com | Archived | No |
+| 1499368168 | Developer . | inboundwebhub@gmail.com | Archived | No |
+| 151388545 | Pamela Viarengo | pamela.viarengo@colppy.com | Archived | No |
+| 156735647 | Equipo Andimol | clientes@andimol.com | Archived | No |
+| 156735648 | Macarena Cuadro | macarena.cuadro@colppy.com | Archived | No |
+| 156735649 | Luisa Ines Facchini | luisa.facchini@colppy.com | Archived | No |
+| 1571181342 | Rocio Luque | rocio.luque@colppy.com | Closers | Yes |
+| 1587023252 | Eliana Delpiero | eliana.delpiero@colppy.com | Archived | No |
+| 166611629 |  | mariano.iglesias@colppy.com | Archived | No |
+| 166611630 | Agustina Guevara | agustina.guevara@colppy.com | Archived | No |
+| 166611631 | Carla Alonso | carla.alonso@colppy.com | Equipo Customer | No |
+| 166613311 | Ángela Camelo | angela.camelo@colppy.com | Archived | No |
+| 1718788346 | Ivo Salvador Gassner | ivo.salvador@colppy.com | Archived | No |
+| 1759646158 | Emilia Liberti | eliberti@wearedrew.co | Archived | No |
+| 1812761491 | Marketing Nubox | marketingtools@nubox.com | Unknown | No |
+| 1827157187 | Ines Verna | ines.verna@colppy.com | Unknown | No |
+| 185247245 | Juan Diego Chiapparo | diego.chiapparo@colppy.com | Archived | No |
+| 185249056 | Martin de los santos | martin.delossantos@colppy.com | Archived | No |
+| 185249653 | Julieta Ayerbe | julieta.ayerbe@colppy.com | Archived | No |
+| 185249654 | Fernando Funes | fernando.funes@colppy.com | Archived | No |
+| 185249655 | Agustina Menditto | agustina.menditto@colppy.com | Archived | No |
+| 1942886978 | Colppy Desarrollo | colppyit@colppy.com | Equipo Producto | No |
+| 195420559 | Tupac Bruch | tupac.bruch@colppy.com | Archived | No |
+| 196609872 | Juliana Palacios | juliana.palacios@colppy.com | Equipo Producto | No |
+| 200354433 | Sabrina Boggero | sabrina.boggero@colppy.com | Archived | No |
+| 200354449 | Maximiliano Cabañes | maximiliano.cabanes@colppy.com | Archived | No |
+| 206527914 | Melina Costa | melina.costa@colppy.com | Marketing | No |
+| 206527915 | Hernán Córdoba | hernan.cordoba@colppy.com | Archived | No |
+| 206528273 | Pedro Gomez Goldin | pedro.gomez@colppy.com | Archived | No |
+| 206640141 | Maria Sol Contarino | maria.contarino@colppy.com | Archived | No |
+| 206640142 | Mayra Schneider | mayra.schneider@colppy.com | Archived | No |
+| 2075686622 |  | alex.concha@nubox.com | Unknown | No |
+| 210711167 | Cecilia Bonomo | cecilia.bonomo@colppy.com | Archived | No |
+| 210711168 | Josefina Zabala | josefina.zabala@colppy.com | Unknown | No |
+| 210711169 |  | josejosefina.zabala@colppy.com | Archived | No |
+| 210711170 | Jose Marino | joseluis.marino@colppy.com | Archived | No |
+| 213453847 | Agustina Lopez | agustina.lopez@colppy.com | Archived | No |
+| 213456768 | Facundo Benítez | facundo.benitez@colppy.com | Archived | No |
+| 213456769 | Maria Pia Airaldi | pia.airaldi@colppy.com | Archived | No |
+| 213456770 | Yamila Sosa | yamila.sosa@colppy.com | Equipo Customer | Yes |
+| 213457436 | Antonella Pachas | antonella.pachas@colppy.com | Equipo Customer | No |
+| 213457437 | Juan Calvente | juan.calvente@colppy.com | Archived | No |
+| 213458481 | Angie Páez | angie.paez@colppy.com | Archived | No |
+| 213458482 | yesica nickel | yesica.nickel@colppy.com | Archived | No |
+| 213458511 | Exiree Atencio | exiree.atencio@colppy.com | Archived | No |
+| 213458512 | Mariana Leal | mariana.leal@colppy.com | Equipo Customer | No |
+| 216511812 | Juan Ignacio Onetto | jonetto@colppy.com | HubSpot | No |
+| 218578068 | Fernando Abd el Jalil | fernando.abd@colppy.com | Archived | No |
+| 219689029 | Jose Marino | jose.marino@colppy.com | Archived | No |
+| 221186973 | Fernando Matías Cruz | matias.cruz@colppy.com | Archived | No |
+| 221186974 | Mario Moreno | mario.moreno@colppy.com | Archived | No |
+| 226017704 | Fabian Villafañe | fabian.villafane@colppy.com | Archived | No |
+| 231363935 | Monica Romina Canavese | monica.canavese@colppy.com | Archived | No |
+| 233436011 | Comunicacion Colppy | comunicacion@colppy.com | Unknown | No |
+| 236232108 | Cristian Medina | cristian.medina@colppy.com | Archived | No |
+| 236461859 | Joaquin Baigorri | joaquin.baigorri@colppy.com | Archived | No |
+| 236461907 | Kevin Rico | kevin.rico@colppy.com | Archived | No |
+| 236587913 |  | alejandro.narajo@colppy.com | Archived | No |
+| 236591532 | Alejandro Naranjo | alejandro.naranjo@colppy.com | Unknown | No |
+| 237633620 | Ezequiel Luberriaga | ezequiel.luberriaga@colppy.com | Archived | No |
+| 237633621 | Marcela Boggiano | marcela.boggiano@colppy.com | Archived | No |
+| 240993632 | Florencia Garcia | florencia.garcia@nubox.com | Archived | No |
+| 248204864 | Santiago Piola | santiago.piola@colppy.com | Archived | No |
+| 248391824 | Paulo Rosales Correa | paulo.rosales@nubox.com | Archived | No |
+| 263663363 | Camilo Gonzalez | cristhofer.gonzalez@nubox.com | Unknown | No |
+| 263667385 | Javier Navarro | javier.navarro@nubox.com | Unknown | No |
+| 274859608 | adrian fernandez | adrian.fernandez@colppy.com | Archived | No |
+| 310403488 | Melanie Arevalo | melanie.arevalo@colppy.com | Archived | No |
+| 310404976 |  | sebsebastian.frutos@colppy.com | Archived | No |
+| 315187880 | Florencia Piccoli | florencia.piccoli@colppy.com | Archived | No |
+| 332287602 | Giuliano De Pascual | giuliano.depascual@colppy.com | Archived | No |
+| 335850520 |  | pago@colppy.com | Unknown | No |
+| 345355670 | Adriana Oropeza | adriana.oropeza@colppy.com | Archived | No |
+| 349386563 | Luiselen Bárbara Luque Ortiz | luiselen.luque@colppy.com | Archived | No |
+| 349386564 | Moira Camargo | moira.camargo@colppy.com | Archived | No |
+| 354576217 | Franco Silva | franco.silva@colppy.com | Unknown | No |
+| 362516352 | Diego Mendoza | diego.mendoza@nubox.com | Archived | No |
+| 368626719 | Ronald Toro | topytopystore@gmail.com | Archived | No |
+| 372559501 | Matias Silvi | matias.silvi@colppy.com | Archived | No |
+| 378736477 | Gaston Espoile | gaston.espoile@colppy.com | Unknown | No |
+| 385926168 | Javier Szumilo | javier.szumilo@colppy.com | Archived | No |
+| 392403124 | Marketing WeAreDrew | marketing@wearedrew.co | Archived | No |
+| 393680205 | Milton Morgades | milton@easywebmkt.com.ar | Archived | No |
+| 397942017 | Giuliana Prol | giuliana.prol@colppy.com | Archived | No |
+| 401984309 | Karina Szmulewiez | karina.szmulewiez@colppy.com | Archived | No |
+| 416739362 | Claudia Cristi | claudia.cristi@colppy.com | Equipo Customer | No |
+| 429255243 | Hector tavella | hector.tavella@colppy.com | Archived | No |
+| 430399347 | Micaela Soledad Forese | micaela.forese@colppy.com | Archived | No |
+| 43771160 | Victoria Gutiérrez | victoria.gutierrez@nubox.com | Unknown | No |
+| 446307896 | Soledad Pose | soledad.pose@colppy.com | Archived | No |
+| 456300151 | Fernando Contador | fernando.contador@nubox.com | Unknown | No |
+| 466100664 | Romina Ferrari | romina.ferrari@colppy.com | Archived | No |
+| 466100665 | Gastón Panzino | gaston.panzino@colppy.com | Archived | No |
+| 474441552 | Paulo Rosales | paulo.rosales@colppy.com | Archived | No |
+| 488534830 | Barbara Lamas | barbara.lamas@colppy.com | Equipo Customer | No |
+| 488538403 | Laura Antonio | laura.antonio@colppy.com | Archived | No |
+| 503717270 | Emely Urdaneta | emely.urdaneta@colppy.com | Archived | No |
+| 508333483 | Tupac Bruch | tupacbruch@gmail.com | Archived | No |
+| 509260862 |  | milagro.cortina@colppy.com | Unknown | No |
+| 509292821 | Agustina Grosso | agustina.grosso@colppy.com | Equipo Customer | No |
+| 512834146 | Victoria Dacampo | victoria.dacampo@colppy.com | Equipo Customer | No |
+| 524074776 | alexander rondon | alexander.rondon@colppy.com | Equipo Customer | No |
+| 552491012 | Leticia Quirque | leticia.quirque@colppy.com | Archived | No |
+| 584136823 | Florencia Santovito Duronéa | florenciad@hal.company | Archived | No |
+| 584137249 | Cecilia Hayafuji | ceciliah@hal.company | Archived | No |
+| 584137250 | Lautaro Del Plato | lautarod@hal.company | Archived | No |
+| 585595439 | Nestor Barrios | nestor.gomezbarrios@colppy.com | Archived | No |
+| 585613140 | Mitesh Padariya | mitesh@juicetactics.com | Archived | No |
+| 596156509 | Constanza Arreche | constanza@hal.company | Archived | No |
+| 596156510 | Leandro Echezuri | leandroe@hal.company | Archived | No |
+| 596156511 | Agustin Licari | agustinl@hal.company | Archived | No |
+| 596351244 | Silvana Enriquez | silvana.enriquez@colppy.com | Archived | No |
+| 612003866 | Romina Herrera | romina.herrera@colppy.com | Archived | No |
+| 619916557 | Adriana Zelonka | adriana.zelonka@colppy.com | Equipo Customer | No |
+| 622725686 | Developer Drew | developer@wearedrew.co | Archived | No |
+| 632429459 | Lucia Vagnozzi | lucia.vagnozzi@colppy.com | Archived | No |
+| 644515113 | Franco Bevilacqua Collazo | francob@hal.company | Archived | No |
+| 644763318 | Oscar Caceres | oscar.caceres@colppy.com | Archived | No |
+| 651902703 | Gabriel Salvatierra | gabriel.salvatierra@colppy.com | Archived | No |
+| 672724138 | Pablo Ezcurra | pablo.ezcurra@colppy.com | Accountant Channel | Yes |
+| 680148277 | Candelaria Hidalgo | candelaria.hidalgo@colppy.com | Archived | No |
+| 683775254 | Julio Sanchez | julio.sanchez@colppy.com | Archived | No |
+| 685347337 | Engelberth Sojo | engelberth.sojo@colppy.com | Unknown | No |
+| 685408563 | Ariel Diaz | ariel.diaz@colppy.com | Archived | No |
+| 685409115 | Leslye Monzon | leslye.monzon@colppy.com | Equipo Customer | No |
+| 685415986 | Lisandro Fortuna | lisandro.fortuna@colppy.com | Archived | No |
+| 688875036 | Pablo Pereira Colman | pablo.pereira@colppy.com | Archived | No |
+| 688905556 |  | edgardy.rodriguez@colppy.com | Unknown | No |
+| 689030010 | Dolores Herrero | dolores.herrero@colppy.com | Marketing | No |
+| 690081393 | Diego Facello | diego.facello@colppy.com | Archived | No |
+| 713598836 | Santiago Martinez | santiago.martinez@colppy.com | Marketing | No |
+| 714989994 | Sebastian Frutos | sebastian.frutos@colppy.com | Archived | No |
+| 72282443 | Eduardo Illiano | eduardo.illiano@colppy.com | Archived | No |
+| 75890889 | Mariela Sandroni | mariela.sandroni@colppy.com | Marketing | No |
+| 76272874 | Damaris Justina Rojo | damaris.rojo@colppy.com | Equipo Customer | No |
+| 76909178 | Soporte Colppy | soporte@colppy.com | Equipo Customer | No |
+| 76931304 | Julieta Aguilar | julieta.aguilar@colppy.com | Equipo Revenue | No |
+| 784086009 | Julián Carniellio | julian.carniellio@colppy.com | Archived | No |
+| 78535701 | Estefania Sol Arregui | sol.arregui@colppy.com | Closers | Yes |
+| 79369461 | Mariano Alvarez Bor | mariano.alvarezbor@colppy.com | Closers | Yes |
+| 80100566 |  | alejandro.soto@colppy.com | Equipo Producto | No |
+| 829822750 | Gaston Lanzinetti | glanzinetti@wearedrew.co | Archived | No |
+| 863904255 | Tobías Carvajal Chen | tobias.carvajal@nubox.com | Unknown | No |
+| 881283463 |  | techops@colppy.com | Unknown | No |
+| 8854527 | David Chacon | david.chacon@nubox.com | Unknown | No |

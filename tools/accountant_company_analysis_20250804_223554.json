@@ -1,0 +1,336 @@
+{
+  "analysis_timestamp": "20250804_223554",
+  "analysis_date": "2025-08-04T22:35:54.045651",
+  "analysis_type": "Accountant Company Search in Colppy",
+  "summary": {
+    "total_accountant_companies": 14,
+    "companies_with_matches": 3,
+    "total_matches_found": 3
+  },
+  "detailed_results": [
+    {
+      "hubspot_company": {
+        "hubspot_id": 36234110609,
+        "name": "Contador Alejandro Perez",
+        "cuit": "La empresa identificada es AP Consultores. No se dispone de información suficiente para sugerir un CUIT en formato estándar.",
+        "domain": "apconsultores.com.ar",
+        "deals": [
+          {
+            "deal_id": "40260209460",
+            "deal_name": "94850 - XFIT",
+            "empresa_id": "94850",
+            "amount": "110000"
+          },
+          {
+            "deal_id": "40272444002",
+            "deal_name": "94848 - GORUKA",
+            "empresa_id": "94848",
+            "amount": "110000"
+          },
+          {
+            "deal_id": "40272475303",
+            "deal_name": "94857 - LAPECAS",
+            "empresa_id": "94857",
+            "amount": "110000"
+          },
+          {
+            "deal_id": "40273281699",
+            "deal_name": "94852 - WOD",
+            "empresa_id": "94852",
+            "amount": "110000"
+          },
+          {
+            "deal_id": "40274136338",
+            "deal_name": "94856 - TRAINING SPORTS",
+            "empresa_id": "94856",
+            "amount": "110000"
+          },
+          {
+            "deal_id": "40274308013",
+            "deal_name": "94849 - NANDALE",
+            "empresa_id": "94849",
+            "amount": "110000"
+          },
+          {
+            "deal_id": "40274833236",
+            "deal_name": "94853 - TKL",
+            "empresa_id": "94853",
+            "amount": "110000"
+          }
+        ]
+      },
+      "colppy_matches": [],
+      "match_count": 0
+    },
+    {
+      "hubspot_company": {
+        "hubspot_id": 9018779750,
+        "name": "Estudio Verdier Piazza",
+        "cuit": null,
+        "domain": null,
+        "deals": [
+          {
+            "deal_id": "41072561457",
+            "deal_name": "95502 - HANOK SA",
+            "empresa_id": "95502",
+            "amount": "214500"
+          },
+          {
+            "deal_id": "39833819464",
+            "deal_name": "94571 - Nanowallet SA",
+            "empresa_id": "94571",
+            "amount": "130500"
+          },
+          {
+            "deal_id": "39870302586",
+            "deal_name": "94572 - ADIANTUM SA",
+            "empresa_id": "94572",
+            "amount": "130500"
+          }
+        ]
+      },
+      "colppy_matches": [],
+      "match_count": 0
+    },
+    {
+      "hubspot_company": {
+        "hubspot_id": 34451383990,
+        "name": "estudiotillar.com.ar",
+        "cuit": "30719019737",
+        "domain": "estudiotillar.com.ar",
+        "deals": [
+          {
+            "deal_id": "39613798980",
+            "deal_name": "94382 - BARBAGALLO SUR",
+            "empresa_id": "94382",
+            "amount": "214500"
+          }
+        ]
+      },
+      "colppy_matches": [],
+      "match_count": 0
+    },
+    {
+      "hubspot_company": {
+        "hubspot_id": 9018842512,
+        "name": "Contador Fernando Dipalma",
+        "cuit": "30711888736",
+        "domain": null,
+        "deals": [
+          {
+            "deal_id": "39822384767",
+            "deal_name": "38963 - MJ COMERCIAL SOCIEDAD ANONIMA",
+            "empresa_id": "38963",
+            "amount": "214500"
+          }
+        ]
+      },
+      "colppy_matches": [],
+      "match_count": 0
+    },
+    {
+      "hubspot_company": {
+        "hubspot_id": 17063764855,
+        "name": "Contador Manuel Oscar Fariña",
+        "cuit": "33711027489",
+        "domain": null,
+        "deals": [
+          {
+            "deal_id": "39978400891",
+            "deal_name": "94578 - RILF LOGISTICA S.R.L. -",
+            "empresa_id": "94578",
+            "amount": "214500"
+          }
+        ]
+      },
+      "colppy_matches": [],
+      "match_count": 0
+    },
+    {
+      "hubspot_company": {
+        "hubspot_id": 26565062657,
+        "name": "Estudio Nullo & Asoc",
+        "cuit": "30714763454",
+        "domain": "estudionullo.com.ar",
+        "deals": [
+          {
+            "deal_id": "40270570129",
+            "deal_name": "94875 - TALA WORK",
+            "empresa_id": "94875",
+            "amount": "214500"
+          }
+        ]
+      },
+      "colppy_matches": [],
+      "match_count": 0
+    },
+    {
+      "hubspot_company": {
+        "hubspot_id": 9018759258,
+        "name": "Cdra. Lorena Damlamayan",
+        "cuit": "27231245125",
+        "domain": null,
+        "deals": [
+          {
+            "deal_id": "40317753495",
+            "deal_name": "94915 - MADERO ROOF TOP S. A. -",
+            "empresa_id": "94915",
+            "amount": "180500"
+          }
+        ]
+      },
+      "colppy_matches": [],
+      "match_count": 0
+    },
+    {
+      "hubspot_company": {
+        "hubspot_id": 9018861155,
+        "name": "Emiliano Roggenbau Contador",
+        "cuit": "30619004449",
+        "domain": null,
+        "deals": [
+          {
+            "deal_id": "39980492345",
+            "deal_name": "94707- Miguel Orquin SA",
+            "empresa_id": "94707",
+            "amount": "130500"
+          }
+        ]
+      },
+      "colppy_matches": [],
+      "match_count": 0
+    },
+    {
+      "hubspot_company": {
+        "hubspot_id": 36233955731,
+        "name": "94778 - ALEJANDRO NICOLAS PEREZ",
+        "cuit": "20357299277",
+        "domain": null,
+        "deals": [
+          {
+            "deal_id": "40277332091",
+            "deal_name": "94778 - ALEJANDRO NICOLAS PEREZ",
+            "empresa_id": "94778",
+            "amount": "130500"
+          }
+        ]
+      },
+      "colppy_matches": [
+        {
+          "empresa_id": "94778",
+          "nombre": "ALEJANDRO NICOLAS PEREZ",
+          "razon_social": "ALEJANDRO NICOLAS PEREZ",
+          "cuit": "20357299277",
+          "localidad": "Argentina"
+        }
+      ],
+      "match_count": 1
+    },
+    {
+      "hubspot_company": {
+        "hubspot_id": 9018872934,
+        "name": "Consultoria Integral CCI",
+        "cuit": "30718544242",
+        "domain": "cciconsultora.com.ar",
+        "deals": [
+          {
+            "deal_id": "40328187259",
+            "deal_name": "94959 - ESCORPIO 7 DESIGN STUDIO S.R.L",
+            "empresa_id": "94959",
+            "amount": "88900"
+          }
+        ]
+      },
+      "colppy_matches": [],
+      "match_count": 0
+    },
+    {
+      "hubspot_company": {
+        "hubspot_id": 9693178434,
+        "name": "Estudio Ricca & Asoc.",
+        "cuit": "20356374704",
+        "domain": null,
+        "deals": [
+          {
+            "deal_id": "40576560418",
+            "deal_name": "95179 - DB Motos ",
+            "empresa_id": "95179",
+            "amount": "88900"
+          }
+        ]
+      },
+      "colppy_matches": [],
+      "match_count": 0
+    },
+    {
+      "hubspot_company": {
+        "hubspot_id": 36677604781,
+        "name": "Maria Florencia Peña - Estudio",
+        "cuit": "27051982040",
+        "domain": null,
+        "deals": [
+          {
+            "deal_id": "40767464372",
+            "deal_name": "93615 - IK",
+            "empresa_id": "93615",
+            "amount": "88900"
+          }
+        ]
+      },
+      "colppy_matches": [],
+      "match_count": 0
+    },
+    {
+      "hubspot_company": {
+        "hubspot_id": 36527860848,
+        "name": "95165 - COR CONSULTING ASOCIADOS  S R L",
+        "cuit": "30703967406",
+        "domain": null,
+        "deals": [
+          {
+            "deal_id": "41184802640",
+            "deal_name": "95165 - COR CONSULTING ASOCIADOS  S R L",
+            "empresa_id": "95165",
+            "amount": "88900"
+          }
+        ]
+      },
+      "colppy_matches": [
+        {
+          "empresa_id": "95165",
+          "nombre": "COR CONSULTING ASOCIADOS  S R L",
+          "razon_social": "COR CONSULTING ASOCIADOS  S R L",
+          "cuit": "30703967406",
+          "localidad": "Argentina"
+        }
+      ],
+      "match_count": 1
+    },
+    {
+      "hubspot_company": {
+        "hubspot_id": 9019095822,
+        "name": "31308 - Ombú Consulting Services S.A.",
+        "cuit": "30-60720870-7",
+        "domain": null,
+        "deals": [
+          {
+            "deal_id": "40767451052",
+            "deal_name": "31308 - Ombú Consulting Services S.A.- Nuevo tipo de objeto Deal",
+            "empresa_id": "31308",
+            "amount": "75346"
+          }
+        ]
+      },
+      "colppy_matches": [
+        {
+          "empresa_id": "31308",
+          "nombre": "Ombú Consulting Services S.A.",
+          "razon_social": "Ombú Consulting Services S.A.",
+          "cuit": "30-60720870-7",
+          "localidad": "CABA"
+        }
+      ],
+      "match_count": 1
+    }
+  ]
+}

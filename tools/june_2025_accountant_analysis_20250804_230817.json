@@ -1,0 +1,444 @@
+{
+  "analysis_timestamp": "20250804_230817",
+  "analysis_date": "2025-08-04T23:08:17.663969",
+  "month": "June 2025",
+  "analysis_type": "Accountant Company Search in Colppy",
+  "summary": {
+    "total_accountant_companies": 14,
+    "companies_with_matches": 4,
+    "total_matches_found": 5
+  },
+  "detailed_results": [
+    {
+      "hubspot_company": {
+        "hubspot_id": 9018779797,
+        "name": "31891 - CONTADOR RENZO NICOLAS LICEDA",
+        "cuit": "20-31289408-5",
+        "domain": null,
+        "deals": [
+          {
+            "deal_id": "39378100125",
+            "deal_name": "94216 - HEBLAN",
+            "empresa_id": "94216",
+            "amount": "110000",
+            "close_date": "2025-06-27T20:44:00Z"
+          },
+          {
+            "deal_id": "39380794188",
+            "deal_name": "94202 - OTS BROTHERS",
+            "empresa_id": "94202",
+            "amount": "110000",
+            "close_date": "2025-06-27T20:38:00Z"
+          },
+          {
+            "deal_id": "39389622045",
+            "deal_name": "94177 - GAONA V",
+            "empresa_id": "94177",
+            "amount": "110000",
+            "close_date": "2025-06-27T20:13:00Z"
+          },
+          {
+            "deal_id": "39378673498",
+            "deal_name": "94133 - CV SKY SA",
+            "empresa_id": "94133",
+            "amount": null,
+            "close_date": "2025-06-27T18:34:00Z"
+          },
+          {
+            "deal_id": "39381125025",
+            "deal_name": "94120 - BESTORRE SA",
+            "empresa_id": "94120",
+            "amount": null,
+            "close_date": "2025-06-27T18:22:00Z"
+          },
+          {
+            "deal_id": "39378669744",
+            "deal_name": "94115 - ADMINISTRADORA PUNTA BLANCA",
+            "empresa_id": "94115",
+            "amount": null,
+            "close_date": "2025-06-27T18:15:00Z"
+          },
+          {
+            "deal_id": "39371956758",
+            "deal_name": "94102 - BIUTY SA",
+            "empresa_id": "94102",
+            "amount": "110347",
+            "close_date": "2025-06-27T17:56:00Z"
+          },
+          {
+            "deal_id": "39373436263",
+            "deal_name": "94101 - ELIGIAN SA",
+            "empresa_id": "94101",
+            "amount": "110347",
+            "close_date": "2025-06-27T17:53:00Z"
+          },
+          {
+            "deal_id": "39385928274",
+            "deal_name": "94100 - MENDIOLA-BLANCHARD SA",
+            "empresa_id": "94100",
+            "amount": "110347",
+            "close_date": "2025-06-27T17:50:00Z"
+          },
+          {
+            "deal_id": "39380324231",
+            "deal_name": "94099 - BROWNHOUSE",
+            "empresa_id": "94099",
+            "amount": "110347",
+            "close_date": "2025-06-27T17:48:00Z"
+          },
+          {
+            "deal_id": "39378060654",
+            "deal_name": "94098 - TOBIMATT SAS",
+            "empresa_id": "94098",
+            "amount": "110347",
+            "close_date": "2025-06-27T17:45:00Z"
+          },
+          {
+            "deal_id": "39385540634",
+            "deal_name": "94097 - PAULGERAL SA",
+            "empresa_id": "94097",
+            "amount": "110347",
+            "close_date": "2025-06-27T17:44:00Z"
+          },
+          {
+            "deal_id": "39385514881",
+            "deal_name": "94096 - TIELIS S.A. - EMPRESA MADRE ",
+            "empresa_id": "94096",
+            "amount": "150717.5",
+            "close_date": "2025-06-27T17:39:00Z"
+          },
+          {
+            "deal_id": "39389653145",
+            "deal_name": "94201 - ADMINISTRACION RWJ",
+            "empresa_id": "94201",
+            "amount": "110000",
+            "close_date": "2025-06-27T13:41:18.318Z"
+          }
+        ]
+      },
+      "colppy_matches": [],
+      "match_count": 0
+    },
+    {
+      "hubspot_company": {
+        "hubspot_id": 9019067673,
+        "name": "Gisela Mariotti Contadora",
+        "cuit": null,
+        "domain": null,
+        "deals": [
+          {
+            "deal_id": "39385457040",
+            "deal_name": "94127 - Altatension S.A.",
+            "empresa_id": "94127",
+            "amount": "214500",
+            "close_date": "2025-06-30T16:41:24.516Z"
+          },
+          {
+            "deal_id": "39382560562",
+            "deal_name": "94105 - FARADAY S A  I C F",
+            "empresa_id": "94105",
+            "amount": "214500",
+            "close_date": "2025-06-27T18:34:32.902Z"
+          }
+        ]
+      },
+      "colppy_matches": [],
+      "match_count": 0
+    },
+    {
+      "hubspot_company": {
+        "hubspot_id": 9019039744,
+        "name": "30706 - Estudio Zelido & Figueroa",
+        "cuit": "27-26532326-5",
+        "domain": "estudiozelido.com.ar",
+        "deals": [
+          {
+            "deal_id": "36423534005",
+            "deal_name": "91663 - FUNDACION ARGENTINA MARIA MONTESSORI ( FAMM )",
+            "empresa_id": "91663",
+            "amount": "180500",
+            "close_date": "2025-06-26T00:00:00Z"
+          },
+          {
+            "deal_id": "38522419836",
+            "deal_name": "93432 - FULLMEC S.R.L.",
+            "empresa_id": "93432",
+            "amount": "214500",
+            "close_date": "2025-06-05T13:10:40.299Z"
+          }
+        ]
+      },
+      "colppy_matches": [
+        {
+          "empresa_id": "30706",
+          "nombre": "Estudio Zelido & Figueroa",
+          "razon_social": "Luciana Zelido",
+          "cuit": "27-26532326-5",
+          "localidad": "San Isidro"
+        }
+      ],
+      "match_count": 1
+    },
+    {
+      "hubspot_company": {
+        "hubspot_id": 9018824963,
+        "name": "5072 - Estudio Herrera Alejandra",
+        "cuit": "27-20238296-2",
+        "domain": null,
+        "deals": [
+          {
+            "deal_id": "39333709214",
+            "deal_name": "93974 - FUNDACION INAYEN -",
+            "empresa_id": "93974",
+            "amount": "180500",
+            "close_date": "2025-06-26T00:00:00Z"
+          },
+          {
+            "deal_id": "38420241718",
+            "deal_name": "71892 - COOPERATIVA DE TRABAJO TRAULEN LIMITADA -",
+            "empresa_id": "71892",
+            "amount": "180500",
+            "close_date": "2025-06-04T00:00:00Z"
+          }
+        ]
+      },
+      "colppy_matches": [],
+      "match_count": 0
+    },
+    {
+      "hubspot_company": {
+        "hubspot_id": 34668432479,
+        "name": "Estudio Carballeira",
+        "cuit": null,
+        "domain": null,
+        "deals": [
+          {
+            "deal_id": "38548014090",
+            "deal_name": "93435 - EPICURO SMA S. A. S.",
+            "empresa_id": "93435",
+            "amount": "214500",
+            "close_date": "2025-06-20T00:00:00Z"
+          },
+          {
+            "deal_id": "38661703226",
+            "deal_name": "93517 - Piscis 1",
+            "empresa_id": "93517",
+            "amount": "180500",
+            "close_date": "2025-06-09T15:54:03.333Z"
+          }
+        ]
+      },
+      "colppy_matches": [],
+      "match_count": 0
+    },
+    {
+      "hubspot_company": {
+        "hubspot_id": 9675343394,
+        "name": "67164 - YASA CONSULTORES S.R.L.",
+        "cuit": "30714305367",
+        "domain": null,
+        "deals": [
+          {
+            "deal_id": "38708396693",
+            "deal_name": "93191 - PSIEZE DATA ANALYTICS S. R. L.",
+            "empresa_id": "93191",
+            "amount": "214500",
+            "close_date": "2025-06-05T19:08:41.401Z"
+          },
+          {
+            "deal_id": "38062947848",
+            "deal_name": "68206 - PIANO -",
+            "empresa_id": "68206",
+            "amount": "214500",
+            "close_date": "2025-06-05T17:32:23.511Z"
+          }
+        ]
+      },
+      "colppy_matches": [
+        {
+          "empresa_id": "67164",
+          "nombre": "YASA CONSULTORES S.R.L.",
+          "razon_social": "YASA CONSULTORES S.R.L.",
+          "cuit": "30714305367",
+          "localidad": "DEL VISO"
+        }
+      ],
+      "match_count": 1
+    },
+    {
+      "hubspot_company": {
+        "hubspot_id": 35377716362,
+        "name": "bigconsulting.com.ar",
+        "cuit": null,
+        "domain": "bigconsulting.com.ar",
+        "deals": [
+          {
+            "deal_id": "39222037764",
+            "deal_name": "93947 - Big Consulting - GUSTAVO ANDRES MARTIRENA",
+            "empresa_id": "93947",
+            "amount": "130500",
+            "close_date": "2025-06-30T15:07:44.271Z"
+          }
+        ]
+      },
+      "colppy_matches": [],
+      "match_count": 0
+    },
+    {
+      "hubspot_company": {
+        "hubspot_id": 35448031534,
+        "name": "Contadora Paula",
+        "cuit": null,
+        "domain": "ContadoraPaula.com",
+        "deals": [
+          {
+            "deal_id": "39357003562",
+            "deal_name": "94063 - VELOS S.R.L.",
+            "empresa_id": "94063",
+            "amount": "166500",
+            "close_date": "2025-06-30T12:46:35.627Z"
+          }
+        ]
+      },
+      "colppy_matches": [],
+      "match_count": 0
+    },
+    {
+      "hubspot_company": {
+        "hubspot_id": 9018793224,
+        "name": "Estudio Tronconi - ",
+        "cuit": null,
+        "domain": null,
+        "deals": [
+          {
+            "deal_id": "39252592676",
+            "deal_name": "93860 - INSTALACIONES ELECTRICAS BC",
+            "empresa_id": "93860",
+            "amount": "214500",
+            "close_date": "2025-06-26T00:00:00Z"
+          }
+        ]
+      },
+      "colppy_matches": [],
+      "match_count": 0
+    },
+    {
+      "hubspot_company": {
+        "hubspot_id": 10208771449,
+        "name": "68816 - Estudio Contable Saad y Asociados",
+        "cuit": "20-22431361-7",
+        "domain": null,
+        "deals": [
+          {
+            "deal_id": "38852035185",
+            "deal_name": "93811 - NORTH CHAMP S R L",
+            "empresa_id": "93811",
+            "amount": "214500",
+            "close_date": "2025-06-23T15:58:49.784Z"
+          }
+        ]
+      },
+      "colppy_matches": [],
+      "match_count": 0
+    },
+    {
+      "hubspot_company": {
+        "hubspot_id": 9019039250,
+        "name": "12823 Estudio FyD - Fratantoni, Diez & Asociados ",
+        "cuit": "30-71142759-3",
+        "domain": null,
+        "deals": [
+          {
+            "deal_id": "39040320928",
+            "deal_name": "93599 - PLAN ESTUDIO FRATANTONI, DIEZ Y ASOCIADOS S.R.L. - ",
+            "empresa_id": "93599",
+            "amount": "88900",
+            "close_date": "2025-06-23T00:00:00Z"
+          }
+        ]
+      },
+      "colppy_matches": [],
+      "match_count": 0
+    },
+    {
+      "hubspot_company": {
+        "hubspot_id": 9018793562,
+        "name": "47135 Calcagno, Rafael y Asociados",
+        "cuit": "30-71016966-3",
+        "domain": null,
+        "deals": [
+          {
+            "deal_id": "37960338547",
+            "deal_name": "93074 - ALMACEN DEL TACO SRL",
+            "empresa_id": "93074",
+            "amount": "214500",
+            "close_date": "2025-06-18T18:33:05.960Z"
+          }
+        ]
+      },
+      "colppy_matches": [],
+      "match_count": 0
+    },
+    {
+      "hubspot_company": {
+        "hubspot_id": 9251208499,
+        "name": "65534 - EGM CONSULTING GROUP SRL",
+        "cuit": "30-71765010-3",
+        "domain": "egmconsulting.com.ar",
+        "deals": [
+          {
+            "deal_id": "39037260084",
+            "deal_name": "93793 - RESGUARDO DE VALOR SA",
+            "empresa_id": "93793",
+            "amount": "180500",
+            "close_date": "2025-06-18T16:12:57.037Z"
+          }
+        ]
+      },
+      "colppy_matches": [
+        {
+          "empresa_id": "65534",
+          "nombre": "EGM CONSULTING GROUP SRL",
+          "razon_social": "EGM CONSULTING GROUP SRL",
+          "cuit": "30-71765010-3",
+          "localidad": "CABA"
+        },
+        {
+          "empresa_id": "15312",
+          "nombre": "EGM CONSULTING (Administradas)",
+          "razon_social": "EGM CONSULTING GROUP SRL",
+          "cuit": "30-71765010-3",
+          "localidad": "CIUDAD AUTONOMA BUENOS AIRES"
+        }
+      ],
+      "match_count": 2
+    },
+    {
+      "hubspot_company": {
+        "hubspot_id": 9019047293,
+        "name": "16425 - GRUPO ANTU CONTADORES PUBLICOS",
+        "cuit": "20-22787665-5",
+        "domain": null,
+        "deals": [
+          {
+            "deal_id": "38978649364",
+            "deal_name": "93719 - OLIVIA CRUZ ACCESORIOS",
+            "empresa_id": "93719",
+            "amount": "180500",
+            "close_date": "2025-06-18T00:00:00Z"
+          }
+        ]
+      },
+      "colppy_matches": [
+        {
+          "empresa_id": "16425",
+          "nombre": "GRUPO ANTU CONTADORES PUBLICOS",
+          "razon_social": "ANTU EXPRESS",
+          "cuit": "20-22787665-5",
+          "localidad": "CALETA OLIVIA"
+        }
+      ],
+      "match_count": 1
+    }
+  ]
+}

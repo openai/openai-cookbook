@@ -1,0 +1,8 @@
+node_modules
+.venv
+venv
+__pycache__/
+*.py[cod]
+*$py.class# Ignore generated outputs
+outputs/
+**/outputs/**

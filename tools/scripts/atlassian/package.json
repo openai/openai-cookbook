@@ -1,0 +1,38 @@
+{
+  "name": "mcp-server-atlassian",
+  "version": "1.0.0",
+  "description": "MCP server for Atlassian (Jira & Confluence) integration",
+  "type": "module",
+  "main": "mcp-atlassian-server.js",
+  "scripts": {
+    "start": "node mcp-atlassian-server.js",
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "keywords": [
+    "mcp",
+    "atlassian",
+    "jira",
+    "confluence",
+    "api",
+    "integration"
+  ],
+  "author": "Colppy Dev Team",
+  "license": "MIT",
+  "dependencies": {
+    "@modelcontextprotocol/sdk": "^0.5.0",
+    "axios": "^1.6.2",
+    "dotenv": "^16.3.1"
+  },
+  "devDependencies": {
+    "@types/node": "^20.10.0"
+  },
+  "engines": {
+    "node": ">=18.0.0"
+  }
+}
+
+
+
+
+
+

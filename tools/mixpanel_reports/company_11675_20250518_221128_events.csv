@@ -1,0 +1,277 @@
+event_name,count
+$identify,659
+$mp_click,58572
+$mp_input_change,5544
+$mp_scroll,2
+$mp_submit,7
+$mp_web_page_view,2149
+Abrió el Calendario de Vencimientos,680
+Abrió el módulo clientes,10614
+Abrió el módulo configuración de empresa,4349
+Abrió el módulo contabilidad,5544
+Abrió el módulo inventario,4986
+Abrió el módulo mi cuenta colppy,4089
+Abrió el módulo proveedores,5794
+Abrió el módulo tesorería,6099
+Abrió la solapa importación de facturas,1285
+Activó impresión de remitos sin precios,8
+Actualizó precios en pantalla masivo,102
+Agregó centros de costo,4
+Agregó medio de cobro,515
+Agregó medio de pago,177
+Agregó un cliente,209
+Agregó un depósito,71
+Agregó un proveedor,147
+Agregó un talonario,83
+Agregó un ítem,189
+Agregó una chequera,5
+Agregó una cuenta contable,32
+Agregó una cuenta de tesorería,40
+Agregó una empresa,111
+Cambia solapa en comprobante,367
+Cambió la contraseña,10
+Canceló en editar fila a importar con error,23
+Cerró primeros pasos,40
+Checklist Shown (Appcues),11
+Click  descarga archivo Mis comprobantes AFIP emitidos,32
+Click  descarga archivo Mis comprobantes AFIP recibidos,7
+Click Tablero,4327
+Click Terminar e imprimir reporte,18
+Click Upselling,1
+Click abrir filtro empresas,107
+Click abrir filtro impuestos,59
+Click cambiar dia en minicalendario,320
+"Click cambiar dia, semana o mes en navegador de fechas",124
+Click cerrar calendario,386
+Click cerrar filtro empresas,53
+Click cerrar filtro impuestos,94
+Click descarga archivo mis comprobantes AFIP recibidos,5
+Click en Botón de Operación Conciliar,60
+Click en Botón de Operación Contabilizar,64
+Click en Cerrar Notificación trial,5
+Click en Clonar Asiento a Diario,1
+Click en Descargar Papel de Trabajo,4
+Click en Empresa Demo,68
+Click en Escribinos ahora,164
+Click en Generar Asiento de Ajuste de Saldos Iniciales,4
+Click en Generar Asiento de ajuste por inflación,22
+Click en Ir a configurar empresa,467
+Click en Nuevo Asiento a Diario,336
+Click en activar lista de precios,6
+Click en activar productos en Listas de Precios,1
+Click en agregar cliente,1141
+Click en agregar cobro,1464
+Click en agregar lista de precios,217
+Click en agregar pago,1316
+Click en agregar proveedor,503
+Click en ayuda,67
+Click en botón Conectar banco,1308
+Click en buscar movimientos en la conciliación,73
+Click en capacitaciones,304
+Click en comenzar primeros pasos,164
+Click en completar datos wizard,441
+Click en desactivar lista de precios,2
+Click en desactivar productos en Listas de Precios,10
+Click en descargar archivos del libro iva digital,59
+Click en descargar excel de Lista de precios,34
+Click en duplicar lista de precio,9
+Click en editar lista de precios,74
+Click en editar precios en Listas de Precios,181
+Click en el buscador de Intercom,800
+Click en eliminar movimiento del extracto en la Conciliación,8
+Click en emitir nota de crédito automática,38
+Click en empty state tablero,14
+Click en escribinos ahora,164
+Click en generar asientos de cierre y apertura de ejercicio,3
+Click en guardar Asiento,112
+Click en guardar edición de lista de precios,17
+Click en guardar editar precios en Lista de precios,76
+Click en guardar factura con Lista de Precios,4
+Click en guardar factura con Lista de precios,242
+Click en guardar nota de crédito automática,7
+Click en guardar nueva lista de precios,58
+Click en icono ayuda,2743
+Click en integracion con Mercado Pago (MPC),14
+Click en libro iva digital,127
+Click en multiples depositos,38
+Click en pagar,769
+Click en posición de cuenta de tesorería,19
+Click en pregunta frecuente,211
+Click en productos inactivos de Listas de Precios,57
+Click en quiero que me llamen,59
+Click en reporte Balance,106
+Click en reporte CITI Compras y Ventas,24
+Click en reporte Diario General,1
+Click en reporte Diario general,111
+Click en reporte Estado de flujo de efectivo,47
+Click en reporte Estado de resultados,100
+Click en reporte IVA Compras,98
+Click en reporte Listado Proveedores,57
+Click en reporte Mayor,108
+Click en reporte Posición impositiva mensual,45
+Click en reporte Resultado por CCosto,235
+Click en reporte Retenciones y percepciones,87
+Click en reporte disponibilidad por deposito,57
+Click en reporte listado de movimientos,105
+Click en solapa listas de precios,1306
+Click en sueldos,1342
+Click en sugerencias,17
+Click en uso de remitos,38
+Click guardar comentarios calendario de vencimientos,1
+Completó el tour,16
+Completó el tour primeros Pasos,2
+Completó encuesta NPS,12
+Conectó el banco,8
+Configura Calculo automatico de ARBA,345
+Configura Talonario FE,7
+Configuró Calculo automatico de AGIP,23
+Configuró Calculo automatico de ARBA,326
+Corrigió fila a importar con error,44
+Descargó el balance,56
+Descargó el diario general,64
+Descargó el estado de flujo de  efectivo,29
+Descargó el estado de resultados,74
+Descargó el libro iva compras,28
+Descargó el libro iva digital,59
+Descargó el libro iva ventas,34
+Descargó el listado de clientes,33
+Descargó el listado de cobranzas,50
+Descargó el listado de comprobantes de compra,46
+Descargó el listado de comprobantes de compra borrador,7
+Descargó el listado de comprobantes de venta,78
+Descargó el listado de comprobantes de venta borrador,52
+Descargó el listado de pagos,20
+Descargó el listado de proveedores,15
+Descargó el listado de ítems de inventario,48
+Descargó el mayor,100
+Descargó el plan de cuentas,37
+Descargó el reporte de cheques emitidos diferidos,11
+Descargó el reporte de cheques en cartera,21
+Descargó el reporte de seguimiento de cheques,16
+Descargó el resultado por centros de costo,115
+Descargó el retenciones y percepciones,42
+Descargó el régimen de información de compras y ventas,41
+Descargó la posición impositiva mensual,78
+Descargó movimientos no conciliados,17
+Desconectó el banco,7
+Editó tasa de cambio aplicado,238
+Elige tipo de moneda,440
+Eliminó filas a importar con error,66
+Eliminó las transacciones de la empresa,10
+Envió el plan de cuentas al contador,3
+Essential B,1
+Estudio contable o consultoría,10
+Finalizó importación,25
+Finalizó primeros pasos,7
+Flow Completed (Appcues),53
+Flow Skipped (Appcues),685
+Flow Started (Appcues),984
+Full B,1
+Genera Reporte Listado de Movimientos,2
+Genera Reporte disponibilidad por deposito,17
+Genera nuevo pago,38
+Genera reporte listado de movimientos,48
+Generó asiento contable,55
+Generó comprobante de compra,235
+Generó comprobante de venta,496
+Generó orden de pago,130
+Generó recibo de cobro,170
+Generó un ajuste de inventario,14
+Generó un remito,18
+Guardó un nuevo usuario invitado de tipo POS,1
+Importacion Asientos,21
+Importacion Clientes,51
+Importacion de Factura de Compra,7
+Importacion de Factura de compra - Mis comprobantes,1
+Importacion de items,21
+Importar proveedores,3
+Imprimir Facturas Masivamente,8
+Imprimió comprobante de venta,373
+Imprimió orden de compra,24
+Invita usuario Pos,2
+Login,8458
+Modificó perfil,66
+NPS Ask Me Later Selected At (Appcues),229
+NPS Clicked Update NPS Score (Appcues),2
+NPS Feedback (Appcues),22
+NPS Score (Appcues),49
+NPS Survey Started (Appcues),420
+PAGE_VIEW,3
+Pedido de desactivación,9
+Platinum B,1
+Quiero que me llamen,24
+Realizó canje interno de caja,5
+Realizó depósito de cheques,3
+Realizó depósito o extracción de efectivo,9
+Reenviar validación email,18
+Registro,38
+Reporta en ARBA,28
+Reporte en Moneda Extranjera (Appcues),204
+Respondió Encuesta,6
+Seleccionó agregar remito,289
+Seleccionó agregar ítem,821
+Seleccionó invitar usuario,55
+Seleccionó la opción actualizar precios en pantalla masivo,341
+Seleccionó la opción agregar chequera,20
+Seleccionó la opción agregar cuenta de tesorería,465
+Seleccionó la opción asiento de ajuste por inflación,46
+Seleccionó la opción asiento de cierre y apertura,21
+Seleccionó la opción asiento de refundición,12
+Seleccionó la opción conciliar,1075
+Seleccionó la opción de configurar delegación factura electrónica,250
+Seleccionó la opción editar en fila a importar con error,3
+Seleccionó la opción eliminar en filas a importar con error,7
+Seleccionó la opción nuevo plan de cuentas,144
+Seleccionó la opción para agregar un comprobante de compra,909
+Seleccionó la opción para agregar un comprobante de venta,3044
+Seleccionó la opción perfil,621
+Seleccionó la opción recomendá y ganá,75
+Seleccionó opción para importar,2867
+Step Completed (Appcues),66
+Step Interacted (Appcues),112
+Step Skipped (Appcues),685
+Step Started (Appcues),984
+Subió archivo para importar,108
+Subscription Billed,15
+Validó email,3
+Vende productos,25
+Vende productos o servicios,18
+Vende servicios,14
+Vio anuncio e hizo click en importación factura de compra,2
+Visualizó aviso para delegar factura electrónica,10292
+Visualizó detalle de importación,854
+Visualizó inicio colppy,4400
+Visualizó ventana de upsell,2
+Website,110
+Website_CTA_Button,3
+Website_Price_Button,1
+app abrió consultar productos,1
+app abrió detalle de comprobante de compra,8
+app abrió detalle de comprobante de venta,97
+app abrió el alta de comprobante de venta,3
+app abrió el módulo clientes,182
+app abrió el módulo facturas,274
+app abrió el módulo proveedores,93
+app abrió el módulo tablero,346
+app abrió escanear productos,1
+app agregó un cliente,3
+app cambió de empresa,56
+app cambió filtro de facturas de clientes,3
+app compartió comprobante de venta,11
+app configuró facturación por defecto,3
+app generó recibo de cobro,17
+app imprimió comprobante de venta,4
+app login,123
+app seleccionó el listado de Bancos,20
+app seleccionó el listado de Cajas,13
+app seleccionó el listado de Tarjetas de crédito,10
+app seleccionó el listado de facturas borrador,67
+app seleccionó el listado de facturas cobradas,86
+app seleccionó el listado de facturas impagas,102
+app seleccionó el listado de facturas impagas proveedores,19
+app seleccionó el listado de facturas pagadas,25
+app seleccionó el listado de proveedores,12
+app seleccionó lista de precios en la factura,4
+app seleccionó ver más facturas,7
+app validó que no tiene datos de facturación por defecto,237
+record,82

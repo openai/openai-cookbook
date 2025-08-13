@@ -1,0 +1,14 @@
+# Example accounting firms to search
+# Lines starting with # are comments and will be ignored
+
+PwC Argentina
+KPMG
+Deloitte & Touche
+Ernst & Young
+Estudio Carballeira
+Fratantoni, Diez & Asociados
+BDO Argentina
+Grant Thornton
+RSM Argentina
+Estudio Contable Rodriguez
+# Add more firms below as needed

@@ -1,0 +1,237 @@
+{
+  "company_id": "14389",
+  "total_events": 74,
+  "event_counts": [
+    {
+      "event_name": "$identify",
+      "count": 5
+    },
+    {
+      "event_name": "Abri\u00f3 el m\u00f3dulo clientes",
+      "count": 2
+    },
+    {
+      "event_name": "Abri\u00f3 el m\u00f3dulo mi cuenta colppy",
+      "count": 5
+    },
+    {
+      "event_name": "Abri\u00f3 el m\u00f3dulo proveedores",
+      "count": 1
+    },
+    {
+      "event_name": "Abri\u00f3 el m\u00f3dulo tesorer\u00eda",
+      "count": 2
+    },
+    {
+      "event_name": "Cambi\u00f3 de empresa",
+      "count": 2
+    },
+    {
+      "event_name": "Click en Escribinos ahora",
+      "count": 4
+    },
+    {
+      "event_name": "Click en escribinos ahora",
+      "count": 4
+    },
+    {
+      "event_name": "Click en icono ayuda",
+      "count": 5
+    },
+    {
+      "event_name": "Click en quiero que me llamen",
+      "count": 1
+    },
+    {
+      "event_name": "Click en sueldos",
+      "count": 1
+    },
+    {
+      "event_name": "Flow Skipped (Appcues)",
+      "count": 1
+    },
+    {
+      "event_name": "Flow Started (Appcues)",
+      "count": 1
+    },
+    {
+      "event_name": "Login",
+      "count": 11
+    },
+    {
+      "event_name": "Seleccion\u00f3 la opci\u00f3n recomend\u00e1 y gan\u00e1",
+      "count": 1
+    },
+    {
+      "event_name": "Step Skipped (Appcues)",
+      "count": 1
+    },
+    {
+      "event_name": "Step Started (Appcues)",
+      "count": 1
+    },
+    {
+      "event_name": "Vio anuncio e hizo click en importaci\u00f3n factura de compra",
+      "count": 2
+    },
+    {
+      "event_name": "Visualiz\u00f3 inicio colppy",
+      "count": 20
+    },
+    {
+      "event_name": "app abri\u00f3 el m\u00f3dulo proveedores",
+      "count": 1
+    },
+    {
+      "event_name": "app abri\u00f3 el m\u00f3dulo tablero",
+      "count": 2
+    },
+    {
+      "event_name": "app login",
+      "count": 1
+    }
+  ],
+  "user_count": 4,
+  "users": [
+    {
+      "user_id": "jonetto@colppy.com",
+      "event_count": 64
+    },
+    {
+      "user_id": "jonetto@gmail.com",
+      "event_count": 2
+    },
+    {
+      "user_id": "jonettoprueba-v3@gmail.com",
+      "event_count": 3
+    },
+    {
+      "user_id": "unknown",
+      "event_count": 5
+    }
+  ],
+  "events_by_day": [
+    {
+      "date": "2025-01-05",
+      "event_count": 52
+    },
+    {
+      "date": "2025-01-07",
+      "event_count": 4
+    },
+    {
+      "date": "2025-01-08",
+      "event_count": 9
+    },
+    {
+      "date": "2025-01-15",
+      "event_count": 5
+    },
+    {
+      "date": "2025-01-27",
+      "event_count": 4
+    }
+  ],
+  "top_user_activities": [
+    {
+      "user": "jonetto@colppy.com",
+      "event_name": "Visualiz\u00f3 inicio colppy",
+      "count": 20
+    },
+    {
+      "user": "jonetto@colppy.com",
+      "event_name": "Login",
+      "count": 6
+    },
+    {
+      "user": "jonetto@colppy.com",
+      "event_name": "$identify",
+      "count": 5
+    },
+    {
+      "user": "jonetto@colppy.com",
+      "event_name": "Abri\u00f3 el m\u00f3dulo mi cuenta colppy",
+      "count": 5
+    },
+    {
+      "user": "jonetto@colppy.com",
+      "event_name": "Click en icono ayuda",
+      "count": 5
+    },
+    {
+      "user": "jonetto@colppy.com",
+      "event_name": "Click en Escribinos ahora",
+      "count": 4
+    },
+    {
+      "user": "jonetto@colppy.com",
+      "event_name": "Click en escribinos ahora",
+      "count": 4
+    },
+    {
+      "user": "jonettoprueba-v3@gmail.com",
+      "event_name": "Login",
+      "count": 3
+    },
+    {
+      "user": "jonetto@colppy.com",
+      "event_name": "Abri\u00f3 el m\u00f3dulo clientes",
+      "count": 2
+    },
+    {
+      "user": "jonetto@colppy.com",
+      "event_name": "Abri\u00f3 el m\u00f3dulo tesorer\u00eda",
+      "count": 2
+    },
+    {
+      "user": "jonetto@colppy.com",
+      "event_name": "Cambi\u00f3 de empresa",
+      "count": 2
+    },
+    {
+      "user": "jonetto@gmail.com",
+      "event_name": "Login",
+      "count": 2
+    },
+    {
+      "user": "unknown",
+      "event_name": "app abri\u00f3 el m\u00f3dulo tablero",
+      "count": 2
+    },
+    {
+      "user": "jonetto@colppy.com",
+      "event_name": "Abri\u00f3 el m\u00f3dulo proveedores",
+      "count": 1
+    },
+    {
+      "user": "jonetto@colppy.com",
+      "event_name": "Click en quiero que me llamen",
+      "count": 1
+    },
+    {
+      "user": "jonetto@colppy.com",
+      "event_name": "Click en sueldos",
+      "count": 1
+    },
+    {
+      "user": "jonetto@colppy.com",
+      "event_name": "Flow Skipped (Appcues)",
+      "count": 1
+    },
+    {
+      "user": "jonetto@colppy.com",
+      "event_name": "Flow Started (Appcues)",
+      "count": 1
+    },
+    {
+      "user": "jonetto@colppy.com",
+      "event_name": "Seleccion\u00f3 la opci\u00f3n recomend\u00e1 y gan\u00e1",
+      "count": 1
+    },
+    {
+      "user": "jonetto@colppy.com",
+      "event_name": "Step Skipped (Appcues)",
+      "count": 1
+    }
+  ]
+}

@@ -1,0 +1,1442 @@
+🔍 ANALYZING JULY 2025 REFERENCIA EMPRESA ADMINISTRADA DEALS
+================================================================================
+
+📋 Searching for deals...
+Found 41 deals with Lead Source: 'Referencia Empresa Administrada'
+
+📊 DEAL ANALYSIS:
+--------------------------------------------------------------------------------
+
+1. Deal: 51913 - FINCA - Nuevo tipo de objeto Deal
+   ID: 39665888882
+   Amount: $88900
+   Close Date: 2025-07-04T00:00:00Z
+   ID Empresa: 51913
+   Associated Companies: 1
+   ❌ No Primary Company Set
+   🏢 All Associated Companies:
+      1. 51913 - FINCA
+         ID: 9019062832
+         CUIT: 20-28262488-6
+
+2. Deal: 87624 - GLAM FILMS SA
+   ID: 39867108669
+   Amount: $130500
+   Close Date: 2025-07-31T00:00:00Z
+   ID Empresa: 87624
+   Associated Companies: 1
+   ❌ No Primary Company Set
+   🏢 All Associated Companies:
+      1. 87624 - GLAM FILMS SA
+         ID: 22621974713
+         CUIT: 33-70979693-9
+
+3. Deal: 69964 - GIZMO ANIMATION LTD
+   ID: 39867109190
+   Amount: $130500
+   Close Date: 2025-07-08T18:08:25.069Z
+   ID Empresa: 69964
+   Associated Companies: 1
+   📌 Current Primary: 87624 - GLAM FILMS SA
+      CUIT: 33-70979693-9
+   🏢 All Associated Companies:
+      1. 87624 - GLAM FILMS SA (PRIMARY)
+         ID: 22621974713
+         CUIT: 33-70979693-9
+         Labels: Primary
+
+4. Deal: 69963 - GIZMO ANIMATION LLC
+   ID: 39867109517
+   Amount: $130500
+   Close Date: 2025-07-08T18:10:42.698Z
+   ID Empresa: 69963
+   Associated Companies: 1
+   📌 Current Primary: 87624 - GLAM FILMS SA
+      CUIT: 33-70979693-9
+   🏢 All Associated Companies:
+      1. 87624 - GLAM FILMS SA (PRIMARY)
+         ID: 22621974713
+         CUIT: 33-70979693-9
+         Labels: Primary
+
+5. Deal: 94778 - ALEJANDRO NICOLAS PEREZ
+   ID: 40277332091
+   Amount: $130500
+   Close Date: 2025-07-15T19:43:29.329Z
+   ID Empresa: 94778
+   Associated Companies: 2
+   📌 Current Primary: 94778 - ALEJANDRO NICOLAS PEREZ
+      CUIT: 20357299277
+   🏢 All Associated Companies:
+      1. 94778 - ALEJANDRO NICOLAS PEREZ (PRIMARY)
+         ID: 36233955731
+         CUIT: 20357299277
+         Labels: Primary
+      2. Contador Alejandro Perez (ACCOUNTANT)
+         ID: 36234110609
+         CUIT: La empresa identificada es AP Consultores. No se dispone de información suficiente para sugerir un CUIT en formato estándar.
+         Labels: Estudio Contable / Asesor / Consultor Externo del negocio
+
+6. Deal: 94779 - GORUKA
+   ID: 40193585423
+   Amount: $6090
+   Close Date: 2025-07-15T19:58:32.700Z
+   ID Empresa: 94779
+   Associated Companies: 2
+   📌 Current Primary: Contador Alejandro Perez
+      CUIT: La empresa identificada es AP Consultores. No se dispone de información suficiente para sugerir un CUIT en formato estándar.
+   🏢 All Associated Companies:
+      1. 94779 - GORUKA
+         ID: 36215126794
+         CUIT: 30-71466969-5
+      2. Contador Alejandro Perez (PRIMARY, ACCOUNTANT)
+         ID: 36234110609
+         CUIT: La empresa identificada es AP Consultores. No se dispone de información suficiente para sugerir un CUIT en formato estándar.
+         Labels: Estudio Contable / Asesor / Consultor Externo del negocio, Primary
+
+7. Deal: 94848 - GORUKA
+   ID: 40272444002
+   Amount: $6090
+   Close Date: 2025-07-15T20:50:41.977Z
+   ID Empresa: 94848
+   Associated Companies: 2
+   📌 Current Primary: 94848 - GORUKA
+      CUIT: 30-71466969-5
+   🏢 All Associated Companies:
+      1. Contador Alejandro Perez (ACCOUNTANT)
+         ID: 36234110609
+         CUIT: La empresa identificada es AP Consultores. No se dispone de información suficiente para sugerir un CUIT en formato estándar.
+         Labels: Estudio Contable / Asesor / Consultor Externo del negocio
+      2. 94848 - GORUKA (PRIMARY)
+         ID: 36280577679
+         CUIT: 30-71466969-5
+         Labels: Primary
+
+8. Deal: 94849 - NANDALE
+   ID: 40274308013
+   Amount: $6090
+   Close Date: 2025-07-15T20:37:08.204Z
+   ID Empresa: 94849
+   Associated Companies: 2
+   📌 Current Primary: 94849 - NANDALE
+      CUIT: 33-71843787-9
+   🏢 All Associated Companies:
+      1. Contador Alejandro Perez (ACCOUNTANT)
+         ID: 36234110609
+         CUIT: La empresa identificada es AP Consultores. No se dispone de información suficiente para sugerir un CUIT en formato estándar.
+         Labels: Estudio Contable / Asesor / Consultor Externo del negocio
+      2. 94849 - NANDALE (PRIMARY)
+         ID: 36247900198
+         CUIT: 33-71843787-9
+         Labels: Primary
+
+9. Deal: 94850 - XFIT
+   ID: 40260209460
+   Amount: $6090
+   Close Date: 2025-07-21T20:17:14.729Z
+   ID Empresa: 94850
+   Associated Companies: 2
+   📌 Current Primary: 94850 - XFIT
+      CUIT: 30-71202128-0
+   🏢 All Associated Companies:
+      1. Contador Alejandro Perez (ACCOUNTANT)
+         ID: 36234110609
+         CUIT: La empresa identificada es AP Consultores. No se dispone de información suficiente para sugerir un CUIT en formato estándar.
+         Labels: Estudio Contable / Asesor / Consultor Externo del negocio
+      2. 94850 - XFIT (PRIMARY)
+         ID: 36246053187
+         CUIT: 30-71202128-0
+         Labels: Primary
+
+10. Deal: 94852 - WOD
+   ID: 40273281699
+   Amount: $6090
+   Close Date: 2025-07-15T20:47:10.306Z
+   ID Empresa: 94852
+   Associated Companies: 2
+   📌 Current Primary: 94852 - WOD
+      CUIT: 30-71233946-9
+   🏢 All Associated Companies:
+      1. Contador Alejandro Perez (ACCOUNTANT)
+         ID: 36234110609
+         CUIT: La empresa identificada es AP Consultores. No se dispone de información suficiente para sugerir un CUIT en formato estándar.
+         Labels: Estudio Contable / Asesor / Consultor Externo del negocio
+      2. 94852 - WOD (PRIMARY)
+         ID: 36281040993
+         CUIT: 30-71233946-9
+         Labels: Primary
+
+11. Deal: 94853 - TKL
+   ID: 40274833236
+   Amount: $6090
+   Close Date: 2025-07-15T20:32:44.393Z
+   ID Empresa: 94853
+   Associated Companies: 2
+   📌 Current Primary: 94853 - TKL
+      CUIT: 33-71472274-9
+   🏢 All Associated Companies:
+      1. Contador Alejandro Perez (ACCOUNTANT)
+         ID: 36234110609
+         CUIT: La empresa identificada es AP Consultores. No se dispone de información suficiente para sugerir un CUIT en formato estándar.
+         Labels: Estudio Contable / Asesor / Consultor Externo del negocio
+      2. 94853 - TKL (PRIMARY)
+         ID: 36281195695
+         CUIT: 33-71472274-9
+         Labels: Primary
+
+12. Deal: 94856 - TRAINING SPORTS
+   ID: 40274136338
+   Amount: $6090
+   Close Date: 2025-07-15T20:46:23.836Z
+   ID Empresa: 94856
+   Associated Companies: 2
+   📌 Current Primary: 94856 - TRAINING SPORTS
+      CUIT: 30-71598130-7
+   🏢 All Associated Companies:
+      1. Contador Alejandro Perez (ACCOUNTANT)
+         ID: 36234110609
+         CUIT: La empresa identificada es AP Consultores. No se dispone de información suficiente para sugerir un CUIT en formato estándar.
+         Labels: Estudio Contable / Asesor / Consultor Externo del negocio
+      2. 94856 - TRAINING SPORTS (PRIMARY)
+         ID: 36264958886
+         CUIT: 30-71598130-7
+         Labels: Primary
+
+13. Deal: 94857 - LAPECAS
+   ID: 40272475303
+   Amount: $6090
+   Close Date: 2025-07-15T20:47:53.859Z
+   ID Empresa: 94857
+   Associated Companies: 2
+   📌 Current Primary: 94857 - LAPECAS
+      CUIT: 30-71691259-7
+   🏢 All Associated Companies:
+      1. Contador Alejandro Perez (ACCOUNTANT)
+         ID: 36234110609
+         CUIT: La empresa identificada es AP Consultores. No se dispone de información suficiente para sugerir un CUIT en formato estándar.
+         Labels: Estudio Contable / Asesor / Consultor Externo del negocio
+      2. 94857 - LAPECAS (PRIMARY)
+         ID: 36255208857
+         CUIT: 30-71691259-7
+         Labels: Primary
+
+14. Deal: 75356 - ROOTS EOR -
+   ID: 40573683800
+   Amount: $214500
+   Close Date: 2025-07-18T20:27:59.970Z
+   ID Empresa: 75356
+   Associated Companies: 1
+   📌 Current Primary: 75356 - ROOTS EOR
+      CUIT: 30-71572745-1
+   🏢 All Associated Companies:
+      1. 75356 - ROOTS EOR (PRIMARY)
+         ID: 16924201522
+         CUIT: 30-71572745-1
+         Labels: Primary
+
+15. Deal: 18355 - Barlow Limited -
+   ID: 40759344814
+   Amount: $88900
+   Close Date: 2025-07-24T13:35:08.778Z
+   ID Empresa: 18355
+   Associated Companies: 2
+   📌 Current Primary: Maria Florencia Peña - Estudio
+      CUIT: 27051982040
+   🏢 All Associated Companies:
+      1. 18355 BARLOW LIMITED
+         ID: 9018875255
+         CUIT: 20-23261733-1
+         Labels: Compañía con Múltiples Negocios
+      2. Maria Florencia Peña - Estudio (PRIMARY, ACCOUNTANT)
+         ID: 36677604781
+         CUIT: 27051982040
+         Labels: Primary, Estudio Contable / Asesor / Consultor Externo del negocio
+
+16. Deal: 18459 - WAINSCOTT LIMITED
+   ID: 40759346358
+   Amount: $88900
+   Close Date: 2025-07-24T13:45:24.922Z
+   ID Empresa: 18459
+   Associated Companies: 2
+   📌 Current Primary: Maria Florencia Peña - Estudio
+      CUIT: 27051982040
+   🏢 All Associated Companies:
+      1. 18459 WAINSCOTT LIMITED
+         ID: 9019070019
+         CUIT: 20-23261733-1
+         Labels: Compañía con Múltiples Negocios
+      2. Maria Florencia Peña - Estudio (PRIMARY, ACCOUNTANT)
+         ID: 36677604781
+         CUIT: 27051982040
+         Labels: Estudio Contable / Asesor / Consultor Externo del negocio, Primary
+
+17. Deal: 18460 - ELM LIMITED
+   ID: 40750609974
+   Amount: $88900
+   Close Date: 2025-07-24T13:53:44.936Z
+   ID Empresa: 18460
+   Associated Companies: 2
+   📌 Current Primary: Maria Florencia Peña - Estudio
+      CUIT: 27051982040
+   🏢 All Associated Companies:
+      1. 18460 ELM LIMITED
+         ID: 9019106360
+         CUIT: 20-23261733-1
+         Labels: Compañía con Múltiples Negocios
+      2. Maria Florencia Peña - Estudio (PRIMARY, ACCOUNTANT)
+         ID: 36677604781
+         CUIT: 27051982040
+         Labels: Primary, Estudio Contable / Asesor / Consultor Externo del negocio
+
+18. Deal: 18009 - FINCH LIMITED
+   ID: 40750610808
+   Amount: $88900
+   Close Date: 2025-07-24T13:58:54.405Z
+   ID Empresa: 18009
+   Associated Companies: 2
+   📌 Current Primary: Maria Florencia Peña - Estudio
+      CUIT: 27051982040
+   🏢 All Associated Companies:
+      1. 18009 FINCH LIMITED
+         ID: 9019035648
+         CUIT: 20-23261733-1
+         Labels: Compañía con Múltiples Negocios
+      2. Maria Florencia Peña - Estudio (PRIMARY, ACCOUNTANT)
+         ID: 36677604781
+         CUIT: 27051982040
+         Labels: Estudio Contable / Asesor / Consultor Externo del negocio, Primary
+
+19. Deal: 18461 - GEO PRIVATE INVESTMENTS LTD -
+   ID: 40762192528
+   Amount: $88900
+   Close Date: 2025-07-24T14:06:04.459Z
+   ID Empresa: 18461
+   Associated Companies: 2
+   📌 Current Primary: 18461 GEO PRIVATE INVESTMENTS LTD
+      CUIT: 20-23261733-1
+   🏢 All Associated Companies:
+      1. 18461 GEO PRIVATE INVESTMENTS LTD (PRIMARY)
+         ID: 9019036258
+         CUIT: 20-23261733-1
+         Labels: Primary
+      2. Maria Florencia Peña - Estudio (ACCOUNTANT)
+         ID: 36677604781
+         CUIT: 27051982040
+         Labels: Estudio Contable / Asesor / Consultor Externo del negocio
+
+20. Deal: 18462 - GIO INTERNATIONAL LLC -
+   ID: 40767446558
+   Amount: $88900
+   Close Date: 2025-07-24T14:16:03.711Z
+   ID Empresa: 18462
+   Associated Companies: 2
+   📌 Current Primary: Maria Florencia Peña - Estudio
+      CUIT: 27051982040
+   🏢 All Associated Companies:
+      1. 18462 GIO INTERNATIONAL LLC
+         ID: 9019106357
+         CUIT: 20-23261733-1
+         Labels: Compañía con Múltiples Negocios
+      2. Maria Florencia Peña - Estudio (PRIMARY, ACCOUNTANT)
+         ID: 36677604781
+         CUIT: 27051982040
+         Labels: Primary, Estudio Contable / Asesor / Consultor Externo del negocio
+
+21. Deal: 18458 - HALSEY LIMITED - Nuevo tipo de objeto Deal
+   ID: 40767447415
+   Amount: $75346
+   Close Date: 2025-07-24T00:00:00Z
+   ID Empresa: 18458
+   Associated Companies: 2
+   ❌ No Primary Company Set
+   🏢 All Associated Companies:
+      1. 18458 - HALSEY LIMITED
+         ID: 18458799183
+         CUIT: 20-23261733-1
+      2. Maria Florencia Peña - Estudio (ACCOUNTANT)
+         ID: 36677604781
+         CUIT: 27051982040
+         Labels: Estudio Contable / Asesor / Consultor Externo del negocio
+
+22. Deal: 18463 - NEWMORE HOLDING LTD - Nuevo tipo de objeto Deal
+   ID: 40767448389
+   Amount: $88900
+   Close Date: 2025-07-24T14:27:30.608Z
+   ID Empresa: 18463
+   Associated Companies: 2
+   📌 Current Primary: Maria Florencia Peña - Estudio
+      CUIT: 27051982040
+   🏢 All Associated Companies:
+      1. 18463 NEWMORE HOLDING LTD
+         ID: 9019082890
+         CUIT: 20-23261733-1
+         Labels: Compañía con Múltiples Negocios
+      2. Maria Florencia Peña - Estudio (PRIMARY, ACCOUNTANT)
+         ID: 36677604781
+         CUIT: 27051982040
+         Labels: Estudio Contable / Asesor / Consultor Externo del negocio, Primary
+
+23. Deal: 25576 - Los Cardones SA - Nuevo tipo de objeto Deal
+   ID: 40767449375
+   Amount: $88900
+   Close Date: 2025-07-24T14:32:55.756Z
+   ID Empresa: 25576
+   Associated Companies: 2
+   📌 Current Primary: 25576 Los Cardones S.A.
+      CUIT: 30-61627002-4
+   🏢 All Associated Companies:
+      1. 25576 Los Cardones S.A. (PRIMARY)
+         ID: 9019041628
+         CUIT: 30-61627002-4
+         Labels: Primary
+      2. Maria Florencia Peña - Estudio (ACCOUNTANT)
+         ID: 36677604781
+         CUIT: 27051982040
+         Labels: Estudio Contable / Asesor / Consultor Externo del negocio
+
+24. Deal: 31307- Agua Mansa Inversora S.A. - Nuevo tipo de objeto Deal
+   ID: 40768589852
+   Amount: $75346
+   Close Date: 2025-07-24T00:00:00Z
+   ID Empresa: 31307
+   Associated Companies: 2
+   ❌ No Primary Company Set
+   🏢 All Associated Companies:
+      1. 31307 - Agua Mansa Inversora S.A.
+         ID: 9019050393
+         CUIT: 30-61683976-0
+      2. Maria Florencia Peña - Estudio (ACCOUNTANT)
+         ID: 36677604781
+         CUIT: 27051982040
+         Labels: Estudio Contable / Asesor / Consultor Externo del negocio
+
+25. Deal: 31308 - Ombú Consulting Services S.A.- Nuevo tipo de objeto Deal
+   ID: 40767451052
+   Amount: $75346
+   Close Date: 2025-07-24T00:00:00Z
+   ID Empresa: 31308
+   Associated Companies: 2
+   ❌ No Primary Company Set
+   🏢 All Associated Companies:
+      1. 31308 - Ombú Consulting Services S.A.
+         ID: 9019095822
+         CUIT: 30-60720870-7
+      2. Maria Florencia Peña - Estudio (ACCOUNTANT)
+         ID: 36677604781
+         CUIT: 27051982040
+         Labels: Estudio Contable / Asesor / Consultor Externo del negocio
+
+26. Deal: 28253 - Delsesenta S.A. - Nuevo tipo de objeto Deal
+   ID: 40768591499
+   Amount: $88900
+   Close Date: 2025-07-24T14:46:21.098Z
+   ID Empresa: 28253
+   Associated Companies: 2
+   📌 Current Primary: Maria Florencia Peña - Estudio
+      CUIT: 27051982040
+   🏢 All Associated Companies:
+      1. 28253 - Delsesenta S.A.
+         ID: 9018884788
+         CUIT: 30-70741555-6
+         Labels: Compañía con Múltiples Negocios
+      2. Maria Florencia Peña - Estudio (PRIMARY, ACCOUNTANT)
+         ID: 36677604781
+         CUIT: 27051982040
+         Labels: Estudio Contable / Asesor / Consultor Externo del negocio, Primary
+
+27. Deal: 28565 - Edificadora del Litoral S.A. - Nuevo tipo de objeto Deal
+   ID: 40768592716
+   Amount: $88900
+   Close Date: 2025-07-24T00:00:00Z
+   ID Empresa: 28565
+   Associated Companies: 2
+   📌 Current Primary: Maria Florencia Peña - Estudio
+      CUIT: 27051982040
+   🏢 All Associated Companies:
+      1. 28565 - Edificadora del Litoral S.A.
+         ID: 9019049596
+         CUIT: 30-58259270-1
+      2. Maria Florencia Peña - Estudio (PRIMARY, ACCOUNTANT)
+         ID: 36677604781
+         CUIT: 27051982040
+         Labels: Primary, Estudio Contable / Asesor / Consultor Externo del negocio
+
+28. Deal: 31306 - Menta Inversiones S.A.- Nuevo tipo de objeto Deal
+   ID: 40767455412
+   Amount: $88900
+   Close Date: 2025-07-24T00:00:00Z
+   ID Empresa: 31306
+   Associated Companies: 2
+   ❌ No Primary Company Set
+   🏢 All Associated Companies:
+      1. 31306 - Menta Inversiones S.A.
+         ID: 9019062704
+         CUIT: 30-61925434-8
+      2. Maria Florencia Peña - Estudio (ACCOUNTANT)
+         ID: 36677604781
+         CUIT: 27051982040
+         Labels: Estudio Contable / Asesor / Consultor Externo del negocio
+
+29. Deal: 28306 - Fundación Retama - Nuevo tipo de objeto Deal
+   ID: 40768596124
+   Amount: $88900
+   Close Date: 2025-07-24T15:11:34.292Z
+   ID Empresa: 28306
+   Associated Companies: 2
+   📌 Current Primary: Maria Florencia Peña - Estudio
+      CUIT: 27051982040
+   🏢 All Associated Companies:
+      1. 28306 - Fundación Retama
+         ID: 9018869140
+         CUIT: 30-70711606-0
+         Labels: Compañía con Múltiples Negocios
+      2. Maria Florencia Peña - Estudio (PRIMARY, ACCOUNTANT)
+         ID: 36677604781
+         CUIT: 27051982040
+         Labels: Estudio Contable / Asesor / Consultor Externo del negocio, Primary
+
+30. Deal: 56729 - Pestow SA - Nuevo tipo de objeto Deal
+   ID: 40768597001
+   Amount: $88900
+   Close Date: 2025-07-24T00:00:00Z
+   ID Empresa: 56729
+   Associated Companies: 2
+   ❌ No Primary Company Set
+   🏢 All Associated Companies:
+      1. 56729 - Pestow SA
+         ID: 9018832169
+         CUIT: 20-23261733-1
+      2. Maria Florencia Peña - Estudio (ACCOUNTANT)
+         ID: 36677604781
+         CUIT: 27051982040
+         Labels: Estudio Contable / Asesor / Consultor Externo del negocio
+
+31. Deal: 36987 - RG - Nuevo tipo de objeto Deal
+   ID: 40768598096
+   Amount: $88900
+   Close Date: 2025-07-24T00:00:00Z
+   ID Empresa: 36987
+   Associated Companies: 2
+   ❌ No Primary Company Set
+   🏢 All Associated Companies:
+      1. 36987 - RG
+         ID: 9018884787
+         CUIT: 20-17405134-9
+      2. Maria Florencia Peña - Estudio (ACCOUNTANT)
+         ID: 36677604781
+         CUIT: 27051982040
+         Labels: Estudio Contable / Asesor / Consultor Externo del negocio
+
+32. Deal: 36985 - IG - Nuevo tipo de objeto Deal
+   ID: 40768598819
+   Amount: $88900
+   Close Date: 2025-07-24T00:00:00Z
+   ID Empresa: 36985
+   Associated Companies: 2
+   ❌ No Primary Company Set
+   🏢 All Associated Companies:
+      1. 36985 - IG
+         ID: 9018898816
+         CUIT: 27-05198204-0
+      2. Maria Florencia Peña - Estudio (ACCOUNTANT)
+         ID: 36677604781
+         CUIT: 27051982040
+         Labels: Estudio Contable / Asesor / Consultor Externo del negocio
+
+33. Deal: 36989 - DG- Nuevo tipo de objeto Deal
+   ID: 40767459373
+   Amount: $88900
+   Close Date: 2025-07-24T00:00:00Z
+   ID Empresa: 36989
+   Associated Companies: 2
+   ❌ No Primary Company Set
+   🏢 All Associated Companies:
+      1. 36989 - DG
+         ID: 9018827277
+         CUIT: 20-16938183-7
+      2. Maria Florencia Peña - Estudio (ACCOUNTANT)
+         ID: 36677604781
+         CUIT: 27051982040
+         Labels: Estudio Contable / Asesor / Consultor Externo del negocio
+
+34. Deal: 36984 - AG - Nuevo tipo de objeto Deal
+   ID: 40768600328
+   Amount: $88900
+   Close Date: 2025-07-24T00:00:00Z
+   ID Empresa: 36984
+   Associated Companies: 2
+   ❌ No Primary Company Set
+   🏢 All Associated Companies:
+      1. 36984 - AG
+         ID: 9018898204
+         CUIT: 20-20384595-3
+      2. Maria Florencia Peña - Estudio (ACCOUNTANT)
+         ID: 36677604781
+         CUIT: 27051982040
+         Labels: Estudio Contable / Asesor / Consultor Externo del negocio
+
+35. Deal: 62732- DG Uruguay - Nuevo tipo de objeto Deal
+   ID: 40767460765
+   Amount: $88900
+   Close Date: 2025-07-24T00:00:00Z
+   ID Empresa: 62732
+   Associated Companies: 2
+   ❌ No Primary Company Set
+   🏢 All Associated Companies:
+      1. 62732 - DG Uruguay
+         ID: 9018837369
+         CUIT: 20-16938183-7
+      2. Maria Florencia Peña - Estudio (ACCOUNTANT)
+         ID: 36677604781
+         CUIT: 27051982040
+         Labels: Estudio Contable / Asesor / Consultor Externo del negocio
+
+36. Deal: 62780 Pestow SA en ROU - Nuevo tipo de objeto Deal
+   ID: 40768601653
+   Amount: $88900
+   Close Date: 2025-07-24T00:00:00Z
+   ID Empresa: 62780
+   Associated Companies: 2
+   ❌ No Primary Company Set
+   🏢 All Associated Companies:
+      1. 62780 - Pestow SA en ROU
+         ID: 9018825004
+         CUIT: 30-70794988-7
+      2. Maria Florencia Peña - Estudio (ACCOUNTANT)
+         ID: 36677604781
+         CUIT: 27051982040
+         Labels: Estudio Contable / Asesor / Consultor Externo del negocio
+
+37. Deal: 74384 - Parkcorp Inc - Nuevo tipo de objeto Deal
+   ID: 40767462053
+   Amount: $88900
+   Close Date: 2025-07-24T00:00:00Z
+   ID Empresa: 74384
+   Associated Companies: 2
+   ❌ No Primary Company Set
+   🏢 All Associated Companies:
+      1. 74384 - Parkcorp Inc
+         ID: 16365680512
+         CUIT: 27-30083994-6
+      2. Maria Florencia Peña - Estudio (ACCOUNTANT)
+         ID: 36677604781
+         CUIT: 27051982040
+         Labels: Estudio Contable / Asesor / Consultor Externo del negocio
+
+38. Deal: 74385 - Tacal Capital Corp - Nuevo tipo de objeto Deal
+   ID: 40768603037
+   Amount: $88900
+   Close Date: 2025-07-24T00:00:00Z
+   ID Empresa: 74385
+   Associated Companies: 2
+   ❌ No Primary Company Set
+   🏢 All Associated Companies:
+      1. 74385 - Tacal Capital Corp
+         ID: 16366754946
+         CUIT: 27-30083994-6
+      2. Maria Florencia Peña - Estudio (ACCOUNTANT)
+         ID: 36677604781
+         CUIT: 27051982040
+         Labels: Estudio Contable / Asesor / Consultor Externo del negocio
+
+39. Deal: 74386 - Mounton Inc - Nuevo tipo de objeto Deal
+   ID: 40767463596
+   Amount: $88900
+   Close Date: 2025-07-24T00:00:00Z
+   ID Empresa: 74386
+   Associated Companies: 2
+   ❌ No Primary Company Set
+   🏢 All Associated Companies:
+      1. 74386 - Mounton Inc
+         ID: 16366074179
+         CUIT: 27-30083994-6
+      2. Maria Florencia Peña - Estudio (ACCOUNTANT)
+         ID: 36677604781
+         CUIT: 27051982040
+         Labels: Estudio Contable / Asesor / Consultor Externo del negocio
+
+40. Deal: 93615 - IK
+   ID: 40767464372
+   Amount: $88900
+   Close Date: 2025-07-24T15:56:25.614Z
+   ID Empresa: 93615
+   Associated Companies: 2
+   📌 Current Primary: 93615 - IK
+      CUIT: NOT SET
+   🏢 All Associated Companies:
+      1. Maria Florencia Peña - Estudio (ACCOUNTANT)
+         ID: 36677604781
+         CUIT: 27051982040
+         Labels: Estudio Contable / Asesor / Consultor Externo del negocio
+      2. 93615 - IK (PRIMARY)
+         ID: 36696516366
+         CUIT: NOT SET
+         Labels: Primary
+
+41. Deal: 36988 - GK -
+   ID: 40981997240
+   Amount: $88900
+   Close Date: 2025-07-28T00:00:00Z
+   ID Empresa: 36988
+   Associated Companies: 2
+   ❌ No Primary Company Set
+   🏢 All Associated Companies:
+      1. 36988 - GK
+         ID: 9019070022
+         CUIT: 20-14391779-8
+      2. Maria Florencia Peña - Estudio (ACCOUNTANT)
+         ID: 36677604781
+         CUIT: 27051982040
+         Labels: Estudio Contable / Asesor / Consultor Externo del negocio
+
+
+🕵️ IDENTIFYING ACCOUNTANT PATTERNS:
+================================================================================
+
+📈 COMPANY FREQUENCY ANALYSIS:
+--------------------------------------------------------------------------------
+
+🏢 Maria Florencia Peña - Estudio
+   ID: 36677604781
+   CUIT: 27051982040
+   Associated Deals: 27
+   Primary in: 9 deals
+   Likely Accountant: YES
+   ✅ RECOMMENDATION: This appears to be an accountant serving multiple clients
+
+🏢 Contador Alejandro Perez
+   ID: 36234110609
+   CUIT: La empresa identificada es AP Consultores. No se dispone de información suficiente para sugerir un CUIT en formato estándar.
+   Associated Deals: 9
+   Primary in: 1 deals
+   Likely Accountant: YES
+   ✅ RECOMMENDATION: This appears to be an accountant serving multiple clients
+
+🏢 87624 - GLAM FILMS SA
+   ID: 22621974713
+   CUIT: 33-70979693-9
+   Associated Deals: 3
+   Primary in: 2 deals
+   Likely Accountant: NO
+
+🏢 51913 - FINCA
+   ID: 9019062832
+   CUIT: 20-28262488-6
+   Associated Deals: 1
+   Primary in: 0 deals
+   Likely Accountant: NO
+
+🏢 94778 - ALEJANDRO NICOLAS PEREZ
+   ID: 36233955731
+   CUIT: 20357299277
+   Associated Deals: 1
+   Primary in: 1 deals
+   Likely Accountant: NO
+
+🏢 94779 - GORUKA
+   ID: 36215126794
+   CUIT: 30-71466969-5
+   Associated Deals: 1
+   Primary in: 0 deals
+   Likely Accountant: NO
+
+🏢 94848 - GORUKA
+   ID: 36280577679
+   CUIT: 30-71466969-5
+   Associated Deals: 1
+   Primary in: 1 deals
+   Likely Accountant: NO
+
+🏢 94849 - NANDALE
+   ID: 36247900198
+   CUIT: 33-71843787-9
+   Associated Deals: 1
+   Primary in: 1 deals
+   Likely Accountant: NO
+
+🏢 94850 - XFIT
+   ID: 36246053187
+   CUIT: 30-71202128-0
+   Associated Deals: 1
+   Primary in: 1 deals
+   Likely Accountant: NO
+
+🏢 94852 - WOD
+   ID: 36281040993
+   CUIT: 30-71233946-9
+   Associated Deals: 1
+   Primary in: 1 deals
+   Likely Accountant: NO
+
+🏢 94853 - TKL
+   ID: 36281195695
+   CUIT: 33-71472274-9
+   Associated Deals: 1
+   Primary in: 1 deals
+   Likely Accountant: NO
+
+🏢 94856 - TRAINING SPORTS
+   ID: 36264958886
+   CUIT: 30-71598130-7
+   Associated Deals: 1
+   Primary in: 1 deals
+   Likely Accountant: NO
+
+🏢 94857 - LAPECAS
+   ID: 36255208857
+   CUIT: 30-71691259-7
+   Associated Deals: 1
+   Primary in: 1 deals
+   Likely Accountant: NO
+
+🏢 75356 - ROOTS EOR
+   ID: 16924201522
+   CUIT: 30-71572745-1
+   Associated Deals: 1
+   Primary in: 1 deals
+   Likely Accountant: NO
+
+🏢 18355 BARLOW LIMITED
+   ID: 9018875255
+   CUIT: 20-23261733-1
+   Associated Deals: 1
+   Primary in: 0 deals
+   Likely Accountant: NO
+
+🏢 18459 WAINSCOTT LIMITED
+   ID: 9019070019
+   CUIT: 20-23261733-1
+   Associated Deals: 1
+   Primary in: 0 deals
+   Likely Accountant: NO
+
+🏢 18460 ELM LIMITED
+   ID: 9019106360
+   CUIT: 20-23261733-1
+   Associated Deals: 1
+   Primary in: 0 deals
+   Likely Accountant: NO
+
+🏢 18009 FINCH LIMITED
+   ID: 9019035648
+   CUIT: 20-23261733-1
+   Associated Deals: 1
+   Primary in: 0 deals
+   Likely Accountant: NO
+
+🏢 18461 GEO PRIVATE INVESTMENTS LTD
+   ID: 9019036258
+   CUIT: 20-23261733-1
+   Associated Deals: 1
+   Primary in: 1 deals
+   Likely Accountant: NO
+
+🏢 18462 GIO INTERNATIONAL LLC
+   ID: 9019106357
+   CUIT: 20-23261733-1
+   Associated Deals: 1
+   Primary in: 0 deals
+   Likely Accountant: NO
+
+🏢 18458 - HALSEY LIMITED
+   ID: 18458799183
+   CUIT: 20-23261733-1
+   Associated Deals: 1
+   Primary in: 0 deals
+   Likely Accountant: NO
+
+🏢 18463 NEWMORE HOLDING LTD
+   ID: 9019082890
+   CUIT: 20-23261733-1
+   Associated Deals: 1
+   Primary in: 0 deals
+   Likely Accountant: NO
+
+🏢 25576 Los Cardones S.A.
+   ID: 9019041628
+   CUIT: 30-61627002-4
+   Associated Deals: 1
+   Primary in: 1 deals
+   Likely Accountant: NO
+
+🏢 31307 - Agua Mansa Inversora S.A.
+   ID: 9019050393
+   CUIT: 30-61683976-0
+   Associated Deals: 1
+   Primary in: 0 deals
+   Likely Accountant: NO
+
+🏢 31308 - Ombú Consulting Services S.A.
+   ID: 9019095822
+   CUIT: 30-60720870-7
+   Associated Deals: 1
+   Primary in: 0 deals
+   Likely Accountant: YES
+
+🏢 28253 - Delsesenta S.A.
+   ID: 9018884788
+   CUIT: 30-70741555-6
+   Associated Deals: 1
+   Primary in: 0 deals
+   Likely Accountant: NO
+
+🏢 28565 - Edificadora del Litoral S.A.
+   ID: 9019049596
+   CUIT: 30-58259270-1
+   Associated Deals: 1
+   Primary in: 0 deals
+   Likely Accountant: NO
+
+🏢 31306 - Menta Inversiones S.A.
+   ID: 9019062704
+   CUIT: 30-61925434-8
+   Associated Deals: 1
+   Primary in: 0 deals
+   Likely Accountant: NO
+
+🏢 28306 - Fundación Retama
+   ID: 9018869140
+   CUIT: 30-70711606-0
+   Associated Deals: 1
+   Primary in: 0 deals
+   Likely Accountant: NO
+
+🏢 56729 - Pestow SA
+   ID: 9018832169
+   CUIT: 20-23261733-1
+   Associated Deals: 1
+   Primary in: 0 deals
+   Likely Accountant: NO
+
+🏢 36987 - RG
+   ID: 9018884787
+   CUIT: 20-17405134-9
+   Associated Deals: 1
+   Primary in: 0 deals
+   Likely Accountant: NO
+
+🏢 36985 - IG
+   ID: 9018898816
+   CUIT: 27-05198204-0
+   Associated Deals: 1
+   Primary in: 0 deals
+   Likely Accountant: NO
+
+🏢 36989 - DG
+   ID: 9018827277
+   CUIT: 20-16938183-7
+   Associated Deals: 1
+   Primary in: 0 deals
+   Likely Accountant: NO
+
+🏢 36984 - AG
+   ID: 9018898204
+   CUIT: 20-20384595-3
+   Associated Deals: 1
+   Primary in: 0 deals
+   Likely Accountant: NO
+
+🏢 62732 - DG Uruguay
+   ID: 9018837369
+   CUIT: 20-16938183-7
+   Associated Deals: 1
+   Primary in: 0 deals
+   Likely Accountant: NO
+
+🏢 62780 - Pestow SA en ROU
+   ID: 9018825004
+   CUIT: 30-70794988-7
+   Associated Deals: 1
+   Primary in: 0 deals
+   Likely Accountant: NO
+
+🏢 74384 - Parkcorp Inc
+   ID: 16365680512
+   CUIT: 27-30083994-6
+   Associated Deals: 1
+   Primary in: 0 deals
+   Likely Accountant: NO
+
+🏢 74385 - Tacal Capital Corp
+   ID: 16366754946
+   CUIT: 27-30083994-6
+   Associated Deals: 1
+   Primary in: 0 deals
+   Likely Accountant: NO
+
+🏢 74386 - Mounton Inc
+   ID: 16366074179
+   CUIT: 27-30083994-6
+   Associated Deals: 1
+   Primary in: 0 deals
+   Likely Accountant: NO
+
+🏢 93615 - IK
+   ID: 36696516366
+   CUIT: NOT SET
+   Associated Deals: 1
+   Primary in: 1 deals
+   Likely Accountant: NO
+
+🏢 36988 - GK
+   ID: 9019070022
+   CUIT: 20-14391779-8
+   Associated Deals: 1
+   Primary in: 0 deals
+   Likely Accountant: NO
+
+
+💡 DEAL-SPECIFIC RECOMMENDATIONS:
+================================================================================
+
+📄 Deal: 51913 - FINCA - Nuevo tipo de objeto Deal (ID: 39665888882)
+   ⚠️  NO CLEAR ACCOUNTANT IDENTIFIED
+   Associated Companies:
+     - 51913 - FINCA
+
+📄 Deal: 87624 - GLAM FILMS SA (ID: 39867108669)
+   🔄 CHANGE RECOMMENDED
+      Current Primary: NONE
+      Recommended Primary: 87624 - GLAM FILMS SA (Accountant by name)
+      Reason: Accountant pattern in name
+
+📄 Deal: 69964 - GIZMO ANIMATION LTD (ID: 39867109190)
+   ✅ CURRENT SETUP IS CORRECT
+      Primary: 87624 - GLAM FILMS SA (Accountant by name)
+
+📄 Deal: 69963 - GIZMO ANIMATION LLC (ID: 39867109517)
+   ✅ CURRENT SETUP IS CORRECT
+      Primary: 87624 - GLAM FILMS SA (Accountant by name)
+
+📄 Deal: 94778 - ALEJANDRO NICOLAS PEREZ (ID: 40277332091)
+   🔄 CHANGE RECOMMENDED
+      Current Primary: 94778 - ALEJANDRO NICOLAS PEREZ
+      Recommended Primary: Contador Alejandro Perez (Accountant)
+      Reason: Company labeled as 'Estudio Contable/Asesor/Consultor Externo'
+      Customer Companies:
+        - 94778 - ALEJANDRO NICOLAS PEREZ
+
+📄 Deal: 94779 - GORUKA (ID: 40193585423)
+   ✅ CURRENT SETUP IS CORRECT
+      Primary: Contador Alejandro Perez (Accountant)
+
+📄 Deal: 94848 - GORUKA (ID: 40272444002)
+   🔄 CHANGE RECOMMENDED
+      Current Primary: 94848 - GORUKA
+      Recommended Primary: Contador Alejandro Perez (Accountant)
+      Reason: Company labeled as 'Estudio Contable/Asesor/Consultor Externo'
+      Customer Companies:
+        - 94848 - GORUKA
+
+📄 Deal: 94849 - NANDALE (ID: 40274308013)
+   🔄 CHANGE RECOMMENDED
+      Current Primary: 94849 - NANDALE
+      Recommended Primary: Contador Alejandro Perez (Accountant)
+      Reason: Company labeled as 'Estudio Contable/Asesor/Consultor Externo'
+      Customer Companies:
+        - 94849 - NANDALE
+
+📄 Deal: 94850 - XFIT (ID: 40260209460)
+   🔄 CHANGE RECOMMENDED
+      Current Primary: 94850 - XFIT
+      Recommended Primary: Contador Alejandro Perez (Accountant)
+      Reason: Company labeled as 'Estudio Contable/Asesor/Consultor Externo'
+      Customer Companies:
+        - 94850 - XFIT
+
+📄 Deal: 94852 - WOD (ID: 40273281699)
+   🔄 CHANGE RECOMMENDED
+      Current Primary: 94852 - WOD
+      Recommended Primary: Contador Alejandro Perez (Accountant)
+      Reason: Company labeled as 'Estudio Contable/Asesor/Consultor Externo'
+      Customer Companies:
+        - 94852 - WOD
+
+📄 Deal: 94853 - TKL (ID: 40274833236)
+   🔄 CHANGE RECOMMENDED
+      Current Primary: 94853 - TKL
+      Recommended Primary: Contador Alejandro Perez (Accountant)
+      Reason: Company labeled as 'Estudio Contable/Asesor/Consultor Externo'
+      Customer Companies:
+        - 94853 - TKL
+
+📄 Deal: 94856 - TRAINING SPORTS (ID: 40274136338)
+   🔄 CHANGE RECOMMENDED
+      Current Primary: 94856 - TRAINING SPORTS
+      Recommended Primary: Contador Alejandro Perez (Accountant)
+      Reason: Company labeled as 'Estudio Contable/Asesor/Consultor Externo'
+      Customer Companies:
+        - 94856 - TRAINING SPORTS
+
+📄 Deal: 94857 - LAPECAS (ID: 40272475303)
+   🔄 CHANGE RECOMMENDED
+      Current Primary: 94857 - LAPECAS
+      Recommended Primary: Contador Alejandro Perez (Accountant)
+      Reason: Company labeled as 'Estudio Contable/Asesor/Consultor Externo'
+      Customer Companies:
+        - 94857 - LAPECAS
+
+📄 Deal: 75356 - ROOTS EOR - (ID: 40573683800)
+   ⚠️  NO CLEAR ACCOUNTANT IDENTIFIED
+   Associated Companies:
+     - 75356 - ROOTS EOR (PRIMARY)
+
+📄 Deal: 18355 - Barlow Limited - (ID: 40759344814)
+   ✅ CURRENT SETUP IS CORRECT
+      Primary: Maria Florencia Peña - Estudio (Accountant)
+
+📄 Deal: 18459 - WAINSCOTT LIMITED (ID: 40759346358)
+   ✅ CURRENT SETUP IS CORRECT
+      Primary: Maria Florencia Peña - Estudio (Accountant)
+
+📄 Deal: 18460 - ELM LIMITED (ID: 40750609974)
+   ✅ CURRENT SETUP IS CORRECT
+      Primary: Maria Florencia Peña - Estudio (Accountant)
+
+📄 Deal: 18009 - FINCH LIMITED (ID: 40750610808)
+   ✅ CURRENT SETUP IS CORRECT
+      Primary: Maria Florencia Peña - Estudio (Accountant)
+
+📄 Deal: 18461 - GEO PRIVATE INVESTMENTS LTD - (ID: 40762192528)
+   🔄 CHANGE RECOMMENDED
+      Current Primary: 18461 GEO PRIVATE INVESTMENTS LTD
+      Recommended Primary: Maria Florencia Peña - Estudio (Accountant)
+      Reason: Company labeled as 'Estudio Contable/Asesor/Consultor Externo'
+      Customer Companies:
+        - 18461 GEO PRIVATE INVESTMENTS LTD
+
+📄 Deal: 18462 - GIO INTERNATIONAL LLC - (ID: 40767446558)
+   ✅ CURRENT SETUP IS CORRECT
+      Primary: Maria Florencia Peña - Estudio (Accountant)
+
+📄 Deal: 18458 - HALSEY LIMITED - Nuevo tipo de objeto Deal (ID: 40767447415)
+   🔄 CHANGE RECOMMENDED
+      Current Primary: NONE
+      Recommended Primary: Maria Florencia Peña - Estudio (Accountant)
+      Reason: Company labeled as 'Estudio Contable/Asesor/Consultor Externo'
+      Customer Companies:
+        - 18458 - HALSEY LIMITED
+
+📄 Deal: 18463 - NEWMORE HOLDING LTD - Nuevo tipo de objeto Deal (ID: 40767448389)
+   ✅ CURRENT SETUP IS CORRECT
+      Primary: Maria Florencia Peña - Estudio (Accountant)
+
+📄 Deal: 25576 - Los Cardones SA - Nuevo tipo de objeto Deal (ID: 40767449375)
+   🔄 CHANGE RECOMMENDED
+      Current Primary: 25576 Los Cardones S.A.
+      Recommended Primary: Maria Florencia Peña - Estudio (Accountant)
+      Reason: Company labeled as 'Estudio Contable/Asesor/Consultor Externo'
+      Customer Companies:
+        - 25576 Los Cardones S.A.
+
+📄 Deal: 31307- Agua Mansa Inversora S.A. - Nuevo tipo de objeto Deal (ID: 40768589852)
+   🔄 CHANGE RECOMMENDED
+      Current Primary: NONE
+      Recommended Primary: Maria Florencia Peña - Estudio (Accountant)
+      Reason: Company labeled as 'Estudio Contable/Asesor/Consultor Externo'
+      Customer Companies:
+        - 31307 - Agua Mansa Inversora S.A.
+
+📄 Deal: 31308 - Ombú Consulting Services S.A.- Nuevo tipo de objeto Deal (ID: 40767451052)
+   🔄 CHANGE RECOMMENDED
+      Current Primary: NONE
+      Recommended Primary: Maria Florencia Peña - Estudio (Accountant)
+      Reason: Company labeled as 'Estudio Contable/Asesor/Consultor Externo'
+      Customer Companies:
+        - 31308 - Ombú Consulting Services S.A.
+
+📄 Deal: 28253 - Delsesenta S.A. - Nuevo tipo de objeto Deal (ID: 40768591499)
+   ✅ CURRENT SETUP IS CORRECT
+      Primary: Maria Florencia Peña - Estudio (Accountant)
+
+📄 Deal: 28565 - Edificadora del Litoral S.A. - Nuevo tipo de objeto Deal (ID: 40768592716)
+   ✅ CURRENT SETUP IS CORRECT
+      Primary: Maria Florencia Peña - Estudio (Accountant)
+
+📄 Deal: 31306 - Menta Inversiones S.A.- Nuevo tipo de objeto Deal (ID: 40767455412)
+   🔄 CHANGE RECOMMENDED
+      Current Primary: NONE
+      Recommended Primary: Maria Florencia Peña - Estudio (Accountant)
+      Reason: Company labeled as 'Estudio Contable/Asesor/Consultor Externo'
+      Customer Companies:
+        - 31306 - Menta Inversiones S.A.
+
+📄 Deal: 28306 - Fundación Retama - Nuevo tipo de objeto Deal (ID: 40768596124)
+   ✅ CURRENT SETUP IS CORRECT
+      Primary: Maria Florencia Peña - Estudio (Accountant)
+
+📄 Deal: 56729 - Pestow SA - Nuevo tipo de objeto Deal (ID: 40768597001)
+   🔄 CHANGE RECOMMENDED
+      Current Primary: NONE
+      Recommended Primary: Maria Florencia Peña - Estudio (Accountant)
+      Reason: Company labeled as 'Estudio Contable/Asesor/Consultor Externo'
+      Customer Companies:
+        - 56729 - Pestow SA
+
+📄 Deal: 36987 - RG - Nuevo tipo de objeto Deal (ID: 40768598096)
+   🔄 CHANGE RECOMMENDED
+      Current Primary: NONE
+      Recommended Primary: Maria Florencia Peña - Estudio (Accountant)
+      Reason: Company labeled as 'Estudio Contable/Asesor/Consultor Externo'
+      Customer Companies:
+        - 36987 - RG
+
+📄 Deal: 36985 - IG - Nuevo tipo de objeto Deal (ID: 40768598819)
+   🔄 CHANGE RECOMMENDED
+      Current Primary: NONE
+      Recommended Primary: Maria Florencia Peña - Estudio (Accountant)
+      Reason: Company labeled as 'Estudio Contable/Asesor/Consultor Externo'
+      Customer Companies:
+        - 36985 - IG
+
+📄 Deal: 36989 - DG- Nuevo tipo de objeto Deal (ID: 40767459373)
+   🔄 CHANGE RECOMMENDED
+      Current Primary: NONE
+      Recommended Primary: Maria Florencia Peña - Estudio (Accountant)
+      Reason: Company labeled as 'Estudio Contable/Asesor/Consultor Externo'
+      Customer Companies:
+        - 36989 - DG
+
+📄 Deal: 36984 - AG - Nuevo tipo de objeto Deal (ID: 40768600328)
+   🔄 CHANGE RECOMMENDED
+      Current Primary: NONE
+      Recommended Primary: Maria Florencia Peña - Estudio (Accountant)
+      Reason: Company labeled as 'Estudio Contable/Asesor/Consultor Externo'
+      Customer Companies:
+        - 36984 - AG
+
+📄 Deal: 62732- DG Uruguay - Nuevo tipo de objeto Deal (ID: 40767460765)
+   🔄 CHANGE RECOMMENDED
+      Current Primary: NONE
+      Recommended Primary: Maria Florencia Peña - Estudio (Accountant)
+      Reason: Company labeled as 'Estudio Contable/Asesor/Consultor Externo'
+      Customer Companies:
+        - 62732 - DG Uruguay
+
+📄 Deal: 62780 Pestow SA en ROU - Nuevo tipo de objeto Deal (ID: 40768601653)
+   🔄 CHANGE RECOMMENDED
+      Current Primary: NONE
+      Recommended Primary: Maria Florencia Peña - Estudio (Accountant)
+      Reason: Company labeled as 'Estudio Contable/Asesor/Consultor Externo'
+      Customer Companies:
+        - 62780 - Pestow SA en ROU
+
+📄 Deal: 74384 - Parkcorp Inc - Nuevo tipo de objeto Deal (ID: 40767462053)
+   🔄 CHANGE RECOMMENDED
+      Current Primary: NONE
+      Recommended Primary: Maria Florencia Peña - Estudio (Accountant)
+      Reason: Company labeled as 'Estudio Contable/Asesor/Consultor Externo'
+      Customer Companies:
+        - 74384 - Parkcorp Inc
+
+📄 Deal: 74385 - Tacal Capital Corp - Nuevo tipo de objeto Deal (ID: 40768603037)
+   🔄 CHANGE RECOMMENDED
+      Current Primary: NONE
+      Recommended Primary: Maria Florencia Peña - Estudio (Accountant)
+      Reason: Company labeled as 'Estudio Contable/Asesor/Consultor Externo'
+      Customer Companies:
+        - 74385 - Tacal Capital Corp
+
+📄 Deal: 74386 - Mounton Inc - Nuevo tipo de objeto Deal (ID: 40767463596)
+   🔄 CHANGE RECOMMENDED
+      Current Primary: NONE
+      Recommended Primary: Maria Florencia Peña - Estudio (Accountant)
+      Reason: Company labeled as 'Estudio Contable/Asesor/Consultor Externo'
+      Customer Companies:
+        - 74386 - Mounton Inc
+
+📄 Deal: 93615 - IK (ID: 40767464372)
+   🔄 CHANGE RECOMMENDED
+      Current Primary: 93615 - IK
+      Recommended Primary: Maria Florencia Peña - Estudio (Accountant)
+      Reason: Company labeled as 'Estudio Contable/Asesor/Consultor Externo'
+      Customer Companies:
+        - 93615 - IK
+
+📄 Deal: 36988 - GK - (ID: 40981997240)
+   🔄 CHANGE RECOMMENDED
+      Current Primary: NONE
+      Recommended Primary: Maria Florencia Peña - Estudio (Accountant)
+      Reason: Company labeled as 'Estudio Contable/Asesor/Consultor Externo'
+      Customer Companies:
+        - 36988 - GK
+
+
+📋 SUMMARY OF RECOMMENDED CHANGES:
+================================================================================
+Total Deals to Update: 27
+
+1. Deal: 87624 - GLAM FILMS SA
+   Deal ID: 39867108669
+   Current Primary: NONE
+   → Change to: 87624 - GLAM FILMS SA
+   Reason: Accountant pattern in name
+
+2. Deal: 94778 - ALEJANDRO NICOLAS PEREZ
+   Deal ID: 40277332091
+   Current Primary: 94778 - ALEJANDRO NICOLAS PEREZ
+   → Change to: Contador Alejandro Perez
+   Reason: Company labeled as 'Estudio Contable/Asesor/Consultor Externo'
+
+3. Deal: 94848 - GORUKA
+   Deal ID: 40272444002
+   Current Primary: 94848 - GORUKA
+   → Change to: Contador Alejandro Perez
+   Reason: Company labeled as 'Estudio Contable/Asesor/Consultor Externo'
+
+4. Deal: 94849 - NANDALE
+   Deal ID: 40274308013
+   Current Primary: 94849 - NANDALE
+   → Change to: Contador Alejandro Perez
+   Reason: Company labeled as 'Estudio Contable/Asesor/Consultor Externo'
+
+5. Deal: 94850 - XFIT
+   Deal ID: 40260209460
+   Current Primary: 94850 - XFIT
+   → Change to: Contador Alejandro Perez
+   Reason: Company labeled as 'Estudio Contable/Asesor/Consultor Externo'
+
+6. Deal: 94852 - WOD
+   Deal ID: 40273281699
+   Current Primary: 94852 - WOD
+   → Change to: Contador Alejandro Perez
+   Reason: Company labeled as 'Estudio Contable/Asesor/Consultor Externo'
+
+7. Deal: 94853 - TKL
+   Deal ID: 40274833236
+   Current Primary: 94853 - TKL
+   → Change to: Contador Alejandro Perez
+   Reason: Company labeled as 'Estudio Contable/Asesor/Consultor Externo'
+
+8. Deal: 94856 - TRAINING SPORTS
+   Deal ID: 40274136338
+   Current Primary: 94856 - TRAINING SPORTS
+   → Change to: Contador Alejandro Perez
+   Reason: Company labeled as 'Estudio Contable/Asesor/Consultor Externo'
+
+9. Deal: 94857 - LAPECAS
+   Deal ID: 40272475303
+   Current Primary: 94857 - LAPECAS
+   → Change to: Contador Alejandro Perez
+   Reason: Company labeled as 'Estudio Contable/Asesor/Consultor Externo'
+
+10. Deal: 18461 - GEO PRIVATE INVESTMENTS LTD -
+   Deal ID: 40762192528
+   Current Primary: 18461 GEO PRIVATE INVESTMENTS LTD
+   → Change to: Maria Florencia Peña - Estudio
+   Reason: Company labeled as 'Estudio Contable/Asesor/Consultor Externo'
+
+11. Deal: 18458 - HALSEY LIMITED - Nuevo tipo de objeto Deal
+   Deal ID: 40767447415
+   Current Primary: NONE
+   → Change to: Maria Florencia Peña - Estudio
+   Reason: Company labeled as 'Estudio Contable/Asesor/Consultor Externo'
+
+12. Deal: 25576 - Los Cardones SA - Nuevo tipo de objeto Deal
+   Deal ID: 40767449375
+   Current Primary: 25576 Los Cardones S.A.
+   → Change to: Maria Florencia Peña - Estudio
+   Reason: Company labeled as 'Estudio Contable/Asesor/Consultor Externo'
+
+13. Deal: 31307- Agua Mansa Inversora S.A. - Nuevo tipo de objeto Deal
+   Deal ID: 40768589852
+   Current Primary: NONE
+   → Change to: Maria Florencia Peña - Estudio
+   Reason: Company labeled as 'Estudio Contable/Asesor/Consultor Externo'
+
+14. Deal: 31308 - Ombú Consulting Services S.A.- Nuevo tipo de objeto Deal
+   Deal ID: 40767451052
+   Current Primary: NONE
+   → Change to: Maria Florencia Peña - Estudio
+   Reason: Company labeled as 'Estudio Contable/Asesor/Consultor Externo'
+
+15. Deal: 31306 - Menta Inversiones S.A.- Nuevo tipo de objeto Deal
+   Deal ID: 40767455412
+   Current Primary: NONE
+   → Change to: Maria Florencia Peña - Estudio
+   Reason: Company labeled as 'Estudio Contable/Asesor/Consultor Externo'
+
+16. Deal: 56729 - Pestow SA - Nuevo tipo de objeto Deal
+   Deal ID: 40768597001
+   Current Primary: NONE
+   → Change to: Maria Florencia Peña - Estudio
+   Reason: Company labeled as 'Estudio Contable/Asesor/Consultor Externo'
+
+17. Deal: 36987 - RG - Nuevo tipo de objeto Deal
+   Deal ID: 40768598096
+   Current Primary: NONE
+   → Change to: Maria Florencia Peña - Estudio
+   Reason: Company labeled as 'Estudio Contable/Asesor/Consultor Externo'
+
+18. Deal: 36985 - IG - Nuevo tipo de objeto Deal
+   Deal ID: 40768598819
+   Current Primary: NONE
+   → Change to: Maria Florencia Peña - Estudio
+   Reason: Company labeled as 'Estudio Contable/Asesor/Consultor Externo'
+
+19. Deal: 36989 - DG- Nuevo tipo de objeto Deal
+   Deal ID: 40767459373
+   Current Primary: NONE
+   → Change to: Maria Florencia Peña - Estudio
+   Reason: Company labeled as 'Estudio Contable/Asesor/Consultor Externo'
+
+20. Deal: 36984 - AG - Nuevo tipo de objeto Deal
+   Deal ID: 40768600328
+   Current Primary: NONE
+   → Change to: Maria Florencia Peña - Estudio
+   Reason: Company labeled as 'Estudio Contable/Asesor/Consultor Externo'
+
+21. Deal: 62732- DG Uruguay - Nuevo tipo de objeto Deal
+   Deal ID: 40767460765
+   Current Primary: NONE
+   → Change to: Maria Florencia Peña - Estudio
+   Reason: Company labeled as 'Estudio Contable/Asesor/Consultor Externo'
+
+22. Deal: 62780 Pestow SA en ROU - Nuevo tipo de objeto Deal
+   Deal ID: 40768601653
+   Current Primary: NONE
+   → Change to: Maria Florencia Peña - Estudio
+   Reason: Company labeled as 'Estudio Contable/Asesor/Consultor Externo'
+
+23. Deal: 74384 - Parkcorp Inc - Nuevo tipo de objeto Deal
+   Deal ID: 40767462053
+   Current Primary: NONE
+   → Change to: Maria Florencia Peña - Estudio
+   Reason: Company labeled as 'Estudio Contable/Asesor/Consultor Externo'
+
+24. Deal: 74385 - Tacal Capital Corp - Nuevo tipo de objeto Deal
+   Deal ID: 40768603037
+   Current Primary: NONE
+   → Change to: Maria Florencia Peña - Estudio
+   Reason: Company labeled as 'Estudio Contable/Asesor/Consultor Externo'
+
+25. Deal: 74386 - Mounton Inc - Nuevo tipo de objeto Deal
+   Deal ID: 40767463596
+   Current Primary: NONE
+   → Change to: Maria Florencia Peña - Estudio
+   Reason: Company labeled as 'Estudio Contable/Asesor/Consultor Externo'
+
+26. Deal: 93615 - IK
+   Deal ID: 40767464372
+   Current Primary: 93615 - IK
+   → Change to: Maria Florencia Peña - Estudio
+   Reason: Company labeled as 'Estudio Contable/Asesor/Consultor Externo'
+
+27. Deal: 36988 - GK -
+   Deal ID: 40981997240
+   Current Primary: NONE
+   → Change to: Maria Florencia Peña - Estudio
+   Reason: Company labeled as 'Estudio Contable/Asesor/Consultor Externo'
+
+
+⚠️  CONFIRMATION REQUIRED:
+================================================================================
+These changes will modify the primary company association for the deals listed above.
+Each deal will have its primary company changed to the identified accountant.
+
+To proceed with these changes, you need to:
+1. Review the recommendations above
+2. Confirm you want to make these changes
+3. Run the update script (will be created separately)
+
+💾 Recommendations saved to: referencia_empresa_primary_changes_20250805_205319.json

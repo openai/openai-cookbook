@@ -1,0 +1,245 @@
+[
+  {
+    "deal_id": "39867108669",
+    "deal_name": "87624 - GLAM FILMS SA",
+    "current_primary_id": null,
+    "current_primary_name": null,
+    "recommended_primary_id": "22621974713",
+    "recommended_primary_name": "87624 - GLAM FILMS SA",
+    "reason": "Accountant pattern in name"
+  },
+  {
+    "deal_id": "40277332091",
+    "deal_name": "94778 - ALEJANDRO NICOLAS PEREZ",
+    "current_primary_id": "36233955731",
+    "current_primary_name": "94778 - ALEJANDRO NICOLAS PEREZ",
+    "recommended_primary_id": "36234110609",
+    "recommended_primary_name": "Contador Alejandro Perez",
+    "reason": "Company labeled as 'Estudio Contable/Asesor/Consultor Externo'"
+  },
+  {
+    "deal_id": "40272444002",
+    "deal_name": "94848 - GORUKA",
+    "current_primary_id": "36280577679",
+    "current_primary_name": "94848 - GORUKA",
+    "recommended_primary_id": "36234110609",
+    "recommended_primary_name": "Contador Alejandro Perez",
+    "reason": "Company labeled as 'Estudio Contable/Asesor/Consultor Externo'"
+  },
+  {
+    "deal_id": "40274308013",
+    "deal_name": "94849 - NANDALE",
+    "current_primary_id": "36247900198",
+    "current_primary_name": "94849 - NANDALE",
+    "recommended_primary_id": "36234110609",
+    "recommended_primary_name": "Contador Alejandro Perez",
+    "reason": "Company labeled as 'Estudio Contable/Asesor/Consultor Externo'"
+  },
+  {
+    "deal_id": "40260209460",
+    "deal_name": "94850 - XFIT",
+    "current_primary_id": "36246053187",
+    "current_primary_name": "94850 - XFIT",
+    "recommended_primary_id": "36234110609",
+    "recommended_primary_name": "Contador Alejandro Perez",
+    "reason": "Company labeled as 'Estudio Contable/Asesor/Consultor Externo'"
+  },
+  {
+    "deal_id": "40273281699",
+    "deal_name": "94852 - WOD",
+    "current_primary_id": "36281040993",
+    "current_primary_name": "94852 - WOD",
+    "recommended_primary_id": "36234110609",
+    "recommended_primary_name": "Contador Alejandro Perez",
+    "reason": "Company labeled as 'Estudio Contable/Asesor/Consultor Externo'"
+  },
+  {
+    "deal_id": "40274833236",
+    "deal_name": "94853 - TKL",
+    "current_primary_id": "36281195695",
+    "current_primary_name": "94853 - TKL",
+    "recommended_primary_id": "36234110609",
+    "recommended_primary_name": "Contador Alejandro Perez",
+    "reason": "Company labeled as 'Estudio Contable/Asesor/Consultor Externo'"
+  },
+  {
+    "deal_id": "40274136338",
+    "deal_name": "94856 - TRAINING SPORTS",
+    "current_primary_id": "36264958886",
+    "current_primary_name": "94856 - TRAINING SPORTS",
+    "recommended_primary_id": "36234110609",
+    "recommended_primary_name": "Contador Alejandro Perez",
+    "reason": "Company labeled as 'Estudio Contable/Asesor/Consultor Externo'"
+  },
+  {
+    "deal_id": "40272475303",
+    "deal_name": "94857 - LAPECAS",
+    "current_primary_id": "36255208857",
+    "current_primary_name": "94857 - LAPECAS",
+    "recommended_primary_id": "36234110609",
+    "recommended_primary_name": "Contador Alejandro Perez",
+    "reason": "Company labeled as 'Estudio Contable/Asesor/Consultor Externo'"
+  },
+  {
+    "deal_id": "40762192528",
+    "deal_name": "18461 - GEO PRIVATE INVESTMENTS LTD -",
+    "current_primary_id": "9019036258",
+    "current_primary_name": "18461 GEO PRIVATE INVESTMENTS LTD",
+    "recommended_primary_id": "36677604781",
+    "recommended_primary_name": "Maria Florencia Pe\u00f1a - Estudio",
+    "reason": "Company labeled as 'Estudio Contable/Asesor/Consultor Externo'"
+  },
+  {
+    "deal_id": "40767447415",
+    "deal_name": "18458 - HALSEY LIMITED - Nuevo tipo de objeto Deal",
+    "current_primary_id": null,
+    "current_primary_name": null,
+    "recommended_primary_id": "36677604781",
+    "recommended_primary_name": "Maria Florencia Pe\u00f1a - Estudio",
+    "reason": "Company labeled as 'Estudio Contable/Asesor/Consultor Externo'"
+  },
+  {
+    "deal_id": "40767449375",
+    "deal_name": "25576 - Los Cardones SA - Nuevo tipo de objeto Deal",
+    "current_primary_id": "9019041628",
+    "current_primary_name": "25576 Los Cardones S.A.",
+    "recommended_primary_id": "36677604781",
+    "recommended_primary_name": "Maria Florencia Pe\u00f1a - Estudio",
+    "reason": "Company labeled as 'Estudio Contable/Asesor/Consultor Externo'"
+  },
+  {
+    "deal_id": "40768589852",
+    "deal_name": "31307- Agua Mansa Inversora S.A. - Nuevo tipo de objeto Deal",
+    "current_primary_id": null,
+    "current_primary_name": null,
+    "recommended_primary_id": "36677604781",
+    "recommended_primary_name": "Maria Florencia Pe\u00f1a - Estudio",
+    "reason": "Company labeled as 'Estudio Contable/Asesor/Consultor Externo'"
+  },
+  {
+    "deal_id": "40767451052",
+    "deal_name": "31308 - Omb\u00fa Consulting Services S.A.- Nuevo tipo de objeto Deal",
+    "current_primary_id": null,
+    "current_primary_name": null,
+    "recommended_primary_id": "36677604781",
+    "recommended_primary_name": "Maria Florencia Pe\u00f1a - Estudio",
+    "reason": "Company labeled as 'Estudio Contable/Asesor/Consultor Externo'"
+  },
+  {
+    "deal_id": "40767455412",
+    "deal_name": "31306 - Menta Inversiones S.A.- Nuevo tipo de objeto Deal",
+    "current_primary_id": null,
+    "current_primary_name": null,
+    "recommended_primary_id": "36677604781",
+    "recommended_primary_name": "Maria Florencia Pe\u00f1a - Estudio",
+    "reason": "Company labeled as 'Estudio Contable/Asesor/Consultor Externo'"
+  },
+  {
+    "deal_id": "40768597001",
+    "deal_name": "56729 - Pestow SA - Nuevo tipo de objeto Deal",
+    "current_primary_id": null,
+    "current_primary_name": null,
+    "recommended_primary_id": "36677604781",
+    "recommended_primary_name": "Maria Florencia Pe\u00f1a - Estudio",
+    "reason": "Company labeled as 'Estudio Contable/Asesor/Consultor Externo'"
+  },
+  {
+    "deal_id": "40768598096",
+    "deal_name": "36987 - RG - Nuevo tipo de objeto Deal",
+    "current_primary_id": null,
+    "current_primary_name": null,
+    "recommended_primary_id": "36677604781",
+    "recommended_primary_name": "Maria Florencia Pe\u00f1a - Estudio",
+    "reason": "Company labeled as 'Estudio Contable/Asesor/Consultor Externo'"
+  },
+  {
+    "deal_id": "40768598819",
+    "deal_name": "36985 - IG - Nuevo tipo de objeto Deal",
+    "current_primary_id": null,
+    "current_primary_name": null,
+    "recommended_primary_id": "36677604781",
+    "recommended_primary_name": "Maria Florencia Pe\u00f1a - Estudio",
+    "reason": "Company labeled as 'Estudio Contable/Asesor/Consultor Externo'"
+  },
+  {
+    "deal_id": "40767459373",
+    "deal_name": "36989 - DG- Nuevo tipo de objeto Deal",
+    "current_primary_id": null,
+    "current_primary_name": null,
+    "recommended_primary_id": "36677604781",
+    "recommended_primary_name": "Maria Florencia Pe\u00f1a - Estudio",
+    "reason": "Company labeled as 'Estudio Contable/Asesor/Consultor Externo'"
+  },
+  {
+    "deal_id": "40768600328",
+    "deal_name": "36984 - AG - Nuevo tipo de objeto Deal",
+    "current_primary_id": null,
+    "current_primary_name": null,
+    "recommended_primary_id": "36677604781",
+    "recommended_primary_name": "Maria Florencia Pe\u00f1a - Estudio",
+    "reason": "Company labeled as 'Estudio Contable/Asesor/Consultor Externo'"
+  },
+  {
+    "deal_id": "40767460765",
+    "deal_name": "62732- DG Uruguay - Nuevo tipo de objeto Deal",
+    "current_primary_id": null,
+    "current_primary_name": null,
+    "recommended_primary_id": "36677604781",
+    "recommended_primary_name": "Maria Florencia Pe\u00f1a - Estudio",
+    "reason": "Company labeled as 'Estudio Contable/Asesor/Consultor Externo'"
+  },
+  {
+    "deal_id": "40768601653",
+    "deal_name": "62780 Pestow SA en ROU - Nuevo tipo de objeto Deal",
+    "current_primary_id": null,
+    "current_primary_name": null,
+    "recommended_primary_id": "36677604781",
+    "recommended_primary_name": "Maria Florencia Pe\u00f1a - Estudio",
+    "reason": "Company labeled as 'Estudio Contable/Asesor/Consultor Externo'"
+  },
+  {
+    "deal_id": "40767462053",
+    "deal_name": "74384 - Parkcorp Inc - Nuevo tipo de objeto Deal",
+    "current_primary_id": null,
+    "current_primary_name": null,
+    "recommended_primary_id": "36677604781",
+    "recommended_primary_name": "Maria Florencia Pe\u00f1a - Estudio",
+    "reason": "Company labeled as 'Estudio Contable/Asesor/Consultor Externo'"
+  },
+  {
+    "deal_id": "40768603037",
+    "deal_name": "74385 - Tacal Capital Corp - Nuevo tipo de objeto Deal",
+    "current_primary_id": null,
+    "current_primary_name": null,
+    "recommended_primary_id": "36677604781",
+    "recommended_primary_name": "Maria Florencia Pe\u00f1a - Estudio",
+    "reason": "Company labeled as 'Estudio Contable/Asesor/Consultor Externo'"
+  },
+  {
+    "deal_id": "40767463596",
+    "deal_name": "74386 - Mounton Inc - Nuevo tipo de objeto Deal",
+    "current_primary_id": null,
+    "current_primary_name": null,
+    "recommended_primary_id": "36677604781",
+    "recommended_primary_name": "Maria Florencia Pe\u00f1a - Estudio",
+    "reason": "Company labeled as 'Estudio Contable/Asesor/Consultor Externo'"
+  },
+  {
+    "deal_id": "40767464372",
+    "deal_name": "93615 - IK",
+    "current_primary_id": "36696516366",
+    "current_primary_name": "93615 - IK",
+    "recommended_primary_id": "36677604781",
+    "recommended_primary_name": "Maria Florencia Pe\u00f1a - Estudio",
+    "reason": "Company labeled as 'Estudio Contable/Asesor/Consultor Externo'"
+  },
+  {
+    "deal_id": "40981997240",
+    "deal_name": "36988 - GK -",
+    "current_primary_id": null,
+    "current_primary_name": null,
+    "recommended_primary_id": "36677604781",
+    "recommended_primary_name": "Maria Florencia Pe\u00f1a - Estudio",
+    "reason": "Company labeled as 'Estudio Contable/Asesor/Consultor Externo'"
+  }
+]

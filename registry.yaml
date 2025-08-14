@@ -167,6 +167,15 @@
     - evals
     - images
 
+- title: Using Evals API on Audio Inputs
+  path: examples/evaluation/use-cases/EvalsAPI_Audio_Inputs.ipynb
+  date: 2025-08-13
+  authors:
+    - hendrytl
+  tags:
+    - evals
+    - audio
+
 - title: Optimize Prompts
   path: examples/Optimize_Prompts.ipynb
   date: 2025-07-14

@@ -10,6 +10,7 @@ People are writing great tools and papers for improving outputs from GPT. Here a
 - [ElatoAI](https://github.com/akdeb/ElatoAI): A platform for running OpenAI Realtime API Speech on ESP32 on Arduino using Deno Edge Runtime and Supabase.
 - [Embedchain](https://github.com/embedchain/embedchain): A Python library for managing and syncing unstructured data with LLMs.
 - [FLAML (A Fast Library for Automated Machine Learning & Tuning)](https://microsoft.github.io/FLAML/docs/Getting-Started/): A Python library for automating selection of models, hyperparameters, and other tunable choices.
+- [God Tier Prompts](https://www.godtierprompts.com/): The leaderboard for AI prompts.
 - [Guidance](https://github.com/microsoft/guidance): A handy looking Python library from Microsoft that uses Handlebars templating to interleave generation, prompting, and logical control.
 - [Haystack](https://github.com/deepset-ai/haystack): Open-source LLM orchestration framework to build customizable, production-ready LLM applications in Python.
 - [HoneyHive](https://honeyhive.ai): An enterprise platform to evaluate, debug, and monitor LLM apps.
@@ -33,7 +34,6 @@ People are writing great tools and papers for improving outputs from GPT. Here a
 
 ## Prompting guides
 
-- [God Tier Prompts](https://www.godtierprompts.com/): The leaderboard for AI prompts.
 - [Brex's Prompt Engineering Guide](https://github.com/brexhq/prompt-engineering): Brex's introduction to language models and prompt engineering.
 - [learnprompting.org](https://learnprompting.org/): An introductory course to prompt engineering.
 - [Lil'Log Prompt Engineering](https://lilianweng.github.io/posts/2023-03-15-prompt-engineering/): An OpenAI researcher's review of the prompt engineering literature (as of March 2023).

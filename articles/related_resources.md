@@ -33,6 +33,7 @@ People are writing great tools and papers for improving outputs from GPT. Here a
 
 ## Prompting guides
 
+- [God Tier Prompts](https://www.godtierprompts.com/): The leaderboard for AI prompts.
 - [Brex's Prompt Engineering Guide](https://github.com/brexhq/prompt-engineering): Brex's introduction to language models and prompt engineering.
 - [learnprompting.org](https://learnprompting.org/): An introductory course to prompt engineering.
 - [Lil'Log Prompt Engineering](https://lilianweng.github.io/posts/2023-03-15-prompt-engineering/): An OpenAI researcher's review of the prompt engineering literature (as of March 2023).

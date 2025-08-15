@@ -147,15 +147,16 @@
   path: examples/partners/temporal_agents_with_knowledge_graphs/temporal_agents_with_knowledge_graphs.ipynb
   date: 2025-07-22
   authors:
-    - shikhar-cyber
     - dwigg-openai
+    - shikhar-cyber
     - Alex Heald
     - Douglas Adams
     - Rishabh Sagar
   tags:
     - knowledge-graphs
-    - temporal-agents
-    - RAG
+    - retrieval
+    - functions
+    - responses
 
 - title: Using Evals API on Image Inputs
   path: examples/evaluation/use-cases/EvalsAPI_Image_Inputs.ipynb
@@ -165,6 +166,15 @@
   tags:
     - evals
     - images
+
+- title: Using Evals API on Audio Inputs
+  path: examples/evaluation/use-cases/EvalsAPI_Audio_Inputs.ipynb
+  date: 2025-08-13
+  authors:
+    - hendrytl
+  tags:
+    - evals
+    - audio
 
 - title: Optimize Prompts
   path: examples/Optimize_Prompts.ipynb

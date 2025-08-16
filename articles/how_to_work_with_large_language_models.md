@@ -2,41 +2,43 @@
 
 ## How large language models work
 
-[Large language models][Large language models Blog Post] are functions that map text to text. Given an input string of text, a large language model predicts the text that should come next.
+[Large language models][Large language models Blog Post] are mathematical functions that take a sequence of words (or tokens) as input and produce a sequence of words (or tokens) as output. They are trained on vast amounts of text data to learn the statistical relationships between words, allowing them to generate coherent and contextually relevant text.
 
-The magic of large language models is that by being trained to minimize this prediction error over vast quantities of text, the models end up learning concepts useful for these predictions. For example, they learn:
+These models can perform a wide range of tasks, including but not limited to:
+- text generation
+- summarization
+- translation
+- sentiment analysis
+- text classification
+- text completion
+- text extraction
+- question answering
+- code generation
+- code completion
+- code explanation
+- code debugging
+- and more.
 
-- how to spell
-- how grammar works
-- how to paraphrase
-- how to answer questions
-- how to hold a conversation
-- how to write in many languages
-- how to code
-- etc.
+To do this, they are trained on large datasets containing diverse text from books, articles, websites, and other sources. The training process involves adjusting the model's parameters to minimize the difference between its predicted output and the actual output in the training data. This allows the model to learn patterns, grammar, facts, and even some reasoning abilities from the data it has seen. 
 
-They do this by “reading” a large amount of existing text and learning how words tend to appear in context with other words, and uses what it has learned to predict the next most likely word that might appear in response to a user request, and each subsequent word after that.
-
-GPT-3 and GPT-4 power [many software products][OpenAI Customer Stories], including productivity apps, education apps, games, and more.
+One such language model is the Generative Pre-trained Transformer (GPT). GPT-4o and GPT-5 power [many software products][OpenAI Customer Stories], including [GitHub Copilot] and [Replit]. These models are designed to understand and generate human-like text, making them suitable for a wide range of applications.
 
 ## How to control a large language model
-
-Of all the inputs to a large language model, by far the most influential is the text prompt.
 
 Large language models can be prompted to produce output in a few ways:
 
 - **Instruction**: Tell the model what you want
-- **Completion**: Induce the model to complete the beginning of what you want
+- **Completion**: Make the model finish what you want
 - **Scenario**: Give the model a situation to play out
 - **Demonstration**: Show the model what you want, with either:
-  - A few examples in the prompt
-  - Many hundreds or thousands of examples in a fine-tuning training dataset
+  - A few examples (few-shot learning)
+  - Thousands to millions of examples (fine-tuning)
 
 An example of each is shown below.
 
 ### Instruction prompts
 
-Write your instruction at the top of the prompt (or at the bottom, or both), and the model will do its best to follow the instruction and then stop. Instructions can be detailed, so don't be afraid to write a paragraph explicitly detailing the output you want, just stay aware of how many [tokens](https://help.openai.com/en/articles/4936856-what-are-tokens-and-how-to-count-them) the model can process.
+Write your instruction at the top of the prompt (or at the bottom, or both), and the model will do its best to follow the instruction and then stop. Instructions can be detailed, so don't be afraid to write a paragraph explicitly detailing the output you want, but just be aware of how many [tokens](https://help.openai.com/en/articles/4936856-what-are-tokens-and-how-to-count-them) the model can process.
 
 Example instruction prompt:
 
@@ -55,7 +57,7 @@ Ted Chiang
 
 ### Completion prompt example
 
-Completion-style prompts take advantage of how large language models try to write text they think is most likely to come next. To steer the model, try beginning a pattern or sentence that will be completed by the output you want to see. Relative to direct instructions, this mode of steering large language models can take more care and experimentation. In addition, the models won't necessarily know where to stop, so you will often need stop sequences or post-processing to cut off text generated beyond the desired output.
+Completion-style prompts take advantage of how large language models try to write text they think is most likely to come next. To steer the model, begin a pattern or sentence you want to see completed. This mode of steering large language models can take more care and experimentation. Additionally, the models won't necessarily know where to stop, so you will often need stop sequences or post-processing to cut off text generated beyond the desired output.
 
 Example completion prompt:
 
@@ -74,7 +76,7 @@ Output:
 
 ### Scenario prompt example
 
-Giving the model a scenario to follow or role to play out can be helpful for complex queries or when seeking imaginative responses. When using a hypothetical prompt, you set up a situation, problem, or story, and then ask the model to respond as if it were a character in that scenario or an expert on the topic.
+Giving the model a scenario to follow or role to play can be helpful for complex queries or when seeking creative responses. Using a hypothetical prompt, you set up a situation, problem, or story, then ask the model to respond as if it were a character in that scenario or an expert on the topic.
 
 Example scenario prompt:
 
@@ -93,7 +95,7 @@ Output:
 
 ### Demonstration prompt example (few-shot learning)
 
-Similar to completion-style prompts, demonstrations can show the model what you want it to do. This approach is sometimes called few-shot learning, as the model learns from a few examples provided in the prompt.
+Similar to completion-style prompts, demonstrations show the model what to do. This approach is sometimes called few-shot learning, as the model learns from a few examples provided in the prompt.
 
 Example demonstration prompt:
 
@@ -117,7 +119,7 @@ Output:
 
 ### Fine-tuned prompt example
 
-With enough training examples, you can [fine-tune][Fine Tuning Docs] a custom model. In this case, instructions become unnecessary, as the model can learn the task from the training data provided. However, it can be helpful to include separator sequences (e.g., `->` or `###` or any string that doesn't commonly appear in your inputs) to tell the model when the prompt has ended and the output should begin. Without separator sequences, there is a risk that the model continues elaborating on the input text rather than starting on the answer you want to see.
+With enough examples, you can [fine-tune][Fine Tuning Docs] a custom model. In this case, instructions become unnecessary. However, it can be helpful to include separator sequences (e.g., `->` or `###` or any string that doesn't commonly appear in your inputs) to tell the model when the prompt has ended and the output should begin. Without separator sequences, the model may continue elaborating, rather than generating what you want to see.
 
 Example fine-tuned prompt (for a model that has been custom trained on similar prompt-completion pairs):
 
@@ -154,7 +156,7 @@ For more prompt examples, visit [OpenAI Examples][OpenAI Examples].
 
 In general, the input prompt is the best lever for improving model outputs. You can try tricks like:
 
-- **Be more specific** E.g., if you want the output to be a comma separated list, ask it to return a comma separated list. If you want it to say "I don't know" when it doesn't know the answer, tell it 'Say "I don't know" if you do not know the answer.' The more specific your instructions, the better the model can respond.
+- **Be specific** If you want the output to be a comma separated list, ask the LLM to return a comma separated list. If you want it to say "I don't know" when it doesn't know the answer, tell it 'Say "I don't know" if you do not know the answer.' The more specific your instructions, the better the model can respond.
 - **Provide Context**: Help the model understand the bigger picture of your request. This could be background information, examples/demonstrations of what you want or explaining the purpose of your task.
 - **Ask the model to answer as if it was an expert.** Explicitly asking the model to produce high quality output or output as if it was written by an expert can induce the model to give higher quality answers that it thinks an expert would write. Phrases like "Explain in detail" or "Describe step-by-step" can be effective.
 - **Prompt the model to write down the series of steps explaining its reasoning.** If understanding the 'why' behind an answer is important, prompt the model to include its reasoning. This can be done by simply adding a line like "[Let's think step by step](https://arxiv.org/abs/2205.11916)" before each answer.

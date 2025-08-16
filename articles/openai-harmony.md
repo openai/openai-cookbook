@@ -95,7 +95,7 @@ convo = Conversation.from_messages(
         ).with_channel("analysis"),
         Message.from_role_and_content(Role.ASSISTANT, '{"location": "Tokyo"}')
         .with_channel("commentary")
-        .with_recipient("functions.get_weather")
+        .with_recipient("functions.get_current_weather")
         .with_content_type("<|constrain|> json"),
         Message.from_author_and_content(
             Author.new(Role.TOOL, "functions.get_current_weather"),

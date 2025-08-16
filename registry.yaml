@@ -78,7 +78,7 @@
     - open-models
 
 - title: Using NVIDIA TensorRT-LLM to run gpt-oss-20b
-  path: articles/run-nvidia.ipynb
+  path: articles/gpt-oss/run-nvidia.ipynb
   date: 2025-08-05
   authors:
     - jayrodge

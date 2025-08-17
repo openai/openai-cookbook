@@ -4,6 +4,14 @@
 # should build pages for, and indicates metadata such as tags, creation date and
 # authors for each page.
 
+- title: LLMs 101: What Even Is It?
+path: articles/"llms 101.md"
+date: 2025-08-17
+author:
+  - paytonison
+tags:
+  - introduction
+
 - title: Verifying gpt-oss implementations
   path: articles/gpt-oss/verifying-implementations.md
   date: 2025-08-11

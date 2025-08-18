@@ -52,13 +52,8 @@ encoding = load_harmony_encoding(HarmonyEncodingName.HARMONY_GPT_OSS)
 
 system_message = (
     SystemContent.new()
-        .with_model_identity(
-            "You are ChatGPT, a large language model trained by OpenAI."
-        )
         .with_reasoning_effort(ReasoningEffort.HIGH)
         .with_conversation_start_date("2025-06-28")
-        .with_knowledge_cutoff("2024-06")
-        .with_required_channels(["analysis", "commentary", "final"])
 )
 
 developer_message = (
@@ -66,10 +61,6 @@ developer_message = (
         .with_instructions("Always respond in riddles")
         .with_function_tools(
             [
-                ToolDescription.new(
-                    "get_location",
-                    "Gets the location of the user.",
-                ),
                 ToolDescription.new(
                     "get_current_weather",
                     "Gets the current weather in the provided location.",
@@ -90,7 +81,7 @@ developer_message = (
                     },
                 ),
             ]
-        )
+	)
 )
 
 convo = Conversation.from_messages(
@@ -105,11 +96,11 @@ convo = Conversation.from_messages(
         Message.from_role_and_content(Role.ASSISTANT, '{"location": "Tokyo"}')
         .with_channel("commentary")
         .with_recipient("functions.get_weather")
-        .with_content_type("json"),
+        .with_content_type("<|constrain|> json"),
         Message.from_author_and_content(
             Author.new(Role.TOOL, "functions.lookup_weather"),
             '{ "temperature": 20, "sunny": true }',
-        ).with_recipient("assistant").with_channel("commentary"),
+        ).with_channel("commentary"),
     ]
 )
 
@@ -201,6 +192,8 @@ Once its done generating it will stop with either a `<|return|>` token indicatin
 ```
 
 The `final` channel will contain the answer to your user’s request. Check out the [reasoning section](#reasoning) for more details on the chain-of-thought.
+
+**Implementation note:** `<|return|>` is a decode-time stop token only. When you add the assistant’s generated reply to conversation history for the next turn, replace the trailing `<|return|>` with `<|end|>` so that stored messages are fully formed as `<|start|>{header}<|message|>{content}<|end|>`. Prior messages in prompts should therefore end with `<|end|>`. For supervised targets/training examples, ending with `<|return|>` is appropriate; for persisted history, normalize to `<|end|>`.
 
 ### System message format
 

@@ -91,14 +91,14 @@ convo = Conversation.from_messages(
         Message.from_role_and_content(Role.USER, "What is the weather in Tokyo?"),
         Message.from_role_and_content(
             Role.ASSISTANT,
-            'User asks: "What is the weather in Tokyo?" We need to use get_weather tool.',
+            'User asks: "What is the weather in Tokyo?" We need to use get_current_weather tool.',
         ).with_channel("analysis"),
         Message.from_role_and_content(Role.ASSISTANT, '{"location": "Tokyo"}')
         .with_channel("commentary")
-        .with_recipient("functions.get_weather")
+        .with_recipient("functions.get_current_weather")
         .with_content_type("<|constrain|> json"),
         Message.from_author_and_content(
-            Author.new(Role.TOOL, "functions.lookup_weather"),
+            Author.new(Role.TOOL, "functions.get_current_weather"),
             '{ "temperature": 20, "sunny": true }',
         ).with_channel("commentary"),
     ]
@@ -376,7 +376,7 @@ If the model decides to call a tool it will define a `recipient` in the header o
 The model might also specify a `<|constrain|>` token to indicate the type of input for the tool call. In this case since it’s being passed in as JSON the `<|constrain|>` is set to `json`.
 
 ```
-<|channel|>analysis<|message|>Need to use function get_weather.<|end|><|start|>assistant<|channel|>commentary to=functions.get_weather <|constrain|>json<|message|>{"location":"San Francisco"}<|call|>
+<|channel|>analysis<|message|>Need to use function get_current_weather.<|end|><|start|>assistant<|channel|>commentary to=functions.get_current_weather <|constrain|>json<|message|>{"location":"San Francisco"}<|call|>
 ```
 
 #### Handling tool calls
@@ -392,7 +392,7 @@ A tool message has the following format:
 So in our example above
 
 ```
-<|start|>functions.get_weather to=assistant<|channel|>commentary<|message|>{"sunny": true, "temperature": 20}<|end|>
+<|start|>functions.get_current_weather to=assistant<|channel|>commentary<|message|>{"sunny": true, "temperature": 20}<|end|>
 ```
 
 Once you have gathered the output for the tool calls you can run inference with the complete content:
@@ -432,10 +432,10 @@ locations: string[],
 format?: "celsius" | "fahrenheit", // default: celsius
 }) => any;
 
-} // namespace functions<|end|><|start|>user<|message|>What is the weather like in SF?<|end|><|start|>assistant<|channel|>analysis<|message|>Need to use function get_weather.<|end|><|start|>assistant<|channel|>commentary to=functions.get_weather <|constrain|>json<|message|>{"location":"San Francisco"}<|call|><|start|>functions.get_weather to=assistant<|channel|>commentary<|message|>{"sunny": true, "temperature": 20}<|end|><|start|>assistant
+} // namespace functions<|end|><|start|>user<|message|>What is the weather like in SF?<|end|><|start|>assistant<|channel|>analysis<|message|>Need to use function get_current_weather.<|end|><|start|>assistant<|channel|>commentary to=functions.get_current_weather <|constrain|>json<|message|>{"location":"San Francisco"}<|call|><|start|>functions.get_current_weather to=assistant<|channel|>commentary<|message|>{"sunny": true, "temperature": 20}<|end|><|start|>assistant
 ```
 
-As you can see above we are passing not just the function out back into the model for further sampling but also the previous chain-of-thought (“Need to use function get_weather.”) to provide the model with the necessary information to continue its chain-of-thought or provide the final answer.
+As you can see above we are passing not just the function out back into the model for further sampling but also the previous chain-of-thought (“Need to use function get_current_weather.”) to provide the model with the necessary information to continue its chain-of-thought or provide the final answer.
 
 #### Preambles
 

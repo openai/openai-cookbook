@@ -11,12 +11,12 @@
             "name": "Jens Walter",
             "company": "API Meister Consulting GmbH",
             "address": "Friedrichstr. 123, 10117 Berlin, Germany",
-            "room_number": "305",
+            "room_no": "305",
             "arrival_date": "30.11.19",
             "departure_date": "01.12.19",
-            "folio_number": "227638",
-            "confirmation_number": "8511510",
-            "cashier_number": "8370",
+            "folio_no": "227638",
+            "confirmation_no": "85111510",
+            "cashier_no": "8370",
             "invoice_date": "01.12.19"
         },
         "invoice_information": {
@@ -81,6 +81,7 @@
             "terminal_id": null,
             "receipt_no": null,
             "transaction_amount": "48.00",
+            "approval_amount": "48.00",
             "approval_code": "A1848003"
         },
         "signature": {
@@ -89,12 +90,12 @@
         "entity_information": {
             "name": "QMHotel Germany GmbH",
             "chamber_of_commerce_number": "HRB 207980",
-            "registered_office": "MUNCHEN",
+            "registered_office": "MÜNCHEN",
             "fiscal_number": "143/317/7200",
-            "vat_id_number": "UId DE294499203",
+            "vat_id_number": "UID DE294499203",
             "authorized_representative": "Rune Fring",
             "bank": "NORDEA BANK AB",
-            "iban": "DE25 5143 0030 6869 0400 01",
+            "iban": "DE25 3143 5030 6889 0400 01",
             "swift_code": "NDEADEFF"
         }
     }

@@ -16,7 +16,7 @@
             "address": "Friedrichstr. 123, 10117 Berlin, Germany",
             "room_number": "306",
             "arrival_date": "30.11.19",
-            "departure_date": "02.12.19",
+            "departure_date": "01.12.19",
             "folio_number": "227639",
             "confirmation_number": "85111762",
             "cashier_number": "8370",
@@ -43,7 +43,7 @@
                     "credit_eur": "44.86"
                 }
             ],
-            "deposit_information": [
+            "deposit_folio": [
                 {
                     "date": "21.11.19",
                     "folio_number": "223554",
@@ -52,7 +52,8 @@
                 }
             ],
             "total": {
-                "total_amount": "48.00",
+                "debit_eur": "48.00",
+                "credit_eur": "48.00",
                 "balance_to_pay": "0.00"
             }
         },
@@ -94,7 +95,7 @@
             "authorized_representative": "Rune Firing",
             "bank": {
                 "name": "NORDEA BANK A/S",
-                "iban": "DE23 2143 0030 6886 0400 01",
+                "iban": "DE23 6143 0030 6869 0400 01",
                 "swift_code": "NDEADEFF"
             }
         }

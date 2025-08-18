@@ -2,37 +2,34 @@
     {
         "Hotel Information": {
             "Name": "THE MADISON. HAMBURG",
-            "Address": "Schaarsteinweg 4, 20459 Hamburg",
+            "Address": "MADISON Hotel GmbH Schaarsteinweg 4 20459 Hamburg",
             "Contact": {
                 "Phone": "+49-40-37 666-0",
                 "Fax": "+49-40-37 666-137",
                 "Email": "info@madisonhotel.de",
                 "Website": "madisonhotel.de"
             },
-            "Geschäftsführer": "Marlies Head, Thomas Kleinertz",
-            "Handelsregister": "AG Hamburg HRB 47881",
-            "USt-IdNr": "DE118 666 407",
-            "Bank": {
-                "Name": "HypoVereinsbank",
+            "Bank Details": {
+                "Bank": "HypoVereinsbank",
                 "BLZ": "200 300 00",
                 "Konto-Nr": "360 27 11",
-                "IBAN": "DE48 2003 0000 0036 0271 11",
+                "IBAN": "DE84 2003 0000 0003 6027 11",
                 "BIC": "HYVEDEMM300"
             }
         },
         "Guest Information": {
-            "Name": "APImeiser Consulting GmbH",
-            "Address": "Friedrichstr. 123, 10117 Berlin",
-            "Guest Name": "Herr Jens Walter"
+            "Name": "Herr Jens Walter",
+            "Company": "APImeiser Consulting GmbH",
+            "Address": "Friedrichstr. 123, 10117 Berlin"
         },
         "Invoice Information": {
-            "Rechnungs-Nr": "489347 /",
-            "Date": "08.02.19",
-            "Room": "334",
-            "Arrival": "03.02.19",
-            "Departure": "08.02.19",
-            "Page": "1 of 1",
-            "User ID": "POE"
+            "Rechnungs-Nr.": "489347 /",
+            "Datum": "08.02.19",
+            "Zimmer": "334",
+            "Anreise": "03.02.19",
+            "Abreise": "08.02.19",
+            "Seite": "1 of 1",
+            "Benutzer ID": "POE"
         },
         "Charges": [
             {
@@ -74,11 +71,9 @@
         ],
         "Summary": {
             "Umsatzsteuer Detail": {
-                "Total inkl. MwSt.": 550.0,
                 "Netto EUR": 514.02,
                 "MwSt. EUR": 35.98,
-                "Brutto EUR": 550.0,
-                "MwSt. %": "7%"
+                "Brutto EUR": 550.0
             },
             "Total": {
                 "Belastung": 550.0,
@@ -91,18 +86,18 @@
         },
         "Payment Information": {
             "Finanzamt": "Hamburg Mitte",
-            "Steuernummer": "48/741/01128",
+            "Steuernummer": "487/410/12128",
             "Kreditkartendetails": {
-                "Vertragspartner": "15498432",
+                "Kartenaussteller": "15498432",
                 "Kreditkartennummer": "XXXXXXXXXXXX5502",
                 "Verfallsdatum": "XX/XX",
                 "Terminal ID": "6926492",
                 "Beleg Nr.": "22705",
-                "Transaktionsbetrag": 550.0,
-                "Genehmigter Betrag": 550.0,
+                "Transaktionsbetrag": "550.00",
+                "Genehmigter Betrag": "550.00",
                 "Genehmigungscode": "67109"
             },
-            "Unterschrift des Karteninhabers": "null"
+            "Unterschrift": "Unterschrift des Karteninhabers"
         }
     },
     {}

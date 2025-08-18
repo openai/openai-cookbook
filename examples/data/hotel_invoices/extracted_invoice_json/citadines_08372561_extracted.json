@@ -12,65 +12,65 @@
             "Operator": "Citadines Betreibs GmbH - Amtsgericht Frankfurt/Main - HRB 52815",
             "Bank Information": {
                 "Bank": "Commerzbank Frankfurt",
-                "Account Number": "040 230 343731",
+                "Account Number": "040 230 3437",
                 "IBAN": "DE27500400000385712500",
                 "Swift/BIC": "COBADEFFXXX"
             }
         },
-        "Invoice Information": {
-            "Rechnungsadresse": {
-                "Company": "APImeisler Consulting GmbH",
-                "Address": "Friedrichstrasse 123, 10117 Berlin, Germany"
-            },
-            "Rechnungsnr.": "083-72561",
-            "A/R Nr.": null,
-            "TO Reference No.": null,
-            "Rechnungsdatum": "05/04/19 - 09:46",
-            "Bediener": "DE-GB",
-            "Seite": "1 von 1"
+        "Rechnungsadresse": {
+            "Company": "APImeisler Consulting GmbH",
+            "Address": "Friedrichstrasse 123, 10117 Berlin, Germany"
         },
         "Guest Information": {
             "Name": "Herr Jens Walter",
-            "Reservierungsnr.": "1221737070-1",
-            "Apartment Nr.": "420",
+            "Reservierungsnr": "1221737070-1",
+            "Apartment Nr": "420",
             "Apartment Typ": "1-Bedroom",
             "Anreisedatum": "31/03/2019",
             "Abreisedatum": "05/04/2019"
         },
+        "Invoice Information": {
+            "Rechnungsnr": "083-72561",
+            "A/R Nr": null,
+            "TO Reference No": null,
+            "Rechnungsdatum": "05/04/19 - 09:46",
+            "Bediener": "DE-GB",
+            "Seite": "1 von 1"
+        },
         "Charges": [
             {
                 "DATUM": "31/03/19",
-                "APT NR.": "420",
+                "APT NR": "420",
                 "BESCHREIBUNG": "Apartment 31/03/19#420",
-                "EURO": "92,58"
+                "EURO": "92,56"
             },
             {
                 "DATUM": "01/04/19",
-                "APT NR.": "420",
+                "APT NR": "420",
                 "BESCHREIBUNG": "Apartment 01/04/19#420",
                 "EURO": "197,20"
             },
             {
                 "DATUM": "02/04/19",
-                "APT NR.": "420",
+                "APT NR": "420",
                 "BESCHREIBUNG": "Apartment 02/04/19#420",
                 "EURO": "254,15"
             },
             {
                 "DATUM": "03/04/19",
-                "APT NR.": "420",
+                "APT NR": "420",
                 "BESCHREIBUNG": "Apartment 03/04/19#420",
                 "EURO": "215,90"
             },
             {
                 "DATUM": "04/04/19",
-                "APT NR.": "420",
+                "APT NR": "420",
                 "BESCHREIBUNG": "Apartment 04/04/19#420",
                 "EURO": "143,82"
             },
             {
                 "DATUM": "31/03/19",
-                "APT NR.": "420",
+                "APT NR": "420",
                 "BESCHREIBUNG": "Mastercard bnr 8324 SPLIT",
                 "EURO": "-903,63"
             }

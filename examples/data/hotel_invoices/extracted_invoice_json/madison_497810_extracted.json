@@ -10,13 +10,12 @@
                 "Website": "madisonhotel.de"
             },
             "Geschäftsführer": "Martens Heald, Thomas Kleinertz",
-            "AG": "Hamburg HRB 47881",
-            "VAT": "DE118 686 407",
             "Bank": {
                 "Name": "HypoVereinsbank",
-                "IBAN": "DE48 2003 0000 0003 6027 111",
+                "IBAN": "DE48 2003 0000 0003 0671 111",
                 "BIC": "HYVEDEMM300"
-            }
+            },
+            "VAT": "DE118 686 407"
         },
         "Guest Information": {
             "Company": "APImeiseter Consulting GmbH",
@@ -27,8 +26,8 @@
             "Invoice Number": "497810 /",
             "Date": "26.04.19",
             "Room Number": "403",
-            "Arrival Date": "22.04.19",
-            "Departure Date": "26.04.19",
+            "Check-in Date": "22.04.19",
+            "Check-out Date": "26.04.19",
             "Page": "1 of 1",
             "User ID": "RIL"
         },
@@ -64,38 +63,35 @@
                 "Entlastung": 440.0
             }
         ],
-        "Summary": {
-            "Total": {
-                "Netto EUR": 411.21,
-                "MwSt. EUR": 28.79,
-                "Brutto EUR": 440.0
-            },
-            "Saldo": {
-                "Amount": 0.0,
-                "Currency": "EUR"
-            }
+        "Total": {
+            "Netto EUR": 411.21,
+            "MwSt. EUR": 28.79,
+            "Brutto EUR": 440.0,
+            "Saldo": "0.00 EUR"
         },
         "Tax Details": {
-            "Total inkl. MwSt.": {
-                "Netto EUR": 411.21,
-                "MwSt. 7%": 28.79,
-                "Brutto EUR": 440.0
-            }
+            "Total inkl. MwSt.": 411.21,
+            "MwSt. 7%": 28.79
         },
-        "Payment Information": {
+        "Financial Information": {
             "Finanzamt": "Hamburg Mitte",
-            "Steuernummer": "48/741/01228",
-            "Kreditkartendetails": {
-                "Kartennummer": "XXXXXXXXXXXX2825",
-                "Verfallsdatum": "XX/XX",
-                "Terminal ID": "6928491"
-            },
-            "Vorgangsnummer": "164984932",
+            "Steuernummer": "48/741/00128"
+        },
+        "Credit Card Information": {
+            "Kreditkartendetails": "Mastercard",
+            "Verfallsdatum": "XXXX",
+            "Kreditkartennummer": "XXXXXXXXXXXX2825",
+            "Terminal ID": "6928491",
             "Beleg Nr.": "7635",
-            "Transaktionsbetrag": 440.0,
-            "Genehmigungsnr.": "626349",
-            "Genehmigungscode": "626349"
+            "Transaktionsbetrag": "440.00",
+            "Genehmigungsnr.": "692849",
+            "Genehmigungscode": "692849"
         }
     },
-    {}
+    {
+        "hotel_information": {
+            "name": "THE MADISON",
+            "location": "HAMBURG"
+        }
+    }
 ]

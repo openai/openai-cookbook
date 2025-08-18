@@ -1,43 +1,24 @@
 [
     {
-        "Hotel Information": {
-            "Name": "Citadines Michel Hamburg",
-            "Address": "Ludwig-Erhard-Str. 7, D-20459 Hamburg, Deutschland",
-            "Contact": {
-                "Phone": "+49 (0)40-30618-0",
-                "Fax": "+49 (0)40-30618-1999",
-                "Email": "hamburg@citadines.com",
-                "Website": "www.citadines.com"
-            },
-            "Operator": "Citadines Betriebes GmbH - Amtsgericht Frankfurt/Main - HRB 52815",
-            "Bank Details": {
-                "Bank": "Commerzbank Frankfurt",
-                "Account Number": "040 230 34731",
-                "IBAN": "DE27500400000385712500",
-                "Swift/BIC": "COBADEFFXXX"
-            }
+        "Rechnungsadresse": {
+            "Firma": "APImeisster Consulting GmbH",
+            "Adresse": "Friedrichstrasse 123",
+            "Stadt": "10117 Berlin",
+            "Land": "Germany"
         },
-        "Invoice Information": {
-            "Rechnungsadresse": {
-                "Company": "APImeisster Consulting GmbH",
-                "Address": "Friedrichstrasse 123, 10117 Berlin, Germany"
-            },
-            "Rechnungsnr.": "083-72561",
-            "A/R Nr.": null,
-            "TO Reference No.": null,
-            "Rechnungsdatum": "05/04/19 - 09:46",
-            "Bediener": "DE-GB",
-            "Seite": "1 von 1"
-        },
-        "Guest Information": {
-            "Name": "Herr Jens Walter",
-            "Reservierungsnr.": "1221737070-1",
-            "Apartment Nr.": "420",
-            "Apartment Typ": "1-Bedroom",
-            "Anreisedatum": "31/03/2019",
-            "Abreisedatum": "05/04/2019"
-        },
-        "Charges": [
+        "Gastname": "Herr Jens Walter",
+        "Reservierungsnr.": "1221737070-1",
+        "Apartment Nr.": "420",
+        "Apartment Typ": "1-Bedroom",
+        "Anreisedatum": "31/03/2019",
+        "Abreisedatum": "05/04/2019",
+        "Rechnungsnr.": "083-72561",
+        "A/R Nr.": null,
+        "TO Reference No.": null,
+        "Rechnungsdatum": "05/04/19 - 09:46",
+        "Bediener": "DE-GB",
+        "Seite": "1 von 1",
+        "Tabelle": [
             {
                 "DATUM": "31/03/19",
                 "APT NR.": "420",
@@ -75,32 +56,40 @@
                 "EURO": "-903,63"
             }
         ],
-        "Summary": {
-            "Summe Belastungen": "903,63",
-            "Summe Zahlungen": "-903,63",
-            "offener Betrag": "0,00"
-        },
-        "Tax Information": {
-            "MwSt. %": [
-                {
-                    "Rate": "19.00 %",
-                    "NETTO €": "0,00",
-                    "MwSt €": "0,00",
-                    "BRUTTO €": "0,00"
-                },
-                {
-                    "Rate": "7.00 %",
-                    "NETTO €": "844,51",
-                    "MwSt €": "59,12",
-                    "BRUTTO €": "903,63"
-                },
-                {
-                    "Rate": "0.00 %",
-                    "NETTO €": "0,00",
-                    "MwSt €": "0,00",
-                    "BRUTTO €": "0,00"
-                }
-            ]
+        "Summe Belastungen": "903,63",
+        "Summe Zahlungen": "-903,63",
+        "offener Betrag": "0,00",
+        "MwSt.": [
+            {
+                "Satz": "19.00 %",
+                "NETTO €": "0,00",
+                "MwSt €": "0,00",
+                "BRUTTO €": "0,00"
+            },
+            {
+                "Satz": "7.00 %",
+                "NETTO €": "844,51",
+                "MwSt €": "59,12",
+                "BRUTTO €": "903,63"
+            },
+            {
+                "Satz": "0.00 %",
+                "NETTO €": "0,00",
+                "MwSt €": "0,00",
+                "BRUTTO €": "0,00"
+            }
+        ],
+        "Hotel Information": {
+            "Name": "Citadines Michel Hamburg",
+            "Adresse": "Ludwig-Erhard-Str. 7, D-20459 Hamburg, Deutschland",
+            "Telefon": "+49 (0)40-30618-0",
+            "Fax": "+49 (0)40-30618-1999",
+            "Email": "hamburg@citadines.com",
+            "Website": "www.citadines.com",
+            "Betreiber": "Citadines Betriebes GmbH - Amtsgericht Frankfurt/Main - HRB 52815",
+            "Bankverbindung": "Commerzbank Frankfurt - St.-Nr.: 040 230 34731",
+            "IBAN": "DE27500400000385712500",
+            "Swift/BIC": "COBADEFFXXX"
         }
     },
     {}

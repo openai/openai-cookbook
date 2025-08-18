@@ -1,103 +1,93 @@
 [
     {
-        "hotel_information": {
-            "name": "MADISON Hotel GmbH",
-            "address": "Schaarsteinweg 4, 20459 Hamburg",
-            "contact": {
-                "phone": "+49.40.37 666-0",
-                "fax": "+49.40.37 666-137",
-                "email": "info@madisonhotel.de",
-                "website": "madisonhotel.de"
+        "Hotel Information": {
+            "Name": "MADISON Hotel GmbH",
+            "Address": "Schaarsteinweg 4, 20459 Hamburg",
+            "Contact": {
+                "Phone": "+49.40.37 666-0",
+                "Fax": "+49.40.37 666-137",
+                "Email": "info@madisonhotel.de",
+                "Website": "madisonhotel.de"
             },
-            "managing_directors": "Marlies Head, Thomas Kleinertz",
-            "registration": {
-                "AG Hamburg HRB 47881": null,
-                "VAT": "DE118 690 407"
-            },
-            "bank_details": {
-                "bank_name": "HypoVereinsbank",
-                "iban": "DE49 20030000 0038627111",
-                "bic": "HYVEDEMM300",
-                "account_number": "360 27 11",
-                "bank_code": "200 300 00"
+            "Geschäftsführer": "Marlies Head, Thomas Kleinertz",
+            "AG Hamburg HRB": "47881",
+            "VAT ID": "DE118 690 407",
+            "Bank": {
+                "Name": "HypoVereinsbank",
+                "BLZ": "200 300 00",
+                "Konto-Nr": "360 27 11",
+                "IBAN": "DE49 2003 0000 0036 0271 11",
+                "BIC": "HYVEDEMM300"
             }
         },
-        "guest_information": {
-            "name": "Herr Jens Walter",
-            "company": "APIMeister Consulting GmbH",
-            "address": "Friedrichstr. 123, 10117 Berlin"
+        "Guest Information": {
+            "Name": "Herr Jens Walter",
+            "Company": "APIMeister Consulting GmbH",
+            "Address": "Friedrichstr. 123, 10117 Berlin"
         },
-        "invoice_information": {
-            "invoice_number": "502875",
-            "date": "14.06.19",
-            "room_number": "426",
-            "check_in_date": "10.06.19",
-            "check_out_date": "14.06.19",
-            "page": "1 of 1",
-            "user_id": "BD"
+        "Invoice Information": {
+            "Rechnungs-Nr.": "502875",
+            "Datum": "14.06.19",
+            "Zimmer": "426",
+            "Anreise": "10.06.19",
+            "Abreise": "14.06.19",
+            "Seite": "1 of 1",
+            "Benutzer ID": "BD"
         },
-        "charges": [
+        "Charges": [
             {
-                "date": "10.06.19",
-                "description": "Übernachtung exklusive Frühstück",
-                "charge": 110.0,
-                "credit": null
+                "Datum": "10.06.19",
+                "Beschreibung": "Übernachtung exklusive Frühstück",
+                "Belastung": "110.00",
+                "Entlastung": null
             },
             {
-                "date": "11.06.19",
-                "description": "Übernachtung exklusive Frühstück",
-                "charge": 110.0,
-                "credit": null
+                "Datum": "11.06.19",
+                "Beschreibung": "Übernachtung exklusive Frühstück",
+                "Belastung": "110.00",
+                "Entlastung": null
             },
             {
-                "date": "12.06.19",
-                "description": "Übernachtung exklusive Frühstück",
-                "charge": 110.0,
-                "credit": null
+                "Datum": "12.06.19",
+                "Beschreibung": "Übernachtung exklusive Frühstück",
+                "Belastung": "110.00",
+                "Entlastung": null
             },
             {
-                "date": "13.06.19",
-                "description": "Übernachtung exklusive Frühstück",
-                "charge": 110.0,
-                "credit": null
+                "Datum": "13.06.19",
+                "Beschreibung": "Übernachtung exklusive Frühstück",
+                "Belastung": "110.00",
+                "Entlastung": null
             },
             {
-                "date": "14.06.19",
-                "description": "Mastercard IFC",
-                "charge": 440.0,
-                "credit": 440.0
+                "Datum": "14.06.19",
+                "Beschreibung": "Mastercard IFC",
+                "Belastung": "440.00",
+                "Entlastung": null
             }
         ],
-        "total": {
-            "net_amount": 411.21,
-            "tax_amount": 28.79,
-            "gross_amount": 440.0,
-            "balance_due": 0.0
+        "Total": {
+            "Netto EUR": "411.21",
+            "MwSt. EUR": "28.79",
+            "Brutto EUR": "440.00",
+            "Saldo": "0.00 EUR"
         },
-        "tax_information": {
-            "tax_office": "Finanzamt: Hamburg Mitte",
-            "tax_number": "Steuernummer: 47/841/01228"
+        "Umsatzsteuer Detail": {
+            "Total inkl. MwSt.": "411.21",
+            "MwSt. 7%": "28.79",
+            "Finanzamt": "Hamburg Mitte",
+            "Steuernummer": "47/841/01228"
         },
-        "card_information": {
-            "card_type": "Mastercard IFC",
-            "contract_number": "15694832",
-            "receipt_number": "271492",
-            "card_number": "XXXXXXXXXXXX0502",
-            "transaction_number": "440.00",
-            "approval_code": "366417",
-            "terminal_id": "89264892",
-            "approved_amount": "440.00"
+        "Kreditkartendetails": {
+            "Vertragspartnernummer": "15694832",
+            "Beleg Nr.": "27142",
+            "Kartenfolgenummer": "XXXXXXXXXXXX0502",
+            "Transaktionsbetrag": "440.00",
+            "Verfallsdatum": "XX/XX",
+            "Genehmigter Betrag": "440.00",
+            "Terminal ID": "89264892",
+            "Genehmigungscode": "366417"
         }
     },
-    {
-        "hotel_information": {
-            "name": "THE MADISON",
-            "location": "HAMBURG"
-        },
-        "guest_information": null,
-        "invoice_information": null,
-        "room_charges": null,
-        "taxes": null,
-        "total_charges": null
-    }
+    {}
 ]

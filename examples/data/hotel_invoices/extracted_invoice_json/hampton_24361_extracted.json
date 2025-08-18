@@ -7,23 +7,21 @@
             "fax": "+49(0)40-302372-100"
         },
         "guest_information": {
-            "name": "APIMEISTER CONSULTING GMBH",
-            "address": "FRIEDRICHSR. 123, 10117 BERLIN, GERMANY",
-            "guest_name": "JENS WALTER"
+            "name": "JENS WALTER",
+            "company": "APIMEISTER CONSULTING GMBH",
+            "address": "FRIEDRICHSR. 123, 10117 BERLIN, GERMANY"
         },
         "invoice_information": {
             "vat_invoice": "24361",
             "confirmation_number": "87607957",
             "arrival_date": "28/04/2019 23:53:00",
             "departure_date": "30/04/2019",
+            "room_no": "119",
             "adult/child": "1/0",
             "room_rate": "102.00",
             "rate_plan": "2G2",
-            "room_no": "119",
-            "folio_no": "107155A",
             "vat": "DE259895636",
-            "cashier_id": "H",
-            "ref_no": "107155A"
+            "folio_no/che": "107155A"
         },
         "charges": [
             {
@@ -33,7 +31,7 @@
                 "ref_no": "331422",
                 "guest_charges": null,
                 "credit": "€221.00",
-                "balance": null
+                "balance": "-€221.00"
             },
             {
                 "date": "28/04/2019",
@@ -42,16 +40,16 @@
                 "ref_no": "331424",
                 "guest_charges": "€221.00",
                 "credit": null,
-                "balance": null
+                "balance": "€0.00"
             },
             {
                 "date": "28/04/2019",
                 "description": "ADVANCED DEPOSIT CREDIT",
                 "cashier_id": "GARO",
-                "ref_no": "331424",
+                "ref_no": "331425",
                 "guest_charges": null,
                 "credit": "€221.00",
-                "balance": null
+                "balance": "€221.00"
             },
             {
                 "date": "28/04/2019",
@@ -60,7 +58,7 @@
                 "ref_no": "331455",
                 "guest_charges": "€97.05",
                 "credit": null,
-                "balance": null
+                "balance": "€318.05"
             },
             {
                 "date": "28/04/2019",
@@ -69,7 +67,7 @@
                 "ref_no": "331455",
                 "guest_charges": "€14.95",
                 "credit": null,
-                "balance": null
+                "balance": "€333.00"
             },
             {
                 "date": "29/04/2019",
@@ -78,7 +76,7 @@
                 "ref_no": "331959",
                 "guest_charges": "€114.05",
                 "credit": null,
-                "balance": null
+                "balance": "€447.05"
             }
         ]
     },
@@ -98,48 +96,53 @@
                 "city": "BERLIN",
                 "postal_code": "10117",
                 "country": "GERMANY"
-            }
+            },
+            "guest_name": "JENS WALTER"
         },
         "invoice_information": {
             "invoice_number": "24361",
             "confirmation_number": "87607597",
-            "guest_name": "JENS WALTER",
+            "vat_number": "DE259965636",
+            "folio_number": "107515 A"
+        },
+        "stay_information": {
             "room_number": "119",
             "arrival_date": "28/04/2019 23:53:00",
             "departure_date": "30/04/2019",
             "adults_children": "1/0",
             "room_rate": "102.00",
             "rate_plan": "2G2",
-            "AL": "null",
-            "HH#: ": "null",
-            "VAT": "DE259965636",
-            "folio_no_che": "107515 A"
-        },
-        "charges": {
-            "date": "30/04/2019 08:25:00",
-            "description": "BREAKFAST",
             "cashier_id": "FEBA",
             "ref_no": "331969",
-            "guest_charges": "64.95",
-            "credit": "null",
-            "balance": "0.00"
+            "hhonors_number": "107515 A"
         },
+        "charges": [
+            {
+                "date": "29/04/2019",
+                "description": "BREAKFAST",
+                "guest_charges": "64.95",
+                "credit": null,
+                "balance": "€0.00"
+            }
+        ],
         "tax_summary": {
-            "trade_receivable_net_19%": "8.32",
-            "trade_receivable_net_7%": "0.00",
-            "trade_receivable_net_7%_2": "197.29",
-            "vat_at_19%": "1.58",
-            "f&b_vat_7%": "0.00",
-            "vat_at_7%": "13.81",
-            "trade_receivables_incl_vat": "221.00"
+            "trade_receivable_net_19%": "€8.32",
+            "trade_receivable_net_7%": "€0.00",
+            "trade_receivable_net_7.00%": "€197.29",
+            "vat_at_19%": "€1.58",
+            "f&b_vat_7%": "€0.00",
+            "vat_at_7%": "€13.81",
+            "trade_receivables_incl_vat": "€221.00"
         },
         "payment_information": {
-            "approval_amount": "221.00",
+            "approval_amount": "€221.00",
+            "approval_code": "491464",
             "transaction_id": "331422",
-            "appr_code": "491464",
-            "balance": "221.00"
+            "balance": "€221.00"
         },
-        "guest_signature": "null",
-        "debt_related_verbiage": "null"
+        "signature": {
+            "guest_signature": null,
+            "debit_related_verbiage": null
+        }
     }
 ]

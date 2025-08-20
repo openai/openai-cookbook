@@ -2,6 +2,11 @@
 
 # You can optionally customize how your information shows up cookbook.openai.com over here.
 # If your information is not present here, it will be pulled from your GitHub profile.
+b-per:
+  name: "Benoit Perigaud"
+  website: "https://www.linkedin.com/in/benoit-perigaud/"
+  avatar: "https://avatars.githubusercontent.com/u/8754100?v=4"
+
 WJPBProjects:
   name: "Wulfie Bain"
   website: "https://www.linkedin.com/in/wulfie-bain/"

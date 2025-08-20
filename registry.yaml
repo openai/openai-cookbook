@@ -4,6 +4,19 @@
 # should build pages for, and indicates metadata such as tags, creation date and
 # authors for each page.
 
+- title: Trusting your data using the Agents SDK and the dbt MCP server
+  path: examples/Trusting_your_data_using_Agents_SDK_and_dbt_MCP_server.ipynb
+  date: 2025-08-20
+  authors:
+    - b-per
+  tags:
+    - agents-sdk
+    - gpt-5
+    - mcp
+    - dbt
+    - data
+    - semantic-layer
+
 - title: Verifying gpt-oss implementations
   path: articles/gpt-oss/verifying-implementations.md
   date: 2025-08-11

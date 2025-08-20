@@ -4,6 +4,7 @@ People are writing great tools and papers for improving outputs from GPT. Here a
 
 ## Prompting libraries & tools (in alphabetical order)
 
+- [Agenta](https://agenta.ai): An open-source LLMOps platform with prompt management, playground, evaluations, and observability 
 - [Arthur Shield](https://www.arthur.ai/get-started): A paid product for detecting toxicity, hallucination, prompt injection, etc.
 - [Baserun](https://baserun.ai/): A paid product for testing, debugging, and monitoring LLM-based apps
 - [Chainlit](https://docs.chainlit.io/overview): A Python library for making chatbot interfaces.

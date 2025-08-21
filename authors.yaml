@@ -2,6 +2,12 @@
 
 # You can optionally customize how your information shows up cookbook.openai.com over here.
 # If your information is not present here, it will be pulled from your GitHub profile.
+
+alex000kim:
+  name: "Alex Kim"
+  website: "https://alex000kim.com"
+  avatar: "https://alex000kim.com/about/profile-pic.png"
+  
 WJPBProjects:
   name: "Wulfie Bain"
   website: "https://www.linkedin.com/in/wulfie-bain/"
@@ -451,7 +457,7 @@ Vaibhavs10:
   name: "vb"
   website: "https://huggingface.co/reach-vb"
   avatar: "https://cdn-avatars.huggingface.co/v1/production/uploads/1655385361868-61b85ce86eb1f2c5e6233736.jpeg"
-
+  
 yagil:
   name: "Yagil Burowski"
   website: "https://x.com/yagilb"

@@ -427,6 +427,17 @@
     - pinecone
     - web-search
 
+- title: Agent with Persistent Memory Capabilities
+  path: examples/agents_sdk/agent_with_persistent_memory.ipynb
+  date: 2025-08-25
+  authors:
+    - Boburmirzo
+  tags:
+    - agents-sdk
+    - memory
+    - functions
+    - responses
+
 - title: Automating Dispute Management with Agents SDK and Stripe API
   path: examples/agents_sdk/dispute_agent.ipynb
   date: 2025-03-17

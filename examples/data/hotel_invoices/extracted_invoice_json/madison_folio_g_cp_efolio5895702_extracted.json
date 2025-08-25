@@ -2,7 +2,7 @@
     {
         "Hotel Information": {
             "Name": "MADISON Hotel GmbH",
-            "Address": "Schaartseineweg 4, 20459 Hamburg",
+            "Address": "Schaartwiete 4, 20459 Hamburg",
             "Contact": {
                 "Phone": "+49.40.37 666-0",
                 "Fax": "+49.40.37 666-137",
@@ -27,12 +27,12 @@
         },
         "Invoice Information": {
             "Rechnungs-Nr": "505050",
-            "Date": "04.07.19",
-            "Room": "203",
-            "Arrival": "30.06.19",
-            "Departure": "04.07.19",
-            "Page": "1 of 1",
-            "User ID": "RIL"
+            "Datum": "04.07.19",
+            "Zimmer": "203",
+            "Anreise": "30.06.19",
+            "Abreise": "04.07.19",
+            "Seite": "1 of 1",
+            "Benutzer ID": "RIL"
         },
         "Charges": [
             {
@@ -72,7 +72,7 @@
             "Brutto EUR": "440.00",
             "Saldo": "0.00 EUR"
         },
-        "Tax Details": {
+        "Umsatzsteuer Detail": {
             "Total inkl. MwSt.": {
                 "Netto EUR": "411.21",
                 "MwSt. EUR": "28.79",
@@ -82,8 +82,10 @@
                 "Netto EUR": "411.21",
                 "MwSt. EUR": "28.79",
                 "Brutto EUR": "440.00"
-            },
-            "Finanzamt": "Hamburg Mitte",
+            }
+        },
+        "Finanzamt": {
+            "Name": "Hamburg Mitte",
             "Steuernummer": "48/741/01228"
         }
     }

@@ -1,103 +1,105 @@
 [
     {
-        "hotel_information": {
-            "name": "MADISON Hotel GmbH",
-            "address": "Schaartestraße 4, 20459 Hamburg",
-            "contact": {
-                "phone": "+49.40.37 666-0",
-                "fax": "+49.40.37 666-137",
-                "email": "info@madisonhotel.de",
-                "website": "madisonhotel.de"
+        "Hotel Information": {
+            "Name": "MADISON Hotel GmbH",
+            "Address": "Schaartestraße 4, 20459 Hamburg",
+            "Contact": {
+                "Phone": "+49.40.37 666-0",
+                "Fax": "+49.40.37 666-137",
+                "Email": "info@madisonhotel.de",
+                "Website": "madisonhotel.de"
             },
-            "managing_directors": "Marlies Head, Thomas Kleinertz",
-            "registration": {
-                "court": "AG Hamburg HRB 47281",
-                "VAT_ID": "DE118 696 407"
-            },
-            "bank_details": {
-                "bank": "HypoVereinsbank",
-                "account_number": "360 27 11",
+            "Geschäftsführer": "Marlies Head, Thomas Kleinertz",
+            "Handelsregister": "AG Hamburg HRB 47281",
+            "VAT ID": "DE118 696 407",
+            "Bank": {
+                "Name": "HypoVereinsbank",
                 "IBAN": "DE48 2003 0000 0003 6027 11",
-                "BIC": "HYVEDEMM300"
+                "BIC": "HYVEDEMM300",
+                "Konto-Nr.": "360 27 11",
+                "BLZ": "200 300 00"
             }
         },
-        "guest_information": {
-            "company": "APfmeister Consulting GmbH",
-            "address": "Friedrichstr. 123, 10117 Berlin",
-            "guest_name": "Herr Jens Walter"
+        "Guest Information": {
+            "Company": "APfmeister Consulting GmbH",
+            "Address": "Friedrichstr. 123, 10117 Berlin",
+            "Guest Name": "Herr Jens Walter"
         },
-        "invoice_information": {
-            "invoice_number": "506928",
-            "date": "26.07.19",
-            "room_number": "437",
-            "check_in": "21.07.19",
-            "check_out": "26.07.19",
-            "page": "1 of 1",
-            "user_id": "RF"
+        "Invoice Information": {
+            "Rechnungs-Nr.": "506928",
+            "Date": "26.07.19",
+            "Room": "437",
+            "Anreise": "21.07.19",
+            "Abreise": "26.07.19",
+            "Seite": "1 of 1",
+            "Benutzer ID": "RF"
         },
-        "charges": [
+        "Charges": [
             {
-                "date": "21.07.19",
-                "description": "Übernachtung exklusive Frühstück",
-                "charge": 110.0,
-                "credit": null
+                "Datum": "21.07.19",
+                "Beschreibung": "Übernachtung exklusive Frühstück",
+                "Belastung": 110.0,
+                "Entlastung": null
             },
             {
-                "date": "22.07.19",
-                "description": "Übernachtung exklusive Frühstück",
-                "charge": 110.0,
-                "credit": null
+                "Datum": "22.07.19",
+                "Beschreibung": "Übernachtung exklusive Frühstück",
+                "Belastung": 110.0,
+                "Entlastung": null
             },
             {
-                "date": "23.07.19",
-                "description": "Übernachtung exklusive Frühstück",
-                "charge": 110.0,
-                "credit": null
+                "Datum": "23.07.19",
+                "Beschreibung": "Übernachtung exklusive Frühstück",
+                "Belastung": 110.0,
+                "Entlastung": null
             },
             {
-                "date": "24.07.19",
-                "description": "Übernachtung exklusive Frühstück",
-                "charge": 110.0,
-                "credit": null
+                "Datum": "24.07.19",
+                "Beschreibung": "Übernachtung exklusive Frühstück",
+                "Belastung": 110.0,
+                "Entlastung": null
             },
             {
-                "date": "25.07.19",
-                "description": "Übernachtung exklusive Frühstück",
-                "charge": 110.0,
-                "credit": null
+                "Datum": "25.07.19",
+                "Beschreibung": "Übernachtung exklusive Frühstück",
+                "Belastung": 110.0,
+                "Entlastung": null
             },
             {
-                "date": "26.07.19",
-                "description": "Mastercard IFC",
-                "charge": null,
-                "credit": 550.0
+                "Datum": "26.07.19",
+                "Beschreibung": "Mastercard IFC",
+                "Belastung": null,
+                "Entlastung": 550.0
             }
         ],
-        "summary": {
-            "total_net": 514.02,
-            "total_vat": 35.98,
-            "total_gross": 550.0,
-            "total": 550.0,
-            "balance_due": 0.0
-        },
-        "payment_information": {
-            "financial_institution": "Finanzamt: Hamburg Mitte",
-            "tax_number": "47/841/01122",
-            "credit_card_details": {
-                "card_number": "XXXXXXXXXXXX0502",
-                "transaction_amount": 550.0,
-                "approval_code": "869152",
-                "terminal_id": "692648593",
-                "approval_date": "26.07.19",
-                "approval_time": "XXXX"
+        "Summary": {
+            "Total inkl. MwSt.": {
+                "Netto EUR": 514.02,
+                "MwSt. EUR": 35.98,
+                "Brutto EUR": 550.0
             },
-            "merchant_details": {
-                "merchant_number": "156489382",
-                "receipt_number": "36856",
-                "transaction_number": "550.00",
-                "approved_amount": 550.0,
-                "approval_code": "869152"
-            }
+            "MwSt. 7%": {
+                "Netto EUR": 514.02,
+                "MwSt. EUR": 35.98,
+                "Brutto EUR": 550.0
+            },
+            "Total": 550.0,
+            "Saldo": "0.00 EUR"
+        },
+        "Payment Information": {
+            "Finanzamt": "Hamburg Mitte",
+            "Steuernummer": "48/741/00128",
+            "Kreditkarteninstitut": {
+                "Vertragspartner": "15648932",
+                "Beleg Nr.": "36856",
+                "Kreditkartennummer": "XXXXXXXXXXXX0502",
+                "Transaktionsbetrag": "550.00",
+                "Verfallsdatum": "XXXX",
+                "Genehmigter Betrag": "550.00",
+                "Terminal ID": "69264893",
+                "Genehmigungscode": "696152"
+            },
+            "Unterschrift": "Unterschrift des Karteninhabers"
         }
     }
 ]

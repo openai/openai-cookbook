@@ -19,12 +19,10 @@
             "invoice_number": "HA007 - 123123 - 37816396",
             "date": "05.07.19",
             "page": "1 von 1",
-            "user_id": "IWINKING"
-        },
-        "stay_information": {
+            "user_id": "IWINKING",
             "room_number": "1307",
-            "check_in": "04.07.19",
-            "check_out": "05.07.19"
+            "arrival_date": "04.07.19",
+            "departure_date": "05.07.19"
         },
         "charges": [
             {
@@ -40,24 +38,18 @@
                 "credit": 118.0
             }
         ],
-        "taxes": [
-            {
-                "description": "Total inkl. MwSt",
+        "summary": {
+            "total_incl_vat": {
                 "net_amount": 110.28,
-                "tax_amount": 7.72,
-                "gross_amount": 118.0,
-                "total": 118.0
+                "vat_amount": 7.72,
+                "gross_amount": 118.0
             },
-            {
-                "description": "MwSt 7%",
+            "vat_7_percent": {
                 "net_amount": 110.28,
-                "tax_amount": 7.72,
-                "gross_amount": 118.0,
-                "total": 0.0
-            }
-        ],
-        "total": {
-            "amount": 118.0,
+                "vat_amount": 7.72,
+                "gross_amount": 118.0
+            },
+            "total": 118.0,
             "balance": 0.0
         },
         "message": "Vielen Dank für Ihren Aufenthalt im Mercure Bochum City. Wir wünschen Ihnen eine gute Heimreise und freuen uns schon heute auf einen erneuten Besuch in unserem Hotel. Ihr Mercure Hotel Bochum City."

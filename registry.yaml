@@ -6,7 +6,7 @@
 
 - title: "Fine-tune gpt-oss for better Korean language performance"
   path: articles/gpt-oss/fine-tune-korean.ipynb
-  description: "Guide to fine-tuning an open-weight model for Korean and workflow tips."
+  date: 2025-08-26
   authors: 
     - heejingithub
     - danial-openai

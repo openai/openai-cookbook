@@ -13,8 +13,6 @@
     - joanneshin-openai 
   tags: 
     - gpt-oss
-    - fine-tuning
-    - korean
     - open-models
   
 - title: Verifying gpt-oss implementations

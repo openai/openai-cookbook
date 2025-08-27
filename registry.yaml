@@ -13,9 +13,6 @@
     - agents-sdk
     - gpt-5
     - mcp
-    - dbt
-    - data
-    - semantic-layer
 
 - title: Verifying gpt-oss implementations
   path: articles/gpt-oss/verifying-implementations.md

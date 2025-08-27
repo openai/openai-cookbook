@@ -4,6 +4,18 @@
 # should build pages for, and indicates metadata such as tags, creation date and
 # authors for each page.
 
+
+- title: "Fine-tune gpt-oss for better Korean language performance"
+  path: articles/gpt-oss/fine-tune-korean.ipynb
+  date: 2025-08-26
+  authors: 
+    - heejingithub
+    - danial-openai
+    - joanneshin-openai 
+  tags: 
+    - gpt-oss
+    - open-models
+
 - title: Trusting your data using the Agents SDK and the dbt MCP server
   path: examples/Trusting_your_data_using_Agents_SDK_and_dbt_MCP_server.ipynb
   date: 2025-08-20

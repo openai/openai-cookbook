@@ -1,0 +1,28 @@
+{
+  "merchant": "Fuel Mart",
+  "location": {
+    "city": "San Bernardino",
+    "state": "CA",
+    "zipcode": "92417"
+  },
+  "time": "2024-07-07T17:47:46",
+  "items": [
+    {
+      "description": "REG CR #09",
+      "product_code": null,
+      "category": "Fuel",
+      "item_price": "4.199",
+      "sale_price": null,
+      "quantity": "14.507G",
+      "total": "60.91"
+    }
+  ],
+  "subtotal": "60.91",
+  "tax": null,
+  "total": "60.91",
+  "handwritten_notes": [
+    "224014",
+    "Nissan",
+    "X"
+  ]
+}

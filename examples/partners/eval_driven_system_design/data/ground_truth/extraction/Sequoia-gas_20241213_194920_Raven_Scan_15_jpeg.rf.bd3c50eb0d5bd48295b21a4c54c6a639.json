@@ -1,0 +1,28 @@
+{
+  "merchant": "Shell Gasoline",
+  "location": {
+    "city": "Sylmar",
+    "state": "CA",
+    "zipcode": "91342"
+  },
+  "time": "2024-04-18T09:55:00",
+  "items": [
+    {
+      "description": "E85",
+      "product_code": null,
+      "category": "Fuel",
+      "item_price": "3.599",
+      "sale_price": null,
+      "quantity": "11.168",
+      "total": "40.19"
+    }
+  ],
+  "subtotal": null,
+  "tax": null,
+  "total": "40.19",
+  "handwritten_notes": [
+    "Sequoia",
+    "home -> yos",
+    "229003"
+  ]
+}

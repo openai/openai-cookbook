@@ -4,6 +4,17 @@
 # should build pages for, and indicates metadata such as tags, creation date and
 # authors for each page.
 
+- title: Realtime Prompting Guide
+  path: examples/Realtime_prompting_guide.ipynb
+  date: 2025-08-29
+  authors:
+    - minh-hoque
+  tags:
+    - realtime
+    - speech
+    - audio
+    - responses
+
 - title: "Fine-tune gpt-oss for better Korean language performance"
   path: articles/gpt-oss/fine-tune-korean.ipynb
   date: 2025-08-26

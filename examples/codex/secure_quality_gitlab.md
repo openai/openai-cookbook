@@ -146,10 +146,11 @@ codex_review:
 
 The generated artifacts can be downloaded from the pipeline page
 
-![][image1]  
+<img src="./images/gitlab_pipelines_success.png" alt="GitLab Pipelines" width="700"/>
+
 Or when running as a merge from a feature to master branch, 
 
-![][image2]
+<img src="./images/GitLab_MR_Widget.png" alt="GitLab Merge Request Widget" width="700"/>
 
 By embedding Codex CLI into your GitLab CI/CD pipelines, you can **elevate code quality checks beyond static rules**. Instead of only catching syntax errors or style violations, you enable reasoning-based analysis that highlights potential issues in context.
 

@@ -5,6 +5,15 @@
 # authors for each page.
 
 - title: Realtime Prompting Guide
+  path: examples/codex/secure_quality_gitlab.md
+  date: 2025-08-29
+  authors:
+    - jonlim-openai
+    - pap-openai
+  tags:
+    - codex
+
+- title: Realtime Prompting Guide
   path: examples/Realtime_prompting_guide.ipynb
   date: 2025-08-28
   authors:

@@ -15,6 +15,17 @@
     - audio
     - responses
 
+- title: "Fine-tune gpt-oss for better Korean language performance"
+  path: articles/gpt-oss/fine-tune-korean.ipynb
+  date: 2025-08-26
+  authors: 
+    - heejingithub
+    - danial-openai
+    - joanneshin-openai 
+  tags: 
+    - gpt-oss
+    - open-models
+  
 - title: Verifying gpt-oss implementations
   path: articles/gpt-oss/verifying-implementations.md
   date: 2025-08-11
@@ -23,6 +34,7 @@
   tags:
     - gpt-oss
     - open-models
+    - gpt-oss-providers
 
 - title: How to run gpt-oss locally with LM Studio
   path: articles/gpt-oss/run-locally-lmstudio.md
@@ -32,6 +44,8 @@
   tags:
     - gpt-oss
     - open-models
+    - gpt-oss-local
+    
 - title: GPT-5 Prompt Migration and Improvement Using the New Optimizer
   path: examples/gpt-5/prompt-optimization-cookbook.ipynb
   date: 2025-08-07
@@ -87,15 +101,17 @@
   tags:
     - gpt-oss
     - open-models
+    - gpt-oss-server
 
 - title: Using NVIDIA TensorRT-LLM to run gpt-oss-20b
-  path: articles/run-nvidia.ipynb
+  path: articles/gpt-oss/run-nvidia.ipynb
   date: 2025-08-05
   authors:
     - jayrodge
   tags:
     - gpt-oss
     - open-models
+    - gpt-oss-server
 
 - title: Fine-tuning with gpt-oss and Hugging Face Transformers
   path: articles/gpt-oss/fine-tune-transfomers.ipynb
@@ -107,6 +123,7 @@
   tags:
     - open-models
     - gpt-oss
+    - gpt-oss-fine-tuning
 
 - title: How to handle the raw chain of thought in gpt-oss
   path: articles/gpt-oss/handle-raw-cot.md
@@ -116,6 +133,8 @@
   tags:
     - open-models
     - gpt-oss
+    - gpt-oss-fine-tuning
+    - gpt-oss-providers
 
 - title: How to run gpt-oss with Transformers
   path: articles/gpt-oss/run-transformers.md
@@ -125,6 +144,7 @@
   tags:
     - open-models
     - gpt-oss
+    - gpt-oss-server
 
 - title: How to run gpt-oss with vLLM
   path: articles/gpt-oss/run-vllm.md
@@ -134,6 +154,7 @@
   tags:
     - open-models
     - gpt-oss
+    - gpt-oss-server
 
 - title: How to run gpt-oss locally with Ollama
   path: articles/gpt-oss/run-locally-ollama.md
@@ -143,6 +164,7 @@
   tags:
     - open-models
     - gpt-oss
+    - gpt-oss-local
 
 - title: OpenAI Harmony Response Format
   path: articles/openai-harmony.md
@@ -153,6 +175,8 @@
     - open-models
     - gpt-oss
     - harmony
+    - gpt-oss-providers
+    - gpt-oss-fine-tuning
 
 - title: Temporal Agents with Knowledge Graphs
   path: examples/partners/temporal_agents_with_knowledge_graphs/temporal_agents_with_knowledge_graphs.ipynb

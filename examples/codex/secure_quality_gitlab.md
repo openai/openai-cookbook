@@ -1,6 +1,6 @@
-# **Automating Code Quality and Security Fixes with Codex CLI in GitLab**
+# Automating Code Quality and Security Fixes with Codex CLI in GitLab
 
-## **Introduction**
+## Introduction
 
 When deploying production code, most teams rely on CI/CD pipelines to validate changes before merging. Reviewers typically look at unit test results, vulnerability scans, and code quality reports. Traditionally, these are produced by rule-based engines that catch known issues but often miss contextual or higher-order problems—while leaving developers with noisy results that are hard to prioritize or act on.
 
@@ -12,7 +12,7 @@ With LLMs, you can add a new layer of intelligence to this process: reasoning ab
 
 This guide shows how to integrate Codex CLI into a GitLab pipeline for both use cases—delivering structured, machine-readable reports alongside actionable, human-readable guidance.
 
-## **What is Codex CLI?**
+## What is Codex CLI?
 
 Codex CLI is an open-source command-line tool for bringing OpenAI’s reasoning models into your development workflow. For installation, usage, and full documentation, refer to the official repository: [github.com/openai/codex](https://github.com/openai/codex?utm_source=chatgpt.com).
 
@@ -28,7 +28,7 @@ To follow along, you’ll need:
 * An **OpenAI API key** (`OPENAI_API_KEY`)  
 * GitLab CI/CD variables configured under **Settings → CI/CD → Variables**
 
-## **Example \#1 \- Using Codex CLI to Produce a Code Quality Report**
+## Example #1 - Using Codex CLI to Produce a Code Quality Report
 
 ### Background
 
@@ -148,11 +148,11 @@ codex_review:
 
 The generated artifacts can be downloaded from the pipeline page
 
-<img src="./images/gitlab_pipelines_success.png" alt="GitLab Pipelines" width="700"/>
+<img src="../../images/gitlab-pipelines-success.png" alt="GitLab Pipelines" width="700"/>
 
 Or when running as a merge from a feature to master branch, 
 
-<img src="./images/GitLab_MR_Widget.png" alt="GitLab Merge Request Widget" width="700"/>
+<img src="../../images/gitlab-mr-widget.png" alt="GitLab Merge Request Widget" width="700"/>
 
 By embedding Codex CLI into your GitLab CI/CD pipelines, you can **elevate code quality checks beyond static rules**. Instead of only catching syntax errors or style violations, you enable reasoning-based analysis that highlights potential issues in context.
 
@@ -164,7 +164,7 @@ This approach has several benefits:
 
 As teams adopt this workflow, LLM-powered quality checks can complement traditional linting and vulnerability scanning—helping ensure that code shipped to production is both robust and maintainable.
 
-## **Example \#2 – Using Codex CLI for Security Remediation**
+## Example #2 – Using Codex CLI for Security Remediation
 
 ### Background
 
@@ -304,13 +304,13 @@ codex_recommendations:
 ```
 Here's an example of the output we receive: 
 
-# Example Output: Consolidated SAST Findings
+### Example Output: Consolidated SAST Findings
 
 Parsed `gl-sast-report.json` and merged overlapping issues.  
 **Total raw findings:** 5 → **Consolidated into:** 4 representative entries  
 (duplicated SQL injection patterns across endpoints were merged).
 
-## Summary Table
+#### Summary Table
 
 | Rank | CWE      | Title                                | Affected Locations | Likely Exploit Path                  | Risk     | Rationale (1–2 lines)                                                                                 |
 |------|----------|--------------------------------------|-------------------|--------------------------------------|----------|--------------------------------------------------------------------------------------------------------|
@@ -319,14 +319,14 @@ Parsed `gl-sast-report.json` and merged overlapping issues.
 | 3    | CWE-94   | Server-side code injection via eval  | 1                 | User profile update handler          | High     | `eval()` on user input allows RCE; conditionally enabled but still high-impact when reachable.          |
 | 4    | — (SSRF) | SSRF via arbitrary image URL fetch   | 1                 | Image URL fetch/write flow           | High     | Outbound fetch of unvalidated URLs enables internal service / metadata access (e.g., AWS metadata).     |
 
-## Top 5 Immediate Actions
+#### Top 5 Immediate Actions
 1. Replace hardcoded JWT signing key in `lib/insecurity.ts:23`; load from secret storage, rotate keys, and invalidate existing tokens.  
 2. Update `routes/login.ts:34` to use parameterized queries; remove raw concatenation; validate and escape inputs.  
 3. Fix `routes/search.ts:23` by using ORM bind parameters or escaped `LIKE` helpers instead of string concatenation.  
 4. Refactor `routes/userProfile.ts:55–66`; replace `eval()` with safe templating or a whitelisted evaluator.  
 5. Harden image import logic: allowlist schemes/hosts, block link-local/metadata IPs, apply timeouts and size limits.  
 
-### Deduplicated Findings (Full Details)
+##### Deduplicated Findings (Full Details)
 
 ##### 1. CWE-798 — Hardcoded JWT private key
 - Risk: Critical — Exploitability 98/100  
@@ -587,7 +587,7 @@ Using Codex CLI in GitLab CI/CD allows you to augment existing review processes 
 
 ---
 
-## **Wrapping Up**
+## Wrapping Up
 
 In this cookbook, we explored how **Codex CLI** can be embedded into GitLab CI/CD pipelines to make software delivery safer and more maintainable:
 

@@ -4,7 +4,7 @@
 # should build pages for, and indicates metadata such as tags, creation date and
 # authors for each page.
 
-- title: Realtime Prompting Guide
+- title: Automating Code Quality and Security Fixes with Codex CLI on GitLab
   path: examples/codex/secure_quality_gitlab.md
   date: 2025-08-29
   authors:

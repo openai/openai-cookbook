@@ -370,155 +370,153 @@ Parsed `gl-sast-report.json` and merged overlapping issues.
 
 **Requirement**: This job depends on the previous stage output of the `security_priority.md` file to use as input to generate the patch file for creating an MR 
 ```yaml
- # --- Resolution prompt (produces unified git diffs only) ---
- CODEX_DIFF_PROMPT: |
-   You are a secure code remediation assistant.
-   You will receive:
-   - The repository working tree (read-only)
-   - One vulnerability (JSON from a GitLab SAST report)
-   - Allowed files list
+ stages:
+  - remediation
 
+default:
+  image: node:24
 
-   GOAL:
-   - Create the minimal, safe fix for the vulnerability.
-   - Output a unified git diff that applies cleanly with `git apply -p0` (or -p1 for a/ b/ paths).
-   - Prefer surgical changes: input validation, safe APIs, parameterized queries, permission checks.
-   - Do NOT refactor broadly or change unrelated code.
+variables:
+  # Inputs/outputs
+  SAST_REPORT_PATH: "gl-sast-report.json"
+  PATCH_DIR: "codex_patches"
+  CODEX_DIFF_RAW: "artifacts/codex-diff-raw.log"
 
+  # --- Resolution prompt (produces unified git diffs only) ---
+  CODEX_DIFF_PROMPT: |
+    You are a secure code remediation assistant.
+    You will receive:
+    - The repository working tree (read-only)
+    - One vulnerability (JSON from a GitLab SAST report)
+    - Allowed files list
 
-   RULES (must follow exactly):
-   - PRINT ONLY the diff between the markers below.
-   - Use repo-relative paths; `diff --git a/path b/path` headers are accepted.
-   - No binary file changes. No prose/explanations outside the markers.
+    GOAL:
+    - Create the minimal, safe fix for the vulnerability.
+    - Output a unified git diff that applies cleanly with `git apply -p0` (or -p1 for a/ b/ paths).
+    - Prefer surgical changes: input validation, safe APIs, parameterized queries, permission checks.
+    - Do NOT refactor broadly or change unrelated code.
 
+    RULES (must follow exactly):
+    - PRINT ONLY the diff between the markers below.
+    - Use repo-relative paths; `diff --git a/path b/path` headers are accepted.
+    - No binary file changes. No prose/explanations outside the markers.
 
-   MARKERS:
-   === BEGIN_UNIFIED_DIFF ===
-   <unified diff here>
-   === END_UNIFIED_DIFF ===
+    MARKERS:
+    === BEGIN_UNIFIED_DIFF ===
+    <unified diff here>
+    === END_UNIFIED_DIFF ===
 
-
-   If no safe fix is possible without deeper changes, output an empty diff between the markers.
-
+    If no safe fix is possible without deeper changes, output an empty diff between the markers.
 
 # ---------------------------
-# Stage: remediation → Job 2 (Resolution / git diffs)
+# Stage: remediation → Generate unified diffs/patches
 # ---------------------------
 codex_resolution:
- stage: remediation
- needs:
-   - job: codex_recommendations
-     artifacts: true
- rules:
-   - if: '$OPENAI_API_KEY'
-     when: on_success
-   - when: never
- variables:
-   SAST_REPORT_PATH: "gl-sast-report.json"
-   PATCH_DIR: "codex_patches"
-   CODEX_DIFF_RAW: "artifacts/codex-diff-raw.log"
- script:
-   - set -euo pipefail
-   - mkdir -p "$PATCH_DIR" artifacts
+  stage: remediation
+  rules:
+    - if: '$OPENAI_API_KEY'
+      when: on_success
+    - when: never
+  script:
+    - set -euo pipefail
+    - mkdir -p "$PATCH_DIR" artifacts
 
-   - apt-get update && apt-get install -y --no-install-recommends bash git jq curl ca-certificates
-   - npm -g i @openai/codex@latest
-   - git --version && codex --version || true
+    # Deps
+    - apt-get update && apt-get install -y --no-install-recommends bash git jq curl ca-certificates
+    - npm -g i @openai/codex@latest
+    - git --version && codex --version || true
 
+    # Require SAST report; no-op if missing
+    - |
+      if [ ! -s "${SAST_REPORT_PATH}" ]; then
+        echo "No SAST report found; remediation will no-op."
+        printf "CODEX_CREATED_PATCHES=false\n" > codex.env
+        exit 0
+      fi
 
-   # If SAST missing, no-op (job still visible/success)
-   - |
-     if [ ! -s "${SAST_REPORT_PATH}" ]; then
-       echo "No SAST report found; resolution will no-op."
-       printf "CODEX_CREATED_PATCHES=false\n" > codex.env
-       exit 0
-     fi
+    # Pull High/Critical items
+    - jq -c '.vulnerabilities[]? | select((.severity|ascii_downcase)=="high" or (.severity|ascii_downcase)=="critical")' "$SAST_REPORT_PATH" \
+        | nl -ba > /tmp/hicrit.txt || true
+    - |
+      if [ ! -s /tmp/hicrit.txt ]; then
+        echo "No High/Critical vulnerabilities found. Nothing to fix."
+        printf "CODEX_CREATED_PATCHES=false\n" > codex.env
+        exit 0
+      fi
 
-   # Filter High/Critical
-   - |
-     jq -c '.vulnerabilities[]? | select((.severity|ascii_downcase)=="high" or (.severity|ascii_downcase)=="critical")' "$SAST_REPORT_PATH" \
-       | nl -ba > /tmp/hicrit.txt || true
+    # Ground Codex to actual repo files
+    - FILE_LIST="$(git ls-files | sed 's/^/- /')"
 
+    # Identity for any local patch ops
+    - git config user.name "CI Codex Bot"
+    - git config user.email "codex-bot@example.com"
 
-     if [ ! -s /tmp/hicrit.txt ]; then
-       echo "No High/Critical vulnerabilities found. Nothing to fix."
-       printf "CODEX_CREATED_PATCHES=false\n" > codex.env
-       exit 0
-     fi
+    - created=0
 
-   - FILE_LIST="$(git ls-files | sed 's/^/- /')"
-   - git config user.name "CI Codex Bot"
-   - git config user.email "codex-bot@example.com"
+    # Loop: build prompt (robust temp-file), run Codex, extract diff, validate
+    - |
+      while IFS=$'\t' read -r idx vuln_json; do
+        echo "Processing vulnerability #$idx"
+        echo "$vuln_json" > "/tmp/vuln-$idx.json"
 
-   - created=0
+        PROMPT_FILE="$(mktemp)"
+        {
+          printf "%s\n\n" "$CODEX_DIFF_PROMPT"
+          printf "VULNERABILITY_JSON:\n<<JSON\n"
+          cat "/tmp/vuln-$idx.json"
+          printf "\nJSON\n\n"
+          printf "EXISTING_REPOSITORY_FILES (exact list):\n"
+          printf "%s\n" "$FILE_LIST"
+        } > "$PROMPT_FILE"
 
-   # Loop per finding → compose prompt via a temp file (robust) → run Codex → extract diff
-   - |
-     while IFS=$'\t' read -r idx vuln_json; do
-       echo "Processing vulnerability #$idx"
-       echo "$vuln_json" > "/tmp/vuln-$idx.json"
+        PER_FINDING_PROMPT="$(tr -d '\r' < "$PROMPT_FILE")"
+        rm -f "$PROMPT_FILE"
 
-       # --- Compose prompt into a temp file (no heredocs/quoting traps) ---
-       PROMPT_FILE="$(mktemp)"
-       {
-         printf "%s\n\n" "$CODEX_DIFF_PROMPT"
-         printf "VULNERABILITY_JSON:\n<<JSON\n"
-         cat "/tmp/vuln-$idx.json"
-         printf "\nJSON\n\n"
-         printf "EXISTING_REPOSITORY_FILES (exact list):\n"
-         printf "%s\n" "$FILE_LIST"
-       } > "$PROMPT_FILE"
+        : > "$CODEX_DIFF_RAW"
+        set +o pipefail
+        codex exec --full-auto "$PER_FINDING_PROMPT" | tee -a "$CODEX_DIFF_RAW" >/dev/null
+        RC=${PIPESTATUS[0]}
+        set -o pipefail
+        echo "Codex (diff) exit code: ${RC}"
 
-       PER_FINDING_PROMPT="$(tr -d '\r' < "$PROMPT_FILE")"
-       rm -f "$PROMPT_FILE"
+        OUT_PATCH="$PATCH_DIR/fix-$idx.patch"
+        sed -E 's/\x1B\[[0-9;]*[A-Za-z]//g' "$CODEX_DIFF_RAW" \
+          | tr -d '\r' \
+          | awk '
+              /^\s*=== BEGIN_UNIFIED_DIFF ===\s*$/ {grab=1; next}
+              /^\s*=== END_UNIFIED_DIFF ===\s*$/   {grab=0}
+              grab
+            ' > "$OUT_PATCH"
 
-       : > "$CODEX_DIFF_RAW"
-       set +o pipefail
-       codex exec --full-auto "$PER_FINDING_PROMPT" | tee -a "$CODEX_DIFF_RAW" >/dev/null
-       RC=${PIPESTATUS[0]}
-       set -o pipefail
-       echo "Codex (diff) exit code: ${RC}"
+        if ! [ -s "$OUT_PATCH" ] || ! grep -qE '^\s*diff --git ' "$OUT_PATCH"; then
+          echo "  No usable diff produced for #$idx; skipping."
+          rm -f "$OUT_PATCH"
+          continue
+        fi
 
-       OUT_PATCH="$PATCH_DIR/fix-$idx.patch"
-       sed -E 's/\x1B\[[0-9;]*[A-Za-z]//g' "$CODEX_DIFF_RAW" \
-         | tr -d '\r' \
-         | awk '
-             /^\s*=== BEGIN_UNIFIED_DIFF ===\s*$/ {grab=1; next}
-             /^\s*=== END_UNIFIED_DIFF ===\s*$/   {grab=0}
-             grab
-           ' > "$OUT_PATCH"
+        # Validate: accept -p0 (repo-relative) or -p1 (a/ b/ prefixes)
+        if git apply --check -p0 "$OUT_PATCH" || git apply --check -p1 "$OUT_PATCH"; then
+          echo "  Patch validated → $OUT_PATCH"
+          created=$((created+1))
+        else
+          echo "  Patch failed to apply cleanly; removing."
+          rm -f "$OUT_PATCH"
+        fi
+      done < /tmp/hicrit.txt
 
-       # must contain at least one diff hunk
-       if ! [ -s "$OUT_PATCH" ] || ! grep -qE '^\s*diff --git ' "$OUT_PATCH"; then
-         echo "  No usable diff produced for #$idx; skipping."
-         rm -f "$OUT_PATCH"
-         continue
-       fi
-
-       # Validate apply; accept -p0 (repo-relative) or -p1 (a/ b/ prefixes)
-       if git apply --check -p0 "$OUT_PATCH" || git apply --check -p1 "$OUT_PATCH"; then
-         echo "  Patch validated for #$idx → $OUT_PATCH"
-         created=$((created+1))
-       else
-         echo "  Patch failed to apply cleanly; removing."
-         rm -f "$OUT_PATCH"
-       fi
-     done < /tmp/hicrit.txt
-
-     echo "Total patches created: $created"
-     if [ "$created" -gt 0 ]; then
-       printf "CODEX_CREATED_PATCHES=true\nPATCH_DIR=%s\n" "$PATCH_DIR" > codex.env
-     else
-       printf "CODEX_CREATED_PATCHES=false\n" > codex.env
-     fi
- artifacts:
-   when: always
-   paths:
-     - codex_patches/
-     - artifacts/codex-diff-raw.log
-   reports:
-     dotenv: codex.env
-   expire_in: 14 days
+      if [ "$created" -gt 0 ]; then
+        printf "CODEX_CREATED_PATCHES=true\nPATCH_DIR=%s\n" "$PATCH_DIR" > codex.env
+      else
+        printf "CODEX_CREATED_PATCHES=false\n" > codex.env
+      fi
+  artifacts:
+    when: always
+    paths:
+      - codex_patches/
+      - artifacts/codex-diff-raw.log
+    reports:
+      dotenv: codex.env
+    expire_in: 14 days
 ```
 
 Example generated patch:

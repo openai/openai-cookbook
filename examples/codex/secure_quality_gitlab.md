@@ -1,4 +1,4 @@
-# **Automating Code Quality and Security Fixes with Codex CLI**
+# **Automating Code Quality and Security Fixes with Codex CLI in GitLab**
 
 ## **Introduction**
 

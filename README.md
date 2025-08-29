@@ -99,6 +99,7 @@ The assistant connects to your HubSpot CRM to analyze:
 - Sales pipeline performance
 - Customer lifetime value
 - Churn analysis
+- **Monthly PQL Analysis** - Automated Product Qualified Lead tracking with standardized metrics
 
 ### Mixpanel Integration
 Product analytics integration provides:
@@ -236,3 +237,36 @@ This project is built on the OpenAI Cookbook foundation and follows the same ope
 **Built for accelerating SaaS B2B growth at Colppy.com** 🚀
 
 *Remember: The goal is not just to build an AI assistant, but to create a strategic advantage that enhances your effectiveness as CEO and drives measurable business growth.*
+
+## 🎯 Monthly PQL Analysis Tool
+
+### Overview
+Automated Product Qualified Lead (PQL) analysis with standardized metrics for consistent month-over-month tracking.
+
+### Usage
+```bash
+# Current month-to-date analysis
+./tools/scripts/run_monthly_pql.sh
+
+# Specific month
+./tools/scripts/run_monthly_pql.sh 2025-08
+
+# Multi-month comparison
+./tools/scripts/run_monthly_pql.sh last4
+
+# Pre-configured comparison
+./tools/scripts/run_monthly_pql.sh may-aug-2025
+```
+
+### Features
+- **Standardized Metric**: PQL Rate = PQLs / All Contacts Created in Month
+- **MoM Analysis**: Automatic calculation of deltas and trends
+- **Multiple Formats**: JSON and CSV exports with timestamps
+- **Real-time Data**: Direct HubSpot API integration using `activo` field
+- **Executive Insights**: Key trends with visual indicators
+
+### Output
+- CSV/JSON files saved to `tools/outputs/`
+- Console summary with MoM deltas and insights
+- Standardized format for consistent reporting
+

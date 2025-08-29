@@ -155,3 +155,5 @@ confluence-mcp-server/
 
 # Ignore generated outputs globally
 **/outputs/**
+*.env.migrated_*
+.env.*

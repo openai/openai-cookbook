@@ -11,6 +11,12 @@
         "GOOGLE_ADS_REFRESH_TOKEN": "${GOOGLE_ADS_REFRESH_TOKEN}",
         "GOOGLE_ADS_CUSTOMER_ID": "${GOOGLE_ADS_CUSTOMER_ID}"
       }
+    },
+    "intercom": {
+      "command": "node",
+      "args": [
+        "/Users/virulana/openai-cookbook/tools/scripts/intercom/mcp-intercom-server.js"
+      ]
     }
   }
 }

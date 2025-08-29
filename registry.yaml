@@ -4,17 +4,28 @@
 # should build pages for, and indicates metadata such as tags, creation date and
 # authors for each page.
 
+- title: Realtime Prompting Guide
+  path: examples/Realtime_prompting_guide.ipynb
+  date: 2025-08-28
+  authors:
+    - minh-hoque
+  tags:
+    - realtime
+    - speech
+    - audio
+    - responses
+
 - title: "Fine-tune gpt-oss for better Korean language performance"
   path: articles/gpt-oss/fine-tune-korean.ipynb
   date: 2025-08-26
-  authors: 
+  authors:
     - heejingithub
     - danial-openai
-    - joanneshin-openai 
-  tags: 
+    - joanneshin-openai
+  tags:
     - gpt-oss
     - open-models
-  
+
 - title: Verifying gpt-oss implementations
   path: articles/gpt-oss/verifying-implementations.md
   date: 2025-08-11
@@ -34,7 +45,7 @@
     - gpt-oss
     - open-models
     - gpt-oss-local
-    
+
 - title: GPT-5 Prompt Migration and Improvement Using the New Optimizer
   path: examples/gpt-5/prompt-optimization-cookbook.ipynb
   date: 2025-08-07

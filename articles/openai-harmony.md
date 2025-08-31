@@ -1,6 +1,6 @@
 # OpenAI harmony response format
 
-The [`gpt-oss` models](https://openai.com/open-models) were trained on the harmony response format for defining conversation structures, generating reasoning output and structuring function calls. If you are not using `gpt-oss` directly but through an API or a provider like Ollama, you will not have to be concerned about this as your inference solution will handle the formatting. If you are building your own inference solution, this guide will walk you through the prompt format. The format is designed to mimic the OpenAI Responses API, so if you have used that API before, this format should hopefully feel familiar to you. `gpt-oss` should not be used without using the harmony format, as it will not work correctly.
+The [`gpt-oss` models](https://openai.com/open-models) were trained on the harmony response format for defining conversation structures, generating reasoning outputs and structuring function calls. If you are not using `gpt-oss` directly but through an API or a provider like Ollama, you will not have to be concerned about this as your inference solution will handle the formatting. If you are building your own inference solution, this guide will walk you through the prompt format. The format is designed to mimic the OpenAI Responses API, so if you have used that API before, this format should hopefully feel familiar to you. `gpt-oss` should not be used without using the harmony format, as it will not work correctly.
 
 ## Concepts
 
@@ -16,7 +16,7 @@ Every message that the model processes has a role associated with it. The model 
 | `assistant` | Output by the model which can either be a tool call or a message output. The output might also be associated with a particular “channel” identifying what the intent of the message is. |
 | `tool`      | Messages representing the output of a tool call. The specific tool name will be used as the role inside a message.                                                                      |
 
-These roles also represent the information hierarchy that the model applies in case there are any instruction conflicts: `system` \> `developer` \> `user` \> `assistant` \> `tool`
+These roles also represent the information hierarchy the model applies when instruction conflicts arise: `system` \> `developer` \> `user` \> `assistant` \> `tool`
 
 #### Channels
 
@@ -111,7 +111,7 @@ tokens = encoding.render_conversation_for_completion(convo, Role.ASSISTANT)
 parsed_response = encoding.parse_messages_from_completion_tokens(new_tokens, Role.ASSISTANT)
 ```
 
-Additionally the openai_harmony library also includes a StreamableParser for parsing and decoding as the model is generating new tokens. This can be helpful for example to stream output and handle unicode characters during decoding.
+Additionally, the `openai_harmony` library also includes a StreamableParser for parsing and decoding as the model is generating new tokens. This can be helpful for example to stream output and handle unicode characters during decoding.
 
 ```py
 from openai_harmony import (

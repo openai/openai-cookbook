@@ -2,6 +2,12 @@
 
 # You can optionally customize how your information shows up cookbook.openai.com over here.
 # If your information is not present here, it will be pulled from your GitHub profile.
+
+jonlim-openai:
+  name: "Jonathan Lim"
+  website: "https://www.linkedin.com/in/jonlmr"
+  avatar: "https://avatars.githubusercontent.com/u/189068472?v=4"
+
 WJPBProjects:
   name: "Wulfie Bain"
   website: "https://www.linkedin.com/in/wulfie-bain/"

@@ -3,6 +3,235 @@
 # This file is used to generate cookbook.openai.com. It specifies which paths we
 # should build pages for, and indicates metadata such as tags, creation date and
 # authors for each page.
+
+- title: Automating Code Quality and Security Fixes with Codex CLI on GitLab
+  path: examples/codex/secure_quality_gitlab.md
+  date: 2025-08-29
+  authors:
+    - jonlim-openai
+    - pap-openai
+  tags:
+    - codex
+
+- title: Realtime Prompting Guide
+  path: examples/Realtime_prompting_guide.ipynb
+  date: 2025-08-28
+  authors:
+    - minh-hoque
+  tags:
+    - realtime
+    - speech
+    - audio
+    - responses
+
+- title: "Fine-tune gpt-oss for better Korean language performance"
+  path: articles/gpt-oss/fine-tune-korean.ipynb
+  date: 2025-08-26
+  authors:
+    - heejingithub
+    - danial-openai
+    - joanneshin-openai
+  tags:
+    - gpt-oss
+    - open-models
+
+- title: Verifying gpt-oss implementations
+  path: articles/gpt-oss/verifying-implementations.md
+  date: 2025-08-11
+  authors:
+    - dkundel-openai
+  tags:
+    - gpt-oss
+    - open-models
+    - gpt-oss-providers
+
+- title: How to run gpt-oss locally with LM Studio
+  path: articles/gpt-oss/run-locally-lmstudio.md
+  date: 2025-08-07
+  authors:
+    - yagil
+  tags:
+    - gpt-oss
+    - open-models
+    - gpt-oss-local
+
+- title: GPT-5 Prompt Migration and Improvement Using the New Optimizer
+  path: examples/gpt-5/prompt-optimization-cookbook.ipynb
+  date: 2025-08-07
+  authors:
+    - rajpathak-openai
+    - corwin
+  tags:
+    - gpt-5
+    - responses
+    - reasoning
+    - prompt-optimization
+
+- title: GPT-5 prompting guide
+  path: examples/gpt-5/gpt-5_prompting_guide.ipynb
+  date: 2025-08-07
+  authors:
+    - anoop-openai
+    - julian-openai
+    - ericzakariasson
+    - erinkav-openai
+  tags:
+    - gpt-5
+    - responses
+    - reasoning
+
+- title: Frontend coding with GPT-5
+  path: examples/gpt-5/gpt-5_frontend.ipynb
+  date: 2025-08-07
+  authors:
+    - WJPBProjects
+    - anoop-openai
+  tags:
+    - gpt-5
+    - responses
+    - reasoning
+
+- title: GPT-5 New Params and Tools
+  path: examples/gpt-5/gpt-5_new_params_and_tools.ipynb
+  date: 2025-08-07
+  authors:
+    - msingh-openai
+  tags:
+    - gpt-5
+    - functions
+    - reasoning
+
+- title: How to run gpt-oss-20b on Google Colab
+  path: articles/gpt-oss/run-colab.ipynb
+  date: 2025-08-06
+  authors:
+    - pcuenca
+    - Vaibhavs10
+  tags:
+    - gpt-oss
+    - open-models
+    - gpt-oss-server
+
+- title: Using NVIDIA TensorRT-LLM to run gpt-oss-20b
+  path: articles/gpt-oss/run-nvidia.ipynb
+  date: 2025-08-05
+  authors:
+    - jayrodge
+  tags:
+    - gpt-oss
+    - open-models
+    - gpt-oss-server
+
+- title: Fine-tuning with gpt-oss and Hugging Face Transformers
+  path: articles/gpt-oss/fine-tune-transfomers.ipynb
+  date: 2025-08-05
+  authors:
+    - edbeeching
+    - qgallouedec
+    - lewtun
+  tags:
+    - open-models
+    - gpt-oss
+    - gpt-oss-fine-tuning
+
+- title: How to handle the raw chain of thought in gpt-oss
+  path: articles/gpt-oss/handle-raw-cot.md
+  date: 2025-08-05
+  authors:
+    - dkundel-openai
+  tags:
+    - open-models
+    - gpt-oss
+    - gpt-oss-fine-tuning
+    - gpt-oss-providers
+
+- title: How to run gpt-oss with Transformers
+  path: articles/gpt-oss/run-transformers.md
+  date: 2025-08-05
+  authors:
+    - dkundel-openai
+  tags:
+    - open-models
+    - gpt-oss
+    - gpt-oss-server
+
+- title: How to run gpt-oss with vLLM
+  path: articles/gpt-oss/run-vllm.md
+  date: 2025-08-05
+  authors:
+    - dkundel-openai
+  tags:
+    - open-models
+    - gpt-oss
+    - gpt-oss-server
+
+- title: How to run gpt-oss locally with Ollama
+  path: articles/gpt-oss/run-locally-ollama.md
+  date: 2025-08-05
+  authors:
+    - dkundel-openai
+  tags:
+    - open-models
+    - gpt-oss
+    - gpt-oss-local
+
+- title: OpenAI Harmony Response Format
+  path: articles/openai-harmony.md
+  date: 2025-08-05
+  authors:
+    - dkundel-openai
+  tags:
+    - open-models
+    - gpt-oss
+    - harmony
+    - gpt-oss-providers
+    - gpt-oss-fine-tuning
+
+- title: Temporal Agents with Knowledge Graphs
+  path: examples/partners/temporal_agents_with_knowledge_graphs/temporal_agents_with_knowledge_graphs.ipynb
+  date: 2025-07-22
+  authors:
+    - dwigg-openai
+    - shikhar-cyber
+    - Alex Heald
+    - Douglas Adams
+    - Rishabh Sagar
+  tags:
+    - knowledge-graphs
+    - retrieval
+    - functions
+    - responses
+
+- title: Using Evals API on Image Inputs
+  path: examples/evaluation/use-cases/EvalsAPI_Image_Inputs.ipynb
+  date: 2025-07-15
+  authors:
+    - daisyshe-oai
+  tags:
+    - evals
+    - images
+
+- title: Using Evals API on Audio Inputs
+  path: examples/evaluation/use-cases/EvalsAPI_Audio_Inputs.ipynb
+  date: 2025-08-13
+  authors:
+    - hendrytl
+  tags:
+    - evals
+    - audio
+
+- title: Optimize Prompts
+  path: examples/Optimize_Prompts.ipynb
+  date: 2025-07-14
+  authors:
+    - corwin
+  tags:
+    - prompt
+    - completions
+    - responses
+    - agents-sdk
+    - tracing
+
 - title: Automate Jira ↔ GitHub with Codex
   path: examples/codex/jira-github.ipynb
   date: 2025-06-21
@@ -12,12 +241,13 @@
   tags:
     - codex
     - automation
-    
+
 - title: Prompt Migration Guide
   path: examples/Prompt_migration_guide.ipynb
   date: 2025-06-26
   authors:
     - minh-hoque
+    - corwin
   tags:
     - prompt
     - completions
@@ -43,6 +273,16 @@
     - voice
     - agents-sdk
     - functions
+    - tracing
+
+- title: Building a Supply-Chain Copilot with OpenAI Agent SDK and Databricks MCP Servers
+  path: examples/mcp/databricks_mcp_cookbook.ipynb
+  date: 2025-07-08
+  authors:
+    - lara-openai
+  tags:
+    - agents-sdk
+    - mcp
     - tracing
 
 - title: Eval Driven System Design - From Prototype to Production
@@ -177,7 +417,7 @@
   authors:
     - josiah-openai
   tags:
-    - evals-api
+    - evals
     - completions
 
 - title: Evals API Use-case - Bulk model and prompt experimentation
@@ -186,7 +426,7 @@
   authors:
     - josiah-openai
   tags:
-    - evals-api
+    - evals
     - completions
 
 - title: Evals API Use-case - Monitoring stored completions
@@ -195,7 +435,7 @@
   authors:
     - josiah-openai
   tags:
-    - evals-api
+    - evals
     - completions
 
 - title: Evals API Use-case - Responses Evaluation
@@ -204,7 +444,7 @@
   authors:
     - willhath-openai
   tags:
-    - evals-api
+    - evals
     - responses
 
 - title: Multi-Tool Orchestration with RAG approach using OpenAI's Responses API
@@ -2258,7 +2498,7 @@
   path: examples/vector_databases/surrealdb/README.md
   date: 2025-06-27
   authors:
-    - dghomon
+    - dhghomon
   tags:
     - embeddings
 
@@ -2269,3 +2509,11 @@
     - dhghomon
   tags:
     - embeddings
+
+- title: Generate images with high input fidelity
+  path: examples/Generate_Images_With_High_Input_Fidelity.ipynb
+  date: 2025-07-17
+  authors:
+    - katiagg
+  tags:
+    - images

@@ -3,6 +3,11 @@
 # You can optionally customize how your information shows up cookbook.openai.com over here.
 # If your information is not present here, it will be pulled from your GitHub profile.
 
+ChenyangLi4288:
+  name: "Chenyang Li"
+  website: "https://www.linkedin.com/in/chenyang-li-ba04a9249/"
+  avatar: "https://avatars.githubusercontent.com/u/113459182?v=4"
+
 jonlim-openai:
   name: "Jonathan Lim"
   website: "https://www.linkedin.com/in/jonlmr"

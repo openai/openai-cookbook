@@ -4,6 +4,18 @@
 # should build pages for, and indicates metadata such as tags, creation date and
 # authors for each page.
 
+- title: Add More Examples for Structured Responses
+  path: examples/How_to_count_tokens_with_tiktoken.ipynb
+  date: 2025-09-02
+  authors:
+    - ChenyangLi4288
+  tags:
+    - tiktoken
+    - token-counting
+    - structured-responses
+    - api-usage
+    - cost-estimation
+
 - title: Automating Code Quality and Security Fixes with Codex CLI on GitLab
   path: examples/codex/secure_quality_gitlab.md
   date: 2025-08-29

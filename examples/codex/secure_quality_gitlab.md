@@ -36,7 +36,7 @@ This repository is a deliberately vulnerable Node.js Express demo app based on [
 
 The code includes common pitfalls such as command injection, path traversal, unsafe `eval`, regex DoS, weak cryptography (MD5), and hardcoded secrets. It’s used to validate that Codex-powered analyzers produce GitLab-native reports (Code Quality and SAST) that render directly in merge requests.
 
-The CI runs on GitLab SaaS runners with `node:24` images and a few extras (`jq`, `curl`, `ca-certificates`, `ajv-cli`). Jobs are hardened with `set -euo pipefail`, schema validation, and strict JSON markers to keep parsing reliable even if Codex output varies.
+The CI runs on GitLab SaaS runners with `node:24` images and a few extras (`jq`, `curl`, `ca-certificates`, `ripgrep`, `ajv-cli`). Jobs are hardened with `set -euo pipefail`, schema validation, and strict JSON markers to keep parsing reliable even if Codex output varies.
 
 This pipeline pattern—prompt, JSON marker extraction, schema validation—can be adapted to other stacks, though prompt wording and schema rules may need tweaks. Since Codex runs in a sandbox, some system commands (like `awk` or `nl`) may be restricted.
 
@@ -94,8 +94,8 @@ codex_review:
     - ': > ${CODEX_RAW_LOG}'
     - ': > ${CODEX_QA_PATH}'
     # Minimal deps + Codex CLI
-    - apt-get update && apt-get install -y --no-install-recommends curl ca-certificates git lsb-release
-    - npm -g i @openai/codex@latest
+    - apt-get update && apt-get install -y --no-install-recommends curl ca-certificates git lsb-release ripgrep
+    - npm --ignore-scripts -g i @openai/codex@latest
     - codex --version && git --version
     # Build a real-file allowlist to guide Codex to valid paths/lines
     - FILE_LIST="$(git ls-files | sed 's/^/- /')"
@@ -253,8 +253,8 @@ codex_recommendations:
    - ": > ${CODEX_RAW_LOG}"
    - ": > ${CODEX_SECURITY_MD}"
 
-   - apt-get update && apt-get install -y --no-install-recommends curl ca-certificates git lsb-release
-   - npm -g i @openai/codex@latest
+   - apt-get update && apt-get install -y --no-install-recommends curl ca-certificates git lsb-release ripgrep
+   - npm --ignore-scripts -g i @openai/codex@latest
    - codex --version && git --version
 
    - |
@@ -424,8 +424,8 @@ codex_resolution:
     - mkdir -p "$PATCH_DIR" artifacts
 
     # Deps
-    - apt-get update && apt-get install -y --no-install-recommends bash git jq curl ca-certificates
-    - npm -g i @openai/codex@latest
+    - apt-get update && apt-get install -y --no-install-recommends bash git jq curl ca-certificates ripgrep
+    - npm --ignore-scripts -g i @openai/codex@latest
     - git --version && codex --version || true
 
     # Require SAST report; no-op if missing
@@ -610,4 +610,3 @@ Looking forward, this pattern can be extended to unify all major scan types thro
 By merging these into a single Codex-powered post-processing \+ remediation pipeline, teams can get a consistent stream of **actionable guidance, validated patches** across all security domains.
 
 **The broader takeaway:** with prompt engineering, schema validation, and integration into GitLab’s native MR workflow, LLMs evolve from “advisors” into **first-class CI/CD agents** — helping teams ship code that is not only functional, but also secure, maintainable, and automatically remediated where possible.
-

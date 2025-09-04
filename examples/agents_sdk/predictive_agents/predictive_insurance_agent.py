@@ -16,7 +16,7 @@ from agents.extensions.handoff_prompt import RECOMMENDED_PROMPT_PREFIX
 DATA_DIR = "s3://kumo-sdk-public/rfm-datasets/insurance/"
 # FILE_NAMES = ["agents.csv", "policies.csv", "customers.csv", "pets.csv", 
 #               "products.csv", "properties.csv", "vehicles.csv"]
-FILE_NAMES = ["agents.csv", "policies.csv", "customers.csv" ] # simpler example
+FILE_NAMES = ["agents.csv", "policies.csv", "customers.csv", "products.csv"] # simpler example
 # FILE_NAMES = ["customers.csv", "pets.csv"] # failing example (not enough data)
 
 # Sample customer IDs with policies expiring in next 30 days
@@ -167,13 +167,15 @@ async def setup_predictive_agents(mcp_server: MCPServer):
         4. When Business Action Agent returns, compile and present final results
         
         Each sub-agent will return to you with their results. Coordinate the workflow
-        by deciding which agent to involve next based on the current state and results.""",
+        by deciding which agent to involve next based on the current state and results. 
+        
+        Make sure to hand off to the next agent with the results of the previous agent.""",
         mcp_servers=[mcp_server],
         handoffs=[handoff(assessment_agent), handoff(prediction_agent), handoff(action_agent)]
     )
     
     # Configure handoffs
-    assessment_agent.handoffs = [handoff(orchestrator_agent)]
+    assessment_agent.handoffs = [handoff(orchestrator_agent,)]
     prediction_agent.handoffs = [handoff(orchestrator_agent)]
     action_agent.handoffs = [handoff(orchestrator_agent)]
     

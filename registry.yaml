@@ -2501,3 +2501,14 @@
     - katiagg
   tags:
     - images
+
+- title: Bridging the Predictive Gap in Agents with KumoRFM MCP
+  path: examples/agents_sdk/predictive_agents/bridging-the-predictive-gap-in-agents.ipynb
+  date: 2025-09-04
+  authors:
+    - blazstojanovic
+  tags:
+    - agents
+    - agents-sdk
+    - mcp
+    - tracing

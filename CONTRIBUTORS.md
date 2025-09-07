@@ -14,7 +14,6 @@ The cookbook currently includes contributions from **94 amazing contributors** w
 
 **Payton Ison** ([@paytonison](https://github.com/paytonison)) is a contributor to the OpenAI Cookbook project.
 
-- **Website**: [https://www.threads.com/@pls.stfu.payton](https://www.threads.com/@pls.stfu.payton)
 - **GitHub Profile**: [https://github.com/paytonison](https://github.com/paytonison)
 
 ## How to Become a Contributor

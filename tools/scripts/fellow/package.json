@@ -1,0 +1,39 @@
+{
+  "name": "fellow-meeting-mcp-server",
+  "version": "1.0.0",
+  "description": "Fellow Meeting App MCP Server - Access meetings, contacts, transcripts and copilot features via Model Context Protocol",
+  "type": "module",
+  "main": "src/index.js",
+  "bin": {
+    "fellow-meeting-mcp-server": "./src/index.js"
+  },
+  "scripts": {
+    "start": "node src/index.js",
+    "test": "node --test",
+    "dev": "node --watch src/index.js"
+  },
+  "keywords": [
+    "fellow",
+    "mcp",
+    "model-context-protocol", 
+    "meetings",
+    "transcription",
+    "contacts",
+    "copilot",
+    "api",
+    "productivity"
+  ],
+  "author": "Colppy Analytics Team",
+  "license": "MIT",
+  "dependencies": {
+    "@modelcontextprotocol/sdk": "^1.0.0",
+    "axios": "^1.9.0",
+    "dotenv": "^16.5.0"
+  },
+  "devDependencies": {
+    "@types/node": "^20.0.0"
+  },
+  "engines": {
+    "node": ">=18.0.0"
+  }
+}

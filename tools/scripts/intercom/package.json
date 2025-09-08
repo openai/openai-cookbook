@@ -1,0 +1,52 @@
+{
+  "name": "intercom-mcp-server",
+  "version": "1.0.0",
+  "description": "Intercom MCP Server - Export and analyze Intercom conversations via Model Context Protocol",
+  "type": "module",
+  "main": "mcp-intercom-server.js",
+  "bin": {
+    "intercom-mcp-server": "./mcp-intercom-server.js"
+  },
+  "scripts": {
+    "start": "node mcp-intercom-server.js",
+    "test": "node --test"
+  },
+  "keywords": [
+    "intercom",
+    "mcp",
+    "model-context-protocol",
+    "conversations",
+    "export",
+    "api",
+    "customer-support",
+    "analytics"
+  ],
+  "author": "Colppy Analytics Team",
+  "license": "MIT",
+  "dependencies": {
+    "@modelcontextprotocol/sdk": "^1.0.0",
+    "axios": "^1.9.0",
+    "dotenv": "^16.5.0"
+  },
+  "devDependencies": {
+    "@types/node": "^20.0.0"
+  },
+  "engines": {
+    "node": ">=18.0.0"
+  },
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/jonetto1978/intercom-export.git"
+  },
+  "bugs": {
+    "url": "https://github.com/jonetto1978/intercom-export/issues"
+  },
+  "homepage": "https://github.com/jonetto1978/intercom-export#readme",
+  "publishConfig": {
+    "access": "public"
+  },
+  "files": [
+    "mcp-intercom-server.js",
+    "README-MCP.md"
+  ]
+} 

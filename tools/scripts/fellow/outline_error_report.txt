@@ -1,0 +1,7 @@
+=== MCP OUTLINE ERROR DIAGNOSTIC REPORT ===
+Generated: Fri Aug 29 22:01:50 -03 2025
+
+Current MCP Outline Configuration:
+API_URL: https://dev.fellow.wiki/api
+API_KEY: faf85794d4ee619f0a9ddc347a20bf85c15b9530ef14c6541a6ed55729ea93f3
+

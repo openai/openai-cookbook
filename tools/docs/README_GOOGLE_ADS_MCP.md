@@ -78,6 +78,97 @@ Outputs
 - REQUESTED_METRICS_FOR_MANAGER: Query the client account; set `GOOGLE_ADS_LOGIN_CUSTOMER_ID` to the manager.
 - BAD_VALUE for dates: Use `YYYY-MM-DD` and wrap in single quotes in GAQL when building raw queries.
 
+#### Campaign Status Verification (Critical)
+
+**IMPORTANT:** Google Ads campaigns have three status fields that must all be checked to understand campaign state:
+
+| **Status Field** | **Purpose** | **Values** | **Meaning** |
+|------------------|-------------|------------|-------------|
+| `campaign.status` | User control | ENABLED, PAUSED, REMOVED | Whether campaign is manually enabled by user |
+| `campaign.serving_status` | System control | SERVING, ENDED, NONE | Whether campaign is actually running ads |
+| `campaign.primary_status` | Detailed status | ELIGIBLE, PAUSED, ENDED, LIMITED, LEARNING, REMOVED | Why campaign is/isn't serving |
+
+**✅ TRULY ACTIVE CAMPAIGN = ENABLED + SERVING + ELIGIBLE/LEARNING/LIMITED**
+
+**Common Mistake:**
+```sql
+-- ❌ WRONG - This finds campaigns that could run, not campaigns that are running
+SELECT campaign.name FROM campaign WHERE campaign.status = 'ENABLED'
+
+-- ✅ CORRECT - This finds campaigns that are actually running (matches Google Ads UI)
+SELECT campaign.name FROM campaign 
+WHERE campaign.status = 'ENABLED' AND campaign.serving_status = 'SERVING'
+```
+
+**Campaign Status Combinations:**
+
+**🟢 Fully Active Campaigns:**
+```
+campaign.status = 'ENABLED'          ✅ User enabled it
+campaign.serving_status = 'SERVING' ✅ System serving ads
+campaign.primary_status = 'ELIGIBLE' ✅ No restrictions
+```
+
+**🟡 Active with Limitations:**
+```
+campaign.status = 'ENABLED'          ✅ User enabled it
+campaign.serving_status = 'SERVING' ✅ System serving ads
+campaign.primary_status = 'LIMITED' ⚠️ Has restrictions (budget, targeting)
+```
+
+**🔴 "Technically Enabled" (Not Actually Running):**
+```
+campaign.status = 'ENABLED'          ✅ User never paused it
+campaign.serving_status = 'ENDED'   ❌ System stopped it
+campaign.primary_status = 'ENDED'   ❌ Cannot serve ads
+```
+
+**Why This Matters:**
+- **Google Ads UI Filter**: Only shows campaigns with `serving_status = 'SERVING'`
+- **API vs UI Discrepancy**: API returns all `ENABLED` campaigns, UI filters by serving status
+- **Budget Analysis**: Only serving campaigns consume budget
+- **Performance Metrics**: Ended campaigns show historical data only
+- **Optimization Decisions**: Should only optimize truly active campaigns
+- **ICP Conflicts**: Only matter if campaigns are actually competing for traffic
+
+**Common Causes of "Technically Enabled" Status:**
+1. **End Date Reached**: Campaign had end date that passed
+2. **Budget Exhausted**: Daily budget completely used
+3. **Policy Violations**: Google automatically stopped campaign
+4. **Scheduling Issues**: Campaign outside scheduled hours
+
+**Recommended Query for Active Campaign Analysis (Matches Google Ads UI):**
+```sql
+SELECT 
+  campaign.id,
+  campaign.name, 
+  campaign.status,
+  campaign.serving_status,
+  campaign.primary_status,
+  campaign.advertising_channel_type,
+  metrics.impressions,
+  metrics.clicks,
+  metrics.conversions
+FROM campaign 
+WHERE campaign.status = 'ENABLED' 
+  AND campaign.serving_status = 'SERVING'
+  AND segments.date DURING LAST_7_DAYS
+ORDER BY metrics.impressions DESC
+```
+
+**Query to Find "Technically Enabled" Campaigns (Need Review):**
+```sql
+SELECT 
+  campaign.name,
+  campaign.status,
+  campaign.serving_status,
+  campaign.primary_status
+FROM campaign 
+WHERE campaign.status = 'ENABLED' 
+  AND campaign.serving_status != 'SERVING'
+ORDER BY campaign.name
+```
+
 #### Security
 - Never commit secrets.
 - Rotate exposed credentials immediately.

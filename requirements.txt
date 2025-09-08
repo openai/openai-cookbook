@@ -15,4 +15,11 @@ aiofiles>=23.0.0
 # Database dependencies
 sqlalchemy>=2.0.0
 pymysql>=1.0.0
-cryptography>=41.0.0 
+cryptography>=41.0.0
+# Analytics and ML dependencies
+scikit-learn>=1.3.0
+matplotlib>=3.7.0
+seaborn>=0.12.0
+numpy>=1.24.0
+tqdm>=4.65.0
+aiohttp>=3.8.0 

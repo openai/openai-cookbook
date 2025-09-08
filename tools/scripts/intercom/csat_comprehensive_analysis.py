@@ -582,7 +582,7 @@ def main():
     print("Investigating the 'activity-satisfaction paradox' in support context\n")
     
     # Initialize analyzer
-    csat_file = '/Users/virulana/openai-cookbook/tools/intercom_reports/csat.csv'
+    csat_file = '/Users/virulana/openai-cookbook/tools/outputs/csat.csv'
     analyzer = CSATAnalyzer(csat_file)
     
     # Run comprehensive analysis

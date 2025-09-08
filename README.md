@@ -173,6 +173,7 @@ The assistant is configured with:
 - [OpenAI Function Calling Guide](https://platform.openai.com/docs/guides/function-calling)
 - [HubSpot API Documentation](https://developers.hubspot.com/)
 - [Mixpanel API Documentation](https://developer.mixpanel.com/)
+- [Intercom Analytics & Export Toolkit](tools/docs/README_INTERCOM_CONSOLIDATED.md) - Complete guide for MCP and REST API integration
 
 ### Learning Materials
 - **Agent Architecture**: NVIDIA's LLM Agent guides (linked in learning guide)

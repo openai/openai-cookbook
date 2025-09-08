@@ -30,7 +30,7 @@ if not INTERCOM_ACCESS_TOKEN:
     raise ValueError("INTERCOM_ACCESS_TOKEN not found in environment variables.")
 
 class IntercomAnalytics:
-    def __init__(self, access_token, output_dir='intercom_reports'):
+    def __init__(self, access_token, output_dir='tools/outputs'):
         self.access_token = access_token
         self.api_url = "https://api.intercom.io"
         self.headers = {
@@ -1131,7 +1131,7 @@ def main():
     parser.add_argument('--start-date', type=str, help='Start date in YYYY-MM-DD format')
     parser.add_argument('--end-date', type=str, help='End date in YYYY-MM-DD format')
     parser.add_argument('--limit', type=int, default=1000, help='Limit number of conversations to fetch')
-    parser.add_argument('--output-dir', type=str, default='intercom_reports', help='Output directory for reports')
+    parser.add_argument('--output-dir', type=str, default='tools/outputs', help='Output directory for reports')
     parser.add_argument('--export-zip', action='store_true', help='Export results to a zip file')
     parser.add_argument('--zip-name', type=str, help='Name for the zip file (default: intercom_analysis_TIMESTAMP.zip)')
     

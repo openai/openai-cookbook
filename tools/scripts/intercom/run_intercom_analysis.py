@@ -59,8 +59,8 @@ def main():
                        help='Use a local CSV file instead of the Intercom API')
     
     # Output options
-    parser.add_argument('--output-dir', type=str, default='intercom_reports',
-                       help='Directory to save reports (default: intercom_reports)')
+    parser.add_argument('--output-dir', type=str, default='tools/outputs',
+                       help='Directory to save reports (default: tools/outputs)')
     parser.add_argument('--export-zip', action='store_true',
                        help='Export all results to a zip file')
     

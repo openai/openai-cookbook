@@ -22,10 +22,10 @@ import { fileURLToPath } from 'url';
 import { dirname, join } from 'path';
 import dotenv from 'dotenv';
 
-// Load environment variables
+// Load environment variables from root level
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = dirname(__filename);
-dotenv.config({ path: join(__dirname, '../../.env') });
+dotenv.config({ path: join(__dirname, '../../../.env') });
 
 class IntercomMCPServer {
   constructor() {
@@ -106,6 +106,31 @@ class IntercomMCPServer {
           }
         },
         {
+          name: 'count_intercom_conversations',
+          description: 'Count conversations matching optional filters (date range, state) with full pagination',
+          inputSchema: {
+            type: 'object',
+            properties: {
+              from_date: {
+                type: 'string',
+                description: 'Start date in YYYY-MM-DD format',
+                pattern: '^\\d{4}-\\d{2}-\\d{2}$'
+              },
+              to_date: {
+                type: 'string',
+                description: 'End date in YYYY-MM-DD format (defaults to today)',
+                pattern: '^\\d{4}-\\d{2}-\\d{2}$'
+              },
+              state: {
+                type: 'string',
+                description: 'Conversation state to filter by',
+                enum: ['open', 'closed', 'snoozed']
+              }
+            },
+            additionalProperties: false
+          }
+        },
+        {
           name: 'get_intercom_conversation_stats',
           description: 'Get statistics about conversations in a date range without full export',
           inputSchema: {
@@ -172,6 +197,8 @@ class IntercomMCPServer {
         switch (name) {
           case 'export_intercom_conversations':
             return await this.exportConversations(args);
+          case 'count_intercom_conversations':
+            return await this.countConversations(args);
           case 'get_intercom_conversation_stats':
             return await this.getConversationStats(args);
           case 'search_intercom_conversations':
@@ -192,6 +219,110 @@ class IntercomMCPServer {
         );
       }
     });
+  }
+
+  // Tool: Count conversations with pagination
+  async countConversations(args) {
+    const {
+      from_date,
+      to_date = new Date().toISOString().split('T')[0],
+      state
+    } = args;
+
+    try {
+      const searchQuery = {
+        query: {
+          operator: 'AND',
+          value: []
+        },
+        pagination: {
+          per_page: 150
+        }
+      };
+
+      // Add date filters if provided
+      if (from_date) {
+        const fromTimestamp = Math.floor(new Date(from_date).getTime() / 1000);
+        searchQuery.query.value.push({
+          field: 'created_at',
+          operator: '>=',
+          value: fromTimestamp
+        });
+      }
+
+      if (to_date) {
+        const toTimestamp = Math.floor(new Date(to_date).getTime() / 1000);
+        searchQuery.query.value.push({
+          field: 'created_at',
+          operator: '<=',
+          value: toTimestamp
+        });
+      }
+
+      // Add state filter if provided
+      if (state) {
+        searchQuery.query.value.push({
+          field: 'state',
+          operator: '=',
+          value: state
+        });
+      }
+
+      // If no filters at all, add a non-restrictive upper bound to satisfy API
+      if (searchQuery.query.value.length === 0) {
+        const toTimestamp = Math.floor(new Date(to_date).getTime() / 1000);
+        searchQuery.query.value.push({
+          field: 'created_at',
+          operator: '<=',
+          value: toTimestamp
+        });
+      }
+
+      let total = 0;
+      let startingAfter = null;
+      let hasMore = true;
+
+      while (hasMore) {
+        if (startingAfter) {
+          searchQuery.pagination.starting_after = startingAfter;
+        } else {
+          delete searchQuery.pagination.starting_after;
+        }
+
+        const response = await this.retryableRequest(async () => {
+          return await this.intercomApi.post('/conversations/search', searchQuery);
+        });
+
+        const conversations = response.data.conversations || [];
+        total += conversations.length;
+
+        if (response.data.pages && response.data.pages.next && response.data.pages.next.starting_after) {
+          startingAfter = response.data.pages.next.starting_after;
+          hasMore = true;
+        } else {
+          hasMore = false;
+        }
+      }
+
+      const results = {
+        success: true,
+        date_range: { from: from_date || null, to: to_date },
+        state: state || null,
+        total_count: total
+      };
+
+      return {
+        content: [{
+          type: 'text',
+          text: JSON.stringify(results, null, 2)
+        }]
+      };
+    } catch (error) {
+      throw new McpError(
+        ErrorCode.InternalError,
+        `Count failed: ${error.message}`
+      );
+    }
   }
 
   // Retry mechanism for API requests

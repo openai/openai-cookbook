@@ -4,6 +4,17 @@
 # should build pages for, and indicates metadata such as tags, creation date and
 # authors for each page.
 
+- title: OpenAI Cookbook - LLMs 101
+  path: articles/openai-cookbook-llms-101.md
+  date: 2025-08-30
+  authors:
+    - paytonison
+  tags:
+    - introduction
+    - llms
+    - gpt-5
+    - getting-started
+
 - title: Automating Code Quality and Security Fixes with Codex CLI on GitLab
   path: examples/codex/secure_quality_gitlab.md
   date: 2025-08-29

@@ -1,0 +1,42 @@
+name: Generate RSS Feed
+
+on:
+  push:
+    branches:
+      - main
+  workflow_dispatch:
+
+permissions:
+  contents: write
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Check out repository
+        uses: actions/checkout@v4
+
+      - name: Set up Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: '3.x'
+
+      - name: Install dependencies
+        run: pip install pyyaml
+
+      - name: Generate rss.xml
+        run: python .github/scripts/generate_rss.py
+
+      - name: Commit and push changes
+        run: |
+          set -e
+          git config user.name "github-actions[bot]"
+          git config user.email "github-actions[bot]@users.noreply.github.com"
+          if [ -n "$(git status --porcelain rss.xml)" ]; then
+            git add rss.xml
+            git commit -m "chore: update RSS feed"
+            git push
+          else
+            echo "No changes to rss.xml"
+          fi
+

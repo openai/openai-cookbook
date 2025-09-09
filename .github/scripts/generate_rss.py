@@ -11,7 +11,6 @@ from __future__ import annotations
 import os
 import sys
 import yaml
-import hashlib
 from datetime import datetime, timezone
 from email.utils import format_datetime
 import xml.etree.ElementTree as ET

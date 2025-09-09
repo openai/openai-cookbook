@@ -45,8 +45,6 @@ def build_feed(entries: list[dict], authors: dict) -> ET.ElementTree:
         "rss",
         attrib={
             "version": "2.0",
-            "xmlns:atom": atom_ns,
-            "xmlns:dc": dc_ns,
         },
     )
     channel = ET.SubElement(rss, "channel")

@@ -5,10 +5,40 @@ on:
     branches:
       - main
 
+permissions:
+  contents: write
+
 jobs:
   deploy:
     runs-on: ubuntu-latest
 
     steps:
+      - name: Check out repository
+        uses: actions/checkout@v4
+
+      - name: Set up Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: '3.x'
+
+      - name: Install dependencies
+        run: pip install pyyaml
+
+      - name: Generate RSS feed
+        run: python .github/scripts/generate_rss.py
+
+      - name: Commit feed.xml if changed
+        if: github.actor != 'github-actions[bot]'
+        run: |
+          if [[ -n "$(git status --porcelain)" ]]; then
+            git config user.name "github-actions[bot]"
+            git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+            git add feed.xml
+            git commit -m "chore: update RSS feed [skip ci]"
+            git push
+          else
+            echo "No changes to commit."
+          fi
+
       - name: Call Deploy Hook
         run: curl -X POST ${{ secrets.WEBSITE_DEPLOY_HOOK_URL }}

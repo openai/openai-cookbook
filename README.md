@@ -15,6 +15,11 @@ Most code examples are written in Python, though the concepts can be applied in 
 
 For other useful tools, guides and courses, check out these [related resources from around the web](https://cookbook.openai.com/related_resources).
 
+## Subscribe via RSS
+
+- RSS feed of new and updated cookbook content: `https://raw.githubusercontent.com/openai/openai-cookbook/main/feed.xml`
+- Add this URL to your feed reader to get the latest additions as they land.
+
 ## License
 
 MIT License

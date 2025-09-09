@@ -1,0 +1,448 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<rss version="2.0">
+  <channel>
+    <title>OpenAI Cookbook – New Content</title>
+    <link>https://cookbook.openai.com/</link>
+    <description>New and updated guides, examples, and articles from the OpenAI Cookbook repository.</description>
+    <lastBuildDate>Tue, 09 Sep 2025 04:56:58 +0000</lastBuildDate>
+    <generator>openai-cookbook rss generator</generator>
+    <item>
+      <title>OpenAI Cookbook - LLMs 101</title>
+      <link>https://github.com/openai/openai-cookbook/blob/main/articles/openai-cookbook-llms-101.md</link>
+      <guid isPermaLink="true">https://github.com/openai/openai-cookbook/blob/main/articles/openai-cookbook-llms-101.md</guid>
+      <pubDate>Sat, 30 Aug 2025 00:00:00 +0000</pubDate>
+      <description>Tags: introduction, llms, gpt-5, getting-started | Source: articles/openai-cookbook-llms-101.md</description>
+      <author>Payton Ison</author>
+    </item>
+    <item>
+      <title>Automating Code Quality and Security Fixes with Codex CLI on GitLab</title>
+      <link>https://github.com/openai/openai-cookbook/blob/main/examples/codex/secure_quality_gitlab.md</link>
+      <guid isPermaLink="true">https://github.com/openai/openai-cookbook/blob/main/examples/codex/secure_quality_gitlab.md</guid>
+      <pubDate>Fri, 29 Aug 2025 00:00:00 +0000</pubDate>
+      <description>Tags: codex | Source: examples/codex/secure_quality_gitlab.md</description>
+      <author>Jonathan Lim</author>
+      <author>Pierre-Antoine Porte</author>
+    </item>
+    <item>
+      <title>Realtime Prompting Guide</title>
+      <link>https://github.com/openai/openai-cookbook/blob/main/examples/Realtime_prompting_guide.ipynb</link>
+      <guid isPermaLink="true">https://github.com/openai/openai-cookbook/blob/main/examples/Realtime_prompting_guide.ipynb</guid>
+      <pubDate>Thu, 28 Aug 2025 00:00:00 +0000</pubDate>
+      <description>Tags: realtime, speech, audio, responses | Source: examples/Realtime_prompting_guide.ipynb</description>
+      <author>Minhajul Hoque</author>
+    </item>
+    <item>
+      <title>Fine-tune gpt-oss for better Korean language performance</title>
+      <link>https://github.com/openai/openai-cookbook/blob/main/articles/gpt-oss/fine-tune-korean.ipynb</link>
+      <guid isPermaLink="true">https://github.com/openai/openai-cookbook/blob/main/articles/gpt-oss/fine-tune-korean.ipynb</guid>
+      <pubDate>Tue, 26 Aug 2025 00:00:00 +0000</pubDate>
+      <description>Tags: gpt-oss, open-models | Source: articles/gpt-oss/fine-tune-korean.ipynb</description>
+      <author>Heejin Cho</author>
+      <author>Danial Mirza</author>
+      <author>joanneshin-openai</author>
+    </item>
+    <item>
+      <title>Using Evals API on Audio Inputs</title>
+      <link>https://github.com/openai/openai-cookbook/blob/main/examples/evaluation/use-cases/EvalsAPI_Audio_Inputs.ipynb</link>
+      <guid isPermaLink="true">https://github.com/openai/openai-cookbook/blob/main/examples/evaluation/use-cases/EvalsAPI_Audio_Inputs.ipynb</guid>
+      <pubDate>Wed, 13 Aug 2025 00:00:00 +0000</pubDate>
+      <description>Tags: evals, audio | Source: examples/evaluation/use-cases/EvalsAPI_Audio_Inputs.ipynb</description>
+      <author>Todd Hendry</author>
+    </item>
+    <item>
+      <title>Verifying gpt-oss implementations</title>
+      <link>https://github.com/openai/openai-cookbook/blob/main/articles/gpt-oss/verifying-implementations.md</link>
+      <guid isPermaLink="true">https://github.com/openai/openai-cookbook/blob/main/articles/gpt-oss/verifying-implementations.md</guid>
+      <pubDate>Mon, 11 Aug 2025 00:00:00 +0000</pubDate>
+      <description>Tags: gpt-oss, open-models, gpt-oss-providers | Source: articles/gpt-oss/verifying-implementations.md</description>
+      <author>Dominik Kundel</author>
+    </item>
+    <item>
+      <title>How to run gpt-oss locally with LM Studio</title>
+      <link>https://github.com/openai/openai-cookbook/blob/main/articles/gpt-oss/run-locally-lmstudio.md</link>
+      <guid isPermaLink="true">https://github.com/openai/openai-cookbook/blob/main/articles/gpt-oss/run-locally-lmstudio.md</guid>
+      <pubDate>Thu, 07 Aug 2025 00:00:00 +0000</pubDate>
+      <description>Tags: gpt-oss, open-models, gpt-oss-local | Source: articles/gpt-oss/run-locally-lmstudio.md</description>
+      <author>Yagil Burowski</author>
+    </item>
+    <item>
+      <title>GPT-5 Prompt Migration and Improvement Using the New Optimizer</title>
+      <link>https://github.com/openai/openai-cookbook/blob/main/examples/gpt-5/prompt-optimization-cookbook.ipynb</link>
+      <guid isPermaLink="true">https://github.com/openai/openai-cookbook/blob/main/examples/gpt-5/prompt-optimization-cookbook.ipynb</guid>
+      <pubDate>Thu, 07 Aug 2025 00:00:00 +0000</pubDate>
+      <description>Tags: gpt-5, responses, reasoning, prompt-optimization | Source: examples/gpt-5/prompt-optimization-cookbook.ipynb</description>
+      <author>Raj Pathak</author>
+      <author>Corwin Cheung</author>
+    </item>
+    <item>
+      <title>GPT-5 prompting guide</title>
+      <link>https://github.com/openai/openai-cookbook/blob/main/examples/gpt-5/gpt-5_prompting_guide.ipynb</link>
+      <guid isPermaLink="true">https://github.com/openai/openai-cookbook/blob/main/examples/gpt-5/gpt-5_prompting_guide.ipynb</guid>
+      <pubDate>Thu, 07 Aug 2025 00:00:00 +0000</pubDate>
+      <description>Tags: gpt-5, responses, reasoning | Source: examples/gpt-5/gpt-5_prompting_guide.ipynb</description>
+      <author>Anoop Kotha</author>
+      <author>Julian Lee</author>
+      <author>Eric Zakariasson</author>
+      <author>Erin Kavanaugh</author>
+    </item>
+    <item>
+      <title>Frontend coding with GPT-5</title>
+      <link>https://github.com/openai/openai-cookbook/blob/main/examples/gpt-5/gpt-5_frontend.ipynb</link>
+      <guid isPermaLink="true">https://github.com/openai/openai-cookbook/blob/main/examples/gpt-5/gpt-5_frontend.ipynb</guid>
+      <pubDate>Thu, 07 Aug 2025 00:00:00 +0000</pubDate>
+      <description>Tags: gpt-5, responses, reasoning | Source: examples/gpt-5/gpt-5_frontend.ipynb</description>
+      <author>Wulfie Bain</author>
+      <author>Anoop Kotha</author>
+    </item>
+    <item>
+      <title>GPT-5 New Params and Tools</title>
+      <link>https://github.com/openai/openai-cookbook/blob/main/examples/gpt-5/gpt-5_new_params_and_tools.ipynb</link>
+      <guid isPermaLink="true">https://github.com/openai/openai-cookbook/blob/main/examples/gpt-5/gpt-5_new_params_and_tools.ipynb</guid>
+      <pubDate>Thu, 07 Aug 2025 00:00:00 +0000</pubDate>
+      <description>Tags: gpt-5, functions, reasoning | Source: examples/gpt-5/gpt-5_new_params_and_tools.ipynb</description>
+      <author>Mandeep Singh</author>
+    </item>
+    <item>
+      <title>How to run gpt-oss-20b on Google Colab</title>
+      <link>https://github.com/openai/openai-cookbook/blob/main/articles/gpt-oss/run-colab.ipynb</link>
+      <guid isPermaLink="true">https://github.com/openai/openai-cookbook/blob/main/articles/gpt-oss/run-colab.ipynb</guid>
+      <pubDate>Wed, 06 Aug 2025 00:00:00 +0000</pubDate>
+      <description>Tags: gpt-oss, open-models, gpt-oss-server | Source: articles/gpt-oss/run-colab.ipynb</description>
+      <author>Pedro Cuenca</author>
+      <author>vb</author>
+    </item>
+    <item>
+      <title>Using NVIDIA TensorRT-LLM to run gpt-oss-20b</title>
+      <link>https://github.com/openai/openai-cookbook/blob/main/articles/gpt-oss/run-nvidia.ipynb</link>
+      <guid isPermaLink="true">https://github.com/openai/openai-cookbook/blob/main/articles/gpt-oss/run-nvidia.ipynb</guid>
+      <pubDate>Tue, 05 Aug 2025 00:00:00 +0000</pubDate>
+      <description>Tags: gpt-oss, open-models, gpt-oss-server | Source: articles/gpt-oss/run-nvidia.ipynb</description>
+      <author>Jay Rodge</author>
+    </item>
+    <item>
+      <title>Fine-tuning with gpt-oss and Hugging Face Transformers</title>
+      <link>https://github.com/openai/openai-cookbook/blob/main/articles/gpt-oss/fine-tune-transfomers.ipynb</link>
+      <guid isPermaLink="true">https://github.com/openai/openai-cookbook/blob/main/articles/gpt-oss/fine-tune-transfomers.ipynb</guid>
+      <pubDate>Tue, 05 Aug 2025 00:00:00 +0000</pubDate>
+      <description>Tags: open-models, gpt-oss, gpt-oss-fine-tuning | Source: articles/gpt-oss/fine-tune-transfomers.ipynb</description>
+      <author>Edward Beeching</author>
+      <author>Quentin Gallouédec</author>
+      <author>Lewis Tunstall</author>
+    </item>
+    <item>
+      <title>How to handle the raw chain of thought in gpt-oss</title>
+      <link>https://github.com/openai/openai-cookbook/blob/main/articles/gpt-oss/handle-raw-cot.md</link>
+      <guid isPermaLink="true">https://github.com/openai/openai-cookbook/blob/main/articles/gpt-oss/handle-raw-cot.md</guid>
+      <pubDate>Tue, 05 Aug 2025 00:00:00 +0000</pubDate>
+      <description>Tags: open-models, gpt-oss, gpt-oss-fine-tuning, gpt-oss-providers | Source: articles/gpt-oss/handle-raw-cot.md</description>
+      <author>Dominik Kundel</author>
+    </item>
+    <item>
+      <title>How to run gpt-oss with Transformers</title>
+      <link>https://github.com/openai/openai-cookbook/blob/main/articles/gpt-oss/run-transformers.md</link>
+      <guid isPermaLink="true">https://github.com/openai/openai-cookbook/blob/main/articles/gpt-oss/run-transformers.md</guid>
+      <pubDate>Tue, 05 Aug 2025 00:00:00 +0000</pubDate>
+      <description>Tags: open-models, gpt-oss, gpt-oss-server | Source: articles/gpt-oss/run-transformers.md</description>
+      <author>Dominik Kundel</author>
+    </item>
+    <item>
+      <title>How to run gpt-oss with vLLM</title>
+      <link>https://github.com/openai/openai-cookbook/blob/main/articles/gpt-oss/run-vllm.md</link>
+      <guid isPermaLink="true">https://github.com/openai/openai-cookbook/blob/main/articles/gpt-oss/run-vllm.md</guid>
+      <pubDate>Tue, 05 Aug 2025 00:00:00 +0000</pubDate>
+      <description>Tags: open-models, gpt-oss, gpt-oss-server | Source: articles/gpt-oss/run-vllm.md</description>
+      <author>Dominik Kundel</author>
+    </item>
+    <item>
+      <title>How to run gpt-oss locally with Ollama</title>
+      <link>https://github.com/openai/openai-cookbook/blob/main/articles/gpt-oss/run-locally-ollama.md</link>
+      <guid isPermaLink="true">https://github.com/openai/openai-cookbook/blob/main/articles/gpt-oss/run-locally-ollama.md</guid>
+      <pubDate>Tue, 05 Aug 2025 00:00:00 +0000</pubDate>
+      <description>Tags: open-models, gpt-oss, gpt-oss-local | Source: articles/gpt-oss/run-locally-ollama.md</description>
+      <author>Dominik Kundel</author>
+    </item>
+    <item>
+      <title>OpenAI Harmony Response Format</title>
+      <link>https://github.com/openai/openai-cookbook/blob/main/articles/openai-harmony.md</link>
+      <guid isPermaLink="true">https://github.com/openai/openai-cookbook/blob/main/articles/openai-harmony.md</guid>
+      <pubDate>Tue, 05 Aug 2025 00:00:00 +0000</pubDate>
+      <description>Tags: open-models, gpt-oss, harmony, gpt-oss-providers, gpt-oss-fine-tuning | Source: articles/openai-harmony.md</description>
+      <author>Dominik Kundel</author>
+    </item>
+    <item>
+      <title>Temporal Agents with Knowledge Graphs</title>
+      <link>https://github.com/openai/openai-cookbook/blob/main/examples/partners/temporal_agents_with_knowledge_graphs/temporal_agents_with_knowledge_graphs.ipynb</link>
+      <guid isPermaLink="true">https://github.com/openai/openai-cookbook/blob/main/examples/partners/temporal_agents_with_knowledge_graphs/temporal_agents_with_knowledge_graphs.ipynb</guid>
+      <pubDate>Tue, 22 Jul 2025 00:00:00 +0000</pubDate>
+      <description>Tags: knowledge-graphs, retrieval, functions, responses | Source: examples/partners/temporal_agents_with_knowledge_graphs/temporal_agents_with_knowledge_graphs.ipynb</description>
+      <author>Danny Wigg</author>
+      <author>Shikhar Kwatra</author>
+      <author>Alex Heald</author>
+      <author>Douglas Adams</author>
+      <author>Rishabh Sagar</author>
+    </item>
+    <item>
+      <title>Generate images with high input fidelity</title>
+      <link>https://github.com/openai/openai-cookbook/blob/main/examples/Generate_Images_With_High_Input_Fidelity.ipynb</link>
+      <guid isPermaLink="true">https://github.com/openai/openai-cookbook/blob/main/examples/Generate_Images_With_High_Input_Fidelity.ipynb</guid>
+      <pubDate>Thu, 17 Jul 2025 00:00:00 +0000</pubDate>
+      <description>Tags: images | Source: examples/Generate_Images_With_High_Input_Fidelity.ipynb</description>
+      <author>Katia Gil Guzman</author>
+    </item>
+    <item>
+      <title>Using Evals API on Image Inputs</title>
+      <link>https://github.com/openai/openai-cookbook/blob/main/examples/evaluation/use-cases/EvalsAPI_Image_Inputs.ipynb</link>
+      <guid isPermaLink="true">https://github.com/openai/openai-cookbook/blob/main/examples/evaluation/use-cases/EvalsAPI_Image_Inputs.ipynb</guid>
+      <pubDate>Tue, 15 Jul 2025 00:00:00 +0000</pubDate>
+      <description>Tags: evals, images | Source: examples/evaluation/use-cases/EvalsAPI_Image_Inputs.ipynb</description>
+      <author>Daisy Sheng</author>
+    </item>
+    <item>
+      <title>Optimize Prompts</title>
+      <link>https://github.com/openai/openai-cookbook/blob/main/examples/Optimize_Prompts.ipynb</link>
+      <guid isPermaLink="true">https://github.com/openai/openai-cookbook/blob/main/examples/Optimize_Prompts.ipynb</guid>
+      <pubDate>Mon, 14 Jul 2025 00:00:00 +0000</pubDate>
+      <description>Tags: prompt, completions, responses, agents-sdk, tracing | Source: examples/Optimize_Prompts.ipynb</description>
+      <author>Corwin Cheung</author>
+    </item>
+    <item>
+      <title>Building a Supply-Chain Copilot with OpenAI Agent SDK and Databricks MCP Servers</title>
+      <link>https://github.com/openai/openai-cookbook/blob/main/examples/mcp/databricks_mcp_cookbook.ipynb</link>
+      <guid isPermaLink="true">https://github.com/openai/openai-cookbook/blob/main/examples/mcp/databricks_mcp_cookbook.ipynb</guid>
+      <pubDate>Tue, 08 Jul 2025 00:00:00 +0000</pubDate>
+      <description>Tags: agents-sdk, mcp, tracing | Source: examples/mcp/databricks_mcp_cookbook.ipynb</description>
+      <author>Lara Rachidi</author>
+    </item>
+    <item>
+      <title>Prompt Migration Guide</title>
+      <link>https://github.com/openai/openai-cookbook/blob/main/examples/Prompt_migration_guide.ipynb</link>
+      <guid isPermaLink="true">https://github.com/openai/openai-cookbook/blob/main/examples/Prompt_migration_guide.ipynb</guid>
+      <pubDate>Thu, 26 Jun 2025 00:00:00 +0000</pubDate>
+      <description>Tags: prompt, completions, responses | Source: examples/Prompt_migration_guide.ipynb</description>
+      <author>Minhajul Hoque</author>
+      <author>Corwin Cheung</author>
+    </item>
+    <item>
+      <title>Introduction to deep research in the OpenAI API</title>
+      <link>https://github.com/openai/openai-cookbook/blob/main/examples/deep_research_api/introduction_to_deep_research_api.ipynb</link>
+      <guid isPermaLink="true">https://github.com/openai/openai-cookbook/blob/main/examples/deep_research_api/introduction_to_deep_research_api.ipynb</guid>
+      <pubDate>Wed, 25 Jun 2025 00:00:00 +0000</pubDate>
+      <description>Tags: deep-research-api, responses, mcp, deep-research | Source: examples/deep_research_api/introduction_to_deep_research_api.ipynb</description>
+      <author>Glory Jain</author>
+      <author>Kevin Alwell</author>
+    </item>
+    <item>
+      <title>Deep Research API with the Agents SDK</title>
+      <link>https://github.com/openai/openai-cookbook/blob/main/examples/deep_research_api/introduction_to_deep_research_api_agents.ipynb</link>
+      <guid isPermaLink="true">https://github.com/openai/openai-cookbook/blob/main/examples/deep_research_api/introduction_to_deep_research_api_agents.ipynb</guid>
+      <pubDate>Wed, 25 Jun 2025 00:00:00 +0000</pubDate>
+      <description>Tags: deep-research-api, mcp, deep-research, agents, agents-sdk | Source: examples/deep_research_api/introduction_to_deep_research_api_agents.ipynb</description>
+      <author>Kevin Alwell</author>
+      <author>Glory Jain</author>
+    </item>
+    <item>
+      <title>Building a Deep Research MCP Server</title>
+      <link>https://github.com/openai/openai-cookbook/blob/main/examples/deep_research_api/how_to_build_a_deep_research_mcp_server/README.md</link>
+      <guid isPermaLink="true">https://github.com/openai/openai-cookbook/blob/main/examples/deep_research_api/how_to_build_a_deep_research_mcp_server/README.md</guid>
+      <pubDate>Wed, 25 Jun 2025 00:00:00 +0000</pubDate>
+      <description>Tags: mcp, deep-research-api, responses, deep-research, agents, agents-sdk | Source: examples/deep_research_api/how_to_build_a_deep_research_mcp_server/README.md</description>
+      <author>Kevin Alwell</author>
+      <author>Glory Jain</author>
+    </item>
+    <item>
+      <title>Automate Jira ↔ GitHub with Codex</title>
+      <link>https://github.com/openai/openai-cookbook/blob/main/examples/codex/jira-github.ipynb</link>
+      <guid isPermaLink="true">https://github.com/openai/openai-cookbook/blob/main/examples/codex/jira-github.ipynb</guid>
+      <pubDate>Sat, 21 Jun 2025 00:00:00 +0000</pubDate>
+      <description>Tags: codex, automation | Source: examples/codex/jira-github.ipynb</description>
+      <author>Kevin Alwell</author>
+      <author>Naren Sankaran</author>
+    </item>
+    <item>
+      <title>Fine-Tuning Techniques - Choosing Between SFT, DPO, and RFT (With a Guide to DPO)</title>
+      <link>https://github.com/openai/openai-cookbook/blob/main/examples/Fine_tuning_direct_preference_optimization_guide.ipynb</link>
+      <guid isPermaLink="true">https://github.com/openai/openai-cookbook/blob/main/examples/Fine_tuning_direct_preference_optimization_guide.ipynb</guid>
+      <pubDate>Wed, 18 Jun 2025 00:00:00 +0000</pubDate>
+      <description>Tags: fine-tuning | Source: examples/Fine_tuning_direct_preference_optimization_guide.ipynb</description>
+      <author>Alex Lowden</author>
+    </item>
+    <item>
+      <title>MCP-Powered Agentic Voice Framework</title>
+      <link>https://github.com/openai/openai-cookbook/blob/main/examples/partners/mcp_powered_voice_agents/mcp_powered_agents_cookbook.ipynb</link>
+      <guid isPermaLink="true">https://github.com/openai/openai-cookbook/blob/main/examples/partners/mcp_powered_voice_agents/mcp_powered_agents_cookbook.ipynb</guid>
+      <pubDate>Tue, 17 Jun 2025 00:00:00 +0000</pubDate>
+      <description>Tags: mcp, voice, agents-sdk, functions, tracing | Source: examples/partners/mcp_powered_voice_agents/mcp_powered_agents_cookbook.ipynb</description>
+      <author>Shikhar Kwatra</author>
+      <author>Cece Z</author>
+      <author>Sibon li</author>
+    </item>
+    <item>
+      <title>Evals API Use-case - MCP Evaluation</title>
+      <link>https://github.com/openai/openai-cookbook/blob/main/examples/evaluation/use-cases/mcp_eval_notebook.ipynb</link>
+      <guid isPermaLink="true">https://github.com/openai/openai-cookbook/blob/main/examples/evaluation/use-cases/mcp_eval_notebook.ipynb</guid>
+      <pubDate>Mon, 09 Jun 2025 00:00:00 +0000</pubDate>
+      <description>Tags: evals-api, responses, evals, mcp | Source: examples/evaluation/use-cases/mcp_eval_notebook.ipynb</description>
+      <author>Josiah Grace</author>
+      <author>Shikhar Kwatra</author>
+    </item>
+    <item>
+      <title>Evals API Use-case - Structured Outputs Evaluation</title>
+      <link>https://github.com/openai/openai-cookbook/blob/main/examples/evaluation/use-cases/structured-outputs-evaluation.ipynb</link>
+      <guid isPermaLink="true">https://github.com/openai/openai-cookbook/blob/main/examples/evaluation/use-cases/structured-outputs-evaluation.ipynb</guid>
+      <pubDate>Mon, 09 Jun 2025 00:00:00 +0000</pubDate>
+      <description>Tags: evals-api, responses, evals | Source: examples/evaluation/use-cases/structured-outputs-evaluation.ipynb</description>
+      <author>Josiah Grace</author>
+      <author>Shikhar Kwatra</author>
+    </item>
+    <item>
+      <title>Evals API Use-case - Tools Evaluation</title>
+      <link>https://github.com/openai/openai-cookbook/blob/main/examples/evaluation/use-cases/tools-evaluation.ipynb</link>
+      <guid isPermaLink="true">https://github.com/openai/openai-cookbook/blob/main/examples/evaluation/use-cases/tools-evaluation.ipynb</guid>
+      <pubDate>Mon, 09 Jun 2025 00:00:00 +0000</pubDate>
+      <description>Tags: evals-api, responses, evals | Source: examples/evaluation/use-cases/tools-evaluation.ipynb</description>
+      <author>Josiah Grace</author>
+      <author>Shikhar Kwatra</author>
+    </item>
+    <item>
+      <title>Evals API Use-case - Web Search Evaluation</title>
+      <link>https://github.com/openai/openai-cookbook/blob/main/examples/evaluation/use-cases/web-search-evaluation.ipynb</link>
+      <guid isPermaLink="true">https://github.com/openai/openai-cookbook/blob/main/examples/evaluation/use-cases/web-search-evaluation.ipynb</guid>
+      <pubDate>Mon, 09 Jun 2025 00:00:00 +0000</pubDate>
+      <description>Tags: evals-api, responses, evals | Source: examples/evaluation/use-cases/web-search-evaluation.ipynb</description>
+      <author>Josiah Grace</author>
+      <author>Shikhar Kwatra</author>
+    </item>
+    <item>
+      <title>Eval Driven System Design - From Prototype to Production</title>
+      <link>https://github.com/openai/openai-cookbook/blob/main/examples/partners/eval_driven_system_design/receipt_inspection.ipynb</link>
+      <guid isPermaLink="true">https://github.com/openai/openai-cookbook/blob/main/examples/partners/eval_driven_system_design/receipt_inspection.ipynb</guid>
+      <pubDate>Mon, 02 Jun 2025 00:00:00 +0000</pubDate>
+      <description>Tags: evals, API Flywheel, completions, responses, functions, tracing | Source: examples/partners/eval_driven_system_design/receipt_inspection.ipynb</description>
+      <author>Shikhar Kwatra</author>
+      <author>Hugh Wimberly</author>
+      <author>Joshua Marker</author>
+      <author>Eddie Siegel</author>
+    </item>
+    <item>
+      <title>Selecting a Model Based on Stripe Conversion – A Practical Eval for Startups</title>
+      <link>https://github.com/openai/openai-cookbook/blob/main/examples/stripe_model_eval/selecting_a_model_based_on_stripe_conversion.ipynb</link>
+      <guid isPermaLink="true">https://github.com/openai/openai-cookbook/blob/main/examples/stripe_model_eval/selecting_a_model_based_on_stripe_conversion.ipynb</guid>
+      <pubDate>Mon, 02 Jun 2025 00:00:00 +0000</pubDate>
+      <description>Tags: evals, stripe, conversion | Source: examples/stripe_model_eval/selecting_a_model_based_on_stripe_conversion.ipynb</description>
+      <author>Josh Bickett</author>
+      <author>Lucie Lozinski</author>
+      <author>Shyamal Anadkat</author>
+    </item>
+    <item>
+      <title>Practical guide to data-intensive apps with the Realtime API</title>
+      <link>https://github.com/openai/openai-cookbook/blob/main/examples/Data-intensive-Realtime-apps.ipynb</link>
+      <guid isPermaLink="true">https://github.com/openai/openai-cookbook/blob/main/examples/Data-intensive-Realtime-apps.ipynb</guid>
+      <pubDate>Thu, 29 May 2025 00:00:00 +0000</pubDate>
+      <description>Tags: audio, speech | Source: examples/Data-intensive-Realtime-apps.ipynb</description>
+      <author>Alistair Gillespie</author>
+      <author>Robin Koenig</author>
+      <author>Patrick Hundal</author>
+    </item>
+    <item>
+      <title>Multi-Agent Portfolio Collaboration with OpenAI Agents SDK</title>
+      <link>https://github.com/openai/openai-cookbook/blob/main/examples/agents_sdk/multi-agent-portfolio-collaboration/multi_agent_portfolio_collaboration.ipynb</link>
+      <guid isPermaLink="true">https://github.com/openai/openai-cookbook/blob/main/examples/agents_sdk/multi-agent-portfolio-collaboration/multi_agent_portfolio_collaboration.ipynb</guid>
+      <pubDate>Wed, 28 May 2025 00:00:00 +0000</pubDate>
+      <description>Tags: agents-sdk, functions, responses, mutli-agent-collaboration | Source: examples/agents_sdk/multi-agent-portfolio-collaboration/multi_agent_portfolio_collaboration.ipynb</description>
+      <author>Raj Pathak</author>
+      <author>Chelsea Hu</author>
+    </item>
+    <item>
+      <title>o3/o4-mini Function Calling Guide</title>
+      <link>https://github.com/openai/openai-cookbook/blob/main/examples/o-series/o3o4-mini_prompting_guide.ipynb</link>
+      <guid isPermaLink="true">https://github.com/openai/openai-cookbook/blob/main/examples/o-series/o3o4-mini_prompting_guide.ipynb</guid>
+      <pubDate>Mon, 26 May 2025 00:00:00 +0000</pubDate>
+      <description>Tags: functions, responses, reasoning | Source: examples/o-series/o3o4-mini_prompting_guide.ipynb</description>
+      <author>Bill Chen</author>
+      <author>Prashant Mital</author>
+    </item>
+    <item>
+      <title>Exploring Model Graders for Reinforcement Fine-Tuning</title>
+      <link>https://github.com/openai/openai-cookbook/blob/main/examples/Reinforcement_Fine_Tuning.ipynb</link>
+      <guid isPermaLink="true">https://github.com/openai/openai-cookbook/blob/main/examples/Reinforcement_Fine_Tuning.ipynb</guid>
+      <pubDate>Fri, 23 May 2025 00:00:00 +0000</pubDate>
+      <description>Tags: reinforcement-learning, fine-tuning, reinforcement-learning-graders | Source: examples/Reinforcement_Fine_Tuning.ipynb</description>
+      <author>Theophile Sautory</author>
+    </item>
+    <item>
+      <title>Reinforcement Fine-Tuning for Conversational Reasoning with the OpenAI API</title>
+      <link>https://github.com/openai/openai-cookbook/blob/main/examples/fine-tuned_qa/reinforcement_finetuning_healthbench.ipynb</link>
+      <guid isPermaLink="true">https://github.com/openai/openai-cookbook/blob/main/examples/fine-tuned_qa/reinforcement_finetuning_healthbench.ipynb</guid>
+      <pubDate>Wed, 21 May 2025 00:00:00 +0000</pubDate>
+      <description>Tags: fine-tuning, qa, evals, reinforcement | Source: examples/fine-tuned_qa/reinforcement_finetuning_healthbench.ipynb</description>
+      <author>Robert Tinn</author>
+    </item>
+    <item>
+      <title>Guide to Using the Responses API's MCP Tool</title>
+      <link>https://github.com/openai/openai-cookbook/blob/main/examples/mcp/mcp_tool_guide.ipynb</link>
+      <guid isPermaLink="true">https://github.com/openai/openai-cookbook/blob/main/examples/mcp/mcp_tool_guide.ipynb</guid>
+      <pubDate>Wed, 21 May 2025 00:00:00 +0000</pubDate>
+      <description>Tags: mcp | Source: examples/mcp/mcp_tool_guide.ipynb</description>
+      <author>Charu Jaiswal</author>
+    </item>
+    <item>
+      <title>Image Understanding with RAG</title>
+      <link>https://github.com/openai/openai-cookbook/blob/main/examples/multimodal/image_understanding_with_rag.ipynb</link>
+      <guid isPermaLink="true">https://github.com/openai/openai-cookbook/blob/main/examples/multimodal/image_understanding_with_rag.ipynb</guid>
+      <pubDate>Fri, 16 May 2025 00:00:00 +0000</pubDate>
+      <description>Tags: responses, images, RAG, vision | Source: examples/multimodal/image_understanding_with_rag.ipynb</description>
+      <author>Robert Tinn</author>
+    </item>
+    <item>
+      <title>Evals API Use-case - Responses Evaluation</title>
+      <link>https://github.com/openai/openai-cookbook/blob/main/examples/evaluation/use-cases/responses-evaluation.ipynb</link>
+      <guid isPermaLink="true">https://github.com/openai/openai-cookbook/blob/main/examples/evaluation/use-cases/responses-evaluation.ipynb</guid>
+      <pubDate>Tue, 13 May 2025 00:00:00 +0000</pubDate>
+      <description>Tags: evals, responses | Source: examples/evaluation/use-cases/responses-evaluation.ipynb</description>
+      <author>Will Hathaway</author>
+    </item>
+    <item>
+      <title>Better performance from reasoning models using the Responses API</title>
+      <link>https://github.com/openai/openai-cookbook/blob/main/examples/responses_api/reasoning_items.ipynb</link>
+      <guid isPermaLink="true">https://github.com/openai/openai-cookbook/blob/main/examples/responses_api/reasoning_items.ipynb</guid>
+      <pubDate>Sun, 11 May 2025 00:00:00 +0000</pubDate>
+      <description>Tags: responses, functions | Source: examples/responses_api/reasoning_items.ipynb</description>
+      <author>Bill Chen</author>
+    </item>
+    <item>
+      <title>Context Summarization with Realtime API</title>
+      <link>https://github.com/openai/openai-cookbook/blob/main/examples/Context_summarization_with_realtime_api.ipynb</link>
+      <guid isPermaLink="true">https://github.com/openai/openai-cookbook/blob/main/examples/Context_summarization_with_realtime_api.ipynb</guid>
+      <pubDate>Sat, 10 May 2025 00:00:00 +0000</pubDate>
+      <description>Tags: audio, speech, tiktoken | Source: examples/Context_summarization_with_realtime_api.ipynb</description>
+      <author>Minhajul Hoque</author>
+    </item>
+    <item>
+      <title>Practical Guide for Model Selection for Real‑World Use Cases</title>
+      <link>https://github.com/openai/openai-cookbook/blob/main/examples/partners/model_selection_guide/model_selection_guide.ipynb</link>
+      <guid isPermaLink="true">https://github.com/openai/openai-cookbook/blob/main/examples/partners/model_selection_guide/model_selection_guide.ipynb</guid>
+      <pubDate>Wed, 07 May 2025 00:00:00 +0000</pubDate>
+      <description>Tags: responses, functions, web-search, tool calling, RAG, insurance, legal, pharma | Source: examples/partners/model_selection_guide/model_selection_guide.ipynb</description>
+      <author>Shikhar Kwatra</author>
+      <author>kashyapm-tribe</author>
+      <author>saip-tribe</author>
+      <author>nharada-tribe</author>
+    </item>
+    <item>
+      <title>ElatoAI - Realtime Speech AI Agents for ESP32 on Arduino</title>
+      <link>https://github.com/openai/openai-cookbook/blob/main/examples/voice_solutions/running_realtime_api_speech_on_esp32_arduino_edge_runtime_elatoai.md</link>
+      <guid isPermaLink="true">https://github.com/openai/openai-cookbook/blob/main/examples/voice_solutions/running_realtime_api_speech_on_esp32_arduino_edge_runtime_elatoai.md</guid>
+      <pubDate>Thu, 01 May 2025 00:00:00 +0000</pubDate>
+      <description>Tags: realtime-api, speech, audio, esp32, iot, arduino | Source: examples/voice_solutions/running_realtime_api_speech_on_esp32_arduino_edge_runtime_elatoai.md</description>
+      <author>Akashdeep Deb</author>
+    </item>
+    <item>
+      <title>Parallel Agents with the OpenAI Agents SDK</title>
+      <link>https://github.com/openai/openai-cookbook/blob/main/examples/agents_sdk/parallel_agents.ipynb</link>
+      <guid isPermaLink="true">https://github.com/openai/openai-cookbook/blob/main/examples/agents_sdk/parallel_agents.ipynb</guid>
+      <pubDate>Thu, 01 May 2025 00:00:00 +0000</pubDate>
+      <description>Tags: agents, agents-sdk, parallel-agents | Source: examples/agents_sdk/parallel_agents.ipynb</description>
+      <author>Brandon Baker</author>
+    </item>
+  </channel>
+</rss>

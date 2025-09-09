@@ -35,13 +35,29 @@ jobs:
           if [ -n "$(git status --porcelain rss.xml)" ]; then
             git add rss.xml
             git commit -m "chore: update RSS feed"
-            # Pull latest changes and rebase before pushing
-            if ! git pull --rebase; then
-              echo "Error: git pull --rebase failed. Please check for conflicts."
+            # Fetch latest changes and rebase before pushing
+            git fetch origin
+            if ! git rebase origin/main; then
+              echo "Error: git rebase origin/main failed. Please check for conflicts."
               exit 1
             fi
-            if ! git push; then
-              echo "Error: git push failed. Please check network or remote conflicts."
+            # Try to push up to 3 times in case of race conditions
+            n=0
+            until [ $n -ge 3 ]; do
+              if git push; then
+                break
+              fi
+              n=$((n+1))
+              echo "git push failed, retrying ($n/3)..."
+              sleep 2
+              git fetch origin
+              if ! git rebase origin/main; then
+                echo "Error: git rebase origin/main failed during retry. Please check for conflicts."
+                exit 1
+              fi
+            done
+            if [ $n -ge 3 ]; then
+              echo "Error: git push failed after 3 attempts. Please check network or remote conflicts."
               exit 1
             fi
           else

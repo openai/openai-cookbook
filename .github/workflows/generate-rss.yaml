@@ -35,7 +35,15 @@ jobs:
           if [ -n "$(git status --porcelain rss.xml)" ]; then
             git add rss.xml
             git commit -m "chore: update RSS feed"
-            git push
+            # Pull latest changes and rebase before pushing
+            if ! git pull --rebase; then
+              echo "Error: git pull --rebase failed. Please check for conflicts."
+              exit 1
+            fi
+            if ! git push; then
+              echo "Error: git push failed. Please check network or remote conflicts."
+              exit 1
+            fi
           else
             echo "No changes to rss.xml"
           fi

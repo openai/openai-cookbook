@@ -77,7 +77,7 @@ def build_feed(entries: list[dict], authors: dict) -> ET.ElementTree:
             continue
         try:
             dt = parse_date(str(e["date"]))
-        except Exception:
+        except (ValueError, TypeError):
             # Skip invalid date entries
             continue
         prepared.append((dt, e))

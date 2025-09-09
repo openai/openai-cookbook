@@ -42,7 +42,14 @@ def build_feed(entries: list[dict], authors: dict) -> ET.ElementTree:
     ET.register_namespace("atom", atom_ns)
     ET.register_namespace("dc", dc_ns)
 
-    rss = ET.Element("rss", attrib={"version": "2.0"})
+    rss = ET.Element(
+        "rss",
+        attrib={
+            "version": "2.0",
+            "xmlns:atom": atom_ns,
+            "xmlns:dc": dc_ns,
+        },
+    )
     channel = ET.SubElement(rss, "channel")
 
     ET.SubElement(channel, "title").text = "OpenAI Cookbook"

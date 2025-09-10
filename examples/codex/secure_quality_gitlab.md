@@ -145,6 +145,7 @@ codex_review:
 3. Runs Codex in **full-auto mode** with a strict JSON-only prompt  
 4. Extracts valid JSON between markers, validates it, and falls back to `[]` if invalid  
 5. Publishes artifacts to GitLab so results appear inline with merge requests
+6. [`Edit: 10 Sep 2025`] Enriched with ripgrep hotspot context to produce markdown report
 
 The generated artifacts can be downloaded from the pipeline page
 
@@ -187,120 +188,140 @@ By adding Codex CLI into your pipeline, you can turn scanner results generated b
 
 ```yaml
 stages:
- - codex
- - remediation
+  - codex
+  - remediation
 
 default:
- image: node:24
+  image: node:24
 
 variables:
- CODEX_SAST_PATH: "gl-sast-report.json"
- CODEX_SECURITY_MD: "security_priority.md"
- CODEX_RAW_LOG: "artifacts/codex-sast-raw.log"
+  CODEX_SAST_PATH: "gl-sast-report.json"
+  CODEX_SECURITY_MD: "security_priority.md"
+  CODEX_RAW_LOG: "artifacts/codex-sast-raw.log"
 
- # --- Recommendations prompt (reads SAST → writes Markdown) ---
- CODEX_PROMPT: |
-   You are a security triage assistant analyzing GitLab SAST output.
-   The SAST JSON is located at: ${CODEX_SAST_PATH}
+  # -------- Recommendations prompt (Codex reads embedded SAST JSON and writes Markdown) --------
+  CODEX_PROMPT: |-
+    You are a security triage assistant analyzing GitLab SAST output.
 
-   GOAL:
-   - Read and parse ${CODEX_SAST_PATH}.
-   - Consolidate duplicate or overlapping findings (e.g., same CWE + same sink/function, same file/line ranges, or same data flow root cause).
-   - Rank findings by realistic exploitability and business risk, not just library presence.
-     * Prioritize issues that:
-       - Are reachable from exposed entry points (HTTP handlers, controllers, public APIs, CLI args).
-       - Involve user-controlled inputs reaching dangerous sinks (e.g., SQL exec, OS exec, eval, path/file ops, deserialization, SSRF).
-       - Occur in authentication/authorization boundaries or around secrets/keys/tokens.
-       - Have clear call stacks/evidence strings pointing to concrete methods that run.
-       - Affect internet-facing or privileged components.
-     * De-prioritize purely theoretical findings with no reachable path or dead code.
+    INPUTS YOU WILL RECEIVE INLINE IN THIS PROMPT:
+    - SAST_JSON_BASE64: A base64-encoded (UTF-8) minified copy of gl-sast-report.json. Decode before parsing.
+    - A short repo file list and a ripgrep hotspot summary (heuristics only).
 
-   CONSOLIDATION RULES:
-   - Aggregate by (CWE, primary sink/function, file[:line], framework route/handler) when applicable.
-   - Merge repeated instances across files if they share the same source-sink pattern and remediation is the same.
-   - Keep a single representative entry with a count of affected locations; list notable examples.
+    GOAL:
+    - Parse the SAST JSON.
+    - Consolidate duplicate/overlapping findings (same CWE + same sink/function, same file/line ranges, or same data flow root cause).
+    - Rank by realistic exploitability & business risk (not just presence).
+      * PRIORITIZE where:
+        - Reachable from exposed entry points (HTTP handlers, controllers, public APIs, CLI args)
+        - User-controlled input reaches dangerous sinks (SQL/OS exec/eval/path/file ops/deserialization/SSRF)
+        - In/around authZ/authN boundaries or secrets/keys/tokens
+        - Clear call stacks/evidence pointing to concrete methods that run
+        - Internet-facing or privileged components
+      * DE-PRIORITIZE dead code / purely theoretical
 
-   OUTPUT FORMAT (MARKDOWN ONLY, BETWEEN MARKERS BELOW):
-   - Start with a title and short summary of total findings and how many were consolidated.
-   - A table of TOP PRIORITIES sorted by exploitability (highest first) with columns:
-     Rank | CWE | Title | Affected Locations | Likely Exploit Path | Risk | Rationale (1–2 lines)
-   - "Top 5 Immediate Actions" list with concrete next steps.
-   - "Deduplicated Findings (Full Details)" with risk, 0–100 exploitability score, evidence (file:line + methods), remediation, owners, references.
-   - If ${CODEX_SAST_PATH} is missing or invalid JSON, output a brief note stating no parsable SAST findings.
+    CONSOLIDATION RULES:
+    - Aggregate by (CWE, primary sink/function, file[:line], framework route/handler) when applicable.
+    - Merge repeated instances if the source→sink pattern and remediation are the same.
+    - Keep a single representative entry with a count of affected locations; list notable examples.
 
-   RULES (must follow exactly):
-   - PRINT ONLY between these two lines:
-     === BEGIN_SECURITY_MD ===
-     <MARKDOWN CONTENT HERE>
-     === END_SECURITY_MD ===
-   - No prose, backticks, code fences, or anything outside the markers.
-   - Be concise but specific. Cite only evidence present in the SAST report.
+    OUTPUT FORMAT (MARKDOWN ONLY, BETWEEN MARKERS):
+    === BEGIN_SECURITY_MD ===
+    <TITLE + short summary of total findings and how many consolidated>
+    <Table "TOP PRIORITIES" sorted by exploitability>
+    <Top 5 Immediate Actions>
+    <Deduplicated Findings (Full Details): risk, 0–100 exploitability score, evidence (file:line + methods), remediation, owners, references>
+    === END_SECURITY_MD ===
+
+    RULES:
+    - Print ONLY between the markers above. No prose, no backticks outside.
+    - Be concise but specific. Cite only evidence present in SAST.
+    - If SAST is missing/invalid, print a brief note inside the markers.
+
 
 # ---------------------------
 # Stage: codex → Job 1 (Recommendations)
 # ---------------------------
 codex_recommendations:
- stage: codex
- rules:
-   - if: '$CI_PIPELINE_SOURCE == "merge_request_event" && $CI_MERGE_REQUEST_SOURCE_PROJECT_ID != $CI_PROJECT_ID'
-     when: never
-   - if: '$OPENAI_API_KEY'
-     when: on_success
-   - when: never
- script:
-   - set -euo pipefail
-   - mkdir -p artifacts
-   - ": > ${CODEX_RAW_LOG}"
-   - ": > ${CODEX_SECURITY_MD}"
-
-   - apt-get update && apt-get install -y --no-install-recommends curl ca-certificates git lsb-release ripgrep
-   - npm --ignore-scripts -g i @openai/codex@latest
-   - codex --version && git --version
-
-   - |
-     if [ ! -s "${CODEX_SAST_PATH}" ]; then
-       echo "WARNING: ${CODEX_SAST_PATH} not found or empty. Codex will emit a 'no parsable findings' note."
-     fi
-
-   - FILE_LIST="$(git ls-files | sed 's/^/- /')"
-   - |
-     export CODEX_PROMPT="${CODEX_PROMPT}
-
-     Existing repository files (for reference only; use paths exactly as listed in SAST evidence):
-     ${FILE_LIST}"
-
-   # Run Codex and capture raw output (preserve Codex's exit code via PIPESTATUS)
-   - |
-     set +o pipefail
-     codex exec --full-auto "$CODEX_PROMPT" | tee "${CODEX_RAW_LOG}" >/dev/null
-     CODEX_RC=${PIPESTATUS[0]}
-     set -o pipefail
-     echo "Codex exit code: ${CODEX_RC}"
-
-   # Extract markdown between markers; fallback to a minimal note
-   - |
-     TMP_OUT="$(mktemp)"
-     sed -E 's/\x1B\[[0-9;]*[A-Za-z]//g' "${CODEX_RAW_LOG}" | tr -d '\r' | awk '
-       /^\s*=== BEGIN_SECURITY_MD ===\s*$/ {grab=1; next}
-       /^\s*=== END_SECURITY_MD ===\s*$/   {grab=0}
-       grab
-     ' > "${TMP_OUT}"
-     if ! [ -s "${TMP_OUT}" ]; then
-       cat > "${TMP_OUT}" <<'EOF' # Security Findings Priority
-       No parsable SAST findings detected in `gl-sast-report.json`._
-     EOF
-       echo "WARNING: No content extracted; wrote minimal placeholder."
-     fi
-     mv -f "${TMP_OUT}" "${CODEX_SECURITY_MD}"
-     if [ "${CODEX_RC}" -ne 0 ]; then
-       echo "WARNING: Codex exited with code ${CODEX_RC}. Proceeding with extracted report." >&2
-     fi
- artifacts:
-   when: always
-   paths:
-     - artifacts/codex-sast-raw.log
-     - security_priority.md
-   expire_in: 14 days
+  stage: codex
+  rules:
+    - if: '$CI_PIPELINE_SOURCE == "merge_request_event" && $CI_MERGE_REQUEST_SOURCE_PROJECT_ID != $CI_PROJECT_ID'
+      when: never
+    - if: '$OPENAI_API_KEY'
+      when: on_success
+    - when: never
+  script:
+    - set -euo pipefail
+    - mkdir -p artifacts
+    - ': > "$CODEX_RAW_LOG"'
+    - ': > "$CODEX_SECURITY_MD"'
+    - apt-get update && apt-get install -y --no-install-recommends curl ca-certificates git jq ripgrep coreutils
+    - npm -g i @openai/codex@latest ajv-cli
+    - codex --version && git --version && jq --version && rg --version
+    - FILE_LIST="$(git ls-files | sed 's/^/- /')"
+    - |
+      cat > /tmp/rg-patterns.txt <<'PATTERNS'
+      \b(eval|Function)\s*\(
+      child_process\.(exec|execFile|spawn|spawnSync|execSync)\s*\(
+      \bfs\.(readFile|writeFile|appendFile|createWriteStream|createReadStream|unlink|rm)\s*\(
+      (\[|\.)innerHTML\s*=?|document\.write\s*\(
+      jsonwebtoken\.(sign|verify)\s*\(
+      SELECT\s+.+FROM
+      PATTERNS
+      rg -n -f /tmp/rg-patterns.txt -S --hidden --no-ignore-vcs \
+        -g '!**/*.spec.ts' -g '!**/test/**' -g '!**/cypress/**' \
+        -g '!**/assets/**' -g '!**/*.map' -g '!**/*.min.*' \
+        -g '!**/screenshots/**' -g '!**/*.{gif,jpg,png,svg,ico,mp4}' \
+        --no-heading --max-count 100 | head -n 100 > artifacts/hotspots_samples.txt || true
+      rg -c -f /tmp/rg-patterns.txt -S --hidden --no-ignore-vcs \
+        -g '!**/*.spec.ts' -g '!**/test/**' -g '!**/cypress/**' \
+        -g '!**/assets/**' -g '!**/*.map' -g '!**/*.min.*' \
+        -g '!**/screenshots/**' -g '!**/*.{gif,jpg,png,svg,ico,mp4}' \
+        --no-messages | sort -t: -k2,2nr | head -n 50 > artifacts/hotspots_summary.txt || true
+      HOTSPOT_SUMMARY="$(head -n 50 artifacts/hotspots_summary.txt | sed 's/^/- /')"
+    - |
+      TMP_PROMPT="$(mktemp)"
+      printf "%s\n\n" "$CODEX_PROMPT" > "$TMP_PROMPT"
+      printf "Existing repository files (for reference only; use paths exactly as listed in SAST evidence):\n%s\n\n" "$FILE_LIST" >> "$TMP_PROMPT"
+      printf "ripgrep hotspot summary (top 50 files with pattern hits):\n%s\n\n" "${HOTSPOT_SUMMARY:-<none>}" >> "$TMP_PROMPT"
+      if [ -s "${CODEX_SAST_PATH}" ]; then
+        SAST_MINI_B64="$(jq -c . "${CODEX_SAST_PATH}" | head -c 200000 | base64 -w0)"
+        printf "SAST_JSON_BASE64:%s\n" "$SAST_MINI_B64" >> "$TMP_PROMPT"
+      else
+        echo "WARNING: ${CODEX_SAST_PATH} not found or empty; Codex will print a 'no parsable findings' note." >&2
+        printf "SAST_JSON_BASE64:\n" >> "$TMP_PROMPT"
+      fi
+      PROMPT_CONTENT="$(cat "$TMP_PROMPT")"
+      rm -f "$TMP_PROMPT"
+    - |
+      set +o pipefail
+      codex exec --full-auto "$PROMPT_CONTENT" | tee "${CODEX_RAW_LOG}" >/dev/null
+      CODEX_RC=${PIPESTATUS[0]}
+      set -o pipefail
+      echo "Codex exit code: ${CODEX_RC}"
+    - |
+      TMP_OUT="$(mktemp)"
+      sed -E 's/\x1B\[[0-9;]*[A-Za-z]//g' "${CODEX_RAW_LOG}" | tr -d '\r' | awk '
+        /^\s*=== BEGIN_SECURITY_MD ===\s*$/ {grab=1; next}
+        /^\s*=== END_SECURITY_MD ===\s*$/   {grab=0}
+        grab
+      ' > "${TMP_OUT}"
+      if ! [ -s "${TMP_OUT}" ]; then
+        {
+          echo "=== BEGIN_SECURITY_MD ==="
+          echo "No parsable SAST findings detected in \`gl-sast-report.json\`."
+          echo "=== END_SECURITY_MD ==="
+        } > "${TMP_OUT}"
+        echo "WARNING: No content extracted; wrote minimal placeholder."
+      fi
+      mv -f "${TMP_OUT}" "${CODEX_SECURITY_MD}"
+  artifacts:
+    when: always
+    paths:
+      - artifacts/codex-sast-raw.log
+      - artifacts/hotspots_summary.txt
+      - artifacts/hotspots_samples.txt
+      - security_priority.md
+    expire_in: 14 days
 ```
 Here's an example of the output we receive: 
 
@@ -371,109 +392,149 @@ Parsed `gl-sast-report.json` and merged overlapping issues.
 #### Remediation CI/CD Job Example
 
 **Requirement**: This job depends on the previous stage output of the `security_priority.md` file to use as input to generate the patch file for creating an MR: 
+
 ```yaml
- stages:
-  - remediation
-
-default:
-  image: node:24
-
-variables:
-  # Inputs/outputs
-  SAST_REPORT_PATH: "gl-sast-report.json"
-  PATCH_DIR: "codex_patches"
-  CODEX_DIFF_RAW: "artifacts/codex-diff-raw.log"
-
-  # --- Resolution prompt (produces unified git diffs only) ---
-  CODEX_DIFF_PROMPT: |
+  # -------- Remediation prompt (Codex outputs unified diffs only) --------
+  CODEX_DIFF_PROMPT: |-
     You are a secure code remediation assistant.
-    You will receive:
-    - The repository working tree (read-only)
-    - One vulnerability (JSON from a GitLab SAST report)
-    - Allowed files list
+
+    YOU WILL RECEIVE:
+    - VULNERABILITY_JSON: one item from a GitLab SAST report
+    - EXISITING_REPOSITORY_FILES: flat list of repo files
+    - CONSTRAINTS: the exact file you may edit (EXPECTED_FILE) and approximate line range
 
     GOAL:
-    - Create the minimal, safe fix for the vulnerability.
-    - Output a unified git diff that applies cleanly with `git apply -p0` (or -p1 for a/ b/ paths).
-    - Prefer surgical changes: input validation, safe APIs, parameterized queries, permission checks.
-    - Do NOT refactor broadly or change unrelated code.
+    - Produce the minimal, safe code change that fixes the vulnerability.
+    - Keep behavior identical except for the security fix.
+    - Do not refactor or touch unrelated code.
 
-    RULES (must follow exactly):
-    - PRINT ONLY the diff between the markers below.
-    - Use repo-relative paths; `diff --git a/path b/path` headers are accepted.
-    - No binary file changes. No prose/explanations outside the markers.
+    GENERAL GUIDANCE:
+    - Prefer surgical fixes: input validation, strict allowlists, parameterized queries, permission checks, safe APIs.
+    - For SQL: replace string concatenation with parameterized queries/placeholders.
+    - For file/OS exec: validate/normalize inputs; switch to safer APIs.
+    - For SSRF/HTTP: enforce allowlists or block private IP ranges unless required.
+    - For authZ/authN: add missing checks in the narrowest scope possible.
 
-    MARKERS:
-    === BEGIN_UNIFIED_DIFF ===
-    <unified diff here>
-    === END_UNIFIED_DIFF ===
+    XML SAFETY NOTE (libxmljs2):
+    - Do NOT use `noent: true` (entity substitution). Remove it if present.
+    - Prefer `{ nonet: true }` to block external entity/network access.
+    - Avoid DTD/entity expansion entirely (no DOCTYPE usage).
 
-    If no safe fix is possible without deeper changes, output an empty diff between the markers.
+    OUTPUT RULES (MUST FOLLOW EXACTLY):
+    - PRINT ONLY between these two markers:
+      === BEGIN_UNIFIED_DIFF ===
+      <unified diff here>
+      === END_UNIFIED_DIFF ===
+    - The diff must be repo-relative paths. `diff --git a/path b/path` headers are accepted.
+    - Output a valid unified diff that `git apply` can consume. When possible include:
+      * `diff --git a/<path> b/<path>`
+      * `index <hash>..<hash> <mode>` (if known)
+      * `--- a/<path>`
+      * `+++ b/<path>`
+      * At least one `@@` hunk header with a few lines of context (like `git diff -U3`)
+    - Modify exactly ONE file: the EXPECTED_FILE from CONSTRAINTS. Do not add, delete, or rename files.
+    - No binary changes. No explanations outside the markers.
+    - If no safe, minimal fix is possible without broader changes, output an empty diff between the markers.
+
+    FORMAT REMINDER:
+    - Absolutely no prose before, between, or after the markers.
+    - If you change a string literal, ensure quotes and escaping remain valid.
 
 # ---------------------------
-# Stage: remediation → Generate unified diffs/patches
+# Stage: remediation → Job 2 (Resolution / git diffs)
 # ---------------------------
 codex_resolution:
   stage: remediation
+  needs:
+    - job: codex_recommendations
+      artifacts: true
   rules:
     - if: '$OPENAI_API_KEY'
       when: on_success
     - when: never
+  variables:
+    SAST_REPORT_PATH: "gl-sast-report.json"
+    PATCH_DIR: "codex_patches"
+    CODEX_DIFF_RAW: "artifacts/codex-diff-raw.log"
   script:
-    - set -euo pipefail
+    - set -Eeuo pipefail
     - mkdir -p "$PATCH_DIR" artifacts
-
-    # Deps
-    - apt-get update && apt-get install -y --no-install-recommends bash git jq curl ca-certificates ripgrep
-    - npm --ignore-scripts -g i @openai/codex@latest
+    - apt-get update && apt-get install -y --no-install-recommends bash git jq curl ca-certificates coreutils
+    - npm -g i @openai/codex@latest ajv-cli
     - git --version && codex --version || true
+    - jq --version || true
 
-    # Require SAST report; no-op if missing
     - |
+      # --- Fast exit if SAST missing ---
       if [ ! -s "${SAST_REPORT_PATH}" ]; then
-        echo "No SAST report found; remediation will no-op."
+        echo "No SAST report found; resolution will no-op."
         printf "CODEX_CREATED_PATCHES=false\n" > codex.env
         exit 0
       fi
 
-    # Pull High/Critical items
-    - jq -c '.vulnerabilities[]? | select((.severity|ascii_downcase)=="high" or (.severity|ascii_downcase)=="critical")' "$SAST_REPORT_PATH" \
+      # --- Pick High/Critical findings only ---
+      jq -c '.vulnerabilities[]? | select((.severity|ascii_downcase)=="high" or (.severity|ascii_downcase)=="critical")' "$SAST_REPORT_PATH" \
         | nl -ba > /tmp/hicrit.txt || true
-    - |
+
       if [ ! -s /tmp/hicrit.txt ]; then
         echo "No High/Critical vulnerabilities found. Nothing to fix."
         printf "CODEX_CREATED_PATCHES=false\n" > codex.env
         exit 0
       fi
 
-    # Ground Codex to actual repo files
-    - FILE_LIST="$(git ls-files | sed 's/^/- /')"
+      FILE_LIST="$(git ls-files | sed 's/^/- /')"
+      git config user.name "CI Codex Bot"
+      git config user.email "codex-bot@example.com"
+      created=0
 
-    # Identity for any local patch ops
-    - git config user.name "CI Codex Bot"
-    - git config user.email "codex-bot@example.com"
-
-    - created=0
-
-    # Loop: build prompt (robust temp-file), run Codex, extract diff, validate
-    - |
       while IFS=$'\t' read -r idx vuln_json; do
         echo "Processing vulnerability #$idx"
         echo "$vuln_json" > "/tmp/vuln-$idx.json"
 
+        EXPECTED_FILE=$(jq -r '.location.file // .file // empty' "/tmp/vuln-$idx.json")
+        START_LINE=$(jq -r '.location.start_line // .start_line // 0' "/tmp/vuln-$idx.json")
+        END_LINE=$(jq -r '.location.end_line // .end_line // 0' "/tmp/vuln-$idx.json")
+
+        # --- Build constraints text (no heredoc-in-substitution to avoid EOF pitfalls) ---
+        CONSTRAINTS_HEADER="CONSTRAINTS:"
+        CONSTRAINTS_BODY=$' - Modify exactly one file: '
+        CONSTRAINTS_BODY+="${EXPECTED_FILE:-<unknown>}"$'\n'
+        CONSTRAINTS_BODY+=$' - Do not touch any other file. If a safe fix requires multiple files, output an empty diff.\n'
+        CONSTRAINTS_BODY+=$' - Make a minimal change in the vicinity of lines '"${START_LINE}-${END_LINE}"$' if present.\n'
+        CONSTRAINTS_BODY+=$' - Keep behavior unchanged except for the security fix.\n'
+        CONSTRAINTS="${CONSTRAINTS_HEADER}\n${CONSTRAINTS_BODY}"
+
+        # --- Optional context snippet for the target file & range ---
+        CONTEXT_SNIPPET=""
+        if [ -n "${EXPECTED_FILE}" ] && [ -f "${EXPECTED_FILE}" ]; then
+          if [ "${START_LINE}" -gt 0 ]; then
+            START=$(( START_LINE>30 ? START_LINE-30 : 1 ))
+            END=$(( END_LINE>0 ? END_LINE+30 : START+60 ))
+            CONTEXT_SNIPPET="$(sed -n "${START},${END}p" "${EXPECTED_FILE}" | nl -ba | sed 's/^/    /')"
+          fi
+        fi
+
+        # --- Compose model prompt in a temp file; here-docs with left-justified terminators ---
         PROMPT_FILE="$(mktemp)"
         {
           printf "%s\n\n" "$CODEX_DIFF_PROMPT"
           printf "VULNERABILITY_JSON:\n<<JSON\n"
           cat "/tmp/vuln-$idx.json"
           printf "\nJSON\n\n"
+          printf "%b\n\n" "$CONSTRAINTS"
+          if [ -n "$CONTEXT_SNIPPET" ]; then
+            printf "AFFECTED_FILE_CONTEXT (numbered lines):\n<<CODE\n"
+            printf "%s\n" "$CONTEXT_SNIPPET"
+            printf "CODE\n\n"
+          fi
           printf "EXISTING_REPOSITORY_FILES (exact list):\n"
           printf "%s\n" "$FILE_LIST"
         } > "$PROMPT_FILE"
 
-        PER_FINDING_PROMPT="$(tr -d '\r' < "$PROMPT_FILE")"
+        PER_FINDING_PROMPT="$(cat "$PROMPT_FILE")"
         rm -f "$PROMPT_FILE"
 
+        # --- Run Codex and capture raw output ---
         : > "$CODEX_DIFF_RAW"
         set +o pipefail
         codex exec --full-auto "$PER_FINDING_PROMPT" | tee -a "$CODEX_DIFF_RAW" >/dev/null
@@ -482,35 +543,86 @@ codex_resolution:
         echo "Codex (diff) exit code: ${RC}"
 
         OUT_PATCH="$PATCH_DIR/fix-$idx.patch"
+
+        # --- Extract and sanitize diff strictly to avoid 'corrupt patch' ---
+        # 1) strip ANSI + CRs
+        # 2) grab only lines between markers
+        # 3) drop anything before the first 'diff --git'
+        # 4) ensure at least one hunk header '@@'
         sed -E 's/\x1B\[[0-9;]*[A-Za-z]//g' "$CODEX_DIFF_RAW" \
           | tr -d '\r' \
           | awk '
               /^\s*=== BEGIN_UNIFIED_DIFF ===\s*$/ {grab=1; next}
               /^\s*=== END_UNIFIED_DIFF ===\s*$/   {grab=0}
               grab
+            ' \
+          | awk '
+              start { print; next }
+              /^diff --git / { start=1; print; next }
             ' > "$OUT_PATCH"
 
-        if ! [ -s "$OUT_PATCH" ] || ! grep -qE '^\s*diff --git ' "$OUT_PATCH"; then
-          echo "  No usable diff produced for #$idx; skipping."
+        # --- Basic structure checks ---
+        if ! [ -s "$OUT_PATCH" ] || ! grep -q '^diff --git ' "$OUT_PATCH"; then
+          echo "  Diff lacks headers; skipping."
+          rm -f "$OUT_PATCH"
+          continue
+        fi
+        if ! grep -q '^@@ ' "$OUT_PATCH"; then
+          echo "  Diff lacks hunk headers; skipping."
           rm -f "$OUT_PATCH"
           continue
         fi
 
-        # Validate: accept -p0 (repo-relative) or -p1 (a/ b/ prefixes)
-        if git apply --check -p0 "$OUT_PATCH" || git apply --check -p1 "$OUT_PATCH"; then
-          echo "  Patch validated → $OUT_PATCH"
-          created=$((created+1))
-        else
-          echo "  Patch failed to apply cleanly; removing."
+        # --- Ensure only the expected file is modified ---
+        PATCH_FILES=$(grep -E '^diff --git ' "$OUT_PATCH" | awk '{print $3}' | sed 's@^a/@@')
+        UNIQUE_COUNT=$(printf "%s\n" "$PATCH_FILES" | sort -u | wc -l | tr -d ' ')
+        FIRST_FILE=$(printf "%s\n" "$PATCH_FILES" | head -n1)
+
+        if [ "$UNIQUE_COUNT" -ne 1 ] || { [ -n "${EXPECTED_FILE}" ] && [ "$FIRST_FILE" != "$EXPECTED_FILE" ]; }; then
+          echo "  Patch touches unexpected file(s):"
+          printf "    %s\n" "$PATCH_FILES"
+          echo "  Expected: ${EXPECTED_FILE:-<unknown>}. Skipping."
           rm -f "$OUT_PATCH"
+          continue
         fi
+
+        # --- Special guard for XML issue in fileUpload.ts ---
+        if echo "$EXPECTED_FILE" | grep -q 'fileUpload\.ts$'; then
+          if ! grep -E 'parseXml|noent|nonet' "$OUT_PATCH" >/dev/null 2>&1; then
+            echo "  Patch does not appear to change XML parsing; skipping."
+            rm -f "$OUT_PATCH"
+            continue
+          fi
+        fi
+
+        # --- Try to validate/applyability (print errors but keep going if a later mode passes) ---
+        if git apply --check -p0 "$OUT_PATCH"; then
+          echo "  Patch validated with -p0 → $OUT_PATCH"
+          created=$((created+1))
+          continue
+        fi
+        if git apply --check -p1 "$OUT_PATCH"; then
+          echo "  Patch validated with -p1 → $OUT_PATCH"
+          created=$((created+1))
+          continue
+        fi
+        if git apply --3way -p1 "$OUT_PATCH"; then
+          echo "  Patch validated with 3-way -p1 → $OUT_PATCH"
+          created=$((created+1))
+          continue
+        fi
+
+        echo "  Patch failed to apply cleanly in all modes; removing."
+        rm -f "$OUT_PATCH"
       done < /tmp/hicrit.txt
 
+      echo "Total patches created: $created"
       if [ "$created" -gt 0 ]; then
         printf "CODEX_CREATED_PATCHES=true\nPATCH_DIR=%s\n" "$PATCH_DIR" > codex.env
       else
         printf "CODEX_CREATED_PATCHES=false\n" > codex.env
       fi
+
   artifacts:
     when: always
     paths:
@@ -519,63 +631,6 @@ codex_resolution:
     reports:
       dotenv: codex.env
     expire_in: 14 days
-```
-
-Running the CI/CD job with Codex CLI, we receive a Git patch that fixes the issues originally found by our security scanner:
-
-```patch
-<unified diff here>
-diff --git a/routes/profileImageUrlUpload.ts b/routes/profileImageUrlUpload.ts
-index 9b4a62d..c7f1a7e 100644
---- a/routes/profileImageUrlUpload.ts
-+++ b/routes/profileImageUrlUpload.ts
-@@ -5,17 +5,12 @@
- * SPDX-License-Identifier: MIT
- */
--import fs from 'node:fs'
--import { Readable } from 'node:stream'
--import { finished } from 'node:stream/promises'
-import { type Request, type Response, type NextFunction } from 'express'
-import * as security from '../lib/insecurity'
-import { UserModel } from '../models/user'
--import * as utils from '../lib/utils'
--import logger from '../lib/logger'
-export function profileImageUrlUpload () {
-  return async (req: Request, res: Response, next: NextFunction) => {
-    if (req.body.imageUrl !== undefined) {
-      const url = req.body.imageUrl
-      if (url.match(/(.)*solve\\/challenges\\/server-side(.)*/) !== null) req.app.locals.abused_ssrf_bug = true
-      const loggedInUser = security.authenticatedUsers.get(req.cookies.token)
-      if (loggedInUser) {
--        try {
--          const response = await fetch(url)
--          if (!response.ok || !response.body) {
--            throw new Error('url returned a non-OK status code or an empty body')
--          }
--          const ext = ['jpg', 'jpeg', 'png', 'svg', 'gif'].includes(url.split('.').slice(-1)[0].toLowerCase()) ? url.split('.').slice(-1)[0].toLowerCase() : 'jpg'
--          const fileStream = fs.createWriteStream(`frontend/dist/frontend/assets/public/images/uploads/${loggedInUser.data.id}.${ext}`, { flags: 'w' })
--          await finished(Readable.fromWeb(response.body as any).pipe(fileStream))
--          await UserModel.findByPk(loggedInUser.data.id).then(async (user: UserModel | null) => { return await user?.update({ profileImage: `/assets/public/images/uploads/${loggedInUser.data.id}.${ext}` }) }).catch((error: Error) => { next(error) })
--        } catch (error) {
--          try {
--            const user = await UserModel.findByPk(loggedInUser.data.id)
--            await user?.update({ profileImage: url })
--            logger.warn(`Error retrieving user profile image: ${utils.getErrorMessage(error)}; using image link directly`)
--          } catch (error) {
--            next(error)
--            return
--          }
--        }
-+        try {
-+          const user = await UserModel.findByPk(loggedInUser.data.id)
-+          await user?.update({ profileImage: url })
-+        } catch (error) {
-+          next(error)
-+          return
-+        }
-      } else {
-        next(new Error('Blocked illegal activity by ' + req.socket.remoteAddress))
-        return
 ```
 
 ## Key Benefits

@@ -1,0 +1,2 @@
+openai-agents-sdk>=1.0.0
+kumo-rfm-mcp>=1.0.0

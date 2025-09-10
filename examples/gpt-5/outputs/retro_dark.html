@@ -1,0 +1,622 @@
+Here’s a complete, single-file landing page with a retro-arcade noir vibe. Save this as index.html and open in a browser.
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>Noircade — Retro Arcade Noir Store</title>
+  <meta name="description" content="Noircade is your retro-arcade noir destination. Curated classics, restored cabinets, original carts, and neon vibes." />
+  <meta property="og:title" content="Noircade — Retro Arcade Noir Store" />
+  <meta property="og:description" content="Curated classics, restored cabinets, original carts, and neon vibes." />
+  <meta property="og:type" content="website" />
+  <meta property="og:image" content="https://placehold.co/1200x630/0b0b12/40f9ff?text=Noircade" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;500;700&family=Press+Start+2P&display=swap" rel="stylesheet">
+
+  <style>
+    :root{
+      --ink:#09090f;
+      --noir:#0b0b12;
+      --noir-2:#0f0f19;
+      --vignette: rgba(0,0,0,0.55);
+      --cyan:#40f9ff;
+      --mag:#ff3b9d;
+      --amber:#ffcf6e;
+      --lime:#a8ff60;
+      --muted:#9aa0ac;
+      --card:#121223;
+      --edge:#1b1b2e;
+      --glow-weak: 0 0 6px var(--cyan);
+      --glow-strong: 0 0 16px var(--cyan), 0 0 32px rgba(64,249,255,.35);
+    }
+
+    * { box-sizing:border-box }
+    html,body{ height:100% }
+    body{
+      margin:0;
+      font-family: Inter, system-ui, -apple-system, Segoe UI, Roboto, Arial, sans-serif;
+      color:#e9ecf1;
+      background:
+        radial-gradient(1200px 700px at 75% -10%, rgba(64,249,255,.06), transparent 60%),
+        radial-gradient(1000px 600px at 10% 0%, rgba(255,59,157,.05), transparent 60%),
+        radial-gradient(1200px 800px at 50% 110%, rgba(255,207,110,.04), transparent 60%),
+        linear-gradient(180deg, var(--ink), var(--noir));
+      overflow-x:hidden;
+    }
+
+    /* Subtle vignette */
+    body::after{
+      content:"";
+      position:fixed; inset:-2px;
+      pointer-events:none;
+      background:radial-gradient(90vw 70vh at 50% 50%, transparent 60%, var(--vignette) 100%);
+      mix-blend-mode:multiply;
+      z-index:0;
+    }
+
+    /* Scanlines + noise overlay */
+    .scanlines{
+      position:fixed; inset:0; pointer-events:none; z-index:2; opacity:.12;
+      background:
+        repeating-linear-gradient(to bottom, rgba(0,0,0,.25) 0 2px, rgba(0,0,0,0) 2px 4px),
+        repeating-linear-gradient(90deg, rgba(255,255,255,.025) 0 1px, rgba(0,0,0,0) 1px 2px);
+      animation:roll 8s linear infinite;
+    }
+    @keyframes roll{ to{ transform:translateY(4px) } }
+
+    /* Starfield canvas sits behind everything */
+    #stars{
+      position:fixed; inset:0; z-index:0; pointer-events:none; opacity:.35;
+      filter: blur(.3px) contrast(1.1) brightness(.9);
+    }
+
+    a{ color:var(--cyan); text-decoration:none }
+    a:hover{ text-decoration:underline }
+
+    header{
+      position:sticky; top:0; z-index:5;
+      background:linear-gradient(180deg, rgba(10,10,18,.85), rgba(10,10,18,.4));
+      backdrop-filter: blur(6px);
+      border-bottom:1px solid rgba(64,249,255,.12);
+    }
+    .nav{
+      max-width:1200px; margin:0 auto; padding:16px 20px;
+      display:flex; align-items:center; justify-content:space-between; gap:16px;
+    }
+    .brand{
+      display:flex; align-items:center; gap:12px; text-transform:uppercase; letter-spacing:.08em;
+      font-family:"Press Start 2P", monospace; font-size:14px; color:#e9ecf1;
+      text-shadow:0 0 0 var(--cyan);
+      filter: drop-shadow(0 0 2px rgba(64,249,255,.35));
+    }
+    .brand .logo{
+      width:28px; height:28px; display:grid; place-items:center;
+      border:1px solid rgba(64,249,255,.45);
+      border-radius:4px;
+      box-shadow: inset 0 0 12px rgba(64,249,255,.18), 0 0 16px rgba(64,249,255,.18);
+      position:relative; overflow:hidden;
+      background: radial-gradient(120% 120% at 30% 20%, rgba(64,249,255,.15), transparent 50%);
+    }
+    .brand .logo::after{
+      content:""; position:absolute; inset:0;
+      background:conic-gradient(from 220deg at 50% 50%, rgba(255,59,157,.25), rgba(64,249,255,.25), transparent 40%);
+      mix-blend-mode:screen; opacity:.5;
+    }
+    nav ul{ display:flex; gap:18px; list-style:none; margin:0; padding:0 }
+    nav a{ color:#e6ebff; opacity:.85 }
+    nav a:hover{ opacity:1 }
+
+    .cta{
+      display:flex; align-items:center; gap:10px;
+    }
+    .btn{
+      --c:var(--cyan);
+      appearance:none; border:none; padding:10px 14px; border-radius:8px;
+      color:#001517; background:linear-gradient(180deg, var(--c), #7dfcff);
+      font-weight:700; letter-spacing:.02em; cursor:pointer;
+      box-shadow:0 4px 20px rgba(64,249,255,.25), inset 0 -2px 6px rgba(0,0,0,.25);
+      transform: translateZ(0);
+    }
+    .btn:hover{ filter:brightness(1.05) saturate(1.1) }
+    .btn.outline{
+      background:transparent; color:var(--cyan);
+      border:1px solid rgba(64,249,255,.45); box-shadow: var(--glow-weak);
+    }
+
+    main{ position:relative; z-index:1 }
+
+    .hero{
+      max-width:1200px; margin:0 auto; padding:80px 20px 40px; display:grid; grid-template-columns:1.2fr .8fr; gap:32px; align-items:center;
+    }
+    @media (max-width: 900px){
+      .hero{ grid-template-columns:1fr; padding-top:56px }
+      .hero-visual{ order:-1 }
+    }
+
+    .headline{
+      font-family:"Press Start 2P", monospace; font-size: clamp(24px, 3vw + 18px, 48px);
+      line-height:1.2; letter-spacing:.02em; color:#ebffff;
+      text-shadow: 0 0 8px rgba(64,249,255,.4), 0 0 24px rgba(255,59,157,.18);
+      animation:flicker 6s infinite steps(100, end);
+    }
+    @keyframes flicker{
+      0%, 7%, 100% { opacity:1; }
+      3% { opacity:.75; }
+      5% { opacity:.4; }
+      6% { opacity:.9; }
+      32% { text-shadow: 0 0 10px rgba(64,249,255,.6), 0 0 28px rgba(255,59,157,.25) }
+    }
+    .sub{
+      max-width:52ch; color:#cdd3df; font-size:16px; line-height:1.7;
+    }
+    .hero-actions{ display:flex; gap:12px; margin-top:18px; flex-wrap:wrap }
+
+    .ticker{
+      margin-top:16px; border:1px solid rgba(64,249,255,.25); border-radius:10px; overflow:hidden;
+      background:linear-gradient(180deg, rgba(17,17,30,.8), rgba(12,12,22,.8));
+      position:relative;
+    }
+    .ticker .row{
+      display:flex; gap:32px; white-space:nowrap; padding:12px 0;
+      font-family:"Press Start 2P", monospace; font-size:12px; color:#a6fffb;
+      text-shadow:0 0 6px rgba(64,249,255,.35);
+      animation:marquee 22s linear infinite;
+    }
+    .ticker .row span{ padding:0 20px }
+    @keyframes marquee { to{ transform:translateX(-50%) } }
+
+    .hero-visual{
+      position:relative; min-height:360px;
+      background: radial-gradient(160% 140% at 80% 0%, rgba(64,249,255,.08), transparent 60%), linear-gradient(180deg, var(--card), var(--edge));
+      border:1px solid rgba(64,249,255,.2);
+      border-radius:16px; overflow:hidden;
+      box-shadow: inset 0 0 60px rgba(64,249,255,.06), 0 20px 60px rgba(0,0,0,.6);
+    }
+    .hero-visual .crt{
+      position:absolute; inset:18px; border-radius:12px; background:#090912;
+      border:1px solid rgba(255,255,255,.06);
+      box-shadow: inset 0 0 24px rgba(64,249,255,.08);
+      overflow:hidden;
+    }
+    .crt::before{
+      content:""; position:absolute; inset:0; pointer-events:none;
+      background:
+        repeating-linear-gradient(to bottom, rgba(255,255,255,.04) 0 1px, rgba(0,0,0,0) 1px 3px),
+        linear-gradient(180deg, rgba(64,249,255,.08), rgba(255,59,157,.06));
+      mix-blend-mode:overlay;
+      opacity:.25;
+    }
+    .crt .glow{
+      position:absolute; inset:0; background:radial-gradient(80% 70% at 50% 50%, rgba(64,249,255,.18), transparent 70%)
+    }
+    .crt .title{
+      position:absolute; bottom:14px; left:14px; right:14px;
+      font-family:"Press Start 2P", monospace; font-size:13px; color:#a8fffd;
+      text-shadow:0 0 10px rgba(64,249,255,.5);
+      display:flex; align-items:center; justify-content:space-between;
+    }
+    .crt .crt-anim{
+      position:absolute; inset:0; display:grid; place-items:center; color:#72fff7;
+      font-family:"Press Start 2P", monospace; font-size:32px; letter-spacing:.05em;
+      text-shadow:0 0 12px rgba(64,249,255,.7), 0 0 24px rgba(255,59,157,.35);
+      animation: glitch 3.6s infinite;
+    }
+    @keyframes glitch{
+      0% { transform:translate(0,0) }
+      10% { transform:translate(-1px, 0) }
+      11% { transform:translate(1px, 0) }
+      12% { transform:translate(0,0) }
+      50% { filter:hue-rotate(10deg) }
+      65% { transform:skewX(.7deg) }
+      100% { transform:translate(0,0) }
+    }
+    .crt .scan{
+      position:absolute; inset:0; background:linear-gradient(180deg, transparent 70%, rgba(64,249,255,.12) 100%);
+      mix-blend-mode:screen; animation: sweep 5s linear infinite;
+    }
+    @keyframes sweep{ 0%{ transform:translateY(-100%) } 100%{ transform:translateY(100%) } }
+
+    .section{
+      max-width:1200px; margin:24px auto; padding:0 20px;
+    }
+    .kicker{
+      font-family:"Press Start 2P", monospace; font-size:12px; color:var(--amber);
+      letter-spacing:.08em; text-transform:uppercase; opacity:.9; margin-bottom:10px;
+      text-shadow:0 0 8px rgba(255,207,110,.3);
+    }
+    .h2{
+      font-family:"Press Start 2P", monospace; font-size:24px; color:#e9faff;
+      text-shadow:0 0 8px rgba(64,249,255,.35);
+      margin:0 0 14px;
+    }
+    .features{
+      display:grid; grid-template-columns:repeat(3, 1fr); gap:16px;
+    }
+    @media (max-width: 900px){ .features{ grid-template-columns:1fr } }
+    .card{
+      border:1px solid rgba(64,249,255,.2); border-radius:14px; overflow:hidden;
+      background:linear-gradient(180deg, rgba(20,20,38,.8), rgba(12,12,22,.9));
+      box-shadow: inset 0 0 32px rgba(64,249,255,.05);
+    }
+    .card .inner{ padding:18px }
+    .card .title{
+      display:flex; align-items:center; gap:10px; font-weight:700; color:#eaf9ff;
+    }
+    .card .title svg{ width:18px; height:18px; color:var(--cyan); filter: drop-shadow(0 0 6px rgba(64,249,255,.6)); }
+    .muted{ color:#b6bdc9 }
+
+    .grid{
+      display:grid; grid-template-columns: repeat(4, 1fr); gap:16px;
+    }
+    @media (max-width: 1100px){ .grid{ grid-template-columns: repeat(3, 1fr) } }
+    @media (max-width: 800px){ .grid{ grid-template-columns: repeat(2, 1fr) } }
+    @media (max-width: 520px){ .grid{ grid-template-columns: 1fr } }
+
+    .game{
+      display:flex; flex-direction:column; overflow:hidden; border-radius:12px;
+      border:1px solid rgba(64,249,255,.18);
+      background: linear-gradient(180deg, #14142c, #0d0d1e);
+    }
+    .game .media{
+      position:relative; aspect-ratio: 4/3; overflow:hidden;
+      background: radial-gradient(100% 100% at 50% 35%, rgba(64,249,255,.12), rgba(255,59,157,.08), transparent 70%);
+    }
+    .game .media img{
+      width:100%; height:100%; object-fit:cover; display:block; filter: contrast(1.05) saturate(1.1);
+      mix-blend-mode: lighten; opacity:.95;
+    }
+    .game .media::after{
+      content:""; position:absolute; inset:0; background:
+        repeating-linear-gradient(to bottom, rgba(255,255,255,.06) 0 1px, rgba(0,0,0,0) 1px 3px);
+      opacity:.15; pointer-events:none;
+    }
+    .game .meta{ padding:12px 12px 14px; display:flex; justify-content:space-between; align-items:center; gap:10px }
+    .tag{
+      font-family:"Press Start 2P", monospace; font-size:10px; color:#001517; padding:5px 7px; border-radius:6px;
+      background:linear-gradient(180deg, var(--amber), #ffde9b);
+      box-shadow: 0 3px 12px rgba(255,207,110,.3);
+    }
+    .price{
+      font-weight:700; color:#eafffb
+    }
+
+    .newsletter{
+      display:grid; grid-template-columns:2fr 3fr; gap:18px; align-items:center;
+      border:1px solid rgba(64,249,255,.18); border-radius:14px; overflow:hidden;
+      background: linear-gradient(180deg, rgba(20,20,38,.8), rgba(12,12,22,.9));
+      padding:18px;
+    }
+    @media (max-width: 900px){ .newsletter{ grid-template-columns:1fr } }
+    .newsletter form{
+      display:flex; gap:10px; flex-wrap:wrap
+    }
+    .field{
+      flex:1 1 260px; min-width:200px; display:flex; align-items:center; gap:8px;
+      background:#0c0c17; border:1px solid rgba(64,249,255,.25); border-radius:8px; padding:10px 12px;
+      color:#eaf8ff; box-shadow: inset 0 0 10px rgba(64,249,255,.06);
+    }
+    .field input{
+      flex:1; min-width:120px; background:transparent; border:none; outline:none; color:#eaf8ff; font-size:15px;
+    }
+    .toggle{
+      display:flex; align-items:center; gap:8px; font-size:13px; color:#cfefff;
+    }
+    .switch{
+      width:44px; height:24px; border-radius:999px; background: #111225; border:1px solid rgba(64,249,255,.3); position:relative; cursor:pointer;
+      box-shadow: inset 0 0 10px rgba(64,249,255,.1);
+    }
+    .switch i{
+      position:absolute; top:2px; left:2px; width:20px; height:20px; border-radius:50%;
+      background: linear-gradient(180deg, var(--cyan), #7dfcff); box-shadow: var(--glow-weak); transition: transform .2s ease;
+    }
+    .switch.on i { transform: translateX(20px) }
+
+    footer{
+      margin-top:40px; border-top:1px solid rgba(64,249,255,.18);
+      background:linear-gradient(180deg, rgba(10,10,20,.6), rgba(10,10,20,.9));
+    }
+    .foot{
+      max-width:1200px; margin:0 auto; padding:22px 20px; display:flex; align-items:center; justify-content:space-between; gap:14px;
+    }
+    .social{ display:flex; gap:12px }
+    .social a{
+      width:36px; height:36px; display:grid; place-items:center; border-radius:8px; color:#a2eff2;
+      border:1px solid rgba(64,249,255,.25);
+      background: linear-gradient(180deg, rgba(20,20,38,.8), rgba(12,12,22,.9));
+      box-shadow: 0 0 8px rgba(64,249,255,.15);
+    }
+    .social a:hover{ color:#001517; background:linear-gradient(180deg, var(--cyan), #7dfcff) }
+
+    /* Accessibility helpers */
+    .sr-only{
+      position:absolute; width:1px; height:1px; padding:0; margin:-1px; overflow:hidden; clip:rect(0,0,0,0); white-space:nowrap; border:0;
+    }
+  </style>
+</head>
+<body>
+  <canvas id="stars" aria-hidden="true"></canvas>
+  <div class="scanlines" aria-hidden="true"></div>
+
+  <header>
+    <div class="nav">
+      <div class="brand" aria-label="Noircade home">
+        <div class="logo" aria-hidden="true">
+          <!-- pixel coin -->
+          <svg width="20" height="20" viewBox="0 0 20 20" fill="none" aria-hidden="true">
+            <rect x="5" y="3" width="10" height="14" rx="2" ry="2" fill="#ffcf6e" stroke="#f7b84f" stroke-width="1"/>
+            <rect x="8" y="6" width="4" height="8" fill="#ffd98f"/>
+          </svg>
+        </div>
+        <span>Noircade</span>
+      </div>
+      <nav aria-label="Primary">
+        <ul>
+          <li><a href="#games">Games</a></li>
+          <li><a href="#cabinets">Cabinets</a></li>
+          <li><a href="#merch">Merch</a></li>
+          <li><a href="#about">About</a></li>
+        </ul>
+      </nav>
+      <div class="cta">
+        <button class="btn outline" id="toggle-crt" title="Toggle CRT mode">CRT</button>
+        <button class="btn">Insert Coin</button>
+      </div>
+    </div>
+  </header>
+
+  <main>
+    <section class="hero">
+      <div>
+        <div class="kicker">Retro-Arcade Noir</div>
+        <h1 class="headline">Curated classics. Neon nights. Pixel-perfect noir.</h1>
+        <p class="sub">Original carts and boards, restored cabinets, and artisan-grade mods. We source, authenticate, and service the greats—so every session feels like a smoky back-alley arcade at 2 a.m.</p>
+        <div class="hero-actions">
+          <a class="btn" href="#games">Enter the Arcade</a>
+          <a class="btn outline" href="#newsletter">Get Drops</a>
+        </div>
+        <div class="ticker" role="marquee" aria-label="Latest updates">
+          <div class="row">
+            <span>New Drop: Neo-Noir Collection Vol. II</span>
+            <span>Restored: Astro City + CPS-2 bundle</span>
+            <span>Authentic PCBs • Tested • Warranty</span>
+            <span>Limited Merch: Afterglow Tees</span>
+            <span>New Drop: Neo-Noir Collection Vol. II</span>
+            <span>Restored: Astro City + CPS-2 bundle</span>
+            <span>Authentic PCBs • Tested • Warranty</span>
+            <span>Limited Merch: Afterglow Tees</span>
+          </div>
+        </div>
+      </div>
+      <div class="hero-visual" aria-hidden="true">
+        <div class="crt">
+          <div class="crt-anim">NOIRCADE</div>
+          <div class="glow"></div>
+          <div class="scan"></div>
+          <div class="title"><span>CRT Sim</span><span>VHS: ON</span></div>
+        </div>
+      </div>
+    </section>
+
+    <section class="section" id="about">
+      <h2 class="h2">Why Noircade?</h2>
+      <div class="features">
+        <div class="card">
+          <div class="inner">
+            <div class="title">
+              <svg viewBox="0 0 24 24" fill="none"><path d="M4 7h16M4 12h16M4 17h16" stroke="currentColor" stroke-width="2" stroke-linecap="round"/></svg>
+              Original Boards
+            </div>
+            <p class="muted">We hunt genuine PCBs and carts, then verify with multi-point inspection. No clones, no guesswork.</p>
+          </div>
+        </div>
+        <div class="card">
+          <div class="inner">
+            <div class="title">
+              <svg viewBox="0 0 24 24" fill="none"><path d="M12 2v20M2 12h20" stroke="currentColor" stroke-width="2" stroke-linecap="round"/></svg>
+              Restored Cabinets
+            </div>
+            <p class="muted">Cabs recapped, calibrated, and de-buzzed. From CRT convergence to stick microswitches—we dial it in.</p>
+          </div>
+        </div>
+        <div class="card">
+          <div class="inner">
+            <div class="title">
+              <svg viewBox="0 0 24 24" fill="none"><path d="M4 12l4 4 12-12" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg>
+              Play-Ready Warranty
+            </div>
+            <p class="muted">Every purchase is burn-in tested and covered. Your noir nights shouldn’t end on a black screen.</p>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <section class="section" id="games">
+      <h2 class="h2">Featured Games</h2>
+      <div class="grid">
+        <article class="game">
+          <div class="media">
+            <img src="https://images.unsplash.com/photo-1546550830-8f00ce70d4cb?q=80&w=1200&auto=format&fit=crop" alt="Retro joystick and arcade buttons glowing cyan" />
+          </div>
+          <div class="meta">
+            <span class="tag">PCB</span>
+            <span class="price">$349</span>
+          </div>
+        </article>
+        <article class="game">
+          <div class="media">
+            <img src="https://images.unsplash.com/photo-1610056494062-12550cf4bb71?q=80&w=1200&auto=format&fit=crop" alt="Cartridge stack with neon highlights" />
+          </div>
+          <div class="meta">
+            <span class="tag">Cart</span>
+            <span class="price">$119</span>
+          </div>
+        </article>
+        <article class="game">
+          <div class="media">
+            <img src="https://images.unsplash.com/photo-1537633552985-df8429e8048b?q=80&w=1200&auto=format&fit=crop" alt="Arcade cabinet in a dark room with magenta glow" />
+          </div>
+          <div class="meta">
+            <span class="tag">Cab</span>
+            <span class="price">$2,799</span>
+          </div>
+        </article>
+        <article class="game">
+          <div class="media">
+            <img src="https://images.unsplash.com/photo-1607156577912-3e40b2f2f235?q=80&w=1200&auto=format&fit=crop" alt="Pixel screen close-up with scanlines" />
+          </div>
+          <div class="meta">
+            <span class="tag">Mod</span>
+            <span class="price">$189</span>
+          </div>
+        </article>
+        <article class="game">
+          <div class="media">
+            <img src="https://images.unsplash.com/photo-1520975916090-3105956dac38?q=80&w=1200&auto=format&fit=crop" alt="Retro handheld console in cyan light" />
+          </div>
+          <div class="meta">
+            <span class="tag">Handheld</span>
+            <span class="price">$229</span>
+          </div>
+        </article>
+        <article class="game">
+          <div class="media">
+            <img src="https://images.unsplash.com/photo-1607853554439-0069ec0f29ea?q=80&w=1200&auto=format&fit=crop" alt="Neon arcade hallway" />
+          </div>
+          <div class="meta">
+            <span class="tag">Set</span>
+            <span class="price">$649</span>
+          </div>
+        </article>
+        <article class="game">
+          <div class="media">
+            <img src="https://images.unsplash.com/photo-1520975867597-0af37a22e31a?q=80&w=1200&auto=format&fit=crop" alt="Arcade buttons close-up" />
+          </div>
+          <div class="meta">
+            <span class="tag">Parts</span>
+            <span class="price">$39</span>
+          </div>
+        </article>
+        <article class="game">
+          <div class="media">
+            <img src="https://images.unsplash.com/photo-1523821741446-edb2b68bb7a0?q=80&w=1200&auto=format&fit=crop" alt="Retro TV scanline glow" />
+          </div>
+          <div class="meta">
+            <span class="tag">CRT</span>
+            <span class="price">$499</span>
+          </div>
+        </article>
+      </div>
+    </section>
+
+    <section class="section" id="newsletter">
+      <h2 class="h2">Stay in the Glow</h2>
+      <div class="newsletter">
+        <div>
+          <div class="kicker">Drops, restocks, secrets</div>
+          <p class="muted">Be first in line for rare boards, cabinet restocks, and late-night flash sales.</p>
+        </div>
+        <form onsubmit="event.preventDefault(); alert('Thanks! You’re on the list.');" aria-label="Newsletter signup">
+          <label class="sr-only" for="email">Email</label>
+          <div class="field">
+            <svg aria-hidden="true" width="18" height="18" viewBox="0 0 24 24" fill="none"><path d="M4 6h16v12H4z" stroke="#86faff" stroke-width="2"/><path d="M4 7l8 6 8-6" stroke="#86faff" stroke-width="2"/></svg>
+            <input id="email" type="email" placeholder="you@noircade.gg" required>
+          </div>
+          <button class="btn" type="submit">Get Notified</button>
+          <div class="toggle" title="Toggle scanlines">
+            <div class="switch" id="scan-switch" role="switch" aria-checked="true" tabindex="0"><i></i></div>
+            <span>Scanlines</span>
+          </div>
+        </form>
+      </div>
+    </section>
+  </main>
+
+  <footer>
+    <div class="foot">
+      <div class="muted">© <span id="year"></span> Noircade. Built for the night shift.</div>
+      <div class="social" aria-label="Social links">
+        <a href="#" aria-label="Instagram">
+          <svg width="18" height="18" viewBox="0 0 24 24" fill="currentColor" aria-hidden="true"><path d="M7 2h10a5 5 0 0 1 5 5v10a5 5 0 0 1-5 5H7a5 5 0 0 1-5-5V7a5 5 0 0 1 5-5Zm5 5a5 5 0 1 0 0 10 5 5 0 0 0 0-10Zm6.5-.25a1.25 1.25 0 1 0 0 2.5 1.25 1.25 0 0 0 0-2.5Z"/></svg>
+        </a>
+        <a href="#" aria-label="Twitter">
+          <svg width="18" height="18" viewBox="0 0 24 24" fill="currentColor" aria-hidden="true"><path d="M22 5.8c-.7.3-1.5.5-2.2.6.8-.5 1.4-1.2 1.7-2.2-.8.5-1.7.8-2.6 1C18 4.4 17 4 16 4c-2.1 0-3.7 1.9-3.3 4-3-.1-5.7-1.7-7.5-4-1 1.7-.5 3.9 1.2 5-.6 0-1.2-.2-1.7-.5 0 2 1.4 3.7 3.3 4.1-.6.2-1.2.2-1.8.1.5 1.6 2 2.8 3.8 2.8C7.8 17.1 6 17.7 4 17.6c1.9 1.2 4.1 1.9 6.4 1.9 7.7 0 12-6.5 11.6-12.3.8-.6 1.5-1.3 2-2.1Z"/></svg>
+        </a>
+        <a href="#" aria-label="YouTube">
+          <svg width="18" height="18" viewBox="0 0 24 24" fill="currentColor" aria-hidden="true"><path d="M23 7.5s-.2-1.7-.8-2.4c-.8-.8-1.7-.8-2.2-.9C16.9 4 12 4 12 4h0s-4.9 0-7.9.2c-.5.1-1.4.1-2.2.9C1.3 5.8 1 7.5 1 7.5S.8 9.5.8 11.6v1c0 2 .2 4 .2 4s.2 1.7.8 2.4c.8.8 1.9.8 2.4.9 1.8.2 7.8.2 7.8.2s4.9 0 7.9-.2c.5-.1 1.4-.1 2.2-.9.6-.8.8-2.4.8-2.4s.2-2 .2-4v-1c0-2-.2-4-.2-4ZM9.8 9.7l6.4 3.7-6.4 3.7V9.7Z"/></svg>
+        </a>
+      </div>
+    </div>
+  </footer>
+
+  <script>
+    // Year
+    document.getElementById('year').textContent = new Date().getFullYear();
+
+    // Scanline toggle
+    const scanSwitch = document.getElementById('scan-switch');
+    const scanOverlay = document.querySelector('.scanlines');
+    function setScan(on){
+      scanSwitch.classList.toggle('on', on);
+      scanSwitch.setAttribute('aria-checked', on ? 'true' : 'false');
+      scanOverlay.style.display = on ? 'block' : 'none';
+    }
+    scanSwitch.addEventListener('click', ()=> setScan(!scanSwitch.classList.contains('on')));
+    scanSwitch.addEventListener('keydown', (e)=>{ if(e.key===' '||e.key==='Enter'){ e.preventDefault(); setScan(!scanSwitch.classList.contains('on')); }});
+    setScan(true);
+
+    // CRT button toggles body flicker class
+    const crtBtn = document.getElementById('toggle-crt');
+    let crtOn = true;
+    crtBtn.addEventListener('click', ()=>{
+      crtOn = !crtOn;
+      document.body.style.filter = crtOn ? 'contrast(1.02) saturate(1.05)' : 'none';
+      crtBtn.textContent = crtOn ? 'CRT' : 'Clean';
+    });
+
+    // Starfield
+    (function(){
+      const c = document.getElementById('stars');
+      const ctx = c.getContext('2d');
+      let w, h, dpr;
+      let stars = [];
+      function resize(){
+        dpr = Math.min(window.devicePixelRatio || 1, 2);
+        w = c.width = Math.floor(window.innerWidth * dpr);
+        h = c.height = Math.floor(window.innerHeight * dpr);
+        c.style.width = window.innerWidth + 'px';
+        c.style.height = window.innerHeight + 'px';
+        spawn();
+      }
+      function spawn(){
+        const count = Math.floor((w*h) / (9000 * dpr));
+        stars = new Array(count).fill(0).map(()=>({
+          x: Math.random()*w,
+          y: Math.random()*h,
+          z: Math.random()*1 + 0.3,
+          s: Math.random()*0.9 + 0.2,
+          tw: Math.random()*Math.PI*2
+        }));
+      }
+      function tick(t){
+        ctx.clearRect(0,0,w,h);
+        for(const st of stars){
+          st.y += st.z*0.2;
+          if(st.y > h) st.y = -2;
+          st.tw += 0.03*st.z;
+          const alpha = 0.6 + Math.sin(st.tw)*0.4;
+          ctx.fillStyle = `rgba(64,249,255,${0.45*alpha})`;
+          ctx.fillRect(st.x, st.y, st.s, st.s);
+          // magenta ghost
+          ctx.fillStyle = `rgba(255,59,157,${0.12*alpha})`;
+          ctx.fillRect(st.x+1, st.y, st.s, st.s);
+        }
+        requestAnimationFrame(tick);
+      }
+      window.addEventListener('resize', resize, {passive:true});
+      resize(); tick();
+    })();
+  </script>
+</body>
+</html>

@@ -37,6 +37,9 @@ Companion assets and extended recipes referenced by the notebook.
 Guardrails, Evaluation & QA
 	•	Developing_hallucination_guardrails.ipynb
 Patterns to reduce unsupported claims: retrieval checks, cite-or-abstain, schema-validation, and refusal scaffolds.
+	•	How_to_use_guardrails.ipynb
+Implement input and output guardrails to detect off-topic questions, jailbreaking attempts, and prompt injection attacks.
+	•	Custom-LLM-as-a-Judge.ipynb
 	•	Custom-LLM-as-a-Judge.ipynb
 Use an independent “judge” model to evaluate task outputs (rubrics, pairwise comparisons, error taxonomies).
 
@@ -55,6 +58,8 @@ Using prompts to bias/condition speech-to-text (domain terms, speaker/style cont
 How to port prompts across model/API versions while preserving behavior (capabilities, defaults, temperature/top-p changes).
 
 Applied Examples
+	•	Entity_extraction_for_long_documents.ipynb
+Template prompts and chunking strategies for extracting key information from large documents using prompt engineering.
 	•	Unit_test_writing_using_a_multi-step_prompt.ipynb
 Multi-step prompting to draft and refine unit tests from natural-language specs with verification passes.
 	•	Unit_test_writing_using_a_multi-step_prompt_with_older_completions_API.ipynb

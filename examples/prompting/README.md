@@ -40,7 +40,6 @@ Patterns to reduce unsupported claims: retrieval checks, cite-or-abstain, schema
 	•	How_to_use_guardrails.ipynb
 Implement input and output guardrails to detect off-topic questions, jailbreaking attempts, and prompt injection attacks.
 	•	Custom-LLM-as-a-Judge.ipynb
-	•	Custom-LLM-as-a-Judge.ipynb
 Use an independent “judge” model to evaluate task outputs (rubrics, pairwise comparisons, error taxonomies).
 
 Model-Specific Prompting Guides

@@ -660,6 +660,16 @@
     - tiktoken
     - completions
 
+- title: Understanding ChatCompletion to Model-Ready Format Transformation for SFT
+  path: examples/Understanding_ChatCompletion_SFT_transformation.ipynb
+  date: 2025-01-13
+  authors:
+    - openai
+  tags:
+    - completions
+    - fine-tuning
+    - chatcompletion
+
 - title: How to fine-tune chat models
   path: examples/How_to_finetune_chat_models.ipynb
   date: 2024-07-23

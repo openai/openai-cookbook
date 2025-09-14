@@ -4,6 +4,23 @@
 # should build pages for, and indicates metadata such as tags, creation date and
 # authors for each page.
 
+- title: Context Engineering - Short-Term Memory Management with Sessions from OpenAI Agents SDK
+  path: examples/agents_sdk/session_memory.ipynb
+  date: 2025-09-09
+  authors:
+    - emreokcular
+  tags:
+    - agents-sdk
+
+- title: Automating Code Quality and Security Fixes with Codex CLI on GitLab
+  path: examples/codex/secure_quality_gitlab.md
+  date: 2025-08-29
+  authors:
+    - jonlim-openai
+    - pap-openai
+  tags:
+    - codex
+
 - title: Realtime Prompting Guide
   path: examples/Realtime_prompting_guide.ipynb
   date: 2025-08-28

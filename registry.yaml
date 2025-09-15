@@ -2509,3 +2509,13 @@
     - katiagg
   tags:
     - images
+
+- title: LLMs 101: A Practical Introduction
+  path: articles/openai-cookbook-llms-101.md
+  date: 2025-15-9
+  authors:
+    - paytonison
+    - asari
+  tags:
+    - llms
+    - beginners

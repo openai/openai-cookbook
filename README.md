@@ -57,6 +57,13 @@ OPENAI_API_KEY=your_openai_api_key_here
 HUBSPOT_API_KEY=your_hubspot_api_key_here
 MIXPANEL_PROJECT_ID=your_mixpanel_project_id_here
 MIXPANEL_API_SECRET=your_mixpanel_api_secret_here
+
+# Meta Ads API (for campaign analysis)
+META_ADS_ACCESS_TOKEN=your_meta_ads_access_token_here
+META_ADS_ACCOUNT_ID=act_111192969640236
+META_ADS_APP_ID=4098296043769963
+META_ADS_APP_SECRET=your_meta_ads_app_secret_here
+META_ADS_BUSINESS_ID=632964907150647
 ```
 
 ### 4. Run the Assistant
@@ -174,6 +181,15 @@ The assistant is configured with:
 - [HubSpot API Documentation](https://developers.hubspot.com/)
 - [Mixpanel API Documentation](https://developer.mixpanel.com/)
 - [Intercom Analytics & Export Toolkit](tools/docs/README_INTERCOM_CONSOLIDATED.md) - Complete guide for MCP and REST API integration
+
+### Internal Documentation
+- **[HubSpot Configuration](tools/docs/README_HUBSPOT_CONFIGURATION.md)** - Complete field mapping and API integration guide
+- **[HubSpot Pagination Standards](tools/docs/README_HUBSPOT_PAGINATION_STANDARDS.md)** - Complete data retrieval methodology and best practices
+- **[HubSpot Complete Retrieval Quick Reference](tools/docs/HUBSPOT_COMPLETE_RETRIEVAL_QUICK_REFERENCE.md)** - Ready-to-use scripts for complete data analysis
+- **[HubSpot First Deal Won Date Implementation](tools/docs/HUBSPOT_FIRST_DEAL_WON_DATE_IMPLEMENTATION.md)** - Complete guide for tracking first deal won date at company level
+- **[HubSpot Custom Code Testing Framework](tools/docs/README_HUBSPOT_CUSTOM_CODE_TESTING.md)** - Complete testing and validation system for HubSpot Custom Code workflows (✅ **CORRECTED DATE LOGIC VERIFIED**)
+- **[Google Ads MCP](tools/docs/README_GOOGLE_ADS_MCP.md)** - Campaign performance analysis and optimization
+- **[Meta Ads API](meta_ads_mcp_config/CAMPAIGN_STATUS_DETECTION_GUIDE.md)** - Campaign status detection and performance analysis
 
 ### Learning Materials
 - **Agent Architecture**: NVIDIA's LLM Agent guides (linked in learning guide)

@@ -46,12 +46,14 @@ print(resp.output_text)
 import OpenAI from "openai";
 const client = new OpenAI();
 
-const resp = await client.responses.create({
+const resp = await client.chat.completions.create({
   model: "gpt-4o",
-  instructions: "You are a concise technical explainer.",
-  input: "In one paragraph, explain what a token is in an LLM."
+  messages: [
+    { role: "system", content: "You are a concise technical explainer." },
+    { role: "user", content: "In one paragraph, explain what a token is in an LLM." }
+  ]
 });
-console.log(resp.output_text);
+console.log(resp.choices[0].message.content);
 ```
 
 > **Tip.** Model names evolve; check your Models list before shipping. Prefer streaming for chat‑like UIs (see below).

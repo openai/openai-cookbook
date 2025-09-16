@@ -1,115 +1,114 @@
 [
     {
-        "hotel_information": {
-            "name": "MADISON Hotel GmbH",
-            "address": "Schaartinsweg 4, 20459 Hamburg, Germany",
-            "contact": {
-                "phone": "+49.40.37 666-0",
-                "fax": "+49.40.37 666-137",
-                "email": "info@madisonhotel.de",
-                "website": "madisonhotel.de"
+        "Hotel Information": {
+            "Name": "MADISON Hotel GmbH",
+            "Address": "Schaartorweg 4, 20459 Hamburg, Germany",
+            "Contact": {
+                "Phone": "+49.40.37 666-0",
+                "Fax": "+49.40.37 666-137",
+                "Email": "info@madisonhotel.de",
+                "Website": "madisonhotel.de"
             },
-            "managing_directors": "Marlies Head, Thomas Kleinertz",
-            "registration": {
-                "court": "AG Hamburg HRB 47281",
-                "VAT_ID": "DE118 696 407"
-            },
-            "bank_details": {
-                "bank_name": "HypoVereinsbank",
-                "IBAN": "DE84 2003 0000 0003 6027 11",
+            "Geschäftsführer": "Marlies Head, Thomas Kleinertz",
+            "AG Hamburg HRB": "47281",
+            "VAT": "DE118 696 407",
+            "Bank": {
+                "Name": "HypoVereinsbank",
+                "IBAN": "DE40 2003 0000 0003 6027 11",
                 "BIC": "HYVEDEMM300"
             }
         },
-        "guest_information": {
-            "company": "APMeister Consulting GmbH",
-            "address": "Friedrichstr. 123, 10117 Berlin",
-            "guest_name": "Herr Jens Walter"
+        "Guest Information": {
+            "Company": "APMeister Consulting GmbH",
+            "Address": "Friedrichstr. 123, 10117 Berlin",
+            "Guest Name": "Herr Jens Walter"
         },
-        "invoice_information": {
-            "invoice_number": "508189",
-            "date": "09.08.19",
-            "room_number": "438",
-            "check_in": "04.08.19",
-            "check_out": "09.08.19",
-            "page": "1 of 1",
-            "user_id": "WM"
+        "Invoice Information": {
+            "Rechnungs-Nr.": "508189",
+            "Datum": "09.08.19",
+            "Zimmer": "438",
+            "Anreise": "04.08.19",
+            "Abreise": "09.08.19",
+            "Seite": "1 of 1",
+            "Benutzer ID": "WM"
         },
-        "charges": [
+        "Charges": [
             {
-                "date": "04.08.19",
-                "description": "Übernachtung exklusive Frühstück*",
-                "charge": 110.0,
-                "credit": null
+                "Datum": "04.08.19",
+                "Beschreibung": "Übernachtung exklusive Frühstück*",
+                "Belastung": 110.0,
+                "Entlastung": null
             },
             {
-                "date": "05.08.19",
-                "description": "Übernachtung exklusive Frühstück*",
-                "charge": 110.0,
-                "credit": null
+                "Datum": "05.08.19",
+                "Beschreibung": "Übernachtung exklusive Frühstück*",
+                "Belastung": 110.0,
+                "Entlastung": null
             },
             {
-                "date": "06.08.19",
-                "description": "Übernachtung exklusive Frühstück*",
-                "charge": 110.0,
-                "credit": null
+                "Datum": "06.08.19",
+                "Beschreibung": "Übernachtung exklusive Frühstück*",
+                "Belastung": 110.0,
+                "Entlastung": null
             },
             {
-                "date": "07.08.19",
-                "description": "Übernachtung exklusive Frühstück*",
-                "charge": 110.0,
-                "credit": null
+                "Datum": "07.08.19",
+                "Beschreibung": "Übernachtung exklusive Frühstück*",
+                "Belastung": 110.0,
+                "Entlastung": null
             },
             {
-                "date": "08.08.19",
-                "description": "Übernachtung exklusive Frühstück*",
-                "charge": 110.0,
-                "credit": null
+                "Datum": "08.08.19",
+                "Beschreibung": "Übernachtung exklusive Frühstück*",
+                "Belastung": 110.0,
+                "Entlastung": null
             },
             {
-                "date": "09.08.19",
-                "description": "Frühstück **",
-                "charge": 20.0,
-                "credit": null
+                "Datum": "09.08.19",
+                "Beschreibung": "Frühstück **",
+                "Belastung": 20.0,
+                "Entlastung": null
             },
             {
-                "date": "09.08.19",
-                "description": "Mastercard IFC",
-                "charge": null,
-                "credit": 570.0
+                "Datum": "09.08.19",
+                "Beschreibung": "Mastercard IFC",
+                "Belastung": null,
+                "Entlastung": 570.0
             }
         ],
-        "summary": {
-            "total_netto": 530.83,
-            "total_mwst": 39.17,
-            "total_brutto": 570.0,
-            "saldo": 0.0
-        },
-        "tax_details": [
-            {
-                "rate": "7%",
-                "netto": 16.81,
-                "mwst": 1.18,
-                "brutto": 20.0
+        "Summary": {
+            "Total Netto EUR": 530.83,
+            "Total MwSt. EUR": 39.17,
+            "Total Brutto EUR": 570.0,
+            "MwSt. 19%": {
+                "Netto EUR": 16.81,
+                "MwSt. EUR": 3.19,
+                "Brutto EUR": 20.0
             },
-            {
-                "rate": "19%",
-                "netto": 514.02,
-                "mwst": 35.98,
-                "brutto": 550.0
+            "MwSt. 7%": {
+                "Netto EUR": 514.02,
+                "MwSt. EUR": 35.98,
+                "Brutto EUR": 550.0
+            },
+            "Saldo": {
+                "Amount": 0.0,
+                "Currency": "EUR"
             }
-        ],
-        "financial_information": {
-            "bank": "Finanzamt Hamburg Mitte",
-            "tax_number": "48/741/01228"
         },
-        "credit_card_details": {
-            "contract_number": "154584932",
-            "card_number": "XXXXXXXXXXXX5052",
-            "terminal_id": "52964893",
-            "approval_code": "165942",
-            "receipt_number": "93935",
-            "transaction_amount": 570.0,
-            "approved_amount": 570.0
+        "Financial Information": {
+            "Finanzamt": "Hamburg Mitte",
+            "Steuernummer": "4874/101/0228"
+        },
+        "Credit Card Information": {
+            "Vertragspartner-ID": "154654932",
+            "Kartenfolgenummer": "XXXXXX",
+            "Kreditkartennummer": "XXXXXXXXXXXX5052",
+            "Verfallsdatum": "XXXX",
+            "Terminal ID": "52964893",
+            "Beleg Nr.": "93935",
+            "Transaktionsbetrag": "570.00",
+            "Genehmigter Betrag": "570.00",
+            "Genehmigungscode": "165942"
         }
     }
 ]

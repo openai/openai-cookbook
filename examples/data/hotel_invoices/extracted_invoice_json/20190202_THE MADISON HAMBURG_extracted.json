@@ -15,22 +15,22 @@
             "Bank": {
                 "Name": "HypoVereinsbank",
                 "BLZ": "200 300 00",
-                "Konto-Nr": "360 27 11",
+                "Konto-Nr.": "360 27 11",
                 "IBAN": "DE48 2003 0000 0036 0271 11",
                 "BIC": "HYVEDEMM300"
             }
         },
         "Guest Information": {
-            "Name": "Herr Jens Walter",
             "Company": "APImeiseter Consulting GmbH",
-            "Address": "Friedrichstr. 123, 10117 Berlin"
+            "Address": "Friedrichstr. 123, 10117 Berlin",
+            "Guest Name": "Herr Jens Walter"
         },
         "Invoice Information": {
-            "Rechnungs-Nr.": "487812 /",
+            "Invoice Number": "487812 /",
             "Date": "25.01.19",
-            "Room": "316",
-            "Arrival": "20.01.19",
-            "Departure": "25.01.19",
+            "Room Number": "316",
+            "Arrival Date": "20.01.19",
+            "Departure Date": "25.01.19",
             "Page": "1 of 1",
             "User ID": "POE"
         },
@@ -68,7 +68,7 @@
             {
                 "Datum": "25.01.19",
                 "Beschreibung": "Mastercard IFC",
-                "Belastung": "550.00",
+                "Belastung": null,
                 "Entlastung": "550.00"
             }
         ],
@@ -79,9 +79,8 @@
                 "Brutto EUR": "550.00"
             },
             "Total": {
-                "Total Netto": "514.02",
-                "Total MwSt.": "35.98",
-                "Total Brutto": "550.00"
+                "Belastung": "550.00",
+                "Entlastung": "550.00"
             },
             "Saldo": "0.00 EUR"
         },
@@ -91,15 +90,22 @@
             "Kreditkartendetails": {
                 "Kartennummer": "154984832",
                 "Verfallsdatum": "XX/XX",
-                "Terminal ID": "92964892",
+                "Terminal ID": "92954892",
                 "Beleg Nr.": "22161",
-                "Transaktionsbetrag": "550.00",
-                "Genehmigter Betrag": "550.00",
-                "Genehmigungscode": "148460"
-            },
-            "Authorization": "Ich authorisiere den aufgeführten Betrag.",
-            "Signature": "Unterschrift des Karteninhabers"
+                "Transaktionsbeleg": "550.00",
+                "Genehmigungsnummer": "149460"
+            }
         }
     },
-    {}
+    {
+        "hotel_information": {
+            "name": "THE MADISON",
+            "location": "HAMBURG"
+        },
+        "guest_information": null,
+        "invoice_information": null,
+        "room_charges": null,
+        "taxes": null,
+        "total_charges": null
+    }
 ]

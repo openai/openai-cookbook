@@ -4,7 +4,7 @@
 # should build pages for, and indicates metadata such as tags, creation date and
 # authors for each page.
 
-- title: Context Engineering - Short-Term Memory Management with Sessions from OpenAI Agents SDK
+- title: GPT-5 Troubleshooting Guide
   path: examples/gpt-5/gpt-5_troubleshooting_guide.ipynb
   date: 2025-09-17
   authors:

@@ -5,6 +5,17 @@
 # authors for each page.
 
 - title: Context Engineering - Short-Term Memory Management with Sessions from OpenAI Agents SDK
+  path: examples/gpt-5/gpt-5_troubleshooting_guide.ipynb
+  date: 2025-09-17
+  authors:
+    - prashantmital-openai
+    - bfioca-openai
+    - carter-oai
+  tags:
+    - gpt-5
+    - prompt-optimization
+
+- title: Context Engineering - Short-Term Memory Management with Sessions from OpenAI Agents SDK
   path: examples/agents_sdk/session_memory.ipynb
   date: 2025-09-09
   authors:

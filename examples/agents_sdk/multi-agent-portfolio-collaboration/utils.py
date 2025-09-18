@@ -39,7 +39,7 @@ def outputs_dir() -> Path:
 # Prompt loader
 # ---------------------------------------------------------------------------
 
-PROMPTS_DIR: Path = repo_path("prompts")
+PROMPTS_DIR: Path = Path(__file__).resolve().parent.parent.parent / "prompting" / "agents_sdk" / "multi-agent-portfolio-collaboration" / "prompts"
 
 
 def load_prompt(name: str, **subs) -> str:

@@ -15,7 +15,120 @@
 - ✅ **VERIFIED**: Multiple companies tested with September 2025 deals
 - ✅ **CONFIRMED**: Workflow correctly identifies earliest won dates
 
-## CRITICAL INSTRUCTION: Workflow Testing Protocol
+## CRITICAL INSTRUCTION: HubSpot Field Clearing Best Practices
+
+**⚠️ ALWAYS use empty string (`""`) to clear HubSpot fields in custom code workflows**
+
+### Field Clearing Method Requirements:
+
+#### ✅ CORRECT Implementation
+```javascript
+// ✅ CORRECT: Use empty string to clear fields
+await client.crm.companies.basicApi.update(companyId, {
+  properties: {
+    first_deal_closed_won_date: ""  // This actually clears the field
+  }
+});
+console.log(`✅ FIELD CLEARED: first_deal_closed_won_date set to empty`);
+```
+
+#### ❌ INCORRECT Implementation
+```javascript
+// ❌ INCORRECT: null does NOT clear the field
+await client.crm.companies.basicApi.update(companyId, {
+  properties: {
+    first_deal_closed_won_date: null  // This ignores the update
+  }
+});
+console.log(`❌ FIELD NOT CLEARED: null value ignored by HubSpot API`);
+```
+
+### Why This Matters for Custom Code Workflows:
+
+1. **Silent Failures**: Using `null` causes workflows to log "success" but fields retain values
+2. **Data Integrity**: Incorrect clearing methods lead to stale data in CRM
+3. **Business Logic**: Field clearing is critical for accurate reporting and analysis
+
+### Testing Field Clearing in Workflows:
+
+#### Step 1: Verify API Update Success
+```javascript
+try {
+  await client.crm.companies.basicApi.update(companyId, {
+    properties: { first_deal_closed_won_date: "" }
+  });
+  console.log(`✅ FIELD CLEARED: first_deal_closed_won_date set to empty`);
+} catch (error) {
+  console.error(`❌ FIELD CLEAR FAILED: ${error.message}`);
+}
+```
+
+#### Step 2: Verify Field Value After Update
+```javascript
+// Fetch updated company to verify field was cleared
+const updatedCompany = await client.crm.companies.basicApi.getById(companyId);
+const fieldValue = updatedCompany.properties.first_deal_closed_won_date;
+console.log(`🔍 FIELD VALUE AFTER CLEARING: ${fieldValue}`);
+// Should be: undefined, null, or empty string (not the old value)
+```
+
+#### Step 3: Log Field Clearing Results
+```javascript
+if (fieldValue === undefined || fieldValue === null || fieldValue === "") {
+  console.log(`✅ FIELD CLEARING VERIFIED: Field is now empty`);
+} else {
+  console.log(`❌ FIELD CLEARING FAILED: Field still has value: ${fieldValue}`);
+}
+```
+
+### Common Field Clearing Scenarios:
+
+#### Scenario 1: No Primary Deals Found
+```javascript
+if (primaryDealIds.length === 0) {
+  // Clear first deal date when no primary deals exist
+  await client.crm.companies.basicApi.update(companyId, {
+    properties: { first_deal_closed_won_date: "" }
+  });
+}
+```
+
+#### Scenario 2: Company Churned
+```javascript
+if (isChurned) {
+  // Clear active dates when company churns
+  await client.crm.companies.basicApi.update(companyId, {
+    properties: { 
+      first_deal_closed_won_date: "",
+      company_churn_date: new Date().toISOString()
+    }
+  });
+}
+```
+
+### Field Clearing Validation Checklist:
+
+- [ ] **Use Empty String**: `""` not `null` for clearing fields
+- [ ] **Verify API Response**: Check update was successful
+- [ ] **Fetch Updated Record**: Confirm field is actually empty
+- [ ] **Log Results**: Document clearing success/failure
+- [ ] **Test Edge Cases**: No deals, churned companies, etc.
+
+### Troubleshooting Field Clearing Issues:
+
+#### Issue: Field Appears Cleared in Logs But Retains Value
+**Cause**: Using `null` instead of empty string
+**Solution**: Change `null` to `""` in API update
+
+#### Issue: Field Clearing Fails Silently
+**Cause**: API error not caught in try/catch
+**Solution**: Add proper error handling and verification
+
+#### Issue: Field Shows Empty in API But Not in UI
+**Cause**: UI cache not refreshed
+**Solution**: Wait for UI refresh or check API directly
+
+---
 
 **⚠️ ALWAYS test HubSpot Custom Code with real data before deployment**
 
@@ -107,16 +220,16 @@ HubSpot Custom Code Testing Framework
 
 ### **First Deal Won Date Calculation Workflow**
 
-**✅ VERIFIED VIA LIVE HUBSPOT API - September 13, 2025**  
-**✅ CORRECTED DATE COMPARISON LOGIC - Version 1.4.0**
+**✅ VERIFIED VIA LIVE HUBSPOT API - September 18, 2025**  
+**✅ CORRECTED FIELD CLEARING METHOD - Version 1.12.42**
 
 **Purpose:** Calculate and update the `first_deal_closed_won_date` field for companies based on their primary won deals.
 
-**Key Improvements (Version 1.4.0):**
-- ✅ **Date-based comparison** prevents unnecessary updates when only time differs
-- ✅ **Full timestamp preservation** maintains exact time information
-- ✅ **Enhanced logging** shows date comparison details
-- ✅ **Improved performance** reduces unnecessary API calls
+**Key Improvements (Version 1.12.42):**
+- ✅ **CORRECTED FIELD CLEARING**: Changed from `null` to `""` for proper field clearing
+- ✅ **FIELD CLEARING VERIFICATION**: Added comprehensive logging for field clearing process
+- ✅ **SILENT FAILURE PREVENTION**: Prevents logs showing "success" while fields retain values
+- ✅ **DATA INTEGRITY**: Ensures fields are actually cleared when no primary deals found
 
 **Field Mapping:**
 | **UI Field Name** | **Internal Property** | **Type** | **Status** | **Purpose** |
@@ -386,6 +499,30 @@ To meet your requirements, you need **3 separate workflows**:
 // Error: Property "first_deal_won_date" does not exist
 // Solution: ✅ Corrected to "first_deal_closed_won_date"
 // Status: ✅ RESOLVED - Field name corrected
+```
+
+### **Issue 5: Field Clearing Appears Successful But Field Retains Value (RESOLVED)**
+```javascript
+// Error: Workflow logs show "FIELD CLEARED" but field still has value in HubSpot
+// Cause: Using null instead of empty string for field clearing
+// Solution: ✅ Changed from null to "" for clearing first_deal_closed_won_date field
+// Status: ✅ RESOLVED - Empty string properly clears HubSpot fields
+```
+
+**Detailed Resolution:**
+- **Problem**: `first_deal_closed_won_date: null` was ignored by HubSpot API
+- **Root Cause**: HubSpot API treats `null` and empty string differently
+- **Solution**: Use `first_deal_closed_won_date: ""` to actually clear the field
+- **Verification**: Field now properly clears when no primary deals found
+- **Testing**: Confirmed with `pglogistica.com.ar` company (ID: 38687547047)
+
+**Code Fix Applied:**
+```javascript
+// OLD (incorrect):
+first_deal_closed_won_date: null
+
+// NEW (correct):
+first_deal_closed_won_date: ""
 ```
 
 ### **Issue 4: Workflow Hanging with No Logs (RESOLVED)**

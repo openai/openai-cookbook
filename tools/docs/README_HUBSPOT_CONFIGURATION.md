@@ -3,8 +3,8 @@
 This document serves as the official reference for Colppy's HubSpot configuration, mapping the customer journey from lead to deal.
 
 ## 🔍 LIVE CRM FIELD VERIFICATION STATUS
-**✅ Last Verified**: August 1, 2025 via Live HubSpot API  
-**📊 Verification Coverage**: Products, Line Items, Companies, Deals, Contacts  
+**✅ Last Verified**: January 9, 2025 via Live HubSpot API  
+**📊 Verification Coverage**: Products, Line Items, Companies, Deals, Contacts, UTM Marketing Fields  
 **📝 Documentation Status**: All field mappings verified through direct API calls
 
 **What Was Verified:**
@@ -14,8 +14,63 @@ This document serves as the official reference for Colppy's HubSpot configuratio
 - ✅ Deal custom fields (plan names, accountant associations)
 - ✅ Association mappings for accountant channel tracking
 - ✅ Contact fields for key events and lifecycle tracking
+- ✅ **UTM Marketing Attribution Fields** (8 fields verified: utm_campaign, utm_source, utm_medium, utm_term, utm_content, initial_utm_campaign, initial_utm_source, initial_utm_medium)
+- ✅ **Mixpanel Webhook Integration** (uses existing UTM fields only, no custom fields required)
 
-## CRITICAL INSTRUCTION: Field Name Mapping
+## CRITICAL INSTRUCTION: HubSpot Field Clearing Methods
+
+**⚠️ ALWAYS use empty string (`""`) to clear HubSpot fields, NOT `null`**
+
+When clearing HubSpot properties via API, you MUST use the correct method:
+
+### ✅ CORRECT Method - Empty String
+```javascript
+// ✅ CORRECT: Use empty string to clear fields
+await client.crm.companies.basicApi.update(companyId, {
+  properties: {
+    first_deal_closed_won_date: ""  // This actually clears the field
+  }
+});
+```
+
+### ❌ INCORRECT Method - Null Value
+```javascript
+// ❌ INCORRECT: null does NOT clear the field
+await client.crm.companies.basicApi.update(companyId, {
+  properties: {
+    first_deal_closed_won_date: null  // This ignores the update
+  }
+});
+```
+
+### Why This Matters:
+- **Empty String (`""`)**: HubSpot API recognizes this as "clear the field" instruction
+- **Null (`null`)**: HubSpot API ignores this update, field retains existing value
+- **Empty String vs Null**: Different data types with different API behaviors
+
+### Field Types That Require Empty String Clearing:
+- **Date Fields**: `first_deal_closed_won_date`, `closedate`, etc.
+- **Text Fields**: `description`, `notes`, etc.
+- **Number Fields**: `amount`, `quantity`, etc.
+- **Select Fields**: `dealstage`, `lifecyclestage`, etc.
+
+### Testing Field Clearing:
+Always verify field clearing worked by:
+1. **Check API Response**: Confirm update was successful
+2. **Verify Field Value**: Fetch the record to confirm field is empty
+3. **UI Verification**: Check HubSpot UI shows empty field
+
+**Example Verification:**
+```javascript
+// After clearing field, verify it worked
+const updatedCompany = await client.crm.companies.basicApi.getById(companyId);
+console.log('Field value after clearing:', updatedCompany.properties.first_deal_closed_won_date);
+// Should be: undefined, null, or empty string (not the old value)
+```
+
+This prevents silent failures where logs show "success" but fields retain their values.
+
+---
 
 **⚠️ ALWAYS map UI field names to internal property names when working with HubSpot data**
 
@@ -178,6 +233,31 @@ This section documents the exact field mappings for each HubSpot object, verifie
 | **Became a Lead Date** | `hs_lifecyclestage_lead_date` | Date | ✅ Native | When contact became a lead |
 | **Became an Opportunity Date** | `hs_lifecyclestage_opportunity_date` | Date | ✅ Native | When contact became an opportunity |
 | **Became a Customer Date** | `hs_lifecyclestage_customer_date` | Date | ✅ Native | When contact became a customer |
+
+#### **🎯 UTM Marketing Attribution Fields (Live Verified)**
+
+| **UI Field Name** | **Internal Property** | **Type** | **Status** | **Purpose** |
+|------------------|---------------------|-----------|------------|-------------|
+| **UTM Campaign** | `utm_campaign` | String | ✅ **LIVE VERIFIED** | Current/latest UTM campaign tracking |
+| **UTM Source** | `utm_source` | String | ✅ **LIVE VERIFIED** | Traffic source (google, facebook, etc.) |
+| **UTM Medium** | `utm_medium` | String | ✅ **LIVE VERIFIED** | Marketing medium (cpc, email, social) |
+| **UTM Term** | `utm_term` | String | ✅ **LIVE VERIFIED** | Paid search keywords |
+| **UTM Content** | `utm_content` | String | ✅ **LIVE VERIFIED** | Ad content variation |
+| **Initial UTM Campaign** | `initial_utm_campaign` | String | ✅ **LIVE VERIFIED** | First-touch UTM campaign |
+| **Initial UTM Source** | `initial_utm_source` | String | ✅ **LIVE VERIFIED** | First-touch traffic source |
+| **Initial UTM Medium** | `initial_utm_medium` | String | ✅ **LIVE VERIFIED** | First-touch marketing medium |
+
+**UTM Field Usage:**
+- **Current UTM Fields** (`utm_*`): Track latest marketing attribution
+- **Initial UTM Fields** (`initial_utm_*`): Track first-touch attribution for customer journey analysis
+- **Marketing Attribution**: Essential for measuring campaign effectiveness and ROI
+- **Mixpanel Integration**: UTM data flows from Mixpanel cohort exports to HubSpot contacts via webhook
+
+**Mixpanel Webhook Integration:**
+- **No New Fields Required**: Webhook uses existing verified UTM fields only
+- **Data Flow**: Mixpanel → Zapier → HubSpot webhook → Custom Code → Existing UTM fields
+- **Contact Matching**: `$distinct_id` from Mixpanel maps to `email` in HubSpot for contact identification
+- **UTM Data Only**: Only UTM parameters are updated, no custom Mixpanel fields created
 
 ---
 

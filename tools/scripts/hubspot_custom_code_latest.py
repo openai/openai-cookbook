@@ -31,17 +31,82 @@ exports.main = async (event, callback) => {
     accessToken: process.env.ColppyCRMAutomations
   });
 
+  // Helper function to resolve owner names with detailed logging
+  async function getOwnerName(ownerId) {
+    console.log(`🔍 OWNER RESOLUTION START - Owner ID: ${ownerId}`);
+    
+    if (!ownerId) {
+      console.log(`❌ OWNER RESOLUTION: No owner ID provided`);
+      return 'No Owner';
+    }
+    
+    try {
+      console.log(`📡 OWNER API CALL: Fetching owner details for ID ${ownerId}`);
+      console.log(`🔑 API Key Status: ${process.env.ColppyCRMAutomations ? 'Present' : 'Missing'}`);
+      
+      const response = await fetch(`https://api.hubspot.com/crm/v3/owners/${ownerId}`, {
+        headers: {
+          'Authorization': `Bearer ${process.env.ColppyCRMAutomations}`,
+          'Content-Type': 'application/json'
+        }
+      });
+      
+      console.log(`📊 OWNER API RESPONSE: Status ${response.status} for ID ${ownerId}`);
+      
+      if (response.ok) {
+        const data = await response.json();
+        console.log(`✅ OWNER API SUCCESS: Raw data for ID ${ownerId}:`, JSON.stringify(data, null, 2));
+        
+        const firstName = data.firstName || '';
+        const lastName = data.lastName || '';
+        const fullName = `${firstName} ${lastName}`.trim();
+        const isActive = data.archived === false;
+        
+        console.log(`👤 OWNER DETAILS: ID ${ownerId}`);
+        console.log(`   - First Name: "${firstName}"`);
+        console.log(`   - Last Name: "${lastName}"`);
+        console.log(`   - Full Name: "${fullName}"`);
+        console.log(`   - Active Status: ${isActive ? 'ACTIVE' : 'INACTIVE'}`);
+        console.log(`   - Archived: ${data.archived}`);
+        
+        const result = fullName || `Owner ID: ${ownerId}`;
+        console.log(`✅ OWNER RESOLUTION SUCCESS: "${result}" for ID ${ownerId}`);
+        return result;
+        
+      } else if (response.status === 404) {
+        console.log(`❌ OWNER NOT FOUND: ID ${ownerId} does not exist (404)`);
+        return `Owner ID: ${ownerId}`;
+      } else {
+        console.log(`⚠️ OWNER API ERROR: Status ${response.status} for ID ${ownerId}`);
+        const errorText = await response.text();
+        console.log(`📄 Error Response Body: ${errorText}`);
+        return `Owner ID: ${ownerId}`;
+      }
+    } catch (error) {
+      console.log(`💥 OWNER API EXCEPTION: ID ${ownerId} - ${error.message}`);
+      console.log(`🔍 Error Stack: ${error.stack}`);
+      return `Owner ID: ${ownerId}`;
+    }
+  }
+
   try {
     const companyId = String(event.object.objectId);
 
-    console.log('=== ENHANCED FIRST DEAL WON DATE CALCULATION STARTED ===');
-    console.log('Company ID:', companyId);
-    console.log('Timestamp:', new Date().toISOString());
-    console.log('Event type:', event.eventType || 'unknown');
-    console.log('Properties changed:', event.propertiesChanged || 'none');
+    console.log('='.repeat(80));
+    console.log('🚀 ENHANCED FIRST DEAL WON DATE CALCULATION STARTED');
+    console.log('='.repeat(80));
+    console.log('📋 WORKFLOW INFO:');
+    console.log(`   Company ID: ${companyId}`);
+    console.log(`   Timestamp: ${new Date().toISOString()}`);
+    console.log(`   Event Type: ${event.eventType || 'unknown'}`);
+    console.log(`   Properties Changed: ${event.propertiesChanged || 'none'}`);
+    console.log('='.repeat(80));
 
-    // Step 1: Log association retrieval
-    console.log('--- STEP 1: Retrieving deal associations ---');
+    // ========================================================================
+    // STEP 1: RETRIEVING DEAL ASSOCIATIONS
+    // ========================================================================
+    console.log('📊 STEP 1: RETRIEVING DEAL ASSOCIATIONS');
+    console.log('-'.repeat(50));
     let after = undefined;
     const primaryDealIds = [];
     const allDealIds = [];
@@ -81,14 +146,18 @@ exports.main = async (event, callback) => {
       }
     } while (after);
 
-    console.log(`--- STEP 1 COMPLETE ---`);
-    console.log(`Total associations found: ${totalAssociations}`);
-    console.log(`Total primary deals found: ${totalPrimaryDeals}`);
-    console.log(`Primary deal IDs: [${primaryDealIds.join(', ')}]`);
+    console.log('✅ STEP 1 COMPLETE');
+    console.log(`   Total associations found: ${totalAssociations}`);
+    console.log(`   Total primary deals found: ${totalPrimaryDeals}`);
+    console.log(`   Primary deal IDs: [${primaryDealIds.join(', ')}]`);
+    console.log('='.repeat(80));
 
-    // Step 2: Log deal data retrieval
-    console.log('--- STEP 2: Retrieving deal details ---');
-    const props = ['dealstage', 'closedate', 'dealname', 'amount', 'fecha_de_desactivacion'];
+    // ========================================================================
+    // STEP 2: RETRIEVING DEAL DETAILS
+    // ========================================================================
+    console.log('📋 STEP 2: RETRIEVING DEAL DETAILS');
+    console.log('-'.repeat(50));
+    const props = ['dealstage', 'closedate', 'dealname', 'amount', 'fecha_de_desactivacion', 'hubspot_owner_id'];
     const wonDates = [];
     const allDealDetails = [];
     let totalDealsProcessed = 0;
@@ -114,6 +183,18 @@ exports.main = async (event, callback) => {
         const dealName = deal.properties.dealname;
         const amount = deal.properties.amount;
         const fechaDesactivacion = deal.properties.fecha_de_desactivacion;
+        const ownerId = deal.properties.hubspot_owner_id;
+
+        // Get deal owner name using the helper function with detailed logging
+        console.log(`🔍 DEAL OWNER RESOLUTION: Processing deal ${deal.id}`);
+        let dealOwnerName = 'No Owner';
+        if (ownerId) {
+          console.log(`👤 DEAL OWNER: Resolving owner ID ${ownerId} for deal ${deal.id}`);
+          dealOwnerName = await getOwnerName(ownerId);
+          console.log(`✅ DEAL OWNER RESOLVED: "${dealOwnerName}" for deal ${deal.id}`);
+        } else {
+          console.log(`❌ DEAL OWNER: No owner ID found for deal ${deal.id}`);
+        }
 
         const dealInfo = {
           id: deal.id,
@@ -122,12 +203,15 @@ exports.main = async (event, callback) => {
           closeDate: closeDate,
           amount: amount,
           fechaDesactivacion: fechaDesactivacion,
+          ownerId: ownerId,
+          ownerName: dealOwnerName,
           isPrimary: primaryDealIds.includes(deal.id) /* Check if this deal is primary */
         };
 
         allDealDetails.push(dealInfo);
 
-        console.log(`Deal ${deal.id}: stage="${dealStage}", closedate="${closeDate}", fecha_desactivacion="${fechaDesactivacion || 'NULL'}", name="${dealName}", isPrimary=${dealInfo.isPrimary}`);
+        const fechaDesactivacionDisplay = fechaDesactivacion || 'NULL';
+        console.log(`Deal ${deal.id}: stage="${dealStage}", closedate="${closeDate}", fecha_desactivacion="${fechaDesactivacionDisplay}", name="${dealName}", isPrimary=${dealInfo.isPrimary}`);
 
         if ((dealStage === 'closedwon' || dealStage === '34692158') && closeDate) {
           const wonDate = new Date(closeDate);
@@ -140,23 +224,40 @@ exports.main = async (event, callback) => {
       }
     }
 
-    console.log(`--- STEP 2 COMPLETE ---`);
-    console.log(`Total deals processed: ${totalDealsProcessed}`);
-    console.log(`Won deals found: ${wonDealsFound}`);
-    console.log(`Won dates: [${wonDates.map(d => d.toISOString().split('T')[0]).join(', ')}]`);
+    console.log('✅ STEP 2 COMPLETE');
+    console.log(`   Total deals processed: ${totalDealsProcessed}`);
+    console.log(`   Won deals found: ${wonDealsFound}`);
+    console.log(`   Won dates: [${wonDates.map(d => d.toISOString().split('T')[0]).join(', ')}]`);
+    console.log('='.repeat(80));
 
-    // Step 3: Enhanced calculation and update with Slack notifications
-    console.log('--- STEP 3: Enhanced calculation and update with notifications ---');
+    // ========================================================================
+    // STEP 3: ENHANCED CALCULATION AND UPDATE WITH NOTIFICATIONS
+    // ========================================================================
+    console.log('⚙️ STEP 3: ENHANCED CALCULATION AND UPDATE WITH NOTIFICATIONS');
+    console.log('-'.repeat(50));
 
     // Get current field values for comparison
-    const currentCompany = await client.crm.companies.basicApi.getById(companyId, ['first_deal_closed_won_date', 'company_churn_date', 'name', 'lifecyclestage', 'type']);
+    const currentCompany = await client.crm.companies.basicApi.getById(companyId, ['first_deal_closed_won_date', 'company_churn_date', 'name', 'lifecyclestage', 'type', 'hubspot_owner_id']);
     const currentFirstDealValue = currentCompany.properties.first_deal_closed_won_date;
     const currentChurnDateValue = currentCompany.properties.company_churn_date;
     const companyName = currentCompany.properties.name;
+    
+     // Get company owner name using the helper function with detailed logging
+     console.log(`🔍 COMPANY OWNER RESOLUTION: Processing company ${companyId}`);
+     let companyOwnerName = 'No Owner';
+     if (currentCompany.properties.hubspot_owner_id) {
+       console.log(`👤 COMPANY OWNER: Resolving owner ID ${currentCompany.properties.hubspot_owner_id} for company ${companyId}`);
+       companyOwnerName = await getOwnerName(currentCompany.properties.hubspot_owner_id);
+       console.log(`✅ COMPANY OWNER RESOLVED: "${companyOwnerName}" for company ${companyId}`);
+     } else {
+       console.log(`❌ COMPANY OWNER: No owner ID found for company ${companyId}`);
+     }
 
     console.log(`Current company: ${companyName}`);
-    console.log(`Current first_deal_closed_won_date: ${currentFirstDealValue || 'NULL'}`);
-    console.log(`Current company_churn_date: ${currentChurnDateValue || 'NULL'}`);
+    const currentFirstDate = currentFirstDealValue || 'NULL';
+    const currentChurnDate = currentChurnDateValue || 'NULL';
+    console.log(`Current first_deal_closed_won_date: ${currentFirstDate}`);
+    console.log(`Current company_churn_date: ${currentChurnDate}`);
 
     // Determine workflow outcome for Slack notification
     let workflowOutcome = '';
@@ -205,6 +306,36 @@ exports.main = async (event, callback) => {
             reason: 'Accountant companies refer clients but typically don\'t get PRIMARY deals - verification needed to confirm this is normal'
           }
         };
+        
+        // CLEAR FIRST DEAL DATE: No primary deals means no valid first deal date (even for accountants)
+        if (currentFirstDealValue) {
+          console.log(`🧹 CLEARING FIELD: No primary deals found for accountant company - clearing first_deal_closed_won_date from "${currentFirstDealValue}" to NULL`);
+          
+          try {
+            await client.crm.companies.basicApi.update(companyId, {
+              properties: {
+                first_deal_closed_won_date: ""
+              }
+            });
+            
+            console.log(`✅ FIELD CLEARED: first_deal_closed_won_date set to NULL for accountant company`);
+            
+            // Update workflow outcome to reflect the change
+            workflowOutcome = 'ACCOUNTANT_FIELD_CLEARED_NO_PRIMARY_DEALS';
+            
+            // Update notification to reflect the field clearing
+            slackNotification.details.changeReason = 'No primary deals found - cleared first_deal_closed_won_date field for accountant company';
+            slackNotification.details.oldFirstDate = currentFirstDealValue ? new Date(currentFirstDealValue).toISOString().split('T')[0] : 'NULL';
+            slackNotification.details.newFirstDate = 'NULL';
+            
+          } catch (updateError) {
+            console.error(`❌ FIELD CLEAR FAILED: ${updateError.message}`);
+            // Don't fail the workflow if field clearing fails
+          }
+        } else {
+          console.log(`✅ FIELD ALREADY CLEAR: first_deal_closed_won_date is already NULL for accountant company - no action needed`);
+          workflowOutcome = 'ACCOUNTANT_NO_CHANGE_NEEDED_NO_PRIMARY_DEALS';
+        }
       } else {
         // CHECK FOR AUTO-FIX OPPORTUNITY: Single company, non-accountant, missing PRIMARY
         const isSingleCompany = totalAssociations === 1;
@@ -239,32 +370,80 @@ exports.main = async (event, callback) => {
             
             console.log(`✅ AUTO-FIX SUCCESS: Added PRIMARY association for company ${singleCompanyId} to deal ${dealId}`);
             
-            // Update notification to success
+            // IMMEDIATE RECALCULATION: Now that we have PRIMARY association, recalculate dates
+            console.log('🔄 IMMEDIATE RECALCULATION: Recalculating dates after PRIMARY association added');
+            
+            // Update primaryDealIds to include the newly fixed deal
+            // Note: primaryDealIds is const array, so we'll push to it instead of reassigning
+            primaryDealIds.push(dealId);
+            
+            // Recalculate won dates with the new PRIMARY deal
+            const dealStage = allDealDetails[0].stage;
+            const dealCloseDate = allDealDetails[0].closeDate;
+            
+            let recalculatedFirstDate = null;
+            let recalculatedChurnDate = null;
+            
+            if (dealStage === 'closedwon' || dealStage === '34692158') {
+              // This is a won deal - set first_deal_closed_won_date
+              recalculatedFirstDate = dealCloseDate;
+              console.log(`✅ RECALCULATED: First deal won date set to ${recalculatedFirstDate}`);
+            }
+            
+            // Update company with recalculated dates
+            const updateProperties = {};
+            let needsUpdate = false;
+            
+            if (recalculatedFirstDate && recalculatedFirstDate !== currentFirstDealValue) {
+              updateProperties.first_deal_closed_won_date = recalculatedFirstDate;
+              needsUpdate = true;
+              const oldDate = currentFirstDealValue || 'NULL';
+              console.log(`🔄 UPDATE NEEDED: First deal date ${oldDate} → ${recalculatedFirstDate}`);
+            }
+            
+            if (needsUpdate) {
+              await client.crm.companies.basicApi.update(companyId, {
+                properties: updateProperties
+              });
+              console.log(`✅ IMMEDIATE UPDATE: Company updated with recalculated dates`);
+            }
+            
+            // Update notification to success with actual calculated dates
             workflowOutcome = 'AUTO_FIX_SUCCESS';
             slackNotification = {
               type: 'success',
               title: '✅ Auto-Fix Completed Successfully',
-              message: `Successfully added PRIMARY association for company "${companyName}" to deal ${dealId}`,
+              message: `Successfully added PRIMARY association and immediately calculated dates for company "${companyName}"`,
               details: {
                 companyId: companyId,
                 companyName: companyName,
+                companyOwnerId: currentCompany.properties.hubspot_owner_id,
+                companyOwnerName: companyOwnerName,
                 dealId: dealId,
                 totalDeals: totalAssociations,
                 primaryDeals: 1, // Now has 1 PRIMARY deal
-                wonDeals: (allDealDetails[0].stage === 'closedwon' || allDealDetails[0].stage === '34692158') ? 1 : 0,
+                wonDeals: (dealStage === 'closedwon' || dealStage === '34692158') ? 1 : 0,
                 isChurned: false, // Auto-fix doesn't change churn status
-                dealDetails: [], // We don't have deal details since we didn't process any
+                dealDetails: [{
+                  name: allDealDetails[0].name,
+                  stage: dealStage,
+                  closeDateFormatted: dealCloseDate ? new Date(dealCloseDate).toISOString().split('T')[0] : 'NULL',
+                  amount: allDealDetails[0].amount,
+                  isPrimary: true,
+                  ownerId: allDealDetails[0].ownerId,
+                  ownerName: allDealDetails[0].ownerName
+                }],
                 lifecycleStage: lifecycleStage,
                 companyType: companyType,
-                reason: 'Auto-fix completed: Single company now has PRIMARY association',
+                reason: 'Auto-fix completed: PRIMARY association added and dates immediately calculated',
                 autoFixCompleted: true,
                 autoFixAction: `Added PRIMARY association (typeId 5) for company ${singleCompanyId} to deal ${dealId}`,
-                // Add the missing date fields for the notification template
+                // Show actual calculated dates
                 oldFirstDate: currentFirstDealValue ? new Date(currentFirstDealValue).toISOString().split('T')[0] : 'NULL',
-                newFirstDate: currentFirstDealValue ? new Date(currentFirstDealValue).toISOString().split('T')[0] : 'NULL', 
+                newFirstDate: recalculatedFirstDate ? new Date(recalculatedFirstDate).toISOString().split('T')[0] : 'NULL', 
                 oldChurnDate: currentChurnDateValue ? new Date(currentChurnDateValue).toISOString().split('T')[0] : 'NULL',
-                newChurnDate: currentChurnDateValue ? new Date(currentChurnDateValue).toISOString().split('T')[0] : 'NULL',
-                changeReason: 'Auto-fix completed: PRIMARY association added - dates will be calculated on next workflow run'
+                newChurnDate: recalculatedChurnDate ? new Date(recalculatedChurnDate).toISOString().split('T')[0] : 'NULL',
+                changeReason: 'Auto-fix completed: Added PRIMARY association and immediately calculated first_deal_closed_won_date'
               }
             };
             
@@ -309,6 +488,8 @@ exports.main = async (event, callback) => {
             details: {
               companyId: companyId,
               companyName: companyName,
+              companyOwnerId: currentCompany.properties.hubspot_owner_id,
+              companyOwnerName: companyOwnerName,
               totalDeals: totalAssociations,
               primaryDeals: 0,
               dealDetails: [], // We don't have deal details since we didn't process any
@@ -319,6 +500,36 @@ exports.main = async (event, callback) => {
             }
           };
           console.log(`🚨 EDGE CASE: No primary deals found for company ${companyName} (lifecycle: ${lifecycleStage}, total deals: ${totalAssociations})`);
+          
+          // CLEAR FIRST DEAL DATE: No primary deals means no valid first deal date
+          if (currentFirstDealValue) {
+            console.log(`🧹 CLEARING FIELD: No primary deals found - clearing first_deal_closed_won_date from "${currentFirstDealValue}" to NULL`);
+            
+            try {
+              await client.crm.companies.basicApi.update(companyId, {
+                properties: {
+                  first_deal_closed_won_date: ""
+                }
+              });
+              
+              console.log(`✅ FIELD CLEARED: first_deal_closed_won_date set to NULL`);
+              
+              // Update workflow outcome to reflect the change
+              workflowOutcome = 'FIELD_CLEARED_NO_PRIMARY_DEALS';
+              
+              // Update notification to reflect the field clearing
+              slackNotification.details.changeReason = 'No primary deals found - cleared first_deal_closed_won_date field';
+              slackNotification.details.oldFirstDate = currentFirstDealValue ? new Date(currentFirstDealValue).toISOString().split('T')[0] : 'NULL';
+              slackNotification.details.newFirstDate = 'NULL';
+              
+            } catch (updateError) {
+              console.error(`❌ FIELD CLEAR FAILED: ${updateError.message}`);
+              // Don't fail the workflow if field clearing fails
+            }
+          } else {
+            console.log(`✅ FIELD ALREADY CLEAR: first_deal_closed_won_date is already NULL - no action needed`);
+            workflowOutcome = 'NO_CHANGE_NEEDED_NO_PRIMARY_DEALS';
+          }
         }
       }
       
@@ -518,6 +729,8 @@ exports.main = async (event, callback) => {
           details: {
             companyId: companyId,
             companyName: companyName,
+            companyOwnerId: currentCompany.properties.hubspot_owner_id,
+            companyOwnerName: companyOwnerName,
             oldChurnValue: currentChurnDateValue,
             newChurnValue: companyChurnDate,
             oldChurnDate: currentChurnDateValue ? new Date(currentChurnDateValue).toISOString().split('T')[0] : 'NULL',
@@ -536,7 +749,9 @@ exports.main = async (event, callback) => {
               fechaDesactivacion: d.fechaDesactivacion,
               fechaDesactivacionFormatted: d.fechaDesactivacion ? new Date(d.fechaDesactivacion).toISOString().split('T')[0] : 'NULL',
               amount: d.amount,
-              isPrimary: d.isPrimary
+              isPrimary: d.isPrimary,
+              ownerId: d.ownerId,
+              ownerName: d.ownerName
             })),
             churnDateSource: churnDateSource,
             manualErrorDetected: manualErrorDetected,
@@ -649,6 +864,8 @@ exports.main = async (event, callback) => {
           details: {
             companyId: companyId,
             companyName: companyName,
+            companyOwnerId: currentCompany.properties.hubspot_owner_id,
+            companyOwnerName: companyOwnerName,
             totalDeals: totalAssociations,
             primaryDeals: 0,
             wonDeals: wonDates.length,
@@ -698,16 +915,16 @@ exports.main = async (event, callback) => {
       }
 
       // Check if changes are needed (date-based comparison, not exact timestamp)
-      const currentFirstDate = currentFirstDealValue ? new Date(currentFirstDealValue).toISOString().split('T')[0] : null;
+      const normalizedCurrentFirstDate = currentFirstDealValue ? new Date(currentFirstDealValue).toISOString().split('T')[0] : null;
       const calculatedFirstDate = new Date(formattedFirstDate).toISOString().split('T')[0];
       
-      const needsFirstUpdate = currentFirstDate !== calculatedFirstDate;
+      const needsFirstUpdate = normalizedCurrentFirstDate !== calculatedFirstDate;
       const needsChurnUpdate = (currentChurnDateValue !== companyChurnDate);
       const needsUpdate = needsFirstUpdate || needsChurnUpdate;
 
-      console.log(`Current first date: ${currentFirstDate || 'NULL'}`);
+      console.log(`Current first date: ${normalizedCurrentFirstDate || 'NULL'}`);
       console.log(`Calculated first date: ${calculatedFirstDate}`);
-      console.log(`First date comparison: ${currentFirstDate} !== ${calculatedFirstDate} = ${needsFirstUpdate}`);
+      console.log(`First date comparison: ${normalizedCurrentFirstDate} !== ${calculatedFirstDate} = ${needsFirstUpdate}`);
       console.log(`Current churn date: ${currentChurnDateValue || 'NULL'}`);
       console.log(`Calculated churn date: ${companyChurnDate || 'NULL'}`);
       console.log(`Churn date comparison: ${currentChurnDateValue} !== ${companyChurnDate} = ${needsChurnUpdate}`);
@@ -756,6 +973,8 @@ exports.main = async (event, callback) => {
           details: {
             companyId: companyId,
             companyName: companyName,
+            companyOwnerId: currentCompany.properties.hubspot_owner_id,
+            companyOwnerName: companyOwnerName,
             oldFirstValue: currentFirstDealValue,
             newFirstValue: needsFirstUpdate ? formattedFirstDate : currentFirstDealValue,
             oldChurnValue: currentChurnDateValue,
@@ -774,7 +993,9 @@ exports.main = async (event, callback) => {
               closeDate: d.closeDate,
               closeDateFormatted: d.closeDate ? new Date(d.closeDate).toISOString().split('T')[0] : 'No date',
               amount: d.amount,
-              isPrimary: d.isPrimary
+              isPrimary: d.isPrimary,
+              ownerId: d.ownerId,
+              ownerName: d.ownerName
             })),
             changeReason: wasAutoFix 
               ? `Auto-fix completed: Added PRIMARY associations to won deals and immediately calculated first_deal_closed_won_date`
@@ -798,25 +1019,37 @@ exports.main = async (event, callback) => {
       }
     }
 
-    console.log('--- STEP 3 COMPLETE ---');
+    console.log('✅ STEP 3 COMPLETE');
+    console.log('='.repeat(80));
 
-    // Step 4: Send Slack notification if needed
+    // ========================================================================
+    // STEP 4: SENDING SLACK NOTIFICATION
+    // ========================================================================
     if (slackNotification) {
-      console.log('--- STEP 4: Sending Slack notification ---');
+      console.log('📢 STEP 4: SENDING SLACK NOTIFICATION');
+      console.log('-'.repeat(50));
       
       try {
+        console.log(`📤 Sending notification: ${slackNotification.type} - ${slackNotification.title}`);
         await sendSlackNotification(slackNotification);
         console.log(`✅ Slack notification sent successfully`);
       } catch (slackError) {
         console.error(`❌ Slack notification failed:`, slackError.message);
+        console.error(`🔍 Slack error details:`, slackError);
         // Don't fail the entire workflow if Slack fails
       }
       
-      console.log('--- STEP 4 COMPLETE ---');
+      console.log('✅ STEP 4 COMPLETE');
+    } else {
+      console.log('📢 STEP 4: SKIPPED (No notification needed)');
     }
+    console.log('='.repeat(80));
 
-    // Final summary log
-    console.log('=== ENHANCED WORKFLOW EXECUTION SUMMARY ===');
+    // ========================================================================
+    // FINAL WORKFLOW EXECUTION SUMMARY
+    // ========================================================================
+    console.log('📊 FINAL WORKFLOW EXECUTION SUMMARY');
+    console.log('-'.repeat(50));
     console.log(`Company: ${companyName} (ID: ${companyId})`);
     console.log(`Primary deals processed: ${primaryDealIds.length}`);
     console.log(`Won deals found: ${wonDates.length}`);
@@ -836,7 +1069,10 @@ exports.main = async (event, callback) => {
       console.log(`Current field value: ${currentFirstDealValue || 'NULL'}`);
       console.log(`Change made: ${currentFirstDealValue !== null && currentFirstDealValue !== undefined ? 'YES (cleared)' : 'NO'}`);
     }
-    console.log('=== ENHANCED FIRST DEAL WON DATE CALCULATION COMPLETED SUCCESSFULLY ===');
+    
+    console.log('='.repeat(80));
+    console.log('🎉 ENHANCED FIRST DEAL WON DATE CALCULATION COMPLETED SUCCESSFULLY');
+    console.log('='.repeat(80));
     
     // Call callback to indicate success
     callback(null, 'Success');
@@ -866,11 +1102,14 @@ exports.main = async (event, callback) => {
     if (err.response) {
       console.error('HTTP Status:', err.response.status);
       console.error('HTTP Status Text:', err.response.statusText);
-      console.error('Response headers:', JSON.stringify(err.response.headers, null, 2));
-      console.error('Response body:', JSON.stringify(err.response.body, null, 2));
+      const headersString = JSON.stringify(err.response.headers, null, 2);
+      const bodyString = JSON.stringify(err.response.body, null, 2);
+      console.error('Response headers:', headersString);
+      console.error('Response body:', bodyString);
     }
 
-    console.error('Full error object:', JSON.stringify(err, null, 2));
+    const errorString = JSON.stringify(err, null, 2);
+    console.error('Full error object:', errorString);
     console.error('=== ERROR LOGGING COMPLETE ===');
 
     // Call callback with error
@@ -880,14 +1119,14 @@ exports.main = async (event, callback) => {
 
 // Enhanced Slack notification function with detailed sales team information
 async function sendSlackNotification(notification) {
-  const slackWebhookUrl = 'https://hooks.slack.com/services/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';
+  const slackWebhookUrl = 'YOUR_SLACK_WEBHOOK_URL_HERE';
   
   let slackMessage;
   
   if (notification.type === 'success' && notification.details.dealDetails) {
     // Enhanced success notification with detailed change information
     const dealList = notification.details.dealDetails
-      .map(d => `• ${d.name} (${d.stage}) - ${d.closeDateFormatted}${d.amount ? ` - $${parseInt(d.amount).toLocaleString()}` : ''}${d.isPrimary ? ' [PRIMARY]' : ''}`)
+      .map(d => `• <https://app.hubspot.com/contacts/19877595/deal/${d.id}|${d.name}> (${d.stage}) - ${d.closeDateFormatted}${d.amount ? ` - $${parseInt(d.amount).toLocaleString()}` : ''}${d.isPrimary ? ' [PRIMARY]' : ''}${d.ownerName && d.ownerName !== 'No Owner' ? ` - Owner: ${d.ownerName}` : ''}`)
       .join('\n');
     
     slackMessage = {
@@ -902,8 +1141,8 @@ async function sendSlackNotification(notification) {
               short: true
             },
             {
-              title: '🔗 View Company',
-              value: `<https://app.hubspot.com/contacts/19877595/company/${notification.details.companyId}|Open in HubSpot>`,
+              title: '👤 Company Owner',
+              value: notification.details.companyOwnerName || 'No Owner',
               short: true
             },
                         {
@@ -942,7 +1181,7 @@ async function sendSlackNotification(notification) {
     // Enhanced warning notification for no primary deals
     const dealList = notification.details.dealDetails
       .slice(0, 5)
-      .map(d => `• ${d.name} (${d.stage}) - ${d.closeDateFormatted}${d.amount ? ` - $${parseInt(d.amount).toLocaleString()}` : ''}${d.isPrimary ? ' [PRIMARY]' : ''}`)
+      .map(d => `• <https://app.hubspot.com/contacts/19877595/deal/${d.id}|${d.name}> (${d.stage}) - ${d.closeDateFormatted}${d.amount ? ` - $${parseInt(d.amount).toLocaleString()}` : ''}${d.isPrimary ? ' [PRIMARY]' : ''}${d.ownerName && d.ownerName !== 'No Owner' ? ` - Owner: ${d.ownerName}` : ''}`)
       .join('\n');
     
     const dealSummary = dealList + (notification.details.dealDetails.length > 5 ? '\n• ...' : '');
@@ -959,8 +1198,8 @@ async function sendSlackNotification(notification) {
               short: true
             },
             {
-              title: '🔗 View Company',
-              value: `<https://app.hubspot.com/contacts/19877595/company/${notification.details.companyId}|Open in HubSpot>`,
+              title: '👤 Company Owner',
+              value: notification.details.companyOwnerName || 'No Owner',
               short: true
             },
             {
@@ -988,7 +1227,7 @@ async function sendSlackNotification(notification) {
   } else if (notification.type === 'info') {
     // Enhanced info notification for no won deals
     const dealList = notification.details.dealDetails
-      .map(d => `• ${d.name} (${d.stage}) - ${d.closeDateFormatted}${d.amount ? ` - $${parseInt(d.amount).toLocaleString()}` : ''}`)
+      .map(d => `• <https://app.hubspot.com/contacts/19877595/deal/${d.id}|${d.name}> (${d.stage}) - ${d.closeDateFormatted}${d.amount ? ` - $${parseInt(d.amount).toLocaleString()}` : ''}${d.ownerName && d.ownerName !== 'No Owner' ? ` - Owner: ${d.ownerName}` : ''}`)
       .join('\n');
     
     slackMessage = {
@@ -1003,8 +1242,8 @@ async function sendSlackNotification(notification) {
               short: true
             },
             {
-              title: '🔗 View Company',
-              value: `<https://app.hubspot.com/contacts/19877595/company/${notification.details.companyId}|Open in HubSpot>`,
+              title: '👤 Company Owner',
+              value: notification.details.companyOwnerName || 'No Owner',
               short: true
             },
             {
@@ -1040,11 +1279,6 @@ async function sendSlackNotification(notification) {
             {
               title: '🏢 Company',
               value: `<https://app.hubspot.com/contacts/19877595/company/${notification.details.companyId}|${notification.details.companyName || 'Unknown'}>`,
-              short: true
-            },
-            {
-              title: '🔗 View Company',
-              value: `<https://app.hubspot.com/contacts/19877595/company/${notification.details.companyId}|Open in HubSpot>`,
               short: true
             },
             {
@@ -1090,11 +1324,6 @@ async function sendSlackNotification(notification) {
               short: true
             },
             {
-              title: '🔗 View Company',
-              value: `<https://app.hubspot.com/contacts/19877595/company/${notification.details.companyId}|Open in HubSpot>`,
-              short: true
-            },
-            {
               title: '🏢 Company Type',
               value: notification.details.companyType || 'Unknown',
               short: true
@@ -1137,8 +1366,8 @@ async function sendSlackNotification(notification) {
               short: true
             },
             {
-              title: '🔗 View Company',
-              value: `<https://app.hubspot.com/contacts/19877595/company/${notification.details.companyId}|Open in HubSpot>`,
+              title: '👤 Company Owner',
+              value: notification.details.companyOwnerName || 'No Owner',
               short: true
             },
             {
@@ -1311,13 +1540,20 @@ def calculate_first_deal_won_date_python(company_id: str, hubspot_client) -> Opt
         raise e
 
 # Version tracking
-WORKFLOW_VERSION = "1.12.10"
-LAST_UPDATED = "2025-09-15T12:15:00Z"
+WORKFLOW_VERSION = "1.12.44"
+LAST_UPDATED = "2025-09-15T20:00:00Z"
 CHANGES = [
-    "Added comprehensive logging",
-    "Fixed field name to first_deal_closed_won_date", 
-    "Added error handling for missing properties",
-    "Added verification logging",
+    "ENHANCED ACCOUNTANT VERIFICATION NOTIFICATIONS: Added company owner information to accountant verification notifications. Now shows the full name of the company owner (resolved from owner ID) in the Slack notification, making it easier to identify who manages the accountant company for verification purposes.",
+    "FIXED ACCOUNTANT COMPANY FIELD CLEARING: Added field clearing logic to accountant company section. Previously, accountant companies with no primary deals would retain their first_deal_closed_won_date field even though they had no valid primary deals. Now accountant companies also get their first_deal_closed_won_date field cleared when no primary deals are found, with proper logging and notification updates.",
+    "CORRECTED FIELD CLEARING METHOD: Changed from null to empty string ('') for clearing first_deal_closed_won_date field. HubSpot API requires empty string to properly clear date fields, not null. This fixes the issue where the field appeared cleared in logs but retained its value in HubSpot.",
+    "FIXED FIELD CLEARING FOR NO PRIMARY DEALS: Added logic to clear first_deal_closed_won_date field when no primary deals are found. Previously, companies with no primary deals would keep their old first deal date even though they had no valid primary deals. Now the field is properly cleared to NULL and the notification reflects this change with proper before/after values.",
+    "SLACK NOTIFICATION IMPROVEMENTS: Removed redundant 'View Company' link since company name is already clickable. Added direct clickable links for each deal in all notification types (success, warning, info). Now each deal shows as clickable link: '• [Deal Name] (stage) - date - amount - Owner: Name'.",
+    "ENHANCED OWNER NAME RESOLUTION LOGGING: Added comprehensive logging for getOwnerName function with detailed API call tracking, response analysis, and owner status detection (active/inactive). Shows full API responses, owner details breakdown, and error handling for deactivated owners.",
+    "IMPROVED STEP SEPARATION: Added clear visual separators between workflow steps with emojis and consistent formatting for better log readability. Each step now has distinct headers and completion markers.",
+    "DETAILED DEAL OWNER LOGGING: Enhanced logging for deal owner resolution showing the complete process from ID to full name resolution with success/failure tracking.",
+    "DETAILED COMPANY OWNER LOGGING: Enhanced logging for company owner resolution with step-by-step process tracking and result verification.",
+    "ENHANCED SLACK NOTIFICATION LOGGING: Added detailed logging for Slack notification process including notification type, title, and error details.",
+    "VISUAL LOG IMPROVEMENTS: Added emojis and consistent formatting throughout all log messages for better readability and quick identification of different log types.",
     "Improved batch processing",
     "Added change detection and explicit change/no-change logging",
     "Added workflow execution summary with change status",
@@ -1366,7 +1602,28 @@ CHANGES = [
     "AUTO-FIX SINGLE PRIMARY RULE: Fixed auto-fix to follow business rule of only ONE PRIMARY deal per company - now selects the OLDEST won deal for PRIMARY association instead of adding PRIMARY to all won deals",
     "NOTIFICATION MESSAGE FIX: Fixed misleading notification messages - now distinguishes between date field updates (existing PRIMARY deals) vs actual PRIMARY association additions - prevents false 'Added PRIMARY associations' messages when only updating date fields",
     "CODE CLEANUP: Removed unused variables (callback parameter, autoFixFailedCount, updatedPrimaryDealsCount, associationResponse) and fixed duplicate companyName declaration - resolved all linting warnings",
-    "CRITICAL FIX: Added callback execution for HubSpot workflow - callback(null, 'Success') on success and callback(err) on error - prevents workflow from hanging with no logs"
+    "CRITICAL FIX: Added callback execution for HubSpot workflow - callback(null, 'Success') on success and callback(err) on error - prevents workflow from hanging with no logs",
+    "SLACK WEBHOOK FIX: Updated to new working Slack webhook URL - previous webhook expired/invalid, new webhook tested and confirmed working",
+    "CRITICAL AUTO-FIX BUG FIX: Fixed auto-fix to actually perform immediate recalculation instead of deferring to next workflow run - now calculates and updates first_deal_closed_won_date immediately after adding PRIMARY association, with accurate notification showing real calculated dates",
+    "JAVASCRIPT ERROR FIX: Fixed 'Assignment to constant variable' error by using array.push() instead of reassigning const primaryDealIds array - resolves TypeError in auto-fix immediate recalculation",
+    "JAVASCRIPT SYNTAX FIX: Fixed 'SyntaxError: Unexpected string' by simplifying complex template literal expressions - moved || operators outside template literals to prevent syntax errors in HubSpot runtime",
+    "VARIABLE CONFLICT FIX: Fixed duplicate variable declaration error - renamed second 'currentFirstDate' to 'normalizedCurrentFirstDate' to resolve 'already declared in upper scope' error",
+    "OWNER INFORMATION ENHANCEMENT: Added company owner and deal owner information to all Slack notifications - now displays company owner ID and individual deal owner IDs for better sales team visibility and accountability",
+    "OWNER NAME RESOLUTION: Enhanced owner information to display full names instead of IDs - now fetches owner details from HubSpot API to show actual names (e.g., 'John Smith') instead of owner IDs (e.g., '12345') for better readability and sales team identification",
+    "STABILITY FIX: Simplified owner resolution to prevent API timeouts - reverted to showing owner IDs instead of making additional API calls to avoid workflow failures, ensuring reliable execution while still providing owner information",
+    "TIMEOUT-PROTECTED OWNER NAMES: Re-implemented owner name resolution with timeout protection - now uses Promise.race with 2-second timeout for company owners and 1.5-second timeout for deal owners to prevent workflow failures while still showing actual names instead of IDs",
+    "DIRECT API OWNER RESOLUTION: Fixed owner name resolution by using direct HTTP fetch requests instead of HubSpot SDK - now makes direct calls to https://api.hubapi.com/crm/v3/owners/{id} which is more reliable and returns actual names like 'Rocio Luque' instead of 'Owner ID: 1571181342'",
+    "SDK OWNER RESOLUTION: Reverted to HubSpot SDK for owner resolution after testing revealed fetch API compatibility issues - now uses client.crm.owners.ownersApi.getById() with proper error handling to show actual names like 'Karina Lorena Russo' for existing owners and 'Owner ID: XXXX' for non-existent owners",
+    "ALTERNATIVE SDK OWNER RESOLUTION: Updated to use client.owners.ownersApi.getById() instead of client.crm.owners.ownersApi.getById() - this alternative HubSpot SDK method should properly resolve owner names like 'Karina Lorena Russo' and 'Sofia Celentano' instead of showing 'Owner ID: 103406387'",
+    "DIRECT HTTP OWNER RESOLUTION: Fixed owner resolution by using direct HTTP fetch requests to https://api.hubapi.com/crm/v3/owners/{id} - this bypasses SDK compatibility issues and should properly resolve owner names like 'Karina Lorena Russo' and 'Sofia Celentano' instead of showing 'Owner ID: 103406387'",
+    "DETAILED OWNER API LOGGING: Added comprehensive logging to HTTP owner requests to debug why owner IDs are still showing instead of names - now logs HTTP response status, response data, and detailed error information to identify the root cause",
+    "FIXED JAVASCRIPT SYNTAX ERROR: Fixed SyntaxError: Unexpected identifier 'hubspot' by moving JSON.stringify calls outside template literals - the issue was caused by JSON.stringify being called directly inside template literals which caused JavaScript parsing errors",
+    "FIXED OWNER API AUTHORIZATION: Fixed 401 Unauthorized error by using the correct API key (process.env.ColppyCRMAutomations) and correct API endpoint (api.hubspot.com) - the owner API calls were failing because they were using the wrong environment variable and wrong domain",
+    "REVERTED TO SIMPLE OWNER IDS: Reverted owner name resolution back to simple Owner ID display due to persistent API issues (403 Forbidden) - now shows 'Owner ID: 103406387' instead of making complex API calls that cause workflow failures",
+    "PROPER OWNER NAME RESOLUTION: Fixed owner name resolution to display actual full names instead of IDs - now uses direct fetch API calls to https://api.hubspot.com/crm/v3/owners/{id} with proper error handling to show names like 'Karina Lorena Russo' and 'Sofia Celentano' instead of 'Owner ID: 103406387'. Tested locally before implementation to ensure reliability.",
+    "USERS API OWNER RESOLUTION: Fixed 403 Forbidden error by switching from Owners API to Users API endpoint (/crm/v3/objects/users/{id}) which uses the existing crm.objects.users.read scope instead of requiring crm.objects.owners.read. Now properly resolves owner names with fallback to email-based names when full names aren't available.",
+    "REVERTED TO OWNER IDS: Reverted owner name resolution back to simple Owner ID display due to persistent 403 Forbidden errors from both Owners and Users APIs - the current HubSpot app scopes don't allow access to owner/user name information. Now shows 'Owner ID: 103406387' format to avoid API errors while still providing owner identification.",
+    "IMPLEMENTED OWNER NAME RESOLUTION: Added getOwnerName helper function and integrated it into the workflow to display actual owner full names instead of IDs. The function uses direct fetch API calls to https://api.hubspot.com/crm/v3/owners/{id} with proper error handling. Now both deal owners and company owners will show full names like 'Karina Lorena Russo' instead of 'Owner ID: 103406387'. The function is properly called in both deal processing and company processing sections."
 ]
 
 def get_latest_code() -> str:

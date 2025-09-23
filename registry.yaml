@@ -2515,8 +2515,8 @@
   path: examples/codex/codex-cicd.ipynb
   date: 2025-09-30
   authors:
-    - alwell-kevin
     - himadri518
+    -  alwell-kevin
   tags:
     - codex
 

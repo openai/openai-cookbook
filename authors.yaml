@@ -3,6 +3,11 @@
 # You can optionally customize how your information shows up cookbook.openai.com over here.
 # If your information is not present here, it will be pulled from your GitHub profile.
 
+daveleo-openai:
+  name: "Dave Leo"
+  website: "https://www.linkedin.com/in/davidanthonyleo/"
+  avatar: "https://media.licdn.com/dms/image/v2/C5603AQF2Kg-D7XJKNw/profile-displayphoto-shrink_800_800/profile-displayphoto-shrink_800_800/0/1612654752234?e=1761782400&v=beta&t=RkO9jCbJrY6Ox9YRbMA6HAAZhxfYJV1OsZeIT3YatBM"
+
 jonlim-openai:
   name: "Jonathan Lim"
   website: "https://www.linkedin.com/in/jonlmr"
@@ -57,6 +62,16 @@ theophile-oai:
   name: "Theophile Sautory"
   website: "https://www.linkedin.com/in/theophilesautory"
   avatar: "https://avatars.githubusercontent.com/u/206768658?v=4"
+
+bfioca-openai:
+  name: "Brian Fioca"
+  website: "https://www.linkedin.com/in/brian-fioca/"
+  avatar: "https://avatars.githubusercontent.com/u/206814564?v=4"
+
+carter-oai:
+  name: "Carter Mcclellan"
+  website: "https://www.linkedin.com/in/carter-mcclellan/"
+  avatar: "https://avatars.githubusercontent.com/u/219906258?v=4"
 
 robert-tinn:
   name: "Robert Tinn"

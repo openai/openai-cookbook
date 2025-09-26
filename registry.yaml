@@ -4,6 +4,15 @@
 # should build pages for, and indicates metadata such as tags, creation date and
 # authors for each page.
 
+- title: GPT-5-Codex Prompting Guide
+  path: examples/gpt-5-codex_prompting_guide.ipynb
+  date: 2025-09-23
+  authors:
+    - daveleo-openai
+  tags:
+    - gpt-5
+    - codex
+
 - title: GPT-5 Troubleshooting Guide
   path: examples/gpt-5/gpt-5_troubleshooting_guide.ipynb
   date: 2025-09-17
@@ -2520,3 +2529,17 @@
     - katiagg
   tags:
     - images
+
+
+- title: Codex CLI to automatically fix CI failures
+  path: examples/codex/codex-cicd.ipynb
+  date: 2025-09-30
+  authors:
+    - himadri518
+    - alwell-kevin
+  tags:
+    - codex
+
+
+
+    

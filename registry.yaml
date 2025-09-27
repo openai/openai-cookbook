@@ -26,7 +26,7 @@
     - mcp
 
 - title: GPT-5-Codex Prompting Guide
-  path: examples/gpt-5-codex_prompting_guide.ipynb
+  path: examples/prompting/gpt-5-codex_prompting_guide.ipynb
   date: 2025-09-23
   authors:
     - daveleo-openai
@@ -63,7 +63,7 @@
     - codex
 
 - title: Realtime Prompting Guide
-  path: examples/Realtime_prompting_guide.ipynb
+  path: examples/prompting/Realtime_prompting_guide.ipynb
   date: 2025-08-28
   authors:
     - minh-hoque
@@ -105,7 +105,7 @@
     - gpt-oss-local
 
 - title: GPT-5 Prompt Migration and Improvement Using the New Optimizer
-  path: examples/gpt-5/prompt-optimization-cookbook.ipynb
+  path: examples/prompting/prompt-optimization-cookbook.ipynb
   date: 2025-08-07
   authors:
     - rajpathak-openai
@@ -117,7 +117,7 @@
     - prompt-optimization
 
 - title: GPT-5 prompting guide
-  path: examples/gpt-5/gpt-5_prompting_guide.ipynb
+  path: examples/prompting/gpt-5_prompting_guide.ipynb
   date: 2025-08-07
   authors:
     - anoop-openai
@@ -270,7 +270,7 @@
     - audio
 
 - title: Optimize Prompts
-  path: examples/Optimize_Prompts.ipynb
+  path: examples/prompting/Optimize_Prompts.ipynb
   date: 2025-07-14
   authors:
     - corwin
@@ -292,7 +292,7 @@
     - automation
 
 - title: Prompt Migration Guide
-  path: examples/Prompt_migration_guide.ipynb
+  path: examples/prompting/Prompt_migration_guide.ipynb
   date: 2025-06-26
   authors:
     - minh-hoque
@@ -363,7 +363,7 @@
     - mutli-agent-collaboration
 
 - title: o3/o4-mini Function Calling Guide
-  path: examples/o-series/o3o4-mini_prompting_guide.ipynb
+  path: examples/prompting/o3o4-mini_prompting_guide.ipynb
   date: 2025-05-26
   authors:
     - billchen-openai
@@ -817,7 +817,7 @@
     - embeddings
 
 - title: Unit test writing using a multi-step prompt
-  path: examples/Unit_test_writing_using_a_multi-step_prompt.ipynb
+  path: examples/prompting/Unit_test_writing_using_a_multi-step_prompt.ipynb
   date: 2022-11-15
   authors:
     - ted-at-openai
@@ -826,7 +826,7 @@
 
 - title: Unit test writing using a multi-step prompt with legacy Completions
   path: >-
-    examples/Unit_test_writing_using_a_multi-step_prompt_with_older_completions_API.ipynb
+    examples/prompting/Unit_test_writing_using_a_multi-step_prompt_with_older_completions_API.ipynb
   date: 2023-05-19
   authors:
     - ted-at-openai
@@ -896,7 +896,7 @@
   archived: true
 
 - title: Whisper prompting guide
-  path: examples/Whisper_prompting_guide.ipynb
+  path: examples/prompting/Whisper_prompting_guide.ipynb
   date: 2023-06-27
   authors:
     - prestontuggle
@@ -2174,7 +2174,7 @@
     - completions
 
 - title: Prompt Caching 101
-  path: examples/Prompt_Caching101.ipynb
+  path: examples/prompting/Prompt_Caching101.ipynb
   date: 2024-10-01
   authors:
     - charuj
@@ -2215,7 +2215,7 @@
     - audio
 
 - title: Enhance your prompts with meta prompting
-  path: examples/Enhance_your_prompts_with_meta_prompting.ipynb
+  path: examples/prompting/Enhance_your_prompts_with_meta_prompting.ipynb
   date: 2024-10-23
   authors:
     - teomusatoiu
@@ -2398,7 +2398,7 @@
     - chatgpt-productivity
 
 - title: GPT-4.1 Prompting Guide
-  path: examples/gpt4-1_prompting_guide.ipynb
+  path: examples/prompting/gpt4-1_prompting_guide.ipynb
   date: 2025-04-14
   authors:
     - nm-openai

@@ -11,7 +11,7 @@ Use a virtual environment to isolate dependencies:
 - `python .github/scripts/check_notebooks.py` to validate notebook structure before pushing
 
 ## Coding Style & Naming Conventions
-Write Python to PEP 8 with four-space indentation, descriptive variable names, and concise docstrings that explain API usage choices. Name new notebooks with lowercase, dash-or-underscore-separated phrases that match their directory—for example `examples/gpt-5/prompt-optimization-cookbook.ipynb`. Keep markdown cells focused and prefer numbered steps for multi-part workflows. Store secrets in environment variables such as `OPENAI_API_KEY`; never hard-code keys inside notebooks.
+Write Python to PEP 8 with four-space indentation, descriptive variable names, and concise docstrings that explain API usage choices. Name new notebooks with lowercase, dash-or-underscore-separated phrases that match their directory—for example `examples/prompting/prompt-optimization-cookbook.ipynb`. Keep markdown cells focused and prefer numbered steps for multi-part workflows. Store secrets in environment variables such as `OPENAI_API_KEY`; never hard-code keys inside notebooks.
 
 ## Testing Guidelines
 Execute notebooks top-to-bottom after installing dependencies and clear lingering execution counts before committing. For Python modules or utilities, include self-check cells or lightweight `pytest` snippets and show how to run them (for example, `pytest examples/object_oriented_agentic_approach/tests`). When contributions depend on external services, mock responses or gate the cells behind clearly labeled opt-in flags.

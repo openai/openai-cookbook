@@ -2,10 +2,21 @@
 
 # You can optionally customize how your information shows up cookbook.openai.com over here.
 # If your information is not present here, it will be pulled from your GitHub profile.
+
 b-per:
   name: "Benoit Perigaud"
   website: "https://www.linkedin.com/in/benoit-perigaud/"
   avatar: "https://avatars.githubusercontent.com/u/8754100?v=4"
+
+daveleo-openai:
+  name: "Dave Leo"
+  website: "https://www.linkedin.com/in/davidanthonyleo/"
+  avatar: "https://media.licdn.com/dms/image/v2/C5603AQF2Kg-D7XJKNw/profile-displayphoto-shrink_800_800/profile-displayphoto-shrink_800_800/0/1612654752234?e=1761782400&v=beta&t=RkO9jCbJrY6Ox9YRbMA6HAAZhxfYJV1OsZeIT3YatBM"
+
+jonlim-openai:
+  name: "Jonathan Lim"
+  website: "https://www.linkedin.com/in/jonlmr"
+  avatar: "https://avatars.githubusercontent.com/u/189068472?v=4"
 
 WJPBProjects:
   name: "Wulfie Bain"
@@ -37,6 +48,11 @@ rajpathak-openai:
   website: "https://www.linkedin.com/in/rajpathakopenai/"
   avatar: "https://avatars.githubusercontent.com/u/208723614?s=400&u=c852eed3be082f7fbd402b5a45e9b89a0bfed1b8&v=4"
 
+emreokcular:
+  name: "Emre Okcular"
+  website: "https://www.linkedin.com/in/emreokcular/"
+  avatar: "https://avatars.githubusercontent.com/u/26163154?v=4"
+
 chelseahu-openai:
   name: "Chelsea Hu"
   website: "https://www.linkedin.com/in/chelsea-tsaiszuhu/"
@@ -51,6 +67,16 @@ theophile-oai:
   name: "Theophile Sautory"
   website: "https://www.linkedin.com/in/theophilesautory"
   avatar: "https://avatars.githubusercontent.com/u/206768658?v=4"
+
+bfioca-openai:
+  name: "Brian Fioca"
+  website: "https://www.linkedin.com/in/brian-fioca/"
+  avatar: "https://avatars.githubusercontent.com/u/206814564?v=4"
+
+carter-oai:
+  name: "Carter Mcclellan"
+  website: "https://www.linkedin.com/in/carter-mcclellan/"
+  avatar: "https://avatars.githubusercontent.com/u/219906258?v=4"
 
 robert-tinn:
   name: "Robert Tinn"
@@ -471,3 +497,11 @@ heejingithub:
   name: "Heejin Cho"
   website: "https://www.linkedin.com/in/heejc/"
   avatar: "https://avatars.githubusercontent.com/u/169293861"
+
+
+himadri: 
+  name: "Himadri Acharya"
+  website: "https://www.linkedin.com/in/himadri-acharya-086ba261/"
+  avatar: "https://avatars.githubusercontent.com/u/14100684?v=4"
+
+  

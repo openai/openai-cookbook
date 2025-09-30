@@ -253,7 +253,7 @@ async def process_api_requests_from_file(
                     )
                     await asyncio.sleep(remaining_seconds_to_pause)
                     # ^e.g., if pause is 15 seconds and final limit was hit 5 seconds ago
-                    logging.warn(
+                    logging.warning(
                         f"Pausing to cool down until {time.ctime(status_tracker.time_of_last_rate_limit_error + seconds_to_pause_after_rate_limit_error)}"
                     )
 

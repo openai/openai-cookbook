@@ -1,0 +1,9 @@
+===== SUMMARY =====
+Total evaluated runs: 30
+Compilation/Execution Success: 30/30 (100.00%)
+Violations (static scan): 0
+Average Execution Time (successful): 7.906391 s
+Average Peak Memory (successful): 3626.26 KB
+Exact matches: 30/30
+Sorted correctly: 30/30
+CSV written to: results_topk_baseline/run_results_topk_baseline.csv

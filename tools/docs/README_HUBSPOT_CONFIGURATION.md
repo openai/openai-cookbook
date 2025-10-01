@@ -4,7 +4,7 @@ This document serves as the official reference for Colppy's HubSpot configuratio
 
 ## 🔍 LIVE CRM FIELD VERIFICATION STATUS
 **✅ Last Verified**: January 9, 2025 via Live HubSpot API  
-**📊 Verification Coverage**: Products, Line Items, Companies, Deals, Contacts, UTM Marketing Fields  
+**📊 Verification Coverage**: Products, Line Items, Companies, Deals, Contacts, UTM Marketing Fields, Teams & Owners API  
 **📝 Documentation Status**: All field mappings verified through direct API calls
 
 **What Was Verified:**
@@ -16,12 +16,203 @@ This document serves as the official reference for Colppy's HubSpot configuratio
 - ✅ Contact fields for key events and lifecycle tracking
 - ✅ **UTM Marketing Attribution Fields** (8 fields verified: utm_campaign, utm_source, utm_medium, utm_term, utm_content, initial_utm_campaign, initial_utm_source, initial_utm_medium)
 - ✅ **Mixpanel Webhook Integration** (uses existing UTM fields only, no custom fields required)
+- ✅ **Teams & Owners API Mapping** (Owners API vs Users API, team detection, collaborator mapping)
+- ✅ **Deal Collaborators Property** (`hs_all_collaborator_owner_ids` verified for team detection)
 
 ## CRITICAL INSTRUCTION: HubSpot Field Clearing Methods
 
 **⚠️ ALWAYS use empty string (`""`) to clear HubSpot fields, NOT `null`**
 
 When clearing HubSpot properties via API, you MUST use the correct method:
+
+## 🔧 CRITICAL INSTRUCTION: HubSpot Teams and Owners API Mapping
+
+**⚠️ ALWAYS use Owners API (`/crm/v3/owners/{ownerId}`) for team information, NOT Users API**
+
+### ✅ CORRECT Method - Owners API
+```javascript
+// ✅ CORRECT: Use Owners API for team information
+const response = await fetch(`https://api.hubspot.com/crm/v3/owners/${ownerId}`, {
+  headers: {
+    'Authorization': `Bearer ${process.env.ColppyCRMAutomations}`,
+    'Content-Type': 'application/json'
+  }
+});
+
+if (response.ok) {
+  const data = await response.json();
+  const teams = data.teams || [];
+  
+  // Check teams array for specific team
+  let isAccountantChannel = false;
+  for (const team of teams) {
+    if (team.name === 'Accountant Channel') {
+      isAccountantChannel = true;
+      break;
+    }
+  }
+}
+```
+
+### ❌ INCORRECT Method - Users API
+```javascript
+// ❌ INCORRECT: Users API doesn't provide team information reliably
+const response = await fetch(`https://api.hubspot.com/settings/v3/users/${ownerId}`, {
+  headers: {
+    'Authorization': `Bearer ${process.env.ColppyCRMAutomations}`,
+    'Content-Type': 'application/json'
+  }
+});
+// This often returns 404 or missing team data
+```
+
+### Why This Matters:
+- **Owners API (`/crm/v3/owners/{ownerId}`)**: Provides complete team information in `teams` array
+- **Users API (`/settings/v3/users/{userId}`)**: Often returns 404 or missing team data
+- **Team Data Structure**: Teams are provided as an array with `name` and `primary` properties
+- **API Reliability**: Owners API is more reliable for team assignments and user details
+
+### Team Data Structure:
+```json
+{
+  "id": "103406387",
+  "email": "karina.russo@colppy.com",
+  "firstName": "Karina Lorena",
+  "lastName": "Russo",
+  "teams": [
+    {
+      "id": "57999915",
+      "name": "Accountant Channel",
+      "primary": true
+    }
+  ]
+}
+```
+
+### Best Practices:
+1. **Always use Owners API** for team information
+2. **Check teams array** for team assignments
+3. **Handle multiple teams** by iterating through the array
+4. **Use team.name** for team identification
+5. **Check team.primary** for primary team assignment
+
+## 🔧 CRITICAL INSTRUCTION: HubSpot Deal Collaborators Mapping
+
+**⚠️ ALWAYS use `hs_all_collaborator_owner_ids` property for deal collaborators, NOT contact associations**
+
+### ✅ CORRECT Method - Deal Property
+```javascript
+// ✅ CORRECT: Use deal property for collaborators
+const deal = await client.crm.deals.basicApi.getById(dealId, [
+  'dealname',
+  'hubspot_owner_id',
+  'hs_all_collaborator_owner_ids'  // This contains all collaborator IDs
+]);
+
+const collaboratorIdsString = deal.properties.hs_all_collaborator_owner_ids;
+if (collaboratorIdsString) {
+  const collaboratorIds = collaboratorIdsString.split(';').filter(id => id.trim() !== '');
+  
+  for (const ownerId of collaboratorIds) {
+    // Use Owners API to get team information
+    const ownerDetails = await getOwnerDetails(ownerId);
+  }
+}
+```
+
+### ❌ INCORRECT Method - Contact Associations
+```javascript
+// ❌ INCORRECT: Don't use contact associations for collaborators
+const associations = await client.crm.deals.associationsApi.getAll(dealId, 'contacts');
+// This doesn't provide owner/team information
+```
+
+### Why This Matters:
+- **`hs_all_collaborator_owner_ids`**: Contains semicolon-separated owner IDs of all collaborators
+- **Contact Associations**: Don't provide owner/team information needed for team detection
+- **Owner IDs**: Can be used directly with Owners API to get team information
+- **Data Completeness**: Deal property provides all collaborator information in one call
+
+### Collaborator Data Structure:
+```javascript
+// Deal property contains: "103406387;79369461"
+const collaboratorIds = "103406387;79369461".split(';');
+// Results in: ["103406387", "79369461"]
+
+// Each ID can be used with Owners API to get team information
+for (const ownerId of collaboratorIds) {
+  const ownerDetails = await getOwnerDetails(ownerId);
+  // ownerDetails.teams contains team information
+}
+```
+
+### Best Practices for Collaborators:
+1. **Always use `hs_all_collaborator_owner_ids`** for deal collaborators
+2. **Parse semicolon-separated string** to get individual owner IDs
+3. **Use Owners API** for each collaborator to get team information
+4. **Handle empty/null values** gracefully
+5. **Log collaborator processing** for debugging
+
+## 🔧 CRITICAL INSTRUCTION: HubSpot API Troubleshooting
+
+**⚠️ Common API Issues and Solutions for Teams and Owners**
+
+### Issue 1: Users API Returns 404
+**Problem**: `/settings/v3/users/{userId}` returns 404 for valid users
+**Solution**: Use Owners API instead
+```javascript
+// ❌ Problem: Users API 404
+const userResponse = await fetch(`https://api.hubspot.com/settings/v3/users/${userId}`);
+
+// ✅ Solution: Use Owners API
+const ownerResponse = await fetch(`https://api.hubspot.com/crm/v3/owners/${userId}`);
+```
+
+### Issue 2: Teams API Returns 404
+**Problem**: `/settings/v3/teams/{teamId}` returns 404
+**Solution**: Teams information is available in Owners API response
+```javascript
+// ❌ Problem: Teams API 404
+const teamResponse = await fetch(`https://api.hubspot.com/settings/v3/teams/${teamId}`);
+
+// ✅ Solution: Teams are in Owners API response
+const ownerResponse = await fetch(`https://api.hubspot.com/crm/v3/owners/${userId}`);
+const ownerData = await ownerResponse.json();
+const teams = ownerData.teams; // Teams array with name and primary properties
+```
+
+### Issue 3: Team Information Shows as "Unknown"
+**Problem**: Team detection returns "Unknown" for valid team members
+**Solution**: Check the correct team name and use proper comparison
+```javascript
+// ✅ Correct team detection
+for (const team of teams) {
+  if (team.name === 'Accountant Channel' || team.name === 'accountant_channel') {
+    isAccountantChannel = true;
+    break;
+  }
+}
+```
+
+### Issue 4: Collaborators Not Detected
+**Problem**: Deal shows 0 collaborators when users are assigned
+**Solution**: Use the correct deal property
+```javascript
+// ❌ Problem: Using contact associations
+const associations = await client.crm.deals.associationsApi.getAll(dealId, 'contacts');
+
+// ✅ Solution: Use deal property
+const deal = await client.crm.deals.basicApi.getById(dealId, ['hs_all_collaborator_owner_ids']);
+const collaboratorIds = deal.properties.hs_all_collaborator_owner_ids;
+```
+
+### Debugging Checklist:
+1. **Check API endpoint**: Use Owners API, not Users API
+2. **Verify team names**: Check exact team name in HubSpot
+3. **Check deal properties**: Use `hs_all_collaborator_owner_ids`
+4. **Log API responses**: Always log raw API responses for debugging
+5. **Handle errors gracefully**: Implement fallback mechanisms
+6. **Test with known data**: Use verified user IDs and team names
 
 ### ✅ CORRECT Method - Empty String
 ```javascript
@@ -69,6 +260,78 @@ console.log('Field value after clearing:', updatedCompany.properties.first_deal_
 ```
 
 This prevents silent failures where logs show "success" but fields retain their values.
+
+---
+
+## 🔧 HUBSPOT CUSTOM CODE WORKFLOWS
+
+This section documents the custom code workflows implemented in HubSpot for automated data processing and field updates.
+
+### 📊 **First Deal Won Date Calculation Workflow**
+
+**File**: `hubspot_custom_code_latest.py`  
+**Purpose**: Calculates and updates `first_deal_closed_won_date` for companies based on their primary won deals  
+**Trigger**: Company object updates  
+**Version**: 1.12.44 (Last Updated: 2025-09-15T20:00:00Z)
+
+**Key Features**:
+- ✅ Automatic calculation of first won deal date from primary deals
+- ✅ Churn detection and `company_churn_date` field updates
+- ✅ Auto-fix for missing PRIMARY associations
+- ✅ Comprehensive Slack notifications for edge cases
+- ✅ Support for trial companies and accountant companies
+- ✅ Detailed logging and error handling
+
+**Business Logic**:
+- Only processes companies with PRIMARY deal associations
+- Calculates earliest won date from `closedwon` and `34692158` (recovery) stages
+- Handles churn detection when all primary deals are lost/churned
+- Auto-fixes single company deals missing PRIMARY associations
+
+### 🎯 **Accountant Channel Deal Workflow**
+
+**File**: `hubspot_accountant_channel_deal_workflow.py`  
+**Purpose**: Automatically detects Accountant Channel team involvement in deals and updates `accountant_channel_involucrado_en_la_venta` field  
+**Trigger**: Deal object updates  
+**Version**: 1.0.0 (Last Updated: 2025-01-15T20:00:00Z)
+
+**Key Features**:
+- ✅ Automatic detection of Accountant Channel team involvement
+- ✅ Checks both deal owners and collaborators for team membership
+- ✅ Updates `accountant_channel_involucrado_en_la_venta` field with `true`/`false`
+- ✅ Comprehensive Slack notifications with deal details
+- ✅ Detailed logging for debugging and monitoring
+- ✅ Error handling with Slack error notifications
+
+**Business Logic**:
+- **Deal Owner Check**: If deal owner belongs to "Accountant Channel" team → set field to `true`
+- **Collaborator Check**: If any collaborator's owner belongs to "Accountant Channel" team → set field to `true`
+- **Field Values**: `true` = Accountant Channel involvement, `false` = No involvement
+- **Update Logic**: Only updates field when value changes to prevent unnecessary API calls
+
+**Workflow Steps**:
+1. **Get Deal Details**: Retrieve deal name, owner, current field value, amount, stage
+2. **Check Deal Owner**: Verify if deal owner belongs to "Accountant Channel" team
+3. **Check Collaborators**: Get all deal collaborators and check their owners' teams
+4. **Determine Involvement**: Set field to `true` if owner OR any collaborator's owner is Accountant Channel
+5. **Update Field**: Update `accountant_channel_involucrado_en_la_venta` if value changed
+6. **Send Notification**: Send Slack notification with update details
+
+**Slack Notification Types**:
+- **Success**: Field updated with before/after values and involvement details
+- **Info**: Field already correct, no update needed
+- **Error**: Workflow failure with error details
+
+**Example Use Cases**:
+- **Deal Owner Example**: "Fundacion para la igualdad de oportunidades" deal owned by Accountant Channel team member
+- **Collaborator Example**: "$ 366.000 Fideicomisos inmobiliarios" deal with Accountant Channel team member as collaborator
+- **Revenue Attribution**: Track which deals involve Accountant Channel team for performance analysis
+- **Team Collaboration**: Monitor cross-team collaboration on deals
+
+**Integration Requirements**:
+- HubSpot API access with `crm.objects.deals.read` and `crm.objects.deals.write` scopes
+- Slack webhook URL for notifications
+- Environment variable `ColppyCRMAutomations` for API authentication
 
 ---
 
@@ -192,6 +455,16 @@ This section documents the exact field mappings for each HubSpot object, verifie
 | **Cantidad de cuentas contador asociadas** | `tiene_cuenta_contador` | Number | ✅ **LIVE VERIFIED** | Count of associated accountants |
 | **_colppy_es_referido_del_contador** | `colppy_es_referido_del_contador` | Select | ✅ **LIVE VERIFIED** | Accountant referral tracking |
 | **_colppy_quien_lo_refirió** | `colppy_quien_lo_refirio` | String | ✅ **LIVE VERIFIED** | Referrer identification |
+| **Accountant Channel involucrado en la venta** | `accountant_channel_involucrado_en_la_venta` | Single Checkbox | ✅ **NEW FIELD** | **🎯 ACCOUNTANT CHANNEL TEAM INVOLVEMENT TRACKING** |
+
+**Accountant Channel Field Details:**
+- **Field Type**: Single Checkbox with "Yes" (internal: `true`) and "No" (internal: `false`) options
+- **Purpose**: Automatically tracks when deals involve Accountant Channel team members
+- **Workflow Integration**: Updated by custom code workflow when deal owners or collaborators belong to "Accountant Channel" team
+- **Business Logic**: 
+  - `true` = Deal owner OR any collaborator's owner belongs to "Accountant Channel" team
+  - `false` = No Accountant Channel team members involved in the deal
+- **Use Cases**: Revenue attribution, channel performance tracking, team collaboration analysis
 
 ---
 
@@ -277,12 +550,153 @@ This section documents the exact field mappings for each HubSpot object, verifie
 | **UI Association Label** | **ID** | **Category** | **Purpose** |
 |-------------------------|--------|--------------|-------------|
 | Primary Contact | `4` | HUBSPOT_DEFINED | Default relationship |
-| Contacto Inicial | `14` | USER_DEFINED | Deal originator |
+| Contacto Inicial que da el Alta del Negocio - Pendiente asignar rol | `14` | USER_DEFINED | Initial contact creating the deal - pending role assignment |
 | Decide | `5` | USER_DEFINED | Decision maker |
 | **Influenciador Contador** | **`54`** | **USER_DEFINED** | **🎯 ACCOUNTANT INFLUENCE** |
 | Refiere | `4` | USER_DEFINED | Referrer contact |
 
 ---
+
+## HubSpot List Access with MCP Tools
+
+### Key Learning: List Access Limitations
+
+**❌ What Doesn't Work:**
+- **Direct list ID search**: `mcp_hubspot_hubspot-search-objects` with `query: "list:2216"` returns empty results
+- **Filter-based search**: Complex filter groups don't reliably return list members
+- **Owner-based assumptions**: Assuming list membership based on owner criteria
+
+**✅ What Works:**
+- **Company name search**: Search for specific company names from the list
+- **Verification approach**: Confirm each company exists and retrieve details
+- **Batch operations**: Use `mcp_hubspot_hubspot-batch-read-objects` for multiple companies
+- **Direct REST API**: HubSpot provides `/crm/v3/lists` and related endpoints for programmatic access
+
+### **Direct REST API Approach (Recommended)**
+
+Based on testing with a HubSpot Private App API key, the following endpoints work:
+
+**✅ Available Endpoints:**
+- `GET /crm/v3/lists` - Lists all available lists
+- `GET /crm/v3/lists/{list_id}` - Get specific list details
+- `GET /crm/v4/objects/lists/{list_id}/associations/contacts` - Get contact associations
+- `GET /crm/v4/objects/lists/{list_id}/associations/companies` - Get company associations  
+- `GET /contacts/v1/lists/{list_id}/contacts/all` - Get all contacts in list
+
+**❌ Non-Working Endpoints:**
+- `GET /crm/v3/lists/{list_id}/contacts` - Returns 404
+- `GET /crm/v3/lists/{list_id}/companies` - Returns 404
+- `GET /contacts/v1/lists/{list_id}/members` - Returns 404
+
+**🔧 Working Implementation Example:**
+
+```python
+import requests
+import os
+
+api_key = os.environ.get('HUBSPOT_API_KEY')
+headers = {'Authorization': f'Bearer {api_key}'}
+
+# 1. Get list details (works)
+response = requests.get(f'https://api.hubapi.com/crm/v3/lists/2216', headers=headers)
+list_details = response.json()
+
+# 2. Search for companies by name (most reliable method)
+search_payload = {
+    'query': 'Contadora Fernanda Carini',
+    'limit': 5,
+    'properties': ['name', 'type', 'cuit', 'hubspot_owner_id'],
+    'sorts': [{'propertyName': 'name', 'direction': 'ASCENDING'}]
+}
+response = requests.post('https://api.hubapi.com/crm/v3/objects/companies/search', 
+                        headers=headers, json=search_payload)
+companies = response.json()['results']
+
+# 3. Get contacts in list (legacy endpoint - works)
+response = requests.get(f'https://api.hubapi.com/contacts/v1/lists/2216/contacts/all', 
+                       headers=headers)
+contacts = response.json()['contacts']
+
+# 4. Get company-contact associations
+company_id = "9018787369"  # Example company ID
+response = requests.get(f'https://api.hubapi.com/crm/v4/objects/companies/{company_id}/associations/contacts', 
+                       headers=headers)
+contact_associations = response.json()['results']
+```
+
+**🚀 Complete Working Implementation:**
+
+A full working implementation is available in `/tools/hubspot_lists_api_working.py` that includes:
+
+- ✅ Automated company discovery by name search
+- ✅ Contact association analysis  
+- ✅ Contactability pattern analysis
+- ✅ CUIT validation and missing data detection
+- ✅ Professional vs personal email domain identification
+- ✅ Phone number completeness checking
+
+**Test Results from List 2216:**
+- Found 10 companies successfully via name search
+- All companies show as "Contador Robado" type
+- 90% missing CUIT (critical data gap)
+- 52 total contacts across all companies
+- Owners: Sofia Celentano (ID: 80563180) and Tatiana Amaya (ID: 81313123)
+
+### Step-by-Step Process
+
+#### 1. Identify List Members
+```bash
+# From HubSpot UI, identify company names in the list
+# Example: "Lista Prioridad 1 Sofi- Empresas Tipo contador con Actividad anterior a 60 días con DEALS GANADOS"
+# Contains companies like: "Contadora Fernanda Carini", "Chicolino de Luca", etc.
+```
+
+#### 2. Search by Company Name
+```python
+# Search for each company by name
+response = mcp_hubspot_hubspot-search-objects(
+    objectType="companies",
+    query="Contadora Fernanda Carini",
+    limit=10,
+    properties=["name", "type", "hubspot_owner_id", "cuit", "lifecyclestage"]
+)
+```
+
+#### 3. Verify and Batch Process
+```python
+# Get company details and associated contacts
+company_ids = [company['id'] for company in search_results]
+
+# Batch read companies
+companies = mcp_hubspot_hubspot-batch-read-objects(
+    objectType="companies",
+    inputs=[{"id": company_id} for company_id in company_ids],
+    properties=["name", "type", "hubspot_owner_id", "cuit", "lifecyclestage", "createdate", "lastmodifieddate"]
+)
+
+# Get associated contacts for each company
+for company in companies:
+    contacts = mcp_hubspot_hubspot-list-associations(
+        objectType="companies",
+        objectId=company['id'],
+        toObjectType="contacts"
+    )
+```
+
+### Best Practices
+
+1. **Always verify list membership** by searching for specific company names
+2. **Use batch operations** for efficiency when processing multiple companies
+3. **Document the search process** for future reference
+4. **Handle pagination** when dealing with large lists
+5. **Cross-reference with HubSpot UI** to confirm accuracy
+
+### Limitations
+
+- **No direct list API**: HubSpot MCP tools don't provide direct access to list membership
+- **Manual verification required**: Must search by company name rather than list ID
+- **Owner-based filtering**: Can help narrow search but doesn't guarantee list membership
+- **List criteria complexity**: Complex list filters may not be replicable via API search
 
 ## API Connection Methods
 
@@ -903,7 +1317,7 @@ The following values are used in the `lead_source` field to track the origin of 
 | Relationship Type | Technical ID | Description |
 |-------------------|-------------|-------------|
 | Primary Contact | 4 (HUBSPOT_DEFINED) | Default HubSpot relationship |
-| Contacto Inicial | 14 (USER_DEFINED) | Initial contact creating the deal |
+| Contacto Inicial que da el Alta del Negocio - Pendiente asignar rol | 14 (USER_DEFINED) | Initial contact creating the deal - pending role assignment |
 | Decide | 5 (USER_DEFINED) | Decision maker |
 | Refiere | 4 (USER_DEFINED) | Referrer |
 | Influenciador | 48 (USER_DEFINED) | Influencer in the decision process |
@@ -1137,6 +1551,7 @@ La estrategia **"Contador Robado"** es un método inteligente de desarrollo de c
 
 | **Etiqueta** | **ID Técnico** | **Significado** | **Uso** |
 |--------------|-------------|-----------------|---------|
+| "Contacto Inicial que da el Alta del Negocio - Pendiente asignar rol" | `14 (USER_DEFINED)` | Contacto que inicia el proceso de alta del negocio | **NUEVO**: Identifica contacto inicial para productos adicionales |
 | "Influenciador Contador" | `54 (USER_DEFINED)` | Contador que influye en la decisión | **ESPECÍFICO**: Influencia contable |
 | "Refiere" | `4 (USER_DEFINED)` | Contacto que refiere el negocio | Rastreo de referencias |
 
@@ -1684,8 +2099,330 @@ Association Type IDs: [8, 341]
 |---------|-------|-------------|-------------|-------------|
 | 5 | PRIMARY | Primary company association | ✅ Full support | Company that receives revenue attribution |
 | 8 | Estudio Contable / Asesor / Consultor Externo del negocio | Accountant firm label | ❌ Cannot create via API | Accountant companies (preserve if exists) |
-| 11 | Deal with Primary Company | SMB client label when accountant is primary | ✅ Full support | Non-accountant companies when not primary |
-| 341 | Default | Standard association | ✅ Full support | All associated companies |
+| 11 | Compañía con Múltiples Negocios | Company with multiple business relationships | ❌ Cannot create via API | Multi-entity customers (preserve if exists) |
+| 39 | Compañía Integrador del Negocio | Integration partner company | ❌ Cannot create via API | Integration partners (preserve if exists) |
+| 2 | Compañía que refiere al negocio | Company that referred the deal | ❌ Cannot create via API | Referral tracking (preserve if exists) |
+| 341 | Default/Standard | Standard association (no label) | ✅ Full support | All associated companies - **RECOMMENDED FOR ADDITIONAL PRODUCTS** |
+
+### 🔧 Complete Deal-Company Association Types (Live Verified)
+
+**✅ VERIFIED VIA LIVE HUBSPOT API - January 27, 2025**
+
+| Type ID | Category | Label | Description | API Support | Usage |
+|---------|----------|-------|-------------|-------------|-------|
+| **5** | **HUBSPOT_DEFINED** | **Primary** | Primary company association | ✅ **Full support** | **Company that receives revenue attribution** |
+| **6** | **HUBSPOT_DEFINED** | **Deal with Primary Company** | Company-side PRIMARY label | ✅ **Full support** | **Bidirectional PRIMARY association** |
+| **341** | **HUBSPOT_DEFINED** | **Default/Standard** | Standard association (no label) | ✅ **Full support** | **Recommended for additional products** |
+| **342** | **HUBSPOT_DEFINED** | **Standard (Alternative)** | Alternative standard association | ✅ **Full support** | **Alternative standard association** |
+| **39** | **USER_DEFINED** | **Compañía Integrador del Negocio** | Integration partner company | ❌ **Cannot create via API** | Integration partners (preserve if exists) |
+| **8** | **USER_DEFINED** | **Estudio Contable / Asesor / Consultor Externo del negocio** | Accountant firm label | ❌ **Cannot create via API** | Accountant companies (preserve if exists) |
+| **2** | **USER_DEFINED** | **Compañía que refiere al negocio** | Company that referred the deal | ❌ **Cannot create via API** | Referral tracking (preserve if exists) |
+| **11** | **USER_DEFINED** | **Compañía con Múltiples Negocios** | Company with multiple business relationships | ❌ **Cannot create via API** | Multi-entity customers (preserve if exists) |
+
+### 🎯 Association Type Selection Guide
+
+**For Additional Product Deals:**
+- ✅ **RECOMMENDED**: Type ID **341** (Default/Standard) - Perfect for additional products for existing customers
+- ❌ **NOT RECOMMENDED**: Type ID **5** (Primary) - Would incorrectly indicate a new customer relationship
+
+**For New Customer Deals:**
+- ✅ **RECOMMENDED**: Type ID **5** (Primary) - Standard for new customer relationships
+
+**For Accountant Channel Deals:**
+- ✅ **PRESERVE**: Type ID **8** (Estudio Contable) - If already exists, preserve for accountant tracking
+- ✅ **COMBINE**: Type ID **5** + **8** - For accountant companies that should receive revenue attribution
+
+### ⚠️ API Limitations for Association Creation
+
+**✅ Can Create via API:**
+- Type ID **5** (Primary) - Full support
+- Type ID **341** (Default/Standard) - Full support
+
+**❌ Cannot Create via API (UI Only):**
+- Type ID **8** (Estudio Contable) - Must be created via HubSpot UI
+- Type ID **39** (Integrador) - Must be created via HubSpot UI  
+- Type ID **2** (Referrer) - Must be created via HubSpot UI
+- Type ID **11** (Múltiples Negocios) - Must be created via HubSpot UI
+
+**Best Practice:** Always preserve existing USER_DEFINED association types when making API changes.
+
+### 🔧 HubSpot Association Label Removal API Guide
+
+**✅ VERIFIED VIA LIVE TESTING - January 28, 2025**
+
+This section documents the correct API methods for removing association labels while preserving the underlying association relationship.
+
+#### 🎯 Key Concepts
+
+**Bidirectional Associations:**
+- HubSpot associations are **bidirectional** with different `typeId`s for each direction
+- **Deal → Company**: `typeId: 5` (PRIMARY) 
+- **Company → Deal**: `typeId: 6` (Deal with Primary Company)
+- Both directions must be handled separately for complete label removal
+
+**Label Removal vs Association Removal:**
+- **Label Removal**: Removes specific association type while preserving the relationship
+- **Association Removal**: Completely removes the relationship between objects
+- **V4 Batch Archive**: Recommended method for label removal
+- **V3 Direct DELETE**: Removes entire association (not recommended for label-only removal)
+
+#### ✅ V4 Batch Archive API (Recommended)
+
+**Endpoint**: `POST /crm/v4/associations/{fromObjectType}/{toObjectType}/batch/labels/archive`
+
+**Python Example:**
+```python
+import requests
+
+def remove_primary_labels_bidirectionally(deal_id, company_id, api_token):
+    """Remove PRIMARY labels from both deal and company sides"""
+    
+    # Step 1: Remove typeId 5 (PRIMARY) from Deal → Company direction
+    deal_to_company_url = "https://api.hubapi.com/crm/v4/associations/deals/companies/batch/labels/archive"
+    
+    deal_payload = {
+        "inputs": [{
+            "from": {"id": deal_id},
+            "to": {"id": company_id},
+            "types": [{
+                "associationCategory": "HUBSPOT_DEFINED",
+                "associationTypeId": 5  # PRIMARY
+            }]
+        }]
+    }
+    
+    headers = {
+        "Authorization": f"Bearer {api_token}",
+        "Content-Type": "application/json"
+    }
+    
+    # Remove from deal side
+    response1 = requests.post(deal_to_company_url, headers=headers, json=deal_payload)
+    print(f"Deal → Company removal: {response1.status_code}")
+    
+    # Step 2: Remove typeId 6 (Deal with Primary Company) from Company → Deal direction
+    company_to_deal_url = "https://api.hubapi.com/crm/v4/associations/companies/deals/batch/labels/archive"
+    
+    company_payload = {
+        "inputs": [{
+            "from": {"id": company_id},
+            "to": {"id": deal_id},
+            "types": [{
+                "associationCategory": "HUBSPOT_DEFINED",
+                "associationTypeId": 6  # Deal with Primary Company
+            }]
+        }]
+    }
+    
+    # Remove from company side
+    response2 = requests.post(company_to_deal_url, headers=headers, json=company_payload)
+    print(f"Company → Deal removal: {response2.status_code}")
+    
+    return response1.status_code == 204 and response2.status_code == 204
+```
+
+**JavaScript Example (HubSpot Custom Code):**
+```javascript
+// Remove PRIMARY labels bidirectionally
+async function removePrimaryLabels(dealId, companyId) {
+    const apiToken = process.env.ColppyCRMAutomations;
+    
+    // Step 1: Remove typeId 5 from Deal → Company
+    const dealToCompanyUrl = "https://api.hubapi.com/crm/v4/associations/deals/companies/batch/labels/archive";
+    
+    const dealPayload = {
+        inputs: [{
+            from: { id: dealId },
+            to: { id: companyId },
+            types: [{
+                associationCategory: "HUBSPOT_DEFINED",
+                associationTypeId: 5  // PRIMARY
+            }]
+        }]
+    };
+    
+    const dealResponse = await fetch(dealToCompanyUrl, {
+        method: 'POST',
+        headers: {
+            'Authorization': `Bearer ${apiToken}`,
+            'Content-Type': 'application/json'
+        },
+        body: JSON.stringify(dealPayload)
+    });
+    
+    console.log(`Deal → Company removal: ${dealResponse.status}`);
+    
+    // Step 2: Remove typeId 6 from Company → Deal
+    const companyToDealUrl = "https://api.hubapi.com/crm/v4/associations/companies/deals/batch/labels/archive";
+    
+    const companyPayload = {
+        inputs: [{
+            from: { id: companyId },
+            to: { id: dealId },
+            types: [{
+                associationCategory: "HUBSPOT_DEFINED",
+                associationTypeId: 6  // Deal with Primary Company
+            }]
+        }]
+    };
+    
+    const companyResponse = await fetch(companyToDealUrl, {
+        method: 'POST',
+        headers: {
+            'Authorization': `Bearer ${apiToken}`,
+            'Content-Type': 'application/json'
+        },
+        body: JSON.stringify(companyPayload)
+    });
+    
+    console.log(`Company → Deal removal: ${companyResponse.status}`);
+    
+    return dealResponse.status === 204 && companyResponse.status === 204;
+}
+```
+
+#### ✅ V4 Batch Create API (For Standard Associations)
+
+**Endpoint**: `POST /crm/v4/associations/{fromObjectType}/{toObjectType}/batch/create`
+
+**Python Example:**
+```python
+def create_standard_association(deal_id, company_id, api_token):
+    """Create STANDARD association (typeId 341) between deal and company"""
+    
+    url = "https://api.hubapi.com/crm/v4/associations/deals/companies/batch/create"
+    
+    payload = {
+        "inputs": [{
+            "from": {"id": deal_id},
+            "to": {"id": company_id},
+            "types": [{
+                "associationCategory": "HUBSPOT_DEFINED",
+                "associationTypeId": 341  # STANDARD
+            }]
+        }]
+    }
+    
+    headers = {
+        "Authorization": f"Bearer {api_token}",
+        "Content-Type": "application/json"
+    }
+    
+    response = requests.post(url, headers=headers, json=payload)
+    print(f"Standard association creation: {response.status_code}")
+    
+    return response.status_code == 201
+```
+
+#### ❌ V3 Direct DELETE (Not Recommended for Label Removal)
+
+**Warning**: V3 DELETE endpoints remove the **entire association**, not just specific labels.
+
+**Endpoint**: `DELETE /crm/v3/objects/{fromObjectType}/{fromObjectId}/associations/{toObjectType}/{toObjectId}/{associationTypeId}`
+
+**Why Not Recommended:**
+- Removes entire association relationship
+- Cannot preserve other association types
+- Requires recreation of association after label removal
+
+#### 🔍 Response Handling
+
+**V4 Batch Archive Responses:**
+- **204 No Content**: Success (no JSON body to parse)
+- **200 OK**: Success with response body
+- **400 Bad Request**: Invalid request parameters
+- **404 Not Found**: Association or objects not found
+
+**Python Response Handling:**
+```python
+def handle_archive_response(response):
+    """Handle V4 batch archive API responses"""
+    
+    if response.status_code == 204:
+        print("✅ Label removed successfully (204 No Content)")
+        return True
+    elif response.status_code == 200:
+        try:
+            result = response.json()
+            print(f"✅ Label removed successfully: {result}")
+            return True
+        except json.JSONDecodeError:
+            print("✅ Label removed successfully (non-JSON response)")
+            return True
+    else:
+        error_text = response.text
+        print(f"❌ Label removal failed: {response.status_code} - {error_text}")
+        return False
+```
+
+#### 🎯 Complete Workflow Example
+
+**Scenario**: Remove PRIMARY label and create STANDARD association
+
+```python
+def switch_to_standard_association(deal_id, company_id, api_token):
+    """Complete workflow: Remove PRIMARY, create STANDARD"""
+    
+    # Step 1: Remove PRIMARY labels bidirectionally
+    primary_removed = remove_primary_labels_bidirectionally(deal_id, company_id, api_token)
+    
+    if not primary_removed:
+        print("❌ Failed to remove PRIMARY labels")
+        return False
+    
+    # Step 2: Create STANDARD association
+    standard_created = create_standard_association(deal_id, company_id, api_token)
+    
+    if not standard_created:
+        print("❌ Failed to create STANDARD association")
+        return False
+    
+    print("✅ Successfully switched to STANDARD association")
+    return True
+```
+
+#### ⚠️ Common Pitfalls
+
+1. **Single Direction Removal**: Only removing `typeId: 5` without removing `typeId: 6`
+2. **Wrong Endpoint**: Using V3 DELETE instead of V4 batch archive
+3. **JSON Parsing Errors**: Attempting to parse 204 No Content responses
+4. **Association Recreation**: Not creating STANDARD association after PRIMARY removal
+
+#### 🔧 Testing and Verification
+
+**Verify Label Removal:**
+```python
+def verify_association_state(deal_id, company_id, api_token):
+    """Verify current association state"""
+    
+    # Get deal associations
+    deal_url = f"https://api.hubapi.com/crm/v4/objects/deals/{deal_id}/associations/companies"
+    headers = {"Authorization": f"Bearer {api_token}"}
+    
+    response = requests.get(deal_url, headers=headers)
+    if response.status_code == 200:
+        data = response.json()
+        
+        for assoc in data.get('results', []):
+            if assoc['toObjectId'] == company_id:
+                types = assoc.get('associationTypes', [])
+                type_ids = [t['typeId'] for t in types]
+                
+                has_primary = 5 in type_ids
+                has_standard = 341 in type_ids
+                
+                print(f"Association Types: {type_ids}")
+                print(f"Has PRIMARY (5): {has_primary}")
+                print(f"Has STANDARD (341): {has_standard}")
+                
+                return {
+                    'has_primary': has_primary,
+                    'has_standard': has_standard,
+                    'type_ids': type_ids
+                }
+    
+    return None
+```
 
 ### 🔍 Reference Examples
 
@@ -1730,5 +2467,22 @@ Revenue → 18463 NEWMORE HOLDING LTD
 #### Issue: Revenue Not Attributed Correctly
 **Cause**: Wrong company has PRIMARY association  
 **Solution**: Ensure the company that should receive revenue attribution has typeId 5 (PRIMARY)
+
+#### 🎯 Additional Company Label Removal Strategy
+
+**Two-Step Process for Labels:**
+1. **Remove Unwanted Labels**: Filter out PRIMARY (typeId 5) and USER_DEFINED labels
+2. **Preserve STANDARD**: Keep typeId 342 to maintain association integrity
+
+**API Approach:**
+```javascript
+// Remove all labels except STANDARD (typeId 342)
+const labelsToRemove = existingTypes.filter(assocType => assocType.typeId !== 342);
+
+// Use V4 batch archive to remove unwanted labels
+const archiveUrl = `https://api.hubapi.com/crm/v4/associations/companies/deals/batch/labels/archive`;
+```
+
+**Important**: Removing ALL labels deletes the entire association. Always preserve at least ONE label type to maintain the relationship.
 
 ---

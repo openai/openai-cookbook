@@ -1,0 +1,28 @@
+{
+  "name": "openai-cookbook",
+  "version": "1.0.0",
+  "description": "An intelligent AI assistant specifically designed for SaaS B2B CEOs, built using OpenAI's LLM agents and integrated with your business tools (HubSpot, Mixpanel, etc.).",
+  "main": "index.js",
+  "directories": {
+    "example": "examples"
+  },
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/jonetto1978/openai-cookbook.git"
+  },
+  "keywords": [],
+  "author": "",
+  "license": "ISC",
+  "type": "commonjs",
+  "bugs": {
+    "url": "https://github.com/jonetto1978/openai-cookbook/issues"
+  },
+  "homepage": "https://github.com/jonetto1978/openai-cookbook#readme",
+  "dependencies": {
+    "@hubspot/api-client": "^13.4.0",
+    "dotenv": "^17.2.2"
+  }
+}

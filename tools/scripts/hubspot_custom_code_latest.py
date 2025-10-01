@@ -1119,7 +1119,7 @@ exports.main = async (event, callback) => {
 
 // Enhanced Slack notification function with detailed sales team information
 async function sendSlackNotification(notification) {
-  const slackWebhookUrl = 'YOUR_SLACK_WEBHOOK_URL_HERE';
+  const slackWebhookUrl = process.env.SlackWebhookUrl;
   
   let slackMessage;
   

@@ -380,6 +380,17 @@
     - charuj
   tags:
     - mcp
+- title: Roundtable MCP Server - Unified AI Assistant Management
+  path: examples/mcp/roundtable_unified_ai_assistants.ipynb
+  date: 2025-09-30
+  authors:
+    - roundtable-ai
+  tags:
+    - mcp
+    - ai-assistants
+    - multi-agent
+    - code-generation
+    - developer-tools
 
 - title: Image Understanding with RAG
   path: examples/multimodal/image_understanding_with_rag.ipynb

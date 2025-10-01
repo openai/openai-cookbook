@@ -1,5 +1,3 @@
-# Building Resilient Prompts Using an Evaluation Flywheel
-
 ## Overview
 
 ### Purpose of this cookbook

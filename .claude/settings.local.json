@@ -1,7 +1,11 @@
 {
   "permissions": {
     "allow": [
-      "Bash(node:*)"
+      "Bash(node:*)",
+      "Bash(python test_deal_processing_logic.py)",
+      "mcp__ide__getDiagnostics",
+      "Bash(python:*)",
+      "Bash(export ColppyCRMAutomations=*)"
     ],
     "deny": [],
     "ask": []

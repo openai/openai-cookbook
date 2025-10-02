@@ -2542,7 +2542,7 @@
 
 
 - title: Codex CLI to automatically fix CI failures
-  path: examples/codex/codex-cicd.ipynb
+  path: examples/codex/Autofix-github-actions.ipynb
   date: 2025-09-30
   authors:
     - himadri518

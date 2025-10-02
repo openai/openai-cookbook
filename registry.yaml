@@ -4,6 +4,16 @@
 # should build pages for, and indicates metadata such as tags, creation date and
 # authors for each page.
 
+- title: Building Consistent Workflows with Codex CLI & Agents SDK
+  path: examples/codex/codex_mcp_agents_sdk/building_consistent_workflows_codex_cli_agents_sdk.ipynb
+  date: 2025-10-01
+  authors:
+    - jhall-openai
+  tags:
+    - agents-sdk
+    - codex
+    - mcp
+
 - title: GPT-5-Codex Prompting Guide
   path: examples/gpt-5-codex_prompting_guide.ipynb
   date: 2025-09-23

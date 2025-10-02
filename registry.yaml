@@ -4,6 +4,16 @@
 # should build pages for, and indicates metadata such as tags, creation date and
 # authors for each page.
 
+- title: Trusting your data using the Agents SDK and the dbt MCP server
+  path: examples/Trusting_your_data_using_Agents_SDK_and_dbt_MCP_server.ipynb
+  date: 2025-09-29
+  authors:
+    - b-per
+  tags:
+    - agents-sdk
+    - gpt-5
+    - mcp
+
 - title: GPT-5-Codex Prompting Guide
   path: examples/gpt-5-codex_prompting_guide.ipynb
   date: 2025-09-23

@@ -9,6 +9,7 @@
   date: 2025-10-01
   authors:
     - jhall-openai
+    - charlie-openai
   tags:
     - agents-sdk
     - codex

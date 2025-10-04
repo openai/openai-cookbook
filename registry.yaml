@@ -2541,6 +2541,16 @@
   tags:
     - images
 
+- title: Semantic Search with DuckDB and OpenAI Embeddings
+  path: examples/vector_databases/duckdb/duckdb-sql-with-openai-embeddings.ipynb
+  date: 2025-09-06
+  authors:
+    - ayman-openai
+  tags:
+    - embeddings
+    - duckdb
+    - sql
+    - semantic-search
 
 - title: Use Codex CLI to automatically fix CI failures
   path: examples/codex/Autofix-github-actions.ipynb

@@ -6,7 +6,7 @@ The [`gpt-oss` models](https://openai.com/open-models) were trained on the harmo
 
 ### Roles
 
-Every message that the model processes has a role associated with it. The model knows about three types of roles:
+Every message that the model processes has a role associated with it. The model knows about five types of roles:
 
 | Role        | Purpose                                                                                                                                                                                 |
 | :---------- | :-------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
@@ -52,13 +52,8 @@ encoding = load_harmony_encoding(HarmonyEncodingName.HARMONY_GPT_OSS)
 
 system_message = (
     SystemContent.new()
-        .with_model_identity(
-            "You are ChatGPT, a large language model trained by OpenAI."
-        )
         .with_reasoning_effort(ReasoningEffort.HIGH)
         .with_conversation_start_date("2025-06-28")
-        .with_knowledge_cutoff("2024-06")
-        .with_required_channels(["analysis", "commentary", "final"])
 )
 
 developer_message = (
@@ -66,10 +61,6 @@ developer_message = (
         .with_instructions("Always respond in riddles")
         .with_function_tools(
             [
-                ToolDescription.new(
-                    "get_location",
-                    "Gets the location of the user.",
-                ),
                 ToolDescription.new(
                     "get_current_weather",
                     "Gets the current weather in the provided location.",
@@ -90,7 +81,6 @@ developer_message = (
                     },
                 ),
             ]
-        )
 	)
 )
 
@@ -101,16 +91,16 @@ convo = Conversation.from_messages(
         Message.from_role_and_content(Role.USER, "What is the weather in Tokyo?"),
         Message.from_role_and_content(
             Role.ASSISTANT,
-            'User asks: "What is the weather in Tokyo?" We need to use get_weather tool.',
+            'User asks: "What is the weather in Tokyo?" We need to use get_current_weather tool.',
         ).with_channel("analysis"),
         Message.from_role_and_content(Role.ASSISTANT, '{"location": "Tokyo"}')
         .with_channel("commentary")
-        .with_recipient("functions.get_weather")
-        .with_content_type("json"),
+        .with_recipient("functions.get_current_weather")
+        .with_content_type("<|constrain|> json"),
         Message.from_author_and_content(
-            Author.new(Role.TOOL, "functions.lookup_weather"),
+            Author.new(Role.TOOL, "functions.get_current_weather"),
             '{ "temperature": 20, "sunny": true }',
-        ).with_recipient("assistant").with_channel("commentary"),
+        ).with_channel("commentary"),
     ]
 )
 
@@ -126,7 +116,9 @@ Additionally the openai_harmony library also includes a StreamableParser for par
 ```py
 from openai_harmony import (
     load_harmony_encoding,
-    StreamableParser
+    Role,
+    StreamableParser,
+    HarmonyEncodingName
 )
 
 encoding = load_harmony_encoding(HarmonyEncodingName.HARMONY_GPT_OSS)
@@ -201,6 +193,8 @@ Once its done generating it will stop with either a `<|return|>` token indicatin
 
 The `final` channel will contain the answer to your user’s request. Check out the [reasoning section](#reasoning) for more details on the chain-of-thought.
 
+**Implementation note:** `<|return|>` is a decode-time stop token only. When you add the assistant’s generated reply to conversation history for the next turn, replace the trailing `<|return|>` with `<|end|>` so that stored messages are fully formed as `<|start|>{header}<|message|>{content}<|end|>`. Prior messages in prompts should therefore end with `<|end|>`. For supervised targets/training examples, ending with `<|return|>` is appropriate; for persisted history, normalize to `<|end|>`.
+
 ### System message format
 
 The system message is used to provide general information to the system. This is different to what might be considered the “system prompt” in other prompt formats. For that, check out the [developer message format](#developer-message-format).
@@ -220,6 +214,18 @@ For the best performance stick to this format as closely as possible.
 #### Example system message
 
 The most basic system message you should use is the following:
+
+```
+<|start|>system<|message|>You are ChatGPT, a large language model trained by OpenAI.
+Knowledge cutoff: 2024-06
+Current date: 2025-06-28
+
+Reasoning: high
+
+# Valid channels: analysis, commentary, final. Channel must be included for every message.<|end|>
+```
+
+If functions calls are present in the developer message section, use:
 
 ```
 <|start|>system<|message|>You are ChatGPT, a large language model trained by OpenAI.
@@ -301,7 +307,7 @@ For the model to work properly, the input for the next sampling should be
 
 ```
 <|start|>user<|message|>What is 2 + 2?<|end|>
-<|start|>assistant<|channel|>final<|message|>2 + 2 = 4.<|return|>
+<|start|>assistant<|channel|>final<|message|>2 + 2 = 4.<|end|>
 <|start|>user<|message|>What about 9 / 2?<|end|>
 <|start|>assistant
 ```
@@ -370,7 +376,7 @@ If the model decides to call a tool it will define a `recipient` in the header o
 The model might also specify a `<|constrain|>` token to indicate the type of input for the tool call. In this case since it’s being passed in as JSON the `<|constrain|>` is set to `json`.
 
 ```
-<|channel|>analysis<|message|>Need to use function get_weather.<|end|><|start|>assistant<|channel|>commentary to=functions.get_weather <|constrain|>json<|message|>{"location":"San Francisco"}<|call|>
+<|channel|>analysis<|message|>Need to use function get_current_weather.<|end|><|start|>assistant<|channel|>commentary to=functions.get_current_weather <|constrain|>json<|message|>{"location":"San Francisco"}<|call|>
 ```
 
 #### Handling tool calls
@@ -386,7 +392,7 @@ A tool message has the following format:
 So in our example above
 
 ```
-<|start|>functions.get_weather to=assistant<|channel|>commentary<|message|>{"sunny": true, "temperature": 20}<|end|>
+<|start|>functions.get_current_weather to=assistant<|channel|>commentary<|message|>{"sunny": true, "temperature": 20}<|end|>
 ```
 
 Once you have gathered the output for the tool calls you can run inference with the complete content:
@@ -426,10 +432,10 @@ locations: string[],
 format?: "celsius" | "fahrenheit", // default: celsius
 }) => any;
 
-} // namespace functions<|end|><|start|>user<|message|>What is the weather like in SF?<|end|><|start|>assistant<|channel|>analysis<|message|>Need to use function get_weather.<|end|><|start|>assistant<|channel|>commentary to=functions.get_weather <|constrain|>json<|message|>{"location":"San Francisco"}<|call|><|start|>functions.get_weather to=assistant<|channel|>commentary<|message|>{"sunny": true, "temperature": 20}<|end|><|start|>assistant
+} // namespace functions<|end|><|start|>user<|message|>What is the weather like in SF?<|end|><|start|>assistant<|channel|>analysis<|message|>Need to use function get_current_weather.<|end|><|start|>assistant<|channel|>commentary to=functions.get_current_weather <|constrain|>json<|message|>{"location":"San Francisco"}<|call|><|start|>functions.get_current_weather to=assistant<|channel|>commentary<|message|>{"sunny": true, "temperature": 20}<|end|><|start|>assistant
 ```
 
-As you can see above we are passing not just the function out back into the model for further sampling but also the previous chain-of-thought (“Need to use function get_weather.”) to provide the model with the necessary information to continue its chain-of-thought or provide the final answer.
+As you can see above we are passing not just the function out back into the model for further sampling but also the previous chain-of-thought (“Need to use function get_current_weather.”) to provide the model with the necessary information to continue its chain-of-thought or provide the final answer.
 
 #### Preambles
 

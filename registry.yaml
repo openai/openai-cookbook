@@ -2560,3 +2560,13 @@
     - charlie-openai
   tags:
     - codex
+
+- title: Building resilient prompts using an evaluation flywheel
+  path: examples/evaluation/Building_resilient_prompts_using_an_evaluation_flywheel.md
+  date: 2025-10-06
+  authors:
+    - neelk-oai
+    - hamel
+  tags:
+    - evals
+    - datasets

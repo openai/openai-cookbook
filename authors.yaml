@@ -3,6 +3,11 @@
 # You can optionally customize how your information shows up cookbook.openai.com over here.
 # If your information is not present here, it will be pulled from your GitHub profile.
 
+joanneshin-openai:
+  name: "Joanne Shin"
+  website: "https://www.linkedin.com/in/jeongminshin"
+  avatar: "https://avatars.githubusercontent.com/u/206945323?v=4"
+
 daveleo-openai:
   name: "Dave Leo"
   website: "https://www.linkedin.com/in/davidanthonyleo/"
@@ -493,8 +498,7 @@ heejingithub:
   website: "https://www.linkedin.com/in/heejc/"
   avatar: "https://avatars.githubusercontent.com/u/169293861"
 
-
-himadri518: 
+himadri518:
   name: "Himadri Acharya"
   website: "https://www.linkedin.com/in/himadri-acharya-086ba261/"
   avatar: "https://avatars.githubusercontent.com/u/14100684?v=4"
@@ -503,7 +507,7 @@ jhall-openai:
   name: "Josh Hall"
   website: "https://www.linkedin.com/in/jhall14/"
   avatar: "https://avatars.githubusercontent.com/u/198997750?v=4"
-  
+
 charlie-openai:
   name: "Charlie Weems"
   website: "https://wee.ms"

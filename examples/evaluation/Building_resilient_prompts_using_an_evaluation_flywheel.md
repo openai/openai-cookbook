@@ -48,7 +48,6 @@ It answers questions from prospective renters, such as:
 
 Suppose we have a specific prompt within our application that we’d like to analyze. We can get started in the OpenAI Platform by adding in our prompt and uploading our input and output data to our Dataset (learn more about how to do this in [our docs](platform.openai.com/docs/evaluations-getting-started)).
 
-<!-- TODO: insert image -->
 ![Leasing agent data](/images/dataset.png)
 
 With our prompt and traces loaded in, we’re ready to analyze prompt effectiveness.
@@ -76,7 +75,6 @@ For our apartment leasing assistant, our initial open codes might look like this
 
 These specific, grounded-in-data labels become the raw material for the next step.
 
-<!-- TODO: insert image -->
 ![Open coding](/images/open-coding.png)
 
 Here's our dataset after open coding.
@@ -113,8 +111,6 @@ Our formatting grader is a fairly straightforward directive.
 Our availability accuracy grader will reference additional input columns we’ve added to our dataset to capture business hours and day availability.
 ![Creating availability grader](/images/creating-availability-grader.png)
 ![Ground truth columns](/images/ground-truth-columns.png)
-<!-- TODO: insert image -->
-<!-- TODO: insert image -->
 
 With automated graders in place, we can easily evaluate our performance on any change to our system — an updated prompt, updated model parameters, or newly discovered edge cases.
 

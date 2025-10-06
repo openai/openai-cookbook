@@ -1,8 +1,0 @@
-{
-  "not_travel_related": true,
-  "amount_over_limit": false,
-  "math_error": false,
-  "handwritten_x": false,
-  "reasoning": "1. NOT_TRAVEL_RELATED: The receipt is for stationery items, so it is not a travel-related expense (TRUE). \n\n2. AMOUNT_OVER_LIMIT: The total amount is $8.68, which does not exceed $50 (FALSE). \n\n3. MATH_ERROR: The subtotal of $7.98 plus tax of $0.70 correctly sums up to a total of $8.68 (FALSE). \n\n4. HANDWRITTEN_X: There is no 'X' present in the handwritten notes (FALSE). \n\nSince NOT_TRAVEL_RELATED is true the receipt requires auditing.",
-  "needs_audit": true
-}

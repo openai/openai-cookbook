@@ -1,8 +1,0 @@
-{
-  "not_travel_related": false,
-  "amount_over_limit": false,
-  "math_error": false,
-  "handwritten_x": false,
-  "reasoning": "1. NOT_TRAVEL_RELATED: The receipt is for fuel, which is considered a travel-related expense, so this is FALSE. 2. AMOUNT_OVER_LIMIT: The total amount is $41.46, which does not exceed $50, so this is FALSE. 3. MATH_ERROR: The total of the line item ($41.46) matches the total provided, so this is FALSE. 4. HANDWRITTEN_X: There is no 'X' in the handwritten notes, so this is FALSE. Since none of the criteria are violated, the receipt does not need auditing.",
-  "needs_audit": false
-}

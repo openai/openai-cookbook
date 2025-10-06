@@ -1,8 +1,0 @@
-{
-  "not_travel_related": true,
-  "amount_over_limit": false,
-  "math_error": false,
-  "handwritten_x": false,
-  "reasoning": "The receipt is for tools purchased at The Home Depot, which are NOT travel-related expenses, so NOT_TRAVEL_RELATED is true. The total amount of $43.54 does not exceed $50, so AMOUNT_OVER_LIMIT is false. All line items sum correctly to the total, and there are no handwritten notes indicating an 'X', so HANDWRITTEN_X is false. Since NOT_TRAVEL_RELATED is violated the receipt needs to be audited.",
-  "needs_audit": true
-}

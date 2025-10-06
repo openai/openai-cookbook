@@ -4,6 +4,16 @@
 # should build pages for, and indicates metadata such as tags, creation date and
 # authors for each page.
 
+- title: Sora 2 Prompting Guide
+  path: examples/sora/sora2_prompting_guide.ipynb
+  date: 2025-10-06
+  authors:
+    - rkoenig-openai
+    - joanneshin-openai
+  tags:
+    - sora
+    - prompt
+
 - title: Building Consistent Workflows with Codex CLI & Agents SDK
   path: examples/codex/codex_mcp_agents_sdk/building_consistent_workflows_codex_cli_agents_sdk.ipynb
   date: 2025-10-01
@@ -2540,7 +2550,6 @@
     - katiagg
   tags:
     - images
-
 
 - title: Use Codex CLI to automatically fix CI failures
   path: examples/codex/Autofix-github-actions.ipynb

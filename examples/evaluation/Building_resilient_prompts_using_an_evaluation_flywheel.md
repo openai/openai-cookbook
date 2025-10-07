@@ -46,7 +46,7 @@ It answers questions from prospective renters, such as:
 * “How large are the apartments?”
 * “When can I come in for a tour?”
 
-Suppose we have a specific prompt within our application that we’d like to analyze. We can get started in the OpenAI Platform by adding in our prompt and uploading our input and output data to our Dataset (learn more about how to do this in [our docs](platform.openai.com/docs/evaluations-getting-started)).
+Suppose we have a specific prompt within our application that we’d like to analyze. We can get started in the OpenAI Platform by adding in our prompt and uploading our input and output data to our Dataset (learn more about how to do this in [our docs](https://platform.openai.com/docs/evaluations-getting-started)).
 
 ![Leasing agent data](/images/dataset.png)
 
@@ -100,7 +100,7 @@ This simple taxonomy gives us a clear, quantitative picture of our system's prim
 
 ## Adding robustness with automatic graders
 
-Armed with our taxonomy and dataset, we’re now ready to start automating the evaluation flywheel. The OpenAI Platform supports [a variety of grader types](platform.openai.com/docs/guides/graders) (including Python graders and LLM graders) that can be run in bulk on our dataset (learn more [here](platform.openai.com/docs/guides/evaluation-getting-started#adding-graders)). For this example, we can build and run LLM graders for the following:
+Armed with our taxonomy and dataset, we’re now ready to start automating the evaluation flywheel. The OpenAI Platform supports [a variety of grader types](https://platform.openai.com/docs/guides/graders) (including Python graders and LLM graders) that can be run in bulk on our dataset (learn more [here](https://platform.openai.com/docs/guides/evaluation-getting-started#adding-graders)). For this example, we can build and run LLM graders for the following:
 
 * **Formatting grader:** assess whether the model's response matches the desired format
 * **Availability accuracy grader:** compares the availability returned by the model to a ground truth value you specify in your dataset
@@ -118,7 +118,7 @@ For more detail on how to get graders right, see our section on “Aligning your
 
 ## Optimizing the prompt
 
-We’ve now identified and classified our errors, and built out grading to automate our flywheel. At this stage, we could choose to use our data to inform manual changes to our prompt. However, the OpenAI Platform supports an automatic [prompt optimization tool](platform.openai.com/docs/guides/prompt-optimizer) that speeds up this process.
+We’ve now identified and classified our errors, and built out grading to automate our flywheel. At this stage, we could choose to use our data to inform manual changes to our prompt. However, the OpenAI Platform supports an automatic [prompt optimization tool](https://platform.openai.com/docs/guides/prompt-optimizer) that speeds up this process.
 
 The prompt optimizer takes our generated output, our custom annotation columns, and our graders into consideration to construct an improved prompt. We’ve constructed a fairly small example here, but with a full-fledged dataset (say, with the 50 rows we recommended earlier), the optimizer will produce a new prompt that solves many of our identified errors.
 

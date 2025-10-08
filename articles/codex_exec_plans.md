@@ -19,7 +19,6 @@ ExecPlans give a stateless assistant everything it needs to resume complex work.
 
 The specification below is provided verbatim so you can copy it directly into `PLANS.md` or adapt it for related repositories.
 
----
 ````md
 # ChatGPT Codex Execution Plans (ExecPlans):
 

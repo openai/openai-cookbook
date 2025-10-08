@@ -4,7 +4,7 @@
 
 This cookbook provides a practical guide on how to use the OpenAI Platform to easily build resilience into your prompts.
 
-> A **resilient prompt** is one that provides high-quality responses across the full breadth of possible inputs. 
+> A **resilient prompt** is one test that provides high-quality responses across the full breadth of possible inputs. 
 
 Prompt resilience is an essential piece of deploying AI applications in production. Without this property, your prompts can produce unexpected results on edge cases, provide subpar responses in normal cases, and undermine the effectiveness of your AI application.
 

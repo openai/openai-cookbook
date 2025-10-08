@@ -1,38 +1,41 @@
 # Using PLANS.md for multi-hour problem solving
 
-Codex can stay aligned on multi-step engineering projects when you drive the effort through a durable PLANS.md roadmap. This article introduces execution plans ("ExecPlans") that let Codex continue for hours on demanding refactors, data investigations, or documentation pushes without losing context.
+Codex and the `gpt-5-codex` model can be used to implement complex tasks that take significant time to research, design, and implement. The approach described here is one way to prompt the model to implement these tasks and to steer it towards successful completion of a project.
 
-## Why execution plans help long-running Codex sessions
+These plans are thorough design documents, and "living documents". As a user of Codex, you can use these documents to verify the approach that Codex will take before it begins a long implementation process. The particular `PLANS.md` included below is very similar to one that has enabled Codex to work for more than seven hours from a single prompt.
 
-ExecPlans give a stateless assistant everything it needs to resume complex work. They set expectations about scope, progress tracking, and validation so that another contributor—or Codex itself—can rehydrate effort at any time. Use them when you expect an engagement to take more than a quick edit, especially for:
+We enable Codex to use these documemnts by first updating `AGENTS.md` to describe when to use `PLANS.md`, and then of course, to add the `PLANS.md` file to our repository.
 
-- Layered code migrations that span multiple services or packages.
-- Investigations that require prototypes, proof points, and progressive testing.
-- Documentation initiatives that must synchronize across teammates and review cycles.
+## `AGENTS.md`
 
-## How to incorporate ExecPlans into your workflow
+[`AGENTS.md`](https://github.com/openai/agents.md) is a simple format for guiding coding agents such as Codex. We describe a term that users can use as a shorthand and a simple rule for when to use planning documents. Here, we call it an "ExecPlan". Note that this is an arbitrary term, Codex has not been trained on it. This shorthand can then be used when prompting Codex to direct it to a particular definition of a plan.
 
-1. Capture intent first. Document why the work matters to the end user before outlining tasks.
-2. Decompose delivery into verifiable milestones with validation instructions Codex can execute unattended.
-3. Keep the plan living: update progress, decisions, and discoveries as soon as Codex or a teammate completes a milestone.
-4. Commit ExecPlans with the accompanying feature work so anyone can relaunch Codex and finish the effort confidently.
+Here's an example mechanism for instructing an agent when to use
 
-The specification below is provided verbatim so you can copy it directly into `PLANS.md` or adapt it for related repositories.
+```md
+# ExecPlans
+
+When writing complex features or significant refactors, use an ExecPlan (as described in .agent/PLANS.md) from design to implementation.
+```
+
+## `PLANS.md`
+
+Below is the entire document. The prompting in this document was carefully chosen to provide significant amounts of feedback to users and to guide the model to implement precisely what a plan specifies. Users may find that they benefit from customizing the file to meet their needs, to add or remove required sections, and more.
 
 ````md
-# ChatGPT Codex Execution Plans (ExecPlans):
+# Codex Execution Plans (ExecPlans):
 
-This document describes the requirements for an execution plan ("ExecPlan"), a design document that a stateless coding agent can follow to deliver a working feature or system change. Treat the reader as a complete beginner to this repository: they have only the current working tree and the single ExecPlan file you provide. There is no memory of prior plans and no external context.
+This document describes the requirements for an execution plan ("ExecPlan"), a design document that a coding agent can follow to deliver a working feature or system change. Treat the reader as a complete beginner to this repository: they have only the current working tree and the single ExecPlan file you provide. There is no memory of prior plans and no external context.
 
 ## How to use ExecPlans and PLANS.md
 
 When authoring an executable specification (ExecPlan), follow PLANS.md _to the letter_. If it is not in your context, refresh your memory by reading the entire PLANS.md file. Be thorough in reading (and re-reading) source material to produce an accurate specification. When creating a spec, start from the skeleton and flesh it out as you do your research.
 
-When implementing a executable specification (ExecPlan), do not promp the user for "next steps", simply proceed to the next milestone. Keep all sections sections up to date, add or split entries in the list at every stopping point to affirmatively state the progress made and next steps. Resolve ambiguities autonomously, and commit frequently.
+When implementing an executable specification (ExecPlan), do not prompt the user for "next steps"; simply proceed to the next milestone. Keep all sections up to date, add or split entries in the list at every stopping point to affirmatively state the progress made and next steps. Resolve ambiguities autonomously, and commit frequently.
 
-When discussing a executable specification (ExecPlan), record decisions in a log in the spec for posterity, it should be unambiguously clear why any change to the specification was made. ExecSpecs are living documents, and it should always be possible to restart from _only_ the ExecPlan and no other work.
+When discussing an executable specification (ExecPlan), record decisions in a log in the spec for posterity; it should be unambiguously clear why any change to the specification was made. ExecPlans are living documents, and it should always be possible to restart from _only_ the ExecPlan and no other work.
 
-When researching a design with challenging requirements or significant unknowns, use milestones to implement proof of concepts, "toy implementations", etc., that allow validating whether the user's proposal is feasible. Read the source code of libraries by finding or acquiring them, research deeply, and include prototypes to guide a fuller implementation. 
+When researching a design with challenging requirements or significant unknowns, use milestones to implement proof of concepts, "toy implementations", etc., that allow validating whether the user's proposal is feasible. Read the source code of libraries by finding or acquiring them, research deeply, and include prototypes to guide a fuller implementation.
 
 ## Requirements
 
@@ -92,8 +95,6 @@ It is acceptable—-and often encouraged—-to include explicit prototyping mile
 
 Prefer additive code changes followed by subtractions that keep tests passing. Parallel implementations (e.g., keeping an adapter alongside an older path during migration) are fine when they reduce risk or enable tests to continue passing during a large migration. Describe how to validate both paths and how to retire one safely with tests. When working with multiple new libraries or feature areas, consider creating spikes that evaluate the feasibility of these features _independently_ of one another, proving that the external library performs as expected and implements the features we need in isolation.
 
----
-
 ## Skeleton of a Good ExecPlan
 
 ```md
@@ -111,30 +112,30 @@ Explain in a few sentences what someone gains after this change and how they can
 
 Use a list with checkboxes to summarize granular steps. Every stopping point must be documented here, even if it requires splitting a partially completed task into two (“done” vs. “remaining”). This section must always reflect the actual current state of the work.
 
-- [x] (2025-10-01 13:00Z) Example completed step.  
-- [ ] Example incomplete step.  
-- [ ] Example partially completed step (completed: X; remaining: Y).  
+- [x] (2025-10-01 13:00Z) Example completed step.
+- [ ] Example incomplete step.
+- [ ] Example partially completed step (completed: X; remaining: Y).
 
 Use timestamps to measure rates of progress.
 
 ## Surprises & Discoveries
 
-Document unexpected behaviors, bugs, optimizations, or insights discovered during implementation. Provide concise evidence.  
+Document unexpected behaviors, bugs, optimizations, or insights discovered during implementation. Provide concise evidence.
 
-- Observation: …  
-  Evidence: …  
+- Observation: …
+  Evidence: …
 
 ## Decision Log
 
-Record every decision made while working on the plan in the format:  
+Record every decision made while working on the plan in the format:
 
-- Decision: …  
-  Rationale: …  
-  Date/Author: …  
+- Decision: …
+  Rationale: …
+  Date/Author: …
 
 ## Outcomes & Retrospective
 
-Summarize outcomes, gaps, and lessons learned at major milestones or at completion. Compare the result against the original purpose.  
+Summarize outcomes, gaps, and lessons learned at major milestones or at completion. Compare the result against the original purpose.
 
 ## Context and Orientation
 

@@ -20,7 +20,7 @@ When writing complex features or significant refactors, use an ExecPlan (as desc
 
 ## `PLANS.md`
 
-Below is the entire document. The prompting in this document was carefully chosen to provide significant amounts of feedback to users and to guide the model to implement precisely what a plan specifies. Users may find that they benefit from customizing the file to meet their needs, to add or remove required sections, and more.
+Below is the entire document. The prompting in this document was carefully chosen to provide significant amounts of feedback to users and to guide the model to implement precisely what a plan specifies. Users may find that they benefit from customizing the file to meet their needs, or to add or remove required sections.
 
 ````md
 # Codex Execution Plans (ExecPlans):

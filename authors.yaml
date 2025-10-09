@@ -3,6 +3,11 @@
 # You can optionally customize how your information shows up cookbook.openai.com over here.
 # If your information is not present here, it will be pulled from your GitHub profile.
 
+joanneshin-openai:
+  name: "Joanne Shin"
+  website: "https://www.linkedin.com/in/jeongminshin"
+  avatar: "https://avatars.githubusercontent.com/u/206945323?v=4"
+
 daveleo-openai:
   name: "Dave Leo"
   website: "https://www.linkedin.com/in/davidanthonyleo/"
@@ -410,8 +415,8 @@ phundal-openai:
 
 rkoenig-openai:
   name: "Robin Koenig"
-  website: "https://www.linkedin.com/in/robinkoenig/"
-  avatar: "https://media.licdn.com/dms/image/v2/C5603AQEqUVtbts8Huw/profile-displayphoto-shrink_400_400/profile-displayphoto-shrink_400_400/0/1558137883581?e=1753920000&v=beta&t=jcm-qNJfmgVJsS6uNHxHu5T2nQoUWkXivthzxTJMWqA"
+  website: "https://robinkoenig.com"
+  avatar: "https://avatars.githubusercontent.com/u/208886811?v=4"
 
 joshbickett:
   name: "Josh Bickett"
@@ -493,14 +498,36 @@ heejingithub:
   website: "https://www.linkedin.com/in/heejc/"
   avatar: "https://avatars.githubusercontent.com/u/169293861"
 
-
-himadri: 
+himadri518:
   name: "Himadri Acharya"
   website: "https://www.linkedin.com/in/himadri-acharya-086ba261/"
   avatar: "https://avatars.githubusercontent.com/u/14100684?v=4"
 
+<<<<<<< HEAD
  
 paytonison:
   name: "Payton Ison"
   website: "https://linkedin.com/in/paytonison"
   avatar: "https://avatars.githubusercontent.com/u/148833579?v=4" 
+=======
+neelk-oai:
+  name: "Neel Kapse"
+  website: "https://www.linkedin.com/in/neel-kapse/"
+  avatar: "https://media.licdn.com/dms/image/v2/D4E03AQEegSR4W4Ylmg/profile-displayphoto-scale_400_400/B4EZkLjdrcIQAk-/0/1756835470622?e=1762387200&v=beta&t=HETTFnoh3nV_Yc84tHGkahKgOFdvnPlesfi3ki8mWFg"
+
+hamel:
+  name: "Hamel Husain"
+  website: "https://www.linkedin.com/in/hamelhusain/"
+  avatar: "https://media.licdn.com/dms/image/v2/C5603AQGoyHYtA2QIXw/profile-displayphoto-shrink_400_400/profile-displayphoto-shrink_400_400/0/1572471557655?e=1762387200&v=beta&t=wZrq-Nfc8-4Xq-nJ5g2jt9gZ1KLTg23KOIBGHk2xkZ0"
+
+jhall-openai:
+  name: "Josh Hall"
+  website: "https://www.linkedin.com/in/jhall14/"
+  avatar: "https://avatars.githubusercontent.com/u/198997750?v=4"
+
+charlie-openai:
+  name: "Charlie Weems"
+  website: "https://wee.ms"
+  avatar: "https://avatars.githubusercontent.com/u/181146176?v=4"
+
+>>>>>>> main

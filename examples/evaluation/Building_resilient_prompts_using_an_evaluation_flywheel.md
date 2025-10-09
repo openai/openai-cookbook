@@ -46,7 +46,7 @@ It answers questions from prospective renters, such as:
 * “How large are the apartments?”
 * “When can I come in for a tour?”
 
-Suppose we have a specific prompt within our application that we’d like to analyze. We can get started in the OpenAI Platform by adding in our prompt and uploading our input and output data to our Dataset (learn more about how to do this in [our docs](https://platform.openai.com/docs/guides/evaluations-getting-started)).
+Suppose we have a specific prompt within our application that we’d like to analyze. We can get started in the OpenAI Platform by adding in our prompt and uploading our input and output data to our Dataset (learn more about how to do this in [our docs](https://platform.openai.com/docs/evaluations-getting-started)).
 
 ![Leasing agent data](/images/dataset.png)
 

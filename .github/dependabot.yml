@@ -1,0 +1,345 @@
+# Dependabot configuration file
+# Place this file in .github/dependabot.yml
+# Last updated: October 2025
+
+version: 2
+
+# Optional: Define private registries if needed
+registries:
+  npm-private:
+    type: npm-registry
+    url: https://registry.npmjs.org
+    token: ${{secrets.NPM_TOKEN}}
+  
+  docker-private:
+    type: docker-registry
+    url: registry.docker.io
+    username: ${{secrets.DOCKER_USERNAME}}
+    password: ${{secrets.DOCKER_PASSWORD}}
+
+# Define update configurations for each package ecosystem
+updates:
+  # JavaScript/Node.js dependencies
+  - package-ecosystem: "npm"
+    directory: "/"
+    schedule:
+      interval: "weekly"
+      day: "monday"
+      time: "09:00"
+      timezone: "America/Chicago"  # CDT for Jackson, MS
+    
+    # Grouped updates for better PR management
+    groups:
+      # Group all production dependencies
+      production-deps:
+        applies-to: version-updates
+        dependency-type: "production"
+        update-types:
+          - "minor"
+          - "patch"
+      
+      # Group all development dependencies
+      dev-deps:
+        applies-to: version-updates
+        dependency-type: "development"
+        patterns:
+          - "*"
+        exclude-patterns:
+          - "eslint*"  # Keep ESLint separate for easier review
+          - "@types/*" # Keep TypeScript types separate
+      
+      # Group ESLint and related packages
+      linting:
+        patterns:
+          - "eslint*"
+          - "prettier*"
+      
+      # Group TypeScript type definitions
+      types:
+        patterns:
+          - "@types/*"
+      
+      # Security updates group
+      security-critical:
+        applies-to: security-updates
+        patterns:
+          - "*"
+    
+    # Set reasonable PR limits
+    open-pull-requests-limit: 10
+    
+    # Customize commit messages
+    commit-message:
+      prefix: "chore"
+      prefix-development: "chore(dev)"
+      include: "scope"
+    
+    # Labels for organization
+    labels:
+      - "dependencies"
+      - "javascript"
+      - "automerge-patch"
+    
+    # Auto-assign reviewers
+    assignees:
+      - "mrchristopher7k"
+    
+    # Ignore specific updates
+    ignore:
+      - dependency-name: "aws-sdk"
+        versions: ["3.x"]  # Stay on v2 for now
+      - dependency-name: "*"
+        update-types: ["version-update:semver-major"]  # Ignore major updates by default
+    
+    # Allow only specific dependencies (optional - remove if not needed)
+    # allow:
+    #   - dependency-type: "production"
+    
+    # Minimum package age (cooldown period) - NEW in 2025!
+    # Wait 3 days before creating PRs for new releases
+    # minimum-age: "3 days"
+    
+    # Exclude paths from scanning - NEW in 2025!
+    # exclude-paths:
+    #   - "examples/**"
+    #   - "test/fixtures/**"
+
+  # Python dependencies
+  - package-ecosystem: "pip"
+    directory: "/"
+    schedule:
+      interval: "weekly"
+      day: "tuesday"
+    
+    groups:
+      python-dev:
+        dependency-type: "development"
+        patterns:
+          - "pytest*"
+          - "black"
+          - "flake8"
+          - "mypy"
+      
+      python-prod:
+        dependency-type: "production"
+        update-types:
+          - "minor"
+          - "patch"
+    
+    open-pull-requests-limit: 5
+    
+    # Enable external code execution for pip if needed
+    # insecure-external-code-execution: allow
+    
+    labels:
+      - "dependencies"
+      - "python"
+
+  # Docker images
+  - package-ecosystem: "docker"
+    directory: "/"
+    schedule:
+      interval: "weekly"
+      day: "wednesday"
+    
+    groups:
+      docker-base-images:
+        patterns:
+          - "node"
+          - "python"
+          - "alpine"
+    
+    registries:
+      - docker-private  # Use private registry defined above
+    
+    labels:
+      - "dependencies"
+      - "docker"
+    
+    # Only update patch and minor versions for base images
+    ignore:
+      - dependency-name: "*"
+        update-types: ["version-update:semver-major"]
+
+  # GitHub Actions
+  - package-ecosystem: "github-actions"
+    directory: "/"
+    schedule:
+      interval: "weekly"
+      day: "thursday"
+    
+    groups:
+      github-actions:
+        patterns:
+          - "*"  # Group all GitHub Actions updates
+    
+    commit-message:
+      prefix: "ci"
+    
+    labels:
+      - "dependencies"
+      - "github-actions"
+      - "ci/cd"
+
+  # Go modules
+  - package-ecosystem: "gomod"
+    directory: "/"
+    schedule:
+      interval: "weekly"
+    
+    groups:
+      go-dependencies:
+        patterns:
+          - "*"
+        exclude-patterns:
+          - "github.com/aws/*"  # Handle AWS SDK separately
+      
+      aws-sdk-go:
+        patterns:
+          - "github.com/aws/*"
+    
+    # Maintain vendored dependencies
+    vendor: true
+    
+    labels:
+      - "dependencies"
+      - "golang"
+
+  # .NET/NuGet
+  - package-ecosystem: "nuget"
+    directory: "/src"
+    schedule:
+      interval: "weekly"
+    
+    groups:
+      dotnet-prod:
+        dependency-type: "production"
+        patterns:
+          - "Microsoft.*"
+          - "System.*"
+      
+      dotnet-test:
+        dependency-type: "development"
+        patterns:
+          - "xunit*"
+          - "NUnit*"
+          - "Moq*"
+    
+    # NuGet-specific versioning strategy
+    versioning-strategy: "increase"
+    
+    labels:
+      - "dependencies"
+      - "dotnet"
+
+  # Ruby/Bundler
+  - package-ecosystem: "bundler"
+    directory: "/"
+    schedule:
+      interval: "monthly"  # Less frequent for stable Ruby apps
+    
+    groups:
+      rails:
+        patterns:
+          - "rails"
+          - "activerecord"
+          - "actionpack"
+          - "activesupport"
+        update-types:
+          - "minor"
+          - "patch"
+    
+    # Bundler-specific options
+    versioning-strategy: "increase"
+    vendor: false
+    
+    labels:
+      - "dependencies"
+      - "ruby"
+
+  # Terraform
+  - package-ecosystem: "terraform"
+    directory: "/infrastructure"
+    schedule:
+      interval: "weekly"
+    
+    groups:
+      terraform-providers:
+        patterns:
+          - "hashicorp/*"
+          - "terraform-providers/*"
+    
+    commit-message:
+      prefix: "infra"
+    
+    labels:
+      - "dependencies"
+      - "infrastructure"
+      - "terraform"
+
+  # Composer (PHP)
+  - package-ecosystem: "composer"
+    directory: "/"
+    schedule:
+      interval: "weekly"
+    
+    groups:
+      php-framework:
+        patterns:
+          - "laravel/*"
+          - "symfony/*"
+      
+      php-testing:
+        dependency-type: "development"
+        patterns:
+          - "phpunit/*"
+          - "mockery/*"
+    
+    versioning-strategy: "widen"
+    
+    labels:
+      - "dependencies"
+      - "php"
+
+  # Maven (Java)
+  - package-ecosystem: "maven"
+    directory: "/"
+    schedule:
+      interval: "weekly"
+    
+    groups:
+      spring-framework:
+        patterns:
+          - "org.springframework*"
+        update-types:
+          - "minor"
+          - "patch"
+      
+      test-dependencies:
+        dependency-type: "development"
+        patterns:
+          - "junit:junit"
+          - "org.mockito:*"
+    
+    labels:
+      - "dependencies"
+      - "java"
+    
+    # Target specific branch for this ecosystem
+    # target-branch: "develop"
+
+  # Gradle (Java/Kotlin)
+  - package-ecosystem: "gradle"
+    directory: "/"
+    schedule:
+      interval: "weekly"
+    
+    groups:
+      kotlin-deps:
+        patterns:
+          - "org.jetbrains.kotlin:*"
+    
+    labels:
+      - "dependencies"
+      - "gradle"
+      - "kotlin"

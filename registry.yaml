@@ -4,6 +4,14 @@
 # should build pages for, and indicates metadata such as tags, creation date and
 # authors for each page.
 
+- title: Build with Realtime Mini
+  path: examples/byo_realtime/byo_realtime.ipynb
+  date: 2025-10-11
+  authors:
+    - carter-openai
+  tags:
+    - gpt-realtime-mini 
+
 - title: Sora 2 Prompting Guide
   path: examples/sora/sora2_prompting_guide.ipynb
   date: 2025-10-06

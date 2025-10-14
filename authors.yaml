@@ -420,8 +420,8 @@ phundal-openai:
 
 rkoenig-openai:
   name: "Robin Koenig"
-  website: "https://robinkoenig.com"
-  avatar: "https://avatars.githubusercontent.com/u/208886811?v=4"
+  website: "https://www.linkedin.com/in/robinkoenig/"
+  avatar: "https://media.licdn.com/dms/image/v2/C5603AQEqUVtbts8Huw/profile-displayphoto-shrink_400_400/profile-displayphoto-shrink_400_400/0/1558137883581?e=1753920000&v=beta&t=jcm-qNJfmgVJsS6uNHxHu5T2nQoUWkXivthzxTJMWqA"
 
 joshbickett:
   name: "Josh Bickett"
@@ -528,3 +528,7 @@ charlie-openai:
   website: "https://wee.ms"
   avatar: "https://avatars.githubusercontent.com/u/181146176?v=4"
 
+paytonison:
+  name: "Payton Ison"
+  website: "https://x.com/p8on_"
+  avatar: "https://avatars.githubusercontent.com/u/148833579?v=4" 

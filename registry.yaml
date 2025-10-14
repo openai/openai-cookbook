@@ -2581,6 +2581,18 @@
   tags:
     - codex
 
+<<<<<<< HEAD
+
+- title: LLMs 101 - A Practical Introduction
+  path: articles/openai-cookbook-llms-101.md
+  date: 2025-09-26
+  authors:
+    - paytonison
+  tags:
+    - introduction
+    - beginners
+
+=======
 - title: Building resilient prompts using an evaluation flywheel
   path: examples/evaluation/Building_resilient_prompts_using_an_evaluation_flywheel.md
   date: 2025-10-06
@@ -2590,3 +2602,4 @@
   tags:
     - evals
     - datasets
+>>>>>>> main

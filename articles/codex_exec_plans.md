@@ -10,7 +10,7 @@ We enable Codex to use these documemnts by first updating `AGENTS.md` to describ
 
 [`AGENTS.md`](https://github.com/openai/agents.md) is a simple format for guiding coding agents such as Codex. We describe a term that users can use as a shorthand and a simple rule for when to use planning documents. Here, we call it an "ExecPlan". Note that this is an arbitrary term, Codex has not been trained on it. This shorthand can then be used when prompting Codex to direct it to a particular definition of a plan.
 
-Here's an example mechanism for instructing an agent when to use
+Here's an `AGENTS.md` section instructing an agent about when to use a plan:
 
 ```md
 # ExecPlans

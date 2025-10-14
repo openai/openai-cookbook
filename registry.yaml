@@ -22,6 +22,18 @@
     - sora
     - prompt
 
+- title: Using PLANS.md for multi-hour problem solving
+  path: articles/codex_exec_plans.md
+  date: 2025-10-07
+  authors:
+    - aaronfriel
+  tags:
+    - codex
+    - gpt-5
+    - planning
+    - documentation
+    - agents
+
 - title: Building Consistent Workflows with Codex CLI & Agents SDK
   path: examples/codex/codex_mcp_agents_sdk/building_consistent_workflows_codex_cli_agents_sdk.ipynb
   date: 2025-10-01

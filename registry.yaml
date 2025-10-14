@@ -4,11 +4,11 @@
 # should build pages for, and indicates metadata such as tags, creation date and
 # authors for each page.
 
-- title: Build with Realtime Mini
+- title: Building with Realtime Mini
   path: examples/building_w_rt_mini/building_w_rt_mini.ipynb
   date: 2025-10-11
   authors:
-    - carter-openai
+    - carter-oai
   tags:
     - gpt-realtime-mini 
 

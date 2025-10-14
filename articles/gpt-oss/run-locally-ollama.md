@@ -114,12 +114,12 @@ Ollama doesn’t (yet) support the **Responses API** natively.
 
 If you do want to use the Responses API you can use [**Hugging Face’s `Responses.js` proxy**](https://github.com/huggingface/responses.js) to convert Chat Completions to Responses API.
 
-For basic use cases you can also [**run our example Python server with Ollama as the backend.**](https://github.com/openai/gpt-oss?tab=readme-ov-file#responses-api) This server is a basic example server and does not have the
+For basic use cases you can also [**run our example Python server with Ollama as the backend.**](https://github.com/openai/gpt-oss?tab=readme-ov-file#responses-api) This server is a basic example server and does not have the ...
 
 ```shell
 pip install gpt-oss
 python -m gpt_oss.responses_api.serve \
-    --inference_backend=ollama \
+    --inference-backend ollama \
     --checkpoint gpt-oss:20b
 ```
 

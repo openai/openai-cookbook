@@ -5,7 +5,7 @@
 # authors for each page.
 
 - title: Build with Realtime Mini
-  path: examples/building_w_rt_mini/byo_realtime.ipynb
+  path: examples/building_w_rt_mini/building_w_rt_mini.ipynb
   date: 2025-10-11
   authors:
     - carter-openai

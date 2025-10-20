@@ -4,6 +4,106 @@
 # should build pages for, and indicates metadata such as tags, creation date and
 # authors for each page.
 
+- title: Building with Realtime Mini
+  path: examples/building_w_rt_mini/building_w_rt_mini.ipynb
+  date: 2025-10-11
+  authors:
+    - carter-oai
+  tags:
+    - gpt-realtime-mini 
+
+- title: Sora 2 Prompting Guide
+  path: examples/sora/sora2_prompting_guide.ipynb
+  date: 2025-10-06
+  authors:
+    - rkoenig-openai
+    - joanneshin-openai
+  tags:
+    - sora
+    - prompt
+
+- title: Using PLANS.md for multi-hour problem solving
+  path: articles/codex_exec_plans.md
+  date: 2025-10-07
+  authors:
+    - aaronfriel
+  tags:
+    - codex
+    - gpt-5
+    - planning
+    - documentation
+    - agents
+
+- title: Building Consistent Workflows with Codex CLI & Agents SDK
+  path: examples/codex/codex_mcp_agents_sdk/building_consistent_workflows_codex_cli_agents_sdk.ipynb
+  date: 2025-10-01
+  authors:
+    - jhall-openai
+    - charlie-openai
+  tags:
+    - agents-sdk
+    - codex
+    - mcp
+
+- title: GPT-5-Codex Prompting Guide
+  path: examples/gpt-5-codex_prompting_guide.ipynb
+  date: 2025-09-23
+  authors:
+    - daveleo-openai
+  tags:
+    - gpt-5
+    - codex
+
+- title: GPT-5 Troubleshooting Guide
+  path: examples/gpt-5/gpt-5_troubleshooting_guide.ipynb
+  date: 2025-09-17
+  authors:
+    - prashantmital-openai
+    - bfioca-openai
+    - carter-oai
+  tags:
+    - gpt-5
+    - prompt-optimization
+
+- title: Context Engineering - Short-Term Memory Management with Sessions from OpenAI Agents SDK
+  path: examples/agents_sdk/session_memory.ipynb
+  date: 2025-09-09
+  authors:
+    - emreokcular
+  tags:
+    - agents-sdk
+
+- title: Automating Code Quality and Security Fixes with Codex CLI on GitLab
+  path: examples/codex/secure_quality_gitlab.md
+  date: 2025-08-29
+  authors:
+    - jonlim-openai
+    - pap-openai
+  tags:
+    - codex
+
+- title: Realtime Prompting Guide
+  path: examples/Realtime_prompting_guide.ipynb
+  date: 2025-08-28
+  authors:
+    - minh-hoque
+  tags:
+    - realtime
+    - speech
+    - audio
+    - responses
+
+- title: "Fine-tune gpt-oss for better Korean language performance"
+  path: articles/gpt-oss/fine-tune-korean.ipynb
+  date: 2025-08-26
+  authors:
+    - heejingithub
+    - danial-openai
+    - joanneshin-openai
+  tags:
+    - gpt-oss
+    - open-models
+
 - title: Verifying gpt-oss implementations
   path: articles/gpt-oss/verifying-implementations.md
   date: 2025-08-11
@@ -23,7 +123,7 @@
     - gpt-oss
     - open-models
     - gpt-oss-local
-    
+
 - title: GPT-5 Prompt Migration and Improvement Using the New Optimizer
   path: examples/gpt-5/prompt-optimization-cookbook.ipynb
   date: 2025-08-07
@@ -2470,3 +2570,23 @@
     - katiagg
   tags:
     - images
+
+- title: Use Codex CLI to automatically fix CI failures
+  path: examples/codex/Autofix-github-actions.ipynb
+  date: 2025-09-30
+  authors:
+    - himadri518
+    - alwell-kevin
+    - charlie-openai
+  tags:
+    - codex
+
+- title: Building resilient prompts using an evaluation flywheel
+  path: examples/evaluation/Building_resilient_prompts_using_an_evaluation_flywheel.md
+  date: 2025-10-06
+  authors:
+    - neelk-oai
+    - hamel
+  tags:
+    - evals
+    - datasets

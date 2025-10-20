@@ -4,6 +4,15 @@
 # should build pages for, and indicates metadata such as tags, creation date and
 # authors for each page.
 
+- title: Build, deploy, and optimize agentic workflows with AgentKit
+  path: examples/agentkit/agentkit_walkthrough.ipynb
+  date: 2025-10-17
+  authors:
+    - nikhils-oai
+  tags:
+    - agentkit
+    - evals
+
 - title: Building with Realtime Mini
   path: examples/building_w_rt_mini/building_w_rt_mini.ipynb
   date: 2025-10-11

@@ -2599,3 +2599,11 @@
   tags:
     - evals
     - datasets
+
+- title: Build Code Review with the Codex SDK
+  path: examples/codex/build_code_review_with_codex_sdk.md
+  date: 2025-10-21
+  authors:
+    - charlie-openai
+  tags:
+    - codex

@@ -100,7 +100,9 @@ convo = Conversation.from_messages(
         Message.from_author_and_content(
             Author.new(Role.TOOL, "functions.get_current_weather"),
             '{ "temperature": 20, "sunny": true }',
-        ).with_channel("commentary"),
+        )
+        .with_channel("commentary")
+        .with_recipient("assistant"),
     ]
 )
 

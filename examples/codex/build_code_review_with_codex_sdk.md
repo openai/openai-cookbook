@@ -501,6 +501,7 @@ pipeline {
                 --model "${CODEX_MODEL}" \
                 --input-file "${REVIEW_PROMPT}" \
                 --response-format "json_object" \
+                --output-schema "${RESPONSE_FORMAT}" \
                 --tool-choice "auto" \
                 > raw_response.json || true
 

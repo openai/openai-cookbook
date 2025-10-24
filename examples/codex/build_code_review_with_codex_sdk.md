@@ -1,20 +1,56 @@
 # Build Code Review with the Codex SDK
 
-With [Code Review](https://chatgpt.com/codex/settings/code-review) in Codex Cloud, you can connect your team's cloud hosted Github repository to Codex and received automated code reviews on every PR. But what if your code is hosted on-prem, or you don't have Github as an SCM?
+With [Code Review](https://chatgpt.com/codex/settings/code-review) in Codex Cloud, you can connect your team's cloud hosted Github repository to Codex and receive automated code reviews on every PR. But what if your code is hosted on-prem, or you don't have Github as an SCM?
 
 Luckily, we can replicate Codex's cloud hosted review process in our own CI/CD runners. In this guide, we'll build our own Code Review action using the Codex CLI headless mode with both Github actions and Jenkins.
 
 To build our own Code review, we'll take the following steps:
-1. Install the Codex CLI
-1. Use the Code Review prompt that ships with the CLI
-1. Specify a structured output JSON schema
-1. Make API calls to our SCM to create review comments
+1. Install the Codex CLI in our CI/CD runner
+1. Prompt Codex in headless (exec) mode with the Code Review prompt that ships with the CLI
+1. Specify a structured output JSON schema for Codex
+1. Parse the JSON result and use it to make API calls to our SCM to create review comments
 
 Once implemented, Codex will be able to leave inline code review comments:
 <img src="../../images/codex_code_review.png" alt="Codex Code Review in Github" width="500"/>
 
+## The Code Review Prompt
+GPT-5-Codex has received specific training to improve is code review abilities. You can steer GPT-5-Codex to conduct a code review with the following prompt:
+
+```
+You are acting as a reviewer for a proposed code change made by another engineer.
+Focus on issues that impact correctness, performance, security, maintainability, or developer experience.
+Flag only actionable issues introduced by the pull request.
+When you flag an issue, provide a short, direct explanation and cite the affected file and line range.
+Prioritize severe issues and avoid nit-level comments unless they block understanding of the diff.
+After listing findings, produce an overall correctness verdict (\"patch is correct\" or \"patch is incorrect\") with a concise justification and a confidence score between 0 and 1.
+Ensure that file citations and line numbers are exactly correct using the tools available; if they are incorrect your comments will be rejected.
+```
+## Codex Structured Outputs
+In order to make comments on code ranges in our pull request, we need to receive Codex's response in a specific format. To do that we can create a file called `codex-output-schema.json` that conforms to OpenAI's [structured outputs](https://platform.openai.com/docs/guides/structured-outputs) format.
+
+To use this file in our workflow YAML, we can call Codex with the `output-schema-file` argument like this:
+
+```yaml
+- name: Run Codex structured review
+        id: run-codex
+        uses: openai/codex-action@main
+        with:
+            openai-api-key: ${{ secrets.OPENAI_API_KEY }}
+            prompt-file: codex-prompt.md
+            sandbox: read-only
+            model: ${{ env.CODEX_MODEL }}
+            output-schema-file: codex-output-schema.json # <-- Our schema file
+            output-file: codex-output.json
+```
+
+You can also pass a similar argument to `codex exec` for example:
+
+```bash
+codex exec "Review my pull request!" --output-schema codex-output-schema.json
+```
+
 ## Github Actions Example
-If you're using Github actions in an on-prem environment, you can tailor this example to your specific workflow. Inline comments highlight the key steps.
+Let's put it all together. If you're using Github actions in an on-prem environment, you can tailor this example to your specific workflow. Inline comments highlight the key steps.
 ```yaml
 name: Codex Code Review
 
@@ -183,9 +219,8 @@ jobs:
               printf '%s\n' "Flag only actionable issues introduced by the pull request."
               printf '%s\n' "When you flag an issue, provide a short, direct explanation and cite the affected file and line range."
               printf '%s\n' "Prioritize severe issues and avoid nit-level comments unless they block understanding of the diff."
-              printf '%s\n' "After listing findings, produce an overall correctness verdict (\"patch is correct\" or \"patch is incorrect\")"
+              printf '%s\n' "After listing findings, produce an overall correctness verdict (\"patch is correct\" or \"patch is incorrect\") with a concise justification and a confidence score between 0 and 1."
               printf '%s\n' "Ensure that file citations and line numbers are exactly correct using the tools available; if they are incorrect your comments will be rejected."
-              printf '%s\n' "with a concise justification and a confidence score between 0 and 1."
             } > "$PROMPT_PATH"
           fi
 
@@ -453,9 +488,8 @@ pipeline {
               printf '%s\n' "Flag only actionable issues introduced by the pull request."
               printf '%s\n' "When you flag an issue, provide a short, direct explanation and cite the affected file and line range."
               printf '%s\n' "Prioritize severe issues and avoid nit-level comments unless they block understanding of the diff."
-              printf '%s\n' "After listing findings, produce an overall correctness verdict (\\\"patch is correct\\\" or \\\"patch is incorrect\\\")"
+              printf '%s\n' "After listing findings, produce an overall correctness verdict (\\\"patch is correct\\\" or \\\"patch is incorrect\\\") with a concise justification and a confidence score between 0 and 1."
               printf '%s\n' "Ensure that file citations and line numbers are exactly correct using the tools available; if they are incorrect your comments will be rejected."
-              printf '%s\n' "with a concise justification and a confidence score between 0 and 1."
             } > "$PROMPT_PATH"
           fi
 

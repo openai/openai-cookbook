@@ -20,7 +20,7 @@
             {
                 "guest": "Apimeister consulting GmbH",
                 "service": "Deposit 548113520/02 vom 11.11.19",
-                "VAT": null,
+                "VAT": "null",
                 "num": "-1",
                 "price_EUR": "90,50",
                 "amount_EUR": "-90,50"
@@ -44,17 +44,17 @@
             {
                 "guest": "Walter, Jens",
                 "room": "330",
-                "date_range": "from 11.11.2019 to 12.11.2019",
+                "date_range": "11.11.2019 to 12.11.2019",
                 "service": "Best Price including Breakfast",
-                "VAT": null,
-                "num": null,
-                "price_EUR": null,
-                "amount_EUR": null
+                "VAT": "null",
+                "num": "1",
+                "price_EUR": "90,50",
+                "amount_EUR": "90,50"
             },
             {
                 "guest": "Walter, Jens",
                 "room": "330",
-                "date_range": "from 11.11.2019 to 12.11.2019",
+                "date_range": "11.11.2019 to 12.11.2019",
                 "service": "Frühstück",
                 "VAT": "19,00%",
                 "num": "1",
@@ -64,7 +64,7 @@
             {
                 "guest": "Walter, Jens",
                 "room": "330",
-                "date_range": "from 11.11.2019 to 12.11.2019",
+                "date_range": "11.11.2019 to 12.11.2019",
                 "service": "Lodging",
                 "VAT": "7,00%",
                 "num": "1",
@@ -77,31 +77,30 @@
             "amount": "0,00"
         },
         "payment_information": {
-            "date": null,
-            "payment": null,
-            "card_number": null,
-            "amount_currency": null,
-            "payment_EUR": null
+            "date": "null",
+            "payment": "null",
+            "card_number": "null",
+            "amount_currency": "null",
+            "payment_EUR": "null"
         },
         "balance_to_pay": {
             "currency": "EUR",
             "amount": "0,00"
         },
         "VAT_information": {
-            "19,00% (Mwst)": {
+            "19,00%": {
                 "net_amount_EUR": "0,00",
                 "VAT_amount_EUR": "0,00",
                 "VAT_gross_EUR": "0,00"
             },
-            "7,00% (Mwst)": {
+            "7,00%": {
                 "net_amount_EUR": "0,00",
                 "VAT_amount_EUR": "0,00",
                 "VAT_gross_EUR": "0,00"
             }
         },
-        "issuer_information": {
-            "name": "Motel One Stuttgart-Bad Cannstatt",
-            "agent": "Sarah Golombiewski",
+        "staff_information": {
+            "name": "Sarah Golombiewski",
             "position": "Front Office Agent"
         }
     }

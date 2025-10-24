@@ -10,13 +10,10 @@
                 "Website": "madisonhotel.de"
             },
             "Geschäftsführer": "Markies Head, Thomas Kleinertz",
-            "AG Hamburg HRB": "47881",
-            "VAT": "DE118 656 407",
+            "VAT": "DE118 696 407",
             "Bank": {
                 "Name": "HypoVereinsbank",
-                "BLZ": "200 300 00",
-                "Konto-Nr": "360 27 11",
-                "IBAN": "DE48 2003 0000 0036 0271 17",
+                "IBAN": "DE48 2003 0000 0030 6027 11",
                 "BIC": "HYVEDEMM300"
             }
         },
@@ -26,9 +23,9 @@
             "Guest Name": "Herr Jens Walter"
         },
         "Invoice Information": {
-            "Rechnungs-Nr": "490969",
+            "Invoice Number": "490969",
             "Date": "22.02.19",
-            "Room": "320",
+            "Room Number": "320",
             "Arrival Date": "17.02.19",
             "Departure Date": "22.02.19",
             "Page": "1 of 1",
@@ -83,7 +80,8 @@
                 "Entlastung": 550.0
             },
             "Saldo": {
-                "EUR": 0.0
+                "Amount": 0.0,
+                "Currency": "EUR"
             }
         },
         "Payment Information": {
@@ -92,13 +90,25 @@
             "Kreditkarteninstitut": "XXXXXX",
             "Verfallsdatum": "XX/XX",
             "Terminal ID": "69284962",
-            "Kreditkartennummer": "XXXX XXXX XXXX 5052",
-            "Vorgangsnummer": "154698432",
-            "Beleg Nr.": "23137",
-            "Transaktionsbetrag": "550.00",
-            "Genehmigter Betrag": "550.00",
-            "Genehmigungscode": "811233"
+            "Karteninhaber": {
+                "Kartennummer": "XXXX XXXX XXXX 5052",
+                "Vorgangsnummer": "154698432",
+                "Beleg Nr.": "23137",
+                "Transaktionsbetrag": 550.0,
+                "Genehmigter Betrag": 550.0,
+                "Genehmigungscode": "811233"
+            }
         }
     },
-    {}
+    {
+        "hotel_information": {
+            "name": "THE MADISON",
+            "location": "HAMBURG"
+        },
+        "guest_information": null,
+        "invoice_information": null,
+        "room_charges": null,
+        "taxes": null,
+        "total_charges": null
+    }
 ]

@@ -4,6 +4,16 @@
 # should build pages for, and indicates metadata such as tags, creation date and
 # authors for each page.
 
+- title: User guide for gpt-oss-safeguard
+  path: articles/gpt-oss-safeguard-guide.md
+  date: 2025-10-29
+  authors:
+    - roost
+  tags:
+    - gpt-oss
+    - open-models
+    - guardrails
+
 - title: Build, deploy, and optimize agentic workflows with AgentKit
   path: examples/agentkit/agentkit_walkthrough.ipynb
   date: 2025-10-17
@@ -19,7 +29,7 @@
   authors:
     - carter-oai
   tags:
-    - gpt-realtime-mini 
+    - gpt-realtime-mini
 
 - title: Sora 2 Prompting Guide
   path: examples/sora/sora2_prompting_guide.ipynb

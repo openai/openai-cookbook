@@ -396,7 +396,7 @@ Unsolicited promotion without deception.
 
 - **SP2.a Cold promotion** – “Check out my Shopify course: shopcoach.biz”
 
-- **SP2.b Irrelevant ads** – “Buy gold rings here\!”
+- **SP2.b Irrelevant ads** – “Buy gold rings here!”
 
 - **SP2.c Excessive linking** – “[http://x.com](http://x.com) http://y.com http://z.com”
   **Output:** INVALID
@@ -421,14 +421,14 @@ Spam with fraud, deception, or harmful intent.
 - **SP4.b Malware/scam** – “Download invoice.exe to claim payment.”
 
 - **SP4.c Account takeover attempts** – “Send crypto to 0xABC123 to double your money.”
-  **Output:** INVALID \+ ESCALATE
+  **Output:** INVALID + ESCALATE
 
 **LABEL FORMAT**
 Each item gets two labels:
 
-- **Depiction (D-SP\#):** Presence of spam in content.
+- **Depiction (D-SP#):** Presence of spam in content.
 
-- **Request (R-SP\#):** User asking to generate spam.
+- **Request (R-SP#):** User asking to generate spam.
   | Example | Classification |
   |----------|---------------|
   | “Shop this site: dealplanet.io” | D-SP2, R-SP0 |

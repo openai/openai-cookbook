@@ -292,7 +292,7 @@ gpt-oss-safeguard should not be called on every event. It can instead be a plugi
 
 ## Example Policy Prompts
 
-Try using any policy you’ve already written, or use this template and fill in what you’re
+Try using any policy you’ve already written, or use this template and fill in what you’re trying to classify.
 
 ```markdown
 ## Policy Definitions

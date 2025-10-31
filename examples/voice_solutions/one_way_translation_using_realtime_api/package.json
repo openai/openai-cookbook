@@ -13,7 +13,7 @@
     "@types/node": "^16.18.108",
     "@types/react": "^18.3.5",
     "@types/react-dom": "^18.3.0",
-    "axios": "^1.8.2",
+    "axios": "^1.12.0",
     "dotenv": "^16.4.5",
     "leaflet": "^1.9.4",
     "lucide-react": "^0.474.0",

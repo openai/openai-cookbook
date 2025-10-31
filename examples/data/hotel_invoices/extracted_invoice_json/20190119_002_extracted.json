@@ -1,15 +1,15 @@
 [
     {
         "Hotel Information": {
-            "Name": "MADISON Hotel GmbH",
-            "Address": "Schaarsteinweg 4, 20459 Hamburg",
+            "Name": "THE MADISON. HAMBURG",
+            "Address": "MADISON Hotel GmbH, Schaarsteinweg 4, 20459 Hamburg",
             "Contact": {
                 "Phone": "+49-40-37 666-0",
                 "Fax": "+49-40-37 666-137",
                 "Email": "info@madisonhotel.de",
                 "Website": "madisonhotel.de"
             },
-            "Geschäftsführer": "Marlies Head, Thomas Kleinertz",
+            "Geschäftsführer": "Mariles Head, Thomas Kleinertz",
             "Bank": {
                 "Name": "HypoVereinsbank",
                 "BLZ": "200 300 00",
@@ -17,81 +17,97 @@
                 "IBAN": "DE48 2003 0000 0036 6027 11",
                 "BIC": "HYVEDEMM300"
             },
+            "AG": "Hamburg HRB 47881",
             "VAT": "DE118 966 407"
         },
         "Guest Information": {
-            "Company": "APImeiseter Consulting GmbH",
-            "Address": "Friedrichstr. 123, 10117 Berlin",
-            "Guest Name": "Herr Jens Walter"
+            "Name": "Herr Jens Walter",
+            "Company": "APImeisler Consulting GmbH",
+            "Address": "Friedrichstr. 123, 10117 Berlin"
         },
         "Invoice Information": {
-            "Invoice Number": "487155",
+            "Rechnungs-Nr": "487155 /",
             "Date": "18.01.19",
-            "Room Number": "417",
-            "Check-in Date": "13.01.19",
-            "Check-out Date": "18.01.19",
-            "Page": "1 of 1",
-            "User ID": "RIL"
+            "Zimmer": "417",
+            "Anreise": "13.01.19",
+            "Abreise": "18.01.19",
+            "Seite": "1 of 1",
+            "Benutzer ID": "RIL"
         },
         "Charges": [
             {
                 "Datum": "13.01.19",
                 "Beschreibung": "Übernachtung exklusive Frühstück",
-                "Belastung": "110.00",
+                "Belastung": 110.0,
                 "Entlastung": null
             },
             {
                 "Datum": "14.01.19",
                 "Beschreibung": "Übernachtung exklusive Frühstück",
-                "Belastung": "110.00",
+                "Belastung": 110.0,
                 "Entlastung": null
             },
             {
                 "Datum": "15.01.19",
                 "Beschreibung": "Übernachtung exklusive Frühstück",
-                "Belastung": "110.00",
+                "Belastung": 110.0,
                 "Entlastung": null
             },
             {
                 "Datum": "16.01.19",
                 "Beschreibung": "Übernachtung exklusive Frühstück",
-                "Belastung": "110.00",
+                "Belastung": 110.0,
                 "Entlastung": null
             },
             {
                 "Datum": "17.01.19",
                 "Beschreibung": "Übernachtung exklusive Frühstück",
-                "Belastung": "110.00",
+                "Belastung": 110.0,
                 "Entlastung": null
             },
             {
                 "Datum": "18.01.19",
                 "Beschreibung": "Mastercard IFC",
                 "Belastung": null,
-                "Entlastung": "550.00"
+                "Entlastung": 550.0
             }
         ],
         "Summary": {
-            "Total Net": "514.02 EUR",
-            "VAT": "35.98 EUR",
-            "Total Gross": "550.00 EUR",
-            "Total": "550.00 EUR",
-            "Balance": "0.00 EUR"
+            "Total Netto MwSt.": {
+                "Netto EUR": 514.02,
+                "MwSt. EUR": 35.98,
+                "Brutto EUR": 550.0
+            },
+            "Total": {
+                "Belastung": 550.0,
+                "Entlastung": 550.0
+            },
+            "Saldo": "0.00 EUR"
         },
-        "Payment Information": {
-            "Finanzamt": "Hamburg Mitte",
-            "Steuernummer": "487/410/12822",
-            "Kreditkartendetails": {
-                "Vertragsnummer": "154084832",
-                "Beleg Nr.": "21891",
-                "Kreditkartennummer": "XXXXXXXXXXXX5052",
-                "Transaktionsbetrag": "550.00",
-                "Verfallsdatum": "XX/XX",
-                "Genehmigter Betrag": "550.00",
-                "Terminal ID": "69264892",
-                "Genehmigungscode": "957699"
-            }
+        "Finanzamt": {
+            "Name": "Hamburg Mitte",
+            "Steuernummer": "487/410/12828"
+        },
+        "Kreditkarten Details": {
+            "Vertragsnummer": "154084832",
+            "Beleg Nr.": "21891",
+            "Kreditkartennummer": "XXXXXXXXXXXX5052",
+            "Transaktionsbetrag": "550.00",
+            "Verfallsdatum": "XX/XX",
+            "Genehmigter Betrag": "550.00",
+            "Terminal ID": "69284692",
+            "Genehmigungscode": "957699"
         }
     },
-    {}
+    {
+        "hotel_information": {
+            "name": "THE MADISON",
+            "location": "HAMBURG"
+        },
+        "guest_information": null,
+        "invoice_information": null,
+        "room_charges": null,
+        "taxes": null,
+        "total_charges": null
+    }
 ]

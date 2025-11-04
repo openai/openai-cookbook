@@ -4,6 +4,23 @@
 # should build pages for, and indicates metadata such as tags, creation date and
 # authors for each page.
 
+- title: Self-Evolving Agents - A Cookbook for Autonomous Agent Retraining
+  path: examples/partners/self_evolving_agents/autonomous_agent_retraining.ipynb
+  date: 2025-11-04
+  authors:
+    - shikhar-cyber
+    - Calvin Maguranis
+    - Valentina Frenkel
+    - Fanny Perraudeau
+    - Giorgio Saladino
+  tags:
+    - partners
+    - self-evolving-agents
+    - evals
+    - llmops
+    - prompt-engineering
+    - agent-retraining
+
 - title: User guide for gpt-oss-safeguard
   path: articles/gpt-oss-safeguard-guide.md
   date: 2025-10-29

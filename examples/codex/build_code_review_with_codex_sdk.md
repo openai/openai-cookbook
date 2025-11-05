@@ -4,16 +4,18 @@ With [Code Review](https://chatgpt.com/codex/settings/code-review) in Codex Clou
 
 Luckily, we can replicate Codex's cloud hosted review process in our own CI/CD runners. In this guide, we'll build our own Code Review action using the Codex CLI headless mode with both GitHub Actions and Jenkins.
 
-To build our own Code review, we'll take the following steps:
+To build our own Code review, we'll take the following stps:
+
 1. Install the Codex CLI in our CI/CD runner
-1. Prompt Codex in headless (exec) mode with the Code Review prompt that ships with the CLI
-1. Specify a structured output JSON schema for Codex
-1. Parse the JSON result and use it to make API calls to our SCM to create review comments
+2. Prompt Codex in headless (exec) mode with the Code Review prompt that ships with the CLI
+3. Specify a structured output JSON schema for Codex
+4. Parse the JSON result and use it to make API calls to our SCM to create review comments
 
 Once implemented, Codex will be able to leave inline code review comments:
-<img src="../../images/codex_code_review.png" alt="Codex Code Review in GitHub" width="500"/>
+`<img src="../../images/codex_code_review.png" alt="Codex Code Review in GitHub" width="500"/>`
 
 ## The Code Review Prompt
+
 GPT-5-Codex has received specific training to improve its code review abilities. You can steer GPT-5-Codex to conduct a code review with the following prompt:
 
 ```
@@ -25,7 +27,9 @@ Prioritize severe issues and avoid nit-level comments unless they block understa
 After listing findings, produce an overall correctness verdict (\"patch is correct\" or \"patch is incorrect\") with a concise justification and a confidence score between 0 and 1.
 Ensure that file citations and line numbers are exactly correct using the tools available; if they are incorrect your comments will be rejected.
 ```
+
 ## Codex Structured Outputs
+
 In order to make comments on code ranges in our pull request, we need to receive Codex's response in a specific format. To do that we can create a file called `codex-output-schema.json` that conforms to OpenAI's [structured outputs](https://platform.openai.com/docs/guides/structured-outputs) format.
 
 To use this file in our workflow YAML, we can call Codex with the `output-schema-file` argument like this:
@@ -50,7 +54,9 @@ codex exec "Review my pull request!" --output-schema codex-output-schema.json
 ```
 
 ## GitHub Actions Example
+
 Let's put it all together. If you're using GitHub Actions in an on-prem environment, you can tailor this example to your specific workflow. Inline comments highlight the key steps.
+
 ```yaml
 name: Codex Code Review
 
@@ -331,6 +337,7 @@ jobs:
 ```
 
 ## Jenkins Example
+
 We can use the same approach to scripting a job with Jenkins. Once again, comments highlight key stages of the workflow:
 
 ```groovy
@@ -650,5 +657,7 @@ pipeline {
   }
 }
 ```
+
 # Wrap Up
+
 With the Codex SDK, you can build your own GitHub Code Review in on-prem environments. However, the pattern of triggering Codex with a prompt, receiving a structured output, and then acting on that output with an API call extends far beyond Code Review. For example, we could use this pattern to trigger a root-cause analysis when an incident is created and post a structured report into a Slack channel. Or we could create a code quality report on each PR and post results into a dashboard.

@@ -4,7 +4,7 @@ With [Code Review](https://chatgpt.com/codex/settings/code-review) in Codex Clou
 
 Luckily, we can replicate Codex's cloud hosted review process in our own CI/CD runners. In this guide, we'll build our own Code Review action using the Codex CLI headless mode with both GitHub Actions and Jenkins.
 
-To build our own Code review, we'll take the following steps:
+To build our own Code review, we'll take the follong stes:
 
 1. Install the Codex CLI in our CI/CD runner
 2. Prompt Codex in headless (exec) mode with the Code Review prompt that ships with the CLI
@@ -12,7 +12,7 @@ To build our own Code review, we'll take the following steps:
 4. Parse the JSON result and use it to make API calls to our SCM to create review comments
 
 Once implemented, Codex will be able to leave inline code review comments:
-<img src="../../images/codex_code_review.png" alt="Codex Code Review in GitHub" width="500"/>
+`<img src="../../images/codex_code_review.png" alt="Codex Code Review in GitHub" width="500"/>`
 
 ## The Code Review Prompt
 

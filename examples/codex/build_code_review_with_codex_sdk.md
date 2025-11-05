@@ -1,8 +1,8 @@
 # Build Code Review with the Codex SDK
 
-With [Code Review](https://chatgpt.com/codex/settings/code-review) in Codex Cloud, you can connect your team's cloud hosted Github repository to Codex and receive automated code reviews on every PR. But what if your code is hosted on-prem, or you don't have Github as an SCM?
+With [Code Review](https://chatgpt.com/codex/settings/code-review) in Codex Cloud, you can connect your team's cloud hosted GitHub repository to Codex and receive automated code reviews on every PR. But what if your code is hosted on-prem, or you don't have GitHub as an SCM?
 
-Luckily, we can replicate Codex's cloud hosted review process in our own CI/CD runners. In this guide, we'll build our own Code Review action using the Codex CLI headless mode with both Github actions and Jenkins.
+Luckily, we can replicate Codex's cloud hosted review process in our own CI/CD runners. In this guide, we'll build our own Code Review action using the Codex CLI headless mode with both GitHub Actions and Jenkins.
 
 To build our own Code review, we'll take the following steps:
 1. Install the Codex CLI in our CI/CD runner
@@ -11,10 +11,10 @@ To build our own Code review, we'll take the following steps:
 1. Parse the JSON result and use it to make API calls to our SCM to create review comments
 
 Once implemented, Codex will be able to leave inline code review comments:
-<img src="../../images/codex_code_review.png" alt="Codex Code Review in Github" width="500"/>
+<img src="../../images/codex_code_review.png" alt="Codex Code Review in GitHub" width="500"/>
 
 ## The Code Review Prompt
-GPT-5-Codex has received specific training to improve is code review abilities. You can steer GPT-5-Codex to conduct a code review with the following prompt:
+GPT-5-Codex has received specific training to improve its code review abilities. You can steer GPT-5-Codex to conduct a code review with the following prompt:
 
 ```
 You are acting as a reviewer for a proposed code change made by another engineer.
@@ -49,8 +49,8 @@ You can also pass a similar argument to `codex exec` for example:
 codex exec "Review my pull request!" --output-schema codex-output-schema.json
 ```
 
-## Github Actions Example
-Let's put it all together. If you're using Github actions in an on-prem environment, you can tailor this example to your specific workflow. Inline comments highlight the key steps.
+## GitHub Actions Example
+Let's put it all together. If you're using GitHub Actions in an on-prem environment, you can tailor this example to your specific workflow. Inline comments highlight the key steps.
 ```yaml
 name: Codex Code Review
 
@@ -651,4 +651,4 @@ pipeline {
 }
 ```
 # Wrap Up
-With the Codex SDK, you can build your own Github Code Review in on-prem environments. However, the pattern of triggering Codex with a prompt, receiving a structured output, and then acting on that output with an API call extends far beyond Code Review. For example, we could use this pattern to trigger a root-cause analysis when an incident is created and post a structured report into a slack channel. Or we could create a code quality report on each PR and post results into a dashboard.
+With the Codex SDK, you can build your own GitHub Code Review in on-prem environments. However, the pattern of triggering Codex with a prompt, receiving a structured output, and then acting on that output with an API call extends far beyond Code Review. For example, we could use this pattern to trigger a root-cause analysis when an incident is created and post a structured report into a Slack channel. Or we could create a code quality report on each PR and post results into a dashboard.

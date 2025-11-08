@@ -82,7 +82,7 @@ def main():
     print("=" * 80)
     
     # Get access token
-    access_token = "pat-na1-4e40760d-1a3a-483e-a588-0e8f6d681b57"
+    access_token = "REPLACED_API_KEY"
     
     # Check the specific collaborators from the deal
     collaborator_ids = ["103406387", "79369461"]

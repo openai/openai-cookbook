@@ -1,0 +1,25 @@
+language: node_js
+node_js:
+  - 8
+branches:
+  only:
+  - master
+  - next
+services:
+  - redis-server
+env:
+  global:
+    - "REDIS_HOST=127.0.0.1"
+    - "REDIS_PORT=6379"
+cache:
+  directories:
+  - $HOME/.npm
+install:
+- npm i
+sudo: required
+after_success: npx codecov --file=./coverage/lcov.info
+script: npm run test-all
+
+before_install:
+  - npm i -g npm@5.10
+  - npm --version

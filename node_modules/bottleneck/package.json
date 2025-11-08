@@ -1,0 +1,56 @@
+{
+  "name": "bottleneck",
+  "version": "2.19.5",
+  "description": "Distributed task scheduler and rate limiter",
+  "main": "lib/index.js",
+  "typings": "bottleneck.d.ts",
+  "scripts": {
+    "test": "mocha test",
+    "test-all": "./scripts/test_all.sh"
+  },
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/SGrondin/bottleneck"
+  },
+  "keywords": [
+    "async rate limiter",
+    "rate limiter",
+    "rate limiting",
+    "async",
+    "rate",
+    "limiting",
+    "limiter",
+    "throttle",
+    "throttling",
+    "throttler",
+    "load",
+    "clustering"
+  ],
+  "author": {
+    "name": "Simon Grondin"
+  },
+  "license": "MIT",
+  "bugs": {
+    "url": "https://github.com/SGrondin/bottleneck/issues"
+  },
+  "devDependencies": {
+    "@babel/core": "^7.5.0",
+    "@babel/preset-env": "^7.5.0",
+    "@types/es6-promise": "0.0.33",
+    "assert": "^1.5.0",
+    "coffeescript": "2.4.x",
+    "ejs-cli": "github:SGrondin/ejs-cli#master",
+    "ioredis": "^4.11.1",
+    "leakage": "^0.4.0",
+    "mocha": "^6.1.4",
+    "redis": "^2.8.0",
+    "regenerator-runtime": "^0.12.1",
+    "rollup": "^0.66.6",
+    "rollup-plugin-babel": "^4.3.3",
+    "rollup-plugin-commonjs": "^9.3.4",
+    "rollup-plugin-json": "^3.1.0",
+    "rollup-plugin-node-resolve": "^3.4.0",
+    "typescript": "^2.6.2"
+  },
+  "dependencies": {}
+}

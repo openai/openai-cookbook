@@ -2,6 +2,17 @@
 
 This document serves as the official reference for Colppy's HubSpot configuration, mapping the customer journey from lead to deal.
 
+## 🔑 Environment Configuration
+
+**API Key Location:** `/Users/virulana/openai-cookbook/.env`
+
+**Supported Environment Variables:**
+- `HUBSPOT_API_KEY` - Primary HubSpot API key
+- `COLPPY_CRM_AUTOMATIONS` - Alternative HubSpot API key name
+- `ColppyCRMAutomations` - Legacy HubSpot API key name
+
+**Note:** All HubSpot scripts check these three environment variables in order. Set at least one in the `.env` file.
+
 ## 🔍 LIVE CRM FIELD VERIFICATION STATUS
 **✅ Last Verified**: January 9, 2025 via Live HubSpot API  
 **📊 Verification Coverage**: Products, Line Items, Companies, Deals, Contacts, UTM Marketing Fields, Teams & Owners API  
@@ -565,12 +576,15 @@ This section documents the exact field mappings for each HubSpot object, verifie
 - **Direct list ID search**: `mcp_hubspot_hubspot-search-objects` with `query: "list:2216"` returns empty results
 - **Filter-based search**: Complex filter groups don't reliably return list members
 - **Owner-based assumptions**: Assuming list membership based on owner criteria
+- **Direct associations endpoint**: `/crm/v4/objects/lists/{list_id}/associations/companies` returns 400 error
+- **Legacy contacts endpoint**: `/contacts/v1/lists/{list_id}/contacts/all` returns empty for some lists
 
-**✅ What Works:**
-- **Company name search**: Search for specific company names from the list
+**✅ What Works (Verified):**
+- **Company name search**: Search for specific company names from the list - **Most Reliable Method**
 - **Verification approach**: Confirm each company exists and retrieve details
 - **Batch operations**: Use `mcp_hubspot_hubspot-batch-read-objects` for multiple companies
-- **Direct REST API**: HubSpot provides `/crm/v3/lists` and related endpoints for programmatic access
+- **Direct REST API**: `/crm/v3/lists/{list_id}` for list details
+- **Contact associations**: `/crm/v4/objects/companies/{company_id}/associations/contacts` for company contacts
 
 ### **Direct REST API Approach (Recommended)**
 
@@ -634,13 +648,14 @@ A full working implementation is available in `/tools/hubspot_lists_api_working.
 - ✅ CUIT validation and missing data detection
 - ✅ Professional vs personal email domain identification
 - ✅ Phone number completeness checking
+- ✅ **Environment variable support** (loads API key from `.env` file)
+- ✅ **Clickable HubSpot URLs** for each company analyzed
 
-**Test Results from List 2216:**
-- Found 10 companies successfully via name search
-- All companies show as "Contador Robado" type
-- 90% missing CUIT (critical data gap)
-- 52 total contacts across all companies
-- Owners: Sofia Celentano (ID: 80563180) and Tatiana Amaya (ID: 81313123)
+**Run the test:**
+```bash
+cd /Users/virulana/openai-cookbook/tools
+python hubspot_lists_api_working.py
+```
 
 ### Step-by-Step Process
 

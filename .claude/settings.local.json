@@ -1,11 +1,12 @@
 {
   "permissions": {
     "allow": [
-      "Bash(node:*)",
-      "Bash(python test_deal_processing_logic.py)",
-      "mcp__ide__getDiagnostics",
-      "Bash(python:*)",
-      "Bash(export ColppyCRMAutomations=*)"
+      "Read(//Users/virulana/Library/**)",
+      "Bash(npx:*)",
+      "Bash(cat:*)",
+      "Read(//Users/virulana/.cursor/**)",
+      "Bash(python3:*)",
+      "Bash(compgen -c)"
     ],
     "deny": [],
     "ask": []

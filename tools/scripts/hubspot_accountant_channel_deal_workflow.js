@@ -129,66 +129,66 @@ exports.main = async (event, callback) => {
 
   // Helper function to get deal collaborators using the correct property
   async function getDealCollaborators(dealId, collaboratorIdsString = null) {
-      console.log(`🔍 COLLABORATORS START - Deal ID: ${dealId}`);
-      
-      try {
+    console.log(`🔍 COLLABORATORS START - Deal ID: ${dealId}`);
+    
+    try {
           let idsString = collaboratorIdsString;
 
           if (!idsString) {
-            console.log(`📡 COLLABORATORS API CALL: Fetching deal with hs_all_collaborator_owner_ids property`);
-            
-            const response = await fetch(`https://api.hubspot.com/crm/v3/objects/deals/${dealId}?properties=hs_all_collaborator_owner_ids`, {
-              headers: {
-                'Authorization': `Bearer ${process.env.ColppyCRMAutomations}`,
-                'Content-Type': 'application/json'
-              }
-            });
-            
-            console.log(`📊 COLLABORATORS API RESPONSE: Status ${response.status} for deal ${dealId}`);
-            
+      console.log(`📡 COLLABORATORS API CALL: Fetching deal with hs_all_collaborator_owner_ids property`);
+      
+      const response = await fetch(`https://api.hubspot.com/crm/v3/objects/deals/${dealId}?properties=hs_all_collaborator_owner_ids`, {
+        headers: {
+          'Authorization': `Bearer ${process.env.ColppyCRMAutomations}`,
+          'Content-Type': 'application/json'
+        }
+      });
+      
+      console.log(`📊 COLLABORATORS API RESPONSE: Status ${response.status} for deal ${dealId}`);
+      
             if (!response.ok) {
               console.log(`⚠️ COLLABORATORS API ERROR: Status ${response.status} for deal ${dealId}`);
               return [];
             }
             
-            const data = await response.json();
+        const data = await response.json();
             idsString = data.properties?.hs_all_collaborator_owner_ids;
           }
-          
+        
           console.log(`🔍 COLLABORATOR IDS STRING: "${idsString}"`);
-          
+        
           if (!idsString) {
-            console.log(`❌ NO COLLABORATORS: Deal ${dealId} has no collaborators`);
-            return [];
-          }
-          
-          // Parse the semicolon-separated string of user IDs
-          const collaboratorIds = idsString.split(';').filter(id => id.trim() !== '');
-          console.log(`✅ COLLABORATORS FOUND: ${collaboratorIds.length} collaborator IDs: [${collaboratorIds.join(', ')}]`);
-          
-          const collaborators = [];
-          for (const ownerId of collaboratorIds) {
-            console.log(`👤 COLLABORATOR: Processing owner ID ${ownerId}`);
-            
-            try {
-              const ownerDetails = await getOwnerDetails(ownerId);
-              collaborators.push({
-                ownerId: ownerId,
-                ownerName: ownerDetails.name,
-                team: ownerDetails.team,
-                isAccountantChannel: ownerDetails.isAccountantChannel
-              });
-            } catch (ownerError) {
-              console.log(`💥 COLLABORATOR OWNER ERROR: ${ownerError.message}`);
-            }
-          }
-          
-          console.log(`✅ COLLABORATORS COMPLETE: Found ${collaborators.length} collaborators with owner info`);
-          return collaborators;
-      } catch (error) {
-          console.log(`💥 COLLABORATORS API EXCEPTION: Deal ${dealId} - ${error.message}`);
+          console.log(`❌ NO COLLABORATORS: Deal ${dealId} has no collaborators`);
           return [];
-      }
+        }
+        
+        // Parse the semicolon-separated string of user IDs
+          const collaboratorIds = idsString.split(';').filter(id => id.trim() !== '');
+        console.log(`✅ COLLABORATORS FOUND: ${collaboratorIds.length} collaborator IDs: [${collaboratorIds.join(', ')}]`);
+        
+        const collaborators = [];
+        for (const ownerId of collaboratorIds) {
+          console.log(`👤 COLLABORATOR: Processing owner ID ${ownerId}`);
+          
+          try {
+            const ownerDetails = await getOwnerDetails(ownerId);
+            collaborators.push({
+              ownerId: ownerId,
+              ownerName: ownerDetails.name,
+              team: ownerDetails.team,
+              isAccountantChannel: ownerDetails.isAccountantChannel
+            });
+          } catch (ownerError) {
+            console.log(`💥 COLLABORATOR OWNER ERROR: ${ownerError.message}`);
+          }
+        }
+        
+        console.log(`✅ COLLABORATORS COMPLETE: Found ${collaborators.length} collaborators with owner info`);
+        return collaborators;
+    } catch (error) {
+      console.log(`💥 COLLABORATORS API EXCEPTION: Deal ${dealId} - ${error.message}`);
+      return [];
+    }
   }
 
   try {

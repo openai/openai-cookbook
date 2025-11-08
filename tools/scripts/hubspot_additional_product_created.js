@@ -1,7 +1,33 @@
-// HubSpot Additional Product Association Workflow
-// Version: 1.0.27 - Clean JavaScript Version
-// Copy this to HubSpot Custom Code
-
+// =============================================================================
+// HubSpot Custom Code - Additional Product Association Workflow
+// =============================================================================
+// VERSION: 1.0.27 (Clean JavaScript)
+// LAST UPDATED: 2025-11-08
+// FILE: hubspot_additional_product_workflow_clean.js
+// WF: https://app.hubspot.com/workflows/19877595/platform/flow/1699053467/edit/actions/6/custom-code
+// PURPOSE:
+// Automates the association of an Additional Product company with the correct
+// customer deal. The workflow validates the secondary company, traces the
+// originating contact, resolves the primary customer company, finds the newest
+// additional-product deal, applies the proper contact/deal label, cleans legacy
+// deal → additional-company labels, and ensures the deal is linked to the billing
+// (primary) company. Every action is logged and surfaced via Slack notifications.
+//
+// FEATURES:
+// ✅ COMPANY VALIDATION: Confirms `empresa_adicional` and captures owner metadata
+// ✅ CONTACT DISCOVERY: Pulls the first associated contact and resolves ownership
+// ✅ PRIMARY CUSTOMER RESOLUTION: Finds the contact’s primary company (association typeId 1)
+// ✅ DEAL IDENTIFICATION: Locates the latest deal in stage “Negociación Producto Adicional” with `empresa_adicional = true`
+// ✅ LABEL ENFORCEMENT: Adds the “Contacto Inicial que da el Alta del Negocio - Pendiente asignar rol” label on the contact ↔ deal link
+// ✅ ASSOCIATION CLEAN-UP: Uses v4 batch archive to strip unwanted labels from the additional-company association while preserving STANDARD (typeId 342)
+// ✅ CUSTOMER LINKAGE: Adds a STANDARD (typeId 341) association between the deal and the primary customer company if missing
+// ✅ SLACK VISIBILITY: Sends detailed success/error notifications with links to the company, contact, and deal
+// ✅ RESILIENT LOGGING: Captures granular diagnostics and avoids workflow failure where possible
+//
+// ENVIRONMENT VARIABLES REQUIRED:
+// - ColppyCRMAutomations: HubSpot Private App token with CRM scopes
+// - SlackWebhookUrl: Incoming webhook URL for notifications
+//
 const hubspot = require('@hubspot/api-client');
 
 exports.main = async (event, callback) => {

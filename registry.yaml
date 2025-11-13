@@ -2634,3 +2634,13 @@
     - charlie-openai
   tags:
     - codex
+
+- title: GPT-5.1 Prompting Guide
+  path: examples/gpt-5/gpt5-1_prompting_guide.ipynb
+  date: 2025-11-13
+  authors:
+    - samarth-oai
+  tags:
+    - gpt-5.1
+    - responses
+    - reasoning

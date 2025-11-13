@@ -2634,3 +2634,11 @@
     - charlie-openai
   tags:
     - codex
+
+- title: Build a coding agent with GPT 5.1
+  path: examples/Build_a_coding_agent_with_GPT-5.1.ipynb
+  date: 2025-11-13
+  authors:
+    - katiagg
+  tags:
+    - agents-sdk

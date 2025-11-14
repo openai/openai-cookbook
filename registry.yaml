@@ -38,6 +38,7 @@
     - nikhils-oai
   tags:
     - agentkit
+    - agents
     - evals
 
 - title: Building with Realtime Mini
@@ -46,7 +47,8 @@
   authors:
     - carter-oai
   tags:
-    - gpt-realtime-mini
+    - realtime
+    - voice
 
 - title: Sora 2 Prompting Guide
   path: examples/sora/sora2_prompting_guide.ipynb
@@ -56,7 +58,7 @@
     - joanneshin-openai
   tags:
     - sora
-    - prompt
+    - prompt-optimization
 
 - title: Using PLANS.md for multi-hour problem solving
   path: articles/codex_exec_plans.md
@@ -89,6 +91,7 @@
   tags:
     - gpt-5
     - codex
+    - prompt-optimization
 
 - title: GPT-5 Troubleshooting Guide
   path: examples/gpt-5/gpt-5_troubleshooting_guide.ipynb
@@ -108,6 +111,7 @@
     - emreokcular
   tags:
     - agents-sdk
+    - context
 
 - title: Automating Code Quality and Security Fixes with Codex CLI on GitLab
   path: examples/codex/secure_quality_gitlab.md
@@ -128,6 +132,7 @@
     - speech
     - audio
     - responses
+    - prompt-optimization
 
 - title: "Fine-tune gpt-oss for better Korean language performance"
   path: articles/gpt-oss/fine-tune-korean.ipynb
@@ -302,10 +307,10 @@
     - Douglas Adams
     - Rishabh Sagar
   tags:
-    - knowledge-graphs
     - retrieval
     - functions
     - responses
+    - agents
 
 - title: Using Evals API on Image Inputs
   path: examples/evaluation/use-cases/EvalsAPI_Image_Inputs.ipynb
@@ -331,7 +336,7 @@
   authors:
     - corwin
   tags:
-    - prompt
+    - prompt-optimization
     - completions
     - responses
     - agents-sdk
@@ -354,7 +359,7 @@
     - minh-hoque
     - corwin
   tags:
-    - prompt
+    - prompt-optimization
     - completions
     - responses
 
@@ -400,7 +405,7 @@
     - Eddie Siegel
   tags:
     - evals
-    - API Flywheel
+    - evals-flywheel
     - completions
     - responses
     - functions
@@ -414,9 +419,9 @@
     - chelseahu-openai
   tags:
     - agents-sdk
+    - agents
     - functions
     - responses
-    - mutli-agent-collaboration
 
 - title: o3/o4-mini Function Calling Guide
   path: examples/o-series/o3o4-mini_prompting_guide.ipynb
@@ -457,6 +462,7 @@
     - charuj
   tags:
     - mcp
+    - functions
 
 - title: Image Understanding with RAG
   path: examples/multimodal/image_understanding_with_rag.ipynb
@@ -484,9 +490,11 @@
   authors:
     - minh-hoque
   tags:
+    - realtime
     - audio
     - speech
     - tiktoken
+    - context
 
 - title: Comparing Speech-to-Text Methods with the OpenAI API
   path: examples/Speech_transcription_methods.ipynb
@@ -508,9 +516,8 @@
     - nharada-tribe
   tags:
     - responses
-    - functions
     - web-search
-    - tool calling
+    - functions
     - RAG
     - insurance
     - legal
@@ -560,7 +567,7 @@
   tags:
     - responses
     - functions
-    - pinecone
+    - RAG
     - web-search
 
 - title: Automating Dispute Management with Agents SDK and Stripe API
@@ -572,6 +579,7 @@
     - responses
     - agents-sdk
     - functions
+    - stripe
 
 - title: Web Search and States with Responses API
   path: examples/responses_api/responses_example.ipynb
@@ -678,6 +686,7 @@
   tags:
     - embeddings
     - tiktoken
+    - context
 
 - title: Long document content extraction
   path: examples/Entity_extraction_for_long_documents.ipynb
@@ -1435,6 +1444,7 @@
   tags:
     - completions
     - embeddings
+    - context
 
 - title: Using Tair as a vector database for OpenAI embeddings
   path: examples/vector_databases/tair/Getting_started_with_Tair_and_OpenAI.ipynb
@@ -1582,12 +1592,9 @@
   authors:
     - akashdeepdeb
   tags:
-    - realtime-api
+    - realtime
     - speech
     - audio
-    - esp32
-    - iot
-    - arduino
 
 - title: Related resources from around the web
   path: articles/related_resources.md
@@ -1691,7 +1698,8 @@
   date: 2023-09-01
   authors:
     - ted-at-openai
-  tags: []
+  tags:
+    - documentation
 
 - title: Function calling with an OpenAPI specification
   path: examples/Function_calling_with_an_OpenAPI_spec.ipynb
@@ -2228,6 +2236,8 @@
     - msingh-openai
   tags:
     - completions
+    - functions
+    - web-search
 
 - title: Prompt Caching 101
   path: examples/Prompt_Caching101.ipynb
@@ -2237,7 +2247,7 @@
   tags:
     - latency
     - cost
-    - prompt caching
+    - prompt-optimization
     - completions
 
 - title: GPT Actions library - Google Ads via Adzviser
@@ -2376,7 +2386,6 @@
   authors:
     - alwell-kevin
   tags:
-    - SDLC
     - reasoning
     - completions
 
@@ -2424,6 +2433,7 @@
     - audio
     - responses
     - speech
+    - agents-sdk
 
 - title: Multi-Language One-Way Translation with the Realtime API
   path: examples/voice_solutions/one_way_translation_using_realtime_api.mdx
@@ -2431,6 +2441,7 @@
   authors:
     - erikakettleson-openai
   tags:
+    - realtime
     - audio
     - speech
 
@@ -2462,6 +2473,7 @@
   tags:
     - responses
     - api
+    - prompt-optimization
 
 - title: Generate images with GPT Image
   path: examples/Generate_Images_With_GPT_Image.ipynb
@@ -2490,7 +2502,6 @@
   tags:
     - agents
     - agents-sdk
-    - parallel-agents
 
 - title: Practical guide to data-intensive apps with the Realtime API
   path: examples/Data-intensive-Realtime-apps.ipynb
@@ -2500,6 +2511,7 @@
     - rkoenig-openai
     - phundal-openai
   tags:
+    - realtime
     - audio
     - speech
 
@@ -2513,7 +2525,6 @@
   tags:
     - evals
     - stripe
-    - conversion
 
 - title: Evals API Use-case - MCP Evaluation
   path: examples/evaluation/use-cases/mcp_eval_notebook.ipynb
@@ -2548,6 +2559,7 @@
     - evals-api
     - responses
     - evals
+    - functions
 
 - title: Evals API Use-case - Web Search Evaluation
   path: examples/evaluation/use-cases/web-search-evaluation.ipynb
@@ -2559,6 +2571,7 @@
     - evals-api
     - responses
     - evals
+    - web-search
 
 - title: Introduction to deep research in the OpenAI API
   path: examples/deep_research_api/introduction_to_deep_research_api.ipynb
@@ -2567,7 +2580,6 @@
     - glojain
     - alwell-kevin
   tags:
-    - deep-research-api
     - responses
     - mcp
     - deep-research
@@ -2579,7 +2591,6 @@
     - alwell-kevin
     - glojain
   tags:
-    - deep-research-api
     - mcp
     - deep-research
     - agents
@@ -2593,7 +2604,6 @@
     - glojain
   tags:
     - mcp
-    - deep-research-api
     - responses
     - deep-research
     - agents
@@ -2626,6 +2636,8 @@
   tags:
     - evals
     - datasets
+    - prompt-optimization
+    - evals-flywheel
 
 - title: Build Code Review with the Codex SDK
   path: examples/codex/build_code_review_with_codex_sdk.md

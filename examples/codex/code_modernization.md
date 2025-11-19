@@ -1,4 +1,4 @@
-# Modernizing your Cgiodebase with Codex
+# Modernizing your Codebase with Codex
 
 ## Introduction
 

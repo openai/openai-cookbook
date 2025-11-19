@@ -2652,3 +2652,11 @@
     - gpt-5.1
     - responses
     - reasoning
+
+- title: Modernizing your Codebase with Codex
+  path: examples/codex/code-modernization.md
+  date: 2025-11-19
+  authors:
+    - derrickchoi-openai
+  tags:
+    - codex

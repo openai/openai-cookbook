@@ -525,7 +525,6 @@ codex-structured-review:
 
     # Run Codex exec CLI
     - |
-      echo "OPENAI_API_KEY=${OPENAI_API_KEY}"
       printenv OPENAI_API_KEY | codex login --with-api-key && \
       codex exec --output-schema codex-output-schema.json \
                  --output-last-message codex-output.json \

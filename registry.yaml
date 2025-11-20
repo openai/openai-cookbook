@@ -4,6 +4,17 @@
 # should build pages for, and indicates metadata such as tags, creation date and
 # authors for each page.
 
+- title: Out-of-Band Transcription with the OpenAI Realtime API
+  path: examples/Realtime_out_of_band_transcription.ipynb
+  date: 2025-11-20
+  authors:
+    - minh-hoque
+  tags:
+    - realtime
+    - transcription
+    - speech
+    - audio
+
 - title: Self-Evolving Agents - A Cookbook for Autonomous Agent Retraining
   path: examples/partners/self_evolving_agents/autonomous_agent_retraining.ipynb
   date: 2025-11-04

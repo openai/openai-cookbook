@@ -31,6 +31,7 @@ New or relocated content must have an entry in `registry.yaml` with an accurate 
 
 ## Review Guidelines
 
+These are considered priority 0 issues for this repo, in addition to the normal priority for possible issues.
 - Verify file, function, and notebook names follow the repo's naming conventions and clearly describe their purpose.
 - Scan prose and markdown for typos, broken links, and inconsistent formatting before approving.
 - Check that code identifiers remain descriptive (no leftover placeholder names) and that repeated values are factored into constants when practical.

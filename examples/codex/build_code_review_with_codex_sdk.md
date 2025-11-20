@@ -336,6 +336,266 @@ jobs:
         shell: bash
 ```
 
+## Gitlab Example
+GitLab doesn’t have a direct equivalent to the GitHub Action, but you can run codex exec inside GitLab CI/CD to perform automated code reviews.
+
+However, the GitHub Action includes an important [safety strategy](https://github.com/openai/codex-action?tab=readme-ov-file#safety-strategy): it drops sudo permissions so Codex cannot access its own OpenAI API key. This isolation is critical—especially for public repositories where sensitive secrets (like your OpenAI API key) may be present—because it prevents Codex from reading or exfiltrating credentials during execution.
+
+```yaml
+# Set the following variables Settings > CI/CD
+# OPENAI_API_KEY: $OPENAI_API_KEY
+# GITLAB_TOKEN: $GITLAB_TOKEN
+
+# Note: only for use on private repositories.
+
+stages:
+  - review
+
+codex-structured-review:
+  stage: review
+  image: ubuntu:22.04
+  rules:
+    - if: '$CI_PIPELINE_SOURCE == "merge_request_event"'
+  variables:
+    PR_NUMBER: $CI_MERGE_REQUEST_IID
+    REPOSITORY: "$CI_PROJECT_PATH"
+    BASE_SHA: "$CI_MERGE_REQUEST_DIFF_BASE_SHA"
+    HEAD_SHA: "$CI_COMMIT_SHA"
+
+  before_script:
+    - apt-get update -y
+    - apt-get install -y git curl jq
+    - |
+      if ! command -v codex >/dev/null 2>&1; then
+        ARCH="$(uname -m)"
+        case "$ARCH" in
+          x86_64) CODEX_PLATFORM="x86_64-unknown-linux-musl" ;;
+          aarch64|arm64) CODEX_PLATFORM="aarch64-unknown-linux-musl" ;;
+          *)
+            echo "Unsupported architecture: $ARCH"
+            exit 1
+            ;;
+        esac
+
+        CODEX_VERSION="${CODEX_VERSION:-latest}"
+        if [ -n "${CODEX_DOWNLOAD_URL:-}" ]; then
+          CODEX_URL="$CODEX_DOWNLOAD_URL"
+        elif [ "$CODEX_VERSION" = "latest" ]; then
+          CODEX_URL="https://github.com/openai/codex/releases/latest/download/codex-${CODEX_PLATFORM}.tar.gz"
+        else
+          CODEX_URL="https://github.com/openai/codex/releases/download/${CODEX_VERSION}/codex-${CODEX_PLATFORM}.tar.gz"
+        fi
+
+        TMP_DIR="$(mktemp -d)"
+        curl -fsSL "$CODEX_URL" -o "$TMP_DIR/codex.tar.gz"
+        tar -xzf "$TMP_DIR/codex.tar.gz" -C "$TMP_DIR"
+        install -m 0755 "$TMP_DIR"/codex-* /usr/local/bin/codex
+        rm -rf "$TMP_DIR"
+      fi
+    - git fetch origin $CI_MERGE_REQUEST_TARGET_BRANCH_NAME
+    - git fetch origin $CI_MERGE_REQUEST_SOURCE_BRANCH_NAME
+    - git checkout $CI_MERGE_REQUEST_SOURCE_BRANCH_NAME
+
+  script:
+    - echo "Running Codex structured review for MR !${PR_NUMBER}"
+
+    # Generate structured output schema
+    - |
+      cat <<'JSON' > codex-output-schema.json
+      {
+        "$schema": "http://json-schema.org/draft-07/schema#",
+        "title": "Codex Structured Review",
+        "type": "object",
+        "additionalProperties": false,
+        "required": [
+          "overall_correctness",
+          "overall_explanation",
+          "overall_confidence_score",
+          "findings"
+        ],
+        "properties": {
+          "overall_correctness": {
+            "type": "string",
+            "description": "Overall verdict for the merge request."
+          },
+          "overall_explanation": {
+            "type": "string",
+            "description": "Explanation backing up the verdict."
+          },
+          "overall_confidence_score": {
+            "type": "number",
+            "minimum": 0,
+            "maximum": 1,
+            "description": "Confidence level for the verdict."
+          },
+          "findings": {
+            "type": "array",
+            "description": "Collection of actionable review findings.",
+            "items": {
+              "type": "object",
+              "additionalProperties": false,
+              "required": [
+                "title",
+                "body",
+                "confidence_score",
+                "code_location"
+              ],
+              "properties": {
+                "title": {
+                  "type": "string"
+                },
+                "body": {
+                  "type": "string"
+                },
+                "confidence_score": {
+                  "type": "number",
+                  "minimum": 0,
+                  "maximum": 1
+                },
+                "code_location": {
+                  "type": "object",
+                  "additionalProperties": false,
+                  "required": [
+                    "absolute_file_path",
+                    "relative_file_path",
+                    "line_range"
+                  ],
+                  "properties": {
+                    "absolute_file_path": {
+                      "type": "string"
+                    },
+                    "relative_file_path": {
+                      "type": "string"
+                    },
+                    "line_range": {
+                      "type": "object",
+                      "additionalProperties": false,
+                      "required": [
+                        "start",
+                        "end"
+                      ],
+                      "properties": {
+                        "start": {
+                          "type": "integer",
+                          "minimum": 1
+                        },
+                        "end": {
+                          "type": "integer",
+                          "minimum": 1
+                        }
+                      }
+                    }
+                  }
+                }
+              }
+            },
+            "default": []
+          }
+        }
+      }
+      JSON
+
+    # Build Codex review prompt
+    - |
+      PROMPT_PATH="codex-prompt.md"
+      TEMPLATE_PATH="${REVIEW_PROMPT_PATH:-review_prompt.md}"
+      if [ -n "$TEMPLATE_PATH" ] && [ -f "$TEMPLATE_PATH" ]; then
+        cat "$TEMPLATE_PATH" > "$PROMPT_PATH"
+      else
+        {
+          printf '%s\n' "You are acting as a reviewer for a proposed code change..."
+          printf '%s\n' "Focus on issues that impact correctness, performance, security..."
+          printf '%s\n' "Flag only actionable issues introduced by this merge request..."
+          printf '%s\n' "Provide an overall correctness verdict..."
+        } > "$PROMPT_PATH"
+      fi
+      {
+        echo ""
+        echo "Repository: ${REPOSITORY}"
+        echo "Merge Request #: ${PR_NUMBER}"
+        echo "Base SHA: ${BASE_SHA}"
+        echo "Head SHA: ${HEAD_SHA}"
+        echo ""
+        echo "Changed files:"
+        git --no-pager diff --name-status "${BASE_SHA}" "${HEAD_SHA}"
+        echo ""
+        echo "Unified diff (context=5):"
+        git --no-pager diff --unified=5 "${BASE_SHA}" "${HEAD_SHA}"
+      } >> "$PROMPT_PATH"
+
+    # Run Codex exec CLI
+    - |
+      echo "OPENAI_API_KEY=${OPENAI_API_KEY}"
+      printenv OPENAI_API_KEY | codex login --with-api-key && \
+      codex exec --output-schema codex-output-schema.json \
+                 --output-last-message codex-output.json \
+                 --sandbox read-only \
+                 - < codex-prompt.md
+
+    # Inspect structured Codex output
+    - |
+      if [ -s codex-output.json ]; then
+        jq '.' codex-output.json || true
+      else
+        echo "Codex output file missing"; exit 1
+      fi
+
+    # Publish inline comments to GitLab MR
+    - |
+      findings_count=$(jq '.findings | length' codex-output.json)
+      if [ "$findings_count" -eq 0 ]; then
+        echo "No findings from Codex; skipping comments."
+        exit 0
+      fi
+
+      jq -c \
+        --arg base "$BASE_SHA" \
+        --arg start "$BASE_SHA" \
+        --arg head "$HEAD_SHA" '
+        .findings[] | {
+          body: (.title + "\n\n" + .body + "\n\nConfidence: " + (.confidence_score | tostring)),
+          position: {
+            position_type: "text",
+            base_sha: $base,
+            start_sha: $start,
+            head_sha: $head,
+            new_path: (.code_location.relative_file_path // .code_location.absolute_file_path),
+            new_line: .code_location.line_range.end
+          }
+        }
+      ' codex-output.json > findings.jsonl
+
+      while IFS= read -r payload; do
+        curl -sS --request POST \
+             --header "PRIVATE-TOKEN: $GITLAB_TOKEN" \
+             --header "Content-Type: application/json" \
+             --data "$payload" \
+             "https://gitlab.com/api/v4/projects/${CI_PROJECT_ID}/merge_requests/${PR_NUMBER}/discussions"
+      done < findings.jsonl
+
+    # Publish overall summary comment
+    - |
+      overall_state=$(jq -r '.overall_correctness' codex-output.json)
+      overall_body=$(jq -r '.overall_explanation' codex-output.json)
+      confidence=$(jq -r '.overall_confidence_score' codex-output.json)
+
+      summary="**Codex automated review**\n\nVerdict: ${overall_state}\nConfidence: ${confidence}\n\n${overall_body}"
+
+      curl -sS --request POST \
+           --header "PRIVATE-TOKEN: $GITLAB_TOKEN" \
+           --header "Content-Type: application/json" \
+           --data "$(jq -n --arg body "$summary" '{body: $body}')" \
+           "https://gitlab.com/api/v4/projects/${CI_PROJECT_ID}/merge_requests/${PR_NUMBER}/notes"
+
+  artifacts:
+    when: always
+    paths:
+      - codex-output.json
+      - codex-prompt.md
+
+```
+
+
 ## Jenkins Example
 
 We can use the same approach to scripting a job with Jenkins. Once again, comments highlight key stages of the workflow:

@@ -1,97 +1,103 @@
 [
     {
-        "hotel_information": {
-            "name": "MADISON Hotel GmbH",
-            "address": "Schaartestraße 4, 20459 Hamburg",
-            "contact": {
-                "phone": "+49.40.37 666-0",
-                "fax": "+49.40.37 666-137",
-                "email": "info@madisonhotel.de",
-                "website": "madisonhotel.de"
+        "Hotel Information": {
+            "Name": "MADISON Hotel GmbH",
+            "Address": "Schaartinsweg 4, 20459 Hamburg",
+            "Contact": {
+                "Phone": "+49.40.37 666-0",
+                "Fax": "+49.40.37 666-137",
+                "Email": "info@madisonhotel.de",
+                "Website": "madisonhotel.de"
             },
-            "managing_directors": "Marlies Head, Thomas Kleinertz",
-            "registration": {
-                "court": "AG Hamburg HRB 47881",
-                "VAT_ID": "DE118 696 407"
-            },
-            "bank_details": {
-                "bank": "HypoVereinsbank",
-                "account_number": "360 27 11",
-                "IBAN": "DE48 2003 0000 0003 6027 11",
+            "Geschäftsführer": "Marlies Head, Thomas Kleinertz",
+            "AG Hamburg": "HRB 47821",
+            "VAT": "DE118 696 407",
+            "Bank": {
+                "Name": "HypoVereinsbank",
+                "BLZ": "200 300 00",
+                "Konto-Nr": "360 27 11",
+                "IBAN": "DE48 2003 0000 0360 0271 11",
                 "BIC": "HYVEDEMM300"
             }
         },
-        "guest_information": {
-            "company": "APMeister Consulting GmbH",
-            "address": "Friedrichstr. 123, 10117 Berlin",
-            "guest_name": "Herr Jens Walter"
+        "Guest Information": {
+            "Company": "APMeister Consulting GmbH",
+            "Address": "Friedrichstr. 123, 10117 Berlin",
+            "Guest Name": "Herr Jens Walter"
         },
-        "invoice_information": {
-            "invoice_number": "508873",
-            "date": "16.08.19",
-            "room_number": "407",
-            "check_in": "11.08.19",
-            "check_out": "16.08.19",
-            "page": "1 of 1",
-            "user_id": "RF"
+        "Invoice Information": {
+            "Rechnungs-Nr.": "508873 /",
+            "Date": "16.08.19",
+            "Room": "407",
+            "Arrival": "11.08.19",
+            "Departure": "16.08.19",
+            "Page": "1 of 1",
+            "User ID": "RF"
         },
-        "charges": [
+        "Charges": [
             {
-                "date": "11.08.19",
-                "description": "Übernachtung exklusive Frühstück*",
-                "charge": 110.0,
-                "credit": null
+                "Datum": "11.08.19",
+                "Beschreibung": "Übernachtung exklusive Frühstück*",
+                "Belastung": 110.0,
+                "Entlastung": null
             },
             {
-                "date": "12.08.19",
-                "description": "Übernachtung exklusive Frühstück*",
-                "charge": 110.0,
-                "credit": null
+                "Datum": "12.08.19",
+                "Beschreibung": "Übernachtung exklusive Frühstück*",
+                "Belastung": 110.0,
+                "Entlastung": null
             },
             {
-                "date": "13.08.19",
-                "description": "Übernachtung exklusive Frühstück*",
-                "charge": 110.0,
-                "credit": null
+                "Datum": "13.08.19",
+                "Beschreibung": "Übernachtung exklusive Frühstück*",
+                "Belastung": 110.0,
+                "Entlastung": null
             },
             {
-                "date": "14.08.19",
-                "description": "Übernachtung exklusive Frühstück*",
-                "charge": 110.0,
-                "credit": null
+                "Datum": "14.08.19",
+                "Beschreibung": "Übernachtung exklusive Frühstück*",
+                "Belastung": 110.0,
+                "Entlastung": null
             },
             {
-                "date": "15.08.19",
-                "description": "Übernachtung exklusive Frühstück*",
-                "charge": 110.0,
-                "credit": null
+                "Datum": "15.08.19",
+                "Beschreibung": "Übernachtung exklusive Frühstück*",
+                "Belastung": 110.0,
+                "Entlastung": null
             },
             {
-                "date": "16.08.19",
-                "description": "Mastercard IFC",
-                "charge": null,
-                "credit": 550.0
+                "Datum": "16.08.19",
+                "Beschreibung": "Mastercard IFC",
+                "Belastung": 550.0,
+                "Entlastung": null
             }
         ],
-        "totals": {
-            "net_amount": 514.02,
-            "tax_amount": 35.98,
-            "gross_amount": 550.0,
-            "total": 550.0,
-            "balance": 0.0
+        "Summary": {
+            "Total inkl. MwSt.": {
+                "Netto EUR": 514.02,
+                "MwSt. EUR": 35.98,
+                "Brutto EUR": 550.0
+            },
+            "MwSt. 7%": {
+                "Netto EUR": 514.02,
+                "MwSt. EUR": 35.98,
+                "Brutto EUR": 550.0
+            },
+            "Total": 550.0,
+            "Saldo": "0.00 EUR"
         },
-        "payment_information": {
-            "payment_method": "Mastercard",
-            "card_number": "XXXX-XXXX-XXXX-5052",
-            "transaction_amount": 550.0,
-            "authorization_code": "790675",
-            "terminal_id": "692648593",
-            "approval_code": "790675",
-            "receipt_number": "36959"
-        },
-        "tax_information": {
-            "tax_office": "Finanzamt: Hamburg Mitte",
-            "tax_number": "47/841/01128"
+        "Payment Information": {
+            "Kreditkarteninstitut": "Finanzamt: Hamburg Mitte",
+            "Steuernummer": "47/841/01128",
+            "Vertragspartner": "154694832",
+            "Beleg Nr.": "39659",
+            "Kartenknummer": "XXXXXXXXXXXX0502",
+            "Transaktionsbetrag": "550.00",
+            "Verfallsdatum": "XXXX",
+            "Genehmigter Betrag": "550.00",
+            "Terminal ID": "692648593",
+            "Genehmigungscode": "750675",
+            "Unterschrift": "Unterschrift des Karteninhabers"
         }
     }
 ]

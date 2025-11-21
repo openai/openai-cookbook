@@ -3,6 +3,16 @@
 # You can optionally customize how your information shows up cookbook.openai.com over here.
 # If your information is not present here, it will be pulled from your GitHub profile.
 
+joanneshin-openai:
+  name: "Joanne Shin"
+  website: "https://www.linkedin.com/in/jeongminshin"
+  avatar: "https://avatars.githubusercontent.com/u/206945323?v=4"
+
+daveleo-openai:
+  name: "Dave Leo"
+  website: "https://www.linkedin.com/in/davidanthonyleo/"
+  avatar: "https://media.licdn.com/dms/image/v2/C5603AQF2Kg-D7XJKNw/profile-displayphoto-shrink_800_800/profile-displayphoto-shrink_800_800/0/1612654752234?e=1761782400&v=beta&t=RkO9jCbJrY6Ox9YRbMA6HAAZhxfYJV1OsZeIT3YatBM"
+
 jonlim-openai:
   name: "Jonathan Lim"
   website: "https://www.linkedin.com/in/jonlmr"
@@ -38,6 +48,11 @@ rajpathak-openai:
   website: "https://www.linkedin.com/in/rajpathakopenai/"
   avatar: "https://avatars.githubusercontent.com/u/208723614?s=400&u=c852eed3be082f7fbd402b5a45e9b89a0bfed1b8&v=4"
 
+emreokcular:
+  name: "Emre Okcular"
+  website: "https://www.linkedin.com/in/emreokcular/"
+  avatar: "https://avatars.githubusercontent.com/u/26163154?v=4"
+
 chelseahu-openai:
   name: "Chelsea Hu"
   website: "https://www.linkedin.com/in/chelsea-tsaiszuhu/"
@@ -52,6 +67,16 @@ theophile-oai:
   name: "Theophile Sautory"
   website: "https://www.linkedin.com/in/theophilesautory"
   avatar: "https://avatars.githubusercontent.com/u/206768658?v=4"
+
+bfioca-openai:
+  name: "Brian Fioca"
+  website: "https://www.linkedin.com/in/brian-fioca/"
+  avatar: "https://avatars.githubusercontent.com/u/206814564?v=4"
+
+carter-oai:
+  name: "Carter Mcclellan"
+  website: "https://www.linkedin.com/in/carter-mcclellan/"
+  avatar: "https://avatars.githubusercontent.com/u/219906258?v=4"
 
 robert-tinn:
   name: "Robert Tinn"
@@ -92,6 +117,11 @@ shyamal-anadkat:
   name: "Shyamal Anadkat"
   website: "https://twitter.com/shyamalanadkat"
   avatar: "https://pbs.twimg.com/profile_images/1590564338682560512/3bbZJqxZ_400x400.jpg"
+
+aaronfriel:
+  name: "Aaron Friel"
+  website: "https://www.github.com/aaronfriel"
+  avatar: "https://avatars.githubusercontent.com/aaronfriel"
 
 simonpfish:
   name: "Simón Fishman"
@@ -390,8 +420,8 @@ phundal-openai:
 
 rkoenig-openai:
   name: "Robin Koenig"
-  website: "https://www.linkedin.com/in/robinkoenig/"
-  avatar: "https://media.licdn.com/dms/image/v2/C5603AQEqUVtbts8Huw/profile-displayphoto-shrink_400_400/profile-displayphoto-shrink_400_400/0/1558137883581?e=1753920000&v=beta&t=jcm-qNJfmgVJsS6uNHxHu5T2nQoUWkXivthzxTJMWqA"
+  website: "https://robinkoenig.com"
+  avatar: "https://avatars.githubusercontent.com/u/208886811?v=4"
 
 joshbickett:
   name: "Josh Bickett"
@@ -430,7 +460,7 @@ daisyshe-oai:
 
 dkundel-openai:
   name: "Dominik Kundel"
-  website: "https://www.linkedin.com/in/dominik-kundel/"
+  website: "https://www.linkedin.com/in/dkundel/"
   avatar: "https://avatars.githubusercontent.com/u/200841172?v=4"
 
 edbeeching:
@@ -472,3 +502,48 @@ heejingithub:
   name: "Heejin Cho"
   website: "https://www.linkedin.com/in/heejc/"
   avatar: "https://avatars.githubusercontent.com/u/169293861"
+
+himadri518:
+  name: "Himadri Acharya"
+  website: "https://www.linkedin.com/in/himadri-acharya-086ba261/"
+  avatar: "https://avatars.githubusercontent.com/u/14100684?v=4"
+
+neelk-oai:
+  name: "Neel Kapse"
+  website: "https://www.linkedin.com/in/neel-kapse/"
+  avatar: "https://media.licdn.com/dms/image/v2/D4E03AQEegSR4W4Ylmg/profile-displayphoto-scale_400_400/B4EZkLjdrcIQAk-/0/1756835470622?e=1762387200&v=beta&t=HETTFnoh3nV_Yc84tHGkahKgOFdvnPlesfi3ki8mWFg"
+
+hamel:
+  name: "Hamel Husain"
+  website: "https://www.linkedin.com/in/hamelhusain/"
+  avatar: "https://media.licdn.com/dms/image/v2/C5603AQGoyHYtA2QIXw/profile-displayphoto-shrink_400_400/profile-displayphoto-shrink_400_400/0/1572471557655?e=1762387200&v=beta&t=wZrq-Nfc8-4Xq-nJ5g2jt9gZ1KLTg23KOIBGHk2xkZ0"
+
+jhall-openai:
+  name: "Josh Hall"
+  website: "https://www.linkedin.com/in/jhall14/"
+  avatar: "https://avatars.githubusercontent.com/u/198997750?v=4"
+
+charlie-openai:
+  name: "Charlie Weems"
+  website: "https://wee.ms"
+  avatar: "https://avatars.githubusercontent.com/u/181146176?v=4"
+
+nikhils-oai:
+  name: "Nikhil Srivastava"
+  website: "https://www.linkedin.com/in/nsrivast/"
+  avatar: "https://avatars.githubusercontent.com/u/231350150"
+
+roost:
+  name: "ROOST"
+  website: "https://roost.tools"
+  avatar: "https://avatars.githubusercontent.com/u/189051351?v=4"
+
+samarth-oai:
+  name: "Samarth Madduru"
+  website: "https://x.com/samarthmadduru"
+  avatar: "https://pbs.twimg.com/profile_images/1911309450368970752/6IFoTpmu_400x400.jpg"
+
+derrickchoi-openai:
+  name: "Derrick Choi"
+  website: "https://www.linkedin.com/in/derrickchoi/"
+  avatar: "https://avatars.githubusercontent.com/u/211427900"

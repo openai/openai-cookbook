@@ -340,14 +340,19 @@ jobs:
 GitLab doesn’t have a direct equivalent to the GitHub Action, but you can run codex exec inside GitLab CI/CD to perform automated code reviews.
 
 However, the GitHub Action includes an important [safety strategy](https://github.com/openai/codex-action?tab=readme-ov-file#safety-strategy): it drops sudo permissions so Codex cannot access its own OpenAI API key. This isolation is critical—especially for public repositories where sensitive secrets (like your OpenAI API key) may be present—because it prevents Codex from reading or exfiltrating credentials during execution.
+Before running this job, configure your GitLab project:
+
+1. Go to **Project → Settings → CI/CD**.
+2. Expand the **Variables** section.
+3. Add these variables:
+   - `OPENAI_API_KEY`
+   - `GITLAB_TOKEN`
+4. Mark them as masked/protected as appropriate.
+5. Add the following GitLab example job to your `.gitlab-ci.yml` file at the root of your repository so it runs during merge request pipelines.
+
+Please be mindful with your API key on public repositories.
 
 ```yaml
-# Set the following variables Settings > CI/CD
-# OPENAI_API_KEY: $OPENAI_API_KEY
-# GITLAB_TOKEN: $GITLAB_TOKEN
-
-# Note: only for use on private repositories.
-
 stages:
   - review
 

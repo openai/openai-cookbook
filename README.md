@@ -18,3 +18,7 @@ For other useful tools, guides and courses, check out these [related resources f
 ## License
 
 MIT License
+
+The **MIT License** is a permissive open-source license that allows anyone to use, modify, and distribute the software freely.  
+It requires only that the original license notice and copyright statement are included in any copies or substantial portions of the software.  
+This makes the project accessible for both personal and commercial use while promoting open collaboration.

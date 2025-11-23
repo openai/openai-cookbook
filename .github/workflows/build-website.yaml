@@ -12,3 +12,4 @@ jobs:
     steps:
       - name: Call Deploy Hook
         run: curl -X POST ${{ secrets.WEBSITE_DEPLOY_HOOK_URL }}
+[![Rebuild Cookbook Website](https://github.com/openai/openai-cookbook/actions/workflows/build-website.yaml/badge.svg)](https://github.com/openai/openai-cookbook/actions/workflows/build-website.yaml)

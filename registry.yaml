@@ -1650,6 +1650,24 @@
   tags:
     - embeddings
 
+
+- title: Prisma as a vector database
+  path: examples/vector_databases/prisma/README.md
+  date: 2025-11-27
+  authors:
+    - mhartington
+  tags:
+    - embeddings
+
+- title: Vector similarity search using Prisma Postgres
+  path: examples/vector_databases/prisma/prisma-postgres-vector-search-pgvector.ipynb
+  date: 2025-11-27
+  authors:
+    - mhartington
+  tags:
+    - embeddings
+
+
 - title: Question answering with LangChain, Deep Lake, & OpenAI
   path: examples/vector_databases/deeplake/deeplake_langchain_qa.ipynb
   date: 2023-09-30

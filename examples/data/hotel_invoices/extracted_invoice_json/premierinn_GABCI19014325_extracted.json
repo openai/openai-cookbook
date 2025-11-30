@@ -11,15 +11,15 @@
             "Address": "Friedrichstr. 123, 10117 Berlin"
         },
         "Invoice Information": {
-            "Ankunft": "23.09.19",
-            "Referenznummer": "GABC015452127",
-            "Nächte": 4,
-            "Abreise": "27.09.19",
-            "Zimmer": 626,
-            "Kundereferenz": null,
             "Rechnungsnummer": "GABC19014325",
             "Rechnungsdatum": "23.09.19",
-            "Buchungsnummer": "GABR15867"
+            "Referenznummer": "GABC015452127",
+            "Buchungsnummer": "GABR15867",
+            "Ankunft": "23.09.19",
+            "Abreise": "27.09.19",
+            "Nächte": 4,
+            "Zimmer": 626,
+            "Kundereferenz": 2
         },
         "Charges": [
             {
@@ -90,7 +90,8 @@
         "Payment Information": {
             "Zahlung": "550,60",
             "Gesamt (Rechnungsbetrag)": "550,60",
-            "Offener Betrag": "0,00"
+            "Offener Betrag": "0,00",
+            "Bezahlart": "Mastercard-Kreditkarte"
         },
         "Tax Information": {
             "MwSt.%": [

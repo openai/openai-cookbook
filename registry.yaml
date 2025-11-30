@@ -2196,6 +2196,16 @@
     - chatgpt
     - chatgpt-data
 
+- title: GPT Actions library - Snowflake Cortex Analyst
+  path: examples/chatgpt/gpt_actions_library/gpt_action_snowflake_cortex_analyst.ipynb
+  date: 2025-12-01
+  authors:
+    - alex-dinsmoor-openai
+  tags:
+    - gpt-actions-library
+    - chatgpt
+    - chatgpt-data
+
 - title: GPT Actions library - Retool Workflow
   path: examples/chatgpt/gpt_actions_library/gpt_action_retool_workflow.md
   date: 2024-08-28

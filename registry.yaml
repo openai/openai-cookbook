@@ -4,6 +4,306 @@
 # should build pages for, and indicates metadata such as tags, creation date and
 # authors for each page.
 
+- title: Transcribing User Audio with a Separate Realtime Request
+  path: examples/Realtime_out_of_band_transcription.ipynb
+  date: 2025-11-20
+  authors:
+    - minh-hoque
+  tags:
+    - realtime
+    - transcription
+    - voice
+    - speech
+    - audio
+
+- title: Self-Evolving Agents - A Cookbook for Autonomous Agent Retraining
+  path: examples/partners/self_evolving_agents/autonomous_agent_retraining.ipynb
+  date: 2025-11-04
+  authors:
+    - shikhar-cyber
+    - Calvin Maguranis
+    - Valentina Frenkel
+    - Fanny Perraudeau
+    - Giorgio Saladino
+  tags:
+    - partners
+    - self-evolving-agents
+    - evals
+    - llmops
+    - prompt-engineering
+    - agent-retraining
+
+- title: User guide for gpt-oss-safeguard
+  path: articles/gpt-oss-safeguard-guide.md
+  date: 2025-10-29
+  authors:
+    - roost
+  tags:
+    - gpt-oss
+    - open-models
+    - guardrails
+
+- title: Build, deploy, and optimize agentic workflows with AgentKit
+  path: examples/agentkit/agentkit_walkthrough.ipynb
+  date: 2025-10-17
+  authors:
+    - nikhils-oai
+  tags:
+    - agentkit
+    - evals
+
+- title: Building with Realtime Mini
+  path: examples/building_w_rt_mini/building_w_rt_mini.ipynb
+  date: 2025-10-11
+  authors:
+    - carter-oai
+  tags:
+    - gpt-realtime-mini
+
+- title: Sora 2 Prompting Guide
+  path: examples/sora/sora2_prompting_guide.ipynb
+  date: 2025-10-06
+  authors:
+    - rkoenig-openai
+    - joanneshin-openai
+  tags:
+    - sora
+    - prompt
+
+- title: Using PLANS.md for multi-hour problem solving
+  path: articles/codex_exec_plans.md
+  date: 2025-10-07
+  authors:
+    - aaronfriel
+  tags:
+    - codex
+    - gpt-5
+    - planning
+    - documentation
+    - agents
+
+- title: Building Consistent Workflows with Codex CLI & Agents SDK
+  path: examples/codex/codex_mcp_agents_sdk/building_consistent_workflows_codex_cli_agents_sdk.ipynb
+  date: 2025-10-01
+  authors:
+    - jhall-openai
+    - charlie-openai
+  tags:
+    - agents-sdk
+    - codex
+    - mcp
+
+- title: GPT-5-Codex Prompting Guide
+  path: examples/gpt-5-codex_prompting_guide.ipynb
+  date: 2025-09-23
+  authors:
+    - daveleo-openai
+  tags:
+    - gpt-5
+    - codex
+
+- title: GPT-5 Troubleshooting Guide
+  path: examples/gpt-5/gpt-5_troubleshooting_guide.ipynb
+  date: 2025-09-17
+  authors:
+    - prashantmital-openai
+    - bfioca-openai
+    - carter-oai
+  tags:
+    - gpt-5
+    - prompt-optimization
+
+- title: Context Engineering - Short-Term Memory Management with Sessions from OpenAI Agents SDK
+  path: examples/agents_sdk/session_memory.ipynb
+  date: 2025-09-09
+  authors:
+    - emreokcular
+  tags:
+    - agents-sdk
+
+- title: Automating Code Quality and Security Fixes with Codex CLI on GitLab
+  path: examples/codex/secure_quality_gitlab.md
+  date: 2025-08-29
+  authors:
+    - jonlim-openai
+    - pap-openai
+  tags:
+    - codex
+
+- title: Realtime Prompting Guide
+  path: examples/Realtime_prompting_guide.ipynb
+  date: 2025-08-28
+  authors:
+    - minh-hoque
+  tags:
+    - realtime
+    - speech
+    - audio
+    - responses
+
+- title: "Fine-tune gpt-oss for better Korean language performance"
+  path: articles/gpt-oss/fine-tune-korean.ipynb
+  date: 2025-08-26
+  authors:
+    - heejingithub
+    - danial-openai
+    - joanneshin-openai
+  tags:
+    - gpt-oss
+    - open-models
+
+- title: Verifying gpt-oss implementations
+  path: articles/gpt-oss/verifying-implementations.md
+  date: 2025-08-11
+  authors:
+    - dkundel-openai
+  tags:
+    - gpt-oss
+    - open-models
+    - gpt-oss-providers
+
+- title: How to run gpt-oss locally with LM Studio
+  path: articles/gpt-oss/run-locally-lmstudio.md
+  date: 2025-08-07
+  authors:
+    - yagil
+  tags:
+    - gpt-oss
+    - open-models
+    - gpt-oss-local
+
+- title: GPT-5 Prompt Migration and Improvement Using the New Optimizer
+  path: examples/gpt-5/prompt-optimization-cookbook.ipynb
+  date: 2025-08-07
+  authors:
+    - rajpathak-openai
+    - corwin
+  tags:
+    - gpt-5
+    - responses
+    - reasoning
+    - prompt-optimization
+
+- title: GPT-5 prompting guide
+  path: examples/gpt-5/gpt-5_prompting_guide.ipynb
+  date: 2025-08-07
+  authors:
+    - anoop-openai
+    - julian-openai
+    - ericzakariasson
+    - erinkav-openai
+  tags:
+    - gpt-5
+    - responses
+    - reasoning
+
+- title: Frontend coding with GPT-5
+  path: examples/gpt-5/gpt-5_frontend.ipynb
+  date: 2025-08-07
+  authors:
+    - WJPBProjects
+    - anoop-openai
+  tags:
+    - gpt-5
+    - responses
+    - reasoning
+
+- title: GPT-5 New Params and Tools
+  path: examples/gpt-5/gpt-5_new_params_and_tools.ipynb
+  date: 2025-08-07
+  authors:
+    - msingh-openai
+  tags:
+    - gpt-5
+    - functions
+    - reasoning
+
+- title: How to run gpt-oss-20b on Google Colab
+  path: articles/gpt-oss/run-colab.ipynb
+  date: 2025-08-06
+  authors:
+    - pcuenca
+    - Vaibhavs10
+  tags:
+    - gpt-oss
+    - open-models
+    - gpt-oss-server
+
+- title: Using NVIDIA TensorRT-LLM to run gpt-oss-20b
+  path: articles/gpt-oss/run-nvidia.ipynb
+  date: 2025-08-05
+  authors:
+    - jayrodge
+  tags:
+    - gpt-oss
+    - open-models
+    - gpt-oss-server
+
+- title: Fine-tuning with gpt-oss and Hugging Face Transformers
+  path: articles/gpt-oss/fine-tune-transfomers.ipynb
+  date: 2025-08-05
+  authors:
+    - edbeeching
+    - qgallouedec
+    - lewtun
+  tags:
+    - open-models
+    - gpt-oss
+    - gpt-oss-fine-tuning
+
+- title: How to handle the raw chain of thought in gpt-oss
+  path: articles/gpt-oss/handle-raw-cot.md
+  date: 2025-08-05
+  authors:
+    - dkundel-openai
+  tags:
+    - open-models
+    - gpt-oss
+    - gpt-oss-fine-tuning
+    - gpt-oss-providers
+
+- title: How to run gpt-oss with Transformers
+  path: articles/gpt-oss/run-transformers.md
+  date: 2025-08-05
+  authors:
+    - dkundel-openai
+  tags:
+    - open-models
+    - gpt-oss
+    - gpt-oss-server
+
+- title: How to run gpt-oss with vLLM
+  path: articles/gpt-oss/run-vllm.md
+  date: 2025-08-05
+  authors:
+    - dkundel-openai
+  tags:
+    - open-models
+    - gpt-oss
+    - gpt-oss-server
+
+- title: How to run gpt-oss locally with Ollama
+  path: articles/gpt-oss/run-locally-ollama.md
+  date: 2025-08-05
+  authors:
+    - dkundel-openai
+  tags:
+    - open-models
+    - gpt-oss
+    - gpt-oss-local
+
+- title: OpenAI Harmony Response Format
+  path: articles/openai-harmony.md
+  date: 2025-08-05
+  authors:
+    - dkundel-openai
+  tags:
+    - open-models
+    - gpt-oss
+    - harmony
+    - gpt-oss-providers
+    - gpt-oss-fine-tuning
+
 - title: Temporal Agents with Knowledge Graphs
   path: examples/partners/temporal_agents_with_knowledge_graphs/temporal_agents_with_knowledge_graphs.ipynb
   date: 2025-07-22
@@ -19,7 +319,6 @@
     - functions
     - responses
 
-
 - title: Using Evals API on Image Inputs
   path: examples/evaluation/use-cases/EvalsAPI_Image_Inputs.ipynb
   date: 2025-07-15
@@ -28,6 +327,15 @@
   tags:
     - evals
     - images
+
+- title: Using Evals API on Audio Inputs
+  path: examples/evaluation/use-cases/EvalsAPI_Audio_Inputs.ipynb
+  date: 2025-08-13
+  authors:
+    - hendrytl
+  tags:
+    - evals
+    - audio
 
 - title: Optimize Prompts
   path: examples/Optimize_Prompts.ipynb
@@ -2310,3 +2618,57 @@
     - katiagg
   tags:
     - images
+
+- title: Use Codex CLI to automatically fix CI failures
+  path: examples/codex/Autofix-github-actions.ipynb
+  date: 2025-09-30
+  authors:
+    - himadri518
+    - alwell-kevin
+    - charlie-openai
+  tags:
+    - codex
+
+- title: Building resilient prompts using an evaluation flywheel
+  path: examples/evaluation/Building_resilient_prompts_using_an_evaluation_flywheel.md
+  date: 2025-10-06
+  authors:
+    - neelk-oai
+    - hamel
+  tags:
+    - evals
+    - datasets
+
+- title: Build Code Review with the Codex SDK
+  path: examples/codex/build_code_review_with_codex_sdk.md
+  date: 2025-10-21
+  authors:
+    - charlie-openai
+  tags:
+    - codex
+
+- title: Build a coding agent with GPT 5.1
+  path: examples/Build_a_coding_agent_with_GPT-5.1.ipynb
+  date: 2025-11-13
+  authors:
+    - katiagg
+  tags:
+    - agents-sdk
+
+- title: GPT-5.1 Prompting Guide
+  path: examples/gpt-5/gpt-5-1_prompting_guide.ipynb
+  date: 2025-11-13
+  authors:
+    - samarth-oai
+  tags:
+    - gpt-5.1
+    - responses
+    - reasoning
+
+- title: Modernizing your Codebase with Codex
+  path: examples/codex/code_modernization.md
+  date: 2025-11-19
+  authors:
+    - derrickchoi-openai
+  tags:
+    - codex

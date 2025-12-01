@@ -305,7 +305,7 @@
     - gpt-oss-fine-tuning
 
 - title: Temporal Agents with Knowledge Graphs
-  path: examples/partners/temporal_agents_with_knowledge_graphs/temporal_agents_with_knowledge_graphs.ipynb
+  path: examples/partners/temporal_agents_with_knowledge_graphs/temporal_agents.ipynb
   date: 2025-07-22
   authors:
     - dwigg-openai

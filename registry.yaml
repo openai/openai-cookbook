@@ -2662,8 +2662,16 @@
     - samarth-oai
   tags:
     - gpt-5.1
+
+- title: GPT-5.1-Codex-Max Prompting Guide
+  path: examples/gpt-5/gpt-5-1-codex-max_prompting_guide.ipynb
+  date: 2025-12-04
+  authors:
+    - nm-openai
+  tags:
+    - codex
     - responses
-    - reasoning
+    - compaction
 
 - title: Modernizing your Codebase with Codex
   path: examples/codex/code_modernization.md

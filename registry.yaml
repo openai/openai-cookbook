@@ -4,6 +4,84 @@
 # should build pages for, and indicates metadata such as tags, creation date and
 # authors for each page.
 
+- title: Transcribing User Audio with a Separate Realtime Request
+  path: examples/Realtime_out_of_band_transcription.ipynb
+  date: 2025-11-20
+  authors:
+    - minh-hoque
+  tags:
+    - realtime
+    - transcription
+    - voice
+    - speech
+    - audio
+
+- title: Self-Evolving Agents - A Cookbook for Autonomous Agent Retraining
+  path: examples/partners/self_evolving_agents/autonomous_agent_retraining.ipynb
+  date: 2025-11-04
+  authors:
+    - shikhar-cyber
+    - Calvin Maguranis
+    - Valentina Frenkel
+    - Fanny Perraudeau
+    - Giorgio Saladino
+  tags:
+    - partners
+    - self-evolving-agents
+    - evals
+    - llmops
+    - prompt-engineering
+    - agent-retraining
+
+- title: User guide for gpt-oss-safeguard
+  path: articles/gpt-oss-safeguard-guide.md
+  date: 2025-10-29
+  authors:
+    - roost
+  tags:
+    - gpt-oss
+    - open-models
+    - guardrails
+
+- title: Build, deploy, and optimize agentic workflows with AgentKit
+  path: examples/agentkit/agentkit_walkthrough.ipynb
+  date: 2025-10-17
+  authors:
+    - nikhils-oai
+  tags:
+    - agentkit
+    - evals
+
+- title: Building with Realtime Mini
+  path: examples/building_w_rt_mini/building_w_rt_mini.ipynb
+  date: 2025-10-11
+  authors:
+    - carter-oai
+  tags:
+    - gpt-realtime-mini
+
+- title: Sora 2 Prompting Guide
+  path: examples/sora/sora2_prompting_guide.ipynb
+  date: 2025-10-06
+  authors:
+    - rkoenig-openai
+    - joanneshin-openai
+  tags:
+    - sora
+    - prompt
+
+- title: Using PLANS.md for multi-hour problem solving
+  path: articles/codex_exec_plans.md
+  date: 2025-10-07
+  authors:
+    - aaronfriel
+  tags:
+    - codex
+    - gpt-5
+    - planning
+    - documentation
+    - agents
+
 - title: Building Consistent Workflows with Codex CLI & Agents SDK
   path: examples/codex/codex_mcp_agents_sdk/building_consistent_workflows_codex_cli_agents_sdk.ipynb
   date: 2025-10-01
@@ -227,7 +305,7 @@
     - gpt-oss-fine-tuning
 
 - title: Temporal Agents with Knowledge Graphs
-  path: examples/partners/temporal_agents_with_knowledge_graphs/temporal_agents_with_knowledge_graphs.ipynb
+  path: examples/partners/temporal_agents_with_knowledge_graphs/temporal_agents.ipynb
   date: 2025-07-22
   authors:
     - dwigg-openai
@@ -2559,6 +2637,54 @@
   tags:
     - codex
 
+- title: Building resilient prompts using an evaluation flywheel
+  path: examples/evaluation/Building_resilient_prompts_using_an_evaluation_flywheel.md
+  date: 2025-10-06
+  authors:
+    - neelk-oai
+    - hamel
+  tags:
+    - evals
+    - datasets
 
+- title: Build Code Review with the Codex SDK
+  path: examples/codex/build_code_review_with_codex_sdk.md
+  date: 2025-10-21
+  authors:
+    - charlie-openai
+  tags:
+    - codex
 
-    
+- title: Build a coding agent with GPT 5.1
+  path: examples/Build_a_coding_agent_with_GPT-5.1.ipynb
+  date: 2025-11-13
+  authors:
+    - katiagg
+  tags:
+    - agents-sdk
+
+- title: GPT-5.1 Prompting Guide
+  path: examples/gpt-5/gpt-5-1_prompting_guide.ipynb
+  date: 2025-11-13
+  authors:
+    - samarth-oai
+  tags:
+    - gpt-5.1
+
+- title: GPT-5.1-Codex-Max Prompting Guide
+  path: examples/gpt-5/gpt-5-1-codex-max_prompting_guide.ipynb
+  date: 2025-12-04
+  authors:
+    - nm-openai
+  tags:
+    - codex
+    - responses
+    - compaction
+
+- title: Modernizing your Codebase with Codex
+  path: examples/codex/code_modernization.md
+  date: 2025-11-19
+  authors:
+    - derrickchoi-openai
+  tags:
+    - codex

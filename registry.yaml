@@ -2681,7 +2681,7 @@
   tags:
     - codex
 
-- title: Enterprise Compliance API Logs Platform quickstart
+- title: OpenAI Compliance Logs Platform quickstart
   path: examples/chatgpt/compliance_api/logs_platform.ipynb
   date: 2025-12-11
   authors:

@@ -2681,11 +2681,23 @@
   tags:
     - codex
 
+- title: OpenAI Compliance Logs Platform quickstart
+  path: examples/chatgpt/compliance_api/logs_platform.ipynb
+  date: 2025-12-11
+  authors:
+    - kevinv-openai
+  tags:
+    - chatgpt
+    - chatgpt-data
+    - chatgpt-and-api
+    - compliance
+    - enterprise
+
 - title: GPT-5.2 Prompting Guide
   path: examples/gpt-5/gpt-5-2_prompting_guide.ipynb
   date: 2025-12-11
   authors:
     - msingh-openai
-    - emre-openai 
+    - emre-openai
   tags:
     - gpt-5.2

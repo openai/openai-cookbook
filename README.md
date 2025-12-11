@@ -1,4 +1,10 @@
-# OpenAI Cookbook
+<div align="center">
+
+# <img src="https://raw.githubusercontent.com/openai/openai-cookbook/main/images/openai-cookbook-logo.svg" alt="OpenAI Cookbook" width="400">
+
+✨ Navigate at [cookbook.openai.com](https://cookbook.openai.com)
+
+</div>
 
 ## What is the OpenAI Cookbook?
 
@@ -79,20 +85,15 @@ Then open any `.ipynb` file from the `examples/` directory and run the cells.
 
 The cookbook is organized into focused examples covering common use cases:
 
-- **[Function Calling](examples/function_calling/)**: Connect models to external tools, APIs, and databases
-- **[Embeddings & RAG](examples/rag/)**: Build retrieval-augmented generation systems over your own data
-- **[Agents](examples/agents/)**: Create autonomous agents that plan, reason, and execute tasks
-- **[Vision](examples/vision/)**: Work with image inputs for analysis and understanding
-- **[Audio](examples/audio/)**: Build applications for transcription, speech recognition, and audio processing
-- **[Image Generation](examples/image_generation/)**: Create images using the DALL·E API
-- **[Structured Outputs](examples/structured_outputs/)**: Produce guaranteed JSON using `response_format`
-- **[Batch Processing](examples/batch/)**: Run large-scale inference jobs efficiently
-- **[Prompt Engineering](examples/prompt_engineering/)**: Learn effective prompt design techniques
-- **[Evaluation & Reasoning](examples/reasoning/)**: Evaluate model performance and test reasoning quality
-- **[Data ETL](examples/data_etl/)**: Prepare and transform data for downstream tasks
-- **[Python Examples](examples/python/)**: How to use the Python SDK in real applications
-- **[JavaScript Examples](examples/javascript/)**: Examples demonstrating the Node.js SDK
-- **[Assistants](examples/assistants/)**: Build assistants with persistent threads and tool use
+- **[Function Calling](examples/)**: Connect models to external tools, APIs, and databases
+- **[Embeddings & RAG](examples/)**: Build retrieval-augmented generation systems over your own data
+- **[Agents](examples/)**: Create autonomous agents that plan, reason, and execute tasks
+- **[Vision](examples/)**: Work with image inputs for analysis and understanding
+- **[Audio](examples/)**: Build applications for transcription, speech recognition, and audio processing
+- **[Image Generation](examples/)**: Create images using the DALL·E API
+- **[Structured Outputs](examples/)**: Produce guaranteed JSON using `response_format`
+- **[Batch Processing](examples/)**: Run large-scale inference jobs efficiently
+- **[Prompt Engineering](examples/)**: Learn effective prompt design techniques
 
 Browse the full collection at [cookbook.openai.com](https://cookbook.openai.com) or explore the [examples directory](examples/) directly.
 

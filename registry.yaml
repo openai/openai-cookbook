@@ -2680,3 +2680,12 @@
     - derrickchoi-openai
   tags:
     - codex
+
+- title: GPT-5.2 Prompting Guide
+  path: examples/gpt-5/gpt-5-2_prompting_guide.ipynb
+  date: 2025-12-11
+  authors:
+    - msingh-openai
+    - emre-openai 
+  tags:
+    - gpt-5.2

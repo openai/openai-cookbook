@@ -2706,6 +2706,7 @@
   path: examples/multimodal/image-gen-1.5-prompting_guide.ipynb
   date: 2025-12-16
   authors:
+    - annikab-oai
     - msingh-openai
     - emreokcular
   tags:

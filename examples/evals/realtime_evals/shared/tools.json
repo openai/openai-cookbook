@@ -1,0 +1,66 @@
+[
+  {
+    "type": "function",
+    "name": "get_order_status",
+    "description": "Look up the latest status for a customer order.",
+    "parameters": {
+      "type": "object",
+      "properties": {
+        "order_id": {
+          "type": "string",
+          "description": "Order ID, e.g. A12345."
+        },
+        "email": {
+          "type": "string",
+          "description": "Customer email on the order."
+        }
+      },
+      "required": [
+        "order_id"
+      ]
+    }
+  },
+  {
+    "type": "function",
+    "name": "refund_order",
+    "description": "Create a refund request for an order.",
+    "parameters": {
+      "type": "object",
+      "properties": {
+        "order_id": {
+          "type": "string",
+          "description": "Order ID to refund."
+        },
+        "reason": {
+          "type": "string",
+          "description": "Short reason for the refund."
+        }
+      },
+      "required": [
+        "order_id"
+      ]
+    }
+  },
+  {
+    "type": "function",
+    "name": "update_shipping_address",
+    "description": "Update the shipping address on an order before it ships.",
+    "parameters": {
+      "type": "object",
+      "properties": {
+        "order_id": {
+          "type": "string",
+          "description": "Order ID to update."
+        },
+        "new_address": {
+          "type": "string",
+          "description": "Full new shipping address."
+        }
+      },
+      "required": [
+        "order_id",
+        "new_address"
+      ]
+    }
+  }
+]

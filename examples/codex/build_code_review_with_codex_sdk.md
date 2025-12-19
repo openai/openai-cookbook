@@ -4,6 +4,8 @@ With [Code Review](https://chatgpt.com/codex/settings/code-review) in Codex Clou
 
 Luckily, we can replicate Codex's cloud hosted review process in our own CI/CD runners. In this guide, we'll build our own Code Review action using the Codex CLI headless mode with both GitHub Actions and Jenkins.
 
+Model recommendation: use `gpt-5.2-codex` for the strongest code review accuracy and consistency in these workflows.
+
 To build our own Code review, we'll take the following steps and adhere to them closely:
 
 1. Install the Codex CLI in our CI/CD runner
@@ -16,7 +18,7 @@ Once implemented, Codex will be able to leave inline code review comments:
 
 ## The Code Review Prompt
 
-GPT-5-Codex has received specific training to improve its code review abilities. You can steer GPT-5-Codex to conduct a code review with the following prompt:
+GPT-5.2-Codex has received specific training to improve its code review abilities. You can steer GPT-5.2-Codex to conduct a code review with the following prompt:
 
 ```
 You are acting as a reviewer for a proposed code change made by another engineer.

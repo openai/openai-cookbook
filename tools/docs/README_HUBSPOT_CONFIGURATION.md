@@ -13,6 +13,47 @@ This document serves as the official reference for Colppy's HubSpot configuratio
 
 **Note:** All HubSpot scripts check these three environment variables in order. Set at least one in the `.env` file.
 
+## 🎯 CRITICAL DEFINITION: What is a "Lead" in Colppy?
+
+**Colppy's Definition of a Lead:**
+- A "Lead" in Colppy = **Contact with an associated Lead object**
+- **NOT** just a contact with `lifecyclestage = 'lead'`
+- Requires a **Lead object** (separate HubSpot object) to be created and associated with the contact
+- A contact **cannot be a Lead** without an associated Lead object, regardless of lifecycle stage
+
+**Key Distinction:**
+- `lifecyclestage = 'lead'` is just a property on the contact (lifecycle stage)
+- A "Lead" in Colppy requires an actual **Lead object** (separate HubSpot object) associated with the contact
+- Contacts can have `lifecyclestage = 'lead'` but still NOT be Leads if they don't have an associated Lead object
+
+**How to Identify if a Contact is a Lead:**
+1. Check for associated Lead object using `hubspot-list-associations` (contact → leads)
+2. If results exist: Contact HAS Lead object = IS a Lead in Colppy's system
+3. If empty: Contact has NO Lead object = NOT a Lead (even if `lifecyclestage = 'lead'`)
+
+**Lead Object Creation Methods:**
+1. **Workflow-Created (Automatic)**: HubSpot workflow automatically creates Lead object and associates it with contact
+   - Source: `AUTOMATION_PLATFORM` (in Lead object property history)
+   - Timing: Usually seconds after contact creation
+   - Typically for Colppy integration contacts
+2. **Manual Creation**: Salesperson manually creates Lead object and associates it with contact
+   - Source: `CRM_UI` (in Lead object `hs_created_by_user_id` property history)
+   - Timing: Usually minutes to hours after contact creation
+   - Typically for Intercom integration contacts
+
+**How to Determine Lead Creation Type:**
+1. Get Lead object: `hubspot-batch-read-objects` (leads)
+2. Get property history: `propertiesWithHistory=['hs_created_by_user_id']`
+3. Check `sourceType` in property history:
+   - `CRM_UI` = Manual creation by salesperson
+   - `AUTOMATION_PLATFORM` = Workflow creation
+   - `INTEGRATION` = Integration creation
+4. Compare timing: Lead `createdate` vs Contact `createdate`
+   - Manual: Usually minutes/hours difference
+   - Workflow: Usually seconds difference
+
+---
+
 ## 🔍 LIVE CRM FIELD VERIFICATION STATUS
 **✅ Last Verified**: January 9, 2025 via Live HubSpot API  
 **📊 Verification Coverage**: Products, Line Items, Companies, Deals, Contacts, UTM Marketing Fields, Teams & Owners API  
@@ -278,6 +319,98 @@ This prevents silent failures where logs show "success" but fields retain their 
 
 This section documents the custom code workflows implemented in HubSpot for automated data processing and field updates.
 
+### 🔄 **Automatic Lead Creation Workflow**
+
+**Purpose**: Automatically creates Lead objects and sets `lifecyclestage = 'lead'` when contacts are created from Colppy or Intercom integrations
+
+**Important Note**: In Colppy, a "Lead" requires an associated Lead object, NOT just `lifecyclestage = 'lead'`. This workflow may create Lead objects automatically OR salespeople may create them manually for Intercom contacts.
+
+**Trigger**: Contact Created event in HubSpot
+
+**Trigger Conditions**:
+- Contact created via Colppy integration (when user signs up for trial)
+- Contact created via Intercom integration (when user contacts sales team)
+- Contact created by sales team manually in HubSpot
+
+**Workflow Behavior**:
+1. **Contact Created**: Integration (Colppy/Intercom) or manual creation creates contact in HubSpot
+2. **Workflow Triggers**: HubSpot workflow automatically runs when contact is created
+3. **Invitation Check**: Workflow checks if `lead_source = 'Usuario Invitado'`
+   - **If invitation contact**: Workflow SKIPS lead creation (these are invitations from existing customers, should NOT be contacted by sales team)
+   - **If regular contact**: Workflow proceeds with lead creation
+4. **Lead Object Creation**: Workflow may automatically create Lead object and associate it with contact (for Colppy integration contacts)
+5. **Lifecycle Stage**: Workflow sets `lifecyclestage = 'lead'` automatically (only for non-invitation contacts)
+   - **Note**: Setting `lifecyclestage = 'lead'` does NOT automatically create a Lead object. Lead objects may be created separately by workflow or manually by salesperson.
+6. **Date Set**: `hs_v2_date_entered_lead` (UI: "Date entered \"Lead (Pipeline de etapa del ciclo de vida)\"") is set to the same timestamp as `createdate` (UI: "Create Date") (only for non-invitation contacts)
+
+**Key Characteristics**:
+- **Automatic**: No manual intervention required
+- **Universal**: Applies to ALL contacts created (Colppy, Intercom, or manual) **EXCEPT invitation contacts**
+- **Invitation Exception**: Contacts with `lead_source = 'Usuario Invitado'` do NOT get Lead status (invitations from existing customers, should not be contacted by sales)
+- **Simultaneous**: Lead is created at the same time as contact (typically same timestamp) for non-invitation contacts
+- **Integration-Driven**: Works for both product-led (Colppy signup) and sales-led (Intercom) contacts
+
+**HubSpot Fields Updated**:
+- `lifecyclestage` → Set to `'lead'` (lifecycle stage property)
+- `hs_v2_date_entered_lead` (UI: "Date entered \"Lead (Pipeline de etapa del ciclo de vida)\"") → Set to contact `createdate` (UI: "Create Date") timestamp
+- **Lead Object**: May be created automatically by workflow OR manually by salesperson (see Lead Object Creation Methods below)
+
+**Integration Sources**:
+1. **Colppy Integration**: When user signs up for 7-day free trial
+   - Backend creates contact in HubSpot via API
+   - Workflow automatically sets lifecycle stage to 'lead' (unless invitation contact)
+   - **Lead Object**: Typically created automatically by workflow (source: `AUTOMATION_PLATFORM`)
+   - Contact is immediately available as a lead for sales team
+   - **Type**: Workflow-created lead (user signed up for trial → has "Validó email" event → IS an MQL)
+
+2. **Intercom Integration**: When user contacts sales via Intercom
+   - Intercom integration creates contact in HubSpot
+   - Integration may set `lifecyclestage = 'lead'` directly (source: `INTEGRATION`)
+   - **Lead Object**: Typically created manually by salesperson (source: `CRM_UI`)
+   - Salesperson manually creates Lead object and associates it with contact (minutes to hours after contact creation)
+   - **Type**: Manual-created lead (may NOT have "Validó email" event → either never signed up, or signed up but never entered validation code → CANNOT be MQL until user signs up for trial AND validates email)
+
+3. **Manual Creation**: When sales team creates contact manually
+   - Sales team creates contact in HubSpot UI
+   - Workflow automatically sets lifecycle stage to 'lead' (unless invitation contact)
+   - **Lead Object**: May be created by workflow or manually by salesperson
+   - **Type**: Sales-created lead (may NOT have "Validó email" event → either never signed up, or signed up but never entered validation code → CANNOT be MQL until user signs up for trial AND validates email)
+
+4. **Invitation Contacts**: When existing customer invites team member
+   - Contact created with `lead_source = 'Usuario Invitado'`
+   - Workflow identifies invitation and SKIPS lead creation
+   - Contact does NOT get Lead status (should not be contacted by sales team)
+
+**Critical Notes**:
+- **Contact → Lead**: In Colppy, a "Lead" requires an associated Lead object, NOT just `lifecyclestage = 'lead'`
+- **Lead Object Creation**: Lead objects can be created automatically by workflow OR manually by salesperson
+- **Lifecycle Stage**: `lifecyclestage = 'lead'` may be set by integration or workflow, but this alone does NOT make a contact a Lead in Colppy's system
+- **Time Difference**: `hs_v2_date_entered_lead` (UI: "Date entered \"Lead (Pipeline de etapa del ciclo de vida)\"") - `createdate` (UI: "Create Date") is typically 0 seconds (same timestamp)
+- **Lead Object Timing**: 
+  - Workflow-created: Usually seconds after contact creation
+  - Manual-created: Usually minutes to hours after contact creation
+- **Exception Cases**: 
+  - **Invitation Contacts**: Contacts with `lead_source = 'Usuario Invitado'` should be created WITHOUT Lead status
+    - These are invitations from existing customers to add team members
+    - Workflow should identify them by `lead_source = 'Usuario Invitado'` and skip lead creation (should not be contacted by sales team)
+    - **Expected**: `lifecyclestage` (UI: "Lifecycle Stage") should be null/empty, `hs_v2_date_entered_lead` (UI: "Date entered \"Lead (Pipeline de etapa del ciclo de vida)\"") should be null
+    - **Note**: Some invitation contacts may have different `lead_source` values or may have been created before workflow logic was implemented, resulting in Lead status being set (data inconsistency)
+    - **Concept**: Invitation contacts are identified by `lead_source = 'Usuario Invitado'` and are created without Lead status
+  - **Other Edge Cases**: Very few other exceptions where contact is created without lead status
+- **Analysis Impact**: For cycle time calculations, `createdate` (UI: "Create Date") and `hs_v2_date_entered_lead` (UI: "Date entered \"Lead (Pipeline de etapa del ciclo de vida)\"") are typically identical (except for invitation contacts where `hs_v2_date_entered_lead` is null)
+
+**Use Cases**:
+- Ensures all contacts from integrations are immediately available as leads
+- Eliminates manual step of setting lifecycle stage
+- Provides consistent lead qualification process
+- Enables immediate sales team assignment and engagement
+
+**Related Documentation**:
+- See [Lead Lifecycle Cycle Time](./README_HUBSPOT_CONFIGURATION.md#lead-lifecycle-cycle-time) for cycle time calculations
+- See [Contact Creation Funnel](./COLPPY_FUNNEL_MAPPING_COMPLETE.md#11-contact-creation-funnel-universal-entry-point) for funnel mapping
+
+---
+
 ### 📊 **First Deal Won Date Calculation Workflow**
 
 **File**: `hubspot_custom_code_latest.py`  
@@ -514,9 +647,30 @@ This section documents the exact field mappings for each HubSpot object, verifie
 | **UI Field Name** | **Internal Property** | **Type** | **Status** | **Purpose** |
 |------------------|---------------------|-----------|------------|-------------|
 | **Number of Associated Deals** | `num_associated_deals` | Number | ✅ Native | Count of deals associated with contact |
-| **Became a Lead Date** | `hs_lifecyclestage_lead_date` | Date | ✅ Native | When contact became a lead |
-| **Became an Opportunity Date** | `hs_lifecyclestage_opportunity_date` | Date | ✅ Native | When contact became an opportunity |
-| **Became a Customer Date** | `hs_lifecyclestage_customer_date` | Date | ✅ Native | When contact became a customer |
+| **Date entered "Lead (Pipeline de etapa del ciclo de vida)"** | `hs_v2_date_entered_lead` | Date | ✅ Native | When contact entered the Lead lifecycle stage |
+| **Became an Opportunity Date** | `hs_v2_date_entered_opportunity` | Date | ✅ Native | When contact became an opportunity (entered 'Oportunidad' lifecycle stage) |
+| **Date entered "Cliente (Pipeline de etapa del ciclo de vida)"** | `hs_v2_date_entered_customer` | Date | ✅ Native | When contact entered the Customer lifecycle stage |
+
+#### **📞 Sales Engagement Fields (Live Verified)**
+
+| **UI Field Name** | **Internal Property** | **Type** | **Status** | **Purpose** |
+|------------------|---------------------|-----------|------------|-------------|
+| **Date of first engagement** | `hs_sa_first_engagement_date` | Date | ✅ **LIVE VERIFIED** | The date the current contact owner first engaged with the contact (calls, emails, meetings) |
+| **Description of first engagement** | `hs_sa_first_engagement_descr` | String | ✅ **LIVE VERIFIED** | Description/outcome of first engagement (e.g., "COMPLETED", "NO_ANSWER", "SENT") |
+| **Type of first engagement** | `hs_sa_first_engagement_object_type` | String | ✅ **LIVE VERIFIED** | Type of engagement ("CALL", "EMAIL", "MEETING_EVENT") |
+| **ID of first engagement** | `hs_first_engagement_object_id` | Number | ✅ **LIVE VERIFIED** | ID of the engagement object in HubSpot |
+| **Lead response time** | `hs_time_to_first_engagement` | Number | ✅ Native | HubSpot's built-in field (in seconds, may be inaccurate - use custom calculation instead) |
+
+**Engagement Field Usage:**
+- **First Touch Tracking**: `hs_sa_first_engagement_date` is the primary field for measuring "Lead Creation to First Touch" cycle time
+- **Engagement Types**: Tracks calls, emails, and meetings logged by the current contact owner
+- **Owner-Specific**: Only tracks engagement by the current owner (resets if owner changes)
+- **Cycle Time Calculation**: See "Lead Creation to First Touch Cycle Time" section for detailed calculation methodology including business hours
+
+**⚠️ Important Notes:**
+- `hs_sa_first_engagement_date` is owner-specific and resets if contact is reassigned
+- `hs_time_to_first_engagement` (HubSpot's built-in field) may be inaccurate - use custom calculation for precise results
+- For business hours calculation, see the comprehensive documentation in the "Cycle Time Tracking Fields" section
 
 #### **🎯 UTM Marketing Attribution Fields (Live Verified)**
 
@@ -1168,7 +1322,7 @@ When analyzing key events (`fecha_activo`) and their relationship to deal closin
 - **Registration timestamps**: Stored in UTC with full time precision
 - **Key event timestamps**: Stored as Argentina local time truncated to midnight (00:00)
 - **3-hour offset**: Can create appearance of events occurring "before" registration
-- **Impact**: ~45% of timing sequences appear invalid but represent same-day activations
+- **Impact**: Some timing sequences may appear invalid but represent same-day activations
 
 ### Data Quality Assessment Requirements
 Before making strategic decisions based on timing analysis, you MUST:
@@ -1184,10 +1338,9 @@ Before making strategic decisions based on timing analysis, you MUST:
 - **Recommendation**: Fix backend timezone handling before making PLG strategy decisions
 
 ### Business Intelligence Priority
-Focus on same-day activation patterns:
-- **76.5%** of customers activate on registration day
-- **100%** of conversions occur within 7 days
-- Same-day engagement is critical for conversion success
+Focus on activation patterns:
+- Activation timing varies by contact
+- Early engagement is important for conversion success
 
 **Example Timezone-Aware Analysis:**
 ```python
@@ -1355,23 +1508,212 @@ This section documents the key fields used for calculating important cycle times
 
 ### Lead Lifecycle Cycle Time
 
-> **Note:** In Colppy's workflow, leads are typically created at the same time as contacts, with very few exceptions. The most important cycle times are from lead creation to deal conversion.
+> **Note:** In Colppy's workflow, leads are automatically created at the same time as contacts through a HubSpot workflow that triggers when contacts are created from Colppy or Intercom integrations (or manually by sales team). This workflow sets `lifecyclestage = 'lead'` and `hs_v2_date_entered_lead` (UI: "Date entered \"Lead (Pipeline de etapa del ciclo de vida)\"") = `createdate` (UI: "Create Date") automatically. With very few exceptions, contacts and leads are created simultaneously. The most important cycle times are from lead creation to deal conversion.
+
+**Automatic Lead Creation**:
+- **Workflow**: HubSpot workflow automatically sets `lifecyclestage = 'lead'` when contact is created
+- **Trigger**: Contact Created event (from Colppy integration, Intercom integration, or manual creation)
+- **Result**: `hs_v2_date_entered_lead` (UI: "Date entered \"Lead (Pipeline de etapa del ciclo de vida)\"") is set to the same timestamp as `createdate` (UI: "Create Date")
+- **Time Difference**: Typically 0 seconds (same timestamp)
 
 **Start Time Fields:**
 | Field Name | Object Type | Description |
 |------------|-------------|-------------|
 | createdate | Contact | Timestamp when the contact/lead record was created |
-| hs_lifecyclestage_lead_date | Contact | Timestamp when the contact became a lead (usually same as createdate) |
+| hs_v2_date_entered_lead | Contact | Timestamp when the contact entered the Lead lifecycle stage (usually same as createdate) |
 
 **End Time Fields:**
 | Field Name | Object Type | Description |
 |------------|-------------|-------------|
-| hs_lifecyclestage_opportunity_date | Contact | Timestamp when the contact was associated with a deal opportunity |
-| hs_lifecyclestage_customer_date | Contact | Timestamp when the contact became a customer |
+| hs_v2_date_entered_opportunity | Contact | Timestamp when the contact entered the 'Oportunidad' (opportunity) lifecycle stage |
+| hs_v2_date_entered_customer | Contact | Timestamp when the contact entered the Customer lifecycle stage |
 
 **Cycle Time Calculations:**
-- **Lead to Opportunity Time**: `hs_lifecyclestage_opportunity_date - createdate`
-- **Lead to Customer Time**: `hs_lifecyclestage_customer_date - createdate`
+- **Lead to Opportunity Time**: `hs_v2_date_entered_opportunity - createdate`
+- **Lead to Customer Time**: `hs_v2_date_entered_customer` (UI: "Date entered \"Cliente (Pipeline de etapa del ciclo de vida)\"") - `createdate` (UI: "Create Date")
+
+### Lead Creation to First Touch Cycle Time
+
+> **Purpose:** Measure the time from when a lead is created until the sales team makes first contact. This metric is critical for understanding sales team responsiveness and lead response time.
+
+**Start Time Field:**
+| Field Name | Object Type | Description |
+|------------|-------------|-------------|
+| `createdate` | Contact | Timestamp when the contact/lead record was created in HubSpot |
+
+**End Time Field:**
+| Field Name | Object Type | Description |
+|------------|-------------|-------------|
+| `hs_sa_first_engagement_date` | Contact | **Date of first engagement** - The date the current contact owner first engaged with the contact |
+
+**What Counts as "First Engagement":**
+- **CALLS** (`CALL`): Completed calls, no-answer calls, any call activity logged by the owner
+- **EMAILS** (`EMAIL`): Emails sent by the owner, email replies
+- **MEETINGS** (`MEETING_EVENT`): Scheduled meetings, completed meetings
+
+**Important Limitations:**
+- ⚠️ **Owner-Specific**: Only tracks engagement by the **current contact owner**
+- ⚠️ **Resets on Owner Change**: If contact owner changes, this field resets to the new owner's first engagement
+- ⚠️ **Not All Sales Touches**: Only tracks activities logged by the current owner
+
+**Basic Cycle Time Calculation (Total Hours):**
+```
+IF(
+  AND(
+    createdate IS NOT NULL,
+    hs_sa_first_engagement_date IS NOT NULL,
+    hs_sa_first_engagement_date >= createdate
+  ),
+  DATEDIFF(createdate, hs_sa_first_engagement_date, "HOUR"),
+  NULL
+)
+```
+
+**Business Hours Calculation (Recommended):**
+
+For accurate cycle time measurement, calculate **business hours only**, excluding:
+- Nights (outside 9 AM - 6 PM)
+- Weekends (Saturday and Sunday)
+- Argentina National Holidays
+
+**Business Hours Rules:**
+- **Days**: Monday to Friday (weekdays only)
+- **Hours**: 9:00 AM to 6:00 PM (Argentina timezone: `America/Argentina/Buenos_Aires`)
+- **Excludes**: All hours outside 9 AM - 6 PM, weekends, and holidays
+
+**Argentina Holidays 2025 (Excluded from Business Hours):**
+| Date | Holiday |
+|------|---------|
+| 2025-01-01 | New Year's Day |
+| 2025-03-03 | Carnival |
+| 2025-04-03 | Carnival |
+| 2025-03-24 | Truth and Justice Day |
+| 2025-04-02 | Malvinas Day |
+| 2025-04-17 | Maundy Thursday |
+| 2025-04-18 | Good Friday |
+| 2025-05-01 | Labour Day |
+| 2025-05-02 | Labour Day Holiday |
+| 2025-05-25 | Revolution Day |
+| 2025-06-16 | Martín Miguel de Güemes' Day |
+| 2025-06-20 | Flag Day |
+| 2025-07-09 | Independence Day |
+| 2025-08-15 | Death of San Martin Holiday |
+| 2025-08-17 | Death of San Martin |
+| 2025-10-12 | Day of Respect for Cultural Diversity |
+| 2025-11-21 | National Sovereignty Day Holiday |
+| 2025-11-24 | National Sovereignty Day |
+| 2025-12-08 | Immaculate Conception |
+| 2025-12-25 | Christmas Day |
+
+**⚠️ Note:** HubSpot formulas **cannot directly calculate business hours** (excluding weekends and holidays). Use one of these approaches:
+
+**Option 1: HubSpot Workflow with Custom Code (Recommended)**
+- Create a workflow that triggers when `hs_sa_first_engagement_date` is populated
+- Use custom code to calculate business hours excluding weekends and holidays
+- Update a custom property: `cycle_time_lead_to_first_touch_business_hours`
+
+**Option 2: External Calculation (Current Approach)**
+- Calculate business hours using Python script (see reference implementation below)
+- Import results into HubSpot via API or manual update
+
+**Python Reference Implementation:**
+
+```python
+from datetime import datetime, timedelta
+import pytz
+
+# Argentina timezone
+AR_TIMEZONE = pytz.timezone('America/Argentina/Buenos_Aires')
+
+# Argentina holidays 2025
+ARGENTINA_HOLIDAYS_2025 = [
+    datetime(2025, 1, 1), datetime(2025, 3, 3), datetime(2025, 4, 3),
+    datetime(2025, 3, 24), datetime(2025, 4, 2), datetime(2025, 4, 17),
+    datetime(2025, 4, 18), datetime(2025, 5, 1), datetime(2025, 5, 2),
+    datetime(2025, 5, 25), datetime(2025, 6, 16), datetime(2025, 6, 20),
+    datetime(2025, 7, 9), datetime(2025, 8, 15), datetime(2025, 8, 17),
+    datetime(2025, 10, 12), datetime(2025, 11, 21), datetime(2025, 11, 24),
+    datetime(2025, 12, 8), datetime(2025, 12, 25),
+]
+
+def is_holiday(dt):
+    """Check if date is a holiday"""
+    dt_ar = dt.astimezone(AR_TIMEZONE) if dt.tzinfo else AR_TIMEZONE.localize(dt)
+    date_only = dt_ar.date()
+    holiday_dates = [h.date() for h in ARGENTINA_HOLIDAYS_2025]
+    return date_only in holiday_dates
+
+def is_business_hour(dt):
+    """Check if datetime is within business hours (9 AM - 6 PM, weekdays, non-holidays)"""
+    if dt.tzinfo is None:
+        dt = pytz.UTC.localize(dt)
+    dt_ar = dt.astimezone(AR_TIMEZONE)
+    
+    # Check if holiday
+    if is_holiday(dt):
+        return False
+    
+    # Check if weekday (Monday=0, Sunday=6)
+    if dt_ar.weekday() >= 5:  # Saturday or Sunday
+        return False
+    
+    # Check if within business hours (9 AM - 6 PM)
+    hour = dt_ar.hour
+    return 9 <= hour < 18  # 9 AM to 5:59 PM (6 PM is exclusive)
+
+def calculate_business_hours(start_dt, end_dt):
+    """
+    Calculate business hours between two datetimes
+    Business hours: 9 AM - 6 PM, Monday-Friday, excluding holidays
+    """
+    if start_dt.tzinfo is None:
+        start_dt = pytz.UTC.localize(start_dt)
+    if end_dt.tzinfo is None:
+        end_dt = pytz.UTC.localize(end_dt)
+    
+    start_ar = start_dt.astimezone(AR_TIMEZONE)
+    end_ar = end_dt.astimezone(AR_TIMEZONE)
+    
+    if end_ar <= start_ar:
+        return 0.0
+    
+    business_hours = 0.0
+    current = start_ar
+    
+    # Iterate hour by hour
+    while current < end_ar:
+        if is_business_hour(current):
+            hour_start = current.replace(minute=0, second=0, microsecond=0)
+            hour_end = hour_start + timedelta(hours=1)
+            segment_start = max(current, hour_start)
+            segment_end = min(end_ar, hour_end)
+            hours_in_segment = (segment_end - segment_start).total_seconds() / 3600
+            business_hours += hours_in_segment
+        current = (current.replace(minute=0, second=0, microsecond=0) + timedelta(hours=1))
+    
+    return business_hours
+
+# Usage example:
+# created = datetime.fromisoformat('2025-11-24T00:12:21.498Z'.replace('Z', '+00:00'))
+# first_eng = datetime.fromisoformat('2025-11-25T13:07:48.919Z'.replace('Z', '+00:00'))
+# business_hours = calculate_business_hours(created, first_eng)
+```
+
+**Expected Results:**
+- **Average Total Hours**: ~29 hours (includes nights, weekends, holidays)
+- **Average Business Hours**: ~7 hours (excludes nights, weekends, holidays)
+- **Average Reduction**: ~75% (22 hours excluded on average)
+
+**Related Fields:**
+- `hs_sa_first_engagement_descr`: Description of first engagement (e.g., "COMPLETED", "NO_ANSWER", "SENT")
+- `hs_sa_first_engagement_object_type`: Type of engagement ("CALL", "EMAIL", "MEETING_EVENT")
+- `hs_first_engagement_object_id`: ID of the engagement object
+- `hs_time_to_first_engagement`: HubSpot's built-in field (in seconds, but may be inaccurate)
+
+**Verification:**
+- ✅ Field verified via HubSpot API: `hs_sa_first_engagement_date` exists and is populated
+- ✅ Calculation tested on sample contacts
+- ✅ Business hours calculation verified against manual calculations
 
 ### Deal Creation to Close Cycle Time
 
@@ -1457,6 +1799,73 @@ When integrating with HubSpot or analyzing data:
 3. Be aware of both active and historical properties
 4. When in doubt, verify current configuration in HubSpot UI
 
+## Date Filtering Standard for Monthly Analysis
+
+**⚠️ CRITICAL: Monthly Analysis Date Filtering Standard**
+
+For monthly analysis of conversions or closures, you **MUST** filter by **BOTH** creation date AND conversion/closure date within the same period:
+
+### Deals (Created AND Closed)
+
+For monthly analysis of closed deals, filter by **BOTH** `createdate` AND `closedate` within the same month:
+- **`createdate`** between month start and end
+- **`closedate`** between month start and end
+
+This matches the standard HubSpot report filter:
+- "Close date is This month" AND "Create date is This month"
+
+### Contacts/Conversions (Created AND Converted)
+
+For monthly analysis of contact conversions (SQL, PQL, Customer), filter by **BOTH** `createdate` AND conversion date within the same period:
+- **`createdate`** between period start and end
+- **Conversion date** (SQL/PQL/Customer) between period start and end
+  - SQL: `hs_v2_date_entered_opportunity`
+  - PQL: `fecha_activo`
+  - Customer: Deal `closedate` (from earliest won deal) or `hs_v2_date_entered_customer`
+
+**Why this matters:**
+- Deals/contacts created in previous periods but closed/converted in the current period should NOT be included in monthly analysis
+- This ensures monthly reports reflect work that was both created AND completed in that specific month
+- This matches the business standard for monthly revenue and conversion reporting
+
+**Scripts using this standard (Created AND Converted/Closed in same period):**
+- `analyze_icp_operador_billing.py` - Always uses both date filters for deals
+- `fetch_hubspot_deals_with_company.py` - Use `--filter-both-dates` flag or `--analyze-icp-operador` (automatically uses both)
+- `pql_sql_deal_relationship_analysis.py` - Filters SQL, PQL, and Customer conversions by date in period
+- `sql_pql_conversion_analysis.py` - Filters SQL conversions by date in period
+- `complete_sql_conversion_analysis.py` - Filters SQL conversions by date in period
+- `deal_focused_pql_analysis.py` - Filters PQL conversions by activation date in period
+
+**Note - Alternative Methodology:**
+- `mtd_scoring_full_pagination.py` - Uses creation date only (different purpose: measures lead quality by creation period, not monthly conversion rates). This script intentionally uses a different methodology for lead quality analysis.
+
+**Example - Deals:**
+```python
+# ✅ CORRECT: Monthly analysis with both date filters
+filters = [
+    {"propertyName": "createdate", "operator": "GTE", "value": "2025-12-01T00:00:00Z"},
+    {"propertyName": "createdate", "operator": "LT", "value": "2026-01-01T00:00:00Z"},
+    {"propertyName": "closedate", "operator": "GTE", "value": "2025-12-01T00:00:00Z"},
+    {"propertyName": "closedate", "operator": "LT", "value": "2026-01-01T00:00:00Z"},
+    {"propertyName": "dealstage", "operator": "EQ", "value": "closedwon"}
+]
+```
+
+**Example - Contact Conversions:**
+```python
+# ✅ CORRECT: Filter contacts created AND converted to SQL in same period
+contact_created = parse_datetime(contact['createdate'])
+sql_date = parse_datetime(contact['hs_v2_date_entered_opportunity'])
+period_start = parse_datetime(f"{start_date}T00:00:00.000Z")
+period_end = parse_datetime(f"{end_date}T23:59:59.999Z")
+
+# Both must be in period
+is_sql = (contact_created and period_start <= contact_created <= period_end and
+          sql_date and period_start <= sql_date <= period_end)
+```
+
+---
+
 ## Deal Analysis Rule
 
 - For every output, report, or analysis involving HubSpot deals, **always include**:
@@ -1465,6 +1874,56 @@ When integrating with HubSpot or analyzing data:
   - **ID Empresa (Company ID) is the unique identifier for the company associated with the deal. This is the key used to join HubSpot deals to Mixpanel company data.**
 - This information must be present in all summaries, insights, exports, and responses, regardless of whether the deal is won, lost, or open.
 - If the association is not available, explicitly state that the information is missing or not set for the deal.
+
+---
+
+## ICP Operador Billing Analysis
+
+**Purpose:** Determine "who we bill" - identifying deals billed to accountants (ICP Operador) vs SMBs.
+
+### Definition of "ICP Operador" (Accountant Billing)
+
+A deal is considered **ICP Operador** (billed to accountant) **ONLY** if the following condition is met:
+
+**PRIMARY COMPANY METHOD (ONLY RELIABLE METHOD)**:
+   - The PRIMARY company (association Type ID 5) has company type = one of:
+     - `"Cuenta Contador"`
+     - `"Cuenta Contador y Reseller"`
+     - `"Contador Robado"`
+
+**⚠️ IMPORTANT:** Plan name method is **NOT reliable** because PYMEs can have "ICP Contador" plans when an accountant refers them, but we still bill the PYME (not the accountant). The only reliable way to determine who we bill is by checking the PRIMARY company type.
+
+### Script: `analyze_icp_operador_billing.py`
+
+**Location:** `tools/scripts/hubspot/analyze_icp_operador_billing.py`
+
+**Usage:**
+```bash
+# By month
+python tools/scripts/hubspot/analyze_icp_operador_billing.py --month 2025-12
+
+# By date range
+python tools/scripts/hubspot/analyze_icp_operador_billing.py --start-date 2025-12-01 --end-date 2026-01-01
+```
+
+**Output:**
+- Summary statistics (ICP Operador vs Non-ICP Operador)
+- Additional information (plan names for reference only)
+- Detailed CSV with all deal-level data
+
+**Key Metrics:**
+- Total closed deals
+- ICP Operador count and percentage (billed to accountant) - **based ONLY on PRIMARY company type**
+- Non-ICP Operador count and percentage (billed to SMB)
+- Additional information:
+  - Deals with 'ICP Contador' plan name (informational only - not used for classification)
+  - Accountant companies with non-ICP Contador plan (informational)
+
+**Related Documentation:**
+- See [HUBSPOT_MONTHLY_ANALYSIS_GUIDE.md](./HUBSPOT_MONTHLY_ANALYSIS_GUIDE.md) for monthly analysis workflow
+- See [HUBSPOT_SCRIPTS_DOCUMENTATION.md](./HUBSPOT_SCRIPTS_DOCUMENTATION.md) for script details
+
+---
 
 ### How to check for accountant channel
 - Always check the deal-company association for the type:
@@ -1697,6 +2156,162 @@ Para cualquier análisis, reporte o salida que involucre negocios de HubSpot:
 
 This section defines the standard methodologies for measuring different types of conversions in Colppy's HubSpot CRM. These methodologies must be used consistently across all analyses and reports.
 
+### 🎯 SQL (Sales Qualified Lead) Conversion Analysis
+
+**Last Updated:** 2025-12-21  
+**Note:** SQL definition updated to include deal validation requirement for accurate conversion measurement.
+
+**Definition**: Measures the conversion rate of contacts created in a given month to SQL (Sales Qualified Lead) status within the same month, with validated deal association.
+
+**SQL Conversion Cohort Definition for a Given Month (Updated - with Deal Validation):**
+A contact is counted as an SQL conversion for month *M* if **ALL THREE** conditions are met:
+1. **`createdate` falls within the month** (between `{month_start}` and `{month_end}`) - MQL definition (excluding 'Usuario Invitado')
+2. **`hs_v2_date_entered_opportunity` falls within the month** (between `{month_start}` and `{month_end}`)
+3. **Contact has a deal associated that was created between `createdate` and SQL date (within the same month)** - Deal validation requirement
+
+**CRITICAL**: Both creation AND conversion must happen in the same month, AND the contact must have a validated deal association to measure monthly conversion rate accurately.
+
+**Example for a Given Month**:
+- **Base Cohort**: ALL contacts created in target month (`createdate` between `{month_start}` and `{month_end}`)
+- **SQL Conversions**: Subset of base cohort that also has `hs_v2_date_entered_opportunity` between `{month_start}` and `{month_end}`
+- **Conversion Rate**: (SQL conversions / Total contacts created) × 100
+
+**Primary Method**: Lifecycle Stage Transition Date with Deal Validation
+- **Field Used**: `hs_v2_date_entered_opportunity` (Contact object)
+- **Formula**: `contacts_df['is_sql'] = contacts_df['hs_v2_date_entered_opportunity'].notna() AND has_validated_deal()`
+- **Cohort Filter**: 
+  - `createdate` BETWEEN `{month_start}` AND `{month_end}` (base cohort - excluding 'Usuario Invitado')
+  - AND `hs_v2_date_entered_opportunity` BETWEEN `{month_start}` AND `{month_end}` (converted in period)
+  - AND deal.createdate BETWEEN `contact.createdate` AND `hs_v2_date_entered_opportunity` (deal validation within period)
+- **Deal Validation**: Contact must have at least one deal associated where `deal.createdate` falls between contact `createdate` and `hs_v2_date_entered_opportunity`, all within the analysis period
+
+**SQL → PQL Timing Analysis**:
+For contacts in the SQL cohort, determine if they were PQL (Product Qualified Lead) before SQL:
+- **PQL BEFORE SQL**: `fecha_activo < hs_v2_date_entered_opportunity` (product-led)
+- **PQL AFTER SQL**: `fecha_activo >= hs_v2_date_entered_opportunity` (sales-led)
+- **NEVER PQL**: `activo != 'true'` or `fecha_activo` is null
+
+**Cycle Time Calculation**:
+- **SQL Cycle Time**: `hs_v2_date_entered_opportunity - createdate` (in days)
+- **PQL Cycle Time**: `fecha_activo - createdate` (in days)
+- Both creation AND conversion must occur in the same period
+- **IMPORTANT - Same-Day Handling**: `fecha_activo` is date-only (no time component), while `createdate` has full timestamp. If both dates are on the same calendar day, cycle time = 0.0 days (same day conversion). This prevents negative cycle times for same-day activations.
+- See [SQL-PQL Correlation Analysis](./HUBSPOT_SQL_PQL_CORRELATION_ANALYSIS.md#cycle-time-calculation-methodology) for detailed methodology
+
+**Critical Implementation Requirements**:
+- Must fetch ALL contacts using pagination (don't stop at first 100)
+- Use timezone-aware datetime comparisons (UTC)
+- Both createdate AND conversion date must be in target period
+- **MUST validate deal associations**: Contact must have a deal created between `createdate` and SQL date (within the analysis period)
+- Exclude 'Usuario Invitado' contacts from MQL base (internal invited users)
+- Monthly conversion rate varies by analysis period
+- Reusable script locations: 
+  - `/tools/scripts/hubspot/sql_pql_conversion_analysis.py` (legacy - needs update)
+  - `/tools/scripts/hubspot/mtd_scoring_full_pagination.py` (updated with deal validation)
+  - `/tools/scripts/hubspot/complete_sql_conversion_analysis.py` (updated with deal validation)
+
+### 🎯 PQL (Product Qualified Lead) Conversion Analysis
+
+**Definition**: Measures the conversion rate of contacts created in a given month to PQL (Product Qualified Lead) status within the same month.
+
+**PQL Conversion Cohort Definition for a Given Month:**
+A contact is counted as a PQL conversion for month *M* if **ALL** conditions are met:
+1. **`createdate` falls within the month** (between `{month_start}` and `{month_end}`)
+2. **`activo` = 'true'** (PQL activation flag)
+3. **`fecha_activo` falls within the month** (between `{month_start}` and `{month_end}`)
+
+**CRITICAL**: Both creation AND activation must happen in the same month to measure monthly PQL conversion rate.
+
+**Primary Method**: Custom Product Activation Fields
+- **Fields Used**: 
+  - `activo` (custom boolean flag, value is string 'true')
+  - `fecha_activo` (custom date field, format: 'YYYY-MM-DD')
+- **Cohort Filter**: 
+  - `createdate` BETWEEN `{month_start}` AND `{month_end}` (base cohort)
+  - AND `activo` = 'true'
+  - AND `fecha_activo` BETWEEN `{month_start}` AND `{month_end}` (activated in period)
+
+**Typical Results Pattern**:
+- PQL conversion rate varies by analysis period
+- PQL activation timing varies by contact
+- Low overlap with SQL conversions (< 10%)
+- Fast self-service activation when it occurs
+
+**Key Differences from SQL**:
+- PQL uses custom fields (`activo`, `fecha_activo`) vs native HubSpot lifecycle field
+- `fecha_activo` is a date string, not a datetime (must append time when parsing)
+- PQL activation is typically faster (same-day) vs SQL conversion (can take days)
+- Low overlap between PQL and SQL cohorts (separate customer journeys)
+
+**Use Cases**:
+- Product-led growth (PLG) effectiveness measurement
+- Sales vs product-driven conversion analysis
+- SQL qualification velocity tracking
+
+---
+
+## 🔗 SQL-PQL CORRELATION ANALYSIS
+
+**Definition**: Analyzes the relationship between SQL and PQL conversions to understand overlap, timing patterns, and customer journey paths.
+
+**Purpose**: 
+- Measure PLG effectiveness (do PQLs become SQLs?)
+- Identify sales-led adoption (do SQLs activate in product?)
+- Detect broken handoffs (PQLs not followed up, SQLs not activating)
+- Optimize the product-sales team coordination
+
+**Methodology Overview**:
+
+1. **Fetch Complete Dataset** (with pagination)
+2. **Categorize All Contacts**:
+   - SQL-only (sales engagement, no product activation)
+   - PQL-only (product activation, no sales engagement)
+   - Both SQL and PQL (overlap - ideal PLG flow)
+   - Neither (no conversion)
+3. **Analyze Overlap and Timing**
+4. **Calculate Correlation Metrics**
+
+**Key Metrics**:
+- **Overlap Rate**: % of SQLs that are also PQL (and vice versa)
+- **Correlation Ratio**: P(SQL ∩ PQL) / [P(SQL) × P(PQL)]
+- **Timing Pattern**: PQL→SQL (product-led) vs SQL→PQL (sales-led)
+- **Gap Analysis**: % with neither conversion
+
+**Critical Fields**:
+- SQL: `hs_v2_date_entered_opportunity` (datetime with timezone)
+- PQL: `activo` (string 'true') + `fecha_activo` (date string 'YYYY-MM-DD')
+- **IMPORTANT**: Different precision levels affect timing analysis
+
+**Pagination Requirements**:
+- MUST fetch ALL contacts (typical month = 500-600 contacts = 5-6 pages)
+- Use `after` cursor until `paging.next` is null
+- Incomplete pagination = invalid analysis
+
+**Typical Results Pattern**:
+- SQL conversions: Percentage varies by analysis period
+- PQL conversions: Percentage varies by analysis period
+- Overlap: < 10% (typically < 5% of either cohort)
+- Correlation: Near independence (1.5-2.5x ratio)
+- Common pattern: Sales-led model with low PLG effectiveness
+- Gap: 90-95% with no conversion (major opportunity)
+
+**Key Insights**:
+- SQL and PQL are typically independent paths (separate customer segments)
+- Overlap rate < 10% indicates broken handoff between product and sales teams
+- PQL→SQL pattern (when it occurs) is ideal PLG flow
+- SQL-only contacts missing product adoption opportunity
+- PQL-only contacts missing sales follow-up (hot leads being ignored)
+
+**Detailed Documentation**: See [SQL-PQL Correlation Analysis Guide](./HUBSPOT_SQL_PQL_CORRELATION_ANALYSIS.md)
+
+**Use Cases**:
+- Measuring PLG program effectiveness
+- Identifying team coordination gaps
+- Optimizing product-to-sales handoff
+- Understanding customer journey paths
+- Prioritizing growth opportunities
+- Lifecycle stage progression analysis
+
 ### 🎯 Contact-to-Deal Conversion
 
 **Definition**: Measures how many contacts generate associated deals (opportunities), regardless of deal outcome.
@@ -1731,9 +2346,9 @@ Contact-to-Deal Conversion Analysis:
 - **Conversion Rate**: `(customer contacts / total contacts) × 100`
 
 **Secondary Method**: Customer Date Method
-- **Field Used**: `hs_lifecyclestage_customer_date` (populated)
-- **Formula**: `contacts_df['is_customer_date'] = contacts_df['hs_lifecyclestage_customer_date'].notna()`
-- **Timing**: `hs_lifecyclestage_customer_date - createdate`
+- **Field Used**: `hs_v2_date_entered_customer` (UI: "Date entered \"Cliente (Pipeline de etapa del ciclo de vida)\"") (populated)
+- **Formula**: `contacts_df['is_customer_date'] = contacts_df['hs_v2_date_entered_customer'].notna()`
+- **Timing**: `hs_v2_date_entered_customer` (UI: "Date entered \"Cliente (Pipeline de etapa del ciclo de vida)\"") - `createdate` (UI: "Create Date")
 
 **Data Quality Check**:
 - Both methods should yield identical results
@@ -1810,11 +2425,9 @@ When conducting any conversion analysis, always:
 
 ### 🔍 Corrected Business Intelligence
 
-**Same-Day Activation Patterns:**
-- **76.5%** of customers activate on registration day
-- **11.8%** activate on the next day
-- **100%** of conversions occur within 7 days
-- Same-day engagement is **critical** for conversion success
+**Activation Patterns:**
+- Activation timing varies by contact
+- Early engagement is important for conversion success
 
 **Key Event Impact on Conversion:**
 - **With key events**: 21.6% conversion rate (236 contacts)
@@ -1874,13 +2487,47 @@ CONVERSION METHODOLOGY:
 ### 📊 Conversion Funnel Analysis
 
 **Complete Customer Journey**:
-1. **Contact Creation** → `createdate`
-2. **Lead Qualification** → `hs_lifecyclestage_lead_date`
-3. **Deal Creation** → `hs_lifecyclestage_opportunity_date`
-4. **Customer Conversion** → `hs_lifecyclestage_customer_date`
+1. **Contact Creation** → `createdate` (UI: "Create Date")
+2. **Lead Qualification** → `hs_v2_date_entered_lead` (UI: "Date entered \"Lead (Pipeline de etapa del ciclo de vida)\"")
+3. **Deal Creation** → `hs_v2_date_entered_opportunity` (UI: "Date entered \"Oportunidad (Pipeline de etapa del ciclo de vida)\"")
+4. **Customer Conversion** → `hs_v2_date_entered_customer` (UI: "Date entered \"Cliente (Pipeline de etapa del ciclo de vida)\"")
 
 **Funnel Metrics**:
-- Contact → Lead: Usually 100% (created simultaneously)
+- Contact → Lead: Contacts are created as leads simultaneously via HubSpot workflow
+  - **Workflow**: HubSpot automatically sets `lifecyclestage = 'lead'` when contact is created
+  - **Trigger**: Contact Created event (from Colppy integration, Intercom integration, or manual creation)
+  - **Result**: `hs_v2_date_entered_lead` (UI: "Date entered \"Lead (Pipeline de etapa del ciclo de vida)\"") = `createdate` (UI: "Create Date") (typically same timestamp)
+  - **Exception**: Invitation contacts (`lead_source = 'Usuario Invitado'`) do NOT get Lead status
+- Contact → MQL: Use `hs_v2_date_entered_lead` (UI: "Date entered \"Lead (Pipeline de etapa del ciclo de vida)\"") (Marketing Qualified Lead)
+  - **SIMPLIFIED MQL DEFINITION FOR ANALYSIS**: 
+    - **All contacts created (excluding 'Usuario Invitado') are considered MQLs**
+    - When a user signs up for the 7-day free trial and validates their email, a contact is created in HubSpot
+    - Therefore: **Contact created (excluding 'Usuario Invitado') = MQL**
+    - **EXCLUSION**: Contacts with `lead_source = 'Usuario Invitado'` are NOT MQLs
+      → These are team member invitations from existing customers
+      → They are NOT new contacts starting from trial period
+      → They should be excluded from all analysis
+  - **DETAILED MQL Definition**: Lead that has signed up for trial AND validated their email in Colppy
+  - **Note**: "Marketing Qualified" is HubSpot terminology, but qualification happens automatically via HubSpot workflows - no marketing person is involved
+  - **DETAILED MQL Requirements** (for technical verification, ALL must be met):
+    1. **Contact must have Lead object**: Contact must have an associated Lead object (created by workflow, not manual)
+    2. **User signed up for trial**: User must have signed up for the 7-day free trial in Colppy
+    3. **Email validated in Colppy**: Contact must have "Validó email" event in Mixpanel
+      - **What it means**: User signed up on the signup page, received validation email with code, and entered the code to validate their email
+      - **If event does NOT exist**: User signed up on the signup page, platform sent them an email with a code, but the user never entered the code to validate the email → NOT an MQL
+      - **Note**: This is one of the FIRST events a user does in the platform (after signup)
+    4. **MQL qualification date set**: `hs_v2_date_entered_lead` (UI: "Date entered \"Lead (Pipeline de etapa del ciclo de vida)\"") must be populated
+  - **MQL Characteristics** (typically present):
+    - **UTM Sources**: MQLs typically have UTM parameters (`utm_source`, `utm_campaign`, `utm_medium`) set by the visitor at original access
+    - **Lead Source**: Lead source doesn't matter for MQL qualification - could be anywhere (organic, paid, referral, etc.)
+    - **Lead Object**: Created by workflow (source: `AUTOMATION_PLATFORM`), not manually
+  - **Critical Rule**: The ONLY way to have a new Lead MQL in Colppy is:
+    - User signs up for trial
+    - User validates their email ("Validó email" event)
+    - Lead source doesn't matter - could be anywhere
+    - UTM sources don't matter for MQL qualification - if there's a new signup, marketing had something to do with it
+  - **Time to MQL**: Qualification happens automatically via HubSpot lead scoring workflow after email validation
+  - **Important**: Not all leads become MQLs. Sales-created leads CANNOT be MQLs until they sign up for trial AND validate their email. Contacts without Lead objects are invitations (not MQLs). If there are no UTM parameters, the contact was probably created manually by a HubSpot salesperson via UI (not an MQL until they sign up and validate email).
 - Contact → Deal: Use `num_associated_deals > 0`
 - Contact → Customer: Use `lifecyclestage = 'customer'`
 - Deal → Customer: Use deal `dealstage` analysis
@@ -1893,7 +2540,7 @@ CONVERSION METHODOLOGY:
    - Contact-to-Customer rates are always lower than Contact-to-Deal
 
 2. **Data Integrity Requirements**:
-   - Always verify `lifecyclestage` matches `hs_lifecyclestage_customer_date`
+   - Always verify `lifecyclestage` (UI: "Lifecycle Stage") matches `hs_v2_date_entered_customer` (UI: "Date entered \"Cliente (Pipeline de etapa del ciclo de vida)\"")
    - Report discrepancies as data quality issues
    - Use primary method consistently across analyses
 
@@ -2499,5 +3146,16 @@ const archiveUrl = `https://api.hubapi.com/crm/v4/associations/companies/deals/b
 ```
 
 **Important**: Removing ALL labels deletes the entire association. Always preserve at least ONE label type to maintain the relationship.
+
+---
+
+## Related Documentation
+
+### Analysis Methodologies
+
+- **[UTM Campaign vs Scoring Correlation Analysis](./HUBSPOT_UTM_CAMPAIGN_SCORING_ANALYSIS.md)** - Methodology for analyzing marketing campaign quality and lead assignment criteria
+- **[SQL-PQL Correlation Analysis](./HUBSPOT_SQL_PQL_CORRELATION_ANALYSIS.md)** - Analysis of sales vs product-led conversion patterns
+- **[SQL Conversion Analysis Lessons](./HUBSPOT_SQL_CONVERSION_ANALYSIS_LESSONS.md)** - SQL cohort definitions and conversion tracking
+- **[PQL Conversion Analysis Lessons](./HUBSPOT_PQL_CONVERSION_ANALYSIS_LESSONS.md)** - PQL cohort definitions and activation tracking
 
 ---

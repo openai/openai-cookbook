@@ -3,8 +3,10 @@ import sys
 import time
 import requests
 import csv
+import pandas as pd
 from datetime import datetime
 from dotenv import load_dotenv
+import argparse
 
 load_dotenv()
 
@@ -18,33 +20,29 @@ HEADERS = {
     "Content-Type": "application/json"
 }
 
-# Accept start and end date as arguments, dealstage, and filter type
-if len(sys.argv) > 4:
-    START_DATE = sys.argv[1]
-    END_DATE = sys.argv[2]
-    DEAL_STAGE = sys.argv[3]
-    FILTER_TYPE = sys.argv[4]  # "closedate" or "createdate"
-elif len(sys.argv) > 3:
-    START_DATE = sys.argv[1]
-    END_DATE = sys.argv[2]
-    DEAL_STAGE = sys.argv[3]
-    FILTER_TYPE = "closedate"
-else:
-    START_DATE = "2025-05-01"
-    END_DATE = "2025-06-01"
-    DEAL_STAGE = "closedwon"
-    FILTER_TYPE = "closedate"
+# Accountant channel company types (from documentation)
+ACCOUNTANT_COMPANY_TYPES = [
+    'Cuenta Contador',
+    'Cuenta Contador y Reseller',
+    'Contador Robado'
+]
 
-OUTPUT_DIR = os.path.join("hubspot_reports", "deals")
+OUTPUT_DIR = os.path.join("tools", "outputs")
 os.makedirs(OUTPUT_DIR, exist_ok=True)
-OUTPUT_CSV = os.path.join(
-    OUTPUT_DIR,
-    f"hubspot_deals_{START_DATE}_to_{END_DATE}_stage_{DEAL_STAGE}_{FILTER_TYPE}_with_company.csv"
-)
 
 # Helper to fetch all deals in the given date range
 
-def fetch_deals(start_date, end_date, deal_stage, filter_type="closedate"):
+def fetch_deals(start_date, end_date, deal_stage, filter_type="closedate", filter_both_dates=False):
+    """
+    Fetch deals from HubSpot API
+    
+    Args:
+        start_date: Start date in YYYY-MM-DD format
+        end_date: End date in YYYY-MM-DD format
+        deal_stage: Deal stage filter (e.g., 'closedwon', 'all')
+        filter_type: Primary date filter type ('closedate' or 'createdate')
+        filter_both_dates: If True, filter by BOTH createdate AND closedate (for monthly analysis)
+    """
     url = "https://api.hubapi.com/crm/v3/objects/deals/search"
     all_deals = []
     after = None
@@ -54,10 +52,20 @@ def fetch_deals(start_date, end_date, deal_stage, filter_type="closedate"):
         print(f"Fetching deals page {page}...")
         
         # Build filters based on filter_type and deal_stage
-        filters = [
-            {"propertyName": filter_type, "operator": "GTE", "value": f"{start_date}T00:00:00Z"},
-            {"propertyName": filter_type, "operator": "LT", "value": f"{end_date}T00:00:00Z"}
-        ]
+        if filter_both_dates:
+            # Filter by BOTH createdate AND closedate (for monthly analysis - matches HubSpot report filter)
+            filters = [
+                {"propertyName": "createdate", "operator": "GTE", "value": f"{start_date}T00:00:00Z"},
+                {"propertyName": "createdate", "operator": "LT", "value": f"{end_date}T00:00:00Z"},
+                {"propertyName": "closedate", "operator": "GTE", "value": f"{start_date}T00:00:00Z"},
+                {"propertyName": "closedate", "operator": "LT", "value": f"{end_date}T00:00:00Z"}
+            ]
+        else:
+            # Filter by single date type (default behavior)
+            filters = [
+                {"propertyName": filter_type, "operator": "GTE", "value": f"{start_date}T00:00:00Z"},
+                {"propertyName": filter_type, "operator": "LT", "value": f"{end_date}T00:00:00Z"}
+            ]
         
         # Only add dealstage filter if it's not "all"
         if deal_stage.lower() != "all":
@@ -71,6 +79,7 @@ def fetch_deals(start_date, end_date, deal_stage, filter_type="closedate"):
             ],
             "properties": [
                 "dealname", "dealstage", "closedate", "createdate", "amount", "hubspot_owner_id",
+                "nombre_del_plan_del_negocio",  # Subscription plan name for ICP Operador analysis
                 # UTM and campaign properties
                 "hs_analytics_source", "hs_analytics_source_data_1", "hs_analytics_source_data_2",
                 "utm_campaign", "utm_source", "utm_medium", "utm_content", "utm_term",
@@ -96,7 +105,7 @@ def fetch_deals(start_date, end_date, deal_stage, filter_type="closedate"):
         time.sleep(0.2)
     return all_deals
 
-# Helper to get company ID from associations
+# Helper to get company ID from associations (gets first company, not necessarily PRIMARY)
 
 def extract_company_id(deal):
     assoc = deal.get("associations", {})
@@ -104,6 +113,92 @@ def extract_company_id(deal):
     if companies:
         return companies[0].get("id", "")
     return ""
+
+def get_deal_company_associations(deal_id):
+    """Get all company associations for a deal using v4 API"""
+    url = f"https://api.hubapi.com/crm/v4/objects/deals/{deal_id}/associations/companies"
+    try:
+        response = requests.get(url, headers=HEADERS, timeout=30)
+        if response.status_code == 200:
+            return response.json().get('results', [])
+        return []
+    except Exception as e:
+        print(f"    ⚠️  Warning: Error getting associations for deal {deal_id}: {e}")
+        return []
+
+def get_primary_company_id(deal_id):
+    """Find the primary company ID from deal-company associations (Type ID 5)"""
+    associations = get_deal_company_associations(deal_id)
+    for assoc in associations:
+        association_types = assoc.get('associationTypes', [])
+        for assoc_type in association_types:
+            if assoc_type.get('typeId') == 5:  # PRIMARY association
+                return assoc.get('toObjectId')
+    return None
+
+def get_company_details(company_id):
+    """Get company details including name and type"""
+    url = f"https://api.hubapi.com/crm/v3/objects/companies/{company_id}"
+    params = {'properties': 'name,type'}
+    try:
+        response = requests.get(url, headers=HEADERS, params=params, timeout=30)
+        if response.status_code == 200:
+            return response.json().get('properties', {})
+        return {}
+    except Exception as e:
+        print(f"    ⚠️  Warning: Error getting company {company_id}: {e}")
+        return {}
+
+def is_accountant_plan(plan_name):
+    """Check if plan name contains 'ICP' AND 'Contador'"""
+    if not plan_name:
+        return False
+    plan_upper = plan_name.upper()
+    return 'ICP' in plan_upper and 'CONTADOR' in plan_upper
+
+def analyze_icp_operador_billing(deal):
+    """
+    Analyze if deal is billed to accountant (ICP Operador).
+    Returns dict with analysis results.
+    """
+    deal_id = deal.get('id')
+    props = deal.get('properties', {})
+    plan_name = props.get('nombre_del_plan_del_negocio', '')
+    
+    result = {
+        'is_icp_operador': False,
+        'method_used': 'NEITHER',
+        'primary_company_id': None,
+        'primary_company_name': None,
+        'primary_company_type': None,
+        'is_accountant_by_company_type': False,
+        'is_accountant_by_plan_name': False
+    }
+    
+    # METHOD 1: Check PRIMARY company type
+    primary_company_id = get_primary_company_id(deal_id)
+    if primary_company_id:
+        result['primary_company_id'] = primary_company_id
+        company_details = get_company_details(primary_company_id)
+        result['primary_company_name'] = company_details.get('name', 'Unknown')
+        result['primary_company_type'] = company_details.get('type', 'Unknown')
+        
+        if result['primary_company_type'] in ACCOUNTANT_COMPANY_TYPES:
+            result['is_accountant_by_company_type'] = True
+            result['is_icp_operador'] = True
+            result['method_used'] = 'PRIMARY_COMPANY_TYPE'
+    
+    # METHOD 2: Check plan name
+    if is_accountant_plan(plan_name):
+        result['is_accountant_by_plan_name'] = True
+        if not result['is_icp_operador']:
+            result['is_icp_operador'] = True
+            result['method_used'] = 'PLAN_NAME'
+        elif result['method_used'] == 'PRIMARY_COMPANY_TYPE':
+            result['method_used'] = 'BOTH'
+    
+    time.sleep(0.1)  # Rate limiting
+    return result
 
 # Optionally, map owner IDs to names (reuse mapping from leads script)
 OWNER_MAP = {
@@ -185,34 +280,138 @@ OWNER_MAP = {
 }
 
 def main():
-    deals = fetch_deals(START_DATE, END_DATE, DEAL_STAGE, FILTER_TYPE)
-    print(f"Fetched {len(deals)} deals.")
-    with open(OUTPUT_CSV, "w", newline="") as csvfile:
-        writer = csv.writer(csvfile)
-        writer.writerow(["Deal ID", "Deal Name", "Stage", "Close Date", "Create Date", "Amount", "Owner ID", "Owner Name", "Company ID (ID Empresa)", "UTM Campaign", "UTM Source", "UTM Medium", "Lead Source", "Analytics Source", "First Touch Campaign", "Last Touch Campaign"])
-        for deal in deals:
-            deal_id = deal.get("id", "")
+    parser = argparse.ArgumentParser(description='Fetch HubSpot deals with company associations and optional ICP Operador analysis')
+    parser.add_argument('--start-date', type=str, help='Start date in format YYYY-MM-DD')
+    parser.add_argument('--end-date', type=str, help='End date in format YYYY-MM-DD')
+    parser.add_argument('--deal-stage', type=str, default='closedwon', help='Deal stage (default: closedwon)')
+    parser.add_argument('--filter-type', type=str, default='closedate', choices=['closedate', 'createdate'], help='Date filter type (default: closedate). Ignored if --filter-both-dates is used.')
+    parser.add_argument('--filter-both-dates', action='store_true', help='Filter by BOTH createdate AND closedate (matches HubSpot report filter for monthly analysis)')
+    parser.add_argument('--analyze-icp-operador', action='store_true', help='Analyze ICP Operador billing (who we bill)')
+    parser.add_argument('--month', type=str, help='Month in format YYYY-MM (alternative to start-date/end-date)')
+    
+    args = parser.parse_args()
+    
+    # Handle month argument
+    if args.month:
+        year, month = args.month.split('-')
+        start_date = f"{year}-{month}-01"
+        if month == '12':
+            end_date = f"{int(year)+1}-01-01"
+        else:
+            end_date = f"{year}-{int(month)+1:02d}-01"
+    elif args.start_date and args.end_date:
+        start_date = args.start_date
+        end_date = args.end_date
+    else:
+        parser.error("Either --month or both --start-date and --end-date must be provided")
+    
+    deal_stage = args.deal_stage
+    filter_type = args.filter_type
+    filter_both_dates = args.filter_both_dates
+    
+    # For ICP Operador analysis, always use both dates filter (matches HubSpot report standard)
+    if args.analyze_icp_operador:
+        filter_both_dates = True
+        print("Note: Using both createdate AND closedate filter for ICP Operador analysis (matches HubSpot report standard)")
+    
+    # Fetch deals
+    deals = fetch_deals(start_date, end_date, deal_stage, filter_type, filter_both_dates)
+    print(f"\n✅ Fetched {len(deals)} deals.")
+    
+    if not deals:
+        print("No deals found in the specified period.")
+        return
+    
+    # Analyze ICP Operador billing if requested
+    if args.analyze_icp_operador:
+        print(f"\n🔍 ANALYZING ICP OPERADOR BILLING")
+        print("=" * 80)
+        
+        analysis_results = []
+        for i, deal in enumerate(deals, 1):
+            print(f"[{i}/{len(deals)}] Analyzing deal {deal.get('id')}...", end="\r")
+            result = analyze_icp_operador_billing(deal)
+            analysis_results.append(result)
+        
+        # Create DataFrame and add analysis results
+        df_data = []
+        for deal, analysis in zip(deals, analysis_results):
             props = deal.get("properties", {})
-            deal_name = props.get("dealname", "")
-            stage = props.get("dealstage", "")
-            close_date = props.get("closedate", "")
-            create_date = props.get("createdate", "")
-            amount = props.get("amount", "")
-            owner_id = props.get("hubspot_owner_id", "")
-            owner_name = OWNER_MAP.get(owner_id, "")
-            company_id = extract_company_id(deal)
+            deal_id = deal.get("id", "")
             
-            # UTM and campaign data
-            utm_campaign = props.get("utm_campaign", "")
-            utm_source = props.get("utm_source", "")
-            utm_medium = props.get("utm_medium", "")
-            lead_source = props.get("lead_source", "")
-            analytics_source = props.get("hs_analytics_source", "")
-            first_touch_campaign = props.get("hs_analytics_first_touch_converting_campaign", "")
-            last_touch_campaign = props.get("hs_analytics_last_touch_converting_campaign", "")
-            
-            writer.writerow([deal_id, deal_name, stage, close_date, create_date, amount, owner_id, owner_name, company_id, utm_campaign, utm_source, utm_medium, lead_source, analytics_source, first_touch_campaign, last_touch_campaign])
-    print(f"Exported to {OUTPUT_CSV}")
+            df_data.append({
+                'deal_id': deal_id,
+                'deal_name': props.get("dealname", ""),
+                'deal_stage': props.get("dealstage", ""),
+                'closedate': props.get("closedate", ""),
+                'createdate': props.get("createdate", ""),
+                'amount': props.get("amount", ""),
+                'plan_name': props.get("nombre_del_plan_del_negocio", ""),
+                'owner_id': props.get("hubspot_owner_id", ""),
+                'owner_name': OWNER_MAP.get(props.get("hubspot_owner_id", ""), ""),
+                'primary_company_id': analysis['primary_company_id'],
+                'primary_company_name': analysis['primary_company_name'],
+                'primary_company_type': analysis['primary_company_type'],
+                'is_icp_operador': analysis['is_icp_operador'],
+                'method_used': analysis['method_used'],
+                'is_accountant_by_company_type': analysis['is_accountant_by_company_type'],
+                'is_accountant_by_plan_name': analysis['is_accountant_by_plan_name']
+            })
+        
+        df = pd.DataFrame(df_data)
+        
+        # Summary statistics
+        print("\n" + "=" * 80)
+        print("📊 ICP OPERADOR BILLING SUMMARY")
+        print("=" * 80)
+        
+        total_deals = len(df)
+        icp_operador_deals = df['is_icp_operador'].sum()
+        by_company_type = df['is_accountant_by_company_type'].sum()
+        by_plan_name = df['is_accountant_by_plan_name'].sum()
+        non_icp_deals = total_deals - icp_operador_deals
+        
+        print(f"\nTotal Deals: {total_deals}")
+        print(f"ICP Operador (Billed to Accountant): {icp_operador_deals} ({icp_operador_deals/total_deals*100:.1f}%)")
+        print(f"  - Identified by PRIMARY company type: {by_company_type}")
+        print(f"  - Identified by plan name (ICP + Contador): {by_plan_name}")
+        print(f"Non-ICP Operador (Billed to SMB): {non_icp_deals} ({non_icp_deals/total_deals*100:.1f}%)")
+        
+        # Save detailed results
+        output_csv = os.path.join(OUTPUT_DIR, f"hubspot_deals_{start_date}_to_{end_date}_stage_{deal_stage}_icp_operador_analysis.csv")
+        df.to_csv(output_csv, index=False)
+        print(f"\n💾 Detailed results saved to: {output_csv}")
+        
+    else:
+        # Original functionality: export basic deal data
+        output_csv = os.path.join(OUTPUT_DIR, f"hubspot_deals_{start_date}_to_{end_date}_stage_{deal_stage}_{filter_type}_with_company.csv")
+        with open(output_csv, "w", newline="") as csvfile:
+            writer = csv.writer(csvfile)
+            writer.writerow(["Deal ID", "Deal Name", "Stage", "Close Date", "Create Date", "Amount", "Owner ID", "Owner Name", "Company ID (ID Empresa)", "Plan Name", "UTM Campaign", "UTM Source", "UTM Medium", "Lead Source", "Analytics Source", "First Touch Campaign", "Last Touch Campaign"])
+            for deal in deals:
+                deal_id = deal.get("id", "")
+                props = deal.get("properties", {})
+                deal_name = props.get("dealname", "")
+                stage = props.get("dealstage", "")
+                close_date = props.get("closedate", "")
+                create_date = props.get("createdate", "")
+                amount = props.get("amount", "")
+                owner_id = props.get("hubspot_owner_id", "")
+                owner_name = OWNER_MAP.get(owner_id, "")
+                company_id = extract_company_id(deal)
+                plan_name = props.get("nombre_del_plan_del_negocio", "")
+                
+                # UTM and campaign data
+                utm_campaign = props.get("utm_campaign", "")
+                utm_source = props.get("utm_source", "")
+                utm_medium = props.get("utm_medium", "")
+                lead_source = props.get("lead_source", "")
+                analytics_source = props.get("hs_analytics_source", "")
+                first_touch_campaign = props.get("hs_analytics_first_touch_converting_campaign", "")
+                last_touch_campaign = props.get("hs_analytics_last_touch_converting_campaign", "")
+                
+                writer.writerow([deal_id, deal_name, stage, close_date, create_date, amount, owner_id, owner_name, company_id, plan_name, utm_campaign, utm_source, utm_medium, lead_source, analytics_source, first_touch_campaign, last_touch_campaign])
+        print(f"💾 Exported to {output_csv}")
 
 if __name__ == "__main__":
     main() 

@@ -16,12 +16,12 @@ def analyze_contact_quality():
     print("="*60)
     
     # Load contact data
-    april_contacts = pd.read_csv("outputs/csv_data/hubspot/contacts/hubspot_contacts_2025_04_01_2025_04_25.csv")
-    may_contacts = pd.read_csv("outputs/csv_data/hubspot/contacts/hubspot_contacts_2025_05_01_2025_05_25.csv")
+    april_contacts = pd.read_csv("tools/outputs/csv_data/hubspot/contacts/hubspot_contacts_2025_04_01_2025_04_25.csv")
+    may_contacts = pd.read_csv("tools/outputs/csv_data/hubspot/contacts/hubspot_contacts_2025_05_01_2025_05_25_with_company.csv")
     
     # Load deals data
-    april_deals = pd.read_csv("outputs/csv_data/hubspot/deals/hubspot_deals_2025_04_01_2025_04_25_with_company.csv")
-    may_deals = pd.read_csv("outputs/csv_data/hubspot/deals/hubspot_deals_2025_05_01_2025_05_25_with_company.csv")
+    april_deals = pd.read_csv("tools/outputs/csv_data/hubspot/deals/hubspot_deals_2025_04_01_2025_04_25_with_company.csv")
+    may_deals = pd.read_csv("tools/outputs/csv_data/hubspot/deals/hubspot_deals_2025_05_01_2025_05_25_with_company.csv")
     
     print(f"📊 Data Loaded:")
     print(f"   April: {len(april_contacts):,} contacts, {len(april_deals):,} deals")

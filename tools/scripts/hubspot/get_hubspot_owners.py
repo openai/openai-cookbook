@@ -100,13 +100,16 @@ def get_hubspot_owners(api_key=None):
                 print(f"Owner ID: {owner_id}, Name: {first_name} {last_name}, Email: {email} (Archived)")
         
         # Save owner information to a file
-        with open("hubspot_owners.json", "w") as f:
+        output_dir = "tools/outputs"
+        os.makedirs(output_dir, exist_ok=True)
+        
+        with open(os.path.join(output_dir, "hubspot_owners.json"), "w") as f:
             json.dump(owner_info, f, indent=2)
             
-        print(f"\nOwner information saved to hubspot_owners.json")
+        print(f"\nOwner information saved to tools/outputs/hubspot_owners.json")
         
         # Create text file with the table format
-        with open("hubspot_owner_list_updated.txt", "w") as f:
+        with open(os.path.join(output_dir, "hubspot_owner_list_updated.txt"), "w") as f:
             f.write("# HubSpot Owner IDs and Names\n")
             f.write("# Retrieved using direct API method\n\n")
             f.write("| Owner ID | Full Name | Email | Team |\n")
@@ -119,7 +122,7 @@ def get_hubspot_owners(api_key=None):
                 
                 f.write(f"| {owner_id} | {full_name} | {email} | {team} |\n")
         
-        print(f"Updated owner list saved to hubspot_owner_list_updated.txt")
+        print(f"Updated owner list saved to tools/outputs/hubspot_owner_list_updated.txt")
         return owner_info
         
     except Exception as e:

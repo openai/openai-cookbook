@@ -24,6 +24,7 @@ This project provides a simple, extensible Python wrapper for the Mixpanel Query
 ## Features
 - Authenticate securely using a Mixpanel service account
 - Run custom JQL queries
+- Export Insight Reports to CSV
 - Helper methods for:
   - Active companies in a date range
   - Company plan segmentation
@@ -46,6 +47,14 @@ MIXPANEL_PROJECT_ID=your_project_id
    pip install -r requirements.txt
    ```
 3. Ensure your `.env` file is present and filled out as above.
+
+## CSV Export Format
+
+All CSV exports use **comma (`,`) as the field separator** and are formatted for direct import into spreadsheets:
+- ✅ Compatible with Google Sheets, Excel, and other spreadsheet applications
+- ✅ Properly escaped fields containing commas or quotes
+- ✅ Nested JSON structures are flattened with underscore separators (e.g., `meta_min_sampling_factor`)
+- ✅ Lists are converted to JSON strings for preservation
 
 ## Usage Examples
 
@@ -364,6 +373,7 @@ mixpanel = MixpanelAPI(
 ### Methods
 
 - **run_jql(script, params=None)**: Run a raw JQL query against Mixpanel
+- **export_insight_report(bookmark_id, workspace_id, output_file)**: Export a Mixpanel Insight report to CSV
 - **get_user_companies(user_email, from_date, to_date)**: Get all companies a user belongs to
 - **get_active_companies(from_date, to_date)**: Get list of active companies in date range
 - **get_company_plan_segmentation(from_date, to_date)**: Get company distribution by plan type
@@ -408,6 +418,61 @@ mixpanel = MixpanelAPI(
 - **"Uncaught exception"**: Check your JQL syntax, especially for invalid property access or chaining operations
 - **"is not a function"**: Certain operations can't be chained together. Try breaking into separate queries.
 
+## Exporting Insight Reports
+
+Mixpanel Insight Reports can be exported directly to CSV format using the API.
+
+### Getting the Bookmark ID
+
+Share links (e.g., `https://mixpanel.com/s/hmnpw`) contain a **share token**, not a bookmark_id. To get the actual bookmark_id:
+
+1. **Open the report in Mixpanel** using the share link
+2. **Look at the URL** in your browser after logging in - it will look like:
+   ```
+   https://mixpanel.com/project/2201475/view/142035/app/boards#id=12345&editor-card-id="report-123456"
+   ```
+3. **Extract the bookmark_id** - it's the number after `report-` (e.g., `123456`)
+
+### Exporting via Command Line
+
+Use the `download_insight.py` script:
+
+```bash
+cd /Users/virulana/openai-cookbook/tools/scripts/mixpanel
+
+# Export by bookmark ID
+python download_insight.py --bookmark-id 123456
+
+# Export with custom output file
+python download_insight.py --bookmark-id 123456 --output my_report.csv
+
+# With workspace ID (if needed)
+python download_insight.py --bookmark-id 123456 --workspace-id 142035 --output report.csv
+```
+
+### Exporting via Python API
+
+```python
+from mixpanel_api import MixpanelAPI
+
+mixpanel = MixpanelAPI()
+
+# Export insight report to CSV
+output_file = mixpanel.export_insight_report(
+    bookmark_id="123456",
+    workspace_id=None,  # Optional, defaults to env var or project default
+    output_file="insight_report.csv"  # Optional, auto-generated if not provided
+)
+
+print(f"Report exported to: {output_file}")
+```
+
+### CSV Output Format
+
+The exported CSV files use **comma (`,`) as the field separator** and are formatted for direct import into spreadsheets (Google Sheets, Excel, etc.). Nested JSON structures are flattened with underscore separators (e.g., `meta_min_sampling_factor`).
+
+**Note:** The Insight Reports API uses **GET method** with query parameters, which helps avoid rate limit issues compared to POST requests.
+
 ## Running the Example Script
 You can run the provided example/test script:
 ```
@@ -418,6 +483,8 @@ python src/mixpanel_api.py
 - Store credentials in `.env` and keep them secure.
 - Use service accounts for API access, not personal credentials.
 - **Exclude internal events**: Always filter out events whose name starts with `$` when analyzing user activity or generating reports.
+- **Use GET method for Insight Reports**: The `download_insight.py` script uses GET requests which are more reliable and avoid rate limit issues.
+- **CSV Format**: All CSV exports use comma separators and are ready for direct import into spreadsheets.
 - Review Mixpanel's [Query API documentation](https://developer.mixpanel.com/reference/query-api) and [JQL reference](https://developer.mixpanel.com/reference/query-jql) for advanced queries.
 - Extend the wrapper with new helper methods as your analytics needs grow.
 - For production, consider adding more robust error handling and logging.

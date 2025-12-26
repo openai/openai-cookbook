@@ -11,6 +11,11 @@ Key Metrics:
 - Revenue per Contact: Average revenue generated per contact segment
 - Sales Velocity: Time from contact → deal → win
 
+FILTERING STANDARD:
+- Contacts must be CREATED in the period
+- PQL conversions must be ACTIVATED in the same period (matches monthly analysis standard)
+- This ensures monthly reports reflect conversions that occurred in that specific month
+
 Usage:
   python deal_focused_pql_analysis.py --start-date 2025-07-01 --end-date 2025-07-30
 """
@@ -57,9 +62,14 @@ def make_hubspot_request(endpoint, search_data=None, timeout=30):
         return None
 
 def fetch_contacts_with_pql(start_date, end_date):
-    """Fetch contacts created in period with PQL and basic info"""
+    """Fetch contacts created in period with PQL and basic info
+    
+    NOTE: PQL conversions are filtered to only include those activated in the same period
+    (matches monthly analysis standard: created AND converted in same period).
+    """
     print(f"\n📞 FETCHING CONTACTS - DEAL-FOCUSED ANALYSIS")
     print(f"📅 Date Range: {start_date} to {end_date}")
+    print("   📊 Filtering: Contacts created AND PQL activated in same period")
     
     start_datetime = f"{start_date}T00:00:00.000Z"
     end_datetime = f"{end_date}T23:59:59.999Z"
@@ -192,10 +202,30 @@ def fetch_deal_details(deal_ids):
     
     return all_deals
 
-def analyze_deal_focused_metrics(contacts, deals):
-    """Analyze PQL effectiveness using deal-focused metrics"""
+def parse_datetime(date_str):
+    """Parse HubSpot datetime string to datetime object"""
+    if not date_str:
+        return None
+    try:
+        if 'T' in date_str:
+            return datetime.fromisoformat(date_str.replace('Z', '+00:00'))
+        else:
+            return datetime.fromisoformat(date_str + "T00:00:00+00:00")
+    except (ValueError, AttributeError):
+        return None
+
+def analyze_deal_focused_metrics(contacts, deals, start_date, end_date):
+    """Analyze PQL effectiveness using deal-focused metrics
+    
+    Filters PQL conversions to only include those activated in the same period as contact creation
+    (matches monthly analysis standard: created AND converted in same period).
+    """
     print(f"\n🎯 DEAL-FOCUSED CAUSALITY ANALYSIS")
     print("=" * 50)
+    
+    # Parse date range for filtering PQL conversions
+    start_dt = parse_datetime(f"{start_date}T00:00:00.000Z")
+    end_dt = parse_datetime(f"{end_date}T23:59:59.999Z")
     
     # Create deal lookup for fast access
     deal_lookup = {deal['deal_id']: deal for deal in deals}
@@ -204,11 +234,19 @@ def analyze_deal_focused_metrics(contacts, deals):
     contact_data = []
     
     for contact in contacts:
+        # Filter PQL: Must be created AND activated in the same period (monthly analysis standard)
+        pql_date = parse_datetime(contact.get('pql_date'))
+        is_pql_original = contact['is_pql']
+        is_pql = False
+        if is_pql_original and pql_date and start_dt and end_dt:
+            if start_dt <= pql_date <= end_dt:
+                is_pql = True
+        
         # Basic contact info
         row = {
             'contact_id': contact['contact_id'],
             'email': contact['email'],
-            'is_pql': contact['is_pql'],
+            'is_pql': is_pql,
             'is_customer': contact['is_customer'],
             'associated_deal_count': len(contact['associated_deal_ids'])
         }
@@ -353,8 +391,8 @@ def main():
     # Step 3: Fetch deal details
     deals = fetch_deal_details(unique_deal_ids) if unique_deal_ids else []
     
-    # Step 4: Analyze deal-focused metrics
-    results, contact_df = analyze_deal_focused_metrics(contacts, deals)
+    # Step 4: Analyze deal-focused metrics (with date filtering for PQL conversions)
+    results, contact_df = analyze_deal_focused_metrics(contacts, deals, args.start_date, args.end_date)
     
     # Step 5: Save results
     timestamp = datetime.now().strftime('%Y%m%d_%H%M%S')

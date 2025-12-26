@@ -1,0 +1,91 @@
+{
+  "headers": [
+    "$metric",
+    "$time",
+    "email"
+  ],
+  "computed_at": "2025-12-09T10:51:02.723593+00:00",
+  "date_range": {
+    "from_date": "2025-12-02T00:00:00-03:00",
+    "to_date": "2025-12-09T07:51:02.544012-03:00"
+  },
+  "meta": {
+    "min_sampling_factor": 1.0,
+    "is_segmentation_limit_hit": false,
+    "sub_query_count": 1,
+    "report_sections": {
+      "group": [
+        {
+          "bookmark": {
+            "dataset": "$mixpanel",
+            "value": "$time",
+            "resourceType": "events",
+            "search": "",
+            "propertyType": "datetime"
+          }
+        },
+        {
+          "bookmark": {
+            "dataset": "$mixpanel",
+            "value": "email",
+            "resourceType": "events",
+            "search": "",
+            "propertyType": "string"
+          }
+        }
+      ],
+      "show": [
+        {
+          "metric_key": "Uniques of Invitó usuario"
+        }
+      ]
+    }
+  },
+  "series": {
+    "Uniques of Invitó usuario": {
+      "$overall": {
+        "all": 4
+      },
+      "2025-12-03T15:11:01": {
+        "$overall": {
+          "all": 1
+        },
+        "estudiomc.recepcion@gmail.com": {
+          "all": 1
+        }
+      },
+      "2025-12-05T14:58:21": {
+        "$overall": {
+          "all": 1
+        },
+        "luciatorres@estudiofay.com": {
+          "all": 1
+        }
+      },
+      "2025-12-05T15:22:31": {
+        "$overall": {
+          "all": 1
+        },
+        "romina@estudiofay.com": {
+          "all": 1
+        }
+      },
+      "2025-12-02T17:45:41": {
+        "$overall": {
+          "all": 1
+        },
+        "administracion@tododrones.com.ar": {
+          "all": 1
+        }
+      },
+      "2025-12-05T12:23:02": {
+        "$overall": {
+          "all": 1
+        },
+        "ignaciobaudino@gmail.com": {
+          "all": 1
+        }
+      }
+    }
+  }
+}

@@ -26,8 +26,8 @@ def load_comparison_data():
     print("Loading comparison data...")
     
     # Load April metrics
-    april_file = "outputs/csv_data/hubspot/hubspot_conversion_metrics_2025_04.csv"
-    may_file = "outputs/csv_data/hubspot/hubspot_conversion_metrics_2025_05.csv"
+    april_file = "tools/outputs/csv_data/hubspot/hubspot_conversion_metrics_2025_04.csv"
+    may_file = "tools/outputs/csv_data/hubspot/hubspot_conversion_metrics_2025_05.csv"
     
     april_df = pd.read_csv(april_file)
     may_df = pd.read_csv(may_file)
@@ -180,8 +180,8 @@ def create_comparison_visualizations(april_metrics, may_metrics, changes):
     plt.tight_layout()
     
     # Save the comparison dashboard
-    os.makedirs("outputs/visualizations/hubspot", exist_ok=True)
-    dashboard_file = "outputs/visualizations/hubspot/hubspot_april_may_comparison_2025.png"
+    os.makedirs("tools/outputs/visualizations/hubspot", exist_ok=True)
+    dashboard_file = "tools/outputs/visualizations/hubspot/hubspot_april_may_comparison_2025.png"
     plt.savefig(dashboard_file, dpi=300, bbox_inches='tight')
     print(f"Saved comparison dashboard to {dashboard_file}")
     plt.close()
@@ -307,8 +307,8 @@ Contact: Data Analytics Team - Colppy Argentina
     """
     
     # Save summary
-    os.makedirs("outputs/csv_data/hubspot", exist_ok=True)
-    summary_file = "outputs/csv_data/hubspot/hubspot_april_may_executive_summary.txt"
+    os.makedirs("tools/outputs/csv_data/hubspot", exist_ok=True)
+    summary_file = "tools/outputs/csv_data/hubspot/hubspot_april_may_executive_summary.txt"
     with open(summary_file, 'w', encoding='utf-8') as f:
         f.write(summary)
     

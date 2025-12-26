@@ -1,0 +1,49 @@
+function main() {
+  var targetEmails = [
+    "danielacarando@gmail.com",
+    "fliagfernandez@gmail.com",
+    "matiasfagundes777@gmail.com",
+    "kevinnnmaldonadoo@gmail.com",
+    "aquinopedacredaiaradahiana@gmail.com",
+    "milagrose071@gmail.com",
+    "melaroberto186@gmail.com",
+    "estudiocontablekobiak@gmail.com",
+    "santiagomrex@gmail.com",
+    "jorge_v_78@hotmail.com",
+    "aquinomaximoenrique@gmail.com",
+    "munozjorgeeduardo0@gmail.com"
+  ];
+  
+  return Events({
+    from_date: "2025-01-01",
+    to_date: "2025-12-08"
+  })
+  .filter(function(event) {
+    // Skip internal Mixpanel events
+    if (event.name.indexOf("$") === 0) return false;
+    
+    var email = event.properties["Email"] || 
+                event.properties["$email"] || 
+                event.properties["email"] ||
+                event.distinct_id;
+    if (!email) return false;
+    return targetEmails.indexOf(email.toLowerCase()) >= 0;
+  })
+  .groupBy(
+    [function(event) {
+      return event.properties["Email"] || 
+             event.properties["$email"] || 
+             event.properties["email"] ||
+             event.distinct_id;
+    }, "name"],
+    mixpanel.reducer.count()
+  )
+  .map(function(result) {
+    return {
+      email: result.key[0],
+      event_name: result.key[1],
+      count: result.value
+    };
+  });
+}
+

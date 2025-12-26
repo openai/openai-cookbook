@@ -116,11 +116,11 @@ FILE_SUFFIX = get_file_suffix(START_DATE, END_DATE)
 API_KEY = os.getenv("HUBSPOT_API_KEY")
 
 # Output directories
-OUTPUT_BASE = "outputs/csv_data/hubspot"
+OUTPUT_BASE = "tools/outputs/csv_data/hubspot"
 LEADS_DIR = os.path.join(OUTPUT_BASE, "leads")
 DEALS_DIR = os.path.join(OUTPUT_BASE, "deals")
 CONTACTS_DIR = os.path.join(OUTPUT_BASE, "contacts")
-VISUALIZATIONS_DIR = "outputs/visualizations/hubspot"
+VISUALIZATIONS_DIR = "tools/outputs/visualizations/hubspot"
 
 # Create directories if they don't exist
 for directory in [LEADS_DIR, DEALS_DIR, CONTACTS_DIR, VISUALIZATIONS_DIR]:

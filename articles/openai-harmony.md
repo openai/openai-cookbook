@@ -108,7 +108,7 @@ tokens = encoding.render_conversation_for_completion(convo, Role.ASSISTANT)
 
 # After receiving a token response
 # Do not pass in the stop token
-parsed_response = encoding.parse_messages_from_completion_tokens(new_tokens, Role.ASSISTANT)
+parsed_response = encoding.parse_messages_from_completion_tokens(tokens, Role.ASSISTANT)
 ```
 
 Additionally the openai_harmony library also includes a StreamableParser for parsing and decoding as the model is generating new tokens. This can be helpful for example to stream output and handle unicode characters during decoding.

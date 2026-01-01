@@ -157,3 +157,6 @@ confluence-mcp-server/
 **/outputs/**
 *.env.migrated_*
 .env.*
+
+# Large dataset files (RNS - Registro Nacional de Sociedades)
+**/registro-nacional-sociedades-*.csv

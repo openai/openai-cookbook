@@ -1,6 +1,6 @@
 # HubSpot Scripts and Workflows
 
-**Last Updated:** 2025-01-27  
+**Last Updated:** 2025-12-30  
 **Purpose:** Centralized HubSpot analysis scripts and custom code workflows
 
 ---
@@ -26,6 +26,7 @@ tools/scripts/hubspot/
 │   ├── __init__.py
 │   ├── datetime_utils.py              # Date parsing and formatting
 │   └── constants.py                   # HubSpot field names and constants
+├── fix_close_date_from_history.py      # Fix deal close dates from property history
 └── *.py                                # Main analysis scripts
 ```
 
@@ -144,12 +145,37 @@ tools/scripts/hubspot/
 #### Other Analysis Scripts
 - **Cycle Time:** `time_to_contact_analysis_nov_2025.py` - Time to first contact analysis
 - **Conversion Rates:** `hubspot_conversion_analysis.py` - Comprehensive conversion analysis
-- **Period Comparison:** `hubspot_april_may_comparison.py` - Month-over-month comparisons
+- **ICP Operador Billing:** `analyze_icp_operador_billing.py` - Analyzes closed deals to determine "who we bill" (Accountant billing)
 
 ### Data Fetching Scripts
 - `fetch_unengaged_contacts.py` - Fetch unengaged contacts
 - `fetch_hubspot_deals_with_company.py` - Fetch deals with company associations
 - `get_hubspot_owners.py` - Fetch HubSpot owners
+
+### Data Management & Fixing Scripts
+- **Fix Close Date from History:** `fix_close_date_from_history.py` - Fixes deal close dates by finding the earliest close date from property history
+  - Retrieves property history for deals to find when they were first closed
+  - Useful for fixing deals where close date was updated incorrectly
+  - Supports single company/deal or bulk processing via CSV
+  - **Usage:**
+    ```bash
+    # Process a single company
+    python fix_close_date_from_history.py --company-id 17655187038
+    
+    # Process a single deal
+    python fix_close_date_from_history.py --deal-id 15583212916
+    
+    # Process from CSV (with company_id or deal_id columns)
+    python fix_close_date_from_history.py --csv input.csv
+    
+    # Apply updates (default is dry run)
+    python fix_close_date_from_history.py --csv input.csv --update
+    
+    # Save results to CSV
+    python fix_close_date_from_history.py --csv input.csv --output results.csv
+    ```
+  - **CSV Format:** CSV should contain `company_id` column (fetches all deals) or `deal_id` column (processes specific deals), or both
+  - **Output:** CSV with columns: `deal_id`, `deal_name`, `status`, `old_date`, `new_date`, `old_date_only`, `new_date_only`, `message`
 
 ### Visualization & Reporting
 - `generate_visualization_report.py` - Generates HTML reports with charts and visualizations
@@ -219,6 +245,21 @@ python tools/scripts/hubspot/check_owner_status.py
 python tools/scripts/hubspot/generate_visualization_report.py
 ```
 
+#### Data Management & Fixing Scripts
+```bash
+# Fix close date for a single company
+python tools/scripts/hubspot/fix_close_date_from_history.py --company-id 17655187038
+
+# Fix close date for a single deal
+python tools/scripts/hubspot/fix_close_date_from_history.py --deal-id 15583212916
+
+# Process from CSV (dry run)
+python tools/scripts/hubspot/fix_close_date_from_history.py --csv input.csv --output results.csv
+
+# Process from CSV and apply updates
+python tools/scripts/hubspot/fix_close_date_from_history.py --csv input.csv --update --output results.csv
+```
+
 ### Using Workflow Custom Codes
 
 1. Navigate to HubSpot Workflows
@@ -230,6 +271,13 @@ python tools/scripts/hubspot/generate_visualization_report.py
 ---
 
 ## 🔄 Recent Changes
+
+**2025-12-30:**
+- ✅ Added `fix_close_date_from_history.py` - **DATA FIXING SCRIPT** for correcting deal close dates
+  - Retrieves property history to find earliest close date when deal was first won
+  - Supports single company/deal processing or bulk CSV processing
+  - Includes dry-run mode and CSV output for results tracking
+  - Useful for fixing deals where close date was incorrectly updated
 
 **2025-12-26:**
 - ✅ Documented edge cases and CSV export discrepancies for funnel analysis scripts
@@ -275,6 +323,7 @@ python tools/scripts/hubspot/generate_visualization_report.py
 - ✅ Updated all scripts to automatically exclude inactive owners
 - ✅ Added `hs_lead_status` field to contact exports
 - ✅ Created `owner_utils.py` - Centralized owner name and status fetching
+
 
 **2025-01-27:**
 - ✅ Moved all HubSpot custom code workflow files to `workflows/` subdirectory

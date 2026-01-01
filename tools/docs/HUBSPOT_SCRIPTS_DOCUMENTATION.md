@@ -404,6 +404,68 @@ python fetch_hubspot_deals_with_company.py --month 2025-12 --deal-stage closedwo
 
 ---
 
+#### `analyze_smb_accountant_involved_funnel.py` ⭐ **NEW**
+**Purpose:** Analyze SMB funnel comparing deals WITH vs WITHOUT accountant involvement, using dual-criteria detection.
+
+**Key Features:**
+- **Dual-Criteria Accountant Detection**: Uses TWO methods to identify accountant involvement:
+  - **Method 1 (Formula Field)**: `tiene_cuenta_contador > 0` - Formula field that counts associated accountant companies
+  - **Method 2 (Rollup Field Logic)**: Has companies with association type 8 ("Estudio Contable / Asesor / Consultor Externo del negocio") - Rollup field that counts companies with the accountant association label
+- **Side-by-Side Comparison**: Generates funnels for both WITH and WITHOUT accountant involvement
+- **Overlap Analysis**: Tracks which deals are identified by both methods, only Method 1, or only Method 2
+- **Funnel Stages**: Deal Created → Deal Closed Won (starts directly from deals, not MQL/SQL, as accountant referrals often skip traditional paths)
+- **ICP Classification**: Classifies closed won deals by ICP Operador vs ICP PYME
+- **Revenue Analysis**: Calculates total revenue, ICP Operador revenue, and ICP PYME revenue
+- **Visualization**: Creates comprehensive comparison charts showing both funnels side-by-side
+
+**Funnel Logic:**
+1. **WITH Accountant**: Deals created in period where EITHER:
+   - `tiene_cuenta_contador > 0` (Formula field method), OR
+   - Has companies with association type 8 (Rollup field method)
+2. **WITHOUT Accountant**: Deals created in period where:
+   - `tiene_cuenta_contador = 0` or null, AND
+   - Does NOT have companies with association type 8
+3. **Contact Filtering**: All deals must have at least one associated contact (all contact types included - SMB, accountant, or no rol_wizard)
+4. **Closed Won**: Deals where both `createdate` and `closedate` are in the period
+
+**Usage:**
+```bash
+# Single month analysis
+python tools/scripts/hubspot/analyze_smb_accountant_involved_funnel.py --month 2025-12
+
+# Multiple months comparison
+python tools/scripts/hubspot/analyze_smb_accountant_involved_funnel.py --months 2025-10 2025-11 2025-12
+
+# Custom date range
+python tools/scripts/hubspot/analyze_smb_accountant_involved_funnel.py --start-date 2025-12-01 --end-date 2026-01-01
+
+# Visualization only (from existing CSV)
+python tools/scripts/hubspot/analyze_smb_accountant_involved_funnel.py --csv smb_accountant_funnel_comparison_20251201_20260101.csv
+```
+
+**Output Files:**
+- `smb_accountant_funnel_comparison_{start_date}_{end_date}.csv` - Comparison results with both funnels
+- `smb_accountant_funnel_comparison_{start_date}_{end_date}_visualization.png` - Side-by-side comparison charts
+
+**Key Metrics:**
+- Deal Created counts (WITH vs WITHOUT)
+- Deal Closed Won counts (WITH vs WITHOUT)
+- Deal→Won conversion rates (WITH vs WITHOUT)
+- Total Revenue (WITH vs WITHOUT)
+- ICP Operador vs ICP PYME breakdown
+- Overlap analysis between detection methods
+
+**Dual-Criteria Detection Details:**
+- **Overlap Tracking**: Shows deals identified by BOTH methods, ONLY by Method 1, or ONLY by Method 2
+- **Data Quality Validation**: Helps identify discrepancies between Formula field and Rollup field calculations
+- **Comprehensive Coverage**: Ensures all deals with accountant involvement are captured regardless of which method identifies them
+
+**Related Documentation:**
+- See README_HUBSPOT_CONFIGURATION.md for accountant company types and deal-company associations
+- See association type 8 documentation for Rollup field logic
+
+---
+
 #### `analyze_icp_operador_billing.py`
 **Purpose:** Analyze closed deals to determine "who we bill" (ICP Operador = Accountant billing).
 
@@ -604,6 +666,7 @@ python switch_primary_company.py <deal_id> <new_primary_company_id> [current_pri
 | **Fetch Deals** | `fetch_hubspot_deals_with_company.py` |
 | **Fetch Owners** | `get_hubspot_owners.py` |
 | **ICP Operador Billing** | `analyze_icp_operador_billing.py` |
+| **SMB Accountant Involved Funnel** | `analyze_smb_accountant_involved_funnel.py` |
 | **Data Management** | `data_management/*.py` |
 
 ### Scripts by Data Source

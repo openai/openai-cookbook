@@ -41,6 +41,9 @@ from datetime import datetime
 from dotenv import load_dotenv
 import argparse
 import time
+import matplotlib.pyplot as plt
+import matplotlib.gridspec as gridspec
+import seaborn as sns
 
 load_dotenv()
 
@@ -85,6 +88,8 @@ def fetch_smb_mqls(start_date, end_date):
     url = f"{HUBSPOT_BASE_URL}/crm/v3/objects/contacts/search"
     all_contacts = []
     after = None
+    max_retries = 3
+    retry_delay = 2
     
     while True:
         filters = [
@@ -101,10 +106,91 @@ def fetch_smb_mqls(start_date, end_date):
         }
         if after:
             payload["after"] = after
-            
-        response = requests.post(url, headers=HEADERS, json=payload, timeout=30)
-        response.raise_for_status()
-        data = response.json()
+        
+        # Retry logic for API calls
+        for attempt in range(max_retries):
+            try:
+                response = requests.post(url, headers=HEADERS, json=payload, timeout=60)
+                
+                # Handle different error types
+                if response.status_code == 400:
+                    # Bad Request - don't retry, this is a client error
+                    error_data = {}
+                    try:
+                        error_data = response.json()
+                    except:
+                        pass
+                    error_msg = error_data.get('message', 'Bad Request')
+                    print(f"❌ API Error 400: {error_msg}")
+                    print(f"   This may be due to:")
+                    print(f"   - Date range too large (try using --months instead)")
+                    print(f"   - Invalid filter parameters")
+                    print(f"   - API query limits exceeded")
+                    # Create HTTPError with response attached
+                    http_error = requests.exceptions.HTTPError(f"400 Client Error: {error_msg}")
+                    http_error.response = response
+                    raise http_error
+                
+                elif response.status_code == 429:
+                    # Rate limiting - retry with backoff
+                    retry_after = int(response.headers.get('Retry-After', retry_delay * (attempt + 1)))
+                    if attempt < max_retries - 1:
+                        print(f"⚠️  Rate limit hit. Waiting {retry_after} seconds before retry {attempt + 1}/{max_retries}...")
+                        time.sleep(retry_after)
+                        continue
+                    else:
+                        response.raise_for_status()
+                
+                elif response.status_code >= 500:
+                    # Server errors - retry
+                    if attempt < max_retries - 1:
+                        wait_time = retry_delay * (attempt + 1)
+                        print(f"⚠️  Server error {response.status_code}. Retrying in {wait_time} seconds ({attempt + 1}/{max_retries})...")
+                        time.sleep(wait_time)
+                        continue
+                    else:
+                        response.raise_for_status()
+                
+                # Success
+                response.raise_for_status()
+                data = response.json()
+                break
+                
+            except requests.exceptions.HTTPError as e:
+                # Don't retry on client errors (4xx), only retry on server errors (5xx)
+                if e.response is not None:
+                    status_code = e.response.status_code
+                    if 400 <= status_code < 500:
+                        # Client error - don't retry, just raise
+                        if status_code != 400:  # 400 already has detailed message
+                            print(f"❌ Client error {status_code}: {e}")
+                        raise
+                    elif status_code >= 500:
+                        # Server error - retry
+                        if attempt < max_retries - 1:
+                            wait_time = retry_delay * (attempt + 1)
+                            print(f"⚠️  Server error {status_code}. Retrying in {wait_time} seconds ({attempt + 1}/{max_retries})...")
+                            time.sleep(wait_time)
+                            continue
+                        else:
+                            raise
+                # If no response, treat as network error and retry
+                if attempt < max_retries - 1:
+                    wait_time = retry_delay * (attempt + 1)
+                    print(f"⚠️  HTTP error (no response). Retrying in {wait_time} seconds ({attempt + 1}/{max_retries})...")
+                    time.sleep(wait_time)
+                else:
+                    raise
+                    
+            except requests.exceptions.RequestException as e:
+                # Network errors - retry
+                if attempt < max_retries - 1:
+                    wait_time = retry_delay * (attempt + 1)
+                    print(f"⚠️  Request error: {str(e)}. Retrying in {wait_time} seconds ({attempt + 1}/{max_retries})...")
+                    time.sleep(wait_time)
+                else:
+                    print(f"❌ Error fetching contacts after {max_retries} attempts: {str(e)}")
+                    raise
         
         results = data.get('results', [])
         all_contacts.extend(results)
@@ -408,17 +494,431 @@ def is_icp_operador(deal):
     
     return False
 
+def create_funnel_visualization(csv_file_path, output_dir=None):
+    """
+    Create comprehensive funnel visualization from CSV output.
+    Handles both single-period and multi-month comparative data.
+    
+    Args:
+        csv_file_path: Path to the CSV file generated by analyze_funnel
+        output_dir: Directory to save visualization (defaults to same dir as CSV)
+    
+    Returns:
+        Path to saved visualization file
+    """
+    # Read CSV data
+    df = pd.read_csv(csv_file_path)
+    
+    # Check if this is a multi-month comparison (has 'Month' column)
+    if 'Month' in df.columns and len(df) > 1:
+        # Multi-month comparison - create comparative visualization
+        return create_comparative_visualization(df, csv_file_path, output_dir)
+    
+    # Single period visualization
+    row = df.iloc[0]
+    
+    # Extract values
+    period = row.get('Period', 'N/A')
+    mql = int(row.get('MQL_PYME', 0))
+    deal_created = int(row.get('Deal_Created', 0))
+    deal_won = int(row.get('Deal_Closed_Won', 0))
+    mql_to_deal = float(row.get('MQL_to_Deal_Rate_%', 0))
+    deal_to_won = float(row.get('Deal_to_Won_Rate_%', 0))
+    mql_to_won = float(row.get('MQL_to_Won_Rate_%', 0))
+    sql_info = int(row.get('SQL_Informational', 0))
+    mql_to_sql = float(row.get('MQL_to_SQL_Rate_%', 0))
+    icp_operador_count = int(row.get('ICP_Operador_Count', 0))
+    icp_pyme_count = int(row.get('ICP_PYME_Count', 0))
+    total_revenue = float(row.get('Total_Revenue', 0))
+    icp_operador_revenue = float(row.get('ICP_Operador_Revenue', 0))
+    icp_pyme_revenue = float(row.get('ICP_PYME_Revenue', 0))
+    
+    # Set style
+    plt.style.use('default')
+    sns.set_palette("husl")
+    
+    # Create figure with grid layout
+    fig = plt.figure(figsize=(16, 12))
+    gs = gridspec.GridSpec(3, 2, figure=fig, hspace=0.35, wspace=0.3, 
+                           height_ratios=[2, 1, 1], width_ratios=[1.2, 1])
+    
+    # ===== MAIN FUNNEL CHART =====
+    ax1 = fig.add_subplot(gs[0, :])
+    
+    stages = ['MQL PYME', 'Deal Created', 'Deal Closed Won']
+    values = [mql, deal_created, deal_won]
+    percentages = [
+        100,
+        (deal_created/mql*100) if mql > 0 else 0,
+        (deal_won/mql*100) if mql > 0 else 0
+    ]
+    
+    # Color gradient for funnel
+    colors = ['#4A90E2', '#7B68EE', '#9370DB']
+    y_positions = [0, 1.5, 3]
+    
+    # Draw funnel bars
+    max_width = max(values) if values else 1
+    for stage, value, pct, y_pos, color in zip(stages, values, percentages, y_positions, colors):
+        # Proportional width based on max value
+        width = (value / max_width) * 10 if max_width > 0 else 0.5
+        bar = ax1.barh(y_pos, width, height=0.8, color=color, alpha=0.85, 
+                      edgecolor='white', linewidth=2.5)
+        
+        # Add value and percentage labels
+        ax1.text(width/2, y_pos, f'{value:,}\n({pct:.1f}%)', 
+                ha='center', va='center', fontsize=13, fontweight='bold', 
+                color='white')
+        
+        # Add stage label
+        ax1.text(-0.8, y_pos, stage, ha='right', va='center', 
+                fontsize=13, fontweight='bold', color='#2c3e50')
+    
+    ax1.set_xlim(-3, 12)
+    ax1.set_ylim(-0.5, 4.5)
+    ax1.set_title(f'SMB MQL Funnel - {period}', fontsize=16, fontweight='bold', pad=20)
+    ax1.axis('off')
+    
+    # ===== CONVERSION RATES BAR CHART =====
+    ax2 = fig.add_subplot(gs[1, 0])
+    
+    paths = ['MQL→Deal', 'Deal→Won', 'MQL→Won']
+    rates = [mql_to_deal, deal_to_won, mql_to_won]
+    x_pos = range(len(paths))
+    bars = ax2.bar(x_pos, rates, color='#4A90E2', alpha=0.8, edgecolor='white', linewidth=2)
+    
+    for bar, rate in zip(bars, rates):
+        ax2.text(bar.get_x() + bar.get_width()/2., bar.get_height() + max(rates)*0.02,
+                f'{rate:.1f}%', ha='center', va='bottom', fontsize=12, fontweight='bold')
+    
+    ax2.set_ylabel('Conversion Rate (%)', fontsize=11, fontweight='bold')
+    ax2.set_title('Conversion Rates', fontsize=13, fontweight='bold', pad=15)
+    ax2.set_ylim(0, max(rates) * 1.25 if rates and max(rates) > 0 else 50)
+    ax2.grid(axis='y', alpha=0.3, linestyle='--')
+    ax2.set_xticks(x_pos)
+    ax2.set_xticklabels(paths, rotation=15, ha='right')
+    
+    # ===== ICP BREAKDOWN =====
+    ax3 = fig.add_subplot(gs[1, 1])
+    
+    icp_types = ['ICP Operador', 'ICP PYME']
+    icp_counts = [icp_operador_count, icp_pyme_count]
+    icp_colors = ['#E74C3C', '#27AE60']
+    
+    if sum(icp_counts) > 0:
+        bars = ax3.bar(icp_types, icp_counts, color=icp_colors, alpha=0.8, 
+                      edgecolor='white', linewidth=2)
+        
+        for bar, count in zip(bars, icp_counts):
+            pct = (count / sum(icp_counts) * 100) if sum(icp_counts) > 0 else 0
+            ax3.text(bar.get_x() + bar.get_width()/2., bar.get_height() + max(icp_counts)*0.02,
+                    f'{count}\n({pct:.1f}%)', ha='center', va='bottom', 
+                    fontsize=11, fontweight='bold')
+        
+        ax3.set_ylabel('Count', fontsize=11, fontweight='bold')
+        ax3.set_title('ICP Classification (Closed Won)', fontsize=13, fontweight='bold', pad=15)
+        ax3.set_ylim(0, max(icp_counts) * 1.25 if icp_counts else 10)
+        ax3.grid(axis='y', alpha=0.3, linestyle='--')
+    else:
+        ax3.text(0.5, 0.5, 'No Closed Won Deals', ha='center', va='center',
+                fontsize=12, transform=ax3.transAxes)
+        ax3.set_title('ICP Classification (Closed Won)', fontsize=13, fontweight='bold', pad=15)
+    
+    # ===== REVENUE BREAKDOWN =====
+    ax4 = fig.add_subplot(gs[2, 0])
+    
+    if total_revenue > 0:
+        revenue_types = ['ICP Operador', 'ICP PYME']
+        revenues = [icp_operador_revenue, icp_pyme_revenue]
+        
+        bars = ax4.bar(revenue_types, revenues, color=icp_colors, alpha=0.8,
+                      edgecolor='white', linewidth=2)
+        
+        for bar, rev in zip(bars, revenues):
+            pct = (rev / total_revenue * 100) if total_revenue > 0 else 0
+            ax4.text(bar.get_x() + bar.get_width()/2., bar.get_height() + total_revenue*0.02,
+                    f'${rev:,.0f}\n({pct:.1f}%)', ha='center', va='bottom',
+                    fontsize=11, fontweight='bold')
+        
+        ax4.set_ylabel('Revenue ($)', fontsize=11, fontweight='bold')
+        ax4.set_title('Revenue by ICP Type', fontsize=13, fontweight='bold', pad=15)
+        ax4.set_ylim(0, total_revenue * 1.25)
+        ax4.grid(axis='y', alpha=0.3, linestyle='--')
+        
+        # Format y-axis as currency
+        ax4.yaxis.set_major_formatter(plt.FuncFormatter(lambda x, p: f'${x:,.0f}'))
+    else:
+        ax4.text(0.5, 0.5, 'No Revenue Data', ha='center', va='center',
+                fontsize=12, transform=ax4.transAxes)
+        ax4.set_title('Revenue by ICP Type', fontsize=13, fontweight='bold', pad=15)
+    
+    # ===== SQL INFORMATIONAL METRICS =====
+    ax5 = fig.add_subplot(gs[2, 1])
+    
+    sql_metrics = ['MQL→SQL', 'SQL→Deal']
+    sql_rates = [mql_to_sql, 
+                 float(row.get('SQL_to_Deal_Rate_%', 0)) if sql_info > 0 else 0]
+    
+    x_pos_sql = range(len(sql_metrics))
+    bars = ax5.bar(x_pos_sql, sql_rates, color='#F39C12', alpha=0.8,
+                  edgecolor='white', linewidth=2)
+    
+    for bar, rate in zip(bars, sql_rates):
+        ax5.text(bar.get_x() + bar.get_width()/2., bar.get_height() + max(sql_rates)*0.02,
+                f'{rate:.1f}%', ha='center', va='bottom', fontsize=11, fontweight='bold')
+    
+    ax5.set_ylabel('Rate (%)', fontsize=11, fontweight='bold')
+    ax5.set_title('SQL Metrics (Informational)', fontsize=13, fontweight='bold', pad=15)
+    ax5.set_ylim(0, max(sql_rates) * 1.25 if sql_rates and max(sql_rates) > 0 else 50)
+    ax5.grid(axis='y', alpha=0.3, linestyle='--')
+    ax5.set_xticks(x_pos_sql)
+    ax5.set_xticklabels(sql_metrics, rotation=15, ha='right')
+    
+    # Add summary text box
+    summary_text = (
+        f"Summary:\n"
+        f"MQL PYME: {mql:,} | "
+        f"Deal Created: {deal_created:,} ({mql_to_deal:.1f}%) | "
+        f"Won: {deal_won:,} ({mql_to_won:.1f}%)\n"
+        f"Total Revenue: ${total_revenue:,.2f} | "
+        f"ICP Operador: {icp_operador_count} (${icp_operador_revenue:,.2f}) | "
+        f"ICP PYME: {icp_pyme_count} (${icp_pyme_revenue:,.2f})"
+    )
+    
+    fig.text(0.5, 0.02, summary_text, ha='center', fontsize=10,
+            bbox=dict(boxstyle='round', facecolor='wheat', alpha=0.3))
+    
+    plt.suptitle('SMB MQL Funnel Analysis Dashboard', fontsize=18, fontweight='bold', y=0.98)
+    
+    # Save visualization
+    if output_dir is None:
+        output_dir = os.path.dirname(csv_file_path)
+    
+    os.makedirs(output_dir, exist_ok=True)
+    
+    # Generate visualization filename from CSV filename
+    csv_basename = os.path.basename(csv_file_path)
+    viz_filename = csv_basename.replace('.csv', '_visualization.png')
+    viz_path = os.path.join(output_dir, viz_filename)
+    
+    plt.savefig(viz_path, dpi=300, bbox_inches='tight', facecolor='white')
+    plt.close()
+    
+    print(f"📊 Visualization saved to: {viz_path}")
+    
+    return viz_path
+
+def create_comparative_visualization(df, csv_file_path, output_dir=None):
+    """
+    Create comparative visualization for multi-month analysis.
+    
+    Args:
+        df: DataFrame with multiple months of data
+        csv_file_path: Path to the CSV file
+        output_dir: Directory to save visualization
+    
+    Returns:
+        Path to saved visualization file
+    """
+    # Set style
+    plt.style.use('default')
+    sns.set_palette("husl")
+    
+    # Create figure with gridspec for better layout control
+    fig = plt.figure(figsize=(18, 14))
+    gs = gridspec.GridSpec(3, 2, figure=fig, hspace=0.4, wspace=0.3, 
+                           height_ratios=[1.5, 1, 1], width_ratios=[1, 1])
+    fig.suptitle('SMB MQL Funnel - Multi-Month Comparison', fontsize=18, fontweight='bold', y=0.98)
+    
+    months = df['Month'].tolist()
+    
+    # Extract metrics
+    mql_values = df['MQL_PYME'].tolist()
+    deal_created_values = df['Deal_Created'].tolist()
+    deal_won_values = df['Deal_Closed_Won'].tolist()
+    mql_to_deal_rates = df['MQL_to_Deal_Rate_%'].tolist()
+    deal_to_won_rates = df['Deal_to_Won_Rate_%'].tolist()
+    mql_to_won_rates = df['MQL_to_Won_Rate_%'].tolist()
+    total_revenue_values = df['Total_Revenue'].tolist()
+    
+    # Calculate aggregated totals for funnel
+    total_mql = sum(mql_values)
+    total_deal_created = sum(deal_created_values)
+    total_deal_won = sum(deal_won_values)
+    total_revenue = sum(total_revenue_values)
+    total_icp_operador = sum(df['ICP_Operador_Count'].tolist()) if 'ICP_Operador_Count' in df.columns else 0
+    total_icp_pyme = sum(df['ICP_PYME_Count'].tolist()) if 'ICP_PYME_Count' in df.columns else 0
+    
+    # Calculate overall conversion rates
+    overall_mql_to_deal = (total_deal_created / total_mql * 100) if total_mql > 0 else 0
+    overall_deal_to_won = (total_deal_won / total_deal_created * 100) if total_deal_created > 0 else 0
+    overall_mql_to_won = (total_deal_won / total_mql * 100) if total_mql > 0 else 0
+    
+    # ===== AGGREGATED FUNNEL CHART =====
+    ax_funnel = fig.add_subplot(gs[0, :])
+    
+    stages = ['MQL PYME', 'Deal Created', 'Deal Closed Won']
+    values = [total_mql, total_deal_created, total_deal_won]
+    percentages = [
+        100,
+        (total_deal_created/total_mql*100) if total_mql > 0 else 0,
+        (total_deal_won/total_mql*100) if total_mql > 0 else 0
+    ]
+    
+    # Color gradient for funnel
+    colors = ['#4A90E2', '#7B68EE', '#9370DB']
+    y_positions = [0, 1.5, 3]
+    
+    # Draw funnel bars
+    max_width = max(values) if values else 1
+    for stage, value, pct, y_pos, color in zip(stages, values, percentages, y_positions, colors):
+        # Proportional width based on max value
+        width = (value / max_width) * 12 if max_width > 0 else 0.5
+        bar = ax_funnel.barh(y_pos, width, height=0.8, color=color, alpha=0.85, 
+                             edgecolor='white', linewidth=2.5)
+        
+        # Add value and percentage labels
+        ax_funnel.text(width/2, y_pos, f'{value:,}\n({pct:.1f}%)', 
+                      ha='center', va='center', fontsize=14, fontweight='bold', 
+                      color='white')
+        
+        # Add stage label
+        ax_funnel.text(-1.0, y_pos, stage, ha='right', va='center', 
+                      fontsize=14, fontweight='bold', color='#2c3e50')
+    
+    ax_funnel.set_xlim(-2, 14)
+    ax_funnel.set_ylim(-0.5, 4.5)
+    period_label = f"{months[0]} to {months[-1]}" if len(months) > 1 else months[0]
+    ax_funnel.set_title(f'Aggregated Funnel - {period_label} (Total: {len(months)} months)', 
+                       fontsize=15, fontweight='bold', pad=20)
+    ax_funnel.axis('off')
+    
+    # Add summary text on funnel chart
+    funnel_summary = (
+        f"Overall Rates: MQL→Deal: {overall_mql_to_deal:.1f}% | "
+        f"Deal→Won: {overall_deal_to_won:.1f}% | "
+        f"MQL→Won: {overall_mql_to_won:.1f}% | "
+        f"Total Revenue: ${total_revenue:,.0f}"
+    )
+    ax_funnel.text(0.5, -0.3, funnel_summary, ha='center', fontsize=11,
+                   transform=ax_funnel.transAxes, 
+                   bbox=dict(boxstyle='round', facecolor='wheat', alpha=0.3))
+    
+    # ===== FUNNEL VALUES OVER TIME =====
+    ax1 = fig.add_subplot(gs[1, 0])
+    x = range(len(months))
+    width = 0.25
+    
+    ax1.bar([i - width for i in x], mql_values, width, label='MQL PYME', color='#4A90E2', alpha=0.8)
+    ax1.bar(x, deal_created_values, width, label='Deal Created', color='#7B68EE', alpha=0.8)
+    ax1.bar([i + width for i in x], deal_won_values, width, label='Deal Closed Won', color='#9370DB', alpha=0.8)
+    
+    ax1.set_xlabel('Month', fontweight='bold')
+    ax1.set_ylabel('Count', fontweight='bold')
+    ax1.set_title('Funnel Stages Over Time', fontsize=13, fontweight='bold', pad=15)
+    ax1.set_xticks(x)
+    ax1.set_xticklabels(months, rotation=45, ha='right')
+    ax1.legend()
+    ax1.grid(axis='y', alpha=0.3, linestyle='--')
+    
+    # ===== CONVERSION RATES OVER TIME =====
+    ax2 = fig.add_subplot(gs[1, 1])
+    x_pos = range(len(months))
+    ax2.plot(x_pos, mql_to_deal_rates, marker='o', linewidth=2.5, label='MQL→Deal', color='#4A90E2')
+    ax2.plot(x_pos, deal_to_won_rates, marker='s', linewidth=2.5, label='Deal→Won', color='#7B68EE')
+    ax2.plot(x_pos, mql_to_won_rates, marker='^', linewidth=2.5, label='MQL→Won', color='#9370DB')
+    
+    ax2.set_xlabel('Month', fontweight='bold')
+    ax2.set_ylabel('Conversion Rate (%)', fontweight='bold')
+    ax2.set_title('Conversion Rates Over Time', fontsize=13, fontweight='bold', pad=15)
+    ax2.set_xticks(x_pos)
+    ax2.set_xticklabels(months, rotation=45, ha='right')
+    ax2.legend()
+    ax2.grid(alpha=0.3, linestyle='--')
+    
+    # ===== REVENUE OVER TIME =====
+    ax3 = fig.add_subplot(gs[2, 0])
+    x_pos_rev = range(len(months))
+    bars = ax3.bar(x_pos_rev, total_revenue_values, color='#27AE60', alpha=0.8, edgecolor='white', linewidth=2)
+    
+    for bar, rev in zip(bars, total_revenue_values):
+        ax3.text(bar.get_x() + bar.get_width()/2., bar.get_height() + max(total_revenue_values)*0.02,
+                f'${rev:,.0f}', ha='center', va='bottom', fontsize=10, fontweight='bold')
+    
+    ax3.set_xlabel('Month', fontweight='bold')
+    ax3.set_ylabel('Revenue ($)', fontsize=11, fontweight='bold')
+    ax3.set_title('Total Revenue Over Time', fontsize=13, fontweight='bold', pad=15)
+    ax3.set_xticks(x_pos_rev)
+    ax3.set_xticklabels(months, rotation=45, ha='right')
+    ax3.grid(axis='y', alpha=0.3, linestyle='--')
+    ax3.yaxis.set_major_formatter(plt.FuncFormatter(lambda x, p: f'${x:,.0f}'))
+    
+    # ===== ICP BREAKDOWN COMPARISON =====
+    ax4 = fig.add_subplot(gs[2, 1])
+    if 'ICP_Operador_Count' in df.columns and 'ICP_PYME_Count' in df.columns:
+        icp_operador_counts = df['ICP_Operador_Count'].tolist()
+        icp_pyme_counts = df['ICP_PYME_Count'].tolist()
+        
+        x = range(len(months))
+        width = 0.35
+        
+        ax4.bar([i - width/2 for i in x], icp_operador_counts, width, 
+               label='ICP Operador', color='#E74C3C', alpha=0.8)
+        ax4.bar([i + width/2 for i in x], icp_pyme_counts, width,
+               label='ICP PYME', color='#27AE60', alpha=0.8)
+        
+        ax4.set_xlabel('Month', fontweight='bold')
+        ax4.set_ylabel('Count', fontweight='bold')
+        ax4.set_title('ICP Classification Over Time', fontsize=13, fontweight='bold', pad=15)
+        ax4.set_xticks(x)
+        ax4.set_xticklabels(months, rotation=45, ha='right')
+        ax4.legend()
+        ax4.grid(axis='y', alpha=0.3, linestyle='--')
+    else:
+        ax4.text(0.5, 0.5, 'No ICP Data Available', ha='center', va='center',
+                fontsize=12, transform=ax4.transAxes)
+        ax4.set_title('ICP Classification Over Time', fontsize=13, fontweight='bold', pad=15)
+    
+    plt.tight_layout(rect=[0, 0.02, 1, 0.96], pad=2.0)
+    
+    # Save visualization
+    if output_dir is None:
+        output_dir = os.path.dirname(csv_file_path)
+    
+    os.makedirs(output_dir, exist_ok=True)
+    
+    # Generate visualization filename
+    csv_basename = os.path.basename(csv_file_path)
+    viz_filename = csv_basename.replace('.csv', '_visualization.png')
+    viz_path = os.path.join(output_dir, viz_filename)
+    
+    plt.savefig(viz_path, dpi=300, bbox_inches='tight', facecolor='white')
+    plt.close()
+    
+    print(f"📊 Comparative visualization saved to: {viz_path}")
+    
+    return viz_path
+
 def analyze_funnel(start_date, end_date):
     """
     Analyze the funnel from MQL PYME to Closed Won deals
     """
+    # Validate date range
+    start_dt = datetime.fromisoformat(f"{start_date}T00:00:00+00:00")
+    end_dt = datetime.fromisoformat(f"{end_date}T00:00:00+00:00")
+    days_diff = (end_dt - start_dt).days
+    
+    if days_diff > 365:
+        print(f"⚠️  Warning: Large date range detected ({days_diff} days).")
+        print(f"   This may take a long time and could hit API rate limits or query limits.")
+        print(f"   For full year analysis, consider using --months instead:")
+        print(f"   Example: --months 2025-01 2025-02 2025-03 ... 2025-12")
+        print(f"   Or analyze in smaller chunks (e.g., quarterly).\n")
+    
     print(f"\n{'='*80}")
     print(f"SMB MQL FUNNEL ANALYSIS")
     print(f"Period: {start_date} to {end_date}")
     print(f"{'='*80}\n")
-    
-    start_dt = datetime.fromisoformat(f"{start_date}T00:00:00+00:00")
-    end_dt = datetime.fromisoformat(f"{end_date}T00:00:00+00:00")
     
     # STAGE 1: Fetch MQL PYME (contacts created in period with SMB rol_wizard - NOT accountant)
     print("📊 Stage 1: Fetching MQL PYME...")
@@ -820,6 +1320,14 @@ def analyze_funnel(start_date, end_date):
     print(f"📄 Results saved to CSV: {output_file}")
     print()
     
+    # Generate visualization automatically
+    try:
+        viz_path = create_funnel_visualization(output_file, output_dir)
+        print()
+    except Exception as e:
+        print(f"⚠️  Warning: Could not generate visualization: {str(e)}")
+        print()
+    
     return results
 
 def main():
@@ -828,8 +1336,32 @@ def main():
     parser.add_argument('--months', nargs='+', type=str, help='Multiple months in format YYYY-MM (e.g., --months 2025-11 2025-12)')
     parser.add_argument('--start-date', type=str, help='Start date in YYYY-MM-DD format')
     parser.add_argument('--end-date', type=str, help='End date in YYYY-MM-DD format')
+    parser.add_argument('--csv', type=str, help='Path to existing CSV file to generate visualization from (e.g., tools/outputs/smb_mql_funnel_20251201_20260101.csv)')
     
     args = parser.parse_args()
+    
+    # Handle CSV-only visualization
+    if args.csv:
+        csv_path = args.csv
+        if not os.path.exists(csv_path):
+            # Try relative to outputs directory
+            if not csv_path.startswith('tools/outputs/'):
+                csv_path = f"tools/outputs/{csv_path}"
+            if not os.path.exists(csv_path):
+                print(f"❌ Error: CSV file not found: {csv_path}")
+                print(f"   Please provide the full path or filename from tools/outputs/")
+                return
+        
+        print(f"📊 Generating visualization from CSV: {csv_path}")
+        print()
+        try:
+            viz_path = create_funnel_visualization(csv_path)
+            print(f"✅ Visualization generated successfully: {viz_path}")
+        except Exception as e:
+            print(f"❌ Error generating visualization: {str(e)}")
+            import traceback
+            traceback.print_exc()
+        return
     
     # Handle multiple months
     if args.months:
@@ -937,6 +1469,14 @@ def main():
             df.to_csv(output_file, index=False)
             print(f"📄 Comparative results saved to CSV: {output_file}")
             print()
+            
+            # Generate visualization for comparative data
+            try:
+                viz_path = create_funnel_visualization(output_file, output_dir)
+                print()
+            except Exception as e:
+                print(f"⚠️  Warning: Could not generate visualization: {str(e)}")
+                print()
         return
     
     # Single month or date range

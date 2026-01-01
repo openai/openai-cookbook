@@ -1964,7 +1964,7 @@ Esta sección documenta la configuración específica para identificar y rastrea
 
 | **Campo Interno** | **Nombre en HubSpot UI** | **Tipo** | **Descripción** | **Uso para Canal Contador** |
 |-------------------|-------------------------|----------|-----------------|----------------------------|
-| `tiene_cuenta_contador` | "Cantidad de cuentas contador asociadas" | Number | Cuenta etiquetas de contador relacionado | **FÓRMULA**: Cantidad de contadores asociados |
+| `tiene_cuenta_contador` | "Cantidad de cuentas contador asociadas" | Number | Cuenta etiquetas de contador relacionado | **FÓRMULA/ROLLUP**: Cantidad de contadores asociados (Method 1: Formula field, Method 2: Rollup via association type 8) |
 | `utm_campaign_negocio` | "UTM Campaign del Negocio" | String | Campaña UTM del negocio | **DETECCIÓN AUTOMÁTICA**: Campañas con "conta" = intención contador |
 | `colppy_es_referido_del_contador` | "_colppy_es_referido_del_contador" | Enumeration | Si es referido por contador | **CANAL DIRECTO**: Referencia de contador |
 | `colppy_quien_lo_refirio` | "_colppy_quien_lo_refirió" | String | Quien refirió el negocio | Identificación del contador referente |
@@ -2042,26 +2042,37 @@ La estrategia **"Contador Robado"** es un método inteligente de desarrollo de c
 - **Criterio**: `true`
 - **Propósito**: Marca explícita de contador
 
-#### **3. Identificación por Asociación de Compañías**
+#### **3. Identificación por Asociación de Compañías (Rollup Field Method)**
 - **Método**: Etiqueta "Estudio Contable / Asesor / Consultor Externo del negocio"
 - **ID**: `8 (USER_DEFINED)`
 - **Propósito**: Rastrear negocios vinculados a estudios contables
+- **Field Type**: Rollup field that counts Company records associated with Deal using association label ID 8
+- **Calculation**: Counts companies with association type 8 ("Estudio Contable / Asesor / Consultor Externo del negocio")
+- **Usage**: Used as Method 2 in dual-criteria accountant involvement detection (alongside `tiene_cuenta_contador` Formula field)
 
 #### **4. Identificación por Referencia Directa**
 - **Campo**: `colppy_es_referido_del_contador` (Negocios)
 - **Propósito**: Negocios referidos específicamente por contadores
 
-#### **5. Conteo Automático de Contadores**
+#### **5. Conteo Automático de Contadores (Dual-Criteria Method)**
 - **Campo**: `tiene_cuenta_contador` (Negocios)
-- **Tipo**: Fórmula calculada
+- **Tipo**: Fórmula calculada (Method 1) / Rollup field (Method 2)
 - **Propósito**: Cuenta automáticamente las etiquetas de contador relacionado
+- **Dual-Criteria Detection**:
+  - **Method 1 (Formula Field)**: `tiene_cuenta_contador > 0` - Formula field that counts associated accountant companies
+  - **Method 2 (Rollup Field Logic)**: Has companies with association type 8 ("Estudio Contable / Asesor / Consultor Externo del negocio") - Rollup field that counts companies with the accountant association label
+- **Usage**: Both methods are checked in funnel analysis scripts. A deal is considered to have accountant involvement if it meets EITHER criterion (OR logic).
+- **Overlap Analysis**: Scripts track which deals are identified by both methods, only by Method 1, or only by Method 2 for data quality validation.
 
 ### 📊 REGLAS DE ANÁLISIS CANAL CONTADOR
 
 Para cualquier análisis, reporte o salida que involucre negocios de HubSpot:
 
 1. **Siempre incluir**:
-   - Si tiene contador asociado (usando etiqueta ID 8)
+   - Si tiene contador asociado (usando etiqueta ID 8) - **Dual-Criteria Detection**:
+     - **Method 1**: `tiene_cuenta_contador > 0` (Formula field)
+     - **Method 2**: Has companies with association type 8 (Rollup field logic)
+     - **Logic**: Deal has accountant involvement if it meets EITHER criterion (OR logic)
    - Si fue referido por contador (`colppy_es_referido_del_contador`)
    - Cantidad de contadores relacionados (`tiene_cuenta_contador`)
    - Origen de campaña UTM con "conta"

@@ -2,7 +2,7 @@
 
 **Document Purpose:** Complete documentation of all HubSpot custom code workflows, their features, notification types, and workflow URLs for the new Head of Revenue.
 
-**Last Updated:** 2025-01-27  
+**Last Updated:** 2025-12-30  
 **Maintained By:** CEO Assistant
 
 ---
@@ -39,28 +39,34 @@ This document provides a complete mapping of all HubSpot custom code workflows i
 
 ### 1. First Deal Won Date Calculation
 
-**File:** `tools/scripts/hubspot/workflows/hubspot_first_deal_won_calculations.js`  
+**File:** `tools/scripts/hubspot/custom_code/hubspot_first_deal_won_calculations.js`  
 **Workflow URL:** https://app.hubspot.com/workflows/19877595/platform/flow/1693911922/edit/actions/1/custom-code  
-**Version:** 1.6.0  
-**Last Updated:** 2025-10-19
+**Version:** 1.8.0  
+**Last Updated:** 2025-12-30
 
 #### Purpose
-Calculates `first_deal_closed_won_date` and `company_churn_date` for companies based on their PRIMARY deal associations. Includes auto-fix capabilities for missing PRIMARY associations.
+Calculates `first_deal_closed_won_date` and `company_churn_date` (fecha de baja) for companies based on their PRIMARY deal associations. Includes auto-fix capabilities for missing PRIMARY associations, data consistency fixes, and intelligent churn detection.
 
 #### Key Features
 - ✅ **Auto-Fix:** Automatically adds PRIMARY associations when safe to do so
-- ✅ **Churn Detection:** Tracks company churn dates based on deal stages
+- ✅ **Churn Detection:** Tracks company churn dates based on deal stages (only stage 31849274 counts as churn)
+- ✅ **Churn Date Clearing:** Automatically clears churn date when company has won deals (even non-primary)
+- ✅ **Data Consistency Fix:** Calculates `first_deal_closed_won_date` for churned companies when missing OR incorrect
+- ✅ **Historical CloseDate:** Fetches historical `closeDate` from property history when deal's current `closeDate` is incorrect (after churn date or equals churn date)
+- ✅ **Churn Date Fallback:** Uses `fecha_de_desactivacion` as fallback when `fecha_pedido_baja` is null (older field that was used as fecha de baja)
+- ✅ **Date Normalization:** Uses date-only comparison (YYYY-MM-DD) to prevent false updates from format differences
+- ✅ **Empty String Clearing:** Uses `""` (not `null`) to properly clear date fields in HubSpot
 - ✅ **Owner Resolution:** Shows deal and company owner names in Slack notifications
-- ✅ **Edge Case Handling:** Handles trial companies, accountants, referrers
-- ✅ **Slack Notifications:** Detailed notifications for all state changes
+- ✅ **Edge Case Handling:** Handles trial companies, accountants, referrers, data quality issues, incorrect dates
+- ✅ **Slack Notifications:** Detailed notifications for all state changes including data fixes
 
 #### Trigger
 - **When:** Company record is created or updated
 - **Event Type:** Company property change or creation
 
 #### Fields Updated
-- `first_deal_closed_won_date` - Date of first PRIMARY closed-won deal
-- `company_churn_date` - Date when company churned (if applicable)
+- `first_deal_closed_won_date` - Date of first PRIMARY closed-won deal (or earliest PRIMARY deal closeDate if churned)
+- `company_churn_date` (fecha de baja) - Date when company churned (if applicable), cleared when company has won deals
 
 #### Notification Types
 1. **`success`** - Field updated successfully with deal details
@@ -70,25 +76,104 @@ Calculates `first_deal_closed_won_date` and `company_churn_date` for companies b
 5. **`auto_fix_available`** - Auto-fix available for missing PRIMARY associations
 6. **`error`** - Workflow execution failed
 
+**Special Notification Titles:**
+- **`🔴 Churn + First Date Fixed`** - Company is churned and `first_deal_closed_won_date` was calculated from PRIMARY deals
+- **`✅ Auto-Fix: Churn Date Cleared`** - Churn date cleared because company has won deals
+- **`🔴 Company Churn Detected`** - Company marked as churned with churn date set
+
 #### Slack Channel
 - **Channel ID:** `C07RY5760TZ`
 - **Channel Name:** `#intercom_mixpanel_notification`
 
 #### Business Logic
-1. Retrieves all deal associations for the company
-2. Identifies PRIMARY associations (type ID 5)
-3. Filters for closed-won deals (`dealstage = closedwon`)
-4. Calculates earliest won date from PRIMARY deals
+
+**Step 1: Deal Association Retrieval**
+1. Retrieves all deal associations for the company (paginated)
+2. Identifies PRIMARY associations (type ID 5 or 6, or label contains "primary")
+3. Separates deals into `primaryDealIds[]` and `allDealIds[]`
+
+**Step 2: Deal Details Retrieval**
+1. Fetches deal properties: `dealstage`, `closedate`, `dealname`, `amount`, `fecha_de_desactivacion`, `fecha_pedido_baja`, `hubspot_owner_id`
+2. Processes ALL deals (not just primary) to find true first won date
+3. **Historical CloseDate Detection:** For churned deals (stage 31849274), checks if `closeDate` has data quality issues:
+   - If `closeDate` equals `fecha_pedido_baja` OR `closeDate` is after `fecha_de_desactivacion` (churn date)
+   - Fetches historical `closeDate` from property history (when deal was FIRST set to closed won)
+   - Uses historical date instead of current incorrect `closeDate`
+4. Identifies won deals: `dealstage === 'closedwon'` or `'34692158'`
+5. Builds `wonDates[]` array with all won deal dates (using historical dates when available)
+
+**Step 3: Calculation and Update Logic**
+
+**Path A: No Won Deals (`wonDates.length === 0`)**
+1. Checks for auto-fix: won deals without PRIMARY associations
+   - If found: adds PRIMARY to oldest won deal
+   - If successful: immediately clears churn date
+2. Counts ALL won deals (primary + non-primary) to determine if company is active
+3. Determines churn status:
+   - Company is churned ONLY if:
+     - Has primary deals (was a customer)
+     - Has NO won deals at all (primary OR non-primary)
+     - Has deals in ACTUAL CHURN STAGE (31849274), not just `closedlost`
+4. **Data Consistency Fix:** If company is churned but `first_deal_closed_won_date` is blank OR incorrect (after churn date):
+   - Finds earliest `closeDate` from PRIMARY deals (closed won OR churned)
+   - Uses historical `closeDate` if available (from property history)
+   - Sets `first_deal_closed_won_date` to that date
+5. Sets churn date from (with fallback logic):
+   - Priority 1: `fecha_pedido_baja` from most recent churned deal (primary churn date field)
+   - Priority 2: `fecha_de_desactivacion` from most recent churned deal (fallback - older field that was used as fecha de baja)
+   - Priority 3: `closeDate` from most recent churned deal (last resort)
+6. Clears churn date if company has ANY won deals (even non-primary)
+
+**Path B: Has Won Deals (`wonDates.length > 0`)**
+1. Calculates first won date: `Math.min(...wonDates)`
+2. Checks for auto-fix: won deals without PRIMARY associations
+   - If found: adds PRIMARY to oldest won deal
+3. Counts ALL won deals (primary + non-primary)
+4. **Always clears churn date** if ANY won deals exist (company is active)
 5. Updates `first_deal_closed_won_date` if different from current value
-6. Handles edge cases:
-   - Trial companies (lifecycle stage = 'lead') - skipped
-   - Accountant companies - sends verification notification
-   - Missing PRIMARY associations - attempts auto-fix when safe
+
+**Date Comparison:**
+- Uses date-only format (YYYY-MM-DD) for comparison, ignoring time/milliseconds
+- Prevents false updates from format differences (e.g., `2025-06-01T00:00:00Z` vs `2025-06-01T00:00:00.000Z`)
+
+**Field Clearing:**
+- Uses empty string `""` (not `null`) to clear date fields in HubSpot
+- HubSpot API requires `""` to clear date fields, `null` is ignored
+
+**Edge Cases Handled:**
+- Trial companies (lifecycle stage = 'lead') - skipped
+- Accountant companies - sends verification notification
+- Missing PRIMARY associations - attempts auto-fix when safe
+- Companies with won deals but not marked as PRIMARY (data quality issue) - auto-fixes and clears churn date
+- Churned companies with missing `first_deal_closed_won_date` - calculates from PRIMARY deals (closed won OR churned)
+- Churned companies with incorrect `first_deal_closed_won_date` (after churn date) - recalculates using historical `closeDate`
+- Deals with incorrect `closeDate` (after churn date or equals churn date) - fetches historical `closeDate` from property history
+- Companies with `fecha_pedido_baja` = null - falls back to `fecha_de_desactivacion` for churn date
+- Companies with `churn_date` but no PRIMARY deals - clears `churn_date` (not a customer, just a channel partner/accountant)
 
 #### Special Cases
-- **Trial Companies:** Skipped (no notification sent)
+
+- **Trial Companies:** Skipped (no notification sent) - Companies in 'lead' lifecycle stage
 - **Accountant Companies:** Sends verification notification (may not have PRIMARY deals)
-- **Auto-Fix:** Only for single-company deals, non-accountant, missing PRIMARY
+- **Auto-Fix PRIMARY:** Only for single-company deals, non-accountant, missing PRIMARY
+- **Active Companies with Churn Date:** Automatically clears churn date when won deals are detected
+- **Churned Companies Missing First Date:** Automatically calculates `first_deal_closed_won_date` from PRIMARY deals (closed won OR churned)
+- **Churned Companies with Incorrect First Date:** Automatically recalculates `first_deal_closed_won_date` if it's after churn date
+- **Data Quality Issues:** Handles companies with won deals not marked as PRIMARY - auto-fixes and clears churn date
+- **Historical CloseDate:** For churned deals with incorrect `closeDate`, fetches historical value from property history
+- **Churn Date Fallback:** Uses `fecha_de_desactivacion` when `fecha_pedido_baja` is null (backward compatibility)
+- **Non-Customer Churn Dates:** Clears `churn_date` for companies without PRIMARY deals (not customers, just channel partners)
+
+#### Workflow Outcomes
+
+- **`UPDATE_MADE`** - Fields updated successfully
+- **`CHURN_DETECTED`** - Company marked as churned
+- **`FIRST_DATE_FIXED_FOR_CHURNED`** - Fixed data inconsistency: set `first_deal_closed_won_date` for churned company
+- **`CHURN_AND_FIRST_DATE_FIXED`** - Both churn date and first date updated
+- **`AUTO_FIX_CHURN_CLEARED`** - Auto-fixed PRIMARY and cleared churn date
+- **`AUTO_FIX_SUCCESS`** - Successfully added PRIMARY association
+- **`NO_CHANGE_NEEDED`** - Fields already correct
+- **`TRIAL_COMPANY_SKIPPED`** - Trial company, no action needed
 
 ---
 
@@ -371,6 +456,53 @@ All workflows require the following environment variables configured in HubSpot:
 | `validation_status` | Blank Field Validator | On company property changes |
 | Deal Associations | Additional Product | On company creation/update |
 | Deal Associations | Deal Stage Update | On deal stage changes |
+
+---
+
+## Recent Updates (Version 1.8.0 - 2025-12-30)
+
+### Enhanced Data Quality Detection and Fixes
+
+**Historical CloseDate Detection:**
+- ✅ Script now detects when a deal's `closeDate` is incorrect (after churn date or equals churn date)
+- ✅ Automatically fetches historical `closeDate` from property history (when deal was FIRST set to closed won)
+- ✅ Uses historical date instead of current incorrect value for accurate `first_deal_closed_won_date` calculation
+
+**Churn Date Fallback Logic:**
+- ✅ Enhanced churn date determination with fallback hierarchy:
+  1. `fecha_pedido_baja` (primary churn date field)
+  2. `fecha_de_desactivacion` (fallback - older field that was used as fecha de baja)
+  3. `closeDate` (last resort)
+- ✅ Ensures backward compatibility with older deals that only have `fecha_de_desactivacion`
+
+**Enhanced First Deal Date Calculation:**
+- ✅ Now includes PRIMARY churned deals (not just closed won deals) when calculating `first_deal_closed_won_date`
+- ✅ Detects and corrects incorrect `first_deal_closed_won_date` values (e.g., after churn date)
+- ✅ Uses historical `closeDate` when available for accurate date calculation
+
+**Critical Validation:**
+- ✅ Clears `churn_date` for companies without PRIMARY deals (not customers, just channel partners/accountants)
+- ✅ Ensures data consistency: companies with `churn_date` must have PRIMARY deals
+
+**Logging Improvements:**
+- ✅ Fixed misleading log messages that incorrectly reported field clearing
+- ✅ Added accurate tracking of field changes during workflow execution
+- ✅ Enhanced log messages to clearly indicate when historical dates are used
+
+### Edge Cases Now Handled
+
+1. **Companies with incorrect `first_deal_closed_won_date`** (e.g., after churn date) - automatically recalculated
+2. **Deals with incorrect `closeDate`** (after churn date) - uses historical value from property history
+3. **Companies with `fecha_pedido_baja` = null** - falls back to `fecha_de_desactivacion`
+4. **Companies with `churn_date` but no PRIMARY deals** - clears `churn_date` (not a customer)
+
+### Testing Recommendations
+
+Test with companies that have:
+- `churn_date` set but `first_deal_closed_won_date` missing or incorrect
+- Deals with `closeDate` after `fecha_de_desactivacion` or `fecha_pedido_baja`
+- `fecha_pedido_baja` = null but `fecha_de_desactivacion` set
+- `churn_date` set but no PRIMARY deals
 
 ---
 

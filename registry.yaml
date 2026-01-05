@@ -2712,3 +2712,13 @@
   tags:
     - images 
     - vision
+
+- title: Prompt Personalities
+  path: examples/gpt-5/prompt_personalities.ipynb
+  date: 2026-01-05
+  authors:
+    - msingh-openai
+    - kathylau-oai
+  tags:
+    - gpt-5
+    - prompt-personalities

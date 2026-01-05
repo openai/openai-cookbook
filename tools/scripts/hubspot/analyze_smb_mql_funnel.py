@@ -35,6 +35,15 @@ Usage:
 
 import os
 import sys
+import warnings
+# Suppress urllib3 OpenSSL/LibreSSL compatibility warning (harmless) - MUST be before any imports
+warnings.filterwarnings('ignore')
+# Also suppress urllib3 warnings specifically
+try:
+    import urllib3
+    urllib3.disable_warnings()
+except ImportError:
+    pass
 import requests
 import pandas as pd
 from datetime import datetime

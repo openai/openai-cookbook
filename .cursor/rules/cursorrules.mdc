@@ -47,6 +47,8 @@ alwaysApply: true
 ## Code Management Principles
 
 - Avoid creating unnecessary scripts or files; only create what's essential
+- **Never create temporary scripts** - Use the chatbot to explain, demonstrate, or test concepts instead
+- **For one-time tasks or exploratory work**: Provide code examples directly in the chat response, not as files
 - Remove any temporary testing code after demonstration
 - Prioritize modifying existing code over creating new implementations
 - Always explain why a particular approach was chosen
@@ -55,11 +57,21 @@ alwaysApply: true
 
 ## Documentation Standards
 
-- Always update or create `README` files when making significant changes
-- Document the purpose, functionality, and usage of any new code
-- Include examples of how to use new functions or features
-- Document dependencies and environment requirements
-- Create/update documentation that explains architectural decisions
+- **Default to chatbot output** for instructions, explanations, or guidance - only create README files when explicitly requested
+- **When to use chatbot instead of README files:**
+  - Setup instructions or configuration steps
+  - Usage examples or how-to guides
+  - Troubleshooting steps or common issues
+  - Quick reference information
+  - One-time explanations or walkthroughs
+- **When README files are appropriate:**
+  - User explicitly requests a README file
+  - Long-term project documentation for a new module/library
+  - Architectural decisions that need to be preserved in the codebase
+  - API documentation for reusable modules
+- For existing code with significant changes: Update existing documentation, but prefer chatbot explanations unless documentation is critical for the codebase
+- Include examples of how to use new functions or features in the chatbot response, not necessarily in files
+- Document dependencies and environment requirements in chatbot responses unless they're part of a formal project setup
 
 ## Data Handling & Analysis
 
@@ -260,7 +272,9 @@ If a helper is reusable, place it in the existing `utils/` or `services/` folder
 
 ## Avoid Single-Use Python Files
 
-For exploratory work prefer notebooks, SQL in `/queries`, or Airflow/DBT jobs. **Only commit production code**.
+- For exploratory work prefer notebooks, SQL in `/queries`, or Airflow/DBT jobs. **Only commit production code**
+- **Never create temporary or one-off scripts** - Provide code examples directly in the chatbot instead
+- For demonstration or testing purposes, show the code in the chat response rather than creating files
 
 ## Check Mixpanel Lexicon Before Adding Tracking
 
@@ -453,3 +467,52 @@ When working with these tools:
 ### Default Behavior:
 - **Default**: Show all analysis, reports, and insights in the chat response
 - **Exception**: Only create files when explicitly requested by the user
+
+## Comprehensive File Creation Guidelines
+
+**Golden Rule: Default to chatbot output. Only create files when explicitly requested or for production code.**
+
+### ❌ DO NOT Create Files For:
+- **Temporary scripts** - Provide code examples directly in the chatbot instead
+- **One-off tasks or exploratory code** - Show code in chat response, not as files
+- **Setup instructions or configuration guides** - Explain in chat unless explicitly requested as a file
+- **Usage examples or how-to documentation** - Provide in chatbot response
+- **Troubleshooting steps or explanations** - Use chatbot for guidance
+- **Quick reference information** - Include in chat response
+- **Demonstration code or test snippets** - Show in chat, don't save as files
+- **Analysis results, reports, or insights** - Always display in chatbot
+- **README files with instructions** - Use chatbot explanations instead
+- **Documentation files for one-time use** - Provide information directly in chat
+
+### ✅ DO Create Files For:
+- **Production code** (`.py`, `.js`, `.ts`, etc.) that will be committed to the repository
+- **User explicitly requests**: "save this", "export to file", "create a file", "write to file", "generate a file"
+- **Long-term architectural documentation** for modules/libraries (only when explicitly needed)
+- **Configuration files** required for tool setup or integration (actual configs, not guides)
+- **Test files** that are part of the test suite
+- **Notebooks** for data exploration (`.ipynb`) when doing actual analysis work
+
+### Decision Framework:
+When unsure whether to create a file, ask yourself:
+1. **Is this temporary or one-time use?** → Use chatbot
+2. **Is this production code that will be committed?** → Create file
+3. **Did the user explicitly ask to create a file?** → Create file
+4. **Is this an explanation, instruction, or guide?** → Use chatbot
+5. **Is this reusable code for the codebase?** → Create file
+6. **Is this analysis output or a report?** → Use chatbot (unless explicitly requested as file)
+
+### Examples:
+
+**✅ Use Chatbot (DO NOT create files):**
+- "How do I configure X?" → Explain steps in chat response
+- "Show me example code for Y" → Display code in chat with markdown formatting
+- "Analyze this data" → Present tables/charts/results directly in chat
+- "What are the steps to set up Z?" → List numbered steps in chat
+- "Create a quick script to test API" → Show script code in chat, don't save
+- "Document how this integration works" → Explain in chat response
+
+**✅ Create Files (appropriate cases):**
+- "Create a script to process invoices" → Create `.py` file (production code)
+- "Save this analysis to a CSV file" → Create CSV (explicit request)
+- "Generate a config file for the HubSpot integration" → Create config file (tool requirement)
+- "Write a function to calculate metrics" → Add function to existing module file

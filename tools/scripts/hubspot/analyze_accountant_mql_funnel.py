@@ -1,4 +1,14 @@
 #!/usr/bin/env python3
+# Suppress urllib3 OpenSSL/LibreSSL compatibility warning (harmless) - MUST be before any imports
+import warnings
+warnings.filterwarnings('ignore')
+# Also suppress urllib3 warnings specifically
+try:
+    import urllib3
+    urllib3.disable_warnings()
+except ImportError:
+    pass
+
 """
 ACCOUNTANT MQL FUNNEL ANALYSIS
 ==============================

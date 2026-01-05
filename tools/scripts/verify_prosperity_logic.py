@@ -103,3 +103,9 @@ print("\nReady to run full analysis on all companies!")
 
 
 
+
+
+
+
+
+

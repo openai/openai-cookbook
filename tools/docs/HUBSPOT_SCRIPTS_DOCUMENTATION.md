@@ -31,6 +31,13 @@ For detailed documentation on specific analysis types, see:
   - Owner Performance Tracking
   - Visualization Reports
 
+- **[HUBSPOT_SALES_RAMP_COHORT_ANALYSIS.md](./HUBSPOT_SALES_RAMP_COHORT_ANALYSIS.md)** - **NEW** Sales Team Ramping Cohort Analysis
+  - Sales rep ramping performance tracking
+  - Cohort analysis from start date (Month 0)
+  - Team-based deal attribution (Closers vs Accountant Channel)
+  - Collaborator attribution for Accountant Channel reps
+  - Visualizations: Line charts and heatmap grids
+
 ---
 
 ## Overview
@@ -101,6 +108,29 @@ tools/scripts/hubspot/
 **Quick Usage:**
 ```bash
 python tools/scripts/hubspot/high_score_sales_handling_analysis.py --current-mtd
+```
+
+---
+
+### Sales Team Ramping Cohort Analysis ⭐ **NEW**
+
+#### `sales_ramp_cohort_analysis.py`
+
+**Purpose:** Analyzes sales rep performance from their start date, showing deals closed over time as a cohort analysis. Each rep's trajectory is tracked from Month 0 (their first month) onwards.
+
+**Key Features:**
+- Cohort analysis aligned to start dates (Month 0 = first month)
+- Team-based deal attribution (Closers vs Accountant Channel)
+- Collaborator attribution for Accountant Channel reps
+- Dynamic month range (auto-detects maximum months)
+- Visualizations: Line chart and heatmap grid
+- Hardcoded start dates (actual first day in Colppy)
+
+**For complete documentation, see:** [HUBSPOT_SALES_RAMP_COHORT_ANALYSIS.md](./HUBSPOT_SALES_RAMP_COHORT_ANALYSIS.md)
+
+**Quick Usage:**
+```bash
+python tools/scripts/hubspot/sales_ramp_cohort_analysis.py
 ```
 
 ---

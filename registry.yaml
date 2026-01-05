@@ -1452,7 +1452,7 @@
   path: examples/vector_databases/valkey/README.md
   date: 2025-12-31
   authors:
-    - Daria Korenieva
+    - dkorenieva
   tags:
     - embeddings
 
@@ -1460,7 +1460,7 @@
   path: examples/vector_databases/valkey/getting-started-with-valkey-and-openai.ipynb
   date: 2025-12-31
   authors:
-    - Daria Korenieva
+    - dkorenieva
   tags:
     - embeddings
 

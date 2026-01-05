@@ -1448,6 +1448,22 @@
     - completions
     - embeddings
 
+- title: Valkey
+  path: examples/vector_databases/valkey/README.md
+  date: 2025-12-31
+  authors:
+    - Daria Korenieva
+  tags:
+    - embeddings
+
+- title: Using Valkey as a vector database with OpenAI
+  path: examples/vector_databases/valkey/getting-started-with-valkey-and-openai.ipynb
+  date: 2025-12-31
+  authors:
+    - Daria Korenieva
+  tags:
+    - embeddings
+
 - title: Using Tair as a vector database for OpenAI embeddings
   path: examples/vector_databases/tair/Getting_started_with_Tair_and_OpenAI.ipynb
   date: 2023-09-11

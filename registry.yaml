@@ -2647,6 +2647,13 @@
   tags:
     - codex
 
+- title: Context Engineering for Personalization - State Management with Long-Term Memory Notes using OpenAI Agents SDK
+  path: examples/agents_sdk/context_personalization.ipynb
+  date: 2026-01-05
+  authors:
+    - emreokcular
+  tags:
+    - agents-sdk
 - title: Build a coding agent with GPT 5.1
   path: examples/Build_a_coding_agent_with_GPT-5.1.ipynb
   date: 2025-11-13

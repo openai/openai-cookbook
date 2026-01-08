@@ -13,6 +13,9 @@
       "slug": {
         "type": "string"
       },
+      "description": {
+        "type": "string"
+      },
       "redirects": {
         "type": "array",
         "items": {

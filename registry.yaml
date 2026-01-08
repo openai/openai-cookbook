@@ -7,6 +7,7 @@
 - title: Transcribing User Audio with a Separate Realtime Request
   path: examples/Realtime_out_of_band_transcription.ipynb
   slug: realtime-out-of-band-transcription
+  description: Cookbook to transcribe user audio using out-of-band Realtime sessions.
   date: 2025-11-20
   authors:
     - minh-hoque
@@ -68,6 +69,7 @@
 - title: Sora 2 Prompting Guide
   path: examples/sora/sora2_prompting_guide.ipynb
   slug: sora2-prompting-guide
+  description: Cookbook to craft effective video prompts for Sora 2 generation.
   date: 2025-10-06
   authors:
     - rkoenig-openai
@@ -104,6 +106,7 @@
 - title: GPT-5-Codex Prompting Guide
   path: examples/gpt-5-codex_prompting_guide.ipynb
   slug: gpt-5-codex-prompting-guide
+  description: Cookbook to prompt GPT-5-Codex effectively for agentic and interactive coding tasks.
   date: 2025-09-23
   authors:
     - daveleo-openai
@@ -442,6 +445,7 @@
 - title: Eval Driven System Design - From Prototype to Production
   path: examples/partners/eval_driven_system_design/receipt_inspection.ipynb
   slug: receipt-inspection
+  description: Cookbook for eval-driven design of a receipt parsing automation workflow.
   date: 2025-06-02
   authors:
     - shikhar-cyber
@@ -459,6 +463,7 @@
 - title: Multi-Agent Portfolio Collaboration with OpenAI Agents SDK
   path: examples/agents_sdk/multi-agent-portfolio-collaboration/multi_agent_portfolio_collaboration.ipynb
   slug: multi-agent-portfolio-collaboration
+  description: Cookbook for multi-agent portfolio analysis workflows using the OpenAI Agents SDK.
   date: 2025-05-28
   authors:
     - rajpathak-openai
@@ -472,6 +477,7 @@
 - title: o3/o4-mini Function Calling Guide
   path: examples/o-series/o3o4-mini_prompting_guide.ipynb
   slug: o3o4-mini-prompting-guide
+  description: Cookbook to improve o3/o4-mini function calling with prompt best practices.
   date: 2025-05-26
   authors:
     - billchen-openai
@@ -484,6 +490,7 @@
 - title: Exploring Model Graders for Reinforcement Fine-Tuning
   path: examples/Reinforcement_Fine_Tuning.ipynb
   slug: reinforcement-fine-tuning
+  description: Cookbook to use model graders for reinforcement fine-tuning in expert tasks.
   date: 2025-05-23
   authors:
     - theophile-oai
@@ -495,6 +502,7 @@
 - title: Reinforcement Fine-Tuning for Conversational Reasoning with the OpenAI API
   path: examples/fine-tuned_qa/reinforcement_finetuning_healthbench.ipynb
   slug: reinforcement-finetuning-healthbench
+  description: Cookbook for reinforcement fine-tuning conversational reasoning using HealthBench evaluations.
   date: 2025-05-21
   authors:
     - robert-tinn
@@ -507,6 +515,7 @@
 - title: Guide to Using the Responses API's MCP Tool
   path: examples/mcp/mcp_tool_guide.ipynb
   slug: mcp-tool-guide
+  description: Cookbook to connect external services using the Responses API MCP tool.
   date: 2025-05-21
   authors:
     - charuj
@@ -549,6 +558,7 @@
 - title: Comparing Speech-to-Text Methods with the OpenAI API
   path: examples/Speech_transcription_methods.ipynb
   slug: speech-transcription-methods
+  description: Cookbook to compare speech-to-text methods and choose the right approach.
   date: 2025-04-29
   authors:
     - minh-hoque
@@ -609,6 +619,7 @@
 - title: Evals API Use-case - Responses Evaluation
   path: examples/evaluation/use-cases/responses-evaluation.ipynb
   slug: responses-evaluation
+  description: Cookbook to evaluate new models against stored Responses API logs.
   date: 2025-05-13
   authors:
     - willhath-openai
@@ -619,6 +630,7 @@
 - title: Multi-Tool Orchestration with RAG approach using OpenAI's Responses API
   path: examples/responses_api/responses_api_tool_orchestration.ipynb
   slug: responses-api-tool-orchestration
+  description: Cookbook to route queries across tools with RAG using the Responses API.
   date: 2025-03-28
   authors:
     - shikhar-cyber
@@ -1176,6 +1188,7 @@
 - title: Developing Hallucination Guardrails
   path: examples/Developing_hallucination_guardrails.ipynb
   slug: developing-hallucination-guardrails
+  description: Cookbook to build hallucination guardrails with evals for support agents.
   date: 2024-05-29
   authors:
     - royziv11
@@ -1949,6 +1962,7 @@
 - title: "Orchestrating Agents: Routines and Handoffs"
   path: examples/Orchestrating_agents.ipynb
   slug: orchestrating-agents
+  description: Cookbook for orchestrating agent workflows with routines and handoffs.
   date: 2024-10-10
   authors:
     - ibigio
@@ -2474,6 +2488,7 @@
 - title: Prompt Caching 101
   path: examples/Prompt_Caching101.ipynb
   slug: prompt-caching101
+  description: Cookbook to reduce latency and cost using OpenAI prompt caching.
   date: 2024-10-01
   authors:
     - charuj
@@ -2499,6 +2514,7 @@
 - title: Leveraging model distillation to fine-tune a model
   path: examples/Leveraging_model_distillation_to_fine-tune_a_model.ipynb
   slug: leveraging-model-distillation-to-fine-tune-a-model
+  description: Cookbook to distill a larger model into a smaller fine-tuned model.
   date: 2024-10-16
   authors:
     - pap-openai
@@ -2649,6 +2665,7 @@
 - title: How to use the Usage API and Cost API to monitor your OpenAI usage
   path: examples/completions_usage_api.ipynb
   slug: completions-usage-api
+  description: Cookbook to fetch and visualize Completions Usage and cost data via API.
   date: 2025-01-14
   authors:
     - MW-OAI
@@ -2669,6 +2686,7 @@
 - title: Doing RAG on PDFs using File Search in the Responses API
   path: examples/File_Search_Responses.ipynb
   slug: file-search-responses
+  description: Cookbook to search PDFs with the Responses API file search tool.
   date: 2025-03-11
   authors:
     - pap-openai
@@ -2690,6 +2708,7 @@
 - title: Multi-Language One-Way Translation with the Realtime API
   path: examples/voice_solutions/one_way_translation_using_realtime_api.mdx
   slug: one-way-translation-using-realtime-api
+  description: Cookbook to build one-way speech translation with the Realtime API.
   date: 2025-03-24
   authors:
     - erikakettleson-openai
@@ -2732,6 +2751,7 @@
 - title: Generate images with GPT Image
   path: examples/Generate_Images_With_GPT_Image.ipynb
   slug: generate-images-with-gpt-image
+  description: Cookbook to generate and edit images with GPT Image capabilities.
   date: 2025-04-23
   authors:
     - katiagg
@@ -2880,6 +2900,7 @@
 - title: Generate images with high input fidelity
   path: examples/Generate_Images_With_High_Input_Fidelity.ipynb
   slug: generate-images-with-high-input-fidelity
+  description: Cookbook to preserve image details using high input fidelity in Image API.
   date: 2025-07-17
   authors:
     - katiagg
@@ -2949,6 +2970,7 @@
 - title: Modernizing your Codebase with Codex
   path: examples/codex/code_modernization.md
   slug: code-modernization
+  description: Cookbook to modernize legacy codebases using the OpenAI Codex CLI.
   date: 2025-11-19
   authors:
     - derrickchoi-openai
@@ -2971,6 +2993,7 @@
 - title: GPT-5.2 Prompting Guide
   path: examples/gpt-5/gpt-5-2_prompting_guide.ipynb
   slug: gpt-5-2-prompting-guide
+  description: Cookbook to prompt GPT-5.2 for accurate, concise enterprise workflows.
   date: 2025-12-11
   authors:
     - msingh-openai
@@ -2981,6 +3004,7 @@
 - title: Gpt-image-1.5 Prompting Guide
   path: examples/multimodal/image-gen-1.5-prompting_guide.ipynb
   slug: image-gen-1-5-prompting-guide
+  description: Cookbook to prompt gpt-image-1.5 for reliable image generation results.
   date: 2025-12-16
   authors:
     - annikab-oai

@@ -23,7 +23,7 @@
     "react-dom": "^18.3.1",
     "react-feather": "^2.0.10",
     "react-leaflet": "^4.2.1",
-    "react-router-dom": "^7.5.2",
+    "react-router-dom": "^7.12.0",
     "react-scripts": "^5.0.1",
     "sass": "^1.78.0",
     "save": "^2.9.0",

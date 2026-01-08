@@ -20,19 +20,32 @@ Both models are **MXFP4 quantized** out of the box.
 
 ## Quick Setup
 
-1. **Install vLLM**  
-   vLLM recommends using [uv](https://docs.astral.sh/uv/) to manage your Python environment. This will help with picking the right implementation based on your environment. [Learn more in their quickstart](https://docs.vllm.ai/en/latest/getting_started/quickstart.html#installation). To create a new virtual environment and install vLLM run:
+> [!NOTE]
+> **Requirements**: Python 3.10–3.12 · CUDA 12.8 · NVIDIA driver ≥ 550 · GPU compute capability ≥ 8.0 (Ampere or newer)
+
+vLLM recommends using [uv](https://docs.astral.sh/uv/) to manage your Python environment.
 
 ```shell
+# Example shown for Python 3.12
 uv venv --python 3.12 --seed
 source .venv/bin/activate
-uv pip install --pre vllm==0.10.1+gptoss \
-    --extra-index-url https://wheels.vllm.ai/gpt-oss/ \
-    --extra-index-url https://download.pytorch.org/whl/nightly/cu128 \
-    --index-strategy unsafe-best-match
+
+# Install PyTorch 2.9.0 for CUDA 12.8 (stable wheel)
+uv pip install \
+  https://download.pytorch.org/whl/cu128/torch-2.9.0%2Bcu128-cp312-cp312-manylinux_2_28_x86_64.whl
+
+# Install vLLM from GPT-OSS wheels
+uv pip install --pre "vllm==0.10.1+gptoss" \
+  --extra-index-url https://wheels.vllm.ai/gpt-oss/ \
+  --index-strategy unsafe-best-match
 ```
 
-2. **Start up a server and download the model**  
+> [!NOTE]
+> **Why stable PyTorch?** Previous versions of this guide referenced a PyTorch nightly build, which has since expired.
+> Installing the stable CUDA 12.8 PyTorch wheel separately avoids dependency resolution failures while remaining compatible
+> with current GPT-OSS vLLM wheels.
+
+**Start up a server and download the model**  
    vLLM provides a `serve` command that will automatically download the model from HuggingFace and spin up an OpenAI-compatible server on `localhost:8000`. Run the following command depending on your desired model size in a terminal session on your server.
 
 ```shell

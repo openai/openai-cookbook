@@ -460,7 +460,7 @@ daisyshe-oai:
 
 dkundel-openai:
   name: "Dominik Kundel"
-  website: "https://www.linkedin.com/in/dominik-kundel/"
+  website: "https://www.linkedin.com/in/dkundel/"
   avatar: "https://avatars.githubusercontent.com/u/200841172?v=4"
 
 edbeeching:
@@ -537,3 +537,28 @@ roost:
   name: "ROOST"
   website: "https://roost.tools"
   avatar: "https://avatars.githubusercontent.com/u/189051351?v=4"
+
+samarth-oai:
+  name: "Samarth Madduru"
+  website: "https://x.com/samarthmadduru"
+  avatar: "https://pbs.twimg.com/profile_images/1911309450368970752/6IFoTpmu_400x400.jpg"
+
+derrickchoi-openai:
+  name: "Derrick Choi"
+  website: "https://www.linkedin.com/in/derrickchoi/"
+  avatar: "https://avatars.githubusercontent.com/u/211427900"
+
+kevinv-openai:
+  name: "Kevin Verdieck"
+  website: "https://www.linkedin.com/in/kevinverdieck/"
+  avatar: "https://avatars.githubusercontent.com/u/197816265?v=4"
+
+annikab-oai:
+  name: "Annika Brundyn"
+  website: "https://www.linkedin.com/in/annikabrundyn/"
+  avatar: "https://avatars.githubusercontent.com/u/231350694"
+
+kathylau-oai:
+  name: "Kathy Lau"
+  website: "https://www.linkedin.com/in/kathy-lau-nyc/"
+  avatar: "https://avatars.githubusercontent.com/u/231350694"

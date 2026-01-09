@@ -2938,6 +2938,13 @@
   tags:
     - codex
 
+- title: Context Engineering for Personalization - State Management with Long-Term Memory Notes using OpenAI Agents SDK
+  path: examples/agents_sdk/context_personalization.ipynb
+  date: 2026-01-05
+  authors:
+    - emreokcular
+  tags:
+    - agents-sdk
 - title: Build a coding agent with GPT 5.1
   path: examples/Build_a_coding_agent_with_GPT-5.1.ipynb
   slug: build-a-coding-agent-with-gpt-5-1
@@ -3013,3 +3020,15 @@
   tags:
     - images 
     - vision
+
+- title: Prompt Personalities
+  path: examples/gpt-5/prompt_personalities.ipynb
+  slug: prompt-personalities
+  description: Cookbook to shape agent personality via instruction prompts for tone and style.
+  date: 2026-01-05
+  authors:
+    - msingh-openai
+    - kathylau-oai
+  tags:
+    - gpt-5
+    - prompt-personalities

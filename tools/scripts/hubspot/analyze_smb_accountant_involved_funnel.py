@@ -699,20 +699,48 @@ def analyze_funnel_with_accountant(start_date, end_date):
     print(f"   Found {len(closed_won_deals)} closed won deals (created AND closed in period)\n")
     
     # ========================================================================
-    # STEP 4: Classify by ICP Operador vs ICP PYME
+    # STEP 4: Classify by ICP Operador vs ICP PYME + Coverage Analysis
     # ========================================================================
-    print("📊 STEP 4: Classifying by ICP...")
+    print("📊 STEP 4: Classifying by ICP and analyzing coverage...")
     icp_operador_deals = []
     icp_pyme_deals = []
     
+    # Track ICP coverage (type field population)
+    companies_analyzed = {}
+    companies_with_type = 0
+    companies_without_type = 0
+    
     for deal in closed_won_deals:
+        deal_id = deal.get('id')
+        props = deal.get('properties', {})
+        primary_company_type = props.get('primary_company_type', '')
+        
+        # Track company type coverage
+        company_id = get_primary_company_id(deal_id)
+        if company_id and company_id not in companies_analyzed:
+            company_name, company_type = get_company_type(company_id)
+            companies_analyzed[company_id] = {
+                'name': company_name,
+                'type': company_type,
+                'deal_id': deal_id
+            }
+            if company_type and company_type.strip() and company_type.strip().lower() not in ['null', 'none', '']:
+                companies_with_type += 1
+            else:
+                companies_without_type += 1
+        
+        # Classify deal by ICP
         if is_icp_operador(deal):
             icp_operador_deals.append(deal)
         else:
             icp_pyme_deals.append(deal)
     
+    total_companies_analyzed = len(companies_analyzed)
+    coverage_percentage = (companies_with_type / total_companies_analyzed * 100) if total_companies_analyzed > 0 else 0
+    
     print(f"   ICP Operador: {len(icp_operador_deals)}")
-    print(f"   ICP PYME: {len(icp_pyme_deals)}\n")
+    print(f"   ICP PYME: {len(icp_pyme_deals)}")
+    print(f"   ICP Coverage: {companies_with_type}/{total_companies_analyzed} companies ({coverage_percentage:.1f}%) have type field populated\n")
     
     # ========================================================================
     # STEP 5: Calculate Revenue
@@ -777,6 +805,42 @@ def analyze_funnel_with_accountant(start_date, end_date):
     print(f"  - {', '.join(ACCOUNTANT_COMPANY_TYPES)}")
     print()
     
+    # ========================================================================
+    # ICP COVERAGE ANALYSIS
+    # ========================================================================
+    print("="*80)
+    print("ICP COVERAGE ANALYSIS (Primary Companies from Closed Won Deals)")
+    print("="*80)
+    print()
+    print("This shows how many PRIMARY companies have their 'type' field populated,")
+    print("which enables ICP classification. Industry enrichment workflow populates")
+    print("this field based on industria field, improving coverage over time.")
+    print()
+    print("| Metric | Count | Percentage |")
+    print("|--------|-------|------------|")
+    print(f"| Total PRIMARY Companies Analyzed | {total_companies_analyzed} | 100.0% |")
+    print(f"| Companies WITH Type Field Populated | {companies_with_type} | {coverage_percentage:.1f}% |")
+    print(f"| Companies WITHOUT Type Field (NULL/Empty) | {companies_without_type} | {(companies_without_type / total_companies_analyzed * 100) if total_companies_analyzed > 0 else 0:.1f}% |")
+    print()
+    if companies_without_type > 0:
+        print("**Companies without type field:**")
+        print("These companies cannot be classified as ICP Operador or ICP PYME")
+        print("until their 'type' field is populated (via industry enrichment workflow).")
+        print()
+        # Show sample companies without type
+        companies_without_type_list = [
+            (cid, info['name'], info['deal_id'])
+            for cid, info in companies_analyzed.items()
+            if not info['type'] or info['type'].strip() == '' or info['type'].strip().lower() in ['null', 'none']
+        ]
+        print(f"**Sample companies without type field (showing first 10 of {companies_without_type}):**")
+        for company_id, company_name, deal_id in companies_without_type_list[:10]:
+            print(f"  - {company_name} (Company ID: {company_id}, Deal ID: {deal_id})")
+        if len(companies_without_type_list) > 10:
+            print(f"  ... and {len(companies_without_type_list) - 10} more")
+        print()
+    print()
+    
     # Prepare results dictionary
     results = {
         'deal_created_count': deal_created_count,
@@ -787,6 +851,10 @@ def analyze_funnel_with_accountant(start_date, end_date):
         'total_revenue': total_revenue,
         'icp_operador_revenue': icp_operador_revenue,
         'icp_pyme_revenue': icp_pyme_revenue,
+        'icp_coverage_total_companies': total_companies_analyzed,
+        'icp_coverage_with_type': companies_with_type,
+        'icp_coverage_without_type': companies_without_type,
+        'icp_coverage_percentage': round(coverage_percentage, 2),
         'start_date': start_date,
         'end_date': end_date
     }
@@ -805,6 +873,10 @@ def analyze_funnel_with_accountant(start_date, end_date):
         'ICP_PYME_Count': [len(icp_pyme_deals)],
         'ICP_PYME_Revenue': [round(icp_pyme_revenue, 2)],
         'Total_Revenue': [round(total_revenue, 2)],
+        'ICP_Coverage_Total_Companies': [total_companies_analyzed],
+        'ICP_Coverage_With_Type': [companies_with_type],
+        'ICP_Coverage_Without_Type': [companies_without_type],
+        'ICP_Coverage_Percentage': [round(coverage_percentage, 2)],
     }
     
     df = pd.DataFrame(df_data)

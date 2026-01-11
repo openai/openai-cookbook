@@ -12,7 +12,8 @@ This script analyzes NPS survey responses to provide:
 6. Sentiment analysis of feedback
 
 Usage:
-    python analyze_nps_data.py --file path/to/nps_file.csv [--output-dir outputs/]
+    python analyze_nps_data.py --files path/to/nps_file1.csv path/to/nps_file2.csv [--output-dir outputs/]
+    python analyze_nps_data.py --file path/to/nps_file.csv [--output-dir outputs/]  # Single file (backward compatible)
 """
 
 import pandas as pd
@@ -32,9 +33,19 @@ plt.style.use('default')
 sns.set_palette("husl")
 
 class NPSAnalyzer:
-    def __init__(self, file_path, output_dir="outputs/nps_analysis"):
-        """Initialize NPS Analyzer with file path and output directory."""
-        self.file_path = file_path
+    def __init__(self, file_paths, output_dir="outputs/nps_analysis"):
+        """Initialize NPS Analyzer with file path(s) and output directory.
+        
+        Args:
+            file_paths: Single file path (str) or list of file paths (list)
+            output_dir: Output directory for results
+        """
+        # Handle both single file (backward compatibility) and multiple files
+        if isinstance(file_paths, str):
+            self.file_paths = [file_paths]
+        else:
+            self.file_paths = file_paths
+        
         self.output_dir = Path(output_dir)
         self.output_dir.mkdir(parents=True, exist_ok=True)
         
@@ -50,12 +61,37 @@ class NPSAnalyzer:
         self.analysis_results = {}
         
     def load_and_clean_data(self):
-        """Load and clean the NPS data."""
-        print(f"🔄 Loading NPS data from: {self.file_path}")
+        """Load and clean the NPS data from one or multiple files."""
+        print(f"🔄 Loading NPS data from {len(self.file_paths)} file(s)...")
         
         try:
-            # Load CSV with proper encoding
-            self.df = pd.read_csv(self.file_path, encoding='utf-8')
+            dataframes = []
+            total_rows_before = 0
+            
+            # Load each file
+            for idx, file_path in enumerate(self.file_paths):
+                if not os.path.exists(file_path):
+                    print(f"⚠️  Warning: File not found: {file_path}, skipping...")
+                    continue
+                
+                print(f"   📂 Loading file {idx + 1}/{len(self.file_paths)}: {os.path.basename(file_path)}")
+                df = pd.read_csv(file_path, encoding='utf-8')
+                total_rows_before += len(df)
+                
+                # Add source file column to track origin
+                df['source_file'] = os.path.basename(file_path)
+                
+                dataframes.append(df)
+            
+            if not dataframes:
+                print("❌ Error: No valid files found to load")
+                return False
+            
+            # Combine all dataframes
+            print(f"🔗 Combining {len(dataframes)} file(s)...")
+            self.df = pd.concat(dataframes, ignore_index=True)
+            
+            print(f"   📊 Total rows before processing: {len(self.df):,}")
             
             # Rename columns for easier processing
             self.df = self.df.rename(columns=self.column_mapping)
@@ -75,7 +111,15 @@ class NPSAnalyzer:
             self.df = self.df.dropna(subset=['nps_score'])
             final_count = len(self.df)
             
-            print(f"✅ Loaded {final_count:,} complete NPS responses ({initial_count - final_count:,} incomplete removed)")
+            print(f"✅ Loaded {final_count:,} complete NPS responses from {len(dataframes)} file(s)")
+            print(f"   📉 Removed {initial_count - final_count:,} incomplete responses")
+            
+            # Show breakdown by source file
+            if 'source_file' in self.df.columns:
+                file_breakdown = self.df['source_file'].value_counts()
+                print(f"\n📋 Responses by source file:")
+                for file_name, count in file_breakdown.items():
+                    print(f"   • {file_name}: {count:,} responses")
             
             # Identify duplicates
             self.identify_duplicates()
@@ -84,31 +128,97 @@ class NPSAnalyzer:
             
         except Exception as e:
             print(f"❌ Error loading data: {str(e)}")
+            import traceback
+            traceback.print_exc()
             return False
     
     def identify_duplicates(self):
-        """Identify and handle duplicate responses."""
-        # Check for duplicates based on email and date
-        duplicates_by_email = self.df.groupby('email').size()
-        duplicate_emails = duplicates_by_email[duplicates_by_email > 1]
+        """Identify and handle duplicate responses.
         
-        if len(duplicate_emails) > 0:
-            print(f"⚠️  Found {len(duplicate_emails)} emails with multiple responses")
+        Only removes true duplicates (same email, same date, same score).
+        Keeps multiple responses from the same user across different time periods
+        to track how their answers evolved.
+        """
+        # Create date-only column for same-day duplicate detection
+        self.df['received_date'] = self.df['received_at'].dt.date
+        
+        # Identify true duplicates: same email, same date, same score
+        # These are likely duplicate submissions on the same day
+        duplicate_mask = self.df.duplicated(
+            subset=['email', 'received_date', 'nps_score'],
+            keep='first'
+        )
+        
+        true_duplicates = self.df[duplicate_mask]
+        duplicate_count = len(true_duplicates)
+        
+        if duplicate_count > 0:
+            print(f"⚠️  Found {duplicate_count} true duplicates (same email, same date, same score)")
+            print(f"   Removing these duplicates while keeping legitimate multiple responses...")
             
-            # For analysis, keep the most recent response per email
-            self.df_deduplicated = self.df.sort_values('received_at').groupby('email').tail(1)
+            # Remove only true duplicates
+            self.df_deduplicated = self.df[~duplicate_mask].copy()
             
-            print(f"📊 After deduplication: {len(self.df_deduplicated):,} unique responses")
+            print(f"📊 After removing true duplicates: {len(self.df_deduplicated):,} responses")
+        else:
+            self.df_deduplicated = self.df.copy()
+            print("✅ No true duplicates found (same email, same date, same score)")
+        
+        # Analyze users with multiple responses across different periods
+        users_with_multiple = self.df_deduplicated.groupby('email').size()
+        users_multiple_responses = users_with_multiple[users_with_multiple > 1]
+        
+        if len(users_multiple_responses) > 0:
+            print(f"📈 Found {len(users_multiple_responses)} users with multiple responses across different periods")
+            print(f"   These will be analyzed to track answer evolution over time")
+            
+            # Calculate time differences between responses for these users
+            user_evolution_data = []
+            for email in users_multiple_responses.index:
+                user_responses = self.df_deduplicated[
+                    self.df_deduplicated['email'] == email
+                ].sort_values('received_at')
+                
+                if len(user_responses) > 1:
+                    first_response = user_responses.iloc[0]
+                    last_response = user_responses.iloc[-1]
+                    
+                    time_diff = (last_response['received_at'] - first_response['received_at']).days
+                    
+                    user_evolution_data.append({
+                        'email': email,
+                        'response_count': len(user_responses),
+                        'first_response_date': first_response['received_at'],
+                        'last_response_date': last_response['received_at'],
+                        'days_between': time_diff,
+                        'first_score': first_response['nps_score'],
+                        'last_score': last_response['nps_score'],
+                        'score_change': last_response['nps_score'] - first_response['nps_score']
+                    })
+            
+            # Store evolution analysis
+            self.analysis_results['user_evolution'] = {
+                'users_with_multiple_responses': len(users_multiple_responses),
+                'total_multiple_responses': users_multiple_responses.sum(),
+                'evolution_data': user_evolution_data
+            }
             
             # Store duplicate info for reporting
             self.analysis_results['duplicates'] = {
-                'total_duplicate_emails': len(duplicate_emails),
+            'true_duplicates_removed': duplicate_count,
                 'total_responses_before': len(self.df),
-                'total_responses_after': len(self.df_deduplicated)
+            'total_responses_after': len(self.df_deduplicated),
+            'users_with_multiple_responses': len(users_multiple_responses) if len(users_multiple_responses) > 0 else 0
+        }
+        
+        # Add source file breakdown if available
+        if 'source_file' in self.df.columns:
+            source_breakdown = self.df['source_file'].value_counts().to_dict()
+            self.analysis_results['source_files'] = {
+                'total_files': len(self.file_paths),
+                'files_processed': list(source_breakdown.keys()),
+                'responses_per_file': source_breakdown
             }
-        else:
-            self.df_deduplicated = self.df.copy()
-            print("✅ No duplicates found")
     
     def calculate_nps_metrics(self):
         """Calculate comprehensive NPS metrics."""
@@ -238,6 +348,57 @@ class NPSAnalyzer:
         
         return self.analysis_results['feedback_analysis']
     
+    def analyze_user_evolution(self):
+        """Analyze how individual users' NPS scores evolved over time."""
+        if 'user_evolution' not in self.analysis_results:
+            print("ℹ️  No users with multiple responses found for evolution analysis")
+            return None
+        
+        evolution_data = self.analysis_results['user_evolution']['evolution_data']
+        if not evolution_data:
+            return None
+        
+        df_evolution = pd.DataFrame(evolution_data)
+        
+        # Calculate evolution statistics
+        improved = len(df_evolution[df_evolution['score_change'] > 0])
+        declined = len(df_evolution[df_evolution['score_change'] < 0])
+        unchanged = len(df_evolution[df_evolution['score_change'] == 0])
+        
+        avg_score_change = df_evolution['score_change'].mean()
+        avg_days_between = df_evolution['days_between'].mean()
+        
+        # Categorize evolution patterns
+        significant_improvement = len(df_evolution[df_evolution['score_change'] >= 3])
+        significant_decline = len(df_evolution[df_evolution['score_change'] <= -3])
+        
+        evolution_stats = {
+            'total_users_tracked': len(df_evolution),
+            'improved': improved,
+            'declined': declined,
+            'unchanged': unchanged,
+            'significant_improvement': significant_improvement,
+            'significant_decline': significant_decline,
+            'avg_score_change': round(avg_score_change, 2),
+            'avg_days_between_responses': round(avg_days_between, 1),
+            'improvement_rate': round((improved / len(df_evolution)) * 100, 1) if len(df_evolution) > 0 else 0,
+            'decline_rate': round((declined / len(df_evolution)) * 100, 1) if len(df_evolution) > 0 else 0
+        }
+        
+        self.analysis_results['user_evolution_stats'] = evolution_stats
+        
+        print(f"\n📈 User Evolution Analysis:")
+        print(f"   Users with multiple responses: {len(df_evolution)}")
+        print(f"   Improved: {improved} ({evolution_stats['improvement_rate']}%)")
+        print(f"   Declined: {declined} ({evolution_stats['decline_rate']}%)")
+        print(f"   Unchanged: {unchanged}")
+        print(f"   Significant improvement (≥3 points): {significant_improvement}")
+        print(f"   Significant decline (≤-3 points): {significant_decline}")
+        print(f"   Average score change: {avg_score_change:+.2f} points")
+        print(f"   Average time between responses: {avg_days_between:.1f} days")
+        
+        return evolution_stats
+    
     def extract_keywords(self, feedback_series):
         """Extract common keywords from feedback text."""
         if len(feedback_series) == 0:
@@ -262,15 +423,27 @@ class NPSAnalyzer:
         return dict(sorted(word_freq.items(), key=lambda x: x[1], reverse=True)[:10])
     
     def create_visualizations(self):
-        """Create comprehensive NPS visualizations."""
+        """Create comprehensive NPS visualizations in a single consolidated dashboard."""
         df = self.df_deduplicated
         
         # Set up the plotting style
         plt.style.use('default')
+        
+        # Determine grid size based on whether we have user evolution data
+        has_evolution = 'user_evolution_stats' in self.analysis_results and \
+                       self.analysis_results['user_evolution_stats']['total_users_tracked'] > 0
+        
+        if has_evolution:
+            # Larger figure for consolidated view with user evolution
+            fig = plt.figure(figsize=(24, 20))
+            grid_rows, grid_cols = 4, 4  # 16 subplots total
+        else:
+            # Standard size if no evolution data
         fig = plt.figure(figsize=(20, 16))
+            grid_rows, grid_cols = 3, 3  # 9 subplots
         
         # 1. NPS Distribution
-        ax1 = plt.subplot(3, 3, 1)
+        ax1 = plt.subplot(grid_rows, grid_cols, 1)
         nps_counts = df['nps_score'].value_counts().sort_index()
         colors = ['#d32f2f' if x <= 6 else '#ff9800' if x <= 8 else '#388e3c' for x in nps_counts.index]
         bars = ax1.bar(nps_counts.index, nps_counts.values, color=colors, alpha=0.8)
@@ -286,7 +459,7 @@ class NPSAnalyzer:
                     f'{int(height)}', ha='center', va='bottom')
         
         # 2. NPS Categories Pie Chart
-        ax2 = plt.subplot(3, 3, 2)
+        ax2 = plt.subplot(grid_rows, grid_cols, 2)
         df['nps_category'] = df['nps_score'].apply(self.categorize_nps_score)
         category_counts = df['nps_category'].value_counts()
         colors_pie = ['#388e3c', '#ff9800', '#d32f2f']
@@ -297,7 +470,7 @@ class NPSAnalyzer:
         # 3. Monthly Trend
         monthly_stats, weekly_stats = self.analyze_temporal_trends()
         if len(monthly_stats) > 1:
-            ax3 = plt.subplot(3, 3, 3)
+            ax3 = plt.subplot(grid_rows, grid_cols, 3)
             months = [str(m) for m in monthly_stats.index]
             ax3.plot(months, monthly_stats['nps_score'], marker='o', linewidth=2, markersize=8)
             ax3.set_title('Evolución NPS Mensual', fontsize=14, fontweight='bold')
@@ -307,7 +480,7 @@ class NPSAnalyzer:
             ax3.tick_params(axis='x', rotation=45)
         
         # 4. Response Volume Over Time
-        ax4 = plt.subplot(3, 3, 4)
+        ax4 = plt.subplot(grid_rows, grid_cols, 4)
         df['date'] = df['received_at'].dt.date
         daily_responses = df.groupby('date').size()
         ax4.plot(daily_responses.index, daily_responses.values, alpha=0.7)
@@ -319,7 +492,7 @@ class NPSAnalyzer:
         
         # 5. NPS by Month Heatmap
         if len(monthly_stats) > 1:
-            ax5 = plt.subplot(3, 3, 5)
+            ax5 = plt.subplot(grid_rows, grid_cols, 5)
             # Create a simple heatmap-style visualization
             months = list(range(len(monthly_stats)))
             scores = monthly_stats['nps_score'].values
@@ -331,7 +504,7 @@ class NPSAnalyzer:
             ax5.grid(axis='y', alpha=0.3)
         
         # 6. Average Score Distribution
-        ax6 = plt.subplot(3, 3, 6)
+        ax6 = plt.subplot(grid_rows, grid_cols, 6)
         ax6.hist(df['nps_score'], bins=11, alpha=0.7, color='skyblue', edgecolor='black')
         ax6.axvline(df['nps_score'].mean(), color='red', linestyle='--', linewidth=2, 
                    label=f'Promedio: {df["nps_score"].mean():.1f}')
@@ -343,7 +516,7 @@ class NPSAnalyzer:
         
         # 7. Response Rate by Hour (if time data available)
         if 'received_at' in df.columns:
-            ax7 = plt.subplot(3, 3, 7)
+            ax7 = plt.subplot(grid_rows, grid_cols, 7)
             df['hour'] = df['received_at'].dt.hour
             hourly_responses = df.groupby('hour').size()
             ax7.bar(hourly_responses.index, hourly_responses.values, alpha=0.7, color='lightcoral')
@@ -354,7 +527,7 @@ class NPSAnalyzer:
         
         # 8. Weekly Trend (Recent 8 weeks)
         if len(weekly_stats) > 1:
-            ax8 = plt.subplot(3, 3, 8)
+            ax8 = plt.subplot(grid_rows, grid_cols, 8)
             weeks = [str(w) for w in weekly_stats.index]
             ax8.plot(weeks, weekly_stats['nps_score'], marker='s', linewidth=2, markersize=6, color='orange')
             ax8.set_title('Evolución NPS Semanal (Últimas 8 semanas)', fontsize=14, fontweight='bold')
@@ -364,11 +537,12 @@ class NPSAnalyzer:
             ax8.tick_params(axis='x', rotation=45)
         
         # 9. Summary Stats Box
-        ax9 = plt.subplot(3, 3, 9)
+        ax9 = plt.subplot(grid_rows, grid_cols, 9)
         ax9.axis('off')
         
         # Create summary statistics text
         nps_metrics = self.analysis_results['nps_metrics']
+        
         summary_text = f"""
         RESUMEN NPS
         
@@ -386,18 +560,156 @@ class NPSAnalyzer:
         {df['received_at'].min().strftime('%d/%m/%Y')} - {df['received_at'].max().strftime('%d/%m/%Y')}
         """
         
-        ax9.text(0.1, 0.9, summary_text, transform=ax9.transAxes, fontsize=12,
+        ax9.text(0.1, 0.9, summary_text, transform=ax9.transAxes, fontsize=10,
                 verticalalignment='top', fontfamily='monospace',
                 bbox=dict(boxstyle='round', facecolor='lightblue', alpha=0.8))
         
+        # Add user evolution visualizations if data exists
+        if has_evolution:
+            self._add_user_evolution_charts(fig, grid_rows, grid_cols)
+        
         plt.tight_layout()
         
-        # Save the plot
+        # Save the consolidated plot
         plot_path = self.output_dir / f"nps_analysis_{datetime.now().strftime('%Y%m%d_%H%M%S')}.png"
         plt.savefig(plot_path, dpi=300, bbox_inches='tight')
-        print(f"📊 Visualizations saved to: {plot_path}")
+        print(f"📊 Consolidated visualization saved to: {plot_path}")
         
         return plot_path
+    
+    def _add_user_evolution_charts(self, fig, grid_rows, grid_cols):
+        """Add user evolution charts to the main consolidated visualization."""
+        if 'user_evolution' not in self.analysis_results:
+            return
+        
+        evolution_data = self.analysis_results['user_evolution']['evolution_data']
+        if not evolution_data:
+            return
+        
+        df_evolution = pd.DataFrame(evolution_data)
+        
+        # 10. Score Change Distribution
+        ax10 = plt.subplot(grid_rows, grid_cols, 10)
+        score_changes = df_evolution['score_change']
+        ax10.hist(score_changes, bins=20, color='skyblue', edgecolor='black', alpha=0.7)
+        ax10.axvline(0, color='red', linestyle='--', linewidth=2, label='Sin cambio')
+        ax10.axvline(score_changes.mean(), color='green', linestyle='--', linewidth=2, 
+                   label=f'Promedio: {score_changes.mean():+.2f}')
+        ax10.set_title('Distribución de Cambios en Puntuación', fontsize=11, fontweight='bold')
+        ax10.set_xlabel('Cambio en Puntuación')
+        ax10.set_ylabel('Cantidad de Usuarios')
+        ax10.legend(fontsize=8)
+        ax10.grid(axis='y', alpha=0.3)
+        
+        # 11. Evolution Categories Pie Chart
+        ax11 = plt.subplot(grid_rows, grid_cols, 11)
+        improved = len(df_evolution[df_evolution['score_change'] > 0])
+        declined = len(df_evolution[df_evolution['score_change'] < 0])
+        unchanged = len(df_evolution[df_evolution['score_change'] == 0])
+        categories = ['Mejoraron', 'Empeoraron', 'Sin Cambio']
+        sizes = [improved, declined, unchanged]
+        colors_pie = ['#388e3c', '#d32f2f', '#ff9800']
+        wedges, texts, autotexts = ax11.pie(sizes, labels=categories, autopct='%1.1f%%',
+                                          colors=colors_pie, startangle=90, textprops={'fontsize': 9})
+        ax11.set_title('Categorías de Evolución', fontsize=11, fontweight='bold')
+        
+        # 12. Time Between Responses
+        ax12 = plt.subplot(grid_rows, grid_cols, 12)
+        days_between = df_evolution['days_between']
+        ax12.hist(days_between, bins=15, color='lightcoral', edgecolor='black', alpha=0.7)
+        ax12.axvline(days_between.mean(), color='blue', linestyle='--', linewidth=2,
+                   label=f'Promedio: {days_between.mean():.1f} días')
+        ax12.set_title('Tiempo Entre Respuestas', fontsize=11, fontweight='bold')
+        ax12.set_xlabel('Días entre Respuestas')
+        ax12.set_ylabel('Cantidad de Usuarios')
+        ax12.legend(fontsize=8)
+        ax12.grid(axis='y', alpha=0.3)
+        
+        # 13. First vs Last Score Scatter
+        ax13 = plt.subplot(grid_rows, grid_cols, 13)
+        ax13.scatter(df_evolution['first_score'], df_evolution['last_score'], 
+                   alpha=0.6, s=30, c=df_evolution['score_change'], 
+                   cmap='RdYlGn', edgecolors='black', linewidth=0.3)
+        # Add diagonal line (no change)
+        max_score = max(df_evolution['first_score'].max(), df_evolution['last_score'].max())
+        min_score = min(df_evolution['first_score'].min(), df_evolution['last_score'].min())
+        ax13.plot([min_score, max_score], [min_score, max_score], 
+                'r--', linewidth=1.5, label='Sin cambio')
+        ax13.set_title('Primera vs Última Puntuación', fontsize=11, fontweight='bold')
+        ax13.set_xlabel('Primera Puntuación')
+        ax13.set_ylabel('Última Puntuación')
+        ax13.legend(fontsize=8)
+        ax13.grid(True, alpha=0.3)
+        
+        # 14. Score Change by Time Period
+        ax14 = plt.subplot(grid_rows, grid_cols, 14)
+        # Categorize time periods
+        df_evolution['time_category'] = pd.cut(
+            df_evolution['days_between'],
+            bins=[0, 30, 90, 180, 365, float('inf')],
+            labels=['<1 mes', '1-3 meses', '3-6 meses', '6-12 meses', '>12 meses']
+        )
+        time_avg_change = df_evolution.groupby('time_category')['score_change'].mean()
+        colors_bar = ['#388e3c' if x > 0 else '#d32f2f' if x < 0 else '#ff9800' for x in time_avg_change.values]
+        bars = ax14.bar(range(len(time_avg_change)), time_avg_change.values, color=colors_bar, alpha=0.7)
+        ax14.set_xticks(range(len(time_avg_change)))
+        ax14.set_xticklabels(time_avg_change.index, rotation=45, ha='right', fontsize=8)
+        ax14.axhline(0, color='black', linestyle='-', linewidth=1)
+        ax14.set_title('Cambio Promedio por Período', fontsize=11, fontweight='bold')
+        ax14.set_ylabel('Cambio Promedio')
+        ax14.grid(axis='y', alpha=0.3)
+        # Add value labels
+        for i, (bar, val) in enumerate(zip(bars, time_avg_change.values)):
+            height = bar.get_height()
+            ax14.text(bar.get_x() + bar.get_width()/2., height,
+                    f'{val:+.2f}', ha='center', va='bottom' if val > 0 else 'top', fontsize=8)
+        
+        # 15. Evolution Summary Stats
+        ax15 = plt.subplot(grid_rows, grid_cols, 15)
+        ax15.axis('off')
+        
+        evo_stats = self.analysis_results['user_evolution_stats']
+        summary_text = f"""
+        EVOLUCIÓN DE USUARIOS
+        
+        👥 Usuarios múltiples: {evo_stats['total_users_tracked']}
+        
+        📊 Cambios:
+        • Mejoraron: {evo_stats['improved']} ({evo_stats['improvement_rate']}%)
+        • Empeoraron: {evo_stats['declined']} ({evo_stats['decline_rate']}%)
+        • Sin cambio: {evo_stats['unchanged']}
+        
+        🎯 Significativos:
+        • Mejora ≥3: {evo_stats['significant_improvement']}
+        • Declive ≥3: {evo_stats['significant_decline']}
+        
+        📈 Promedio:
+        • Cambio: {evo_stats['avg_score_change']:+.2f}
+        • Días: {evo_stats['avg_days_between_responses']:.1f}
+        """
+        
+        ax15.text(0.1, 0.9, summary_text, transform=ax15.transAxes, fontsize=9,
+                verticalalignment='top', fontfamily='monospace',
+                bbox=dict(boxstyle='round', facecolor='lightgreen', alpha=0.8))
+        
+        # 16. Source Files Info (if multiple files)
+        ax16 = plt.subplot(grid_rows, grid_cols, 16)
+        ax16.axis('off')
+        
+        if 'source_files' in self.analysis_results:
+            source_info = self.analysis_results['source_files']
+            source_text = f"""
+        ARCHIVOS PROCESADOS
+        
+        📁 Total archivos: {source_info['total_files']}
+        
+        📊 Respuestas por archivo:"""
+            for file_name, count in source_info['responses_per_file'].items():
+                source_text += f"\n        • {file_name}: {count:,}"
+            
+            ax16.text(0.1, 0.9, source_text, transform=ax16.transAxes, fontsize=9,
+                    verticalalignment='top', fontfamily='monospace',
+                    bbox=dict(boxstyle='round', facecolor='lightyellow', alpha=0.8))
     
     def generate_executive_summary(self):
         """Generate an executive summary of NPS insights."""
@@ -441,7 +753,8 @@ class NPSAnalyzer:
             'key_insights': insights,
             'recommendations': self.generate_recommendations(nps_metrics, feedback_analysis),
             'analysis_date': datetime.now().isoformat(),
-            'data_period': f"{self.df_deduplicated['received_at'].min()} to {self.df_deduplicated['received_at'].max()}"
+            'data_period': f"{self.df_deduplicated['received_at'].min()} to {self.df_deduplicated['received_at'].max()}",
+            'source_files': self.analysis_results.get('source_files', {})
         }
         
         return summary
@@ -519,6 +832,10 @@ class NPSAnalyzer:
         print("\n💬 Analyzing feedback...")
         self.analyze_feedback()
         
+        # Analyze user evolution
+        print("\n📈 Analyzing user evolution over time...")
+        self.analyze_user_evolution()
+        
         # Create visualizations
         print("\n📊 Creating visualizations...")
         self.create_visualizations()
@@ -552,20 +869,48 @@ class NPSAnalyzer:
 
 def main():
     """Main function to run NPS analysis from command line."""
-    parser = argparse.ArgumentParser(description='Analyze NPS data from Intercom surveys')
-    parser.add_argument('--file', '-f', required=True, help='Path to NPS CSV file')
+    parser = argparse.ArgumentParser(
+        description='Analyze NPS data from Intercom surveys',
+        formatter_class=argparse.RawDescriptionHelpFormatter,
+        epilog="""
+Examples:
+  # Single file (backward compatible)
+  python analyze_nps_data.py --file path/to/nps_file.csv
+  
+  # Multiple files
+  python analyze_nps_data.py --files file1.csv file2.csv file3.csv
+  
+  # Multiple files with custom output directory
+  python analyze_nps_data.py --files file1.csv file2.csv --output-dir outputs/custom/
+        """
+    )
+    
+    # Support both --file (single, backward compatible) and --files (multiple)
+    group = parser.add_mutually_exclusive_group(required=True)
+    group.add_argument('--file', '-f', help='Path to a single NPS CSV file (backward compatible)')
+    group.add_argument('--files', nargs='+', help='Paths to one or more NPS CSV files')
+    
     parser.add_argument('--output-dir', '-o', default='outputs/nps_analysis', 
                        help='Output directory for results (default: outputs/nps_analysis)')
     
     args = parser.parse_args()
     
-    # Validate file exists
-    if not os.path.exists(args.file):
-        print(f"❌ Error: File not found: {args.file}")
+    # Determine which files to process
+    if args.file:
+        file_paths = [args.file]
+    else:
+        file_paths = args.files
+    
+    # Validate files exist
+    missing_files = [f for f in file_paths if not os.path.exists(f)]
+    if missing_files:
+        print(f"❌ Error: The following file(s) not found:")
+        for f in missing_files:
+            print(f"   • {f}")
         return 1
     
     # Run analysis
-    analyzer = NPSAnalyzer(args.file, args.output_dir)
+    analyzer = NPSAnalyzer(file_paths, args.output_dir)
     success = analyzer.run_complete_analysis()
     
     return 0 if success else 1

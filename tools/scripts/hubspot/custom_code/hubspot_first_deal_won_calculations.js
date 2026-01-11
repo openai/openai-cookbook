@@ -1352,7 +1352,7 @@ exports.main = async (event, callback) => {
       
       console.log(`Current churn date: ${currentChurnDateValue || 'NULL'}`);
       console.log(`Calculated churn date: ${companyChurnDate || 'NULL'}`);
-      console.log(`Normalized comparison (date-only): "${normalizedCurrentChurnDate}" !== "${normalizedCalculatedChurnDate}" = ${needsChurnUpdate}`);
+      console.log(`Normalized comparison (date-only): ${normalizedCurrentChurnDate || 'NULL'} !== ${normalizedCalculatedChurnDate || 'NULL'} = ${needsChurnUpdate}`);
 
       if (needsChurnUpdate || needsFirstDealUpdate) {
         workflowOutcome = needsFirstDealUpdate && needsChurnUpdate ? 'CHURN_AND_FIRST_DATE_FIXED' : 
@@ -1710,10 +1710,10 @@ exports.main = async (event, callback) => {
 
       console.log(`Current first date: ${normalizedCurrentFirstDate || 'NULL'}`);
       console.log(`Calculated first date: ${calculatedFirstDate}`);
-      console.log(`First date comparison: ${normalizedCurrentFirstDate} !== ${calculatedFirstDate} = ${needsFirstUpdate}`);
+      console.log(`First date comparison: ${normalizedCurrentFirstDate || 'NULL'} !== ${calculatedFirstDate} = ${needsFirstUpdate}`);
       console.log(`Current churn date: ${currentChurnDateValue || 'NULL'}`);
       console.log(`Calculated churn date: ${companyChurnDate || 'NULL'}`);
-      console.log(`Churn date comparison (date-only): "${normalizedCurrentChurnDate}" !== "${normalizedCalculatedChurnDate}" = ${needsChurnUpdate}`);
+      console.log(`Churn date comparison (date-only): ${normalizedCurrentChurnDate || 'NULL'} !== ${normalizedCalculatedChurnDate || 'NULL'} = ${needsChurnUpdate}`);
       console.log(`Overall needs update: ${needsUpdate}`);
 
       if (needsUpdate) {

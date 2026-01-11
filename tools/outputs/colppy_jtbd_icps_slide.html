@@ -1,0 +1,403 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Jobs to Be Done - Colppy 2026</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Arial, sans-serif;
+            background: linear-gradient(135deg, #e8e3f5 0%, #e3f0ff 50%, #ffffff 100%);
+            color: #2c2c2c;
+            line-height: 1.6;
+            padding: 0;
+            margin: 0;
+            min-height: 100vh;
+            position: relative;
+            overflow: hidden;
+        }
+
+        /* Gradient background shapes */
+        body::before {
+            content: '';
+            position: fixed;
+            top: -200px;
+            right: -200px;
+            width: 600px;
+            height: 600px;
+            background: radial-gradient(circle, rgba(232, 227, 245, 0.5) 0%, transparent 70%);
+            border-radius: 50%;
+            z-index: 0;
+        }
+
+        body::after {
+            content: '';
+            position: fixed;
+            bottom: -150px;
+            left: -150px;
+            width: 500px;
+            height: 500px;
+            background: radial-gradient(circle, rgba(227, 240, 255, 0.4) 0%, transparent 70%);
+            border-radius: 50%;
+            z-index: 0;
+        }
+
+        .slide-container {
+            position: relative;
+            z-index: 1;
+            background: transparent;
+            width: 100%;
+            min-height: 100vh;
+            padding: 60px 80px;
+            max-width: 1920px;
+            margin: 0 auto;
+        }
+
+        /* Header Section */
+        .header {
+            display: flex;
+            justify-content: space-between;
+            align-items: flex-start;
+            margin-bottom: 50px;
+        }
+
+        .header-left {
+            flex: 1;
+            max-width: 900px;
+        }
+
+        .header-title {
+            display: flex;
+            align-items: center;
+            margin-bottom: 25px;
+        }
+
+        .header-title-bar {
+            width: 6px;
+            height: 70px;
+            background: linear-gradient(180deg, #9b7dd4 0%, #7b5fb8 100%);
+            border-radius: 3px;
+            margin-right: 20px;
+        }
+
+        .header-title h1 {
+            color: #2c2c2c;
+            font-size: 56px;
+            font-weight: 700;
+            letter-spacing: -1.5px;
+            margin: 0;
+        }
+
+        .header-intro {
+            color: #4a4a4a;
+            font-size: 20px;
+            line-height: 1.8;
+            max-width: 850px;
+        }
+
+        .header-logo {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            color: #9b7dd4;
+            font-size: 32px;
+            font-weight: 600;
+            letter-spacing: 2px;
+        }
+
+        .logo-icon {
+            width: 45px;
+            height: 45px;
+            position: relative;
+        }
+
+        .logo-icon::before,
+        .logo-icon::after {
+            content: '';
+            position: absolute;
+            border: 3px solid #9b7dd4;
+            border-radius: 50%;
+            opacity: 0.8;
+        }
+
+        .logo-icon::before {
+            width: 45px;
+            height: 45px;
+            top: 0;
+            left: 0;
+        }
+
+        .logo-icon::after {
+            width: 30px;
+            height: 30px;
+            top: 7.5px;
+            left: 7.5px;
+            border-width: 2px;
+        }
+
+        /* Jobs Cards Grid */
+        .jobs-grid {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 30px;
+            margin: 60px 0;
+        }
+
+        .job-card {
+            background: rgba(255, 255, 255, 0.95);
+            border-radius: 16px;
+            padding: 35px;
+            box-shadow: 0 4px 20px rgba(0, 0, 0, 0.08);
+            display: flex;
+            gap: 25px;
+            align-items: flex-start;
+            transition: transform 0.2s, box-shadow 0.2s;
+            border: 1px solid rgba(255, 255, 255, 0.8);
+        }
+
+        .job-card:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 6px 25px rgba(0, 0, 0, 0.12);
+        }
+
+        .job-icon {
+            flex-shrink: 0;
+            width: 80px;
+            height: 80px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            background: #f8f9fa;
+            border-radius: 12px;
+            position: relative;
+        }
+
+        .job-icon svg {
+            width: 100%;
+            height: 100%;
+        }
+
+        .job-content {
+            flex: 1;
+        }
+
+        .job-title {
+            color: #2c2c2c;
+            font-size: 22px;
+            font-weight: 700;
+            margin-bottom: 12px;
+            line-height: 1.3;
+        }
+
+        .job-description {
+            color: #5a5a5a;
+            font-size: 17px;
+            line-height: 1.7;
+        }
+
+        /* Card 1 - Business Management Icon */
+        .job-card:nth-child(1) .job-icon {
+            background: linear-gradient(135deg, #f0f0f0 0%, #e8e8e8 100%);
+        }
+
+        /* Card 2 - Invoice Icon */
+        .job-card:nth-child(2) .job-icon {
+            background: linear-gradient(135deg, #fff9e6 0%, #ffeaa7 100%);
+        }
+
+        /* Card 3 - Ledger Icon */
+        .job-card:nth-child(3) .job-icon {
+            background: linear-gradient(135deg, #e8f4fd 0%, #d0e8fb 100%);
+        }
+
+        /* Card 4 - Compliance Icon */
+        .job-card:nth-child(4) .job-icon {
+            background: linear-gradient(135deg, #e3f2fd 0%, #bbdefb 100%);
+        }
+
+        /* Card 5 - Payroll Icon */
+        .job-card:nth-child(5) .job-icon {
+            background: linear-gradient(135deg, #f3e5f5 0%, #e1bee7 100%);
+        }
+
+        /* Footer */
+        .footer {
+            margin-top: 80px;
+            text-align: center;
+            padding-top: 30px;
+        }
+
+        .footer-reference {
+            color: #7b5fb8;
+            font-size: 16px;
+            text-decoration: underline;
+            text-decoration-color: #7b5fb8;
+            cursor: pointer;
+        }
+
+        /* Responsive adjustments for PowerPoint */
+        @media print {
+            body {
+                background: linear-gradient(135deg, #e8e3f5 0%, #e3f0ff 50%, #ffffff 100%);
+            }
+            .slide-container {
+                padding: 50px 70px;
+            }
+        }
+
+        /* SVG Icons Styles */
+        .icon-gear-chart { fill: #666; }
+        .icon-bars { fill: #3498db; }
+        .icon-bars-alt { fill: #ff9800; }
+        .icon-doc { fill: #fff; stroke: #666; }
+        .icon-coin { fill: #f39c12; }
+        .icon-ledger { fill: #e3f2fd; stroke: #1976d2; }
+        .icon-calculator { fill: #fff; stroke: #666; }
+        .icon-shield { fill: #2196f3; }
+        .icon-checkmark { fill: #fff; }
+        .icon-payroll { fill: #f3e5f5; stroke: #9c27b0; }
+        .icon-people { fill: #9c27b0; }
+    </style>
+</head>
+<body>
+    <div class="slide-container">
+        <!-- Header Section -->
+        <div class="header">
+            <div class="header-left">
+                <div class="header-title">
+                    <div class="header-title-bar"></div>
+                    <h1>Jobs to be Done</h1>
+                </div>
+                <p class="header-intro">
+                    En 2026 vamos a ordenar el crecimiento de Colppy desde el enfoque de Job To Be Done (JTBD): 
+                    definir con precisión qué "trabajo" nos contratan los usuarios para hacer y qué evidencia 
+                    concreta demuestra que Colppy ya les entregó valor.
+                </p>
+            </div>
+            <div class="header-logo">
+                <div class="logo-icon"></div>
+                <span>COLPPY</span>
+            </div>
+        </div>
+
+        <!-- Jobs Cards Grid -->
+        <div class="jobs-grid">
+            <!-- Card 1: Gestionar su negocio con información al día -->
+            <div class="job-card">
+                <div class="job-icon">
+                    <svg viewBox="0 0 80 80" xmlns="http://www.w3.org/2000/svg">
+                        <circle cx="40" cy="40" r="25" class="icon-gear-chart" opacity="0.3"/>
+                        <path d="M40 15 L40 25 M40 55 L40 65 M15 40 L25 40 M55 40 L65 40 M25.5 25.5 L32.5 32.5 M47.5 47.5 L54.5 54.5 M54.5 25.5 L47.5 32.5 M32.5 47.5 L25.5 54.5" stroke="#666" stroke-width="2.5" fill="none"/>
+                        <rect x="50" y="50" width="8" height="15" class="icon-bars"/>
+                        <rect x="60" y="45" width="8" height="20" class="icon-bars-alt"/>
+                    </svg>
+                </div>
+                <div class="job-content">
+                    <div class="job-title">Gestionar su negocio con información al día</div>
+                    <div class="job-description">
+                        tener la realidad económica actualizada — compras, ventas y caja — para saber si gana o pierde, ordenar la operación y poder crecer.
+                    </div>
+                </div>
+            </div>
+
+            <!-- Card 2: Facturar y cobrar -->
+            <div class="job-card">
+                <div class="job-icon">
+                    <svg viewBox="0 0 80 80" xmlns="http://www.w3.org/2000/svg">
+                        <rect x="25" y="20" width="30" height="40" rx="2" class="icon-doc" stroke-width="2"/>
+                        <text x="40" y="32" font-family="Arial" font-size="8" font-weight="bold" fill="#666" text-anchor="middle">INVOICE</text>
+                        <line x1="28" y1="38" x2="52" y2="38" stroke="#999" stroke-width="1"/>
+                        <line x1="28" y1="43" x2="52" y2="43" stroke="#999" stroke-width="1"/>
+                        <line x1="28" y1="48" x2="52" y2="48" stroke="#999" stroke-width="1"/>
+                        <circle cx="50" cy="58" r="12" class="icon-coin"/>
+                        <text x="50" y="63" font-family="Arial" font-size="14" font-weight="bold" fill="#fff" text-anchor="middle">$</text>
+                    </svg>
+                </div>
+                <div class="job-content">
+                    <div class="job-title">Facturar y cobrar</div>
+                    <div class="job-description">
+                        emitir comprobantes, dar seguimiento al cobro y reducir fricción para cobrar a tiempo.
+                    </div>
+                </div>
+            </div>
+
+            <!-- Card 3: Registrar gastos y caja -->
+            <div class="job-card">
+                <div class="job-icon">
+                    <svg viewBox="0 0 80 80" xmlns="http://www.w3.org/2000/svg">
+                        <rect x="20" y="20" width="25" height="35" rx="2" class="icon-ledger" stroke-width="2"/>
+                        <text x="32.5" y="30" font-family="Arial" font-size="7" font-weight="bold" fill="#1976d2" text-anchor="middle">LEDGER</text>
+                        <line x1="23" y1="35" x2="42" y2="35" stroke="#1976d2" stroke-width="1"/>
+                        <line x1="23" y1="40" x2="42" y2="40" stroke="#1976d2" stroke-width="1"/>
+                        <line x1="23" y1="45" x2="42" y2="45" stroke="#1976d2" stroke-width="1"/>
+                        <rect x="45" y="30" width="20" height="28" rx="2" class="icon-calculator" stroke-width="2"/>
+                        <rect x="48" y="35" width="5" height="3" rx="0.5" fill="#666"/>
+                        <rect x="54" y="35" width="5" height="3" rx="0.5" fill="#666"/>
+                        <rect x="60" y="35" width="3" height="3" rx="0.5" fill="#666"/>
+                        <rect x="48" y="40" width="5" height="3" rx="0.5" fill="#666"/>
+                        <rect x="54" y="40" width="5" height="3" rx="0.5" fill="#666"/>
+                        <rect x="60" y="40" width="3" height="3" rx="0.5" fill="#666"/>
+                    </svg>
+                </div>
+                <div class="job-content">
+                    <div class="job-title">Registrar gastos y caja</div>
+                    <div class="job-description">
+                        cargar compras/gastos/movimientos y mantener orden del flujo de caja.
+                    </div>
+                </div>
+            </div>
+
+            <!-- Card 4: Cumplimiento / estar listo para impuestos -->
+            <div class="job-card">
+                <div class="job-icon">
+                    <svg viewBox="0 0 80 80" xmlns="http://www.w3.org/2000/svg">
+                        <path d="M40 20 L55 30 L55 50 Q55 65 40 65 Q25 65 25 50 L25 30 Z" class="icon-shield"/>
+                        <path d="M35 45 L40 50 L45 40" stroke="#fff" stroke-width="3" fill="none" stroke-linecap="round" stroke-linejoin="round"/>
+                        <rect x="22" y="52" width="36" height="8" rx="1" fill="#e3f2fd" opacity="0.5"/>
+                        <line x1="25" y1="55" x2="53" y2="55" stroke="#1976d2" stroke-width="1"/>
+                        <line x1="25" y1="58" x2="53" y2="58" stroke="#1976d2" stroke-width="1"/>
+                    </svg>
+                </div>
+                <div class="job-content">
+                    <div class="job-title">Cumplimiento / estar listo para impuestos</div>
+                    <div class="job-description">
+                        tener la información consistente y los reportes listos para el contador y hacer sus presentaciones impositivas.
+                    </div>
+                </div>
+            </div>
+
+            <!-- Card 5: Liquidar sueldos -->
+            <div class="job-card">
+                <div class="job-icon">
+                    <svg viewBox="0 0 80 80" xmlns="http://www.w3.org/2000/svg">
+                        <rect x="25" y="20" width="30" height="25" rx="2" class="icon-payroll" stroke-width="2"/>
+                        <text x="40" y="32" font-family="Arial" font-size="7" font-weight="bold" fill="#9c27b0" text-anchor="middle">PAYROLL</text>
+                        <line x1="28" y1="37" x2="52" y2="37" stroke="#9c27b0" stroke-width="1"/>
+                        <line x1="28" y1="40" x2="52" y2="40" stroke="#9c27b0" stroke-width="1"/>
+                        <circle cx="35" cy="55" r="6" class="icon-people"/>
+                        <circle cx="40" cy="55" r="6" class="icon-people"/>
+                        <circle cx="45" cy="55" r="6" class="icon-people"/>
+                    </svg>
+                </div>
+                <div class="job-content">
+                    <div class="job-title">Liquidar sueldos</div>
+                    <div class="job-description">
+                        Liquidar sueldos correctamente y en término, cumpliendo normativa, con el menor estrés operativo posible.
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Footer -->
+        <div class="footer">
+            <div class="footer-reference">Referencia: Colppy ICP & Product Summary</div>
+        </div>
+    </div>
+</body>
+</html>

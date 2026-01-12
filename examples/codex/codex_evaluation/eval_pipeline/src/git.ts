@@ -23,6 +23,9 @@ export function diffWorktreeStream(worktreeDir: string, args: string[] = []): Pr
   });
 }
 
+/** 
+ * Runs a git command and captures its output as a string.
+ */
 export function runGitCapture(args: string[], cwd: string): Promise<string> {
   return new Promise<string>((resolve, reject) => {
     const ps = spawn('git', args, { cwd, stdio: ['ignore', 'pipe', 'pipe'] });
@@ -41,7 +44,10 @@ export function runGitCapture(args: string[], cwd: string): Promise<string> {
   });
 }
 
-export async function resolveBaseCommitFromCommitHash(repoDir: string, commitHash: string): Promise<{ mergedCommit: string; baseCommit: string }>{
+/**
+ * Given a commit hash, resolves the merged commit and its base commit (first parent)
+ */
+export async function resolveBaseCommitFromCommitHash(repoDir: string, commitHash: string): Promise<{ mergedCommit: string; baseCommit: string }> {
   const mergedCommit = await runGitCapture(['rev-parse', commitHash], repoDir);
   if (!mergedCommit) {
     throw new Error(`Could not resolve commit ${commitHash}. Ensure the repository has the commit locally.`);

@@ -4,6 +4,18 @@ tasks:
   patch_summary: >
     Add scrollbar width to desired size if enabled
   task_prompt: >
-    Add scrollbar width to desired size if enabled in tbxctrls
-  additional_context: >
-    The patch adds scrollbar width via aSize.AdjustWidth. The patch is a simple change to svx/source/tbxctrls/linectrl.cxx
+    Please fix the sizing of the line style/line end popup controls so they account for an enabled vertical scrollbar.
+    In `svx/source/tbxctrls/linectrl.cxx`
+
+- name: "Fix-order-of-sub-elements-of-tblCellMar-and-tblBorders"
+  commit_hash: a83869739c5ea8c3ac7d2f1515ffdfb874ccc597
+  patch_summary: >
+    Fix order of sub-elements
+  task_prompt: >
+    Please fix OOXML table style export ordering in the Writer DOCX exporter.
+
+    In `sw/source/filter/ww8/docxtablestyleexport.cxx`, update the necessary parts to serialize sub-elements in the schema-required order. 
+      - tblCellMar: top, start, left, bottom, end, right
+      - tcBorders: top, start, left, bottom, end, right, insideH, insideV, tl2br, tr2bl
+      Only emit elements that are present.
+      Once that’s done, the validation workaround should no longer be needed

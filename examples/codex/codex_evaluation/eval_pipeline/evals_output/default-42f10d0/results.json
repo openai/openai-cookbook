@@ -1,0 +1,37 @@
+{
+  "experimentName": "default",
+  "runId": "42f10d0",
+  "timestamp": "2026-01-06T14:18:17.235Z",
+  "startedAt": "2026-01-06T14:18:17.235Z",
+  "parameters": {
+    "tasksFile": "data/tasks.yaml",
+    "workingDirectory": "-w",
+    "outputDir": "evals_output",
+    "experiment": "default",
+    "model": "gpt-5-codex",
+    "reasoningEffort": "medium",
+    "repeat": 1
+  },
+  "summary": {
+    "numTasks": 1,
+    "numSucceeded": 0,
+    "numFailed": 1,
+    "averageDurationSeconds": 0
+  },
+  "tasks": [
+    {
+      "name": "Embed-fonts-decomposed-pdf-with-additional-context",
+      "commit_hash": "25e08e4ea0df956f46bd7ef81493fcf5a5c1879c",
+      "summary": "Add scrollbar width to desired size if enabled\n",
+      "outputs": {},
+      "groundTruth": {},
+      "grade": null,
+      "success": false,
+      "errorMessage": "spawn git ENOENT",
+      "error": "spawn git ENOENT",
+      "usage": null
+    }
+  ],
+  "finishedAt": "2026-01-06T14:18:17.243Z",
+  "durationSeconds": 0.008
+}

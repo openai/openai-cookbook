@@ -1,0 +1,22 @@
+diff --git a/svx/source/tbxctrls/linectrl.cxx b/svx/source/tbxctrls/linectrl.cxx
+index 02e412350c86..0243e631ff32 100644
+--- a/svx/source/tbxctrls/linectrl.cxx
++++ b/svx/source/tbxctrls/linectrl.cxx
+@@ -431,6 +431,8 @@ void SvxLineEndWindow::SetSize()
+     Size aSize( maBmpSize );
+     aSize.AdjustWidth(6 );
+     aSize.AdjustHeight(6 );
++    if (nBits & WB_VSCROLL)
++        aSize.AdjustWidth(Application::GetSettings().GetStyleSettings().GetScrollBarSize());
+     aSize = mxLineEndSet->CalcWindowSizePixel( aSize );
+     mxLineEndSet->GetDrawingArea()->set_size_request(aSize.Width(), aSize.Height());
+     mxLineEndSet->SetOutputSizePixel(aSize);
+@@ -570,6 +572,8 @@ void SvxLineBox::Fill( const XDashListRef &pList )
+     Size aSize(aBmpSize);
+     aSize.AdjustWidth(6);
+     aSize.AdjustHeight(6);
++    if (nBits & WB_VSCROLL)
++        aSize.AdjustWidth(Application::GetSettings().GetStyleSettings().GetScrollBarSize());
+     aSize = mxLineStyleSet->CalcWindowSizePixel(aSize);
+     mxLineStyleSet->GetDrawingArea()->set_size_request(aSize.Width(), aSize.Height());
+     mxLineStyleSet->SetOutputSizePixel(aSize);

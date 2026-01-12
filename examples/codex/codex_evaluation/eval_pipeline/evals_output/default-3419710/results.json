@@ -1,0 +1,50 @@
+{
+  "experimentName": "default",
+  "runId": "3419710",
+  "timestamp": "2026-01-06T14:18:30.129Z",
+  "startedAt": "2026-01-06T14:18:30.129Z",
+  "parameters": {
+    "tasksFile": "data/tasks.yaml",
+    "workingDirectory": "/Users/ayman/code/libre-office-core",
+    "outputDir": "evals_output",
+    "experiment": "default",
+    "model": "gpt-5-codex",
+    "reasoningEffort": "medium",
+    "repeat": 1
+  },
+  "summary": {
+    "numTasks": 1,
+    "numSucceeded": 1,
+    "numFailed": 0,
+    "averageDurationSeconds": 96.667941833
+  },
+  "tasks": [
+    {
+      "name": "Embed-fonts-decomposed-pdf-with-additional-context",
+      "commit_hash": "25e08e4ea0df956f46bd7ef81493fcf5a5c1879c",
+      "summary": "Add scrollbar width to desired size if enabled\n",
+      "durationSeconds": 96.667941833,
+      "outputs": {
+        "diffPath": "evals_output/default-3419710/diffs/Embed-fonts-decomposed-pdf-with-additional-context.diff",
+        "codexLogPath": "evals_output/default-3419710/codex_logs/Embed-fonts-decomposed-pdf-with-additional-context.codex.log"
+      },
+      "groundTruth": {
+        "originalDiffPath": "evals_output/default-3419710/original_diffs/Embed-fonts-decomposed-pdf-with-additional-context.diff"
+      },
+      "grade": {
+        "score": 2,
+        "explanation": "Both diffs aim to adjust the control width when a vertical scrollbar is present, but the GeneratedDiff differs notably: it uses '&' instead of the original '|', computes the scrollbar width via global settings instead of GetScrollWidth(), and places the adjustment before CalcWindowSizePixel rather than after. These changes alter the semantics and may affect sizing behavior."
+      },
+      "success": true,
+      "errorMessage": null,
+      "error": null,
+      "usage": {
+        "input_tokens": 255725,
+        "cached_input_tokens": 221952,
+        "output_tokens": 2410
+      }
+    }
+  ],
+  "finishedAt": "2026-01-06T14:20:59.191Z",
+  "durationSeconds": 149.062
+}

@@ -1,0 +1,23 @@
+{
+  "name": "codex-sdk-demo",
+  "version": "1.0.0",
+  "description": "Simplified Codex evaluation demo",
+  "license": "ISC",
+  "author": "",
+  "type": "module",
+  "main": "src/main.ts",
+  "scripts": {
+    "solve": "ts-node src/main.ts solve --tasks data/tasks.yaml",
+    "analyze": "python3 analysis/analyze.py --results-dir evals_output"
+  },
+  "dependencies": {
+    "@openai/codex-sdk": "^0.46.0",
+    "commander": "^12.1.0",
+    "openai": "^6.6.0",
+    "yaml": "^2.8.1",
+    "zod": "^3.25.76"
+  },
+  "devDependencies": {
+    "ts-node": "^10.9.2"
+  }
+}

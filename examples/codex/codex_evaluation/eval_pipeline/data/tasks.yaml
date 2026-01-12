@@ -1,0 +1,9 @@
+tasks:
+- name: "Embed-fonts-decomposed-pdf-with-additional-context"
+  commit_hash: 25e08e4ea0df956f46bd7ef81493fcf5a5c1879c
+  patch_summary: >
+    Add scrollbar width to desired size if enabled
+  task_prompt: >
+    Add scrollbar width to desired size if enabled in tbxctrls
+  additional_context: >
+    The patch adds scrollbar width via aSize.AdjustWidth. The patch is a simple change to svx/source/tbxctrls/linectrl.cxx

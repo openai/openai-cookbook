@@ -1,9 +1,3 @@
-# yaml-language-server: $schema=./.github/registry_schema.json
-
-# This file is used to generate cookbook.openai.com. It specifies which paths we
-# should build pages for, and indicates metadata such as tags, creation date and
-# authors for each page.
-
 - title: Transcribing User Audio with a Separate Realtime Request
   path: examples/Realtime_out_of_band_transcription.ipynb
   slug: realtime-out-of-band-transcription
@@ -992,8 +986,8 @@
 
 - title: Unit test writing using a multi-step prompt with legacy Completions
   path: >-
-  slug: 
     examples/Unit_test_writing_using_a_multi-step_prompt_with_older_completions_API.ipynb
+  slug: unit-test-writing-using-a-multi-step-prompt-with-older-completions-api
   date: 2023-05-19
   authors:
     - ted-at-openai
@@ -1145,8 +1139,8 @@
 
 - title: How to create dynamic masks with DALL·E and Segment Anything
   path: >-
-  slug: 
     examples/dalle/How_to_create_dynamic_masks_with_DALL-E_and_Segment_Anything.ipynb
+  slug: how-to-create-dynamic-masks-with-dall-e-and-segment-anything
   date: 2023-05-19
   authors:
     - colin-openai
@@ -1242,8 +1236,8 @@
 
 - title: Financial document analysis with LlamaIndex
   path: >-
-  slug: 
     examples/third_party/financial_document_analysis_with_llamaindex.ipynb
+  slug: financial-document-analysis-with-llamaindex
   date: 2023-06-22
   authors:
     - Disiok
@@ -1253,7 +1247,7 @@
 
 - title: Vector databases
   path: examples/vector_databases/README.md
-  slug: readme
+  slug: vector-databases-readme
   date: 2023-06-28
   authors:
     - colin-openai
@@ -1263,8 +1257,8 @@
 
 - title: Using PolarDB-PG as a vector database for OpenAI embeddings
   path: >-
-  slug: 
     examples/vector_databases/PolarDB/Getting_started_with_PolarDB_and_OpenAI.ipynb
+  slug: getting-started-with-polardb-and-openai
   date: 2023-07-11
   authors:
     - liuchengshan-lcs
@@ -1273,8 +1267,8 @@
 
 - title: Semantic search with SingleStoreDB
   path: >-
-  slug: 
     examples/vector_databases/SingleStoreDB/OpenAI_wikipedia_semantic_search.ipynb
+  slug: openai-wikipedia-semantic-search
   date: 2023-05-22
   authors:
     - arno756
@@ -1284,7 +1278,7 @@
 
 - title: SingleStoreDB
   path: examples/vector_databases/SingleStoreDB/README.md
-  slug: readme
+  slug: singlestoredb-readme
   date: 2023-05-22
   authors:
     - arno756
@@ -1294,8 +1288,8 @@
 
 - title: Using AnalyticDB as a vector database for OpenAI embeddings
   path: >-
-  slug: 
     examples/vector_databases/analyticdb/Getting_started_with_AnalyticDB_and_OpenAI.ipynb
+  slug: getting-started-with-analyticdb-and-openai
   date: 2023-04-06
   authors:
     - wangxuqi
@@ -1304,8 +1298,8 @@
 
 - title: Question answering with Langchain, AnalyticDB and OpenAI
   path: >-
-  slug: 
     examples/vector_databases/analyticdb/QA_with_Langchain_AnalyticDB_and_OpenAI.ipynb
+  slug: qa-with-langchain-analyticdb-and-openai
   date: 2023-05-05
   authors:
     - wangxuqi
@@ -1315,8 +1309,8 @@
 
 - title: Azure AI Search as a vector database for OpenAI embeddings
   path: >-
-  slug: 
     examples/vector_databases/azuresearch/Getting_started_with_azure_ai_search_and_openai.ipynb
+  slug: getting-started-with-azure-ai-search-and-openai
   date: 2023-09-11
   authors:
     - farzad528
@@ -1335,8 +1329,8 @@
 
 - title: Philosophy with vector embeddings, OpenAI and Cassandra / Astra DB
   path: >-
-  slug: 
     examples/vector_databases/cassandra_astradb/Philosophical_Quotes_cassIO.ipynb
+  slug: philosophical-quotes-cassio
   date: 2023-08-29
   authors:
     - hemidactylus
@@ -1346,7 +1340,7 @@
 
 - title: Cassandra / Astra DB
   path: examples/vector_databases/cassandra_astradb/README.md
-  slug: readme
+  slug: cassandra-astradb-readme
   date: 2023-08-29
   authors:
     - hemidactylus
@@ -1376,7 +1370,7 @@
 
 - title: Elasticsearch
   path: examples/vector_databases/elasticsearch/README.md
-  slug: readme
+  slug: elasticsearch-readme
   date: 2023-08-29
   authors:
     - leemthompo
@@ -1386,8 +1380,8 @@
 
 - title: Retrieval augmented generation using Elasticsearch and OpenAI
   path: >-
-  slug: 
     examples/vector_databases/elasticsearch/elasticsearch-retrieval-augmented-generation.ipynb
+  slug: elasticsearch-retrieval-augmented-generation
   date: 2023-08-29
   authors:
     - leemthompo
@@ -1406,8 +1400,8 @@
 
 - title: Using Hologres as a vector database for OpenAI embeddings
   path: >-
-  slug: 
     examples/vector_databases/hologres/Getting_started_with_Hologres_and_OpenAI.ipynb
+  slug: getting-started-with-hologres-and-openai
   date: 2023-05-19
   authors:
     - zcgeng
@@ -1416,8 +1410,8 @@
 
 - title: Kusto as a vector database for embeddings
   path: >-
-  slug: 
     examples/vector_databases/kusto/Getting_started_with_kusto_and_openai_embeddings.ipynb
+  slug: getting-started-with-kusto-and-openai-embeddings
   date: 2023-05-10
   authors:
     - Anshul Sharma
@@ -1426,7 +1420,7 @@
 
 - title: Kusto as a vector database
   path: examples/vector_databases/kusto/README.md
-  slug: readme
+  slug: kusto-readme
   date: 2023-05-10
   authors:
     - Anshul Sharma
@@ -1435,8 +1429,8 @@
 
 - title: Filtered search with Milvus and OpenAI
   path: >-
-  slug: 
     examples/vector_databases/milvus/Filtered_search_with_Milvus_and_OpenAI.ipynb
+  slug: filtered-search-with-milvus-and-openai
   date: 2023-03-28
   authors:
     - filip-halt
@@ -1445,8 +1439,8 @@
 
 - title: Getting started with Milvus and OpenAI
   path: >-
-  slug: 
     examples/vector_databases/milvus/Getting_started_with_Milvus_and_OpenAI.ipynb
+  slug: getting-started-with-milvus-and-openai
   date: 2023-03-28
   authors:
     - filip-halt
@@ -1455,8 +1449,8 @@
 
 - title: Using MyScale as a vector database for OpenAI embeddings
   path: >-
-  slug: 
     examples/vector_databases/myscale/Getting_started_with_MyScale_and_OpenAI.ipynb
+  slug: getting-started-with-myscale-and-openai
   date: 2023-05-01
   authors:
     - melovy
@@ -1495,7 +1489,7 @@
 
 - title: Pinecone vector database
   path: examples/vector_databases/pinecone/README.md
-  slug: readme
+  slug: pinecone-readme
   date: 2023-03-24
   authors:
     - jamescalam
@@ -1505,7 +1499,7 @@
 
 - title: Semantic search with Pinecone and OpenAI
   path: examples/vector_databases/pinecone/Semantic_Search.ipynb
-  slug: semantic-search
+  slug: pinecone-semantic-search
   date: 2023-03-24
   authors:
     - jamescalam
@@ -1514,8 +1508,8 @@
 
 - title: Using Pinecone for embeddings search
   path: >-
-  slug: 
     examples/vector_databases/pinecone/Using_Pinecone_for_embeddings_search.ipynb
+  slug: using-pinecone-for-embeddings-search
   date: 2023-06-28
   authors:
     - colin-openai
@@ -1524,8 +1518,8 @@
 
 - title: Using Qdrant as a vector database for OpenAI embeddings
   path: >-
-  slug: 
     examples/vector_databases/qdrant/Getting_started_with_Qdrant_and_OpenAI.ipynb
+  slug: getting-started-with-qdrant-and-openai
   date: 2023-02-16
   authors:
     - kacperlukawski
@@ -1553,7 +1547,7 @@
 
 - title: Redis
   path: examples/vector_databases/redis/README.md
-  slug: readme
+  slug: redis-readme
   date: 2023-02-13
   authors:
     - Spartee
@@ -1630,7 +1624,7 @@
 
 - title: Typesense
   path: examples/vector_databases/typesense/README.md
-  slug: readme
+  slug: typesense-readme
   date: 2023-04-13
   authors:
     - jasonbosco
@@ -1640,8 +1634,8 @@
 
 - title: Using Typesense for embeddings search
   path: >-
-  slug: 
     examples/vector_databases/typesense/Using_Typesense_for_embeddings_search.ipynb
+  slug: using-typesense-for-embeddings-search
   date: 2023-06-28
   authors:
     - colin-openai
@@ -1651,7 +1645,7 @@
 
 - title: Weaviate <> OpenAI
   path: examples/vector_databases/weaviate/README.md
-  slug: readme
+  slug: weaviate-readme
   date: 2023-02-13
   authors:
     - colin-openai
@@ -1660,8 +1654,8 @@
 
 - title: Using Weaviate for embeddings search
   path: >-
-  slug: 
     examples/vector_databases/weaviate/Using_Weaviate_for_embeddings_search.ipynb
+  slug: using-weaviate-for-embeddings-search
   date: 2023-06-28
   authors:
     - colin-openai
@@ -1670,8 +1664,8 @@
 
 - title: Using Weaviate with generative OpenAI module for generative search
   path: >-
-  slug: 
     examples/vector_databases/weaviate/generative-search-with-weaviate-and-openai.ipynb
+  slug: generative-search-with-weaviate-and-openai
   date: 2023-05-22
   authors:
     - sebawita
@@ -1681,8 +1675,8 @@
 
 - title: Using Weaviate with OpenAI vectorize module for embeddings search
   path: >-
-  slug: 
     examples/vector_databases/weaviate/getting-started-with-weaviate-and-openai.ipynb
+  slug: getting-started-with-weaviate-and-openai
   date: 2023-02-13
   authors:
     - colin-openai
@@ -1691,8 +1685,8 @@
 
 - title: Using Weaviate with OpenAI vectorize module for hybrid search
   path: >-
-  slug: 
     examples/vector_databases/weaviate/hybrid-search-with-weaviate-and-openai.ipynb
+  slug: hybrid-search-with-weaviate-and-openai
   date: 2023-02-13
   authors:
     - colin-openai
@@ -1701,8 +1695,8 @@
 
 - title: Question Answering in Weaviate with OpenAI Q&A module
   path: >-
-  slug: 
     examples/vector_databases/weaviate/question-answering-with-weaviate-and-openai.ipynb
+  slug: question-answering-with-weaviate-and-openai
   date: 2023-02-13
   authors:
     - colin-openai
@@ -1712,8 +1706,8 @@
 
 - title: Filtered Search with Zilliz and OpenAI
   path: >-
-  slug: 
     examples/vector_databases/zilliz/Filtered_search_with_Zilliz_and_OpenAI.ipynb
+  slug: filtered-search-with-zilliz-and-openai
   date: 2023-03-28
   authors:
     - filip-halt
@@ -1722,8 +1716,8 @@
 
 - title: Getting Started with Zilliz and OpenAI
   path: >-
-  slug: 
     examples/vector_databases/zilliz/Getting_started_with_Zilliz_and_OpenAI.ipynb
+  slug: getting-started-with-zilliz-and-openai
   date: 2023-03-28
   authors:
     - filip-halt
@@ -1815,7 +1809,7 @@
 
 - title: Neon as a vector database
   path: examples/vector_databases/neon/README.md
-  slug: readme
+  slug: neon-readme
   date: 2023-09-28
   authors:
     - Barqawiz
@@ -1973,7 +1967,7 @@
 
 - title: MongoDB Atlas Vector Search
   path: examples/vector_databases/mongodb_atlas/README.md
-  slug: readme
+  slug: mongodb-atlas-readme
   date: 2023-11-21
   authors:
     - prakul
@@ -2013,7 +2007,7 @@
 
 - title: Supabase Vector Database
   path: examples/vector_databases/supabase/README.md
-  slug: readme
+  slug: supabase-readme
   date: 2023-12-04
   authors:
     - ggrn
@@ -2022,7 +2016,7 @@
 
 - title: Semantic search using Supabase Vector
   path: examples/vector_databases/supabase/semantic-search.mdx
-  slug: semantic-search
+  slug: supabase-semantic-search
   date: 2023-12-04
   authors:
     - ggrn
@@ -2884,7 +2878,7 @@
 
 - title: Building a Deep Research MCP Server
   path: examples/deep_research_api/how_to_build_a_deep_research_mcp_server/README.md
-  slug: readme
+  slug: how-to-build-a-deep-research-mcp-server-readme
   date: 2025-06-25
   authors:
     - alwell-kevin

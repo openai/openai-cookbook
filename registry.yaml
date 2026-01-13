@@ -8,7 +8,7 @@
   path: articles/gpt-oss/build-your-own-fact-checker-cerebras.ipynb
   slug: build-your-own-fact-checker-cerebras
   description: Cookbook to build a content fact checker with gpt-oss-120B on Cerebras using Parallel.
-  date: 2025-01-12
+  date: 2026-01-13
   authors:
     - zhenweig-cerebras
   tags:

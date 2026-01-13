@@ -3,6 +3,11 @@
 # You can optionally customize how your information shows up cookbook.openai.com over here.
 # If your information is not present here, it will be pulled from your GitHub profile.
 
+zhenweig-cerebras:
+  name: "Zhenwei Gao"
+  website: "https://www.linkedin.com/in/zhenwei-gao/"
+  avatar: "https://avatars.githubusercontent.com/u/240548509?v=4"
+
 joanneshin-openai:
   name: "Joanne Shin"
   website: "https://www.linkedin.com/in/jeongminshin"

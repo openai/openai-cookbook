@@ -4,6 +4,21 @@
 # should build pages for, and indicates metadata such as tags, creation date and
 # authors for each page.
 
+- title: Build your own content fact checker with gpt-oss-120B, Cerebras, and Parallel
+  path: articles/gpt-oss/build-your-own-fact-checker-cerebras.ipynb
+  slug: build-your-own-fact-checker-cerebras
+  description: Cookbook to build a content fact checker with gpt-oss-120B on Cerebras using Parallel.
+  date: 2025-01-12
+  authors:
+    - zhenweig-cerebras
+  tags:
+    - gpt-oss
+    - open-models
+    - fact-checking
+    - search
+    - reasoning
+    - cerebras
+
 - title: Transcribing User Audio with a Separate Realtime Request
   path: examples/Realtime_out_of_band_transcription.ipynb
   slug: realtime-out-of-band-transcription

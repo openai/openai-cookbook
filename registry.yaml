@@ -1,3 +1,9 @@
+# yaml-language-server: $schema=./.github/registry_schema.json
+
+# This file is used to generate cookbook.openai.com. It specifies which paths we
+# should build pages for, and indicates metadata such as tags, creation date and
+# authors for each page.
+
 - title: Transcribing User Audio with a Separate Realtime Request
   path: examples/Realtime_out_of_band_transcription.ipynb
   slug: realtime-out-of-band-transcription

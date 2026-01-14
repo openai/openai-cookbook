@@ -8,7 +8,7 @@
   path: articles/gpt-oss/build-your-own-fact-checker-cerebras.ipynb
   slug: build-your-own-fact-checker-cerebras
   description: Cookbook to build a content fact checker with gpt-oss-120B on Cerebras using Parallel.
-  date: 2025-01-12
+  date: 2026-01-13
   authors:
     - zhenweig-cerebras
   tags:
@@ -2980,9 +2980,9 @@
   tags:
     - gpt-5.1
 
-- title: GPT-5.1-Codex-Max Prompting Guide
-  path: examples/gpt-5/gpt-5-1-codex-max_prompting_guide.ipynb
-  slug: gpt-5-1-codex-max-prompting-guide
+- title: Codex Prompting Guide
+  path: examples/gpt-5/codex_prompting_guide.ipynb
+  slug: codex-prompting-guide
   date: 2025-12-04
   authors:
     - nm-openai

@@ -118,17 +118,6 @@
     - codex
     - mcp
 
-- title: GPT-5-Codex Prompting Guide
-  path: examples/gpt-5-codex_prompting_guide.ipynb
-  slug: gpt-5-codex-prompting-guide
-  description: Cookbook to prompt GPT-5-Codex effectively for agentic and interactive coding tasks.
-  date: 2025-09-23
-  authors:
-    - daveleo-openai
-  tags:
-    - gpt-5
-    - codex
-
 - title: GPT-5 Troubleshooting Guide
   path: examples/gpt-5/gpt-5_troubleshooting_guide.ipynb
   slug: gpt-5-troubleshooting-guide

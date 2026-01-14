@@ -2972,6 +2972,11 @@
 - title: Codex Prompting Guide
   path: examples/gpt-5/codex_prompting_guide.ipynb
   slug: codex-prompting-guide
+  redirects:
+    - gpt-5-1-codex-max-prompting-guide
+    - gpt-5-1-codex-max_prompting_guide
+    - gpt-5-codex-prompting-guide
+    - gpt-5-codex_prompting_guide
   date: 2025-12-04
   authors:
     - nm-openai

@@ -4,6 +4,21 @@
 # should build pages for, and indicates metadata such as tags, creation date and
 # authors for each page.
 
+- title: Build your own content fact checker with gpt-oss-120B, Cerebras, and Parallel
+  path: articles/gpt-oss/build-your-own-fact-checker-cerebras.ipynb
+  slug: build-your-own-fact-checker-cerebras
+  description: Cookbook to build a content fact checker with gpt-oss-120B on Cerebras using Parallel.
+  date: 2026-01-13
+  authors:
+    - zhenweig-cerebras
+  tags:
+    - gpt-oss
+    - open-models
+    - fact-checking
+    - search
+    - reasoning
+    - cerebras
+
 - title: Transcribing User Audio with a Separate Realtime Request
   path: examples/Realtime_out_of_band_transcription.ipynb
   slug: realtime-out-of-band-transcription
@@ -102,17 +117,6 @@
     - agents-sdk
     - codex
     - mcp
-
-- title: GPT-5-Codex Prompting Guide
-  path: examples/gpt-5-codex_prompting_guide.ipynb
-  slug: gpt-5-codex-prompting-guide
-  description: Cookbook to prompt GPT-5-Codex effectively for agentic and interactive coding tasks.
-  date: 2025-09-23
-  authors:
-    - daveleo-openai
-  tags:
-    - gpt-5
-    - codex
 
 - title: GPT-5 Troubleshooting Guide
   path: examples/gpt-5/gpt-5_troubleshooting_guide.ipynb
@@ -2965,9 +2969,14 @@
   tags:
     - gpt-5.1
 
-- title: GPT-5.1-Codex-Max Prompting Guide
-  path: examples/gpt-5/gpt-5-1-codex-max_prompting_guide.ipynb
-  slug: gpt-5-1-codex-max-prompting-guide
+- title: Codex Prompting Guide
+  path: examples/gpt-5/codex_prompting_guide.ipynb
+  slug: codex-prompting-guide
+  redirects:
+    - gpt-5-1-codex-max-prompting-guide
+    - gpt-5-1-codex-max_prompting_guide
+    - gpt-5-codex-prompting-guide
+    - gpt-5-codex_prompting_guide
   date: 2025-12-04
   authors:
     - nm-openai

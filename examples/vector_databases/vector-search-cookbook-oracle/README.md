@@ -121,18 +121,12 @@ Update the database connection details to point to the local instance.
 
 ## 📦 Install Dependencies
 
-```markdown
-## 📦 Install Dependencies
-```
 ```bash
 pip install -r requirements.txt
 
 ```
 ---
 
-## ▶️ Run the Jupyter Cookbook
-
-```markdown
 ## ▶️ Run the Jupyter Cookbook
 
 ```bash
@@ -148,9 +142,6 @@ result interpretation
 
 ---
 
-## ▶️ Run the Streamlit Application
-
-```markdown
 ## ▶️ Run the Streamlit Application
 
 ```bash
@@ -192,6 +183,7 @@ The cookbook is:
 - cloud-first
 - reproducible
 - easy to adapt for real-world AI applications
+
 
 
 

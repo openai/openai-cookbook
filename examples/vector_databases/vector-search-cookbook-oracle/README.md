@@ -73,17 +73,13 @@ CREATE TABLE documents (
 
 ## ⚙️ Environment & Prerequisites
 
-```markdown
-## ⚙️ Environment & Prerequisites
-```
-
----
 ### Common Requirements
 - Python **3.10+**
 - OpenAI API key (used for embeddings)
 - `python-oracledb`
 - Oracle Instant Client (Thick mode)
 ---
+
 ## ☁️ Oracle Autonomous AI Database (Primary Target)
 
 This cookbook is **cloud-first** and designed to run primarily on
@@ -196,5 +192,6 @@ The cookbook is:
 - cloud-first
 - reproducible
 - easy to adapt for real-world AI applications
+
 
 

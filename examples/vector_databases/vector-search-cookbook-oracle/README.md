@@ -75,23 +75,25 @@ CREATE TABLE documents (
 
 ```markdown
 ## ⚙️ Environment & Prerequisites
+```
 
+---
 ### Common Requirements
 - Python **3.10+**
 - OpenAI API key (used for embeddings)
 - `python-oracledb`
 - Oracle Instant Client (Thick mode)
-
+---
 ## ☁️ Oracle Autonomous AI Database (Primary Target)
 
 This cookbook is **cloud-first** and designed to run primarily on
 **Oracle Autonomous AI Database**, where vector search is supported natively.
-
+---
 ### Prerequisites
 - Oracle Autonomous AI Database (23ai)
 - Database wallet downloaded
 - Database user with privileges to create tables
-
+---
 ### Environment Variables
 
 ```bash
@@ -99,14 +101,10 @@ export OPENAI_API_KEY="your_openai_api_key"
 export DB_USER="your_db_user"
 export DB_PASSWORD="your_db_password"
 export DB_DSN="your_autonomous_db_high"
-
+```
 ---
 Only the connection details differ between Autonomous and local setups. All SQL and Python code remains identical.
-
-
-## 🖥️ Local Oracle Database (Oracle Free / XE)
-
-```markdown
+---
 ## 🖥️ Local Oracle Database (Oracle Free / XE)
 
 For local development and testing, the same cookbook can be run against
@@ -120,7 +118,7 @@ docker run -d \
   --name oracle-free \
   -e ORACLE_PASSWORD=mypassword \
   gvenzl/oracle-free:latest
-
+```
 Update the database connection details to point to the local instance.
 
 ---
@@ -129,11 +127,11 @@ Update the database connection details to point to the local instance.
 
 ```markdown
 ## 📦 Install Dependencies
-
+```
 ```bash
 pip install -r requirements.txt
 
-
+```
 ---
 
 ## ▶️ Run the Jupyter Cookbook
@@ -143,7 +141,7 @@ pip install -r requirements.txt
 
 ```bash
 jupyter notebook demo.ipynb
-
+```
 The notebook walks through:
 environment verification
 embedding generation
@@ -161,17 +159,14 @@ result interpretation
 
 ```bash
 streamlit run app_streamlit.py
-
-
+```
+---
 Open in browser:
 
 http://localhost:8501
 
 ---
 
-## 🧠 Why Oracle Vector Search?
-
-```markdown
 ## 🧠 Why Oracle Vector Search?
 
 Unlike external vector databases, Oracle allows embeddings and business data
@@ -181,6 +176,7 @@ to live together in the same database, enabling:
 - transactional consistency
 - SQL-native AI workflows
 - easier enterprise integration
+---
 
 ## 🔜 Next Steps
 
@@ -188,6 +184,7 @@ Planned follow-ups for this cookbook:
 - Extend the example to a RAG-style workflow
 - Add metadata filtering and hybrid search
 - Integrate additional Oracle AI features
+---
 
 ## ✅ Summary
 
@@ -199,3 +196,4 @@ The cookbook is:
 - cloud-first
 - reproducible
 - easy to adapt for real-world AI applications
+

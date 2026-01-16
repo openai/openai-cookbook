@@ -68,7 +68,7 @@ CREATE TABLE documents (
     content CLOB,
     embedding VECTOR(1536, FLOAT32, DENSE)
 );
-
+```
 ---
 
 ## ⚙️ Environment & Prerequisites
@@ -196,4 +196,5 @@ The cookbook is:
 - cloud-first
 - reproducible
 - easy to adapt for real-world AI applications
+
 

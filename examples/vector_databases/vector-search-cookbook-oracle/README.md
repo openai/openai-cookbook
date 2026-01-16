@@ -16,8 +16,7 @@ a **Jupyter Notebook** and an **interactive Streamlit UI**.
 The following short video (≈17 seconds) demonstrates the interactive Streamlit
 application built on top of Oracle Vector Search.
 
-📹 **Demo video:**  
-[Watch the demo video](assets/oracle_vector_sesrch_demo.mp4)
+👉 [Download MP4 demo](https://raw.githubusercontent.com/Ela689/openai-cookbook/main/examples/vector_databases/vector-search-cookbook-oracle/assets/oracle_vector_search_demo.mp4)
 
 The demo showcases:
 - Natural language queries
@@ -183,6 +182,7 @@ The cookbook is:
 - cloud-first
 - reproducible
 - easy to adapt for real-world AI applications
+
 
 
 

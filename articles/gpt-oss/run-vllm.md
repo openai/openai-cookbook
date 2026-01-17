@@ -136,7 +136,7 @@ def get_weather(city: str):
     return f"The weather in {city} is sunny."
 
 
-async def main(model: str, api_key: str):
+async def main():
     agent = Agent(
         name="Assistant",
         instructions="You only respond in haikus.",
@@ -146,7 +146,7 @@ async def main(model: str, api_key: str):
                 base_url="http://localhost:8000/v1",
                 api_key="EMPTY",
             ),
-        )
+        ),
         tools=[get_weather],
     )
 

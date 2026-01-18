@@ -1,5 +1,5 @@
 # 📘 Vector Search with OpenAI Embeddings and Oracle Database 23ai  
-      Vector Search Cookbook
+   ##Vector Search Cookbook
 
 This repository contains a **cloud-first, reproducible cookbook** demonstrating
 how to build **semantic similarity search** applications using **OpenAI embeddings**,
@@ -17,7 +17,7 @@ a **Jupyter Notebook** and an **interactive Streamlit UI**.
 The following short video (≈17 seconds) demonstrates the interactive Streamlit
 application built on top of Oracle Vector Search.
 
-👉 [Download MP4 demo](assets/oracle_vector_search_demo.mp4)
+👉 [Download MP4 demo](https://raw.githubusercontent.com/Ela689/openai-cookbook/main/examples/vector_databases/vector-search-db/assets/oracle_vector_search_demo.mp4)
 
 The demo showcases:
 - Natural language queries
@@ -189,3 +189,4 @@ The cookbook is:
 - reproducible
 
 - easy to adapt for real-world AI applications
+

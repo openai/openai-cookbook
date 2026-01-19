@@ -1,0 +1,6 @@
+oracledb
+openai
+python-dotenv
+numpy
+pandas
+streamlit

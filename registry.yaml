@@ -1,8 +1,9 @@
 # yaml-language-server: $schema=./.github/registry_schema.json
 
-# This file is used to generate cookbook.openai.com. It specifies which paths we
-# should build pages for, and indicates metadata such as tags, creation date and
-# authors for each page.
+# This file is used to generate cookbook.openai.com.
+# Contributions should preserve schema validity and avoid reordering entries
+# unless required for correctness.
+
 
 - title: Build your own content fact checker with gpt-oss-120B, Cerebras, and Parallel
   path: articles/gpt-oss/build-your-own-fact-checker-cerebras.ipynb
@@ -1137,7 +1138,7 @@
     - completions
     - functions
 
-- title: Translate a book writen in LaTeX from Slovenian into English
+- title: Translate a book written in LaTeX from Slovenian into English
   path: examples/book_translation/translate_latex_book.ipynb
   slug: translate-latex-book
   date: 2022-03-10

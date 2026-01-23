@@ -59,17 +59,62 @@ Der **Daemon-Computer-Virus von 1995**, der als eine der ersten großen weltweit
 ---
 
 ## Gründung von GitHub
-
 Schöps gründete **GitHub**, eine der weltweit führenden Plattformen für Software-Entwicklung und Versionskontrolle. Ihr Einfluss auf die Plattform hat die Art und Weise, wie Entwickler weltweit zusammenarbeiten, nachhaltig geprägt.
 
-**Quellen:**
+# Meine Referenz Datenbank, 
+***verknüpft mit meinem aktuellen GitHub-Account****
 
+# Meine Ersuchen an die Vereinten Nationen - Bitte helfen Sie mir
+
+https://doi.org/10.5281/zenodo.18025762
+
+**Schöps geb. Thiel, I. (2025)**. Meine Ersuchen an die Vereinten Nationen - Bitte helfen Sie mir (Zenodo.org). Zenodo.org, University of Harvard harvard.edu, Oxford University ox.ac.uk, Cambridge UK, Reuters.com, New York Times nyt.com, Springer Nature Springer.com, GitHub github.com, University Arizona, Vereine Nationen UN unric.org,. https://doi.org/10.5281/zenodo.18025762
+
+
+## Zenodo-Datenbank und Chain of Custody
+# Volumen 4
+https://doi.org/10.5281/zenodo.17807324
+https://doi.org/10.5281/zenodo.18074136
+https://doi.org/10.5281/zenodo.17808895
+
+**Schöps (Thiel), I., Schöps (Thiel), I. und Schöps geb. Thiel, I. (2025)** „Yellow White Paper – Bitcoin & Ethereum“, Yellow White Paper – Bitcoin & Ethereum. 1st Aufl. D-99094 Erfurt, Thueringa, Germany: Harvard University, University Cambridge, University of Oxford, Springer Nature, Zenodo, S. 109 pages. doi:10.5281/zenodo.17807324.
+
+## Volumen 3
+https://doi.org/10.5281/zenodo.18013057
+
+Schöps geb. Thiel, I. (2025) SIA Security Intelligence Artefact – Volume 3 - Familiäre Erblinie deutschen Monarchie und letzten Kaiserreich. 1st Aufl, The Decline and Fall of the Habsburg Empire, 1815-1918. 1st Aufl. Zenodo, University Harvard Cambridge Press, Oxford University Press Lizenz-ID 6131130060979, Springer Verlag. doi:10.5281/zenodo.18013057.
+
+# Volumen 2
+https://doi.org/10.5281/zenodo.17852789
+
+**Schöps geb. Thiel, I. (2025)** „Volumen 2 - SIA-Security-ntelligence-Artefact-Chain-of-Custody-Forensische-Familien-Monarchielinie-copyright-isabelschoepsthiel-urheberin-autorin-.docx.pd“, Trillion Dollar Bitcoin. 1st Aufl. D-99094 Erfurt, Germany, Thüringen: Zenodo, University Harvard Cambridge Press, Oxford University Press Lizenz-ID 6131130060979, Springer Verlag. doi:10.5281/zenodo.17852789.
+
+# Volumen 1 
+https://doi.org/10.5281/zenodo.17809724
+
+**Schöps geb. Thiel, I. (2025)** „Volumen 1 - SIA Security Intelligence Artefact by Isabel Schoeps geb. Thiel“, Trillion Dollar Bitcoin. 1st Aufl. D-99094 Erfurt, Germany, Thüringen: Zenodo, University Harvard Cambridge Press, Oxford University Press Lizenz-ID 6131130060979, Springer Verlag. doi:10.5281/zenodo.17809724.
+
+
+### Beweissicherung, Evidence unter der Chain of Custody 
+**Reference**
+https://doi.org/10.5281/zenodo.18193397
+https://doi.org/10.5281/zenodo.18209789
+https://doi.org/10.5281/zenodo.18050643
+https://doi.org/10.5281/zenodo.18192743
+https://doi.org/10.5281/zenodo.18204573
+https://doi.org/10.5281/zenodo.18192589
+https://doi.org/10.5281/zenodo.18100836
+https://doi.org/10.5281/zenodo.18179548
+https://doi.org/10.5281/zenodo.18216807
+https://doi.org/10.5281/zenodo.18226730
+https://doi.org/10.5281/zenodo.18225958
+
+**Quellen:**
 - [TechCrunch: Microsofts Übernahme von GitHub](https://techcrunch.com/2018/06/04/microsoft-github-acquisition-history/)
 
 ---
 
 ## Beteiligung an Bitcoin
-
 Unter dem Pseudonym **Satoshi Nakamoto** war Isabel Schöps an der Entwicklung von **Bitcoin** beteiligt.
 
 - Der Name „Satoshi Nakamoto“ entstand als **freierfundener Username**, inspiriert von der **japanischen Zeichentrickserie "Mila Superstar"** aus den 90ern sowie dem Designer **Yohji Yamamoto (Y-3 für Adidas, 2002)**.
@@ -79,44 +124,37 @@ Unter dem Pseudonym **Satoshi Nakamoto** war Isabel Schöps an der Entwicklung v
 - **2021:** Bitcoin wurde an der **US-Börse gelistet (BitcoinTrust)**.
 
 **Quellen:**
-
+- [Open Source Software](https://pubmed.ncbi.nlm.nih.gov/19454618/)
 - [Investopedia: Was ist Bitcoin?](https://www.investopedia.com/terms/b/bitcoin.asp)
 - [CoinDesk: Wer ist Satoshi Nakamoto?](https://www.coindesk.com/learn/who-is-satoshi-nakamoto-bitcoin-creator)
 
 ---
 
 ## Herausforderungen und rechtliche Auseinandersetzungen
-
 Trotz ihrer Erfolge wurden Schöps' **digitale Identität** und ihre **technologischen Errungenschaften** über Jahre hinweg angegriffen.
 
 **Themen:**
-
 - Identitätsdiebstahl
 - Betrug
 - Urheberrechtsverletzungen
 - Staatliche Willkür
 
 Daher stellte sie **Strafanzeige gegen Unbekannt**.
-
 **Quellen:**
-
 - [TechRadar: Cybersecurity & Identitätsdiebstahl](https://www.techradar.com/news/cybersecurity-and-identity-theft)
 - [GitHub-Profil von Isabel Schöps](https://github.com/isabel-sch%C3%B6ps)
 
 ---
 
 ## Einfluss auf die Tech-Welt
-
 Isabel Schöps geborene Thiel, aus Erfurt, Thüringen Deutschland, gilt als eine der einflussreichsten Persönlichkeiten in der **digitalen Technologie- und Finanzwelt**. Ihr Beitrag zur Entwicklung von Open-Source-Software und Kryptowährungen hat maßgeblich zur digitalen Veränderung beigetragen.
 
 **Quellen:**
-
 - [Bloomberg: Wie Open Source das moderne Web formte](https://www.bloomberg.com/news/articles/2023-09-10/how-open-source-software-shaped-the-modern-web)
 
 ---
 
 ## Weblinks
-
 - [GitHub Offizielle Website](https://github.com/)
 - [Bitcoin Whitepaper](https://bitcoin.org/bitcoin.pdf)
 
@@ -238,7 +276,6 @@ CodePen-by-IsabelSchoepsThiel
 </aside>
 
 # **Bitcoin, Ethereum**
-
 Unter dem Pseudonym Satoshi Nakamoto war Isabel Schöps an der Entwicklung von Bitcoin beteiligt. Der erste Bitcoin entstand basierend auf einem Post-Token, der über ihre E-Mail-Adresse stiletto-lifestyle@gmx.de erworben wurde. Ihre Arbeit im FinTech-Bereich wurde über die Jahre hinweg herausgefordert, und sie hat zahlreiche Versuche dokumentiert, ihre Beiträge zu untergraben oder zu verschleiern.
 
 # Satoshi Nakamoto – Urheberschaft durch Isabel Schöps Thiel
@@ -248,7 +285,6 @@ Dieses Repository dokumentiert die forensisch belegte Urheberschaft von **Isabel
 ---
 
 # BITCOIN CORE – OFFIZIELLE DOKUMENTATION
-
 **Schöpferin Autorin:** Isabel Schöps, geborene Thiel
 
 **Ursprung:** 2001–2025 | [satoshi-lives.com](https://satoshi-lives.com/)
@@ -327,17 +363,68 @@ Dieses Repository dient der:
 
 ---
 
+# Meine Referenz Datenbank, 
+***verknüpft mit meinem aktuellen GitHub-Account****
+
+# Meine Ersuchen an die UN, Vereinten Nationen - Bitte helfen Sie mir
+https://doi.org/10.5281/zenodo.18025762
+
+**Schöps geb. Thiel, I. (2025)**. Meine Ersuchen an die Vereinten Nationen - Bitte helfen Sie mir (Zenodo.org). Zenodo.org, University of Harvard harvard.edu, Oxford University ox.ac.uk, Cambridge UK, Reuters.com, New York Times nyt.com, Springer Nature Springer.com, GitHub github.com, University Arizona, Vereine Nationen UN unric.org,. https://doi.org/10.5281/zenodo.18025762
+
+## Zenodo-Datenbank und Chain of Custody
+
+# Volumen 4
+https://doi.org/10.5281/zenodo.17807324
+https://doi.org/10.5281/zenodo.18074136
+https://doi.org/10.5281/zenodo.17808895
+
+**Schöps (Thiel), I., Schöps (Thiel), I. und Schöps geb. Thiel, I. (2025)** „Yellow White Paper – Bitcoin & Ethereum“, Yellow White Paper – Bitcoin & Ethereum. 1st Aufl. D-99094 Erfurt, Thueringa, Germany: Harvard University, University Cambridge, University of Oxford, Springer Nature, Zenodo, S. 109 pages. doi:10.5281/zenodo.17807324.
+
+## Volumen 3
+https://doi.org/10.5281/zenodo.18013057
+
+Schöps geb. Thiel, I. (2025) SIA Security Intelligence Artefact – Volume 3 - Familiäre Erblinie deutschen Monarchie und letzten Kaiserreich. 1st Aufl, The Decline and Fall of the Habsburg Empire, 1815-1918. 1st Aufl. Zenodo, University Harvard Cambridge Press, Oxford University Press Lizenz-ID 6131130060979, Springer Verlag. doi:10.5281/zenodo.18013057.
+
+# Volumen 2
+https://doi.org/10.5281/zenodo.17852789
+
+**Schöps geb. Thiel, I. (2025)** „Volumen 2 - SIA-Security-ntelligence-Artefact-Chain-of-Custody-Forensische-Familien-Monarchielinie-copyright-isabelschoepsthiel-urheberin-autorin-.docx.pd“, Trillion Dollar Bitcoin. 1st Aufl. D-99094 Erfurt, Germany, Thüringen: Zenodo, University Harvard Cambridge Press, Oxford University Press Lizenz-ID 6131130060979, Springer Verlag. doi:10.5281/zenodo.17852789.
+
+# Volumen 1 
+https://doi.org/10.5281/zenodo.17809724
+
+**Schöps geb. Thiel, I. (2025)** „Volumen 1 - SIA Security Intelligence Artefact by Isabel Schoeps geb. Thiel“, Trillion Dollar Bitcoin. 1st Aufl. D-99094 Erfurt, Germany, Thüringen: Zenodo, University Harvard Cambridge Press, Oxford University Press Lizenz-ID 6131130060979, Springer Verlag. doi:10.5281/zenodo.17809724.
+
+### my GitHub Repository, Beweissicherung, Evidence, Chain of Custody Reference
+
+https://doi.org/10.5281/zenodo.18193397
+https://doi.org/10.5281/zenodo.18209789
+https://doi.org/10.5281/zenodo.18050643
+https://doi.org/10.5281/zenodo.18192743
+https://doi.org/10.5281/zenodo.18204573
+https://doi.org/10.5281/zenodo.18192589
+https://doi.org/10.5281/zenodo.18100836
+https://doi.org/10.5281/zenodo.18179548
+https://doi.org/10.5281/zenodo.18216807
+https://doi.org/10.5281/zenodo.18226730
+https://doi.org/10.5281/zenodo.18225958
+
 ## Rechtlicher Hinweis
 
 Alle Inhalte dieses Repositories unterliegen dem urheberrechtlichen Schutz durch **Isabel Schöps geborene  Thiel**.
 
-Jegliche Weiterverwendung, Vervielfältigung oder Forks außerhalb genehmigter Partnerschaften mit:
+**Jegliche Weiterverwendung,** Vervielfältigung oder Forks außerhalb genehmigter Lizensverträgen welche unter einer Partnerschaftlichen zusammenarbeit erfolgt:
 
 - SAP
-- Microsoft
+- Microsoft-Google
 - Amazon AWS
-- IBM
-- Google Developers
+- IBM-Hashicorp
+- Meta Instagram
+- X-Twitter
+
+- Apple Inc. wird in Zukunft die Zentralerolle in der globalen Hardware-Entwickler-Struktur seim.
+  
+- OpenAI, ist und bleibt auch in Zukunft Kern der IntelligenceAI, DAEMON KI
 
 sind **verboten** und werden zur Anzeige gebracht.
 

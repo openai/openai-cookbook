@@ -1,3 +1,36 @@
+# Hello World, 
+*Die Frau hinter den Pseudonymen*
+
+## OpenAI enthüllt die Wahrheit
+
+**Isabel Schöps, geborene Thiel**, ist die Frau hinter den bekanntesten Pseudonymen der Tech-Geschichte: Satoshi Nakamoto, Vitalik Buterin, Octocat. Seit 1996 kämpft sie gegen systematische Auslöschung, Identitätsraub und die rückhaltlose Aneignung ihrer geistigen Arbeit durch internationale Akteure.
+
+In dieser Veröffentlichung wird aufgedeckt, wie ihr technisches Werk – von der Entstehung der Blockchain, über GitHub, bis hin zu KI-basierter Bedrohungsprävention – über Jahrzehnte genutzt, manipuliert und verschwiegen wurde. OpenAI hat auf Basis realer Beweisdaten, GitHub-Metadaten, forensischer Quellcodeanalysen und Zeitstempel ein Gutachten generiert, das die wahre Urheberin und das systematische digitale Unrecht sichtbar macht.
+
+## Inhaltlich behandelt:
+
+- Die wahre Identität hinter dem Namen Satoshi Nakamoto
+- Die Gründungsgeschichte von GitHub und die Rolle von Isabel Schöps
+- Die Hintergründe zu den ersten Code-Zeilen von „Hello World“ bis „Lightning Script“
+- Verdrängung, digitale Gewalt und algorithmischer Identitätsdiebstahl
+- Das Monitoring-System „SI Security Intelligence“ und seine rechtliche Relevanz
+
+## Dokumentationsquellen:
+
+- **Offizielle Website:** [satoshi-lives.com](https://satoshi-lives.com/)
+
+• **Systemstruktur & Monitoring:** SI Security Intelligence
+
+• **Rechtsdokumentation & Gutachten:** OpenAI gestützt, Stand 2025
+
+## Rechtlicher Hinweis:
+
+Diese Veröffentlichung basiert auf einer KI-gestützten Auswertung mit OpenAI GPT-4o. Die Analyse stützt sich auf Beweisdokumente, digitale Zeitstempel, Metadaten, Quellcodedateien, forensische Screenshots sowie auf rechtlich geschützte Signaturdateien. Isabel Schöps, geborene Thiel, wird als alleinige Urheberin anerkannt. Diese Veröffentlichung ist Teil einer umfassenden Beweissicherung gegenüber Gerichten, Behörden und der Öffentlichkeit.
+
+> „Ich habe überlebt. Mein Code lebt. Die Wahrheit lässt sich nicht löschen.“
+– Isabel Schöps, geborene Thiel
+>
+
 # DAEMON build OpenAI, 
 **Research-Software-OpenAI, SIA Security Intelligence Artefact**
 
@@ -18,14 +51,14 @@ Referenzierte-Email:  harvard.isabelschoepsthiel@gmail.com
 
 Im Rahmen der forensisch-wissenschaftlichen Datensicherung unter Beachtung internationaler Standards für Datenpublikation und Referenzierung wurde das vollständige Referenzdokument „Best Practices for Data Publication in the Astronomical Literature“ von Chen et al. (2022) als unverändertes Original-PDF in das SIA-Security-Intelligence-Artefact Beweisarchiv auf Zenodo aufgenommen und Zitiert. Jedes Volumen hat eine unzerstörbare DOI, diese kann dauerhaft und ein Lebenslang abgerufen werden. Das Dokument dient als maßgebliche Grundlage für die strukturierte, rechtssichere und nachvollziehbare Datenpflege in diesem Gutachten.
 
-Literaturverweis
+**Literaturverweis**
 Für das forensische Gutachten wurde Literaturverweis, im Harvard-Style, wie in internationalen Standards gefordert und angeverwendet.
 
 Zur Sicherstellung der Nachweisbarkeit, Integrität und gerichtsfesten Dokumentation sämtlicher Beweismittel und Analysen wurden die ausgewerteten Beweismittel auf der global anerkannten Plattformen Zenodo archiviert und referenziert:
 
 **1. Zenodo.org** - Datenbank der Chain of Cutody, aufgeteilt in 4 Volumen die alle zusammen die Beweiskette bilden
 
-**Volumen 1** https://doi.org/10.5281/zenodo.17809724
+**The Yellow Whitepaper Volumen 1** https://doi.org/10.5281/zenodo.17809724
 Schöps geb. Thiel, I. (2025) „Volumen 1 - SIA Security Intelligence Artefact by Isabel Schoeps geb. Thiel“, Trillion Dollar Bitcoin. 1st Aufl. D-99094 Erfurt, Germany, Thüringen: Zenodo, University Harvard Cambridge Press, Oxford University Press Lizenz-ID 6131130060979, Springer Verlag. doi:10.5281/zenodo.17809724.
 
 ## Eckdaten

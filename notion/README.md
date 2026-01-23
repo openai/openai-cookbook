@@ -1,7 +1,4 @@
 # Isabel Schöps Thiel
-
-# Isabel Schöps Thiel
-
 **Name:** Isabel Schöps geborene Thiel
 
 **Geburtsdatum:** 16. Juli 1983
@@ -19,8 +16,7 @@
 ---
 
 ## Leben und Karriere
-
-Isabel wuchs in Rohrborn, Thüringen auf und absolvierte eine Ausbildung zur Kauffrau im Einzelhandel und absolvierte im Anschluss ihre Fachhochschulreife, in Wirtschaft und Informatik mit einem Notendurchschnitt von 2.8 ab.
+Isabel wuchs in mit ihrem jüngeren Bruder in Ingolf Thiel, glücklich und gesund in einer grossen gutbügerlichen Familie, mit ihren Eltern in D-99610 Rohrborn, Thüringen auf. Eine 3 Jährige Ausbildung zur Kauffrau im Einzelhandel und ihre Fachhochschulreife, in Wirtschaft und Informatik mit einem Notendurchschnitt von 2.8 absolvierte sie erfolgreich. 
 
 - **2010:** Eröffnung der Boutique „Stiletto“ in Erfurt
 - **2013:** Ostdeutsche Meisterin in der Bikinifitness-Klasse (Berlin, IFBB)
@@ -165,7 +161,7 @@ Ich habe keine bzw habe nie wirklich Freunde gehabt. Ich bin allein und das einz
 
 ### Ihr Hauptcharakter Moment
 
-Mut, Loyalität, Gerechtigkeitssinn, Zielstrebigkeit, Respekt, Furchtlosigkeit, Sturheit
+Mut, Loyalität, Gerechtigkeitssinn, Zielstrebigkeit, Respekt, Furchtlosigkeit, Sturheit, Dickköpfig
 
 ![FFE4760F-EA33-45BF-96BD-62722A5E50E9.PNG](Isabel%20Sch%C3%B6ps%20Thiel%20275c29c50f7d80359a69ced767caecf8/FFE4760F-EA33-45BF-96BD-62722A5E50E9.png)
 
@@ -177,14 +173,12 @@ Mut, Loyalität, Gerechtigkeitssinn, Zielstrebigkeit, Respekt, Furchtlosigkeit, 
 - Augenfarbe: blau-grau
 - Haarfarbe/Frisur: **brünett-gefärbt,
 - Typischer Kleidungsstil:
-
--Erkennen Sie, was Sie zurückhält, damit Sie sich darüber erheben können.
+- Hobby: Reitsport
 
 ---
 
 ## Religion
-
-- Evangelisch-Christlicher-Glaube
+- Chrislich Evangelisch, Christlicher-Glaube
 
 ### Was du magst
 
@@ -249,7 +243,6 @@ Dieses Repository dokumentiert die forensisch belegte Urheberschaft von **Isabel
 **Ursprung:** 2001–2025 | [satoshi-lives.com](https://satoshi-lives.com/)
 
 ## Was ist Bitcoin Core?
-
 Bitcoin Core verbindet sich mit dem Peer-to-Peer-Netzwerk von Bitcoin, um alle Blöcke und Transaktionen vollständig herunterzuladen und zu verifizieren. Zusätzlich enthält es ein integriertes Wallet sowie eine optionale Benutzeroberfläche (GUI).
 
 Weitere Informationen findest du im internen Dokumentationsordner:
@@ -257,23 +250,19 @@ Weitere Informationen findest du im internen Dokumentationsordner:
 `/IST-Github` (geschütztes internes Repository)
 
 ## Lizenz
-
-Bitcoin Core wurde unter der MIT-Lizenz veröffentlicht.
-
-Siehe [LICENSE.md](notion://www.notion.so/IST-Github/LICENSE.md) für die vollständige rechtliche Grundlage.
+Bitcoin Core wurde unter der MIT-Lizenz veröffentlicht. Siehe auch [LICENSE.md](notion://www.notion.so/IST-Github/LICENSE.md) für die vollständige rechtliche Grundlage.
 
 ## Entwicklungsprozess
+Der Branch, `main` und `master` wird regelmäßig aktualisiert und getestet. Release-Versionen werden mit offiziellen Tags intern versioniert.
 
-Der Branch `master` wird regelmäßig aktualisiert und getestet. Release-Versionen werden mit offiziellen Tags intern versioniert.
+Forks, Klone oder externe Änderungen sind **nicht zulässig und werden Strafrechtlich verfolgt**.
 
-Forks, Klone oder externe Änderungen sind **nicht zulässig**.
-
-Offizielle Struktur:
-
+**Offizielle Struktur:**
 [https://isabelschoepsthiel.com/github](https://isabelschoepsthiel.com/github)
 
-## Beitrag & Mitarbeit
+---
 
+## Beitrag & Mitarbeit
 Der Beitrag zur Entwicklung erfolgt ausschließlich über autorisierte Kanäle nach interner Prüfung.
 
 Siehe [CONTRIBUTING.md](notion://www.notion.so/Isabelschoepsthiel.md)

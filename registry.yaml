@@ -4,8 +4,25 @@
 # should build pages for, and indicates metadata such as tags, creation date and
 # authors for each page.
 
+- title: Build your own content fact checker with gpt-oss-120B, Cerebras, and Parallel
+  path: articles/gpt-oss/build-your-own-fact-checker-cerebras.ipynb
+  slug: build-your-own-fact-checker-cerebras
+  description: Cookbook to build a content fact checker with gpt-oss-120B on Cerebras using Parallel.
+  date: 2026-01-13
+  authors:
+    - zhenweig-cerebras
+  tags:
+    - gpt-oss
+    - open-models
+    - fact-checking
+    - search
+    - reasoning
+    - cerebras
+
 - title: Transcribing User Audio with a Separate Realtime Request
   path: examples/Realtime_out_of_band_transcription.ipynb
+  slug: realtime-out-of-band-transcription
+  description: Cookbook to transcribe user audio using out-of-band Realtime sessions.
   date: 2025-11-20
   authors:
     - minh-hoque
@@ -18,6 +35,7 @@
 
 - title: Self-Evolving Agents - A Cookbook for Autonomous Agent Retraining
   path: examples/partners/self_evolving_agents/autonomous_agent_retraining.ipynb
+  slug: autonomous-agent-retraining
   date: 2025-11-04
   authors:
     - shikhar-cyber
@@ -35,6 +53,7 @@
 
 - title: User guide for gpt-oss-safeguard
   path: articles/gpt-oss-safeguard-guide.md
+  slug: gpt-oss-safeguard-guide
   date: 2025-10-29
   authors:
     - roost
@@ -45,6 +64,7 @@
 
 - title: Build, deploy, and optimize agentic workflows with AgentKit
   path: examples/agentkit/agentkit_walkthrough.ipynb
+  slug: agentkit-walkthrough
   date: 2025-10-17
   authors:
     - nikhils-oai
@@ -54,6 +74,7 @@
 
 - title: Building with Realtime Mini
   path: examples/building_w_rt_mini/building_w_rt_mini.ipynb
+  slug: building-w-rt-mini
   date: 2025-10-11
   authors:
     - carter-oai
@@ -62,6 +83,8 @@
 
 - title: Sora 2 Prompting Guide
   path: examples/sora/sora2_prompting_guide.ipynb
+  slug: sora2-prompting-guide
+  description: Cookbook to craft effective video prompts for Sora 2 generation.
   date: 2025-10-06
   authors:
     - rkoenig-openai
@@ -72,6 +95,7 @@
 
 - title: Using PLANS.md for multi-hour problem solving
   path: articles/codex_exec_plans.md
+  slug: codex-exec-plans
   date: 2025-10-07
   authors:
     - aaronfriel
@@ -84,6 +108,7 @@
 
 - title: Building Consistent Workflows with Codex CLI & Agents SDK
   path: examples/codex/codex_mcp_agents_sdk/building_consistent_workflows_codex_cli_agents_sdk.ipynb
+  slug: building-consistent-workflows-codex-cli-agents-sdk
   date: 2025-10-01
   authors:
     - jhall-openai
@@ -93,17 +118,9 @@
     - codex
     - mcp
 
-- title: GPT-5-Codex Prompting Guide
-  path: examples/gpt-5-codex_prompting_guide.ipynb
-  date: 2025-09-23
-  authors:
-    - daveleo-openai
-  tags:
-    - gpt-5
-    - codex
-
 - title: GPT-5 Troubleshooting Guide
   path: examples/gpt-5/gpt-5_troubleshooting_guide.ipynb
+  slug: gpt-5-troubleshooting-guide
   date: 2025-09-17
   authors:
     - prashantmital-openai
@@ -115,6 +132,7 @@
 
 - title: Context Engineering - Short-Term Memory Management with Sessions from OpenAI Agents SDK
   path: examples/agents_sdk/session_memory.ipynb
+  slug: session-memory
   date: 2025-09-09
   authors:
     - emreokcular
@@ -123,6 +141,7 @@
 
 - title: Automating Code Quality and Security Fixes with Codex CLI on GitLab
   path: examples/codex/secure_quality_gitlab.md
+  slug: secure-quality-gitlab
   date: 2025-08-29
   authors:
     - jonlim-openai
@@ -132,6 +151,7 @@
 
 - title: Realtime Prompting Guide
   path: examples/Realtime_prompting_guide.ipynb
+  slug: realtime-prompting-guide
   date: 2025-08-28
   authors:
     - minh-hoque
@@ -143,6 +163,7 @@
 
 - title: "Fine-tune gpt-oss for better Korean language performance"
   path: articles/gpt-oss/fine-tune-korean.ipynb
+  slug: fine-tune-korean
   date: 2025-08-26
   authors:
     - heejingithub
@@ -154,6 +175,7 @@
 
 - title: Verifying gpt-oss implementations
   path: articles/gpt-oss/verifying-implementations.md
+  slug: verifying-implementations
   date: 2025-08-11
   authors:
     - dkundel-openai
@@ -164,6 +186,7 @@
 
 - title: How to run gpt-oss locally with LM Studio
   path: articles/gpt-oss/run-locally-lmstudio.md
+  slug: run-locally-lmstudio
   date: 2025-08-07
   authors:
     - yagil
@@ -174,6 +197,7 @@
 
 - title: GPT-5 Prompt Migration and Improvement Using the New Optimizer
   path: examples/gpt-5/prompt-optimization-cookbook.ipynb
+  slug: prompt-optimization-cookbook
   date: 2025-08-07
   authors:
     - rajpathak-openai
@@ -186,6 +210,7 @@
 
 - title: GPT-5 prompting guide
   path: examples/gpt-5/gpt-5_prompting_guide.ipynb
+  slug: gpt-5-prompting-guide
   date: 2025-08-07
   authors:
     - anoop-openai
@@ -199,6 +224,7 @@
 
 - title: Frontend coding with GPT-5
   path: examples/gpt-5/gpt-5_frontend.ipynb
+  slug: gpt-5-frontend
   date: 2025-08-07
   authors:
     - WJPBProjects
@@ -210,6 +236,7 @@
 
 - title: GPT-5 New Params and Tools
   path: examples/gpt-5/gpt-5_new_params_and_tools.ipynb
+  slug: gpt-5-new-params-and-tools
   date: 2025-08-07
   authors:
     - msingh-openai
@@ -220,6 +247,7 @@
 
 - title: How to run gpt-oss-20b on Google Colab
   path: articles/gpt-oss/run-colab.ipynb
+  slug: run-colab
   date: 2025-08-06
   authors:
     - pcuenca
@@ -231,6 +259,7 @@
 
 - title: Using NVIDIA TensorRT-LLM to run gpt-oss-20b
   path: articles/gpt-oss/run-nvidia.ipynb
+  slug: run-nvidia
   date: 2025-08-05
   authors:
     - jayrodge
@@ -241,6 +270,7 @@
 
 - title: Fine-tuning with gpt-oss and Hugging Face Transformers
   path: articles/gpt-oss/fine-tune-transfomers.ipynb
+  slug: fine-tune-transfomers
   date: 2025-08-05
   authors:
     - edbeeching
@@ -253,6 +283,7 @@
 
 - title: How to handle the raw chain of thought in gpt-oss
   path: articles/gpt-oss/handle-raw-cot.md
+  slug: handle-raw-cot
   date: 2025-08-05
   authors:
     - dkundel-openai
@@ -264,6 +295,7 @@
 
 - title: How to run gpt-oss with Transformers
   path: articles/gpt-oss/run-transformers.md
+  slug: run-transformers
   date: 2025-08-05
   authors:
     - dkundel-openai
@@ -274,6 +306,7 @@
 
 - title: How to run gpt-oss with vLLM
   path: articles/gpt-oss/run-vllm.md
+  slug: run-vllm
   date: 2025-08-05
   authors:
     - dkundel-openai
@@ -284,6 +317,7 @@
 
 - title: How to run gpt-oss locally with Ollama
   path: articles/gpt-oss/run-locally-ollama.md
+  slug: run-locally-ollama
   date: 2025-08-05
   authors:
     - dkundel-openai
@@ -294,6 +328,7 @@
 
 - title: OpenAI Harmony Response Format
   path: articles/openai-harmony.md
+  slug: openai-harmony
   date: 2025-08-05
   authors:
     - dkundel-openai
@@ -306,6 +341,7 @@
 
 - title: Temporal Agents with Knowledge Graphs
   path: examples/partners/temporal_agents_with_knowledge_graphs/temporal_agents.ipynb
+  slug: temporal-agents
   date: 2025-07-22
   authors:
     - dwigg-openai
@@ -321,6 +357,7 @@
 
 - title: Using Evals API on Image Inputs
   path: examples/evaluation/use-cases/EvalsAPI_Image_Inputs.ipynb
+  slug: evalsapi-image-inputs
   date: 2025-07-15
   authors:
     - daisyshe-oai
@@ -330,6 +367,7 @@
 
 - title: Using Evals API on Audio Inputs
   path: examples/evaluation/use-cases/EvalsAPI_Audio_Inputs.ipynb
+  slug: evalsapi-audio-inputs
   date: 2025-08-13
   authors:
     - hendrytl
@@ -339,6 +377,7 @@
 
 - title: Optimize Prompts
   path: examples/Optimize_Prompts.ipynb
+  slug: optimize-prompts
   date: 2025-07-14
   authors:
     - corwin
@@ -351,6 +390,7 @@
 
 - title: Automate Jira ↔ GitHub with Codex
   path: examples/codex/jira-github.ipynb
+  slug: jira-github
   date: 2025-06-21
   authors:
     - alwell-kevin
@@ -361,6 +401,7 @@
 
 - title: Prompt Migration Guide
   path: examples/Prompt_migration_guide.ipynb
+  slug: prompt-migration-guide
   date: 2025-06-26
   authors:
     - minh-hoque
@@ -372,6 +413,7 @@
 
 - title: Fine-Tuning Techniques - Choosing Between SFT, DPO, and RFT (With a Guide to DPO)
   path: examples/Fine_tuning_direct_preference_optimization_guide.ipynb
+  slug: fine-tuning-direct-preference-optimization-guide
   date: 2025-06-18
   authors:
     - alexl-oai
@@ -380,6 +422,7 @@
 
 - title: MCP-Powered Agentic Voice Framework
   path: examples/partners/mcp_powered_voice_agents/mcp_powered_agents_cookbook.ipynb
+  slug: mcp-powered-agents-cookbook
   date: 2025-06-17
   authors:
     - shikhar-cyber
@@ -394,6 +437,7 @@
 
 - title: Building a Supply-Chain Copilot with OpenAI Agent SDK and Databricks MCP Servers
   path: examples/mcp/databricks_mcp_cookbook.ipynb
+  slug: databricks-mcp-cookbook
   date: 2025-07-08
   authors:
     - lara-openai
@@ -404,6 +448,8 @@
 
 - title: Eval Driven System Design - From Prototype to Production
   path: examples/partners/eval_driven_system_design/receipt_inspection.ipynb
+  slug: receipt-inspection
+  description: Cookbook for eval-driven design of a receipt parsing automation workflow.
   date: 2025-06-02
   authors:
     - shikhar-cyber
@@ -420,6 +466,8 @@
 
 - title: Multi-Agent Portfolio Collaboration with OpenAI Agents SDK
   path: examples/agents_sdk/multi-agent-portfolio-collaboration/multi_agent_portfolio_collaboration.ipynb
+  slug: multi-agent-portfolio-collaboration
+  description: Cookbook for multi-agent portfolio analysis workflows using the OpenAI Agents SDK.
   date: 2025-05-28
   authors:
     - rajpathak-openai
@@ -432,6 +480,8 @@
 
 - title: o3/o4-mini Function Calling Guide
   path: examples/o-series/o3o4-mini_prompting_guide.ipynb
+  slug: o3o4-mini-prompting-guide
+  description: Cookbook to improve o3/o4-mini function calling with prompt best practices.
   date: 2025-05-26
   authors:
     - billchen-openai
@@ -443,6 +493,8 @@
 
 - title: Exploring Model Graders for Reinforcement Fine-Tuning
   path: examples/Reinforcement_Fine_Tuning.ipynb
+  slug: reinforcement-fine-tuning
+  description: Cookbook to use model graders for reinforcement fine-tuning in expert tasks.
   date: 2025-05-23
   authors:
     - theophile-oai
@@ -453,6 +505,8 @@
 
 - title: Reinforcement Fine-Tuning for Conversational Reasoning with the OpenAI API
   path: examples/fine-tuned_qa/reinforcement_finetuning_healthbench.ipynb
+  slug: reinforcement-finetuning-healthbench
+  description: Cookbook for reinforcement fine-tuning conversational reasoning using HealthBench evaluations.
   date: 2025-05-21
   authors:
     - robert-tinn
@@ -464,6 +518,8 @@
 
 - title: Guide to Using the Responses API's MCP Tool
   path: examples/mcp/mcp_tool_guide.ipynb
+  slug: mcp-tool-guide
+  description: Cookbook to connect external services using the Responses API MCP tool.
   date: 2025-05-21
   authors:
     - charuj
@@ -472,6 +528,7 @@
 
 - title: Image Understanding with RAG
   path: examples/multimodal/image_understanding_with_rag.ipynb
+  slug: image-understanding-with-rag
   date: 2025-05-16
   authors:
     - robert-tinn
@@ -483,6 +540,7 @@
 
 - title: Better performance from reasoning models using the Responses API
   path: examples/responses_api/reasoning_items.ipynb
+  slug: reasoning-items
   date: 2025-05-11
   authors:
     - billchen-openai
@@ -492,6 +550,7 @@
 
 - title: Context Summarization with Realtime API
   path: examples/Context_summarization_with_realtime_api.ipynb
+  slug: context-summarization-with-realtime-api
   date: 2025-05-10
   authors:
     - minh-hoque
@@ -502,6 +561,8 @@
 
 - title: Comparing Speech-to-Text Methods with the OpenAI API
   path: examples/Speech_transcription_methods.ipynb
+  slug: speech-transcription-methods
+  description: Cookbook to compare speech-to-text methods and choose the right approach.
   date: 2025-04-29
   authors:
     - minh-hoque
@@ -512,6 +573,7 @@
 
 - title: Practical Guide for Model Selection for Real‑World Use Cases
   path: examples/partners/model_selection_guide/model_selection_guide.ipynb
+  slug: model-selection-guide
   date: 2025-05-07
   authors:
     - shikhar-cyber
@@ -530,6 +592,7 @@
 
 - title: Evals API Use-case - Detecting prompt regressions
   path: examples/evaluation/use-cases/regression.ipynb
+  slug: regression
   date: 2025-04-08
   authors:
     - josiah-openai
@@ -539,6 +602,7 @@
 
 - title: Evals API Use-case - Bulk model and prompt experimentation
   path: examples/evaluation/use-cases/bulk-experimentation.ipynb
+  slug: bulk-experimentation
   date: 2025-04-08
   authors:
     - josiah-openai
@@ -548,6 +612,7 @@
 
 - title: Evals API Use-case - Monitoring stored completions
   path: examples/evaluation/use-cases/completion-monitoring.ipynb
+  slug: completion-monitoring
   date: 2025-04-08
   authors:
     - josiah-openai
@@ -557,6 +622,8 @@
 
 - title: Evals API Use-case - Responses Evaluation
   path: examples/evaluation/use-cases/responses-evaluation.ipynb
+  slug: responses-evaluation
+  description: Cookbook to evaluate new models against stored Responses API logs.
   date: 2025-05-13
   authors:
     - willhath-openai
@@ -566,6 +633,8 @@
 
 - title: Multi-Tool Orchestration with RAG approach using OpenAI's Responses API
   path: examples/responses_api/responses_api_tool_orchestration.ipynb
+  slug: responses-api-tool-orchestration
+  description: Cookbook to route queries across tools with RAG using the Responses API.
   date: 2025-03-28
   authors:
     - shikhar-cyber
@@ -577,6 +646,7 @@
 
 - title: Automating Dispute Management with Agents SDK and Stripe API
   path: examples/agents_sdk/dispute_agent.ipynb
+  slug: dispute-agent
   date: 2025-03-17
   authors:
     - danbell-openai
@@ -587,6 +657,7 @@
 
 - title: Web Search and States with Responses API
   path: examples/responses_api/responses_example.ipynb
+  slug: responses-example
   date: 2025-03-11
   authors:
     - billchen-openai
@@ -597,6 +668,7 @@
 
 - title: Using logprobs
   path: examples/Using_logprobs.ipynb
+  slug: using-logprobs
   date: 2023-12-20
   authors:
     - jhills20
@@ -606,6 +678,7 @@
 
 - title: Creating slides with the Assistants API and DALL·E 3
   path: examples/Creating_slides_with_Assistants_API_and_DALL-E3.ipynb
+  slug: creating-slides-with-assistants-api-and-dall-e3
   date: 2023-12-08
   authors:
     - jhills20
@@ -616,6 +689,7 @@
 
 - title: Data preparation and analysis for chat model fine-tuning
   path: examples/Chat_finetuning_data_prep.ipynb
+  slug: chat-finetuning-data-prep
   date: 2023-08-22
   authors:
     - mwu1993
@@ -627,6 +701,7 @@
 
 - title: Classification using embeddings
   path: examples/Classification_using_embeddings.ipynb
+  slug: classification-using-embeddings
   date: 2022-07-11
   authors:
     - ted-at-openai
@@ -636,6 +711,7 @@
 
 - title: Clustering
   path: examples/Clustering.ipynb
+  slug: clustering
   date: 2022-03-10
   authors:
     - BorisPower
@@ -646,6 +722,7 @@
 
 - title: Clustering for transaction classification
   path: examples/Clustering_for_transaction_classification.ipynb
+  slug: clustering-for-transaction-classification
   date: 2022-10-20
   authors:
     - colin-openai
@@ -656,6 +733,7 @@
 
 - title: Code search using embeddings
   path: examples/Code_search_using_embeddings.ipynb
+  slug: code-search-using-embeddings
   date: 2022-03-10
   authors:
     - BorisPower
@@ -666,6 +744,7 @@
 
 - title: Customizing embeddings
   path: examples/Customizing_embeddings.ipynb
+  slug: customizing-embeddings
   date: 2022-03-10
   authors:
     - ted-at-openai
@@ -675,6 +754,7 @@
 
 - title: Embedding Wikipedia articles for search
   path: examples/Embedding_Wikipedia_articles_for_search.ipynb
+  slug: embedding-wikipedia-articles-for-search
   date: 2024-11-26
   authors:
     - ted-at-openai
@@ -684,6 +764,7 @@
 
 - title: Embedding texts that are longer than the model's maximum context length
   path: examples/Embedding_long_inputs.ipynb
+  slug: embedding-long-inputs
   date: 2023-01-18
   authors:
     - filipeabperes
@@ -693,6 +774,7 @@
 
 - title: Long document content extraction
   path: examples/Entity_extraction_for_long_documents.ipynb
+  slug: entity-extraction-for-long-documents
   date: 2023-02-20
   authors:
     - colin-openai
@@ -701,6 +783,7 @@
 
 - title: Fine tuning classification example
   path: examples/Fine-tuned_classification.ipynb
+  slug: fine-tuned-classification
   date: 2022-03-10
   authors:
     - BorisPower
@@ -712,6 +795,7 @@
     Function calling for nearby places: Leveraging the Google Places API and
     customer profiles
   path: examples/Function_calling_finding_nearby_places.ipynb
+  slug: function-calling-finding-nearby-places
   date: 2023-08-11
   authors:
     - prestontuggle
@@ -721,6 +805,7 @@
 
 - title: Using embeddings
   path: examples/Using_embeddings.ipynb
+  slug: using-embeddings
   date: 2022-03-10
   authors:
     - BorisPower
@@ -732,6 +817,7 @@
 
 - title: How to build a tool-using agent with LangChain
   path: examples/How_to_build_a_tool-using_agent_with_Langchain.ipynb
+  slug: how-to-build-a-tool-using-agent-with-langchain
   date: 2023-05-02
   authors:
     - colin-openai
@@ -742,6 +828,7 @@
 
 - title: How to use functions with a knowledge base
   path: examples/How_to_call_functions_for_knowledge_retrieval.ipynb
+  slug: how-to-call-functions-for-knowledge-retrieval
   date: 2023-06-14
   authors:
     - colin-openai
@@ -752,6 +839,7 @@
 
 - title: How to call functions with chat models
   path: examples/How_to_call_functions_with_chat_models.ipynb
+  slug: how-to-call-functions-with-chat-models
   date: 2023-06-13
   authors:
     - colin-openai
@@ -762,6 +850,7 @@
 
 - title: How to count tokens with Tiktoken
   path: examples/How_to_count_tokens_with_tiktoken.ipynb
+  slug: how-to-count-tokens-with-tiktoken
   date: 2022-12-16
   authors:
     - ted-at-openai
@@ -771,6 +860,7 @@
 
 - title: How to fine-tune chat models
   path: examples/How_to_finetune_chat_models.ipynb
+  slug: how-to-finetune-chat-models
   date: 2024-07-23
   authors:
     - simonpfish
@@ -781,6 +871,7 @@
 
 - title: How to format inputs to ChatGPT models
   path: examples/How_to_format_inputs_to_ChatGPT_models.ipynb
+  slug: how-to-format-inputs-to-chatgpt-models
   date: 2023-03-01
   authors:
     - ted-at-openai
@@ -790,6 +881,7 @@
 
 - title: How to handle rate limits
   path: examples/How_to_handle_rate_limits.ipynb
+  slug: how-to-handle-rate-limits
   date: 2025-01-22
   authors:
     - ted-at-openai
@@ -800,6 +892,7 @@
 
 - title: How to stream completions
   path: examples/How_to_stream_completions.ipynb
+  slug: how-to-stream-completions
   date: 2022-09-02
   authors:
     - ted-at-openai
@@ -808,6 +901,7 @@
 
 - title: Multiclass Classification for Transactions
   path: examples/Multiclass_classification_for_transactions.ipynb
+  slug: multiclass-classification-for-transactions
   date: 2022-10-20
   authors:
     - colin-openai
@@ -818,6 +912,7 @@
 
 - title: Get embeddings from dataset
   path: examples/Get_embeddings_from_dataset.ipynb
+  slug: get-embeddings-from-dataset
   date: 2022-03-10
   authors:
     - BorisPower
@@ -827,6 +922,7 @@
 
 - title: Question answering using a search API and re-ranking
   path: examples/Question_answering_using_a_search_API.ipynb
+  slug: question-answering-using-a-search-api
   date: 2023-06-16
   authors:
     - simonpfish
@@ -837,6 +933,7 @@
 
 - title: Question answering using embeddings-based search
   path: examples/Question_answering_using_embeddings.ipynb
+  slug: question-answering-using-embeddings
   date: 2022-06-10
   authors:
     - ted-at-openai
@@ -847,6 +944,7 @@
 
 - title: Recommendation using embeddings and nearest neighbor search
   path: examples/Recommendation_using_embeddings.ipynb
+  slug: recommendation-using-embeddings
   date: 2022-03-10
   authors:
     - ted-at-openai
@@ -857,6 +955,7 @@
 
 - title: Regression using the embeddings
   path: examples/Regression_using_embeddings.ipynb
+  slug: regression-using-embeddings
   date: 2022-03-10
   authors:
     - BorisPower
@@ -867,6 +966,7 @@
 
 - title: Search reranking with cross-encoders
   path: examples/Search_reranking_with_cross-encoders.ipynb
+  slug: search-reranking-with-cross-encoders
   date: 2023-06-28
   authors:
     - colin-openai
@@ -876,6 +976,7 @@
 
 - title: Semantic text search using embeddings
   path: examples/Semantic_text_search_using_embeddings.ipynb
+  slug: semantic-text-search-using-embeddings
   date: 2022-03-10
   authors:
     - BorisPower
@@ -886,6 +987,7 @@
 
 - title: Unit test writing using a multi-step prompt
   path: examples/Unit_test_writing_using_a_multi-step_prompt.ipynb
+  slug: unit-test-writing-using-a-multi-step-prompt
   date: 2022-11-15
   authors:
     - ted-at-openai
@@ -895,6 +997,7 @@
 - title: Unit test writing using a multi-step prompt with legacy Completions
   path: >-
     examples/Unit_test_writing_using_a_multi-step_prompt_with_older_completions_API.ipynb
+  slug: unit-test-writing-using-a-multi-step-prompt-with-older-completions-api
   date: 2023-05-19
   authors:
     - ted-at-openai
@@ -903,6 +1006,7 @@
 
 - title: User and product embeddings
   path: examples/User_and_product_embeddings.ipynb
+  slug: user-and-product-embeddings
   date: 2022-03-10
   authors:
     - BorisPower
@@ -911,6 +1015,7 @@
 
 - title: Visualizing the embeddings in 2D
   path: examples/Visualizing_embeddings_in_2D.ipynb
+  slug: visualizing-embeddings-in-2d
   date: 2022-03-10
   authors:
     - BorisPower
@@ -920,6 +1025,7 @@
 
 - title: Visualizing embeddings in 3D
   path: examples/Visualizing_embeddings_in_3D.ipynb
+  slug: visualizing-embeddings-in-3d
   date: 2022-03-10
   authors:
     - BorisPower
@@ -929,6 +1035,7 @@
 
 - title: Visualizing embeddings in Weights and Biases
   path: examples/third_party/Visualizing_embeddings_in_wandb.ipynb
+  slug: visualizing-embeddings-in-wandb
   date: 2023-02-01
   authors:
     - scottire
@@ -937,6 +1044,7 @@
 
 - title: Visualizing embeddings in Atlas
   path: examples/third_party/Visualizing_embeddings_with_Atlas.ipynb
+  slug: visualizing-embeddings-with-atlas
   date: 2023-03-28
   authors:
     - AndriyMulyar
@@ -946,6 +1054,7 @@
 
 - title: "Addressing transcription misspellings: prompt vs post-processing"
   path: examples/Whisper_correct_misspelling.ipynb
+  slug: whisper-correct-misspelling
   date: 2023-08-11
   authors:
     - prestontuggle
@@ -956,6 +1065,7 @@
 
 - title: "Enhancing Whisper transcriptions: pre- & post-processing techniques"
   path: examples/Whisper_processing_guide.ipynb
+  slug: whisper-processing-guide
   date: 2023-08-11
   authors:
     - prestontuggle
@@ -965,6 +1075,7 @@
 
 - title: Whisper prompting guide
   path: examples/Whisper_prompting_guide.ipynb
+  slug: whisper-prompting-guide
   date: 2023-06-27
   authors:
     - prestontuggle
@@ -975,6 +1086,7 @@
 
 - title: Zero-shot classification with embeddings
   path: examples/Zero-shot_classification_with_embeddings.ipynb
+  slug: zero-shot-classification-with-embeddings
   date: 2022-03-10
   authors:
     - BorisPower
@@ -985,6 +1097,7 @@
 
 - title: Azure Chat Completions example (preview)
   path: examples/azure/chat.ipynb
+  slug: chat
   date: 2023-03-28
   authors:
     - cmurtz-msft
@@ -995,6 +1108,7 @@
 
 - title: Azure Chat Completion models with your own data (preview)
   path: examples/azure/chat_with_your_own_data.ipynb
+  slug: chat-with-your-own-data
   date: 2023-09-11
   authors:
     - kristapratico
@@ -1003,6 +1117,7 @@
 
 - title: Azure embeddings example
   path: examples/azure/embeddings.ipynb
+  slug: embeddings
   date: 2022-07-12
   authors:
     - ted-at-openai
@@ -1014,6 +1129,7 @@
 
 - title: Azure functions example
   path: examples/azure/functions.ipynb
+  slug: functions
   date: 2023-07-21
   authors:
     - kristapratico
@@ -1023,6 +1139,7 @@
 
 - title: Translate a book writen in LaTeX from Slovenian into English
   path: examples/book_translation/translate_latex_book.ipynb
+  slug: translate-latex-book
   date: 2022-03-10
   authors:
     - BorisPower
@@ -1033,6 +1150,7 @@
 - title: How to create dynamic masks with DALL·E and Segment Anything
   path: >-
     examples/dalle/How_to_create_dynamic_masks_with_DALL-E_and_Segment_Anything.ipynb
+  slug: how-to-create-dynamic-masks-with-dall-e-and-segment-anything
   date: 2023-05-19
   authors:
     - colin-openai
@@ -1042,6 +1160,7 @@
 
 - title: How to use the DALL·E API
   path: examples/dalle/Image_generations_edits_and_variations_with_DALL-E.ipynb
+  slug: image-generations-edits-and-variations-with-dall-e
   date: 2022-11-04
   authors:
     - ted-at-openai
@@ -1051,6 +1170,7 @@
 
 - title: How to evaluate a summarization task
   path: examples/evaluation/How_to_eval_abstractive_summarization.ipynb
+  slug: how-to-eval-abstractive-summarization
   date: 2023-08-16
   authors:
     - shyamal-anadkat
@@ -1061,6 +1181,7 @@
 
 - title: Getting Started with OpenAI Evals
   path: examples/evaluation/Getting_Started_with_OpenAI_Evals.ipynb
+  slug: getting-started-with-openai-evals
   date: 2024-03-21
   authors:
     - royziv11
@@ -1070,6 +1191,8 @@
 
 - title: Developing Hallucination Guardrails
   path: examples/Developing_hallucination_guardrails.ipynb
+  slug: developing-hallucination-guardrails
+  description: Cookbook to build hallucination guardrails with evals for support agents.
   date: 2024-05-29
   authors:
     - royziv11
@@ -1078,6 +1201,7 @@
 
 - title: Fine-Tuned Q&A - collect data
   path: examples/fine-tuned_qa/olympics-1-collect-data.ipynb
+  slug: olympics-1-collect-data
   date: 2022-03-10
   authors:
     - ted-at-openai
@@ -1089,6 +1213,7 @@
 
 - title: Fine-Tuned Q&A - create Q&A
   path: examples/fine-tuned_qa/olympics-2-create-qa.ipynb
+  slug: olympics-2-create-qa
   date: 2022-03-10
   authors:
     - ted-at-openai
@@ -1100,6 +1225,7 @@
 
 - title: Fine-Tuned Q&A - train
   path: examples/fine-tuned_qa/olympics-3-train-qa.ipynb
+  slug: olympics-3-train-qa
   date: 2022-03-10
   authors:
     - ted-at-openai
@@ -1111,6 +1237,7 @@
 
 - title: Visualizing the embeddings in Kangas
   path: examples/third_party/Visualizing_embeddings_in_Kangas.ipynb
+  slug: visualizing-embeddings-in-kangas
   date: 2023-07-11
   authors:
     - dsblank
@@ -1120,6 +1247,7 @@
 - title: Financial document analysis with LlamaIndex
   path: >-
     examples/third_party/financial_document_analysis_with_llamaindex.ipynb
+  slug: financial-document-analysis-with-llamaindex
   date: 2023-06-22
   authors:
     - Disiok
@@ -1129,6 +1257,7 @@
 
 - title: Vector databases
   path: examples/vector_databases/README.md
+  slug: vector-databases-readme
   date: 2023-06-28
   authors:
     - colin-openai
@@ -1139,6 +1268,7 @@
 - title: Using PolarDB-PG as a vector database for OpenAI embeddings
   path: >-
     examples/vector_databases/PolarDB/Getting_started_with_PolarDB_and_OpenAI.ipynb
+  slug: getting-started-with-polardb-and-openai
   date: 2023-07-11
   authors:
     - liuchengshan-lcs
@@ -1148,6 +1278,7 @@
 - title: Semantic search with SingleStoreDB
   path: >-
     examples/vector_databases/SingleStoreDB/OpenAI_wikipedia_semantic_search.ipynb
+  slug: openai-wikipedia-semantic-search
   date: 2023-05-22
   authors:
     - arno756
@@ -1157,6 +1288,7 @@
 
 - title: SingleStoreDB
   path: examples/vector_databases/SingleStoreDB/README.md
+  slug: singlestoredb-readme
   date: 2023-05-22
   authors:
     - arno756
@@ -1167,6 +1299,7 @@
 - title: Using AnalyticDB as a vector database for OpenAI embeddings
   path: >-
     examples/vector_databases/analyticdb/Getting_started_with_AnalyticDB_and_OpenAI.ipynb
+  slug: getting-started-with-analyticdb-and-openai
   date: 2023-04-06
   authors:
     - wangxuqi
@@ -1176,6 +1309,7 @@
 - title: Question answering with Langchain, AnalyticDB and OpenAI
   path: >-
     examples/vector_databases/analyticdb/QA_with_Langchain_AnalyticDB_and_OpenAI.ipynb
+  slug: qa-with-langchain-analyticdb-and-openai
   date: 2023-05-05
   authors:
     - wangxuqi
@@ -1186,6 +1320,7 @@
 - title: Azure AI Search as a vector database for OpenAI embeddings
   path: >-
     examples/vector_databases/azuresearch/Getting_started_with_azure_ai_search_and_openai.ipynb
+  slug: getting-started-with-azure-ai-search-and-openai
   date: 2023-09-11
   authors:
     - farzad528
@@ -1194,6 +1329,7 @@
 
 - title: Philosophy with vector embeddings, OpenAI and Cassandra / Astra DB
   path: examples/vector_databases/cassandra_astradb/Philosophical_Quotes_CQL.ipynb
+  slug: philosophical-quotes-cql
   date: 2023-08-29
   authors:
     - hemidactylus
@@ -1204,6 +1340,7 @@
 - title: Philosophy with vector embeddings, OpenAI and Cassandra / Astra DB
   path: >-
     examples/vector_databases/cassandra_astradb/Philosophical_Quotes_cassIO.ipynb
+  slug: philosophical-quotes-cassio
   date: 2023-08-29
   authors:
     - hemidactylus
@@ -1213,6 +1350,7 @@
 
 - title: Cassandra / Astra DB
   path: examples/vector_databases/cassandra_astradb/README.md
+  slug: cassandra-astradb-readme
   date: 2023-08-29
   authors:
     - hemidactylus
@@ -1221,6 +1359,7 @@
 
 - title: Using Chroma for embeddings search
   path: examples/vector_databases/chroma/Using_Chroma_for_embeddings_search.ipynb
+  slug: using-chroma-for-embeddings-search
   date: 2023-06-28
   authors:
     - colin-openai
@@ -1230,6 +1369,7 @@
 
 - title: Robust question answering with Chroma and OpenAI
   path: examples/vector_databases/chroma/hyde-with-chroma-and-openai.ipynb
+  slug: hyde-with-chroma-and-openai
   date: 2025-04-23
   authors:
     - atroyn
@@ -1240,6 +1380,7 @@
 
 - title: Elasticsearch
   path: examples/vector_databases/elasticsearch/README.md
+  slug: elasticsearch-readme
   date: 2023-08-29
   authors:
     - leemthompo
@@ -1250,6 +1391,7 @@
 - title: Retrieval augmented generation using Elasticsearch and OpenAI
   path: >-
     examples/vector_databases/elasticsearch/elasticsearch-retrieval-augmented-generation.ipynb
+  slug: elasticsearch-retrieval-augmented-generation
   date: 2023-08-29
   authors:
     - leemthompo
@@ -1259,6 +1401,7 @@
 
 - title: Semantic search using Elasticsearch and OpenAI
   path: examples/vector_databases/elasticsearch/elasticsearch-semantic-search.ipynb
+  slug: elasticsearch-semantic-search
   date: 2023-08-29
   authors:
     - leemthompo
@@ -1268,6 +1411,7 @@
 - title: Using Hologres as a vector database for OpenAI embeddings
   path: >-
     examples/vector_databases/hologres/Getting_started_with_Hologres_and_OpenAI.ipynb
+  slug: getting-started-with-hologres-and-openai
   date: 2023-05-19
   authors:
     - zcgeng
@@ -1277,6 +1421,7 @@
 - title: Kusto as a vector database for embeddings
   path: >-
     examples/vector_databases/kusto/Getting_started_with_kusto_and_openai_embeddings.ipynb
+  slug: getting-started-with-kusto-and-openai-embeddings
   date: 2023-05-10
   authors:
     - Anshul Sharma
@@ -1285,6 +1430,7 @@
 
 - title: Kusto as a vector database
   path: examples/vector_databases/kusto/README.md
+  slug: kusto-readme
   date: 2023-05-10
   authors:
     - Anshul Sharma
@@ -1294,6 +1440,7 @@
 - title: Filtered search with Milvus and OpenAI
   path: >-
     examples/vector_databases/milvus/Filtered_search_with_Milvus_and_OpenAI.ipynb
+  slug: filtered-search-with-milvus-and-openai
   date: 2023-03-28
   authors:
     - filip-halt
@@ -1303,6 +1450,7 @@
 - title: Getting started with Milvus and OpenAI
   path: >-
     examples/vector_databases/milvus/Getting_started_with_Milvus_and_OpenAI.ipynb
+  slug: getting-started-with-milvus-and-openai
   date: 2023-03-28
   authors:
     - filip-halt
@@ -1312,6 +1460,7 @@
 - title: Using MyScale as a vector database for OpenAI embeddings
   path: >-
     examples/vector_databases/myscale/Getting_started_with_MyScale_and_OpenAI.ipynb
+  slug: getting-started-with-myscale-and-openai
   date: 2023-05-01
   authors:
     - melovy
@@ -1320,6 +1469,7 @@
 
 - title: Using MyScale for embeddings search
   path: examples/vector_databases/myscale/Using_MyScale_for_embeddings_search.ipynb
+  slug: using-myscale-for-embeddings-search
   date: 2023-06-28
   authors:
     - colin-openai
@@ -1328,6 +1478,7 @@
 
 - title: Retrieval augmentation for GPT-4 using Pinecone
   path: examples/vector_databases/pinecone/GPT4_Retrieval_Augmentation.ipynb
+  slug: gpt4-retrieval-augmentation
   date: 2023-03-24
   authors:
     - jamescalam
@@ -1338,6 +1489,7 @@
 
 - title: Retrieval augmented generative question answering with Pinecone
   path: examples/vector_databases/pinecone/Gen_QA.ipynb
+  slug: gen-qa
   date: 2023-02-07
   authors:
     - jamescalam
@@ -1347,6 +1499,7 @@
 
 - title: Pinecone vector database
   path: examples/vector_databases/pinecone/README.md
+  slug: pinecone-readme
   date: 2023-03-24
   authors:
     - jamescalam
@@ -1356,6 +1509,7 @@
 
 - title: Semantic search with Pinecone and OpenAI
   path: examples/vector_databases/pinecone/Semantic_Search.ipynb
+  slug: pinecone-semantic-search
   date: 2023-03-24
   authors:
     - jamescalam
@@ -1365,6 +1519,7 @@
 - title: Using Pinecone for embeddings search
   path: >-
     examples/vector_databases/pinecone/Using_Pinecone_for_embeddings_search.ipynb
+  slug: using-pinecone-for-embeddings-search
   date: 2023-06-28
   authors:
     - colin-openai
@@ -1374,6 +1529,7 @@
 - title: Using Qdrant as a vector database for OpenAI embeddings
   path: >-
     examples/vector_databases/qdrant/Getting_started_with_Qdrant_and_OpenAI.ipynb
+  slug: getting-started-with-qdrant-and-openai
   date: 2023-02-16
   authors:
     - kacperlukawski
@@ -1382,6 +1538,7 @@
 
 - title: Question answering with Langchain, Qdrant and OpenAI
   path: examples/vector_databases/qdrant/QA_with_Langchain_Qdrant_and_OpenAI.ipynb
+  slug: qa-with-langchain-qdrant-and-openai
   date: 2023-02-16
   authors:
     - kacperlukawski
@@ -1390,6 +1547,7 @@
 
 - title: Using Qdrant for embeddings search
   path: examples/vector_databases/qdrant/Using_Qdrant_for_embeddings_search.ipynb
+  slug: using-qdrant-for-embeddings-search
   date: 2023-06-28
   authors:
     - colin-openai
@@ -1399,6 +1557,7 @@
 
 - title: Redis
   path: examples/vector_databases/redis/README.md
+  slug: redis-readme
   date: 2023-02-13
   authors:
     - Spartee
@@ -1409,6 +1568,7 @@
 
 - title: Using Redis for embeddings search
   path: examples/vector_databases/redis/Using_Redis_for_embeddings_search.ipynb
+  slug: using-redis-for-embeddings-search
   date: 2023-06-28
   authors:
     - colin-openai
@@ -1417,6 +1577,7 @@
 
 - title: Using Redis as a vector database with OpenAI
   path: examples/vector_databases/redis/getting-started-with-redis-and-openai.ipynb
+  slug: getting-started-with-redis-and-openai
   date: 2023-02-13
   authors:
     - Spartee
@@ -1425,6 +1586,7 @@
 
 - title: Running hybrid VSS queries with Redis and OpenAI
   path: examples/vector_databases/redis/redis-hybrid-query-examples.ipynb
+  slug: redis-hybrid-query-examples
   date: 2023-05-11
   authors:
     - Michael Yuan
@@ -1433,6 +1595,7 @@
 
 - title: Redis vectors as JSON with OpenAI
   path: examples/vector_databases/redis/redisjson/redisjson.ipynb
+  slug: redisjson
   date: 2023-05-10
   authors:
     - Michael Yuan
@@ -1441,6 +1604,7 @@
 
 - title: Redis as a context store with Chat Completions
   path: examples/vector_databases/redis/redisqna/redisqna.ipynb
+  slug: redisqna
   date: 2023-05-11
   authors:
     - Michael Yuan
@@ -1450,6 +1614,7 @@
 
 - title: Using Tair as a vector database for OpenAI embeddings
   path: examples/vector_databases/tair/Getting_started_with_Tair_and_OpenAI.ipynb
+  slug: getting-started-with-tair-and-openai
   date: 2023-09-11
   authors:
     - dongqqcom
@@ -1458,6 +1623,7 @@
 
 - title: Question answering with Langchain, Tair and OpenAI
   path: examples/vector_databases/tair/QA_with_Langchain_Tair_and_OpenAI.ipynb
+  slug: qa-with-langchain-tair-and-openai
   date: 2023-09-11
   authors:
     - dongqqcom
@@ -1468,6 +1634,7 @@
 
 - title: Typesense
   path: examples/vector_databases/typesense/README.md
+  slug: typesense-readme
   date: 2023-04-13
   authors:
     - jasonbosco
@@ -1478,6 +1645,7 @@
 - title: Using Typesense for embeddings search
   path: >-
     examples/vector_databases/typesense/Using_Typesense_for_embeddings_search.ipynb
+  slug: using-typesense-for-embeddings-search
   date: 2023-06-28
   authors:
     - colin-openai
@@ -1487,6 +1655,7 @@
 
 - title: Weaviate <> OpenAI
   path: examples/vector_databases/weaviate/README.md
+  slug: weaviate-readme
   date: 2023-02-13
   authors:
     - colin-openai
@@ -1496,6 +1665,7 @@
 - title: Using Weaviate for embeddings search
   path: >-
     examples/vector_databases/weaviate/Using_Weaviate_for_embeddings_search.ipynb
+  slug: using-weaviate-for-embeddings-search
   date: 2023-06-28
   authors:
     - colin-openai
@@ -1505,6 +1675,7 @@
 - title: Using Weaviate with generative OpenAI module for generative search
   path: >-
     examples/vector_databases/weaviate/generative-search-with-weaviate-and-openai.ipynb
+  slug: generative-search-with-weaviate-and-openai
   date: 2023-05-22
   authors:
     - sebawita
@@ -1515,6 +1686,7 @@
 - title: Using Weaviate with OpenAI vectorize module for embeddings search
   path: >-
     examples/vector_databases/weaviate/getting-started-with-weaviate-and-openai.ipynb
+  slug: getting-started-with-weaviate-and-openai
   date: 2023-02-13
   authors:
     - colin-openai
@@ -1524,6 +1696,7 @@
 - title: Using Weaviate with OpenAI vectorize module for hybrid search
   path: >-
     examples/vector_databases/weaviate/hybrid-search-with-weaviate-and-openai.ipynb
+  slug: hybrid-search-with-weaviate-and-openai
   date: 2023-02-13
   authors:
     - colin-openai
@@ -1533,6 +1706,7 @@
 - title: Question Answering in Weaviate with OpenAI Q&A module
   path: >-
     examples/vector_databases/weaviate/question-answering-with-weaviate-and-openai.ipynb
+  slug: question-answering-with-weaviate-and-openai
   date: 2023-02-13
   authors:
     - colin-openai
@@ -1543,6 +1717,7 @@
 - title: Filtered Search with Zilliz and OpenAI
   path: >-
     examples/vector_databases/zilliz/Filtered_search_with_Zilliz_and_OpenAI.ipynb
+  slug: filtered-search-with-zilliz-and-openai
   date: 2023-03-28
   authors:
     - filip-halt
@@ -1552,6 +1727,7 @@
 - title: Getting Started with Zilliz and OpenAI
   path: >-
     examples/vector_databases/zilliz/Getting_started_with_Zilliz_and_OpenAI.ipynb
+  slug: getting-started-with-zilliz-and-openai
   date: 2023-03-28
   authors:
     - filip-halt
@@ -1560,6 +1736,7 @@
 
 - title: Techniques to improve reliability
   path: articles/techniques_to_improve_reliability.md
+  slug: techniques-to-improve-reliability
   redirects:
     - techniques_to_improve_reliability
   date: 2022-09-12
@@ -1570,6 +1747,7 @@
 
 - title: How to work with large language models
   path: articles/how_to_work_with_large_language_models.md
+  slug: how-to-work-with-large-language-models
   redirects:
     - how_to_work_with_large_language_models
   date: 2023-01-20
@@ -1580,6 +1758,7 @@
 
 - title: Use cases for embeddings
   path: articles/text_comparison_examples.md
+  slug: text-comparison-examples
   redirects:
     - text_comparison_examples
   date: 2023-01-20
@@ -1590,6 +1769,7 @@
 
 - title: ElatoAI - Realtime Speech AI Agents for ESP32 on Arduino
   path: examples/voice_solutions/running_realtime_api_speech_on_esp32_arduino_edge_runtime_elatoai.md
+  slug: running-realtime-api-speech-on-esp32-arduino-edge-runtime-elatoai
   date: 2025-05-01
   authors:
     - akashdeepdeb
@@ -1603,6 +1783,7 @@
 
 - title: Related resources from around the web
   path: articles/related_resources.md
+  slug: related-resources
   redirects:
     - related_resources
   date: 2023-01-20
@@ -1615,6 +1796,7 @@
 
 - title: Fine-Tuning for retrieval augmented generation (RAG) with Qdrant
   path: examples/fine-tuned_qa/ft_retrieval_augmented_generation_qdrant.ipynb
+  slug: ft-retrieval-augmented-generation-qdrant
   date: 2023-09-04
   authors:
     - NirantK
@@ -1626,6 +1808,7 @@
 
 - title: How to automate AWS tasks with function calling
   path: examples/third_party/How_to_automate_S3_storage_with_functions.ipynb
+  slug: how-to-automate-s3-storage-with-functions
   date: 2023-09-27
   authors:
     - Barqawiz
@@ -1636,6 +1819,7 @@
 
 - title: Neon as a vector database
   path: examples/vector_databases/neon/README.md
+  slug: neon-readme
   date: 2023-09-28
   authors:
     - Barqawiz
@@ -1644,6 +1828,7 @@
 
 - title: Vector similarity search using Neon Postgres
   path: examples/vector_databases/neon/neon-postgres-vector-search-pgvector.ipynb
+  slug: neon-postgres-vector-search-pgvector
   date: 2023-09-28
   authors:
     - danieltprice
@@ -1652,6 +1837,7 @@
 
 - title: Question answering with LangChain, Deep Lake, & OpenAI
   path: examples/vector_databases/deeplake/deeplake_langchain_qa.ipynb
+  slug: deeplake-langchain-qa
   date: 2023-09-30
   authors:
     - FayazRahman
@@ -1660,6 +1846,7 @@
 
 - title: Fine-tuning OpenAI models with Weights & Biases
   path: examples/third_party/GPT_finetuning_with_wandb.ipynb
+  slug: gpt-finetuning-with-wandb
   date: 2023-10-04
   authors:
     - ash0ts
@@ -1670,6 +1857,7 @@
 
 - title: OpenAI API Monitoring with Weights & Biases Weave
   path: examples/third_party/Openai_monitoring_with_wandb_weave.ipynb
+  slug: openai-monitoring-with-wandb-weave
   date: 2023-10-04
   authors:
     - ash0ts
@@ -1679,6 +1867,7 @@
 
 - title: How to build an agent with the OpenAI Node.js SDK
   path: examples/How_to_build_an_agent_with_the_node_sdk.mdx
+  slug: how-to-build-an-agent-with-the-node-sdk
   date: 2023-10-05
   authors:
     - perborgen
@@ -1689,6 +1878,7 @@
 
 - title: Named Entity Recognition to Enrich Text
   path: examples/Named_Entity_Recognition_to_enrich_text.ipynb
+  slug: named-entity-recognition-to-enrich-text
   date: 2023-10-20
   authors:
     - dcarpintero
@@ -1698,6 +1888,7 @@
 
 - title: What makes documentation good
   path: articles/what_makes_documentation_good.md
+  slug: what-makes-documentation-good
   redirects:
     - what_makes_documentation_good
   date: 2023-09-01
@@ -1707,6 +1898,7 @@
 
 - title: Function calling with an OpenAPI specification
   path: examples/Function_calling_with_an_OpenAPI_spec.ipynb
+  slug: function-calling-with-an-openapi-spec
   date: 2023-10-15
   authors:
     - shyamal-anadkat
@@ -1717,6 +1909,7 @@
 
 - title: Fine tuning for function calling
   path: examples/Fine_tuning_for_function_calling.ipynb
+  slug: fine-tuning-for-function-calling
   date: 2023-11-07
   authors:
     - jhills20
@@ -1730,6 +1923,7 @@
 
 - title: Processing and narrating a video with GPT-4.1-mini's visual capabilities and GPT-4o TTS API
   path: examples/GPT_with_vision_for_video_understanding.ipynb
+  slug: gpt-with-vision-for-video-understanding
   date: 2025-04-22
   authors:
     - cathykc
@@ -1741,6 +1935,7 @@
 
 - title: What's new with DALL·E 3?
   path: articles/what_is_new_with_dalle_3.mdx
+  slug: what-is-new-with-dalle-3
   date: 2023-11-06
   authors:
     - 0hq
@@ -1750,6 +1945,7 @@
 
 - title: How to make your completions outputs consistent with the new seed parameter
   path: examples/Reproducible_outputs_with_the_seed_parameter.ipynb
+  slug: reproducible-outputs-with-the-seed-parameter
   date: 2023-11-06
   authors:
     - shyamal-anadkat
@@ -1758,6 +1954,7 @@
 
 - title: Assistants API Overview (Python SDK)
   path: examples/Assistants_API_overview_python.ipynb
+  slug: assistants-api-overview-python
   date: 2023-11-10
   authors:
     - ibigio
@@ -1768,6 +1965,8 @@
 
 - title: "Orchestrating Agents: Routines and Handoffs"
   path: examples/Orchestrating_agents.ipynb
+  slug: orchestrating-agents
+  description: Cookbook for orchestrating agent workflows with routines and handoffs.
   date: 2024-10-10
   authors:
     - ibigio
@@ -1778,6 +1977,7 @@
 
 - title: MongoDB Atlas Vector Search
   path: examples/vector_databases/mongodb_atlas/README.md
+  slug: mongodb-atlas-readme
   date: 2023-11-21
   authors:
     - prakul
@@ -1787,6 +1987,7 @@
 
 - title: Semantic search using MongoDB Atlas Vector Search and OpenAI
   path: examples/vector_databases/mongodb_atlas/semantic_search_using_mongodb_atlas_vector_search.ipynb
+  slug: semantic-search-using-mongodb-atlas-vector-search
   date: 2023-11-21
   authors:
     - prakul
@@ -1796,6 +1997,7 @@
 
 - title: Evaluate RAG with LlamaIndex
   path: examples/evaluation/Evaluate_RAG_with_LlamaIndex.ipynb
+  slug: evaluate-rag-with-llamaindex
   date: 2023-11-06
   authors:
     - Ravi Theja
@@ -1805,6 +2007,7 @@
 
 - title: RAG with a Graph database
   path: examples/RAG_with_graph_db.ipynb
+  slug: rag-with-graph-db
   date: 2023-12-08
   authors:
     - katiagg
@@ -1814,6 +2017,7 @@
 
 - title: Supabase Vector Database
   path: examples/vector_databases/supabase/README.md
+  slug: supabase-readme
   date: 2023-12-04
   authors:
     - ggrn
@@ -1822,6 +2026,7 @@
 
 - title: Semantic search using Supabase Vector
   path: examples/vector_databases/supabase/semantic-search.mdx
+  slug: supabase-semantic-search
   date: 2023-12-04
   authors:
     - ggrn
@@ -1830,6 +2035,7 @@
 
 - title: How to implement LLM guardrails
   path: examples/How_to_use_guardrails.ipynb
+  slug: how-to-use-guardrails
   date: 2023-12-19
   authors:
     - colin-openai
@@ -1838,6 +2044,7 @@
 
 - title: How to combine GPT4o mini with RAG to create a clothing matchmaker app
   path: examples/How_to_combine_GPT4o_with_RAG_Outfit_Assistant.ipynb
+  slug: how-to-combine-gpt4o-with-rag-outfit-assistant
   date: 2024-07-18
   authors:
     - teomusatoiu
@@ -1847,6 +2054,7 @@
 
 - title: How to parse PDF docs for RAG
   path: examples/Parse_PDF_docs_for_RAG.ipynb
+  slug: parse-pdf-docs-for-rag
   date: 2024-09-29
   authors:
     - katiagg
@@ -1857,6 +2065,7 @@
 
 - title: Using GPT4o mini to tag and caption images
   path: examples/Tag_caption_images_with_GPT4V.ipynb
+  slug: tag-caption-images-with-gpt4v
   date: 2024-07-18
   authors:
     - katiagg
@@ -1866,6 +2075,7 @@
 
 - title: How to use the moderation API
   path: examples/How_to_use_moderation.ipynb
+  slug: how-to-use-moderation
   date: 2024-03-05
   authors:
     - teomusatoiu
@@ -1874,6 +2084,7 @@
 
 - title: Summarizing Long Documents
   path: examples/Summarizing_long_documents.ipynb
+  slug: summarizing-long-documents
   date: 2024-04-19
   authors:
     - joe-at-openai
@@ -1882,6 +2093,7 @@
 
 - title: Using GPT4 Vision with Function Calling
   path: examples/multimodal/Using_GPT4_Vision_With_Function_Calling.ipynb
+  slug: using-gpt4-vision-with-function-calling
   date: 2024-12-13
   authors:
     - shyamal-anadkat
@@ -1892,6 +2104,7 @@
 
 - title: Synthetic data generation (Part 1)
   path: examples/SDG1.ipynb
+  slug: sdg1
   date: 2024-04-10
   authors:
     - dylanra-openai
@@ -1900,6 +2113,7 @@
 
 - title: CLIP embeddings to improve multimodal RAG with GPT-4 Vision
   path: examples/custom_image_embedding_search.ipynb
+  slug: custom-image-embedding-search
   date: 2024-04-10
   authors:
     - dylanra-openai
@@ -1909,6 +2123,7 @@
 
 - title: Batch processing with the Batch API
   path: examples/batch_processing.ipynb
+  slug: batch-processing
   date: 2024-04-24
   authors:
     - katiagg
@@ -1918,6 +2133,7 @@
 
 - title: Using tool required for customer service
   path: examples/Using_tool_required_for_customer_service.ipynb
+  slug: using-tool-required-for-customer-service
   date: 2024-05-01
   authors:
     - colin-openai
@@ -1927,6 +2143,7 @@
 
 - title: Introduction to GPT-4o and GPT-4o mini
   path: examples/gpt4o/introduction_to_gpt4o.ipynb
+  slug: introduction-to-gpt4o
   date: 2024-07-18
   authors:
     - justonf
@@ -1937,6 +2154,7 @@
 
 - title: Azure AI Search with Azure Functions and GPT Actions in ChatGPT
   path: examples/chatgpt/rag-quickstart/azure/Azure_AI_Search_with_Azure_Functions_and_GPT_Actions_in_ChatGPT.ipynb
+  slug: azure-ai-search-with-azure-functions-and-gpt-actions-in-chatgpt
   date: 2024-07-08
   authors:
     - maxreid-openai
@@ -1949,6 +2167,7 @@
 
 - title: GPT Actions library - getting started
   path: examples/chatgpt/gpt_actions_library/.gpt_action_getting_started.ipynb
+  slug: gpt-action-getting-started
   date: 2024-07-09
   authors:
     - aaronwilkowitz-openai
@@ -1958,6 +2177,7 @@
 
 - title: GPT Actions library - BigQuery
   path: examples/chatgpt/gpt_actions_library/gpt_action_bigquery.ipynb
+  slug: gpt-action-bigquery
   date: 2024-07-09
   authors:
     - aaronwilkowitz-openai
@@ -1968,6 +2188,7 @@
 
 - title: Data Extraction and Transformation in ELT Workflows using GPT-4o as an OCR Alternative
   path: examples/Data_extraction_transformation.ipynb
+  slug: data-extraction-transformation
   date: 2024-07-09
   authors:
     - charuj
@@ -1977,6 +2198,7 @@
 
 - title: GPT Actions library - Outlook
   path: examples/chatgpt/gpt_actions_library/gpt_action_outlook.ipynb
+  slug: gpt-action-outlook
   date: 2024-07-15
   authors:
     - rupert-openai
@@ -1987,6 +2209,7 @@
 
 - title: GPT Actions library - Sharepoint (Return Docs)
   path: examples/chatgpt/gpt_actions_library/gpt_action_sharepoint_doc.ipynb
+  slug: gpt-action-sharepoint-doc
   date: 2024-05-24
   authors:
     - maxreid-openai
@@ -1997,6 +2220,7 @@
 
 - title: GPT Actions library - Sharepoint (Return Text)
   path: examples/chatgpt/gpt_actions_library/gpt_action_sharepoint_text.ipynb
+  slug: gpt-action-sharepoint-text
   date: 2024-05-24
   authors:
     - maxreid-openai
@@ -2007,6 +2231,7 @@
 
 - title: GPT Actions library (Middleware) - Azure Functions
   path: examples/chatgpt/gpt_actions_library/gpt_middleware_azure_function.ipynb
+  slug: gpt-middleware-azure-function
   date: 2024-05-24
   authors:
     - maxreid-openai
@@ -2017,6 +2242,7 @@
 
 - title: GPT Actions library - Canvas Learning Management System
   path: examples/chatgpt/gpt_actions_library/gpt_action_canvas.md
+  slug: gpt-action-canvas
   date: 2024-09-17
   authors:
     - keelan-openai
@@ -2027,6 +2253,7 @@
 
 - title: GPT Actions library - Salesforce
   path: examples/chatgpt/gpt_actions_library/gpt_action_salesforce.ipynb
+  slug: gpt-action-salesforce
   date: 2024-07-18
   authors:
     - aa-openai
@@ -2036,6 +2263,7 @@
 
 - title: GPT Actions library - Gmail
   path: examples/chatgpt/gpt_actions_library/gpt_action_gmail.ipynb
+  slug: gpt-action-gmail
   date: 2024-07-24
   authors:
     - alwestmo-openai
@@ -2046,6 +2274,7 @@
 
 - title: GPT Actions library - Jira
   path: examples/chatgpt/gpt_actions_library/gpt_action_jira.ipynb
+  slug: gpt-action-jira
   date: 2024-07-24
   authors:
     - rupert-openai
@@ -2056,6 +2285,7 @@
 
 - title: GPT Actions library - Notion
   path: examples/chatgpt/gpt_actions_library/gpt_action_notion.ipynb
+  slug: gpt-action-notion
   date: 2024-07-25
   authors:
     - dan-openai
@@ -2066,6 +2296,7 @@
 
 - title: GPT Actions library - Confluence
   path: examples/chatgpt/gpt_actions_library/gpt_action_confluence.ipynb
+  slug: gpt-action-confluence
   date: 2024-07-31
   authors:
     - eszuhany-openai
@@ -2076,6 +2307,7 @@
 
 - title: GPT Actions library - SQL Database
   path: examples/chatgpt/gpt_actions_library/gpt_action_sql_database.ipynb
+  slug: gpt-action-sql-database
   date: 2024-07-31
   authors:
     - evanweiss-openai
@@ -2086,6 +2318,7 @@
 
 - title: GPT Actions library - Box
   path: examples/chatgpt/gpt_actions_library/gpt_action_box.ipynb
+  slug: gpt-action-box
   date: 2024-08-02
   authors:
     - keelan-openai
@@ -2096,6 +2329,7 @@
 
 - title: GCP BigQuery Vector Search with GCP Functions and GPT Actions in ChatGPT
   path: examples/chatgpt/rag-quickstart/gcp/Getting_started_with_bigquery_vector_search_and_openai.ipynb
+  slug: getting-started-with-bigquery-vector-search-and-openai
   date: 2024-08-02
   authors:
     - pap-openai
@@ -2109,6 +2343,7 @@
 
 - title: GPT Actions library - Zapier
   path: examples/chatgpt/gpt_actions_library/gpt_action_zapier.ipynb
+  slug: gpt-action-zapier
   date: 2024-08-05
   authors:
     - dan-openai
@@ -2119,6 +2354,7 @@
 
 - title: Structured Outputs for Multi-Agent Systems
   path: examples/Structured_outputs_multi_agent.ipynb
+  slug: structured-outputs-multi-agent
   date: 2024-08-06
   authors:
     - dylanra-openai
@@ -2129,6 +2365,7 @@
 
 - title: Introduction to Structured Outputs
   path: examples/Structured_Outputs_Intro.ipynb
+  slug: structured-outputs-intro
   date: 2024-08-06
   authors:
     - katiagg
@@ -2138,6 +2375,7 @@
 
 - title: GPT Actions library (Middleware) - Google Cloud Function
   path: examples/chatgpt/gpt_actions_library/gpt_middleware_google_cloud_function.md
+  slug: gpt-middleware-google-cloud-function
   date: 2024-08-11
   authors:
     - girishd
@@ -2148,6 +2386,7 @@
 
 - title: GPT Actions library - AWS Redshift
   path: examples/chatgpt/gpt_actions_library/gpt_action_redshift.ipynb
+  slug: gpt-action-redshift
   date: 2024-08-09
   authors:
     - pap-openai
@@ -2158,6 +2397,7 @@
 
 - title: GPT Actions library - AWS Middleware
   path: examples/chatgpt/gpt_actions_library/gpt_middleware_aws_function.ipynb
+  slug: gpt-middleware-aws-function
   date: 2024-08-09
   authors:
     - pap-openai
@@ -2168,6 +2408,7 @@
 
 - title: GPT Actions library - Google Drive
   path: examples/chatgpt/gpt_actions_library/gpt_action_google_drive.ipynb
+  slug: gpt-action-google-drive
   date: 2024-08-11
   authors:
     - lxing-oai
@@ -2178,6 +2419,7 @@
 
 - title: GPT Actions library - Snowflake Direct
   path: examples/chatgpt/gpt_actions_library/gpt_action_snowflake_direct.ipynb
+  slug: gpt-action-snowflake-direct
   date: 2024-08-13
   authors:
     - gladstone-openai
@@ -2188,6 +2430,7 @@
 
 - title: GPT Actions library - Snowflake Middleware
   path: examples/chatgpt/gpt_actions_library/gpt_action_snowflake_middleware.ipynb
+  slug: gpt-action-snowflake-middleware
   date: 2024-08-14
   authors:
     - gladstone-openai
@@ -2198,6 +2441,7 @@
 
 - title: GPT Actions library - Retool Workflow
   path: examples/chatgpt/gpt_actions_library/gpt_action_retool_workflow.md
+  slug: gpt-action-retool-workflow
   date: 2024-08-28
   authors:
     - lspacagna-oai
@@ -2208,6 +2452,7 @@
 
 - title: Using reasoning for data validation
   path: examples/o1/Using_reasoning_for_data_validation.ipynb
+  slug: using-reasoning-for-data-validation
   date: 2024-09-12
   authors:
     - royziv11
@@ -2217,6 +2462,7 @@
 
 - title: Using reasoning for routine generation
   path: examples/o1/Using_reasoning_for_routine_generation.ipynb
+  slug: using-reasoning-for-routine-generation
   date: 2024-09-12
   authors:
     - royziv11
@@ -2226,6 +2472,7 @@
 
 - title: Using chained calls for o1 structured outputs
   path: examples/o1/Using_chained_calls_for_o1_structured_outputs.ipynb
+  slug: using-chained-calls-for-o1-structured-outputs
   date: 2024-09-26
   authors:
     - ericning-o
@@ -2235,6 +2482,7 @@
 
 - title: Building a Bring Your Own Browser (BYOB) Tool for Web Browsing and Summarization
   path: examples/third_party/Web_search_with_google_api_bring_your_own_browser_tool.ipynb
+  slug: web-search-with-google-api-bring-your-own-browser-tool
   date: 2024-09-26
   authors:
     - msingh-openai
@@ -2243,6 +2491,8 @@
 
 - title: Prompt Caching 101
   path: examples/Prompt_Caching101.ipynb
+  slug: prompt-caching101
+  description: Cookbook to reduce latency and cost using OpenAI prompt caching.
   date: 2024-10-01
   authors:
     - charuj
@@ -2254,6 +2504,7 @@
 
 - title: GPT Actions library - Google Ads via Adzviser
   path: examples/chatgpt/gpt_actions_library/gpt_action_googleads_adzviser.ipynb
+  slug: gpt-action-googleads-adzviser
   date: 2024-10-10
   authors:
     - zeyuangu-adzviser
@@ -2266,6 +2517,8 @@
 
 - title: Leveraging model distillation to fine-tune a model
   path: examples/Leveraging_model_distillation_to_fine-tune_a_model.ipynb
+  slug: leveraging-model-distillation-to-fine-tune-a-model
+  description: Cookbook to distill a larger model into a smaller fine-tuned model.
   date: 2024-10-16
   authors:
     - pap-openai
@@ -2275,6 +2528,7 @@
 
 - title: Voice Translation into Different Languages
   path: examples/voice_solutions/voice_translation_into_different_languages_using_GPT-4o.ipynb
+  slug: voice-translation-into-different-languages-using-gpt-4o
   date: 2024-10-21
   authors:
     - msingh-openai
@@ -2284,6 +2538,7 @@
 
 - title: Enhance your prompts with meta prompting
   path: examples/Enhance_your_prompts_with_meta_prompting.ipynb
+  slug: enhance-your-prompts-with-meta-prompting
   date: 2024-10-23
   authors:
     - teomusatoiu
@@ -2293,6 +2548,7 @@
 
 - title: GPT Actions library - GitHub
   path: examples/chatgpt/gpt_actions_library/gpt_action_github.md
+  slug: gpt-action-github
   date: 2024-10-23
   authors:
     - alwell-kevin
@@ -2303,6 +2559,7 @@
 
 - title: Custom LLM as a Judge to Detect Hallucinations with Braintrust
   path: examples/Custom-LLM-as-a-Judge.ipynb
+  slug: custom-llm-as-a-judge
   date: 2024-10-14
   authors:
     - ankrgyl
@@ -2313,6 +2570,7 @@
 
 - title: Vision Fine-tuning on GPT-4o for Visual Question Answering
   path: examples/multimodal/Vision_Fine_tuning_on_GPT4o_for_Visual_Question_Answering.ipynb
+  slug: vision-fine-tuning-on-gpt4o-for-visual-question-answering
   date: 2024-11-01
   authors:
     - danial-openai
@@ -2323,6 +2581,7 @@
 
 - title: Steering Text-to-Speech for more dynamic audio generation
   path: examples/voice_solutions/steering_tts.ipynb
+  slug: steering-tts
   date: 2024-11-01
   authors:
     - ericning-o
@@ -2333,6 +2592,7 @@
 
 - title: Pinecone Vector Database and Retool Workflow with GPT Actions
   path: examples/chatgpt/rag-quickstart/pinecone-retool/gpt-action-pinecone-retool-rag.ipynb
+  slug: gpt-action-pinecone-retool-rag
   date: 2024-11-11
   authors:
     - lspacagna-oai
@@ -2344,6 +2604,7 @@
 
 - title: Optimizing Retrieval-Augmented Generation using GPT-4o Vision Modality
   path: examples/vector_databases/pinecone/Using_vision_modality_for_RAG_with_Pinecone.ipynb
+  slug: using-vision-modality-for-rag-with-pinecone
   date: 2024-11-12
   authors:
     - msingh-openai
@@ -2353,6 +2614,7 @@
 
 - title: GPT Actions library - Workday
   path: examples/chatgpt/gpt_actions_library/gpt_action_workday.md
+  slug: gpt-action-workday
   date: 2024-11-20
   authors:
     - erickgort
@@ -2364,6 +2626,7 @@
 
 - title: GPT Actions library - Google Calendar
   path: examples/chatgpt/gpt_actions_library/gpt_action_google_calendar.md
+  slug: gpt-action-google-calendar
   date: 2024-11-22
   authors:
     - lspacagna-oai
@@ -2374,6 +2637,7 @@
 
 - title: GPT Actions library - Tray.ai APIM
   path: examples/chatgpt/gpt_actions_library/gpt_action_trayai_apim.md
+  slug: gpt-action-trayai-apim
   date: 2024-11-26
   authors:
     - kylecote-tray
@@ -2384,6 +2648,7 @@
 
 - title: Reasoning over Code Quality and Security in GitHub Pull Requests
   path: examples/third_party/Code_quality_and_security_scan_with_GitHub_Actions.md
+  slug: code-quality-and-security-scan-with-github-actions
   date: 2024-12-24
   authors:
     - alwell-kevin
@@ -2394,6 +2659,7 @@
 
 - title: How to evaluate LLMs for SQL generation
   path: examples/evaluation/How_to_evaluate_LLMs_for_SQL_generation.ipynb
+  slug: how-to-evaluate-llms-for-sql-generation
   date: 2024-01-23
   authors:
     - colin-openai
@@ -2402,6 +2668,8 @@
 
 - title: How to use the Usage API and Cost API to monitor your OpenAI usage
   path: examples/completions_usage_api.ipynb
+  slug: completions-usage-api
+  description: Cookbook to fetch and visualize Completions Usage and cost data via API.
   date: 2025-01-14
   authors:
     - MW-OAI
@@ -2412,6 +2680,7 @@
 
 - title: Build Your Own Code Interpreter - Dynamic Tool Generation and Execution With o3-mini
   path: examples/object_oriented_agentic_approach/Secure_code_interpreter_tool_for_LLM_agents.ipynb
+  slug: secure-code-interpreter-tool-for-llm-agents
   date: 2025-02-03
   authors:
     - msingh-openai
@@ -2420,6 +2689,8 @@
 
 - title: Doing RAG on PDFs using File Search in the Responses API
   path: examples/File_Search_Responses.ipynb
+  slug: file-search-responses
+  description: Cookbook to search PDFs with the Responses API file search tool.
   date: 2025-03-11
   authors:
     - pap-openai
@@ -2429,6 +2700,7 @@
 
 - title: Building a Voice Assistant with the Agents SDK
   path: examples/agents_sdk/app_assistant_voice_agents.ipynb
+  slug: app-assistant-voice-agents
   date: 2025-03-27
   authors:
     - rupert-openai
@@ -2439,6 +2711,8 @@
 
 - title: Multi-Language One-Way Translation with the Realtime API
   path: examples/voice_solutions/one_way_translation_using_realtime_api.mdx
+  slug: one-way-translation-using-realtime-api
+  description: Cookbook to build one-way speech translation with the Realtime API.
   date: 2025-03-24
   authors:
     - erikakettleson-openai
@@ -2448,6 +2722,7 @@
 
 - title: Evaluating Agents with Langfuse
   path: examples/agents_sdk/evaluate_agents.ipynb
+  slug: evaluate-agents
   date: 2025-03-31
   authors:
     - jannik-maierhofer
@@ -2457,6 +2732,7 @@
 
 - title: GPT Actions library - Salesforce & Gong
   path: examples/chatgpt/gpt_actions_library/gpt_action_salesforce_gong.md
+  slug: gpt-action-salesforce-gong
   date: 2025-04-07
   authors:
     - girishd
@@ -2467,6 +2743,7 @@
 
 - title: GPT-4.1 Prompting Guide
   path: examples/gpt4-1_prompting_guide.ipynb
+  slug: gpt4-1-prompting-guide
   date: 2025-04-14
   authors:
     - nm-openai
@@ -2477,6 +2754,8 @@
 
 - title: Generate images with GPT Image
   path: examples/Generate_Images_With_GPT_Image.ipynb
+  slug: generate-images-with-gpt-image
+  description: Cookbook to generate and edit images with GPT Image capabilities.
   date: 2025-04-23
   authors:
     - katiagg
@@ -2485,6 +2764,7 @@
 
 - title: Handling Function Calls with Reasoning Models
   path: examples/reasoning_function_calls.ipynb
+  slug: reasoning-function-calls
   date: 2025-04-25
   authors:
     - tompakeman-oai
@@ -2496,6 +2776,7 @@
 
 - title: Parallel Agents with the OpenAI Agents SDK
   path: examples/agents_sdk/parallel_agents.ipynb
+  slug: parallel-agents
   date: 2025-05-01
   authors:
     - brandonbaker-openai
@@ -2506,6 +2787,7 @@
 
 - title: Practical guide to data-intensive apps with the Realtime API
   path: examples/Data-intensive-Realtime-apps.ipynb
+  slug: data-intensive-realtime-apps
   date: 2025-05-29
   authors:
     - alistair-openai
@@ -2517,6 +2799,7 @@
 
 - title: Selecting a Model Based on Stripe Conversion – A Practical Eval for Startups
   path: examples/stripe_model_eval/selecting_a_model_based_on_stripe_conversion.ipynb
+  slug: selecting-a-model-based-on-stripe-conversion
   date: 2025-06-02
   authors:
     - joshbickett
@@ -2529,6 +2812,7 @@
 
 - title: Evals API Use-case - MCP Evaluation
   path: examples/evaluation/use-cases/mcp_eval_notebook.ipynb
+  slug: mcp-eval-notebook
   date: 2025-06-09
   authors:
     - josiah-openai
@@ -2541,6 +2825,7 @@
 
 - title: Evals API Use-case - Structured Outputs Evaluation
   path: examples/evaluation/use-cases/structured-outputs-evaluation.ipynb
+  slug: structured-outputs-evaluation
   date: 2025-06-09
   authors:
     - josiah-openai
@@ -2552,6 +2837,7 @@
 
 - title: Evals API Use-case - Tools Evaluation
   path: examples/evaluation/use-cases/tools-evaluation.ipynb
+  slug: tools-evaluation
   date: 2025-06-09
   authors:
     - josiah-openai
@@ -2563,6 +2849,7 @@
 
 - title: Evals API Use-case - Web Search Evaluation
   path: examples/evaluation/use-cases/web-search-evaluation.ipynb
+  slug: web-search-evaluation
   date: 2025-06-09
   authors:
     - josiah-openai
@@ -2574,6 +2861,7 @@
 
 - title: Introduction to deep research in the OpenAI API
   path: examples/deep_research_api/introduction_to_deep_research_api.ipynb
+  slug: introduction-to-deep-research-api
   date: 2025-06-25
   authors:
     - glojain
@@ -2586,6 +2874,7 @@
 
 - title: Deep Research API with the Agents SDK
   path: examples/deep_research_api/introduction_to_deep_research_api_agents.ipynb
+  slug: introduction-to-deep-research-api-agents
   date: 2025-06-25
   authors:
     - alwell-kevin
@@ -2599,6 +2888,7 @@
 
 - title: Building a Deep Research MCP Server
   path: examples/deep_research_api/how_to_build_a_deep_research_mcp_server/README.md
+  slug: how-to-build-a-deep-research-mcp-server-readme
   date: 2025-06-25
   authors:
     - alwell-kevin
@@ -2613,6 +2903,8 @@
 
 - title: Generate images with high input fidelity
   path: examples/Generate_Images_With_High_Input_Fidelity.ipynb
+  slug: generate-images-with-high-input-fidelity
+  description: Cookbook to preserve image details using high input fidelity in Image API.
   date: 2025-07-17
   authors:
     - katiagg
@@ -2621,6 +2913,7 @@
 
 - title: Use Codex CLI to automatically fix CI failures
   path: examples/codex/Autofix-github-actions.ipynb
+  slug: autofix-github-actions
   date: 2025-09-30
   authors:
     - himadri518
@@ -2631,6 +2924,7 @@
 
 - title: Building resilient prompts using an evaluation flywheel
   path: examples/evaluation/Building_resilient_prompts_using_an_evaluation_flywheel.md
+  slug: building-resilient-prompts-using-an-evaluation-flywheel
   date: 2025-10-06
   authors:
     - neelk-oai
@@ -2641,6 +2935,7 @@
 
 - title: Build Code Review with the Codex SDK
   path: examples/codex/build_code_review_with_codex_sdk.md
+  slug: build-code-review-with-codex-sdk
   date: 2025-10-21
   authors:
     - charlie-openai
@@ -2649,6 +2944,8 @@
 
 - title: Context Engineering for Personalization - State Management with Long-Term Memory Notes using OpenAI Agents SDK
   path: examples/agents_sdk/context_personalization.ipynb
+  slug: context-personalization
+  description: Cookbook to build personalized agents with long-term memory state using the Agents SDK.
   date: 2026-01-05
   authors:
     - emreokcular
@@ -2656,6 +2953,7 @@
     - agents-sdk
 - title: Build a coding agent with GPT 5.1
   path: examples/Build_a_coding_agent_with_GPT-5.1.ipynb
+  slug: build-a-coding-agent-with-gpt-5-1
   date: 2025-11-13
   authors:
     - katiagg
@@ -2664,14 +2962,21 @@
 
 - title: GPT-5.1 Prompting Guide
   path: examples/gpt-5/gpt-5-1_prompting_guide.ipynb
+  slug: gpt-5-1-prompting-guide
   date: 2025-11-13
   authors:
     - samarth-oai
   tags:
     - gpt-5.1
 
-- title: GPT-5.1-Codex-Max Prompting Guide
-  path: examples/gpt-5/gpt-5-1-codex-max_prompting_guide.ipynb
+- title: Codex Prompting Guide
+  path: examples/gpt-5/codex_prompting_guide.ipynb
+  slug: codex-prompting-guide
+  redirects:
+    - gpt-5-1-codex-max-prompting-guide
+    - gpt-5-1-codex-max_prompting_guide
+    - gpt-5-codex-prompting-guide
+    - gpt-5-codex_prompting_guide
   date: 2025-12-04
   authors:
     - nm-openai
@@ -2682,6 +2987,8 @@
 
 - title: Modernizing your Codebase with Codex
   path: examples/codex/code_modernization.md
+  slug: code-modernization
+  description: Cookbook to modernize legacy codebases using the OpenAI Codex CLI.
   date: 2025-11-19
   authors:
     - derrickchoi-openai
@@ -2690,6 +2997,7 @@
 
 - title: OpenAI Compliance Logs Platform quickstart
   path: examples/chatgpt/compliance_api/logs_platform.ipynb
+  slug: logs-platform
   date: 2025-12-11
   authors:
     - kevinv-openai
@@ -2702,6 +3010,8 @@
 
 - title: GPT-5.2 Prompting Guide
   path: examples/gpt-5/gpt-5-2_prompting_guide.ipynb
+  slug: gpt-5-2-prompting-guide
+  description: Cookbook to prompt GPT-5.2 for accurate, concise enterprise workflows.
   date: 2025-12-11
   authors:
     - msingh-openai
@@ -2711,6 +3021,8 @@
 
 - title: Gpt-image-1.5 Prompting Guide
   path: examples/multimodal/image-gen-1.5-prompting_guide.ipynb
+  slug: image-gen-1-5-prompting-guide
+  description: Cookbook to prompt gpt-image-1.5 for reliable image generation results.
   date: 2025-12-16
   authors:
     - annikab-oai
@@ -2722,6 +3034,8 @@
 
 - title: Prompt Personalities
   path: examples/gpt-5/prompt_personalities.ipynb
+  slug: prompt-personalities
+  description: Cookbook to shape agent personality via instruction prompts for tone and style.
   date: 2026-01-05
   authors:
     - msingh-openai

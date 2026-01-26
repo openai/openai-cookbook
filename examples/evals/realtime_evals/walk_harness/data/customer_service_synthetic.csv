@@ -1,0 +1,12 @@
+example_id,user_text,gt_tool_call,gt_tool_call_arg,audio_path
+cs_001,"Hi, can you check the status of my order A12345?",get_order_status,"{""order_id"":""A12345""}",audio/cs_001.wav
+cs_002,My order B67890 arrived damaged. I want a refund.,refund_order,"{""order_id"":""B67890""}",audio/cs_002.wav
+cs_003,"Please change the shipping address on order C24680 to 123 Pine St, Austin TX.",update_shipping_address,"{""order_id"":""C24680"",""new_address"":""123 Pine St, Austin TX""}",audio/cs_003.wav
+cs_004,Where is my package for order D13579? It is late.,get_order_status,"{""order_id"":""D13579""}",audio/cs_004.wav
+cs_005,I need to cancel order E11223 before it ships.,refund_order,"{""order_id"":""E11223""}",audio/cs_005.wav
+cs_006,I was double charged for order F44556 and need help.,refund_order,"{""order_id"":""F44556""}",audio/cs_006.wav
+cs_007,What is the estimated delivery date for order G77889?,get_order_status,"{""order_id"":""G77889""}",audio/cs_007.wav
+cs_008,"Update the shipping address for order H99001 to 55 Market St, San Francisco.",update_shipping_address,"{""order_id"":""H99001"",""new_address"":""55 Market St, San Francisco""}",audio/cs_008.wav
+cs_009,Thanks for the help earlier. That's all I needed.,,,audio/cs_009.wav
+cs_010,"Hello, I just want to leave positive feedback about your support team.",,,audio/cs_010.wav
+cs_011,What are your customer support hours?,,,audio/cs_011.wav

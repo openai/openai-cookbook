@@ -1,0 +1,4 @@
+simulation_id,simulation_path,enabled,notes,max_turns_override
+sim_cs_order_status,sim_cs_order_status.json,true,Order status with tool call,0
+sim_cs_refund,sim_cs_refund.json,true,Refund request with tool call,0
+sim_cs_address_update,sim_cs_address_update.json,true,Address update with tool call,0

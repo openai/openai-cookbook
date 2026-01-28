@@ -1,0 +1,100 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Weather App</title>
+    <style>
+        body {
+            background: linear-gradient(to right, #4facfe, #00f2fe);
+            font-family: Arial, sans-serif;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            height: 100vh;
+        }
+
+        .weather-app {
+            background: white;
+            padding: 25px;
+            border-radius: 10px;
+            width: 300px;
+            text-align: center;
+            box-shadow: 0 4px 10px rgba(0,0,0,0.2);
+        }
+
+        input {
+            width: 100%;
+            padding: 10px;
+            margin-bottom: 10px;
+            border-radius: 5px;
+            border: 1px solid #ccc;
+        }
+
+        button {
+            padding: 10px;
+            width: 100%;
+            background: #4facfe;
+            border: none;
+            color: white;
+            font-size: 16px;
+            cursor: pointer;
+            border-radius: 5px;
+        }
+
+        button:hover {
+            background: #00c6ff;
+        }
+
+        .result {
+            margin-top: 15px;
+        }
+
+        h2 {
+            margin: 5px 0;
+        }
+    </style>
+</head>
+<body>
+
+<div class="weather-app">
+    <h1>🌤 Weather App</h1>
+    <input type="text" id="city" placeholder="Enter city name">
+    <button onclick="getWeather()">Get Weather</button>
+
+    <div class="result" id="result"></div>
+</div>
+
+<script>
+    const apiKey = "YOUR_API_KEY";
+
+    function getWeather() {
+        const city = document.getElementById("city").value;
+        const result = document.getElementById("result");
+
+        if (city === "") {
+            result.innerHTML = "<p>Please enter a city name</p>";
+            return;
+        }
+
+        fetch(`https://api.openweathermap.org/data/2.5/weather?q=${city}&appid=${apiKey}&units=metric`)
+            .then(response => response.json())
+            .then(data => {
+                if (data.cod === "404") {
+                    result.innerHTML = "<p>City not found</p>";
+                } else {
+                    result.innerHTML = `
+                        <h2>${data.name}, ${data.sys.country}</h2>
+                        <p>🌡 Temperature: ${data.main.temp} °C</p>
+                        <p>💧 Humidity: ${data.main.humidity}%</p>
+                        <p>☁ Weather: ${data.weather[0].description}</p>
+                    `;
+                }
+            })
+            .catch(() => {
+                result.innerHTML = "<p>Error fetching data</p>";
+            });
+    }
+</script>
+
+</body>
+</html>

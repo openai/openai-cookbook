@@ -4,6 +4,19 @@
 # should build pages for, and indicates metadata such as tags, creation date and
 # authors for each page.
 
+- title: Realtime Eval Guide
+  path: examples/Realtime_eval_guide.ipynb
+  slug: realtime-eval-guide
+  date: 2026-01-25
+  authors:
+    - minh-hoque
+  tags:
+    - realtime
+    - speech
+    - audio
+    - responses
+    - evals
+
 - title: Build your own content fact checker with gpt-oss-120B, Cerebras, and Parallel
   path: articles/gpt-oss/build-your-own-fact-checker-cerebras.ipynb
   slug: build-your-own-fact-checker-cerebras
@@ -3029,7 +3042,7 @@
     - msingh-openai
     - emreokcular
   tags:
-    - images 
+    - images
     - vision
 
 - title: Prompt Personalities

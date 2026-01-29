@@ -2924,6 +2924,14 @@
   tags:
     - images
 
+- title: Running hybrid VSS queries with Dragonfly and OpenAI
+  path: examples/vector_databases/dragonfly/dragonfly-hybrid-query-examples.ipynb
+  date: 2025-07-28
+  authors:
+    - vyavdoshenko
+  tags:
+    - embeddings
+
 - title: Use Codex CLI to automatically fix CI failures
   path: examples/codex/Autofix-github-actions.ipynb
   slug: autofix-github-actions

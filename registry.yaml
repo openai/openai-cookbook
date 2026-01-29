@@ -3043,3 +3043,16 @@
   tags:
     - gpt-5
     - prompt-personalities
+
+- title: Image Evals for Image Generation and Editing Use Cases
+  path: examples/multimodal/image_evals.ipynb
+  slug: image-evals
+  description: Cookbook to build image evals for image generation and editing use cases.
+  date: 2026-01-29
+  authors:
+    - emreokcular
+    - kathylau-oai
+  tags:
+    - evals
+    - vision
+    - images

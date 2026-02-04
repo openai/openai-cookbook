@@ -18,3 +18,5 @@ For other useful tools, guides and courses, check out these [related resources f
 ## License
 
 MIT License
+
+- [AgentMarket](https://agentmarket.cloud) - B2A marketplace for AI agents. Enterprise-ready, 189 APIs, real energy data.

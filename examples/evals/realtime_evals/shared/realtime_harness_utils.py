@@ -7,6 +7,7 @@ import wave
 from pathlib import Path
 from typing import Any, Dict, List, Optional, TextIO
 
+from shared.graders import parse_json_dict
 from shared.realtime_utils import ToolCallAccumulator
 from shared.trace_utils import build_event_record
 
@@ -113,15 +114,22 @@ async def collect_realtime_response(
 ) -> Dict[str, Any]:
     """Collect a realtime response and optionally log each event as JSONL."""
     assistant_text_parts: List[str] = []
+    current_response_text_parts: List[str] = []
     output_audio_bytes = bytearray()
     tool_call_accumulator = ToolCallAccumulator()
     # Track tool calls we've already responded to so follow-up responses are clean.
     responded_call_ids: set[str] = set()
+    response_segments: List[Dict[str, Any]] = []
 
     first_audio_time_ms: Optional[float] = None
     first_text_time_ms: Optional[float] = None
     response_done_time_ms: Optional[float] = None
-    usage_data: Dict[str, Any] = {}
+    usage_output_tokens = 0
+    usage_output_audio_tokens = 0
+    usage_output_text_tokens = 0
+    has_output_tokens = False
+    has_output_audio_tokens = False
+    has_output_text_tokens = False
     awaiting_followup = False
 
     loop = asyncio.get_running_loop()
@@ -160,18 +168,60 @@ async def collect_realtime_response(
         if event_type == "response.output_audio_transcript.delta":
             if first_text_time_ms is None:
                 first_text_time_ms = event_time_ms
-            assistant_text_parts.append(payload.get("delta", ""))
+            delta_text = payload.get("delta", "")
+            assistant_text_parts.append(delta_text)
+            current_response_text_parts.append(delta_text)
 
         if event_type == "response.output_text.delta":
             if first_text_time_ms is None:
                 first_text_time_ms = event_time_ms
-            assistant_text_parts.append(payload.get("delta", ""))
+            delta_text = payload.get("delta", "")
+            assistant_text_parts.append(delta_text)
+            current_response_text_parts.append(delta_text)
 
         if event_type == "response.done":
             response_done_time_ms = event_time_ms
             tool_call_accumulator.handle_event_payload(payload)
             response = payload.get("response") or {}
-            usage_data = response.get("usage") or {}
+            response_usage = response.get("usage") or {}
+            response_output_tokens = response_usage.get("output_tokens")
+            if response_output_tokens is not None:
+                usage_output_tokens += int(response_output_tokens)
+                has_output_tokens = True
+
+            response_output_details = response_usage.get("output_token_details") or {}
+            response_audio_tokens = response_output_details.get("audio_tokens")
+            if response_audio_tokens is not None:
+                usage_output_audio_tokens += int(response_audio_tokens)
+                has_output_audio_tokens = True
+            response_text_tokens = response_output_details.get("text_tokens")
+            if response_text_tokens is not None:
+                usage_output_text_tokens += int(response_text_tokens)
+                has_output_text_tokens = True
+
+            response_tool_calls: List[Dict[str, Any]] = []
+            for output_item in response.get("output") or []:
+                if output_item.get("type") != "function_call":
+                    continue
+                call_id = output_item.get("call_id") or output_item.get("id") or ""
+                if not call_id:
+                    continue
+                response_tool_calls.append(
+                    {
+                        "name": output_item.get("name", ""),
+                        "arguments": parse_json_dict(output_item.get("arguments", "")),
+                        "raw_arguments": output_item.get("arguments", "") or "",
+                        "call_id": call_id,
+                    }
+                )
+
+            response_segments.append(
+                {
+                    "assistant_text": "".join(current_response_text_parts).strip(),
+                    "tool_calls": response_tool_calls,
+                }
+            )
+            current_response_text_parts = []
 
             tool_calls = tool_call_accumulator.build_tool_calls()
             # Only respond to newly observed tool calls; some calls may repeat in follow-ups.
@@ -209,8 +259,18 @@ async def collect_realtime_response(
             break
 
     tool_calls = tool_call_accumulator.build_tool_calls()
+    usage_data: Dict[str, Any] = {}
+    if has_output_tokens:
+        usage_data["output_tokens"] = usage_output_tokens
+    if has_output_audio_tokens or has_output_text_tokens:
+        usage_data["output_token_details"] = {}
+        if has_output_audio_tokens:
+            usage_data["output_token_details"]["audio_tokens"] = usage_output_audio_tokens
+        if has_output_text_tokens:
+            usage_data["output_token_details"]["text_tokens"] = usage_output_text_tokens
     return {
         "assistant_text": "".join(assistant_text_parts).strip(),
+        "response_segments": response_segments,
         "output_audio_bytes": bytes(output_audio_bytes),
         "tool_calls": tool_calls,
         "first_audio_time_ms": first_audio_time_ms,

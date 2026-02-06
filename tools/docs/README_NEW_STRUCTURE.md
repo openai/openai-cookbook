@@ -1,5 +1,12 @@
 # Colppy Analytics Codebase – Repository Structure
 
+**Last Updated:** 2026-01-28  
+**Status:** 📋 Partially outdated – structure has evolved
+
+> **Note:** This document describes the repository structure. Some referenced files (e.g. `fetch_hubspot_contacts_may_2025.py`, `fetch_hubspot_leads_may_2025.py`, `mixpanel_jql_queries.txt`, `insights_sueldos_colppy.txt`) have been removed. See `HUBSPOT_SCRIPTS_DOCUMENTATION.md` and `tools/scripts/hubspot/README.md` for current HubSpot script structure.
+
+---
+
 This repository is organized for clarity, maintainability, and data-driven analytics across Mixpanel, HubSpot, and Intercom platforms.
 
 ## Directory Structure

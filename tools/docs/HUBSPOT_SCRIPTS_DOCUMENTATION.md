@@ -1,6 +1,6 @@
 # HubSpot Scripts Documentation
 
-**Last Updated:** 2025-01-09  
+**Last Updated:** 2026-01-28  
 **Purpose:** Complete documentation of all HubSpot analysis scripts and their usage
 
 ---
@@ -48,9 +48,9 @@ This directory contains HubSpot analysis scripts for CRM data analysis. The scri
 - **SQL/PQL Conversion Analysis** (Sales and Product Qualified Leads)
 - **Cycle Time Analysis** (Time to contact, time to conversion)
 - **Monthly Reporting** (PQL rates, conversion metrics)
-- **Period Comparisons** (April vs May, month-over-month)
+- **Period Comparisons** (month-over-month conversion analysis)
 - **Data Fetching** (Contacts, deals, owners)
-- **Data Management** (Company identification, associations, enrichment)
+- **Data Enrichment** (Industry enrichment, company data)
 - **Owner Status Tracking** (Active/inactive owner monitoring)
 
 ---
@@ -61,17 +61,6 @@ This directory contains HubSpot analysis scripts for CRM data analysis. The scri
 tools/scripts/hubspot/
 ├── analysis/              # Analysis scripts (engaged/unengaged contacts)
 │   └── unengaged_contacts_analysis.py
-├── data_management/       # Data management utilities
-│   ├── hubspot_hybrid_identifier_implementation.py
-│   ├── hubspot_list_contactability_analysis.py
-│   ├── hubspot_lists_api_working.py
-│   ├── switch_primary_company.py
-│   └── update_companies_via_deals.py
-├── archive/               # Archived specific use case scripts
-│   ├── make_accountant_primary.py
-│   ├── preview_referencia_updates.py
-│   ├── update_referencia_empresa_primaries.py
-│   └── update_single_deal.py
 ├── custom_code/            # HubSpot custom code workflows (JavaScript)
 │   ├── hubspot_first_deal_won_calculations.js
 │   ├── hubspot_accountant_channel_deal_workflow.js
@@ -449,26 +438,6 @@ python hubspot_conversion_analysis.py --start-date 2025-05-01 --end-date 2025-06
 
 ---
 
-### Period Comparison
-
-#### `hubspot_april_may_comparison.py`
-**Purpose:** Comprehensive April vs May 2025 conversion comparison.
-
-**Key Features:**
-- Loads pre-calculated metrics from CSV files
-- Calculates month-over-month changes and growth rates
-- Creates comprehensive visualizations:
-  - Volume comparison charts
-  - Conversion rate comparisons
-  - Growth rate analysis
-  - Trend visualizations
-
-**Data Sources:**
-- `outputs/csv_data/hubspot/hubspot_conversion_metrics_2025_04.csv`
-- `outputs/csv_data/hubspot/hubspot_conversion_metrics_2025_05.csv`
-
----
-
 ### Data Fetching Utilities
 
 #### `fetch_unengaged_contacts.py`
@@ -825,27 +794,9 @@ python analyze_referral_type8_correlation.py --start-date 2025-12-01 --end-date 
 
 ---
 
-### Lead Qualification
+### Lead Status Analysis
 
-#### `lead_qualification_analysis.py`
-**Purpose:** Deep dive analysis of lead qualification quality.
-
-**Key Features:**
-- Investigates why more contacts generate fewer deals
-- Analyzes contact quality differences between periods
-- Breakdowns by:
-  - Lead source
-  - Lifecycle stage
-  - Lead status
-  - Owner performance
-  - Deal attachment rates
-
-**Data Sources:**
-- Requires pre-fetched CSV files from `outputs/csv_data/hubspot/`
-
----
-
-#### `analyze_uncontacted_lead_status.py` ⭐ **NEW**
+#### `analyze_uncontacted_lead_status.py`
 **Purpose:** Analyzes uncontacted leads and their lead status distribution.
 
 **Key Features:**
@@ -862,7 +813,7 @@ python analyze_uncontacted_lead_status.py --start-date 2025-12-01 --end-date 202
 
 ### Analysis Subdirectory
 
-**Note:** `analysis/complete_november_analysis.py` has been moved to `archive/analysis/` as it was hardcoded for November 2025. Its functionality is covered by:
+**Note:** `analysis/complete_november_analysis.py` was removed (hardcoded for November 2025). Its functionality is covered by:
 - `high_score_sales_handling_analysis.py` - Time to contact analysis (parametrized)
 - `fetch_unengaged_contacts.py` - Unengaged contacts analysis (utility function)
 
@@ -878,67 +829,7 @@ python analyze_uncontacted_lead_status.py --start-date 2025-12-01 --end-date 202
 
 ---
 
-### Data Management Utilities
-
-#### `data_management/hubspot_hybrid_identifier_implementation.py`
-**Purpose:** Company identification system using both CUIT and normalized names.
-
-**Key Features:**
-- Normalizes company names for consistent matching
-- Cleans CUIT values
-- Hybrid identification approach (CUIT + Name)
-
----
-
-#### `data_management/hubspot_list_contactability_analysis.py`
-**Purpose:** Detailed contactability analysis for HubSpot lists.
-
-**Key Features:**
-- Analyzes list contactability
-- Company search functionality
-- Uses HubSpot Lists API
-
----
-
-#### `data_management/hubspot_lists_api_working.py`
-**Purpose:** Working HubSpot Lists API implementation using direct REST API calls.
-
-**Key Features:**
-- Direct REST API calls (beyond MCP tools)
-- List details retrieval
-- List membership operations
-- Comprehensive API client class
-
----
-
-#### `data_management/switch_primary_company.py`
-**Purpose:** Generic primary company switcher for deals.
-
-**Key Features:**
-- Switches primary company while preserving ALL associations
-- Uses PUT instead of DELETE to avoid losing associations
-- Generic, reusable function
-- Command-line interface
-
-**Usage:**
-```bash
-python switch_primary_company.py <deal_id> <new_primary_company_id> [current_primary_company_id]
-```
-
----
-
-#### `data_management/update_companies_via_deals.py`
-**Purpose:** Updates companies with CUITs via deal associations.
-
-**Key Features:**
-- Gets closed won deals from a period
-- Finds associated companies
-- Updates missing CUITs from Colppy database
-- Integrates HubSpot API with Colppy database
-
----
-
-### Visualization Scripts ⭐ **NEW**
+### Visualization Scripts
 
 #### `generate_visualization_report.py` ⭐ **NEW**
 **Purpose:** Generates comprehensive visualization reports from analysis data.
@@ -1048,8 +939,7 @@ python enrich_company_industry.py
 | **Cycle Time** | `high_score_sales_handling_analysis.py` (includes time to contact), `visualize_sql_cycle_time.py` |
 | **Monthly PQL** | `monthly_pql_analysis.py`, `deal_focused_pql_analysis.py` |
 | **Conversion Rates** | `hubspot_conversion_analysis.py` |
-| **Period Comparison** | `hubspot_april_may_comparison.py` |
-| **Lead Qualification** | `lead_qualification_analysis.py`, `analyze_uncontacted_lead_status.py` |
+| **Lead Status Analysis** | `analyze_uncontacted_lead_status.py` |
 | **Funnel Analysis** | `analyze_accountant_mql_funnel.py`, `analyze_smb_mql_funnel.py`, `analyze_accountant_referral_funnel.py`, `analyze_customer_referral_funnel.py`, `analyze_direct_deals_lead_source.py`, `analyze_referral_type8_correlation.py` |
 | **Fetch Contacts** | `fetch_unengaged_contacts.py` |
 | **Fetch Deals** | `fetch_hubspot_deals_with_company.py` |
@@ -1059,7 +949,6 @@ python enrich_company_industry.py
 | **Data Quality** | `find_contacts_without_lead_objects.py`, `fix_close_date_from_history.py`, `analyze_industria_field_history.py` |
 | **Data Enrichment** | `enrich_company_industry.py` |
 | **Visualization** | `generate_visualization_report.py`, `visualize_sql_cycle_time.py` |
-| **Data Management** | `data_management/*.py` |
 
 ### Scripts by Data Source
 
@@ -1067,16 +956,16 @@ python enrich_company_industry.py
 |------------|---------|
 | **HubSpot API Direct** | `sql_pql_conversion_analysis.py`, `complete_sql_conversion_analysis.py`, `hubspot_conversion_analysis.py`, `deal_focused_pql_analysis.py`, `monthly_pql_analysis.py`, `pql_sql_deal_relationship_analysis.py`, `analyze_accountant_mql_funnel.py`, `analyze_smb_mql_funnel.py`, `analyze_accountant_referral_funnel.py`, `analyze_customer_referral_funnel.py`, `analyze_direct_deals_lead_source.py`, `analyze_referral_type8_correlation.py`, `analyze_smb_accountant_involved_funnel.py`, `analyze_icp_operador_billing.py`, `fetch_*` scripts, `find_contacts_without_lead_objects.py`, `fix_close_date_from_history.py`, `analyze_industria_field_history.py`, `enrich_company_industry.py` |
 | **MCP Tools** | `mtd_scoring_full_pagination.py`, `analyze_sql_pql_from_mcp.py` |
-| **Pre-fetched CSV** | `lead_qualification_analysis.py`, `hubspot_april_may_comparison.py`, `visualize_sql_cycle_time.py`, `generate_visualization_report.py` |
+| **Pre-fetched CSV** | `visualize_sql_cycle_time.py`, `generate_visualization_report.py` |
 
 ### Scripts by Output Format
 
 | Output Format | Scripts |
 |---------------|---------|
-| **Console Only** | `lead_qualification_analysis.py`, `check_owner_status.py`, `compare_owner_status_months.py` |
+| **Console Only** | `check_owner_status.py`, `compare_owner_status_months.py` |
 | **CSV Files** | `mtd_scoring_full_pagination.py`, `sql_pql_conversion_analysis.py`, `complete_sql_conversion_analysis.py`, `pql_sql_deal_relationship_analysis.py`, `analyze_accountant_mql_funnel.py`, `analyze_smb_mql_funnel.py`, `analyze_accountant_referral_funnel.py`, `analyze_customer_referral_funnel.py`, `analyze_direct_deals_lead_source.py`, `analyze_referral_type8_correlation.py`, `analyze_smb_accountant_involved_funnel.py`, `analyze_icp_operador_billing.py`, `fetch_*` scripts, `find_contacts_without_lead_objects.py`, `fix_close_date_from_history.py`, `analyze_industria_field_history.py` |
 | **JSON Files** | `sql_pql_conversion_analysis.py`, `get_hubspot_owners.py` |
-| **Visualizations** | `hubspot_conversion_analysis.py`, `hubspot_april_may_comparison.py`, `generate_visualization_report.py`, `visualize_sql_cycle_time.py`, `analyze_smb_accountant_involved_funnel.py` |
+| **Visualizations** | `hubspot_conversion_analysis.py`, `generate_visualization_report.py`, `visualize_sql_cycle_time.py`, `analyze_smb_accountant_involved_funnel.py` |
 
 ---
 

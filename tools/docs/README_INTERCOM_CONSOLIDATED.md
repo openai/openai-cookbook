@@ -168,7 +168,7 @@ curl https://api.openai.com/v1/responses \
 
 **Usage:**
 ```bash
-node scripts/intercom/fast-export-intercom.js --from YYYY-MM-DD --to YYYY-MM-DD --output intercom_reports/latest_export/conversations-YYYYMMDD.csv
+node tools/scripts/intercom/fast-export-intercom.js --from YYYY-MM-DD --to YYYY-MM-DD --output intercom_reports/latest_export/conversations-YYYYMMDD.csv
 ```
 
 **Options:**
@@ -181,7 +181,7 @@ node scripts/intercom/fast-export-intercom.js --from YYYY-MM-DD --to YYYY-MM-DD 
 
 **Example:**
 ```bash
-node scripts/intercom/fast-export-intercom.js --from 2025-05-13 --to 2025-05-14 --output intercom_reports/latest_export/conversations-150.csv --batch-size 50 --chunk-size 150
+node tools/scripts/intercom/fast-export-intercom.js --from 2025-05-13 --to 2025-05-14 --output intercom_reports/latest_export/conversations-150.csv --batch-size 50 --chunk-size 150
 ```
 
 #### 2. Python Analytics Scripts
@@ -212,15 +212,16 @@ python run_intercom_analysis.py --date-range 2023-01-01 2023-01-31 --output-dir 
 
 **Colppy-Specific Analysis:**
 ```bash
-# Analyze a specific file
-python analyze_colppy_may_conversations.py --input intercom-conversations-may-2025.csv
+# Use run_intercom_analysis.py for date-range analysis
+python tools/scripts/intercom/run_intercom_analysis.py --days 30 --export-zip
 
-# Analyze a specific date range
-python analyze_colppy_may_conversations.py --from-date 2025-05-01 --to-date 2025-05-15
+# Use intercom_analytics.py for comprehensive analytics
+python tools/scripts/intercom/intercom_analytics.py
 
-# Generate detailed analysis
-python analyze_colppy_may_conversations.py --from-date 2025-05-01 --to-date 2025-05-07 --detailed
+# Use intercom_conversation_taxonomy.py for conversation taxonomy analysis
+python tools/scripts/intercom/intercom_conversation_taxonomy.py
 ```
+> **Note:** `analyze_colppy_may_conversations.py` was removed. Use the scripts above for conversation analysis.
 
 ---
 
@@ -434,12 +435,12 @@ INTERCOM_ACCESS_TOKEN=your_intercom_access_token_here
 
 #### Basic Export
 ```bash
-node scripts/intercom/fast-export-intercom.js --from 2025-06-01 --to 2025-06-30
+node tools/scripts/intercom/fast-export-intercom.js --from 2025-06-01 --to 2025-06-30
 ```
 
 #### High-Performance Export
 ```bash
-node scripts/intercom/fast-export-intercom.js \
+node tools/scripts/intercom/fast-export-intercom.js \
   --from 2025-06-01 \
   --to 2025-06-30 \
   --batch-size 100 \
@@ -519,7 +520,7 @@ echo '{"jsonrpc": "2.0", "id": 1, "method": "tools/list"}' | node mcp-intercom-s
 
 #### Before (CLI):
 ```bash
-node fast-export-intercom.js --from 2025-06-01 --to 2025-06-30 --output conversations.csv
+node tools/scripts/intercom/fast-export-intercom.js --from 2025-06-01 --to 2025-06-30 --output conversations.csv
 ```
 
 #### After (MCP):

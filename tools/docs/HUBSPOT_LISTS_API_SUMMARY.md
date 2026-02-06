@@ -1,7 +1,10 @@
 # HubSpot Lists API - Access & Testing Summary
 
 **Date:** October 31, 2025  
-**Status:** ✅ Successfully Configured and Tested
+**Last Updated:** 2026-01-28  
+**Status:** 📋 Reference Documentation (scripts removed)
+
+> **Note:** The scripts `hubspot_lists_api_working.py` and `hubspot_list_contactability_analysis.py` were removed in a previous cleanup. This document is retained as **reference documentation** for HubSpot Lists API patterns, endpoints, and workflows. The API patterns described here remain valid for future implementations.
 
 ---
 
@@ -13,10 +16,9 @@ Successfully configured and tested HubSpot Lists API access for Colppy CRM.
 
 ## 📍 Key Files & Locations
 
-### Working Implementation
-- **File:** `/Users/virulana/openai-cookbook/tools/hubspot_lists_api_working.py`
-- **Status:** ✅ Updated with environment variable support
-- **Usage:** `python hubspot_lists_api_working.py`
+### Implementation (Reference)
+- **Previous Location:** `tools/hubspot_lists_api_working.py` (removed)
+- **Status:** Script removed; API patterns documented below for reference
 
 ### Environment Configuration
 - **File:** `/Users/virulana/openai-cookbook/.env`
@@ -126,34 +128,10 @@ analysis = client.analyze_contactability(companies)
 From HubSpot UI, export company names or note them manually.
 
 ### Step 2: Search by Company Name (Most Reliable)
-```python
-from hubspot_lists_api_working import HubSpotListsAPI
-import os
-
-# Load API key from environment
-api_key = (
-    os.environ.get('HUBSPOT_API_KEY') or 
-    os.environ.get('COLPPY_CRM_AUTOMATIONS')
-)
-
-client = HubSpotListsAPI(api_key)
-
-company_names = [
-    "Company Name 1",
-    "Company Name 2",
-    # ... more names
-]
-
-companies = client.get_all_companies_by_name_search(company_names)
-```
+Use HubSpot Search API: `POST /crm/v3/objects/companies/search` with filter on company name. The previous implementation (`hubspot_lists_api_working.py`) used a `HubSpotListsAPI` class - script removed but API pattern remains valid.
 
 ### Step 3: Analyze Contactability
-```python
-analysis = client.analyze_contactability(companies['results'])
-print(f"Companies analyzed: {analysis['summary']['companies_analyzed']}")
-print(f"Total contacts: {analysis['summary']['total_contacts']}")
-print(f"Missing CUIT: {analysis['issues']['missing_cuit']}")
-```
+Check contacts via `GET /crm/v4/objects/companies/{id}/associations/contacts`. Validate CUIT, phone, and email presence for each company.
 
 ---
 
@@ -194,9 +172,9 @@ print(f"Missing CUIT: {analysis['issues']['missing_cuit']}")
 
 ## 📚 References
 
-- **Main Documentation:** `/Users/virulana/openai-cookbook/tools/docs/README_HUBSPOT_CONFIGURATION.md`
-- **Working Script:** `/Users/virulana/openai-cookbook/tools/hubspot_lists_api_working.py`
-- **Environment File:** `/Users/virulana/openai-cookbook/.env` (protected by `.cursorignore`)
+- **Main Documentation:** `tools/docs/README_HUBSPOT_CONFIGURATION.md`
+- **Environment File:** `.env` (protected by `.cursorignore`)
+- **HubSpot Search API:** Use `POST /crm/v3/objects/companies/search` for company name lookups
 
 ---
 
@@ -223,9 +201,8 @@ print(f"Missing CUIT: {analysis['issues']['missing_cuit']}")
 
 ---
 
-**Last Updated:** October 31, 2025  
-**Verified By:** Cursor AI + Juan Ignacio Onetto  
-**Status:** Production Ready ✅
+**Last Updated:** 2026-01-28  
+**Status:** Reference documentation (implementation scripts removed)
 
 
 

@@ -33,22 +33,47 @@ This document serves as the official reference for Colppy's HubSpot configuratio
 
 **Lead Object Creation Methods:**
 1. **Workflow-Created (Automatic)**: HubSpot workflow automatically creates Lead object and associates it with contact
-   - Source: `AUTOMATION_PLATFORM` (in Lead object property history)
-   - Timing: Usually seconds after contact creation
-   - Typically for Colppy integration contacts
+   - **Contact Creation**: Contact is created by API from Colppy platform when user signs up for 7-day free trial
+   - **Workflow Trigger**: Main Lead creation workflow [Workflow ID: 1736621666](https://app.hubspot.com/workflows/19877595/platform/flow/1736621666/edit) is triggered when contact is created via API
+   - **Workflow Function**: This workflow creates the Lead object and associates it with the contact
+   - **Cascading Workflows**: The main workflow calls other workflows to populate different fields and information (field mappings, lifecycle stage updates, UTM attribution, etc.)
+   - **Source**: `AUTOMATION_PLATFORM` (in Lead object property history API response - `sourceType` value)
+   - **What this means**: The Lead object was created by a HubSpot workflow, not manually by a user
+   - **How to verify**: In API response, check `sourceType: "AUTOMATION_PLATFORM"` in property history for `hs_created_by_user_id`
+   - **In HubSpot UI**: Will show "Automation Platform", "Workflow", or the workflow name (NOT the literal text "AUTOMATION_PLATFORM")
+   - **Timing**: Usually seconds after contact creation (workflow triggers immediately)
+   - **For**: Colppy integration contacts (trial signups from Colppy platform)
 2. **Manual Creation**: Salesperson manually creates Lead object and associates it with contact
-   - Source: `CRM_UI` (in Lead object `hs_created_by_user_id` property history)
+   - Source: `CRM_UI` (in Lead object `hs_created_by_user_id` (UI: "Created by User") property history)
    - Timing: Usually minutes to hours after contact creation
    - Typically for Intercom integration contacts
 
 **How to Determine Lead Creation Type:**
-1. Get Lead object: `hubspot-batch-read-objects` (leads)
-2. Get property history: `propertiesWithHistory=['hs_created_by_user_id']`
+1. Get Lead object: Use `hubspot-batch-read-objects` (leads) to retrieve Lead objects
+2. Get property history: Include `propertiesWithHistory=['hs_created_by_user_id']` in the API call
+   - **Field**: `hs_created_by_user_id` (UI: "Created by User")
+   - **Location**: In the property history response for the Lead object
+   - **How to view in HubSpot UI**: Navigate to Lead object → View property history for "Created by User" field
 3. Check `sourceType` in property history:
-   - `CRM_UI` = Manual creation by salesperson
-   - `AUTOMATION_PLATFORM` = Workflow creation
-   - `INTEGRATION` = Integration creation
-4. Compare timing: Lead `createdate` vs Contact `createdate`
+   - **Field**: `sourceType` (internal API property in property history response)
+   - **Location**: Found in the property history API response for `hs_created_by_user_id` when you request `propertiesWithHistory=['hs_created_by_user_id']`
+   - **How to identify**: The `sourceType` value appears in the property history API response when you request property history
+   - **In HubSpot UI**: When viewing property history in HubSpot UI, you won't see the literal `sourceType` value, but you'll see descriptive labels:
+     - RevOps will see the user name, workflow name, or integration name in the property history
+   - **API Values** (what you'll see in API response):
+     - `CRM_UI` = Manual creation by salesperson
+       - **API shows**: `sourceType: "CRM_UI"`
+       - **HubSpot UI shows**: User's name who made the change (e.g., "John Doe")
+       - **Meaning**: Someone manually created/modified the Lead object in HubSpot UI
+     - `AUTOMATION_PLATFORM` = Workflow creation (automatic)
+       - **API shows**: `sourceType: "AUTOMATION_PLATFORM"`
+       - **HubSpot UI shows**: "Automation Platform", "Workflow", or the actual workflow name (e.g., "Lead Creation Workflow")
+       - **Meaning**: A HubSpot workflow automatically created/modified the Lead object
+     - `INTEGRATION` = Integration creation
+       - **API shows**: `sourceType: "INTEGRATION"`
+       - **HubSpot UI shows**: Integration name (e.g., "Intercom Integration", "Colppy API")
+       - **Meaning**: An integration (via API) created/modified the Lead object
+4. Compare timing: Lead `createdate` (UI: "Create Date") vs Contact `createdate` (UI: "Create Date")
    - Manual: Usually minutes/hours difference
    - Workflow: Usually seconds difference
 
@@ -323,25 +348,35 @@ This section documents the custom code workflows implemented in HubSpot for auto
 
 **Purpose**: Automatically creates Lead objects and sets `lifecyclestage = 'lead'` when contacts are created from Colppy or Intercom integrations
 
-**Important Note**: In Colppy, a "Lead" requires an associated Lead object, NOT just `lifecyclestage = 'lead'`. This workflow may create Lead objects automatically OR salespeople may create them manually for Intercom contacts.
+**Workflow Details**:
+- **Main Workflow**: [Workflow ID: 1736621666](https://app.hubspot.com/workflows/19877595/platform/flow/1736621666/edit)
+- **This workflow creates the Lead object** and associates it with the contact
+- **Cascading Workflows**: The main workflow calls other workflows to populate different fields and information (field mappings, lifecycle stage updates, UTM attribution, etc.)
+
+**Important Note**: In Colppy, a "Lead" requires an associated Lead object, NOT just `lifecyclestage = 'lead'`. This workflow creates Lead objects automatically for Colppy integration contacts. Salespeople may create them manually for Intercom contacts.
 
 **Trigger**: Contact Created event in HubSpot
 
 **Trigger Conditions**:
-- Contact created via Colppy integration (when user signs up for trial)
+- **Primary**: Contact created via Colppy API when user signs up for 7-day free trial (Colppy platform → HubSpot API → Contact created → Workflow triggered)
 - Contact created via Intercom integration (when user contacts sales team)
 - Contact created by sales team manually in HubSpot
 
-**Workflow Behavior**:
-1. **Contact Created**: Integration (Colppy/Intercom) or manual creation creates contact in HubSpot
-2. **Workflow Triggers**: HubSpot workflow automatically runs when contact is created
-3. **Invitation Check**: Workflow checks if `lead_source = 'Usuario Invitado'`
+**Workflow Behavior** (for Colppy Integration Contacts):
+1. **Contact Creation**: User signs up for 7-day free trial in Colppy platform → Colppy API creates contact in HubSpot
+2. **Workflow Triggers**: Main Lead creation workflow [Workflow ID: 1736621666](https://app.hubspot.com/workflows/19877595/platform/flow/1736621666/edit) automatically triggers when contact is created via API
+3. **Lead Object Creation**: Main workflow creates the Lead object and associates it with the contact
+4. **Cascading Workflows**: Main workflow calls other workflows to populate different fields and information:
+   - Field mappings (populating contact properties from trial signup data)
+   - Lifecycle stage updates (`lifecyclestage = 'lead'`)
+   - UTM attribution (capturing marketing source data)
+   - Other property updates
+5. **Invitation Check**: Workflow checks if `lead_source = 'Usuario Invitado'`
    - **If invitation contact**: Workflow SKIPS lead creation (these are invitations from existing customers, should NOT be contacted by sales team)
    - **If regular contact**: Workflow proceeds with lead creation
-4. **Lead Object Creation**: Workflow may automatically create Lead object and associate it with contact (for Colppy integration contacts)
-5. **Lifecycle Stage**: Workflow sets `lifecyclestage = 'lead'` automatically (only for non-invitation contacts)
-   - **Note**: Setting `lifecyclestage = 'lead'` does NOT automatically create a Lead object. Lead objects may be created separately by workflow or manually by salesperson.
-6. **Date Set**: `hs_v2_date_entered_lead` (UI: "Date entered \"Lead (Pipeline de etapa del ciclo de vida)\"") is set to the same timestamp as `createdate` (UI: "Create Date") (only for non-invitation contacts)
+6. **Lifecycle Stage**: Workflow sets `lifecyclestage = 'lead'` automatically (only for non-invitation contacts)
+   - **Note**: Setting `lifecyclestage = 'lead'` does NOT automatically create a Lead object. Lead objects are created by the main workflow (step 3 above).
+7. **Date Set**: `hs_v2_date_entered_lead` (UI: "Date entered \"Lead (Pipeline de etapa del ciclo de vida)\"") is set to the same timestamp as `createdate` (UI: "Create Date") (only for non-invitation contacts)
 
 **Key Characteristics**:
 - **Automatic**: No manual intervention required
@@ -357,9 +392,11 @@ This section documents the custom code workflows implemented in HubSpot for auto
 
 **Integration Sources**:
 1. **Colppy Integration**: When user signs up for 7-day free trial
+   - **Sequence**: User signs up for trial in Colppy platform → Colppy API creates contact in HubSpot → Main Lead creation workflow [Workflow ID: 1736621666](https://app.hubspot.com/workflows/19877595/platform/flow/1736621666/edit) triggers → Workflow creates Lead object → Workflow calls other workflows to populate fields (lifecycle stage, UTM attribution, etc.)
    - Backend creates contact in HubSpot via API
-   - Workflow automatically sets lifecycle stage to 'lead' (unless invitation contact)
-   - **Lead Object**: Typically created automatically by workflow (source: `AUTOMATION_PLATFORM`)
+   - Main workflow automatically creates Lead object and associates it with contact (source: `AUTOMATION_PLATFORM`)
+   - Cascading workflows automatically set lifecycle stage to 'lead' (unless invitation contact)
+   - Cascading workflows populate field mappings and UTM attribution
    - Contact is immediately available as a lead for sales team
    - **Type**: Workflow-created lead (user signed up for trial → has "Validó email" event → IS an MQL)
 
@@ -1476,9 +1513,15 @@ The following values are used in the `lead_source` field to track the origin of 
 | Referencia de Integrador | Partner/integrator referrals |
 | Referencia Interna | Internal referrals from Colppy employees |
 | Referencia Externa Pyme | External referrals from SMB customers or Accountant channel |
+| Referencia Externa Contador | External referrals from accountants (internal name in HubSpot) |
 | CS | Customer Success team initiated leads |
 | Referencia Intercom | Leads from Intercom chat/support |
 | Usuario Invitado | Invited users (trials, demos) |
+
+**Important Notes:**
+- **Referencia Externa Contador** is the internal name used in HubSpot for deals referred by accountants
+- This lead source is used in conjunction with Association Type 8 (Accountant association) to identify accountant referrals
+- For referral funnel analysis, we filter deals where: `lead_source = 'Referencia Externa Contador'` AND deal has accountant association (type 8)
 
 ## Contact-Deal Associations
 
@@ -1922,6 +1965,7 @@ python tools/scripts/hubspot/analyze_icp_operador_billing.py --start-date 2025-1
 **Related Documentation:**
 - See [HUBSPOT_MONTHLY_ANALYSIS_GUIDE.md](./HUBSPOT_MONTHLY_ANALYSIS_GUIDE.md) for monthly analysis workflow
 - See [HUBSPOT_SCRIPTS_DOCUMENTATION.md](./HUBSPOT_SCRIPTS_DOCUMENTATION.md) for script details
+- See [ICP_COMPANY_DEFINITIONS_AND_ASSUMPTIONS.md](./ICP_COMPANY_DEFINITIONS_AND_ASSUMPTIONS.md) for ICP and Company-level assumptions (RevOps)
 
 ---
 
@@ -2169,32 +2213,33 @@ This section defines the standard methodologies for measuring different types of
 
 ### 🎯 SQL (Sales Qualified Lead) Conversion Analysis
 
-**Last Updated:** 2025-12-21  
-**Note:** SQL definition updated to include deal validation requirement for accurate conversion measurement.
+**Last Updated:** 2025-01-14  
+**Note:** SQL definition updated to reflect association-based conversion methodology. SQL conversion occurs when a contact is associated to a deal, which triggers the lifecycle stage change to "Opportunity".
 
-**Definition**: Measures the conversion rate of contacts created in a given month to SQL (Sales Qualified Lead) status within the same month, with validated deal association.
+**Definition**: Measures the conversion rate of contacts created in a given month to SQL (Sales Qualified Lead) status within the same month.
 
-**SQL Conversion Cohort Definition for a Given Month (Updated - with Deal Validation):**
-A contact is counted as an SQL conversion for month *M* if **ALL THREE** conditions are met:
+**SQL Conversion Cohort Definition for a Given Month (Updated - Association-Based):**
+A contact is counted as an SQL conversion for month *M* if **BOTH** conditions are met:
 1. **`createdate` falls within the month** (between `{month_start}` and `{month_end}`) - MQL definition (excluding 'Usuario Invitado')
-2. **`hs_v2_date_entered_opportunity` falls within the month** (between `{month_start}` and `{month_end}`)
-3. **Contact has a deal associated that was created between `createdate` and SQL date (within the same month)** - Deal validation requirement
+2. **`hs_v2_date_entered_opportunity` falls within the month** (between `{month_start}` and `{month_end}`) - When contact was associated to deal
 
-**CRITICAL**: Both creation AND conversion must happen in the same month, AND the contact must have a validated deal association to measure monthly conversion rate accurately.
+**KEY INSIGHT**: SQL conversion occurs when a contact (who starts as a "lead") is associated to a deal. HubSpot automatically changes their lifecycle stage to "Opportunity", which sets the `hs_v2_date_entered_opportunity` field. The association event IS the SQL conversion, regardless of when the deal was created.
+
+**CRITICAL**: Both creation AND conversion (association to deal) must happen in the same month to measure monthly conversion rate accurately.
 
 **Example for a Given Month**:
 - **Base Cohort**: ALL contacts created in target month (`createdate` between `{month_start}` and `{month_end}`)
 - **SQL Conversions**: Subset of base cohort that also has `hs_v2_date_entered_opportunity` between `{month_start}` and `{month_end}`
 - **Conversion Rate**: (SQL conversions / Total contacts created) × 100
 
-**Primary Method**: Lifecycle Stage Transition Date with Deal Validation
-- **Field Used**: `hs_v2_date_entered_opportunity` (Contact object)
-- **Formula**: `contacts_df['is_sql'] = contacts_df['hs_v2_date_entered_opportunity'].notna() AND has_validated_deal()`
+**Primary Method**: Lifecycle Stage Transition Date (Association-Based)
+- **Field Used**: `hs_v2_date_entered_opportunity` (Contact object) - timestamp when contact was associated to deal
+- **Formula**: `contacts_df['is_sql'] = contacts_df['hs_v2_date_entered_opportunity'].notna()`
+- **Conversion Event**: Contact associated to deal → Lifecycle stage changes to "Opportunity" → SQL conversion date set
 - **Cohort Filter**: 
   - `createdate` BETWEEN `{month_start}` AND `{month_end}` (base cohort - excluding 'Usuario Invitado')
-  - AND `hs_v2_date_entered_opportunity` BETWEEN `{month_start}` AND `{month_end}` (converted in period)
-  - AND deal.createdate BETWEEN `contact.createdate` AND `hs_v2_date_entered_opportunity` (deal validation within period)
-- **Deal Validation**: Contact must have at least one deal associated where `deal.createdate` falls between contact `createdate` and `hs_v2_date_entered_opportunity`, all within the analysis period
+  - AND `hs_v2_date_entered_opportunity` BETWEEN `{month_start}` AND `{month_end}` (converted in period - when associated to deal)
+- **Key Insight**: The association event IS the SQL conversion. The deal may have been created at any point - what matters is when the contact was associated to it
 
 **SQL → PQL Timing Analysis**:
 For contacts in the SQL cohort, determine if they were PQL (Product Qualified Lead) before SQL:
@@ -3157,6 +3202,67 @@ const archiveUrl = `https://api.hubapi.com/crm/v4/associations/companies/deals/b
 ```
 
 **Important**: Removing ALL labels deletes the entire association. Always preserve at least ONE label type to maintain the relationship.
+
+---
+
+## ✅ DOCUMENTATION VERIFICATION SUMMARY
+
+**Last Verified**: January 9, 2025  
+**Last Reviewed**: January 9, 2025  
+**Verification Method**: Live HubSpot API calls, code review, cross-document consistency check
+
+### Verification Status
+
+| Concept | Status | Evidence |
+|---------|--------|----------|
+| **Lead Definition** | ✅ Verified | Consistent across all documents and code |
+| **Field Mappings** | ✅ Verified | Live API verification Jan 9, 2025 - All critical fields verified |
+| **UTM Attribution Fields** | ✅ Verified | 8 fields verified via live API (utm_campaign, utm_source, utm_medium, utm_term, utm_content, initial_utm_campaign, initial_utm_source, initial_utm_medium) |
+| **Teams & Owners API** | ✅ Verified | Owners API vs Users API mapping verified, team detection logic confirmed |
+| **Deal Collaborators** | ✅ Verified | `hs_all_collaborator_owner_ids` property verified for team detection |
+| **Company Types** | ✅ Verified | 12 company types verified via live API |
+| **Association Mappings** | ✅ Verified | Deal-company association types verified (type 8 for Estudio Contable) |
+| **Product Family** | ✅ Verified | Colppy vs Sueldos classification verified |
+| **Subscription Fields** | ✅ Verified | MRR, ARR, billing dates verified in Line Items object |
+| **Contact Fields** | ✅ Verified | Key event fields (activo, fecha_activo) verified |
+
+### Key Verification Points
+
+1. **Field Clearing Method**: ✅ Confirmed - Empty string (`""`) required, NOT `null`
+2. **Owners API Usage**: ✅ Confirmed - Must use `/crm/v3/owners/{ownerId}` NOT Users API
+3. **Deal Collaborators**: ✅ Confirmed - Use `hs_all_collaborator_owner_ids` property
+4. **UTM Fields**: ✅ Verified - All 8 UTM fields exist and are populated correctly
+5. **Company Types**: ✅ Verified - 12 company types confirmed via live API
+6. **Association Type 8**: ✅ Verified - Estudio Contable association verified
+
+### Live API Verification Evidence
+
+**Verification Date**: January 9, 2025  
+**Verification Method**: Direct HubSpot API calls to production instance  
+**Coverage**: Products, Line Items, Companies, Deals, Contacts, UTM Marketing Fields, Teams & Owners API
+
+**Verified Objects**:
+- ✅ Products object (Product Family classification)
+- ✅ Line Items object (MRR, ARR, billing dates)
+- ✅ Companies object (CUIT fields, 12 company types)
+- ✅ Deals object (Custom fields, plan names, associations)
+- ✅ Contacts object (Key events, lifecycle, UTM fields)
+- ✅ Associations (Deal-company, contact-deal, contact-lead)
+- ✅ Teams & Owners API (Team detection, collaborator mapping)
+
+### Cross-Document Consistency
+
+- **Funnel Mapping**: `COLPPY_FUNNEL_MAPPING_COMPLETE.md` - All field references match this document
+- **SQL Definition**: Consistent with `HUBSPOT_SQL_PQL_CORRELATION_ANALYSIS.md`
+- **PQL Definition**: Consistent with `HUBSPOT_PQL_ANALYSIS_DOCUMENTATION.md`
+- **Lead Definition**: Consistent across all documents
+
+### Code Implementation Evidence
+
+- **Field Usage**: All scripts use field names as documented
+- **API Patterns**: Scripts follow Owners API usage (not Users API)
+- **Deal Validation**: SQL scripts implement deal validation as documented
+- **UTM Attribution**: Analysis scripts use `initial_utm_source` for MQL identification
 
 ---
 

@@ -15,12 +15,15 @@ Measure and analyze the overlap between sales-driven conversions (SQL) and produ
 ## Key Definitions
 
 ### SQL (Sales Qualified Lead)
-- **Definition**: Contact that converted to Opportunity lifecycle stage **with validated deal association**
-- **HubSpot Field**: `hs_v2_date_entered_opportunity`
+- **Definition**: Contact that was associated to a deal, which triggered lifecycle stage change to 'Opportunity'
+- **HubSpot Field**: `hs_v2_date_entered_opportunity` (timestamp when contact was associated to deal)
 - **Field Type**: Datetime (ISO format with timezone)
 - **Example**: `2025-11-03T12:56:32.703Z`
-- **NEW VALIDATION REQUIREMENT**: Contact must have a deal associated that was created between `createdate` and SQL date (within the analysis period)
-- **Complete Definition**: SQL = MQL (contact created in period, excluding 'Usuario Invitado') + `hs_v2_date_entered_opportunity` in period + deal created between contact creation and SQL date (within period)
+- **KEY INSIGHT**: When a contact (who starts as a "lead") gets associated to a deal, HubSpot automatically changes their lifecycle stage to "Opportunity", which sets the SQL conversion date
+- **SQL Conversion = Deal Association Event**: The association itself is the conversion event, regardless of when the deal was created
+- **Funnel Flow**: Lead → (Association to Deal) → Opportunity (SQL)
+- **Complete Definition**: SQL = MQL (contact created in period, excluding 'Usuario Invitado') + `hs_v2_date_entered_opportunity` in period + contact associated to a deal
+- The timing of deal creation vs association doesn't matter for funnel analysis - what matters is when the contact was associated to the deal
 
 ### PQL (Product Qualified Lead)
 - **Definition**: Contact that activated in the product during trial

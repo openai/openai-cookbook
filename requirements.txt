@@ -22,4 +22,7 @@ matplotlib>=3.7.0
 seaborn>=0.12.0
 numpy>=1.24.0
 tqdm>=4.65.0
-aiohttp>=3.8.0 
+aiohttp>=3.8.0
+# Semantic labelling (intercom_conversation_taxonomy.py --labelling-method semantic)
+transformers>=4.30.0
+torch>=2.0.0

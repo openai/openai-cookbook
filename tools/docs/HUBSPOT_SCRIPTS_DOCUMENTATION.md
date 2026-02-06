@@ -1,6 +1,6 @@
 # HubSpot Scripts Documentation
 
-**Last Updated:** 2025-12-21  
+**Last Updated:** 2025-01-09  
 **Purpose:** Complete documentation of all HubSpot analysis scripts and their usage
 
 ---
@@ -72,19 +72,21 @@ tools/scripts/hubspot/
 │   ├── preview_referencia_updates.py
 │   ├── update_referencia_empresa_primaries.py
 │   └── update_single_deal.py
-├── workflows/             # HubSpot custom code workflows (JavaScript)
+├── custom_code/            # HubSpot custom code workflows (JavaScript)
 │   ├── hubspot_first_deal_won_calculations.js
 │   ├── hubspot_accountant_channel_deal_workflow.js
 │   ├── hubspot_additional_product_created.js
 │   ├── hubspot_company_blank_field_validator.js
-│   └── hubspot_deal_stage_update_workflow.js
+│   ├── hubspot_deal_stage_update_workflow.js
+│   ├── hubspot_contact_creation_business_hours.js
+│   └── hubspot_industry_enrichment.js
 ├── utils/                 # Shared utilities
 │   ├── datetime_utils.py
 │   └── constants.py
 └── [main analysis scripts]
 ```
 
-**Note:** HubSpot custom code workflow files (JavaScript) are located in `workflows/` subdirectory. See `HUBSPOT_CUSTOM_CODE_WORKFLOW_MAPPING.md` for workflow documentation.
+**Note:** HubSpot custom code workflow files (JavaScript) are located in `custom_code/` subdirectory. See `HUBSPOT_CUSTOM_CODE_WORKFLOW_MAPPING.md` for workflow documentation.
 
 ---
 
@@ -177,11 +179,15 @@ python tools/scripts/hubspot/sales_ramp_cohort_analysis.py
 
 **PQL Definition:**
 - `activo = 'true'` (boolean flag)
-- `fecha_activo` (timestamp when activation occurred)
+- `fecha_activo` (timestamp when critical event was performed)
 
-**SQL Definition (Deal Creation):**
+**SQL Definition (Deal Association):**
 - `hs_v2_date_entered_opportunity` (when contact entered 'Oportunidad' stage)
-- **Assumption:** SQL conversion = Deal creation
+- **Key Insight:** SQL conversion = Deal Association Event
+- When a contact (who starts as a "lead") is associated to a deal, HubSpot automatically changes their 
+  lifecycle stage to "Opportunity", which sets the SQL conversion date
+- The deal may have been created at any point - what matters is when the contact was associated to it
+- **Funnel Flow:** Lead → (Association to Deal) → Opportunity (SQL)
 
 **Output Metrics:**
 - PQL Deal Creation Rate: % of PQLs that became SQL
@@ -221,14 +227,17 @@ python tools/scripts/hubspot/pql_sql_deal_relationship_analysis.py --start-date 
 - Comprehensive cohort definition (created AND converted in period)
 - Saves detailed CSV and summary JSON
 
-**SQL Definition (Updated - with Deal Validation):**
-- Contact that converted to Opportunity (entered 'Oportunidad' lifecycle stage)
-- Field: `hs_v2_date_entered_opportunity`
-- **NEW REQUIREMENT**: Contact must have a deal associated that was created between `createdate` and SQL date (within the analysis period)
-- **Validation**: SQL = MQL + `hs_v2_date_entered_opportunity` in period + deal created between contact creation and SQL date (within period)
+**SQL Definition (Updated - Association-Based Conversion):**
+- **SQL = Contact associated to a deal, which triggers lifecycle stage change to 'Opportunity'**
+- **KEY INSIGHT**: When a contact (who starts as a "lead") gets associated to a deal, HubSpot automatically 
+  changes their lifecycle stage to "Opportunity", which sets the `hs_v2_date_entered_opportunity` field
+- **SQL Conversion = Deal Association Event**: The association itself is the conversion event, regardless of 
+  when the deal was created. The timing of deal creation vs association doesn't matter for funnel analysis.
+- Field: `hs_v2_date_entered_opportunity` = timestamp when contact was associated to deal (lifecycle stage changed)
+- **Funnel Flow**: Lead → (Association to Deal) → Opportunity (SQL)
 
 **PQL Definition:**
-- Contact that activated during trial
+- Contact that performed the critical event during trial
 - Fields: `activo = 'true'`, `fecha_activo` populated
 
 **Cohort Definition (Updated - with Deal Validation):**
@@ -255,18 +264,70 @@ python sql_pql_conversion_analysis.py --start-date 2025-11-01 --end-date 2025-11
 ---
 
 #### `analyze_sql_pql_from_mcp.py`
-**Purpose:** Analyze SQL → PQL timing relationship from MCP tool data.
+**Purpose:** Analyze SQL → PQL timing relationship from HubSpot contact data.
 
 **Key Features:**
-- Analyzes contacts fetched via MCP HubSpot tools
-- Determines if contacts were PQL before or after SQL conversion
-- Requires pre-fetched data (doesn't fetch itself)
+- Analyzes contacts to determine if they were PQL before or after SQL conversion
+- Filters for contacts that became SQL (entered opportunity stage) in the specified date range
+- Requires pre-fetched contact data (doesn't fetch data itself)
+- Handles multiple date formats (ISO, timestamps, date-only)
 
 **Analysis Types:**
-- `pql_before_sql` - Activated in product BEFORE sales engagement
-- `pql_after_sql` - Activated AFTER sales engagement
-- `never_pql` - Never activated
+- `pql_before_sql` - Performed critical event BEFORE sales engagement
+- `pql_after_sql` - Performed critical event AFTER sales engagement started
+- `never_pql` - Never performed the critical event
 - `pql_no_date` - Data quality issue (marked PQL but no date)
+
+**Usage Workflow:**
+1. **Fetch contacts using HubSpot API** (for the period you want to analyze)
+   ```python
+   from hubspot_api.client import HubSpotClient
+   
+   client = HubSpotClient()
+   result = client.search_objects(
+       object_type="contacts",
+       filter_groups=[{
+           "filters": [{
+               "propertyName": "createdate",
+               "operator": "GTE",
+               "value": "2025-11-01T00:00:00.000Z"
+           }, {
+               "propertyName": "createdate",
+               "operator": "LTE",
+               "value": "2025-11-30T23:59:59.999Z"
+           }]
+       }],
+       properties=['email', 'firstname', 'lastname', 'createdate',
+                   'hs_lifecyclestage_opportunity_date', 'fecha_activo', 'activo',
+                   'lifecyclestage', 'num_associated_deals'],
+       limit=100
+   )
+   contacts = result.get("results", [])
+   ```
+
+2. **Save contacts to JSON file**
+   ```python
+   import json
+   with open('contacts_nov_2025.json', 'w') as f:
+       json.dump(contacts, f, indent=2)
+   ```
+
+3. **Run analysis using the script's function**
+   ```python
+   from analyze_sql_pql_from_mcp import analyze_sql_pql_timing
+   import json
+   
+   with open('contacts_nov_2025.json', 'r') as f:
+       contacts_data = json.load(f)
+   
+   df, summary = analyze_sql_pql_timing(
+       contacts_data, 
+       start_date='2025-11-01',
+       end_date='2025-11-30'
+   )
+   ```
+
+**Note:** The script filters for contacts where `hs_lifecyclestage_opportunity_date` (SQL date) falls within the specified date range. The script handles timestamps (milliseconds) and ISO date formats automatically.
 
 ---
 
@@ -322,7 +383,35 @@ python monthly_pql_analysis.py --months 2025-05,2025-06,2025-07,2025-08
 
 **PQL Definition:**
 - `activo = 'true'` (boolean flag)
-- `fecha_activo` (activation timestamp)
+- `fecha_activo` (timestamp when critical event was performed)
+
+---
+
+### SQL Conversion Analysis
+
+#### `complete_sql_conversion_analysis.py` ⭐ **NEW**
+**Purpose:** Comprehensive SQL conversion analysis from July 2025 to current month using the NEW SQL definition.
+
+**Key Features:**
+- Runs analysis for each month from July 2025 to current month
+- Uses NEW SQL definition: Contact created in period + `hs_v2_date_entered_opportunity` in period + validated deal association
+- Validates deal association: Deal created between `createdate` and SQL date (within period)
+- Excludes 'Usuario Invitado' contacts
+- Provides aggregated results across all months
+- Generates detailed CSV output with contact-level data
+
+**SQL Definition:**
+- Contact created in period (MQL - excluding 'Usuario Invitado')
+- `hs_v2_date_entered_opportunity` falls within the period
+- Contact has a deal associated that was created between `createdate` and SQL date (within the period)
+
+**Usage:**
+```bash
+python complete_sql_conversion_analysis.py
+```
+
+**Output Files:**
+- `complete_sql_conversion_analysis_{timestamp}.csv` - Detailed results with all months
 
 ---
 
@@ -556,6 +645,7 @@ Additional Information:
 
 **Related Documentation:**
 - See README_HUBSPOT_CONFIGURATION.md for accountant company types and deal-company associations
+- See [ICP_COMPANY_DEFINITIONS_AND_ASSUMPTIONS.md](./ICP_COMPANY_DEFINITIONS_AND_ASSUMPTIONS.md) for ICP and Company-level definitions and script assumptions (RevOps)
 
 ---
 
@@ -581,6 +671,160 @@ python get_hubspot_owners.py --api-key YOUR_API_KEY
 
 ---
 
+#### `check_owner_status.py` ⭐ **NEW**
+**Purpose:** Checks owner status (active/inactive) for a specific month.
+
+**Key Features:**
+- Identifies active vs inactive owners
+- Tracks owner changes over time
+- Supports month-based analysis
+
+**Usage:**
+```bash
+python check_owner_status.py --month 2025-12
+```
+
+---
+
+#### `compare_owner_status_months.py` ⭐ **NEW**
+**Purpose:** Compares owner status across multiple months to track changes.
+
+**Key Features:**
+- Compares owner status between months
+- Identifies owners who became active/inactive
+- Supports multiple month comparison
+
+**Usage:**
+```bash
+python compare_owner_status_months.py --months 2025-11 2025-12
+```
+
+---
+
+### Funnel Analysis Scripts ⭐ **NEW**
+
+#### `analyze_accountant_mql_funnel.py` ⭐ **NEW**
+**Purpose:** Analyzes the funnel from MQL (Marketing Qualified Lead) to Closed Won deals for contacts referred by accountants.
+
+**Key Features:**
+- Filters contacts by accountant role (`rol_wizard` indicates accountant)
+- Tracks MQL → SQL → Deal Created → Deal Closed Won funnel
+- Validates SQL with deal association requirement
+- Classifies by ICP Operador vs ICP PYME (based on PRIMARY company type)
+- Supports single month, multiple months, or custom date range
+
+**Funnel Stages:**
+1. MQL Contador: Contacts created in period with accountant `rol_wizard`
+2. SQL: MQLs that entered opportunity stage in period WITH validated deal association
+3. Deal Created: Deals created in period (associated with MQL contacts)
+4. Deal Closed Won: Deals closed won in period (both `createdate` and `closedate` in period)
+
+**Usage:**
+```bash
+python analyze_accountant_mql_funnel.py --month 2025-12
+python analyze_accountant_mql_funnel.py --months 2025-11 2025-12
+python analyze_accountant_mql_funnel.py --start-date 2025-12-01 --end-date 2026-01-01
+```
+
+---
+
+#### `analyze_smb_mql_funnel.py` ⭐ **NEW**
+**Purpose:** Analyzes the funnel from MQL to Closed Won deals for SMB (Small and Medium Business) contacts (NOT accountants).
+
+**Key Features:**
+- Filters contacts by SMB role (`rol_wizard` does NOT indicate accountant)
+- Tracks MQL → SQL → Deal Created → Deal Closed Won funnel
+- Validates SQL with deal association requirement
+- Classifies by ICP Operador vs ICP PYME (based on PRIMARY company type)
+- Supports single month, multiple months, or custom date range
+
+**Funnel Stages:**
+1. MQL PYME: Contacts created in period with SMB `rol_wizard` (NOT accountant)
+2. SQL: MQLs that entered opportunity stage in period WITH validated deal association
+3. Deal Created: Deals created in period (associated with MQL contacts)
+4. Deal Closed Won: Deals closed won in period (both `createdate` and `closedate` in period)
+
+**Usage:**
+```bash
+python analyze_smb_mql_funnel.py --month 2025-12
+python analyze_smb_mql_funnel.py --months 2025-11 2025-12
+python analyze_smb_mql_funnel.py --start-date 2025-12-01 --end-date 2026-01-01
+```
+
+---
+
+#### `analyze_accountant_referral_funnel.py` ⭐ **NEW**
+**Purpose:** Validates the referral funnel for deals referred by accountants using dual-criteria detection.
+
+**Key Features:**
+- **Dual-Criteria Detection**: Uses BOTH:
+  1. `lead_source = 'Referencia Externa Contador'` (internal name in HubSpot)
+  2. Deal has accountant association (type 8: "Estudio Contable / Asesor / Consultor Externo del negocio")
+- Tracks Deal Created → Deal Closed Won funnel
+- Identifies accountant referrers from associations
+- Classifies by ICP Operador vs ICP PYME
+- Revenue analysis by ICP classification
+
+**Funnel Logic:**
+- Deals must meet BOTH criteria: `lead_source = 'Referencia Externa Contador'` AND have accountant association (type 8)
+- Period: Deals CREATED in the date range
+- Closed Won: Deals that closed won in period (both `createdate` and `closedate` in period)
+
+**Usage:**
+```bash
+python analyze_accountant_referral_funnel.py --month 2025-12
+python analyze_accountant_referral_funnel.py --months 2025-11 2025-12
+python analyze_accountant_referral_funnel.py --start-date 2025-12-01 --end-date 2026-01-01
+```
+
+---
+
+#### `analyze_customer_referral_funnel.py` ⭐ **NEW**
+**Purpose:** Analyzes the customer referral funnel tracking referrals from existing customers.
+
+**Key Features:**
+- Tracks customer referral sources
+- Analyzes referral conversion rates
+- Supports single month, multiple months, or custom date range
+
+**Usage:**
+```bash
+python analyze_customer_referral_funnel.py --month 2025-12
+python analyze_customer_referral_funnel.py --months 2025-11 2025-12
+```
+
+---
+
+#### `analyze_direct_deals_lead_source.py` ⭐ **NEW**
+**Purpose:** Analyzes deals by lead source to understand direct deal creation patterns.
+
+**Key Features:**
+- Groups deals by lead source
+- Tracks conversion rates by source
+- Supports date range filtering
+
+**Usage:**
+```bash
+python analyze_direct_deals_lead_source.py --start-date 2025-12-01 --end-date 2026-01-01
+```
+
+---
+
+#### `analyze_referral_type8_correlation.py` ⭐ **NEW**
+**Purpose:** Analyzes correlation between referral sources and association type 8 (accountant associations).
+
+**Key Features:**
+- Cross-references referral sources with accountant associations
+- Identifies patterns in referral attribution
+- Supports date range filtering
+
+**Usage:**
+```bash
+python analyze_referral_type8_correlation.py --start-date 2025-12-01 --end-date 2026-01-01
+```
+
+---
+
 ### Lead Qualification
 
 #### `lead_qualification_analysis.py`
@@ -598,6 +842,21 @@ python get_hubspot_owners.py --api-key YOUR_API_KEY
 
 **Data Sources:**
 - Requires pre-fetched CSV files from `outputs/csv_data/hubspot/`
+
+---
+
+#### `analyze_uncontacted_lead_status.py` ⭐ **NEW**
+**Purpose:** Analyzes uncontacted leads and their lead status distribution.
+
+**Key Features:**
+- Identifies leads that haven't been contacted
+- Analyzes lead status breakdown
+- Supports date range filtering
+
+**Usage:**
+```bash
+python analyze_uncontacted_lead_status.py --start-date 2025-12-01 --end-date 2026-01-01
+```
 
 ---
 
@@ -679,6 +938,104 @@ python switch_primary_company.py <deal_id> <new_primary_company_id> [current_pri
 
 ---
 
+### Visualization Scripts ⭐ **NEW**
+
+#### `generate_visualization_report.py` ⭐ **NEW**
+**Purpose:** Generates comprehensive visualization reports from analysis data.
+
+**Key Features:**
+- Creates visualizations from CSV data
+- Supports multiple chart types
+- Generates publication-ready reports
+- Supports date range filtering
+
+**Usage:**
+```bash
+python generate_visualization_report.py --csv input_data.csv
+```
+
+---
+
+#### `visualize_sql_cycle_time.py` ⭐ **NEW**
+**Purpose:** Creates visualizations for SQL cycle time analysis from `complete_sql_conversion_analysis.py` output.
+
+**Key Features:**
+- Visualizes SQL cycle time distributions
+- Creates cycle time range charts
+- Reuses visualization patterns from `generate_visualization_report.py`
+- Supports Argentina formatting (comma decimal separator)
+
+**Usage:**
+```bash
+python visualize_sql_cycle_time.py --csv complete_sql_conversion_analysis_*.csv
+```
+
+---
+
+### Data Quality & Validation Scripts ⭐ **NEW**
+
+#### `find_contacts_without_lead_objects.py` ⭐ **NEW**
+**Purpose:** Finds contacts created in a period that don't have associated Lead objects (workflow failure detection).
+
+**Key Features:**
+- Identifies contacts missing Lead objects
+- Filters by date range
+- Excludes 'Usuario Invitado' contacts
+- Helps detect workflow failures
+
+**Usage:**
+```bash
+python find_contacts_without_lead_objects.py --month 2025-12
+python find_contacts_without_lead_objects.py --start-date 2025-12-01 --end-date 2026-01-01
+```
+
+---
+
+#### `fix_close_date_from_history.py` ⭐ **NEW**
+**Purpose:** Fixes deal close dates using property history when close dates are incorrect.
+
+**Key Features:**
+- Uses property history to find correct close dates
+- Validates and corrects deal close dates
+- Supports date range filtering
+
+**Usage:**
+```bash
+python fix_close_date_from_history.py --start-date 2025-12-01 --end-date 2026-01-01
+```
+
+---
+
+#### `analyze_industria_field_history.py` ⭐ **NEW**
+**Purpose:** Analyzes industry field history to track changes and data quality.
+
+**Key Features:**
+- Tracks industry field changes over time
+- Identifies data quality issues
+- Supports date range filtering
+
+**Usage:**
+```bash
+python analyze_industria_field_history.py --start-date 2025-12-01 --end-date 2026-01-01
+```
+
+---
+
+#### `enrich_company_industry.py` ⭐ **NEW**
+**Purpose:** Enriches company records with industry information.
+
+**Key Features:**
+- Adds industry data to companies
+- Supports batch processing
+- Validates data quality
+
+**Usage:**
+```bash
+python enrich_company_industry.py
+```
+
+---
+
 ## Quick Reference
 
 ### Scripts by Purpose
@@ -686,35 +1043,40 @@ python switch_primary_company.py <deal_id> <new_primary_company_id> [current_pri
 | Purpose | Script |
 |---------|--------|
 | **MTD Scoring** | `mtd_scoring_full_pagination.py` |
-| **SQL/PQL Analysis** | `sql_pql_conversion_analysis.py`, `analyze_sql_pql_from_mcp.py` |
-| **Cycle Time** | `high_score_sales_handling_analysis.py` (includes time to contact) |
+| **SQL/PQL Analysis** | `sql_pql_conversion_analysis.py`, `analyze_sql_pql_from_mcp.py`, `complete_sql_conversion_analysis.py` |
+| **PQL Analysis** | `pql_sql_deal_relationship_analysis.py` ⭐ PRIMARY |
+| **Cycle Time** | `high_score_sales_handling_analysis.py` (includes time to contact), `visualize_sql_cycle_time.py` |
 | **Monthly PQL** | `monthly_pql_analysis.py`, `deal_focused_pql_analysis.py` |
 | **Conversion Rates** | `hubspot_conversion_analysis.py` |
 | **Period Comparison** | `hubspot_april_may_comparison.py` |
-| **Lead Qualification** | `lead_qualification_analysis.py` |
+| **Lead Qualification** | `lead_qualification_analysis.py`, `analyze_uncontacted_lead_status.py` |
+| **Funnel Analysis** | `analyze_accountant_mql_funnel.py`, `analyze_smb_mql_funnel.py`, `analyze_accountant_referral_funnel.py`, `analyze_customer_referral_funnel.py`, `analyze_direct_deals_lead_source.py`, `analyze_referral_type8_correlation.py` |
 | **Fetch Contacts** | `fetch_unengaged_contacts.py` |
 | **Fetch Deals** | `fetch_hubspot_deals_with_company.py` |
-| **Fetch Owners** | `get_hubspot_owners.py` |
+| **Fetch Owners** | `get_hubspot_owners.py`, `check_owner_status.py`, `compare_owner_status_months.py` |
 | **ICP Operador Billing** | `analyze_icp_operador_billing.py` |
 | **SMB Accountant Involved Funnel** | `analyze_smb_accountant_involved_funnel.py` |
+| **Data Quality** | `find_contacts_without_lead_objects.py`, `fix_close_date_from_history.py`, `analyze_industria_field_history.py` |
+| **Data Enrichment** | `enrich_company_industry.py` |
+| **Visualization** | `generate_visualization_report.py`, `visualize_sql_cycle_time.py` |
 | **Data Management** | `data_management/*.py` |
 
 ### Scripts by Data Source
 
 | Data Source | Scripts |
 |------------|---------|
-| **HubSpot API Direct** | `sql_pql_conversion_analysis.py`, `hubspot_conversion_analysis.py`, `deal_focused_pql_analysis.py`, `monthly_pql_analysis.py`, `fetch_*` scripts |
+| **HubSpot API Direct** | `sql_pql_conversion_analysis.py`, `complete_sql_conversion_analysis.py`, `hubspot_conversion_analysis.py`, `deal_focused_pql_analysis.py`, `monthly_pql_analysis.py`, `pql_sql_deal_relationship_analysis.py`, `analyze_accountant_mql_funnel.py`, `analyze_smb_mql_funnel.py`, `analyze_accountant_referral_funnel.py`, `analyze_customer_referral_funnel.py`, `analyze_direct_deals_lead_source.py`, `analyze_referral_type8_correlation.py`, `analyze_smb_accountant_involved_funnel.py`, `analyze_icp_operador_billing.py`, `fetch_*` scripts, `find_contacts_without_lead_objects.py`, `fix_close_date_from_history.py`, `analyze_industria_field_history.py`, `enrich_company_industry.py` |
 | **MCP Tools** | `mtd_scoring_full_pagination.py`, `analyze_sql_pql_from_mcp.py` |
-| **Pre-fetched CSV** | `lead_qualification_analysis.py`, `hubspot_april_may_comparison.py` |
+| **Pre-fetched CSV** | `lead_qualification_analysis.py`, `hubspot_april_may_comparison.py`, `visualize_sql_cycle_time.py`, `generate_visualization_report.py` |
 
 ### Scripts by Output Format
 
 | Output Format | Scripts |
 |---------------|---------|
-| **Console Only** | `lead_qualification_analysis.py` |
-| **CSV Files** | `mtd_scoring_full_pagination.py`, `sql_pql_conversion_analysis.py`, `fetch_*` scripts |
+| **Console Only** | `lead_qualification_analysis.py`, `check_owner_status.py`, `compare_owner_status_months.py` |
+| **CSV Files** | `mtd_scoring_full_pagination.py`, `sql_pql_conversion_analysis.py`, `complete_sql_conversion_analysis.py`, `pql_sql_deal_relationship_analysis.py`, `analyze_accountant_mql_funnel.py`, `analyze_smb_mql_funnel.py`, `analyze_accountant_referral_funnel.py`, `analyze_customer_referral_funnel.py`, `analyze_direct_deals_lead_source.py`, `analyze_referral_type8_correlation.py`, `analyze_smb_accountant_involved_funnel.py`, `analyze_icp_operador_billing.py`, `fetch_*` scripts, `find_contacts_without_lead_objects.py`, `fix_close_date_from_history.py`, `analyze_industria_field_history.py` |
 | **JSON Files** | `sql_pql_conversion_analysis.py`, `get_hubspot_owners.py` |
-| **Visualizations** | `hubspot_conversion_analysis.py`, `hubspot_april_may_comparison.py` |
+| **Visualizations** | `hubspot_conversion_analysis.py`, `hubspot_april_may_comparison.py`, `generate_visualization_report.py`, `visualize_sql_cycle_time.py`, `analyze_smb_accountant_involved_funnel.py` |
 
 ---
 

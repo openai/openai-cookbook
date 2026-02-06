@@ -274,6 +274,39 @@ CSV file with columns:
 
 ---
 
+## Tags vs Attributes (Intercom guidance)
+
+For **user feedback and product input** (bugs, improvements), Intercom recommends:
+
+- **Conversation data attributes** (not only tags): Predefined values (e.g. type: bug / feature request, priority: high / medium / low). Better for reporting, routing, and consistency. Can be collected from customers and used in Workflows and Inbox Views.
+- **Tags**: Flexible, good for marking specific messages or ad-hoc needs (e.g. "Beta candidate"). Can be inconsistent across teammates (e.g. "billing query" vs "billing issue").
+- **Topics**: Keyword-based, automated; good for trend reporting.
+
+Use a **combination** of topics, attributes, and tags. Prefer **attributes** for structured feedback to product (e.g. "Feedback type" = Bug | Sugerencia de mejora | Otro).
+
+**Tag sampling**: Use `intercom_tags_report.py --output-samples` (with a date range) to write tag -> sample conversation IDs JSON; then validate with MCP `get_conversation` that the tag matches the conversation content before defining an attribute taxonomy.
+
+**Conversation taxonomy (content labelling)**: Use `intercom_conversation_taxonomy.py` to fetch conversations by ID, extract message content, and label with a taxonomy. Two methods: **semantic** (default) = ML zero-shot classification (Hugging Face; requires `pip install transformers torch`); **keyword** = deterministic keyword + tag mapping (no extra deps). Use `--labelling-method semantic` or `--labelling-method keyword`. Input: `--from-samples path/to/intercom_tag_samples_*.json`, `--from-ids-file path/to/intercom_conversation_ids_*.json` (from tags report `--output-ids`), or `--ids id1,id2,...`. Output: summary table, optional CSV/JSON. For the **full 2-day dataset**: run tags report with `--output-ids`, then taxonomy with `--from-ids-file` on that JSON to study taxonomy by reading all conversations in the range.
+
+---
+
+## Follow-up and Resolución tags (Colppy)
+
+These tags are used for **follow-up workflows** and **resolution status**. Inferred from tag names and co-occurrence in the tags report (no internal workflow docs in repo).
+
+| Tag | Likely meaning | Notes |
+|-----|----------------|-------|
+| **Workflow-D5** | Conversations in "Day 5" of a follow-up workflow | Highest volume in report; often appears with W5-P1-No-resuelto on the same conversation |
+| **¿Resolviste tu pregunta?** | "Did you resolve your question?" | Likely an automated or manual follow-up prompt sent to the user |
+| **W5-P0-No-resuelto** | Workflow 5, Priority 0, not resolved | Same workflow family as Workflow-D5; P0 = priority level |
+| **W5-P1-No-resuelto** | Workflow 5, Priority 1, not resolved | Same conversation IDs as Workflow-D5 in sampled data — status tag on the same conv |
+| **W5-P3-No-resuelto** | Workflow 5, Priority 3, not resolved | Same pattern |
+| **W5-Ya-resuelto** | Workflow 5, already resolved | Resolution outcome |
+
+**What’s inside (content):** Conversations with these tags are support threads that entered a **day-5 follow-up** (Workflow-D5). They are then tagged with resolution status (No-resuelto / Ya-resuelto) and priority (P0, P1, P3). The tag "¿Resolviste tu pregunta?" suggests a **closure check** (e.g. a message asking the customer if their issue was resolved). To inspect actual message content, open the conversation in Intercom or use MCP `get_conversation` with IDs from `intercom_tag_samples_*.json`.
+
+---
+
 ## 🚀 Installation & Setup
 
 ### **Prerequisites**

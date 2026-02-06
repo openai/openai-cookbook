@@ -248,6 +248,7 @@ When I paste or upload information in a spreadsheet for you to analyze:
 
 For slides generation:
 - Be sure to **format properly any table**, with the right format so I can present it with a decent look and feel
+- In markdown tables, do **not** use bold (`**text**`) inside table cells—it breaks the pipe delimiters and corrupts the table; use plain text in cells or bold only outside tables
 - You generate **presentation notes** so I can have more context about the content you are proposing
 
 ---
@@ -456,6 +457,7 @@ When working with these tools:
 - **Do NOT create** files in `/tools/analysis/`, `/analysis/`, or similar directories
 - **Only create files** when the user explicitly asks to "save", "export", "create a file", or "write to file"
 - **For data analysis**: Present tables, charts, and insights directly in the chat using markdown formatting
+- When rendering markdown tables in chat, do not use `**` inside table cells (pipes get broken); use plain text in cells
 - **For reports**: Show complete results in the response, not in separate files
 
 ### When File Creation IS Allowed:

@@ -10,19 +10,21 @@ This analysis determines if Sales Qualified Leads (SQLs) were Product Qualified 
 ## Definitions
 
 ### SQL (Sales Qualified Lead)
-- **Definition**: Contact that converted from Lead to Opportunity (entered 'Oportunidad' lifecycle stage) **with validated deal association**
-- **HubSpot Field**: `hs_v2_date_entered_opportunity` (timestamp when contact entered opportunity stage)
-- **NEW REQUIREMENT**: Contact must have a deal associated that was created between `createdate` and SQL date (within the analysis period)
-- **Validation**: SQL = MQL + `hs_v2_date_entered_opportunity` in period + deal created between contact creation and SQL date (within period)
+- **Definition**: Contact that was associated to a deal, which triggered lifecycle stage change to 'Opportunity' (entered 'Oportunidad' lifecycle stage)
+- **HubSpot Field**: `hs_v2_date_entered_opportunity` (timestamp when contact was associated to deal / entered opportunity stage)
+- **KEY INSIGHT**: When a contact (who starts as a "lead") gets associated to a deal, HubSpot automatically changes their lifecycle stage to "Opportunity", which sets the SQL conversion date
+- **SQL Conversion = Deal Association Event**: The association itself is the conversion event, regardless of when the deal was created
+- **Funnel Flow**: Lead → (Association to Deal) → Opportunity (SQL)
+- The timing of deal creation vs association doesn't matter for funnel analysis - what matters is when the contact was associated to the deal
 
 ### SQL Conversion Cohort
-- **Definition**: Contacts **CREATED** in the period that **ALSO converted to SQL** in the same period **with validated deal association**
+- **Definition**: Contacts **CREATED** in the period that **ALSO converted to SQL** in the same period (associated to a deal)
 - **Cohort Requirements**:
   1. `createdate` must be within the specified date range (MQL - excluding 'Usuario Invitado')
-  2. `hs_v2_date_entered_opportunity` must be within the same date range
-  3. **Contact must have a deal associated that was created between `createdate` and SQL date (within the same period)**
-- **Purpose**: Measures conversion rate within the period (e.g., monthly conversion rate) with deal validation
-- **Example**: For any given month, includes contacts created in that month that also became SQL in the same month AND have a validated deal association
+  2. `hs_v2_date_entered_opportunity` must be within the same date range (when contact was associated to deal)
+  3. Contact must be associated to a deal (the association triggers the SQL conversion)
+- **Purpose**: Measures conversion rate within the period (e.g., monthly conversion rate)
+- **Example**: For any given month, includes contacts created in that month that also became SQL in the same month (were associated to a deal)
 
 ### PQL (Product Qualified Lead)
 - **Definition**: Contact that activated during trial (triggered key event)
@@ -80,12 +82,13 @@ python tools/scripts/hubspot/sql_pql_conversion_analysis.py --start-date YYYY-MM
 ## Methodology
 
 Based on HubSpot documentation:
-- **SQL Conversion**: `hs_v2_date_entered_opportunity` field (native HubSpot field) **WITH deal validation**
-- **Deal Validation**: Contact must have a deal associated that was created between `createdate` and SQL date (within the analysis period)
+- **SQL Conversion**: `hs_v2_date_entered_opportunity` field (native HubSpot field) - timestamp when contact was associated to deal
+- **SQL Conversion Event**: When a contact (who starts as a "lead") is associated to a deal, HubSpot automatically changes their lifecycle stage to "Opportunity", which sets the SQL conversion date
+- **Key Insight**: The association event IS the SQL conversion, regardless of when the deal was created
 - **PQL Identification**: `activo` and `fecha_activo` fields (custom Colppy fields)
 - **Timing Comparison**: Direct date comparison in UTC timezone
-- **Cohort Definition**: Contacts CREATED in period (MQL - excluding 'Usuario Invitado') that ALSO converted to SQL in the same period WITH validated deal association
-- **Conversion Rate**: (Validated SQL conversions / Total contacts created) × 100
+- **Cohort Definition**: Contacts CREATED in period (MQL - excluding 'Usuario Invitado') that ALSO converted to SQL in the same period (were associated to a deal)
+- **Conversion Rate**: (SQL conversions / Total contacts created) × 100
 
 ## Data Quality Checks
 

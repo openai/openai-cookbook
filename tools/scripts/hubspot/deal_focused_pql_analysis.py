@@ -28,6 +28,10 @@ from datetime import datetime, timedelta
 import os
 import argparse
 import time
+from dotenv import load_dotenv
+
+# Load environment variables
+load_dotenv()
 
 # HubSpot API Configuration
 HUBSPOT_API_KEY = os.getenv('HUBSPOT_API_KEY')

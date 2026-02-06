@@ -4,11 +4,13 @@
 
 This document provides a complete mapping of all funnels in Colppy's customer journey, organized by multiple dimensions.
 
-**Last Updated**: 2025-12-24  
+**Last Updated**: 2025-01-09  
+**Last Reviewed**: 2025-01-09  
 **Status**: Living document - update as new funnels are identified  
 **Recent Updates**: 
 - SQL definition updated to include deal validation requirement (contact must have deal created between `createdate` and `hs_v2_date_entered_opportunity` within analysis period)
 - Added MQL Funnel Analysis Scripts documentation with strict funnel logic (MQL → Deal Created → Won)
+- MQL definition clarification added (simplified vs detailed requirements)
 
 ---
 
@@ -22,6 +24,71 @@ This document is structured to support multiple ways of analyzing funnels:
 4. **By Channel**
 5. **By Outcome**
 6. **By Time Period**
+
+---
+
+## 📋 HUBSPOT FIELD NAME QUICK REFERENCE
+
+**Complete Field Mapping**: See `README_HUBSPOT_CONFIGURATION.md` for comprehensive field mappings with verification status.
+
+This quick reference lists the most commonly used fields in funnel analysis. All fields are documented with both internal API name (what you use in code/API) and UI display name (what you see in HubSpot interface).
+
+### Core Contact Fields
+
+| Internal Name | UI Display Name | Purpose |
+|--------------|----------------|---------|
+| `createdate` | "Create Date" | Contact creation timestamp |
+| `lifecyclestage` | "Lifecycle Stage" | Current lifecycle stage (lead, opportunity, customer) |
+| `email` | "Email" | Primary email address |
+
+### Lifecycle Stage Date Fields
+
+| Internal Name | UI Display Name | Purpose |
+|--------------|----------------|---------|
+| `hs_v2_date_entered_lead` | "Date entered \"Lead (Pipeline de etapa del ciclo de vida)\"" | MQL qualification date |
+| `hs_v2_date_entered_opportunity` | "Date entered \"Oportunidad (Pipeline de etapa del ciclo de vida)\"" | SQL qualification date |
+| `hs_v2_date_entered_customer` | "Date entered \"Cliente (Pipeline de etapa del ciclo de vida)\"" | Customer conversion date |
+
+### PQL (Product Qualified Lead) Fields
+
+| Internal Name | UI Display Name | Purpose |
+|--------------|----------------|---------|
+| `activo` | "Hizo evento clave en trial" | PQL key event flag ('true') |
+| `fecha_activo` | "Fecha de Hizo Evento Clave en Trial" | PQL key event date (date-only, no time) |
+
+### Lead Object Fields
+
+| Internal Name | UI Display Name | Purpose |
+|--------------|----------------|---------|
+| `hs_created_by_user_id` | "Created by User" | User who created Lead object (check property history for `sourceType`) |
+
+### UTM Attribution Fields
+
+| Internal Name | UI Display Name | Purpose |
+|--------------|----------------|---------|
+| `lead_source` | "Lead Source" | Current source classification (can be changed) |
+| `initial_utm_source` | "Initial UTM Source" | Original marketing attribution (immutable, first touch) |
+| `utm_source` | "UTM Source" | Last touch traffic source |
+| `utm_campaign` | "UTM Campaign" | Last touch campaign name |
+| `utm_medium` | "UTM Medium" | Last touch marketing medium |
+
+### Deal Fields
+
+| Internal Name | UI Display Name | Purpose |
+|--------------|----------------|---------|
+| `dealstage` | "Deal Stage" | Current deal stage |
+| `amount` | "Amount" | Deal value |
+| `createdate` | "Create Date" | Deal creation date |
+
+**📋 Field Name Documentation Pattern**:
+Throughout this document, we follow a consistent pattern for field references:
+- **First use per major section** (## or ###): Include UI name in parentheses
+  - Example: `fecha_activo` (UI: "Fecha de Hizo Evento Clave en Trial")
+- **Subsequent uses in same section**: Use internal name only
+  - Example: `fecha_activo`
+- **Quick Reference**: Use this section for quick lookup, or refer to `README_HUBSPOT_CONFIGURATION.md` for complete mappings
+
+**Purpose**: This pattern provides context on first mention while keeping subsequent references clean and code-ready.
 
 ---
 
@@ -45,20 +112,42 @@ This document is structured to support multiple ways of analyzing funnels:
 
 **Lead Object Creation Methods:**
 1. **Workflow-Created (Automatic)**: HubSpot workflow automatically creates Lead object and associates it with contact
-   - Source: `AUTOMATION_PLATFORM`
-   - For Colppy integration contacts
+   - **Contact Creation**: Contact is created by API from Colppy platform when user signs up for 7-day free trial
+   - **Workflow Trigger**: Main Lead creation workflow [Workflow ID: 1736621666](https://app.hubspot.com/workflows/19877595/platform/flow/1736621666/edit) is triggered when contact is created
+   - **Workflow Function**: This workflow creates the Lead object and associates it with the contact
+   - **Cascading Workflows**: The main workflow calls other workflows to populate different fields and information (field mappings, lifecycle stage updates, etc.)
+   - **Source**: `AUTOMATION_PLATFORM` (in Lead object property history API response - `sourceType` value)
+   - **What this means**: The Lead object was created by a HubSpot workflow, not manually by a user
+   - **How to verify**: In API response, check `sourceType: "AUTOMATION_PLATFORM"` in property history for `hs_created_by_user_id`
+   - **In HubSpot UI**: Will show "Automation Platform", "Workflow", or the workflow name (NOT the literal text "AUTOMATION_PLATFORM")
+   - **For**: Colppy integration contacts (trial signups from Colppy platform)
 2. **Manual Creation**: Salesperson manually creates Lead object and associates it with contact
-   - Source: `CRM_UI` (in `hs_created_by_user_id` property history)
+   - Source: `CRM_UI` (in `hs_created_by_user_id` (UI: "Created by User") property history)
    - For Intercom integration contacts
 
 **How to Determine Lead Creation Type:**
-1. Get Lead object: `hubspot-batch-read-objects` (leads)
-2. Get property history: `propertiesWithHistory=['hs_created_by_user_id']`
+1. Get Lead object: Use `hubspot-batch-read-objects` (leads) to retrieve Lead objects
+2. Get property history: Include `propertiesWithHistory=['hs_created_by_user_id']` in the API call
+   - **Field**: `hs_created_by_user_id` (UI: "Created by User")
+   - **Location**: In the property history response for the Lead object
 3. Check `sourceType` in property history:
-   - `CRM_UI` = Manual creation by salesperson
-   - `AUTOMATION_PLATFORM` = Workflow creation
-   - `INTEGRATION` = Integration creation
-4. Compare timing: Lead `createdate` vs Contact `createdate`
+   - **Field**: `sourceType` (internal API property in property history response)
+   - **Location**: Found in the property history API response for `hs_created_by_user_id` when you request `propertiesWithHistory=['hs_created_by_user_id']`
+   - **In HubSpot UI**: When viewing property history in HubSpot UI, you won't see the literal `sourceType` value, but you'll see descriptive labels (user name, workflow name, or integration name)
+   - **API Values** (what you'll see in API response):
+     - `CRM_UI` = Manual creation by salesperson
+       - **API shows**: `sourceType: "CRM_UI"`
+       - **HubSpot UI shows**: User's name who made the change (e.g., "John Doe")
+       - **Meaning**: Someone manually created/modified the Lead object in HubSpot UI
+     - `AUTOMATION_PLATFORM` = Workflow creation (automatic)
+       - **API shows**: `sourceType: "AUTOMATION_PLATFORM"`
+       - **HubSpot UI shows**: "Automation Platform", "Workflow", or the actual workflow name (e.g., "Lead Creation Workflow")
+       - **Meaning**: A HubSpot workflow automatically created/modified the Lead object
+     - `INTEGRATION` = Integration creation
+       - **API shows**: `sourceType: "INTEGRATION"`
+       - **HubSpot UI shows**: Integration name (e.g., "Intercom Integration", "Colppy API")
+       - **Meaning**: An integration (via API) created/modified the Lead object
+4. Compare timing: Lead `createdate` (UI: "Create Date") vs Contact `createdate` (UI: "Create Date")
    - Manual: Minutes/hours difference
    - Workflow: Seconds difference
 
@@ -101,9 +190,17 @@ This section explains how contacts move through HubSpot's lifecycle stages and h
 
 **Lifecycle Stages**:
 ```
-Contact Created (createdate)
+User Signs Up for Trial in Colppy Platform
     ↓
-Lead (lifecyclestage = 'lead')
+Colppy API Creates Contact in HubSpot (createdate)
+    ↓
+Main Lead Creation Workflow Triggers [Workflow ID: 1736621666]
+    ↓
+Workflow Creates Lead Object and Associates with Contact
+    ↓
+Cascading Workflows Populate Fields (lifecycle stage, UTM attribution, etc.)
+    ↓
+Lead (lifecyclestage = 'lead', Lead object associated)
     ↓
 ├─► MQL (hs_v2_date_entered_lead) - Marketing Qualified Lead
     │   (Requires: Lead object + Trial signup + Email validated "Validó email" event)
@@ -126,8 +223,10 @@ Lead (lifecyclestage = 'lead')
 
 **Cycle Time Calculations**:
 - Contact → Lead: Lead objects are created and associated with contacts
+  - **Contact Creation**: Contact is created by API from Colppy platform when user signs up for 7-day free trial
+  - **Lead Object Creation**: Main Lead creation workflow [Workflow ID: 1736621666](https://app.hubspot.com/workflows/19877595/platform/flow/1736621666/edit) triggers when contact is created → Workflow creates Lead object and associates it with contact → Workflow calls other workflows to populate fields
   - **Important**: In Colppy, a "Lead" requires an associated Lead object, NOT just `lifecyclestage = 'lead'`
-  - **Lead Object Creation**: Lead objects can be created by workflow (automatic) or manually by salesperson
+  - **Lead Object Creation Methods**: Lead objects can be created by workflow (automatic for Colppy integration contacts) or manually by salesperson (for Intercom contacts)
   - **Lifecycle Stage**: `lifecyclestage = 'lead'` is set by integration or workflow, but this alone does NOT make a contact a Lead in Colppy's system
     - **Invitation Exception**: Contacts with `lead_source = 'Usuario Invitado'` do NOT get Lead objects created
     - **Invitation Contacts - Complete Definition**:
@@ -142,29 +241,40 @@ Lead (lifecyclestage = 'lead')
       - **Result**: Contact created, but no Lead object associated (not a Lead in Colppy's system)
   - **Lead Object Creation Methods** (for non-invitation contacts):
     1. **Workflow-Created (Automatic)**: HubSpot workflow automatically creates Lead object and associates it with contact
-       - Source: `AUTOMATION_PLATFORM` (in Lead object property history)
-       - For Colppy integration contacts
-       - User signed up for trial, received validation email, entered code → Has "Validó email" event in Mixpanel → Can become MQL
+       - **Contact Creation**: Contact is created by API from Colppy platform when user signs up for 7-day free trial
+       - **Workflow Trigger**: Main Lead creation workflow [Workflow ID: 1736621666](https://app.hubspot.com/workflows/19877595/platform/flow/1736621666/edit) is triggered when contact is created via API
+       - **Workflow Function**: This workflow creates the Lead object and associates it with the contact
+       - **Cascading Workflows**: The main workflow calls other workflows to populate different fields and information (field mappings, lifecycle stage updates, UTM attribution, etc.)
+       - **Source**: `AUTOMATION_PLATFORM` (in Lead object property history API response - `sourceType` value)
+       - **What this means**: The Lead object was created by a HubSpot workflow, not manually by a user
+       - **In HubSpot UI**: Will show "Automation Platform", "Workflow", or the workflow name (NOT the literal text "AUTOMATION_PLATFORM")
+       - **For**: Colppy integration contacts (trial signups from Colppy platform)
+       - **Sequence**: User signs up for trial → Colppy API creates contact in HubSpot → Workflow creates Lead object → User validates email → Has "Validó email" event in Mixpanel → Can become MQL
     2. **Manual Creation**: Salesperson manually creates Lead object and associates it with contact
-       - Source: `CRM_UI` (in Lead object `hs_created_by_user_id` property history)
+       - Source: `CRM_UI` (in Lead object `hs_created_by_user_id` (UI: "Created by User") property history)
        - For Intercom integration contacts
        - Created by sales team → May NOT have "Validó email" event (never signed up or signed up but didn't validate) → Cannot become MQL until user validates email
   - **Critical Distinction**: 
-    - **Workflow-Created Leads**: Lead object created automatically by workflow → User signed up for trial → Has "Validó email" event in Mixpanel → Can become MQL
+    - **Workflow-Created Leads**: 
+      - **Sequence**: User signs up for trial in Colppy platform → Colppy API creates contact in HubSpot → Main Lead creation workflow [Workflow ID: 1736621666](https://app.hubspot.com/workflows/19877595/platform/flow/1736621666/edit) triggers → Workflow creates Lead object and calls other workflows to populate fields → User validates email → Has "Validó email" event in Mixpanel → Can become MQL
     - **Manual-Created Leads**: Lead object created manually by salesperson → May NOT have "Validó email" event → Cannot become MQL until user validates email
     - **Invitation Contacts**: Created from existing customer invitations → NO Lead object created → Cannot become MQL (not meant for sales contact)
     - **Lifecycle Stage Note**: `lifecyclestage = 'lead'` is set by integration or workflow, but this is separate from Lead object creation. A contact with `lifecyclestage = 'lead'` but no associated Lead object is NOT a Lead in Colppy's system.
-- Contact → MQL: `hs_v2_date_entered_lead` (UI: "Date entered \"Lead (Pipeline de etapa del ciclo de vida)\"") - `createdate` (UI: "Create Date")
+- Contact → MQL: `hs_v2_date_entered_lead` - `createdate`
   - **What is MQL?**: Marketing Qualified Lead (HubSpot terminology) - a lead that has signed up for trial AND validated their email in Colppy. **Note**: Qualification is automatic via HubSpot workflows - no marketing person is involved.
-  - **SIMPLIFIED MQL DEFINITION FOR ANALYSIS**: 
-    - **All contacts created (excluding 'Usuario Invitado') are considered MQLs**
-    - When a user signs up for the 7-day free trial and validates their email, a contact is created in HubSpot
-    - Therefore: **Contact created (excluding 'Usuario Invitado') = MQL**
-    - **EXCLUSION**: Contacts with `lead_source = 'Usuario Invitado'` are NOT MQLs
-      → These are team member invitations from existing customers
-      → They are NOT new contacts starting from trial period
-      → They should be excluded from all analysis
-  - **DETAILED MQL Requirements** (for technical verification, ALL must be met):
+  - **⚠️ IMPORTANT: Two MQL Definitions - Use the Right One**
+    - **SIMPLIFIED MQL DEFINITION FOR ANALYSIS** (used in scripts and funnel analysis):
+      - **All contacts created (excluding 'Usuario Invitado') are considered MQLs**
+      - When a user signs up for the 7-day free trial and validates their email, a contact is created in HubSpot
+      - Therefore: **Contact created (excluding 'Usuario Invitado') = MQL**
+      - **EXCLUSION**: Contacts with `lead_source = 'Usuario Invitado'` are NOT MQLs
+        → These are team member invitations from existing customers
+        → They are NOT new contacts starting from trial period
+        → They should be excluded from all analysis
+      - **When to Use**: For funnel analysis, reporting, and automated scripts
+      - **Evidence**: This definition is used in all analysis scripts (`pql_sql_deal_relationship_analysis.py`, `complete_sql_conversion_analysis.py`, etc.)
+    
+    - **DETAILED MQL Requirements** (for technical verification and data quality checks, ALL must be met):
     1. **Contact must have Lead object**: Contact must have an associated Lead object (created by workflow, not manual)
     2. **User signed up for trial**: User must have signed up for the 7-day free trial in Colppy
     3. **Email validated in Colppy**: Contact must have "Validó email" event in Mixpanel
@@ -176,7 +286,7 @@ Lead (lifecyclestage = 'lead')
       - This event occurs when user enters the validation code from the email (one of the FIRST events after signup)
       - If event exists → User signed up, received validation email with code, and entered the code to validate their email → True MQL candidate
       - If event does NOT exist → User signed up on the signup page, platform sent them an email with a code, but the user never entered the code to validate the email → Sales-created lead or incomplete signup
-    4. **MQL qualification date set**: `hs_v2_date_entered_lead` (UI: "Date entered \"Lead (Pipeline de etapa del ciclo de vida)\"") must be populated
+    4. **MQL qualification date set**: `hs_v2_date_entered_lead` must be populated
   - **MQL Characteristics**:
     - **UTM Sources**: MQLs have UTM parameters (`utm_source`, `utm_campaign`, `utm_medium`) set by the visitor at original access
     - **Lead Source**: Lead source doesn't matter for MQL qualification - could be anywhere (organic, paid, referral, etc.)
@@ -186,7 +296,7 @@ Lead (lifecyclestage = 'lead')
     - User validates their email ("Validó email" event)
     - Lead source doesn't matter - could be anywhere
     - UTM sources don't matter for MQL qualification - if there's a new signup, marketing had something to do with it
-  - **When is it set?**: `hs_v2_date_entered_lead` (UI: "Date entered \"Lead (Pipeline de etapa del ciclo de vida)\"") is set automatically by HubSpot workflows when a lead meets qualification criteria (via HubSpot lead scoring workflow, triggered automatically after email validation). **Note**: This is an automatic system process - no marketing person is involved in qualification.
+  - **When is it set?**: `hs_v2_date_entered_lead` is set automatically by HubSpot workflows when a lead meets qualification criteria (via HubSpot lead scoring workflow, triggered automatically after email validation). **Note**: This is an automatic system process - no marketing person is involved in qualification.
   - **Pattern**: MQL qualification happens very quickly (minutes, not days), suggesting automatic qualification via HubSpot lead scoring workflow after email validation
   - **Never (null)**: Many contacts never become MQLs (go directly to SQL, don't validate email, or remain as leads)
   - **Important Note**: Not all contacts become MQLs. Many skip MQL stage and go directly from Lead → SQL, or remain as leads without qualification. For contacts that DO become MQLs, they must have signed up for trial AND validated their email in Colppy ("Validó email" event in Mixpanel).
@@ -194,10 +304,10 @@ Lead (lifecyclestage = 'lead')
   - **Contacts without Lead objects**: If a contact doesn't have a Lead object, it's a user invitation (not an MQL). These are considered new contacts from the product but have no value, only the record.
   - **No UTM Sources**: If there are no UTM parameters, the contact was created manually by a HubSpot salesperson via UI (not an MQL until they sign up and validate email).
   - **Incomplete Signups**: Users who sign up on the signup page but never enter the validation code from their email will NOT have the "Validó email" event, and therefore cannot be MQLs even if they have Lead status and MQL qualification in HubSpot.
-- Contact → SQL: `hs_v2_date_entered_opportunity` (UI: "Date entered \"Oportunidad (Pipeline de etapa del ciclo de vida)\"") - `createdate` (UI: "Create Date")
-- Contact → PQL: `fecha_activo` (UI: "Fecha de Hizo Evento Clave en Trial") - `createdate` (UI: "Create Date")
+- Contact → SQL: `hs_v2_date_entered_opportunity` - `createdate`
+- Contact → PQL: `fecha_activo` - `createdate`
   - **Note**: `fecha_activo` is date-only (no time). If both dates are on the same calendar day, cycle time = 0.0 days.
-- Contact → Customer: `hs_v2_date_entered_customer` (UI: "Date entered \"Cliente (Pipeline de etapa del ciclo de vida)\"") - `createdate` (UI: "Create Date")
+- Contact → Customer: `hs_v2_date_entered_customer` - `createdate`
 
 ---
 
@@ -238,11 +348,13 @@ PQL (activo = 'true', fecha_activo)
 - **PQL → Customer Rate**: Customers from PQL cohort / total PQLs
 
 **HubSpot Fields**:
-- `createdate` - Trial signup date
+- `createdate` (UI: "Create Date") - Trial signup date
 - `activo` (UI: "Hizo evento clave en trial") - PQL key event flag
 - `fecha_activo` (UI: "Fecha de Hizo Evento Clave en Trial") - PQL key event date
 - `hs_v2_date_entered_opportunity` (UI: "Date entered \"Oportunidad (Pipeline de etapa del ciclo de vida)\"") - SQL qualification date
 - `hs_v2_date_entered_customer` (UI: "Date entered \"Cliente (Pipeline de etapa del ciclo de vida)\"") - Customer conversion date
+
+**Note**: UI names shown above for reference. Subsequent field references in this section use internal names only.
 
 **Mixpanel Events**:
 - Invoice Created
@@ -260,12 +372,12 @@ PQL (activo = 'true', fecha_activo)
 - `initial_utm_medium` - First touch marketing medium (original marketing attribution, immutable)
 
 **Cycle Times**:
-- Trial → PQL: `fecha_activo` (UI: "Fecha de Hizo Evento Clave en Trial") - `createdate` (UI: "Create Date")
+- Trial → PQL: `fecha_activo` - `createdate`
   - **Note**: `fecha_activo` is date-only (no time). If both dates are on the same calendar day, cycle time = 0.0 days.
-- PQL → SQL: `hs_v2_date_entered_opportunity` (UI: "Date entered \"Oportunidad (Pipeline de etapa del ciclo de vida)\"") - `fecha_activo` (UI: "Fecha de Hizo Evento Clave en Trial")
-  - **Critical**: Chronological order matters - only calculate when PQL comes BEFORE SQL (fecha_activo < hs_v2_date_entered_opportunity)
+- PQL → SQL: `hs_v2_date_entered_opportunity` - `fecha_activo`
+  - **Critical**: Chronological order matters - only calculate when PQL comes BEFORE SQL (`fecha_activo` < `hs_v2_date_entered_opportunity`)
   - **Purpose**: Identify which comes first to understand the sequence of events (product-led vs sales-led)
-- PQL → Customer: `hs_v2_date_entered_customer` (UI: "Date entered \"Cliente (Pipeline de etapa del ciclo de vida)\"") - `fecha_activo` (UI: "Fecha de Hizo Evento Clave en Trial")
+- PQL → Customer: `hs_v2_date_entered_customer` - `fecha_activo`
 
 **Patterns/Characteristics**:
 - Product-led growth (PLG) model
@@ -321,12 +433,14 @@ Customer (lifecyclestage = 'customer')
 - **Win Rate**: Won deals / total deals
 
 **HubSpot Fields**:
-- `createdate` - Trial signup date
-- `lifecyclestage` - Current lifecycle stage
+- `createdate` (UI: "Create Date") - Trial signup date
+- `lifecyclestage` (UI: "Lifecycle Stage") - Current lifecycle stage
 - `hs_v2_date_entered_lead` (UI: "Date entered \"Lead (Pipeline de etapa del ciclo de vida)\"") - MQL qualification date
 - `hs_v2_date_entered_opportunity` (UI: "Date entered \"Oportunidad (Pipeline de etapa del ciclo de vida)\"") - SQL qualification date
-- `num_associated_deals` - Number of associated deals
+- `num_associated_deals` (UI: "Number of Associated Deals") - Number of associated deals
 - `hs_v2_date_entered_customer` (UI: "Date entered \"Cliente (Pipeline de etapa del ciclo de vida)\"") - Customer conversion date
+
+**Note**: UI names shown above for reference. Subsequent field references in this section use internal names only.
 
 **Mixpanel Events**:
 - "Validó email" - Email validation event (required for MQL)
@@ -342,9 +456,9 @@ Customer (lifecyclestage = 'customer')
 
 **Cycle Times**:
 - Trial Signup → Lead: Lead object creation
-- Trial Signup → MQL: `hs_v2_date_entered_lead` (UI: "Date entered \"Lead (Pipeline de etapa del ciclo de vida)\"") - `createdate` (UI: "Create Date")
-- Trial Signup → SQL: `hs_v2_date_entered_opportunity` (UI: "Date entered \"Oportunidad (Pipeline de etapa del ciclo de vida)\"") - `createdate` (UI: "Create Date")
-- Trial Signup → Customer: `hs_v2_date_entered_customer` (UI: "Date entered \"Cliente (Pipeline de etapa del ciclo de vida)\"") - `createdate` (UI: "Create Date")
+- Trial Signup → MQL: `hs_v2_date_entered_lead` - `createdate`
+- Trial Signup → SQL: `hs_v2_date_entered_opportunity` - `createdate`
+- Trial Signup → Customer: `hs_v2_date_entered_customer` - `createdate`
 
 **Patterns/Characteristics**:
 - Marketing-driven acquisition
@@ -375,7 +489,8 @@ Customer (lifecyclestage = 'customer')
 - **Lifecycle Stage**: Integration sets `lifecyclestage = 'lead'` directly (source: `INTEGRATION`)
 - **Lead Source Attribution**: `lead_source` is set to "Orgánico" (Label: "Orgánico / Directo") by HubSpot workflow
   - Attribution is Intercom, but we don't know how they got to Intercom at the time of contact creation
-  - Set by AUTOMATION_PLATFORM (HubSpot workflow) automatically when contact is created
+  - Set by HubSpot workflow automatically when contact is created (sourceType: `AUTOMATION_PLATFORM` in property history API response)
+  - **Note**: `AUTOMATION_PLATFORM` is an API value you'll see in property history responses, not in HubSpot UI
   - SourceId format: `enrollmentId:XXXXX;actionExecutionIndex:2` (HubSpot workflow enrollment)
   - "Orgánico" includes both organic and direct traffic
   - NOT "Referencia Intercom" (that's only for form submissions, not integration-created contacts)
@@ -383,7 +498,7 @@ Customer (lifecyclestage = 'customer')
 - **Lead Object Creation**: Lead object is created MANUALLY by salesperson (not automatic)
   - At this point, you only have a contact (not a Lead yet)
   - Salesperson manually creates Lead object and associates it with contact
-  - Source: `CRM_UI` (in Lead object `hs_created_by_user_id` property history)
+  - Source: `CRM_UI` (in Lead object `hs_created_by_user_id` (UI: "Created by User") property history)
 - **Initial State - NOT an MQL**: Initially, this is NOT an MQL because there's no event in the product - it's just a question/lead from Intercom
 - **No Product Activity Initially**: No product events in Mixpanel until user later signs up for trial (if directed by sales)
 - **Bidirectional Conversation Flow**: Conversations happen in both Intercom and HubSpot, with all interactions integrated into HubSpot
@@ -442,18 +557,20 @@ Sales Engagement in HubSpot:
 - **SQL + PQL Overlap Rate**: Contacts with both SQL and PQL / Intercom contacts
 
 **HubSpot Fields**:
-- `lead_source = 'Orgánico'` (Label: "Orgánico / Directo") - Source tracking
+- `lead_source` (UI: "Lead Source") - Source tracking (set to 'Orgánico' / Label: "Orgánico / Directo" by workflow)
   - Attribution is Intercom, but we don't know how they got to Intercom
-  - Set by AUTOMATION_PLATFORM (workflow) to indicate unknown attribution
+  - Set by HubSpot workflow automatically when contact is created (sourceType: `AUTOMATION_PLATFORM` in property history API response)
   - Includes both organic and direct traffic
   - NOT "Referencia Intercom" (that's only for form submissions)
-- `createdate` - Contact creation date in HubSpot
-- `lifecyclestage = 'lead'` - Lead lifecycle stage (set by Intercom integration)
-- `hs_first_outreach_date` - First sales outreach
-- `hs_sa_first_engagement_date` - First engagement with current owner
-- `hs_v2_date_entered_lead` - MQL qualification date (set if user later signs up for trial and validates email)
-- `hs_v2_date_entered_opportunity` - SQL qualification date
-- `last_lead_status_date` - Last lead status change
+- `createdate` (UI: "Create Date") - Contact creation date in HubSpot
+- `lifecyclestage` (UI: "Lifecycle Stage") - Lead lifecycle stage (set to 'lead' by Intercom integration)
+- `hs_first_outreach_date` (UI: "Date of first outreach") - First sales outreach
+- `hs_sa_first_engagement_date` (UI: "Date of first engagement") - First engagement with current owner
+- `hs_v2_date_entered_lead` (UI: "Date entered \"Lead (Pipeline de etapa del ciclo de vida)\"") - MQL qualification date (set if user later signs up for trial and validates email)
+- `hs_v2_date_entered_opportunity` (UI: "Date entered \"Oportunidad (Pipeline de etapa del ciclo de vida)\"") - SQL qualification date
+- `last_lead_status_date` (UI: "Last lead status date") - Last lead status change
+
+**Note**: UI names shown above for reference. Subsequent field references in this section use internal names only.
 
 **Mixpanel Events**:
 - **"Qualification"** - Only event fired when HubSpot qualification happens (SQL)
@@ -480,14 +597,14 @@ Sales Engagement in HubSpot:
 
 **Cycle Times**:
 - Contact → Lead: Lead object creation (manual by salesperson)
-- Contact → SQL: `hs_v2_date_entered_opportunity` (UI: "Date entered \"Oportunidad (Pipeline de etapa del ciclo de vida)\"") - `createdate` (UI: "Create Date")
-- Contact → MQL (if trial signup): `hs_v2_date_entered_lead` (UI: "Date entered \"Lead (Pipeline de etapa del ciclo de vida)\"") - `createdate` (UI: "Create Date")
+- Contact → SQL: `hs_v2_date_entered_opportunity` - `createdate`
+- Contact → MQL (if trial signup): `hs_v2_date_entered_lead` - `createdate`
   - **Note**: Only if user signs up for trial and validates email
-- Contact → PQL (if critical events): `fecha_activo` (UI: "Fecha de Hizo Evento Clave en Trial") - `createdate` (UI: "Create Date")
+- Contact → PQL (if critical events): `fecha_activo` - `createdate`
   - **Note**: `fecha_activo` is date-only (no time). If both dates are on the same calendar day, cycle time = 0.0 days.
   - **Note**: Only if user performs critical events after trial signup
   - **Critical**: Chronological order matters - identify which comes first (PQL or SQL)
-- Contact → Customer: `hs_v2_date_entered_customer` (UI: "Date entered \"Cliente (Pipeline de etapa del ciclo de vida)\"") - `createdate` (UI: "Create Date")
+- Contact → Customer: `hs_v2_date_entered_customer` - `createdate`
 
 **Patterns/Characteristics**:
 1. **Business Email Domains**: Have business email domains (corporate/organizational email addresses)
@@ -495,7 +612,8 @@ Sales Engagement in HubSpot:
 3. **Contact Creation**: Contact created by Intercom integration when user starts chatting
 4. **Lead Source Attribution**: `lead_source` is set to "Orgánico" (not "Referencia Intercom") by HubSpot workflow
    - Attribution is Intercom, but we don't know how they got to Intercom at the time of contact creation
-   - Set by AUTOMATION_PLATFORM (HubSpot workflow) automatically when contact is created
+   - Set by HubSpot workflow automatically when contact is created (sourceType: `AUTOMATION_PLATFORM` in property history API response)
+   - **Note**: `AUTOMATION_PLATFORM` is an API value you'll see in property history responses, not in HubSpot UI
    - SourceId format: `enrollmentId:XXXXX;actionExecutionIndex:2` (HubSpot workflow enrollment)
    - "Orgánico" (Label: "Orgánico / Directo") includes both organic and direct traffic
    - "Referencia Intercom" is only used when Intercom form is submitted (not for integration-created contacts)
@@ -504,7 +622,7 @@ Sales Engagement in HubSpot:
 5. **Manual Lead Object Creation**: Lead objects are created manually by salesperson (not automatic)
    - At this point, you only have a contact (not a Lead yet)
    - Salesperson manually creates Lead object and associates it with contact
-   - Source: `CRM_UI` (in Lead object `hs_created_by_user_id` property history)
+   - Source: `CRM_UI` (in Lead object `hs_created_by_user_id` (UI: "Created by User") property history)
 6. **Lifecycle Stage**: `lifecyclestage = 'lead'` is set by Intercom integration directly (source: `INTEGRATION`)
    - **Important**: Setting `lifecyclestage = 'lead'` does NOT automatically create a Lead object
    - Lead object must be created separately (manually by salesperson)
@@ -588,17 +706,19 @@ Customer (lifecyclestage = 'customer')
 - **Average Deal Size**: Average deal amount from accountant channel
 
 **HubSpot Fields**:
-- `lead_source` - Current source classification (can be changed by sales/forms/workflows)
+- `lead_source` (UI: "Lead Source") - Current source classification (can be changed by sales/forms/workflows)
   - **Note**: `lead_source` may not reflect original source if it has been reclassified
   - **Example**: MQL originally from Google PPC may have `lead_source` changed to "Referencia Externa Pyme"
-- `initial_utm_source` - Original marketing attribution source (immutable, first touch)
-- `initial_utm_medium` - Original marketing attribution medium (immutable, first touch)
-- `initial_utm_campaign` - Original marketing attribution campaign (immutable, first touch)
+- `initial_utm_source` (UI: "Initial UTM Source") - Original marketing attribution source (immutable, first touch)
+- `initial_utm_medium` (UI: "Initial UTM Medium") - Original marketing attribution medium (immutable, first touch)
+- `initial_utm_campaign` (UI: "Initial UTM Campaign") - Original marketing attribution campaign (immutable, first touch)
   - **Use**: Identify original MQLs even when `lead_source` has been changed
-- `hubspot_owner_id` - Owner from Accountant Channel team
+- `hubspot_owner_id` (UI: "HubSpot Owner") - Owner from Accountant Channel team
 - `hs_v2_date_entered_opportunity` (UI: "Date entered \"Oportunidad (Pipeline de etapa del ciclo de vida)\"") - SQL qualification date
 - Deal association type `8` - Estudio Contable relationship
 - `hs_v2_date_entered_customer` (UI: "Date entered \"Cliente (Pipeline de etapa del ciclo de vida)\"") - Customer conversion date
+
+**Note**: UI names shown above for reference. Subsequent field references in this section use internal names only.
 
 **Mixpanel Events**:
 - Product events after trial signup (if user signs up)
@@ -612,8 +732,8 @@ Customer (lifecyclestage = 'customer')
 
 **Cycle Times**:
 - Referral → Lead: Lead object creation
-- Referral → SQL: `hs_v2_date_entered_opportunity` (UI: "Date entered \"Oportunidad (Pipeline de etapa del ciclo de vida)\"") - `createdate` (UI: "Create Date")
-- Referral → Customer: `hs_v2_date_entered_customer` (UI: "Date entered \"Cliente (Pipeline de etapa del ciclo de vida)\"") - `createdate` (UI: "Create Date")
+- Referral → SQL: `hs_v2_date_entered_opportunity` - `createdate`
+- Referral → Customer: `hs_v2_date_entered_customer` - `createdate`
 
 **Patterns/Characteristics**:
 - Partner-driven acquisition
@@ -642,13 +762,23 @@ Organizes funnels based on the primary conversion mechanism.
 
 ### 2.1 SQL Conversion Funnel (Sales-Led)
 
-**Definition**: Contacts that convert via sales qualification (SQL) **WITH validated deal association**
+**Definition**: Contacts that convert via sales qualification (SQL) when a deal is associated and the contact transitions from Lead to Opportunity stage
 
-**SQL Definition (Updated - with Deal Validation)**:
+**SQL Definition**:
+SQL occurs when:
+1. **Contact is in Lead stage** (`lifecyclestage = 'lead'`) - This is the MQL (Marketing Qualified Lead)
+2. **Sales qualifies the contact** - Sales team evaluates and decides the contact is sales-qualified
+3. **Deal is created and associated** - A new deal is created and associated with the contact (MQL)
+4. **Lifecycle stage transitions** - When the deal is associated, HubSpot automatically transitions the contact from `'lead'` to `'opportunity'` lifecycle stage
+5. **SQL conversion date is set** - The transition sets `hs_v2_date_entered_opportunity` (SQL qualification date)
+
+**Key Concept**: SQL is the transition from Lead (MQL) to Opportunity stage. The deal association triggers this transition, which sets the SQL conversion date.
+
+**SQL Conversion Requirements** (for analysis):
 A contact is counted as SQL if **ALL THREE** conditions are met:
 1. Contact created in the period (MQL - excluding 'Usuario Invitado')
-2. `hs_v2_date_entered_opportunity` in the period
-3. **Contact has a deal associated that was created between `createdate` and SQL date (within the same period)**
+2. `hs_v2_date_entered_opportunity` in the period (indicates transition from Lead to Opportunity)
+3. **Contact has a deal associated** that validates the SQL conversion (deal was created between `createdate` and SQL date, within the same period)
 
 **Important**: Contacts that have `hs_v2_date_entered_opportunity` in the period but do NOT have a valid deal association are **NOT counted as SQL**. These contacts are tracked separately as edge cases for data quality analysis:
 - **NO_DEALS_ASSOCIATED**: Contact has SQL date but no deals are associated
@@ -665,11 +795,16 @@ Contact Created
     ↓
 Lead (lifecyclestage = 'lead')
     ↓
-MQL (hs_v2_date_entered_lead) - Optional stage (many contacts skip this)
+MQL (hs_v2_date_entered_lead) - Contact in Lead stage
     ↓
-SQL (hs_v2_date_entered_opportunity + validated deal)
+Sales Qualifies MQL
     ↓
-Deal Created (validated deal that qualified SQL)
+Deal Created and Associated with Contact (MQL)
+    ↓
+Lifecycle Stage Transitions: Lead → Opportunity
+    (hs_v2_date_entered_opportunity is set)
+    ↓
+SQL (lifecyclestage = 'opportunity')
     ↓
 Deal Stages:
     ├─► Pendiente de Demo (qualifiedtobuy) - 30% probability
@@ -681,7 +816,7 @@ Deal Stages:
 
 **Key Metrics**:
 - **SQL Conversion Rate**: `(SQLs / total contacts) × 100`
-- **SQL Cycle Time**: `hs_v2_date_entered_opportunity - createdate`
+- **SQL Cycle Time**: `hs_v2_date_entered_opportunity` - `createdate`
 - **Deal Creation Rate**: `(deals / SQLs) × 100`
   - **Note**: This rate may exceed 100% because:
     - A contact can have multiple deals
@@ -690,28 +825,36 @@ Deal Stages:
 - **Average Sales Cycle**: `dealstage_cerrado_ganado_entered_at - dealstage_pendiente_de_demo_entered_at`
 
 **HubSpot Fields**:
-- `hs_v2_date_entered_opportunity` - SQL qualification date
-- `num_associated_deals` - Number of associated deals
-- Deal `createdate` - Deal creation date (used for SQL validation)
-- `dealstage` - Current deal stage
-- `dealstage_pendiente_de_demo_entered_at` - First stage entry
-- `dealstage_cerrado_ganado_entered_at` - Won stage entry
+- `hs_v2_date_entered_opportunity` (UI: "Date entered \"Oportunidad (Pipeline de etapa del ciclo de vida)\"") - SQL qualification date
+- `num_associated_deals` (UI: "Number of Associated Deals") - Number of associated deals
+- Deal `createdate` (UI: "Create Date") - Deal creation date (used for SQL validation)
+- `dealstage` (UI: "Deal Stage") - Current deal stage
+- `dealstage_pendiente_de_demo_entered_at` - First stage entry date
+- `dealstage_cerrado_ganado_entered_at` - Won stage entry date
+
+**Note**: UI names shown above for reference. Subsequent field references in this section use internal names only.
 
 **Cohort Definition**:
 - Contact must be created AND convert to SQL in the same period
 - Both `createdate` and `hs_v2_date_entered_opportunity` must be in target period
-- **Deal Validation**: Contact must have at least one deal where:
-  - `deal.createdate` is between `contact.createdate` and `hs_v2_date_entered_opportunity`
-  - `deal.createdate` is within the analysis period
-- **Purpose**: Ensures SQL conversion is validated by actual deal creation, providing accurate conversion measurement
+- **Deal Association Validation**: Contact must have at least one deal associated where:
+  - Deal was created between `contact.createdate` and `hs_v2_date_entered_opportunity`
+  - Deal `createdate` is within the analysis period
+  - **Note**: The deal association triggers the lifecycle stage transition from Lead to Opportunity, which sets `hs_v2_date_entered_opportunity`
+- **Purpose**: Ensures SQL conversion is validated by actual deal association, providing accurate conversion measurement. SQL is the transition from Lead (MQL) to Opportunity stage when a deal is associated.
 
-**Difference between SQL and Deal Created**:
-- **SQL**: Counts **contacts** that meet all validation criteria (including deal timing)
+**SQL vs Deal Created - Key Distinctions**:
+- **SQL**: Represents the **contact** transition from Lead (MQL) to Opportunity stage when a deal is associated
+  - Counts **contacts** that meet all validation criteria (including deal timing)
+  - The transition itself (`hs_v2_date_entered_opportunity`) is the SQL conversion event
 - **Deal Created**: Counts **all deals** created in period (associated with MQL contacts)
-- **Why Deal Created > SQL**: 
-  - Multiple deals per contact
-  - Deals from contacts without SQL date in period
+  - A deal may be created but not yet associated (not SQL yet)
+  - Multiple deals can be associated with one contact (multiple opportunities)
+- **Why Deal Created may differ from SQL**: 
+  - Multiple deals per contact (one contact can have multiple SQL conversions over time)
+  - Deals from contacts without SQL date in period (deal exists but no transition yet)
   - Deals created outside the SQL validation window (before contact creation or after SQL date)
+  - Deal may be created before association (deal exists, but SQL happens when associated)
 
 ---
 
@@ -719,13 +862,38 @@ Deal Stages:
 
 **Definition**: Contacts that convert via critical events (key product events) (PQL)
 
+**PQL Qualification Process**:
+PQL qualification is **automatic** via integration:
+1. **User performs key event** in Colppy product (e.g., Invoice Created, Payment Processed, etc.)
+2. **Event tracked in Mixpanel** - Product event is sent to Mixpanel
+3. **Zapier detects key event** - Zapier monitors Mixpanel for "evento clave" (key events)
+4. **Zap triggers automatically** - When Zapier detects a key event, it triggers a Zap
+5. **HubSpot contact updated** - The Zap automatically updates the contact in HubSpot:
+   - Sets `activo = 'true'` (PQL key event flag)
+   - Sets `fecha_activo` to the date when the key event occurred (PQL key event date)
+6. **PQL qualification complete** - Contact is now a PQL
+
+**Integration Flow**: Mixpanel → Zapier → HubSpot
+- **Source**: Mixpanel (product events)
+- **Middleware**: Zapier (detects key events and triggers automation)
+- **Destination**: HubSpot (updates contact fields automatically)
+- **Automatic**: No manual intervention required - integration handles field updates
+
 **Funnel Stages**:
 ```
 Contact Created
     ↓
 Trial Signup (7-day free trial)
     ↓
-Critical Events (key events: Invoice Created, Payment Processed, etc.)
+User Performs Key Event in Product
+    ↓
+Event Tracked in Mixpanel
+    ↓
+Zapier Detects Key Event → Triggers Zap
+    ↓
+HubSpot Contact Updated Automatically:
+    - activo = 'true'
+    - fecha_activo = [date of key event]
     ↓
 PQL (activo = 'true', fecha_activo)
     ↓
@@ -738,32 +906,53 @@ PQL (activo = 'true', fecha_activo)
 
 **Key Metrics**:
 - **PQL Conversion Rate**: `(PQLs / total contacts) × 100`
-- **PQL Cycle Time**: `fecha_activo - createdate`
+- **PQL Cycle Time**: `fecha_activo` - `createdate`
   - **IMPORTANT**: `fecha_activo` is date-only (no time), while `createdate` has full timestamp. If both dates are on the same calendar day, cycle time = 0.0 days (same day conversion).
 - **PQL → SQL Rate**: `(SQLs from PQL cohort / total PQLs) × 100`
 - **PQL → Customer Rate**: `(customers from PQL cohort / total PQLs) × 100`
 
 **HubSpot Fields**:
-- `activo` - PQL key event flag (string 'true')
-- `fecha_activo` - PQL key event date (date string 'YYYY-MM-DD')
-- `hs_v2_date_entered_opportunity` - SQL qualification date (if sales engages)
+- `activo` (UI: "Hizo evento clave en trial") - PQL key event flag (string 'true')
+  - **Updated by**: Mixpanel → Zapier → HubSpot integration (automatic)
+  - **When**: When Zapier detects a key event in Mixpanel, it triggers a Zap that sets this field to 'true'
+- `fecha_activo` (UI: "Fecha de Hizo Evento Clave en Trial") - PQL key event date (date string 'YYYY-MM-DD')
+  - **Updated by**: Mixpanel → Zapier → HubSpot integration (automatic)
+  - **When**: When Zapier detects a key event in Mixpanel, it triggers a Zap that sets this field to the date of the key event
+  - **Format**: Date-only string 'YYYY-MM-DD' (no time component)
+- `hs_v2_date_entered_opportunity` (UI: "Date entered \"Oportunidad (Pipeline de etapa del ciclo de vida)\"") - SQL qualification date (if sales engages)
 - `hs_v2_date_entered_customer` (UI: "Date entered \"Cliente (Pipeline de etapa del ciclo de vida)\"") - Customer conversion date
 
+**Note**: UI names shown above for reference. Subsequent field references in this section use internal names only.
+
 **Product Events** (Mixpanel):
+These are the key events that trigger PQL qualification when detected by Zapier:
 - Invoice Created
 - Payment Processed
 - Report Generated
 - User Login
 - Feature Used
 
+**Integration Details**:
+- **Source**: Mixpanel tracks product events from Colppy platform
+- **Middleware**: Zapier monitors Mixpanel for "evento clave" (key events)
+- **Trigger**: When Zapier detects a key event in Mixpanel, it automatically triggers a Zap
+- **Action**: The Zap updates the contact in HubSpot:
+  - Sets `activo = 'true'` (indicates contact performed key event)
+  - Sets `fecha_activo` to the date of the key event (PQL qualification date)
+- **Automatic**: This process is fully automated - no manual intervention required
+
 **Cohort Definition**:
 - Contact must be created AND perform critical events (PQL) in the same period
 - Both `createdate` and `fecha_activo` must be in target period
 - `activo` must equal 'true'
 
-**Critical Note**:
-- `fecha_activo` is date-only (not datetime)
-- Must append `T00:00:00+00:00` when parsing for timezone-aware comparisons
+**Critical Notes**:
+- **Integration Updates**: `activo` and `fecha_activo` are updated automatically by the Mixpanel → Zapier → HubSpot integration, not manually
+- **Date Format**: `fecha_activo` is date-only (not datetime)
+  - Format: 'YYYY-MM-DD' (no time component)
+  - Must append `T00:00:00+00:00` when parsing for timezone-aware comparisons
+- **Same-Day Conversion**: If both `createdate` and `fecha_activo` are on the same calendar day, cycle time = 0.0 days (same day conversion)
+  - This is because `fecha_activo` defaults to 00:00:00 when parsed, while `createdate` has a full timestamp
 
 ---
 
@@ -802,10 +991,12 @@ Contact Created
 - **Time Between Events**: Hours between first and second event (only calculate when order is established)
 
 **HubSpot Fields**:
-- `hs_v2_date_entered_opportunity` - SQL qualification date
-- `activo` - PQL key event flag
-- `fecha_activo` - PQL key event date
-- `createdate` - Contact creation date
+- `hs_v2_date_entered_opportunity` (UI: "Date entered \"Oportunidad (Pipeline de etapa del ciclo de vida)\"") - SQL qualification date
+- `activo` (UI: "Hizo evento clave en trial") - PQL key event flag
+- `fecha_activo` (UI: "Fecha de Hizo Evento Clave en Trial") - PQL key event date
+- `createdate` (UI: "Create Date") - Contact creation date
+
+**Note**: UI names shown above for reference. Subsequent field references in this section use internal names only.
 
 **Typical Patterns**:
 - **Low Overlap (< 10%)**: Independent customer journeys, broken handoff
@@ -839,13 +1030,15 @@ Lead (lifecyclestage = 'lead', hs_v2_date_entered_lead)
 **Key Metrics**:
 - **Subscriber Count**: Contacts with `lifecyclestage = 'subscriber'`
 - **Lead Conversion Rate**: `(leads / subscribers) × 100`
-- **Time to Lead**: `hs_v2_date_entered_lead` (UI: "Date entered \"Lead (Pipeline de etapa del ciclo de vida)\"") - `createdate` (UI: "Create Date")
+- **Time to Lead**: `hs_v2_date_entered_lead` - `createdate`
 
 **HubSpot Fields**:
 - `lifecyclestage` (UI: "Lifecycle Stage") - Current lifecycle stage
 - `hs_v2_date_entered_lead` (UI: "Date entered \"Lead (Pipeline de etapa del ciclo de vida)\"") - Lead qualification date
 
-**Note**: In Colppy, a "Lead" requires an associated Lead object, NOT just `lifecyclestage = 'lead'`. Lead objects can be created automatically by workflow (for Colppy integration contacts) or manually by salesperson (for Intercom contacts). The workflow sets `lifecyclestage = 'lead'` and `hs_v2_date_entered_lead` (UI: "Date entered \"Lead (Pipeline de etapa del ciclo de vida)\"") = `createdate` (UI: "Create Date") automatically, but Lead object creation is separate. For Intercom contacts, Lead objects are created manually by salesperson.
+**Note**: UI names shown above for reference. Subsequent field references in this section use internal names only.
+
+**Important**: In Colppy, a "Lead" requires an associated Lead object, NOT just `lifecyclestage = 'lead'`. Lead objects can be created automatically by workflow (for Colppy integration contacts) or manually by salesperson (for Intercom contacts). The workflow sets `lifecyclestage = 'lead'` and `hs_v2_date_entered_lead` = `createdate` automatically, but Lead object creation is separate. For Intercom contacts, Lead objects are created manually by salesperson.
 
 ---
 
@@ -865,14 +1058,16 @@ Deal Created
 **Key Metrics**:
 - **Lead Count**: Contacts with `lifecyclestage = 'lead'`
 - **Opportunity Conversion Rate**: `(opportunities / leads) × 100`
-- **Time to Opportunity**: `hs_v2_date_entered_opportunity` (UI: "Date entered \"Oportunidad (Pipeline de etapa del ciclo de vida)\"") - `hs_v2_date_entered_lead` (UI: "Date entered \"Lead (Pipeline de etapa del ciclo de vida)\"")
+- **Time to Opportunity**: `hs_v2_date_entered_opportunity` - `hs_v2_date_entered_lead`
 - **Deal Creation Rate**: `(deals / opportunities) × 100`
 
 **HubSpot Fields**:
 - `lifecyclestage` (UI: "Lifecycle Stage") - Current lifecycle stage
 - `hs_v2_date_entered_lead` (UI: "Date entered \"Lead (Pipeline de etapa del ciclo de vida)\"") - Lead qualification date
 - `hs_v2_date_entered_opportunity` (UI: "Date entered \"Oportunidad (Pipeline de etapa del ciclo de vida)\"") - Opportunity qualification date
-- `num_associated_deals` - Number of associated deals
+- `num_associated_deals` (UI: "Number of Associated Deals") - Number of associated deals
+
+**Note**: UI names shown above for reference. Subsequent field references in this section use internal names only.
 
 ---
 
@@ -897,15 +1092,17 @@ Deal Stages:
 **Key Metrics**:
 - **Opportunity Count**: Contacts with `lifecyclestage = 'opportunity'`
 - **Customer Conversion Rate**: `(customers / opportunities) × 100`
-- **Time to Customer**: `hs_v2_date_entered_customer` (UI: "Date entered \"Cliente (Pipeline de etapa del ciclo de vida)\"") - `hs_v2_date_entered_opportunity` (UI: "Date entered \"Oportunidad (Pipeline de etapa del ciclo de vida)\"")
+- **Time to Customer**: `hs_v2_date_entered_customer` - `hs_v2_date_entered_opportunity`
 - **Win Rate**: `(won deals / total deals) × 100`
 
 **HubSpot Fields**:
-- `lifecyclestage` - Current lifecycle stage
-- `hs_v2_date_entered_opportunity` - Opportunity qualification date
+- `lifecyclestage` (UI: "Lifecycle Stage") - Current lifecycle stage
+- `hs_v2_date_entered_opportunity` (UI: "Date entered \"Oportunidad (Pipeline de etapa del ciclo de vida)\"") - Opportunity qualification date
 - `hs_v2_date_entered_customer` (UI: "Date entered \"Cliente (Pipeline de etapa del ciclo de vida)\"") - Customer conversion date
-- `dealstage` - Current deal stage
-- `dealstage_cerrado_ganado_entered_at` - Won stage entry
+- `dealstage` (UI: "Deal Stage") - Current deal stage
+- `dealstage_cerrado_ganado_entered_at` - Won stage entry date
+
+**Note**: UI names shown above for reference. Subsequent field references in this section use internal names only.
 
 ---
 
@@ -940,11 +1137,13 @@ Customer (lifecyclestage = 'customer')
 - **CAC by Channel**: Marketing spend / customers acquired
 
 **HubSpot Fields**:
-- `utm_source` - Traffic source
-- `utm_campaign` - Campaign name
-- `utm_medium` - Marketing medium
-- `hs_v2_date_entered_lead` - MQL qualification date
-- `hs_v2_date_entered_opportunity` - SQL qualification date
+- `utm_source` (UI: "UTM Source") - Traffic source
+- `utm_campaign` (UI: "UTM Campaign") - Campaign name
+- `utm_medium` (UI: "UTM Medium") - Marketing medium
+- `hs_v2_date_entered_lead` (UI: "Date entered \"Lead (Pipeline de etapa del ciclo de vida)\"") - MQL qualification date
+- `hs_v2_date_entered_opportunity` (UI: "Date entered \"Oportunidad (Pipeline de etapa del ciclo de vida)\"") - SQL qualification date
+
+**Note**: UI names shown above for reference. Subsequent field references in this section use internal names only.
 
 **Lead Sources**:
 - `lead_source = 'Orgánico'` - Organic traffic
@@ -974,10 +1173,12 @@ Customer (lifecyclestage = 'customer')
 - **Customer Conversion Rate**: `(customers from PQL / total PQLs) × 100`
 
 **HubSpot Fields**:
-- `createdate` - Trial signup date
-- `activo` - PQL key event flag
-- `fecha_activo` - PQL key event date
+- `createdate` (UI: "Create Date") - Trial signup date
+- `activo` (UI: "Hizo evento clave en trial") - PQL key event flag
+- `fecha_activo` (UI: "Fecha de Hizo Evento Clave en Trial") - PQL key event date
 - `hs_v2_date_entered_customer` (UI: "Date entered \"Cliente (Pipeline de etapa del ciclo de vida)\"") - Customer conversion date
+
+**Note**: UI names shown above for reference. Subsequent field references in this section use internal names only.
 
 **Product Events** (Mixpanel):
 - Invoice Created
@@ -1014,11 +1215,13 @@ Customer (lifecyclestage = 'customer')
 - **Deal Win Rate**: `(won deals / total deals) × 100`
 
 **HubSpot Fields**:
-- `hs_first_outreach_date` - First outreach date
-- `hs_sa_first_engagement_date` - First engagement with current owner
-- `hs_v2_date_entered_opportunity` - SQL qualification date
-- `num_contacted_notes` - Number of contacted notes
-- `notes_last_contacted` - Last contact date
+- `hs_first_outreach_date` (UI: "Date of first outreach") - First outreach date
+- `hs_sa_first_engagement_date` (UI: "Date of first engagement") - First engagement with current owner
+- `hs_v2_date_entered_opportunity` (UI: "Date entered \"Oportunidad (Pipeline de etapa del ciclo de vida)\"") - SQL qualification date
+- `num_contacted_notes` (UI: "Number of contacted notes") - Number of contacted notes
+- `notes_last_contacted` (UI: "Notes last contacted") - Last contact date
+
+**Note**: UI names shown above for reference. Subsequent field references in this section use internal names only.
 
 **Engagement Types**:
 - CALL - Completed calls, no-answer calls
@@ -1043,7 +1246,7 @@ Customer (lifecyclestage = 'customer')
 - **Lead Object Creation**: Lead object is created MANUALLY by salesperson (not automatic)
   - At this point, you only have a contact (not a Lead yet)
   - Salesperson manually creates Lead object and associates it with contact
-  - Source: `CRM_UI` (in Lead object `hs_created_by_user_id` property history)
+  - Source: `CRM_UI` (in Lead object `hs_created_by_user_id` (UI: "Created by User") property history)
 - **NOT an MQL**: This is NOT an MQL because there's no event in the product - it's just a question/lead from Intercom
 - **Cannot Become MQL Retroactively**: Intercom contacts cannot retroactively become MQLs. If the user later signs up for trial, that creates a NEW contact with the standard MQL process.
 - **Existing Customer Contacts**: If the Intercom contact is from an existing paying company (customer), that's NOT an MQL
@@ -1086,17 +1289,19 @@ Sales Engagement in HubSpot:
 - **PQL Conversion Rate (Later)**: PQLs from Intercom / Intercom contacts
 
 **HubSpot Fields**:
-- `lead_source = 'Orgánico'` (Label: "Orgánico / Directo") - Source tracking
+- `lead_source` (UI: "Lead Source") - Source tracking (set to 'Orgánico' / Label: "Orgánico / Directo" by workflow)
   - Attribution is Intercom, but we don't know how they got to Intercom
-  - Set by AUTOMATION_PLATFORM (workflow) to indicate unknown attribution
+  - Set by HubSpot workflow automatically when contact is created (sourceType: `AUTOMATION_PLATFORM` in property history API response)
   - Includes both organic and direct traffic
   - NOT "Referencia Intercom" (that's only for form submissions)
-- `createdate` - Contact creation date
-- `lifecyclestage = 'lead'` - Lead lifecycle stage (set by Intercom integration)
-- `hs_first_outreach_date` - First sales outreach
-- `hs_sa_first_engagement_date` - First engagement with owner
-- `hs_v2_date_entered_lead` - MQL qualification date (set if user later signs up for trial and validates email)
-- `hs_v2_date_entered_opportunity` - SQL qualification date
+- `createdate` (UI: "Create Date") - Contact creation date
+- `lifecyclestage` (UI: "Lifecycle Stage") - Lead lifecycle stage (set to 'lead' by Intercom integration)
+- `hs_first_outreach_date` (UI: "Date of first outreach") - First sales outreach
+- `hs_sa_first_engagement_date` (UI: "Date of first engagement") - First engagement with owner
+- `hs_v2_date_entered_lead` (UI: "Date entered \"Lead (Pipeline de etapa del ciclo de vida)\"") - MQL qualification date (set if user later signs up for trial and validates email)
+- `hs_v2_date_entered_opportunity` (UI: "Date entered \"Oportunidad (Pipeline de etapa del ciclo de vida)\"") - SQL qualification date
+
+**Note**: UI names shown above for reference. Subsequent field references in this section use internal names only.
 
 **Mixpanel Events**:
 - **"Qualification"** - Fired when HubSpot qualification happens (ONLY event initially)
@@ -1156,10 +1361,12 @@ Customer (lifecyclestage = 'customer')
 - **Average Deal Size**: Average deal amount from accountant channel
 
 **HubSpot Fields**:
-- `lead_source` - Source tracking
-- `hubspot_owner_id` - Owner from Accountant Channel team
-- `hs_v2_date_entered_opportunity` - SQL qualification date
+- `lead_source` (UI: "Lead Source") - Source tracking
+- `hubspot_owner_id` (UI: "HubSpot Owner") - Owner from Accountant Channel team
+- `hs_v2_date_entered_opportunity` (UI: "Date entered \"Oportunidad (Pipeline de etapa del ciclo de vida)\"") - SQL qualification date
 - Deal association type `8` - Estudio Contable relationship
+
+**Note**: UI names shown above for reference. Subsequent field references in this section use internal names only.
 
 **Team Detection**:
 - Owner must be in "Accountant Channel" team
@@ -1191,14 +1398,16 @@ Contact Created
 **Key Metrics**:
 - **Total Contacts**: All contacts created
 - **Customer Conversion Rate**: `(customers / total contacts) × 100`
-- **Time to Customer**: `hs_v2_date_entered_customer` (UI: "Date entered \"Cliente (Pipeline de etapa del ciclo de vida)\"") - `createdate` (UI: "Create Date")
+- **Time to Customer**: `hs_v2_date_entered_customer` - `createdate`
 - **Revenue per Customer**: Total revenue / customers
 
 **HubSpot Fields**:
-- `createdate` - Contact creation date
+- `createdate` (UI: "Create Date") - Contact creation date
 - `hs_v2_date_entered_customer` (UI: "Date entered \"Cliente (Pipeline de etapa del ciclo de vida)\"") - Customer conversion date
-- `lifecyclestage` - Current lifecycle stage
-- Deal `amount` - Deal value (for SQL path)
+- `lifecyclestage` (UI: "Lifecycle Stage") - Current lifecycle stage
+- Deal `amount` (UI: "Amount") - Deal value (for SQL path)
+
+**Note**: UI names shown above for reference. Subsequent field references in this section use internal names only.
 
 ---
 
@@ -1224,11 +1433,13 @@ Deal Created
 - **Average Deal Size**: Average deal amount
 
 **HubSpot Fields**:
-- `createdate` - Contact creation date
-- `num_associated_deals` - Number of associated deals
-- `hs_v2_date_entered_opportunity` - SQL qualification date (with deal validation)
-- Deal `createdate` - Deal creation date (used for SQL validation)
-- Deal `amount` - Deal value
+- `createdate` (UI: "Create Date") - Contact creation date
+- `num_associated_deals` (UI: "Number of Associated Deals") - Number of associated deals
+- `hs_v2_date_entered_opportunity` (UI: "Date entered \"Oportunidad (Pipeline de etapa del ciclo de vida)\"") - SQL qualification date (with deal validation)
+- Deal `createdate` (UI: "Create Date") - Deal creation date (used for SQL validation)
+- Deal `amount` (UI: "Amount") - Deal value
+
+**Note**: UI names shown above for reference. Subsequent field references in this section use internal names only.
 
 **Note**: SQL now requires deal validation. A contact is SQL only if they have a deal created between `createdate` and `hs_v2_date_entered_opportunity` (within the analysis period). This ensures SQL conversion is validated by actual deal creation.
 
@@ -1259,13 +1470,15 @@ Cerrado Ganado (closedwon) - 100% probability
 - **Stage Conversion Rates**: Conversion rate at each stage
 
 **HubSpot Fields**:
-- `dealstage` - Current deal stage
-- `dealstage_pendiente_de_demo_entered_at` - First stage entry
-- `dealstage_análisis_entered_at` - Analysis stage entry
-- `dealstage_negociación_entered_at` - Negotiation stage entry
-- `dealstage_cerrado_ganado_entered_at` - Won stage entry
-- `amount` - Deal value
-- `closedate` - Deal close date
+- `dealstage` (UI: "Deal Stage") - Current deal stage
+- `dealstage_pendiente_de_demo_entered_at` - First stage entry date
+- `dealstage_análisis_entered_at` - Analysis stage entry date
+- `dealstage_negociación_entered_at` - Negotiation stage entry date
+- `dealstage_cerrado_ganado_entered_at` - Won stage entry date
+- `amount` (UI: "Amount") - Deal value
+- `closedate` (UI: "Close Date") - Deal close date
+
+**Note**: UI names shown above for reference. Subsequent field references in this section use internal names only.
 
 **Won Stages**:
 - `closedwon` - Cerrado Ganado
@@ -1307,10 +1520,12 @@ Contacts Created in Analysis Period
 - Both `createdate` and conversion date must be in target period
 
 **HubSpot Fields**:
-- `createdate` - Contact creation date (must be in analysis period)
-- `hs_v2_date_entered_opportunity` - SQL date (must be in analysis period)
-- `fecha_activo` - PQL date (must be in analysis period)
+- `createdate` (UI: "Create Date") - Contact creation date (must be in analysis period)
+- `hs_v2_date_entered_opportunity` (UI: "Date entered \"Oportunidad (Pipeline de etapa del ciclo de vida)\"") - SQL date (must be in analysis period)
+- `fecha_activo` (UI: "Fecha de Hizo Evento Clave en Trial") - PQL date (must be in analysis period)
 - `hs_v2_date_entered_customer` (UI: "Date entered \"Cliente (Pipeline de etapa del ciclo de vida)\"") - Customer date (can be in analysis period or later)
+
+**Note**: UI names shown above for reference. Subsequent field references in this section use internal names only.
 
 ---
 
@@ -1338,11 +1553,13 @@ First Contact (priority order):
   - 7+ days
 
 **HubSpot Fields**:
-- `hs_v2_date_entered_lead` - Lead qualification date
-- `hs_first_outreach_date` - First outreach date
-- `hs_sa_first_engagement_date` - First engagement date
-- `last_lead_status_date` - Last lead status change date
-- `hs_lead_status` - Current lead status
+- `hs_v2_date_entered_lead` (UI: "Date entered \"Lead (Pipeline de etapa del ciclo de vida)\"") - Lead qualification date
+- `hs_first_outreach_date` (UI: "Date of first outreach") - First outreach date
+- `hs_sa_first_engagement_date` (UI: "Date of first engagement") - First engagement date
+- `last_lead_status_date` (UI: "Last lead status date") - Last lead status change date
+- `hs_lead_status` (UI: "Lead Status") - Current lead status
+
+**Note**: UI names shown above for reference. Subsequent field references in this section use internal names only.
 
 **Contact Method Priority**:
 1. `hs_first_outreach_date` - First outreach (email, call, meeting)
@@ -1358,6 +1575,7 @@ First Contact (priority order):
 - **Lead**: Contact showing interest (`lifecyclestage = 'lead'`)
   - **Automatic**: Set automatically when contact is created via HubSpot workflow
   - **Date Field**: `hs_v2_date_entered_lead` (UI: "Date entered \"Lead (Pipeline de etapa del ciclo de vida)\"") (same as `createdate` (UI: "Create Date"))
+  - **Note**: See "HubSpot Field Name Quick Reference" section above for UI display names.
   - **Time to Lead**: 0 seconds (same timestamp as contact creation)
   
 - **MQL (Marketing Qualified Lead)**: Lead automatically qualified by HubSpot system (`hs_v2_date_entered_lead`)
@@ -1374,7 +1592,7 @@ First Contact (priority order):
       - **Distinction**: `lead_source` can be changed by sales/forms/workflows, so it may not reflect the original source
       - **Use Case**: Identifies true MQLs even when `lead_source` has been reclassified (e.g., MQL reclassified as "Referencia Externa Pyme")
   - **Critical Rule**: If contact is created WITHOUT Lead status, it CANNOT be an MQL (Lead is a prerequisite)
-  - **Date Field**: `hs_v2_date_entered_lead` (timestamp when automatic qualification occurred)
+  - **Date Field**: `hs_v2_date_entered_lead` (UI: "Date entered \"Lead (Pipeline de etapa del ciclo de vida)\"") - timestamp when automatic qualification occurred
   - **Qualification Method**: 
     - **Automatic Only**: HubSpot lead scoring workflow automatically qualifies leads based on score thresholds (triggered after email validation). This is a system process - no marketing person is involved. Qualification is based on email validation ("Validó email" event), form submissions, email engagement, website visits, etc.
   - **Time to MQL**: `hs_v2_date_entered_lead - createdate`
@@ -1386,15 +1604,29 @@ First Contact (priority order):
   
 - **PQL (Product Qualified Lead)**: User performed critical events in product (`activo = 'true'`, `fecha_activo`)
   - **Definition**: User who performed critical events during trial (triggered key product events that demonstrate engagement)
+  - **Qualification Process**: Automatic via integration
+    1. User performs key event in Colppy product (e.g., Invoice Created, Payment Processed)
+    2. Event tracked in Mixpanel
+    3. Zapier detects key event and triggers Zap
+    4. Zap automatically updates contact in HubSpot:
+       - Sets `activo = 'true'` (PQL key event flag)
+       - Sets `fecha_activo` to date of key event (PQL key event date)
+  - **Integration Flow**: Mixpanel → Zapier → HubSpot (fully automated, no manual intervention)
   - **Time to PQL**: `fecha_activo - createdate`
     - **Note**: `fecha_activo` is date-only (no time). If both dates are on the same calendar day, cycle time = 0.0 days.
   
-- **SQL (Sales Qualified Lead)**: Lead qualified by sales (`hs_v2_date_entered_opportunity`) **WITH validated deal association**
-  - **Definition**: Lead that sales team has qualified as an opportunity AND has a validated deal created between contact creation and SQL date (within the analysis period)
-  - **Date Field**: `hs_v2_date_entered_opportunity` (timestamp when entered opportunity stage)
-  - **Deal Validation**: Contact must have a deal where `deal.createdate` is between `contact.createdate` and `hs_v2_date_entered_opportunity` (all within the analysis period)
+- **SQL (Sales Qualified Lead)**: Transition from Lead (MQL) to Opportunity stage when a deal is associated
+  - **Core Concept**: SQL occurs when sales qualifies a contact in Lead stage (MQL), creates/associates a deal with that contact, and HubSpot automatically transitions the contact from `'lead'` to `'opportunity'` lifecycle stage
+  - **Process**: 
+    1. Contact is in Lead stage (`lifecyclestage = 'lead'`) - This is the MQL
+    2. Sales qualifies the contact and decides it's sales-qualified
+    3. Deal is created and associated with the contact (MQL)
+    4. HubSpot automatically transitions contact from Lead to Opportunity (`lifecyclestage = 'opportunity'`)
+    5. `hs_v2_date_entered_opportunity` is set (SQL conversion date)
+  - **Date Field**: `hs_v2_date_entered_opportunity` (UI: "Date entered \"Oportunidad (Pipeline de etapa del ciclo de vida)\"") - timestamp when contact transitioned from Lead to Opportunity stage (SQL conversion)
+  - **Deal Association**: The deal association triggers the lifecycle stage transition, which sets the SQL conversion date
   - **Time to SQL**: `hs_v2_date_entered_opportunity - createdate`
-  - **Complete Definition**: SQL = MQL (contact created in period, excluding 'Usuario Invitado') + `hs_v2_date_entered_opportunity` in period + deal created between `createdate` and SQL date (within period)
+  - **Complete Definition** (for analysis): SQL = MQL (contact created in period, excluding 'Usuario Invitado') + `hs_v2_date_entered_opportunity` in period + deal associated between `createdate` and SQL date (within period)
 
 ### Lifecycle Stages
 
@@ -1487,16 +1719,67 @@ Colppy has a HubSpot workflow that integrates with Mixpanel to track qualificati
 
 ---
 
+## ✅ DOCUMENTATION VERIFICATION SUMMARY
+
+**Last Verified**: January 9, 2025  
+**Verification Method**: Code review, cross-document consistency check, implementation verification
+
+### Verification Status
+
+| Concept | Status | Evidence |
+|---------|--------|----------|
+| **Lead Definition** | ✅ Verified | Consistent across all documents and code |
+| **MQL Definition (Simplified)** | ✅ Verified | Used in all analysis scripts |
+| **MQL Definition (Detailed)** | ✅ Verified | Matches HubSpot configuration documentation |
+| **SQL Definition** | ✅ Verified | Validated against `sql_pql_conversion_analysis.py` and `complete_sql_conversion_analysis.py` |
+| **PQL Definition** | ✅ Verified | Consistent across all PQL analysis scripts |
+| **Field Mappings** | ✅ Verified | Cross-referenced with `README_HUBSPOT_CONFIGURATION.md` (verified Jan 9, 2025) |
+| **UTM Attribution** | ✅ Verified | Consistent logic across all documents |
+| **Intercom Funnel** | ✅ Verified | Detailed explanation matches business logic |
+| **HubSpot → Mixpanel Integration** | ✅ Verified | Workflow behavior documented accurately |
+
+### Key Verification Points
+
+1. **Lead Object Requirement**: ✅ Confirmed - All documents consistently state Lead = Contact with associated Lead object
+2. **SQL Deal Validation**: ✅ Confirmed - SQL definition includes deal validation requirement, matches code implementation
+3. **PQL Date Handling**: ✅ Confirmed - `fecha_activo` is date-only, same-day conversion = 0.0 days
+4. **MQL Dual Definition**: ✅ Clarified - Simplified definition for analysis, detailed for verification
+5. **Field Names**: ✅ Verified - All HubSpot field names match configuration document (verified Jan 9, 2025)
+
+### Code Implementation Evidence
+
+- **SQL Validation**: `sql_pql_conversion_analysis.py` lines 160-209 implement deal validation logic
+- **MQL Simplified**: `pql_sql_deal_relationship_analysis.py` line 20-23 uses simplified MQL definition
+- **PQL Logic**: All PQL scripts use `activo = 'true'` AND `fecha_activo` populated
+- **Lead Object Check**: `find_contacts_without_lead_objects.py` implements Lead object association check
+
+### Related Documentation Cross-Reference
+
+- **HubSpot Configuration**: `README_HUBSPOT_CONFIGURATION.md` - Field mappings verified Jan 9, 2025
+- **SQL-PQL Correlation**: `HUBSPOT_SQL_PQL_CORRELATION_ANALYSIS.md` - Methodology matches definitions
+- **Funnel Methodology**: `HUBSPOT_FUNNEL_CONTACT_TO_DEAL_METHODOLOGY.md` - Technical implementation verified
+- **ICP & Company (RevOps)**: `ICP_COMPANY_DEFINITIONS_AND_ASSUMPTIONS.md` - ICP definitions and script assumptions at Company object level
+
+---
+
 ## 📚 RELATED DOCUMENTATION
 
 - [HubSpot Configuration](./README_HUBSPOT_CONFIGURATION.md) - Complete HubSpot field mapping
 - [SQL-PQL Correlation Analysis](./HUBSPOT_SQL_PQL_CORRELATION_ANALYSIS.md) - Detailed overlap methodology
 - [HubSpot Complete Retrieval Quick Reference](./HUBSPOT_COMPLETE_RETRIEVAL_QUICK_REFERENCE.md) - API usage guide
 - [HubSpot Pagination Standards](./README_HUBSPOT_PAGINATION_STANDARDS.md) - Pagination requirements
+- [ICP & Company Definitions and Assumptions](./ICP_COMPANY_DEFINITIONS_AND_ASSUMPTIONS.md) - ICP and Company-level assumptions for RevOps
 
 ---
 
 ## 🔄 VERSION HISTORY
+
+- **v1.2** (2025-01-09): Documentation verification and clarification
+  - Updated "Last Updated" date to 2025-01-09
+  - Added MQL definition clarification (simplified vs detailed requirements)
+  - Added verification summary section with evidence
+  - Cross-verified all concepts against code implementation
+  - Confirmed consistency with HubSpot configuration documentation
 
 - **v1.1**: Added Intercom → HubSpot → Mixpanel funnel
   - Added Intercom Support Channel funnel (Section 1.4 and 4.4)

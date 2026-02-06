@@ -6,16 +6,32 @@ This script analyzes contacts fetched via MCP HubSpot tools
 
 import json
 import pandas as pd
-from datetime import datetime
+from datetime import datetime, timezone
 import sys
 
 def parse_datetime(date_str):
-    """Parse HubSpot datetime string to datetime object"""
+    """Parse HubSpot datetime string to datetime object
+    
+    Handles multiple formats:
+    - ISO format: "2025-11-15T10:30:00.000Z"
+    - Timestamp (milliseconds): "1762174592703"
+    - Date-only: "2025-11-15"
+    """
     if not date_str:
         return None
     try:
-        return datetime.fromisoformat(date_str.replace('Z', '+00:00'))
-    except (ValueError, AttributeError):
+        # Try ISO format first (e.g., "2025-11-15T10:30:00.000Z")
+        if 'T' in str(date_str) or 'Z' in str(date_str):
+            return datetime.fromisoformat(str(date_str).replace('Z', '+00:00'))
+        # Try timestamp (milliseconds since epoch)
+        elif str(date_str).isdigit() and len(str(date_str)) > 10:
+            # Convert milliseconds to seconds, UTC timezone
+            timestamp_ms = int(date_str)
+            return datetime.fromtimestamp(timestamp_ms / 1000.0, tz=timezone.utc)
+        # Try date-only format (e.g., "2025-11-15")
+        else:
+            return datetime.fromisoformat(str(date_str) + "T00:00:00+00:00")
+    except (ValueError, AttributeError, OSError, OverflowError):
         return None
 
 def analyze_sql_pql_timing(contacts_data, start_date, end_date):
@@ -112,19 +128,19 @@ def analyze_sql_pql_timing(contacts_data, start_date, end_date):
     print("=" * 50)
     print(f"Total SQLs Analyzed: {total_sqls:,}")
     print(f"\n🎯 PQL BEFORE SQL: {len(pql_before_sql):,} ({len(pql_before_sql)/total_sqls*100:.1f}%)")
-    print(f"   → These contacts activated in product BEFORE sales engagement")
+    print(f"   → These contacts performed the critical event BEFORE sales engagement")
     if len(pql_before_sql) > 0:
         avg_days = pql_before_sql['days_between_pql_sql'].mean()
         print(f"   → Average days between PQL and SQL: {avg_days:.1f} days")
     
     print(f"\n⏰ PQL AFTER SQL: {len(pql_after_sql):,} ({len(pql_after_sql)/total_sqls*100:.1f}%)")
-    print(f"   → These contacts activated AFTER sales engagement started")
+    print(f"   → These contacts performed the critical event AFTER sales engagement started")
     if len(pql_after_sql) > 0:
         avg_days = pql_after_sql['days_between_pql_sql'].abs().mean()
         print(f"   → Average days between SQL and PQL: {avg_days:.1f} days")
     
     print(f"\n❌ NEVER PQL: {len(never_pql):,} ({len(never_pql)/total_sqls*100:.1f}%)")
-    print(f"   → These contacts never activated in product")
+    print(f"   → These contacts never performed the critical event")
     
     if len(pql_no_date) > 0:
         print(f"\n⚠️  PQL NO DATE: {len(pql_no_date):,} ({len(pql_no_date)/total_sqls*100:.1f}%)")
@@ -153,16 +169,33 @@ def analyze_sql_pql_timing(contacts_data, start_date, end_date):
     return df, summary
 
 if __name__ == "__main__":
-    print("📋 SQL PQL Conversion Analysis from MCP Data")
+    print("📋 SQL PQL Conversion Analysis")
     print("=" * 60)
-    print("\nThis script analyzes contacts fetched via MCP HubSpot tools")
-    print("To use: Fetch contacts using MCP tools, save to JSON, then analyze")
-    print("\nExample:")
-    print("1. Use MCP hubspot-list-objects to fetch contacts")
-    print("2. Save results to a JSON file")
-    print("3. Run this script with the JSON file")
-    print("\nFor November 2025 analysis, use:")
-    print("  python analyze_sql_pql_from_mcp.py --input contacts.json --start-date 2025-11-01 --end-date 2025-11-30")
+    print("\nThis script analyzes contacts to determine SQL → PQL timing relationship")
+    print("Requires pre-fetched contact data (doesn't fetch data itself)")
+    print("\nUsage Workflow:")
+    print("1. Fetch contacts using HubSpot API (for the period you want to analyze)")
+    print("   - Filter by createdate to get contacts from the period")
+    print("   - Required properties: email, firstname, lastname, createdate,")
+    print("     hs_lifecyclestage_opportunity_date, fecha_activo, activo,")
+    print("     lifecyclestage, num_associated_deals")
+    print("2. Save contacts to JSON file")
+    print("3. Load JSON and call analyze_sql_pql_timing() function")
+    print("\nExample code:")
+    print("  from analyze_sql_pql_from_mcp import analyze_sql_pql_timing")
+    print("  import json")
+    print("  ")
+    print("  with open('contacts_nov_2025.json', 'r') as f:")
+    print("      contacts_data = json.load(f)")
+    print("  ")
+    print("  df, summary = analyze_sql_pql_timing(")
+    print("      contacts_data, ")
+    print("      start_date='2025-11-01',")
+    print("      end_date='2025-11-30'")
+    print("  )")
+    print("\nNote: The script filters for contacts where hs_lifecyclestage_opportunity_date")
+    print("      (SQL date) falls within the specified date range.")
+    print("      Handles timestamps (milliseconds) and ISO date formats automatically.")
 
 
 

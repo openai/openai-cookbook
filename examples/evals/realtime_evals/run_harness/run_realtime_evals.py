@@ -143,6 +143,39 @@ def compute_tool_outputs(
     return outputs
 
 
+def build_tool_output_by_call_id(
+    tool_outputs: List[Dict[str, Any]],
+) -> Dict[str, Dict[str, Any]]:
+    outputs_by_call_id: Dict[str, Dict[str, Any]] = {}
+    for output in tool_outputs:
+        call_id = output.get("call_id", "")
+        if not call_id:
+            continue
+        outputs_by_call_id[call_id] = output
+    return outputs_by_call_id
+
+
+def transcript_lines_for_assistant_turn(
+    turn_index: int,
+    response_segments: List[Dict[str, Any]],
+    tool_outputs_by_call_id: Dict[str, Dict[str, Any]],
+) -> List[str]:
+    lines: List[str] = []
+    for segment in response_segments:
+        assistant_text = str(segment.get("assistant_text", "")).strip()
+        if assistant_text:
+            lines.append(f"TURN {turn_index} ASSISTANT: {assistant_text}")
+        for tool_call in segment.get("tool_calls", []):
+            lines.append(f"TURN {turn_index} TOOL_CALL: {json.dumps(tool_call)}")
+            call_id = str(tool_call.get("call_id", "")).strip()
+            if call_id and call_id in tool_outputs_by_call_id:
+                lines.append(
+                    f"TURN {turn_index} TOOL_OUTPUT: "
+                    f"{json.dumps(tool_outputs_by_call_id[call_id])}"
+                )
+    return lines
+
+
 def build_simulator_prompt_text(
     history: List[Dict[str, str]], fixed_first_turn: str, turn_index: int
 ) -> str:
@@ -370,6 +403,11 @@ async def run_simulation(
     real_time = bool(audio_config.get("real_time", args.real_time))
 
     max_turns = int(turns_config.get("max_turns", 0))
+    max_turns_override = simulation_row.get("max_turns_override")
+    if max_turns_override is not None and not pd.isna(max_turns_override):
+        override_value = int(max_turns_override)
+        if override_value > 0:
+            max_turns = override_value
     if args.max_turns > 0:
         max_turns = args.max_turns
     if max_turns <= 0:
@@ -553,9 +591,11 @@ async def run_simulation(
                 )
 
                 assistant_text = assistant_result["assistant_text"]
+                assistant_segments = assistant_result.get("response_segments", [])
                 assistant_audio_bytes = assistant_result["output_audio_bytes"]
                 tool_calls = assistant_result["tool_calls"]
                 tool_outputs = compute_tool_outputs(tool_calls, tool_mocks)
+                tool_outputs_by_call_id = build_tool_output_by_call_id(tool_outputs)
                 tool_call_grade_data = compute_tool_call_grade(
                     expected_tool_name,
                     expected_tool_args_text,
@@ -578,20 +618,31 @@ async def run_simulation(
                         assistant_audio_path, assistant_audio_bytes, sample_rate_hz
                     )
 
-                transcript_lines.append(
-                    f"TURN {turn_index} ASSISTANT: {assistant_text}"
+                transcript_lines.extend(
+                    transcript_lines_for_assistant_turn(
+                        turn_index, assistant_segments, tool_outputs_by_call_id
+                    )
                 )
+                if not assistant_segments and assistant_text:
+                    # Keep backwards-compatible transcript output if no segment metadata is available.
+                    transcript_lines.append(
+                        f"TURN {turn_index} ASSISTANT: {assistant_text}"
+                    )
                 conversation_history.append(
                     {"role": "assistant", "text": assistant_text}
                 )
 
                 if tool_calls:
-                    tool_summary = (
-                        f"TURN {turn_index} TOOL_CALLS: {json.dumps(tool_calls)} "
-                        f"TOOL_OUTPUTS: {json.dumps(tool_outputs)}"
-                    )
-                    tool_summaries.append(tool_summary)
-                    transcript_lines.append(tool_summary)
+                    for tool_call in tool_calls:
+                        tool_summaries.append(
+                            f"TURN {turn_index} TOOL_CALL: {json.dumps(tool_call)}"
+                        )
+                        call_id = str(tool_call.get("call_id", "")).strip()
+                        if call_id and call_id in tool_outputs_by_call_id:
+                            tool_summaries.append(
+                                f"TURN {turn_index} TOOL_OUTPUT: "
+                                f"{json.dumps(tool_outputs_by_call_id[call_id])}"
+                            )
 
                 turn_context = build_turn_context(
                     simulation_id,
@@ -640,9 +691,6 @@ async def run_simulation(
                 results_rows.append(row_data)
                 for grader in turn_level_graders:
                     if grader.get("type") != "llm_as_judge":
-                        continue
-                    if not tool_calls:
-                        # Skip judge calls when the assistant made no tool call.
                         continue
                     turn_grade_requests.append(
                         {

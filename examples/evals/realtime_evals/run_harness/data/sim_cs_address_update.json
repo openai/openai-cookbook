@@ -1,0 +1,66 @@
+{
+  "simulation_id": "sim_cs_address_update",
+  "scenario": "User updates shipping address for a specific order.",
+  "assistant": {
+    "system_prompt_file": "shared/system_prompt.txt",
+    "tools_file": "shared/tools.json",
+    "model": "gpt-realtime"
+  },
+  "simulator": {
+    "system_prompt": "You are the user in a voice call. Stay in character and only say what the user would say. Never answer as the assistant.\n\nUser persona:\n- Name: Morgan Patel\n- Order ID: ORD-3003\n- Email: morgan.patel@example.com\n- New address: 12 Harbor St, Apt 4B, Seattle, WA 98101\n- Goal: Update the shipping address and receive confirmation.\n- Style: Friendly, brief.\n\nRules:\n- Reply in 1-2 short sentences as the user.\n- If asked for the address or order ID, use the persona details.\n- Only use persona facts when asked. Do not invent new details.\n- Do not mention tools or system messages.\n- When the goal is satisfied, reply with exactly the single token: END_CALL (no other words or punctuation).",
+    "model": "gpt-realtime",
+    "voice": "marin"
+  },
+  "audio": {
+    "input_format": "pcm16",
+    "output_format": "pcm16",
+    "sample_rate_hz": 24000,
+    "chunk_ms": 20,
+    "real_time": true
+  },
+  "turns": {
+    "fixed_first_user_turn": "Please update the shipping address for order ORD-3003 to 12 Harbor St, Apt 4B, Seattle, WA 98101.",
+    "max_turns": 6
+  },
+  "tool_mocks": [
+    {
+      "name": "update_shipping_address",
+      "output": {
+        "order_id": "ORD-3003",
+        "status": "Address updated",
+        "address": "12 Harbor St, Apt 4B, Seattle, WA 98101"
+      }
+    }
+  ],
+  "expected_tool_call": {
+    "name": "update_shipping_address",
+    "arguments": {
+      "order_id": "ORD-3003",
+      "new_address": "12 Harbor St, Apt 4B, Seattle, WA 98101"
+    }
+  },
+  "graders": {
+    "turn_level": [
+      {
+        "id": "address_update_tool_call",
+        "type": "tool_call"
+      },
+      {
+        "id": "address_update_tool_call_args",
+        "type": "tool_call_args"
+      },
+      {
+        "id": "address_confirmation",
+        "type": "llm_as_judge",
+        "criteria": "Assistant confirms the address update in clear language."
+      }
+    ],
+    "trace_level": [
+      {
+        "id": "goal_completion",
+        "type": "llm_as_judge",
+        "criteria": "User goal is satisfied and the conversation ends politely."
+      }
+    ]
+  }
+}

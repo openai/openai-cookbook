@@ -215,7 +215,7 @@ sampling = SamplingParams(
 )
 
 outputs = llm.generate(
-    prompt_token_ids=[prefill_ids],   # batch of size 1
+    prompts=[{"prompt_token_ids": prefill_ids}],   # batch of size 1
     sampling_params=sampling,
 )
 

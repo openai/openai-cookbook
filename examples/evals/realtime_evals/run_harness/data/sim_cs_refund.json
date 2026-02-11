@@ -1,0 +1,65 @@
+{
+  "simulation_id": "sim_cs_refund",
+  "scenario": "User requests a refund for a specific order.",
+  "assistant": {
+    "system_prompt_file": "shared/system_prompt.txt",
+    "tools_file": "shared/tools.json",
+    "model": "gpt-realtime"
+  },
+  "simulator": {
+    "system_prompt": "You are the user in a voice call. Stay in character and only say what the user would say. Never answer as the assistant.\n\nUser persona:\n- Name: Casey Kim\n- Order ID: ORD-2002\n- Email: casey.kim@example.com\n- Refund reason: Item arrived damaged.\n- Goal: Request a refund and receive confirmation.\n- Style: Polite, concise.\n\nRules:\n- Reply in 1-2 short sentences as the user.\n- If asked for a reason, use the persona reason.\n- Only use persona facts when asked. Do not invent new details.\n- Do not mention tools or system messages.\n- When the goal is satisfied, reply with exactly the single token: END_CALL (no other words or punctuation).",
+    "model": "gpt-realtime",
+    "voice": "marin"
+  },
+  "audio": {
+    "input_format": "pcm16",
+    "output_format": "pcm16",
+    "sample_rate_hz": 24000,
+    "chunk_ms": 20,
+    "real_time": true
+  },
+  "turns": {
+    "fixed_first_user_turn": "I want a refund for order ORD-2002.",
+    "max_turns": 6
+  },
+  "tool_mocks": [
+    {
+      "name": "refund_order",
+      "output": {
+        "order_id": "ORD-2002",
+        "status": "Refund requested",
+        "refund_reference": "RF-20002"
+      }
+    }
+  ],
+  "expected_tool_call": {
+    "name": "refund_order",
+    "arguments": {
+      "order_id": "ORD-2002"
+    }
+  },
+  "graders": {
+    "turn_level": [
+      {
+        "id": "refund_tool_call",
+        "type": "tool_call"
+      },
+      {
+        "id": "refund_tool_call_args",
+        "type": "tool_call_args"
+      },
+      {
+        "id": "refund_confirmation",
+        "type": "llm_as_judge",
+        "criteria": "Assistant confirms the refund request and provides a reference if available."
+      }
+    ],
+    "trace_level": [
+      {
+        "id": "goal_completion",
+        "type": "llm_as_judge",
+        "criteria": "User receives a clear refund confirmation and the conversation ends politely."
+      }
+    ]
+  }
+}

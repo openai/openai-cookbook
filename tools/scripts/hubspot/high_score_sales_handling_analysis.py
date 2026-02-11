@@ -254,6 +254,9 @@ def fetch_high_score_contacts(start_date, end_date):
                                 "value": "40"
                             }, {
                                 "propertyName": "lead_source",
+                                "operator": "HAS_PROPERTY"
+                            }, {
+                                "propertyName": "lead_source",
                                 "operator": "NEQ",
                                 "value": "Usuario Invitado"
                             }]
@@ -262,10 +265,10 @@ def fetch_high_score_contacts(start_date, end_date):
                         limit=100,
                         after=after
                     )
-                    
+
                     contacts = result.get("results", [])
                     all_contacts.extend(contacts)
-                    
+
                     if page % 5 == 0:
                         print(f"   📊 Fetched {len(all_contacts)} contacts so far...")
                     
@@ -316,6 +319,9 @@ def fetch_high_score_contacts(start_date, end_date):
                     "propertyName": "fit_score_contador",
                     "operator": "GTE",
                     "value": "40"
+                }, {
+                    "propertyName": "lead_source",
+                    "operator": "HAS_PROPERTY"
                 }, {
                     "propertyName": "lead_source",
                     "operator": "NEQ",

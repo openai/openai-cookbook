@@ -181,8 +181,8 @@ def get_initial_contact_for_deal(deal_id):
                 contact_id = assoc.get('toObjectId')
                 email, createdate, name, lead_source, rol_wizard = get_contact_details(contact_id)
                 
-                # Exclude 'Usuario Invitado' (team member invitations, not MQLs)
-                if lead_source == 'Usuario Invitado':
+                # Exclude 'Usuario Invitado' (team member invitations, not MQLs) and contacts with no lead_source (null)
+                if lead_source == 'Usuario Invitado' or not lead_source:
                     continue
                 
                 # If contact fetch failed, skip

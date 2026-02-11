@@ -34,11 +34,14 @@ KEY ASSUMPTIONS & QUESTIONS:
    → ASSUMPTION: We'll analyze both - PQL timing relative to contact creation AND relative to SQL/deal creation
 
 3. SQL DEFINITION:
-   - **SQL = Contact associated to a deal, which triggers lifecycle stage change to 'Opportunity'**
-   - **KEY INSIGHT**: When a contact (who starts as a "lead") gets associated to a deal, HubSpot automatically 
+   - **SQL = Contact with hs_v2_date_entered_opportunity AND at least one deal associated**
+   - **KEY INSIGHT**: When a contact (who starts as a "lead") gets associated to a deal, HubSpot automatically
      changes their lifecycle stage to "Opportunity", which sets the `hs_v2_date_entered_opportunity` field
-   - **SQL Conversion = Deal Association Event**: The association itself is the conversion event, regardless of 
+   - **SQL Conversion = Deal Association Event**: The association itself is the conversion event, regardless of
      when the deal was created. The timing of deal creation vs association doesn't matter for funnel analysis.
+   - **VALIDATION**: Contacts with hs_v2_date_entered_opportunity but NO deal associations are excluded
+     (these are manual lifecycle overrides, not real SQL conversions)
+   - This aligns with sql_pql_conversion_analysis.py which also requires at least one deal
    - Field: `hs_v2_date_entered_opportunity` = timestamp when contact was associated to deal (lifecycle stage changed)
    - Question: Should we only count SQLs that occurred in the period, or any SQL regardless of when?
    → ASSUMPTION: We'll show both - SQLs that occurred in the period AND all SQLs for contacts created in period
@@ -280,6 +283,10 @@ def fetch_contacts_with_deals(start_date, end_date):
                 "propertyName": "createdate",
                 "operator": "LTE",
                 "value": end_datetime
+            },
+            {
+                "propertyName": "lead_source",
+                "operator": "HAS_PROPERTY"
             },
             {
                 "propertyName": "lead_source",
@@ -586,11 +593,11 @@ def analyze_pql_sql_deal_relationship(contacts, deals, start_date, end_date, con
         # that we did in the main function (contact['associated_deal_ids'] was updated)
         # So we just need to use the deals we found
         
-        is_sql = sql_date is not None
-        
-        # SQL = Deal Creation, so if contact is SQL, a deal was created
-        # We should have the deal in associated_deals if the reverse lookup worked
-        has_deals = len(associated_deals) > 0 or is_sql  # SQL = Deal Creation
+        # SQL requires BOTH hs_v2_date_entered_opportunity AND at least one deal associated
+        # This aligns with sql_pql_conversion_analysis.py logic and HubSpot funnel definition
+        # (contacts with opportunity date but no deals are manual overrides, not real SQLs)
+        has_deals = len(associated_deals) > 0
+        is_sql = sql_date is not None and has_deals
         
         won_deals = [d for d in associated_deals if d['is_won']]
         closed_deals = [d for d in associated_deals if d['is_closed']]
@@ -746,7 +753,7 @@ def analyze_pql_sql_deal_relationship(contacts, deals, start_date, end_date, con
             'fit_score_contador': float(contact['fit_score_contador']) if contact['fit_score_contador'] else None,
             'is_pql': is_pql,
             'pql_date': contact['pql_date'],
-            'is_sql': sql_date is not None,
+            'is_sql': is_sql,
             'sql_date': contact['sql_date'],
             'is_customer': is_customer,
             'customer_date': customer_date.isoformat() if customer_date else contact.get('customer_date'),

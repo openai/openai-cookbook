@@ -227,6 +227,7 @@ def fetch_sql_contacts(start_date, end_date):
             "filters": [
                 {"propertyName": "createdate", "operator": "GTE", "value": start_datetime},
                 {"propertyName": "createdate", "operator": "LTE", "value": end_datetime},
+                {"propertyName": "lead_source", "operator": "HAS_PROPERTY"},
                 {"propertyName": "lead_source", "operator": "NEQ", "value": "Usuario Invitado"}
             ]
         }],

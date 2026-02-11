@@ -177,6 +177,9 @@ def fetch_contacts_from_api(start_date, end_date):
                                 "value": end_datetime
                             }, {
                                 "propertyName": "lead_source",
+                                "operator": "HAS_PROPERTY"
+                            }, {
+                                "propertyName": "lead_source",
                                 "operator": "NEQ",
                                 "value": "Usuario Invitado"
                             }]
@@ -185,13 +188,13 @@ def fetch_contacts_from_api(start_date, end_date):
                         limit=100,
                         after=after
                     )
-                    
+
                     contacts = result.get("results", [])
                     all_contacts.extend(contacts)
-                    
+
                     if page % 5 == 0:
                         print(f"   📊 Fetched {len(all_contacts)} contacts so far...")
-                    
+
                     if 'paging' not in result or 'next' not in result['paging']:
                         break
                     after = result['paging']['next']['after']
@@ -233,6 +236,9 @@ def fetch_contacts_from_api(start_date, end_date):
                     "propertyName": "createdate",
                     "operator": "LTE",
                     "value": end_datetime
+                }, {
+                    "propertyName": "lead_source",
+                    "operator": "HAS_PROPERTY"
                 }, {
                     "propertyName": "lead_source",
                     "operator": "NEQ",

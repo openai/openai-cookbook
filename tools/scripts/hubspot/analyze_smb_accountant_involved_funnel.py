@@ -146,8 +146,9 @@ def get_deal_contacts(deal_id):
                         contacts = response.json().get('results', [])
                         for contact in contacts:
                             props = contact.get('properties', {})
-                            # Exclude 'Usuario Invitado'
-                            if props.get('lead_source') == 'Usuario Invitado':
+                            # Exclude 'Usuario Invitado' and contacts with no lead_source (null)
+                            lead_source = props.get('lead_source')
+                            if lead_source == 'Usuario Invitado' or not lead_source:
                                 continue
                             contacts_data.append({
                                 'contact_id': contact.get('id'),

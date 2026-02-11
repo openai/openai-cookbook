@@ -103,6 +103,7 @@ def fetch_smb_mqls(start_date, end_date):
         filters = [
             {"propertyName": "createdate", "operator": "GTE", "value": f"{start_date}T00:00:00Z"},
             {"propertyName": "createdate", "operator": "LT", "value": f"{end_date}T00:00:00Z"},
+            {"propertyName": "lead_source", "operator": "HAS_PROPERTY"},
             {"propertyName": "lead_source", "operator": "NEQ", "value": "Usuario Invitado"}
         ]
         

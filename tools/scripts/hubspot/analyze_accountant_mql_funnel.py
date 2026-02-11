@@ -30,8 +30,8 @@ DEFINITION OF "ACCOUNTANT MQL":
 
 FUNNEL STAGES:
 1. MQL Contador: Contacts created in period with accountant rol_wizard
-2. SQL: MQLs that entered opportunity stage (hs_v2_date_entered_opportunity) in period WITH validated deal association
-   - Validation: Contact must have a deal created between contact creation and SQL date (within period)
+2. SQL: MQLs that entered opportunity stage (hs_v2_date_entered_opportunity) in period with at least one deal
+   - Validation: Contact must have at least one deal associated (any deal)
 3. Deal Created: Deals created in period (associated with MQL contacts)
 4. Deal Closed Won: Deals closed won in period (createdate AND closedate in period)
 5. ICP Operador vs ICP PYME: Classification based on PRIMARY company type
@@ -927,10 +927,10 @@ def analyze_funnel(start_date, end_date):
     mql_contacts = fetch_accountant_mqls(start_date, end_date)
     print(f"   Found {len(mql_contacts)} MQL Contadores\n")
     
-    # STAGE 2: Identify SQLs (MQLs that entered opportunity in period WITH validated deal association)
-    print("📊 Stage 2: Identifying SQLs (with deal validation)...")
+    # STAGE 2: Identify SQLs (MQLs that entered opportunity in period with at least one deal)
+    print("📊 Stage 2: Identifying SQLs (sql_date in period + at least one deal)...")
     sql_contacts = []
-    sql_without_valid_deal = []  # Track contacts with SQL date but no valid deal
+    sql_without_valid_deal = []  # Track contacts with SQL date but no deals returned by API
     
     for contact in mql_contacts:
         props = contact.get('properties', {})
@@ -944,91 +944,34 @@ def analyze_funnel(start_date, end_date):
                 
                 # SQL conversion must be in period
                 if start_dt <= sql_date < end_dt:
-                    # Validate: Contact must have a deal created between contact creation and SQL date (within period)
                     contact_id = contact.get('id')
-                    deals = get_contact_deals(contact_id, start_date, end_date)
-                    
-                    # Check if any deal was created between contact creation and SQL date (within period)
-                    # IMPORTANT: For deals with multiple contacts, use the EARLIEST contact's createdate
-                    has_valid_deal = False
+                    # Fetch ALL deals for contact (not only created in period) to align with HubSpot funnel
+                    deals = get_contact_deals(contact_id, start_date, end_date, include_all_deals=True)
+                    has_valid_deal = len(deals) > 0
                     deal_validation_reasons = []
                     edge_case_type = None
-                    
                     if not deals:
-                        deal_validation_reasons.append("No deals associated with contact")
+                        deal_validation_reasons.append("No deals associated with contact (API returned empty)")
                         edge_case_type = "NO_DEALS_ASSOCIATED"
-                    else:
-                        for deal in deals:
-                            deal_id = deal.get('id')
-                            deal_props = deal.get('properties', {})
-                            deal_createdate_str = deal_props.get('createdate', '')
-                            if deal_createdate_str:
-                                deal_createdate = datetime.fromisoformat(deal_createdate_str.replace('Z', '+00:00'))
-                                
-                                # Get ALL contacts for this deal to find the earliest one
-                                deal_contacts = get_deal_contacts(deal_id)
-                                earliest_contact_createdate = contact_createdate  # Default to current contact
-                                
-                                if deal_contacts:
-                                    # Find earliest contact createdate
-                                    earliest_contact = min(
-                                        deal_contacts,
-                                        key=lambda x: datetime.fromisoformat(x.get('createdate', contact_createdate_str).replace('Z', '+00:00')) if x.get('createdate') else contact_createdate
-                                    )
-                                    earliest_contact_createdate_str = earliest_contact.get('createdate', contact_createdate_str)
-                                    if earliest_contact_createdate_str:
-                                        earliest_contact_createdate = datetime.fromisoformat(earliest_contact_createdate_str.replace('Z', '+00:00'))
-                                
-                                # Check each validation criterion
-                                reason_parts = []
-                                if deal_createdate < earliest_contact_createdate:
-                                    reason_parts.append(f"Deal created BEFORE earliest contact ({deal_createdate.date()} < {earliest_contact_createdate.date()})")
-                                    edge_case_type = "DEAL_BEFORE_EARLIEST_CONTACT"
-                                elif deal_createdate < contact_createdate:
-                                    # Deal created before THIS contact, but after earliest contact (self-serve pattern)
-                                    reason_parts.append(f"Deal created BEFORE this contact ({deal_createdate.date()} < {contact_createdate.date()}) but after earliest contact")
-                                    edge_case_type = "SELF_SERVE_DEAL_PATTERN"
-                                if deal_createdate > sql_date:
-                                    reason_parts.append(f"Deal created AFTER SQL date ({deal_createdate.date()} > {sql_date.date()})")
-                                    if not edge_case_type:
-                                        edge_case_type = "DEAL_AFTER_SQL_DATE"
-                                if deal_createdate < start_dt or deal_createdate >= end_dt:
-                                    reason_parts.append(f"Deal created OUTSIDE period ({deal_createdate.date()} not in [{start_date}, {end_date}])")
-                                    if not edge_case_type:
-                                        edge_case_type = "DEAL_OUTSIDE_PERIOD"
-                                
-                                # Deal must be created between EARLIEST contact creation and SQL date, AND within the period
-                                if (earliest_contact_createdate <= deal_createdate <= sql_date and 
-                                    start_dt <= deal_createdate < end_dt):
-                                    has_valid_deal = True
-                                    break
-                                else:
-                                    if reason_parts:
-                                        deal_validation_reasons.append(f"Deal {deal_id}: {', '.join(reason_parts)}")
-                            else:
-                                deal_validation_reasons.append(f"Deal {deal_id}: No createdate")
-                                if not edge_case_type:
-                                    edge_case_type = "DEAL_NO_CREATEDATE"
                     
                     if has_valid_deal:
                         sql_contacts.append(contact)
                     else:
-                        # Contact has SQL date but no valid deal
                         sql_without_valid_deal.append({
                             'contact_id': contact_id,
                             'email': props.get('email', ''),
                             'name': f"{props.get('firstname', '')} {props.get('lastname', '')}".strip(),
                             'createdate': contact_createdate_str,
                             'sql_date': sql_date_str,
-                            'num_deals': len(deals),
+                            'num_deals': 0,
                             'reasons': deal_validation_reasons,
                             'edge_case_type': edge_case_type
                         })
             except Exception as e:
                 pass
     
-    print(f"   Found {len(sql_contacts)} SQLs ({len(sql_contacts)/len(mql_contacts)*100:.1f}% of MQLs)")
-    print(f"   Found {len(sql_without_valid_deal)} contacts with SQL date but NO valid deal\n")
+    print(f"   Found {len(sql_contacts)} SQLs ({len(sql_contacts)/len(mql_contacts)*100:.1f}% of MQLs)" if mql_contacts else "   Found 0 SQLs")
+    print(f"   Found {len(sql_without_valid_deal)} contacts with SQL date but NO deals from API\n")
     
     # Analyze reasons for SQL without valid deal
     if sql_without_valid_deal:

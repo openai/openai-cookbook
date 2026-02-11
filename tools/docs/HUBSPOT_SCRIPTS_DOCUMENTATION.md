@@ -1,6 +1,6 @@
 # HubSpot Scripts Documentation
 
-**Last Updated:** 2026-01-28  
+**Last Updated:** 2026-01-26  
 **Purpose:** Complete documentation of all HubSpot analysis scripts and their usage
 
 ---
@@ -230,7 +230,7 @@ python tools/scripts/hubspot/pql_sql_deal_relationship_analysis.py --start-date 
 - Fields: `activo = 'true'`, `fecha_activo` populated
 
 **Cohort Definition (Updated - with Deal Validation):**
-- Contacts **CREATED** in period that **ALSO converted to SQL** in same period **with validated deal association**
+- Contacts **CREATED** in period that **ALSO converted to SQL** in same period **with at least one deal associated (any deal)**
 - Requirements:
   1. `createdate` must be within the specified date range (MQL - excluding 'Usuario Invitado')
   2. `hs_v2_date_entered_opportunity` must be within the same date range
@@ -383,8 +383,8 @@ python monthly_pql_analysis.py --months 2025-05,2025-06,2025-07,2025-08
 
 **Key Features:**
 - Runs analysis for each month from July 2025 to current month
-- Uses NEW SQL definition: Contact created in period + `hs_v2_date_entered_opportunity` in period + validated deal association
-- Validates deal association: Deal created between `createdate` and SQL date (within period)
+- Uses NEW SQL definition: Contact created in period + `hs_v2_date_entered_opportunity` in period + at least one deal associated (any deal)
+- SQL validation: Contact must have at least one deal associated (any deal)
 - Excludes 'Usuario Invitado' contacts
 - Provides aggregated results across all months
 - Generates detailed CSV output with contact-level data
@@ -684,7 +684,7 @@ python compare_owner_status_months.py --months 2025-11 2025-12
 
 **Funnel Stages:**
 1. MQL Contador: Contacts created in period with accountant `rol_wizard`
-2. SQL: MQLs that entered opportunity stage in period WITH validated deal association
+2. SQL: MQLs that entered opportunity stage in period with at least one deal associated (any deal)
 3. Deal Created: Deals created in period (associated with MQL contacts)
 4. Deal Closed Won: Deals closed won in period (both `createdate` and `closedate` in period)
 
@@ -709,7 +709,7 @@ python analyze_accountant_mql_funnel.py --start-date 2025-12-01 --end-date 2026-
 
 **Funnel Stages:**
 1. MQL PYME: Contacts created in period with SMB `rol_wizard` (NOT accountant)
-2. SQL: MQLs that entered opportunity stage in period WITH validated deal association
+2. SQL: MQLs that entered opportunity stage in period with at least one deal associated (any deal)
 3. Deal Created: Deals created in period (associated with MQL contacts)
 4. Deal Closed Won: Deals closed won in period (both `createdate` and `closedate` in period)
 

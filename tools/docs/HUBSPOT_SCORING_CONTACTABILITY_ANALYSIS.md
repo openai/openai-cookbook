@@ -1,6 +1,6 @@
 # HubSpot Scoring & Contactability Analysis Documentation
 
-**Last Updated:** 2025-12-20  
+**Last Updated:** 2026-01-26  
 **Purpose:** Complete documentation for scoring and contactability analysis scripts
 
 ---
@@ -78,6 +78,8 @@ python tools/scripts/hubspot/high_score_sales_handling_analysis.py --month 2025-
 # Custom date range
 python tools/scripts/hubspot/high_score_sales_handling_analysis.py --start-date 2025-12-01 --end-date 2025-12-20
 ```
+
+**Multi-month comparison:** Run for multiple months (e.g. `--month 2025-10`, `--month 2025-11`, etc.) to compare agent-by-agent performance over time.
 
 #### Output Metrics
 

@@ -5,10 +5,10 @@ SQL PQL CONVERSION ANALYSIS
 Analyzes Sales Qualified Leads (SQL) to determine if they were Product Qualified Leads (PQL)
 BEFORE converting to SQL (becoming an opportunity).
 
-SQL Definition: Contact that converted from Lead to Opportunity WITH validated deal association
+SQL Definition: Contact that converted from Lead to Opportunity with at least one deal (aligns with HubSpot funnel "Deal record created")
 - Field: hs_v2_date_entered_opportunity (when contact entered 'Oportunidad' lifecycle stage)
-- Validation: Contact must have a deal created between contact creation and SQL date (within the period)
-- Complete Definition: SQL = MQL (contact created in period) + hs_v2_date_entered_opportunity in period + deal created between createdate and SQL date (within period)
+- Validation: Contact has hs_v2_date_entered_opportunity in period AND at least one deal associated (no deal-createdate window)
+- Exclusion: Contacts with lead_source = 'Usuario Invitado' are excluded (same as HubSpot funnel)
 
 PQL Definition: Contact that activated during trial
 - Field: activo = 'true' (boolean flag)
@@ -19,10 +19,9 @@ Analysis Goal: For contacts that became SQL in a given month, determine:
 - How many became PQL AFTER becoming SQL (fecha_activo >= hs_v2_date_entered_opportunity)
 - How many were never PQL (activo != 'true' or fecha_activo is null)
 
-SQL Conversion Cohort Definition: Contacts CREATED in the period that ALSO converted to SQL in the same period WITH validated deal association
-- BOTH createdate AND hs_v2_date_entered_opportunity must be within the date range
-- Contact must have a deal created between createdate and SQL date (within the same period)
-- This measures conversion rate within the period (e.g., monthly conversion rate) with deal validation
+SQL Conversion Cohort Definition: Contacts CREATED in the period that ALSO converted to SQL in the same period with at least one deal
+- BOTH createdate AND hs_v2_date_entered_opportunity must be within the date range; excludes Usuario Invitado
+- Contact must have at least one deal associated (matches HubSpot "Contact record created to Deal record created")
 
 Usage:
   python sql_pql_conversion_analysis.py --month 2025-11
@@ -40,13 +39,19 @@ import time
 import requests
 from dotenv import load_dotenv
 
+# Load .env from repo root BEFORE any HubSpot imports (so get_config finds HUBSPOT_API_KEY)
+_repo_root = os.path.abspath(os.path.join(os.path.dirname(__file__), '..', '..', '..'))
+_env_path = os.path.join(_repo_root, '.env')
+if os.path.exists(_env_path):
+    load_dotenv(_env_path)
+else:
+    load_dotenv()
+
 # Add tools directory to path to import HubSpot API client
 sys.path.insert(0, os.path.join(os.path.dirname(__file__), '..', '..'))
 
 from hubspot_api.client import HubSpotClient, HubSpotAPIError
 from hubspot_api.config import get_config
-
-load_dotenv()
 
 # Initialize HubSpot client
 try:
@@ -160,53 +165,32 @@ def fetch_deal_details(deal_ids):
 def validate_sql_with_deal(contact, start_dt, end_dt):
     """
     Validate that a contact is SQL by checking:
-    1. Has hs_v2_date_entered_opportunity in period
-    2. Has a deal created between contact creation and SQL date (within period)
+    1. Has hs_v2_date_entered_opportunity in period (converted to Opportunity in period)
+    2. Has at least one deal associated (aligns with HubSpot funnel "Deal record created")
     
-    Returns True if valid SQL, False otherwise.
+    No longer requires deal createdate to fall in a narrow window; that rule caused 0 counts
+    because many deals are created before the contact or outside the period.
     """
-    props = contact.get('properties', {})
-    contact_createdate_str = contact.get('createdate')
-    sql_date_str = contact.get('sql_date')  # This is hs_v2_date_entered_opportunity
+    sql_date_str = contact.get('sql_date')  # hs_v2_date_entered_opportunity
     
-    if not sql_date_str or not contact_createdate_str:
+    if not sql_date_str:
         return False
     
-    contact_createdate = parse_datetime(contact_createdate_str)
     sql_date = parse_datetime(sql_date_str)
-    
-    if not contact_createdate or not sql_date:
+    if not sql_date:
         return False
     
     # SQL conversion must be in period
     if not (start_dt <= sql_date <= end_dt):
         return False
     
-    # Fetch deal associations
     contact_id = contact.get('contact_id')
     if not contact_id:
         return False
     
     deal_ids = fetch_deal_associations(contact_id)
-    if not deal_ids:
-        return False
-    
-    # Fetch deal details
-    deals_data = fetch_deal_details(deal_ids)
-    
-    # Check if any deal was created between contact creation and SQL date (within period)
-    for deal_id in deal_ids:
-        if deal_id in deals_data:
-            deal_createdate_str = deals_data[deal_id].get('createdate')
-            if deal_createdate_str:
-                deal_createdate = parse_datetime(deal_createdate_str)
-                if deal_createdate:
-                    # Deal must be created between contact creation and SQL date, AND within the period
-                    if (contact_createdate <= deal_createdate <= sql_date and 
-                        start_dt <= deal_createdate <= end_dt):
-                        return True
-    
-    return False
+    # SQL = contact entered Opportunity and has at least one deal (matches HubSpot funnel)
+    return len(deal_ids) > 0
 
 def fetch_sql_contacts(start_date, end_date):
     """
@@ -219,6 +203,7 @@ def fetch_sql_contacts(start_date, end_date):
     """
     print(f"\n📞 FETCHING SQL CONVERSIONS (Contacts created AND converted in period)")
     print(f"📅 Date Range: {start_date} to {end_date}")
+    print("   ⚠️  Excluding 'Usuario Invitado' contacts (align with HubSpot funnel)")
     
     start_datetime = f"{start_date}T00:00:00.000Z"
     end_datetime = f"{end_date}T23:59:59.999Z"
@@ -232,21 +217,18 @@ def fetch_sql_contacts(start_date, end_date):
         'hs_v2_date_entered_customer',
         'activo',  # PQL boolean flag
         'fecha_activo',  # PQL activation timestamp
-        'num_associated_deals'
+        'num_associated_deals',
+        'lead_source'  # To exclude "Usuario Invitado"
     ]
     
-    # Step 1: Fetch all contacts CREATED in the date range
+    # Step 1: Fetch all contacts CREATED in the date range (excluding Usuario Invitado)
     search_request = {
         "filterGroups": [{
-            "filters": [{
-                "propertyName": "createdate",
-                "operator": "GTE",
-                "value": start_datetime
-            }, {
-                "propertyName": "createdate",
-                "operator": "LTE",
-                "value": end_datetime
-            }]
+            "filters": [
+                {"propertyName": "createdate", "operator": "GTE", "value": start_datetime},
+                {"propertyName": "createdate", "operator": "LTE", "value": end_datetime},
+                {"propertyName": "lead_source", "operator": "NEQ", "value": "Usuario Invitado"}
+            ]
         }],
         "properties": properties,
         "limit": 100
@@ -315,16 +297,16 @@ def fetch_sql_contacts(start_date, end_date):
     
     sql_conversions = []
     total_created = len(all_contacts)
-    
-    print(f"🔍 Validating SQL conversions with deal associations...")
+    candidates_count = sum(1 for c in all_contacts if c.get('sql_date') and parse_datetime(c.get('sql_date')) and start_dt <= parse_datetime(c['sql_date']) <= end_dt)
+    print(f"🔍 Validating SQL conversions with deal associations ({candidates_count} contacts with SQL date in period)...")
     for i, contact in enumerate(all_contacts):
-        if (i + 1) % 50 == 0:
+        if (i + 1) % 500 == 0:
             print(f"   Progress: {i + 1}/{total_created} contacts checked...")
-        
-        # Validate SQL with deal association
         if validate_sql_with_deal(contact, start_dt, end_dt):
-            # This contact was created AND converted to SQL in the period WITH validated deal
             sql_conversions.append(contact)
+        # Light delay when contact could trigger association API call (rate-limit avoidance)
+        if contact.get('sql_date') and parse_datetime(contact.get('sql_date')) and start_dt <= parse_datetime(contact['sql_date']) <= end_dt:
+            time.sleep(0.05)
     
     print(f"🎯 SQL CONVERSIONS (created AND converted in period WITH validated deal): {len(sql_conversions)}")
     print(f"📊 Conversion Rate: {len(sql_conversions)/total_created*100:.2f}%" if total_created > 0 else "N/A")

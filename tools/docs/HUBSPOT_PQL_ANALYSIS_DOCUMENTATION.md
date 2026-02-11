@@ -1,6 +1,6 @@
 # PQL (Product Qualified Lead) Analysis - Complete Documentation
 
-**Last Updated:** 2025-12-20  
+**Last Updated:** 2026-01-26  
 **Purpose:** Comprehensive documentation of all PQL analysis scripts and methodologies
 
 ---
@@ -66,6 +66,12 @@ python tools/scripts/hubspot/pql_sql_deal_relationship_analysis.py --month-mtd 2
 # Custom date range
 python tools/scripts/hubspot/pql_sql_deal_relationship_analysis.py --start-date 2025-11-01 --end-date 2025-11-30
 ```
+
+**Rate Limiting (429 avoidance):**
+- `HUBSPOT_RATE_LIMIT_DELAY` (default 0,5 s): Delay between API requests
+- `HUBSPOT_INITIAL_DELAY` (default 1,0 s): Longer delay before first request and for first 5 pages
+- `HUBSPOT_INITIAL_DELAY_REQUESTS`: Number of initial requests with longer delay (default 5)
+- Set in `.env` to override; helps avoid burst 429 when fetching large contact cohorts
 
 **Output Metrics:**
 - PQL Deal Creation Rate: % of PQLs that became SQL (created deals)

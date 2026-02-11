@@ -94,6 +94,12 @@ except ImportError:
 
 HUBSPOT_API_KEY = os.getenv('HUBSPOT_API_KEY')
 HUBSPOT_BASE_URL = 'https://api.hubapi.com'
+# Delay (seconds) between HubSpot API calls to avoid 429; set HUBSPOT_RATE_LIMIT_DELAY in .env to increase
+HUBSPOT_RATE_LIMIT_DELAY = float(os.getenv('HUBSPOT_RATE_LIMIT_DELAY', '0.5'))
+# Longer delay for first N contact-search requests to avoid burst 429 at run start
+HUBSPOT_INITIAL_DELAY = float(os.getenv('HUBSPOT_INITIAL_DELAY', '1.0'))
+HUBSPOT_INITIAL_DELAY_REQUESTS = 5
+MAX_429_RETRIES = 3
 
 def parse_datetime(date_str):
     """Parse HubSpot datetime string to datetime object"""
@@ -284,6 +290,9 @@ def fetch_contacts_with_deals(start_date, end_date):
     }]
     
     while True:
+        # Throttle: longer delay before first few requests to avoid burst 429
+        if after is None and total_requests == 0:
+            time.sleep(HUBSPOT_INITIAL_DELAY)
         search_request = {
             "filterGroups": filter_groups,
             "properties": properties,
@@ -294,18 +303,40 @@ def fetch_contacts_with_deals(start_date, end_date):
         if after:
             search_request["after"] = after
         
-        try:
-            # Always use direct API requests for associations support
-            url = f"{HUBSPOT_BASE_URL}/crm/v3/objects/contacts/search"
-            headers = {
-                'Authorization': f'Bearer {HUBSPOT_API_KEY}',
-                'Content-Type': 'application/json'
-            }
-            response = requests.post(url, headers=headers, json=search_request, timeout=30)
-            response.raise_for_status()
-            result = response.json()
-        except Exception as e:
-            print(f"❌ Error fetching contacts: {e}")
+        url = f"{HUBSPOT_BASE_URL}/crm/v3/objects/contacts/search"
+        headers = {
+            'Authorization': f'Bearer {HUBSPOT_API_KEY}',
+            'Content-Type': 'application/json'
+        }
+        result = None
+        for attempt in range(MAX_429_RETRIES + 1):
+            try:
+                response = requests.post(url, headers=headers, json=search_request, timeout=30)
+                if response.status_code == 429:
+                    retry_after = int(response.headers.get('Retry-After', 10))
+                    if attempt < MAX_429_RETRIES:
+                        print(f"   ⚠️  Rate limited (429). Waiting {retry_after}s before retry {attempt + 1}/{MAX_429_RETRIES}...")
+                        time.sleep(retry_after)
+                        continue
+                    else:
+                        print(f"❌ Error fetching contacts: 429 Too Many Requests (retries exhausted)")
+                        break
+                response.raise_for_status()
+                result = response.json()
+                break
+            except requests.exceptions.HTTPError as e:
+                if e.response is not None and e.response.status_code == 429:
+                    retry_after = int(e.response.headers.get('Retry-After', 10))
+                    if attempt < MAX_429_RETRIES:
+                        print(f"   ⚠️  Rate limited (429). Waiting {retry_after}s before retry {attempt + 1}/{MAX_429_RETRIES}...")
+                        time.sleep(retry_after)
+                        continue
+                print(f"❌ Error fetching contacts: {e}")
+                break
+            except Exception as e:
+                print(f"❌ Error fetching contacts: {e}")
+                break
+        if result is None:
             break
         
         if not result or 'results' not in result:
@@ -365,6 +396,8 @@ def fetch_contacts_with_deals(start_date, end_date):
         if 'paging' not in result or 'next' not in result['paging']:
             break
         after = result['paging']['next']['after']
+        delay = HUBSPOT_INITIAL_DELAY if total_requests < HUBSPOT_INITIAL_DELAY_REQUESTS else HUBSPOT_RATE_LIMIT_DELAY
+        time.sleep(delay)
     
     print(f"✅ Fetched {len(all_contacts)} contacts")
     if len(all_contacts) > 0:
@@ -404,19 +437,34 @@ def fetch_deal_details(deal_ids):
             "inputs": inputs
         }
         
-        try:
-            url = f"{HUBSPOT_BASE_URL}/crm/v3/objects/deals/batch/read"
-            headers = {
-                'Authorization': f'Bearer {HUBSPOT_API_KEY}',
-                'Content-Type': 'application/json'
-            }
-            response = requests.post(url, headers=headers, json=request_data, timeout=30)
-            response.raise_for_status()
-            result = response.json()
-        except Exception as e:
-            print(f"❌ Error fetching deals: {e}")
+        url = f"{HUBSPOT_BASE_URL}/crm/v3/objects/deals/batch/read"
+        headers = {'Authorization': f'Bearer {HUBSPOT_API_KEY}', 'Content-Type': 'application/json'}
+        result = None
+        for attempt in range(MAX_429_RETRIES + 1):
+            try:
+                response = requests.post(url, headers=headers, json=request_data, timeout=30)
+                if response.status_code == 429:
+                    retry_after = int(response.headers.get('Retry-After', 10))
+                    if attempt < MAX_429_RETRIES:
+                        time.sleep(retry_after)
+                        continue
+                response.raise_for_status()
+                result = response.json()
+                break
+            except requests.exceptions.HTTPError as e:
+                if e.response is not None and e.response.status_code == 429 and attempt < MAX_429_RETRIES:
+                    time.sleep(int(e.response.headers.get('Retry-After', 10)))
+                    continue
+                print(f"❌ Error fetching deals: {e}")
+                result = None
+                break
+            except Exception as e:
+                print(f"❌ Error fetching deals: {e}")
+                result = None
+                break
+        if result is None:
             continue
-        
+        time.sleep(HUBSPOT_RATE_LIMIT_DELAY)
         if result and 'results' in result:
             for deal in result['results']:
                 props = deal.get('properties', {})
@@ -1127,6 +1175,7 @@ def main():
     contacts_to_check = sql_contacts if sql_contacts else contacts  # Fallback to all if no SQLs
     
     print(f"   Searching for deals associated with {len(contacts_to_check)} contacts ({len(sql_contacts)} SQL contacts)...")
+    headers = {'Authorization': f'Bearer {HUBSPOT_API_KEY}', 'Content-Type': 'application/json'}
     for i, contact in enumerate(contacts_to_check):
         if (i + 1) % 50 == 0:
             print(f"   Progress: {i + 1}/{len(contacts_to_check)} contacts checked")
@@ -1134,50 +1183,51 @@ def main():
         contact_id = contact['contact_id']
         contact_deal_ids = []
         
-        # Search for deals associated with this contact
-        try:
-            url = f"{HUBSPOT_BASE_URL}/crm/v4/objects/contacts/{contact_id}/associations/deals"
-            headers = {
-                'Authorization': f'Bearer {HUBSPOT_API_KEY}',
-                'Content-Type': 'application/json'
-            }
-            response = requests.get(url, headers=headers, timeout=30)
-            if response.status_code == 200:
-                result = response.json()
-                if 'results' in result:
-                    # v4 API uses 'toObjectId' field
-                    contact_deal_ids = [str(assoc.get('toObjectId') or assoc.get('id')) for assoc in result['results'] if assoc.get('toObjectId') or assoc.get('id')]
-                    if contact_deal_ids:
-                        deal_ids_from_contact_search.extend(contact_deal_ids)
-                        contact_to_deal_ids_map[contact_id] = contact_deal_ids
+        for attempt in range(MAX_429_RETRIES + 1):
+            try:
+                response = requests.get(f"{HUBSPOT_BASE_URL}/crm/v4/objects/contacts/{contact_id}/associations/deals", headers=headers, timeout=30)
+                if response.status_code == 429:
+                    retry_after = int(response.headers.get('Retry-After', 10))
+                    if attempt < MAX_429_RETRIES:
+                        time.sleep(retry_after)
                         continue
-        except Exception as e:
-            # Silently continue to try v3 API
-            pass
+                    break
+                if response.status_code == 200:
+                    result = response.json()
+                    if 'results' in result:
+                        contact_deal_ids = [str(assoc.get('toObjectId') or assoc.get('id')) for assoc in result['results'] if assoc.get('toObjectId') or assoc.get('id')]
+                        if contact_deal_ids:
+                            deal_ids_from_contact_search.extend(contact_deal_ids)
+                            contact_to_deal_ids_map[contact_id] = contact_deal_ids
+                break
+            except Exception:
+                break
         
-        # If v4 API doesn't work, try v3 associations API
-        try:
-            url = f"{HUBSPOT_BASE_URL}/crm/v3/objects/contacts/{contact_id}/associations/deals"
-            headers = {
-                'Authorization': f'Bearer {HUBSPOT_API_KEY}',
-                'Content-Type': 'application/json'
-            }
-            response = requests.get(url, headers=headers, timeout=30)
-            if response.status_code == 200:
-                result = response.json()
-                if 'results' in result:
-                    # v3 API may use 'id' or 'toObjectId' depending on version
-                    contact_deal_ids = [str(assoc.get('id') or assoc.get('toObjectId')) for assoc in result['results'] if assoc.get('id') or assoc.get('toObjectId')]
-                    if contact_deal_ids:
-                        deal_ids_from_contact_search.extend(contact_deal_ids)
-                        contact_to_deal_ids_map[contact_id] = contact_deal_ids
-        except Exception as e:
-            # Silently continue - no deals found for this contact
-            pass
+        if contact_deal_ids:
+            time.sleep(HUBSPOT_RATE_LIMIT_DELAY)
+            continue
         
-        # Small delay to avoid rate limiting
-        if (i + 1) % 10 == 0:
-            time.sleep(0.1)
+        for attempt in range(MAX_429_RETRIES + 1):
+            try:
+                response = requests.get(f"{HUBSPOT_BASE_URL}/crm/v3/objects/contacts/{contact_id}/associations/deals", headers=headers, timeout=30)
+                if response.status_code == 429:
+                    retry_after = int(response.headers.get('Retry-After', 10))
+                    if attempt < MAX_429_RETRIES:
+                        time.sleep(retry_after)
+                        continue
+                    break
+                if response.status_code == 200:
+                    result = response.json()
+                    if 'results' in result:
+                        contact_deal_ids = [str(assoc.get('id') or assoc.get('toObjectId')) for assoc in result['results'] if assoc.get('id') or assoc.get('toObjectId')]
+                        if contact_deal_ids:
+                            deal_ids_from_contact_search.extend(contact_deal_ids)
+                            contact_to_deal_ids_map[contact_id] = contact_deal_ids
+                break
+            except Exception:
+                break
+        
+        time.sleep(HUBSPOT_RATE_LIMIT_DELAY)
     
     # Update contacts with deal IDs found from reverse lookup
     for contact in contacts:

@@ -1,6 +1,6 @@
 # HubSpot Scripts and Workflows
 
-**Last Updated:** 2025-12-30  
+**Last Updated:** 2026-01-26  
 **Purpose:** Centralized HubSpot analysis scripts and custom code workflows
 
 ---
@@ -13,15 +13,14 @@ tools/scripts/hubspot/
 ├── analysis/                           # Analysis scripts
 │   ├── complete_november_analysis.py  # Comprehensive November 2025 analysis
 │   └── unengaged_contacts_analysis.py # Unengaged contacts analysis
-├── workflows/                          # HubSpot custom code workflows (JavaScript)
+├── custom_code/                        # HubSpot custom code workflows (JavaScript)
 │   ├── hubspot_first_deal_won_calculations.js
 │   ├── hubspot_accountant_channel_deal_workflow.js
 │   ├── hubspot_additional_product_created.js
 │   ├── hubspot_company_blank_field_validator.js
 │   ├── hubspot_deal_stage_update_workflow.js
-│   ├── hubspot_mixpanel_webhook_integration.py
-│   ├── hubspot_mixpanel_webhook_enhanced.py
-│   └── hubspot_real_mixpanel_webhook.py
+│   ├── hubspot_contact_creation_business_hours.js
+│   └── hubspot_industry_enrichment.js
 ├── utils/                              # Shared utilities (NEW)
 │   ├── __init__.py
 │   ├── datetime_utils.py              # Date parsing and formatting
@@ -110,7 +109,7 @@ tools/scripts/hubspot/
     - Deal Created: Deals created in period (associated with MQL contacts)
     - Deal Closed Won: Deals closed won in period (both `createdate` and `closedate` in period)
   - **SQL Metrics**: Shown as informational only (not part of strict funnel calculation)
-    - SQL: Contacts with `hs_v2_date_entered_opportunity` in period WITH validated deal association
+    - SQL: Contacts with `hs_v2_date_entered_opportunity` in period with at least one deal associated (any deal)
     - Edge case tracking: Deals created before contacts, no deals associated, etc.
   - **Conversion Rates**: MQL→Deal, Deal→Won, MQL→Won (strict funnel)
   - ICP Classification: Based on PRIMARY company type (ICP Operador vs ICP PYME)
@@ -126,7 +125,7 @@ tools/scripts/hubspot/
     - Deal Created: Deals created in period (associated with MQL contacts)
     - Deal Closed Won: Deals closed won in period (both `createdate` and `closedate` in period)
   - **SQL Metrics**: Shown as informational only (not part of strict funnel calculation)
-    - SQL: Contacts with `hs_v2_date_entered_opportunity` in period WITH validated deal association
+    - SQL: Contacts with `hs_v2_date_entered_opportunity` in period with at least one deal associated (any deal)
     - Edge case tracking: Deals created before contacts, no deals associated, etc.
   - **Conversion Rates**: MQL→Deal, Deal→Won, MQL→Won (strict funnel)
   - ICP Classification: Based on PRIMARY company type (ICP Operador vs ICP PYME)
@@ -181,7 +180,7 @@ tools/scripts/hubspot/
 - `generate_visualization_report.py` - Generates HTML reports with charts and visualizations
 
 ### Workflow Custom Codes (JavaScript)
-All workflow custom codes are in the `workflows/` directory. These are JavaScript files designed to run in HubSpot's workflow automation system.
+All workflow custom codes are in the `custom_code/` directory. These are JavaScript files designed to run in HubSpot's workflow automation system.
 
 See **[HUBSPOT_CUSTOM_CODE_WORKFLOW_MAPPING.md](../../docs/HUBSPOT_CUSTOM_CODE_WORKFLOW_MAPPING.md)** for complete workflow documentation.
 
@@ -271,6 +270,13 @@ python tools/scripts/hubspot/fix_close_date_from_history.py --csv input.csv --up
 ---
 
 ## 🔄 Recent Changes
+
+**2026-01-26:**
+- ✅ PQL script rate limit improvements (`pql_sql_deal_relationship_analysis.py`)
+  - `HUBSPOT_RATE_LIMIT_DELAY` default 0,5 s; `HUBSPOT_INITIAL_DELAY` 1,0 s for first 5 requests
+  - Delay before first request to avoid burst 429; configurable via `.env`
+- ✅ Funnel scripts SQL validation relaxed (accountant, SMB): SQL = contact with at least one deal associated (any deal)
+- ✅ Scoring study: `high_score_sales_handling_analysis.py` supports multi-month runs for agent-by-agent comparison
 
 **2025-12-30:**
 - ✅ Added `fix_close_date_from_history.py` - **DATA FIXING SCRIPT** for correcting deal close dates

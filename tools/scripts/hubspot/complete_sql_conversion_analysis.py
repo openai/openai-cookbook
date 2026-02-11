@@ -5,7 +5,7 @@ COMPLETE SQL CONVERSION ANALYSIS (July to Today)
 Comprehensive SQL conversion analysis using the NEW SQL definition:
 - Contact created in period (MQL - excluding 'Usuario Invitado')
 - hs_v2_date_entered_opportunity falls within the period
-- Contact has a deal associated that was created between createdate and SQL date (within the period)
+- Contact has at least one deal associated (aligned with HubSpot "Deal record created"; no deal-createdate window)
 
 Runs analysis for each month from July 2025 to current month and provides aggregated results.
 """
@@ -335,7 +335,7 @@ def analyze_month(contacts, period_name, period_start_date, period_end_date):
         if not createdate or not (period_start <= createdate <= period_end):
             continue
         
-        # NEW SQL DEFINITION: SQL = An MQL that has a deal associated during the period
+        # SQL DEFINITION (aligned with HubSpot funnel): MQL with sql_date in period AND at least one deal
         is_sql = False
         
         # Check if SQL conversion happened in the same period
@@ -344,36 +344,29 @@ def analyze_month(contacts, period_name, period_start_date, period_end_date):
             deal_ids = contact_to_deals.get(contact_id, [])
             
             if len(deal_ids) > 0:
-                # Check if any deal was created between contact creation and SQL date (within the period)
+                # Count as SQL if contact has at least one deal (no deal-createdate window)
+                is_sql = True
+                deal_created = None
                 for deal_id in deal_ids:
-                    if deal_id in deals_data:
+                    if deal_id in deals_data and deals_data[deal_id].get('createdate'):
                         deal_created = parse_datetime(deals_data[deal_id].get('createdate'))
-                        if deal_created:
-                            # Deal must be created between contact creation and SQL date
-                            # AND within the analysis period
-                            if (createdate <= deal_created <= sql_date) and (period_start <= deal_created <= period_end):
-                                is_sql = True
-                                if contact_id:
-                                    score_str = props.get('fit_score_contador')
-                                    try:
-                                        score = float(score_str) if score_str and score_str != '' else None
-                                    except:
-                                        score = None
-                                    # Calculate SQL cycle time (createdate to sql_date)
-                                    sql_cycle_days = None
-                                    if createdate and sql_date:
-                                        sql_cycle_days = (sql_date - createdate).total_seconds() / 86400
-                                    
-                                    sql_contacts.append({
-                                        'contact_id': contact_id,
-                                        'email': props.get('email'),
-                                        'score': score,
-                                        'createdate': createdate,
-                                        'sql_date': sql_date,
-                                        'deal_created': deal_created,
-                                        'sql_cycle_days': sql_cycle_days
-                                    })
-                                break
+                        break
+                if contact_id:
+                    score_str = props.get('fit_score_contador')
+                    try:
+                        score = float(score_str) if score_str and score_str != '' else None
+                    except:
+                        score = None
+                    sql_cycle_days = (sql_date - createdate).total_seconds() / 86400 if createdate and sql_date else None
+                    sql_contacts.append({
+                        'contact_id': contact_id,
+                        'email': props.get('email'),
+                        'score': score,
+                        'createdate': createdate,
+                        'sql_date': sql_date,
+                        'deal_created': deal_created,
+                        'sql_cycle_days': sql_cycle_days
+                    })
         
         # Check PQL
         is_pql_in_period = False

@@ -146,6 +146,7 @@ source .env
 - Built-in 0.1 second delay between requests
 - Handles API rate limits gracefully
 - Reports errors without stopping analysis
+- **`pql_sql_deal_relationship_analysis.py`** uses configurable throttling: `HUBSPOT_RATE_LIMIT_DELAY` (default 0,5 s), `HUBSPOT_INITIAL_DELAY` (1,0 s), `HUBSPOT_INITIAL_DELAY_REQUESTS` (5); set in `.env` to reduce 429 errors
 
 ---
 

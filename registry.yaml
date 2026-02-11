@@ -3069,3 +3069,14 @@
     - evals
     - vision
     - images
+
+- title: Skills in OpenAI API
+  path: examples/skills_in_api.ipynb
+  slug: skills-in-api
+  description: Cookbook for building skills with the OpenAI API.
+  date: 2026-02-10
+  authors:
+    - emreokcular
+
+  tags:
+    - responses

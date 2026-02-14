@@ -83,8 +83,8 @@ class HubSpotClient:
             )
             
             # Handle different response status codes
-            if response.status_code == 200:
-                return response.json()
+            if response.status_code in (200, 201):
+                return response.json() if response.content else {}
             elif response.status_code == 429:  # Rate limited
                 if retry_count < self.config.max_retries:
                     retry_after = int(response.headers.get('Retry-After', 1))
@@ -120,6 +120,10 @@ class HubSpotClient:
     def patch(self, endpoint: str, json_data: Dict[str, Any]) -> Dict[str, Any]:
         """Make PATCH request to HubSpot API"""
         return self._make_request("PATCH", endpoint, json_data=json_data)
+    
+    def put(self, endpoint: str, json_data: Union[Dict[str, Any], List[Any]]) -> Dict[str, Any]:
+        """Make PUT request to HubSpot API (body can be dict or list for JSON array)"""
+        return self._make_request("PUT", endpoint, json_data=json_data)
     
     def delete(self, endpoint: str) -> Dict[str, Any]:
         """Make DELETE request to HubSpot API"""

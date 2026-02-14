@@ -397,14 +397,17 @@ Use **semver-compliant version bumps** in `package__init__.py` whenever a public
 **Before any HubSpot work**, reference these documents:
 1. `/Users/virulana/openai-cookbook/tools/docs/HUBSPOT_COMPLETE_RETRIEVAL_QUICK_REFERENCE.md` - Quick reference for data retrieval
 2. `/Users/virulana/openai-cookbook/tools/docs/README_HUBSPOT_CONFIGURATION.md` - Configuration standards
-3. `/Users/virulana/openai-cookbook/tools/docs/README_HUBSPOT_PAGINATION_STANDARDS.md` - Pagination implementation
-4. `/Users/virulana/openai-cookbook/tools/docs/HUBSPOT_FIRST_DEAL_WON_DATE_IMPLEMENTATION.md` - Custom property patterns
-5. `/Users/virulana/openai-cookbook/tools/docs/README_HUBSPOT_CUSTOM_CODE_TESTING.md` - Testing requirements
+3. `/Users/virulana/openai-cookbook/tools/docs/HUBSPOT_DEAL_COMPANY_ASSOCIATION_RULES.md` - Deal–company associations, multiple companies per CUIT, CUIT format, deal stage
+4. `/Users/virulana/openai-cookbook/tools/docs/README_HUBSPOT_PAGINATION_STANDARDS.md` - Pagination implementation
+5. `/Users/virulana/openai-cookbook/tools/docs/HUBSPOT_FIRST_DEAL_WON_DATE_IMPLEMENTATION.md` - Custom property patterns
+6. `/Users/virulana/openai-cookbook/tools/docs/README_HUBSPOT_CUSTOM_CODE_TESTING.md` - Testing requirements
 
 **Critical HubSpot Rules:**
 - Always generate **clickable UI URLs** for any HubSpot objects mentioned in responses
 - Follow pagination standards exactly as documented
 - Use the documented testing patterns for custom code
+- **Deal–company associations:** Normalize CUIT (both formats); handle multiple companies per CUIT (pick or merge); consider deal stage (closedwon/churn) when matching to facturacion
+- **fix_deal_associations.py:** When you run this script and it completes, **always show the log result** to the user (the script prints it when `--log-fixed` is used; if you ran it, include the log output or read and display the log file). **When presenting outcomes, include BOTH:** (1) the preview table format: "Next N Group X Deals (offset Y)" with columns #, Deal ID (clickable), Deal Name, Amount, id_empresa, Billing Company, Billing CUIT; (2) clickable markdown links for each deal and company: `[Deal Name](https://app.hubspot.com/contacts/19877595/deal/DEAL_ID)` and `[Company Name](https://app.hubspot.com/contacts/19877595/company/COMPANY_ID)`
 
 ## Intercom Integration
 

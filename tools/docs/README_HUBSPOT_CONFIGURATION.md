@@ -1536,6 +1536,8 @@ The following values are used in the `lead_source` field to track the origin of 
 
 ## Deal-Company Associations
 
+**Billing rule:** One product = one billing CUIT = PRIMARY. Other companies (accountant, etc.) have different CUITs and are not PRIMARY. See [HUBSPOT_DEAL_COMPANY_ASSOCIATION_RULES.md](./HUBSPOT_DEAL_COMPANY_ASSOCIATION_RULES.md).
+
 | Relationship Type | Technical ID | Description | Usage |
 |-------------------|-------------|-------------|-------|
 | Primary | 5 (HUBSPOT_DEFINED) | Default primary company relationship | Main client company |
@@ -2763,21 +2765,11 @@ Association Type IDs: [8, 341]
 
 #### ❌ API Limitations
 
-1. **Cannot CREATE typeId 8 via API**
-   - ❌ HubSpot API v4 blocks creating "Estudio Contable" (typeId 8) in deal→company direction
-   - ❌ Error: "One or more association types in request don't match specified object types & direction"
-   - ✅ Can PRESERVE typeId 8 if it already exists
-   - ✅ Can add via HubSpot UI manually
-
-2. **Cannot CREATE typeId 11 via API**
-   - ❌ HubSpot API v4 blocks creating "Deal with Primary Company" (typeId 11) in deal→company direction
-   - ❌ Same error as typeId 8 - API limitation for custom association labels
-   - ✅ Can PRESERVE typeId 11 if it already exists
-   - ✅ Can add via HubSpot UI manually
-
-3. **UI-Only Association Types**
-   - ❌ Both typeId 8 and typeId 11 require HubSpot UI for initial creation
-   - ❌ API can only preserve existing associations, not create new ones
+1. **Creating typeId 8 and typeId 11 via API**
+   - ✅ HubSpot v4 API supports creating USER_DEFINED labels via `POST /crm/v4/associations/deals/companies/batch/create`
+   - ✅ Use `associationCategory: "USER_DEFINED"` and `associationTypeId: 8` (Estudio Contable) or `11` (Múltiples Negocios)
+   - ✅ To change labels: archive unwanted type via `batch/labels/archive`, then batch create the new type
+   - See `fix_deal_associations.py --fix-label` for implementation
 
 ### 📋 Best Practices for Switching Primary Companies
 
@@ -2833,9 +2825,9 @@ Association Type IDs: [8, 341]
 | **341** | **HUBSPOT_DEFINED** | **Default/Standard** | Standard association (no label) | ✅ **Full support** | **Recommended for additional products** |
 | **342** | **HUBSPOT_DEFINED** | **Standard (Alternative)** | Alternative standard association | ✅ **Full support** | **Alternative standard association** |
 | **39** | **USER_DEFINED** | **Compañía Integrador del Negocio** | Integration partner company | ❌ **Cannot create via API** | Integration partners (preserve if exists) |
-| **8** | **USER_DEFINED** | **Estudio Contable / Asesor / Consultor Externo del negocio** | Accountant firm label | ❌ **Cannot create via API** | Accountant companies (preserve if exists) |
-| **2** | **USER_DEFINED** | **Compañía que refiere al negocio** | Company that referred the deal | ❌ **Cannot create via API** | Referral tracking (preserve if exists) |
-| **11** | **USER_DEFINED** | **Compañía con Múltiples Negocios** | Company with multiple business relationships | ❌ **Cannot create via API** | Multi-entity customers (preserve if exists) |
+| **8** | **USER_DEFINED** | **Estudio Contable / Asesor / Consultor Externo del negocio** | Accountant firm label | ✅ **Can create via API** (batch/create) | Accountant companies |
+| **2** | **USER_DEFINED** | **Compañía que refiere al negocio** | Company that referred the deal | ✅ **Can create via API** | Referral tracking |
+| **11** | **USER_DEFINED** | **Compañía con Múltiples Negocios** | Company with multiple business relationships | ✅ **Can create via API** | Multi-entity customers |
 
 ### 🎯 Association Type Selection Guide
 
@@ -2856,13 +2848,11 @@ Association Type IDs: [8, 341]
 - Type ID **5** (Primary) - Full support
 - Type ID **341** (Default/Standard) - Full support
 
-**❌ Cannot Create via API (UI Only):**
-- Type ID **8** (Estudio Contable) - Must be created via HubSpot UI
-- Type ID **39** (Integrador) - Must be created via HubSpot UI  
-- Type ID **2** (Referrer) - Must be created via HubSpot UI
-- Type ID **11** (Múltiples Negocios) - Must be created via HubSpot UI
+**✅ Can Create via API (batch/create with USER_DEFINED):**
+- Type ID **8** (Estudio Contable), **11** (Múltiples Negocios), **2** (Referrer) - Use `fix_deal_associations.py --fix-label` or v4 batch/create
+- Type ID **39** (Integrador) - Same API pattern
 
-**Best Practice:** Always preserve existing USER_DEFINED association types when making API changes.
+**Best Practice:** Use batch/labels/archive to remove unwanted labels, then batch/create to add new ones.
 
 ### 🔧 HubSpot Association Label Removal API Guide
 

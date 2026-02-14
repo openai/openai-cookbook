@@ -29,6 +29,7 @@ class RNSCreationDateResult:
     domicilio_fiscal: Optional[str] = None
     domicilio_legal: Optional[str] = None
     provincia: Optional[str] = None
+    actividad_descripcion: Optional[str] = None  # ARCA activity description
     found: bool = False
     source_file: Optional[str] = None
 
@@ -344,6 +345,11 @@ class RNSDatasetLookup:
         domicilio_fiscal = row.get('domicilio_fiscal', '') if 'domicilio_fiscal' in row else None
         domicilio_legal = row.get('domicilio_legal', '') if 'domicilio_legal' in row else None
         provincia = row.get('dom_legal_provincia', '') if 'dom_legal_provincia' in row else None
+        actividad_descripcion = None
+        if 'actividad_descripcion' in row.index:
+            val = row.get('actividad_descripcion', None)
+            if val is not None and not (pd.isna(val) or str(val).strip() == ''):
+                actividad_descripcion = str(val).strip()
         
         return RNSCreationDateResult(
             cuit=formatted_cuit,
@@ -353,6 +359,7 @@ class RNSDatasetLookup:
             domicilio_fiscal=domicilio_fiscal,
             domicilio_legal=domicilio_legal,
             provincia=provincia,
+            actividad_descripcion=actividad_descripcion,
             found=True
         )
     

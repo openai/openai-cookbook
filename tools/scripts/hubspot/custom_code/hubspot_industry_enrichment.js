@@ -3,8 +3,8 @@
 // =============================================================================
 // source: hubspot_industry_enrichment.js
 // Hubspot workflow: https://app.hubspot.com/workflows/19877595/platform/flow/1693911922/edit
-// VERSION: 1.0.0
-// LAST UPDATED: 2025-01-09
+// VERSION: 1.1.0
+// LAST UPDATED: 2026-02-13
 // PURPOSE: 
 // Auto-populates industria field and Type field for companies using:
 // 1. LLM-based classification from ARCA activity text (primary method)
@@ -30,6 +30,20 @@ const hubspot = require('@hubspot/api-client');
 // In HubSpot custom code, require() must be at top level (cannot be in try-catch)
 // https is a Node.js built-in module and should be available in HubSpot environment
 const httpsModule = require('https');
+
+/** Delay helper - avoid HubSpot 429 rate limit (19 req/sec) */
+function sleep(ms) {
+  return new Promise(resolve => setTimeout(resolve, ms));
+}
+
+/** Truncate error for logging - keep logs under 4KB limit (no full Body/Headers) */
+function formatErrorForLog(err) {
+  if (!err) return 'Unknown error';
+  const code = err.code || (err.message && err.message.includes('429') ? 429 : null);
+  const msg = err.body?.message || err.message || 'Error';
+  const short = typeof msg === 'string' ? msg.split('\n')[0].substring(0, 80) : String(msg).substring(0, 80);
+  return code ? `HTTP ${code}: ${short}` : short;
+}
 
 /**
  * Map English enum values to Spanish industria field values
@@ -972,7 +986,8 @@ function getSlackColor(type) {
 // Main export function for HubSpot workflow
 exports.main = async (event, callback) => {
   const client = new hubspot.Client({
-    accessToken: process.env.ColppyCRMAutomations
+    accessToken: process.env.ColppyCRMAutomations,
+    numberOfApiCallRetries: 3  // Retry 429 rate limit errors (delay: 200ms, 400ms, 600ms)
   });
 
   try {
@@ -988,12 +1003,7 @@ exports.main = async (event, callback) => {
     
     const companyIdString = String(companyId);
 
-    console.log('='.repeat(80));
-    console.log('🚀 INDUSTRY ENRICHMENT WORKFLOW STARTED');
-    console.log('='.repeat(80));
-    console.log(`📋 Company ID: ${companyIdString}`);
-    console.log(`📅 Timestamp: ${new Date().toISOString()}`);
-    console.log('='.repeat(80));
+    console.log('🚀 INDUSTRY ENRICHMENT STARTED', companyIdString);
 
     // Get current company properties
     const currentCompany = await client.crm.companies.basicApi.getById(companyIdString, [
@@ -1011,6 +1021,7 @@ exports.main = async (event, callback) => {
     async function getOwnerName(ownerId) {
       if (!ownerId) return 'No Owner';
       try {
+        await sleep(600);
         const response = await fetch(`https://api.hubspot.com/crm/v3/owners/${ownerId}`, {
           headers: {
             'Authorization': `Bearer ${process.env.ColppyCRMAutomations}`,
@@ -1034,11 +1045,7 @@ exports.main = async (event, callback) => {
       ? await getOwnerName(currentCompany.properties.hubspot_owner_id)
       : 'No Owner';
 
-    console.log(`📊 Current Company: ${companyName}`);
-    console.log(`   Domain: ${companyDomain || 'NULL'}`);
-    console.log(`   CUIT: ${companyCuit || 'NULL'}`);
-    console.log(`   Industria: ${companyIndustry || 'NULL'}`);
-    console.log(`   Type: ${currentCompanyType || 'NULL'}`);
+    console.log(`📊 ${companyName} | Domain:${companyDomain || '-'} CUIT:${companyCuit || '-'} Industria:${companyIndustry || '-'}`);
 
     // ========================================================================
     // INDUSTRY ENRICHMENT: Auto-populate industria field if NULL/EMPTY
@@ -1149,6 +1156,7 @@ exports.main = async (event, callback) => {
           console.log(`✅ CUIT SEARCH SUCCESS: Found domain ${cuitResult.domain}`);
           
           try {
+            await sleep(600);
             await client.crm.companies.basicApi.update(companyIdString, {
               properties: { domain: cuitResult.domain }
             });
@@ -1163,7 +1171,7 @@ exports.main = async (event, callback) => {
               }
             }
           } catch (updateError) {
-            console.log(`⚠️  Could not update domain field: ${updateError.message}`);
+            console.log(`⚠️  Could not update domain: ${formatErrorForLog(updateError)}`);
           }
         } else if (cuitResult && (cuitResult.websiteContent || cuitResult.activity)) {
           // Track ARCA activity text for notification (use original before cleaning)
@@ -1199,6 +1207,7 @@ exports.main = async (event, callback) => {
               // Update arcaActivityText to use cleaned version for notification (matches what's saved in HubSpot)
               arcaActivityText = cleanActivity;
               
+              await sleep(600);
               await client.crm.companies.basicApi.update(companyIdString, {
                 properties: {
                   actividad_de_la_compania_segun_arca: cleanActivity
@@ -1206,7 +1215,7 @@ exports.main = async (event, callback) => {
               });
               console.log(`✅ ACTIVIDAD SAVED: Cleaned activity text saved: "${cleanActivity.substring(0, 60)}..."`);
             } catch (updateError) {
-              console.log(`⚠️  Could not update actividad_de_la_compania_segun_arca field: ${updateError.message}`);
+              console.log(`⚠️  Could not update actividad_de_la_compania_segun_arca: ${formatErrorForLog(updateError)}`);
             }
           }
           
@@ -1221,7 +1230,7 @@ exports.main = async (event, callback) => {
               llmReasoning = llmResult.reasoning; // Track LLM reasoning for notification
               console.log(`✅ LLM Industry Classification: ${inferredIndustryEnum} → "${llmResult.hubspotValue}"`);
               if (llmResult.reasoning) {
-                console.log(`💭 LLM Reasoning: ${llmResult.reasoning}`);
+                if (llmResult.reasoning) console.log(`💭 LLM: ${(llmResult.reasoning || '').substring(0, 80)}`);
               }
             } else if (llmResult.reasoning && !llmResult.reasoning.includes('OPENAI_API_KEY not configured')) {
               console.log(`⚠️  LLM classification failed: ${llmResult.reasoning} - falling back to keyword matching`);
@@ -1273,12 +1282,13 @@ exports.main = async (event, callback) => {
               console.log(`✅ Industry inferred from found domain: ${inferredIndustryEnum}`);
               
               try {
+                await sleep(600);
                 await client.crm.companies.basicApi.update(companyIdString, {
                   properties: { domain: foundDomain }
                 });
                 console.log(`✅ DOMAIN UPDATED: ${foundDomain}`);
               } catch (updateError) {
-                console.log(`⚠️  Could not update domain field: ${updateError.message}`);
+                console.log(`⚠️  Could not update domain: ${formatErrorForLog(updateError)}`);
               }
             }
           }
@@ -1305,6 +1315,7 @@ exports.main = async (event, callback) => {
         const industriaValue = mapToIndustriaField(inferredIndustryEnum);
         if (industriaValue) {
           try {
+            await sleep(600);
             await client.crm.companies.basicApi.update(companyIdString, {
               properties: { industria: industriaValue }
             });
@@ -1312,7 +1323,7 @@ exports.main = async (event, callback) => {
             companyIndustry = industriaValue; // Update local variable for Type inference
             newIndustria = industriaValue; // Track for notification
           } catch (updateError) {
-            console.error(`❌ Failed to update industria: ${updateError.message}`);
+            console.error(`❌ Failed to update industria: ${formatErrorForLog(updateError)}`);
           }
         }
       } else {
@@ -1386,6 +1397,7 @@ exports.main = async (event, callback) => {
         
         // Save cleaned activity text to HubSpot field
         try {
+          await sleep(600);
           await client.crm.companies.basicApi.update(companyIdString, {
             properties: {
               actividad_de_la_compania_segun_arca: cleanActivity
@@ -1401,7 +1413,7 @@ exports.main = async (event, callback) => {
             enrichmentMethod = 'ARCA activity enrichment (industria already existed)';
           }
         } catch (updateError) {
-          console.log(`⚠️  Could not update actividad_de_la_compania_segun_arca field: ${updateError.message}`);
+          console.log(`⚠️  Could not update actividad_de_la_compania_segun_arca: ${formatErrorForLog(updateError)}`);
         }
       } else {
         console.log(`⚠️  ARCA ACTIVITY ENRICHMENT: No activity found for CUIT ${companyCuit}`);
@@ -1449,12 +1461,13 @@ exports.main = async (event, callback) => {
         typeWasInferred = true;
         
         try {
+          await sleep(600);
           await client.crm.companies.basicApi.update(companyIdString, {
             properties: { type: inferredType }
           });
           console.log(`✅ TYPE SET: Company type updated to "${inferredType}" based on industry "${companyIndustry}" (${typeMatchType})`);
         } catch (updateError) {
-          console.error(`❌ TYPE UPDATE FAILED: ${updateError.message}`);
+          console.error(`❌ TYPE UPDATE FAILED: ${formatErrorForLog(updateError)}`);
           typeWasInferred = false; // Mark as not inferred if update failed
         }
       } else {
@@ -1543,9 +1556,7 @@ exports.main = async (event, callback) => {
       console.log('📢 STEP 4: SKIPPED (No enrichment occurred)');
     }
 
-    console.log('='.repeat(80));
-    console.log('✅ INDUSTRY ENRICHMENT WORKFLOW COMPLETED');
-    console.log('='.repeat(80));
+    console.log('✅ INDUSTRY ENRICHMENT COMPLETED');
     
     callback(null, 'Success');
 

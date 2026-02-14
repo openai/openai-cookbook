@@ -912,6 +912,25 @@ python analyze_industria_field_history.py --start-date 2025-12-01 --end-date 202
 
 ---
 
+#### `infer_numeric_company_names.py`
+
+**Purpose:** Infers better names for HubSpot companies whose name is only a number (e.g. `64481`). Uses deal names and email domains from facturacion mapping.
+
+**Key Features:**
+- Identifies companies with numeric-only names
+- Infers from deal_name patterns (`"95973 - PayGoal Uruguay"` → `PayGoal Uruguay`)
+- Fallback: email domain (`admin@paygoal.io` → `PayGoal`)
+- Proposed format: `{id} - {InferredName}` for traceability
+
+**See:** [HUBSPOT_NUMERIC_COMPANY_NAME_INFERENCE.md](./HUBSPOT_NUMERIC_COMPANY_NAME_INFERENCE.md)
+
+```bash
+python tools/scripts/hubspot/infer_numeric_company_names.py          # Dry-run
+python tools/scripts/hubspot/infer_numeric_company_names.py --apply # Update HubSpot
+```
+
+---
+
 #### `enrich_company_industry.py` ⭐ **NEW**
 **Purpose:** Enriches company records with industry information.
 
@@ -947,7 +966,7 @@ python enrich_company_industry.py
 | **ICP Operador Billing** | `analyze_icp_operador_billing.py` |
 | **SMB Accountant Involved Funnel** | `analyze_smb_accountant_involved_funnel.py` |
 | **Data Quality** | `find_contacts_without_lead_objects.py`, `fix_close_date_from_history.py`, `analyze_industria_field_history.py` |
-| **Data Enrichment** | `enrich_company_industry.py` |
+| **Data Enrichment** | `enrich_company_industry.py`, `infer_numeric_company_names.py` |
 | **Visualization** | `generate_visualization_report.py`, `visualize_sql_cycle_time.py` |
 
 ### Scripts by Data Source

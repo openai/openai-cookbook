@@ -1,0 +1,144 @@
+# HubSpot Deal–Company Association Rules
+
+**Purpose:** Rules for handling deal–company associations when matching facturacion to HubSpot, including multiple companies per CUIT and CUIT format differences.
+
+---
+
+## 0. Core Billing Rule (Facturacion is Master)
+
+**One product = one billing CUIT = PRIMARY association.**
+
+| Role | CUIT | Association | Meaning |
+|------|------|-------------|---------|
+| **Billing company** | `customer_cuit` from facturacion | **PRIMARY** (type 5) | The company we bill for the product. Exactly one per deal. |
+| **Other companies** | Different CUITs | Not PRIMARY (e.g. type 8, 11) | Accountant, referrer, integrator, etc. Different legal entities. |
+
+**Rule:** You can only bill a product to one single CUIT. That company must be the PRIMARY association on the deal. A product can have other companies (accountant, etc.) associated with different CUITs, but they are not primary.
+
+**CUIT required for PRIMARY:** We do not accept companies without a valid CUIT as PRIMARY. A company must have a CUIT in HubSpot to be set as billing/primary. If the company has no CUIT (empty or invalid), it must be enriched or merged with the correct company record before it can be PRIMARY.
+
+**Reference:** [ICP_COMPANY_DEFINITIONS_AND_ASSUMPTIONS.md](./ICP_COMPANY_DEFINITIONS_AND_ASSUMPTIONS.md) — Primary company and association type 8 (Estudio Contable).
+
+---
+
+## 0.1 How to Know Which Non-Primary Company Is the Accountant (Type 8)
+
+**When a deal has multiple companies** (billing + others), use the **Company `type`** field to assign the correct association label:
+
+| Company `type` (HubSpot) | Association label | Type ID |
+|-------------------------|-------------------|---------|
+| `Cuenta Contador` | Estudio Contable (accountant) | **8** |
+| `Cuenta Contador y Reseller` | Estudio Contable (accountant) | **8** |
+| `Contador Robado` | Estudio Contable (accountant) | **8** |
+| Other (multi-entity, referrer, etc.) | Compañía con Múltiples Negocios | **11** |
+
+**Rule:** If a non-primary company has `type` ∈ `Cuenta Contador` \| `Cuenta Contador y Reseller` \| `Contador Robado`, it should have **association type 8** (Estudio Contable). Use `fix_deal_associations.py --fix-label DEAL_ID COMPANY_ID --remove 11 --add 8` to correct mislabeled associations.
+
+**Empresa Administrada + industria contabilidad:** Companies with `type` = Empresa Administrada and `industria` containing "contabilidad" (e.g. "Contabilidad, impuestos, legales") are accountant firms misclassified. Fix company records with `icp_type_from_billing.py --fix-empresa-administrada-accountants`. The fix_deal_associations script also treats them as type 8 when assigning secondary labels.
+
+**Name-based inference (fallback):** When `company.type` and `industria` are both empty, the script infers accountant from the company name. Patterns include: "estudio contable", "contador", "contadores", "asesor impositivo", "contaduría", "contadoría", "asesoramiento contable", "servicios contables". Example: "Estudio Contable Ferretti" with no type/industria → type 8 (Estudio Contable). This fallback is used only when type and industria are empty; it does not override explicit type/industria.
+
+**Company enrichment:** When accountant is inferred from name, the script also PATCHes the company record with `type` = "Cuenta Contador" and `industria` = "Contabilidad, impuestos, legales". This enriches the HubSpot company so future runs use type/industria instead of name inference.
+
+**Audit (type 8/11 validation):** After each fix batch, the script audits all non-primary companies on fixed deals. If a company has association type 8 (Estudio Contable) but `company.type` (and name fallback) does not warrant accountant → the label is corrected to type 11 (Múltiples Negocios). Conversely, if a company has type 11 but `company.type` or name warrants accountant → corrected to type 8. This prevents mislabeled associations (e.g. Power Silens with type 8 but company.type null).
+
+**Source of truth:** Company `type` in HubSpot (primary). Name inference is fallback when type/industria are empty. See [ICP_COMPANY_DEFINITIONS_AND_ASSUMPTIONS.md](./ICP_COMPANY_DEFINITIONS_AND_ASSUMPTIONS.md) for `ACCOUNTANT_COMPANY_TYPES`.
+
+---
+
+## 1. CUIT Format Handling
+
+**Problem:** HubSpot may store CUIT in different formats:
+- `33715806679` (11 digits)
+- `33-71580667-9` (formatted with hyphens)
+
+**Rule:** Always treat both as the same legal entity. Normalize to 11 digits for matching.
+
+**Implementation:**
+- When **searching** HubSpot by CUIT: include BOTH formats in the `IN` filter
+  ```python
+  values = [format_cuit_display(c) for c in batch] + list(batch)  # both 33-71580667-9 and 33715806679
+  ```
+- When **matching** facturacion to companies: normalize `customer_cuit` to 11 digits before lookup
+
+---
+
+## 2. Multiple Companies per CUIT (Duplicates)
+
+**Problem:** Same legal entity (CUIT) can have multiple company records in HubSpot due to:
+- Different CUIT formats at creation time
+- Legacy imports or integrations
+- Deal creation creating a new company instead of linking to existing
+
+**Rule:** Treat all companies with the same normalized CUIT as the same legal entity.
+
+**When associating deals to billing company:**
+1. **Search** with both CUIT formats → may return multiple companies
+2. **If multiple companies:** Pick ONE for the association:
+   - Prefer the one already associated with the deal (if any)
+   - Prefer the one whose name contains `id_empresa` matching facturacion
+   - Prefer the one with `type` set (per `icp_type_from_billing.py`)
+   - Otherwise: **merge duplicates first** using `merge_duplicate_companies.py`, then use merged result
+3. **Do NOT** assume "first result" is correct — explicitly pick or merge
+
+**Script logic:** `fix_deal_associations.py` verifies each company has a valid CUIT in HubSpot before applying. When a company lacks CUIT, it fixes it: (1) PATCH the company with `customer_cuit` from facturacion, or (2) find another company with that CUIT and use it. Only skips when both fixes fail. `build_facturacion_hubspot_mapping.py` and `fix_deal_associations.py`:
+- Store **all** companies per CUIT (multiple rows per cuit in `companies` table)
+- Check if deal has **any** company with `customer_cuit` as PRIMARY (not just one specific company)
+- Exclude false positives when deal has a different company record with same CUIT
+
+**Script:** `tools/scripts/hubspot/merge_duplicate_companies.py` for merging duplicate companies.
+
+---
+
+## 3. Deal Stage and Facturacion Matching
+
+**Problem:** A company can have multiple deals. Only some correspond to current billing (facturacion).
+
+**Rule:** Always consider `dealstage` when evaluating deal–company–facturacion alignment.
+
+| dealstage | Meaning | In facturacion? |
+|-----------|---------|-----------------|
+| `closedwon` | Active, paying | Yes |
+| `34692158` | Cerrado Ganado Recupero (recovery) | Yes |
+| `closedlost` | Lost, no revenue | No |
+| `31849274` | Cerrado Churn (customer left) | No |
+
+**Implications:**
+- **closedwon** (and 34692158): Expect a matching facturacion row for `customer_cuit` + `id_empresa`
+- **closedlost** / **31849274** (churn): Correctly NOT in facturacion — customer is no longer paying
+- A company with 2 deals (one closedwon, one churn) is valid — both associations stay; facturacion only has the active one
+
+**Reference:** [README_HUBSPOT_CONFIGURATION.md](./README_HUBSPOT_CONFIGURATION.md) — Main Sales Pipeline stages
+
+---
+
+## 4. Summary Checklist
+
+When analyzing or fixing deal–company associations:
+
+- [ ] Normalize CUIT to 11 digits; search with both formats
+- [ ] If multiple companies per CUIT: pick explicitly or merge first
+- [ ] Filter by `dealstage` when matching to facturacion (closedwon/34692158 = active)
+- [ ] Churn/lost deals on a company are expected — do not remove those associations
+
+---
+
+## 5. Fix Workflow (No Full Populate After Each Batch)
+
+**Scripts:**
+- `fix_deal_associations.py` — fixes Groups 1 & 2, updates local `deal_associations` after each batch
+- `populate_deal_associations.py --deals 123,456` — incremental refresh for specific deals (e.g. after merges)
+
+**Local DB updates (reconciliation):**
+- When removing PRIMARY from a company: deletes that row from `deal_associations`
+- When adding billing as PRIMARY: inserts `(deal, billing_company, type 5)`
+- When fixing secondary labels (8 or 11): removes old type, inserts new type in `deal_associations`
+- Run `populate_deal_associations.py` periodically to refresh from HubSpot for full reconciliation
+
+**Workflow:**
+1. Run `fix_deal_associations.py --status` to see counts
+2. Fix in batches: `fix_deal_associations.py --group 2 --batch 5 --log-fixed` (updates local DB; no full populate)
+3. After merges: `populate_deal_associations.py --deals id1,id2,id3` to refresh those deals only
+4. Full populate only when needed (e.g. new session, or to verify)
+
+**Log (`--log-fixed`):** Writes all outcomes to `tools/outputs/fix_deal_associations_log.csv` and prints clickable HubSpot URLs. Columns: `timestamp`, `group`, `deal_id`, `deal_name`, `deal_url`, `billing_id`, `billing_name`, `company_url`, `customer_cuit`, `outcome`, `detail`. Outcomes: `fixed` (detail: `cuit_ok`|`cuit_patched`|`cuit_alternative`), `failed` (detail: error message), `skipped` (detail: `no_customer_cuit`|`cuit_unfixable`), `dry_run` (when `--dry-run`).

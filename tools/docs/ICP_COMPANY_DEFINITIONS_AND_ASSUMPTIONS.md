@@ -12,6 +12,7 @@ Este documento define **qué es ICP a nivel objeto Compañía** y **qué assumpt
 - **Funnel y definiciones Lead/MQL/SQL**: [COLPPY_FUNNEL_MAPPING_COMPLETE.md](./COLPPY_FUNNEL_MAPPING_COMPLETE.md)
 - **Configuración HubSpot (campos, asociaciones)**: [README_HUBSPOT_CONFIGURATION.md](./README_HUBSPOT_CONFIGURATION.md)
 - **Scripts HubSpot**: [HUBSPOT_SCRIPTS_DOCUMENTATION.md](./HUBSPOT_SCRIPTS_DOCUMENTATION.md)
+- **Deal–Company associations, billing rule, facturacion as master**: [HUBSPOT_DEAL_COMPANY_ASSOCIATION_RULES.md](./HUBSPOT_DEAL_COMPANY_ASSOCIATION_RULES.md)
 
 ---
 
@@ -126,6 +127,8 @@ Estas son las **assumptions** explícitas que hacen los scripts al usar el objet
 ### 5. Association type 8 ≠ ICP Operador
 
 - **Assumption**: Type 8 indica **canal contador / referral**, no “facturamos al contador”. Un deal puede tener type 8 y ser ICP PYME (primary = PyME).
+- **Billing rule:** Un producto se factura a un solo CUIT. Ese CUIT = PRIMARY. Otras compañías (contador, etc.) tienen CUITs distintos y no son PRIMARY. Ver [HUBSPOT_DEAL_COMPANY_ASSOCIATION_RULES.md](./HUBSPOT_DEAL_COMPANY_ASSOCIATION_RULES.md).
+- **CUIT obligatorio para PRIMARY:** No aceptamos compañías sin CUIT válido como PRIMARY. La compañía debe tener CUIT en HubSpot para ser billing/primary. Si no tiene CUIT, debe enriquecerse o fusionarse antes.
 
 ### 6. Constante `ACCOUNTANT_COMPANY_TYPES` única
 

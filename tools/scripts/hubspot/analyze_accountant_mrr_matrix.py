@@ -1190,20 +1190,20 @@ def generate_dashboard_html(
         .col-hidden {{ display: none !important; }}
         .col-toggle {{ position: relative; display: inline-block; margin-left: 12px; }}
         .col-toggle-btn {{
-            padding: 4px 10px; font-size: 0.8rem; background: var(--accent-dim); border: 1px solid var(--border);
-            border-radius: 6px; color: var(--text); cursor: pointer;
+            padding: 10px 14px; min-height: 44px; font-size: 0.9rem; background: var(--accent-dim); border: 1px solid var(--border);
+            border-radius: 8px; color: var(--text); cursor: pointer; display: inline-flex; align-items: center;
         }}
         .col-toggle-btn:hover {{ background: var(--accent); }}
         .col-toggle-dropdown {{
-            display: none; position: absolute; top: 100%; left: 0; margin-top: 4px; z-index: 100;
-            background: var(--card); border: 1px solid var(--border); border-radius: 8px;
-            padding: 12px; min-width: 180px; max-height: 280px; overflow-y: auto;
-            box-shadow: 0 4px 12px rgba(0,0,0,0.3);
+            display: none; position: fixed; z-index: 9999;
+            background: var(--card); border: 1px solid var(--border); border-radius: 10px;
+            padding: 14px; min-width: 220px; max-width: min(320px, 90vw); max-height: min(360px, 70vh); overflow-y: auto;
+            box-shadow: 0 8px 24px rgba(0,0,0,0.4);
         }}
         .col-toggle-dropdown.open {{ display: block; }}
-        .col-toggle-dropdown label {{ display: flex; align-items: center; gap: 8px; padding: 4px 0; cursor: pointer; font-size: 0.85rem; }}
-        .col-toggle-dropdown label:hover {{ color: var(--accent); }}
-        .col-toggle-dropdown input {{ margin: 0; }}
+        .col-toggle-dropdown label {{ display: flex; align-items: center; gap: 10px; padding: 10px 6px; min-height: 44px; cursor: pointer; font-size: 0.9rem; color: var(--text); border-radius: 6px; }}
+        .col-toggle-dropdown label:hover {{ background: var(--accent-dim); color: var(--accent); }}
+        .col-toggle-dropdown input {{ margin: 0; width: 18px; height: 18px; flex-shrink: 0; }}
     </style>
 </head>
 <body>
@@ -1511,7 +1511,7 @@ def generate_dashboard_html(
             var vis = loadColVisibility(tableId) || {{}};
             var checkboxes = [];
             var toggleAllLink = document.createElement('div');
-            toggleAllLink.style.cssText = 'display:flex;gap:8px;margin-bottom:8px;padding-bottom:6px;border-bottom:1px solid var(--border);font-size:0.8rem;';
+            toggleAllLink.style.cssText = 'display:flex;gap:12px;margin-bottom:10px;padding:8px 0 10px 0;border-bottom:1px solid var(--border);font-size:0.9rem;';
             var selAll = document.createElement('a');
             selAll.textContent = 'Select all';
             selAll.href = '#';
@@ -1559,12 +1559,29 @@ def generate_dashboard_html(
                 dropdown.appendChild(label);
             }});
             applyColVisibility(table, vis);
+            function positionDropdown() {{
+                var rect = btn.getBoundingClientRect();
+                var dropW = dropdown.offsetWidth || 220;
+                var dropH = dropdown.offsetHeight || Math.min(360, window.innerHeight * 0.7);
+                var pad = 8;
+                var left = rect.left;
+                var top = rect.bottom + pad;
+                if (left + dropW > window.innerWidth - pad) left = window.innerWidth - dropW - pad;
+                if (left < pad) left = pad;
+                if (top + dropH > window.innerHeight - pad) {{ top = rect.top - dropH - pad; }}
+                if (top < pad) top = pad;
+                dropdown.style.left = left + 'px';
+                dropdown.style.top = top + 'px';
+            }}
             btn.addEventListener('click', function(e) {{
                 e.stopPropagation();
+                var isOpening = !dropdown.classList.contains('open');
                 dropdown.classList.toggle('open');
+                if (isOpening) {{ dropdown.style.left = ''; dropdown.style.top = ''; requestAnimationFrame(positionDropdown); }}
             }});
             document.addEventListener('click', function() {{ dropdown.classList.remove('open'); }});
             dropdown.addEventListener('click', function(e) {{ e.stopPropagation(); }});
+            window.addEventListener('resize', function() {{ if (dropdown.classList.contains('open')) positionDropdown(); }});
         }});
     }})();
     document.querySelectorAll("table.sortable").forEach(function(table) {{

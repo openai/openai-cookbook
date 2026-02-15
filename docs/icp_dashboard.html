@@ -1,0 +1,204 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>Colppy - ICP Dashboard</title>
+    <style>
+        :root {
+            --bg: #0f172a;
+            --card: #1e293b;
+            --accent: #3b82f6;
+            --accent-dim: #1e40af;
+            --text: #f1f5f9;
+            --text-muted: #94a3b8;
+            --success: #22c55e;
+            --warning: #f59e0b;
+            --border: #334155;
+        }
+        * { box-sizing: border-box; }
+        body {
+            font-family: 'Segoe UI', system-ui, sans-serif;
+            background: var(--bg);
+            color: var(--text);
+            margin: 0;
+            padding: 24px;
+            min-height: 100vh;
+        }
+        .container { max-width: 1200px; margin: 0 auto; }
+        h1 { font-size: 1.5rem; font-weight: 600; margin-bottom: 8px; color: var(--text); }
+        .subtitle { color: var(--text-muted); font-size: 0.9rem; margin-bottom: 24px; }
+        .grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+            gap: 20px;
+            margin-bottom: 24px;
+        }
+        .card {
+            background: var(--card);
+            border-radius: 12px;
+            padding: 20px;
+            border: 1px solid var(--border);
+        }
+        .card h2 { font-size: 0.95rem; font-weight: 600; margin: 0 0 12px 0; color: var(--text-muted); }
+        .card .value { font-size: 1.5rem; font-weight: 700; color: var(--accent); }
+        .card .detail { font-size: 0.85rem; color: var(--text-muted); margin-top: 8px; }
+        .churn-card { border-left: 4px solid var(--warning); }
+        .table-card { grid-column: 1 / -1; }
+        table { width: 100%; border-collapse: collapse; font-size: 0.9rem; }
+        th, td { padding: 12px; text-align: left; border-bottom: 1px solid var(--border); }
+        th { font-weight: 600; color: var(--text-muted); }
+        .num { text-align: right; }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>Colppy ICP Dashboard</h1>
+        <p class="subtitle">Paying customers, MRR, and churn by Ideal Customer Profile</p>
+
+        <div class="grid">
+            <div class="card">
+                <h2>Paying Customers</h2>
+                <div class="value">2,365</div>
+                <div class="detail">Unique CUITs billed (no duplication)</div>
+            </div>
+            <div class="card">
+                <h2>Total MRR</h2>
+                <div class="value">$622.204.153,00</div>
+                <div class="detail">From facturacion (billing source of truth)</div>
+            </div>
+            <div class="card churn-card">
+                <h2>Churn Deals</h2>
+                <div class="value">59</div>
+                <div class="detail">Deal stage closedlost/31849274 · primary company in billing · 2.2% churn rate</div>
+            </div>
+        </div>
+
+        <div class="grid">
+            
+            <div class="card">
+                <h2>ICP Operador</h2>
+                <div class="value">$63.765.215,00</div>
+                <div class="detail">275 unique CUITs · 23 churn deals</div>
+            </div>
+            <div class="card">
+                <h2>ICP Asesor</h2>
+                <div class="value">$1.729.954,00</div>
+                <div class="detail">7 unique CUITs · 0 churn deals</div>
+            </div>
+            <div class="card">
+                <h2>ICP Híbrido</h2>
+                <div class="value">$22.736.065,00</div>
+                <div class="detail">88 unique CUITs · 23 churn deals</div>
+            </div>
+            <div class="card">
+                <h2>ICP Contador</h2>
+                <div class="value">$2.693.944,00</div>
+                <div class="detail">12 unique CUITs · 0 churn deals</div>
+            </div>
+            <div class="card">
+                <h2>ICP PYME</h2>
+                <div class="value">$513.127.230,00</div>
+                <div class="detail">1,983 unique CUITs · 13 churn deals</div>
+            </div>
+        </div>
+        <p class="detail" style="margin-bottom:16px;font-size:0.85rem">Total MRR comes from facturacion directly (no join). ICP uses tipo_icp_contador (Operador/Asesor/Híbrido) when set; else type (Cuenta Contador → ICP Contador, Cuenta Pyme → ICP PYME). See tools/docs/NPS_TO_ICP_DATA_FLOW.md.</p>
+
+        <div class="card table-card">
+            <h2>Churn by ICP</h2>
+            <p class="detail" style="margin-bottom:12px">Churn = deals with deal_stage in (closedlost, 31849274), id_empresa NOT in facturacion, primary company in billing. close_date = when product stopped being paid.</p>
+            <table>
+                <thead>
+                    <tr>
+                        <th>ICP</th>
+                        <th class="num">Churn Deals</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    
+                    <tr>
+                        <td>ICP Operador</td>
+                        <td class="num">23</td>
+                    </tr>
+                    <tr>
+                        <td>ICP Híbrido</td>
+                        <td class="num">23</td>
+                    </tr>
+                    <tr>
+                        <td>ICP PYME</td>
+                        <td class="num">13</td>
+                    </tr>
+                    <tr>
+                        <td><strong>Total</strong></td>
+                        <td class="num"><strong>59</strong></td>
+                    </tr>
+                </tbody>
+            </table>
+        </div>
+
+        <div class="card table-card">
+            <h2>Churn by Month (close_date)</h2>
+            <p class="detail" style="margin-bottom:12px">When the product stopped being paid. Last 12 months.</p>
+            <table>
+                <thead>
+                    <tr>
+                        <th>Month</th>
+                        <th class="num">Churn Deals</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    
+                    <tr>
+                        <td>2026-02</td>
+                        <td class="num">2</td>
+                    </tr>
+                    <tr>
+                        <td>2026-01</td>
+                        <td class="num">1</td>
+                    </tr>
+                    <tr>
+                        <td>2025-12</td>
+                        <td class="num">2</td>
+                    </tr>
+                    <tr>
+                        <td>2025-11</td>
+                        <td class="num">13</td>
+                    </tr>
+                    <tr>
+                        <td>2025-10</td>
+                        <td class="num">1</td>
+                    </tr>
+                    <tr>
+                        <td>2025-09</td>
+                        <td class="num">3</td>
+                    </tr>
+                    <tr>
+                        <td>2025-06</td>
+                        <td class="num">2</td>
+                    </tr>
+                    <tr>
+                        <td>2025-05</td>
+                        <td class="num">1</td>
+                    </tr>
+                    <tr>
+                        <td>2025-04</td>
+                        <td class="num">2</td>
+                    </tr>
+                    <tr>
+                        <td>2024-11</td>
+                        <td class="num">2</td>
+                    </tr>
+                    <tr>
+                        <td>2024-10</td>
+                        <td class="num">2</td>
+                    </tr>
+                    <tr>
+                        <td>2024-09</td>
+                        <td class="num">1</td>
+                    </tr>
+                </tbody>
+            </table>
+        </div>
+    </div>
+</body>
+</html>

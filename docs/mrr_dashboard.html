@@ -1,0 +1,1615 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>Colppy - MRR Accountant Offices</title>
+    <style>
+        :root {
+            --bg: #0f172a;
+            --card: #1e293b;
+            --accent: #3b82f6;
+            --accent-dim: #1e40af;
+            --text: #f1f5f9;
+            --text-muted: #94a3b8;
+            --success: #22c55e;
+            --border: #334155;
+        }
+        * { box-sizing: border-box; }
+        body {
+            font-family: 'Segoe UI', system-ui, sans-serif;
+            background: var(--bg);
+            color: var(--text);
+            margin: 0;
+            padding: 24px;
+            min-height: 100vh;
+        }
+        .container {
+            max-width: 100%;
+            margin: 0 auto;
+        }
+        h1 {
+            font-size: 1.5rem;
+            font-weight: 600;
+            margin-bottom: 8px;
+            color: var(--text);
+        }
+        .subtitle {
+            color: var(--text-muted);
+            font-size: 0.9rem;
+            margin-bottom: 24px;
+        }
+        .top-tier {
+            background: var(--card);
+            border-radius: 12px;
+            padding: 16px 20px;
+            margin-bottom: 24px;
+            border: 1px solid var(--border);
+        }
+        .top-tier h2 {
+            font-size: 1rem;
+            font-weight: 600;
+            margin: 0 0 12px 0;
+            color: var(--text);
+        }
+        .top-tier ul {
+            list-style: none;
+            padding: 0;
+            margin: 0;
+            display: flex;
+            flex-wrap: wrap;
+            gap: 16px 24px;
+        }
+        .top-tier li {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            font-size: 0.9rem;
+            color: var(--text-muted);
+        }
+        .top-tier li::before {
+            content: "✓";
+            color: var(--success);
+            font-weight: bold;
+        }
+        .main-grid {
+            display: grid;
+            grid-template-columns: 1fr 260px;
+            gap: 24px;
+            align-items: start;
+        }
+        @media (max-width: 900px) {
+            .main-grid { grid-template-columns: 1fr; }
+        }
+        .matrix-card {
+            background: var(--card);
+            border-radius: 12px;
+            padding: 20px;
+            overflow-x: auto;
+            border: 1px solid var(--border);
+        }
+        .matrix-card h2 {
+            font-size: 1rem;
+            font-weight: 600;
+            margin: 0 0 16px 0;
+            color: var(--text);
+        }
+        table {
+            width: max-content;
+            min-width: 100%;
+            border-collapse: collapse;
+            font-size: 0.85rem;
+        }
+        th, td {
+            padding: 10px 12px;
+            text-align: right;
+            border-bottom: 1px solid var(--border);
+        }
+        th {
+            font-weight: 600;
+            color: var(--text-muted);
+            text-align: center;
+        }
+        .growth-label {
+            text-align: left;
+            font-weight: 500;
+            color: var(--text);
+        }
+        .cell {
+            min-width: 100px;
+        }
+        .cell:not(:empty) {
+            color: var(--accent);
+        }
+        .sidebar {
+            background: var(--card);
+            border-radius: 12px;
+            padding: 20px;
+            border: 1px solid var(--accent);
+        }
+        .sidebar h2 {
+            font-size: 1rem;
+            font-weight: 600;
+            margin: 0 0 12px 0;
+            color: var(--accent);
+        }
+        .sidebar p {
+            font-size: 0.85rem;
+            color: var(--text-muted);
+            margin: 0 0 16px 0;
+            line-height: 1.4;
+        }
+        .sidebar .goal {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            padding: 10px 12px;
+            background: var(--accent-dim);
+            border-radius: 8px;
+            margin-bottom: 8px;
+            font-size: 0.9rem;
+        }
+        .sidebar .goal-btn {
+            background: var(--accent);
+            color: white;
+            border: none;
+            padding: 4px 12px;
+            border-radius: 6px;
+            font-weight: 600;
+            font-size: 0.8rem;
+        }
+        .metrics {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 24px;
+            margin-top: 24px;
+            padding: 16px 0;
+            border-top: 1px solid var(--border);
+        }
+        .metric {
+            font-size: 0.9rem;
+        }
+        .metric strong {
+            color: var(--accent);
+        }
+        .detail {
+            font-size: 0.85rem;
+            color: var(--text-muted);
+        }
+        .positive { color: var(--success); }
+        .negative { color: #ef4444; }
+        a { color: var(--accent); text-decoration: none; }
+        a:hover { text-decoration: underline; }
+        table.sortable th { cursor: pointer; -webkit-user-select: none; user-select: none; }
+        table.sortable th:hover { color: var(--accent); }
+        table.sortable th::after { content: " ⇅"; opacity: 0.5; font-size: 0.8em; }
+        .col-hidden { display: none !important; }
+        .col-toggle { position: relative; display: inline-block; margin-left: 12px; }
+        .col-toggle-btn {
+            padding: 4px 10px; font-size: 0.8rem; background: var(--accent-dim); border: 1px solid var(--border);
+            border-radius: 6px; color: var(--text); cursor: pointer;
+        }
+        .col-toggle-btn:hover { background: var(--accent); }
+        .col-toggle-dropdown {
+            display: none; position: absolute; top: 100%; left: 0; margin-top: 4px; z-index: 100;
+            background: var(--card); border: 1px solid var(--border); border-radius: 8px;
+            padding: 12px; min-width: 180px; max-height: 280px; overflow-y: auto;
+            box-shadow: 0 4px 12px rgba(0,0,0,0.3);
+        }
+        .col-toggle-dropdown.open { display: block; }
+        .col-toggle-dropdown label { display: flex; align-items: center; gap: 8px; padding: 4px 0; cursor: pointer; font-size: 0.85rem; }
+        .col-toggle-dropdown label:hover { color: var(--accent); }
+        .col-toggle-dropdown input { margin: 0; }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>Colppy Accountant Offices: Where We Win</h1>
+        <p class="subtitle">MRR by Client Portfolio Growth and Managed Tax IDs (ICP accountants only · MRR only, not NRR · includes churned)</p>
+
+        <div class="top-tier">
+            <h2>Top Tier Accountant Offices</h2>
+            <ul>
+                <li>Growth Oriented</li>
+                <li>Offer bookkeeping, payroll and at least one advisory service (tax, legal, HR, etc)</li>
+                <li>Value productivity in core workflows (free up time for advisory service)</li>
+                <li>Digital Adopters (High quality webpage, e-signature, others)</li>
+            </ul>
+        </div>
+
+        <div class="main-grid">
+            <div class="matrix-card">
+                <div style="display:flex;align-items:center;justify-content:space-between;flex-wrap:wrap;gap:8px;margin-bottom:8px">
+                    <h2 style="margin:0">MRR - Accountant Customers (not NRR)</h2>
+                    <div class="col-toggle" data-table-id="mrr-matrix"><button type="button" class="col-toggle-btn">Columns</button><div class="col-toggle-dropdown"></div></div>
+                </div>
+                <table class="sortable" data-table-id="mrr-matrix">
+                    <thead>
+                        <tr>
+                            <th data-col-id="growth">Accountant's Client Portfolio Growth</th>
+                            <th data-col-id="pb-1">Managed Tax IDs: 1</th><th data-col-id="pb-2">Managed Tax IDs: 2</th><th data-col-id="pb-3-5">Managed Tax IDs: 3-5</th><th data-col-id="pb-6-10">Managed Tax IDs: 6-10</th><th data-col-id="pb-11-20">Managed Tax IDs: 11-20</th><th data-col-id="pb-20-40">Managed Tax IDs: 20-40</th><th data-col-id="pb-40-100">Managed Tax IDs: 40-100</th><th data-col-id="pb-100-200">Managed Tax IDs: 100-200</th><th data-col-id="pb-200+">Managed Tax IDs: 200+</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        
+        <tr>
+            <td class="growth-label" data-col-id="growth"><-14%</td>
+            <td class="cell" data-col-id="pb-1">N/A</td><td class="cell" data-col-id="pb-2">$813.035,00</td><td class="cell" data-col-id="pb-3-5">$110.896,00</td><td class="cell" data-col-id="pb-6-10">N/A</td><td class="cell" data-col-id="pb-11-20">N/A</td><td class="cell" data-col-id="pb-20-40">N/A</td><td class="cell" data-col-id="pb-40-100">N/A</td><td class="cell" data-col-id="pb-100-200">N/A</td><td class="cell" data-col-id="pb-200+">N/A</td>
+        </tr>
+        <tr>
+            <td class="growth-label" data-col-id="growth">-14% - 0%</td>
+            <td class="cell" data-col-id="pb-1">N/A</td><td class="cell" data-col-id="pb-2">N/A</td><td class="cell" data-col-id="pb-3-5">N/A</td><td class="cell" data-col-id="pb-6-10">N/A</td><td class="cell" data-col-id="pb-11-20">N/A</td><td class="cell" data-col-id="pb-20-40">N/A</td><td class="cell" data-col-id="pb-40-100">N/A</td><td class="cell" data-col-id="pb-100-200">N/A</td><td class="cell" data-col-id="pb-200+">N/A</td>
+        </tr>
+        <tr>
+            <td class="growth-label" data-col-id="growth">0% - +14%</td>
+            <td class="cell" data-col-id="pb-1">$54.002.763,00</td><td class="cell" data-col-id="pb-2">$10.805.615,00</td><td class="cell" data-col-id="pb-3-5">$2.697.519,00</td><td class="cell" data-col-id="pb-6-10">$919.604,00</td><td class="cell" data-col-id="pb-11-20">N/A</td><td class="cell" data-col-id="pb-20-40">N/A</td><td class="cell" data-col-id="pb-40-100">N/A</td><td class="cell" data-col-id="pb-100-200">N/A</td><td class="cell" data-col-id="pb-200+">N/A</td>
+        </tr>
+        <tr>
+            <td class="growth-label" data-col-id="growth">>+14%</td>
+            <td class="cell" data-col-id="pb-1">N/A</td><td class="cell" data-col-id="pb-2">$17.979.412,00</td><td class="cell" data-col-id="pb-3-5">$15.778.846,00</td><td class="cell" data-col-id="pb-6-10">$21.391.717,00</td><td class="cell" data-col-id="pb-11-20">$15.136.416,00</td><td class="cell" data-col-id="pb-20-40">$7.466.720,00</td><td class="cell" data-col-id="pb-40-100">N/A</td><td class="cell" data-col-id="pb-100-200">N/A</td><td class="cell" data-col-id="pb-200+">N/A</td>
+        </tr>
+                    </tbody>
+                </table>
+                <p class="detail" style="margin:12px 0 8px 0;font-size:0.8rem;color:var(--text-muted)">Cells = sum of MRR (facturacion amount) for accountants in that segment. Not NRR. Churned MRR = sum of deal.amount for deals with deal_stage Cerrado Churn.</p>
+                <div style="display:flex;align-items:center;justify-content:space-between;flex-wrap:wrap;gap:8px;margin:20px 0 8px 0"><h3 style="font-size:0.95rem;margin:0;color:var(--text)">CAGR by Segment (rolling)</h3><div class="col-toggle" data-table-id="cagr-matrix"><button type="button" class="col-toggle-btn">Columns</button><div class="col-toggle-dropdown"></div></div></div><table class="sortable" data-table-id="cagr-matrix"><thead><tr><th data-col-id="growth">Accountant's Client Portfolio Growth</th><th data-col-id="pb-1">Managed Tax IDs: 1</th><th data-col-id="pb-2">Managed Tax IDs: 2</th><th data-col-id="pb-3-5">Managed Tax IDs: 3-5</th><th data-col-id="pb-6-10">Managed Tax IDs: 6-10</th><th data-col-id="pb-11-20">Managed Tax IDs: 11-20</th><th data-col-id="pb-20-40">Managed Tax IDs: 20-40</th><th data-col-id="pb-40-100">Managed Tax IDs: 40-100</th><th data-col-id="pb-100-200">Managed Tax IDs: 100-200</th><th data-col-id="pb-200+">Managed Tax IDs: 200+</th></tr></thead><tbody id="cagr-matrix-tbody"><tr data-gb="<-14%"><td class="growth-label" data-col-id="growth"><-14%</td><td class="cell " data-gb="<-14%" data-pb="1" data-col-id="pb-1">N/A</td><td class="cell positive" data-gb="<-14%" data-pb="2" data-col-id="pb-2">+0.0%</td><td class="cell positive" data-gb="<-14%" data-pb="3-5" data-col-id="pb-3-5">+0.0%</td><td class="cell " data-gb="<-14%" data-pb="6-10" data-col-id="pb-6-10">N/A</td><td class="cell " data-gb="<-14%" data-pb="11-20" data-col-id="pb-11-20">N/A</td><td class="cell " data-gb="<-14%" data-pb="20-40" data-col-id="pb-20-40">N/A</td><td class="cell " data-gb="<-14%" data-pb="40-100" data-col-id="pb-40-100">N/A</td><td class="cell " data-gb="<-14%" data-pb="100-200" data-col-id="pb-100-200">N/A</td><td class="cell " data-gb="<-14%" data-pb="200+" data-col-id="pb-200+">N/A</td></tr><tr data-gb="-14% - 0%"><td class="growth-label" data-col-id="growth">-14% - 0%</td><td class="cell " data-gb="-14% - 0%" data-pb="1" data-col-id="pb-1">N/A</td><td class="cell " data-gb="-14% - 0%" data-pb="2" data-col-id="pb-2">N/A</td><td class="cell " data-gb="-14% - 0%" data-pb="3-5" data-col-id="pb-3-5">N/A</td><td class="cell " data-gb="-14% - 0%" data-pb="6-10" data-col-id="pb-6-10">N/A</td><td class="cell " data-gb="-14% - 0%" data-pb="11-20" data-col-id="pb-11-20">N/A</td><td class="cell " data-gb="-14% - 0%" data-pb="20-40" data-col-id="pb-20-40">N/A</td><td class="cell " data-gb="-14% - 0%" data-pb="40-100" data-col-id="pb-40-100">N/A</td><td class="cell " data-gb="-14% - 0%" data-pb="100-200" data-col-id="pb-100-200">N/A</td><td class="cell " data-gb="-14% - 0%" data-pb="200+" data-col-id="pb-200+">N/A</td></tr><tr data-gb="0% - +14%"><td class="growth-label" data-col-id="growth">0% - +14%</td><td class="cell positive" data-gb="0% - +14%" data-pb="1" data-col-id="pb-1">+0.0%</td><td class="cell positive" data-gb="0% - +14%" data-pb="2" data-col-id="pb-2">+0.0%</td><td class="cell positive" data-gb="0% - +14%" data-pb="3-5" data-col-id="pb-3-5">+0.0%</td><td class="cell positive" data-gb="0% - +14%" data-pb="6-10" data-col-id="pb-6-10">+0.0%</td><td class="cell " data-gb="0% - +14%" data-pb="11-20" data-col-id="pb-11-20">N/A</td><td class="cell " data-gb="0% - +14%" data-pb="20-40" data-col-id="pb-20-40">N/A</td><td class="cell " data-gb="0% - +14%" data-pb="40-100" data-col-id="pb-40-100">N/A</td><td class="cell " data-gb="0% - +14%" data-pb="100-200" data-col-id="pb-100-200">N/A</td><td class="cell " data-gb="0% - +14%" data-pb="200+" data-col-id="pb-200+">N/A</td></tr><tr data-gb=">+14%"><td class="growth-label" data-col-id="growth">>+14%</td><td class="cell " data-gb=">+14%" data-pb="1" data-col-id="pb-1">N/A</td><td class="cell positive" data-gb=">+14%" data-pb="2" data-col-id="pb-2">+0.0%</td><td class="cell positive" data-gb=">+14%" data-pb="3-5" data-col-id="pb-3-5">+0.0%</td><td class="cell positive" data-gb=">+14%" data-pb="6-10" data-col-id="pb-6-10">+0.0%</td><td class="cell positive" data-gb=">+14%" data-pb="11-20" data-col-id="pb-11-20">+0.0%</td><td class="cell positive" data-gb=">+14%" data-pb="20-40" data-col-id="pb-20-40">+0.0%</td><td class="cell " data-gb=">+14%" data-pb="40-100" data-col-id="pb-40-100">N/A</td><td class="cell " data-gb=">+14%" data-pb="100-200" data-col-id="pb-100-200">N/A</td><td class="cell " data-gb=">+14%" data-pb="200+" data-col-id="pb-200+">N/A</td></tr></tbody></table><p class="detail" style="margin:12px 0 0 0;font-size:0.8rem;color:var(--text-muted)">CAGR = (MRR_now / MRR_at_start)^(1/years) - 1. Same dimensions as MRR matrix.</p>
+                <div class="metrics">
+                    <span class="metric">Total accountants: <strong>423</strong></span>
+                    <span class="metric">Total MRR: <strong>$147.102.543,00</strong></span>
+                    <span class="metric">Avg ticket (MRR/accountant): <strong>$347.760,15</strong></span>
+                    <span class="metric">Total portfolio (active+churned): <strong>931</strong></span>
+                    <span class="metric">Active SMBs: <strong>723</strong></span>
+                    <span class="metric">Churned SMBs: <strong>88</strong></span>
+                    <span class="metric">Churned MRR: <strong>$7.670.816,00</strong></span>
+                    <span class="metric">Churn rate (SMBs): <strong>9.5%</strong></span>
+                    <span class="metric">Churn rate (MRR): <strong>5.0%</strong></span>
+                </div>
+            </div>
+            <div class="sidebar">
+                <h2>Colppy Top Accountants</h2>
+                <p>Most attractive Accounting Offices to accelerate Accountant Partner Channel Growth</p>
+                <div class="goal">
+                    <span>Top accountant</span>
+                    <span class="goal-btn">29 related deals</span>
+                </div>
+                <div class="goal">
+                    <span>Grow their Client Portfolio</span>
+                    <span class="goal-btn">+31% YoY</span>
+                </div>
+                <div class="goal">
+                    <span>Manage</span>
+                    <span class="goal-btn">20+ SMBs</span>
+                </div>
+            </div>
+        </div>
+
+        
+        <div class="cagr-period-control" style="margin:20px 0 12px 0;display:flex;align-items:center;gap:12px;">
+            <label for="cagr-period-select" style="font-size:0.9rem;color:var(--text-muted)">CAGR period (rolling):</label>
+            <select id="cagr-period-select" style="padding:6px 12px;border-radius:8px;background:var(--card);border:1px solid var(--border);color:var(--text);font-size:0.9rem;">
+                <option value="6" >Last 6 months</option><option value="12" >Last 12 months</option><option value="18" >Last 18 months</option><option value="24" selected>Last 24 months</option><option value="36" >Last 36 months</option><option value="48" >Last 48 months</option>
+            </select>
+            <span id="cagr-cutoff-span" class="detail" style="font-size:0.85rem;">Start: 2024-02-15</span>
+        </div>
+        <div class="matrix-card" style="margin-top: 24px;"><div style="display:flex;align-items:center;justify-content:space-between;flex-wrap:wrap;gap:8px;margin-bottom:8px"><h2 style="margin:0">MRR Growth by Portfolio Tier (CAGR rolling)</h2><div class="col-toggle" data-table-id="mrr-growth"><button type="button" class="col-toggle-btn">Columns</button><div class="col-toggle-dropdown"></div></div></div><p class="detail" style="margin-bottom:12px;font-size:0.85rem;color:var(--text-muted)">ICP accountants only. MRR now vs MRR at start of rolling period. Use dropdown above to change period. CAGR = (MRR_now / MRR_start)^(1/years) - 1. Reconstructed from deal close_date.</p><table class="sortable" data-table-id="mrr-growth"><thead><tr><th data-col-id="tier">Managed Tax IDs</th><th class="num" data-col-id="mrr_now">MRR Now</th><th class="num" data-col-id="mrr_start">MRR at Start</th><th class="num" data-col-id="cagr_pct">CAGR %</th></tr></thead><tbody id="mrr-growth-tbody">
+                        <tr data-row-index="0">
+                            <td class="growth-label" data-col-id="tier">1</td>
+                            <td class="num" data-col-id="mrr_now">$54.002.763,00</td>
+                            <td class="num" data-col="mrr_start" data-col-id="mrr_start">$44.774.542,00</td>
+                            <td class="num positive" data-col="cagr_pct" data-col-id="cagr_pct">+9.8%</td>
+                        </tr>
+                        <tr data-row-index="1">
+                            <td class="growth-label" data-col-id="tier">2</td>
+                            <td class="num" data-col-id="mrr_now">$29.598.062,00</td>
+                            <td class="num" data-col="mrr_start" data-col-id="mrr_start">$22.697.915,00</td>
+                            <td class="num positive" data-col="cagr_pct" data-col-id="cagr_pct">+14.2%</td>
+                        </tr>
+                        <tr data-row-index="2">
+                            <td class="growth-label" data-col-id="tier">3-5</td>
+                            <td class="num" data-col-id="mrr_now">$18.587.261,00</td>
+                            <td class="num" data-col="mrr_start" data-col-id="mrr_start">$16.816.757,00</td>
+                            <td class="num positive" data-col="cagr_pct" data-col-id="cagr_pct">+5.1%</td>
+                        </tr>
+                        <tr data-row-index="3">
+                            <td class="growth-label" data-col-id="tier">6-10</td>
+                            <td class="num" data-col-id="mrr_now">$22.311.321,00</td>
+                            <td class="num" data-col="mrr_start" data-col-id="mrr_start">$21.520.984,00</td>
+                            <td class="num positive" data-col="cagr_pct" data-col-id="cagr_pct">+1.8%</td>
+                        </tr>
+                        <tr data-row-index="4">
+                            <td class="growth-label" data-col-id="tier">11-20</td>
+                            <td class="num" data-col-id="mrr_now">$15.136.416,00</td>
+                            <td class="num" data-col="mrr_start" data-col-id="mrr_start">$12.238.587,00</td>
+                            <td class="num positive" data-col="cagr_pct" data-col-id="cagr_pct">+11.2%</td>
+                        </tr>
+                        <tr data-row-index="5">
+                            <td class="growth-label" data-col-id="tier">20-40</td>
+                            <td class="num" data-col-id="mrr_now">$7.466.720,00</td>
+                            <td class="num" data-col="mrr_start" data-col-id="mrr_start">$7.747.170,00</td>
+                            <td class="num negative" data-col="cagr_pct" data-col-id="cagr_pct">-1.8%</td>
+                        </tr></tbody></table><p class="detail" id="mrr-growth-cutoff" style="margin-top:8px;font-size:0.8rem;">Start: 2024-02-15</p></div>
+        <div class="matrix-card" style="margin-top: 24px;"><div style="display:flex;align-items:center;justify-content:space-between;flex-wrap:wrap;gap:8px;margin-bottom:8px"><h2 style="margin:0">Deals Growth by Portfolio Tier (CAGR rolling)</h2><div class="col-toggle" data-table-id="deals-growth"><button type="button" class="col-toggle-btn">Columns</button><div class="col-toggle-dropdown"></div></div></div><p class="detail" style="margin-bottom:12px;font-size:0.85rem;color:var(--text-muted)">ICP accountants only. Deals now vs deals at start of rolling period. Same tier buckets as MRR. CAGR = (deals_now / deals_start)^(1/years) - 1. New = cannot compute CAGR from zero (no deals at start).</p><table class="sortable" data-table-id="deals-growth"><thead><tr><th data-col-id="tier">Managed Tax IDs</th><th class="num" data-col-id="deals_now">Deals Now</th><th class="num" data-col-id="deals_start">Deals at Start</th><th class="num" data-col-id="cagr_pct">CAGR %</th></tr></thead><tbody id="deals-growth-tbody">
+                        <tr data-row-index="0">
+                            <td class="growth-label" data-col-id="tier">1</td>
+                            <td class="num" data-col-id="deals_now">325</td>
+                            <td class="num" data-col="deals_start" data-col-id="deals_start">260</td>
+                            <td class="num positive" data-col="cagr_pct" data-col-id="cagr_pct">+11.8%</td>
+                        </tr>
+                        <tr data-row-index="1">
+                            <td class="growth-label" data-col-id="tier">2</td>
+                            <td class="num" data-col-id="deals_now">208</td>
+                            <td class="num" data-col="deals_start" data-col-id="deals_start">146</td>
+                            <td class="num positive" data-col="cagr_pct" data-col-id="cagr_pct">+19.4%</td>
+                        </tr>
+                        <tr data-row-index="2">
+                            <td class="growth-label" data-col-id="tier">3-5</td>
+                            <td class="num" data-col-id="deals_now">185</td>
+                            <td class="num" data-col="deals_start" data-col-id="deals_start">104</td>
+                            <td class="num positive" data-col="cagr_pct" data-col-id="cagr_pct">+33.4%</td>
+                        </tr>
+                        <tr data-row-index="3">
+                            <td class="growth-label" data-col-id="tier">6-10</td>
+                            <td class="num" data-col-id="deals_now">213</td>
+                            <td class="num" data-col="deals_start" data-col-id="deals_start">146</td>
+                            <td class="num positive" data-col="cagr_pct" data-col-id="cagr_pct">+20.8%</td>
+                        </tr>
+                        <tr data-row-index="4">
+                            <td class="growth-label" data-col-id="tier">11-20</td>
+                            <td class="num" data-col-id="deals_now">133</td>
+                            <td class="num" data-col="deals_start" data-col-id="deals_start">102</td>
+                            <td class="num positive" data-col="cagr_pct" data-col-id="cagr_pct">+14.2%</td>
+                        </tr>
+                        <tr data-row-index="5">
+                            <td class="growth-label" data-col-id="tier">20-40</td>
+                            <td class="num" data-col-id="deals_now">88</td>
+                            <td class="num" data-col="deals_start" data-col-id="deals_start">46</td>
+                            <td class="num positive" data-col="cagr_pct" data-col-id="cagr_pct">+38.3%</td>
+                        </tr></tbody></table><p class="detail" id="deals-growth-cutoff" style="margin-top:8px;font-size:0.8rem;">Start: 2024-02-15</p></div>
+
+        <div class="matrix-card" style="margin-top: 24px;">
+            <div style="display:flex;align-items:center;justify-content:space-between;flex-wrap:wrap;gap:8px;margin-bottom:8px">
+                <h2 style="margin:0">Top 20 Accountants by MRR</h2>
+                <div class="col-toggle" data-table-id="top-20"><button type="button" class="col-toggle-btn">Columns</button><div class="col-toggle-dropdown"></div></div>
+            </div>
+            <p class="detail" style="margin-bottom:12px;font-size:0.85rem;color:var(--text-muted)">ICP accountants only. Operador = type 5 only (bill, excludes hybrids). Asesor = type 8 (includes hybrids). Binary: each deal in one bucket. Total Deals = all associations (matches HubSpot company record). Churn = deal_stage Cerrado Churn (31849274) only. Lost = deal_stage Cerrado Perdido (closedlost). Top accountant has <strong>29</strong> related deals.</p>
+            <table class="sortable" data-table-id="top-20">
+                <thead>
+                    <tr>
+                        <th class="num" data-col-id="num">#</th>
+                        <th data-col-id="accountant">Accountant</th>
+                        <th class="num" data-col-id="mrr">MRR</th>
+                        <th class="num" data-col-id="mrr_operador">MRR Operador</th>
+                        <th class="num" data-col-id="mrr_asesor">MRR Asesor</th>
+                        <th class="num" data-col-id="churn">Churn</th>
+                        <th class="num" data-col-id="churn_operador">Churn Operador</th>
+                        <th class="num" data-col-id="churn_asesor">Churn Asesor</th>
+                        <th class="num" data-col-id="churn_pct">Churn %</th>
+                        <th class="num" data-col-id="churn_op_pct">Churn Operador %</th>
+                        <th class="num" data-col-id="churn_as_pct">Churn Asesor %</th>
+                        <th class="num" data-col-id="lost">Lost</th>
+                        <th class="num" data-col-id="lost_operador">Lost Operador</th>
+                        <th class="num" data-col-id="lost_asesor">Lost Asesor</th>
+                        <th class="num" data-col-id="lost_count">Lost #</th>
+                        <th class="num" data-col-id="operador">Operador</th>
+                        <th class="num" data-col-id="asesor">Asesor</th>
+                        <th class="num" data-col-id="total_deals">Total Deals</th>
+                        <th class="num" data-col-id="cagr_pct">CAGR (from start)</th>
+                        <th class="num" data-col-id="cagr_billed_pct">CAGR Operador</th>
+                        <th class="num" data-col-id="cagr_consultant_pct">CAGR Asesor</th>
+                    </tr>
+                </thead>
+                <tbody id="top-20-tbody">
+                    
+                        <tr data-row-index="0">
+                            <td class="num" data-col-id="num">1</td>
+                            <td data-col-id="accountant"><a href="https://app.hubspot.com/contacts/19877595/company/9019040645" target="_blank" rel="noopener" class="growth-label">8624 - Sociedad de Landen Sergio F. y Revich Marce…</a></td>
+                            <td class="num" data-col-id="mrr">$4.377.538,00</td>
+                            <td class="num" data-col-id="mrr_operador">$120.395,00</td>
+                            <td class="num" data-col-id="mrr_asesor">$4.257.143,00</td>
+                            <td class="num" data-col-id="churn">$331.739,00</td>
+                            <td class="num" data-col-id="churn_operador">$0,00</td>
+                            <td class="num" data-col-id="churn_asesor">$331.739,00</td>
+                            <td class="num" data-col-id="churn_pct">7.0%</td>
+                            <td class="num" data-col-id="churn_op_pct">0.0%</td>
+                            <td class="num" data-col-id="churn_as_pct">7.2%</td>
+                            <td class="num" data-col-id="lost">$0,00</td>
+                            <td class="num" data-col-id="lost_operador">$0,00</td>
+                            <td class="num" data-col-id="lost_asesor">$0,00</td>
+                            <td class="num" data-col-id="lost_count">0</td>
+                            <td class="num" data-col-id="operador">0</td>
+                            <td class="num" data-col-id="asesor">25</td>
+                            <td class="num" data-col-id="total_deals">25</td>
+                            <td class="num positive" data-col="cagr_pct" data-col-id="cagr_pct">+0.0%</td>
+                            <td class="num positive" data-col="cagr_billed_pct" data-col-id="cagr_billed_pct">+0.0%</td>
+                            <td class="num positive" data-col="cagr_consultant_pct" data-col-id="cagr_consultant_pct">+0.0%</td>
+                        </tr>
+                        <tr data-row-index="1">
+                            <td class="num" data-col-id="num">2</td>
+                            <td data-col-id="accountant"><a href="https://app.hubspot.com/contacts/19877595/company/9018871980" target="_blank" rel="noopener" class="growth-label">42157 Jorge Camporesi Estudio - interno</a></td>
+                            <td class="num" data-col-id="mrr">$3.337.373,00</td>
+                            <td class="num" data-col-id="mrr_operador">$364.694,00</td>
+                            <td class="num" data-col-id="mrr_asesor">$2.972.679,00</td>
+                            <td class="num" data-col-id="churn">$80.355,00</td>
+                            <td class="num" data-col-id="churn_operador">$0,00</td>
+                            <td class="num" data-col-id="churn_asesor">$80.355,00</td>
+                            <td class="num" data-col-id="churn_pct">2.4%</td>
+                            <td class="num" data-col-id="churn_op_pct">0.0%</td>
+                            <td class="num" data-col-id="churn_as_pct">2.6%</td>
+                            <td class="num" data-col-id="lost">$0,00</td>
+                            <td class="num" data-col-id="lost_operador">$0,00</td>
+                            <td class="num" data-col-id="lost_asesor">$0,00</td>
+                            <td class="num" data-col-id="lost_count">0</td>
+                            <td class="num" data-col-id="operador">2</td>
+                            <td class="num" data-col-id="asesor">14</td>
+                            <td class="num" data-col-id="total_deals">17</td>
+                            <td class="num positive" data-col="cagr_pct" data-col-id="cagr_pct">+6.7%</td>
+                            <td class="num positive" data-col="cagr_billed_pct" data-col-id="cagr_billed_pct">+0.0%</td>
+                            <td class="num positive" data-col="cagr_consultant_pct" data-col-id="cagr_consultant_pct">+7.7%</td>
+                        </tr>
+                        <tr data-row-index="2">
+                            <td class="num" data-col-id="num">3</td>
+                            <td data-col-id="accountant"><a href="https://app.hubspot.com/contacts/19877595/company/9019093368" target="_blank" rel="noopener" class="growth-label">22648 LA VISTA CASAL S.A.</a></td>
+                            <td class="num" data-col-id="mrr">$3.289.385,00</td>
+                            <td class="num" data-col-id="mrr_operador">$338.679,00</td>
+                            <td class="num" data-col-id="mrr_asesor">$2.950.706,00</td>
+                            <td class="num" data-col-id="churn">$100.698,00</td>
+                            <td class="num" data-col-id="churn_operador">$0,00</td>
+                            <td class="num" data-col-id="churn_asesor">$100.698,00</td>
+                            <td class="num" data-col-id="churn_pct">3.0%</td>
+                            <td class="num" data-col-id="churn_op_pct">0.0%</td>
+                            <td class="num" data-col-id="churn_as_pct">3.3%</td>
+                            <td class="num" data-col-id="lost">$91.500,00</td>
+                            <td class="num" data-col-id="lost_operador">$0,00</td>
+                            <td class="num" data-col-id="lost_asesor">$91.500,00</td>
+                            <td class="num" data-col-id="lost_count">1</td>
+                            <td class="num" data-col-id="operador">0</td>
+                            <td class="num" data-col-id="asesor">18</td>
+                            <td class="num" data-col-id="total_deals">20</td>
+                            <td class="num positive" data-col="cagr_pct" data-col-id="cagr_pct">+5.4%</td>
+                            <td class="num positive" data-col="cagr_billed_pct" data-col-id="cagr_billed_pct">+0.0%</td>
+                            <td class="num positive" data-col="cagr_consultant_pct" data-col-id="cagr_consultant_pct">+6.1%</td>
+                        </tr>
+                        <tr data-row-index="3">
+                            <td class="num" data-col-id="num">4</td>
+                            <td data-col-id="accountant"><a href="https://app.hubspot.com/contacts/19877595/company/9018909815" target="_blank" rel="noopener" class="growth-label">2613 - VIABUSINESS SC</a></td>
+                            <td class="num" data-col-id="mrr">$2.794.184,00</td>
+                            <td class="num" data-col-id="mrr_operador">$690.574,00</td>
+                            <td class="num" data-col-id="mrr_asesor">$2.103.610,00</td>
+                            <td class="num" data-col-id="churn">$394.906,00</td>
+                            <td class="num" data-col-id="churn_operador">$0,00</td>
+                            <td class="num" data-col-id="churn_asesor">$394.906,00</td>
+                            <td class="num" data-col-id="churn_pct">12.4%</td>
+                            <td class="num" data-col-id="churn_op_pct">0.0%</td>
+                            <td class="num" data-col-id="churn_as_pct">15.8%</td>
+                            <td class="num" data-col-id="lost">$0,00</td>
+                            <td class="num" data-col-id="lost_operador">$0,00</td>
+                            <td class="num" data-col-id="lost_asesor">$0,00</td>
+                            <td class="num" data-col-id="lost_count">0</td>
+                            <td class="num" data-col-id="operador">7</td>
+                            <td class="num" data-col-id="asesor">22</td>
+                            <td class="num" data-col-id="total_deals">29</td>
+                            <td class="num negative" data-col="cagr_pct" data-col-id="cagr_pct">-1.3%</td>
+                            <td class="num positive" data-col="cagr_billed_pct" data-col-id="cagr_billed_pct">+13.9%</td>
+                            <td class="num negative" data-col="cagr_consultant_pct" data-col-id="cagr_consultant_pct">-5.0%</td>
+                        </tr>
+                        <tr data-row-index="4">
+                            <td class="num" data-col-id="num">5</td>
+                            <td data-col-id="accountant"><a href="https://app.hubspot.com/contacts/19877595/company/9018854442" target="_blank" rel="noopener" class="growth-label">54298 - MORUE S.R.L.</a></td>
+                            <td class="num" data-col-id="mrr">$2.336.268,00</td>
+                            <td class="num" data-col-id="mrr_operador">$149.919,00</td>
+                            <td class="num" data-col-id="mrr_asesor">$2.186.349,00</td>
+                            <td class="num" data-col-id="churn">$179.892,00</td>
+                            <td class="num" data-col-id="churn_operador">$0,00</td>
+                            <td class="num" data-col-id="churn_asesor">$179.892,00</td>
+                            <td class="num" data-col-id="churn_pct">7.1%</td>
+                            <td class="num" data-col-id="churn_op_pct">0.0%</td>
+                            <td class="num" data-col-id="churn_as_pct">7.6%</td>
+                            <td class="num" data-col-id="lost">$0,00</td>
+                            <td class="num" data-col-id="lost_operador">$0,00</td>
+                            <td class="num" data-col-id="lost_asesor">$0,00</td>
+                            <td class="num" data-col-id="lost_count">1</td>
+                            <td class="num" data-col-id="operador">1</td>
+                            <td class="num" data-col-id="asesor">17</td>
+                            <td class="num" data-col-id="total_deals">20</td>
+                            <td class="num positive" data-col="cagr_pct" data-col-id="cagr_pct">+0.0%</td>
+                            <td class="num positive" data-col="cagr_billed_pct" data-col-id="cagr_billed_pct">+0.0%</td>
+                            <td class="num positive" data-col="cagr_consultant_pct" data-col-id="cagr_consultant_pct">+0.0%</td>
+                        </tr>
+                        <tr data-row-index="5">
+                            <td class="num" data-col-id="num">6</td>
+                            <td data-col-id="accountant"><a href="https://app.hubspot.com/contacts/19877595/company/9018793562" target="_blank" rel="noopener" class="growth-label">47135 Calcagno, Rafael y Asociados</a></td>
+                            <td class="num" data-col-id="mrr">$2.278.067,00</td>
+                            <td class="num" data-col-id="mrr_operador">$0,00</td>
+                            <td class="num" data-col-id="mrr_asesor">$2.278.067,00</td>
+                            <td class="num" data-col-id="churn">$352.722,00</td>
+                            <td class="num" data-col-id="churn_operador">$0,00</td>
+                            <td class="num" data-col-id="churn_asesor">$352.722,00</td>
+                            <td class="num" data-col-id="churn_pct">13.4%</td>
+                            <td class="num" data-col-id="churn_op_pct">—</td>
+                            <td class="num" data-col-id="churn_as_pct">13.4%</td>
+                            <td class="num" data-col-id="lost">$0,00</td>
+                            <td class="num" data-col-id="lost_operador">$0,00</td>
+                            <td class="num" data-col-id="lost_asesor">$0,00</td>
+                            <td class="num" data-col-id="lost_count">0</td>
+                            <td class="num" data-col-id="operador">0</td>
+                            <td class="num" data-col-id="asesor">17</td>
+                            <td class="num" data-col-id="total_deals">19</td>
+                            <td class="num negative" data-col="cagr_pct" data-col-id="cagr_pct">-1.5%</td>
+                            <td class="num positive" data-col="cagr_billed_pct" data-col-id="cagr_billed_pct">—</td>
+                            <td class="num negative" data-col="cagr_consultant_pct" data-col-id="cagr_consultant_pct">-1.5%</td>
+                        </tr>
+                        <tr data-row-index="6">
+                            <td class="num" data-col-id="num">7</td>
+                            <td data-col-id="accountant"><a href="https://app.hubspot.com/contacts/19877595/company/9018824963" target="_blank" rel="noopener" class="growth-label">5072 - Estudio</a></td>
+                            <td class="num" data-col-id="mrr">$2.055.518,00</td>
+                            <td class="num" data-col-id="mrr_operador">$338.679,00</td>
+                            <td class="num" data-col-id="mrr_asesor">$1.716.839,00</td>
+                            <td class="num" data-col-id="churn">$54.212,00</td>
+                            <td class="num" data-col-id="churn_operador">$0,00</td>
+                            <td class="num" data-col-id="churn_asesor">$54.212,00</td>
+                            <td class="num" data-col-id="churn_pct">2.6%</td>
+                            <td class="num" data-col-id="churn_op_pct">0.0%</td>
+                            <td class="num" data-col-id="churn_as_pct">3.1%</td>
+                            <td class="num" data-col-id="lost">$0,00</td>
+                            <td class="num" data-col-id="lost_operador">$0,00</td>
+                            <td class="num" data-col-id="lost_asesor">$0,00</td>
+                            <td class="num" data-col-id="lost_count">1</td>
+                            <td class="num" data-col-id="operador">1</td>
+                            <td class="num" data-col-id="asesor">11</td>
+                            <td class="num" data-col-id="total_deals">18</td>
+                            <td class="num positive" data-col="cagr_pct" data-col-id="cagr_pct">+30.2%</td>
+                            <td class="num positive" data-col="cagr_billed_pct" data-col-id="cagr_billed_pct">+0.0%</td>
+                            <td class="num positive" data-col="cagr_consultant_pct" data-col-id="cagr_consultant_pct">+40.1%</td>
+                        </tr>
+                        <tr data-row-index="7">
+                            <td class="num" data-col-id="num">8</td>
+                            <td data-col-id="accountant"><a href="https://app.hubspot.com/contacts/19877595/company/9019080056" target="_blank" rel="noopener" class="growth-label">RPA Consulting</a></td>
+                            <td class="num" data-col-id="mrr">$1.839.805,00</td>
+                            <td class="num" data-col-id="mrr_operador">$244.299,00</td>
+                            <td class="num" data-col-id="mrr_asesor">$1.595.506,00</td>
+                            <td class="num" data-col-id="churn">$0,00</td>
+                            <td class="num" data-col-id="churn_operador">$0,00</td>
+                            <td class="num" data-col-id="churn_asesor">$0,00</td>
+                            <td class="num" data-col-id="churn_pct">0.0%</td>
+                            <td class="num" data-col-id="churn_op_pct">0.0%</td>
+                            <td class="num" data-col-id="churn_as_pct">0.0%</td>
+                            <td class="num" data-col-id="lost">$82.918,00</td>
+                            <td class="num" data-col-id="lost_operador">$82.918,00</td>
+                            <td class="num" data-col-id="lost_asesor">$0,00</td>
+                            <td class="num" data-col-id="lost_count">3</td>
+                            <td class="num" data-col-id="operador">5</td>
+                            <td class="num" data-col-id="asesor">8</td>
+                            <td class="num" data-col-id="total_deals">41</td>
+                            <td class="num positive" data-col="cagr_pct" data-col-id="cagr_pct">+102.4%</td>
+                            <td class="num positive" data-col="cagr_billed_pct" data-col-id="cagr_billed_pct">+0.0%</td>
+                            <td class="num positive" data-col="cagr_consultant_pct" data-col-id="cagr_consultant_pct">+179.0%</td>
+                        </tr>
+                        <tr data-row-index="8">
+                            <td class="num" data-col-id="num">9</td>
+                            <td data-col-id="accountant"><a href="https://app.hubspot.com/contacts/19877595/company/32973942817" target="_blank" rel="noopener" class="growth-label">19119 - Estudio Eidelstein y Asoc.</a></td>
+                            <td class="num" data-col-id="mrr">$1.822.139,00</td>
+                            <td class="num" data-col-id="mrr_operador">$535.788,00</td>
+                            <td class="num" data-col-id="mrr_asesor">$1.286.351,00</td>
+                            <td class="num" data-col-id="churn">$303.884,00</td>
+                            <td class="num" data-col-id="churn_operador">$0,00</td>
+                            <td class="num" data-col-id="churn_asesor">$303.884,00</td>
+                            <td class="num" data-col-id="churn_pct">14.3%</td>
+                            <td class="num" data-col-id="churn_op_pct">0.0%</td>
+                            <td class="num" data-col-id="churn_as_pct">19.1%</td>
+                            <td class="num" data-col-id="lost">$0,00</td>
+                            <td class="num" data-col-id="lost_operador">$0,00</td>
+                            <td class="num" data-col-id="lost_asesor">$0,00</td>
+                            <td class="num" data-col-id="lost_count">0</td>
+                            <td class="num" data-col-id="operador">1</td>
+                            <td class="num" data-col-id="asesor">9</td>
+                            <td class="num" data-col-id="total_deals">13</td>
+                            <td class="num negative" data-col="cagr_pct" data-col-id="cagr_pct">-5.1%</td>
+                            <td class="num positive" data-col="cagr_billed_pct" data-col-id="cagr_billed_pct">+0.0%</td>
+                            <td class="num negative" data-col="cagr_consultant_pct" data-col-id="cagr_consultant_pct">-7.0%</td>
+                        </tr>
+                        <tr data-row-index="9">
+                            <td class="num" data-col-id="num">10</td>
+                            <td data-col-id="accountant"><a href="https://app.hubspot.com/contacts/19877595/company/9019093116" target="_blank" rel="noopener" class="growth-label">10981 GUILLERMO GAMBERA</a></td>
+                            <td class="num" data-col-id="mrr">$1.784.629,00</td>
+                            <td class="num" data-col-id="mrr_operador">$149.919,00</td>
+                            <td class="num" data-col-id="mrr_asesor">$1.634.710,00</td>
+                            <td class="num" data-col-id="churn">$0,00</td>
+                            <td class="num" data-col-id="churn_operador">$0,00</td>
+                            <td class="num" data-col-id="churn_asesor">$0,00</td>
+                            <td class="num" data-col-id="churn_pct">0.0%</td>
+                            <td class="num" data-col-id="churn_op_pct">0.0%</td>
+                            <td class="num" data-col-id="churn_as_pct">0.0%</td>
+                            <td class="num" data-col-id="lost">$0,00</td>
+                            <td class="num" data-col-id="lost_operador">$0,00</td>
+                            <td class="num" data-col-id="lost_asesor">$0,00</td>
+                            <td class="num" data-col-id="lost_count">0</td>
+                            <td class="num" data-col-id="operador">0</td>
+                            <td class="num" data-col-id="asesor">8</td>
+                            <td class="num" data-col-id="total_deals">9</td>
+                            <td class="num positive" data-col="cagr_pct" data-col-id="cagr_pct">+9.3%</td>
+                            <td class="num positive" data-col="cagr_billed_pct" data-col-id="cagr_billed_pct">+0.0%</td>
+                            <td class="num positive" data-col="cagr_consultant_pct" data-col-id="cagr_consultant_pct">+10.3%</td>
+                        </tr>
+                        <tr data-row-index="10">
+                            <td class="num" data-col-id="num">11</td>
+                            <td data-col-id="accountant"><a href="https://app.hubspot.com/contacts/19877595/company/16092757907" target="_blank" rel="noopener" class="growth-label">73751 - ARCE KABBACHE CONSULTORES</a></td>
+                            <td class="num" data-col-id="mrr">$1.634.710,00</td>
+                            <td class="num" data-col-id="mrr_operador">$177.265,00</td>
+                            <td class="num" data-col-id="mrr_asesor">$1.457.445,00</td>
+                            <td class="num" data-col-id="churn">$0,00</td>
+                            <td class="num" data-col-id="churn_operador">$0,00</td>
+                            <td class="num" data-col-id="churn_asesor">$0,00</td>
+                            <td class="num" data-col-id="churn_pct">0.0%</td>
+                            <td class="num" data-col-id="churn_op_pct">0.0%</td>
+                            <td class="num" data-col-id="churn_as_pct">0.0%</td>
+                            <td class="num" data-col-id="lost">$0,00</td>
+                            <td class="num" data-col-id="lost_operador">$0,00</td>
+                            <td class="num" data-col-id="lost_asesor">$0,00</td>
+                            <td class="num" data-col-id="lost_count">0</td>
+                            <td class="num" data-col-id="operador">0</td>
+                            <td class="num" data-col-id="asesor">6</td>
+                            <td class="num" data-col-id="total_deals">7</td>
+                            <td class="num positive" data-col="cagr_pct" data-col-id="cagr_pct">+0.0%</td>
+                            <td class="num positive" data-col="cagr_billed_pct" data-col-id="cagr_billed_pct">+0.0%</td>
+                            <td class="num positive" data-col="cagr_consultant_pct" data-col-id="cagr_consultant_pct">+0.0%</td>
+                        </tr>
+                        <tr data-row-index="11">
+                            <td class="num" data-col-id="num">12</td>
+                            <td data-col-id="accountant"><a href="https://app.hubspot.com/contacts/19877595/company/9019060294" target="_blank" rel="noopener" class="growth-label">50847 Fernandez & Alesio Contadores</a></td>
+                            <td class="num" data-col-id="mrr">$1.543.797,00</td>
+                            <td class="num" data-col-id="mrr_operador">$244.299,00</td>
+                            <td class="num" data-col-id="mrr_asesor">$1.299.498,00</td>
+                            <td class="num" data-col-id="churn">$100.315,00</td>
+                            <td class="num" data-col-id="churn_operador">$0,00</td>
+                            <td class="num" data-col-id="churn_asesor">$100.315,00</td>
+                            <td class="num" data-col-id="churn_pct">6.1%</td>
+                            <td class="num" data-col-id="churn_op_pct">0.0%</td>
+                            <td class="num" data-col-id="churn_as_pct">7.2%</td>
+                            <td class="num" data-col-id="lost">$21.382,00</td>
+                            <td class="num" data-col-id="lost_operador">$0,00</td>
+                            <td class="num" data-col-id="lost_asesor">$21.382,00</td>
+                            <td class="num" data-col-id="lost_count">2</td>
+                            <td class="num" data-col-id="operador">1</td>
+                            <td class="num" data-col-id="asesor">7</td>
+                            <td class="num" data-col-id="total_deals">8</td>
+                            <td class="num positive" data-col="cagr_pct" data-col-id="cagr_pct">+0.0%</td>
+                            <td class="num positive" data-col="cagr_billed_pct" data-col-id="cagr_billed_pct">+0.0%</td>
+                            <td class="num positive" data-col="cagr_consultant_pct" data-col-id="cagr_consultant_pct">+0.0%</td>
+                        </tr>
+                        <tr data-row-index="12">
+                            <td class="num" data-col-id="num">13</td>
+                            <td data-col-id="accountant"><a href="https://app.hubspot.com/contacts/19877595/company/10208771449" target="_blank" rel="noopener" class="growth-label">68816 - Saad Eduardo Agustin</a></td>
+                            <td class="num" data-col-id="mrr">$1.520.244,00</td>
+                            <td class="num" data-col-id="mrr_operador">$244.299,00</td>
+                            <td class="num" data-col-id="mrr_asesor">$1.275.945,00</td>
+                            <td class="num" data-col-id="churn">$165.221,00</td>
+                            <td class="num" data-col-id="churn_operador">$0,00</td>
+                            <td class="num" data-col-id="churn_asesor">$165.221,00</td>
+                            <td class="num" data-col-id="churn_pct">9.8%</td>
+                            <td class="num" data-col-id="churn_op_pct">0.0%</td>
+                            <td class="num" data-col-id="churn_as_pct">11.5%</td>
+                            <td class="num" data-col-id="lost">$0,00</td>
+                            <td class="num" data-col-id="lost_operador">$0,00</td>
+                            <td class="num" data-col-id="lost_asesor">$0,00</td>
+                            <td class="num" data-col-id="lost_count">0</td>
+                            <td class="num" data-col-id="operador">1</td>
+                            <td class="num" data-col-id="asesor">7</td>
+                            <td class="num" data-col-id="total_deals">10</td>
+                            <td class="num positive" data-col="cagr_pct" data-col-id="cagr_pct">+17.1%</td>
+                            <td class="num positive" data-col="cagr_billed_pct" data-col-id="cagr_billed_pct">+0.0%</td>
+                            <td class="num positive" data-col="cagr_consultant_pct" data-col-id="cagr_consultant_pct">+21.4%</td>
+                        </tr>
+                        <tr data-row-index="13">
+                            <td class="num" data-col-id="num">14</td>
+                            <td data-col-id="accountant"><a href="https://app.hubspot.com/contacts/19877595/company/9018866554" target="_blank" rel="noopener" class="growth-label">43510 - CONSULTORES TRIBUTARIOS SRL</a></td>
+                            <td class="num" data-col-id="mrr">$1.410.255,00</td>
+                            <td class="num" data-col-id="mrr_operador">$244.299,00</td>
+                            <td class="num" data-col-id="mrr_asesor">$1.165.956,00</td>
+                            <td class="num" data-col-id="churn">$0,00</td>
+                            <td class="num" data-col-id="churn_operador">$0,00</td>
+                            <td class="num" data-col-id="churn_asesor">$0,00</td>
+                            <td class="num" data-col-id="churn_pct">0.0%</td>
+                            <td class="num" data-col-id="churn_op_pct">0.0%</td>
+                            <td class="num" data-col-id="churn_as_pct">0.0%</td>
+                            <td class="num" data-col-id="lost">$0,00</td>
+                            <td class="num" data-col-id="lost_operador">$0,00</td>
+                            <td class="num" data-col-id="lost_asesor">$0,00</td>
+                            <td class="num" data-col-id="lost_count">0</td>
+                            <td class="num" data-col-id="operador">0</td>
+                            <td class="num" data-col-id="asesor">5</td>
+                            <td class="num" data-col-id="total_deals">6</td>
+                            <td class="num positive" data-col="cagr_pct" data-col-id="cagr_pct">+0.0%</td>
+                            <td class="num positive" data-col="cagr_billed_pct" data-col-id="cagr_billed_pct">+0.0%</td>
+                            <td class="num positive" data-col="cagr_consultant_pct" data-col-id="cagr_consultant_pct">+0.0%</td>
+                        </tr>
+                        <tr data-row-index="14">
+                            <td class="num" data-col-id="num">15</td>
+                            <td data-col-id="accountant"><a href="https://app.hubspot.com/contacts/19877595/company/18335802731" target="_blank" rel="noopener" class="growth-label">79226 - EGND CONSULTORÍA</a></td>
+                            <td class="num" data-col-id="mrr">$1.323.255,00</td>
+                            <td class="num" data-col-id="mrr_operador">$291.489,00</td>
+                            <td class="num" data-col-id="mrr_asesor">$1.031.766,00</td>
+                            <td class="num" data-col-id="churn">$0,00</td>
+                            <td class="num" data-col-id="churn_operador">$0,00</td>
+                            <td class="num" data-col-id="churn_asesor">$0,00</td>
+                            <td class="num" data-col-id="churn_pct">0.0%</td>
+                            <td class="num" data-col-id="churn_op_pct">0.0%</td>
+                            <td class="num" data-col-id="churn_as_pct">0.0%</td>
+                            <td class="num" data-col-id="lost">$0,00</td>
+                            <td class="num" data-col-id="lost_operador">$0,00</td>
+                            <td class="num" data-col-id="lost_asesor">$0,00</td>
+                            <td class="num" data-col-id="lost_count">0</td>
+                            <td class="num" data-col-id="operador">1</td>
+                            <td class="num" data-col-id="asesor">7</td>
+                            <td class="num" data-col-id="total_deals">15</td>
+                            <td class="num positive" data-col="cagr_pct" data-col-id="cagr_pct">+84.1%</td>
+                            <td class="num positive" data-col="cagr_billed_pct" data-col-id="cagr_billed_pct">+0.0%</td>
+                            <td class="num positive" data-col="cagr_consultant_pct" data-col-id="cagr_consultant_pct">+222.7%</td>
+                        </tr>
+                        <tr data-row-index="15">
+                            <td class="num" data-col-id="num">16</td>
+                            <td data-col-id="accountant"><a href="https://app.hubspot.com/contacts/19877595/company/9019067026" target="_blank" rel="noopener" class="growth-label">15312 - EGM CONSULTING (Administradas)</a></td>
+                            <td class="num" data-col-id="mrr">$1.286.472,00</td>
+                            <td class="num" data-col-id="mrr_operador">$149.919,00</td>
+                            <td class="num" data-col-id="mrr_asesor">$1.136.553,00</td>
+                            <td class="num" data-col-id="churn">$0,00</td>
+                            <td class="num" data-col-id="churn_operador">$0,00</td>
+                            <td class="num" data-col-id="churn_asesor">$0,00</td>
+                            <td class="num" data-col-id="churn_pct">0.0%</td>
+                            <td class="num" data-col-id="churn_op_pct">0.0%</td>
+                            <td class="num" data-col-id="churn_as_pct">0.0%</td>
+                            <td class="num" data-col-id="lost">$0,00</td>
+                            <td class="num" data-col-id="lost_operador">$0,00</td>
+                            <td class="num" data-col-id="lost_asesor">$0,00</td>
+                            <td class="num" data-col-id="lost_count">0</td>
+                            <td class="num" data-col-id="operador">0</td>
+                            <td class="num" data-col-id="asesor">8</td>
+                            <td class="num" data-col-id="total_deals">8</td>
+                            <td class="num positive" data-col="cagr_pct" data-col-id="cagr_pct">+0.0%</td>
+                            <td class="num positive" data-col="cagr_billed_pct" data-col-id="cagr_billed_pct">+0.0%</td>
+                            <td class="num positive" data-col="cagr_consultant_pct" data-col-id="cagr_consultant_pct">+0.0%</td>
+                        </tr>
+                        <tr data-row-index="16">
+                            <td class="num" data-col-id="num">17</td>
+                            <td data-col-id="accountant"><a href="https://app.hubspot.com/contacts/19877595/company/9018560425" target="_blank" rel="noopener" class="growth-label">10910 - Cosentino y Asociados SC</a></td>
+                            <td class="num" data-col-id="mrr">$1.187.978,00</td>
+                            <td class="num" data-col-id="mrr_operador">$244.299,00</td>
+                            <td class="num" data-col-id="mrr_asesor">$943.679,00</td>
+                            <td class="num" data-col-id="churn">$68.496,00</td>
+                            <td class="num" data-col-id="churn_operador">$0,00</td>
+                            <td class="num" data-col-id="churn_asesor">$68.496,00</td>
+                            <td class="num" data-col-id="churn_pct">5.5%</td>
+                            <td class="num" data-col-id="churn_op_pct">0.0%</td>
+                            <td class="num" data-col-id="churn_as_pct">6.8%</td>
+                            <td class="num" data-col-id="lost">$0,00</td>
+                            <td class="num" data-col-id="lost_operador">$0,00</td>
+                            <td class="num" data-col-id="lost_asesor">$0,00</td>
+                            <td class="num" data-col-id="lost_count">0</td>
+                            <td class="num" data-col-id="operador">1</td>
+                            <td class="num" data-col-id="asesor">6</td>
+                            <td class="num" data-col-id="total_deals">7</td>
+                            <td class="num positive" data-col="cagr_pct" data-col-id="cagr_pct">+8.4%</td>
+                            <td class="num positive" data-col="cagr_billed_pct" data-col-id="cagr_billed_pct">+0.0%</td>
+                            <td class="num positive" data-col="cagr_consultant_pct" data-col-id="cagr_consultant_pct">+11.0%</td>
+                        </tr>
+                        <tr data-row-index="17">
+                            <td class="num" data-col-id="num">18</td>
+                            <td data-col-id="accountant"><a href="https://app.hubspot.com/contacts/19877595/company/9018574184" target="_blank" rel="noopener" class="growth-label">17461 - JUAN MARIA BERASATEGUI</a></td>
+                            <td class="num" data-col-id="mrr">$1.151.206,00</td>
+                            <td class="num" data-col-id="mrr_operador">$244.299,00</td>
+                            <td class="num" data-col-id="mrr_asesor">$906.907,00</td>
+                            <td class="num" data-col-id="churn">$24.603,00</td>
+                            <td class="num" data-col-id="churn_operador">$24.603,00</td>
+                            <td class="num" data-col-id="churn_asesor">$0,00</td>
+                            <td class="num" data-col-id="churn_pct">2.1%</td>
+                            <td class="num" data-col-id="churn_op_pct">9.1%</td>
+                            <td class="num" data-col-id="churn_as_pct">0.0%</td>
+                            <td class="num" data-col-id="lost">$0,00</td>
+                            <td class="num" data-col-id="lost_operador">$0,00</td>
+                            <td class="num" data-col-id="lost_asesor">$0,00</td>
+                            <td class="num" data-col-id="lost_count">0</td>
+                            <td class="num" data-col-id="operador">1</td>
+                            <td class="num" data-col-id="asesor">5</td>
+                            <td class="num" data-col-id="total_deals">7</td>
+                            <td class="num positive" data-col="cagr_pct" data-col-id="cagr_pct">+0.0%</td>
+                            <td class="num positive" data-col="cagr_billed_pct" data-col-id="cagr_billed_pct">+0.0%</td>
+                            <td class="num positive" data-col="cagr_consultant_pct" data-col-id="cagr_consultant_pct">+0.0%</td>
+                        </tr>
+                        <tr data-row-index="18">
+                            <td class="num" data-col-id="num">19</td>
+                            <td data-col-id="accountant"><a href="https://app.hubspot.com/contacts/19877595/company/9019067013" target="_blank" rel="noopener" class="growth-label">VAGO Hugo Raúl</a></td>
+                            <td class="num" data-col-id="mrr">$1.145.410,00</td>
+                            <td class="num" data-col-id="mrr_operador">$270.943,00</td>
+                            <td class="num" data-col-id="mrr_asesor">$874.467,00</td>
+                            <td class="num" data-col-id="churn">$229.206,00</td>
+                            <td class="num" data-col-id="churn_operador">$0,00</td>
+                            <td class="num" data-col-id="churn_asesor">$229.206,00</td>
+                            <td class="num" data-col-id="churn_pct">16.7%</td>
+                            <td class="num" data-col-id="churn_op_pct">0.0%</td>
+                            <td class="num" data-col-id="churn_as_pct">20.8%</td>
+                            <td class="num" data-col-id="lost">$0,00</td>
+                            <td class="num" data-col-id="lost_operador">$0,00</td>
+                            <td class="num" data-col-id="lost_asesor">$0,00</td>
+                            <td class="num" data-col-id="lost_count">0</td>
+                            <td class="num" data-col-id="operador">1</td>
+                            <td class="num" data-col-id="asesor">6</td>
+                            <td class="num" data-col-id="total_deals">8</td>
+                            <td class="num positive" data-col="cagr_pct" data-col-id="cagr_pct">+0.0%</td>
+                            <td class="num positive" data-col="cagr_billed_pct" data-col-id="cagr_billed_pct">+0.0%</td>
+                            <td class="num positive" data-col="cagr_consultant_pct" data-col-id="cagr_consultant_pct">+0.0%</td>
+                        </tr>
+                        <tr data-row-index="19">
+                            <td class="num" data-col-id="num">20</td>
+                            <td data-col-id="accountant"><a href="https://app.hubspot.com/contacts/19877595/company/9019073314" target="_blank" rel="noopener" class="growth-label">87687- Juan Ignacio Sanchez</a></td>
+                            <td class="num" data-col-id="mrr">$1.121.380,00</td>
+                            <td class="num" data-col-id="mrr_operador">$218.889,00</td>
+                            <td class="num" data-col-id="mrr_asesor">$902.491,00</td>
+                            <td class="num" data-col-id="churn">$100.315,00</td>
+                            <td class="num" data-col-id="churn_operador">$0,00</td>
+                            <td class="num" data-col-id="churn_asesor">$100.315,00</td>
+                            <td class="num" data-col-id="churn_pct">8.2%</td>
+                            <td class="num" data-col-id="churn_op_pct">0.0%</td>
+                            <td class="num" data-col-id="churn_as_pct">10.0%</td>
+                            <td class="num" data-col-id="lost">$0,00</td>
+                            <td class="num" data-col-id="lost_operador">$0,00</td>
+                            <td class="num" data-col-id="lost_asesor">$0,00</td>
+                            <td class="num" data-col-id="lost_count">0</td>
+                            <td class="num" data-col-id="operador">0</td>
+                            <td class="num" data-col-id="asesor">7</td>
+                            <td class="num" data-col-id="total_deals">8</td>
+                            <td class="num positive" data-col="cagr_pct" data-col-id="cagr_pct">+11.5%</td>
+                            <td class="num positive" data-col="cagr_billed_pct" data-col-id="cagr_billed_pct">New</td>
+                            <td class="num positive" data-col="cagr_consultant_pct" data-col-id="cagr_consultant_pct">+0.0%</td>
+                        </tr>
+                </tbody>
+            </table>
+        </div>
+
+        <div class="matrix-card" style="margin-top: 24px;">
+            <div style="display:flex;align-items:center;justify-content:space-between;flex-wrap:wrap;gap:8px;margin-bottom:8px">
+                <h2 style="margin:0">Worst 20 Accountants by Churn %</h2>
+                <div class="col-toggle" data-table-id="worst-20"><button type="button" class="col-toggle-btn">Columns</button><div class="col-toggle-dropdown"></div></div>
+            </div>
+            <p class="detail" style="margin-bottom:12px;font-size:0.85rem;color:var(--text-muted)">ICP accountants with churn deals only. Sorted by Churn % (MRR-based). Same columns as Top 20. Lost = deals closed but no revenue (Cerrado Perdido).</p>
+            <table class="sortable" data-table-id="worst-20">
+                <thead>
+                    <tr>
+                        <th class="num" data-col-id="num">#</th>
+                        <th data-col-id="accountant">Accountant</th>
+                        <th class="num" data-col-id="mrr">MRR</th>
+                        <th class="num" data-col-id="mrr_operador">MRR Operador</th>
+                        <th class="num" data-col-id="mrr_asesor">MRR Asesor</th>
+                        <th class="num" data-col-id="churn">Churn</th>
+                        <th class="num" data-col-id="churn_operador">Churn Operador</th>
+                        <th class="num" data-col-id="churn_asesor">Churn Asesor</th>
+                        <th class="num" data-col-id="churn_pct">Churn %</th>
+                        <th class="num" data-col-id="churn_op_pct">Churn Operador %</th>
+                        <th class="num" data-col-id="churn_as_pct">Churn Asesor %</th>
+                        <th class="num" data-col-id="lost">Lost</th>
+                        <th class="num" data-col-id="lost_operador">Lost Operador</th>
+                        <th class="num" data-col-id="lost_asesor">Lost Asesor</th>
+                        <th class="num" data-col-id="lost_count">Lost #</th>
+                        <th class="num" data-col-id="operador">Operador</th>
+                        <th class="num" data-col-id="asesor">Asesor</th>
+                        <th class="num" data-col-id="total_deals">Total Deals</th>
+                        <th class="num" data-col-id="cagr_pct">CAGR (from start)</th>
+                        <th class="num" data-col-id="cagr_billed_pct">CAGR Operador</th>
+                        <th class="num" data-col-id="cagr_consultant_pct">CAGR Asesor</th>
+                    </tr>
+                </thead>
+                <tbody id="worst-20-tbody">
+                    
+                        <tr data-row-index="0">
+                            <td class="num" data-col-id="num">1</td>
+                            <td data-col-id="accountant"><a href="https://app.hubspot.com/contacts/19877595/company/9018905203" target="_blank" rel="noopener" class="growth-label">23090 - ESTUDIO BERNABO</a></td>
+                            <td class="num" data-col-id="mrr">$177.265,00</td>
+                            <td class="num" data-col-id="mrr_operador">$177.265,00</td>
+                            <td class="num" data-col-id="mrr_asesor">$0,00</td>
+                            <td class="num" data-col-id="churn">$147.522,00</td>
+                            <td class="num" data-col-id="churn_operador">$0,00</td>
+                            <td class="num" data-col-id="churn_asesor">$147.522,00</td>
+                            <td class="num" data-col-id="churn_pct">45.4%</td>
+                            <td class="num" data-col-id="churn_op_pct">0.0%</td>
+                            <td class="num" data-col-id="churn_as_pct">100.0%</td>
+                            <td class="num" data-col-id="lost">$0,00</td>
+                            <td class="num" data-col-id="lost_operador">$0,00</td>
+                            <td class="num" data-col-id="lost_asesor">$0,00</td>
+                            <td class="num" data-col-id="lost_count">0</td>
+                            <td class="num" data-col-id="operador">1</td>
+                            <td class="num" data-col-id="asesor">1</td>
+                            <td class="num" data-col-id="total_deals">2</td>
+                            <td class="num positive" data-col="cagr_pct" data-col-id="cagr_pct">+0.0%</td>
+                            <td class="num positive" data-col="cagr_billed_pct" data-col-id="cagr_billed_pct">+0.0%</td>
+                            <td class="num positive" data-col="cagr_consultant_pct" data-col-id="cagr_consultant_pct">—</td>
+                        </tr>
+                        <tr data-row-index="1">
+                            <td class="num" data-col-id="num">2</td>
+                            <td data-col-id="accountant"><a href="https://app.hubspot.com/contacts/19877595/company/9018898042" target="_blank" rel="noopener" class="growth-label">23129 - AM CONSULTING SA</a></td>
+                            <td class="num" data-col-id="mrr">$758.095,00</td>
+                            <td class="num" data-col-id="mrr_operador">$0,00</td>
+                            <td class="num" data-col-id="mrr_asesor">$758.095,00</td>
+                            <td class="num" data-col-id="churn">$539.145,00</td>
+                            <td class="num" data-col-id="churn_operador">$0,00</td>
+                            <td class="num" data-col-id="churn_asesor">$539.145,00</td>
+                            <td class="num" data-col-id="churn_pct">41.6%</td>
+                            <td class="num" data-col-id="churn_op_pct">—</td>
+                            <td class="num" data-col-id="churn_as_pct">41.6%</td>
+                            <td class="num" data-col-id="lost">$0,00</td>
+                            <td class="num" data-col-id="lost_operador">$0,00</td>
+                            <td class="num" data-col-id="lost_asesor">$0,00</td>
+                            <td class="num" data-col-id="lost_count">0</td>
+                            <td class="num" data-col-id="operador">1</td>
+                            <td class="num" data-col-id="asesor">9</td>
+                            <td class="num" data-col-id="total_deals">12</td>
+                            <td class="num negative" data-col="cagr_pct" data-col-id="cagr_pct">-12.2%</td>
+                            <td class="num positive" data-col="cagr_billed_pct" data-col-id="cagr_billed_pct">—</td>
+                            <td class="num negative" data-col="cagr_consultant_pct" data-col-id="cagr_consultant_pct">-12.2%</td>
+                        </tr>
+                        <tr data-row-index="2">
+                            <td class="num" data-col-id="num">3</td>
+                            <td data-col-id="accountant"><a href="https://app.hubspot.com/contacts/19877595/company/9019047212" target="_blank" rel="noopener" class="growth-label">62163 - Publicidad y Marketing Integral S.R.L.</a></td>
+                            <td class="num" data-col-id="mrr">$244.299,00</td>
+                            <td class="num" data-col-id="mrr_operador">$244.299,00</td>
+                            <td class="num" data-col-id="mrr_asesor">$0,00</td>
+                            <td class="num" data-col-id="churn">$165.221,00</td>
+                            <td class="num" data-col-id="churn_operador">$165.221,00</td>
+                            <td class="num" data-col-id="churn_asesor">$0,00</td>
+                            <td class="num" data-col-id="churn_pct">40.3%</td>
+                            <td class="num" data-col-id="churn_op_pct">40.3%</td>
+                            <td class="num" data-col-id="churn_as_pct">—</td>
+                            <td class="num" data-col-id="lost">$0,00</td>
+                            <td class="num" data-col-id="lost_operador">$0,00</td>
+                            <td class="num" data-col-id="lost_asesor">$0,00</td>
+                            <td class="num" data-col-id="lost_count">0</td>
+                            <td class="num" data-col-id="operador">2</td>
+                            <td class="num" data-col-id="asesor">0</td>
+                            <td class="num" data-col-id="total_deals">2</td>
+                            <td class="num positive" data-col="cagr_pct" data-col-id="cagr_pct">+0.0%</td>
+                            <td class="num positive" data-col="cagr_billed_pct" data-col-id="cagr_billed_pct">New</td>
+                            <td class="num positive" data-col="cagr_consultant_pct" data-col-id="cagr_consultant_pct">—</td>
+                        </tr>
+                        <tr data-row-index="3">
+                            <td class="num" data-col-id="num">4</td>
+                            <td data-col-id="accountant"><a href="https://app.hubspot.com/contacts/19877595/company/9019066898" target="_blank" rel="noopener" class="growth-label">7150 - Estudio Ferrando Diaz S.A.S.</a></td>
+                            <td class="num" data-col-id="mrr">$390.709,00</td>
+                            <td class="num" data-col-id="mrr_operador">$149.919,00</td>
+                            <td class="num" data-col-id="mrr_asesor">$240.790,00</td>
+                            <td class="num" data-col-id="churn">$262.288,00</td>
+                            <td class="num" data-col-id="churn_operador">$0,00</td>
+                            <td class="num" data-col-id="churn_asesor">$262.288,00</td>
+                            <td class="num" data-col-id="churn_pct">40.2%</td>
+                            <td class="num" data-col-id="churn_op_pct">0.0%</td>
+                            <td class="num" data-col-id="churn_as_pct">52.1%</td>
+                            <td class="num" data-col-id="lost">$0,00</td>
+                            <td class="num" data-col-id="lost_operador">$0,00</td>
+                            <td class="num" data-col-id="lost_asesor">$0,00</td>
+                            <td class="num" data-col-id="lost_count">0</td>
+                            <td class="num" data-col-id="operador">1</td>
+                            <td class="num" data-col-id="asesor">7</td>
+                            <td class="num" data-col-id="total_deals">9</td>
+                            <td class="num negative" data-col="cagr_pct" data-col-id="cagr_pct">-7.8%</td>
+                            <td class="num positive" data-col="cagr_billed_pct" data-col-id="cagr_billed_pct">+0.0%</td>
+                            <td class="num negative" data-col="cagr_consultant_pct" data-col-id="cagr_consultant_pct">-11.8%</td>
+                        </tr>
+                        <tr data-row-index="4">
+                            <td class="num" data-col-id="num">5</td>
+                            <td data-col-id="accountant"><a href="https://app.hubspot.com/contacts/19877595/company/9018877471" target="_blank" rel="noopener" class="growth-label">Elizalde, Casares y Asociados</a></td>
+                            <td class="num" data-col-id="mrr">$244.299,00</td>
+                            <td class="num" data-col-id="mrr_operador">$244.299,00</td>
+                            <td class="num" data-col-id="mrr_asesor">$0,00</td>
+                            <td class="num" data-col-id="churn">$152.533,00</td>
+                            <td class="num" data-col-id="churn_operador">$0,00</td>
+                            <td class="num" data-col-id="churn_asesor">$152.533,00</td>
+                            <td class="num" data-col-id="churn_pct">38.4%</td>
+                            <td class="num" data-col-id="churn_op_pct">0.0%</td>
+                            <td class="num" data-col-id="churn_as_pct">100.0%</td>
+                            <td class="num" data-col-id="lost">$0,00</td>
+                            <td class="num" data-col-id="lost_operador">$0,00</td>
+                            <td class="num" data-col-id="lost_asesor">$0,00</td>
+                            <td class="num" data-col-id="lost_count">0</td>
+                            <td class="num" data-col-id="operador">0</td>
+                            <td class="num" data-col-id="asesor">2</td>
+                            <td class="num" data-col-id="total_deals">5</td>
+                            <td class="num negative" data-col="cagr_pct" data-col-id="cagr_pct">-21.5%</td>
+                            <td class="num positive" data-col="cagr_billed_pct" data-col-id="cagr_billed_pct">+0.0%</td>
+                            <td class="num negative" data-col="cagr_consultant_pct" data-col-id="cagr_consultant_pct">-100.0%</td>
+                        </tr>
+                        <tr data-row-index="5">
+                            <td class="num" data-col-id="num">6</td>
+                            <td data-col-id="accountant"><a href="https://app.hubspot.com/contacts/19877595/company/9018892127" target="_blank" rel="noopener" class="growth-label">11131 Mapplics SRL</a></td>
+                            <td class="num" data-col-id="mrr">$120.395,00</td>
+                            <td class="num" data-col-id="mrr_operador">$0,00</td>
+                            <td class="num" data-col-id="mrr_asesor">$120.395,00</td>
+                            <td class="num" data-col-id="churn">$68.496,00</td>
+                            <td class="num" data-col-id="churn_operador">$0,00</td>
+                            <td class="num" data-col-id="churn_asesor">$68.496,00</td>
+                            <td class="num" data-col-id="churn_pct">36.3%</td>
+                            <td class="num" data-col-id="churn_op_pct">—</td>
+                            <td class="num" data-col-id="churn_as_pct">36.3%</td>
+                            <td class="num" data-col-id="lost">$0,00</td>
+                            <td class="num" data-col-id="lost_operador">$0,00</td>
+                            <td class="num" data-col-id="lost_asesor">$0,00</td>
+                            <td class="num" data-col-id="lost_count">0</td>
+                            <td class="num" data-col-id="operador">0</td>
+                            <td class="num" data-col-id="asesor">2</td>
+                            <td class="num" data-col-id="total_deals">3</td>
+                            <td class="num positive" data-col="cagr_pct" data-col-id="cagr_pct">+0.0%</td>
+                            <td class="num positive" data-col="cagr_billed_pct" data-col-id="cagr_billed_pct">—</td>
+                            <td class="num positive" data-col="cagr_consultant_pct" data-col-id="cagr_consultant_pct">+0.0%</td>
+                        </tr>
+                        <tr data-row-index="6">
+                            <td class="num" data-col-id="num">7</td>
+                            <td data-col-id="accountant"><a href="https://app.hubspot.com/contacts/19877595/company/9804217088" target="_blank" rel="noopener" class="growth-label">67641 MARA GORINI</a></td>
+                            <td class="num" data-col-id="mrr">$291.489,00</td>
+                            <td class="num" data-col-id="mrr_operador">$291.489,00</td>
+                            <td class="num" data-col-id="mrr_asesor">$0,00</td>
+                            <td class="num" data-col-id="churn">$165.221,00</td>
+                            <td class="num" data-col-id="churn_operador">$165.221,00</td>
+                            <td class="num" data-col-id="churn_asesor">$0,00</td>
+                            <td class="num" data-col-id="churn_pct">36.2%</td>
+                            <td class="num" data-col-id="churn_op_pct">36.2%</td>
+                            <td class="num" data-col-id="churn_as_pct">—</td>
+                            <td class="num" data-col-id="lost">$0,00</td>
+                            <td class="num" data-col-id="lost_operador">$0,00</td>
+                            <td class="num" data-col-id="lost_asesor">$0,00</td>
+                            <td class="num" data-col-id="lost_count">0</td>
+                            <td class="num" data-col-id="operador">1</td>
+                            <td class="num" data-col-id="asesor">0</td>
+                            <td class="num" data-col-id="total_deals">1</td>
+                            <td class="num positive" data-col="cagr_pct" data-col-id="cagr_pct">+0.0%</td>
+                            <td class="num positive" data-col="cagr_billed_pct" data-col-id="cagr_billed_pct">+0.0%</td>
+                            <td class="num positive" data-col="cagr_consultant_pct" data-col-id="cagr_consultant_pct">—</td>
+                        </tr>
+                        <tr data-row-index="7">
+                            <td class="num" data-col-id="num">8</td>
+                            <td data-col-id="accountant"><a href="https://app.hubspot.com/contacts/19877595/company/9018787941" target="_blank" rel="noopener" class="growth-label">6582 - Lujan Producciones SRL</a></td>
+                            <td class="num" data-col-id="mrr">$177.265,00</td>
+                            <td class="num" data-col-id="mrr_operador">$177.265,00</td>
+                            <td class="num" data-col-id="mrr_asesor">$0,00</td>
+                            <td class="num" data-col-id="churn">$100.315,00</td>
+                            <td class="num" data-col-id="churn_operador">$100.315,00</td>
+                            <td class="num" data-col-id="churn_asesor">$0,00</td>
+                            <td class="num" data-col-id="churn_pct">36.1%</td>
+                            <td class="num" data-col-id="churn_op_pct">36.1%</td>
+                            <td class="num" data-col-id="churn_as_pct">—</td>
+                            <td class="num" data-col-id="lost">$0,00</td>
+                            <td class="num" data-col-id="lost_operador">$0,00</td>
+                            <td class="num" data-col-id="lost_asesor">$0,00</td>
+                            <td class="num" data-col-id="lost_count">0</td>
+                            <td class="num" data-col-id="operador">2</td>
+                            <td class="num" data-col-id="asesor">0</td>
+                            <td class="num" data-col-id="total_deals">2</td>
+                            <td class="num positive" data-col="cagr_pct" data-col-id="cagr_pct">+0.0%</td>
+                            <td class="num positive" data-col="cagr_billed_pct" data-col-id="cagr_billed_pct">+0.0%</td>
+                            <td class="num positive" data-col="cagr_consultant_pct" data-col-id="cagr_consultant_pct">—</td>
+                        </tr>
+                        <tr data-row-index="8">
+                            <td class="num" data-col-id="num">9</td>
+                            <td data-col-id="accountant"><a href="https://app.hubspot.com/contacts/19877595/company/9018591658" target="_blank" rel="noopener" class="growth-label">VIDAL DESARROLLOS S.A.</a></td>
+                            <td class="num" data-col-id="mrr">$338.679,00</td>
+                            <td class="num" data-col-id="mrr_operador">$338.679,00</td>
+                            <td class="num" data-col-id="mrr_asesor">$0,00</td>
+                            <td class="num" data-col-id="churn">$189.856,00</td>
+                            <td class="num" data-col-id="churn_operador">$189.856,00</td>
+                            <td class="num" data-col-id="churn_asesor">$0,00</td>
+                            <td class="num" data-col-id="churn_pct">35.9%</td>
+                            <td class="num" data-col-id="churn_op_pct">35.9%</td>
+                            <td class="num" data-col-id="churn_as_pct">—</td>
+                            <td class="num" data-col-id="lost">$0,00</td>
+                            <td class="num" data-col-id="lost_operador">$0,00</td>
+                            <td class="num" data-col-id="lost_asesor">$0,00</td>
+                            <td class="num" data-col-id="lost_count">0</td>
+                            <td class="num" data-col-id="operador">1</td>
+                            <td class="num" data-col-id="asesor">0</td>
+                            <td class="num" data-col-id="total_deals">1</td>
+                            <td class="num positive" data-col="cagr_pct" data-col-id="cagr_pct">+0.0%</td>
+                            <td class="num positive" data-col="cagr_billed_pct" data-col-id="cagr_billed_pct">+0.0%</td>
+                            <td class="num positive" data-col="cagr_consultant_pct" data-col-id="cagr_consultant_pct">—</td>
+                        </tr>
+                        <tr data-row-index="9">
+                            <td class="num" data-col-id="num">10</td>
+                            <td data-col-id="accountant"><a href="https://app.hubspot.com/contacts/19877595/company/9018599839" target="_blank" rel="noopener" class="growth-label">Lyracons</a></td>
+                            <td class="num" data-col-id="mrr">$149.919,00</td>
+                            <td class="num" data-col-id="mrr_operador">$149.919,00</td>
+                            <td class="num" data-col-id="mrr_asesor">$0,00</td>
+                            <td class="num" data-col-id="churn">$80.818,00</td>
+                            <td class="num" data-col-id="churn_operador">$80.818,00</td>
+                            <td class="num" data-col-id="churn_asesor">$0,00</td>
+                            <td class="num" data-col-id="churn_pct">35.0%</td>
+                            <td class="num" data-col-id="churn_op_pct">35.0%</td>
+                            <td class="num" data-col-id="churn_as_pct">—</td>
+                            <td class="num" data-col-id="lost">$0,00</td>
+                            <td class="num" data-col-id="lost_operador">$0,00</td>
+                            <td class="num" data-col-id="lost_asesor">$0,00</td>
+                            <td class="num" data-col-id="lost_count">0</td>
+                            <td class="num" data-col-id="operador">1</td>
+                            <td class="num" data-col-id="asesor">0</td>
+                            <td class="num" data-col-id="total_deals">1</td>
+                            <td class="num positive" data-col="cagr_pct" data-col-id="cagr_pct">+0.0%</td>
+                            <td class="num positive" data-col="cagr_billed_pct" data-col-id="cagr_billed_pct">+0.0%</td>
+                            <td class="num positive" data-col="cagr_consultant_pct" data-col-id="cagr_consultant_pct">—</td>
+                        </tr>
+                        <tr data-row-index="10">
+                            <td class="num" data-col-id="num">11</td>
+                            <td data-col-id="accountant"><a href="https://app.hubspot.com/contacts/19877595/company/17099980842" target="_blank" rel="noopener" class="growth-label">Estudio ISRAELCONSULT (Martín Abatedaga)</a></td>
+                            <td class="num" data-col-id="mrr">$244.299,00</td>
+                            <td class="num" data-col-id="mrr_operador">$244.299,00</td>
+                            <td class="num" data-col-id="mrr_asesor">$0,00</td>
+                            <td class="num" data-col-id="churn">$122.500,00</td>
+                            <td class="num" data-col-id="churn_operador">$0,00</td>
+                            <td class="num" data-col-id="churn_asesor">$122.500,00</td>
+                            <td class="num" data-col-id="churn_pct">33.4%</td>
+                            <td class="num" data-col-id="churn_op_pct">0.0%</td>
+                            <td class="num" data-col-id="churn_as_pct">100.0%</td>
+                            <td class="num" data-col-id="lost">$130.000,00</td>
+                            <td class="num" data-col-id="lost_operador">$0,00</td>
+                            <td class="num" data-col-id="lost_asesor">$130.000,00</td>
+                            <td class="num" data-col-id="lost_count">1</td>
+                            <td class="num" data-col-id="operador">1</td>
+                            <td class="num" data-col-id="asesor">2</td>
+                            <td class="num" data-col-id="total_deals">3</td>
+                            <td class="num negative" data-col="cagr_pct" data-col-id="cagr_pct">-19.2%</td>
+                            <td class="num positive" data-col="cagr_billed_pct" data-col-id="cagr_billed_pct">+0.0%</td>
+                            <td class="num negative" data-col="cagr_consultant_pct" data-col-id="cagr_consultant_pct">-100.0%</td>
+                        </tr>
+                        <tr data-row-index="11">
+                            <td class="num" data-col-id="num">12</td>
+                            <td data-col-id="accountant"><a href="https://app.hubspot.com/contacts/19877595/company/9018854460" target="_blank" rel="noopener" class="growth-label">53551 CFO Startup SRL</a></td>
+                            <td class="num" data-col-id="mrr">$291.489,00</td>
+                            <td class="num" data-col-id="mrr_operador">$291.489,00</td>
+                            <td class="num" data-col-id="mrr_asesor">$0,00</td>
+                            <td class="num" data-col-id="churn">$138.663,00</td>
+                            <td class="num" data-col-id="churn_operador">$0,00</td>
+                            <td class="num" data-col-id="churn_asesor">$138.663,00</td>
+                            <td class="num" data-col-id="churn_pct">32.2%</td>
+                            <td class="num" data-col-id="churn_op_pct">0.0%</td>
+                            <td class="num" data-col-id="churn_as_pct">100.0%</td>
+                            <td class="num" data-col-id="lost">$0,00</td>
+                            <td class="num" data-col-id="lost_operador">$0,00</td>
+                            <td class="num" data-col-id="lost_asesor">$0,00</td>
+                            <td class="num" data-col-id="lost_count">0</td>
+                            <td class="num" data-col-id="operador">1</td>
+                            <td class="num" data-col-id="asesor">2</td>
+                            <td class="num" data-col-id="total_deals">5</td>
+                            <td class="num positive" data-col="cagr_pct" data-col-id="cagr_pct">+0.0%</td>
+                            <td class="num positive" data-col="cagr_billed_pct" data-col-id="cagr_billed_pct">+0.0%</td>
+                            <td class="num positive" data-col="cagr_consultant_pct" data-col-id="cagr_consultant_pct">—</td>
+                        </tr>
+                        <tr data-row-index="12">
+                            <td class="num" data-col-id="num">13</td>
+                            <td data-col-id="accountant"><a href="https://app.hubspot.com/contacts/19877595/company/9019053474" target="_blank" rel="noopener" class="growth-label">ADRIANA NOEMI CHARYTON</a></td>
+                            <td class="num" data-col-id="mrr">$719.738,00</td>
+                            <td class="num" data-col-id="mrr_operador">$183.224,00</td>
+                            <td class="num" data-col-id="mrr_asesor">$536.514,00</td>
+                            <td class="num" data-col-id="churn">$339.851,00</td>
+                            <td class="num" data-col-id="churn_operador">$0,00</td>
+                            <td class="num" data-col-id="churn_asesor">$339.851,00</td>
+                            <td class="num" data-col-id="churn_pct">32.1%</td>
+                            <td class="num" data-col-id="churn_op_pct">0.0%</td>
+                            <td class="num" data-col-id="churn_as_pct">38.8%</td>
+                            <td class="num" data-col-id="lost">$0,00</td>
+                            <td class="num" data-col-id="lost_operador">$0,00</td>
+                            <td class="num" data-col-id="lost_asesor">$0,00</td>
+                            <td class="num" data-col-id="lost_count">0</td>
+                            <td class="num" data-col-id="operador">1</td>
+                            <td class="num" data-col-id="asesor">7</td>
+                            <td class="num" data-col-id="total_deals">10</td>
+                            <td class="num negative" data-col="cagr_pct" data-col-id="cagr_pct">-2.1%</td>
+                            <td class="num positive" data-col="cagr_billed_pct" data-col-id="cagr_billed_pct">+0.0%</td>
+                            <td class="num negative" data-col="cagr_consultant_pct" data-col-id="cagr_consultant_pct">-2.8%</td>
+                        </tr>
+                        <tr data-row-index="13">
+                            <td class="num" data-col-id="num">14</td>
+                            <td data-col-id="accountant"><a href="https://app.hubspot.com/contacts/19877595/company/9018891894" target="_blank" rel="noopener" class="growth-label">27080 SCMOBILE SRL</a></td>
+                            <td class="num" data-col-id="mrr">$245.025,00</td>
+                            <td class="num" data-col-id="mrr_operador">$245.025,00</td>
+                            <td class="num" data-col-id="mrr_asesor">$0,00</td>
+                            <td class="num" data-col-id="churn">$110.347,00</td>
+                            <td class="num" data-col-id="churn_operador">$110.347,00</td>
+                            <td class="num" data-col-id="churn_asesor">$0,00</td>
+                            <td class="num" data-col-id="churn_pct">31.1%</td>
+                            <td class="num" data-col-id="churn_op_pct">31.1%</td>
+                            <td class="num" data-col-id="churn_as_pct">—</td>
+                            <td class="num" data-col-id="lost">$0,00</td>
+                            <td class="num" data-col-id="lost_operador">$0,00</td>
+                            <td class="num" data-col-id="lost_asesor">$0,00</td>
+                            <td class="num" data-col-id="lost_count">0</td>
+                            <td class="num" data-col-id="operador">2</td>
+                            <td class="num" data-col-id="asesor">0</td>
+                            <td class="num" data-col-id="total_deals">2</td>
+                            <td class="num positive" data-col="cagr_pct" data-col-id="cagr_pct">+0.0%</td>
+                            <td class="num positive" data-col="cagr_billed_pct" data-col-id="cagr_billed_pct">+0.0%</td>
+                            <td class="num positive" data-col="cagr_consultant_pct" data-col-id="cagr_consultant_pct">—</td>
+                        </tr>
+                        <tr data-row-index="14">
+                            <td class="num" data-col-id="num">15</td>
+                            <td data-col-id="accountant"><a href="https://app.hubspot.com/contacts/19877595/company/9018861155" target="_blank" rel="noopener" class="growth-label">Emiliano Roggenbau Contador</a></td>
+                            <td class="num" data-col-id="mrr">$1.060.021,00</td>
+                            <td class="num" data-col-id="mrr_operador">$0,00</td>
+                            <td class="num" data-col-id="mrr_asesor">$1.060.021,00</td>
+                            <td class="num" data-col-id="churn">$434.766,00</td>
+                            <td class="num" data-col-id="churn_operador">$0,00</td>
+                            <td class="num" data-col-id="churn_asesor">$434.766,00</td>
+                            <td class="num" data-col-id="churn_pct">29.1%</td>
+                            <td class="num" data-col-id="churn_op_pct">—</td>
+                            <td class="num" data-col-id="churn_as_pct">29.1%</td>
+                            <td class="num" data-col-id="lost">$0,00</td>
+                            <td class="num" data-col-id="lost_operador">$0,00</td>
+                            <td class="num" data-col-id="lost_asesor">$0,00</td>
+                            <td class="num" data-col-id="lost_count">0</td>
+                            <td class="num" data-col-id="operador">0</td>
+                            <td class="num" data-col-id="asesor">7</td>
+                            <td class="num" data-col-id="total_deals">7</td>
+                            <td class="num positive" data-col="cagr_pct" data-col-id="cagr_pct">+5.7%</td>
+                            <td class="num positive" data-col="cagr_billed_pct" data-col-id="cagr_billed_pct">—</td>
+                            <td class="num positive" data-col="cagr_consultant_pct" data-col-id="cagr_consultant_pct">+5.7%</td>
+                        </tr>
+                        <tr data-row-index="15">
+                            <td class="num" data-col-id="num">16</td>
+                            <td data-col-id="accountant"><a href="https://app.hubspot.com/contacts/19877595/company/10360304905" target="_blank" rel="noopener" class="growth-label">69075 - KENNEDY REPRESAS Y ASOCIADOS</a></td>
+                            <td class="num" data-col-id="mrr">$338.679,00</td>
+                            <td class="num" data-col-id="mrr_operador">$338.679,00</td>
+                            <td class="num" data-col-id="mrr_asesor">$0,00</td>
+                            <td class="num" data-col-id="churn">$138.663,00</td>
+                            <td class="num" data-col-id="churn_operador">$0,00</td>
+                            <td class="num" data-col-id="churn_asesor">$138.663,00</td>
+                            <td class="num" data-col-id="churn_pct">29.0%</td>
+                            <td class="num" data-col-id="churn_op_pct">0.0%</td>
+                            <td class="num" data-col-id="churn_as_pct">100.0%</td>
+                            <td class="num" data-col-id="lost">$0,00</td>
+                            <td class="num" data-col-id="lost_operador">$0,00</td>
+                            <td class="num" data-col-id="lost_asesor">$0,00</td>
+                            <td class="num" data-col-id="lost_count">0</td>
+                            <td class="num" data-col-id="operador">2</td>
+                            <td class="num" data-col-id="asesor">1</td>
+                            <td class="num" data-col-id="total_deals">3</td>
+                            <td class="num negative" data-col="cagr_pct" data-col-id="cagr_pct">-15.8%</td>
+                            <td class="num positive" data-col="cagr_billed_pct" data-col-id="cagr_billed_pct">+0.0%</td>
+                            <td class="num negative" data-col="cagr_consultant_pct" data-col-id="cagr_consultant_pct">-100.0%</td>
+                        </tr>
+                        <tr data-row-index="16">
+                            <td class="num" data-col-id="num">17</td>
+                            <td data-col-id="accountant"><a href="https://app.hubspot.com/contacts/19877595/company/9018787980" target="_blank" rel="noopener" class="growth-label">23468 - COTRUAR</a></td>
+                            <td class="num" data-col-id="mrr">$177.265,00</td>
+                            <td class="num" data-col-id="mrr_operador">$177.265,00</td>
+                            <td class="num" data-col-id="mrr_asesor">$0,00</td>
+                            <td class="num" data-col-id="churn">$69.432,00</td>
+                            <td class="num" data-col-id="churn_operador">$0,00</td>
+                            <td class="num" data-col-id="churn_asesor">$69.432,00</td>
+                            <td class="num" data-col-id="churn_pct">28.1%</td>
+                            <td class="num" data-col-id="churn_op_pct">0.0%</td>
+                            <td class="num" data-col-id="churn_as_pct">100.0%</td>
+                            <td class="num" data-col-id="lost">$0,00</td>
+                            <td class="num" data-col-id="lost_operador">$0,00</td>
+                            <td class="num" data-col-id="lost_asesor">$0,00</td>
+                            <td class="num" data-col-id="lost_count">0</td>
+                            <td class="num" data-col-id="operador">1</td>
+                            <td class="num" data-col-id="asesor">1</td>
+                            <td class="num" data-col-id="total_deals">2</td>
+                            <td class="num positive" data-col="cagr_pct" data-col-id="cagr_pct">+0.0%</td>
+                            <td class="num positive" data-col="cagr_billed_pct" data-col-id="cagr_billed_pct">+0.0%</td>
+                            <td class="num positive" data-col="cagr_consultant_pct" data-col-id="cagr_consultant_pct">—</td>
+                        </tr>
+                        <tr data-row-index="17">
+                            <td class="num" data-col-id="num">18</td>
+                            <td data-col-id="accountant"><a href="https://app.hubspot.com/contacts/19877595/company/30934639914" target="_blank" rel="noopener" class="growth-label">25604 - Abolsky & Asociados</a></td>
+                            <td class="num" data-col-id="mrr">$489.324,00</td>
+                            <td class="num" data-col-id="mrr_operador">$244.299,00</td>
+                            <td class="num" data-col-id="mrr_asesor">$245.025,00</td>
+                            <td class="num" data-col-id="churn">$181.747,00</td>
+                            <td class="num" data-col-id="churn_operador">$0,00</td>
+                            <td class="num" data-col-id="churn_asesor">$181.747,00</td>
+                            <td class="num" data-col-id="churn_pct">27.1%</td>
+                            <td class="num" data-col-id="churn_op_pct">0.0%</td>
+                            <td class="num" data-col-id="churn_as_pct">42.6%</td>
+                            <td class="num" data-col-id="lost">$0,00</td>
+                            <td class="num" data-col-id="lost_operador">$0,00</td>
+                            <td class="num" data-col-id="lost_asesor">$0,00</td>
+                            <td class="num" data-col-id="lost_count">0</td>
+                            <td class="num" data-col-id="operador">1</td>
+                            <td class="num" data-col-id="asesor">2</td>
+                            <td class="num" data-col-id="total_deals">8</td>
+                            <td class="num negative" data-col="cagr_pct" data-col-id="cagr_pct">-14.6%</td>
+                            <td class="num positive" data-col="cagr_billed_pct" data-col-id="cagr_billed_pct">+0.0%</td>
+                            <td class="num negative" data-col="cagr_consultant_pct" data-col-id="cagr_consultant_pct">-24.2%</td>
+                        </tr>
+                        <tr data-row-index="18">
+                            <td class="num" data-col-id="num">19</td>
+                            <td data-col-id="accountant"><a href="https://app.hubspot.com/contacts/19877595/company/9018854443" target="_blank" rel="noopener" class="growth-label">56086 - RIVERO PLEZ ARGENTO Y ASOC. S.R.L.</a></td>
+                            <td class="num" data-col-id="mrr">$149.919,00</td>
+                            <td class="num" data-col-id="mrr_operador">$149.919,00</td>
+                            <td class="num" data-col-id="mrr_asesor">$0,00</td>
+                            <td class="num" data-col-id="churn">$52.890,00</td>
+                            <td class="num" data-col-id="churn_operador">$0,00</td>
+                            <td class="num" data-col-id="churn_asesor">$52.890,00</td>
+                            <td class="num" data-col-id="churn_pct">26.1%</td>
+                            <td class="num" data-col-id="churn_op_pct">0.0%</td>
+                            <td class="num" data-col-id="churn_as_pct">100.0%</td>
+                            <td class="num" data-col-id="lost">$0,00</td>
+                            <td class="num" data-col-id="lost_operador">$0,00</td>
+                            <td class="num" data-col-id="lost_asesor">$0,00</td>
+                            <td class="num" data-col-id="lost_count">0</td>
+                            <td class="num" data-col-id="operador">1</td>
+                            <td class="num" data-col-id="asesor">1</td>
+                            <td class="num" data-col-id="total_deals">2</td>
+                            <td class="num positive" data-col="cagr_pct" data-col-id="cagr_pct">+0.0%</td>
+                            <td class="num positive" data-col="cagr_billed_pct" data-col-id="cagr_billed_pct">+0.0%</td>
+                            <td class="num positive" data-col="cagr_consultant_pct" data-col-id="cagr_consultant_pct">—</td>
+                        </tr>
+                        <tr data-row-index="19">
+                            <td class="num" data-col-id="num">20</td>
+                            <td data-col-id="accountant"><a href="https://app.hubspot.com/contacts/19877595/company/9018811769" target="_blank" rel="noopener" class="growth-label">19540 - NG ASOC</a></td>
+                            <td class="num" data-col-id="mrr">$195.439,00</td>
+                            <td class="num" data-col-id="mrr_operador">$195.439,00</td>
+                            <td class="num" data-col-id="mrr_asesor">$0,00</td>
+                            <td class="num" data-col-id="churn">$68.496,00</td>
+                            <td class="num" data-col-id="churn_operador">$68.496,00</td>
+                            <td class="num" data-col-id="churn_asesor">$0,00</td>
+                            <td class="num" data-col-id="churn_pct">26.0%</td>
+                            <td class="num" data-col-id="churn_op_pct">26.0%</td>
+                            <td class="num" data-col-id="churn_as_pct">—</td>
+                            <td class="num" data-col-id="lost">$0,00</td>
+                            <td class="num" data-col-id="lost_operador">$0,00</td>
+                            <td class="num" data-col-id="lost_asesor">$0,00</td>
+                            <td class="num" data-col-id="lost_count">0</td>
+                            <td class="num" data-col-id="operador">3</td>
+                            <td class="num" data-col-id="asesor">0</td>
+                            <td class="num" data-col-id="total_deals">3</td>
+                            <td class="num negative" data-col="cagr_pct" data-col-id="cagr_pct">-26.8%</td>
+                            <td class="num negative" data-col="cagr_billed_pct" data-col-id="cagr_billed_pct">-26.8%</td>
+                            <td class="num positive" data-col="cagr_consultant_pct" data-col-id="cagr_consultant_pct">—</td>
+                        </tr>
+                </tbody>
+            </table>
+        </div>
+    </div>
+    <script type="application/json" id="cagr-data-json">{"6": {"growth_by_tier": [{"tier": "1", "mrr_now": 54002763.0, "mrr_start": 53542565.0, "cagr_pct": 1.7263860983026014, "cutoff": "2025-08-16"}, {"tier": "2", "mrr_now": 29598062.0, "mrr_start": 28733593.0, "cagr_pct": 6.1076459081113255, "cutoff": null}, {"tier": "3-5", "mrr_now": 18587261.0, "mrr_start": 19401867.0, "cagr_pct": -8.220909799882358, "cutoff": null}, {"tier": "6-10", "mrr_now": 22311321.0, "mrr_start": 22694694.0, "cagr_pct": -3.3499893099224964, "cutoff": null}, {"tier": "11-20", "mrr_now": 15136416.0, "mrr_start": 14940556.0, "cagr_pct": 2.639042244965717, "cutoff": null}, {"tier": "20-40", "mrr_now": 7466720.0, "mrr_start": 7650945.0, "cagr_pct": -4.757766483779557, "cutoff": null}], "deals_growth_by_tier": [{"tier": "1", "deals_now": 325, "deals_start": 315, "cagr_pct": 6.449987402368373, "cutoff": "2025-08-16"}, {"tier": "2", "deals_now": 208, "deals_start": 195, "cagr_pct": 13.777777777777779, "cutoff": null}, {"tier": "3-5", "deals_now": 185, "deals_start": 154, "cagr_pct": 44.31185697419464, "cutoff": null}, {"tier": "6-10", "deals_now": 213, "deals_start": 190, "cagr_pct": 25.675900277008303, "cutoff": null}, {"tier": "11-20", "deals_now": 133, "deals_start": 127, "cagr_pct": 9.672019344038674, "cutoff": null}, {"tier": "20-40", "deals_now": 88, "deals_start": 55, "cagr_pct": 156.00000000000006, "cutoff": null}], "top_cagr": [{"cagr_pct": 0.0, "cagr_billed_pct": 0.0, "cagr_consultant_pct": 0.0, "_mrr_billed_now": 120395.0, "_mrr_consultant_now": 4257143.0}, {"cagr_pct": 29.803097054882866, "cagr_billed_pct": 0.0, "cagr_consultant_pct": 34.35642758806172, "_mrr_billed_now": 364694.0, "_mrr_consultant_now": 2972679.0}, {"cagr_pct": -5.339538356129935, "cagr_billed_pct": 0.0, "cagr_consultant_pct": -5.9249099971829144, "_mrr_billed_now": 338679.0, "_mrr_consultant_now": 2950706.0}, {"cagr_pct": 1.777126652641936, "cagr_billed_pct": 7.492482192432948, "cagr_consultant_pct": 0.0, "_mrr_billed_now": 690574.0, "_mrr_consultant_now": 2103610.0}, {"cagr_pct": 0.0, "cagr_billed_pct": 0.0, "cagr_consultant_pct": 0.0, "_mrr_billed_now": 149919.0, "_mrr_consultant_now": 2186349.0}, {"cagr_pct": 0.0, "cagr_billed_pct": null, "cagr_consultant_pct": 0.0, "_mrr_billed_now": 0, "_mrr_consultant_now": 2278067.0}, {"cagr_pct": 8.733328026553444, "cagr_billed_pct": 0.0, "cagr_consultant_pct": 10.59086154969464, "_mrr_billed_now": 338679.0, "_mrr_consultant_now": 1716839.0}, {"cagr_pct": -19.04572406741144, "cagr_billed_pct": 0.0, "cagr_consultant_pct": -21.475037522613004, "_mrr_billed_now": 244299.0, "_mrr_consultant_now": 1595506.0}, {"cagr_pct": -19.003209429252564, "cagr_billed_pct": 0.0, "cagr_consultant_pct": -25.352287631088288, "_mrr_billed_now": 535788.0, "_mrr_consultant_now": 1286351.0}, {"cagr_pct": 0.0, "cagr_billed_pct": 0.0, "cagr_consultant_pct": 0.0, "_mrr_billed_now": 149919.0, "_mrr_consultant_now": 1634710.0}, {"cagr_pct": 0.0, "cagr_billed_pct": 0.0, "cagr_consultant_pct": 0.0, "_mrr_billed_now": 177265.0, "_mrr_consultant_now": 1457445.0}, {"cagr_pct": 0.0, "cagr_billed_pct": 0.0, "cagr_consultant_pct": 0.0, "_mrr_billed_now": 244299.0, "_mrr_consultant_now": 1299498.0}, {"cagr_pct": 53.07208577244731, "cagr_billed_pct": 0.0, "cagr_consultant_pct": 67.98530349109389, "_mrr_billed_now": 244299.0, "_mrr_consultant_now": 1275945.0}, {"cagr_pct": 0.0, "cagr_billed_pct": 0.0, "cagr_consultant_pct": 0.0, "_mrr_billed_now": 244299.0, "_mrr_consultant_now": 1165956.0}, {"cagr_pct": 36.30971244258816, "cagr_billed_pct": 0.0, "cagr_consultant_pct": 50.18906396614191, "_mrr_billed_now": 291489.0, "_mrr_consultant_now": 1031766.0}, {"cagr_pct": 0.0, "cagr_billed_pct": 0.0, "cagr_consultant_pct": 0.0, "_mrr_billed_now": 149919.0, "_mrr_consultant_now": 1136553.0}, {"cagr_pct": 0.0, "cagr_billed_pct": 0.0, "cagr_consultant_pct": 0.0, "_mrr_billed_now": 244299.0, "_mrr_consultant_now": 943679.0}, {"cagr_pct": 0.0, "cagr_billed_pct": 0.0, "cagr_consultant_pct": 0.0, "_mrr_billed_now": 244299.0, "_mrr_consultant_now": 906907.0}, {"cagr_pct": 0.0, "cagr_billed_pct": 0.0, "cagr_consultant_pct": 0.0, "_mrr_billed_now": 270943.0, "_mrr_consultant_now": 874467.0}, {"cagr_pct": 0.0, "cagr_billed_pct": 0.0, "cagr_consultant_pct": 0.0, "_mrr_billed_now": 218889.0, "_mrr_consultant_now": 902491.0}], "worst_cagr": [{"cagr_pct": 0.0, "cagr_billed_pct": 0.0, "cagr_consultant_pct": null, "_mrr_billed_now": 177265.0, "_mrr_consultant_now": 0}, {"cagr_pct": 0.0, "cagr_billed_pct": null, "cagr_consultant_pct": 0.0, "_mrr_billed_now": 0, "_mrr_consultant_now": 758095.0}, {"cagr_pct": 0.0, "cagr_billed_pct": 0.0, "cagr_consultant_pct": null, "_mrr_billed_now": 244299.0, "_mrr_consultant_now": 0}, {"cagr_pct": 0.0, "cagr_billed_pct": 0.0, "cagr_consultant_pct": 0.0, "_mrr_billed_now": 149919.0, "_mrr_consultant_now": 240790.0}, {"cagr_pct": 0.0, "cagr_billed_pct": 0.0, "cagr_consultant_pct": null, "_mrr_billed_now": 244299.0, "_mrr_consultant_now": 0}, {"cagr_pct": 0.0, "cagr_billed_pct": null, "cagr_consultant_pct": 0.0, "_mrr_billed_now": 0, "_mrr_consultant_now": 120395.0}, {"cagr_pct": 0.0, "cagr_billed_pct": 0.0, "cagr_consultant_pct": null, "_mrr_billed_now": 291489.0, "_mrr_consultant_now": 0}, {"cagr_pct": 0.0, "cagr_billed_pct": 0.0, "cagr_consultant_pct": null, "_mrr_billed_now": 177265.0, "_mrr_consultant_now": 0}, {"cagr_pct": 0.0, "cagr_billed_pct": 0.0, "cagr_consultant_pct": null, "_mrr_billed_now": 338679.0, "_mrr_consultant_now": 0}, {"cagr_pct": 0.0, "cagr_billed_pct": 0.0, "cagr_consultant_pct": null, "_mrr_billed_now": 149919.0, "_mrr_consultant_now": 0}, {"cagr_pct": -57.400348634352305, "cagr_billed_pct": 0.0, "cagr_consultant_pct": -100.0, "_mrr_billed_now": 244299.0, "_mrr_consultant_now": 0}, {"cagr_pct": 0.0, "cagr_billed_pct": 0.0, "cagr_consultant_pct": null, "_mrr_billed_now": 291489.0, "_mrr_consultant_now": 0}, {"cagr_pct": 0.0, "cagr_billed_pct": 0.0, "cagr_consultant_pct": 0.0, "_mrr_billed_now": 183224.0, "_mrr_consultant_now": 536514.0}, {"cagr_pct": 0.0, "cagr_billed_pct": 0.0, "cagr_consultant_pct": null, "_mrr_billed_now": 245025.0, "_mrr_consultant_now": 0}, {"cagr_pct": 0.0, "cagr_billed_pct": null, "cagr_consultant_pct": 0.0, "_mrr_billed_now": 0, "_mrr_consultant_now": 1060021.0}, {"cagr_pct": 0.0, "cagr_billed_pct": 0.0, "cagr_consultant_pct": null, "_mrr_billed_now": 338679.0, "_mrr_consultant_now": 0}, {"cagr_pct": 0.0, "cagr_billed_pct": 0.0, "cagr_consultant_pct": null, "_mrr_billed_now": 177265.0, "_mrr_consultant_now": 0}, {"cagr_pct": 0.0, "cagr_billed_pct": 0.0, "cagr_consultant_pct": 0.0, "_mrr_billed_now": 244299.0, "_mrr_consultant_now": 245025.0}, {"cagr_pct": 0.0, "cagr_billed_pct": 0.0, "cagr_consultant_pct": null, "_mrr_billed_now": 149919.0, "_mrr_consultant_now": 0}, {"cagr_pct": 0.0, "cagr_billed_pct": 0.0, "cagr_consultant_pct": null, "_mrr_billed_now": 195439.0, "_mrr_consultant_now": 0}], "matrix_cagr": {"<-14%|1": null, "<-14%|2": 0.0, "<-14%|3-5": 0.0, "<-14%|6-10": null, "<-14%|11-20": null, "<-14%|20-40": null, "<-14%|40-100": null, "<-14%|100-200": null, "<-14%|200+": null, "-14% - 0%|1": null, "-14% - 0%|2": null, "-14% - 0%|3-5": null, "-14% - 0%|6-10": null, "-14% - 0%|11-20": null, "-14% - 0%|20-40": null, "-14% - 0%|40-100": null, "-14% - 0%|100-200": null, "-14% - 0%|200+": null, "0% - +14%|1": 0.0, "0% - +14%|2": 0.0, "0% - +14%|3-5": 0.0, "0% - +14%|6-10": 0.0, "0% - +14%|11-20": null, "0% - +14%|20-40": null, "0% - +14%|40-100": null, "0% - +14%|100-200": null, "0% - +14%|200+": null, ">+14%|1": null, ">+14%|2": 0.0, ">+14%|3-5": 0.0, ">+14%|6-10": 0.0, ">+14%|11-20": 0.0, ">+14%|20-40": 0.0, ">+14%|40-100": null, ">+14%|100-200": null, ">+14%|200+": null}}, "12": {"growth_by_tier": [{"tier": "1", "mrr_now": 54002763.0, "mrr_start": 50660249.0, "cagr_pct": 6.597902825151936, "cutoff": "2025-02-14"}, {"tier": "2", "mrr_now": 29598062.0, "mrr_start": 26654409.0, "cagr_pct": 11.043775159299152, "cutoff": null}, {"tier": "3-5", "mrr_now": 18587261.0, "mrr_start": 17470043.0, "cagr_pct": 6.395050086596821, "cutoff": null}, {"tier": "6-10", "mrr_now": 22311321.0, "mrr_start": 22599789.0, "cagr_pct": -1.2764189966552375, "cutoff": null}, {"tier": "11-20", "mrr_now": 15136416.0, "mrr_start": 13786429.0, "cagr_pct": 9.792144144070946, "cutoff": null}, {"tier": "20-40", "mrr_now": 7466720.0, "mrr_start": 7517485.0, "cagr_pct": -0.675292335136024, "cutoff": null}], "deals_growth_by_tier": [{"tier": "1", "deals_now": 325, "deals_start": 296, "cagr_pct": 9.797297297297302, "cutoff": "2025-02-14"}, {"tier": "2", "deals_now": 208, "deals_start": 168, "cagr_pct": 23.809523809523814, "cutoff": null}, {"tier": "3-5", "deals_now": 185, "deals_start": 117, "cagr_pct": 58.11965811965811, "cutoff": null}, {"tier": "6-10", "deals_now": 213, "deals_start": 162, "cagr_pct": 31.481481481481488, "cutoff": null}, {"tier": "11-20", "deals_now": 133, "deals_start": 115, "cagr_pct": 15.652173913043477, "cutoff": null}, {"tier": "20-40", "deals_now": 88, "deals_start": 49, "cagr_pct": 79.59183673469387, "cutoff": null}], "top_cagr": [{"cagr_pct": 0.0, "cagr_billed_pct": 0.0, "cagr_consultant_pct": 0.0, "_mrr_billed_now": 120395.0, "_mrr_consultant_now": 4257143.0}, {"cagr_pct": 13.93116213524852, "cagr_billed_pct": 0.0, "cagr_consultant_pct": 15.912220058137837, "_mrr_billed_now": 364694.0, "_mrr_consultant_now": 2972679.0}, {"cagr_pct": -2.706391965417343, "cagr_billed_pct": 0.0, "cagr_consultant_pct": -3.0076858700561315, "_mrr_billed_now": 338679.0, "_mrr_consultant_now": 2950706.0}, {"cagr_pct": 5.991983983139515, "cagr_billed_pct": 29.657987427996368, "cagr_consultant_pct": 0.0, "_mrr_billed_now": 690574.0, "_mrr_consultant_now": 2103610.0}, {"cagr_pct": 0.0, "cagr_billed_pct": 0.0, "cagr_consultant_pct": 0.0, "_mrr_billed_now": 149919.0, "_mrr_consultant_now": 2186349.0}, {"cagr_pct": 1.3129379220784942, "cagr_billed_pct": null, "cagr_consultant_pct": 1.3129379220784942, "_mrr_billed_now": 0, "_mrr_consultant_now": 2278067.0}, {"cagr_pct": 69.43698450145324, "cagr_billed_pct": 0.0, "cagr_consultant_pct": 96.32976430214062, "_mrr_billed_now": 338679.0, "_mrr_consultant_now": 1716839.0}, {"cagr_pct": 9.6233918212282, "cagr_billed_pct": 0.0, "cagr_consultant_pct": 11.262854803740874, "_mrr_billed_now": 244299.0, "_mrr_consultant_now": 1595506.0}, {"cagr_pct": -10.001783033913703, "cagr_billed_pct": 0.0, "cagr_consultant_pct": -13.601092386007728, "_mrr_billed_now": 535788.0, "_mrr_consultant_now": 1286351.0}, {"cagr_pct": 0.0, "cagr_billed_pct": 0.0, "cagr_consultant_pct": 0.0, "_mrr_billed_now": 149919.0, "_mrr_consultant_now": 1634710.0}, {"cagr_pct": 0.0, "cagr_billed_pct": 0.0, "cagr_consultant_pct": 0.0, "_mrr_billed_now": 177265.0, "_mrr_consultant_now": 1457445.0}, {"cagr_pct": 0.0, "cagr_billed_pct": 0.0, "cagr_consultant_pct": 0.0, "_mrr_billed_now": 244299.0, "_mrr_consultant_now": 1299498.0}, {"cagr_pct": 37.03756119502815, "cagr_billed_pct": 0.0, "cagr_consultant_pct": 47.49717939944327, "_mrr_billed_now": 244299.0, "_mrr_consultant_now": 1275945.0}, {"cagr_pct": 0.0, "cagr_billed_pct": 0.0, "cagr_consultant_pct": 0.0, "_mrr_billed_now": 244299.0, "_mrr_consultant_now": 1165956.0}, {"cagr_pct": 38.397409549149856, "cagr_billed_pct": 0.0, "cagr_consultant_pct": 55.23728706453739, "_mrr_billed_now": 291489.0, "_mrr_consultant_now": 1031766.0}, {"cagr_pct": 0.0, "cagr_billed_pct": 0.0, "cagr_consultant_pct": 0.0, "_mrr_billed_now": 149919.0, "_mrr_consultant_now": 1136553.0}, {"cagr_pct": 0.0, "cagr_billed_pct": 0.0, "cagr_consultant_pct": 0.0, "_mrr_billed_now": 244299.0, "_mrr_consultant_now": 943679.0}, {"cagr_pct": 0.0, "cagr_billed_pct": 0.0, "cagr_consultant_pct": 0.0, "_mrr_billed_now": 244299.0, "_mrr_consultant_now": 906907.0}, {"cagr_pct": 0.0, "cagr_billed_pct": 0.0, "cagr_consultant_pct": 0.0, "_mrr_billed_now": 270943.0, "_mrr_consultant_now": 874467.0}, {"cagr_pct": 0.0, "cagr_billed_pct": 0.0, "cagr_consultant_pct": 0.0, "_mrr_billed_now": 218889.0, "_mrr_consultant_now": 902491.0}], "worst_cagr": [{"cagr_pct": 0.0, "cagr_billed_pct": 0.0, "cagr_consultant_pct": null, "_mrr_billed_now": 177265.0, "_mrr_consultant_now": 0}, {"cagr_pct": -13.911048779518397, "cagr_billed_pct": null, "cagr_consultant_pct": -13.911048779518397, "_mrr_billed_now": 0, "_mrr_consultant_now": 758095.0}, {"cagr_pct": 0.0, "cagr_billed_pct": 0.0, "cagr_consultant_pct": null, "_mrr_billed_now": 244299.0, "_mrr_consultant_now": 0}, {"cagr_pct": 0.0, "cagr_billed_pct": 0.0, "cagr_consultant_pct": 0.0, "_mrr_billed_now": 149919.0, "_mrr_consultant_now": 240790.0}, {"cagr_pct": -38.437676397064756, "cagr_billed_pct": 0.0, "cagr_consultant_pct": -100.0, "_mrr_billed_now": 244299.0, "_mrr_consultant_now": 0}, {"cagr_pct": 0.0, "cagr_billed_pct": null, "cagr_consultant_pct": 0.0, "_mrr_billed_now": 0, "_mrr_consultant_now": 120395.0}, {"cagr_pct": 0.0, "cagr_billed_pct": 0.0, "cagr_consultant_pct": null, "_mrr_billed_now": 291489.0, "_mrr_consultant_now": 0}, {"cagr_pct": 0.0, "cagr_billed_pct": 0.0, "cagr_consultant_pct": null, "_mrr_billed_now": 177265.0, "_mrr_consultant_now": 0}, {"cagr_pct": 0.0, "cagr_billed_pct": 0.0, "cagr_consultant_pct": null, "_mrr_billed_now": 338679.0, "_mrr_consultant_now": 0}, {"cagr_pct": 0.0, "cagr_billed_pct": 0.0, "cagr_consultant_pct": null, "_mrr_billed_now": 149919.0, "_mrr_consultant_now": 0}, {"cagr_pct": -34.731591588542855, "cagr_billed_pct": 0.0, "cagr_consultant_pct": -100.0, "_mrr_billed_now": 244299.0, "_mrr_consultant_now": 0}, {"cagr_pct": 0.0, "cagr_billed_pct": 0.0, "cagr_consultant_pct": null, "_mrr_billed_now": 291489.0, "_mrr_consultant_now": 0}, {"cagr_pct": 0.0, "cagr_billed_pct": 0.0, "cagr_consultant_pct": 0.0, "_mrr_billed_now": 183224.0, "_mrr_consultant_now": 536514.0}, {"cagr_pct": 0.0, "cagr_billed_pct": 0.0, "cagr_consultant_pct": null, "_mrr_billed_now": 245025.0, "_mrr_consultant_now": 0}, {"cagr_pct": 11.641444274645153, "cagr_billed_pct": null, "cagr_consultant_pct": 11.641444274645153, "_mrr_billed_now": 0, "_mrr_consultant_now": 1060021.0}, {"cagr_pct": 0.0, "cagr_billed_pct": 0.0, "cagr_consultant_pct": null, "_mrr_billed_now": 338679.0, "_mrr_consultant_now": 0}, {"cagr_pct": 0.0, "cagr_billed_pct": 0.0, "cagr_consultant_pct": null, "_mrr_billed_now": 177265.0, "_mrr_consultant_now": 0}, {"cagr_pct": -27.083125332490898, "cagr_billed_pct": 0.0, "cagr_consultant_pct": -42.586439597724315, "_mrr_billed_now": 244299.0, "_mrr_consultant_now": 245025.0}, {"cagr_pct": 0.0, "cagr_billed_pct": 0.0, "cagr_consultant_pct": null, "_mrr_billed_now": 149919.0, "_mrr_consultant_now": 0}, {"cagr_pct": 0.0, "cagr_billed_pct": 0.0, "cagr_consultant_pct": null, "_mrr_billed_now": 195439.0, "_mrr_consultant_now": 0}], "matrix_cagr": {"<-14%|1": null, "<-14%|2": 0.0, "<-14%|3-5": 0.0, "<-14%|6-10": null, "<-14%|11-20": null, "<-14%|20-40": null, "<-14%|40-100": null, "<-14%|100-200": null, "<-14%|200+": null, "-14% - 0%|1": null, "-14% - 0%|2": null, "-14% - 0%|3-5": null, "-14% - 0%|6-10": null, "-14% - 0%|11-20": null, "-14% - 0%|20-40": null, "-14% - 0%|40-100": null, "-14% - 0%|100-200": null, "-14% - 0%|200+": null, "0% - +14%|1": 0.0, "0% - +14%|2": 0.0, "0% - +14%|3-5": 0.0, "0% - +14%|6-10": 0.0, "0% - +14%|11-20": null, "0% - +14%|20-40": null, "0% - +14%|40-100": null, "0% - +14%|100-200": null, "0% - +14%|200+": null, ">+14%|1": null, ">+14%|2": 0.0, ">+14%|3-5": 0.0, ">+14%|6-10": 0.0, ">+14%|11-20": 0.0, ">+14%|20-40": 0.0, ">+14%|40-100": null, ">+14%|100-200": null, ">+14%|200+": null}}, "18": {"growth_by_tier": [{"tier": "1", "mrr_now": 54002763.0, "mrr_start": 47126661.0, "cagr_pct": 9.504728690816599, "cutoff": "2024-08-16"}, {"tier": "2", "mrr_now": 29598062.0, "mrr_start": 23893174.0, "cagr_pct": 15.34345421292651, "cutoff": null}, {"tier": "3-5", "mrr_now": 18587261.0, "mrr_start": 16978037.0, "cagr_pct": 6.223012618002266, "cutoff": null}, {"tier": "6-10", "mrr_now": 22311321.0, "mrr_start": 21312366.0, "cagr_pct": 3.1008895933521297, "cutoff": null}, {"tier": "11-20", "mrr_now": 15136416.0, "mrr_start": 12607026.0, "cagr_pct": 12.964054346250343, "cutoff": null}, {"tier": "20-40", "mrr_now": 7466720.0, "mrr_start": 7656148.0, "cagr_pct": -1.65634077764103, "cutoff": null}], "deals_growth_by_tier": [{"tier": "1", "deals_now": 325, "deals_start": 274, "cagr_pct": 12.052581254870255, "cutoff": "2024-08-16"}, {"tier": "2", "deals_now": 208, "deals_start": 154, "cagr_pct": 22.18795869276029, "cutoff": null}, {"tier": "3-5", "deals_now": 185, "deals_start": 109, "cagr_pct": 42.28643131621062, "cutoff": null}, {"tier": "6-10", "deals_now": 213, "deals_start": 153, "cagr_pct": 24.678656867033677, "cutoff": null}, {"tier": "11-20", "deals_now": 133, "deals_start": 105, "cagr_pct": 17.068906361284377, "cutoff": null}, {"tier": "20-40", "deals_now": 88, "deals_start": 48, "cagr_pct": 49.79395578459469, "cutoff": null}], "top_cagr": [{"cagr_pct": 0.0, "cagr_billed_pct": 0.0, "cagr_consultant_pct": 0.0, "_mrr_billed_now": 120395.0, "_mrr_consultant_now": 4257143.0}, {"cagr_pct": 9.08415829017606, "cagr_billed_pct": 0.0, "cagr_consultant_pct": 10.345039875278971, "_mrr_billed_now": 364694.0, "_mrr_consultant_now": 2972679.0}, {"cagr_pct": -2.761116927925711, "cagr_billed_pct": 0.0, "cagr_consultant_pct": -3.0659486033389083, "_mrr_billed_now": 338679.0, "_mrr_consultant_now": 2950706.0}, {"cagr_pct": 0.4631230600752101, "cagr_billed_pct": 18.904835773734895, "cagr_consultant_pct": -4.1663948453651845, "_mrr_billed_now": 690574.0, "_mrr_consultant_now": 2103610.0}, {"cagr_pct": 0.0, "cagr_billed_pct": 0.0, "cagr_consultant_pct": 0.0, "_mrr_billed_now": 149919.0, "_mrr_consultant_now": 2186349.0}, {"cagr_pct": 0.8733876997542023, "cagr_billed_pct": null, "cagr_consultant_pct": 0.8733876997542023, "_mrr_billed_now": 0, "_mrr_consultant_now": 2278067.0}, {"cagr_pct": 42.12554478806179, "cagr_billed_pct": 0.0, "cagr_consultant_pct": 56.792071086929894, "_mrr_billed_now": 338679.0, "_mrr_consultant_now": 1716839.0}, {"cagr_pct": 155.95143092891846, "cagr_billed_pct": 0.0, "cagr_consultant_pct": 292.732088502169, "_mrr_billed_now": 244299.0, "_mrr_consultant_now": 1595506.0}, {"cagr_pct": -6.784256003435263, "cagr_billed_pct": 0.0, "cagr_consultant_pct": -9.286449031472454, "_mrr_billed_now": 535788.0, "_mrr_consultant_now": 1286351.0}, {"cagr_pct": 12.624171870631828, "cagr_billed_pct": 0.0, "cagr_consultant_pct": 13.98879541557334, "_mrr_billed_now": 149919.0, "_mrr_consultant_now": 1634710.0}, {"cagr_pct": 0.0, "cagr_billed_pct": 0.0, "cagr_consultant_pct": 0.0, "_mrr_billed_now": 177265.0, "_mrr_consultant_now": 1457445.0}, {"cagr_pct": 0.0, "cagr_billed_pct": 0.0, "cagr_consultant_pct": 0.0, "_mrr_billed_now": 244299.0, "_mrr_consultant_now": 1299498.0}, {"cagr_pct": 23.374786472682164, "cagr_billed_pct": 0.0, "cagr_consultant_pct": 29.575375747466957, "_mrr_billed_now": 244299.0, "_mrr_consultant_now": 1275945.0}, {"cagr_pct": 0.0, "cagr_billed_pct": 0.0, "cagr_consultant_pct": 0.0, "_mrr_billed_now": 244299.0, "_mrr_consultant_now": 1165956.0}, {"cagr_pct": 125.57668878683997, "cagr_billed_pct": 0.0, "cagr_consultant_pct": 376.853660908037, "_mrr_billed_now": 291489.0, "_mrr_consultant_now": 1031766.0}, {"cagr_pct": 0.0, "cagr_billed_pct": 0.0, "cagr_consultant_pct": 0.0, "_mrr_billed_now": 149919.0, "_mrr_consultant_now": 1136553.0}, {"cagr_pct": 0.0, "cagr_billed_pct": 0.0, "cagr_consultant_pct": 0.0, "_mrr_billed_now": 244299.0, "_mrr_consultant_now": 943679.0}, {"cagr_pct": 0.0, "cagr_billed_pct": 0.0, "cagr_consultant_pct": 0.0, "_mrr_billed_now": 244299.0, "_mrr_consultant_now": 906907.0}, {"cagr_pct": 0.0, "cagr_billed_pct": 0.0, "cagr_consultant_pct": 0.0, "_mrr_billed_now": 270943.0, "_mrr_consultant_now": 874467.0}, {"cagr_pct": 15.577496831741655, "cagr_billed_pct": null, "cagr_consultant_pct": 0.0, "_mrr_billed_now": 218889.0, "_mrr_consultant_now": 902491.0}], "worst_cagr": [{"cagr_pct": 0.0, "cagr_billed_pct": 0.0, "cagr_consultant_pct": null, "_mrr_billed_now": 177265.0, "_mrr_consultant_now": 0}, {"cagr_pct": 12.470897769917432, "cagr_billed_pct": null, "cagr_consultant_pct": 12.470897769917432, "_mrr_billed_now": 0, "_mrr_consultant_now": 758095.0}, {"cagr_pct": 0.0, "cagr_billed_pct": null, "cagr_consultant_pct": null, "_mrr_billed_now": 244299.0, "_mrr_consultant_now": 0}, {"cagr_pct": 0.0, "cagr_billed_pct": 0.0, "cagr_consultant_pct": 0.0, "_mrr_billed_now": 149919.0, "_mrr_consultant_now": 240790.0}, {"cagr_pct": -27.63253901965539, "cagr_billed_pct": 0.0, "cagr_consultant_pct": -100.0, "_mrr_billed_now": 244299.0, "_mrr_consultant_now": 0}, {"cagr_pct": 0.0, "cagr_billed_pct": null, "cagr_consultant_pct": 0.0, "_mrr_billed_now": 0, "_mrr_consultant_now": 120395.0}, {"cagr_pct": 0.0, "cagr_billed_pct": 0.0, "cagr_consultant_pct": null, "_mrr_billed_now": 291489.0, "_mrr_consultant_now": 0}, {"cagr_pct": 0.0, "cagr_billed_pct": 0.0, "cagr_consultant_pct": null, "_mrr_billed_now": 177265.0, "_mrr_consultant_now": 0}, {"cagr_pct": 0.0, "cagr_billed_pct": 0.0, "cagr_consultant_pct": null, "_mrr_billed_now": 338679.0, "_mrr_consultant_now": 0}, {"cagr_pct": 0.0, "cagr_billed_pct": 0.0, "cagr_consultant_pct": null, "_mrr_billed_now": 149919.0, "_mrr_consultant_now": 0}, {"cagr_pct": -24.756553226448563, "cagr_billed_pct": 0.0, "cagr_consultant_pct": -100.0, "_mrr_billed_now": 244299.0, "_mrr_consultant_now": 0}, {"cagr_pct": 0.0, "cagr_billed_pct": 0.0, "cagr_consultant_pct": null, "_mrr_billed_now": 291489.0, "_mrr_consultant_now": 0}, {"cagr_pct": 0.0, "cagr_billed_pct": 0.0, "cagr_consultant_pct": 0.0, "_mrr_billed_now": 183224.0, "_mrr_consultant_now": 536514.0}, {"cagr_pct": 0.0, "cagr_billed_pct": 0.0, "cagr_consultant_pct": null, "_mrr_billed_now": 245025.0, "_mrr_consultant_now": 0}, {"cagr_pct": 7.617681343380456, "cagr_billed_pct": null, "cagr_consultant_pct": 7.617681343380456, "_mrr_billed_now": 0, "_mrr_consultant_now": 1060021.0}, {"cagr_pct": 0.0, "cagr_billed_pct": 0.0, "cagr_consultant_pct": null, "_mrr_billed_now": 338679.0, "_mrr_consultant_now": 0}, {"cagr_pct": 0.0, "cagr_billed_pct": 0.0, "cagr_consultant_pct": null, "_mrr_billed_now": 177265.0, "_mrr_consultant_now": 0}, {"cagr_pct": -18.98750072847403, "cagr_billed_pct": 0.0, "cagr_consultant_pct": -30.92148601258746, "_mrr_billed_now": 244299.0, "_mrr_consultant_now": 245025.0}, {"cagr_pct": 0.0, "cagr_billed_pct": 0.0, "cagr_consultant_pct": null, "_mrr_billed_now": 149919.0, "_mrr_consultant_now": 0}, {"cagr_pct": 0.0, "cagr_billed_pct": 0.0, "cagr_consultant_pct": null, "_mrr_billed_now": 195439.0, "_mrr_consultant_now": 0}], "matrix_cagr": {"<-14%|1": null, "<-14%|2": 0.0, "<-14%|3-5": 0.0, "<-14%|6-10": null, "<-14%|11-20": null, "<-14%|20-40": null, "<-14%|40-100": null, "<-14%|100-200": null, "<-14%|200+": null, "-14% - 0%|1": null, "-14% - 0%|2": null, "-14% - 0%|3-5": null, "-14% - 0%|6-10": null, "-14% - 0%|11-20": null, "-14% - 0%|20-40": null, "-14% - 0%|40-100": null, "-14% - 0%|100-200": null, "-14% - 0%|200+": null, "0% - +14%|1": 0.0, "0% - +14%|2": 0.0, "0% - +14%|3-5": 0.0, "0% - +14%|6-10": 0.0, "0% - +14%|11-20": null, "0% - +14%|20-40": null, "0% - +14%|40-100": null, "0% - +14%|100-200": null, "0% - +14%|200+": null, ">+14%|1": null, ">+14%|2": 0.0, ">+14%|3-5": 0.0, ">+14%|6-10": 0.0, ">+14%|11-20": 0.0, ">+14%|20-40": 0.0, ">+14%|40-100": null, ">+14%|100-200": null, ">+14%|200+": null}}, "24": {"growth_by_tier": [{"tier": "1", "mrr_now": 54002763.0, "mrr_start": 44774542.0, "cagr_pct": 9.822775253710535, "cutoff": "2024-02-15"}, {"tier": "2", "mrr_now": 29598062.0, "mrr_start": 22697915.0, "cagr_pct": 14.192782428207916, "cutoff": null}, {"tier": "3-5", "mrr_now": 18587261.0, "mrr_start": 16816757.0, "cagr_pct": 5.1323989167498585, "cutoff": null}, {"tier": "6-10", "mrr_now": 22311321.0, "mrr_start": 21520984.0, "cagr_pct": 1.8196453452731465, "cutoff": null}, {"tier": "11-20", "mrr_now": 15136416.0, "mrr_start": 12238587.0, "cagr_pct": 11.210524197712179, "cutoff": null}, {"tier": "20-40", "mrr_now": 7466720.0, "mrr_start": 7747170.0, "cagr_pct": -1.8266999499453984, "cutoff": null}], "deals_growth_by_tier": [{"tier": "1", "deals_now": 325, "deals_start": 260, "cagr_pct": 11.80339887498949, "cutoff": "2024-02-15"}, {"tier": "2", "deals_now": 208, "deals_start": 146, "cagr_pct": 19.359018689271036, "cutoff": null}, {"tier": "3-5", "deals_now": 185, "deals_start": 104, "cagr_pct": 33.37339141845925, "cutoff": null}, {"tier": "6-10", "deals_now": 213, "deals_start": 146, "cagr_pct": 20.78510295516749, "cutoff": null}, {"tier": "11-20", "deals_now": 133, "deals_start": 102, "cagr_pct": 14.189385173379886, "cutoff": null}, {"tier": "20-40", "deals_now": 88, "deals_start": 46, "cagr_pct": 38.31281496162493, "cutoff": null}], "top_cagr": [{"cagr_pct": 0.0, "cagr_billed_pct": 0.0, "cagr_consultant_pct": 0.0, "_mrr_billed_now": 120395.0, "_mrr_consultant_now": 4257143.0}, {"cagr_pct": 6.738541368733597, "cagr_billed_pct": 0.0, "cagr_consultant_pct": 7.662537615522447, "_mrr_billed_now": 364694.0, "_mrr_consultant_now": 2972679.0}, {"cagr_pct": 5.386501659956511, "cagr_billed_pct": 0.0, "cagr_consultant_pct": 6.062049863105101, "_mrr_billed_now": 338679.0, "_mrr_consultant_now": 2950706.0}, {"cagr_pct": -1.2592426162235437, "cagr_billed_pct": 13.86746129952856, "cagr_consultant_pct": -5.049383665396611, "_mrr_billed_now": 690574.0, "_mrr_consultant_now": 2103610.0}, {"cagr_pct": 0.0, "cagr_billed_pct": 0.0, "cagr_consultant_pct": 0.0, "_mrr_billed_now": 149919.0, "_mrr_consultant_now": 2186349.0}, {"cagr_pct": -1.518494204173415, "cagr_billed_pct": null, "cagr_consultant_pct": -1.518494204173415, "_mrr_billed_now": 0, "_mrr_consultant_now": 2278067.0}, {"cagr_pct": 30.16796245676323, "cagr_billed_pct": 0.0, "cagr_consultant_pct": 40.11772346928157, "_mrr_billed_now": 338679.0, "_mrr_consultant_now": 1716839.0}, {"cagr_pct": 102.35697165118358, "cagr_billed_pct": 0.0, "cagr_consultant_pct": 178.97949920309512, "_mrr_billed_now": 244299.0, "_mrr_consultant_now": 1595506.0}, {"cagr_pct": -5.1326099409885195, "cagr_billed_pct": 0.0, "cagr_consultant_pct": -7.048987302992615, "_mrr_billed_now": 535788.0, "_mrr_consultant_now": 1286351.0}, {"cagr_pct": 9.326062796036805, "cagr_billed_pct": 0.0, "cagr_consultant_pct": 10.318061839568738, "_mrr_billed_now": 149919.0, "_mrr_consultant_now": 1634710.0}, {"cagr_pct": 0.0, "cagr_billed_pct": 0.0, "cagr_consultant_pct": 0.0, "_mrr_billed_now": 177265.0, "_mrr_consultant_now": 1457445.0}, {"cagr_pct": 0.0, "cagr_billed_pct": 0.0, "cagr_consultant_pct": 0.0, "_mrr_billed_now": 244299.0, "_mrr_consultant_now": 1299498.0}, {"cagr_pct": 17.06304335486419, "cagr_billed_pct": 0.0, "cagr_consultant_pct": 21.44841678648728, "_mrr_billed_now": 244299.0, "_mrr_consultant_now": 1275945.0}, {"cagr_pct": 0.0, "cagr_billed_pct": 0.0, "cagr_consultant_pct": 0.0, "_mrr_billed_now": 244299.0, "_mrr_consultant_now": 1165956.0}, {"cagr_pct": 84.06476600383289, "cagr_billed_pct": 0.0, "cagr_consultant_pct": 222.69247710879267, "_mrr_billed_now": 291489.0, "_mrr_consultant_now": 1031766.0}, {"cagr_pct": 0.0, "cagr_billed_pct": 0.0, "cagr_consultant_pct": 0.0, "_mrr_billed_now": 149919.0, "_mrr_consultant_now": 1136553.0}, {"cagr_pct": 8.41522443044429, "cagr_billed_pct": 0.0, "cagr_consultant_pct": 10.96357253648601, "_mrr_billed_now": 244299.0, "_mrr_consultant_now": 943679.0}, {"cagr_pct": 0.0, "cagr_billed_pct": 0.0, "cagr_consultant_pct": 0.0, "_mrr_billed_now": 244299.0, "_mrr_consultant_now": 906907.0}, {"cagr_pct": 0.0, "cagr_billed_pct": 0.0, "cagr_consultant_pct": 0.0, "_mrr_billed_now": 270943.0, "_mrr_consultant_now": 874467.0}, {"cagr_pct": 11.46922026986581, "cagr_billed_pct": null, "cagr_consultant_pct": 0.0, "_mrr_billed_now": 218889.0, "_mrr_consultant_now": 902491.0}], "worst_cagr": [{"cagr_pct": 0.0, "cagr_billed_pct": 0.0, "cagr_consultant_pct": null, "_mrr_billed_now": 177265.0, "_mrr_consultant_now": 0}, {"cagr_pct": -12.213792685714475, "cagr_billed_pct": null, "cagr_consultant_pct": -12.213792685714475, "_mrr_billed_now": 0, "_mrr_consultant_now": 758095.0}, {"cagr_pct": 0.0, "cagr_billed_pct": null, "cagr_consultant_pct": null, "_mrr_billed_now": 244299.0, "_mrr_consultant_now": 0}, {"cagr_pct": -7.759127221930118, "cagr_billed_pct": 0.0, "cagr_consultant_pct": -11.765365214914148, "_mrr_billed_now": 149919.0, "_mrr_consultant_now": 240790.0}, {"cagr_pct": -21.538338277261015, "cagr_billed_pct": 0.0, "cagr_consultant_pct": -100.0, "_mrr_billed_now": 244299.0, "_mrr_consultant_now": 0}, {"cagr_pct": 0.0, "cagr_billed_pct": null, "cagr_consultant_pct": 0.0, "_mrr_billed_now": 0, "_mrr_consultant_now": 120395.0}, {"cagr_pct": 0.0, "cagr_billed_pct": 0.0, "cagr_consultant_pct": null, "_mrr_billed_now": 291489.0, "_mrr_consultant_now": 0}, {"cagr_pct": 0.0, "cagr_billed_pct": 0.0, "cagr_consultant_pct": null, "_mrr_billed_now": 177265.0, "_mrr_consultant_now": 0}, {"cagr_pct": 0.0, "cagr_billed_pct": 0.0, "cagr_consultant_pct": null, "_mrr_billed_now": 338679.0, "_mrr_consultant_now": 0}, {"cagr_pct": 0.0, "cagr_billed_pct": 0.0, "cagr_consultant_pct": null, "_mrr_billed_now": 149919.0, "_mrr_consultant_now": 0}, {"cagr_pct": -19.211134175892063, "cagr_billed_pct": 0.0, "cagr_consultant_pct": -100.0, "_mrr_billed_now": 244299.0, "_mrr_consultant_now": 0}, {"cagr_pct": 0.0, "cagr_billed_pct": 0.0, "cagr_consultant_pct": null, "_mrr_billed_now": 291489.0, "_mrr_consultant_now": 0}, {"cagr_pct": -2.075116847985903, "cagr_billed_pct": 0.0, "cagr_consultant_pct": -2.7547393689750233, "_mrr_billed_now": 183224.0, "_mrr_consultant_now": 536514.0}, {"cagr_pct": 0.0, "cagr_billed_pct": 0.0, "cagr_consultant_pct": null, "_mrr_billed_now": 245025.0, "_mrr_consultant_now": 0}, {"cagr_pct": 5.660514987693088, "cagr_billed_pct": null, "cagr_consultant_pct": 5.660514987693088, "_mrr_billed_now": 0, "_mrr_consultant_now": 1060021.0}, {"cagr_pct": -15.76757378984135, "cagr_billed_pct": 0.0, "cagr_consultant_pct": -100.0, "_mrr_billed_now": 338679.0, "_mrr_consultant_now": 0}, {"cagr_pct": 0.0, "cagr_billed_pct": 0.0, "cagr_consultant_pct": null, "_mrr_billed_now": 177265.0, "_mrr_consultant_now": 0}, {"cagr_pct": -14.60862182426782, "cagr_billed_pct": 0.0, "cagr_consultant_pct": -24.228263579171106, "_mrr_billed_now": 244299.0, "_mrr_consultant_now": 245025.0}, {"cagr_pct": 0.0, "cagr_billed_pct": 0.0, "cagr_consultant_pct": null, "_mrr_billed_now": 149919.0, "_mrr_consultant_now": 0}, {"cagr_pct": -26.75030247122072, "cagr_billed_pct": -26.75030247122072, "cagr_consultant_pct": null, "_mrr_billed_now": 195439.0, "_mrr_consultant_now": 0}], "matrix_cagr": {"<-14%|1": null, "<-14%|2": 0.0, "<-14%|3-5": 0.0, "<-14%|6-10": null, "<-14%|11-20": null, "<-14%|20-40": null, "<-14%|40-100": null, "<-14%|100-200": null, "<-14%|200+": null, "-14% - 0%|1": null, "-14% - 0%|2": null, "-14% - 0%|3-5": null, "-14% - 0%|6-10": null, "-14% - 0%|11-20": null, "-14% - 0%|20-40": null, "-14% - 0%|40-100": null, "-14% - 0%|100-200": null, "-14% - 0%|200+": null, "0% - +14%|1": 0.0, "0% - +14%|2": 0.0, "0% - +14%|3-5": 0.0, "0% - +14%|6-10": 0.0, "0% - +14%|11-20": null, "0% - +14%|20-40": null, "0% - +14%|40-100": null, "0% - +14%|100-200": null, "0% - +14%|200+": null, ">+14%|1": null, ">+14%|2": 0.0, ">+14%|3-5": 0.0, ">+14%|6-10": 0.0, ">+14%|11-20": 0.0, ">+14%|20-40": 0.0, ">+14%|40-100": null, ">+14%|100-200": null, ">+14%|200+": null}}, "36": {"growth_by_tier": [{"tier": "1", "mrr_now": 54002763.0, "mrr_start": 38162261.0, "cagr_pct": 12.269199934093944, "cutoff": "2023-02-15"}, {"tier": "2", "mrr_now": 29598062.0, "mrr_start": 18967429.0, "cagr_pct": 15.989391352517934, "cutoff": null}, {"tier": "3-5", "mrr_now": 18587261.0, "mrr_start": 14416600.0, "cagr_pct": 8.838909769603486, "cutoff": null}, {"tier": "6-10", "mrr_now": 22311321.0, "mrr_start": 19742439.0, "cagr_pct": 4.16172413264182, "cutoff": null}, {"tier": "11-20", "mrr_now": 15136416.0, "mrr_start": 11365631.0, "cagr_pct": 10.021231299286448, "cutoff": null}, {"tier": "20-40", "mrr_now": 7466720.0, "mrr_start": 7557643.0, "cagr_pct": -0.4026390953315362, "cutoff": null}], "deals_growth_by_tier": [{"tier": "1", "deals_now": 325, "deals_start": 215, "cagr_pct": 14.766455004123301, "cutoff": "2023-02-15"}, {"tier": "2", "deals_now": 208, "deals_start": 114, "cagr_pct": 22.194828974399307, "cutoff": null}, {"tier": "3-5", "deals_now": 185, "deals_start": 88, "cagr_pct": 28.104096782773613, "cutoff": null}, {"tier": "6-10", "deals_now": 213, "deals_start": 126, "cagr_pct": 19.125029018818694, "cutoff": null}, {"tier": "11-20", "deals_now": 133, "deals_start": 83, "cagr_pct": 17.019395293268392, "cutoff": null}, {"tier": "20-40", "deals_now": 88, "deals_start": 41, "cagr_pct": 28.99303817194927, "cutoff": null}], "top_cagr": [{"cagr_pct": 1.4862885758319733, "cagr_billed_pct": 0.0, "cagr_consultant_pct": 1.5296207383515892, "_mrr_billed_now": 120395.0, "_mrr_consultant_now": 4257143.0}, {"cagr_pct": 7.529222861877116, "cagr_billed_pct": 0.0, "cagr_consultant_pct": 8.62092844836775, "_mrr_billed_now": 364694.0, "_mrr_consultant_now": 2972679.0}, {"cagr_pct": 6.640596485383243, "cagr_billed_pct": 0.0, "cagr_consultant_pct": 7.5229862006854775, "_mrr_billed_now": 338679.0, "_mrr_consultant_now": 2950706.0}, {"cagr_pct": -0.8412668910876664, "cagr_billed_pct": 9.043493970862325, "cagr_consultant_pct": -3.3952401075446614, "_mrr_billed_now": 690574.0, "_mrr_consultant_now": 2103610.0}, {"cagr_pct": -1.0382429592672882, "cagr_billed_pct": 0.0, "cagr_consultant_pct": -1.1078695844947806, "_mrr_billed_now": 149919.0, "_mrr_consultant_now": 2186349.0}, {"cagr_pct": 7.907214196429346, "cagr_billed_pct": null, "cagr_consultant_pct": 7.907214196429346, "_mrr_billed_now": 0, "_mrr_consultant_now": 2278067.0}, {"cagr_pct": 19.216418662892988, "cagr_billed_pct": 0.0, "cagr_consultant_pct": 25.216640701996916, "_mrr_billed_now": 338679.0, "_mrr_consultant_now": 1716839.0}, {"cagr_pct": 51.203212154236574, "cagr_billed_pct": -9.28162195071316, "cagr_consultant_pct": 98.17469275923428, "_mrr_billed_now": 244299.0, "_mrr_consultant_now": 1595506.0}, {"cagr_pct": -4.153894132501956, "cagr_billed_pct": 0.0, "cagr_consultant_pct": -5.693449165800901, "_mrr_billed_now": 535788.0, "_mrr_consultant_now": 1286351.0}, {"cagr_pct": 10.690692208510244, "cagr_billed_pct": 0.0, "cagr_consultant_pct": 11.92304553804442, "_mrr_billed_now": 149919.0, "_mrr_consultant_now": 1634710.0}, {"cagr_pct": 3.90015167866431, "cagr_billed_pct": null, "cagr_consultant_pct": 0.0, "_mrr_billed_now": 177265.0, "_mrr_consultant_now": 1457445.0}, {"cagr_pct": 0.0, "cagr_billed_pct": 0.0, "cagr_consultant_pct": 0.0, "_mrr_billed_now": 244299.0, "_mrr_consultant_now": 1299498.0}, {"cagr_pct": 6.051043267118583, "cagr_billed_pct": 0.0, "cagr_consultant_pct": 7.388602933297328, "_mrr_billed_now": 244299.0, "_mrr_consultant_now": 1275945.0}, {"cagr_pct": 0.0, "cagr_billed_pct": 0.0, "cagr_consultant_pct": 0.0, "_mrr_billed_now": 244299.0, "_mrr_consultant_now": 1165956.0}, {"cagr_pct": 137.25388773509172, "cagr_billed_pct": null, "cagr_consultant_pct": 118.36979207482821, "_mrr_billed_now": 291489.0, "_mrr_consultant_now": 1031766.0}, {"cagr_pct": 0.0, "cagr_billed_pct": 0.0, "cagr_consultant_pct": 0.0, "_mrr_billed_now": 149919.0, "_mrr_consultant_now": 1136553.0}, {"cagr_pct": 12.540790951129566, "cagr_billed_pct": 0.0, "cagr_consultant_pct": 17.003732231560043, "_mrr_billed_now": 244299.0, "_mrr_consultant_now": 943679.0}, {"cagr_pct": 67.65266128674105, "cagr_billed_pct": 0.0, "cagr_consultant_pct": null, "_mrr_billed_now": 244299.0, "_mrr_consultant_now": 906907.0}, {"cagr_pct": -2.2700418931067223, "cagr_billed_pct": 0.0, "cagr_consultant_pct": -2.93284209292477, "_mrr_billed_now": 270943.0, "_mrr_consultant_now": 874467.0}, {"cagr_pct": 7.506975044292674, "cagr_billed_pct": null, "cagr_consultant_pct": 0.0, "_mrr_billed_now": 218889.0, "_mrr_consultant_now": 902491.0}], "worst_cagr": [{"cagr_pct": 0.0, "cagr_billed_pct": 0.0, "cagr_consultant_pct": null, "_mrr_billed_now": 177265.0, "_mrr_consultant_now": 0}, {"cagr_pct": -8.31797630957447, "cagr_billed_pct": null, "cagr_consultant_pct": -8.31797630957447, "_mrr_billed_now": 0, "_mrr_consultant_now": 758095.0}, {"cagr_pct": 0.0, "cagr_billed_pct": null, "cagr_consultant_pct": null, "_mrr_billed_now": 244299.0, "_mrr_consultant_now": 0}, {"cagr_pct": -6.206593889040657, "cagr_billed_pct": 0.0, "cagr_consultant_pct": -9.38284452815793, "_mrr_billed_now": 149919.0, "_mrr_consultant_now": 240790.0}, {"cagr_pct": -14.9309333656795, "cagr_billed_pct": 0.0, "cagr_consultant_pct": -100.0, "_mrr_billed_now": 244299.0, "_mrr_consultant_now": 0}, {"cagr_pct": 20.68345831445477, "cagr_billed_pct": null, "cagr_consultant_pct": 20.68345831445477, "_mrr_billed_now": 0, "_mrr_consultant_now": 120395.0}, {"cagr_pct": 0.0, "cagr_billed_pct": 0.0, "cagr_consultant_pct": null, "_mrr_billed_now": 291489.0, "_mrr_consultant_now": 0}, {"cagr_pct": 0.0, "cagr_billed_pct": 0.0, "cagr_consultant_pct": null, "_mrr_billed_now": 177265.0, "_mrr_consultant_now": 0}, {"cagr_pct": 0.0, "cagr_billed_pct": 0.0, "cagr_consultant_pct": null, "_mrr_billed_now": 338679.0, "_mrr_consultant_now": 0}, {"cagr_pct": 0.0, "cagr_billed_pct": 0.0, "cagr_consultant_pct": null, "_mrr_billed_now": 149919.0, "_mrr_consultant_now": 0}, {"cagr_pct": 23.40311210589188, "cagr_billed_pct": null, "cagr_consultant_pct": -100.0, "_mrr_billed_now": 244299.0, "_mrr_consultant_now": 0}, {"cagr_pct": 0.0, "cagr_billed_pct": 0.0, "cagr_consultant_pct": null, "_mrr_billed_now": 291489.0, "_mrr_consultant_now": 0}, {"cagr_pct": -1.3882404670541582, "cagr_billed_pct": 0.0, "cagr_consultant_pct": -1.8450296006732092, "_mrr_billed_now": 183224.0, "_mrr_consultant_now": 536514.0}, {"cagr_pct": 0.0, "cagr_billed_pct": 0.0, "cagr_consultant_pct": null, "_mrr_billed_now": 245025.0, "_mrr_consultant_now": 0}, {"cagr_pct": -0.11989821100543141, "cagr_billed_pct": null, "cagr_consultant_pct": -0.11989821100543141, "_mrr_billed_now": 0, "_mrr_consultant_now": 1060021.0}, {"cagr_pct": -10.809306635798377, "cagr_billed_pct": 0.0, "cagr_consultant_pct": -100.0, "_mrr_billed_now": 338679.0, "_mrr_consultant_now": 0}, {"cagr_pct": -10.431965871946392, "cagr_billed_pct": 0.0, "cagr_consultant_pct": -100.0, "_mrr_billed_now": 177265.0, "_mrr_consultant_now": 0}, {"cagr_pct": 4.66469198192434, "cagr_billed_pct": null, "cagr_consultant_pct": -16.886514940466768, "_mrr_billed_now": 244299.0, "_mrr_consultant_now": 245025.0}, {"cagr_pct": -9.581669403681104, "cagr_billed_pct": 0.0, "cagr_consultant_pct": -100.0, "_mrr_billed_now": 149919.0, "_mrr_consultant_now": 0}, {"cagr_pct": -18.74117144961781, "cagr_billed_pct": -18.74117144961781, "cagr_consultant_pct": null, "_mrr_billed_now": 195439.0, "_mrr_consultant_now": 0}], "matrix_cagr": {"<-14%|1": null, "<-14%|2": 0.0, "<-14%|3-5": 0.0, "<-14%|6-10": null, "<-14%|11-20": null, "<-14%|20-40": null, "<-14%|40-100": null, "<-14%|100-200": null, "<-14%|200+": null, "-14% - 0%|1": null, "-14% - 0%|2": null, "-14% - 0%|3-5": null, "-14% - 0%|6-10": null, "-14% - 0%|11-20": null, "-14% - 0%|20-40": null, "-14% - 0%|40-100": null, "-14% - 0%|100-200": null, "-14% - 0%|200+": null, "0% - +14%|1": 0.0, "0% - +14%|2": 0.0, "0% - +14%|3-5": 0.0, "0% - +14%|6-10": 0.0, "0% - +14%|11-20": null, "0% - +14%|20-40": null, "0% - +14%|40-100": null, "0% - +14%|100-200": null, "0% - +14%|200+": null, ">+14%|1": null, ">+14%|2": 0.0, ">+14%|3-5": 0.0, ">+14%|6-10": 0.0, ">+14%|11-20": 0.0, ">+14%|20-40": 0.0, ">+14%|40-100": null, ">+14%|100-200": null, ">+14%|200+": null}}, "48": {"growth_by_tier": [{"tier": "1", "mrr_now": 54002763.0, "mrr_start": 31410195.0, "cagr_pct": 14.5081338579921, "cutoff": "2022-02-15"}, {"tier": "2", "mrr_now": 29598062.0, "mrr_start": 16161144.0, "cagr_pct": 16.331624797829548, "cutoff": null}, {"tier": "3-5", "mrr_now": 18587261.0, "mrr_start": 12318191.0, "cagr_pct": 10.83249651525131, "cutoff": null}, {"tier": "6-10", "mrr_now": 22311321.0, "mrr_start": 17378991.0, "cagr_pct": 6.4449792308024945, "cutoff": null}, {"tier": "11-20", "mrr_now": 15136416.0, "mrr_start": 11360095.0, "cagr_pct": 7.438583284924349, "cutoff": null}, {"tier": "20-40", "mrr_now": 7466720.0, "mrr_start": 6328646.0, "cagr_pct": 4.220887120000372, "cutoff": null}], "deals_growth_by_tier": [{"tier": "1", "deals_now": 325, "deals_start": 176, "cagr_pct": 16.571577421836526, "cutoff": "2022-02-15"}, {"tier": "2", "deals_now": 208, "deals_start": 87, "cagr_pct": 24.347202902603993, "cutoff": null}, {"tier": "3-5", "deals_now": 185, "deals_start": 67, "cagr_pct": 28.906326240448, "cutoff": null}, {"tier": "6-10", "deals_now": 213, "deals_start": 110, "cagr_pct": 17.96325008108377, "cutoff": null}, {"tier": "11-20", "deals_now": 133, "deals_start": 68, "cagr_pct": 18.2594029489646, "cutoff": null}, {"tier": "20-40", "deals_now": 88, "deals_start": 36, "cagr_pct": 25.038870753903698, "cutoff": null}], "top_cagr": [{"cagr_pct": 4.973619034550336, "cagr_billed_pct": 0.0, "cagr_consultant_pct": 5.133262721855458, "_mrr_billed_now": 120395.0, "_mrr_consultant_now": 4257143.0}, {"cagr_pct": 3.2544926262960683, "cagr_billed_pct": 0.0, "cagr_consultant_pct": 3.6919136347711046, "_mrr_billed_now": 364694.0, "_mrr_consultant_now": 2972679.0}, {"cagr_pct": 6.728450150251963, "cagr_billed_pct": 0.0, "cagr_consultant_pct": 7.659642696024682, "_mrr_billed_now": 338679.0, "_mrr_consultant_now": 2950706.0}, {"cagr_pct": 5.920734692990348, "cagr_billed_pct": 6.708697536577857, "cagr_consultant_pct": 5.66831310827991, "_mrr_billed_now": 690574.0, "_mrr_consultant_now": 2103610.0}, {"cagr_pct": -2.334273571002521, "cagr_billed_pct": 0.0, "cagr_consultant_pct": -2.48463013541228, "_mrr_billed_now": 149919.0, "_mrr_consultant_now": 2186349.0}, {"cagr_pct": 5.873643862531663, "cagr_billed_pct": null, "cagr_consultant_pct": 5.873643862531663, "_mrr_billed_now": 0, "_mrr_consultant_now": 2278067.0}, {"cagr_pct": 20.470979245495634, "cagr_billed_pct": 0.0, "cagr_consultant_pct": 28.119476279698752, "_mrr_billed_now": 338679.0, "_mrr_consultant_now": 1716839.0}, {"cagr_pct": 36.35490434545214, "cagr_billed_pct": -7.0452777216583495, "cagr_consultant_pct": 67.0267940191319, "_mrr_billed_now": 244299.0, "_mrr_consultant_now": 1595506.0}, {"cagr_pct": 0.6152712410602446, "cagr_billed_pct": 0.0, "cagr_consultant_pct": 0.877204765664441, "_mrr_billed_now": 535788.0, "_mrr_consultant_now": 1286351.0}, {"cagr_pct": 18.728132389653517, "cagr_billed_pct": 0.0, "cagr_consultant_pct": 21.578253116665902, "_mrr_billed_now": 149919.0, "_mrr_consultant_now": 1634710.0}, {"cagr_pct": 8.815218743063413, "cagr_billed_pct": null, "cagr_consultant_pct": 5.737126344056409, "_mrr_billed_now": 177265.0, "_mrr_consultant_now": 1457445.0}, {"cagr_pct": 11.34110402397348, "cagr_billed_pct": 0.0, "cagr_consultant_pct": 14.342003157683504, "_mrr_billed_now": 244299.0, "_mrr_consultant_now": 1299498.0}, {"cagr_pct": 10.21456230441462, "cagr_billed_pct": null, "cagr_consultant_pct": 5.491785821734663, "_mrr_billed_now": 244299.0, "_mrr_consultant_now": 1275945.0}, {"cagr_pct": 5.959426049574135, "cagr_billed_pct": 0.0, "cagr_consultant_pct": 7.456993182354199, "_mrr_billed_now": 244299.0, "_mrr_consultant_now": 1165956.0}, {"cagr_pct": 91.16571401051925, "cagr_billed_pct": null, "cagr_consultant_pct": 79.63643202557566, "_mrr_billed_now": 291489.0, "_mrr_consultant_now": 1031766.0}, {"cagr_pct": 0.0, "cagr_billed_pct": 0.0, "cagr_consultant_pct": 0.0, "_mrr_billed_now": 149919.0, "_mrr_consultant_now": 1136553.0}, {"cagr_pct": 9.265352794700444, "cagr_billed_pct": 0.0, "cagr_consultant_pct": 12.49929126692113, "_mrr_billed_now": 244299.0, "_mrr_consultant_now": 943679.0}, {"cagr_pct": 47.33564843329794, "cagr_billed_pct": 0.0, "cagr_consultant_pct": null, "_mrr_billed_now": 244299.0, "_mrr_consultant_now": 906907.0}, {"cagr_pct": 0.9974881864147189, "cagr_billed_pct": 0.0, "cagr_consultant_pct": 1.3168407477091248, "_mrr_billed_now": 270943.0, "_mrr_consultant_now": 874467.0}, {"cagr_pct": 5.578984779105456, "cagr_billed_pct": null, "cagr_consultant_pct": 0.0, "_mrr_billed_now": 218889.0, "_mrr_consultant_now": 902491.0}], "worst_cagr": [{"cagr_pct": 0.0, "cagr_billed_pct": 0.0, "cagr_consultant_pct": null, "_mrr_billed_now": 177265.0, "_mrr_consultant_now": 0}, {"cagr_pct": -5.219734182398117, "cagr_billed_pct": null, "cagr_consultant_pct": -5.219734182398117, "_mrr_billed_now": 0, "_mrr_consultant_now": 758095.0}, {"cagr_pct": 10.271710360107678, "cagr_billed_pct": 10.271710360107678, "cagr_consultant_pct": null, "_mrr_billed_now": 244299.0, "_mrr_consultant_now": 0}, {"cagr_pct": -4.692027535703868, "cagr_billed_pct": 0.0, "cagr_consultant_pct": -7.123076975607012, "_mrr_billed_now": 149919.0, "_mrr_consultant_now": 240790.0}, {"cagr_pct": -11.421412450446589, "cagr_billed_pct": 0.0, "cagr_consultant_pct": -100.0, "_mrr_billed_now": 244299.0, "_mrr_consultant_now": 0}, {"cagr_pct": 15.142541206193293, "cagr_billed_pct": null, "cagr_consultant_pct": 15.142541206193293, "_mrr_billed_now": 0, "_mrr_consultant_now": 120395.0}, {"cagr_pct": 0.0, "cagr_billed_pct": null, "cagr_consultant_pct": null, "_mrr_billed_now": 291489.0, "_mrr_consultant_now": 0}, {"cagr_pct": 0.0, "cagr_billed_pct": 0.0, "cagr_consultant_pct": null, "_mrr_billed_now": 177265.0, "_mrr_consultant_now": 0}, {"cagr_pct": 0.0, "cagr_billed_pct": 0.0, "cagr_consultant_pct": null, "_mrr_billed_now": 338679.0, "_mrr_consultant_now": 0}, {"cagr_pct": 0.0, "cagr_billed_pct": 0.0, "cagr_consultant_pct": null, "_mrr_billed_now": 149919.0, "_mrr_consultant_now": 0}, {"cagr_pct": 17.08320016589453, "cagr_billed_pct": null, "cagr_consultant_pct": -100.0, "_mrr_billed_now": 244299.0, "_mrr_consultant_now": 0}, {"cagr_pct": -13.902419014517363, "cagr_billed_pct": 0.0, "cagr_consultant_pct": -100.0, "_mrr_billed_now": 291489.0, "_mrr_consultant_now": 0}, {"cagr_pct": -1.042997644424326, "cagr_billed_pct": 0.0, "cagr_consultant_pct": -1.3869883681544959, "_mrr_billed_now": 183224.0, "_mrr_consultant_now": 536514.0}, {"cagr_pct": 0.0, "cagr_billed_pct": 0.0, "cagr_consultant_pct": null, "_mrr_billed_now": 245025.0, "_mrr_consultant_now": 0}, {"cagr_pct": 8.23669365909967, "cagr_billed_pct": null, "cagr_consultant_pct": 8.23669365909967, "_mrr_billed_now": 0, "_mrr_consultant_now": 1060021.0}, {"cagr_pct": 25.013501414642825, "cagr_billed_pct": null, "cagr_consultant_pct": -100.0, "_mrr_billed_now": 338679.0, "_mrr_consultant_now": 0}, {"cagr_pct": -7.930712621882574, "cagr_billed_pct": 0.0, "cagr_consultant_pct": -100.0, "_mrr_billed_now": 177265.0, "_mrr_consultant_now": 0}, {"cagr_pct": 3.478505983595692, "cagr_billed_pct": null, "cagr_consultant_pct": -12.953037720533345, "_mrr_billed_now": 244299.0, "_mrr_consultant_now": 245025.0}, {"cagr_pct": -7.2759562387176295, "cagr_billed_pct": 0.0, "cagr_consultant_pct": -100.0, "_mrr_billed_now": 149919.0, "_mrr_consultant_now": 0}, {"cagr_pct": -14.413962862637886, "cagr_billed_pct": -14.413962862637886, "cagr_consultant_pct": null, "_mrr_billed_now": 195439.0, "_mrr_consultant_now": 0}], "matrix_cagr": {"<-14%|1": null, "<-14%|2": 0.0, "<-14%|3-5": 0.0, "<-14%|6-10": null, "<-14%|11-20": null, "<-14%|20-40": null, "<-14%|40-100": null, "<-14%|100-200": null, "<-14%|200+": null, "-14% - 0%|1": null, "-14% - 0%|2": null, "-14% - 0%|3-5": null, "-14% - 0%|6-10": null, "-14% - 0%|11-20": null, "-14% - 0%|20-40": null, "-14% - 0%|40-100": null, "-14% - 0%|100-200": null, "-14% - 0%|200+": null, "0% - +14%|1": 0.0, "0% - +14%|2": 0.0, "0% - +14%|3-5": 0.0, "0% - +14%|6-10": 0.0, "0% - +14%|11-20": null, "0% - +14%|20-40": null, "0% - +14%|40-100": null, "0% - +14%|100-200": null, "0% - +14%|200+": null, ">+14%|1": null, ">+14%|2": 0.0, ">+14%|3-5": 0.0, ">+14%|6-10": 0.0, ">+14%|11-20": 0.0, ">+14%|20-40": 0.0, ">+14%|40-100": null, ">+14%|100-200": null, ">+14%|200+": null}}}</script>
+    <script>
+    (function() {
+        var cagrDataEl = document.getElementById('cagr-data-json');
+        var selectEl = document.getElementById('cagr-period-select');
+        if (!cagrDataEl || !selectEl) return;
+        var cagrData = JSON.parse(cagrDataEl.textContent || '{}'  );
+        if (Object.keys(cagrData).length === 0) return;
+
+        function formatArs(v) {
+            if (v == null || v === undefined) return 'N/A';
+            var parts = v.toFixed(2).split('.');
+            var intPart = parts[0].replace(/\B(?=(\d{3})+(?!\d))/g, '.');
+            return '$' + intPart + ',' + parts[1];
+        }
+        function formatCagr(v, hasNow) {
+            if (v != null && v !== undefined) return (v >= 0 ? '+' : '') + v.toFixed(1) + '%';
+            return hasNow ? 'New' : '—';
+        }
+        function qsRow(tbodyId, idx) {
+            return document.querySelector('#' + tbodyId + ' tr[data-row-index="' + idx + '"]');
+        }
+        function qsCol(row, col) {
+            return row.querySelector('td[data-col="' + col + '"]');
+        }
+
+        function applyCagrPeriod(months) {
+            var key = String(months);
+            var d = cagrData[key];
+            if (!d) return;
+
+            var cutoff = (d.growth_by_tier && d.growth_by_tier[0]) ? d.growth_by_tier[0].cutoff : '?';
+            var cutoffDeals = (d.deals_growth_by_tier && d.deals_growth_by_tier[0]) ? d.deals_growth_by_tier[0].cutoff : '?';
+            var cutoffSpan = document.getElementById('cagr-cutoff-span');
+            if (cutoffSpan) cutoffSpan.textContent = 'Start: ' + cutoff;
+
+            var mrrCutoff = document.getElementById('mrr-growth-cutoff');
+            if (mrrCutoff) mrrCutoff.textContent = 'Start: ' + cutoff;
+            var dealsCutoff = document.getElementById('deals-growth-cutoff');
+            if (dealsCutoff) dealsCutoff.textContent = 'Start: ' + cutoffDeals;
+
+            if (d.growth_by_tier) {
+                d.growth_by_tier.forEach(function(g, idx) {
+                    var row = qsRow('mrr-growth-tbody', idx);
+                    if (!row) return;
+                    var mrrStart = qsCol(row, 'mrr_start');
+                    var cagrPct = qsCol(row, 'cagr_pct');
+                    if (mrrStart) { mrrStart.textContent = formatArs(g.mrr_start); }
+                    if (cagrPct) {
+                        var c = g.cagr_pct;
+                        cagrPct.textContent = formatCagr(c, g.mrr_now > 0);
+                        cagrPct.className = 'num ' + (c != null ? (c >= 0 ? 'positive' : 'negative') : '');
+                    }
+                });
+            }
+
+            if (d.deals_growth_by_tier) {
+                d.deals_growth_by_tier.forEach(function(g, idx) {
+                    var row = qsRow('deals-growth-tbody', idx);
+                    if (!row) return;
+                    var dealsStart = qsCol(row, 'deals_start');
+                    var cagrPct = qsCol(row, 'cagr_pct');
+                    if (dealsStart) { dealsStart.textContent = (g.deals_start || 0).toLocaleString('es-AR'); }
+                    if (cagrPct) {
+                        var c = g.cagr_pct;
+                        cagrPct.textContent = formatCagr(c, g.deals_now > 0);
+                        cagrPct.className = 'num ' + (c != null ? (c >= 0 ? 'positive' : 'negative') : '');
+                    }
+                });
+            }
+
+            if (d.top_cagr) {
+                d.top_cagr.forEach(function(a, idx) {
+                    var row = qsRow('top-20-tbody', idx);
+                    if (!row) return;
+                    var cells = row.querySelectorAll('td[data-col]');
+                    cells.forEach(function(cell) {
+                        var col = cell.getAttribute('data-col');
+                        var v, hasNow = false;
+                        if (col === 'cagr_pct') { v = a.cagr_pct; }
+                        else if (col === 'cagr_billed_pct') { v = a.cagr_billed_pct; hasNow = (a._mrr_billed_now || 0) > 0; }
+                        else if (col === 'cagr_consultant_pct') { v = a.cagr_consultant_pct; hasNow = (a._mrr_consultant_now || 0) > 0; }
+                        if (v !== undefined) {
+                            cell.textContent = formatCagr(v, hasNow);
+                            cell.className = 'num ' + (v != null ? (v >= 0 ? 'positive' : 'negative') : '');
+                        }
+                    });
+                });
+            }
+
+            if (d.worst_cagr) {
+                d.worst_cagr.forEach(function(a, idx) {
+                    var row = qsRow('worst-20-tbody', idx);
+                    if (!row) return;
+                    var cells = row.querySelectorAll('td[data-col]');
+                    cells.forEach(function(cell) {
+                        var col = cell.getAttribute('data-col');
+                        var v, hasNow = false;
+                        if (col === 'cagr_pct') { v = a.cagr_pct; }
+                        else if (col === 'cagr_billed_pct') { v = a.cagr_billed_pct; hasNow = (a._mrr_billed_now || 0) > 0; }
+                        else if (col === 'cagr_consultant_pct') { v = a.cagr_consultant_pct; hasNow = (a._mrr_consultant_now || 0) > 0; }
+                        if (v !== undefined) {
+                            cell.textContent = formatCagr(v, hasNow);
+                            cell.className = 'num ' + (v != null ? (v >= 0 ? 'positive' : 'negative') : '');
+                        }
+                    });
+                });
+            }
+
+            if (d.matrix_cagr) {
+                var tbody = document.getElementById('cagr-matrix-tbody');
+                if (tbody) {
+                    tbody.querySelectorAll('td[data-gb][data-pb]').forEach(function(td) {
+                        var gb = td.getAttribute('data-gb');
+                        var pb = td.getAttribute('data-pb');
+                        var k = gb + '|' + pb;
+                        var v = d.matrix_cagr[k];
+                        td.textContent = (v != null && v !== undefined) ? (v >= 0 ? '+' : '') + v.toFixed(1) + '%' : 'N/A';
+                        td.className = 'cell ' + (v != null && v !== undefined ? (v >= 0 ? 'positive' : 'negative') : '');
+                    });
+                }
+            }
+        }
+
+        selectEl.addEventListener('change', function() { applyCagrPeriod(parseInt(selectEl.value, 10)); });
+    })();
+    (function() {
+        var STORAGE_KEY = 'mrr-dashboard-cols';
+        function loadColVisibility(tableId) {
+            try {
+                var s = localStorage.getItem(STORAGE_KEY);
+                if (!s) return null;
+                var all = JSON.parse(s);
+                return all[tableId] || null;
+            } catch (e) { return null; }
+        }
+        function saveColVisibility(tableId, vis) {
+            try {
+                var all = JSON.parse(localStorage.getItem(STORAGE_KEY) || '{}');
+                all[tableId] = vis;
+                localStorage.setItem(STORAGE_KEY, JSON.stringify(all));
+            } catch (e) {}
+        }
+        function applyColVisibility(table, vis) {
+            if (!vis) return;
+            table.querySelectorAll('[data-col-id]').forEach(function(el) {
+                var id = el.getAttribute('data-col-id');
+                if (vis[id] === false) el.classList.add('col-hidden');
+                else el.classList.remove('col-hidden');
+            });
+        }
+        document.querySelectorAll('.col-toggle').forEach(function(toggle) {
+            var tableId = toggle.getAttribute('data-table-id');
+            var table = document.querySelector('table[data-table-id="' + tableId + '"]');
+            if (!table) return;
+            var btn = toggle.querySelector('.col-toggle-btn');
+            var dropdown = toggle.querySelector('.col-toggle-dropdown');
+            var headers = table.querySelectorAll('thead th[data-col-id]');
+            var vis = loadColVisibility(tableId) || {};
+            var checkboxes = [];
+            var toggleAllLink = document.createElement('div');
+            toggleAllLink.style.cssText = 'display:flex;gap:8px;margin-bottom:8px;padding-bottom:6px;border-bottom:1px solid var(--border);font-size:0.8rem;';
+            var selAll = document.createElement('a');
+            selAll.textContent = 'Select all';
+            selAll.href = '#';
+            selAll.style.color = 'var(--accent)';
+            var deselAll = document.createElement('a');
+            deselAll.textContent = 'Deselect all';
+            deselAll.href = '#';
+            deselAll.style.color = 'var(--accent)';
+            toggleAllLink.appendChild(selAll);
+            toggleAllLink.appendChild(deselAll);
+            dropdown.appendChild(toggleAllLink);
+            function setAll(state) {
+                checkboxes.forEach(function(cb) {
+                    cb.checked = state;
+                    var id = cb.dataset.colId;
+                    vis[id] = state;
+                    table.querySelectorAll('[data-col-id="' + id + '"]').forEach(function(el) {
+                        if (state) el.classList.remove('col-hidden');
+                        else el.classList.add('col-hidden');
+                    });
+                });
+                saveColVisibility(tableId, vis);
+            }
+            selAll.addEventListener('click', function(e) { e.preventDefault(); setAll(true); });
+            deselAll.addEventListener('click', function(e) { e.preventDefault(); setAll(false); });
+            headers.forEach(function(th) {
+                var id = th.getAttribute('data-col-id');
+                if (vis[id] === undefined) vis[id] = true;
+                var label = document.createElement('label');
+                var cb = document.createElement('input');
+                cb.type = 'checkbox';
+                cb.checked = vis[id];
+                cb.dataset.colId = id;
+                checkboxes.push(cb);
+                cb.addEventListener('change', function() {
+                    vis[id] = cb.checked;
+                    table.querySelectorAll('[data-col-id="' + id + '"]').forEach(function(el) {
+                        if (cb.checked) el.classList.remove('col-hidden');
+                        else el.classList.add('col-hidden');
+                    });
+                    saveColVisibility(tableId, vis);
+                });
+                label.appendChild(cb);
+                label.appendChild(document.createTextNode(th.textContent.trim()));
+                dropdown.appendChild(label);
+            });
+            applyColVisibility(table, vis);
+            btn.addEventListener('click', function(e) {
+                e.stopPropagation();
+                dropdown.classList.toggle('open');
+            });
+            document.addEventListener('click', function() { dropdown.classList.remove('open'); });
+            dropdown.addEventListener('click', function(e) { e.stopPropagation(); });
+        });
+    })();
+    document.querySelectorAll("table.sortable").forEach(function(table) {
+        var headers = table.querySelectorAll("th");
+        headers.forEach(function(th, idx) {
+            th.addEventListener("click", function() {
+                var tbody = table.querySelector("tbody");
+                var rows = Array.from(tbody.querySelectorAll("tr"));
+                var asc = th.getAttribute("data-sort") !== "asc";
+                th.setAttribute("data-sort", asc ? "asc" : "desc");
+                rows.sort(function(a, b) {
+                    var va = a.cells[idx] ? a.cells[idx].textContent.trim() : "";
+                    var vb = b.cells[idx] ? b.cells[idx].textContent.trim() : "";
+                    var cell = a.cells[idx];
+                    var isNum = cell && (cell.classList.contains("num") || /^[$€]?[\d.,\s]+%?$|^[+-]?[\d.]+\s*%?$|^[+-]?[\d,]+%?$/.test(va));
+                    if (isNum) {
+                        var parseVal = function(s) {
+                            if (!s || s === "N/A" || s === "—" || s === "New") return NaN;
+                            var neg = s.includes("-") && s.indexOf("-") < 3;
+                            var n = parseFloat(s.replace(/[.$€\s]/g, "").replace(",", ".").replace(/[^0-9.-]/g, "")) || 0;
+                            return neg ? -Math.abs(n) : n;
+                        };
+                        var na = parseVal(va), nb = parseVal(vb);
+                        if (isNaN(na) && isNaN(nb)) return 0;
+                        if (isNaN(na)) return asc ? 1 : -1;
+                        if (isNaN(nb)) return asc ? -1 : 1;
+                        return asc ? na - nb : nb - na;
+                    }
+                    return asc ? (va < vb ? -1 : va > vb ? 1 : 0) : (vb < va ? -1 : vb > va ? 1 : 0);
+                });
+                rows.forEach(function(r) { tbody.appendChild(r); });
+            });
+        });
+    });
+    </script>
+</body>
+</html>

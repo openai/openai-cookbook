@@ -803,7 +803,7 @@ def generate_dashboard_html(
         if not cagr_rows:
             return ""
         th_cols = "".join(f'<th data-col-id="pb-{pb}">Managed Tax IDs: {pb}</th>' for pb in cols)
-        return f'<div style="display:flex;align-items:center;justify-content:space-between;flex-wrap:wrap;gap:8px;margin:20px 0 8px 0"><h3 style="font-size:0.95rem;margin:0;color:var(--text)">CAGR by Segment (rolling)</h3><div class="col-toggle" data-table-id="cagr-matrix"><button type="button" class="col-toggle-btn">Columns</button><div class="col-toggle-dropdown"></div></div></div><table class="sortable" data-table-id="cagr-matrix"><thead><tr><th data-col-id="growth">Accountant\'s Client Portfolio Growth</th>{th_cols}</tr></thead><tbody id="cagr-matrix-tbody">{cagr_rows}</tbody></table><p class="detail" style="margin:12px 0 0 0;font-size:0.8rem;color:var(--text-muted)">CAGR = (MRR_now / MRR_at_start)^(1/years) - 1. Same dimensions as MRR matrix.</p>'
+        return f'<div style="display:flex;align-items:center;justify-content:space-between;flex-wrap:wrap;gap:8px;margin:20px 0 8px 0"><h3 style="font-size:0.95rem;margin:0;color:var(--text)">CAGR (MRR) by Segment (rolling)</h3><div class="col-toggle" data-table-id="cagr-matrix"><button type="button" class="col-toggle-btn">Columns</button><div class="col-toggle-dropdown"></div></div></div><table class="sortable" data-table-id="cagr-matrix"><thead><tr><th data-col-id="growth">Accountant\'s Client Portfolio Growth</th>{th_cols}</tr></thead><tbody id="cagr-matrix-tbody">{cagr_rows}</tbody></table><p class="detail" style="margin:12px 0 0 0;font-size:0.8rem;color:var(--text-muted)">CAGR = (MRR_now / MRR_at_start)^(1/years) - 1. Same dimensions as MRR matrix.</p>'
 
     def cell_cagr_val(gb: str, pb: str) -> str:
         c = matrix_cagr.get((gb, pb)) if matrix_cagr else None
@@ -1271,8 +1271,8 @@ def generate_dashboard_html(
         </div>
 
         {cagr_dropdown_html}
-        {f'<div class="matrix-card" style="margin-top: 24px;"><div style="display:flex;align-items:center;justify-content:space-between;flex-wrap:wrap;gap:8px;margin-bottom:8px"><h2 style="margin:0">MRR Growth by Portfolio Tier (CAGR rolling)</h2><div class="col-toggle" data-table-id="mrr-growth"><button type="button" class="col-toggle-btn">Columns</button><div class="col-toggle-dropdown"></div></div></div><p class="detail" style="margin-bottom:12px;font-size:0.85rem;color:var(--text-muted)">ICP accountants only. MRR now vs MRR at start of rolling period. Use dropdown above to change period. CAGR = (MRR_now / MRR_start)^(1/years) - 1. Reconstructed from deal close_date.</p><table class="sortable" data-table-id="mrr-growth"><thead><tr><th data-col-id="tier">Managed Tax IDs</th><th class="num" data-col-id="mrr_now">MRR Now</th><th class="num" data-col-id="mrr_start">MRR at Start</th><th class="num" data-col-id="cagr_pct">CAGR %</th></tr></thead><tbody id="mrr-growth-tbody">{growth_tier_rows_html}</tbody></table><p class="detail" id="mrr-growth-cutoff" style="margin-top:8px;font-size:0.8rem;">Start: {default_cutoff}</p></div>' if growth_by_tier else ''}
-        {f'<div class="matrix-card" style="margin-top: 24px;"><div style="display:flex;align-items:center;justify-content:space-between;flex-wrap:wrap;gap:8px;margin-bottom:8px"><h2 style="margin:0">Deals Growth by Portfolio Tier (CAGR rolling)</h2><div class="col-toggle" data-table-id="deals-growth"><button type="button" class="col-toggle-btn">Columns</button><div class="col-toggle-dropdown"></div></div></div><p class="detail" style="margin-bottom:12px;font-size:0.85rem;color:var(--text-muted)">ICP accountants only. Deals now vs deals at start of rolling period. Same tier buckets as MRR. CAGR = (deals_now / deals_start)^(1/years) - 1. New = cannot compute CAGR from zero (no deals at start).</p><table class="sortable" data-table-id="deals-growth"><thead><tr><th data-col-id="tier">Managed Tax IDs</th><th class="num" data-col-id="deals_now">Deals Now</th><th class="num" data-col-id="deals_start">Deals at Start</th><th class="num" data-col-id="cagr_pct">CAGR %</th></tr></thead><tbody id="deals-growth-tbody">{deals_growth_tier_rows_html}</tbody></table><p class="detail" id="deals-growth-cutoff" style="margin-top:8px;font-size:0.8rem;">Start: {cutoff_deals}</p></div>' if deals_growth_by_tier else ''}
+        {f'<div class="matrix-card" style="margin-top: 24px;"><div style="display:flex;align-items:center;justify-content:space-between;flex-wrap:wrap;gap:8px;margin-bottom:8px"><h2 style="margin:0">MRR Growth by Portfolio Tier (CAGR rolling)</h2><div class="col-toggle" data-table-id="mrr-growth"><button type="button" class="col-toggle-btn">Columns</button><div class="col-toggle-dropdown"></div></div></div><p class="detail" style="margin-bottom:12px;font-size:0.85rem;color:var(--text-muted)">ICP accountants only. MRR now vs MRR at start of rolling period. Use dropdown above to change period. CAGR = (MRR_now / MRR_start)^(1/years) - 1. Reconstructed from deal close_date.</p><table class="sortable" data-table-id="mrr-growth"><thead><tr><th data-col-id="tier">Managed Tax IDs</th><th class="num" data-col-id="mrr_now">MRR Now</th><th class="num" data-col-id="mrr_start">MRR at Start</th><th class="num" data-col-id="cagr_pct">CAGR % (MRR)</th></tr></thead><tbody id="mrr-growth-tbody">{growth_tier_rows_html}</tbody></table><p class="detail" id="mrr-growth-cutoff" style="margin-top:8px;font-size:0.8rem;">Start: {default_cutoff}</p></div>' if growth_by_tier else ''}
+        {f'<div class="matrix-card" style="margin-top: 24px;"><div style="display:flex;align-items:center;justify-content:space-between;flex-wrap:wrap;gap:8px;margin-bottom:8px"><h2 style="margin:0">Deals Growth by Portfolio Tier (CAGR rolling)</h2><div class="col-toggle" data-table-id="deals-growth"><button type="button" class="col-toggle-btn">Columns</button><div class="col-toggle-dropdown"></div></div></div><p class="detail" style="margin-bottom:12px;font-size:0.85rem;color:var(--text-muted)">ICP accountants only. Deals now vs deals at start of rolling period. Same tier buckets as MRR. CAGR = (deals_now / deals_start)^(1/years) - 1. New = cannot compute CAGR from zero (no deals at start).</p><table class="sortable" data-table-id="deals-growth"><thead><tr><th data-col-id="tier">Managed Tax IDs</th><th class="num" data-col-id="deals_now">Deals Now</th><th class="num" data-col-id="deals_start">Deals at Start</th><th class="num" data-col-id="cagr_pct">CAGR % (deals)</th></tr></thead><tbody id="deals-growth-tbody">{deals_growth_tier_rows_html}</tbody></table><p class="detail" id="deals-growth-cutoff" style="margin-top:8px;font-size:0.8rem;">Start: {cutoff_deals}</p></div>' if deals_growth_by_tier else ''}
 
         <div class="matrix-card" style="margin-top: 24px;">
             <div style="display:flex;align-items:center;justify-content:space-between;flex-wrap:wrap;gap:8px;margin-bottom:8px">
@@ -1301,9 +1301,9 @@ def generate_dashboard_html(
                         <th class="num" data-col-id="operador">Operador</th>
                         <th class="num" data-col-id="asesor">Asesor</th>
                         <th class="num" data-col-id="total_deals">Total Deals</th>
-                        <th class="num" data-col-id="cagr_pct">CAGR (from start)</th>
-                        <th class="num" data-col-id="cagr_billed_pct">CAGR Operador</th>
-                        <th class="num" data-col-id="cagr_consultant_pct">CAGR Asesor</th>
+                        <th class="num" data-col-id="cagr_pct">CAGR from start (MRR)</th>
+                        <th class="num" data-col-id="cagr_billed_pct">CAGR Operador (MRR)</th>
+                        <th class="num" data-col-id="cagr_consultant_pct">CAGR Asesor (MRR)</th>
                     </tr>
                 </thead>
                 <tbody id="top-20-tbody">
@@ -1339,9 +1339,9 @@ def generate_dashboard_html(
                         <th class="num" data-col-id="operador">Operador</th>
                         <th class="num" data-col-id="asesor">Asesor</th>
                         <th class="num" data-col-id="total_deals">Total Deals</th>
-                        <th class="num" data-col-id="cagr_pct">CAGR (from start)</th>
-                        <th class="num" data-col-id="cagr_billed_pct">CAGR Operador</th>
-                        <th class="num" data-col-id="cagr_consultant_pct">CAGR Asesor</th>
+                        <th class="num" data-col-id="cagr_pct">CAGR from start (MRR)</th>
+                        <th class="num" data-col-id="cagr_billed_pct">CAGR Operador (MRR)</th>
+                        <th class="num" data-col-id="cagr_consultant_pct">CAGR Asesor (MRR)</th>
                     </tr>
                 </thead>
                 <tbody id="worst-20-tbody">

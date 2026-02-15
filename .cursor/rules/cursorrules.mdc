@@ -46,7 +46,7 @@ alwaysApply: true
 
 ## Code Management Principles
 
-- **After making any change to tracked files**: Commit and push to `main` automatically in the same response (unless the user explicitly asks not to). Do not wait for the user to push.
+- **When to commit and push automatically**: Only when the change is specifically for the **live GitHub Pages site** (e.g. updates to `docs/` dashboards, or to scripts that generate them, and the live page at GitHub needs to reflect the change). In those cases, commit and push to `main` in the same response so the site deploys. **Otherwise**, do not commit or push unless the user explicitly asks you to; wait for their instruction.
 - Avoid creating unnecessary scripts or files; only create what's essential
 - **Never create temporary scripts** - Use the chatbot to explain, demonstrate, or test concepts instead
 - **For one-time tasks or exploratory work**: Provide code examples directly in the chat response, not as files

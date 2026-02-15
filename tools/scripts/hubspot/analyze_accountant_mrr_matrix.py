@@ -38,8 +38,10 @@ tools/docs/HUBSPOT_DEAL_COMPANY_ASSOCIATION_RULES.md section 6.
 
 import argparse
 import os
+import subprocess
 import sqlite3
 import sys
+import time
 import webbrowser
 from typing import Optional
 from datetime import datetime, timedelta
@@ -376,22 +378,32 @@ def get_deals_growth_by_tier(conn: sqlite3.Connection, months: int = CAGR_LOOKBA
             JOIN accountant_tier at ON at.accountant_id = da.company_hubspot_id
             WHERE c.type IN ('Cuenta Contador', 'Cuenta Contador y Reseller', 'Contador Robado')
               AND d.close_date IS NOT NULL AND d.close_date != ''
+        ),
+        tier_companies AS (
+            SELECT tier, COUNT(DISTINCT accountant_id) AS companies
+            FROM accountant_tier
+            GROUP BY tier
         )
-        SELECT tier,
-               COUNT(DISTINCT deal_hubspot_id) AS deals_now,
-               COUNT(DISTINCT CASE WHEN date(close_date) <= (SELECT d FROM cutoff) THEN deal_hubspot_id END) AS deals_start
-        FROM deal_accountant_tier
-        GROUP BY tier
+        SELECT dat.tier,
+               COUNT(DISTINCT dat.deal_hubspot_id) AS deals_now,
+               COUNT(DISTINCT CASE WHEN date(dat.close_date) <= (SELECT d FROM cutoff) THEN dat.deal_hubspot_id END) AS deals_start,
+               MAX(tc.companies) AS companies
+        FROM deal_accountant_tier dat
+        LEFT JOIN tier_companies tc ON tc.tier = dat.tier
+        GROUP BY dat.tier
     """, (cutoff,)).fetchall()
     tier_order = [pb for _, _, pb in PORTFOLIO_BUCKETS]
     result = []
     for r in rows:
-        tier, deals_now, deals_start = r[0], int(r[1] or 0), int(r[2] or 0)
+        tier = r[0]
+        deals_now = int(r[1] or 0)
+        deals_start = int(r[2] or 0)
+        companies = int(r[3] or 0)
         if deals_start > 0:
             cagr = ((deals_now / deals_start) ** (1 / years) - 1) * 100
         else:
             cagr = None  # Cannot compute CAGR from zero; show "New" in UI
-        result.append({"tier": tier, "deals_now": deals_now, "deals_start": deals_start, "cagr_pct": cagr})
+        result.append({"tier": tier, "deals_now": deals_now, "deals_start": deals_start, "companies": companies, "cagr_pct": cagr})
     result.sort(key=lambda x: tier_order.index(x["tier"]) if x["tier"] in tier_order else 999)
     if result:
         result[0]["_cutoff_date"] = cutoff
@@ -740,6 +752,131 @@ def format_ars(val: float) -> str:
     return f"${s}"
 
 
+def print_verification_examples(
+    db_path: Path,
+    metrics: list[dict],
+    matrix: dict[tuple[str, str], float],
+    growth_by_tier: list[dict],
+    deals_growth_by_tier: list[dict],
+    matrix_cagr: dict[tuple[str, str], Optional[float]],
+    cols: list[str],
+    rows_order: list[str],
+) -> None:
+    """
+    Print real examples and formulas so you can validate the dashboard calculations.
+    Uses default CAGR period (24 months).
+    """
+    months = CAGR_LOOKBACK_DEFAULT_MONTHS
+    cutoff, years = _get_cagr_cutoff(months)
+    conn = sqlite3.connect(str(db_path))
+    mrr_start_by_id, _, _ = get_accountant_mrr_timeline(conn, months=months)
+    conn.close()
+
+    print("\n" + "=" * 80)
+    print("VERIFICATION EXAMPLES (default CAGR period = 24 months)")
+    print("=" * 80)
+
+    # --- 1. MRR matrix: one cell = sum of MRR of accountants in (growth_bucket, portfolio_bucket) ---
+    print("\n--- 1. MRR MATRIX (Growth x Portfolio) ---")
+    print("Each cell = sum of MRR of all ICP accountants whose:")
+    print("  - growth_pct falls in the row bucket (e.g. '>+14%' means growth >= 14%)")
+    print("  - portfolio (total managed tax IDs) falls in the column bucket (e.g. '3-5')")
+    for gb in rows_order:
+        for pb in cols:
+            cell_mrr = matrix.get((gb, pb), 0)
+            if cell_mrr <= 0:
+                continue
+            in_cell = [
+                m for m in metrics
+                if bucket_growth(m["growth"]) == gb and bucket_portfolio(m["portfolio"]) == pb
+            ]
+            manual_sum = sum(m["mrr"] for m in in_cell)
+            print(f"\n  Cell ({gb!r}, {pb!r}): dashboard value = {format_ars(cell_mrr)}")
+            print(f"  Accountants in this cell: {len(in_cell)}")
+            if len(in_cell) <= 5:
+                for m in in_cell:
+                    print(f"    - {m['name'][:40]}... growth={m['growth']}% portfolio={m['portfolio']} mrr={format_ars(m['mrr'])}")
+            else:
+                for m in in_cell[:3]:
+                    print(f"    - {m['name'][:40]}... growth={m['growth']}% portfolio={m['portfolio']} mrr={format_ars(m['mrr'])}")
+                print(f"    ... and {len(in_cell) - 3} more")
+            print(f"  Sum of their MRR: {format_ars(manual_sum)}  (match: {abs(manual_sum - cell_mrr) < 0.01})")
+            break
+        else:
+            continue
+        break
+
+    # --- 2. MRR Growth by Tier ---
+    print("\n--- 2. MRR GROWTH BY PORTFOLIO TIER (CAGR from MRR) ---")
+    print("Formula: CAGR = (MRR_now / MRR_start)^(1/years) - 1  (then * 100 for %)")
+    print(f"  Cutoff date (start of period): {cutoff}  |  years = {years}")
+    if growth_by_tier:
+        g = growth_by_tier[0]
+        tier = g["tier"]
+        mrr_now = g["mrr_now"]
+        mrr_start = g["mrr_start"]
+        cagr_pct = g.get("cagr_pct")
+        print(f"\n  Example tier: {tier!r}")
+        print(f"    MRR now (sum):     {format_ars(mrr_now)}")
+        print(f"    MRR at start:      {format_ars(mrr_start)}")
+        if mrr_start > 0:
+            computed = ((mrr_now / mrr_start) ** (1 / years) - 1) * 100
+            print(f"    CAGR % (computed): {computed:+.1f}%")
+            print(f"    CAGR % (dashboard): {cagr_pct:+.1f}%" if cagr_pct is not None else "    CAGR % (dashboard): N/A")
+            print(f"    Match: {abs(computed - (cagr_pct or 0)) < 0.01}")
+
+    # --- 3. Deals Growth by Tier ---
+    print("\n--- 3. DEALS GROWTH BY PORTFOLIO TIER (CAGR from deal counts) ---")
+    print("Formula: CAGR = (deals_now / deals_start)^(1/years) - 1  (then * 100 for %)")
+    print("  Companies = number of ICP accountant companies in that portfolio-size tier.")
+    if deals_growth_by_tier:
+        d = deals_growth_by_tier[0]
+        tier = d["tier"]
+        companies = d.get("companies", 0)
+        deals_now = d["deals_now"]
+        deals_start = d["deals_start"]
+        cagr_pct = d.get("cagr_pct")
+        print(f"\n  Example tier: {tier!r}")
+        print(f"    Companies (in cohort): {companies}")
+        print(f"    Deals now:   {deals_now:,}")
+        print(f"    Deals at start: {deals_start:,}")
+        if deals_start > 0:
+            computed = ((deals_now / deals_start) ** (1 / years) - 1) * 100
+            print(f"    CAGR % (computed):   {computed:+.1f}%")
+            print(f"    CAGR % (dashboard):  {cagr_pct:+.1f}%" if cagr_pct is not None else "    CAGR % (dashboard): N/A")
+            print(f"    Match: {abs(computed - (cagr_pct or 0)) < 0.01}")
+
+    # --- 4. CAGR (MRR) matrix cell ---
+    print("\n--- 4. CAGR (MRR) BY SEGMENT MATRIX ---")
+    print("Each cell = (sum MRR_now / sum MRR_start)^(1/years) - 1 for that (growth, portfolio) bucket.")
+    for gb in rows_order:
+        for pb in cols:
+            cagr_val = matrix_cagr.get((gb, pb))
+            if cagr_val is None:
+                continue
+            in_cell = [
+                m for m in metrics
+                if bucket_growth(m["growth"]) == gb and bucket_portfolio(m["portfolio"]) == pb
+            ]
+            sum_now = sum(m["mrr"] for m in in_cell)
+            sum_start = sum(mrr_start_by_id.get(str(m["id"]), 0) for m in in_cell)
+            if sum_start <= 0:
+                continue
+            computed = ((sum_now / sum_start) ** (1 / years) - 1) * 100
+            print(f"\n  Cell ({gb!r}, {pb!r}):")
+            print(f"    Sum MRR now:   {format_ars(sum_now)}")
+            print(f"    Sum MRR start: {format_ars(sum_start)}")
+            print(f"    CAGR % (computed):   {computed:+.1f}%")
+            print(f"    CAGR % (dashboard): {cagr_val:+.1f}%")
+            print(f"    Match: {abs(computed - cagr_val) < 0.01}")
+            break
+        else:
+            continue
+        break
+
+    print("\n" + "=" * 80 + "\n")
+
+
 def _serialize_cagr_data_for_js(cagr_data_by_months: dict[int, dict], cols: list[str], rows_order: list[str]) -> str:
     """Serialize CAGR data for client-side period switching. Returns JSON string."""
     import json
@@ -758,7 +895,7 @@ def _serialize_cagr_data_for_js(cagr_data_by_months: dict[int, dict], cols: list
                 for g in gbt
             ],
             "deals_growth_by_tier": [
-                {"tier": g["tier"], "deals_now": g["deals_now"], "deals_start": g["deals_start"], "cagr_pct": g.get("cagr_pct"), "cutoff": g.get("_cutoff_date")}
+                {"tier": g["tier"], "companies": g.get("companies", 0), "deals_now": g["deals_now"], "deals_start": g["deals_start"], "cagr_pct": g.get("cagr_pct"), "cutoff": g.get("_cutoff_date")}
                 for g in dgt
             ],
             "top_cagr": [{"cagr_pct": a.get("cagr_pct"), "cagr_billed_pct": a.get("cagr_billed_pct"), "cagr_consultant_pct": a.get("cagr_consultant_pct"), "_mrr_billed_now": a.get("_mrr_billed_now", 0), "_mrr_consultant_now": a.get("_mrr_consultant_now", 0)} for a in top],
@@ -864,6 +1001,7 @@ def generate_dashboard_html(
             deals_growth_tier_rows_html += f"""
                         <tr data-row-index="{idx}">
                             <td class="growth-label" data-col-id="tier">{g["tier"]}</td>
+                            <td class="num" data-col-id="companies">{g.get("companies", 0):,}</td>
                             <td class="num" data-col-id="deals_now">{g["deals_now"]:,}</td>
                             <td class="num" data-col="deals_start" data-col-id="deals_start">{g["deals_start"]:,}</td>
                             <td class="num {cagr_class}" data-col="cagr_pct" data-col-id="cagr_pct">{cagr_str}</td>
@@ -1272,7 +1410,7 @@ def generate_dashboard_html(
 
         {cagr_dropdown_html}
         {f'<div class="matrix-card" style="margin-top: 24px;"><div style="display:flex;align-items:center;justify-content:space-between;flex-wrap:wrap;gap:8px;margin-bottom:8px"><h2 style="margin:0">MRR Growth by Portfolio Tier (CAGR rolling)</h2><div class="col-toggle" data-table-id="mrr-growth"><button type="button" class="col-toggle-btn">Columns</button><div class="col-toggle-dropdown"></div></div></div><p class="detail" style="margin-bottom:12px;font-size:0.85rem;color:var(--text-muted)">ICP accountants only. MRR now vs MRR at start of rolling period. Use dropdown above to change period. CAGR = (MRR_now / MRR_start)^(1/years) - 1. Reconstructed from deal close_date.</p><table class="sortable" data-table-id="mrr-growth"><thead><tr><th data-col-id="tier">Managed Tax IDs</th><th class="num" data-col-id="mrr_now">MRR Now</th><th class="num" data-col-id="mrr_start">MRR at Start</th><th class="num" data-col-id="cagr_pct">CAGR % (MRR)</th></tr></thead><tbody id="mrr-growth-tbody">{growth_tier_rows_html}</tbody></table><p class="detail" id="mrr-growth-cutoff" style="margin-top:8px;font-size:0.8rem;">Start: {default_cutoff}</p></div>' if growth_by_tier else ''}
-        {f'<div class="matrix-card" style="margin-top: 24px;"><div style="display:flex;align-items:center;justify-content:space-between;flex-wrap:wrap;gap:8px;margin-bottom:8px"><h2 style="margin:0">Deals Growth by Portfolio Tier (CAGR rolling)</h2><div class="col-toggle" data-table-id="deals-growth"><button type="button" class="col-toggle-btn">Columns</button><div class="col-toggle-dropdown"></div></div></div><p class="detail" style="margin-bottom:12px;font-size:0.85rem;color:var(--text-muted)">ICP accountants only. Deals now vs deals at start of rolling period. Same tier buckets as MRR. CAGR = (deals_now / deals_start)^(1/years) - 1. New = cannot compute CAGR from zero (no deals at start).</p><table class="sortable" data-table-id="deals-growth"><thead><tr><th data-col-id="tier">Managed Tax IDs</th><th class="num" data-col-id="deals_now">Deals Now</th><th class="num" data-col-id="deals_start">Deals at Start</th><th class="num" data-col-id="cagr_pct">CAGR % (deals)</th></tr></thead><tbody id="deals-growth-tbody">{deals_growth_tier_rows_html}</tbody></table><p class="detail" id="deals-growth-cutoff" style="margin-top:8px;font-size:0.8rem;">Start: {cutoff_deals}</p></div>' if deals_growth_by_tier else ''}
+        {f'<div class="matrix-card" style="margin-top: 24px;"><div style="display:flex;align-items:center;justify-content:space-between;flex-wrap:wrap;gap:8px;margin-bottom:8px"><h2 style="margin:0">Deals Growth by Portfolio Tier (CAGR rolling)</h2><div class="col-toggle" data-table-id="deals-growth"><button type="button" class="col-toggle-btn">Columns</button><div class="col-toggle-dropdown"></div></div></div><p class="detail" style="margin-bottom:12px;font-size:0.85rem;color:var(--text-muted)">ICP accountants only. Deals now vs deals at start of rolling period. Same tier buckets as MRR. CAGR = (deals_now / deals_start)^(1/years) - 1. New = cannot compute CAGR from zero (no deals at start).</p><table class="sortable" data-table-id="deals-growth"><thead><tr><th data-col-id="tier">Managed Tax IDs</th><th class="num" data-col-id="companies">Companies</th><th class="num" data-col-id="deals_now">Deals Now</th><th class="num" data-col-id="deals_start">Deals at Start</th><th class="num" data-col-id="cagr_pct">CAGR % (deals)</th></tr></thead><tbody id="deals-growth-tbody">{deals_growth_tier_rows_html}</tbody></table><p class="detail" id="deals-growth-cutoff" style="margin-top:8px;font-size:0.8rem;">Start: {cutoff_deals}</p></div>' if deals_growth_by_tier else ''}
 
         <div class="matrix-card" style="margin-top: 24px;">
             <div style="display:flex;align-items:center;justify-content:space-between;flex-wrap:wrap;gap:8px;margin-bottom:8px">
@@ -1635,6 +1773,7 @@ def main():
     parser.add_argument("--csv", action="store_true", help="Output as CSV")
     parser.add_argument("--html", metavar="PATH", help="Generate HTML dashboard (e.g. tools/outputs/mrr_dashboard.html)")
     parser.add_argument("--serve", action="store_true", help="Serve dashboard and open in browser (implies --html)")
+    parser.add_argument("--verify", action="store_true", help="Print verification examples (formulas and one cell per section) to validate calculations")
     args = parser.parse_args()
 
     db_path = Path(args.db)
@@ -1685,6 +1824,13 @@ def main():
     cols = [pb for _, _, pb in PORTFOLIO_BUCKETS]
     rows_order = [gb for gb, _ in GROWTH_BUCKETS]
 
+    if args.verify:
+        print_verification_examples(
+            db_path, metrics, matrix,
+            growth_by_tier, deals_growth_by_tier, matrix_cagr,
+            cols, rows_order,
+        )
+
     if args.csv:
         print("growth_bucket," + ",".join(cols))
         for gb in rows_order:
@@ -1701,10 +1847,24 @@ def main():
         print(f"Dashboard written to: {html_path.absolute()}")
         if args.serve:
             port = 8765
+            # Kill any process already using the port so we can reuse it
+            try:
+                out = subprocess.run(
+                    ["lsof", "-ti", f":{port}"],
+                    capture_output=True,
+                    text=True,
+                    timeout=5,
+                )
+                if out.returncode == 0 and out.stdout.strip():
+                    pids = out.stdout.strip().split()
+                    subprocess.run(["kill", "-9"] + pids, capture_output=True, timeout=5)
+                    time.sleep(0.5)
+            except (FileNotFoundError, subprocess.TimeoutExpired):
+                pass
             os.chdir(html_path.parent)
             server = HTTPServer(("", port), SimpleHTTPRequestHandler)
             url = f"http://localhost:{port}/{html_path.name}"
-            print(f"Opening {url}")
+            print(f"Serving at {url}")
             webbrowser.open(url)
             try:
                 server.serve_forever()

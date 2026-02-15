@@ -60,6 +60,10 @@ CHURN_STAGES = ("31849274",)
 # Lost = deal stage Cerrado Perdido (closedlost). Deals that closed but generated no revenue.
 LOST_STAGES = ("closedlost",)
 
+# Company-wide ICP (all facturacion by tipo_icp_contador / type). Churn = closedlost + Cerrado Churn.
+ICP_ORDER = ("ICP Operador", "ICP Asesor", "ICP Híbrido", "ICP Contador", "ICP PYME")
+ICP_CHURN_STAGES = ("closedlost", "31849274")
+
 # CAGR lookback: rolling window options (months). Default 24. User can switch in dashboard.
 CAGR_LOOKBACK_MONTHS_OPTIONS = [6, 12, 18, 24, 36, 48]
 CAGR_LOOKBACK_DEFAULT_MONTHS = 24
@@ -83,6 +87,121 @@ PORTFOLIO_BUCKETS = [
     (101, 200, "100-200"),
     (201, 99999, "200+"),
 ]
+
+
+def _ensure_tipo_icp_contador(conn: sqlite3.Connection) -> None:
+    """Add tipo_icp_contador column to companies if missing (for company-wide ICP)."""
+    cols = [r[1] for r in conn.execute("PRAGMA table_info(companies)").fetchall()]
+    if "tipo_icp_contador" not in cols:
+        conn.execute("ALTER TABLE companies ADD COLUMN tipo_icp_contador TEXT")
+
+
+def get_company_icp_metrics(conn: sqlite3.Connection) -> dict:
+    """
+    Company-wide metrics: paying customers, total MRR, churn by ICP type (Operador, Asesor, etc.).
+    Used for the consolidated ICP section. Churn = deal_stage in (closedlost, 31849274).
+    """
+    _ensure_tipo_icp_contador(conn)
+    ph = ",".join("?" * len(ICP_CHURN_STAGES))
+    paying_customers = conn.execute(
+        "SELECT COUNT(DISTINCT customer_cuit) FROM facturacion WHERE customer_cuit != ''"
+    ).fetchone()[0]
+    total_mrr_raw = conn.execute(
+        "SELECT COALESCE(SUM(CAST(amount AS REAL)), 0) FROM facturacion"
+    ).fetchone()[0]
+    _icp_case = """
+        CASE
+            WHEN c.type IN ('Cuenta Contador', 'Cuenta Contador y Reseller', 'Contador Robado') THEN
+                CASE
+                    WHEN COALESCE(c.tipo_icp_contador, '') = 'Operador' THEN 'ICP Operador'
+                    WHEN COALESCE(c.tipo_icp_contador, '') = 'Asesor' THEN 'ICP Asesor'
+                    WHEN COALESCE(c.tipo_icp_contador, '') = 'Híbrido' THEN 'ICP Híbrido'
+                    ELSE 'ICP Contador'
+                END
+            ELSE 'ICP PYME'
+        END
+    """
+    mrr_rows = conn.execute(f"""
+        SELECT {_icp_case} AS icp,
+            SUM(CAST(f.amount AS REAL)) AS mrr,
+            COUNT(DISTINCT f.customer_cuit) AS unique_cuits
+        FROM facturacion f
+        JOIN companies c ON f.customer_cuit = c.cuit
+          AND c.hubspot_id = (SELECT MIN(c2.hubspot_id) FROM companies c2 WHERE c2.cuit = f.customer_cuit)
+        WHERE f.customer_cuit != ''
+        GROUP BY icp
+    """).fetchall()
+    mrr_by_icp = {r[0]: {"mrr": r[1], "unique_cuits": r[2]} for r in mrr_rows}
+    billed_cuit_subq = "SELECT DISTINCT customer_cuit FROM facturacion WHERE customer_cuit != ''"
+    churn_base = """
+        d.id_empresa != '' AND d.id_empresa NOT IN (SELECT id_empresa FROM facturacion WHERE id_empresa != '')
+        AND d.deal_stage IN ({0})
+    """.format(ph)
+    churn_total = conn.execute(
+        f"""
+        SELECT COUNT(DISTINCT d.hubspot_id) FROM deals d
+        JOIN deal_associations da ON da.deal_hubspot_id = d.hubspot_id AND da.association_type_id = 5
+        JOIN companies c ON c.hubspot_id = da.company_hubspot_id
+        WHERE c.cuit IN ({billed_cuit_subq}) AND {churn_base}
+        """,
+        ICP_CHURN_STAGES,
+    ).fetchone()[0]
+    churn_by_icp_rows = conn.execute(
+        f"""
+        WITH churn_deals AS (
+            SELECT d.hubspot_id
+            FROM deals d
+            JOIN deal_associations da ON da.deal_hubspot_id = d.hubspot_id AND da.association_type_id = 5
+            JOIN companies c ON c.hubspot_id = da.company_hubspot_id
+            WHERE c.cuit IN ({billed_cuit_subq}) AND d.id_empresa != ''
+            AND d.id_empresa NOT IN (SELECT id_empresa FROM facturacion WHERE id_empresa != '')
+            AND d.deal_stage IN ({ph})
+        ),
+        deal_primary AS (
+            SELECT da.deal_hubspot_id, da.company_hubspot_id
+            FROM deal_associations da
+            WHERE da.association_type_id = 5
+        )
+        SELECT {_icp_case} AS icp, COUNT(*) AS churn_count
+        FROM churn_deals cd
+        JOIN deal_primary dp ON dp.deal_hubspot_id = cd.hubspot_id
+        JOIN companies c ON c.hubspot_id = dp.company_hubspot_id
+        GROUP BY icp
+        """,
+        ICP_CHURN_STAGES,
+    ).fetchall()
+    churn_by_icp = {r[0]: r[1] for r in churn_by_icp_rows}
+    churn_by_month = conn.execute(
+        f"""
+        SELECT strftime('%Y-%m', d.close_date) AS month, COUNT(*) AS cnt
+        FROM deals d
+        JOIN deal_associations da ON da.deal_hubspot_id = d.hubspot_id AND da.association_type_id = 5
+        JOIN companies c ON c.hubspot_id = da.company_hubspot_id
+        WHERE c.cuit IN ({billed_cuit_subq}) AND d.id_empresa != ''
+        AND d.id_empresa NOT IN (SELECT id_empresa FROM facturacion WHERE id_empresa != '')
+        AND d.deal_stage IN ({ph})
+        AND d.close_date IS NOT NULL AND d.close_date != ''
+        GROUP BY month
+        ORDER BY month DESC
+        LIMIT 12
+        """,
+        ICP_CHURN_STAGES,
+    ).fetchall()
+    active_deals = conn.execute(
+        """SELECT COUNT(*) FROM deals d
+        WHERE d.id_empresa IN (SELECT id_empresa FROM facturacion WHERE id_empresa != '')"""
+    ).fetchone()[0]
+    churn_rate = (churn_total / (active_deals + churn_total) * 100) if (active_deals + churn_total) else 0
+    return {
+        "paying_customers": paying_customers,
+        "total_mrr": total_mrr_raw,
+        "mrr_by_icp": mrr_by_icp,
+        "churn_total": churn_total,
+        "churn_by_icp": churn_by_icp,
+        "churn_by_month": churn_by_month,
+        "active_deals": active_deals,
+        "churn_rate": churn_rate,
+    }
 
 
 def get_accountant_metrics(conn: sqlite3.Connection) -> list[dict]:
@@ -201,12 +320,7 @@ def get_accountant_mrr_timeline(conn: sqlite3.Connection, months: int = CAGR_LOO
         id_mrr_timeline AS (
             SELECT ad.accountant_id, ad.id_empresa,
                 COALESCE(im.mrr, 0) AS mrr_now,
-                CASE
-                    WHEN im.id_empresa IS NOT NULL THEN
-                        CASE WHEN date(ad.close_date) <= (SELECT d FROM cutoff) THEN COALESCE(im.mrr, 0) ELSE 0 END
-                    ELSE
-                        CASE WHEN date(ad.close_date) > (SELECT d FROM cutoff) THEN ad.deal_amount ELSE 0 END
-                END AS mrr_start
+                CASE WHEN date(ad.close_date) <= (SELECT d FROM cutoff) THEN COALESCE(ad.deal_amount, 0) ELSE 0 END AS mrr_start
             FROM accountant_deals ad
             LEFT JOIN id_empresa_mrr im ON ad.id_empresa = im.id_empresa
             WHERE ad.close_date IS NOT NULL AND ad.close_date != ''
@@ -242,7 +356,7 @@ def get_growth_by_tier(conn: sqlite3.Connection, months: int = CAGR_LOOKBACK_DEF
     MRR growth by portfolio tier. Only ICP accountant companies.
     Reconstructs MRR at cutoff using close_date:
     - Active: in facturacion; if close_date <= cutoff they were paying at cutoff
-    - Churned: not in facturacion; if close_date > cutoff they were paying at cutoff (use deal.amount)
+    - Churned: not in facturacion; if close_date <= cutoff they were paying at cutoff (use deal.amount)
     CAGR = (MRR_now / MRR_start)^(1/years) - 1
     Uses rolling window: last `months` months.
     """
@@ -270,12 +384,7 @@ def get_growth_by_tier(conn: sqlite3.Connection, months: int = CAGR_LOOKBACK_DEF
         id_mrr_timeline AS (
             SELECT ad.accountant_id, ad.id_empresa,
                 COALESCE(im.mrr, 0) AS mrr_now,
-                CASE
-                    WHEN im.id_empresa IS NOT NULL THEN
-                        CASE WHEN date(ad.close_date) <= (SELECT d FROM cutoff) THEN COALESCE(im.mrr, 0) ELSE 0 END
-                    ELSE
-                        CASE WHEN date(ad.close_date) > (SELECT d FROM cutoff) THEN ad.deal_amount ELSE 0 END
-                END AS mrr_12m_ago
+                CASE WHEN date(ad.close_date) <= (SELECT d FROM cutoff) THEN COALESCE(ad.deal_amount, 0) ELSE 0 END AS mrr_12m_ago
             FROM accountant_deals ad
             LEFT JOIN id_empresa_mrr im ON ad.id_empresa = im.id_empresa
             WHERE ad.close_date IS NOT NULL AND ad.close_date != ''
@@ -476,9 +585,9 @@ def get_top_accountants(conn: sqlite3.Connection, limit: int = 20, order_by: str
                 COALESCE(im.mrr, 0) AS mrr_now,
                 CASE
                     WHEN im.id_empresa IS NOT NULL THEN
-                        CASE WHEN date(adb.close_date) <= (SELECT d FROM cutoff) THEN COALESCE(im.mrr, 0) ELSE 0 END
+                        CASE WHEN date(adb.close_date) <= (SELECT d FROM cutoff) THEN COALESCE(adb.deal_amount, 0) ELSE 0 END
                     ELSE
-                        CASE WHEN date(adb.close_date) > (SELECT d FROM cutoff) THEN adb.deal_amount ELSE 0 END
+                        CASE WHEN date(adb.close_date) <= (SELECT d FROM cutoff) THEN adb.deal_amount ELSE 0 END
                 END AS mrr_start
             FROM accountant_deals_billed adb
             LEFT JOIN id_empresa_mrr im ON adb.id_empresa = im.id_empresa
@@ -489,9 +598,9 @@ def get_top_accountants(conn: sqlite3.Connection, limit: int = 20, order_by: str
                 COALESCE(im.mrr, 0) AS mrr_now,
                 CASE
                     WHEN im.id_empresa IS NOT NULL THEN
-                        CASE WHEN date(adc.close_date) <= (SELECT d FROM cutoff) THEN COALESCE(im.mrr, 0) ELSE 0 END
+                        CASE WHEN date(adc.close_date) <= (SELECT d FROM cutoff) THEN COALESCE(adc.deal_amount, 0) ELSE 0 END
                     ELSE
-                        CASE WHEN date(adc.close_date) > (SELECT d FROM cutoff) THEN adc.deal_amount ELSE 0 END
+                        CASE WHEN date(adc.close_date) <= (SELECT d FROM cutoff) THEN adc.deal_amount ELSE 0 END
                 END AS mrr_start
             FROM accountant_deals_consultant adc
             JOIN id_empresa_consultant_only ico ON adc.accountant_id = ico.accountant_id AND adc.id_empresa = ico.id_empresa
@@ -516,12 +625,7 @@ def get_top_accountants(conn: sqlite3.Connection, limit: int = 20, order_by: str
         id_mrr_timeline AS (
             SELECT ad.accountant_id, ad.id_empresa,
                 COALESCE(im.mrr, 0) AS mrr_now,
-                CASE
-                    WHEN im.id_empresa IS NOT NULL THEN
-                        CASE WHEN date(ad.close_date) <= (SELECT d FROM cutoff) THEN COALESCE(im.mrr, 0) ELSE 0 END
-                    ELSE
-                        CASE WHEN date(ad.close_date) > (SELECT d FROM cutoff) THEN ad.deal_amount ELSE 0 END
-                END AS mrr_12m_ago
+                CASE WHEN date(ad.close_date) <= (SELECT d FROM cutoff) THEN COALESCE(ad.deal_amount, 0) ELSE 0 END AS mrr_12m_ago
             FROM accountant_deals ad
             LEFT JOIN id_empresa_mrr im ON ad.id_empresa = im.id_empresa
             WHERE ad.close_date IS NOT NULL AND ad.close_date != ''
@@ -917,8 +1021,9 @@ def generate_dashboard_html(
     growth_by_tier: Optional[list[dict]] = None,
     deals_growth_by_tier: Optional[list[dict]] = None,
     cagr_data_by_months: Optional[dict[int, dict]] = None,
+    icp_metrics: Optional[dict] = None,
 ) -> str:
-    """Generate HTML dashboard (Nubox-style layout)."""
+    """Generate HTML dashboard (Nubox-style layout). Includes company-wide ICP section when icp_metrics provided."""
     total_mrr = sum(m["mrr"] for m in metrics)
     total_accountants = len(metrics)
     avg_ticket = total_mrr / total_accountants if total_accountants else 0
@@ -928,6 +1033,48 @@ def generate_dashboard_html(
     churned_mrr = churn_metrics.get("churned_mrr", 0)
     churn_rate_smbs = (total_churned / total_portfolio * 100) if total_portfolio else 0
     churn_rate_mrr = (churned_mrr / (total_mrr + churned_mrr) * 100) if (total_mrr + churned_mrr) else 0
+    # Company-wide ICP section (consolidated from ICP dashboard)
+    icp_section_html = ""
+    if icp_metrics:
+        im = icp_metrics
+        icp_cards = ""
+        for icp in ICP_ORDER:
+            data = im.get("mrr_by_icp", {}).get(icp, {})
+            churn = im.get("churn_by_icp", {}).get(icp, 0)
+            mrr = data.get("mrr", 0)
+            cuits = data.get("unique_cuits", 0)
+            if mrr > 0 or cuits > 0 or churn > 0:
+                icp_cards += f'<div class="card" style="min-width:160px"><h2 style="font-size:0.9rem;margin:0 0 8px 0;color:var(--text-muted)">{icp}</h2><div class="value" style="font-size:1.2rem">{format_ars(mrr)}</div><div class="detail" style="font-size:0.8rem;margin-top:6px">{cuits:,} CUITs · {churn} churn</div></div>'
+        churn_rows = "".join(
+            f'<tr><td>{icp}</td><td class="num">{im.get("churn_by_icp", {}).get(icp, 0)}</td></tr>'
+            for icp in ICP_ORDER if im.get("churn_by_icp", {}).get(icp, 0) > 0
+        )
+        churn_rows += f'<tr><td><strong>Total</strong></td><td class="num"><strong>{im["churn_total"]}</strong></td></tr>'
+        churn_month_rows = "".join(
+            f'<tr><td>{r[0]}</td><td class="num">{r[1]}</td></tr>' for r in im.get("churn_by_month", [])
+        )
+        if not churn_month_rows:
+            churn_month_rows = '<tr><td colspan="2">No churn with close_date in last 12 months</td></tr>'
+        icp_section_html = f'''
+        <div class="matrix-card" id="company-icp" style="margin-top: 24px;">
+            <h2 style="margin:0 0 16px 0;font-size:1.1rem">Company-wide: revenue by ICP</h2>
+            <p class="detail" style="margin-bottom:16px;font-size:0.85rem;color:var(--text-muted)">All paying customers (facturacion). ICP = tipo_icp_contador (Operador/Asesor/Híbrido) or type (Contador/PYME). Churn = deal_stage closedlost or 31849274.</p>
+            <div class="grid" style="display:grid;grid-template-columns:repeat(auto-fit, minmax(160px, 1fr));gap:12px;margin-bottom:20px">
+                <div class="card" style="min-width:140px"><h2 style="font-size:0.9rem;margin:0 0 8px 0;color:var(--text-muted)">Paying Customers</h2><div class="value" style="font-size:1.2rem">{im["paying_customers"]:,}</div><div class="detail" style="font-size:0.8rem">Unique CUITs billed</div></div>
+                <div class="card" style="min-width:140px"><h2 style="font-size:0.9rem;margin:0 0 8px 0;color:var(--text-muted)">Total MRR</h2><div class="value" style="font-size:1.2rem">{format_ars(im["total_mrr"])}</div><div class="detail" style="font-size:0.8rem">From facturacion</div></div>
+                <div class="card churn-card" style="min-width:140px;border-left:4px solid var(--warning)"><h2 style="font-size:0.9rem;margin:0 0 8px 0;color:var(--text-muted)">Churn Deals</h2><div class="value" style="font-size:1.2rem">{im["churn_total"]}</div><div class="detail" style="font-size:0.8rem">{im["churn_rate"]:.1f}% churn rate</div></div>
+            </div>
+            <div class="grid" style="display:grid;grid-template-columns:repeat(auto-fit, minmax(160px, 1fr));gap:12px;margin-bottom:20px">{icp_cards}</div>
+            <table class="sortable" style="width:100%;border-collapse:collapse;font-size:0.9rem;margin-bottom:16px">
+                <thead><tr><th>ICP</th><th class="num">Churn Deals</th></tr></thead>
+                <tbody>{churn_rows}</tbody>
+            </table>
+            <p class="detail" style="font-size:0.8rem;margin-bottom:8px">Churn by month (close_date). Last 12 months.</p>
+            <table class="sortable" style="width:100%;border-collapse:collapse;font-size:0.9rem">
+                <thead><tr><th>Month</th><th class="num">Churn Deals</th></tr></thead>
+                <tbody>{churn_month_rows}</tbody>
+            </table>
+        </div>'''
     max_related_deals = max(
         (a.get("operator_deals", 0) + a.get("consultant_deals", 0)) for a in top_accountants
     ) if top_accountants else 0
@@ -1155,6 +1302,7 @@ def generate_dashboard_html(
             --text: #f1f5f9;
             --text-muted: #94a3b8;
             --success: #22c55e;
+            --warning: #f59e0b;
             --border: #334155;
         }}
         * {{ box-sizing: border-box; }}
@@ -1230,6 +1378,13 @@ def generate_dashboard_html(
             overflow-x: auto;
             border: 1px solid var(--border);
         }}
+        #company-icp .card {{
+            background: var(--card);
+            border-radius: 8px;
+            padding: 12px;
+            border: 1px solid var(--border);
+        }}
+        #company-icp .value {{ font-weight: 700; color: var(--accent); }}
         .matrix-card h2 {{
             font-size: 1rem;
             font-weight: 600;
@@ -1487,6 +1642,7 @@ def generate_dashboard_html(
                 </tbody>
             </table>
         </div>
+        {icp_section_html}
     </div>
     <script type="application/json" id="cagr-data-json">{cagr_data_json}</script>
     <script>
@@ -1785,6 +1941,7 @@ def main():
     conn = sqlite3.connect(str(db_path))
     metrics = get_accountant_metrics(conn)
     churn_metrics = get_portfolio_churn_metrics(conn)
+    icp_metrics = get_company_icp_metrics(conn)
     conn.close()
 
     if not metrics:
@@ -1801,7 +1958,7 @@ def main():
         deals_growth_by_tier = get_deals_growth_by_tier(conn, months=months)
         top_accountants = get_top_accountants(conn, limit=20, order_by="mrr", months=months)
         worst_accountants = get_top_accountants(conn, limit=20, order_by="churn_pct", months=months)
-        mrr_start_by_id, _, years = get_accountant_mrr_timeline(conn, months=months)
+        mrr_now_by_id, mrr_start_by_id, years = get_accountant_mrr_timeline(conn, months=months)
         conn.close()
         matrix_cagr = build_matrix_cagr(metrics, mrr_start_by_id, years)
         cagr_data_by_months[months] = {
@@ -1842,7 +1999,7 @@ def main():
     if html_path:
         html_path = Path(html_path)
         html_path.parent.mkdir(parents=True, exist_ok=True)
-        html = generate_dashboard_html(matrix, matrix_cagr, metrics, cols, rows_order, top_accountants, worst_accountants, churn_metrics, growth_by_tier, deals_growth_by_tier, cagr_data_by_months)
+        html = generate_dashboard_html(matrix, matrix_cagr, metrics, cols, rows_order, top_accountants, worst_accountants, churn_metrics, growth_by_tier, deals_growth_by_tier, cagr_data_by_months, icp_metrics)
         html_path.write_text(html, encoding="utf-8")
         print(f"Dashboard written to: {html_path.absolute()}")
         if args.serve:

@@ -1,11 +1,13 @@
 #!/usr/bin/env python3
 """
-Colppy ICP Dashboard
+Colppy ICP Dashboard (redirect)
 
-Builds a dashboard for Ideal Customer Profiles (ICP) with:
-- Paying customers (unique CUITs billed)
-- MRR by ICP (Operador, Asesor, Híbrido, Contador, PYME)
-- Churn deals and churn by ICP
+This script now generates a redirect page to the MRR Dashboard, which includes
+the company-wide ICP section (revenue by ICP, churn by ICP, churn by month).
+Run analyze_accountant_mrr_matrix.py --html to build the full dashboard.
+
+Legacy: Builds a redirect for Ideal Customer Profiles (ICP) so old links
+(icp_dashboard.html) still work. The real content lives in mrr_dashboard.html#company-icp.
 
 ICP definitions (from tools/docs/NPS_TO_ICP_DATA_FLOW.md and ICP_COMPANY_DEFINITIONS_AND_ASSUMPTIONS.md):
 - ICP Operador: tipo_icp_contador == "Operador" (empresa contadora que opera directamente)
@@ -348,22 +350,27 @@ def main():
     parser.add_argument("--serve", action="store_true", help="Serve and open in browser")
     args = parser.parse_args()
 
-    db_path = Path(args.db)
-    if not db_path.exists():
-        print(f"ERROR: Database not found: {db_path}", file=sys.stderr)
-        return 1
-
-    conn = sqlite3.connect(str(db_path))
-    metrics = get_icp_metrics(conn)
-    conn.close()
-
     html_path = args.html or (Path("tools/outputs/icp_dashboard.html") if args.serve else None)
     if html_path:
         html_path = Path(html_path)
         html_path.parent.mkdir(parents=True, exist_ok=True)
-        html = generate_dashboard_html(metrics)
-        html_path.write_text(html, encoding="utf-8")
-        print(f"Dashboard written to: {html_path.absolute()}")
+        # Redirect to MRR Dashboard (company-wide ICP section consolidated there)
+        mrr_anchor = "mrr_dashboard.html#company-icp"
+        redirect_html = f"""<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8">
+  <meta http-equiv="refresh" content="0;url={mrr_anchor}">
+  <title>Colppy ICP - Redirect</title>
+  <style>body {{ font-family: system-ui; background: #0f172a; color: #f1f5f9; padding: 40px; }}</style>
+</head>
+<body>
+  <p>ICP view is consolidated into the <a href="{mrr_anchor}">MRR Dashboard</a> (company-wide revenue by ICP).</p>
+  <p>Redirecting to <a href="{mrr_anchor}">MRR Dashboard &rarr;</a></p>
+</body>
+</html>"""
+        html_path.write_text(redirect_html, encoding="utf-8")
+        print(f"Redirect page written to: {html_path.absolute()} (target: {mrr_anchor})")
         if args.serve:
             port = 8766
             os.chdir(html_path.parent)
@@ -377,8 +384,15 @@ def main():
                 pass
         return 0
 
-    # Console output
-    print("\nICP Dashboard Metrics")
+    # Console output (still need DB)
+    db_path = Path(args.db)
+    if not db_path.exists():
+        print(f"ERROR: Database not found: {db_path}", file=sys.stderr)
+        return 1
+    conn = sqlite3.connect(str(db_path))
+    metrics = get_icp_metrics(conn)
+    conn.close()
+    print("\nICP Dashboard Metrics (company-wide; also in MRR Dashboard)")
     print("=" * 50)
     print(f"Paying customers (unique CUITs): {metrics['paying_customers']:,}")
     print(f"Churn deals: {metrics['churn_total']} (stage closedlost/31849274, billing companies only)")

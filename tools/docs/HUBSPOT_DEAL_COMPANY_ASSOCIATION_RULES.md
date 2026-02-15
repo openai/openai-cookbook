@@ -225,3 +225,44 @@ python tools/scripts/hubspot/build_facturacion_hubspot_mapping.py \
   --restore-from-mapping tools/outputs/facturacion_hubspot_mapping.csv
 ```
 Then run the full build as usual.
+
+---
+
+## 9. Keeping the dashboard and data up to date
+
+**Current state:** Nothing runs automatically. The MRR dashboard (and company-wide ICP section) stay in sync with billing and HubSpot only when you run the pipeline manually.
+
+**Data chain:**
+
+| Step | What it uses | What it updates |
+|------|----------------|-----------------|
+| **1. Billing export** | Colppy/billing system | `tools/outputs/facturacion.csv` (canonical source). You must export and place this file; no script creates it from an API. |
+| **2. Build** | `facturacion.csv` + HubSpot API (companies by CUIT, deals by id_empresa) | `facturacion_hubspot.db` (companies, deals, facturacion tables) |
+| **3. Populate associations** | DB + HubSpot API | `deal_associations` in DB |
+| **4. Populate accountant deals** | DB + HubSpot API | `deals` in DB (adds churned deals for MRR matrix) |
+| **5. Dashboard** | DB only | `mrr_dashboard.html` (and optionally `docs/mrr_dashboard.html` for GitHub Pages) |
+
+**Refresh order when you want up-to-date dashboards:**
+
+1. **Update billing:** Replace `tools/outputs/facturacion.csv` with a fresh export from your billing source (same columns/format as before).
+2. **Run the refresh script (recommended):**
+   ```bash
+   ./tools/scripts/hubspot/refresh_dashboard.sh --output-dir docs
+   ```
+   This runs: build (with `--csv`) → populate_deal_associations → populate_accountant_deals → analyze_accountant_mrr_matrix → analyze_icp_dashboard, and writes `docs/mrr_dashboard.html` and `docs/icp_dashboard.html`.
+3. **Dashboard-only (no billing/HubSpot refresh):** If only regenerating HTML from the existing DB:
+   ```bash
+   ./tools/scripts/hubspot/refresh_dashboard.sh --dashboard-only --output-dir docs
+   ```
+4. **Publish:** Commit and push so GitHub Pages serves the new `docs/mrr_dashboard.html` (if you use the deploy-from-branch workflow).
+
+**Script options:** `--dashboard-only` (skip build and populate), `--output-dir DIR` (default `docs`), `--facturacion PATH`, `--db PATH`. Env: `FACTURACION`, `DB`, `OUTPUT_DIR`.
+
+**GitHub Action (implemented):** `.github/workflows/refresh-dashboard.yaml`
+
+- **Triggers:** Manual (`workflow_dispatch`), push to `main` when dashboard scripts or workflow change, and **schedule** (Mondays 12:00 UTC).
+- **Secrets:** Set `HUBSPOT_API_KEY` (or `HUBSPOT_ACCESS_TOKEN`) so build and populate can call the HubSpot API. Optional: `FACTURACION_CSV` = base64-encoded `facturacion.csv`; if set, the workflow writes it to `tools/outputs/facturacion.csv` and runs a full refresh; if not set, it runs dashboard-only using the **cached DB** from the previous run.
+- **Cache:** The workflow caches `tools/outputs` (DB only; `facturacion.csv` is removed before saving) so scheduled runs without `FACTURACION_CSV` can still regenerate the dashboard from the last built DB.
+- **Commit:** On success, it commits and pushes `docs/mrr_dashboard.html` and `docs/icp_dashboard.html` with message `chore: refresh MRR and ICP dashboards [skip ci]`.
+
+**First-time CI setup:** Run the workflow once with `FACTURACION_CSV` set (export facturacion.csv, then `base64 -i tools/outputs/facturacion.csv | pbcopy` or equivalent and paste into the repo secret) and `HUBSPOT_API_KEY` set, so the DB is built and cached. Later scheduled runs can omit `FACTURACION_CSV` to only refresh the HTML from the cached DB.

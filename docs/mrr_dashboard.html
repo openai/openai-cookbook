@@ -13,6 +13,7 @@
             --text: #f1f5f9;
             --text-muted: #94a3b8;
             --success: #22c55e;
+            --warning: #f59e0b;
             --border: #334155;
         }
         * { box-sizing: border-box; }
@@ -88,6 +89,13 @@
             overflow-x: auto;
             border: 1px solid var(--border);
         }
+        #company-icp .card {
+            background: var(--card);
+            border-radius: 8px;
+            padding: 12px;
+            border: 1px solid var(--border);
+        }
+        #company-icp .value { font-weight: 700; color: var(--accent); }
         .matrix-card h2 {
             font-size: 1rem;
             font-weight: 600;
@@ -1364,6 +1372,26 @@
                             <td class="num positive" data-col="cagr_consultant_pct" data-col-id="cagr_consultant_pct">—</td>
                         </tr>
                 </tbody>
+            </table>
+        </div>
+        
+        <div class="matrix-card" id="company-icp" style="margin-top: 24px;">
+            <h2 style="margin:0 0 16px 0;font-size:1.1rem">Company-wide: revenue by ICP</h2>
+            <p class="detail" style="margin-bottom:16px;font-size:0.85rem;color:var(--text-muted)">All paying customers (facturacion). ICP = tipo_icp_contador (Operador/Asesor/Híbrido) or type (Contador/PYME). Churn = deal_stage closedlost or 31849274.</p>
+            <div class="grid" style="display:grid;grid-template-columns:repeat(auto-fit, minmax(160px, 1fr));gap:12px;margin-bottom:20px">
+                <div class="card" style="min-width:140px"><h2 style="font-size:0.9rem;margin:0 0 8px 0;color:var(--text-muted)">Paying Customers</h2><div class="value" style="font-size:1.2rem">2,365</div><div class="detail" style="font-size:0.8rem">Unique CUITs billed</div></div>
+                <div class="card" style="min-width:140px"><h2 style="font-size:0.9rem;margin:0 0 8px 0;color:var(--text-muted)">Total MRR</h2><div class="value" style="font-size:1.2rem">$622.204.153,00</div><div class="detail" style="font-size:0.8rem">From facturacion</div></div>
+                <div class="card churn-card" style="min-width:140px;border-left:4px solid var(--warning)"><h2 style="font-size:0.9rem;margin:0 0 8px 0;color:var(--text-muted)">Churn Deals</h2><div class="value" style="font-size:1.2rem">59</div><div class="detail" style="font-size:0.8rem">2.2% churn rate</div></div>
+            </div>
+            <div class="grid" style="display:grid;grid-template-columns:repeat(auto-fit, minmax(160px, 1fr));gap:12px;margin-bottom:20px"><div class="card" style="min-width:160px"><h2 style="font-size:0.9rem;margin:0 0 8px 0;color:var(--text-muted)">ICP Operador</h2><div class="value" style="font-size:1.2rem">$63.765.215,00</div><div class="detail" style="font-size:0.8rem;margin-top:6px">275 CUITs · 23 churn</div></div><div class="card" style="min-width:160px"><h2 style="font-size:0.9rem;margin:0 0 8px 0;color:var(--text-muted)">ICP Asesor</h2><div class="value" style="font-size:1.2rem">$1.729.954,00</div><div class="detail" style="font-size:0.8rem;margin-top:6px">7 CUITs · 0 churn</div></div><div class="card" style="min-width:160px"><h2 style="font-size:0.9rem;margin:0 0 8px 0;color:var(--text-muted)">ICP Híbrido</h2><div class="value" style="font-size:1.2rem">$22.736.065,00</div><div class="detail" style="font-size:0.8rem;margin-top:6px">88 CUITs · 23 churn</div></div><div class="card" style="min-width:160px"><h2 style="font-size:0.9rem;margin:0 0 8px 0;color:var(--text-muted)">ICP Contador</h2><div class="value" style="font-size:1.2rem">$2.693.944,00</div><div class="detail" style="font-size:0.8rem;margin-top:6px">12 CUITs · 0 churn</div></div><div class="card" style="min-width:160px"><h2 style="font-size:0.9rem;margin:0 0 8px 0;color:var(--text-muted)">ICP PYME</h2><div class="value" style="font-size:1.2rem">$513.127.230,00</div><div class="detail" style="font-size:0.8rem;margin-top:6px">1,983 CUITs · 13 churn</div></div></div>
+            <table class="sortable" style="width:100%;border-collapse:collapse;font-size:0.9rem;margin-bottom:16px">
+                <thead><tr><th>ICP</th><th class="num">Churn Deals</th></tr></thead>
+                <tbody><tr><td>ICP Operador</td><td class="num">23</td></tr><tr><td>ICP Híbrido</td><td class="num">23</td></tr><tr><td>ICP PYME</td><td class="num">13</td></tr><tr><td><strong>Total</strong></td><td class="num"><strong>59</strong></td></tr></tbody>
+            </table>
+            <p class="detail" style="font-size:0.8rem;margin-bottom:8px">Churn by month (close_date). Last 12 months.</p>
+            <table class="sortable" style="width:100%;border-collapse:collapse;font-size:0.9rem">
+                <thead><tr><th>Month</th><th class="num">Churn Deals</th></tr></thead>
+                <tbody><tr><td>2026-02</td><td class="num">2</td></tr><tr><td>2026-01</td><td class="num">1</td></tr><tr><td>2025-12</td><td class="num">2</td></tr><tr><td>2025-11</td><td class="num">13</td></tr><tr><td>2025-10</td><td class="num">1</td></tr><tr><td>2025-09</td><td class="num">3</td></tr><tr><td>2025-06</td><td class="num">2</td></tr><tr><td>2025-05</td><td class="num">1</td></tr><tr><td>2025-04</td><td class="num">2</td></tr><tr><td>2024-11</td><td class="num">2</td></tr><tr><td>2024-10</td><td class="num">2</td></tr><tr><td>2024-09</td><td class="num">1</td></tr></tbody>
             </table>
         </div>
     </div>

@@ -1,0 +1,98 @@
+# Refresh Colppy MRR dashboard: build DB from billing + HubSpot, regenerate HTML, optionally commit.
+#
+# Required secret: HUBSPOT_API_KEY (or HUBSPOT_ACCESS_TOKEN) for build and populate steps.
+# Optional secret: FACTURACION_CSV — base64-encoded facturacion.csv; if set, written to
+#   tools/outputs/facturacion.csv so full refresh runs. If not set, runs dashboard-only
+#   using cached DB from a previous run.
+#
+# See tools/docs/HUBSPOT_DEAL_COMPANY_ASSOCIATION_RULES.md section 9.
+
+name: Refresh Colppy MRR Dashboard
+
+on:
+  workflow_dispatch:
+  push:
+    branches: [main]
+    paths:
+      - 'tools/scripts/hubspot/refresh_dashboard.sh'
+      - 'tools/scripts/hubspot/analyze_accountant_mrr_matrix.py'
+      - 'tools/scripts/hubspot/analyze_icp_dashboard.py'
+      - '.github/workflows/refresh-dashboard.yaml'
+  schedule:
+    - cron: '0 12 * * 1'
+
+env:
+  DB_PATH: tools/outputs/facturacion_hubspot.db
+  FACTURACION_PATH: tools/outputs/facturacion.csv
+
+jobs:
+  refresh:
+    runs-on: ubuntu-latest
+    permissions:
+      contents: write
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Set up Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: '3.11'
+
+      - name: Install dependencies
+        run: pip install -r requirements.txt
+
+      - name: Restore database from cache
+        uses: actions/cache/restore@v4
+        id: db-cache
+        with:
+          path: tools/outputs
+          key: refresh-dashboard-db
+          fail-on-cache-miss: false
+
+      - name: Create facturacion.csv from secret
+        run: |
+          mkdir -p tools/outputs
+          if [ -n "$FACTURACION_CSV" ]; then
+            echo "$FACTURACION_CSV" | base64 -d > tools/outputs/facturacion.csv
+            echo "Facturacion rows: $(wc -l < tools/outputs/facturacion.csv)"
+          fi
+        env:
+          FACTURACION_CSV: ${{ secrets.FACTURACION_CSV }}
+
+      - name: Run refresh
+        env:
+          HUBSPOT_API_KEY: ${{ secrets.HUBSPOT_API_KEY }}
+          HUBSPOT_ACCESS_TOKEN: ${{ secrets.HUBSPOT_ACCESS_TOKEN }}
+        run: |
+          if [ -f "$FACTURACION_PATH" ] && [ "$(wc -l < "$FACTURACION_PATH")" -gt 50 ]; then
+            ./tools/scripts/hubspot/refresh_dashboard.sh --output-dir docs
+          else
+            echo "No facturacion.csv (or too few rows); running dashboard-only."
+            ./tools/scripts/hubspot/refresh_dashboard.sh --dashboard-only --output-dir docs
+          fi
+
+      - name: Save database to cache
+        if: success()
+        run: |
+          rm -f tools/outputs/facturacion.csv
+          echo "Caching tools/outputs (DB only; facturacion.csv removed)."
+      - name: Save cache
+        if: success()
+        uses: actions/cache/save@v4
+        with:
+          path: tools/outputs
+          key: refresh-dashboard-db
+
+      - name: Commit and push dashboard HTML
+        run: |
+          git config user.name "github-actions[bot]"
+          git config user.email "github-actions[bot]@users.noreply.github.com"
+          if git diff --quiet docs/mrr_dashboard.html docs/icp_dashboard.html 2>/dev/null; then
+            echo "No changes to dashboard files."
+            exit 0
+          fi
+          git add docs/mrr_dashboard.html docs/icp_dashboard.html
+          git commit -m "chore: refresh MRR and ICP dashboards [skip ci]"
+          git push

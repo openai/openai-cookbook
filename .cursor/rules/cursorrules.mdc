@@ -46,6 +46,7 @@ alwaysApply: true
 
 ## Code Management Principles
 
+- **After making any change to tracked files**: Commit and push to `main` automatically in the same response (unless the user explicitly asks not to). Do not wait for the user to push.
 - Avoid creating unnecessary scripts or files; only create what's essential
 - **Never create temporary scripts** - Use the chatbot to explain, demonstrate, or test concepts instead
 - **For one-time tasks or exploratory work**: Provide code examples directly in the chat response, not as files

@@ -1,3 +1,10 @@
+Disclaimer and Personal Statements of Tech Transfers from USA to PRC!
+
+U.S. EAR restricts AI exports (e.g., model weights >10^25 FLOP, ECCN 4E091) to PRC/Entity List.
+Check license needs: bis.doc.gov/ear. Report issues to compliance.
+
+Even if not controlled, I protest unauthorized sharing—protect U.S. security, in accordance with my rights to 1st Amendment.
+
 <a href="https://cookbook.openai.com" target="_blank">
   <picture>
     <source media="(prefers-color-scheme: dark)" srcset="/images/openai-cookbook-white.png" style="max-width: 100%; width: 400px; margin-bottom: 20px">

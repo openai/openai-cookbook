@@ -271,17 +271,25 @@ def main():
             batch = cuit_list[i : i + batch_size]
             values = [format_cuit_display(c) for c in batch] + list(batch)  # both formats
             values = list(dict.fromkeys(values))
-            try:
-                resp = client.search_objects(
-                    object_type="companies",
-                    filter_groups=[{"filters": [{"propertyName": "cuit", "operator": "IN", "values": values}]}],
-                    properties=["name", "cuit", "industria", "type", "lifecyclestage"],
-                    limit=100,
-                )
-                for r in resp.get("results", []):
-                    billing_companies.append(r)
-            except Exception as e:
-                print(f"  Warning: Batch {i//batch_size + 1} failed: {e}")
+            after = None
+            while True:
+                try:
+                    resp = client.search_objects(
+                        object_type="companies",
+                        filter_groups=[{"filters": [{"propertyName": "cuit", "operator": "IN", "values": values}]}],
+                        properties=["name", "cuit", "industria", "type", "lifecyclestage"],
+                        limit=100,
+                        after=after,
+                    )
+                    for r in resp.get("results", []):
+                        billing_companies.append(r)
+                    after = resp.get("paging", {}).get("next", {}).get("after")
+                    if not after:
+                        break
+                    time.sleep(args.delay)
+                except Exception as e:
+                    print(f"  Warning: Batch {i//batch_size + 1} failed: {e}")
+                    break
             time.sleep(args.delay)
         # Dedupe by CUIT: one company per billing CUIT (facturacion focus)
         # When multiple HubSpot companies share same CUIT, prefer one with type or industria

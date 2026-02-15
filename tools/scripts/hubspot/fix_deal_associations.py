@@ -517,6 +517,9 @@ def _fix_secondary_company_labels(
         print(f"  Inferred from name: 0")
 
 
+# Active deal stages (in facturacion): closedwon + Cerrado Ganado Recupero
+ACTIVE_DEAL_STAGES = ("closedwon", "34692158")
+
 # Group 1: billing company (any with that CUIT) not associated as PRIMARY
 # Facturacion is master: deal must have a company with customer_cuit as PRIMARY
 SQL_GROUP1 = """
@@ -530,7 +533,7 @@ SELECT d.hubspot_id, d.deal_name, d.amount, d.id_empresa,
   f.customer_cuit
 FROM facturacion f
 JOIN deals d ON f.id_empresa = d.id_empresa
-WHERE d.deal_stage = 'closedwon'
+WHERE d.deal_stage IN ('closedwon', '34692158')
 AND d.hubspot_id != ''
 AND f.customer_cuit IN (SELECT cuit FROM companies WHERE hubspot_id != '')
 AND NOT EXISTS (
@@ -554,7 +557,7 @@ SELECT d.hubspot_id, d.deal_name, d.amount, d.id_empresa,
   f.customer_cuit
 FROM facturacion f
 JOIN deals d ON f.id_empresa = d.id_empresa
-WHERE d.deal_stage = 'closedwon'
+WHERE d.deal_stage IN ('closedwon', '34692158')
 AND d.hubspot_id != ''
 AND f.customer_cuit IN (SELECT cuit FROM companies WHERE hubspot_id != '')
 AND EXISTS (

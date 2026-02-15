@@ -38,6 +38,53 @@ def get_deal_hubspot_ids(conn: sqlite3.Connection) -> list[str]:
     return [r[0] for r in rows]
 
 
+BATCH_SIZE = 100
+
+
+def fetch_deal_associations_batch(client, deal_ids: list[str]) -> list[dict]:
+    """
+    Fetch company associations for multiple deals via batch v4 API.
+    Endpoint: POST /crm/v4/associations/deals/companies/batch/read
+    Max 100 deals per request. Returns same format as fetch_deal_associations.
+    """
+    if not deal_ids:
+        return []
+    all_assocs = []
+    try:
+        resp = client.post(
+            "crm/v4/associations/deals/companies/batch/read",
+            json_data={"inputs": [{"id": did} for did in deal_ids]},
+        )
+    except Exception:
+        return []
+    for r in resp.get("results", []):
+        deal_id = str(r.get("from", {}).get("id", ""))
+        if not deal_id:
+            continue
+        for to_obj in r.get("to", []) or []:
+            company_id = to_obj.get("toObjectId")
+            if not company_id:
+                continue
+            assoc_types = to_obj.get("associationTypes", []) or []
+            if not assoc_types:
+                all_assocs.append({
+                    "deal_hubspot_id": deal_id,
+                    "company_hubspot_id": str(company_id),
+                    "association_type_id": 0,
+                    "association_category": "UNKNOWN",
+                })
+            else:
+                for at in assoc_types:
+                    if at and isinstance(at, dict):
+                        all_assocs.append({
+                            "deal_hubspot_id": deal_id,
+                            "company_hubspot_id": str(company_id),
+                            "association_type_id": at.get("typeId", 0),
+                            "association_category": at.get("category", ""),
+                        })
+    return all_assocs
+
+
 def fetch_deal_associations(client, deal_id: str) -> list[dict]:
     """
     Fetch company associations for a single deal via the individual v4 API.
@@ -225,6 +272,11 @@ def main():
         default="",
         help="Comma-separated deal IDs for incremental refresh only (e.g. 123,456,789). Skips full fetch.",
     )
+    parser.add_argument(
+        "--batch",
+        action="store_true",
+        help="Use batch API (100 deals/request) instead of individual calls. Faster for full refresh.",
+    )
     args = parser.parse_args()
 
     from tools.hubspot_api.client import get_hubspot_client
@@ -256,36 +308,60 @@ def main():
         conn.close()
         return 0
 
-    # Fetch one deal at a time (reliable approach)
     all_associations = []
     deals_processed = 0
     deals_with_assoc = 0
     deals_failed = 0
     total = len(deal_ids)
     log(f"Fetching associations for {total:,} deals...")
-    if not incremental:
+    if args.batch:
+        log(f"Using batch API ({BATCH_SIZE} deals/request). Estimated time: ~{((total + BATCH_SIZE - 1) // BATCH_SIZE) * 2 / 60:.1f} min\n")
+    elif not incremental:
         log(f"Estimated time: ~{total * (args.delay + 0.45) / 60:.0f} min\n")
 
-    for i, deal_id in enumerate(deal_ids, 1):
-        try:
-            assocs = fetch_deal_associations(client, deal_id)
-            all_associations.extend(assocs)
-            deals_processed += 1
-            if assocs:
-                deals_with_assoc += 1
-        except Exception as e:
-            deals_failed += 1
-            if deals_failed <= 5:
-                log(f"  Warning: deal {deal_id} failed: {e}")
+    if args.batch:
+        # Batch fetch: 100 deals per request
+        for i in range(0, total, BATCH_SIZE):
+            batch = deal_ids[i : i + BATCH_SIZE]
+            try:
+                assocs = fetch_deal_associations_batch(client, batch)
+                all_associations.extend(assocs)
+                deals_processed += len(batch)
+                deals_with_assoc += len(set(a["deal_hubspot_id"] for a in assocs))
+            except Exception as e:
+                deals_failed += len(batch)
+                if deals_failed <= BATCH_SIZE:
+                    log(f"  Warning: batch at {i} failed: {e}")
+            if (i + BATCH_SIZE) % 400 == 0 or i + BATCH_SIZE >= total:
+                log(
+                    f"  {min(i + BATCH_SIZE, total):,}/{total:,} deals | "
+                    f"{len(all_associations):,} associations | "
+                    f"{deals_with_assoc:,} with companies | "
+                    f"{deals_failed} failed"
+                )
+            time.sleep(0.15)
+    else:
+        # Individual fetch (reliable approach)
+        for i, deal_id in enumerate(deal_ids, 1):
+            try:
+                assocs = fetch_deal_associations(client, deal_id)
+                all_associations.extend(assocs)
+                deals_processed += 1
+                if assocs:
+                    deals_with_assoc += 1
+            except Exception as e:
+                deals_failed += 1
+                if deals_failed <= 5:
+                    log(f"  Warning: deal {deal_id} failed: {e}")
 
-        if i % 200 == 0 or i == total:
-            log(
-                f"  {i:,}/{total:,} deals | "
-                f"{len(all_associations):,} associations | "
-                f"{deals_with_assoc:,} with companies | "
-                f"{deals_failed} failed"
-            )
-        time.sleep(args.delay)
+            if i % 200 == 0 or i == total:
+                log(
+                    f"  {i:,}/{total:,} deals | "
+                    f"{len(all_associations):,} associations | "
+                    f"{deals_with_assoc:,} with companies | "
+                    f"{deals_failed} failed"
+                )
+            time.sleep(args.delay)
 
     log(f"\nTotal associations fetched: {len(all_associations):,}")
     log(f"Deals processed: {deals_processed:,} | with associations: {deals_with_assoc:,} | failed: {deals_failed}")

@@ -141,4 +141,87 @@ When analyzing or fixing deal–company associations:
 3. After merges: `populate_deal_associations.py --deals id1,id2,id3` to refresh those deals only
 4. Full populate only when needed (e.g. new session, or to verify)
 
+**Avoid duplicate deals:** When facturacion has rows without matching deals, run `reconcile_missing_deals.py --dry-run` first. It finds existing deals with wrong/empty `id_empresa` (e.g. deal name "54468 - X" but id_empresa=54274). Run `reconcile_missing_deals.py --apply` to fix them in HubSpot.
+
+**Deal creation — confirmation required:** For facturacion rows with no matching deal in HubSpot, **do NOT create deals without explicit user confirmation**. Creation must be approved manually. The reconcile script reports "Create new deals for:" — treat this as a list requiring approval before any creation.
+
 **Log (`--log-fixed`):** Writes all outcomes to `tools/outputs/fix_deal_associations_log.csv` and prints clickable HubSpot URLs. Columns: `timestamp`, `group`, `deal_id`, `deal_name`, `deal_url`, `billing_id`, `billing_name`, `company_url`, `customer_cuit`, `outcome`, `detail`. Outcomes: `fixed` (detail: `cuit_ok`|`cuit_patched`|`cuit_alternative`), `failed` (detail: error message), `skipped` (detail: `no_customer_cuit`|`cuit_unfixable`), `dry_run` (when `--dry-run`).
+
+---
+
+## 6. Accountant Portfolio & Churn (MRR Matrix)
+
+**Purpose:** The MRR matrix (`analyze_accountant_mrr_matrix.py`) analyzes accountant portfolio behavior including **churned** deals. The build script only fetches deals for `id_empresa` in facturacion, so churned deals are missing by default.
+
+**Script:** `populate_accountant_deals.py` — fetches deals associated with accountant companies (type 8 or Cuenta Contador) from HubSpot, including those with `id_empresa` not in facturacion (churned).
+
+**Workflow for MRR matrix with churn:**
+1. Run `build_facturacion_hubspot_mapping.py --csv` (companies, deals from facturacion; `--csv` exports mapping as backup)
+2. Run `populate_deal_associations.py` (associations for existing deals)
+3. Run `populate_accountant_deals.py` (adds churned deals from accountant associations)
+4. Run `analyze_accountant_mrr_matrix.py` (or `--serve` for dashboard)
+
+**When to populate vs when to rebuild dashboard:**
+
+| Action | When to use |
+|--------|-------------|
+| **Run populate** (`populate_accountant_deals.py`, `populate_deal_associations.py`, `build_facturacion_hubspot_mapping.py`) | First-time setup; HubSpot data changed (new deals, associations, companies); previously ran with `--limit` and now need full dataset |
+| **Rebuild dashboard only** (`analyze_accountant_mrr_matrix.py --html` or `--serve`) | Regenerating the MRR dashboard from existing DB; nothing changed in HubSpot or facturacion |
+
+**Do NOT re-run populate** when only rebuilding the dashboard. Populate scripts call the HubSpot API and update the local SQLite DB. If HubSpot data is unchanged, populate adds no new data and is unnecessary.
+
+---
+
+## 7. ICP Dashboard
+
+**Purpose:** Dashboard for Ideal Customer Profiles (ICP Operador, Asesor, Híbrido, Contador, PYME) with paying customers, MRR, and churn.
+
+**Script:** `analyze_icp_dashboard.py` — builds HTML dashboard from facturacion_hubspot.db.
+
+**ICP definitions** (from NPS_TO_ICP_DATA_FLOW.md):
+- **ICP Operador:** tipo_icp_contador = "Operador" (empresa contadora que opera directamente)
+- **ICP Asesor:** tipo_icp_contador = "Asesor" (empresa contadora que asesora)
+- **ICP Híbrido:** tipo_icp_contador = "Híbrido" (empresa contadora híbrida)
+- **ICP Contador:** type in (Cuenta Contador, Cuenta Contador y Reseller, Contador Robado) AND tipo_icp_contador empty
+- **ICP PYME:** type = Cuenta Pyme (facturamos a la PyME)
+
+**Metrics:**
+- Paying customers: unique CUITs billed (customer_cuit), no duplication
+- MRR by ICP: from billing company (tipo_icp_contador when set, else type)
+- Churn deals: id_empresa NOT in facturacion; all churn associated with billed companies
+- Churn by ICP: from primary company (association type 5)
+- Self-billed vs Intermediary: customer_cuit = product_cuit vs not
+
+**Usage:**
+```bash
+python tools/scripts/hubspot/analyze_icp_dashboard.py --html tools/outputs/icp_dashboard.html
+python tools/scripts/hubspot/analyze_icp_dashboard.py --serve
+```
+
+**Note:** Run `build_facturacion_hubspot_mapping.py` to fetch `tipo_icp_contador` from HubSpot. Until then, accountant companies appear as "ICP Contador" (fallback when tipo_icp_contador is empty).
+
+---
+
+## 8. Facturacion Data Safety (Prevent Accidental Wipe)
+
+**Purpose:** Prevent `facturacion.csv` from being overwritten or corrupted, which would wipe `facturacion` and `companies` tables in the DB.
+
+**Rules:**
+
+| Do | Don't |
+|----|-------|
+| Keep `facturacion.csv` as the canonical billing source | Never overwrite with `echo` or manual commands |
+| Use `facturacion_hubspot_mapping.csv` as backup (output of build with `--csv`) | Never truncate or replace facturacion.csv without a valid source |
+| Run build with `--csv` periodically to refresh the mapping backup | Don't run build with an empty or corrupt facturacion.csv |
+
+**Build script safeguards:**
+- Refuses to run if `facturacion.csv` has fewer than 50 data rows (avoids wiping DB with empty input)
+- Use `--force` only for small test datasets
+- Use `--restore-from-mapping` to recover when facturacion.csv was overwritten
+
+**Recovery when facturacion.csv is empty/corrupt:**
+```bash
+python tools/scripts/hubspot/build_facturacion_hubspot_mapping.py \
+  --restore-from-mapping tools/outputs/facturacion_hubspot_mapping.csv
+```
+Then run the full build as usual.

@@ -158,25 +158,33 @@ def fetch_companies_by_cuits(cuits: list[str], batch_size: int = 20) -> dict[str
             values.append(c)
         values = list(dict.fromkeys(values))
 
-        try:
-            response = client.search_objects(
-                object_type="companies",
-                filter_groups=[{"filters": [{"propertyName": "cuit", "operator": "IN", "values": values}]}],
-                properties=["name", "cuit", "type", "hs_object_id"],
-                limit=100,
-            )
-            for r in response.get("results", []):
-                props = r.get("properties", {})
-                n = normalize_cuit(props.get("cuit"))
-                if n:
-                    cuit_to_companies[n].append({
-                        "id": r.get("id"),
-                        "name": props.get("name"),
-                        "cuit": props.get("cuit"),
-                        "type": props.get("type") or "(No value)",
-                    })
-        except Exception as e:
-            print(f"  Warning: Batch fetch failed ({e})")
+        after = None
+        while True:
+            try:
+                response = client.search_objects(
+                    object_type="companies",
+                    filter_groups=[{"filters": [{"propertyName": "cuit", "operator": "IN", "values": values}]}],
+                    properties=["name", "cuit", "type", "hs_object_id"],
+                    limit=100,
+                    after=after,
+                )
+                for r in response.get("results", []):
+                    props = r.get("properties", {})
+                    n = normalize_cuit(props.get("cuit"))
+                    if n:
+                        cuit_to_companies[n].append({
+                            "id": r.get("id"),
+                            "name": props.get("name"),
+                            "cuit": props.get("cuit"),
+                            "type": props.get("type") or "(No value)",
+                        })
+                after = response.get("paging", {}).get("next", {}).get("after")
+                if not after:
+                    break
+                time.sleep(0.15)
+            except Exception as e:
+                print(f"  Warning: Batch fetch failed ({e})")
+                break
 
         time.sleep(0.15)
 

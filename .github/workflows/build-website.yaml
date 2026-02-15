@@ -8,9 +8,14 @@ on:
 jobs:
   deploy:
     runs-on: ubuntu-latest
-    # Only run when deploy hook is configured (avoid exit 2 from curl with empty URL)
-    if: ${{ secrets.WEBSITE_DEPLOY_HOOK_URL != '' }}
 
     steps:
       - name: Call Deploy Hook
-        run: curl -sf -X POST "${{ secrets.WEBSITE_DEPLOY_HOOK_URL }}"
+        env:
+          URL: ${{ secrets.WEBSITE_DEPLOY_HOOK_URL }}
+        run: |
+          if [ -n "$URL" ]; then
+            curl -sf -X POST "$URL"
+          else
+            echo "WEBSITE_DEPLOY_HOOK_URL not set, skipping deploy hook."
+          fi

@@ -45,7 +45,7 @@ import time
 import webbrowser
 from typing import Optional
 from datetime import datetime, timedelta
-from http.server import HTTPServer, SimpleHTTPRequestHandler
+from http.server import BaseHTTPRequestHandler, HTTPServer
 from pathlib import Path
 
 DEFAULT_DB = "tools/outputs/facturacion_hubspot.db"
@@ -1009,6 +1009,55 @@ def _serialize_cagr_data_for_js(cagr_data_by_months: dict[int, dict], cols: list
     return json.dumps(out)
 
 
+def build_dashboard_from_db(db_path: Path) -> str:
+    """
+    Build dashboard HTML from DB. Returns HTML string. Used for live serving so each page load
+    shows fresh data from the DB (no pre-refresh needed).
+    """
+    conn = sqlite3.connect(str(db_path))
+    metrics = get_accountant_metrics(conn)
+    churn_metrics = get_portfolio_churn_metrics(conn)
+    icp_metrics = get_company_icp_metrics(conn)
+    conn.close()
+
+    if not metrics:
+        return "<!DOCTYPE html><html><body><h1>No accountant data</h1><p>Need portfolio_12m_ago > 0.</p></body></html>"
+
+    matrix = build_matrix(metrics)
+    cagr_data_by_months: dict[int, dict] = {}
+    for months in CAGR_LOOKBACK_MONTHS_OPTIONS:
+        conn = sqlite3.connect(str(db_path))
+        growth_by_tier = get_growth_by_tier(conn, months=months)
+        deals_growth_by_tier = get_deals_growth_by_tier(conn, months=months)
+        top_accountants = get_top_accountants(conn, limit=20, order_by="mrr", months=months)
+        worst_accountants = get_top_accountants(conn, limit=20, order_by="churn_pct", months=months)
+        mrr_now_by_id, mrr_start_by_id, years = get_accountant_mrr_timeline(conn, months=months)
+        conn.close()
+        matrix_cagr = build_matrix_cagr(metrics, mrr_start_by_id, years)
+        cagr_data_by_months[months] = {
+            "growth_by_tier": growth_by_tier,
+            "deals_growth_by_tier": deals_growth_by_tier,
+            "top_accountants": top_accountants,
+            "worst_accountants": worst_accountants,
+            "matrix_cagr": matrix_cagr,
+        }
+
+    default_data = cagr_data_by_months[CAGR_LOOKBACK_DEFAULT_MONTHS]
+    top_accountants = default_data["top_accountants"]
+    worst_accountants = default_data["worst_accountants"]
+    growth_by_tier = default_data["growth_by_tier"]
+    deals_growth_by_tier = default_data["deals_growth_by_tier"]
+    matrix_cagr = default_data["matrix_cagr"]
+    cols = [pb for _, _, pb in PORTFOLIO_BUCKETS]
+    rows_order = [gb for gb, _ in GROWTH_BUCKETS]
+
+    return generate_dashboard_html(
+        matrix, matrix_cagr, metrics, cols, rows_order,
+        top_accountants, worst_accountants, churn_metrics,
+        growth_by_tier, deals_growth_by_tier, cagr_data_by_months, icp_metrics,
+    )
+
+
 def generate_dashboard_html(
     matrix: dict[tuple[str, str], float],
     matrix_cagr: Optional[dict[tuple[str, str], Optional[float]]],
@@ -1024,6 +1073,7 @@ def generate_dashboard_html(
     icp_metrics: Optional[dict] = None,
 ) -> str:
     """Generate HTML dashboard (Nubox-style layout). Includes company-wide ICP section when icp_metrics provided."""
+    generated_at = datetime.now().strftime("%Y-%m-%d %H:%M")
     total_mrr = sum(m["mrr"] for m in metrics)
     total_accountants = len(metrics)
     avg_ticket = total_mrr / total_accountants if total_accountants else 0
@@ -1078,6 +1128,18 @@ def generate_dashboard_html(
     max_related_deals = max(
         (a.get("operator_deals", 0) + a.get("consultant_deals", 0)) for a in top_accountants
     ) if top_accountants else 0
+    # Sidebar "Grow their Client Portfolio": median CAGR (annualized) of top 20 by MRR
+    cagr_values = [a.get("cagr_pct") for a in top_accountants if a.get("cagr_pct") is not None]
+    if cagr_values:
+        s = sorted(cagr_values)
+        n = len(s)
+        median_cagr_top = (s[(n - 1) // 2] + s[n // 2]) / 2
+        sidebar_goal_growth = f"{median_cagr_top:+.0f}% YoY"
+    else:
+        sidebar_goal_growth = "—"
+    # Sidebar "Manage": minimum portfolio (total_deals) among top 20
+    min_portfolio_top = min((a.get("total_deals", 0) for a in top_accountants), default=0)
+    sidebar_goal_smbs = f"{min_portfolio_top}+ SMBs" if top_accountants else "—"
 
     def cell_val(gb: str, pb: str) -> str:
         v = matrix.get((gb, pb), 0)
@@ -1503,6 +1565,7 @@ def generate_dashboard_html(
     <div class="container">
         <h1>Colppy Accountant Offices: Where We Win</h1>
         <p class="subtitle">MRR by Client Portfolio Growth and Managed Tax IDs (ICP accountants only · MRR only, not NRR · includes churned)</p>
+        <p class="detail" style="font-size:0.8rem;color:var(--text-muted);margin:-8px 0 16px 0">Generated: {generated_at} — hard refresh (Ctrl+Shift+R / Cmd+Shift+R) if you don’t see this time.</p>
 
         <div class="top-tier">
             <h2>Top Tier Accountant Offices</h2>
@@ -1554,11 +1617,11 @@ def generate_dashboard_html(
                 </div>
                 <div class="goal">
                     <span>Grow their Client Portfolio</span>
-                    <span class="goal-btn">+31% YoY</span>
+                    <span class="goal-btn">{sidebar_goal_growth}</span>
                 </div>
                 <div class="goal">
                     <span>Manage</span>
-                    <span class="goal-btn">20+ SMBs</span>
+                    <span class="goal-btn">{sidebar_goal_smbs}</span>
                 </div>
             </div>
         </div>
@@ -2004,7 +2067,6 @@ def main():
         print(f"Dashboard written to: {html_path.absolute()}")
         if args.serve:
             port = 8765
-            # Kill any process already using the port so we can reuse it
             try:
                 out = subprocess.run(
                     ["lsof", "-ti", f":{port}"],
@@ -2018,10 +2080,37 @@ def main():
                     time.sleep(0.5)
             except (FileNotFoundError, subprocess.TimeoutExpired):
                 pass
-            os.chdir(html_path.parent)
-            server = HTTPServer(("", port), SimpleHTTPRequestHandler)
-            url = f"http://localhost:{port}/{html_path.name}"
-            print(f"Serving at {url}")
+
+            def make_handler(db):
+                class DashboardHandler(BaseHTTPRequestHandler):
+                    """Serves dashboard regenerated from DB on each request (no refresh needed)."""
+
+                    def do_GET(self):
+                        if self.path in ("/", "/mrr_dashboard.html"):
+                            try:
+                                html = build_dashboard_from_db(db)
+                                self.send_response(200)
+                                self.send_header("Content-Type", "text/html; charset=utf-8")
+                                self.send_header("Content-Length", str(len(html.encode("utf-8"))))
+                                self.end_headers()
+                                self.wfile.write(html.encode("utf-8"))
+                            except Exception as e:
+                                self.send_response(500)
+                                self.send_header("Content-Type", "text/plain; charset=utf-8")
+                                self.end_headers()
+                                self.wfile.write(f"Error: {e}".encode("utf-8"))
+                        else:
+                            self.send_response(404)
+                            self.end_headers()
+
+                    def log_message(self, format, *args):
+                        pass
+
+                return DashboardHandler
+
+            server = HTTPServer(("", port), make_handler(db_path))
+            url = f"http://localhost:{port}/"
+            print(f"Serving at {url} (dashboard regenerated from DB on each request)")
             webbrowser.open(url)
             try:
                 server.serve_forever()

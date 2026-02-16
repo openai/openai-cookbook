@@ -4,6 +4,19 @@
 # should build pages for, and indicates metadata such as tags, creation date and
 # authors for each page.
 
+- title: Persistent Agent Memory with Shodh-Memory
+  path: examples/agents_sdk/persistent_memory_with_shodh.ipynb
+  slug: persistent-memory-with-shodh
+  description: Give OpenAI Agents SDK agents persistent cognitive memory with semantic search, knowledge graphs, and biological decay — all running locally as a single binary.
+  date: 2026-02-16
+  authors:
+    - varun29ankuS
+  tags:
+    - agents-sdk
+    - agents
+    - memory
+    - tools
+
 - title: Realtime Eval Guide
   path: examples/Realtime_eval_guide.ipynb
   slug: realtime-eval-guide

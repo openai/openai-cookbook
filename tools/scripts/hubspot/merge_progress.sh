@@ -8,7 +8,7 @@
 SCRIPT_DIR="$(cd "$(dirname "$0")" && pwd)"
 REPO_ROOT="$(cd "$SCRIPT_DIR/../../.." && pwd)"
 cd "$REPO_ROOT"
-DB="$REPO_ROOT/tools/outputs/facturacion_hubspot.db"
+DB="$REPO_ROOT/tools/data/facturacion_hubspot.db"
 INTERVAL="${1:-5}"
 NO_CLEAR=""
 [[ "${2:-}" == "--no-clear" || "${2:-}" == "-n" ]] && NO_CLEAR=1

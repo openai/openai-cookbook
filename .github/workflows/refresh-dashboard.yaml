@@ -22,7 +22,7 @@ on:
     - cron: '0 12 * * 1'
 
 env:
-  DB_PATH: tools/outputs/facturacion_hubspot.db
+  DB_PATH: tools/data/facturacion_hubspot.db
   FACTURACION_PATH: tools/outputs/facturacion.csv
 
 jobs:

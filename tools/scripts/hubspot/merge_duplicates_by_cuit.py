@@ -33,7 +33,7 @@ from dotenv import load_dotenv
 
 load_dotenv()
 
-DEFAULT_DB = "tools/outputs/facturacion_hubspot.db"
+DEFAULT_DB = "tools/data/facturacion_hubspot.db"
 TEST_CUIT = "20000000001"
 
 

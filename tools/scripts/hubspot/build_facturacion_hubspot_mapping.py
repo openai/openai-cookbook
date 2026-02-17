@@ -41,7 +41,7 @@ load_dotenv()
 
 EXCLUDE_CUITS = {"12345678911", "12345678901", "00000000000"}
 DEFAULT_FACTURACION = "tools/outputs/facturacion.csv"
-DEFAULT_DB = "tools/outputs/facturacion_hubspot.db"
+DEFAULT_DB = "tools/data/facturacion_hubspot.db"
 DEFAULT_CSV = "tools/outputs/facturacion_hubspot_mapping.csv"
 
 # Minimum rows to prevent accidental overwrite with empty/corrupt facturacion.csv

@@ -28,7 +28,7 @@ import webbrowser
 from http.server import HTTPServer, SimpleHTTPRequestHandler
 from pathlib import Path
 
-DEFAULT_DB = "tools/outputs/facturacion_hubspot.db"
+DEFAULT_DB = "tools/data/facturacion_hubspot.db"
 ACCOUNTANT_TYPES = ("Cuenta Contador", "Cuenta Contador y Reseller", "Contador Robado")
 ICP_ORDER = ("ICP Operador", "ICP Asesor", "ICP Híbrido", "ICP Contador", "ICP PYME")
 # Churn = deal stage indicates customer left or no revenue (Cerrado Churn, Cerrado Perdido)

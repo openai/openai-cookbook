@@ -38,7 +38,7 @@ python tools/scripts/hubspot/infer_numeric_company_names.py --db path/to/factura
 ```
 
 **Prerequisites:**
-- `tools/outputs/facturacion_hubspot.db` (from `build_facturacion_hubspot_mapping.py`)
+- `tools/data/facturacion_hubspot.db` (from `build_facturacion_hubspot_mapping.py`)
 - Tables: `companies`, `deals`, `facturacion`
 
 ## When to Use

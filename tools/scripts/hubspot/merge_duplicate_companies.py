@@ -24,7 +24,7 @@ from dotenv import load_dotenv
 
 load_dotenv()
 
-DEFAULT_DB = "tools/outputs/facturacion_hubspot.db"
+DEFAULT_DB = "tools/data/facturacion_hubspot.db"
 
 
 def merge_companies(client, primary_id: str, secondary_id: str) -> dict:

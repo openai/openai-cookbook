@@ -48,7 +48,7 @@ from dotenv import load_dotenv
 
 load_dotenv()
 
-DEFAULT_DB = "tools/outputs/facturacion_hubspot.db"
+DEFAULT_DB = "tools/data/facturacion_hubspot.db"
 
 EXCLUDE_CUITS = {"12345678911", "12345678901", "00000000000"}
 

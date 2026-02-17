@@ -4,7 +4,7 @@
 #
 # Prerequisites:
 #   - For full refresh: tools/outputs/facturacion.csv (or any facturacion*.csv there). Auto-detected.
-#   - For HTML-only refresh: tools/outputs/facturacion_hubspot.db (or any facturacion*.db there). Auto-detected.
+#   - For HTML-only refresh: tools/data/facturacion_hubspot.db (or any facturacion*.db there). Auto-detected.
 #   - HUBSPOT_API_KEY (or HUBSPOT_ACCESS_TOKEN) in .env or environment.
 #
 # Usage:
@@ -19,7 +19,7 @@ set -e
 REPO_ROOT="$(cd "$(dirname "$0")/../../.." && pwd)"
 cd "$REPO_ROOT"
 
-DB="${DB:-tools/outputs/facturacion_hubspot.db}"
+DB="${DB:-tools/data/facturacion_hubspot.db}"
 OUTPUT_DIR="${OUTPUT_DIR:-docs}"
 DASHBOARD_ONLY=false
 

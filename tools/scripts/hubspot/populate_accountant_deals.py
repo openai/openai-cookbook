@@ -38,7 +38,7 @@ from dotenv import load_dotenv
 
 load_dotenv()
 
-DEFAULT_DB = "tools/outputs/facturacion_hubspot.db"
+DEFAULT_DB = "tools/data/facturacion_hubspot.db"
 ACCOUNTANT_TYPES = ("Cuenta Contador", "Cuenta Contador y Reseller", "Contador Robado")
 DEAL_PROPERTIES = ["dealname", "id_empresa", "dealstage", "amount", "closedate", "hs_object_id"]
 

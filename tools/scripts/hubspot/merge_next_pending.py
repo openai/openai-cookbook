@@ -14,7 +14,7 @@ def main() -> int:
     stats_only = args and args[0] == "--stats"
     if stats_only:
         args = args[1:]
-    db_path = args[0] if args else "tools/outputs/facturacion_hubspot.db"
+    db_path = args[0] if args else "tools/data/facturacion_hubspot.db"
     n = int(args[1]) if len(args) > 1 and not stats_only else (0 if stats_only else 5)
 
     conn = sqlite3.connect(db_path, timeout=10)

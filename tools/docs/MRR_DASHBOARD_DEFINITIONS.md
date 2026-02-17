@@ -110,8 +110,8 @@ To keep the dashboard up to date:
 
 3. **After fixing deal associations** (e.g. redundant type 8 removal, Group 4):
    ```bash
-   python tools/scripts/hubspot/populate_deal_associations.py --db tools/outputs/facturacion_hubspot.db
-   python tools/scripts/hubspot/populate_accountant_deals.py --db tools/outputs/facturacion_hubspot.db
+   python tools/scripts/hubspot/populate_deal_associations.py --db tools/data/facturacion_hubspot.db
+   python tools/scripts/hubspot/populate_accountant_deals.py --db tools/data/facturacion_hubspot.db
    ./tools/scripts/hubspot/refresh_dashboard.sh --dashboard-only --output-dir docs
    ```
 

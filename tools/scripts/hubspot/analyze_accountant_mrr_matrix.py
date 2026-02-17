@@ -48,7 +48,7 @@ from datetime import datetime, timedelta
 from http.server import BaseHTTPRequestHandler, HTTPServer
 from pathlib import Path
 
-DEFAULT_DB = "tools/outputs/facturacion_hubspot.db"
+DEFAULT_DB = "tools/data/facturacion_hubspot.db"
 HUBSPOT_PORTAL_ID = "19877595"
 
 # Only ICP accountant companies (Cuenta Contador types)

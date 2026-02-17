@@ -30,7 +30,7 @@ from dotenv import load_dotenv
 
 load_dotenv()
 
-DEFAULT_DB = "tools/outputs/facturacion_hubspot.db"
+DEFAULT_DB = "tools/data/facturacion_hubspot.db"
 PORTAL_ID = "19877595"
 COMPANY_URL = f"https://app.hubspot.com/contacts/{PORTAL_ID}/company/{{id}}"
 

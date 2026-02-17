@@ -1541,6 +1541,10 @@ def generate_dashboard_html(
             font-size: 0.85rem;
             color: var(--text-muted);
         }}
+        .detail-generated {{
+            font-size: 0.8rem;
+            margin: -8px 0 16px 0;
+        }}
         .positive {{ color: var(--success); }}
         .negative {{ color: #ef4444; }}
         a {{ color: var(--accent); text-decoration: none; }}
@@ -1571,7 +1575,7 @@ def generate_dashboard_html(
     <div class="container">
         <h1>Colppy Accountant Offices: Where We Win</h1>
         <p class="subtitle">MRR by Client Portfolio Growth and Managed Tax IDs (ICP accountants only · MRR only, not NRR · includes churned)</p>
-        <p class="detail" style="font-size:0.8rem;color:var(--text-muted);margin:-8px 0 16px 0">Generated: {generated_at} — hard refresh (Ctrl+Shift+R / Cmd+Shift+R) if you don’t see this time.</p>
+        <p class="detail detail-generated">Generated: {generated_at} — hard refresh (Ctrl+Shift+R / Cmd+Shift+R) if you don’t see this time.</p>
 
         <div class="top-tier">
             <h2>Top Tier Accountant Offices</h2>

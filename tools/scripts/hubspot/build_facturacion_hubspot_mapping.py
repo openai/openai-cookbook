@@ -32,6 +32,7 @@ import sqlite3
 import sys
 import time
 from pathlib import Path
+from typing import Optional
 
 sys.path.insert(0, str(Path(__file__).resolve().parents[3]))
 from dotenv import load_dotenv
@@ -94,6 +95,27 @@ CREATE INDEX IF NOT EXISTS idx_companies_hubspot_id ON companies(hubspot_id);
 CREATE INDEX IF NOT EXISTS idx_deals_hubspot_id ON deals(hubspot_id);
 CREATE INDEX IF NOT EXISTS idx_deal_assoc_deal ON deal_associations(deal_hubspot_id);
 CREATE INDEX IF NOT EXISTS idx_deal_assoc_company ON deal_associations(company_hubspot_id);
+
+CREATE TABLE IF NOT EXISTS edit_logs (
+    id              INTEGER PRIMARY KEY AUTOINCREMENT,
+    timestamp       TEXT NOT NULL,
+    script          TEXT NOT NULL,
+    action          TEXT NOT NULL,
+    outcome         TEXT NOT NULL,
+    detail          TEXT,
+    deal_id         TEXT,
+    deal_name       TEXT,
+    deal_url        TEXT,
+    company_id      TEXT,
+    company_name    TEXT,
+    company_url     TEXT,
+    company_id_secondary TEXT,
+    customer_cuit   TEXT
+);
+
+CREATE INDEX IF NOT EXISTS idx_edit_logs_script ON edit_logs(script);
+CREATE INDEX IF NOT EXISTS idx_edit_logs_timestamp ON edit_logs(timestamp);
+CREATE INDEX IF NOT EXISTS idx_edit_logs_deal ON edit_logs(deal_id);
 """
 
 
@@ -101,7 +123,7 @@ CREATE INDEX IF NOT EXISTS idx_deal_assoc_company ON deal_associations(company_h
 # Helpers
 # ---------------------------------------------------------------------------
 
-def normalize_cuit(raw: str) -> str | None:
+def normalize_cuit(raw: str) -> Optional[str]:
     """Normalize CUIT to 11 digits."""
     if not raw or str(raw).strip().upper() in ("#N/A", "N/A", ""):
         return None
@@ -452,7 +474,13 @@ def export_csv(conn: sqlite3.Connection, csv_path: str):
             CASE WHEN d.id_empresa IS NOT NULL THEN 'yes' ELSE 'no' END AS deal_found
         FROM facturacion f
         LEFT JOIN companies c ON f.customer_cuit = c.cuit
-            AND c.hubspot_id = (SELECT MIN(c2.hubspot_id) FROM companies c2 WHERE c2.cuit = f.customer_cuit)
+            AND c.hubspot_id = (
+                SELECT c2.hubspot_id FROM companies c2
+                WHERE c2.cuit = f.customer_cuit AND c2.hubspot_id != ''
+                ORDER BY CASE WHEN c2.type IN ('Cuenta Contador', 'Cuenta Contador y Reseller', 'Contador Robado') THEN 0 ELSE 1 END,
+                         c2.hubspot_id
+                LIMIT 1
+            )
         LEFT JOIN deals d ON f.id_empresa = d.id_empresa
         ORDER BY f.id
     """
@@ -619,6 +647,20 @@ def main():
     # Optional CSV export
     if args.csv:
         export_csv(conn, args.csv_path)
+
+    # Log build completion to edit_logs
+    try:
+        from tools.scripts.hubspot.edit_log_db import log_edit
+        total_companies = sum(len(v) for v in cuit_to_company.values())
+        log_edit(
+            conn,
+            script="build_facturacion_hubspot_mapping",
+            action="build",
+            outcome="success",
+            detail=f"companies: {total_companies:,}, deals: {len(id_to_deal):,}, facturacion: {len(records):,}",
+        )
+    except Exception as e:
+        print(f"  Warning: Could not log to edit_logs: {e}", file=sys.stderr)
 
     conn.close()
     print(f"Database: {db_path}")

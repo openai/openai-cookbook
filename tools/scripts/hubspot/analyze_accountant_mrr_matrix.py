@@ -127,7 +127,13 @@ def get_company_icp_metrics(conn: sqlite3.Connection) -> dict:
             COUNT(DISTINCT f.customer_cuit) AS unique_cuits
         FROM facturacion f
         JOIN companies c ON f.customer_cuit = c.cuit
-          AND c.hubspot_id = (SELECT MIN(c2.hubspot_id) FROM companies c2 WHERE c2.cuit = f.customer_cuit)
+          AND c.hubspot_id = (
+            SELECT c2.hubspot_id FROM companies c2
+            WHERE c2.cuit = f.customer_cuit AND c2.hubspot_id != ''
+            ORDER BY CASE WHEN c2.type IN ('Cuenta Contador', 'Cuenta Contador y Reseller', 'Contador Robado') THEN 0 ELSE 1 END,
+                     c2.hubspot_id
+            LIMIT 1
+          )
         WHERE f.customer_cuit != ''
         GROUP BY icp
     """).fetchall()

@@ -216,37 +216,37 @@ def print_summary(conn: sqlite3.Connection):
     """).fetchone()[0]
     print(f"  Deals without PRIMARY company (type 5): {deals_no_primary:,} / {deals_total:,}")
 
-    # Facturacion rows where billing company is NOT primary on the deal
+    # Facturacion rows where billing company is NOT primary on the deal (one count per deal+cuit)
     billing_not_primary = conn.execute("""
         SELECT COUNT(*) FROM facturacion f
-        JOIN companies c ON f.customer_cuit = c.cuit
         JOIN deals d ON f.id_empresa = d.id_empresa
-        WHERE c.hubspot_id != '' AND d.hubspot_id != ''
+        WHERE d.hubspot_id != '' AND f.customer_cuit != ''
+        AND f.customer_cuit IN (SELECT cuit FROM companies WHERE hubspot_id != '')
         AND NOT EXISTS (
             SELECT 1 FROM deal_associations da
-            WHERE da.deal_hubspot_id = d.hubspot_id
-            AND da.company_hubspot_id = c.hubspot_id
+            JOIN companies c ON da.company_hubspot_id = c.hubspot_id
+            WHERE da.deal_hubspot_id = d.hubspot_id AND c.cuit = f.customer_cuit
             AND da.association_type_id = 5
         )
     """).fetchone()[0]
     billing_total = conn.execute("""
         SELECT COUNT(*) FROM facturacion f
-        JOIN companies c ON f.customer_cuit = c.cuit
         JOIN deals d ON f.id_empresa = d.id_empresa
-        WHERE c.hubspot_id != '' AND d.hubspot_id != ''
+        WHERE d.hubspot_id != '' AND f.customer_cuit != ''
+        AND f.customer_cuit IN (SELECT cuit FROM companies WHERE hubspot_id != '')
     """).fetchone()[0]
     print(f"\n  Billing company NOT primary on deal: {billing_not_primary:,} / {billing_total:,}")
 
-    # Billing company not associated at all
+    # Billing company not associated at all (one count per deal+cuit)
     billing_no_assoc = conn.execute("""
         SELECT COUNT(*) FROM facturacion f
-        JOIN companies c ON f.customer_cuit = c.cuit
         JOIN deals d ON f.id_empresa = d.id_empresa
-        WHERE c.hubspot_id != '' AND d.hubspot_id != ''
+        WHERE d.hubspot_id != '' AND f.customer_cuit != ''
+        AND f.customer_cuit IN (SELECT cuit FROM companies WHERE hubspot_id != '')
         AND NOT EXISTS (
             SELECT 1 FROM deal_associations da
-            WHERE da.deal_hubspot_id = d.hubspot_id
-            AND da.company_hubspot_id = c.hubspot_id
+            JOIN companies c ON da.company_hubspot_id = c.hubspot_id
+            WHERE da.deal_hubspot_id = d.hubspot_id AND c.cuit = f.customer_cuit
         )
     """).fetchone()[0]
     print(f"  Billing company NOT associated at all: {billing_no_assoc:,} / {billing_total:,}")
@@ -378,6 +378,19 @@ def main():
 
     # Summary
     print_summary(conn)
+
+    # Log to edit_logs
+    try:
+        from tools.scripts.hubspot.edit_log_db import log_edit
+        log_edit(
+            conn,
+            script="populate_deal_associations",
+            action="populate",
+            outcome="success",
+            detail=f"associations: {len(all_associations):,}, deals: {deals_processed:,}",
+        )
+    except Exception as e:
+        log(f"  Warning: Could not log to edit_logs: {e}")
 
     conn.close()
     log(f"Database: {db_path}")

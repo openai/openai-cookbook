@@ -83,12 +83,19 @@ def get_missing_facturacion(conn: sqlite3.Connection) -> list[dict]:
 
 
 def get_company_hubspot_id(conn: sqlite3.Connection, cuit: str) -> str | None:
-    """Get first HubSpot company ID for CUIT from companies table."""
-    if not cuit or not normalize_cuit(cuit):
+    """Get HubSpot company ID for CUIT. Prefers accountant type when multiple per CUIT."""
+    cuit_norm = normalize_cuit(cuit)
+    if not cuit_norm:
         return None
     row = conn.execute(
-        "SELECT hubspot_id FROM companies WHERE cuit = ? AND hubspot_id != '' LIMIT 1",
-        (normalize_cuit(cuit),),
+        """
+        SELECT hubspot_id FROM companies
+        WHERE cuit = ? AND hubspot_id != ''
+        ORDER BY CASE WHEN type IN ('Cuenta Contador', 'Cuenta Contador y Reseller', 'Contador Robado') THEN 0 ELSE 1 END,
+                 hubspot_id
+        LIMIT 1
+        """,
+        (cuit_norm,),
     ).fetchone()
     return row[0] if row else None
 
@@ -242,6 +249,22 @@ def main():
                     print(f"  {id_empresa}: UPDATED deal {deal_id} ({deal_name}) id_empresa {current_ie} → {id_empresa}")
                     print(f"    https://app.hubspot.com/contacts/{PORTAL_ID}/deal/{deal_id}")
                     updated += 1
+                    # Log to edit_logs
+                    conn_log = sqlite3.connect(str(db_path))
+                    try:
+                        from tools.scripts.hubspot.edit_log_db import log_edit
+                        log_edit(
+                            conn_log,
+                            script="reconcile_missing_deals",
+                            action="update_id_empresa",
+                            outcome="success",
+                            detail=f"{current_ie} → {id_empresa}",
+                            deal_id=str(deal_id),
+                            deal_name=(deal_name or "")[:200],
+                            customer_cuit=(cuit_norm or "") if cuit_norm else "",
+                        )
+                    finally:
+                        conn_log.close()
                 except Exception as e:
                     print(f"  {id_empresa}: FAILED to update deal {deal_id}: {e}")
             else:

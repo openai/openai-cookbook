@@ -74,6 +74,19 @@ alwaysApply: true
 - Include examples of how to use new functions or features in the chatbot response, not necessarily in files
 - Document dependencies and environment requirements in chatbot responses unless they're part of a formal project setup
 
+## Data Modification Workflow (HubSpot, CRM, DB, APIs)
+
+**Before executing any command that modifies external data** (HubSpot API, databases, CRM, MCP tools that write/update/delete):
+
+1. **Preview first** — Run with `--dry-run` or equivalent; show what would change
+2. **Show examples** — Present 3–5 concrete examples (records, IDs, before/after) so the user can verify
+3. **Wait for explicit approval** — Do NOT execute until the user explicitly confirms (e.g. "proceed", "execute", "go ahead", "yes")
+4. **Exception:** Only skip preview when the user explicitly says "run it" or "execute" in the same message where they request the action
+
+**Applies to:** `fix_deal_associations.py`, `merge_duplicate_companies.py`, `populate_*`, `build_*`, HubSpot batch-create/update, Intercom updates, and any script or tool that writes to external systems.
+
+**Logging (default: always on):** All HubSpot sync operations must log to `edit_logs` in `facturacion_hubspot.db` by default. Scripts: fix_deal_associations, merge_duplicate_companies, reconcile_missing_deals, build_facturacion_hubspot_mapping, populate_deal_associations, populate_accountant_deals. Use `--no-log` only when explicitly requested to skip logging.
+
 ## Data Handling & Analysis
 
 - **Never invent or assume data** when information is missing

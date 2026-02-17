@@ -70,7 +70,7 @@
 - Legacy imports or integrations
 - Deal creation creating a new company instead of linking to existing
 
-**Rule:** Treat all companies with the same normalized CUIT as the same legal entity.
+**Rule:** Treat all companies with the same normalized CUIT as the same legal entity. **One company per CUIT:** There is no reason to have multiple HubSpot companies for the same CUIT; all duplicates should be merged.
 
 **When associating deals to billing company:**
 1. **Search** with both CUIT formats → may return multiple companies
@@ -86,7 +86,7 @@
 - Check if deal has **any** company with `customer_cuit` as PRIMARY (not just one specific company)
 - Exclude false positives when deal has a different company record with same CUIT
 
-**Script:** `tools/scripts/hubspot/merge_duplicate_companies.py` for merging duplicate companies.
+**Scripts:** `merge_duplicate_companies.py` (pairwise) or `merge_duplicates_by_cuit.py` (batch). Batch script finds all CUITs in facturacion with multiple companies and merges them into one per CUIT. Primary selection: prefer company with `type` set, then prefer name not just a number. Usage: `--dry-run` to preview, `--apply` to execute, `--batch N` to limit, `--exclude-test` to skip test CUIT.
 
 ---
 
@@ -126,12 +126,14 @@ When analyzing or fixing deal–company associations:
 ## 5. Fix Workflow (No Full Populate After Each Batch)
 
 **Scripts:**
-- `fix_deal_associations.py` — fixes Groups 1 & 2, updates local `deal_associations` after each batch
+- `fix_deal_associations.py` — fixes Groups 1, 2, 3 & 4, updates local `deal_associations` after each batch
 - `populate_deal_associations.py --deals 123,456` — incremental refresh for specific deals (e.g. after merges)
 
 **Local DB updates (reconciliation):**
 - When removing PRIMARY from a company: deletes that row from `deal_associations`
 - When adding billing as PRIMARY: inserts `(deal, billing_company, type 5)`
+- When adding accountant as type 8 (Group 3): inserts `(deal, accountant_company, type 8)` — considers ALL companies per CUIT
+- When adding type 8 to accountant missing it (Group 4): inserts `(deal, company, type 8)` — for non-primary Cuenta Contador companies that have only 341
 - When fixing secondary labels (8 or 11): removes old type, inserts new type in `deal_associations`
 - Run `populate_deal_associations.py` periodically to refresh from HubSpot for full reconciliation
 
@@ -145,13 +147,17 @@ When analyzing or fixing deal–company associations:
 
 **Deal creation — confirmation required:** For facturacion rows with no matching deal in HubSpot, **do NOT create deals without explicit user confirmation**. Creation must be approved manually. The reconcile script reports "Create new deals for:" — treat this as a list requiring approval before any creation.
 
-**Log (`--log-fixed`):** Writes all outcomes to `tools/outputs/fix_deal_associations_log.csv` and prints clickable HubSpot URLs. Columns: `timestamp`, `group`, `deal_id`, `deal_name`, `deal_url`, `billing_id`, `billing_name`, `company_url`, `customer_cuit`, `outcome`, `detail`. Outcomes: `fixed` (detail: `cuit_ok`|`cuit_patched`|`cuit_alternative`), `failed` (detail: error message), `skipped` (detail: `no_customer_cuit`|`cuit_unfixable`), `dry_run` (when `--dry-run`).
+**Logging (default: always on):** All HubSpot sync scripts log to `edit_logs` in `facturacion_hubspot.db` by default. fix_deal_associations logs every fix batch; use `--no-log` to skip. Columns: `timestamp`, `script`, `action`, `outcome`, `detail`, `deal_id`, `deal_name`, `deal_url`, `company_id`, `company_name`, `company_url`, `customer_cuit`. Outcomes: `fixed` (detail: `cuit_ok`|`cuit_patched`|`cuit_alternative`), `failed` (detail: error message), `skipped` (detail: `no_customer_cuit`|`cuit_unfixable`), `dry_run` (when `--dry-run`). Merge, reconcile, build, and populate scripts also log.
+
+**Redundant type 8 removal (`--remove-redundant-type8`):** Only removes type 8 when the **same company record** has both Primary (5) and type 8 (Estudio Contable). A company cannot be both the customer and their own accountant. We do **not** remove type 8 from a different company record, even if it shares the same CUIT as Primary — deals can have multiple accountants; if the association exists, the company is an actual accountant.
 
 ---
 
 ## 6. Accountant Portfolio & Churn (MRR Matrix)
 
-**Purpose:** The MRR matrix (`analyze_accountant_mrr_matrix.py`) analyzes accountant portfolio behavior including **churned** deals. The build script only fetches deals for `id_empresa` in facturacion, so churned deals are missing by default.
+**Purpose:** The MRR matrix (`analyze_accountant_mrr_matrix.py`) analyzes accountant portfolio behavior including **churned** deals.
+
+**Team doc:** [MRR_DASHBOARD_DEFINITIONS.md](./MRR_DASHBOARD_DEFINITIONS.md) – Shareable definitions, formulas, and how the dashboard works. The build script only fetches deals for `id_empresa` in facturacion, so churned deals are missing by default.
 
 **Script:** `populate_accountant_deals.py` — fetches deals associated with accountant companies (type 8 or Cuenta Contador) from HubSpot, including those with `id_empresa` not in facturacion (churned).
 

@@ -1,6 +1,6 @@
 # HubSpot Scripts and Workflows
 
-**Last Updated:** 2026-01-26  
+**Last Updated:** 2026-02-16  
 **Purpose:** Centralized HubSpot analysis scripts and custom code workflows
 
 ---
@@ -46,6 +46,7 @@ tools/scripts/hubspot/
   - Comparison with our script approach
 - **[HUBSPOT_SCORING_CONTACTABILITY_ANALYSIS.md](../../docs/HUBSPOT_SCORING_CONTACTABILITY_ANALYSIS.md)** - Scoring and contactability analysis guide
 - **[HUBSPOT_CUSTOM_CODE_WORKFLOW_MAPPING.md](../../docs/HUBSPOT_CUSTOM_CODE_WORKFLOW_MAPPING.md)** - Documentation of HubSpot workflow custom codes
+- **[MRR_DASHBOARD_DEFINITIONS.md](../../docs/MRR_DASHBOARD_DEFINITIONS.md)** - **Team-shareable** MRR dashboard definitions, formulas, and how it works
 
 ---
 
@@ -270,6 +271,12 @@ python tools/scripts/hubspot/fix_close_date_from_history.py --csv input.csv --up
 ---
 
 ## 🔄 Recent Changes
+
+**2026-02-16:**
+- ✅ **fix_deal_associations.py** – Group 4 (accountant missing type 8), redundant type 8 removal fix
+  - Group 4: Adds type 8 to non-primary Cuenta Contador companies that have only 341
+  - `--remove-redundant-type8`: Removes type 8 when same company has both Primary and Estudio Contable (no longer requires company in `companies` table)
+- ✅ **MRR_DASHBOARD_DEFINITIONS.md** – New team-shareable doc with dashboard formulas and definitions
 
 **2026-01-26:**
 - ✅ PQL script rate limit improvements (`pql_sql_deal_relationship_analysis.py`)

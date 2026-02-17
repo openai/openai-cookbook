@@ -190,6 +190,20 @@ def main():
 
     conn = sqlite3.connect(str(db_path))
     inserted, inserted_ids = insert_deals(conn, all_deals)
+
+    # Log to edit_logs
+    try:
+        from tools.scripts.hubspot.edit_log_db import log_edit
+        log_edit(
+            conn,
+            script="populate_accountant_deals",
+            action="populate",
+            outcome="success",
+            detail=f"inserted: {inserted:,} deals (churned/accountant-associated)",
+        )
+    except Exception as e:
+        print(f"  Warning: Could not log to edit_logs: {e}", file=sys.stderr)
+
     conn.close()
 
     print(f"\nInserted {inserted:,} deals into deals table.")

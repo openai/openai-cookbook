@@ -15,13 +15,17 @@ billing company, the script removes PRIMARY from any other company on the deal.
 Groups:
   1. Missing billing: billing company not associated at all → add association (PRIMARY)
   2. Billing not PRIMARY: billing associated but not type 5 → add PRIMARY
+  3. Accountant not associated: accountant company (Cuenta Contador, etc.) matches customer_cuit
+     but is not associated with deal (type 5 or 8) → add type 8 (Estudio Contable). Considers ALL
+     companies per CUIT (not just one).
 
 Usage:
     python tools/scripts/hubspot/fix_deal_associations.py --group 1 --batch 5
     python tools/scripts/hubspot/fix_deal_associations.py --group 2 --batch 5
+    python tools/scripts/hubspot/fix_deal_associations.py --group 3 --batch 10
     python tools/scripts/hubspot/fix_deal_associations.py --status   # show counts only
     python tools/scripts/hubspot/fix_deal_associations.py --dry-run  # show what would be fixed
-    python tools/scripts/hubspot/fix_deal_associations.py --group 2 --batch 10 --log-fixed  # log all outcomes
+    python tools/scripts/hubspot/fix_deal_associations.py --group 2 --batch 10  # logs to edit_logs by default; use --no-log to skip
 
 Fix association label (change type 11 → 8 for accountant company):
     python tools/scripts/hubspot/fix_deal_associations.py --fix-label 9424153860 9019047084 --remove 11 --add 8
@@ -33,7 +37,6 @@ After each fix batch, an audit corrects type 8/11 labels when company.type is nu
 See tools/docs/HUBSPOT_DEAL_COMPANY_ASSOCIATION_RULES.md section 0.1.
 """
 import argparse
-import csv
 import re
 import sqlite3
 import sys
@@ -46,8 +49,6 @@ from dotenv import load_dotenv
 load_dotenv()
 
 DEFAULT_DB = "tools/outputs/facturacion_hubspot.db"
-_PROJECT_ROOT = Path(__file__).resolve().parents[3]
-DEFAULT_LOG = str(_PROJECT_ROOT / "tools" / "outputs" / "fix_deal_associations_log.csv")
 
 EXCLUDE_CUITS = {"12345678911", "12345678901", "00000000000"}
 
@@ -575,8 +576,160 @@ ORDER BY CAST(d.amount AS INTEGER) DESC
 """
 
 
+def _get_group3_candidates(conn: sqlite3.Connection) -> list[dict]:
+    """
+    Group 3: Deals where facturacion.customer_cuit matches an accountant company
+    (Cuenta Contador, etc.) that is NOT associated with the deal (type 5 or 8).
+    Considers ALL companies per CUIT (not just one).
+    Skips when deal already has ANY company with that customer_cuit as PRIMARY (redundant).
+    Returns list of {deal_id, deal_name, accountant_id, accountant_name, amount, customer_cuit}.
+    """
+    accountants = conn.execute("""
+        SELECT hubspot_id, name, cuit FROM companies
+        WHERE type IN ('Cuenta Contador', 'Cuenta Contador y Reseller', 'Contador Robado')
+        AND cuit IS NOT NULL AND TRIM(cuit) != '' AND hubspot_id != ''
+    """).fetchall()
+    cuit_to_accs: dict[str, list[tuple[str, str]]] = {}
+    for r in accountants:
+        c = _normalize_cuit(r[2])
+        if c and len(c) == 11:
+            cuit_to_accs.setdefault(c, []).append((r[0], r[1]))
+    rows = conn.execute("""
+        SELECT f.customer_cuit, f.id_empresa, f.amount, d.hubspot_id, d.deal_name
+        FROM facturacion f
+        JOIN deals d ON f.id_empresa = d.id_empresa
+        WHERE d.deal_stage IN ('closedwon', '34692158')
+        AND d.hubspot_id != '' AND f.customer_cuit != ''
+    """).fetchall()
+    candidates: list[dict] = []
+    seen: set[tuple[str, str]] = set()
+    for r in rows:
+        c = _normalize_cuit(r[0])
+        if not c or len(c) != 11:
+            continue
+        # Skip if deal already has ANY company with this CUIT as PRIMARY (redundant)
+        has_primary_same_cuit = conn.execute(
+            """
+            SELECT 1 FROM deal_associations da
+            JOIN companies c ON da.company_hubspot_id = c.hubspot_id
+            WHERE da.deal_hubspot_id = ? AND da.association_type_id = 5
+            AND (REPLACE(REPLACE(c.cuit,'-',''),' ','') = ? OR c.cuit = ?)
+            """,
+            (r[3], c, r[0]),
+        ).fetchone()
+        if has_primary_same_cuit:
+            continue
+        for acc_id, acc_name in cuit_to_accs.get(c, []):
+            if (r[3], acc_id) in seen:
+                continue
+            assoc = conn.execute(
+                "SELECT 1 FROM deal_associations WHERE deal_hubspot_id=? AND company_hubspot_id=? AND association_type_id IN (5, 8)",
+                (r[3], acc_id),
+            ).fetchone()
+            if assoc is None:
+                seen.add((r[3], acc_id))
+                candidates.append({
+                    "deal_id": r[3],
+                    "deal_name": r[4],
+                    "billing_id": acc_id,
+                    "billing_name": acc_name,
+                    "amount": r[2],
+                    "id_empresa": r[1],
+                    "customer_cuit": r[0],
+                })
+    candidates.sort(key=lambda x: float(x.get("amount") or 0), reverse=True)
+    return candidates
+
+
+def _get_redundant_type8(conn: sqlite3.Connection) -> list[dict]:
+    """
+    Type 8 associations that are redundant: the SAME company record has both PRIMARY (5) and
+    type 8 (Estudio Contable). A company cannot be both the customer and their own accountant.
+
+    IMPORTANT: We only remove when it's the SAME company (same hubspot_id). We do NOT remove
+    type 8 from a different company record, even if it shares the same CUIT as the Primary.
+    A deal can have multiple accountants (multiple type 8 associations); if the association
+    exists, the company is an actual accountant (not Primary). Different company records
+    with same CUIT may be valid (e.g. Cuenta Pyme vs Cuenta Contador views).
+    """
+    rows = conn.execute("""
+        WITH deal_primary AS (
+            SELECT da.deal_hubspot_id, da.company_hubspot_id
+            FROM deal_associations da
+            WHERE da.association_type_id = 5
+        ),
+        deal_type8 AS (
+            SELECT da.deal_hubspot_id, da.company_hubspot_id
+            FROM deal_associations da
+            WHERE da.association_type_id = 8
+        )
+        SELECT dp.deal_hubspot_id, dp.company_hubspot_id
+        FROM deal_primary dp
+        JOIN deal_type8 dt ON dp.deal_hubspot_id = dt.deal_hubspot_id
+            AND dp.company_hubspot_id = dt.company_hubspot_id
+    """).fetchall()
+    result = []
+    for r in rows:
+        deal_name = conn.execute("SELECT deal_name FROM deals WHERE hubspot_id = ?", (r[0],)).fetchone()
+        company = conn.execute("SELECT name, cuit FROM companies WHERE hubspot_id = ?", (r[1],)).fetchone()
+        result.append({
+            "deal_id": r[0],
+            "deal_name": (deal_name[0] if deal_name else "")[:60],
+            "company_id": r[1],
+            "company_name": (company[0] if company and company[0] else r[1])[:60],
+            "cuit": company[1] if company and company[1] else "",
+        })
+    return result
+
+
+def _get_group4_candidates(conn: sqlite3.Connection) -> list[dict]:
+    """
+    Group 4: Non-primary companies that are accountants (type Cuenta Contador, etc.) and
+    associated with a deal, but missing type 8 (Estudio Contable). Add type 8 to them.
+
+    Example: RPA Consulting (Cuenta Contador) associated with deal 66535 - PICNIC
+    with only type 341 — should have type 8.
+    """
+    rows = conn.execute("""
+        SELECT DISTINCT da.deal_hubspot_id, da.company_hubspot_id, c.name,
+               d.deal_name, CAST(d.amount AS INTEGER)
+        FROM deal_associations da
+        JOIN companies c ON da.company_hubspot_id = c.hubspot_id
+        JOIN deals d ON da.deal_hubspot_id = d.hubspot_id
+        WHERE c.type IN ('Cuenta Contador', 'Cuenta Contador y Reseller', 'Contador Robado')
+        AND d.deal_stage IN ('closedwon', '34692158')
+        AND NOT EXISTS (
+            SELECT 1 FROM deal_associations da2
+            WHERE da2.deal_hubspot_id = da.deal_hubspot_id
+              AND da2.company_hubspot_id = da.company_hubspot_id
+              AND da2.association_type_id = 5
+        )
+        AND NOT EXISTS (
+            SELECT 1 FROM deal_associations da2
+            WHERE da2.deal_hubspot_id = da.deal_hubspot_id
+              AND da2.company_hubspot_id = da.company_hubspot_id
+              AND da2.association_type_id = 8
+        )
+        ORDER BY CAST(d.amount AS INTEGER) DESC
+    """).fetchall()
+    return [
+        {
+            "deal_id": r[0],
+            "deal_name": (r[3] or "")[:60],
+            "billing_id": r[1],
+            "billing_name": (r[2] or "")[:60],
+            "amount": r[4],
+            "customer_cuit": "",
+        }
+        for r in rows
+    ]
+
+
 def get_group_batch(conn: sqlite3.Connection, group: int, limit: int, offset: int) -> list[dict]:
     """Get next batch of deals to fix for given group."""
+    if group in (3, 4):
+        candidates = _get_group3_candidates(conn) if group == 3 else _get_group4_candidates(conn)
+        return candidates[offset : offset + limit]
     sql = SQL_GROUP1 if group == 1 else SQL_GROUP2
     sql += f" LIMIT {limit} OFFSET {offset}"
     rows = conn.execute(sql).fetchall()
@@ -596,6 +749,10 @@ def get_group_batch(conn: sqlite3.Connection, group: int, limit: int, offset: in
 
 def get_group_count(conn: sqlite3.Connection, group: int) -> int:
     """Get total count for group."""
+    if group == 3:
+        return len(_get_group3_candidates(conn))
+    if group == 4:
+        return len(_get_group4_candidates(conn))
     sql = SQL_GROUP1 if group == 1 else SQL_GROUP2
     sql = "SELECT COUNT(*) FROM (" + sql.replace("\n", " ") + ")"
     return conn.execute(sql).fetchone()[0]
@@ -603,9 +760,10 @@ def get_group_count(conn: sqlite3.Connection, group: int) -> int:
 
 def insert_association_local(conn: sqlite3.Connection, deal_id: str, company_id: str, type_id: int = 5):
     """Insert association locally after successful API call."""
+    cat = "USER_DEFINED" if type_id in USER_DEFINED_TYPES else "HUBSPOT_DEFINED"
     conn.execute(
         "INSERT OR REPLACE INTO deal_associations (deal_hubspot_id, company_hubspot_id, association_type_id, association_category) VALUES (?, ?, ?, ?)",
-        (deal_id, company_id, type_id, "HUBSPOT_DEFINED"),
+        (deal_id, company_id, type_id, cat),
     )
     conn.commit()
 
@@ -706,10 +864,6 @@ def fix_association_label(
 
 
 HUBSPOT_PORTAL = "19877595"
-LOG_HEADER = [
-    "timestamp", "group", "deal_id", "deal_name", "deal_url", "billing_id", "billing_name",
-    "company_url", "customer_cuit", "outcome", "detail",
-]
 
 
 def _hubspot_deal_url(deal_id: str) -> str:
@@ -746,67 +900,49 @@ def _print_batch_preview(batch: list[dict], group: int, offset: int) -> None:
     print("-" * 100)
 
 
-def _log_outcomes(
-    log_path: Path,
-    group: int,
-    outcomes: list[dict],
-) -> None:
+def _log_outcomes_to_db(conn: sqlite3.Connection, group: int, outcomes: list[dict]) -> int:
     """
-    Append all deal outcomes to a CSV log file.
+    Append all deal outcomes to edit_logs table in DB.
 
     Args:
-        log_path: Path to CSV log file
-        group: Group number (1 or 2)
+        conn: SQLite connection
+        group: Group number (1, 2, 3, or 4)
         outcomes: List of {deal_id, deal_name, billing_id, billing_name, customer_cuit, outcome, detail}
+
+    Returns:
+        Number of rows inserted
     """
-    log_path.parent.mkdir(parents=True, exist_ok=True)
-    file_exists = log_path.exists()
-    ts = datetime.now(timezone.utc).strftime("%Y-%m-%dT%H:%M:%SZ")
-    with open(log_path, "a", newline="", encoding="utf-8") as f:
-        writer = csv.writer(f)
-        if not file_exists:
-            writer.writerow(LOG_HEADER)
-        for r in outcomes:
-            deal_id = str(r.get("deal_id", ""))
-            billing_id = str(r.get("billing_id", ""))
-            writer.writerow([
-                ts,
-                group,
-                deal_id,
-                (r.get("deal_name") or "")[:200],
-                _hubspot_deal_url(deal_id) if deal_id else "",
-                billing_id,
-                (r.get("billing_name") or "")[:200],
-                _hubspot_company_url(billing_id) if billing_id else "",
-                (r.get("customer_cuit") or ""),
-                r.get("outcome", ""),
-                (r.get("detail") or "")[:500],
-            ])
+    from tools.scripts.hubspot.edit_log_db import log_edits_batch
+
+    action = f"group_{group}"
+    return log_edits_batch(conn, "fix_deal_associations", action, outcomes)
 
 
-def _show_log_result(log_path: Path, limit: int = 50) -> None:
-    """Print the last N lines of the log file with clickable HubSpot URLs."""
-    if not log_path.exists():
+def _show_log_result(conn: sqlite3.Connection, limit: int = 50) -> None:
+    """Print the last N entries from edit_logs with clickable HubSpot URLs."""
+    try:
+        rows = conn.execute(
+            """
+            SELECT deal_id, deal_name, deal_url, company_id, company_url, outcome
+            FROM edit_logs
+            WHERE script = 'fix_deal_associations'
+            ORDER BY id DESC
+            LIMIT ?
+            """,
+            (limit,),
+        ).fetchall()
+    except sqlite3.OperationalError:
         return
-    with open(log_path, encoding="utf-8") as f:
-        rows = list(csv.DictReader(f))
     if not rows:
         return
     print("\n" + "=" * 60)
     print("LOG RESULT (last entries) — click links below")
     print("=" * 60)
-    to_show = rows[-limit:] if len(rows) > limit else rows
-    for r in to_show:
-        deal_id = str(r.get("deal_id", ""))
-        billing_id = str(r.get("billing_id", ""))
-        # Guard: billing_id may be misaligned in old-format files (no deal_url column)
-        if billing_id.startswith("http"):
-            billing_id = ""
-        deal_url = r.get("deal_url") or (_hubspot_deal_url(deal_id) if deal_id else "")
-        company_url = r.get("company_url") or (_hubspot_company_url(billing_id) if billing_id and not billing_id.startswith("http") else "")
-        outcome = r.get("outcome", "")
-        deal_name = (r.get("deal_name") or "")[:40]
-        print(f"  {deal_name} | {outcome}")
+    for r in rows:
+        deal_id, deal_name, deal_url, company_id, company_url, outcome = r
+        deal_url = deal_url or _hubspot_deal_url(deal_id or "")
+        company_url = company_url or _hubspot_company_url(company_id or "")
+        print(f"  {(deal_name or '')[:40]} | {outcome}")
         print(f"    Deal: {deal_url}")
         print(f"    Company: {company_url}")
     print("=" * 60)
@@ -815,16 +951,16 @@ def _show_log_result(log_path: Path, limit: int = 50) -> None:
 def main():
     parser = argparse.ArgumentParser(description="Fix deal–company associations (Groups 1 & 2)")
     parser.add_argument("--db", default=DEFAULT_DB, help="SQLite database path")
-    parser.add_argument("--group", type=int, choices=[1, 2], help="Group to fix: 1=missing, 2=not PRIMARY")
+    parser.add_argument("--group", type=int, choices=[1, 2, 3, 4], help="Group to fix: 1=missing, 2=not PRIMARY, 3=accountant type 8, 4=accountant missing type 8")
     parser.add_argument("--batch", type=int, default=5, help="Batch size (default 5)")
     parser.add_argument("--offset", type=int, default=0, help="Offset for pagination")
     parser.add_argument("--status", action="store_true", help="Show group counts only")
     parser.add_argument("--dry-run", action="store_true", help="Show what would be fixed, no API calls")
-    parser.add_argument("--log-fixed", action="store_true", help="Log all outcomes (fixed, failed, skipped) to CSV and show result")
-    parser.add_argument("--log-path", default=DEFAULT_LOG, help=f"Log file path (default: {DEFAULT_LOG})")
+    parser.add_argument("--no-log", action="store_true", help="Skip logging to edit_logs (default: always log)")
     parser.add_argument("--fix-label", nargs=2, metavar=("DEAL_ID", "COMPANY_ID"), help="Fix association labels: deal_id company_id")
     parser.add_argument("--remove", type=int, nargs="+", default=[], help="Type IDs to archive (e.g. 11)")
     parser.add_argument("--add", type=int, nargs="+", default=[], help="Type IDs to add (e.g. 8)")
+    parser.add_argument("--remove-redundant-type8", action="store_true", help="Remove type 8 only when SAME company has both Primary and type 8 (redundant). Use --dry-run to preview.")
     args = parser.parse_args()
 
     # --fix-label mode: change association label (e.g. type 11 → 8)
@@ -843,6 +979,23 @@ def main():
             add_type_ids=args.add or [],
             dry_run=args.dry_run,
         )
+        # Log to edit_logs (default: always)
+        db_path = Path(args.db)
+        if success and not args.no_log and db_path.exists():
+            conn = sqlite3.connect(str(db_path))
+            try:
+                from tools.scripts.hubspot.edit_log_db import log_edit
+                log_edit(
+                    conn,
+                    script="fix_deal_associations",
+                    action="fix_label",
+                    outcome="dry_run" if args.dry_run else "fixed",
+                    detail=f"remove={args.remove} add={args.add}",
+                    deal_id=str(deal_id),
+                    company_id=str(company_id),
+                )
+            finally:
+                conn.close()
         if success:
             print(f"  Result: {msg}")
             return 0
@@ -859,16 +1012,79 @@ def main():
     if args.status:
         c1 = get_group_count(conn, 1)
         c2 = get_group_count(conn, 2)
+        c3 = get_group_count(conn, 3)
+        redundant = len(_get_redundant_type8(conn))
         print("DEAL ASSOCIATION FIX STATUS")
         print("=" * 50)
+        c4 = get_group_count(conn, 4)
         print(f"  Group 1 (billing NOT associated):  {c1:,}")
         print(f"  Group 2 (billing not PRIMARY):    {c2:,}")
-        print(f"  Total to fix:                     {c1 + c2:,}")
+        print(f"  Group 3 (accountant not type 8):  {c3:,}")
+        print(f"  Group 4 (accountant missing type 8): {c4:,}")
+        print(f"  Redundant type 8 (same company Primary+8): {redundant:,}")
+        print(f"  Total to fix:                     {c1 + c2 + c3 + c4:,}")
+        conn.close()
+        return 0
+
+    # --remove-redundant-type8: remove type 8 where same CUIT is already PRIMARY
+    if args.remove_redundant_type8:
+        redundant = _get_redundant_type8(conn)
+        print("=" * 90)
+        print("REDUNDANT TYPE 8 ASSOCIATIONS (same company has both Primary + type 8 — would remove)")
+        print("=" * 90)
+        print(f"\nTotal: {len(redundant)}")
+        print(f"\n{'#':<4} {'Deal ID':<14} {'Deal Name':<45} {'Company ID':<14} {'Company Name':<35} {'CUIT'}")
+        print("-" * 90)
+        portal = HUBSPOT_PORTAL
+        for i, r in enumerate(redundant[:25], 1):
+            print(f"{i:<4} {r['deal_id']:<14} {(r['deal_name'] or '')[:42]:<45} {r['company_id']:<14} {(r['company_name'] or '')[:32]:<35} {r.get('cuit','')}")
+        if len(redundant) > 25:
+            print(f"... and {len(redundant) - 25} more")
+        print("\n--- HUBSPOT LINKS (first 5) ---")
+        for i, r in enumerate(redundant[:5]):
+            print(f"  Deal: https://app.hubspot.com/contacts/{portal}/deal/{r['deal_id']}")
+            print(f"  Company (type 8 to remove): https://app.hubspot.com/contacts/{portal}/company/{r['company_id']}")
+        if args.dry_run:
+            print("\n[DRY-RUN] No changes made. Run without --dry-run to remove these associations.")
+            if not args.no_log and redundant:
+                from tools.scripts.hubspot.edit_log_db import log_edits_batch
+                outcomes = [
+                    {"deal_id": r["deal_id"], "deal_name": r["deal_name"], "billing_id": r["company_id"],
+                     "billing_name": r["company_name"], "customer_cuit": r.get("cuit", ""),
+                     "outcome": "dry_run", "detail": "redundant_type8_remove"}
+                    for r in redundant
+                ]
+                n = log_edits_batch(conn, "fix_deal_associations", "remove_redundant_type8", outcomes)
+                print(f"  Logged {n} to edit_logs (dry-run)")
+        else:
+            from tools.hubspot_api.client import get_hubspot_client
+            client = get_hubspot_client()
+            ok, fail = 0, 0
+            outcomes = []
+            for r in redundant:
+                success, msg = fix_association_label(
+                    client, r["deal_id"], r["company_id"],
+                    remove_type_ids=[8], add_type_ids=[],
+                    dry_run=False, quiet=True,
+                )
+                if success:
+                    delete_association_local(conn, r["deal_id"], r["company_id"], 8)
+                    ok += 1
+                    outcomes.append({"deal_id": r["deal_id"], "deal_name": r["deal_name"], "billing_id": r["company_id"], "billing_name": r["company_name"], "customer_cuit": r.get("cuit", ""), "outcome": "fixed", "detail": "redundant_type8_removed"})
+                else:
+                    print(f"  Failed deal {r['deal_id']} → company {r['company_id']}: {msg}", file=sys.stderr)
+                    fail += 1
+                    outcomes.append({"deal_id": r["deal_id"], "deal_name": r["deal_name"], "billing_id": r["company_id"], "billing_name": r["company_name"], "customer_cuit": r.get("cuit", ""), "outcome": "failed", "detail": str(msg)[:500]})
+            if not args.no_log and outcomes:
+                from tools.scripts.hubspot.edit_log_db import log_edits_batch
+                n = log_edits_batch(conn, "fix_deal_associations", "remove_redundant_type8", outcomes)
+                print(f"  Logged {n} to edit_logs")
+            print(f"\nRemoved type 8 from {ok} associations. Failed: {fail}. Local DB updated.")
         conn.close()
         return 0
 
     if not args.group:
-        print("ERROR: Use --group 1 or --group 2 (or --status for counts)", file=sys.stderr)
+        print("ERROR: Use --group 1, 2, 3, or 4 (or --status for counts)", file=sys.stderr)
         return 1
 
     from tools.hubspot_api.client import get_hubspot_client
@@ -887,15 +1103,58 @@ def main():
 
     _print_batch_preview(batch, args.group, args.offset)
 
+    # Group 3 & 4: Add accountant as type 8 (Estudio Contable) — different flow from Group 1/2
+    if args.group in (3, 4):
+        if args.dry_run:
+            print(f"\nDRY-RUN: Would add type 8 (Estudio Contable) to these deal–accountant pairs (Group {args.group}):")
+            for r in batch:
+                print(f"  {r['deal_id']} {r['deal_name'][:45]} → {r['billing_id']} {r['billing_name'][:35]}")
+            conn.close()
+            return 0
+        inputs = [
+            {
+                "from": {"id": r["deal_id"]},
+                "to": {"id": r["billing_id"]},
+                "types": [{"associationCategory": "USER_DEFINED", "associationTypeId": 8}],
+            }
+            for r in batch
+        ]
+        failed = []
+        try:
+            client.post(
+                "crm/v4/associations/deals/companies/batch/create",
+                json_data={"inputs": inputs},
+            )
+            for r in batch:
+                insert_association_local(conn, r["deal_id"], r["billing_id"], 8)
+            print(f"Fixed {len(batch)} deal–accountant associations (type 8). Local DB updated.")
+        except Exception as e:
+            print(f"  Failed batch create: {e}", file=sys.stderr)
+            failed = [(r["deal_id"], str(e)) for r in batch]
+        if not args.no_log and batch:
+            failed_by_deal = {d: err for d, err in failed}
+            outcomes = [
+                {"deal_id": r["deal_id"], "deal_name": r["deal_name"], "billing_id": r["billing_id"],
+                 "billing_name": r["billing_name"], "customer_cuit": r.get("customer_cuit", ""),
+                 "outcome": "failed" if r["deal_id"] in failed_by_deal else "fixed",
+                 "detail": failed_by_deal.get(r["deal_id"], "type_8_added")[:500]}
+                for r in batch
+            ]
+            n = _log_outcomes_to_db(conn, 3, outcomes)
+            print(f"  Logged {n} outcomes to edit_logs")
+            _show_log_result(conn)
+        conn.close()
+        return 0
+
     # Verify CUIT on each company; fix (PATCH or find alternative) when missing
     cuit_by_deal = {r["deal_id"]: (r.get("customer_cuit") or "") for r in batch}
     to_fix, verify_outcomes = _verify_and_fix_companies(client, batch, cuit_by_deal)
     if not to_fix:
         print("  No deals to fix (all skipped or unfixable).")
-        if args.log_fixed and verify_outcomes:
-            log_path = Path(args.log_path)
-            _log_outcomes(log_path, args.group, verify_outcomes)
-            _show_log_result(log_path)
+        if not args.no_log and verify_outcomes:
+            n = _log_outcomes_to_db(conn, args.group, verify_outcomes)
+            print(f"  Logged {n} outcomes to edit_logs")
+            _show_log_result(conn)
         conn.close()
         return 0
 
@@ -910,14 +1169,14 @@ def main():
             print(f"    Deal: {deal_url}")
             if company_url:
                 print(f"    Company: {company_url}")
-        if args.log_fixed and verify_outcomes:
+        if not args.no_log and verify_outcomes:
             dry_outcomes = [
                 {**o, "outcome": "dry_run" if o.get("outcome") == "to_fix" else o.get("outcome")}
                 for o in verify_outcomes
             ]
-            log_path = Path(args.log_path)
-            _log_outcomes(log_path, args.group, dry_outcomes)
-            _show_log_result(log_path)
+            n = _log_outcomes_to_db(conn, args.group, dry_outcomes)
+            print(f"  Logged {n} outcomes to edit_logs (dry-run)")
+            _show_log_result(conn)
         conn.close()
         return 0
 
@@ -1017,11 +1276,10 @@ def main():
         else:
             final_outcomes.append({**o, "outcome": "fixed"})  # detail kept: cuit_ok|cuit_patched|cuit_alternative
 
-    if args.log_fixed and final_outcomes:
-        log_path = Path(args.log_path)
-        _log_outcomes(log_path, args.group, final_outcomes)
-        print(f"  Logged {len(final_outcomes)} outcomes to {log_path}")
-        _show_log_result(log_path)
+    if not args.no_log and final_outcomes:
+        n = _log_outcomes_to_db(conn, args.group, final_outcomes)
+        print(f"  Logged {n} outcomes to edit_logs")
+        _show_log_result(conn)
     if failed:
         print(f"Fixed {fixed_count} deals. {len(failed)} failed. Local DB updated.")
     else:

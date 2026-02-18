@@ -1100,7 +1100,7 @@ def generate_dashboard_html(
             mrr = data.get("mrr", 0)
             cuits = data.get("unique_cuits", 0)
             if mrr > 0 or cuits > 0 or churn > 0:
-                icp_cards += f'<div class="card" style="min-width:160px"><h2 style="font-size:0.9rem;margin:0 0 8px 0;color:var(--text-muted)">{icp}</h2><div class="value" style="font-size:1.2rem">{format_ars(mrr)}</div><div class="detail" style="font-size:0.8rem;margin-top:6px">{cuits:,} CUITs · {churn} churn</div></div>'
+                icp_cards += f'<div class="card icp-card-wide"><h2>{icp}</h2><div class="value">{format_ars(mrr)}</div><div class="detail icp-card-detail-mt">{cuits:,} CUITs · {churn} churn</div></div>'
         churn_rows = "".join(
             f'<tr><td>{icp}</td><td class="num">{im.get("churn_by_icp", {}).get(icp, 0)}</td></tr>'
             for icp in ICP_ORDER if im.get("churn_by_icp", {}).get(icp, 0) > 0
@@ -1112,21 +1112,21 @@ def generate_dashboard_html(
         if not churn_month_rows:
             churn_month_rows = '<tr><td colspan="2">No churn with close_date in last 12 months</td></tr>'
         icp_section_html = f'''
-        <div class="matrix-card" id="company-icp" style="margin-top: 24px;">
-            <h2 style="margin:0 0 16px 0;font-size:1.1rem">Company-wide: revenue by ICP</h2>
-            <p class="detail" style="margin-bottom:16px;font-size:0.85rem;color:var(--text-muted)">All paying customers (facturacion). ICP = tipo_icp_contador (Operador/Asesor/Híbrido) or type (Contador/PYME). Churn = deal_stage closedlost or 31849274.</p>
-            <div class="grid" style="display:grid;grid-template-columns:repeat(auto-fit, minmax(160px, 1fr));gap:12px;margin-bottom:20px">
-                <div class="card" style="min-width:140px"><h2 style="font-size:0.9rem;margin:0 0 8px 0;color:var(--text-muted)">Paying Customers</h2><div class="value" style="font-size:1.2rem">{im["paying_customers"]:,}</div><div class="detail" style="font-size:0.8rem">Unique CUITs billed</div></div>
-                <div class="card" style="min-width:140px"><h2 style="font-size:0.9rem;margin:0 0 8px 0;color:var(--text-muted)">Total MRR</h2><div class="value" style="font-size:1.2rem">{format_ars(im["total_mrr"])}</div><div class="detail" style="font-size:0.8rem">From facturacion</div></div>
-                <div class="card churn-card" style="min-width:140px;border-left:4px solid var(--warning)"><h2 style="font-size:0.9rem;margin:0 0 8px 0;color:var(--text-muted)">Churn Deals</h2><div class="value" style="font-size:1.2rem">{im["churn_total"]}</div><div class="detail" style="font-size:0.8rem">{im["churn_rate"]:.1f}% churn rate</div></div>
+        <div class="matrix-card" id="company-icp">
+            <h2 class="icp-section-title">Company-wide: revenue by ICP</h2>
+            <p class="detail detail-icp-intro">All paying customers (facturacion). ICP = tipo_icp_contador (Operador/Asesor/Híbrido) or type (Contador/PYME). Churn = deal_stage closedlost or 31849274.</p>
+            <div class="icp-grid">
+                <div class="card icp-card"><h2>Paying Customers</h2><div class="value">{im["paying_customers"]:,}</div><div class="detail">Unique CUITs billed</div></div>
+                <div class="card icp-card"><h2>Total MRR</h2><div class="value">{format_ars(im["total_mrr"])}</div><div class="detail">From facturacion</div></div>
+                <div class="card churn-card icp-card"><h2>Churn Deals</h2><div class="value">{im["churn_total"]}</div><div class="detail">{im["churn_rate"]:.1f}% churn rate</div></div>
             </div>
-            <div class="grid" style="display:grid;grid-template-columns:repeat(auto-fit, minmax(160px, 1fr));gap:12px;margin-bottom:20px">{icp_cards}</div>
-            <table class="sortable" style="width:100%;border-collapse:collapse;font-size:0.9rem;margin-bottom:16px">
+            <div class="icp-grid">{icp_cards}</div>
+            <table class="sortable icp-table icp-table-mb">
                 <thead><tr><th>ICP</th><th class="num">Churn Deals</th></tr></thead>
                 <tbody>{churn_rows}</tbody>
             </table>
-            <p class="detail" style="font-size:0.8rem;margin-bottom:8px">Churn by month (close_date). Last 12 months.</p>
-            <table class="sortable" style="width:100%;border-collapse:collapse;font-size:0.9rem">
+            <p class="detail detail-churn-label">Churn by month (close_date). Last 12 months.</p>
+            <table class="sortable icp-table">
                 <thead><tr><th>Month</th><th class="num">Churn Deals</th></tr></thead>
                 <tbody>{churn_month_rows}</tbody>
             </table>
@@ -1155,7 +1155,7 @@ def generate_dashboard_html(
         if not cagr_rows:
             return ""
         th_cols = "".join(f'<th data-col-id="pb-{pb}">Managed Tax IDs: {pb}</th>' for pb in cols)
-        return f'<div style="display:flex;align-items:center;justify-content:space-between;flex-wrap:wrap;gap:8px;margin:20px 0 8px 0"><h3 style="font-size:0.95rem;margin:0;color:var(--text)">CAGR (MRR) by Segment (rolling)</h3><div class="col-toggle" data-table-id="cagr-matrix"><button type="button" class="col-toggle-btn">Columns</button><div class="col-toggle-dropdown"></div></div></div><table class="sortable" data-table-id="cagr-matrix"><thead><tr><th data-col-id="growth">Accountant\'s Client Portfolio Growth</th>{th_cols}</tr></thead><tbody id="cagr-matrix-tbody">{cagr_rows}</tbody></table><p class="detail" style="margin:12px 0 0 0;font-size:0.8rem;color:var(--text-muted)">CAGR = (MRR_now / MRR_at_start)^(1/years) - 1. Same dimensions as MRR matrix.</p>'
+        return f'<div class="cagr-section-header"><h3>CAGR (MRR) by Segment (rolling)</h3><div class="col-toggle" data-table-id="cagr-matrix"><button type="button" class="col-toggle-btn">Columns</button><div class="col-toggle-dropdown"></div></div></div><table class="sortable" data-table-id="cagr-matrix"><thead><tr><th data-col-id="growth">Accountant\'s Client Portfolio Growth</th>{th_cols}</tr></thead><tbody id="cagr-matrix-tbody">{cagr_rows}</tbody></table><p class="detail detail-cagr-formula">CAGR = (MRR_now / MRR_at_start)^(1/years) - 1. Same dimensions as MRR matrix.</p>'
 
     def cell_cagr_val(gb: str, pb: str) -> str:
         c = matrix_cagr.get((gb, pb)) if matrix_cagr else None
@@ -1346,12 +1346,12 @@ def generate_dashboard_html(
             for m in cagr_options
         )
         cagr_dropdown_html = f'''
-        <div class="cagr-period-control" style="margin:20px 0 12px 0;display:flex;align-items:center;gap:12px;">
-            <label for="cagr-period-select" style="font-size:0.9rem;color:var(--text-muted)">CAGR period (rolling):</label>
-            <select id="cagr-period-select" style="padding:6px 12px;border-radius:8px;background:var(--card);border:1px solid var(--border);color:var(--text);font-size:0.9rem;">
+        <div class="cagr-period-control">
+            <label for="cagr-period-select">CAGR period (rolling):</label>
+            <select id="cagr-period-select">
                 {opts}
             </select>
-            <span id="cagr-cutoff-span" class="detail" style="font-size:0.85rem;">Start: {default_cutoff}</span>
+            <span id="cagr-cutoff-span" class="detail">Start: {default_cutoff}</span>
         </div>'''
         cagr_data_json = _serialize_cagr_data_for_js(cagr_data_by_months, cols, rows_order)
 
@@ -1446,13 +1446,67 @@ def generate_dashboard_html(
             overflow-x: auto;
             border: 1px solid var(--border);
         }}
+        #company-icp {{
+            margin-top: 24px;
+        }}
+        #company-icp .icp-section-title {{
+            margin: 0 0 16px 0;
+            font-size: 1.1rem;
+        }}
+        #company-icp .detail-icp-intro {{
+            margin-bottom: 16px;
+            font-size: 0.85rem;
+            color: var(--text-muted);
+        }}
+        #company-icp .icp-grid {{
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(160px, 1fr));
+            gap: 12px;
+            margin-bottom: 20px;
+        }}
         #company-icp .card {{
             background: var(--card);
             border-radius: 8px;
             padding: 12px;
             border: 1px solid var(--border);
         }}
-        #company-icp .value {{ font-weight: 700; color: var(--accent); }}
+        #company-icp .icp-card {{
+            min-width: 140px;
+        }}
+        #company-icp .icp-card-wide {{
+            min-width: 160px;
+        }}
+        #company-icp .card h2 {{
+            font-size: 0.9rem;
+            margin: 0 0 8px 0;
+            color: var(--text-muted);
+        }}
+        #company-icp .value {{
+            font-weight: 700;
+            color: var(--accent);
+            font-size: 1.2rem;
+        }}
+        #company-icp .card .detail {{
+            font-size: 0.8rem;
+        }}
+        #company-icp .icp-card-detail-mt {{
+            margin-top: 6px;
+        }}
+        #company-icp .churn-card {{
+            border-left: 4px solid var(--warning);
+        }}
+        #company-icp .icp-table {{
+            width: 100%;
+            border-collapse: collapse;
+            font-size: 0.9rem;
+        }}
+        #company-icp .icp-table-mb {{
+            margin-bottom: 16px;
+        }}
+        #company-icp .detail-churn-label {{
+            font-size: 0.8rem;
+            margin-bottom: 8px;
+        }}
         .matrix-card h2 {{
             font-size: 1rem;
             font-weight: 600;
@@ -1545,6 +1599,67 @@ def generate_dashboard_html(
             font-size: 0.8rem;
             margin: -8px 0 16px 0;
         }}
+        .detail-caption {{
+            margin-bottom: 12px;
+            font-size: 0.85rem;
+        }}
+        .detail-cutoff {{
+            margin-top: 8px;
+            font-size: 0.8rem;
+        }}
+        .matrix-card-spaced {{
+            margin-top: 24px;
+        }}
+        .section-header {{
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            flex-wrap: wrap;
+            gap: 8px;
+            margin-bottom: 8px;
+        }}
+        .section-header h2 {{
+            margin: 0;
+        }}
+        .cagr-period-control {{
+            margin: 20px 0 12px 0;
+            display: flex;
+            align-items: center;
+            gap: 12px;
+        }}
+        .cagr-period-control label {{
+            font-size: 0.9rem;
+            color: var(--text-muted);
+        }}
+        #cagr-period-select {{
+            padding: 6px 12px;
+            border-radius: 8px;
+            background: var(--card);
+            border: 1px solid var(--border);
+            color: var(--text);
+            font-size: 0.9rem;
+        }}
+        .cagr-section-header {{
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            flex-wrap: wrap;
+            gap: 8px;
+            margin: 20px 0 8px 0;
+        }}
+        .cagr-section-header h3 {{
+            font-size: 0.95rem;
+            margin: 0;
+            color: var(--text);
+        }}
+        .detail-matrix-intro {{
+            margin: 12px 0 8px 0;
+            font-size: 0.8rem;
+        }}
+        .detail-cagr-formula {{
+            margin: 12px 0 0 0;
+            font-size: 0.8rem;
+        }}
         .positive {{ color: var(--success); }}
         .negative {{ color: #ef4444; }}
         a {{ color: var(--accent); text-decoration: none; }}
@@ -1589,8 +1704,8 @@ def generate_dashboard_html(
 
         <div class="main-grid">
             <div class="matrix-card">
-                <div style="display:flex;align-items:center;justify-content:space-between;flex-wrap:wrap;gap:8px;margin-bottom:8px">
-                    <h2 style="margin:0">MRR - Accountant Customers (not NRR)</h2>
+                <div class="section-header">
+                    <h2>MRR - Accountant Customers (not NRR)</h2>
                     <div class="col-toggle" data-table-id="mrr-matrix"><button type="button" class="col-toggle-btn">Columns</button><div class="col-toggle-dropdown"></div></div>
                 </div>
                 <table class="sortable" data-table-id="mrr-matrix">
@@ -1604,7 +1719,7 @@ def generate_dashboard_html(
                         {matrix_rows}
                     </tbody>
                 </table>
-                <p class="detail" style="margin:12px 0 8px 0;font-size:0.8rem;color:var(--text-muted)">Cells = sum of MRR (facturacion amount) for accountants in that segment. Not NRR. Churned MRR = sum of deal.amount for deals with deal_stage Cerrado Churn.</p>
+                <p class="detail detail-matrix-intro">Cells = sum of MRR (facturacion amount) for accountants in that segment. Not NRR. Churned MRR = sum of deal.amount for deals with deal_stage Cerrado Churn.</p>
                 {_cagr_section(cols, cagr_matrix_rows)}
                 <div class="metrics">
                     <span class="metric">Total accountants: <strong>{total_accountants:,}</strong></span>
@@ -1637,15 +1752,15 @@ def generate_dashboard_html(
         </div>
 
         {cagr_dropdown_html}
-        {f'<div class="matrix-card" style="margin-top: 24px;"><div style="display:flex;align-items:center;justify-content:space-between;flex-wrap:wrap;gap:8px;margin-bottom:8px"><h2 style="margin:0">MRR Growth by Portfolio Tier (CAGR rolling)</h2><div class="col-toggle" data-table-id="mrr-growth"><button type="button" class="col-toggle-btn">Columns</button><div class="col-toggle-dropdown"></div></div></div><p class="detail" style="margin-bottom:12px;font-size:0.85rem;color:var(--text-muted)">ICP accountants only. MRR now vs MRR at start of rolling period. Use dropdown above to change period. CAGR = (MRR_now / MRR_start)^(1/years) - 1. Reconstructed from deal close_date.</p><table class="sortable" data-table-id="mrr-growth"><thead><tr><th data-col-id="tier">Managed Tax IDs</th><th class="num" data-col-id="mrr_now">MRR Now</th><th class="num" data-col-id="mrr_start">MRR at Start</th><th class="num" data-col-id="cagr_pct">CAGR % (MRR)</th></tr></thead><tbody id="mrr-growth-tbody">{growth_tier_rows_html}</tbody></table><p class="detail" id="mrr-growth-cutoff" style="margin-top:8px;font-size:0.8rem;">Start: {default_cutoff}</p></div>' if growth_by_tier else ''}
-        {f'<div class="matrix-card" style="margin-top: 24px;"><div style="display:flex;align-items:center;justify-content:space-between;flex-wrap:wrap;gap:8px;margin-bottom:8px"><h2 style="margin:0">Deals Growth by Portfolio Tier (CAGR rolling)</h2><div class="col-toggle" data-table-id="deals-growth"><button type="button" class="col-toggle-btn">Columns</button><div class="col-toggle-dropdown"></div></div></div><p class="detail" style="margin-bottom:12px;font-size:0.85rem;color:var(--text-muted)">ICP accountants only. Deals now vs deals at start of rolling period. Same tier buckets as MRR. CAGR = (deals_now / deals_start)^(1/years) - 1. New = cannot compute CAGR from zero (no deals at start).</p><table class="sortable" data-table-id="deals-growth"><thead><tr><th data-col-id="tier">Managed Tax IDs</th><th class="num" data-col-id="companies">Companies</th><th class="num" data-col-id="deals_now">Deals Now</th><th class="num" data-col-id="deals_start">Deals at Start</th><th class="num" data-col-id="cagr_pct">CAGR % (deals)</th></tr></thead><tbody id="deals-growth-tbody">{deals_growth_tier_rows_html}</tbody></table><p class="detail" id="deals-growth-cutoff" style="margin-top:8px;font-size:0.8rem;">Start: {cutoff_deals}</p></div>' if deals_growth_by_tier else ''}
+        {f'<div class="matrix-card matrix-card-spaced"><div class="section-header"><h2>MRR Growth by Portfolio Tier (CAGR rolling)</h2><div class="col-toggle" data-table-id="mrr-growth"><button type="button" class="col-toggle-btn">Columns</button><div class="col-toggle-dropdown"></div></div></div><p class="detail detail-caption">ICP accountants only. MRR now vs MRR at start of rolling period. Use dropdown above to change period. CAGR = (MRR_now / MRR_start)^(1/years) - 1. Reconstructed from deal close_date.</p><table class="sortable" data-table-id="mrr-growth"><thead><tr><th data-col-id="tier">Managed Tax IDs</th><th class="num" data-col-id="mrr_now">MRR Now</th><th class="num" data-col-id="mrr_start">MRR at Start</th><th class="num" data-col-id="cagr_pct">CAGR % (MRR)</th></tr></thead><tbody id="mrr-growth-tbody">{growth_tier_rows_html}</tbody></table><p class="detail detail-cutoff" id="mrr-growth-cutoff">Start: {default_cutoff}</p></div>' if growth_by_tier else ''}
+        {f'<div class="matrix-card matrix-card-spaced"><div class="section-header"><h2>Deals Growth by Portfolio Tier (CAGR rolling)</h2><div class="col-toggle" data-table-id="deals-growth"><button type="button" class="col-toggle-btn">Columns</button><div class="col-toggle-dropdown"></div></div></div><p class="detail detail-caption">ICP accountants only. Deals now vs deals at start of rolling period. Same tier buckets as MRR. CAGR = (deals_now / deals_start)^(1/years) - 1. New = cannot compute CAGR from zero (no deals at start).</p><table class="sortable" data-table-id="deals-growth"><thead><tr><th data-col-id="tier">Managed Tax IDs</th><th class="num" data-col-id="companies">Companies</th><th class="num" data-col-id="deals_now">Deals Now</th><th class="num" data-col-id="deals_start">Deals at Start</th><th class="num" data-col-id="cagr_pct">CAGR % (deals)</th></tr></thead><tbody id="deals-growth-tbody">{deals_growth_tier_rows_html}</tbody></table><p class="detail detail-cutoff" id="deals-growth-cutoff">Start: {cutoff_deals}</p></div>' if deals_growth_by_tier else ''}
 
-        <div class="matrix-card" style="margin-top: 24px;">
-            <div style="display:flex;align-items:center;justify-content:space-between;flex-wrap:wrap;gap:8px;margin-bottom:8px">
-                <h2 style="margin:0">Top 20 Accountants by MRR</h2>
+        <div class="matrix-card matrix-card-spaced">
+            <div class="section-header">
+                <h2>Top 20 Accountants by MRR</h2>
                 <div class="col-toggle" data-table-id="top-20"><button type="button" class="col-toggle-btn">Columns</button><div class="col-toggle-dropdown"></div></div>
             </div>
-            <p class="detail" style="margin-bottom:12px;font-size:0.85rem;color:var(--text-muted)">ICP accountants only. Operador = type 5 only (bill, excludes hybrids). Asesor = type 8 (includes hybrids). Binary: each deal in one bucket. Total Deals = all associations (matches HubSpot company record). Churn = deal_stage Cerrado Churn (31849274) only. Lost = deal_stage Cerrado Perdido (closedlost). Top accountant has <strong>{max_related_deals}</strong> related deals.</p>
+            <p class="detail detail-caption">ICP accountants only. Operador = type 5 only (bill, excludes hybrids). Asesor = type 8 (includes hybrids). Binary: each deal in one bucket. Total Deals = all associations (matches HubSpot company record). Churn = deal_stage Cerrado Churn (31849274) only. Lost = deal_stage Cerrado Perdido (closedlost). Top accountant has <strong>{max_related_deals}</strong> related deals.</p>
             <table class="sortable" data-table-id="top-20">
                 <thead>
                     <tr>
@@ -1678,12 +1793,12 @@ def generate_dashboard_html(
             </table>
         </div>
 
-        <div class="matrix-card" style="margin-top: 24px;">
-            <div style="display:flex;align-items:center;justify-content:space-between;flex-wrap:wrap;gap:8px;margin-bottom:8px">
-                <h2 style="margin:0">Worst 20 Accountants by Churn %</h2>
+        <div class="matrix-card matrix-card-spaced">
+            <div class="section-header">
+                <h2>Worst 20 Accountants by Churn %</h2>
                 <div class="col-toggle" data-table-id="worst-20"><button type="button" class="col-toggle-btn">Columns</button><div class="col-toggle-dropdown"></div></div>
             </div>
-            <p class="detail" style="margin-bottom:12px;font-size:0.85rem;color:var(--text-muted)">ICP accountants with churn deals only. Sorted by Churn % (MRR-based). Same columns as Top 20. Lost = deals closed but no revenue (Cerrado Perdido).</p>
+            <p class="detail detail-caption">ICP accountants with churn deals only. Sorted by Churn % (MRR-based). Same columns as Top 20. Lost = deals closed but no revenue (Cerrado Perdido).</p>
             <table class="sortable" data-table-id="worst-20">
                 <thead>
                     <tr>

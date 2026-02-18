@@ -4,6 +4,24 @@
 # should build pages for, and indicates metadata such as tags, creation date and
 # authors for each page.
 
+- title: Building Governed AI Agents - A Practical Guide to Agentic Scaffolding
+  path: examples/partners/agentic_governance_guide/agentic_governance_cookbook.ipynb
+  slug: agentic-governance-cookbook
+  description: A practical guide to building governed AI agents with OpenAI Agents SDK and Guardrails.
+  date: 2026-02-23
+  authors:
+    - shikhar-cyber
+    - Pavan Kumar Muthozu
+    - Frankie LaCarrubba
+  tags:
+    - agents
+    - tracing
+    - guardrails
+    - governance
+    - evals
+    - promptfoo
+    - partners
+
 - title: Realtime Eval Guide
   path: examples/Realtime_eval_guide.ipynb
   slug: realtime-eval-guide

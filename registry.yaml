@@ -3080,3 +3080,17 @@
 
   tags:
     - responses
+
+- title: Prompt Caching 201
+  path: examples/Prompt_Caching_201.ipynb
+  slug: prompt-caching-201
+  description: Cookbook for improving prompt caching hit rate, latency, and cost.
+  date: 2026-02-18
+  authors:
+    - erikakettleson-openai
+  tags:
+    - prompt-caching
+    - latency
+    - cost
+    - responses
+    - realtime

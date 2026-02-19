@@ -1,0 +1,390 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>Colppy - Building Blocks Budget vs Actual</title>
+    <style>
+        :root {
+            --bg: #0f172a;
+            --card: #1e293b;
+            --accent: #3b82f6;
+            --accent-dim: #1e40af;
+            --text: #f1f5f9;
+            --text-muted: #94a3b8;
+            --success: #22c55e;
+            --danger: #ef4444;
+            --warning: #f59e0b;
+            --border: #334155;
+        }
+        * { box-sizing: border-box; }
+        body {
+            font-family: 'Segoe UI', system-ui, sans-serif;
+            background: var(--bg);
+            color: var(--text);
+            margin: 0;
+            padding: 24px;
+            min-height: 100vh;
+        }
+        .container { max-width: 1200px; margin: 0 auto; }
+        h1 { font-size: 1.5rem; font-weight: 600; margin-bottom: 8px; }
+        .subtitle { color: var(--text-muted); font-size: 0.9rem; margin-bottom: 24px; }
+        .detail-generated { font-size: 0.8rem; margin: -8px 0 16px 0; color: var(--text-muted); }
+        a { color: var(--accent); text-decoration: none; }
+        a:hover { text-decoration: underline; }
+
+        .summary-cards {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 16px;
+            margin-bottom: 32px;
+        }
+        .summary-card {
+            background: var(--card);
+            border-radius: 12px;
+            padding: 16px 20px;
+            border: 1px solid var(--border);
+        }
+        .summary-card h3 {
+            font-size: 0.85rem;
+            font-weight: 500;
+            margin: 0 0 8px 0;
+            color: var(--text-muted);
+        }
+        .summary-card .value {
+            font-size: 1.25rem;
+            font-weight: 700;
+            color: var(--accent);
+        }
+        .summary-card .value.positive { color: var(--success); }
+        .summary-card .value.negative { color: var(--danger); }
+
+        .section {
+            background: var(--card);
+            border-radius: 12px;
+            padding: 20px;
+            margin-bottom: 24px;
+            border: 1px solid var(--border);
+        }
+        .section h2 {
+            font-size: 1.1rem;
+            font-weight: 600;
+            margin: 0 0 16px 0;
+            color: var(--text);
+        }
+        .section p.detail {
+            font-size: 0.85rem;
+            color: var(--text-muted);
+            margin: 0 0 12px 0;
+        }
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            font-size: 0.9rem;
+        }
+        th, td {
+            padding: 10px 12px;
+            text-align: right;
+            border-bottom: 1px solid var(--border);
+        }
+        th {
+            font-weight: 600;
+            color: var(--text-muted);
+            text-align: left;
+        }
+        th.num, td.num { text-align: right; }
+        .item-col { text-align: left; font-weight: 500; }
+        .positive { color: var(--success); }
+        .negative { color: var(--danger); }
+        table.sortable th { cursor: pointer; -webkit-user-select: none; user-select: none; }
+        table.sortable th:hover { color: var(--accent); }
+        table.sortable th::after { content: " ⇅"; opacity: 0.5; font-size: 0.8em; }
+
+        .nav-links {
+            margin-bottom: 24px;
+            display: flex;
+            gap: 16px;
+            flex-wrap: wrap;
+        }
+        .nav-links a {
+            padding: 8px 14px;
+            background: var(--card);
+            border-radius: 8px;
+            border: 1px solid var(--border);
+            font-size: 0.9rem;
+        }
+        .nav-links a:hover {
+            background: var(--accent-dim);
+            border-color: var(--accent);
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <nav class="nav-links">
+            <a href="index.html">← Dashboards</a>
+            <a href="mrr_dashboard.html">MRR Dashboard</a>
+        </nav>
+
+        <h1>Building Blocks — Budget vs Actual</h1>
+        <p class="subtitle">Deviation review: MRR and Average Ticket by product line · January 2026</p>
+        <p class="detail-generated">Data source: Google Sheets (Building Blocks Por Producto Q4'25 HLT, ASP Forecast 2026 & Actual). First iteration.</p>
+
+        <div class="summary-cards">
+            <div class="summary-card">
+                <h3>New Product MRR</h3>
+                <span class="value positive">+3,8%</span>
+                <p class="detail" style="margin:8px 0 0 0;font-size:0.8rem">Budget $5.513.375 → Actual $5.724.884</p>
+            </div>
+            <div class="summary-card">
+                <h3>Upsell MRR</h3>
+                <span class="value positive">+101,7%</span>
+                <p class="detail" style="margin:8px 0 0 0;font-size:0.8rem">Budget $618.750 → Actual $1.248.224</p>
+            </div>
+            <div class="summary-card">
+                <h3>Cross Sell MRR</h3>
+                <span class="value negative">-78,6%</span>
+                <p class="detail" style="margin:8px 0 0 0;font-size:0.8rem">Budget $619.298 → Actual $132.500</p>
+            </div>
+            <div class="summary-card">
+                <h3>EoP MRR</h3>
+                <span class="value negative">-27,6%</span>
+                <p class="detail" style="margin:8px 0 0 0;font-size:0.8rem">Budget $9.811.423 → Actual $7.105.608</p>
+            </div>
+            <div class="summary-card">
+                <h3>Avg Ticket New Product</h3>
+                <span class="value positive">+2,1%</span>
+                <p class="detail" style="margin:8px 0 0 0;font-size:0.8rem">Budget $119.125 → Actual $121.611</p>
+            </div>
+            <div class="summary-card">
+                <h3>Avg Ticket Upselling</h3>
+                <span class="value negative">-13,5%</span>
+                <p class="detail" style="margin:8px 0 0 0;font-size:0.8rem">Budget $67.950 → Actual $58.804</p>
+            </div>
+        </div>
+
+        <div class="section">
+            <h2>MRR — Budget vs Actual (Jan 2026)</h2>
+            <p class="detail">Building Blocks Por Producto - Q4'25 HLT. Values in ARS.</p>
+            <table class="sortable">
+                <thead>
+                    <tr>
+                        <th>Item</th>
+                        <th class="num">Budget (ARS)</th>
+                        <th class="num">Actual (ARS)</th>
+                        <th class="num">Deviation</th>
+                        <th class="num">% Var</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr>
+                        <td class="item-col">New Product - Administración - ICP Pyme</td>
+                        <td class="num">2.437.909</td>
+                        <td class="num">2.470.200</td>
+                        <td class="num positive">+32.291</td>
+                        <td class="num positive">+1,3%</td>
+                    </tr>
+                    <tr>
+                        <td class="item-col">New Product - Administración - ICP Operador</td>
+                        <td class="num">2.031.591</td>
+                        <td class="num">2.830.184</td>
+                        <td class="num positive">+798.593</td>
+                        <td class="num positive">+39,3%</td>
+                    </tr>
+                    <tr>
+                        <td class="item-col">New Product - Sueldos - ICP Pyme</td>
+                        <td class="num">997.500</td>
+                        <td class="num">182.000</td>
+                        <td class="num negative">-815.500</td>
+                        <td class="num negative">-81,8%</td>
+                    </tr>
+                    <tr>
+                        <td class="item-col">New Product - Sueldos - ICP Operador</td>
+                        <td class="num">46.375</td>
+                        <td class="num">242.500</td>
+                        <td class="num positive">+196.125</td>
+                        <td class="num positive">+422,9%</td>
+                    </tr>
+                    <tr>
+                        <td class="item-col">Upsell - Administración - ICP Pyme</td>
+                        <td class="num">454.560</td>
+                        <td class="num">972.924</td>
+                        <td class="num positive">+518.364</td>
+                        <td class="num positive">+114,0%</td>
+                    </tr>
+                    <tr>
+                        <td class="item-col">Upsell - Administración - ICP Operador</td>
+                        <td class="num">60.000</td>
+                        <td class="num">47.000</td>
+                        <td class="num negative">-13.000</td>
+                        <td class="num negative">-21,7%</td>
+                    </tr>
+                    <tr>
+                        <td class="item-col">Upsell - Sueldos - ICP Pyme</td>
+                        <td class="num">54.000</td>
+                        <td class="num">180.400</td>
+                        <td class="num positive">+126.400</td>
+                        <td class="num positive">+234,1%</td>
+                    </tr>
+                    <tr>
+                        <td class="item-col">Upsell - Sueldos - ICP Operador</td>
+                        <td class="num">31.440</td>
+                        <td class="num">47.900</td>
+                        <td class="num positive">+16.460</td>
+                        <td class="num positive">+52,4%</td>
+                    </tr>
+                    <tr>
+                        <td class="item-col">Cross sell - Sueldos</td>
+                        <td class="num">619.298</td>
+                        <td class="num">132.500</td>
+                        <td class="num negative">-486.798</td>
+                        <td class="num negative">-78,6%</td>
+                    </tr>
+                    <tr>
+                        <td class="item-col">EoP</td>
+                        <td class="num">9.811.423</td>
+                        <td class="num">7.105.608</td>
+                        <td class="num negative">-2.705.815</td>
+                        <td class="num negative">-27,6%</td>
+                    </tr>
+                </tbody>
+            </table>
+        </div>
+
+        <div class="section">
+            <h2>Average Ticket (ASP) — Budget vs Actual (Jan 2026)</h2>
+            <p class="detail">ASP Forecast 2026 & Actual. Values in ARS.</p>
+            <table class="sortable">
+                <thead>
+                    <tr>
+                        <th>Item</th>
+                        <th class="num">Budget (ARS)</th>
+                        <th class="num">Actual (ARS)</th>
+                        <th class="num">Deviation</th>
+                        <th class="num">% Var</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr>
+                        <td class="item-col">New Product - Administración - ICP Pyme</td>
+                        <td class="num">180.000</td>
+                        <td class="num">79.684</td>
+                        <td class="num negative">-100.316</td>
+                        <td class="num negative">-55,7%</td>
+                    </tr>
+                    <tr>
+                        <td class="item-col">New Product - Administración - ICP Operador</td>
+                        <td class="num">80.000</td>
+                        <td class="num">141.509</td>
+                        <td class="num positive">+61.509</td>
+                        <td class="num positive">+76,9%</td>
+                    </tr>
+                    <tr>
+                        <td class="item-col">New Product - Sueldos - ICP Pyme</td>
+                        <td class="num">190.000</td>
+                        <td class="num">22.750</td>
+                        <td class="num negative">-167.250</td>
+                        <td class="num negative">-88,0%</td>
+                    </tr>
+                    <tr>
+                        <td class="item-col">New Product - Sueldos - ICP Operador</td>
+                        <td class="num">26.500</td>
+                        <td class="num">242.500</td>
+                        <td class="num positive">+216.000</td>
+                        <td class="num positive">+815,1%</td>
+                    </tr>
+                    <tr>
+                        <td class="item-col">Upsell - Administración - ICP Pyme</td>
+                        <td class="num">75.000</td>
+                        <td class="num">138.989</td>
+                        <td class="num positive">+63.989</td>
+                        <td class="num positive">+85,3%</td>
+                    </tr>
+                    <tr>
+                        <td class="item-col">Upsell - Administración - ICP Operador</td>
+                        <td class="num">55.000</td>
+                        <td class="num">47.000</td>
+                        <td class="num negative">-8.000</td>
+                        <td class="num negative">-14,5%</td>
+                    </tr>
+                    <tr>
+                        <td class="item-col">Upsell - Sueldos - ICP Pyme</td>
+                        <td class="num">54.000</td>
+                        <td class="num">60.133</td>
+                        <td class="num positive">+6.133</td>
+                        <td class="num positive">+11,4%</td>
+                    </tr>
+                    <tr>
+                        <td class="item-col">Upsell - Sueldos - ICP Operador</td>
+                        <td class="num">31.400</td>
+                        <td class="num">47.900</td>
+                        <td class="num positive">+16.500</td>
+                        <td class="num positive">+52,5%</td>
+                    </tr>
+                    <tr>
+                        <td class="item-col">Average New Product</td>
+                        <td class="num">119.125</td>
+                        <td class="num">121.611</td>
+                        <td class="num positive">+2.486</td>
+                        <td class="num positive">+2,1%</td>
+                    </tr>
+                    <tr>
+                        <td class="item-col">Average Upselling</td>
+                        <td class="num">67.950</td>
+                        <td class="num">58.804</td>
+                        <td class="num negative">-9.146</td>
+                        <td class="num negative">-13,5%</td>
+                    </tr>
+                </tbody>
+            </table>
+        </div>
+
+        <div class="section">
+            <h2>Key Insights</h2>
+            <ul style="color: var(--text-muted); font-size: 0.9rem; line-height: 1.6; margin: 0; padding-left: 20px;">
+                <li><strong>New Product - Sueldos ICP Pyme</strong>: -81,8% vs budget (major shortfall; $815.500 below)</li>
+                <li><strong>New Product - Administración ICP Operador</strong>: +39,3% vs budget (strong overperformance)</li>
+                <li><strong>Upsell</strong>: +101,7% vs budget; Admin ICP Pyme and Sueldos ICP Pyme drive overperformance</li>
+                <li><strong>Cross sell</strong>: -78,6% vs budget ($486.798 below)</li>
+                <li><strong>EoP</strong>: -27,6% vs budget ($2.705.815 below)</li>
+                <li><strong>Average Ticket New Product</strong>: +2,1% vs budget</li>
+                <li><strong>Average Ticket Upselling</strong>: -13,5% vs budget</li>
+            </ul>
+        </div>
+    </div>
+
+    <script>
+    document.querySelectorAll("table.sortable").forEach(function(table) {
+        var headers = table.querySelectorAll("th");
+        headers.forEach(function(th, idx) {
+            th.addEventListener("click", function() {
+                var tbody = table.querySelector("tbody");
+                var rows = Array.from(tbody.querySelectorAll("tr"));
+                var asc = th.getAttribute("data-sort") !== "asc";
+                th.setAttribute("data-sort", asc ? "asc" : "desc");
+                rows.sort(function(a, b) {
+                    var va = a.cells[idx] ? a.cells[idx].textContent.trim() : "";
+                    var vb = b.cells[idx] ? b.cells[idx].textContent.trim() : "";
+                    var isNum = /^[$€]?[\d.,\s]+%?$|^[+-]?[\d.]+\s*%?$|^[+-]?[\d,]+%?$/.test(va);
+                    if (isNum) {
+                        var parseVal = function(s) {
+                            if (!s || s === "N/A" || s === "—") return NaN;
+                            var neg = s.includes("-") && s.indexOf("-") < 3;
+                            var n = parseFloat(s.replace(/[.$€\s]/g, "").replace(",", ".").replace(/[^0-9.-]/g, "")) || 0;
+                            return neg ? -Math.abs(n) : n;
+                        };
+                        var na = parseVal(va), nb = parseVal(vb);
+                        if (isNaN(na) && isNaN(nb)) return 0;
+                        if (isNaN(na)) return asc ? 1 : -1;
+                        if (isNaN(nb)) return asc ? -1 : 1;
+                        return asc ? na - nb : nb - na;
+                    }
+                    return asc ? (va < vb ? -1 : va > vb ? 1 : 0) : (vb < va ? -1 : vb > va ? 1 : 0);
+                });
+                rows.forEach(function(r) { tbody.appendChild(r); });
+            });
+        });
+    });
+    </script>
+</body>
+</html>

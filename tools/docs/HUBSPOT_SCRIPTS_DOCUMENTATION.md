@@ -495,6 +495,10 @@ python fetch_hubspot_deals_with_company.py --month 2025-12 --deal-stage closedwo
 #### `analyze_smb_accountant_involved_funnel.py` ⭐ **NEW**
 **Purpose:** Analyze SMB funnel comparing deals WITH vs WITHOUT accountant involvement, using dual-criteria detection.
 
+**Definition of "Accountant Involvement" (for this analysis):**
+- An SMB deal is closed and an accountant company (association type 8) is part of that deal. The accountant is involved in the sales process (referral, advisory, etc.). We bill to the SMB.
+- **NOT the same as ICP Operador:** ICP Operador = we bill to the accountant (accountant channel sales). Different concept. Deals with `primary_company_type` = Cuenta Contador in the WITHOUT group are ICP Operador — they are accountant channel deals, not "SMB with accountant involvement."
+
 **Key Features:**
 - **Dual-Criteria Accountant Detection**: Uses TWO methods to identify accountant involvement:
   - **Method 1 (Formula Field)**: `tiene_cuenta_contador > 0` - Formula field that counts associated accountant companies

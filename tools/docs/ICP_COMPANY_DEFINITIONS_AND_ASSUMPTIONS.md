@@ -21,7 +21,7 @@ Este documento define **qué es ICP a nivel objeto Compañía** y **qué assumpt
 - **ICP Operador (billing)**: Se determina **solo** por el **tipo de la PRIMARY company** del deal. Si `type` ∈ `Cuenta Contador` | `Cuenta Contador y Reseller` | `Contador Robado` → facturamos al contador (ICP Operador). Cualquier otro caso → ICP PYME (facturamos a la PyME).
 - **Primary company**: Es la compañía con **asociación tipo 5** (PRIMARY) en deal–company. Los scripts **solo usan esta** para clasificar ICP Operador vs PYME.
 - **Plan name / `nombre_del_plan`**: **No** se usa para ICP Operador. Una PyME referida por contador puede tener plan “ICP Contador” pero facturamos a la PyME; el tipo de la primary company es la fuente de verdad.
-- **Association type 8** (Estudio Contable): Se usa para **canal contador / referral**, no para definir “quién facturamos”. Un deal puede tener type 8 y no ser ICP Operador (ej. PyME con contador asociado).
+- **Association type 8** (Estudio Contable): Se usa para **accountant involvement** (contador involucrado en venta SMB), no para definir “quién facturamos”. Un deal puede tener type 8 y no ser ICP Operador (ej. PyME con contador asociado).
 - **Deals sin primary company**: No se pueden clasificar como ICP Operador ni PYME. Los scripts los reportan como **issues de calidad de datos**.
 
 ---
@@ -126,7 +126,7 @@ Estas son las **assumptions** explícitas que hacen los scripts al usar el objet
 
 ### 5. Association type 8 ≠ ICP Operador
 
-- **Assumption**: Type 8 indica **canal contador / referral**, no “facturamos al contador”. Un deal puede tener type 8 y ser ICP PYME (primary = PyME).
+- **Assumption**: Type 8 indica **accountant involvement** (contador involucrado en venta SMB; ver README_HUBSPOT_CONFIGURATION), no “facturamos al contador”. Un deal puede tener type 8 y ser ICP PYME (primary = PyME).
 - **Billing rule:** Un producto se factura a un solo CUIT. Ese CUIT = PRIMARY. Otras compañías (contador, etc.) tienen CUITs distintos y no son PRIMARY. Ver [HUBSPOT_DEAL_COMPANY_ASSOCIATION_RULES.md](./HUBSPOT_DEAL_COMPANY_ASSOCIATION_RULES.md).
 - **CUIT obligatorio para PRIMARY:** No aceptamos compañías sin CUIT válido como PRIMARY. La compañía debe tener CUIT en HubSpot para ser billing/primary. Si no tiene CUIT, debe enriquecerse o fusionarse antes.
 

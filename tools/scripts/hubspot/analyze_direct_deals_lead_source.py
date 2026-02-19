@@ -308,8 +308,9 @@ def analyze_direct_deals_lead_source(start_date, end_date):
     }
 
 if __name__ == '__main__':
-    # December 2025
-    start_date = '2025-12-01'
-    end_date = '2026-01-01'
-    
-    results = analyze_direct_deals_lead_source(start_date, end_date)
+    import argparse
+    parser = argparse.ArgumentParser(description='Analyze direct deals by lead source')
+    parser.add_argument('--start-date', default='2025-10-01', help='Start date YYYY-MM-DD')
+    parser.add_argument('--end-date', default='2026-02-01', help='End date YYYY-MM-DD')
+    args = parser.parse_args()
+    results = analyze_direct_deals_lead_source(args.start_date, args.end_date)

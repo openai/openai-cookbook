@@ -442,6 +442,13 @@ Use **semver-compliant version bumps** in `package__init__.py` whenever a public
 - `/Users/virulana/openai-cookbook/tools/docs/mcp_integration_guide.md` - MCP server patterns
 - `/Users/virulana/openai-cookbook/tools/docs/CLAUDE_CONTEXT_MASTER.md` - Context and prompt optimization
 
+## Colppy CEO Assistant Plugin
+
+**When modifying the plugin** (`plugins/colppy-ceo-assistant/`):
+- **Always run** `./publish.sh` from `plugins/` (or `./colppy-ceo-assistant/publish.sh` from plugin dir) to regenerate the zip
+- **Zip output:** `tools/outputs/colppy-ceo-assistant-plugin-full.zip` — provide this path to the user for upload to Claude Cowork / Cloud AI
+- **README:** Plugin README documents the zip location; keep it updated
+
 ## Contactability & Analysis
 
 For customer contactability analysis:

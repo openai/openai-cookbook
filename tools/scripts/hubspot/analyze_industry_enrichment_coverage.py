@@ -1,16 +1,17 @@
 #!/usr/bin/env python3
 """
-Industry Enrichment Coverage Analysis
-=====================================
-Analyzes how much the industria (and type) fields are populated across HubSpot companies.
+Industry Enrichment Coverage Analysis (Company ICP Health Check)
+===============================================================
+Analyzes how much industria, type, and tipo_icp_contador are populated across HubSpot companies.
+Use as a company ICP health check: Industry, Company type, Tipo ICP.
 
 Segments:
 1. All companies with CUIT (billing-relevant pool)
 2. Billing companies only (from facturacion.csv)
 
 Usage:
+    python tools/scripts/hubspot/analyze_industry_enrichment_coverage.py --billing-only  # ICP health check, no DB refresh
     python tools/scripts/hubspot/analyze_industry_enrichment_coverage.py
-    python tools/scripts/hubspot/analyze_industry_enrichment_coverage.py --billing-only
     python tools/scripts/hubspot/analyze_industry_enrichment_coverage.py --max-companies 5000
 """
 import argparse
@@ -91,7 +92,7 @@ def fetch_companies_with_cuit(
             response = client.search_objects(
                 object_type="companies",
                 filter_groups=[{"filters": [{"propertyName": "cuit", "operator": "HAS_PROPERTY"}]}],
-                properties=["name", "cuit", "industria", "type", "lifecyclestage"],
+                properties=["name", "cuit", "industria", "type", "tipo_icp_contador", "lifecyclestage"],
                 limit=batch_size,
                 after=after,
             )
@@ -117,24 +118,30 @@ def fetch_companies_with_cuit(
 
 
 def analyze_companies(companies: list[dict], segment_name: str) -> dict:
-    """Aggregate industria and type coverage from company list."""
+    """Aggregate industria, type, and tipo_icp_contador coverage from company list."""
     total = len(companies)
     with_industria = 0
     without_industria = 0
     with_type = 0
     without_type = 0
+    with_tipo_icp = 0
+    without_tipo_icp = 0
     both = 0
     neither = 0
+    all_three = 0
     industria_values: dict[str, int] = defaultdict(int)
     type_values: dict[str, int] = defaultdict(int)
+    tipo_icp_values: dict[str, int] = defaultdict(int)
 
     for c in companies:
         props = c.get("properties", {})
         ind = (props.get("industria") or "").strip()
         typ = (props.get("type") or "").strip()
+        tipo = (props.get("tipo_icp_contador") or "").strip()
 
         has_ind = bool(ind and ind != "(No value)")
         has_typ = bool(typ and typ != "(No value)")
+        has_tipo = bool(tipo and tipo != "(No value)")
 
         if has_ind:
             with_industria += 1
@@ -148,10 +155,19 @@ def analyze_companies(companies: list[dict], segment_name: str) -> dict:
         else:
             without_type += 1
 
+        if has_tipo:
+            with_tipo_icp += 1
+            tipo_icp_values[tipo] += 1
+        else:
+            without_tipo_icp += 1
+
         if has_ind and has_typ:
             both += 1
         elif not has_ind and not has_typ:
             neither += 1
+
+        if has_ind and has_typ and has_tipo:
+            all_three += 1
 
     return {
         "segment": segment_name,
@@ -160,10 +176,14 @@ def analyze_companies(companies: list[dict], segment_name: str) -> dict:
         "without_industria": without_industria,
         "with_type": with_type,
         "without_type": without_type,
+        "with_tipo_icp": with_tipo_icp,
+        "without_tipo_icp": without_tipo_icp,
         "both": both,
         "neither": neither,
+        "all_three": all_three,
         "industria_values": dict(industria_values),
         "type_values": dict(type_values),
+        "tipo_icp_values": dict(tipo_icp_values),
     }
 
 
@@ -178,21 +198,33 @@ def print_report(data: dict) -> None:
     wo = data["without_industria"]
     wt = data["with_type"]
     wot = data["without_type"]
+    wtipo = data["with_tipo_icp"]
+    wotipo = data["without_tipo_icp"]
     both = data["both"]
     neither = data["neither"]
+    all_three = data.get("all_three", 0)
 
     pct_ind = 100 * wi / t
     pct_typ = 100 * wt / t
+    pct_tipo = 100 * wtipo / t
     pct_both = 100 * both / t
     pct_neither = 100 * neither / t
+    pct_all = 100 * all_three / t if t else 0
 
     print(f"\n  Total companies: {t:,}")
+    print(f"\n  --- Industry ---")
     print(f"  With industria:   {wi:,} ({pct_ind:.1f}%)")
     print(f"  Without industria: {wo:,} ({100 - pct_ind:.1f}%)")
+    print(f"\n  --- Company type ---")
     print(f"  With type:       {wt:,} ({pct_typ:.1f}%)")
     print(f"  Without type:    {wot:,} ({100 - pct_typ:.1f}%)")
-    print(f"  Both populated: {both:,} ({pct_both:.1f}%)")
-    print(f"  Neither:        {neither:,} ({pct_neither:.1f}%)")
+    print(f"\n  --- Tipo ICP ---")
+    print(f"  With tipo_icp_contador: {wtipo:,} ({pct_tipo:.1f}%)")
+    print(f"  Without tipo_icp_contador: {wotipo:,} ({100 - pct_tipo:.1f}%)")
+    print(f"\n  --- Combined ---")
+    print(f"  Industria + type populated: {both:,} ({pct_both:.1f}%)")
+    print(f"  Neither industria nor type: {neither:,} ({pct_neither:.1f}%)")
+    print(f"  All three (industria + type + tipo ICP): {all_three:,} ({pct_all:.1f}%)")
 
     if data["industria_values"]:
         print(f"\n  Top 10 industria values:")
@@ -203,6 +235,12 @@ def print_report(data: dict) -> None:
     if data["type_values"]:
         print(f"\n  Type distribution:")
         for val, cnt in sorted(data["type_values"].items(), key=lambda x: -x[1])[:12]:
+            pct = 100 * cnt / t
+            print(f"    - {val}: {cnt:,} ({pct:.1f}%)")
+
+    if data.get("tipo_icp_values"):
+        print(f"\n  Tipo ICP distribution:")
+        for val, cnt in sorted(data["tipo_icp_values"].items(), key=lambda x: -x[1])[:10]:
             pct = 100 * cnt / t
             print(f"    - {val}: {cnt:,} ({pct:.1f}%)")
 
@@ -277,7 +315,7 @@ def main():
                     resp = client.search_objects(
                         object_type="companies",
                         filter_groups=[{"filters": [{"propertyName": "cuit", "operator": "IN", "values": values}]}],
-                        properties=["name", "cuit", "industria", "type", "lifecyclestage"],
+                        properties=["name", "cuit", "industria", "type", "tipo_icp_contador", "lifecyclestage"],
                         limit=100,
                         after=after,
                     )

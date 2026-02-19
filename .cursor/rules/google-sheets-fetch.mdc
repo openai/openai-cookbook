@@ -1,0 +1,43 @@
+---
+description: Use curl CSV export for Google Sheets when user shares a sheet URL or asks to fetch/refresh registered sheets
+alwaysApply: true
+---
+
+# Google Sheets Data Fetch
+
+## Registry (no URL needed)
+
+**Registry file:** `tools/docs/GOOGLE_SHEETS_REGISTRY.json`
+
+When the user says **"fetch"**, **"refresh"**, **"grab"**, **"access"**, or **"get the data"** for sheets (without pasting a URL), read the registry and fetch the relevant tab(s) via curl. Use the `id` or `name` to match what the user needs (e.g. "colppy budget", "budget", "Building Blocks").
+
+Each tab entry has: `id`, `tab_name` (exact Google Sheets tab name), `name`, `file_id`, `gid`, `notes`. When presenting fetched data, include the `tab_name` so the user knows which tab is being referenced.
+
+To add a new tab: append to `tabs` with `id`, `tab_name`, `name`, `file_id`, `gid`, and optional `notes`. Extract `file_id` and `gid` from the sheet URL (`.../d/{FILE_ID}/edit?gid={GID}`).
+
+## When user shares a URL
+
+1. **Extract FILE_ID** from the URL: `https://docs.google.com/spreadsheets/d/{FILE_ID}/...`
+2. **Single tab (GID known):** Use `curl -L "https://docs.google.com/spreadsheets/d/{FILE_ID}/export?format=csv&gid={GID}"` to download CSV
+3. **Multiple tabs:** If user needs all tabs, use Google Sheets API key to get sheet list first:
+   - `curl -s "https://sheets.googleapis.com/v4/spreadsheets/{FILE_ID}?fields=sheets(properties(sheetId,title))&key={API_KEY}"`
+   - Then download each via export URL with the returned `sheetId` (GID)
+
+## URL pattern
+
+```
+https://docs.google.com/spreadsheets/d/{FILE_ID}/export?format=csv&gid={GID}
+```
+
+- **FILE_ID:** From the sheet URL (e.g. `1vouNcGMeNbpWW6znS8SZZdjUvG6ZzUIq_rh0zr4mJlY`)
+- **GID:** Tab/sheet ID (from URL when clicking a tab, or from Sheets API `sheetId`)
+
+## Requirements
+
+- Sheet must be shared as **"Anyone with the link can view"** for curl to work without auth
+- Run `curl` from the terminal (user's machine); `mcp_web_fetch` may fail (500) due to Google blocking isolated requests
+
+## Do NOT use
+
+- `mcp_web_fetch` for Google Sheets export URLs (unreliable)
+- Google Sheets MCP unless user explicitly requests read/write or OAuth-based access

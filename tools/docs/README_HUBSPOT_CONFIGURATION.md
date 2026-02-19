@@ -2100,15 +2100,27 @@ La estrategia **"Contador Robado"** es un método inteligente de desarrollo de c
 - **Campo**: `colppy_es_referido_del_contador` (Negocios)
 - **Propósito**: Negocios referidos específicamente por contadores
 
-#### **5. Conteo Automático de Contadores (Dual-Criteria Method)**
+#### **5. Definición: Accountant Involvement (Involucramiento del Contador en la Venta)**
+
+**Propósito:** Medir cuándo un contador participa en el proceso de venta de un producto SMB.
+
+**Definición canónica:**
+- **Accountant involvement** = Cuando cerramos un deal de producto SMB y una compañía contador está asociada al deal mediante association type 8 (Estudio Contable). El contador participa en la venta (referencia, asesoría, etc.) y facturamos a la PyME.
+- **NO es lo mismo que ICP Operador:** ICP Operador = facturamos al contador (canal contador). Es un concepto distinto. Los deals con `primary_company_type` = Cuenta Contador son canal contador, no "SMB con contador involucrado".
+- **Fuente de verdad:** `tiene_cuenta_contador > 0` O association type 8 en deal–company. Ambos indican que hay una compañía contador asociada al deal (no como PRIMARY, sino como asesor/referente).
+
+**Scope:** Solo aplica a análisis de funnel SMB (WITH vs WITHOUT accountant). No confundir con accountant channel sales ni con ICP Operador billing.
+
+#### **6. Conteo Automático de Contadores (Dual-Criteria Method)**
 - **Campo**: `tiene_cuenta_contador` (Negocios)
 - **Tipo**: Fórmula calculada (Method 1) / Rollup field (Method 2)
-- **Propósito**: Cuenta automáticamente las etiquetas de contador relacionado
+- **Propósito**: Cuenta automáticamente las compañías contador asociadas al deal (association type 8). Usado para detectar **accountant involvement** en ventas SMB.
 - **Dual-Criteria Detection**:
-  - **Method 1 (Formula Field)**: `tiene_cuenta_contador > 0` - Formula field that counts associated accountant companies
+  - **Method 1 (Formula Field)**: `tiene_cuenta_contador > 0` - Formula field that counts associated accountant companies (type 8)
   - **Method 2 (Rollup Field Logic)**: Has companies with association type 8 ("Estudio Contable / Asesor / Consultor Externo del negocio") - Rollup field that counts companies with the accountant association label
-- **Usage**: Both methods are checked in funnel analysis scripts. A deal is considered to have accountant involvement if it meets EITHER criterion (OR logic).
+- **Usage**: Both methods are checked in funnel analysis scripts. A deal has **accountant involvement** if it meets EITHER criterion (OR logic).
 - **Overlap Analysis**: Scripts track which deals are identified by both methods, only by Method 1, or only by Method 2 for data quality validation.
+- **Nota:** Deals con `primary_company_type` = Cuenta Contador y `tiene_cuenta_contador = 0` son ICP Operador (facturamos al contador). No son "accountant involvement" en el sentido SMB; son canal contador.
 
 ### 📊 REGLAS DE ANÁLISIS CANAL CONTADOR
 

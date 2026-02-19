@@ -17,6 +17,15 @@ Analyzes the funnel for SMB deals where an accountant is involved in the sales p
 This script starts directly from deals (not contacts) because accountant referrals often
 skip the traditional MQL → SQL → Deal path.
 
+DEFINITION — Accountant Involvement (for this analysis):
+---------------------------------------------------------
+- An SMB product is closed and an accountant company (association type 8) is part of that deal.
+  The accountant is involved in the sales process (referral, advisory, etc.). We bill to the SMB.
+- NOT the same as ICP Operador: ICP Operador = we bill to the accountant (accountant channel sales).
+  Different concept. Deals with primary_company_type = Cuenta Contador in WITHOUT group are
+  ICP Operador — accountant channel deals, not "SMB with accountant involvement."
+- Source: tiene_cuenta_contador > 0 OR association type 8 (Estudio Contable) on deal–company.
+
 FILTERING CRITERIA:
 - Deal Created: Deals CREATED in the period where:
   1. Accountant involvement (meets EITHER criteria):

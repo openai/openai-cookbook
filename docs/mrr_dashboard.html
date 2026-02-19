@@ -327,10 +327,17 @@
         .col-toggle-dropdown label { display: flex; align-items: center; gap: 10px; padding: 10px 6px; min-height: 44px; cursor: pointer; font-size: 0.9rem; color: var(--text); border-radius: 6px; }
         .col-toggle-dropdown label:hover { background: var(--accent-dim); color: var(--accent); }
         .col-toggle-dropdown input { margin: 0; width: 18px; height: 18px; flex-shrink: 0; }
+        .nav-links { margin-bottom: 20px; display: flex; gap: 12px; flex-wrap: wrap; }
+        .nav-links a { padding: 8px 14px; background: var(--card); border-radius: 8px; border: 1px solid var(--border); font-size: 0.9rem; color: var(--accent); text-decoration: none; }
+        .nav-links a:hover { background: var(--accent-dim); border-color: var(--accent); }
     </style>
 </head>
 <body>
     <div class="container">
+        <nav class="nav-links">
+            <a href="index.html">← Dashboards</a>
+            <a href="budget_dashboard.html">Budget Dashboard</a>
+        </nav>
         <h1>Colppy Accountant Offices: Where We Win</h1>
         <p class="subtitle">MRR by Client Portfolio Growth and Managed Tax IDs (ICP accountants only · MRR only, not NRR · includes churned)</p>
         <p class="detail detail-generated">Generated: 2026-02-18 13:31 — hard refresh (Ctrl+Shift+R / Cmd+Shift+R) if you don’t see this time.</p>

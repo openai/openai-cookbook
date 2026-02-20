@@ -175,7 +175,7 @@ def get_first_payment_date(deal: dict) -> datetime | None:
     return parse_ts(p.get("closedate") or "")
 
 
-def run_analysis(start_date: str, end_date: str):
+def run_analysis(start_date: str, end_date: str, table: bool = False):
     """Run touch sequence analysis."""
     print("=" * 100)
     print("TOUCH SEQUENCE ANALYSIS (Touch Before/After First Payment)")
@@ -306,6 +306,35 @@ def run_analysis(start_date: str, end_date: str):
             print(f"   ... and {len(no_payment_date) - 10} more")
         print()
 
+    if table:
+        print("=" * 100)
+        print("FULL TABLE (clickable links to HubSpot)")
+        print("=" * 100)
+        print()
+        print("| # | Category | Deal | Amount | First Touch | First Payment |")
+        print("|---|----------|------|--------|-------------|---------------|")
+        n = 1
+        for i, (deal, ft, fp) in enumerate(touch_before, 1):
+            p = deal["properties"]
+            link = f"https://{HUBSPOT_UI_DOMAIN}/contacts/{HUBSPOT_PORTAL_ID}/deal/{deal['id']}"
+            name = (p.get("dealname") or "N/A").replace("|", "-")
+            print(f"| {n} | Touch before | [{name}]({link}) | {fmt_amt(float(p.get('amount') or 0))} | {ft.strftime('%Y-%m-%d')} | {fp.strftime('%Y-%m-%d')} |")
+            n += 1
+        for i, (deal, ft, fp) in enumerate(touch_after, 1):
+            p = deal["properties"]
+            link = f"https://{HUBSPOT_UI_DOMAIN}/contacts/{HUBSPOT_PORTAL_ID}/deal/{deal['id']}"
+            name = (p.get("dealname") or "N/A").replace("|", "-")
+            print(f"| {n} | Touch after | [{name}]({link}) | {fmt_amt(float(p.get('amount') or 0))} | {ft.strftime('%Y-%m-%d')} | {fp.strftime('%Y-%m-%d')} |")
+            n += 1
+        for i, deal in enumerate(no_touch, 1):
+            p = deal["properties"]
+            link = f"https://{HUBSPOT_UI_DOMAIN}/contacts/{HUBSPOT_PORTAL_ID}/deal/{deal['id']}"
+            name = (p.get("dealname") or "N/A").replace("|", "-")
+            fp = get_first_payment_date(deal)
+            print(f"| {n} | No touch | [{name}]({link}) | {fmt_amt(float(p.get('amount') or 0))} | - | {fp.strftime('%Y-%m-%d') if fp else '-'} |")
+            n += 1
+        print()
+
     print("=" * 100)
     return {"touch_before": touch_before, "touch_after": touch_after, "no_touch": no_touch, "no_payment_date": no_payment_date}
 
@@ -316,6 +345,7 @@ def main():
     group.add_argument("--month", type=str, help="Month YYYY-MM")
     group.add_argument("--start-date", type=str)
     parser.add_argument("--end-date", type=str)
+    parser.add_argument("--table", action="store_true", help="Print full table with clickable HubSpot links")
     args = parser.parse_args()
 
     if args.month:
@@ -330,7 +360,7 @@ def main():
         start_date = args.start_date
         end_date = args.end_date
 
-    run_analysis(start_date, end_date)
+    run_analysis(start_date, end_date, table=args.table)
 
 
 if __name__ == "__main__":

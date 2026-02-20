@@ -1,7 +1,81 @@
-# Mixpanel API Python Wrapper
+# Mixpanel API & MCP Integration
 
 ## Overview
 This project provides a simple, extensible Python wrapper for the Mixpanel Query API, with a focus on company (Group) analytics for Colppy.com. It enables you to run JQL queries, segment events by company, and analyze user and company activity for Product-Led Growth (PLG) initiatives.
+
+---
+
+## Mixpanel MCP (Model Context Protocol) Setup
+
+**Official docs:** [Mixpanel MCP - docs.mixpanel.com](https://docs.mixpanel.com/docs/features/mcp)
+
+The Mixpanel MCP integration lets you query Mixpanel data via natural language in Cursor, Claude, or Gemini. If MCP tools return errors (e.g. "Tool not found"), follow this setup.
+
+### Prerequisites
+
+- **Node.js** (required for `mcp-remote`): `brew install node`
+- **Mixpanel org admin** must enable MCP: **Settings → Organization → Overview** → toggle **"Enable MCP"**
+
+### Cursor Setup
+
+1. **Add MCP server config**
+   - Cursor → **Settings** → **MCP & Integrations** → **MCP Tools** → **New MCP Server**
+   - Paste:
+
+   ```json
+   {
+     "mcpServers": {
+       "mixpanel": {
+         "command": "npx",
+         "args": [
+           "-y",
+           "mcp-remote",
+           "https://mcp.mixpanel.com/mcp",
+           "--allow-http"
+         ]
+       }
+     }
+   }
+   ```
+
+   - **EU region:** use `https://mcp-eu.mixpanel.com/mcp`
+   - **IN region:** use `https://mcp-in.mixpanel.com/mcp`
+
+2. **Authorize with Mixpanel**
+   - Run in terminal:
+
+   ```bash
+   npx -y mcp-remote https://mcp.mixpanel.com/mcp --static-oauth-client-metadata '{ "scope": "projects analysis events insights segmentation retention data:read funnels flows data_definitions" }' --allow-http
+   ```
+
+   - Follow the link to complete OAuth in the browser.
+
+3. **Restart Cursor** after config changes.
+
+### Available MCP Tools
+
+- `get_projects` – List Mixpanel projects
+- `get_events` – List events in a project
+- `get_event_properties` – Properties for an event
+- `get_event_property_values` – Values for a property
+- `run_segmentation_query` – Segmentation (event counts, unique users)
+- `run_frequency_query` – Frequency analysis
+- `run_retention_query` – Retention analysis
+- `run_funnels_query` – Funnel analysis
+- `get_user_replays_data` – Session replays for a user
+- `get_data_volume_anomalies` – Data quality checks
+- `get_lexicon_detail_url` – Lexicon links
+
+### Troubleshooting
+
+| Issue | Fix |
+|-------|-----|
+| **"Tool not found"** | MCP server not configured or not connected. Re-add config and restart Cursor. |
+| **Authorization fails** | Ensure Mixpanel org admin enabled MCP. Re-run the `npx mcp-remote` auth command. |
+| **Node.js not found** | `brew install node` |
+| **Desktop app issues** | Restart Cursor after config changes. |
+
+---
 
 ## Key Findings
 
@@ -355,6 +429,68 @@ function main() {
   return results;
 }
 ```
+
+### Find First Payment Date (Subscription Billed) for id_empresa
+
+**Purpose:** Determine when an `id_empresa` paid for the first time. The event `Subscription Billed` fires when Colppy bills a subscription; the **first occurrence** for a given `id_empresa` = **new subscription paid** (first payment date).
+
+**Event:** `Subscription Billed`  
+**Company property:** `idEmpresa` or `company_id` or `$groups.Company`
+
+**Procedure:**
+
+1. **Get first Subscription Billed (first payment date) for a specific id_empresa:**
+   ```javascript
+   function main() {
+     var idEmpresa = "105440";  // Replace with your id_empresa
+     return Events({
+       from_date: "2025-01-01",
+       to_date: "2026-12-31"
+     })
+     .filter(function(event) {
+       return event.name === "Subscription Billed" &&
+         (event.properties["idEmpresa"] === idEmpresa ||
+          event.properties["company_id"] === idEmpresa ||
+          (event.properties["$groups"] && event.properties["$groups"]["Company"] === idEmpresa));
+     })
+     .groupBy([], mixpanel.reducer.min("time"))
+     .map(function(r) {
+       var t = r.value;
+       return {
+         id_empresa: idEmpresa,
+         first_billed_time: t,
+         first_billed_date: t ? new Date(t).toISOString().split("T")[0] : null
+       };
+     });
+   }
+   ```
+   **Note:** `reducer.min("time")` returns the earliest event timestamp. If no events match, value may be null.
+
+2. **List id_empresa that had Subscription Billed in a month (e.g. January 2026):**
+   ```javascript
+   function main() {
+     return Events({
+       from_date: "2026-01-01",
+       to_date: "2026-01-31"
+     })
+     .filter(function(e) { return e.name === "Subscription Billed"; })
+     .groupBy([
+       function(e) {
+         return e.properties["idEmpresa"] || e.properties["company_id"] ||
+           (e.properties["$groups"] && e.properties["$groups"]["Company"]) || "unknown";
+       }
+     ], mixpanel.reducer.count())
+     .map(function(r) { return { id_empresa: r.key[0], count: r.value }; });
+   }
+   ```
+
+3. **Via run_jql.py:**
+   ```bash
+   cd tools/scripts/mixpanel
+   python run_jql.py --query 'function main(){...}' --output first_payment.json
+   ```
+
+**Note:** Mixpanel rate limit is 60 JQL queries/hour. Use date ranges wisely.
 
 ## API Reference
 

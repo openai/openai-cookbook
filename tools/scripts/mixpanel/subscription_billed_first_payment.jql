@@ -1,0 +1,32 @@
+/**
+ * Subscription Billed - First payment EVER per id_empresa
+ * Event: Subscription Billed (Colppy bills a subscription)
+ * First occurrence EVER per id_empresa = new subscription paid (first payment date)
+ * Filtered to id_empresa whose first ever Subscription Billed was in January 2026.
+ * Use for fecha_primer_pago reconciliation with HubSpot closed won.
+ */
+function main() {
+  return Events({
+    from_date: "2015-01-01",
+    to_date: "2026-12-31"
+  })
+  .filter(function(e) { return e.name === "Subscription Billed"; })
+  .groupBy([
+    function(e) {
+      return e.properties["idEmpresa"] || e.properties["company_id"] ||
+        (e.properties["$groups"] && e.properties["$groups"]["Company"]) || "unknown";
+    }
+  ], mixpanel.reducer.min("time"))
+  .map(function(r) {
+    var t = r.value;
+    var d = t ? new Date(t).toISOString().split("T")[0] : null;
+    return {
+      id_empresa: r.key[0],
+      first_billed_time: t,
+      first_billed_date: d
+    };
+  })
+  .filter(function(r) {
+    return r.first_billed_date && r.first_billed_date >= "2026-01-01" && r.first_billed_date <= "2026-01-31";
+  });
+}

@@ -520,16 +520,20 @@ python fetch_hubspot_deals_with_company.py --month 2025-12 --deal-stage closedwo
 3. **Contact Filtering**: All deals must have at least one associated contact (all contact types included - SMB, accountant, or no rol_wizard)
 4. **Closed Won**: Deals where both `createdate` and `closedate` are in the period
 
+**Performance:**
+- **Default (fast):** Uses `tiene_cuenta_contador` field only. ~2-3 min for 4 months.
+- **`--dual-criteria`:** Also checks association type 8 per deal. ~5-10 min for 4 months.
+
 **Usage:**
 ```bash
-# Single month analysis
+# Single month analysis (fast)
 python tools/scripts/hubspot/analyze_smb_accountant_involved_funnel.py --month 2025-12
 
-# Multiple months comparison
-python tools/scripts/hubspot/analyze_smb_accountant_involved_funnel.py --months 2025-10 2025-11 2025-12
+# Custom date range (fast)
+python tools/scripts/hubspot/analyze_smb_accountant_involved_funnel.py --start-date 2025-10-01 --end-date 2026-02-01
 
-# Custom date range
-python tools/scripts/hubspot/analyze_smb_accountant_involved_funnel.py --start-date 2025-12-01 --end-date 2026-01-01
+# Dual-criteria mode (slower, for overlap analysis)
+python tools/scripts/hubspot/analyze_smb_accountant_involved_funnel.py --start-date 2025-10-01 --end-date 2026-02-01 --dual-criteria
 
 # Visualization only (from existing CSV)
 python tools/scripts/hubspot/analyze_smb_accountant_involved_funnel.py --csv smb_accountant_funnel_comparison_20251201_20260101.csv

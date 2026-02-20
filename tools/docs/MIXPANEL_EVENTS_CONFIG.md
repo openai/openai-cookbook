@@ -81,6 +81,11 @@
 | `Imprimió comprobante de venta` | Invoice printing | format, option | Document output |
 | `app imprimió comprobante de venta` | Mobile invoice printing | format, option | Mobile printing |
 
+### **Subscription Billing:**
+| Event | Description | Properties | Usage |
+|-------|-------------|------------|-------|
+| `Subscription Billed` | Colppy subscription billed (payment processed) | idEmpresa, company_id, $groups.Company | **First occurrence per id_empresa = new subscription paid** (first payment date). Use for fecha_primer_pago reconciliation. |
+
 ### **Payment & Banking:**
 | Event | Description | Properties | Usage |
 |-------|-------------|------------|-------|

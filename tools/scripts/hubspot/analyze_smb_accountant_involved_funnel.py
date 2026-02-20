@@ -81,6 +81,11 @@ Usage:
   python analyze_smb_accountant_involved_funnel.py --month 2025-12
   python analyze_smb_accountant_involved_funnel.py --months 2025-11 2025-12
   python analyze_smb_accountant_involved_funnel.py --start-date 2025-12-01 --end-date 2026-01-01
+
+Modes:
+  Default (fast): Uses tiene_cuenta_contador field only. ~2-3 min for 4 months.
+  --dual-criteria: Also checks association type 8 per deal. ~5-10 min for 4 months.
+  --minimal: Fastest run. Skips contact filter and ICP coverage. Keeps core metrics and CSV.
 """
 
 import os
@@ -339,17 +344,23 @@ def is_icp_operador(deal):
     
     return False
 
-def analyze_funnel_with_accountant(start_date, end_date):
+def analyze_funnel_with_accountant(start_date, end_date, use_field_only=True, minimal=False):
     """
     Analyze the funnel for SMB deals WITH accountant involvement.
+    
+    Args:
+        use_field_only: If True (default), use tiene_cuenta_contador only (fast).
+            If False, also check association type 8 per deal (dual-criteria, slow).
+        minimal: If True, skip contact filter, edge case analysis, ICP coverage (fastest).
     
     FUNNEL LOGIC:
     ============
     1. Fetch all deals created in period where tiene_cuenta_contador > 0
-    2. For each deal, check associated contacts - filter for contacts
-    3. Track: Deal Created → Deal Closed Won
-    4. Classify by ICP Operador vs ICP PYME
-    5. Calculate revenue
+    2. (Optional) Also include deals with association type 8 if use_field_only=False
+    3. For each deal, check associated contacts - filter for contacts
+    4. Track: Deal Created → Deal Closed Won
+    5. Classify by ICP Operador vs ICP PYME
+    6. Calculate revenue
     """
     # Validate date range
     start_dt = datetime.fromisoformat(f"{start_date}T00:00:00+00:00")
@@ -364,9 +375,13 @@ def analyze_funnel_with_accountant(start_date, end_date):
     # STEP 1: Fetch Deals with Accountant Involvement
     # ========================================================================
     print("📊 STEP 1: Fetching deals with accountant involvement...")
-    print("   Using TWO criteria:")
-    print("   1. tiene_cuenta_contador > 0 (Formula field - counts accountant companies)")
-    print("   2. Has companies with association type 8 (Rollup field logic - 'Estudio Contable' label)")
+    if use_field_only:
+        print("   Mode: Field only (fast) — tiene_cuenta_contador > 0")
+        print("   Use --dual-criteria for type 8 check per deal.")
+    else:
+        print("   Using TWO criteria:")
+        print("   1. tiene_cuenta_contador > 0 (Formula field - counts accountant companies)")
+        print("   2. Has companies with association type 8 (Rollup field logic - 'Estudio Contable' label)")
     print()
     
     url = f"{HUBSPOT_BASE_URL}/crm/v3/objects/deals/search"
@@ -404,283 +419,152 @@ def analyze_funnel_with_accountant(start_date, end_date):
     
     print(f"   Method 1 (tiene_cuenta_contador > 0): Found {len(deals_by_formula)} deals")
     
-    # Method 2: Fetch ALL deals in period, then check for association type 8
-    print("   Method 2: Fetching all deals in period to check association type 8...")
-    all_deals_in_period = []
-    after = None
-    
-    while True:
-        filters = [
-            {"propertyName": "createdate", "operator": "GTE", "value": f"{start_date}T00:00:00Z"},
-            {"propertyName": "createdate", "operator": "LT", "value": f"{end_date}T00:00:00Z"}
-        ]
+    if use_field_only:
+        # Fast mode: use tiene_cuenta_contador only (HubSpot rollup field counts type 8)
+        all_deals_with_accountant = deals_by_formula
+        print(f"   Using field-only mode (fast). Total: {len(all_deals_with_accountant)} deals")
+        print()
+    else:
+        # Dual-criteria: also fetch all deals and check association type 8
+        print("   Method 2: Fetching all deals in period to check association type 8...")
+        all_deals_in_period = []
+        after = None
         
-        payload = {
-            "filterGroups": [{"filters": filters}],
-            "properties": ["dealname", "createdate", "closedate", "dealstage", "amount", "primary_company_type", "tiene_cuenta_contador"],
-            "limit": 100
-        }
-        if after:
-            payload["after"] = after
+        while True:
+            filters = [
+                {"propertyName": "createdate", "operator": "GTE", "value": f"{start_date}T00:00:00Z"},
+                {"propertyName": "createdate", "operator": "LT", "value": f"{end_date}T00:00:00Z"}
+            ]
+            payload = {
+                "filterGroups": [{"filters": filters}],
+                "properties": ["dealname", "createdate", "closedate", "dealstage", "amount", "primary_company_type", "tiene_cuenta_contador"],
+                "limit": 100
+            }
+            if after:
+                payload["after"] = after
+            response = requests.post(url, headers=HEADERS, json=payload, timeout=30)
+            response.raise_for_status()
+            data = response.json()
+            results = data.get('results', [])
+            all_deals_in_period.extend(results)
+            after = data.get('paging', {}).get('next', {}).get('after')
+            if not after:
+                break
+            time.sleep(0.2)
         
-        response = requests.post(url, headers=HEADERS, json=payload, timeout=30)
-        response.raise_for_status()
-        data = response.json()
+        print(f"   Found {len(all_deals_in_period)} total deals in period")
+        print("   Checking which deals have association type 8 (Estudio Contable)...")
         
-        results = data.get('results', [])
-        all_deals_in_period.extend(results)
+        deals_by_association = []
+        deal_id_to_deal = {deal.get('id'): deal for deal in all_deals_in_period}
+        for i, deal in enumerate(all_deals_in_period, 1):
+            if i % 50 == 0:
+                print(f"      Checking deal {i}/{len(all_deals_in_period)}...")
+            deal_id = deal.get('id')
+            has_assoc, _, _ = has_accountant_company_association(deal_id)
+            if has_assoc:
+                deals_by_association.append(deal_id)
+            time.sleep(0.05)
         
-        after = data.get('paging', {}).get('next', {}).get('after')
-        if not after:
-            break
-        time.sleep(0.2)
+        print(f"   Method 2 (association type 8): Found {len(deals_by_association)} deals")
+        
+        deal_ids_by_formula = {deal.get('id') for deal in deals_by_formula}
+        deal_ids_by_association = set(deals_by_association)
+        all_deal_ids = deal_ids_by_formula | deal_ids_by_association
+        all_deals_with_accountant = [deal_id_to_deal[did] for did in all_deal_ids if did in deal_id_to_deal]
+        
+        deals_only_formula = deal_ids_by_formula - deal_ids_by_association
+        deals_only_association = deal_ids_by_association - deal_ids_by_formula
+        deals_both_methods = deal_ids_by_formula & deal_ids_by_association
     
-    print(f"   Found {len(all_deals_in_period)} total deals in period")
-    print("   Checking which deals have association type 8 (Estudio Contable)...")
-    
-    # Check each deal for association type 8
-    deals_by_association = []
-    deal_id_to_deal = {deal.get('id'): deal for deal in all_deals_in_period}
-    
-    for i, deal in enumerate(all_deals_in_period, 1):
-        if i % 50 == 0:
-            print(f"      Checking deal {i}/{len(all_deals_in_period)}...")
-        deal_id = deal.get('id')
-        has_assoc, company_count, company_ids = has_accountant_company_association(deal_id)
-        if has_assoc:
-            deals_by_association.append(deal_id)
-        time.sleep(0.05)  # Rate limiting
-    
-    print(f"   Method 2 (association type 8): Found {len(deals_by_association)} deals")
-    
-    # Combine both methods (OR logic)
-    deal_ids_by_formula = {deal.get('id') for deal in deals_by_formula}
-    deal_ids_by_association = set(deals_by_association)
-    
-    all_deal_ids = deal_ids_by_formula | deal_ids_by_association
-    all_deals_with_accountant = [deal_id_to_deal[deal_id] for deal_id in all_deal_ids if deal_id in deal_id_to_deal]
-    
-    # Track which method identified each deal
-    deals_only_formula = deal_ids_by_formula - deal_ids_by_association
-    deals_only_association = deal_ids_by_association - deal_ids_by_formula
-    deals_both_methods = deal_ids_by_formula & deal_ids_by_association
-    
-    print()
-    print(f"   📊 OVERLAP ANALYSIS:")
-    print(f"   - Deals identified by BOTH methods: {len(deals_both_methods)}")
-    print(f"   - Deals identified ONLY by tiene_cuenta_contador: {len(deals_only_formula)}")
-    print(f"   - Deals identified ONLY by association type 8: {len(deals_only_association)}")
-    print(f"   - TOTAL unique deals with accountant involvement: {len(all_deals_with_accountant)}")
-    print()
+        print()
+        print(f"   📊 OVERLAP ANALYSIS:")
+        print(f"   - Deals identified by BOTH methods: {len(deals_both_methods)}")
+        print(f"   - Deals identified ONLY by tiene_cuenta_contador: {len(deals_only_formula)}")
+        print(f"   - Deals identified ONLY by association type 8: {len(deals_only_association)}")
+        print(f"   - TOTAL unique deals with accountant involvement: {len(all_deals_with_accountant)}")
+        print()
     
     # ========================================================================
-    # STEP 2: Filter for Deals with Contacts (Simplified Logic)
+    # STEP 2: Filter for Deals with Contacts (or skip in minimal mode)
     # ========================================================================
-    print("📊 STEP 2: Filtering for deals with contacts...")
-    print("   SIMPLIFIED LOGIC: All contact types indicate accountant influence")
-    print("   - SMB contacts → included")
-    print("   - Accountant contacts → included (part of accountant influence)")
-    print("   - No rol_wizard contacts → included (treated as SMB)")
-    print("   - Only exclude deals with NO contacts at all\n")
-    
-    deals_with_contacts = []
-    edge_cases = {
-        'no_contacts': [],
-        'only_accountant_contacts': [],
-        'explicit_smb_only': [],
-        'no_rol_wizard_only': [],
-        'explicit_smb_and_no_rol': [],
-        'accountant_and_smb': [],
-        'accountant_and_no_rol_wizard': [],
-        'only_accountant_contacts_included': []
-    }
-    
-    for i, deal in enumerate(all_deals_with_accountant, 1):
-        if i % 10 == 0:
-            print(f"   Processing deal {i}/{len(all_deals_with_accountant)}...")
+    if minimal:
+        deals_with_contacts = all_deals_with_accountant
+        print("📊 STEP 2: Minimal mode — skipping contact filter (all deals included)\n")
+    else:
+        print("📊 STEP 2: Filtering for deals with contacts...")
+        print("   SIMPLIFIED LOGIC: All contact types indicate accountant influence")
+        print("   - SMB contacts → included")
+        print("   - Accountant contacts → included (part of accountant influence)")
+        print("   - No rol_wizard contacts → included (treated as SMB)")
+        print("   - Only exclude deals with NO contacts at all\n")
         
-        deal_id = deal.get('id')
-        deal_name = deal.get('properties', {}).get('dealname', 'N/A')
-        should_include, total_contacts, smb_count, contact_details = has_smb_contact(deal_id)
-        
-        deal_edge_case = {
-            'deal_id': deal_id,
-            'deal_name': deal_name,
-            'total_contacts': total_contacts,
-            'contact_breakdown': contact_details
+        deals_with_contacts = []
+        edge_cases = {
+            'no_contacts': [], 'only_accountant_contacts': [], 'explicit_smb_only': [],
+            'no_rol_wizard_only': [], 'explicit_smb_and_no_rol': [], 'accountant_and_smb': [],
+            'accountant_and_no_rol_wizard': [], 'only_accountant_contacts_included': []
         }
         
-        # Use breakdown from contact_details (with safe defaults)
-        explicit_smb = contact_details.get('smb_explicit', 0)
-        no_rol_wizard_count = contact_details.get('smb_no_rol_wizard', 0)
-        accountant_count = contact_details.get('accountant', 0)
-        
-        if should_include:
-            deals_with_contacts.append(deal)
-            # Categorize included deals
-            if accountant_count > 0 and explicit_smb > 0:
-                edge_cases['accountant_and_smb'].append(deal_edge_case)
-            elif accountant_count > 0 and no_rol_wizard_count > 0:
-                edge_cases['accountant_and_no_rol_wizard'].append(deal_edge_case)
-            elif accountant_count > 0 and explicit_smb == 0 and no_rol_wizard_count == 0:
-                # Only accountant contacts - NOW INCLUDED (part of accountant influence)
-                edge_cases['only_accountant_contacts_included'].append(deal_edge_case)
-            elif explicit_smb > 0 and no_rol_wizard_count == 0 and accountant_count == 0:
-                edge_cases['explicit_smb_only'].append(deal_edge_case)
-            elif no_rol_wizard_count > 0 and explicit_smb == 0 and accountant_count == 0:
-                edge_cases['no_rol_wizard_only'].append(deal_edge_case)
-            elif explicit_smb > 0 and no_rol_wizard_count > 0:
-                edge_cases['explicit_smb_and_no_rol'].append(deal_edge_case)
-        else:
-            # Only exclude deals with NO contacts
-            if total_contacts == 0:
+        for i, deal in enumerate(all_deals_with_accountant, 1):
+            if i % 10 == 0:
+                print(f"   Processing deal {i}/{len(all_deals_with_accountant)}...")
+            deal_id = deal.get('id')
+            deal_name = deal.get('properties', {}).get('dealname', 'N/A')
+            should_include, total_contacts, smb_count, contact_details = has_smb_contact(deal_id)
+            deal_edge_case = {'deal_id': deal_id, 'deal_name': deal_name, 'total_contacts': total_contacts, 'contact_breakdown': contact_details}
+            explicit_smb = contact_details.get('smb_explicit', 0)
+            no_rol_wizard_count = contact_details.get('smb_no_rol_wizard', 0)
+            accountant_count = contact_details.get('accountant', 0)
+            if should_include:
+                deals_with_contacts.append(deal)
+                if accountant_count > 0 and explicit_smb > 0:
+                    edge_cases['accountant_and_smb'].append(deal_edge_case)
+                elif accountant_count > 0 and no_rol_wizard_count > 0:
+                    edge_cases['accountant_and_no_rol_wizard'].append(deal_edge_case)
+                elif accountant_count > 0 and explicit_smb == 0 and no_rol_wizard_count == 0:
+                    edge_cases['only_accountant_contacts_included'].append(deal_edge_case)
+                elif explicit_smb > 0 and no_rol_wizard_count == 0 and accountant_count == 0:
+                    edge_cases['explicit_smb_only'].append(deal_edge_case)
+                elif no_rol_wizard_count > 0 and explicit_smb == 0 and accountant_count == 0:
+                    edge_cases['no_rol_wizard_only'].append(deal_edge_case)
+                elif explicit_smb > 0 and no_rol_wizard_count > 0:
+                    edge_cases['explicit_smb_and_no_rol'].append(deal_edge_case)
+            elif total_contacts == 0:
                 edge_cases['no_contacts'].append(deal_edge_case)
+            time.sleep(0.1)
         
-        time.sleep(0.1)  # Rate limiting
-    
-    excluded_count = len(edge_cases['no_contacts'])
-    print(f"   Found {len(deals_with_contacts)} deals with contacts (all contact types included)")
-    print(f"   Excluded: {excluded_count} deals (no contacts at all)\n")
-    
-    # ========================================================================
-    # EDGE CASE ANALYSIS REPORT
-    # ========================================================================
-    print("="*80)
-    print("EDGE CASE ANALYSIS - Contact rol_wizard Status")
-    print("="*80)
-    print()
-    print("**SIMPLIFIED LOGIC:**")
-    print("  - All contact types indicate accountant influence → INCLUDED")
-    print("  - Contacts with no rol_wizard are TREATED AS SMB")
-    print("  - Only exclude deals with NO contacts at all")
-    print()
-    
-    excluded_count = len(edge_cases['no_contacts'])
-    
-    print(f"**Summary:**")
-    print(f"- Deals INCLUDED in funnel: {len(deals_with_contacts)}")
-    print(f"  • Deals with explicit SMB contacts: {len(edge_cases['explicit_smb_only']) + len(edge_cases['explicit_smb_and_no_rol']) + len(edge_cases['accountant_and_smb'])}")
-    print(f"  • Deals with no rol_wizard contacts (treated as SMB): {len(edge_cases['no_rol_wizard_only']) + len(edge_cases['explicit_smb_and_no_rol']) + len(edge_cases['accountant_and_no_rol_wizard'])}")
-    print(f"  • Deals with ONLY accountant contacts (included - part of accountant influence): {len(edge_cases['only_accountant_contacts_included'])}")
-    print(f"  • Deals with both explicit SMB + no rol_wizard: {len(edge_cases['explicit_smb_and_no_rol'])}")
-    print(f"- Deals EXCLUDED: {excluded_count} (no contacts at all)")
-    print()
-    
-    # No contacts
-    if edge_cases['no_contacts']:
-        print(f"**1. Deals with NO contacts ({len(edge_cases['no_contacts'])} deals) - EXCLUDED:**")
-        print("   These deals have accountant involvement (tiene_cuenta_contador > 0) but no contacts associated.")
-        print("   This could indicate:")
-        print("   - Deal created directly without contact association")
-        print("   - Contact association removed or never created")
-        print("   - Data quality issue")
-        print()
-        for case in edge_cases['no_contacts'][:5]:
-            print(f"   - Deal: {case['deal_name'][:60]}")
-            print(f"     ID: {case['deal_id']}")
-        if len(edge_cases['no_contacts']) > 5:
-            print(f"   ... and {len(edge_cases['no_contacts']) - 5} more")
-        print()
-    
-    # Included deals breakdown
-    print("**INCLUDED DEALS BREAKDOWN:**")
-    print()
-    
-    # Only accountant contacts - NOW INCLUDED
-    if edge_cases['only_accountant_contacts_included']:
-        print(f"**2. Deals with ONLY accountant contacts ({len(edge_cases['only_accountant_contacts_included'])} deals) - INCLUDED:**")
-        print("   ✅ These deals are INCLUDED (accountant contacts are part of accountant influence).")
-        print("   These deals have accountant involvement (tiene_cuenta_contador > 0) AND accountant contacts.")
-        print("   This indicates strong accountant influence in the sales process.")
-        print()
-        for case in edge_cases['only_accountant_contacts_included'][:5]:
-            print(f"   - Deal: {case['deal_name'][:60]}")
-            print(f"     ID: {case['deal_id']}")
-            print(f"     Contacts: {case['contact_breakdown'].get('accountant', 0)} accountant(s)")
-            for contact in case['contact_breakdown']['contacts'][:3]:
-                print(f"       • {contact['email']} ({contact['rol_wizard']})")
-        if len(edge_cases['only_accountant_contacts_included']) > 5:
-            print(f"   ... and {len(edge_cases['only_accountant_contacts_included']) - 5} more")
-        print()
-    
-    # Explicit SMB only
-    if edge_cases['explicit_smb_only']:
-        print(f"**3. Deals with explicit SMB contacts only ({len(edge_cases['explicit_smb_only'])} deals) - INCLUDED:**")
-        print("   These deals have contacts with explicit SMB rol_wizard (no accountant contacts).")
-        print()
-        for case in edge_cases['explicit_smb_only'][:3]:
-            print(f"   - Deal: {case['deal_name'][:60]}")
-            print(f"     ID: {case['deal_id']}")
-        if len(edge_cases['explicit_smb_only']) > 3:
-            print(f"   ... and {len(edge_cases['explicit_smb_only']) - 3} more")
-        print()
-    
-    # No rol_wizard only (treated as SMB)
-    if edge_cases['no_rol_wizard_only']:
-        print(f"**4. Deals with contacts that have NO rol_wizard ({len(edge_cases['no_rol_wizard_only'])} deals) - INCLUDED:**")
-        print("   ✅ These deals are INCLUDED (contacts with no rol_wizard are treated as SMB).")
-        print("   These contacts may have:")
-        print("   - Never gone through the wizard (older contacts, direct referrals)")
-        print("   - rol_wizard field not populated (data quality issue)")
-        print("   - Still valid SMB deals referred by accountants")
-        print()
-        for case in edge_cases['no_rol_wizard_only'][:5]:
-            print(f"   - Deal: {case['deal_name'][:60]}")
-            print(f"     ID: {case['deal_id']}")
-            print(f"     Contacts: {case['contact_breakdown'].get('no_rol_wizard', 0)} contact(s) without rol_wizard (treated as SMB)")
-            for contact in case['contact_breakdown']['contacts'][:3]:
-                print(f"       • {contact['email']} ({contact['name']}) - rol_wizard: {contact['rol_wizard']}")
-        if len(edge_cases['no_rol_wizard_only']) > 5:
-            print(f"   ... and {len(edge_cases['no_rol_wizard_only']) - 5} more")
-        print()
-    
-    # Accountant + no rol_wizard (treated as SMB)
-    if edge_cases['accountant_and_no_rol_wizard']:
-        print(f"**5. Deals with accountant contacts + contacts without rol_wizard ({len(edge_cases['accountant_and_no_rol_wizard'])} deals) - INCLUDED:**")
-        print("   ✅ These deals are INCLUDED (contacts without rol_wizard are treated as SMB).")
-        print("   These deals have both accountant contacts and contacts without rol_wizard.")
-        print("   The contacts without rol_wizard are treated as SMB contacts.")
-        print()
-        for case in edge_cases['accountant_and_no_rol_wizard'][:5]:
-            print(f"   - Deal: {case['deal_name'][:60]}")
-            print(f"     ID: {case['deal_id']}")
-            print(f"     Contacts: {case['contact_breakdown'].get('accountant', 0)} accountant(s), {case['contact_breakdown'].get('no_rol_wizard', 0)} without rol_wizard (treated as SMB)")
-            for contact in case['contact_breakdown']['contacts'][:3]:
-                print(f"       • {contact['email']} - Type: {contact['type']}, rol_wizard: {contact['rol_wizard']}")
-        if len(edge_cases['accountant_and_no_rol_wizard']) > 5:
-            print(f"   ... and {len(edge_cases['accountant_and_no_rol_wizard']) - 5} more")
-        print()
-    
-    # Accountant + explicit SMB
-    if edge_cases['accountant_and_smb']:
-        print(f"**6. Deals with BOTH accountant AND explicit SMB contacts ({len(edge_cases['accountant_and_smb'])} deals) - INCLUDED:**")
-        print("   These deals are included in the funnel (have explicit SMB contacts).")
-        print("   They also have accountant contacts, which is normal for accountant-referred SMB deals.")
-        print()
-        for case in edge_cases['accountant_and_smb'][:5]:
-            print(f"   - Deal: {case['deal_name'][:60]}")
-            print(f"     ID: {case['deal_id']}")
-            print(f"     Contacts: {case['contact_breakdown'].get('accountant', 0)} accountant(s), {case['contact_breakdown'].get('smb_explicit', 0)} explicit SMB")
-            for contact in case['contact_breakdown']['contacts'][:3]:
-                print(f"       • {contact['email']} - Type: {contact['type']}, rol_wizard: {contact['rol_wizard']}")
-        if len(edge_cases['accountant_and_smb']) > 5:
-            print(f"   ... and {len(edge_cases['accountant_and_smb']) - 5} more")
-        print()
-    
-    # Explicit SMB + no rol_wizard
-    if edge_cases['explicit_smb_and_no_rol']:
-        print(f"**7. Deals with explicit SMB + no rol_wizard contacts ({len(edge_cases['explicit_smb_and_no_rol'])} deals) - INCLUDED:**")
-        print("   These deals have both explicit SMB contacts and contacts without rol_wizard.")
-        print()
-        for case in edge_cases['explicit_smb_and_no_rol'][:3]:
-            print(f"   - Deal: {case['deal_name'][:60]}")
-            print(f"     ID: {case['deal_id']}")
-        if len(edge_cases['explicit_smb_and_no_rol']) > 3:
-            print(f"   ... and {len(edge_cases['explicit_smb_and_no_rol']) - 3} more")
-        print()
-    
-    print("="*80)
-    print()
+        excluded_count = len(edge_cases['no_contacts'])
+        print(f"   Found {len(deals_with_contacts)} deals with contacts (all contact types included)")
+        print(f"   Excluded: {excluded_count} deals (no contacts at all)\n")
+        
+        # EDGE CASE ANALYSIS REPORT (skip in minimal)
+        if not minimal:
+            print("="*80)
+            print("EDGE CASE ANALYSIS - Contact rol_wizard Status")
+            print("="*80)
+            print()
+            print("**SIMPLIFIED LOGIC:**")
+            print("  - All contact types indicate accountant influence → INCLUDED")
+            print("  - Contacts with no rol_wizard are TREATED AS SMB")
+            print("  - Only exclude deals with NO contacts at all")
+            print()
+            print(f"**Summary:**")
+            print(f"- Deals INCLUDED in funnel: {len(deals_with_contacts)}")
+            print(f"  • Deals with explicit SMB contacts: {len(edge_cases['explicit_smb_only']) + len(edge_cases['explicit_smb_and_no_rol']) + len(edge_cases['accountant_and_smb'])}")
+            print(f"  • Deals with no rol_wizard contacts (treated as SMB): {len(edge_cases['no_rol_wizard_only']) + len(edge_cases['explicit_smb_and_no_rol']) + len(edge_cases['accountant_and_no_rol_wizard'])}")
+            print(f"  • Deals with ONLY accountant contacts: {len(edge_cases['only_accountant_contacts_included'])}")
+            print(f"- Deals EXCLUDED: {excluded_count} (no contacts at all)")
+            print()
+            if edge_cases['no_contacts']:
+                print(f"**Deals with NO contacts ({len(edge_cases['no_contacts'])} deals) - EXCLUDED:**")
+                for case in edge_cases['no_contacts'][:3]:
+                    print(f"   - {case['deal_name'][:50]} (ID: {case['deal_id']})")
+                if len(edge_cases['no_contacts']) > 3:
+                    print(f"   ... and {len(edge_cases['no_contacts']) - 3} more")
+                print()
+            print("="*80)
+            print()
     
     # ========================================================================
     # STEP 3: Filter for Closed Won Deals
@@ -709,48 +593,41 @@ def analyze_funnel_with_accountant(start_date, end_date):
     print(f"   Found {len(closed_won_deals)} closed won deals (created AND closed in period)\n")
     
     # ========================================================================
-    # STEP 4: Classify by ICP Operador vs ICP PYME + Coverage Analysis
+    # STEP 4: Classify by ICP Operador vs ICP PYME (+ Coverage in non-minimal)
     # ========================================================================
-    print("📊 STEP 4: Classifying by ICP and analyzing coverage...")
+    print("📊 STEP 4: Classifying by ICP" + (" and analyzing coverage..." if not minimal else "..."))
     icp_operador_deals = []
     icp_pyme_deals = []
-    
-    # Track ICP coverage (type field population)
     companies_analyzed = {}
     companies_with_type = 0
     companies_without_type = 0
     
     for deal in closed_won_deals:
-        deal_id = deal.get('id')
-        props = deal.get('properties', {})
-        primary_company_type = props.get('primary_company_type', '')
-        
-        # Track company type coverage
-        company_id = get_primary_company_id(deal_id)
-        if company_id and company_id not in companies_analyzed:
-            company_name, company_type = get_company_type(company_id)
-            companies_analyzed[company_id] = {
-                'name': company_name,
-                'type': company_type,
-                'deal_id': deal_id
-            }
-            if company_type and company_type.strip() and company_type.strip().lower() not in ['null', 'none', '']:
-                companies_with_type += 1
-            else:
-                companies_without_type += 1
-        
-        # Classify deal by ICP
         if is_icp_operador(deal):
             icp_operador_deals.append(deal)
         else:
             icp_pyme_deals.append(deal)
+        
+        # Coverage analysis (skip in minimal to avoid API calls)
+        if not minimal:
+            deal_id = deal.get('id')
+            company_id = get_primary_company_id(deal_id)
+            if company_id and company_id not in companies_analyzed:
+                company_name, company_type = get_company_type(company_id)
+                companies_analyzed[company_id] = {'name': company_name, 'type': company_type, 'deal_id': deal_id}
+                if company_type and company_type.strip() and company_type.strip().lower() not in ['null', 'none', '']:
+                    companies_with_type += 1
+                else:
+                    companies_without_type += 1
     
     total_companies_analyzed = len(companies_analyzed)
     coverage_percentage = (companies_with_type / total_companies_analyzed * 100) if total_companies_analyzed > 0 else 0
     
     print(f"   ICP Operador: {len(icp_operador_deals)}")
     print(f"   ICP PYME: {len(icp_pyme_deals)}")
-    print(f"   ICP Coverage: {companies_with_type}/{total_companies_analyzed} companies ({coverage_percentage:.1f}%) have type field populated\n")
+    if not minimal:
+        print(f"   ICP Coverage: {companies_with_type}/{total_companies_analyzed} companies ({coverage_percentage:.1f}%) have type field populated")
+    print()
     
     # ========================================================================
     # STEP 5: Calculate Revenue
@@ -816,40 +693,34 @@ def analyze_funnel_with_accountant(start_date, end_date):
     print()
     
     # ========================================================================
-    # ICP COVERAGE ANALYSIS
+    # ICP COVERAGE ANALYSIS (skip in minimal)
     # ========================================================================
-    print("="*80)
-    print("ICP COVERAGE ANALYSIS (Primary Companies from Closed Won Deals)")
-    print("="*80)
-    print()
-    print("This shows how many PRIMARY companies have their 'type' field populated,")
-    print("which enables ICP classification. Industry enrichment workflow populates")
-    print("this field based on industria field, improving coverage over time.")
-    print()
-    print("| Metric | Count | Percentage |")
-    print("|--------|-------|------------|")
-    print(f"| Total PRIMARY Companies Analyzed | {total_companies_analyzed} | 100.0% |")
-    print(f"| Companies WITH Type Field Populated | {companies_with_type} | {coverage_percentage:.1f}% |")
-    print(f"| Companies WITHOUT Type Field (NULL/Empty) | {companies_without_type} | {(companies_without_type / total_companies_analyzed * 100) if total_companies_analyzed > 0 else 0:.1f}% |")
-    print()
-    if companies_without_type > 0:
-        print("**Companies without type field:**")
-        print("These companies cannot be classified as ICP Operador or ICP PYME")
-        print("until their 'type' field is populated (via industry enrichment workflow).")
+    if not minimal:
+        print("="*80)
+        print("ICP COVERAGE ANALYSIS (Primary Companies from Closed Won Deals)")
+        print("="*80)
         print()
-        # Show sample companies without type
-        companies_without_type_list = [
-            (cid, info['name'], info['deal_id'])
-            for cid, info in companies_analyzed.items()
-            if not info['type'] or info['type'].strip() == '' or info['type'].strip().lower() in ['null', 'none']
-        ]
-        print(f"**Sample companies without type field (showing first 10 of {companies_without_type}):**")
-        for company_id, company_name, deal_id in companies_without_type_list[:10]:
-            print(f"  - {company_name} (Company ID: {company_id}, Deal ID: {deal_id})")
-        if len(companies_without_type_list) > 10:
-            print(f"  ... and {len(companies_without_type_list) - 10} more")
+        print("This shows how many PRIMARY companies have their 'type' field populated,")
+        print("which enables ICP classification. Industry enrichment workflow populates")
+        print("this field based on industria field, improving coverage over time.")
         print()
-    print()
+        print("| Metric | Count | Percentage |")
+        print("|--------|-------|------------|")
+        print(f"| Total PRIMARY Companies Analyzed | {total_companies_analyzed} | 100.0% |")
+        print(f"| Companies WITH Type Field Populated | {companies_with_type} | {coverage_percentage:.1f}% |")
+        print(f"| Companies WITHOUT Type Field (NULL/Empty) | {companies_without_type} | {(companies_without_type / total_companies_analyzed * 100) if total_companies_analyzed > 0 else 0:.1f}% |")
+        print()
+        if companies_without_type > 0:
+            companies_without_type_list = [
+                (cid, info['name'], info['deal_id'])
+                for cid, info in companies_analyzed.items()
+                if not info['type'] or info['type'].strip() == '' or info['type'].strip().lower() in ['null', 'none']
+            ]
+            print(f"**Sample companies without type field (first 10 of {companies_without_type}):**")
+            for company_id, company_name, deal_id in companies_without_type_list[:10]:
+                print(f"  - {company_name} (Company ID: {company_id}, Deal ID: {deal_id})")
+            print()
+        print()
     
     # Prepare results dictionary
     results = {
@@ -902,17 +773,23 @@ def analyze_funnel_with_accountant(start_date, end_date):
     
     return results
 
-def analyze_funnel_without_accountant(start_date, end_date):
+def analyze_funnel_without_accountant(start_date, end_date, use_field_only=True, minimal=False):
     """
     Analyze the funnel for SMB deals WITHOUT accountant involvement.
+    
+    Args:
+        use_field_only: If True (default), use tiene_cuenta_contador only (fast).
+            If False, also exclude deals with association type 8 (dual-criteria, slow).
+        minimal: If True, skip contact filter (use all deals as deals_with_contacts) for faster run.
     
     FUNNEL LOGIC:
     ============
     1. Fetch all deals created in period where tiene_cuenta_contador = 0 or null
-    2. For each deal, check associated contacts - filter for contacts
-    3. Track: Deal Created → Deal Closed Won
-    4. Classify by ICP Operador vs ICP PYME
-    5. Calculate revenue
+    2. (Optional) Exclude deals with association type 8 if use_field_only=False
+    3. For each deal, check associated contacts - filter for contacts
+    4. Track: Deal Created → Deal Closed Won
+    5. Classify by ICP Operador vs ICP PYME
+    6. Calculate revenue
     """
     # Validate date range
     start_dt = datetime.fromisoformat(f"{start_date}T00:00:00+00:00")
@@ -927,9 +804,13 @@ def analyze_funnel_without_accountant(start_date, end_date):
     # STEP 1: Fetch Deals WITHOUT Accountant Involvement
     # ========================================================================
     print("📊 STEP 1: Fetching deals WITHOUT accountant involvement...")
-    print("   Excluding deals that meet EITHER criteria:")
-    print("   1. tiene_cuenta_contador > 0 (Formula field)")
-    print("   2. Has companies with association type 8 (Rollup field logic)")
+    if use_field_only:
+        print("   Mode: Field only (fast) — tiene_cuenta_contador = 0 or null")
+        print("   Use --dual-criteria to also exclude deals with type 8.")
+    else:
+        print("   Excluding deals that meet EITHER criteria:")
+        print("   1. tiene_cuenta_contador > 0 (Formula field)")
+        print("   2. Has companies with association type 8 (Rollup field logic)")
     print()
     
     url = f"{HUBSPOT_BASE_URL}/crm/v3/objects/deals/search"
@@ -982,41 +863,45 @@ def analyze_funnel_without_accountant(start_date, end_date):
         time.sleep(0.2)
     
     print(f"   Found {len(deals_by_formula)} deals with tiene_cuenta_contador = 0 or null")
-    print("   Now checking which of these also have NO association type 8...")
     
-    # Check each deal to exclude those with association type 8
-    all_deals_without_accountant = []
-    for i, deal in enumerate(deals_by_formula, 1):
-        if i % 50 == 0:
-            print(f"      Checking deal {i}/{len(deals_by_formula)}...")
-        deal_id = deal.get('id')
-        has_assoc, company_count, company_ids = has_accountant_company_association(deal_id)
-        if not has_assoc:  # Only include if NO association type 8
-            all_deals_without_accountant.append(deal)
-        time.sleep(0.05)  # Rate limiting
-    
-    print(f"   After excluding deals with association type 8: {len(all_deals_without_accountant)} deals")
+    if use_field_only:
+        # Fast mode: trust the field (HubSpot rollup reflects type 8)
+        all_deals_without_accountant = deals_by_formula
+        print(f"   Using field-only mode (fast). Total: {len(all_deals_without_accountant)} deals")
+    else:
+        # Dual-criteria: exclude deals that have association type 8
+        print("   Checking which of these also have NO association type 8...")
+        all_deals_without_accountant = []
+        for i, deal in enumerate(deals_by_formula, 1):
+            if i % 50 == 0:
+                print(f"      Checking deal {i}/{len(deals_by_formula)}...")
+            deal_id = deal.get('id')
+            has_assoc, _, _ = has_accountant_company_association(deal_id)
+            if not has_assoc:
+                all_deals_without_accountant.append(deal)
+            time.sleep(0.05)
+        print(f"   After excluding deals with association type 8: {len(all_deals_without_accountant)} deals")
     print()
     
     # ========================================================================
-    # STEP 2: Filter for Deals with Contacts
+    # STEP 2: Filter for Deals with Contacts (skip in minimal mode)
     # ========================================================================
-    print("📊 STEP 2: Filtering for deals with contacts...")
-    deals_with_contacts = []
-    
-    for i, deal in enumerate(all_deals_without_accountant, 1):
-        if i % 50 == 0:
-            print(f"   Processing deal {i}/{len(all_deals_without_accountant)}...")
-        
-        deal_id = deal.get('id')
-        should_include, total_contacts, smb_count, contact_details = has_smb_contact(deal_id)
-        
-        if should_include:
-            deals_with_contacts.append(deal)
-        
-        time.sleep(0.05)  # Rate limiting
-    
-    print(f"   Found {len(deals_with_contacts)} deals with contacts\n")
+    if minimal:
+        print("📊 STEP 2: Skipping contact filter (minimal mode)...")
+        deals_with_contacts = all_deals_without_accountant
+        print(f"   Using all {len(deals_with_contacts)} deals\n")
+    else:
+        print("📊 STEP 2: Filtering for deals with contacts...")
+        deals_with_contacts = []
+        for i, deal in enumerate(all_deals_without_accountant, 1):
+            if i % 50 == 0:
+                print(f"   Processing deal {i}/{len(all_deals_without_accountant)}...")
+            deal_id = deal.get('id')
+            should_include, total_contacts, smb_count, contact_details = has_smb_contact(deal_id)
+            if should_include:
+                deals_with_contacts.append(deal)
+            time.sleep(0.05)
+        print(f"   Found {len(deals_with_contacts)} deals with contacts\n")
     
     # ========================================================================
     # STEP 3: Filter for Closed Won Deals
@@ -1136,15 +1021,20 @@ def analyze_funnel_without_accountant(start_date, end_date):
     
     return results
 
-def analyze_funnel(start_date, end_date):
+def analyze_funnel(start_date, end_date, use_field_only=True, minimal=False):
     """
     Analyze both funnels (WITH and WITHOUT accountant involvement) and compare them.
+    
+    Args:
+        use_field_only: If True (default), use tiene_cuenta_contador only (fast).
+            If False, use dual-criteria (tiene_cuenta_contador + association type 8).
+        minimal: If True, skip contact filter and ICP coverage for fastest run.
     """
     # Analyze WITH accountant
-    results_with = analyze_funnel_with_accountant(start_date, end_date)
+    results_with = analyze_funnel_with_accountant(start_date, end_date, use_field_only=use_field_only, minimal=minimal)
     
     # Analyze WITHOUT accountant
-    results_without = analyze_funnel_without_accountant(start_date, end_date)
+    results_without = analyze_funnel_without_accountant(start_date, end_date, use_field_only=use_field_only, minimal=minimal)
     
     # ========================================================================
     # COMPARISON SUMMARY
@@ -1517,6 +1407,8 @@ def main():
     parser.add_argument('--months', nargs='+', type=str, help='Multiple months in format YYYY-MM (e.g., --months 2025-11 2025-12)')
     parser.add_argument('--start-date', type=str, help='Start date in YYYY-MM-DD format')
     parser.add_argument('--end-date', type=str, help='End date in YYYY-MM-DD format')
+    parser.add_argument('--dual-criteria', action='store_true', help='Also check association type 8 per deal (slower, ~5-10 min for 4 months). Default uses tiene_cuenta_contador only (~2-3 min).')
+    parser.add_argument('--minimal', action='store_true', help='Fastest run: skip contact filter and ICP coverage. Keeps core metrics and CSV output.')
     parser.add_argument('--csv', type=str, help='Path to existing CSV file to generate visualization from (e.g., tools/outputs/smb_accountant_funnel_comparison_20251201_20260101.csv)')
     
     args = parser.parse_args()
@@ -1550,6 +1442,8 @@ def main():
         print("MULTI-MONTH ANALYSIS")
         print("="*80)
         print()
+        if args.minimal:
+            print("⚡ Minimal mode: skipping contact filter and ICP coverage.\n")
         print(f"Analyzing {len(args.months)} month(s): {', '.join(args.months)}")
         print()
         
@@ -1567,7 +1461,7 @@ def main():
             print("="*80)
             print()
             
-            result = analyze_funnel(start_date, end_date)
+            result = analyze_funnel(start_date, end_date, use_field_only=not args.dual_criteria, minimal=args.minimal)
             if result:
                 result['month'] = month_str
                 all_results.append(result)
@@ -1649,7 +1543,10 @@ def main():
         else:
             end_date = f"{today.year}-{today.month+1:02d}-01"
     
-    result = analyze_funnel(start_date, end_date)
+    if args.minimal:
+        print("⚡ Minimal mode: skipping contact filter and ICP coverage for fastest run.\n")
+    
+    result = analyze_funnel(start_date, end_date, use_field_only=not args.dual_criteria, minimal=args.minimal)
     
     # Generate visualization
     if result and result.get('csv_file'):

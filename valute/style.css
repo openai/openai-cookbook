@@ -1,6 +1,4 @@
-@import url("https://fonts.googleapis.com/css2?family=Roboto+Mono:wght@400;500;700&display=swap");
-
-* {
+{
   margin: 0;
   padding: 0;
   box-sizing: border-box;
@@ -9,7 +7,7 @@
 body {
   background: #000000;
   min-height: 100vh;
-  overflow: hidden;
+  overflow: show;
   font-family: "Arial", sans-serif;
 }
 
@@ -137,7 +135,7 @@ body {
 }
 
 .card-normal {
-  background: transparent;
+  background: default;
   box-shadow: 0 15px 40px rgba(0, 0, 0, 0.4);
   display: flex;
   flex-direction: column;
@@ -175,15 +173,6 @@ body {
   overflow: hidden;
 }
 
-.card-chip {
-  width: 40px;
-  height: 30px;
-  background: linear-gradient(45deg, #ffd700, #ffed4e);
-  border-radius: 5px;
-  position: relative;
-  margin-bottom: 20px;
-}
-
 .card-chip::before {
   content: "";
   position: absolute;
@@ -216,14 +205,7 @@ body {
   height: 15px;
   border: 1px solid rgba(255, 255, 255, 0.6);
   border-radius: 50%;
-}
 
-.card-number {
-  font-size: 22px;
-  font-weight: bold;
-  letter-spacing: 3px;
-  margin-bottom: 15px;
-  text-shadow: 0 2px 4px rgba(0, 0, 0, 0.3);
 }
 
 .card-info {
@@ -231,13 +213,6 @@ body {
   justify-content: space-between;
   align-items: flex-end;
 }
-
-.card-holder {
-  color: white;
-  font-size: 14px;
-  text-transform: uppercase;
-}
-
 .card-expiry {
   color: white;
   font-size: 14px;

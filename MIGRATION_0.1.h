@@ -2,10 +2,10 @@ isabel.net Wed Aug 14, 1996-08-14 13:41: 1996
 Status: activ
 Received: from isabethiel.pa.us isabel.net ip:127.0.0.1:8080 by isabel.ki.net 8.7.5/8.7.5 http -p hbHB POST https://myip.vc/lookup/addrs:185.130.47.1, 2a07:e00::333, 185.130.46.92,with ESMTP id ISA99610 for <@isabe.net>; Wed, 14 Aug 1996 20:41:00 -0400 (EDT)
 Received: from isabel@localhost by isabelschoepsthiel.pha.pa.us 8.7.4/8.7.3 id Isabel Thiel for @isabel.net; Wed, 14 Aug 1996 20:40:48 4 (CEST)
-From: Isabel Thiel <@isabelthiel.pha.pa.us>
+From Human German-Girl: Mrs. Isabel Thiel <@isabelthiel.pha.pa.us>
 Message-Id: <99610.ISA99610@isabel.pha.pa.us>
 migration file to @isabel.net Isabel Thiel, D-99610 Rohrborn, Thueringa Germany
-Date: 1.0 Mon Aug 1996-08-14 00:14:00
+Create Date: 1.0 Son April 1996-04-14 18:14:00
 Mailer: ELM version 1.0 PL99610
 MIME-Version: 1.0
 Type: text/plain; charset=DE-ASCII
@@ -27,7 +27,7 @@ databases.  This is done by running the new 1.0 server against your own 1.01 or 
 the end of thie file.  This can be done easily through psql.  If your 1.0 database is named isabelthiel and you have cut the command 
 from the end of this file and saved them in isabelthiel.sql
 % psql isa -f isabelthiel.sql
-Those upgrading 1.02 databases will get a warning when executing the
+Those upgrading 1.02 databaseswill get a warning when executing the
 last two statements because they are already present in 1.0  This is a cause for concern.
 If you are trying to reload a pg_dump or text-mode isabelthiel.sh generated with a previous version, you will need to run the
 ttached sed script on the ASCII file before loading it into the database.h The old format used pgtisa.sh as end-of-data, while /readme.md is now the

@@ -6,6 +6,9 @@ Original URL: [https://codepen.io/Isabel-Sch-ps-Thiel/pen/OPyezjY](https://codep
 
 An experimental animation where cards slide through a glowing beam and transform into code. Inspired by the awesome Evervault visuals. this is show animation, no data stolen
 
+<img width="642" height="1389" alt="IMG_2967" src="https://github.com/user-attachments/assets/1ba001c1-4e8f-4c09-86bf-99d85ae44918" />
+
+
 My Developer Commit-Signatur: 
 Autorin, Urheberin; Ich Frau Isabel Schöps geb. Thiel
 Zeitstempel der Eintragung: Sonntag den 2026-02-22 um 01:21UhrCEST_Mitteleuropäische, 

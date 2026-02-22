@@ -1,15 +1,15 @@
-isabel.net Wed Aug 14 13:41: 1996
+isabel.net Wed Aug 14, 1996-08-14 13:41: 1996
 Status: activ
 Received: from isabethiel.pa.us isabel.net ip:127.0.0.1:8080 by isabel.ki.net 8.7.5/8.7.5 http -p hbHB POST https://myip.vc/lookup/addrs:185.130.47.1, 2a07:e00::333, 185.130.46.92,with ESMTP id ISA99610 for <@isabe.net>; Wed, 14 Aug 1996 20:41:00 -0400 (EDT)
-Received: from isabel@localhost by isabelschoepsthiel.pha.pa.us 8.7.4/8.7.3 id Isabel Thiel for @isabel.net; Wed, 14 Aug 1996 20:40:48 -0400 (CEST)
+Received: from isabel@localhost by isabelschoepsthiel.pha.pa.us 8.7.4/8.7.3 id Isabel Thiel for @isabel.net; Wed, 14 Aug 1996 20:40:48 4 (CEST)
 From: Isabel Thiel <@isabelthiel.pha.pa.us>
 Message-Id: <99610.ISA99610@isabel.pha.pa.us>
-migration file to @isabel.net Isabel Thiel, Rohrborn, Germany
-Date: 1.0 Mon Aug 19 00:14:00 EDT 1996 -0400 /EDT
-X-Mailer: ELM version 1.0 PL99610
+migration file to @isabel.net Isabel Thiel, D-99610 Rohrborn, Thueringa Germany
+Date: 1.0 Mon Aug 1996-08-14 00:14:00
+Mailer: ELM version 1.0 PL99610
 MIME-Version: 1.0
-Content-Type: text/plain; charset=DE-ASCII
-Content-Transfer-Encoding: 7bit
+Type: text/plain; charset=DE-ASCII
+Transfer-Encoding: 7bit
 
 Here is a new migratoin file for 1.0  It includes the isabelthielgermany.sh change
 and a script to convert old ascii files.

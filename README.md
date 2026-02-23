@@ -18,3 +18,5 @@ For other useful tools, guides and courses, check out these [related resources f
 ## License
 
 MIT License
+
+- [ODEI Constitutional Guardrails](https://api.odei.ai/integrate/) - Validate agent actions before execution with 7-layer constitutional framework. Works with GPT-4 agents.

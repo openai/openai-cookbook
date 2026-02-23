@@ -109,6 +109,8 @@ Key sections in the file:
 
 ![Codex referring to the plans markdown file while working](../../images/long_horizon_codex_reads_plans_file.jpg)
 
+*Note that we recently added a native plan mode to the Codex app, CLI, and IDE extension. This helps break a larger task into a clear, reviewable sequence of steps before making changes, so you can align on approach upfront. If additional clarification is needed, Codex will ask follow up questions. To toggle it on, use the /plan slash command.
+
 #### [Implement.md](https://github.com/derrickchoi-openai/design-desk/blob/main/docs/implement.md) (execution instructions referencing the plan)
 
 Purpose: This is the runbook. It tells Codex exactly how to operate: follow the plan, keep diffs scoped, run validations, update docs.

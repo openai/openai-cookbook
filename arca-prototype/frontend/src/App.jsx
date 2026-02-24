@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import LoginForm from "./components/LoginForm";
 import NotificationsPage from "./components/NotificationsPage";
 import ComprobantesPage from "./components/ComprobantesPage";
@@ -6,6 +6,74 @@ import RetencionesPage from "./components/RetencionesPage";
 import ReconciliacionPage from "./components/ReconciliacionPage";
 import BancoGaliciaPage from "./components/BancoGaliciaPage";
 import LibroIVAPage from "./components/LibroIVAPage";
+
+// ── Runtime backend URL config ──────────────────────────────
+const DEFAULT_BACKEND = "http://localhost:8000";
+
+export function getApiBase() {
+  // Build-time env var takes priority, then localStorage, then default
+  const envUrl = import.meta.env.VITE_API_URL;
+  if (envUrl) return envUrl;
+  // In dev mode (Vite proxy), use empty string so /api goes to same origin
+  if (import.meta.env.DEV) return "";
+  return localStorage.getItem("arca_backend_url") || DEFAULT_BACKEND;
+}
+
+function BackendStatus() {
+  const [status, setStatus] = useState("checking"); // "checking" | "connected" | "disconnected"
+  const [editing, setEditing] = useState(false);
+  const [url, setUrl] = useState(localStorage.getItem("arca_backend_url") || DEFAULT_BACKEND);
+
+  const checkConnection = async (targetUrl) => {
+    setStatus("checking");
+    try {
+      const res = await fetch(`${targetUrl}/health`, { signal: AbortSignal.timeout(3000) });
+      if (res.ok) { setStatus("connected"); return; }
+    } catch {}
+    setStatus("disconnected");
+  };
+
+  useEffect(() => { checkConnection(getApiBase()); }, []);
+
+  const handleSave = () => {
+    const clean = url.replace(/\/+$/, "");
+    localStorage.setItem("arca_backend_url", clean);
+    setUrl(clean);
+    setEditing(false);
+    checkConnection(clean);
+    // Force reload so all components pick up new URL
+    window.location.reload();
+  };
+
+  const dot = status === "connected" ? "#22c55e" : status === "disconnected" ? "#ef4444" : "#f59e0b";
+  const label = status === "connected" ? "Backend conectado" : status === "disconnected" ? "Backend no disponible" : "Verificando...";
+
+  return (
+    <div style={{ display: "flex", alignItems: "center", gap: "0.5rem", fontSize: "0.75rem", color: "#94a3b8" }}>
+      <span style={{ width: 8, height: 8, borderRadius: "50%", background: dot, display: "inline-block" }} />
+      {!editing ? (
+        <>
+          <span>{label}</span>
+          <button onClick={() => setEditing(true)} style={{ background: "none", border: "none", color: "#64748b", cursor: "pointer", fontSize: "0.7rem", textDecoration: "underline" }}>
+            {getApiBase() || "localhost"}
+          </button>
+        </>
+      ) : (
+        <>
+          <input
+            value={url}
+            onChange={e => setUrl(e.target.value)}
+            onKeyDown={e => e.key === "Enter" && handleSave()}
+            style={{ background: "#1e293b", border: "1px solid #334155", borderRadius: 4, color: "#e2e8f0", padding: "2px 6px", fontSize: "0.75rem", width: 220 }}
+            autoFocus
+          />
+          <button onClick={handleSave} style={{ background: "#3b82f6", border: "none", borderRadius: 4, color: "#fff", padding: "2px 8px", fontSize: "0.7rem", cursor: "pointer" }}>OK</button>
+          <button onClick={() => setEditing(false)} style={{ background: "none", border: "none", color: "#64748b", cursor: "pointer", fontSize: "0.7rem" }}>Cancelar</button>
+        </>
+      )}
+    </div>
+  );
+}
 
 function App() {
   const [result, setResult] = useState(null);
@@ -18,7 +86,10 @@ function App() {
   return (
     <div style={styles.container}>
       <header style={styles.header}>
-        <h1 style={styles.title}>ARCA Prototype</h1>
+        <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center" }}>
+          <h1 style={styles.title}>ARCA Prototype</h1>
+          <BackendStatus />
+        </div>
         <p style={styles.subtitle}>
           {view === "login"
             ? "Ingrese su CUIT y Clave Fiscal para iniciar"

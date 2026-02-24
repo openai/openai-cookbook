@@ -1,7 +1,7 @@
 import { useState } from "react";
+import { getApiBase } from "../App";
 
-// Use proxy in dev (vite forwards /api to backend), or explicit URL
-const API_BASE = import.meta.env.VITE_API_URL || "";
+const API_BASE = getApiBase();
 
 async function callApi(endpoint, body, onResult) {
   try {

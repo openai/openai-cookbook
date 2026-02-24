@@ -3,8 +3,9 @@
  * "Ver caché" loads instantly. "Descargar de Banco Galicia" fetches via Playwright.
  */
 import { useState, useEffect } from "react";
+import { getApiBase } from "../App";
 
-const API_BASE = import.meta.env.VITE_API_URL || "";
+const API_BASE = getApiBase();
 
 function fmtMoney(n) {
   if (n == null) return "-";

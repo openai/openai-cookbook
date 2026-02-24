@@ -4,8 +4,9 @@
  *   2. ARCA Emitidos vs Colppy Ventas (new)
  */
 import { useState, useEffect, Fragment } from "react";
+import { getApiBase } from "../App";
 
-const API_BASE = import.meta.env.VITE_API_URL || "";
+const API_BASE = getApiBase();
 
 export default function ReconciliacionPage() {
   const [mode, setMode] = useState("emitidos"); // "emitidos" | "recibidos" | "retenciones"

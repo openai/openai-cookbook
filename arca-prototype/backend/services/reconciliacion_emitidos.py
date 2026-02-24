@@ -357,10 +357,16 @@ async def reconcile_emitidos(
     only_arca = sum(1 for d in discrepancies if d["status"] == "only_arca")
     only_colppy = sum(1 for d in discrepancies if d["status"] == "only_colppy")
 
+    # Count Colppy anuladas (idEstadoFactura == "3") for data quality warnings
+    colppy_anuladas = sum(
+        1 for v in colppy_items if str(v.get("idEstadoFactura", "")) == "3"
+    )
+
     return {
         "success": True,
         "fecha_desde": fecha_desde,
         "fecha_hasta": fecha_hasta,
+        "reconciled_at": datetime.now().strftime("%Y-%m-%d %H:%M:%S"),
         "summary": {
             "arca_total": len(arca_items),
             "colppy_total": len(colppy_items),
@@ -375,6 +381,7 @@ async def reconcile_emitidos(
             "colppy_duplicate_cae": len(colppy_dup_cae),
             "arca_importe_total": round(arca_total_pesos, 2),
             "colppy_importe_total": round(colppy_total_pesos, 2),
+            "colppy_anuladas": colppy_anuladas,
         },
         "arca_fetched_at": arca_fetched,
         "arca_auto_fetched": arca_auto_fetched,
@@ -641,10 +648,15 @@ async def reconcile_emitidos_stream(
     yield _sse({"type": "progress", "step": 5, "total": total_steps, "pct": 100,
                 "message": f"Listo — {matched} matcheados, {len(discrepancies)} discrepancias"})
 
+    colppy_anuladas_stream = sum(
+        1 for v in colppy_items if str(v.get("idEstadoFactura", "")) == "3"
+    )
+
     yield _sse({"type": "result", "data": {
         "success": True,
         "fecha_desde": fecha_desde,
         "fecha_hasta": fecha_hasta,
+        "reconciled_at": datetime.now().strftime("%Y-%m-%d %H:%M:%S"),
         "summary": {
             "arca_total": len(arca_items),
             "colppy_total": len(colppy_items),
@@ -659,6 +671,7 @@ async def reconcile_emitidos_stream(
             "colppy_duplicate_cae": len(colppy_dup_cae),
             "arca_importe_total": round(arca_total_pesos, 2),
             "colppy_importe_total": round(colppy_total_pesos, 2),
+            "colppy_anuladas": colppy_anuladas_stream,
         },
         "arca_fetched_at": arca_fetched,
         "arca_auto_fetched": arca_auto_fetched,

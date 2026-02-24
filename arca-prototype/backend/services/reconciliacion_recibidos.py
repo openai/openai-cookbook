@@ -574,10 +574,16 @@ async def reconcile_recibidos_stream(
     yield _sse({"type": "progress", "step": 6, "total": total_steps, "pct": 100,
                 "message": f"Listo — {matched} matcheados, {len(discrepancies)} discrepancias"})
 
+    # Count Colppy anuladas for data quality warnings
+    colppy_anuladas = sum(
+        1 for v in colppy_items if str(v.get("idEstadoFactura", "")) == "3"
+    )
+
     yield _sse({"type": "result", "data": {
         "success": True,
         "fecha_desde": fecha_desde,
         "fecha_hasta": fecha_hasta,
+        "reconciled_at": datetime.now().strftime("%Y-%m-%d %H:%M:%S"),
         "summary": {
             "arca_total": len(arca_items),
             "colppy_total": len(colppy_items),
@@ -594,6 +600,7 @@ async def reconcile_recibidos_stream(
             "retenciones_cached": len(all_retenciones),
             "retenciones_linked": retenciones_linked,
             "retenciones_total": total_retenciones_amount,
+            "colppy_anuladas": colppy_anuladas,
         },
         "arca_fetched_at": arca_fetched,
         "arca_auto_fetched": arca_auto_fetched,

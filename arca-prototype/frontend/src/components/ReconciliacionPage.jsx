@@ -589,6 +589,7 @@ function EmitidosReconciliation() {
                           <th style={s.th}>CAE</th>
                           <th style={s.th}>Número</th>
                           <th style={s.th}>Fecha</th>
+                          <th style={s.th}>Tipo</th>
                           <th style={{ ...s.th, textAlign: "right" }}>ARCA $</th>
                           <th style={{ ...s.th, textAlign: "right" }}>Colppy $</th>
                           <th style={{ ...s.th, textAlign: "right" }}>Diff $</th>
@@ -632,7 +633,7 @@ function EmitidosReconciliation() {
                         ...(isExpanded ? { background: "rgba(99,102,241,0.06)" } : {}),
                       };
                       const toggleExpand = () => setExpandedRow(isExpanded ? null : dKey);
-                      const colCount = status === "amount_mismatch" ? 7 : 7; // all have 7 columns
+                      const colCount = status === "amount_mismatch" ? 8 : 7;
 
                       const detailRow = isExpanded ? (
                         <tr key={`${i}-detail`}>
@@ -675,6 +676,8 @@ function EmitidosReconciliation() {
                       );
 
                       if (status === "amount_mismatch") {
+                        const estadoColppy = d.colppy?.estadoFactura;
+                        const isAnulada = estadoColppy === "Anulada";
                         return (
                           <Fragment key={i}>
                             <tr style={rowStyle} onClick={toggleExpand}>
@@ -683,8 +686,12 @@ function EmitidosReconciliation() {
                               </td>
                               <td style={s.td}>{d.arca?.numero || d.colppy?.nroFactura}</td>
                               <td style={s.td}>{d.arca?.fecha_emision || d.colppy?.fechaFactura}</td>
+                              <td style={{ ...s.td, fontSize: "0.8rem" }}>{d.arca?.tipo_comprobante || ""}</td>
                               <td style={{ ...s.td, textAlign: "right" }}>{fmtMoney(d.arca?.importe_total)}</td>
-                              <td style={{ ...s.td, textAlign: "right" }}>{fmtMoney(d.colppy?.totalFactura_pesos)}</td>
+                              <td style={{ ...s.td, textAlign: "right" }}>
+                                {fmtMoney(d.colppy?.totalFactura_pesos)}
+                                {isAnulada && <span style={s.anuladaBadge}>Anulada</span>}
+                              </td>
                               <td style={{ ...s.td, textAlign: "right", color: d.diff_pesos > 0 ? "#fb923c" : "#93c5fd" }}>
                                 {d.diff_pesos > 0 ? "+" : ""}{fmtMoney(d.diff_pesos)}
                               </td>
@@ -717,6 +724,8 @@ function EmitidosReconciliation() {
                       }
                       const rec = d.arca || d.colppy;
                       const isArca = !!d.arca;
+                      const colppyEstado = d.colppy?.estadoFactura;
+                      const isAnuladaOther = colppyEstado === "Anulada";
                       return (
                         <Fragment key={i}>
                           <tr style={rowStyle} onClick={toggleExpand}>
@@ -724,7 +733,10 @@ function EmitidosReconciliation() {
                             <td style={s.td}>{isArca ? rec.numero : rec.nroFactura}</td>
                             <td style={s.td}>{isArca ? rec.fecha_emision : rec.fechaFactura}</td>
                             <td style={s.td}>{isArca ? rec.tipo_comprobante : `Tipo ${rec.idTipoComprobante}`}</td>
-                            <td style={s.td}>{isArca ? rec.denominacion_contraparte : rec.RazonSocial}</td>
+                            <td style={s.td}>
+                              {isArca ? rec.denominacion_contraparte : rec.RazonSocial}
+                              {isAnuladaOther && <span style={s.anuladaBadge}>Anulada</span>}
+                            </td>
                             <td style={{ ...s.td, textAlign: "right" }}>
                               {fmtMoney(isArca ? rec.importe_total : rec.totalFactura_pesos)}
                             </td>
@@ -764,6 +776,7 @@ function EmitidosReconciliation() {
                     <th style={s.th}>CAE</th>
                     <th style={s.th}>Número</th>
                     <th style={s.th}>Fecha</th>
+                    <th style={s.th}>Tipo</th>
                     <th style={s.th}>Contraparte</th>
                     <th style={{ ...s.th, textAlign: "right" }}>ARCA $</th>
                     <th style={{ ...s.th, textAlign: "right" }}>Colppy $</th>
@@ -773,14 +786,19 @@ function EmitidosReconciliation() {
                   {result.matched_pairs.map((pair, i) => {
                     const cae = pair.arca?.cod_autorizacion || "";
                     const isHL = highlightedCaes.has(cae);
+                    const matchedAnulada = pair.colppy?.estadoFactura === "Anulada";
                     return (
                       <tr key={i} style={isHL ? { borderLeft: "3px solid rgba(59,130,246,0.7)", background: "rgba(59,130,246,0.05)" } : {}}>
                         <td style={{ ...s.td, fontSize: "0.75rem", fontFamily: "monospace" }}>{cae}</td>
                         <td style={s.td}>{pair.arca?.numero}</td>
                         <td style={s.td}>{pair.arca?.fecha_emision}</td>
+                        <td style={{ ...s.td, fontSize: "0.8rem" }}>{pair.arca?.tipo_comprobante}</td>
                         <td style={s.td}>{pair.arca?.denominacion_contraparte}</td>
                         <td style={{ ...s.td, textAlign: "right" }}>{fmtMoney(pair.arca?.importe_total)}</td>
-                        <td style={{ ...s.td, textAlign: "right" }}>{fmtMoney(pair.colppy?.totalFactura_pesos)}</td>
+                        <td style={{ ...s.td, textAlign: "right" }}>
+                          {fmtMoney(pair.colppy?.totalFactura_pesos)}
+                          {matchedAnulada && <span style={s.anuladaBadge}>Anulada</span>}
+                        </td>
                       </tr>
                     );
                   })}
@@ -799,9 +817,20 @@ function EmitidosReconciliation() {
       )}
 
       {/* Data freshness */}
-      {result?.arca_fetched_at && (
-        <div style={s.footer}>
-          ARCA data cached: {result.arca_fetched_at}. Colppy data fetched live.
+      {result && (
+        <div style={s.freshness}>
+          {result.reconciled_at && (
+            <span>Reconciliado: <strong>{result.reconciled_at}</strong></span>
+          )}
+          {result.arca_fetched_at && (
+            <span style={{ marginLeft: 16 }}>ARCA cache: {result.arca_fetched_at}</span>
+          )}
+          <span style={{ marginLeft: 16 }}>Colppy: en vivo</span>
+          {(summary?.colppy_anuladas || 0) > 0 && (
+            <span style={{ marginLeft: 16, color: "#f87171" }}>
+              {summary.colppy_anuladas} factura(s) anulada(s) en Colppy
+            </span>
+          )}
         </div>
       )}
     </>
@@ -1118,6 +1147,7 @@ function RecibidosReconciliation() {
                       <thead>
                         <tr>
                           <th style={s.th}>Nro Factura</th>
+                          <th style={s.th}>Tipo</th>
                           <th style={s.th}>Fecha</th>
                           <th style={s.th}>Proveedor</th>
                           <th style={s.th}>CUIT</th>
@@ -1138,11 +1168,13 @@ function RecibidosReconciliation() {
                           const key = discKey(d);
                           const isExpanded = expandedRow === key;
                           const nro = d.arca?.numero || d.colppy?.nroFactura || d.duplicate_number || "";
+                          const tipo = d.arca?.tipo_comprobante || (d.colppy?.idTipoComprobante ? `Tipo ${d.colppy.idTipoComprobante}` : "");
                           const fecha = d.arca?.fecha_emision || d.colppy?.fechaFactura || "";
                           const prov = d.arca?.denominacion_contraparte || d.colppy?.RazonSocial || "";
                           const cuit = d.arca?.cuit_contraparte || d.colppy?.cuit_proveedor || "";
                           const percTotal = d.colppy?.totalPercepciones || 0;
                           const retCount = d.retenciones?.length || 0;
+                          const recibidoAnulada = d.colppy?.estadoFactura === "Anulada";
                           return (
                             <Fragment key={key + i}>
                               <tr
@@ -1150,11 +1182,15 @@ function RecibidosReconciliation() {
                                 style={{ cursor: "pointer", background: isExpanded ? "rgba(99,102,241,0.08)" : "transparent" }}
                               >
                                 <td style={s.td}>{nro}</td>
+                                <td style={{ ...s.td, fontSize: "0.8rem" }}>{tipo}</td>
                                 <td style={s.td}>{fmtDate(fecha)}</td>
                                 <td style={{ ...s.td, maxWidth: 180, overflow: "hidden", textOverflow: "ellipsis", whiteSpace: "nowrap" }}>{prov}</td>
                                 <td style={{ ...s.td, fontSize: "0.75rem", color: "#64748b" }}>{cuit}</td>
                                 <td style={{ ...s.td, textAlign: "right" }}>{d.arca ? fmtMoney(d.arca.importe_total) : "—"}</td>
-                                <td style={{ ...s.td, textAlign: "right" }}>{d.colppy ? fmtMoney(d.colppy.totalFactura_pesos) : "—"}</td>
+                                <td style={{ ...s.td, textAlign: "right" }}>
+                                  {d.colppy ? fmtMoney(d.colppy.totalFactura_pesos) : "—"}
+                                  {recibidoAnulada && <span style={s.anuladaBadge}>Anulada</span>}
+                                </td>
                                 {status === "duplicate_number" ? (
                                   <td style={s.td}>
                                     <span style={{
@@ -1180,7 +1216,7 @@ function RecibidosReconciliation() {
                               </tr>
                               {isExpanded && (
                                 <tr>
-                                  <td colSpan={status === "duplicate_number" ? 7 : 8} style={{ padding: "8px 4px", background: "rgba(15,23,42,0.5)" }}>
+                                  <td colSpan={status === "duplicate_number" ? 8 : 9} style={{ padding: "8px 4px", background: "rgba(15,23,42,0.5)" }}>
                                     <RecibidoDetail arca={d.arca} colppy={d.colppy} retenciones={d.retenciones} percepcionesDiff={d.percepciones_diff} cuitMatch={d.cuit_match} />
                                   </td>
                                 </tr>
@@ -1213,6 +1249,7 @@ function RecibidosReconciliation() {
                       <thead>
                         <tr>
                           <th style={s.th}>Nro Factura</th>
+                          <th style={s.th}>Tipo</th>
                           <th style={s.th}>Fecha</th>
                           <th style={s.th}>Proveedor</th>
                           <th style={s.th}>CUIT</th>
@@ -1228,6 +1265,7 @@ function RecibidosReconciliation() {
                           const isExpanded = expandedRow === key;
                           const percTotal = pair.colppy?.totalPercepciones || 0;
                           const retCount = pair.retenciones?.length || 0;
+                          const matchedRecAnulada = pair.colppy?.estadoFactura === "Anulada";
                           return (
                             <Fragment key={key}>
                               <tr
@@ -1235,6 +1273,7 @@ function RecibidosReconciliation() {
                                 style={{ cursor: "pointer", background: isExpanded ? "rgba(99,102,241,0.08)" : "transparent" }}
                               >
                                 <td style={s.td}>{pair.arca?.numero || pair.colppy?.nroFactura}</td>
+                                <td style={{ ...s.td, fontSize: "0.8rem" }}>{pair.arca?.tipo_comprobante || ""}</td>
                                 <td style={s.td}>{fmtDate(pair.arca?.fecha_emision)}</td>
                                 <td style={{ ...s.td, maxWidth: 180, overflow: "hidden", textOverflow: "ellipsis", whiteSpace: "nowrap" }}>
                                   {pair.arca?.denominacion_contraparte || pair.colppy?.RazonSocial}
@@ -1243,7 +1282,10 @@ function RecibidosReconciliation() {
                                   {pair.arca?.cuit_contraparte || pair.colppy?.cuit_proveedor}
                                 </td>
                                 <td style={{ ...s.td, textAlign: "right" }}>{fmtMoney(pair.arca?.importe_total)}</td>
-                                <td style={{ ...s.td, textAlign: "right" }}>{fmtMoney(pair.colppy?.totalFactura_pesos)}</td>
+                                <td style={{ ...s.td, textAlign: "right" }}>
+                                  {fmtMoney(pair.colppy?.totalFactura_pesos)}
+                                  {matchedRecAnulada && <span style={s.anuladaBadge}>Anulada</span>}
+                                </td>
                                 <td style={{ ...s.td, textAlign: "right", color: percTotal > 0 ? "#c4b5fd" : "#475569" }}>
                                   {percTotal > 0 ? fmtMoney(percTotal) : "—"}
                                 </td>
@@ -1255,7 +1297,7 @@ function RecibidosReconciliation() {
                               </tr>
                               {isExpanded && (
                                 <tr>
-                                  <td colSpan={8} style={{ padding: "8px 4px", background: "rgba(15,23,42,0.5)" }}>
+                                  <td colSpan={9} style={{ padding: "8px 4px", background: "rgba(15,23,42,0.5)" }}>
                                     <RecibidoDetail arca={pair.arca} colppy={pair.colppy} retenciones={pair.retenciones} percepcionesDiff={pair.percepciones_diff} cuitMatch={pair.cuit_match} />
                                   </td>
                                 </tr>
@@ -1272,10 +1314,23 @@ function RecibidosReconciliation() {
           )}
 
           {/* Footer */}
-          {result?.arca_fetched_at && (
-            <div style={s.footer}>
-              ARCA data cached: {result.arca_fetched_at}. Colppy data fetched live.
-              {result.proveedores_count > 0 && ` ${result.proveedores_count} proveedores.`}
+          {result && (
+            <div style={s.freshness}>
+              {result.reconciled_at && (
+                <span>Reconciliado: <strong>{result.reconciled_at}</strong></span>
+              )}
+              {result.arca_fetched_at && (
+                <span style={{ marginLeft: 16 }}>ARCA cache: {result.arca_fetched_at}</span>
+              )}
+              <span style={{ marginLeft: 16 }}>Colppy: en vivo</span>
+              {result.proveedores_count > 0 && (
+                <span style={{ marginLeft: 16 }}>{result.proveedores_count} proveedores</span>
+              )}
+              {(summary?.colppy_anuladas || 0) > 0 && (
+                <span style={{ marginLeft: 16, color: "#f87171" }}>
+                  {summary.colppy_anuladas} factura(s) anulada(s) en Colppy
+                </span>
+              )}
             </div>
           )}
         </>
@@ -2053,6 +2108,18 @@ const s = {
     marginTop: "1.5rem", padding: "1rem", borderRadius: "8px",
     background: "rgba(30,41,59,0.3)", border: "1px solid #1e293b",
     fontSize: "0.8rem", color: "#64748b", textAlign: "center",
+  },
+  freshness: {
+    marginTop: "1.5rem", padding: "0.75rem 1rem", borderRadius: "8px",
+    background: "rgba(30,41,59,0.4)", border: "1px solid rgba(51,65,85,0.6)",
+    fontSize: "0.8rem", color: "#94a3b8", display: "flex", flexWrap: "wrap",
+    alignItems: "center", gap: "4px 0",
+  },
+  anuladaBadge: {
+    display: "inline-block", marginLeft: 6, padding: "1px 6px",
+    borderRadius: 4, fontSize: "0.65rem", fontWeight: 600,
+    background: "rgba(248,113,113,0.2)", color: "#f87171",
+    verticalAlign: "middle", letterSpacing: 0.3,
   },
 
   // Chat panel

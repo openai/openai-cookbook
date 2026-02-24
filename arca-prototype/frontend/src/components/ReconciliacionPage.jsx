@@ -940,7 +940,7 @@ function RecibidosReconciliation() {
     only_arca: { label: "Solo en ARCA", badge: s.badgeOnlyArca },
     only_colppy: { label: "Solo en Colppy", badge: s.badgeOnlyColppy },
     missing_number: { label: "Sin número", badge: s.badgeNoData },
-    duplicate_number: { label: "Número duplicado", badge: s.badgeMismatch },
+    duplicate_number: { label: "Nro factura duplicado", badge: s.badgeMismatch },
   };
 
   return (
@@ -1085,8 +1085,8 @@ function RecibidosReconciliation() {
               <strong>Alertas de calidad de datos:</strong>
               {(summary.arca_no_number || 0) > 0 && <span> {summary.arca_no_number} ARCA sin número.</span>}
               {(summary.colppy_no_number || 0) > 0 && <span> {summary.colppy_no_number} Colppy sin número.</span>}
-              {(summary.arca_duplicate_number || 0) > 0 && <span> {summary.arca_duplicate_number} ARCA con número duplicado.</span>}
-              {(summary.colppy_duplicate_number || 0) > 0 && <span> {summary.colppy_duplicate_number} Colppy con número duplicado.</span>}
+              {(summary.arca_duplicate_number || 0) > 0 && <span> {summary.arca_duplicate_number} facturas con nro repetido en ARCA (mismo nro aparece 2+ veces).</span>}
+              {(summary.colppy_duplicate_number || 0) > 0 && <span> {summary.colppy_duplicate_number} facturas con nro repetido en Colppy (mismo nro aparece 2+ veces).</span>}
             </div>
           )}
 
@@ -1108,6 +1108,12 @@ function RecibidosReconciliation() {
                 </div>
                 {!collapsed && (
                   <div style={{ overflowX: "auto" }}>
+                    {status === "duplicate_number" && (
+                      <div style={{ fontSize: "0.8rem", color: "#94a3b8", marginBottom: 8, padding: "8px 12px", background: "rgba(251,146,60,0.08)", borderRadius: 6 }}>
+                        Estas facturas tienen el mismo número que otra factura ya existente en la misma fuente.
+                        Solo la primera aparición se usa para el matching; las repetidas aparecen aquí.
+                      </div>
+                    )}
                     <table style={s.table}>
                       <thead>
                         <tr>
@@ -1117,15 +1123,21 @@ function RecibidosReconciliation() {
                           <th style={s.th}>CUIT</th>
                           <th style={{ ...s.th, textAlign: "right" }}>ARCA</th>
                           <th style={{ ...s.th, textAlign: "right" }}>Colppy</th>
-                          <th style={{ ...s.th, textAlign: "right" }}>Perc.</th>
-                          <th style={{ ...s.th, textAlign: "center" }}>Ret.</th>
+                          {status === "duplicate_number" ? (
+                            <th style={s.th}>Duplicado en</th>
+                          ) : (
+                            <>
+                              <th style={{ ...s.th, textAlign: "right" }}>Perc.</th>
+                              <th style={{ ...s.th, textAlign: "center" }}>Ret.</th>
+                            </>
+                          )}
                         </tr>
                       </thead>
                       <tbody>
                         {items.map((d, i) => {
                           const key = discKey(d);
                           const isExpanded = expandedRow === key;
-                          const nro = d.arca?.numero || d.colppy?.nroFactura || "";
+                          const nro = d.arca?.numero || d.colppy?.nroFactura || d.duplicate_number || "";
                           const fecha = d.arca?.fecha_emision || d.colppy?.fechaFactura || "";
                           const prov = d.arca?.denominacion_contraparte || d.colppy?.RazonSocial || "";
                           const cuit = d.arca?.cuit_contraparte || d.colppy?.cuit_proveedor || "";
@@ -1143,18 +1155,32 @@ function RecibidosReconciliation() {
                                 <td style={{ ...s.td, fontSize: "0.75rem", color: "#64748b" }}>{cuit}</td>
                                 <td style={{ ...s.td, textAlign: "right" }}>{d.arca ? fmtMoney(d.arca.importe_total) : "—"}</td>
                                 <td style={{ ...s.td, textAlign: "right" }}>{d.colppy ? fmtMoney(d.colppy.totalFactura_pesos) : "—"}</td>
-                                <td style={{ ...s.td, textAlign: "right", color: percTotal > 0 ? "#c4b5fd" : "#475569" }}>
-                                  {percTotal > 0 ? fmtMoney(percTotal) : "—"}
-                                </td>
-                                <td style={{ ...s.td, textAlign: "center" }}>
-                                  {retCount > 0 ? (
-                                    <span style={{ ...s.badge, background: "rgba(147,130,220,0.2)", color: "#c4b5fd" }}>{retCount}</span>
-                                  ) : "—"}
-                                </td>
+                                {status === "duplicate_number" ? (
+                                  <td style={s.td}>
+                                    <span style={{
+                                      ...s.badge,
+                                      background: d.source === "arca" ? "rgba(59,130,246,0.2)" : "rgba(168,85,247,0.2)",
+                                      color: d.source === "arca" ? "#93c5fd" : "#c4b5fd",
+                                    }}>
+                                      {d.source === "arca" ? "ARCA" : "Colppy"}
+                                    </span>
+                                  </td>
+                                ) : (
+                                  <>
+                                    <td style={{ ...s.td, textAlign: "right", color: percTotal > 0 ? "#c4b5fd" : "#475569" }}>
+                                      {percTotal > 0 ? fmtMoney(percTotal) : "—"}
+                                    </td>
+                                    <td style={{ ...s.td, textAlign: "center" }}>
+                                      {retCount > 0 ? (
+                                        <span style={{ ...s.badge, background: "rgba(147,130,220,0.2)", color: "#c4b5fd" }}>{retCount}</span>
+                                      ) : "—"}
+                                    </td>
+                                  </>
+                                )}
                               </tr>
                               {isExpanded && (
                                 <tr>
-                                  <td colSpan={8} style={{ padding: "8px 4px", background: "rgba(15,23,42,0.5)" }}>
+                                  <td colSpan={status === "duplicate_number" ? 7 : 8} style={{ padding: "8px 4px", background: "rgba(15,23,42,0.5)" }}>
                                     <RecibidoDetail arca={d.arca} colppy={d.colppy} retenciones={d.retenciones} percepcionesDiff={d.percepciones_diff} cuitMatch={d.cuit_match} />
                                   </td>
                                 </tr>

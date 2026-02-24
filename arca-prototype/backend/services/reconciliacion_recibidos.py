@@ -150,6 +150,7 @@ def _index_by_invoice_number(
     """
     Index records by invoice number. Detects duplicates and missing numbers.
     Returns (by_number, no_number, duplicates).
+    Duplicates include `_duplicate_of_number` with the conflicting invoice number.
     """
     by_number: dict[str, dict[str, Any]] = {}
     no_number: list[dict[str, Any]] = []
@@ -160,6 +161,7 @@ def _index_by_invoice_number(
         if not nro:
             no_number.append(item)
         elif nro in by_number:
+            item["_duplicate_of_number"] = nro
             duplicates.append(item)
         else:
             by_number[nro] = item
@@ -437,13 +439,21 @@ async def reconcile_recibidos_stream(
         discrepancies.append({"status": "missing_number", "source": "colppy",
                               "arca": None, "colppy": _colppy_record_summary(item, cuit_map)})
 
-    # Duplicate invoice numbers
+    # Duplicate invoice numbers — include which number and which source
     for item in arca_dup:
-        discrepancies.append({"status": "duplicate_number", "source": "arca",
-                              "arca": _arca_record_summary(item), "colppy": None})
+        dup_nro = item.get("_duplicate_of_number", "")
+        discrepancies.append({
+            "status": "duplicate_number", "source": "arca",
+            "duplicate_number": dup_nro,
+            "arca": _arca_record_summary(item), "colppy": None,
+        })
     for item in colppy_dup:
-        discrepancies.append({"status": "duplicate_number", "source": "colppy",
-                              "arca": None, "colppy": _colppy_record_summary(item, cuit_map)})
+        dup_nro = item.get("_duplicate_of_number", "")
+        discrepancies.append({
+            "status": "duplicate_number", "source": "colppy",
+            "duplicate_number": dup_nro,
+            "arca": None, "colppy": _colppy_record_summary(item, cuit_map),
+        })
 
     # Cross-match
     matched = 0

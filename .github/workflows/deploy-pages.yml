@@ -5,6 +5,8 @@ on:
     branches: [main]
     paths:
       - 'docs/**'
+      - '.github/workflows/deploy-pages.yml'
+  workflow_dispatch:
 
 permissions:
   pages: write

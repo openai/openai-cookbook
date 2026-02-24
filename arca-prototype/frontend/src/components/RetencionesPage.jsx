@@ -4,7 +4,7 @@
  * Uses representado selector (same pattern as Notifications/Comprobantes).
  */
 import { useState, useEffect } from "react";
-import { getApiBase } from "../App";
+import { getApiBase } from "../apiConfig";
 
 const API_BASE = getApiBase();
 

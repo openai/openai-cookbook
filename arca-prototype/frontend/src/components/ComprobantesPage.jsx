@@ -3,7 +3,7 @@
  * Choose representado (CUIT), toggle direction, view table, click for details.
  */
 import { useState, useEffect } from "react";
-import { getApiBase } from "../App";
+import { getApiBase } from "../apiConfig";
 
 const API_BASE = getApiBase();
 

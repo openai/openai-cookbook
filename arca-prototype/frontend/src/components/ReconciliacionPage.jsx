@@ -4,7 +4,7 @@
  *   2. ARCA Emitidos vs Colppy Ventas (new)
  */
 import { useState, useEffect, Fragment } from "react";
-import { getApiBase } from "../App";
+import { getApiBase } from "../apiConfig";
 
 const API_BASE = getApiBase();
 

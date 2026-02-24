@@ -3,7 +3,7 @@
  * Uses credentials from .env (no login needed). Cache-first loading.
  */
 import { useState, useEffect } from "react";
-import { getApiBase } from "../App";
+import { getApiBase } from "../apiConfig";
 
 const API_BASE = getApiBase();
 

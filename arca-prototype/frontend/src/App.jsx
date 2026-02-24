@@ -1,4 +1,5 @@
 import { useState, useEffect } from "react";
+import { getApiBase, DEFAULT_BACKEND } from "./apiConfig";
 import LoginForm from "./components/LoginForm";
 import NotificationsPage from "./components/NotificationsPage";
 import ComprobantesPage from "./components/ComprobantesPage";
@@ -6,18 +7,6 @@ import RetencionesPage from "./components/RetencionesPage";
 import ReconciliacionPage from "./components/ReconciliacionPage";
 import BancoGaliciaPage from "./components/BancoGaliciaPage";
 import LibroIVAPage from "./components/LibroIVAPage";
-
-// ── Runtime backend URL config ──────────────────────────────
-const DEFAULT_BACKEND = "http://localhost:8000";
-
-export function getApiBase() {
-  // Build-time env var takes priority, then localStorage, then default
-  const envUrl = import.meta.env.VITE_API_URL;
-  if (envUrl) return envUrl;
-  // In dev mode (Vite proxy), use empty string so /api goes to same origin
-  if (import.meta.env.DEV) return "";
-  return localStorage.getItem("arca_backend_url") || DEFAULT_BACKEND;
-}
 
 function BackendStatus() {
   const [status, setStatus] = useState("checking"); // "checking" | "connected" | "disconnected"

@@ -1,5 +1,5 @@
 import { useState } from "react";
-import { getApiBase } from "../App";
+import { getApiBase } from "../apiConfig";
 
 const API_BASE = getApiBase();
 

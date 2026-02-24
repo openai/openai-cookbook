@@ -1,0 +1,45 @@
+---
+description: Standards for SaaS metric calculations, formatting, and reporting at Colppy. Auto-applied when working with MRR, churn, cohorts, or growth analytics.
+alwaysApply: true
+---
+
+# SaaS Metrics Conventions — Colppy
+
+## Metric Definitions
+
+- **MRR (Monthly Recurring Revenue)**: Sum of all active subscription amounts normalized to monthly. Each legal entity ID (CUIT) = one paid account.
+- **ARR**: MRR × 12.
+- **Net New MRR**: New MRR + Expansion MRR − Contraction MRR − Churned MRR.
+- **Gross Churn Rate**: Churned MRR ÷ Starting MRR of the period.
+- **Net Revenue Retention (NRR)**: (Starting MRR + Expansion − Contraction − Churn) ÷ Starting MRR.
+- **LTV**: Average revenue per account ÷ Gross churn rate.
+- **CAC Payback**: CAC ÷ (Average MRR per account × Gross margin).
+
+## MRR Movement Categories
+
+| Category       | Definition                                                  |
+|----------------|-------------------------------------------------------------|
+| New            | First subscription payment from a CUIT not previously active |
+| Expansion      | Existing CUIT upgrades plan or adds invoices                 |
+| Contraction    | Existing CUIT downgrades plan or reduces invoices            |
+| Churn          | CUIT cancels subscription — MRR goes to $0                   |
+| Reactivation   | Previously churned CUIT starts paying again                  |
+
+## Formatting Rules (Argentina)
+
+- Currency: `$` symbol, comma decimal separator, period thousand separator (e.g., `$1.234,56`).
+- Percentages: comma decimal separator (e.g., `12,5%`).
+- Dates: `DD/MM/YYYY` for display, `YYYY-MM-DD` for data/code.
+- Always include: date range, data source, record count, and filters used in any metric export.
+
+## Cohort Rules
+
+- Cohort month = month of first paid subscription (not trial start).
+- Retention is measured monthly: active CUIT in month N ÷ CUIT in cohort.
+- A CUIT is "retained" if it has any active subscription in the measurement month.
+
+## Data Source Priority
+
+1. Billing database (`facturacion_hubspot.db`) for revenue/subscription data.
+2. HubSpot CRM for deal and contact lifecycle data.
+3. Mixpanel for product usage and activation metrics.

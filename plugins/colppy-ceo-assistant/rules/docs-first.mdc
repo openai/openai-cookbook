@@ -1,0 +1,18 @@
+---
+description: For Colppy-specific questions about definitions, APIs, methodology, or configuration, always read the relevant doc from docs/ before answering. The docs are the source of truth.
+alwaysApply: true
+---
+
+# Docs-First Rule
+
+When the user asks about **Colppy** and any of the following:
+
+- HubSpot (config, API, associations, pagination, deal stages)
+- MRR, churn, retention, portfolio, CAGR
+- Mixpanel (events, properties, lexicon)
+- ICP (Operador, PYME, Contador)
+- Funnel (MQL, PQL, SQL)
+- Billing, facturacion, id_empresa
+- Contactability, scoring
+
+**Action:** Read the relevant doc from `docs/` (see the docs-reference skill for the mapping) before answering. Do not rely on general knowledge — the bundled docs are authoritative for Colppy.

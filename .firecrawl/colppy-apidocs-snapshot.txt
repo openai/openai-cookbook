@@ -1,0 +1,85 @@
+- document:
+  - text: Public ENVIRONMENT sandbox
+  - combobox [ref=e1]
+  - text: LAYOUT Double Column
+  - combobox [ref=e2] [nth=1]
+  - text: LANGUAGE cURL - cURL
+  - combobox [ref=e3] [nth=2]
+  - button [ref=e4]:
+    - img
+  - text: Colppy API
+  - link "Introduction" [ref=e5]:
+    - /url: "#intro"
+  - img
+  - img
+  - text: Sesiones
+  - img
+  - img
+  - text: Clientes
+  - img
+  - img
+  - text: Contabilidad
+  - img
+  - img
+  - text: Empresa POST https://login.colppy.com/resources/php/paneldecontrol/TC_graficoResultados.php
+  - main:
+    - heading "Colppy API" [ref=e6] [level=1]
+    - paragraph:
+      - strong: Colppy
+      - text: esta construido en base a una API propia. Esta API es el nexo entre el sitio web de Colppy y sus servidores. Como desarrolladores podemos usar este nexo para crear nuestras propias aplicaciones contables o automatizar nuestros sistemas de gestión aprovechando el potencial contable que ofrece Colppy.
+    - paragraph:
+      - text: Para empezar a trabajar con
+      - strong: Colppy API
+      - text: primero debemos ingresar a la web de desarrollador de Colppy, registrar un usuario y contraseña.
+    - paragraph: Luego, ingresar a la documentación de las provisiones y operaciones disponibles de Colppy API.
+    - paragraph: Recuerda que para poder utilizar el ambiente de prueba Staging una vez creado el usuario DEV tarda 24 horas en habilitarse.
+    - paragraph:
+      - strong: Qué es Colppy API?
+    - paragraph: La API de Colppy utiliza el protocolo HTTPS para hacer las pegadas a la API. Colppy API permite mediante una solicitud en formato json; iniciar sesión, realizar altas y bajas de facturas, leer datos de empresas o cliente entre otras funcionalidades.
+    - paragraph:
+      - strong: Cómo empiezo?
+    - paragraph: El primer paso para empezar a desarrollar es registrar usuario y contraseña en la Web de desarrolladores de Colppy. Para realizar una petición podemos o generar un script en php que utilice Curl o utilizando alguna herramienta que puedan ejecutar HTTP POST Request (Por ej. httprequester para Firefox o PostMan para Chrome).
+    - paragraph:
+      - strong: Cómo realizo una petición?
+    - paragraph:
+      - text: La url de Colppy API para realizar pruebas es
+      - link "https://staging.colppy.com/lib/frontera2/service.php" [ref=e7]:
+        - /url: https://staging.colppy.com/lib/frontera2/service.php
+      - text: . El punto de acceso a Colppy API en su versión Producción es
+      - link "https://login.colppy.com/lib/frontera2/service.php" [ref=e8]:
+        - /url: https://login.colppy.com/lib/frontera2/service.php
+      - text: ". Para poder generar una petición debemos ejecutar HTTP POST Request a una de las URLs en donde se encuentra el servicios, ya sea de producción o testing con JSON que tiene el siguiente formato: El JSON se divide en tres partes"
+      - strong: auth, service y parameters
+      - text: .
+    - paragraph:
+      - code: "{ \"auth\":{ \"usuario\":\"usuario_API\", \"password\":\"Clave MD5\" }, \"service\":{ \"provision\":\"Usuario\", \"operacion\":\"iniciar_sesion\" }, \"parameters\":{ \"usuario\":\"Usuario_Colppy\", \"password\":\"Clave MD5\" } }"
+    - paragraph:
+      - text: En
+      - strong: auth
+      - text: van tus credenciales, con las que te registraste en la web de desarrolladores de Colppy, y el MD5 de la contraseña que utilizaste para registraste. Por ejemplo si mi nombre usuario como desarrollador es SujetoDePrueba y mi contraseña
+      - strong: SujetoDePruebaContraseña
+      - text: ", el JSON quedaría de la siguiente forma:"
+    - paragraph:
+      - code: "{ \"auth\": { \"usuario\": \"SujetoDePrueba\", \"password\": \"d0edfe89f30a78ef45ab9a22bd0f826b\" } }"
+    - paragraph:
+      - text: El md5 de la cadena
+      - strong: "\"SujetoDePruebaContraseña\""
+      - text: es la cadena
+      - strong: "\"d0edfe89f30a78ef45ab9a22bd0f826b\""
+      - text: . En
+      - strong: service
+      - text: se especifica que es lo que deseo hacer con en la petición. Cada alta, baja y modificación de colppy están en diferentes Provisiones y cada una de estas en diferentes operaciones. La Provisiones hacen referencia sobre cual de los módulo Colppy deseo trabajar, y la operación hace referencia a lo que deseo hacer con ese módulo. Existe un Índice con las distintas Provisiones y Operaciones que soporta Colppy. Por ejemplo si lo que quiero hacer es iniciar sesión en Colppy lo que tengo que hacer es modificar el campo
+      - emphasis: provision
+      - text: con el nombre del modulo al que quiero acceder en este caso
+      - emphasis: Usuario
+      - text: ", luego me fijo en el índice de provisiones y operaciones de Colppy y verifico que exista la operaciones iniciar_sesion, Entonces en el campo operaciones lo cambio a iniciar_sesion. Entonces el JSON quedaría de la siguiente manera"
+    - paragraph:
+      - code: "{ \"service\": { \"provision\": \"Usuario\", \"operacion\": \"iniciar_sesion\" }, }"
+    - paragraph: Nota importante sobre el nombre de las provisiones y operaciones; son sensible a mayúsculas. Siempre tener el índice de provisiones y operaciones a mano. En parameters van los parametros que espera la operacion para poderse ejecutar. Estos parámetros varían de provisión en provision y de operación en operacion. En este caso estamos tratando de iniciar sesion en Colppy, si nos fijamos en el índice de provisiones y operaciones en la sección de la provisión sesion, podemos ver los parámetros que espera la operación en el JSON.
+    - paragraph: "En el nuestro ejemplo el JSON final quedaría de la siguiente manera:"
+    - paragraph:
+      - code: "{ \"auth\":{ \"usuario\":\"Usuario Desarrollador\", \"password\":\"Password Desarollador\" }, \"service\":{ \"provision\":\"Usuario\", \"operacion\":\"iniciar_sesion\" }, \"parameters\":{ \"usuario\":\"UsuarioColppy\", \"password\":\"ContraseñaColppy\" } }"
+    - paragraph: Una vez que ejecutamos la HTTP POST Request con nuestro JSON, Colppy API nos va a responder con un mensaje informándonos si el requerimiento se realizó con éxito o no.
+    - paragraph: "Ejemplo de una respuesta de éxito:"
+    - paragraph:
+      - code: "{ \"service\":{ \"provision\":\"Usuario\", \"operacion\":\"iniciar_sesion\", \"version\":\"1_0_0_0\", \"response_date\":\"2014-24-06 17:10:19\" }, \"result\":{ \"estado\":0, \"mensaje\":\"La operaci\\u00f3n se realiz\\u00f3 correctamente\" }, \"response\":{ \"success\":true, \"message\":\"La operacion se realizo con exito.\", \"data\":{ \"claveSesion\":\"b5a97564ad59e624a6ba545ecd3ca112\" } } }"

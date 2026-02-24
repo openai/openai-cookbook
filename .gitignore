@@ -160,3 +160,6 @@ confluence-mcp-server/
 
 # Large dataset files (RNS - Registro Nacional de Sociedades)
 **/registro-nacional-sociedades-*.csv
+
+# Claude worktrees (embedded git repos - not for versioning)
+.claude/worktrees/

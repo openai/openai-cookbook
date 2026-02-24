@@ -1,0 +1,53 @@
+---
+description: Claude Code plugin behaviors — code-simplifier, feature-dev, frontend-design. Use when simplifying code, developing features, or building frontends.
+globs: ["**/*.ts", "**/*.tsx", "**/*.js", "**/*.jsx", "**/*.py", "**/*.vue"]
+alwaysApply: false
+---
+
+# Claude Code Plugin Behaviors (Cursor Agent)
+
+These rules adapt Claude Code plugin behaviors for the Cursor Agent. MCP equivalents (Firecrawl, Slack, Playwright) are configured in ~/.cursor/mcp.json.
+
+---
+
+## Code Simplifier
+
+When simplifying or refactoring code:
+- Preserve exact functionality — never change what the code does
+- Apply project standards from CLAUDE.md or cursorrules
+- Enhance clarity: reduce nesting, eliminate redundancy, improve names
+- Avoid nested ternaries — prefer switch or if/else
+- Choose clarity over brevity
+- Focus on recently modified code unless instructed otherwise
+
+---
+
+## Feature Development
+
+When implementing new features:
+1. **Discovery**: Create todo list, ask clarifying questions, confirm understanding
+2. **Codebase exploration**: Use code-explorer or semantic search to understand patterns
+3. **Clarifying questions**: Resolve ambiguities before designing
+4. **Architecture**: Design before implementing
+5. **Implementation**: Follow existing patterns, use TodoWrite for progress
+
+---
+
+## Frontend Design
+
+When building UI components, pages, or applications:
+- Commit to a bold aesthetic direction (minimal, maximalist, retro, etc.)
+- Avoid generic AI aesthetics: Inter, Roboto, purple gradients, predictable layouts
+- Typography: distinctive display + refined body font
+- Color: cohesive palette with sharp accents
+- Motion: high-impact animations, staggered reveals
+- Spatial composition: asymmetry, overlap, grid-breaking
+- Match implementation complexity to the vision
+
+---
+
+## Firecrawl (MCP)
+
+When web scraping, search, or research is needed:
+- Use Firecrawl MCP tools (search, scrape, map, crawl) instead of WebFetch/WebSearch when available
+- Set FIRECRAWL_API_KEY in ~/.cursor/mcp.json (get key at firecrawl.dev/app/api-keys)

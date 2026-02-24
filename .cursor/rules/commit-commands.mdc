@@ -1,0 +1,49 @@
+---
+description: Git workflow commands — commit, commit-push-pr, clean_gone. Use when the user asks to commit, push, create PR, or clean stale branches.
+globs: ["**/*"]
+alwaysApply: false
+---
+
+# Commit Commands
+
+Replicates Claude Code's commit-commands plugin. Use these workflows when the user asks to commit, push, create a PR, or clean up branches.
+
+---
+
+## /commit — Create a git commit
+
+When the user asks to commit, stage, or "create a commit":
+
+1. Run `git status`, `git diff HEAD`, `git branch --show-current`, `git log --oneline -10`
+2. Analyze staged and unstaged changes
+3. Draft a commit message that matches the repo's style (check recent commits)
+4. Avoid committing secrets (.env, credentials.json, etc.)
+5. Stage and commit in one go: `git add ...` then `git commit -m "..."`
+
+**Conventional commits:** Prefer `type(scope): message` (feat, fix, docs, refactor, etc.)
+
+---
+
+## /commit-push-pr — Commit, push, and open PR
+
+When the user asks to push, create a PR, or "commit and open a PR":
+
+1. If on main: create a new branch with `git checkout -b <branch-name>`
+2. Run `git status`, `git diff HEAD`
+3. Stage, commit with an appropriate message
+4. Push: `git push -u origin <branch>`
+5. Create PR: `gh pr create` (requires GitHub CLI)
+
+**PR description:** Include summary (1-3 bullets), test plan checklist. Analyze all commits in the branch, not just the latest.
+
+---
+
+## /clean_gone — Clean stale local branches
+
+When the user asks to clean branches, remove gone branches, or "clean up my branch list":
+
+1. List branches: `git branch -v` (identify `[gone]` branches)
+2. List worktrees: `git worktree list` (branches with `+` have worktrees)
+3. For each `[gone]` branch: remove worktree if exists, then `git branch -D <branch>`
+
+**Note:** Run `git fetch --prune` first if branches don't show as [gone].

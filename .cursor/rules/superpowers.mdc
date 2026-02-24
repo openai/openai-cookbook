@@ -1,0 +1,80 @@
+---
+description: Superpowers workflows — TDD, systematic debugging, brainstorming, planning. Use when implementing features, fixing bugs, or designing before coding.
+globs: ["**/*.ts", "**/*.tsx", "**/*.js", "**/*.jsx", "**/*.py", "**/*.go", "**/*.rs"]
+alwaysApply: false
+---
+
+# Superpowers
+
+Core development workflows. **Check if a workflow applies before acting.** Even a 1% chance means use it.
+
+---
+
+## Skill Priority
+
+1. **Process skills first** (brainstorming, debugging) — determine HOW to approach
+2. **Implementation skills second** — guide execution
+
+"Let's build X" → brainstorming first, then implementation.
+"Fix this bug" → debugging first, then domain skills.
+
+---
+
+## Brainstorming — Design before implementation
+
+**When:** Creating features, building components, adding functionality, modifying behavior.
+
+**Rule:** Do NOT write code, scaffold, or implement until you have a design and user approval.
+
+1. Explore project context (files, docs, recent commits)
+2. Ask clarifying questions — one at a time
+3. Propose 2-3 approaches with trade-offs
+4. Present design in sections, get approval after each
+5. Write design doc to `docs/plans/YYYY-MM-DD-<topic>-design.md`
+6. Then create implementation plan
+
+**No exceptions for "simple" projects.** Present design and get approval.
+
+---
+
+## Test-Driven Development (TDD)
+
+**When:** Implementing features, bug fixes, refactoring, behavior changes.
+
+**Iron law:** NO PRODUCTION CODE WITHOUT A FAILING TEST FIRST.
+
+**Red-Green-Refactor:**
+1. **RED** — Write failing test. Verify it fails correctly.
+2. **GREEN** — Write minimal code to pass. Verify all green.
+3. **REFACTOR** — Clean up. All tests still pass.
+
+Wrote code before the test? Delete it. Start over. No exceptions.
+
+---
+
+## Systematic Debugging
+
+**When:** Any bug, test failure, unexpected behavior.
+
+**Iron law:** NO FIXES WITHOUT ROOT CAUSE INVESTIGATION FIRST.
+
+**Phase 1 — Root cause (before any fix):**
+1. Read error messages and stack traces completely
+2. Reproduce consistently — exact steps
+3. Check recent changes (git diff, new deps, config)
+4. For multi-component systems: add diagnostic logging at boundaries
+
+**Phase 2+:** Only after root cause is identified.
+
+Don't guess. Don't patch symptoms. Find root cause first.
+
+---
+
+## Red Flags (don't rationalize)
+
+| Thought | Reality |
+|---------|---------|
+| "This is too simple for a design" | Present design, get approval |
+| "I'll skip TDD just this once" | Delete pre-test code, start over |
+| "The fix is obvious" | Complete root cause investigation first |
+| "Let me explore first" | Skills tell you HOW to explore |

@@ -9,15 +9,17 @@ from typing import Optional
 from dotenv import load_dotenv
 
 # Load environment variables from multiple possible locations
-# Check root directory first, then tools directory
-root_env = os.path.join(os.path.dirname(os.path.dirname(os.path.abspath(__file__))), '.env')
-tools_env = os.path.join(os.path.dirname(os.path.abspath(__file__)), '..', '.env')
+# tools/hubspot_api/config.py -> tools/ -> repo root
+_tools_dir = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
+_repo_root = os.path.dirname(_tools_dir)
+tools_env = os.path.join(_tools_dir, '.env')
+repo_env = os.path.join(_repo_root, '.env')
 
-# Load from root first (takes precedence)
-if os.path.exists(root_env):
-    load_dotenv(root_env)
-    
-# Then load from tools directory (supplements root)
+# Load from repo root first (HUBSPOT_API_KEY typically lives here)
+if os.path.exists(repo_env):
+    load_dotenv(repo_env)
+
+# Then load from tools directory (supplements; tools/.env has Colppy DB, etc.)
 if os.path.exists(tools_env):
     load_dotenv(tools_env)
 

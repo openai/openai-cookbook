@@ -25,7 +25,7 @@ from datetime import datetime
 from typing import Any, AsyncIterator
 
 from backend.services import arca_db, colppy_api
-from backend.services.comprobantes_api import get_comprobantes_recibidos
+from backend.services.comprobantes_api import TIPO_COMPROBANTE, get_comprobantes_recibidos
 
 logger = logging.getLogger(__name__)
 
@@ -110,6 +110,7 @@ def _colppy_record_summary(v: dict[str, Any], cuit_map: dict[int, str]) -> dict[
         "nroFactura": v.get("nroFactura", ""),
         "fechaFactura": v.get("fechaFactura", ""),
         "idTipoComprobante": v.get("idTipoComprobante", ""),
+        "tipo_comprobante": TIPO_COMPROBANTE.get(str(v.get("idTipoComprobante", "")), f"Tipo {v.get('idTipoComprobante', '')}"),
         "RazonSocial": v.get("RazonSocial", ""),
         "idEstadoFactura": estado_id,
         "estadoFactura": _ESTADO_FACTURA.get(estado_id, estado_id),
@@ -146,13 +147,23 @@ def _colppy_record_summary(v: dict[str, Any], cuit_map: dict[int, str]) -> dict[
 def _index_by_invoice_number(
     items: list[dict[str, Any]],
     number_field: str,
+    cuit_extractor=None,
+    tipo_extractor=None,
 ) -> tuple[dict[str, dict[str, Any]], list[dict[str, Any]], list[dict[str, Any]]]:
     """
-    Index records by invoice number. Detects duplicates and missing numbers.
-    Returns (by_number, no_number, duplicates).
-    Duplicates include `_duplicate_of_number` with the conflicting invoice number.
+    Index records by compound key (supplier_cuit|tipo|invoice_number).
+
+    In Argentina, invoice numbers are only unique within (CUIT emisor +
+    tipo comprobante + punto de venta).  Two different suppliers can both
+    issue ``00001-00000003``, and the *same* supplier can issue a Factura
+    and a Nota de Crédito with the same number.
+
+    When *cuit_extractor* and/or *tipo_extractor* are provided, they are
+    included in the dict key to avoid false-positive duplicate detection.
+
+    Returns (by_key, no_number, duplicates).
     """
-    by_number: dict[str, dict[str, Any]] = {}
+    by_key: dict[str, dict[str, Any]] = {}
     no_number: list[dict[str, Any]] = []
     duplicates: list[dict[str, Any]] = []
 
@@ -160,13 +171,30 @@ def _index_by_invoice_number(
         nro = _normalize_invoice_number(item.get(number_field, ""))
         if not nro:
             no_number.append(item)
-        elif nro in by_number:
+            continue
+
+        parts = []
+        if cuit_extractor:
+            parts.append(cuit_extractor(item) or "")
+        if tipo_extractor:
+            parts.append(str(tipo_extractor(item) or ""))
+        if parts:
+            key = "|".join(parts) + "|" + nro
+        else:
+            key = nro
+
+        if key in by_key:
             item["_duplicate_of_number"] = nro
             duplicates.append(item)
         else:
-            by_number[nro] = item
+            by_key[key] = item
 
-    return by_number, no_number, duplicates
+    return by_key, no_number, duplicates
+
+
+def _extract_nro_from_key(key: str) -> str:
+    """Extract the invoice number part from a compound key ``cuit|tipo|nro``."""
+    return key.rsplit("|", 1)[-1] if "|" in key else key
 
 
 # ── Retenciones overlay ──────────────────────────────────────────────────────
@@ -421,10 +449,20 @@ async def reconcile_recibidos_stream(
 
     # --- Step 5: Index + cross-match ---
     yield _sse({"type": "progress", "step": 5, "total": total_steps, "pct": 70,
-                "message": f"Indexando {len(arca_items) + len(colppy_items)} comprobantes por número..."})
+                "message": f"Indexando {len(arca_items) + len(colppy_items)} comprobantes por proveedor + número..."})
 
-    arca_by_nro, arca_no_nro, arca_dup = _index_by_invoice_number(arca_items, "numero")
-    colppy_by_nro, colppy_no_nro, colppy_dup = _index_by_invoice_number(colppy_items, "nroFactura")
+    # Index by compound key (supplier_cuit|invoice_number) to avoid
+    # false-positive duplicates when different suppliers share the same nro.
+    arca_by_key, arca_no_nro, arca_dup = _index_by_invoice_number(
+        arca_items, "numero",
+        cuit_extractor=lambda item: _normalize_cuit(item.get("cuit_contraparte", "")),
+        tipo_extractor=lambda item: item.get("tipo_comprobante_codigo", ""),
+    )
+    colppy_by_key, colppy_no_nro, colppy_dup = _index_by_invoice_number(
+        colppy_items, "nroFactura",
+        cuit_extractor=lambda item: _normalize_cuit(cuit_map.get(item.get("idProveedor"), "")),
+        tipo_extractor=lambda item: item.get("idTipoComprobante", ""),
+    )
 
     yield _sse({"type": "progress", "step": 5, "total": total_steps, "pct": 75,
                 "message": "Comparando facturas y detectando discrepancias..."})
@@ -439,7 +477,7 @@ async def reconcile_recibidos_stream(
         discrepancies.append({"status": "missing_number", "source": "colppy",
                               "arca": None, "colppy": _colppy_record_summary(item, cuit_map)})
 
-    # Duplicate invoice numbers — include which number and which source
+    # True duplicates: same supplier + same invoice number within one source
     for item in arca_dup:
         dup_nro = item.get("_duplicate_of_number", "")
         discrepancies.append({
@@ -455,27 +493,29 @@ async def reconcile_recibidos_stream(
             "arca": None, "colppy": _colppy_record_summary(item, cuit_map),
         })
 
-    # Cross-match
+    # ── Primary cross-match by compound key ──
     matched = 0
     matched_pairs: list[dict[str, Any]] = []
     amount_mismatch = 0
     colppy_total_pesos = 0.0
     arca_total_pesos = 0.0
+    matched_keys: set[str] = set()
 
-    all_numbers = set(arca_by_nro.keys()) | set(colppy_by_nro.keys())
+    all_keys = set(arca_by_key.keys()) | set(colppy_by_key.keys())
 
-    for nro in sorted(all_numbers):
-        in_arca = nro in arca_by_nro
-        in_colppy = nro in colppy_by_nro
+    for key in sorted(all_keys):
+        in_arca = key in arca_by_key
+        in_colppy = key in colppy_by_key
 
         if in_colppy:
-            colppy_total_pesos += _safe_float(colppy_by_nro[nro].get("totalFactura", "0"))
+            colppy_total_pesos += _safe_float(colppy_by_key[key].get("totalFactura", "0"))
         if in_arca:
-            arca_total_pesos += _safe_float(arca_by_nro[nro].get("importe_total", 0))
+            arca_total_pesos += _safe_float(arca_by_key[key].get("importe_total", 0))
 
         if in_arca and in_colppy:
-            arca_rec = arca_by_nro[nro]
-            colppy_rec = colppy_by_nro[nro]
+            matched_keys.add(key)
+            arca_rec = arca_by_key[key]
+            colppy_rec = colppy_by_key[key]
             arca_amount = _safe_float(arca_rec.get("importe_total", 0))
             colppy_amt = _safe_float(colppy_rec.get("totalFactura", "0"))
 
@@ -509,19 +549,85 @@ async def reconcile_recibidos_stream(
                     **pair_meta,
                     "diff_pesos": round(arca_amount - colppy_amt, 2),
                 })
+            continue
 
-        elif in_arca and not in_colppy:
+        # Not matched by compound key — try nro-only fallback below
+        pass
+
+    # ── Fallback: nro-only matching for CUIT resolution gaps ──
+    # When a Colppy supplier lacks CUIT, compound keys won't align.
+    # Collect unmatched items, group by bare nro, and match 1:1 pairs.
+    arca_unmatched = {k: v for k, v in arca_by_key.items() if k not in matched_keys}
+    colppy_unmatched = {k: v for k, v in colppy_by_key.items() if k not in matched_keys}
+
+    arca_orphan_by_nro: dict[str, list[tuple[str, dict]]] = defaultdict(list)
+    for k, v in arca_unmatched.items():
+        arca_orphan_by_nro[_extract_nro_from_key(k)].append((k, v))
+
+    colppy_orphan_by_nro: dict[str, list[tuple[str, dict]]] = defaultdict(list)
+    for k, v in colppy_unmatched.items():
+        colppy_orphan_by_nro[_extract_nro_from_key(k)].append((k, v))
+
+    fallback_matched_arca: set[str] = set()
+    fallback_matched_colppy: set[str] = set()
+
+    for nro in set(arca_orphan_by_nro) & set(colppy_orphan_by_nro):
+        arca_candidates = arca_orphan_by_nro[nro]
+        colppy_candidates = colppy_orphan_by_nro[nro]
+        # Only safe to match when exactly one from each side (unambiguous)
+        if len(arca_candidates) == 1 and len(colppy_candidates) == 1:
+            a_key, arca_rec = arca_candidates[0]
+            c_key, colppy_rec = colppy_candidates[0]
+            arca_amount = _safe_float(arca_rec.get("importe_total", 0))
+            colppy_amt = _safe_float(colppy_rec.get("totalFactura", "0"))
+
+            arca_summary = _arca_record_summary(arca_rec)
+            colppy_summary = _colppy_record_summary(colppy_rec, cuit_map)
+
+            arca_otros = _safe_float(arca_rec.get("otros_tributos"))
+            colppy_percepciones = colppy_summary["totalPercepciones"]
+            percepciones_diff = round(arca_otros - colppy_percepciones, 2) if arca_otros else None
+
+            arca_cuit = _normalize_cuit(arca_rec.get("cuit_contraparte", ""))
+            colppy_cuit = colppy_summary.get("cuit_proveedor", "")
+            cuit_match = (arca_cuit == colppy_cuit) if arca_cuit and colppy_cuit else None
+
+            pair_meta = {
+                "arca": arca_summary,
+                "colppy": colppy_summary,
+                "percepciones_diff": percepciones_diff,
+                "cuit_match": cuit_match,
+            }
+
+            if abs(arca_amount - colppy_amt) < 0.02:
+                matched += 1
+                matched_pairs.append(pair_meta)
+            else:
+                amount_mismatch += 1
+                discrepancies.append({
+                    "status": "amount_mismatch",
+                    **pair_meta,
+                    "diff_pesos": round(arca_amount - colppy_amt, 2),
+                })
+
+            fallback_matched_arca.add(a_key)
+            fallback_matched_colppy.add(c_key)
+
+    # Remaining unmatched → only_arca / only_colppy
+    for key, rec in arca_unmatched.items():
+        if key not in fallback_matched_arca:
             discrepancies.append({
                 "status": "only_arca",
-                "arca": _arca_record_summary(arca_by_nro[nro]),
+                "arca": _arca_record_summary(rec),
                 "colppy": None,
             })
 
-        elif in_colppy and not in_arca:
+    for key, rec in colppy_unmatched.items():
+        if key not in fallback_matched_colppy:
             discrepancies.append({
                 "status": "only_colppy",
                 "arca": None,
-                "colppy": _colppy_record_summary(colppy_by_nro[nro], cuit_map),
+                "colppy": _colppy_record_summary(rec, cuit_map),
             })
 
     only_arca = sum(1 for d in discrepancies if d["status"] == "only_arca")

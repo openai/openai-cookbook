@@ -590,6 +590,7 @@ function EmitidosReconciliation() {
                           <th style={s.th}>Número</th>
                           <th style={s.th}>Fecha</th>
                           <th style={s.th}>Tipo</th>
+                          <th style={s.th}>Estado</th>
                           <th style={{ ...s.th, textAlign: "right" }}>ARCA $</th>
                           <th style={{ ...s.th, textAlign: "right" }}>Colppy $</th>
                           <th style={{ ...s.th, textAlign: "right" }}>Diff $</th>
@@ -601,6 +602,7 @@ function EmitidosReconciliation() {
                           <th style={s.th}>Número</th>
                           <th style={s.th}>Fecha</th>
                           <th style={s.th}>Tipo</th>
+                          <th style={s.th}>Estado</th>
                           <th style={{ ...s.th, textAlign: "right" }}>ARCA (orig.)</th>
                           <th style={{ ...s.th, textAlign: "right" }}>Colppy (ARS)</th>
                           <th style={{ ...s.th, textAlign: "center", width: "90px" }}>Acción</th>
@@ -611,6 +613,7 @@ function EmitidosReconciliation() {
                           <th style={s.th}>Número</th>
                           <th style={s.th}>Fecha</th>
                           <th style={s.th}>Tipo</th>
+                          <th style={s.th}>Estado</th>
                           <th style={s.th}>Contraparte</th>
                           <th style={{ ...s.th, textAlign: "right" }}>Importe</th>
                           <th style={{ ...s.th, textAlign: "center", width: "90px" }}>Acción</th>
@@ -633,7 +636,7 @@ function EmitidosReconciliation() {
                         ...(isExpanded ? { background: "rgba(99,102,241,0.06)" } : {}),
                       };
                       const toggleExpand = () => setExpandedRow(isExpanded ? null : dKey);
-                      const colCount = status === "amount_mismatch" ? 8 : 7;
+                      const colCount = status === "amount_mismatch" ? 9 : 8;
 
                       const detailRow = isExpanded ? (
                         <tr key={`${i}-detail`}>
@@ -676,8 +679,7 @@ function EmitidosReconciliation() {
                       );
 
                       if (status === "amount_mismatch") {
-                        const estadoColppy = d.colppy?.estadoFactura;
-                        const isAnulada = estadoColppy === "Anulada";
+                        const estadoColppy = d.colppy?.estadoFactura || "";
                         return (
                           <Fragment key={i}>
                             <tr style={rowStyle} onClick={toggleExpand}>
@@ -686,12 +688,10 @@ function EmitidosReconciliation() {
                               </td>
                               <td style={s.td}>{d.arca?.numero || d.colppy?.nroFactura}</td>
                               <td style={s.td}>{d.arca?.fecha_emision || d.colppy?.fechaFactura}</td>
-                              <td style={{ ...s.td, fontSize: "0.8rem" }}>{d.arca?.tipo_comprobante || ""}</td>
+                              <td style={{ ...s.td, fontSize: "0.8rem" }}>{tipoLetter(d.arca?.tipo_comprobante)}</td>
+                              <td style={{ ...s.td, fontSize: "0.8rem", ...(ESTADO_COLORS[estadoColppy] || {}) }}>{estadoColppy || "—"}</td>
                               <td style={{ ...s.td, textAlign: "right" }}>{fmtMoney(d.arca?.importe_total)}</td>
-                              <td style={{ ...s.td, textAlign: "right" }}>
-                                {fmtMoney(d.colppy?.totalFactura_pesos)}
-                                {isAnulada && <span style={s.anuladaBadge}>Anulada</span>}
-                              </td>
+                              <td style={{ ...s.td, textAlign: "right" }}>{fmtMoney(d.colppy?.totalFactura_pesos)}</td>
                               <td style={{ ...s.td, textAlign: "right", color: d.diff_pesos > 0 ? "#fb923c" : "#93c5fd" }}>
                                 {d.diff_pesos > 0 ? "+" : ""}{fmtMoney(d.diff_pesos)}
                               </td>
@@ -703,6 +703,7 @@ function EmitidosReconciliation() {
                       }
                       if (status === "currency_mismatch") {
                         const moneda = d.arca?.moneda || "???";
+                        const estadoCurr = d.colppy?.estadoFactura || "";
                         return (
                           <Fragment key={i}>
                             <tr style={rowStyle} onClick={toggleExpand}>
@@ -711,7 +712,8 @@ function EmitidosReconciliation() {
                               </td>
                               <td style={s.td}>{d.arca?.numero}</td>
                               <td style={s.td}>{d.arca?.fecha_emision}</td>
-                              <td style={s.td}>{d.arca?.tipo_comprobante}</td>
+                              <td style={{ ...s.td, fontSize: "0.8rem" }}>{tipoLetter(d.arca?.tipo_comprobante)}</td>
+                              <td style={{ ...s.td, fontSize: "0.8rem", ...(ESTADO_COLORS[estadoCurr] || {}) }}>{estadoCurr || "—"}</td>
                               <td style={{ ...s.td, textAlign: "right" }}>
                                 {moneda} {d.arca?.importe_total?.toLocaleString("es-AR", { minimumFractionDigits: 2 })}
                               </td>
@@ -724,18 +726,17 @@ function EmitidosReconciliation() {
                       }
                       const rec = d.arca || d.colppy;
                       const isArca = !!d.arca;
-                      const colppyEstado = d.colppy?.estadoFactura;
-                      const isAnuladaOther = colppyEstado === "Anulada";
+                      const estadoOther = d.colppy?.estadoFactura || "";
                       return (
                         <Fragment key={i}>
                           <tr style={rowStyle} onClick={toggleExpand}>
                             <td style={{ ...s.td, fontSize: "0.75rem" }}>{d.source || (isArca ? "ARCA" : "Colppy")}</td>
                             <td style={s.td}>{isArca ? rec.numero : rec.nroFactura}</td>
                             <td style={s.td}>{isArca ? rec.fecha_emision : rec.fechaFactura}</td>
-                            <td style={s.td}>{isArca ? rec.tipo_comprobante : `Tipo ${rec.idTipoComprobante}`}</td>
+                            <td style={{ ...s.td, fontSize: "0.8rem" }}>{tipoLetter(rec.tipo_comprobante)}</td>
+                            <td style={{ ...s.td, fontSize: "0.8rem", ...(ESTADO_COLORS[estadoOther] || {}) }}>{estadoOther || "—"}</td>
                             <td style={s.td}>
                               {isArca ? rec.denominacion_contraparte : rec.RazonSocial}
-                              {isAnuladaOther && <span style={s.anuladaBadge}>Anulada</span>}
                             </td>
                             <td style={{ ...s.td, textAlign: "right" }}>
                               {fmtMoney(isArca ? rec.importe_total : rec.totalFactura_pesos)}
@@ -777,6 +778,7 @@ function EmitidosReconciliation() {
                     <th style={s.th}>Número</th>
                     <th style={s.th}>Fecha</th>
                     <th style={s.th}>Tipo</th>
+                    <th style={s.th}>Estado</th>
                     <th style={s.th}>Contraparte</th>
                     <th style={{ ...s.th, textAlign: "right" }}>ARCA $</th>
                     <th style={{ ...s.th, textAlign: "right" }}>Colppy $</th>
@@ -786,19 +788,17 @@ function EmitidosReconciliation() {
                   {result.matched_pairs.map((pair, i) => {
                     const cae = pair.arca?.cod_autorizacion || "";
                     const isHL = highlightedCaes.has(cae);
-                    const matchedAnulada = pair.colppy?.estadoFactura === "Anulada";
+                    const estadoMatched = pair.colppy?.estadoFactura || "";
                     return (
                       <tr key={i} style={isHL ? { borderLeft: "3px solid rgba(59,130,246,0.7)", background: "rgba(59,130,246,0.05)" } : {}}>
                         <td style={{ ...s.td, fontSize: "0.75rem", fontFamily: "monospace" }}>{cae}</td>
                         <td style={s.td}>{pair.arca?.numero}</td>
                         <td style={s.td}>{pair.arca?.fecha_emision}</td>
-                        <td style={{ ...s.td, fontSize: "0.8rem" }}>{pair.arca?.tipo_comprobante}</td>
+                        <td style={{ ...s.td, fontSize: "0.8rem" }}>{tipoLetter(pair.arca?.tipo_comprobante)}</td>
+                        <td style={{ ...s.td, fontSize: "0.8rem", ...(ESTADO_COLORS[estadoMatched] || {}) }}>{estadoMatched || "—"}</td>
                         <td style={s.td}>{pair.arca?.denominacion_contraparte}</td>
                         <td style={{ ...s.td, textAlign: "right" }}>{fmtMoney(pair.arca?.importe_total)}</td>
-                        <td style={{ ...s.td, textAlign: "right" }}>
-                          {fmtMoney(pair.colppy?.totalFactura_pesos)}
-                          {matchedAnulada && <span style={s.anuladaBadge}>Anulada</span>}
-                        </td>
+                        <td style={{ ...s.td, textAlign: "right" }}>{fmtMoney(pair.colppy?.totalFactura_pesos)}</td>
                       </tr>
                     );
                   })}
@@ -1151,6 +1151,7 @@ function RecibidosReconciliation() {
                           <th style={s.th}>Fecha</th>
                           <th style={s.th}>Proveedor</th>
                           <th style={s.th}>CUIT</th>
+                          <th style={s.th}>Estado</th>
                           <th style={{ ...s.th, textAlign: "right" }}>ARCA</th>
                           <th style={{ ...s.th, textAlign: "right" }}>Colppy</th>
                           {status === "duplicate_number" ? (
@@ -1168,13 +1169,13 @@ function RecibidosReconciliation() {
                           const key = discKey(d);
                           const isExpanded = expandedRow === key;
                           const nro = d.arca?.numero || d.colppy?.nroFactura || d.duplicate_number || "";
-                          const tipo = d.arca?.tipo_comprobante || (d.colppy?.idTipoComprobante ? `Tipo ${d.colppy.idTipoComprobante}` : "");
+                          const tipo = tipoLetter(d.arca?.tipo_comprobante || d.colppy?.tipo_comprobante);
                           const fecha = d.arca?.fecha_emision || d.colppy?.fechaFactura || "";
                           const prov = d.arca?.denominacion_contraparte || d.colppy?.RazonSocial || "";
                           const cuit = d.arca?.cuit_contraparte || d.colppy?.cuit_proveedor || "";
                           const percTotal = d.colppy?.totalPercepciones || 0;
                           const retCount = d.retenciones?.length || 0;
-                          const recibidoAnulada = d.colppy?.estadoFactura === "Anulada";
+                          const estadoRec = d.colppy?.estadoFactura || "";
                           return (
                             <Fragment key={key + i}>
                               <tr
@@ -1186,10 +1187,10 @@ function RecibidosReconciliation() {
                                 <td style={s.td}>{fmtDate(fecha)}</td>
                                 <td style={{ ...s.td, maxWidth: 180, overflow: "hidden", textOverflow: "ellipsis", whiteSpace: "nowrap" }}>{prov}</td>
                                 <td style={{ ...s.td, fontSize: "0.75rem", color: "#64748b" }}>{cuit}</td>
+                                <td style={{ ...s.td, fontSize: "0.8rem", ...(ESTADO_COLORS[estadoRec] || {}) }}>{estadoRec || "—"}</td>
                                 <td style={{ ...s.td, textAlign: "right" }}>{d.arca ? fmtMoney(d.arca.importe_total) : "—"}</td>
                                 <td style={{ ...s.td, textAlign: "right" }}>
                                   {d.colppy ? fmtMoney(d.colppy.totalFactura_pesos) : "—"}
-                                  {recibidoAnulada && <span style={s.anuladaBadge}>Anulada</span>}
                                 </td>
                                 {status === "duplicate_number" ? (
                                   <td style={s.td}>
@@ -1216,7 +1217,7 @@ function RecibidosReconciliation() {
                               </tr>
                               {isExpanded && (
                                 <tr>
-                                  <td colSpan={status === "duplicate_number" ? 8 : 9} style={{ padding: "8px 4px", background: "rgba(15,23,42,0.5)" }}>
+                                  <td colSpan={status === "duplicate_number" ? 9 : 10} style={{ padding: "8px 4px", background: "rgba(15,23,42,0.5)" }}>
                                     <RecibidoDetail arca={d.arca} colppy={d.colppy} retenciones={d.retenciones} percepcionesDiff={d.percepciones_diff} cuitMatch={d.cuit_match} />
                                   </td>
                                 </tr>
@@ -1253,6 +1254,7 @@ function RecibidosReconciliation() {
                           <th style={s.th}>Fecha</th>
                           <th style={s.th}>Proveedor</th>
                           <th style={s.th}>CUIT</th>
+                          <th style={s.th}>Estado</th>
                           <th style={{ ...s.th, textAlign: "right" }}>ARCA</th>
                           <th style={{ ...s.th, textAlign: "right" }}>Colppy</th>
                           <th style={{ ...s.th, textAlign: "right" }}>Perc.</th>
@@ -1265,7 +1267,7 @@ function RecibidosReconciliation() {
                           const isExpanded = expandedRow === key;
                           const percTotal = pair.colppy?.totalPercepciones || 0;
                           const retCount = pair.retenciones?.length || 0;
-                          const matchedRecAnulada = pair.colppy?.estadoFactura === "Anulada";
+                          const estadoMatchedRec = pair.colppy?.estadoFactura || "";
                           return (
                             <Fragment key={key}>
                               <tr
@@ -1273,7 +1275,7 @@ function RecibidosReconciliation() {
                                 style={{ cursor: "pointer", background: isExpanded ? "rgba(99,102,241,0.08)" : "transparent" }}
                               >
                                 <td style={s.td}>{pair.arca?.numero || pair.colppy?.nroFactura}</td>
-                                <td style={{ ...s.td, fontSize: "0.8rem" }}>{pair.arca?.tipo_comprobante || ""}</td>
+                                <td style={{ ...s.td, fontSize: "0.8rem" }}>{tipoLetter(pair.arca?.tipo_comprobante)}</td>
                                 <td style={s.td}>{fmtDate(pair.arca?.fecha_emision)}</td>
                                 <td style={{ ...s.td, maxWidth: 180, overflow: "hidden", textOverflow: "ellipsis", whiteSpace: "nowrap" }}>
                                   {pair.arca?.denominacion_contraparte || pair.colppy?.RazonSocial}
@@ -1281,11 +1283,9 @@ function RecibidosReconciliation() {
                                 <td style={{ ...s.td, fontSize: "0.75rem", color: "#64748b" }}>
                                   {pair.arca?.cuit_contraparte || pair.colppy?.cuit_proveedor}
                                 </td>
+                                <td style={{ ...s.td, fontSize: "0.8rem", ...(ESTADO_COLORS[estadoMatchedRec] || {}) }}>{estadoMatchedRec || "—"}</td>
                                 <td style={{ ...s.td, textAlign: "right" }}>{fmtMoney(pair.arca?.importe_total)}</td>
-                                <td style={{ ...s.td, textAlign: "right" }}>
-                                  {fmtMoney(pair.colppy?.totalFactura_pesos)}
-                                  {matchedRecAnulada && <span style={s.anuladaBadge}>Anulada</span>}
-                                </td>
+                                <td style={{ ...s.td, textAlign: "right" }}>{fmtMoney(pair.colppy?.totalFactura_pesos)}</td>
                                 <td style={{ ...s.td, textAlign: "right", color: percTotal > 0 ? "#c4b5fd" : "#475569" }}>
                                   {percTotal > 0 ? fmtMoney(percTotal) : "—"}
                                 </td>
@@ -1297,7 +1297,7 @@ function RecibidosReconciliation() {
                               </tr>
                               {isExpanded && (
                                 <tr>
-                                  <td colSpan={9} style={{ padding: "8px 4px", background: "rgba(15,23,42,0.5)" }}>
+                                  <td colSpan={10} style={{ padding: "8px 4px", background: "rgba(15,23,42,0.5)" }}>
                                     <RecibidoDetail arca={pair.arca} colppy={pair.colppy} retenciones={pair.retenciones} percepcionesDiff={pair.percepciones_diff} cuitMatch={pair.cuit_match} />
                                   </td>
                                 </tr>
@@ -1965,6 +1965,26 @@ const fmtDate = (iso) => {
   return `${d}/${m}/${y}`;
 };
 
+/** Extract comprobante letter (A/B/C/E/M/T) from tipo_comprobante string.
+ *  Matches a standalone single letter at the end: "Factura A" → "A", "NC B" → "B".
+ *  Handles edge cases: "Tique" → "Tique", "Factura de Exportación" → "Exp" */
+const tipoLetter = (tipo) => {
+  if (!tipo) return "";
+  // Match a standalone letter at the end (preceded by space)
+  const m = tipo.trim().match(/\s([A-Z])\s*$/);
+  if (m) return m[1];
+  // Known non-letter types → short abbreviations
+  if (/exportaci/i.test(tipo)) return "Exp";
+  if (/^tique$/i.test(tipo.trim())) return "Tiq";
+  return tipo;
+};
+
+const ESTADO_COLORS = {
+  Activa: { color: "#86efac" },
+  Anulada: { color: "#f87171" },
+  "Aplicada parcial": { color: "#fbbf24" },
+};
+
 
 /* ── Styles ──────────────────────────────────────────────────────────── */
 
@@ -2115,13 +2135,6 @@ const s = {
     fontSize: "0.8rem", color: "#94a3b8", display: "flex", flexWrap: "wrap",
     alignItems: "center", gap: "4px 0",
   },
-  anuladaBadge: {
-    display: "inline-block", marginLeft: 6, padding: "1px 6px",
-    borderRadius: 4, fontSize: "0.65rem", fontWeight: 600,
-    background: "rgba(248,113,113,0.2)", color: "#f87171",
-    verticalAlign: "middle", letterSpacing: 0.3,
-  },
-
   // Chat panel
   chatPanel: {
     marginTop: "1.5rem", borderRadius: "8px",

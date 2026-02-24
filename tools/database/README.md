@@ -49,84 +49,59 @@ print(f"Available tables: {tables}")
 ### Simple Queries
 
 ```python
-from database.connection import db
+from database import get_db
+
+db = get_db()
 
 # Execute direct SQL
-companies = db.execute_query(
-    "SELECT * FROM companies WHERE status = :status",
-    {"status": "active"}
+empresas = db.execute_query(
+    "SELECT IdEmpresa, Nombre, CUIT FROM empresa WHERE activa != 0 LIMIT 10"
 )
 
 # Fetch table data with filtering
-active_companies = db.fetch_table_data(
-    "companies",
-    "status = :status AND type = :type",
-    {"status": "active", "type": "SMB"},
+active_empresas = db.fetch_table_data(
+    "empresa",
+    "activa != 0",
     limit=100
 )
 ```
 
-### Using Models
+### Using Colppy Models
 
 ```python
-from database.models import Company, User
+from database import Empresa, Facturacion, Usuario, Plan
 
-# Find all active companies
-companies = Company.find_active_companies()
+# Find empresa by ID (IdEmpresa = id_empresa in HubSpot)
+empresa = Empresa.find_by_id(12345)
 
-# Find company by ID
-company = Company.find_by_id(123)
+# Find by CUIT
+empresa = Empresa.find_by_cuit("20123456789")
 
-# Find user by email
-user = User.find_by_email("admin@colppy.com")
+# Active empresas
+empresas = Empresa.find_activas(limit=100)
 
-# Count records
-total_companies = Company.count()
-smb_companies = Company.count("type = :type", {"type": "SMB"})
+# Facturacion by id_empresa
+rows = Facturacion.find_by_id_empresa("12345")
+
+# Count
+total = Empresa.count()
+activas = Empresa.count("activa != 0")
 ```
 
 ### Query Builder (Complex Queries)
 
 ```python
 from database import QueryBuilder
+from database.query_builder import JoinType
 
-# Build complex query
+# Empresa + Plan join
 results = (QueryBuilder()
-    .select("c.name", "u.email", "COUNT(a.id) as accounts")
-    .from_table("companies c")
-    .join("users u", "c.id = u.company_id")
-    .join("accounts a", "c.id = a.company_id")
-    .where("c.status = :status", status="active")
-    .group_by("c.id", "c.name", "u.email")
-    .order_by("accounts", "DESC")
+    .select("e.IdEmpresa", "e.Nombre", "e.CUIT", "p.nombre as plan_nombre")
+    .from_table("empresa e")
+    .join("plan p", "e.idPlan = p.idPlan", join_type=JoinType.LEFT)
+    .where("e.activa != 0")
     .limit(50)
     .execute())
-```
-
-### HubSpot Migration
-
-```python
-from database.query_builder import build_migration_query
-
-# Map database columns to HubSpot properties
-mapping = {
-    "id": "external_id",
-    "company_name": "name", 
-    "email": "domain",
-    "type": "industry",
-    "created_at": "createdate"
-}
-
-# Get data ready for HubSpot
-migration_query = build_migration_query(
-    "companies", 
-    mapping,
-    "status = :status AND created_at > :date",
-    status="active",
-    date="2024-01-01"
-)
-
-hubspot_data = migration_query.execute()
 ```
 
 ## File Structure
@@ -153,46 +128,33 @@ tools/database/
 - **HubSpot migration helpers**
 - **Error handling and logging**
 
-## Customizing Models
+## Colppy Schema
 
-Update the model classes in `models.py` to match your database schema:
+Models are pre-configured for Colppy MySQL: `Empresa`, `Facturacion`, `Usuario`, `UsuarioEmpresa`, `EmpresasHubspot`, `CrmMatch`, `Plan`.
+
+Full schema: `tools/docs/COLPPY_MYSQL_SCHEMA.md`
+
+## Common Operations
+
+### Find Empresas for HubSpot Sync
 
 ```python
-class Company(BaseModel):
-    table_name = "your_companies_table"
-    primary_key = "company_id"  # or whatever your PK is
-    
-    @classmethod
-    def find_by_cuit(cls, cuit: str):
-        return cls.find_one("cuit = :cuit", {"cuit": cuit})
+# Active empresas (id_empresa = IdEmpresa for HubSpot deals)
+empresas = Empresa.find_activas(limit=500)
+
+# By CUIT (matches customer_cuit in facturacion)
+empresa = Empresa.find_by_cuit("20123456789")
 ```
 
-## Common Operations for Data Migration
-
-### Find Companies for HubSpot Sync
+### Analyze Data
 
 ```python
-# Get companies created/updated since last sync
-new_companies = (QueryBuilder()
-    .from_table("companies")
-    .where("updated_at > :last_sync OR created_at > :last_sync", 
-           last_sync="2025-01-15")
-    .execute())
-```
+# Count by activa
+total = Empresa.count()
+activas = Empresa.count("activa != 0")
 
-### Analyze Data Before Migration
-
-```python
-# Check data quality
-missing_emails = Company.count("email IS NULL OR email = ''")
-print(f"Companies missing email: {missing_emails}")
-
-# Get company type distribution
-types = (QueryBuilder()
-    .select("type", "COUNT(*) as count")
-    .from_table("companies") 
-    .group_by("type")
-    .execute())
+# Facturacion by id_empresa
+rows = Facturacion.find_by_id_empresa("12345")
 ```
 
 ### Batch Processing for Large Tables

@@ -1,6 +1,6 @@
 # HubSpot Scripts and Workflows
 
-**Last Updated:** 2026-02-16  
+**Last Updated:** 2026-02-24  
 **Purpose:** Centralized HubSpot analysis scripts and custom code workflows
 
 ---
@@ -152,6 +152,21 @@ tools/scripts/hubspot/
 - `fetch_hubspot_deals_with_company.py` - Fetch deals with company associations
 - `get_hubspot_owners.py` - Fetch HubSpot owners
 
+### Reconciliation & Billing Mapping
+- **build_facturacion_hubspot_mapping.py** - Builds `facturacion_hubspot.db` from billing CSV + HubSpot API
+  - **Full build:** Loads facturacion.csv, fetches companies by CUIT, fetches deals by id_empresa
+  - **Refresh deals only:** `--refresh-deals-only --year YYYY --month M` — updates deals for a given month
+  - **Fetch wrong stage:** `--fetch-wrong-stage` — populates `deals_any_stage` for WRONG_STAGE detection (Cerrado Churn, etc.). Fetches deals by id_empresa for Colppy-only + facturacion no deal.
+  - **Usage:**
+    ```bash
+    # Full build (requires facturacion.csv)
+    python tools/scripts/hubspot/build_facturacion_hubspot_mapping.py
+
+    # Refresh deals for a month (for Colppy ↔ HubSpot reconciliation)
+    python tools/scripts/hubspot/build_facturacion_hubspot_mapping.py --refresh-deals-only --year 2026 --month 2 --fetch-wrong-stage
+    ```
+  - See [FACTURACION_COLPPY_RECONCILIATION.md](../../docs/FACTURACION_COLPPY_RECONCILIATION.md), [RECONCILE_REPORT_GROUPS.md](../../docs/RECONCILE_REPORT_GROUPS.md)
+
 ### Data Management & Fixing Scripts
 - **Fix Close Date from History:** `fix_close_date_from_history.py` - Fixes deal close dates by finding the earliest close date from property history
   - Retrieves property history for deals to find when they were first closed
@@ -176,6 +191,22 @@ tools/scripts/hubspot/
     ```
   - **CSV Format:** CSV should contain `company_id` column (fetches all deals) or `deal_id` column (processes specific deals), or both
   - **Output:** CSV with columns: `deal_id`, `deal_name`, `status`, `old_date`, `new_date`, `old_date_only`, `new_date_only`, `message`
+
+- **Classify Deal Age from History:** `classify_deal_age_from_history.py` - Distinguishes fresh closes vs old deals with date corrections
+  - Fetches createdate, closedate, dealstage history from HubSpot API
+  - Classifies: **fresh_close** (created and closed in same period), **old_deal_date_correction** (first closed long ago, closedate updated later), **slow_close** (created long ago, first closed in period)
+  - **Usage:**
+    ```bash
+    # Deals from facturacion_hubspot.db for a month
+    python classify_deal_age_from_history.py --year 2026 --month 2
+
+    # Specific deal IDs
+    python classify_deal_age_from_history.py --deal-ids 13424641957
+
+    # Export to CSV
+    python classify_deal_age_from_history.py --year 2026 --month 2 --output results.csv
+    ```
+  - See [FACTURACION_COLPPY_RECONCILIATION.md](../../docs/FACTURACION_COLPPY_RECONCILIATION.md#deal-age-classification-fresh-vs-old-deal)
 
 ### Visualization & Reporting
 - `generate_visualization_report.py` - Generates HTML reports with charts and visualizations

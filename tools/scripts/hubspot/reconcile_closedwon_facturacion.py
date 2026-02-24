@@ -13,6 +13,7 @@ Direction 2 (Facturación → HubSpot): id_empresa in facturación with NO close
 Uses: facturacion_hubspot.db, HubSpot API.
 """
 import argparse
+import calendar
 import sqlite3
 import sys
 from pathlib import Path
@@ -26,18 +27,21 @@ DEFAULT_DB = "tools/data/facturacion_hubspot.db"
 ACTIVE_DEAL_STAGES = ("closedwon", "34692158")
 
 
-def fetch_all_closed_won_deals(client):
-    """Fetch ALL deals with dealstage in closedwon or 34692158 (Cerrado Ganado Recupero)."""
+def fetch_closed_won_deals(
+    client,
+    closedate_start: str | None = None,
+    closedate_end: str | None = None,
+):
+    """Fetch closed won deals. Filter by closedate at API when start/end provided (faster)."""
     all_deals = []
     after = None
     props = ["dealname", "id_empresa", "dealstage", "amount", "closedate", "hs_object_id"]
-    filter_groups = [{
-        "filters": [{
-            "propertyName": "dealstage",
-            "operator": "IN",
-            "values": list(ACTIVE_DEAL_STAGES),
-        }]
-    }]
+    filters = [{"propertyName": "dealstage", "operator": "IN", "values": list(ACTIVE_DEAL_STAGES)}]
+    if closedate_start:
+        filters.append({"propertyName": "closedate", "operator": "GTE", "value": closedate_start})
+    if closedate_end:
+        filters.append({"propertyName": "closedate", "operator": "LTE", "value": closedate_end})
+    filter_groups = [{"filters": filters}]
     while True:
         resp = client.search_objects(
             object_type="deals",
@@ -54,27 +58,45 @@ def fetch_all_closed_won_deals(client):
     return all_deals
 
 
-def get_facturacion_id_empresas(conn):
-    """Get distinct id_empresa from facturacion table."""
+def get_facturacion_id_empresas(conn, id_empresas: set[str] | None = None):
+    """Get id_empresa from facturacion. If id_empresas given, only query those (faster)."""
+    if id_empresas is not None:
+        if not id_empresas:
+            return set()
+        placeholders = ",".join("?" * len(id_empresas))
+        rows = conn.execute(
+            f"SELECT DISTINCT id_empresa FROM facturacion WHERE id_empresa IN ({placeholders})",
+            tuple(id_empresas),
+        ).fetchall()
+        return {str(r[0]).strip() for r in rows}
     rows = conn.execute(
         "SELECT DISTINCT id_empresa FROM facturacion WHERE id_empresa IS NOT NULL AND TRIM(id_empresa) != ''"
     ).fetchall()
     return {str(r[0]).strip() for r in rows}
 
 
-def run_reconciliation(db_path: str, dry_run: bool = False, year_filter: str = None, month_filter: int = None, export_path: str = None):
+def run_reconciliation(db_path: str, dry_run: bool = False, year_filter: str = None, month_filter: int = None, export_path: str = None, skip_log: bool = False):
     from tools.hubspot_api.client import get_hubspot_client
 
     conn = sqlite3.connect(db_path)
 
-    # 1. Facturación id_empresa from DB
-    fact_ids = get_facturacion_id_empresas(conn)
-    print(f"Facturación: {len(fact_ids):,} unique id_empresa")
+    # 1. Closedate filter at API when year/month provided (faster: fetch only that period)
+    closedate_start = closedate_end = None
+    if year_filter:
+        closedate_start = f"{year_filter}-01-01"
+        closedate_end = f"{year_filter}-12-31"
+        if month_filter is not None:
+            last_day = calendar.monthrange(int(year_filter), month_filter)[1]
+            closedate_start = f"{year_filter}-{month_filter:02d}-01"
+            closedate_end = f"{year_filter}-{month_filter:02d}-{last_day}"
 
-    # 2. HubSpot closed won deals
+    # 2. HubSpot closed won deals (filtered at API when timeframe set)
     client = get_hubspot_client()
-    print("Fetching all HubSpot closed won deals...")
-    deals = fetch_all_closed_won_deals(client)
+    if closedate_start:
+        print(f"Fetching HubSpot closed won deals ({closedate_start} to {closedate_end}, filtered at API)...")
+    else:
+        print("Fetching all HubSpot closed won deals...")
+    deals = fetch_closed_won_deals(client, closedate_start, closedate_end)
     print(f"HubSpot: {len(deals):,} closed won deals")
 
     # Build id_empresa -> deal (keep first if duplicates)
@@ -85,7 +107,15 @@ def run_reconciliation(db_path: str, dry_run: bool = False, year_filter: str = N
             hubspot_by_id[ie] = d
     hubspot_ids = set(hubspot_by_id.keys())
 
-    # 3. Direction 1: HubSpot closed won NOT in facturación
+    # 3. Facturación: when timeframe filter, only query DB for those HubSpot ids (faster)
+    if closedate_start:
+        fact_ids = get_facturacion_id_empresas(conn, hubspot_ids)
+        print(f"Facturación (queried for {len(hubspot_ids):,} ids): {len(fact_ids):,} found")
+    else:
+        fact_ids = get_facturacion_id_empresas(conn)
+        print(f"Facturación: {len(fact_ids):,} unique id_empresa")
+
+    # 4. Direction 1: HubSpot closed won NOT in facturación
     hubspot_not_fact = hubspot_ids - fact_ids
     def _amt(d):
         try:
@@ -98,39 +128,28 @@ def run_reconciliation(db_path: str, dry_run: bool = False, year_filter: str = N
         for ie in sorted(hubspot_not_fact, key=lambda x: -_amt(hubspot_by_id[x]))
     ]
 
-    # Filter by year/month if requested
-    if year_filter:
-        def _matches_date(ie):
-            cd = (hubspot_by_id[ie].get("properties", {}).get("closedate") or "")
-            if len(cd) < 4:
-                return False
-            if cd[:4] != year_filter:
-                return False
-            if month_filter is not None and (len(cd) < 7 or int(cd[5:7]) != month_filter):
-                return False
-            return True
+    # 5. Direction 2: Facturación id_empresa with NO closed won deal (only when full snapshot)
+    if closedate_start:
+        billed_no_deal = []
+    else:
+        fact_not_hubspot = fact_ids - hubspot_ids
+        billed_no_deal = []
+        for ie in sorted(fact_not_hubspot):
+            row = conn.execute(
+                "SELECT COALESCE(SUM(CAST(amount AS REAL)), 0) FROM facturacion WHERE id_empresa = ?",
+                (ie,),
+            ).fetchone()
+            amt = row[0] if row else 0
+            billed_no_deal.append((ie, amt))
 
-        hubspot_not_fact = {ie for ie in hubspot_not_fact if _matches_date(ie)}
-        deals_not_billed = [
-            (ie, hubspot_by_id[ie].get("properties", {}).get("dealname", ""), _amt(hubspot_by_id[ie]))
-            for ie in sorted(hubspot_not_fact, key=lambda x: -_amt(hubspot_by_id[x]))
-        ]
-
-    # 4. Direction 2: Facturación id_empresa with NO closed won deal in HubSpot
-    fact_not_hubspot = fact_ids - hubspot_ids
-    # Get amount from facturacion for these
-    billed_no_deal = []
-    for ie in sorted(fact_not_hubspot):
-        row = conn.execute(
-            "SELECT COALESCE(SUM(CAST(amount AS REAL)), 0) FROM facturacion WHERE id_empresa = ?",
-            (ie,),
-        ).fetchone()
-        amt = row[0] if row else 0
-        billed_no_deal.append((ie, amt))
-
-    # 5. Report
+    # 6. Report
     print("\n" + "=" * 70)
-    print("CLOSED WON ↔ FACTURACIÓN RECONCILIATION (Full Snapshot)")
+    title = "CLOSED WON ↔ FACTURACIÓN RECONCILIATION"
+    if closedate_start:
+        title += f" ({closedate_start} to {closedate_end})"
+    else:
+        title += " (Full Snapshot)"
+    print(title)
     print("=" * 70)
     print(f"\nHubSpot closed won:     {len(hubspot_ids):,} unique id_empresa")
     print(f"Facturación:           {len(fact_ids):,} unique id_empresa")
@@ -186,8 +205,11 @@ def run_reconciliation(db_path: str, dry_run: bool = False, year_filter: str = N
         print("   None (all closed won deals are in facturación)")
 
     print("\n--- DIRECTION 2: Facturación id_empresa with NO closed won deal ---")
-    print(f"   (We bill them but no closed won deal in HubSpot: {len(billed_no_deal):,})")
-    if billed_no_deal:
+    if closedate_start:
+        print("   (Skipped when filtering by timeframe; run without --year/--month for full snapshot)")
+    else:
+        print(f"   (We bill them but no closed won deal in HubSpot: {len(billed_no_deal):,})")
+    if not closedate_start and billed_no_deal:
         total = sum(d[1] for d in billed_no_deal)
         print(f"   Total amount billed: ${total:,.0f}")
         print("\n   Top 20 by amount:")
@@ -199,6 +221,42 @@ def run_reconciliation(db_path: str, dry_run: bool = False, year_filter: str = N
     else:
         print("   None (all facturación id_empresa have closed won deals)")
 
+    # Log to SQLite for progress tracking
+    if skip_log:
+        conn.close()
+        return len(deals_not_billed), len(billed_no_deal)
+    match_count = len(hubspot_ids & fact_ids)
+    period = None
+    if year_filter:
+        period = f"{year_filter}"
+        if month_filter is not None:
+            period = f"{year_filter}-{month_filter:02d}"
+    try:
+        from tools.utils.reconciliation_logger import log_reconciliation
+        hubspot_ids_list = sorted(hubspot_ids, key=lambda x: int(x) if x.isdigit() else 0)
+        fact_ids_list = sorted(fact_ids, key=lambda x: int(x) if x.isdigit() else 0)
+        match_ids_list = sorted(hubspot_ids & fact_ids, key=lambda x: int(x) if x.isdigit() else 0)
+        a_only_list = [t[0] for t in deals_not_billed]
+        b_only_list = [t[0] for t in billed_no_deal]
+        log_reconciliation(
+            db_path=db_path,
+            script="reconcile_closedwon_facturacion",
+            reconciliation_type="hubspot_closedwon_facturacion",
+            period=period,
+            match_count=match_count,
+            source_a_total=len(hubspot_ids),
+            source_b_total=len(fact_ids),
+            source_a_only_count=len(deals_not_billed),
+            source_b_only_count=len(billed_no_deal),
+            match_ids=match_ids_list,
+            source_a_only_ids=a_only_list,
+            source_b_only_ids=b_only_list,
+            source_metadata={"year_filter": year_filter, "month_filter": month_filter} if year_filter else None,
+        )
+        print(f"\nReconciliation logged to {db_path}")
+    except Exception as e:
+        print(f"\nWarning: Could not log reconciliation: {e}")
+
     conn.close()
     return len(deals_not_billed), len(billed_no_deal)
 
@@ -207,11 +265,19 @@ def main():
     parser = argparse.ArgumentParser(description="Full closed won ↔ facturación reconciliation")
     parser.add_argument("--db", default=DEFAULT_DB, help="Path to facturacion_hubspot.db")
     parser.add_argument("--dry-run", action="store_true", help="No-op (same output)")
+    parser.add_argument("--no-log", action="store_true", help="Skip logging to SQLite")
     parser.add_argument("--year", type=str, help="Filter Direction 1 to close date year (e.g. 2026)")
     parser.add_argument("--month", type=int, help="Filter Direction 1 to close date month 1-12 (use with --year)")
     parser.add_argument("--export", type=str, help="Export filtered list to CSV path")
     args = parser.parse_args()
-    run_reconciliation(args.db, args.dry_run, year_filter=args.year, month_filter=args.month, export_path=args.export)
+    run_reconciliation(
+        args.db,
+        args.dry_run,
+        year_filter=args.year,
+        month_filter=args.month,
+        export_path=args.export,
+        skip_log=args.no_log,
+    )
 
 
 if __name__ == "__main__":

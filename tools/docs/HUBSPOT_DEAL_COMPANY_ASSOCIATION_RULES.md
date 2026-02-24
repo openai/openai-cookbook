@@ -1,16 +1,16 @@
 # HubSpot Deal–Company Association Rules
 
-**Purpose:** Rules for handling deal–company associations when matching facturacion to HubSpot, including multiple companies per CUIT and CUIT format differences.
+**Purpose:** Rules for handling deal–company associations when matching billing to HubSpot. See [DATA_SOURCES_TERMINOLOGY.md](./DATA_SOURCES_TERMINOLOGY.md) for standard terms (Billing, HubSpot, Colppy).
 
 ---
 
-## 0. Core Billing Rule (Facturacion is Master)
+## 0. Core Billing Rule (Billing is Master for CRM Mapping)
 
 **One product = one billing CUIT = PRIMARY association.**
 
 | Role | CUIT | Association | Meaning |
 |------|------|-------------|---------|
-| **Billing company** | `customer_cuit` from facturacion | **PRIMARY** (type 5) | The company we bill for the product. Exactly one per deal. |
+| **Billing company** | `customer_cuit` from billing (facturacion.csv / facturacion table) | **PRIMARY** (type 5) | The company we bill for the product. Exactly one per deal. |
 | **Other companies** | Different CUITs | Not PRIMARY (e.g. type 8, 11) | Accountant, referrer, integrator, etc. Different legal entities. |
 
 **Rule:** You can only bill a product to one single CUIT. That company must be the PRIMARY association on the deal. A product can have other companies (accountant, etc.) associated with different CUITs, but they are not primary.
@@ -59,7 +59,7 @@
   ```python
   values = [format_cuit_display(c) for c in batch] + list(batch)  # both 33-71580667-9 and 33715806679
   ```
-- When **matching** facturacion to companies: normalize `customer_cuit` to 11 digits before lookup
+- When **matching** billing to companies: normalize `customer_cuit` to 11 digits before lookup
 
 ---
 
@@ -76,7 +76,7 @@
 1. **Search** with both CUIT formats → may return multiple companies
 2. **If multiple companies:** Pick ONE for the association:
    - Prefer the one already associated with the deal (if any)
-   - Prefer the one whose name contains `id_empresa` matching facturacion
+   - Prefer the one whose name contains `id_empresa` matching billing
    - Prefer the one with `type` set (per `icp_type_from_billing.py`)
    - Otherwise: **merge duplicates first** using `merge_duplicate_companies.py`, then use merged result
 3. **Do NOT** assume "first result" is correct — explicitly pick or merge
@@ -92,7 +92,7 @@
 
 ## 3. Deal Stage and Facturacion Matching
 
-**Problem:** A company can have multiple deals. Only some correspond to current billing (facturacion).
+**Problem:** A company can have multiple deals. Only some correspond to current billing (billing table).
 
 **Rule:** Always consider `dealstage` when evaluating deal–company–facturacion alignment.
 
@@ -109,6 +109,35 @@
 - A company with 2 deals (one closedwon, one churn) is valid — both associations stay; facturacion only has the active one
 
 **Reference:** [README_HUBSPOT_CONFIGURATION.md](./README_HUBSPOT_CONFIGURATION.md) — Main Sales Pipeline stages
+
+---
+
+## 3.1 HubSpot ↔ Billing Reconciliation (Deals + id_empresa + CUIT)
+
+**Purpose:** Verify that deals in the DB align with billing (facturacion table from facturacion.csv) by:
+1. **id_empresa** — each deal must have a billing row for that id_empresa
+2. **Primary company CUIT** — the deal's PRIMARY (type 5) company CUIT must equal billing.customer_cuit for that id_empresa
+
+**Script:** `reconcile_hubspot_deals_facturacion.py`
+
+**Usage:**
+```bash
+python tools/scripts/hubspot/reconcile_hubspot_deals_facturacion.py --year 2025 --month 11
+python tools/scripts/hubspot/reconcile_hubspot_deals_facturacion.py --year 2025 --month 11 --output tools/outputs/hubspot_facturacion_reconcile_202511.md
+```
+
+**Statuses:**
+| Status | Meaning |
+|--------|---------|
+| MATCH | HubSpot primary company CUIT = billing.customer_cuit for that id_empresa |
+| MISMATCH | HubSpot primary CUIT ≠ billing.customer_cuit — fix associations in HubSpot |
+| NO_PRIMARY | Deal has no type 5 association — add primary company |
+| NO_FACTURACION | id_empresa not in billing table (facturacion.csv) |
+| NO_CUIT | Primary company has no CUIT in HubSpot |
+
+**Prerequisite:** Run `populate_deal_associations.py` so `deal_associations` is current before reconciliation.
+
+**When to run:** After HubSpot refresh (`--refresh-deals-only`) and before Colppy/billing CSV reconciliation. This step validates HubSpot ↔ DB alignment separately from billing.
 
 ---
 
@@ -210,7 +239,7 @@ python tools/scripts/hubspot/analyze_icp_dashboard.py --serve
 
 ## 8. Facturacion Data Safety (Prevent Accidental Wipe)
 
-**Purpose:** Prevent `facturacion.csv` from being overwritten or corrupted, which would wipe `facturacion` and `companies` tables in the DB.
+**Purpose:** Prevent `facturacion.csv` (billing export) from being overwritten or corrupted, which would wipe `facturacion` and `companies` tables in the DB.
 
 **Rules:**
 
@@ -219,6 +248,8 @@ python tools/scripts/hubspot/analyze_icp_dashboard.py --serve
 | Keep `facturacion.csv` as the canonical billing source | Never overwrite with `echo` or manual commands |
 | Use `facturacion_hubspot_mapping.csv` as backup (output of build with `--csv`) | Never truncate or replace facturacion.csv without a valid source |
 | Run build with `--csv` periodically to refresh the mapping backup | Don't run build with an empty or corrupt facturacion.csv |
+
+**Reconciliation with Colppy MySQL:** Run `reconcile_facturacion_colppy.py` to compare facturacion.csv with Colppy MySQL (live billing). See [FACTURACION_COLPPY_RECONCILIATION.md](./FACTURACION_COLPPY_RECONCILIATION.md).
 
 **Build script safeguards:**
 - Refuses to run if `facturacion.csv` has fewer than 50 data rows (avoids wiping DB with empty input)

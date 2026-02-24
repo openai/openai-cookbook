@@ -38,6 +38,28 @@ For detailed documentation on specific analysis types, see:
   - Collaborator attribution for Accountant Channel reps
   - Visualizations: Line charts and heatmap grids
 
+- **[FIRST_PAYMENT_ENTRY_POINTS.md](./FIRST_PAYMENT_ENTRY_POINTS.md)** - **Payment flow (primary reference)**
+  - All entry points: CBU (Paypertic), Card, Bank transfer
+  - CBU: subscription status (immediate) vs money collection (3–7 days)
+  - CBU: collected vs pending – how to read `payment_detail.payment_status` in DB
+  - Data model: `pago`, `payment_detail`, first payment queries
+  - Script: `first_payments_by_product.py`
+
+- **[COLPPY_PAYMENT_TO_CRM_FLOW.md](./COLPPY_PAYMENT_TO_CRM_FLOW.md)** - Payment → CRM Integration (benjamin/svc_integracion_crm)
+  - Paypertic webhook, direct API, company registry
+  - Flow from Colppy to svc_integracion_crm and HubSpot
+  - Salesforce code removed; HubSpot only.
+
+- **[FACTURACION_COLPPY_RECONCILIATION.md](./FACTURACION_COLPPY_RECONCILIATION.md)** - Reconciliation: facturacion.csv ↔ Colppy MySQL ↔ facturacion_hubspot.db
+  - Script: `reconcile_facturacion_colppy.py`
+  - Workflow similar to HubSpot + facturacion reconciliation
+
+- **[HUBSPOT_INTEGRATION_ARCHITECTURE.md](./HUBSPOT_INTEGRATION_ARCHITECTURE.md)** - **NEW** HubSpot Integration Architecture
+  - svc_integracion_crm: API gateway, routes, payload transformation
+  - colppy-crmintegration-connector: HTTP client for svc_integracion_crm
+  - colppy-app: Entry points (Paypertic, recepcion_op_pago, provisioning)
+  - Data flow diagram and recommendations
+
 ---
 
 ## Overview

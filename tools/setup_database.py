@@ -29,7 +29,7 @@ def install_dependencies():
 
 def check_env_file():
     """Check if .env file exists and has required variables."""
-    env_path = Path("tools/.env")
+    env_path = Path(__file__).parent / ".env"
     
     if not env_path.exists():
         print("❌ .env file not found!")
@@ -75,7 +75,8 @@ def test_database_connection():
         sys.path.insert(0, str(tools_path))
         
         # Import and test database
-        from database.connection import db
+        from database.connection import get_db
+        db = get_db()
         
         if db.test_connection():
             print("✅ Database connection successful!")
@@ -118,8 +119,9 @@ def run_example():
         tools_path = Path(__file__).parent
         sys.path.insert(0, str(tools_path))
         
-        from database.connection import db
+        from database.connection import get_db
         from database import QueryBuilder
+        db = get_db()
         
         # Get first table and show sample data
         tables = db.list_tables()

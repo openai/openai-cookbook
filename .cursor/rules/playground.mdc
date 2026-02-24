@@ -1,0 +1,64 @@
+---
+description: Playground builder — create interactive HTML explorers with controls, live preview, and copyable prompt output. Use when the user asks for a playground, explorer, or interactive tool.
+globs: ["**/*.html", "**/*.htm"]
+alwaysApply: false
+---
+
+# Playground Builder
+
+Creates self-contained HTML playgrounds: interactive controls on one side, live preview on the other, prompt output at the bottom with a copy button.
+
+**When to use:** User asks for an interactive playground, explorer, or visual tool — especially when the input space is large, visual, or structural.
+
+---
+
+## Core Requirements (every playground)
+
+- **Single HTML file** — Inline all CSS and JS. No external dependencies.
+- **Live preview** — Updates instantly on every control change. No "Apply" button.
+- **Prompt output** — Natural language, not a value dump. Only mentions non-default choices. Actionable without seeing the playground. Updates live.
+- **Copy button** — Clipboard copy with brief "Copied!" feedback.
+- **Sensible defaults + presets** — Looks good on first load. Include 3-5 named presets.
+- **Dark theme** — System font for UI, monospace for code/values. Minimal chrome.
+
+---
+
+## Templates (choose by topic)
+
+| Topic | Template | Use for |
+|-------|----------|---------|
+| Visual design | design-playground | Components, layouts, spacing, color, typography |
+| Data & queries | data-explorer | SQL, APIs, pipelines, regex |
+| Learning | concept-map | Concept maps, knowledge gaps, scope mapping |
+| Document review | document-critique | Suggestions with approve/reject/comment workflow |
+| Code review | diff-review | Git diffs, commits, PRs with line-by-line commenting |
+| Codebase | code-map | Component relationships, data flow, layer diagrams |
+
+---
+
+## State Management Pattern
+
+```javascript
+const state = { /* all configurable values */ };
+
+function updateAll() {
+  renderPreview();
+  updatePrompt();
+}
+// Every control calls updateAll() on change
+```
+
+---
+
+## Prompt Output Pattern
+
+- Only mention non-default values
+- Use qualitative language alongside numbers
+- Output must be actionable without the playground
+- Natural instruction, not a value dump
+
+---
+
+## After Writing
+
+Run `open <filename>.html` to launch in the user's default browser.

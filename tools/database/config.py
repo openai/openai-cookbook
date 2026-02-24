@@ -6,10 +6,16 @@ Loads settings from environment variables.
 import os
 from dataclasses import dataclass
 from typing import Optional
+from urllib.parse import quote_plus
+
 from dotenv import load_dotenv
 
-# Load environment variables
+# Load environment variables (tools/.env when run from repo)
 load_dotenv()
+_env_tools = os.path.join(os.path.dirname(__file__), "..", ".env")
+if os.path.exists(_env_tools):
+    load_dotenv(_env_tools)
+
 
 @dataclass
 class DatabaseConfig:
@@ -44,10 +50,11 @@ class DatabaseConfig:
     
     @property
     def connection_url(self) -> str:
-        """Generate SQLAlchemy connection URL."""
+        """Generate SQLAlchemy connection URL. Password is URL-encoded for special chars (@, $, &)."""
         db_part = f"/{self.database}" if self.database else ""
+        safe_password = quote_plus(self.password)
         return (
-            f"mysql+pymysql://{self.user}:{self.password}"
+            f"mysql+pymysql://{self.user}:{safe_password}"
             f"@{self.host}:{self.port}{db_part}"
             f"?charset={self.charset}"
         )

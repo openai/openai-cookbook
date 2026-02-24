@@ -22,7 +22,7 @@ from datetime import datetime
 from typing import Any, AsyncIterator
 
 from backend.services import arca_db, colppy_api
-from backend.services.comprobantes_api import get_comprobantes_emitidos
+from backend.services.comprobantes_api import TIPO_COMPROBANTE, get_comprobantes_emitidos
 
 logger = logging.getLogger(__name__)
 
@@ -71,6 +71,7 @@ def _colppy_record_summary(v: dict[str, Any]) -> dict[str, Any]:
         "nroFactura": v.get("nroFactura", ""),
         "fechaFactura": v.get("fechaFactura", ""),
         "idTipoComprobante": v.get("idTipoComprobante", ""),
+        "tipo_comprobante": TIPO_COMPROBANTE.get(str(v.get("idTipoComprobante", "")), f"Tipo {v.get('idTipoComprobante', '')}"),
         "RazonSocial": v.get("RazonSocial", ""),
         "totalFactura_pesos": _safe_float(v.get("totalFactura", "0")),
         "cae": v.get("cae", ""),

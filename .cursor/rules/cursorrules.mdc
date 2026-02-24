@@ -43,6 +43,7 @@ alwaysApply: true
 - **Structure:** Start with 1-3 key bullets (TL;DR), then steps/edits, end with a brief summary
 - **Formatting:** Use headings, bold for key points, and bullet lists; render links as markdown links (not bare URLs)
 - **Disclaimers:** Do not add leading disclaimers unless required by the unverified-facts rule above
+- **Command and script output:** When running any script that produces output (reconciliation reports, exports, data analysis, etc.), **always display the full output in the chat response** — do not only say "done" or "written to file". Show the complete output directly in the chat so the user has all information without opening files
 
 ## Code Management Principles
 
@@ -423,6 +424,32 @@ Use **semver-compliant version bumps** in `package__init__.py` whenever a public
 - **Deal–company associations:** Normalize CUIT (both formats); handle multiple companies per CUIT (pick or merge); consider deal stage (closedwon/churn) when matching to facturacion
 - **Deal creation:** Do NOT create deals in HubSpot without explicit user confirmation. For facturacion rows without matching deals, run `reconcile_missing_deals.py` first; creation of new deals requires manual approval
 - **fix_deal_associations.py:** When you run this script and it completes, **always show the log result** to the user (the script prints it when `--log-fixed` is used; if you ran it, include the log output or read and display the log file). **When presenting outcomes, include BOTH:** (1) the preview table format: "Next N Group X Deals (offset Y)" with columns #, Deal ID (clickable), Deal Name, Amount, id_empresa, Billing Company, Billing CUIT; (2) clickable markdown links for each deal and company: `[Deal Name](https://app.hubspot.com/contacts/19877595/deal/DEAL_ID)` and `[Company Name](https://app.hubspot.com/contacts/19877595/company/COMPANY_ID)`
+- **Facturacion ↔ Colppy reconciliation:** For reconciling facturacion.csv, Colppy MySQL, and facturacion_hubspot.db, reference `FACTURACION_COLPPY_RECONCILIATION.md` and use `reconcile_facturacion_colppy.py`
+- **reconcile_colppy_hubspot_db_only.py:** When you run this script, **always include the full report in the chatbot response** — do not only say "report written to file" or a brief summary. Display the complete reconciliation output (summary tables, MATCH lists, Colppy Only, HubSpot Only) directly in the chat so the user has all information without opening the file
+
+## Colppy Payment Flow
+
+**Before any payment-related work** (first payment, CBU, Paypertic, pago, payment_detail), reference:
+1. `/Users/virulana/openai-cookbook/tools/docs/FIRST_PAYMENT_ENTRY_POINTS.md` - Primary reference: entry points (CBU, card, bank transfer), CBU subscription vs money collection, collected vs pending, data model, scripts
+2. `/Users/virulana/openai-cookbook/tools/docs/COLPPY_PAYMENT_TO_CRM_FLOW.md` - benjamin/svc_integracion_crm perspective
+
+**Key concepts:**
+- CBU: subscription status immediate (optimistic); money collection 3–7 days (Paypertic)
+- Collected: `payment_detail.payment_status = 4`, `accreditation_date` set
+- Pending: `payment_detail.payment_status IN (1, 2, 3)`, `accreditation_date IS NULL`
+- First payment: `pago.primerPago = 1` or `payment_detail.is_first_payment = 1` (CBU only)
+
+## Billing & Reconciliation
+
+**Before any billing or Colppy–HubSpot reconciliation work**, reference:
+1. `/Users/virulana/openai-cookbook/tools/docs/README_BILLING_RECONCILIATION.md` - Entry point: data flow, monthly workflow, logging
+2. `/Users/virulana/openai-cookbook/tools/docs/FACTURACION_COLPPY_RECONCILIATION.md` - Full reconciliation design, scripts, HubSpot refresh evolution
+
+## ARCA Prototype
+
+**Before any ARCA, Banco Galicia, or AFIP-related work**, reference:
+1. `/Users/virulana/openai-cookbook/tools/docs/README_ARCA_PROTOTYPE.md` - Entry point: capabilities, Banco Galicia, reconciliación
+2. `/Users/virulana/openai-cookbook/arca-prototype/docs/ARCHITECTURE.md` - Architecture, flows, configuration
 
 ## Intercom Integration
 

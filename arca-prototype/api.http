@@ -1,0 +1,122 @@
+# ARCA Prototype API — Reusable, versioned requests
+# Use with: VS Code REST Client extension, or run scripts/test_api.sh for curl-based tests
+# Start backend: cd arca-prototype && uvicorn backend.main:app --port 8000
+# Variables: ARCA_CUIT, ARCA_PASSWORD from .env (or override @cuit, @password below)
+
+@baseUrl = http://localhost:8000
+@cuit = 20268448536
+@password = {{$dotenv ARCA_PASSWORD}}
+
+### Health check
+GET {{baseUrl}}/health
+
+### --- Representados (Comunicaciones de mis representados) ---
+
+### GET representados from cache
+GET {{baseUrl}}/api/arca/representados?cuit={{cuit}}
+
+### POST fetch representados from ARCA
+POST {{baseUrl}}/api/arca/representados
+Content-Type: application/json
+
+{
+  "cuit": "{{cuit}}",
+  "password": "{{password}}"
+}
+
+### --- Notifications (cache) ---
+
+### GET notifications from SQLite cache (no ARCA call)
+GET {{baseUrl}}/api/arca/notificaciones-contenido?cuit={{cuit}}
+
+### POST fetch from ARCA and save to cache
+# Add "cuit_representado": "30712461221" for comunicaciones de mis representados (e.g. ALL ONLINE SOLUTIONS)
+POST {{baseUrl}}/api/arca/notificaciones-contenido
+Content-Type: application/json
+
+{
+  "cuit": "{{cuit}}",
+  "password": "{{password}}"
+}
+
+### --- PDF attachments ---
+
+### GET PDF from cache (notification 582958952 = SCT Intimación)
+GET {{baseUrl}}/api/arca/notificaciones/582958952/pdf?cuit={{cuit}}
+
+### POST upload PDF to store in SQLite
+# Prereq: notification must exist in cache (run POST notificaciones-contenido first)
+# Replace path with actual PDF file (relative to this file)
+POST {{baseUrl}}/api/arca/attachments/upload
+Content-Type: multipart/form-data; boundary=----FormBoundary
+
+------FormBoundary
+Content-Disposition: form-data; name="cuit"
+
+{{cuit}}
+------FormBoundary
+Content-Disposition: form-data; name="notification_id"
+
+582958952
+------FormBoundary
+Content-Disposition: form-data; name="file"; filename="SCT-Intimacion.pdf"
+Content-Type: application/pdf
+
+< ./data/attachments/SCT-Intimacion.pdf
+------FormBoundary--
+
+### POST download PDF attachment via DFE REST API
+# Logs in, fetches notification detail to discover idArchivo, then GET /api/v1/communications/{id}/{idArchivo}
+# id_archivo=0 triggers auto-discovery; or pass known ID (e.g. 587346976 for SCT Intimación)
+POST {{baseUrl}}/api/arca/attachments/download
+Content-Type: application/json
+
+{
+  "cuit": "{{cuit}}",
+  "password": "{{password}}",
+  "notification_id": 582958952,
+  "id_archivo": 0,
+  "filename": ""
+}
+
+### --- Libro IVA Digital ---
+
+### GET generate from Mis Comprobantes (ventas)
+GET {{baseUrl}}/api/arca/libro-iva/generate?cuit=30712461221&fecha_desde=2026-02-01&fecha_hasta=2026-02-29&tipo=ventas
+
+### GET reconcile data (comprobantes + IVA breakdown)
+GET {{baseUrl}}/api/arca/libro-iva/reconcile-data?cuit=30712461221&fecha_desde=2026-02-01&fecha_hasta=2026-02-29&tipo=ventas
+
+### GET CSV template
+GET {{baseUrl}}/api/arca/libro-iva/template?tipo=ventas
+
+### POST convert CSV to AFIP format (returns file)
+# Use multipart: file=@path/to/ventas.csv, tipo=ventas
+POST {{baseUrl}}/api/arca/libro-iva/convert
+Content-Type: multipart/form-data; boundary=----FormBoundary
+
+------FormBoundary
+Content-Disposition: form-data; name="tipo"
+
+ventas
+------FormBoundary
+Content-Disposition: form-data; name="file"; filename="ventas.csv"
+Content-Type: text/csv
+
+fecha,tipo_comp,punto_venta,numero_desde,numero_hasta,cuit_contraparte,denominacion,importe_total,importe_neto,importe_iva
+20260201,1,4,206682,206682,30123456789,EMPRESA EJEMPLO SRL,12100,10000,2100
+------FormBoundary--
+
+### POST convert preview (JSON, no download)
+# Same as above but /convert-preview
+
+### --- Other endpoints ---
+
+### POST login
+POST {{baseUrl}}/api/arca/login
+Content-Type: application/json
+
+{
+  "cuit": "{{cuit}}",
+  "password": "{{password}}"
+}

@@ -1,0 +1,37 @@
+# Python
+__pycache__/
+*.py[cod]
+.venv/
+venv/
+.env
+
+# Node
+node_modules/
+frontend/dist/
+
+# IDE
+.idea/
+.vscode/
+*.swp
+*.swo
+.DS_Store
+
+# Playwright
+playwright-report/
+test-results/
+
+# Runtime data (DB, exports, debug screenshots, attachments)
+data/
+
+# Private keys and CSRs (public CA certs are OK)
+certs/*private*
+certs/*.csr
+
+# Accidental files from malformed curl commands
+-[A-Z]
+-[a-z]
+POST
+curl
+sleep
+=*
+[0-9]

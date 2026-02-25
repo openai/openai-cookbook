@@ -3023,9 +3023,10 @@
     - gpt-5-1-codex-max_prompting_guide
     - gpt-5-codex-prompting-guide
     - gpt-5-codex_prompting_guide
-  date: 2025-12-04
+  date: 2026-02-25
   authors:
     - nm-openai
+    - bfioca-openai
   tags:
     - codex
     - responses

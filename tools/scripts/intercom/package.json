@@ -9,6 +9,7 @@
   },
   "scripts": {
     "start": "node mcp-intercom-server.js",
+    "start:http": "node mcp-intercom-http.js",
     "test": "node --test"
   },
   "keywords": [
@@ -26,7 +27,8 @@
   "dependencies": {
     "@modelcontextprotocol/sdk": "^1.0.0",
     "axios": "^1.9.0",
-    "dotenv": "^16.5.0"
+    "dotenv": "^16.5.0",
+    "express": "^5.2.1"
   },
   "devDependencies": {
     "@types/node": "^20.0.0"
@@ -49,4 +51,4 @@
     "mcp-intercom-server.js",
     "README-MCP.md"
   ]
-} 
+}

@@ -2,9 +2,9 @@
 
 /**
  * Intercom MCP Server
- * 
- * Provides Model Context Protocol (MCP) tools for Intercom data export and analysis.
- * Converts the fast-export-intercom.js functionality into callable MCP tools.
+ *
+ * Provides Model Context Protocol (MCP) tools for Intercom data export,
+ * analysis, and customer feedback research.
  */
 
 import { Server } from '@modelcontextprotocol/sdk/server/index.js';
@@ -17,41 +17,45 @@ import {
 } from '@modelcontextprotocol/sdk/types.js';
 
 import axios from 'axios';
-import fs from 'fs';
 import { fileURLToPath } from 'url';
 import { dirname, join } from 'path';
 import dotenv from 'dotenv';
 
-// Load environment variables from root level
+import {
+  retryableRequest,
+  fetchConversationIds,
+  getConversationDetails,
+  processConversation,
+  convertToCSV,
+  groupBy,
+  stripHtml,
+  extractTags,
+  buildConversationText,
+  buildSearchQuery,
+} from './intercom-api-helpers.js';
+
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = dirname(__filename);
 dotenv.config({ path: join(__dirname, '../../../.env') });
 
+import { TOOL_DEFINITIONS } from './mcp-tool-definitions.js';
+
 class IntercomMCPServer {
   constructor() {
     this.server = new Server(
-      {
-        name: 'intercom-export-server',
-        version: '1.0.0',
-      },
-      {
-        capabilities: {
-          tools: {},
-        },
-      }
+      { name: 'intercom-export-server', version: '2.0.0' },
+      { capabilities: { tools: {} } },
     );
-
     this.setupErrorHandling();
     this.setupToolHandlers();
 
-    // Initialize Intercom API client
     this.intercomApi = axios.create({
       baseURL: 'https://api.intercom.io',
       headers: {
         'Authorization': `Bearer ${process.env.INTERCOM_ACCESS_TOKEN}`,
         'Accept': 'application/json',
         'Content-Type': 'application/json',
-        'Intercom-Version': '2.13'
+        'Intercom-Version': '2.13',
       },
       timeout: 30000,
     });
@@ -59,731 +63,327 @@ class IntercomMCPServer {
 
   setupErrorHandling() {
     this.server.onerror = (error) => console.error('[MCP Error]', error);
-    process.on('SIGINT', async () => {
-      await this.server.close();
-      process.exit(0);
-    });
+    process.on('SIGINT', async () => { await this.server.close(); process.exit(0); });
   }
 
   setupToolHandlers() {
     this.server.setRequestHandler(ListToolsRequestSchema, async () => ({
-      tools: [
-        {
-          name: 'export_intercom_conversations',
-          description: 'Export Intercom conversations from a specific date range to CSV format',
-          inputSchema: {
-            type: 'object',
-            properties: {
-              from_date: {
-                type: 'string',
-                description: 'Start date in YYYY-MM-DD format',
-                pattern: '^\\d{4}-\\d{2}-\\d{2}$'
-              },
-              to_date: {
-                type: 'string',
-                description: 'End date in YYYY-MM-DD format (defaults to today)',
-                pattern: '^\\d{4}-\\d{2}-\\d{2}$'
-              },
-              output_format: {
-                type: 'string',
-                description: 'Output format: "csv" or "json"',
-                enum: ['csv', 'json'],
-                default: 'csv'
-              },
-              limit: {
-                type: 'number',
-                description: 'Maximum number of conversations to export (default: no limit)',
-                minimum: 1
-              },
-              include_message_content: {
-                type: 'boolean',
-                description: 'Whether to include full message content (default: true)',
-                default: true
-              }
-            },
-            required: ['from_date'],
-            additionalProperties: false
-          }
-        },
-        {
-          name: 'count_intercom_conversations',
-          description: 'Count conversations matching optional filters (date range, state) with full pagination',
-          inputSchema: {
-            type: 'object',
-            properties: {
-              from_date: {
-                type: 'string',
-                description: 'Start date in YYYY-MM-DD format',
-                pattern: '^\\d{4}-\\d{2}-\\d{2}$'
-              },
-              to_date: {
-                type: 'string',
-                description: 'End date in YYYY-MM-DD format (defaults to today)',
-                pattern: '^\\d{4}-\\d{2}-\\d{2}$'
-              },
-              state: {
-                type: 'string',
-                description: 'Conversation state to filter by',
-                enum: ['open', 'closed', 'snoozed']
-              }
-            },
-            additionalProperties: false
-          }
-        },
-        {
-          name: 'get_intercom_conversation_stats',
-          description: 'Get statistics about conversations in a date range without full export',
-          inputSchema: {
-            type: 'object',
-            properties: {
-              from_date: {
-                type: 'string',
-                description: 'Start date in YYYY-MM-DD format',
-                pattern: '^\\d{4}-\\d{2}-\\d{2}$'
-              },
-              to_date: {
-                type: 'string',
-                description: 'End date in YYYY-MM-DD format (defaults to today)',
-                pattern: '^\\d{4}-\\d{2}-\\d{2}$'
-              }
-            },
-            required: ['from_date'],
-            additionalProperties: false
-          }
-        },
-        {
-          name: 'search_intercom_conversations',
-          description: 'Search for specific conversations based on criteria',
-          inputSchema: {
-            type: 'object',
-            properties: {
-              query: {
-                type: 'string',
-                description: 'Search query or keywords'
-              },
-              from_date: {
-                type: 'string',
-                description: 'Start date in YYYY-MM-DD format',
-                pattern: '^\\d{4}-\\d{2}-\\d{2}$'
-              },
-              to_date: {
-                type: 'string',
-                description: 'End date in YYYY-MM-DD format',
-                pattern: '^\\d{4}-\\d{2}-\\d{2}$'
-              },
-              state: {
-                type: 'string',
-                description: 'Conversation state to filter by',
-                enum: ['open', 'closed', 'snoozed']
-              },
-              limit: {
-                type: 'number',
-                description: 'Maximum number of results (default: 50)',
-                minimum: 1,
-                maximum: 150,
-                default: 50
-              }
-            },
-            additionalProperties: false
-          }
-        }
-      ]
+      tools: TOOL_DEFINITIONS,
     }));
 
     this.server.setRequestHandler(CallToolRequestSchema, async (request) => {
       const { name, arguments: args } = request.params;
-
       try {
         switch (name) {
-          case 'export_intercom_conversations':
-            return await this.exportConversations(args);
-          case 'count_intercom_conversations':
-            return await this.countConversations(args);
-          case 'get_intercom_conversation_stats':
-            return await this.getConversationStats(args);
-          case 'search_intercom_conversations':
-            return await this.searchConversations(args);
+          case 'export_intercom_conversations': return await this.exportConversations(args);
+          case 'count_intercom_conversations': return await this.countConversations(args);
+          case 'get_intercom_conversation_stats': return await this.getConversationStats(args);
+          case 'search_intercom_conversations': return await this.searchConversations(args);
+          case 'scan_customer_feedback': return await this.scanCustomerFeedback(args);
+          case 'get_conversation_feedback': return await this.getConversationFeedback(args);
           default:
-            throw new McpError(
-              ErrorCode.MethodNotFound,
-              `Unknown tool: ${name}`
-            );
+            throw new McpError(ErrorCode.MethodNotFound, `Unknown tool: ${name}`);
         }
       } catch (error) {
-        if (error instanceof McpError) {
-          throw error;
-        }
-        throw new McpError(
-          ErrorCode.InternalError,
-          `Tool execution failed: ${error.message}`
-        );
+        if (error instanceof McpError) throw error;
+        throw new McpError(ErrorCode.InternalError, `Tool execution failed: ${error.message}`);
       }
     });
   }
 
-  // Tool: Count conversations with pagination
+  // ── Existing tools ────────────────────────────────────────────────────
+
   async countConversations(args) {
-    const {
-      from_date,
-      to_date = new Date().toISOString().split('T')[0],
-      state
-    } = args;
-
+    const { from_date, to_date = new Date().toISOString().split('T')[0], state } = args;
     try {
-      const searchQuery = {
-        query: {
-          operator: 'AND',
-          value: []
-        },
-        pagination: {
-          per_page: 150
-        }
-      };
-
-      // Add date filters if provided
-      if (from_date) {
-        const fromTimestamp = Math.floor(new Date(from_date).getTime() / 1000);
-        searchQuery.query.value.push({
-          field: 'created_at',
-          operator: '>=',
-          value: fromTimestamp
-        });
-      }
-
-      if (to_date) {
-        const toTimestamp = Math.floor(new Date(to_date).getTime() / 1000);
-        searchQuery.query.value.push({
-          field: 'created_at',
-          operator: '<=',
-          value: toTimestamp
-        });
-      }
-
-      // Add state filter if provided
-      if (state) {
-        searchQuery.query.value.push({
-          field: 'state',
-          operator: '=',
-          value: state
-        });
-      }
-
-      // If no filters at all, add a non-restrictive upper bound to satisfy API
-      if (searchQuery.query.value.length === 0) {
-        const toTimestamp = Math.floor(new Date(to_date).getTime() / 1000);
-        searchQuery.query.value.push({
-          field: 'created_at',
-          operator: '<=',
-          value: toTimestamp
-        });
-      }
-
+      const searchQuery = buildSearchQuery({ from_date, to_date, state });
       let total = 0;
       let startingAfter = null;
       let hasMore = true;
-
       while (hasMore) {
-        if (startingAfter) {
-          searchQuery.pagination.starting_after = startingAfter;
-        } else {
-          delete searchQuery.pagination.starting_after;
-        }
-
-        const response = await this.retryableRequest(async () => {
-          return await this.intercomApi.post('/conversations/search', searchQuery);
-        });
-
-        const conversations = response.data.conversations || [];
-        total += conversations.length;
-
-        if (response.data.pages && response.data.pages.next && response.data.pages.next.starting_after) {
-          startingAfter = response.data.pages.next.starting_after;
-          hasMore = true;
-        } else {
-          hasMore = false;
-        }
+        if (startingAfter) searchQuery.pagination.starting_after = startingAfter;
+        else delete searchQuery.pagination.starting_after;
+        const response = await retryableRequest(() => this.intercomApi.post('/conversations/search', searchQuery));
+        total += (response.data.conversations || []).length;
+        const next = response.data.pages?.next?.starting_after;
+        hasMore = !!next;
+        startingAfter = next;
       }
-
-      const results = {
-        success: true,
-        date_range: { from: from_date || null, to: to_date },
-        state: state || null,
-        total_count: total
-      };
-
-      return {
-        content: [{
-          type: 'text',
-          text: JSON.stringify(results, null, 2)
-        }]
-      };
+      return this._json({ success: true, date_range: { from: from_date || null, to: to_date }, state: state || null, total_count: total });
     } catch (error) {
-      throw new McpError(
-        ErrorCode.InternalError,
-        `Count failed: ${error.message}`
-      );
+      throw new McpError(ErrorCode.InternalError, `Count failed: ${error.message}`);
     }
   }
 
-  // Retry mechanism for API requests
-  async retryableRequest(fn, maxRetries = 3, delay = 750) {
-    let lastError;
-
-    for (let attempt = 1; attempt <= maxRetries; attempt++) {
-      try {
-        return await fn();
-      } catch (error) {
-        lastError = error;
-
-        if (attempt < maxRetries) {
-          if (error.response && error.response.status === 429) {
-            const retryAfter = parseInt(error.response.headers['retry-after'] || '5', 10);
-            const waitTime = retryAfter * 1000 || Math.min(delay * Math.pow(2, attempt), 30000);
-            await new Promise(resolve => setTimeout(resolve, waitTime));
-          } else {
-            const waitTime = delay * Math.pow(1.5, attempt - 1);
-            await new Promise(resolve => setTimeout(resolve, waitTime));
-          }
-        }
-      }
-    }
-
-    throw lastError;
-  }
-
-  // Fetch conversation IDs for a date range
-  async fetchConversationIds(fromDate, toDate, limit = null) {
-    const fromTimestamp = Math.floor(new Date(fromDate).getTime() / 1000);
-    const toTimestamp = Math.floor(new Date(toDate).getTime() / 1000);
-
-    const allIds = [];
-    let hasMore = true;
-    const maxPerPage = 150;
-    let startingAfter = null;
-
-    while (hasMore && (limit === null || allIds.length < limit)) {
-      try {
-        const searchQuery = {
-          query: {
-            operator: 'AND',
-            value: [
-              {
-                field: 'created_at',
-                operator: '>=',
-                value: fromTimestamp
-              },
-              {
-                field: 'created_at',
-                operator: '<=',
-                value: toTimestamp
-              }
-            ]
-          },
-          pagination: {
-            per_page: Math.min(maxPerPage, limit ? limit - allIds.length : maxPerPage)
-          }
-        };
-
-        if (startingAfter) {
-          searchQuery.pagination.starting_after = startingAfter;
-        }
-
-        const response = await this.retryableRequest(async () => {
-          return await this.intercomApi.post('/conversations/search', searchQuery);
-        });
-
-        const conversations = response.data.conversations || [];
-
-        if (conversations.length === 0) {
-          hasMore = false;
-          continue;
-        }
-
-        const ids = conversations.map(c => c.id);
-        allIds.push(...ids);
-
-        if (!response.data.pages.next || !response.data.pages.next.starting_after) {
-          hasMore = false;
-        } else {
-          startingAfter = response.data.pages.next.starting_after;
-        }
-
-        if (limit && allIds.length >= limit) {
-          hasMore = false;
-        }
-      } catch (error) {
-        throw new Error(`Failed to fetch conversation IDs: ${error.message}`);
-      }
-    }
-
-    return allIds.slice(0, limit || allIds.length);
-  }
-
-  // Get detailed conversation data
-  async getConversationDetails(conversationId) {
-    try {
-      return await this.retryableRequest(async () => {
-        const response = await this.intercomApi.get(`/conversations/${conversationId}`);
-        return response.data;
-      });
-    } catch (error) {
-      throw new Error(`Failed to get conversation ${conversationId}: ${error.message}`);
-    }
-  }
-
-  // Process conversation to extract structured data
-  async processConversation(conversation, includeContent = true) {
-    if (!conversation) return [];
-
-    const conversationId = conversation.id;
-    const createdAt = conversation.created_at ? new Date(conversation.created_at * 1000).toISOString() : '';
-    const updatedAt = conversation.updated_at ? new Date(conversation.updated_at * 1000).toISOString() : '';
-    const state = conversation.state || '';
-    const read = conversation.read !== undefined ? conversation.read.toString() : '';
-
-    let ownerName = '';
-    if (conversation.admin_assignee_id && conversation.teammates && conversation.teammates.admins) {
-      const admin = conversation.teammates.admins.find(a => a.id === conversation.admin_assignee_id.toString());
-      if (admin && admin.name) {
-        ownerName = admin.name;
-      }
-    }
-
-    let userId = '';
-    let companyId = '';
-    if (conversation.contacts && conversation.contacts.contacts && conversation.contacts.contacts.length > 0) {
-      const contact = conversation.contacts.contacts[0];
-      userId = contact.id || '';
-      if (contact.companies && contact.companies.length > 0) {
-        companyId = contact.companies[0].id;
-      }
-    }
-
-    const rows = [];
-
-    // Process main conversation message
-    if (conversation.source) {
-      const mainRow = {
-        conversation_id: conversationId,
-        created_at: createdAt,
-        updated_at: updatedAt,
-        message_id: conversation.source.id || '',
-        message_body: includeContent ? (conversation.source.body || '') : '[CONTENT_HIDDEN]',
-        part_type: 'conversation',
-        author_type: conversation.source.author ? conversation.source.author.type : '',
-        author_id: conversation.source.author ? conversation.source.author.id : '',
-        author_name: conversation.source.author ? conversation.source.author.name : '',
-        owner_name: ownerName,
-        user_id: userId,
-        company_id: companyId,
-        state: state,
-        read: read
-      };
-      rows.push(mainRow);
-    }
-
-    // Process conversation parts (replies)
-    if (conversation.conversation_parts && conversation.conversation_parts.conversation_parts) {
-      for (const part of conversation.conversation_parts.conversation_parts) {
-        const partRow = {
-          conversation_id: conversationId,
-          created_at: part.created_at ? new Date(part.created_at * 1000).toISOString() : '',
-          updated_at: part.updated_at ? new Date(part.updated_at * 1000).toISOString() : '',
-          message_id: part.id || '',
-          message_body: includeContent ? (part.body || '') : '[CONTENT_HIDDEN]',
-          part_type: part.part_type || 'comment',
-          author_type: part.author ? part.author.type : '',
-          author_id: part.author ? part.author.id : '',
-          author_name: part.author ? part.author.name : '',
-          owner_name: ownerName,
-          user_id: userId,
-          company_id: companyId,
-          state: state,
-          read: read
-        };
-        rows.push(partRow);
-      }
-    }
-
-    return rows;
-  }
-
-  // Tool: Export conversations
   async exportConversations(args) {
-    const {
-      from_date,
-      to_date = new Date().toISOString().split('T')[0],
-      output_format = 'csv',
-      limit,
-      include_message_content = true
-    } = args;
-
+    const { from_date, to_date = new Date().toISOString().split('T')[0], output_format = 'csv', limit, include_message_content = true } = args;
     try {
-      // Validate API token
-      if (!process.env.INTERCOM_ACCESS_TOKEN) {
-        throw new Error('INTERCOM_ACCESS_TOKEN not found in environment variables');
-      }
-
-      // Fetch conversation IDs
-      const conversationIds = await this.fetchConversationIds(from_date, to_date, limit);
-
+      if (!process.env.INTERCOM_ACCESS_TOKEN) throw new Error('INTERCOM_ACCESS_TOKEN not found');
+      const conversationIds = await fetchConversationIds(this.intercomApi, from_date, to_date, limit);
       if (conversationIds.length === 0) {
-        return {
-          content: [{
-            type: 'text',
-            text: JSON.stringify({
-              success: true,
-              message: 'No conversations found in the specified date range',
-              date_range: { from: from_date, to: to_date },
-              total_conversations: 0,
-              data: []
-            }, null, 2)
-          }]
-        };
+        return this._json({ success: true, message: 'No conversations found', date_range: { from: from_date, to: to_date }, total_conversations: 0, data: [] });
       }
-
-      // Process conversations with concurrency control
-      const maxConcurrent = 10; // Reduced for MCP to avoid overwhelming
+      const maxConcurrent = 10;
       const allRows = [];
-      const processedConversations = [];
-
+      const summary = [];
       for (let i = 0; i < conversationIds.length; i += maxConcurrent) {
         const batch = conversationIds.slice(i, i + maxConcurrent);
-        const batchPromises = batch.map(async (id) => {
+        const results = await Promise.all(batch.map(async (id) => {
           try {
-            const conversation = await this.getConversationDetails(id);
-            const rows = await this.processConversation(conversation, include_message_content);
-            return { id, rows, conversation };
-          } catch (error) {
-            return { id, error: error.message, rows: [] };
-          }
-        });
-
-        const batchResults = await Promise.all(batchPromises);
-        
-        for (const result of batchResults) {
-          if (result.rows.length > 0) {
-            allRows.push(...result.rows);
-          }
-          if (result.conversation) {
-            processedConversations.push({
-              id: result.id,
-              created_at: result.conversation.created_at,
-              state: result.conversation.state,
-              message_count: result.rows.length
-            });
-          }
+            const conv = await getConversationDetails(this.intercomApi, id);
+            const rows = processConversation(conv, include_message_content);
+            return { id, rows, conv };
+          } catch { return { id, rows: [] }; }
+        }));
+        for (const r of results) {
+          if (r.rows.length > 0) allRows.push(...r.rows);
+          if (r.conv) summary.push({ id: r.id, created_at: r.conv.created_at, state: r.conv.state, message_count: r.rows.length });
         }
       }
-
-      const responseData = {
-        success: true,
-        date_range: { from: from_date, to: to_date },
-        total_conversations: conversationIds.length,
-        total_messages: allRows.length,
-        output_format,
-        include_message_content,
-        conversations_summary: processedConversations,
-        data: output_format === 'csv' ? this.convertToCSV(allRows) : allRows
-      };
-
-      return {
-        content: [{
-          type: 'text',
-          text: JSON.stringify(responseData, null, 2)
-        }]
-      };
-
-    } catch (error) {
-      throw new McpError(
-        ErrorCode.InternalError,
-        `Export failed: ${error.message}`
-      );
-    }
-  }
-
-  // Tool: Get conversation statistics
-  async getConversationStats(args) {
-    const {
-      from_date,
-      to_date = new Date().toISOString().split('T')[0]
-    } = args;
-
-    try {
-      const conversationIds = await this.fetchConversationIds(from_date, to_date, 100);
-      
-      // Get sample of conversations for stats
-      const sampleSize = Math.min(20, conversationIds.length);
-      const sampleIds = conversationIds.slice(0, sampleSize);
-      
-      const statsPromises = sampleIds.map(async (id) => {
-        try {
-          const conversation = await this.getConversationDetails(id);
-          return {
-            id,
-            state: conversation.state,
-            created_at: conversation.created_at,
-            parts_count: conversation.conversation_parts ? conversation.conversation_parts.conversation_parts.length : 0,
-            has_admin_assignee: !!conversation.admin_assignee_id
-          };
-        } catch (error) {
-          return null;
-        }
+      return this._json({
+        success: true, date_range: { from: from_date, to: to_date },
+        total_conversations: conversationIds.length, total_messages: allRows.length,
+        output_format, include_message_content, conversations_summary: summary,
+        data: output_format === 'csv' ? convertToCSV(allRows) : allRows,
       });
-
-      const sampleStats = (await Promise.all(statsPromises)).filter(Boolean);
-
-      const stats = {
-        success: true,
-        date_range: { from: from_date, to: to_date },
-        total_conversations_found: conversationIds.length,
-        sample_size: sampleStats.length,
-        statistics: {
-          states: this.groupBy(sampleStats, 'state'),
-          avg_parts_per_conversation: sampleStats.reduce((sum, s) => sum + s.parts_count, 0) / sampleStats.length,
-          assigned_conversations: sampleStats.filter(s => s.has_admin_assignee).length,
-          assignment_rate: sampleStats.filter(s => s.has_admin_assignee).length / sampleStats.length
-        }
-      };
-
-      return {
-        content: [{
-          type: 'text',
-          text: JSON.stringify(stats, null, 2)
-        }]
-      };
-
     } catch (error) {
-      throw new McpError(
-        ErrorCode.InternalError,
-        `Stats retrieval failed: ${error.message}`
-      );
+      throw new McpError(ErrorCode.InternalError, `Export failed: ${error.message}`);
     }
   }
 
-  // Tool: Search conversations
+  async getConversationStats(args) {
+    const { from_date, to_date = new Date().toISOString().split('T')[0] } = args;
+    try {
+      const ids = await fetchConversationIds(this.intercomApi, from_date, to_date, 100);
+      const sampleIds = ids.slice(0, Math.min(20, ids.length));
+      const sampleStats = (await Promise.all(sampleIds.map(async (id) => {
+        try {
+          const conv = await getConversationDetails(this.intercomApi, id);
+          return { id, state: conv.state, created_at: conv.created_at, parts_count: conv.conversation_parts?.conversation_parts?.length || 0, has_admin_assignee: !!conv.admin_assignee_id };
+        } catch { return null; }
+      }))).filter(Boolean);
+      return this._json({
+        success: true, date_range: { from: from_date, to: to_date },
+        total_conversations_found: ids.length, sample_size: sampleStats.length,
+        statistics: {
+          states: groupBy(sampleStats, 'state'),
+          avg_parts_per_conversation: sampleStats.reduce((s, x) => s + x.parts_count, 0) / (sampleStats.length || 1),
+          assigned_conversations: sampleStats.filter(s => s.has_admin_assignee).length,
+          assignment_rate: sampleStats.filter(s => s.has_admin_assignee).length / (sampleStats.length || 1),
+        },
+      });
+    } catch (error) {
+      throw new McpError(ErrorCode.InternalError, `Stats failed: ${error.message}`);
+    }
+  }
+
   async searchConversations(args) {
+    const { query, from_date, to_date = new Date().toISOString().split('T')[0], state, limit = 50 } = args;
+    try {
+      const searchQuery = buildSearchQuery({ from_date, to_date, state, per_page: Math.min(limit, 150) });
+      const response = await retryableRequest(() => this.intercomApi.post('/conversations/search', searchQuery));
+      let convs = response.data.conversations || [];
+      if (query) {
+        const q = query.toLowerCase();
+        convs = convs.filter(c => (c.source?.body?.toLowerCase() || '').includes(q));
+      }
+      return this._json({
+        success: true, search_criteria: { query, from_date, to_date, state, limit },
+        total_found: convs.length,
+        conversations: convs.map(c => ({
+          id: c.id, created_at: c.created_at ? new Date(c.created_at * 1000).toISOString() : '',
+          state: c.state, source_body_preview: c.source?.body?.substring(0, 200) || '',
+          admin_assignee_id: c.admin_assignee_id, contact_count: c.contacts?.contacts?.length || 0,
+        })),
+      });
+    } catch (error) {
+      throw new McpError(ErrorCode.InternalError, `Search failed: ${error.message}`);
+    }
+  }
+
+  // ── New: Customer Research tools ──────────────────────────────────────
+
+  async scanCustomerFeedback(args) {
     const {
-      query,
+      topic,
+      keywords: userKeywords,
+      tags: tagFilter,
       from_date,
       to_date = new Date().toISOString().split('T')[0],
       state,
-      limit = 50
+      limit = 30,
     } = args;
 
     try {
-      const searchQuery = {
-        query: {
-          operator: 'AND',
-          value: []
-        },
-        pagination: {
-          per_page: Math.min(limit, 150)
+      const keywords = (userKeywords && userKeywords.length > 0)
+        ? userKeywords.map(k => k.toLowerCase())
+        : topic.toLowerCase().split(/\s+/).filter(w => w.length > 2);
+
+      const tagFilterLower = (tagFilter || []).map(t => t.toLowerCase());
+
+      const searchQuery = buildSearchQuery({ from_date, to_date, state });
+      const matches = [];
+      let startingAfter = null;
+      let scannedCount = 0;
+      const MAX_SCAN = 500;
+
+      while (scannedCount < MAX_SCAN && matches.length < limit) {
+        if (startingAfter) searchQuery.pagination.starting_after = startingAfter;
+        else delete searchQuery.pagination.starting_after;
+
+        const response = await retryableRequest(() => this.intercomApi.post('/conversations/search', searchQuery));
+        const convs = response.data.conversations || [];
+        if (convs.length === 0) break;
+        scannedCount += convs.length;
+
+        for (const conv of convs) {
+          if (matches.length >= limit) break;
+          const convTags = extractTags(conv);
+          const body = stripHtml(conv.source?.body || '').toLowerCase();
+          const matchReasons = [];
+
+          if (tagFilterLower.length > 0) {
+            const matched = convTags.filter(t => tagFilterLower.some(f => t.toLowerCase().includes(f)));
+            if (matched.length > 0) matchReasons.push(`tag: ${matched.join(', ')}`);
+          }
+
+          const matchedKw = keywords.filter(kw => body.includes(kw));
+          if (matchedKw.length > 0) matchReasons.push(`keyword: ${matchedKw.join(', ')}`);
+
+          if (matchReasons.length === 0) continue;
+
+          matches.push({
+            conversation_id: conv.id,
+            created_at: conv.created_at ? new Date(conv.created_at * 1000).toISOString() : '',
+            state: conv.state,
+            tags: convTags,
+            source_preview: stripHtml(conv.source?.body || '').substring(0, 300),
+            match_reason: matchReasons.join(' + '),
+            admin_assignee_id: conv.admin_assignee_id || null,
+            contact_count: conv.contacts?.contacts?.length || 0,
+          });
         }
-      };
 
-      // Add date filters if provided
-      if (from_date) {
-        const fromTimestamp = Math.floor(new Date(from_date).getTime() / 1000);
-        searchQuery.query.value.push({
-          field: 'created_at',
-          operator: '>=',
-          value: fromTimestamp
-        });
+        const next = response.data.pages?.next?.starting_after;
+        if (!next) break;
+        startingAfter = next;
       }
 
-      if (to_date) {
-        const toTimestamp = Math.floor(new Date(to_date).getTime() / 1000);
-        searchQuery.query.value.push({
-          field: 'created_at',
-          operator: '<=',
-          value: toTimestamp
-        });
-      }
-
-      // Add state filter if provided
-      if (state) {
-        searchQuery.query.value.push({
-          field: 'state',
-          operator: '=',
-          value: state
-        });
-      }
-
-      const response = await this.retryableRequest(async () => {
-        return await this.intercomApi.post('/conversations/search', searchQuery);
-      });
-
-      const conversations = response.data.conversations || [];
-      
-      // Filter by query if provided (simple text search in source body)
-      let filteredConversations = conversations;
-      if (query) {
-        filteredConversations = conversations.filter(conv => {
-          const body = conv.source?.body?.toLowerCase() || '';
-          return body.includes(query.toLowerCase());
-        });
-      }
-
-      const results = {
+      return this._json({
         success: true,
-        search_criteria: { query, from_date, to_date, state, limit },
-        total_found: filteredConversations.length,
-        conversations: filteredConversations.map(conv => ({
-          id: conv.id,
-          created_at: conv.created_at ? new Date(conv.created_at * 1000).toISOString() : '',
-          state: conv.state,
-          source_body_preview: conv.source?.body?.substring(0, 200) || '',
-          admin_assignee_id: conv.admin_assignee_id,
-          contact_count: conv.contacts?.contacts?.length || 0
-        }))
-      };
-
-      return {
-        content: [{
-          type: 'text',
-          text: JSON.stringify(results, null, 2)
-        }]
-      };
-
+        research_topic: topic,
+        search_criteria: { keywords, tags: tagFilter || [], from_date, to_date, state: state || null },
+        conversations_scanned: scannedCount,
+        matches_found: matches.length,
+        matches,
+      });
     } catch (error) {
-      throw new McpError(
-        ErrorCode.InternalError,
-        `Search failed: ${error.message}`
-      );
+      throw new McpError(ErrorCode.InternalError, `Scan failed: ${error.message}`);
     }
   }
 
-  // Utility: Convert data to CSV format
-  convertToCSV(rows) {
-    if (rows.length === 0) return '';
+  async getConversationFeedback(args) {
+    const {
+      conversation_ids,
+      topic,
+      excerpt_length = 1500,
+    } = args;
 
-    const headers = Object.keys(rows[0]);
-    const csvRows = [
-      headers.map(h => `"${h}"`).join(','),
-      ...rows.map(row => 
-        headers.map(h => `"${String(row[h] || '').replace(/"/g, '""')}"`).join(',')
-      )
-    ];
+    try {
+      const ids = conversation_ids.slice(0, 10);
+      const topicKeywords = topic
+        ? topic.toLowerCase().split(/\s+/).filter(w => w.length > 2)
+        : [];
 
-    return csvRows.join('\n');
+      const maxConcurrent = 5;
+      const results = [];
+
+      for (let i = 0; i < ids.length; i += maxConcurrent) {
+        const batch = ids.slice(i, i + maxConcurrent);
+        const batchResults = await Promise.all(batch.map(async (id) => {
+          try {
+            const conv = await getConversationDetails(this.intercomApi, id);
+            const tags = extractTags(conv);
+            const { fullText, parts } = buildConversationText(conv);
+
+            let nUser = 0, nAdmin = 0, nBot = 0;
+            for (const p of parts) {
+              if (p.author_type === 'user' || p.author_type === 'lead') nUser++;
+              else if (p.author_type === 'admin') nAdmin++;
+              else if (p.author_type === 'bot') nBot++;
+            }
+
+            const timeline = parts.map(p => `[${p.author_type}] ${p.body}`).join('\n');
+            const excerpt = timeline.length > excerpt_length
+              ? timeline.substring(0, excerpt_length) + '…'
+              : timeline;
+
+            let feedbackSnippets = [];
+            if (topicKeywords.length > 0) {
+              for (const p of parts) {
+                const bodyLower = p.body.toLowerCase();
+                if (topicKeywords.some(kw => bodyLower.includes(kw))) {
+                  feedbackSnippets.push({
+                    author_type: p.author_type,
+                    text: p.body.substring(0, 500),
+                    created_at: p.created_at ? new Date(p.created_at * 1000).toISOString() : null,
+                  });
+                }
+              }
+            }
+
+            return {
+              conversation_id: id,
+              created_at: conv.created_at ? new Date(conv.created_at * 1000).toISOString() : '',
+              state: conv.state,
+              tags,
+              participants: { user_messages: nUser, admin_messages: nAdmin, bot_messages: nBot, total: parts.length },
+              conversation_text: excerpt,
+              feedback_snippets: feedbackSnippets,
+              intercom_url: `https://app.intercom.com/a/apps/${process.env.INTERCOM_APP_ID || '_'}/inbox/inbox/conversation/${id}`,
+            };
+          } catch (error) {
+            return { conversation_id: id, error: error.message };
+          }
+        }));
+        results.push(...batchResults);
+      }
+
+      return this._json({
+        success: true,
+        topic: topic || null,
+        conversations_requested: ids.length,
+        conversations_retrieved: results.filter(r => !r.error).length,
+        results,
+      });
+    } catch (error) {
+      throw new McpError(ErrorCode.InternalError, `Feedback retrieval failed: ${error.message}`);
+    }
   }
 
-  // Utility: Group array by property
-  groupBy(array, property) {
-    return array.reduce((groups, item) => {
-      const key = item[property];
-      groups[key] = (groups[key] || 0) + 1;
-      return groups;
-    }, {});
+  // ── Helpers ───────────────────────────────────────────────────────────
+
+  _json(data) {
+    return { content: [{ type: 'text', text: JSON.stringify(data, null, 2) }] };
+  }
+
+  async connectTransport(transport) {
+    await this.server.connect(transport);
   }
 
   async run() {
     const transport = new StdioServerTransport();
-    await this.server.connect(transport);
+    await this.connectTransport(transport);
     console.error('Intercom MCP server running on stdio');
   }
 }
 
-const server = new IntercomMCPServer();
-server.run().catch(console.error); 
+export { IntercomMCPServer };
+
+const isDirectRun = process.argv[1] &&
+  fileURLToPath(import.meta.url).endsWith(process.argv[1].replace(/^.*[\\/]/, ''));
+
+if (isDirectRun) {
+  const server = new IntercomMCPServer();
+  server.run().catch(console.error);
+}

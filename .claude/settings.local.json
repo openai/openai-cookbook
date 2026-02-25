@@ -39,7 +39,11 @@
       "mcp__claude_ai_Fellow_ai__*",
       "mcp__claude_ai_Slack__*",
       "mcp__claude_ai_Atlassian__*",
-      "mcp__claude_ai_Granola__*"
+      "mcp__claude_ai_Granola__*",
+      "Skill(commit-commands:commit-push-pr)",
+      "Skill(commit-commands:commit-push-pr:*)",
+      "Skill(commit-commands:commit)",
+      "Skill(commit-commands:commit:*)"
     ],
     "deny": [],
     "ask": []

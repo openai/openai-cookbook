@@ -688,7 +688,7 @@ function EmitidosReconciliation() {
                               </td>
                               <td style={s.td}>{d.arca?.numero || d.colppy?.nroFactura}</td>
                               <td style={s.td}>{d.arca?.fecha_emision || d.colppy?.fechaFactura}</td>
-                              <td style={{ ...s.td, fontSize: "0.8rem" }}>{tipoLetter(d.arca?.tipo_comprobante)}</td>
+                              <td style={{ ...s.td, fontSize: "0.8rem" }}>{tipoShort(d.arca?.tipo_comprobante)}</td>
                               <td style={{ ...s.td, fontSize: "0.8rem", ...(ESTADO_COLORS[estadoColppy] || {}) }}>{estadoColppy || "—"}</td>
                               <td style={{ ...s.td, textAlign: "right" }}>{fmtMoney(d.arca?.importe_total)}</td>
                               <td style={{ ...s.td, textAlign: "right" }}>{fmtMoney(d.colppy?.totalFactura_pesos)}</td>
@@ -712,7 +712,7 @@ function EmitidosReconciliation() {
                               </td>
                               <td style={s.td}>{d.arca?.numero}</td>
                               <td style={s.td}>{d.arca?.fecha_emision}</td>
-                              <td style={{ ...s.td, fontSize: "0.8rem" }}>{tipoLetter(d.arca?.tipo_comprobante)}</td>
+                              <td style={{ ...s.td, fontSize: "0.8rem" }}>{tipoShort(d.arca?.tipo_comprobante)}</td>
                               <td style={{ ...s.td, fontSize: "0.8rem", ...(ESTADO_COLORS[estadoCurr] || {}) }}>{estadoCurr || "—"}</td>
                               <td style={{ ...s.td, textAlign: "right" }}>
                                 {moneda} {d.arca?.importe_total?.toLocaleString("es-AR", { minimumFractionDigits: 2 })}
@@ -733,7 +733,7 @@ function EmitidosReconciliation() {
                             <td style={{ ...s.td, fontSize: "0.75rem" }}>{d.source || (isArca ? "ARCA" : "Colppy")}</td>
                             <td style={s.td}>{isArca ? rec.numero : rec.nroFactura}</td>
                             <td style={s.td}>{isArca ? rec.fecha_emision : rec.fechaFactura}</td>
-                            <td style={{ ...s.td, fontSize: "0.8rem" }}>{tipoLetter(rec.tipo_comprobante)}</td>
+                            <td style={{ ...s.td, fontSize: "0.8rem" }}>{tipoShort(rec.tipo_comprobante)}</td>
                             <td style={{ ...s.td, fontSize: "0.8rem", ...(ESTADO_COLORS[estadoOther] || {}) }}>{estadoOther || "—"}</td>
                             <td style={s.td}>
                               {isArca ? rec.denominacion_contraparte : rec.RazonSocial}
@@ -794,7 +794,7 @@ function EmitidosReconciliation() {
                         <td style={{ ...s.td, fontSize: "0.75rem", fontFamily: "monospace" }}>{cae}</td>
                         <td style={s.td}>{pair.arca?.numero}</td>
                         <td style={s.td}>{pair.arca?.fecha_emision}</td>
-                        <td style={{ ...s.td, fontSize: "0.8rem" }}>{tipoLetter(pair.arca?.tipo_comprobante)}</td>
+                        <td style={{ ...s.td, fontSize: "0.8rem" }}>{tipoShort(pair.arca?.tipo_comprobante)}</td>
                         <td style={{ ...s.td, fontSize: "0.8rem", ...(ESTADO_COLORS[estadoMatched] || {}) }}>{estadoMatched || "—"}</td>
                         <td style={s.td}>{pair.arca?.denominacion_contraparte}</td>
                         <td style={{ ...s.td, textAlign: "right" }}>{fmtMoney(pair.arca?.importe_total)}</td>
@@ -1169,7 +1169,7 @@ function RecibidosReconciliation() {
                           const key = discKey(d);
                           const isExpanded = expandedRow === key;
                           const nro = d.arca?.numero || d.colppy?.nroFactura || d.duplicate_number || "";
-                          const tipo = tipoLetter(d.arca?.tipo_comprobante || d.colppy?.tipo_comprobante);
+                          const tipo = tipoShort(d.arca?.tipo_comprobante || d.colppy?.tipo_comprobante);
                           const fecha = d.arca?.fecha_emision || d.colppy?.fechaFactura || "";
                           const prov = d.arca?.denominacion_contraparte || d.colppy?.RazonSocial || "";
                           const cuit = d.arca?.cuit_contraparte || d.colppy?.cuit_proveedor || "";
@@ -1275,7 +1275,7 @@ function RecibidosReconciliation() {
                                 style={{ cursor: "pointer", background: isExpanded ? "rgba(99,102,241,0.08)" : "transparent" }}
                               >
                                 <td style={s.td}>{pair.arca?.numero || pair.colppy?.nroFactura}</td>
-                                <td style={{ ...s.td, fontSize: "0.8rem" }}>{tipoLetter(pair.arca?.tipo_comprobante)}</td>
+                                <td style={{ ...s.td, fontSize: "0.8rem" }}>{tipoShort(pair.arca?.tipo_comprobante)}</td>
                                 <td style={s.td}>{fmtDate(pair.arca?.fecha_emision)}</td>
                                 <td style={{ ...s.td, maxWidth: 180, overflow: "hidden", textOverflow: "ellipsis", whiteSpace: "nowrap" }}>
                                   {pair.arca?.denominacion_contraparte || pair.colppy?.RazonSocial}
@@ -1965,18 +1965,34 @@ const fmtDate = (iso) => {
   return `${d}/${m}/${y}`;
 };
 
-/** Extract comprobante letter (A/B/C/E/M/T) from tipo_comprobante string.
- *  Matches a standalone single letter at the end: "Factura A" → "A", "NC B" → "B".
- *  Handles edge cases: "Tique" → "Tique", "Factura de Exportación" → "Exp" */
-const tipoLetter = (tipo) => {
+/** Return a short display label for a tipo_comprobante string.
+ *  Maps Argentine comprobante type names to abbreviated labels with letter suffix.
+ *  Examples: "Factura A" → "Fac A", "Nota de Crédito B" → "NC B", "FCE A" → "FCE A" */
+const tipoShort = (tipo) => {
   if (!tipo) return "";
-  // Match a standalone letter at the end (preceded by space)
-  const m = tipo.trim().match(/\s([A-Z])\s*$/);
-  if (m) return m[1];
-  // Known non-letter types → short abbreviations
-  if (/exportaci/i.test(tipo)) return "Exp";
-  if (/^tique$/i.test(tipo.trim())) return "Tiq";
-  return tipo;
+  const t = tipo.trim();
+  // Extract trailing letter suffix: "Factura A" → l="A", pre="Factura"
+  const lm = t.match(/\s([A-Z])\s*$/);
+  const l = lm ? lm[1] : "";
+  const pre = lm ? t.slice(0, lm.index).trim() : t;
+  if (/^factura de exp/i.test(pre))  return "Fac Exp";
+  if (/^factura/i.test(pre))         return l ? `Fac ${l}` : "Fac";
+  if (/^nota de cr/i.test(pre))      return l ? `NC ${l}` : "NC";
+  if (/^nota de d/i.test(pre))       return l ? `ND ${l}` : "ND";
+  if (/^recibo/i.test(pre))          return l ? `Rec ${l}` : "Rec";
+  if (/^nc fce/i.test(pre))          return l ? `NC FCE ${l}` : "NC FCE";
+  if (/^nd fce/i.test(pre))          return l ? `ND FCE ${l}` : "ND FCE";
+  if (/^fce/i.test(pre))             return l ? `FCE ${l}` : "FCE";
+  if (/^tique factura/i.test(pre))   return l ? `Tiq ${l}` : "Tiq";
+  if (/^tique nc/i.test(pre))        return l ? `T-NC ${l}` : "T-NC";
+  if (/^tique nd/i.test(pre))        return l ? `T-ND ${l}` : "T-ND";
+  if (/^tique/i.test(pre))           return l ? `Tiq ${l}` : "Tiq";
+  if (/^nd operac/i.test(t))         return "ND Ext";
+  if (/^nc operac/i.test(t))         return "NC Ext";
+  if (/^nd$/i.test(pre))             return l ? `ND ${l}` : "ND";
+  if (/^nc$/i.test(pre))             return l ? `NC ${l}` : "NC";
+  // Fallback: keep as-is (e.g. "Tipo 37" for unknown codes)
+  return t;
 };
 
 const ESTADO_COLORS = {

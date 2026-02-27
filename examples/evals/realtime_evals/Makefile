@@ -1,16 +1,16 @@
 .PHONY: format lint lint-fix typecheck test
 
 format:
-	uv run --with ruff ruff format .
+	uv run --group dev ruff format .
 
 lint:
-	uv run --with ruff ruff check .
+	uv run --group dev ruff check .
 
 lint-fix:
-	uv run --with ruff ruff check . --fix
+	uv run --group dev ruff check . --fix
 
 typecheck:
-	uv run --with mypy --with pandas-stubs --with types-tqdm mypy --explicit-package-bases .
+	uv run --group dev mypy .
 
 test:
-	uv run --with pytest pytest
+	uv run --group dev pytest

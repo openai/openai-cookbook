@@ -98,6 +98,9 @@ def _apply_chart_theme() -> None:
             "xtick.color": TEXT,
             "ytick.color": TEXT,
             "axes.titlecolor": TEXT,
+            "axes.titleweight": "normal",
+            "axes.labelweight": "normal",
+            "font.weight": "normal",
             "font.family": "sans-serif",
             "font.sans-serif": FONT_STACK,
             "grid.color": GRID,
@@ -121,7 +124,7 @@ def _plot_scorecard(
         x=0.06,
         y=0.98,
         ha="left",
-        fontsize=22,
+        fontsize=19,
         fontweight="normal",
     )
 
@@ -173,7 +176,7 @@ def _plot_detail_panels(
         x=0.06,
         y=0.98,
         ha="left",
-        fontsize=20,
+        fontsize=18,
         fontweight="normal",
     )
 
@@ -222,7 +225,7 @@ def _plot_turn_trends(
         x=0.06,
         y=0.98,
         ha="left",
-        fontsize=20,
+        fontsize=18,
         fontweight="normal",
     )
 
@@ -240,9 +243,11 @@ def _plot_turn_trends(
             markersize=6,
             markeredgecolor=EDGE,
         )
-        latency_ax.set_title("response latency by turn", loc="left", pad=12, fontsize=15)
-        latency_ax.set_xlabel("turn index", fontsize=13)
-        latency_ax.set_ylabel("ms", fontsize=13)
+        latency_ax.set_title(
+            "response latency by turn", loc="left", pad=12, fontsize=14
+        )
+        latency_ax.set_xlabel("turn index", fontsize=12)
+        latency_ax.set_ylabel("ms", fontsize=12)
         latency_ax.set_xticks(grouped["turn_index"])
     else:
         _empty_panel(latency_ax, "No turn-level latency values available.")
@@ -258,9 +263,11 @@ def _plot_turn_trends(
             markeredgecolor=EDGE,
         )
         grade_ax.set_ylim(0, 1.05)
-        grade_ax.set_title("turn-level score by turn", loc="left", pad=12, fontsize=15)
-        grade_ax.set_xlabel("turn index", fontsize=13)
-        grade_ax.set_ylabel("score", fontsize=13)
+        grade_ax.set_title(
+            "turn-level score by turn", loc="left", pad=12, fontsize=14
+        )
+        grade_ax.set_xlabel("turn index", fontsize=12)
+        grade_ax.set_ylabel("score", fontsize=12)
         grade_ax.set_xticks(grouped["turn_index"])
         for _, row in grouped.iterrows():
             grade_ax.text(
@@ -284,7 +291,7 @@ def _plot_turn_trends(
 
 def _plot_score_metrics(axis: plt.Axes, summary: Mapping[str, Any]) -> None:
     metric_rows = _score_metric_rows(summary)
-    axis.set_title("scorecard metrics", loc="left", pad=12, fontsize=15)
+    axis.set_title("scorecard metrics", loc="left", pad=12, fontsize=14)
     if not metric_rows:
         _empty_panel(axis, "No score metrics found in summary.json.")
         return
@@ -292,36 +299,67 @@ def _plot_score_metrics(axis: plt.Axes, summary: Mapping[str, Any]) -> None:
     labels = [label for label, _ in metric_rows]
     values = [value for _, value in metric_rows]
     colors = _palette_cycle(len(metric_rows))
-    bars = axis.bar(
-        labels,
-        values,
-        color=colors,
-        edgecolor=EDGE,
-        linewidth=1.2,
-        width=0.68,
-        zorder=3,
-    )
-    axis.set_ylim(0, 1.05)
-    axis.set_ylabel("share", fontsize=13)
-    axis.tick_params(axis="x", labelrotation=0, pad=8, labelsize=11)
-    axis.tick_params(axis="y", labelsize=11)
-    axis.grid(axis="y", color=GRID, linewidth=0.8, alpha=0.9)
-
-    for bar, value in zip(bars, values, strict=False):
-        axis.text(
-            bar.get_x() + (bar.get_width() / 2),
-            value + 0.03,
-            f"{value:.0%}",
-            ha="center",
-            va="bottom",
-            fontsize=10,
-            color=TEXT,
+    use_horizontal = len(labels) > 4 or max(len(label) for label in labels) > 12
+    if use_horizontal:
+        positions = list(range(len(labels)))
+        bars = axis.barh(
+            positions,
+            values,
+            color=colors,
+            edgecolor=EDGE,
+            linewidth=1.2,
+            height=0.62,
+            zorder=3,
         )
+        axis.set_xlim(0, 1.05)
+        axis.set_xlabel("share", fontsize=12)
+        axis.set_yticks(positions)
+        axis.set_yticklabels(labels, fontsize=10)
+        axis.tick_params(axis="x", labelsize=10)
+        axis.grid(axis="x", color=GRID, linewidth=0.8, alpha=0.9)
+        axis.grid(axis="y", visible=False)
+        axis.invert_yaxis()
+        for bar, value in zip(bars, values, strict=False):
+            axis.text(
+                value + 0.02,
+                bar.get_y() + (bar.get_height() / 2),
+                f"{value:.0%}",
+                ha="left",
+                va="center",
+                fontsize=10,
+                color=TEXT,
+            )
+    else:
+        bars = axis.bar(
+            labels,
+            values,
+            color=colors,
+            edgecolor=EDGE,
+            linewidth=1.2,
+            width=0.68,
+            zorder=3,
+        )
+        axis.set_ylim(0, 1.05)
+        axis.set_ylabel("share", fontsize=12)
+        axis.tick_params(axis="x", labelrotation=0, pad=8, labelsize=10)
+        axis.tick_params(axis="y", labelsize=10)
+        axis.grid(axis="y", color=GRID, linewidth=0.8, alpha=0.9)
+
+        for bar, value in zip(bars, values, strict=False):
+            axis.text(
+                bar.get_x() + (bar.get_width() / 2),
+                value + 0.03,
+                f"{value:.0%}",
+                ha="center",
+                va="bottom",
+                fontsize=10,
+                color=TEXT,
+            )
 
 
 def _plot_latency_quantiles(axis: plt.Axes, summary: Mapping[str, Any]) -> None:
     quantile_frame = _summary_quantile_frame(summary, LATENCY_COLUMNS, ["p50", "p95", "p99"])
-    axis.set_title("latency percentiles", loc="left", pad=12, fontsize=15)
+    axis.set_title("latency percentiles", loc="left", pad=12, fontsize=14)
     if quantile_frame.empty:
         _empty_panel(axis, "No latency percentile values found.")
         return
@@ -345,20 +383,20 @@ def _plot_latency_quantiles(axis: plt.Axes, summary: Mapping[str, Any]) -> None:
             markeredgecolor=EDGE,
         )
 
-    axis.set_ylabel("ms", fontsize=13)
+    axis.set_ylabel("ms", fontsize=12)
     axis.grid(axis="y", color=GRID, linewidth=0.8, alpha=0.9)
     axis.legend(
         loc="upper center",
         bbox_to_anchor=(0.5, 1.12),
         ncol=3,
         frameon=False,
-        fontsize=11,
+        fontsize=10,
     )
 
 
 def _plot_token_summary(axis: plt.Axes, summary: Mapping[str, Any]) -> None:
     token_frame = _summary_quantile_frame(summary, TOKEN_COLUMNS, ["avg", "p50", "p95"])
-    axis.set_title("token summary", loc="left", pad=12, fontsize=15)
+    axis.set_title("token summary", loc="left", pad=12, fontsize=14)
     if token_frame.empty:
         _empty_panel(axis, "No output token summaries found.")
         return
@@ -406,20 +444,20 @@ def _plot_token_summary(axis: plt.Axes, summary: Mapping[str, Any]) -> None:
             )
 
     axis.set_xticks(x_positions)
-    axis.set_xticklabels(metrics, fontsize=11)
-    axis.set_ylabel("tokens", fontsize=13)
+    axis.set_xticklabels(metrics, fontsize=10)
+    axis.set_ylabel("tokens", fontsize=12)
     axis.grid(axis="y", color=GRID, linewidth=0.8, alpha=0.9)
     axis.legend(
         loc="upper center",
         bbox_to_anchor=(0.5, 1.12),
         ncol=3,
         frameon=False,
-        fontsize=11,
+        fontsize=10,
     )
 
 
 def _plot_status_donut(axis: plt.Axes, results: pd.DataFrame) -> None:
-    axis.set_title("run status", loc="left", pad=12, fontsize=15)
+    axis.set_title("run status", loc="left", pad=12, fontsize=14)
     status_counts = _status_counts(results)
     if status_counts.empty:
         _empty_panel(axis, "No status values found in results.csv.")
@@ -428,6 +466,47 @@ def _plot_status_donut(axis: plt.Axes, results: pd.DataFrame) -> None:
     labels = status_counts.index.tolist()
     values = status_counts.tolist()
     colors = [_status_color(label) for label in labels]
+
+    total_rows = sum(values)
+    if len(labels) == 1:
+        label = labels[0]
+        axis.pie(
+            values,
+            colors=colors,
+            startangle=92,
+            counterclock=False,
+            wedgeprops={"edgecolor": EDGE, "linewidth": 1.2, "width": 0.34},
+        )
+        axis.text(
+            0,
+            0.10,
+            label.replace("_", " "),
+            ha="center",
+            va="center",
+            fontsize=16,
+            color=TEXT,
+        )
+        axis.text(
+            0,
+            -0.12,
+            f"{total_rows} rows",
+            ha="center",
+            va="center",
+            fontsize=11,
+            color=TEXT,
+        )
+        failure_note = _failure_stage_note(results)
+        if failure_note:
+            axis.text(
+                0,
+                -1.12,
+                failure_note,
+                ha="center",
+                va="top",
+                fontsize=10,
+                color=TEXT,
+            )
+        return
 
     wedges, _, autotexts = axis.pie(
         values,
@@ -446,7 +525,7 @@ def _plot_status_donut(axis: plt.Axes, results: pd.DataFrame) -> None:
         bbox_to_anchor=(0.5, 1.05),
         ncol=min(3, len(labels)),
         frameon=False,
-        fontsize=11,
+        fontsize=10,
     )
     for auto_text in autotexts:
         auto_text.set_color(TEXT)
@@ -465,7 +544,7 @@ def _plot_status_donut(axis: plt.Axes, results: pd.DataFrame) -> None:
 
 
 def _plot_latency_distribution(axis: plt.Axes, results: pd.DataFrame) -> None:
-    axis.set_title("response latency distribution", loc="left", pad=12, fontsize=15)
+    axis.set_title("response latency distribution", loc="left", pad=12, fontsize=14)
     latency_series = _numeric_series(results, "latency_response_done_ms")
     if latency_series is None:
         _empty_panel(axis, "No response latency values available.")
@@ -484,21 +563,28 @@ def _plot_latency_distribution(axis: plt.Axes, results: pd.DataFrame) -> None:
             stat="count",
             element="step",
             fill=True,
-            alpha=0.22,
+            alpha=0.18,
             linewidth=1.4,
             color=color,
             ax=axis,
             label=status.replace("_", " "),
         )
+        axis.axvline(
+            subset["latency_response_done_ms"].median(),
+            color=color,
+            linewidth=1.4,
+            linestyle="--",
+            alpha=0.9,
+        )
 
-    axis.set_xlabel("response latency (ms)", fontsize=13)
-    axis.set_ylabel("rows", fontsize=13)
+    axis.set_xlabel("response latency (ms)", fontsize=12)
+    axis.set_ylabel("rows", fontsize=12)
     axis.grid(axis="y", color=GRID, linewidth=0.8, alpha=0.9)
-    axis.legend(frameon=False, fontsize=11)
+    axis.legend(frameon=False, fontsize=10)
 
 
 def _plot_token_latency_scatter(axis: plt.Axes, results: pd.DataFrame) -> None:
-    axis.set_title("tokens vs. response latency", loc="left", pad=12, fontsize=15)
+    axis.set_title("tokens vs. response latency", loc="left", pad=12, fontsize=14)
     tokens = _numeric_series(results, "output_tokens")
     latency = _numeric_series(results, "latency_response_done_ms")
     if tokens is None or latency is None:
@@ -543,18 +629,19 @@ def _plot_token_latency_scatter(axis: plt.Axes, results: pd.DataFrame) -> None:
             )
         )
 
-    axis.set_xlabel("output tokens", fontsize=13)
-    axis.set_ylabel("response latency (ms)", fontsize=13)
+    axis.set_xlabel("output tokens", fontsize=12)
+    axis.set_ylabel("response latency (ms)", fontsize=12)
     axis.grid(axis="y", color=GRID, linewidth=0.8, alpha=0.9)
     axis.grid(axis="x", color=GRID, linewidth=0.5, alpha=0.35)
     if legend_handles:
-        axis.legend(handles=legend_handles, frameon=False, fontsize=11)
+        axis.legend(handles=legend_handles, frameon=False, fontsize=10)
 
 
 def _style_axis(axis: plt.Axes) -> None:
     axis.set_facecolor(AXIS_BG)
     axis.grid(axis="x", visible=False)
     axis.grid(axis="y", color=GRID, linewidth=0.8, alpha=0.9)
+    axis.tick_params(axis="both", labelsize=10, pad=6)
     for spine in axis.spines.values():
         spine.set_color(SPINE)
         spine.set_linewidth(1.0)
@@ -717,7 +804,12 @@ def _metric_label(metric_name: str) -> str:
         label = label[: -len("_mean")]
     if label.endswith("_grade"):
         label = label[: -len("_grade")]
-    return label.replace("_", " ")
+    label = label.replace("_tool_call_args", "_args")
+    label = label.replace("_tool_call", "_tool")
+    words = label.replace("_", " ").split()
+    if len(words) > 3:
+        words = words[:3]
+    return " ".join(words)
 
 
 def _palette_cycle(count: int) -> list[str]:

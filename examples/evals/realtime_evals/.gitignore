@@ -24,3 +24,6 @@ htmlcov/
 
 # uv local cache
 .uv-cache/
+
+# Harness outputs
+*_harness/results/

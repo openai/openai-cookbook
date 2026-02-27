@@ -9,8 +9,8 @@ import streamlit as st
 
 if TYPE_CHECKING:
     from results_viewer.config import (
-        DEFAULT_SCORE_KEYS,
         DEFAULT_LATENCY_SERIES,
+        DEFAULT_SCORE_KEYS,
         DEFAULT_TOKEN_SERIES,
         LATENCY_CHART_KEYS,
         PERCENTILE_LABELS,
@@ -21,8 +21,8 @@ if TYPE_CHECKING:
 else:
     try:
         from .config import (
-            DEFAULT_SCORE_KEYS,
             DEFAULT_LATENCY_SERIES,
+            DEFAULT_SCORE_KEYS,
             DEFAULT_TOKEN_SERIES,
             LATENCY_CHART_KEYS,
             PERCENTILE_LABELS,
@@ -32,8 +32,8 @@ else:
         )
     except ImportError:
         from config import (
-            DEFAULT_SCORE_KEYS,
             DEFAULT_LATENCY_SERIES,
+            DEFAULT_SCORE_KEYS,
             DEFAULT_TOKEN_SERIES,
             LATENCY_CHART_KEYS,
             PERCENTILE_LABELS,
@@ -68,6 +68,10 @@ def relative_directory_labels(paths: list[Path], root: Path) -> list[str]:
 
 def summary_path_for_run(run_directory: Path) -> Path:
     return run_directory / "summary.json"
+
+
+def results_csv_path_for_run(run_directory: Path) -> Path:
+    return run_directory / "results.csv"
 
 
 def coerce_float(value: object) -> float | None:
@@ -110,6 +114,32 @@ def selected_result_directories(harness: str) -> list[Path]:
     ]
 
 
+def selected_run_directory(harness: str) -> Path | None:
+    results_root = HARNESS_RESULTS_DIRS[harness]
+    available_paths = discover_result_directories(results_root)
+    available_labels = relative_directory_labels(available_paths, results_root)
+
+    if not available_paths:
+        st.info("No result directories found for this harness yet.")
+        return None
+
+    current_selection = st.session_state.get(f"selected_run_{harness}")
+    default_index = 0
+    if current_selection in available_labels:
+        default_index = available_labels.index(current_selection)
+
+    selected_label = st.selectbox(
+        "Run",
+        options=available_labels,
+        index=default_index,
+        key=f"selected_run_{harness}",
+    )
+    if not selected_label:
+        return None
+
+    return available_paths[available_labels.index(selected_label)]
+
+
 def load_selected_summaries(
     selected_paths: list[Path], results_root: Path
 ) -> tuple[list[dict[str, object]], list[str]]:
@@ -143,6 +173,19 @@ def load_selected_summaries(
         )
 
     return loaded_summaries, load_errors
+
+
+def load_results_frame(run_directory: Path) -> tuple[pd.DataFrame | None, str | None]:
+    results_csv_path = results_csv_path_for_run(run_directory)
+    if not results_csv_path.exists():
+        return None, "This run is missing `results.csv`."
+
+    try:
+        results = pd.read_csv(results_csv_path, keep_default_na=False)
+    except Exception as exc:
+        return None, f"Could not load `results.csv`: {exc}"
+
+    return results, None
 
 
 def build_score_chart_frame(
@@ -411,7 +454,11 @@ def render_percentile_ladder_chart(data: pd.DataFrame, y_title: str) -> None:
                                 "title": "Run",
                             },
                             "tooltip": [
-                                {"field": "run_label", "type": "nominal", "title": "Run"},
+                                {
+                                    "field": "run_label",
+                                    "type": "nominal",
+                                    "title": "Run",
+                                },
                                 {
                                     "field": "series_label",
                                     "type": "nominal",
@@ -464,7 +511,7 @@ def render_percentile_ladder_chart(data: pd.DataFrame, y_title: str) -> None:
         )
 
 
-def render_config_bar() -> tuple[str, list[Path]]:
+def render_comparison_config_bar() -> tuple[str, list[Path]]:
     with st.container():
         left, middle, right = st.columns([1.2, 1.4, 1])
 
@@ -474,6 +521,7 @@ def render_config_bar() -> tuple[str, list[Path]]:
                 options=["crawl", "walk", "run"],
                 index=0,
                 format_func=lambda value: f"{value}_harness",
+                key="comparison_harness",
             )
 
         with middle:
@@ -485,19 +533,136 @@ def render_config_bar() -> tuple[str, list[Path]]:
     return harness, selected_paths
 
 
-def main() -> None:
-    st.set_page_config(
-        page_title="Realtime Results Viewer",
-        page_icon=":bar_chart:",
-        layout="wide",
-    )
+def render_run_viewer_config_bar() -> tuple[str, Path | None]:
+    with st.container():
+        left, right = st.columns([1.1, 2.2])
 
-    st.title("Realtime Results Viewer")
-    st.caption(
-        "Scaffold only for now: choose a harness and one or more saved result directories."
-    )
+        with left:
+            harness = st.selectbox(
+                "Harness",
+                options=["crawl", "walk", "run"],
+                index=0,
+                format_func=lambda value: f"{value}_harness",
+                key="run_viewer_harness",
+            )
 
-    harness, selected_paths = render_config_bar()
+        with right:
+            selected_path = selected_run_directory(harness)
+
+    return harness, selected_path
+
+
+def read_text_if_present(path: Path | None) -> str | None:
+    if path is None or not path.exists():
+        return None
+    return path.read_text(encoding="utf-8")
+
+
+def audio_bytes_if_present(path: Path | None) -> bytes | None:
+    if path is None or not path.exists():
+        return None
+    return path.read_bytes()
+
+
+def clean_path_value(value: object) -> Path | None:
+    if not isinstance(value, str):
+        return None
+    cleaned_value = value.strip()
+    if not cleaned_value:
+        return None
+    return Path(cleaned_value)
+
+
+def selected_row_indices(selection_state: object) -> list[int]:
+    selection = getattr(selection_state, "selection", None)
+    rows = getattr(selection, "rows", [])
+    if not isinstance(rows, list):
+        return []
+    return [row_index for row_index in rows if isinstance(row_index, int)]
+
+
+def input_audio_path_for_row(run_directory: Path, row: pd.Series) -> Path | None:
+    for column_name in ("input_audio_path", "audio_path"):
+        candidate = clean_path_value(row.get(column_name, ""))
+        if candidate is not None:
+            return candidate
+
+    example_id = str(row.get("example_id", "")).strip()
+    if not example_id:
+        return None
+    candidate = run_directory / "audio" / example_id / "input.wav"
+    if candidate.exists():
+        return candidate
+    return None
+
+
+def output_audio_path_for_row(run_directory: Path, row: pd.Series) -> Path | None:
+    candidate = clean_path_value(row.get("output_audio_path", ""))
+    if candidate is not None:
+        return candidate
+
+    example_id = str(row.get("example_id", "")).strip()
+    if not example_id:
+        return None
+    candidate = run_directory / "audio" / example_id / "output.wav"
+    if candidate.exists():
+        return candidate
+    return None
+
+
+def event_log_path_for_row(run_directory: Path, row: pd.Series) -> Path | None:
+    candidate = clean_path_value(row.get("event_log_path", ""))
+    if candidate is not None:
+        return candidate
+
+    example_id = str(row.get("example_id", "")).strip()
+    if not example_id:
+        return None
+    candidate = run_directory / "events" / f"{example_id}.jsonl"
+    if candidate.exists():
+        return candidate
+    return None
+
+
+def render_example_viewer(run_directory: Path, row: pd.Series) -> None:
+    example_id = str(row.get("example_id", "")).strip() or "Unknown example"
+
+    st.subheader(example_id)
+
+    input_audio_path = input_audio_path_for_row(run_directory, row)
+    output_audio_path = output_audio_path_for_row(run_directory, row)
+    event_log_path = event_log_path_for_row(run_directory, row)
+
+    st.caption("Input audio")
+    input_audio_bytes = audio_bytes_if_present(input_audio_path)
+    if input_audio_bytes is None:
+        st.info("No input audio found for this example.")
+    else:
+        st.audio(input_audio_bytes, format="audio/wav")
+        st.caption(str(input_audio_path))
+
+    st.caption("Output audio")
+    output_audio_bytes = audio_bytes_if_present(output_audio_path)
+    if output_audio_bytes is None:
+        st.info("No output audio found for this example.")
+    else:
+        st.audio(output_audio_bytes, format="audio/wav")
+        st.caption(str(output_audio_path))
+
+    st.caption("Events")
+    event_log_text = read_text_if_present(event_log_path)
+    if event_log_text is None:
+        st.info("No event log found for this example.")
+    else:
+        st.code(event_log_text, language="json")
+        st.caption(str(event_log_path))
+
+
+def render_comparison_view() -> None:
+    st.title("Comparison View")
+    st.caption("Compare metrics across one or more saved realtime eval runs.")
+
+    harness, selected_paths = render_comparison_config_bar()
     results_root = HARNESS_RESULTS_DIRS[harness]
 
     st.divider()
@@ -550,7 +715,76 @@ def main() -> None:
     if summary_table.empty:
         st.info("No table columns are currently selected.")
     else:
-        st.dataframe(summary_table, use_container_width=True)
+        st.dataframe(summary_table, use_container_width=True, hide_index=True)
+
+
+def render_run_viewer() -> None:
+    st.title("Run Viewer")
+    st.caption("Inspect one saved run and drill into example-level artifacts.")
+
+    harness, selected_path = render_run_viewer_config_bar()
+    results_root = HARNESS_RESULTS_DIRS[harness]
+
+    st.divider()
+
+    if selected_path is None:
+        st.info(
+            f"Choose a result directory from `{results_root.relative_to(ROOT_DIR)}` to continue."
+        )
+        return
+
+    if harness == "run":
+        st.info("Not implemented yet for `run_harness`.")
+        return
+
+    results, load_error = load_results_frame(selected_path)
+    if load_error is not None:
+        st.error(load_error)
+        return
+    if results is None or results.empty:
+        st.info("This run does not contain any rows in `results.csv`.")
+        return
+
+    st.caption(f"Viewing `{selected_path.relative_to(ROOT_DIR)}`")
+
+    table_column, detail_column = st.columns([1.45, 1], gap="large")
+
+    with table_column:
+        st.subheader("Examples")
+        selection = st.dataframe(
+            results,
+            use_container_width=True,
+            hide_index=True,
+            on_select="rerun",
+            selection_mode="single-row",
+            key=f"run_viewer_table_{harness}_{selected_path.name}",
+        )
+
+    with detail_column:
+        st.subheader("Example Viewer")
+        selected_rows = selected_row_indices(selection)
+        if not selected_rows:
+            st.info("Select a row in the table to inspect its audio and event log.")
+            return
+
+        selected_row = results.iloc[selected_rows[0]]
+        render_example_viewer(selected_path, selected_row)
+
+
+def main() -> None:
+    st.set_page_config(
+        page_title="Realtime Results Viewer",
+        page_icon=":bar_chart:",
+        layout="wide",
+    )
+
+    navigation = st.navigation(
+        [
+            st.Page(render_comparison_view, title="Comparison View", default=True),
+            st.Page(render_run_viewer, title="Run Viewer"),
+        ]
+    )
+    navigation.run()
 
 
 if __name__ == "__main__":

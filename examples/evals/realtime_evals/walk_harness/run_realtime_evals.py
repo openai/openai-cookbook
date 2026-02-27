@@ -64,7 +64,6 @@ DEFAULT_SAMPLE_RATE_HZ = 8000
 DEFAULT_INPUT_AUDIO_FORMAT = "g711_ulaw"
 DEFAULT_OUTPUT_AUDIO_FORMAT = "pcm16"
 DEFAULT_OUTPUT_SAMPLE_RATE_HZ = 24000
-DEFAULT_MAX_OUTPUT_TOKENS = 512
 
 
 def parse_args() -> argparse.Namespace:
@@ -90,9 +89,6 @@ def parse_args() -> argparse.Namespace:
     )
     parser.add_argument(
         "--output-sample-rate-hz", type=int, default=DEFAULT_OUTPUT_SAMPLE_RATE_HZ
-    )
-    parser.add_argument(
-        "--max-output-tokens", type=int, default=DEFAULT_MAX_OUTPUT_TOKENS
     )
     parser.add_argument(
         "--real-time", action="store_true", help="Send audio at real-time cadence."
@@ -307,7 +303,6 @@ async def run_single_eval(
                     "voice": config["voice"],
                 },
             },
-            "max_output_tokens": config["max_output_tokens"],
         }
         await connection.session.update(
             session=cast(RealtimeSessionCreateRequestParam, session)
@@ -394,7 +389,11 @@ def compute_summary(
     summary: Dict[str, Any] = {
         "total_examples": int(results.shape[0]),
         "failed_examples": failed_examples,
-        "grade_mean": float(results["grade"].mean()) if not results.empty else 0.0,
+        "grade_mean": (
+            float(results["grade"].mean())
+            if "grade" in results.columns and not results.empty
+            else 0.0
+        ),
     }
     if "tool_call_correctness" in results.columns and not results.empty:
         summary["tool_call_correctness_mean"] = float(
@@ -476,7 +475,6 @@ async def run_evals() -> None:
         "input_audio_format": args.input_audio_format,
         "output_audio_format": args.output_audio_format,
         "output_sample_rate_hz": args.output_sample_rate_hz,
-        "max_output_tokens": args.max_output_tokens,
         "real_time": args.real_time,
         "voice": args.voice,
     }
@@ -504,7 +502,15 @@ async def run_evals() -> None:
             result = build_failed_result(row, args.data_csv, run_events_dir, error_info)
         results.append(result)
 
-    results_df = pd.DataFrame([result.to_csv_row() for result in results])
+    results_df = pd.DataFrame(
+        [
+            result.to_csv_row(
+                include_tool_call_columns=True,
+                include_tool_call_arg_columns=True,
+            )
+            for result in results
+        ]
+    )
     results_df = order_result_columns(results_df)
     results_csv_path = run_dir / "results.csv"
     results_df.to_csv(results_csv_path, index=False)
@@ -520,7 +526,6 @@ async def run_evals() -> None:
             input_audio_format=args.input_audio_format,
             output_audio_format=args.output_audio_format,
             output_sample_rate_hz=args.output_sample_rate_hz,
-            max_output_tokens=args.max_output_tokens,
             real_time=args.real_time,
             data_csv=args.data_csv,
             system_prompt_file=args.system_prompt_file,

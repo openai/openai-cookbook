@@ -273,6 +273,34 @@ def _tool_call_arguments(
 def expected_args_subset(
     expected_args: Dict[str, Any], actual_args: Dict[str, Any]
 ) -> bool:
+    def values_match(expected_value: Any, actual_value: Any) -> bool:
+        if isinstance(expected_value, dict):
+            if not isinstance(actual_value, dict):
+                return False
+            return expected_args_subset(expected_value, actual_value)
+
+        if isinstance(expected_value, list):
+            if not isinstance(actual_value, list):
+                return False
+            if len(expected_value) > len(actual_value):
+                return False
+            return all(
+                values_match(expected_item, actual_item)
+                for expected_item, actual_item in zip(expected_value, actual_value)
+            )
+
+        if isinstance(expected_value, bool) or isinstance(actual_value, bool):
+            return expected_value is actual_value
+
+        if isinstance(expected_value, (int, float)) and isinstance(
+            actual_value, (int, float)
+        ):
+            return expected_value == actual_value
+
+        expected_text = str(expected_value)
+        actual_text = str(actual_value)
+        return normalize_text(expected_text) == normalize_text(actual_text)
+
     for key, expected_value in expected_args.items():
         if key not in actual_args:
             return False
@@ -287,9 +315,8 @@ def expected_args_subset(
                 str(actual_value)
             ):
                 return False
-        else:
-            if normalize_text(str(expected_value)) != normalize_text(str(actual_value)):
-                return False
+        elif not values_match(expected_value, actual_value):
+            return False
     return True
 
 

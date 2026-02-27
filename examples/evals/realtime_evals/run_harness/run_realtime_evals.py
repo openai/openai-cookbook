@@ -344,6 +344,31 @@ def run_llm_grade(
     }
 
 
+def apply_turn_level_tool_grades(
+    row_data: RunTurnResult,
+    tool_call_grader_ids: List[str],
+    tool_call_args_grader_ids: List[str],
+) -> None:
+    for grader_id in tool_call_grader_ids:
+        row_data.set_grader_result(
+            grader_id,
+            row_data.tool_call_grade.tool_call_correctness,
+            "",
+        )
+    for grader_id in tool_call_args_grader_ids:
+        row_data.set_grader_result(
+            grader_id,
+            row_data.tool_call_grade.tool_call_arg_correctness,
+            "",
+        )
+
+
+def trace_grade_row_indices(row_indices: List[int]) -> List[int]:
+    if not row_indices:
+        return []
+    return [row_indices[-1]]
+
+
 def execute_grade_job(job: Dict[str, Any]) -> Dict[str, Any]:
     client = OpenAI()
     grade_result = run_llm_grade(client, job["model"], job["criteria"], job["context"])
@@ -532,9 +557,6 @@ async def run_simulation(
     results_rows: List[RunTurnResult] = []
     turn_grade_requests: List[Dict[str, Any]] = []
     trace_grade_requests: List[Dict[str, Any]] = []
-    any_tool_call_correctness = 0
-    any_tool_call_arg_correctness = 0
-    tool_call_correctness_flags: List[int] = []
 
     assistant_voice = assistant_config.get("voice", "")
     simulator_voice = simulator_config.get("voice", "")
@@ -681,14 +703,6 @@ async def run_simulation(
                     tool_calls,
                 )
                 tool_call_grade = ToolCallGrade.from_mapping(tool_call_grade_data)
-                # Track whether any turn matched the expected tool behavior.
-                tool_call_correctness_flags.append(
-                    tool_call_grade.tool_call_correctness
-                )
-                if tool_call_grade.tool_call_correctness == 1:
-                    any_tool_call_correctness = 1
-                if tool_call_grade.tool_call_arg_correctness == 1:
-                    any_tool_call_arg_correctness = 1
 
                 assistant_audio_path = (
                     run_audio_dir / f"turn_{turn_index:02d}_assistant.wav"
@@ -770,6 +784,11 @@ async def run_simulation(
                         output_text_tokens=output_text_tokens,
                     ),
                 )
+                apply_turn_level_tool_grades(
+                    row_data,
+                    tool_call_grader_ids,
+                    tool_call_args_grader_ids,
+                )
                 results_rows.append(row_data)
                 for grader in turn_level_graders:
                     if grader.get("type") != "llm_as_judge":
@@ -790,20 +809,6 @@ async def run_simulation(
     )
 
     transcript_path.write_text("\n".join(transcript_lines), encoding="utf-8")
-    if not expected_tool_name and tool_call_correctness_flags:
-        if all(flag == 1 for flag in tool_call_correctness_flags):
-            any_tool_call_correctness = 1
-            any_tool_call_arg_correctness = 1
-        else:
-            any_tool_call_correctness = 0
-            any_tool_call_arg_correctness = 0
-
-    if tool_call_grader_ids or tool_call_args_grader_ids:
-        for row_data in results_rows:
-            for grader_id in tool_call_grader_ids:
-                row_data.set_grader_result(grader_id, any_tool_call_correctness, "")
-            for grader_id in tool_call_args_grader_ids:
-                row_data.set_grader_result(grader_id, any_tool_call_arg_correctness, "")
 
     for grader in trace_level_graders:
         if grader.get("type") != "llm_as_judge":
@@ -823,6 +828,8 @@ async def run_simulation(
         turn_grade_requests=turn_grade_requests,
         trace_grade_requests=trace_grade_requests,
         simulation_id=simulation_id,
+        include_tool_call_columns=bool(tool_call_grader_ids),
+        include_tool_call_arg_columns=bool(tool_call_args_grader_ids),
     )
 
 
@@ -848,6 +855,8 @@ async def run_evals() -> None:
     turn_grade_requests: List[Dict[str, Any]] = []
     trace_grade_requests: List[Dict[str, Any]] = []
     simulation_row_indices: Dict[str, List[int]] = {}
+    include_tool_call_columns = False
+    include_tool_call_arg_columns = False
 
     total_simulations = int(dataset.shape[0])
     print(f"Running run harness: {total_simulations} simulations -> {run_dir}")
@@ -863,6 +872,13 @@ async def run_evals() -> None:
             )
         rows = simulation_result.rows
         simulation_id = simulation_result.simulation_id
+        include_tool_call_columns = (
+            include_tool_call_columns or simulation_result.include_tool_call_columns
+        )
+        include_tool_call_arg_columns = (
+            include_tool_call_arg_columns
+            or simulation_result.include_tool_call_arg_columns
+        )
         offset = len(all_rows)
         all_rows.extend(rows)
         simulation_row_indices[simulation_id] = list(range(offset, offset + len(rows)))
@@ -880,7 +896,9 @@ async def run_evals() -> None:
             )
 
         for request in simulation_result.trace_grade_requests:
-            row_indices = simulation_row_indices.get(request["simulation_id"], [])
+            row_indices = trace_grade_row_indices(
+                simulation_row_indices.get(request["simulation_id"], [])
+            )
             trace_grade_requests.append(
                 {
                     "row_indices": row_indices,
@@ -903,7 +921,15 @@ async def run_evals() -> None:
                         result["rationale"],
                     )
 
-    results_df = pd.DataFrame([row.to_csv_row() for row in all_rows])
+    results_df = pd.DataFrame(
+        [
+            row.to_csv_row(
+                include_tool_call_columns=include_tool_call_columns,
+                include_tool_call_arg_columns=include_tool_call_arg_columns,
+            )
+            for row in all_rows
+        ]
+    )
     results_df = order_result_columns(results_df)
     results_csv_path = run_dir / "results.csv"
     results_df.to_csv(results_csv_path, index=False)

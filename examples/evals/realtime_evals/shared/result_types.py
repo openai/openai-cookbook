@@ -1,6 +1,4 @@
-"""Structured dataclasses for crawl harness outputs."""
-
-from __future__ import annotations
+"""Structured dataclasses for crawl, walk, and run harness outputs."""
 
 import json
 from dataclasses import dataclass, field
@@ -249,12 +247,36 @@ class CrawlEvalResult:
             ),
         )
 
-    def to_csv_row(self) -> dict[str, Any]:
-        return {
+    def _tool_grade_csv_fields(
+        self,
+        *,
+        include_tool_call_columns: bool,
+        include_tool_call_arg_columns: bool,
+    ) -> dict[str, Any]:
+        row: dict[str, Any] = {}
+        if include_tool_call_columns:
+            row["gt_tool_call"] = self.expected_tool_call.name
+            row["pred_tool_call"] = self.tool_call_grade.pred_tool_call
+            row["tool_call_correctness"] = self.tool_call_grade.tool_call_correctness
+        if include_tool_call_arg_columns:
+            row["gt_tool_call_arg"] = self.expected_tool_call.arguments_json
+            row["pred_tool_call_arg"] = self.tool_call_grade.pred_tool_call_arg
+            row["tool_call_arg_correctness"] = (
+                self.tool_call_grade.tool_call_arg_correctness
+            )
+        if include_tool_call_columns and include_tool_call_arg_columns:
+            row["grade"] = self.tool_call_grade.grade
+        return row
+
+    def to_csv_row(
+        self,
+        *,
+        include_tool_call_columns: bool = True,
+        include_tool_call_arg_columns: bool = True,
+    ) -> dict[str, Any]:
+        row = {
             "example_id": self.example_id,
             "user_text": self.user_text,
-            "gt_tool_call": self.expected_tool_call.name,
-            "gt_tool_call_arg": self.expected_tool_call.arguments_json,
             "input_audio_path": str(self.artifact_paths.input_audio_path),
             "assistant_text": self.assistant_text,
             "output_audio_path": (
@@ -266,11 +288,6 @@ class CrawlEvalResult:
             "tool_calls": json.dumps(
                 [tool_call.to_dict() for tool_call in self.tool_calls]
             ),
-            "pred_tool_call": self.tool_call_grade.pred_tool_call,
-            "pred_tool_call_arg": self.tool_call_grade.pred_tool_call_arg,
-            "tool_call_correctness": self.tool_call_grade.tool_call_correctness,
-            "tool_call_arg_correctness": self.tool_call_grade.tool_call_arg_correctness,
-            "grade": self.tool_call_grade.grade,
             "latency_first_audio_ms": self.latencies.first_audio_ms,
             "latency_first_text_ms": self.latencies.first_text_ms,
             "latency_response_done_ms": self.latencies.response_done_ms,
@@ -282,6 +299,13 @@ class CrawlEvalResult:
             "error_type": self.error_info.error_type,
             "error_message": self.error_info.error_message,
         }
+        row.update(
+            self._tool_grade_csv_fields(
+                include_tool_call_columns=include_tool_call_columns,
+                include_tool_call_arg_columns=include_tool_call_arg_columns,
+            )
+        )
+        return row
 
 
 @dataclass(slots=True)
@@ -299,12 +323,36 @@ class WalkEvalResult:
     output_tokens: OutputTokenUsage
     error_info: EvalErrorInfo = EvalErrorInfo()
 
-    def to_csv_row(self) -> dict[str, Any]:
-        return {
+    def _tool_grade_csv_fields(
+        self,
+        *,
+        include_tool_call_columns: bool,
+        include_tool_call_arg_columns: bool,
+    ) -> dict[str, Any]:
+        row: dict[str, Any] = {}
+        if include_tool_call_columns:
+            row["gt_tool_call"] = self.expected_tool_call.name
+            row["pred_tool_call"] = self.tool_call_grade.pred_tool_call
+            row["tool_call_correctness"] = self.tool_call_grade.tool_call_correctness
+        if include_tool_call_arg_columns:
+            row["gt_tool_call_arg"] = self.expected_tool_call.arguments_json
+            row["pred_tool_call_arg"] = self.tool_call_grade.pred_tool_call_arg
+            row["tool_call_arg_correctness"] = (
+                self.tool_call_grade.tool_call_arg_correctness
+            )
+        if include_tool_call_columns and include_tool_call_arg_columns:
+            row["grade"] = self.tool_call_grade.grade
+        return row
+
+    def to_csv_row(
+        self,
+        *,
+        include_tool_call_columns: bool = True,
+        include_tool_call_arg_columns: bool = True,
+    ) -> dict[str, Any]:
+        row = {
             "example_id": self.example_id,
             "user_text": self.user_text,
-            "gt_tool_call": self.expected_tool_call.name,
-            "gt_tool_call_arg": self.expected_tool_call.arguments_json,
             "audio_path": str(self.audio_path),
             "assistant_text": self.assistant_text,
             "output_audio_path": (
@@ -316,11 +364,6 @@ class WalkEvalResult:
             "tool_calls": json.dumps(
                 [tool_call.to_dict() for tool_call in self.tool_calls]
             ),
-            "pred_tool_call": self.tool_call_grade.pred_tool_call,
-            "pred_tool_call_arg": self.tool_call_grade.pred_tool_call_arg,
-            "tool_call_correctness": self.tool_call_grade.tool_call_correctness,
-            "tool_call_arg_correctness": self.tool_call_grade.tool_call_arg_correctness,
-            "grade": self.tool_call_grade.grade,
             "latency_first_audio_ms": self.latencies.first_audio_ms,
             "latency_first_text_ms": self.latencies.first_text_ms,
             "latency_response_done_ms": self.latencies.response_done_ms,
@@ -332,6 +375,13 @@ class WalkEvalResult:
             "error_type": self.error_info.error_type,
             "error_message": self.error_info.error_message,
         }
+        row.update(
+            self._tool_grade_csv_fields(
+                include_tool_call_columns=include_tool_call_columns,
+                include_tool_call_arg_columns=include_tool_call_arg_columns,
+            )
+        )
+        return row
 
 
 @dataclass(slots=True, frozen=True)
@@ -491,7 +541,6 @@ class WalkEvalRunConfig:
     input_audio_format: str
     output_audio_format: str
     output_sample_rate_hz: int
-    max_output_tokens: int
     real_time: bool
     data_csv: Path
     system_prompt_file: Path
@@ -507,7 +556,6 @@ class WalkEvalRunConfig:
             "input_audio_format": self.input_audio_format,
             "output_audio_format": self.output_audio_format,
             "output_sample_rate_hz": self.output_sample_rate_hz,
-            "max_output_tokens": self.max_output_tokens,
             "real_time": self.real_time,
             "data_csv": str(self.data_csv),
             "system_prompt_file": str(self.system_prompt_file),
@@ -621,7 +669,31 @@ class RunTurnResult:
         self.extra_grades[grader_id] = grade
         self.extra_rationales[grader_id] = rationale
 
-    def to_csv_row(self) -> dict[str, Any]:
+    def _tool_grade_csv_fields(
+        self,
+        *,
+        include_tool_call_columns: bool,
+        include_tool_call_arg_columns: bool,
+    ) -> dict[str, Any]:
+        row: dict[str, Any] = {}
+        if include_tool_call_columns:
+            row["gt_tool_call"] = self.expected_tool_call.name
+            row["pred_tool_call"] = self.tool_call_grade.pred_tool_call
+            row["tool_call_correctness"] = self.tool_call_grade.tool_call_correctness
+        if include_tool_call_arg_columns:
+            row["gt_tool_call_arg"] = self.expected_tool_call.arguments_json
+            row["pred_tool_call_arg"] = self.tool_call_grade.pred_tool_call_arg
+            row["tool_call_arg_correctness"] = (
+                self.tool_call_grade.tool_call_arg_correctness
+            )
+        return row
+
+    def to_csv_row(
+        self,
+        *,
+        include_tool_call_columns: bool = True,
+        include_tool_call_arg_columns: bool = True,
+    ) -> dict[str, Any]:
         row = {
             "simulation_id": self.simulation_id,
             "assistant_model": self.assistant_model,
@@ -629,18 +701,12 @@ class RunTurnResult:
             "turn_index": self.turn_index,
             "user_text": self.user_text,
             "assistant_text": self.assistant_text,
-            "gt_tool_call": self.expected_tool_call.name,
-            "gt_tool_call_arg": self.expected_tool_call.arguments_json,
             "tool_calls": json.dumps(
                 [tool_call.to_dict() for tool_call in self.tool_calls]
             ),
             "tool_outputs": json.dumps(
                 [tool_output.to_dict() for tool_output in self.tool_outputs]
             ),
-            "pred_tool_call": self.tool_call_grade.pred_tool_call,
-            "pred_tool_call_arg": self.tool_call_grade.pred_tool_call_arg,
-            "tool_call_correctness": self.tool_call_grade.tool_call_correctness,
-            "tool_call_arg_correctness": self.tool_call_grade.tool_call_arg_correctness,
             "user_audio_path": str(self.artifact_paths.user_audio_path),
             "assistant_audio_path": str(self.artifact_paths.assistant_audio_path),
             "event_log_path": str(self.artifact_paths.event_log_path),
@@ -655,6 +721,12 @@ class RunTurnResult:
             "error_type": self.error_info.error_type,
             "error_message": self.error_info.error_message,
         }
+        row.update(
+            self._tool_grade_csv_fields(
+                include_tool_call_columns=include_tool_call_columns,
+                include_tool_call_arg_columns=include_tool_call_arg_columns,
+            )
+        )
         for grader_id, grade in self.extra_grades.items():
             row[f"{grader_id}_grade"] = grade
             row[f"{grader_id}_rationale"] = self.extra_rationales.get(grader_id, "")
@@ -667,6 +739,8 @@ class RunSimulationResult:
     turn_grade_requests: list[dict[str, Any]]
     trace_grade_requests: list[dict[str, Any]]
     simulation_id: str
+    include_tool_call_columns: bool = False
+    include_tool_call_arg_columns: bool = False
 
 
 @dataclass(slots=True, frozen=True)

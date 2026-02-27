@@ -92,9 +92,16 @@ Each harness writes into its own `results/` folder:
 
 - `results/<run_id>/results.csv`: per-example outputs and grades
 - `results/<run_id>/summary.json`: aggregate metrics
+- `results/<run_id>/plots/*.png`: warm-editorial summary charts for scores, latency, tokens, and run shape
 - `results/<run_id>/events/*.jsonl`: full realtime event stream per datapoint
 
 The shared typed representation of these artifacts for the crawl, walk, and run harnesses lives in `shared/result_types.py`.
+
+To render charts for an existing run after the fact:
+
+```bash
+uv run python plot_eval_results.py --run-dir run_harness/results/<run_id>
+```
 
 ## Common CLI flags
 
@@ -104,5 +111,6 @@ All harnesses share a core set of flags so you can switch between them easily:
 - `--model` (assistant under test), `--system-prompt-file`, `--tools-file`
 - `--chunk-ms`, `--sample-rate-hz`, `--real-time`
 - `--max-examples` (quick smoke tests)
+- `--skip-plots` (skip post-run PNG chart generation)
 
 Run harness adds multi-turn and simulator-specific flags (see its README).

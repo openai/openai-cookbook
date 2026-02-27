@@ -11,6 +11,7 @@ manually (VAD off), and records responses, tool calls, and latency metrics.
 - Commits the input buffer explicitly to avoid VAD variability.
 - Captures transcript deltas, audio deltas, tool calls, and completion events.
 - Writes `results.csv` and `summary.json` with accuracy and latency stats.
+- Renders styled PNG plots under `results/<run>/plots/` by default.
 - Stores a JSONL stream of all realtime events per example under `results/<run>/events/`.
 
 ## Files
@@ -61,6 +62,7 @@ python walk_harness/run_realtime_evals.py --max-examples 2
 - Change the model or voice via CLI flags (`--model`, `--voice`).
 - Override the system prompt and tools with `--system-prompt-file` and `--tools-file`.
 - Update chunking and cadence with `--chunk-ms` and `--real-time`.
+- Use `--skip-plots` if you only want CSV/JSON artifacts.
 - Swap datasets with `--data-csv` (ensure it includes `audio_path`).
 - Use a different audio format only if the Realtime API supports it. The default
   is `g711_ulaw` at 8 kHz to match the saved WAV files. Output audio is stored

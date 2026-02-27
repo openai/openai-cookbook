@@ -357,8 +357,14 @@ def execute_grade_job(job: Dict[str, Any]) -> Dict[str, Any]:
 def compute_summary(
     results: pd.DataFrame, config: RunEvalRunConfig
 ) -> RunEvalRunSummary:
+    failed_simulations = 0
+    if "status" in results.columns and "simulation_id" in results.columns:
+        failed_simulations = int(
+            results.loc[results["status"] == "failed", "simulation_id"].nunique()
+        )
     summary: Dict[str, Any] = {
         "total_rows": int(results.shape[0]),
+        "failed_simulations": failed_simulations,
     }
 
     add_grade_means(summary, results)

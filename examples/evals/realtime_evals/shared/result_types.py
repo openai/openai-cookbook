@@ -405,6 +405,7 @@ class CrawlEvalRunConfig:
 @dataclass(slots=True, frozen=True)
 class CrawlEvalRunSummary:
     total_examples: int
+    failed_examples: int
     grade_mean: float
     config: CrawlEvalRunConfig
     tool_call_correctness_mean: float | None = None
@@ -422,6 +423,7 @@ class CrawlEvalRunSummary:
     ) -> "CrawlEvalRunSummary":
         return cls(
             total_examples=int(summary.get("total_examples", 0)),
+            failed_examples=int(summary.get("failed_examples", 0)),
             grade_mean=float(summary.get("grade_mean", 0.0)),
             config=config,
             tool_call_correctness_mean=_coerce_optional_float(
@@ -453,6 +455,7 @@ class CrawlEvalRunSummary:
     def to_flat_summary(self) -> dict[str, Any]:
         summary: dict[str, Any] = {
             "total_examples": self.total_examples,
+            "failed_examples": self.failed_examples,
             "grade_mean": self.grade_mean,
         }
         if self.tool_call_correctness_mean is not None:
@@ -515,6 +518,7 @@ class WalkEvalRunConfig:
 @dataclass(slots=True, frozen=True)
 class WalkEvalRunSummary:
     total_examples: int
+    failed_examples: int
     grade_mean: float
     config: WalkEvalRunConfig
     tool_call_correctness_mean: float | None = None
@@ -532,6 +536,7 @@ class WalkEvalRunSummary:
     ) -> "WalkEvalRunSummary":
         return cls(
             total_examples=int(summary.get("total_examples", 0)),
+            failed_examples=int(summary.get("failed_examples", 0)),
             grade_mean=float(summary.get("grade_mean", 0.0)),
             config=config,
             tool_call_correctness_mean=_coerce_optional_float(
@@ -563,6 +568,7 @@ class WalkEvalRunSummary:
     def to_flat_summary(self) -> dict[str, Any]:
         summary: dict[str, Any] = {
             "total_examples": self.total_examples,
+            "failed_examples": self.failed_examples,
             "grade_mean": self.grade_mean,
         }
         if self.tool_call_correctness_mean is not None:
@@ -687,6 +693,7 @@ class RunEvalRunConfig:
 @dataclass(slots=True, frozen=True)
 class RunEvalRunSummary:
     total_rows: int
+    failed_simulations: int
     grade_means: dict[str, float]
     config: RunEvalRunConfig
     latency_first_audio_ms: NumericMetricSummary | None = None
@@ -707,6 +714,7 @@ class RunEvalRunSummary:
         }
         return cls(
             total_rows=int(summary.get("total_rows", 0)),
+            failed_simulations=int(summary.get("failed_simulations", 0)),
             grade_means=grade_means,
             config=config,
             latency_first_audio_ms=NumericMetricSummary.from_flat_summary(
@@ -730,7 +738,10 @@ class RunEvalRunSummary:
         )
 
     def to_flat_summary(self) -> dict[str, Any]:
-        summary: dict[str, Any] = {"total_rows": self.total_rows}
+        summary: dict[str, Any] = {
+            "total_rows": self.total_rows,
+            "failed_simulations": self.failed_simulations,
+        }
         summary.update(self.grade_means)
         for prefix, metric in {
             "latency_first_audio_ms": self.latency_first_audio_ms,

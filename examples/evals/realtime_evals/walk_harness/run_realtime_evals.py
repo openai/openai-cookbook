@@ -388,8 +388,12 @@ async def run_single_eval(
 def compute_summary(
     results: pd.DataFrame, config: WalkEvalRunConfig
 ) -> WalkEvalRunSummary:
+    failed_examples = 0
+    if "status" in results.columns:
+        failed_examples = int((results["status"] == "failed").sum())
     summary: Dict[str, Any] = {
         "total_examples": int(results.shape[0]),
+        "failed_examples": failed_examples,
         "grade_mean": float(results["grade"].mean()) if not results.empty else 0.0,
     }
     if "tool_call_correctness" in results.columns and not results.empty:

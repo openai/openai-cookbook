@@ -18,6 +18,7 @@ if TYPE_CHECKING:
         SUMMARY_TABLE_BASE_COLUMNS,
         TOKEN_CHART_KEYS,
     )
+    from results_viewer.ui import load_css
 else:
     try:
         from .config import (
@@ -30,6 +31,7 @@ else:
             SUMMARY_TABLE_BASE_COLUMNS,
             TOKEN_CHART_KEYS,
         )
+        from .ui import load_css
     except ImportError:
         from config import (
             DEFAULT_LATENCY_SERIES,
@@ -41,6 +43,7 @@ else:
             SUMMARY_TABLE_BASE_COLUMNS,
             TOKEN_CHART_KEYS,
         )
+        from ui import load_css
 
 ROOT_DIR = Path(__file__).resolve().parents[1]
 HARNESS_RESULTS_DIRS = {
@@ -344,6 +347,21 @@ def render_grouped_bar_chart(data: pd.DataFrame) -> None:
     st.vega_lite_chart(
         data,
         {
+            "config": {
+                "view": {"stroke": None},
+                "background": "transparent",
+                "axis": {
+                    "labelColor": "#eef4ff",
+                    "titleColor": "#eef4ff",
+                    "domainColor": "rgba(167, 184, 218, 0.18)",
+                    "gridColor": "rgba(167, 184, 218, 0.12)",
+                    "tickColor": "rgba(167, 184, 218, 0.18)",
+                },
+                "legend": {
+                    "labelColor": "#eef4ff",
+                    "titleColor": "#eef4ff",
+                },
+            },
             "layer": [
                 {
                     "mark": {
@@ -407,7 +425,7 @@ def render_grouped_bar_chart(data: pd.DataFrame) -> None:
                             "format": ".3f",
                         },
                         "color": {
-                            "value": "#1f2937",
+                            "value": "#eef4ff",
                         },
                     },
                 },
@@ -428,6 +446,21 @@ def render_percentile_ladder_chart(data: pd.DataFrame, y_title: str) -> None:
         st.vega_lite_chart(
             series_data,
             {
+                "config": {
+                    "view": {"stroke": None},
+                    "background": "transparent",
+                    "axis": {
+                        "labelColor": "#eef4ff",
+                        "titleColor": "#eef4ff",
+                        "domainColor": "rgba(167, 184, 218, 0.18)",
+                        "gridColor": "rgba(167, 184, 218, 0.12)",
+                        "tickColor": "rgba(167, 184, 218, 0.18)",
+                    },
+                    "legend": {
+                        "labelColor": "#eef4ff",
+                        "titleColor": "#eef4ff",
+                    },
+                },
                 "layer": [
                     {
                         "mark": {
@@ -501,7 +534,7 @@ def render_percentile_ladder_chart(data: pd.DataFrame, y_title: str) -> None:
                                 "type": "quantitative",
                                 "format": ".2f",
                             },
-                            "color": {"value": "#1f2937"},
+                            "color": {"value": "#eef4ff"},
                         },
                     },
                 ],
@@ -690,21 +723,6 @@ def render_comparison_view() -> None:
         harness, summaries
     )
 
-    st.subheader("Overall Scores")
-    render_grouped_bar_chart(build_score_chart_frame(summaries, score_keys))
-
-    st.subheader("Latency")
-    render_percentile_ladder_chart(
-        build_percentile_chart_frame(summaries, latency_config),
-        y_title="Latency (ms)",
-    )
-
-    st.subheader("Token Consumption")
-    render_percentile_ladder_chart(
-        build_percentile_chart_frame(summaries, token_config),
-        y_title="Tokens",
-    )
-
     st.subheader("Summary Table")
     summary_table = build_summary_table(
         summaries,
@@ -717,6 +735,21 @@ def render_comparison_view() -> None:
     else:
         st.dataframe(summary_table, use_container_width=True, hide_index=True)
 
+
+    st.subheader("Overall Scores (higher is better)")
+    render_grouped_bar_chart(build_score_chart_frame(summaries, score_keys))
+
+    st.subheader("Latency (lower is better)")
+    render_percentile_ladder_chart(
+        build_percentile_chart_frame(summaries, latency_config),
+        y_title="Latency (ms)",
+    )
+
+    st.subheader("Token Consumption (lower is better)")
+    render_percentile_ladder_chart(
+        build_percentile_chart_frame(summaries, token_config),
+        y_title="Tokens",
+    )
 
 def render_run_viewer() -> None:
     st.title("Run Viewer")
@@ -777,6 +810,7 @@ def main() -> None:
         page_icon=":bar_chart:",
         layout="wide",
     )
+    load_css()
 
     navigation = st.navigation(
         [

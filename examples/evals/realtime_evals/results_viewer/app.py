@@ -87,13 +87,53 @@ def coerce_float(value: object) -> float | None:
     return None
 
 
+def _set_results_selection(
+    selection_key: str, select_all_key: str, available_labels: list[str]
+) -> None:
+    if st.session_state.get(select_all_key):
+        st.session_state[selection_key] = available_labels
+        return
+
+    current_selection = st.session_state.get(selection_key, [])
+    st.session_state[selection_key] = [
+        label for label in current_selection if label in available_labels
+    ]
+
+
+def _sync_select_all_toggle(
+    selection_key: str, select_all_key: str, available_labels: list[str]
+) -> None:
+    selected_labels = st.session_state.get(selection_key, [])
+    st.session_state[select_all_key] = bool(available_labels) and len(
+        selected_labels
+    ) == len(available_labels)
+
+
 def selected_result_directories(harness: str) -> list[Path]:
     results_root = HARNESS_RESULTS_DIRS[harness]
     available_paths = discover_result_directories(results_root)
     available_labels = relative_directory_labels(available_paths, results_root)
 
-    current_selection = st.session_state.get(f"selected_results_{harness}", [])
+    selection_key = f"selected_results_{harness}"
+    select_all_key = f"selected_results_all_{harness}"
+
+    current_selection = st.session_state.get(selection_key, [])
     valid_defaults = [label for label in current_selection if label in available_labels]
+    all_selected = bool(available_labels) and len(valid_defaults) == len(available_labels)
+
+    if selection_key not in st.session_state:
+        st.session_state[selection_key] = valid_defaults
+    if select_all_key not in st.session_state:
+        st.session_state[select_all_key] = all_selected
+
+    if st.session_state.get(select_all_key) and st.session_state.get(
+        selection_key
+    ) != available_labels:
+        st.session_state[selection_key] = available_labels
+    elif not st.session_state.get(select_all_key) and st.session_state.get(
+        selection_key
+    ) != valid_defaults:
+        st.session_state[selection_key] = valid_defaults
 
     with st.popover("Results browser"):
         st.caption(f"Browsing `{results_root.relative_to(ROOT_DIR)}`")
@@ -101,15 +141,22 @@ def selected_result_directories(harness: str) -> list[Path]:
             st.info("No result directories found for this harness yet.")
             return []
 
+        st.checkbox(
+            "Select all",
+            key=select_all_key,
+            on_change=_set_results_selection,
+            args=(selection_key, select_all_key, available_labels),
+        )
         st.multiselect(
             "Select one or more result directories",
             options=available_labels,
-            default=valid_defaults,
-            key=f"selected_results_{harness}",
+            key=selection_key,
             placeholder="Choose saved runs",
+            on_change=_sync_select_all_toggle,
+            args=(selection_key, select_all_key, available_labels),
         )
 
-    selected_set = set(st.session_state.get(f"selected_results_{harness}", []))
+    selected_set = set(st.session_state.get(selection_key, []))
     return [
         path
         for path, label in zip(available_paths, available_labels, strict=False)
@@ -546,7 +593,7 @@ def render_percentile_ladder_chart(data: pd.DataFrame, y_title: str) -> None:
 
 def render_comparison_config_bar() -> tuple[str, list[Path]]:
     with st.container():
-        left, middle, right = st.columns([1.2, 1.4, 1])
+        left, right = st.columns([1.6, 1])
 
         with left:
             harness = st.selectbox(
@@ -557,11 +604,11 @@ def render_comparison_config_bar() -> tuple[str, list[Path]]:
                 key="comparison_harness",
             )
 
-        with middle:
-            selected_paths = selected_result_directories(harness)
-
         with right:
-            st.metric("Selected runs", len(selected_paths))
+            selected_runs_metric = st.empty()
+
+        selected_paths = selected_result_directories(harness)
+        selected_runs_metric.metric("Selected runs", len(selected_paths))
 
     return harness, selected_paths
 
@@ -604,6 +651,10 @@ def clean_path_value(value: object) -> Path | None:
     if not cleaned_value:
         return None
     return Path(cleaned_value)
+
+
+def simulation_id_for_row(row: pd.Series) -> str:
+    return str(row.get("simulation_id", "")).strip()
 
 
 def selected_row_indices(selection_state: object) -> list[int]:
@@ -657,6 +708,59 @@ def event_log_path_for_row(run_directory: Path, row: pd.Series) -> Path | None:
     return None
 
 
+def simulation_transcript_path_for_row(run_directory: Path, row: pd.Series) -> Path | None:
+    simulation_id = simulation_id_for_row(row)
+    if not simulation_id:
+        return None
+
+    candidate = run_directory / "conversations" / f"{simulation_id}.txt"
+    if candidate.exists():
+        return candidate
+    return None
+
+
+def simulation_event_log_path_for_row(run_directory: Path, row: pd.Series) -> Path | None:
+    candidate = clean_path_value(row.get("event_log_path", ""))
+    if candidate is not None:
+        return candidate
+
+    simulation_id = simulation_id_for_row(row)
+    if not simulation_id:
+        return None
+
+    candidate = run_directory / "events" / f"{simulation_id}.jsonl"
+    if candidate.exists():
+        return candidate
+    return None
+
+
+def _audio_sort_key(path: Path) -> tuple[int, int, str]:
+    stem_parts = path.stem.split("_")
+    turn_index = -1
+    role_order = 2
+
+    if len(stem_parts) >= 3 and stem_parts[0] == "turn":
+        try:
+            turn_index = int(stem_parts[1])
+        except ValueError:
+            turn_index = -1
+        role_order = {"user": 0, "assistant": 1}.get(stem_parts[2], 2)
+
+    return turn_index, role_order, path.name
+
+
+def simulation_audio_paths_for_row(run_directory: Path, row: pd.Series) -> list[Path]:
+    simulation_id = simulation_id_for_row(row)
+    if not simulation_id:
+        return []
+
+    audio_dir = run_directory / "audio" / simulation_id
+    if not audio_dir.exists():
+        return []
+
+    return sorted(audio_dir.glob("*.wav"), key=_audio_sort_key)
+
+
 def render_example_viewer(run_directory: Path, row: pd.Series) -> None:
     example_id = str(row.get("example_id", "")).strip() or "Unknown example"
 
@@ -689,6 +793,52 @@ def render_example_viewer(run_directory: Path, row: pd.Series) -> None:
     else:
         st.code(event_log_text, language="json")
         st.caption(str(event_log_path))
+
+
+def render_simulation_viewer(run_directory: Path, row: pd.Series) -> None:
+    simulation_id = simulation_id_for_row(row) or "Unknown simulation"
+    turn_index = str(row.get("turn_index", "")).strip()
+
+    st.subheader(simulation_id)
+    if turn_index:
+        st.caption(f"Selected row turn: {turn_index}")
+
+    transcript_path = simulation_transcript_path_for_row(run_directory, row)
+    event_log_path = simulation_event_log_path_for_row(run_directory, row)
+    audio_paths = simulation_audio_paths_for_row(run_directory, row)
+
+    transcript_tab, events_tab, audio_tab = st.tabs(
+        ["Transcript", "Events", "Audio by turn"]
+    )
+
+    with transcript_tab:
+        transcript_text = read_text_if_present(transcript_path)
+        if transcript_text is None:
+            st.info("No transcript found for this simulation.")
+        else:
+            st.code(transcript_text, language="text")
+            st.caption(str(transcript_path))
+
+    with events_tab:
+        event_log_text = read_text_if_present(event_log_path)
+        if event_log_text is None:
+            st.info("No event log found for this simulation.")
+        else:
+            st.code(event_log_text, language="json")
+            st.caption(str(event_log_path))
+
+    with audio_tab:
+        if not audio_paths:
+            st.info("No turn audio files found for this simulation.")
+        else:
+            for audio_path in audio_paths:
+                st.caption(audio_path.name)
+                audio_bytes = audio_bytes_if_present(audio_path)
+                if audio_bytes is None:
+                    st.info("Could not load this audio file.")
+                    continue
+                st.audio(audio_bytes, format="audio/wav")
+                st.caption(str(audio_path))
 
 
 def render_comparison_view() -> None:
@@ -753,7 +903,7 @@ def render_comparison_view() -> None:
 
 def render_run_viewer() -> None:
     st.title("Run Viewer")
-    st.caption("Inspect one saved run and drill into example-level artifacts.")
+    st.caption("Inspect one saved run and drill into example- or simulation-level artifacts.")
 
     harness, selected_path = render_run_viewer_config_bar()
     results_root = HARNESS_RESULTS_DIRS[harness]
@@ -764,10 +914,6 @@ def render_run_viewer() -> None:
         st.info(
             f"Choose a result directory from `{results_root.relative_to(ROOT_DIR)}` to continue."
         )
-        return
-
-    if harness == "run":
-        st.info("Not implemented yet for `run_harness`.")
         return
 
     results, load_error = load_results_frame(selected_path)
@@ -783,7 +929,7 @@ def render_run_viewer() -> None:
     table_column, detail_column = st.columns([1.45, 1], gap="large")
 
     with table_column:
-        st.subheader("Examples")
+        st.subheader("Examples" if harness != "run" else "Simulation rows")
         selection = st.dataframe(
             results,
             use_container_width=True,
@@ -794,14 +940,19 @@ def render_run_viewer() -> None:
         )
 
     with detail_column:
-        st.subheader("Example Viewer")
+        st.subheader("Example Viewer" if harness != "run" else "Simulation Viewer")
         selected_rows = selected_row_indices(selection)
         if not selected_rows:
-            st.info("Select a row in the table to inspect its audio and event log.")
+            st.info(
+                "Select a row in the table to inspect its artifacts."
+            )
             return
 
         selected_row = results.iloc[selected_rows[0]]
-        render_example_viewer(selected_path, selected_row)
+        if harness == "run":
+            render_simulation_viewer(selected_path, selected_row)
+        else:
+            render_example_viewer(selected_path, selected_row)
 
 
 def main() -> None:

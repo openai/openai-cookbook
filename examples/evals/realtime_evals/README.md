@@ -94,7 +94,7 @@ Each harness writes into its own `results/` folder:
 - `results/<run_id>/summary.json`: aggregate metrics
 - `results/<run_id>/events/*.jsonl`: full realtime event stream per datapoint
 
-For the crawl harness, the shared typed representation of these artifacts lives in `shared/result_types.py`.
+The shared typed representation of these artifacts for the crawl, walk, and run harnesses lives in `shared/result_types.py`.
 
 ## Common CLI flags
 

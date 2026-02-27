@@ -16,9 +16,11 @@ Python 3.12+ required.
 ```bash
 uv venv .venv
 source .venv/bin/activate
-uv sync
+uv sync --group dev
 export OPENAI_API_KEY="your_api_key"
 ```
+
+If you are not using `uv`, install with `pip install -r requirements.txt -r requirements-dev.txt`.
 
 Run a first command per harness:
 

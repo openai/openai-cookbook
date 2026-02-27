@@ -8,5 +8,13 @@ dependencies = [
     "openai[realtime]==2.15.0",
     "pandas==2.3.3",
 ]
+
+[dependency-groups]
+dev = [
+  "ruff",
+  "mypy",
+  "pytest",
+]
+
 [tool.ruff.lint]
 ignore = ["E402"]

@@ -32,6 +32,7 @@ if str(ROOT_DIR) not in sys.path:
 from shared.graders import compute_tool_call_grade
 from shared.metrics_utils import add_grade_means, add_numeric_summaries, order_columns
 from shared.realtime_harness_utils import (
+    RealtimeResponseError,
     audio_format_config,
     collect_realtime_response,
     ensure_dir,
@@ -40,6 +41,7 @@ from shared.realtime_harness_utils import (
 )
 from shared.result_types import (
     ExpectedToolCall,
+    EvalErrorInfo,
     OutputTokenUsage,
     ResultLatencies,
     RunEvalRunConfig,
@@ -136,6 +138,54 @@ def extract_json_object(text: str) -> Dict[str, Any]:
         return json.loads(text[start : end + 1])
     except json.JSONDecodeError:
         return {}
+
+
+def build_error_info(exc: Exception, default_stage: str) -> EvalErrorInfo:
+    failure_stage = default_stage
+    if isinstance(exc, RealtimeResponseError) and exc.failure_stage:
+        failure_stage = exc.failure_stage
+    return EvalErrorInfo(
+        status="failed",
+        failure_stage=failure_stage,
+        error_type=type(exc).__name__,
+        error_message=str(exc),
+    )
+
+
+def build_failed_simulation_result(
+    simulation_row: pd.Series,
+    args: argparse.Namespace,
+    run_dir: Path,
+    error_info: EvalErrorInfo,
+) -> RunSimulationResult:
+    simulation_id = str(simulation_row.get("simulation_id", "")).strip() or "unknown"
+    run_audio_dir = run_dir / "audio" / simulation_id
+    trace_path = run_dir / "events" / f"{simulation_id}.jsonl"
+    row = RunTurnResult(
+        simulation_id=simulation_id,
+        assistant_model=args.assistant_model or args.model or "",
+        simulator_model=args.simulator_model or "",
+        turn_index=0,
+        user_text="",
+        assistant_text="",
+        tool_calls=[],
+        tool_outputs=[],
+        tool_call_grade=ToolCallGrade(),
+        artifact_paths=RunTurnArtifactPaths(
+            user_audio_path=run_audio_dir / "turn_00_user.wav",
+            assistant_audio_path=run_audio_dir / "turn_00_assistant.wav",
+            event_log_path=trace_path,
+        ),
+        latencies=ResultLatencies(),
+        output_tokens=OutputTokenUsage(),
+        error_info=error_info,
+    )
+    return RunSimulationResult(
+        rows=[row],
+        turn_grade_requests=[],
+        trace_grade_requests=[],
+        simulation_id=simulation_id,
+    )
 
 
 def compute_tool_outputs(
@@ -338,6 +388,10 @@ def order_result_columns(results: pd.DataFrame) -> pd.DataFrame:
         "assistant_text",
         "tool_calls",
         "tool_outputs",
+        "status",
+        "failure_stage",
+        "error_type",
+        "error_message",
         "pred_tool_call",
         "pred_tool_call_arg",
         "user_audio_path",
@@ -786,7 +840,15 @@ async def run_evals() -> None:
     total_simulations = int(dataset.shape[0])
     print(f"Running run harness: {total_simulations} simulations -> {run_dir}")
     for _, row in tqdm(dataset.iterrows(), total=total_simulations, desc="Run evals"):
-        simulation_result = await run_simulation(async_client, row, args, run_dir)
+        try:
+            simulation_result = await run_simulation(async_client, row, args, run_dir)
+        except Exception as exc:
+            error_info = build_error_info(exc, "simulation_execution")
+            simulation_id = str(row.get("simulation_id", "")).strip() or "unknown"
+            tqdm.write(f"[run] simulation {simulation_id} failed: {exc}")
+            simulation_result = build_failed_simulation_result(
+                row, args, run_dir, error_info
+            )
         rows = simulation_result.rows
         simulation_id = simulation_result.simulation_id
         offset = len(all_rows)

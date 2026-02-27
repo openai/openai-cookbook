@@ -173,6 +173,14 @@ class OutputTokenUsage:
     output_text_tokens: int | None = None
 
 
+@dataclass(slots=True, frozen=True)
+class EvalErrorInfo:
+    status: str = "ok"
+    failure_stage: str = ""
+    error_type: str = ""
+    error_message: str = ""
+
+
 @dataclass(slots=True)
 class CrawlEvalResult:
     example_id: str
@@ -184,6 +192,7 @@ class CrawlEvalResult:
     artifact_paths: ResultArtifactPaths
     latencies: ResultLatencies
     output_tokens: OutputTokenUsage
+    error_info: EvalErrorInfo = EvalErrorInfo()
 
     @classmethod
     def from_csv_row(cls, row: Mapping[str, Any]) -> "CrawlEvalResult":
@@ -232,6 +241,12 @@ class CrawlEvalResult:
                 ),
                 output_text_tokens=_coerce_optional_int(row.get("output_text_tokens")),
             ),
+            error_info=EvalErrorInfo(
+                status=_coerce_str(row.get("status", "ok")) or "ok",
+                failure_stage=_coerce_str(row.get("failure_stage", "")),
+                error_type=_coerce_str(row.get("error_type", "")),
+                error_message=_coerce_str(row.get("error_message", "")),
+            ),
         )
 
     def to_csv_row(self) -> dict[str, Any]:
@@ -262,6 +277,10 @@ class CrawlEvalResult:
             "output_tokens": self.output_tokens.output_tokens,
             "output_audio_tokens": self.output_tokens.output_audio_tokens,
             "output_text_tokens": self.output_tokens.output_text_tokens,
+            "status": self.error_info.status,
+            "failure_stage": self.error_info.failure_stage,
+            "error_type": self.error_info.error_type,
+            "error_message": self.error_info.error_message,
         }
 
 
@@ -278,6 +297,7 @@ class WalkEvalResult:
     output_audio_path: Path | None
     latencies: ResultLatencies
     output_tokens: OutputTokenUsage
+    error_info: EvalErrorInfo = EvalErrorInfo()
 
     def to_csv_row(self) -> dict[str, Any]:
         return {
@@ -307,6 +327,10 @@ class WalkEvalResult:
             "output_tokens": self.output_tokens.output_tokens,
             "output_audio_tokens": self.output_tokens.output_audio_tokens,
             "output_text_tokens": self.output_tokens.output_text_tokens,
+            "status": self.error_info.status,
+            "failure_stage": self.error_info.failure_stage,
+            "error_type": self.error_info.error_type,
+            "error_message": self.error_info.error_message,
         }
 
 
@@ -582,6 +606,7 @@ class RunTurnResult:
     artifact_paths: RunTurnArtifactPaths
     latencies: ResultLatencies
     output_tokens: OutputTokenUsage
+    error_info: EvalErrorInfo = EvalErrorInfo()
     extra_grades: dict[str, int] = field(default_factory=dict)
     extra_rationales: dict[str, str] = field(default_factory=dict)
 
@@ -614,6 +639,10 @@ class RunTurnResult:
             "output_tokens": self.output_tokens.output_tokens,
             "output_audio_tokens": self.output_tokens.output_audio_tokens,
             "output_text_tokens": self.output_tokens.output_text_tokens,
+            "status": self.error_info.status,
+            "failure_stage": self.error_info.failure_stage,
+            "error_type": self.error_info.error_type,
+            "error_message": self.error_info.error_message,
         }
         for grader_id, grade in self.extra_grades.items():
             row[f"{grader_id}_grade"] = grade

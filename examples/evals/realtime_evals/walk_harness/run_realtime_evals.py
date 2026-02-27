@@ -32,6 +32,7 @@ if str(ROOT_DIR) not in sys.path:
 from shared.graders import compute_tool_call_grade
 from shared.metrics_utils import add_numeric_summaries, order_columns
 from shared.realtime_harness_utils import (
+    RealtimeResponseError,
     audio_format_config,
     collect_realtime_response,
     ensure_dir,
@@ -42,6 +43,7 @@ from shared.result_types import (
     ExpectedToolCall,
     OutputTokenUsage,
     ResultLatencies,
+    EvalErrorInfo,
     ToolCallGrade,
     ToolCallRecord,
     WalkEvalResult,
@@ -199,6 +201,58 @@ def resolve_audio_path(audio_path_value: str, dataset_path: Path) -> Path:
     if not audio_path.is_absolute():
         audio_path = dataset_path.parent / audio_path
     return audio_path
+
+
+def build_error_info(exc: Exception, default_stage: str) -> EvalErrorInfo:
+    failure_stage = default_stage
+    if isinstance(exc, RealtimeResponseError) and exc.failure_stage:
+        failure_stage = exc.failure_stage
+    return EvalErrorInfo(
+        status="failed",
+        failure_stage=failure_stage,
+        error_type=type(exc).__name__,
+        error_message=str(exc),
+    )
+
+
+def build_failed_result(
+    row: pd.Series,
+    dataset_path: Path,
+    events_dir: Path,
+    error_info: EvalErrorInfo,
+) -> WalkEvalResult:
+    example_id = str(row["example_id"])
+    user_text = str(row["user_text"])
+    expected_tool_call = (
+        "" if bool(pd.isna(row["gt_tool_call"])) else str(row["gt_tool_call"])
+    )
+    expected_tool_call_arg = (
+        "" if bool(pd.isna(row["gt_tool_call_arg"])) else str(row["gt_tool_call_arg"])
+    )
+    audio_path_value = str(row.get("audio_path", "")).strip()
+    if audio_path_value:
+        audio_path = Path(audio_path_value)
+        if not audio_path.is_absolute():
+            audio_path = dataset_path.parent / audio_path
+    else:
+        audio_path = dataset_path.parent / "missing_audio.wav"
+    event_log_path = events_dir / f"{example_id}.jsonl"
+    return WalkEvalResult(
+        example_id=example_id,
+        user_text=user_text,
+        expected_tool_call=ExpectedToolCall(
+            name=expected_tool_call, arguments_json=expected_tool_call_arg
+        ),
+        assistant_text="",
+        tool_calls=[],
+        tool_call_grade=ToolCallGrade(),
+        audio_path=audio_path,
+        event_log_path=event_log_path,
+        output_audio_path=None,
+        latencies=ResultLatencies(),
+        output_tokens=OutputTokenUsage(),
+        error_info=error_info,
+    )
 
 
 async def run_single_eval(
@@ -376,6 +430,10 @@ def order_result_columns(results: pd.DataFrame) -> pd.DataFrame:
         "grade",
         "assistant_text",
         "tool_calls",
+        "status",
+        "failure_stage",
+        "error_type",
+        "error_message",
         "event_log_path",
         "audio_path",
         "output_audio_path",
@@ -425,16 +483,21 @@ async def run_evals() -> None:
     total_examples = int(dataset.shape[0])
     print(f"Running walk evals: {total_examples} examples -> {run_dir}")
     for _, row in tqdm(dataset.iterrows(), total=total_examples, desc="Walk evals"):
-        result = await run_single_eval(
-            async_client,
-            row,
-            system_prompt,
-            tools,
-            run_audio_dir,
-            run_events_dir,
-            config,
-            args.data_csv,
-        )
+        try:
+            result = await run_single_eval(
+                async_client,
+                row,
+                system_prompt,
+                tools,
+                run_audio_dir,
+                run_events_dir,
+                config,
+                args.data_csv,
+            )
+        except Exception as exc:
+            error_info = build_error_info(exc, "example_execution")
+            tqdm.write(f"[walk] example {row['example_id']} failed: {exc}")
+            result = build_failed_result(row, args.data_csv, run_events_dir, error_info)
         results.append(result)
 
     results_df = pd.DataFrame([result.to_csv_row() for result in results])

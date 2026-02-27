@@ -12,6 +12,24 @@ from shared.realtime_utils import ToolCallAccumulator
 from shared.trace_utils import build_event_record
 
 
+DEFAULT_RESPONSE_TIMEOUT_SECONDS = 60.0
+
+
+class RealtimeResponseError(RuntimeError):
+    def __init__(
+        self,
+        message: str,
+        *,
+        failure_stage: str,
+        response_status: str = "",
+        error_code: str = "",
+    ) -> None:
+        super().__init__(message)
+        self.failure_stage = failure_stage
+        self.response_status = response_status
+        self.error_code = error_code
+
+
 def ensure_dir(path: Path) -> None:
     path.mkdir(parents=True, exist_ok=True)
 
@@ -111,6 +129,7 @@ async def collect_realtime_response(
     source: Optional[str] = None,
     turn_index: Optional[int] = None,
     tool_mocks: Optional[Dict[str, Dict[str, Any]]] = None,
+    response_timeout_seconds: float = DEFAULT_RESPONSE_TIMEOUT_SECONDS,
 ) -> Dict[str, Any]:
     """Collect a realtime response and optionally log each event as JSONL."""
     assistant_text_parts: List[str] = []
@@ -137,7 +156,23 @@ async def collect_realtime_response(
     await connection.response.create(response=response_payload)
 
     local_event_index = 0
-    async for event in connection:
+    event_iterator = connection.__aiter__()
+    while True:
+        try:
+            event = await asyncio.wait_for(
+                anext(event_iterator), timeout=response_timeout_seconds
+            )
+        except StopAsyncIteration:
+            break
+        except asyncio.TimeoutError as exc:
+            raise RealtimeResponseError(
+                (
+                    "Timed out waiting for realtime response events after "
+                    f"{response_timeout_seconds:.1f}s."
+                ),
+                failure_stage="response_timeout",
+            ) from exc
+
         event_time_ms = (loop.time() - response_start_time) * 1000
         if event_index_state is None:
             # Use a local counter when the caller does not need cross-stream ordering.
@@ -159,6 +194,25 @@ async def collect_realtime_response(
 
         payload = event.model_dump()
         event_type = payload.get("type", "")
+
+        if event_type == "error":
+            error_payload = payload.get("error") or {}
+            error_type = str(error_payload.get("type", "")).strip()
+            error_code = str(error_payload.get("code", "")).strip()
+            error_message = str(error_payload.get("message", "")).strip()
+            error_details: List[str] = []
+            if error_type:
+                error_details.append(error_type)
+            if error_code:
+                error_details.append(error_code)
+            detail_text = (
+                f" ({', '.join(error_details)})" if error_details else ""
+            )
+            raise RealtimeResponseError(
+                f"Realtime error event{detail_text}: {error_message or 'Unknown error.'}",
+                failure_stage="response_error",
+                error_code=error_code,
+            )
 
         if event_type == "response.output_audio.delta":
             if first_audio_time_ms is None:
@@ -183,6 +237,32 @@ async def collect_realtime_response(
             response_done_time_ms = event_time_ms
             tool_call_accumulator.handle_event_payload(payload)
             response = payload.get("response") or {}
+            response_status = str(response.get("status", "")).strip()
+            if response_status != "completed":
+                status_details = response.get("status_details") or {}
+                error_payload = {}
+                if isinstance(status_details, dict):
+                    error_payload = status_details.get("error") or {}
+                error_code = str(error_payload.get("code", "")).strip()
+                error_type = str(error_payload.get("type", "")).strip()
+                error_message = str(error_payload.get("message", "")).strip()
+                status_reason = ""
+                if isinstance(status_details, dict):
+                    status_reason = str(status_details.get("reason", "")).strip()
+                details: List[str] = [response_status]
+                if status_reason:
+                    details.append(status_reason)
+                if error_type:
+                    details.append(error_type)
+                if error_code:
+                    details.append(error_code)
+                raise RealtimeResponseError(
+                    "Realtime response finished without completion"
+                    f" ({', '.join(details)}): {error_message or 'No error message provided.'}",
+                    failure_stage="response_status",
+                    response_status=response_status,
+                    error_code=error_code,
+                )
             response_usage = response.get("usage") or {}
             response_output_tokens = response_usage.get("output_tokens")
             if response_output_tokens is not None:
@@ -257,6 +337,12 @@ async def collect_realtime_response(
                 # This `response.done` corresponds to the post-tool-call follow-up response.
                 awaiting_followup = False
             break
+
+    if response_done_time_ms is None:
+        raise RealtimeResponseError(
+            "Realtime connection closed before a terminal response.done event arrived.",
+            failure_stage="response_missing_done",
+        )
 
     tool_calls = tool_call_accumulator.build_tool_calls()
     usage_data: Dict[str, Any] = {}

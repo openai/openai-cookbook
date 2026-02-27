@@ -103,6 +103,42 @@ def test_check_tool_args_correct_normalizes_addresses() -> None:
     assert reason == ""
 
 
+def test_check_tool_args_correct_handles_nested_json_arguments() -> None:
+    passed, reason = check_tool_args_correct(
+        [
+            {
+                "name": "create_ticket",
+                "arguments": {
+                    "customer": {
+                        "order_id": "ORD-4004",
+                        "address": {"city": "Seattle", "state": "WA"},
+                    },
+                    "items": [
+                        {"sku": "sku-1", "quantity": 2},
+                        {"sku": "sku-2", "quantity": 1, "notes": "gift wrap"},
+                    ],
+                    "expedite": False,
+                },
+            }
+        ],
+        "create_ticket",
+        {
+            "customer": {
+                "order_id": "ord 4004",
+                "address": {"city": "Seattle"},
+            },
+            "items": [
+                {"sku": "SKU-1", "quantity": 2},
+                {"sku": "sku-2"},
+            ],
+            "expedite": False,
+        },
+    )
+
+    assert passed is True
+    assert reason == ""
+
+
 def test_compute_tool_call_grade_uses_deterministic_graders() -> None:
     result = compute_tool_call_grade(
         "get_order_status",

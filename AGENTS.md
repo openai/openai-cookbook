@@ -41,3 +41,4 @@ These are considered priority 0 issues for this repo, in addition to the normal 
 ## Recent Learnings
 
 - **Realtime eval shared imports can resolve the wrong module under pytest** -> Add `shared/__init__.py` and ensure tests prepend `examples/evals/realtime_evals` to `sys.path` before importing `shared.*` -> Prevents collection failures caused by unrelated installed packages named `shared`.
+- **Run-level grades can be overweighted by long simulations** -> Store turn-level grades on the matching turn and trace-level grades on one row per simulation instead of copying them onto every row -> Keeps `results.csv` row semantics intact and prevents summary means from favoring longer conversations.

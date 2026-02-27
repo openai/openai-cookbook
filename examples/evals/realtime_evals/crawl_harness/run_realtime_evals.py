@@ -326,7 +326,11 @@ def compute_summary(
     summary: Dict[str, Any] = {
         "total_examples": int(results.shape[0]),
         "failed_examples": failed_examples,
-        "grade_mean": float(results["grade"].mean()) if not results.empty else 0.0,
+        "grade_mean": (
+            float(results["grade"].mean())
+            if "grade" in results.columns and not results.empty
+            else 0.0
+        ),
     }
     if "tool_call_correctness" in results.columns and not results.empty:
         summary["tool_call_correctness_mean"] = float(
@@ -435,7 +439,15 @@ async def run_evals() -> None:
             result = build_failed_result(row, run_audio_dir, run_events_dir, error_info)
         results.append(result)
 
-    results_df = pd.DataFrame([result.to_csv_row() for result in results])
+    results_df = pd.DataFrame(
+        [
+            result.to_csv_row(
+                include_tool_call_columns=True,
+                include_tool_call_arg_columns=True,
+            )
+            for result in results
+        ]
+    )
     results_df = order_result_columns(results_df)
     results_csv_path = run_dir / "results.csv"
     results_df.to_csv(results_csv_path, index=False)

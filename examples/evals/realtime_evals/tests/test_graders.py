@@ -7,6 +7,10 @@ if str(ROOT_DIR) not in sys.path:
 
 from shared.graders import (
     AUDIO_TEXT_MISMATCH_GRADER_SYSTEM_PROMPT,
+    DEFAULT_GRADER_FUNCTIONS,
+    DEFAULT_GRADER_MODEL,
+    DEFAULT_GRADER_SPECS,
+    DEFAULT_TRANSCRIPTION_MODEL,
     INSTRUCTION_FOLLOWING_GRADER_SYSTEM_PROMPT,
     STT_THEN_TEXT_GRADER_SYSTEM_PROMPT,
     check_instruction_following_model_grader,
@@ -14,7 +18,10 @@ from shared.graders import (
     check_tool_call_names_correct,
     compute_tool_call_grade,
     grade_audio_text_mismatch,
+    grade_audio_text_mismatch_from_model_response,
     grade_stt_then_text,
+    grade_stt_then_text_from_model_response,
+    run_default_grader,
     transcribe_model_response_audio,
 )
 
@@ -127,6 +134,7 @@ def test_instruction_following_grader_uses_instruction_prompt_and_schema() -> No
         "reason",
         "adheres_to_instructions",
     ]
+    assert request["model"] == DEFAULT_GRADER_MODEL
 
 
 def test_audio_text_mismatch_grader_uses_specialized_prompt() -> None:
@@ -177,7 +185,7 @@ def test_transcribe_model_response_audio_writes_valid_wav() -> None:
     assert passed is True
     assert transcript == "Thanks for calling support."
     transcription_call = client.audio.transcriptions.calls[0]
-    assert transcription_call["model"]
+    assert transcription_call["model"] == DEFAULT_TRANSCRIPTION_MODEL
     assert transcription_call["filename"].endswith(".wav")
     assert transcription_call["audio_size"] > 0
 
@@ -193,3 +201,64 @@ def test_transcribe_model_response_audio_rejects_missing_audio() -> None:
 
     assert passed is False
     assert "No audio returned" in reason
+
+
+def test_audio_text_mismatch_from_model_response_transcribes_then_grades() -> None:
+    client = FakeClient(
+        grader_output_text='{"pass": true, "reason": "Audio matches the text."}',
+        transcript_text="Your order ORD-1001 will arrive tomorrow.",
+    )
+
+    passed, reason = grade_audio_text_mismatch_from_model_response(
+        client,
+        assistant_text="Your order ORD-1001 will arrive tomorrow.",
+        audio_bytes=b"\x00\x00" * 200,
+        sample_rate_hz=24000,
+    )
+
+    assert passed is True
+    assert reason == "Audio matches the text."
+    assert len(client.audio.transcriptions.calls) == 1
+    assert len(client.responses.calls) == 1
+
+
+def test_stt_then_text_from_model_response_transcribes_then_grades() -> None:
+    client = FakeClient(
+        grader_output_text='{"pass": true, "reason": "Assistant addressed the request."}',
+        transcript_text="Please refund my damaged order.",
+    )
+
+    passed, reason = grade_stt_then_text_from_model_response(
+        client,
+        user_audio_bytes=b"\x00\x00" * 200,
+        sample_rate_hz=24000,
+        assistant_text="I can help with that refund.",
+        criteria="Assistant acknowledges the refund request and responds directly.",
+    )
+
+    assert passed is True
+    assert reason == "Assistant addressed the request."
+    assert len(client.audio.transcriptions.calls) == 1
+    assert len(client.responses.calls) == 1
+
+
+def test_run_default_grader_dispatches_named_graders() -> None:
+    client = FakeClient(
+        grader_output_text='{"adheres_to_instructions": true, "reason": "All rules followed."}'
+    )
+
+    passed, reason = run_default_grader(
+        "instruction_following",
+        client=client,
+        instructions="Do not mention pricing.",
+        response_text="I can help with your order.",
+    )
+
+    assert "instruction_following" in DEFAULT_GRADER_FUNCTIONS
+    assert DEFAULT_GRADER_SPECS["instruction_following"]["required_kwargs"] == (
+        "client",
+        "instructions",
+        "response_text",
+    )
+    assert passed is True
+    assert reason == "All rules followed."

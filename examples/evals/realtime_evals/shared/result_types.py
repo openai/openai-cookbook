@@ -606,6 +606,7 @@ class RunTurnResult:
     turn_index: int
     user_text: str
     assistant_text: str
+    expected_tool_call: ExpectedToolCall
     tool_calls: list[ToolCallRecord]
     tool_outputs: list[ToolOutputRecord]
     tool_call_grade: ToolCallGrade
@@ -628,6 +629,8 @@ class RunTurnResult:
             "turn_index": self.turn_index,
             "user_text": self.user_text,
             "assistant_text": self.assistant_text,
+            "gt_tool_call": self.expected_tool_call.name,
+            "gt_tool_call_arg": self.expected_tool_call.arguments_json,
             "tool_calls": json.dumps(
                 [tool_call.to_dict() for tool_call in self.tool_calls]
             ),
@@ -636,6 +639,8 @@ class RunTurnResult:
             ),
             "pred_tool_call": self.tool_call_grade.pred_tool_call,
             "pred_tool_call_arg": self.tool_call_grade.pred_tool_call_arg,
+            "tool_call_correctness": self.tool_call_grade.tool_call_correctness,
+            "tool_call_arg_correctness": self.tool_call_grade.tool_call_arg_correctness,
             "user_audio_path": str(self.artifact_paths.user_audio_path),
             "assistant_audio_path": str(self.artifact_paths.assistant_audio_path),
             "event_log_path": str(self.artifact_paths.event_log_path),

@@ -1,7 +1,13 @@
 """Reusable default graders for realtime eval harnesses.
 
-This module intentionally keeps the default graders small, explicit, and easy
-for coding models to adapt into a project-specific eval harness.
+Design notes:
+- Every grader returns the same shape: `(passed: bool, reason: str)`.
+- Deterministic graders do not call a model.
+- Model-based graders take an OpenAI client plus the smallest possible inputs.
+- Audio-byte helpers are convenience wrappers for harnesses that only have raw
+  PCM16 bytes and want this module to handle transcription first.
+- `run_default_grader(...)` is the smallest shared integration surface for the
+  core named graders in `DEFAULT_GRADER_FUNCTIONS`.
 """
 
 import json
@@ -15,9 +21,9 @@ from openai import APIConnectionError, APIError, APITimeoutError, RateLimitError
 
 from shared.result_types import ToolCallRecord
 
-DEFAULT_GRADER_MODEL = "gpt-5.1"
+DEFAULT_GRADER_MODEL = "gpt-5.2"
 DEFAULT_GRADER_REASONING_EFFORT = "none"
-DEFAULT_TRANSCRIPTION_MODEL = "gpt-4o-transcribe"
+DEFAULT_TRANSCRIPTION_MODEL = "gpt-4o-mini-transcribe"
 
 PASS_FAIL_REASON_SCHEMA = {
     "type": "object",
@@ -514,7 +520,122 @@ def transcribe_model_response_audio(
         wav_path.unlink(missing_ok=True)
 
 
-check_if_model_grader = check_instruction_following_model_grader
+def grade_audio_text_mismatch_from_model_response(
+    client: Any,
+    assistant_text: str,
+    audio_bytes: bytes | None,
+    sample_rate_hz: int,
+    *,
+    grade_model: str = DEFAULT_GRADER_MODEL,
+    grade_reasoning_effort: str | None = DEFAULT_GRADER_REASONING_EFFORT,
+    transcription_model: str = DEFAULT_TRANSCRIPTION_MODEL,
+) -> tuple[bool, str]:
+    """Transcribe assistant audio bytes, then grade transcript/text alignment."""
+
+    transcribed, transcript_or_reason = transcribe_model_response_audio(
+        client,
+        audio_bytes,
+        sample_rate_hz,
+        transcription_model=transcription_model,
+    )
+    if not transcribed:
+        return False, transcript_or_reason
+    return grade_audio_text_mismatch(
+        client,
+        assistant_text,
+        transcript_or_reason,
+        model=grade_model,
+        reasoning_effort=grade_reasoning_effort,
+    )
+
+
+def grade_stt_then_text_from_model_response(
+    client: Any,
+    user_audio_bytes: bytes | None,
+    sample_rate_hz: int,
+    assistant_text: str,
+    criteria: str,
+    *,
+    grade_model: str = DEFAULT_GRADER_MODEL,
+    grade_reasoning_effort: str | None = DEFAULT_GRADER_REASONING_EFFORT,
+    transcription_model: str = DEFAULT_TRANSCRIPTION_MODEL,
+) -> tuple[bool, str]:
+    """Transcribe user audio bytes, then grade assistant text against that STT."""
+
+    transcribed, transcript_or_reason = transcribe_model_response_audio(
+        client,
+        user_audio_bytes,
+        sample_rate_hz,
+        transcription_model=transcription_model,
+    )
+    if not transcribed:
+        return False, transcript_or_reason
+    return grade_stt_then_text(
+        client,
+        transcript_or_reason,
+        assistant_text,
+        criteria,
+        model=grade_model,
+        reasoning_effort=grade_reasoning_effort,
+    )
+
+
+DEFAULT_GRADER_FUNCTIONS: Dict[str, Any] = {
+    "tool_call": check_tool_call_names_correct,
+    "tool_call_args": check_tool_args_correct,
+    "rubric": check_rubric_model_grader,
+    "instruction_following": check_instruction_following_model_grader,
+    "audio_text_mismatch": grade_audio_text_mismatch,
+    "stt_then_text": grade_stt_then_text,
+}
+
+DEFAULT_GRADER_SPECS: Dict[str, Dict[str, Any]] = {
+    "tool_call": {
+        "summary": "Deterministic grader for whether the expected tool names were called.",
+        "required_kwargs": ("tool_calls", "expected_tool_names"),
+    },
+    "tool_call_args": {
+        "summary": "Deterministic grader for whether a named tool call includes the expected argument subset.",
+        "required_kwargs": ("tool_calls", "expected_tool_name", "expected_args"),
+    },
+    "rubric": {
+        "summary": "Generic LLM-as-judge grader for one explicit criterion.",
+        "required_kwargs": ("client", "input_context", "response_text", "criteria"),
+    },
+    "instruction_following": {
+        "summary": "LLM-as-judge grader for whether a response obeys instructions.",
+        "required_kwargs": ("client", "instructions", "response_text"),
+    },
+    "audio_text_mismatch": {
+        "summary": "LLM-as-judge grader that compares assistant text to an existing audio transcript.",
+        "required_kwargs": ("client", "assistant_text", "audio_transcript"),
+    },
+    "stt_then_text": {
+        "summary": "LLM-as-judge grader that treats a provided STT transcript as source of truth.",
+        "required_kwargs": ("client", "user_audio_transcript", "assistant_text", "criteria"),
+    },
+}
+
+
+def run_default_grader(grader_name: str, /, **kwargs: Any) -> tuple[bool, str]:
+    """Run a named default grader through a shared registry.
+
+    Intended usage:
+    1. Pick one of the names in DEFAULT_GRADER_FUNCTIONS.
+    2. Look up the expected kwargs in DEFAULT_GRADER_SPECS.
+    3. Forward only those kwargs from the harness.
+
+    If a harness only has raw audio bytes rather than a transcript, call
+    `grade_audio_text_mismatch_from_model_response(...)` or
+    `grade_stt_then_text_from_model_response(...)` directly instead of routing
+    through this registry.
+    """
+
+    grader = DEFAULT_GRADER_FUNCTIONS.get(grader_name.strip())
+    if grader is None:
+        supported = ", ".join(sorted(DEFAULT_GRADER_FUNCTIONS))
+        return False, f"Unsupported grader '{grader_name}'. Supported: {supported}"
+    return grader(**kwargs)
 
 
 def compute_tool_call_grade(

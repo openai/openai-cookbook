@@ -38,6 +38,19 @@ from shared.realtime_harness_utils import (
     stream_audio_to_connection,
     write_pcm16_wav,
 )
+from shared.result_types import (
+    ExpectedToolCall,
+    OutputTokenUsage,
+    ResultLatencies,
+    RunEvalRunConfig,
+    RunEvalRunSummary,
+    RunSimulationResult,
+    RunTurnArtifactPaths,
+    RunTurnResult,
+    ToolCallGrade,
+    ToolCallRecord,
+    ToolOutputRecord,
+)
 
 DEFAULT_DATA_CSV = ROOT_DIR / "run_harness" / "data" / "simulations.csv"
 DEFAULT_RESULTS_DIR = ROOT_DIR / "run_harness" / "results"
@@ -126,29 +139,22 @@ def extract_json_object(text: str) -> Dict[str, Any]:
 
 
 def compute_tool_outputs(
-    tool_calls: List[Dict[str, Any]], tool_mocks: Dict[str, Dict[str, Any]]
-) -> List[Dict[str, Any]]:
-    outputs = []
+    tool_calls: List[ToolCallRecord], tool_mocks: Dict[str, Dict[str, Any]]
+) -> List[ToolOutputRecord]:
+    outputs: List[ToolOutputRecord] = []
     for call in tool_calls:
-        tool_name = call.get("name", "")
+        tool_name = call.name
         output = tool_mocks.get(tool_name, {"status": "Unsupported tool"})
-        outputs.append(
-            {
-                "call_id": call.get("call_id", ""),
-                "name": tool_name,
-                "arguments": call.get("arguments", {}),
-                "output": output,
-            }
-        )
+        outputs.append(ToolOutputRecord.from_tool_call(call, output))
     return outputs
 
 
 def build_tool_output_by_call_id(
-    tool_outputs: List[Dict[str, Any]],
-) -> Dict[str, Dict[str, Any]]:
-    outputs_by_call_id: Dict[str, Dict[str, Any]] = {}
+    tool_outputs: List[ToolOutputRecord],
+) -> Dict[str, ToolOutputRecord]:
+    outputs_by_call_id: Dict[str, ToolOutputRecord] = {}
     for output in tool_outputs:
-        call_id = output.get("call_id", "")
+        call_id = output.call_id
         if not call_id:
             continue
         outputs_by_call_id[call_id] = output
@@ -158,7 +164,7 @@ def build_tool_output_by_call_id(
 def transcript_lines_for_assistant_turn(
     turn_index: int,
     response_segments: List[Dict[str, Any]],
-    tool_outputs_by_call_id: Dict[str, Dict[str, Any]],
+    tool_outputs_by_call_id: Dict[str, ToolOutputRecord],
 ) -> List[str]:
     lines: List[str] = []
     for segment in response_segments:
@@ -171,7 +177,7 @@ def transcript_lines_for_assistant_turn(
             if call_id and call_id in tool_outputs_by_call_id:
                 lines.append(
                     f"TURN {turn_index} TOOL_OUTPUT: "
-                    f"{json.dumps(tool_outputs_by_call_id[call_id])}"
+                    f"{json.dumps(tool_outputs_by_call_id[call_id].to_dict())}"
                 )
     return lines
 
@@ -196,8 +202,8 @@ def build_turn_context(
     turn_index: int,
     user_text: str,
     assistant_text: str,
-    tool_calls: List[Dict[str, Any]],
-    tool_outputs: List[Dict[str, Any]],
+    tool_calls: List[ToolCallRecord],
+    tool_outputs: List[ToolOutputRecord],
 ) -> str:
     return (
         f"Simulation: {simulation_id}\n"
@@ -205,8 +211,8 @@ def build_turn_context(
         f"Turn: {turn_index}\n"
         f"User: {user_text}\n"
         f"Assistant: {assistant_text}\n"
-        f"Tool Calls: {json.dumps(tool_calls)}\n"
-        f"Tool Outputs: {json.dumps(tool_outputs)}\n"
+        f"Tool Calls: {json.dumps([tool_call.to_dict() for tool_call in tool_calls])}\n"
+        f"Tool Outputs: {json.dumps([tool_output.to_dict() for tool_output in tool_outputs])}\n"
     )
 
 
@@ -298,7 +304,9 @@ def execute_grade_job(job: Dict[str, Any]) -> Dict[str, Any]:
     }
 
 
-def compute_summary(results: pd.DataFrame) -> Dict[str, Any]:
+def compute_summary(
+    results: pd.DataFrame, config: RunEvalRunConfig
+) -> RunEvalRunSummary:
     summary: Dict[str, Any] = {
         "total_rows": int(results.shape[0]),
     }
@@ -317,7 +325,7 @@ def compute_summary(results: pd.DataFrame) -> Dict[str, Any]:
         ],
     )
 
-    return summary
+    return RunEvalRunSummary.from_flat_summary(summary, config)
 
 
 def order_result_columns(results: pd.DataFrame) -> pd.DataFrame:
@@ -349,7 +357,7 @@ async def run_simulation(
     simulation_row: pd.Series,
     args: argparse.Namespace,
     run_dir: Path,
-) -> Dict[str, Any]:
+) -> RunSimulationResult:
     simulation_path = resolve_path(
         str(simulation_row["simulation_path"]), args.data_csv.parent
     )
@@ -424,6 +432,9 @@ async def run_simulation(
     expected_tool_args_text = (
         json.dumps(expected_tool_args) if expected_tool_args else ""
     )
+    expected_tool = ExpectedToolCall(
+        name=expected_tool_name, arguments_json=expected_tool_args_text
+    )
 
     graders = simulation.get("graders", {})
     turn_level_graders = graders.get("turn_level", [])
@@ -453,7 +464,7 @@ async def run_simulation(
     transcript_lines: List[str] = []
     tool_summaries: List[str] = []
 
-    results_rows: List[Dict[str, Any]] = []
+    results_rows: List[RunTurnResult] = []
     turn_grade_requests: List[Dict[str, Any]] = []
     trace_grade_requests: List[Dict[str, Any]] = []
     any_tool_call_correctness = 0
@@ -504,11 +515,10 @@ async def run_simulation(
     event_index_state = {"value": 0}
 
     # Keep both sessions open across turns; rely on server-side conversation state.
-    async with async_client.realtime.connect(
-        model=simulator_model
-    ) as simulator_connection, async_client.realtime.connect(
-        model=assistant_model
-    ) as assistant_connection:
+    async with (
+        async_client.realtime.connect(model=simulator_model) as simulator_connection,
+        async_client.realtime.connect(model=assistant_model) as assistant_connection,
+    ):
         await simulator_connection.session.update(
             session=cast(RealtimeSessionCreateRequestParam, simulator_session)
         )
@@ -593,21 +603,26 @@ async def run_simulation(
                 assistant_text = assistant_result["assistant_text"]
                 assistant_segments = assistant_result.get("response_segments", [])
                 assistant_audio_bytes = assistant_result["output_audio_bytes"]
-                tool_calls = assistant_result["tool_calls"]
+                raw_tool_calls = assistant_result["tool_calls"]
+                tool_calls = [
+                    ToolCallRecord.from_mapping(tool_call)
+                    for tool_call in raw_tool_calls
+                ]
                 tool_outputs = compute_tool_outputs(tool_calls, tool_mocks)
                 tool_outputs_by_call_id = build_tool_output_by_call_id(tool_outputs)
                 tool_call_grade_data = compute_tool_call_grade(
-                    expected_tool_name,
-                    expected_tool_args_text,
+                    expected_tool.name,
+                    expected_tool.arguments_json,
                     tool_calls,
                 )
+                tool_call_grade = ToolCallGrade.from_mapping(tool_call_grade_data)
                 # Track whether any turn matched the expected tool behavior.
                 tool_call_correctness_flags.append(
-                    tool_call_grade_data.get("tool_call_correctness", 0)
+                    tool_call_grade.tool_call_correctness
                 )
-                if tool_call_grade_data.get("tool_call_correctness") == 1:
+                if tool_call_grade.tool_call_correctness == 1:
                     any_tool_call_correctness = 1
-                if tool_call_grade_data.get("tool_call_arg_correctness") == 1:
+                if tool_call_grade.tool_call_arg_correctness == 1:
                     any_tool_call_arg_correctness = 1
 
                 assistant_audio_path = (
@@ -635,13 +650,13 @@ async def run_simulation(
                 if tool_calls:
                     for tool_call in tool_calls:
                         tool_summaries.append(
-                            f"TURN {turn_index} TOOL_CALL: {json.dumps(tool_call)}"
+                            f"TURN {turn_index} TOOL_CALL: {json.dumps(tool_call.to_dict())}"
                         )
-                        call_id = str(tool_call.get("call_id", "")).strip()
+                        call_id = tool_call.call_id.strip()
                         if call_id and call_id in tool_outputs_by_call_id:
                             tool_summaries.append(
                                 f"TURN {turn_index} TOOL_OUTPUT: "
-                                f"{json.dumps(tool_outputs_by_call_id[call_id])}"
+                                f"{json.dumps(tool_outputs_by_call_id[call_id].to_dict())}"
                             )
 
                 turn_context = build_turn_context(
@@ -663,31 +678,32 @@ async def run_simulation(
                     output_audio_tokens = output_details.get("audio_tokens")
                     output_text_tokens = output_details.get("text_tokens")
 
-                row_data = {
-                    "simulation_id": simulation_id,
-                    "assistant_model": assistant_model,
-                    "simulator_model": simulator_model,
-                    "turn_index": turn_index,
-                    "user_text": user_text,
-                    "assistant_text": assistant_text,
-                    "tool_calls": json.dumps(tool_calls),
-                    "tool_outputs": json.dumps(tool_outputs),
-                    "pred_tool_call": tool_call_grade_data.get("pred_tool_call", ""),
-                    "pred_tool_call_arg": tool_call_grade_data.get(
-                        "pred_tool_call_arg", ""
+                row_data = RunTurnResult(
+                    simulation_id=simulation_id,
+                    assistant_model=assistant_model,
+                    simulator_model=simulator_model,
+                    turn_index=turn_index,
+                    user_text=user_text,
+                    assistant_text=assistant_text,
+                    tool_calls=tool_calls,
+                    tool_outputs=tool_outputs,
+                    tool_call_grade=tool_call_grade,
+                    artifact_paths=RunTurnArtifactPaths(
+                        user_audio_path=user_audio_path,
+                        assistant_audio_path=assistant_audio_path,
+                        event_log_path=trace_path,
                     ),
-                    "user_audio_path": str(user_audio_path),
-                    "assistant_audio_path": str(assistant_audio_path),
-                    "event_log_path": str(trace_path),
-                    "latency_first_audio_ms": assistant_result["first_audio_time_ms"],
-                    "latency_first_text_ms": assistant_result["first_text_time_ms"],
-                    "latency_response_done_ms": assistant_result[
-                        "response_done_time_ms"
-                    ],
-                    "output_tokens": output_tokens,
-                    "output_audio_tokens": output_audio_tokens,
-                    "output_text_tokens": output_text_tokens,
-                }
+                    latencies=ResultLatencies(
+                        first_audio_ms=assistant_result["first_audio_time_ms"],
+                        first_text_ms=assistant_result["first_text_time_ms"],
+                        response_done_ms=assistant_result["response_done_time_ms"],
+                    ),
+                    output_tokens=OutputTokenUsage(
+                        output_tokens=output_tokens,
+                        output_audio_tokens=output_audio_tokens,
+                        output_text_tokens=output_text_tokens,
+                    ),
+                )
                 results_rows.append(row_data)
                 for grader in turn_level_graders:
                     if grader.get("type") != "llm_as_judge":
@@ -719,11 +735,9 @@ async def run_simulation(
     if tool_call_grader_ids or tool_call_args_grader_ids:
         for row_data in results_rows:
             for grader_id in tool_call_grader_ids:
-                row_data[f"{grader_id}_grade"] = any_tool_call_correctness
-                row_data[f"{grader_id}_rationale"] = ""
+                row_data.set_grader_result(grader_id, any_tool_call_correctness, "")
             for grader_id in tool_call_args_grader_ids:
-                row_data[f"{grader_id}_grade"] = any_tool_call_arg_correctness
-                row_data[f"{grader_id}_rationale"] = ""
+                row_data.set_grader_result(grader_id, any_tool_call_arg_correctness, "")
 
     for grader in trace_level_graders:
         if grader.get("type") != "llm_as_judge":
@@ -738,12 +752,12 @@ async def run_simulation(
             }
         )
 
-    return {
-        "rows": results_rows,
-        "turn_grade_requests": turn_grade_requests,
-        "trace_grade_requests": trace_grade_requests,
-        "simulation_id": simulation_id,
-    }
+    return RunSimulationResult(
+        rows=results_rows,
+        turn_grade_requests=turn_grade_requests,
+        trace_grade_requests=trace_grade_requests,
+        simulation_id=simulation_id,
+    )
 
 
 async def run_evals() -> None:
@@ -764,7 +778,7 @@ async def run_evals() -> None:
 
     async_client = AsyncOpenAI()
 
-    all_rows: List[Dict[str, Any]] = []
+    all_rows: List[RunTurnResult] = []
     turn_grade_requests: List[Dict[str, Any]] = []
     trace_grade_requests: List[Dict[str, Any]] = []
     simulation_row_indices: Dict[str, List[int]] = {}
@@ -773,13 +787,13 @@ async def run_evals() -> None:
     print(f"Running run harness: {total_simulations} simulations -> {run_dir}")
     for _, row in tqdm(dataset.iterrows(), total=total_simulations, desc="Run evals"):
         simulation_result = await run_simulation(async_client, row, args, run_dir)
-        rows = simulation_result["rows"]
-        simulation_id = simulation_result["simulation_id"]
+        rows = simulation_result.rows
+        simulation_id = simulation_result.simulation_id
         offset = len(all_rows)
         all_rows.extend(rows)
         simulation_row_indices[simulation_id] = list(range(offset, offset + len(rows)))
 
-        for request in simulation_result["turn_grade_requests"]:
+        for request in simulation_result.turn_grade_requests:
             row_index = offset + request["turn_index"] - 1
             turn_grade_requests.append(
                 {
@@ -791,7 +805,7 @@ async def run_evals() -> None:
                 }
             )
 
-        for request in simulation_result["trace_grade_requests"]:
+        for request in simulation_result.trace_grade_requests:
             row_indices = simulation_row_indices.get(request["simulation_id"], [])
             trace_grade_requests.append(
                 {
@@ -809,40 +823,42 @@ async def run_evals() -> None:
         with concurrent.futures.ThreadPoolExecutor(max_workers=max_workers) as executor:
             for result in executor.map(execute_grade_job, grade_jobs):
                 for row_index in result["row_indices"]:
-                    all_rows[row_index][f"{result['grader_id']}_grade"] = result[
-                        "grade"
-                    ]
-                    all_rows[row_index][f"{result['grader_id']}_rationale"] = result[
-                        "rationale"
-                    ]
+                    all_rows[row_index].set_grader_result(
+                        result["grader_id"],
+                        result["grade"],
+                        result["rationale"],
+                    )
 
-    results_df = pd.DataFrame(all_rows)
+    results_df = pd.DataFrame([row.to_csv_row() for row in all_rows])
     results_df = order_result_columns(results_df)
     results_csv_path = run_dir / "results.csv"
     results_df.to_csv(results_csv_path, index=False)
 
-    summary = compute_summary(results_df)
-    summary.update(
-        {
-            "run_name": run_name,
-            "assistant_model_default": args.assistant_model or args.model or "",
-            "simulator_model_default": args.simulator_model or "",
-            "input_audio_format": args.input_audio_format,
-            "output_audio_format": args.output_audio_format,
-            "chunk_ms": args.chunk_ms,
-            "sample_rate_hz": args.sample_rate_hz,
-            "real_time": args.real_time,
-            "data_csv": str(args.data_csv),
-        }
+    summary = compute_summary(
+        results_df,
+        RunEvalRunConfig(
+            run_name=run_name,
+            assistant_model_default=args.assistant_model or args.model or "",
+            simulator_model_default=args.simulator_model or "",
+            input_audio_format=args.input_audio_format,
+            output_audio_format=args.output_audio_format,
+            chunk_ms=args.chunk_ms,
+            sample_rate_hz=args.sample_rate_hz,
+            real_time=args.real_time,
+            data_csv=args.data_csv,
+        ),
     )
 
     summary_path = run_dir / "summary.json"
-    summary_path.write_text(json.dumps(summary, indent=2), encoding="utf-8")
-    grade_keys = sorted(key for key in summary.keys() if key.endswith("_grade_mean"))
-    grade_notes = " ".join(f"{key}={summary.get(key, 0):.3f}" for key in grade_keys)
+    summary_dict = summary.to_flat_summary()
+    summary_path.write_text(json.dumps(summary_dict, indent=2), encoding="utf-8")
+    grade_keys = sorted(summary.grade_means.keys())
+    grade_notes = " ".join(
+        f"{key}={summary.grade_means.get(key, 0):.3f}" for key in grade_keys
+    )
     print(
         "Summary:"
-        f" total_rows={summary.get('total_rows', 0)}"
+        f" total_rows={summary.total_rows}"
         f"{(' ' + grade_notes) if grade_notes else ''}"
     )
     print(f"Wrote results to {run_dir}")

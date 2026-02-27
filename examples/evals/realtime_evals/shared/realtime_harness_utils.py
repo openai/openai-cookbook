@@ -265,7 +265,9 @@ async def collect_realtime_response(
     if has_output_audio_tokens or has_output_text_tokens:
         usage_data["output_token_details"] = {}
         if has_output_audio_tokens:
-            usage_data["output_token_details"]["audio_tokens"] = usage_output_audio_tokens
+            usage_data["output_token_details"]["audio_tokens"] = (
+                usage_output_audio_tokens
+            )
         if has_output_text_tokens:
             usage_data["output_token_details"]["text_tokens"] = usage_output_text_tokens
     return {

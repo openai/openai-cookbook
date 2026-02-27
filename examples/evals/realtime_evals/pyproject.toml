@@ -8,3 +8,5 @@ dependencies = [
     "openai[realtime]==2.15.0",
     "pandas==2.3.3",
 ]
+[tool.ruff.lint]
+ignore = ["E402"]

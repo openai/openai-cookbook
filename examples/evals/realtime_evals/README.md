@@ -11,20 +11,32 @@ Depending on your realtime eval maturity, point Codex (or your preferred coding 
 
 ## Quickstart
 
-Python 3.9+ required.
+Python 3.12+ required.
 
 ```bash
-pip install -r requirements.txt
+uv venv .venv
+source .venv/bin/activate
+uv sync
 export OPENAI_API_KEY="your_api_key"
 ```
 
 Run a first command per harness:
 
-- Crawl: `python crawl_harness/run_realtime_evals.py`
+- Crawl: `uv run python crawl_harness/run_realtime_evals.py`
 - Walk: install ffmpeg (`brew install ffmpeg`), then:
-  - `python walk_harness/generate_audio.py`
-  - `python walk_harness/run_realtime_evals.py`
-- Run: `python run_harness/run_realtime_evals.py --max-examples 1`
+  - `uv run python walk_harness/generate_audio.py`
+  - `uv run python walk_harness/run_realtime_evals.py`
+- Run: `uv run python run_harness/run_realtime_evals.py --max-examples 1`
+
+## Dev commands
+
+Use the root `Makefile` for common checks:
+
+- `make format`
+- `make lint`
+- `make lint-fix`
+- `make typecheck`
+- `make test`
 
 ## [Crawl (synthetic single-turn)](./crawl_harness)
 
@@ -38,7 +50,7 @@ Run a first command per harness:
 Run:
 
 ```
-python crawl_harness/run_realtime_evals.py
+uv run python crawl_harness/run_realtime_evals.py
 ```
 
 ## [Walk (saved audio replay)](./walk_harness)
@@ -53,8 +65,8 @@ python crawl_harness/run_realtime_evals.py
 Run:
 
 ```
-python walk_harness/generate_audio.py
-python walk_harness/run_realtime_evals.py
+uv run python walk_harness/generate_audio.py
+uv run python walk_harness/run_realtime_evals.py
 ```
 
 ## [Run (multi-turn simulation)](./run_harness)
@@ -69,7 +81,7 @@ python walk_harness/run_realtime_evals.py
 Run:
 
 ```
-python run_harness/run_realtime_evals.py
+uv run python run_harness/run_realtime_evals.py
 ```
 
 ## Results layout
@@ -79,6 +91,8 @@ Each harness writes into its own `results/` folder:
 - `results/<run_id>/results.csv`: per-example outputs and grades
 - `results/<run_id>/summary.json`: aggregate metrics
 - `results/<run_id>/events/*.jsonl`: full realtime event stream per datapoint
+
+For the crawl harness, the shared typed representation of these artifacts lives in `shared/result_types.py`.
 
 ## Common CLI flags
 

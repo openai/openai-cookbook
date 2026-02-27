@@ -40,4 +40,3 @@ def order_columns(results: pd.DataFrame, preferred_columns: List[str]) -> pd.Dat
         column for column in preferred_columns if column in results.columns
     ] + remaining_columns
     return results.loc[:, ordered_columns]
-

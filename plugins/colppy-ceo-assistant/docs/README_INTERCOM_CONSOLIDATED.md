@@ -107,6 +107,10 @@ Search for specific conversations based on criteria.
 - `state` (optional): Conversation state - "open", "closed", or "snoozed"
 - `limit` (optional): Maximum number of results (default: 50, max: 150)
 
+#### 4. `scan_full_text` — Result limits
+
+**`scan_full_text` returns all matches** — no cap. The cost is in fetching conversations; once fetched, all matches are returned. The `limit` parameter is deprecated and no longer used.
+
 ### **🔧 MCP Integration Examples**
 
 #### Claude Desktop Configuration

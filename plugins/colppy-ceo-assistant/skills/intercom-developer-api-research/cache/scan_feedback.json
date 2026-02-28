@@ -1,0 +1,17 @@
+{
+  "_instructions": "Edit this file to mark conversations. I'll use it to suggest keyword changes. Leave arrays empty if unsure.",
+  "true_positives": [
+    "84078801455971",
+    "84078801455975",
+    "84078801454756",
+    "84078801454521",
+    "84078801454381",
+    "84078801454021",
+    "84078801454856",
+    "84078801454795"
+  ],
+  "false_positives": [
+    "84078801455928"
+  ],
+  "_notes": "Current 9 matches: 8 TP (developer/API/integration), 1 FP (internal mail with 'staging')."
+}

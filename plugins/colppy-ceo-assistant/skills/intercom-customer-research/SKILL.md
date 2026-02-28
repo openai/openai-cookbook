@@ -31,10 +31,18 @@ That's it. No tokens, no config files, no local server needed.
 
 ### Step 1: Scan for relevant conversations
 
+**Two scan options:**
+
+| Tool | Scope | When to use |
+|------|-------|-------------|
+| `scan_customer_feedback` | First message only | Fast. Topic likely in the opening message. |
+| `scan_full_text` | All messages (including replies) | Slower. Topic may appear in support replies (e.g. Mercado Pago, integrations). |
+
 Search conversations by date range, filtering by topic keywords and/or Intercom tags. Start narrow (7–14 days) and widen if you get too few results.
 
 Ask for example:
 - *"Search Intercom conversations from the last 14 days about conciliacion bancaria"*
+- *"Find conversations where Mercado Pago was mentioned in the last 5 days"* (use `scan_full_text`)
 - *"Find conversations tagged 'Bug' about factura electronica since January 2026"*
 
 ### Step 2: Deep-dive into specific conversations
@@ -55,6 +63,7 @@ Ask for example:
 - "What are customers saying about the new eSueldos module?"
 - "What pain points do customers report about conecta tu banco?"
 - "Find conversations where customers asked about carga masiva de facturas"
+- "In which conversations did Mercado Pago appear in the last 5 days?" (use `scan_full_text`)
 - "How many Intercom conversations were there last week?"
 
 ---
@@ -65,3 +74,10 @@ Ask for example:
 - **Combine tags + keywords** for precision: e.g. tag "Bug" + keyword "factura" finds bug reports about invoicing.
 - **Scan first, then read**: get a list of matching conversations first, then pick the 3–5 most relevant to read in full.
 - **Specify keywords explicitly** if the topic is multi-word: e.g. "conciliacion", "banco", "CBU" separately gives better matches than the full phrase.
+- **Use `scan_full_text`** when the topic may appear in replies (e.g. Mercado Pago, integrations). It fetches full conversations so uses more API calls; keep date ranges narrow (5–7 days) and `max_scan` at 200 unless needed.
+
+---
+
+## Scan result limits
+
+**`scan_full_text` returns all matches** — no cap. The cost is in fetching conversations; once fetched, all matches are returned. The `limit` parameter is deprecated and no longer used.

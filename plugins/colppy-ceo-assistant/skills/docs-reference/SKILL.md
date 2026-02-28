@@ -35,7 +35,7 @@ All documentation is bundled in the **`docs/`** folder (relative to the plugin r
 | First payments count by month (how many in Jan 2026?) | `docs/colppy_first_payments_snapshot.json` → `first_payments_by_month[YYYY-MM]` |
 | facturacion.csv vs Colppy billing reconciliation | `docs/COLPPY_HUBSPOT_RECONCILIATION.md`, `docs/colppy_facturacion_snapshot.json` |
 | id_empresa → CUIT (Colppy DB source, for HubSpot CUIT reconciliation) | `docs/colppy_cuit_snapshot.json` — different from billing facturacion.csv |
-| Colppy DB CUIT ↔ HubSpot primary company reconciliation | `docs/COLPPY_HUBSPOT_RECONCILIATION.md` § Colppy DB CUIT; `tools/docs/COLPPY_DB_CUIT_HUBSPOT_RECONCILIATION.md` |
+| Colppy DB CUIT ↔ HubSpot primary company reconciliation | `docs/COLPPY_HUBSPOT_RECONCILIATION.md` § Colppy DB CUIT; `tools/docs/COLPPY_DB_CUIT_HUBSPOT_RECONCILIATION.md` (repo root, when full repo present) |
 | Numeric company names, CUIT inference | `docs/HUBSPOT_NUMERIC_COMPANY_NAME_INFERENCE.md` |
 | Monthly analysis guide | `docs/HUBSPOT_MONTHLY_ANALYSIS_GUIDE.md` |
 

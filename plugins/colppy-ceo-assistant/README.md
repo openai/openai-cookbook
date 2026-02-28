@@ -23,6 +23,7 @@ CEO analytics assistant for **Colppy.com** — SaaS B2B accounting software for 
 | **colppy-first-payments** | Query first payments count by month from Colppy. Uses bundled colppy_first_payments_snapshot.json (no VPN/MySQL). |
 | **facturacion-csv-colppy** | Reconcile facturacion.csv vs Colppy billing. Uses bundled colppy_facturacion_snapshot.json. User attaches facturacion.csv. |
 | **intercom-customer-research** | Search and analyze Intercom conversations for customer feedback on any feature or topic. Two-step workflow: scan (quick preview) then deep dive (full conversation content). Requires Claude Desktop's built-in Intercom integration (Settings → Integrations → Intercom). |
+| **intercom-developer-api-research** | Find Colppy API integration conversations (developers, integrators, e‑commerce, ERP). Uses editable `keywords.json` for learning. Negative filter for false positives. |
 
 ## Commands (Slash Commands)
 
@@ -58,6 +59,7 @@ CEO analytics assistant for **Colppy.com** — SaaS B2B accounting software for 
 | Command | Description |
 |---------|-------------|
 | `/colppy-ceo-assistant:intercom-research` | Search Intercom conversations for customer feedback on a specific feature or topic. Scans by keywords/tags, deep-dives relevant conversations, categorizes findings. |
+| `/colppy-ceo-assistant:intercom-developer-api-research` | Find developer/API integration conversations in Intercom. Uses curated keywords and negative filters. Editable config for learning. |
 
 ## Agents
 
@@ -77,41 +79,23 @@ CEO analytics assistant for **Colppy.com** — SaaS B2B accounting software for 
 
 ### Intercom (required for customer research)
 
-The **intercom-customer-research** skill requires a local MCP server that connects to Colppy's Intercom workspace.
+The **intercom-customer-research** skill uses the **intercom-research** MCP server bundled with this plugin. Tools: `scan_full_text`, `scan_customer_feedback`, `get_conversation_feedback`, `export_intercom_conversations`, `count_intercom_conversations`, `get_intercom_conversation_stats`, `search_intercom_conversations`.
 
-**Quick setup (3 steps):**
+**Quick setup:**
 
 1. **Get the access token** — Ask the team lead or IT for the `INTERCOM_ACCESS_TOKEN`. It's generated in Intercom > Settings > Integrations > Developer Hub > your app > Authentication. The token looks like `dG9rOjxxx...`. This token is a secret; do not commit it to any file.
 
-2. **Add the MCP server config** to your app's config file:
+2. **Set the token** — Add `INTERCOM_ACCESS_TOKEN=your-token` to your workspace `.env` file (at the repo root), or in Cursor: Settings → Tools & MCP → **intercom-research** → env. The plugin loads `.env` from the workspace root as a fallback.
 
-| App | Config file location |
-|-----|---------------------|
-| **Cursor IDE** | `~/.cursor/mcp.json` |
-| **Claude Desktop (macOS)** | `~/Library/Application Support/Claude/claude_desktop_config.json` |
-| **Claude Desktop (Windows)** | `%APPDATA%\Claude\claude_desktop_config.json` |
+3. **Install dependencies** (first time only) — Run `npm install` in `plugins/colppy-ceo-assistant/mcp/` if the MCP fails to start.
 
-Paste this JSON (create the file if it doesn't exist):
-
-```json
-{
-  "mcpServers": {
-    "intercom-research": {
-      "command": "node",
-      "args": ["/absolute/path/to/openai-cookbook/tools/scripts/intercom/mcp-intercom-server.js"],
-      "env": {
-        "INTERCOM_ACCESS_TOKEN": "paste-your-token-here"
-      }
-    }
-  }
-}
-```
-
-Replace the path and token with your actual values.
-
-3. **Restart the app** — Cursor: restart IDE. Claude Desktop: quit and reopen. The MCP tools will become available.
+4. **Restart Cursor** — The MCP tools will become available.
 
 > Full setup details are in `skills/intercom-customer-research/SKILL.md`.
+
+#### Intercom MCP: Scan result limits
+
+**`scan_full_text` returns all matches** — no cap. The cost is in fetching conversations; once fetched, all matches are returned. The `limit` parameter is deprecated and no longer used.
 
 **Local only** — Use Cursor or Claude Desktop. Claude Cowork and Cloud Agents do not support this (no remote MCP).
 

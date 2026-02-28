@@ -59,7 +59,7 @@ facturacion_hubspot.db                      colppy_facturacion_snapshot.json
 |-------|---------|
 | **1. Match same month** | fechaPago ≠ close_date (same month, wrong day). Action: Set HubSpot close_date = Colppy fechaPago. |
 | **2. Match different month** | HubSpot deal exists but close_date in another month. Action: Set HubSpot close_date = Colppy fechaPago. |
-| **3. Wrong Stage** | COLPPY_NOT_ACTIVE (activa≠0), WRONG_STAGE (deal e.g. Cerrado Churn), NO_HUBSPOT_DEAL. |
+| **3. Wrong Stage** | COLPPY_NOT_ACTIVE (activa≠0), WRONG_STAGE (deal e.g. Cerrado Churn), NO_HUBSPOT_DEAL. Each row includes **Expected stage** and **Explanation** for the recommended action. |
 | **4. HubSpot only** | Closed-won this month; Colppy first payment in different month or absent. |
 
 **Match by id_empresa regardless of stage** — deals in Cerrado Churn appear in Group 3 (WRONG_STAGE).
@@ -93,9 +93,10 @@ facturacion_hubspot.db                      colppy_facturacion_snapshot.json
 **When presenting reconciliation results in the chatbot**, always:
 
 1. **Display in chat** — Do not only reference .md files. Show summary tables and deal lists directly.
-2. **All deals with clickable links** — For every deal mentioned, generate `[Deal Name](https://app.hubspot.com/contacts/19877595/deal/DEAL_ID)`.
-3. **Required outputs:**
-   - Colppy ↔ HubSpot: 4-group summary + full deal list with links
+2. **Output MUST be identical every time** — NEVER abbreviate, summarize, or say "same as Group X". Show the full markdown table for **each** of the 4 groups (Group 1, Group 2, Group 3, Group 4) with all rows and all columns. Each group has its own table; display every group in full.
+3. **All deals with clickable links** — For every deal mentioned, generate `[Deal Name](https://app.hubspot.com/contacts/19877595/deal/DEAL_ID)`.
+4. **Required outputs:**
+   - Colppy ↔ HubSpot: 4-group summary + full table for Group 1 + full table for Group 2 + full table for Group 3 (with Expected stage, Explanation) + full table for Group 4
    - CUIT reconciliation: MATCH/MISMATCH/NO_PRIMARY summary + deal lists with links
 
 **Output files** (written to `tools/outputs/`):

@@ -1,4 +1,12 @@
 {
-  "mcpServers": {},
-  "_comment": "No remote MCP servers needed. Intercom access uses Claude Desktop's built-in Intercom integration (Settings → Integrations → Intercom). No tokens or local server config required."
+  "mcpServers": {
+    "intercom-research": {
+      "command": "node",
+      "args": ["mcp/mcp-intercom-server.js"],
+      "env": {
+        "INTERCOM_ACCESS_TOKEN": "${INTERCOM_ACCESS_TOKEN}"
+      }
+    }
+  },
+  "_comment": "intercom-research: export, scan_full_text, scan_customer_feedback, get_conversation_feedback. Set INTERCOM_ACCESS_TOKEN in Cursor MCP settings or .env."
 }

@@ -1,0 +1,13 @@
+{
+  "name": "colppy-intercom-mcp",
+  "version": "1.0.0",
+  "description": "Intercom research MCP for Colppy CEO Assistant - export, scan, stats",
+  "type": "module",
+  "main": "mcp-intercom-server.js",
+  "dependencies": {
+    "@modelcontextprotocol/sdk": "^1.0.0",
+    "axios": "^1.9.0",
+    "dotenv": "^16.5.0"
+  },
+  "engines": { "node": ">=18.0.0" }
+}

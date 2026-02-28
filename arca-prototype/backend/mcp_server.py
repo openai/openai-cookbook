@@ -45,7 +45,7 @@ import logging
 import os
 import sys
 from dataclasses import asdict
-from datetime import datetime
+from datetime import datetime, timedelta, timezone
 from pathlib import Path
 from typing import Any
 
@@ -71,16 +71,21 @@ for p in [str(BACKEND_PARENT), str(REPO_ROOT), str(REPO_ROOT / "tools" / "script
 
 _env_path = ARCA_ROOT / ".env"
 if _env_path.exists():
-    for line in _env_path.read_text().splitlines():
-        line = line.strip()
-        if not line or line.startswith("#"):
-            continue
-        if "=" in line:
-            key, _, value = line.partition("=")
-            key = key.strip()
-            value = value.strip().strip("'\"")
-            if key and key not in os.environ:
-                os.environ[key] = value
+    try:
+        from dotenv import load_dotenv
+        load_dotenv(_env_path, override=False)
+    except ImportError:
+        # Fallback: minimal parser if python-dotenv not installed
+        for line in _env_path.read_text().splitlines():
+            line = line.strip()
+            if not line or line.startswith("#"):
+                continue
+            if "=" in line:
+                key, _, value = line.partition("=")
+                key = key.strip()
+                value = value.strip().strip("'\"")
+                if key and key not in os.environ:
+                    os.environ[key] = value
 
 # ---------------------------------------------------------------------------
 # Configuration from env
@@ -127,7 +132,7 @@ def _meta(source: str, count: int, cuit: str = "", fetched_at: str | None = None
     """Build standard _meta dict for tool responses."""
     return {
         "source": source,
-        "fetched_at": fetched_at or datetime.utcnow().isoformat() + "Z",
+        "fetched_at": fetched_at or datetime.now(timezone.utc).isoformat().replace("+00:00", "Z"),
         "count": count,
         "cuit": cuit,
     }
@@ -197,7 +202,7 @@ def ping(arca_cuit: str | int = "") -> dict:
         "login_cuit": login_cuit if len(login_cuit) == 11 else None,
         "entity_cuit": entity_cuit if len(entity_cuit) == 11 else None,
         "credentials_source": "parameter" if str(arca_cuit).strip() else "env",
-        "timestamp": datetime.utcnow().isoformat() + "Z",
+        "timestamp": datetime.now(timezone.utc).isoformat().replace("+00:00", "Z"),
     }
 
 
@@ -226,6 +231,7 @@ async def get_comprobantes(
         force_refresh: If True, bypass cache and fetch live from ARCA
         arca_cuit: ARCA login CUIT. Falls back to ARCA_CUIT env var if not provided.
         arca_password: ARCA Clave Fiscal. Falls back to ARCA_PASSWORD env var if not provided.
+                      Note: transmitted in MCP protocol and may be logged by the client. Prefer env vars for persistent setups.
     """
     from backend.services import arca_db
     from backend.services.comprobantes_api import (
@@ -333,6 +339,7 @@ async def get_retenciones(
         force_refresh: If True, bypass cache and fetch live from ARCA
         arca_cuit: ARCA login CUIT. Falls back to ARCA_CUIT env var if not provided.
         arca_password: ARCA Clave Fiscal. Falls back to ARCA_PASSWORD env var if not provided.
+                      Note: transmitted in MCP protocol and may be logged by the client. Prefer env vars for persistent setups.
     """
     from backend.services import arca_db
     from backend.services.retenciones_api import download_retenciones
@@ -445,6 +452,7 @@ async def get_notificaciones(
                           If None, uses the first representado for the login CUIT.
         arca_cuit: ARCA login CUIT. Falls back to ARCA_CUIT env var if not provided.
         arca_password: ARCA Clave Fiscal. Falls back to ARCA_PASSWORD env var if not provided.
+                      Note: transmitted in MCP protocol and may be logged by the client. Prefer env vars for persistent setups.
     """
     from backend.services import arca_db
     from backend.services.notifications_api import get_notifications_with_content
@@ -522,6 +530,7 @@ async def get_representados(
         force_refresh: If True, bypass cache and fetch live from ARCA
         arca_cuit: ARCA login CUIT. Falls back to ARCA_CUIT env var if not provided.
         arca_password: ARCA Clave Fiscal. Falls back to ARCA_PASSWORD env var if not provided.
+                      Note: transmitted in MCP protocol and may be logged by the client. Prefer env vars for persistent setups.
     """
     from backend.services import arca_db
     from backend.services.notifications_api import get_representados as api_get_representados
@@ -649,8 +658,6 @@ def test_wsaa_auth() -> dict:
             "message": "WSAA authentication OK. Token obtained.",
             "token_preview": creds["token"][:20] + "..." if creds.get("token") else None,
         }
-    except RuntimeError as e:
-        return {"success": False, "error": str(e)}
     except Exception as e:
         return {"success": False, "error": str(e)}
 
@@ -896,6 +903,13 @@ async def reconcile_retenciones_vs_comprobantes(
                     )
                     if compra_result.get("success"):
                         colppy_percepciones = defaultdict(list)
+
+                        def _sf(raw):
+                            try:
+                                return round(float(raw or 0), 2)
+                            except (ValueError, TypeError):
+                                return 0.0
+
                         for v in (compra_result.get("data") or []):
                             # Skip anuladas
                             if str(v.get("idEstadoFactura", "")) == "3":
@@ -904,12 +918,6 @@ async def reconcile_retenciones_vs_comprobantes(
                             supplier_cuit = cuit_map.get(pid, "")
                             if not supplier_cuit:
                                 continue
-
-                            def _sf(raw):
-                                try:
-                                    return round(float(raw or 0), 2)
-                                except (ValueError, TypeError):
-                                    return 0.0
 
                             perc_iva = _sf(v.get("percepcionIVA", "0"))
                             perc_iibb = _sf(v.get("percepcionIIBB", "0"))
@@ -990,13 +998,12 @@ async def search_invoices(
     # Default to last 3 months if no specific range
     today = datetime.now()
     fecha_hasta = today.strftime("%Y-%m-%d")
-    from datetime import timedelta
     fecha_desde = (today - timedelta(days=90)).strftime("%Y-%m-%d")
 
-    # Load emitidos for reconciliation context
-    arca_items, _ = arca_db.get_comprobantes(entity_cuit, "E", fecha_desde, fecha_hasta)
-    if not arca_items:
-        arca_items, _ = arca_db.get_comprobantes(entity_cuit, "R", fecha_desde, fecha_hasta)
+    # Load both emitidos and recibidos for reconciliation context
+    arca_emitidos, _ = arca_db.get_comprobantes(entity_cuit, "E", fecha_desde, fecha_hasta)
+    arca_recibidos, _ = arca_db.get_comprobantes(entity_cuit, "R", fecha_desde, fecha_hasta)
+    arca_items = arca_emitidos + arca_recibidos
 
     # Build minimal discrepancies/matched from cache (we don't have full reconciliation
     # results cached, so we pass the comprobantes as context)

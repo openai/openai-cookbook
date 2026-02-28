@@ -1,5 +1,7 @@
 {
+  "env": {},
   "permissions": {
+    "defaultMode": "acceptEdits",
     "allow": [
       "Read(//Users/virulana/Library/**)",
       "Bash(npx:*)",
@@ -40,10 +42,15 @@
       "mcp__claude_ai_Slack__*",
       "mcp__claude_ai_Atlassian__*",
       "mcp__claude_ai_Granola__*",
+      "mcp__intercom__*",
       "Skill(commit-commands:commit-push-pr)",
       "Skill(commit-commands:commit-push-pr:*)",
       "Skill(commit-commands:commit)",
-      "Skill(commit-commands:commit:*)"
+      "Skill(commit-commands:commit:*)",
+      "mcp__claude_ai_Intercom__search",
+      "mcp__arca__*",
+      "WebFetch",
+      "WebSearch"
     ],
     "deny": [],
     "ask": []

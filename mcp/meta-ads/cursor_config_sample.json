@@ -3,7 +3,9 @@
     "meta-ads": {
       "command": "/Users/virulana/openai-cookbook/meta_ads_mcp_env/bin/python",
       "args": ["-m", "mcp_meta_ads"],
+      "cwd": "/Users/virulana/openai-cookbook",
       "env": {
+        "PYTHONPATH": "/Users/virulana/openai-cookbook/mcp/meta-ads/src",
         "META_ADS_APP_ID": "${META_ADS_APP_ID}",
         "META_ADS_APP_SECRET": "${META_ADS_APP_SECRET}",
         "META_ADS_ACCESS_TOKEN": "${META_ADS_ACCESS_TOKEN}",
@@ -26,9 +28,7 @@
     },
     "intercom": {
       "command": "node",
-      "args": [
-        "/Users/virulana/openai-cookbook/tools/scripts/intercom/mcp-intercom-server.js"
-      ]
+      "args": ["/Users/virulana/openai-cookbook/tools/scripts/intercom/mcp-intercom-server.js"]
     }
   }
 }

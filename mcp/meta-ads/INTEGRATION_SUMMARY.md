@@ -73,23 +73,23 @@ account_info = account.api_get(fields=['name', 'account_status', 'currency'])
 ```bash
 cd /Users/virulana/openai-cookbook
 source meta_ads_mcp_env/bin/activate
-python meta_ads_mcp_config/campaign_status_detection.py
+python mcp/meta-ads/campaign_status_detection.py
 ```
 
 ### **2. Quick Reference**
 ```bash
-python meta_ads_mcp_config/meta_ads_quick_reference.py
+python mcp/meta-ads/meta_ads_quick_reference.py
 ```
 
 ### **3. Full Analysis**
 ```bash
-python meta_ads_mcp_config/meta_ads_analysis.py
+python mcp/meta-ads/meta_ads_analysis.py
 ```
 
 ## 📚 **Documentation Structure:**
 
 ```
-meta_ads_mcp_config/
+mcp/meta-ads/
 ├── CAMPAIGN_STATUS_DETECTION_GUIDE.md    # Complete API reference
 ├── campaign_status_detection.py          # Full working example
 ├── meta_ads_quick_reference.py           # Essential API calls

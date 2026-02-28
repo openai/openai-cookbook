@@ -35,7 +35,7 @@ Review the Google Ads MCP integration in this codebase. What tools and scripts a
 ```
 
 **What to Expect:**
-- Identification of `google_ads_mcp_config/` directory
+- Identification of `mcp/google-ads/` directory
 - Analysis of scripts in `tools/scripts/`
 - Explanation of HubSpot-Google Ads integration
 - Documentation review

@@ -52,7 +52,7 @@ GOOGLE_ADS_CLIENT_SECRET=your_client_secret_here
 GOOGLE_ADS_REFRESH_TOKEN=your_refresh_token_here
 
 # If using Service Account (for server applications)
-GOOGLE_ADS_CREDENTIALS_PATH=/Users/virulana/openai-cookbook/google_ads_mcp_config/credentials/service_account.json
+GOOGLE_ADS_CREDENTIALS_PATH=/Users/virulana/openai-cookbook/mcp/google-ads/credentials/service_account.json
 
 # Optional: Default Customer ID (remove dashes)
 GOOGLE_ADS_CUSTOMER_ID=1234567890
@@ -65,7 +65,7 @@ If using OAuth, run this script to generate your refresh token:
 ```bash
 cd /Users/virulana/openai-cookbook
 source google_ads_mcp_env/bin/activate
-python google_ads_mcp_config/generate_refresh_token.py
+python mcp/google-ads/generate_refresh_token.py
 ```
 
 ## 5. Configure Your IDE
@@ -121,7 +121,7 @@ Run the test script:
 ```bash
 cd /Users/virulana/openai-cookbook
 source google_ads_mcp_env/bin/activate
-python google_ads_mcp_config/test_setup.py
+python mcp/google-ads/test_setup.py
 ```
 
 ## 7. Restart Your IDE

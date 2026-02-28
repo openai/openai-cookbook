@@ -1,0 +1,15 @@
+{
+  "name": "colppy-ceo-assistant",
+  "version": "1.0.0",
+  "description": "CEO analytics assistant for Colppy.com — SaaS B2B accounting software for the Argentina market.",
+  "type": "module",
+  "scripts": {
+    "scan": "node scripts/local_scan.mjs",
+    "classify": "node scripts/llm_classify.mjs",
+    "suggest": "node scripts/suggest_keyword_changes.mjs"
+  },
+  "license": "ISC",
+  "dependencies": {
+    "openai": "^6.25.0"
+  }
+}

@@ -18,6 +18,10 @@ Groups:
   3. Accountant not associated: accountant company (Cuenta Contador, etc.) matches customer_cuit
      but is not associated with deal (type 5 or 8) → add type 8 (Estudio Contable). Considers ALL
      companies per CUIT (not just one).
+  5. MISMATCH: HubSpot primary CUIT ≠ Colppy DB CUIT → remove PRIMARY from wrong company,
+     add PRIMARY to company with Colppy CUIT. Requires --colppy-db --year --month.
+     When multiple companies share the same CUIT, disambiguates by id_empresa in name,
+     then razon_social/empresa_nombre.
 
 Usage:
     python tools/scripts/hubspot/fix_deal_associations.py --group 1 --batch 5
@@ -25,7 +29,14 @@ Usage:
     python tools/scripts/hubspot/fix_deal_associations.py --group 3 --batch 10
     python tools/scripts/hubspot/fix_deal_associations.py --status   # show counts only
     python tools/scripts/hubspot/fix_deal_associations.py --dry-run  # show what would be fixed
+    # Group 1 with Colppy DB (fixes NO_PRIMARY deals not in billing):
+    python tools/scripts/hubspot/fix_deal_associations.py --group 1 --colppy-db --year 2026 --month 2 --dry-run
     python tools/scripts/hubspot/fix_deal_associations.py --group 2 --batch 10  # logs to edit_logs by default; use --no-log to skip
+
+    # Group 1 with Colppy DB (fix NO_PRIMARY deals not in billing):
+    python tools/scripts/hubspot/fix_deal_associations.py --group 1 --colppy-db --year 2026 --month 2 --dry-run
+    # Group 5 (MISMATCH: wrong primary CUIT → swap to Colppy DB company):
+    python tools/scripts/hubspot/fix_deal_associations.py --group 5 --colppy-db --year 2026 --month 2 --dry-run
 
 Fix association label (change type 11 → 8 for accountant company):
     python tools/scripts/hubspot/fix_deal_associations.py --fix-label 9424153860 9019047084 --remove 11 --add 8
@@ -36,6 +47,8 @@ When inferred from name, the script also enriches the company: type=Cuenta Conta
 After each fix batch, an audit corrects type 8/11 labels when company.type is null or inconsistent.
 See tools/docs/HUBSPOT_DEAL_COMPANY_ASSOCIATION_RULES.md section 0.1.
 """
+from __future__ import annotations
+
 import argparse
 import re
 import sqlite3
@@ -43,12 +56,15 @@ import sys
 from datetime import datetime, timezone
 from pathlib import Path
 
-sys.path.insert(0, str(Path(__file__).resolve().parents[3]))
+REPO_ROOT = Path(__file__).resolve().parents[3]
+sys.path.insert(0, str(REPO_ROOT))
 from dotenv import load_dotenv
 
-load_dotenv()
+load_dotenv(REPO_ROOT / ".env")
+load_dotenv(REPO_ROOT / "tools" / ".env")
 
-DEFAULT_DB = "tools/data/facturacion_hubspot.db"
+DEFAULT_DB = str(REPO_ROOT / "tools" / "data" / "facturacion_hubspot.db")
+DEFAULT_COLPPY_DB = str(REPO_ROOT / "tools" / "data" / "colppy_export.db")
 
 EXCLUDE_CUITS = {"12345678911", "12345678901", "00000000000"}
 
@@ -576,13 +592,355 @@ ORDER BY CAST(d.amount AS INTEGER) DESC
 """
 
 
-def _get_group3_candidates(conn: sqlite3.Connection) -> list[dict]:
+def _date_filter_sql(year: int | None, month: int | None) -> tuple[str, list]:
+    """Return (date_sql, params) for close_date filter. Empty if year/month not provided."""
+    if year is None or month is None:
+        return "", []
+    import calendar
+    start = f"{year}-{month:02d}-01"
+    last_day = calendar.monthrange(year, month)[1]
+    end = f"{year}-{month:02d}-{last_day}"
+    return " AND d.close_date >= ? AND d.close_date <= ?", [start, end]
+
+
+def _load_colppy_cuit_map(colppy_db_path: Path) -> dict[str, dict]:
+    """
+    Load id_empresa → {cuit, cuit_display, razon_social, empresa_nombre} from colppy_export.db.
+    Primary: facturacion.CUIT. Fallback: empresa.CUIT.
+    empresa_nombre (empresa.Nombre) is used for disambiguation when multiple HubSpot companies share the same CUIT.
+    """
+    if not colppy_db_path.exists():
+        return {}
+    with sqlite3.connect(colppy_db_path) as conn:
+        conn.row_factory = sqlite3.Row
+        by_facturacion: dict[str, dict] = {}
+        cur = conn.execute(
+            """
+            SELECT f.IdEmpresa AS id_empresa, f.CUIT AS cuit_raw, f.razonSocial
+            FROM facturacion f
+            WHERE (f.fechaBaja IS NULL OR f.fechaBaja = '' OR f.fechaBaja = '0000-00-00')
+              AND f.IdEmpresa IS NOT NULL AND f.IdEmpresa != 0 AND f.IdEmpresa != ''
+            """
+        )
+        for r in cur.fetchall():
+            ie = str(r["id_empresa"] or "").strip()
+            if not ie:
+                continue
+            cuit = _normalize_cuit(r["cuit_raw"] or "")
+            if cuit and len(cuit) == 11:
+                by_facturacion[ie] = {
+                    "cuit": cuit,
+                    "cuit_display": _format_cuit_display(cuit),
+                    "razon_social": (r["razonSocial"] or "").strip()[:80],
+                    "empresa_nombre": "",
+                }
+        # Enrich with empresa.Nombre for disambiguation (same id_empresa can have different names)
+        cur2 = conn.execute(
+            """
+            SELECT e.IdEmpresa AS id_empresa, e.Nombre AS empresa_nombre
+            FROM empresa e
+            WHERE e.IdEmpresa IS NOT NULL AND e.IdEmpresa != 0 AND e.IdEmpresa != ''
+            """
+        )
+        empresa_by_ie: dict[str, str] = {}
+        for r in cur2.fetchall():
+            ie = str(r["id_empresa"] or "").strip()
+            if ie:
+                empresa_by_ie[ie] = (r["empresa_nombre"] or "").strip()[:80]
+        for ie, data in by_facturacion.items():
+            data["empresa_nombre"] = empresa_by_ie.get(ie, "")
+        # Fallback: id_empresa not in facturacion
+        cur3 = conn.execute(
+            """
+            SELECT e.IdEmpresa AS id_empresa, e.CUIT AS cuit_raw, e.Nombre AS empresa_nombre
+            FROM empresa e
+            WHERE e.IdEmpresa IS NOT NULL AND e.IdEmpresa != 0 AND e.IdEmpresa != ''
+            """
+        )
+        for r in cur3.fetchall():
+            ie = str(r["id_empresa"] or "").strip()
+            if not ie or ie in by_facturacion:
+                continue
+            cuit = _normalize_cuit(r["cuit_raw"] or "")
+            if cuit and len(cuit) == 11:
+                by_facturacion[ie] = {
+                    "cuit": cuit,
+                    "cuit_display": _format_cuit_display(cuit),
+                    "razon_social": (r["empresa_nombre"] or "").strip()[:80],
+                    "empresa_nombre": (r["empresa_nombre"] or "").strip()[:80],
+                }
+    return by_facturacion
+
+
+def _pick_target_company_by_cuit(
+    conn: sqlite3.Connection,
+    cuit_norm: str,
+    id_empresa: str,
+    razon_social: str,
+    empresa_nombre: str,
+) -> tuple[str | None, str]:
+    """
+    When multiple HubSpot companies share the same CUIT, pick the one for this deal.
+    Tiebreaker: (1) company name starts with "{id_empresa} - ", (2) name contains razon_social or empresa_nombre.
+    Returns (hubspot_id, name) or (None, "") if no match or ambiguous.
+    """
+    rows = conn.execute(
+        """
+        SELECT hubspot_id, name FROM companies
+        WHERE (REPLACE(REPLACE(REPLACE(COALESCE(cuit,''),'-',''),' ',''),'.','') = ?)
+          AND hubspot_id != ''
+        """,
+        (cuit_norm,),
+    ).fetchall()
+    if not rows:
+        return None, ""
+    if len(rows) == 1:
+        return rows[0][0], (rows[0][1] or "")
+    # Multiple companies with same CUIT: use tiebreaker
+    id_prefix = f"{id_empresa} - "
+    rs_lower = (razon_social or "").strip().lower()
+    en_lower = (empresa_nombre or "").strip().lower()
+    for hubspot_id, name in rows:
+        name_str = (name or "").strip()
+        if name_str.startswith(id_prefix):
+            return hubspot_id, name_str
+    for hubspot_id, name in rows:
+        name_lower = (name or "").strip().lower()
+        if rs_lower and rs_lower in name_lower:
+            return hubspot_id, (name or "")
+        if en_lower and en_lower in name_lower:
+            return hubspot_id, (name or "")
+    return None, ""  # ambiguous
+
+
+def _get_group5_mismatch_candidates(
+    conn: sqlite3.Connection,
+    colppy_db_path: Path,
+    year: int | None = None,
+    month: int | None = None,
+) -> list[dict]:
+    """
+    Group 5 (MISMATCH): Deals where HubSpot primary company CUIT ≠ Colppy DB CUIT.
+    Fix: remove PRIMARY from wrong company, add PRIMARY to company with Colppy CUIT.
+    When multiple companies share the same CUIT, uses id_empresa/razon_social/empresa_nombre to disambiguate.
+    Returns list of {deal_id, deal_name, amount, id_empresa, billing_id, billing_name, customer_cuit}.
+    Skips when target company not found or ambiguous.
+    """
+    colppy_cuit = _load_colppy_cuit_map(colppy_db_path)
+    if not colppy_cuit:
+        return []
+    import calendar
+
+    sql = """
+        SELECT d.hubspot_id, d.deal_name, d.amount, d.id_empresa, d.close_date,
+               da.company_hubspot_id AS primary_company_hs_id,
+               c.cuit AS hubspot_primary_cuit
+        FROM deals d
+        JOIN deal_associations da ON da.deal_hubspot_id = d.hubspot_id AND da.association_type_id = 5
+        JOIN companies c ON c.hubspot_id = da.company_hubspot_id
+        WHERE d.deal_stage IN ('closedwon', '34692158')
+          AND d.hubspot_id != ''
+          AND d.id_empresa IS NOT NULL AND d.id_empresa != ''
+    """
+    params: list = []
+    if year is not None and month is not None:
+        start = f"{year}-{month:02d}-01"
+        last_day = calendar.monthrange(year, month)[1]
+        end = f"{year}-{month:02d}-{last_day}"
+        sql += " AND d.close_date >= ? AND d.close_date <= ?"
+        params = [start, end]
+    sql += " ORDER BY CAST(d.amount AS INTEGER) DESC"
+
+    rows = conn.execute(sql, params).fetchall()
+    result: list[dict] = []
+    for r in rows:
+        ie = str(r[3] or "").strip()
+        colppy_row = colppy_cuit.get(ie)
+        if not colppy_row:
+            continue
+        colppy_cuit_norm = colppy_row.get("cuit", "")
+        hs_cuit_norm = _normalize_cuit(r[6])
+        if not colppy_cuit_norm or colppy_cuit_norm in EXCLUDE_CUITS:
+            continue
+        if hs_cuit_norm == colppy_cuit_norm:
+            continue  # MATCH, not MISMATCH
+        target_id, target_name = _pick_target_company_by_cuit(
+            conn,
+            colppy_cuit_norm,
+            ie,
+            colppy_row.get("razon_social", ""),
+            colppy_row.get("empresa_nombre", ""),
+        )
+        if not target_id:
+            continue
+        result.append({
+            "deal_id": r[0],
+            "deal_name": r[1],
+            "amount": r[2],
+            "id_empresa": ie,
+            "billing_id": target_id,
+            "billing_name": target_name or "",
+            "customer_cuit": colppy_row.get("cuit_display", ""),
+        })
+    return result
+
+
+def _find_company_by_name(
+    conn: sqlite3.Connection,
+    id_empresa: str,
+    razon_social: str,
+    empresa_nombre: str,
+    client=None,
+) -> tuple[str | None, str]:
+    """
+    Fallback when no company found by CUIT: search by name.
+    1. DB: name starts with "{id_empresa} - " or contains empresa_nombre/razon_social key part.
+    2. HubSpot API: text search by id_empresa or empresa_nombre (if client provided).
+    Returns (hubspot_id, name) or (None, "").
+    """
+    id_prefix = f"{id_empresa} - "
+    en = (empresa_nombre or "").strip()
+    rs = (razon_social or "").strip()
+    # Prefer short distinctive name for search (empresa_nombre often matches deal)
+    search_term = en if len(en) > 3 else (rs.split()[0] if rs else id_empresa)
+
+    # 1. Search our DB by name
+    rows = conn.execute(
+        """
+        SELECT hubspot_id, name FROM companies
+        WHERE hubspot_id != '' AND (
+          name LIKE ? OR name LIKE ?
+        )
+        ORDER BY CASE WHEN name LIKE ? THEN 0 ELSE 1 END
+        LIMIT 1
+        """,
+        (id_prefix + "%", "%" + (search_term or "") + "%", id_prefix + "%"),
+    ).fetchall()
+    if rows:
+        return rows[0][0], (rows[0][1] or "")
+
+    # 2. HubSpot API text search (query param does full-text search)
+    if client and search_term:
+        try:
+            resp = client.search_objects(
+                object_type="companies",
+                query=search_term[:50],
+                properties=["name", "cuit"],
+                limit=5,
+            )
+            results = resp.get("results", [])
+            for obj in results:
+                name = (obj.get("properties") or {}).get("name", "")
+                if not name:
+                    continue
+                # Prefer name starting with id_empresa
+                if name.strip().startswith(id_prefix):
+                    return str(obj.get("id", "")), name
+                # Or contains search term
+                if search_term.lower() in (name or "").lower():
+                    return str(obj.get("id", "")), name
+            if results:
+                r0 = results[0]
+                return str(r0.get("id", "")), (r0.get("properties") or {}).get("name", "")
+        except Exception:
+            pass
+    return None, ""
+
+
+def _get_group1_colppy_db(
+    conn: sqlite3.Connection,
+    colppy_db_path: Path,
+    year: int | None = None,
+    month: int | None = None,
+    client=None,
+) -> list[dict]:
+    """
+    Group 1 (Colppy DB source): Deals with NO_PRIMARY (no type 5 association).
+    Uses Colppy DB for CUIT mapping instead of facturacion (billing CSV).
+    When no company with CUIT in DB, falls back to search by name (DB then HubSpot API if client).
+    Returns list of {deal_id, deal_name, amount, id_empresa, billing_id, billing_name, customer_cuit}.
+    """
+    colppy_cuit = _load_colppy_cuit_map(colppy_db_path)
+    if not colppy_cuit:
+        return []
+
+    # NO_PRIMARY deals: no type 5 association
+    sql = """
+        SELECT d.hubspot_id, d.deal_name, d.amount, d.id_empresa, d.close_date
+        FROM deals d
+        LEFT JOIN deal_associations da ON da.deal_hubspot_id = d.hubspot_id AND da.association_type_id = 5
+        WHERE d.deal_stage IN ('closedwon', '34692158')
+          AND d.hubspot_id != ''
+          AND d.id_empresa IS NOT NULL AND d.id_empresa != ''
+          AND da.company_hubspot_id IS NULL
+    """
+    params: list = []
+    if year is not None and month is not None:
+        start = f"{year}-{month:02d}-01"
+        import calendar
+        last_day = calendar.monthrange(year, month)[1]
+        end = f"{year}-{month:02d}-{last_day}"
+        sql += " AND d.close_date >= ? AND d.close_date <= ?"
+        params = [start, end]
+    sql += " ORDER BY CAST(d.amount AS INTEGER) DESC"
+
+    rows = conn.execute(sql, params).fetchall()
+    result: list[dict] = []
+    for r in rows:
+        ie = str(r[3] or "").strip()
+        colppy_row = colppy_cuit.get(ie)
+        if not colppy_row:
+            continue
+        cuit = colppy_row["cuit"]
+        cuit_display = colppy_row["cuit_display"]
+        if not cuit or cuit in EXCLUDE_CUITS:
+            continue
+        # 1. Find by CUIT in our DB
+        company_row = conn.execute(
+            """
+            SELECT hubspot_id, name FROM companies
+            WHERE (cuit = ? OR REPLACE(REPLACE(REPLACE(COALESCE(cuit,''),'-',''),' ',''),'.','') = ?)
+              AND hubspot_id != ''
+            ORDER BY hubspot_id LIMIT 1
+            """,
+            (cuit, cuit),
+        ).fetchone()
+        if not company_row:
+            # 2. Fallback: search by name (DB then HubSpot API)
+            billing_id, billing_name = _find_company_by_name(
+                conn, ie,
+                colppy_row.get("razon_social", ""),
+                colppy_row.get("empresa_nombre", ""),
+                client,
+            )
+            if not billing_id:
+                continue
+        else:
+            billing_id, billing_name = company_row[0], company_row[1]
+        result.append({
+            "deal_id": r[0],
+            "deal_name": r[1],
+            "amount": r[2],
+            "id_empresa": ie,
+            "billing_id": billing_id,
+            "billing_name": billing_name or "",
+            "customer_cuit": cuit_display,
+        })
+    return result
+
+
+def _get_group3_candidates(
+    conn: sqlite3.Connection,
+    year: int | None = None,
+    month: int | None = None,
+) -> list[dict]:
     """
     Group 3: Deals where facturacion.customer_cuit matches an accountant company
     (Cuenta Contador, etc.) that is NOT associated with the deal (type 5 or 8).
     Considers ALL companies per CUIT (not just one).
     Skips when deal already has ANY company with that customer_cuit as PRIMARY (redundant).
     Returns list of {deal_id, deal_name, accountant_id, accountant_name, amount, customer_cuit}.
+    When year/month provided, filter to deals closed in that month.
     """
     accountants = conn.execute("""
         SELECT hubspot_id, name, cuit FROM companies
@@ -594,13 +952,18 @@ def _get_group3_candidates(conn: sqlite3.Connection) -> list[dict]:
         c = _normalize_cuit(r[2])
         if c and len(c) == 11:
             cuit_to_accs.setdefault(c, []).append((r[0], r[1]))
-    rows = conn.execute("""
+    date_sql, date_params = _date_filter_sql(year, month)
+    rows = conn.execute(
+        f"""
         SELECT f.customer_cuit, f.id_empresa, f.amount, d.hubspot_id, d.deal_name
         FROM facturacion f
         JOIN deals d ON f.id_empresa = d.id_empresa
         WHERE d.deal_stage IN ('closedwon', '34692158')
         AND d.hubspot_id != '' AND f.customer_cuit != ''
-    """).fetchall()
+        {date_sql}
+        """,
+        date_params,
+    ).fetchall()
     candidates: list[dict] = []
     seen: set[tuple[str, str]] = set()
     for r in rows:
@@ -641,7 +1004,11 @@ def _get_group3_candidates(conn: sqlite3.Connection) -> list[dict]:
     return candidates
 
 
-def _get_redundant_type8(conn: sqlite3.Connection) -> list[dict]:
+def _get_redundant_type8(
+    conn: sqlite3.Connection,
+    year: int | None = None,
+    month: int | None = None,
+) -> list[dict]:
     """
     Type 8 associations that are redundant: the SAME company record has both PRIMARY (5) and
     type 8 (Estudio Contable). A company cannot be both the customer and their own accountant.
@@ -651,8 +1018,13 @@ def _get_redundant_type8(conn: sqlite3.Connection) -> list[dict]:
     A deal can have multiple accountants (multiple type 8 associations); if the association
     exists, the company is an actual accountant (not Primary). Different company records
     with same CUIT may be valid (e.g. Cuenta Pyme vs Cuenta Contador views).
+
+    When year/month provided, filter to deals closed in that month.
     """
-    rows = conn.execute("""
+    date_sql, date_params = _date_filter_sql(year, month)
+    join_deals = " JOIN deals d ON dp.deal_hubspot_id = d.hubspot_id " if date_params else ""
+    rows = conn.execute(
+        f"""
         WITH deal_primary AS (
             SELECT da.deal_hubspot_id, da.company_hubspot_id
             FROM deal_associations da
@@ -667,7 +1039,11 @@ def _get_redundant_type8(conn: sqlite3.Connection) -> list[dict]:
         FROM deal_primary dp
         JOIN deal_type8 dt ON dp.deal_hubspot_id = dt.deal_hubspot_id
             AND dp.company_hubspot_id = dt.company_hubspot_id
-    """).fetchall()
+        {join_deals}
+        WHERE 1=1 {date_sql}
+        """,
+        date_params,
+    ).fetchall()
     result = []
     for r in rows:
         deal_name = conn.execute("SELECT deal_name FROM deals WHERE hubspot_id = ?", (r[0],)).fetchone()
@@ -682,15 +1058,23 @@ def _get_redundant_type8(conn: sqlite3.Connection) -> list[dict]:
     return result
 
 
-def _get_group4_candidates(conn: sqlite3.Connection) -> list[dict]:
+def _get_group4_candidates(
+    conn: sqlite3.Connection,
+    year: int | None = None,
+    month: int | None = None,
+) -> list[dict]:
     """
     Group 4: Non-primary companies that are accountants (type Cuenta Contador, etc.) and
     associated with a deal, but missing type 8 (Estudio Contable). Add type 8 to them.
 
     Example: RPA Consulting (Cuenta Contador) associated with deal 66535 - PICNIC
     with only type 341 — should have type 8.
+
+    When year/month provided, filter to deals closed in that month.
     """
-    rows = conn.execute("""
+    date_sql, date_params = _date_filter_sql(year, month)
+    rows = conn.execute(
+        f"""
         SELECT DISTINCT da.deal_hubspot_id, da.company_hubspot_id, c.name,
                d.deal_name, CAST(d.amount AS INTEGER)
         FROM deal_associations da
@@ -698,6 +1082,7 @@ def _get_group4_candidates(conn: sqlite3.Connection) -> list[dict]:
         JOIN deals d ON da.deal_hubspot_id = d.hubspot_id
         WHERE c.type IN ('Cuenta Contador', 'Cuenta Contador y Reseller', 'Contador Robado')
         AND d.deal_stage IN ('closedwon', '34692158')
+        {date_sql}
         AND NOT EXISTS (
             SELECT 1 FROM deal_associations da2
             WHERE da2.deal_hubspot_id = da.deal_hubspot_id
@@ -711,7 +1096,9 @@ def _get_group4_candidates(conn: sqlite3.Connection) -> list[dict]:
               AND da2.association_type_id = 8
         )
         ORDER BY CAST(d.amount AS INTEGER) DESC
-    """).fetchall()
+    """,
+        date_params,
+    ).fetchall()
     return [
         {
             "deal_id": r[0],
@@ -725,14 +1112,37 @@ def _get_group4_candidates(conn: sqlite3.Connection) -> list[dict]:
     ]
 
 
-def get_group_batch(conn: sqlite3.Connection, group: int, limit: int, offset: int) -> list[dict]:
+def get_group_batch(
+    conn: sqlite3.Connection,
+    group: int,
+    limit: int,
+    offset: int,
+    *,
+    colppy_db_path: Path | None = None,
+    year: int | None = None,
+    month: int | None = None,
+    client=None,
+) -> list[dict]:
     """Get next batch of deals to fix for given group."""
     if group in (3, 4):
-        candidates = _get_group3_candidates(conn) if group == 3 else _get_group4_candidates(conn)
+        candidates = (
+            _get_group3_candidates(conn, year=year, month=month)
+            if group == 3
+            else _get_group4_candidates(conn, year=year, month=month)
+        )
         return candidates[offset : offset + limit]
+    if group == 1 and colppy_db_path and colppy_db_path.exists():
+        all_rows = _get_group1_colppy_db(conn, colppy_db_path, year, month, client)
+        return all_rows[offset : offset + limit]
+    if group == 5 and colppy_db_path and colppy_db_path.exists():
+        all_rows = _get_group5_mismatch_candidates(conn, colppy_db_path, year, month)
+        return all_rows[offset : offset + limit]
     sql = SQL_GROUP1 if group == 1 else SQL_GROUP2
+    date_sql, date_params = _date_filter_sql(year, month)
+    if date_sql and date_params:
+        sql = sql.replace("GROUP BY", date_sql + " GROUP BY")
     sql += f" LIMIT {limit} OFFSET {offset}"
-    rows = conn.execute(sql).fetchall()
+    rows = conn.execute(sql, date_params).fetchall() if date_params else conn.execute(sql).fetchall()
     return [
         {
             "deal_id": r[0],
@@ -747,15 +1157,30 @@ def get_group_batch(conn: sqlite3.Connection, group: int, limit: int, offset: in
     ]
 
 
-def get_group_count(conn: sqlite3.Connection, group: int) -> int:
+def get_group_count(
+    conn: sqlite3.Connection,
+    group: int,
+    *,
+    colppy_db_path: Path | None = None,
+    year: int | None = None,
+    month: int | None = None,
+) -> int:
     """Get total count for group."""
     if group == 3:
-        return len(_get_group3_candidates(conn))
+        return len(_get_group3_candidates(conn, year=year, month=month))
     if group == 4:
-        return len(_get_group4_candidates(conn))
+        return len(_get_group4_candidates(conn, year=year, month=month))
+    if group == 1 and colppy_db_path and colppy_db_path.exists():
+        return len(_get_group1_colppy_db(conn, colppy_db_path, year, month, client=None))
+    if group == 5 and colppy_db_path and colppy_db_path.exists():
+        return len(_get_group5_mismatch_candidates(conn, colppy_db_path, year, month))
     sql = SQL_GROUP1 if group == 1 else SQL_GROUP2
+    date_sql, date_params = _date_filter_sql(year, month)
+    if date_sql and date_params:
+        sql = sql.replace("GROUP BY", date_sql + " GROUP BY")
     sql = "SELECT COUNT(*) FROM (" + sql.replace("\n", " ") + ")"
-    return conn.execute(sql).fetchone()[0]
+    row = conn.execute(sql, date_params).fetchone() if date_params else conn.execute(sql).fetchone()
+    return row[0]
 
 
 def insert_association_local(conn: sqlite3.Connection, deal_id: str, company_id: str, type_id: int = 5):
@@ -951,7 +1376,7 @@ def _show_log_result(conn: sqlite3.Connection, limit: int = 50) -> None:
 def main():
     parser = argparse.ArgumentParser(description="Fix deal–company associations (Groups 1 & 2)")
     parser.add_argument("--db", default=DEFAULT_DB, help="SQLite database path")
-    parser.add_argument("--group", type=int, choices=[1, 2, 3, 4], help="Group to fix: 1=missing, 2=not PRIMARY, 3=accountant type 8, 4=accountant missing type 8")
+    parser.add_argument("--group", type=int, choices=[1, 2, 3, 4, 5], help="Group to fix: 1=missing, 2=not PRIMARY, 3=accountant type 8, 4=accountant missing type 8, 5=MISMATCH (Colppy CUIT)")
     parser.add_argument("--batch", type=int, default=5, help="Batch size (default 5)")
     parser.add_argument("--offset", type=int, default=0, help="Offset for pagination")
     parser.add_argument("--status", action="store_true", help="Show group counts only")
@@ -961,6 +1386,10 @@ def main():
     parser.add_argument("--remove", type=int, nargs="+", default=[], help="Type IDs to archive (e.g. 11)")
     parser.add_argument("--add", type=int, nargs="+", default=[], help="Type IDs to add (e.g. 8)")
     parser.add_argument("--remove-redundant-type8", action="store_true", help="Remove type 8 only when SAME company has both Primary and type 8 (redundant). Use --dry-run to preview.")
+    parser.add_argument("--colppy-db", action="store_true", help="[Group 1 & 5] Use Colppy DB for CUIT mapping. Group 1: NO_PRIMARY. Group 5: MISMATCH (wrong primary CUIT).")
+    parser.add_argument("--colppy-db-path", default=DEFAULT_COLPPY_DB, help=f"Path to colppy_export.db (default: {DEFAULT_COLPPY_DB})")
+    parser.add_argument("--year", type=int, help="Filter deals by close_date year (e.g. 2026). Applies to Group 1/5 with --colppy-db, Group 2, and --remove-redundant-type8.")
+    parser.add_argument("--month", type=int, help="Filter deals by close_date month (e.g. 2). Use with --year.")
     args = parser.parse_args()
 
     # --fix-label mode: change association label (e.g. type 11 → 8)
@@ -1010,27 +1439,44 @@ def main():
     conn = sqlite3.connect(str(db_path))
 
     if args.status:
-        c1 = get_group_count(conn, 1)
-        c2 = get_group_count(conn, 2)
-        c3 = get_group_count(conn, 3)
-        redundant = len(_get_redundant_type8(conn))
+        colppy_path = Path(args.colppy_db_path) if args.colppy_db else None
+        year_month = (args.year, args.month) if (args.year is not None and args.month is not None) else (None, None)
+        c1 = get_group_count(
+            conn, 1,
+            colppy_db_path=colppy_path,
+            year=year_month[0],
+            month=year_month[1],
+        )
+        c2 = get_group_count(conn, 2, year=year_month[0], month=year_month[1])
+        c3 = get_group_count(conn, 3, year=year_month[0], month=year_month[1])
+        redundant = len(_get_redundant_type8(conn, year=year_month[0], month=year_month[1]))
         print("DEAL ASSOCIATION FIX STATUS")
         print("=" * 50)
-        c4 = get_group_count(conn, 4)
-        print(f"  Group 1 (billing NOT associated):  {c1:,}")
+        c4 = get_group_count(conn, 4, year=year_month[0], month=year_month[1])
+        c5 = get_group_count(
+            conn, 5,
+            colppy_db_path=colppy_path,
+            year=year_month[0],
+            month=year_month[1],
+        ) if colppy_path and year_month[0] and year_month[1] else 0
+        g1_label = "Group 1 (Colppy DB, NO_PRIMARY)" if colppy_path else "Group 1 (billing NOT associated)"
+        print(f"  {g1_label}:  {c1:,}")
         print(f"  Group 2 (billing not PRIMARY):    {c2:,}")
         print(f"  Group 3 (accountant not type 8):  {c3:,}")
         print(f"  Group 4 (accountant missing type 8): {c4:,}")
+        print(f"  Group 5 (MISMATCH, Colppy CUIT):  {c5:,}" + (" (requires --colppy-db --year --month)" if c5 == 0 and not colppy_path else ""))
         print(f"  Redundant type 8 (same company Primary+8): {redundant:,}")
-        print(f"  Total to fix:                     {c1 + c2 + c3 + c4:,}")
+        print(f"  Total to fix:                     {c1 + c2 + c3 + c4 + c5:,}")
         conn.close()
         return 0
 
     # --remove-redundant-type8: remove type 8 where same CUIT is already PRIMARY
     if args.remove_redundant_type8:
-        redundant = _get_redundant_type8(conn)
+        year_month = (args.year, args.month) if (args.year is not None and args.month is not None) else (None, None)
+        redundant = _get_redundant_type8(conn, year=year_month[0], month=year_month[1])
         print("=" * 90)
-        print("REDUNDANT TYPE 8 ASSOCIATIONS (same company has both Primary + type 8 — would remove)")
+        period = f" ({year_month[0]}-{year_month[1]:02d})" if year_month[0] is not None and year_month[1] is not None else ""
+        print(f"REDUNDANT TYPE 8 ASSOCIATIONS{period} (same company has both Primary + type 8 — would remove)")
         print("=" * 90)
         print(f"\nTotal: {len(redundant)}")
         print(f"\n{'#':<4} {'Deal ID':<14} {'Deal Name':<45} {'Company ID':<14} {'Company Name':<35} {'CUIT'}")
@@ -1084,14 +1530,41 @@ def main():
         return 0
 
     if not args.group:
-        print("ERROR: Use --group 1, 2, 3, or 4 (or --status for counts)", file=sys.stderr)
+        print("ERROR: Use --group 1, 2, 3, 4, or 5 (or --status for counts)", file=sys.stderr)
         return 1
 
-    from tools.hubspot_api.client import get_hubspot_client
+    if args.colppy_db and args.group not in (1, 5):
+        print("ERROR: --colppy-db is only supported with --group 1 or 5", file=sys.stderr)
+        return 1
 
-    client = get_hubspot_client()
-    total = get_group_count(conn, args.group)
-    batch = get_group_batch(conn, args.group, args.batch, args.offset)
+    if args.group == 5 and not args.colppy_db:
+        print("ERROR: Group 5 (MISMATCH) requires --colppy-db", file=sys.stderr)
+        return 1
+
+    if args.group == 5 and (args.year is None or args.month is None):
+        print("ERROR: Group 5 (MISMATCH) requires --year and --month", file=sys.stderr)
+        return 1
+
+    colppy_path = Path(args.colppy_db_path) if args.colppy_db else None
+    year_month = (args.year, args.month) if (args.year is not None and args.month is not None) else (None, None)
+    total = get_group_count(
+        conn, args.group,
+        colppy_db_path=colppy_path,
+        year=year_month[0],
+        month=year_month[1],
+    )
+    # Group 1 with Colppy DB may need HubSpot API for name fallback; create client early
+    from tools.hubspot_api.client import get_hubspot_client
+    client = get_hubspot_client() if (args.group == 1 and colppy_path) else None
+    batch = get_group_batch(
+        conn, args.group, args.batch, args.offset,
+        colppy_db_path=colppy_path,
+        year=year_month[0],
+        month=year_month[1],
+        client=client,
+    )
+    if not client:
+        client = get_hubspot_client()
 
     if not batch:
         print(f"Group {args.group}: No deals to fix (offset {args.offset})")

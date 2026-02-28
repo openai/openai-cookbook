@@ -19,7 +19,7 @@ import re
 import sqlite3
 import sys
 from calendar import monthrange
-from datetime import datetime
+from datetime import datetime, timezone
 from pathlib import Path
 
 REPO_ROOT = Path(__file__).resolve().parents[3]
@@ -56,7 +56,7 @@ def query_first_payments(db_path: Path, start_date: str, end_date: str) -> list[
         FROM pago p
         LEFT JOIN plan pl ON pl.idPlan = p.idPlan
         LEFT JOIN payment_detail pd ON pd.payment_id = p.idPago AND pd.is_first_payment = 1
-        LEFT JOIN facturacion f ON f.IdEmpresa = p.idEmpresa AND (f.fechaBaja IS NULL OR f.fechaBaja = '')
+        LEFT JOIN facturacion f ON f.IdEmpresa = p.idEmpresa AND (f.fechaBaja IS NULL OR f.fechaBaja = '' OR f.fechaBaja = '0000-00-00')
         WHERE p.primerPago = 1
           AND (p.estado = 1 OR (p.estado = 0 AND p.fechaTransferencia IS NOT NULL))
           AND p.fechaPago >= ?
@@ -88,7 +88,7 @@ def query_colppy_facturacion(db_path: Path) -> list[dict]:
         FROM facturacion f
         LEFT JOIN empresa e ON e.IdEmpresa = f.IdEmpresa
         LEFT JOIN plan p ON p.idPlan = e.idPlan
-        WHERE (f.fechaBaja IS NULL OR f.fechaBaja = '')
+        WHERE (f.fechaBaja IS NULL OR f.fechaBaja = '' OR f.fechaBaja = '0000-00-00')
           AND f.IdEmpresa IS NOT NULL AND f.IdEmpresa != 0 AND f.IdEmpresa != ''
         ORDER BY f.IdEmpresa
         """
@@ -122,7 +122,7 @@ def run_export(db_path: Path, output_path: Path, months: int) -> None:
         print("Run export_colppy_to_sqlite.py first (requires Colppy MySQL/VPN).")
         sys.exit(1)
 
-    now = datetime.utcnow()
+    now = datetime.now(timezone.utc)
     snapshot = {
         "metadata": {
             "exported_at": now.isoformat() + "Z",

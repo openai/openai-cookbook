@@ -11,12 +11,21 @@ from .hubspot_build_fetchers import (
     fetch_deals_closed_in_month,
 )
 from .hubspot_build_sqlite import (
+    _get_deal_deal_type,
     _get_deal_fecha_primer_pago,
     _get_deal_id_plan,
+    _get_deal_nombre_del_plan_del_negocio,
+    _ensure_deals_has_deal_type,
     _ensure_deals_has_fecha_primer_pago,
     _ensure_deals_has_id_plan,
+    _ensure_deals_has_plan_name,
+    _ensure_deals_has_nombre_del_plan_del_negocio,
+    _ensure_deals_any_stage_has_deal_type,
     _ensure_deals_any_stage_has_fecha_primer_pago,
     _ensure_deals_any_stage_has_id_plan,
+    _ensure_deals_any_stage_has_plan_name,
+    _ensure_deals_any_stage_has_nombre_del_plan_del_negocio,
+    populate_plan_names_from_colppy,
 )
 
 
@@ -44,11 +53,15 @@ def run_refresh_deals_only(
         conn.executescript("""
             CREATE TABLE IF NOT EXISTS deals (
                 id_empresa TEXT PRIMARY KEY, hubspot_id TEXT, deal_name TEXT, deal_stage TEXT,
-                amount TEXT, close_date TEXT, id_plan TEXT, fecha_primer_pago TEXT
+                amount TEXT, close_date TEXT, id_plan TEXT, fecha_primer_pago TEXT,
+                deal_type TEXT, plan_name TEXT, nombre_del_plan_del_negocio TEXT
             );
         """)
         _ensure_deals_has_id_plan(conn)
         _ensure_deals_has_fecha_primer_pago(conn)
+        _ensure_deals_has_deal_type(conn)
+        _ensure_deals_has_plan_name(conn)
+        _ensure_deals_has_nombre_del_plan_del_negocio(conn)
 
         old_rows = conn.execute(
             """SELECT id_empresa, deal_name, amount, close_date, id_plan, fecha_primer_pago FROM deals
@@ -98,13 +111,19 @@ def run_refresh_deals_only(
             conn.execute(f"DELETE FROM deals WHERE id_empresa IN ({placeholders})", removed_ids)
             conn.commit()
 
+        nombre_del_plan_count = 0
+        nombre_del_plan_deals = []
         for id_emp, d in id_to_deal.items():
             if not d:
                 continue
             props = d.get("properties", {})
+            nombre_plan = _get_deal_nombre_del_plan_del_negocio(props)
+            if nombre_plan:
+                nombre_del_plan_count += 1
+                nombre_del_plan_deals.append({"id_empresa": id_emp, "nombre_del_plan_del_negocio": nombre_plan})
             conn.execute(
-                """INSERT OR REPLACE INTO deals (id_empresa, hubspot_id, deal_name, deal_stage, amount, close_date, id_plan, fecha_primer_pago)
-                   VALUES (?, ?, ?, ?, ?, ?, ?, ?)""",
+                """INSERT OR REPLACE INTO deals (id_empresa, hubspot_id, deal_name, deal_stage, amount, close_date, id_plan, fecha_primer_pago, deal_type, plan_name, nombre_del_plan_del_negocio)
+                   VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)""",
                 (
                     id_emp,
                     d.get("id", ""),
@@ -114,8 +133,12 @@ def run_refresh_deals_only(
                     (props.get("closedate") or "")[:10],
                     _get_deal_id_plan(props),
                     _get_deal_fecha_primer_pago(props),
+                    _get_deal_deal_type(props),
+                    "",  # plan_name filled by populate_plan_names_from_colppy
+                    nombre_plan,
                 ),
             )
+        populate_plan_names_from_colppy(conn, colppy_db_path)
         conn.commit()
 
         if fetch_wrong_stage:
@@ -157,20 +180,28 @@ def run_refresh_deals_only(
                 conn.executescript("""
                     CREATE TABLE IF NOT EXISTS deals_any_stage (
                         id_empresa TEXT PRIMARY KEY, hubspot_id TEXT, deal_name TEXT, deal_stage TEXT,
-                        amount TEXT, close_date TEXT, id_plan TEXT, fecha_primer_pago TEXT
+                        amount TEXT, close_date TEXT, id_plan TEXT, fecha_primer_pago TEXT,
+                        deal_type TEXT, plan_name TEXT, nombre_del_plan_del_negocio TEXT
                     );
                 """)
                 _ensure_deals_any_stage_has_id_plan(conn)
                 _ensure_deals_any_stage_has_fecha_primer_pago(conn)
-                conn.execute("DELETE FROM deals_any_stage")
+                _ensure_deals_any_stage_has_deal_type(conn)
+                _ensure_deals_any_stage_has_plan_name(conn)
+                _ensure_deals_any_stage_has_nombre_del_plan_del_negocio(conn)
+                # Delete only ids we're about to upsert (preserve other months when running --years)
+                ids_to_upsert = list(wrong_stage_filtered.keys())
+                if ids_to_upsert:
+                    ph = ",".join("?" * len(ids_to_upsert))
+                    conn.execute(f"DELETE FROM deals_any_stage WHERE id_empresa IN ({ph})", ids_to_upsert)
                 conn.commit()
                 for id_emp, d in wrong_stage_filtered.items():
                     if not d:
                         continue
                     props = d.get("properties", {})
                     conn.execute(
-                        """INSERT OR REPLACE INTO deals_any_stage (id_empresa, hubspot_id, deal_name, deal_stage, amount, close_date, id_plan, fecha_primer_pago)
-                           VALUES (?, ?, ?, ?, ?, ?, ?, ?)""",
+                        """INSERT OR REPLACE INTO deals_any_stage (id_empresa, hubspot_id, deal_name, deal_stage, amount, close_date, id_plan, fecha_primer_pago, deal_type, plan_name, nombre_del_plan_del_negocio)
+                           VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)""",
                         (
                             id_emp,
                             d.get("id", ""),
@@ -180,8 +211,12 @@ def run_refresh_deals_only(
                             (props.get("closedate") or "")[:10],
                             _get_deal_id_plan(props),
                             _get_deal_fecha_primer_pago(props),
+                            _get_deal_deal_type(props),
+                            "",  # plan_name filled by populate_plan_names_from_colppy
+                            _get_deal_nombre_del_plan_del_negocio(props),
                         ),
                     )
+                populate_plan_names_from_colppy(conn, colppy_db_path)
                 conn.commit()
                 print(f"  Stored {len(wrong_stage_filtered):,} deals with wrong stage in deals_any_stage")
 
@@ -195,10 +230,21 @@ def run_refresh_deals_only(
         added_ids=added_ids,
         updated_ids=updated_ids,
         removed_ids=removed_ids,
-        source_metadata={"source": "hubspot_api", "filter": "closedate_in_month"},
+        source_metadata={
+            "source": "hubspot_api",
+            "filter": "closedate_in_month",
+            "nombre_del_plan_del_negocio_count": nombre_del_plan_count,
+            "nombre_del_plan_del_negocio_deals": nombre_del_plan_deals,
+        },
     )
 
     print(f"  Upserted {len(id_to_deal):,} deals into {db_path}")
+    print(f"  nombre_del_plan_del_negocio (HubSpot internal name): {nombre_del_plan_count:,} deals with value")
+    if nombre_del_plan_deals:
+        for item in nombre_del_plan_deals[:5]:
+            print(f"    {item['id_empresa']}: {item['nombre_del_plan_del_negocio']}")
+        if len(nombre_del_plan_deals) > 5:
+            print(f"    ... and {len(nombre_del_plan_deals) - 5} more (see hubspot_refresh_logs.source_metadata)")
     if added_ids or updated_ids or removed_ids:
         print(f"  Evolution: +{len(added_ids)} added, ~{len(updated_ids)} updated, -{len(removed_ids)} removed")
         if added_ids:

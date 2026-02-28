@@ -1,6 +1,6 @@
 {
   "metadata": {
-    "exported_at": "2026-02-24T22:03:33.055727Z",
+    "exported_at": "2026-02-28T13:59:57.643905+00:00Z",
     "source": "colppy_export.db",
     "months_included": 62
   },
@@ -435,6 +435,36 @@
         "importe": 229521,
         "medioPago": "CBU",
         "cuit_invoicing": "30-71895494-7"
+      },
+      {
+        "idPago": 33547,
+        "idEmpresa": 117168,
+        "idPlan": 642,
+        "plan_name": "Full",
+        "fechaPago": "2026-02-26",
+        "importe": 262526,
+        "medioPago": "CBU",
+        "cuit_invoicing": "30-71754229-7"
+      },
+      {
+        "idPago": 33548,
+        "idEmpresa": 117172,
+        "idPlan": 642,
+        "plan_name": "Full",
+        "fechaPago": "2026-02-26",
+        "importe": 262526,
+        "medioPago": "CBU",
+        "cuit_invoicing": "30-71646324-5"
+      },
+      {
+        "idPago": 33549,
+        "idEmpresa": 117170,
+        "idPlan": 642,
+        "plan_name": "Full",
+        "fechaPago": "2026-02-26",
+        "importe": 221312,
+        "medioPago": "CBU",
+        "cuit_invoicing": "30-71926788-9"
       }
     ],
     "2026-01": [
@@ -6078,7 +6108,7 @@
         "fechaPago": "2025-02-17",
         "importe": 86394,
         "medioPago": "CBU",
-        "cuit_invoicing": "30-71879813-9"
+        "cuit_invoicing": "20-28898931-2"
       },
       {
         "idPago": 30059,

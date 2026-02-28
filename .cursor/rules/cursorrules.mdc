@@ -425,7 +425,7 @@ Use **semver-compliant version bumps** in `package__init__.py` whenever a public
 - **Deal creation:** Do NOT create deals in HubSpot without explicit user confirmation. For facturacion rows without matching deals, run `reconcile_missing_deals.py` first; creation of new deals requires manual approval
 - **fix_deal_associations.py:** When you run this script and it completes, **always show the log result** to the user (the script prints it when `--log-fixed` is used; if you ran it, include the log output or read and display the log file). **When presenting outcomes, include BOTH:** (1) the preview table format: "Next N Group X Deals (offset Y)" with columns #, Deal ID (clickable), Deal Name, Amount, id_empresa, Billing Company, Billing CUIT; (2) clickable markdown links for each deal and company: `[Deal Name](https://app.hubspot.com/contacts/19877595/deal/DEAL_ID)` and `[Company Name](https://app.hubspot.com/contacts/19877595/company/COMPANY_ID)`
 - **Facturacion ↔ Colppy reconciliation:** For reconciling facturacion.csv, Colppy MySQL, and facturacion_hubspot.db, reference `FACTURACION_COLPPY_RECONCILIATION.md` and use `reconcile_facturacion_colppy.py`
-- **reconcile_colppy_hubspot_db_only.py:** When you run this script, **always include the full report in the chatbot response** — do not only say "report written to file" or a brief summary. Display the complete reconciliation output (summary tables, MATCH lists, Colppy Only, HubSpot Only) directly in the chat so the user has all information without opening the file
+- **reconcile_colppy_hubspot_db_only.py / reconciliation output:** When presenting Colppy ↔ HubSpot reconciliation results, **the output MUST always be identical** — the full detailed report. **NEVER abbreviate, summarize, or say "same as Group X"**. Display the complete report: Summary table + **full markdown table for Group 1** (all rows, all columns) + **full markdown table for Group 2** (all rows, all columns) + **full markdown table for Group 3** (all rows, all columns including Expected stage, Explanation) + **full markdown table for Group 4** (all rows, all columns). Each group has its own table structure; show every group in full. Do not only reference the .md file — display the complete output directly in the chat.
 
 ## Colppy Payment Flow
 
@@ -444,6 +444,14 @@ Use **semver-compliant version bumps** in `package__init__.py` whenever a public
 **Before any billing or Colppy–HubSpot reconciliation work**, reference:
 1. `/Users/virulana/openai-cookbook/tools/docs/README_BILLING_RECONCILIATION.md` - Entry point: data flow, monthly workflow, logging
 2. `/Users/virulana/openai-cookbook/tools/docs/FACTURACION_COLPPY_RECONCILIATION.md` - Full reconciliation design, scripts, HubSpot refresh evolution
+
+## Reconciliation MCP
+
+**When using or configuring the Reconciliation MCP** (natural-language refresh + reconcile):
+- Reference: `/Users/virulana/openai-cookbook/tools/scripts/reconciliation/README.md` - Setup, tools, Cursor config
+- Tools: `refresh_colppy_db`, `refresh_hubspot_deals`, `populate_deal_associations`, `run_reconciliation`, `run_full_refresh`
+- Prefer MCP tools over manual CLI when the user asks in natural language (e.g. "refresh for today", "run reconciliation for Feb 2026")
+- Cursor config: Add to `~/.cursor/mcp.json` — see README for `command`, `args`, `cwd`
 
 ## ARCA Prototype
 

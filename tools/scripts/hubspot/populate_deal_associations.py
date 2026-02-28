@@ -5,13 +5,12 @@ Populate Deal–Company Associations in SQLite
 Reads deal HubSpot IDs from the facturacion_hubspot.db, fetches their
 company associations from HubSpot, and stores them in the deal_associations table.
 
-Uses: GET /crm/v4/objects/deals/{deal_id}/associations/companies
-(Individual endpoint per deal – proven reliable across all codebase scripts)
+Batch mode (--batch): Uses POST /crm/v4/associations/deals/companies/batch/read
+with retries, missing-deal detection, and individual API fallback for deals omitted
+by the batch response. Returns exit code 1 if any deal fetch failed.
 
-Previous approach used POST /crm/v4/associations/deals/companies/batch/read
-which silently dropped deals on failed batches. Switched to individual endpoint
-matching the pattern used by analyze_smb_mql_funnel.py, analyze_icp_operador_billing.py,
-fetch_hubspot_deals_with_company.py, etc.
+Individual mode: Uses GET /crm/v4/objects/deals/{deal_id}/associations/companies
+(proven reliable across analyze_smb_mql_funnel.py, analyze_icp_operador_billing.py, etc.)
 
 Usage:
     python tools/scripts/hubspot/populate_deal_associations.py
@@ -24,12 +23,14 @@ import sys
 import time
 from pathlib import Path
 
-sys.path.insert(0, str(Path(__file__).resolve().parents[3]))
+REPO_ROOT = Path(__file__).resolve().parents[3]
+sys.path.insert(0, str(REPO_ROOT))
 from dotenv import load_dotenv
 
-load_dotenv()
+load_dotenv(REPO_ROOT / ".env")
+load_dotenv(REPO_ROOT / "tools" / ".env")
 
-DEFAULT_DB = "tools/data/facturacion_hubspot.db"
+DEFAULT_DB = str(REPO_ROOT / "tools" / "data" / "facturacion_hubspot.db")
 
 
 def get_deal_hubspot_ids(conn: sqlite3.Connection) -> list[str]:
@@ -39,50 +40,86 @@ def get_deal_hubspot_ids(conn: sqlite3.Connection) -> list[str]:
 
 
 BATCH_SIZE = 100
+BATCH_RETRIES = 3
+RETRY_BACKOFF = (1.0, 2.0, 4.0)  # seconds
 
 
-def fetch_deal_associations_batch(client, deal_ids: list[str]) -> list[dict]:
+def fetch_deal_associations_batch(client, deal_ids: list[str], log_fn=None) -> tuple[list[dict], set[str]]:
     """
     Fetch company associations for multiple deals via batch v4 API.
     Endpoint: POST /crm/v4/associations/deals/companies/batch/read
-    Max 100 deals per request. Returns same format as fetch_deal_associations.
+    Max 100 deals per request. Returns (associations, returned_deal_ids).
+    Raises on API failure after retries. Caller should re-fetch missing deals via individual API.
     """
     if not deal_ids:
-        return []
-    all_assocs = []
-    try:
-        resp = client.post(
-            "crm/v4/associations/deals/companies/batch/read",
-            json_data={"inputs": [{"id": did} for did in deal_ids]},
-        )
-    except Exception:
-        return []
-    for r in resp.get("results", []):
-        deal_id = str(r.get("from", {}).get("id", ""))
-        if not deal_id:
+        return [], set()
+    log_fn = log_fn or (lambda m: None)
+    last_error = None
+    for attempt in range(BATCH_RETRIES):
+        try:
+            resp = client.post(
+                "crm/v4/associations/deals/companies/batch/read",
+                json_data={"inputs": [{"id": did} for did in deal_ids]},
+            )
+        except Exception as e:
+            last_error = e
+            log_fn(f"  Batch API attempt {attempt + 1}/{BATCH_RETRIES} failed: {e}")
+            if attempt < BATCH_RETRIES - 1:
+                time.sleep(RETRY_BACKOFF[attempt])
             continue
-        for to_obj in r.get("to", []) or []:
-            company_id = to_obj.get("toObjectId")
-            if not company_id:
+        if resp is None:
+            last_error = ValueError("API returned None")
+            if attempt < BATCH_RETRIES - 1:
+                time.sleep(RETRY_BACKOFF[attempt])
+            continue
+        results = resp.get("results") or []
+        all_assocs = []
+        returned_deal_ids = set()
+        for r in results:
+            if r is None or not isinstance(r, dict):
                 continue
-            assoc_types = to_obj.get("associationTypes", []) or []
-            if not assoc_types:
-                all_assocs.append({
-                    "deal_hubspot_id": deal_id,
-                    "company_hubspot_id": str(company_id),
-                    "association_type_id": 0,
-                    "association_category": "UNKNOWN",
-                })
-            else:
-                for at in assoc_types:
-                    if at and isinstance(at, dict):
+            from_obj = r.get("from")
+            if from_obj is None:
+                from_obj = {}
+            elif not isinstance(from_obj, dict):
+                continue
+            deal_id = str(from_obj.get("id") or "")
+            if not deal_id:
+                continue
+            returned_deal_ids.add(deal_id)
+            to_list = r.get("to")
+            if to_list is None:
+                to_list = []
+            elif not isinstance(to_list, list):
+                continue
+            for to_obj in to_list:
+                if to_obj is None or not isinstance(to_obj, dict):
+                    continue
+                company_id = to_obj.get("toObjectId")
+                if company_id is None or company_id == "":
+                    continue
+                assoc_types = to_obj.get("associationTypes") or []
+                if not isinstance(assoc_types, list):
+                    assoc_types = []
+                if not assoc_types:
+                    all_assocs.append({
+                        "deal_hubspot_id": deal_id,
+                        "company_hubspot_id": str(company_id),
+                        "association_type_id": 0,
+                        "association_category": "UNKNOWN",
+                    })
+                else:
+                    for at in assoc_types:
+                        if at is None or not isinstance(at, dict):
+                            continue
                         all_assocs.append({
                             "deal_hubspot_id": deal_id,
                             "company_hubspot_id": str(company_id),
                             "association_type_id": at.get("typeId", 0),
                             "association_category": at.get("category", ""),
                         })
-    return all_assocs
+        return all_assocs, returned_deal_ids
+    raise last_error or ValueError("Batch API failed after retries")
 
 
 def fetch_deal_associations(client, deal_id: str) -> list[dict]:
@@ -99,9 +136,8 @@ def fetch_deal_associations(client, deal_id: str) -> list[dict]:
     """
     endpoint = f"crm/v4/objects/deals/{deal_id}/associations/companies"
 
-    try:
-        resp = client.get(endpoint)
-    except Exception:
+    resp = client.get(endpoint)
+    if resp is None:
         return []
 
     results = resp.get("results", [])
@@ -277,6 +313,12 @@ def main():
         action="store_true",
         help="Use batch API (100 deals/request) instead of individual calls. Faster for full refresh.",
     )
+    parser.add_argument(
+        "--debug-batch",
+        type=int,
+        metavar="OFFSET",
+        help="Fetch one batch at given offset, print raw API response (for investigating failures).",
+    )
     args = parser.parse_args()
 
     from tools.hubspot_api.client import get_hubspot_client
@@ -287,6 +329,50 @@ def main():
         log(f"ERROR: Database not found: {db_path}")
         log("Run build_facturacion_hubspot_mapping.py first.")
         return 1
+
+    if args.debug_batch is not None:
+        conn = sqlite3.connect(str(db_path))
+        deal_ids = get_deal_hubspot_ids(conn)
+        conn.close()
+        offset = args.debug_batch
+        batch = deal_ids[offset : offset + BATCH_SIZE]
+        if not batch:
+            log(f"No deals at offset {offset} (total: {len(deal_ids)})")
+            return 1
+        log(f"Debug batch at offset {offset}: {len(batch)} deals")
+        log(f"Deal IDs (first 5): {batch[:5]}")
+        try:
+            resp = client.post(
+                "crm/v4/associations/deals/companies/batch/read",
+                json_data={"inputs": [{"id": did} for did in batch]},
+            )
+        except Exception as e:
+            log(f"API error: {e}")
+            return 1
+        import json
+        log("\n--- Raw API response (structure) ---")
+        if resp is None:
+            log("Response is None")
+        else:
+            log(f"Keys: {list(resp.keys()) if isinstance(resp, dict) else type(resp)}")
+            results = resp.get("results", [])
+            log(f"results length: {len(results)}")
+            for i, r in enumerate(results):
+                if r is None:
+                    log(f"  results[{i}]: None")
+                elif not isinstance(r, dict):
+                    log(f"  results[{i}]: type={type(r).__name__}")
+                else:
+                    from_val = r.get("from")
+                    to_val = r.get("to")
+                    from_str = "None" if from_val is None else f"dict(id={from_val.get('id') if isinstance(from_val, dict) else '?'})"
+                    to_str = "None" if to_val is None else f"list(len={len(to_val)})" if isinstance(to_val, list) else type(to_val).__name__
+                    log(f"  results[{i}]: from={from_str}, to={to_str}")
+                    if from_val is None:
+                        log(f"    FULL: {json.dumps(r, default=str)[:200]}...")
+            log("\n--- Full response (first 2 results) ---")
+            log(json.dumps({"results": results[:2]}, indent=2, default=str))
+        return 0
 
     conn = sqlite3.connect(str(db_path))
 
@@ -320,18 +406,42 @@ def main():
         log(f"Estimated time: ~{total * (args.delay + 0.45) / 60:.0f} min\n")
 
     if args.batch:
-        # Batch fetch: 100 deals per request
+        # Batch fetch: 100 deals per request, with missing-deal detection and individual fallback
         for i in range(0, total, BATCH_SIZE):
             batch = deal_ids[i : i + BATCH_SIZE]
             try:
-                assocs = fetch_deal_associations_batch(client, batch)
+                assocs, returned_deal_ids = fetch_deal_associations_batch(client, batch, log_fn=log)
                 all_associations.extend(assocs)
                 deals_processed += len(batch)
                 deals_with_assoc += len(set(a["deal_hubspot_id"] for a in assocs))
+                # Detect deals omitted by batch API (e.g. 99 results for 100 requests)
+                missing = set(batch) - returned_deal_ids
+                if missing:
+                    log(f"  Batch at {i}: {len(missing)} deals missing from API response, re-fetching individually")
+                    for did in missing:
+                        try:
+                            fallback = fetch_deal_associations(client, did)
+                            all_associations.extend(fallback)
+                            deals_with_assoc += 1 if fallback else 0
+                            time.sleep(args.delay)
+                        except Exception as e:
+                            deals_failed += 1
+                            if deals_failed <= 5:
+                                log(f"  Warning: individual fetch for deal {did} failed: {e}")
             except Exception as e:
-                deals_failed += len(batch)
-                if deals_failed <= BATCH_SIZE:
-                    log(f"  Warning: batch at {i} failed: {e}")
+                log(f"  Warning: batch at {i} failed after retries: {e}")
+                # Fallback: fetch each deal individually
+                for did in batch:
+                    try:
+                        fallback = fetch_deal_associations(client, did)
+                        all_associations.extend(fallback)
+                        deals_processed += 1
+                        deals_with_assoc += 1 if fallback else 0
+                        time.sleep(args.delay)
+                    except Exception as e2:
+                        deals_failed += 1
+                        if deals_failed <= 5:
+                            log(f"  Warning: fallback fetch for deal {did} failed: {e2}")
             if (i + BATCH_SIZE) % 400 == 0 or i + BATCH_SIZE >= total:
                 log(
                     f"  {min(i + BATCH_SIZE, total):,}/{total:,} deals | "
@@ -366,6 +476,15 @@ def main():
     log(f"\nTotal associations fetched: {len(all_associations):,}")
     log(f"Deals processed: {deals_processed:,} | with associations: {deals_with_assoc:,} | failed: {deals_failed}")
 
+    # Post-fetch validation: ensure we have data for all requested deals
+    deals_in_results = {a["deal_hubspot_id"] for a in all_associations}
+    never_fetched = set(deal_ids) - deals_in_results
+    if never_fetched and deals_failed == 0:
+        # Deals with no associations in HubSpot (legitimate empty)
+        log(f"  Note: {len(never_fetched):,} deals have no company associations in HubSpot")
+    elif never_fetched and deals_failed > 0:
+        log(f"  Warning: {len(never_fetched):,} deals have no data (includes {deals_failed} fetch failures)")
+
     # Populate SQLite
     if incremental:
         # Remove existing rows for these deals, then insert new
@@ -379,6 +498,22 @@ def main():
     # Summary
     print_summary(conn)
 
+    # Log refresh timestamp (for "when was deal_associations last synced?")
+    total_assocs = conn.execute("SELECT COUNT(*) FROM deal_associations").fetchone()[0]
+    unique_deals = conn.execute("SELECT COUNT(DISTINCT deal_hubspot_id) FROM deal_associations").fetchone()[0]
+    unique_companies = conn.execute("SELECT COUNT(DISTINCT company_hubspot_id) FROM deal_associations").fetchone()[0]
+    try:
+        from tools.utils.hubspot_refresh_logger import log_deal_associations_refresh
+        log_deal_associations_refresh(
+            str(db_path),
+            total_associations=total_assocs,
+            unique_deals=unique_deals,
+            unique_companies=unique_companies,
+        )
+        log(f"  Refresh logged to hubspot_deal_associations_refresh_logs")
+    except Exception as e:
+        log(f"  Warning: Could not log refresh: {e}")
+
     # Log to edit_logs
     try:
         from tools.scripts.hubspot.edit_log_db import log_edit
@@ -386,8 +521,8 @@ def main():
             conn,
             script="populate_deal_associations",
             action="populate",
-            outcome="success",
-            detail=f"associations: {len(all_associations):,}, deals: {deals_processed:,}",
+            outcome="failure" if deals_failed > 0 else "success",
+            detail=f"associations: {len(all_associations):,}, deals: {deals_processed:,}, failed: {deals_failed}",
         )
     except Exception as e:
         log(f"  Warning: Could not log to edit_logs: {e}")
@@ -395,7 +530,7 @@ def main():
     conn.close()
     log(f"Database: {db_path}")
     log("=" * 70)
-    return 0
+    return 1 if deals_failed > 0 else 0
 
 
 if __name__ == "__main__":

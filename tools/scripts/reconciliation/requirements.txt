@@ -1,0 +1,2 @@
+# MCP Reconciliation Server
+mcp[cli]>=1.0.0

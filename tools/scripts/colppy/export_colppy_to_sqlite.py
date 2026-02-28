@@ -7,30 +7,63 @@ Exports key tables for offline reconciliation with facturacion.csv and HubSpot.
 Tables: facturacion, empresa, plan, pago, payment_detail
 ~135k rows total, ~50 MB, ~1-2 min
 
+Refresh strategy: See tools/docs/COLPPY_EXPORT_REFRESH_STRATEGY.md
+- Transactional (incremental): pago, payment_detail (by fechaPago)
+- Snapshot: empresa, facturacion, plan
+
 Usage:
   python tools/scripts/colppy/export_colppy_to_sqlite.py
   python tools/scripts/colppy/export_colppy_to_sqlite.py --output tools/data/colppy_export.db
-  python tools/scripts/colppy/export_colppy_to_sqlite.py --year 2026 --month 1  # timeframe-only refresh
+  python tools/scripts/colppy/export_colppy_to_sqlite.py --full              # full snapshot (bootstrap)
+  python tools/scripts/colppy/export_colppy_to_sqlite.py --incremental       # pago since last_sync
+  python tools/scripts/colppy/export_colppy_to_sqlite.py --incremental --incremental-since 2026-02-01
+  python tools/scripts/colppy/export_colppy_to_sqlite.py --year 2026 --month 1  # timeframe merge
   python tools/scripts/colppy/export_colppy_to_sqlite.py --dry-run
 """
 
 import argparse
 import calendar
+import json
 import sqlite3
 import sys
+from datetime import datetime
 from pathlib import Path
+from zoneinfo import ZoneInfo
 
 tools_dir = Path(__file__).resolve().parents[2]
+REPO_ROOT = Path(__file__).resolve().parents[3]
 sys.path.insert(0, str(tools_dir))
 
 from dotenv import load_dotenv
 
+load_dotenv(REPO_ROOT / ".env")
 load_dotenv(tools_dir / ".env")
 
-DEFAULT_OUTPUT = "tools/data/colppy_export.db"
+ARGENTINA_TZ = ZoneInfo("America/Argentina/Buenos_Aires")
+DEFAULT_OUTPUT = str(REPO_ROOT / "tools" / "data" / "colppy_export.db")
 BATCH_SIZE = 5000
 
 TABLES = ["plan", "facturacion", "pago", "payment_detail", "empresa"]
+
+COLPPY_REFRESH_LOGS_SCHEMA = """
+CREATE TABLE IF NOT EXISTS colppy_export_refresh_logs (
+    id              INTEGER PRIMARY KEY AUTOINCREMENT,
+    timestamp       TEXT NOT NULL,
+    mode            TEXT NOT NULL,
+    total_rows      INTEGER NOT NULL,
+    table_counts    TEXT
+);
+CREATE INDEX IF NOT EXISTS idx_colppy_refresh_ts ON colppy_export_refresh_logs(timestamp);
+"""
+
+COLPPY_SYNC_STATE_SCHEMA = """
+CREATE TABLE IF NOT EXISTS colppy_sync_state (
+    id                  INTEGER PRIMARY KEY CHECK (id = 1),
+    last_pago_sync      TEXT,
+    updated_at          TEXT
+);
+INSERT OR IGNORE INTO colppy_sync_state (id, last_pago_sync, updated_at) VALUES (1, NULL, NULL);
+"""
 
 
 def _py_to_sqlite(val):
@@ -216,9 +249,35 @@ def run_export_timeframe(
     _insert_rows("plan", plan_rows)
     _insert_rows("payment_detail", payment_detail_rows)
     conn.commit()
+
+    conn.executescript(COLPPY_SYNC_STATE_SCHEMA)
+    max_fecha = max((r.get("fechaPago") or "") for r in pago_rows if r.get("fechaPago"))
+    if max_fecha:
+        if hasattr(max_fecha, "strftime"):
+            max_fecha_str = max_fecha.strftime("%Y-%m-%d")
+        else:
+            max_fecha_str = str(max_fecha)[:10]
+        _set_last_pago_sync(conn, max_fecha_str)
+        conn.commit()
+        print(f"  last_pago_sync = {max_fecha_str} (for incremental)")
+
     conn.close()
 
+    total_rows = len(pago_rows) + len(facturacion_rows) + len(empresa_rows) + len(plan_rows) + len(payment_detail_rows)
+    _log_colppy_refresh(
+        str(out_p),
+        mode=f"timeframe_{month_key}",
+        total_rows=total_rows,
+        table_counts={
+            "pago": len(pago_rows),
+            "facturacion": len(facturacion_rows),
+            "empresa": len(empresa_rows),
+            "plan": len(plan_rows),
+            "payment_detail": len(payment_detail_rows),
+        },
+    )
     print(f"\nMerged {month_key} data into {out_p.absolute()}")
+    print(f"  Refresh logged to colppy_export_refresh_logs")
 
 
 def _table_exists(conn: sqlite3.Connection, table: str) -> bool:
@@ -227,6 +286,268 @@ def _table_exists(conn: sqlite3.Connection, table: str) -> bool:
         (table,),
     )
     return cur.fetchone() is not None
+
+
+def _log_colppy_refresh(
+    db_path: str,
+    mode: str,
+    total_rows: int,
+    table_counts: dict[str, int] | None = None,
+) -> None:
+    """Log refresh to colppy_export_refresh_logs so you can see when DB was last synced."""
+    conn = sqlite3.connect(db_path)
+    conn.executescript(COLPPY_REFRESH_LOGS_SCHEMA)
+    ts = datetime.now(ARGENTINA_TZ).isoformat()
+    counts_json = json.dumps(table_counts) if table_counts else None
+    conn.execute(
+        """
+        INSERT INTO colppy_export_refresh_logs (timestamp, mode, total_rows, table_counts)
+        VALUES (?, ?, ?, ?)
+        """,
+        (ts, mode, total_rows, counts_json),
+    )
+    conn.commit()
+    conn.close()
+
+
+def get_last_colppy_refresh(db_path: str) -> dict | None:
+    """Return the most recent colppy_export refresh record, or None."""
+    path = Path(db_path)
+    if not path.exists():
+        return None
+    conn = sqlite3.connect(str(db_path))
+    conn.executescript(COLPPY_REFRESH_LOGS_SCHEMA)
+    row = conn.execute(
+        """
+        SELECT timestamp, mode, total_rows, table_counts
+        FROM colppy_export_refresh_logs
+        ORDER BY timestamp DESC LIMIT 1
+        """
+    ).fetchone()
+    conn.close()
+    if not row:
+        return None
+    counts = None
+    if row[3]:
+        try:
+            counts = json.loads(row[3])
+        except (json.JSONDecodeError, TypeError):
+            pass
+    return {"timestamp": row[0], "mode": row[1], "total_rows": row[2], "table_counts": counts}
+
+
+def _get_last_pago_sync(conn: sqlite3.Connection) -> str | None:
+    """Get last_pago_sync from colppy_sync_state. Returns None if not set."""
+    conn.executescript(COLPPY_SYNC_STATE_SCHEMA)
+    row = conn.execute(
+        "SELECT last_pago_sync FROM colppy_sync_state WHERE id = 1"
+    ).fetchone()
+    if not row or not row[0]:
+        return None
+    return row[0]
+
+
+def _set_last_pago_sync(conn: sqlite3.Connection, sync_date: str) -> None:
+    """Update last_pago_sync in colppy_sync_state."""
+    conn.executescript(COLPPY_SYNC_STATE_SCHEMA)
+    ts = datetime.now(ARGENTINA_TZ).isoformat()
+    conn.execute(
+        "UPDATE colppy_sync_state SET last_pago_sync = ?, updated_at = ? WHERE id = 1",
+        (sync_date, ts),
+    )
+
+
+def _upsert_rows(
+    conn: sqlite3.Connection,
+    table: str,
+    rows: list[dict],
+    id_column: str,
+    id_values: list,
+) -> None:
+    """Delete existing rows by id_column IN (...) and insert new rows. Runs DELETE even when rows empty (removes stale data)."""
+    if id_values:
+        placeholders_in = ",".join("?" * len(id_values))
+        conn.execute(
+            f'DELETE FROM {table} WHERE "{id_column}" IN ({placeholders_in})',
+            id_values,
+        )
+    if not rows:
+        return
+    cols = list(rows[0].keys())
+    col_list = ",".join(f'"{c}"' for c in cols)
+    placeholders = ",".join("?" * len(cols))
+    vals = [tuple(_py_to_sqlite(r.get(c)) for c in cols) for r in rows]
+    conn.executemany(
+        f'INSERT INTO {table} ({col_list}) VALUES ({placeholders})',
+        vals,
+    )
+
+
+def _upsert_payment_detail(
+    conn: sqlite3.Connection, rows: list[dict], payment_ids: list
+) -> None:
+    """Delete payment_detail by payment_id and insert. Multiple rows per payment_id. Runs DELETE even when rows empty."""
+    if payment_ids:
+        ph = ",".join("?" * len(payment_ids))
+        conn.execute(f"DELETE FROM payment_detail WHERE payment_id IN ({ph})", payment_ids)
+    if not rows:
+        return
+    cols = list(rows[0].keys())
+    col_list = ",".join(f'"{c}"' for c in cols)
+    placeholders = ",".join("?" * len(cols))
+    vals = [tuple(_py_to_sqlite(r.get(c)) for c in cols) for r in rows]
+    conn.executemany(
+        f"INSERT INTO payment_detail ({col_list}) VALUES ({placeholders})",
+        vals,
+    )
+
+
+def run_export_incremental(
+    output_path: str,
+    dry_run: bool,
+    since_date: str | None = None,
+) -> None:
+    """
+    Incremental export: pago + payment_detail by fechaPago >= last_sync.
+    Fetches empresa, facturacion, plan only for id_empresa in new pago (targeted merge).
+    Requires existing DB from --full or --year --month. Use --full for bootstrap.
+    """
+    from database import get_db
+
+    out_p = Path(output_path)
+    if not out_p.exists():
+        print(f"Error: {output_path} does not exist. Run --full first to bootstrap.")
+        return
+
+    conn = sqlite3.connect(str(out_p))
+    try:
+        conn.executescript(COLPPY_SYNC_STATE_SCHEMA)
+        last_sync = since_date or _get_last_pago_sync(conn)
+        if not last_sync:
+            last_sync = "2020-01-01"
+            print(f"  No last_sync; using bootstrap date: {last_sync}")
+
+        print("=" * 60)
+        print("Colppy MySQL → SQLite Export (incremental)")
+        print("=" * 60)
+        print(f"Output: {output_path}")
+        print(f"Since: {last_sync}")
+        if dry_run:
+            print("(dry-run: count only, no write)")
+        print()
+
+        mysql_db = get_db()
+        pago_query = """
+            SELECT * FROM pago
+            WHERE fechaPago >= :since
+            ORDER BY fechaPago
+        """
+        pago_rows = mysql_db.execute_query(pago_query, {"since": last_sync})
+
+        if not pago_rows:
+            print(f"No new pago since {last_sync}.")
+            if not dry_run:
+                today = datetime.now(ARGENTINA_TZ).strftime("%Y-%m-%d")
+                _set_last_pago_sync(conn, today)
+                conn.commit()
+                _log_colppy_refresh(
+                    str(out_p),
+                    mode="incremental",
+                    total_rows=0,
+                    table_counts={"pago": 0, "payment_detail": 0},
+                )
+            return
+
+        max_fecha = max(
+            (r.get("fechaPago") or "") for r in pago_rows
+            if r.get("fechaPago")
+        )
+        if isinstance(max_fecha, datetime):
+            max_fecha = max_fecha.strftime("%Y-%m-%d") if max_fecha else last_sync
+        else:
+            max_fecha = str(max_fecha)[:10] if max_fecha else last_sync
+
+        id_pagos = sorted({r.get("idPago") for r in pago_rows if r.get("idPago")})
+        id_empresas = sorted({str(r.get("idEmpresa") or "") for r in pago_rows if r.get("idEmpresa")})
+        id_plans = sorted({r.get("idPlan") for r in pago_rows if r.get("idPlan")})
+
+        payment_detail_rows = []
+        if id_pagos:
+            ph = ",".join([f":pd{i}" for i in range(len(id_pagos))])
+            params = {f"pd{i}": id_pagos[i] for i in range(len(id_pagos))}
+            payment_detail_rows = mysql_db.execute_query(
+                f"SELECT * FROM payment_detail WHERE payment_id IN ({ph})", params
+            )
+
+        facturacion_rows = []
+        empresa_rows = []
+        if id_empresas:
+            ph = ",".join([f":e{i}" for i in range(len(id_empresas))])
+            params = {f"e{i}": id_empresas[i] for i in range(len(id_empresas))}
+            facturacion_rows = mysql_db.execute_query(
+                f"SELECT * FROM facturacion WHERE IdEmpresa IN ({ph})", params
+            )
+            empresa_rows = mysql_db.execute_query(
+                f"SELECT * FROM empresa WHERE IdEmpresa IN ({ph})", params
+            )
+        plan_rows = []
+        if id_plans:
+            ph = ",".join([f":p{i}" for i in range(len(id_plans))])
+            params = {f"p{i}": id_plans[i] for i in range(len(id_plans))}
+            plan_rows = mysql_db.execute_query(
+                f"SELECT * FROM plan WHERE idPlan IN ({ph})", params
+            )
+
+        print(f"  pago: {len(pago_rows):,} | payment_detail: {len(payment_detail_rows):,}")
+        print(f"  empresa: {len(empresa_rows):,} | facturacion: {len(facturacion_rows):,} | plan: {len(plan_rows):,}")
+
+        if dry_run:
+            print(f"  Would merge into {output_path}; next last_sync = {max_fecha}")
+            return
+
+        if not _table_exists(conn, "pago"):
+            for table, rows in [
+                ("pago", pago_rows),
+                ("payment_detail", payment_detail_rows),
+                ("facturacion", facturacion_rows),
+                ("empresa", empresa_rows),
+                ("plan", plan_rows),
+            ]:
+                if rows:
+                    cols = list(rows[0].keys())
+                    col_list = ",".join(f'"{c}"' for c in cols)
+                    conn.execute(f"CREATE TABLE IF NOT EXISTS {table} ({col_list})")
+            conn.commit()
+
+        id_pago_list = list(id_pagos)
+        _upsert_rows(conn, "pago", pago_rows, "idPago", id_pago_list)
+        _upsert_payment_detail(conn, payment_detail_rows, id_pago_list)
+        if id_empresas:
+            _upsert_rows(conn, "facturacion", facturacion_rows, "IdEmpresa", id_empresas)
+            _upsert_rows(conn, "empresa", empresa_rows, "IdEmpresa", id_empresas)
+        if id_plans:
+            _upsert_rows(conn, "plan", plan_rows, "idPlan", list(id_plans))
+
+        _set_last_pago_sync(conn, max_fecha)
+        conn.commit()
+        total = len(pago_rows) + len(payment_detail_rows) + len(facturacion_rows) + len(empresa_rows) + len(plan_rows)
+        _log_colppy_refresh(
+            str(out_p),
+            mode="incremental",
+            total_rows=total,
+            table_counts={
+                "pago": len(pago_rows),
+                "payment_detail": len(payment_detail_rows),
+                "facturacion": len(facturacion_rows),
+                "empresa": len(empresa_rows),
+                "plan": len(plan_rows),
+            },
+        )
+        print(f"\nMerged incremental data into {out_p.absolute()}")
+        print(f"  last_pago_sync = {max_fecha}")
+        print(f"  Refresh logged to colppy_export_refresh_logs")
+    finally:
+        conn.close()
 
 
 def run_export(output_path: str, dry_run: bool) -> None:
@@ -258,13 +579,27 @@ def run_export(output_path: str, dry_run: bool) -> None:
     out_p.parent.mkdir(parents=True, exist_ok=True)
     conn = sqlite3.connect(str(out_p))
 
+    table_counts = {}
     for table in TABLES:
         print(f"Exporting {table}...", end=" ", flush=True)
         cnt = export_table(mysql_db, conn, table, dry_run=False)
         total += cnt
+        table_counts[table] = cnt
         print(f"{cnt:,} rows")
 
+    conn.executescript(COLPPY_SYNC_STATE_SCHEMA)
+    row = conn.execute(
+        "SELECT MAX(date(fechaPago)) FROM pago WHERE fechaPago IS NOT NULL"
+    ).fetchone()
+    if row and row[0]:
+        _set_last_pago_sync(conn, row[0])
+        conn.commit()
+        print(f"  last_pago_sync = {row[0]} (for incremental)")
+
     conn.close()
+    _log_colppy_refresh(str(out_p), mode="full", total_rows=total, table_counts=table_counts)
+    print(f"  Refresh logged to colppy_export_refresh_logs")
+
     size_mb = out_p.stat().st_size / (1024 * 1024)
     print()
     print(f"Total: {total:,} rows")
@@ -296,9 +631,29 @@ def main():
         action="store_true",
         help="Count rows only, do not write",
     )
+    parser.add_argument(
+        "--full",
+        action="store_true",
+        help="Full snapshot (default when no other mode). Bootstrap for --incremental.",
+    )
+    parser.add_argument(
+        "--incremental",
+        action="store_true",
+        help="Incremental: pago + payment_detail since last_sync. Requires existing DB.",
+    )
+    parser.add_argument(
+        "--incremental-since",
+        type=str,
+        metavar="YYYY-MM-DD",
+        help="Override last_sync date for --incremental (e.g. 2026-02-01)",
+    )
     args = parser.parse_args()
     if args.year and args.month:
         run_export_timeframe(args.output, args.year, args.month, args.dry_run)
+    elif args.incremental:
+        run_export_incremental(
+            args.output, args.dry_run, since_date=args.incremental_since
+        )
     elif args.year or args.month:
         parser.error("--year and --month must be used together")
     else:

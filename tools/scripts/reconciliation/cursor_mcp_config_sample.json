@@ -1,0 +1,10 @@
+{
+  "mcpServers": {
+    "reconciliation": {
+      "command": "python",
+      "args": ["/Users/virulana/openai-cookbook/tools/scripts/reconciliation/mcp_reconciliation_server.py"],
+      "cwd": "/Users/virulana/openai-cookbook",
+      "env": {}
+    }
+  }
+}

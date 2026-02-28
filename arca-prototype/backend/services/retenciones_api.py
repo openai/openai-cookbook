@@ -5,14 +5,16 @@ Target app: Mirequa (https://mirequa-web.arca.gob.ar) — a Vue.js SPA using
 EDA components (e-input, e-check-item, multiselect, e-date-picker, etc.).
 
 Flow:
-  1. Login to ARCA portal (CUIT + Clave Fiscal)
-  2. Search for "Mis Retenciones" → opens Mirequa in new tab
-  3. Check "Exportar para aplicativos SIAP" checkbox
-  4. Select Impuesto from Vue multiselect (#selectImpuestos)
-  5. Select Tipo de operación (radio buttons: Retención / Percepción)
-  6. Fill date fields (e-date-picker inputs, DD/MM/AAAA format)
-  7. Click "Consultar" and wait for results
-  8. Intercept Mirequa JSON API response, paginate, return structured data
+  1.   Login to ARCA portal (CUIT + Clave Fiscal)
+  2.   Search for "Mis Retenciones" → opens Mirequa in new tab
+  2.5  Select representado inside Mirequa (user initials dropdown
+       → "Seleccionar representado" → entity card matching target CUIT)
+  3.   Check "Exportar para aplicativos SIAP" checkbox
+  4.   Select Impuesto from Vue multiselect (#selectImpuestos)
+  5.   Select Tipo de operación (radio buttons: Retención / Percepción)
+  6.   Fill date fields (e-date-picker inputs, DD/MM/AAAA format)
+  7.   Click "Consultar" and wait for results
+  8.   Intercept Mirequa JSON API response, paginate, return structured data
 """
 import asyncio
 import json
@@ -145,19 +147,23 @@ async def download_retenciones(
     impuesto: str = "767",
     tipo_operacion: str = "retencion",
     output_path: Path | None = None,
+    cuit_representado: str = "",
 ) -> dict[str, Any]:
     """
     Download retenciones y percepciones from Mis Retenciones (Exportar para Aplicativo).
 
     Args:
-        cuit: CUIT/CUIL (11 digits)
+        cuit: CUIT/CUIL (11 digits) — the login CUIT
         password: Clave Fiscal
         fecha_desde: Start date DD/MM/YYYY
         fecha_hasta: End date DD/MM/YYYY
-        id_contribuyente: 0-based index of persona to select (0 = first)
+        id_contribuyente: 0-based index of persona to select (legacy, unused if cuit_representado set)
         impuesto: Impuesto code — "767" (default, SICORE Ret y Perc), "216" (IVA), "217" (Ganancias)
         tipo_operacion: "retencion" or "percepcion"
         output_path: Where to save the CSV. Default: data/retenciones_{cuit}_{timestamp}.csv
+        cuit_representado: CUIT of the entity to represent (e.g. company CUIT).
+                           If different from login cuit, Mirequa's in-app representado
+                           selector will be used to switch to this entity.
 
     Returns:
         Dict with success, message, file_path, content_preview, row_count.
@@ -201,6 +207,9 @@ async def download_retenciones(
             if "login" in page.url.lower() and "portal" not in page.url.lower():
                 await browser.close()
                 return _make_error("Login fallido. Verifique CUIT y Clave Fiscal.")
+
+            # NOTE: Representado selection happens INSIDE Mirequa (Step 2.5),
+            # not at the portal level. The portal has no representado switcher.
 
             # ================================================================
             # STEP 2: Open "Mis Retenciones" via search bar → Mirequa app
@@ -247,6 +256,96 @@ async def download_retenciones(
             mret.on("response", intercept_response)
 
             await _save_debug_screenshot(mret, "01_mirequa_loaded")
+
+            # ================================================================
+            # STEP 2.5: Select representado inside Mirequa
+            # ================================================================
+            # Mirequa defaults to the login CUIT (personal). To query for a
+            # representado (e.g. a company), we use Mirequa's built-in selector:
+            #   1. Click user initials link in the top-right header
+            #   2. Click "Seleccionar representado" from the dropdown
+            #   3. Click the entity card matching cuit_representado
+            #   4. Wait for "Representando a:" confirmation in header
+            cuit_rep_clean = "".join(c for c in cuit_representado if c.isdigit()) if cuit_representado else ""
+            if cuit_rep_clean and cuit_rep_clean != cuit_clean:
+                try:
+                    # Format CUIT as XX-XXXXXXXX-X for matching
+                    cuit_formatted = f"{cuit_rep_clean[:2]}-{cuit_rep_clean[2:10]}-{cuit_rep_clean[10:]}"
+
+                    # Close any notification bar that might block clicks
+                    close_btn = mret.locator('button:has-text("Close"), button[aria-label="Close"]').first
+                    if await close_btn.count() > 0:
+                        try:
+                            await close_btn.click(timeout=3000)
+                            await asyncio.sleep(0.5)
+                        except Exception:
+                            pass
+
+                    # 1. Click user initials link (the avatar in the top-right navbar)
+                    # Mirequa renders it as: <a href="#"> <span>OJ</span> </a>
+                    # We look for a short-text link (2-3 chars) in the header area.
+                    initials_clicked = False
+                    # Strategy A: find by short text inside nav links
+                    nav_links = mret.locator('nav a[href="#"]')
+                    nav_count = await nav_links.count()
+                    for i in range(nav_count):
+                        link = nav_links.nth(i)
+                        text = (await link.inner_text()).strip()
+                        if 1 <= len(text) <= 4 and text.isalpha():
+                            await link.click()
+                            initials_clicked = True
+                            break
+                    if not initials_clicked:
+                        # Strategy B: last anchor in the nav
+                        if nav_count > 0:
+                            await nav_links.last.click()
+                            initials_clicked = True
+                    await asyncio.sleep(2)
+
+                    # 2. Click "Seleccionar representado" from the dropdown
+                    sel_rep = mret.locator('a:has-text("Seleccionar representado"), button:has-text("Seleccionar representado")')
+                    await sel_rep.first.wait_for(state="visible", timeout=5000)
+                    await sel_rep.first.click()
+                    await asyncio.sleep(4)
+
+                    await _save_debug_screenshot(mret, "02a_representado_selector")
+
+                    # 3. Click the entity card matching the target CUIT
+                    # The selector page shows entity cards as tab elements with CUIT text.
+                    # Try multiple locator strategies:
+                    entity_clicked = False
+
+                    # Strategy A: role="tab" with CUIT text (formatted XX-XXXXXXXX-X)
+                    for cuit_text in [cuit_formatted, cuit_rep_clean]:
+                        entity_card = mret.locator(f'[role="tab"]:has-text("{cuit_text}")')
+                        if await entity_card.count() > 0:
+                            await entity_card.first.click()
+                            entity_clicked = True
+                            break
+
+                    # Strategy B: any clickable card/link with CUIT text
+                    if not entity_clicked:
+                        for cuit_text in [cuit_formatted, cuit_rep_clean]:
+                            card = mret.locator(f'a:has-text("{cuit_text}"), button:has-text("{cuit_text}"), [class*="card"]:has-text("{cuit_text}")')
+                            if await card.count() > 0:
+                                await card.first.click()
+                                entity_clicked = True
+                                break
+
+                    if entity_clicked:
+                        await asyncio.sleep(5)
+
+                        # 4. Verify: check for "Representando a:" in header
+                        header_text = await mret.locator("nav").first.inner_text()
+                        if "Representando a:" in header_text or cuit_formatted in header_text:
+                            await _save_debug_screenshot(mret, "02b_representado_ok")
+                        else:
+                            await _save_debug_screenshot(mret, "02b_representado_not_confirmed")
+                    else:
+                        await _save_debug_screenshot(mret, "02b_representado_no_card_found")
+                except Exception as e:
+                    # Non-fatal: continue with whatever entity is active
+                    await _save_debug_screenshot(mret, "02_representado_error")
 
             # ================================================================
             # STEP 3: Check "Exportar para aplicativos SIAP" checkbox

@@ -13,6 +13,7 @@ def reconcile_retenciones(
     comprobantes: list[dict[str, Any]],
     fecha_desde: str | None = None,
     fecha_hasta: str | None = None,
+    colppy_percepciones: dict[str, list[dict[str, Any]]] | None = None,
 ) -> dict[str, Any]:
     """
     Main reconciliation: cross-reference retenciones against comprobantes recibidos.
@@ -20,7 +21,11 @@ def reconcile_retenciones(
     1. Group retenciones by (agent_cuit, YYYY-MM)
     2. Index comprobantes by (cuit_contraparte, YYYY-MM)
     3. For each group: find matching comprobantes, assign match_status
-    4. Return structured result with summary + coverage info
+    4. If colppy_percepciones provided, add Colppy comparison per agent
+    5. Return structured result with summary + coverage info
+
+    colppy_percepciones: optional dict keyed by normalized CUIT, each value
+    is a list of Colppy invoice dicts with percepciones fields.
     """
     if not retenciones:
         return {
@@ -98,13 +103,13 @@ def reconcile_retenciones(
             "retenciones": [
                 {
                     "numeroCertificado": r.get("numeroCertificado", ""),
-                    "fechaRetencion": r.get("fechaRetencion", ""),
+                    "fechaRetencion": r.get("fechaRetencion", "") or "",
                     "importeRetenido": r.get("importeRetenido", 0),
                     "descripcionOperacion": r.get("descripcionOperacion", ""),
                     "codigoRegimen": r.get("codigoRegimen", ""),
                     "impuestoRetenido": r.get("impuestoRetenido", ""),
                     "numeroComprobante": r.get("numeroComprobante", ""),
-                    "fechaComprobante": r.get("fechaComprobante", ""),
+                    "fechaComprobante": r.get("fechaComprobante", "") or "",
                     "descripcionComprobante": r.get("descripcionComprobante", ""),
                 }
                 for r in rets
@@ -115,7 +120,7 @@ def reconcile_retenciones(
             "match_status": match_status,
             "comprobantes": [
                 {
-                    "fecha_emision": c.get("fecha_emision", ""),
+                    "fecha_emision": c.get("fecha_emision", "") or "",
                     "tipo_comprobante": c.get("tipo_comprobante", ""),
                     "numero": c.get("numero", ""),
                     "importe_total": c.get("importe_total", 0),
@@ -125,6 +130,30 @@ def reconcile_retenciones(
             ],
         }
 
+        # Colppy percepciones comparison (when data provided)
+        if colppy_percepciones is not None:
+            colppy_invoices = colppy_percepciones.get(agent_cuit, [])
+            agent_entry["colppy_percepciones"] = [
+                {
+                    "nroFactura": inv.get("nroFactura", "") or "",
+                    "fechaFactura": inv.get("fechaFactura", "") or "",
+                    "RazonSocial": inv.get("RazonSocial", ""),
+                    "totalFactura": inv.get("totalFactura", 0),
+                    "percepcionIVA": inv.get("percepcionIVA", 0),
+                    "percepcionIIBB": inv.get("percepcionIIBB", 0),
+                    "totalPercepciones": inv.get("totalPercepciones", 0),
+                }
+                for inv in colppy_invoices
+            ]
+            colppy_total = round(sum(inv.get("totalPercepciones", 0) for inv in colppy_invoices), 2)
+            agent_entry["colppy_percepciones_total"] = colppy_total
+            agent_entry["percepciones_diff"] = round(neto - colppy_total, 2)
+            # Use Colppy name if we didn't get one from comprobantes
+            if nombre_agente.startswith("AGENTE ") and colppy_invoices:
+                first_name = colppy_invoices[0].get("RazonSocial", "")
+                if first_name:
+                    agent_entry["nombre_agente"] = first_name
+
         periodos_map[periodo]["agentes"].append(agent_entry)
         periodos_map[periodo]["total_retenido_mes"] = round(
             periodos_map[periodo]["total_retenido_mes"] + neto, 2
@@ -133,20 +162,63 @@ def reconcile_retenciones(
     # Sort periodos chronologically
     periodos = [periodos_map[k] for k in sorted(periodos_map.keys())]
 
-    return {
+    summary = {
+        "total_retenciones": len(retenciones),
+        "total_positivo": round(total_positivo, 2),
+        "total_notas_credito": round(total_nc, 2),
+        "total_neto_para_ddjj": round(total_positivo + total_nc, 2),
+        "grupos_matched": grupos_matched,
+        "grupos_orphan": grupos_orphan,
+        "grupos_no_data": grupos_no_data,
+    }
+
+    result = {
         "success": True,
         "periodos": periodos,
-        "summary": {
-            "total_retenciones": len(retenciones),
-            "total_positivo": round(total_positivo, 2),
-            "total_notas_credito": round(total_nc, 2),
-            "total_neto_para_ddjj": round(total_positivo + total_nc, 2),
-            "grupos_matched": grupos_matched,
-            "grupos_orphan": grupos_orphan,
-            "grupos_no_data": grupos_no_data,
-        },
+        "summary": summary,
         "comprobantes_data_coverage": _compute_coverage(comprobantes),
     }
+
+    # Colppy percepciones comparison summary
+    if colppy_percepciones is not None:
+        mirequa_cuits = {agent_cuit for (agent_cuit, _) in groups.keys()}
+        colppy_total = round(
+            sum(
+                inv.get("totalPercepciones", 0)
+                for invs in colppy_percepciones.values()
+                for inv in invs
+            ), 2,
+        )
+        mirequa_total = round(total_positivo + total_nc, 2)
+
+        # Agents only in Colppy (have percepciones but no Mirequa certificates)
+        only_colppy_agents = []
+        for cuit, invs in sorted(colppy_percepciones.items()):
+            if cuit not in mirequa_cuits and invs:
+                agent_total = round(sum(inv.get("totalPercepciones", 0) for inv in invs), 2)
+                only_colppy_agents.append({
+                    "cuit_agente": cuit,
+                    "nombre_agente": invs[0].get("RazonSocial", f"AGENTE {cuit}"),
+                    "colppy_percepciones": [
+                        {
+                            "nroFactura": inv.get("nroFactura", "") or "",
+                            "fechaFactura": inv.get("fechaFactura", "") or "",
+                            "totalFactura": inv.get("totalFactura", 0),
+                            "percepcionIVA": inv.get("percepcionIVA", 0),
+                            "percepcionIIBB": inv.get("percepcionIIBB", 0),
+                            "totalPercepciones": inv.get("totalPercepciones", 0),
+                        }
+                        for inv in invs
+                    ],
+                    "colppy_percepciones_total": agent_total,
+                })
+
+        summary["colppy_percepciones_total"] = colppy_total
+        summary["mirequa_percepciones_total"] = mirequa_total
+        summary["percepciones_diff"] = round(mirequa_total - colppy_total, 2)
+        result["only_colppy_agents"] = only_colppy_agents
+
+    return result
 
 
 def _empty_summary() -> dict:

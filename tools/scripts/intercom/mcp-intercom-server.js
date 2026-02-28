@@ -17,6 +17,7 @@ import {
 } from '@modelcontextprotocol/sdk/types.js';
 
 import axios from 'axios';
+import fs from 'fs';
 import { fileURLToPath } from 'url';
 import { dirname, join } from 'path';
 import dotenv from 'dotenv';
@@ -80,6 +81,7 @@ class IntercomMCPServer {
           case 'get_intercom_conversation_stats': return await this.getConversationStats(args);
           case 'search_intercom_conversations': return await this.searchConversations(args);
           case 'scan_customer_feedback': return await this.scanCustomerFeedback(args);
+          case 'scan_full_text': return await this.scanFullText(args);
           case 'get_conversation_feedback': return await this.getConversationFeedback(args);
           default:
             throw new McpError(ErrorCode.MethodNotFound, `Unknown tool: ${name}`);
@@ -279,6 +281,170 @@ class IntercomMCPServer {
       });
     } catch (error) {
       throw new McpError(ErrorCode.InternalError, `Scan failed: ${error.message}`);
+    }
+  }
+
+  /**
+   * Full-text scan: search ALL messages (source + conversation_parts) for keywords.
+   * Fetches full conversation for each, so more API calls than scan_customer_feedback.
+   * When >500 conversations in range: returns confirmation_required; user must re-call with confirm_large_scan: true.
+   */
+  async scanFullText(args) {
+    const {
+      topic,
+      keywords: userKeywords,
+      from_date,
+      to_date = new Date().toISOString().split('T')[0],
+      state,
+      limit = 30,
+      max_scan = 200,
+      confirm_large_scan = false,
+      large_scan_threshold = 500,
+      exclude_if_only = [],
+      save_cache,
+    } = args;
+
+    const LARGE_SCAN_THRESHOLD = Math.max(50, Math.min(2000, large_scan_threshold));
+
+    try {
+      const keywords = (userKeywords && userKeywords.length > 0)
+        ? userKeywords.map(k => k.toLowerCase())
+        : topic.toLowerCase().split(/\s+/).filter(w => w.length > 2);
+
+      // Check how many conversations in range (fetch up to threshold+1 to detect overflow)
+      const probeIds = await fetchConversationIds(this.intercomApi, from_date, to_date, LARGE_SCAN_THRESHOLD + 1, state);
+      const totalInRange = probeIds.length;
+
+      if (totalInRange > LARGE_SCAN_THRESHOLD && !confirm_large_scan) {
+        return this._json({
+          success: false,
+          confirmation_required: true,
+          total_conversations_at_least: totalInRange,
+          message: `This date range has more than ${LARGE_SCAN_THRESHOLD} conversations (at least ${totalInRange}). Full scan would make ~${totalInRange}+ API calls. Set confirm_large_scan: true to proceed with the full scan.`,
+          search_criteria: { topic, from_date, to_date, state: state || null },
+        });
+      }
+
+      // Proceed: fetch all IDs when confirmed (or when under threshold)
+      const scanLimit = confirm_large_scan ? null : Math.min(max_scan, totalInRange);
+      const conversationIds = confirm_large_scan
+        ? await fetchConversationIds(this.intercomApi, from_date, to_date, null, state)
+        : probeIds.slice(0, scanLimit);
+      const matches = [];
+      const cacheConversations = save_cache ? [] : null;
+      const maxConcurrent = 5;
+
+      for (let i = 0; i < conversationIds.length; i += maxConcurrent) {
+        const batch = conversationIds.slice(i, i + maxConcurrent);
+        const batchResults = await Promise.all(batch.map(async (id) => {
+          try {
+            const conv = await getConversationDetails(this.intercomApi, id);
+            const tags = extractTags(conv);
+            const { parts } = buildConversationText(conv);
+
+            if (cacheConversations) {
+              cacheConversations.push({
+                conversation_id: id,
+                created_at: conv.created_at ? new Date(conv.created_at * 1000).toISOString() : '',
+                state: conv.state,
+                tags,
+                parts: parts.map((p) => ({
+                  author_type: p.author_type,
+                  body: p.body,
+                  created_at: p.created_at ? new Date(p.created_at * 1000).toISOString() : null,
+                })),
+              });
+            }
+
+            const matchedParts = [];
+            for (const p of parts) {
+              const bodyLower = p.body.toLowerCase();
+              const matchedKw = keywords.filter(kw => bodyLower.includes(kw));
+              if (matchedKw.length > 0) {
+                matchedParts.push({
+                  author_type: p.author_type,
+                  matched_keywords: matchedKw,
+                  excerpt: p.body.substring(0, 200) + (p.body.length > 200 ? '…' : ''),
+                  created_at: p.created_at ? new Date(p.created_at * 1000).toISOString() : null,
+                });
+              }
+            }
+
+            if (matchedParts.length === 0) return null;
+
+            return {
+              conversation_id: id,
+              created_at: conv.created_at ? new Date(conv.created_at * 1000).toISOString() : '',
+              state: conv.state,
+              tags,
+              match_reason: `Found in ${matchedParts.length} message(s)`,
+              matched_in: matchedParts,
+              admin_assignee_id: conv.admin_assignee_id || null,
+              contact_count: conv.contacts?.contacts?.length || 0,
+            };
+          } catch (error) {
+            return null;
+          }
+        }));
+
+        for (const r of batchResults) {
+          if (r) matches.push(r);
+        }
+      }
+
+      let cachePathResolved = null;
+      if (save_cache && cacheConversations && cacheConversations.length > 0) {
+        const pluginRoot = join(process.cwd(), 'plugins', 'colppy-ceo-assistant');
+        cachePathResolved = save_cache.startsWith('/') ? save_cache : join(pluginRoot, save_cache);
+        const cacheDir = join(cachePathResolved, '..');
+        if (!fs.existsSync(cacheDir)) fs.mkdirSync(cacheDir, { recursive: true });
+        fs.writeFileSync(cachePathResolved, JSON.stringify({
+          from_date,
+          to_date,
+          state: state || null,
+          topic,
+          saved_at: new Date().toISOString(),
+          conversations: cacheConversations,
+        }, null, 2), 'utf8');
+      }
+
+      // Filter: exclude matches where the ONLY matched keywords are in exclude_if_only
+      const excludeSet = new Set((exclude_if_only || []).map(k => k.toLowerCase()));
+      let filteredMatches = matches;
+      if (excludeSet.size > 0) {
+        filteredMatches = matches.filter((m) => {
+          const allMatched = new Set(
+            (m.matched_in || []).flatMap((p) => (p.matched_keywords || []).map(k => k.toLowerCase()))
+          );
+          if (allMatched.size === 0) return true;
+          const onlyExcluded = [...allMatched].every((kw) => excludeSet.has(kw));
+          return !onlyExcluded;
+        });
+      }
+
+      const result = {
+        success: true,
+        research_topic: topic,
+        search_criteria: {
+          keywords,
+          from_date,
+          to_date,
+          state: state || null,
+          confirm_large_scan: confirm_large_scan || undefined,
+          exclude_if_only: exclude_if_only?.length ? exclude_if_only : undefined,
+        },
+        conversations_scanned: conversationIds.length,
+        matches_found: filteredMatches.length,
+        matches_excluded_by_filter: excludeSet.size > 0 ? matches.length - filteredMatches.length : undefined,
+        matches: filteredMatches,
+      };
+      if (cachePathResolved) {
+        result.cache_saved = cachePathResolved;
+        result.cache_conversations = cacheConversations.length;
+      }
+      return this._json(result);
+    } catch (error) {
+      throw new McpError(ErrorCode.InternalError, `Full-text scan failed: ${error.message}`);
     }
   }
 

@@ -37,10 +37,17 @@ export async function retryableRequest(fn, maxRetries = 3, delay = 750) {
  * @param {string} fromDate - YYYY-MM-DD
  * @param {string} toDate - YYYY-MM-DD
  * @param {number|null} limit - max IDs to return (null = all)
+ * @param {string|null} state - optional: 'open', 'closed', 'snoozed'
  */
-export async function fetchConversationIds(intercomApi, fromDate, toDate, limit = null) {
+export async function fetchConversationIds(intercomApi, fromDate, toDate, limit = null, state = null) {
   const fromTimestamp = Math.floor(new Date(fromDate).getTime() / 1000);
   const toTimestamp = Math.floor(new Date(toDate).getTime() / 1000);
+  const queryValues = [
+    { field: 'created_at', operator: '>=', value: fromTimestamp },
+    { field: 'created_at', operator: '<=', value: toTimestamp },
+  ];
+  if (state) queryValues.push({ field: 'state', operator: '=', value: state });
+
   const allIds = [];
   let hasMore = true;
   const maxPerPage = 150;
@@ -50,10 +57,7 @@ export async function fetchConversationIds(intercomApi, fromDate, toDate, limit 
     const searchQuery = {
       query: {
         operator: 'AND',
-        value: [
-          { field: 'created_at', operator: '>=', value: fromTimestamp },
-          { field: 'created_at', operator: '<=', value: toTimestamp },
-        ],
+        value: queryValues,
       },
       pagination: {
         per_page: Math.min(maxPerPage, limit ? limit - allIds.length : maxPerPage),

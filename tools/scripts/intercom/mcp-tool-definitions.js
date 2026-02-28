@@ -116,11 +116,84 @@ export const TOOL_DEFINITIONS = [
     },
   },
   {
+    name: 'scan_full_text',
+    description:
+      'Full-text scan: search ALL messages in conversations (not just the first) for a topic or keyword. ' +
+      'Fetches full conversation content and filters client-side. Use when the topic may appear in replies (e.g. Mercado Pago). ' +
+      'Slower than scan_customer_feedback but finds matches in any message. Use get_conversation_feedback afterwards to read full content.',
+    inputSchema: {
+      type: 'object',
+      properties: {
+        topic: {
+          type: 'string',
+          description: 'Topic or keyword to search, e.g. "mercado pago", "mercadopago", "factura electronica"',
+        },
+        keywords: {
+          type: 'array',
+          items: { type: 'string' },
+          description: 'Additional keywords. If omitted, topic is split into keywords. Include variations like "mercadopago" and "mercado pago".',
+        },
+        from_date: {
+          type: 'string',
+          description: 'Start date YYYY-MM-DD',
+          pattern: '^\\d{4}-\\d{2}-\\d{2}$',
+        },
+        to_date: {
+          type: 'string',
+          description: 'End date YYYY-MM-DD (defaults to today)',
+          pattern: '^\\d{4}-\\d{2}-\\d{2}$',
+        },
+        state: {
+          type: 'string',
+          description: 'Conversation state filter',
+          enum: ['open', 'closed', 'snoozed'],
+        },
+        limit: {
+          type: 'number',
+          description: 'Deprecated. No longer used — all matches are returned. Kept for backwards compatibility.',
+          minimum: 1,
+          maximum: 100,
+          default: 30,
+        },
+        max_scan: {
+          type: 'number',
+          description: 'Max conversations to fetch (default: all in range). Ignored when confirm_large_scan is used.',
+          minimum: 10,
+          maximum: 2000,
+          default: 200,
+        },
+        confirm_large_scan: {
+          type: 'boolean',
+          description: 'Set to true to confirm scanning when the date range exceeds large_scan_threshold. The tool will first return a confirmation_required response; re-call with confirm_large_scan: true to proceed.',
+          default: false,
+        },
+        large_scan_threshold: {
+          type: 'number',
+          description: 'When conversations in range exceed this count, the tool returns confirmation_required. User must re-call with confirm_large_scan: true. Default 500.',
+          minimum: 50,
+          maximum: 2000,
+          default: 500,
+        },
+        exclude_if_only: {
+          type: 'array',
+          items: { type: 'string' },
+          description: 'Exclude matches where the ONLY matched keywords are in this list (e.g. false positives: colppy.com in signatures, request in rating prompts, rest in resto).',
+        },
+        save_cache: {
+          type: 'string',
+          description: 'Path to save raw conversation data for local iteration. Relative to plugins/colppy-ceo-assistant. E.g. skills/intercom-developer-api-research/cache/conversations_2025-01-21.json',
+        },
+      },
+      required: ['topic', 'from_date'],
+      additionalProperties: false,
+    },
+  },
+  {
     name: 'get_conversation_feedback',
     description:
       'Deep dive: fetch full conversation content for specific conversation IDs and extract customer feedback. ' +
       'Returns the full conversation timeline (user + admin + bot messages), participant breakdown, tags, ' +
-      'and feedback snippets matching the topic. Use after scan_customer_feedback to read the actual conversations.',
+      'and feedback snippets matching the topic. Use after scan_customer_feedback or scan_full_text to read the actual conversations.',
     inputSchema: {
       type: 'object',
       properties: {

@@ -85,6 +85,7 @@ function parseArgs() {
     model: 'gpt-4o-mini',
     concurrency: 5,
     keywords: null,
+    all: false,
   };
   for (let i = 0; i < args.length; i++) {
     if (args[i] === '--cache' && args[i + 1]) opts.cache = args[++i];
@@ -94,6 +95,7 @@ function parseArgs() {
     else if (args[i] === '--model' && args[i + 1]) opts.model = args[++i];
     else if (args[i] === '--concurrency' && args[i + 1]) opts.concurrency = parseInt(args[++i], 10);
     else if (args[i] === '--keywords' && args[i + 1]) opts.keywords = args[++i];
+    else if (args[i] === '--all') opts.all = true;
   }
   if (isNaN(opts.concurrency) || opts.concurrency < 1) {
     console.error('--concurrency must be a positive integer');
@@ -156,6 +158,23 @@ function buildConversationText(parts) {
   return lines.join('\n\n');
 }
 
+// ── Retry helper ─────────────────────────────────────────────────────────
+
+async function withRetry(fn, { maxRetries = 3, baseDelay = 1000 } = {}) {
+  for (let attempt = 0; attempt <= maxRetries; attempt++) {
+    try {
+      return await fn();
+    } catch (err) {
+      const isRateLimit = err.status === 429 || err.code === 'rate_limit_exceeded';
+      if (!isRateLimit || attempt === maxRetries) throw err;
+      // Parse retry-after from error or use exponential backoff
+      const retryAfter = err.headers?.['retry-after'];
+      const delay = retryAfter ? parseFloat(retryAfter) * 1000 : baseDelay * Math.pow(2, attempt);
+      await new Promise(r => setTimeout(r, delay));
+    }
+  }
+}
+
 // ── LLM call ─────────────────────────────────────────────────────────────
 
 async function classifyConversation(client, model, systemPrompt, conversationText, matchedKeywords) {
@@ -167,7 +186,7 @@ ${conversationText}
 
 Classify this conversation. Return only the JSON object.`;
 
-  const response = await client.chat.completions.create({
+  const response = await withRetry(() => client.chat.completions.create({
     model,
     max_tokens: 256,
     temperature: 0,
@@ -176,7 +195,7 @@ Classify this conversation. Return only the JSON object.`;
       { role: 'system', content: systemPrompt },
       { role: 'user', content: userMessage },
     ],
-  });
+  }));
 
   const text = response.choices[0]?.message?.content || '';
   try {
@@ -299,45 +318,61 @@ async function main() {
     console.error('Cache file not found. Use --cache <path>');
     process.exit(1);
   }
-  if (!resultsPath || !fs.existsSync(resultsPath)) {
-    console.error('Scan results not found. Use --results <path>');
+  if (!opts.all && (!resultsPath || !fs.existsSync(resultsPath))) {
+    console.error('Scan results not found. Use --results <path> or --all to classify entire cache');
     process.exit(1);
   }
 
   const cache = JSON.parse(fs.readFileSync(cachePath, 'utf8'));
-  const scanResults = JSON.parse(fs.readFileSync(resultsPath, 'utf8'));
+  const scanResults = opts.all ? null : JSON.parse(fs.readFileSync(resultsPath, 'utf8'));
   const config = JSON.parse(fs.readFileSync(keywordsPath, 'utf8'));
 
-  // Build conversation lookup
-  const convById = new Map();
-  for (const conv of cache.conversations || []) {
-    convById.set(String(conv.conversation_id), conv);
-  }
-
-  // Prepare items to classify (skip conversations not in cache)
+  // Prepare items to classify
   const toClassify = [];
-  for (const match of scanResults.matches) {
-    const conv = convById.get(String(match.conversation_id));
-    if (!conv) {
-      console.warn(`  WARNING: conversation ${match.conversation_id} not found in cache, skipping`);
-      continue;
+
+  if (opts.all) {
+    // --all mode: classify every conversation in the cache
+    for (const conv of cache.conversations || []) {
+      const conversationText = buildConversationText(conv.parts || []);
+      if (!conversationText) continue;
+      toClassify.push({
+        conversation_id: conv.conversation_id,
+        created_at: conv.created_at,
+        state: conv.state,
+        tags: conv.tags || [],
+        matched_keywords: [],
+        conversation_text: conversationText,
+      });
     }
-    const conversationText = buildConversationText(conv.parts || []);
-    if (!conversationText) {
-      console.warn(`  WARNING: conversation ${match.conversation_id} has no text, skipping`);
-      continue;
+  } else {
+    // Normal mode: classify keyword matches only
+    const convById = new Map();
+    for (const conv of cache.conversations || []) {
+      convById.set(String(conv.conversation_id), conv);
     }
-    const matchedKeywords = [...new Set(
-      (match.matched_in || []).flatMap(m => m.matched_keywords || [])
-    )];
-    toClassify.push({
-      conversation_id: match.conversation_id,
-      created_at: match.created_at,
-      state: match.state,
-      tags: match.tags,
-      matched_keywords: matchedKeywords,
-      conversation_text: conversationText,
-    });
+    for (const match of scanResults.matches) {
+      const conv = convById.get(String(match.conversation_id));
+      if (!conv) {
+        console.warn(`  WARNING: conversation ${match.conversation_id} not found in cache, skipping`);
+        continue;
+      }
+      const conversationText = buildConversationText(conv.parts || []);
+      if (!conversationText) {
+        console.warn(`  WARNING: conversation ${match.conversation_id} has no text, skipping`);
+        continue;
+      }
+      const matchedKeywords = [...new Set(
+        (match.matched_in || []).flatMap(m => m.matched_keywords || [])
+      )];
+      toClassify.push({
+        conversation_id: match.conversation_id,
+        created_at: match.created_at,
+        state: match.state,
+        tags: match.tags,
+        matched_keywords: matchedKeywords,
+        conversation_text: conversationText,
+      });
+    }
   }
 
   console.log(`Classifying ${toClassify.length} keyword matches with ${opts.model}...`);
@@ -381,14 +416,15 @@ async function main() {
   // Output JSON
   const result = {
     source: 'llm_classify',
+    mode: opts.all ? 'all' : 'keyword_matches',
     model: opts.model,
-    keyword_matches: scanResults.matches_found,
+    total_classified: classified.length,
     llm_true_positives: tp.length,
     llm_false_positives: fp.length,
-    precision_pct: classified.length > 0 ? Math.round(tp.length / classified.length * 100) : 0,
-    from_date: scanResults.search_criteria?.from_date,
-    to_date: scanResults.search_criteria?.to_date,
-    classified,
+    hit_rate_pct: classified.length > 0 ? Math.round(tp.length / classified.length * 100) : 0,
+    from_date: opts.all ? cache.from_date : scanResults.search_criteria?.from_date,
+    to_date: opts.all ? cache.to_date : scanResults.search_criteria?.to_date,
+    classified: opts.all ? classified.filter(c => c.llm.is_developer_api) : classified,
   };
 
   if (outputPath) {
@@ -398,8 +434,8 @@ async function main() {
 
   if (reportPath) {
     writeReport(classified, reportPath, {
-      from_date: scanResults.search_criteria?.from_date,
-      to_date: scanResults.search_criteria?.to_date,
+      from_date: opts.all ? cache.from_date : scanResults.search_criteria?.from_date,
+      to_date: opts.all ? cache.to_date : scanResults.search_criteria?.to_date,
       model: opts.model,
     });
   }

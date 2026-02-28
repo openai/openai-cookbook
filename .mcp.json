@@ -1,0 +1,19 @@
+{
+  "mcpServers": {
+    "intercom": {
+      "command": "npx",
+      "args": ["-y", "mcp-remote", "https://mcp.intercom.com/mcp", "--allow-http"]
+    },
+    "arca": {
+      "command": "/opt/homebrew/bin/python3.11",
+      "args": ["/Users/virulana/openai-cookbook/arca-prototype/backend/mcp_server.py"],
+      "cwd": "/Users/virulana/openai-cookbook"
+    },
+    "reconciliation": {
+      "command": "python",
+      "args": ["/Users/virulana/openai-cookbook/tools/scripts/reconciliation/mcp_reconciliation_server.py"],
+      "cwd": "/Users/virulana/openai-cookbook",
+      "env": {}
+    }
+  }
+}

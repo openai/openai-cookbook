@@ -2,6 +2,8 @@
 Database queries for Colppy ↔ HubSpot reconciliation.
 Uses context managers for safe connection handling.
 """
+from __future__ import annotations
+
 import calendar
 import sqlite3
 from pathlib import Path
@@ -65,11 +67,20 @@ def load_hubspot_closed_won_from_db(
         cols = _get_deals_columns(conn)
         has_id_plan = "id_plan" in cols
         has_fecha_primer_pago = "fecha_primer_pago" in cols
+        has_deal_type = "deal_type" in cols
+        has_plan_name = "plan_name" in cols
+        has_nombre_del_plan_del_negocio = "nombre_del_plan_del_negocio" in cols
         extra_cols = []
         if has_id_plan:
             extra_cols.append("id_plan")
         if has_fecha_primer_pago:
             extra_cols.append("fecha_primer_pago")
+        if has_deal_type:
+            extra_cols.append("deal_type")
+        if has_plan_name:
+            extra_cols.append("plan_name")
+        if has_nombre_del_plan_del_negocio:
+            extra_cols.append("nombre_del_plan_del_negocio")
         select_cols = "id_empresa, hubspot_id, deal_name, deal_stage, amount, close_date" + (
             ", " + ", ".join(extra_cols) if extra_cols else ""
         )
@@ -91,6 +102,15 @@ def load_hubspot_closed_won_from_db(
     if not has_fecha_primer_pago:
         for r in rows:
             r["fecha_primer_pago"] = ""
+    if not has_deal_type:
+        for r in rows:
+            r["deal_type"] = ""
+    if not has_plan_name:
+        for r in rows:
+            r["plan_name"] = ""
+    if not has_nombre_del_plan_del_negocio:
+        for r in rows:
+            r["nombre_del_plan_del_negocio"] = ""
     return rows, has_id_plan, has_fecha_primer_pago
 
 
@@ -101,11 +121,20 @@ def get_deal_for_id_empresa(hubspot_db_path: Path, id_empresa: str) -> dict | No
         cols = _get_deals_columns(conn)
         has_id_plan = "id_plan" in cols
         has_fecha_primer_pago = "fecha_primer_pago" in cols
+        has_deal_type = "deal_type" in cols
+        has_plan_name = "plan_name" in cols
+        has_nombre_del_plan_del_negocio = "nombre_del_plan_del_negocio" in cols
         extra_cols = []
         if has_id_plan:
             extra_cols.append("id_plan")
         if has_fecha_primer_pago:
             extra_cols.append("fecha_primer_pago")
+        if has_deal_type:
+            extra_cols.append("deal_type")
+        if has_plan_name:
+            extra_cols.append("plan_name")
+        if has_nombre_del_plan_del_negocio:
+            extra_cols.append("nombre_del_plan_del_negocio")
         select_cols = "id_empresa, hubspot_id, deal_name, deal_stage, amount, close_date" + (
             ", " + ", ".join(extra_cols) if extra_cols else ""
         )
@@ -125,6 +154,12 @@ def get_deal_for_id_empresa(hubspot_db_path: Path, id_empresa: str) -> dict | No
             result["id_plan"] = ""
         if not has_fecha_primer_pago:
             result["fecha_primer_pago"] = ""
+        if not has_deal_type:
+            result["deal_type"] = ""
+        if not has_plan_name:
+            result["plan_name"] = ""
+        if not has_nombre_del_plan_del_negocio:
+            result["nombre_del_plan_del_negocio"] = ""
     return result
 
 
@@ -151,11 +186,20 @@ def get_deal_any_stage(hubspot_db_path: Path, id_empresa: str) -> dict | None:
         cols = _get_deals_any_stage_columns(conn)
         has_id_plan = "id_plan" in cols
         has_fecha_primer_pago = "fecha_primer_pago" in cols
+        has_deal_type = "deal_type" in cols
+        has_plan_name = "plan_name" in cols
+        has_nombre_del_plan_del_negocio = "nombre_del_plan_del_negocio" in cols
         extra_cols = []
         if has_id_plan:
             extra_cols.append("id_plan")
         if has_fecha_primer_pago:
             extra_cols.append("fecha_primer_pago")
+        if has_deal_type:
+            extra_cols.append("deal_type")
+        if has_plan_name:
+            extra_cols.append("plan_name")
+        if has_nombre_del_plan_del_negocio:
+            extra_cols.append("nombre_del_plan_del_negocio")
         select_cols = "id_empresa, hubspot_id, deal_name, deal_stage, amount, close_date" + (
             ", " + ", ".join(extra_cols) if extra_cols else ""
         )
@@ -171,6 +215,12 @@ def get_deal_any_stage(hubspot_db_path: Path, id_empresa: str) -> dict | None:
             result["id_plan"] = ""
         if not has_fecha_primer_pago:
             result["fecha_primer_pago"] = ""
+        if not has_deal_type:
+            result["deal_type"] = ""
+        if not has_plan_name:
+            result["plan_name"] = ""
+        if not has_nombre_del_plan_del_negocio:
+            result["nombre_del_plan_del_negocio"] = ""
         return result
 
 
@@ -223,15 +273,34 @@ def get_hubspot_only_colppy_status(
     """
     For each id_empresa, determine Colppy DB status.
     Returns dict: id_empresa -> {
-        "reason": "NOT_IN_COLPPY" | "IN_EMPRESA_NO_PAGO" | "PRIMER_PAGO_OTHER_MONTH",
+        "reason": "NOT_IN_COLPPY" | "IN_EMPRESA_NO_PAGO" | "PRIMER_PAGO_OTHER_MONTH" | "IN_EMPRESA_PAGO_NO_PRIMER",
         "in_empresa": bool,
         "has_any_pago": bool,
         "primer_pago_fecha": str | None,  # YYYY-MM-DD if has primerPago
+        "id_plan": str | None,  # from primer pago when in another month
+        "colppy_fecha_pago": str | None,
+        "colppy_amount": float | None,
+        "colppy_medio_pago": str | None,
     }
     """
     valid_ids = [x for x in id_empresas if str(x).isdigit()]
+    empty_colppy = {
+        "id_plan": None,
+        "colppy_fecha_pago": None,
+        "colppy_amount": None,
+        "colppy_medio_pago": None,
+    }
     if not valid_ids:
-        return {ie: {"reason": "NOT_IN_COLPPY", "in_empresa": False, "has_any_pago": False, "primer_pago_fecha": None} for ie in id_empresas}
+        return {
+            ie: {
+                "reason": "NOT_IN_COLPPY",
+                "in_empresa": False,
+                "has_any_pago": False,
+                "primer_pago_fecha": None,
+                **empty_colppy,
+            }
+            for ie in id_empresas
+        }
 
     out = {}
     with sqlite3.connect(str(colppy_db_path)) as conn:
@@ -267,6 +336,41 @@ def get_hubspot_only_colppy_status(
         )
         primer_pago = {str(r[0]): (r[1][:10] if r[1] else None) for r in cur.fetchall()}
 
+        # Primer pago details (idPlan, fechaPago, importe, medioPago) for ids that have primer pago
+        ids_with_primer = [i for i in ids_int if primer_pago.get(str(i))]
+        if ids_with_primer:
+            ph2 = ",".join("?" * len(ids_with_primer))
+            cur = conn.execute(
+                f"""
+                SELECT p.idEmpresa, p.idPlan, p.fechaPago, p.importe, p.medioPago
+                FROM pago p
+                INNER JOIN (
+                    SELECT idEmpresa, MIN(fechaPago) as min_fecha
+                    FROM pago
+                    WHERE primerPago = 1
+                      AND (estado = 1 OR (estado = 0 AND fechaTransferencia IS NOT NULL))
+                      AND idEmpresa IN ({ph2})
+                    GROUP BY idEmpresa
+                ) sub ON p.idEmpresa = sub.idEmpresa AND p.fechaPago = sub.min_fecha
+                WHERE p.primerPago = 1
+                  AND (p.estado = 1 OR (p.estado = 0 AND p.fechaTransferencia IS NOT NULL))
+                  AND p.idEmpresa IN ({ph2})
+                """,
+                ids_with_primer + ids_with_primer,
+            )
+            primer_detail = {}
+            for r in cur.fetchall():
+                ie = str(r[0])
+                if ie not in primer_detail:
+                    primer_detail[ie] = {
+                        "id_plan": str(r[1]) if r[1] is not None else "",
+                        "colppy_fecha_pago": r[2][:10] if r[2] else None,
+                        "colppy_amount": float(r[3]) if r[3] is not None else None,
+                        "colppy_medio_pago": r[4] or "",
+                    }
+        else:
+            primer_detail = {}
+
     for ie in id_empresas:
         in_e = ie in in_empresa
         has_pago = ie in has_any_pago
@@ -281,11 +385,16 @@ def get_hubspot_only_colppy_status(
         else:
             reason = "IN_EMPRESA_PAGO_NO_PRIMER"
 
+        detail = primer_detail.get(ie, empty_colppy)
         out[ie] = {
             "reason": reason,
             "in_empresa": in_e,
             "has_any_pago": has_pago,
             "primer_pago_fecha": primer_fecha,
+            "id_plan": detail["id_plan"],
+            "colppy_fecha_pago": detail["colppy_fecha_pago"],
+            "colppy_amount": detail["colppy_amount"],
+            "colppy_medio_pago": detail["colppy_medio_pago"],
         }
     return out
 

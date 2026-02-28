@@ -1,6 +1,8 @@
 """
 Shared helpers for Colppy ↔ HubSpot reconciliation.
 """
+from __future__ import annotations
+
 HUBSPOT_PORTAL_ID = "19877595"
 
 
@@ -38,7 +40,7 @@ def fmt_amt(x, decimals: int = 2) -> str:
         fmt = f"${{:,.{decimals}f}}"
         return fmt.format(float(x)).replace(",", "X").replace(".", ",").replace("X", ".")
     except (ValueError, TypeError):
-        return str(x)
+        return "" if x is None else str(x)
 
 
 def sort_key_id_empresa(x) -> tuple:

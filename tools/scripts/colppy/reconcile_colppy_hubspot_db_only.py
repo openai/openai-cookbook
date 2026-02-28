@@ -1,7 +1,6 @@
 #!/usr/bin/env python3
-"""
-Colppy ↔ HubSpot Reconciliation (DB Only)
-=========================================
+"""Colppy ↔ HubSpot Reconciliation (DB Only).
+
 Reconciles Colppy first payments with HubSpot closed won for a given month.
 **Colppy is master** — fechaPago and id_empresa from Colppy dictate; HubSpot should align.
 
@@ -17,6 +16,8 @@ Usage:
   python tools/scripts/colppy/reconcile_colppy_hubspot_db_only.py --year 2026 --month 1
   python tools/scripts/colppy/reconcile_colppy_hubspot_db_only.py --year 2026 --month 1 --output tools/outputs/reconcile_202601_db.md
 """
+from __future__ import annotations
+
 import argparse
 import sys
 from pathlib import Path
@@ -164,6 +165,9 @@ def run(
     colppy_db: Path,
     hubspot_db: Path,
     output_path: str | None = None,
+    output_format: str = "markdown",
+    post_slack_dm: bool = False,
+    slack_user_id: str | None = None,
     db_path: str | None = None,
     no_log: bool = False,
 ) -> None:
@@ -176,7 +180,7 @@ def run(
         load_hubspot_closed_won_from_db,
     )
     from tools.scripts.colppy.reconcile_helpers import dates_match, norm_date, plan_mismatch, sort_key_id_empresa
-    from tools.scripts.colppy.reconcile_report_builder import build_report
+    from tools.scripts.colppy.reconcile_report_builder import build_report, build_report_slack
 
     month_key = f"{year}-{month:02d}"
     print(f"Colppy ↔ HubSpot Reconciliation (DB Only) — {month_key}")
@@ -303,10 +307,7 @@ def run(
     for ie in wrong_stage_case1:
         group3_reasons[ie] = "COLPPY_NOT_ACTIVE"
     for ie in wrong_stage_case2:
-        if _activa_val(ie) != 0:
-            group3_reasons[ie] = "COLPPY_NOT_ACTIVE"
-        else:
-            group3_reasons[ie] = colppy_only_reasons.get(ie, "—")
+        group3_reasons[ie] = colppy_only_reasons.get(ie, "—")
 
     # Exclude case1 from groups 1 and 4
     match_close_date_mismatch_filtered = [ie for ie in match_close_date_mismatch if ie not in wrong_stage_case1]
@@ -325,34 +326,95 @@ def run(
     hubspot_discrepancy_primer_pago_other = [ie for ie in hubspot_colppy_discrepancy if hubspot_only_status.get(ie, {}).get("reason") == "PRIMER_PAGO_OTHER_MONTH"]
     hubspot_discrepancy_in_empresa_pago_no_primer = [ie for ie in hubspot_colppy_discrepancy if hubspot_only_status.get(ie, {}).get("reason") == "IN_EMPRESA_PAGO_NO_PRIMER"]
 
-    report = build_report(
-        month_key=month_key,
-        colppy_by_id=colppy_by_id,
-        hubspot_by_id=hubspot_by_id,
-        match_ok=match_ok,
-        match_ok_id_plan_blank=match_ok_id_plan_blank,
-        match_ok_id_plan_hubspot_has=match_ok_id_plan_hubspot_has,
-        match_ok_plan_mismatch=match_ok_plan_mismatch,
-        match_fecha_primer_pago_blank=match_fecha_primer_pago_blank,
-        match_close_date_mismatch=match_close_date_mismatch_filtered,
-        colppy_only=colppy_only,
-        colppy_only_reasons=colppy_only_reasons,
-        colppy_only_deal=colppy_only_deal,
-        hubspot_only=hubspot_only_filtered,
-        hubspot_only_status=hubspot_only_status,
-        fecha_primer_pago_match_count=fecha_primer_pago_match_count,
-        fecha_primer_pago_diff_count=fecha_primer_pago_diff_count,
-        colppy_db=colppy_db,
-        group3_ids=group3_ids,
-        group3_reasons=group3_reasons,
-        group3_case1_ids=wrong_stage_case1,
-    )
+    if output_format == "slack":
+        report = build_report_slack(
+            month_key=month_key,
+            colppy_by_id=colppy_by_id,
+            hubspot_by_id=hubspot_by_id,
+            match_ok=match_ok,
+            match_ok_id_plan_blank=match_ok_id_plan_blank,
+            match_ok_id_plan_hubspot_has=match_ok_id_plan_hubspot_has,
+            match_ok_plan_mismatch=match_ok_plan_mismatch,
+            match_fecha_primer_pago_blank=match_fecha_primer_pago_blank,
+            match_close_date_mismatch=match_close_date_mismatch_filtered,
+            colppy_only=colppy_only,
+            colppy_only_reasons=colppy_only_reasons,
+            colppy_only_deal=colppy_only_deal,
+            hubspot_only=hubspot_only_filtered,
+            hubspot_only_status=hubspot_only_status,
+            fecha_primer_pago_match_count=fecha_primer_pago_match_count,
+            fecha_primer_pago_diff_count=fecha_primer_pago_diff_count,
+            colppy_db=colppy_db,
+            group3_ids=group3_ids,
+            group3_reasons=group3_reasons,
+            group3_case1_ids=wrong_stage_case1,
+        )
+    else:
+        report = build_report(
+            month_key=month_key,
+            colppy_by_id=colppy_by_id,
+            hubspot_by_id=hubspot_by_id,
+            match_ok=match_ok,
+            match_ok_id_plan_blank=match_ok_id_plan_blank,
+            match_ok_id_plan_hubspot_has=match_ok_id_plan_hubspot_has,
+            match_ok_plan_mismatch=match_ok_plan_mismatch,
+            match_fecha_primer_pago_blank=match_fecha_primer_pago_blank,
+            match_close_date_mismatch=match_close_date_mismatch_filtered,
+            colppy_only=colppy_only,
+            colppy_only_reasons=colppy_only_reasons,
+            colppy_only_deal=colppy_only_deal,
+            hubspot_only=hubspot_only_filtered,
+            hubspot_only_status=hubspot_only_status,
+            fecha_primer_pago_match_count=fecha_primer_pago_match_count,
+            fecha_primer_pago_diff_count=fecha_primer_pago_diff_count,
+            colppy_db=colppy_db,
+            group3_ids=group3_ids,
+            group3_reasons=group3_reasons,
+            group3_case1_ids=wrong_stage_case1,
+        )
 
     if output_path:
         out = Path(output_path)
         out.parent.mkdir(parents=True, exist_ok=True)
         out.write_text(report, encoding="utf-8")
         print(f"\nFull report written to: {out}")
+
+    if post_slack_dm:
+        import os
+        from tools.utils.slack_post import post_slack_dm as _post_slack_dm
+
+        uid = (slack_user_id or os.environ.get("SLACK_DM_USER_ID", "")).strip()
+        if not uid:
+            print("\nSlack DM skipped: SLACK_DM_USER_ID not set. Add to .env or use --slack-user-id.")
+        else:
+            # Use Slack format when posting to Slack
+            dm_report = report if output_format == "slack" else build_report_slack(
+                month_key=month_key,
+                colppy_by_id=colppy_by_id,
+                hubspot_by_id=hubspot_by_id,
+                match_ok=match_ok,
+                match_ok_id_plan_blank=match_ok_id_plan_blank,
+                match_ok_id_plan_hubspot_has=match_ok_id_plan_hubspot_has,
+                match_ok_plan_mismatch=match_ok_plan_mismatch,
+                match_fecha_primer_pago_blank=match_fecha_primer_pago_blank,
+                match_close_date_mismatch=match_close_date_mismatch_filtered,
+                colppy_only=colppy_only,
+                colppy_only_reasons=colppy_only_reasons,
+                colppy_only_deal=colppy_only_deal,
+                hubspot_only=hubspot_only_filtered,
+                hubspot_only_status=hubspot_only_status,
+                fecha_primer_pago_match_count=fecha_primer_pago_match_count,
+                fecha_primer_pago_diff_count=fecha_primer_pago_diff_count,
+                colppy_db=colppy_db,
+                group3_ids=group3_ids,
+                group3_reasons=group3_reasons,
+                group3_case1_ids=wrong_stage_case1,
+            )
+            ok, msg = _post_slack_dm(uid, dm_report)
+            if ok:
+                print(f"\nSlack DM sent to {uid}.")
+            else:
+                print(f"\nSlack DM failed: {msg}")
 
     if not no_log and db_path:
         from tools.utils.reconciliation_logger import log_reconciliation
@@ -432,6 +494,23 @@ def main():
     )
     parser.add_argument("--output", "-o", type=str, help="Write full report to file")
     parser.add_argument(
+        "--format",
+        "-f",
+        choices=["markdown", "slack"],
+        default="markdown",
+        help="Output format: markdown (default) or slack (Unicode tables for copy-paste to Slack)",
+    )
+    parser.add_argument(
+        "--post-slack-dm",
+        action="store_true",
+        help="Post report to Slack DM (uses SLACK_DM_USER_ID from .env, or --slack-user-id)",
+    )
+    parser.add_argument(
+        "--slack-user-id",
+        type=str,
+        help="Slack user ID for DM (overrides SLACK_DM_USER_ID). E.g. U01234567.",
+    )
+    parser.add_argument(
         "--db",
         type=str,
         default=str(REPO_ROOT / "tools/data/facturacion_hubspot.db"),
@@ -444,12 +523,19 @@ def main():
     if err:
         parser.error(err)
 
+    output_path = args.output
+    if args.format == "slack" and not output_path:
+        output_path = str(REPO_ROOT / "tools/outputs" / f"reconcile_{args.year}{args.month:02d}_db.slack.txt")
+
     run(
         args.year,
         args.month,
         Path(args.colppy_db),
         Path(args.hubspot_db),
-        output_path=args.output,
+        output_path=output_path,
+        output_format=args.format,
+        post_slack_dm=args.post_slack_dm,
+        slack_user_id=args.slack_user_id,
         db_path=None if args.no_log else args.db,
         no_log=args.no_log,
     )

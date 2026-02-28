@@ -2,7 +2,7 @@
 
 **Purpose:** Colppy data export, Colppy ↔ HubSpot reconciliation, and snapshot generation for the Claude plugin.
 
-**Last Updated:** 2026-02-24
+**Last Updated:** 2026-02-12
 
 ---
 
@@ -10,7 +10,7 @@
 
 | Script | Purpose |
 |--------|---------|
-| **export_colppy_to_sqlite.py** | Export Colppy MySQL → colppy_export.db (requires VPN) |
+| **export_colppy_to_sqlite.py** | Export Colppy MySQL → colppy_export.db (requires VPN). Logs to `colppy_export_refresh_logs`. |
 | **reconcile_colppy_hubspot_db_only.py** | Colppy ↔ HubSpot reconciliation (4-group report) |
 | **export_reconciliation_db_snapshot.py** | Export reconciliation to JSON for plugin |
 | **export_reconciliation_snapshot.py** | Export first payments + facturacion to JSON |
@@ -71,7 +71,9 @@ python tools/scripts/colppy/export_colppy_cuit_snapshot.py
 
 ```bash
 ./tools/scripts/run_full_refresh_and_publish.sh
-# HubSpot refresh Jan 2025 → current, export snapshot, publish plugin
+# 1. HubSpot refresh Jan 2025 → current (build_facturacion_hubspot_mapping --refresh-deals-only)
+# 2. Populate deal associations (populate_deal_associations --batch, fixed null handling)
+# 3. Export snapshot, publish plugin
 # Log: /tmp/full_refresh_publish.log (~35–50 min)
 ```
 
@@ -94,6 +96,16 @@ python tools/scripts/colppy/export_colppy_cuit_snapshot.py
 **Script:** `reconcile_cuit_hubspot_colppy_db.py`
 
 Reconciles HubSpot primary company (type 5) CUIT with Colppy DB CUIT (facturacion.CUIT / empresa.CUIT). Use to ensure correct label associations in HubSpot for billing. See [COLPPY_DB_CUIT_HUBSPOT_RECONCILIATION.md](../../docs/COLPPY_DB_CUIT_HUBSPOT_RECONCILIATION.md).
+
+---
+
+## Refresh Logging
+
+| Log | Table | Script |
+|-----|-------|--------|
+| Colppy export | `colppy_export_refresh_logs` (in colppy_export.db) | `export_colppy_to_sqlite.py` |
+
+Use `get_last_colppy_refresh()` from the script or query the table to see when the Colppy DB was last synced.
 
 ---
 

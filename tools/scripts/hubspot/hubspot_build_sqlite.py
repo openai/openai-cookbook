@@ -83,6 +83,16 @@ def _get_deal_fecha_primer_pago(props: dict) -> str:
     return v[:10] if v else ""
 
 
+def _get_deal_deal_type(props: dict) -> str:
+    """Get dealtype from HubSpot deal. Can be blank."""
+    return (props.get("dealtype") or "").strip()
+
+
+def _get_deal_nombre_del_plan_del_negocio(props: dict) -> str:
+    """Get nombre_del_plan_del_negocio from HubSpot deal (product description entered in HubSpot). Can be blank."""
+    return (props.get("nombre_del_plan_del_negocio") or "").strip()
+
+
 def _ensure_deals_has_id_plan(conn: sqlite3.Connection) -> None:
     """Add id_plan column to deals if missing (migration)."""
     try:
@@ -119,6 +129,102 @@ def _ensure_deals_any_stage_has_fecha_primer_pago(conn: sqlite3.Connection) -> N
         pass
 
 
+def _ensure_deals_has_deal_type(conn: sqlite3.Connection) -> None:
+    """Add deal_type column to deals if missing (migration)."""
+    try:
+        conn.execute("ALTER TABLE deals ADD COLUMN deal_type TEXT")
+        conn.commit()
+    except sqlite3.OperationalError:
+        pass
+
+
+def _ensure_deals_has_plan_name(conn: sqlite3.Connection) -> None:
+    """Add plan_name column to deals if missing (migration)."""
+    try:
+        conn.execute("ALTER TABLE deals ADD COLUMN plan_name TEXT")
+        conn.commit()
+    except sqlite3.OperationalError:
+        pass
+
+
+def _ensure_deals_has_nombre_del_plan_del_negocio(conn: sqlite3.Connection) -> None:
+    """Add nombre_del_plan_del_negocio column to deals if missing (migration). HubSpot product description."""
+    try:
+        conn.execute("ALTER TABLE deals ADD COLUMN nombre_del_plan_del_negocio TEXT")
+        conn.commit()
+    except sqlite3.OperationalError:
+        pass
+
+
+def _ensure_deals_any_stage_has_deal_type(conn: sqlite3.Connection) -> None:
+    """Add deal_type column to deals_any_stage if missing (migration)."""
+    try:
+        conn.execute("ALTER TABLE deals_any_stage ADD COLUMN deal_type TEXT")
+        conn.commit()
+    except sqlite3.OperationalError:
+        pass
+
+
+def _ensure_deals_any_stage_has_plan_name(conn: sqlite3.Connection) -> None:
+    """Add plan_name column to deals_any_stage if missing (migration)."""
+    try:
+        conn.execute("ALTER TABLE deals_any_stage ADD COLUMN plan_name TEXT")
+        conn.commit()
+    except sqlite3.OperationalError:
+        pass
+
+
+def _ensure_deals_any_stage_has_nombre_del_plan_del_negocio(conn: sqlite3.Connection) -> None:
+    """Add nombre_del_plan_del_negocio column to deals_any_stage if missing (migration)."""
+    try:
+        conn.execute("ALTER TABLE deals_any_stage ADD COLUMN nombre_del_plan_del_negocio TEXT")
+        conn.commit()
+    except sqlite3.OperationalError:
+        pass
+
+
+def populate_plan_names_from_colppy(
+    conn: sqlite3.Connection, colppy_db_path: Path,
+) -> int:
+    """
+    Populate plan_name in deals and deals_any_stage from colppy_export.db plan table.
+    Returns number of rows updated.
+    """
+    if not colppy_db_path.exists():
+        return 0
+    try:
+        cur = conn.execute("PRAGMA table_info(deals)")
+        cols = {r[1] for r in cur.fetchall()}
+        if "plan_name" not in cols:
+            return 0
+    except sqlite3.OperationalError:
+        return 0
+    with sqlite3.connect(str(colppy_db_path)) as colppy_conn:
+        plan_map = colppy_conn.execute(
+            "SELECT idPlan, nombre FROM plan WHERE idPlan IS NOT NULL AND nombre IS NOT NULL"
+        ).fetchall()
+    id_to_name = {str(r[0]): (r[1] or "").strip() for r in plan_map if r[0]}
+    if not id_to_name:
+        return 0
+    updated = 0
+    for id_plan, name in id_to_name.items():
+        cur = conn.execute(
+            "UPDATE deals SET plan_name = ? WHERE id_plan = ? AND (plan_name IS NULL OR plan_name = '')",
+            (name, id_plan),
+        )
+        updated += cur.rowcount
+        try:
+            cur = conn.execute(
+                "UPDATE deals_any_stage SET plan_name = ? WHERE id_plan = ? AND (plan_name IS NULL OR plan_name = '')",
+                (name, id_plan),
+            )
+            updated += cur.rowcount
+        except sqlite3.OperationalError:
+            pass
+    conn.commit()
+    return updated
+
+
 def populate_companies(conn: sqlite3.Connection, cuit_to_companies: dict[str, list[dict]]) -> None:
     """Insert/replace companies into SQLite. Stores ALL companies per CUIT (multiple rows per cuit)."""
     conn.execute("DROP TABLE IF EXISTS companies")
@@ -153,6 +259,8 @@ def populate_deals(conn: sqlite3.Connection, id_to_deal: dict[str, dict]) -> Non
     """Insert/replace deals into SQLite."""
     _ensure_deals_has_id_plan(conn)
     _ensure_deals_has_fecha_primer_pago(conn)
+    _ensure_deals_has_deal_type(conn)
+    _ensure_deals_has_plan_name(conn)
     rows = []
     for id_emp, d in id_to_deal.items():
         if not d:
@@ -164,12 +272,15 @@ def populate_deals(conn: sqlite3.Connection, id_to_deal: dict[str, dict]) -> Non
             props.get("dealname", ""),
             props.get("dealstage", ""),
             props.get("amount", ""),
-            props.get("closedate", ""),
+            (props.get("closedate") or "")[:10],
             _get_deal_id_plan(props),
             _get_deal_fecha_primer_pago(props),
+            _get_deal_deal_type(props),
+            "",  # plan_name filled by populate_plan_names_from_colppy
         ))
     conn.executemany(
-        "INSERT OR REPLACE INTO deals (id_empresa, hubspot_id, deal_name, deal_stage, amount, close_date, id_plan, fecha_primer_pago) VALUES (?, ?, ?, ?, ?, ?, ?, ?)",
+        """INSERT OR REPLACE INTO deals (id_empresa, hubspot_id, deal_name, deal_stage, amount, close_date, id_plan, fecha_primer_pago, deal_type, plan_name)
+           VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?)""",
         rows,
     )
     conn.commit()

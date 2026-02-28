@@ -250,10 +250,14 @@ python tools/scripts/colppy/reconcile_colppy_hubspot_db_only.py --year 2026 --mo
 
 ## 6.3 Export Snapshot for Plugin & Full Refresh
 
-**Export reconciliation to JSON** (for Claude plugin):
+**Export snapshots** (for Claude plugin):
+- `export_reconciliation_snapshot.py` — first payments + facturacion.
+- `export_reconciliation_db_snapshot.py` — Colppy ↔ HubSpot reconciliation by month.
+
 ```bash
+python tools/scripts/colppy/export_reconciliation_snapshot.py --months 62
 python tools/scripts/colppy/export_reconciliation_db_snapshot.py --months 14
-# Output: plugins/colppy-ceo-assistant/docs/colppy_hubspot_reconciliation_snapshot.json
+# Outputs: plugins/colppy-ceo-assistant/docs/colppy_*_snapshot.json
 ```
 
 **Full refresh from Jan 2025** (HubSpot all months + export + publish):

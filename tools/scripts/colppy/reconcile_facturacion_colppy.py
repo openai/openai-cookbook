@@ -109,7 +109,7 @@ def load_colppy_facturacion_local(db_path: str) -> list[dict]:
         FROM facturacion f
         LEFT JOIN empresa e ON e.IdEmpresa = f.IdEmpresa
         LEFT JOIN plan p ON p.idPlan = e.idPlan
-        WHERE (f.fechaBaja IS NULL OR f.fechaBaja = '')
+        WHERE (f.fechaBaja IS NULL OR f.fechaBaja = '' OR f.fechaBaja = '0000-00-00')
           AND f.IdEmpresa IS NOT NULL AND f.IdEmpresa != 0 AND f.IdEmpresa != ''
         """
     )
@@ -155,7 +155,7 @@ def load_colppy_facturacion() -> list[dict]:
     FROM facturacion f
     LEFT JOIN empresa e ON e.IdEmpresa = f.IdEmpresa
     LEFT JOIN plan p ON p.idPlan = e.idPlan
-    WHERE f.fechaBaja IS NULL
+    WHERE (f.fechaBaja IS NULL OR f.fechaBaja = '' OR f.fechaBaja = '0000-00-00')
     """
     rows = db.execute_query(q)
     out = []
@@ -195,8 +195,8 @@ def load_db_facturacion(db_path: str) -> list[dict]:
         out.append({
             "id_empresa": ie,
             "email": (r["email"] or "").strip(),
-            "customer_cuit": cust if isinstance(cust, str) and len(cust) == 11 else cust,
-            "product_cuit": prod if isinstance(prod, str) and len(prod) == 11 else prod,
+            "customer_cuit": cust,
+            "product_cuit": prod,
             "plan": (r["plan"] or "").strip(),
             "id_plan": str(r["id_plan"] or ""),
             "amount": str(r["amount"] or ""),

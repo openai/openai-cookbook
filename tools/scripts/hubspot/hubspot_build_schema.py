@@ -22,7 +22,9 @@ CREATE TABLE IF NOT EXISTS deals (
     amount          TEXT,
     close_date      TEXT,
     id_plan         TEXT,
-    fecha_primer_pago TEXT
+    fecha_primer_pago TEXT,
+    deal_type       TEXT,
+    plan_name       TEXT
 );
 
 CREATE TABLE IF NOT EXISTS facturacion (
@@ -60,7 +62,9 @@ CREATE TABLE IF NOT EXISTS deals_any_stage (
     amount          TEXT,
     close_date      TEXT,
     id_plan         TEXT,
-    fecha_primer_pago TEXT
+    fecha_primer_pago TEXT,
+    deal_type       TEXT,
+    plan_name       TEXT
 );
 CREATE INDEX IF NOT EXISTS idx_deals_any_stage_hubspot_id ON deals_any_stage(hubspot_id);
 

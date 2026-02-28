@@ -5,7 +5,12 @@ Stores each --refresh-deals-only run with before/after comparison so you can see
 what changed in HubSpot even when Colppy staging is unavailable.
 
 Usage:
-    from tools.utils.hubspot_refresh_logger import log_hubspot_refresh, get_hubspot_refresh_history
+    from tools.utils.hubspot_refresh_logger import (
+        log_hubspot_refresh,
+        get_hubspot_refresh_history,
+        log_deal_associations_refresh,
+        get_last_deal_associations_refresh,
+    )
 
     log_hubspot_refresh(
         db_path="tools/data/facturacion_hubspot.db",
@@ -43,10 +48,82 @@ CREATE INDEX IF NOT EXISTS idx_hubspot_refresh_period ON hubspot_refresh_logs(pe
 CREATE INDEX IF NOT EXISTS idx_hubspot_refresh_timestamp ON hubspot_refresh_logs(timestamp);
 """
 
+DEAL_ASSOCIATIONS_REFRESH_SCHEMA = """
+CREATE TABLE IF NOT EXISTS hubspot_deal_associations_refresh_logs (
+    id                  INTEGER PRIMARY KEY AUTOINCREMENT,
+    timestamp           TEXT NOT NULL,
+    total_associations  INTEGER NOT NULL,
+    unique_deals        INTEGER NOT NULL,
+    unique_companies    INTEGER NOT NULL
+);
+CREATE INDEX IF NOT EXISTS idx_deal_assoc_refresh_ts ON hubspot_deal_associations_refresh_logs(timestamp);
+"""
+
 
 def _init_table(conn: sqlite3.Connection) -> None:
     conn.executescript(HUBSPOT_REFRESH_LOGS_SCHEMA)
     conn.commit()
+
+
+def _init_deal_associations_table(conn: sqlite3.Connection) -> None:
+    conn.executescript(DEAL_ASSOCIATIONS_REFRESH_SCHEMA)
+    conn.commit()
+
+
+def log_deal_associations_refresh(
+    db_path: str,
+    total_associations: int,
+    unique_deals: int,
+    unique_companies: int,
+) -> int:
+    """
+    Log a deal_associations populate run. Call from populate_deal_associations.py
+    after successful refresh so you can see when associations were last synced.
+
+    Returns the inserted row id.
+    """
+    path = Path(db_path)
+    path.parent.mkdir(parents=True, exist_ok=True)
+    conn = sqlite3.connect(str(path))
+    _init_deal_associations_table(conn)
+    ts = datetime.now(ARGENTINA_TZ).isoformat()
+    cur = conn.execute(
+        """
+        INSERT INTO hubspot_deal_associations_refresh_logs
+        (timestamp, total_associations, unique_deals, unique_companies)
+        VALUES (?, ?, ?, ?)
+        """,
+        (ts, total_associations, unique_deals, unique_companies),
+    )
+    row_id = cur.lastrowid
+    conn.commit()
+    conn.close()
+    return row_id or 0
+
+
+def get_last_deal_associations_refresh(db_path: str) -> Optional[Dict[str, Any]]:
+    """Return the most recent deal_associations refresh record, or None."""
+    path = Path(db_path)
+    if not path.exists():
+        return None
+    conn = sqlite3.connect(str(path))
+    conn.executescript(DEAL_ASSOCIATIONS_REFRESH_SCHEMA)
+    row = conn.execute(
+        """
+        SELECT timestamp, total_associations, unique_deals, unique_companies
+        FROM hubspot_deal_associations_refresh_logs
+        ORDER BY timestamp DESC LIMIT 1
+        """
+    ).fetchone()
+    conn.close()
+    if not row:
+        return None
+    return {
+        "timestamp": row[0],
+        "total_associations": row[1],
+        "unique_deals": row[2],
+        "unique_companies": row[3],
+    }
 
 
 def log_hubspot_refresh(

@@ -1,6 +1,6 @@
 # HubSpot Scripts and Workflows
 
-**Last Updated:** 2026-02-24  
+**Last Updated:** 2026-02-12  
 **Purpose:** Centralized HubSpot analysis scripts and custom code workflows
 
 ---
@@ -154,7 +154,7 @@ tools/scripts/hubspot/
 
 ### Reconciliation & Billing Mapping
 - **build_facturacion_hubspot_mapping.py** - Builds `facturacion_hubspot.db` from billing CSV + HubSpot API
-  - **Full build:** Loads facturacion.csv, fetches companies by CUIT, fetches deals by id_empresa
+  - **Full build:** Loads facturacion.csv, fetches companies by CUIT, fetches deals by id_empresa. Logs to `hubspot_refresh_logs` (period=full).
   - **Refresh deals only:** `--refresh-deals-only --year YYYY --month M` — updates deals for a given month
   - **Fetch wrong stage:** `--fetch-wrong-stage` — populates `deals_any_stage` for WRONG_STAGE detection (Cerrado Churn, etc.). Fetches deals by id_empresa for Colppy-only + facturacion no deal.
   - **Usage:**
@@ -166,6 +166,48 @@ tools/scripts/hubspot/
     python tools/scripts/hubspot/build_facturacion_hubspot_mapping.py --refresh-deals-only --year 2026 --month 2 --fetch-wrong-stage
     ```
   - See [FACTURACION_COLPPY_RECONCILIATION.md](../../docs/FACTURACION_COLPPY_RECONCILIATION.md), [RECONCILE_REPORT_GROUPS.md](../../docs/RECONCILE_REPORT_GROUPS.md)
+
+- **populate_deal_associations.py** - Fetches deal–company associations from HubSpot and stores them in `deal_associations` table
+  - **Prerequisite:** Run `build_facturacion_hubspot_mapping.py` first.
+  - **Batch mode:** `--batch` — uses batch API (100 deals/request), ~2–3 min for full refresh. Recommended for full refresh.
+  - **Debug mode:** `--debug-batch OFFSET` — fetches one batch at given offset and prints raw API response (for investigating failures).
+  - **Incremental:** `--deals 123,456,789` — refresh only specific deal IDs.
+  - Logs to `hubspot_deal_associations_refresh_logs` in `facturacion_hubspot.db`.
+  - **Usage:**
+    ```bash
+    # Full refresh (batch mode, recommended)
+    python tools/scripts/hubspot/populate_deal_associations.py --batch
+
+    # Individual API (slower, for small sets)
+    python tools/scripts/hubspot/populate_deal_associations.py
+
+    # Incremental refresh for specific deals
+    python tools/scripts/hubspot/populate_deal_associations.py --deals 123,456,789
+
+    # Debug batch API response
+    python tools/scripts/hubspot/populate_deal_associations.py --debug-batch 0
+    ```
+
+- **fix_deal_associations.py** - Fixes deal–company associations (NO_PRIMARY, billing not primary, accountant missing type 8)
+  - **Group 1:** Missing billing company → add PRIMARY. Uses facturacion.csv (billing) or `--colppy-db` (Colppy DB CUIT) for deals not in billing.
+  - **Group 2:** Billing associated but not PRIMARY → add PRIMARY.
+  - **Group 3:** Accountant company matches customer_cuit but not associated → add type 8 (Estudio Contable).
+  - **Colppy DB mode:** `--colppy-db --year YYYY --month M` — uses `colppy_export.db` for CUIT mapping; fixes NO_PRIMARY deals even when not in billing.
+  - **Usage:**
+    ```bash
+    # Group 1 with billing (facturacion.csv)
+    python tools/scripts/hubspot/fix_deal_associations.py --group 1 --batch 5 --dry-run
+
+    # Group 1 with Colppy DB (fixes NO_PRIMARY deals not in billing)
+    python tools/scripts/hubspot/fix_deal_associations.py --group 1 --colppy-db --year 2026 --month 2 --dry-run
+
+    # Group 2: billing not PRIMARY
+    python tools/scripts/hubspot/fix_deal_associations.py --group 2 --batch 10
+
+    # Fix label (type 11 → 8 for accountant)
+    python tools/scripts/hubspot/fix_deal_associations.py --fix-label 9424153860 9019047084 --remove 11 --add 8
+    ```
+  - See [HUBSPOT_DEAL_COMPANY_ASSOCIATION_RULES.md](../../docs/HUBSPOT_DEAL_COMPANY_ASSOCIATION_RULES.md)
 
 ### Data Management & Fixing Scripts
 - **Fix Close Date from History:** `fix_close_date_from_history.py` - Fixes deal close dates by finding the earliest close date from property history
@@ -278,6 +320,13 @@ python tools/scripts/hubspot/generate_visualization_report.py
 
 #### Data Management & Fixing Scripts
 ```bash
+# Populate deal associations (full refresh, batch mode)
+python tools/scripts/hubspot/populate_deal_associations.py --batch
+
+# Fix deal associations (NO_PRIMARY, billing not primary)
+python tools/scripts/hubspot/fix_deal_associations.py --group 1 --colppy-db --year 2026 --month 2 --dry-run
+python tools/scripts/hubspot/fix_deal_associations.py --group 2 --batch 10
+
 # Fix close date for a single company
 python tools/scripts/hubspot/fix_close_date_from_history.py --company-id 17655187038
 
@@ -302,6 +351,20 @@ python tools/scripts/hubspot/fix_close_date_from_history.py --csv input.csv --up
 ---
 
 ## 🔄 Recent Changes
+
+**2026-02-12:**
+- ✅ **populate_deal_associations.py** – Batch API hardening and debug tool
+  - `--batch`: Uses batch API (100 deals/request); ~2–3 min for full refresh
+  - `--debug-batch OFFSET`: Inspect raw API response for a specific batch (investigating failures)
+  - Null checks in batch response parsing (fixes `'NoneType' object has no attribute 'get'` when API returns null)
+  - Logs to `hubspot_deal_associations_refresh_logs`
+- ✅ **fix_deal_associations.py** – `--colppy-db` mode for NO_PRIMARY deals
+  - `--colppy-db --year YYYY --month M`: Uses Colppy DB CUIT instead of facturacion; fixes NO_PRIMARY deals not in billing
+  - `--colppy-db-path`: Override path to colppy_export.db
+- ✅ **Refresh logging** – All refresh operations now log timestamps
+  - `hubspot_deal_associations_refresh_logs` (populate_deal_associations)
+  - `colppy_export_refresh_logs` (export_colppy_to_sqlite)
+  - `hubspot_refresh_logs` (build_facturacion_hubspot_mapping full build)
 
 **2026-02-16:**
 - ✅ **fix_deal_associations.py** – Group 4 (accountant missing type 8), redundant type 8 removal fix

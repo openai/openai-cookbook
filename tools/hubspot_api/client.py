@@ -83,7 +83,8 @@ class HubSpotClient:
             )
             
             # Handle different response status codes
-            if response.status_code in (200, 201):
+            # 207 Multi-Status: batch APIs (e.g. associations batch/read) return 207
+            if response.status_code in (200, 201, 207):
                 return response.json() if response.content else {}
             elif response.status_code == 429:  # Rate limited
                 if retry_count < self.config.max_retries:

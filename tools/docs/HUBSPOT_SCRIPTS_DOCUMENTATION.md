@@ -1,6 +1,6 @@
 # HubSpot Scripts Documentation
 
-**Last Updated:** 2026-01-26  
+**Last Updated:** 2026-02-12  
 **Purpose:** Complete documentation of all HubSpot analysis scripts and their usage
 
 ---
@@ -976,6 +976,104 @@ python enrich_company_industry.py
 
 ---
 
+### Reconciliation & Deal Association Scripts ⭐ **NEW**
+
+#### `populate_deal_associations.py`
+**Purpose:** Fetches deal–company associations from HubSpot and stores them in the `deal_associations` table of `facturacion_hubspot.db`.
+
+**Key Features:**
+- **Batch mode** (`--batch`): Uses batch API (100 deals/request); ~2–3 min for full refresh. Recommended for full refresh.
+- **Debug mode** (`--debug-batch OFFSET`): Fetches one batch at given offset and prints raw API response for investigating failures.
+- **Incremental** (`--deals 123,456,789`): Refresh only specific deal IDs.
+- Logs to `hubspot_deal_associations_refresh_logs` in `facturacion_hubspot.db`.
+- Null-safe batch response parsing (handles API returning null for `from`, `to`, or array items).
+
+**Prerequisite:** Run `build_facturacion_hubspot_mapping.py` first.
+
+**Usage:**
+```bash
+# Full refresh (batch mode, recommended)
+python tools/scripts/hubspot/populate_deal_associations.py --batch
+
+# Individual API (slower)
+python tools/scripts/hubspot/populate_deal_associations.py
+
+# Incremental refresh for specific deals
+python tools/scripts/hubspot/populate_deal_associations.py --deals 123,456,789
+
+# Debug batch API response
+python tools/scripts/hubspot/populate_deal_associations.py --debug-batch 0
+```
+
+---
+
+#### `create_company_from_colppy.py`
+**Purpose:** Creates HubSpot company from Colppy DB for NO_PRIMARY deals where no company with Colppy CUIT exists in HubSpot. Associates the new company as PRIMARY with the deal.
+
+**Key Features:**
+- Loads company data from `colppy_export.db` (facturacion + empresa).
+- Sets `type = "Cuenta Pyme"` for all created companies.
+- Infers `industria` from `actividad_economica` and `razon_social` (valid HubSpot enum values).
+- Leaves `tipo_icp_contador` empty for Pyme (used for accountant subtypes).
+- **Patch mode** (`--patch-company HUBSPOT_ID`): Updates existing company with type and industria from Colppy.
+
+**Usage:**
+```bash
+# Create company from Colppy id_empresa
+python tools/scripts/hubspot/create_company_from_colppy.py --id-empresa 93946
+
+# Dry run (no API calls)
+python tools/scripts/hubspot/create_company_from_colppy.py --id-empresa 93946 --dry-run
+
+# Patch existing company with type and industria from Colppy
+python tools/scripts/hubspot/create_company_from_colppy.py --id-empresa 93946 --patch-company 52110611591
+```
+
+---
+
+#### `fix_deal_associations.py`
+**Purpose:** Fixes deal–company associations for closed-won deals where billing company is missing or not PRIMARY.
+
+**Key Features:**
+- **Group 1:** Missing billing company → add PRIMARY. Uses facturacion.csv (billing) or `--colppy-db` (Colppy DB CUIT) for deals not in billing.
+- **Group 2:** Billing associated but not PRIMARY → add PRIMARY.
+- **Group 3:** Accountant company matches customer_cuit but not associated → add type 8 (Estudio Contable).
+- **Group 4:** Accountant company associated but missing type 8 → add type 8.
+- **Group 5:** MISMATCH (HubSpot primary CUIT ≠ Colppy DB CUIT) → swap PRIMARY. Requires `--colppy-db --year --month`.
+- **Date filter** (`--year YYYY --month M`): All groups and `--remove-redundant-type8` filter to deals closed in that month.
+- **Colppy DB mode** (`--colppy-db --year YYYY --month M`): Uses `colppy_export.db` for CUIT mapping; fixes NO_PRIMARY deals even when not in billing.
+- **Fix label** (`--fix-label`): Change association type (e.g. 11 → 8 for accountant).
+- **Remove redundant type 8** (`--remove-redundant-type8`): Remove type 8 when same company has both PRIMARY and type 8.
+- Logs to `edit_logs` by default; use `--no-log` to skip.
+
+**Usage:**
+```bash
+# Status for a specific month (e.g. Feb 2026)
+python tools/scripts/hubspot/fix_deal_associations.py --status --year 2026 --month 2
+
+# Group 1 with billing (facturacion.csv)
+python tools/scripts/hubspot/fix_deal_associations.py --group 1 --batch 5 --dry-run
+
+# Group 1 with Colppy DB (fixes NO_PRIMARY deals not in billing)
+python tools/scripts/hubspot/fix_deal_associations.py --group 1 --colppy-db --year 2026 --month 2 --dry-run
+
+# Group 2: billing not PRIMARY (filter by month)
+python tools/scripts/hubspot/fix_deal_associations.py --group 2 --year 2026 --month 2 --batch 10
+
+# Group 5: MISMATCH (requires Colppy DB)
+python tools/scripts/hubspot/fix_deal_associations.py --group 5 --colppy-db --year 2026 --month 2 --dry-run
+
+# Remove redundant type 8 (same company PRIMARY + type 8)
+python tools/scripts/hubspot/fix_deal_associations.py --remove-redundant-type8 --year 2026 --month 2
+
+# Fix label (type 11 → 8 for accountant)
+python tools/scripts/hubspot/fix_deal_associations.py --fix-label 9424153860 9019047084 --remove 11 --add 8
+```
+
+**Related Documentation:** [HUBSPOT_DEAL_COMPANY_ASSOCIATION_RULES.md](./HUBSPOT_DEAL_COMPANY_ASSOCIATION_RULES.md), [README_BILLING_RECONCILIATION.md](./README_BILLING_RECONCILIATION.md)
+
+---
+
 ## Quick Reference
 
 ### Scripts by Purpose
@@ -997,13 +1095,14 @@ python enrich_company_industry.py
 | **SMB Accountant Involved Funnel** | `analyze_smb_accountant_involved_funnel.py` |
 | **Data Quality** | `find_contacts_without_lead_objects.py`, `fix_close_date_from_history.py`, `analyze_industria_field_history.py` |
 | **Data Enrichment** | `enrich_company_industry.py`, `infer_numeric_company_names.py` |
+| **Reconciliation & Deal Associations** | `populate_deal_associations.py`, `create_company_from_colppy.py`, `fix_deal_associations.py` |
 | **Visualization** | `generate_visualization_report.py`, `visualize_sql_cycle_time.py` |
 
 ### Scripts by Data Source
 
 | Data Source | Scripts |
 |------------|---------|
-| **HubSpot API Direct** | `sql_pql_conversion_analysis.py`, `complete_sql_conversion_analysis.py`, `hubspot_conversion_analysis.py`, `deal_focused_pql_analysis.py`, `monthly_pql_analysis.py`, `pql_sql_deal_relationship_analysis.py`, `analyze_accountant_mql_funnel.py`, `analyze_smb_mql_funnel.py`, `analyze_accountant_referral_funnel.py`, `analyze_customer_referral_funnel.py`, `analyze_direct_deals_lead_source.py`, `analyze_referral_type8_correlation.py`, `analyze_smb_accountant_involved_funnel.py`, `analyze_icp_operador_billing.py`, `fetch_*` scripts, `find_contacts_without_lead_objects.py`, `fix_close_date_from_history.py`, `analyze_industria_field_history.py`, `enrich_company_industry.py` |
+| **HubSpot API Direct** | `sql_pql_conversion_analysis.py`, `complete_sql_conversion_analysis.py`, `hubspot_conversion_analysis.py`, `deal_focused_pql_analysis.py`, `monthly_pql_analysis.py`, `pql_sql_deal_relationship_analysis.py`, `analyze_accountant_mql_funnel.py`, `analyze_smb_mql_funnel.py`, `analyze_accountant_referral_funnel.py`, `analyze_customer_referral_funnel.py`, `analyze_direct_deals_lead_source.py`, `analyze_referral_type8_correlation.py`, `analyze_smb_accountant_involved_funnel.py`, `analyze_icp_operador_billing.py`, `fetch_*` scripts, `find_contacts_without_lead_objects.py`, `fix_close_date_from_history.py`, `analyze_industria_field_history.py`, `enrich_company_industry.py`, `populate_deal_associations.py`, `fix_deal_associations.py` |
 | **MCP Tools** | `mtd_scoring_full_pagination.py`, `analyze_sql_pql_from_mcp.py` |
 | **Pre-fetched CSV** | `visualize_sql_cycle_time.py`, `generate_visualization_report.py` |
 

@@ -1,6 +1,10 @@
 #!/bin/bash
-# Full refresh from Jan 2025: HubSpot deals (all months) + reconciliation export + plugin publish.
+# Full refresh from Jan 2025: HubSpot deals (all months) + deal associations (batch, fixed) + reconciliation export + plugin publish.
+# Uses populate_deal_associations.py --batch (null-safe batch API) after deals refresh.
 # Run in background. Check progress: tail -f /tmp/full_refresh_publish.log
+#
+# Note: Colppy DB (colppy_export.db) is refreshed by publish.sh when it exists. To refresh from MySQL,
+# run export_colppy_to_sqlite.py separately (requires VPN).
 #
 # Usage: ./tools/scripts/run_full_refresh_and_publish.sh
 
@@ -22,6 +26,10 @@ for ym in $MONTHS; do
   python tools/scripts/hubspot/build_facturacion_hubspot_mapping.py \
     --refresh-deals-only --year "$year" --month "$month" --fetch-wrong-stage 2>&1 | tee -a "$LOG" || true
 done
+
+echo "" | tee -a "$LOG"
+echo "[$(date +%H:%M:%S)] Populating deal associations (batch API, fixed null handling)..." | tee -a "$LOG"
+python tools/scripts/hubspot/populate_deal_associations.py --batch 2>&1 | tee -a "$LOG" || true
 
 echo "" | tee -a "$LOG"
 echo "[$(date +%H:%M:%S)] Exporting reconciliation snapshot..." | tee -a "$LOG"

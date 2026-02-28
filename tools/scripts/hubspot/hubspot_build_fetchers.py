@@ -84,7 +84,7 @@ def fetch_deals_by_id_empresa(client, id_empresas: set[str], delay: float = 0.25
                 resp = client.search_objects(
                     object_type="deals",
                     filter_groups=[{"filters": [{"propertyName": "id_empresa", "operator": "IN", "values": batch}]}],
-                    properties=["dealname", "id_empresa", "dealstage", "amount", "closedate", "hs_object_id", "colppy_plan", "fecha_primer_pago"],
+                    properties=["dealname", "id_empresa", "dealstage", "amount", "closedate", "hs_object_id", "colppy_plan", "fecha_primer_pago", "dealtype", "nombre_del_plan_del_negocio"],
                     limit=100,
                     after=after,
                 )
@@ -114,7 +114,7 @@ def fetch_deals_closed_in_month(
     end = f"{year}-{month:02d}-{last_day}"
     all_deals = []
     after = None
-    props = ["dealname", "id_empresa", "dealstage", "amount", "closedate", "hs_object_id", "colppy_plan", "fecha_primer_pago"]
+    props = ["dealname", "id_empresa", "dealstage", "amount", "closedate", "hs_object_id", "colppy_plan", "fecha_primer_pago", "dealtype", "nombre_del_plan_del_negocio"]
     filter_groups = [{
         "filters": [
             {"propertyName": "dealstage", "operator": "IN", "values": list(ACTIVE_DEAL_STAGES)},

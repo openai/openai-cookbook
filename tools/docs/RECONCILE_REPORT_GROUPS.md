@@ -25,7 +25,7 @@ The reconciliation report is organized into **4 groups** based on date mismatche
 **NO_HUBSPOT_DEAL:** In Colppy DB, no id_empresa in HubSpot (no closed-won deal for this id).
 
 - **Action:** COLPPY_NOT_ACTIVE: Review. WRONG_STAGE: Move to closed-won, set close_date = Colppy fechaPago. NO_HUBSPOT_DEAL: Create deal.
-- **Report:** Group 3 table includes **Reason** and **HubSpot stage** columns.
+- **Report:** Group 3 table includes **Reason**, **HubSpot stage**, **Expected stage**, and **Explanation** columns.
 
 ### 4. HubSpot closed-won this month, Colppy first payment in different month or absent
 
@@ -41,13 +41,15 @@ Column order: id_empresa | Colppy id_plan | HubSpot id_plan | Colppy fechaPago |
 
 **All tables with HubSpot data** (Groups 1, 2, 3, 4) include **HubSpot stage** (deal_stage).
 
-**Group 3 only:** id_empresa | **Reason** | activa | ... (Reason: COLPPY_NOT_ACTIVE, WRONG_STAGE, or NO_HUBSPOT_DEAL)
+**Group 3 only:** id_empresa | **Reason** | HubSpot stage | **Expected stage** | **Explanation** | activa | ... (Reason: COLPPY_NOT_ACTIVE, WRONG_STAGE, or NO_HUBSPOT_DEAL)
 
 Dates and amounts are placed side by side for quick comparison.
 
 | Column | Source | Description |
 |--------|--------|-------------|
 | Reason (Group 3) | group3_reasons | COLPPY_NOT_ACTIVE (activa≠0), WRONG_STAGE (deal not closed-won), NO_HUBSPOT_DEAL (in Colppy, no id_empresa in HubSpot) |
+| Expected stage (Group 3) | _expected_stage_and_explanation | Target stage for the deal: closedlost (COLPPY_NOT_ACTIVE), closedwon (WRONG_STAGE, NO_HUBSPOT_DEAL) |
+| Explanation (Group 3) | _expected_stage_and_explanation | Short explanation for the recommended action |
 | activa | empresa.activa | 0=Activa, 2=Desactivada Falta Pago, 3=Desactivada Usuario |
 | Colppy id_plan | pago.idPlan | Colppy plan ID |
 | HubSpot id_plan | deals.id_plan | HubSpot colppy_plan |

@@ -22,8 +22,10 @@ Usage:
     python tools/scripts/hubspot/build_facturacion_hubspot_mapping.py --restore-from-mapping tools/outputs/facturacion_hubspot_mapping.csv  # recovery
     python tools/scripts/hubspot/build_facturacion_hubspot_mapping.py --refresh-deals-only --year 2026 --month 1  # timeframe-only refresh
     python tools/scripts/hubspot/build_facturacion_hubspot_mapping.py --refresh-deals-only --year 2026 --month 2 --fetch-wrong-stage  # also populate deals_any_stage
+    python tools/scripts/hubspot/build_facturacion_hubspot_mapping.py --refresh-deals-only --years 2025 2026 --fetch-wrong-stage  # complete refresh for 2025 and 2026
 
 Full build clears deals and repopulates from facturacion; run --refresh-deals-only for each month needed.
+Use --years 2025 2026 for a complete multi-year refresh (all months Jan–Dec in each year).
 Use --fetch-wrong-stage when running reconciliation to detect Colppy-only cases where the deal exists but has wrong stage.
 """
 import argparse
@@ -75,8 +77,15 @@ def main():
         action="store_true",
         help="Only refresh deals table for given month (requires --year and --month)",
     )
-    parser.add_argument("--year", type=str, help="Year for timeframe refresh (e.g. 2026)")
-    parser.add_argument("--month", type=int, help="Month 1-12 for timeframe refresh")
+    parser.add_argument("--year", type=str, help="Year for single-month refresh (e.g. 2026)")
+    parser.add_argument("--month", type=int, help="Month 1-12 for single-month refresh")
+    parser.add_argument(
+        "--years",
+        nargs="+",
+        type=str,
+        metavar="YEAR",
+        help="Years for complete refresh (e.g. --years 2025 2026). Refreshes all 12 months per year.",
+    )
     parser.add_argument(
         "--fetch-wrong-stage",
         action="store_true",
@@ -91,9 +100,11 @@ def main():
     args = parser.parse_args()
 
     if args.refresh_deals_only:
-        if not args.year or not args.month:
-            parser.error("--refresh-deals-only requires --year and --month")
-        return _run_refresh_deals_only(args)
+        if args.years:
+            return _run_refresh_deals_years(args)
+        if args.year and args.month:
+            return _run_refresh_deals_only(args)
+        parser.error("--refresh-deals-only requires either --year and --month, or --years (e.g. --years 2025 2026)")
 
     if args.reconcile_no_deal:
         return _run_reconcile_no_deal(args)
@@ -102,6 +113,40 @@ def main():
         return _run_restore_from_mapping(args)
 
     return _run_full_build(args)
+
+
+def _run_refresh_deals_years(args) -> int:
+    """Refresh deals table for all months in given years (e.g. 2025 and 2026)."""
+    from tools.scripts.hubspot.hubspot_build_refresh import run_refresh_deals_only
+
+    db_path = Path(args.db)
+    if not db_path.exists():
+        print(f"\nERROR: Database not found: {db_path}")
+        print("Run full build first (without --refresh-deals-only).")
+        return 1
+
+    colppy_db_path = Path(args.colppy_db)
+    if not colppy_db_path.is_absolute():
+        colppy_db_path = Path(__file__).resolve().parents[3] / colppy_db_path
+
+    years = sorted(set(args.years))
+    total = len(years) * 12
+    done = 0
+    for year in years:
+        for month in range(1, 13):
+            done += 1
+            print(f"\n[{done}/{total}] Refreshing {year}-{month:02d}...")
+            rc = run_refresh_deals_only(
+                db_path=db_path,
+                year=year,
+                month=month,
+                fetch_wrong_stage=args.fetch_wrong_stage,
+                colppy_db_path=colppy_db_path,
+            )
+            if rc != 0:
+                return rc
+    print(f"\nComplete: refreshed {total} months ({years}).")
+    return 0
 
 
 def _run_refresh_deals_only(args) -> int:
@@ -188,6 +233,7 @@ def _run_full_build(args) -> int:
         populate_companies,
         populate_deals,
         populate_facturacion,
+        populate_plan_names_from_colppy,
         print_summary,
     )
 
@@ -246,6 +292,10 @@ def _run_full_build(args) -> int:
         conn.execute("DELETE FROM deals")
         conn.commit()
         populate_deals(conn, id_to_deal)
+        colppy_db = REPO_ROOT / "tools" / "data" / "colppy_export.db"
+        updated = populate_plan_names_from_colppy(conn, colppy_db)
+        if updated:
+            print(f"  plan_name: {updated:,} deals updated from Colppy plan table")
         print(f"  deals:     {len(id_to_deal):,} rows")
 
         populate_facturacion(conn, records)
@@ -267,6 +317,26 @@ def _run_full_build(args) -> int:
             )
         except Exception as e:
             print(f"  Warning: Could not log to edit_logs: {e}", file=sys.stderr)
+
+        try:
+            from tools.utils.hubspot_refresh_logger import log_hubspot_refresh
+            log_hubspot_refresh(
+                str(db_path),
+                period="full",
+                deal_count=len(id_to_deal),
+                added_count=0,
+                updated_count=0,
+                removed_count=0,
+                source_metadata={
+                    "type": "full_build",
+                    "companies": total_companies,
+                    "deals": len(id_to_deal),
+                    "facturacion": len(records),
+                },
+            )
+            print(f"  Refresh logged to hubspot_refresh_logs (period=full)")
+        except Exception as e:
+            print(f"  Warning: Could not log refresh: {e}", file=sys.stderr)
     print(f"Database: {db_path}")
     print("=" * 70)
     return 0

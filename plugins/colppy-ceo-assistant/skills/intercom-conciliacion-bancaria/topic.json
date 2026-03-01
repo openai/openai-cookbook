@@ -1,0 +1,57 @@
+{
+  "_comment": "Topic config for bank reconciliation Intercom research. Used by llm_classify.mjs --topic.",
+  "topic_name": "Conciliación Bancaria",
+  "match_field": "is_bank_reconciliation",
+  "definition": "Bank reconciliation (conciliación bancaria) conversations are those where a customer is asking about, having trouble with, or requesting help with matching bank transactions against Colppy records. This includes: connecting bank accounts (Paybook/open banking), importing bank statements (OFX, CSV, Excel), matching transactions manually or automatically, resolving discrepancies between bank balances and Colppy balances, configuring bank reconciliation settings, and bugs or errors in the reconciliation module.",
+  "categories": [
+    "bank_connection_error",
+    "reconciliation_bug",
+    "reconciliation_howto",
+    "bank_import",
+    "balance_discrepancy",
+    "feature_request",
+    "other"
+  ],
+  "false_positives": [
+    "Conversations about Mercado Pago payment collection — this is a payment gateway, not bank reconciliation",
+    "General billing or invoicing questions (facturación) — unless they specifically mention reconciling with the bank",
+    "AFIP/ARCA tax filing or electronic invoicing configuration — this is tax compliance, not bank reconciliation",
+    "Payroll (eSueldos/sueldos) questions — even if they involve bank transfers for salary payments",
+    "General accounting entries (asientos contables) that don't mention bank matching"
+  ],
+  "true_positives": [
+    "Customer mentions 'conciliación bancaria', 'conciliar', or 'conciliación' in the context of bank accounts",
+    "Issues connecting bank accounts via Paybook or open banking ('Conecta tu banco')",
+    "Importing bank statements (archivos bancarios, extractos, OFX, CSV from banks)",
+    "Discrepancies between bank balance and Colppy balance",
+    "Errors or bugs in the reconciliation module (matching failures, wrong amounts, duplicate matches)",
+    "Questions about how to set up or configure bank reconciliation",
+    "References to specific bank integrations (Galicia, Santander, BBVA, Macro, Nación, etc.)"
+  ],
+  "keywords": [
+    "conciliación bancaria",
+    "conciliacion bancaria",
+    "conciliar",
+    "conciliación",
+    "conciliacion",
+    "extracto bancario",
+    "movimiento bancario",
+    "banco",
+    "paybook",
+    "conecta tu banco",
+    "open banking",
+    "OFX",
+    "saldo bancario",
+    "cuenta bancaria",
+    "tesorería",
+    "tesoreria",
+    "galicia",
+    "santander",
+    "BBVA",
+    "macro",
+    "nación",
+    "nacion",
+    "HSBC",
+    "importar movimientos"
+  ]
+}

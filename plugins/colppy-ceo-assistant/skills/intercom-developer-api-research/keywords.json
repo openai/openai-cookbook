@@ -1,6 +1,24 @@
 {
-  "_comment": "Editable keyword config for developer/API Intercom research. Add or remove keywords to improve discovery. Restart Cursor or reload skill to pick up changes.",
+  "_comment": "Topic config for developer/API Intercom research. Used by llm_classify.mjs --topic.",
   "topic": "Colppy API integration",
+  "topic_name": "Developer/API",
+  "match_field": "is_developer_api",
+  "categories": ["api_integration", "api_bug", "api_inquiry", "feature_config", "bank_connection", "sales_inquiry", "internal", "payroll", "other"],
+  "false_positives": [
+    "\"Mercado Pago\" integration: end-users configure this from the UI (not API work)",
+    "\"Conecta tu banco\" (bank connection): uses Paybook. Users get error 500 and need to re-enter credenciales. NOT developer/API work.",
+    "\"Staging\" environment (app.stg.colppy.com): sometimes appears in internal Jira tickets or login issues",
+    "\"Tiendanube\" / \"Producteca\": e-commerce integrations Colppy supports natively. Users asking about features, NOT building API integrations.",
+    "XML files: users upload SIRADIG XML files for payroll (eSueldos module). NOT API work.",
+    "Bot messages with marketing text like \"Automatizar facturación\" — NOT a developer request."
+  ],
+  "true_positives": [
+    "Someone is writing code against the Colppy API (mentions endpoints, JSON responses, request/response debugging)",
+    "A \"desarrollador\" or \"programador\" is building a custom integration with Colppy",
+    "References to dev.colppy.com, API credentials, provisions, operations",
+    "Debugging API errors with technical detail (HTTP status codes in API context, malformed responses)",
+    "Third-party software company asking about API capabilities for their product"
+  ],
   "keywords": [
     "api",
     "API",

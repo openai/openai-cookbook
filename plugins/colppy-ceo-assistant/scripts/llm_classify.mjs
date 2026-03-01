@@ -1,24 +1,38 @@
 #!/usr/bin/env node
 
 /**
- * LLM-based classifier for Intercom conversation scan results.
+ * Topic-agnostic LLM classifier for Intercom conversations.
  *
- * Takes keyword-scan results + conversation cache and runs each match through
- * GPT-4o-mini to classify whether it's a true developer/API conversation.
- *
- * Architecture (follows Intercom Topics Explorer pattern):
- *   1. Keyword scan = cheap pre-filter (1455 convos → ~37 candidates)
- *   2. LLM classifier = semantic post-filter (~37 → true matches)
+ * Classifies conversations against any topic defined in a topic config JSON file.
+ * The config file must contain a "definition" and "system_prompt" (or it falls back
+ * to a default developer/API prompt built from the definition).
  *
  * Usage:
+ *   # Full scan — classify every conversation in cache against a topic:
  *   node scripts/llm_classify.mjs \
- *     --cache skills/intercom-developer-api-research/cache/conversations_2025-01-21_2025-02-05.json \
- *     --results skills/intercom-developer-api-research/cache/local_scan_results_v3.json \
- *     [--output skills/intercom-developer-api-research/cache/llm_classified.json] \
- *     [--report skills/intercom-developer-api-research/cache/llm_report.md] \
- *     [--model gpt-4o-mini] \
- *     [--concurrency 5] \
- *     [--keywords skills/intercom-developer-api-research/keywords.json]
+ *     --cache <conversations_cache.json> \
+ *     --topic <topic_config.json> \
+ *     --all \
+ *     [--output results.json] [--report report.md] \
+ *     [--model gpt-4o-mini] [--concurrency 3]
+ *
+ *   # Keyword-filtered mode — classify only pre-filtered matches:
+ *   node scripts/llm_classify.mjs \
+ *     --cache <conversations_cache.json> \
+ *     --topic <topic_config.json> \
+ *     --results <scan_results.json> \
+ *     [--output results.json] [--report report.md]
+ *
+ * Topic config JSON format:
+ *   {
+ *     "topic_name": "Developer/API Conversations",
+ *     "match_field": "is_developer_api",
+ *     "definition": "...",
+ *     "system_prompt": "full system prompt (optional, overrides default)",
+ *     "categories": ["api_integration", "api_bug", ...],
+ *     "keywords": [...],
+ *     "exclude_if_only": [...]
+ *   }
  *
  * Requires OPENAI_API_KEY in environment or in root .env file.
  */
@@ -83,7 +97,7 @@ function parseArgs() {
     output: null,
     report: null,
     model: 'gpt-4o-mini',
-    concurrency: 5,
+    concurrency: 10,
     keywords: null,
     all: false,
   };
@@ -94,7 +108,7 @@ function parseArgs() {
     else if (args[i] === '--report' && args[i + 1]) opts.report = args[++i];
     else if (args[i] === '--model' && args[i + 1]) opts.model = args[++i];
     else if (args[i] === '--concurrency' && args[i + 1]) opts.concurrency = parseInt(args[++i], 10);
-    else if (args[i] === '--keywords' && args[i + 1]) opts.keywords = args[++i];
+    else if ((args[i] === '--keywords' || args[i] === '--topic') && args[i + 1]) opts.keywords = args[++i];
     else if (args[i] === '--all') opts.all = true;
   }
   if (isNaN(opts.concurrency) || opts.concurrency < 1) {
@@ -112,37 +126,51 @@ function resolvePath(p) {
 
 // ── Classification prompt ────────────────────────────────────────────────
 
-function buildClassificationPrompt(definition) {
-  return `You are classifying Intercom support conversations for a B2B SaaS company called Colppy (Argentine accounting software).
+function buildClassificationPrompt(config) {
+  // If the config provides a full system_prompt, use it directly
+  if (config.system_prompt) {
+    return config.system_prompt;
+  }
+
+  // Otherwise, build a generic prompt from the config fields
+  const matchField = config.match_field || 'is_match';
+  const topicName = config.topic_name || 'the specified topic';
+  const categories = config.categories
+    ? config.categories.join(' | ')
+    : 'match | other';
+
+  let prompt = `You are classifying Intercom support conversations for a B2B SaaS company called Colppy (Argentine accounting software).
+
+<topic>
+${topicName}
+</topic>
 
 <definition>
-${definition}
-</definition>
+${config.definition}
+</definition>`;
 
-<context>
-Colppy has these features that generate FALSE POSITIVE matches:
-- "Mercado Pago" integration: end-users configure this from the UI (not API work)
-- "Conecta tu banco" (bank connection): uses a third-party integrator called Paybook. Users get "error 500" and need to re-enter "credenciales" (bank login). This is NOT developer/API work.
-- "Staging" environment (app.stg.colppy.com): sometimes appears in internal Jira tickets or login issues
-- "Tiendanube" / "Producteca": e-commerce integrations that Colppy supports natively. Users asking about these as features (not building API integrations) are NOT developer conversations.
-- XML files: users upload SIRADIG XML files for payroll (eSueldos module). This is NOT API work.
-- Bot messages often contain marketing text like "Automatizar facturación" — this is NOT a developer request.
+  if (config.false_positives || config.true_positives) {
+    prompt += `\n\n<context>`;
+    if (config.false_positives) {
+      prompt += `\nFALSE POSITIVE signals (do NOT match these):\n${config.false_positives.map(fp => `- ${fp}`).join('\n')}`;
+    }
+    if (config.true_positives) {
+      prompt += `\n\nTRUE POSITIVE signals:\n${config.true_positives.map(tp => `- ${tp}`).join('\n')}`;
+    }
+    prompt += `\n</context>`;
+  }
 
-TRUE POSITIVE signals:
-- Someone is writing code against the Colppy API (mentions endpoints, JSON responses, request/response debugging)
-- A "desarrollador" or "programador" is building a custom integration with Colppy
-- References to dev.colppy.com, API credentials, provisions, operations
-- Debugging API errors with technical detail (HTTP status codes in API context, malformed responses)
-- Third-party software company asking about API capabilities for their product
-</context>
+  prompt += `
 
 Classify the conversation below. Respond in this exact JSON format:
 {
-  "is_developer_api": true/false,
+  "${matchField}": true/false,
   "confidence": 0.0-1.0,
-  "category": "one of: api_integration | api_bug | api_inquiry | feature_config | bank_connection | sales_inquiry | internal | payroll | other",
+  "category": "one of: ${categories}",
   "reasoning": "1-2 sentence explanation"
 }`;
+
+  return prompt;
 }
 
 function buildConversationText(parts) {
@@ -206,7 +234,7 @@ Classify this conversation. Return only the JSON object.`;
     if (jsonMatch) {
       try { return JSON.parse(jsonMatch[0]); } catch { /* fall through */ }
     }
-    return { is_developer_api: false, confidence: 0, category: 'parse_error', reasoning: `Invalid JSON: ${text.substring(0, 100)}` };
+    return { is_match: false, confidence: 0, category: 'parse_error', reasoning: `Invalid JSON: ${text.substring(0, 100)}` };
   }
 }
 
@@ -228,17 +256,18 @@ async function mapConcurrent(items, fn, concurrency) {
 // ── Report writer ────────────────────────────────────────────────────────
 
 function writeReport(classified, reportPath, meta) {
-  const tp = classified.filter(c => c.llm.is_developer_api);
-  const fp = classified.filter(c => !c.llm.is_developer_api);
+  const topicLabel = meta.topic || 'Topic';
+  const tp = classified.filter(c => c.llm.is_match);
+  const fp = classified.filter(c => !c.llm.is_match);
 
   const lines = [
-    `# Developer/API Research – LLM-Classified Report`,
+    `# ${topicLabel} – LLM-Classified Report`,
     ``,
     `**Date range:** ${meta.from_date} → ${meta.to_date}`,
-    `**Keyword matches:** ${classified.length}`,
-    `**LLM true positives:** ${tp.length}`,
-    `**LLM false positives:** ${fp.length}`,
-    `**Precision (LLM):** ${classified.length > 0 ? Math.round(tp.length / classified.length * 100) : 0}%`,
+    `**Total classified:** ${classified.length}`,
+    `**Matches:** ${tp.length}`,
+    `**Filtered out:** ${fp.length}`,
+    `**Hit rate:** ${classified.length > 0 ? Math.round(tp.length / classified.length * 100) : 0}%`,
     `**Model:** ${meta.model}`,
     ``,
     `---`,
@@ -248,11 +277,11 @@ function writeReport(classified, reportPath, meta) {
   // Summary table
   lines.push(`## Summary`);
   lines.push(``);
-  lines.push(`| # | Conv ID | LLM Verdict | Confidence | Category | Reasoning |`);
-  lines.push(`|---|---------|-------------|------------|----------|-----------|`);
+  lines.push(`| # | Conv ID | Verdict | Confidence | Category | Reasoning |`);
+  lines.push(`|---|---------|---------|------------|----------|-----------|`);
   for (let i = 0; i < classified.length; i++) {
     const c = classified[i];
-    const verdict = c.llm.is_developer_api ? '✅ Developer' : '❌ Not developer';
+    const verdict = c.llm.is_match ? '✅ Match' : '❌ No match';
     const conf = `${Math.round((c.llm.confidence || 0) * 100)}%`;
     lines.push(`| ${i + 1} | ${c.conversation_id} | ${verdict} | ${conf} | ${c.llm.category || '-'} | ${c.llm.reasoning || '-'} |`);
   }
@@ -260,19 +289,19 @@ function writeReport(classified, reportPath, meta) {
   lines.push(`---`);
   lines.push(``);
 
-  // True positives detail
+  // Matches detail
   if (tp.length > 0) {
-    lines.push(`## True Positives (Developer/API Conversations)`);
+    lines.push(`## Matches (${topicLabel})`);
     lines.push(``);
     for (const c of tp) {
       lines.push(`### Conv ${c.conversation_id}`);
       lines.push(``);
       lines.push(`- **Created:** ${c.created_at}`);
       lines.push(`- **Tags:** ${(c.tags || []).join(', ') || '(none)'}`);
-      lines.push(`- **Keyword matches:** ${c.matched_keywords.join(', ')}`);
-      lines.push(`- **LLM category:** ${c.llm.category}`);
-      lines.push(`- **LLM confidence:** ${Math.round((c.llm.confidence || 0) * 100)}%`);
-      lines.push(`- **LLM reasoning:** ${c.llm.reasoning}`);
+      lines.push(`- **Keyword matches:** ${(c.matched_keywords || []).join(', ') || '(full scan)'}`);
+      lines.push(`- **Category:** ${c.llm.category}`);
+      lines.push(`- **Confidence:** ${Math.round((c.llm.confidence || 0) * 100)}%`);
+      lines.push(`- **Reasoning:** ${c.llm.reasoning}`);
       lines.push(``);
       lines.push(`<details><summary>Full conversation</summary>`);
       lines.push(``);
@@ -288,9 +317,9 @@ function writeReport(classified, reportPath, meta) {
     lines.push(``);
   }
 
-  // False positives summary
-  if (fp.length > 0) {
-    lines.push(`## Filtered Out (Not Developer/API)`);
+  // Filtered out summary
+  if (fp.length > 0 && !meta.all_mode) {
+    lines.push(`## Filtered Out`);
     lines.push(``);
     for (const c of fp) {
       lines.push(`- **${c.conversation_id}** — ${c.llm.category}: ${c.llm.reasoning}`);
@@ -375,15 +404,19 @@ async function main() {
     }
   }
 
-  console.log(`Classifying ${toClassify.length} keyword matches with ${opts.model}...`);
+  const classifyLabel = opts.all ? 'conversations' : 'keyword matches';
+  console.log(`Classifying ${toClassify.length} ${classifyLabel} with ${opts.model}...`);
 
-  if (!config.definition) {
-    console.error('keywords.json is missing the "definition" field (used as the LLM classification prompt).');
+  if (!config.definition && !config.system_prompt) {
+    console.error('Topic config is missing "definition" or "system_prompt" field.');
     process.exit(1);
   }
 
+  const matchField = config.match_field || 'is_developer_api';
+  const topicName = config.topic_name || 'Developer/API';
+
   const client = getOpenAIClient();
-  const systemPrompt = buildClassificationPrompt(config.definition);
+  const systemPrompt = buildClassificationPrompt(config);
 
   const classified = await mapConcurrent(
     toClassify,
@@ -396,47 +429,56 @@ async function main() {
           item.conversation_text,
           item.matched_keywords
         );
-        const verdict = llm.is_developer_api ? '✅' : '❌';
+        // Normalize: ensure is_match field exists (maps from whatever match_field the LLM returns)
+        llm.is_match = llm[matchField] ?? llm.is_match ?? false;
+        const verdict = llm.is_match ? '✅' : '❌';
         console.log(`  [${i + 1}/${toClassify.length}] ${item.conversation_id} ${verdict} ${llm.category} (${Math.round((llm.confidence || 0) * 100)}%)`);
         return { ...item, llm };
       } catch (err) {
         console.log(`  [${i + 1}/${toClassify.length}] ${item.conversation_id} ⚠️  ERROR: ${err.message}`);
-        return { ...item, llm: { is_developer_api: false, confidence: 0, category: 'api_error', reasoning: err.message } };
+        return { ...item, llm: { is_match: false, confidence: 0, category: 'api_error', reasoning: err.message } };
       }
     },
     opts.concurrency,
   );
 
   // Summary
-  const tp = classified.filter(c => c.llm.is_developer_api);
-  const fp = classified.filter(c => !c.llm.is_developer_api);
-  console.log(`\nResults: ${tp.length} developer conversations, ${fp.length} filtered out`);
-  console.log(`Precision: ${classified.length > 0 ? Math.round(tp.length / classified.length * 100) : 0}%`);
+  const tp = classified.filter(c => c.llm.is_match);
+  const fp = classified.filter(c => !c.llm.is_match);
+  console.log(`\nResults: ${tp.length} ${topicName} conversations, ${fp.length} filtered out`);
+  console.log(`Hit rate: ${classified.length > 0 ? Math.round(tp.length / classified.length * 100) : 0}%`);
 
   // Output JSON
+  const classifiedOutput = opts.all ? classified.filter(c => c.llm.is_match) : classified;
   const result = {
     source: 'llm_classify',
+    topic: topicName,
     mode: opts.all ? 'all' : 'keyword_matches',
     model: opts.model,
     total_classified: classified.length,
-    llm_true_positives: tp.length,
-    llm_false_positives: fp.length,
+    matches: tp.length,
     hit_rate_pct: classified.length > 0 ? Math.round(tp.length / classified.length * 100) : 0,
     from_date: opts.all ? cache.from_date : scanResults.search_criteria?.from_date,
     to_date: opts.all ? cache.to_date : scanResults.search_criteria?.to_date,
-    classified: opts.all ? classified.filter(c => c.llm.is_developer_api) : classified,
+    classified: classifiedOutput,
   };
 
   if (outputPath) {
     fs.writeFileSync(outputPath, JSON.stringify(result, null, 2), 'utf8');
-    console.log(`Wrote ${classified.length} classified results to ${outputPath}`);
+    const writtenCount = result.classified.length;
+    const writtenMsg = opts.all && writtenCount !== classified.length
+      ? `Wrote ${writtenCount} developer-api conversations (of ${classified.length} classified) to ${outputPath}`
+      : `Wrote ${writtenCount} classified results to ${outputPath}`;
+    console.log(writtenMsg);
   }
 
   if (reportPath) {
     writeReport(classified, reportPath, {
+      topic: topicName,
       from_date: opts.all ? cache.from_date : scanResults.search_criteria?.from_date,
       to_date: opts.all ? cache.to_date : scanResults.search_criteria?.to_date,
       model: opts.model,
+      all_mode: opts.all,
     });
   }
 }

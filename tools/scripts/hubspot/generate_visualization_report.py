@@ -430,6 +430,14 @@ def generate_html_report(contacts_file, owners_file, output_file):
     df_contacts = pd.read_csv(contacts_file)
     df_owners = pd.read_csv(owners_file)
     
+    # Normalize schema: high_score exports total_hours_to_contact, visualization expects days_to_contact
+    if 'days_to_contact' not in df_contacts.columns and 'total_hours_to_contact' in df_contacts.columns:
+        df_contacts['days_to_contact'] = df_contacts['total_hours_to_contact'] / 24
+    
+    # Normalize owners: high_score exports avg_total_hours, visualization expects avg_time_to_contact (days)
+    if 'avg_time_to_contact' not in df_owners.columns and 'avg_total_hours' in df_owners.columns:
+        df_owners['avg_time_to_contact'] = df_owners['avg_total_hours'] / 24
+    
     # Remove "No Owner" row if exists
     df_owners = df_owners[df_owners['owner_name'] != 'No Owner']
     

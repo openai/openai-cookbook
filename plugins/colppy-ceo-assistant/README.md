@@ -99,6 +99,22 @@ The **intercom-customer-research** skill uses the **intercom-research** MCP serv
 
 **Local only** — Use Cursor or Claude Desktop. Claude Cowork and Cloud Agents do not support this (no remote MCP).
 
+### HubSpot Analysis MCP (funnel, scoring, visualization)
+
+The **hubspot-analysis** MCP exposes funnel and scoring scripts for use in Cursor and Claude Desktop. Tools: `run_smb_mql_funnel`, `run_accountant_mql_funnel`, `run_smb_accountant_involved_funnel`, `run_high_score_analysis`, `run_mtd_scoring`, `run_visualization_report`.
+
+**Setup:** Add to project `.mcp.json` (workspace root) or Claude Desktop config:
+
+```json
+"hubspot-analysis": {
+  "command": "python",
+  "args": ["/path/to/openai-cookbook/tools/scripts/hubspot/mcp_hubspot_analysis_server.py"],
+  "cwd": "/path/to/openai-cookbook"
+}
+```
+
+See `tools/scripts/hubspot/README_MCP_HUBSPOT_ANALYSIS.md` for full documentation.
+
 ### HubSpot, Mixpanel, Slack, Atlassian
 
 These connectors are configured via their respective MCP servers in `~/.cursor/mcp.json`. See each skill's SKILL.md for specific setup instructions.

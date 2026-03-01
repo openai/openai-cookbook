@@ -453,6 +453,13 @@ Use **semver-compliant version bumps** in `package__init__.py` whenever a public
 - Prefer MCP tools over manual CLI when the user asks in natural language (e.g. "refresh for today", "run reconciliation for Feb 2026")
 - Cursor config: Add to `~/.cursor/mcp.json` — see README for `command`, `args`, `cwd`
 
+## HubSpot Analysis MCP
+
+**When using funnel, scoring, or visualization analysis** (SMB funnel, accountant funnel, high-score contactability, MTD scoring):
+- Reference: `/Users/virulana/openai-cookbook/tools/scripts/hubspot/README_MCP_HUBSPOT_ANALYSIS.md` - Setup, tools, config
+- Tools: `run_smb_mql_funnel`, `run_accountant_mql_funnel`, `run_smb_accountant_involved_funnel`, `run_high_score_analysis`, `run_mtd_scoring`, `run_visualization_report`
+- Prefer MCP tools over manual CLI when the user asks in natural language (e.g. "run SMB funnel for Jan and Feb 2026", "compare scoring Jan vs Feb")
+
 ## ARCA Prototype
 
 **Before any ARCA, Banco Galicia, or AFIP-related work**, reference:

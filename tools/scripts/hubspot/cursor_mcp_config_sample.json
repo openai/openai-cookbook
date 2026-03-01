@@ -1,0 +1,9 @@
+{
+  "mcpServers": {
+    "hubspot-analysis": {
+      "command": "python",
+      "args": ["/Users/virulana/openai-cookbook/tools/scripts/hubspot/mcp_hubspot_analysis_server.py"],
+      "cwd": "/Users/virulana/openai-cookbook"
+    }
+  }
+}

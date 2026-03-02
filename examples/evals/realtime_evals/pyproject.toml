@@ -15,7 +15,10 @@ dependencies = [
 dev = [
   "ruff",
   "mypy",
+  "pandas-stubs",
   "pytest",
+  "types-seaborn",
+  "types-tqdm",
 ]
 
 [tool.ruff.lint]

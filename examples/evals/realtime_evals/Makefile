@@ -9,7 +9,7 @@ MYPY := $(VENV_DIR)/bin/mypy
 PYTEST := $(VENV_DIR)/bin/pytest
 else
 RUFF := uv run --with ruff ruff
-MYPY := uv run --with mypy --with pandas-stubs --with types-tqdm mypy
+MYPY := uv run --with mypy --with pandas-stubs --with types-seaborn --with types-tqdm mypy
 PYTEST := uv run --with pytest pytest
 endif
 

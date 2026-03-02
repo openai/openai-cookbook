@@ -105,6 +105,27 @@ To render charts for an existing run after the fact:
 uv run python plot_eval_results.py --run-dir run_harness/results/<run_id>
 ```
 
+## Results Viewer
+
+Use the Streamlit results viewer to browse saved runs from `crawl_harness`, `walk_harness`, and `run_harness` without opening the raw artifacts by hand.
+
+- `Comparison View`: select a harness, choose one or more saved runs, and compare summary metrics, scores, latency, and token usage across runs.
+- `Run Viewer`: inspect one saved run in detail, including `results.csv` rows, row-level audio artifacts, and event logs for crawl and walk runs.
+
+Run it from this directory with either:
+
+```bash
+make streamlit
+```
+
+or:
+
+```bash
+uv run streamlit run results_viewer/app.py
+```
+
+Then open the local Streamlit URL, usually `http://localhost:8501`.
+
 ## Common CLI flags
 
 All harnesses share a core set of flags so you can switch between them easily:

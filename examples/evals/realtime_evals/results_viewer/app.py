@@ -51,6 +51,14 @@ HARNESS_RESULTS_DIRS = {
     "walk": ROOT_DIR / "walk_harness" / "results",
     "run": ROOT_DIR / "run_harness" / "results",
 }
+CHART_RUN_PALETTE = [
+    "#79b7ff",
+    "#67ecff",
+    "#ff8ea9",
+    "#ffb066",
+    "#c894ff",
+    "#77a1ff",
+]
 
 
 def discover_result_directories(results_root: Path) -> list[Path]:
@@ -432,6 +440,7 @@ def render_grouped_bar_chart(data: pd.DataFrame) -> None:
                             "field": "run_label",
                             "type": "nominal",
                             "title": "Run",
+                            "scale": {"range": CHART_RUN_PALETTE},
                         },
                         "tooltip": [
                             {
@@ -532,6 +541,7 @@ def render_percentile_ladder_chart(data: pd.DataFrame, y_title: str) -> None:
                                 "field": "run_label",
                                 "type": "nominal",
                                 "title": "Run",
+                                "scale": {"range": CHART_RUN_PALETTE},
                             },
                             "tooltip": [
                                 {
@@ -867,7 +877,11 @@ def render_comparison_view() -> None:
         return
 
     st.subheader("Selected Result Directories")
-    st.write([str(path.relative_to(ROOT_DIR)) for path in selected_paths])
+    selected_runs_text = "\n".join(
+        f"{index}. {path.relative_to(ROOT_DIR)}"
+        for index, path in enumerate(selected_paths, start=1)
+    )
+    st.code(selected_runs_text, language="text")
 
     score_keys, latency_config, token_config = selected_metric_controls(
         harness, summaries

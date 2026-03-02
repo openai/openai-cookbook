@@ -34,6 +34,8 @@ Run a first command per harness:
 
 Use the root `Makefile` for common checks:
 
+- `make install`
+- `make streamlit`
 - `make format`
 - `make lint`
 - `make lint-fix`

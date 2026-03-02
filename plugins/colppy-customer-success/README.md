@@ -84,4 +84,4 @@ See [intercom-onboarding-setup/README.md](skills/intercom-onboarding-setup/READM
 
 1. Set `INTERCOM_ACCESS_TOKEN` in `.env` or Cursor MCP settings
 2. Set `OPENAI_API_KEY` in `.env` for LLM classification
-3. MCP server starts automatically when the plugin is loaded
+3. MCP servers start automatically when the plugin is loaded

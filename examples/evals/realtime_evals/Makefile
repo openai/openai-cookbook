@@ -1,4 +1,4 @@
-.PHONY: format lint lint-fix typecheck test
+.PHONY: install format lint lint-fix typecheck test
 
 format:
 	uv run --group dev ruff format .
@@ -14,3 +14,7 @@ typecheck:
 
 test:
 	uv run --group dev pytest
+
+install:
+	uv venv .venv
+	uv sync --group dev

@@ -40,7 +40,7 @@ load_dotenv(REPO_ROOT / "tools" / ".env")
 
 DEFAULT_HUBSPOT_DB = REPO_ROOT / "tools/data/facturacion_hubspot.db"
 DEFAULT_COLPPY_DB = REPO_ROOT / "tools/data/colppy_export.db"
-DEFAULT_CUIT_SNAPSHOT = REPO_ROOT / "plugins/colppy-ceo-assistant/docs/colppy_cuit_snapshot.json"
+DEFAULT_CUIT_SNAPSHOT = REPO_ROOT / "plugins/colppy-revops/docs/colppy_cuit_snapshot.json"
 PRIMARY_ASSOCIATION_TYPE = 5
 
 

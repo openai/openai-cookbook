@@ -1,0 +1,88 @@
+{
+  "_comment": "Topic for first time to value (hacer factura) — first invoice creation. Used by llm_classify.mjs --topic.",
+  "topic_name": "First Time to Value / Hacer factura",
+  "match_field": "is_first_invoice",
+  "definition": "First time to value (FTV) conversations are those where the user is trying to create their first invoice (comprobante de venta) in Colppy. Value = creating a new invoice. This includes: configuring factura electrónica for the first time, setting up talonario/punto de venta AFIP, 'how do I emit my first invoice', 'no puedo facturar' errors, alta de talonario, delegación de factura electrónica, punto de venta configuration, or any question that indicates the user is blocked or needs help to create their first invoice.",
+  "categories": [
+    "factura_electronica_config",
+    "talonario_punto_venta",
+    "no_puedo_facturar",
+    "emitir_primera_factura",
+    "delegacion_afip",
+    "other"
+  ],
+  "false_positives": [
+    "User has already been invoicing and asks about advanced features (e.g. importación masiva, reportes)",
+    "Questions about cobranzas (collections) without invoicing",
+    "Questions about facturas de compra (purchase invoices)",
+    "Billing or plan renewal questions",
+    "General navigation without invoice context"
+  ],
+  "true_positives": [
+    "User says 'no puedo facturar', 'no puedo generar', 'no puedo emitir'",
+    "Questions about 'cómo facturo', 'cómo emito', 'cómo genero'",
+    "Configuring factura electrónica for first time",
+    "Alta de talonario, punto de venta AFIP",
+    "Delegación de factura electrónica",
+    "User mentions 'primera factura', 'primer comprobante'",
+    "Blocked on creating first invoice"
+  ],
+  "keywords": [
+    "factura",
+    "comprobante",
+    "facturar",
+    "emitir",
+    "generar",
+    "talonario",
+    "punto de venta",
+    "factura electrónica",
+    "facturación"
+  ],
+  "few_shot_examples": [
+    {
+      "conversation_snippet": "[Customer]: ERROR DEL SISTEMA PARA FACTURAR\n[Bot]: ¿En que te puedo ayudar?\n[Customer]: Error del sistema para facturar\n[Bot]: Contanos, ¿Cómo te podemos ayudar?\n[Customer]: Necesito hablar con alguien, no puedo facturar",
+      "classification": {
+        "is_first_invoice": true,
+        "confidence": 0.9,
+        "category": "no_puedo_facturar",
+        "reasoning": "User is blocked from invoicing with a system error — unable to create their first invoice."
+      }
+    },
+    {
+      "conversation_snippet": "[Customer]: Necesito que borres los movimientos que hicimos en el sistema para poder empezar a realizar las facturas electrónicas. Por favor avísame cuando esté listo.\n[Agent]: Hola, ¿Cómo estas? Ya eliminamos los movimientos de prueba.",
+      "classification": {
+        "is_first_invoice": true,
+        "confidence": 0.9,
+        "category": "factura_electronica_config",
+        "reasoning": "User is preparing to start electronic invoicing — clearing test data to begin real invoicing."
+      }
+    },
+    {
+      "conversation_snippet": "[Customer]: Necesito importar las facturas de venta del mes pasado desde un Excel.\n[Agent]: Claro, podés ir a Clientes > Gestión de clientes > Importar > Facturas.\n[Customer]: Perfecto, también necesito el reporte de IVA ventas.",
+      "classification": {
+        "is_first_invoice": false,
+        "confidence": 0.85,
+        "category": "other",
+        "reasoning": "User is importing historical invoices and requesting IVA reports — this is an experienced user managing existing invoicing, not first-time setup."
+      }
+    },
+    {
+      "conversation_snippet": "[Customer (2026-01-14T14:15:57.000Z)]: Buen dia. Agregue una empresa a mi plan de estudio contable. Necesito que facture con fact electrónica ya hice todos los pasos que vi en los instructivos, hace un par de dias, pero al querer hoy emitir me da el siguiente error Ya esta delegado el servicio Les adjunto el alta del punto de venta y la delegación del servicio ¿Me pueden resolver el problema para poder facturar? saludos Cr. Jorge Camporesi Alem 640 - Cipolletti (Rio Negro) Libre de virus. www.av",
+      "classification": {
+        "is_first_invoice": true,
+        "category": "no_puedo_facturar",
+        "confidence": 0.9,
+        "reasoning": "User is experiencing issues with electronic invoicing and is blocked from issuing invoices due to an error, indicating they are trying to create their first invoice."
+      }
+    },
+    {
+      "conversation_snippet": "[Customer]: Hola Camila, buenas tardes! Ya estoy de regreso de mis vacaciones. Te consulto si tendrías disponibilidad para un llamado el jueves a las 10 am Argentina.\n[Agent]: El jueves puedo llamarte a las 15hs o el viernes a las 10hs.\n[Customer]: viernes a las 10 hs, gracias\n...\n[Agent]: Según lo hablado telefónicamente quedo a la espera de que me confirmes que ya realizaste la configuración de la factura electrónica.\n[Customer]: Adjunto los comprobantes emitidos por ARCA para la configuración de FCE. El formulario 3283... También te envío la constancia de creación de punto de venta.\n[Agent]: Ya aceptamos la delegación para que puedan emitir facturas electrónicas desde Colppy.",
+      "classification": {
+        "is_first_invoice": true,
+        "category": "factura_electronica_config",
+        "confidence": 0.85,
+        "reasoning": "Conversation starts with call scheduling but the core topic is first-time electronic invoicing setup: ARCA delegation, punto de venta creation, Form 3283, and FCE acceptance. The onboarding call led to FCE configuration."
+      }
+    }
+  ]
+}

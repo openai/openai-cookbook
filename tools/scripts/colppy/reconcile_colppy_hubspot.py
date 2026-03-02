@@ -22,7 +22,7 @@ from dotenv import load_dotenv
 load_dotenv(REPO_ROOT / ".env")
 load_dotenv(REPO_ROOT / "tools" / ".env")
 
-SNAPSHOT_PATH = REPO_ROOT / "plugins/colppy-ceo-assistant/docs/colppy_first_payments_snapshot.json"
+SNAPSHOT_PATH = REPO_ROOT / "plugins/colppy-revops/docs/colppy_first_payments_snapshot.json"
 ACTIVE_DEAL_STAGES = ("closedwon", "34692158")
 
 

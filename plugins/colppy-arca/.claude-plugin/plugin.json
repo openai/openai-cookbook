@@ -1,0 +1,8 @@
+{
+  "name": "colppy-arca",
+  "version": "1.0.0",
+  "description": "ARCA/AFIP tax operations for Colppy: comprobantes, retenciones, libro IVA generation, CUIT enrichment, bank statement extraction, and Colppy reconciliation.",
+  "author": {
+    "name": "Colppy"
+  }
+}

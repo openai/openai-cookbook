@@ -181,7 +181,7 @@ export const TOOL_DEFINITIONS = [
         },
         save_cache: {
           type: 'string',
-          description: 'Path to save raw conversation data for local iteration. Relative to plugins/colppy-ceo-assistant. E.g. skills/intercom-developer-api-research/cache/conversations_2025-01-21.json',
+          description: 'Path to save raw conversation data for local iteration. Relative to plugins/colppy-customer-success. E.g. skills/intercom-developer-api-research/cache/conversations_2025-01-21.json',
         },
       },
       required: ['topic', 'from_date'],

@@ -1,0 +1,503 @@
+{
+  "from_date": "2026-02-13",
+  "to_date": "2026-02-13",
+  "state": null,
+  "team_assignee_id": "2334166",
+  "topic": "Primeros 90 días",
+  "saved_at": "2026-03-02T11:32:05.809Z",
+  "conversations": [
+    {
+      "conversation_id": "215473095380151",
+      "created_at": "2026-02-13T18:10:26.000Z",
+      "state": "closed",
+      "contact_email": "tiendaultramarsf@gmail.com",
+      "contact_es_contador": false,
+      "contact_rol_wizard": "Dueño de una empresa",
+      "tags": [
+        "Consultas-No responden",
+        "Chat-Bot",
+        "Mod Cli-Factura de venta-Cuenta Corriente",
+        "Mod Cli-Importación de facturas de venta modelo nuevo",
+        "facturas cliente"
+      ],
+      "parts": [
+        {
+          "author_type": "user",
+          "body": "Hacer una consulta",
+          "created_at": "2026-02-13T18:10:26.000Z"
+        },
+        {
+          "author_type": "bot",
+          "body": "¿Desde qué empresa estás realizando la consulta?",
+          "created_at": "2026-02-13T18:10:28.000Z"
+        },
+        {
+          "author_type": "bot",
+          "body": "Por favor, elegí el módulo sobre el cual queres realizar la consulta.",
+          "created_at": "2026-02-13T18:10:37.000Z"
+        },
+        {
+          "author_type": "user",
+          "body": "Clientes",
+          "created_at": "2026-02-13T18:10:45.000Z"
+        },
+        {
+          "author_type": "bot",
+          "body": "¿En que te puedo ayudar?",
+          "created_at": "2026-02-13T18:10:46.000Z"
+        },
+        {
+          "author_type": "user",
+          "body": "ERROR DEL SISTEMA PARA FACTURAR",
+          "created_at": "2026-02-13T18:10:57.000Z"
+        },
+        {
+          "author_type": "user",
+          "body": "Agregar una factura",
+          "created_at": "2026-02-13T18:11:06.000Z"
+        },
+        {
+          "author_type": "bot",
+          "body": "En Colppy tenes dos opciones para cargar tus facturas: ​ Agregar factura manual Debes ingresar a Clientes > Gestión de clientes > elegir el cliente con un clic > Agregar factura Te explicamos como hacerlo en este link 👈 ​ Importar Facturas desde Excel Podes realizar dos tipos de importaciones desde Clientes > Gestión de clientes > Importar > Facturas (modelo nuevo) ​ -Mis comprobantes emitidos desde AFIP [App: Article Inserter] -Emitir masivamente facturas a clientes ​ [App: Article Inserter]",
+          "created_at": "2026-02-13T18:11:07.000Z"
+        },
+        {
+          "author_type": "bot",
+          "body": "¿Pudiste agregar tus facturas?",
+          "created_at": "2026-02-13T18:11:09.000Z"
+        },
+        {
+          "author_type": "user",
+          "body": "Necesito más ayuda",
+          "created_at": "2026-02-13T18:11:13.000Z"
+        },
+        {
+          "author_type": "bot",
+          "body": "Contanos, ¿Cómo te podemos ayudar?",
+          "created_at": "2026-02-13T18:11:13.000Z"
+        },
+        {
+          "author_type": "user",
+          "body": "Error del sistema para facturar",
+          "created_at": "2026-02-13T18:11:27.000Z"
+        },
+        {
+          "author_type": "bot",
+          "body": "Los errores del sistema al facturar suelen estar relacionados con problemas de conexión con AFIP. Cuando esto pasa, nuestro sistema guarda la factura en estado \"En Proceso\" y hace reintentos automáticos. Si AFIP la procesa, le asigna el número correspondiente, y si no, se elimina. Te recomiendo: • Esperar un poco y verificar si la factura se emitió correctamente • Si después de 2 horas el comprobante no se completó, escribinos nuevamente • Intentar generar la factura desde modo incógnito en tu navegador, ya que puede ser un problema de caché ¿Podrías contarme exactamente qué mensaje de error te aparece y qué estabas haciendo cuando ocurrió?",
+          "created_at": "2026-02-13T18:11:51.000Z"
+        },
+        {
+          "author_type": "user",
+          "body": "Hubo un error interno del sistema. Comúniquese con soporte en soporte@colppy.com . ​",
+          "created_at": "2026-02-13T18:12:53.000Z"
+        },
+        {
+          "author_type": "bot",
+          "body": "Perfecto, ya veo el mensaje de error específico. Este error interno del sistema suele estar relacionado con problemas de conexión con AFIP. Nuestro sistema guarda la factura en estado \"En Proceso\" y hace reintentos automáticos. Si AFIP la procesa, le asigna el número correspondiente, y si no, se elimina. Te recomiendo esperar un poco y verificar si la factura se emitió correctamente. Si después de 2 horas el comprobante no se completó, escribinos nuevamente para que podamos ayudarte. Mientras tanto, también podés intentar generar la factura desde modo incógnito en tu navegador, ya que a veces puede ser un problema de caché.",
+          "created_at": "2026-02-13T18:13:12.000Z"
+        },
+        {
+          "author_type": "bot",
+          "body": "¿Es lo que buscabas?",
+          "created_at": "2026-02-13T18:13:12.000Z"
+        },
+        {
+          "author_type": "user",
+          "body": "Si pero sigo con el problema",
+          "created_at": "2026-02-13T18:13:35.000Z"
+        },
+        {
+          "author_type": "bot",
+          "body": "Entiendo que el problema persiste. Como ya pasaron más de 2 horas y el error interno del sistema sigue apareciendo, necesitás que nuestro equipo revise tu caso específicamente. Podés reformular tu pregunta o hablar con nuestro equipo de soporte técnico especializado. Están disponibles de lunes a viernes de 9 a 18hs en días hábiles para ayudarte a resolver este inconveniente.",
+          "created_at": "2026-02-13T18:14:06.000Z"
+        },
+        {
+          "author_type": "bot",
+          "body": "¿Responde eso a tu pregunta?",
+          "created_at": "2026-02-13T18:14:06.000Z"
+        },
+        {
+          "author_type": "user",
+          "body": "Buenas tengo el mensaje de contactarse al soporte al facturar y ya pasaron mas de dos horas del mismo error",
+          "created_at": "2026-02-13T18:15:30.000Z"
+        },
+        {
+          "author_type": "user",
+          "body": "Hubo un error interno del sistema. Comúniquese con soporte en soporte@colppy.com . ​",
+          "created_at": "2026-02-13T18:15:40.000Z"
+        },
+        {
+          "author_type": "bot",
+          "body": "Como ya pasaron más de 2 horas y el error interno del sistema persiste, necesitás que nuestro equipo técnico revise tu caso específicamente. Podés contactar a nuestro soporte técnico especializado a través de: • Chat en vivo dentro de la plataforma • Email: soporte@colppy.com Estamos disponibles de lunes a viernes de 9 a 18hs en días hábiles para ayudarte a resolver este inconveniente. Cuando te comuniques, mencioná que ya pasaron más de 2 horas con el mismo error interno del sistema al facturar para que puedan priorizar tu caso.",
+          "created_at": "2026-02-13T18:16:02.000Z"
+        },
+        {
+          "author_type": "bot",
+          "body": "¿Te fue útil esta información?",
+          "created_at": "2026-02-13T18:16:02.000Z"
+        },
+        {
+          "author_type": "user",
+          "body": "Contactar con el soporte tecnico",
+          "created_at": "2026-02-13T18:16:29.000Z"
+        },
+        {
+          "author_type": "bot",
+          "body": "Claro, te voy a pasar con alguien de nuestro equipo de soporte. Mientras tanto, ¿podrías contarme más detalles sobre el problema para que puedan ayudarte más rápido?",
+          "created_at": "2026-02-13T18:16:35.000Z"
+        },
+        {
+          "author_type": "user",
+          "body": "contactar con el soporte",
+          "created_at": "2026-02-13T18:17:47.000Z"
+        },
+        {
+          "author_type": "admin",
+          "body": "Hola Mariano, ¿Cómo estas? Te pido disculpas por la demora en responder, el inconveniente fue solucionado el mismo día, ¿pudiste facturar?",
+          "created_at": "2026-02-18T12:28:36.000Z"
+        },
+        {
+          "author_type": "admin",
+          "body": "Hola Mariano, ¿pudiste ver mi mensaje?",
+          "created_at": "2026-02-19T12:00:58.000Z"
+        },
+        {
+          "author_type": "admin",
+          "body": "Hola Mariano, ¿Cómo estás? Dado que no tuvimos respuesta, procederemos a cerrar este chat pero podes escribirnos siempre que lo necesites, desde el botón Ayuda > \"Envianos un mensaje\" . Que tengas una buena jornada 😊",
+          "created_at": "2026-02-19T19:04:35.000Z"
+        },
+        {
+          "author_type": "bot",
+          "body": "¿Qué tal estuvo tu conversación con Camila?",
+          "created_at": "2026-02-19T19:04:48.000Z"
+        },
+        {
+          "author_type": "bot",
+          "body": "[Conversation Rating Request]",
+          "created_at": "2026-02-19T19:04:48.000Z"
+        }
+      ]
+    },
+    {
+      "conversation_id": "215473096891717",
+      "created_at": "2026-02-13T20:18:25.000Z",
+      "state": "closed",
+      "contact_email": "liliana@tessileargentina.com.ar",
+      "contact_es_contador": false,
+      "contact_rol_wizard": null,
+      "tags": [
+        "Consultas-No responden",
+        "Chat-Bot",
+        "MC-Invitar usuarios",
+        "invitar usuario"
+      ],
+      "parts": [
+        {
+          "author_type": "user",
+          "body": "Configuración Contadores",
+          "created_at": "2026-02-13T20:18:25.000Z"
+        },
+        {
+          "author_type": "bot",
+          "body": "¡Bienvenido a Colppy! 🎉 Para empezar a configurar tu estudio, debés realizar los siguientes pasos: Verifica los datos registrados de tu empresa en Configuración > Datos Generales Agrega tus empresas administradas Plan de cuentas y su configuración.",
+          "created_at": "2026-02-13T20:18:28.000Z"
+        },
+        {
+          "author_type": "user",
+          "body": "Invitar Usuarios",
+          "created_at": "2026-02-13T20:18:39.000Z"
+        },
+        {
+          "author_type": "bot",
+          "body": "Con tu plan \"Contador Independiente\" o \"Consultoras y Estudios\" podes invitar a tus usuarios, siendo el administrador. - Contador Inicio: único usuario ​ - Contador Independiente: Podes invitar hasta 3 usuarios ​ - Consultoras y Estudios: Podes invitar hasta 30 usuarios 📣Importante Los usuarios que invites deben tener el mismo dominio de email que el usuario administrador . Por ejemplo: Si el usuario administrador usa @gmail.com los demás usuarios deben tener ese mismo dominio. Para invitar a los usuarios desde la plataforma debes dirigirte al botón \"Invitar usuarios\" y completar la información. Para más información sobre invitación de usuarios da clic en este link",
+          "created_at": "2026-02-13T20:18:40.000Z"
+        },
+        {
+          "author_type": "bot",
+          "body": "¿Pudiste invitar a tus usuarios?",
+          "created_at": "2026-02-13T20:18:41.000Z"
+        },
+        {
+          "author_type": "user",
+          "body": "Necesito más ayuda",
+          "created_at": "2026-02-13T20:18:48.000Z"
+        },
+        {
+          "author_type": "bot",
+          "body": "Contanos, ¿Cómo te podemos ayudar?",
+          "created_at": "2026-02-13T20:18:48.000Z"
+        },
+        {
+          "author_type": "user",
+          "body": "envie la invitacion hace un tiempo y no llega el codigo para poder generar la clave",
+          "created_at": "2026-02-13T20:19:09.000Z"
+        },
+        {
+          "author_type": "user",
+          "body": "como hago para volver a invitarlo",
+          "created_at": "2026-02-13T20:19:16.000Z"
+        },
+        {
+          "author_type": "bot",
+          "body": "Para volver a enviar la invitación, tenés que ir a Mi Cuenta > pestaña \"Administración de usuarios\" > buscar el usuario y hacer clic en \"Invitar usuario\" nuevamente. También recordá que el usuario invitado debe revisar la carpeta de spam o correo no deseado, ya que a veces los correos de invitación llegan ahí. Si el usuario ya recibió la invitación pero no recuerda la contraseña, puede ir a https://login.colppy.com/ y usar la opción \"Olvidé mi contraseña\" para recuperarla. Sources: ¿Como puedo crear/ invitar nuevos usuarios a mi empresa en Colppy? Olvidé mi contraseña - Recuperar contraseña",
+          "created_at": "2026-02-13T20:19:32.000Z"
+        },
+        {
+          "author_type": "bot",
+          "body": "¿Es lo que buscabas?",
+          "created_at": "2026-02-13T20:19:33.000Z"
+        },
+        {
+          "author_type": "user",
+          "body": "me dice que el usuario ya tiene acceso",
+          "created_at": "2026-02-13T20:21:37.000Z"
+        },
+        {
+          "author_type": "bot",
+          "body": "Si te dice que el usuario ya tiene acceso, significa que ya fue invitado anteriormente y está activo en el sistema. Para verificar esto, andá a Mi Cuenta > pestaña \"Administración de usuarios\" y ahí vas a ver todos los usuarios, tanto activos como inactivos. Si el usuario aparece como activo, ya puede ingresar a la plataforma. Si necesita recuperar su contraseña, que vaya a https://login.colppy.com/ y use \"Olvidé mi contraseña\". Si querés quitarle el acceso, en esa misma sección podés hacer clic en \"desactivar\" al lado del usuario. Sources: ¿Como puedo crear/ invitar nuevos usuarios a mi empresa en Colppy? Desactivar usuario invitado",
+          "created_at": "2026-02-13T20:21:55.000Z"
+        },
+        {
+          "author_type": "bot",
+          "body": "¿Responde esto a tu pregunta?",
+          "created_at": "2026-02-13T20:21:55.000Z"
+        },
+        {
+          "author_type": "bot",
+          "body": "Si aún necesitas ayuda con el acceso o la gestión de usuarios, estamos aquí para asistirte. ¿Podrías contarme más sobre el problema que estás intentando resolver?",
+          "created_at": "2026-02-13T20:25:57.000Z"
+        },
+        {
+          "author_type": "admin",
+          "body": "Hola Liliana, Espero que estés muy bien Podrás indicarme el mail de la persona a la cuál invitaste?",
+          "created_at": "2026-02-13T20:46:44.000Z"
+        },
+        {
+          "author_type": "admin",
+          "body": "Hola Liliana, ¿Cómo estás? Dado que no tuvimos respuesta, procederemos a cerrar este chat pero podes escribirnos siempre que lo necesites, desde el botón Ayuda > \"Envianos un mensaje\" . Que tengas una buena jornada 😊",
+          "created_at": "2026-02-19T12:04:58.000Z"
+        },
+        {
+          "author_type": "bot",
+          "body": "¿Qué tal estuvo tu conversación con Camila?",
+          "created_at": "2026-02-19T12:05:10.000Z"
+        },
+        {
+          "author_type": "bot",
+          "body": "[Conversation Rating Request]",
+          "created_at": "2026-02-19T12:05:11.000Z"
+        }
+      ]
+    },
+    {
+      "conversation_id": "215473098157622",
+      "created_at": "2026-02-13T21:40:21.000Z",
+      "state": "closed",
+      "contact_email": "fernanda.ferreras@gmail.com",
+      "contact_es_contador": false,
+      "contact_rol_wizard": null,
+      "tags": [
+        "Chat-Bot",
+        "Mod Cont-Retención Ganancias",
+        "Consultas-No responden"
+      ],
+      "parts": [
+        {
+          "author_type": "user",
+          "body": "Configuración Contadores",
+          "created_at": "2026-02-13T21:40:21.000Z"
+        },
+        {
+          "author_type": "bot",
+          "body": "¡Bienvenido a Colppy! 🎉 Para empezar a configurar tu estudio, debés realizar los siguientes pasos: Verifica los datos registrados de tu empresa en Configuración > Datos Generales Agrega tus empresas administradas Plan de cuentas y su configuración.",
+          "created_at": "2026-02-13T21:40:23.000Z"
+        },
+        {
+          "author_type": "user",
+          "body": "Volver al menú principal",
+          "created_at": "2026-02-13T21:40:29.000Z"
+        },
+        {
+          "author_type": "bot",
+          "body": "¿Cómo te podemos ayudar?",
+          "created_at": "2026-02-13T21:40:30.000Z"
+        },
+        {
+          "author_type": "user",
+          "body": "Hacer una consulta",
+          "created_at": "2026-02-13T21:40:36.000Z"
+        },
+        {
+          "author_type": "bot",
+          "body": "¿Desde qué empresa estás realizando la consulta?",
+          "created_at": "2026-02-13T21:40:36.000Z"
+        },
+        {
+          "author_type": "bot",
+          "body": "Por favor, elegí el módulo sobre el cual queres realizar la consulta.",
+          "created_at": "2026-02-13T21:40:46.000Z"
+        },
+        {
+          "author_type": "user",
+          "body": "Contabilidad",
+          "created_at": "2026-02-13T21:40:52.000Z"
+        },
+        {
+          "author_type": "bot",
+          "body": "¿En qué podemos ayudarte?",
+          "created_at": "2026-02-13T21:40:52.000Z"
+        },
+        {
+          "author_type": "user",
+          "body": "Reportes",
+          "created_at": "2026-02-13T21:40:59.000Z"
+        },
+        {
+          "author_type": "bot",
+          "body": "En Colppy podes descargar tus reportes contables desde el módulo Contabilidad. Podes obtener los siguiente: - Diario General - Mayor - Balance - Resultado por Centro de Costo -Estado de Resultados - Estado de Flujo de Efectivo - Retenciones y Percepciones -Régimen de Información de Compras y Ventas - Posición Impositiva Mensual - Libro IVA Digital Para ver el detalle de cada hace clic en este artículo de ayuda 👇 [App: Article Inserter]",
+          "created_at": "2026-02-13T21:41:00.000Z"
+        },
+        {
+          "author_type": "bot",
+          "body": "¿Pudiste descargar tus reportes?",
+          "created_at": "2026-02-13T21:41:00.000Z"
+        },
+        {
+          "author_type": "user",
+          "body": "Necesito más ayuda",
+          "created_at": "2026-02-18T10:58:49.000Z"
+        },
+        {
+          "author_type": "bot",
+          "body": "Contanos, ¿Cómo te podemos ayudar?",
+          "created_at": "2026-02-18T10:58:50.000Z"
+        },
+        {
+          "author_type": "user",
+          "body": "para hacer las retenciones en los pagos, Colppy como actualiza el padron?",
+          "created_at": "2026-02-18T10:59:21.000Z"
+        },
+        {
+          "author_type": "bot",
+          "body": "Colppy consulta automáticamente los padrones oficiales de ARBA y AGIP al momento de hacer el cálculo de retenciones. Cuando generas una orden de pago y seleccionas \"Retenciones IIBB\", nuestro sistema se conecta directamente con el padrón correspondiente (ARBA para Buenos Aires o AGIP para CABA) usando el CUIT del proveedor para obtener la alícuota vigente. Importante: Si tenés atenuaciones o exenciones de alícuotas, esta información no se actualiza automáticamente en el padrón, por lo que tendrías que ajustar el monto manualmente desde la orden de pago. Para usar esta función, necesitas tener habilitado el cálculo automático en Configuración > Datos Impositivos y seleccionar las jurisdicciones correspondientes. Sources: Cálculo de retención de impuesto a los lIBB - provincia de Buenos Aires (ARBA) Calculo automático de retención de AGIP Datos Impositivos",
+          "created_at": "2026-02-18T10:59:39.000Z"
+        },
+        {
+          "author_type": "bot",
+          "body": "¿Es lo que buscabas?",
+          "created_at": "2026-02-18T10:59:40.000Z"
+        },
+        {
+          "author_type": "bot",
+          "body": "Si necesitas más ayuda con la configuración de retenciones o cualquier otro tema, estoy aquí para asistirte. ¿Podrías contarme más sobre lo que estás intentando resolver o entender?",
+          "created_at": "2026-02-18T11:03:42.000Z"
+        }
+      ]
+    },
+    {
+      "conversation_id": "215473092810498",
+      "created_at": "2026-02-13T15:43:16.000Z",
+      "state": "closed",
+      "contact_email": "mariamdf2021@gmail.com",
+      "contact_es_contador": false,
+      "contact_rol_wizard": null,
+      "tags": [
+        "Chat-Bot",
+        "Mod Cli-Factura de venta-Cuenta Corriente",
+        "Mod Cli-Importación de facturas de venta modelo nuevo"
+      ],
+      "parts": [
+        {
+          "author_type": "user",
+          "body": "Hacer una consulta",
+          "created_at": "2026-02-13T15:43:16.000Z"
+        },
+        {
+          "author_type": "bot",
+          "body": "¿Desde qué empresa estás realizando la consulta?",
+          "created_at": "2026-02-13T15:43:18.000Z"
+        },
+        {
+          "author_type": "bot",
+          "body": "Por favor, elegí el módulo sobre el cual queres realizar la consulta.",
+          "created_at": "2026-02-13T15:43:33.000Z"
+        },
+        {
+          "author_type": "user",
+          "body": "Clientes",
+          "created_at": "2026-02-13T15:43:52.000Z"
+        },
+        {
+          "author_type": "bot",
+          "body": "¿En que te puedo ayudar?",
+          "created_at": "2026-02-13T15:43:53.000Z"
+        },
+        {
+          "author_type": "user",
+          "body": "Tengo un problema, estaba facturando y me salto esto",
+          "created_at": "2026-02-13T15:45:16.000Z"
+        },
+        {
+          "author_type": "user",
+          "body": "Agregar una factura",
+          "created_at": "2026-02-13T15:45:30.000Z"
+        },
+        {
+          "author_type": "bot",
+          "body": "En Colppy tenes dos opciones para cargar tus facturas: ​ Agregar factura manual Debes ingresar a Clientes > Gestión de clientes > elegir el cliente con un clic > Agregar factura Te explicamos como hacerlo en este link 👈 ​ Importar Facturas desde Excel Podes realizar dos tipos de importaciones desde Clientes > Gestión de clientes > Importar > Facturas (modelo nuevo) ​ -Mis comprobantes emitidos desde AFIP [App: Article Inserter] -Emitir masivamente facturas a clientes ​ [App: Article Inserter]",
+          "created_at": "2026-02-13T15:45:31.000Z"
+        },
+        {
+          "author_type": "bot",
+          "body": "¿Pudiste agregar tus facturas?",
+          "created_at": "2026-02-13T15:45:32.000Z"
+        },
+        {
+          "author_type": "user",
+          "body": "Necesito más ayuda",
+          "created_at": "2026-02-13T16:13:25.000Z"
+        },
+        {
+          "author_type": "bot",
+          "body": "Contanos, ¿Cómo te podemos ayudar?",
+          "created_at": "2026-02-13T16:13:25.000Z"
+        },
+        {
+          "author_type": "user",
+          "body": "esto me aparece cuando quiero facturar",
+          "created_at": "2026-02-13T16:13:53.000Z"
+        },
+        {
+          "author_type": "bot",
+          "body": "Veo que te aparece un error interno del sistema al intentar facturar. Este tipo de error suele estar relacionado con problemas de conexión con AFIP. Cuando esto pasa, nuestro sistema guarda la factura en estado \"En Proceso\" y hace reintentos automáticos para emitirla. Si AFIP la procesa correctamente, le asigna el número correspondiente, y si no, se elimina. Te recomiendo: Esperar un poco y verificar si la factura se emitió correctamente Si después de 2 horas el comprobante no se completó, escribinos de nuevo También podés intentar generar la factura desde el modo incógnito de tu navegador Si el problema persiste después de estos pasos, podés hablar con nuestro equipo para que te ayudemos.",
+          "created_at": "2026-02-13T16:14:10.000Z"
+        },
+        {
+          "author_type": "bot",
+          "body": "¿Es lo que buscabas?",
+          "created_at": "2026-02-13T16:14:11.000Z"
+        },
+        {
+          "author_type": "user",
+          "body": "okey gracias",
+          "created_at": "2026-02-13T16:15:03.000Z"
+        },
+        {
+          "author_type": "bot",
+          "body": "Me alegra saber que la información fue útil. Quedo a tu disposición para cualquier otra consulta que tengas.",
+          "created_at": "2026-02-13T16:15:08.000Z"
+        },
+        {
+          "author_type": "bot",
+          "body": "¿Qué tal estuvo tu conversación con Colppy?",
+          "created_at": "2026-02-13T16:15:15.000Z"
+        },
+        {
+          "author_type": "bot",
+          "body": "[Conversation Rating Request]",
+          "created_at": "2026-02-13T16:15:15.000Z"
+        }
+      ]
+    }
+  ]
+}

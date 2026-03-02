@@ -1,0 +1,8 @@
+{
+  "name": "colppy-revops",
+  "version": "1.0.0",
+  "description": "Revenue Operations toolkit for Colppy: Colppy-HubSpot billing reconciliation, first payments analysis, facturacion matching, and deal pipeline verification.",
+  "author": {
+    "name": "Colppy"
+  }
+}

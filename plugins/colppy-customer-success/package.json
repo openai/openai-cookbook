@@ -1,0 +1,15 @@
+{
+  "name": "colppy-customer-success",
+  "version": "1.0.0",
+  "description": "Customer Success toolkit for Colppy — Intercom research, onboarding classification, LLM feedback loops.",
+  "type": "module",
+  "scripts": {
+    "scan": "node scripts/local_scan.mjs",
+    "classify": "node scripts/llm_classify.mjs",
+    "suggest": "node scripts/suggest_keyword_changes.mjs"
+  },
+  "license": "ISC",
+  "dependencies": {
+    "openai": "^6.25.0"
+  }
+}

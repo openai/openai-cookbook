@@ -24,7 +24,7 @@ from pathlib import Path
 
 REPO_ROOT = Path(__file__).resolve().parents[3]
 DEFAULT_DB = REPO_ROOT / "tools/data/colppy_export.db"
-DEFAULT_OUTPUT = REPO_ROOT / "plugins/colppy-ceo-assistant/docs/colppy_first_payments_snapshot.json"
+DEFAULT_OUTPUT = REPO_ROOT / "plugins/colppy-revops/docs/colppy_first_payments_snapshot.json"
 EXCLUDE_CUITS = {"12345678911", "12345678901", "00000000000"}
 
 

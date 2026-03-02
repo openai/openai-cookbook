@@ -23,7 +23,7 @@ sys.path.insert(0, str(REPO_ROOT))
 
 DEFAULT_COLPPY_DB = REPO_ROOT / "tools/data/colppy_export.db"
 DEFAULT_HUBSPOT_DB = REPO_ROOT / "tools/data/facturacion_hubspot.db"
-DEFAULT_OUTPUT = REPO_ROOT / "plugins/colppy-ceo-assistant/docs/colppy_hubspot_reconciliation_snapshot.json"
+DEFAULT_OUTPUT = REPO_ROOT / "plugins/colppy-revops/docs/colppy_hubspot_reconciliation_snapshot.json"
 
 
 def main() -> int:

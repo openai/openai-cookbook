@@ -3,6 +3,16 @@
  * Provides: retry logic, conversation fetching, text extraction, CSV conversion.
  */
 
+function toUnixBoundary(dateStr, endOfDay = false) {
+  if (!dateStr) return null;
+  const iso = `${dateStr}${endOfDay ? 'T23:59:59Z' : 'T00:00:00Z'}`;
+  const ms = Date.parse(iso);
+  if (Number.isNaN(ms)) {
+    throw new Error(`Invalid date: ${dateStr}`);
+  }
+  return Math.floor(ms / 1000);
+}
+
 /**
  * Retry wrapper with exponential backoff and 429 rate-limit handling.
  * @param {Function} fn - async function to execute
@@ -38,15 +48,17 @@ export async function retryableRequest(fn, maxRetries = 3, delay = 750) {
  * @param {string} toDate - YYYY-MM-DD
  * @param {number|null} limit - max IDs to return (null = all)
  * @param {string|null} state - optional: 'open', 'closed', 'snoozed'
+ * @param {string|null} teamAssigneeId - optional: team inbox ID (e.g. 2334166 for "Primeros 90 días")
  */
-export async function fetchConversationIds(intercomApi, fromDate, toDate, limit = null, state = null) {
-  const fromTimestamp = Math.floor(new Date(fromDate).getTime() / 1000);
-  const toTimestamp = Math.floor(new Date(toDate).getTime() / 1000);
+export async function fetchConversationIds(intercomApi, fromDate, toDate, limit = null, state = null, teamAssigneeId = null) {
+  const fromTimestamp = toUnixBoundary(fromDate, false);
+  const toTimestamp = toUnixBoundary(toDate, true);
   const queryValues = [
     { field: 'created_at', operator: '>=', value: fromTimestamp },
     { field: 'created_at', operator: '<=', value: toTimestamp },
   ];
   if (state) queryValues.push({ field: 'state', operator: '=', value: state });
+  if (teamAssigneeId) queryValues.push({ field: 'team_assignee_id', operator: '=', value: String(teamAssigneeId) });
 
   const allIds = [];
   let hasMore = true;
@@ -91,6 +103,24 @@ export async function getConversationDetails(intercomApi, conversationId) {
     const response = await intercomApi.get(`/conversations/${conversationId}`);
     return response.data;
   });
+}
+
+/**
+ * Fetch contact details by ID. Returns custom_attributes (e.g. es_contador from HubSpot sync).
+ * Intercom user/contact level is synced with HubSpot contact level.
+ * @param {object} intercomApi - axios instance
+ * @param {string} contactId - Intercom contact/lead ID
+ */
+export async function getContactDetails(intercomApi, contactId) {
+  if (!contactId) return null;
+  try {
+    const response = await retryableRequest(async () => {
+      return await intercomApi.get(`/contacts/${contactId}`);
+    });
+    return response.data;
+  } catch (e) {
+    return null;
+  }
 }
 
 /**
@@ -224,22 +254,25 @@ export function groupBy(array, property) {
 }
 
 /**
- * Build the Intercom Search API query body for date range + state filters.
- * @param {object} opts - { from_date, to_date, state, per_page }
+ * Build the Intercom Search API query body for date range + state + team filters.
+ * @param {object} opts - { from_date, to_date, state, team_assignee_id, per_page }
  */
-export function buildSearchQuery({ from_date, to_date, state, per_page = 150 }) {
+export function buildSearchQuery({ from_date, to_date, state, team_assignee_id, per_page = 150 }) {
   const q = { query: { operator: 'AND', value: [] }, pagination: { per_page } };
   if (from_date) {
-    q.query.value.push({ field: 'created_at', operator: '>=', value: Math.floor(new Date(from_date).getTime() / 1000) });
+    q.query.value.push({ field: 'created_at', operator: '>=', value: toUnixBoundary(from_date, false) });
   }
   if (to_date) {
-    q.query.value.push({ field: 'created_at', operator: '<=', value: Math.floor(new Date(to_date).getTime() / 1000) });
+    q.query.value.push({ field: 'created_at', operator: '<=', value: toUnixBoundary(to_date, true) });
   }
   if (state) {
     q.query.value.push({ field: 'state', operator: '=', value: state });
   }
+  if (team_assignee_id) {
+    q.query.value.push({ field: 'team_assignee_id', operator: '=', value: String(team_assignee_id) });
+  }
   if (q.query.value.length === 0 && to_date) {
-    q.query.value.push({ field: 'created_at', operator: '<=', value: Math.floor(new Date(to_date).getTime() / 1000) });
+    q.query.value.push({ field: 'created_at', operator: '<=', value: toUnixBoundary(to_date, true) });
   }
   return q;
 }

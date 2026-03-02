@@ -77,7 +77,7 @@ python tools/scripts/colppy/reconcile_colppy_hubspot_db_only.py --year 2026 --mo
 
 # 3a. Post report to Slack DM (optional)
 # Requires .env: SLACK_BOT_TOKEN (xoxb-...), SLACK_DM_USER_ID (e.g. U01234567)
-# Get Slack user ID: Profile > Copy member ID. See plugins/colppy-ceo-assistant/docs/SLACKUSER_MENTION_MAP_COMPLETE_GUIDE.md
+# Get Slack user ID: Profile > Copy member ID. See plugins/colppy-revops/docs/SLACKUSER_MENTION_MAP_COMPLETE_GUIDE.md
 python tools/scripts/colppy/reconcile_colppy_hubspot_db_only.py --year 2026 --month 2 --post-slack-dm
 # Or override user: --post-slack-dm --slack-user-id U01234567
 

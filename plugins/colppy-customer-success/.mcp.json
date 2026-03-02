@@ -1,0 +1,12 @@
+{
+  "mcpServers": {
+    "intercom-research": {
+      "command": "node",
+      "args": ["mcp/mcp-intercom-server.js"],
+      "env": {
+        "INTERCOM_ACCESS_TOKEN": "${INTERCOM_ACCESS_TOKEN}"
+      }
+    }
+  },
+  "_comment": "intercom-research: export, scan_full_text, scan_customer_feedback, get_conversation_feedback, analyze_onboarding. Set INTERCOM_ACCESS_TOKEN in Cursor MCP settings or .env."
+}

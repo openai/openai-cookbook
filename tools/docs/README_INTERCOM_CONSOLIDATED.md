@@ -70,11 +70,12 @@ graph TB
 ### **🛠️ Available MCP Tools**
 
 #### 1. `export_intercom_conversations`
-Export Intercom conversations from a specific date range to CSV or JSON format.
+Export Intercom conversations from a date range to CSV or JSON format.
 
 **Parameters:**
 - `from_date` (required): Start date in YYYY-MM-DD format
 - `to_date` (optional): End date in YYYY-MM-DD format (defaults to today)
+- `team_assignee_id` (optional): Team inbox ID (e.g. 2334166 = Primeros 90 días). Use for cycle-time focus.
 - `output_format` (optional): "csv" or "json" (default: "csv")
 - `limit` (optional): Maximum number of conversations to export
 - `include_message_content` (optional): Include full message content (default: true)
@@ -96,6 +97,7 @@ Get statistics about conversations in a date range without full export.
 **Parameters:**
 - `from_date` (required): Start date in YYYY-MM-DD format
 - `to_date` (optional): End date in YYYY-MM-DD format (defaults to today)
+- `team_assignee_id` (optional): Team inbox ID (e.g. 2334166 = Primeros 90 días)
 
 #### 3. `search_intercom_conversations`
 Search for specific conversations based on criteria.
@@ -105,9 +107,21 @@ Search for specific conversations based on criteria.
 - `from_date` (optional): Start date in YYYY-MM-DD format
 - `to_date` (optional): End date in YYYY-MM-DD format
 - `state` (optional): Conversation state - "open", "closed", or "snoozed"
+- `team_assignee_id` (optional): Team inbox ID (e.g. 2334166 = Primeros 90 días)
 - `limit` (optional): Maximum number of results (default: 50, max: 150)
 
-#### 4. `scan_full_text` — Result limits
+#### 4. `analyze_onboarding_first_invoice`
+Analyze onboarding conversations (Primeros 90 días) for first-time-to-value (first invoice) questions, filtered by user type.
+
+**Parameters:**
+- `cache_path` (required): Path to Intercom cache JSON (with contact_email). E.g. `plugins/colppy-revops/skills/intercom-developer-api-research/cache/conversations_2026-02-01_2026-02-28_team2334166.json`
+- `user_type` (optional): `accountant` (es_contador=true), `smb` (es_contador=false, business owners), or `all`. Default: `accountant`
+
+**Prerequisites:** Run `export_cache_for_local_scan.mjs --team 2334166` first to create the cache.
+
+**User type source:** Intercom user/contact level is synced with HubSpot contact level. The export fetches `es_contador` and `rol_wizard` from Intercom contact `custom_attributes` (no HubSpot API call). If the cache lacks these fields, the analysis falls back to HubSpot. Ensure your HubSpot–Intercom sync pushes `es_contador` to Intercom custom attributes for consistency.
+
+#### 5. `scan_full_text` — Result limits
 
 **`scan_full_text` returns all matches** — no cap. The cost is in fetching conversations; once fetched, all matches are returned. The `limit` parameter is deprecated and no longer used.
 

@@ -1,0 +1,10 @@
+{
+  "_comment": "Known Intercom team inbox IDs for cycle-time filtering. Get ID from Intercom URL: inbox/team/TEAM_ID",
+  "team_inboxes": [
+    {
+      "id": "2334166",
+      "name": "Primeros 90 días",
+      "purpose": "New customer onboarding, first 90 days lifecycle"
+    }
+  ]
+}

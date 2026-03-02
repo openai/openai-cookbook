@@ -1,0 +1,635 @@
+{
+  "from_date": "2026-02-26",
+  "to_date": "2026-02-28",
+  "state": null,
+  "team_assignee_id": "2334166",
+  "topic": "Primeros 90 días",
+  "saved_at": "2026-03-01T13:15:18.310Z",
+  "conversations": [
+    {
+      "conversation_id": "215473259892036",
+      "created_at": "2026-02-26T13:06:55.000Z",
+      "state": "open",
+      "tags": [
+        "Chat-Bot",
+        "Mod Cont-Nuevo plan de cuentas"
+      ],
+      "parts": [
+        {
+          "author_type": "user",
+          "body": "Quiero configurar mi empresa",
+          "created_at": "2026-02-26T13:06:55.000Z"
+        },
+        {
+          "author_type": "bot",
+          "body": "¡Bienvenido a Colppy! 🎉 Para empezar a configurar tu empresa, debés realizar los siguientes pasos: Verifica los datos registrados de tu empresa en Configuración > Datos Generales Plan de cuentas y su configuración. Configuración de factura electrónica. Invitar a usuarios. En caso de dudas, aquí te dejamos el instructivo con más información: [App: Article Inserter]",
+          "created_at": "2026-02-26T13:06:57.000Z"
+        },
+        {
+          "author_type": "user",
+          "body": "Definir el plan de cuentas",
+          "created_at": "2026-02-26T13:07:08.000Z"
+        },
+        {
+          "author_type": "bot",
+          "body": "Desde Colppy tenes dos opciones para trabajar tu plan de cuenta: El sistema ya tiene configurado un plan de cuentas genérico, diseñado por nuestro grupo de contadores para que puedas utilizar la plataforma. Lo podes ver en el módulo Contabilidad y si necesitas modificarlo para que se ajuste a las necesidades de tu negocio, te explicamos como hacerlo en este link 👈 ​ Si tenés tu propio plan de cuentas, el sistema te permite importarlo. Te explicamos como hacerlo en este link 👈",
+          "created_at": "2026-02-26T13:07:08.000Z"
+        },
+        {
+          "author_type": "bot",
+          "body": "¿Pudiste configurar el plan de cuentas?",
+          "created_at": "2026-02-26T13:07:09.000Z"
+        },
+        {
+          "author_type": "user",
+          "body": "Necesito más ayuda",
+          "created_at": "2026-02-26T13:07:14.000Z"
+        },
+        {
+          "author_type": "bot",
+          "body": "Contanos, ¿Cómo te podemos ayudar?",
+          "created_at": "2026-02-26T13:07:15.000Z"
+        },
+        {
+          "author_type": "user",
+          "body": "Buen dia, necesito que suban este plan de cuentas por favor",
+          "created_at": "2026-02-26T13:08:29.000Z"
+        },
+        {
+          "author_type": "bot",
+          "body": "La importación del plan de cuentas la tenés que hacer vos mismo desde Colppy. El proceso es: Ir a Contabilidad > Nuevo plan de cuentas Descargar el archivo modelo y completarlo con tus datos Guardarlo en formato CSV delimitado por comas Adjuntarlo en la misma sección Algunas cosas importantes antes de importar: No usar caracteres especiales No dejar filas en blanco No repetir nombres ni códigos de cuentas Pegar la info como solo valores Una vez importado, el proceso demora hasta 48hs hábiles y te avisan por email cuando esté listo. Source: Plan de cuentas",
+          "created_at": "2026-02-26T13:08:48.000Z"
+        },
+        {
+          "author_type": "bot",
+          "body": "¿Es lo que buscabas?",
+          "created_at": "2026-02-26T13:08:49.000Z"
+        },
+        {
+          "author_type": "user",
+          "body": "no",
+          "created_at": "2026-02-26T13:08:56.000Z"
+        },
+        {
+          "author_type": "bot",
+          "body": "Lamento que la información proporcionada no haya sido útil. Por favor, reformula tu consulta o dime cómo prefieres que te asistamos para configurar tu plan de cuentas.",
+          "created_at": "2026-02-26T13:09:01.000Z"
+        },
+        {
+          "author_type": "user",
+          "body": "necesito hablar con un agente",
+          "created_at": "2026-02-26T13:09:02.000Z"
+        },
+        {
+          "author_type": "bot",
+          "body": "Claro, te voy a pasar con alguien de nuestro equipo. Mientras tanto, ¿podrías contarme más detalles sobre tu consulta para que puedan ayudarte mejor?",
+          "created_at": "2026-02-26T13:09:08.000Z"
+        },
+        {
+          "author_type": "user",
+          "body": "aguardo a la persona",
+          "created_at": "2026-02-26T13:09:18.000Z"
+        },
+        {
+          "author_type": "admin",
+          "body": "Hola Martin, ¿Cómo estas? ¿En que te puedo ayudar?",
+          "created_at": "2026-02-26T13:09:36.000Z"
+        },
+        {
+          "author_type": "user",
+          "body": "hola como estas? anteriormente tuve muchos problemas y dias de demora en IMPORTAR CLIENTES",
+          "created_at": "2026-02-26T13:10:07.000Z"
+        },
+        {
+          "author_type": "user",
+          "body": "me podrias subir el PLAN DE CUENTAS por favor",
+          "created_at": "2026-02-26T13:10:20.000Z"
+        },
+        {
+          "author_type": "user",
+          "body": "no tengo apuro",
+          "created_at": "2026-02-26T13:15:56.000Z"
+        },
+        {
+          "author_type": "user",
+          "body": "que en unos dias lo hagan bienvenido",
+          "created_at": "2026-02-26T13:16:09.000Z"
+        },
+        {
+          "author_type": "admin",
+          "body": "Si Martin, yo te importo el plan de cuentas, pero necesito que por favor lo pasen al archivo modelo de Colppy, siguiendo dicho formato. Te dejo el LINK del articulo que te explica como realizarlo.",
+          "created_at": "2026-02-26T13:16:10.000Z"
+        }
+      ]
+    },
+    {
+      "conversation_id": "215473275960140",
+      "created_at": "2026-02-27T13:01:55.000Z",
+      "state": "open",
+      "tags": [
+        "Memoria cache",
+        "Chat-Bot"
+      ],
+      "parts": [
+        {
+          "author_type": "user",
+          "body": "Hacer una consulta",
+          "created_at": "2026-02-27T13:01:55.000Z"
+        },
+        {
+          "author_type": "bot",
+          "body": "¿Desde qué empresa estás realizando la consulta?",
+          "created_at": "2026-02-27T13:01:57.000Z"
+        },
+        {
+          "author_type": "bot",
+          "body": "Por favor, elegí el módulo sobre el cual queres realizar la consulta.",
+          "created_at": "2026-02-27T13:02:07.000Z"
+        },
+        {
+          "author_type": "user",
+          "body": "API",
+          "created_at": "2026-02-27T13:02:24.000Z"
+        },
+        {
+          "author_type": "bot",
+          "body": "Contanos, ¿Cómo te podemos ayudar?",
+          "created_at": "2026-02-27T13:02:24.000Z"
+        },
+        {
+          "author_type": "user",
+          "body": "CAMBIO DE LOGO PARA FACTURA ELECTRONICA",
+          "created_at": "2026-02-27T13:02:37.000Z"
+        },
+        {
+          "author_type": "bot",
+          "body": "Para cambiar el logo que aparece en las facturas electrónicas, tenés que ir al módulo de Configuración y luego a la sección \"Datos Generales\" . En la sección de Logo: Seleccioná el archivo (debe ser formato .jpg o .gif ) Ingresá el ancho y altura deseados ( tamaño máximo: 20mm de alto x 50mm de ancho ) Hacé clic en \"Guardar Logo\" Importante : Este logo aparecerá impreso en el PDF de Facturas Electrónicas, Recibos, Pagos, Remitos X y Presupuestos a clientes. Sources: Datos generales Módulo de configuración",
+          "created_at": "2026-02-27T13:04:51.000Z"
+        },
+        {
+          "author_type": "bot",
+          "body": "¿Eso te ayuda con el cambio de logo?",
+          "created_at": "2026-02-27T13:04:51.000Z"
+        },
+        {
+          "author_type": "user",
+          "body": "AYUDA PORQUE YA SEGUI ESOS PASOS Y NO ME CAMBIA EL LOGO",
+          "created_at": "2026-02-27T13:05:05.000Z"
+        },
+        {
+          "author_type": "bot",
+          "body": "Entiendo que seguiste los pasos pero el logo no se actualiza. Para ayudarte mejor, necesito que me compartas: ¿Qué mensaje exacto aparece cuando hacés clic en \"Guardar Logo\"? ¿El archivo que estás subiendo es formato .jpg o .gif? ¿Verificaste que el tamaño sea máximo 20mm de alto x 50mm de ancho? ¿En qué tipo de comprobante esperás ver el cambio? (Facturas Electrónicas, Recibos, etc.) Con esta información podremos identificar qué está causando el problema. Source: Datos generales",
+          "created_at": "2026-02-27T13:05:19.000Z"
+        },
+        {
+          "author_type": "user",
+          "body": "FACTURAS ELECTRONICAS",
+          "created_at": "2026-02-27T13:05:43.000Z"
+        },
+        {
+          "author_type": "bot",
+          "body": "Vaya, algo salió mal. ¿Podrías repetir la pregunta?",
+          "created_at": "2026-02-27T13:05:45.000Z"
+        },
+        {
+          "author_type": "user",
+          "body": "ERROR FALTA ACTUALIZAR EL LOGO",
+          "created_at": "2026-02-27T13:06:14.000Z"
+        },
+        {
+          "author_type": "bot",
+          "body": "Para ayudarte a resolver el problema con el logo que no se actualiza, necesito que me compartas algunos detalles específicos: ¿Qué mensaje exacto aparece cuando hacés clic en \"Guardar Logo\"? También verificá estos puntos: • Formato del archivo : Debe ser .jpg o .gif únicamente • Tamaño : Máximo 20mm de alto x 50mm de ancho • Proceso : Después de seleccionar el archivo, ingresá las dimensiones y hacé clic en \"Guardar Logo\" Una vez que tengas esta información, podremos identificar exactamente qué está causando que el logo no se actualice en tus facturas electrónicas. ¿Podés compartir el mensaje de error específico que aparece? Source: Datos generales",
+          "created_at": "2026-02-27T13:06:28.000Z"
+        },
+        {
+          "author_type": "user",
+          "body": "NO HAY MENSAJE DE ERROR",
+          "created_at": "2026-02-27T13:06:40.000Z"
+        },
+        {
+          "author_type": "user",
+          "body": "QUIERO HABLAR CON ALGUIEN DEL EQUIPO",
+          "created_at": "2026-02-27T13:07:23.000Z"
+        },
+        {
+          "author_type": "bot",
+          "body": "Claro, te voy a pasar con alguien de nuestro equipo. Mientras tanto, ¿podrías contarme más detalles sobre el problema con el logo para que puedan ayudarte más rápido?",
+          "created_at": "2026-02-27T13:07:29.000Z"
+        },
+        {
+          "author_type": "user",
+          "body": "YA VERIFIQUE TODOS LOS PUNTOS",
+          "created_at": "2026-02-27T13:07:46.000Z"
+        },
+        {
+          "author_type": "user",
+          "body": "si intente hacer nuevas facturas y sigue el mismo logo anterior",
+          "created_at": "2026-02-27T13:13:09.000Z"
+        },
+        {
+          "author_type": "admin",
+          "body": "Hola Maira, ¿Cómo estas? ¿El logo que tiene que salir es es siguiente? ​",
+          "created_at": "2026-02-27T13:32:23.000Z"
+        },
+        {
+          "author_type": "user",
+          "body": "si",
+          "created_at": "2026-02-27T13:34:13.000Z"
+        },
+        {
+          "author_type": "user",
+          "body": "yo aun veo el anterior",
+          "created_at": "2026-02-27T13:34:44.000Z"
+        },
+        {
+          "author_type": "admin",
+          "body": "Maira, te pido que ingreses a la plataforma desde una ventana de incognito y me digas si ahí ves el logo que tiene que estar.",
+          "created_at": "2026-02-27T13:36:27.000Z"
+        },
+        {
+          "author_type": "user",
+          "body": "desde una ventana de incognito?",
+          "created_at": "2026-02-27T13:41:57.000Z"
+        },
+        {
+          "author_type": "user",
+          "body": "ahi ingrese desde otro usuario y lo sigo viendo igual",
+          "created_at": "2026-02-27T13:43:46.000Z"
+        },
+        {
+          "author_type": "admin",
+          "body": "Si, ingresas a google>los 3 puntitos>nueva ventana de incognito>ahí ingresas a la plataforma con tus credenciales",
+          "created_at": "2026-02-27T13:46:21.000Z"
+        },
+        {
+          "author_type": "user",
+          "body": "es verdad desde Incognito si, es ev el cambio",
+          "created_at": "2026-02-27T13:56:15.000Z"
+        },
+        {
+          "author_type": "user",
+          "body": "desde esa funcion de incognito si",
+          "created_at": "2026-02-27T13:56:36.000Z"
+        },
+        {
+          "author_type": "user",
+          "body": "entonces como se solucionaria?",
+          "created_at": "2026-02-27T14:00:42.000Z"
+        },
+        {
+          "author_type": "admin",
+          "body": "Perfecto Mai, con esto comprobamos que el error no es de la plataforma. Lo que tenes que hacer para poder abrirlo en google común es borrar cookies y cache, con eso ya lo solucionas.",
+          "created_at": "2026-02-27T14:04:54.000Z"
+        },
+        {
+          "author_type": "user",
+          "body": "y sabrias donde se puede eliminar el cache?",
+          "created_at": "2026-02-27T14:11:53.000Z"
+        },
+        {
+          "author_type": "admin",
+          "body": "Si usas el navegador de Chrome, para poder hacerlo, debes hacer clic en los tres puntos que están en el lado superior derecho del navegador, se dirigen a CONFIGURACIÓN, seleccionas la opción de PRIVACIDAD Y SEGURIDAD, haces clic sobre BORRAR DATOS DE NAVEGACIÓN, tildan la opción de \"caché y otros datos de navegación\" y BORRAR DATOS. Muy importante poner \"Desde Siempre\" Les dejo la siguiente captura de pantalla a modo de ejemplo:",
+          "created_at": "2026-02-27T14:15:12.000Z"
+        },
+        {
+          "author_type": "user",
+          "body": "ok ya se pudo muchas gracias",
+          "created_at": "2026-02-27T14:16:05.000Z"
+        },
+        {
+          "author_type": "user",
+          "body": "te consulto como se pueden cargar los valores a depositar?",
+          "created_at": "2026-02-27T14:16:40.000Z"
+        },
+        {
+          "author_type": "user",
+          "body": "osea tengo un listado de cheques fisicos y echeqs como puedo dejarlos todos en valores a depositar y en todo caso cuando se cobren aplicarlo a cada cliente?",
+          "created_at": "2026-02-27T14:17:19.000Z"
+        },
+        {
+          "author_type": "user",
+          "body": "esta esa opcion?",
+          "created_at": "2026-02-27T14:17:24.000Z"
+        },
+        {
+          "author_type": "admin",
+          "body": "Mai, ¿vos queres cargar los cheques en la plataforma si asociarlo a ninguna factura y en la fecha de cobro del cheque aplicarlo a la factura ya cargada?",
+          "created_at": "2026-02-27T14:22:02.000Z"
+        },
+        {
+          "author_type": "user",
+          "body": "tengo muchos cheques fisicos y echeqs",
+          "created_at": "2026-02-27T14:33:36.000Z"
+        },
+        {
+          "author_type": "user",
+          "body": "quiero poder cargarlos en la plataforma para que me de un proyectado aca de los cheques a cobrar",
+          "created_at": "2026-02-27T14:33:53.000Z"
+        },
+        {
+          "author_type": "user",
+          "body": "y tambien asi hacer control de los cheques de forma diaria y controlar los depositos",
+          "created_at": "2026-02-27T14:34:19.000Z"
+        },
+        {
+          "author_type": "user",
+          "body": "es posible hacer eso? y controlando los depositos aplicar los cobrados a los clientes que corresponde para ir bajando asi las facturas el saldo a cobrar",
+          "created_at": "2026-02-27T14:34:46.000Z"
+        },
+        {
+          "author_type": "user",
+          "body": "se puede Camila hacer la imagen mas grande del logo?",
+          "created_at": "2026-02-27T14:48:45.000Z"
+        },
+        {
+          "author_type": "user",
+          "body": "Nos queda medio feo super chiquito en la factura",
+          "created_at": "2026-02-27T14:49:09.000Z"
+        },
+        {
+          "author_type": "admin",
+          "body": "Si Mai, se puede hacer lo siguiente: 1. Ingresas al cliente y cargas un \"cobro a cuenta\" por el valor de ese cheque: 2. El recibo te queda en Facturas adeudadas en la cuenta del cliente 3. Cargas la factura del cliente como cuenta corriente y la misma te va a queda en facturas adeudadas de cliente: 4. Ingresas al recibo y acreditas el recibo a dicha factura: 5. Te queda en la cuenta del cliente el recibo asociado a la factura Con respecto a lo del logo, el tamaño que acepta la plataforma es máximo de 20mm de alto x 50 mm de ancho. Pueden modificarlo desde acá el tamaño:",
+          "created_at": "2026-02-27T17:41:32.000Z"
+        },
+        {
+          "author_type": "user",
+          "body": "voy a intentar Camila muchas gracias, tengo muchos clientes que pagan con cheques a cobrar por echeqs de aca a 12 meses y nose aun como hacer con la cuenta si se pueden ir identificando los cobros desde el banco",
+          "created_at": "2026-02-27T17:58:45.000Z"
+        },
+        {
+          "author_type": "admin",
+          "body": "Mai, vos podes ir haciendo un seguimiento de cheques desde: 1. Tesorería>reportes 2. Vas a poder depositar esos cheques cuando corresponda: LINK del articulo que explica como realizarlo 3. Vas a poder pagarle a tus proveedores con los cheques que tengas en cartera: LINK del articulo que explica como realizarlo ​",
+          "created_at": "2026-02-27T18:07:24.000Z"
+        },
+        {
+          "author_type": "user",
+          "body": "sobre los cheques ahi hice la prueba con un caso pero me lo resta del acumulado",
+          "created_at": "2026-02-27T18:43:47.000Z"
+        },
+        {
+          "author_type": "user",
+          "body": "el valor total de la factura es de 45 millones ya se cobro una parte resta aun 17 millones que esta en la linea de arriba y despues son todos cheques electronicos de 2.9 millon cada uno a cobrar de aca a septiembre",
+          "created_at": "2026-02-27T18:45:57.000Z"
+        },
+        {
+          "author_type": "user",
+          "body": "a febrero me tiene que mostrar los 17 millones adeudados a hoy no restarlo del acumulado",
+          "created_at": "2026-02-27T18:46:19.000Z"
+        },
+        {
+          "author_type": "admin",
+          "body": "Clara Mai, vos de esta manera estas ingresando ese dinero a cuenta del recibo, por ende se va a descontar, pero luego vos vas a \"relacionar\" ese recibo con la factura que corresponda a ese monto.",
+          "created_at": "2026-02-27T19:12:47.000Z"
+        },
+        {
+          "author_type": "user",
+          "body": "y hay una forma de importar todo el listado de cheques y se asignen por cuil?",
+          "created_at": "2026-02-27T19:23:28.000Z"
+        },
+        {
+          "author_type": "admin",
+          "body": "Mai, actualmente, la funcionalidad que mencionas no está disponible en Colppy, pero entendemos lo importante que puede ser para vos por lo cual nos encantaría que las compartas en nuestro portal de sugerencias: https://ideas.colppy.com/ .",
+          "created_at": "2026-02-27T19:29:39.000Z"
+        }
+      ]
+    },
+    {
+      "conversation_id": "215473259914614",
+      "created_at": "2026-02-26T13:08:10.000Z",
+      "state": "closed",
+      "tags": [
+        "Chat-Bot",
+        "Mod Pro-Importación de facturas de Compra",
+        "Mod Cli-Factura Exportación"
+      ],
+      "parts": [
+        {
+          "author_type": "user",
+          "body": "Hacer una consulta",
+          "created_at": "2026-02-26T13:08:10.000Z"
+        },
+        {
+          "author_type": "bot",
+          "body": "¿Desde qué empresa estás realizando la consulta?",
+          "created_at": "2026-02-26T13:08:12.000Z"
+        },
+        {
+          "author_type": "bot",
+          "body": "Por favor, elegí el módulo sobre el cual queres realizar la consulta.",
+          "created_at": "2026-02-26T13:08:18.000Z"
+        },
+        {
+          "author_type": "user",
+          "body": "Proveedores",
+          "created_at": "2026-02-26T13:08:22.000Z"
+        },
+        {
+          "author_type": "bot",
+          "body": "¿En qué te puedo ayudar?",
+          "created_at": "2026-02-26T13:08:23.000Z"
+        },
+        {
+          "author_type": "user",
+          "body": "Agregar una factura",
+          "created_at": "2026-02-26T13:08:27.000Z"
+        },
+        {
+          "author_type": "bot",
+          "body": "En Colppy tenes dos opciones para cargar tus facturas: ​ Agregar factura manual Debes ingresar a Proveedores > Gestión de proveedores > elegir el proveedor con un clic > Agregar factura Te explicamos como hacerlo en este link 👈 ​ Importar Facturas desde Excel Podes realizar dos tipos de importaciones desde Proveedores > Gestión de proveedores > Importar > Facturas Ver el paso a paso en este link ​ -Mis comprobantes emitidos desde AFIP Ver el paso a paso en este link",
+          "created_at": "2026-02-26T13:08:28.000Z"
+        },
+        {
+          "author_type": "bot",
+          "body": "¿Pudimos resolver tu consulta?",
+          "created_at": "2026-02-26T13:08:28.000Z"
+        },
+        {
+          "author_type": "user",
+          "body": "Necesito más ayuda",
+          "created_at": "2026-02-26T13:08:34.000Z"
+        },
+        {
+          "author_type": "bot",
+          "body": "Contanos, ¿Cómo te podemos ayudar?",
+          "created_at": "2026-02-26T13:08:34.000Z"
+        },
+        {
+          "author_type": "user",
+          "body": "para cargar una factura del exterior, como ingreso la misma?",
+          "created_at": "2026-02-26T13:08:50.000Z"
+        },
+        {
+          "author_type": "bot",
+          "body": "Para cargar una factura del exterior, primero necesitas crear el proveedor extranjero: Crear proveedor del exterior: CUIT: dejalo vacío Condición de IVA: Exento Completa razón social, nombre, dirección, ciudad, código postal y país Cargar la factura: Ve a Proveedores > Gestión de proveedores > elegí el proveedor > Agregar factura > Cuenta corriente > Tipo de factura X Completa cada línea con los conceptos por el precio correspondiente gravados a IVA 0% contra la cuenta contable donde se registrarán Se recomienda usar factura tipo X ya que el comprobante del exterior no está disponible en Colppy, por lo que no aparecerá en IVA compras ni en el régimen de información Si tu plan es Full o Enterprise, también podes usar la funcionalidad multimoneda para registrar operaciones en moneda extranjera Sources: ¿Cómo registro un despacho de importación? ¿Cómo cargar un cliente o proveedor extranjero para factura de exportación? Factura de compra cuenta corriente multimoneda",
+          "created_at": "2026-02-26T13:09:13.000Z"
+        },
+        {
+          "author_type": "bot",
+          "body": "¿Es lo que buscabas?",
+          "created_at": "2026-02-26T13:09:13.000Z"
+        },
+        {
+          "author_type": "bot",
+          "body": "Si necesitas más ayuda con la carga de facturas del exterior, estamos aquí para asistirte. ¿Podrías contarme más detalles sobre lo que estás intentando resolver?",
+          "created_at": "2026-02-26T13:13:15.000Z"
+        }
+      ]
+    },
+    {
+      "conversation_id": "215473259504740",
+      "created_at": "2026-02-26T12:37:04.000Z",
+      "state": "closed",
+      "tags": [
+        "Chat-Bot",
+        "Mod Pro-Importación de facturas de Compra"
+      ],
+      "parts": [
+        {
+          "author_type": "user",
+          "body": "Hacer una consulta",
+          "created_at": "2026-02-26T12:37:04.000Z"
+        },
+        {
+          "author_type": "bot",
+          "body": "¿Desde qué empresa estás realizando la consulta?",
+          "created_at": "2026-02-26T12:37:05.000Z"
+        },
+        {
+          "author_type": "bot",
+          "body": "Por favor, elegí el módulo sobre el cual queres realizar la consulta.",
+          "created_at": "2026-02-26T12:37:12.000Z"
+        },
+        {
+          "author_type": "user",
+          "body": "Proveedores",
+          "created_at": "2026-02-26T12:37:19.000Z"
+        },
+        {
+          "author_type": "bot",
+          "body": "¿En qué te puedo ayudar?",
+          "created_at": "2026-02-26T12:37:20.000Z"
+        },
+        {
+          "author_type": "user",
+          "body": "Agregar una factura",
+          "created_at": "2026-02-26T12:37:26.000Z"
+        },
+        {
+          "author_type": "bot",
+          "body": "En Colppy tenes dos opciones para cargar tus facturas: ​ Agregar factura manual Debes ingresar a Proveedores > Gestión de proveedores > elegir el proveedor con un clic > Agregar factura Te explicamos como hacerlo en este link 👈 ​ Importar Facturas desde Excel Podes realizar dos tipos de importaciones desde Proveedores > Gestión de proveedores > Importar > Facturas Ver el paso a paso en este link ​ -Mis comprobantes emitidos desde AFIP Ver el paso a paso en este link",
+          "created_at": "2026-02-26T12:37:27.000Z"
+        },
+        {
+          "author_type": "bot",
+          "body": "¿Pudimos resolver tu consulta?",
+          "created_at": "2026-02-26T12:37:27.000Z"
+        },
+        {
+          "author_type": "user",
+          "body": "Necesito más ayuda",
+          "created_at": "2026-02-26T12:37:31.000Z"
+        },
+        {
+          "author_type": "bot",
+          "body": "Contanos, ¿Cómo te podemos ayudar?",
+          "created_at": "2026-02-26T12:37:32.000Z"
+        },
+        {
+          "author_type": "user",
+          "body": "como cargo las percepciones de ganancias, no veo en datos impositivos la opcion de configurarla",
+          "created_at": "2026-02-26T12:37:51.000Z"
+        },
+        {
+          "author_type": "bot",
+          "body": "Para configurar las percepciones de ganancias, tenés que ir a Configuración > Datos Impositivos y buscar la sección \"Percepciones Sufridas\" . Ahí vas a encontrar las opciones para seleccionar las cuentas donde querés registrar las percepciones sufridas de tus proveedores por los diferentes tributos, incluyendo ganancias. Las cuentas que se van a mostrar son las que estén definidas como Tipo de Cuenta = Deudas Sociales, Deudas Fiscales, o Otros Créditos. Una vez configurado, cuando cargues una factura de compra, vas a poder registrar las percepciones de ganancias haciendo clic en \"Otras retenciones\" e ingresar el importe retenido en el impuesto que corresponda. Recordá hacer clic en \"Guardar\" después de cada cambio. Sources: Datos Impositivos ¿Cómo agregar ítems a los comprobantes de venta y compra? ¿Como registro una liquidación de granos? (liquido-producto)?",
+          "created_at": "2026-02-26T12:38:12.000Z"
+        },
+        {
+          "author_type": "bot",
+          "body": "¿Es lo que buscabas?",
+          "created_at": "2026-02-26T12:38:13.000Z"
+        },
+        {
+          "author_type": "user",
+          "body": "no esta percepcion de ganancias",
+          "created_at": "2026-02-26T12:39:28.000Z"
+        },
+        {
+          "author_type": "bot",
+          "body": "En la sección \"Percepciones Sufridas\" solo aparecen IVA e IIBB porque son las únicas percepciones que están configuradas por defecto. Para las percepciones de ganancias, tenés que registrarlas de otra forma: cuando cargues una factura de compra, hacé clic en \"Otras retenciones\" e ingresá el importe retenido en el impuesto que corresponda. También podés cargar las percepciones de ganancias como un detalle en la factura, eligiendo en la columna \"cuenta\" la cuenta contable que corresponde a esa percepción. Las percepciones de ganancias no tienen un campo específico en \"Percepciones Sufridas\" como IVA e IIBB. Sources: Datos Impositivos ¿Como registro una liquidación de granos? (liquido-producto)?",
+          "created_at": "2026-02-26T12:39:54.000Z"
+        },
+        {
+          "author_type": "bot",
+          "body": "¿Responde eso a tu pregunta?",
+          "created_at": "2026-02-26T12:39:54.000Z"
+        },
+        {
+          "author_type": "user",
+          "body": "no, por que necesito cargar un permiso de importacion como factura y agregar la percepcion de ganancias",
+          "created_at": "2026-02-26T12:42:36.000Z"
+        },
+        {
+          "author_type": "bot",
+          "body": "Para cargar un permiso de importación como factura, tenés que registrarlo como una factura X ya que el comprobante \"Despacho de importación\" no está disponible en Colppy. Vas a Proveedores > seleccionás el proveedor > Agregar factura > Cuenta corriente > Tipo de factura X > completás cada línea con los conceptos correspondientes gravados a IVA 0% contra la cuenta contable donde se registrarán. Para agregar la percepción de ganancias, hacé clic en \"Otras Retenciones\" cuando estés cargando la factura. Ahí vas a poder completar el número de certificado y el importe de la percepción de ganancias. Recordá que al registrarlo como factura X no va a aparecer en el IVA compras ni en el régimen de información, por lo que vas a tener que cargarlo manualmente en esos reportes. Sources: ¿Cómo registro un despacho de importación? ¿Cómo generar una Cobranza?",
+          "created_at": "2026-02-26T12:42:56.000Z"
+        },
+        {
+          "author_type": "bot",
+          "body": "¿Te sirvió esta explicación?",
+          "created_at": "2026-02-26T12:42:56.000Z"
+        },
+        {
+          "author_type": "user",
+          "body": "donde dice otra percepcion?",
+          "created_at": "2026-02-26T12:44:29.000Z"
+        },
+        {
+          "author_type": "bot",
+          "body": "En la pantalla de carga de factura, buscá el botón que dice \"Otras Retenciones\". Cuando hagas clic ahí, se va a abrir una ventana donde podés completar el número de certificado y el importe de la percepción de ganancias. Este botón aparece en la sección de retenciones cuando estás cargando la factura del permiso de importación. Sources: Recibo Cobranza multimoneda - Diferencia tipo de cambio ¿Cómo generar una Cobranza? ¿Como registro una liquidación de granos? (liquido-producto)?",
+          "created_at": "2026-02-26T12:44:45.000Z"
+        },
+        {
+          "author_type": "bot",
+          "body": "¿Es lo que buscabas?",
+          "created_at": "2026-02-26T12:44:45.000Z"
+        },
+        {
+          "author_type": "user",
+          "body": "no lo encuentro",
+          "created_at": "2026-02-26T12:45:55.000Z"
+        },
+        {
+          "author_type": "bot",
+          "body": "Te entiendo, el botón \"Otras Retenciones\" no siempre está visible en todas las pantallas de factura. Para las percepciones de ganancias en un permiso de importación, tenés otra opción: cargá la percepción como un detalle más en la factura. En la columna \"cuenta\" elegí la cuenta contable que corresponde a esa percepción de ganancias. Las facturas solo tienen casilleros predeterminados para ciertas retenciones. Para retenciones que no tienen un casillero específico, como las percepciones de ganancias, se cargan como un detalle en la factura eligiendo la cuenta contable correspondiente. Sources: Recibo Cobranza multimoneda - Diferencia tipo de cambio ¿Cómo generar una Cobranza? ¿Como registro una liquidación de granos? (liquido-producto)?",
+          "created_at": "2026-02-26T12:46:15.000Z"
+        },
+        {
+          "author_type": "bot",
+          "body": "¿Esto te ayuda?",
+          "created_at": "2026-02-26T12:46:15.000Z"
+        },
+        {
+          "author_type": "user",
+          "body": "si, ahora pruebo",
+          "created_at": "2026-02-26T12:46:25.000Z"
+        },
+        {
+          "author_type": "bot",
+          "body": "Perfecto, quedo a disposición para cualquier consulta adicional que tengas mientras lo pruebas.",
+          "created_at": "2026-02-26T12:46:30.000Z"
+        },
+        {
+          "author_type": "bot",
+          "body": "¿Qué tal estuvo tu conversación con Colppy?",
+          "created_at": "2026-02-26T12:46:35.000Z"
+        },
+        {
+          "author_type": "bot",
+          "body": "[Conversation Rating Request]",
+          "created_at": "2026-02-26T12:46:35.000Z"
+        }
+      ]
+    }
+  ]
+}

@@ -1,0 +1,109 @@
+{
+  "_comment": "Topic config for setup/onboarding Intercom research. Used by llm_classify.mjs --topic. Focus: typical topics during user onboarding (first days/weeks in Colppy).",
+  "topic_name": "Setup / Onboarding",
+  "match_field": "is_setup_onboarding",
+  "definition": "Setup and onboarding conversations are those where a user is in their initial setup phase with Colppy: creating or configuring their account, company, or product for the first time. This includes: account registration and email validation, company creation (empresa, CUIT, razón social), IVA/AFIP configuration, first-time product configuration, 'how do I get started' questions, plan selection or upgrade during trial, inviting first users, connecting bank or payment methods for the first time, understanding basic navigation or where to find things, and any question that indicates the user is new and still setting up.",
+  "categories": [
+    "account_registration",
+    "company_setup",
+    "iva_afip_config",
+    "first_configuration",
+    "how_to_get_started",
+    "plan_selection",
+    "invite_users",
+    "first_bank_connection",
+    "navigation_help",
+    "trial_questions",
+    "other"
+  ],
+  "false_positives": [
+    "User has been using Colppy for months and asks about advanced features or edge cases",
+    "Billing or payment renewal questions (not first-time setup)",
+    "API/developer integration requests",
+    "Bug reports on mature workflows (not first-time setup issues)",
+    "General accounting questions from experienced users",
+    "Conversations that are purely sales inquiries before signup (no Colppy account yet)"
+  ],
+  "true_positives": [
+    "User mentions 'recién empiezo', 'primera vez', 'cómo empiezo', 'no sé por dónde empezar'",
+    "Questions about creating company, adding CUIT, configuring IVA condition",
+    "Email validation or 'no me llega el mail' during signup",
+    "Plan selection during trial ('qué plan me conviene', 'cómo cambio de plan')",
+    "Inviting team members or 'cómo agrego usuarios'",
+    "First bank connection or 'conectar banco' during setup",
+    "'Dónde está X' or navigation questions from clearly new users",
+    "AFIP/ARCA configuration for first time",
+    "Setup wizard or onboarding flow issues"
+  ],
+  "keywords": [
+    "primera vez",
+    "recién empiezo",
+    "cómo empiezo",
+    "empezar",
+    "configurar",
+    "configuración",
+    "crear empresa",
+    "crear cuenta",
+    "alta",
+    "registro",
+    "CUIT",
+    "IVA",
+    "condición IVA",
+    "AFIP",
+    "ARCA",
+    "validar email",
+    "no me llega",
+    "invitar",
+    "agregar usuario",
+    "plan",
+    "prueba",
+    "trial",
+    "conectar banco",
+    "paybook",
+    "primer",
+    "setup",
+    "onboarding",
+    "wizard",
+    "dónde está",
+    "no encuentro",
+    "cómo hago"
+  ],
+  "few_shot_examples": [
+    {
+      "conversation_snippet": "[Customer]: Quiero configurar mi empresa\n[Bot]: ¡Bienvenido a Colppy! Para empezar a configurar tu empresa, debés realizar los siguientes pasos: Verifica los datos registrados de tu empresa en Configuración > Datos Generales...\n[Customer]: Definir el plan de cuentas\n[Bot]: Desde Colppy tenes dos opciones para trabajar tu plan de cuenta...",
+      "classification": {
+        "is_setup_onboarding": true,
+        "confidence": 0.9,
+        "category": "company_setup",
+        "reasoning": "User explicitly wants to configure their company and set up plan de cuentas — first-time setup."
+      }
+    },
+    {
+      "conversation_snippet": "[Customer]: Conecta tu Banco con Colppy\n[Bot]: Te compartimos este articulo de ayuda para que conozcas como realizar la conexión de tu banco con Colppy...\n[Bot]: ¿Pudiste conectar tu banco?",
+      "classification": {
+        "is_setup_onboarding": true,
+        "confidence": 0.9,
+        "category": "first_bank_connection",
+        "reasoning": "User is connecting their bank to Colppy for the first time — setup phase."
+      }
+    },
+    {
+      "conversation_snippet": "[Customer]: Buenas tardes, escribo con la intención de agendar fecha para recibir capacitación del sistema, agradezco mucho su amable respuesta.\n[Agent]: Te dejo el LINK para que puedas inscribirte a la capacitación de primeros pasos y configuración del sistema.",
+      "classification": {
+        "is_setup_onboarding": true,
+        "confidence": 0.9,
+        "category": "how_to_get_started",
+        "reasoning": "New user requesting training on the system — classic getting started question."
+      }
+    },
+    {
+      "conversation_snippet": "[Customer]: Necesito cambiar la dirección de facturación de mi empresa\n[Agent]: Claro, podés modificar los datos de tu empresa en Configuración > Datos Generales > Dirección.\n[Customer]: Gracias, ya lo cambié. También quiero saber cómo exportar el libro IVA.",
+      "classification": {
+        "is_setup_onboarding": false,
+        "confidence": 0.85,
+        "category": "other",
+        "reasoning": "User is modifying existing company data and asking about advanced features (libro IVA export). This is an experienced user, not first-time setup."
+      }
+    }
+  ]
+}

@@ -1,0 +1,8 @@
+{
+  "name": "colppy-revenue",
+  "version": "3.0.0",
+  "description": "Revenue analytics for Colppy.com: demand generation, marketing funnels, ICP scoring, MRR dashboards, churn analysis, cohort retention, growth KPIs, and multi-platform analytics across HubSpot, Mixpanel, Google Ads, and Meta Ads.",
+  "author": {
+    "name": "Colppy"
+  }
+}

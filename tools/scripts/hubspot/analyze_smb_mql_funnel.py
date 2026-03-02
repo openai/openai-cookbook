@@ -53,6 +53,10 @@ import matplotlib.pyplot as plt
 import matplotlib.gridspec as gridspec
 import seaborn as sns
 
+# Load .env from project root (script lives in tools/scripts/hubspot/)
+_script_dir = os.path.dirname(os.path.abspath(__file__))
+_project_root = os.path.normpath(os.path.join(_script_dir, '..', '..', '..'))
+load_dotenv(os.path.join(_project_root, '.env'))
 load_dotenv()
 
 HUBSPOT_API_KEY = os.getenv('HUBSPOT_API_KEY')
@@ -480,18 +484,86 @@ def get_company_type(company_id):
         pass
     return None, None
 
+def batch_get_associations(from_type, to_type, object_ids, batch_size=100):
+    """
+    Get associations for multiple objects in batch using HubSpot v4 batch API.
+    Returns dict of {from_id: [to_object_ids]}
+    """
+    url = f"{HUBSPOT_BASE_URL}/crm/v4/associations/{from_type}/{to_type}/batch/read"
+    result_map = {}
+
+    for i in range(0, len(object_ids), batch_size):
+        batch = object_ids[i:i+batch_size]
+        payload = {"inputs": [{"id": str(obj_id)} for obj_id in batch]}
+
+        try:
+            response = requests.post(url, headers=HEADERS, json=payload, timeout=60)
+            if response.status_code == 429:
+                retry_after = int(response.headers.get('Retry-After', 2))
+                time.sleep(retry_after)
+                response = requests.post(url, headers=HEADERS, json=payload, timeout=60)
+
+            if response.status_code == 200:
+                results = response.json().get('results', [])
+                for item in results:
+                    from_id = str(item.get('from', {}).get('id', ''))
+                    to_ids = [str(t.get('toObjectId', '')) for t in item.get('to', [])]
+                    result_map[from_id] = to_ids
+        except Exception as e:
+            print(f"⚠️  Batch association error: {e}")
+
+        if i + batch_size < len(object_ids):
+            time.sleep(0.1)
+
+    return result_map
+
+def batch_read_objects(object_type, object_ids, properties, batch_size=100):
+    """
+    Batch read objects from HubSpot.
+    Returns dict of {object_id: properties_dict}
+    """
+    url = f"{HUBSPOT_BASE_URL}/crm/v3/objects/{object_type}/batch/read"
+    result_map = {}
+
+    for i in range(0, len(object_ids), batch_size):
+        batch = object_ids[i:i+batch_size]
+        payload = {
+            "properties": properties,
+            "inputs": [{"id": str(obj_id)} for obj_id in batch]
+        }
+
+        try:
+            response = requests.post(url, headers=HEADERS, json=payload, timeout=60)
+            if response.status_code == 429:
+                retry_after = int(response.headers.get('Retry-After', 2))
+                time.sleep(retry_after)
+                response = requests.post(url, headers=HEADERS, json=payload, timeout=60)
+
+            if response.status_code == 200:
+                results = response.json().get('results', [])
+                for obj in results:
+                    obj_id = str(obj.get('id', ''))
+                    result_map[obj_id] = obj.get('properties', {})
+        except Exception as e:
+            print(f"⚠️  Batch read error: {e}")
+
+        if i + batch_size < len(object_ids):
+            time.sleep(0.1)
+
+    return result_map
+
 def is_icp_operador(deal):
     """
     Determine if deal is ICP Operador based on PRIMARY company type.
     Uses primary_company_type field if available, otherwise fetches from company.
     """
     props = deal.get('properties', {})
-    
+
     # Try to use primary_company_type field first (synced property)
     primary_company_type = props.get('primary_company_type', '')
     if primary_company_type and primary_company_type in ACCOUNTANT_COMPANY_TYPES:
         return True
-    
+
     # Fallback: Fetch from company association
     deal_id = deal.get('id')
     if deal_id:
@@ -500,7 +572,7 @@ def is_icp_operador(deal):
             company_name, company_type = get_company_type(company_id)
             if company_type and company_type in ACCOUNTANT_COMPANY_TYPES:
                 return True
-    
+
     return False
 
 def create_funnel_visualization(csv_file_path, output_dir=None):
@@ -938,44 +1010,45 @@ def analyze_funnel(start_date, end_date):
     print("📊 Stage 2: Identifying SQLs (sql_date in period + at least one deal)...")
     sql_contacts = []
     sql_without_valid_deal = []  # Track contacts with SQL date but no deals returned by API
-    
+
+    # First pass: collect contacts with SQL date in period
+    sql_eligible = []
     for contact in mql_contacts:
         props = contact.get('properties', {})
-        contact_createdate_str = props.get('createdate', '')
         sql_date_str = props.get('hs_v2_date_entered_opportunity', '')
-        
+        contact_createdate_str = props.get('createdate', '')
         if sql_date_str and contact_createdate_str:
             try:
-                contact_createdate = datetime.fromisoformat(contact_createdate_str.replace('Z', '+00:00'))
                 sql_date = datetime.fromisoformat(sql_date_str.replace('Z', '+00:00'))
-                
-                # SQL conversion must be in period
                 if start_dt <= sql_date < end_dt:
-                    contact_id = contact.get('id')
-                    # Fetch ALL deals for contact (not only created in period) to align with HubSpot funnel
-                    deals = get_contact_deals(contact_id, start_date, end_date, include_all_deals=True)
-                    has_valid_deal = len(deals) > 0
-                    deal_validation_reasons = []
-                    edge_case_type = None
-                    if not deals:
-                        deal_validation_reasons.append("No deals associated with contact (API returned empty)")
-                        edge_case_type = "NO_DEALS_ASSOCIATED"
-                    
-                    if has_valid_deal:
-                        sql_contacts.append(contact)
-                    else:
-                        sql_without_valid_deal.append({
-                            'contact_id': contact_id,
-                            'email': props.get('email', ''),
-                            'name': f"{props.get('firstname', '')} {props.get('lastname', '')}".strip(),
-                            'createdate': contact_createdate_str,
-                            'sql_date': sql_date_str,
-                            'num_deals': 0,
-                            'reasons': deal_validation_reasons,
-                            'edge_case_type': edge_case_type
-                        })
-            except Exception as e:
+                    sql_eligible.append(contact)
+            except:
                 pass
+
+    # Batch check deal associations for all SQL-eligible contacts at once
+    if sql_eligible:
+        eligible_ids = [c.get('id') for c in sql_eligible]
+        print(f"   Batch-checking deal associations for {len(eligible_ids)} SQL-eligible contacts...")
+        contact_deal_map = batch_get_associations('contacts', 'deals', eligible_ids)
+
+        for contact in sql_eligible:
+            props = contact.get('properties', {})
+            contact_id = contact.get('id')
+            deal_ids = contact_deal_map.get(str(contact_id), [])
+
+            if deal_ids:
+                sql_contacts.append(contact)
+            else:
+                sql_without_valid_deal.append({
+                    'contact_id': contact_id,
+                    'email': props.get('email', ''),
+                    'name': f"{props.get('firstname', '')} {props.get('lastname', '')}".strip(),
+                    'createdate': props.get('createdate', ''),
+                    'sql_date': props.get('hs_v2_date_entered_opportunity', ''),
+                    'num_deals': 0,
+                    'reasons': ["No deals associated with contact (API returned empty)"],
+                    'edge_case_type': "NO_DEALS_ASSOCIATED"
+                })
     
     print(f"   Found {len(sql_contacts)} SQLs ({len(sql_contacts)/len(mql_contacts)*100:.1f}% of MQLs)" if mql_contacts else "   Found 0 SQLs")
     print(f"   Found {len(sql_without_valid_deal)} contacts with SQL date but NO deals from API\n")
@@ -1021,55 +1094,98 @@ def analyze_funnel(start_date, end_date):
     
     # STAGE 3: Get deals created in period (associated with MQL contacts)
     # STRICT FUNNEL: MQL → Deal Created → Won
-    # This ensures that only deals associated with MQL contacts are considered
-    # IMPORTANT: Contact must be created before or on the same day as the deal (HubSpot logic)
+    # Uses deal-first approach (like accountant funnel) to avoid 10k+ API calls when MQL count is high
     print("📊 Stage 3: Fetching deals created in period (STRICT FUNNEL: MQL → Deal Created)...")
-    all_deals_created = []
-    contact_to_deals = {}
-    
+    mql_contact_ids = {contact.get('id') for contact in mql_contacts}
+    mql_contact_createdates = {}
     for contact in mql_contacts:
         contact_id = contact.get('id')
         contact_props = contact.get('properties', {})
         contact_createdate_str = contact_props.get('createdate', '')
-        
-        if not contact_createdate_str:
+        if contact_createdate_str:
+            try:
+                mql_contact_createdates[contact_id] = datetime.fromisoformat(contact_createdate_str.replace('Z', '+00:00'))
+            except:
+                pass
+
+    # Fetch all deals created in period (deal-first approach - fewer API calls)
+    url = f"{HUBSPOT_BASE_URL}/crm/v3/objects/deals/search"
+    all_deals_in_period = []
+    after = None
+    while True:
+        filters = [
+            {"propertyName": "createdate", "operator": "GTE", "value": f"{start_date}T00:00:00Z"},
+            {"propertyName": "createdate", "operator": "LT", "value": f"{end_date}T00:00:00Z"}
+        ]
+        payload = {
+            "filterGroups": [{"filters": filters}],
+            "properties": ["dealname", "createdate", "closedate", "dealstage", "amount", "primary_company_type"],
+            "associations": ["contacts"],
+            "limit": 100
+        }
+        if after:
+            payload["after"] = after
+        response = requests.post(url, headers=HEADERS, json=payload, timeout=30)
+        response.raise_for_status()
+        data = response.json()
+        results = data.get('results', [])
+        all_deals_in_period.extend(results)
+        after = data.get('paging', {}).get('next', {}).get('after')
+        if not after:
+            break
+        time.sleep(0.2)
+
+    print(f"   Found {len(all_deals_in_period)} total deals created in period")
+
+    # Extract contact associations from search response (already requested via "associations": ["contacts"])
+    # For deals missing inline associations, batch-fetch them
+    deals_needing_assoc = []
+    deal_contact_map = {}  # deal_id -> [contact_ids]
+
+    for deal in all_deals_in_period:
+        deal_id = str(deal.get('id', ''))
+        assoc_data = deal.get('associations', {}).get('contacts', {}).get('results', [])
+        if assoc_data:
+            deal_contact_map[deal_id] = [str(a.get('id', a.get('toObjectId', ''))) for a in assoc_data]
+        else:
+            deals_needing_assoc.append(deal_id)
+
+    # Batch-fetch associations for deals that didn't have them inline
+    if deals_needing_assoc:
+        print(f"   Batch-fetching contact associations for {len(deals_needing_assoc)} deals...")
+        batch_assoc = batch_get_associations('deals', 'contacts', deals_needing_assoc)
+        deal_contact_map.update(batch_assoc)
+
+    # Match deals to MQL contacts using in-memory data (no per-deal API calls needed)
+    deals_created = []
+    contact_to_deals = {}
+    for deal in all_deals_in_period:
+        deal_id = str(deal.get('id', ''))
+        deal_props = deal.get('properties', {})
+        deal_createdate_str = deal_props.get('createdate', '')
+        if not deal_createdate_str:
             continue
-        
         try:
-            contact_created_dt = datetime.fromisoformat(contact_createdate_str.replace('Z', '+00:00'))
+            deal_created_dt = datetime.fromisoformat(deal_createdate_str.replace('Z', '+00:00'))
         except:
             continue
-        
-        deals = get_contact_deals(contact_id, start_date, end_date)
-        if deals:
-            # Validate: Contact must be created before or on the same day as the deal
-            validated_deals = []
-            for deal in deals:
-                deal_props = deal.get('properties', {})
-                deal_createdate_str = deal_props.get('createdate', '')
-                if deal_createdate_str:
-                    try:
-                        deal_created_dt = datetime.fromisoformat(deal_createdate_str.replace('Z', '+00:00'))
-                        # Contact must be created before deal (HubSpot logic - contact must exist when deal is created)
-                        # Using < instead of <= to match HubSpot's strict association logic
-                        if contact_created_dt < deal_created_dt:
-                            validated_deals.append(deal)
-                    except:
-                        pass
-            
-            if validated_deals:
-                contact_to_deals[contact_id] = validated_deals
-                all_deals_created.extend(validated_deals)
-    
-    # Remove duplicates (same deal associated with multiple contacts)
-    unique_deals_created = {}
-    for deal in all_deals_created:
-        deal_id = deal.get('id')
-        if deal_id not in unique_deals_created:
-            unique_deals_created[deal_id] = deal
-    
-    deals_created = list(unique_deals_created.values())
-    print(f"   Found {len(deals_created)} unique deals created in period (associated with MQL contacts, contact created < deal created)\n")
+
+        contact_ids_for_deal = deal_contact_map.get(deal_id, [])
+        has_valid_mql_contact = False
+        matching_contact_id = None
+        for contact_id in contact_ids_for_deal:
+            if contact_id in mql_contact_ids and contact_id in mql_contact_createdates:
+                if mql_contact_createdates[contact_id] < deal_created_dt:
+                    has_valid_mql_contact = True
+                    matching_contact_id = contact_id
+                    break
+
+        if has_valid_mql_contact:
+            deals_created.append(deal)
+            if matching_contact_id not in contact_to_deals:
+                contact_to_deals[matching_contact_id] = []
+            contact_to_deals[matching_contact_id].append(deal)
+    print(f"   Found {len(deals_created)} deals with SMB MQL contacts (created before deal)\n")
     
     # STAGE 4: Filter for closed won deals (STRICT FUNNEL: Deal Created → Won)
     # Only deals that were created in period AND associated with MQL contacts can be closed won
@@ -1096,48 +1212,74 @@ def analyze_funnel(start_date, end_date):
     print(f"   Found {len(closed_won_deals)} closed won deals (created AND closed in period)\n")
     
     # STAGE 5: Classify by ICP Operador vs ICP PYME
+    # Batch-fetch company types for deals missing primary_company_type to avoid per-deal API calls
     print("📊 Stage 5: Classifying by ICP...")
+    deals_needing_company = []
+    for deal in closed_won_deals:
+        pct = deal.get('properties', {}).get('primary_company_type', '')
+        if not pct or pct not in ACCOUNTANT_COMPANY_TYPES:
+            deals_needing_company.append(str(deal.get('id', '')))
+
+    # Batch-fetch primary company associations and types
+    deal_icp_cache = {}  # deal_id -> bool (is_icp_operador)
+    if deals_needing_company:
+        deal_company_map = batch_get_associations('deals', 'companies', deals_needing_company)
+        all_company_ids = set()
+        for company_ids in deal_company_map.values():
+            all_company_ids.update(company_ids)
+        if all_company_ids:
+            company_types = batch_read_objects('companies', list(all_company_ids), ['name', 'type'])
+            for deal_id, company_ids in deal_company_map.items():
+                for cid in company_ids:
+                    ctype = company_types.get(cid, {}).get('type', '')
+                    if ctype in ACCOUNTANT_COMPANY_TYPES:
+                        deal_icp_cache[deal_id] = True
+                        break
+
     icp_operador_deals = []
     icp_pyme_deals = []
-    
+
     for deal in closed_won_deals:
-        if is_icp_operador(deal):
+        deal_id = str(deal.get('id', ''))
+        props = deal.get('properties', {})
+        pct = props.get('primary_company_type', '')
+        if pct and pct in ACCOUNTANT_COMPANY_TYPES:
+            is_operador = True
+        else:
+            is_operador = deal_icp_cache.get(deal_id, False)
+        if is_operador:
             icp_operador_deals.append(deal)
         else:
             icp_pyme_deals.append(deal)
-    
+
     print(f"   ICP Operador: {len(icp_operador_deals)}")
     print(f"   ICP PYME: {len(icp_pyme_deals)}\n")
-    
+
     # Calculate conversion rates
-    # STRICT FUNNEL CALCULATION: MQL → Deal Created → Won
-    # mql_to_won_rate: Only counts closed won deals that are:
-    #   1. Associated with MQL contacts (from deals_created)
-    #   2. Created in period (from deals_created)
-    #   3. Closed won in period (filtered in STAGE 4)
-    
-    # Strict funnel rates (MQL → Deal Created → Won)
     mql_to_deal_rate = (len(deals_created) / len(mql_contacts) * 100) if mql_contacts else 0
     deal_to_won_rate = (len(closed_won_deals) / len(deals_created) * 100) if deals_created else 0
     mql_to_won_rate = (len(closed_won_deals) / len(mql_contacts) * 100) if mql_contacts else 0
-    
+
     # Informational SQL rates (for reference only, not part of strict funnel)
     mql_to_sql_rate = (len(sql_contacts) / len(mql_contacts) * 100) if mql_contacts else 0
     sql_to_deal_rate = (len(deals_created) / len(sql_contacts) * 100) if sql_contacts else 0
-    
-    # Calculate revenue
+
+    # Calculate revenue using cached ICP classification (no duplicate API calls)
     total_revenue = 0
     icp_operador_revenue = 0
     icp_pyme_revenue = 0
-    
+
     for deal in closed_won_deals:
+        deal_id = str(deal.get('id', ''))
         props = deal.get('properties', {})
         amount_str = props.get('amount', '')
         if amount_str:
             try:
                 amount = float(amount_str)
                 total_revenue += amount
-                if is_icp_operador(deal):
+                pct = props.get('primary_company_type', '')
+                is_operador = (pct and pct in ACCOUNTANT_COMPANY_TYPES) or deal_icp_cache.get(deal_id, False)
+                if is_operador:
                     icp_operador_revenue += amount
                 else:
                     icp_pyme_revenue += amount

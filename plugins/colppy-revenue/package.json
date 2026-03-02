@@ -1,0 +1,7 @@
+{
+  "name": "colppy-revenue",
+  "version": "3.0.0",
+  "description": "Revenue analytics for Colppy.com — demand generation, marketing funnels, ICP scoring, MRR, churn, cohort retention, and growth KPIs.",
+  "type": "module",
+  "license": "ISC"
+}

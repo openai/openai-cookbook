@@ -58,11 +58,11 @@ python tools/scripts/colppy/export_reconciliation_snapshot.py --months 62
 
 # Colppy ↔ HubSpot reconciliation (from both DBs)
 python tools/scripts/colppy/export_reconciliation_db_snapshot.py --months 14
-# Output: plugins/colppy-ceo-assistant/docs/colppy_hubspot_reconciliation_snapshot.json
+# Output: plugins/colppy-revops/docs/colppy_hubspot_reconciliation_snapshot.json
 
 # id_empresa → CUIT from Colppy DB (different from billing facturacion.csv)
 python tools/scripts/colppy/export_colppy_cuit_snapshot.py
-# Output: plugins/colppy-ceo-assistant/docs/colppy_cuit_snapshot.json
+# Output: plugins/colppy-revops/docs/colppy_cuit_snapshot.json
 ```
 
 ---

@@ -1,0 +1,8 @@
+{
+  "name": "colppy-customer-success",
+  "version": "1.0.0",
+  "description": "Customer Success toolkit for Colppy: Intercom conversation research, onboarding analysis, LLM classification with few-shot learning, and user feedback insights. Segment by accountant vs SMB, classify onboarding topics, and build feedback loops.",
+  "author": {
+    "name": "Colppy"
+  }
+}

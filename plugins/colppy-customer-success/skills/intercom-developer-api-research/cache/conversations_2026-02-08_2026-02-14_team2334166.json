@@ -1,0 +1,2189 @@
+{
+  "from_date": "2026-02-08",
+  "to_date": "2026-02-14",
+  "state": null,
+  "team_assignee_id": "2334166",
+  "topic": "Primeros 90 días",
+  "saved_at": "2026-03-02T02:26:54.800Z",
+  "conversations": [
+    {
+      "conversation_id": "215473028835440",
+      "created_at": "2026-02-09T18:46:00.000Z",
+      "state": "open",
+      "contact_email": "guitarrascarullo@hotmail.com",
+      "contact_es_contador": null,
+      "contact_rol_wizard": null,
+      "tags": [
+        "Chat-Bot",
+        "Mod Tes-Reporte-Cheques emitidos diferidos",
+        "E-cheq"
+      ],
+      "parts": [
+        {
+          "author_type": "user",
+          "body": "Hacer una consulta",
+          "created_at": "2026-02-09T18:46:00.000Z"
+        },
+        {
+          "author_type": "bot",
+          "body": "¿Desde qué empresa estás realizando la consulta?",
+          "created_at": "2026-02-09T18:46:02.000Z"
+        },
+        {
+          "author_type": "bot",
+          "body": "Por favor, elegí el módulo sobre el cual queres realizar la consulta.",
+          "created_at": "2026-02-09T18:46:13.000Z"
+        },
+        {
+          "author_type": "user",
+          "body": "Tesorería",
+          "created_at": "2026-02-09T18:46:19.000Z"
+        },
+        {
+          "author_type": "bot",
+          "body": "¿En qué te puedo ayudar?",
+          "created_at": "2026-02-09T18:46:20.000Z"
+        },
+        {
+          "author_type": "user",
+          "body": "Cheques",
+          "created_at": "2026-02-09T18:46:24.000Z"
+        },
+        {
+          "author_type": "bot",
+          "body": "Elegí una de estas opciones 👇",
+          "created_at": "2026-02-09T18:46:25.000Z"
+        },
+        {
+          "author_type": "user",
+          "body": "Cheques emitidos",
+          "created_at": "2026-02-09T18:46:31.000Z"
+        },
+        {
+          "author_type": "bot",
+          "body": "En todas las operaciones que involucran egresos de fondos existe la posibilidad de registrar la emisión de cheques. (Por ejemplo Pagos a Proveedores, Factura de Compra Contado, Otras Pagos, Canje Interno de Caja) Existen dos tipos de cheques a emitir con características diferentes: ​ -Cheque Emitido Común Para ingresar un pago con Cheque Emitido Común, se debe seleccionar el Banco, Número, Fecha de Pago e Importe -Cheque Emitido Diferido Para ingresar un pago con un Cheque Emitido Diferido, se debe seleccionar el Banco, Número, Fecha de Pago e Importe 📢 Importante El día de cumplimiento de la Fecha de Pago del cheque emitido diferido, mediante un proceso automático, se realiza la registración del egreso del cheque diferido en la cuenta bancaria. En caso de tener configurada la chequera activa de cheques diferidos en \"Empresa→ Tesorería\", la numeración del cheque se realizará automáticamente. Se podrá consultar el Reporte de cheques emitidos diferidos, desde el módulo Tesorería. Para más información hace clic en este link",
+          "created_at": "2026-02-09T18:46:32.000Z"
+        },
+        {
+          "author_type": "bot",
+          "body": "¿Se resolvió tu duda?",
+          "created_at": "2026-02-09T18:46:32.000Z"
+        },
+        {
+          "author_type": "user",
+          "body": "Necesito más ayuda",
+          "created_at": "2026-02-09T18:46:36.000Z"
+        },
+        {
+          "author_type": "bot",
+          "body": "Contanos, ¿Cómo te podemos ayudar?",
+          "created_at": "2026-02-09T18:46:37.000Z"
+        },
+        {
+          "author_type": "user",
+          "body": "Los cheques emitidos no impactan en la cuneta bancaria a la fecha de su vencimiento.",
+          "created_at": "2026-02-09T18:47:10.000Z"
+        },
+        {
+          "author_type": "user",
+          "body": "Este problema surgio desde el 1/2/26",
+          "created_at": "2026-02-09T18:47:24.000Z"
+        },
+        {
+          "author_type": "user",
+          "body": "Porque nates funcionaba bien",
+          "created_at": "2026-02-09T18:47:36.000Z"
+        },
+        {
+          "author_type": "bot",
+          "body": "Entiendo que los cheques emitidos diferidos no se están debitando automáticamente de la cuenta bancaria en su fecha de vencimiento desde el 1/2/26. Para resolver este problema, probá estos pasos: Revisá la configuración de tesorería : Verificá que tengas configurada correctamente la cuenta para cheques emitidos diferidos en Configuración → Tesorería. Completá el origen de fondo : Asegurate de que el campo del banco esté completo. Podés seleccionar nuevamente la opción de cheque diferido para que te guíe al origen de fondo. Intentá reprocesar : Dale clic en \"guardar\" nuevamente al pago y esperá 30 minutos para que el proceso se complete. Si el problema persiste después de estos pasos, podés reformular tu pregunta con más detalles específicos o hablar con nuestro equipo. Sources: Cheques Emitidos Configurar tesorería en el módulo de configuración",
+          "created_at": "2026-02-09T18:47:55.000Z"
+        },
+        {
+          "author_type": "bot",
+          "body": "¿Es lo que buscabas?",
+          "created_at": "2026-02-09T18:47:55.000Z"
+        },
+        {
+          "author_type": "bot",
+          "body": "Lamento que el problema con los cheques emitidos diferidos persista y entiendo la molestia que esto puede causar. ¿Podrías brindarme más detalles sobre lo que estás intentando resolver para poder ayudarte mejor?",
+          "created_at": "2026-02-09T18:51:57.000Z"
+        },
+        {
+          "author_type": "user",
+          "body": "El pago está bien emitido con sus orígenes de fondos",
+          "created_at": "2026-02-09T18:57:07.000Z"
+        },
+        {
+          "author_type": "user",
+          "body": "He creado la chequera y he reprocesado el pago",
+          "created_at": "2026-02-09T18:57:25.000Z"
+        },
+        {
+          "author_type": "bot",
+          "body": "Entiendo que el pago está correctamente configurado con sus orígenes de fondos. Si los cheques diferidos no se están debitando automáticamente desde el 1/2/26, puede ser un problema del proceso automático. Probá hacer clic en \"Guardar\" nuevamente en el pago y esperá 30 minutos para que el proceso se complete. También podés verificar en el reporte de \"Cheques emitidos diferidos no debitados\" desde el módulo Tesorería para confirmar qué cheques están pendientes de procesamiento. Si después de estos pasos el problema persiste, podés reformular tu pregunta con más detalles específicos o hablar con nuestro equipo. Sources: Cheques Emitidos Reporte de cheques emitidos diferidos",
+          "created_at": "2026-02-09T18:57:25.000Z"
+        },
+        {
+          "author_type": "bot",
+          "body": "¿Responde eso a tu pregunta?",
+          "created_at": "2026-02-09T18:57:25.000Z"
+        },
+        {
+          "author_type": "bot",
+          "body": "Entiendo que ya configuraste todo correctamente pero el problema persiste. Como el proceso automático de débito no está funcionando desde el 1/2/26, podés verificar lo siguiente: 1. Revisá el reporte de cheques emitidos diferidos : Andá a Tesorería → Reportes → \"Reporte de cheques emitidos diferidos\" para ver si los cheques aparecen como no debitados. 2. Verificá la configuración de la cuenta : Asegurate de que en Configuración → Tesorería tengas bien configurada la cuenta para \"Cheques emitidos diferidos\" y que no sea una cuenta bancaria directa. 3. Esperá el tiempo de procesamiento : Después de guardar, el proceso automático puede tardar hasta 30 minutos en completarse. Si después de estas verificaciones el problema continúa, podés reformular tu pregunta con más detalles específicos o hablar con nuestro equipo. Sources: Cheques Emitidos Reporte de cheques emitidos diferidos Configurar tesorería en el módulo de configuración",
+          "created_at": "2026-02-09T18:57:44.000Z"
+        },
+        {
+          "author_type": "bot",
+          "body": "¿Responde eso a tu pregunta?",
+          "created_at": "2026-02-09T18:57:45.000Z"
+        },
+        {
+          "author_type": "user",
+          "body": "En el detalle de cheques emitidos los cheques vencidos ya no aparecen",
+          "created_at": "2026-02-09T18:58:40.000Z"
+        },
+        {
+          "author_type": "bot",
+          "body": "Perfecto, eso es lo que debería pasar. Cuando los cheques diferidos cumplen su fecha de vencimiento, el sistema los procesa automáticamente y ya no aparecen en el reporte de \"Cheques emitidos diferidos no debitados\" porque ya fueron debitados de la cuenta bancaria. Si querés verificar que el proceso se completó correctamente, podés revisar los movimientos de tu cuenta bancaria para confirmar que los cheques se debitaron en las fechas correspondientes. El hecho de que ya no aparezcan en el detalle significa que el proceso automático está funcionando bien y los cheques se procesaron correctamente. Sources: Reporte de cheques emitidos diferidos Cheques Emitidos ¿Cómo puedo descargar toda la información de mi empresa?",
+          "created_at": "2026-02-09T18:58:57.000Z"
+        },
+        {
+          "author_type": "bot",
+          "body": "¿Es lo que buscabas?",
+          "created_at": "2026-02-09T18:58:57.000Z"
+        },
+        {
+          "author_type": "user",
+          "body": "La cuenta de cheques emitidos diferidos esta bien configurada, \"Cheques emitidos no debitados\"",
+          "created_at": "2026-02-09T19:00:16.000Z"
+        },
+        {
+          "author_type": "bot",
+          "body": "Perfecto, si la cuenta está bien configurada y los cheques ya no aparecen en \"Cheques emitidos diferidos no debitados\", significa que el proceso automático funcionó correctamente. El sistema procesa automáticamente los cheques diferidos en su fecha de vencimiento y los debita de la cuenta bancaria. Una vez procesados, desaparecen del reporte porque ya fueron debitados. Para confirmar que todo está en orden, podés revisar los movimientos de tu cuenta bancaria y verificar que los débitos se registraron en las fechas correspondientes. ¿Hay algo específico sobre este proceso que te preocupe o necesitás verificar? Sources: Cheques Emitidos Reporte de cheques emitidos diferidos Configurar tesorería en el módulo de configuración",
+          "created_at": "2026-02-09T19:00:31.000Z"
+        },
+        {
+          "author_type": "user",
+          "body": "Esta todo correcto, pero los cheques no se debitan en la cuenta banco a su fecha de vencimiento. Esto distorsiona significativamente la tesorería es su apartado banco",
+          "created_at": "2026-02-09T19:01:56.000Z"
+        },
+        {
+          "author_type": "bot",
+          "body": "Entiendo que el proceso automático no está funcionando correctamente. Si los cheques diferidos no se debitan automáticamente en la cuenta bancaria en su fecha de vencimiento, tenés estas opciones: Solución temporal: Podés hacer el débito manualmente usando un canje interno. Andá a Tesorería → Depósitos/Extracciones/Canjes → Canje Interno y transferí el importe desde la cuenta de cheques emitidos diferidos hacia la cuenta bancaria correspondiente. Para verificar la configuración: Revisá que en Configuración → Tesorería no tengas seleccionada una cuenta bancaria directa para \"Cheques emitidos diferidos\". Debe ser una cuenta separada para que el proceso automático funcione correctamente. Si el problema persiste después de estos pasos, podés reformular tu pregunta con más detalles específicos o hablar con nuestro equipo. Sources: Cheques Emitidos ¿Cómo llevar cheques emitidos manualmente? Configurar tesorería en el módulo de configuración",
+          "created_at": "2026-02-09T19:02:17.000Z"
+        },
+        {
+          "author_type": "bot",
+          "body": "¿Fue de ayuda?",
+          "created_at": "2026-02-09T19:02:17.000Z"
+        },
+        {
+          "author_type": "bot",
+          "body": "Lamento que el débito automático de los cheques diferidos no se esté reflejando correctamente en la cuenta bancaria, entiendo que esto afecta la gestión de tesorería. ¿Podrías compartir más detalles sobre cómo estás verificando los movimientos para que pueda ayudarte mejor?",
+          "created_at": "2026-02-09T19:06:21.000Z"
+        },
+        {
+          "author_type": "user",
+          "body": "El debito de los cheques sigue sin funcionas",
+          "created_at": "2026-02-09T20:34:30.000Z"
+        },
+        {
+          "author_type": "user",
+          "body": "podria contactarme con un asesor humano?",
+          "created_at": "2026-02-09T20:34:47.000Z"
+        },
+        {
+          "author_type": "bot",
+          "body": "Claro, te voy a pasar con alguien de nuestro equipo. Mientras tanto, ¿podrías contarme más detalles sobre el problema para que puedan ayudarte más rápido?",
+          "created_at": "2026-02-09T20:34:52.000Z"
+        },
+        {
+          "author_type": "user",
+          "body": "ya di todos los detalles y llevo mas de 4 horas con este tema",
+          "created_at": "2026-02-09T20:35:20.000Z"
+        },
+        {
+          "author_type": "admin",
+          "body": "Hola Pablo, ¿Cómo estas? ¿Podrías indicarme los datos del cheque y del proveedor al cual le pagaste con dicho cheque a modo de ejemplo para detectar que sucede?",
+          "created_at": "2026-02-09T20:40:31.000Z"
+        },
+        {
+          "author_type": "user",
+          "body": "Hola Camila",
+          "created_at": "2026-02-09T20:41:04.000Z"
+        },
+        {
+          "author_type": "user",
+          "body": "ahora, luego de las pruebas que me indico la IA el sistema revirtió todos los pagos de cheques",
+          "created_at": "2026-02-09T20:41:40.000Z"
+        },
+        {
+          "author_type": "user",
+          "body": "Osea ni los registrados en enero quedaron, porque los revirtio",
+          "created_at": "2026-02-09T20:41:55.000Z"
+        },
+        {
+          "author_type": "user",
+          "body": "hay 2 ordenes de pago",
+          "created_at": "2026-02-09T20:42:05.000Z"
+        },
+        {
+          "author_type": "user",
+          "body": "La 65 y la 72",
+          "created_at": "2026-02-09T20:42:32.000Z"
+        },
+        {
+          "author_type": "user",
+          "body": "Son todos los cheques emitidos",
+          "created_at": "2026-02-09T20:42:44.000Z"
+        },
+        {
+          "author_type": "user",
+          "body": "Hasta el 31/1 se venían debitando correctamente, luego dejo de hacerlo. Y ahora, con lo que hicimos no tengo ni un cheque debitado",
+          "created_at": "2026-02-09T20:43:52.000Z"
+        },
+        {
+          "author_type": "admin",
+          "body": "Pablo, aguardame que vamos a analizar el caso y vuelvo a vos con novedades por favor.",
+          "created_at": "2026-02-09T20:49:14.000Z"
+        },
+        {
+          "author_type": "user",
+          "body": "ok",
+          "created_at": "2026-02-09T20:51:13.000Z"
+        },
+        {
+          "author_type": "user",
+          "body": "Buen día, ayer me quedo una consulta abierta",
+          "created_at": "2026-02-10T13:05:37.000Z"
+        },
+        {
+          "author_type": "admin",
+          "body": "🔗 Camila Gisel Lagoa linked KAN-12080 : Tesoreria > Cheques y echeqs desaparecieron con fecha >31-01-2026 Jira · colppy.atlassian.net",
+          "created_at": "2026-02-10T15:10:45.000Z"
+        },
+        {
+          "author_type": "admin",
+          "body": "Hola Pablo, ¿Cómo estas? Analizamos tu caso y efectivamente hay un inconveniente en el sistema que ya esta detectado y reportado, en cuanto nuestro equipo de ingeniera lo solucione te voy a estar dando aviso.",
+          "created_at": "2026-02-10T16:48:41.000Z"
+        },
+        {
+          "author_type": "user",
+          "body": "Hola, muchas gracias por la respuesta, aguardo novedades",
+          "created_at": "2026-02-10T16:51:27.000Z"
+        },
+        {
+          "author_type": "user",
+          "body": "2 consulta",
+          "created_at": "2026-02-10T16:51:29.000Z"
+        },
+        {
+          "author_type": "user",
+          "body": "la primera es si sigo cargando mis pagos con cheques como lo hice hastra ahora",
+          "created_at": "2026-02-10T16:51:53.000Z"
+        },
+        {
+          "author_type": "user",
+          "body": "la segunda es como hacer un asiento manual para reflejar el pago de los cheques vencidos",
+          "created_at": "2026-02-10T16:52:32.000Z"
+        },
+        {
+          "author_type": "admin",
+          "body": "Pablo mientras tanto podes seguir cargando los pagos como hasta ahora. Con respecto al asiento para reflejar el pago de estos cheques que no se descontaron de tesorería te pido que por el momento no hagas nada, que están analizando la manera de subsanar este error.",
+          "created_at": "2026-02-10T18:12:45.000Z"
+        },
+        {
+          "author_type": "user",
+          "body": "Genial, quedo a la espera",
+          "created_at": "2026-02-10T18:18:45.000Z"
+        },
+        {
+          "author_type": "user",
+          "body": "Muchas gracias Camila",
+          "created_at": "2026-02-10T18:18:52.000Z"
+        },
+        {
+          "author_type": "admin",
+          "body": "A vos Pablo por entender, en cuanto tenga novedades vuelvo a vos.",
+          "created_at": "2026-02-10T18:29:13.000Z"
+        },
+        {
+          "author_type": "admin",
+          "body": "Hola Pablo, ¿Cómo estas? El equipo estuvo trabajando sobre el inconveniente de los cheques, ¿podrías indicarme si ya ves correctamente los depósitos?",
+          "created_at": "2026-02-27T19:07:06.000Z"
+        }
+      ]
+    },
+    {
+      "conversation_id": "215473061263956",
+      "created_at": "2026-02-11T18:59:58.000Z",
+      "state": "closed",
+      "contact_email": "coordinacionadm@acaculturalarmenia.org.ar",
+      "contact_es_contador": null,
+      "contact_rol_wizard": null,
+      "tags": [
+        "Consultas-No responden",
+        "Mod Tes-Conecta tu Banco",
+        "Chat-Bot",
+        "tesoreria"
+      ],
+      "parts": [
+        {
+          "author_type": "user",
+          "body": "Conecta tu Banco con Colppy",
+          "created_at": "2026-02-11T18:59:58.000Z"
+        },
+        {
+          "author_type": "bot",
+          "body": "Te compartimos este articulo de ayuda para que conozcas como realizar la conexión de tu banco con Colppy Importante: Por el momento s olo es posible conectar las cuentas de tipo EMPRESA. [App: Article Inserter]",
+          "created_at": "2026-02-11T19:00:01.000Z"
+        },
+        {
+          "author_type": "bot",
+          "body": "¿Pudiste conectar tu banco?",
+          "created_at": "2026-02-11T19:00:03.000Z"
+        },
+        {
+          "author_type": "user",
+          "body": "Necesito más ayuda",
+          "created_at": "2026-02-11T19:00:27.000Z"
+        },
+        {
+          "author_type": "bot",
+          "body": "1.- En caso que se presente una demora visual al momento de hacer clic sobre el botón conectar, sólo debes hacer clic en la cruz para finalizar el proceso y nuevamente seleccionar el botón conectar para que te muestre correctamente las entidades habilitadas. 2.- En caso tener el error \"Credenciales Inválidas\" aunque la contraseña sea correcta, por favor asegúrate de cumplir con los siguientes requerimientos: -Sólo se pueden conectar cuentas de tipo empresa (registradas en el banco a nombre de persona jurídica) ​ -La credencial de la cuenta tipo empresa debe ser única, es decir que no puede tener otra cuenta relacionada adicional a la que se quiere conectar.",
+          "created_at": "2026-02-11T19:00:28.000Z"
+        },
+        {
+          "author_type": "bot",
+          "body": "¿Pudiste conectar tu banco?",
+          "created_at": "2026-02-11T19:00:29.000Z"
+        },
+        {
+          "author_type": "user",
+          "body": "Necesito más ayuda",
+          "created_at": "2026-02-11T19:00:35.000Z"
+        },
+        {
+          "author_type": "bot",
+          "body": "Contanos, ¿Cómo te podemos ayudar?",
+          "created_at": "2026-02-11T19:00:37.000Z"
+        },
+        {
+          "author_type": "user",
+          "body": "no puedo eliminar el banco credicoop del modulo tesoreria",
+          "created_at": "2026-02-11T19:00:52.000Z"
+        },
+        {
+          "author_type": "bot",
+          "body": "No es posible eliminar una cuenta de tesorería que tenga movimientos contables vinculados. Para poder eliminarla, primero tenés que eliminar todos los pagos, cobros, otros cobros y otros pagos que estén vinculados a esa cuenta del Banco Credicoop. Si no querés usarla más pero no podés eliminarla, podés editarla y cambiar el nombre agregando \"NO USAR\" para que no la uses en pagos y cobranzas. Para editarla, hacé clic en \"Editar\" en la cuenta desde el listado de bancos en el módulo Tesorería. Source: Modificar Cuentas de Caja, Bancos y Tarjetas",
+          "created_at": "2026-02-11T19:01:26.000Z"
+        },
+        {
+          "author_type": "bot",
+          "body": "¿Es lo que buscabas?",
+          "created_at": "2026-02-11T19:01:26.000Z"
+        },
+        {
+          "author_type": "user",
+          "body": "necesito hablar con un agente",
+          "created_at": "2026-02-11T19:01:52.000Z"
+        },
+        {
+          "author_type": "bot",
+          "body": "Claro, te voy a pasar con alguien de nuestro equipo. Mientras tanto, ¿podrías contarme más detalles sobre el problema con la cuenta de Credicoop para que puedan ayudarte mejor?",
+          "created_at": "2026-02-11T19:01:58.000Z"
+        },
+        {
+          "author_type": "user",
+          "body": "se lo cuento a la persona",
+          "created_at": "2026-02-11T19:02:08.000Z"
+        },
+        {
+          "author_type": "user",
+          "body": "Hola como estas? necesito eliminar la sincronización del banco CREDICOOP por favor",
+          "created_at": "2026-02-11T19:02:52.000Z"
+        },
+        {
+          "author_type": "user",
+          "body": "por unos inconvenientes con otros bancos",
+          "created_at": "2026-02-11T19:03:01.000Z"
+        },
+        {
+          "author_type": "bot",
+          "body": "Las respuestas te llegarán aquí y por correo electrónico: ✉️ coordinacionadm@acaculturalarmenia.org.ar Nuestro tiempo de respuesta habitual 🕒 Unas horas",
+          "created_at": "2026-02-11T19:03:03.000Z"
+        },
+        {
+          "author_type": "admin",
+          "body": "Hola Martin, Espero que estés muy bien Cuando ingresas a tesorería > editar y eliminar, no te está dejando eliminar la cuenta? Por favor, podrás confirmarme si te muestra algún cartel cuando realizas esos pasos ​",
+          "created_at": "2026-02-11T19:16:36.000Z"
+        },
+        {
+          "author_type": "user",
+          "body": "hola si me figura asi",
+          "created_at": "2026-02-12T14:31:49.000Z"
+        },
+        {
+          "author_type": "admin",
+          "body": "Hola Martin, ¿Cómo estas? Te pido disculpas por la demora en responder. ¿Aun persiste el inconveniente? ¿Esto te sucede en la empresa ASOCIACION CULTURAL ARMENIA?",
+          "created_at": "2026-02-18T17:38:01.000Z"
+        },
+        {
+          "author_type": "admin",
+          "body": "Hola Martin, ¿pudiste ver mi mensaje?",
+          "created_at": "2026-02-19T12:05:46.000Z"
+        },
+        {
+          "author_type": "admin",
+          "body": "Hola Martin, ¿Cómo estás? Dado que no tuvimos respuesta, procederemos a cerrar este chat pero podes escribirnos siempre que lo necesites, desde el botón Ayuda > \"Envianos un mensaje\" Que tengas una buena jornada 😊",
+          "created_at": "2026-02-19T19:05:36.000Z"
+        },
+        {
+          "author_type": "bot",
+          "body": "¿Qué tal estuvo tu conversación con Camila?",
+          "created_at": "2026-02-19T19:05:48.000Z"
+        },
+        {
+          "author_type": "bot",
+          "body": "[Conversation Rating Request]",
+          "created_at": "2026-02-19T19:05:48.000Z"
+        }
+      ]
+    },
+    {
+      "conversation_id": "215473095380151",
+      "created_at": "2026-02-13T18:10:26.000Z",
+      "state": "closed",
+      "contact_email": "tiendaultramarsf@gmail.com",
+      "contact_es_contador": null,
+      "contact_rol_wizard": null,
+      "tags": [
+        "Consultas-No responden",
+        "Chat-Bot",
+        "Mod Cli-Factura de venta-Cuenta Corriente",
+        "Mod Cli-Importación de facturas de venta modelo nuevo",
+        "facturas cliente"
+      ],
+      "parts": [
+        {
+          "author_type": "user",
+          "body": "Hacer una consulta",
+          "created_at": "2026-02-13T18:10:26.000Z"
+        },
+        {
+          "author_type": "bot",
+          "body": "¿Desde qué empresa estás realizando la consulta?",
+          "created_at": "2026-02-13T18:10:28.000Z"
+        },
+        {
+          "author_type": "bot",
+          "body": "Por favor, elegí el módulo sobre el cual queres realizar la consulta.",
+          "created_at": "2026-02-13T18:10:37.000Z"
+        },
+        {
+          "author_type": "user",
+          "body": "Clientes",
+          "created_at": "2026-02-13T18:10:45.000Z"
+        },
+        {
+          "author_type": "bot",
+          "body": "¿En que te puedo ayudar?",
+          "created_at": "2026-02-13T18:10:46.000Z"
+        },
+        {
+          "author_type": "user",
+          "body": "ERROR DEL SISTEMA PARA FACTURAR",
+          "created_at": "2026-02-13T18:10:57.000Z"
+        },
+        {
+          "author_type": "user",
+          "body": "Agregar una factura",
+          "created_at": "2026-02-13T18:11:06.000Z"
+        },
+        {
+          "author_type": "bot",
+          "body": "En Colppy tenes dos opciones para cargar tus facturas: ​ Agregar factura manual Debes ingresar a Clientes > Gestión de clientes > elegir el cliente con un clic > Agregar factura Te explicamos como hacerlo en este link 👈 ​ Importar Facturas desde Excel Podes realizar dos tipos de importaciones desde Clientes > Gestión de clientes > Importar > Facturas (modelo nuevo) ​ -Mis comprobantes emitidos desde AFIP [App: Article Inserter] -Emitir masivamente facturas a clientes ​ [App: Article Inserter]",
+          "created_at": "2026-02-13T18:11:07.000Z"
+        },
+        {
+          "author_type": "bot",
+          "body": "¿Pudiste agregar tus facturas?",
+          "created_at": "2026-02-13T18:11:09.000Z"
+        },
+        {
+          "author_type": "user",
+          "body": "Necesito más ayuda",
+          "created_at": "2026-02-13T18:11:13.000Z"
+        },
+        {
+          "author_type": "bot",
+          "body": "Contanos, ¿Cómo te podemos ayudar?",
+          "created_at": "2026-02-13T18:11:13.000Z"
+        },
+        {
+          "author_type": "user",
+          "body": "Error del sistema para facturar",
+          "created_at": "2026-02-13T18:11:27.000Z"
+        },
+        {
+          "author_type": "bot",
+          "body": "Los errores del sistema al facturar suelen estar relacionados con problemas de conexión con AFIP. Cuando esto pasa, nuestro sistema guarda la factura en estado \"En Proceso\" y hace reintentos automáticos. Si AFIP la procesa, le asigna el número correspondiente, y si no, se elimina. Te recomiendo: • Esperar un poco y verificar si la factura se emitió correctamente • Si después de 2 horas el comprobante no se completó, escribinos nuevamente • Intentar generar la factura desde modo incógnito en tu navegador, ya que puede ser un problema de caché ¿Podrías contarme exactamente qué mensaje de error te aparece y qué estabas haciendo cuando ocurrió?",
+          "created_at": "2026-02-13T18:11:51.000Z"
+        },
+        {
+          "author_type": "user",
+          "body": "Hubo un error interno del sistema. Comúniquese con soporte en soporte@colppy.com . ​",
+          "created_at": "2026-02-13T18:12:53.000Z"
+        },
+        {
+          "author_type": "bot",
+          "body": "Perfecto, ya veo el mensaje de error específico. Este error interno del sistema suele estar relacionado con problemas de conexión con AFIP. Nuestro sistema guarda la factura en estado \"En Proceso\" y hace reintentos automáticos. Si AFIP la procesa, le asigna el número correspondiente, y si no, se elimina. Te recomiendo esperar un poco y verificar si la factura se emitió correctamente. Si después de 2 horas el comprobante no se completó, escribinos nuevamente para que podamos ayudarte. Mientras tanto, también podés intentar generar la factura desde modo incógnito en tu navegador, ya que a veces puede ser un problema de caché.",
+          "created_at": "2026-02-13T18:13:12.000Z"
+        },
+        {
+          "author_type": "bot",
+          "body": "¿Es lo que buscabas?",
+          "created_at": "2026-02-13T18:13:12.000Z"
+        },
+        {
+          "author_type": "user",
+          "body": "Si pero sigo con el problema",
+          "created_at": "2026-02-13T18:13:35.000Z"
+        },
+        {
+          "author_type": "bot",
+          "body": "Entiendo que el problema persiste. Como ya pasaron más de 2 horas y el error interno del sistema sigue apareciendo, necesitás que nuestro equipo revise tu caso específicamente. Podés reformular tu pregunta o hablar con nuestro equipo de soporte técnico especializado. Están disponibles de lunes a viernes de 9 a 18hs en días hábiles para ayudarte a resolver este inconveniente.",
+          "created_at": "2026-02-13T18:14:06.000Z"
+        },
+        {
+          "author_type": "bot",
+          "body": "¿Responde eso a tu pregunta?",
+          "created_at": "2026-02-13T18:14:06.000Z"
+        },
+        {
+          "author_type": "user",
+          "body": "Buenas tengo el mensaje de contactarse al soporte al facturar y ya pasaron mas de dos horas del mismo error",
+          "created_at": "2026-02-13T18:15:30.000Z"
+        },
+        {
+          "author_type": "user",
+          "body": "Hubo un error interno del sistema. Comúniquese con soporte en soporte@colppy.com . ​",
+          "created_at": "2026-02-13T18:15:40.000Z"
+        },
+        {
+          "author_type": "bot",
+          "body": "Como ya pasaron más de 2 horas y el error interno del sistema persiste, necesitás que nuestro equipo técnico revise tu caso específicamente. Podés contactar a nuestro soporte técnico especializado a través de: • Chat en vivo dentro de la plataforma • Email: soporte@colppy.com Estamos disponibles de lunes a viernes de 9 a 18hs en días hábiles para ayudarte a resolver este inconveniente. Cuando te comuniques, mencioná que ya pasaron más de 2 horas con el mismo error interno del sistema al facturar para que puedan priorizar tu caso.",
+          "created_at": "2026-02-13T18:16:02.000Z"
+        },
+        {
+          "author_type": "bot",
+          "body": "¿Te fue útil esta información?",
+          "created_at": "2026-02-13T18:16:02.000Z"
+        },
+        {
+          "author_type": "user",
+          "body": "Contactar con el soporte tecnico",
+          "created_at": "2026-02-13T18:16:29.000Z"
+        },
+        {
+          "author_type": "bot",
+          "body": "Claro, te voy a pasar con alguien de nuestro equipo de soporte. Mientras tanto, ¿podrías contarme más detalles sobre el problema para que puedan ayudarte más rápido?",
+          "created_at": "2026-02-13T18:16:35.000Z"
+        },
+        {
+          "author_type": "user",
+          "body": "contactar con el soporte",
+          "created_at": "2026-02-13T18:17:47.000Z"
+        },
+        {
+          "author_type": "admin",
+          "body": "Hola Mariano, ¿Cómo estas? Te pido disculpas por la demora en responder, el inconveniente fue solucionado el mismo día, ¿pudiste facturar?",
+          "created_at": "2026-02-18T12:28:36.000Z"
+        },
+        {
+          "author_type": "admin",
+          "body": "Hola Mariano, ¿pudiste ver mi mensaje?",
+          "created_at": "2026-02-19T12:00:58.000Z"
+        },
+        {
+          "author_type": "admin",
+          "body": "Hola Mariano, ¿Cómo estás? Dado que no tuvimos respuesta, procederemos a cerrar este chat pero podes escribirnos siempre que lo necesites, desde el botón Ayuda > \"Envianos un mensaje\" . Que tengas una buena jornada 😊",
+          "created_at": "2026-02-19T19:04:35.000Z"
+        },
+        {
+          "author_type": "bot",
+          "body": "¿Qué tal estuvo tu conversación con Camila?",
+          "created_at": "2026-02-19T19:04:48.000Z"
+        },
+        {
+          "author_type": "bot",
+          "body": "[Conversation Rating Request]",
+          "created_at": "2026-02-19T19:04:48.000Z"
+        }
+      ]
+    },
+    {
+      "conversation_id": "215473096891717",
+      "created_at": "2026-02-13T20:18:25.000Z",
+      "state": "closed",
+      "contact_email": "liliana@tessileargentina.com.ar",
+      "contact_es_contador": null,
+      "contact_rol_wizard": null,
+      "tags": [
+        "Consultas-No responden",
+        "Chat-Bot",
+        "MC-Invitar usuarios",
+        "invitar usuario"
+      ],
+      "parts": [
+        {
+          "author_type": "user",
+          "body": "Configuración Contadores",
+          "created_at": "2026-02-13T20:18:25.000Z"
+        },
+        {
+          "author_type": "bot",
+          "body": "¡Bienvenido a Colppy! 🎉 Para empezar a configurar tu estudio, debés realizar los siguientes pasos: Verifica los datos registrados de tu empresa en Configuración > Datos Generales Agrega tus empresas administradas Plan de cuentas y su configuración.",
+          "created_at": "2026-02-13T20:18:28.000Z"
+        },
+        {
+          "author_type": "user",
+          "body": "Invitar Usuarios",
+          "created_at": "2026-02-13T20:18:39.000Z"
+        },
+        {
+          "author_type": "bot",
+          "body": "Con tu plan \"Contador Independiente\" o \"Consultoras y Estudios\" podes invitar a tus usuarios, siendo el administrador. - Contador Inicio: único usuario ​ - Contador Independiente: Podes invitar hasta 3 usuarios ​ - Consultoras y Estudios: Podes invitar hasta 30 usuarios 📣Importante Los usuarios que invites deben tener el mismo dominio de email que el usuario administrador . Por ejemplo: Si el usuario administrador usa @gmail.com los demás usuarios deben tener ese mismo dominio. Para invitar a los usuarios desde la plataforma debes dirigirte al botón \"Invitar usuarios\" y completar la información. Para más información sobre invitación de usuarios da clic en este link",
+          "created_at": "2026-02-13T20:18:40.000Z"
+        },
+        {
+          "author_type": "bot",
+          "body": "¿Pudiste invitar a tus usuarios?",
+          "created_at": "2026-02-13T20:18:41.000Z"
+        },
+        {
+          "author_type": "user",
+          "body": "Necesito más ayuda",
+          "created_at": "2026-02-13T20:18:48.000Z"
+        },
+        {
+          "author_type": "bot",
+          "body": "Contanos, ¿Cómo te podemos ayudar?",
+          "created_at": "2026-02-13T20:18:48.000Z"
+        },
+        {
+          "author_type": "user",
+          "body": "envie la invitacion hace un tiempo y no llega el codigo para poder generar la clave",
+          "created_at": "2026-02-13T20:19:09.000Z"
+        },
+        {
+          "author_type": "user",
+          "body": "como hago para volver a invitarlo",
+          "created_at": "2026-02-13T20:19:16.000Z"
+        },
+        {
+          "author_type": "bot",
+          "body": "Para volver a enviar la invitación, tenés que ir a Mi Cuenta > pestaña \"Administración de usuarios\" > buscar el usuario y hacer clic en \"Invitar usuario\" nuevamente. También recordá que el usuario invitado debe revisar la carpeta de spam o correo no deseado, ya que a veces los correos de invitación llegan ahí. Si el usuario ya recibió la invitación pero no recuerda la contraseña, puede ir a https://login.colppy.com/ y usar la opción \"Olvidé mi contraseña\" para recuperarla. Sources: ¿Como puedo crear/ invitar nuevos usuarios a mi empresa en Colppy? Olvidé mi contraseña - Recuperar contraseña",
+          "created_at": "2026-02-13T20:19:32.000Z"
+        },
+        {
+          "author_type": "bot",
+          "body": "¿Es lo que buscabas?",
+          "created_at": "2026-02-13T20:19:33.000Z"
+        },
+        {
+          "author_type": "user",
+          "body": "me dice que el usuario ya tiene acceso",
+          "created_at": "2026-02-13T20:21:37.000Z"
+        },
+        {
+          "author_type": "bot",
+          "body": "Si te dice que el usuario ya tiene acceso, significa que ya fue invitado anteriormente y está activo en el sistema. Para verificar esto, andá a Mi Cuenta > pestaña \"Administración de usuarios\" y ahí vas a ver todos los usuarios, tanto activos como inactivos. Si el usuario aparece como activo, ya puede ingresar a la plataforma. Si necesita recuperar su contraseña, que vaya a https://login.colppy.com/ y use \"Olvidé mi contraseña\". Si querés quitarle el acceso, en esa misma sección podés hacer clic en \"desactivar\" al lado del usuario. Sources: ¿Como puedo crear/ invitar nuevos usuarios a mi empresa en Colppy? Desactivar usuario invitado",
+          "created_at": "2026-02-13T20:21:55.000Z"
+        },
+        {
+          "author_type": "bot",
+          "body": "¿Responde esto a tu pregunta?",
+          "created_at": "2026-02-13T20:21:55.000Z"
+        },
+        {
+          "author_type": "bot",
+          "body": "Si aún necesitas ayuda con el acceso o la gestión de usuarios, estamos aquí para asistirte. ¿Podrías contarme más sobre el problema que estás intentando resolver?",
+          "created_at": "2026-02-13T20:25:57.000Z"
+        },
+        {
+          "author_type": "admin",
+          "body": "Hola Liliana, Espero que estés muy bien Podrás indicarme el mail de la persona a la cuál invitaste?",
+          "created_at": "2026-02-13T20:46:44.000Z"
+        },
+        {
+          "author_type": "admin",
+          "body": "Hola Liliana, ¿Cómo estás? Dado que no tuvimos respuesta, procederemos a cerrar este chat pero podes escribirnos siempre que lo necesites, desde el botón Ayuda > \"Envianos un mensaje\" . Que tengas una buena jornada 😊",
+          "created_at": "2026-02-19T12:04:58.000Z"
+        },
+        {
+          "author_type": "bot",
+          "body": "¿Qué tal estuvo tu conversación con Camila?",
+          "created_at": "2026-02-19T12:05:10.000Z"
+        },
+        {
+          "author_type": "bot",
+          "body": "[Conversation Rating Request]",
+          "created_at": "2026-02-19T12:05:11.000Z"
+        }
+      ]
+    },
+    {
+      "conversation_id": "215473038732392",
+      "created_at": "2026-02-10T13:00:20.000Z",
+      "state": "closed",
+      "contact_email": "camila.lagoa@colppy.com",
+      "contact_es_contador": null,
+      "contact_rol_wizard": null,
+      "tags": [
+        "Mod Cfg-Factura Electrónica-",
+        "importación",
+        "soporte en linea"
+      ],
+      "parts": [
+        {
+          "author_type": "user",
+          "body": "---------- Forwarded message --------- De: Cecilia Machado < c.temptech@gmail.com > Date: lun, 9 feb 2026 a las 12:03 Subject: Re: Ultimo Paso. Descargá tu reporte To: Camila de Colppy < camila.lagoa@colppy.com > También otra consulta que te quiero hacer, es si existe la posiblidad de cargar una factura con la mercadería a ingresar, pero el proveedor realiza entregas parciales. Como se pueden ir cargando luego? Gracias, y perdón por las molestias. El lun, 9 feb 2026 a las 10:06, Cecilia Machado (< c.temptech@gmail.com >) escribió: Hola Camila, buen dìa. Nuevamente me pongo en contacto para hacerte una consulta, ya que estamos conociendo el sistema aùn. Te consulto, còmo puedo hacer para traer la informaciòn de AFIP a Colppy? Me refiero en cuanto a talonarios y facturas A y B Gracias!!! El mié, 21 ene 2026 a las 15:52, Camila de Colppy (< camila.lagoa@colppy.com >) escribió:",
+          "created_at": "2026-02-10T13:00:20.000Z"
+        },
+        {
+          "author_type": "admin",
+          "body": "Hola, buenos días, ¿Cómo estas? ​ Te dejo el LINK del articulo que explica como crear talonarios, tene en cuenta que si esos puntos de venta los utilizas en ARCA, en Colppy solo van a ser de registro, el único punto de venta que impacta en ARCA es el nuevo punto de venta que generes para la factura electrónica. ​ Por otro lado te dejo los link de los artículos que te explican como importar a Colppy los comprobantes ya emitidos en ARCA: ​ Comprobantes emitidos: LINK Comprobantes recibidos: LINK Con respecto a tu consulta sobre la mercadería a ingresar, ¿vos necesitarías hacer una factura por todos los productos y luego sobre esa factura ir pagando parcialmente a medida que te entrega?",
+          "created_at": "2026-02-10T13:20:09.000Z"
+        },
+        {
+          "author_type": "user",
+          "body": "Hola Cami, perdón que te moleste nuevamente. Hoy generamos una factura desde Colppy, pero no nos figura en ARCA. Me podrías indicar cuál es el inconveniente? Gracias ​ El mar, 10 feb 2026 a las 10:20, Camila de Colppy (< soporte@colppy.com >) escribió: ​",
+          "created_at": "2026-02-10T15:20:51.000Z"
+        },
+        {
+          "author_type": "admin",
+          "body": "Ceci, ¿podrías indicarme a que cliente y que numero de factura emitiste? Porque no veo ninguna factura emitida con el punto de venta electronico.",
+          "created_at": "2026-02-10T16:58:11.000Z"
+        },
+        {
+          "author_type": "admin",
+          "body": "Hola Ceci, ¿pudiste ver mi mensaje?",
+          "created_at": "2026-02-10T19:55:36.000Z"
+        },
+        {
+          "author_type": "user",
+          "body": "Hola Cami, buen día. Te envío captura, quizás al momento de generarla, hicimos algo mal... pero esto sería lo que hicimos. Gracias ​ El mar, 10 feb 2026 a las 13:58, Camila de Colppy (< soporte@colppy.com >) escribió: Ceci, ¿podrías indicarme a que cliente y que numero de factura emitiste? Porque no veo ninguna factura emitida con el punto de venta electronico. Camila Colppy Con la tecnología de Intercom El Tue, Feb 10, 2026 a las 12:20 PM, Cecilia Machado < c.temptech@gmail.com > escribió: ​ Hola Cami, perdón que te moleste nuevamente. Hoy generamos una factura desde Colppy, pero no nos figura en ARCA. Me podrías indicar cuál es el inconveniente? Gracias ​ El mar, 10 feb 2026 a las 10:20, Camila de Colppy (< soporte@colppy.com >) escribió: Hola, buenos días, ¿Cómo estas? ​ Te dejo el LINK del articulo que explica como crear talonarios, tene en cuenta que si esos puntos de venta los utilizas en ARCA, en Colppy solo van a ser de registro, el único punto de venta que impacta en ARCA es el nuevo punto de venta que generes para la factura electrónica. ​ Por otro lado te dejo los link de los artículos que te explican como importar a Colppy los comprobantes ya emitidos en ARCA: ​ Comprobantes emitidos: LINK Comprobantes recibidos: LINK ​ Con respecto a tu consulta sobre la mercadería a ingresar, ¿vos necesitarías hacer una factura por todos los productos y luego sobre esa factura ir pagando parcialmente a medida que te entrega? Camila Colppy Con la tecnología de Intercom",
+          "created_at": "2026-02-11T11:11:46.000Z"
+        },
+        {
+          "author_type": "user",
+          "body": "Cami, perdón. Te hago una consulta, habrá algún tipo de soporte que sea vía whatsapp o por otro medio? Para evacuar dudas y consultas de manera más dinámica? ​ El mar, 10 feb 2026 a las 13:58, Camila de Colppy (< soporte@colppy.com >) escribió: Ceci, ¿podrías indicarme a que cliente y que numero de factura emitiste? Porque no veo ninguna factura emitida con el punto de venta electronico. Camila Colppy Con la tecnología de Intercom El Tue, Feb 10, 2026 a las 12:20 PM, Cecilia Machado < c.temptech@gmail.com > escribió: ​ Hola Cami, perdón que te moleste nuevamente. Hoy generamos una factura desde Colppy, pero no nos figura en ARCA. Me podrías indicar cuál es el inconveniente? Gracias ​ El mar, 10 feb 2026 a las 10:20, Camila de Colppy (< soporte@colppy.com >) escribió: Hola, buenos días, ¿Cómo estas? ​ Te dejo el LINK del articulo que explica como crear talonarios, tene en cuenta que si esos puntos de venta los utilizas en ARCA, en Colppy solo van a ser de registro, el único punto de venta que impacta en ARCA es el nuevo punto de venta que generes para la factura electrónica. ​ Por otro lado te dejo los link de los artículos que te explican como importar a Colppy los comprobantes ya emitidos en ARCA: ​ Comprobantes emitidos: LINK Comprobantes recibidos: LINK ​ Con respecto a tu consulta sobre la mercadería a ingresar, ¿vos necesitarías hacer una factura por todos los productos y luego sobre esa factura ir pagando parcialmente a medida que te entrega? Camila Colppy Con la tecnología de Intercom",
+          "created_at": "2026-02-11T11:36:28.000Z"
+        },
+        {
+          "author_type": "admin",
+          "body": "Hola Ceci, ¿estas disponible para que te llame ahora unos minutos? De ser así ¿me brindas un numero telefónico por favor?",
+          "created_at": "2026-02-11T12:13:53.000Z"
+        },
+        {
+          "author_type": "user",
+          "body": "Si, es 1172375839 ​ El mié, 11 feb 2026 a las 9:13, Camila de Colppy (< soporte@colppy.com >) escribió: Hola Ceci, ¿estas disponible para que te llame ahora unos minutos? De ser así ¿me brindas un numero telefónico por favor? Camila Colppy Con la tecnología de Intercom El Wed, Feb 11, 2026 a las 08:36 AM, Cecilia Machado < c.temptech@gmail.com > escribió: ​ Cami, perdón. Te hago una consulta, habrá algún tipo de soporte que sea vía whatsapp o por otro medio? Para evacuar dudas y consultas de manera más dinámica? ​ El mar, 10 feb 2026 a las 13:58, Camila de Colppy (< soporte@colppy.com >) escribió: Ceci, ¿podrías indicarme a que cliente y que numero de factura emitiste? Porque no veo ninguna factura emitida con el punto de venta electronico. Camila Colppy Con la tecnología de Intercom El Tue, Feb 10, 2026 a las 12:20 PM, Cecilia Machado < c.temptech@gmail.com > escribió: ​ Hola Cami, perdón que te moleste nuevamente. Hoy generamos una factura desde Colppy, pero no nos figura en ARCA. Me podrías indicar cuál es el inconveniente? Gracias ​ El mar, 10 feb 2026 a las 10:20, Camila de Colppy (< soporte@colppy.com >) escribió: Hola, buenos días, ¿Cómo estas? ​ Te dejo el LINK del articulo que explica como crear talonarios, tene en cuenta que si esos puntos de venta los utilizas en ARCA, en Colppy solo van a ser de registro, el único punto de venta que impacta en ARCA es el nuevo punto de venta que generes para la factura electrónica. ​ Por otro lado te dejo los link de los artículos que te explican como importar a Colppy los comprobantes ya emitidos en ARCA: ​ Comprobantes emitidos: LINK Comprobantes recibidos: LINK ​ Con respecto a tu consulta sobre la mercadería a ingresar, ¿vos necesitarías hacer una factura por todos los productos y luego sobre esa factura ir pagando parcialmente a medida que te entrega? Camila Colppy Con la tecnología de Intercom",
+          "created_at": "2026-02-11T13:15:18.000Z"
+        },
+        {
+          "author_type": "admin",
+          "body": "Ceci, ¿te ingresa mi llamada? Porque suena pero me da contestador luego",
+          "created_at": "2026-02-11T13:37:13.000Z"
+        },
+        {
+          "author_type": "user",
+          "body": "Hola Cami. Buen día. Perdón que ayer no te pude atender, es un celu que funciona con Whatsapp solamente, y para llamadas hay que activarlo. Debe ser por eso que no entraba la llamada. Me decís en qué horario estas disponible para poder activarlo a esa hora y que charlemos? Gracias ​ El mié, 11 feb 2026 a las 10:37, Camila de Colppy (< soporte@colppy.com >) escribió: Ceci, ¿te ingresa mi llamada? Porque suena pero me da contestador luego Camila Colppy Con la tecnología de Intercom El Wed, Feb 11, 2026 a las 10:15 AM, Cecilia Machado < c.temptech@gmail.com > escribió: ​ Si, es 1172375839 ​ El mié, 11 feb 2026 a las 9:13, Camila de Colppy (< soporte@colppy.com >) escribió: Hola Ceci, ¿estas disponible para que te llame ahora unos minutos? De ser así ¿me brindas un numero telefónico por favor? Camila Colppy Con la tecnología de Intercom El Wed, Feb 11, 2026 a las 08:36 AM, Cecilia Machado < c.temptech@gmail.com > escribió: ​ Cami, perdón. Te hago una consulta, habrá algún tipo de soporte que sea vía whatsapp o por otro medio? Para evacuar dudas y consultas de manera más dinámica? ​ El mar, 10 feb 2026 a las 13:58, Camila de Colppy (< soporte@colppy.com >) escribió: Ceci, ¿podrías indicarme a que cliente y que numero de factura emitiste? Porque no veo ninguna factura emitida con el punto de venta electronico. Camila Colppy Con la tecnología de Intercom El Tue, Feb 10, 2026 a las 12:20 PM, Cecilia Machado < c.temptech@gmail.com > escribió: ​ Hola Cami, perdón que te moleste nuevamente. Hoy generamos una factura desde Colppy, pero no nos figura en ARCA. Me podrías indicar cuál es el inconveniente? Gracias ​ El mar, 10 feb 2026 a las 10:20, Camila de Colppy (< soporte@colppy.com >) escribió: Hola, buenos días, ¿Cómo estas? ​ Te dejo el LINK del articulo que explica como crear talonarios, tene en cuenta que si esos puntos de venta los utilizas en ARCA, en Colppy solo van a ser de registro, el único punto de venta que impacta en ARCA es el nuevo punto de venta que generes para la factura electrónica. ​ Por otro lado te dejo los link de los artículos que te explican como importar a Colppy los comprobantes ya emitidos en ARCA: ​ Comprobantes emitidos: LINK Comprobantes recibidos: LINK ​ Con respecto a tu consulta sobre la mercadería a ingresar, ¿vos necesitarías hacer una factura por todos los productos y luego sobre esa factura ir pagando parcialmente a medida que te entrega? Camila Colppy Con la tecnología de Intercom",
+          "created_at": "2026-02-12T11:47:50.000Z"
+        },
+        {
+          "author_type": "admin",
+          "body": "Hola Ceci, Te podemos llamar entre las 13 y las 14 hs?",
+          "created_at": "2026-02-12T13:36:52.000Z"
+        },
+        {
+          "author_type": "user",
+          "body": "Hola Carla, si. estoy disponible. ​ El jue, 12 feb 2026 a las 10:36, Carla de Colppy (< soporte@colppy.com >) escribió: Hola Ceci, Te podemos llamar entre las 13 y las 14 hs? Carla Colppy Con la tecnología de Intercom El Thu, Feb 12, 2026 a las 08:47 AM, Cecilia Machado < c.temptech@gmail.com > escribió: ​ Hola Cami. Buen día. Perdón que ayer no te pude atender, es un celu que funciona con Whatsapp solamente, y para llamadas hay que activarlo. Debe ser por eso que no entraba la llamada. Me decís en qué horario estas disponible para poder activarlo a esa hora y que charlemos? Gracias ​ El mié, 11 feb 2026 a las 10:37, Camila de Colppy (< soporte@colppy.com >) escribió: Ceci, ¿te ingresa mi llamada? Porque suena pero me da contestador luego Camila Colppy Con la tecnología de Intercom El Wed, Feb 11, 2026 a las 10:15 AM, Cecilia Machado < c.temptech@gmail.com > escribió: ​ Si, es 1172375839 ​ El mié, 11 feb 2026 a las 9:13, Camila de Colppy (< soporte@colppy.com >) escribió: Hola Ceci, ¿estas disponible para que te llame ahora unos minutos? De ser así ¿me brindas un numero telefónico por favor? Camila Colppy Con la tecnología de Intercom El Wed, Feb 11, 2026 a las 08:36 AM, Cecilia Machado < c.temptech@gmail.com > escribió: ​ Cami, perdón. Te hago una consulta, habrá algún tipo de soporte que sea vía whatsapp o por otro medio? Para evacuar dudas y consultas de manera más dinámica? ​ El mar, 10 feb 2026 a las 13:58, Camila de Colppy (< soporte@colppy.com >) escribió: Ceci, ¿podrías indicarme a que cliente y que numero de factura emitiste? Porque no veo ninguna factura emitida con el punto de venta electronico. Camila Colppy Con la tecnología de Intercom El Tue, Feb 10, 2026 a las 12:20 PM, Cecilia Machado < c.temptech@gmail.com > escribió: ​ Hola Cami, perdón que te moleste nuevamente. Hoy generamos una factura desde Colppy, pero no nos figura en ARCA. Me podrías indicar cuál es el inconveniente? Gracias ​ El mar, 10 feb 2026 a las 10:20, Camila de Colppy (< soporte@colppy.com >) escribió: Hola, buenos días, ¿Cómo estas? ​ Te dejo el LINK del articulo que explica como crear talonarios, tene en cuenta que si esos puntos de venta los utilizas en ARCA, en Colppy solo van a ser de registro, el único punto de venta que impacta en ARCA es el nuevo punto de venta que generes para la factura electrónica. ​ Por otro lado te dejo los link de los artículos que te explican como importar a Colppy los comprobantes ya emitidos en ARCA: ​ Comprobantes emitidos: LINK Comprobantes recibidos: LINK ​ Con respecto a tu consulta sobre la mercadería a ingresar, ¿vos necesitarías hacer una factura por todos los productos y luego sobre esa factura ir pagando parcialmente a medida que te entrega? Camila Colppy Con la tecnología de Intercom",
+          "created_at": "2026-02-12T17:02:14.000Z"
+        },
+        {
+          "author_type": "user",
+          "body": "Hola! Perdón por los desencuentros. Podrían llamarnos mañana entre las 9 y las 11hs? Aguardo confirmación. ​ El jue, 12 feb 2026 a las 14:01, Cecilia Machado (< c.temptech@gmail.com >) escribió: ​ Hola Carla, si. estoy disponible. ​ El jue, 12 feb 2026 a las 10:36, Carla de Colppy (< soporte@colppy.com >) escribió: Hola Ceci, Te podemos llamar entre las 13 y las 14 hs? Carla Colppy Con la tecnología de Intercom El Thu, Feb 12, 2026 a las 08:47 AM, Cecilia Machado < c.temptech@gmail.com > escribió: ​ Hola Cami. Buen día. Perdón que ayer no te pude atender, es un celu que funciona con Whatsapp solamente, y para llamadas hay que activarlo. Debe ser por eso que no entraba la llamada. Me decís en qué horario estas disponible para poder activarlo a esa hora y que charlemos? Gracias ​ El mié, 11 feb 2026 a las 10:37, Camila de Colppy (< soporte@colppy.com >) escribió: Ceci, ¿te ingresa mi llamada? Porque suena pero me da contestador luego Camila Colppy Con la tecnología de Intercom El Wed, Feb 11, 2026 a las 10:15 AM, Cecilia Machado < c.temptech@gmail.com > escribió: ​ Si, es 1172375839 ​ El mié, 11 feb 2026 a las 9:13, Camila de Colppy (< soporte@colppy.com >) escribió: Hola Ceci, ¿estas disponible para que te llame ahora unos minutos? De ser así ¿me brindas un numero telefónico por favor? Camila Colppy Con la tecnología de Intercom El Wed, Feb 11, 2026 a las 08:36 AM, Cecilia Machado < c.temptech@gmail.com > escribió: ​ Cami, perdón. Te hago una consulta, habrá algún tipo de soporte que sea vía whatsapp o por otro medio? Para evacuar dudas y consultas de manera más dinámica? ​ El mar, 10 feb 2026 a las 13:58, Camila de Colppy (< soporte@colppy.com >) escribió: Ceci, ¿podrías indicarme a que cliente y que numero de factura emitiste? Porque no veo ninguna factura emitida con el punto de venta electronico. Camila Colppy Con la tecnología de Intercom El Tue, Feb 10, 2026 a las 12:20 PM, Cecilia Machado < c.temptech@gmail.com > escribió: ​ Hola Cami, perdón que te moleste nuevamente. Hoy generamos una factura desde Colppy, pero no nos figura en ARCA. Me podrías indicar cuál es el inconveniente? Gracias ​ El mar, 10 feb 2026 a las 10:20, Camila de Colppy (< soporte@colppy.com >) escribió: Hola, buenos días, ¿Cómo estas? ​ Te dejo el LINK del articulo que explica como crear talonarios, tene en cuenta que si esos puntos de venta los utilizas en ARCA, en Colppy solo van a ser de registro, el único punto de venta que impacta en ARCA es el nuevo punto de venta que generes para la factura electrónica. ​ Por otro lado te dejo los link de los artículos que te explican como importar a Colppy los comprobantes ya emitidos en ARCA: ​ Comprobantes emitidos: LINK Comprobantes recibidos: LINK ​ Con respecto a tu consulta sobre la mercadería a ingresar, ¿vos necesitarías hacer una factura por todos los productos y luego sobre esa factura ir pagando parcialmente a medida que te entrega? Camila Colppy Con la tecnología de Intercom",
+          "created_at": "2026-02-12T19:52:53.000Z"
+        },
+        {
+          "author_type": "user",
+          "body": "Hola Carla, buenas tardes. Te dejo algunas consultas, para ver si por favor, podemos resolverlas a la brevedad. Cargamos una factura en Colppy, pero la misma no impactò en ARCA. Quizás exista algún punto que realizamos mal. Cómo genero un factura para que la misma impacte en ARCA? Además, realizamos la importación de facturas desde ARCA, y hay muchas Fac C, y algunas A, que figuran con errores. Por otra lado, también les comento, que nosotros contamos con una Tienda Nube desde la cual vendemos productos, los productos vendidos a través de la tienda se facturan por medio de un sistema de facturación que tenemos que se llama FACTURANTE. Existe alguna manera de vicular Colppy con facturante? O como debemos hacer para importar esas facturas a Colppy? Aguardo respuesta. Y por otro lado, quiero consultarles si no hay algún medio de comunicación que sea mas efectivo para poder evacuar dudas o consultas sobre el sistema, ya que comunicarnos por este medio demora bastante y hay situaciones que debemos resolverlas de manera rápida. Desde ya, muchas gracias. ​ El jue, 12 feb 2026 a las 16:48, Cecilia Machado (< c.temptech@gmail.com >) escribió: ​ Hola! Perdón por los desencuentros. Podrían llamarnos mañana entre las 9 y las 11hs? Aguardo confirmación. ​ El jue, 12 feb 2026 a las 14:01, Cecilia Machado (< c.temptech@gmail.com >) escribió: ​ Hola Carla, si. estoy disponible. ​ El jue, 12 feb 2026 a las 10:36, Carla de Colppy (< soporte@colppy.com >) escribió: Hola Ceci, Te podemos llamar entre las 13 y las 14 hs? Carla Colppy Con la tecnología de Intercom El Thu, Feb 12, 2026 a las 08:47 AM, Cecilia Machado < c.temptech@gmail.com > escribió: ​ Hola Cami. Buen día. Perdón que ayer no te pude atender, es un celu que funciona con Whatsapp solamente, y para llamadas hay que activarlo. Debe ser por eso que no entraba la llamada. Me decís en qué horario estas disponible para poder activarlo a esa hora y que charlemos? Gracias ​ El mié, 11 feb 2026 a las 10:37, Camila de Colppy (< soporte@colppy.com >) escribió: Ceci, ¿te ingresa mi llamada? Porque suena pero me da contestador luego Camila Colppy Con la tecnología de Intercom El Wed, Feb 11, 2026 a las 10:15 AM, Cecilia Machado < c.temptech@gmail.com > escribió: ​ Si, es 1172375839 ​ El mié, 11 feb 2026 a las 9:13, Camila de Colppy (< soporte@colppy.com >) escribió: Hola Ceci, ¿estas disponible para que te llame ahora unos minutos? De ser así ¿me brindas un numero telefónico por favor? Camila Colppy Con la tecnología de Intercom El Wed, Feb 11, 2026 a las 08:36 AM, Cecilia Machado < c.temptech@gmail.com > escribió: ​ Cami, perdón. Te hago una consulta, habrá algún tipo de soporte que sea vía whatsapp o por otro medio? Para evacuar dudas y consultas de manera más dinámica? ​ El mar, 10 feb 2026 a las 13:58, Camila de Colppy (< soporte@colppy.com >) escribió: Ceci, ¿podrías indicarme a que cliente y que numero de factura emitiste? Porque no veo ninguna factura emitida con el punto de venta electronico. Camila Colppy Con la tecnología de Intercom El Tue, Feb 10, 2026 a las 12:20 PM, Cecilia Machado < c.temptech@gmail.com > escribió: ​ Hola Cami, perdón que te moleste nuevamente. Hoy generamos una factura desde Colppy, pero no nos figura en ARCA. Me podrías indicar cuál es el inconveniente? Gracias ​ El mar, 10 feb 2026 a las 10:20, Camila de Colppy (< soporte@colppy.com >) escribió: Hola, buenos días, ¿Cómo estas? ​ Te dejo el LINK del articulo que explica como crear talonarios, tene en cuenta que si esos puntos de venta los utilizas en ARCA, en Colppy solo van a ser de registro, el único punto de venta que impacta en ARCA es el nuevo punto de venta que generes para la factura electrónica. ​ Por otro lado te dejo los link de los artículos que te explican como importar a Colppy los comprobantes ya emitidos en ARCA: ​ Comprobantes emitidos: LINK Comprobantes recibidos: LINK ​ Con respecto a tu consulta sobre la mercadería a ingresar, ¿vos necesitarías hacer una factura por todos los productos y luego sobre esa factura ir pagando parcialmente a medida que te entrega? Camila Colppy Con la tecnología de Intercom",
+          "created_at": "2026-02-13T16:45:49.000Z"
+        },
+        {
+          "author_type": "admin",
+          "body": "Hola Cecilia, Espero que estés muy bien 1. Factura electrónica: en la empresa TEMPTECH ya está implementada con el talonario de punto de venta 0005. Para emitir facturas electrónicas que impacten en el web service de ARCA y que les permita tener CAE, deben utilizar ese talonario al momento de emitir la factura. En el siguiente link les comparto un paso a paso: https://intercom.help/Colppy/es/articles/3281041-emitir-una-factura-electronica-desde-colppy 2.Por favor, para la Importación de facturas desde ARCA: podrás indicarme un ejemplo en una factura C y una factura A para verificar el error que mencionas. 3. Para importar facturas desde otras plataformas deben utilizar el excel modelo de importación. Este es el proceso del paso a paso: https://intercom.help/Colppy/es/articles/4373868-importar-facturas-de-venta-desde-la-solapa-importacion-de-facturas Como son facturas que ya tienen punto de venta y número de comprobante por eso el excel te va a pedir que completes todos los campos. Como recomendación, verifiquen en configuración > talonarios > que tengan creado ese talonario para que impacten todas las facturas que importen de registro. Respecto al soporte, dentro del plan que tienen contratado pueden enviar sus consultas por mail o por chat directamente desde la plataforma. Adicional, también brindamos capacitaciones de implementación, te comparto el calendario para que puedan inscribirse: https://calendly.com/colppy-capacitaciones/configuracion_inicial_de_tu_cuenta_en_colppy?month=2026-02 Quedo a disposición, Gracias!!",
+          "created_at": "2026-02-13T18:00:49.000Z"
+        },
+        {
+          "author_type": "bot",
+          "body": "¿Qué tal estuvo tu conversación con Carla?",
+          "created_at": "2026-02-19T12:04:18.000Z"
+        },
+        {
+          "author_type": "bot",
+          "body": "[Conversation Rating Request]",
+          "created_at": "2026-02-19T12:04:18.000Z"
+        }
+      ]
+    },
+    {
+      "conversation_id": "215473098157622",
+      "created_at": "2026-02-13T21:40:21.000Z",
+      "state": "closed",
+      "contact_email": "fernanda.ferreras@gmail.com",
+      "contact_es_contador": null,
+      "contact_rol_wizard": null,
+      "tags": [
+        "Chat-Bot",
+        "Mod Cont-Retención Ganancias",
+        "Consultas-No responden"
+      ],
+      "parts": [
+        {
+          "author_type": "user",
+          "body": "Configuración Contadores",
+          "created_at": "2026-02-13T21:40:21.000Z"
+        },
+        {
+          "author_type": "bot",
+          "body": "¡Bienvenido a Colppy! 🎉 Para empezar a configurar tu estudio, debés realizar los siguientes pasos: Verifica los datos registrados de tu empresa en Configuración > Datos Generales Agrega tus empresas administradas Plan de cuentas y su configuración.",
+          "created_at": "2026-02-13T21:40:23.000Z"
+        },
+        {
+          "author_type": "user",
+          "body": "Volver al menú principal",
+          "created_at": "2026-02-13T21:40:29.000Z"
+        },
+        {
+          "author_type": "bot",
+          "body": "¿Cómo te podemos ayudar?",
+          "created_at": "2026-02-13T21:40:30.000Z"
+        },
+        {
+          "author_type": "user",
+          "body": "Hacer una consulta",
+          "created_at": "2026-02-13T21:40:36.000Z"
+        },
+        {
+          "author_type": "bot",
+          "body": "¿Desde qué empresa estás realizando la consulta?",
+          "created_at": "2026-02-13T21:40:36.000Z"
+        },
+        {
+          "author_type": "bot",
+          "body": "Por favor, elegí el módulo sobre el cual queres realizar la consulta.",
+          "created_at": "2026-02-13T21:40:46.000Z"
+        },
+        {
+          "author_type": "user",
+          "body": "Contabilidad",
+          "created_at": "2026-02-13T21:40:52.000Z"
+        },
+        {
+          "author_type": "bot",
+          "body": "¿En qué podemos ayudarte?",
+          "created_at": "2026-02-13T21:40:52.000Z"
+        },
+        {
+          "author_type": "user",
+          "body": "Reportes",
+          "created_at": "2026-02-13T21:40:59.000Z"
+        },
+        {
+          "author_type": "bot",
+          "body": "En Colppy podes descargar tus reportes contables desde el módulo Contabilidad. Podes obtener los siguiente: - Diario General - Mayor - Balance - Resultado por Centro de Costo -Estado de Resultados - Estado de Flujo de Efectivo - Retenciones y Percepciones -Régimen de Información de Compras y Ventas - Posición Impositiva Mensual - Libro IVA Digital Para ver el detalle de cada hace clic en este artículo de ayuda 👇 [App: Article Inserter]",
+          "created_at": "2026-02-13T21:41:00.000Z"
+        },
+        {
+          "author_type": "bot",
+          "body": "¿Pudiste descargar tus reportes?",
+          "created_at": "2026-02-13T21:41:00.000Z"
+        },
+        {
+          "author_type": "user",
+          "body": "Necesito más ayuda",
+          "created_at": "2026-02-18T10:58:49.000Z"
+        },
+        {
+          "author_type": "bot",
+          "body": "Contanos, ¿Cómo te podemos ayudar?",
+          "created_at": "2026-02-18T10:58:50.000Z"
+        },
+        {
+          "author_type": "user",
+          "body": "para hacer las retenciones en los pagos, Colppy como actualiza el padron?",
+          "created_at": "2026-02-18T10:59:21.000Z"
+        },
+        {
+          "author_type": "bot",
+          "body": "Colppy consulta automáticamente los padrones oficiales de ARBA y AGIP al momento de hacer el cálculo de retenciones. Cuando generas una orden de pago y seleccionas \"Retenciones IIBB\", nuestro sistema se conecta directamente con el padrón correspondiente (ARBA para Buenos Aires o AGIP para CABA) usando el CUIT del proveedor para obtener la alícuota vigente. Importante: Si tenés atenuaciones o exenciones de alícuotas, esta información no se actualiza automáticamente en el padrón, por lo que tendrías que ajustar el monto manualmente desde la orden de pago. Para usar esta función, necesitas tener habilitado el cálculo automático en Configuración > Datos Impositivos y seleccionar las jurisdicciones correspondientes. Sources: Cálculo de retención de impuesto a los lIBB - provincia de Buenos Aires (ARBA) Calculo automático de retención de AGIP Datos Impositivos",
+          "created_at": "2026-02-18T10:59:39.000Z"
+        },
+        {
+          "author_type": "bot",
+          "body": "¿Es lo que buscabas?",
+          "created_at": "2026-02-18T10:59:40.000Z"
+        },
+        {
+          "author_type": "bot",
+          "body": "Si necesitas más ayuda con la configuración de retenciones o cualquier otro tema, estoy aquí para asistirte. ¿Podrías contarme más sobre lo que estás intentando resolver o entender?",
+          "created_at": "2026-02-18T11:03:42.000Z"
+        }
+      ]
+    },
+    {
+      "conversation_id": "215473042765552",
+      "created_at": "2026-02-10T15:30:54.000Z",
+      "state": "closed",
+      "contact_email": "navalcoopltda@gmail.com",
+      "contact_es_contador": null,
+      "contact_rol_wizard": null,
+      "tags": [
+        "Consultas-No responden",
+        "Mod Tes-Cheques-"
+      ],
+      "parts": [
+        {
+          "author_type": "user",
+          "body": "Buen dia Cami, un gusto saludarte. Estuve avanzado con la conciliación bancaria de la empresa desde en el comienzo de la actividad (Dic24) y tengo algunas trabas puntuales. Tengo un cliene (25 de mayo) que nos pago con varios cheques, algunos los pude depositar o endosar y otros vinieron rechazados. Un ejemplo es el cheque 2397737 de $ 17.582.647,33. Este cheque se deposito y vino rechazado por falta de fondos, por lo tanto en los movimientos bancarios tengo el deposito y el debito Desde el instructivo se indica que elimine el depósito desde los movimientos bancarios y luego vaya a la orden de cobro y la anule, el tema es que tengo otros cheques con lo que no tuve problema. Cómo procedo en este caso? que hago con la conciliación del débito por el rechazo del valor en cuestión para que no me altere los saldos Quedo a la espera de tus comentarios saludos Lucrecia Fittipaldi Control de Operaciones | Sueldos | Giro Comercial | Administración Cooperativa de Trabajo NavalCoop de Industria Naval Limitada CUIT : 30-71871293-5 Tel : 0280-4325291 El vie, 16 ene 2026 a la(s) 4:11 p.m., Colppy de Colppy ( soporte@colppy.com ) escribió: Califica la conversación Con la tecnología de Intercom",
+          "created_at": "2026-02-10T15:30:54.000Z"
+        },
+        {
+          "author_type": "admin",
+          "body": "Hola Lucrecia, ¿Cómo estas? En este caso los pasos a seguir son: 1. Eliminar el deposito: Tesorería>ingresas al banco>Ingresas al deposito>Eliminar 2. Ir al recibo de la cobranza y eliminar el cheque que fue rechazado 3. Reemplazar por otro medio de cobro y guardar el cambio ​ 4. Luego depositas nuevamente los cheques que corresponden ​",
+          "created_at": "2026-02-10T18:59:39.000Z"
+        },
+        {
+          "author_type": "admin",
+          "body": "Hola Naval, ¿Cómo estás? Nos gustaría saber si pudimos resolver tu inquietud. Para nosotros es muy importante que tus dudas hayan sido resueltas y saber si podemos ayudarte en alguna otra cuestión. Quedamos atentos a tus comentarios.",
+          "created_at": "2026-02-18T13:22:39.000Z"
+        },
+        {
+          "author_type": "admin",
+          "body": "Hola, ¿Cómo estás? Dado que no tuvimos respuesta, procederemos a cerrar este chat pero podes escribirnos siempre que lo necesites, desde el botón Ayuda > \"Envianos un mensaje\" Que tengas una buena jornada 😊",
+          "created_at": "2026-02-18T17:34:14.000Z"
+        },
+        {
+          "author_type": "bot",
+          "body": "¿Qué tal estuvo tu conversación con Camila?",
+          "created_at": "2026-02-18T17:34:26.000Z"
+        },
+        {
+          "author_type": "bot",
+          "body": "[Conversation Rating Request]",
+          "created_at": "2026-02-18T17:34:27.000Z"
+        }
+      ]
+    },
+    {
+      "conversation_id": "215473078525731",
+      "created_at": "2026-02-12T18:08:19.000Z",
+      "state": "closed",
+      "contact_email": "admin@bioferia.com.ar",
+      "contact_es_contador": null,
+      "contact_rol_wizard": null,
+      "tags": [
+        "Chat-Bot",
+        "Mod Tab",
+        "MC-Usuario administrador"
+      ],
+      "parts": [
+        {
+          "author_type": "user",
+          "body": "Hacer una consulta",
+          "created_at": "2026-02-12T18:08:19.000Z"
+        },
+        {
+          "author_type": "bot",
+          "body": "¿Desde qué empresa estás realizando la consulta?",
+          "created_at": "2026-02-12T18:08:22.000Z"
+        },
+        {
+          "author_type": "bot",
+          "body": "Por favor, elegí el módulo sobre el cual queres realizar la consulta.",
+          "created_at": "2026-02-12T18:08:30.000Z"
+        },
+        {
+          "author_type": "user",
+          "body": "Tablero",
+          "created_at": "2026-02-12T18:08:44.000Z"
+        },
+        {
+          "author_type": "bot",
+          "body": "En la pantalla de inicio de tu empresa en Colppy, en el tablero, se exponen en forma gráfica los indicadores principales de la situación económica y financiera de tu empresa. -Total ventas del mes -Total compras del mes -Facturas por cobrar -Facturas por pagar Además se visualizan los 4 gráficos que representan los resultados de tu empresa: -Ingresos y Gastos -Cajas y Bancos -Facturas: por Cobrar y por Pagar -Distribución de Gastos ​ Para conocer el detalle de como se alimentan los gráficos ingresa a este articulo de ayuda [App: Article Inserter]",
+          "created_at": "2026-02-12T18:08:45.000Z"
+        },
+        {
+          "author_type": "bot",
+          "body": "¿ Pudiste resolver la duda?",
+          "created_at": "2026-02-12T18:08:45.000Z"
+        },
+        {
+          "author_type": "user",
+          "body": "Necesito más ayuda",
+          "created_at": "2026-02-12T18:08:52.000Z"
+        },
+        {
+          "author_type": "bot",
+          "body": "Contanos, ¿Cómo te podemos ayudar?",
+          "created_at": "2026-02-12T18:08:53.000Z"
+        },
+        {
+          "author_type": "user",
+          "body": "COMO PUEDO CAMBIAR QUIEN ES EL USUARIO ADMINISTRADOR?",
+          "created_at": "2026-02-12T18:09:07.000Z"
+        },
+        {
+          "author_type": "bot",
+          "body": "Para cambiar el usuario administrador hay dos situaciones: Si tenés acceso al administrador actual: Primero necesitás crear al nuevo usuario como usuario general. El administrador actual debe ir a Mi cuenta Colppy > Administrador de usuarios > Invitar usuario. Si NO tenés acceso al administrador actual: Necesitás enviar una declaración formal por email a soporte@colppy.com . Esta declaración debe incluir datos de la empresa, tu información personal, cargo que ocupás y autorización para asumir las funciones administrativas. ¿En cuál de estas dos situaciones te encontrás?",
+          "created_at": "2026-02-12T18:09:35.000Z"
+        },
+        {
+          "author_type": "user",
+          "body": "TENGO ACCESO AL ADMINISTRADOR ACTUAL",
+          "created_at": "2026-02-12T18:09:52.000Z"
+        },
+        {
+          "author_type": "bot",
+          "body": "Perfecto. Como tenés acceso al administrador actual, estos son los pasos: 1. Crear el nuevo usuario El administrador actual debe ir a Mi cuenta Colppy > Administrador de usuarios > Invitar usuario. 2. Completar los datos Vas a necesitar llenar nombre, email, teléfono y elegir el perfil (Usuario Administrativo o Supervisor). 3. Asignar permisos Podés crear roles específicos desde Mi cuenta > Roles para definir a qué módulos puede acceder el nuevo usuario. Una vez que el nuevo usuario esté creado y configurado, ya va a poder acceder con permisos de administrador. ¿Necesitás ayuda con alguno de estos pasos específicos? Sources: Soy usuario administrador de una empresa en Colppy, ¿Cómo creo roles de usuarios? Mi cuenta Colppy",
+          "created_at": "2026-02-12T18:10:09.000Z"
+        },
+        {
+          "author_type": "user",
+          "body": "lo hice pero no funciona",
+          "created_at": "2026-02-12T18:10:49.000Z"
+        },
+        {
+          "author_type": "bot",
+          "body": "Para ayudarte mejor, necesito que me compartas qué mensaje de error específico estás viendo o qué paso exactamente no está funcionando. Mientras tanto, verificá estos puntos comunes: • Permisos del usuario actual : Confirmá que estés usando el usuario administrador para crear el nuevo usuario • Rol asignado : Después de crear el usuario, asegurate de asignarle el rol correcto desde Mi cuenta > Administración de usuarios • Plan activo : Esta función solo está disponible en planes Pymes y Consultoras y Estudios • Dominio del email : En planes de contadores, el nuevo usuario debe tener el mismo dominio de email que el administrador ¿Podrías contarme exactamente qué mensaje ves o en qué paso se traba? Sources: ¿Como puedo crear/ invitar nuevos usuarios a mi empresa en Colppy? Soy usuario administrador de una empresa en Colppy, ¿Cómo creo roles de usuarios?",
+          "created_at": "2026-02-12T18:11:05.000Z"
+        },
+        {
+          "author_type": "user",
+          "body": "cuando cree el usuario le puse administrador, pero tiene acceso total no adminsitrador, y si busco modificarlo ahora no me da la opcion de administrador.",
+          "created_at": "2026-02-12T18:12:43.000Z"
+        },
+        {
+          "author_type": "bot",
+          "body": "Entiendo el problema. En Colppy hay una diferencia importante entre los tipos de usuario: Usuario Administrativo = acceso total a funciones operativas (facturación, contabilidad, etc.) Usuario Administrador = quien puede gestionar otros usuarios y roles Cuando creaste el usuario, elegiste \"Usuario Administrativo\" en el perfil, no \"Administrador\". Por eso tiene acceso total pero no puede administrar usuarios. Para solucionarlo: Desde tu usuario administrador actual, andá a Mi cuenta Colppy > Administración de usuarios Buscá al usuario que creaste Editalo y en \"Rol (permisos)\" asignale un rol específico que limite sus accesos Si necesitás que sea administrador real (que pueda gestionar usuarios), tendrías que crear un nuevo usuario desde cero eligiendo el perfil correcto. ¿Querés que tenga acceso limitado o necesitás que sea administrador completo? Sources: ¿Como puedo crear/ invitar nuevos usuarios a mi empresa en Colppy? Soy usuario administrador de una empresa en Colppy, ¿Cómo creo roles de usuarios?",
+          "created_at": "2026-02-12T18:13:01.000Z"
+        },
+        {
+          "author_type": "admin",
+          "body": "Hola, Espero que estés muy bien Por favor, podrás indicarme el mail de cuál usuario necesitan que sea el administrador de la cuenta? Así podemos realizar la gestión",
+          "created_at": "2026-02-13T15:54:26.000Z"
+        },
+        {
+          "author_type": "user",
+          "body": "Hola! Queremos pasar de maria.rodriguez@bioguia.com al mail admin@bioferia.com.ar",
+          "created_at": "2026-02-13T16:29:18.000Z"
+        },
+        {
+          "author_type": "admin",
+          "body": "Listo, el mail de admin@bioferia.com.ar ahora es el administrador de la empresa BIOFERIA",
+          "created_at": "2026-02-13T17:43:26.000Z"
+        },
+        {
+          "author_type": "bot",
+          "body": "¿Qué tal estuvo tu conversación con Carla?",
+          "created_at": "2026-02-13T18:42:02.000Z"
+        },
+        {
+          "author_type": "bot",
+          "body": "[Conversation Rating Request]",
+          "created_at": "2026-02-13T18:42:02.000Z"
+        }
+      ]
+    },
+    {
+      "conversation_id": "215473073365233",
+      "created_at": "2026-02-12T13:10:18.000Z",
+      "state": "closed",
+      "contact_email": "zaira.capurro@squad.com.ar",
+      "contact_es_contador": null,
+      "contact_rol_wizard": null,
+      "tags": [
+        "Chat-Bot",
+        "Mod Cli-Factura de venta-Cuenta Corriente",
+        "Mod Cli-Importación de facturas de venta modelo nuevo",
+        "Mod Cfg-Factura Electrónica-"
+      ],
+      "parts": [
+        {
+          "author_type": "user",
+          "body": "Hacer una consulta",
+          "created_at": "2026-02-12T13:10:18.000Z"
+        },
+        {
+          "author_type": "bot",
+          "body": "¿Desde qué empresa estás realizando la consulta?",
+          "created_at": "2026-02-12T13:10:20.000Z"
+        },
+        {
+          "author_type": "bot",
+          "body": "Por favor, elegí el módulo sobre el cual queres realizar la consulta.",
+          "created_at": "2026-02-12T13:10:32.000Z"
+        },
+        {
+          "author_type": "user",
+          "body": "Clientes",
+          "created_at": "2026-02-12T13:10:39.000Z"
+        },
+        {
+          "author_type": "bot",
+          "body": "¿En que te puedo ayudar?",
+          "created_at": "2026-02-12T13:10:40.000Z"
+        },
+        {
+          "author_type": "user",
+          "body": "Hablar con un Humano",
+          "created_at": "2026-02-12T13:10:49.000Z"
+        },
+        {
+          "author_type": "user",
+          "body": "Agregar una factura",
+          "created_at": "2026-02-12T13:11:01.000Z"
+        },
+        {
+          "author_type": "bot",
+          "body": "En Colppy tenes dos opciones para cargar tus facturas: ​ Agregar factura manual Debes ingresar a Clientes > Gestión de clientes > elegir el cliente con un clic > Agregar factura Te explicamos como hacerlo en este link 👈 ​ Importar Facturas desde Excel Podes realizar dos tipos de importaciones desde Clientes > Gestión de clientes > Importar > Facturas (modelo nuevo) ​ -Mis comprobantes emitidos desde AFIP [App: Article Inserter] -Emitir masivamente facturas a clientes ​ [App: Article Inserter]",
+          "created_at": "2026-02-12T13:11:02.000Z"
+        },
+        {
+          "author_type": "bot",
+          "body": "¿Pudiste agregar tus facturas?",
+          "created_at": "2026-02-12T13:11:03.000Z"
+        },
+        {
+          "author_type": "user",
+          "body": "Necesito más ayuda",
+          "created_at": "2026-02-12T13:11:08.000Z"
+        },
+        {
+          "author_type": "bot",
+          "body": "Contanos, ¿Cómo te podemos ayudar?",
+          "created_at": "2026-02-12T13:11:09.000Z"
+        },
+        {
+          "author_type": "user",
+          "body": "Hablar con un humano",
+          "created_at": "2026-02-12T13:11:21.000Z"
+        },
+        {
+          "author_type": "bot",
+          "body": "Claro, te voy a pasar con alguien de nuestro equipo. Mientras tanto, ¿podrías contarme más detalles sobre tu consulta para que puedan ayudarte mejor?",
+          "created_at": "2026-02-12T13:11:25.000Z"
+        },
+        {
+          "author_type": "user",
+          "body": "facturación del exterior",
+          "created_at": "2026-02-12T13:11:40.000Z"
+        },
+        {
+          "author_type": "bot",
+          "body": "Para facturar al exterior en Colppy necesitas configurar algunas cosas: Crear cliente del exterior: No completes el campo CUIT Condición de IVA: Exento País: diferente de Argentina Completa nombre comercial y razón social Configurar factura de exportación: Configura tu CUIT exportador Define condición de IVA para operaciones internacionales El sistema te permite elegir moneda extranjera Genera facturas tipo E o M según corresponda Crear talonario: Ve a Configuración > Talonarios > Nuevo Talonario Descripción: \"Factura electrónica de exportación\" Prefijo: número del punto de venta Tildar \"talonario por defecto\" y \"Factura Electrónica\" Esta funcionalidad está disponible en planes Enterprise o Consultoras y Estudios . ¿Necesitas ayuda con algún paso específico? Sources: Planes y Precios para Empresas y Estudios Contables Configuración Factura de Exportación E ¿Cómo cargar un cliente o proveedor extranjero para factura de exportación? Emitir factura electrónica exportación E en Colppy",
+          "created_at": "2026-02-12T13:13:00.000Z"
+        },
+        {
+          "author_type": "bot",
+          "body": "¿Te sirvió esa respuesta o todavía necesitas ayuda de alguien?",
+          "created_at": "2026-02-12T13:13:01.000Z"
+        },
+        {
+          "author_type": "user",
+          "body": "No, todavía necesito ayuda 👤",
+          "created_at": "2026-02-12T13:13:13.000Z"
+        },
+        {
+          "author_type": "admin",
+          "body": "Hola Zaira, Espero que estés muy bien Cómo puedo ayudarte con las facturas del exterior?",
+          "created_at": "2026-02-12T13:35:09.000Z"
+        },
+        {
+          "author_type": "user",
+          "body": "Hola Carla!",
+          "created_at": "2026-02-12T13:35:36.000Z"
+        },
+        {
+          "author_type": "user",
+          "body": "Como estas?",
+          "created_at": "2026-02-12T13:35:38.000Z"
+        },
+        {
+          "author_type": "user",
+          "body": "Te consulto, quiero agregar en talonarios Facturas de Exportación.",
+          "created_at": "2026-02-12T13:35:58.000Z"
+        },
+        {
+          "author_type": "user",
+          "body": "Recuerdo que cuando comenzamos con colppy le dimos el permiso para dar de alta el PV 7",
+          "created_at": "2026-02-12T13:36:25.000Z"
+        },
+        {
+          "author_type": "user",
+          "body": "podrán dar de alta del PV 8 para Expo?",
+          "created_at": "2026-02-12T13:36:36.000Z"
+        },
+        {
+          "author_type": "admin",
+          "body": "Para que lo podamos autorizar primero necesitamos que ustedes lo soliciten en ARCA por medio de estos pasos: https://intercom.help/Colppy/es/articles/9096779-configuracion-factura-de-exportacion-e Una vez que está realizada esta parte del proceso, nosotros lo autorizamos y ya podemos generar el talonario dentro de la plataforma",
+          "created_at": "2026-02-12T13:42:23.000Z"
+        },
+        {
+          "author_type": "user",
+          "body": "pero ya le habiamos dado los permisos.",
+          "created_at": "2026-02-12T13:42:51.000Z"
+        },
+        {
+          "author_type": "user",
+          "body": "hay que hacerlo de nuevo?",
+          "created_at": "2026-02-12T13:42:55.000Z"
+        },
+        {
+          "author_type": "admin",
+          "body": "Para lo que es comprobantes de exportación si, porque lo que se gestionó son las facturas electrónicas. Vas a ver que dentro de ARCA ellos lo dividen y tienen una opción especifica para cuento el cliente necesita emitir facturas electrónicas de exportación",
+          "created_at": "2026-02-12T13:45:35.000Z"
+        },
+        {
+          "author_type": "user",
+          "body": "ahh oki!",
+          "created_at": "2026-02-12T13:45:59.000Z"
+        },
+        {
+          "author_type": "user",
+          "body": "Ya lo gestiono",
+          "created_at": "2026-02-12T13:46:03.000Z"
+        },
+        {
+          "author_type": "admin",
+          "body": "Y que cuando den de alta el punto de venta la opción es comprobante de exportación web service, a diferencia que cuando se hizo la de electrónica normal que dice RECE, por eso ARCA lo pide por separado",
+          "created_at": "2026-02-12T13:47:06.000Z"
+        },
+        {
+          "author_type": "admin",
+          "body": "Genial Zaira, vos avisame que quedo atenta para aprobarlo y así creamos el talonario en colppy",
+          "created_at": "2026-02-12T13:47:27.000Z"
+        },
+        {
+          "author_type": "user",
+          "body": "lisssto!",
+          "created_at": "2026-02-12T13:51:46.000Z"
+        },
+        {
+          "author_type": "user",
+          "body": "Carla, como estas?",
+          "created_at": "2026-02-12T16:16:52.000Z"
+        },
+        {
+          "author_type": "user",
+          "body": "Pudiste verlo?",
+          "created_at": "2026-02-12T16:16:55.000Z"
+        },
+        {
+          "author_type": "user",
+          "body": "hola?",
+          "created_at": "2026-02-12T18:38:47.000Z"
+        },
+        {
+          "author_type": "admin",
+          "body": "Hola Zaira, espero que estés muy bien Recién ARCA nos notificó que está OK la delegación. Confirmame que el punto de ventas es el 0008?",
+          "created_at": "2026-02-13T14:01:22.000Z"
+        },
+        {
+          "author_type": "user",
+          "body": "carla! Como estas?",
+          "created_at": "2026-02-13T16:15:55.000Z"
+        },
+        {
+          "author_type": "user",
+          "body": "Mcuhas gracias por la confirmacion",
+          "created_at": "2026-02-13T16:15:59.000Z"
+        },
+        {
+          "author_type": "user",
+          "body": "te confirmo el PV de Exportación N° 8",
+          "created_at": "2026-02-13T16:16:13.000Z"
+        },
+        {
+          "author_type": "admin",
+          "body": "Zaira, ya quedó configurado el talonario de punto de venta 8 para facturas electrónicas de exportación Ya lo podes utilizar, solo una aclaración, nos notificaron que los servidores de ARCA están teniendo demoras por eso puede sucederte que quieras emitir una factura y el sistema te diga 'Hubo un error comunicate con el equipo de soporte'. En ese caso te pido que esperes antes de volver a probar emitirla. ​",
+          "created_at": "2026-02-13T16:33:45.000Z"
+        },
+        {
+          "author_type": "user",
+          "body": "Muchas gracias!!! ♥",
+          "created_at": "2026-02-13T18:12:13.000Z"
+        },
+        {
+          "author_type": "admin",
+          "body": "Gracias a vos!",
+          "created_at": "2026-02-13T18:40:37.000Z"
+        },
+        {
+          "author_type": "bot",
+          "body": "¿Qué tal estuvo tu conversación con Carla?",
+          "created_at": "2026-02-13T18:41:09.000Z"
+        },
+        {
+          "author_type": "bot",
+          "body": "[Conversation Rating Request]",
+          "created_at": "2026-02-13T18:41:09.000Z"
+        }
+      ]
+    },
+    {
+      "conversation_id": "215473092810498",
+      "created_at": "2026-02-13T15:43:16.000Z",
+      "state": "closed",
+      "contact_email": "mariamdf2021@gmail.com",
+      "contact_es_contador": null,
+      "contact_rol_wizard": null,
+      "tags": [
+        "Chat-Bot",
+        "Mod Cli-Factura de venta-Cuenta Corriente",
+        "Mod Cli-Importación de facturas de venta modelo nuevo"
+      ],
+      "parts": [
+        {
+          "author_type": "user",
+          "body": "Hacer una consulta",
+          "created_at": "2026-02-13T15:43:16.000Z"
+        },
+        {
+          "author_type": "bot",
+          "body": "¿Desde qué empresa estás realizando la consulta?",
+          "created_at": "2026-02-13T15:43:18.000Z"
+        },
+        {
+          "author_type": "bot",
+          "body": "Por favor, elegí el módulo sobre el cual queres realizar la consulta.",
+          "created_at": "2026-02-13T15:43:33.000Z"
+        },
+        {
+          "author_type": "user",
+          "body": "Clientes",
+          "created_at": "2026-02-13T15:43:52.000Z"
+        },
+        {
+          "author_type": "bot",
+          "body": "¿En que te puedo ayudar?",
+          "created_at": "2026-02-13T15:43:53.000Z"
+        },
+        {
+          "author_type": "user",
+          "body": "Tengo un problema, estaba facturando y me salto esto",
+          "created_at": "2026-02-13T15:45:16.000Z"
+        },
+        {
+          "author_type": "user",
+          "body": "Agregar una factura",
+          "created_at": "2026-02-13T15:45:30.000Z"
+        },
+        {
+          "author_type": "bot",
+          "body": "En Colppy tenes dos opciones para cargar tus facturas: ​ Agregar factura manual Debes ingresar a Clientes > Gestión de clientes > elegir el cliente con un clic > Agregar factura Te explicamos como hacerlo en este link 👈 ​ Importar Facturas desde Excel Podes realizar dos tipos de importaciones desde Clientes > Gestión de clientes > Importar > Facturas (modelo nuevo) ​ -Mis comprobantes emitidos desde AFIP [App: Article Inserter] -Emitir masivamente facturas a clientes ​ [App: Article Inserter]",
+          "created_at": "2026-02-13T15:45:31.000Z"
+        },
+        {
+          "author_type": "bot",
+          "body": "¿Pudiste agregar tus facturas?",
+          "created_at": "2026-02-13T15:45:32.000Z"
+        },
+        {
+          "author_type": "user",
+          "body": "Necesito más ayuda",
+          "created_at": "2026-02-13T16:13:25.000Z"
+        },
+        {
+          "author_type": "bot",
+          "body": "Contanos, ¿Cómo te podemos ayudar?",
+          "created_at": "2026-02-13T16:13:25.000Z"
+        },
+        {
+          "author_type": "user",
+          "body": "esto me aparece cuando quiero facturar",
+          "created_at": "2026-02-13T16:13:53.000Z"
+        },
+        {
+          "author_type": "bot",
+          "body": "Veo que te aparece un error interno del sistema al intentar facturar. Este tipo de error suele estar relacionado con problemas de conexión con AFIP. Cuando esto pasa, nuestro sistema guarda la factura en estado \"En Proceso\" y hace reintentos automáticos para emitirla. Si AFIP la procesa correctamente, le asigna el número correspondiente, y si no, se elimina. Te recomiendo: Esperar un poco y verificar si la factura se emitió correctamente Si después de 2 horas el comprobante no se completó, escribinos de nuevo También podés intentar generar la factura desde el modo incógnito de tu navegador Si el problema persiste después de estos pasos, podés hablar con nuestro equipo para que te ayudemos.",
+          "created_at": "2026-02-13T16:14:10.000Z"
+        },
+        {
+          "author_type": "bot",
+          "body": "¿Es lo que buscabas?",
+          "created_at": "2026-02-13T16:14:11.000Z"
+        },
+        {
+          "author_type": "user",
+          "body": "okey gracias",
+          "created_at": "2026-02-13T16:15:03.000Z"
+        },
+        {
+          "author_type": "bot",
+          "body": "Me alegra saber que la información fue útil. Quedo a tu disposición para cualquier otra consulta que tengas.",
+          "created_at": "2026-02-13T16:15:08.000Z"
+        },
+        {
+          "author_type": "bot",
+          "body": "¿Qué tal estuvo tu conversación con Colppy?",
+          "created_at": "2026-02-13T16:15:15.000Z"
+        },
+        {
+          "author_type": "bot",
+          "body": "[Conversation Rating Request]",
+          "created_at": "2026-02-13T16:15:15.000Z"
+        }
+      ]
+    },
+    {
+      "conversation_id": "215473079423810",
+      "created_at": "2026-02-12T19:11:58.000Z",
+      "state": "closed",
+      "contact_email": "johana.noriega@norimoto.co",
+      "contact_es_contador": null,
+      "contact_rol_wizard": null,
+      "tags": [
+        "Chat-Bot",
+        "Mod Cont-Cierres Contables"
+      ],
+      "parts": [
+        {
+          "author_type": "user",
+          "body": "Hacer una consulta",
+          "created_at": "2026-02-12T19:11:58.000Z"
+        },
+        {
+          "author_type": "bot",
+          "body": "¿Desde qué empresa estás realizando la consulta?",
+          "created_at": "2026-02-12T19:12:00.000Z"
+        },
+        {
+          "author_type": "bot",
+          "body": "Por favor, elegí el módulo sobre el cual queres realizar la consulta.",
+          "created_at": "2026-02-12T19:12:08.000Z"
+        },
+        {
+          "author_type": "user",
+          "body": "Contabilidad",
+          "created_at": "2026-02-12T19:12:13.000Z"
+        },
+        {
+          "author_type": "bot",
+          "body": "¿En qué podemos ayudarte?",
+          "created_at": "2026-02-12T19:12:13.000Z"
+        },
+        {
+          "author_type": "user",
+          "body": "Realizar el cierre contable",
+          "created_at": "2026-02-12T19:12:19.000Z"
+        },
+        {
+          "author_type": "bot",
+          "body": "Esta sección de Colppy permite registrar de manera integral los cierres de ejercicio contable de las empresas. ​ Podes ver el procedimiento en el siguiente articulo 👇 [App: Article Inserter]",
+          "created_at": "2026-02-12T19:12:20.000Z"
+        },
+        {
+          "author_type": "bot",
+          "body": "¿Resolvimos tu duda? o ¿Buscas cierres contables detallados?",
+          "created_at": "2026-02-12T19:12:21.000Z"
+        },
+        {
+          "author_type": "user",
+          "body": "Necesito más ayuda",
+          "created_at": "2026-02-12T19:12:34.000Z"
+        },
+        {
+          "author_type": "bot",
+          "body": "Contanos, ¿Cómo te podemos ayudar?",
+          "created_at": "2026-02-12T19:12:35.000Z"
+        },
+        {
+          "author_type": "user",
+          "body": "Cierre contable mensual para bloquear el período anterior",
+          "created_at": "2026-02-12T19:12:49.000Z"
+        },
+        {
+          "author_type": "bot",
+          "body": "Para hacer un cierre mensual que bloquee el período anterior, podés usar la función de bloqueo de registro contable. Seguí estos pasos: Andá a Contabilidad > Cierres Contables > Asiento de Cierre y Apertura Seleccioná la fecha hasta la cual querés bloquear el registro NO tildes la opción \"Realizar Asiento de Cierre\" - esto es clave para hacer solo el bloqueo Hacé clic en \"Generar Cierre\" De esta forma vas a bloquear la carga de comprobantes con fechas anteriores a la que elegiste, pero sin generar el asiento de cierre (que se usa para el cierre anual). Esto te permite mantener la consistencia del cierre mensual evitando movimientos fuera de fecha. Sources: Eliminar asiento de cierre y apertura - Bloqueo de registro contable Asiento de cierre y apertura de ejercicio Cierre contable para contadores | Software para estudios",
+          "created_at": "2026-02-12T19:13:08.000Z"
+        },
+        {
+          "author_type": "bot",
+          "body": "¿Es lo que buscabas?",
+          "created_at": "2026-02-12T19:13:09.000Z"
+        },
+        {
+          "author_type": "user",
+          "body": "si",
+          "created_at": "2026-02-12T19:14:01.000Z"
+        },
+        {
+          "author_type": "bot",
+          "body": "Perfecto, quedo a disposición para cualquier otra consulta que tengas sobre el cierre contable o cualquier otro tema.",
+          "created_at": "2026-02-12T19:14:06.000Z"
+        },
+        {
+          "author_type": "bot",
+          "body": "¿Qué tal estuvo tu conversación con Colppy?",
+          "created_at": "2026-02-12T19:14:11.000Z"
+        },
+        {
+          "author_type": "bot",
+          "body": "[Conversation Rating Request]",
+          "created_at": "2026-02-12T19:14:11.000Z"
+        }
+      ]
+    },
+    {
+      "conversation_id": "215473058455582",
+      "created_at": "2026-02-11T15:44:22.000Z",
+      "state": "closed",
+      "contact_email": "pablo@samplextech.com",
+      "contact_es_contador": null,
+      "contact_rol_wizard": null,
+      "tags": [
+        "Chat-Bot",
+        "Remito X",
+        "Remito R"
+      ],
+      "parts": [
+        {
+          "author_type": "user",
+          "body": "Hacer una consulta",
+          "created_at": "2026-02-11T15:44:22.000Z"
+        },
+        {
+          "author_type": "bot",
+          "body": "¿Desde qué empresa estás realizando la consulta?",
+          "created_at": "2026-02-11T15:44:25.000Z"
+        },
+        {
+          "author_type": "bot",
+          "body": "Por favor, elegí el módulo sobre el cual queres realizar la consulta.",
+          "created_at": "2026-02-11T15:44:35.000Z"
+        },
+        {
+          "author_type": "user",
+          "body": "Inventario",
+          "created_at": "2026-02-11T15:44:44.000Z"
+        },
+        {
+          "author_type": "bot",
+          "body": "¿En qué podemos ayudarte?",
+          "created_at": "2026-02-11T15:44:45.000Z"
+        },
+        {
+          "author_type": "user",
+          "body": "Remitos",
+          "created_at": "2026-02-11T15:44:52.000Z"
+        },
+        {
+          "author_type": "bot",
+          "body": "Los remitos son importantes para el control de inventario y para documentar la entrega de productos. Colppy cuenta con dos tipos de Remitos: X y R Remitos X : Salen impresos en un formulario. ​ Remitos R : Se imprimen en un talonario preimpreso. Te pedimos que para aprender sobre los remitos veas este video 👈",
+          "created_at": "2026-02-11T15:44:53.000Z"
+        },
+        {
+          "author_type": "bot",
+          "body": "¿Pudiste ver el video? ¿Se revolvió tu duda?",
+          "created_at": "2026-02-11T15:44:53.000Z"
+        },
+        {
+          "author_type": "user",
+          "body": "Necesito más ayuda",
+          "created_at": "2026-02-11T15:46:16.000Z"
+        },
+        {
+          "author_type": "bot",
+          "body": "Contanos, ¿Cómo te podemos ayudar?",
+          "created_at": "2026-02-11T15:46:17.000Z"
+        },
+        {
+          "author_type": "user",
+          "body": "quiero entender desde donde se puede configurar para que me centre bien el remito pre impreso con el archivo de ustedes",
+          "created_at": "2026-02-11T15:47:14.000Z"
+        },
+        {
+          "author_type": "bot",
+          "body": "Para centrar bien el remito preimpreso con nuestro archivo, necesitas hacer lo siguiente: Imprime un ejemplo del remito R desde Colppy Lleva ese ejemplo a la imprenta para que tomen las medidas exactas La imprenta elabora el talonario basándose en esas medidas El archivo para descargar está disponible en la documentación de Remitos R. La clave está en que la imprenta use el ejemplo impreso desde nuestro sistema para hacer coincidir exactamente las posiciones del texto con el formulario preimpreso. Si después de esto sigues teniendo problemas de centrado, podes contactar a nuestro equipo en soporte@colppy.com para ayuda específica. Source: Remitos R",
+          "created_at": "2026-02-11T15:47:34.000Z"
+        },
+        {
+          "author_type": "bot",
+          "body": "¿Es lo que buscabas?",
+          "created_at": "2026-02-11T15:47:34.000Z"
+        },
+        {
+          "author_type": "user",
+          "body": "osea que si ya tengo pre impresos no voy a poder modificar nada y hasta que no se me acaben siempre van a estar mal centrados?",
+          "created_at": "2026-02-11T15:48:08.000Z"
+        },
+        {
+          "author_type": "bot",
+          "body": "Exacto, si ya tenés los talonarios preimpresos con medidas incorrectas, no hay forma de ajustar el centrado desde el sistema. Los remitos R están diseñados para imprimirse sobre formularios preimpresos que deben coincidir exactamente con nuestro formato. Vas a tener que esperar a que se acaben los actuales para hacer nuevos con las medidas correctas. Para los próximos, recordá imprimir primero un ejemplo desde nuestro sistema y llevarlo a la imprenta para que tomen las medidas exactas. Mientras tanto, podrías considerar usar Remitos X que no necesitan formularios preimpresos, se imprimen completos en hojas comunes. Source: Remitos R",
+          "created_at": "2026-02-11T15:48:27.000Z"
+        },
+        {
+          "author_type": "bot",
+          "body": "¿Responde eso a tu pregunta?",
+          "created_at": "2026-02-11T15:48:27.000Z"
+        },
+        {
+          "author_type": "user",
+          "body": "si gracias",
+          "created_at": "2026-02-11T15:48:36.000Z"
+        },
+        {
+          "author_type": "bot",
+          "body": "Me alegra saber que la información fue útil. Quedo a tu disposición para cualquier otra consulta que tengas.",
+          "created_at": "2026-02-11T15:48:42.000Z"
+        },
+        {
+          "author_type": "bot",
+          "body": "¿Qué tal estuvo tu conversación con Colppy?",
+          "created_at": "2026-02-11T15:48:47.000Z"
+        },
+        {
+          "author_type": "bot",
+          "body": "[Conversation Rating Request]",
+          "created_at": "2026-02-11T15:48:47.000Z"
+        }
+      ]
+    },
+    {
+      "conversation_id": "215473025171234",
+      "created_at": "2026-02-09T14:58:56.000Z",
+      "state": "closed",
+      "contact_email": "administracion@lmclogistica.com.ar",
+      "contact_es_contador": null,
+      "contact_rol_wizard": null,
+      "tags": [
+        "UPS-Enterprise",
+        "Consultas-No responden",
+        "Chat-Bot",
+        "Mod Cont-Cierres Contables-Asiento de ajuste por Inflación",
+        "Mod Tes-Tesorería Multimoneda",
+        "cambio de plan",
+        "C-Sat tesorería multimoneda"
+      ],
+      "parts": [
+        {
+          "author_type": "user",
+          "body": "Hacer una consulta",
+          "created_at": "2026-02-09T14:58:56.000Z"
+        },
+        {
+          "author_type": "bot",
+          "body": "¿Desde qué empresa estás realizando la consulta?",
+          "created_at": "2026-02-09T14:59:00.000Z"
+        },
+        {
+          "author_type": "bot",
+          "body": "Por favor, elegí el módulo sobre el cual queres realizar la consulta.",
+          "created_at": "2026-02-09T14:59:06.000Z"
+        },
+        {
+          "author_type": "user",
+          "body": "Contabilidad",
+          "created_at": "2026-02-09T14:59:17.000Z"
+        },
+        {
+          "author_type": "bot",
+          "body": "¿En qué podemos ayudarte?",
+          "created_at": "2026-02-09T14:59:18.000Z"
+        },
+        {
+          "author_type": "user",
+          "body": "Ajuste por inflación",
+          "created_at": "2026-02-09T14:59:37.000Z"
+        },
+        {
+          "author_type": "bot",
+          "body": "Para realizar el ajuste por inflación de forma automática debemos ir al módulo Contabilidad, botón cierres contables y seleccionar \"ajuste por inflación. Para ver el procedimiento paso a paso hace clic en este articulo 👇 [App: Article Inserter]",
+          "created_at": "2026-02-09T14:59:38.000Z"
+        },
+        {
+          "author_type": "bot",
+          "body": "¿Resolviste la duda ?",
+          "created_at": "2026-02-09T14:59:39.000Z"
+        },
+        {
+          "author_type": "user",
+          "body": "Necesito más ayuda",
+          "created_at": "2026-02-09T14:59:43.000Z"
+        },
+        {
+          "author_type": "bot",
+          "body": "Contanos, ¿Cómo te podemos ayudar?",
+          "created_at": "2026-02-09T14:59:44.000Z"
+        },
+        {
+          "author_type": "user",
+          "body": "quiero saber como hacer asientos contables para registras gastos, por ejemplo pago de iva, sueldos, iibb, cuota sindical",
+          "created_at": "2026-02-09T15:00:21.000Z"
+        },
+        {
+          "author_type": "bot",
+          "body": "Para registrar asientos contables de gastos vas al módulo Contabilidad > Panel de cuentas y hacés clic en \"Nuevo asiento a diario\" . Completás: Fecha contable del asiento Descripción del asiento Cuentas : escribís las primeras letras y el sistema te muestra las opciones Importes al débito o crédito según corresponda Para sueldos específicamente: Podés cargar el asiento desde Contabilidad y luego registrar el pago, o usar el módulo eSueldos que genera automáticamente el asiento con el plan de cuentas configurado. Para IVA e IIBB: Primero configurás las cuentas contables en Configuración > Datos Impositivos donde asignás las cuentas para débito/crédito fiscal IVA y retenciones de IIBB según las jurisdicciones que manejes. Una vez configurado, los asientos se pueden registrar manualmente o automáticamente según el tipo de operación. Sources: Generar asiento diario contable ¿Cómo puedo cargar sueldos de empleados? eSueldos - Generando el Asiento de Sueldos para enviarlo a Colppy Datos Impositivos",
+          "created_at": "2026-02-09T15:00:48.000Z"
+        },
+        {
+          "author_type": "bot",
+          "body": "¿Es lo que buscabas?",
+          "created_at": "2026-02-09T15:00:49.000Z"
+        },
+        {
+          "author_type": "user",
+          "body": "lo estoy viendo, en brebes te aviso",
+          "created_at": "2026-02-09T15:03:29.000Z"
+        },
+        {
+          "author_type": "bot",
+          "body": "Perfecto, tómate el tiempo que necesites. Estoy aquí para ayudarte cuando estés listo.",
+          "created_at": "2026-02-09T15:03:34.000Z"
+        },
+        {
+          "author_type": "bot",
+          "body": "Si necesitas más ayuda con los asientos contables o cualquier otro tema, no dudes en decírmelo. ¿Quieres contarme más sobre lo que estás intentando resolver para que pueda asistirte mejor?",
+          "created_at": "2026-02-09T15:07:36.000Z"
+        },
+        {
+          "author_type": "user",
+          "body": "pude resolverlo, necesitaria realizar otra consulta",
+          "created_at": "2026-02-10T12:55:46.000Z"
+        },
+        {
+          "author_type": "bot",
+          "body": "Me alegra saber que pudiste resolverlo. Por favor, dime en qué más puedo ayudarte.",
+          "created_at": "2026-02-10T12:55:50.000Z"
+        },
+        {
+          "author_type": "bot",
+          "body": "Estoy a tu disposición para ayudarte con cualquier otra consulta que tengas. ¿Podrías contarme más detalles sobre la nueva consulta que deseas realizar?",
+          "created_at": "2026-02-10T12:59:51.000Z"
+        },
+        {
+          "author_type": "user",
+          "body": "necesito contabilizar pagos en usd, ya cambie el plan, pude generar la factura pero tambien quiero poner pagos en usd, solo me deja hacer la conversion y no la quiero en pesos",
+          "created_at": "2026-02-10T13:00:23.000Z"
+        },
+        {
+          "author_type": "bot",
+          "body": "Para registrar pagos en USD sin convertir a pesos, necesitas el plan Full que permite operaciones multimoneda completas. Con el plan Full podés: Registrar facturas directamente en USD Hacer cobros y pagos manteniendo la moneda original Manejar diferencias de cambio automáticamente Si tenés un plan Premium o Platinum, solo podés registrar operaciones convirtiendo el importe a pesos al tipo de cambio de la fecha. Para los pagos en USD, configurá las cuentas de diferencia de cambio en Configuración > Clientes/Proveedores, así el sistema maneja automáticamente las fluctuaciones entre la fecha de facturación y cobro. Sources: Operaciones en moneda extranjera/dolares en facturas de venta - Modulo Clientes - Diferencia de cambio Operaciones en moneda extranjera/dolares en facturas de compra - Modulo Proveedores Factura de compra - En cuenta corriente",
+          "created_at": "2026-02-10T13:00:44.000Z"
+        },
+        {
+          "author_type": "bot",
+          "body": "¿Es lo que buscabas?",
+          "created_at": "2026-02-10T13:00:44.000Z"
+        },
+        {
+          "author_type": "user",
+          "body": "tengo la cuenta full",
+          "created_at": "2026-02-10T13:03:49.000Z"
+        },
+        {
+          "author_type": "bot",
+          "body": "Perfecto, con el plan Full podés registrar pagos directamente en USD sin convertir a pesos. Para hacer pagos en USD: Andá al módulo Proveedores > Gestión de proveedores Seleccioná el proveedor en la lista de la izquierda Hacé clic en Agregar Factura > Cuenta corriente En el campo Moneda podés seleccionar USD (o la moneda que necesites) El sistema maneja automáticamente las operaciones multimoneda y calcula el tipo de cambio para los reportes contables. ¿Necesitás ayuda con algún paso específico del proceso de pago en USD? Sources: Factura de compra cuenta corriente multimoneda Factura de venta en cuenta corriente multimoneda Factura de compra - En cuenta corriente",
+          "created_at": "2026-02-10T13:04:07.000Z"
+        },
+        {
+          "author_type": "user",
+          "body": "la factura ya la hice en usd",
+          "created_at": "2026-02-10T13:05:06.000Z"
+        },
+        {
+          "author_type": "user",
+          "body": "lo que quiero hacer es el pago y que toque una caja usd que tambien ya la cree",
+          "created_at": "2026-02-10T13:05:22.000Z"
+        },
+        {
+          "author_type": "bot",
+          "body": "Para registrar el pago en USD y que afecte tu caja USD, necesitas hacer movimientos entre cajas de moneda extranjera. Como ya tienes la factura en USD, ahora debes: Crear una cuenta contable puente en Activo - Otros créditos (tipo \"otros ingresos y egresos\") que sirva para registrar facturas X y quede siempre neteada a cero En el proveedor : Crear una factura X en USD con el tipo de cambio correspondiente En el cliente : Crear una factura X en USD con el mismo tipo de cambio Registrar el pago : Crear una orden de pago en USD desde tu caja USD que creaste Registrar el recibo : Crear un recibo en USD donde registras el ingreso a tu caja USD Este proceso te permite manejar el movimiento entre cajas manteniendo la moneda extranjera sin convertir a pesos. Source: Operaciones en moneda extranjera en el módulo de tesorería",
+          "created_at": "2026-02-10T13:05:41.000Z"
+        },
+        {
+          "author_type": "bot",
+          "body": "¿Responde eso a tu pregunta?",
+          "created_at": "2026-02-10T13:05:41.000Z"
+        },
+        {
+          "author_type": "bot",
+          "body": "Si necesitas más ayuda con el registro de pagos en USD o con el manejo de cajas en moneda extranjera, estoy aquí para asistirte. ¿Podrías contarme más detalles sobre el paso en el que estás o el problema que estás enfrentando?",
+          "created_at": "2026-02-10T13:09:44.000Z"
+        },
+        {
+          "author_type": "user",
+          "body": "aguardamepor favor",
+          "created_at": "2026-02-10T13:10:26.000Z"
+        },
+        {
+          "author_type": "bot",
+          "body": "Por supuesto, tómate el tiempo que necesites. Estoy aquí para ayudarte cuando estés listo.",
+          "created_at": "2026-02-10T13:10:34.000Z"
+        },
+        {
+          "author_type": "bot",
+          "body": "Veo que estás trabajando en el registro de pagos en USD y entiendo que puede ser un proceso complejo; si necesitas más ayuda, te pido disculpas por cualquier inconveniente. ¿Quieres contarme más sobre el paso en el que estás para poder asistirte mejor?",
+          "created_at": "2026-02-10T13:14:37.000Z"
+        },
+        {
+          "author_type": "admin",
+          "body": "Hola Melody, ¿Cómo estas? Si bien, la factura es el dólares te lo va a pesificar, vos tenes que colocar la tasa de cambio del momento del pago. Luego en tesorería lo vas a ver reflejado de esta manera ​ ​",
+          "created_at": "2026-02-10T13:15:22.000Z"
+        },
+        {
+          "author_type": "user",
+          "body": "No me aparece la cuenta en dolares",
+          "created_at": "2026-02-10T13:23:41.000Z"
+        },
+        {
+          "author_type": "user",
+          "body": "me ayudarias a realizarla",
+          "created_at": "2026-02-10T13:24:22.000Z"
+        },
+        {
+          "author_type": "admin",
+          "body": "Melody, te dejo el link de los artículos que te explican como realizarlo: 1. Crear la cuenta en tu plan de cuentas: LINK 2. Crear la cuenta en tesorería: LINK",
+          "created_at": "2026-02-10T13:40:23.000Z"
+        },
+        {
+          "author_type": "user",
+          "body": "no me estaria dejando y tengo el plan correcto",
+          "created_at": "2026-02-10T14:49:21.000Z"
+        },
+        {
+          "author_type": "user",
+          "body": "Por que es?",
+          "created_at": "2026-02-10T15:44:10.000Z"
+        },
+        {
+          "author_type": "admin",
+          "body": "Buenas tardes Melody, lo que sucede es que tesoreria multimoneda lo tienen a partir del plan Enterprise. Este plan incluye todas estas funcionalidades: Tendrias los dias proporcionales del mes de Febrero sin cargo, es decir pagarias a partir del mes Marzo. Solo tenés que seguir estos pasos: Ir a Mi Cuenta > Hacer clic en el botón modificar>Seleccionar el Plan Enterprise > Activar> Hacer clic en Confirmar cambio de plan ¡y listo!",
+          "created_at": "2026-02-10T16:39:10.000Z"
+        },
+        {
+          "author_type": "admin",
+          "body": "Melody, ¿pudiste ver mi mensaje? ¿Te sirve el plan que tenes actualmente o necesitarías cambiar de plan?",
+          "created_at": "2026-02-10T19:03:42.000Z"
+        },
+        {
+          "author_type": "admin",
+          "body": "Hola Melody, ¿Cómo estás? Dado que no tuvimos respuesta, procederemos a cerrar este chat pero podes escribirnos siempre que lo necesites, desde el botón Ayuda > \"Envianos un mensaje\" . Que tengas una buena jornada 😊",
+          "created_at": "2026-02-11T12:03:45.000Z"
+        },
+        {
+          "author_type": "bot",
+          "body": "¿Qué tal estuvo tu conversación con Camila?",
+          "created_at": "2026-02-11T12:03:57.000Z"
+        },
+        {
+          "author_type": "bot",
+          "body": "[Conversation Rating Request]",
+          "created_at": "2026-02-11T12:03:57.000Z"
+        }
+      ]
+    },
+    {
+      "conversation_id": "215473043220569",
+      "created_at": "2026-02-10T15:47:00.000Z",
+      "state": "closed",
+      "contact_email": "angelesconstructora4@gmail.com",
+      "contact_es_contador": null,
+      "contact_rol_wizard": null,
+      "tags": [
+        "Consultas-No responden",
+        "Chat-Bot"
+      ],
+      "parts": [
+        {
+          "author_type": "user",
+          "body": "Hacer una consulta",
+          "created_at": "2026-02-10T15:47:00.000Z"
+        },
+        {
+          "author_type": "bot",
+          "body": "¿Desde qué empresa estás realizando la consulta?",
+          "created_at": "2026-02-10T15:47:02.000Z"
+        },
+        {
+          "author_type": "bot",
+          "body": "Por favor, elegí el módulo sobre el cual queres realizar la consulta.",
+          "created_at": "2026-02-10T15:47:25.000Z"
+        },
+        {
+          "author_type": "user",
+          "body": "Proveedores",
+          "created_at": "2026-02-10T15:47:32.000Z"
+        },
+        {
+          "author_type": "bot",
+          "body": "¿En qué te puedo ayudar?",
+          "created_at": "2026-02-10T15:47:33.000Z"
+        },
+        {
+          "author_type": "admin",
+          "body": "Hola Angeles, ¿Cómo estás? Dado que no tuvimos respuesta, procederemos a cerrar este chat pero podes escribirnos siempre que lo necesites, desde el botón Ayuda > \"Envianos un mensaje\" . Que tengas una buena jornada 😊",
+          "created_at": "2026-02-10T18:13:15.000Z"
+        },
+        {
+          "author_type": "bot",
+          "body": "¿Qué tal estuvo tu conversación con Camila?",
+          "created_at": "2026-02-10T18:13:27.000Z"
+        },
+        {
+          "author_type": "bot",
+          "body": "[Conversation Rating Request]",
+          "created_at": "2026-02-10T18:13:27.000Z"
+        }
+      ]
+    },
+    {
+      "conversation_id": "215473023628579",
+      "created_at": "2026-02-09T13:23:00.000Z",
+      "state": "closed",
+      "contact_email": "camila.lagoa@colppy.com",
+      "contact_es_contador": null,
+      "contact_rol_wizard": null,
+      "tags": [
+        "Mod Cfg-Talonarios",
+        "importación",
+        "Chat Duplicado"
+      ],
+      "parts": [
+        {
+          "author_type": "user",
+          "body": "---------- Forwarded message --------- De: Cecilia Machado < c.temptech@gmail.com > Date: lun, 9 feb 2026 a las 10:10 Subject: Re: Ultimo Paso. Descargá tu reporte To: Camila de Colppy < camila.lagoa@colppy.com > Hola Camila, buen dìa. Nuevamente me pongo en contacto para hacerte una consulta, ya que estamos conociendo el sistema aùn. Te consulto, còmo puedo hacer para traer la informaciòn de AFIP a Colppy? Me refiero en cuanto a talonarios y facturas A y B Gracias!!! El mié, 21 ene 2026 a las 15:52, Camila de Colppy (< camila.lagoa@colppy.com >) escribió:",
+          "created_at": "2026-02-09T13:23:00.000Z"
+        },
+        {
+          "author_type": "admin",
+          "body": "Hola, buenos días, ¿Cómo estas? Te dejo el LINK del articulo que explica como crear talonarios, tene en cuenta que si esos puntos de venta los utilizas en ARCA, en Colppy solo van a ser de registro, el único punto de venta que impacta en ARCA es el nuevo punto de venta que generes para la factura electrónica. Por otro lado te dejo los link de los artículos que te explican como importar a Colppy los comprobantes ya emitidos en ARCA: Comprobantes emitidos: LINK Comprobantes recibidos: LINK",
+          "created_at": "2026-02-09T14:07:44.000Z"
+        },
+        {
+          "author_type": "admin",
+          "body": "Duplicado, sigo aca https://app.intercom.com/a/inbox/j7l53tgt/inbox/admin/8426271/conversation/215473038732392?view=List",
+          "created_at": "2026-02-10T13:20:24.000Z"
+        },
+        {
+          "author_type": "bot",
+          "body": "¿Qué tal estuvo tu conversación con Camila?",
+          "created_at": "2026-02-10T13:21:15.000Z"
+        },
+        {
+          "author_type": "bot",
+          "body": "[Conversation Rating Request]",
+          "created_at": "2026-02-10T13:21:15.000Z"
+        }
+      ]
+    },
+    {
+      "conversation_id": "215473028515706",
+      "created_at": "2026-02-09T18:14:52.000Z",
+      "state": "closed",
+      "contact_email": "angelesconstructora4@gmail.com",
+      "contact_es_contador": null,
+      "contact_rol_wizard": null,
+      "tags": [
+        "Consultas-No responden",
+        "Chat-Bot"
+      ],
+      "parts": [
+        {
+          "author_type": "user",
+          "body": "Hacer una consulta",
+          "created_at": "2026-02-09T18:14:52.000Z"
+        },
+        {
+          "author_type": "bot",
+          "body": "¿Desde qué empresa estás realizando la consulta?",
+          "created_at": "2026-02-09T18:14:54.000Z"
+        },
+        {
+          "author_type": "bot",
+          "body": "Por favor, elegí el módulo sobre el cual queres realizar la consulta.",
+          "created_at": "2026-02-09T18:15:15.000Z"
+        },
+        {
+          "author_type": "user",
+          "body": "Proveedores",
+          "created_at": "2026-02-09T18:15:20.000Z"
+        },
+        {
+          "author_type": "bot",
+          "body": "¿En qué te puedo ayudar?",
+          "created_at": "2026-02-09T18:15:21.000Z"
+        },
+        {
+          "author_type": "admin",
+          "body": "Hola Angeles, ¿Cómo estás? Dado que no tuvimos respuesta, procederemos a cerrar este chat pero podes escribirnos siempre que lo necesites, desde el botón Ayuda > \"Envianos un mensaje\" Que tengas una buena jornada 😊",
+          "created_at": "2026-02-09T20:24:26.000Z"
+        },
+        {
+          "author_type": "bot",
+          "body": "¿Qué tal estuvo tu conversación con Camila?",
+          "created_at": "2026-02-09T20:24:39.000Z"
+        },
+        {
+          "author_type": "bot",
+          "body": "[Conversation Rating Request]",
+          "created_at": "2026-02-09T20:24:39.000Z"
+        }
+      ]
+    },
+    {
+      "conversation_id": "215473026558350",
+      "created_at": "2026-02-09T16:13:17.000Z",
+      "state": "closed",
+      "contact_email": "guitarrascarullo@hotmail.com",
+      "contact_es_contador": null,
+      "contact_rol_wizard": null,
+      "tags": [
+        "Chat-Bot",
+        "Mod Tes-Reporte-Cheques emitidos diferidos"
+      ],
+      "parts": [
+        {
+          "author_type": "user",
+          "body": "Hacer una consulta",
+          "created_at": "2026-02-09T16:13:17.000Z"
+        },
+        {
+          "author_type": "bot",
+          "body": "¿Desde qué empresa estás realizando la consulta?",
+          "created_at": "2026-02-09T16:13:19.000Z"
+        },
+        {
+          "author_type": "bot",
+          "body": "Por favor, elegí el módulo sobre el cual queres realizar la consulta.",
+          "created_at": "2026-02-09T16:13:30.000Z"
+        },
+        {
+          "author_type": "user",
+          "body": "Tesorería",
+          "created_at": "2026-02-09T16:13:36.000Z"
+        },
+        {
+          "author_type": "bot",
+          "body": "¿En qué te puedo ayudar?",
+          "created_at": "2026-02-09T16:13:37.000Z"
+        },
+        {
+          "author_type": "user",
+          "body": "Cheques",
+          "created_at": "2026-02-09T16:13:43.000Z"
+        },
+        {
+          "author_type": "bot",
+          "body": "Elegí una de estas opciones 👇",
+          "created_at": "2026-02-09T16:13:44.000Z"
+        },
+        {
+          "author_type": "user",
+          "body": "Cheques emitidos",
+          "created_at": "2026-02-09T16:13:51.000Z"
+        },
+        {
+          "author_type": "bot",
+          "body": "En todas las operaciones que involucran egresos de fondos existe la posibilidad de registrar la emisión de cheques. (Por ejemplo Pagos a Proveedores, Factura de Compra Contado, Otras Pagos, Canje Interno de Caja) Existen dos tipos de cheques a emitir con características diferentes: ​ -Cheque Emitido Común Para ingresar un pago con Cheque Emitido Común, se debe seleccionar el Banco, Número, Fecha de Pago e Importe -Cheque Emitido Diferido Para ingresar un pago con un Cheque Emitido Diferido, se debe seleccionar el Banco, Número, Fecha de Pago e Importe 📢 Importante El día de cumplimiento de la Fecha de Pago del cheque emitido diferido, mediante un proceso automático, se realiza la registración del egreso del cheque diferido en la cuenta bancaria. En caso de tener configurada la chequera activa de cheques diferidos en \"Empresa→ Tesorería\", la numeración del cheque se realizará automáticamente. Se podrá consultar el Reporte de cheques emitidos diferidos, desde el módulo Tesorería. Para más información hace clic en este link",
+          "created_at": "2026-02-09T16:13:52.000Z"
+        },
+        {
+          "author_type": "bot",
+          "body": "¿Se resolvió tu duda?",
+          "created_at": "2026-02-09T16:13:52.000Z"
+        },
+        {
+          "author_type": "user",
+          "body": "Necesito más ayuda",
+          "created_at": "2026-02-09T16:14:08.000Z"
+        },
+        {
+          "author_type": "bot",
+          "body": "Contanos, ¿Cómo te podemos ayudar?",
+          "created_at": "2026-02-09T16:14:09.000Z"
+        },
+        {
+          "author_type": "user",
+          "body": "He emitido cheques que no se están descontado del banco a la fecha de su vencimiento",
+          "created_at": "2026-02-09T16:14:45.000Z"
+        },
+        {
+          "author_type": "bot",
+          "body": "Para los cheques emitidos diferidos, nuestro sistema hace el descuento automáticamente en la fecha de pago. Si no se están descontando, puede ser por demoras en el procesamiento. Probá hacer clic en \"guardar\" nuevamente en el pago y esperá 30 minutos para que el proceso se complete. También verificá que tengas configurada correctamente la cuenta de cheques emitidos diferidos en Configuración → Tesorería, ya que sin esta configuración no se pueden usar cheques emitidos diferidos. Si seguís teniendo problemas, podés revisar el Reporte de cheques emitidos diferidos en el módulo Tesorería para ver el estado de tus cheques pendientes. Sources: Cheques Emitidos ¿Cómo llevar cheques emitidos manualmente? Reporte de cheques emitidos diferidos",
+          "created_at": "2026-02-09T16:15:06.000Z"
+        },
+        {
+          "author_type": "bot",
+          "body": "¿Es lo que buscabas?",
+          "created_at": "2026-02-09T16:15:07.000Z"
+        },
+        {
+          "author_type": "bot",
+          "body": "Si aún necesitas ayuda con el descuento de los cheques emitidos, lamento cualquier inconveniente que esto te haya causado. ¿Podrías contarme más detalles sobre el problema que estás enfrentando para poder asistirte mejor?",
+          "created_at": "2026-02-09T16:19:09.000Z"
+        },
+        {
+          "author_type": "user",
+          "body": "Si, pero la propuesta no funciona. La tesorería ya estaba configurada correctamente porque hasta el 31 de enero los cheques se descontaban del banco",
+          "created_at": "2026-02-09T16:19:47.000Z"
+        },
+        {
+          "author_type": "bot",
+          "body": "Entiendo que el problema empezó después del 31 de enero, aunque la configuración estaba funcionando bien antes. Para identificar qué está pasando específicamente, necesito que me compartas: - ¿Qué fecha de vencimiento tienen los cheques que no se están descontando? - ¿Aparece algún mensaje de error específico en el sistema? - ¿Podés revisar el Reporte de cheques emitidos diferidos en Tesorería para ver si los cheques aparecen como \"no debitados\"? También probá volver a hacer clic en \"guardar\" en esos pagos específicos y esperá 30 minutos, ya que a veces hay demoras en el procesamiento automático. Con esos detalles voy a poder ayudarte mejor a resolver el problema. Sources: Cheques Emitidos Reporte de cheques emitidos diferidos",
+          "created_at": "2026-02-09T16:20:07.000Z"
+        },
+        {
+          "author_type": "user",
+          "body": "Ya reprocesé el pago, voy a esperar los 30 minutos",
+          "created_at": "2026-02-09T16:20:44.000Z"
+        },
+        {
+          "author_type": "bot",
+          "body": "Perfecto, esa es la mejor opción. Después de los 30 minutos, si el cheque sigue sin descontarse, revisá el Reporte de cheques emitidos diferidos en el módulo Tesorería para ver si aparece como \"no debitado\". Si después de ese tiempo el problema persiste, podés reformular tu pregunta o hablar con nuestro equipo para revisar el caso específico. Source: Cheques Emitidos",
+          "created_at": "2026-02-09T16:21:01.000Z"
+        },
+        {
+          "author_type": "bot",
+          "body": "¿Responde eso a tu pregunta?",
+          "created_at": "2026-02-09T16:21:01.000Z"
+        },
+        {
+          "author_type": "user",
+          "body": "Si, muchas gracias",
+          "created_at": "2026-02-09T16:21:29.000Z"
+        },
+        {
+          "author_type": "bot",
+          "body": "Me alegra saber que la información fue útil. Quedo a tu disposición para cualquier otra consulta que tengas.",
+          "created_at": "2026-02-09T16:21:37.000Z"
+        },
+        {
+          "author_type": "bot",
+          "body": "¿Qué tal estuvo tu conversación con Colppy?",
+          "created_at": "2026-02-09T16:21:42.000Z"
+        },
+        {
+          "author_type": "bot",
+          "body": "[Conversation Rating Request]",
+          "created_at": "2026-02-09T16:21:43.000Z"
+        }
+      ]
+    }
+  ]
+}

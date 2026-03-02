@@ -10,7 +10,7 @@ Use for Colppy-based CUIT reconciliation (Colppy DB vs HubSpot primary company C
 
 Usage:
   python tools/scripts/colppy/export_colppy_cuit_snapshot.py
-  python tools/scripts/colppy/export_colppy_cuit_snapshot.py --output plugins/colppy-ceo-assistant/docs/colppy_cuit_snapshot.json
+  python tools/scripts/colppy/export_colppy_cuit_snapshot.py --output plugins/colppy-revops/docs/colppy_cuit_snapshot.json
 """
 
 import argparse
@@ -24,7 +24,7 @@ REPO_ROOT = Path(__file__).resolve().parents[3]
 sys.path.insert(0, str(REPO_ROOT))
 
 DEFAULT_DB = REPO_ROOT / "tools/data/colppy_export.db"
-DEFAULT_OUTPUT = REPO_ROOT / "plugins/colppy-ceo-assistant/docs/colppy_cuit_snapshot.json"
+DEFAULT_OUTPUT = REPO_ROOT / "plugins/colppy-revops/docs/colppy_cuit_snapshot.json"
 
 from tools.scripts.hubspot.hubspot_build_fetchers import format_cuit_display, normalize_cuit
 

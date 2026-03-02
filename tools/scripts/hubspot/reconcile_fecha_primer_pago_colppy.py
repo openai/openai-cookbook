@@ -161,7 +161,7 @@ def run_reconciliation(
     db_path = Path(local_db_path)
     if not db_path.exists():
         print(f"Error: colppy_export.db not found at {db_path}")
-        print("Run: cd plugins/colppy-ceo-assistant && ./publish.sh --refresh")
+        print("Run: cd plugins/colppy-revops && ./publish.sh --refresh")
         sys.exit(1)
 
     print("Fetching HubSpot closed won deals...")

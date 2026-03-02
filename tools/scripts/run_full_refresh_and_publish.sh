@@ -37,8 +37,8 @@ python tools/scripts/colppy/export_reconciliation_db_snapshot.py --months 14 2>&
 
 echo "" | tee -a "$LOG"
 echo "[$(date +%H:%M:%S)] Publishing plugin..." | tee -a "$LOG"
-cd "$REPO_ROOT/plugins/colppy-ceo-assistant" && ./publish.sh 2>&1 | tee -a "$LOG"
+cd "$REPO_ROOT/plugins/colppy-revenue" && ./publish.sh 2>&1 | tee -a "$LOG"
 
 echo "" | tee -a "$LOG"
 echo "=== DONE at $(date '+%Y-%m-%dT%H:%M:%S') ===" | tee -a "$LOG"
-echo "Plugin zip: $REPO_ROOT/tools/outputs/colppy-ceo-assistant-plugin-full.zip" | tee -a "$LOG"
+echo "Plugin zip: $REPO_ROOT/tools/outputs/colppy-revenue-plugin-full.zip" | tee -a "$LOG"

@@ -1,0 +1,15 @@
+{
+  "mcpServers": {
+    "reconciliation": {
+      "command": "python",
+      "args": ["../../tools/scripts/reconciliation/mcp_reconciliation_server.py"],
+      "cwd": "../.."
+    },
+    "hubspot-analysis": {
+      "command": "python",
+      "args": ["../../tools/scripts/hubspot/mcp_hubspot_analysis_server.py"],
+      "cwd": "../.."
+    }
+  },
+  "_comment": "reconciliation: refresh_colppy_db, refresh_hubspot_deals, populate_deal_associations, run_reconciliation, run_full_refresh. hubspot-analysis: run_smb_mql_funnel, run_accountant_mql_funnel, run_high_score_analysis, etc."
+}

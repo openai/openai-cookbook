@@ -1,0 +1,10 @@
+{
+  "mcpServers": {
+    "arca": {
+      "command": "/opt/homebrew/bin/python3.11",
+      "args": ["../../arca-prototype/backend/mcp_server.py"],
+      "cwd": "../.."
+    }
+  },
+  "_comment": "ARCA MCP: get_comprobantes, get_retenciones, get_notificaciones, get_representados, generate_libro_iva, test_wsaa_auth, get_colppy_empresas, get_colppy_comprobantes, reconcile_arca_vs_colppy, reconcile_retenciones_vs_comprobantes, search_invoices, enrich_cuit, search_company_by_name, get_bank_transactions."
+}

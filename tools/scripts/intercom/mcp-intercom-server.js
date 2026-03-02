@@ -394,7 +394,7 @@ class IntercomMCPServer {
 
       let cachePathResolved = null;
       if (save_cache && cacheConversations && cacheConversations.length > 0) {
-        const pluginRoot = join(process.cwd(), 'plugins', 'colppy-ceo-assistant');
+        const pluginRoot = join(process.cwd(), 'plugins', 'colppy-customer-success');
         cachePathResolved = save_cache.startsWith('/') ? save_cache : join(pluginRoot, save_cache);
         const cacheDir = join(cachePathResolved, '..');
         if (!fs.existsSync(cacheDir)) fs.mkdirSync(cacheDir, { recursive: true });

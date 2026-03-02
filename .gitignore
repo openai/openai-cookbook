@@ -166,3 +166,6 @@ node_modules/
 
 # Claude worktrees (embedded git repos - not for versioning)
 .claude/worktrees/
+
+# Playwright MCP logs
+.playwright-mcp/

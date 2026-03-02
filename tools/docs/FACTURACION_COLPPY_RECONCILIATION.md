@@ -257,7 +257,7 @@ python tools/scripts/colppy/reconcile_colppy_hubspot_db_only.py --year 2026 --mo
 ```bash
 python tools/scripts/colppy/export_reconciliation_snapshot.py --months 62
 python tools/scripts/colppy/export_reconciliation_db_snapshot.py --months 14
-# Outputs: plugins/colppy-ceo-assistant/docs/colppy_*_snapshot.json
+# Outputs: plugins/colppy-revops/docs/colppy_*_snapshot.json
 ```
 
 **Full refresh from Jan 2025** (HubSpot all months + export + publish):

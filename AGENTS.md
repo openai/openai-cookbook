@@ -37,3 +37,8 @@ These are considered priority 0 issues for this repo, in addition to the normal 
 - Check that code identifiers remain descriptive (no leftover placeholder names) and that repeated values are factored into constants when practical.
 - Ensure notebooks or scripts document any required environment variables instead of hard-coding secrets or keys.
 - Confirm metadata files (`registry.yaml`, `authors.yaml`) stay in sync with new or relocated content.
+
+## Recent Learnings
+
+- **Realtime eval shared imports can resolve the wrong module under pytest** -> Add `shared/__init__.py` and ensure tests prepend `examples/evals/realtime_evals` to `sys.path` before importing `shared.*` -> Prevents collection failures caused by unrelated installed packages named `shared`.
+- **Run-level grades can be overweighted by long simulations** -> Store turn-level grades on the matching turn and trace-level grades on one row per simulation instead of copying them onto every row -> Keeps `results.csv` row semantics intact and prevents summary means from favoring longer conversations.

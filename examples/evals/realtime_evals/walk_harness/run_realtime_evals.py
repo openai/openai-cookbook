@@ -31,6 +31,7 @@ if str(ROOT_DIR) not in sys.path:
 
 from shared.graders import compute_tool_call_grade
 from shared.metrics_utils import add_numeric_summaries, order_columns
+from shared.plotting_utils import build_realtime_eval_plots
 from shared.realtime_harness_utils import (
     RealtimeResponseError,
     audio_format_config,
@@ -98,6 +99,11 @@ def parse_args() -> argparse.Namespace:
         type=int,
         default=0,
         help="Limit number of examples for quick checks.",
+    )
+    parser.add_argument(
+        "--skip-plots",
+        action="store_true",
+        help="Skip rendering styled summary plots into results/<run_id>/plots/.",
     )
     return parser.parse_args()
 
@@ -536,6 +542,15 @@ async def run_evals() -> None:
     summary_path = run_dir / "summary.json"
     summary_dict = summary.to_flat_summary()
     summary_path.write_text(json.dumps(summary_dict, indent=2), encoding="utf-8")
+    if not args.skip_plots:
+        plot_paths = build_realtime_eval_plots(
+            results=results_df,
+            summary=summary_dict,
+            output_dir=run_dir / "plots",
+            harness_label="walk harness",
+            run_name=run_name,
+        )
+        print(f"Wrote {len(plot_paths)} plot(s) to {run_dir / 'plots'}")
     print(
         "Summary:"
         f" grade_mean={summary.grade_mean:.3f}"

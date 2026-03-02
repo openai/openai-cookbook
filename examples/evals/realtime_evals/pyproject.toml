@@ -5,8 +5,10 @@ description = "Real-time evaluation examples using the OpenAI Realtime API"
 readme = "README.md"
 requires-python = ">=3.12"
 dependencies = [
+    "matplotlib==3.10.7",
     "openai[realtime]==2.15.0",
     "pandas==2.3.3",
+    "seaborn==0.13.2",
 ]
 
 [dependency-groups]

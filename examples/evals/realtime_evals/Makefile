@@ -1,16 +1,40 @@
-.PHONY: format lint lint-fix typecheck test
+UV_BIN := $(strip $(shell command -v uv 2>/dev/null))
+PYTHON_BIN := $(strip $(shell command -v python 2>/dev/null || command -v python3 2>/dev/null))
+VENV_DIR := .venv
+VENV_PYTHON := $(VENV_DIR)/bin/python
+
+ifeq ($(UV_BIN),)
+RUFF := $(VENV_DIR)/bin/ruff
+MYPY := $(VENV_DIR)/bin/mypy
+PYTEST := $(VENV_DIR)/bin/pytest
+else
+RUFF := uv run --with ruff ruff
+MYPY := uv run --with mypy --with pandas-stubs --with types-tqdm mypy
+PYTEST := uv run --with pytest pytest
+endif
+
+.PHONY: install format lint lint-fix typecheck test
+
+install:
+ifeq ($(UV_BIN),)
+	$(PYTHON_BIN) -m venv $(VENV_DIR)
+	$(VENV_PYTHON) -m pip install -r requirements.txt -r requirements-dev.txt
+else
+	uv venv $(VENV_DIR)
+	uv sync --group dev
+endif
 
 format:
-	uv run --with ruff ruff format .
+	$(RUFF) format .
 
 lint:
-	uv run --with ruff ruff check .
+	$(RUFF) check .
 
 lint-fix:
-	uv run --with ruff ruff check . --fix
+	$(RUFF) check . --fix
 
 typecheck:
-	uv run --with mypy --with pandas-stubs --with types-tqdm mypy --explicit-package-bases .
+	$(MYPY) --explicit-package-bases .
 
 test:
-	uv run --with pytest pytest
+	$(PYTEST)

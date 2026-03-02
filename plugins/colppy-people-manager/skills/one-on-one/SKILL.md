@@ -37,8 +37,14 @@ Read the transcript header or speaker labels (Fellow and Granola label speakers 
 - **1 speaker** → 1:1 mode. Proceed with that one person.
 - **2+ speakers** → Group call mode. List all participants found.
 
-For each participant, derive their slug: first-last lowercase hyphenated (e.g. `ana-gomez`).
-If a participant's name is ambiguous or missing a last name, ask the user to clarify before proceeding.
+For each participant, derive their slug:
+
+- Take firstname-lastname, lowercase, hyphens between words
+- Remove diacritics: á→a, é→e, í→i, ó→o, ú→u, ñ→n, ü→u
+- Keep only alphanumeric characters and hyphens
+- Examples: Ana Gómez → `ana-gomez`, María José García López → `maria-jose-garcia-lopez`
+
+If ambiguous (only first name, initials, or unusual formatting): do NOT guess. Ask: "How should I format [Name]'s folder slug? (e.g., `pedro-silva`)"
 
 If **any participant has no folder** in `data/`: note them, offer to create — "I found [Name] in the transcript but no folder exists. Create one now?"
 
@@ -51,7 +57,11 @@ Read for **every participant** before doing any extraction:
 Also read once (applies to all):
 - `plugins/colppy-people-manager/data/_self/summary.md`
 
-If a person folder doesn't exist and the user confirmed creation: copy all 4 files from `_template/`, replace `<Full Name>` with their actual name.
+If a person folder doesn't exist and the user confirmed creation:
+
+1. Create `data/<slug>/`
+2. Copy these 4 files from `data/_template/`: `profile.md`, `summary.md`, `coaching_arc.md`, `action_items.md`
+3. In each file, replace every occurrence of `<Full Name>` with the person's actual full name
 
 ### [D] Step 3: Accept input
 
@@ -61,7 +71,10 @@ Try in this order:
 3. **Pasted text** — user pasted transcript or notes directly
 4. **Attached file** — PDF, image, slides (Claude reads natively)
 
-If a document was **prepared by a participant** (self-assessment, plan, deck): flag it — _"self-reported from [Name]: weight as their own voice and perception, not external observation."_
+If the document origin is **clear** (user says "Ana prepared this", "from Martin", "his self-assessment", "her plan"):
+Flag it: _"self-reported from [Name]: weight as their own voice and perception, not external observation."_
+
+If the document origin is **unclear**: Ask before extracting — "Did [Name] prepare this document, or is it external feedback about them?"
 
 Multiple inputs can be combined (e.g. transcript + attached self-assessment from one person).
 
@@ -79,7 +92,10 @@ Run this extraction **once per participant**. For group calls: loop through each
 - What concretely moved? (evidence required)
 - What's still stuck? (name what was tried before)
 
-**Coaching intervention** (1:1 only — not applicable in group calls unless you intervened directly with one person in front of others) — what frame or approach you used. Be specific.
+**Coaching intervention:**
+
+- In a **1:1**: Describe the specific frame or approach used. What you tried. What happened. Be concrete.
+- In a **group call**: Write `—` for this field unless you directly addressed one person publicly in the meeting (not in a later side conversation). If you did address someone publicly, note it briefly.
 
 **Self-reflection** (once for the whole session, not per person) — what you noticed about yourself. In a group call: how you facilitated, who you gave airtime to, who you ignored, how you handled tension. In a 1:1: what you did well and what you'd do differently as their coach.
 
@@ -87,7 +103,11 @@ Run this extraction **once per participant**. For group calls: loop through each
 
 Path per person: `plugins/colppy-people-manager/data/<slug>/history/<YYYY-QN>/<YYYY-MM-DD>.md`
 
-Quarter format: `2026-Q1`, `2025-Q4`, etc. (Q1=Jan-Mar, Q2=Apr-Jun, Q3=Jul-Sep, Q4=Oct-Dec)
+Quarter format: `2026-Q1`, `2025-Q4`, etc. Quarter is determined by the **session date** (not the content discussed):
+
+- Jan 1–Mar 31 → Q1 | Apr 1–Jun 30 → Q2 | Jul 1–Sep 30 → Q3 | Oct 1–Dec 31 → Q4
+
+Example: Session on 2026-03-25 → file under `2026-Q1/` even if reviewing Q4 2025 performance.
 
 **Always write all files. Do not skip any participant even if signals were weak.**
 
@@ -165,7 +185,31 @@ For each participant: mark items done if mentioned in transcript (add ✓ + date
 
 **For 1:1s:** 1-2 specific observations to act on before next session with that person.
 
-**For group calls:** 1-2 observations about the group dynamic + 1 observation about your own facilitation. Example: "Martin went silent every time Ana made a strong assertion — worth exploring privately whether that's deference, conflict avoidance, or something else. In your facilitation: you consistently resolved tension before it developed — experiment with letting it sit next time."
+**For group calls:** Do NOT write per-person coaching observations. Instead surface:
+
+1. Group dynamic (1-2 observations): patterns in how the group interacted, power dynamics, who dominated or went silent, unresolved tension
+2. Your facilitation (1 observation): what you did well and one thing to try differently next time
+
+Add these observations at the end of the self-reflection entry in `_self/history/`, not in individual participant files.
+
+Example: "Martin went silent every time Ana made a strong assertion — worth exploring privately whether that's deference or conflict avoidance. Facilitation: you resolved tension before it developed each time — experiment with letting it sit next time."
+
+### Mode A — Completion checklist
+
+Before closing a session, confirm ALL steps are done:
+
+- [ ] Step 1: Detected session type and identified all participants
+- [ ] Step 2: Hydrated context (profile.md + summary.md read for each person)
+- [ ] Step 3: Accepted and labeled all inputs (transcripts, docs, flags self-reported if applicable)
+- [ ] Step 4: Extracted coaching signals per person
+- [ ] Step 5: Wrote session file(s) — one per participant
+- [ ] Step 6: Wrote self-reflection entry to `_self/history/`
+- [ ] Step 7: Rewrote each person's `summary.md` (all 7 sections, under 700 words)
+- [ ] Step 8: Updated `_self/summary.md`
+- [ ] Step 9: Updated `action_items.md` per person
+- [ ] Step 10: Surfaced coaching observations
+
+**Do not consider the session logged until all 10 steps are complete.**
 
 ---
 
@@ -219,7 +263,11 @@ _Generated: YYYY-MM-DD | Period: YYYY-QN → YYYY-QN | Based on N sessions_
 
 ### [D] Step 5: Save feedforward
 Path: `data/<slug>/history/evaluations/<YYYY-MM-DD>-feedforward.md`
-Create `evaluations/` directory if it doesn't exist.
+
+Note: `evaluations/` is a **subfolder inside `history/`** — not a sibling. Full path example:
+`data/ana-gomez/history/evaluations/2026-03-02-feedforward.md`
+
+Create the `evaluations/` directory if it doesn't exist.
 
 ### [A] Step 6: Rewrite coaching_arc.md
 Target ~1500 words. Update the longitudinal story to incorporate evaluation findings:

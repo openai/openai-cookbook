@@ -14,15 +14,14 @@ Depending on your realtime eval maturity, point Codex (or your preferred coding 
 Python 3.12+ required.
 
 ```bash
-uv venv .venv
+make install
 source .venv/bin/activate
-uv sync --group dev
 export OPENAI_API_KEY="your_api_key"
 ```
 
-If you are not using `uv`, install with `pip install -r requirements.txt -r requirements-dev.txt`.
+`make install` creates the local `.venv` and installs both runtime and dev dependencies. It uses `uv` when available and otherwise falls back to `python -m venv` plus `pip install -r requirements.txt -r requirements-dev.txt`.
 
-Run a first command per harness:
+Run a first command per harness. If uv is not installed, replace `uv run` with `python` and run these scripts with your `.venv` activated:
 
 - Crawl: `uv run python crawl_harness/run_realtime_evals.py`
 - Walk: install ffmpeg (`brew install ffmpeg`), then:
@@ -31,6 +30,7 @@ Run a first command per harness:
 - Run: `uv run python run_harness/run_realtime_evals.py --max-examples 1`
 
 ## Dev commands
+Use the root `Makefile` for common checks. Run `make install` first to create `.venv`. These targets work with or without `uv`: when `uv` is installed they run through `uv run`, and otherwise they use the matching tool binaries from the local `.venv`.
 
 Use the root `Makefile` for common checks:
 

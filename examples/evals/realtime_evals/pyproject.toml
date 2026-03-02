@@ -18,6 +18,7 @@ dev = [
   "pandas-stubs",
   "pytest",
   "streamlit",
+  "types-seaborn",
   "types-tqdm",
 ]
 

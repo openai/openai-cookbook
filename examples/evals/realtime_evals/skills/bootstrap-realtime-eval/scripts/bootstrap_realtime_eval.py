@@ -487,8 +487,8 @@ def build_readme(
     }[harness]
 
     file_edit_lines = [
-        f"- `system_prompt.txt`: assistant instructions for this eval.",
-        f"- `tools.json`: tool schema the assistant can call.",
+        "- `system_prompt.txt`: assistant instructions for this eval.",
+        "- `tools.json`: tool schema the assistant can call.",
     ]
     if harness == "run":
         file_edit_lines.append("- `data/simulations.csv`: index of simulations to run.")

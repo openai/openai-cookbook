@@ -1,23 +1,46 @@
+UV_BIN := $(strip $(shell command -v uv 2>/dev/null))
+PYTHON_BIN := $(strip $(shell command -v python 2>/dev/null || command -v python3 2>/dev/null))
+VENV_DIR := .venv
+VENV_PYTHON := $(VENV_DIR)/bin/python
+
+ifeq ($(UV_BIN),)
+RUFF := $(VENV_DIR)/bin/ruff
+MYPY := $(VENV_DIR)/bin/mypy
+PYTEST := $(VENV_DIR)/bin/pytest
+STREAMLIT := $(VENV_DIR)/bin/streamlit
+else
+RUFF := uv run --with ruff ruff
+MYPY := uv run --with mypy --with pandas-stubs --with types-seaborn --with types-tqdm mypy
+PYTEST := uv run --with pytest pytest
+STREAMLIT := uv run --with streamlit streamlit
+endif
+
 .PHONY: install streamlit format lint lint-fix typecheck test
 
 install:
-	uv venv .venv
+ifeq ($(UV_BIN),)
+	$(PYTHON_BIN) -m venv $(VENV_DIR)
+	$(VENV_PYTHON) -m pip install -r requirements.txt -r requirements-dev.txt
+else
+	uv venv $(VENV_DIR)
 	uv sync --group dev
-
-streamlit:
-	uv run --group dev streamlit run results_viewer/app.py
+endif
 
 format:
-	uv run --group dev ruff format .
+	$(RUFF) format .
 
 lint:
-	uv run --group dev ruff check .
+	$(RUFF) check .
 
 lint-fix:
-	uv run --group dev ruff check . --fix
+	$(RUFF) check . --fix
 
 typecheck:
-	uv run --group dev mypy .
+	$(MYPY) --explicit-package-bases .
 
 test:
-	uv run --group dev pytest
+	$(PYTEST)
+
+streamlit:
+	$(STREAMLIT) run results_viewer/app.py
+

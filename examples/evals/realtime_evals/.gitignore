@@ -27,5 +27,3 @@ htmlcov/
 
 # Harness outputs
 *_harness/results/
-
-.streamlit/

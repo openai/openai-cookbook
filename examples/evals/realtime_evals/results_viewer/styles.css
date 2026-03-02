@@ -224,11 +224,13 @@ pre {
 .ui-card::before {
   content: "";
   position: absolute;
-  inset: 0 auto auto 0;
-  width: 100%;
-  height: 2px;
+  inset: 0;
+  border-radius: inherit;
   background: linear-gradient(90deg, rgba(88, 183, 255, 0.88), rgba(255, 106, 165, 0.75), rgba(255, 156, 98, 0.6), transparent 86%);
+  -webkit-mask: linear-gradient(#000 0 0) top / 100% 2px no-repeat;
+  mask: linear-gradient(#000 0 0) top / 100% 2px no-repeat;
   opacity: 0.92;
+  pointer-events: none;
 }
 
 .ui-card::after {
@@ -415,6 +417,7 @@ div[data-baseweb="tag"] {
 [data-testid="stVegaLiteChart"],
 [data-testid="stCodeBlock"] {
   position: relative;
+  overflow: hidden;
   border: 1px solid var(--border);
   background:
     linear-gradient(180deg, rgba(255, 255, 255, 0.05), rgba(255, 255, 255, 0.02)),
@@ -430,10 +433,11 @@ div[data-baseweb="tag"] {
 [data-testid="stCodeBlock"]::before {
   content: "";
   position: absolute;
-  inset: 0 auto auto 0;
-  width: 100%;
-  height: 2px;
+  inset: 0;
+  border-radius: inherit;
   background: linear-gradient(90deg, rgba(88, 183, 255, 0.85), rgba(255, 106, 165, 0.76), rgba(255, 156, 98, 0.44), transparent 90%);
+  -webkit-mask: linear-gradient(#000 0 0) top / 100% 2px no-repeat;
+  mask: linear-gradient(#000 0 0) top / 100% 2px no-repeat;
   pointer-events: none;
 }
 
@@ -536,11 +540,42 @@ input {
 [data-baseweb="input"] > div,
 [data-baseweb="base-input"] > div,
 [data-baseweb="select"] > div {
+  position: relative;
+  overflow: hidden;
   border: 1px solid var(--border);
   background:
     linear-gradient(180deg, rgba(155, 107, 255, 0.08), rgba(88, 183, 255, 0.03)),
     rgba(17, 12, 40, 0.9);
   box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.04), 0 0 18px rgba(155, 107, 255, 0.05);
+}
+
+[data-baseweb="input"] > div::before,
+[data-baseweb="base-input"] > div::before,
+[data-baseweb="select"] > div::before {
+  content: "";
+  position: absolute;
+  inset: 0;
+  border-radius: inherit;
+  background: linear-gradient(90deg, rgba(88, 183, 255, 0.82), rgba(255, 106, 165, 0.72), rgba(255, 156, 98, 0.4), transparent 90%);
+  -webkit-mask: linear-gradient(#000 0 0) top / 100% 2px no-repeat;
+  mask: linear-gradient(#000 0 0) top / 100% 2px no-repeat;
+  pointer-events: none;
+}
+
+.comparison-selection-status {
+  margin: 0 0 0.55rem;
+  color: var(--muted);
+  font-size: 0.9rem;
+  font-weight: 600;
+  letter-spacing: -0.01em;
+  line-height: 1.2;
+  text-align: right;
+  white-space: nowrap;
+}
+
+.comparison-selection-status__count {
+  color: var(--text);
+  font-weight: 720;
 }
 
 [data-baseweb="input"] > div:focus-within,
@@ -597,7 +632,8 @@ textarea::placeholder {
 
 button[data-baseweb="tab"] {
   border: 1px solid transparent;
-  border-radius: 16px;
+  padding: 0.4rem 0.9rem 0.5rem;
+  border-radius: 12px;
   color: var(--muted);
 }
 

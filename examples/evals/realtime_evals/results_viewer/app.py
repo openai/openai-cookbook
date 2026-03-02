@@ -117,6 +117,18 @@ def _sync_select_all_toggle(
     ) == len(available_labels)
 
 
+def selected_runs_status_markup(selected_run_count: int) -> str:
+    run_label = "run" if selected_run_count == 1 else "runs"
+    return (
+        '<p class="comparison-selection-status">'
+        '<span class="comparison-selection-status__count">'
+        f"{selected_run_count}"
+        "</span> "
+        f"{run_label} selected"
+        "</p>"
+    )
+
+
 def selected_result_directories(harness: str) -> list[Path]:
     results_root = HARNESS_RESULTS_DIRS[harness]
     available_paths = discover_result_directories(results_root)
@@ -603,9 +615,13 @@ def render_percentile_ladder_chart(data: pd.DataFrame, y_title: str) -> None:
 
 def render_comparison_config_bar() -> tuple[str, list[Path]]:
     with st.container():
-        left, right = st.columns([1.6, 1])
+        harness_column, browser_column, status_column = st.columns(
+            [2.9, 1.2, 1],
+            gap="small",
+            vertical_alignment="bottom",
+        )
 
-        with left:
+        with harness_column:
             harness = st.selectbox(
                 "Harness",
                 options=["crawl", "walk", "run"],
@@ -614,11 +630,14 @@ def render_comparison_config_bar() -> tuple[str, list[Path]]:
                 key="comparison_harness",
             )
 
-        with right:
-            selected_runs_metric = st.empty()
+        with browser_column:
+            selected_paths = selected_result_directories(harness)
 
-        selected_paths = selected_result_directories(harness)
-        selected_runs_metric.metric("Selected runs", len(selected_paths))
+        with status_column:
+            st.markdown(
+                selected_runs_status_markup(len(selected_paths)),
+                unsafe_allow_html=True,
+            )
 
     return harness, selected_paths
 

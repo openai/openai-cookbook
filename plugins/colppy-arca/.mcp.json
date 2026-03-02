@@ -2,7 +2,7 @@
   "mcpServers": {
     "arca": {
       "command": "/opt/homebrew/bin/python3.11",
-      "args": ["../../arca-prototype/backend/mcp_server.py"],
+      "args": ["arca-prototype/backend/mcp_server.py"],
       "cwd": "../.."
     }
   },

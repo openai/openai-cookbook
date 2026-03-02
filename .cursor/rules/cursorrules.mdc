@@ -90,6 +90,7 @@ alwaysApply: true
 
 ## Data Handling & Analysis
 
+- **Always state last refresh** when presenting analysis from Colppy DB, facturacion_hubspot.db, or other data sources. Include the timestamp so the user knows data freshness. Sources: `colppy_export.db` → `colppy_export_refresh_logs` (most recent `timestamp`); `facturacion_hubspot.db` → `hubspot_refresh_logs` or `hubspot_deal_associations_refresh_logs`.
 - **Never invent or assume data** when information is missing
 - Explicitly state when assumptions are being made about data
 - For unclear data fields, present multiple possible interpretations

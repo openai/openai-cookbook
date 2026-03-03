@@ -1,6 +1,6 @@
 {
   "metadata": {
-    "exported_at": "2026-03-02T00:56:18.758671",
+    "exported_at": "2026-03-02T21:44:18.056440",
     "source": "reconcile_colppy_hubspot_db_only",
     "colppy_db": "/Users/virulana/openai-cookbook/tools/data/colppy_export.db",
     "hubspot_db": "/Users/virulana/openai-cookbook/tools/data/facturacion_hubspot.db",

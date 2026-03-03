@@ -636,6 +636,21 @@ export OPENAI_API_KEY="your_api_key"
 pytest examples/evals/realtime_evals/tests -q
 ```
 
+## Results Viewer
+
+After a run finishes, inspect it in the shared Streamlit viewer:
+
+```bash
+make streamlit
+```
+
+Then open the local Streamlit URL and use:
+
+- `Comparison View` to compare this folder's runs against other saved runs for the same harness.
+- `Run Viewer` to inspect rows, text input/output, audio, and event logs.
+
+The viewer auto-discovers runs written under `{repo_relative(eval_dir / "results")}`.
+
 ## Data Contract
 
 {data_contract}

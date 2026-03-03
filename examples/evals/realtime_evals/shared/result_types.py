@@ -786,11 +786,17 @@ class RunEvalRunSummary:
     def from_flat_summary(
         cls, summary: Mapping[str, Any], config: RunEvalRunConfig
     ) -> "RunEvalRunSummary":
-        grade_means = {
+        grade_means: dict[str, float] = {}
+        overall_grade_mean = _coerce_optional_float(summary.get("grade_mean"))
+        if overall_grade_mean is not None:
+            grade_means["grade_mean"] = overall_grade_mean
+        grade_means.update(
+            {
             key: float(value)
             for key, value in summary.items()
             if key.endswith("_grade_mean") and value not in (None, "")
-        }
+            }
+        )
         return cls(
             total_rows=int(summary.get("total_rows", 0)),
             failed_simulations=int(summary.get("failed_simulations", 0)),

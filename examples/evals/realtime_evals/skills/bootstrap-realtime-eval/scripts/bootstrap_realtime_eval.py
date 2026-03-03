@@ -27,7 +27,9 @@ def parse_args() -> argparse.Namespace:
     parser = argparse.ArgumentParser(
         description="Create a realtime eval starter folder under examples/evals/realtime_evals.",
     )
-    parser.add_argument("--name", required=True, help="Eval name, used in the folder name.")
+    parser.add_argument(
+        "--name", required=True, help="Eval name, used in the folder name."
+    )
     parser.add_argument(
         "--harness",
         required=True,
@@ -139,7 +141,9 @@ def write_text(path: Path, content: str) -> None:
     path.write_text(content.rstrip() + "\n", encoding="utf-8")
 
 
-def copy_or_write_text(source_path: Path | None, destination_path: Path, default_text: str) -> None:
+def copy_or_write_text(
+    source_path: Path | None, destination_path: Path, default_text: str
+) -> None:
     ensure_dir(destination_path.parent)
     if source_path is not None:
         shutil.copy2(source_path, destination_path)
@@ -208,12 +212,23 @@ def normalize_crawl_dataset(
         if "user_text" not in dataframe.columns:
             raise ValueError("CSV must include a user_text column for crawl or walk.")
         if "example_id" not in dataframe.columns:
-            dataframe.insert(0, "example_id", [f"ex_{index + 1:03d}" for index in range(len(dataframe))])
+            dataframe.insert(
+                0,
+                "example_id",
+                [f"ex_{index + 1:03d}" for index in range(len(dataframe))],
+            )
         if "gt_tool_call" not in dataframe.columns:
             dataframe["gt_tool_call"] = expected_tool_name
         if "gt_tool_call_arg" not in dataframe.columns:
             dataframe["gt_tool_call_arg"] = expected_tool_args_json
-        dataframe = dataframe.loc[:, [column for column in CRAWL_REQUIRED_COLUMNS if column in dataframe.columns]]
+        dataframe = dataframe.loc[
+            :,
+            [
+                column
+                for column in CRAWL_REQUIRED_COLUMNS
+                if column in dataframe.columns
+            ],
+        ]
 
     ensure_dir(destination_path.parent)
     dataframe.to_csv(destination_path, index=False)
@@ -262,7 +277,11 @@ def normalize_walk_dataset(
                         [f"ex_{index + 1:03d}" for index in range(len(dataframe))],
                     )
                 else:
-                    dataframe[column] = expected_tool_name if column == "gt_tool_call" else expected_tool_args_json
+                    dataframe[column] = (
+                        expected_tool_name
+                        if column == "gt_tool_call"
+                        else expected_tool_args_json
+                    )
         walk_csv_path = data_dir / "walk_dataset.csv"
         dataframe = dataframe.loc[:, WALK_REQUIRED_COLUMNS]
         dataframe.to_csv(walk_csv_path, index=False)
@@ -356,7 +375,9 @@ def normalize_run_dataset(
         }
 
     template_path = eval_dir / "data" / f"{eval_slug}_simulation_template.json"
-    expected_tool_args = parse_json_object(expected_tool_args_json) if expected_tool_args_json else {}
+    expected_tool_args = (
+        parse_json_object(expected_tool_args_json) if expected_tool_args_json else {}
+    )
     tool_mocks = parse_json_array(tool_mocks_json) if tool_mocks_json else []
     template_simulation = {
         "simulation_id": f"{eval_slug}_replace_me",
@@ -367,7 +388,8 @@ def normalize_run_dataset(
             "model": "gpt-realtime",
         },
         "simulator": {
-            "system_prompt": simulator_system_prompt or "Replace with the simulator prompt.",
+            "system_prompt": simulator_system_prompt
+            or "Replace with the simulator prompt.",
             "model": "gpt-realtime",
             "voice": "marin",
         },
@@ -379,7 +401,8 @@ def normalize_run_dataset(
             "real_time": False,
         },
         "turns": {
-            "fixed_first_user_turn": fixed_first_user_turn or "Replace with the first user turn.",
+            "fixed_first_user_turn": fixed_first_user_turn
+            or "Replace with the first user turn.",
             "max_turns": 4,
         },
         "tool_mocks": tool_mocks,
@@ -394,7 +417,13 @@ def normalize_run_dataset(
     }
     write_text(template_path, json.dumps(template_simulation, indent=2))
     simulations_df = pd.DataFrame(
-        columns=["simulation_id", "simulation_path", "enabled", "notes", "max_turns_override"]
+        columns=[
+            "simulation_id",
+            "simulation_path",
+            "enabled",
+            "notes",
+            "max_turns_override",
+        ]
     )
     simulations_df.to_csv(simulations_csv_path, index=False)
 
@@ -406,7 +435,9 @@ def normalize_run_dataset(
     }
 
 
-def build_run_commands(harness: str, eval_dir: Path, walk_info: dict[str, Any]) -> dict[str, str]:
+def build_run_commands(
+    harness: str, eval_dir: Path, walk_info: dict[str, Any]
+) -> dict[str, str]:
     results_dir = repo_relative(eval_dir / "results")
     prompt_path = repo_relative(eval_dir / "system_prompt.txt")
     tools_path = repo_relative(eval_dir / "tools.json")
@@ -492,10 +523,16 @@ def build_readme(
     ]
     if harness == "run":
         file_edit_lines.append("- `data/simulations.csv`: index of simulations to run.")
-        file_edit_lines.append("- `data/*.json`: scenario, simulator, tool mocks, and graders.")
+        file_edit_lines.append(
+            "- `data/*.json`: scenario, simulator, tool mocks, and graders."
+        )
     elif harness == "walk" and manifest["data"].get("audio_generation_required"):
-        file_edit_lines.append("- `data/source_eval_dataset.csv`: source rows used to generate walk audio.")
-        file_edit_lines.append("- `data/walk_dataset.csv`: generated walk dataset used by the harness.")
+        file_edit_lines.append(
+            "- `data/source_eval_dataset.csv`: source rows used to generate walk audio."
+        )
+        file_edit_lines.append(
+            "- `data/walk_dataset.csv`: generated walk dataset used by the harness."
+        )
     else:
         file_edit_lines.append("- `data/`: harness-specific dataset files.")
 
@@ -564,8 +601,16 @@ def build_readme(
         )
 
     source_notes = [
-        f"- Prompt source: `{prompt_source}`" if prompt_source is not None else "- Prompt source: generated starter prompt.",
-        f"- Tools source: `{tools_source}`" if tools_source is not None else "- Tools source: generated empty tools list.",
+        (
+            f"- Prompt source: `{prompt_source}`"
+            if prompt_source is not None
+            else "- Prompt source: generated starter prompt."
+        ),
+        (
+            f"- Tools source: `{tools_source}`"
+            if tools_source is not None
+            else "- Tools source: generated empty tools list."
+        ),
         f"- Data source mode: `{manifest['data']['source_mode']}`.",
     ]
     if manifest["data"]["source_mode"] == "awaiting_model_authored_starter_data":
@@ -636,6 +681,21 @@ export OPENAI_API_KEY="your_api_key"
 pytest examples/evals/realtime_evals/tests -q
 ```
 
+## Results Viewer
+
+After a run finishes, inspect it in the shared Streamlit viewer:
+
+```bash
+make streamlit
+```
+
+Then open the local Streamlit URL and use:
+
+- `Comparison View` to compare this folder's runs against other saved runs for the same harness.
+- `Run Viewer` to inspect rows, text input/output, audio, and event logs.
+
+The viewer auto-discovers runs written under `{repo_relative(eval_dir / "results")}`.
+
 ## Data Contract
 
 {data_contract}
@@ -669,16 +729,12 @@ def main() -> None:
     args = parse_args()
 
     eval_slug = slugify(args.name)
-    output_dir = args.output_dir or (
-        HARNESS_ROOT / f"{eval_slug}_realtime_eval"
-    )
+    output_dir = args.output_dir or (HARNESS_ROOT / f"{eval_slug}_realtime_eval")
     output_dir = output_dir.resolve()
     try:
         output_dir.relative_to(HARNESS_ROOT)
     except ValueError as exc:
-        raise ValueError(
-            f"Output directory must live under {HARNESS_ROOT}"
-        ) from exc
+        raise ValueError(f"Output directory must live under {HARNESS_ROOT}") from exc
 
     if output_dir.exists():
         if not args.force:
@@ -774,7 +830,11 @@ def main() -> None:
     write_text(output_dir / "README.md", readme_text)
     write_text(output_dir / "bootstrap_manifest.json", json.dumps(manifest, indent=2))
 
-    print(json.dumps({"eval_dir": repo_relative(output_dir), "harness": args.harness}, indent=2))
+    print(
+        json.dumps(
+            {"eval_dir": repo_relative(output_dir), "harness": args.harness}, indent=2
+        )
+    )
 
 
 if __name__ == "__main__":

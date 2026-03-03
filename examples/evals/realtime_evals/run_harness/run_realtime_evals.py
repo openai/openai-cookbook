@@ -291,6 +291,14 @@ def build_trace_context(
     )
 
 
+def grader_type(grader: Dict[str, Any]) -> str:
+    value = grader.get("type", "")
+    if not isinstance(value, str):
+        return ""
+    normalized = value.strip()
+    return normalized or "llm_as_judge"
+
+
 def run_llm_grade(
     client: OpenAI,
     model: str,
@@ -538,12 +546,12 @@ async def run_simulation(
     tool_call_grader_ids = [
         grader.get("id", "tool_call")
         for grader in turn_level_graders
-        if grader.get("type") == "tool_call"
+        if grader_type(grader) == "tool_call"
     ]
     tool_call_args_grader_ids = [
         grader.get("id", "tool_call_args")
         for grader in turn_level_graders
-        if grader.get("type") == "tool_call_args"
+        if grader_type(grader) == "tool_call_args"
     ]
 
     run_audio_dir = run_dir / "audio" / simulation_id
@@ -797,7 +805,7 @@ async def run_simulation(
                 )
                 results_rows.append(row_data)
                 for grader in turn_level_graders:
-                    if grader.get("type") != "llm_as_judge":
+                    if grader_type(grader) != "llm_as_judge":
                         continue
                     turn_grade_requests.append(
                         {
@@ -817,7 +825,7 @@ async def run_simulation(
     transcript_path.write_text("\n".join(transcript_lines), encoding="utf-8")
 
     for grader in trace_level_graders:
-        if grader.get("type") != "llm_as_judge":
+        if grader_type(grader) != "llm_as_judge":
             continue
         trace_grade_requests.append(
             {

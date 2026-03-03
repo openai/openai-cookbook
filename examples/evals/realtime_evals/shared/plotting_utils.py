@@ -9,7 +9,7 @@ matplotlib.use("Agg")
 
 import matplotlib.pyplot as plt
 import pandas as pd
-import seaborn as sns
+import seaborn as sns  # type: ignore[import-untyped]
 from matplotlib.lines import Line2D
 
 PAPER = "#f7f4ee"
@@ -47,6 +47,18 @@ TOKEN_COLUMNS = [
     "output_audio_tokens",
     "output_text_tokens",
 ]
+
+
+def _coerce_summary_float(value: Any) -> float | None:
+    if value in (None, ""):
+        return None
+    return float(value)
+
+
+def _coerce_summary_int(value: Any) -> int | None:
+    if value in (None, ""):
+        return None
+    return int(value)
 
 
 def build_realtime_eval_plots(
@@ -263,9 +275,7 @@ def _plot_turn_trends(
             markeredgecolor=EDGE,
         )
         grade_ax.set_ylim(0, 1.05)
-        grade_ax.set_title(
-            "turn-level score by turn", loc="left", pad=12, fontsize=14
-        )
+        grade_ax.set_title("turn-level score by turn", loc="left", pad=12, fontsize=14)
         grade_ax.set_xlabel("turn index", fontsize=12)
         grade_ax.set_ylabel("score", fontsize=12)
         grade_ax.set_xticks(grouped["turn_index"])
@@ -358,7 +368,9 @@ def _plot_score_metrics(axis: plt.Axes, summary: Mapping[str, Any]) -> None:
 
 
 def _plot_latency_quantiles(axis: plt.Axes, summary: Mapping[str, Any]) -> None:
-    quantile_frame = _summary_quantile_frame(summary, LATENCY_COLUMNS, ["p50", "p95", "p99"])
+    quantile_frame = _summary_quantile_frame(
+        summary, LATENCY_COLUMNS, ["p50", "p95", "p99"]
+    )
     axis.set_title("latency percentiles", loc="left", pad=12, fontsize=14)
     if quantile_frame.empty:
         _empty_panel(axis, "No latency percentile values found.")
@@ -419,9 +431,7 @@ def _plot_token_summary(axis: plt.Axes, summary: Mapping[str, Any]) -> None:
             .reindex(metrics)
             .reset_index()
         )
-        positions = [
-            position + ((stat_index - 1) * width) for position in x_positions
-        ]
+        positions = [position + ((stat_index - 1) * width) for position in x_positions]
         bars = axis.bar(
             positions,
             subset["value"],
@@ -508,7 +518,7 @@ def _plot_status_donut(axis: plt.Axes, results: pd.DataFrame) -> None:
             )
         return
 
-    wedges, _, autotexts = axis.pie(
+    pie_result = axis.pie(
         values,
         colors=colors,
         startangle=92,
@@ -517,6 +527,8 @@ def _plot_status_donut(axis: plt.Axes, results: pd.DataFrame) -> None:
         autopct=lambda pct: f"{pct:.0f}%" if pct >= 5 else "",
         textprops={"color": TEXT, "fontsize": 11},
     )
+    wedges = pie_result[0]
+    autotexts = pie_result[2] if len(pie_result) == 3 else []
     axis.text(0, 0, "status", ha="center", va="center", fontsize=14, color=TEXT)
     axis.legend(
         wedges,
@@ -669,29 +681,30 @@ def _score_metric_rows(summary: Mapping[str, Any]) -> list[tuple[str, float]]:
     failed_count = _summary_failed_count(summary)
     if total_count > 0:
         rows.append(("success rate", max(0.0, 1.0 - (failed_count / total_count))))
-    if "grade_mean" in summary:
-        rows.append(("overall grade", float(summary["grade_mean"])))
+    grade_mean = _coerce_summary_float(summary.get("grade_mean"))
+    if grade_mean is not None:
+        rows.append(("overall grade", grade_mean))
 
     preferred_keys = [
         "tool_call_correctness_mean",
         "tool_call_arg_correctness_mean",
     ]
     for key in preferred_keys:
-        if key in summary:
-            rows.append((_metric_label(key), float(summary[key])))
+        metric_value = _coerce_summary_float(summary.get(key))
+        if metric_value is not None:
+            rows.append((_metric_label(key), metric_value))
 
     extra_grade_keys = sorted(
         key
         for key in summary
         if key.endswith("_mean")
         and key not in {"grade_mean", *preferred_keys}
-        and (
-            key.replace("_mean", "").endswith("_grade")
-            or key.startswith("grade_")
-        )
+        and (key.replace("_mean", "").endswith("_grade") or key.startswith("grade_"))
     )
     for key in extra_grade_keys[:4]:
-        rows.append((_metric_label(key), float(summary[key])))
+        metric_value = _coerce_summary_float(summary.get(key))
+        if metric_value is not None:
+            rows.append((_metric_label(key), metric_value))
     return rows
 
 
@@ -704,15 +717,15 @@ def _summary_quantile_frame(
     for column in metric_columns:
         for stat_name in stat_names:
             key = f"{column}_{stat_name}"
-            value = summary.get(key)
-            if value in (None, ""):
+            value = _coerce_summary_float(summary.get(key))
+            if value is None:
                 continue
             rows.append(
                 {
                     "metric": column,
                     "metric_label": _metric_label(column),
                     "stat": stat_name,
-                    "value": float(value),
+                    "value": value,
                 }
             )
     return pd.DataFrame(rows)
@@ -720,17 +733,17 @@ def _summary_quantile_frame(
 
 def _summary_total_count(summary: Mapping[str, Any]) -> int:
     for key in ("total_examples", "total_rows"):
-        value = summary.get(key)
-        if value not in (None, ""):
-            return int(value)
+        value = _coerce_summary_int(summary.get(key))
+        if value is not None:
+            return value
     return 0
 
 
 def _summary_failed_count(summary: Mapping[str, Any]) -> int:
     for key in ("failed_examples", "failed_simulations"):
-        value = summary.get(key)
-        if value not in (None, ""):
-            return int(value)
+        value = _coerce_summary_int(summary.get(key))
+        if value is not None:
+            return value
     return 0
 
 
@@ -836,5 +849,7 @@ def _status_color(status: str) -> str:
 
 
 def _status_palette(status_values: Any) -> list[tuple[str, str]]:
-    statuses = sorted({str(value).strip() for value in status_values if str(value).strip()})
+    statuses = sorted(
+        {str(value).strip() for value in status_values if str(value).strip()}
+    )
     return [(status, _status_color(status)) for status in statuses]

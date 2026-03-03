@@ -15,8 +15,19 @@ dependencies = [
 dev = [
   "ruff",
   "mypy",
+  "pandas-stubs",
   "pytest",
+  "streamlit",
+  "types-seaborn",
+  "types-tqdm",
 ]
 
 [tool.ruff.lint]
 ignore = ["E402"]
+
+[tool.mypy]
+explicit_package_bases = true
+
+[[tool.mypy.overrides]]
+module = ["streamlit", "streamlit.*"]
+ignore_missing_imports = true

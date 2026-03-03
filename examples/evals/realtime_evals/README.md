@@ -14,15 +14,14 @@ Depending on your realtime eval maturity, point Codex (or your preferred coding 
 Python 3.12+ required.
 
 ```bash
-uv venv .venv
+make install
 source .venv/bin/activate
-uv sync --group dev
 export OPENAI_API_KEY="your_api_key"
 ```
 
-If you are not using `uv`, install with `pip install -r requirements.txt -r requirements-dev.txt`.
+`make install` creates the local `.venv` and installs both runtime and dev dependencies. It uses `uv` when available and otherwise falls back to `python -m venv` plus `pip install -r requirements.txt -r requirements-dev.txt`.
 
-Run a first command per harness:
+Run a first command per harness. If uv is not installed, replace `uv run` with `python` and run these scripts with your `.venv` activated:
 
 - Crawl: `uv run python crawl_harness/run_realtime_evals.py`
 - Walk: install ffmpeg (`brew install ffmpeg`), then:
@@ -31,9 +30,10 @@ Run a first command per harness:
 - Run: `uv run python run_harness/run_realtime_evals.py --max-examples 1`
 
 ## Dev commands
+Use the root `Makefile` for common checks. Run `make install` first to create `.venv`. These targets work with or without `uv`: when `uv` is installed they run through `uv run`, and otherwise they use the matching tool binaries from the local `.venv`.
 
-Use the root `Makefile` for common checks:
-
+- `make install`
+- `make streamlit`
 - `make format`
 - `make lint`
 - `make lint-fix`
@@ -102,6 +102,28 @@ To render charts for an existing run after the fact:
 ```bash
 uv run python plot_eval_results.py --run-dir run_harness/results/<run_id>
 ```
+
+## Results Viewer
+
+Use the Streamlit results viewer to browse saved runs from `crawl_harness`, `walk_harness`, and `run_harness` without opening the raw artifacts by hand.
+
+- `Comparison View`: select a harness, choose one or more saved runs, and compare summary metrics, scores, latency, and token usage across runs.
+- `Run Viewer`: inspect one saved run in detail. Crawl and walk runs show row-level audio artifacts and event logs; run-harness runs use a Simulation Viewer with transcripts, event logs, and turn audio.
+
+Run it from this directory with either:
+
+```bash
+make streamlit
+```
+
+or:
+
+```bash
+cd results_viewer
+uv run streamlit run app.py
+```
+
+Then open the local Streamlit URL, usually `http://localhost:8501`.
 
 ## Common CLI flags
 

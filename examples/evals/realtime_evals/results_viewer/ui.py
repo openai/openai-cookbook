@@ -1,9 +1,21 @@
 from __future__ import annotations
 
+from collections.abc import Callable
 from pathlib import Path
 
 import streamlit as st
-from streamlit.runtime.scriptrunner import get_script_run_ctx
+
+
+def _missing_script_run_ctx(*, suppress_warning: bool = False) -> None:
+    del suppress_warning
+    return None
+
+
+_get_script_run_ctx: Callable[..., object | None]
+try:
+    from streamlit.runtime.scriptrunner import get_script_run_ctx as _get_script_run_ctx
+except ImportError:
+    _get_script_run_ctx = _missing_script_run_ctx
 
 
 UI_DIR = Path(__file__).resolve().parent
@@ -22,14 +34,20 @@ def _resolve_css_path(path: str | Path) -> Path:
 
 
 def _current_run_token() -> str | None:
-    ctx = get_script_run_ctx(suppress_warning=True)
+    ctx = _get_script_run_ctx(suppress_warning=True)
     if ctx is None:
+        return None
+
+    session_id = getattr(ctx, "session_id", None)
+    page_script_hash = getattr(ctx, "page_script_hash", None)
+    cursors = getattr(ctx, "cursors", None)
+    if session_id is None or page_script_hash is None or cursors is None:
         return None
 
     # `ctx.cursors` is recreated for each rerun, which lets us preserve the
     # "no duplicate injection in one run" behavior without breaking styling on
     # refresh or widget-triggered reruns.
-    return f"{ctx.session_id}:{ctx.page_script_hash}:{id(ctx.cursors)}"
+    return f"{session_id}:{page_script_hash}:{id(cursors)}"
 
 
 def load_css(path: str | Path = "styles.css") -> None:

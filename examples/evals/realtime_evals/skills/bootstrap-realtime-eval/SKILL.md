@@ -73,6 +73,8 @@ Add flags for prompt, tools, data, graders, and run-specific fields as needed. R
 7. Validate before returning.
    - Run a smoke eval for the generated folder.
    - Run `pytest examples/evals/realtime_evals/tests -q`.
+   - Confirm the Streamlit results viewer can discover runs written under the generated folder's `results/` directory.
+   - If the viewer does not surface the scaffolded eval correctly, fix the viewer or scaffold before you finish.
    - Inspect the generated README and at least one generated data file.
 
 ## Hard Rules
@@ -85,6 +87,7 @@ Add flags for prompt, tools, data, graders, and run-specific fields as needed. R
   - why this harness was chosen
   - which files to edit first
   - smoke and full run commands
+  - how to inspect runs in the Streamlit results viewer
   - data contract notes
   - troubleshooting notes
 - Prefer assistant-specific flags for run harness commands:
@@ -100,6 +103,7 @@ Treat the task as complete only when:
 - harness-specific starter data exists, authored by you when the user did not provide it
 - the smoke command has been run or is blocked for a clear reason
 - `pytest examples/evals/realtime_evals/tests -q` has been run
+- the Streamlit results viewer can discover the scaffolded eval's `results/` directory, or the blocker is clearly documented
 
 ## Learnings
 
@@ -113,3 +117,4 @@ Only add items that are likely to help future realtime-eval scaffolding in this 
 
 - **`gpt-realtime` temperature is unsupported** -> Do not add a `temperature` field or CLI flag when scaffolding `gpt-realtime` evals -> Avoids invalid config and keeps runs aligned with the realtime harness constraints.
 - **Starter samples should come from the model, not the scaffold script** -> Use the script to create the folder structure and template files, then have you author the initial rows or simulations from the user’s use case -> Produces more relevant starter data and makes iteration easier with the user.
+- **Bootstrap work should verify the repo viewer path end-to-end** -> After scaffolding and a smoke run, make sure `results_viewer/app.py` can see the generated folder's `results/` output -> Prevents new eval folders from working in harness CLI flows but being invisible in the review UI.

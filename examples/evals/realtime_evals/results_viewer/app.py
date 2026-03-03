@@ -52,29 +52,102 @@ HARNESS_RESULTS_DIRS = {
     "run": ROOT_DIR / "run_harness" / "results",
 }
 CHART_RUN_PALETTE = [
-    "#79b7ff",
-    "#67ecff",
-    "#ff8ea9",
-    "#ffb066",
-    "#c894ff",
-    "#77a1ff",
+    "#b9cfdb",
+    "#c7d3bf",
+    "#ddc2be",
+    "#cbc3da",
+    "#ddd0b7",
+    "#bfd4cc",
 ]
+CHART_TEXT_COLOR = "#151515"
+CHART_MUTED_TEXT_COLOR = "#5f5f5a"
+CHART_DOMAIN_COLOR = "#cecec7"
+CHART_GRID_COLOR = "#dfdfd8"
+CHART_CONTENT_HEIGHT = 280
+CHART_LABEL_MAX_CHARS = 10
+CHART_LABEL_SUFFIX = "...."
+RUN_VIEWER_SELECTED_COLUMN = "__selected__"
+RUN_VIEWER_TABLE_VISIBLE_ROWS = 200
+RUN_VIEWER_TABLE_ROW_HEIGHT = 35
+RUN_VIEWER_TABLE_HEADER_HEIGHT = 38
+RUN_VIEWER_TABLE_FRAME_PADDING = 6
 
 
-def discover_result_directories(results_root: Path) -> list[Path]:
-    if not results_root.exists():
-        return []
+def chart_theme_config() -> dict[str, object]:
+    return {
+        "view": {"stroke": None},
+        "background": "transparent",
+        "axis": {
+            "labelColor": CHART_MUTED_TEXT_COLOR,
+            "titleColor": CHART_TEXT_COLOR,
+            "domainColor": CHART_DOMAIN_COLOR,
+            "gridColor": CHART_GRID_COLOR,
+            "tickColor": CHART_DOMAIN_COLOR,
+        },
+        "legend": {
+            "labelColor": CHART_MUTED_TEXT_COLOR,
+            "titleColor": CHART_TEXT_COLOR,
+        },
+    }
+
+
+def result_directory_label(path: Path) -> str:
+    try:
+        return str(path.relative_to(ROOT_DIR))
+    except ValueError:
+        return str(path)
+
+
+def display_run_label(value: str | Path) -> str:
+    raw_value = str(value)
+    display_label = Path(raw_value).name
+    return display_label or raw_value
+
+
+def path_state_key_fragment(path: Path) -> str:
+    return result_directory_label(path).replace("/", "__")
+
+
+def harness_results_roots(harness: str) -> list[Path]:
+    roots = [HARNESS_RESULTS_DIRS[harness]]
+    for manifest_path in sorted(ROOT_DIR.glob("*/bootstrap_manifest.json")):
+        try:
+            manifest_payload = json.loads(manifest_path.read_text(encoding="utf-8"))
+        except (OSError, json.JSONDecodeError):
+            continue
+        if manifest_payload.get("harness") != harness:
+            continue
+        results_root = manifest_path.parent / "results"
+        if results_root not in roots:
+            roots.append(results_root)
+    return roots
+
+
+def discover_result_directories(results_roots: Path | list[Path]) -> list[Path]:
+    if isinstance(results_roots, Path):
+        candidate_roots = [results_roots]
+    else:
+        candidate_roots = results_roots
 
     run_directories = {
         path.parent
+        for results_root in candidate_roots
+        if results_root.exists()
         for path in results_root.rglob("*")
         if path.is_file() and path.name in {"results.csv", "summary.json"}
     }
     return sorted(run_directories)
 
 
-def relative_directory_labels(paths: list[Path], root: Path) -> list[str]:
-    return [str(path.relative_to(root)) for path in paths]
+def relative_directory_labels(paths: list[Path], root: Path | None = None) -> list[str]:
+    label_root = ROOT_DIR if root is None else root
+    labels: list[str] = []
+    for path in paths:
+        try:
+            labels.append(str(path.relative_to(label_root)))
+        except ValueError:
+            labels.append(str(path))
+    return labels
 
 
 def summary_path_for_run(run_directory: Path) -> Path:
@@ -90,8 +163,16 @@ def coerce_float(value: object) -> float | None:
         return None
     if isinstance(value, bool):
         return float(int(value))
-    if isinstance(value, (int, float, str)):
+    if isinstance(value, (int, float)):
         return float(value)
+    if isinstance(value, str):
+        stripped = value.strip()
+        if not stripped:
+            return None
+        try:
+            return float(stripped)
+        except (TypeError, ValueError):
+            return None
     return None
 
 
@@ -130,33 +211,41 @@ def selected_runs_status_markup(selected_run_count: int) -> str:
 
 
 def selected_result_directories(harness: str) -> list[Path]:
-    results_root = HARNESS_RESULTS_DIRS[harness]
-    available_paths = discover_result_directories(results_root)
-    available_labels = relative_directory_labels(available_paths, results_root)
+    results_roots = harness_results_roots(harness)
+    available_paths = discover_result_directories(results_roots)
+    available_labels = relative_directory_labels(available_paths)
 
     selection_key = f"selected_results_{harness}"
     select_all_key = f"selected_results_all_{harness}"
 
     current_selection = st.session_state.get(selection_key, [])
     valid_defaults = [label for label in current_selection if label in available_labels]
-    all_selected = bool(available_labels) and len(valid_defaults) == len(available_labels)
+    all_selected = bool(available_labels) and len(valid_defaults) == len(
+        available_labels
+    )
 
     if selection_key not in st.session_state:
         st.session_state[selection_key] = valid_defaults
     if select_all_key not in st.session_state:
         st.session_state[select_all_key] = all_selected
 
-    if st.session_state.get(select_all_key) and st.session_state.get(
-        selection_key
-    ) != available_labels:
+    if (
+        st.session_state.get(select_all_key)
+        and st.session_state.get(selection_key) != available_labels
+    ):
         st.session_state[selection_key] = available_labels
-    elif not st.session_state.get(select_all_key) and st.session_state.get(
-        selection_key
-    ) != valid_defaults:
+    elif (
+        not st.session_state.get(select_all_key)
+        and st.session_state.get(selection_key) != valid_defaults
+    ):
         st.session_state[selection_key] = valid_defaults
 
     with st.popover("Results browser"):
-        st.caption(f"Browsing `{results_root.relative_to(ROOT_DIR)}`")
+        st.caption(f"Browsing saved `{harness}_harness` runs")
+        if len(results_roots) > 1:
+            st.caption(
+                "Includes scaffolded eval folders created by the bootstrap skill."
+            )
         if not available_labels:
             st.info("No result directories found for this harness yet.")
             return []
@@ -172,6 +261,7 @@ def selected_result_directories(harness: str) -> list[Path]:
             options=available_labels,
             key=selection_key,
             placeholder="Choose saved runs",
+            format_func=display_run_label,
             on_change=_sync_select_all_toggle,
             args=(selection_key, select_all_key, available_labels),
         )
@@ -185,9 +275,9 @@ def selected_result_directories(harness: str) -> list[Path]:
 
 
 def selected_run_directory(harness: str) -> Path | None:
-    results_root = HARNESS_RESULTS_DIRS[harness]
-    available_paths = discover_result_directories(results_root)
-    available_labels = relative_directory_labels(available_paths, results_root)
+    results_roots = harness_results_roots(harness)
+    available_paths = discover_result_directories(results_roots)
+    available_labels = relative_directory_labels(available_paths)
 
     if not available_paths:
         st.info("No result directories found for this harness yet.")
@@ -203,6 +293,7 @@ def selected_run_directory(harness: str) -> Path | None:
         options=available_labels,
         index=default_index,
         key=f"selected_run_{harness}",
+        format_func=display_run_label,
     )
     if not selected_label:
         return None
@@ -211,31 +302,35 @@ def selected_run_directory(harness: str) -> Path | None:
 
 
 def load_selected_summaries(
-    selected_paths: list[Path], results_root: Path
+    selected_paths: list[Path],
 ) -> tuple[list[dict[str, object]], list[str]]:
     loaded_summaries: list[dict[str, object]] = []
     load_errors: list[str] = []
 
     for run_directory in selected_paths:
         summary_path = summary_path_for_run(run_directory)
-        run_label = str(run_directory.relative_to(results_root))
+        run_label = result_directory_label(run_directory)
+        run_display_label = display_run_label(run_label)
         if not summary_path.exists():
-            load_errors.append(f"`{run_label}` is missing `summary.json`.")
+            load_errors.append(f"`{run_display_label}` is missing `summary.json`.")
             continue
 
         try:
             summary_payload = json.loads(summary_path.read_text(encoding="utf-8"))
         except json.JSONDecodeError:
-            load_errors.append(f"`{run_label}` has an invalid `summary.json`.")
+            load_errors.append(f"`{run_display_label}` has an invalid `summary.json`.")
             continue
 
         if not isinstance(summary_payload, dict):
-            load_errors.append(f"`{run_label}` has a non-object `summary.json`.")
+            load_errors.append(
+                f"`{run_display_label}` has a non-object `summary.json`."
+            )
             continue
 
         loaded_summaries.append(
             {
                 "run_label": run_label,
+                "run_display_label": run_display_label,
                 "run_directory": str(run_directory),
                 "summary_path": str(summary_path),
                 **summary_payload,
@@ -258,12 +353,19 @@ def load_results_frame(run_directory: Path) -> tuple[pd.DataFrame | None, str | 
     return results, None
 
 
+def chart_run_label(summary: dict[str, object]) -> str:
+    run_display_label = summary.get("run_display_label")
+    if isinstance(run_display_label, str) and run_display_label:
+        return run_display_label
+    return display_run_label(str(summary["run_label"]))
+
+
 def build_score_chart_frame(
     summaries: list[dict[str, object]], metric_keys: list[str]
 ) -> pd.DataFrame:
     rows: list[dict[str, object]] = []
     for summary in summaries:
-        run_label = str(summary["run_label"])
+        run_label = chart_run_label(summary)
         for metric_key in metric_keys:
             metric_value = coerce_float(summary.get(metric_key))
             if metric_value is None:
@@ -306,7 +408,7 @@ def build_percentile_chart_frame(
 ) -> pd.DataFrame:
     rows: list[dict[str, object]] = []
     for summary in summaries:
-        run_label = str(summary["run_label"])
+        run_label = chart_run_label(summary)
         for series_label, metric_keys in metric_config.items():
             for percentile_order, metric_key in enumerate(metric_keys):
                 metric_value = coerce_float(summary.get(metric_key))
@@ -398,12 +500,33 @@ def build_summary_table(
 
     rows: list[dict[str, object]] = []
     for summary in summaries:
-        rows.append({column: summary.get(column) for column in ordered_columns})
+        row: dict[str, object] = {}
+        for column in ordered_columns:
+            if column == "run_label":
+                row[column] = chart_run_label(summary)
+            else:
+                row[column] = summary.get(column)
+        rows.append(row)
 
     if not rows:
         return pd.DataFrame()
 
     return pd.DataFrame(rows)
+
+
+def truncated_chart_label_expr() -> str:
+    return (
+        f"length(datum.label) > {CHART_LABEL_MAX_CHARS} ? "
+        f"slice(datum.label, 0, {CHART_LABEL_MAX_CHARS}) + '{CHART_LABEL_SUFFIX}' : "
+        "datum.label"
+    )
+
+
+def angled_chart_axis() -> dict[str, object]:
+    return {
+        "labelAngle": 90,
+        "labelExpr": truncated_chart_label_expr(),
+    }
 
 
 def render_grouped_bar_chart(data: pd.DataFrame) -> None:
@@ -414,21 +537,8 @@ def render_grouped_bar_chart(data: pd.DataFrame) -> None:
     st.vega_lite_chart(
         data,
         {
-            "config": {
-                "view": {"stroke": None},
-                "background": "transparent",
-                "axis": {
-                    "labelColor": "#eef4ff",
-                    "titleColor": "#eef4ff",
-                    "domainColor": "rgba(167, 184, 218, 0.18)",
-                    "gridColor": "rgba(167, 184, 218, 0.12)",
-                    "tickColor": "rgba(167, 184, 218, 0.18)",
-                },
-                "legend": {
-                    "labelColor": "#eef4ff",
-                    "titleColor": "#eef4ff",
-                },
-            },
+            "config": chart_theme_config(),
+            "height": CHART_CONTENT_HEIGHT,
             "layer": [
                 {
                     "mark": {
@@ -441,6 +551,7 @@ def render_grouped_bar_chart(data: pd.DataFrame) -> None:
                             "field": "metric_label",
                             "type": "nominal",
                             "title": "Metric",
+                            "axis": angled_chart_axis(),
                         },
                         "xOffset": {"field": "run_label"},
                         "y": {
@@ -480,6 +591,7 @@ def render_grouped_bar_chart(data: pd.DataFrame) -> None:
                             "field": "metric_label",
                             "type": "nominal",
                             "title": "Metric",
+                            "axis": angled_chart_axis(),
                         },
                         "xOffset": {"field": "run_label"},
                         "y": {
@@ -493,11 +605,11 @@ def render_grouped_bar_chart(data: pd.DataFrame) -> None:
                             "format": ".3f",
                         },
                         "color": {
-                            "value": "#eef4ff",
+                            "value": CHART_TEXT_COLOR,
                         },
                     },
                 },
-            ]
+            ],
         },
         use_container_width=True,
     )
@@ -514,21 +626,8 @@ def render_percentile_ladder_chart(data: pd.DataFrame, y_title: str) -> None:
         st.vega_lite_chart(
             series_data,
             {
-                "config": {
-                    "view": {"stroke": None},
-                    "background": "transparent",
-                    "axis": {
-                        "labelColor": "#eef4ff",
-                        "titleColor": "#eef4ff",
-                        "domainColor": "rgba(167, 184, 218, 0.18)",
-                        "gridColor": "rgba(167, 184, 218, 0.12)",
-                        "tickColor": "rgba(167, 184, 218, 0.18)",
-                    },
-                    "legend": {
-                        "labelColor": "#eef4ff",
-                        "titleColor": "#eef4ff",
-                    },
-                },
+                "config": chart_theme_config(),
+                "height": CHART_CONTENT_HEIGHT,
                 "layer": [
                     {
                         "mark": {
@@ -542,6 +641,7 @@ def render_percentile_ladder_chart(data: pd.DataFrame, y_title: str) -> None:
                                 "type": "ordinal",
                                 "title": "Percentile",
                                 "sort": ["avg", "p50", "p95", "p99"],
+                                "axis": angled_chart_axis(),
                             },
                             "xOffset": {"field": "run_label"},
                             "y": {
@@ -591,6 +691,7 @@ def render_percentile_ladder_chart(data: pd.DataFrame, y_title: str) -> None:
                                 "type": "ordinal",
                                 "title": "Percentile",
                                 "sort": ["avg", "p50", "p95", "p99"],
+                                "axis": angled_chart_axis(),
                             },
                             "xOffset": {"field": "run_label"},
                             "y": {
@@ -603,11 +704,10 @@ def render_percentile_ladder_chart(data: pd.DataFrame, y_title: str) -> None:
                                 "type": "quantitative",
                                 "format": ".2f",
                             },
-                            "color": {"value": "#eef4ff"},
+                            "color": {"value": CHART_TEXT_COLOR},
                         },
                     },
                 ],
-                "height": 180,
             },
             use_container_width=True,
         )
@@ -673,83 +773,218 @@ def audio_bytes_if_present(path: Path | None) -> bytes | None:
     return path.read_bytes()
 
 
-def clean_path_value(value: object) -> Path | None:
+def resolve_run_relative_path(run_directory: Path, candidate: Path) -> Path | None:
+    if candidate.is_absolute():
+        return None
+    try:
+        resolved_run_directory = run_directory.resolve()
+        resolved_candidate = (resolved_run_directory / candidate).resolve(strict=False)
+    except OSError:
+        return None
+    if not resolved_candidate.is_relative_to(resolved_run_directory):
+        return None
+    return resolved_candidate
+
+
+def clean_path_value(run_directory: Path, value: object) -> Path | None:
     if not isinstance(value, str):
         return None
     cleaned_value = value.strip()
     if not cleaned_value:
         return None
-    return Path(cleaned_value)
+    return resolve_run_relative_path(run_directory, Path(cleaned_value))
 
 
 def simulation_id_for_row(row: pd.Series) -> str:
     return str(row.get("simulation_id", "")).strip()
 
 
-def selected_row_indices(selection_state: object) -> list[int]:
-    selection = getattr(selection_state, "selection", None)
-    rows = getattr(selection, "rows", [])
-    if not isinstance(rows, list):
+def selected_run_viewer_row_indices(table_data: pd.DataFrame) -> list[int]:
+    if RUN_VIEWER_SELECTED_COLUMN not in table_data.columns:
         return []
-    return [row_index for row_index in rows if isinstance(row_index, int)]
+
+    selected_rows: list[int] = []
+    for row_index, value in enumerate(table_data[RUN_VIEWER_SELECTED_COLUMN].tolist()):
+        if pd.isna(value):
+            continue
+        if bool(value):
+            selected_rows.append(row_index)
+    return selected_rows
+
+
+def edited_run_viewer_row_indices(editing_state: object) -> list[int]:
+    if not isinstance(editing_state, dict):
+        return []
+
+    edited_rows = editing_state.get("edited_rows")
+    if not isinstance(edited_rows, dict):
+        return []
+
+    selected_rows: list[int] = []
+    for row_index, row_changes in edited_rows.items():
+        if not isinstance(row_index, int) or not isinstance(row_changes, dict):
+            continue
+        if row_changes.get(RUN_VIEWER_SELECTED_COLUMN) is True:
+            selected_rows.append(row_index)
+    return selected_rows
+
+
+def row_text_value(row: pd.Series, candidate_columns: tuple[str, ...]) -> str | None:
+    for column_name in candidate_columns:
+        if column_name not in row.index:
+            continue
+        value = str(row.get(column_name, "")).strip()
+        if value:
+            return value
+    return None
+
+
+def normalize_row_index(candidate: object, total_rows: int) -> int | None:
+    if isinstance(candidate, int) and 0 <= candidate < total_rows:
+        return candidate
+    return None
+
+
+def resolve_active_row_index(
+    table_selected_index: int | None,
+    previous_table_selected_index: int | None,
+    stored_active_index: object,
+    total_rows: int,
+) -> int | None:
+    if total_rows <= 0:
+        return None
+    if (
+        table_selected_index is not None
+        and table_selected_index != previous_table_selected_index
+    ):
+        return table_selected_index
+
+    active_row_index = normalize_row_index(stored_active_index, total_rows)
+    if active_row_index is not None:
+        return active_row_index
+
+    if table_selected_index is not None:
+        return table_selected_index
+
+    return 0
+
+
+def build_run_viewer_table(
+    results: pd.DataFrame, active_row_index: int | None
+) -> pd.DataFrame:
+    display_results = results.copy()
+    selected_rows = [False] * len(display_results)
+    if active_row_index is not None and 0 <= active_row_index < len(display_results):
+        selected_rows[active_row_index] = True
+    display_results.insert(0, RUN_VIEWER_SELECTED_COLUMN, selected_rows)
+    return display_results
+
+
+def resolve_run_viewer_table_selected_index(
+    table_data: pd.DataFrame,
+    editing_state: object,
+    current_active_index: int | None,
+) -> int | None:
+    total_rows = len(table_data)
+    for candidate in reversed(edited_run_viewer_row_indices(editing_state)):
+        normalized_candidate = normalize_row_index(candidate, total_rows)
+        if normalized_candidate is not None:
+            return normalized_candidate
+
+    selected_rows = selected_run_viewer_row_indices(table_data)
+    if current_active_index is not None and current_active_index in selected_rows:
+        return current_active_index
+    if selected_rows:
+        return selected_rows[0]
+    return current_active_index
+
+
+def run_viewer_table_matches_active_row(
+    table_data: pd.DataFrame,
+    active_row_index: int | None,
+) -> bool:
+    normalized_active_index = normalize_row_index(active_row_index, len(table_data))
+    expected_rows = [] if normalized_active_index is None else [normalized_active_index]
+    return selected_run_viewer_row_indices(table_data) == expected_rows
+
+
+def run_viewer_table_height(total_rows: int) -> int:
+    visible_rows = max(1, min(total_rows, RUN_VIEWER_TABLE_VISIBLE_ROWS))
+    return (
+        RUN_VIEWER_TABLE_HEADER_HEIGHT
+        + (visible_rows * RUN_VIEWER_TABLE_ROW_HEIGHT)
+        + RUN_VIEWER_TABLE_FRAME_PADDING
+    )
 
 
 def input_audio_path_for_row(run_directory: Path, row: pd.Series) -> Path | None:
     for column_name in ("input_audio_path", "audio_path"):
-        candidate = clean_path_value(row.get(column_name, ""))
+        candidate = clean_path_value(run_directory, row.get(column_name, ""))
         if candidate is not None:
             return candidate
 
     example_id = str(row.get("example_id", "")).strip()
     if not example_id:
         return None
-    candidate = run_directory / "audio" / example_id / "input.wav"
-    if candidate.exists():
+    candidate = resolve_run_relative_path(
+        run_directory, Path("audio") / example_id / "input.wav"
+    )
+    if candidate is not None and candidate.exists():
         return candidate
     return None
 
 
 def output_audio_path_for_row(run_directory: Path, row: pd.Series) -> Path | None:
-    candidate = clean_path_value(row.get("output_audio_path", ""))
+    candidate = clean_path_value(run_directory, row.get("output_audio_path", ""))
     if candidate is not None:
         return candidate
 
     example_id = str(row.get("example_id", "")).strip()
     if not example_id:
         return None
-    candidate = run_directory / "audio" / example_id / "output.wav"
-    if candidate.exists():
+    candidate = resolve_run_relative_path(
+        run_directory, Path("audio") / example_id / "output.wav"
+    )
+    if candidate is not None and candidate.exists():
         return candidate
     return None
 
 
 def event_log_path_for_row(run_directory: Path, row: pd.Series) -> Path | None:
-    candidate = clean_path_value(row.get("event_log_path", ""))
+    candidate = clean_path_value(run_directory, row.get("event_log_path", ""))
     if candidate is not None:
         return candidate
 
     example_id = str(row.get("example_id", "")).strip()
     if not example_id:
         return None
-    candidate = run_directory / "events" / f"{example_id}.jsonl"
-    if candidate.exists():
+    candidate = resolve_run_relative_path(
+        run_directory, Path("events") / f"{example_id}.jsonl"
+    )
+    if candidate is not None and candidate.exists():
         return candidate
     return None
 
 
-def simulation_transcript_path_for_row(run_directory: Path, row: pd.Series) -> Path | None:
+def simulation_transcript_path_for_row(
+    run_directory: Path, row: pd.Series
+) -> Path | None:
     simulation_id = simulation_id_for_row(row)
     if not simulation_id:
         return None
 
-    candidate = run_directory / "conversations" / f"{simulation_id}.txt"
-    if candidate.exists():
+    candidate = resolve_run_relative_path(
+        run_directory, Path("conversations") / f"{simulation_id}.txt"
+    )
+    if candidate is not None and candidate.exists():
         return candidate
     return None
 
 
-def simulation_event_log_path_for_row(run_directory: Path, row: pd.Series) -> Path | None:
-    candidate = clean_path_value(row.get("event_log_path", ""))
+def simulation_event_log_path_for_row(
+    run_directory: Path, row: pd.Series
+) -> Path | None:
+    candidate = clean_path_value(run_directory, row.get("event_log_path", ""))
     if candidate is not None:
         return candidate
 
@@ -757,8 +992,10 @@ def simulation_event_log_path_for_row(run_directory: Path, row: pd.Series) -> Pa
     if not simulation_id:
         return None
 
-    candidate = run_directory / "events" / f"{simulation_id}.jsonl"
-    if candidate.exists():
+    candidate = resolve_run_relative_path(
+        run_directory, Path("events") / f"{simulation_id}.jsonl"
+    )
+    if candidate is not None and candidate.exists():
         return candidate
     return None
 
@@ -783,17 +1020,85 @@ def simulation_audio_paths_for_row(run_directory: Path, row: pd.Series) -> list[
     if not simulation_id:
         return []
 
-    audio_dir = run_directory / "audio" / simulation_id
-    if not audio_dir.exists():
+    audio_dir = resolve_run_relative_path(run_directory, Path("audio") / simulation_id)
+    if audio_dir is None or not audio_dir.exists():
         return []
 
     return sorted(audio_dir.glob("*.wav"), key=_audio_sort_key)
+
+
+def run_viewer_table_key(harness: str, selected_path: Path) -> str:
+    return f"run_viewer_table_{harness}_{path_state_key_fragment(selected_path)}"
+
+
+def normalize_table_revision(candidate: object) -> int:
+    if isinstance(candidate, int) and candidate >= 0:
+        return candidate
+    return 0
+
+
+def run_viewer_active_row_key(harness: str, selected_path: Path) -> str:
+    return f"run_viewer_active_row_{harness}_{path_state_key_fragment(selected_path)}"
+
+
+def run_viewer_table_selection_key(harness: str, selected_path: Path) -> str:
+    return (
+        f"run_viewer_table_selection_{harness}_{path_state_key_fragment(selected_path)}"
+    )
+
+
+def run_viewer_table_revision_key(harness: str, selected_path: Path) -> str:
+    return (
+        f"run_viewer_table_revision_{harness}_{path_state_key_fragment(selected_path)}"
+    )
+
+
+def run_viewer_table_widget_key(
+    harness: str, selected_path: Path, table_revision: int
+) -> str:
+    return f"{run_viewer_table_key(harness, selected_path)}_{table_revision}"
+
+
+def refresh_run_viewer_table_state(
+    harness: str,
+    selected_path: Path,
+    selected_index: int | None,
+) -> None:
+    selection_key = run_viewer_table_selection_key(harness, selected_path)
+    revision_key = run_viewer_table_revision_key(harness, selected_path)
+    st.session_state[selection_key] = selected_index
+    # Streamlit data editor edits are sticky, so bump the widget key to rehydrate
+    # the controlled checkbox state from the active row.
+    st.session_state[revision_key] = (
+        normalize_table_revision(st.session_state.get(revision_key)) + 1
+    )
+
+
+def render_row_text_review(row: pd.Series) -> None:
+    input_text = row_text_value(row, ("user_text", "input_text"))
+    output_text = row_text_value(
+        row,
+        ("assistant_text", "output_text", "response_text"),
+    )
+
+    st.caption("Input text")
+    if input_text is None:
+        st.info("No input text recorded for this row.")
+    else:
+        st.code(input_text, language="text")
+
+    st.caption("Output text")
+    if output_text is None:
+        st.info("No output text recorded for this row.")
+    else:
+        st.code(output_text, language="text")
 
 
 def render_example_viewer(run_directory: Path, row: pd.Series) -> None:
     example_id = str(row.get("example_id", "")).strip() or "Unknown example"
 
     st.subheader(example_id)
+    render_row_text_review(row)
 
     input_audio_path = input_audio_path_for_row(run_directory, row)
     output_audio_path = output_audio_path_for_row(run_directory, row)
@@ -831,6 +1136,7 @@ def render_simulation_viewer(run_directory: Path, row: pd.Series) -> None:
     st.subheader(simulation_id)
     if turn_index:
         st.caption(f"Selected row turn: {turn_index}")
+    render_row_text_review(row)
 
     transcript_path = simulation_transcript_path_for_row(run_directory, row)
     event_log_path = simulation_event_log_path_for_row(run_directory, row)
@@ -875,17 +1181,16 @@ def render_comparison_view() -> None:
     st.caption("Compare metrics across one or more saved realtime eval runs.")
 
     harness, selected_paths = render_comparison_config_bar()
-    results_root = HARNESS_RESULTS_DIRS[harness]
 
     st.divider()
 
     if not selected_paths:
         st.info(
-            f"Choose one or more result directories from `{results_root.relative_to(ROOT_DIR)}` to continue."
+            "Choose one or more result directories from the Results browser to continue."
         )
         return
 
-    summaries, load_errors = load_selected_summaries(selected_paths, results_root)
+    summaries, load_errors = load_selected_summaries(selected_paths)
     for error_message in load_errors:
         st.warning(error_message)
 
@@ -897,7 +1202,7 @@ def render_comparison_view() -> None:
 
     st.subheader("Selected Result Directories")
     selected_runs_text = "\n".join(
-        f"{index}. {path.relative_to(ROOT_DIR)}"
+        f"{index}. {display_run_label(path)}"
         for index, path in enumerate(selected_paths, start=1)
     )
     st.code(selected_runs_text, language="text")
@@ -918,7 +1223,6 @@ def render_comparison_view() -> None:
     else:
         st.dataframe(summary_table, use_container_width=True, hide_index=True)
 
-
     st.subheader("Overall Scores (higher is better)")
     render_grouped_bar_chart(build_score_chart_frame(summaries, score_keys))
 
@@ -934,19 +1238,19 @@ def render_comparison_view() -> None:
         y_title="Tokens",
     )
 
+
 def render_run_viewer() -> None:
     st.title("Run Viewer")
-    st.caption("Inspect one saved run and drill into example- or simulation-level artifacts.")
+    st.caption(
+        "Inspect one saved run and drill into example- or simulation-level artifacts."
+    )
 
     harness, selected_path = render_run_viewer_config_bar()
-    results_root = HARNESS_RESULTS_DIRS[harness]
 
     st.divider()
 
     if selected_path is None:
-        st.info(
-            f"Choose a result directory from `{results_root.relative_to(ROOT_DIR)}` to continue."
-        )
+        st.info("Choose a result directory for the selected harness to continue.")
         return
 
     results, load_error = load_results_frame(selected_path)
@@ -957,31 +1261,109 @@ def render_run_viewer() -> None:
         st.info("This run does not contain any rows in `results.csv`.")
         return
 
-    st.caption(f"Viewing `{selected_path.relative_to(ROOT_DIR)}`")
+    st.caption(f"Viewing `{display_run_label(selected_path)}`")
+
+    active_row_key = run_viewer_active_row_key(harness, selected_path)
+    table_selection_key = run_viewer_table_selection_key(harness, selected_path)
+    table_revision_key = run_viewer_table_revision_key(harness, selected_path)
+    table_revision = normalize_table_revision(
+        st.session_state.get(table_revision_key)
+    )
+    previous_table_selected_index = normalize_row_index(
+        st.session_state.get(table_selection_key),
+        len(results),
+    )
+    render_active_row_index = resolve_active_row_index(
+        previous_table_selected_index,
+        previous_table_selected_index,
+        st.session_state.get(active_row_key),
+        len(results),
+    )
 
     table_column, detail_column = st.columns([1.45, 1], gap="large")
 
     with table_column:
         st.subheader("Examples" if harness != "run" else "Simulation rows")
-        selection = st.dataframe(
-            results,
+        table_widget_key = run_viewer_table_widget_key(
+            harness,
+            selected_path,
+            table_revision,
+        )
+        selection = st.data_editor(
+            build_run_viewer_table(results, render_active_row_index),
+            height=run_viewer_table_height(len(results)),
             use_container_width=True,
             hide_index=True,
-            on_select="rerun",
-            selection_mode="single-row",
-            key=f"run_viewer_table_{harness}_{selected_path.name}",
+            column_config={
+                RUN_VIEWER_SELECTED_COLUMN: st.column_config.CheckboxColumn(
+                    " ",
+                    width="small",
+                )
+            },
+            disabled=list(results.columns),
+            row_height=RUN_VIEWER_TABLE_ROW_HEIGHT,
+            key=table_widget_key,
         )
 
     with detail_column:
         st.subheader("Example Viewer" if harness != "run" else "Simulation Viewer")
-        selected_rows = selected_row_indices(selection)
-        if not selected_rows:
-            st.info(
-                "Select a row in the table to inspect its artifacts."
-            )
+        table_selected_index = resolve_run_viewer_table_selected_index(
+            selection,
+            st.session_state.get(table_widget_key),
+            render_active_row_index,
+        )
+        active_row_index = resolve_active_row_index(
+            table_selected_index,
+            previous_table_selected_index,
+            st.session_state.get(active_row_key),
+            len(results),
+        )
+        st.session_state[table_selection_key] = table_selected_index
+        st.session_state[active_row_key] = active_row_index
+        if active_row_index is None:
+            st.info("No datapoints are available to inspect.")
             return
+        if not run_viewer_table_matches_active_row(selection, active_row_index):
+            refresh_run_viewer_table_state(harness, selected_path, active_row_index)
+            st.rerun()
 
-        selected_row = results.iloc[selected_rows[0]]
+        nav_previous_column, nav_status_column, nav_next_column = st.columns(
+            [1, 1.2, 1]
+        )
+        with nav_previous_column:
+            if st.button(
+                "Previous",
+                key=f"{active_row_key}_previous",
+                disabled=active_row_index <= 0,
+                use_container_width=True,
+            ):
+                previous_row_index = active_row_index - 1
+                st.session_state[active_row_key] = previous_row_index
+                refresh_run_viewer_table_state(
+                    harness,
+                    selected_path,
+                    previous_row_index,
+                )
+                st.rerun()
+        with nav_status_column:
+            st.caption(f"Datapoint {active_row_index + 1} of {len(results)}")
+        with nav_next_column:
+            if st.button(
+                "Next",
+                key=f"{active_row_key}_next",
+                disabled=active_row_index >= len(results) - 1,
+                use_container_width=True,
+            ):
+                next_row_index = active_row_index + 1
+                st.session_state[active_row_key] = next_row_index
+                refresh_run_viewer_table_state(
+                    harness,
+                    selected_path,
+                    next_row_index,
+                )
+                st.rerun()
+
+        selected_row = results.iloc[active_row_index]
         if harness == "run":
             render_simulation_viewer(selected_path, selected_row)
         else:

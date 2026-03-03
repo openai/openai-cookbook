@@ -29,5 +29,5 @@ ignore = ["E402"]
 explicit_package_bases = true
 
 [[tool.mypy.overrides]]
-module = ["streamlit"]
+module = ["streamlit", "streamlit.*"]
 ignore_missing_imports = true

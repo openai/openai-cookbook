@@ -1,24 +1,28 @@
 # Results Viewer
 
 This directory contains a [Streamlit](https://streamlit.io/) app for exploring
-saved realtime eval runs from the crawl, walk, and run harnesses.
+saved realtime eval runs from the crawl, walk, and run harnesses, plus
+bootstrap-generated eval folders created under `examples/evals/realtime_evals/`.
 
 The app auto-discovers run directories under:
 
 - `crawl_harness/results/`
 - `walk_harness/results/`
 - `run_harness/results/`
+- `*_realtime_eval/results/` when the folder includes `bootstrap_manifest.json`
 
 ## What It Shows
 
 - **Comparison View**: compare summary metrics across one or more saved runs
-- **Run Viewer**: inspect a single saved crawl or walk run, including:
+- **Run Viewer**: inspect a single saved run, including:
   - `results.csv` rows
-  - input and output audio artifacts
-  - per-example event logs
+  - crawl/walk input and output audio artifacts
+  - crawl/walk per-example event logs
+  - run-harness simulation transcripts, event logs, and turn audio
 
-Current limitation: the detailed Run Viewer is not implemented for
-`run_harness` yet.
+Note: `run_harness` runs are inspected via the app's **Simulation Viewer**,
+which has a different UI and a different artifact set than the crawl/walk
+viewer.
 
 ## Run Locally
 

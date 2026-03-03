@@ -32,8 +32,6 @@ Run a first command per harness. If uv is not installed, replace `uv run` with `
 ## Dev commands
 Use the root `Makefile` for common checks. Run `make install` first to create `.venv`. These targets work with or without `uv`: when `uv` is installed they run through `uv run`, and otherwise they use the matching tool binaries from the local `.venv`.
 
-Use the root `Makefile` for common checks:
-
 - `make install`
 - `make streamlit`
 - `make format`
@@ -110,7 +108,7 @@ uv run python plot_eval_results.py --run-dir run_harness/results/<run_id>
 Use the Streamlit results viewer to browse saved runs from `crawl_harness`, `walk_harness`, and `run_harness` without opening the raw artifacts by hand.
 
 - `Comparison View`: select a harness, choose one or more saved runs, and compare summary metrics, scores, latency, and token usage across runs.
-- `Run Viewer`: inspect one saved run in detail, including `results.csv` rows, row-level audio artifacts, and event logs for crawl and walk runs.
+- `Run Viewer`: inspect one saved run in detail. Crawl and walk runs show row-level audio artifacts and event logs; run-harness runs use a Simulation Viewer with transcripts, event logs, and turn audio.
 
 Run it from this directory with either:
 

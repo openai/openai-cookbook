@@ -4,15 +4,16 @@ Use this table when the user is not sure which realtime eval harness to start wi
 
 | Harness | Use when | Required starting material | Best first outcome |
 | --- | --- | --- | --- |
-| `crawl` | The user wants fast iteration on single-turn behavior, tool choice, or tool args. | Text prompts. Expected tool names and args are optional if the user wants tool-call grading. | A small CSV plus smoke/full commands that run immediately. |
-| `walk` | The user cares about saved phone audio or wants more realistic audio replay. | Either a CSV with `audio_path`, or text rows that can be turned into audio. | A walk dataset plus optional audio-generation step and replay commands. |
+| `crawl` | The user wants fast iteration on single-turn behavior, tool choice, or tool args, including basic synthetic audio generated from text. | Text prompts. Expected tool names and args are optional if the user wants tool-call grading. | A small CSV plus smoke/full commands that run immediately. |
+| `walk` | The user cares about saved phone audio, wants more realistic audio replay, or needs synthetic audio with replay-specific characteristics such as noise, telephony artifacts, or speaker traits. | Either a CSV with `audio_path`, or text rows that can be turned into audio. | A walk dataset plus optional audio-generation step and replay commands. |
 | `run` | The user needs multi-turn behavior, tool mocks, or conversation-level grading. | A scenario, starter user utterance, simulator prompt, tool mocks, and grader criteria. | `simulations.csv` plus one or more `sim_*.json` files. |
 
 ## Recommendation Rules
 
 1. Recommend `crawl` by default when the user only has text rows or a rough task description.
-2. Recommend `walk` when the user already has WAV files, cares about telephony realism, or wants to validate the audio replay path.
-3. Recommend `run` only when the evaluation target depends on multiple turns, tool outputs, or conversation-level completion.
+2. Recommend `crawl` when the user asks for synthetic audio but does not mention any replay-specific audio characteristics.
+3. Recommend `walk` when the user already has WAV files, cares about telephony realism, wants to validate the audio replay path, or wants synthetic audio with specific noise or speaker characteristics.
+4. Recommend `run` only when the evaluation target depends on multiple turns, tool outputs, or conversation-level completion.
 
 ## Data Contracts
 

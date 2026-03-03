@@ -40,6 +40,7 @@ These are considered priority 0 issues for this repo, in addition to the normal 
 
 ## Recent Learnings
 
+- **`uv run` can inherit the wrong virtualenv in this repo** -> Clear `VIRTUAL_ENV` (for example `env -u VIRTUAL_ENV uv run ...`) when an unrelated environment is active -> Avoids misleading mismatch warnings and makes it clear the repo's `.venv` is the interpreter actually running the harnesses.
 - **Realtime eval shared imports can resolve the wrong module under pytest** -> Add `shared/__init__.py` and ensure tests prepend `examples/evals/realtime_evals` to `sys.path` before importing `shared.*` -> Prevents collection failures caused by unrelated installed packages named `shared`.
 - **Run-level grades can be overweighted by long simulations** -> Store turn-level grades on the matching turn and trace-level grades on one row per simulation instead of copying them onto every row -> Keeps `results.csv` row semantics intact and prevents summary means from favoring longer conversations.
 - **Synthetic-audio scaffold requests can pick the wrong harness** -> Default unspecified synthetic-audio evals to `crawl` text-to-TTS and reserve `walk` for replay-specific audio traits like noise, telephony artifacts, or speaker characteristics -> Keeps new realtime evals on the simplest harness unless audio realism is itself under test.

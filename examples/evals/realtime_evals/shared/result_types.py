@@ -792,9 +792,9 @@ class RunEvalRunSummary:
             grade_means["grade_mean"] = overall_grade_mean
         grade_means.update(
             {
-            key: float(value)
-            for key, value in summary.items()
-            if key.endswith("_grade_mean") and value not in (None, "")
+                key: float(value)
+                for key, value in summary.items()
+                if key.endswith("_grade_mean") and value not in (None, "")
             }
         )
         return cls(

@@ -71,7 +71,11 @@ Add flags for prompt, tools, data, graders, and run-specific fields as needed. R
    - For `run`, make sure `simulations.csv` and the starter `sim_*.json` file reflect the user’s scenario, tool mocks, and graders.
 
 7. Validate before returning.
+   - Run the format checks before the smoke run:
+     - `make -C examples/evals/realtime_evals validate-input HARNESS=<crawl|walk|run> DATA_PATH=<path-to-data-or-simulations.csv>`
    - Run a smoke eval for the generated folder.
+   - Run the output-format check against the emitted run directory:
+     - `make -C examples/evals/realtime_evals validate-output HARNESS=<crawl|walk|run> RUN_DIR=<path-to-results/run_name>`
    - Run `pytest examples/evals/realtime_evals/tests -q`.
    - Confirm the Streamlit results viewer can discover runs written under the generated folder's `results/` directory.
    - If the viewer does not surface the scaffolded eval correctly, fix the viewer or scaffold before you finish.
@@ -102,6 +106,9 @@ Treat the task as complete only when:
 - `README.md`, `system_prompt.txt`, and `tools.json` exist
 - harness-specific starter data exists, authored by you when the user did not provide it
 - the smoke command has been run or is blocked for a clear reason
+- the format validators have been run or are blocked for a clear reason:
+  - `make -C examples/evals/realtime_evals validate-input ...`
+  - `make -C examples/evals/realtime_evals validate-output ...`
 - `pytest examples/evals/realtime_evals/tests -q` has been run
 - the Streamlit results viewer can discover the scaffolded eval's `results/` directory, or the blocker is clearly documented
 

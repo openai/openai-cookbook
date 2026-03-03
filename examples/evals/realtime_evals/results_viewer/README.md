@@ -32,7 +32,8 @@ From `examples/evals/realtime_evals/`:
 uv venv .venv
 source .venv/bin/activate
 uv sync --group dev
-uv run streamlit run results_viewer/app.py
+cd results_viewer
+uv run streamlit run app.py
 ```
 
 Then open the local URL that Streamlit prints, usually
@@ -43,7 +44,8 @@ dependencies first so `streamlit` is available:
 
 ```bash
 pip install -r requirements.txt -r requirements-dev.txt
-streamlit run results_viewer/app.py
+cd results_viewer
+streamlit run app.py
 ```
 
 ## Expected Data Layout

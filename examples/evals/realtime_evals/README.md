@@ -119,7 +119,8 @@ make streamlit
 or:
 
 ```bash
-uv run streamlit run results_viewer/app.py
+cd results_viewer
+uv run streamlit run app.py
 ```
 
 Then open the local Streamlit URL, usually `http://localhost:8501`.

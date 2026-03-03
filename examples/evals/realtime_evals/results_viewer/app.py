@@ -374,19 +374,38 @@ def build_score_chart_frame(
                 {
                     "run_label": run_label,
                     "metric_key": metric_key,
-                    "metric_label": SCORE_KEY_LABELS.get(metric_key, metric_key),
+                    "metric_label": score_key_label(metric_key),
                     "value": metric_value,
                 }
             )
     return pd.DataFrame(rows)
 
 
+def score_key_label(metric_key: str) -> str:
+    if metric_key in SCORE_KEY_LABELS:
+        return SCORE_KEY_LABELS[metric_key]
+    if metric_key.endswith("_grade_mean"):
+        metric_key = metric_key[: -len("_grade_mean")]
+    return metric_key.replace("_", " ").strip().title()
+
+
 def available_score_keys(summaries: list[dict[str, object]]) -> list[str]:
-    return [
+    default_keys = [
         metric_key
         for metric_key in DEFAULT_SCORE_KEYS
-        if any(summary.get(metric_key) is not None for summary in summaries)
+        if any(coerce_float(summary.get(metric_key)) is not None for summary in summaries)
     ]
+    dynamic_grade_keys = sorted(
+        {
+            metric_key
+            for summary in summaries
+            for metric_key, metric_value in summary.items()
+            if metric_key.endswith("_grade_mean")
+            and metric_key not in DEFAULT_SCORE_KEYS
+            and coerce_float(metric_value) is not None
+        }
+    )
+    return default_keys + dynamic_grade_keys
 
 
 def available_series_labels(
@@ -450,7 +469,7 @@ def selected_metric_controls(
             "Overall score metrics",
             options=score_options,
             default=score_defaults,
-            format_func=lambda key: SCORE_KEY_LABELS.get(key, key),
+            format_func=score_key_label,
             key=f"selected_score_keys_{harness}",
         )
         selected_latency_labels = st.multiselect(
@@ -774,14 +793,20 @@ def audio_bytes_if_present(path: Path | None) -> bytes | None:
 
 
 def resolve_run_relative_path(run_directory: Path, candidate: Path) -> Path | None:
-    if candidate.is_absolute():
-        return None
     try:
         resolved_run_directory = run_directory.resolve()
-        resolved_candidate = (resolved_run_directory / candidate).resolve(strict=False)
+        resolved_root = ROOT_DIR.resolve()
+        resolved_candidate = (
+            candidate.resolve(strict=False)
+            if candidate.is_absolute()
+            else (resolved_run_directory / candidate).resolve(strict=False)
+        )
     except OSError:
         return None
-    if not resolved_candidate.is_relative_to(resolved_run_directory):
+    if not (
+        resolved_candidate.is_relative_to(resolved_run_directory)
+        or resolved_candidate.is_relative_to(resolved_root)
+    ):
         return None
     return resolved_candidate
 

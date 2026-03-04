@@ -21,7 +21,6 @@ from typing import Any, Dict, List, cast
 import pandas as pd
 from openai import AsyncOpenAI
 from openai.types.realtime import (
-    RealtimeResponseCreateParamsParam,
     RealtimeSessionCreateRequestParam,
 )
 from tqdm import tqdm
@@ -32,12 +31,25 @@ if str(ROOT_DIR) not in sys.path:
 
 from shared.graders import compute_tool_call_grade
 from shared.metrics_utils import add_numeric_summaries, order_columns
+from shared.plotting_utils import build_realtime_eval_plots
 from shared.realtime_harness_utils import (
+    RealtimeResponseError,
     audio_format_config,
     collect_realtime_response,
     ensure_dir,
     stream_audio_to_connection,
     write_pcm16_wav,
+)
+from shared.result_types import (
+    ExpectedToolCall,
+    OutputTokenUsage,
+    ResultLatencies,
+    EvalErrorInfo,
+    ToolCallGrade,
+    ToolCallRecord,
+    WalkEvalResult,
+    WalkEvalRunConfig,
+    WalkEvalRunSummary,
 )
 
 SHARED_DIR = ROOT_DIR / "shared"
@@ -53,7 +65,6 @@ DEFAULT_SAMPLE_RATE_HZ = 8000
 DEFAULT_INPUT_AUDIO_FORMAT = "g711_ulaw"
 DEFAULT_OUTPUT_AUDIO_FORMAT = "pcm16"
 DEFAULT_OUTPUT_SAMPLE_RATE_HZ = 24000
-DEFAULT_MAX_OUTPUT_TOKENS = 512
 
 
 def parse_args() -> argparse.Namespace:
@@ -81,9 +92,6 @@ def parse_args() -> argparse.Namespace:
         "--output-sample-rate-hz", type=int, default=DEFAULT_OUTPUT_SAMPLE_RATE_HZ
     )
     parser.add_argument(
-        "--max-output-tokens", type=int, default=DEFAULT_MAX_OUTPUT_TOKENS
-    )
-    parser.add_argument(
         "--real-time", action="store_true", help="Send audio at real-time cadence."
     )
     parser.add_argument(
@@ -91,6 +99,11 @@ def parse_args() -> argparse.Namespace:
         type=int,
         default=0,
         help="Limit number of examples for quick checks.",
+    )
+    parser.add_argument(
+        "--skip-plots",
+        action="store_true",
+        help="Skip rendering styled summary plots into results/<run_id>/plots/.",
     )
     return parser.parse_args()
 
@@ -192,6 +205,58 @@ def resolve_audio_path(audio_path_value: str, dataset_path: Path) -> Path:
     return audio_path
 
 
+def build_error_info(exc: Exception, default_stage: str) -> EvalErrorInfo:
+    failure_stage = default_stage
+    if isinstance(exc, RealtimeResponseError) and exc.failure_stage:
+        failure_stage = exc.failure_stage
+    return EvalErrorInfo(
+        status="failed",
+        failure_stage=failure_stage,
+        error_type=type(exc).__name__,
+        error_message=str(exc),
+    )
+
+
+def build_failed_result(
+    row: pd.Series,
+    dataset_path: Path,
+    events_dir: Path,
+    error_info: EvalErrorInfo,
+) -> WalkEvalResult:
+    example_id = str(row["example_id"])
+    user_text = str(row["user_text"])
+    expected_tool_call = (
+        "" if bool(pd.isna(row["gt_tool_call"])) else str(row["gt_tool_call"])
+    )
+    expected_tool_call_arg = (
+        "" if bool(pd.isna(row["gt_tool_call_arg"])) else str(row["gt_tool_call_arg"])
+    )
+    audio_path_value = str(row.get("audio_path", "")).strip()
+    if audio_path_value:
+        audio_path = Path(audio_path_value)
+        if not audio_path.is_absolute():
+            audio_path = dataset_path.parent / audio_path
+    else:
+        audio_path = dataset_path.parent / "missing_audio.wav"
+    event_log_path = events_dir / f"{example_id}.jsonl"
+    return WalkEvalResult(
+        example_id=example_id,
+        user_text=user_text,
+        expected_tool_call=ExpectedToolCall(
+            name=expected_tool_call, arguments_json=expected_tool_call_arg
+        ),
+        assistant_text="",
+        tool_calls=[],
+        tool_call_grade=ToolCallGrade(),
+        audio_path=audio_path,
+        event_log_path=event_log_path,
+        output_audio_path=None,
+        latencies=ResultLatencies(),
+        output_tokens=OutputTokenUsage(),
+        error_info=error_info,
+    )
+
+
 async def run_single_eval(
     async_client: AsyncOpenAI,
     row: pd.Series,
@@ -201,7 +266,7 @@ async def run_single_eval(
     events_dir: Path,
     config: Dict[str, Any],
     dataset_path: Path,
-) -> Dict[str, Any]:
+) -> WalkEvalResult:
     example_id = str(row["example_id"])
     user_text = str(row["user_text"])
     expected_tool_call = (
@@ -244,7 +309,6 @@ async def run_single_eval(
                     "voice": config["voice"],
                 },
             },
-            "max_output_tokens": config["max_output_tokens"],
         }
         await connection.session.update(
             session=cast(RealtimeSessionCreateRequestParam, session)
@@ -259,7 +323,7 @@ async def run_single_eval(
             config["real_time"],
         )
 
-        response_payload: RealtimeResponseCreateParamsParam = {}
+        response_payload: Dict[str, Any] = {}
         with event_log_path.open("w", encoding="utf-8") as log_file:
             # Persist the full event stream so latency/tool-call issues are traceable.
             response_result = await collect_realtime_response(
@@ -267,22 +331,23 @@ async def run_single_eval(
             )
 
     assistant_text = response_result["assistant_text"]
-    tool_calls = response_result["tool_calls"]
+    raw_tool_calls = response_result["tool_calls"]
+    tool_calls = [
+        ToolCallRecord.from_mapping(tool_call) for tool_call in raw_tool_calls
+    ]
     output_audio_bytes = response_result["output_audio_bytes"]
     tool_call_grade_data = compute_tool_call_grade(
         expected_tool_call, expected_tool_call_arg, tool_calls
     )
-    tool_call_correctness = tool_call_grade_data["tool_call_correctness"]
-    tool_call_arg_correctness = tool_call_grade_data["tool_call_arg_correctness"]
-    grade = 1 if tool_call_correctness == 1 and tool_call_arg_correctness == 1 else 0
+    tool_call_grade = ToolCallGrade.from_mapping(tool_call_grade_data)
 
-    output_audio_path = ""
+    output_audio_path: Path | None = None
     if output_audio_bytes:
         example_audio_dir = run_audio_dir / example_id
         ensure_dir(example_audio_dir)
-        output_audio_path = str(example_audio_dir / "output.wav")
+        output_audio_path = example_audio_dir / "output.wav"
         write_pcm16_wav(
-            Path(output_audio_path),
+            output_audio_path,
             bytes(output_audio_bytes),
             config["output_sample_rate_hz"],
         )
@@ -296,34 +361,45 @@ async def run_single_eval(
         usage_output_audio_tokens = output_details.get("audio_tokens")
         usage_output_text_tokens = output_details.get("text_tokens")
 
-    return {
-        "example_id": example_id,
-        "user_text": user_text,
-        "gt_tool_call": expected_tool_call,
-        "gt_tool_call_arg": expected_tool_call_arg,
-        "audio_path": str(audio_path),
-        "assistant_text": assistant_text,
-        "output_audio_path": output_audio_path,
-        "event_log_path": str(event_log_path),
-        "tool_calls": json.dumps(tool_calls),
-        "pred_tool_call": tool_call_grade_data["pred_tool_call"],
-        "pred_tool_call_arg": tool_call_grade_data["pred_tool_call_arg"],
-        "tool_call_correctness": tool_call_correctness,
-        "tool_call_arg_correctness": tool_call_arg_correctness,
-        "grade": grade,
-        "latency_first_audio_ms": response_result["first_audio_time_ms"],
-        "latency_first_text_ms": response_result["first_text_time_ms"],
-        "latency_response_done_ms": response_result["response_done_time_ms"],
-        "output_tokens": usage_output_tokens,
-        "output_audio_tokens": usage_output_audio_tokens,
-        "output_text_tokens": usage_output_text_tokens,
-    }
+    return WalkEvalResult(
+        example_id=example_id,
+        user_text=user_text,
+        expected_tool_call=ExpectedToolCall(
+            name=expected_tool_call, arguments_json=expected_tool_call_arg
+        ),
+        assistant_text=assistant_text,
+        tool_calls=tool_calls,
+        tool_call_grade=tool_call_grade,
+        audio_path=audio_path,
+        event_log_path=event_log_path,
+        output_audio_path=output_audio_path,
+        latencies=ResultLatencies(
+            first_audio_ms=response_result["first_audio_time_ms"],
+            first_text_ms=response_result["first_text_time_ms"],
+            response_done_ms=response_result["response_done_time_ms"],
+        ),
+        output_tokens=OutputTokenUsage(
+            output_tokens=usage_output_tokens,
+            output_audio_tokens=usage_output_audio_tokens,
+            output_text_tokens=usage_output_text_tokens,
+        ),
+    )
 
 
-def compute_summary(results: pd.DataFrame) -> Dict[str, Any]:
+def compute_summary(
+    results: pd.DataFrame, config: WalkEvalRunConfig
+) -> WalkEvalRunSummary:
+    failed_examples = 0
+    if "status" in results.columns:
+        failed_examples = int((results["status"] == "failed").sum())
     summary: Dict[str, Any] = {
         "total_examples": int(results.shape[0]),
-        "grade_mean": float(results["grade"].mean()) if not results.empty else 0.0,
+        "failed_examples": failed_examples,
+        "grade_mean": (
+            float(results["grade"].mean())
+            if "grade" in results.columns and not results.empty
+            else 0.0
+        ),
     }
     if "tool_call_correctness" in results.columns and not results.empty:
         summary["tool_call_correctness_mean"] = float(
@@ -347,22 +423,26 @@ def compute_summary(results: pd.DataFrame) -> Dict[str, Any]:
         ],
     )
 
-    return summary
+    return WalkEvalRunSummary.from_flat_summary(summary, config)
 
 
 def order_result_columns(results: pd.DataFrame) -> pd.DataFrame:
     preferred = [
         "example_id",
         "user_text",
+        "assistant_text",
         "gt_tool_call",
         "pred_tool_call",
+        "tool_call_correctness",
         "gt_tool_call_arg",
         "pred_tool_call_arg",
-        "tool_call_correctness",
         "tool_call_arg_correctness",
         "grade",
-        "assistant_text",
         "tool_calls",
+        "status",
+        "failure_stage",
+        "error_type",
+        "error_message",
         "event_log_path",
         "audio_path",
         "output_audio_path",
@@ -401,60 +481,81 @@ async def run_evals() -> None:
         "input_audio_format": args.input_audio_format,
         "output_audio_format": args.output_audio_format,
         "output_sample_rate_hz": args.output_sample_rate_hz,
-        "max_output_tokens": args.max_output_tokens,
         "real_time": args.real_time,
         "voice": args.voice,
     }
 
     async_client = AsyncOpenAI()
 
-    results: List[Dict[str, Any]] = []
+    results: List[WalkEvalResult] = []
     total_examples = int(dataset.shape[0])
     print(f"Running walk evals: {total_examples} examples -> {run_dir}")
     for _, row in tqdm(dataset.iterrows(), total=total_examples, desc="Walk evals"):
-        result = await run_single_eval(
-            async_client,
-            row,
-            system_prompt,
-            tools,
-            run_audio_dir,
-            run_events_dir,
-            config,
-            args.data_csv,
-        )
+        try:
+            result = await run_single_eval(
+                async_client,
+                row,
+                system_prompt,
+                tools,
+                run_audio_dir,
+                run_events_dir,
+                config,
+                args.data_csv,
+            )
+        except Exception as exc:
+            error_info = build_error_info(exc, "example_execution")
+            tqdm.write(f"[walk] example {row['example_id']} failed: {exc}")
+            result = build_failed_result(row, args.data_csv, run_events_dir, error_info)
         results.append(result)
 
-    results_df = pd.DataFrame(results)
+    results_df = pd.DataFrame(
+        [
+            result.to_csv_row(
+                include_tool_call_columns=True,
+                include_tool_call_arg_columns=True,
+            )
+            for result in results
+        ]
+    )
     results_df = order_result_columns(results_df)
     results_csv_path = run_dir / "results.csv"
     results_df.to_csv(results_csv_path, index=False)
 
-    summary = compute_summary(results_df)
-    summary.update(
-        {
-            "run_name": run_name,
-            "model": args.model,
-            "chunk_ms": args.chunk_ms,
-            "sample_rate_hz": args.sample_rate_hz,
-            "input_audio_format": args.input_audio_format,
-            "output_audio_format": args.output_audio_format,
-            "output_sample_rate_hz": args.output_sample_rate_hz,
-            "max_output_tokens": args.max_output_tokens,
-            "real_time": args.real_time,
-            "voice": args.voice,
-            "data_csv": str(args.data_csv),
-            "system_prompt_file": str(args.system_prompt_file),
-            "tools_file": str(args.tools_file),
-        }
+    summary = compute_summary(
+        results_df,
+        WalkEvalRunConfig(
+            run_name=run_name,
+            model=args.model,
+            voice=args.voice,
+            chunk_ms=args.chunk_ms,
+            sample_rate_hz=args.sample_rate_hz,
+            input_audio_format=args.input_audio_format,
+            output_audio_format=args.output_audio_format,
+            output_sample_rate_hz=args.output_sample_rate_hz,
+            real_time=args.real_time,
+            data_csv=args.data_csv,
+            system_prompt_file=args.system_prompt_file,
+            tools_file=args.tools_file,
+        ),
     )
 
     summary_path = run_dir / "summary.json"
-    summary_path.write_text(json.dumps(summary, indent=2), encoding="utf-8")
+    summary_dict = summary.to_flat_summary()
+    summary_path.write_text(json.dumps(summary_dict, indent=2), encoding="utf-8")
+    if not args.skip_plots:
+        plot_paths = build_realtime_eval_plots(
+            results=results_df,
+            summary=summary_dict,
+            output_dir=run_dir / "plots",
+            harness_label="walk harness",
+            run_name=run_name,
+        )
+        print(f"Wrote {len(plot_paths)} plot(s) to {run_dir / 'plots'}")
     print(
         "Summary:"
-        f" grade_mean={summary.get('grade_mean', 0):.3f}"
-        f" tool_call_correctness_mean={summary.get('tool_call_correctness_mean', 0):.3f}"
-        f" tool_call_arg_correctness_mean={summary.get('tool_call_arg_correctness_mean', 0):.3f}"
+        f" grade_mean={summary.grade_mean:.3f}"
+        f" tool_call_correctness_mean={summary.tool_call_correctness_mean or 0:.3f}"
+        f" tool_call_arg_correctness_mean={summary.tool_call_arg_correctness_mean or 0:.3f}"
     )
     print(f"Wrote results to {run_dir}")
 

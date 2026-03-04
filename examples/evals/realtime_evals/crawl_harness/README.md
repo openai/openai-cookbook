@@ -28,6 +28,7 @@ Each run writes:
 
 - `results.csv`: Per-example outputs and grades.
 - `summary.json`: Aggregate metrics (latency + correctness).
+- `plots/*.png`: Styled score, latency, token, and status charts.
 - `audio/<example_id>/input.wav`: The TTS input audio.
 - `audio/<example_id>/output.wav`: The model output audio (if any).
 - `events/<example_id>.jsonl`: Realtime event stream for the datapoint.
@@ -66,6 +67,7 @@ Common options:
 - `--output-audio-format`: Output audio format (default `pcm16`).
 - `--real-time`: Stream audio in real-time cadence.
 - `--max-examples`: Limit number of examples for quick checks.
+- `--skip-plots`: Skip post-run PNG chart generation.
 
 ## Adapt
 

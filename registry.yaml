@@ -4,20 +4,6 @@
 # should build pages for, and indicates metadata such as tags, creation date and
 # authors for each page.
 
-- title: Getting the most out of GPT-5.4 for document and multimodal understanding
-  path: examples/multimodal/document_and_multimodal_understanding_tips.ipynb
-  slug: document-and-multimodal-understanding-tips
-  description: Practical patterns for dense OCR, handwriting, localization, chart QA, and tool-assisted document understanding with GPT-5.4.
-  date: 2026-03-04
-  authors:
-    - annikab-oai
-  tags:
-    - responses
-    - vision
-    - images
-    - multimodal
-    - reasoning
-
 - title: Realtime Eval Guide
   path: examples/Realtime_eval_guide.ipynb
   slug: realtime-eval-guide

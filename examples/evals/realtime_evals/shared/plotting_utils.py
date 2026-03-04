@@ -275,9 +275,7 @@ def _plot_turn_trends(
             markeredgecolor=EDGE,
         )
         grade_ax.set_ylim(0, 1.05)
-        grade_ax.set_title(
-            "turn-level score by turn", loc="left", pad=12, fontsize=14
-        )
+        grade_ax.set_title("turn-level score by turn", loc="left", pad=12, fontsize=14)
         grade_ax.set_xlabel("turn index", fontsize=12)
         grade_ax.set_ylabel("score", fontsize=12)
         grade_ax.set_xticks(grouped["turn_index"])
@@ -370,7 +368,9 @@ def _plot_score_metrics(axis: plt.Axes, summary: Mapping[str, Any]) -> None:
 
 
 def _plot_latency_quantiles(axis: plt.Axes, summary: Mapping[str, Any]) -> None:
-    quantile_frame = _summary_quantile_frame(summary, LATENCY_COLUMNS, ["p50", "p95", "p99"])
+    quantile_frame = _summary_quantile_frame(
+        summary, LATENCY_COLUMNS, ["p50", "p95", "p99"]
+    )
     axis.set_title("latency percentiles", loc="left", pad=12, fontsize=14)
     if quantile_frame.empty:
         _empty_panel(axis, "No latency percentile values found.")
@@ -431,9 +431,7 @@ def _plot_token_summary(axis: plt.Axes, summary: Mapping[str, Any]) -> None:
             .reindex(metrics)
             .reset_index()
         )
-        positions = [
-            position + ((stat_index - 1) * width) for position in x_positions
-        ]
+        positions = [position + ((stat_index - 1) * width) for position in x_positions]
         bars = axis.bar(
             positions,
             subset["value"],
@@ -701,10 +699,7 @@ def _score_metric_rows(summary: Mapping[str, Any]) -> list[tuple[str, float]]:
         for key in summary
         if key.endswith("_mean")
         and key not in {"grade_mean", *preferred_keys}
-        and (
-            key.replace("_mean", "").endswith("_grade")
-            or key.startswith("grade_")
-        )
+        and (key.replace("_mean", "").endswith("_grade") or key.startswith("grade_"))
     )
     for key in extra_grade_keys[:4]:
         metric_value = _coerce_summary_float(summary.get(key))
@@ -854,5 +849,7 @@ def _status_color(status: str) -> str:
 
 
 def _status_palette(status_values: Any) -> list[tuple[str, str]]:
-    statuses = sorted({str(value).strip() for value in status_values if str(value).strip()})
+    statuses = sorted(
+        {str(value).strip() for value in status_values if str(value).strip()}
+    )
     return [(status, _status_color(status)) for status in statuses]

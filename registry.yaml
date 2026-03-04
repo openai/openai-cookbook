@@ -4,6 +4,21 @@
 # should build pages for, and indicates metadata such as tags, creation date and
 # authors for each page.
 
+- title: Customer Support Email Agent with GPT-4o and Commune
+  path: examples/agents_sdk/email_agent_with_commune.ipynb
+  slug: customer-support-email-agent-commune
+  description: Build a production-ready customer support agent that reads incoming emails via Commune, classifies tickets using GPT-4o function calling, and sends replies autonomously.
+  date: 2026-03-03
+  authors:
+    - shanjairaj7
+  tags:
+    - agents-sdk
+    - function-calling
+    - email
+    - tool-use
+    - communication
+
+
 - title: Long horizon tasks with Codex
   path: examples/codex/long_horizon_tasks.md
   slug: long-horizon-tasks

@@ -29,6 +29,7 @@ People are writing great tools and papers for improving outputs from GPT. Here a
 - [Semantic Kernel](https://github.com/microsoft/semantic-kernel): A Python/C#/Java library from Microsoft that supports prompt templating, function chaining, vectorized memory, and intelligent planning.
 - [Vellum](https://www.vellum.ai/): A paid AI product development platform to experiment with, evaluate, and deploy advanced LLM apps.
 - [Weights & Biases](https://wandb.ai/site/solutions/llmops): A paid product for tracking model training and prompt engineering experiments.
+- [WFGY RAG 16 Problem Map](https://github.com/onestardao/WFGY/blob/main/ProblemMap/README.md): A framework-agnostic troubleshooting checklist for diagnosing common retrieval-augmented generation (RAG) and LLM pipeline failures.
 - [YiVal](https://github.com/YiVal/YiVal): An open-source GenAI-Ops tool for tuning and evaluating prompts, retrieval configurations, and model parameters using customizable datasets, evaluation methods, and evolution strategies.
 
 ## Prompting guides

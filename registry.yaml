@@ -4,6 +4,18 @@
 # should build pages for, and indicates metadata such as tags, creation date and
 # authors for each page.
 
+- title: GPT-5.4 Prompting Guide
+  path: examples/gpt-5/gpt-5-4_prompting_guide.ipynb
+  slug: gpt-5-4-prompting-guide
+  description: Prompting best practices and patterns for GPT-5.4 models.
+  date: 2026-03-06
+  authors:
+    - ryu-omnithrex
+  tags:
+    - prompting
+    - gpt-5
+    - guide
+
 - title: Building Governed AI Agents - A Practical Guide to Agentic Scaffolding
   path: examples/partners/agentic_governance_guide/agentic_governance_cookbook.ipynb
   slug: agentic-governance-cookbook

@@ -3113,3 +3113,14 @@
     - cost
     - responses
     - realtime
+
+- title: Deterministic Calendar Scheduling with MCP
+  path: examples/mcp/deterministic_calendar_scheduling_with_mcp.ipynb
+  slug: deterministic-calendar-scheduling-with-mcp
+  description: Build a scheduling agent that never hallucinates dates using MCP tools for deterministic datetime resolution, cross-provider availability merging, and Two-Phase Commit booking.
+  date: 2026-03-06
+  authors:
+    - billylui
+  tags:
+    - mcp
+    - responses

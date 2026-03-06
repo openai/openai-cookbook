@@ -4,7 +4,7 @@
 # should build pages for, and indicates metadata such as tags, creation date and
 # authors for each page.
 
-- title: GPT-5.4 Vision: Tips and Tricks for High-Accuracy Results
+- title: Getting the Most out of GPT-5.4 for Vision and Document Understanding
   path: examples/multimodal/document_and_multimodal_understanding_tips.ipynb
   slug: vision-understanding
   description: A practical guide to get the best performance on vision tasks with GPT-5.4.

@@ -36,7 +36,7 @@ def normalize_windows_component(component: str) -> str:
 
 def has_control_characters(component: str) -> bool:
     return any(
-        unicodedata.category(char).startswith("C") and char not in "\t\r\n"
+        unicodedata.category(char).startswith("C")
         for char in component
     )
 

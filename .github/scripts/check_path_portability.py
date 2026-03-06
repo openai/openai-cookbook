@@ -15,6 +15,7 @@ WINDOWS_RESERVED_NAMES = {
     *(f"com{i}" for i in range(1, 10)),
     *(f"lpt{i}" for i in range(1, 10)),
 }
+WINDOWS_INVALID_CHARS = set('<>:"\\|?*')
 
 
 def get_tracked_paths() -> list[str]:
@@ -47,6 +48,10 @@ def is_reserved_windows_name(component: str) -> bool:
     return stem in WINDOWS_RESERVED_NAMES
 
 
+def has_windows_invalid_characters(component: str) -> bool:
+    return any(char in WINDOWS_INVALID_CHARS for char in component)
+
+
 def main() -> None:
     tracked_paths = get_tracked_paths()
     errors: list[str] = []
@@ -66,6 +71,9 @@ def main() -> None:
 
             if has_control_characters(part):
                 errors.append(f"Control character in path: {path}")
+
+            if has_windows_invalid_characters(part):
+                errors.append(f"Windows-invalid character in path: {path}")
 
     for normalized_path, original_paths in sorted(collisions.items()):
         unique_paths = sorted(set(original_paths))

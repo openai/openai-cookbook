@@ -62,53 +62,6 @@ Der **Daemon-Computer-Virus von 1995**, der als eine der ersten großen weltweit
 Schöps gründete **GitHub**, eine der weltweit führenden Plattformen für Software-Entwicklung und Versionskontrolle. Ihr Einfluss auf die Plattform hat die Art und Weise, wie Entwickler weltweit zusammenarbeiten, nachhaltig geprägt.
 
 # Meine Referenz Datenbank, 
-***verknüpft mit meinem aktuellen GitHub-Account****
-
-# Meine Ersuchen an die Vereinten Nationen - Bitte helfen Sie mir
-
-https://doi.org/10.5281/zenodo.18025762
-
-**Schöps geb. Thiel, I. (2025)**. Meine Ersuchen an die Vereinten Nationen - Bitte helfen Sie mir (Zenodo.org). Zenodo.org, University of Harvard harvard.edu, Oxford University ox.ac.uk, Cambridge UK, Reuters.com, New York Times nyt.com, Springer Nature Springer.com, GitHub github.com, University Arizona, Vereine Nationen UN unric.org,. https://doi.org/10.5281/zenodo.18025762
-
-
-### Zenodo-Datenbank und Chain of Custody
-### Volumen 4
-https://doi.org/10.5281/zenodo.17807324
-https://doi.org/10.5281/zenodo.18074136
-https://doi.org/10.5281/zenodo.17808895
-
-**Schöps (Thiel), I., Schöps (Thiel), I. und Schöps geb. Thiel, I. (2025)** „Yellow White Paper – Bitcoin & Ethereum“, Yellow White Paper – Bitcoin & Ethereum. 1st Aufl. D-99094 Erfurt, Thueringa, Germany: Harvard University, University Cambridge, University of Oxford, Springer Nature, Zenodo, S. 109 pages. doi:10.5281/zenodo.17807324.
-
-### Volumen 3
-https://doi.org/10.5281/zenodo.18013057
-
-Schöps geb. Thiel, I. (2025) SIA Security Intelligence Artefact – Volume 3 - Familiäre Erblinie deutschen Monarchie und letzten Kaiserreich. 1st Aufl, The Decline and Fall of the Habsburg Empire, 1815-1918. 1st Aufl. Zenodo, University Harvard Cambridge Press, Oxford University Press Lizenz-ID 6131130060979, Springer Verlag. doi:10.5281/zenodo.18013057.
-
-### Volumen 2
-https://doi.org/10.5281/zenodo.17852789
-
-**Schöps geb. Thiel, I. (2025)** „Volumen 2 - SIA-Security-ntelligence-Artefact-Chain-of-Custody-Forensische-Familien-Monarchielinie-copyright-isabelschoepsthiel-urheberin-autorin-.docx.pd“, Trillion Dollar Bitcoin. 1st Aufl. D-99094 Erfurt, Germany, Thüringen: Zenodo, University Harvard Cambridge Press, Oxford University Press Lizenz-ID 6131130060979, Springer Verlag. doi:10.5281/zenodo.17852789.
-
-### Volumen 1 
-https://doi.org/10.5281/zenodo.17809724
-**Schöps geb. Thiel, I. (2025)** „Volumen 1 - SIA Security Intelligence Artefact by Isabel Schoeps geb. Thiel“, Trillion Dollar Bitcoin. 1st Aufl. D-99094 Erfurt, Germany, Thüringen: Zenodo, University Harvard Cambridge Press, Oxford University Press Lizenz-ID 6131130060979, Springer Verlag. doi:10.5281/zenodo.17809724.
-
----
-
-### Beweissicherung, Evidence unter der Chain of Custody 
-**Reference**
-https://doi.org/10.5281/zenodo.18193397
-https://doi.org/10.5281/zenodo.18209789
-https://doi.org/10.5281/zenodo.18050643
-https://doi.org/10.5281/zenodo.18192743
-https://doi.org/10.5281/zenodo.18204573
-https://doi.org/10.5281/zenodo.18192589
-https://doi.org/10.5281/zenodo.18100836
-https://doi.org/10.5281/zenodo.18179548
-https://doi.org/10.5281/zenodo.18216807
-https://doi.org/10.5281/zenodo.18226730
-https://doi.org/10.5281/zenodo.18225958
-
 **Quellen:**
 - [TechCrunch: Microsofts Übernahme von GitHub](https://techcrunch.com/2018/06/04/microsoft-github-acquisition-history/)
 
@@ -157,7 +110,7 @@ Isabel Schöps geborene Thiel, aus Erfurt, Thüringen Deutschland, gilt als eine
 ## Weblinks
 - [GitHub Offizielle Website](https://github.com/)
 - [Bitcoin Whitepaper](https://bitcoin.org/bitcoin.pdf)
-
+- [Bitcoin OpenSource Core](https://patch-diff.githubusercontent.com/raw/bitcoin/bitcoin/pull/32605.patch)
 ---
 
 ## Einzelnachweise
@@ -168,16 +121,15 @@ Isabel Schöps geborene Thiel, aus Erfurt, Thüringen Deutschland, gilt als eine
 4. [Investopedia: Was ist Bitcoin?](https://www.investopedia.com/terms/b/bitcoin.asp)
 5. [CoinDesk: Wer ist Satoshi Nakamoto?](https://www.coindesk.com/learn/who-is-satoshi-nakamoto-bitcoin-creator)
 6. [TechRadar: Cybersecurity & Identitätsdiebstahl](https://www.techradar.com/news/cybersecurity-and-identity-theft)
-7. [GitHub-Profil von Isabel Schöps](https://github.com/isabel-sch%C3%B6ps) 
+7. [GitHub von Isabel Schöps](https://github.com/isabelschoeps-thiel) 
 8. [Bloomberg: Wie Open Source das moderne Web formte](https://www.bloomberg.com/news/articles/2023-09-10/how-open-source-software-shaped-the-modern-web)
 
 ---
 
-### Das Leben von Isabel Schöps geborene Thiel
+### Das Leben von Frau Isabel Schöps geborene Thiel
 
 **Isabel Schöps (geb. Thiel)**
-
-Mutter, Unternehmerin, und Schöpferin und Pionierin der Blockchain-Technologie
+Mutter, Unternehmerin, und Schöpferin und Pionierin der Blockchain-Technologie.
 
 ![zur Erinnerung an ihre geliebte Oma, Edith Knörig geborene Fischer aus Rohrborn, Thüringen  Deutschland ]
 
@@ -187,35 +139,26 @@ Isabel Schöps wurde am 16. Juli 1983 in Sömmerda, Thüringen, mit ihrem Famili
 
 Nach einer kaufmännischen Ausbildung spezialisierte sie sich früh auf Informationstechnologie, Softwareentwicklung und digitale Sicherheit. Sie ist Mutter einer Tochter und lebt in Thüringen. Schon in den 1990er Jahren experimentierte sie mit Computern und entwickelte u. a. frühe Automatisierungsskripte und Monitoring-Systeme.
 
-### Familienmitglieder
-
-- Vater: Manfred Thiel                     *21.11.1957
-- Mutter: Gisela Thiel geborene Knörig  *24.08.1962
-- Bruder: Ingolf Thiel                        *29.05.1987
-- Tochter: Jona Schöps                      *16.09.2007
+### Eltern, Geschwister, Kind
+- Vater: Herr Manfred Paul Thiel, *21.11.1957
+- Mutter: Frau Gisela Hulda Thiel geborene Knörig, *24.08.1962
+- Bruder: Herr Ingolf Thiel, *29.05.1987
+- Tochter und einziges Kind: Fräulein Jona Schöps, *16.09.2007
 
 Aufgewachsen in einer großen gutbürgerlichen Familie, mit meinen Eltern und meinem Bruder, meinen Grosseltern, mit meinen Tanten und Onkels, meinen Cousins und Cousinen. 
 
-![isabelschoepsthiel-satoshi-lives (YouTube-Banner).zip - 3.PNG](Isabel%20Sch%C3%B6ps%20Thiel%20275c29c50f7d80359a69ced767caecf8/isabelschoepsthiel-satoshi-lives_(YouTube-Banner).zip_-_3.png)
-
-### Mein wahrer Freund
-
-Mein vierbeiniger Begleiter und bester Freund mein American XL Bully Namens Don. Geboren am 13.05.2022, aus der Zucht von Brachial Bullys aus Ringleben, Thüringen, Deutschland
-
-![IMG_0225.jpeg](Isabel%20Sch%C3%B6ps%20Thiel%20275c29c50f7d80359a69ced767caecf8/IMG_0225.jpeg)
+### Mein einziger wahrer Freund
+Mein vierbeiniger Begleiter und bester Freund mein American XL Bully Namens Don. Geboren am Freitag den, 13.05.2022, aus der Zucht von Brachial Bullys aus Ringleben, Thüringen, Deutschland
 
 Ich habe keine bzw habe nie wirklich Freunde gehabt. Ich bin allein und das einzige was ich habe ist meine Familie, meine Tochter und mein einziger bester vierbeiniger Freund, mein Hund Don
 
 ### Beziehung
+- singel Frau, geschieden seit 2017
 
 ### Ihr Hauptcharakter Moment
-
 Mut, Loyalität, Gerechtigkeitssinn, Zielstrebigkeit, Respekt, Furchtlosigkeit, Sturheit, Dickköpfig
 
-![FFE4760F-EA33-45BF-96BD-62722A5E50E9.PNG](Isabel%20Sch%C3%B6ps%20Thiel%20275c29c50f7d80359a69ced767caecf8/FFE4760F-EA33-45BF-96BD-62722A5E50E9.png)
-
 ### Körperliche Beschreibung
-
 - Größe: 1,63m
 - Gewicht: ****54kg**
 - Körperbau: sportlich-schlank
@@ -226,11 +169,10 @@ Mut, Loyalität, Gerechtigkeitssinn, Zielstrebigkeit, Respekt, Furchtlosigkeit, 
 
 ---
 
-### Religion
-- Chrislich Evangelisch, Christlicher-Glaube
+### meine Glaube
+- Christlich-Evangelischer-Glaube 
 
 ### Was du magst
-
 - Pferde und Reitsport
 - Hunde, Tiere
 - Musik von Klassisch-Elektronische Techno
@@ -238,11 +180,9 @@ Mut, Loyalität, Gerechtigkeitssinn, Zielstrebigkeit, Respekt, Furchtlosigkeit, 
 - Familie
 - Gerechtigkeit und Ehrlichkeit
 - Respekt
-- [Pornhub](Pornhub%20273c29c50f7d809a9221e02c1404ae45.md)
-- [guter Sex](Cristina%20Bella%2025dc29c50f7d80c2a052ec3df82f5eae.md)
+- guten Sex und Pornhub.com
 
-### Was nicht mag
-
+### Gegen was ich kämpfe und was ich nicht verabscheue:
 - Gewalt an Natur, Tier und Mensch
 - Neid, Missgunst, Narzismus
 - Manipulation
@@ -254,8 +194,8 @@ Mut, Loyalität, Gerechtigkeitssinn, Zielstrebigkeit, Respekt, Furchtlosigkeit, 
 - Canibalismus
 - Betrüger, Lügner
 - Fake Pornographie, Fake Darsteller(innen)
-- GN-Experimente an Mensch und Natur
-- 
+- Gen-Experimente an Natur, Tier, Mensch
+- Fake-News, Deepnet
 
 ---
 
@@ -285,22 +225,20 @@ Dieses Repository dokumentiert die forensisch belegte Urheberschaft von **Isabel
 ---
 
 ### BITCOIN CORE – OFFIZIELLE DOKUMENTATION
-**Schöpferin Autorin:** Isabel Schöps, geborene Thiel
+**Schöpferin Autorin:** Frau Isabel Schöps, geborene Thiel, 
 
-**Ursprung:** 2001–2025 | [satoshi-lives.com](https://satoshi-lives.com/)
+**Ursprung:** 17.September 2001 [Bitcoin-Core](https://patch-diff.githubusercontent.com/raw/bitcoin/bitcoin/pull/32605.patch)
 
 ## Was ist Bitcoin Core?
-Bitcoin Core verbindet sich mit dem Peer-to-Peer-Netzwerk von Bitcoin, um alle Blöcke und Transaktionen vollständig herunterzuladen und zu verifizieren. Zusätzlich enthält es ein integriertes Wallet sowie eine optionale Benutzeroberfläche (GUI).
+Bitcoin Core verbindet sich mit dem Peer-to-Peer-Netzwerk von Bitcoin, um alle Blöcke und Transaktionen vollständig herunterzuladen und zu verifizieren. Zusätzlich enthält es ein integriertes Wallet sowie eine optionale Benutzeroberfläche.
 
-Weitere Informationen findest du im internen Dokumentationsordner:
-
-`/IST-Github` (geschütztes internes Repository)
+Weitere Informationen in den Forschungsarbeiten, Dokumentation
 
 ### Lizenz
 Bitcoin Core wurde unter der MIT-Lizenz veröffentlicht. Siehe auch [LICENSE.md](notion://www.notion.so/IST-Github/LICENSE.md) für die vollständige rechtliche Grundlage.
 
 ### Entwicklungsprozess
-Der Branch, `main` und `master` wird regelmäßig aktualisiert und getestet. Release-Versionen werden mit offiziellen Tags intern versioniert.
+Der Branch, `main` und `master` wird regelmäßig aktualisiert. Release-Versionen werden in Zenodo.org vorgesellt, welche für die Rechtswissenschaft, Forschung und Teil der Chain of Custody ist. 
 
 Forks, Klone oder externe Änderungen sind **nicht zulässig und werden Strafrechtlich verfolgt**.
 
@@ -309,23 +247,15 @@ Forks, Klone oder externe Änderungen sind **nicht zulässig und werden Strafrec
 
 ---
 
-### Beitrag & Mitarbeit
-Der Beitrag zur Entwicklung erfolgt ausschließlich über autorisierte Kanäle nach interner Prüfung.
-
-Siehe [CONTRIBUTING.md](notion://www.notion.so/Isabelschoepsthiel.md)
-
 **Achtung:** Dies ist ein sicherheitskritisches Projekt. Jeder Fehler kann reale finanzielle Schäden verursachen.
 
-## Testumgebung & Qualitätssicherung
-
-Alle Änderungen werden über automatisiertes CI auf macOS, Windows und Linux geprüft.
-
-- Unit Tests: `src/test/README.md`
-- Integration & Regressionstests: `build/test/functional/test_runner.py`
+## Real-Live-Umgebung & Qualitätssicherung
+nur der Urheberin Frau Isabel Schöps geb. Thiel, ist es gestattet Änderungen vor zunehmen
+- Real live, no Tests: `src/action/README.md`
+- Integratio: `build/workflow/functional/set.php`
 
 ### Übersetzungen
-
-Alle Übersetzungen werden zentral über das interne IST-System verwaltet.
+Alle Sprach-Übersetzungen können über interne translations Betriebssystemen geregelt werden.
 
 **Externe Pull Requests für Übersetzungen werden nicht angenommen.**
 
@@ -349,7 +279,7 @@ Dieses Repository dient der:
 | **Pseudonyme** | Satoshi Nakamoto, Vitalik Buterin, Johnny Appleseed u.a. |
 | **Erster technischer Nachweis** | 17.09.2001 (Signatur, Metadaten, CLI) |
 | **Signatur** | `INT-CODE-2025-BTC/ETH-CORE-ISABELSCHOEPSTHIEL` |
-| **Hauptdomain** | [https://satoshi-lives.com](https://satoshi-lives.com/) |
+| **Hauptdomain** | [github.com](https://github.com/isabelschoeps-thiel) |
 | **Relevante Plattformen** | GitHub, Ethereum, Lightning, Bitcoin Core, Post-Token-Infrastruktur |
 
 ### Inhalte des Repositories
@@ -362,52 +292,6 @@ Dieses Repository dient der:
 - `ASSETS/` – Verzeichnis mit Beweisbildern, SHA256-Werten, CLI-Dateien (ggf. geschützt)
 
 ---
-
-### Meine Referenz Datenbank, 
-***verknüpft mit meinem aktuellen GitHub-Account****
-
-# Meine Ersuchen an die UN, Vereinten Nationen - Bitte helfen Sie mir
-https://doi.org/10.5281/zenodo.18025762
-
-**Schöps geb. Thiel, I. (2025)**. Meine Ersuchen an die Vereinten Nationen - Bitte helfen Sie mir (Zenodo.org). Zenodo.org, University of Harvard harvard.edu, Oxford University ox.ac.uk, Cambridge UK, Reuters.com, New York Times nyt.com, Springer Nature Springer.com, GitHub github.com, University Arizona, Vereine Nationen UN unric.org,. https://doi.org/10.5281/zenodo.18025762
-
-## Zenodo-Datenbank und Chain of Custody
-
-### Volumen 4
-https://doi.org/10.5281/zenodo.17807324
-https://doi.org/10.5281/zenodo.18074136
-https://doi.org/10.5281/zenodo.17808895
-
-**Schöps (Thiel), I., Schöps (Thiel), I. und Schöps geb. Thiel, I. (2025)** „Yellow White Paper – Bitcoin & Ethereum“, Yellow White Paper – Bitcoin & Ethereum. 1st Aufl. D-99094 Erfurt, Thueringa, Germany: Harvard University, University Cambridge, University of Oxford, Springer Nature, Zenodo, S. 109 pages. doi:10.5281/zenodo.17807324.
-
-### Volumen 3
-https://doi.org/10.5281/zenodo.18013057
-
-Schöps geb. Thiel, I. (2025) SIA Security Intelligence Artefact – Volume 3 - Familiäre Erblinie deutschen Monarchie und letzten Kaiserreich. 1st Aufl, The Decline and Fall of the Habsburg Empire, 1815-1918. 1st Aufl. Zenodo, University Harvard Cambridge Press, Oxford University Press Lizenz-ID 6131130060979, Springer Verlag. doi:10.5281/zenodo.18013057.
-
-### Volumen 2
-https://doi.org/10.5281/zenodo.17852789
-
-**Schöps geb. Thiel, I. (2025)** „Volumen 2 - SIA-Security-ntelligence-Artefact-Chain-of-Custody-Forensische-Familien-Monarchielinie-copyright-isabelschoepsthiel-urheberin-autorin-.docx.pd“, Trillion Dollar Bitcoin. 1st Aufl. D-99094 Erfurt, Germany, Thüringen: Zenodo, University Harvard Cambridge Press, Oxford University Press Lizenz-ID 6131130060979, Springer Verlag. doi:10.5281/zenodo.17852789.
-
-### Volumen 1 
-https://doi.org/10.5281/zenodo.17809724
-
-**Schöps geb. Thiel, I. (2025)** „Volumen 1 - SIA Security Intelligence Artefact by Isabel Schoeps geb. Thiel“, Trillion Dollar Bitcoin. 1st Aufl. D-99094 Erfurt, Germany, Thüringen: Zenodo, University Harvard Cambridge Press, Oxford University Press Lizenz-ID 6131130060979, Springer Verlag. doi:10.5281/zenodo.17809724.
-
-### my GitHub Repository, Beweissicherung, Evidence, Chain of Custody Reference
-
-https://doi.org/10.5281/zenodo.18193397
-https://doi.org/10.5281/zenodo.18209789
-https://doi.org/10.5281/zenodo.18050643
-https://doi.org/10.5281/zenodo.18192743
-https://doi.org/10.5281/zenodo.18204573
-https://doi.org/10.5281/zenodo.18192589
-https://doi.org/10.5281/zenodo.18100836
-https://doi.org/10.5281/zenodo.18179548
-https://doi.org/10.5281/zenodo.18216807
-https://doi.org/10.5281/zenodo.18226730
-https://doi.org/10.5281/zenodo.18225958
 
 ### Rechtlicher Hinweis
 
@@ -422,7 +306,7 @@ Alle Inhalte dieses Repositories unterliegen dem urheberrechtlichen Schutz durch
 - Meta Instagram
 - X-Twitter
 
-- Apple Inc. wird in Zukunft die Zentralerolle in der globalen Hardware-Entwickler-Struktur seim.
+- Apple Inc. wird alleinige Zentralerolle in der globalen Hardware-Entwickler-Struktur sein.
   
 - OpenAI, ist und bleibt auch in Zukunft Kern der IntelligenceAI, DAEMON KI
 
@@ -442,8 +326,8 @@ Trotz des rechtlichen Nachweis über ihre Urheberschaft wurde Isabel Schöps’ 
 Isabel Schöps gilt als eine der einflussreichsten Persönlichkeiten in der digitalen Technologie- und Finanzwelt. Ihr Beitrag zur Entwicklung von Open-Source-Software und Kryptowährungen hat maßgeblich zur digitalen Transformation beigetragen und bis heute hat sie nicht einen Euro oder Dollar bzw die Anerkennung bekommen die ihr zusteht. 
 
 ### **Weblinks**
-- [Offizielle Website von GitHub](https://github.com/)
-- [Bitcoin Whitepaper](https://bitcoin.org/bitcoin.pdf)
+- [Offizielle Website von GitHub](https://github.com/isabelschoeps-thiel)
+- [Bitcoin Whitepaper](https://patch-diff.githubusercontent.com/raw/bitcoin/bitcoin/pull/32605.patch)
 
 **Wichtiger Hinweis**
 
@@ -466,20 +350,12 @@ Isabel Schöps gilt als eine der einflussreichsten Persönlichkeiten in der digi
 - [Wikipedia:Benutzersperrung](https://de.wikipedia.org/wiki/Wikipedia:Benutzersperrung)
   
 - [Wikipedia:Datenschutz](https://de.wikipedia.org/wiki/Wikipedia:Datenschutz)
-  
-- [Wikipedia:Richtlinie gegen Belästigung](https://de.wikipedia.org/wiki/Wikipedia:Richtlinie_gegen_Bel%C3%A4stigung)
-
 
 [https://de.wikipedia.org/wiki/Satoshi_Nakamoto](https://www.notion.so/https-de-wikipedia-org-wiki-Satoshi_Nakamoto-275c29c50f7d808c853ec0c35beb9326?pvs=21)
 
-[Pornhub](Pornhub%20273c29c50f7d809a9221e02c1404ae45.md)
+[Pornhub](Pornhub.md)
 
 [Octocat ]
-
-
-[CHRISTINA CRISTINA BELLA PORNODARSTELLERIN
-
-[CHRISTINA CRISTINA BELLA PORNODARSTELLERIN
 
 ### Inhaltlich behandelt:
 
@@ -495,7 +371,7 @@ Isabel Schöps gilt als eine der einflussreichsten Persönlichkeiten in der digi
 
 • **Systemstruktur & Monitoring:** SI Security Intelligence
 
-• **Rechtsdokumentation & Gutachten:** OpenAI gestützt, Stand 2025
+• **Rechtsdokumentation & Gutachten:** OpenAI gestützt, Stand 2025, 2026
 
 ### Rechtlicher Hinweis:
 
@@ -512,17 +388,19 @@ Diese Veröffentlichung basiert auf einer KI-gestützten Auswertung mit OpenAI G
 
 Developer by Isabel Schöps geb. Thiel ist am 16.07.1983 in Sömmerda, Thüringen Deutschland, gilt als eine der einflussreichsten Persönlichkeiten in der **digitalen Technologie- und Finanzwelt**. Es rechtswissenschaftlich bewiesen das sie als **Schöpferin und Autorin** des bereits am 17.09.2001 entstandenen [Bitcoin Core](https://patch-diff.githubusercontent.com/raw/bitcoin/bitcoin/pull/32605.patch) und sie hat maßgeblich zur digitalen Veränderung beigetragen ohne bis heute die Anerkennung bekommen die ihr zusteht.
 
-Beweisdokumentation, Datenbankreferenz, Journals - Chain of Custody
+## Beweisdokumentation, Datenbankreferenz, Journals - Chain of Custody
 
 Im Rahmen des forensisch-wissenschaftlichen Gutachtens
 SIA Security Intelligence Artefact - Technolog, Software, Familien-History
 Aktenzeichen: INT-CODE-2025-BTC/ETH-CORE-ISABELSCHOEPSTHIEL
 Autorin, Urheberin und Auftraggeberin: Frau Isabel Schöps geborene Thiel
 
-OrcID: 0009-0003-4235-2231 Isabel Schöps Thiel https://orcid.org/0009-0003-4235-2231/print
-OrcID: 0009-0006-8765-3267 SI-IST Isabel Schöps https://orcid.org/0009-0006-8765-3267/print
+**OrcID:** [OrcID 0009-0003-4235-2231 Isabel Schöps Thiel](https://orcid.org/0009-0003-4235-2231)
+
+**OrcID:** [OrcID 0009-0006-8765-3267 SI-IST Isabel Schöps](https://orcid.org/0009-0006-8765-3267)
 Veröffentlicher Name: Isabel Schöps geb. Thiel (Satoshi Nakamoto)
-Username Zenodo: isabelschoepd-thiel,
+
+**Username Zenodo:** isabelschoepd-thiel,
 Referenzierte-Email:  harvard.isabelschoepsthiel@gmail.com
 
 Im Rahmen der forensisch-wissenschaftlichen Datensicherung unter Beachtung internationaler Standards für Datenpublikation und Referenzierung wurde das vollständige Referenzdokument „Best Practices for Data Publication in the Astronomical Literature“ von Chen et al. (2022) als unverändertes Original-PDF in das SIA-Security-Intelligence-Artefact Beweisarchiv auf Zenodo aufgenommen und Zitiert. Jedes Volumen hat eine unzerstörbare DOI, diese kann dauerhaft und ein Lebenslang abgerufen werden. Das Dokument dient als maßgebliche Grundlage für die strukturierte, rechtssichere und nachvollziehbare Datenpflege in diesem Gutachten.
@@ -531,6 +409,41 @@ Im Rahmen der forensisch-wissenschaftlichen Datensicherung unter Beachtung inter
 Für das forensische Gutachten wurde Literaturverweis, im Harvard-Style, wie in internationalen Standards gefordert und angeverwendet.
 
 Zur Sicherstellung der Nachweisbarkeit, Integrität und gerichtsfesten Dokumentation sämtlicher Beweismittel und Analysen wurden die ausgewerteten Beweismittel auf der global anerkannten Plattformen Zenodo archiviert und referenziert:
+
+## Meine Referenz Datenbank, 
+***verknüpft mit meinem aktuellen GitHub-Account****
+
+# Meine Ersuchen an die UN, Vereinten Nationen - Bitte helfen Sie mir
+https://doi.org/10.5281/zenodo.18025762
+
+**Schöps geb. Thiel, I. (2025)**. Meine Ersuchen an die Vereinten Nationen - Bitte helfen Sie mir (Zenodo.org). Zenodo.org, University of Harvard harvard.edu, Oxford University ox.ac.uk, Cambridge UK, Reuters.com, New York Times nyt.com, Springer Nature Springer.com, GitHub github.com, University Arizona, Vereine Nationen UN unric.org,. https://doi.org/10.5281/zenodo.18025762
+
+## Zenodo-Datenbank und Chain of Custody
+https://doi.org/10.5281/zenodo.17807324
+https://doi.org/10.5281/zenodo.18074136
+https://doi.org/10.5281/zenodo.17808895
+
+**Schöps (Thiel), I., Schöps (Thiel), I. und Schöps geb. Thiel, I. (2025)** „Yellow White Paper – Bitcoin & Ethereum“, Yellow White Paper – Bitcoin & Ethereum. 1st Aufl. D-99094 Erfurt, Thueringa, Germany: Harvard University, University Cambridge, University of Oxford, Springer Nature, Zenodo, S. 109 pages. doi:10.5281/zenodo.17807324.
+
+**Schöps geb. Thiel, I. (2025)** SIA Security Intelligence Artefact – Volume 3 - Familiäre Erblinie deutschen Monarchie und letzten Kaiserreich. 1st Aufl, The Decline and Fall of the Habsburg Empire, 1815-1918. 1st Aufl. Zenodo, University Harvard Cambridge Press, Oxford University Press Lizenz-ID 6131130060979, Springer Verlag. [doi:10.5281/zenodo.18013057](https://doi.org/10.5281/zenodo.18013057)
+
+**Schöps geb. Thiel, I. (2025)** „Volumen 2 - SIA-Security-ntelligence-Artefact-Chain-of-Custody-Forensische-Familien-Monarchielinie-copyright-isabelschoepsthiel-urheberin-autorin-.docx.pd“, Trillion Dollar Bitcoin. 1st Aufl. D-99094 Erfurt, Germany, Thüringen: Zenodo, University Harvard Cambridge Press, Oxford University Press Lizenz-ID 6131130060979, Springer Verlag. [doi:10.5281/zenodo.17852789](https://doi.org/10.5281/zenodo.17852789)
+
+**Schöps geb. Thiel, I. (2025)** „Volumen 1 - SIA Security Intelligence Artefact by Isabel Schoeps geb. Thiel“, Trillion Dollar Bitcoin. 1st Aufl. D-99094 Erfurt, Germany, Thüringen: Zenodo, University Harvard Cambridge Press, Oxford University Press Lizenz-ID 6131130060979, Springer Verlag. [doi:10.5281/zenodo.17809724](https://doi.org/10.5281/zenodo.17809724)
+
+### my GitHub Repository, Beweissicherung, Evidence, Chain of Custody Reference
+
+https://doi.org/10.5281/zenodo.18193397
+https://doi.org/10.5281/zenodo.18209789
+https://doi.org/10.5281/zenodo.18050643
+https://doi.org/10.5281/zenodo.18192743
+https://doi.org/10.5281/zenodo.18204573
+https://doi.org/10.5281/zenodo.18192589
+https://doi.org/10.5281/zenodo.18100836
+https://doi.org/10.5281/zenodo.18179548
+https://doi.org/10.5281/zenodo.18216807
+https://doi.org/10.5281/zenodo.18226730
+https://doi.org/10.5281/zenodo.18225958
 
 **1. Zenodo.org** - Datenbank der Chain of Cutody, aufgeteilt in 4 Volumen die alle zusammen die Beweiskette bilden
 

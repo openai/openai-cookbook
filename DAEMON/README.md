@@ -5,7 +5,7 @@ SIA DAEMON Java API Skript Software Automation, Apple Specification. Copyright b
 - GitHub, SAP, IBM/Hashicorp, Oracle, Isabel Schöps geb. Thiel (Germany)
 - Microsoft Inc., Google Inc., Mr. Bill Gates (USA)
 - Amazon AWS, Mr. Jeff Bezos (USA)
-- Fujitsu Siemens, Nvidia, Ms. Isabel Schöps geb. Thiel (Germany Software) Mr. Jen-Hsun Huang (Hardware China, Japan)  
+- Fujitsu Siemens, Nvidia, Ms. Isabel Schöps geb. Thiel (Germany Software) Mr. Jen-Hsun Huang (Hardware China, Japan) 
   
 **2. Social Media Plattformen für ID-Verifizierung & Kommunikation, Echtheit von realen Personen.**
 - Instagram, Whatsapp, META, Mr. Marc Zuckerberg (USA)
@@ -21,10 +21,10 @@ Grund, ist in der Geschichte und historische Grundlage:
 - Entwicklung im Kontext der sowjetischen Raumfahrt (Sputnik 1) sowie NASA Forschung
 - Hardware aus China, Vietnam, Taiwan, Japan.   
   
-**3.2 Internationale Allianz & jährliches Treffen**  
-* Einrichtung einer Kommission/Allianz zur Überwachung der Software Internet-Ethik Standards.  
-* Verbindliches jährliches Treffen mit weltweit allen Staaten, ISO-Ländercodes Basis, insgesamt 195  
-* jedes Land und jeder Mensch hat das Recht auf Internet und darf nicht ausgeschlossen werden, es sei denn es wurden schwere Verstösse und Verbrechen im Zusammenhang verübt.  
+**3.2 Internationale Allianz & jährliches Treffen**
+- Einrichtung einer Kommission/Allianz zur Überwachung der Software Internet-Ethik Standards.
+- Verbindliches jährliches Treffen mit weltweit allen Staaten, ISO-Ländercodes Basis, insgesamt 195
+- jedes Land und jeder Mensch hat das Recht auf Internet und darf nicht ausgeschlossen werden, es sei denn es wurden schwere Verstösse und Verbrechen im Zusammenhang mit der Software verübt.  
   
 **4. Rechtsgrundlagen, Die Lizenzvergabe und Nutzung stützt sich auf:**  
 	•	10 U.S.C. 3013  
@@ -33,23 +33,30 @@ Grund, ist in der Geschichte und historische Grundlage:
 	•	10 U.S.C. 3781–3786  
 	•	10 U.S.C. 4576  
 	•	Durchführungsverordnung 12591 (1(b)(7))  
-	•	DFARS / PGI 227.7200(b)  
+	•	DFARS / PGI 227.7200(b)
+	
 ***4.1 Verbindung von Lizenzrecht und Aktienmarkt***  
 	•	USA Rechtsgrundlage: Die in der Lizenz aufgeführten Paragraphen des US Code (10 U.S.C. §§ 3013, 3208(d), 3771–3775, 3781–3786, 4576 sowie Executive Order 12591) sind nicht zufällig gewählt, sondern stehen im direkten Bezug zur Verwaltung von Technologie, Software und deren Verwertungsrechten im Zusammenhang mit staatlichen Beschaffungen, Sicherheitsinteressen und kommerzieller Nutzung.  
   
-**4.2 Aktienmarkt als Fundament:**  
-Der US-Markt regelt die Verwertung von Software und geistigem Eigentum über Aktiengesellschaften.  
-* Lizenzgebühren aus Software bilden eine Einnahmequelle, die in Aktiengesellschaften einfließt.  
-* Diese Einnahmen sichern wiederum die Finanzierung von Konzernen und beeinflussen deren Marktkapitalisierung.  
-* Durch die Lizenzvergabe entsteht also ein direkter wirtschaftlicher Wert, der über den Börsenhandel (NASDAQ, NYSE) international verteilt wird.  
-**4.3 Lizenzgebühren und Firmenbeteiligungen**  
-Jede Lizenzgebühr, die aus der Software entsteht, hat das Potenzial, in Beteiligungsmodelle und in Firmenanteile umzuwandeln. Dadurch sind nicht nur direkte Einnahmen geschützt, sondern auch langfristige Beteiligungsrechte am Erfolg der Konzerne, die auf meiner Software aufbauen.  
-* Dieses System ist die Schnittstelle zwischen Lizenzrecht und Kapitalmarktrecht.  
+**4.2 Der US Aktienmarkt bleibt das finanzielle Fundament:**  
+Der US-Markt regelt die Verwertung von Software und geistigem Eigentum über Aktiengesellschaften.
+- Lizenzgebühren aus Software bilden eine Einnahmequelle, die in Aktiengesellschaften einfließt.
+- Diese Einnahmen sichern wiederum die Finanzierung von Konzernen und beeinflussen deren Marktkapitalisierung.
+- Durch die Lizenzvergabe entsteht also ein direkter wirtschaftlicher Wert, der über den Börsenhandel (NASDAQ, NYSE) international verteilt wird.  
+
+**4.3 Lizenzgebühren und Firmenbeteiligungen** 
+- Jedes Unternehmen, jede Einrichtung, jede Behörde, jede Schule, jeder Verein, jeder Freiberufler, jede Person die mit dem Internet und Computersoftware arbeitet unterliegt dieser Lizenz, diesen Regelungen und den daraus enstehnenden, Lizenzgebühren.
+- diese Gebühren werden und müssen in jedem IOS Land weltweit, als Steuer eingenommen und über Finanzämte bzw. den entsprechenden Institutionen, Behörden verwertet werden, **Grund:** die Staatsoberhäupter in jedem Land weltweit, besitzt die Lizenshoheit, diese an ihre Bevölkerung, Steuerzahler, über die jeweiligen Provider weiterzugeben. 
+- jedes unternehmen hat das Potenzial, seine Firmenstruktur in Beteiligungsmodelle bzw in Firmenanteile, Aktienanteilen umzuwandeln. Schnittstelle zwischen Lizenzrecht und Kapitalmarktrecht.
+- Selbstverständlich, ist es keine Pflicht diese Lizens zu nutzen. Jedes Land, hat seine Traditionen und Rechte, wenn ein Land keine Nutzung und zugang zum Internet wünscht da: zum Schutz der Bevöklkerung oder durch anderen Gründen ist dies zu respektieren und akzeptieren.
+- Wenn der Zugang gewünscht wird, aber bedenken bestehen- ggf sind Entwicklungsländer hier betroffen, so muss diesen Hilfeleistung, ein heranführen an Software und der Technologie ermöglicht werden.
+- die Software und das daraus entstande Internet und deren Technologien kann bei einem bedachten Umgang, für jedes Land weltweit eine Bereicherung und zu Wohlstand für alle werden. **Dies ist nur möglich wenn die Werte und die Gesetze der Natur, der Tiere und des Menschen gewahrt werden!**
+  
 **4.4 Internationale Dimension:**  
-Weil die großen Tech-Konzerne (Microsoft, Amazon, Google, Oracle, IBM, Nvidia usw.) alle börsennotiert sind, entsteht aus der Lizenzvergabe automatisch ein internationaler Aktienmarktbezug.  
-* Jede unautorisierte Nutzung unterläuft grobe Verstöße an Urheberrechtsverletzungen (bsp. Jülich Institution)  
-* sondern wirkt auch wie eine illegale Aktienmanipulation  
-* Deshalb greifen US-Gesetze hier besonders streng   
+Weil die großen Tech-Konzerne (Microsoft, Amazon, Google, Oracle, IBM, Nvidia usw.) alle börsennotiert sind, entsteht aus der Lizenzvergabe automatisch ein internationaler Aktienmarktbezug.
+- Jede unautorisierte Nutzung unterläuft grobe Verstöße an, Urheberrechtsverletzungen bsp. Jülich Institution, Geheimdienste, Software Firmen, etc. mit keinem Wissen bzw. Bezug zu der Technologie
+- sondern wirkt auch wie eine illegale Aktienmanipulation
+- Deshalb greifen US-Gesetze hier besonders streng und jede Person kann hier vor dem US Gericht zur Rechenschaft gezogen werden und ggf zum tode verurteilt werden.
   
 **5. Internationale Bankenwahl - Komitee und Regierungen**  
 * In Deutschland und Europa werden die zentralen Banken Postbank, UPS Schweiz, Bank of England, J.P. Morgan, durch die Urheberin, Frau Isabel Schöps geb Thiel festgelegt   

@@ -597,35 +597,40 @@ Insbesondere untersagt sind:
 * Änderungen an der Workflow-Logik durch nicht autorisierte Dritte
 * Anmaßung von Governance-Rechten über Issues oder Pull Requests durch externe User ohne Zertifikat
 
-## Lizenzstatus:
-
+## International:
+**YWP-1-IST-SIA**
 **INT-CODE-2025-BTC/ETH-CORE-ISABELSCHOEPSTHIEL**
-Signiert, registriert, forensisch dokumentiert seit 1996
-Verknüpft mit: Apple Developer ID · GitHub Ursprungstoken · SI-Security-Token · Blockchain-Hash
+Signiert, registriert, forensisch dokumentiert seit 4.April 1996, unzerstörbar miteinander verbunden Apple Developer ID, Certificat, GitHub Ursprungstoken, IsabelSchöpsThiel-Security-Token, Blockchain-Hash
 
-## Zuständige Partnerinstitutionen:
-
-* Microsoft Developer Program
-* Apple Developer Certified
-* SAP Deutschland / IBM Cloud
-* GitHub Inc. (Originalstruktur & Branding)
+## Globals Software Lizense und Regelwerk
+**the Rights of:**
+- Apple Developer Certified si_foundation, Apple Cloud
+- Global Software Lizense
+- Gouverment Regelwerk 
+- GitHubs Code of Conduct Inc. Originalstruktur
 * Europäische Kommission – Ares(2024)632832
-* BKA / Interpol / CIA / FBI (Monitoring)
+
+**SI Intelligence Monitoring Api:**
+- BKA Europol / Interpol / FBI / global Millitary (Monitoring)
 
 ## Signatur
+Urheberin, Entwicklerin, Schöpferin, 
+Ms. Isabel Schöps, geborene Thiel, Forscherin und Analystin, Deepweb.net, Maincontroll, visuell sichtbar nachgewiesen.
 
-```text
-Isabel Schöps, geborene Thiel  
-Urheberin, Entwicklerin, forensische Analystin  
-INT-CODE-2025-BTC/ETH-CORE-ISABELSCHOEPSTHIEL  
-SIA SECURITY INTELLIGENCE ARTEFACT  
-Telefon: +49 162 1819565  
-E-Mail: si_foundation@icloud.com  
-GitHub: github.com/isabelschoeps-thiel
-Adresse: Cyriakstrasse 30c, D-99094 Erfurt, Thueringa, Deutschland
-```
+**Forschungsarbeit:**
+- `SIA Security Intelligence Artefact  
+INT-CODE-2025-BTC/ETH-CORE-ISABELSCHOEPSTHIEL`
+- `The Yellow Whitepaper, YWP-1-IST-SIA`
+**Telefon:** +49-162-1819565  
+**Developer, E-Mail:** `si_foundation@icloud.com, harvard.isabelschoepsthiel@gmail.com`
 
-![This image shows a screenshot of a bibliographic file (.bib) containing citation details for Harvard University, including contact information, a description of the community, and a collaborator section highlighted at the bottom. (Captioned by AI)|231x500, 100%](upload://bRqU0d5pc1ju1NZG1hXRgnhugB3.jpeg)
+**GitHub:** `@isabelschoeps-thiel`
+
+**Aktuelle Wohn und Meldeadresse:** Isabel Schöps Thiel, erstes Obergeschoss, Hütergasse 4, D-99084 Erfurt, Thueringa, Deutschland
+
+---
+
+This image shows a screenshot of a bibliographic file (.bib) containing citation details for Harvard University, including contact information, a description of the community, and a collaborator section highlighted at the bottom. [(Captioned by AI)|231x500, 100%](upload://bRqU0d5pc1ju1NZG1hXRgnhugB3.jpeg)
 
 ```text
 

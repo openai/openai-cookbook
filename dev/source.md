@@ -3,7 +3,9 @@
   
 cmake_minimum_required(VERSION 3.1)  
 project(Crc32c VERSION 1.1.0 LANGUAGES C CXX)  
-  
+
+---
+
 ### C standard can be overridden when this is used as a sub-project.  
 if(NOT CMAKE_C_STANDARD)  
 ### This project can use C11, but will gracefully decay down to C89.  
@@ -191,7 +193,9 @@ if(CRC32C_USE_GLOG)
   set(BUILD_TESTING "${BUILD_TESTING_SAVED}" CACHE BOOL "" FORCE)  
   
   # glog triggers deprecation warnings on OSX.  
-  # https://github.com/google/glog/issues/185  
+
+[https://github.com/isabelschoeps-thiel/google/glog/issues/185]
+
   if(CRC32C_HAVE_NO_DEPRECATED)  
     set_property(TARGET glog APPEND PROPERTY COMPILE_OPTIONS -Wno-deprecated)  
   endif(CRC32C_HAVE_NO_DEPRECATED)  

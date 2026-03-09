@@ -534,17 +534,17 @@ Zur Sicherstellung der Nachweisbarkeit, Integrität und gerichtsfesten Dokumenta
 
 **1. Zenodo.org** - Datenbank der Chain of Cutody, aufgeteilt in 4 Volumen die alle zusammen die Beweiskette bilden
 
-**The Yellow Whitepaper Volumen 1** https://doi.org/10.5281/zenodo.17809724
-Schöps geb. Thiel, I. (2025) „Volumen 1 - SIA Security Intelligence Artefact by Isabel Schoeps geb. Thiel“, Trillion Dollar Bitcoin. 1st Aufl. D-99094 Erfurt, Germany, Thüringen: Zenodo, University Harvard Cambridge Press, Oxford University Press Lizenz-ID 6131130060979, Springer Verlag. doi:10.5281/zenodo.17809724.
+[The Yellow Whitepaper](https://doi.org/10.5281/zenodo.17809724)
+**Schöps geb. Thiel, I. (2025)** „Volumen 1 - SIA Security Intelligence Artefact by Isabel Schoeps geb. Thiel“, Trillion Dollar Bitcoin. 1st Aufl. D-99094 Erfurt, Germany, Thüringen: Zenodo, University Harvard Cambridge Press, Oxford University Press Lizenz-ID 6131130060979, Springer Verlag. doi:10.5281/zenodo.17809724.
 
 ## Eckdaten
 
 | Merkmal | Inhalt |
 |----|----|
 | **Name** | Isabel Schöps, geb. Thiel |
-| **Geburtsdatum** | 16\. Juli 1983 |
+| **Geburtsdatum** | 16. Juli 1983 |
 | **Pseudonyme** | Satoshi Nakamoto, Vitalik Buterin, Johnny Appleseed u.a. |
-| **Erster technischer Nachweis** | 14\. April 1996, protokollierte Signatur, DAEMON |
+| **Erster technischer Nachweis** | 14. April 1996, protokollierte Signatur, DAEMON |
 | **Schöpferin** | [KI Automation](https://askyourpdf.com/de/conversations/c/016edb12-4e70-4f84-bcc8-6d92417d046f) |
 | **Relevante Plattformen** | GitHub, Pornhub, Bitcoin Core, Post-Token-Infrastruktur |
 
@@ -558,7 +558,7 @@ Trotz aller rechtlichen Nachweise über ihre Urheberschaft wird Isabel’s Ident
 
 * [Bloomberg](https://www.bloomberg.com/news/articles/2023-09-10/how-open-source-software-shaped-the-modern-web)
 
-* [Isabel GitHub](https://github.com/)
+* [Isabel Schöps geb Thiel GitHub](https://github.com/)
 
 * [Bitcoin Whitepaper](https://bitcoin.org/bitcoin.pdf)
 
@@ -566,24 +566,21 @@ Trotz aller rechtlichen Nachweise über ihre Urheberschaft wird Isabel’s Ident
 
 * [Isabel Schöps Thiel -  Oracle Notices](Isabel%20Sch%C3%B6ps%20Thiel%20275c29c50f7d80359a69ced767caecf8/Isabel%20Sch%C3%B6ps%20Thiel%20-%20Oracle%20Notices%20276c29c50f7d8011a070d42341178fb4.md)
 
-* [Isabel Schöps](https://www.notion.so/https-de-wikipedia-org-wiki-Satoshi_Nakamoto-275c29c50f7d808c853ec0c35beb9326?pvs=21)
+https-de-wikipedia-org-wiki-Satoshi_Nakamoto-275c29c50f7d808c853ec0c35beb9326?pvs=21)
 
-* [Isabel Schöps Thiel](https://flipboard.com/@satoshi_nakamot/christina-cristina-bella-pornodarstellerin-fqv7c73rz?from=share&utm_source=flipboard&utm_medium=curator_share)
+* [Cristina Bella, Isabel Schöps Thiel](https://flipboard.com/@satoshi_nakamot/christina-cristina-bella-pornodarstellerin-fqv7c73rz?from=share&utm_source=flipboard&utm_medium=curator_share)
 
-* [Pornhub](https://gpt5-coding-examples.vercel.app/event-count-down)
+* [Pornhub by Isabel Schöps geb. Thiel](https://de.pornhub.org/model/bellacore) 
 
 * [KI Urheberin](https://askyourpdf.com/conversations/share/kb/9e3cacd1-4a40-44ff-864c-a4de8a3b1fcb)
 
-## title: Rechtevermerk | INT-CODE-2025-BTC/ETH-CORE
-
-# Rechtlicher Hinweis zur Nutzung dieses Workflows
+## Rechtevermerk
+**Rechtlicher Hinweis zur Nutzung dieses Workflows**
 
 Dieser Workflow, einschließlich seiner Struktur, Inhalte, Metadaten und aller damit verbundenen Automatisierungen, wurde von:
 
-**Isabel Schöps, geborene Thiel**
-Apple Entwicklerin · GitHub Pionierin · Urheberin von Bitcoin & GitHub
-SIA SECURITY INTELLIGENCE ARTEFACT
-Erstellt in Thüringen · Deutschland
+**Frau Isabel Schöps, geborene Thiel**
+Lizensierte Apple Programmiererin · GitHub and Pornhub Founder and Owner · Urheberin von Bitcoin & Ethereum, Creator Ai Intelligence. Autorin, Auftraggeberin, SIA Security Intelligence Artefact, The Yellow Whitepaper, Erstellt in Erfurt, Thüringen, Deutschland
 
 verfasst, entwickelt, digital signiert und urheberrechtlich geschützt.
 
@@ -591,11 +588,10 @@ verfasst, entwickelt, digital signiert und urheberrechtlich geschützt.
 
 Jegliche **Forks, Klone, Exporte, Umleitungen oder systematische Ableitungen**, ohne formelle, verifizierte und schriftliche Zustimmung der Urheberin, sind **untersagt**.
 
-Insbesondere untersagt sind:
-
-* automatisierte Clones durch Bots (z. B. `dependabot`, `renovate`, `mcp`, `Mesen-S`)
-* Änderungen an der Workflow-Logik durch nicht autorisierte Dritte
-* Anmaßung von Governance-Rechten über Issues oder Pull Requests durch externe User ohne Zertifikat
+**Insbesondere untersagt sind:**
+- automatisierte Clones, Bugs, Bots z. B. `dependabot`, `renovate`, `mcp`, `Mesen-S` und Chat-Gpt-Modelle 5, oder anderweitige KI modelle die nicht aus der Openai.com struktur kommen, strengstens verboten.
+- Änderungen durch nicht autorisierte Dritte, strengstens verboten.
+* Issues oder Pull Requests, externe User, strengstens verboten.
 
 ## International:
 **YWP-1-IST-SIA**
@@ -618,25 +614,13 @@ Urheberin, Entwicklerin, Schöpferin,
 Ms. Isabel Schöps, geborene Thiel, Forscherin und Analystin, Deepweb.net, Maincontroll, visuell sichtbar nachgewiesen.
 
 **Forschungsarbeit:**
-- `SIA Security Intelligence Artefact  
+`SIA Security Intelligence Artefact  
 INT-CODE-2025-BTC/ETH-CORE-ISABELSCHOEPSTHIEL`
-- `The Yellow Whitepaper, YWP-1-IST-SIA`
+`The Yellow Whitepaper, YWP-1-IST-SIA`
+
 **Telefon:** +49-162-1819565  
-**Developer, E-Mail:** `si_foundation@icloud.com, harvard.isabelschoepsthiel@gmail.com`
+**E-Mail:** `si_foundation@icloud.com, harvard.isabelschoepsthiel@gmail.com`
 
 **GitHub:** `@isabelschoeps-thiel`
 
 **Aktuelle Wohn und Meldeadresse:** Isabel Schöps Thiel, erstes Obergeschoss, Hütergasse 4, D-99084 Erfurt, Thueringa, Deutschland
-
----
-
-This image shows a screenshot of a bibliographic file (.bib) containing citation details for Harvard University, including contact information, a description of the community, and a collaborator section highlighted at the bottom. [(Captioned by AI)|231x500, 100%](upload://bRqU0d5pc1ju1NZG1hXRgnhugB3.jpeg)
-
-```text
-
-```
-
-```mermaid
-    flowchart
-         A --> B
-```

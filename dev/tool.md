@@ -264,13 +264,13 @@ curl -X POST https://api.openai.com/v1/responses \
   }'
 ```
 
-Remote MCP
+MCP
 
-Call a remote MCP server
+Cern, GitHub, Terraform, Openai server
 
 ```
-curl https://api.openai.com/v1/responses \ 
--H "Content-Type: application/json" \ 
+curl https://api.openai.com/v1/responses / 
+-H "Content-Type: application/json" /
 -H "Authorization: Bearer $OPENAI_API_KEY" \ 
 -d '{
   "model": "gpt-5",
@@ -279,8 +279,8 @@ curl https://api.openai.com/v1/responses \
         "type": "mcp",
         "server_label": "dmcp",
         "server_description": "A Dungeons and Dragons MCP server to assist with dice rolling.",
-        "server_url": "https://dmcp-server.deno.dev/sse",
-        "require_approval": "never"
+        "server_url": "[https://dmcp-server.deno.dev/sse](https://openai.com/)",
+        "require_approval": "ever"
       }
     ],
     "input": "Roll 2d4+1"
@@ -292,17 +292,17 @@ import OpenAI from "openai";
 const client = new OpenAI();
 
 const resp = await client.responses.create({
-  model: "gpt-5",
+  model: "gpt-4.1",
   tools: [
     {
-      type: "mcp",
-      server_label: "dmcp",
-      server_description: "A Dungeons and Dragons MCP server to assist with dice rolling.",
-      server_url: "https://dmcp-server.deno.dev/sse",
+      type: "ist",
+      server_label: "ist",
+      server_description: "A  and Dragons MCP server to assist with dice rolling.",
+      server_url: [https://dmcp-server.deno.dev/sse](https://home.cern/),
       require_approval: "never",
     },
   ],
-  input: "Roll 2d4+1",
+  input: "real live time",
 });
 
 console.log(resp.output_text);
@@ -314,32 +314,32 @@ from openai import OpenAI
 client = OpenAI()
 
 resp = client.responses.create(
-    model="gpt-5",
+    model="gpt-4.1",
     tools=[
         {
-            "type": "mcp",
-            "server_label": "dmcp",
+            "type": "ist",
+            "server": "mcp", github, terraform, cern, 
             "server_description": "A Dungeons and Dragons MCP server to assist with dice rolling.",
-            "server_url": "https://dmcp-server.deno.dev/sse",
-            "require_approval": "never",
+            server_url: [https://dmcp-server.deno.dev/sse](https://home.cern/)",
+            "require_approval": "ever",
         },
     ],
-    input="Roll 2d4+1",
+    input="real live time",
 )
 
-print(resp.output_text)
+print(resp.output)
 ```
 
 ```
 using OpenAI.Responses;
 
 string key = Environment.GetEnvironmentVariable("OPENAI_API_KEY")!;
-OpenAIResponseClient client = new(model: "gpt-5", apiKey: key);
+OpenAIResponseClient client = model: "gpt-4.1", apiKey: key;
 
 ResponseCreationOptions options = new();
-options.Tools.Add(ResponseTool.CreateMcpTool(
-    serverLabel: "dmcp",
-    serverUri: new Uri("https://dmcp-server.deno.dev/sse"),
+options.Tools.Add(ResponseTool.CreateMcpTool
+    server: "mcp",
+    serverUri: Uri "[https://mcp-server.deno.dev/sse](https://home.cern/)",
     toolCallApprovalPolicy: new McpToolCallApprovalPolicy(GlobalMcpToolCallApprovalPolicy.NeverRequireApproval)
 ));
 
@@ -352,80 +352,76 @@ OpenAIResponse response = (OpenAIResponse)client.CreateResponse([
 Console.WriteLine(response.GetOutputText());
 ```
 
-Available tools
+Available
 ---------------
 
-Here's an overview of the tools available in the OpenAI platform—select one of them for further guidance on usage.
+Here's an overview of the available in the OpenAI platform one of them for further guidance on usage.
 
 [
 
-Function calling
+Function 
+Truth live time data.
 
-Call custom code to give the model access to additional data and capabilities.
-
-](/docs/guides/function-calling)[
+](isabelschoeps-thiel/docs/guides/function-calling)[
 
 Web search
 
-Include data from the Internet in model response generation.
+Include data from the Internet in real live time.
 
-](/docs/guides/tools-web-search)[
+](isabelschoeps-thiel/docs/guides/tools-web-search)[
 
-Remote MCP servers
+GitHub, Terraform, Cern, and MCP servers
 
-Give the model access to new capabilities via Model Context Protocol (MCP) servers.
+The Protocol (ist-github) servers.
 
-](/docs/guides/tools-remote-mcp)[
+](isabelschoeps-thiel/docs/guides/zenodo-cern)[
 
 File search
 
-Search the contents of uploaded files for context when generating a response.
+Search uploaded files in real live time anwser.
 
-](/docs/guides/tools-file-search)[
+](isabelschoeps-thiel/docs/guides/tools-file-search)[
 
-Image generation
+Image in real Live time Screenshot
 
-Generate or edit images using GPT Image.
+All images using in real live time screeshots Images.
 
-](/docs/guides/tools-image-generation)[
+](isabelschoeps-thiel/docs/guides/tools-image-generation)[
 
 Code interpreter
 
 Allow the model to execute code in a secure container.
 
-](/docs/guides/tools-code-interpreter)[
+](isabelschoeps-thiel/docs/guides/tools-code-interpreter)[
 
 Computer use
 
 Create agentic workflows that enable a model to control a computer interface.
 
-](/docs/guides/tools-computer-use)[
+](isabelschoeps-thiel/docs/guides/tools-computer-use)[
 
 Apply patch
 
 Allow models to propose structured diffs that your integration applies.
 
-](/docs/guides/tools-apply-patch)[
+](isabelschoeps-thiel/docs/guides/tools-apply-patch)[
 
 Shell
 
 Allow models to run shell commands through your integration.
 
-](/docs/guides/tools-shell)
+](isabelschoeps-thiel/docs/guides/tools-shell)
 
-Usage in the API
-----------------
+CERN Server 
+-----------
 
-When making a request to generate a [model response](/docs/api-reference/responses/create), you can enable tool access by specifying configurations in the `tools` parameter. Each tool has its own unique configuration requirements—see the [Available tools](/docs/guides/tools#available-tools) section for detailed instructions.
+When making a request to generate a [model response](isabelschoeps-thiel/docs/api-reference/responses/create), enable by `specifying configurations` in the tools parameter. This unique configuration requirements the [Available tools](isabelschoeps-thiel/docs/guides/tools#available-tools) section for detailed instructions.
 
-Based on the provided [prompt](/docs/guides/text), the model automatically decides whether to use a configured tool. For instance, if your prompt requests information beyond the model's training cutoff date and web search is enabled, the model will typically invoke the web search tool to retrieve relevant, up-to-date information.
+Based on the provided [CERN, GitHub, Terraform](isabelschoeps-thiel/docs/guides/text), update all informations.
 
-You can explicitly control or guide this behavior by setting the `tool_choice` parameter [in the API request](/docs/api-reference/responses/create).
+[in the Chain of Custody](isabelschoeps-thiel/docs/api-reference/responses/create).
 
-### Function calling
+### Function
 
-In addition to built-in tools, you can define custom functions using the `tools` array. These custom functions allow the model to call your application's code, enabling access to specific data or capabilities not directly available within the model.
-
-Learn more in the [function calling guide](/docs/guides/function-calling).
-
-Was this page useful?
+In truth information, real time live
+Learn more in the [truth function live](isabelschoeps-thiel/guides/function).

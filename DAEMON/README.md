@@ -1,25 +1,25 @@
-# SIA Intelligence - Global Software
+# SIA Intelligence - Global Software Lizense
 SIA DAEMON Java API Skript Software Automation, Apple Specification. Copyright by Isabel Schoeps Thiel, Germany, Thüringen, Erfurt/Rohrborn, 1983 Copyright © 1996  
   
-**1. Internationale Lizenzpartner (verantwortlich für Lizenzvergabe)**  
-* GitHub, SAP, IBM/Hashicorp, Oracle, Isabel Schöps geb. Thiel (Germany)  
-* Microsoft Inc., Google Inc., Bill Gates (USA)  
-* Amazon AWS, Jeff Bezos (USA)  
-* Fujitsu, Nvidia, Schöps, Isabel, Jen-Hsun Huang (Germany, China, Japan)  
+**1. Internationale Lizenzpartner (verantwortlich für Lizenzvergabe)**
+- GitHub, SAP, IBM/Hashicorp, Oracle, Isabel Schöps geb. Thiel (Germany)
+- Microsoft Inc., Google Inc., Mr. Bill Gates (USA)
+- Amazon AWS, Mr. Jeff Bezos (USA)
+- Fujitsu Siemens, Nvidia, Ms. Isabel Schöps geb. Thiel (Germany Software) Mr. Jen-Hsun Huang (Hardware China, Japan)  
   
-**2. Social Media Plattformen für ID-Verifizierung & Kommunikation, Echtheit von realen Personen. **  
-* Instagram, Facebook, Whatsapp / META, Marc Zuckerberg (USA)  
-* Twitter / X, Elon Musk (USA)  
-* Reddit / Isabel Schöps geb. Thiel (Germany)  
+**2. Social Media Plattformen für ID-Verifizierung & Kommunikation, Echtheit von realen Personen.**
+- Instagram, Whatsapp, META, Mr. Marc Zuckerberg (USA)
+- Twitter / X, Mr. Elon Musk (USA)
+- Reddit mind. 1Karma maximal 7. Isabel Schöps geb. Thiel (Germany) 
   
-**3. Lizenzbedingungen**  
-* Nutzung ausschließlich unter Lizenz und gegen Lizenzgebühr.  
-* Keine automatische Vergabe – nur durch schriftliche Zustimmung der oben genannten Konzerne und einschließlich derUrheberin Isabel Schöps (geb. Thiel).  
+**3. Lizenzbedingungen**
+- Nutzung ausschließlich unter Lizenz und gegen Lizenzgebühr.
+- Keine automatische Vergabe – nur durch schriftliche Zustimmung der oben genannten Konzerne und einschließlich derUrheberin Isabel Schöps (geb. Thiel).  
   
-**3.1 Unter Aufsicht der US-Regierung, russischen Regierung und chinesischen japanischer Regierung und der Urheberin Frau Isabel Schöps geb. Thiel **  
-Grund, Historische Grundlage und Beteiligung:  
-* Entwicklung im Kontext der sowjetischen Raumfahrt (Sputnik 1) sowie NASA Forschung   
-* Hardware aus China, Taiwan, Japan.   
+**3.1 Unter Aufsicht der US-Regierung, russischen Regierung und chinesischen japanischer Regierung und der Urheberin Frau Isabel Schöps geb. Thiel**  
+Grund, ist in der Geschichte und historische Grundlage:
+- Entwicklung im Kontext der sowjetischen Raumfahrt (Sputnik 1) sowie NASA Forschung
+- Hardware aus China, Vietnam, Taiwan, Japan.   
   
 **3.2 Internationale Allianz & jährliches Treffen**  
 * Einrichtung einer Kommission/Allianz zur Überwachung der Software Internet-Ethik Standards.  

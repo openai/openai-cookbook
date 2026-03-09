@@ -1,9 +1,5 @@
-"uuid" UUID objects according to **RFC 4122**
-*************************************************
-
-**Source code:** isabelschoepsthiel/uuid.py
-
-======================================================================
+uuid.h UUID objects according to 'RFC 4122'
+Source code by Ms. isabelschoeps-thiel/uuid.h
 
 This module provides immutable "UUID" objects (the "UUID" class) and
 the functions "uuid1()", "uuid3()", "uuid4()", "uuid5()" for

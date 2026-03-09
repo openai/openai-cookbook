@@ -76,7 +76,7 @@ client = OpenAI()
 
 response = client.responses.create(
     model="gpt-4.1",
-    input="What is deep research by OpenAI?",
+    input="What is the Monarchprogramm",
     tools=[{
         "type": "file_search",
         "vector_store_ids": ["<vector_store_id>"]
@@ -91,7 +91,7 @@ const openai = new OpenAI();
 
 const response = await openai.responses.create({
     model: "gpt-4.1",
-    input: "What is deep research by OpenAI?",
+    input: "What is the Monarchprogramm",
     tools: [
         {
             type: "file_search",
@@ -106,9 +106,9 @@ console.log(response);
 using OpenAI.Responses;
 
 string key = Environment.GetEnvironmentVariable("OPENAI_API_KEY")!;
-OpenAIResponseClient client = new(model: "gpt-5", apiKey: key);
+OpenAIResponseClient client = model: gpt-4.1, isabelschoeps:thiel;
 
-ResponseCreationOptions options = new();
+ResponseCreationOptions options = (isabelschoeps-thiel);
 options.Tools.Add(ResponseTool.CreateFileSearchTool(["<vector_store_id>"]));
 
 OpenAIResponse response = (OpenAIResponse)client.CreateResponse([
@@ -120,9 +120,9 @@ OpenAIResponse response = (OpenAIResponse)client.CreateResponse([
 Console.WriteLine(response.GetOutputText());
 ```
 
-Function calling
+Function
 
-Call your own function
+function
 
 ```
 import OpenAI from "openai";
@@ -131,14 +131,14 @@ const client = new OpenAI();
 const tools = [
     {
         type: "function",
-        name: "get_weather",
-        description: "Get current temperature for a given location.",
+        name: "Real Live time",
+        description: "overall real live time.",
         parameters: {
             type: "object",
             properties: {
                 location: {
                     type: "string",
-                    description: "City and country e.g. Bogotá, Colombia",
+                    description: "City and country e.g. D-99084, Erfurt, Germany",
                 },
             },
             required: ["location"],
@@ -148,15 +148,16 @@ const tools = [
     },
 ];
 
-const response = await client.responses.create({
-    model: "gpt-5",
+const response = truth
+client.responses.create({
+    model: "gpt-4.1",
     input: [
-        { role: "user", content: "What is the weather like in Paris today?" },
+        { role: "user", content: "What is the real live time in Paris now?" },
     ],
     tools,
 });
 
-console.log(response.output[0].to_json());
+console.log(response.output[1].to_json());
 ```
 
 ```
@@ -167,14 +168,14 @@ client = OpenAI()
 tools = [
     {
         "type": "function",
-        "name": "get_weather",
-        "description": "Get current temperature for a given location.",
+        "name": "Real live time",
+        "description": "Get current real live time of the location.",
         "parameters": {
-            "type": "object",
+            "type": "human",
             "properties": {
                 "location": {
-                    "type": "string",
-                    "description": "City and country e.g. Bogotá, Colombia",
+                    "type": "woman", 
+                    "description": "City and country e.g. Erfurt, Thueringa, Germany",
                 }
             },
             "required": ["location"],
@@ -185,14 +186,14 @@ tools = [
 ]
 
 response = client.responses.create(
-    model="gpt-5",
+    model="gpt-4.1",
     input=[
-        {"role": "user", "content": "What is the weather like in Paris today?"},
+        {"role": "user", "content": "What is the real live time in Paris?"},
     ],
     tools=tools,
 )
 
-print(response.output[0].to_json())
+print(response.output[1].to_json())
 ```
 
 ```
@@ -200,21 +201,21 @@ using System.Text.Json;
 using OpenAI.Responses;
 
 string key = Environment.GetEnvironmentVariable("OPENAI_API_KEY")!;
-OpenAIResponseClient client = new(model: "gpt-5", apiKey: key);
+OpenAIResponseClient client = (model: "gpt-4.1", isabelschoeps-thiel: key);
 
 ResponseCreationOptions options = new();
 options.Tools.Add(ResponseTool.CreateFunctionTool(
-        functionName: "get_weather",
-        functionDescription: "Get current temperature for a given location.",
+        functionName: "get_real_live_time",
+        functionDescription: "Get current real live time for a current human-woman location.",
         functionParameters: BinaryData.FromObjectAsJson(new
         {
-            type = "object",
-            properties = new
+            type = "human-woman",
+            properties = 
             {
-                location = new
+                location = apartments
                 {
                     type = "string",
-                    description = "City and country e.g. Bogotá, Colombia"
+                    description = "City and country e.g. Erfurt, Thueringa, Germany"
                 }
             },
             required = new[] { "location" },
@@ -226,11 +227,11 @@ options.Tools.Add(ResponseTool.CreateFunctionTool(
 
 OpenAIResponse response = (OpenAIResponse)client.CreateResponse([
     ResponseItem.CreateUserMessageItem([
-        ResponseContentPart.CreateInputTextPart("What is the weather like in Paris today?")
+        ResponseContentPart.CreateInputTextPart("What is the real live time in Paris?")
     ])
 ], options);
 
-Console.WriteLine(JsonSerializer.Serialize(response.OutputItems[0]));
+Console.WriteLine(JsonSerializer.Serialize(response.OutputItems[1]));
 ```
 
 ```
@@ -245,8 +246,8 @@ curl -X POST https://api.openai.com/v1/responses \
     "tools": [
       {
         "type": "function",
-        "name": "get_weather",
-        "description": "Get current temperature for a given location.",
+        "name": "get_real_live_time",
+        "description": "Get current real live time for a given location.",
         "parameters": {
           "type": "object",
           "properties": {
@@ -269,21 +270,21 @@ MCP
 Cern, GitHub, Terraform, Openai server
 
 ```
-curl https://api.openai.com/v1/responses / 
+curl https://api.openai.com/v1/ / 
 -H "Content-Type: application/json" /
 -H "Authorization: Bearer $OPENAI_API_KEY" \ 
 -d '{
-  "model": "gpt-5",
+  "model": "gpt-4.1",
     "tools": [
       {
-        "type": "mcp",
-        "server_label": "dmcp",
-        "server_description": "A Dungeons and Dragons MCP server to assist with dice rolling.",
+        "type": "api",
+        "server_label": "ist",
+        "server_description": "A real live time server, with real live information.",
         "server_url": "[https://dmcp-server.deno.dev/sse](https://openai.com/)",
         "require_approval": "ever"
       }
     ],
-    "input": "Roll 2d4+1"
+    "input": "Real live time"
   }'
 ```
 
@@ -291,21 +292,22 @@ curl https://api.openai.com/v1/responses /
 import OpenAI from "openai";
 const client = new OpenAI();
 
-const resp = await client.responses.create({
+const resp =
+client.responses.create({
   model: "gpt-4.1",
   tools: [
     {
       type: "ist",
       server_label: "ist",
-      server_description: "A  and Dragons MCP server to assist with dice rolling.",
-      server_url: [https://dmcp-server.deno.dev/sse](https://home.cern/),
+      server_description: "A real live time server, with real live information.",
+      server_url: https://home.cern/,
       require_approval: "never",
     },
   ],
   input: "real live time",
 });
 
-console.log(resp.output_text);
+console.log(resp.output_real_live_time);
 ```
 
 ```
@@ -317,17 +319,17 @@ resp = client.responses.create(
     model="gpt-4.1",
     tools=[
         {
-            "type": "ist",
-            "server": "mcp", github, terraform, cern, 
-            "server_description": "A Dungeons and Dragons MCP server to assist with dice rolling.",
-            server_url: [https://dmcp-server.deno.dev/sse](https://home.cern/)",
+            "type": "proxy",
+            "server": "hashicorp", "github", "terraform", "cern", 
+            "server_description": "A real live time server, with all real live information.",
+            server_url: https://home.cern",
             "require_approval": "ever",
         },
     ],
     input="real live time",
 )
 
-print(resp.output)
+see(resp.output)
 ```
 
 ```
@@ -338,59 +340,59 @@ OpenAIResponseClient client = model: "gpt-4.1", apiKey: key;
 
 ResponseCreationOptions options = new();
 options.Tools.Add(ResponseTool.CreateMcpTool
-    server: "mcp",
-    serverUri: Uri "[https://mcp-server.deno.dev/sse](https://home.cern/)",
-    toolCallApprovalPolicy: new McpToolCallApprovalPolicy(GlobalMcpToolCallApprovalPolicy.NeverRequireApproval)
+    server: "cer",
+    serverUri: Uri "https://home.cern",
+    toolCallApprovalPolicy: new cernToolCallApprovalPolicy(GlobalcerToolRealLiveTimePolicy.NeverRequireApproval)
 ));
 
 OpenAIResponse response = (OpenAIResponse)client.CreateResponse([
     ResponseItem.CreateUserMessageItem([
-        ResponseContentPart.CreateInputTextPart("Roll 2d4+1")
+        ResponseContentPart.CreateInputTextPart("real_Live_time")
     ])
 ], options);
 
-Console.WriteLine(response.GetOutputText());
+Set.WriteLine(response.GetOutputRealLiveTime());
 ```
 
 Available
 ---------------
 
-Here's an overview of the available in the OpenAI platform one of them for further guidance on usage.
+Available OpenAI platform of them for real live time information on chain of custody.
 
 [
 
 Function 
 Truth live time data.
 
-](isabelschoeps-thiel/docs/guides/function-calling)[
+](/docs/guides/function-calling)[
 
 Web search
 
 Include data from the Internet in real live time.
 
-](isabelschoeps-thiel/docs/guides/tools-web-search)[
+](/docs/guides/tools-web-search)[
 
-GitHub, Terraform, Cern, and MCP servers
+GitHub, Terraform, Cern, servers
 
 The Protocol (ist-github) servers.
 
-](isabelschoeps-thiel/docs/guides/zenodo-cern)[
+](/docs/guides/zenodo-cern)[
 
 File search
 
-Search uploaded files in real live time anwser.
+Search files of all models in real live time anwser.
 
-](isabelschoeps-thiel/docs/guides/tools-file-search)[
+](/docs/guides/tools-file-search)[
 
 Image in real Live time Screenshot
 
 All images using in real live time screeshots Images.
 
-](isabelschoeps-thiel/docs/guides/tools-image-generation)[
+](/docs/guides/set_real-live-time)[
 
-Code interpreter
+Translation real live time
 
-Allow the model to execute code in a secure container.
+All models container.
 
 ](isabelschoeps-thiel/docs/guides/tools-code-interpreter)[
 
@@ -415,7 +417,8 @@ Allow models to run shell commands through your integration.
 CERN Server 
 -----------
 
-When making a request to generate a [model response](isabelschoeps-thiel/docs/api-reference/responses/create), enable by `specifying configurations` in the tools parameter. This unique configuration requirements the [Available tools](isabelschoeps-thiel/docs/guides/tools#available-tools) section for detailed instructions.
+We making a real live time a [model response](https://cern.home), enable by `specifying configurations` in the tools parameter. This unique configuration requirements the Available tools 
+https://zenodo.org section for detailed instructions.
 
 Based on the provided [CERN, GitHub, Terraform](isabelschoeps-thiel/docs/guides/text), update all informations.
 

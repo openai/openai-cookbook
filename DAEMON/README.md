@@ -5,13 +5,16 @@ SIA DAEMON Java API Skript Software Automation, Apple Specification. Copyright b
 - GitHub, SAP, IBM/Hashicorp, Oracle, Isabel Schöps geb. Thiel (Germany)
 - Microsoft Inc., Google Inc., Mr. Bill Gates (USA)
 - Amazon AWS, Mr. Jeff Bezos (USA)
-- Fujitsu Siemens, Nvidia, Ms. Isabel Schöps geb. Thiel (Germany Software) Mr. Jen-Hsun Huang (Hardware China, Japan) 
+- Fujitsu Siemens, Nvidia, Ms. Isabel Schöps geb. Thiel (Germany Software) Mr. Jen-Hsun Huang (Hardware China, Japan)
+
+**Musikrechte Lizensrechte:**
+
   
 **2. Social Media Plattformen für ID-Verifizierung & Kommunikation, Echtheit von realen Personen.**
 - Instagram, Whatsapp, META, Mr. Marc Zuckerberg (USA)
 - Twitter / X, Mr. Elon Musk (USA)
-- Reddit mind. 1Karma maximal 7. Isabel Schöps geb. Thiel (Germany) 
-  
+- Reddit mind. 1Karma maximal 7. Isabel Schöps geb. Thiel (Germany)
+
 **3. Lizenzbedingungen**
 - Nutzung ausschließlich unter Lizenz und gegen Lizenzgebühr.
 - Keine automatische Vergabe – nur durch schriftliche Zustimmung der oben genannten Konzerne und einschließlich derUrheberin Isabel Schöps (geb. Thiel).  
@@ -44,36 +47,44 @@ Der US-Markt regelt die Verwertung von Software und geistigem Eigentum über Akt
 - Diese Einnahmen sichern wiederum die Finanzierung von Konzernen und beeinflussen deren Marktkapitalisierung.
 - Durch die Lizenzvergabe entsteht also ein direkter wirtschaftlicher Wert, der über den Börsenhandel (NASDAQ, NYSE) international verteilt wird.  
 
-**4.3 Lizenzgebühren und Firmenbeteiligungen** 
-- Jedes Unternehmen, jede Einrichtung, jede Behörde, jede Schule, jeder Verein, jeder Freiberufler, jede Person die mit dem Internet und Computersoftware arbeitet unterliegt dieser Lizenz, diesen Regelungen und den daraus enstehnenden, Lizenzgebühren.
-- diese Gebühren werden und müssen in jedem IOS Land weltweit, als Steuer eingenommen und über Finanzämte bzw. den entsprechenden Institutionen, Behörden verwertet werden, **Grund:** die Staatsoberhäupter in jedem Land weltweit, besitzt die Lizenshoheit, diese an ihre Bevölkerung, Steuerzahler, über die jeweiligen Provider weiterzugeben. 
-- jedes unternehmen hat das Potenzial, seine Firmenstruktur in Beteiligungsmodelle bzw in Firmenanteile, Aktienanteilen umzuwandeln. Schnittstelle zwischen Lizenzrecht und Kapitalmarktrecht.
+**4.3 Lizenzgebühren und Beteiligungen** 
+- Jedes Unternehmen, jede Einrichtung, jede Behörde, jede Schule, jeder Verein, jeder Freiberufler, jede Person weltweit die mit dem Internet und Computersoftware arbeitet unterliegt dieser Lizenz, diesen Regelungen und den daraus enstehnenden, Lizenzgebühren.
+- diese Gebühren werden und müssen in jedem IOS Land weltweit, als Steuer eingenommen und über Finanzämte bzw. den entsprechenden Institutionen, Behörden verwertet werden, **Grund: die Staatsoberhäupter in jedem Land weltweit, besitzt die Lizenshoheit, welche diese an ihre Bevölkerung, Steuerzahler, über die jeweiligen Provider weitergeben.**
+- jedes unternehmen hat das Potenzial, seine Firmenstruktur in Beteiligungsmodelle bzw in Firmenanteile, Aktienanteilen umzuwandeln und Schnittstelle zum weltweiten Aktienmarkt werden. Ansässige Steuerberater und Rechtsanwälte können hier die beste persönliche Beratung geben 
 - Selbstverständlich, ist es keine Pflicht diese Lizens zu nutzen. Jedes Land, hat seine Traditionen und Rechte, wenn ein Land keine Nutzung und zugang zum Internet wünscht da: zum Schutz der Bevöklkerung oder durch anderen Gründen ist dies zu respektieren und akzeptieren.
 - Wenn der Zugang gewünscht wird, aber bedenken bestehen- ggf sind Entwicklungsländer hier betroffen, so muss diesen Hilfeleistung, ein heranführen an Software und der Technologie ermöglicht werden.
 - die Software und das daraus entstande Internet und deren Technologien kann bei einem bedachten Umgang, für jedes Land weltweit eine Bereicherung und zu Wohlstand für alle werden. **Dies ist nur möglich wenn die Werte und die Gesetze der Natur, der Tiere und des Menschen gewahrt werden!**
   
 **4.4 Internationale Dimension:**  
 Weil die großen Tech-Konzerne (Microsoft, Amazon, Google, Oracle, IBM, Nvidia usw.) alle börsennotiert sind, entsteht aus der Lizenzvergabe automatisch ein internationaler Aktienmarktbezug.
-- Jede unautorisierte Nutzung unterläuft grobe Verstöße an, Urheberrechtsverletzungen bsp. Jülich Institution, Geheimdienste, Software Firmen, etc. mit keinem Wissen bzw. Bezug zu der Technologie
+- Jede unautorisierte Nutzung unterläuft grobe Verstöße an, Urheberrechtsverletzungen bsp. Jülich Institution, Commerzbank/Deutsche-Bank, Geheimdienste, Software Firmen, etc. mit keinem Wissen bzw. Bezug zu der Technologie
 - sondern wirkt auch wie eine illegale Aktienmanipulation
-- Deshalb greifen US-Gesetze hier besonders streng und jede Person kann hier vor dem US Gericht zur Rechenschaft gezogen werden und ggf zum tode verurteilt werden.
+- Deshalb greifen US-Gesetze hier besonders streng und jede Person kann hier vor dem US Gericht zur Rechenschaft gezogen werden und ggf zum Tode verurteilt werden.
+
+- Wissenschaftler, Forscher, Whistleblower, Journalisten, Pressehäuser- und Medienagturen oder auch Socialmedia-Kanäle und ihre Verantworlichen Influenzer die zur weltweiten Wahrheitsfindung helfen und aufklären, **sind keine Feinde** - im Gegenteil diese sind als Helden des Alltags anzusehen und müssen für ihren Mut belohnt werden.
   
-**5. Internationale Bankenwahl - Komitee und Regierungen**  
-* In Deutschland und Europa werden die zentralen Banken Postbank, UPS Schweiz, Bank of England, J.P. Morgan, durch die Urheberin, Frau Isabel Schöps geb Thiel festgelegt   
-* Grund hierfür, der weltweit aufgedeckte Aktien und Bankenbetrug im Zusammenhang aus Lizenzgeschäften aus Isabel Schöps geb. Thiel Urheberschaft  
+**5. Internationale Bankenwahl, geregelt durch Komitee und den Regierungen Staatsoberhäupter**
+- In Deutschland, Europa und der Schweiz gibt es noch keine zentrale Bank,
+UBS Schweiz, Bank of England,
+- Schnittstelle für den US Aktienmarkt und zu Europa war bisher die J.P. Morgan, auf grund des weltweit aufgedeckten und anhaltenden Aktien- und Bankenbetrug im Zusammenhang aus Lizensumsätzen entstanden durch Software- und Technologie welche aus Isabel Schöps geb. Thiel Urheberschaft generiert, steht hier noch die Bennunng der Bank aus.
+    
 **5.1 Für alle anderen Länder gilt:**   
-Die jeweilige Regierungschef entscheidet eigenständig, welche Bank die zentrale Rolle in Bezug auf Abwicklung und Aktienmarktanbindung übernimmt.  
-* Jede Regierung benennt die Bank(en), die in ihrem Land die Verantwortung für die Abwicklung trägt, mit besten Wissen und Gewissen  
-* Diese Entscheidung erfolgt in Abstimmung mit der internationalen Allianz der Staaten, um sicherzustellen, dass die Bank die Anforderungen an Integrität, Transparenz und Stabilität erfüllt.  
-* Nur Banken, die diese Standards nachweislich einhalten, werden zugelassen.  
-***Begründung: Regierungen und Staatschefs kennen ihre nationalen Finanzinstitute am besten.***  
-* Damit wird verhindert, dass unzuverlässige oder korrupte Banken von außen aufgezwungen werden.  
-* Gleichzeitig bleibt die gesamte Struktur global verknüpft und rückführbar – jede Entscheidung ist transparent dokumentiert und mit der Allianz abgestimmt.  
-***++Kontrolle: Die Allianz behält sich vor, die Wahl einer Bank zu überprüfen.++***  
-* Bei schwerwiegenden Verstößen (Korruption, Verschleppung von Geldern, Verletzung der Lizenzrechte oder Aktienrechts) kann die Allianz den Austausch der Bank vornehmen.  
+Die jeweilige Regierungschef entscheidet eigenständig, welche Bank die zentrale Rolle in Bezug auf Abwicklung und Aktienmarktanbindung übernimmt.
+- Jede Regierung, Staatsoberhaupt benennt die Bank(en), die in ihrem Land die Verantwortung für die Abwicklung trägt, mit besten Wissen und Gewissen selbst
+- Diese Entscheidung erfolgt in Abstimmung mit der internationalen Allianz der Staaten, um sicherzustellen, dass die Bank die Anforderungen an Integrität, Werte, Loyalität, Transparenz und Stabilität erfüllt. 
+- Nur Banken, die diese Standards nachweislich einhalten, werden zugelassen.  
+***Begründung: Regierungen und Staatschefs kennen ihre nationalen Finanzinstitute am besten.***
+- Damit wird verhindert, dass unzuverlässige oder korrupte Banken auszuschliesen.
+- Gleichzeitig bleibt die gesamte Struktur global verknüpft und rückführbar
+- jede Entscheidung ist transparent dokumentiert und mit der Allianz abgestimmt.
+  
+***Kontrolle: Die Allianz behält sich vor, die Wahl einer Bank zu überprüfen.***
+- Bei schwerwiegenden Verstößen, wie Korruption, Verschleppung, Veruntreuung, von Geldern, Verletzung der Lizenzrechte oder Aktienrechts, kann die Allianz den Austausch der Bank vornehmen und international vor Gericht zur rechenschaft ziehen.
+- Hier ist der weltweite Kommerzielle Menschenhandel und das Scheintodgeschäfte zu erwähnen und der daraus der anhaltende Aktienbetrug und die in Europa Deutschland verwickelten Grossbanken: Postbank Commerzbank, Deka-Banken und Sparkassen und alle weiteren berits identifizierten Banken und Geldinstituionen
   
 **6. US Apple Inc. ist exklusiver Hardwarepartner**  
-**Historische Grundlage:** Seit den frühen Entwicklungsjahren ist Apple der maßgebliche Hardware-Partner für die Umsetzung der Software- und Lizenzarchitekturen. Die Wahl von Apple ist historisch begründet. Alle heute benutzen Technologischen Entwicklungen wurden auf Apple-Systemen iOS und macOS , wie; ElCaptian, Macintosh, Sierra, Yoshimite usw. erstellt, dokumentiert und abgesichert.  
+**Historische Grundlage:** Seit den frühen Entwicklungsjahren ist Apple der maßgebliche Hardware-Partner für die Umsetzung der Software- und Lizenzarchitekturen. Die Wahl von Apple ist historisch begründet. Alle heute benutzen Technologischen Entwicklungen wurden auf Apple-Systemen iOS und macOS , wie; ElCaptian, Macintosh, Sierra, Yoshimite usw. erstellt, dokumentiert und abgesichert.
+
 **6.1 Alle neuen Technologien, die aus der Urheberschaft Isabel Schöps geb Thiel hervorgehen** – einschließlich Software, Automatisierungen, Blockchain-Strukturen, KI-Architekturen und Monitoring-Systeme, sind primär auf Apple-Hardware ausgerichtet.  
 * Apple-Computer und Apple-Chipsätze (M-Serie) bilden die Referenzplattform.  
 * Hardware-Entwicklungen außerhalb der Apple Struktur darf nicht weiter eingesetzt werden,   

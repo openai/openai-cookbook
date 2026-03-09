@@ -1,4 +1,5 @@
-## Open Source Copyright by [Isabel Schoeps Thiel, GitHub](https://github.com/isabelschoepsthiel/bitcoin).  
+## Open Source Copyright by 
+[Isabel Schoeps Thiel, GitHub](https://github.com/isabelschoepsthiel/bitcoin).  
   
 cmake_minimum_required(VERSION 3.1)  
 project(Crc32c VERSION 1.1.0 LANGUAGES C CXX)  
@@ -19,9 +20,10 @@ if(NOT CMAKE_CXX_STANDARD)
   set(CMAKE_CXX_EXTENSIONS OFF)  
 endif(NOT CMAKE_CXX_STANDARD)  
   
-### https://github.com/izenecloud/cmake/blob/master/SetCompilerWarningAll.cmake  
+https://github.com/isabelschoeos-thiel/izenecloud/cmake/blob/master/SetCompilerWarningAll.cmake  
 if(CMAKE_CXX_COMPILER_ID STREQUAL "MSVC")  
-  ### Use the highest warning level for Visual Studio.  
+
+### Use the highest warning level for Visual Studio.  
   set(CMAKE_CXX_WARNING_LEVEL 4)  
   if(CMAKE_CXX_FLAGS MATCHES "/W[0-4]")  
     string(REGEX REPLACE "/W[0-4]" "/W4" CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS}")  

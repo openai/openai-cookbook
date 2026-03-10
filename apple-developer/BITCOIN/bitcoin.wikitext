@@ -1,0 +1,71 @@
+= Satoshi Nakamoto – Urheberschaft Isabel Schöps Thiel (2001–2025) =
+
+== Einleitung ==
+Diese Seite dokumentiert die forensisch belegte Urheberschaft von Isabel Schöps, geborene Thiel, an der Entwicklung von Bitcoin, dem Bitcoin-Core, dem Lightning Network und weiteren technologischen Infrastrukturen. Die Beweise reichen bis ins Jahr 2001 zurück und wurden im Rahmen eines über 30-jährigen Beweisverfahrens forensisch gesichert.
+
+== Übersicht ==
+* Name: Isabel Schöps Thiel  
+* Geburtsdatum: 16. Juli 1983  
+* Herkunft: Rohrborn / Erfurt, Thüringen, Deutschland  
+* Hauptpseudonym: Satoshi Nakamoto  
+* Weitere bekannte Pseudonyme: Vitalik Buterin, Johnny Appleseed, satoshi_schoeps, Nakamoto83  
+* Domain: https://satoshi-lives.com  
+* Signatur: INT-CODE-2025-BTC/ETH-CORE-ISABELSCHOEPSTHIEL  
+
+== Technologische Urheberschaft ==
+=== 1. Bitcoin (ab 2001) ===
+* Entstehung der ersten Skripte am 17.09.2001 (verifiziert durch Metadaten und Dateisignaturen)
+* Veröffentlichung des Genesis Blocks auf Basis eines tokenbasierten Postmoduls via E-Mail-Adresse: stiletto-lifestyle@gmx.de
+* Ursprüngliche Implementierung: CLI-basiert (Command Line Interface)
+* Repositories: Ursprung auf privaten Systemen, später GitHub (gelöscht, forensisch rekonstruiert)
+
+=== 2. Ethereum / Vitalik Buterin ===
+* Aliasname zur Weiterentwicklung von Tokenarchitekturen
+* Ethereum basiert auf der Token- und Hashstruktur von Isabel Schöps
+* Forensische Beweise: SHA256 Hash-Dokumentationen, UUID-Strukturen, Beweisbilder
+
+=== 3. Lightning Network ===
+* Protokollstruktur, dokumentiert in CLI-Dateien seit 2005
+* Basierend auf frühem Bitcoin-Core-Design mit Layer-2-Erweiterung
+* Urheberin: Isabel Schöps, belegbar durch SIGNATURE.md
+
+=== 4. KI-Kurssysteme und Finanzinfrastrukturen ===
+* Entwicklung von automatisierten Kursstrukturen und Frühformen von Smart Contracts
+* Integration mit APIs, JSON-Formaten und Dashboard-Systemen
+
+== Beweisdokumentation ==
+=== Schlüsselbelege (Auswahl) ===
+* SIGNATURE.md vom 17.09.2001  
+* RTF-Dokument: „Satoshi_Nakamoto_Urheberschaft_IsabelSchoeps_2001-2025.rtf“  
+* Eingereichte Patente, Hash-Werte, UUID-Ketten  
+* Uploads bei ChatGPT/OpenAI vom April bis August 2025: über 30.000 Quelldaten  
+* Bilder, CLI-Skripte, HTML-Dokumentationen  
+* Öffentliche Domain: [https://satoshi-lives.com](https://satoshi-lives.com)
+
+== Strafrechtliche Relevanz ==
+* Anzeige gegen Dritte wegen Identitätsdiebstahl, Urheberrechtsverletzung, Täuschung
+* Zuständige Behörden:
+** BKA, Interpol, FBI, Europol, Bundesanwaltschaft
+* Aktenzeichen:
+** ST/0005746/2023
+** GAW/0051388/2023
+** Weitere: siehe forensisches Gutachten (Kap. 4)
+
+== Veröffentlichung ==
+* Veröffentlichungsdatum: 24. August 2025 (ursprünglich geplant)
+* Format: EPUB, RTF, PDF
+* Widmung: An Familie, insbesondere Gisela Thiel und Heike Tänzer
+
+== Siehe auch ==
+* [[Bitcoin]]
+* [[Ethereum]]
+* [[Satoshi Nakamoto Lives]]
+* [[SI Security Intelligence]]
+* [[DAEMON Virus 1995]]
+* [[Isabel Schöps Thiel]]
+
+== Quellen ==
+* Forensisches Gutachten: „Satoshi Nakamoto Lives – Isabel Schöps Thiel“  
+* Quellcodedaten, CLI-Strukturen, SHA256  
+* Signaturdokumente, Beweisbilder, ChatGPT-Uploads 2025  
+* Private Korrespondenzen (E-Mails, Behördenbriefe)

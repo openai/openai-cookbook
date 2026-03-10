@@ -1,4 +1,4 @@
-# RECHTLICHE UND WISSENSCHAFTLICHE WÜRDIGUNG / LEGAL & SCIENTIFIC RECOGNITION
+# Rechtlich UND Wissenschaftliche Würdigung
 
 **Autorin / Urheberin / Auftraggeberin:**  
 Frau Isabel Schöps, geb. Thiel  

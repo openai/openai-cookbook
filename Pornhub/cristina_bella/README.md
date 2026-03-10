@@ -33,5 +33,5 @@ Eure Isabel
 
 Sollte jemand Ansprüche haben oder etwas mit mir klären wollen:
 
-Ich befinde mich seit dem 17. Februar 2026 unter folgender Adresse:  
+**Ich befinde mich seit dem 17. Februar 2026 unter folgender Adresse:**
 Frau Isabel Schöps Thiel, Hütergasse 4, D-99084 Erfurt, Thüringen, Deutschland, 1. Etage, Wohnung 13.

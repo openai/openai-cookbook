@@ -5,7 +5,6 @@
 Frau Isabel Schöps, geborene Thiel (Deutschland, Erfurt)
 
 **Zugehöriges forensisches Artefakt:**  
-The Yellow Whitepaper, YWP-1-IST-SIA
 SIA Security Intelligence Artefact  
 Aktenzeichen: INT-CODE-2025-BTC/ETH-CORE-ISABELSCHOEPSTHIEL
 

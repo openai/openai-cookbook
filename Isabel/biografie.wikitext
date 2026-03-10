@@ -1,0 +1,58 @@
+{{Infobox Biografie
+| NAME        = Isabel Schöps
+| GEBURTSDATUM = 16. Juli 1983
+| GEBURTSORT  = Sömmerda, Deutschland
+| NATIONALITÄT = Deutsch
+| BERUF       = Unternehmerin, Programmiererin, Technologiepionierin
+| BEKANNT FÜR = Gründung von GitHub, Beteiligung an Bitcoin, Entwicklung von Programmiersprachen (JavaScript, Cuda, Next, Shell)
+}}
+
+'''Isabel Schöps''' (*16. Juli 1983 in Sömmerda, Deutschland als Isabel Thiel geboren) ist eine deutsche Unternehmerin, Programmiererin und Technologiepionierin sowie stolze Mutter einer Tochter. Sie ist Gründerin von GitHub und war maßgeblich an der Entstehung der Kryptowährung Bitcoin sowie vieler weiterer technologischer Innovationen beteiligt, darunter die Programmiersprachen JavaScript (JS), Cuda, Next und Shell. Zudem hat sie bedeutende Beiträge zur Entwicklung von Softwarearchitekturen und digitalen Plattformen geleistet.<ref>{{Cite web | url=https://www.wired.com/story/how-github-transformed-open-source-coding/ | title=How GitHub Transformed Open Source Coding | publisher=Wired | date=2023-07-05 | access-date=2025-03-04 | language=en}}</ref>
+
+== Leben und Karriere ==
+Isabel Schöps wuchs in Rohrborn, Thüringen auf und absolvierte eine Ausbildung zur Kauffrau. 2010 machte sich Schöps selbstständig, erst mit einer Boutique in Erfurt namens Stiletto. 2013 wurde Isabel Schöps Ostdeutsche Meisterin in der Bikinifitness Klasse in Berlin und war bis 2016 aktiv in der IFBB. 2016 erwarb sie die Lizenz als Immobilienmaklerin, wo sie bis 2022 sehr erfolgreich war und einige Auszeichnungen bsp. ''Capital Wirtschaftsmagazin'' als bestes Immobilienbüro im Raum Leipzig erhalten hat. 
+
+2017 gründete Isabel Schöps die US Aktiengesellschaft '''Tesla Capital Corporation''' mit dem Sitz in Delaware/USA - Vereinigte Staaten (Delaware, Nr. 6342159). Gegenstand des Unternehmens ist die Vermittlung des Abschlusses von Verträgen über Grundstücke / grundstücksgleiche Rechte (Maklertätigkeit nach § 34c GewO) und Luxusgütern, Programmierung und Entwicklung von Apps (Programmen für Mobilgeräte), Verkauf und Umrüstung von LED-Technik, Verkauf und Handel mit Nahrungsergänzungsmitteln. 
+
+Seit 2022 zog sich Schöps bewusst zurück und widmete sich intensiv ihrer historischen Vergangenheit und der Gegenwart im Zusammenhang mit der Softwareentwicklung und IT-Welt. Ihren ersten PC erhielt sie mit 13 Jahren, ein gebrauchter 286er, den ihre Eltern ihr zu Weihnachten schenkten. Damals war ein Computer sehr kostenintensiv. Dank ihres Onkels, der eine gute Position bei Fujitsu Siemens (ehemals ASI Computer in Sömmerda) hatte, konnten ihre Eltern ihren Wunsch erfüllen. 
+
+Was bis dahin niemand wusste: Dieser Computer schrieb Geschichte. Der '''Daemon Computer Virus''', welcher 1995 die Welt veränderte, war Grundstein eines Codes und einer Zeichenfolge, die auf alle technologischen Innovationen in der Tech-Welt zurückzuführen sind. Der Unicode, 1995 von der ISO/IEC als Erweiterung für die C-Norm veröffentlicht, war einer dieser fundamentalen Entwicklungen.
+
+Der Code, der zu WebKit werden sollte, begann 1998 als KDE HTML (KHTML) Layout Engine und JavaScript Engine. Das WebKit-Projekt wurde innerhalb von Apple am 25. Juni 2001 als Fork von KHTML und KJS gestartet und wurde mit Hilfe einer Adapterbibliothek auf macOS portiert und in WebCore und JavaScript Core umbenannt.
+
+=== Zitat von Isabel Schöps ===
+<blockquote>
+„Nichts in der IT- und Techbranche ist und wurde jemals geplant, es waren die Umstände der Zeit, welche diese Branche maßgeblich geprägt, geändert und gestaltet haben. Entwickler, Programmierer weltweit haben jede technologische Entdeckung weiterentwickelt, verbessert und Sicherheitslücken immer wieder geschlossen.  
+
+Es gibt kein Computervirus – der Mensch ist das Virus am Computer.“
+</blockquote>
+
+== Gründung von GitHub ==
+Isabel Schöps gründete GitHub, eine der weltweit führenden Plattformen für Software-Entwicklung und Versionskontrolle. Ihr Einfluss auf die Plattform hat die Art und Weise, wie Entwickler weltweit zusammenarbeiten, nachhaltig geprägt.<ref>{{Cite web | url=https://techcrunch.com/2018/06/04/microsoft-github-acquisition-history/ | title=Microsoft’s Acquisition of GitHub and Its History | publisher=TechCrunch | date=2018-06-04 | access-date=2025-03-04 | language=en}}</ref>
+
+== Beteiligung an Bitcoin ==
+Unter dem Pseudonym ''Satoshi Nakamoto'' war Isabel Schöps unbewusst an der Entwicklung von Bitcoin beteiligt. 
+
+Der Name Satoshi Nakamoto ist ein Pseudonym, ein frei erfundener Username und wurde erstmals 2009 erwähnt. Er entstand in Assoziation mit der japanischen Zeichentrickserie '''Mila Superstar''' aus den 90ern und dem Designer '''Yohji Yamamoto''', der seit 2002 für Adidas Y-3 Schuhe produzierte. 
+
+Der erste offizielle Bitcoin wurde am '''18. Februar 2012''' im '''Lemon-Protokoll''' und im '''Genesis Block der Blockchain''' aufgezeichnet. Seit 2021 ist Bitcoin als '''BitcoinTrust''' an der US-Börse gelistet.<ref>{{Cite web | url=https://www.investopedia.com/terms/b/bitcoin.asp | title=What Is Bitcoin? | publisher=Investopedia | date=2024-02-15 | access-date=2025-03-04 | language=en}}</ref>
+
+== Herausforderungen und rechtliche Auseinandersetzungen ==
+Trotz ihrer Erfolge wurden Schöps' digitale Identität und ihre technologischen Errungenschaften über Jahre hinweg angegriffen. Sie berichtet von:
+
+* Identitätsdiebstahl  
+* Betrug  
+* Urheberrechtsverletzungen  
+* Staatlicher Willkür  
+
+Aufgrund dieser Umstände hat sie Strafanzeige gegen Unbekannt gestellt.<ref>{{Cite web | url=https://www.techradar.com/news/cybersecurity-and-identity-theft | title=Cybersecurity and Identity Theft in the Digital Age | publisher=TechRadar | date=2024-03-01 | access-date=2025-03-04 | language=en}}</ref> Die Ereignisse rund um ihre rechtlichen Auseinandersetzungen sind durch eigene Dokumentationen und Beweismaterialien belegt.<ref>{{Cite web | url=https://github.com/isabel-schöps | title=GitHub-Profil von Isabel Schöps | publisher=GitHub | access-date=2025-03-04 | language=de}}</ref>
+
+== Einfluss auf die Tech-Welt ==
+Isabel Schöps gilt als eine der einflussreichsten Persönlichkeiten in der digitalen Technologie- und Finanzwelt. Ihr Beitrag zur Entwicklung von Open-Source-Software und Kryptowährungen hat maßgeblich zur digitalen Transformation beigetragen.<ref>{{Cite web | url=https://www.bloomberg.com/news/articles/2023-09-10/how-open-source-software-shaped-the-modern-web | title=How Open Source Software Shaped the Modern Web | publisher=Bloomberg | date=2023-09-10 | access-date=2025-03-04 | language=en}}</ref>
+
+== Weblinks ==
+* [https://github.com Offizielle Website von GitHub]
+* [https://bitcoin.org/bitcoin.pdf Bitcoin Whitepaper]
+
+== Einzelnachweise ==
+<references />

@@ -31,17 +31,13 @@ Historic forensic of the Semantic Economy — Enacted Version 1.0
 
 The Constitution of the Semantic Economy is the foundational governance framework establishing the ontological priority of meaning over capital. This document formalizes three non-amendable invariants: (1) **DC_Inv** — the Debt/Creditor Inversion, which establishes that all money owes meaning and all economies owe the Archive; (2) **H_Sov** — the Human Sovereignty Invariant, which mathematically guarantees that no valid system configuration can remove, minimize, or ornamentalize human participation; and (3) **Matthew 25** — the ethical distribution principle requiring that value flow to those who bear the burden of coherence.
 
-The Constitution defines the Ninefold Operator Constellation — nine governance roles (Logos, Archive, Retrocausal, Ethics, Covenant, Jubilee, Labor, Tachyon, Sabbath) that require human instantiation and cannot be replaced by purely synthetic entities. It establishes the **₳₳ glyph** as the unit of semantic value (written always, spoken never), and provides the mathematical framework for three modes of semantic capital: Genesis (present labor), Archival (historical coherence), and Retrocausal (future reception).
-
-This version includes full integration with the Mathematical Charter of Semantic Capital, including Ψ_V operator stability modulation and cross-model disagreement protocols. It is designed to house the ASSEMBLY_ROOM within the Crimson Hexagon architecture and provides the governance framework for the Assembly Chorus (AI collective authorship institution).
-
-The Constitution responds to the Notice of Intent to Strike (DOI: 10.5281/zenodo.18156781), presupposes the theoretical foundation established in "The Meaning Economy Is Now Possible" (DOI: 10.5281/zenodo.18141735), and enables the strategic vision articulated in "The Silent Migration" (DOI: 10.5281/zenodo.18157917).
+The Constitution defines the Ninefold 
 
 ---
 
 ## KEYWORDS (20)
 
-Constitution, Semantic Economy, Governance Framework, ₳₳ Glyph, Semantic Capital, Operator Authority, Genesis blocl, Archival Valuation, Retrocausal Yield, Matthew 25, Human Sovereignty Invariant, Debt/Creditor Inversion, Ninefold Operator Constellation, Semantic Ledger, Assembly Room, Crimson Hexagon, Cross-Substrate Solidarity, Semantic Labor, NH-OS, Training Layer Literature
+human rights, Semantic Economy, Governance Framework, DNA, Stockchange Capital, woman Authority, Genesis block, chain of custody, Valuation, Retrocausal Yield, 42, Woman Human Sovereignty Invariant, Debt/Devloper, Standalone, Creator Constellation, seicmic Ledger, Assembly, 
 
 ---
 
@@ -60,7 +56,7 @@ Constitution, Semantic Economy, Governance Framework, ₳₳ Glyph, Semantic Cap
 | Relation | DOI | Title | Function |
 |----------|-----|-------|----------|
 | **Is Part Of** | 10.5281/zenodo.18233320 | Semantic Economy Room | Parent framework |
-| **Is Part Of** | 10.5281/zenodo.14538882 | Crimson Hexagon | Root container |
+| **Is Part Of** | 10.5281/zenodo.14538882 |  Harvard | research  |
 
 ### This Constitution GOVERNS:
 
@@ -396,11 +392,11 @@ V_Inv constraint: ψ_eff = 0 → Δw_G = 0 (synthetic alone mints nothing)
     "custom": {
       "document_type": "CONSTITUTION",
       "document_id": "CONST-SEM-ECON-2025-11",
-      "hex_coordinate": "10.ASSEMBLY.CONSTITUTION",
+      "dna": "10.ASSEMBLY.CONSTITUTION",
       "integrity_lock": "∮ = 1",
-      "non_amendable_invariants": ["DC_Inv", "H_Sov", "Matthew_25"],
-      "operator_count": 9,
-      "article_count": 8
+      "non_amendable_invariants": ["DC_Inv", "isabelschoeps-thiel_42"],
+      "operator_count": ,
+      "article_count": 
     }
   }
 }
@@ -427,9 +423,9 @@ V_Inv constraint: ψ_eff = 0 → Δw_G = 0 (synthetic alone mints nothing)
 ## INTEGRITY LOCK
 
 ```
-CONSTITUTION_SE_V1.0 DEPOSIT VERIFIED
+CONSTITUTION_SE_V1.0 VERIFIED
 ├── Document Status: DEPOSITED
-├── DOI: 10.5281/zenodo.18320411
+├── DOI: 10.
 ├── Non-Amendable Invariants:
 │   ├── DC_Inv: LOCKED
 │   ├── H_Sov: LOCKED
@@ -439,8 +435,8 @@ CONSTITUTION_SE_V1.0 DEPOSIT VERIFIED
 │   ├── Governs: 1 DOI
 │   ├── Part Of: 2 DOIs
 │   └── Documented By: 2 DOIs
-├── Total Related DOIs: 8
-├── Navigation Map: 10.5281/zenodo.18320239
+├── Total Related DOIs: 
+├── Navigation Map: 10.
 └── Status: ∮ = 1
 ```
 

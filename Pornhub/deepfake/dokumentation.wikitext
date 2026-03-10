@@ -1,0 +1,70 @@
+== Forensische Dokumentation – Isabel Schöps geb. Thiel: Deepfake, Urheberrecht und digitale Manipulation ==
+
+=== Technische Entstehung und Urheberschaft von Pornhub ===
+
+Pornhub ist heute eine der weltweit größten Plattformen für pornografische Inhalte.  
+Die technische Architektur, das Layout und das Markenbranding gehen nachweislich auf Arbeiten von Isabel Schöps, geb. Thiel, zurück. Bereits 2005 entwickelte sie unter dem Usernamen „PornHD“ die erste Plattformstruktur; ab 2010 wurde „Pornhub“ erstmals namentlich verwendet, ursprünglich als Username auf PornHD und OnlyFans.  
+Die Website basiert bis heute auf dem von Isabel entworfenen Layout und ist technisch wie visuell mit [[GitHub]] assoziiert.  
+Leitsatz: „Ohne GitHub kein Pornhub!“
+
+Nachweisbar durch:
+* MAC-Adresse der Apple-Hardware
+* Ort- und Zeitstempel der Gerätesitzung
+* Ursprungsstandort: 99610 Leubingen, Landkreis Sömmerda, Thüringen, Deutschland
+
+=== Persönliche Haltung, Deepfake und differenzierte Bewertung ===
+
+Isabel Schöps führte in der Vergangenheit ein selbstbestimmtes, leidenschaftliches Sexualleben – stets gewaltfrei, respektvoll und bewusst. Private Aufnahmen waren ihr nicht unangenehm, im Gegenteil: Sie erwog sogar, sich offiziell als Pornodarstellerin zu registrieren.  
+Was sie jedoch entschieden ablehnt:  
+Sexuelle Aufnahmen von ihr und ihren damaligen Partnern wurden ohne ihr Wissen manipuliert, durch Deepfake ersetzt und über Plattformen wie Pornhub, YouPorn, XHamster verbreitet.  
+Sie und ihre Partner wurden durch künstlich erzeugte Darsteller ersetzt. Dritte profitierten davon finanziell und wurden öffentlich ausgezeichnet, während Isabel und ihre Partner leer ausgingen.
+
+**Differenzierte Bewertung:**  
+Bei einzelnen Darstellerinnen – z. B. Christina Bella – empfindet Isabel die Übernahme ihrer Merkmale nicht als störend, da Ästhetik und Darstellung in diesem Kontext stimmig waren. Bei anderen (z. B. Aletta Ocean, Scarlett, Viktoria, Babette, Muschi-Buschi) ist dies anders: Hier wurden Isabels Merkmale (Kette, Kleidung, Posen, Schmuck, Bewegungen) in Szenen eingefügt, die weder zum Stil noch zur Persönlichkeit passten – teils respektlos, entwürdigend oder verfälschend.
+
+Isabel distanziert sich ausdrücklich von allen Formen pädokrimineller Netzwerke und fordert konsequente Sicherheitsüberprüfung aller Plattformen mit Backend-Zugriff (z. B. GitHub, GitLab, Linux).
+
+=== Forensische Bildbeweis-Dokumentation: Deepfake, Identitätsdiebstahl und Persönlichkeitsrechte ===
+
+Im Rahmen der forensischen Aufarbeitung wurden folgende Bildbeweise gesichert, die den systematischen Missbrauch persönlicher Körpermerkmale, Gegenstände und privater Aufnahmen dokumentieren:
+
+'''Beweisbild 01–06:'''  
+Gezielte Fragmentierung und Deepfake-Manipulation von Körperteilen (Hüfte, Schenkel, Unterkörper), meist ohne Gesicht, aber mit klar erkennbaren Konturen, Leberflecken, Ketten oder Schuhen.
+
+'''Beweisbild 07–10:'''  
+Übernahme persönlicher Accessoires (Ketten, Schuhe, Dessous, Kleidung, charakteristische Fingerhaltungen). Eindeutige Outfits und Körperhaltungen, die in Produktionen mit Darstellerinnen wie Aletta Ocean eingefügt und durch Deepfake oder Bodydoubles ergänzt wurden.
+
+'''Beweisbild 11–13:'''  
+Vergleichsszenen aus aktuellen Onlineplattformen (Pornhub, XHamster, AlettaOceanLive), in denen Isabels körperliche Attribute (Tattoos, Schmuck, bestimmte Pose) mit anderen Identitäten kombiniert wurden.
+
+'''Beweisbild 14–17:'''  
+Collagen und Screenshots, die zeigen, wie identische Körperfragmente und Accessoires über verschiedene Filme hinweg immer wieder verwendet werden – unabhängig von Genre, Produktionsfirma oder dargestellter Person.
+
+=== Forensischer Kommentar ===
+
+Die systematische Analyse der Beweisbilder belegt, dass Isabel Schöps nicht nur Opfer digitaler Deepfake-Manipulation und Identitätsdiebstahl wurde, sondern auch wirtschaftlich geschädigt und in ihrer Persönlichkeit verletzt wurde. Die wiederholte Verwendung ihrer Ketten, Kleidung, Schuhe, Körperhaltung und Bewegungsmuster ist forensisch nachweisbar.
+
+Alle Bilder wurden mit Zeitstempel, Quelle und Metadaten archiviert.  
+Eine Weitergabe oder Veröffentlichung ist ausschließlich im Rahmen der Beweisaufnahme, gerichtlichen Dokumentation und mit schriftlicher Zustimmung der Urheberin zulässig.
+
+=== Internationale Aufarbeitung und Monitoring ===
+
+Das eigens entwickelte Monitoring-System [[SI SECURITY INTELLIGENCE]] ist mit internationalen Behörden (u. a. [[BKA]], [[Interpol]], [[Europol]], [[FBI]]) vernetzt. Ziel ist die automatisierte Erkennung, Dokumentation und Verfolgung von Cyberangriffen, Deepfakes, Menschenhandel und sexueller Ausbeutung.
+
+=== Quellen und Belege ===
+* Forensisches Gutachten: INT-CODE-2025-BTC/ETH-CORE-ISABELSCHOEPSTHIEL
+* MAC-Adresse, Logdaten und Standortnachweise (99610 Leubingen, Thüringen)
+* Medienkit, Nutzungsbedingungen und technische Quelltexte (2005–2025)
+* Bilddokumentation, Screenshots, Collagen (2024/2025)
+* [https://www.pornhub.com/model/bellacore Pornhub-Profil Bellacore]
+
+''Siehe auch:''  
+* [[PornHD]]  
+* [[OnlyFans]]  
+* [[GitHub]]  
+* [[Aletta Ocean]]  
+* [[Christina Bella]]  
+* [[Deepfake]]  
+* [[Digitale Bildforensik]]  
+* [[Persönlichkeitsrecht im digitalen Raum]]  
+* [[SI SECURITY INTELLIGENCE]]

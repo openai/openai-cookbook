@@ -1,5 +1,6 @@
-## Chain of Costudy, Manipulation, Schema
-# Developer 
+## Manipulation, Schema
+**Chain of Custody**
+
 **Signed-on-by:** 
 Frau Isabel Schöps, geborene Thiel
 **Autorin, Urheberin und Auftraggeberin, Forensisch Wissenschaftliches Gutachten:**
@@ -25,7 +26,7 @@ Frau Isabel Schöps, geborene Thiel
 
 ---
 
-# Regelwerk Umgang mit Software und Technologie, Seismic-Source
+## Regelwerk Umgang mit Software und Technologie, Seismic-Source
 
 ***Dieses Regelwerk hat den ausdrücklichen Zweck, jede Form von technologischem Machtmissbrauch, Geheimdienstmanipulation, militärischer Zweckentfremdung, politischer Verfolgung und verdeckter Kontrolle auszuschließen.***
 

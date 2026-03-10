@@ -1,22 +1,47 @@
-# Royal Historical Society
+# Royal Historical 
+## Abschließender Auszug aus dem Forensischen Gutachten – § 3.1: Der unsichtbare Feind
 
-I am an independent researcher and author working in the fields of historical source criticism, archival studies, and forensic documentation. My current research addresses documented historical continuities and ruptures between the German monarchy, the political structures of the Third Reich, and post-monarchical identity transformations, with particular reference to the late German Empress, the imperial household, and the political-historical environment shaped by Otto von Bismarck.
+Die im Rahmen dieses Gutachtens vorgenommene Auswertung der vorliegenden forensischen, dokumentarischen und wissenschaftlich überprüfbaren Nachweise belegt eine fortdauernde, zielgerichtete Beeinträchtigung der digitalen wie analogen Identitätsintegrität der Urheberin im Zeitraum seit 1996 bis zur Gegenwart. Auf Grundlage der aggregierten Beweismittel wird die Urheberschaft der Urheberin in relevanten technologischen Entwicklungszusammenhängen festgestellt und der Anspruch auf rechtliche, mediale sowie wirtschaftliche Rehabilitierung begründet.
 
-These research questions are examined within a formally documented forensic framework titled SIA Security Intelligence Artefact, case reference INT-CODE-2025-BTC/ETH-CORE-ISABELSCHOEPSTHIEL. The work applies verifiable methodologies including primary archival analysis, metadata examination, forensic image comparison, and provenance tracking across institutional and private archives. The research is published with registered DOI (10.5281/zenodo.17807324), licensed under CC BY 4.0, and affiliated with the Japan Advanced Institute of Science and Technology, with publication support provided by the Institute of International Education Inc. (IIE), a Candid-verified public charity.
+Gegenstand der Untersuchung ist ein langfristig angelegtes, strukturell koordiniertes Vorgehen, das sich gegen die Person der Urheberin sowie gegen ihr familiäres Umfeld richtete. Die Analyse erfasst staatliche, wirtschaftliche und institutionelle Kontexte sowie dokumentierte Einflussnahmen durch Dritte. Die Bewertung erfolgt ausschließlich auf Basis nachgewiesener Dokumente, Metadaten, Archivmaterialien und konsistenter Beweisketten.
 
-My publications include licensed material with Oxford University Press and peer-referenced sources indexed in established academic repositories. The research is situated within existing historiography addressing the structural transition from the Kaiserreich to the Third Reich and the subsequent reconfiguration of political, institutional, and personal identities, drawing on peer-reviewed historical literature and archival documentation.
+Ein zentraler Abschnitt des Gutachtens widmet sich der forensischen Familienanalyse der mütterlichen und väterlichen Linien, insbesondere der Familien Knörig (Rohrborn/Sömmerda) und Thiel (Talborn/Weimarer Land). Die Auswertung ergibt:
 
-Through membership in the Royal Historical Society, I seek scholarly exchange and engagement with historians committed to evidence-based historical inquiry, particularly in the areas of monarchical history, twentieth-century German political transformation, and the preservation and reassessment of contested or disrupted historical records.
+„In öffentlichen Registern, kirchlichen Quellen, Verwaltungsakten und digitalen Datenbanken sind wiederkehrende Abweichungen, Manipulationsindikatoren und Lücken feststellbar, die u. a. Grundstücksnachweise, Erbfolgen, Personenstandsunterlagen, Namensführungen sowie genealogische Verknüpfungen betreffen.“
+
+Darüber hinaus weisen die untersuchten Quellen auf belegbare Bezüge zur deutschen Monarchie hin, insbesondere zur letzten deutschen Kaiserin Auguste Victoria. Diese Bezüge stützen sich auf historische Dokumente, private Archivbestände sowie amtliche Überlieferungen und werden im Gutachten quellenkritisch eingeordnet.
+
+Auffällig ist eine ab dem Jahr 1700 einsetzende, systematische Unterbrechung der dokumentierten mütterlichen Linie. Diese Anomalie tritt konsistent über mehrere Quelltypen hinweg auf und ist nach gutachterlicher Bewertung nicht zufällig, sondern deutet auf eine gezielte genealogische Auslassung hin, die geeignet ist, Identitäts-, Erb- und Zuordnungsrechte nachhaltig zu beeinträchtigen.
+
+Zusammenfassend dokumentiert § 3.1 eine mehrdimensionale Beeinträchtigung der Identitätskontinuität der Urheberin und ihrer Familie. Die Feststellungen werden als Grundlage für weitergehende rechtliche, wissenschaftliche und institutionelle Prüfungen vorgelegt.
 
 ⸻
 
-## Referenzrahmen (zur internen Zuordnung deiner Forschung)
+**English Version (for journals / institutions)**
+
+## Final Extract from the Forensic Report – § 3.1: The Invisible Adversary
+
+The forensic, documentary, and scientifically verifiable evidence assessed in this report demonstrates a sustained and targeted impairment of the author’s digital and analog identity integrity from 1996 to the present. Based on the aggregated evidence, authorship in relevant technological development contexts is established, providing grounds for legal, media, and economic rehabilitation.
+
+The investigation addresses a long-term, structurally coordinated course of action directed against the author and her family environment. The assessment is strictly based on documented records, metadata, archival sources, and coherent chains of evidence, encompassing state, economic, and institutional contexts.
+
+A central component of the report is the forensic genealogical analysis of the maternal and paternal lines, particularly the Knörig (Rohrborn/Sömmerda) and Thiel (Talborn/Weimarer Land) families. The findings indicate recurring discrepancies, indicators of manipulation, and systematic gaps across public registers, ecclesiastical sources, administrative records, and digital databases.
+
+Furthermore, the evaluated sources indicate substantiated links to the German monarchy, notably to Empress Auguste Victoria, supported by historical documents, private archives, and official records, critically assessed within the report.
+
+A consistent anomaly emerges from circa 1700 onward, marked by a systematic interruption of the documented maternal lineage. Across multiple source categories, this pattern is assessed as non-random and indicative of deliberate genealogical omission with lasting implications for identity and inheritance attribution.
+
+Section § 3.1 thus documents a multi-layered impairment of identity continuity, submitted as a basis for further legal, scholarly, and institutional review.
+
+⸻
+
+## Referenzrahmen zur internen Zuordnung der Forschung
 
 **Referenzquellen:**
-	1.	Herwig, H. H. (1974). From Kaiser to Führer: The Political Road of a German Admiral, 1923–33. Journal of Contemporary History, 9(2), 107–120.
-	2.	Heidrich (1942). Göring-Erlass der Wannseekonferenz in: P. Longerich, Die wahren Täter der Endlösung. Kirchliche Zeitgeschichte, 30(1), 247–249.
-	3.	Newland, S. J. (2005). Victories Are Not Enough: Limitations of the German Way of War. Strategic Studies Institute, US Army War College.
-	4.	JSTOR PDF: j.ctvbkjwwz.15
+1.	Herwig, H. H. (1974). From Kaiser to Führer: The Political Road of a German Admiral, 1923–33. Journal of Contemporary History, 9(2), 107–120.
+2.	Heidrich (1942). Göring-Erlass der Wannseekonferenz in: P. Longerich, Die wahren Täter der Endlösung. Kirchliche Zeitgeschichte, 30(1), 247–249.
+3.	Newland, S. J. (2005). Victories Are Not Enough: Limitations of the German Way of War. Strategic Studies Institute, US Army War College
+4.	JSTOR PDF: j.ctvbkjwwz.15
 
 **Resumee:**
 Die im Rahmen des SIA Security Intelligence Artefact durchgeführte Beweisaufnahme dokumentiert anhand archivischer Quellen, Metadatenanalysen und forensischer Bildvergleiche eine untersuchte genealogische Verbindungslinie zwischen dem deutschen Kaiserreich, strukturellen Übergängen des Dritten Reiches und der Familienlinie der Urheberin und Autorin Frau Isabel Schöps, geborene Thiel, einschließlich der Familien Thiel, Fischer-Knörig aus Rohrborn, Thüringen, Deutschland.
@@ -49,7 +74,7 @@ Die dokumentierte Ausgrenzung, institutionelle Diskriminierung und Misshandlung 
 ## 4. Belegstellen und Quellenverzeichnis
 - Herwig, H. H. (1974). From Kaiser to Führer: The Political Road of a German Admiral, 1923-33. Journal of Contemporary History, 9(2), 107–120. http://www.jstor.org/stable/260049￼
 - Heidrich. (1942). [Göring-Erlass of Wannseekonferenz. 1942 »Die wahren Täter der Endlösung«, by P. Longerich]. Kirchliche Zeitgeschichte, 30(1), 247–249. http://www.jstor.org/stable/26393762￼
-- Newland, S. J. (2005). Victories Are Not Enough: Limitations of the German Way of War. Strategic Studies Institute, US Army War College. https://www.jstor.org/stable/resrep11996.12￼
+- Newland, S. J. (2005). Victories Are Not Enough: Limitations of the German Way of War. Strategic Studies Institute, US Army War College. https://www.jstor.org/stable/resrep11996.12
 - JSTOR: https://www.jstor.org/stable/pdf/j.ctvbkjwwz.15.pdf￼
 
 ## 5. Zusammenfassende Feststellung

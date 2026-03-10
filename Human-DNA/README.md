@@ -1,4 +1,5 @@
-## Zerstörung meiner Familienstruktur aus dem Hause Knörig-Fischer und Thiel aus Rohrborn, Thüringen, Deutschland.
+# In der Genetik die Monarchie
+## Versuchte Zerstörung meiner Familienstruktur aus dem Hause Knörig-Fischer und Thiel aus Rohrborn, Thüringen, Deutschland.
 
 ### 1. Wiederkehrende Verweise auf „Dead“ im Kontext Thiel / Isabel Thiel
 	•	Die Google- und Archive.org-Suche nach „Isabel Thiel dead“ zeigt sofort kritische Begriffsverbindungen, u. a.:

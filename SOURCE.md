@@ -16,7 +16,7 @@ Geboren am 16.07.1983 um 23:20 im Sömmerdarer Kreiskrankenhaus, Thüringen, Deu
 **Kontakt:**
 +49-162-1819565
 E-Mail: si_foundation@icloud.com | isabelschoeps.github@icloud.com | schoepsisabel@gmail.com | isabelschoepsthiel@gmail.com
-Aktueller Aufenthaltsort: Stauffenbergerallee 33, 99085 Erfurt (seit 22.08.2025), gemeinsam mit Hund Don
+Aktuelle Meldeanschrift: erste Etage, Hütergasse 4, D-99084 Erfurt, Thüringen, Deutschland (seit 17.02.2026), gemeinsam mit Hund-Tier American-XL-Bully-Don
 
 
 ## 1. Gegenstand des Abschlusses

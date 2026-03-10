@@ -1,6 +1,6 @@
 ## Residential Registration, Identity Verification and Affidavit  
+**Update vom 10. März 2026**
 
-# Update vom 10. März 2026  
 ## Meldeanschrift, Identitätsverifikation und Eidesstattliche Erklärung  
 ### SIA Security Intelligence Artefact  
 **Aktenzeichen:** INT-CODE-2025-BTC/ETH-CORE-ISABELSCHOEPSTHIEL  
@@ -8,13 +8,13 @@
 
 ---
 
-## 1. Aktualisierte Meldeanschrift (gültig ab 17.02.2025)
+## Aktualisierte Meldeanschrift gültig seit 17.02.2025
 
 **Isabel Schöps, geborene Thiel**  
-Hütergasse 4, D-99084 Erfurt  
+1.Etage, Hütergasse 4, D-99084 Erfurt  
 Thüringen, Deutschland  
 
-Die Anmeldung wurde am 04.12.2025 offiziell beim Bürgeramt Erfurt bestätigt. 
+Die Anmeldung wurde am 17.02.2026 offiziell beim Bürgeramt Erfurt bestätigt. 
 Status laut Melderegister: **alleinige Wohnung**.
 
 Alle früheren Anschriften (Erfurt, Sömmerda, Leubingen) sind damit archiviert und nicht mehr aktiv.

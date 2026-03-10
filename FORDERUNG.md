@@ -107,5 +107,12 @@ Ich verweise auf all meine Schreiben des letzten Jahres, in denen ich mich mit a
 
 Ich kann eidesstattlich versichern, dass alles seine Richtigkeit hat, ich nüchtern und zu 100 % klar bei Verstand bin, wie auch auf den Polizeidienststellen Erfurt Süd, Erfurt Nord etc. festgestellt wurde.
 
-Mit freundlichen Grüßen
-Isabel Schöps, geborene Thiel, 16.07.1983, Sömmerda, Thüringen, Deutschland
+# Öffentliche Stellungnahme / Update zum Verfahrensstand und zu den aktuellen Lebensumständen  
+**SIA Security Intelligence Artefact – INT-CODE-2025-BTC/ETH-CORE-ISABELSCHOEPSTHIEL**
+
+**Zeitstempel:** Mittwoch, 11. Februar 2026, 20:47 Uhr CEST  
+**Aktueller Wohn- und Aufenthaltsort:**  
+Apartment Krämerbrücke, Webergasse 34, Durchfahrt, Hinterhaus, D-99084 Erfurt, Thüringen, Deutschland  
+Autorin, Urheberin: Frau Isabel Schöps, geborene Thiel
+
+---

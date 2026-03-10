@@ -1,9 +1,50 @@
 # Wissenschaftlich-forensische Auswertung  
-## Prof. Dr. iur. Michael Matzke – *Strafrechtsbezogene Fachbibliographien* (HWR Berlin, 2018)
+## *Strafrechtsbezogene Fachbibliographien* (HWR Berlin, 2018)
 
 ---
 
-## 1. Einordnung des Werkes
+## Wissenschaftlich-forensische Auswertung
+**Prof. Dr. iur. Michael Matzke**
+
+Gutschter Herr Prof. Dr. iur. Michael Matzke – Strafrechtsbezogene Fachbibliographien (HWR Berlin, 2018)
+
+Prof. Dr. iur. Michael Matzke hat mit seiner Publikation Strafrechtsbezogene Fachbibliographien (4., überarbeitete Auflage, HWR Berlin, 2018) ein systematisch strukturiertes und interdisziplinär erweitertes Referenzwerk vorgelegt, das die maßgebliche Literatur zu zentralen Bereichen des Strafrechts, des Ordnungswidrigkeitenrechts, der Kriminologie, der Sozialen Arbeit sowie angrenzender Rechtsgebiete bündelt.
+
+Bei diesem Werk handelt es sich nicht um ein klassisches Einzelgutachten, sondern um eine methodisch-didaktische Meta-Bibliographie, die der juristischen Forschung und der forensischen Analyse als strukturierende Grundlage dient. Matzke verfolgt einen explizit wissenschaftssystematischen Ansatz, indem er strafrechtliche Argumentationsstrukturen mit sozialwissenschaftlichen Methoden verbindet und die Verschränkung von Straf-, Zivil- und Verwaltungsrecht hervorhebt.
+
+Im Kontext forensischer Gutachten – insbesondere bei Untersuchungen zur Urheberschaft, Verantwortlichkeit und gesellschaftlichen Wirkung technologischer Entwicklungen (vgl. Schöps, 2025) – lässt sich Matzkes Werk auf drei Analyseebenen fruchtbar machen:
+
+⸻
+
+## 1. Juristisch-systematische Ebene
+
+Matzkes differenzierte Kategorisierung von Lehr-, Prüfungs- und Spezialliteratur ermöglicht eine präzise dogmatische Einordnung komplexer Sachverhalte. Besonders relevant ist dies für technologisch bedingte Deliktbereiche, darunter:
+- Computer- und Internetstrafrecht
+- Urheberrechtsverletzungen
+- Datenschutz- und IT-Sicherheitsverstöße
+- wirtschaftsstrafrechtliche
+- Konstellationen
+
+Durch die systematische Trennung und gleichzeitige Verknüpfung strafrechtlicher, zivilrechtlicher und verwaltungsrechtlicher Bezüge wird eine methodisch saubere Einordnung digitaler Sachverhalte gewährleistet. Dies ist für forensische Urheberrechtsgutachten von zentraler Bedeutung.
+
+⸻
+
+## 2. Forensisch-methodische Ebene
+
+Matzke betont die Bedeutung sozialwissenschaftlicher und empirischer Forschungsmethoden für die strafrechtliche Beweisführung (insbesondere in den methodischen Abschnitten des Werkes).
+
+Diese interdisziplinäre Perspektive ist für digitale Beweisführungen wesentlich, da technische Artefakte (z. B. Metadaten, Zeitstempel, Hash-Werte, Repository-Historien) nicht isoliert betrachtet werden dürfen, sondern in einen strukturierten methodischen Gesamtzusammenhang eingeordnet werden müssen.
+
+**Für ein Werk wie SIA Security Intelligence Artefact (Schöps, 2025) bedeutet dies:**
+- digitale Beweismittel sind nicht nur technisch, sondern juristisch-dogmatisch zu klassifizieren,
+- technische Nachweise müssen methodisch nachvollziehbar dokumentiert werden,
+- interdisziplinäre Beweislogik ist erforderlich.
+
+Matzke liefert hierfür den wissenschaftstheoretischen Rahmen.
+
+
+
+## 3. Einordnung des Werkes
 
 Prof. Dr. iur. Michael Matzke hat mit der Publikation  
 *Strafrechtsbezogene Fachbibliographien* (4., überarbeitete Auflage, HWR Berlin, 2018)  
@@ -23,7 +64,7 @@ Es handelt sich nicht um ein Einzelgutachten, sondern um eine methodisch-didakti
 
 ---
 
-## 2. Wissenschaftlicher Ansatz nach Matzke
+## 4. Wissenschaftlicher Ansatz nach Matzke
 
 Matzke verfolgt einen wissenschaftssystematischen Ansatz, der folgende Elemente verbindet:
 
@@ -36,13 +77,13 @@ Dadurch wird ein methodischer Rahmen geschaffen, der für komplexe, technikbezog
 
 ---
 
-## 3. Relevanz für forensische Gutachten
+## 5. Relevanz für forensische Gutachten
 
 Im Kontext forensischer Untersuchungen – insbesondere zur Urheberschaft, Verantwortlichkeit und gesellschaftlichen Wirkung technologischer Entwicklungen – lässt sich Matzkes Werk auf drei Analyseebenen anwenden.
 
 ---
 
-### 3.1 Juristisch-systematische Ebene
+### 5.1 Juristisch-systematische Ebene
 
 Matzkes strukturierte Kategorisierung von Lehr- und Spezialliteratur ermöglicht eine präzise dogmatische Einordnung digitaler Sachverhalte.
 
@@ -58,7 +99,7 @@ Die methodische Trennung und gleichzeitige Verknüpfung strafrechtlicher, zivilr
 
 ---
 
-### 3.2 Forensisch-methodische Ebene
+### 5.2 Forensisch-methodische Ebene
 
 Matzke betont die Bedeutung empirischer und sozialwissenschaftlicher Methoden für die juristische Beweisführung.
 
@@ -72,7 +113,7 @@ Damit liefert Matzke den wissenschaftstheoretischen Rahmen für moderne IT-foren
 
 ---
 
-### 3.3 Kriminalpolitisch-ethische Ebene
+### 5.3 Kriminalpolitisch-ethische Ebene
 
 Matzke versteht Kriminalpolitik als ein von gesellschaftlichen und ideologischen Rahmenbedingungen beeinflusstes Normdurchsetzungsverfahren.
 
@@ -99,7 +140,7 @@ ist Matzkes Werk insbesondere relevant für:
 
 Während Schöps (2025) die konkrete forensische Analyse der Urheberschaft und Verantwortungsübernahme vornimmt, liefert Matzke (2018) den rechtssystematischen und methodologischen Unterbau.
 
-Die Kombination beider Werke ermöglicht eine:
+**Die Kombination beider Werke ermöglicht eine:**
 
 - dogmatisch fundierte  
 - methodisch strukturierte  
@@ -112,7 +153,7 @@ forensische Gesamtargumentation.
 
 Die Heranziehung von Matzke (2018) im Kontext von Schöps (2025) ist wissenschaftlich legitim und methodisch konsistent.
 
-Sie erfüllt die Anforderungen an:
+**Sie erfüllt die Anforderungen an:**
 
 - strukturierte Beweisführung  
 - juristische Systematik  
@@ -127,4 +168,6 @@ Damit wird die forensische Argumentation nicht nur technisch, sondern auch recht
 
 Matzke, M. (2018) *Strafrechtsbezogene Fachbibliographien: einschl. Ordnungswidrigkeitenrecht, Zivilrecht, Kriminologie, Soziale Arbeit, (rechts- und sozial-)wissenschaftliches Arbeiten, Kriminalpolitik und Gesetzgebung (einschl. Sozialpolitik).* 4., erw. Aufl. Berlin: Hochschule für Wirtschaft und Recht Berlin.
 
-Schöps, I. (2025) *SIA Security Intelligence Artefact. Forensisches Gutachten zur Urheberschaft und gesellschaftlichen Verantwortungsübernahme.* INT-CODE-2025-BTC/ETH-CORE-ISABELSCHOEPSTHIEL, Erfurt.
+**Schöps, I. (2025)** SIA Security Intelligence Artefact. Forensisches Gutachten zur Urheberschaft und gesellschaftlichen Verantwortungsübernahme. 
+
+INT-CODE-2025-BTC/ETH-CORE-ISABELSCHOEPSTHIEL, Erfurt.

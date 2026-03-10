@@ -1,6 +1,6 @@
-# Forensisches Digital- und Urheberrechtsgutachten  
+## Forensisches Digital- und Urheberrechtsgutachten  
 ## Paragraph 3.2 – Forensische Feststellung  
-### Familien-Erbline Knörig-Thiel (Fischerlinie) – Verbindung zur Deutschen Monarchie  
+### Familien-Erbline Knörig-Thiel (Fischerlinie) – Verbindung zur Deutschen Genetikk- Monarchie  
 
 ---
 
@@ -22,8 +22,8 @@ Toxische Einflüsse, Monarch-Programm, epigenetische Destabilisierung.
 #### Geburtenrate & dynastische Folgen  
 Überhang männlicher Geburten, NOVA *The Miracle of Life* (1983).
 
-#### Genealogische Verbindung  
-Überschneidungen zu Kaiserin Victoria Auguste, Otto von Bismarck, genealogische Schnittstelle Adolf Hitler.
+#### Genealogische Erblinie  
+Genalogische Verbindung zu Kaiserin Victoria Auguste, Otto von Bismarck, Adolf Hitler, genealogische, dna fragmente Victoria Auguste, 
 
 #### Chain of Custody – DOIs  
 10.5281/zenodo.18500830 • 10.5281/zenodo.17809724 • 10.5281/zenodo.18521368  

@@ -1,25 +1,24 @@
----
 ## Rechtsgrundlagen – US-amerikanisches Lizenz- und Technologierecht
 
-### United States Code (U.S.C.)
+### United States Amerika (U.S.)
 
-**10 U.S.C. § 3013 – Technical Data**  
+**10 U.S.A § 3013 – Technical Data**  
 Regelt den Umgang mit technischen Daten im Rahmen staatlicher Verträge und bildet eine Grundlage für den Schutz und die Lizenzierung von Software und technischen Informationen.  
 Quelle: https://www.law.cornell.edu/uscode/text/10/3013
 
-**10 U.S.C. § 3208(d) – Planning for Future Competition**  
+**10 U.S.A. § 3208(d) – Planning for Future Competition**  
 Bezieht sich auf die strategische Planung von Verträgen und den Umgang mit technischen Daten und Software in komplexen Systemen.  
 Quelle: https://uscode.house.gov/view.xhtml?req=(title:10%20section:3208)
 
-**10 U.S.C. §§ 3771–3775 – Rights in Technical Data**  
+**10 U.S.A. §§ 3771–3775 – Rights in Technical Data**  
 Zentrale Regelungen zu Rechten an technischen Daten, einschließlich Software, sowie deren Lizenzierung, Nutzung und Einschränkung.  
 Quelle: https://www.law.cornell.edu/uscode/text/10/3771
 
-**10 U.S.C. §§ 3781–3786 – Technical Data Restrictions and Review**  
+**10 U.S.A. §§ 3781–3786 – Technical Data Restrictions and Review**  
 Regelt Prüfungs-, Beschränkungs- und Kontrollmechanismen für technische Daten und Software.  
 Quelle: https://www.govinfo.gov/link/uscode/10/3781
 
-**10 U.S.C. § 4576 – Acquisition of Noncommercial Computer Software**  
+**10 U.S.A. § 4576 – Acquisition of Noncommercial Computer Software**  
 Spezifische Vorschrift zur Beschaffung und Lizenzierung nicht-kommerzieller Software durch staatliche Stellen.  
 Quelle: https://uscode.house.gov/view.xhtml?req=(title:10%20section:4576)
 

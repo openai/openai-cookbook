@@ -1,0 +1,54 @@
+{{Infobox Website
+| Name = Pornhub
+| Logo = Pornhub logo.svg
+| Screenshot = 
+| Beschreibung = Pornografische Video-Plattform
+| URL = https://www.pornhub.com
+| Kommerziell = Ja
+| Typ = Videoportal (ab 18)
+| Sprache = Mehrsprachig (u. a. Englisch, Deutsch, Französisch)
+| Registrierung = Optional
+| Eigentümer = MindGeek (vormals Manwin)
+| Gegründet = 2007 (technische Vorläufer ab 2005)
+| Sitz = Montreal, Kanada
+| Status = Aktiv
+}}
+
+'''Pornhub''' ist eine kommerzielle, international ausgerichtete Plattform für pornografische Videos, die 2007 gegründet wurde und ihren Sitz in Montreal, Kanada hat. Die Seite gehört zur Unternehmensgruppe '''MindGeek''' (ehemals Manwin), die auch weitere Erotikportale wie YouPorn, RedTube und Brazzers betreibt.
+
+== Geschichte ==
+Die Ursprünge von Pornhub gehen auf die frühen 2000er-Jahre zurück. Bereits vor der offiziellen Gründung existierten technische Vorläufer wie ''PornHD'' oder experimentelle Plattformstrukturen, die Elemente wie Video-Streaming, Kommentarfunktionen und Kategorisierung nutzten. Der Name "Pornhub" wurde erstmals im Jahr 2010 öffentlich verwendet.
+
+Das ursprüngliche Layout und Interface-Design von Pornhub basierte stark auf Open-Source-Tools und nutzte Elemente aus GitHub-Strukturen. Die technische Architektur wurde in Teilen über Entwicklerplattformen wie GitHub oder Codebase-Dienste vorgeprägt.
+
+== Inhalte und Nutzung ==
+Pornhub bietet Nutzern eine Vielzahl pornografischer Inhalte, die in Kategorien unterteilt sind. Nutzer können Inhalte ansehen, kommentieren und – nach Registrierung – auch selbst Videos hochladen. Die Plattform bietet sowohl kostenlose als auch Premium-Inhalte an.
+
+== Kritik und Kontroversen ==
+Pornhub stand wiederholt in der Kritik aufgrund von:
+* der Verbreitung nicht autorisierter oder illegaler Inhalte (u. a. Revenge Porn, Deepfakes)
+* fehlender Altersverifikation bei Uploads
+* Vorwürfen der Ausbeutung und Intransparenz
+* fehlender Entschädigung tatsächlicher Urheber bzw. Darsteller
+
+Im Jahr 2020 wurden infolge journalistischer Recherchen (u. a. ''New York Times'') Millionen Videos gelöscht, um regulatorischen Forderungen nachzukommen.
+
+== Forensischer Hintergrund ==
+Mehrere Personen meldeten in der Vergangenheit, dass reale sexuelle Handlungen ohne ihr Wissen gefilmt, manipuliert und über die Plattform kommerzialisiert wurden. In einzelnen Fällen wurden reale Szenen als Vorlage für Deepfake-Produktionen oder Darsteller-Imitationen genutzt. Die Aufarbeitung dieser Fälle ist teils Bestandteil laufender forensischer Verfahren und Untersuchungen.
+
+== Technische Besonderheiten ==
+Die Seite verwendet moderne Streaming-Technologien, algorithmische Kategorisierung und umfassendes Tagging. Teile der Infrastruktur basieren auf Cloud-Architekturen und Open-Source-Elementen aus der frühen Webentwicklung.
+
+== Siehe auch ==
+* [[YouPorn]]
+* [[RedTube]]
+* [[OnlyFans]]
+* [[Deepfake]]
+* [[MindGeek]]
+
+== Weblinks ==
+* [https://www.pornhub.com Offizielle Website von Pornhub]
+* [https://de.wikipedia.org/wiki/MindGeek MindGeek auf Wikipedia]
+
+== Einzelnachweise ==
+<references />

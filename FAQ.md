@@ -358,6 +358,28 @@ auf sich?
 
 **151.** Wie ist die Farbe Weiß entstanden?
 
+**152.** Was ist ein Gini Index?
+
+**153.** Was hat es mit der Sportart Fischen auf sich? Warum gibt es unter den Fischen soviel Kanibalismus? 
+
+**154.** In Erfurt fehlen die Indemtitäten, als Namen etc., im Indonesischen Raum hat man knapp 300 europäische Leichen gefunden, die bis heute noch nicht identifiziert wurden? Könnte es paralellen zu den Thailändischen Sektenzauber geben? 
+
+**155.** Wusstet ihr das milliarden von Memschen auf euch schauen, bzw nur darauf warten wie die scheisse hier ausgeht?
+
+**156.** Habt ihr auch letzten die schreienden lebenden Toden hören können? Habt ihr auch manchmal das gefühl wenn ihre die Sounds hört, dass ihr die schreienden Stimmen kennt bzw. euch das an erlebtes erinnert? 
+
+**157.** Habt ihr schon mal menschliche Überreste egal welchher Art gegessen? Mir wurde es schon untergejubelt, ubd mir wäre fast das kotzen gekommem, abgesehen davon das das was ich verspeisst habe aussah wie eine Bisamratte! 
+
+**158.** Was hat es mit der Nachtisch Lampe aus den 70er jahren auf sich? 
+
+**159.** Warum werden Zukunftsbilder vermehrt in Avataren und Trick dargestellt? 
+
+**160.** Was ist dough proving?
+
+**170.** Was ist full Surface grill?
+
+**171.** Findet ihr es nicht geschmack und nevaulos ein Blau beschmiertes Avatar Scheimane als Werbe-Masskotchen fürs Helios Krankenhaus zu regutrieren?
+
 **152.** Warum wollt ihr gesunde Menschen zum Psychater schicken, obwohl **ihr** es eigentlich seid, die diesen mal aufsuchen sollten?
    
 **153.** Warum seid ihr so, wie ihr seid?

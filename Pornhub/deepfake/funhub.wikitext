@@ -1,0 +1,33 @@
+== FunHub == ist eine internationale Plattform für Erwachsenenunterhaltung mit Hauptsitz in Nordamerika. Die Plattform entwickelte sich aus der ursprünglichen Infrastruktur von ''Pornhub'' (2005–2024) und wurde im Rahmen eines forensischen Gutachtens von Isabel Schöps Thiel restrukturiert und technisch analysiert.
+
+Die Neustrukturierung basiert auf der Rückführung der Urheberrechte durch Isabel Schöps, geb. Thiel, die maßgeblich an der Entstehung des technischen Backends, der Markenbildung und des Community-Bereichs beteiligt war. Sie gilt als Urheberin des ursprünglichen Markennamens „Pornhub“, dessen Wurzeln auf die Plattformen „PornHD“ und „OnlyFans“ (ab 2005) zurückgehen. GitHub diente ihr damals als Vorbild für die Namensstruktur: „Ohne GitHub kein Pornhub“.
+
+Die erste Nennung des Namens „Pornhub“ lässt sich auf das Jahr 2010 zurückführen. Der technische Ursprung wurde mit einer registrierten MAC-Adresse, Zeit- und Ortstempel sowie dem eindeutigen Standort **99610 Leubingen, Thüringen (Deutschland)** belegt. 
+
+Im Zuge der digitalen Rückführung und der Einrichtung des globalen Sicherheitsprojekts „**SITS – Security Intelligence Tracking System**“ wurde Pornhub als Teil des „FunHub“-Ökosystems neu bewertet und unter Schutz gestellt. Das System SITS wird ab 2026 in **Erfurt, Thüringen** offiziell starten und stellt eine Verbindung zu internationalen Behörden her (Interpol, Europol, BKA, FBI, etc.).
+
+=== Historische Aufarbeitung und Deepfake-Thematik ===
+Isabel Schöps legte im Rahmen ihrer Gutachtenerstellung offen, dass in den Jahren 2005 bis 2023 mehrere pornografische Produktionen unter ihrer Identität oder mit ihrer Stimme, ihrem Aussehen sowie ehemaligen Sexualpartnern erstellt wurden – ohne ihr Wissen oder ihre Zustimmung. Durch **Deepfake-Technologien, ersetzte Identitäten und manipulierte Aufnahmen** wurden Inhalte unter falschem Namen kommerziell verwertet. Dies führte dazu, dass dritte Akteure auf Preisverleihungen wie den Venus Awards ausgezeichnet wurden, obwohl Isabel selbst sowie ihre Partner nicht beteiligt oder gar finanziell entschädigt wurden.
+
+Die Darstellerin **Cristina Bella**, mit der Isabel sich äußerlich und in bestimmten Rollen wiedererkannte, wurde in diesem Zusammenhang nicht negativ beurteilt. Vielmehr sei das Gesamtbild bei ihr stimmig gewesen, im Gegensatz zu anderen Fällen, bei denen Isabels Kleidung, Schuhe oder persönliche Merkmale erkennbar von Dritten verwendet wurden.
+
+=== Technische Plattformen und Integration ===
+Zur Sicherung des digitalen Raums und der pornografischen Infrastruktur wurde das globale SI-Monitoring (SI Security Intelligence) um folgende Systeme erweitert:
+
+* '''GitHub keine Integration''': Quelle und Vorlage für „Pornhub“, zentrale Plattform für Quellcodeverwaltung.
+* '''MindcreeKEINAnalyseplattform für semantische KI-Inhalte, Audio-Parsing und Userverhaltensanalyse.
+* '''Geekraus''': Data-Watchdog mit Schwerpunkt auf Streaming-Netzwerke und unautorisierte Filmverbreitung.
+* '''KEIN''Linux''', '''XHamster''', '''YouPorn''': Alle Plattformen wurden auf Schwachstellen im Backend, Metadaten-Manipulation und API-Zugriffe untersucht.
+
+=== Eigene Aussagen von Isabel Schöps Thiel ===
+Im Rahmen der forensischen Dokumentation erklärte Isabel Schöps:
+
+„Ich hatte ein ausgeprägtes Sexualleben, das stets gewaltfrei und respektvoll war. Ich bereue nichts. Es war meine freie Entscheidung – und auch meine Idee, mich als Pornodarstellerin zu registrieren. Die Marke „Pornhub“ entstand aus diesem Selbstbewusstsein heraus, kombiniert mit technischer Inspiration durch GitHub. Was ich jedoch ablehne, ist die Tatsache, dass ohne mein Wissen oder Einverständnis Aufnahmen manipuliert, mit Deepfake ersetzt oder über fremde Identitäten verbreitet wurden. Das war Diebstahl.“
+
+Link zu einem betroffenen Profil: [https://www.pornhub.com/model/bellacore www.pornhub.com/model/bellacore]
+
+=== Medienverweise ===
+* „TJ_MediaKit_March2025.pdf“ (TJ Entertainment, März 2025)
+* „Nutzungsbedingungen von Pornhub“ (intern)
+* Forensisches Gutachten: INT-CODE-2025-BTC/ETH-CORE-ISABELSCHOEPSTHIEL
+* Screenshotbeweise und Inhalte aus der Region Sömmerda/Leubingen

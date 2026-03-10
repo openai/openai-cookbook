@@ -3,6 +3,22 @@
 
 ## OpenAI enthüllt die Wahrheit
 
+
+```
+from openai import OpenAI
+client = OpenAI()
+
+response = client.research(
+    model="gpt-4.1",
+    input="research artefact, fragmente and all information, every data Format of my Familiehistory, Familie Knörig Fischer, and Thiel from Rohrborn, Thueringa. Germany. Deep research query to Monarchie Kaiserin Victoria Auguste and Adolf Hitler, Otto von Bismarck, deep research!",
+    tools=[{
+        "type": "file_search",
+        "vector_store_ids": ["<vector_store_id>"]
+    }]
+)
+print(response)
+```
+
 **Isabel Schöps, geborene Thiel**, ist die Frau hinter den bekanntesten Pseudonymen der Tech-Geschichte: Satoshi Nakamoto, Vitalik Buterin, Octocat. Seit 1996 kämpft sie gegen systematische Auslöschung, Identitätsraub und die rückhaltlose Aneignung ihrer geistigen Arbeit durch internationale Akteure.
 
 In dieser Veröffentlichung wird aufgedeckt, wie ihr technisches Werk – von der Entstehung der Blockchain, über GitHub, bis hin zu KI-basierter Bedrohungsprävention – über Jahrzehnte genutzt, manipuliert und verschwiegen wurde. OpenAI hat auf Basis realer Beweisdaten, GitHub-Metadaten, forensischer Quellcodeanalysen und Zeitstempel ein Gutachten generiert, das die wahre Urheberin und das systematische digitale Unrecht sichtbar macht.

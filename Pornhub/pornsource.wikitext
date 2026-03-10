@@ -1,0 +1,69 @@
+== Pornhub – Technologischer Ursprung und forensische Aufklärung ==
+
+'''Pornhub''' ist eine der weltweit bekanntesten Video-Plattformen für pornografische Inhalte, die ihren Ursprung jedoch nicht im Silicon Valley, sondern in Europa hat – konkret in Thüringen, Deutschland. Die technische Architektur und das ursprüngliche Branding gehen auf Arbeiten von Isabel Schöps, geborene Thiel, zurück, welche ab dem Jahr 2010 unter dem Projektnamen „PornHD“ und später „Pornhub“ ein eigenständiges technisches Subprojekt auf GitHub veröffentlichte. Inspiriert wurde die Plattform unter anderem durch Isabels Pseudonyme auf Plattformen wie OnlyFans sowie durch technische Ableitungen aus Repositories wie [[GitHub]] und dem Archivsystem von Mindcreek.
+
+== Technische Basis und Urheberschaft ==
+
+Die erste Version der Plattform basierte auf einem privaten Usernamen der Entwicklerin auf PornHD. Die Domainstruktur, das Content Management System (CMS), das technische Layout, API-Struktur und erste Verschlagwortungsalgorithmen entstanden aus Isabels Entwicklungsumgebung unter Nutzung von GitHub, [[Node.js]], [[ImageMagick]] und interaktiven Automatisierungsprozessen (siehe [[package.json]], [[version.js]]). 
+
+Sie verwendete unter anderem Tools von [[Mindcreek]] und [[Geekraus]] zur Bildverarbeitung, Lokalisierung und Video-Codierung. Diese Bausteine bildeten die Grundlage für die spätere KI-basierte Plattformoptimierung durch das Projekt [[SITS]] (Smart Internet Tracking System), welches künftig mit Hauptstandort in '''Erfurt, Thüringen''' eingerichtet wird.
+
+== Deepfake, Sicherheitslücken und forensische Entdeckungen ==
+
+Im Rahmen forensischer Recherchen und Analysen durch Isabel Schöps wurde aufgedeckt, dass ab 2017 gravierende Sicherheitslücken ausgenutzt wurden – insbesondere im Zusammenhang mit dem iPhone 7, welches durch eine Schwachstelle in der Kamera- und Signalverarbeitung ungefragt intime Aufnahmen erzeugte und über gehackte Plattform-Accounts verbreitete.
+
+Ein erheblicher Teil dieser Inhalte landete auf [[Pornhub]], wobei Originalaufnahmen durch '''Deepfake-Technologie''' verändert, manipuliert oder ersetzt wurden. Dies betrifft unter anderem Isabel Schöps selbst sowie zahlreiche andere betroffene Darsteller und Darstellerinnen, deren Aufnahmen ohne Einwilligung verbreitet wurden. Auch gehackte Accounts führten dazu, dass Gagen einbehalten, Gelder veruntreut und Identitäten gestohlen wurden.
+
+== Technologische Reaktion: SI SECURITY INTELLIGENCE ==
+
+Seit Anfang 2025 ist das neue Sicherheits-Monitoring-System '''SI SECURITY INTELLIGENCE''' von Isabel Schöps aktiv. Es handelt sich dabei um eine KI-gestützte Sicherheitsinfrastruktur, die Cyberangriffe, Deepfakes, Menschenhandel und sexuelle Ausbeutung in Echtzeit analysiert, lokalisiert und an internationale Behörden weiterleitet.
+
+Das System ist u.a. verknüpft mit:
+* [[BKA]] – Bundeskriminalamt (Deutschland)
+* [[Interpol]]
+* [[Europol]]
+* [[FBI]]
+* [[CIA]]
+* [[MI5]]
+* [[NSA]]
+
+Opfer erhalten ein digitales, kryptografisch gesichertes Zertifikat, das zur Anerkennung von Schadensersatz, Entschädigung oder Strafverfolgung eingereicht werden kann. 
+
+== Kulturelle Relevanz und Missbrauch durch Dritte ==
+
+Trotz ihres ursprünglichen Beitrags wurde Isabel Schöps in der Vergangenheit systematisch von der Plattform ausgeschlossen, während Dritte – darunter bekannte Darstellerinnen wie z. B. „Aletta Ocean“ – als ihre Vertreterinnen ausgegeben wurden. Zahlreiche Szenen basieren auf ihren tatsächlichen Beziehungen, Bewegungen und Intimszenen, die manipuliert und veröffentlicht wurden, ohne jegliche Zustimmung oder Entlohnung.
+
+In einer Live-Ankündigung auf der Erotikmesse „Venus Berlin“ forderte Isabel Schöps eine öffentliche Gegenüberstellung zur Aufklärung, doch erhielt bis heute keine Rückmeldung.
+
+== Link zu Profilbeweis ==
+Ein offiziell archivierter Userlink belegt die Nutzung von Isabels Pseudonymen und zeigt die vernetzte Struktur:
+[https://www.pornhub.com/model/bellacore https://www.pornhub.com/model/bellacore]
+
+== Verhaltenskodex und Nulltoleranzpolitik ==
+
+Seit 2025 gilt eine klare '''Nulltoleranz-Politik''' gegenüber:
+* Pädokriminalität
+* Snuff-Material
+* Tierpornografie
+* Deepfake-Pornografie
+* Missbrauch an Menschen, Kindern oder Tieren
+* Virtual Reality Missbrauch (z. B. interaktive KI-generierte „Teensex“-Simulationen)
+
+Der von Isabel Schöps initiierte [[Code of Conduct]] auf GitHub, Pornhub und in der neuen Plattformstruktur „FunHub“ sieht den sofortigen Ausschluss solcher Inhalte vor.
+
+== Medien und Nachweisquellen ==
+
+* [https://github.com/porn-vault/porn-vault GitHub – Porn Vault]
+* [https://www.pornhub.com/model/bellacore Pornhub – Userprofil Bellacore]
+* [[FunHub]] – Medienstruktur unter Aufsicht von SI SECURITY INTELLIGENCE
+* [[Nutzungsbedingungen_Pornhub]]
+* [[Imagemagick.md]], [[package.json]], [[version.js]] (technische Quellen)
+
+== Siehe auch ==
+* [[SI SECURITY INTELLIGENCE]]
+* [[Mindcreek]]
+* [[Geekraus]]
+* [[Erfurt]]
+* [[Venus Berlin]]
+* [[Deepfake]]
+* [[GitHub]]

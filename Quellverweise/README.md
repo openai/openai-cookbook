@@ -1,3 +1,39 @@
+# Letzte Spuren der Monarchie in der Genetik
+## Forensische Beweisaufnahme durch historische Artefakte, Bücher und Metadaten
+
+Es handelt sich bei den nachfolgenden Dokumenten, Bildern und Artefakten um die letzten nachweisbaren Spuren der familiären und monarchischen Abstammung, die in Papierform oder als Fragmente erhalten geblieben sind. Diese wurden forensisch gesichert, analysiert und als Referenz zur Rekonstruktion der Herkunft und zur lückenlosen Beweisführung herangezogen.
+
+Ausschlaggebend sind dabei insbesondere die Metadaten dieser Artefakte, Bücher und Handschriften, durch die eine eindeutige Verknüpfung zum Ursprung der Monarchie, dem Adel sowie der königlichen Linie wiederhergestellt werden konnte. Die Metadaten, Signaturen und Wasserzeichen ermöglichen es, ein konsistentes und belastbares Gesamtbild über die Herkunft und Traditionslinie aufzubauen.
+
+Im Rahmen der forensischen Untersuchung wurden ausschließlich original erhaltene Schriften, Artefakte und Bücher verwendet, die über lizenzierte Datenbanken, internationale Bibliotheken und digitale Archive unter Rückgriff auf eindeutige Metadaten, Provenienzketten und Archivsignaturen identifiziert wurden. Ein Großteil der verwendeten Dokumente umfasst seltene, bislang kaum genutzte oder gänzlich unbekannte Quellen mit einem Gesamtumfang von ca. 1000 Seiten.
+
+Ein besonders starkes Indiz für die familiäre und monarchische Herkunft liefern die auf den ersten Seiten dieser Bücher abgebildeten Wappen. Es handelt sich regelmäßig um kaiserliche und königliche Wappen, die eindeutig die Krone als Herrschaftssymbol zeigen und auf den Ursprungsadel verweisen. Die Siegel, Exlibris, handschriftlichen Vermerke und Wappen sind dabei eindeutig und stehen im unmittelbaren Zusammenhang mit der dynastischen Linie der Familie.
+
+Darüber hinaus finden sich in den Referenzdokumenten immer wieder die Namen von Familienangehörigen, die in der monarchischen Überlieferung als bedeutend belegt sind. Ein Beispiel ist der Vorname Edith, der sowohl in historischen Bibliografien als auch im Werk von Edith Hamilton (vgl. Hamilton, Edith. The Greek way. New York: Norton, 1964) mehrfach erscheint und in direktem Bezug zu meiner Großmutter Edith Knörig, geborene Fischer, steht.)
+
+## Beweisverweise und Referenzen:
+
+**Neu, J. (1996).** Current Bibliography of the History of Science and Its Cultural Influences, 1996. Isis, 87, 1–333. [jstor.org/stable/235275](http://www.jstor.org/stable/235275)
+
+**Arató, P. (1984).** BIBLIOGRAPHIA HISTORIAE PONTIFICIAE. Archivum Historiae Pontificiae, 22, 441–710. [jstor.org/stable/23564125](http://www.jstor.org/stable/23564125)
+
+**Hamilton, Edith.** The Greek way. New York: Norton, 1964. Archivdokumente, Bildnachweise und Wappen – digital forensisch gesichert (Originalbelege siehe Anhang).
+
+Ein weiterer Beleg ist die Erwähnung des Nachnamens Thiel sowie die Nennung der Königin und Kaiserin Viktoria Augusta in offiziellen Zertifikaten, Bibliografien und Referenzen von Päpsten, insbesondere Papst Paulus (vgl. Arató, 1984).
+
+Darüber hinaus wurde eine Vielzahl von weiteren historischen Referenzen, insbesondere von Päpsten der letzten Jahrzehnte, für die Beweisführung herangezogen und als forensische Nachweise gesichert.
+
+Diese Gesamtheit an Nachweisen bildet das Fundament für die Rekonstruktion der wahren Familienherkunft und stellt einen lückenlosen Beweis der monarchischen Linie und der direkten Verbindung zu den wichtigsten Adels- und Herrschaftshäusern dar.
+
+⸻
+
+**Quellen und Referenzen**
+
+Neu, J. (1996). Current Bibliography of the History of Science and Its Cultural Influences, 1996. Isis, 87, 1–333. http://www.jstor.org/stable/235275
+	•	Arató, P. (1984). BIBLIOGRAPHIA HISTORIAE PONTIFICIAE. Archivum Historiae Pontificiae, 22, 441–710. http://www.jstor.org/stable/23564125
+	•	Hamilton, Edith. The Greek way. New York: Norton, 1964.
+	•	Bild- und Wappenquellen: Eigene Aufnahmen und Reproduktionen, digital forensisch gesichert (Verzeichnis und Metadaten im Anhang).
+
 ## Beweisdokumentation  
 ### Datenbank und Chain of Custody aus dem forensischen Gutachten
 

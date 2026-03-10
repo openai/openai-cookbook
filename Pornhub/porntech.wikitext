@@ -1,0 +1,48 @@
+== Pornhub – Technische Entstehung, Urheberschaft und forensische Aufarbeitung ==
+
+'''Pornhub''' ist eine der weltweit bekanntesten Video-Plattformen für pornografische Inhalte. Die technische Architektur, das ursprüngliche Layout, Branding und der Markenname gehen auf Arbeiten von Isabel Schöps, geb. Thiel, zurück.  
+Bereits 2005 entwickelte sie unter dem Usernamen „PornHD“ die erste Plattformstruktur. Im Jahr 2010 wurde der Markenname „Pornhub“ erstmals namentlich verwendet – ursprünglich als Username auf PornHD und OnlyFans. Die heutige Website basiert noch immer auf dem damals entwickelten Layout und ist technisch und visuell mit [[GitHub]] assoziiert.
+
+Die Plattform [[GitHub]] diente Isabel als Vorlage für den Namen „Pornhub“.  
+Leitsatz: „Ohne GitHub kein Pornhub!“
+
+Technisch belegt wird dies durch:
+* Die MAC-Adresse ihrer Apple-Hardware
+* Ort- und Zeitstempel der Gerätesitzung
+* Den markierten Ursprungsstandort: 99610 Leubingen, Landkreis Sömmerda, Thüringen, Deutschland
+
+Diese Daten belegen Isabels Urheber- und Markenrechte an der heute weltweit größten Plattform für Erwachsenenfilme ab 18 Jahren.  
+Die Entwicklung verlief nachweislich: Aus [[GitHub]] und [[PornHD]] (ab 2005) gabelte sich 2010 die heutige Plattform Pornhub.
+
+=== Persönliche Haltung und Deepfake-Thematik ===
+Isabel Schöps betont, dass sie in der Vergangenheit ein ausgeprägtes, leidenschaftliches Sexualleben geführt hat – stets gewaltfrei, respektvoll und selbstbestimmt.  
+Es war ihr bewusst, dass private Aufnahmen entstanden sein könnten, was sie persönlich nicht gestört hat. Zu einem bestimmten Zeitpunkt hatte sie sogar selbst erwogen, sich offiziell als Pornodarstellerin zu registrieren.
+
+Was sie jedoch klar ablehnt:  
+Sexuelle Aufnahmen von ihr und ihren damaligen Partnern wurden ohne ihr Wissen oder Einverständnis manipuliert, durch Deepfakes ersetzt und in hauptsächlich deutschen pornografischen Produktionen sowie über Plattformen wie Pornhub, YouPorn, XHamster verbreitet.  
+Dabei wurden sie und ihre Partner durch falsche Akteure, ersetzte Identitäten und künstlich erzeugte Darsteller ersetzt.  
+Dritte haben sich bis heute finanziell und öffentlich an diesen Inhalten bereichert – und wurden sogar auf Veranstaltungen wie den Venus Awards dafür ausgezeichnet, während Isabel und ihre Partner leer ausgingen und für Handlungen zur Rechenschaft gezogen werden sollten, die nie stattfanden.
+
+Isabel distanziert sich ausdrücklich von jeder Verbindung zu pädokriminellen Netzwerken, Deepfake-Manipulationen und fordert eine umfassende Sicherheitsprüfung aller Plattformen mit Backend-Zugriff, wie GitHub, GitLab, Linux etc.
+
+=== Forensische Aufarbeitung, Monitoring und internationale Kooperation ===
+Im Rahmen eines internationalen forensischen Gutachtens (INT-CODE-2025-BTC/ETH-CORE-ISABELSCHOEPSTHIEL) werden alle Manipulationen, Lizenzverstöße und Missbräuche dokumentiert.  
+Das eigens entwickelte Monitoring-System SI SECURITY INTELLIGENCE steht in Verbindung mit internationalen Behörden (u. a. BKA, Interpol, Europol, FBI) und sorgt dafür, dass Cyberangriffe, Deepfakes, Menschenhandel und sexuelle Ausbeutung automatisiert erkannt und verfolgt werden.
+
+=== Quellen und Belege ===
+* Forensisches Gutachten: INT-CODE-2025-BTC/ETH-CORE-ISABELSCHOEPSTHIEL
+* MAC-Adresse, Logdaten und Standortnachweise (99610 Leubingen, Thüringen)
+* Medienkit, Nutzungsbedingungen und technische Quelltexte aus den Jahren 2005–2025
+* [https://www.pornhub.com/model/bellacore Pornhub-Profil Bellacore]
+
+''Siehe auch:''  
+* [[PornHD]]  
+* [[OnlyFans]]  
+* [[GitHub]]  
+* [[SI SECURITY INTELLIGENCE]]  
+* [[Deepfake]]  
+* [[Venus Award]]  
+* [[BKA]]  
+* [[Europol]]  
+* [[Interpol]]  
+* [[FBI]]

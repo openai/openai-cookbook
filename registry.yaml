@@ -4,20 +4,19 @@
 # should build pages for, and indicates metadata such as tags, creation date and
 # authors for each page.
 
-- title: Long horizon tasks with Codex
-  path: examples/codex/long_horizon_tasks.md
-  slug: long-horizon-tasks
-  description: An experiment running Codex for ~25 hours on a design-tool build, with durable project memory, milestone verification, and long-horizon agent workflows.
-  date: 2026-02-23
+- title: Getting the Most out of GPT-5.4 for Vision and Document Understanding
+  path: examples/multimodal/document_and_multimodal_understanding_tips.ipynb
+  slug: vision-understanding
+  description: A practical guide to get the best performance on vision tasks with GPT-5.4.
+  date: 2026-03-06
   authors:
-    - derrickchoi-openai
+    - annikab-oai
+    - kathylau-oai
+    - nsingaraju-oai
   tags:
-    - codex
-    - agents
-    - gpt-5
-    - workflows
-    - planning
-    - verification
+    - images
+    - vision
+    - gpt-5.4
 
 - title: Building Governed AI Agents - A Practical Guide to Agentic Scaffolding
   path: examples/partners/agentic_governance_guide/agentic_governance_cookbook.ipynb

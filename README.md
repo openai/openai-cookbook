@@ -15,6 +15,12 @@ Most code examples are written in Python, though the concepts can be applied in 
 
 For other useful tools, guides and courses, check out these [related resources from around the web](https://cookbook.openai.com/related_resources).
 
+## Cross-platform path safety
+
+This repository now enforces cross-platform-safe paths in CI so new content remains checkoutable on Windows, macOS, Linux, and WSL. In practice that means paths must avoid trailing spaces or periods, Windows-reserved device names, and names that would collide after Windows path normalization.
+
+If you contribute from Windows, WSL remains the most reliable development workflow for notebook-heavy changes. Clone the repository inside the Linux filesystem, open it with VS Code Remote - WSL, and run Git commands from WSL rather than from Windows against a `\\\\wsl$` path.
+
 ## License
 
 MIT License

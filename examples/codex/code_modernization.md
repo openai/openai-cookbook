@@ -35,7 +35,7 @@ These 4 files help lay out what code is being changed, what the new system shoul
 
 **Goal**: Give Codex a lightweight contract for how planning works in this repo, without overwhelming people with process.
 
-We’re taking inspiration from the [Using PLANS.md for multi-hour problem solving](https://cookbook.openai.com/articles/codex_exec_plans) cookbook to create an AGENTS.md and PLANS.md file that will be placed in a .agent folder.
+We're taking inspiration from the [Using PLANS.md for multi-hour problem solving](https://cookbook.openai.com/articles/codex_exec_plans) cookbook to create an AGENTS.md file at the repository root (where Codex auto-discovers it) and a PLANS.md file that can be placed in a .agent folder.
 
 * AGENTS.md: If you haven’t created an AGENTS.md for your repository yet, I suggest using the /init command. Once generated, reference the add a section in your AGENTS.md to instruct the agent to reference the PLANS.md. 
 * PLANS.md: Use the example provided in the cookbook as a starting point
@@ -46,7 +46,7 @@ These explain what an ExecPlan is, when to create or update one, where it lives,
 If you want Codex to tighten AGENTS or PLANS for your specific repo, you can run:
 
 ```md
-Please read the directory structure and refine .agent/AGENTS.md and .agent/PLANS.md so they are a clear, opinionated standard for how we plan COBOL modernization work here. Keep the ExecPlan skeleton but add one or two concrete examples.
+Please read the directory structure and refine AGENTS.md and .agent/PLANS.md so they are a clear, opinionated standard for how we plan COBOL modernization work here. Keep the ExecPlan skeleton but add one or two concrete examples.
 ```
 
 ---

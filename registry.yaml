@@ -130,10 +130,11 @@
   path: examples/sora/sora2_prompting_guide.ipynb
   slug: sora2-prompting-guide
   description: Cookbook to craft effective video prompts for Sora 2 generation.
-  date: 2025-10-06
+  date: 2026-03-12
   authors:
     - rkoenig-openai
     - joanneshin-openai
+    - annikab-oai
   tags:
     - sora
     - prompt

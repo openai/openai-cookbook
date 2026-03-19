@@ -3,7 +3,7 @@ from __future__ import annotations
 import json
 import os
 from pathlib import Path
-from typing import Any
+from typing import Any, Callable
 
 from .github_cache import DEFAULT_CACHE_ROOT, load_cached_pull_requests
 from .reporting import default_run_id, render_report_for_run, write_results
@@ -19,21 +19,29 @@ MAX_REFERENCE_COMMENTS = 12
 def run_benchmark(
     *,
     cache_key: str,
-    max_prs: int,
+    max_prs: int | None,
     run_name: str = "",
     cache_root: Path = DEFAULT_CACHE_ROOT,
     harness_dir: Path = DEFAULT_HARNESS_DIR,
+    progress_callback: Callable[[str], None] | None = None,
 ) -> tuple[RunArtifacts, JSONDict]:
     config, agents_md, reviewer_prompt, grader_prompt, review_schema, grader_schema = load_harness_bundle(
         harness_dir
     )
     snapshots = load_cached_pull_requests(cache_root, cache_key=cache_key)
-    if max_prs > 0:
+    if max_prs and max_prs > 0:
         snapshots = snapshots[:max_prs]
 
     client = _build_openai_client()
     results: list[JSONDict] = []
-    for snapshot in snapshots:
+    total_snapshots = len(snapshots)
+    for index, snapshot in enumerate(snapshots, start=1):
+        pr_number = snapshot.get("number")
+        pr_title = str(snapshot.get("title", "")).strip()
+        _emit_progress(
+            progress_callback,
+            f"[{index}/{total_snapshots}] Processing PR #{pr_number} {pr_title}".rstrip(),
+        )
         try:
             review_output = _run_json_schema_completion(
                 client=client,
@@ -59,8 +67,16 @@ def run_benchmark(
                     config=config,
                 )
             )
+            _emit_progress(
+                progress_callback,
+                f"[{index}/{total_snapshots}] Completed PR #{pr_number} ({len(results)} processed)",
+            )
         except Exception as exc:  # pragma: no cover - exercised through CLI smoke paths
             results.append(build_failure_row(snapshot=snapshot, error_message=str(exc), config=config))
+            _emit_progress(
+                progress_callback,
+                f"[{index}/{total_snapshots}] Failed PR #{pr_number} ({len(results)} processed): {exc}",
+            )
 
     run_dir = harness_dir / "results" / default_run_id(run_name)
     return write_results(
@@ -256,6 +272,11 @@ def _format_reference_comment(comment: JSONDict) -> str:
         if part
     )
     return f"- [{metadata}]\n{str(comment.get('body') or '').strip()}"
+
+
+def _emit_progress(progress_callback: Callable[[str], None] | None, message: str) -> None:
+    if progress_callback is not None:
+        progress_callback(message)
 
 
 def _truncate_text(text: str, limit: int) -> str:

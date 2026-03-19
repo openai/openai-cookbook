@@ -2,12 +2,49 @@ from __future__ import annotations
 
 import argparse
 import json
+import sys
 from pathlib import Path
 from typing import Sequence
 
-from .benchmark import DEFAULT_HARNESS_DIR, render_benchmark_report, run_benchmark
-from .github_cache import DEFAULT_CACHE_ROOT, fetch_pull_requests, repo_to_cache_key
+from .benchmark import DEFAULT_HARNESS_DIR, load_harness_bundle, render_benchmark_report, run_benchmark
+from .github_cache import DEFAULT_CACHE_ROOT, fetch_pull_requests, load_cached_pull_requests, repo_to_cache_key
+from .reporting import default_run_id
 from .state import reset_app_state
+
+
+def _find_missing_subcommand_parser(
+    parser: argparse.ArgumentParser, argv: Sequence[str]
+) -> argparse.ArgumentParser | None:
+    current_parser = parser
+    index = 0
+
+    while True:
+        subparsers_action = next(
+            (
+                action
+                for action in current_parser._actions
+                if isinstance(action, argparse._SubParsersAction)
+            ),
+            None,
+        )
+        if subparsers_action is None:
+            return None
+
+        matched_choice = None
+        matched_index = None
+        for offset, token in enumerate(argv[index:], start=index):
+            if token in subparsers_action.choices:
+                matched_choice = token
+                matched_index = offset
+                break
+            if not token.startswith("-"):
+                return None
+
+        if matched_choice is None:
+            return current_parser
+
+        current_parser = subparsers_action.choices[matched_choice]
+        index = matched_index + 1
 
 
 def build_parser() -> argparse.ArgumentParser:
@@ -46,7 +83,7 @@ def build_parser() -> argparse.ArgumentParser:
         help="Run the Level 1 benchmark harness from cached PR data.",
     )
     run_parser.add_argument("--cache-key", type=str, default="openai_codex")
-    run_parser.add_argument("--max-prs", type=int, default=5)
+    run_parser.add_argument("--max-prs", type=int, default=None)
     run_parser.add_argument("--run-name", type=str, default="")
 
     report_parser = benchmark_subparsers.add_parser(
@@ -60,7 +97,16 @@ def build_parser() -> argparse.ArgumentParser:
 
 def main(argv: Sequence[str] | None = None) -> int:
     parser = build_parser()
-    args = parser.parse_args(argv)
+    raw_args = list(sys.argv[1:] if argv is None else argv)
+    if not raw_args:
+        parser.print_help()
+        return 0
+    missing_subcommand_parser = _find_missing_subcommand_parser(parser, raw_args)
+    if missing_subcommand_parser is not None:
+        missing_subcommand_parser.print_help()
+        return 0
+
+    args = parser.parse_args(raw_args)
 
     if args.command == "fetch-prs":
         key = args.cache_key or repo_to_cache_key(args.repo)
@@ -88,11 +134,33 @@ def main(argv: Sequence[str] | None = None) -> int:
         return 0
 
     if args.command == "benchmark" and args.benchmark_command == "run":
+        config, _, _, _, _, _ = load_harness_bundle(DEFAULT_HARNESS_DIR)
+        snapshots = load_cached_pull_requests(DEFAULT_CACHE_ROOT, cache_key=args.cache_key)
+        if args.max_prs and args.max_prs > 0:
+            snapshots = snapshots[: args.max_prs]
+
+        print("Benchmark run configuration:")
+        print(f"- Reviewer model: {config.model}")
+        print(f"- Grader model: {config.grader_model}")
+        print(f"- Cache key: {args.cache_key}")
+        print(f"- Selected PRs: {len(snapshots)}")
+        try:
+            confirmation = input("Press Enter to start, or type 'cancel' to abort: ")
+        except KeyboardInterrupt:
+            print("\nCancelled.")
+            return 0
+        if confirmation.strip().lower() == "cancel":
+            print("Cancelled.")
+            return 0
+
+        resolved_run_name = default_run_id(args.run_name)
+        print(f"Run name: {resolved_run_name}")
         artifacts, summary = run_benchmark(
             cache_key=args.cache_key,
             max_prs=args.max_prs,
-            run_name=args.run_name,
+            run_name=resolved_run_name,
             harness_dir=DEFAULT_HARNESS_DIR,
+            progress_callback=print,
         )
         print(f"Run directory: {artifacts.run_dir}")
         print(f"Report: {artifacts.report_html}")

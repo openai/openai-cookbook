@@ -1,0 +1,4 @@
+{
+  "model": "gpt-5.4",
+  "grader_model": "gpt-5.4-nano"
+}

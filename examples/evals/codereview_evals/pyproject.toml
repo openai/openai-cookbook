@@ -1,0 +1,19 @@
+[build-system]
+requires = ["setuptools>=68", "wheel"]
+build-backend = "setuptools.build_meta"
+
+[project]
+name = "codereview-evals"
+version = "0.1.0"
+description = "Code review evaluation examples with cached GitHub pull request data"
+readme = "README.md"
+requires-python = ">=3.10"
+dependencies = [
+  "openai==2.15.0",
+]
+
+[project.scripts]
+evalcr = "codereview_evals.cli:main"
+
+[tool.setuptools.packages.find]
+include = ["codereview_evals*"]

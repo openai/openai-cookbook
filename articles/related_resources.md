@@ -64,4 +64,4 @@ People are writing great tools and papers for improving outputs from GPT. Here a
 - [Improving Factuality and Reasoning in Language Models through Multiagent Debate (2023)](https://arxiv.org/abs/2305.14325): Generating debates between a few ChatGPT agents over a few rounds improves scores on various benchmarks. Math word problem scores rise from 77% to 85%.
 ### RAG Troubleshooting
 
-For practical debugging of real-world retrieval-augmented generation (RAG) systems, you may find external troubleshooting frameworks useful. These can help diagnose issues such as retrieval misses, poor chunking, stale context, and hallucinated answers.
+- [WFGY RAG 16 Problem Map](https://github.com/onestardao/WFGY/blob/main/ProblemMap/README.md): A framework-agnostic troubleshooting checklist for diagnosing common RAG issues such as retrieval misses, stale or mismatched context, chunking problems, citation instability, and inconsistent answers.

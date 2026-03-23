@@ -1,7 +1,10 @@
 from __future__ import annotations
 
 import argparse
+import functools
+import http.server
 import json
+import socketserver
 import sys
 from pathlib import Path
 from typing import Sequence
@@ -104,6 +107,17 @@ def build_parser() -> argparse.ArgumentParser:
     )
     report_parser.add_argument("--run-dir", type=Path, required=True)
 
+    visualize_parser = subparsers.add_parser(
+        "visualize",
+        help="Serve a completed Level 1 benchmark run over HTTP on port 8000.",
+    )
+    visualize_parser.add_argument(
+        "--run-id",
+        type=str,
+        required=True,
+        help="Run directory name under 1_benchmark_harness/results/.",
+    )
+
     return parser
 
 
@@ -115,6 +129,31 @@ def _resolve_run_harness_dir(harness_type: str) -> Path:
             "Use '--type benchmark' for the current Level 1 harness."
         )
     return harness_dir
+
+
+def _resolve_visualize_run_dir(
+    run_id: str, harness_dir: Path | None = None
+) -> Path:
+    harness_dir = harness_dir or DEFAULT_HARNESS_DIR
+    run_dir = harness_dir / "results" / run_id
+    if not run_dir.exists():
+        raise FileNotFoundError(f"No benchmark run found for {run_id!r} at {run_dir}.")
+    report_path = run_dir / "report.html"
+    if not report_path.exists():
+        raise FileNotFoundError(f"Expected rendered report at {report_path}, but it was not found.")
+    return run_dir
+
+
+def _serve_run_visualization(run_dir: Path, port: int = 8000) -> None:
+    handler = functools.partial(http.server.SimpleHTTPRequestHandler, directory=str(run_dir))
+    with socketserver.TCPServer(("", port), handler) as server:
+        print(f"Serving benchmark run from: {run_dir}")
+        print(f"Report URL: http://127.0.0.1:{port}/report.html")
+        print("Press Ctrl+C to stop.")
+        try:
+            server.serve_forever()
+        except KeyboardInterrupt:
+            print("\nStopped visualization server.")
 
 
 def main(argv: Sequence[str] | None = None) -> int:
@@ -188,12 +227,18 @@ def main(argv: Sequence[str] | None = None) -> int:
         )
         print(f"Run directory: {artifacts.run_dir}")
         print(f"Report: {artifacts.report_html}")
+        print(f"Visualizer: evalcr visualize --run-id {resolved_run_name}")
         print(json.dumps(summary, indent=2, ensure_ascii=False))
         return 0
 
     if args.command == "benchmark" and args.benchmark_command == "report":
         report_path = render_benchmark_report(run_dir=args.run_dir)
         print(f"Wrote report: {report_path}")
+        return 0
+
+    if args.command == "visualize":
+        run_dir = _resolve_visualize_run_dir(args.run_id)
+        _serve_run_visualization(run_dir=run_dir, port=8000)
         return 0
 
     parser.error("Unknown command")

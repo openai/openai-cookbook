@@ -109,6 +109,7 @@ class CliTests(unittest.TestCase):
         self.assertIn("Grader model: gpt-grader", stdout.getvalue())
         self.assertIn("Selected PRs: 2", stdout.getvalue())
         self.assertIn("Run name: resolved-run", stdout.getvalue())
+        self.assertIn("Visualizer: evalcr visualize --run-id resolved-run", stdout.getvalue())
 
     @mock.patch("builtins.input", return_value="cancel")
     @mock.patch("codereview_evals.cli.run_benchmark")
@@ -150,6 +151,27 @@ class CliTests(unittest.TestCase):
             result = cli.main(["benchmark", "report", "--run-dir", str(run_dir)])
             self.assertEqual(result, 0)
             mock_report.assert_called_once_with(run_dir=run_dir)
+
+    @mock.patch("codereview_evals.cli._serve_run_visualization")
+    def test_visualize_command(self, mock_visualize: mock.Mock) -> None:
+        with tempfile.TemporaryDirectory() as tmp_dir:
+            harness_dir = Path(tmp_dir) / "1_benchmark_harness"
+            run_dir = harness_dir / "results" / "run-123"
+            run_dir.mkdir(parents=True)
+            (run_dir / "report.html").write_text("<html></html>", encoding="utf-8")
+            with mock.patch.object(cli, "DEFAULT_HARNESS_DIR", harness_dir):
+                result = cli.main(["visualize", "--run-id", "run-123"])
+        self.assertEqual(result, 0)
+        mock_visualize.assert_called_once_with(run_dir=run_dir, port=8000)
+
+    def test_visualize_command_missing_run(self) -> None:
+        with tempfile.TemporaryDirectory() as tmp_dir:
+            harness_dir = Path(tmp_dir) / "1_benchmark_harness"
+            harness_dir.mkdir(parents=True)
+            with mock.patch.object(cli, "DEFAULT_HARNESS_DIR", harness_dir):
+                with self.assertRaises(FileNotFoundError) as raised:
+                    cli.main(["visualize", "--run-id", "missing-run"])
+        self.assertIn("missing-run", str(raised.exception))
 
 
 if __name__ == "__main__":

@@ -39,6 +39,12 @@ Run the Level 1 benchmark:
 evalcr benchmark run --type benchmark --cache-key openai_codex --max-prs 5
 ```
 
+Serve the generated HTML report for a saved run on `http://127.0.0.1:8000/report.html`:
+
+```bash
+evalcr visualize --run-id <run_id>
+```
+
 `evalcr benchmark run` now requires `--type`:
 
 - `--type benchmark`: Level 1 benchmark harness

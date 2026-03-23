@@ -11,6 +11,12 @@ from .github_cache import DEFAULT_CACHE_ROOT, fetch_pull_requests, load_cached_p
 from .reporting import default_run_id
 from .state import reset_app_state
 
+HARNESS_TYPE_TO_DIR = {
+    "benchmark": DEFAULT_HARNESS_DIR,
+    "pairwise": DEFAULT_HARNESS_DIR.parent / "2_pairwise_harness",
+    "optimizer": DEFAULT_HARNESS_DIR.parent / "3_optimization_harness",
+}
+
 
 def _find_missing_subcommand_parser(
     parser: argparse.ArgumentParser, argv: Sequence[str]
@@ -80,7 +86,13 @@ def build_parser() -> argparse.ArgumentParser:
 
     run_parser = benchmark_subparsers.add_parser(
         "run",
-        help="Run the Level 1 benchmark harness from cached PR data.",
+        help="Run a harness from cached PR data.",
+    )
+    run_parser.add_argument(
+        "--type",
+        choices=tuple(HARNESS_TYPE_TO_DIR),
+        required=True,
+        help="Harness type: benchmark (Level 1), pairwise (Level 2), optimizer (Level 3).",
     )
     run_parser.add_argument("--cache-key", type=str, default="openai_codex")
     run_parser.add_argument("--max-prs", type=int, default=None)
@@ -93,6 +105,16 @@ def build_parser() -> argparse.ArgumentParser:
     report_parser.add_argument("--run-dir", type=Path, required=True)
 
     return parser
+
+
+def _resolve_run_harness_dir(harness_type: str) -> Path:
+    harness_dir = HARNESS_TYPE_TO_DIR[harness_type]
+    if harness_type != "benchmark":
+        raise NotImplementedError(
+            f"Harness type '{harness_type}' is not implemented yet. "
+            "Use '--type benchmark' for the current Level 1 harness."
+        )
+    return harness_dir
 
 
 def main(argv: Sequence[str] | None = None) -> int:
@@ -134,12 +156,14 @@ def main(argv: Sequence[str] | None = None) -> int:
         return 0
 
     if args.command == "benchmark" and args.benchmark_command == "run":
-        config, _, _, _, _, _ = load_harness_bundle(DEFAULT_HARNESS_DIR)
+        harness_dir = _resolve_run_harness_dir(args.type)
+        config, _, _, _, _, _ = load_harness_bundle(harness_dir)
         snapshots = load_cached_pull_requests(DEFAULT_CACHE_ROOT, cache_key=args.cache_key)
         if args.max_prs and args.max_prs > 0:
             snapshots = snapshots[: args.max_prs]
 
         print("Benchmark run configuration:")
+        print(f"- Harness type: {args.type}")
         print(f"- Reviewer model: {config.model}")
         print(f"- Grader model: {config.grader_model}")
         print(f"- Cache key: {args.cache_key}")
@@ -159,7 +183,7 @@ def main(argv: Sequence[str] | None = None) -> int:
             cache_key=args.cache_key,
             max_prs=args.max_prs,
             run_name=resolved_run_name,
-            harness_dir=DEFAULT_HARNESS_DIR,
+            harness_dir=harness_dir,
             progress_callback=print,
         )
         print(f"Run directory: {artifacts.run_dir}")

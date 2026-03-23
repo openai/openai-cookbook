@@ -10,7 +10,7 @@ static HTML report alongside JSON and CSV artifacts.
 ## Run
 
 ```bash
-evalcr benchmark run --cache-key openai_codex --max-prs 5
+evalcr benchmark run --type benchmark --cache-key openai_codex --max-prs 5
 ```
 
 ## Bundled assets

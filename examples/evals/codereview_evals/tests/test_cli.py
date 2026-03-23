@@ -34,6 +34,14 @@ class CliTests(unittest.TestCase):
         self.assertNotIn("error:", stdout.getvalue())
         self.assertEqual("", stderr.getvalue())
 
+    def test_benchmark_run_requires_type(self) -> None:
+        stderr = io.StringIO()
+        with mock.patch("sys.stderr", stderr):
+            with self.assertRaises(SystemExit) as raised:
+                cli.main(["benchmark", "run", "--cache-key", "openai_codex"])
+        self.assertEqual(raised.exception.code, 2)
+        self.assertIn("the following arguments are required: --type", stderr.getvalue())
+
     @mock.patch("codereview_evals.cli.fetch_pull_requests")
     def test_fetch_prs_command(self, mock_fetch: mock.Mock) -> None:
         mock_fetch.return_value = (Path("/tmp/cache"), {"pull_request_count": 2})
@@ -76,14 +84,27 @@ class CliTests(unittest.TestCase):
         artifacts.report_html = Path("/tmp/run/report.html")
         mock_run.return_value = (artifacts, {"total_examples": 1})
         with mock.patch("sys.stdout", stdout):
-            result = cli.main(["benchmark", "run", "--cache-key", "openai_codex", "--max-prs", "2"])
+            result = cli.main(
+                [
+                    "benchmark",
+                    "run",
+                    "--type",
+                    "benchmark",
+                    "--cache-key",
+                    "openai_codex",
+                    "--max-prs",
+                    "2",
+                ]
+            )
         self.assertEqual(result, 0)
         mock_run.assert_called_once()
         mock_input.assert_called_once_with("Press Enter to start, or type 'cancel' to abort: ")
         mock_load_pull_requests.assert_called_once()
         self.assertEqual(mock_run.call_args.kwargs["progress_callback"], print)
         self.assertEqual(mock_run.call_args.kwargs["run_name"], "resolved-run")
+        self.assertEqual(mock_run.call_args.kwargs["harness_dir"], cli.DEFAULT_HARNESS_DIR)
         mock_default_run_id.assert_called_once_with("")
+        self.assertIn("Harness type: benchmark", stdout.getvalue())
         self.assertIn("Reviewer model: gpt-reviewer", stdout.getvalue())
         self.assertIn("Grader model: gpt-grader", stdout.getvalue())
         self.assertIn("Selected PRs: 2", stdout.getvalue())
@@ -107,12 +128,19 @@ class CliTests(unittest.TestCase):
         mock_load_bundle.return_value = (config, "", "", "", {}, {})
         mock_load_pull_requests.return_value = [{"number": 101, "title": "PR one"}]
         with mock.patch("sys.stdout", stdout):
-            result = cli.main(["benchmark", "run", "--cache-key", "openai_codex"])
+            result = cli.main(
+                ["benchmark", "run", "--type", "benchmark", "--cache-key", "openai_codex"]
+            )
         self.assertEqual(result, 0)
         mock_run.assert_not_called()
         self.assertIn("Cancelled.", stdout.getvalue())
         self.assertIn("Selected PRs: 1", stdout.getvalue())
         self.assertNotIn("Run name:", stdout.getvalue())
+
+    def test_benchmark_run_rejects_unimplemented_harness_types(self) -> None:
+        with self.assertRaises(NotImplementedError) as raised:
+            cli.main(["benchmark", "run", "--type", "pairwise", "--cache-key", "openai_codex"])
+        self.assertIn("not implemented yet", str(raised.exception))
 
     @mock.patch("codereview_evals.cli.render_benchmark_report")
     def test_benchmark_report_command(self, mock_report: mock.Mock) -> None:

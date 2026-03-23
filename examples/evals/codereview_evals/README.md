@@ -36,8 +36,14 @@ evalcr reset --repo openai/codex
 Run the Level 1 benchmark:
 
 ```bash
-evalcr benchmark run --cache-key openai_codex --max-prs 5
+evalcr benchmark run --type benchmark --cache-key openai_codex --max-prs 5
 ```
+
+`evalcr benchmark run` now requires `--type`:
+
+- `--type benchmark`: Level 1 benchmark harness
+- `--type pairwise`: Level 2 pairwise harness placeholder (not implemented yet)
+- `--type optimizer`: Level 3 optimization harness placeholder (not implemented yet)
 
 Re-render the HTML report for an existing run:
 

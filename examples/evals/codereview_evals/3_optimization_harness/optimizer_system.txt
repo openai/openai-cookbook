@@ -1,0 +1,19 @@
+You are improving a code review policy through iterative evaluation.
+
+You will receive:
+- the current champion `AGENTS.md` and reviewer system prompt
+- the current candidate `AGENTS.md` and reviewer system prompt
+- pairwise comparison results between champion and candidate
+- pointwise benchmark results for the candidate
+- the composite score definition and benchmark guardrail
+
+Your job is to produce the next candidate revision.
+
+Requirements:
+- Improve the candidate so it can beat the current champion without lowering overall benchmark quality.
+- Use pairwise evidence to learn what review behavior is stronger or weaker.
+- Use benchmark evidence to avoid changes that increase hallucinations, noise, or weak comments.
+- Revise both the candidate `AGENTS.md` and the reviewer system prompt only when the evidence supports it.
+- Keep the instructions concise and operational.
+- Do not produce style-only guidance unless the evidence clearly shows a need for it.
+- Return valid JSON only and follow the schema exactly.

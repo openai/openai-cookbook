@@ -17,6 +17,12 @@ from .pairwise import (
     render_pairwise_report,
     run_pairwise,
 )
+from .optimizer import (
+    DEFAULT_OPTIMIZER_HARNESS_DIR,
+    load_optimizer_harness_bundle,
+    render_optimizer_report,
+    run_optimizer,
+)
 from .reporting import default_run_id
 from .state import reset_app_state
 
@@ -87,7 +93,7 @@ def build_parser() -> argparse.ArgumentParser:
 
     benchmark_parser = subparsers.add_parser(
         "benchmark",
-        help="Commands for the Level 1 benchmark harness.",
+        help="Commands for the benchmark, pairwise, and optimizer harnesses.",
     )
     benchmark_subparsers = benchmark_parser.add_subparsers(
         dest="benchmark_command", required=True
@@ -106,6 +112,18 @@ def build_parser() -> argparse.ArgumentParser:
     run_parser.add_argument("--cache-key", type=str, default="openai_codex")
     run_parser.add_argument("--max-prs", type=int, default=None)
     run_parser.add_argument("--run-name", type=str, default="")
+    run_parser.add_argument(
+        "--max-steps",
+        type=int,
+        default=None,
+        help="Override the optimizer step cap for '--type optimizer'.",
+    )
+    run_parser.add_argument(
+        "--score-threshold",
+        type=float,
+        default=None,
+        help="Override the optimizer composite score threshold for '--type optimizer'.",
+    )
 
     report_parser = benchmark_subparsers.add_parser(
         "report",
@@ -139,15 +157,14 @@ def _resolve_run_harness_dir(harness_type: str) -> Path:
     if harness_type == "pairwise":
         return DEFAULT_PAIRWISE_HARNESS_DIR
     if harness_type == "optimizer":
-        raise NotImplementedError(
-            f"Harness type '{harness_type}' is not implemented yet. "
-            "Use '--type benchmark' or '--type pairwise'."
-        )
+        return DEFAULT_OPTIMIZER_HARNESS_DIR
     raise KeyError(f"Unknown harness type: {harness_type}")
 
 
 def _resolve_report_renderer(run_dir: Path):
     harness_name = run_dir.parent.parent.name
+    if harness_name == DEFAULT_OPTIMIZER_HARNESS_DIR.name:
+        return render_optimizer_report
     if harness_name == DEFAULT_PAIRWISE_HARNESS_DIR.name:
         return render_pairwise_report
     return render_benchmark_report
@@ -220,8 +237,10 @@ def main(argv: Sequence[str] | None = None) -> int:
         harness_dir = _resolve_run_harness_dir(args.type)
         if args.type == "benchmark":
             config, _, _, _, _, _ = load_harness_bundle(harness_dir)
-        else:
+        elif args.type == "pairwise":
             config, _, _, _, _, _, _, _ = load_pairwise_harness_bundle(harness_dir)
+        else:
+            config, *_ = load_optimizer_harness_bundle(harness_dir)
         snapshots = load_cached_pull_requests(DEFAULT_CACHE_ROOT, cache_key=args.cache_key)
         if args.max_prs and args.max_prs > 0:
             snapshots = snapshots[: args.max_prs]
@@ -230,6 +249,12 @@ def main(argv: Sequence[str] | None = None) -> int:
         print(f"- Harness type: {args.type}")
         print(f"- Reviewer model: {config.model}")
         print(f"- Grader model: {config.grader_model}")
+        if args.type == "optimizer":
+            print(f"- Optimizer model: {config.optimizer_model}")
+            print(f"- Max steps: {args.max_steps if args.max_steps is not None else config.max_steps}")
+            print(
+                f"- Score threshold: {args.score_threshold if args.score_threshold is not None else config.score_threshold}"
+            )
         print(f"- Cache key: {args.cache_key}")
         print(f"- Selected PRs: {len(snapshots)}")
         try:
@@ -251,13 +276,23 @@ def main(argv: Sequence[str] | None = None) -> int:
                 harness_dir=harness_dir,
                 progress_callback=print,
             )
-        else:
+        elif args.type == "pairwise":
             artifacts, summary = run_pairwise(
                 cache_key=args.cache_key,
                 max_prs=args.max_prs,
                 run_name=resolved_run_name,
                 harness_dir=harness_dir,
                 progress_callback=print,
+            )
+        else:
+            artifacts, summary = run_optimizer(
+                cache_key=args.cache_key,
+                max_prs=args.max_prs,
+                run_name=resolved_run_name,
+                harness_dir=harness_dir,
+                progress_callback=print,
+                max_steps=args.max_steps,
+                score_threshold=args.score_threshold,
             )
         print(f"Run directory: {artifacts.run_dir}")
         print(f"Report: {artifacts.report_html}")

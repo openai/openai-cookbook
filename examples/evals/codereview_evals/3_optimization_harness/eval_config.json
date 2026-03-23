@@ -1,4 +1,10 @@
 {
   "model": "gpt-5.4",
-  "grader_model": "gpt-5.4-nano"
+  "grader_model": "gpt-5.4-nano",
+  "optimizer_model": "gpt-5.4",
+  "max_steps": 3,
+  "score_threshold": 0.75,
+  "pairwise_weight": 0.5,
+  "benchmark_weight": 0.5,
+  "benchmark_guardrail": 0.03
 }

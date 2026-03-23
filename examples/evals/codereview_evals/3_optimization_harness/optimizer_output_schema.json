@@ -1,0 +1,20 @@
+{
+  "type": "object",
+  "properties": {
+    "rationale": {
+      "type": "string"
+    },
+    "candidate_agents_md": {
+      "type": "string"
+    },
+    "candidate_reviewer_system": {
+      "type": "string"
+    }
+  },
+  "required": [
+    "rationale",
+    "candidate_agents_md",
+    "candidate_reviewer_system"
+  ],
+  "additionalProperties": false
+}

@@ -4,8 +4,7 @@ This folder contains a small CLI app for building code review evals on top of
 cached GitHub pull request data. The harnesses are numbered to match the guide:
 Level 1, Level 2, and Level 3.
 
-Levels 1 and 2 are implemented. Level 3 remains stubbed out so the folder
-structure already matches the notebook.
+Levels 1, 2, and 3 are implemented.
 
 ## Prerequisites
 
@@ -45,17 +44,30 @@ Run the Level 2 pairwise comparison harness:
 evalcr benchmark run --type pairwise --cache-key openai_codex --max-prs 5
 ```
 
+Run the Level 3 optimization loop:
+
+```bash
+evalcr benchmark run --type optimizer --cache-key openai_codex --max-prs 5
+```
+
 Serve the generated HTML report for a saved run on `http://127.0.0.1:8000/report.html`:
 
 ```bash
 evalcr visualize --run-id <run_id>
 ```
 
+For pairwise and optimizer runs, pass the harness type explicitly:
+
+```bash
+evalcr visualize --type pairwise --run-id <run_id>
+evalcr visualize --type optimizer --run-id <run_id>
+```
+
 `evalcr benchmark run` now requires `--type`:
 
 - `--type benchmark`: Level 1 benchmark harness
 - `--type pairwise`: Level 2 pairwise comparison harness
-- `--type optimizer`: Level 3 optimization harness placeholder (not implemented yet)
+- `--type optimizer`: Level 3 optimization loop with pairwise and pointwise guardrails
 
 Re-render the HTML report for an existing run:
 
@@ -69,7 +81,7 @@ evalcr benchmark report --run-dir 1_benchmark_harness/results/<run_id>
 - `data/cache/`: gitignored cached GitHub PR snapshots
 - `1_benchmark_harness/`: runnable Level 1 harness assets
 - `2_pairwise_harness/`: runnable Level 2 pairwise harness assets
-- `3_optimization_harness/`: Level 3 placeholder
+- `3_optimization_harness/`: runnable Level 3 optimizer harness assets
 
 ## What gets cached
 
@@ -92,7 +104,9 @@ For Level 1, `eval_config.json` sets the reviewer model and grader model, while
 `AGENTS.md` is injected into both the reviewer and grader inputs. For Level 2,
 the harness also includes `baseline_AGENTS.md` and `candidate_AGENTS.md`, which
 are compared side-by-side while reusing the same reviewer model and reviewer
-system prompt.
+system prompt. For Level 3, the harness stores baseline and candidate reviewer
+policies plus an optimizer prompt, and each step combines pairwise win rate with
+pointwise benchmark pass rate so the loop does not chase pairwise wins alone.
 
 ## Tests
 

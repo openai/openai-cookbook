@@ -59,16 +59,20 @@ class CliTests(unittest.TestCase):
     @mock.patch("builtins.input", return_value="")
     @mock.patch("codereview_evals.cli.default_run_id", return_value="resolved-run")
     @mock.patch("codereview_evals.cli.run_benchmark")
+    @mock.patch("codereview_evals.cli.run_optimizer")
     @mock.patch("codereview_evals.cli.run_pairwise")
     @mock.patch("codereview_evals.cli.load_cached_pull_requests")
+    @mock.patch("codereview_evals.cli.load_optimizer_harness_bundle")
     @mock.patch("codereview_evals.cli.load_pairwise_harness_bundle")
     @mock.patch("codereview_evals.cli.load_harness_bundle")
     def test_benchmark_run_command(
         self,
         mock_load_bundle: mock.Mock,
+        mock_load_optimizer_bundle: mock.Mock,
         mock_load_pairwise_bundle: mock.Mock,
         mock_load_pull_requests: mock.Mock,
         mock_run_pairwise: mock.Mock,
+        mock_run_optimizer: mock.Mock,
         mock_run: mock.Mock,
         mock_default_run_id: mock.Mock,
         mock_input: mock.Mock,
@@ -78,6 +82,13 @@ class CliTests(unittest.TestCase):
         config.model = "gpt-reviewer"
         config.grader_model = "gpt-grader"
         mock_load_bundle.return_value = (config, "", "", "", {}, {})
+        optimizer_config = mock.Mock()
+        optimizer_config.model = "gpt-reviewer"
+        optimizer_config.grader_model = "gpt-grader"
+        optimizer_config.optimizer_model = "gpt-optimizer"
+        optimizer_config.max_steps = 3
+        optimizer_config.score_threshold = 0.7
+        mock_load_optimizer_bundle.return_value = (optimizer_config, "", "", "", "", "", "", "", {}, {}, {}, "", {})
         mock_load_pairwise_bundle.return_value = (config, "", "", "", "", "", {}, {})
         mock_load_pull_requests.return_value = [
             {"number": 101, "title": "PR one"},
@@ -89,6 +100,7 @@ class CliTests(unittest.TestCase):
         artifacts.report_html = Path("/tmp/run/report.html")
         mock_run.return_value = (artifacts, {"total_examples": 1})
         mock_run_pairwise.return_value = (artifacts, {"total_examples": 1})
+        mock_run_optimizer.return_value = (artifacts, {"steps_run": 1})
         with mock.patch("sys.stdout", stdout):
             result = cli.main(
                 [
@@ -117,6 +129,7 @@ class CliTests(unittest.TestCase):
         self.assertIn("Run name: resolved-run", stdout.getvalue())
         self.assertIn("Visualizer: evalcr visualize --type benchmark --run-id resolved-run", stdout.getvalue())
         mock_run_pairwise.assert_not_called()
+        mock_run_optimizer.assert_not_called()
 
     @mock.patch("builtins.input", return_value="cancel")
     @mock.patch("codereview_evals.cli.run_benchmark")
@@ -180,6 +193,61 @@ class CliTests(unittest.TestCase):
         )
         self.assertIn("Harness type: pairwise", stdout.getvalue())
         self.assertIn("Visualizer: evalcr visualize --type pairwise --run-id pairwise-run", stdout.getvalue())
+
+    @mock.patch("builtins.input", return_value="")
+    @mock.patch("codereview_evals.cli.default_run_id", return_value="optimizer-run")
+    @mock.patch("codereview_evals.cli.run_optimizer")
+    @mock.patch("codereview_evals.cli.load_cached_pull_requests")
+    @mock.patch("codereview_evals.cli.load_optimizer_harness_bundle")
+    def test_benchmark_run_optimizer_command(
+        self,
+        mock_load_optimizer_bundle: mock.Mock,
+        mock_load_pull_requests: mock.Mock,
+        mock_run_optimizer: mock.Mock,
+        _mock_default_run_id: mock.Mock,
+        mock_input: mock.Mock,
+    ) -> None:
+        stdout = io.StringIO()
+        config = mock.Mock()
+        config.model = "gpt-reviewer"
+        config.grader_model = "gpt-grader"
+        config.optimizer_model = "gpt-optimizer"
+        config.max_steps = 4
+        config.score_threshold = 0.75
+        mock_load_optimizer_bundle.return_value = (config, "", "", "", "", "", "", "", {}, {}, {}, "", {})
+        mock_load_pull_requests.return_value = [{"number": 101, "title": "PR one"}]
+        artifacts = mock.Mock()
+        artifacts.run_dir = Path("/tmp/optimizer-run")
+        artifacts.report_html = Path("/tmp/optimizer-run/report.html")
+        mock_run_optimizer.return_value = (artifacts, {"steps_run": 2})
+        with mock.patch("sys.stdout", stdout):
+            result = cli.main(
+                [
+                    "benchmark",
+                    "run",
+                    "--type",
+                    "optimizer",
+                    "--cache-key",
+                    "openai_codex",
+                    "--max-steps",
+                    "5",
+                    "--score-threshold",
+                    "0.8",
+                ]
+            )
+        self.assertEqual(result, 0)
+        mock_input.assert_called_once_with("Press Enter to start, or type 'cancel' to abort: ")
+        self.assertEqual(
+            mock_run_optimizer.call_args.kwargs["harness_dir"],
+            cli.DEFAULT_OPTIMIZER_HARNESS_DIR,
+        )
+        self.assertEqual(mock_run_optimizer.call_args.kwargs["max_steps"], 5)
+        self.assertEqual(mock_run_optimizer.call_args.kwargs["score_threshold"], 0.8)
+        self.assertIn("Harness type: optimizer", stdout.getvalue())
+        self.assertIn("Optimizer model: gpt-optimizer", stdout.getvalue())
+        self.assertIn("Max steps: 5", stdout.getvalue())
+        self.assertIn("Score threshold: 0.8", stdout.getvalue())
+        self.assertIn("Visualizer: evalcr visualize --type optimizer --run-id optimizer-run", stdout.getvalue())
 
     @mock.patch("codereview_evals.cli.render_benchmark_report")
     def test_benchmark_report_command(self, mock_report: mock.Mock) -> None:

@@ -59,12 +59,16 @@ class CliTests(unittest.TestCase):
     @mock.patch("builtins.input", return_value="")
     @mock.patch("codereview_evals.cli.default_run_id", return_value="resolved-run")
     @mock.patch("codereview_evals.cli.run_benchmark")
+    @mock.patch("codereview_evals.cli.run_pairwise")
     @mock.patch("codereview_evals.cli.load_cached_pull_requests")
+    @mock.patch("codereview_evals.cli.load_pairwise_harness_bundle")
     @mock.patch("codereview_evals.cli.load_harness_bundle")
     def test_benchmark_run_command(
         self,
         mock_load_bundle: mock.Mock,
+        mock_load_pairwise_bundle: mock.Mock,
         mock_load_pull_requests: mock.Mock,
+        mock_run_pairwise: mock.Mock,
         mock_run: mock.Mock,
         mock_default_run_id: mock.Mock,
         mock_input: mock.Mock,
@@ -74,6 +78,7 @@ class CliTests(unittest.TestCase):
         config.model = "gpt-reviewer"
         config.grader_model = "gpt-grader"
         mock_load_bundle.return_value = (config, "", "", "", {}, {})
+        mock_load_pairwise_bundle.return_value = (config, "", "", "", "", "", {}, {})
         mock_load_pull_requests.return_value = [
             {"number": 101, "title": "PR one"},
             {"number": 202, "title": "PR two"},
@@ -83,6 +88,7 @@ class CliTests(unittest.TestCase):
         artifacts.run_dir = Path("/tmp/run")
         artifacts.report_html = Path("/tmp/run/report.html")
         mock_run.return_value = (artifacts, {"total_examples": 1})
+        mock_run_pairwise.return_value = (artifacts, {"total_examples": 1})
         with mock.patch("sys.stdout", stdout):
             result = cli.main(
                 [
@@ -109,7 +115,8 @@ class CliTests(unittest.TestCase):
         self.assertIn("Grader model: gpt-grader", stdout.getvalue())
         self.assertIn("Selected PRs: 2", stdout.getvalue())
         self.assertIn("Run name: resolved-run", stdout.getvalue())
-        self.assertIn("Visualizer: evalcr visualize --run-id resolved-run", stdout.getvalue())
+        self.assertIn("Visualizer: evalcr visualize --type benchmark --run-id resolved-run", stdout.getvalue())
+        mock_run_pairwise.assert_not_called()
 
     @mock.patch("builtins.input", return_value="cancel")
     @mock.patch("codereview_evals.cli.run_benchmark")
@@ -138,10 +145,41 @@ class CliTests(unittest.TestCase):
         self.assertIn("Selected PRs: 1", stdout.getvalue())
         self.assertNotIn("Run name:", stdout.getvalue())
 
-    def test_benchmark_run_rejects_unimplemented_harness_types(self) -> None:
-        with self.assertRaises(NotImplementedError) as raised:
-            cli.main(["benchmark", "run", "--type", "pairwise", "--cache-key", "openai_codex"])
-        self.assertIn("not implemented yet", str(raised.exception))
+    @mock.patch("builtins.input", return_value="")
+    @mock.patch("codereview_evals.cli.default_run_id", return_value="pairwise-run")
+    @mock.patch("codereview_evals.cli.run_pairwise")
+    @mock.patch("codereview_evals.cli.load_cached_pull_requests")
+    @mock.patch("codereview_evals.cli.load_pairwise_harness_bundle")
+    def test_benchmark_run_pairwise_command(
+        self,
+        mock_load_pairwise_bundle: mock.Mock,
+        mock_load_pull_requests: mock.Mock,
+        mock_run_pairwise: mock.Mock,
+        _mock_default_run_id: mock.Mock,
+        mock_input: mock.Mock,
+    ) -> None:
+        stdout = io.StringIO()
+        config = mock.Mock()
+        config.model = "gpt-reviewer"
+        config.grader_model = "gpt-grader"
+        mock_load_pairwise_bundle.return_value = (config, "", "", "", "", "", {}, {})
+        mock_load_pull_requests.return_value = [{"number": 101, "title": "PR one"}]
+        artifacts = mock.Mock()
+        artifacts.run_dir = Path("/tmp/pairwise-run")
+        artifacts.report_html = Path("/tmp/pairwise-run/report.html")
+        mock_run_pairwise.return_value = (artifacts, {"candidate_win_rate": 1.0})
+        with mock.patch("sys.stdout", stdout):
+            result = cli.main(
+                ["benchmark", "run", "--type", "pairwise", "--cache-key", "openai_codex"]
+            )
+        self.assertEqual(result, 0)
+        mock_input.assert_called_once_with("Press Enter to start, or type 'cancel' to abort: ")
+        self.assertEqual(
+            mock_run_pairwise.call_args.kwargs["harness_dir"],
+            cli.DEFAULT_PAIRWISE_HARNESS_DIR,
+        )
+        self.assertIn("Harness type: pairwise", stdout.getvalue())
+        self.assertIn("Visualizer: evalcr visualize --type pairwise --run-id pairwise-run", stdout.getvalue())
 
     @mock.patch("codereview_evals.cli.render_benchmark_report")
     def test_benchmark_report_command(self, mock_report: mock.Mock) -> None:
@@ -160,7 +198,7 @@ class CliTests(unittest.TestCase):
             run_dir.mkdir(parents=True)
             (run_dir / "report.html").write_text("<html></html>", encoding="utf-8")
             with mock.patch.object(cli, "DEFAULT_HARNESS_DIR", harness_dir):
-                result = cli.main(["visualize", "--run-id", "run-123"])
+                result = cli.main(["visualize", "--run-id", "run-123", "--type", "benchmark"])
         self.assertEqual(result, 0)
         mock_visualize.assert_called_once_with(run_dir=run_dir, port=8000)
 

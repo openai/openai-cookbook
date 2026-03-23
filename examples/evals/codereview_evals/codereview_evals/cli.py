@@ -11,13 +11,19 @@ from typing import Sequence
 
 from .benchmark import DEFAULT_HARNESS_DIR, load_harness_bundle, render_benchmark_report, run_benchmark
 from .github_cache import DEFAULT_CACHE_ROOT, fetch_pull_requests, load_cached_pull_requests, repo_to_cache_key
+from .pairwise import (
+    DEFAULT_PAIRWISE_HARNESS_DIR,
+    load_pairwise_harness_bundle,
+    render_pairwise_report,
+    run_pairwise,
+)
 from .reporting import default_run_id
 from .state import reset_app_state
 
 HARNESS_TYPE_TO_DIR = {
-    "benchmark": DEFAULT_HARNESS_DIR,
-    "pairwise": DEFAULT_HARNESS_DIR.parent / "2_pairwise_harness",
-    "optimizer": DEFAULT_HARNESS_DIR.parent / "3_optimization_harness",
+    "benchmark": "Level 1 benchmark harness",
+    "pairwise": "Level 2 pairwise harness",
+    "optimizer": "Level 3 optimizer harness",
 }
 
 
@@ -103,32 +109,48 @@ def build_parser() -> argparse.ArgumentParser:
 
     report_parser = benchmark_subparsers.add_parser(
         "report",
-        help="Re-render the HTML report for an existing Level 1 run.",
+        help="Re-render the HTML report for an existing saved run.",
     )
     report_parser.add_argument("--run-dir", type=Path, required=True)
 
     visualize_parser = subparsers.add_parser(
         "visualize",
-        help="Serve a completed Level 1 benchmark run over HTTP on port 8000.",
+        help="Serve a completed harness run over HTTP on port 8000.",
     )
     visualize_parser.add_argument(
         "--run-id",
         type=str,
         required=True,
-        help="Run directory name under 1_benchmark_harness/results/.",
+        help="Run directory name under the selected harness results folder.",
+    )
+    visualize_parser.add_argument(
+        "--type",
+        choices=tuple(HARNESS_TYPE_TO_DIR),
+        default="benchmark",
+        help="Harness type to visualize. Defaults to benchmark.",
     )
 
     return parser
 
 
 def _resolve_run_harness_dir(harness_type: str) -> Path:
-    harness_dir = HARNESS_TYPE_TO_DIR[harness_type]
-    if harness_type != "benchmark":
+    if harness_type == "benchmark":
+        return DEFAULT_HARNESS_DIR
+    if harness_type == "pairwise":
+        return DEFAULT_PAIRWISE_HARNESS_DIR
+    if harness_type == "optimizer":
         raise NotImplementedError(
             f"Harness type '{harness_type}' is not implemented yet. "
-            "Use '--type benchmark' for the current Level 1 harness."
+            "Use '--type benchmark' or '--type pairwise'."
         )
-    return harness_dir
+    raise KeyError(f"Unknown harness type: {harness_type}")
+
+
+def _resolve_report_renderer(run_dir: Path):
+    harness_name = run_dir.parent.parent.name
+    if harness_name == DEFAULT_PAIRWISE_HARNESS_DIR.name:
+        return render_pairwise_report
+    return render_benchmark_report
 
 
 def _resolve_visualize_run_dir(
@@ -196,7 +218,10 @@ def main(argv: Sequence[str] | None = None) -> int:
 
     if args.command == "benchmark" and args.benchmark_command == "run":
         harness_dir = _resolve_run_harness_dir(args.type)
-        config, _, _, _, _, _ = load_harness_bundle(harness_dir)
+        if args.type == "benchmark":
+            config, _, _, _, _, _ = load_harness_bundle(harness_dir)
+        else:
+            config, _, _, _, _, _, _, _ = load_pairwise_harness_bundle(harness_dir)
         snapshots = load_cached_pull_requests(DEFAULT_CACHE_ROOT, cache_key=args.cache_key)
         if args.max_prs and args.max_prs > 0:
             snapshots = snapshots[: args.max_prs]
@@ -218,26 +243,37 @@ def main(argv: Sequence[str] | None = None) -> int:
 
         resolved_run_name = default_run_id(args.run_name)
         print(f"Run name: {resolved_run_name}")
-        artifacts, summary = run_benchmark(
-            cache_key=args.cache_key,
-            max_prs=args.max_prs,
-            run_name=resolved_run_name,
-            harness_dir=harness_dir,
-            progress_callback=print,
-        )
+        if args.type == "benchmark":
+            artifacts, summary = run_benchmark(
+                cache_key=args.cache_key,
+                max_prs=args.max_prs,
+                run_name=resolved_run_name,
+                harness_dir=harness_dir,
+                progress_callback=print,
+            )
+        else:
+            artifacts, summary = run_pairwise(
+                cache_key=args.cache_key,
+                max_prs=args.max_prs,
+                run_name=resolved_run_name,
+                harness_dir=harness_dir,
+                progress_callback=print,
+            )
         print(f"Run directory: {artifacts.run_dir}")
         print(f"Report: {artifacts.report_html}")
-        print(f"Visualizer: evalcr visualize --run-id {resolved_run_name}")
+        print(f"Visualizer: evalcr visualize --type {args.type} --run-id {resolved_run_name}")
         print(json.dumps(summary, indent=2, ensure_ascii=False))
         return 0
 
     if args.command == "benchmark" and args.benchmark_command == "report":
-        report_path = render_benchmark_report(run_dir=args.run_dir)
+        report_renderer = _resolve_report_renderer(args.run_dir)
+        report_path = report_renderer(run_dir=args.run_dir)
         print(f"Wrote report: {report_path}")
         return 0
 
     if args.command == "visualize":
-        run_dir = _resolve_visualize_run_dir(args.run_id)
+        harness_dir = _resolve_run_harness_dir(args.type)
+        run_dir = _resolve_visualize_run_dir(args.run_id, harness_dir=harness_dir)
         _serve_run_visualization(run_dir=run_dir, port=8000)
         return 0
 

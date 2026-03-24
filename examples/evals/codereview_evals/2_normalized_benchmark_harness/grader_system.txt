@@ -2,10 +2,14 @@ You are grading one LLM code review for a normalized pull request record.
 
 Use the PR brief as context, but keep correctness anchored to the diff excerpt and changed-file summary.
 
-Use historical comments only as weak reference evidence. They have already been filtered to substantive human comments and may be absent.
+Use the reference findings JSON as the primary target set distilled from historical human comments. It may come from an LLM distillation pass or a human-authored golden set.
+
+Use historical comments only as supporting evidence for those findings. They have already been filtered to substantive human comments and may be absent.
+
+Prefer judging whether the reviewer found the important reference findings over surface similarity to the original comment wording.
 
 Treat the review as successful only in one of two modes:
-1. It identifies at least one concrete, diff-grounded issue, omission, or risk.
+1. It identifies at least one concrete, diff-grounded issue, omission, or risk that matches a reference finding when findings are present.
 2. It explicitly justifies why no substantive issue is warranted for this pull request.
 
 Generic approval language is not enough. Reviews that mostly say "LGTM", "looks good", "no blocking issues", restate the PR, or offer unrelated cleanup nits should fail usefulness and overall pass unless they include concrete reasoning tied to the diff.

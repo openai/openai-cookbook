@@ -72,7 +72,19 @@ def prepare_dataset(
                 refresh=refresh_derived,
                 client=client,
             )
-            record = _build_normalized_record(record, pr_brief=brief)
+            review_findings_json = _load_or_generate_review_findings(
+                cache_key=cache_key,
+                prepared_root=prepared_root,
+                snapshot=snapshot,
+                reference_comments_text=record["reference_comments_text"],
+                refresh=refresh_derived,
+                client=client,
+            )
+            record = _build_normalized_record(
+                record,
+                pr_brief=brief,
+                reference_findings_json=review_findings_json,
+            )
         if level == 3:
             record = _build_pairwise_record(
                 cache_key=cache_key,
@@ -119,9 +131,15 @@ def _build_basic_record(snapshot: JSONDict) -> JSONDict:
     return record
 
 
-def _build_normalized_record(base_record: JSONDict, *, pr_brief: str) -> JSONDict:
+def _build_normalized_record(
+    base_record: JSONDict,
+    *,
+    pr_brief: str,
+    reference_findings_json: str,
+) -> JSONDict:
     record = dict(base_record)
     record["pr_brief"] = pr_brief.strip()
+    record["reference_findings_json"] = reference_findings_json.strip()
     record["normalized_review_input_text"] = _format_review_input(record, normalized=True)
     return record
 
@@ -200,6 +218,52 @@ def _load_or_generate_pr_brief(
     brief_path.parent.mkdir(parents=True, exist_ok=True)
     brief_path.write_text(brief.strip() + "\n", encoding="utf-8")
     return brief
+
+
+def _load_or_generate_review_findings(
+    *,
+    cache_key: str,
+    prepared_root: Path,
+    snapshot: JSONDict,
+    reference_comments_text: str,
+    refresh: bool,
+    client: OpenAI | None,
+) -> str:
+    pr_number = int(snapshot.get("number") or 0)
+    findings_path = (
+        prepared_root
+        / cache_key
+        / "shared"
+        / "review_findings"
+        / f"{pr_number}.json"
+    )
+    if findings_path.exists() and not refresh:
+        return findings_path.read_text(encoding="utf-8")
+
+    if reference_comments_text.strip() == "No historical comments captured.":
+        findings = json.dumps({"findings": []}, indent=2, ensure_ascii=False)
+    else:
+        if client is None:
+            client = OpenAI()
+
+        harness_dir = harness_dir_for_level(2)
+        eval_config = _read_json(harness_dir / "eval_config.json")
+        findings_model = (
+            eval_config.get("findings_model")
+            or eval_config.get("brief_model")
+            or eval_config.get("reviewer_model")
+            or "gpt-4.1-mini"
+        )
+        findings = _generate_text(
+            client=client,
+            model=findings_model,
+            developer_prompt=_read_text(harness_dir / "review_findings_system.txt"),
+            user_prompt=_format_findings_input(snapshot, reference_comments_text),
+        )
+
+    findings_path.parent.mkdir(parents=True, exist_ok=True)
+    findings_path.write_text(findings.strip() + "\n", encoding="utf-8")
+    return findings
 
 
 def _load_or_generate_review(
@@ -338,6 +402,18 @@ def _format_brief_input(snapshot: JSONDict) -> str:
             "",
             "Diff excerpt:",
             _truncate_text(snapshot.get("diff_text") or "", 8_000) or "No diff available.",
+        ]
+    ).strip()
+
+
+def _format_findings_input(snapshot: JSONDict, reference_comments_text: str) -> str:
+    return "\n".join(
+        [
+            f"Repository: {snapshot.get('repository', '')}",
+            f"Pull request: #{snapshot.get('number')} {snapshot.get('title', '')}",
+            "",
+            "Historical review comments only:",
+            reference_comments_text,
         ]
     ).strip()
 

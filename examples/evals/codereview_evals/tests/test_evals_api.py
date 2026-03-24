@@ -15,7 +15,9 @@ import codereview_evals.evals_api as evals_api
 from codereview_evals.evals_api import (
     _ensure_eval,
     _eval_spec_fingerprint,
+    _benchmark_template,
     _build_benchmark_testing_criteria,
+    _item_schema,
     _versioned_eval_name,
     run_evals,
 )
@@ -99,6 +101,14 @@ class EvalsApiTests(unittest.TestCase):
             developer_prompt = criterion["input"][0]["content"]
             self.assertIn("Return exactly one label: pass or fail.", developer_prompt)
             self.assertIn("Do not output any other text.", developer_prompt)
+
+    def test_level_2_benchmark_template_includes_reference_findings(self) -> None:
+        template = _benchmark_template(2)
+        schema = _item_schema(2)
+
+        self.assertIn("Reference findings JSON:", template)
+        self.assertIn("reference_findings_json", schema["properties"])
+        self.assertIn("reference_findings_json", schema["required"])
 
     def test_run_evals_level_1_writes_summary(self) -> None:
         with tempfile.TemporaryDirectory() as tmp_dir:

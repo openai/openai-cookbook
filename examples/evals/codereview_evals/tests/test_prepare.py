@@ -162,6 +162,12 @@ class PrepareDatasetTests(unittest.TestCase):
             brief_path = prepared_root / "openai_codex" / "shared" / "pr_briefs" / "101.txt"
             brief_path.parent.mkdir(parents=True, exist_ok=True)
             brief_path.write_text("Stable PR brief\n", encoding="utf-8")
+            findings_path = prepared_root / "openai_codex" / "shared" / "review_findings" / "101.json"
+            findings_path.parent.mkdir(parents=True, exist_ok=True)
+            findings_path.write_text(
+                '{\n  "findings": [\n    {\n      "id": "F1",\n      "title": "Missing guard",\n      "summary": "Empty requests need a guard.",\n      "severity": "high"\n    }\n  ]\n}\n',
+                encoding="utf-8",
+            )
 
             artifacts, _summary = prepare_dataset(
                 level=2,
@@ -173,7 +179,34 @@ class PrepareDatasetTests(unittest.TestCase):
             row = json.loads(artifacts.dataset_path.read_text(encoding="utf-8").splitlines()[0])
             item = row["item"]
             self.assertEqual(item["pr_brief"], "Stable PR brief")
+            self.assertIn('"title": "Missing guard"', item["reference_findings_json"])
             self.assertIn("PR brief:", item["normalized_review_input_text"])
+            self.assertNotIn("Reference findings JSON:", item["normalized_review_input_text"])
+
+    def test_level_2_writes_empty_findings_when_no_historical_comments(self) -> None:
+        with tempfile.TemporaryDirectory() as tmp_dir:
+            root = Path(tmp_dir)
+            cache_root = root / "cache"
+            prepared_root = root / "prepared"
+            snapshot = _snapshot()
+            snapshot["reviews"] = []
+            self._write_cache(cache_root, "openai_codex", [snapshot])
+            brief_path = prepared_root / "openai_codex" / "shared" / "pr_briefs" / "101.txt"
+            brief_path.parent.mkdir(parents=True, exist_ok=True)
+            brief_path.write_text("Stable PR brief\n", encoding="utf-8")
+
+            artifacts, _summary = prepare_dataset(
+                level=2,
+                cache_key="openai_codex",
+                cache_root=cache_root,
+                prepared_root=prepared_root,
+            )
+
+            row = json.loads(artifacts.dataset_path.read_text(encoding="utf-8").splitlines()[0])
+            item = row["item"]
+            self.assertEqual(json.loads(item["reference_findings_json"]), {"findings": []})
+            findings_path = prepared_root / "openai_codex" / "shared" / "review_findings" / "101.json"
+            self.assertTrue(findings_path.exists())
 
     def test_level_3_reuses_cached_brief_and_reviews(self) -> None:
         with tempfile.TemporaryDirectory() as tmp_dir:
@@ -185,6 +218,10 @@ class PrepareDatasetTests(unittest.TestCase):
             brief_path = prepared_root / "openai_codex" / "shared" / "pr_briefs" / "101.txt"
             brief_path.parent.mkdir(parents=True, exist_ok=True)
             brief_path.write_text("Stable PR brief\n", encoding="utf-8")
+
+            findings_path = prepared_root / "openai_codex" / "shared" / "review_findings" / "101.json"
+            findings_path.parent.mkdir(parents=True, exist_ok=True)
+            findings_path.write_text('{\n  "findings": []\n}\n', encoding="utf-8")
 
             baseline_path = prepared_root / "openai_codex" / "level_3" / "generated_reviews" / "baseline" / "101.md"
             baseline_path.parent.mkdir(parents=True, exist_ok=True)

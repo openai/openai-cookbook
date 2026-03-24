@@ -5,7 +5,7 @@ This example shows how to evaluate AI code reviews with cached GitHub pull reque
 The three levels now progress like this:
 
 1. `1_basic_benchmark_harness`: a pointwise benchmark over benchmark-eligible cached PR snapshots
-2. `2_normalized_benchmark_harness`: the same benchmark after normalizing PR records with a cached `pr_brief`
+2. `2_normalized_benchmark_harness`: the same benchmark after normalizing PR records with a cached `pr_brief` and distilled `reference_findings_json`
 3. `3_pairwise_harness`: pairwise judging over normalized records with baseline and candidate reviews
 
 ## Prerequisites
@@ -68,7 +68,7 @@ evalcr reset --cache-key openai_codex
 - `fetch-prs` remains GitHub-only. Preparation happens in a separate step.
 - `fetch-prs --limit N` now means "cache N benchmark-eligible PRs", so the command may scan more than `N` recently closed PRs before it stops.
 - Historical comments are filtered down to substantive human comments; trigger text, pure approvals, and connector boilerplate are dropped before dataset preparation.
-- Level 2 keeps the benchmark objective fixed and only changes the input representation.
+- Level 2 keeps the benchmark objective fixed and changes the input representation plus the grading target: it normalizes both PR context and expected findings.
 - Level 3 uses normalized records and cached baseline/candidate reviews before pairwise judging.
 - The primary result surface for all three levels is the Evals API run plus its `report_url`, not a local HTML report.
 - `summary.json` includes the resolved remote eval name and spec fingerprint so config drift is visible in saved artifacts.

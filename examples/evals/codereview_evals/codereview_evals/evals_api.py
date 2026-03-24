@@ -447,7 +447,16 @@ def _benchmark_template(level: int) -> str:
         "Merged: {{ item.merged }}",
     ]
     if level == 2:
-        lines.extend(["", "PR brief:", "{{ item.pr_brief }}"])
+        lines.extend(
+            [
+                "",
+                "PR brief:",
+                "{{ item.pr_brief }}",
+                "",
+                "Reference findings JSON:",
+                "{{ item.reference_findings_json }}",
+            ]
+        )
     lines.extend(
         [
             "",
@@ -521,8 +530,11 @@ def _item_schema(level: int) -> JSONDict:
     ]
     if level >= 2:
         properties["pr_brief"] = {"type": "string"}
+        properties["reference_findings_json"] = {"type": "string"}
         properties["normalized_review_input_text"] = {"type": "string"}
-        required.extend(["pr_brief", "normalized_review_input_text"])
+        required.extend(
+            ["pr_brief", "reference_findings_json", "normalized_review_input_text"]
+        )
     if level == 3:
         properties["baseline_review"] = {"type": "string"}
         properties["candidate_review"] = {"type": "string"}

@@ -1,6 +1,6 @@
 # 3 Pairwise Harness
 
-This harness expresses pairwise judging in Evals over normalized PR records.
+This harness expresses pairwise judging in Evals over normalized PR records from the benchmark-eligible PR set selected during fetch.
 
 Dataset preparation reuses the normalized benchmark record from Level 2, then caches:
 

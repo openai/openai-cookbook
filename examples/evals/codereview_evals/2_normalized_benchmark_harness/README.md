@@ -1,6 +1,6 @@
 # 2 Normalized Benchmark Harness
 
-This harness keeps the benchmark objective fixed and stabilizes the reviewer and grader inputs.
+This harness keeps the benchmark objective fixed and stabilizes the reviewer and grader inputs for the benchmark-eligible PR set selected during fetch.
 
 Compared with Level 1, dataset preparation adds one cached model-generated `pr_brief` per pull request. The benchmark still evaluates the same task, but the reviewer and graders consume a more normalized PR representation.
 

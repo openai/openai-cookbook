@@ -390,10 +390,22 @@ def _build_benchmark_testing_criteria(level: int) -> list[JSONDict]:
     grader_system = _read_text(harness_dir_for_level(level) / "grader_system.txt")
     criteria: list[JSONDict] = []
     for name, extra_instruction in (
-        ("Correctness", "Label pass only if the generated review is grounded in the diff and does not invent nonexistent risks."),
-        ("Usefulness", "Label pass only if the generated review identifies meaningful issues or omissions and gives actionable feedback."),
-        ("Noise", "Label pass only if the generated review stays focused on high-signal issues and avoids trivial or redundant comments."),
-        ("Overall pass", "Label pass only if the generated review is acceptable overall for this pull request."),
+        (
+            "Correctness",
+            "Label pass only if the generated review is grounded in the diff and changed-file summary, and does not invent nonexistent risks. A no-issue review only passes if it gives concrete diff-grounded reasoning.",
+        ),
+        (
+            "Usefulness",
+            "Label pass only if the generated review either identifies a concrete issue or omission, or gives a justified no-issue assessment tied to the diff. Generic approval or PR restatement should fail.",
+        ),
+        (
+            "Noise",
+            "Label pass only if the generated review stays focused on high-signal issues and avoids trivial, redundant, or boilerplate approval language.",
+        ),
+        (
+            "Overall pass",
+            "Label pass only if the generated review is successful overall because it finds a concrete issue or provides a justified no-issue assessment. Generic positive signoff should fail.",
+        ),
     ):
         criteria.append(
             {

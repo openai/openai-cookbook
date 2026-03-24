@@ -93,6 +93,66 @@ class PrepareDatasetTests(unittest.TestCase):
             row = json.loads(artifacts.dataset_path.read_text(encoding="utf-8").splitlines()[0])
             self.assertIn("Please add a guard.", row["item"]["reference_comments_text"])
 
+    def test_level_1_filters_trigger_and_template_comments(self) -> None:
+        with tempfile.TemporaryDirectory() as tmp_dir:
+            root = Path(tmp_dir)
+            cache_root = root / "cache"
+            prepared_root = root / "prepared"
+            snapshot = _snapshot()
+            snapshot["issue_comments"] = [
+                {
+                    "id": 1,
+                    "author_login": "alice",
+                    "body": "@codex review",
+                    "created_at": "2025-01-01T00:00:00Z",
+                    "source": "issue_comment",
+                },
+                {
+                    "id": 2,
+                    "author_login": "chatgpt-codex-connector",
+                    "body": "Codex Review: Didn't find any major issues.\n\nAbout Codex in GitHub",
+                    "created_at": "2025-01-01T00:00:01Z",
+                    "source": "issue_comment",
+                    "is_bot": True,
+                },
+            ]
+            snapshot["reviews"] = [
+                {
+                    "id": 3,
+                    "author_login": "bob",
+                    "body": "LGTM",
+                    "submitted_at": "2025-01-01T00:00:02Z",
+                    "source": "review",
+                }
+            ]
+            snapshot["inline_review_comments"] = [
+                {
+                    "id": 4,
+                    "author_login": "carol",
+                    "body": "This path still needs a guard around the empty-request case.",
+                    "path": "app.py",
+                    "line": 10,
+                    "created_at": "2025-01-01T00:00:03Z",
+                    "source": "inline_review_comment",
+                }
+            ]
+            self._write_cache(cache_root, "openai_codex", [snapshot])
+
+            artifacts, summary = prepare_dataset(
+                level=1,
+                cache_key="openai_codex",
+                cache_root=cache_root,
+                prepared_root=prepared_root,
+            )
+
+            self.assertEqual(summary["record_count"], 1)
+            row = json.loads(artifacts.dataset_path.read_text(encoding="utf-8").splitlines()[0])
+            comments_text = row["item"]["reference_comments_text"]
+            self.assertIn("This path still needs a guard", comments_text)
+            self.assertNotIn("@codex review", comments_text)
+            self.assertNotIn("LGTM", comments_text)
+            self.assertNotIn("About Codex in GitHub", comments_text)
+
     def test_level_2_reuses_cached_pr_brief(self) -> None:
         with tempfile.TemporaryDirectory() as tmp_dir:
             root = Path(tmp_dir)

@@ -6,7 +6,11 @@ from typing import Callable
 
 from openai import OpenAI
 
-from .github_cache import DEFAULT_CACHE_ROOT, load_cached_pull_requests
+from .github_cache import (
+    DEFAULT_CACHE_ROOT,
+    iter_substantive_human_comments,
+    load_cached_pull_requests,
+)
 from .paths import PREPARED_ROOT, harness_dir_for_level
 from .types import JSONDict, PreparedDatasetArtifacts
 
@@ -351,16 +355,7 @@ def _format_changed_files(files: list[JSONDict]) -> str:
 
 
 def _format_reference_comments(snapshot: JSONDict) -> str:
-    comments: list[JSONDict] = []
-    for source_key in ("issue_comments", "reviews", "inline_review_comments"):
-        for comment in snapshot.get(source_key) or []:
-            if comment.get("is_bot"):
-                continue
-            body = (comment.get("body") or "").strip()
-            if not body:
-                continue
-            comments.append(comment)
-
+    comments = iter_substantive_human_comments(snapshot)
     if not comments:
         return "No historical comments captured."
 

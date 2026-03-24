@@ -15,6 +15,7 @@ import codereview_evals.evals_api as evals_api
 from codereview_evals.evals_api import (
     _ensure_eval,
     _eval_spec_fingerprint,
+    _build_benchmark_testing_criteria,
     _versioned_eval_name,
     run_evals,
 )
@@ -90,6 +91,15 @@ class _FakeClient:
 
 
 class EvalsApiTests(unittest.TestCase):
+    def test_benchmark_testing_criteria_require_exact_label(self) -> None:
+        criteria = _build_benchmark_testing_criteria(1)
+
+        self.assertEqual(len(criteria), 4)
+        for criterion in criteria:
+            developer_prompt = criterion["input"][0]["content"]
+            self.assertIn("Return exactly one label: pass or fail.", developer_prompt)
+            self.assertIn("Do not output any other text.", developer_prompt)
+
     def test_run_evals_level_1_writes_summary(self) -> None:
         with tempfile.TemporaryDirectory() as tmp_dir:
             dataset_path = Path(tmp_dir) / "benchmark.jsonl"

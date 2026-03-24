@@ -13,6 +13,8 @@ from .prepare import default_dataset_path
 from .types import EvalRunArtifacts, JSONDict
 
 ProgressCallback = Callable[[str], None] | None
+DEFAULT_REVIEWER_MODEL = "gpt-5.3-codex"
+DEFAULT_EVAL_JUDGE_MODEL = "gpt-4.1"
 
 
 def run_evals(
@@ -137,7 +139,11 @@ def _build_eval_spec(level: int) -> JSONDict:
             "testing_criteria": _build_benchmark_testing_criteria(level),
         }
     eval_config = _read_eval_config(level)
-    grader_model = eval_config.get("judge_model") or eval_config.get("grader_model") or "gpt-5.3-codex"
+    grader_model = (
+        eval_config.get("judge_model")
+        or eval_config.get("grader_model")
+        or DEFAULT_EVAL_JUDGE_MODEL
+    )
     return {
         "data_source_config": {
             "type": "custom",
@@ -182,7 +188,7 @@ def _versioned_eval_name(*, level: int, eval_spec_fingerprint: str) -> str:
 def _build_run_request(*, level: int, file_id: str) -> JSONDict:
     if level in {1, 2}:
         eval_config = _read_eval_config(level)
-        model = eval_config.get("reviewer_model") or eval_config.get("model") or "gpt-5.3-codex"
+        model = eval_config.get("reviewer_model") or eval_config.get("model") or DEFAULT_REVIEWER_MODEL
         reviewer_system = _read_text(harness_dir_for_level(level) / "reviewer_system.txt")
         agents_md = _read_text(harness_dir_for_level(level) / "AGENTS.md")
         developer_prompt = reviewer_system.strip()
@@ -202,7 +208,11 @@ def _build_run_request(*, level: int, file_id: str) -> JSONDict:
             "source": {"type": "file_id", "id": file_id},
         }
 
-    judge_model = _read_eval_config(level).get("judge_model") or _read_eval_config(level).get("grader_model") or "gpt-5.3-codex"
+    judge_model = (
+        _read_eval_config(level).get("judge_model")
+        or _read_eval_config(level).get("grader_model")
+        or DEFAULT_EVAL_JUDGE_MODEL
+    )
     return {
         "type": "responses",
         "model": judge_model,
@@ -386,8 +396,9 @@ def _criterion_key(name: str) -> str | None:
 
 
 def _build_benchmark_testing_criteria(level: int) -> list[JSONDict]:
-    grader_model = _read_eval_config(level).get("grader_model") or "gpt-5.3-codex"
+    grader_model = _read_eval_config(level).get("grader_model") or DEFAULT_EVAL_JUDGE_MODEL
     grader_system = _read_text(harness_dir_for_level(level) / "grader_system.txt")
+    label_instruction = "Return exactly one label: pass or fail. Do not output any other text."
     criteria: list[JSONDict] = []
     for name, extra_instruction in (
         (
@@ -415,7 +426,7 @@ def _build_benchmark_testing_criteria(level: int) -> list[JSONDict]:
                 "input": [
                     {
                         "role": "developer",
-                        "content": f"{grader_system}\n\n{extra_instruction}",
+                        "content": f"{grader_system}\n\n{extra_instruction}\n\n{label_instruction}",
                     },
                     {
                         "role": "user",

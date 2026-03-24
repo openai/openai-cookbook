@@ -1,6 +1,7 @@
 from __future__ import annotations
 
 import argparse
+from dataclasses import replace
 import functools
 import http.server
 import json
@@ -31,6 +32,7 @@ HARNESS_TYPE_TO_DIR = {
     "pairwise": "Level 2 pairwise harness",
     "optimizer": "Level 3 optimizer harness",
 }
+REASONING_EFFORT_CHOICES = ("default", "none", "minimal", "low", "medium", "high", "xhigh")
 
 
 def _find_missing_subcommand_parser(
@@ -112,6 +114,31 @@ def build_parser() -> argparse.ArgumentParser:
     run_parser.add_argument("--cache-key", type=str, default="openai_codex")
     run_parser.add_argument("--max-prs", type=int, default=None)
     run_parser.add_argument("--run-name", type=str, default="")
+    run_parser.add_argument("--reviewer-model", type=str, default="")
+    run_parser.add_argument("--grader-model", type=str, default="")
+    run_parser.add_argument("--optimizer-model", type=str, default="")
+    run_parser.add_argument(
+        "--reviewer-reasoning-effort",
+        choices=REASONING_EFFORT_CHOICES,
+        default="",
+        help="Override reviewer reasoning effort. Use 'default' to clear the harness setting.",
+    )
+    run_parser.add_argument(
+        "--grader-reasoning-effort",
+        choices=REASONING_EFFORT_CHOICES,
+        default="",
+        help="Override grader reasoning effort. Use 'default' to clear the harness setting.",
+    )
+    run_parser.add_argument(
+        "--optimizer-reasoning-effort",
+        choices=REASONING_EFFORT_CHOICES,
+        default="",
+        help="Override optimizer reasoning effort. Use 'default' to clear the harness setting.",
+    )
+    run_parser.add_argument("--reviewer-max-output-tokens", type=int, default=None)
+    run_parser.add_argument("--grader-max-output-tokens", type=int, default=None)
+    run_parser.add_argument("--optimizer-max-output-tokens", type=int, default=None)
+    run_parser.add_argument("--max-concurrency", type=int, default=None)
     run_parser.add_argument(
         "--max-steps",
         type=int,
@@ -195,6 +222,14 @@ def _serve_run_visualization(run_dir: Path, port: int = 8000) -> None:
             print("\nStopped visualization server.")
 
 
+def _resolve_reasoning_override(raw_value: str, current_value: str | None) -> str | None:
+    if not raw_value:
+        return current_value
+    if raw_value == "default":
+        return None
+    return raw_value
+
+
 def main(argv: Sequence[str] | None = None) -> int:
     parser = build_parser()
     raw_args = list(sys.argv[1:] if argv is None else argv)
@@ -237,10 +272,85 @@ def main(argv: Sequence[str] | None = None) -> int:
         harness_dir = _resolve_run_harness_dir(args.type)
         if args.type == "benchmark":
             config, _, _, _, _, _ = load_harness_bundle(harness_dir)
+            config = replace(
+                config,
+                model=args.reviewer_model or config.model,
+                grader_model=args.grader_model or config.grader_model,
+                reviewer_reasoning_effort=_resolve_reasoning_override(
+                    args.reviewer_reasoning_effort, config.reviewer_reasoning_effort
+                ),
+                grader_reasoning_effort=_resolve_reasoning_override(
+                    args.grader_reasoning_effort, config.grader_reasoning_effort
+                ),
+                reviewer_max_output_tokens=(
+                    args.reviewer_max_output_tokens
+                    if args.reviewer_max_output_tokens is not None
+                    else config.reviewer_max_output_tokens
+                ),
+                grader_max_output_tokens=(
+                    args.grader_max_output_tokens
+                    if args.grader_max_output_tokens is not None
+                    else config.grader_max_output_tokens
+                ),
+                max_concurrency=args.max_concurrency or config.max_concurrency,
+            )
         elif args.type == "pairwise":
             config, _, _, _, _, _, _, _ = load_pairwise_harness_bundle(harness_dir)
+            config = replace(
+                config,
+                model=args.reviewer_model or config.model,
+                grader_model=args.grader_model or config.grader_model,
+                reviewer_reasoning_effort=_resolve_reasoning_override(
+                    args.reviewer_reasoning_effort, config.reviewer_reasoning_effort
+                ),
+                grader_reasoning_effort=_resolve_reasoning_override(
+                    args.grader_reasoning_effort, config.grader_reasoning_effort
+                ),
+                reviewer_max_output_tokens=(
+                    args.reviewer_max_output_tokens
+                    if args.reviewer_max_output_tokens is not None
+                    else config.reviewer_max_output_tokens
+                ),
+                grader_max_output_tokens=(
+                    args.grader_max_output_tokens
+                    if args.grader_max_output_tokens is not None
+                    else config.grader_max_output_tokens
+                ),
+                max_concurrency=args.max_concurrency or config.max_concurrency,
+            )
         else:
             config, *_ = load_optimizer_harness_bundle(harness_dir)
+            config = replace(
+                config,
+                model=args.reviewer_model or config.model,
+                grader_model=args.grader_model or config.grader_model,
+                optimizer_model=args.optimizer_model or config.optimizer_model,
+                reviewer_reasoning_effort=_resolve_reasoning_override(
+                    args.reviewer_reasoning_effort, config.reviewer_reasoning_effort
+                ),
+                grader_reasoning_effort=_resolve_reasoning_override(
+                    args.grader_reasoning_effort, config.grader_reasoning_effort
+                ),
+                optimizer_reasoning_effort=_resolve_reasoning_override(
+                    args.optimizer_reasoning_effort, config.optimizer_reasoning_effort
+                ),
+                reviewer_max_output_tokens=(
+                    args.reviewer_max_output_tokens
+                    if args.reviewer_max_output_tokens is not None
+                    else config.reviewer_max_output_tokens
+                ),
+                grader_max_output_tokens=(
+                    args.grader_max_output_tokens
+                    if args.grader_max_output_tokens is not None
+                    else config.grader_max_output_tokens
+                ),
+                optimizer_max_output_tokens=(
+                    args.optimizer_max_output_tokens
+                    if args.optimizer_max_output_tokens is not None
+                    else config.optimizer_max_output_tokens
+                ),
+                max_concurrency=args.max_concurrency or config.max_concurrency,
+            )
         snapshots = load_cached_pull_requests(DEFAULT_CACHE_ROOT, cache_key=args.cache_key)
         if args.max_prs and args.max_prs > 0:
             snapshots = snapshots[: args.max_prs]
@@ -249,8 +359,21 @@ def main(argv: Sequence[str] | None = None) -> int:
         print(f"- Harness type: {args.type}")
         print(f"- Reviewer model: {config.model}")
         print(f"- Grader model: {config.grader_model}")
+        print(f"- Reviewer reasoning effort: {config.reviewer_reasoning_effort or 'default'}")
+        print(f"- Grader reasoning effort: {config.grader_reasoning_effort or 'default'}")
+        print(
+            f"- Reviewer max output tokens: {config.reviewer_max_output_tokens if config.reviewer_max_output_tokens is not None else 'unbounded'}"
+        )
+        print(
+            f"- Grader max output tokens: {config.grader_max_output_tokens if config.grader_max_output_tokens is not None else 'unbounded'}"
+        )
+        print(f"- Max concurrency: {config.max_concurrency}")
         if args.type == "optimizer":
             print(f"- Optimizer model: {config.optimizer_model}")
+            print(f"- Optimizer reasoning effort: {config.optimizer_reasoning_effort or 'default'}")
+            print(
+                f"- Optimizer max output tokens: {config.optimizer_max_output_tokens if config.optimizer_max_output_tokens is not None else 'unbounded'}"
+            )
             print(f"- Max steps: {args.max_steps if args.max_steps is not None else config.max_steps}")
             print(
                 f"- Score threshold: {args.score_threshold if args.score_threshold is not None else config.score_threshold}"
@@ -275,6 +398,13 @@ def main(argv: Sequence[str] | None = None) -> int:
                 run_name=resolved_run_name,
                 harness_dir=harness_dir,
                 progress_callback=print,
+                reviewer_model_override=args.reviewer_model or None,
+                grader_model_override=args.grader_model or None,
+                reviewer_reasoning_effort_override=args.reviewer_reasoning_effort or None,
+                grader_reasoning_effort_override=args.grader_reasoning_effort or None,
+                reviewer_max_output_tokens_override=args.reviewer_max_output_tokens,
+                grader_max_output_tokens_override=args.grader_max_output_tokens,
+                max_concurrency_override=args.max_concurrency,
             )
         elif args.type == "pairwise":
             artifacts, summary = run_pairwise(
@@ -283,6 +413,13 @@ def main(argv: Sequence[str] | None = None) -> int:
                 run_name=resolved_run_name,
                 harness_dir=harness_dir,
                 progress_callback=print,
+                reviewer_model_override=args.reviewer_model or None,
+                grader_model_override=args.grader_model or None,
+                reviewer_reasoning_effort_override=args.reviewer_reasoning_effort or None,
+                grader_reasoning_effort_override=args.grader_reasoning_effort or None,
+                reviewer_max_output_tokens_override=args.reviewer_max_output_tokens,
+                grader_max_output_tokens_override=args.grader_max_output_tokens,
+                max_concurrency_override=args.max_concurrency,
             )
         else:
             artifacts, summary = run_optimizer(
@@ -293,6 +430,16 @@ def main(argv: Sequence[str] | None = None) -> int:
                 progress_callback=print,
                 max_steps=args.max_steps,
                 score_threshold=args.score_threshold,
+                reviewer_model_override=args.reviewer_model or None,
+                grader_model_override=args.grader_model or None,
+                optimizer_model_override=args.optimizer_model or None,
+                reviewer_reasoning_effort_override=args.reviewer_reasoning_effort or None,
+                grader_reasoning_effort_override=args.grader_reasoning_effort or None,
+                optimizer_reasoning_effort_override=args.optimizer_reasoning_effort or None,
+                reviewer_max_output_tokens_override=args.reviewer_max_output_tokens,
+                grader_max_output_tokens_override=args.grader_max_output_tokens,
+                optimizer_max_output_tokens_override=args.optimizer_max_output_tokens,
+                max_concurrency_override=args.max_concurrency,
             )
         print(f"Run directory: {artifacts.run_dir}")
         print(f"Report: {artifacts.report_html}")

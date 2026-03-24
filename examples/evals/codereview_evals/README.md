@@ -38,6 +38,21 @@ Run the Level 1 benchmark:
 evalcr benchmark run --type benchmark --cache-key openai_codex --max-prs 5
 ```
 
+Run the benchmark with faster runtime overrides:
+
+```bash
+evalcr benchmark run \
+  --type benchmark \
+  --cache-key openai_codex \
+  --max-prs 20 \
+  --reviewer-model gpt-5.1 \
+  --reviewer-reasoning-effort none \
+  --grader-reasoning-effort minimal \
+  --reviewer-max-output-tokens 1000 \
+  --grader-max-output-tokens 200 \
+  --max-concurrency 8
+```
+
 Run the Level 2 pairwise comparison harness:
 
 ```bash
@@ -100,8 +115,10 @@ Each harness owns its own:
 - `AGENTS.md`
 - `eval_config.json`
 
-For Level 1, `eval_config.json` sets the reviewer model and grader model, while
-`AGENTS.md` is injected into both the reviewer and grader inputs. For Level 2,
+For Level 1, `eval_config.json` sets the reviewer model and grader model, and
+can also pin reviewer/grader reasoning effort, cap output tokens, and control
+per-run concurrency. `AGENTS.md` is injected into both the reviewer and grader
+inputs. For Level 2,
 the harness also includes `baseline_AGENTS.md` and `candidate_AGENTS.md`, which
 are compared side-by-side while reusing the same reviewer model and reviewer
 system prompt. For Level 3, the harness stores baseline and candidate reviewer
@@ -115,3 +132,10 @@ Run the unit tests from this folder with:
 ```bash
 python -m unittest discover tests
 ```
+
+## Performance Notes
+
+- The Level 1 benchmark now parallelizes PR evaluation across a configurable worker pool via `max_concurrency`.
+- Reviewer and grader requests now support explicit `reasoning.effort` and `max_output_tokens` controls through both `eval_config.json` and `evalcr benchmark run`.
+- The checked-in Level 1 defaults favor speed: `minimal` reasoning for reviewer and grader, bounded output tokens, and concurrency set to `4`.
+- For even lower latency, the current OpenAI docs recommend pinning reasoning effort explicitly and evaluating newer GPT-5.x models such as `gpt-5.1` for low-latency use cases instead of relying on older defaults.

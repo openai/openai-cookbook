@@ -1,8 +1,9 @@
 from __future__ import annotations
 
+from concurrent.futures import ThreadPoolExecutor, as_completed
 import csv
 import json
-from dataclasses import dataclass
+from dataclasses import dataclass, replace
 from html import escape
 from pathlib import Path
 from typing import Callable
@@ -10,6 +11,9 @@ from typing import Callable
 from .benchmark import (
     _build_openai_client,
     _emit_progress,
+    _normalize_optional_int,
+    _normalize_optional_string,
+    _normalize_override,
     _run_json_schema_completion,
     build_failure_row,
     build_grader_input,
@@ -41,6 +45,13 @@ class OptimizationConfig:
     pairwise_weight: float
     benchmark_weight: float
     benchmark_guardrail: float
+    reviewer_reasoning_effort: str | None = None
+    grader_reasoning_effort: str | None = None
+    optimizer_reasoning_effort: str | None = None
+    reviewer_max_output_tokens: int | None = None
+    grader_max_output_tokens: int | None = None
+    optimizer_max_output_tokens: int | None = None
+    max_concurrency: int = 1
 
 
 def load_optimizer_harness_bundle(
@@ -65,6 +76,13 @@ def load_optimizer_harness_bundle(
         model=str(config_data["model"]),
         grader_model=str(config_data["grader_model"]),
         optimizer_model=str(config_data["optimizer_model"]),
+        reviewer_reasoning_effort=_normalize_optional_string(config_data.get("reviewer_reasoning_effort")),
+        grader_reasoning_effort=_normalize_optional_string(config_data.get("grader_reasoning_effort")),
+        optimizer_reasoning_effort=_normalize_optional_string(config_data.get("optimizer_reasoning_effort")),
+        reviewer_max_output_tokens=_normalize_optional_int(config_data.get("reviewer_max_output_tokens")),
+        grader_max_output_tokens=_normalize_optional_int(config_data.get("grader_max_output_tokens")),
+        optimizer_max_output_tokens=_normalize_optional_int(config_data.get("optimizer_max_output_tokens")),
+        max_concurrency=max(1, int(config_data.get("max_concurrency", 1))),
         max_steps=int(config_data.get("max_steps", 3)),
         score_threshold=float(config_data.get("score_threshold", 0.7)),
         pairwise_weight=float(config_data.get("pairwise_weight", 0.5)),
@@ -114,6 +132,16 @@ def run_optimizer(
     progress_callback: Callable[[str], None] | None = None,
     max_steps: int | None = None,
     score_threshold: float | None = None,
+    reviewer_model_override: str | None = None,
+    grader_model_override: str | None = None,
+    optimizer_model_override: str | None = None,
+    reviewer_reasoning_effort_override: str | None = None,
+    grader_reasoning_effort_override: str | None = None,
+    optimizer_reasoning_effort_override: str | None = None,
+    reviewer_max_output_tokens_override: int | None = None,
+    grader_max_output_tokens_override: int | None = None,
+    optimizer_max_output_tokens_override: int | None = None,
+    max_concurrency_override: int | None = None,
 ) -> tuple[RunArtifacts, JSONDict]:
     (
         config,
@@ -130,6 +158,19 @@ def run_optimizer(
         optimizer_system,
         optimizer_schema,
     ) = load_optimizer_harness_bundle(harness_dir)
+    config = _resolve_optimization_config(
+        config,
+        reviewer_model_override=reviewer_model_override,
+        grader_model_override=grader_model_override,
+        optimizer_model_override=optimizer_model_override,
+        reviewer_reasoning_effort_override=reviewer_reasoning_effort_override,
+        grader_reasoning_effort_override=grader_reasoning_effort_override,
+        optimizer_reasoning_effort_override=optimizer_reasoning_effort_override,
+        reviewer_max_output_tokens_override=reviewer_max_output_tokens_override,
+        grader_max_output_tokens_override=grader_max_output_tokens_override,
+        optimizer_max_output_tokens_override=optimizer_max_output_tokens_override,
+        max_concurrency_override=max_concurrency_override,
+    )
     snapshots = load_cached_pull_requests(cache_root, cache_key=cache_key)
     if max_prs and max_prs > 0:
         snapshots = snapshots[:max_prs]
@@ -156,6 +197,7 @@ def run_optimizer(
         benchmark_schema=benchmark_schema,
         progress_callback=progress_callback,
         progress_prefix="[baseline benchmark]",
+        config=config,
     )
     champion_pass_rate = float(champion_benchmark_summary.get("pass_rate", 0) or 0)
 
@@ -202,6 +244,7 @@ def run_optimizer(
             pairwise_schema=pairwise_schema,
             progress_callback=progress_callback,
             progress_prefix=f"[pairwise step {step_index}]",
+            config=config,
         )
         candidate_benchmark_results, candidate_benchmark_summary = _run_pointwise_benchmark(
             snapshots=snapshots,
@@ -215,6 +258,7 @@ def run_optimizer(
             benchmark_schema=benchmark_schema,
             progress_callback=progress_callback,
             progress_prefix=f"[benchmark step {step_index}]",
+            config=config,
         )
 
         _write_json(step_dir / "pairwise_results.json", pairwise_results)
@@ -307,6 +351,8 @@ def run_optimizer(
             ),
             schema_name="optimizer_revision",
             schema=optimizer_schema,
+            reasoning_effort=config.optimizer_reasoning_effort,
+            max_output_tokens=config.optimizer_max_output_tokens,
         )
         optimizer_rationale = str(optimizer_output.get("rationale") or "").strip()
         candidate_agents = str(optimizer_output.get("candidate_agents_md") or "").strip()
@@ -542,59 +588,70 @@ def _run_pairwise_step(
     pairwise_schema: JSONDict,
     progress_callback: Callable[[str], None] | None,
     progress_prefix: str,
+    config: OptimizationConfig,
 ) -> tuple[list[JSONDict], JSONDict]:
-    config = HarnessConfig(model=reviewer_model, grader_model=grader_model)
-    results: list[JSONDict] = []
+    harness_config = HarnessConfig(
+        model=reviewer_model,
+        grader_model=grader_model,
+        reviewer_reasoning_effort=config.reviewer_reasoning_effort,
+        grader_reasoning_effort=config.grader_reasoning_effort,
+        reviewer_max_output_tokens=config.reviewer_max_output_tokens,
+        grader_max_output_tokens=config.grader_max_output_tokens,
+        max_concurrency=config.max_concurrency,
+    )
     total_snapshots = len(snapshots)
+    if harness_config.max_concurrency <= 1 or total_snapshots <= 1:
+        results = []
+        for snapshot in snapshots:
+            results.append(
+                _run_optimizer_pairwise_snapshot(
+                    snapshot=snapshot,
+                    config=harness_config,
+                    client=client,
+                    reviewer_model=reviewer_model,
+                    grader_model=grader_model,
+                    experiment_agents=experiment_agents,
+                    champion_agents=champion_agents,
+                    champion_system=champion_system,
+                    candidate_agents=candidate_agents,
+                    candidate_system=candidate_system,
+                    pairwise_judge_system=pairwise_judge_system,
+                    review_schema=review_schema,
+                    pairwise_schema=pairwise_schema,
+                )
+            )
+    else:
+        results_by_index: dict[int, JSONDict] = {}
+        with ThreadPoolExecutor(max_workers=min(harness_config.max_concurrency, total_snapshots)) as executor:
+            future_map = {
+                executor.submit(
+                    _run_optimizer_pairwise_snapshot,
+                    snapshot=snapshot,
+                    config=harness_config,
+                    client=client,
+                    reviewer_model=reviewer_model,
+                    grader_model=grader_model,
+                    experiment_agents=experiment_agents,
+                    champion_agents=champion_agents,
+                    champion_system=champion_system,
+                    candidate_agents=candidate_agents,
+                    candidate_system=candidate_system,
+                    pairwise_judge_system=pairwise_judge_system,
+                    review_schema=review_schema,
+                    pairwise_schema=pairwise_schema,
+                ): index
+                for index, snapshot in enumerate(snapshots, start=1)
+            }
+            for future in as_completed(future_map):
+                results_by_index[future_map[future]] = future.result()
+        results = [results_by_index[index] for index in range(1, total_snapshots + 1)]
+
     for index, snapshot in enumerate(snapshots, start=1):
         pr_number = snapshot.get("number")
         _emit_progress(
             progress_callback,
             f"{progress_prefix} [{index}/{total_snapshots}] PR #{pr_number}",
         )
-        try:
-            baseline_review = _run_json_schema_completion(
-                client=client,
-                model=reviewer_model,
-                system_prompt=champion_system,
-                user_content=build_reviewer_input(snapshot, champion_agents),
-                schema_name="optimizer_baseline_review_output",
-                schema=review_schema,
-            )
-            candidate_review = _run_json_schema_completion(
-                client=client,
-                model=reviewer_model,
-                system_prompt=candidate_system,
-                user_content=build_reviewer_input(snapshot, candidate_agents),
-                schema_name="optimizer_candidate_review_output",
-                schema=review_schema,
-            )
-            judgment = _run_json_schema_completion(
-                client=client,
-                model=grader_model,
-                system_prompt=pairwise_judge_system,
-                user_content=build_pairwise_judge_input(
-                    snapshot=snapshot,
-                    experiment_agents=experiment_agents,
-                    baseline_agents=champion_agents,
-                    candidate_agents=candidate_agents,
-                    baseline_review=baseline_review,
-                    candidate_review=candidate_review,
-                ),
-                schema_name="optimizer_pairwise_judgment",
-                schema=pairwise_schema,
-            )
-            results.append(
-                build_pairwise_result_row(
-                    snapshot=snapshot,
-                    baseline_review=baseline_review,
-                    candidate_review=candidate_review,
-                    judgment=judgment,
-                    config=config,
-                )
-            )
-        except Exception as exc:  # pragma: no cover - exercised through CLI smoke paths
-            results.append(build_pairwise_failure_row(snapshot=snapshot, error_message=str(exc), config=config))
     return results, summarize_pairwise_results(results)
 
 
@@ -611,44 +668,215 @@ def _run_pointwise_benchmark(
     benchmark_schema: JSONDict,
     progress_callback: Callable[[str], None] | None,
     progress_prefix: str,
+    config: OptimizationConfig,
 ) -> tuple[list[JSONDict], JSONDict]:
-    config = HarnessConfig(model=reviewer_model, grader_model=grader_model)
-    results: list[JSONDict] = []
+    harness_config = HarnessConfig(
+        model=reviewer_model,
+        grader_model=grader_model,
+        reviewer_reasoning_effort=config.reviewer_reasoning_effort,
+        grader_reasoning_effort=config.grader_reasoning_effort,
+        reviewer_max_output_tokens=config.reviewer_max_output_tokens,
+        grader_max_output_tokens=config.grader_max_output_tokens,
+        max_concurrency=config.max_concurrency,
+    )
     total_snapshots = len(snapshots)
+    if harness_config.max_concurrency <= 1 or total_snapshots <= 1:
+        results = []
+        for snapshot in snapshots:
+            results.append(
+                _run_optimizer_benchmark_snapshot(
+                    snapshot=snapshot,
+                    config=harness_config,
+                    client=client,
+                    reviewer_system=reviewer_system,
+                    agents_md=agents_md,
+                    grader_system=grader_system,
+                    review_schema=review_schema,
+                    benchmark_schema=benchmark_schema,
+                )
+            )
+    else:
+        results_by_index: dict[int, JSONDict] = {}
+        with ThreadPoolExecutor(max_workers=min(harness_config.max_concurrency, total_snapshots)) as executor:
+            future_map = {
+                executor.submit(
+                    _run_optimizer_benchmark_snapshot,
+                    snapshot=snapshot,
+                    config=harness_config,
+                    client=client,
+                    reviewer_system=reviewer_system,
+                    agents_md=agents_md,
+                    grader_system=grader_system,
+                    review_schema=review_schema,
+                    benchmark_schema=benchmark_schema,
+                ): index
+                for index, snapshot in enumerate(snapshots, start=1)
+            }
+            for future in as_completed(future_map):
+                results_by_index[future_map[future]] = future.result()
+        results = [results_by_index[index] for index in range(1, total_snapshots + 1)]
+
     for index, snapshot in enumerate(snapshots, start=1):
         pr_number = snapshot.get("number")
         _emit_progress(
             progress_callback,
             f"{progress_prefix} [{index}/{total_snapshots}] PR #{pr_number}",
         )
-        try:
-            review_output = _run_json_schema_completion(
-                client=client,
-                model=reviewer_model,
-                system_prompt=reviewer_system,
-                user_content=build_reviewer_input(snapshot, agents_md),
-                schema_name="optimizer_benchmark_review_output",
-                schema=review_schema,
-            )
-            grade_output = _run_json_schema_completion(
-                client=client,
-                model=grader_model,
-                system_prompt=grader_system,
-                user_content=build_grader_input(snapshot, agents_md, review_output),
-                schema_name="optimizer_benchmark_grade",
-                schema=benchmark_schema,
-            )
-            results.append(
-                build_result_row(
-                    snapshot=snapshot,
-                    review_output=review_output,
-                    grade_output=grade_output,
-                    config=config,
-                )
-            )
-        except Exception as exc:  # pragma: no cover - exercised through CLI smoke paths
-            results.append(build_failure_row(snapshot=snapshot, error_message=str(exc), config=config))
     return results, summarize_results(results)
+
+
+def _run_optimizer_pairwise_snapshot(
+    *,
+    snapshot: JSONDict,
+    config: HarnessConfig,
+    client: object,
+    reviewer_model: str,
+    grader_model: str,
+    experiment_agents: str,
+    champion_agents: str,
+    champion_system: str,
+    candidate_agents: str,
+    candidate_system: str,
+    pairwise_judge_system: str,
+    review_schema: JSONDict,
+    pairwise_schema: JSONDict,
+) -> JSONDict:
+    try:
+        baseline_review = _run_json_schema_completion(
+            client=client,
+            model=reviewer_model,
+            system_prompt=champion_system,
+            user_content=build_reviewer_input(snapshot, champion_agents),
+            schema_name="optimizer_baseline_review_output",
+            schema=review_schema,
+            reasoning_effort=config.reviewer_reasoning_effort,
+            max_output_tokens=config.reviewer_max_output_tokens,
+        )
+        candidate_review = _run_json_schema_completion(
+            client=client,
+            model=reviewer_model,
+            system_prompt=candidate_system,
+            user_content=build_reviewer_input(snapshot, candidate_agents),
+            schema_name="optimizer_candidate_review_output",
+            schema=review_schema,
+            reasoning_effort=config.reviewer_reasoning_effort,
+            max_output_tokens=config.reviewer_max_output_tokens,
+        )
+        judgment = _run_json_schema_completion(
+            client=client,
+            model=grader_model,
+            system_prompt=pairwise_judge_system,
+            user_content=build_pairwise_judge_input(
+                snapshot=snapshot,
+                experiment_agents=experiment_agents,
+                baseline_agents=champion_agents,
+                candidate_agents=candidate_agents,
+                baseline_review=baseline_review,
+                candidate_review=candidate_review,
+            ),
+            schema_name="optimizer_pairwise_judgment",
+            schema=pairwise_schema,
+            reasoning_effort=config.grader_reasoning_effort,
+            max_output_tokens=config.grader_max_output_tokens,
+        )
+        return build_pairwise_result_row(
+            snapshot=snapshot,
+            baseline_review=baseline_review,
+            candidate_review=candidate_review,
+            judgment=judgment,
+            config=config,
+        )
+    except Exception as exc:  # pragma: no cover - exercised through CLI smoke paths
+        return build_pairwise_failure_row(snapshot=snapshot, error_message=str(exc), config=config)
+
+
+def _run_optimizer_benchmark_snapshot(
+    *,
+    snapshot: JSONDict,
+    config: HarnessConfig,
+    client: object,
+    reviewer_system: str,
+    agents_md: str,
+    grader_system: str,
+    review_schema: JSONDict,
+    benchmark_schema: JSONDict,
+) -> JSONDict:
+    try:
+        review_output = _run_json_schema_completion(
+            client=client,
+            model=config.model,
+            system_prompt=reviewer_system,
+            user_content=build_reviewer_input(snapshot, agents_md),
+            schema_name="optimizer_benchmark_review_output",
+            schema=review_schema,
+            reasoning_effort=config.reviewer_reasoning_effort,
+            max_output_tokens=config.reviewer_max_output_tokens,
+        )
+        grade_output = _run_json_schema_completion(
+            client=client,
+            model=config.grader_model,
+            system_prompt=grader_system,
+            user_content=build_grader_input(snapshot, agents_md, review_output),
+            schema_name="optimizer_benchmark_grade",
+            schema=benchmark_schema,
+            reasoning_effort=config.grader_reasoning_effort,
+            max_output_tokens=config.grader_max_output_tokens,
+        )
+        return build_result_row(
+            snapshot=snapshot,
+            review_output=review_output,
+            grade_output=grade_output,
+            config=config,
+        )
+    except Exception as exc:  # pragma: no cover - exercised through CLI smoke paths
+        return build_failure_row(snapshot=snapshot, error_message=str(exc), config=config)
+
+
+def _resolve_optimization_config(
+    config: OptimizationConfig,
+    *,
+    reviewer_model_override: str | None = None,
+    grader_model_override: str | None = None,
+    optimizer_model_override: str | None = None,
+    reviewer_reasoning_effort_override: str | None = None,
+    grader_reasoning_effort_override: str | None = None,
+    optimizer_reasoning_effort_override: str | None = None,
+    reviewer_max_output_tokens_override: int | None = None,
+    grader_max_output_tokens_override: int | None = None,
+    optimizer_max_output_tokens_override: int | None = None,
+    max_concurrency_override: int | None = None,
+) -> OptimizationConfig:
+    return replace(
+        config,
+        model=reviewer_model_override or config.model,
+        grader_model=grader_model_override or config.grader_model,
+        optimizer_model=optimizer_model_override or config.optimizer_model,
+        reviewer_reasoning_effort=_normalize_override(
+            reviewer_reasoning_effort_override, config.reviewer_reasoning_effort
+        ),
+        grader_reasoning_effort=_normalize_override(
+            grader_reasoning_effort_override, config.grader_reasoning_effort
+        ),
+        optimizer_reasoning_effort=_normalize_override(
+            optimizer_reasoning_effort_override, config.optimizer_reasoning_effort
+        ),
+        reviewer_max_output_tokens=(
+            reviewer_max_output_tokens_override
+            if reviewer_max_output_tokens_override is not None
+            else config.reviewer_max_output_tokens
+        ),
+        grader_max_output_tokens=(
+            grader_max_output_tokens_override
+            if grader_max_output_tokens_override is not None
+            else config.grader_max_output_tokens
+        ),
+        optimizer_max_output_tokens=(
+            optimizer_max_output_tokens_override
+            if optimizer_max_output_tokens_override is not None
+            else config.optimizer_max_output_tokens
+        ),
+        max_concurrency=max_concurrency_override or config.max_concurrency,
+    )
 
 
 def _select_pairwise_examples(results: list[JSONDict], limit: int = 3) -> list[JSONDict]:

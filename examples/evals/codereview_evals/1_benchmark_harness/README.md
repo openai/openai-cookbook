@@ -13,10 +13,23 @@ static HTML report alongside JSON and CSV artifacts.
 evalcr benchmark run --type benchmark --cache-key openai_codex --max-prs 5
 ```
 
+For a faster run, override the benchmark config from the CLI:
+
+```bash
+evalcr benchmark run \
+  --type benchmark \
+  --cache-key openai_codex \
+  --max-prs 20 \
+  --reviewer-model gpt-5.1 \
+  --reviewer-reasoning-effort none \
+  --grader-reasoning-effort minimal \
+  --max-concurrency 8
+```
+
 ## Bundled assets
 
 - `AGENTS.md`: harness-local repo guidance passed to the reviewer and grader
-- `eval_config.json`: default reviewer and grader model names
+- `eval_config.json`: default reviewer/grader models plus optional reasoning, token, and concurrency settings
 - `reviewer_system.txt`: reviewer system prompt
 - `grader_system.txt`: judge system prompt
 - `review_output_schema.json`: structured reviewer output schema

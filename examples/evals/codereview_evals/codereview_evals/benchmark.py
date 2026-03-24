@@ -1,5 +1,7 @@
 from __future__ import annotations
 
+from concurrent.futures import ThreadPoolExecutor, as_completed
+from dataclasses import replace
 import json
 import os
 from pathlib import Path
@@ -24,59 +26,57 @@ def run_benchmark(
     cache_root: Path = DEFAULT_CACHE_ROOT,
     harness_dir: Path = DEFAULT_HARNESS_DIR,
     progress_callback: Callable[[str], None] | None = None,
+    reviewer_model_override: str | None = None,
+    grader_model_override: str | None = None,
+    reviewer_reasoning_effort_override: str | None = None,
+    grader_reasoning_effort_override: str | None = None,
+    reviewer_max_output_tokens_override: int | None = None,
+    grader_max_output_tokens_override: int | None = None,
+    max_concurrency_override: int | None = None,
 ) -> tuple[RunArtifacts, JSONDict]:
     config, agents_md, reviewer_prompt, grader_prompt, review_schema, grader_schema = load_harness_bundle(
         harness_dir
+    )
+    config = _resolve_harness_config(
+        config,
+        reviewer_model_override=reviewer_model_override,
+        grader_model_override=grader_model_override,
+        reviewer_reasoning_effort_override=reviewer_reasoning_effort_override,
+        grader_reasoning_effort_override=grader_reasoning_effort_override,
+        reviewer_max_output_tokens_override=reviewer_max_output_tokens_override,
+        grader_max_output_tokens_override=grader_max_output_tokens_override,
+        max_concurrency_override=max_concurrency_override,
     )
     snapshots = load_cached_pull_requests(cache_root, cache_key=cache_key)
     if max_prs and max_prs > 0:
         snapshots = snapshots[:max_prs]
 
     client = _build_openai_client()
-    results: list[JSONDict] = []
     total_snapshots = len(snapshots)
-    for index, snapshot in enumerate(snapshots, start=1):
-        pr_number = snapshot.get("number")
-        pr_title = str(snapshot.get("title", "")).strip()
-        _emit_progress(
-            progress_callback,
-            f"[{index}/{total_snapshots}] Processing PR #{pr_number} {pr_title}".rstrip(),
+    if config.max_concurrency <= 1 or total_snapshots <= 1:
+        results = _run_benchmark_serial(
+            snapshots=snapshots,
+            config=config,
+            client=client,
+            agents_md=agents_md,
+            reviewer_prompt=reviewer_prompt,
+            grader_prompt=grader_prompt,
+            review_schema=review_schema,
+            grader_schema=grader_schema,
+            progress_callback=progress_callback,
         )
-        try:
-            review_output = _run_json_schema_completion(
-                client=client,
-                model=config.model,
-                system_prompt=reviewer_prompt,
-                user_content=build_reviewer_input(snapshot, agents_md),
-                schema_name="code_review_output",
-                schema=review_schema,
-            )
-            grade_output = _run_json_schema_completion(
-                client=client,
-                model=config.grader_model,
-                system_prompt=grader_prompt,
-                user_content=build_grader_input(snapshot, agents_md, review_output),
-                schema_name="code_review_grade",
-                schema=grader_schema,
-            )
-            results.append(
-                build_result_row(
-                    snapshot=snapshot,
-                    review_output=review_output,
-                    grade_output=grade_output,
-                    config=config,
-                )
-            )
-            _emit_progress(
-                progress_callback,
-                f"[{index}/{total_snapshots}] Completed PR #{pr_number} ({len(results)} processed)",
-            )
-        except Exception as exc:  # pragma: no cover - exercised through CLI smoke paths
-            results.append(build_failure_row(snapshot=snapshot, error_message=str(exc), config=config))
-            _emit_progress(
-                progress_callback,
-                f"[{index}/{total_snapshots}] Failed PR #{pr_number} ({len(results)} processed): {exc}",
-            )
+    else:
+        results = _run_benchmark_parallel(
+            snapshots=snapshots,
+            config=config,
+            client=client,
+            agents_md=agents_md,
+            reviewer_prompt=reviewer_prompt,
+            grader_prompt=grader_prompt,
+            review_schema=review_schema,
+            grader_schema=grader_schema,
+            progress_callback=progress_callback,
+        )
 
     run_dir = harness_dir / "results" / default_run_id(run_name)
     return write_results(
@@ -100,6 +100,11 @@ def load_harness_bundle(
     config = HarnessConfig(
         model=str(config_data["model"]),
         grader_model=str(config_data["grader_model"]),
+        reviewer_reasoning_effort=_normalize_optional_string(config_data.get("reviewer_reasoning_effort")),
+        grader_reasoning_effort=_normalize_optional_string(config_data.get("grader_reasoning_effort")),
+        reviewer_max_output_tokens=_normalize_optional_int(config_data.get("reviewer_max_output_tokens")),
+        grader_max_output_tokens=_normalize_optional_int(config_data.get("grader_max_output_tokens")),
+        max_concurrency=max(1, int(config_data.get("max_concurrency", 1))),
     )
     agents_md = (harness_dir / "AGENTS.md").read_text(encoding="utf-8").strip()
     reviewer_prompt = (harness_dir / "reviewer_system.txt").read_text(encoding="utf-8").strip()
@@ -239,14 +244,16 @@ def _run_json_schema_completion(
     user_content: str,
     schema_name: str,
     schema: JSONDict,
+    reasoning_effort: str | None = None,
+    max_output_tokens: int | None = None,
 ) -> JSONDict:
-    response = client.responses.create(
-        model=model,
-        input=[
+    request: JSONDict = {
+        "model": model,
+        "input": [
             {"role": "system", "content": system_prompt},
             {"role": "user", "content": user_content},
         ],
-        text={
+        "text": {
             "format": {
                 "type": "json_schema",
                 "name": schema_name,
@@ -254,8 +261,192 @@ def _run_json_schema_completion(
                 "strict": True,
             }
         },
-    )
+    }
+    if reasoning_effort:
+        request["reasoning"] = {"effort": reasoning_effort}
+    if max_output_tokens is not None:
+        request["max_output_tokens"] = max_output_tokens
+    response = client.responses.create(**request)
     return json.loads(response.output_text)
+
+
+def _run_benchmark_serial(
+    *,
+    snapshots: list[JSONDict],
+    config: HarnessConfig,
+    client: Any,
+    agents_md: str,
+    reviewer_prompt: str,
+    grader_prompt: str,
+    review_schema: JSONDict,
+    grader_schema: JSONDict,
+    progress_callback: Callable[[str], None] | None,
+) -> list[JSONDict]:
+    results: list[JSONDict] = []
+    total_snapshots = len(snapshots)
+    for index, snapshot in enumerate(snapshots, start=1):
+        pr_number = snapshot.get("number")
+        pr_title = str(snapshot.get("title", "")).strip()
+        _emit_progress(
+            progress_callback,
+            f"[{index}/{total_snapshots}] Processing PR #{pr_number} {pr_title}".rstrip(),
+        )
+        result = _run_benchmark_snapshot(
+            snapshot=snapshot,
+            config=config,
+            client=client,
+            agents_md=agents_md,
+            reviewer_prompt=reviewer_prompt,
+            grader_prompt=grader_prompt,
+            review_schema=review_schema,
+            grader_schema=grader_schema,
+        )
+        results.append(result)
+        if result.get("status") == "ok":
+            _emit_progress(
+                progress_callback,
+                f"[{index}/{total_snapshots}] Completed PR #{pr_number} ({len(results)} processed)",
+            )
+        else:
+            _emit_progress(
+                progress_callback,
+                f"[{index}/{total_snapshots}] Failed PR #{pr_number} ({len(results)} processed): {result.get('error_message', '')}",
+            )
+    return results
+
+
+def _run_benchmark_parallel(
+    *,
+    snapshots: list[JSONDict],
+    config: HarnessConfig,
+    client: Any,
+    agents_md: str,
+    reviewer_prompt: str,
+    grader_prompt: str,
+    review_schema: JSONDict,
+    grader_schema: JSONDict,
+    progress_callback: Callable[[str], None] | None,
+) -> list[JSONDict]:
+    total_snapshots = len(snapshots)
+    results_by_index: dict[int, JSONDict] = {}
+    completed = 0
+
+    with ThreadPoolExecutor(max_workers=min(config.max_concurrency, total_snapshots)) as executor:
+        future_map = {}
+        for index, snapshot in enumerate(snapshots, start=1):
+            pr_number = snapshot.get("number")
+            pr_title = str(snapshot.get("title", "")).strip()
+            _emit_progress(
+                progress_callback,
+                f"[{index}/{total_snapshots}] Processing PR #{pr_number} {pr_title}".rstrip(),
+            )
+            future = executor.submit(
+                _run_benchmark_snapshot,
+                snapshot=snapshot,
+                config=config,
+                client=client,
+                agents_md=agents_md,
+                reviewer_prompt=reviewer_prompt,
+                grader_prompt=grader_prompt,
+                review_schema=review_schema,
+                grader_schema=grader_schema,
+            )
+            future_map[future] = (index, pr_number)
+
+        for future in as_completed(future_map):
+            index, pr_number = future_map[future]
+            result = future.result()
+            results_by_index[index] = result
+            completed += 1
+            if result.get("status") == "ok":
+                _emit_progress(
+                    progress_callback,
+                    f"[{index}/{total_snapshots}] Completed PR #{pr_number} ({completed} processed)",
+                )
+            else:
+                _emit_progress(
+                    progress_callback,
+                    f"[{index}/{total_snapshots}] Failed PR #{pr_number} ({completed} processed): {result.get('error_message', '')}",
+                )
+
+    return [results_by_index[index] for index in range(1, total_snapshots + 1)]
+
+
+def _run_benchmark_snapshot(
+    *,
+    snapshot: JSONDict,
+    config: HarnessConfig,
+    client: Any,
+    agents_md: str,
+    reviewer_prompt: str,
+    grader_prompt: str,
+    review_schema: JSONDict,
+    grader_schema: JSONDict,
+) -> JSONDict:
+    try:
+        review_output = _run_json_schema_completion(
+            client=client,
+            model=config.model,
+            system_prompt=reviewer_prompt,
+            user_content=build_reviewer_input(snapshot, agents_md),
+            schema_name="code_review_output",
+            schema=review_schema,
+            reasoning_effort=config.reviewer_reasoning_effort,
+            max_output_tokens=config.reviewer_max_output_tokens,
+        )
+        grade_output = _run_json_schema_completion(
+            client=client,
+            model=config.grader_model,
+            system_prompt=grader_prompt,
+            user_content=build_grader_input(snapshot, agents_md, review_output),
+            schema_name="code_review_grade",
+            schema=grader_schema,
+            reasoning_effort=config.grader_reasoning_effort,
+            max_output_tokens=config.grader_max_output_tokens,
+        )
+        return build_result_row(
+            snapshot=snapshot,
+            review_output=review_output,
+            grade_output=grade_output,
+            config=config,
+        )
+    except Exception as exc:  # pragma: no cover - exercised through CLI smoke paths
+        return build_failure_row(snapshot=snapshot, error_message=str(exc), config=config)
+
+
+def _resolve_harness_config(
+    config: HarnessConfig,
+    *,
+    reviewer_model_override: str | None = None,
+    grader_model_override: str | None = None,
+    reviewer_reasoning_effort_override: str | None = None,
+    grader_reasoning_effort_override: str | None = None,
+    reviewer_max_output_tokens_override: int | None = None,
+    grader_max_output_tokens_override: int | None = None,
+    max_concurrency_override: int | None = None,
+) -> HarnessConfig:
+    return replace(
+        config,
+        model=reviewer_model_override or config.model,
+        grader_model=grader_model_override or config.grader_model,
+        reviewer_reasoning_effort=_normalize_override(
+            reviewer_reasoning_effort_override, config.reviewer_reasoning_effort
+        ),
+        grader_reasoning_effort=_normalize_override(
+            grader_reasoning_effort_override, config.grader_reasoning_effort
+        ),
+        reviewer_max_output_tokens=(
+            reviewer_max_output_tokens_override
+            if reviewer_max_output_tokens_override is not None
+            else config.reviewer_max_output_tokens
+        ),
+        grader_max_output_tokens=(
+            grader_max_output_tokens_override
+            if grader_max_output_tokens_override is not None
+            else config.grader_max_output_tokens
+        ),
+        max_concurrency=max_concurrency_override or config.max_concurrency,
+    )
 
 
 def _format_reference_comment(comment: JSONDict) -> str:
@@ -277,6 +468,28 @@ def _format_reference_comment(comment: JSONDict) -> str:
 def _emit_progress(progress_callback: Callable[[str], None] | None, message: str) -> None:
     if progress_callback is not None:
         progress_callback(message)
+
+
+def _normalize_optional_string(value: object) -> str | None:
+    if value is None:
+        return None
+    normalized = str(value).strip()
+    return normalized or None
+
+
+def _normalize_optional_int(value: object) -> int | None:
+    if value is None:
+        return None
+    return int(value)
+
+
+def _normalize_override(override: str | None, fallback: str | None) -> str | None:
+    if override is None:
+        return fallback
+    normalized = override.strip()
+    if normalized.lower() in {"", "default"}:
+        return None
+    return normalized
 
 
 def _truncate_text(text: str, limit: int) -> str:

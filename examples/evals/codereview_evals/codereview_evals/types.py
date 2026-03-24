@@ -11,6 +11,11 @@ JSONDict = dict[str, Any]
 class HarnessConfig:
     model: str
     grader_model: str
+    reviewer_reasoning_effort: str | None = None
+    grader_reasoning_effort: str | None = None
+    reviewer_max_output_tokens: int | None = None
+    grader_max_output_tokens: int | None = None
+    max_concurrency: int = 1
 
 
 @dataclass(frozen=True)

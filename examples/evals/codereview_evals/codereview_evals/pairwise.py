@@ -1,5 +1,6 @@
 from __future__ import annotations
 
+from concurrent.futures import ThreadPoolExecutor, as_completed
 import csv
 import json
 from html import escape
@@ -9,6 +10,9 @@ from typing import Callable
 from .benchmark import (
     _build_openai_client,
     _emit_progress,
+    _normalize_optional_int,
+    _normalize_optional_string,
+    _resolve_harness_config,
     _run_json_schema_completion,
     build_reviewer_input,
 )
@@ -27,6 +31,11 @@ def load_pairwise_harness_bundle(
     config = HarnessConfig(
         model=str(config_data["model"]),
         grader_model=str(config_data["grader_model"]),
+        reviewer_reasoning_effort=_normalize_optional_string(config_data.get("reviewer_reasoning_effort")),
+        grader_reasoning_effort=_normalize_optional_string(config_data.get("grader_reasoning_effort")),
+        reviewer_max_output_tokens=_normalize_optional_int(config_data.get("reviewer_max_output_tokens")),
+        grader_max_output_tokens=_normalize_optional_int(config_data.get("grader_max_output_tokens")),
+        max_concurrency=max(1, int(config_data.get("max_concurrency", 1))),
     )
     experiment_agents = (harness_dir / "AGENTS.md").read_text(encoding="utf-8").strip()
     baseline_agents = (harness_dir / "baseline_AGENTS.md").read_text(encoding="utf-8").strip()
@@ -55,6 +64,13 @@ def run_pairwise(
     cache_root: Path = DEFAULT_CACHE_ROOT,
     harness_dir: Path = DEFAULT_PAIRWISE_HARNESS_DIR,
     progress_callback: Callable[[str], None] | None = None,
+    reviewer_model_override: str | None = None,
+    grader_model_override: str | None = None,
+    reviewer_reasoning_effort_override: str | None = None,
+    grader_reasoning_effort_override: str | None = None,
+    reviewer_max_output_tokens_override: int | None = None,
+    grader_max_output_tokens_override: int | None = None,
+    max_concurrency_override: int | None = None,
 ) -> tuple[RunArtifacts, JSONDict]:
     (
         config,
@@ -66,71 +82,50 @@ def run_pairwise(
         review_schema,
         judge_schema,
     ) = load_pairwise_harness_bundle(harness_dir)
+    config = _resolve_harness_config(
+        config,
+        reviewer_model_override=reviewer_model_override,
+        grader_model_override=grader_model_override,
+        reviewer_reasoning_effort_override=reviewer_reasoning_effort_override,
+        grader_reasoning_effort_override=grader_reasoning_effort_override,
+        reviewer_max_output_tokens_override=reviewer_max_output_tokens_override,
+        grader_max_output_tokens_override=grader_max_output_tokens_override,
+        max_concurrency_override=max_concurrency_override,
+    )
     snapshots = load_cached_pull_requests(cache_root, cache_key=cache_key)
     if max_prs and max_prs > 0:
         snapshots = snapshots[:max_prs]
 
     client = _build_openai_client()
-    results: list[JSONDict] = []
     total_snapshots = len(snapshots)
-    for index, snapshot in enumerate(snapshots, start=1):
-        pr_number = snapshot.get("number")
-        pr_title = str(snapshot.get("title", "")).strip()
-        _emit_progress(
-            progress_callback,
-            f"[{index}/{total_snapshots}] Pairwise compare PR #{pr_number} {pr_title}".rstrip(),
+    if config.max_concurrency <= 1 or total_snapshots <= 1:
+        results = _run_pairwise_serial(
+            snapshots=snapshots,
+            config=config,
+            client=client,
+            experiment_agents=experiment_agents,
+            baseline_agents=baseline_agents,
+            candidate_agents=candidate_agents,
+            reviewer_prompt=reviewer_prompt,
+            judge_prompt=judge_prompt,
+            review_schema=review_schema,
+            judge_schema=judge_schema,
+            progress_callback=progress_callback,
         )
-        try:
-            baseline_review = _run_json_schema_completion(
-                client=client,
-                model=config.model,
-                system_prompt=reviewer_prompt,
-                user_content=build_reviewer_input(snapshot, baseline_agents),
-                schema_name="baseline_review_output",
-                schema=review_schema,
-            )
-            candidate_review = _run_json_schema_completion(
-                client=client,
-                model=config.model,
-                system_prompt=reviewer_prompt,
-                user_content=build_reviewer_input(snapshot, candidate_agents),
-                schema_name="candidate_review_output",
-                schema=review_schema,
-            )
-            judgment = _run_json_schema_completion(
-                client=client,
-                model=config.grader_model,
-                system_prompt=judge_prompt,
-                user_content=build_pairwise_judge_input(
-                    snapshot=snapshot,
-                    experiment_agents=experiment_agents,
-                    baseline_agents=baseline_agents,
-                    candidate_agents=candidate_agents,
-                    baseline_review=baseline_review,
-                    candidate_review=candidate_review,
-                ),
-                schema_name="pairwise_comparison",
-                schema=judge_schema,
-            )
-            results.append(
-                build_pairwise_result_row(
-                    snapshot=snapshot,
-                    baseline_review=baseline_review,
-                    candidate_review=candidate_review,
-                    judgment=judgment,
-                    config=config,
-                )
-            )
-            _emit_progress(
-                progress_callback,
-                f"[{index}/{total_snapshots}] Completed PR #{pr_number} ({len(results)} processed)",
-            )
-        except Exception as exc:  # pragma: no cover - exercised through CLI smoke paths
-            results.append(build_pairwise_failure_row(snapshot=snapshot, error_message=str(exc), config=config))
-            _emit_progress(
-                progress_callback,
-                f"[{index}/{total_snapshots}] Failed PR #{pr_number} ({len(results)} processed): {exc}",
-            )
+    else:
+        results = _run_pairwise_parallel(
+            snapshots=snapshots,
+            config=config,
+            client=client,
+            experiment_agents=experiment_agents,
+            baseline_agents=baseline_agents,
+            candidate_agents=candidate_agents,
+            reviewer_prompt=reviewer_prompt,
+            judge_prompt=judge_prompt,
+            review_schema=review_schema,
+            judge_schema=judge_schema,
+            progress_callback=progress_callback,
+        )
 
     run_dir = harness_dir / "results" / default_run_id(run_name)
     return write_pairwise_results(run_dir=run_dir, results=results)
@@ -169,6 +164,176 @@ def build_pairwise_judge_input(
             "Candidate review JSON:\n" + candidate_review_json,
         ]
     )
+
+
+def _run_pairwise_serial(
+    *,
+    snapshots: list[JSONDict],
+    config: HarnessConfig,
+    client: object,
+    experiment_agents: str,
+    baseline_agents: str,
+    candidate_agents: str,
+    reviewer_prompt: str,
+    judge_prompt: str,
+    review_schema: JSONDict,
+    judge_schema: JSONDict,
+    progress_callback: Callable[[str], None] | None,
+) -> list[JSONDict]:
+    results: list[JSONDict] = []
+    total_snapshots = len(snapshots)
+    for index, snapshot in enumerate(snapshots, start=1):
+        pr_number = snapshot.get("number")
+        pr_title = str(snapshot.get("title", "")).strip()
+        _emit_progress(
+            progress_callback,
+            f"[{index}/{total_snapshots}] Pairwise compare PR #{pr_number} {pr_title}".rstrip(),
+        )
+        result = _run_pairwise_snapshot(
+            snapshot=snapshot,
+            config=config,
+            client=client,
+            experiment_agents=experiment_agents,
+            baseline_agents=baseline_agents,
+            candidate_agents=candidate_agents,
+            reviewer_prompt=reviewer_prompt,
+            judge_prompt=judge_prompt,
+            review_schema=review_schema,
+            judge_schema=judge_schema,
+        )
+        results.append(result)
+        if result.get("status") == "ok":
+            _emit_progress(
+                progress_callback,
+                f"[{index}/{total_snapshots}] Completed PR #{pr_number} ({len(results)} processed)",
+            )
+        else:
+            _emit_progress(
+                progress_callback,
+                f"[{index}/{total_snapshots}] Failed PR #{pr_number} ({len(results)} processed): {result.get('error_message', '')}",
+            )
+    return results
+
+
+def _run_pairwise_parallel(
+    *,
+    snapshots: list[JSONDict],
+    config: HarnessConfig,
+    client: object,
+    experiment_agents: str,
+    baseline_agents: str,
+    candidate_agents: str,
+    reviewer_prompt: str,
+    judge_prompt: str,
+    review_schema: JSONDict,
+    judge_schema: JSONDict,
+    progress_callback: Callable[[str], None] | None,
+) -> list[JSONDict]:
+    total_snapshots = len(snapshots)
+    results_by_index: dict[int, JSONDict] = {}
+    completed = 0
+    with ThreadPoolExecutor(max_workers=min(config.max_concurrency, total_snapshots)) as executor:
+        future_map = {}
+        for index, snapshot in enumerate(snapshots, start=1):
+            pr_number = snapshot.get("number")
+            pr_title = str(snapshot.get("title", "")).strip()
+            _emit_progress(
+                progress_callback,
+                f"[{index}/{total_snapshots}] Pairwise compare PR #{pr_number} {pr_title}".rstrip(),
+            )
+            future = executor.submit(
+                _run_pairwise_snapshot,
+                snapshot=snapshot,
+                config=config,
+                client=client,
+                experiment_agents=experiment_agents,
+                baseline_agents=baseline_agents,
+                candidate_agents=candidate_agents,
+                reviewer_prompt=reviewer_prompt,
+                judge_prompt=judge_prompt,
+                review_schema=review_schema,
+                judge_schema=judge_schema,
+            )
+            future_map[future] = (index, pr_number)
+
+        for future in as_completed(future_map):
+            index, pr_number = future_map[future]
+            result = future.result()
+            results_by_index[index] = result
+            completed += 1
+            if result.get("status") == "ok":
+                _emit_progress(
+                    progress_callback,
+                    f"[{index}/{total_snapshots}] Completed PR #{pr_number} ({completed} processed)",
+                )
+            else:
+                _emit_progress(
+                    progress_callback,
+                    f"[{index}/{total_snapshots}] Failed PR #{pr_number} ({completed} processed): {result.get('error_message', '')}",
+                )
+    return [results_by_index[index] for index in range(1, total_snapshots + 1)]
+
+
+def _run_pairwise_snapshot(
+    *,
+    snapshot: JSONDict,
+    config: HarnessConfig,
+    client: object,
+    experiment_agents: str,
+    baseline_agents: str,
+    candidate_agents: str,
+    reviewer_prompt: str,
+    judge_prompt: str,
+    review_schema: JSONDict,
+    judge_schema: JSONDict,
+) -> JSONDict:
+    try:
+        baseline_review = _run_json_schema_completion(
+            client=client,
+            model=config.model,
+            system_prompt=reviewer_prompt,
+            user_content=build_reviewer_input(snapshot, baseline_agents),
+            schema_name="baseline_review_output",
+            schema=review_schema,
+            reasoning_effort=config.reviewer_reasoning_effort,
+            max_output_tokens=config.reviewer_max_output_tokens,
+        )
+        candidate_review = _run_json_schema_completion(
+            client=client,
+            model=config.model,
+            system_prompt=reviewer_prompt,
+            user_content=build_reviewer_input(snapshot, candidate_agents),
+            schema_name="candidate_review_output",
+            schema=review_schema,
+            reasoning_effort=config.reviewer_reasoning_effort,
+            max_output_tokens=config.reviewer_max_output_tokens,
+        )
+        judgment = _run_json_schema_completion(
+            client=client,
+            model=config.grader_model,
+            system_prompt=judge_prompt,
+            user_content=build_pairwise_judge_input(
+                snapshot=snapshot,
+                experiment_agents=experiment_agents,
+                baseline_agents=baseline_agents,
+                candidate_agents=candidate_agents,
+                baseline_review=baseline_review,
+                candidate_review=candidate_review,
+            ),
+            schema_name="pairwise_comparison",
+            schema=judge_schema,
+            reasoning_effort=config.grader_reasoning_effort,
+            max_output_tokens=config.grader_max_output_tokens,
+        )
+        return build_pairwise_result_row(
+            snapshot=snapshot,
+            baseline_review=baseline_review,
+            candidate_review=candidate_review,
+            judgment=judgment,
+            config=config,
+        )
+    except Exception as exc:  # pragma: no cover - exercised through CLI smoke paths
+        return build_pairwise_failure_row(snapshot=snapshot, error_message=str(exc), config=config)
 
 
 def build_pairwise_result_row(

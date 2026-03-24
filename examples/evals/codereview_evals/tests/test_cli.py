@@ -12,6 +12,8 @@ if str(ROOT_DIR) not in sys.path:
     sys.path.insert(0, str(ROOT_DIR))
 
 from codereview_evals import cli
+from codereview_evals.optimizer import OptimizationConfig
+from codereview_evals.types import HarnessConfig
 
 
 class CliTests(unittest.TestCase):
@@ -78,16 +80,18 @@ class CliTests(unittest.TestCase):
         mock_input: mock.Mock,
     ) -> None:
         stdout = io.StringIO()
-        config = mock.Mock()
-        config.model = "gpt-reviewer"
-        config.grader_model = "gpt-grader"
+        config = HarnessConfig(model="gpt-reviewer", grader_model="gpt-grader")
         mock_load_bundle.return_value = (config, "", "", "", {}, {})
-        optimizer_config = mock.Mock()
-        optimizer_config.model = "gpt-reviewer"
-        optimizer_config.grader_model = "gpt-grader"
-        optimizer_config.optimizer_model = "gpt-optimizer"
-        optimizer_config.max_steps = 3
-        optimizer_config.score_threshold = 0.7
+        optimizer_config = OptimizationConfig(
+            model="gpt-reviewer",
+            grader_model="gpt-grader",
+            optimizer_model="gpt-optimizer",
+            max_steps=3,
+            score_threshold=0.7,
+            pairwise_weight=0.5,
+            benchmark_weight=0.5,
+            benchmark_guardrail=0.03,
+        )
         mock_load_optimizer_bundle.return_value = (optimizer_config, "", "", "", "", "", "", "", {}, {}, {}, "", {})
         mock_load_pairwise_bundle.return_value = (config, "", "", "", "", "", {}, {})
         mock_load_pull_requests.return_value = [
@@ -125,6 +129,8 @@ class CliTests(unittest.TestCase):
         self.assertIn("Harness type: benchmark", stdout.getvalue())
         self.assertIn("Reviewer model: gpt-reviewer", stdout.getvalue())
         self.assertIn("Grader model: gpt-grader", stdout.getvalue())
+        self.assertIn("Reviewer reasoning effort: default", stdout.getvalue())
+        self.assertIn("Max concurrency: 1", stdout.getvalue())
         self.assertIn("Selected PRs: 2", stdout.getvalue())
         self.assertIn("Run name: resolved-run", stdout.getvalue())
         self.assertIn("Visualizer: evalcr visualize --type benchmark --run-id resolved-run", stdout.getvalue())
@@ -143,9 +149,7 @@ class CliTests(unittest.TestCase):
         _mock_input: mock.Mock,
     ) -> None:
         stdout = io.StringIO()
-        config = mock.Mock()
-        config.model = "gpt-reviewer"
-        config.grader_model = "gpt-grader"
+        config = HarnessConfig(model="gpt-reviewer", grader_model="gpt-grader")
         mock_load_bundle.return_value = (config, "", "", "", {}, {})
         mock_load_pull_requests.return_value = [{"number": 101, "title": "PR one"}]
         with mock.patch("sys.stdout", stdout):
@@ -172,9 +176,7 @@ class CliTests(unittest.TestCase):
         mock_input: mock.Mock,
     ) -> None:
         stdout = io.StringIO()
-        config = mock.Mock()
-        config.model = "gpt-reviewer"
-        config.grader_model = "gpt-grader"
+        config = HarnessConfig(model="gpt-reviewer", grader_model="gpt-grader")
         mock_load_pairwise_bundle.return_value = (config, "", "", "", "", "", {}, {})
         mock_load_pull_requests.return_value = [{"number": 101, "title": "PR one"}]
         artifacts = mock.Mock()
@@ -208,12 +210,16 @@ class CliTests(unittest.TestCase):
         mock_input: mock.Mock,
     ) -> None:
         stdout = io.StringIO()
-        config = mock.Mock()
-        config.model = "gpt-reviewer"
-        config.grader_model = "gpt-grader"
-        config.optimizer_model = "gpt-optimizer"
-        config.max_steps = 4
-        config.score_threshold = 0.75
+        config = OptimizationConfig(
+            model="gpt-reviewer",
+            grader_model="gpt-grader",
+            optimizer_model="gpt-optimizer",
+            max_steps=4,
+            score_threshold=0.75,
+            pairwise_weight=0.5,
+            benchmark_weight=0.5,
+            benchmark_guardrail=0.03,
+        )
         mock_load_optimizer_bundle.return_value = (config, "", "", "", "", "", "", "", {}, {}, {}, "", {})
         mock_load_pull_requests.return_value = [{"number": 101, "title": "PR one"}]
         artifacts = mock.Mock()

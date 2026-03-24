@@ -1,4 +1,9 @@
 {
   "model": "gpt-5.4",
-  "grader_model": "gpt-5.4-nano"
+  "grader_model": "gpt-5.4-nano",
+  "reviewer_reasoning_effort": "minimal",
+  "grader_reasoning_effort": "minimal",
+  "reviewer_max_output_tokens": 1200,
+  "grader_max_output_tokens": 250,
+  "max_concurrency": 4
 }

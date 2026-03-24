@@ -6,7 +6,7 @@ Flow:
 
 1. `evalcr fetch-prs` stores raw PR snapshots.
 2. `evalcr prepare-dataset --level 1` writes a benchmark JSONL file with raw review context.
-3. `evalcr run-evals --level 1` uploads that dataset, creates or reuses an Evals config, and runs the benchmark asynchronously.
+3. `evalcr run-evals --level 1` uploads that dataset, creates or reuses the eval version matching the current local harness config, and runs the benchmark asynchronously.
 
 The primary outputs are:
 

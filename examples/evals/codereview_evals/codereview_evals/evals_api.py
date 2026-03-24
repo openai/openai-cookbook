@@ -1,5 +1,6 @@
 from __future__ import annotations
 
+import hashlib
 import json
 import time
 from pathlib import Path
@@ -44,10 +45,10 @@ def run_evals(
     with dataset_path.open("rb") as handle:
         uploaded_file = _to_jsonable(client.files.create(file=handle, purpose="evals"))
 
-    eval_obj = _ensure_eval(level=level, client=client)
+    eval_obj, eval_name, eval_spec_fingerprint = _ensure_eval(level=level, client=client)
     eval_id = str(eval_obj["id"])
     if progress_callback:
-        progress_callback(f"Using eval {eval_id}.")
+        progress_callback(f"Using eval {eval_id} ({eval_name}).")
 
     run_request = _build_run_request(level=level, file_id=str(uploaded_file["id"]))
     initial_run = _to_jsonable(
@@ -66,7 +67,13 @@ def run_evals(
         progress_callback=progress_callback,
     )
     output_items = _list_output_items(client=client, eval_id=eval_id, run_id=run_id)
-    summary = _build_summary(level=level, run=final_run, output_items=output_items)
+    summary = _build_summary(
+        level=level,
+        run=final_run,
+        output_items=output_items,
+        eval_name=eval_name,
+        eval_spec_fingerprint=eval_spec_fingerprint,
+    )
 
     run_dir = harness_dir_for_level(level) / "results" / run_name
     run_dir.mkdir(parents=True, exist_ok=True)
@@ -98,19 +105,25 @@ def run_evals(
     )
 
 
-def _ensure_eval(*, level: int, client: OpenAI) -> JSONDict:
-    eval_name = f"code-review-evals-level-{level}"
+def _ensure_eval(*, level: int, client: OpenAI) -> tuple[JSONDict, str, str]:
+    eval_spec = _build_eval_spec(level)
+    eval_spec_fingerprint = _eval_spec_fingerprint(eval_spec)
+    eval_name = _versioned_eval_name(level=level, eval_spec_fingerprint=eval_spec_fingerprint)
     page = client.evals.list(limit=100, order="desc")
     for eval_obj in getattr(page, "data", []):
         eval_dict = _to_jsonable(eval_obj)
         if eval_dict.get("name") == eval_name:
-            return eval_dict
+            return eval_dict, eval_name, eval_spec_fingerprint
     created = client.evals.create(
         name=eval_name,
-        metadata={"example": "code_review_evals", "level": str(level)},
-        **_build_eval_spec(level),
+        metadata={
+            "example": "code_review_evals",
+            "level": str(level),
+            "eval_spec_fingerprint": eval_spec_fingerprint,
+        },
+        **eval_spec,
     )
-    return _to_jsonable(created)
+    return _to_jsonable(created), eval_name, eval_spec_fingerprint
 
 
 def _build_eval_spec(level: int) -> JSONDict:
@@ -123,7 +136,8 @@ def _build_eval_spec(level: int) -> JSONDict:
             },
             "testing_criteria": _build_benchmark_testing_criteria(level),
         }
-    grader_model = _read_eval_config(level).get("judge_model") or _read_eval_config(level).get("grader_model") or "gpt-5.3-codex"
+    eval_config = _read_eval_config(level)
+    grader_model = eval_config.get("judge_model") or eval_config.get("grader_model") or "gpt-5.3-codex"
     return {
         "data_source_config": {
             "type": "custom",
@@ -150,6 +164,19 @@ def _build_eval_spec(level: int) -> JSONDict:
             }
         ],
     }
+
+
+def _eval_spec_fingerprint(eval_spec: JSONDict) -> str:
+    fingerprint_input = {
+        "data_source_config": eval_spec["data_source_config"],
+        "testing_criteria": eval_spec["testing_criteria"],
+    }
+    payload = json.dumps(fingerprint_input, sort_keys=True, separators=(",", ":"))
+    return hashlib.sha256(payload.encode("utf-8")).hexdigest()[:12]
+
+
+def _versioned_eval_name(*, level: int, eval_spec_fingerprint: str) -> str:
+    return f"code-review-evals-level-{level}-{eval_spec_fingerprint}"
 
 
 def _build_run_request(*, level: int, file_id: str) -> JSONDict:
@@ -235,9 +262,18 @@ def _list_output_items(*, client: OpenAI, eval_id: str, run_id: str) -> list[JSO
         after = page_items[-1]["id"]
 
 
-def _build_summary(*, level: int, run: JSONDict, output_items: list[JSONDict]) -> JSONDict:
+def _build_summary(
+    *,
+    level: int,
+    run: JSONDict,
+    output_items: list[JSONDict],
+    eval_name: str,
+    eval_spec_fingerprint: str,
+) -> JSONDict:
     summary: JSONDict = {
         "eval_id": run.get("eval_id"),
+        "eval_name": eval_name,
+        "eval_spec_fingerprint": eval_spec_fingerprint,
         "run_id": run.get("id"),
         "status": run.get("status"),
         "report_url": run.get("report_url"),

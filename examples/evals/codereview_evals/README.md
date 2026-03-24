@@ -54,7 +54,7 @@ evalcr reset --cache-key openai_codex
 
 - `evalcr fetch-prs`: fetch raw PR snapshots from GitHub
 - `evalcr prepare-dataset --level 1|2|3`: write upload-ready JSONL datasets
-- `evalcr run-evals --level 1|2|3`: upload the dataset, create or reuse the eval, run it, and save a thin local summary
+- `evalcr run-evals --level 1|2|3`: upload the dataset, create or reuse the eval version matching the current local harness config, run it, and save a thin local summary
 - `evalcr reset`: remove cached PRs, prepared datasets, and saved run artifacts
 
 ## Data Layout
@@ -69,6 +69,7 @@ evalcr reset --cache-key openai_codex
 - Level 2 keeps the benchmark objective fixed and only changes the input representation.
 - Level 3 uses normalized records and cached baseline/candidate reviews before pairwise judging.
 - The primary result surface for all three levels is the Evals API run plus its `report_url`, not a local HTML report.
+- `summary.json` includes the resolved remote eval name and spec fingerprint so config drift is visible in saved artifacts.
 
 ## Tests
 

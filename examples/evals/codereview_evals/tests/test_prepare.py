@@ -65,6 +65,34 @@ class PrepareDatasetTests(unittest.TestCase):
             self.assertIn("Changed files:", item["review_input_text"])
             self.assertIn("Please add a guard.", item["reference_comments_text"])
 
+    def test_level_1_accepts_opaque_github_comment_ids(self) -> None:
+        with tempfile.TemporaryDirectory() as tmp_dir:
+            root = Path(tmp_dir)
+            cache_root = root / "cache"
+            prepared_root = root / "prepared"
+            snapshot = _snapshot()
+            snapshot["reviews"] = [
+                {
+                    "id": "IC_kwDOOYsS4c71a3Vu",
+                    "author_login": "alice",
+                    "body": "Please add a guard.",
+                    "submitted_at": "2025-01-01T00:00:00Z",
+                    "source": "review",
+                }
+            ]
+            self._write_cache(cache_root, "openai_codex", [snapshot])
+
+            artifacts, summary = prepare_dataset(
+                level=1,
+                cache_key="openai_codex",
+                cache_root=cache_root,
+                prepared_root=prepared_root,
+            )
+
+            self.assertEqual(summary["record_count"], 1)
+            row = json.loads(artifacts.dataset_path.read_text(encoding="utf-8").splitlines()[0])
+            self.assertIn("Please add a guard.", row["item"]["reference_comments_text"])
+
     def test_level_2_reuses_cached_pr_brief(self) -> None:
         with tempfile.TemporaryDirectory() as tmp_dir:
             root = Path(tmp_dir)

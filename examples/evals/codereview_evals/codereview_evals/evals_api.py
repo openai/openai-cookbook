@@ -123,7 +123,7 @@ def _build_eval_spec(level: int) -> JSONDict:
             },
             "testing_criteria": _build_benchmark_testing_criteria(level),
         }
-    grader_model = _read_eval_config(level).get("judge_model") or _read_eval_config(level).get("grader_model") or "gpt-4.1-mini"
+    grader_model = _read_eval_config(level).get("judge_model") or _read_eval_config(level).get("grader_model") or "gpt-5.3-codex"
     return {
         "data_source_config": {
             "type": "custom",
@@ -155,7 +155,7 @@ def _build_eval_spec(level: int) -> JSONDict:
 def _build_run_request(*, level: int, file_id: str) -> JSONDict:
     if level in {1, 2}:
         eval_config = _read_eval_config(level)
-        model = eval_config.get("reviewer_model") or eval_config.get("model") or "gpt-4.1"
+        model = eval_config.get("reviewer_model") or eval_config.get("model") or "gpt-5.3-codex"
         reviewer_system = _read_text(harness_dir_for_level(level) / "reviewer_system.txt")
         agents_md = _read_text(harness_dir_for_level(level) / "AGENTS.md")
         developer_prompt = reviewer_system.strip()
@@ -175,7 +175,7 @@ def _build_run_request(*, level: int, file_id: str) -> JSONDict:
             "source": {"type": "file_id", "id": file_id},
         }
 
-    judge_model = _read_eval_config(level).get("judge_model") or _read_eval_config(level).get("grader_model") or "gpt-4.1-mini"
+    judge_model = _read_eval_config(level).get("judge_model") or _read_eval_config(level).get("grader_model") or "gpt-5.3-codex"
     return {
         "type": "responses",
         "model": judge_model,
@@ -350,7 +350,7 @@ def _criterion_key(name: str) -> str | None:
 
 
 def _build_benchmark_testing_criteria(level: int) -> list[JSONDict]:
-    grader_model = _read_eval_config(level).get("grader_model") or "gpt-4.1-mini"
+    grader_model = _read_eval_config(level).get("grader_model") or "gpt-5.3-codex"
     grader_system = _read_text(harness_dir_for_level(level) / "grader_system.txt")
     criteria: list[JSONDict] = []
     for name, extra_instruction in (

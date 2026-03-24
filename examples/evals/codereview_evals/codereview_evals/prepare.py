@@ -133,7 +133,7 @@ def _build_pairwise_record(
     harness_dir = harness_dir_for_level(3)
     reviewer_system = _read_text(harness_dir / "reviewer_system.txt")
     eval_config = _read_json(harness_dir / "eval_config.json")
-    reviewer_model = eval_config.get("reviewer_model") or eval_config.get("model") or "gpt-4.1"
+    reviewer_model = eval_config.get("reviewer_model") or eval_config.get("model") or "gpt-5.3-codex"
     review_input_text = base_record.get("normalized_review_input_text") or base_record["review_input_text"]
 
     baseline_review = _load_or_generate_review(
@@ -364,9 +364,14 @@ def _format_reference_comments(snapshot: JSONDict) -> str:
     if not comments:
         return "No historical comments captured."
 
-    def sort_key(comment: JSONDict) -> tuple[str, str, int]:
+    def sort_key(comment: JSONDict) -> tuple[str, str, int, int, str]:
         timestamp = comment.get("created_at") or comment.get("submitted_at") or ""
-        return (timestamp, comment.get("source", ""), int(comment.get("id") or 0))
+        comment_id = str(comment.get("id") or "")
+        try:
+            numeric_id = int(comment_id)
+            return (timestamp, comment.get("source", ""), 0, numeric_id, comment_id)
+        except ValueError:
+            return (timestamp, comment.get("source", ""), 1, 0, comment_id)
 
     lines = []
     for comment in sorted(comments, key=sort_key)[:DEFAULT_REFERENCE_COMMENT_LIMIT]:

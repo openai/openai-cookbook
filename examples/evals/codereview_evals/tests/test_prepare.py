@@ -63,6 +63,8 @@ class PrepareDatasetTests(unittest.TestCase):
             item = row["item"]
             self.assertEqual(item["pr_number"], 101)
             self.assertIn("Changed files:", item["review_input_text"])
+            self.assertNotIn("Historical review comments:", item["review_input_text"])
+            self.assertNotIn("Please add a guard.", item["review_input_text"])
             self.assertIn("Please add a guard.", item["reference_comments_text"])
 
     def test_level_1_accepts_opaque_github_comment_ids(self) -> None:

@@ -127,7 +127,11 @@ def _build_basic_record(snapshot: JSONDict) -> JSONDict:
         "diff_text": _truncate_text(snapshot.get("diff_text") or "", DEFAULT_DIFF_CHAR_LIMIT),
         "reference_comments_text": _format_reference_comments(snapshot),
     }
-    record["review_input_text"] = _format_review_input(record, normalized=False)
+    record["review_input_text"] = _format_review_input(
+        record,
+        normalized=False,
+        include_reference_comments=False,
+    )
     return record
 
 
@@ -140,7 +144,11 @@ def _build_normalized_record(
     record = dict(base_record)
     record["pr_brief"] = pr_brief.strip()
     record["reference_findings_json"] = reference_findings_json.strip()
-    record["normalized_review_input_text"] = _format_review_input(record, normalized=True)
+    record["normalized_review_input_text"] = _format_review_input(
+        record,
+        normalized=True,
+        include_reference_comments=True,
+    )
     return record
 
 
@@ -342,7 +350,12 @@ def _generate_text(
     raise RuntimeError("Could not extract output_text from preparation response.")
 
 
-def _format_review_input(record: JSONDict, *, normalized: bool) -> str:
+def _format_review_input(
+    record: JSONDict,
+    *,
+    normalized: bool,
+    include_reference_comments: bool,
+) -> str:
     lines = [
         f"Repository: {record.get('repository', '')}",
         f"Pull request: #{record['pr_number']} {record['pr_title']}",
@@ -361,9 +374,18 @@ def _format_review_input(record: JSONDict, *, normalized: bool) -> str:
             "",
             "Diff excerpt:",
             record["diff_text"] or "No diff available.",
-            "",
-            "Historical review comments:",
-            record["reference_comments_text"],
+        ]
+    )
+    if include_reference_comments:
+        lines.extend(
+            [
+                "",
+                "Historical review comments:",
+                record["reference_comments_text"],
+            ]
+        )
+    lines.extend(
+        [
             "",
             "Return a concise review that focuses on the most important issues introduced by this pull request.",
         ]

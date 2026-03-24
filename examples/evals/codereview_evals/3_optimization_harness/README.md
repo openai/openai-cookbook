@@ -29,6 +29,14 @@ Optional overrides:
 evalcr benchmark run --type optimizer --cache-key openai_codex --max-steps 4 --score-threshold 0.8
 ```
 
+Pointwise benchmark results are cached persistently across optimizer runs when
+the full benchmark input fingerprint is unchanged. Disable that cache for a
+forced refresh with:
+
+```bash
+evalcr benchmark run --type optimizer --cache-key openai_codex --disable-benchmark-cache
+```
+
 ## Bundled assets
 
 - `AGENTS.md`: optimization objective and guardrail framing

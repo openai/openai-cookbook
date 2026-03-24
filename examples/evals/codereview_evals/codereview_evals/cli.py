@@ -140,6 +140,11 @@ def build_parser() -> argparse.ArgumentParser:
     run_parser.add_argument("--optimizer-max-output-tokens", type=int, default=None)
     run_parser.add_argument("--max-concurrency", type=int, default=None)
     run_parser.add_argument(
+        "--disable-benchmark-cache",
+        action="store_true",
+        help="Disable persistent pointwise benchmark caching for '--type optimizer'.",
+    )
+    run_parser.add_argument(
         "--max-steps",
         type=int,
         default=None,
@@ -374,6 +379,7 @@ def main(argv: Sequence[str] | None = None) -> int:
             print(
                 f"- Optimizer max output tokens: {config.optimizer_max_output_tokens if config.optimizer_max_output_tokens is not None else 'unbounded'}"
             )
+            print(f"- Benchmark cache: {'disabled' if args.disable_benchmark_cache else 'enabled'}")
             print(f"- Max steps: {args.max_steps if args.max_steps is not None else config.max_steps}")
             print(
                 f"- Score threshold: {args.score_threshold if args.score_threshold is not None else config.score_threshold}"
@@ -440,6 +446,7 @@ def main(argv: Sequence[str] | None = None) -> int:
                 grader_max_output_tokens_override=args.grader_max_output_tokens,
                 optimizer_max_output_tokens_override=args.optimizer_max_output_tokens,
                 max_concurrency_override=args.max_concurrency,
+                enable_benchmark_cache=not args.disable_benchmark_cache,
             )
         print(f"Run directory: {artifacts.run_dir}")
         print(f"Report: {artifacts.report_html}")

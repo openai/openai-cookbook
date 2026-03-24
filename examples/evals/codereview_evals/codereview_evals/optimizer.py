@@ -2,13 +2,17 @@ from __future__ import annotations
 
 from concurrent.futures import ThreadPoolExecutor, as_completed
 import csv
+import hashlib
 import json
 from dataclasses import dataclass, replace
 from html import escape
 from pathlib import Path
+import tempfile
 from typing import Callable
 
 from .benchmark import (
+    MAX_DIFF_CHARS,
+    MAX_REFERENCE_COMMENTS,
     _build_openai_client,
     _emit_progress,
     _normalize_optional_int,
@@ -33,6 +37,7 @@ from .types import HarnessConfig, JSONDict, RunArtifacts
 
 PROJECT_ROOT = Path(__file__).resolve().parents[1]
 DEFAULT_OPTIMIZER_HARNESS_DIR = PROJECT_ROOT / "3_optimization_harness"
+OPTIMIZER_BENCHMARK_CACHE_DIRNAME = "optimizer_benchmarks"
 
 
 @dataclass(frozen=True)
@@ -52,6 +57,14 @@ class OptimizationConfig:
     grader_max_output_tokens: int | None = None
     optimizer_max_output_tokens: int | None = None
     max_concurrency: int = 1
+
+
+@dataclass(frozen=True)
+class PointwiseBenchmarkRun:
+    results: list[JSONDict]
+    summary: JSONDict
+    fingerprint: str
+    cache_hit: bool
 
 
 def load_optimizer_harness_bundle(
@@ -142,6 +155,7 @@ def run_optimizer(
     grader_max_output_tokens_override: int | None = None,
     optimizer_max_output_tokens_override: int | None = None,
     max_concurrency_override: int | None = None,
+    enable_benchmark_cache: bool = True,
 ) -> tuple[RunArtifacts, JSONDict]:
     (
         config,
@@ -185,8 +199,10 @@ def run_optimizer(
     champion_agents = baseline_agents
     champion_system = baseline_system
     champion_label = "baseline_seed"
-    champion_benchmark_results, champion_benchmark_summary = _run_pointwise_benchmark(
+    champion_benchmark_run = _run_pointwise_benchmark(
         snapshots=snapshots,
+        cache_key=cache_key,
+        cache_root=cache_root,
         client=client,
         reviewer_model=config.model,
         grader_model=config.grader_model,
@@ -198,7 +214,10 @@ def run_optimizer(
         progress_callback=progress_callback,
         progress_prefix="[baseline benchmark]",
         config=config,
+        enable_cache=enable_benchmark_cache,
     )
+    champion_benchmark_results = champion_benchmark_run.results
+    champion_benchmark_summary = champion_benchmark_run.summary
     champion_pass_rate = float(champion_benchmark_summary.get("pass_rate", 0) or 0)
 
     baseline_dir = run_dir / "baseline"
@@ -246,8 +265,10 @@ def run_optimizer(
             progress_prefix=f"[pairwise step {step_index}]",
             config=config,
         )
-        candidate_benchmark_results, candidate_benchmark_summary = _run_pointwise_benchmark(
+        candidate_benchmark_run = _run_pointwise_benchmark(
             snapshots=snapshots,
+            cache_key=cache_key,
+            cache_root=cache_root,
             client=client,
             reviewer_model=config.model,
             grader_model=config.grader_model,
@@ -259,7 +280,10 @@ def run_optimizer(
             progress_callback=progress_callback,
             progress_prefix=f"[benchmark step {step_index}]",
             config=config,
+            enable_cache=enable_benchmark_cache,
         )
+        candidate_benchmark_results = candidate_benchmark_run.results
+        candidate_benchmark_summary = candidate_benchmark_run.summary
 
         _write_json(step_dir / "pairwise_results.json", pairwise_results)
         _write_json(step_dir / "pairwise_summary.json", pairwise_summary)
@@ -314,6 +338,8 @@ def run_optimizer(
             "champion_label_after_step": champion_label,
             "pairwise_summary": pairwise_summary,
             "benchmark_summary": candidate_benchmark_summary,
+            "benchmark_fingerprint": candidate_benchmark_run.fingerprint,
+            "benchmark_cache_hit": candidate_benchmark_run.cache_hit,
             "candidate_agents_md": candidate_agents,
             "candidate_reviewer_system": candidate_system,
         }
@@ -379,6 +405,8 @@ def run_optimizer(
         stop_reason=stop_reason,
         max_steps=resolved_max_steps,
         score_threshold=resolved_score_threshold,
+        baseline_benchmark_fingerprint=champion_benchmark_run.fingerprint,
+        baseline_benchmark_cache_hit=champion_benchmark_run.cache_hit,
     )
     return write_optimizer_results(
         run_dir=run_dir,
@@ -456,6 +484,8 @@ def summarize_optimizer_iterations(
     stop_reason: str,
     max_steps: int,
     score_threshold: float,
+    baseline_benchmark_fingerprint: str,
+    baseline_benchmark_cache_hit: bool,
 ) -> JSONDict:
     best_iteration = max(
         iterations,
@@ -469,6 +499,8 @@ def summarize_optimizer_iterations(
         "stop_reason": stop_reason,
         "final_champion_label": champion_label,
         "final_champion_pass_rate": champion_pass_rate,
+        "baseline_benchmark_fingerprint": baseline_benchmark_fingerprint,
+        "baseline_benchmark_cache_hit": baseline_benchmark_cache_hit,
         "best_step": best_iteration.get("step", 0),
         "best_candidate_composite_score": best_iteration.get("candidate_composite_score", 0),
         "best_candidate_win_rate": best_iteration.get("candidate_win_rate", 0),
@@ -658,6 +690,8 @@ def _run_pairwise_step(
 def _run_pointwise_benchmark(
     *,
     snapshots: list[JSONDict],
+    cache_key: str,
+    cache_root: Path,
     client: object,
     reviewer_model: str,
     grader_model: str,
@@ -669,7 +703,8 @@ def _run_pointwise_benchmark(
     progress_callback: Callable[[str], None] | None,
     progress_prefix: str,
     config: OptimizationConfig,
-) -> tuple[list[JSONDict], JSONDict]:
+    enable_cache: bool,
+) -> PointwiseBenchmarkRun:
     harness_config = HarnessConfig(
         model=reviewer_model,
         grader_model=grader_model,
@@ -679,10 +714,40 @@ def _run_pointwise_benchmark(
         grader_max_output_tokens=config.grader_max_output_tokens,
         max_concurrency=config.max_concurrency,
     )
+    fingerprint = _build_pointwise_benchmark_fingerprint(
+        cache_key=cache_key,
+        snapshots=snapshots,
+        reviewer_model=reviewer_model,
+        grader_model=grader_model,
+        reviewer_reasoning_effort=harness_config.reviewer_reasoning_effort,
+        grader_reasoning_effort=harness_config.grader_reasoning_effort,
+        reviewer_max_output_tokens=harness_config.reviewer_max_output_tokens,
+        grader_max_output_tokens=harness_config.grader_max_output_tokens,
+        reviewer_system=reviewer_system,
+        agents_md=agents_md,
+        grader_system=grader_system,
+        review_schema=review_schema,
+        benchmark_schema=benchmark_schema,
+    )
+    cache_dir = _optimizer_benchmark_cache_root(cache_root)
+    if enable_cache:
+        cached_run = _load_pointwise_benchmark_cache(cache_dir=cache_dir, fingerprint=fingerprint)
+        if cached_run is not None:
+            _emit_progress(progress_callback, f"{progress_prefix} cache hit {fingerprint}")
+            return cached_run
+        _emit_progress(progress_callback, f"{progress_prefix} cache miss {fingerprint}")
+    else:
+        _emit_progress(progress_callback, f"{progress_prefix} cache disabled {fingerprint}")
+
     total_snapshots = len(snapshots)
     if harness_config.max_concurrency <= 1 or total_snapshots <= 1:
         results = []
-        for snapshot in snapshots:
+        for index, snapshot in enumerate(snapshots, start=1):
+            pr_number = snapshot.get("number")
+            _emit_progress(
+                progress_callback,
+                f"{progress_prefix} [{index}/{total_snapshots}] PR #{pr_number}",
+            )
             results.append(
                 _run_optimizer_benchmark_snapshot(
                     snapshot=snapshot,
@@ -698,31 +763,52 @@ def _run_pointwise_benchmark(
     else:
         results_by_index: dict[int, JSONDict] = {}
         with ThreadPoolExecutor(max_workers=min(harness_config.max_concurrency, total_snapshots)) as executor:
-            future_map = {
-                executor.submit(
-                    _run_optimizer_benchmark_snapshot,
-                    snapshot=snapshot,
-                    config=harness_config,
-                    client=client,
-                    reviewer_system=reviewer_system,
-                    agents_md=agents_md,
-                    grader_system=grader_system,
-                    review_schema=review_schema,
-                    benchmark_schema=benchmark_schema,
-                ): index
-                for index, snapshot in enumerate(snapshots, start=1)
-            }
+            future_map = {}
+            for index, snapshot in enumerate(snapshots, start=1):
+                pr_number = snapshot.get("number")
+                _emit_progress(
+                    progress_callback,
+                    f"{progress_prefix} [{index}/{total_snapshots}] PR #{pr_number}",
+                )
+                future_map[
+                    executor.submit(
+                        _run_optimizer_benchmark_snapshot,
+                        snapshot=snapshot,
+                        config=harness_config,
+                        client=client,
+                        reviewer_system=reviewer_system,
+                        agents_md=agents_md,
+                        grader_system=grader_system,
+                        review_schema=review_schema,
+                        benchmark_schema=benchmark_schema,
+                    )
+                ] = index
             for future in as_completed(future_map):
                 results_by_index[future_map[future]] = future.result()
         results = [results_by_index[index] for index in range(1, total_snapshots + 1)]
-
-    for index, snapshot in enumerate(snapshots, start=1):
-        pr_number = snapshot.get("number")
-        _emit_progress(
-            progress_callback,
-            f"{progress_prefix} [{index}/{total_snapshots}] PR #{pr_number}",
+    summary = summarize_results(results)
+    benchmark_run = PointwiseBenchmarkRun(
+        results=results,
+        summary=summary,
+        fingerprint=fingerprint,
+        cache_hit=False,
+    )
+    if enable_cache and _is_cacheable_benchmark_results(results):
+        _write_pointwise_benchmark_cache(
+            cache_dir=cache_dir,
+            benchmark_run=benchmark_run,
+            metadata=_build_pointwise_benchmark_metadata(
+                cache_key=cache_key,
+                snapshots=snapshots,
+                reviewer_model=reviewer_model,
+                grader_model=grader_model,
+                reviewer_reasoning_effort=harness_config.reviewer_reasoning_effort,
+                grader_reasoning_effort=harness_config.grader_reasoning_effort,
+                reviewer_max_output_tokens=harness_config.reviewer_max_output_tokens,
+                grader_max_output_tokens=harness_config.grader_max_output_tokens,
+            ),
         )
-    return results, summarize_results(results)
+    return benchmark_run
 
 
 def _run_optimizer_pairwise_snapshot(
@@ -830,6 +916,124 @@ def _run_optimizer_benchmark_snapshot(
         )
     except Exception as exc:  # pragma: no cover - exercised through CLI smoke paths
         return build_failure_row(snapshot=snapshot, error_message=str(exc), config=config)
+
+
+def _optimizer_benchmark_cache_root(cache_root: Path) -> Path:
+    return cache_root.parent / OPTIMIZER_BENCHMARK_CACHE_DIRNAME
+
+
+def _build_pointwise_benchmark_fingerprint(
+    *,
+    cache_key: str,
+    snapshots: list[JSONDict],
+    reviewer_model: str,
+    grader_model: str,
+    reviewer_reasoning_effort: str | None,
+    grader_reasoning_effort: str | None,
+    reviewer_max_output_tokens: int | None,
+    grader_max_output_tokens: int | None,
+    reviewer_system: str,
+    agents_md: str,
+    grader_system: str,
+    review_schema: JSONDict,
+    benchmark_schema: JSONDict,
+) -> str:
+    payload = {
+        "version": "optimizer-pointwise-benchmark-v1",
+        "cache_key": cache_key,
+        "snapshots": snapshots,
+        "reviewer_model": reviewer_model,
+        "grader_model": grader_model,
+        "reviewer_reasoning_effort": reviewer_reasoning_effort,
+        "grader_reasoning_effort": grader_reasoning_effort,
+        "reviewer_max_output_tokens": reviewer_max_output_tokens,
+        "grader_max_output_tokens": grader_max_output_tokens,
+        "reviewer_system": reviewer_system,
+        "agents_md": agents_md,
+        "grader_system": grader_system,
+        "review_schema": review_schema,
+        "benchmark_schema": benchmark_schema,
+        "max_diff_chars": MAX_DIFF_CHARS,
+        "max_reference_comments": MAX_REFERENCE_COMMENTS,
+    }
+    return hashlib.sha256(
+        json.dumps(payload, sort_keys=True, ensure_ascii=False, separators=(",", ":")).encode("utf-8")
+    ).hexdigest()
+
+
+def _build_pointwise_benchmark_metadata(
+    *,
+    cache_key: str,
+    snapshots: list[JSONDict],
+    reviewer_model: str,
+    grader_model: str,
+    reviewer_reasoning_effort: str | None,
+    grader_reasoning_effort: str | None,
+    reviewer_max_output_tokens: int | None,
+    grader_max_output_tokens: int | None,
+) -> JSONDict:
+    return {
+        "cache_key": cache_key,
+        "snapshot_count": len(snapshots),
+        "snapshot_digest": hashlib.sha256(
+            json.dumps(snapshots, sort_keys=True, ensure_ascii=False, separators=(",", ":")).encode("utf-8")
+        ).hexdigest(),
+        "reviewer_model": reviewer_model,
+        "grader_model": grader_model,
+        "reviewer_reasoning_effort": reviewer_reasoning_effort,
+        "grader_reasoning_effort": grader_reasoning_effort,
+        "reviewer_max_output_tokens": reviewer_max_output_tokens,
+        "grader_max_output_tokens": grader_max_output_tokens,
+        "max_diff_chars": MAX_DIFF_CHARS,
+        "max_reference_comments": MAX_REFERENCE_COMMENTS,
+    }
+
+
+def _load_pointwise_benchmark_cache(
+    *, cache_dir: Path, fingerprint: str
+) -> PointwiseBenchmarkRun | None:
+    cache_path = cache_dir / f"{fingerprint}.json"
+    if not cache_path.exists():
+        return None
+    payload = json.loads(cache_path.read_text(encoding="utf-8"))
+    return PointwiseBenchmarkRun(
+        results=list(payload.get("results") or []),
+        summary=dict(payload.get("summary") or {}),
+        fingerprint=str(payload.get("fingerprint") or fingerprint),
+        cache_hit=True,
+    )
+
+
+def _write_pointwise_benchmark_cache(
+    *,
+    cache_dir: Path,
+    benchmark_run: PointwiseBenchmarkRun,
+    metadata: JSONDict,
+) -> None:
+    cache_dir.mkdir(parents=True, exist_ok=True)
+    cache_path = cache_dir / f"{benchmark_run.fingerprint}.json"
+    payload = {
+        "fingerprint": benchmark_run.fingerprint,
+        "results": benchmark_run.results,
+        "summary": benchmark_run.summary,
+        "metadata": metadata,
+    }
+    _write_json_atomic(cache_path, payload)
+
+
+def _write_json_atomic(path: Path, payload: object) -> None:
+    path.parent.mkdir(parents=True, exist_ok=True)
+    with tempfile.NamedTemporaryFile(
+        mode="w", encoding="utf-8", dir=path.parent, prefix=path.name, suffix=".tmp", delete=False
+    ) as handle:
+        temp_path = Path(handle.name)
+        json.dump(payload, handle, indent=2, ensure_ascii=False)
+        handle.write("\n")
+    temp_path.replace(path)
+
+
+def _is_cacheable_benchmark_results(results: list[JSONDict]) -> bool:
+    return bool(results) and all(row.get("status") == "ok" for row in results)
 
 
 def _resolve_optimization_config(

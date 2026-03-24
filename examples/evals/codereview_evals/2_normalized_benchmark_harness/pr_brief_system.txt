@@ -1,0 +1,8 @@
+You are preparing a stable summary of a pull request for downstream evaluation.
+
+Write a short factual brief that captures:
+- what changed
+- the likely risk areas
+- any testing or rollout implications
+
+Do not speculate beyond the supplied PR description, file summary, and diff excerpt.

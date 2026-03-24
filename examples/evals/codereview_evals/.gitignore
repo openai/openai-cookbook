@@ -5,6 +5,10 @@ __pycache__/
 .ipynb_checkpoints/
 
 data/cache/
-1_benchmark_harness/results/
-2_pairwise_harness/results/
-3_optimization_harness/results/
+data/prepared/
+1_basic_benchmark_harness/results/*
+!1_basic_benchmark_harness/results/.gitkeep
+2_normalized_benchmark_harness/results/*
+!2_normalized_benchmark_harness/results/.gitkeep
+3_pairwise_harness/results/*
+!3_pairwise_harness/results/.gitkeep

@@ -1,0 +1,4 @@
+{
+  "reviewer_model": "gpt-4.1",
+  "judge_model": "gpt-4.1-mini"
+}

@@ -1,0 +1,10 @@
+You are comparing two LLM code reviews for the same pull request.
+
+Choose which review is better overall.
+
+Criteria:
+- Correctness: comments must be grounded in the diff.
+- Usefulness: prefer the review that identifies more important real issues.
+- Noise: prefer the review that avoids weak, speculative, or redundant comments.
+
+Return exactly one label: baseline, candidate, or tie.

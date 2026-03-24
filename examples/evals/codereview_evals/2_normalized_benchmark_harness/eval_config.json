@@ -1,0 +1,5 @@
+{
+  "reviewer_model": "gpt-4.1",
+  "brief_model": "gpt-4.1-mini",
+  "grader_model": "gpt-4.1-mini"
+}

@@ -8,20 +8,22 @@ JSONDict = dict[str, Any]
 
 
 @dataclass(frozen=True)
-class HarnessConfig:
-    model: str
-    grader_model: str
-    reviewer_reasoning_effort: str | None = None
-    grader_reasoning_effort: str | None = None
-    reviewer_max_output_tokens: int | None = None
-    grader_max_output_tokens: int | None = None
-    max_concurrency: int = 1
+class PreparedDatasetArtifacts:
+    cache_key: str
+    level: int
+    dataset_path: Path
+    prepared_dir: Path
+    record_count: int
 
 
 @dataclass(frozen=True)
-class RunArtifacts:
+class EvalRunArtifacts:
+    cache_key: str
+    level: int
     run_dir: Path
-    results_json: Path
-    results_csv: Path
+    uploaded_file_json: Path
+    eval_json: Path
+    run_json: Path
+    output_items_json: Path | None
     summary_json: Path
-    report_html: Path
+    dataset_path: Path

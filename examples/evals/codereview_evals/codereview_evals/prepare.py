@@ -147,7 +147,7 @@ def _build_normalized_record(
     record["normalized_review_input_text"] = _format_review_input(
         record,
         normalized=True,
-        include_reference_comments=True,
+        include_reference_comments=False,
     )
     return record
 

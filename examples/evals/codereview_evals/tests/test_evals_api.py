@@ -17,6 +17,7 @@ from codereview_evals.evals_api import (
     _eval_spec_fingerprint,
     _benchmark_template,
     _build_benchmark_testing_criteria,
+    _build_eval_spec,
     _item_schema,
     _versioned_eval_name,
     run_evals,
@@ -109,6 +110,14 @@ class EvalsApiTests(unittest.TestCase):
         self.assertIn("Reference findings JSON:", template)
         self.assertIn("reference_findings_json", schema["properties"])
         self.assertIn("reference_findings_json", schema["required"])
+
+    def test_level_3_label_criterion_reads_sample_output_text(self) -> None:
+        spec = _build_eval_spec(3)
+
+        self.assertEqual(len(spec["testing_criteria"]), 1)
+        criterion = spec["testing_criteria"][0]
+        self.assertIn("{{ sample.output_text }}", criterion["input"][1]["content"])
+        self.assertIn("Do not output any other text.", criterion["input"][0]["content"])
 
     def test_run_evals_level_1_writes_summary(self) -> None:
         with tempfile.TemporaryDirectory() as tmp_dir:

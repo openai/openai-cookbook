@@ -158,11 +158,15 @@ def _build_eval_spec(level: int) -> JSONDict:
                 "input": [
                     {
                         "role": "developer",
-                        "content": _read_text(harness_dir_for_level(level) / "pairwise_judge_system.txt"),
+                        "content": (
+                            "You are extracting the final winner label from a pairwise judge output.\n\n"
+                            "Return exactly one label: baseline, candidate, or tie. "
+                            "Do not output any other text."
+                        ),
                     },
                     {
                         "role": "user",
-                        "content": _pairwise_template(),
+                        "content": _pairwise_label_template(),
                     },
                 ],
                 "labels": ["baseline", "candidate", "tie"],
@@ -500,6 +504,15 @@ def _pairwise_template() -> str:
             "",
             "Candidate review:",
             "{{ item.candidate_review }}",
+        ]
+    )
+
+
+def _pairwise_label_template() -> str:
+    return "\n".join(
+        [
+            "Pairwise judge output:",
+            "{{ sample.output_text }}",
         ]
     )
 

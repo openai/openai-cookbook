@@ -184,6 +184,9 @@ class PrepareDatasetTests(unittest.TestCase):
             self.assertIn('"title": "Missing guard"', item["reference_findings_json"])
             self.assertIn("PR brief:", item["normalized_review_input_text"])
             self.assertNotIn("Reference findings JSON:", item["normalized_review_input_text"])
+            self.assertNotIn("Historical review comments:", item["normalized_review_input_text"])
+            self.assertNotIn("Please add a guard.", item["normalized_review_input_text"])
+            self.assertIn("Please add a guard.", item["reference_comments_text"])
 
     def test_level_2_writes_empty_findings_when_no_historical_comments(self) -> None:
         with tempfile.TemporaryDirectory() as tmp_dir:

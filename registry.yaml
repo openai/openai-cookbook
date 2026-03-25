@@ -3128,3 +3128,17 @@
     - cost
     - responses
     - realtime
+
+- title: Real-Time Web Search with GPT Using free-web-search-ultimate
+  path: examples/real_time_web_search_with_gpt_using_free_web_search.ipynb
+  slug: real-time-web-search-gpt-free-web-search-ultimate
+  description: Give GPT real-time web search capabilities using the free-web-search-ultimate package — completely free, no additional API keys required. Uses DuckDuckGo and privacy-respecting search engines.
+  date: 2026-03-18
+  authors:
+    - wd041216-bit
+  tags:
+    - tools
+    - function-calling
+    - web-search
+    - agents
+

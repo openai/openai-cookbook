@@ -11,6 +11,6 @@ jobs:
 
     steps:
       - name: Call Deploy Hook
-        run: curl -X POST ${WEBSITE_DEPLOY_HOOK_URL}
+        run: curl -X POST "${WEBSITE_DEPLOY_HOOK_URL}"
         env:
           WEBSITE_DEPLOY_HOOK_URL: ${{ secrets.WEBSITE_DEPLOY_HOOK_URL }}

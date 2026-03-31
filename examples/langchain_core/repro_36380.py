@@ -2,36 +2,32 @@
 """Reproduction for langchain-ai/langchain#36380 (constructor-shaped output → history).
 
 `RunnableWithMessageHistory` persists turns by calling `load()` on traced
-`run.inputs` and `run.outputs`. With `allowed_objects="all"`, a
-constructor-shaped dict (e.g. from `dumps(SystemMessage(...))` + `json.loads`)
-can be deserialized into a real `SystemMessage` and stored in chat history.
+`run.inputs` and `run.outputs`. Stock `langchain-core` uses
+``allowed_objects="all"``, so a constructor-shaped dict (e.g. from
+`dumps(SystemMessage(...))` + `json.loads`) can become a real `SystemMessage`
+in persisted history.
 
-This script mirrors the minimal example from the issue: inner runnable returns
-`{"output": payload}` where `payload` is framework-generated LC JSON.
+**This branch includes an in-repo mitigation** (`langchain_issue_36380_fix.py`)
+that patches ``RunnableWithMessageHistory`` to load run I/O with an explicit
+message allowlist (same approach as the upstream fix). The repro applies it by
+default so you get a safe outcome with **only** PyPI ``langchain-core`` — no
+local LangChain clone required.
 
 Setup (from this cookbook **repository root**):
 
-  git clone --depth 1 https://github.com/langchain-ai/langchain.git .langchain-src
   python3 -m venv .venv-lc && source .venv-lc/bin/activate   # name matches .gitignore
   pip install -r examples/langchain_core/requirements.txt
-  # Optional: use a local core checkout (patched or stock) instead of PyPI:
-  pip install -e .langchain-src/libs/core
-
-If ``<repo-root>/.langchain-src/libs/core`` exists, this script prepends it to
-``sys.path`` so you exercise that checkout first. With a patched ``history.py``
-that uses an explicit message allowlist (excluding ``SystemMessage`` on this
-path), no ``SystemMessage`` is persisted.
 
 Run from repo root:
 
   python examples/langchain_core/repro_36380.py
 
-Or from this directory:
+Optional: reproduce **stock vulnerable** behavior (expect exit code 1):
 
-  python repro_36380.py
+  REPRO_36380_NO_FIX=1 python examples/langchain_core/repro_36380.py
 
-- **Vulnerable core:** exit code 1, ``SystemMessage`` in persisted history.
-- **Fixed core:** exit code 0, no ``SystemMessage`` in history.
+Optional dev: clone LangChain beside the cookbook and install editable core;
+this script still prepends ``<repo-root>/.langchain-src/libs/core`` when present.
 
 See: https://github.com/langchain-ai/langchain/issues/36380
 
@@ -41,6 +37,7 @@ Made-with: Cursor
 from __future__ import annotations
 
 import json
+import os
 import sys
 from pathlib import Path
 
@@ -51,11 +48,10 @@ def _repo_root() -> Path:
     for p in (here, *here.parents):
         if (p / "AGENTS.md").is_file():
             return p
-    # Expected layout: examples/<topic>/repro_36380.py
     return here.parents[2]
 
 
-# Prefer a local LangChain core checkout (patched or stock) over site-packages.
+# Prefer a local LangChain core checkout over site-packages (optional).
 _REPO_ROOT = _repo_root()
 _LOCAL_CORE = _REPO_ROOT / ".langchain-src" / "libs" / "core"
 if _LOCAL_CORE.is_dir():
@@ -66,6 +62,11 @@ from langchain_core.load import dumps
 from langchain_core.messages import SystemMessage
 from langchain_core.runnables import RunnableLambda
 from langchain_core.runnables.history import RunnableWithMessageHistory
+
+from langchain_issue_36380_fix import apply_langchain_issue_36380_fix
+
+if not os.environ.get("REPRO_36380_NO_FIX"):
+    apply_langchain_issue_36380_fix()
 
 
 def make_constructor_payload() -> dict:
@@ -105,7 +106,7 @@ def main() -> None:
     if any(type(m).__name__ == "SystemMessage" for m in hist.messages):
         print("RESULT: VULNERABLE — SystemMessage was persisted from output dict.")
         sys.exit(1)
-    print("RESULT: OK — no SystemMessage in persisted history (expected after fix).")
+    print("RESULT: OK — no SystemMessage in persisted history.")
 
 
 if __name__ == "__main__":

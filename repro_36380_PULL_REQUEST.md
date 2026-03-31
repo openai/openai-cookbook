@@ -2,11 +2,11 @@ Made-with: Cursor
 
 ## Summary
 
-Add `examples/langchain_core/repro_36380.py`, a minimal script that reproduces [langchain-ai/langchain#36380](https://github.com/langchain-ai/langchain/issues/36380): constructor-shaped LangChain JSON in a runnable’s output can be deserialized during `RunnableWithMessageHistory` history writes and persisted as a live `SystemMessage`. The script uses the same payload pattern as the issue (`dumps(SystemMessage(...))` + `json.loads`) and the same `input_messages_key` / `output_messages_key` shape. It resolves the cookbook repo root via `AGENTS.md`, prepends `<repo-root>/.langchain-src/libs/core` to `sys.path` when present, and documents `pip install -r examples/langchain_core/requirements.txt` for topic-scoped deps. Extend `.gitignore` with `.langchain-src/` and `.venv-lc/` so local clones and a dedicated venv stay untracked.
+Add `examples/langchain_core/repro_36380.py` plus **`langchain_issue_36380_fix.py`**, an in-repo mitigation for [langchain-ai/langchain#36380](https://github.com/langchain-ai/langchain/issues/36380). Stock `langchain-core` deserializes traced run I/O with `allowed_objects="all"`, so constructor-shaped output (e.g. `dumps(SystemMessage(...))` + `json.loads`) can become a live `SystemMessage` in history. The fix module monkeypatches `RunnableWithMessageHistory` to use the same explicit message allowlist as the intended upstream patch. The repro calls `apply_langchain_issue_36380_fix()` by default so **`pip install -r examples/langchain_core/requirements.txt` alone** yields a safe exit (no persisted `SystemMessage`). Set `REPRO_36380_NO_FIX=1` to exercise stock vulnerable behavior (expect exit 1 with PyPI core). Optional: prepend `<repo-root>/.langchain-src/libs/core` when a local clone exists. `.gitignore` includes `.langchain-src/` and `.venv-lc/`.
 
 ## Motivation
 
-The cookbook repo is a convenient place to keep a **self-contained repro** under `examples/langchain_core/` (per `AGENTS.md`: Python samples live under `examples/<topic>/`) with a topic-scoped `requirements.txt`. Maintainers can run it while validating security fixes in `langchain_core` without hunting through issue comments. Ignoring `.langchain-src/` and `.venv-lc/` keeps optional local LangChain development artifacts out of git. This change does **not** add website-facing cookbook content; it is a developer utility aligned with the vulnerability described in #36380.
+The cookbook branch should **actually address** the unsafe deserialization behavior for developers who cannot wait on a `langchain-core` release: import `apply_langchain_issue_36380_fix()` at app startup (with `examples/langchain_core` on `PYTHONPATH`, or copy the module into your project) until upstream merges. The repro stays aligned with `AGENTS.md` (`examples/<topic>/`) and topic-scoped `requirements.txt`. This is **not** a substitute for merging the fix into `langchain-ai/langchain`, but it **does** resolve the issue in-process for this branch. No website-facing cookbook page.
 
 ---
 
@@ -15,7 +15,7 @@ The cookbook repo is a convenient place to keep a **self-contained repro** under
 This PR adds a **standalone repro script and gitignore entries**, not a new article or notebook for cookbook.openai.com.
 
 - [ ] **registry.yaml / authors.yaml** — N/A: no new published cookbook page; nothing to register.
-- [ ] **Self-review (contribution rubric)** — N/A for registry content; script is documented in its module docstring, runs with `pip install -e .langchain-src/libs/core`, and is scoped to LangChain/OpenAI-adjacent debugging.
+- [ ] **Self-review (contribution rubric)** — N/A for registry content; repro and fix modules are documented; scoped to LangChain/OpenAI-adjacent security debugging.
 
 If you prefer every PR to tick the full rubric for *any* file change, treat the script as **tooling**:
 
@@ -23,5 +23,5 @@ If you prefer every PR to tick the full rubric for *any* file change, treat the 
 - **Uniqueness:** Small, issue-linked repro not duplicated elsewhere in this repo.
 - **Spelling / grammar:** Docstring reviewed.
 - **Clarity:** Docstring includes clone, venv, install, and expected exit codes.
-- **Correctness:** From repo root, run `python examples/langchain_core/repro_36380.py` after `pip install -r examples/langchain_core/requirements.txt` and optionally `pip install -e .langchain-src/libs/core` (vulnerable vs fixed tree determines exit 1 vs 0).
+- **Correctness:** From repo root, `pip install -r examples/langchain_core/requirements.txt`, then `python examples/langchain_core/repro_36380.py` (expect exit 0). With `REPRO_36380_NO_FIX=1`, expect exit 1 against stock PyPI `langchain-core`.
 - **Completeness:** Links to #36380 and explains `.gitignore` rationale.

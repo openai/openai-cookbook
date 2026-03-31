@@ -9,16 +9,24 @@ can be deserialized into a real `SystemMessage` and stored in chat history.
 This script mirrors the minimal example from the issue: inner runnable returns
 `{"output": payload}` where `payload` is framework-generated LC JSON.
 
-Setup (from this cookbook repo root):
+Setup (from this cookbook **repository root**):
 
   git clone --depth 1 https://github.com/langchain-ai/langchain.git .langchain-src
   python3 -m venv .venv-lc && source .venv-lc/bin/activate   # name matches .gitignore
+  pip install -r examples/langchain_core/requirements.txt
+  # Optional: use a local core checkout (patched or stock) instead of PyPI:
   pip install -e .langchain-src/libs/core
 
-If `.langchain-src/` exists, this script prepends it to ``sys.path`` so you
-exercise that checkout (patched or stock). With a patched `history.py` that
-uses an explicit message allowlist (excluding `SystemMessage` on this path),
-no `SystemMessage` is persisted.
+If ``<repo-root>/.langchain-src/libs/core`` exists, this script prepends it to
+``sys.path`` so you exercise that checkout first. With a patched ``history.py``
+that uses an explicit message allowlist (excluding ``SystemMessage`` on this
+path), no ``SystemMessage`` is persisted.
+
+Run from repo root:
+
+  python examples/langchain_core/repro_36380.py
+
+Or from this directory:
 
   python repro_36380.py
 
@@ -36,9 +44,20 @@ import json
 import sys
 from pathlib import Path
 
+
+def _repo_root() -> Path:
+    """Resolve openai-cookbook root (directory containing AGENTS.md)."""
+    here = Path(__file__).resolve().parent
+    for p in (here, *here.parents):
+        if (p / "AGENTS.md").is_file():
+            return p
+    # Expected layout: examples/<topic>/repro_36380.py
+    return here.parents[2]
+
+
 # Prefer a local LangChain core checkout (patched or stock) over site-packages.
-_ROOT = Path(__file__).resolve().parent
-_LOCAL_CORE = _ROOT / ".langchain-src" / "libs" / "core"
+_REPO_ROOT = _repo_root()
+_LOCAL_CORE = _REPO_ROOT / ".langchain-src" / "libs" / "core"
 if _LOCAL_CORE.is_dir():
     sys.path.insert(0, str(_LOCAL_CORE))
 

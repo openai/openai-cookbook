@@ -2,11 +2,11 @@ Made-with: Cursor
 
 ## Summary
 
-Add `repro_36380.py`, a minimal script that reproduces [langchain-ai/langchain#36380](https://github.com/langchain-ai/langchain/issues/36380): constructor-shaped LangChain JSON in a runnable’s output can be deserialized during `RunnableWithMessageHistory` history writes and persisted as a live `SystemMessage`. The script uses the same payload pattern as the issue (`dumps(SystemMessage(...))` + `json.loads`) and the same `input_messages_key` / `output_messages_key` shape. It prepends `.langchain-src/libs/core` to `sys.path` when present so developers can run against a local LangChain clone (e.g. with the upstream `langchain_core` fix). Extend `.gitignore` with `.langchain-src/` and `.venv-lc/` so local clones and a dedicated venv stay untracked.
+Add `examples/langchain_core/repro_36380.py`, a minimal script that reproduces [langchain-ai/langchain#36380](https://github.com/langchain-ai/langchain/issues/36380): constructor-shaped LangChain JSON in a runnable’s output can be deserialized during `RunnableWithMessageHistory` history writes and persisted as a live `SystemMessage`. The script uses the same payload pattern as the issue (`dumps(SystemMessage(...))` + `json.loads`) and the same `input_messages_key` / `output_messages_key` shape. It resolves the cookbook repo root via `AGENTS.md`, prepends `<repo-root>/.langchain-src/libs/core` to `sys.path` when present, and documents `pip install -r examples/langchain_core/requirements.txt` for topic-scoped deps. Extend `.gitignore` with `.langchain-src/` and `.venv-lc/` so local clones and a dedicated venv stay untracked.
 
 ## Motivation
 
-The cookbook repo is a convenient place to keep a **self-contained repro** that maintainers and contributors can run while validating security fixes in `langchain_core`, without hunting through issue comments. Ignoring `.langchain-src/` and `.venv-lc/` keeps optional local LangChain development artifacts out of git. This change does **not** add website-facing cookbook content; it is a developer utility aligned with the vulnerability described in #36380.
+The cookbook repo is a convenient place to keep a **self-contained repro** under `examples/langchain_core/` (per `AGENTS.md`: Python samples live under `examples/<topic>/`) with a topic-scoped `requirements.txt`. Maintainers can run it while validating security fixes in `langchain_core` without hunting through issue comments. Ignoring `.langchain-src/` and `.venv-lc/` keeps optional local LangChain development artifacts out of git. This change does **not** add website-facing cookbook content; it is a developer utility aligned with the vulnerability described in #36380.
 
 ---
 
@@ -23,5 +23,5 @@ If you prefer every PR to tick the full rubric for *any* file change, treat the 
 - **Uniqueness:** Small, issue-linked repro not duplicated elsewhere in this repo.
 - **Spelling / grammar:** Docstring reviewed.
 - **Clarity:** Docstring includes clone, venv, install, and expected exit codes.
-- **Correctness:** Run `python repro_36380.py` after installing core from `.langchain-src` (vulnerable vs fixed tree determines exit 1 vs 0).
+- **Correctness:** From repo root, run `python examples/langchain_core/repro_36380.py` after `pip install -r examples/langchain_core/requirements.txt` and optionally `pip install -e .langchain-src/libs/core` (vulnerable vs fixed tree determines exit 1 vs 0).
 - **Completeness:** Links to #36380 and explains `.gitignore` rationale.

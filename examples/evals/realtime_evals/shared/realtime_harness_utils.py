@@ -7,8 +7,27 @@ import wave
 from pathlib import Path
 from typing import Any, Dict, List, Optional, TextIO
 
+from shared.graders import parse_json_dict
 from shared.realtime_utils import ToolCallAccumulator
 from shared.trace_utils import build_event_record
+
+
+DEFAULT_RESPONSE_TIMEOUT_SECONDS = 60.0
+
+
+class RealtimeResponseError(RuntimeError):
+    def __init__(
+        self,
+        message: str,
+        *,
+        failure_stage: str,
+        response_status: str = "",
+        error_code: str = "",
+    ) -> None:
+        super().__init__(message)
+        self.failure_stage = failure_stage
+        self.response_status = response_status
+        self.error_code = error_code
 
 
 def ensure_dir(path: Path) -> None:
@@ -110,18 +129,26 @@ async def collect_realtime_response(
     source: Optional[str] = None,
     turn_index: Optional[int] = None,
     tool_mocks: Optional[Dict[str, Dict[str, Any]]] = None,
+    response_timeout_seconds: float = DEFAULT_RESPONSE_TIMEOUT_SECONDS,
 ) -> Dict[str, Any]:
     """Collect a realtime response and optionally log each event as JSONL."""
     assistant_text_parts: List[str] = []
+    current_response_text_parts: List[str] = []
     output_audio_bytes = bytearray()
     tool_call_accumulator = ToolCallAccumulator()
     # Track tool calls we've already responded to so follow-up responses are clean.
     responded_call_ids: set[str] = set()
+    response_segments: List[Dict[str, Any]] = []
 
     first_audio_time_ms: Optional[float] = None
     first_text_time_ms: Optional[float] = None
     response_done_time_ms: Optional[float] = None
-    usage_data: Dict[str, Any] = {}
+    usage_output_tokens = 0
+    usage_output_audio_tokens = 0
+    usage_output_text_tokens = 0
+    has_output_tokens = False
+    has_output_audio_tokens = False
+    has_output_text_tokens = False
     awaiting_followup = False
 
     loop = asyncio.get_running_loop()
@@ -129,7 +156,23 @@ async def collect_realtime_response(
     await connection.response.create(response=response_payload)
 
     local_event_index = 0
-    async for event in connection:
+    event_iterator = connection.__aiter__()
+    while True:
+        try:
+            event = await asyncio.wait_for(
+                anext(event_iterator), timeout=response_timeout_seconds
+            )
+        except StopAsyncIteration:
+            break
+        except asyncio.TimeoutError as exc:
+            raise RealtimeResponseError(
+                (
+                    "Timed out waiting for realtime response events after "
+                    f"{response_timeout_seconds:.1f}s."
+                ),
+                failure_stage="response_timeout",
+            ) from exc
+
         event_time_ms = (loop.time() - response_start_time) * 1000
         if event_index_state is None:
             # Use a local counter when the caller does not need cross-stream ordering.
@@ -152,6 +195,25 @@ async def collect_realtime_response(
         payload = event.model_dump()
         event_type = payload.get("type", "")
 
+        if event_type == "error":
+            error_payload = payload.get("error") or {}
+            error_type = str(error_payload.get("type", "")).strip()
+            error_code = str(error_payload.get("code", "")).strip()
+            error_message = str(error_payload.get("message", "")).strip()
+            error_details: List[str] = []
+            if error_type:
+                error_details.append(error_type)
+            if error_code:
+                error_details.append(error_code)
+            detail_text = (
+                f" ({', '.join(error_details)})" if error_details else ""
+            )
+            raise RealtimeResponseError(
+                f"Realtime error event{detail_text}: {error_message or 'Unknown error.'}",
+                failure_stage="response_error",
+                error_code=error_code,
+            )
+
         if event_type == "response.output_audio.delta":
             if first_audio_time_ms is None:
                 first_audio_time_ms = event_time_ms
@@ -160,18 +222,86 @@ async def collect_realtime_response(
         if event_type == "response.output_audio_transcript.delta":
             if first_text_time_ms is None:
                 first_text_time_ms = event_time_ms
-            assistant_text_parts.append(payload.get("delta", ""))
+            delta_text = payload.get("delta", "")
+            assistant_text_parts.append(delta_text)
+            current_response_text_parts.append(delta_text)
 
         if event_type == "response.output_text.delta":
             if first_text_time_ms is None:
                 first_text_time_ms = event_time_ms
-            assistant_text_parts.append(payload.get("delta", ""))
+            delta_text = payload.get("delta", "")
+            assistant_text_parts.append(delta_text)
+            current_response_text_parts.append(delta_text)
 
         if event_type == "response.done":
             response_done_time_ms = event_time_ms
             tool_call_accumulator.handle_event_payload(payload)
             response = payload.get("response") or {}
-            usage_data = response.get("usage") or {}
+            response_status = str(response.get("status", "")).strip()
+            if response_status != "completed":
+                status_details = response.get("status_details") or {}
+                error_payload = {}
+                if isinstance(status_details, dict):
+                    error_payload = status_details.get("error") or {}
+                error_code = str(error_payload.get("code", "")).strip()
+                error_type = str(error_payload.get("type", "")).strip()
+                error_message = str(error_payload.get("message", "")).strip()
+                status_reason = ""
+                if isinstance(status_details, dict):
+                    status_reason = str(status_details.get("reason", "")).strip()
+                details: List[str] = [response_status]
+                if status_reason:
+                    details.append(status_reason)
+                if error_type:
+                    details.append(error_type)
+                if error_code:
+                    details.append(error_code)
+                raise RealtimeResponseError(
+                    "Realtime response finished without completion"
+                    f" ({', '.join(details)}): {error_message or 'No error message provided.'}",
+                    failure_stage="response_status",
+                    response_status=response_status,
+                    error_code=error_code,
+                )
+            response_usage = response.get("usage") or {}
+            response_output_tokens = response_usage.get("output_tokens")
+            if response_output_tokens is not None:
+                usage_output_tokens += int(response_output_tokens)
+                has_output_tokens = True
+
+            response_output_details = response_usage.get("output_token_details") or {}
+            response_audio_tokens = response_output_details.get("audio_tokens")
+            if response_audio_tokens is not None:
+                usage_output_audio_tokens += int(response_audio_tokens)
+                has_output_audio_tokens = True
+            response_text_tokens = response_output_details.get("text_tokens")
+            if response_text_tokens is not None:
+                usage_output_text_tokens += int(response_text_tokens)
+                has_output_text_tokens = True
+
+            response_tool_calls: List[Dict[str, Any]] = []
+            for output_item in response.get("output") or []:
+                if output_item.get("type") != "function_call":
+                    continue
+                call_id = output_item.get("call_id") or output_item.get("id") or ""
+                if not call_id:
+                    continue
+                response_tool_calls.append(
+                    {
+                        "name": output_item.get("name", ""),
+                        "arguments": parse_json_dict(output_item.get("arguments", "")),
+                        "raw_arguments": output_item.get("arguments", "") or "",
+                        "call_id": call_id,
+                    }
+                )
+
+            response_segments.append(
+                {
+                    "assistant_text": "".join(current_response_text_parts).strip(),
+                    "tool_calls": response_tool_calls,
+                }
+            )
+            current_response_text_parts = []
 
             tool_calls = tool_call_accumulator.build_tool_calls()
             # Only respond to newly observed tool calls; some calls may repeat in follow-ups.
@@ -208,9 +338,27 @@ async def collect_realtime_response(
                 awaiting_followup = False
             break
 
+    if response_done_time_ms is None:
+        raise RealtimeResponseError(
+            "Realtime connection closed before a terminal response.done event arrived.",
+            failure_stage="response_missing_done",
+        )
+
     tool_calls = tool_call_accumulator.build_tool_calls()
+    usage_data: Dict[str, Any] = {}
+    if has_output_tokens:
+        usage_data["output_tokens"] = usage_output_tokens
+    if has_output_audio_tokens or has_output_text_tokens:
+        usage_data["output_token_details"] = {}
+        if has_output_audio_tokens:
+            usage_data["output_token_details"]["audio_tokens"] = (
+                usage_output_audio_tokens
+            )
+        if has_output_text_tokens:
+            usage_data["output_token_details"]["text_tokens"] = usage_output_text_tokens
     return {
         "assistant_text": "".join(assistant_text_parts).strip(),
+        "response_segments": response_segments,
         "output_audio_bytes": bytes(output_audio_bytes),
         "tool_calls": tool_calls,
         "first_audio_time_ms": first_audio_time_ms,

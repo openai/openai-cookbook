@@ -15,6 +15,7 @@ from the simulation JSON, and records full traces.
 - Captures assistant audio/text, tool calls, tool outputs, and latencies.
 - Grades turn-level and trace-level criteria with an LLM-as-judge.
 - Writes `results.csv`, `summary.json`, and full trace logs under `run_harness/results/`.
+- Renders styled PNG plots under `run_harness/results/<run_id>/plots/` by default.
 
 ## Files
 
@@ -55,6 +56,7 @@ Common options:
 - `--simulator-system-prompt`: Override simulator system prompt (string).
 - `--chunk-ms`, `--sample-rate-hz`, `--real-time`.
 - `--max-turns`, `--max-examples`.
+- `--skip-plots`.
 
 Notes:
 

@@ -4,6 +4,19 @@
 # should build pages for, and indicates metadata such as tags, creation date and
 # authors for each page.
 
+- title: How AI Agents Are Replacing the Slowest Part of Paid Media
+  path: examples/mcp/adspirer_mcp_ad_campaign_creation.ipynb
+  slug: adspirer-mcp-ad-campaign-creation
+  description: Create a complete multi-platform ad campaign (Google Search + Meta Ads with 8 creative variants) in a single ChatGPT conversation using the Adspirer MCP server.
+  date: 2026-04-02
+  authors:
+    - amekala
+  tags:
+    - mcp
+    - advertising
+    - google-ads
+    - meta-ads
+
 - title: Getting the Most out of GPT-5.4 for Vision and Document Understanding
   path: examples/multimodal/document_and_multimodal_understanding_tips.ipynb
   slug: vision-understanding

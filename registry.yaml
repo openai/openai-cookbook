@@ -4,6 +4,21 @@
 # should build pages for, and indicates metadata such as tags, creation date and
 # authors for each page.
 
+- title: Production Document Q&A with Dewey's Managed RAG Backend
+  path: examples/dewey_rag_pipeline.ipynb
+  slug: dewey-rag-pipeline
+  description: Build a production RAG pipeline using Dewey's managed document backend — upload PDFs, run hybrid search, stream agentic research, and integrate with the OpenAI SDK.
+  date: 2026-04-03
+  authors:
+    - lambdabaa
+  tags:
+    - rag
+    - retrieval
+    - search
+    - embeddings
+    - agents
+    - partners
+
 - title: Getting the Most out of GPT-5.4 for Vision and Document Understanding
   path: examples/multimodal/document_and_multimodal_understanding_tips.ipynb
   slug: vision-understanding

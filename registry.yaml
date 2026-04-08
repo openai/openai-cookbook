@@ -3128,3 +3128,16 @@
     - cost
     - responses
     - realtime
+
+- title: Building World-Aware Agents — Real-Time Context from Prediction Markets
+  path: examples/partners/building_world_aware_agents/building_world_aware_agents.ipynb
+  slug: building-world-aware-agents
+  description: Give agents real-time world awareness using calibrated prediction market data. Covers dynamic instructions, focused topic drilling, incremental updates, and multi-agent consistency.
+  date: 2026-04-02
+  authors:
+    - patrickliu0077
+  tags:
+    - agents
+    - agents-sdk
+    - partners
+    - function-calling

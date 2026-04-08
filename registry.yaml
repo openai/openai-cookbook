@@ -3128,3 +3128,25 @@
     - cost
     - responses
     - realtime
+
+- title: Multi-Agent Collaborative Chat with AG2
+  path: examples/third_party/multi_agent_chat_with_ag2.ipynb
+  slug: multi-agent-chat-with-ag2
+  date: "2026-04-01"
+  authors:
+    - faridun-ag2
+  tags:
+    - agents
+    - completions
+    - third-party
+
+- title: Tool Use with AG2 Agents
+  path: examples/third_party/tool_use_with_ag2_agents.ipynb
+  slug: tool-use-with-ag2-agents
+  date: "2026-04-01"
+  authors:
+    - faridun-ag2
+  tags:
+    - agents
+    - functions
+    - third-party

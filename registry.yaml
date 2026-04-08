@@ -3128,3 +3128,18 @@
     - cost
     - responses
     - realtime
+
+- title: Building Resilient Agents with Kalibr
+  path: examples/partners/kalibr_resilient_agents/kalibr_resilient_agents.ipynb
+  slug: kalibr-resilient-agents
+  description: How to use Kalibr execution path routing to keep OpenAI agents running at 88-100% success during provider degradation. Before/after comparison with benchmark results.
+  date: 2026-03-25
+  authors:
+    - devonakelley
+  tags:
+    - agents
+    - reliability
+    - routing
+    - production
+    - partners
+    - resilience

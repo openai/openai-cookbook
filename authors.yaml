@@ -3,6 +3,11 @@
 # You can optionally customize how your information shows up cookbook.openai.com over here.
 # If your information is not present here, it will be pulled from your GitHub profile.
 
+kkahadze-oai:
+  name: "Konstantine Kahadze"
+  website: "https://www.linkedin.com/in/kahadze/"
+  avatar: "https://avatars.githubusercontent.com/kkahadze-oai"
+
 zhenweig-cerebras:
   name: "Zhenwei Gao"
   website: "https://www.linkedin.com/in/zhenwei-gao/"

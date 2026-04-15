@@ -92,7 +92,7 @@ For example, if you ask ChatGPT to “Write a biography for each president of th
 ## 4. Write the prompt clearly 
 **Before you write the full prompt, take 30 seconds to outline the job in a simple structure. The easiest way is to use headings.**
 
-All LLMs understand a language called “markdown” – the easiest aspect to master in markdown is that “#” is a label for “Header”. So in ChatGPT, the model understands that a line that starts with “#”  is a section or header title in a document. It helps both you and ChatGPT quickly see what each part of the prompt is doing.
+All LLMs understand a language called “markdown” – the easiest aspect to master in markdown is that “#” is a label for “Header”. So in ChatGPT, the model understands that a line that starts with “#” is a section or header title in a document. It helps both you and ChatGPT quickly see what each part of the prompt is doing.
 
 We recommend the prompt layout below. Below are several examples using real use cases.
 
@@ -148,23 +148,27 @@ Examples: “contains 3 action items,” “matches our template,” “valid CS
 
 ## 5. Use ChatGPT to help you prompt (meta-prompting)
 
-Meta‑prompting is when you use ChatGPT to **write or improve your prompt.** You’re essentially asking the model to help you give it better instructions. This is especially helpful when you know what you want, but you’re not sure how to phrase it clearly or consistently.
+Meta-prompting is when you use ChatGPT to **write or improve your prompt.** You're essentially asking the model to help you give it better instructions. This is especially helpful when you know what you want, but you're not sure how to phrase it clearly or consistently.
 
-To do this, simply paste in your messy notes to ChatGPT (or use the speech feature to talk to it directly) and ask ChatGPT for help making the prompt clearer: ask it to ask you questions, ask it to play back what you’re trying to do, missing gaps, etc.  
+To do this, simply paste in your messy notes to ChatGPT (or use the speech feature to talk to it directly) and ask ChatGPT for help making the prompt clearer: ask it to ask you questions, ask it to play back what you're trying to do, identify missing gaps, etc.
+
+You can also use a **Skill** to assist with this. For example, if you find yourself repeatedly asking ChatGPT to clean up rough prompts in a consistent way, a prompt-redrafting Skill can turn that into a more repeatable workflow.
 
 **Example Prompt**
 
 ```
-Help me build a prompt that I can feed to a GenAI language model. I’m going to paste my draft prompt below - you ask me questions, then write up a clean prompt summarizing what we covered. The final prompt should have 3 sections (“# Context”, “# Instructions”, and “# Additional Information”)
+Help me build a prompt that I can feed to a GenAI language model. I'm going to paste my draft prompt below - you ask me questions, then write up a clean prompt summarizing what we covered. The final prompt should have 3 sections ("# Context", "# Instructions", and "# Additional Information").
 ```
 
 **When *not* to meta‑prompt**
 
-Meta‑prompting isn’t the right tool when:
+Meta‑prompting isn't the right tool when:
 
 * The task is already simple and you can write the prompt directly
 * The missing piece is **source material** (you need the right document or data, not a prettier prompt)
-* You’re trying to “prompt your way” out of unclear requirements - scoping still comes first
+* You're trying to "prompt your way" out of unclear requirements - scoping still comes first
+
+Skills can help make meta-prompting more consistent, but they do not replace good scoping or the need for the right source material.
 
 ## 6. Improve accuracy
 

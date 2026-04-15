@@ -4,26 +4,26 @@ This guide is for Enterprise users who want more reliable results from ChatGPT w
 
 Note, there is no single perfect prompt template. This guide is designed to help you make your task clear enough for ChatGPT to produce reliable, useful results.
 
-<details>
-<summary><strong>Start using this right away</strong> — install the accompanying Skill and apply these best practices immediately</summary>
+> <details>
+> <summary><strong>Start using this right away</strong> — install the accompanying Skill and apply these best practices immediately</summary>
+> 
+> Don't have time to read the full guide right now? You can start applying these prompting best practices immediately by installing the accompanying Skill in ChatGPT.
+> 
+> **Download the Skill here:** [Prompting Best Practices Skill](https://cdn.openai.com/cookbook/chatgpt-prompt-guide/prompt-redrafter.zip)
+> 
+> Skills are small reusable add-ons that teach ChatGPT how to perform a specific task or follow a repeatable workflow. This Skill is designed to help apply the guidance in this guide more consistently, so you can get better results with less setup each time.
+> 
+> **To install it:**
+> 1. Download the Skill from the link above
+> 2. Go to `/skills`
+> 3. Click **New Skill**
+> 4. Select **Upload from your computer**
+> 5. Upload the downloaded file
+> 6. Start a new chat and use it in your everyday work
+> 
+> Then, when you have time, come back to this guide for the deeper explanations, examples, and reasoning behind the approach.
+> </details>
 
-Don't have time to read the full guide right now? You can start applying these prompting best practices immediately by installing the accompanying Skill in ChatGPT.
-
-**Download the Skill here:** [Prompting Best Practices Skill](https://cdn.openai.com/cookbook/chatgpt-prompt-guide/prompt-redrafter.zip)
-
-Skills are small reusable add-ons that teach ChatGPT how to perform a specific task or follow a repeatable workflow. This Skill is designed to help apply the guidance in this guide more consistently, so you can get better results with less setup each time.
-
-**To install it:**
-1. Download the Skill from the link above
-2. Go to `/skills`
-3. Click **New Skill**
-4. Select **Upload from your computer**
-5. Upload the downloaded file
-6. Start a new chat and use it in your everyday work
-
-Then, when you have time, come back to this guide for the deeper explanations, examples, and reasoning behind the approach.
-</details>
-<br>
 
 ## **Table of Contents**
 1. [Introduction](#1-introduction)

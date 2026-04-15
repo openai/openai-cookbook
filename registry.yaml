@@ -3128,3 +3128,15 @@
     - cost
     - responses
     - realtime
+
+- title: ChatGPT Enterprise Prompting Guide
+  path: examples/chatgpt/chatgpt_prompt_guide.md
+  slug: chatgpt_prompt_engineering
+  description: Cookbook for writing better prompts for everyday work in ChatGPT Enterprise.  
+  date: 2026-04-09
+  authors:
+    - sophiaqin-openai
+    - aaronwilkowitz-openai
+  tags:
+    - chatgpt
+    - prompt-engineering

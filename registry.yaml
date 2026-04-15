@@ -4,6 +4,20 @@
 # should build pages for, and indicates metadata such as tags, creation date and
 # authors for each page.
 
+- title: Migrate a Legacy Codebase with Sandbox Agents
+  path: examples/agents_sdk/sandboxed-code-migration/sandboxed_code_migration_agent.ipynb
+  slug: sandboxed-code-migration-agent
+  description: Build a sandboxed code-migration agent that splits a modernization campaign into isolated tasks and returns validated patch bundles.
+  date: 2026-04-07
+  authors:
+    - kkahadze-oai
+  tags:
+    - agents-sdk
+    - agents
+    - sandbox
+    - security
+    - evals
+
 - title: Getting the Most out of GPT-5.4 for Vision and Document Understanding
   path: examples/multimodal/document_and_multimodal_understanding_tips.ipynb
   slug: vision-understanding

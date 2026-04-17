@@ -147,3 +147,7 @@ examples/coding-agent-workspace
 # VS Code files
 .vscode/
 .cursorignore
+
+# Local LangChain source clone + venv for examples/langchain_core/repro_36380.py
+.langchain-src/
+.venv-lc/

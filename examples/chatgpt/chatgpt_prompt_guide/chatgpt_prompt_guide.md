@@ -15,11 +15,13 @@ Note, there is no single perfect prompt template. This guide is designed to help
 > 
 > **To install it:**
 > 1. Download the Skill from the link above
-> 2. Go to `/skills`
-> 3. Click **New Skill**
-> 4. Select **Upload from your computer**
-> 5. Upload the downloaded file
-> 6. Start a new chat and use it in your everyday work
+> 2. Log into ChatGPT
+> 3. Click your profile icon in ChatGPT
+> 4. Select Skills in the pop-up menu
+> 5. Click **New Skill**
+> 6. Select **Upload from your computer**
+> 7. Upload the downloaded file
+> 8. Start a new chat and use it in your everyday work
 > 
 > Then, when you have time, come back to this guide for the deeper explanations, examples, and reasoning behind the approach.
 > </details>

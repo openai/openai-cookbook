@@ -1,0 +1,12 @@
+__pycache__/
+*.py[cod]
+.pytest_cache/
+.venv/
+.env
+.env.*
+runloop-devbox-lifecycle-downloads/
+outputs/
+downloads/
+*.log
+*.jsonl
+.ipynb_checkpoints/

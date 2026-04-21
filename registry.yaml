@@ -4,6 +4,19 @@
 # should build pages for, and indicates metadata such as tags, creation date and
 # authors for each page.
 
+- title: Run Stateful Agents with Runloop Devboxes
+  path: examples/agents_sdk/runloop-devbox-lifecycle/runloop_devbox_lifecycle.ipynb
+  slug: runloop-devbox-lifecycle-agents
+  description: Build a stateful Agents SDK workflow that stages documents across Runloop devbox suspend, resume, wake-on-HTTP, verification, and snapshot steps.
+  date: 2026-04-20
+  authors:
+    - runloopai
+  tags:
+    - agents-sdk
+    - agents
+    - sandbox
+    - runloop
+
 - title: Migrate a Legacy Codebase with Sandbox Agents
   path: examples/agents_sdk/sandboxed-code-migration/sandboxed_code_migration_agent.ipynb
   slug: sandboxed-code-migration-agent

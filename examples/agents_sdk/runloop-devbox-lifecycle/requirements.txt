@@ -1,0 +1,3 @@
+openai-agents[runloop]
+pytest
+pytest-asyncio

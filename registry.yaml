@@ -3142,3 +3142,15 @@
     - cost
     - responses
     - realtime
+
+- title: GPT Image Generation Models Prompting Guide
+  path: examples/multimodal/image-gen-models-prompting-guide.ipynb
+  slug: image-gen-models-prompting-guide
+  description: Cookbook to prompt gpt-image models for reliable image generation results.
+  date: 2026-04-21
+  authors:
+    - msingh-openai
+    - emreokcular
+  tags:
+    - images
+    - vision

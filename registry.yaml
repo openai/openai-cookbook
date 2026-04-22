@@ -4,6 +4,18 @@
 # should build pages for, and indicates metadata such as tags, creation date and
 # authors for each page.
 
+- title: Computer Use Agents in Daytona Sandboxes
+  path: examples/agents_sdk/computer_use_with_daytona/computer_use_with_daytona.ipynb
+  slug: computer-use-with-daytona
+  description: Build an Agents SDK agent that uses Computer Use on a Daytona sandbox desktop to fill a multi-section web form end to end.
+  date: 2026-04-19
+  authors:
+    - lpesut-daytona
+  tags:
+    - agents-sdk
+    - agents
+    - sandbox
+
 - title: Migrate a Legacy Codebase with Sandbox Agents
   path: examples/agents_sdk/sandboxed-code-migration/sandboxed_code_migration_agent.ipynb
   slug: sandboxed-code-migration-agent

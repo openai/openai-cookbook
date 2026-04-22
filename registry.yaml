@@ -4,6 +4,18 @@
 # should build pages for, and indicates metadata such as tags, creation date and
 # authors for each page.
 
+- title: Building workspace agents in ChatGPT to complete repeatable, end-to-end work
+  path: articles/chatgpt-agents-sales-meeting-prep.md
+  slug: chatgpt-agents-sales-meeting-prep
+  description: Build, test, schedule, and share a ChatGPT workspace agent that prepares sales meeting briefs with calendar, SharePoint, and web search context.
+  date: 2026-04-22
+  authors:
+    - nikhils-oai
+  tags:
+    - chatgpt
+    - agents
+    - enterprise
+
 - title: Computer Use Agents in Daytona Sandboxes
   path: examples/agents_sdk/computer_use_with_daytona/computer_use_with_daytona.ipynb
   slug: computer-use-with-daytona

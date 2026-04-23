@@ -2641,6 +2641,17 @@
     - chatgpt
     - chatgpt-productivity
 
+- title: GPT Actions library - GitHub (OAuth)
+  path: examples/chatgpt/gpt_actions_library/gpt_action_github_oauth.md
+  slug: gpt-action-github-oauth
+  date: 2026-04-18
+  authors:
+    - ChrisCarini
+  tags:
+    - gpt-actions-library
+    - chatgpt
+    - chatgpt-productivity
+
 - title: Custom LLM as a Judge to Detect Hallucinations with Braintrust
   path: examples/Custom-LLM-as-a-Judge.ipynb
   slug: custom-llm-as-a-judge

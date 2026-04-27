@@ -4,20 +4,57 @@
 # should build pages for, and indicates metadata such as tags, creation date and
 # authors for each page.
 
-- title: Long horizon tasks with Codex
-  path: examples/codex/long_horizon_tasks.md
-  slug: long-horizon-tasks
-  description: An experiment running Codex for ~25 hours on a design-tool build, with durable project memory, milestone verification, and long-horizon agent workflows.
-  date: 2026-02-23
+- title: Building workspace agents in ChatGPT to complete repeatable, end-to-end work
+  path: articles/chatgpt-agents-sales-meeting-prep.md
+  slug: chatgpt-agents-sales-meeting-prep
+  description: Build, test, schedule, and share a ChatGPT workspace agent that prepares sales meeting briefs with calendar, SharePoint, and web search context.
+  date: 2026-04-22
   authors:
-    - derrickchoi-openai
+    - nikhils-oai
   tags:
-    - codex
+    - chatgpt
     - agents
-    - gpt-5
-    - workflows
-    - planning
-    - verification
+    - enterprise
+
+- title: Computer Use Agents in Daytona Sandboxes
+  path: examples/agents_sdk/computer_use_with_daytona/computer_use_with_daytona.ipynb
+  slug: computer-use-with-daytona
+  description: Build an Agents SDK agent that uses Computer Use on a Daytona sandbox desktop to fill a multi-section web form end to end.
+  date: 2026-04-19
+  authors:
+    - lpesut-daytona
+  tags:
+    - agents-sdk
+    - agents
+    - sandbox
+
+- title: Migrate a Legacy Codebase with Sandbox Agents
+  path: examples/agents_sdk/sandboxed-code-migration/sandboxed_code_migration_agent.ipynb
+  slug: sandboxed-code-migration-agent
+  description: Build a sandboxed code-migration agent that splits a modernization campaign into isolated tasks and returns validated patch bundles.
+  date: 2026-04-07
+  authors:
+    - kkahadze-oai
+  tags:
+    - agents-sdk
+    - agents
+    - sandbox
+    - security
+    - evals
+
+- title: Getting the Most out of GPT-5.4 for Vision and Document Understanding
+  path: examples/multimodal/document_and_multimodal_understanding_tips.ipynb
+  slug: vision-understanding
+  description: A practical guide to get the best performance on vision tasks with GPT-5.4.
+  date: 2026-03-06
+  authors:
+    - annikab-oai
+    - kathylau-oai
+    - nsingaraju-oai
+  tags:
+    - images
+    - vision
+    - gpt-5.4
 
 - title: Building Governed AI Agents - A Practical Guide to Agentic Scaffolding
   path: examples/partners/agentic_governance_guide/agentic_governance_cookbook.ipynb
@@ -131,10 +168,11 @@
   path: examples/sora/sora2_prompting_guide.ipynb
   slug: sora2-prompting-guide
   description: Cookbook to craft effective video prompts for Sora 2 generation.
-  date: 2025-10-06
+  date: 2026-03-12
   authors:
     - rkoenig-openai
     - joanneshin-openai
+    - annikab-oai
   tags:
     - sora
     - prompt
@@ -198,7 +236,7 @@
 - title: Realtime Prompting Guide
   path: examples/Realtime_prompting_guide.ipynb
   slug: realtime-prompting-guide
-  date: 2025-08-28
+  date: 2026-02-25
   authors:
     - minh-hoque
   tags:
@@ -3023,9 +3061,10 @@
     - gpt-5-1-codex-max_prompting_guide
     - gpt-5-codex-prompting-guide
     - gpt-5-codex_prompting_guide
-  date: 2025-12-04
+  date: 2026-02-25
   authors:
     - nm-openai
+    - bfioca-openai
   tags:
     - codex
     - responses
@@ -3127,3 +3166,15 @@
     - cost
     - responses
     - realtime
+
+- title: GPT Image Generation Models Prompting Guide
+  path: examples/multimodal/image-gen-models-prompting-guide.ipynb
+  slug: image-gen-models-prompting-guide
+  description: Cookbook to prompt gpt-image models for reliable image generation results.
+  date: 2026-04-21
+  authors:
+    - msingh-openai
+    - emreokcular
+  tags:
+    - images
+    - vision

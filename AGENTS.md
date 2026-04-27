@@ -37,3 +37,12 @@ These are considered priority 0 issues for this repo, in addition to the normal 
 - Check that code identifiers remain descriptive (no leftover placeholder names) and that repeated values are factored into constants when practical.
 - Ensure notebooks or scripts document any required environment variables instead of hard-coding secrets or keys.
 - Confirm metadata files (`registry.yaml`, `authors.yaml`) stay in sync with new or relocated content.
+
+## Recent Learnings
+
+- **`uv run` can inherit the wrong virtualenv in this repo** -> Clear `VIRTUAL_ENV` (for example `env -u VIRTUAL_ENV uv run ...`) when an unrelated environment is active -> Avoids misleading mismatch warnings and makes it clear the repo's `.venv` is the interpreter actually running the harnesses.
+- **Realtime eval shared imports can resolve the wrong module under pytest** -> Add `shared/__init__.py` and ensure tests prepend `examples/evals/realtime_evals` to `sys.path` before importing `shared.*` -> Prevents collection failures caused by unrelated installed packages named `shared`.
+- **Run-level grades can be overweighted by long simulations** -> Store turn-level grades on the matching turn and trace-level grades on one row per simulation instead of copying them onto every row -> Keeps `results.csv` row semantics intact and prevents summary means from favoring longer conversations.
+- **Synthetic-audio scaffold requests can pick the wrong harness** -> Default unspecified synthetic-audio evals to `crawl` text-to-TTS and reserve `walk` for replay-specific audio traits like noise, telephony artifacts, or speaker characteristics -> Keeps new realtime evals on the simplest harness unless audio realism is itself under test.
+- **Task-specific single-turn grading can outgrow the shared crawl schema** -> Keep the shared crawl harness for realtime execution, then add eval-local wrapper scripts that post-grade domain-specific quality and overwrite `results.csv` while preserving `results_base.csv` -> Avoids forking the harness when a use case needs richer grading than tool-call correctness.
+- **Synthetic learner audio can sound like eval scaffolding** -> Write `user_text` as a realistic in-app learner request and keep evaluation rules in metadata plus the system prompt -> Produces audio inputs that match the product surface instead of teaching the model the grading rubric through the spoken prompt.

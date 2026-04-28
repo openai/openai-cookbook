@@ -223,6 +223,17 @@
   tags:
     - agents-sdk
 
+- title: Runtime Containment for Multi-Agent Workflows
+  path: examples/agents_sdk/runtime_containment_multi_agent.ipynb
+  slug: runtime-containment-multi-agent
+  date: 2026-03-15
+  authors:
+    - amabito
+  tags:
+    - agents-sdk
+    - budget
+    - circuit-breaker
+
 - title: Automating Code Quality and Security Fixes with Codex CLI on GitLab
   path: examples/codex/secure_quality_gitlab.md
   slug: secure-quality-gitlab

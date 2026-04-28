@@ -3182,7 +3182,7 @@
 - title: ChatGPT Enterprise Prompting Guide
   path: examples/chatgpt/chatgpt_prompt_guide/chatgpt_prompt_guide.md
   slug: chatgpt_prompt_engineering
-  description: Cookbook for writing better prompts for everyday work in ChatGPT Enterprise.  
+  description: Cookbook for writing better prompts for everyday work in ChatGPT Enterprise.
   date: 2026-04-27
   authors:
     - sophiaqin-openai
@@ -3190,3 +3190,20 @@
   tags:
     - chatgpt
     - prompt-engineering
+
+- title: Structured outputs with validate-and-retry using agentcast
+  path: examples/Structured_outputs_with_validate_and_retry_using_agentcast.ipynb
+  slug: structured-outputs-with-validate-and-retry-using-agentcast
+  description: Use agentcast to wrap any LLM call with validate-and-retry. Useful when
+    JSON Schema can't express your invariant (e.g. category scores must sum to 1.0),
+    when calling models that don't support strict mode, or when you want one validation
+    layer that's portable across providers. Includes a Pydantic example with a custom
+    model_validator and a stub LLM that demonstrates the retry loop end-to-end.
+  date: 2026-04-27
+  authors:
+    - MukundaKatta
+  tags:
+    - structured-outputs
+    - pydantic
+    - validation
+    - agents

@@ -214,7 +214,7 @@
     - gpt-5
     - prompt-optimization
 
-- title: Context Engineering - Short-Term Memory Management with Sessions from OpenAI Agents SDK
+- title: Context Engineering - Short-Term Memory Management with Sessions
   path: examples/agents_sdk/session_memory.ipynb
   slug: session-memory
   date: 2025-09-09
@@ -3027,7 +3027,7 @@
   tags:
     - codex
 
-- title: Context Engineering for Personalization - State Management with Long-Term Memory Notes using OpenAI Agents SDK
+- title: Context Engineering for Personalization - State Management with Long-Term Memory Notes
   path: examples/agents_sdk/context_personalization.ipynb
   slug: context-personalization
   description: Cookbook to build personalized agents with long-term memory state using the Agents SDK.
@@ -3191,8 +3191,8 @@
   tags:
     - chatgpt
 
-  - title: Building Reliable Agents with Memory and Compaction
-  path: examples/agents/building_reliable_agents_memory_compaction.ipynb
+- title: Building Reliable Agents with Memory and Compaction
+  path: examples/agents_sdk/building_reliable_agents_memory_compaction.ipynb
   slug: building-reliable-agents-memory-compaction
   description: Cookbook for building evidence review agent that uses compaction and memory from Agents SDK.
   date: 2026-05-01

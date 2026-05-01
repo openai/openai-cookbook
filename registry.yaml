@@ -3190,3 +3190,19 @@
     - aaronwilkowitz-openai
   tags:
     - chatgpt
+
+- title: Build a self-optimizing agent harness with human feedback, generated evals, and HALO
+  path: examples/agents_sdk/self_optimizing_harness_loop.ipynb
+  slug: self-optimizing-harness-loop
+  description: Build a trace-driven improvement loop that turns human and model feedback into Promptfoo evals, HALO-ranked harness changes, and a Codex handoff.
+  date: 2026-05-01
+  authors:
+    - PASFIELD-OAI
+  tags:
+    - agents-sdk
+    - agents
+    - evals
+    - promptfoo
+    - tracing
+    - codex
+    - halo

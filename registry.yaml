@@ -3190,3 +3190,17 @@
     - aaronwilkowitz-openai
   tags:
     - chatgpt
+
+  - title: Building Reliable Agents with Memory and Compaction
+  path: examples/agents/building_reliable_agents_memory_compaction.ipynb
+  slug: building-reliable-agents-memory-compaction
+  description: Cookbook for building evidence review agent that uses compaction and memory from Agents SDK.
+  date: 2026-05-01
+  authors:
+    - PASFIELD-OAI
+    - emreokcular
+  tags:
+    - agents-sdk
+    - agents
+    - memory
+    - compaction

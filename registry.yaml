@@ -3167,6 +3167,18 @@
     - cost
     - responses
     - realtime
+  
+- title: Responses API Overview (Python SDK)
+  path: examples/Responses_API_overview_python.ipynb
+  slug: responses-api-overview-python
+  date: 2026-02-27
+  authors:
+    - DhruvTilva
+  tags:
+    - responses
+    - functions
+    - streaming
+    - migration
     
 - title: GPT Image Generation Models Prompting Guide
   path: examples/multimodal/image-gen-models-prompting-guide.ipynb

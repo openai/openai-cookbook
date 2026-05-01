@@ -1,0 +1,50 @@
+<svg width="1400" height="430" viewBox="0 0 1400 430" fill="none" xmlns="http://www.w3.org/2000/svg">
+  <defs>
+    <linearGradient id="bg2" x1="0" y1="0" x2="1400" y2="430" gradientUnits="userSpaceOnUse">
+      <stop stop-color="#FCFCFD"/>
+      <stop offset="1" stop-color="#F8FAFC"/>
+    </linearGradient>
+    <marker id="arrow-main" markerWidth="12" markerHeight="12" refX="10" refY="6" orient="auto">
+      <path d="M0 0L12 6L0 12V0Z" fill="#0F172A"/>
+    </marker>
+  </defs>
+
+  <rect width="1400" height="430" rx="28" fill="url(#bg2)"/>
+  <text x="700" y="58" text-anchor="middle" fill="#0F172A" font-family="Inter, Arial, sans-serif" font-size="28" font-weight="700">
+    Human gates can be placed anywhere in the delivery path
+  </text>
+
+  <path d="M120 226H1275" stroke="#0F172A" stroke-width="5" stroke-linecap="round" marker-end="url(#arrow-main)"/>
+
+  <g font-family="Inter, Arial, sans-serif">
+    <circle cx="210" cy="226" r="28" fill="#DBEAFE" stroke="#2563EB" stroke-width="3"/>
+    <text x="210" y="232" text-anchor="middle" fill="#1D4ED8" font-size="18" font-weight="700">1</text>
+    <text x="210" y="162" text-anchor="middle" fill="#0F172A" font-size="18" font-weight="700">Trace review</text>
+    <text x="210" y="188" text-anchor="middle" fill="#475569" font-size="15">Add domain feedback</text>
+
+    <circle cx="470" cy="226" r="28" fill="#DBEAFE" stroke="#2563EB" stroke-width="3"/>
+    <text x="470" y="232" text-anchor="middle" fill="#1D4ED8" font-size="18" font-weight="700">2</text>
+    <text x="470" y="162" text-anchor="middle" fill="#0F172A" font-size="18" font-weight="700">Eval review</text>
+    <text x="470" y="188" text-anchor="middle" fill="#475569" font-size="15">Tighten the gate</text>
+
+    <circle cx="730" cy="226" r="28" fill="#DCFCE7" stroke="#16A34A" stroke-width="3"/>
+    <text x="730" y="232" text-anchor="middle" fill="#15803D" font-size="18" font-weight="700">3</text>
+    <text x="730" y="162" text-anchor="middle" fill="#0F172A" font-size="18" font-weight="700">PR review</text>
+    <text x="730" y="188" text-anchor="middle" fill="#475569" font-size="15">Inspect the diff</text>
+
+    <circle cx="990" cy="226" r="28" fill="#DCFCE7" stroke="#16A34A" stroke-width="3"/>
+    <text x="990" y="232" text-anchor="middle" fill="#15803D" font-size="18" font-weight="700">4</text>
+    <text x="990" y="162" text-anchor="middle" fill="#0F172A" font-size="18" font-weight="700">Merge approval</text>
+    <text x="990" y="188" text-anchor="middle" fill="#475569" font-size="15">Deploy by policy</text>
+
+    <rect x="1128" y="146" width="180" height="160" rx="22" fill="#F8FAFC" stroke="#CBD5E1" stroke-width="2"/>
+    <text x="1218" y="180" text-anchor="middle" fill="#0F172A" font-size="18" font-weight="700">Autonomous path</text>
+    <text x="1218" y="214" text-anchor="middle" fill="#475569" font-size="15">All gates can be</text>
+    <text x="1218" y="238" text-anchor="middle" fill="#475569" font-size="15">policy-driven when</text>
+    <text x="1218" y="262" text-anchor="middle" fill="#475569" font-size="15">confidence is high</text>
+  </g>
+
+  <text x="700" y="368" text-anchor="middle" fill="#334155" font-family="Inter, Arial, sans-serif" font-size="18">
+    The same loop supports full autonomy, selective review, or review at every stage.
+  </text>
+</svg>

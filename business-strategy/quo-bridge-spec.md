@@ -47,7 +47,7 @@ The receptionist captures: caller intent (1 sentence), preferred callback time, 
 ## 3. Inbound webhook contract (Quo → n8n)
 
 **Endpoint:** `POST https://n8n.<azure-vm>/webhook/quo-inbound/v1`
-**Auth:** HMAC `X-TPS-Signature: sha256=<hex>` over the raw body, using `INTAKE_WEBHOOK_SECRET`.
+**Auth:** HMAC `X-TPS-Signature: sha256=<hex>` over the **exact raw body bytes Quo transmits**, using `INTAKE_WEBHOOK_SECRET`. The receiving n8n Webhook node must be configured with **Options → Binary Data: true** so verifyHmac compares against the wire bytes, not a re-serialization of the parsed JSON. See `n8n-routing-workflow.md` §3 verifyHmac notes.
 **Content-Type:** `application/json`
 
 ### Voice event payload

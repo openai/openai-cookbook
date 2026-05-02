@@ -11,13 +11,14 @@ const vm = require('vm');
 const FN_DIR = path.join(__dirname, '..', 'functions');
 
 // ---- shim n8n's runtime --------------------------------------------------
-function runFn(file, payload, headers = {}, env = {}) {
+function runFn(file, payload, headers = {}, env = {}, binary = null) {
   const code = fs.readFileSync(path.join(FN_DIR, file), 'utf8');
   const wrapped = `(function () {\n${code}\n})()`;
   const ctx = {
     $json: payload,
     $headers: headers,
     $env: env,
+    $binary: binary,
     require, Buffer, Date, Math, JSON, Array, Object, Number, String, Boolean, console,
   };
   return vm.runInNewContext(wrapped, ctx);
@@ -273,55 +274,109 @@ function expectRange(name, actual, lo, hi) {
 }
 
 // ---- HMAC verification tests --------------------------------------------
+// These exercise the production path: the sender hashes the wire bytes, and
+// verifyHmac reads those exact bytes from $binary.data.data (Binary Data
+// mode) or $json.__rawBody (Raw Body mode). Re-serializing parsed JSON is
+// not supported — the function throws if neither raw-body source is present.
 {
   const crypto = require('crypto');
   const SECRET = 'test-secret-1234';
-  const body = { hello: 'world', n: 42 };
-  const goodSig = crypto.createHmac('sha256', SECRET).update(JSON.stringify(body)).digest('hex');
+  const env = { INTAKE_WEBHOOK_SECRET: SECRET };
 
-  // 14. Bare hex signature passes (HubSpot-style)
+  // Realistic wire bytes — note explicit key ordering and whitespace that
+  // JSON.stringify on a parsed object would NOT reproduce.
+  const wire = '{"event":"intake.submitted","n":42,"hello":"world"}';
+  const parsed = JSON.parse(wire);
+  const goodSig = crypto.createHmac('sha256', SECRET).update(wire).digest('hex');
+
+  const binary = { data: { data: Buffer.from(wire, 'utf8').toString('base64') } };
+  const rawBodyJson = Object.assign({}, parsed, { __rawBody: wire });
+
+  // 14. Binary Data mode — bare hex passes
   try {
-    runFn('01-verify-hmac.js', body, { 'x-tps-signature': goodSig }, { INTAKE_WEBHOOK_SECRET: SECRET });
+    runFn('01-verify-hmac.js', parsed, { 'x-tps-signature': goodSig }, env, binary);
     passed++;
   } catch (e) {
     failed++;
-    failures.push(`  t14_hmac_bare.passes\n    threw: ${e.message}`);
+    failures.push(`  t14_hmac_binary_bare.passes\n    threw: ${e.message}`);
   }
 
-  // 15. sha256=<hex> prefixed signature passes (Quo / GitHub-style)
+  // 15. Binary Data mode — sha256=<hex> prefix passes (Quo style)
   try {
-    runFn('01-verify-hmac.js', body, { 'x-tps-signature': 'sha256=' + goodSig }, { INTAKE_WEBHOOK_SECRET: SECRET });
+    runFn('01-verify-hmac.js', parsed, { 'x-tps-signature': 'sha256=' + goodSig }, env, binary);
     passed++;
   } catch (e) {
     failed++;
-    failures.push(`  t15_hmac_prefixed.passes\n    threw: ${e.message}`);
+    failures.push(`  t15_hmac_binary_prefixed.passes\n    threw: ${e.message}`);
   }
 
-  // 16. Wrong signature throws INVALID_SIGNATURE (no RangeError on length mismatch)
+  // 16. Raw Body mode — passes via $json.__rawBody
   try {
-    runFn('01-verify-hmac.js', body, { 'x-tps-signature': 'deadbeef' }, { INTAKE_WEBHOOK_SECRET: SECRET });
+    runFn('01-verify-hmac.js', rawBodyJson, { 'x-tps-signature': goodSig }, env, null);
+    passed++;
+  } catch (e) {
     failed++;
-    failures.push(`  t16_hmac_wrong.throws\n    expected throw, got success`);
+    failures.push(`  t16_hmac_rawbody.passes\n    threw: ${e.message}`);
+  }
+
+  // 17. Re-serialized JSON drift — the bot's bug. With the SAME parsed object
+  //     and NO raw body source, the function must refuse rather than silently
+  //     accepting a re-stringified body that hashes to a different value.
+  try {
+    runFn('01-verify-hmac.js', parsed, { 'x-tps-signature': goodSig }, env, null);
+    failed++;
+    failures.push(`  t17_hmac_no_rawbody.throws\n    expected throw, got success`);
+  } catch (e) {
+    if (e.message.includes('raw body unavailable')) {
+      passed++;
+    } else {
+      failed++;
+      failures.push(`  t17_hmac_no_rawbody.throws\n    expected 'raw body unavailable' error, got: ${e.message}`);
+    }
+  }
+
+  // 18. Wrong signature throws INVALID_SIGNATURE (no RangeError on length)
+  try {
+    runFn('01-verify-hmac.js', parsed, { 'x-tps-signature': 'deadbeef' }, env, binary);
+    failed++;
+    failures.push(`  t18_hmac_wrong.throws\n    expected throw, got success`);
   } catch (e) {
     if (e.message === 'INVALID_SIGNATURE') {
       passed++;
     } else {
       failed++;
-      failures.push(`  t16_hmac_wrong.throws\n    expected INVALID_SIGNATURE, got: ${e.message}`);
+      failures.push(`  t18_hmac_wrong.throws\n    expected INVALID_SIGNATURE, got: ${e.message}`);
     }
   }
 
-  // 17. Missing header throws explicit error (not a crash)
+  // 19. Missing header throws explicit error
   try {
-    runFn('01-verify-hmac.js', body, {}, { INTAKE_WEBHOOK_SECRET: SECRET });
+    runFn('01-verify-hmac.js', parsed, {}, env, binary);
     failed++;
-    failures.push(`  t17_hmac_missing.throws\n    expected throw, got success`);
+    failures.push(`  t19_hmac_missing.throws\n    expected throw, got success`);
   } catch (e) {
     if (e.message === 'Missing X-TPS-Signature header') {
       passed++;
     } else {
       failed++;
-      failures.push(`  t17_hmac_missing.throws\n    expected Missing X-TPS-Signature header, got: ${e.message}`);
+      failures.push(`  t19_hmac_missing.throws\n    expected Missing X-TPS-Signature header, got: ${e.message}`);
+    }
+  }
+
+  // 20. Tampered body fails verification (different bytes, same parsed shape).
+  //     Sender signs `wire`; receiver gets a DIFFERENT byte sequence in binary.
+  const tampered = '{"hello":"world","n":42,"event":"intake.submitted"}'; // reordered keys
+  const tamperedBinary = { data: { data: Buffer.from(tampered, 'utf8').toString('base64') } };
+  try {
+    runFn('01-verify-hmac.js', parsed, { 'x-tps-signature': goodSig }, env, tamperedBinary);
+    failed++;
+    failures.push(`  t20_hmac_tampered.throws\n    expected INVALID_SIGNATURE on byte mismatch`);
+  } catch (e) {
+    if (e.message === 'INVALID_SIGNATURE') {
+      passed++;
+    } else {
+      failed++;
+      failures.push(`  t20_hmac_tampered.throws\n    expected INVALID_SIGNATURE, got: ${e.message}`);
     }
   }
 }

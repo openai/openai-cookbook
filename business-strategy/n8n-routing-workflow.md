@@ -67,6 +67,13 @@ The five Function nodes are checked in as standalone files at `business-strategy
 
 Accepts both the bare-hex format (HubSpot's "Send a webhook" custom-code action emits this) and the `sha256=<hex>` prefixed format (Quo / GitHub-style — see `quo-bridge-spec.md` §3). Length-guard required: `timingSafeEqual` throws `RangeError` on length mismatch. Paste the canonical implementation from `scripts/n8n/functions/01-verify-hmac.js`.
 
+**Webhook node configuration (REQUIRED).** The function verifies HMAC against the raw wire bytes, not the parsed JSON, because re-serializing `$json` can produce different whitespace, key ordering, or number formatting than what the sender signed. Set ONE of these on the upstream Webhook node:
+
+- **Options → Binary Data: `true`** — raw bytes available at `$binary.data.data` (base64). *Preferred.*
+- **Options → Raw Body: `true`** — raw string available at `$json.__rawBody`.
+
+If neither is configured, `verifyHmac` throws an explicit error rather than silently accepting a re-stringified body whose HMAC will never match.
+
 ### `normalizePayload` (Node 3) — `02-normalize-payload.js`
 Coerces HubSpot's submission shape into a stable internal schema and applies source-derived field defaults so the score reflects them.
 

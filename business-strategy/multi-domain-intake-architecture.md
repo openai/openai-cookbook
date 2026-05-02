@@ -188,46 +188,55 @@ For authority CTAs that go to `/meetings/case-review` first:
    - Wait 72h → set `tps_routing_decision = manual_review`, notify ops.
 
 ### C. Score (n8n)
-Scoring runs on every intake submission. Output → `tps_triage_score` (0–100) and `tps_triage_tier`.
+Scoring runs on every intake submission. Output → `tps_triage_score` (0–100, always clamped) and `tps_triage_tier`. Variable names below match the property internal names from §3 with the `tps_` prefix dropped for readability.
 
 ```
 score = 0
 
-# Enforcement urgency (max 50)
-if "levy_active" in enforcement_status:        score += 35
-if "wage_garnishment" in enforcement_status:   score += 35
-if "bank_levy" in enforcement_status:          score += 30
-if "warrant_filed" in enforcement_status:      score += 25
-if "lien_filed" in enforcement_status:         score += 15
-if "passport_revocation" in enforcement_status: score += 25
-if enforcement_deadline within 14 days:        score += 15
+# Enforcement urgency — multi-select; flags are independent.
+# Sum then clamp to 60 so this section can never alone exceed the 0–100 envelope.
+enforcement_subtotal = 0
+if "levy_active"         in enforcement_status: enforcement_subtotal += 35
+if "wage_garnishment"    in enforcement_status: enforcement_subtotal += 35
+if "bank_levy"           in enforcement_status: enforcement_subtotal += 30
+if "warrant_filed"       in enforcement_status: enforcement_subtotal += 25
+if "lien_filed"          in enforcement_status: enforcement_subtotal += 15
+if "passport_revocation" in enforcement_status: enforcement_subtotal += 25
+if enforcement_deadline within 14 days:         enforcement_subtotal += 15
+score += min(enforcement_subtotal, 60)
 
 # Balance signal (max 20)
-balance_range == "over_250k":                  score += 20
-balance_range == "100k_250k":                  score += 16
-balance_range == "50k_100k":                   score += 12
-balance_range == "25k_50k":                    score += 8
-balance_range == "10k_25k":                    score += 4
+if balance_range == "over_250k":  score += 20
+if balance_range == "100k_250k":  score += 16
+if balance_range == "50k_100k":   score += 12
+if balance_range == "25k_50k":    score += 8
+if balance_range == "10k_25k":    score += 4
 
-# Fit signal (max 20)
-agency_track in ("irs","fdor","both"):         score += 10
-state_of_residence == "FL" and agency in ("fdor","both"): score += 5
-entity_type in ("s_corp","multi_member_llc","c_corp"):    score += 5
+# Fit signal (max 20) — uses agency_track (the defined property), not a separate `agency` var
+if agency_track in ("irs","fdor","both"):                          score += 10
+if state_of_residence == "FL" and agency_track in ("fdor","both"): score += 5
+if entity_type in ("s_corp","multi_member_llc","c_corp"):          score += 5
 
 # Negative signals
-balance_range == "under_10k" and no enforcement: score -= 20
-prior_representation == "national_firm" and consult declined before: score -= 10
+if balance_range == "under_10k" and no enforcement:                   score -= 20
+if prior_representation == "national_firm" and consult declined before: score -= 10
+
+# Final clamp — guarantees stored value matches the documented 0–100 range.
+score = max(0, min(100, score))
 ```
 
-**Tier mapping**
+**Tier mapping (exhaustive — every contact lands in exactly one tier)**
 
-| Score / condition | Tier | Routing |
-|---|---|---|
-| Any active levy/garnishment/warrant **OR** score ≥ 70 | `tier_1_emergency` | `same_day_callback` |
-| Score 40–69 with valid agency + balance | `tier_2_qualified` | `book_case_review` |
-| Score 15–39 | `tier_3_nurture` | `nurture_sequence` |
-| Score < 15 OR `under_10k` + no enforcement | `tier_4_disqualified` | `referral_out` |
-| Conflicting / missing critical fields | — | `manual_review` |
+Evaluate top-down; the first matching row wins.
+
+| # | Condition | Tier | Routing |
+|---|---|---|---|
+| 1 | Any of `levy_active`, `wage_garnishment`, `bank_levy`, `warrant_filed` in `enforcement_status` **OR** score ≥ 70 | `tier_1_emergency` | `same_day_callback` |
+| 2 | Score 40–69 **AND** `agency_track` ∈ (`irs`, `fdor`, `both`) **AND** `balance_range` ≠ `under_10k` | `tier_2_qualified` | `book_case_review` |
+| 3 | Score 40–69 **AND** not row 2 (e.g., `agency_track` = `other_state` / `unknown`, or `under_10k`) | — | `manual_review` |
+| 4 | Score 15–39 | `tier_3_nurture` | `nurture_sequence` |
+| 5 | Score < 15 **OR** (`balance_range` = `under_10k` **AND** no enforcement) | `tier_4_disqualified` | `referral_out` |
+| 6 | Required fields missing or contradictory (catch-all) | — | `manual_review` |
 
 ### D. Route (n8n → HubSpot + downstream)
 

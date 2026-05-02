@@ -64,26 +64,8 @@ All values stored in **Azure Key Vault** and injected into the n8n container at 
 The five Function nodes are checked in as standalone files at `business-strategy/scripts/n8n/functions/`. Snippets below are illustrative — paste from the files for accuracy.
 
 ### `verifyHmac` (Node 2) — `01-verify-hmac.js`
-```js
-const crypto = require('crypto');
 
-const secret = $env.INTAKE_WEBHOOK_SECRET;
-const sig    = $headers['x-tps-signature'];
-const body   = JSON.stringify($json);
-
-if (!secret) throw new Error('INTAKE_WEBHOOK_SECRET not configured');
-if (!sig)    throw new Error('Missing X-TPS-Signature header');
-
-const expected = crypto.createHmac('sha256', secret).update(body).digest('hex');
-const a = Buffer.from(sig, 'utf8');
-const b = Buffer.from(expected, 'utf8');
-
-// Length-guard required: timingSafeEqual throws RangeError on length mismatch.
-const ok = a.length === b.length && crypto.timingSafeEqual(a, b);
-if (!ok) throw new Error('INVALID_SIGNATURE');
-
-return $json;
-```
+Accepts both the bare-hex format (HubSpot's "Send a webhook" custom-code action emits this) and the `sha256=<hex>` prefixed format (Quo / GitHub-style — see `quo-bridge-spec.md` §3). Length-guard required: `timingSafeEqual` throws `RangeError` on length mismatch. Paste the canonical implementation from `scripts/n8n/functions/01-verify-hmac.js`.
 
 ### `normalizePayload` (Node 3) — `02-normalize-payload.js`
 Coerces HubSpot's submission shape into a stable internal schema and applies source-derived field defaults so the score reflects them.

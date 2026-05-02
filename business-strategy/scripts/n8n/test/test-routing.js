@@ -272,6 +272,60 @@ function expectRange(name, actual, lo, hi) {
   expect('t13_output_keys.has_score',            typeof r.triage_score, 'number');
 }
 
+// ---- HMAC verification tests --------------------------------------------
+{
+  const crypto = require('crypto');
+  const SECRET = 'test-secret-1234';
+  const body = { hello: 'world', n: 42 };
+  const goodSig = crypto.createHmac('sha256', SECRET).update(JSON.stringify(body)).digest('hex');
+
+  // 14. Bare hex signature passes (HubSpot-style)
+  try {
+    runFn('01-verify-hmac.js', body, { 'x-tps-signature': goodSig }, { INTAKE_WEBHOOK_SECRET: SECRET });
+    passed++;
+  } catch (e) {
+    failed++;
+    failures.push(`  t14_hmac_bare.passes\n    threw: ${e.message}`);
+  }
+
+  // 15. sha256=<hex> prefixed signature passes (Quo / GitHub-style)
+  try {
+    runFn('01-verify-hmac.js', body, { 'x-tps-signature': 'sha256=' + goodSig }, { INTAKE_WEBHOOK_SECRET: SECRET });
+    passed++;
+  } catch (e) {
+    failed++;
+    failures.push(`  t15_hmac_prefixed.passes\n    threw: ${e.message}`);
+  }
+
+  // 16. Wrong signature throws INVALID_SIGNATURE (no RangeError on length mismatch)
+  try {
+    runFn('01-verify-hmac.js', body, { 'x-tps-signature': 'deadbeef' }, { INTAKE_WEBHOOK_SECRET: SECRET });
+    failed++;
+    failures.push(`  t16_hmac_wrong.throws\n    expected throw, got success`);
+  } catch (e) {
+    if (e.message === 'INVALID_SIGNATURE') {
+      passed++;
+    } else {
+      failed++;
+      failures.push(`  t16_hmac_wrong.throws\n    expected INVALID_SIGNATURE, got: ${e.message}`);
+    }
+  }
+
+  // 17. Missing header throws explicit error (not a crash)
+  try {
+    runFn('01-verify-hmac.js', body, {}, { INTAKE_WEBHOOK_SECRET: SECRET });
+    failed++;
+    failures.push(`  t17_hmac_missing.throws\n    expected throw, got success`);
+  } catch (e) {
+    if (e.message === 'Missing X-TPS-Signature header') {
+      passed++;
+    } else {
+      failed++;
+      failures.push(`  t17_hmac_missing.throws\n    expected Missing X-TPS-Signature header, got: ${e.message}`);
+    }
+  }
+}
+
 // ---- report --------------------------------------------------------------
 console.log(`\n${passed} passed, ${failed} failed`);
 if (failures.length) {

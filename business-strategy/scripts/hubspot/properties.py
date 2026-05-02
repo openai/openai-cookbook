@@ -1,4 +1,4 @@
-"""Single source of truth for the tps_* contact property definitions.
+"""Single source of truth for the intake_/triage_/lifecycle_ contact property definitions.
 
 Mirrors `business-strategy/multi-domain-intake-architecture.md` §3.
 Edit here, re-run `create_properties.py`, and HubSpot updates non-destructively.
@@ -28,6 +28,8 @@ class Property(TypedDict, total=False):
     options: list[Option]
     hasUniqueValue: bool
     formField: bool
+    referencedObjectType: str  # for HubSpot Owner properties
+    externalOptions: bool      # for HubSpot Owner properties
 
 
 # ---- groups ----------------------------------------------------------------
@@ -37,6 +39,7 @@ GROUPS: list[dict[str, str]] = [
     {"name": "tps_intake",    "label": "TPS – Intake"},
     {"name": "tps_triage",    "label": "TPS – Triage"},
     {"name": "tps_lifecycle", "label": "TPS – Lifecycle"},
+    {"name": "tps_quo",       "label": "TPS – Quo"},
 ]
 
 
@@ -64,22 +67,22 @@ US_STATES: list[Option] = _opts(
 
 SOURCE_PROPERTIES: list[Property] = [
     {
-        "name": "tps_source_domain",
-        "label": "Source domain",
+        "name": "intake_source_domain",
+        "label": "Intake source domain",
         "description": "Which domain the lead originated from.",
         "groupName": "tps_source",
         "type": "enumeration",
         "fieldType": "select",
         "options": _opts(
-            ("keithjones.cpa",       "keithjones.cpa"),
-            ("taxstrategist.cpa",    "taxstrategist.cpa"),
-            ("floridataxsavior.com", "floridataxsavior.com"),
+            ("keithjones.cpa",     "keithjones.cpa"),
+            ("thefltaxguy.cpa",    "thefltaxguy.cpa"),
+            ("taxstrategist.cpa",  "taxstrategist.cpa"),
         ),
         "formField": True,
     },
     {
-        "name": "tps_source_site_group",
-        "label": "Source site group",
+        "name": "intake_source_site_group",
+        "label": "Intake source site group",
         "description": "Canonical vs funnel role of the source domain.",
         "groupName": "tps_source",
         "type": "enumeration",
@@ -92,8 +95,23 @@ SOURCE_PROPERTIES: list[Property] = [
         "formField": True,
     },
     {
-        "name": "tps_source_page_type",
-        "label": "Source page type",
+        "name": "intake_channel",
+        "label": "Intake channel",
+        "description": "How the lead arrived.",
+        "groupName": "tps_source",
+        "type": "enumeration",
+        "fieldType": "select",
+        "options": _opts(
+            ("web_form",       "Web form"),
+            ("quo_voice",      "Quo voice"),
+            ("quo_sms",        "Quo SMS"),
+            ("meetings_link",  "HubSpot Meetings link"),
+            ("direct",         "Direct"),
+        ),
+    },
+    {
+        "name": "intake_source_page_type",
+        "label": "Intake source page type",
         "groupName": "tps_source",
         "type": "enumeration",
         "fieldType": "select",
@@ -108,8 +126,8 @@ SOURCE_PROPERTIES: list[Property] = [
         "formField": True,
     },
     {
-        "name": "tps_source_offer",
-        "label": "Source offer",
+        "name": "intake_source_offer",
+        "label": "Intake source offer",
         "groupName": "tps_source",
         "type": "enumeration",
         "fieldType": "select",
@@ -123,24 +141,33 @@ SOURCE_PROPERTIES: list[Property] = [
         "formField": True,
     },
     {
-        "name": "tps_source_campaign",
-        "label": "Source campaign (utm_campaign)",
+        "name": "intake_source_campaign",
+        "label": "Intake source campaign (utm_campaign)",
         "groupName": "tps_source",
         "type": "string",
         "fieldType": "text",
         "formField": True,
     },
     {
-        "name": "tps_source_cta_variant",
-        "label": "Source CTA variant",
+        "name": "intake_source_cta_variant",
+        "label": "Intake source CTA variant",
         "groupName": "tps_source",
         "type": "string",
         "fieldType": "text",
         "formField": True,
     },
     {
-        "name": "tps_first_touch_entry_url",
-        "label": "First-touch entry URL",
+        "name": "utm_landing_path",
+        "label": "UTM landing path",
+        "description": "First-touch path on the originating domain.",
+        "groupName": "tps_source",
+        "type": "string",
+        "fieldType": "text",
+        "formField": True,
+    },
+    {
+        "name": "intake_first_touch_url",
+        "label": "Intake first-touch URL",
         "description": "Set once, never overwritten.",
         "groupName": "tps_source",
         "type": "string",
@@ -148,16 +175,16 @@ SOURCE_PROPERTIES: list[Property] = [
         "formField": True,
     },
     {
-        "name": "tps_latest_funnel_entry_url",
-        "label": "Latest funnel entry URL",
+        "name": "intake_latest_funnel_url",
+        "label": "Intake latest funnel URL",
         "groupName": "tps_source",
         "type": "string",
         "fieldType": "text",
         "formField": True,
     },
     {
-        "name": "tps_first_touch_timestamp",
-        "label": "First-touch timestamp",
+        "name": "intake_first_touch_timestamp",
+        "label": "Intake first-touch timestamp",
         "groupName": "tps_source",
         "type": "datetime",
         "fieldType": "date",
@@ -170,7 +197,7 @@ SOURCE_PROPERTIES: list[Property] = [
 
 INTAKE_PROPERTIES: list[Property] = [
     {
-        "name": "tps_existing_client_status",
+        "name": "intake_existing_client_status",
         "label": "Client status",
         "groupName": "tps_intake",
         "type": "enumeration",
@@ -184,7 +211,7 @@ INTAKE_PROPERTIES: list[Property] = [
         "formField": True,
     },
     {
-        "name": "tps_agency_track",
+        "name": "intake_agency_track",
         "label": "Agency track",
         "groupName": "tps_intake",
         "type": "enumeration",
@@ -199,22 +226,26 @@ INTAKE_PROPERTIES: list[Property] = [
         "formField": True,
     },
     {
-        "name": "tps_primary_service_line",
-        "label": "Primary service line",
+        "name": "intake_lane",
+        "label": "Intake lane",
+        "description": "Service lane classification used for routing + reporting.",
         "groupName": "tps_intake",
         "type": "enumeration",
         "fieldType": "select",
         "options": _opts(
-            ("irs_resolution",     "IRS resolution"),
-            ("florida_sales_tax",  "Florida sales tax"),
-            ("state_tax_dispute",  "State tax dispute"),
-            ("notice_response",    "Notice response"),
-            ("advisory_review",    "Advisory review"),
+            ("irs_collections",            "IRS collections"),
+            ("irs_audit",                  "IRS audit"),
+            ("unfiled_returns",            "Unfiled returns"),
+            ("payroll_tfrp",               "Payroll TFRP"),
+            ("fl_dor_sales_audit",         "FL DOR sales audit"),
+            ("fl_dor_voluntary_disclosure","FL DOR voluntary disclosure"),
+            ("planning",                   "Planning"),
+            ("unqualified",                "Unqualified"),
         ),
         "formField": True,
     },
     {
-        "name": "tps_primary_issue_family",
+        "name": "intake_primary_issue_family",
         "label": "Primary issue family",
         "groupName": "tps_intake",
         "type": "enumeration",
@@ -227,12 +258,13 @@ INTAKE_PROPERTIES: list[Property] = [
             ("sales_tax_exposure",   "Sales tax exposure"),
             ("payment_resolution",   "Payment resolution"),
             ("penalty_relief",       "Penalty relief"),
+            ("planning",             "Planning"),
             ("other",                "Other"),
         ),
         "formField": True,
     },
     {
-        "name": "tps_notice_type",
+        "name": "intake_notice_type",
         "label": "Notice type(s)",
         "groupName": "tps_intake",
         "type": "enumeration",
@@ -256,7 +288,7 @@ INTAKE_PROPERTIES: list[Property] = [
         "formField": True,
     },
     {
-        "name": "tps_tax_years_owed",
+        "name": "intake_tax_years_owed",
         "label": "Tax years involved",
         "description": "Free-form text, e.g. '2019, 2021–2023'.",
         "groupName": "tps_intake",
@@ -265,7 +297,7 @@ INTAKE_PROPERTIES: list[Property] = [
         "formField": True,
     },
     {
-        "name": "tps_balance_range",
+        "name": "intake_balance_range",
         "label": "Balance range",
         "groupName": "tps_intake",
         "type": "enumeration",
@@ -282,7 +314,7 @@ INTAKE_PROPERTIES: list[Property] = [
         "formField": True,
     },
     {
-        "name": "tps_enforcement_status",
+        "name": "intake_enforcement_status",
         "label": "Enforcement status",
         "groupName": "tps_intake",
         "type": "enumeration",
@@ -299,7 +331,7 @@ INTAKE_PROPERTIES: list[Property] = [
         "formField": True,
     },
     {
-        "name": "tps_enforcement_deadline",
+        "name": "intake_enforcement_deadline",
         "label": "Enforcement deadline",
         "groupName": "tps_intake",
         "type": "date",
@@ -307,7 +339,7 @@ INTAKE_PROPERTIES: list[Property] = [
         "formField": True,
     },
     {
-        "name": "tps_state_of_residence",
+        "name": "intake_state_of_residence",
         "label": "State of residence",
         "groupName": "tps_intake",
         "type": "enumeration",
@@ -316,7 +348,7 @@ INTAKE_PROPERTIES: list[Property] = [
         "formField": True,
     },
     {
-        "name": "tps_entity_type",
+        "name": "intake_entity_type",
         "label": "Entity type",
         "groupName": "tps_intake",
         "type": "enumeration",
@@ -334,7 +366,7 @@ INTAKE_PROPERTIES: list[Property] = [
         "formField": True,
     },
     {
-        "name": "tps_returns_unfiled_count",
+        "name": "intake_returns_unfiled_count",
         "label": "Unfiled returns (count)",
         "groupName": "tps_intake",
         "type": "number",
@@ -342,7 +374,7 @@ INTAKE_PROPERTIES: list[Property] = [
         "formField": True,
     },
     {
-        "name": "tps_has_been_contacted_by_revenue_officer",
+        "name": "intake_contacted_by_revenue_officer",
         "label": "Contacted by Revenue Officer?",
         "groupName": "tps_intake",
         "type": "enumeration",
@@ -351,7 +383,7 @@ INTAKE_PROPERTIES: list[Property] = [
         "formField": True,
     },
     {
-        "name": "tps_prior_representation",
+        "name": "intake_prior_representation",
         "label": "Prior representation",
         "groupName": "tps_intake",
         "type": "enumeration",
@@ -366,7 +398,15 @@ INTAKE_PROPERTIES: list[Property] = [
         "formField": True,
     },
     {
-        "name": "tps_intake_notes",
+        "name": "intake_qualifying_signal_count",
+        "label": "Qualifying signal count",
+        "description": "0–3, computed by n8n classifier per FL SaaS 2-Lane ICP rule.",
+        "groupName": "tps_intake",
+        "type": "number",
+        "fieldType": "number",
+    },
+    {
+        "name": "intake_notes",
         "label": "Intake notes",
         "groupName": "tps_intake",
         "type": "string",
@@ -374,7 +414,7 @@ INTAKE_PROPERTIES: list[Property] = [
         "formField": True,
     },
     {
-        "name": "tps_consent_contact",
+        "name": "intake_consent_contact",
         "label": "Consent to contact (TCPA)",
         "groupName": "tps_intake",
         "type": "bool",
@@ -383,12 +423,27 @@ INTAKE_PROPERTIES: list[Property] = [
         "formField": True,
     },
     {
-        "name": "tps_consent_no_engagement",
+        "name": "intake_consent_no_engagement",
         "label": "Acknowledged: no engagement until signed",
         "groupName": "tps_intake",
         "type": "bool",
         "fieldType": "booleancheckbox",
         "options": _opts(("true", "Yes"), ("false", "No")),
+        "formField": True,
+    },
+    {
+        "name": "intake_completed_at",
+        "label": "Intake completed at",
+        "groupName": "tps_intake",
+        "type": "datetime",
+        "fieldType": "date",
+    },
+    {
+        "name": "intake_form_version",
+        "label": "Intake form version",
+        "groupName": "tps_intake",
+        "type": "string",
+        "fieldType": "text",
         "formField": True,
     },
 ]
@@ -398,7 +453,15 @@ INTAKE_PROPERTIES: list[Property] = [
 
 TRIAGE_PROPERTIES: list[Property] = [
     {
-        "name": "tps_triage_tier",
+        "name": "triage_score",
+        "label": "Triage score (0–100)",
+        "description": "Computed by n8n; clamped to 0–100.",
+        "groupName": "tps_triage",
+        "type": "number",
+        "fieldType": "number",
+    },
+    {
+        "name": "triage_tier",
         "label": "Triage tier",
         "groupName": "tps_triage",
         "type": "enumeration",
@@ -411,16 +474,8 @@ TRIAGE_PROPERTIES: list[Property] = [
         ),
     },
     {
-        "name": "tps_triage_score",
-        "label": "Triage score (0–100)",
-        "description": "Computed by n8n; clamped to 0–100.",
-        "groupName": "tps_triage",
-        "type": "number",
-        "fieldType": "number",
-    },
-    {
-        "name": "tps_routing_decision",
-        "label": "Routing decision",
+        "name": "triage_routing_decision",
+        "label": "Triage routing decision",
         "groupName": "tps_triage",
         "type": "enumeration",
         "fieldType": "select",
@@ -433,26 +488,21 @@ TRIAGE_PROPERTIES: list[Property] = [
         ),
     },
     {
-        "name": "tps_routing_reason",
-        "label": "Routing reason",
+        "name": "triage_routing_reason",
+        "label": "Triage routing reason",
         "groupName": "tps_triage",
         "type": "string",
         "fieldType": "textarea",
     },
     {
-        "name": "tps_intake_completed_at",
-        "label": "Intake completed at",
+        "name": "triage_assigned_owner",
+        "label": "Triage assigned owner",
+        "description": "HubSpot Owner ID set by routing.",
         "groupName": "tps_triage",
-        "type": "datetime",
-        "fieldType": "date",
-    },
-    {
-        "name": "tps_intake_form_version",
-        "label": "Intake form version",
-        "groupName": "tps_triage",
-        "type": "string",
-        "fieldType": "text",
-        "formField": True,
+        "type": "enumeration",
+        "fieldType": "select",
+        "referencedObjectType": "OWNER",
+        "externalOptions": True,
     },
 ]
 
@@ -461,7 +511,7 @@ TRIAGE_PROPERTIES: list[Property] = [
 
 LIFECYCLE_PROPERTIES: list[Property] = [
     {
-        "name": "tps_lifecycle_stage",
+        "name": "lifecycle_stage_tps",
         "label": "TPS lifecycle stage",
         "description": "Custom stage track parallel to HubSpot lifecyclestage.",
         "groupName": "tps_lifecycle",
@@ -478,7 +528,7 @@ LIFECYCLE_PROPERTIES: list[Property] = [
         ),
     },
     {
-        "name": "tps_consult_outcome",
+        "name": "lifecycle_consult_outcome",
         "label": "Consult outcome",
         "groupName": "tps_lifecycle",
         "type": "enumeration",
@@ -492,7 +542,22 @@ LIFECYCLE_PROPERTIES: list[Property] = [
         ),
     },
     {
-        "name": "tps_canopy_synced",
+        "name": "lifecycle_engagement_letter_sent_at",
+        "label": "Engagement letter sent at",
+        "groupName": "tps_lifecycle",
+        "type": "datetime",
+        "fieldType": "date",
+    },
+    {
+        "name": "lifecycle_engagement_letter_signed_at",
+        "label": "Engagement letter signed at",
+        "description": "Triggers Canopy migration workflow.",
+        "groupName": "tps_lifecycle",
+        "type": "datetime",
+        "fieldType": "date",
+    },
+    {
+        "name": "lifecycle_canopy_synced",
         "label": "Synced to Canopy?",
         "groupName": "tps_lifecycle",
         "type": "bool",
@@ -500,29 +565,33 @@ LIFECYCLE_PROPERTIES: list[Property] = [
         "options": _opts(("true", "Yes"), ("false", "No")),
     },
     {
-        "name": "tps_canopy_client_id",
+        "name": "lifecycle_canopy_client_id",
         "label": "Canopy client ID",
         "groupName": "tps_lifecycle",
         "type": "string",
         "fieldType": "text",
     },
+]
+
+
+# ---- E. Quo-specific ------------------------------------------------------
+
+QUO_PROPERTIES: list[Property] = [
     {
-        "name": "tps_engagement_letter_sent_at",
-        "label": "Engagement letter sent at",
-        "groupName": "tps_lifecycle",
-        "type": "datetime",
-        "fieldType": "date",
-    },
-    {
-        "name": "tps_engagement_letter_signed_at",
-        "label": "Engagement letter signed at",
-        "groupName": "tps_lifecycle",
-        "type": "datetime",
-        "fieldType": "date",
+        "name": "quo_phone_number_routed",
+        "label": "Quo phone number routed (DID)",
+        "description": "The Quo DID the inbound call/SMS hit, in E.164 format.",
+        "groupName": "tps_quo",
+        "type": "string",
+        "fieldType": "phonenumber",
     },
 ]
 
 
 ALL_PROPERTIES: list[Property] = (
-    SOURCE_PROPERTIES + INTAKE_PROPERTIES + TRIAGE_PROPERTIES + LIFECYCLE_PROPERTIES
+    SOURCE_PROPERTIES
+    + INTAKE_PROPERTIES
+    + TRIAGE_PROPERTIES
+    + LIFECYCLE_PROPERTIES
+    + QUO_PROPERTIES
 )

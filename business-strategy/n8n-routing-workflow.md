@@ -1,37 +1,43 @@
 # n8n Routing Workflow — `tps_intake_router_v1`
 
-Companion to `multi-domain-intake-architecture.md` and `hubspot-intake-form-spec.md`. Defines the n8n workflow that consumes the HubSpot intake webhook, scores the contact, and dispatches the routing decision back to HubSpot + downstream channels.
+Companion to `multi-domain-intake-architecture.md` and `hubspot-intake-form-spec.md`. Defines the n8n workflow that consumes the HubSpot intake webhook (and the Quo voice/SMS bridge), scores the contact, and dispatches the routing decision back to HubSpot + Quo SMS + Microsoft Teams.
 
-**Webhook path:** `POST /webhook/intake/v1`
+**Hosting:** **n8n self-hosted on Azure VM.** Secrets via **Azure Key Vault**. Zapier and Make are prohibited.
+**Webhook path:** `POST /webhook/intake/v1` (web form) and `POST /webhook/quo-inbound/v1` (Quo bridge).
 **Auth:** HMAC header `X-TPS-Signature` validated against `INTAKE_WEBHOOK_SECRET`.
-**Outputs:** HubSpot contact update, Twilio SMS (Tier 1 only), Microsoft Teams alert (Tier 1 only), email task assignment via HubSpot.
+**Outputs:** HubSpot contact update, Quo SMS (Tier 1 only), Microsoft Teams alert (Tier 1 + manual_review), email task assignment via HubSpot.
 
 ---
 
-## 1. Node-by-node walkthrough
+## 1. Node-by-node walkthrough (web-form path)
 
 ```
 [1] Webhook (POST /intake/v1)
        │
 [2] Function: verifyHmac           ─── on failure → [F1] Respond 401
        │
-[3] Function: normalizePayload     (lowercase enums, coerce arrays, parse dates)
+[3] Function: normalizePayload     (lowercase enums, coerce arrays, parse dates,
+       │                            apply source-derived field defaults
+       │                            e.g. FL funnel agency_track=fdor)
        │
 [4] Function: scoreContact         (implements §4C of architecture spec)
        │
-[5] Function: assignTier           (implements tier mapping table, top-down)
+[5] Function: assignTier           (implements tier mapping table, top-down,
+       │                            emergency BEFORE missing-fields catch-all)
        │
-[6] Function: applySourceOverrides (FDOR domain, advisor referral, etc.)
+[6] Function: applySourceOverrides (advisor-referral, urgent-floor)
        │
-[7] Switch: routing_decision
-       ├── same_day_callback ──► [8a] HubSpot:updateContact ─► [9a] Twilio:SMS ─► [10a] Teams:postMessage ─► [11a] HubSpot:createTask(URGENT)
+[7] Switch: triage_routing_decision
+       ├── same_day_callback ──► [8a] HubSpot:updateContact ─► [9a] Quo:SMS ─► [10a] Teams:postMessage ─► [11a] HubSpot:createTask(URGENT)
        ├── book_case_review  ──► [8b] HubSpot:updateContact ─► [9b] HubSpot:sendEmail(booking link)
        ├── manual_review     ──► [8c] HubSpot:updateContact ─► [9c] HubSpot:createTask(ops queue)
        ├── nurture_sequence  ──► [8d] HubSpot:updateContact ─► [9d] HubSpot:enrollInWorkflow(nurture)
        └── referral_out      ──► [8e] HubSpot:updateContact ─► [9e] HubSpot:sendEmail(referral)
        │
-[12] Respond 200 (with routing_decision + score for HubSpot's webhook log)
+[12] Respond 200 (with triage_routing_decision + triage_score)
 ```
+
+The Quo inbound bridge (§5) feeds the same `[3]–[12]` pipeline after creating/upserting the HubSpot contact and stamping `intake_channel = quo_voice|quo_sms`.
 
 ---
 
@@ -39,192 +45,75 @@ Companion to `multi-domain-intake-architecture.md` and `hubspot-intake-form-spec
 
 | Var | Purpose |
 |---|---|
-| `INTAKE_WEBHOOK_SECRET` | HMAC shared secret with HubSpot |
-| `HUBSPOT_PRIVATE_APP_TOKEN` | HubSpot CRM API token (Contacts: read/write, Workflows: enroll, Tasks: write) |
-| `TWILIO_ACCOUNT_SID` / `TWILIO_AUTH_TOKEN` / `TWILIO_FROM_NUMBER` | SMS sender |
-| `ON_CALL_PHONE` | E.164 number for Tier 1 SMS |
+| `INTAKE_WEBHOOK_SECRET` | HMAC shared secret with HubSpot + Quo |
+| `HUBSPOT_PRIVATE_APP_TOKEN` | HubSpot CRM API token (Contacts r/w, Workflows enroll, Tasks write) |
+| `QUO_API_KEY` / `QUO_API_BASE` | Quo.com REST endpoint for outbound SMS |
+| `QUO_FROM_NUMBER` | Quo DID used as the SMS sender for internal alerts |
+| `ON_CALL_PHONE` | E.164 number for Tier 1 SMS to on-call |
 | `TEAMS_WEBHOOK_URL` | Incoming-webhook URL for `#tps-urgent` |
 | `OPS_QUEUE_OWNER_ID` | HubSpot owner ID for manual-review queue |
 | `ON_CALL_OWNER_ID` | HubSpot owner ID for Tier 1 routing |
-| `BOOKING_URL_BASE` | `https://keithjones.cpa/meetings/case-review` |
+| `MEETINGS_BASE_URL` | `https://keithjones.cpa` (for `/triage-*` link composition) |
+
+All values stored in **Azure Key Vault** and injected into the n8n container at start (or referenced by Key Vault SDK at request time).
 
 ---
 
 ## 3. Function node code
 
-### `verifyHmac` (Node 2)
+The five Function nodes are checked in as standalone files at `business-strategy/scripts/n8n/functions/`. Snippets below are illustrative — paste from the files for accuracy.
+
+### `verifyHmac` (Node 2) — `01-verify-hmac.js`
 ```js
 const crypto = require('crypto');
+
 const secret = $env.INTAKE_WEBHOOK_SECRET;
 const sig    = $headers['x-tps-signature'];
-const body   = JSON.stringify($json); // n8n parses JSON; re-stringify deterministically
+const body   = JSON.stringify($json);
+
+if (!secret) throw new Error('INTAKE_WEBHOOK_SECRET not configured');
+if (!sig)    throw new Error('Missing X-TPS-Signature header');
 
 const expected = crypto.createHmac('sha256', secret).update(body).digest('hex');
-const ok = sig && crypto.timingSafeEqual(Buffer.from(sig), Buffer.from(expected));
-if (!ok) {
-  throw new Error('INVALID_SIGNATURE');
-}
+const a = Buffer.from(sig, 'utf8');
+const b = Buffer.from(expected, 'utf8');
+
+// Length-guard required: timingSafeEqual throws RangeError on length mismatch.
+const ok = a.length === b.length && crypto.timingSafeEqual(a, b);
+if (!ok) throw new Error('INVALID_SIGNATURE');
+
 return $json;
 ```
 
-### `normalizePayload` (Node 3)
-```js
-const f = $json.fields || {};
+### `normalizePayload` (Node 3) — `02-normalize-payload.js`
+Coerces HubSpot's submission shape into a stable internal schema and applies source-derived field defaults so the score reflects them.
 
-const arr = (v) => Array.isArray(v) ? v : (v ? String(v).split(';').map(s => s.trim()) : []);
-const lower = (v) => (v == null ? null : String(v).toLowerCase());
-const num = (v) => (v == null || v === '' ? null : Number(v));
+Key behaviors:
+- `intake_*` → unprefixed internal field names (e.g. `intake_agency_track` → `agency_track`).
+- Multi-select properties parsed as arrays.
+- Dates parsed to `Date` objects.
+- **FL funnel coercion:** if `intake_source_domain == thefltaxguy.cpa` and `intake_agency_track` is `unknown`/empty, set to `fdor` and default `intake_lane = fl_dor_sales_audit`. Runs here (before scoring) so the fit bonus is applied.
 
-return {
-  hs_contact_id: $json.hs_contact_id,
-  submitted_at:  $json.submitted_at,
-  fields: {
-    email:                    f.email,
-    phone:                    f.phone,
-    firstname:                f.firstname,
-    lastname:                 f.lastname,
-    source_domain:            lower(f.tps_source_domain),
-    source_site_group:        lower(f.tps_source_site_group),
-    source_offer:             lower(f.tps_source_offer),
-    existing_client_status:   lower(f.tps_existing_client_status),
-    agency_track:             lower(f.tps_agency_track),
-    primary_service_line:     lower(f.tps_primary_service_line),
-    primary_issue_family:     lower(f.tps_primary_issue_family),
-    notice_type:              arr(f.tps_notice_type).map(lower),
-    enforcement_status:       arr(f.tps_enforcement_status).map(lower),
-    enforcement_deadline:     f.tps_enforcement_deadline ? new Date(f.tps_enforcement_deadline) : null,
-    tax_years_owed:           f.tps_tax_years_owed,
-    balance_range:            lower(f.tps_balance_range),
-    returns_unfiled_count:    num(f.tps_returns_unfiled_count),
-    has_been_contacted_by_ro: lower(f.tps_has_been_contacted_by_revenue_officer),
-    prior_representation:     lower(f.tps_prior_representation),
-    state_of_residence:       (f.tps_state_of_residence || '').toUpperCase(),
-    entity_type:              lower(f.tps_entity_type),
-    intake_notes:             f.tps_intake_notes
-  }
-};
-```
+### `scoreContact` (Node 4) — `03-score-contact.js`
+Implements the scoring rules from architecture §4C:
+- Enforcement subtotal capped at **60** (multi-select can't blow past the envelope).
+- Final score clamped to **[0, 100]**.
 
-### `scoreContact` (Node 4)
-Implements the scoring rules from architecture §4C, including the enforcement subtotal cap and final 0–100 clamp.
+### `assignTier` (Node 5) — `04-assign-tier.js`
+Top-down tier assignment matching architecture §4C. **Active enforcement is checked BEFORE the missing-critical-fields catch-all** — emergencies always win even if other fields are blank.
 
-```js
-const f = $json.fields;
-const inc = (set, v) => Array.isArray(set) && set.indexOf(v) > -1;
-
-let score = 0;
-
-// Enforcement urgency — cap at 60
-let enforcementSub = 0;
-if (inc(f.enforcement_status, 'levy_active'))         enforcementSub += 35;
-if (inc(f.enforcement_status, 'wage_garnishment'))    enforcementSub += 35;
-if (inc(f.enforcement_status, 'bank_levy'))           enforcementSub += 30;
-if (inc(f.enforcement_status, 'warrant_filed'))       enforcementSub += 25;
-if (inc(f.enforcement_status, 'lien_filed'))          enforcementSub += 15;
-if (inc(f.enforcement_status, 'passport_revocation')) enforcementSub += 25;
-
-if (f.enforcement_deadline) {
-  const days = Math.floor((f.enforcement_deadline - new Date()) / 864e5);
-  if (days >= 0 && days <= 14) enforcementSub += 15;
-}
-score += Math.min(enforcementSub, 60);
-
-// Balance signal
-const balanceMap = { 'over_250k': 20, '100k_250k': 16, '50k_100k': 12, '25k_50k': 8, '10k_25k': 4 };
-score += balanceMap[f.balance_range] || 0;
-
-// Fit signal — uses agency_track consistently
-if (['irs','fdor','both'].includes(f.agency_track)) score += 10;
-if (f.state_of_residence === 'FL' && ['fdor','both'].includes(f.agency_track)) score += 5;
-if (['s_corp','multi_member_llc','c_corp'].includes(f.entity_type)) score += 5;
-
-// Negative signals
-const noEnforcement = !f.enforcement_status || f.enforcement_status.length === 0
-  || (f.enforcement_status.length === 1 && f.enforcement_status[0] === 'none');
-if (f.balance_range === 'under_10k' && noEnforcement) score -= 20;
-// (national_firm + previously declined consult requires a HubSpot lookup; deferred to v2)
-
-// Final clamp — matches the documented 0–100 range
-score = Math.max(0, Math.min(100, score));
-
-return Object.assign({}, $json, { triage_score: score, no_enforcement: noEnforcement });
-```
-
-### `assignTier` (Node 5)
-Top-down evaluation matching the tier table in architecture §4C.
-
-```js
-const f = $json.fields;
-const score = $json.triage_score;
-const noEnf = $json.no_enforcement;
-
-const activeEnforcement = ['levy_active','wage_garnishment','bank_levy','warrant_filed']
-  .some(s => f.enforcement_status.includes(s));
-
-const validAgency = ['irs','fdor','both'].includes(f.agency_track);
-const hasBalance  = f.balance_range && f.balance_range !== 'under_10k';
-
-// Catch-all: critical fields missing
-const missingCritical = !f.agency_track || !f.balance_range || !f.primary_issue_family;
-
-let tier, routing, reason;
-
-if (missingCritical) {
-  tier = null; routing = 'manual_review'; reason = 'missing_critical_fields';
-} else if (activeEnforcement || score >= 70) {
-  tier = 'tier_1_emergency'; routing = 'same_day_callback'; reason = activeEnforcement ? 'active_enforcement' : 'high_score';
-} else if (score >= 40 && validAgency && hasBalance) {
-  tier = 'tier_2_qualified'; routing = 'book_case_review'; reason = 'qualified_score';
-} else if (score >= 40) {
-  tier = null; routing = 'manual_review'; reason = 'score_in_band_but_unclear_fit';
-} else if (score >= 15) {
-  tier = 'tier_3_nurture'; routing = 'nurture_sequence'; reason = 'low_score';
-} else {
-  tier = 'tier_4_disqualified'; routing = 'referral_out';
-  reason = (f.balance_range === 'under_10k' && noEnf) ? 'small_balance_no_enforcement' : 'very_low_score';
-}
-
-return Object.assign({}, $json, { tier, routing_decision: routing, routing_reason: reason });
-```
-
-### `applySourceOverrides` (Node 6)
-
-```js
-const out = JSON.parse(JSON.stringify($json));
-const src = out.fields.source_domain;
-const offer = out.fields.source_offer;
-const existing = out.fields.existing_client_status;
-
-// Florida funnel: if agency unknown, assume FDOR
-if (src === 'floridataxsavior.com' && (!out.fields.agency_track || out.fields.agency_track === 'unknown')) {
-  out.fields.agency_track = 'fdor';
-  out.routing_reason = (out.routing_reason || '') + '|fdor_default_from_source';
-}
-
-// Advisor referrals always get a meeting
-if (src === 'taxstrategist.cpa' && (offer === 'advisor_referral' || existing === 'referral')) {
-  out.routing_decision = 'book_case_review';
-  out.tier = out.tier || 'tier_2_qualified';
-  out.routing_reason = (out.routing_reason || '') + '|advisor_override';
-}
-
-// keithjones.cpa /irs-help urgent CTA: floor at tier 2
-if (src === 'keithjones.cpa' && offer === 'urgent_triage' && out.routing_decision === 'nurture_sequence') {
-  out.routing_decision = 'book_case_review';
-  out.tier = out.tier || 'tier_2_qualified';
-  out.routing_reason += '|urgent_page_floor';
-}
-
-return out;
-```
+### `applySourceOverrides` (Node 6) — `05-apply-source-overrides.js`
+Routing-only overrides (field defaults already applied in normalize):
+- Advisor referral via `taxstrategist.cpa/for-advisors` → forced `book_case_review`, tier upgraded to `tier_2_qualified` (only upgrades from tier_3/tier_4/null — never downgrades tier_1).
+- `keithjones.cpa` `/irs-help` urgent CTA: if routing would be `nurture_sequence` **or** `referral_out`, force `book_case_review` and upgrade tier.
 
 ---
 
 ## 4. Downstream actions
 
 ### `same_day_callback` branch
-1. **HubSpot:updateContact** — set `tps_triage_score`, `tps_triage_tier`, `tps_routing_decision`, `tps_routing_reason`, `tps_assigned_owner = ON_CALL_OWNER_ID`, `tps_lifecycle_stage = mql_triaged`.
-2. **Twilio:SMS** — to `ON_CALL_PHONE`:
+1. **HubSpot:updateContact** — set `triage_score`, `triage_tier`, `triage_routing_decision`, `triage_routing_reason`, `triage_assigned_owner = ON_CALL_OWNER_ID`, `lifecycle_stage_tps = mql_triaged`.
+2. **Quo:SMS** — to `ON_CALL_PHONE`:
    ```
    URGENT TPS lead: {firstname} {lastname} | {agency_track} | {enforcement_status}
    {phone} | https://app.hubspot.com/contacts/{portalId}/contact/{hs_contact_id}
@@ -234,26 +123,60 @@ return out;
 5. **HubSpot:sendEmail** to prospect — confirms callback within 1 hr + fallback booking link.
 
 ### `book_case_review` branch
-1. **HubSpot:updateContact** — same as above with `tps_assigned_owner = round-robin`.
-2. **HubSpot:sendEmail** — booking invitation with prefilled link:
-   `${BOOKING_URL_BASE}?contact_id={hs_contact_id}&src_domain={source_domain}`
-3. **HubSpot:enrollInWorkflow** — *Booking Reminder* workflow (48h SLA, then escalate to manual_review).
+1. **HubSpot:updateContact** — `triage_assigned_owner = round-robin`.
+2. **HubSpot:sendEmail** — booking invitation. Pick the domain-specific Meetings link based on `intake_source_domain`:
+   ```
+   ${MEETINGS_BASE_URL}/triage-keithjones?contact_id={hs_contact_id}   # canonical
+   ${MEETINGS_BASE_URL}/triage-fltaxguy?contact_id={hs_contact_id}     # FL funnel
+   ${MEETINGS_BASE_URL}/triage-strategist?contact_id={hs_contact_id}   # strategist
+   ```
+3. **HubSpot:enrollInWorkflow** — *Booking Reminder* (48h SLA, then escalate to manual_review).
 
 ### `manual_review` branch
-1. **HubSpot:updateContact** — `tps_assigned_owner = OPS_QUEUE_OWNER_ID`, `tps_lifecycle_stage = mql_triaged`.
-2. **HubSpot:createTask** — assigned to ops, due in 1 business day, body includes `routing_reason` for context.
+1. **HubSpot:updateContact** — `triage_assigned_owner = OPS_QUEUE_OWNER_ID`, `lifecycle_stage_tps = mql_triaged`.
+2. **HubSpot:createTask** — assigned to ops, due in 1 business day, body includes `triage_routing_reason`.
+3. **Teams:postMessage** to `#tps-ops` with field-level reason.
 
 ### `nurture_sequence` branch
-1. **HubSpot:updateContact** — `tps_lifecycle_stage = lead`.
-2. **HubSpot:enrollInWorkflow** — *Educational Nurture* workflow (6 touches; promotion threshold defined in HubSpot).
+1. **HubSpot:updateContact** — `lifecycle_stage_tps = lead`.
+2. **HubSpot:enrollInWorkflow** — *Educational Nurture* (6 touches; promotion threshold defined in HubSpot).
 
 ### `referral_out` branch
-1. **HubSpot:updateContact** — `tps_lifecycle_stage = closed_lost`, `tps_routing_decision = referral_out`.
+1. **HubSpot:updateContact** — `lifecycle_stage_tps = closed_lost`, `triage_routing_decision = referral_out`.
 2. **HubSpot:sendEmail** — referral template (IRS self-help / VITA / partner network depending on `agency_track`).
 
 ---
 
-## 5. Importable n8n workflow JSON (skeleton)
+## 5. Quo voice & SMS inbound bridge
+
+Detailed setup is in `quo-bridge-spec.md`. Workflow integration summary:
+
+```
+[Q1] Webhook (POST /quo-inbound/v1)
+       │
+[Q2] verifyHmac (same secret)
+       │
+[Q3] Function: quoNormalize
+       │   - DID → intake_source_domain via static map
+       │   - ANI → phone (E.164)
+       │   - event_type → intake_channel (quo_voice | quo_sms)
+       │   - body → intake_notes (for SMS only)
+       │
+[Q4] HubSpot:upsertContact (dedupe on phone)
+       │   - sets intake_channel, quo_phone_number_routed, intake_source_domain
+       │   - sets utm_landing_path = "(quo_inbound)"
+       │
+[Q5] Branch on event_type
+       ├── voice → [Q6] Teams alert + create HubSpot task
+       │            (no scoring yet — wait for follow-up intake form completion)
+       └── sms   → [Q7] route into the same scoreContact → assignTier pipeline
+                   (SMS leads have less data; many will land in manual_review,
+                    which is correct — humans triage from there)
+```
+
+---
+
+## 6. Importable n8n workflow JSON (skeleton)
 
 Trim or extend in the n8n editor. Function nodes contain the code from §3.
 
@@ -275,35 +198,35 @@ Trim or extend in the n8n editor. Function nodes contain the code from §3.
       "webhookId": "intake-v1"
     },
     {
-      "parameters": { "functionCode": "// paste verifyHmac from §3" },
+      "parameters": { "functionCode": "// paste from scripts/n8n/functions/01-verify-hmac.js" },
       "name": "verifyHmac",
       "type": "n8n-nodes-base.function",
       "typeVersion": 1,
       "position": [420, 300]
     },
     {
-      "parameters": { "functionCode": "// paste normalizePayload from §3" },
+      "parameters": { "functionCode": "// paste from scripts/n8n/functions/02-normalize-payload.js" },
       "name": "normalizePayload",
       "type": "n8n-nodes-base.function",
       "typeVersion": 1,
       "position": [640, 300]
     },
     {
-      "parameters": { "functionCode": "// paste scoreContact from §3" },
+      "parameters": { "functionCode": "// paste from scripts/n8n/functions/03-score-contact.js" },
       "name": "scoreContact",
       "type": "n8n-nodes-base.function",
       "typeVersion": 1,
       "position": [860, 300]
     },
     {
-      "parameters": { "functionCode": "// paste assignTier from §3" },
+      "parameters": { "functionCode": "// paste from scripts/n8n/functions/04-assign-tier.js" },
       "name": "assignTier",
       "type": "n8n-nodes-base.function",
       "typeVersion": 1,
       "position": [1080, 300]
     },
     {
-      "parameters": { "functionCode": "// paste applySourceOverrides from §3" },
+      "parameters": { "functionCode": "// paste from scripts/n8n/functions/05-apply-source-overrides.js" },
       "name": "applySourceOverrides",
       "type": "n8n-nodes-base.function",
       "typeVersion": 1,
@@ -312,7 +235,7 @@ Trim or extend in the n8n editor. Function nodes contain the code from §3.
     {
       "parameters": {
         "dataType": "string",
-        "value1": "={{$json[\"routing_decision\"]}}",
+        "value1": "={{$json[\"triage_routing_decision\"]}}",
         "rules": {
           "rules": [
             { "operation": "equal", "value2": "same_day_callback", "output": 0 },
@@ -342,32 +265,35 @@ Trim or extend in the n8n editor. Function nodes contain the code from §3.
 }
 ```
 
-After importing, add the five downstream branches off `routeSwitch` outputs 0–4 using HubSpot, Twilio, and Microsoft Teams nodes per §4. Add an Error Trigger node that posts to `#tps-eng-alerts` if any branch fails.
+After importing, add the five downstream branches off `routeSwitch` outputs 0–4 using HubSpot, Quo, and Microsoft Teams nodes per §4. Add an Error Trigger node that posts to `#tps-eng-alerts` if any branch fails.
 
 ---
 
-## 6. Test plan
+## 7. Test plan
 
-| Scenario | Expected `routing_decision` | Expected `tier` |
+| Scenario | Expected `triage_routing_decision` | Expected `triage_tier` |
 |---|---|---|
 | FL S-corp, `bank_levy`, $100k–250k | `same_day_callback` | `tier_1_emergency` |
+| Active levy with missing `agency_track` | `same_day_callback` | `tier_1_emergency` (emergency wins over missing-fields catch-all) |
 | IRS individual, `lien_filed`, $50k–100k, deadline in 10 days | `book_case_review` (score ~58) | `tier_2_qualified` |
 | `other_state` LLC, `lien_filed`, $100k–250k (score 40–69, fails fit) | `manual_review` | `null` |
 | IRS individual, no enforcement, `under_10k` | `referral_out` | `tier_4_disqualified` |
-| `floridataxsavior.com` lead, `agency_track = unknown` | route as FDOR | per score |
+| `thefltaxguy.cpa` lead, `agency_track = unknown` | route as FDOR | per score |
 | `taxstrategist.cpa` `/for-advisors` referral | `book_case_review` regardless of score | `tier_2_qualified` |
-| Submission missing `agency_track` | `manual_review` | `null` |
+| `keithjones.cpa` `/irs-help` urgent CTA, `under_10k`, no enforcement | `book_case_review` (urgent floor) | `tier_2_qualified` |
+| Submission missing `agency_track`, no enforcement | `manual_review` | `null` |
 
-Run each through n8n's "Test workflow" with sample payloads from `hubspot-intake-form-spec.md` §7.
+The harness at `scripts/n8n/test/test-routing.js` runs eleven such scenarios end-to-end against the actual function-node code. `node test/test-routing.js` from `scripts/n8n/`. Currently 25/25 assertions pass.
 
 ---
 
-## 7. Deployment
+## 8. Deployment
 
 1. Import the JSON skeleton into n8n.
-2. Set the env vars in §2.
-3. Paste function code into the four Function nodes.
+2. Set the env vars in §2 (Azure Key Vault → n8n container env).
+3. Paste function code from `scripts/n8n/functions/` into the five Function nodes.
 4. Wire up downstream branches per §4.
 5. Activate the workflow.
 6. In HubSpot, configure the post-form workflow to send the webhook with the HMAC signature header (use HubSpot's "custom code" action to compute the signature with `INTAKE_WEBHOOK_SECRET`).
-7. Submit a test intake from each of the three domains; confirm contact properties update and Tier 1 alerts fire end-to-end.
+7. Provision Quo DIDs and webhook per `quo-bridge-spec.md`.
+8. Submit a test intake from each of the three domains and from each of the three Quo DIDs; confirm contact properties update and Tier 1 alerts fire end-to-end.

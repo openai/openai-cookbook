@@ -4,7 +4,7 @@
 // 02-normalize-payload.js so the score reflects them.
 //
 // Inputs:  routed payload from 04-assign-tier
-// Outputs: same shape with possibly-changed routing_decision / tier
+// Outputs: same shape with possibly-changed triage_routing_decision / tier / triage_tier
 
 const out = JSON.parse(JSON.stringify($json));
 const src = out.fields.source_domain;
@@ -12,7 +12,9 @@ const offer = out.fields.source_offer;
 const existing = out.fields.existing_client_status;
 
 const appendReason = (s) => {
-  out.routing_reason = (out.routing_reason || '') + (out.routing_reason ? '|' : '') + s;
+  out.triage_routing_reason = (out.triage_routing_reason || '')
+    + (out.triage_routing_reason ? '|' : '')
+    + s;
 };
 
 // Upgrade tier only if the current tier is unset, tier_3, or tier_4.
@@ -20,6 +22,7 @@ const appendReason = (s) => {
 const upgradeToTier2 = () => {
   if (!out.tier || ['tier_3_nurture', 'tier_4_disqualified'].includes(out.tier)) {
     out.tier = 'tier_2_qualified';
+    out.triage_tier = 'tier_2_qualified';
   }
 };
 
@@ -28,7 +31,7 @@ if (
   src === 'taxstrategist.cpa' &&
   (offer === 'advisor_referral' || existing === 'referral')
 ) {
-  out.routing_decision = 'book_case_review';
+  out.triage_routing_decision = 'book_case_review';
   upgradeToTier2();
   appendReason('advisor_override');
 }
@@ -39,9 +42,9 @@ if (
 if (
   src === 'keithjones.cpa' &&
   offer === 'urgent_triage' &&
-  ['nurture_sequence', 'referral_out'].includes(out.routing_decision)
+  ['nurture_sequence', 'referral_out'].includes(out.triage_routing_decision)
 ) {
-  out.routing_decision = 'book_case_review';
+  out.triage_routing_decision = 'book_case_review';
   upgradeToTier2();
   appendReason('urgent_page_floor');
 }

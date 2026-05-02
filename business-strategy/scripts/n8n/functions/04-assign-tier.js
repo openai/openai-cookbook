@@ -3,7 +3,8 @@
 // Every contact lands in exactly one routing decision; first matching row wins.
 //
 // Inputs:  scored payload from 03-score-contact
-// Outputs: { ...payload, tier, routing_decision, routing_reason }
+// Outputs: { ...payload, tier, triage_tier, triage_routing_decision, triage_routing_reason }
+// (`tier` is also exposed unprefixed for downstream override convenience.)
 
 const f = $json.fields;
 const score = $json.triage_score;
@@ -16,8 +17,8 @@ const hasBalance = f.balance_range && f.balance_range !== 'under_10k';
 const missingCritical = !f.agency_track || !f.balance_range || !f.primary_issue_family;
 
 let tier = null;
-let routing_decision;
-let routing_reason;
+let triage_routing_decision;
+let triage_routing_reason;
 
 // Spec §4C tier table, evaluated top-down.
 // Row 1 (emergency) MUST come before row 6 (missing-critical catch-all):
@@ -25,28 +26,33 @@ let routing_reason;
 // emergency — get them to a human immediately, fill gaps later.
 if (activeEnforcement || score >= 70) {
   tier = 'tier_1_emergency';
-  routing_decision = 'same_day_callback';
-  routing_reason = activeEnforcement ? 'active_enforcement' : 'high_score';
+  triage_routing_decision = 'same_day_callback';
+  triage_routing_reason = activeEnforcement ? 'active_enforcement' : 'high_score';
 } else if (missingCritical) {
-  routing_decision = 'manual_review';
-  routing_reason = 'missing_critical_fields';
+  triage_routing_decision = 'manual_review';
+  triage_routing_reason = 'missing_critical_fields';
 } else if (score >= 40 && validAgency && hasBalance) {
   tier = 'tier_2_qualified';
-  routing_decision = 'book_case_review';
-  routing_reason = 'qualified_score';
+  triage_routing_decision = 'book_case_review';
+  triage_routing_reason = 'qualified_score';
 } else if (score >= 40) {
-  routing_decision = 'manual_review';
-  routing_reason = 'score_in_band_but_unclear_fit';
+  triage_routing_decision = 'manual_review';
+  triage_routing_reason = 'score_in_band_but_unclear_fit';
 } else if (score >= 15) {
   tier = 'tier_3_nurture';
-  routing_decision = 'nurture_sequence';
-  routing_reason = 'low_score';
+  triage_routing_decision = 'nurture_sequence';
+  triage_routing_reason = 'low_score';
 } else {
   tier = 'tier_4_disqualified';
-  routing_decision = 'referral_out';
-  routing_reason = (f.balance_range === 'under_10k' && noEnf)
+  triage_routing_decision = 'referral_out';
+  triage_routing_reason = (f.balance_range === 'under_10k' && noEnf)
     ? 'small_balance_no_enforcement'
     : 'very_low_score';
 }
 
-return Object.assign({}, $json, { tier, routing_decision, routing_reason });
+return Object.assign({}, $json, {
+  tier,                       // unprefixed for downstream override convenience
+  triage_tier: tier,          // matches HubSpot property name
+  triage_routing_decision,
+  triage_routing_reason,
+});

@@ -3023,6 +3023,7 @@
   date: 2025-10-21
   authors:
     - charlie-openai
+    - joanneshin-openai
   tags:
     - codex
 
@@ -3189,4 +3190,3 @@
     - aaronwilkowitz-openai
   tags:
     - chatgpt
-    - prompt-engineering

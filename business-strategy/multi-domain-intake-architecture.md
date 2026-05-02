@@ -95,8 +95,9 @@ Three CTA categories, each with a deterministic destination. Copy varies by page
 - **Copy options:** *Get Emergency Case Review* · *Tell Us What Notice You Got* · *Start Your Tax Triage*
 - **Destination (intake-first):**
   ```
-  https://keithjones.cpa/case-review?src_domain={DOMAIN}&intent=urgent&agency_hint={irs|fdor}
+  https://keithjones.cpa/case-review?src_domain={DOMAIN}&intent=urgent&offer=urgent_triage&agency_hint={irs|fdor}
   ```
+  `offer=urgent_triage` is **required** — it lands in `intake_source_offer` and is the trigger for the urgent-floor routing override (§4E). Without it, low-scoring crisis-CTA visitors get nurtured/referred-out instead of booked.
 - **Why intake-first:** urgent leads must not skip triage — qualification data drives the same-day callback queue.
 
 ### B. General service
@@ -105,7 +106,7 @@ Three CTA categories, each with a deterministic destination. Copy varies by page
 - **Copy options:** *See If You Qualify* · *Request a Case Review* · *Start Here*
 - **Destination (intake-first):**
   ```
-  https://keithjones.cpa/case-review?src_domain={DOMAIN}&intent=general&lane={lane_value}
+  https://keithjones.cpa/case-review?src_domain={DOMAIN}&intent=general&offer=case_review&lane={lane_value}
   ```
 
 ### C. Authority / educational

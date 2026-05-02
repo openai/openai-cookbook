@@ -120,18 +120,23 @@ HubSpot supports the simple show/hide rules natively. Reorder + skip behaviors r
 
 Pre-fills `intake_lane` from `intake_primary_issue_family` + `intake_agency_track`. User can override.
 
-| Issue family | Agency | Default lane |
-|---|---|---|
-| `collections` | `irs` / `both` | `irs_collections` |
-| `audit` | `irs` / `both` | `irs_audit` |
-| `notice` | any | (keep blank; classify in n8n from `intake_notice_type`) |
-| `filing_problem` | any | `unfiled_returns` |
-| `sales_tax_exposure` | `fdor` / `both` | `fl_dor_sales_audit` |
-| `payment_resolution` | `fdor` / `both` | `fl_dor_voluntary_disclosure` |
-| `payment_resolution` | `irs` / `both` | `irs_collections` |
-| `penalty_relief` | any | `irs_collections` (or `fl_dor_sales_audit` if FDOR) |
-| `planning` | any | `planning` |
-| `other` | any | leave blank → n8n routes to `manual_review` |
+**Precedence:** rows are evaluated top-down; the first matching row wins. For `agency_track = both`, IRS-side mappings take precedence (IRS resolution work is the dominant practice area; FDOR-only flows that need separate routing should set `agency_track = fdor` explicitly).
+
+| # | Issue family | Agency | Default lane |
+|---|---|---|---|
+| 1 | `collections` | `irs` / `both` | `irs_collections` |
+| 2 | `collections` | `fdor` | `fl_dor_voluntary_disclosure` |
+| 3 | `audit` | `irs` / `both` | `irs_audit` |
+| 4 | `audit` | `fdor` | `fl_dor_sales_audit` |
+| 5 | `notice` | any | (keep blank; classify in n8n from `intake_notice_type`) |
+| 6 | `filing_problem` | any | `unfiled_returns` |
+| 7 | `sales_tax_exposure` | any | `fl_dor_sales_audit` |
+| 8 | `payment_resolution` | `irs` / `both` | `irs_collections` |
+| 9 | `payment_resolution` | `fdor` | `fl_dor_voluntary_disclosure` |
+| 10 | `penalty_relief` | `irs` / `both` | `irs_collections` |
+| 11 | `penalty_relief` | `fdor` | `fl_dor_sales_audit` |
+| 12 | `planning` | any | `planning` |
+| 13 | `other` | any | leave blank → n8n routes to `manual_review` |
 
 Payroll TFRP cases: when `intake_notice_type` includes a payroll-related notice or `intake_notes` mentions "941"/"payroll", set `intake_lane = payroll_tfrp`. Implemented in n8n classifier.
 
@@ -221,9 +226,12 @@ Same form GUID embedded everywhere; `intake_source_domain` resolves from URL par
           if (levy.length) { levy.prop('checked', true).change(); }
         }
 
-        // Continuity: post-booking intake completion
-        var contactId = qs('contact_id');
-        if (contactId) setVal('intake_hs_contact_id', contactId);
+        // Continuity: post-booking intake completion.
+        // We don't write contact_id to a HubSpot field — HubSpot dedupes by
+        // email anyway, so the post-booking submission updates the same
+        // contact created at meeting time. The contact_id param is consumed
+        // server-side by n8n (passed via webhook query string) for activity
+        // logging and the "you already booked" banner copy.
       },
 
       onFormSubmitted: function () {

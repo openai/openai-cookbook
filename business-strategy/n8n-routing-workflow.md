@@ -178,7 +178,11 @@ Trim or extend in the n8n editor. Function nodes contain the code from §3.
         "httpMethod": "POST",
         "path": "intake/v1",
         "responseMode": "lastNode",
-        "options": { "responseHeaders": { "entries": [{ "name": "X-TPS-Router", "value": "v1" }] } }
+        "options": {
+          "binaryData": true,
+          "rawBody": true,
+          "responseHeaders": { "entries": [{ "name": "X-TPS-Router", "value": "v1" }] }
+        }
       },
       "name": "Webhook",
       "type": "n8n-nodes-base.webhook",

@@ -35,7 +35,6 @@ const fields = {
   existing_client_status:   lower(f.intake_existing_client_status),
   agency_track:             lower(f.intake_agency_track),
   lane:                     lower(f.intake_lane),
-  primary_service_line:     lower(f.intake_primary_service_line),
   primary_issue_family:     lower(f.intake_primary_issue_family),
   notice_type:              arr(f.intake_notice_type).map(lower),
   enforcement_status:       arr(f.intake_enforcement_status).map(lower),

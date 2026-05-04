@@ -4,6 +4,76 @@
 # should build pages for, and indicates metadata such as tags, creation date and
 # authors for each page.
 
+- title: Building workspace agents in ChatGPT to complete repeatable, end-to-end work
+  path: articles/chatgpt-agents-sales-meeting-prep.md
+  slug: chatgpt-agents-sales-meeting-prep
+  description: Build, test, schedule, and share a ChatGPT workspace agent that prepares sales meeting briefs with calendar, SharePoint, and web search context.
+  date: 2026-04-22
+  authors:
+    - nikhils-oai
+  tags:
+    - chatgpt
+    - agents
+    - enterprise
+
+- title: Computer Use Agents in Daytona Sandboxes
+  path: examples/agents_sdk/computer_use_with_daytona/computer_use_with_daytona.ipynb
+  slug: computer-use-with-daytona
+  description: Build an Agents SDK agent that uses Computer Use on a Daytona sandbox desktop to fill a multi-section web form end to end.
+  date: 2026-04-19
+  authors:
+    - lpesut-daytona
+  tags:
+    - agents-sdk
+    - agents
+    - sandbox
+
+- title: Migrate a Legacy Codebase with Sandbox Agents
+  path: examples/agents_sdk/sandboxed-code-migration/sandboxed_code_migration_agent.ipynb
+  slug: sandboxed-code-migration-agent
+  description: Build a sandboxed code-migration agent that splits a modernization campaign into isolated tasks and returns validated patch bundles.
+  date: 2026-04-07
+  authors:
+    - kkahadze-oai
+  tags:
+    - agents-sdk
+    - agents
+    - sandbox
+    - security
+    - evals
+
+- title: Getting the Most out of GPT-5.4 for Vision and Document Understanding
+  path: examples/multimodal/document_and_multimodal_understanding_tips.ipynb
+  slug: vision-understanding
+  description: A practical guide to get the best performance on vision tasks with GPT-5.4.
+  date: 2026-03-06
+  authors:
+    - annikab-oai
+    - kathylau-oai
+    - nsingaraju-oai
+  tags:
+    - images
+    - vision
+    - gpt-5.4
+
+- title: Building Governed AI Agents - A Practical Guide to Agentic Scaffolding
+  path: examples/partners/agentic_governance_guide/agentic_governance_cookbook.ipynb
+  slug: agentic-governance-cookbook
+  description: A practical guide to building governed AI agents with OpenAI Agents SDK and Guardrails.
+  date: 2026-02-23
+  authors:
+    - shikhar-cyber
+    - Pavan Kumar Muthozu
+    - Frankie LaCarrubba
+  tags:
+    - agents
+    - tracing
+    - guardrails
+    - governance
+    - evals
+    - promptfoo
+    - partners
+
 - title: Realtime Eval Guide
   path: examples/Realtime_eval_guide.ipynb
   slug: realtime-eval-guide
@@ -98,10 +168,11 @@
   path: examples/sora/sora2_prompting_guide.ipynb
   slug: sora2-prompting-guide
   description: Cookbook to craft effective video prompts for Sora 2 generation.
-  date: 2025-10-06
+  date: 2026-03-12
   authors:
     - rkoenig-openai
     - joanneshin-openai
+    - annikab-oai
   tags:
     - sora
     - prompt
@@ -165,7 +236,7 @@
 - title: Realtime Prompting Guide
   path: examples/Realtime_prompting_guide.ipynb
   slug: realtime-prompting-guide
-  date: 2025-08-28
+  date: 2026-02-25
   authors:
     - minh-hoque
   tags:
@@ -2960,6 +3031,7 @@
   date: 2025-10-21
   authors:
     - charlie-openai
+    - joanneshin-openai
   tags:
     - codex
 
@@ -2998,9 +3070,10 @@
     - gpt-5-1-codex-max_prompting_guide
     - gpt-5-codex-prompting-guide
     - gpt-5-codex_prompting_guide
-  date: 2025-12-04
+  date: 2026-02-25
   authors:
     - nm-openai
+    - bfioca-openai
   tags:
     - codex
     - responses
@@ -3088,3 +3161,40 @@
 
   tags:
     - responses
+
+- title: Prompt Caching 201
+  path: examples/Prompt_Caching_201.ipynb
+  slug: prompt-caching-201
+  description: Cookbook for improving prompt caching hit rate, latency, and cost.
+  date: 2026-02-18
+  authors:
+    - erikakettleson-openai
+  tags:
+    - prompt-caching
+    - latency
+    - cost
+    - responses
+    - realtime
+    
+- title: GPT Image Generation Models Prompting Guide
+  path: examples/multimodal/image-gen-models-prompting-guide.ipynb
+  slug: image-gen-models-prompting-guide
+  description: Cookbook to prompt gpt-image models for reliable image generation results.
+  date: 2026-04-21
+  authors:
+    - msingh-openai
+    - emreokcular
+  tags:
+    - images
+    - vision
+
+- title: ChatGPT Enterprise Prompting Guide
+  path: examples/chatgpt/chatgpt_prompt_guide/chatgpt_prompt_guide.md
+  slug: chatgpt_prompt_engineering
+  description: Cookbook for writing better prompts for everyday work in ChatGPT Enterprise.  
+  date: 2026-04-27
+  authors:
+    - sophiaqin-openai
+    - aaronwilkowitz-openai
+  tags:
+    - chatgpt

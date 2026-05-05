@@ -8,6 +8,11 @@ kkahadze-oai:
   website: "https://www.linkedin.com/in/kahadze/"
   avatar: "https://avatars.githubusercontent.com/kkahadze-oai"
 
+lpesut-daytona:
+  name: "Lovre Pesut"
+  website: "https://github.com/rovle"
+  avatar: "https://avatars.githubusercontent.com/rovle"
+
 zhenweig-cerebras:
   name: "Zhenwei Gao"
   website: "https://www.linkedin.com/in/zhenwei-gao/"
@@ -577,3 +582,13 @@ nsingaraju-oai:
   name: "Nishanth Singaraju"
   website: "https://github.com/nsingaraju-oai"
   avatar: "https://avatars.githubusercontent.com/u/232978332"
+
+sophiaqin-openai:
+  name: "Sophia Qin"
+  website: "https://github.com/sophiaqin-openai"
+  avatar: "https://avatars.githubusercontent.com/u/205098674?v=4"
+
+PASFIELD-OAI:
+  name: "Wesley Pasfield"
+  website: "https://github.com/PASFIELD-OAI"
+  avatar: "https://avatars.githubusercontent.com/u/276116382?v=4"  

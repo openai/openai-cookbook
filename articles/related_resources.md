@@ -6,6 +6,7 @@ People are writing great tools and papers for improving outputs from GPT. Here a
 
 - [Arthur Shield](https://www.arthur.ai/get-started): A paid product for detecting toxicity, hallucination, prompt injection, etc.
 - [Baserun](https://baserun.ai/): A paid product for testing, debugging, and monitoring LLM-based apps
+- [Bifrost](https://getmaxim.ai/bifrost): An open-source AI gateway built in Go for enterprise-grade reliability and governance with just 20μs overhead at 5,000 RPS.
 - [Chainlit](https://docs.chainlit.io/overview): A Python library for making chatbot interfaces.
 - [ElatoAI](https://github.com/akdeb/ElatoAI): A platform for running OpenAI Realtime API Speech on ESP32 on Arduino using Deno Edge Runtime and Supabase.
 - [Embedchain](https://github.com/embedchain/embedchain): A Python library for managing and syncing unstructured data with LLMs.

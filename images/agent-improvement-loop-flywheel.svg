@@ -21,7 +21,7 @@
   <rect width="1400" height="760" rx="32" fill="url(#bg)"/>
 
   <text x="700" y="62" text-anchor="middle" fill="#0F172A" font-family="Inter, Arial, sans-serif" font-size="30" font-weight="700">
-    A self-optimizing agent harness can close the loop from feedback to code
+    An agent improvement loop can connect feedback to code
   </text>
 
   <circle cx="700" cy="388" r="226" stroke="#CBD5E1" stroke-width="28"/>

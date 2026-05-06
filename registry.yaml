@@ -3,12 +3,11 @@
 # This file is used to generate cookbook.openai.com. It specifies which paths we
 # should build pages for, and indicates metadata such as tags, creation date and
 # authors for each page.
-
 - title: Autonomous Kubernetes Debugging Agent
-  path: examples/autonomous_kubernetes_agent.ipynb
+  path: examples/structured_outputs/autonomous_kubernetes_agent.ipynb
   slug: autonomous-kubernetes-debugging-agent
   description: Use Structured Outputs to autonomously diagnose and auto-correct infrastructure manifests.
-  date: 2026-05-07
+  date: 2026-05-06
   authors:
     - azaynul10
   tags:

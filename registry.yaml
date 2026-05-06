@@ -4,6 +4,17 @@
 # should build pages for, and indicates metadata such as tags, creation date and
 # authors for each page.
 
+- title: Autonomous Kubernetes Debugging Agent
+  path: examples/autonomous_kubernetes_agent.ipynb
+  slug: autonomous-kubernetes-debugging-agent
+  description: Use Structured Outputs to autonomously diagnose and auto-correct infrastructure manifests.
+  date: 2026-05-07
+  authors:
+    - azaynul10
+  tags:
+    - agents
+    - completions
+    
 - title: Building workspace agents in ChatGPT to complete repeatable, end-to-end work
   path: articles/chatgpt-agents-sales-meeting-prep.md
   slug: chatgpt-agents-sales-meeting-prep

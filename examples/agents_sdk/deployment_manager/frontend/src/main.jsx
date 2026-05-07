@@ -1711,7 +1711,7 @@ function AgentsList({
       <div className="panel-head agents-panel-head">
         <span className="panel-count">{rows.length} total</span>
       </div>
-      <div className="agent-list" role="table" aria-label="Local apps">
+      <div className={`agent-list ${rows.length ? "" : "empty"}`} role="table" aria-label="Local apps">
         {rows.length ? (
           <>
             <div className="agent-table-head" role="row">
@@ -1818,7 +1818,11 @@ function AgentsList({
             })}
           </>
         ) : (
-          <div className="agent-empty">Deploy an app to see it here.</div>
+          <div className="agent-empty">
+            <strong>No apps deployed</strong>
+            <span>Deploy an Agents SDK app to inspect traces, logs, and runtime state here.</span>
+            <code>make deploy PROJECT_PATH=/path/to/agents-sdk-app</code>
+          </div>
         )}
       </div>
     </section>
@@ -1833,6 +1837,7 @@ function RecentRunsSummary({ appRows = [], sessions, rangeHours = 24, onRangeCha
   const timeline = buildTraceTimeline(sessions, rangeHours, appRows);
   const tracedCount = timeline.sessions.filter((item) => item.session.trace_id).length;
   const emptyLabel = activeRange.hours === "all" ? "all time" : activeRange.label.toLowerCase();
+  const emptyMessage = appRows.length ? `No runs recorded in ${emptyLabel}.` : "Deploy an app to see run activity.";
   const timelineWidth = `${Math.round(1600 * timelineZoom)}px`;
 
   function resetTimelineView() {
@@ -1932,7 +1937,7 @@ function RecentRunsSummary({ appRows = [], sessions, rangeHours = 24, onRangeCha
       </div>
       <div
         ref={gridRef}
-        className="trace-time-grid"
+        className={`trace-time-grid ${timeline.lanes.length ? "" : "empty"}`}
         tabIndex={0}
         aria-label="Zoomable run activity timeline"
         style={{ "--trace-time-width": timelineWidth }}
@@ -1982,7 +1987,7 @@ function RecentRunsSummary({ appRows = [], sessions, rangeHours = 24, onRangeCha
             ))}
           </>
         ) : (
-          <div className="trace-summary-empty">No runs recorded in {emptyLabel}.</div>
+          <div className="trace-summary-empty">{emptyMessage}</div>
         )}
       </div>
     </section>

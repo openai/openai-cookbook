@@ -20,7 +20,7 @@
     "livekit-client": "2.17.3",
     "livekit-server-sdk": "2.15.0",
     "lucide-react": "^1.8.0",
-    "next": "16.1.6",
+    "next": "16.2.3",
     "next-themes": "^0.4.6",
     "radix-ui": "^1.4.3",
     "react": "^19.2.4",

@@ -52,6 +52,19 @@
     - security
     - evals
 
+- title: Agents SDK Deployment Manager
+  path: examples/agents_sdk/deployment_manager/README.md
+  slug: agents-sdk-deployment-manager
+  description: Run, inspect, and trace local Agents SDK demo apps from a browser-based deployment manager.
+  date: 2026-05-05
+  authors:
+    - alfozan
+  tags:
+    - agents-sdk
+    - agents
+    - tracing
+    - deployment
+
 - title: Getting the Most out of GPT-5.4 for Vision and Document Understanding
   path: examples/multimodal/document_and_multimodal_understanding_tips.ipynb
   slug: vision-understanding

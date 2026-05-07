@@ -1,0 +1,10 @@
+.venv/
+.ruff_cache/
+.pytest_cache/
+*.egg-info/
+dist/
+node_modules/
+state/
+*.log
+package-lock.json
+uv.lock

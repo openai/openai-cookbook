@@ -1,0 +1,15 @@
+{
+  "name": "browser-realtime-translation-demo",
+  "version": "0.1.0",
+  "private": true,
+  "type": "module",
+  "engines": {
+    "node": ">=20"
+  },
+  "scripts": {
+    "start": "node src/server.js",
+    "dev": "node --watch src/server.js",
+    "test": "node --test test/*.test.js",
+    "smoke": "node scripts/smoke-realtime.mjs"
+  }
+}

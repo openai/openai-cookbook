@@ -1,0 +1,562 @@
+# Build Live Translation Apps with gpt-realtime-translate
+
+`gpt-realtime-translate` is a live speech-to-speech translation model for building multilingual audio experiences across broadcasts, streams, calls, and video conversations. It accepts spoken input, automatically detects the source language, and returns translated speech plus text transcripts. Developers only need to specify the target output language.
+
+This model has two new features that make it uniquely capable:
+
+1. Unlike general-purpose voice models, `gpt-realtime-translate` is **optimized for interpretation**. It was trained on thousands of hours of professional interpreter audio, which helps it remain translation-only and wait for enough context before producing speech. This is especially important across languages with different sentence structures.
+2. It can **process input audio while simultaneously streaming translated audio back**. This allows for truly low latency over continuous speech.
+
+We built `gpt-realtime-translate` because live interpretation has different requirements than existing AI voice interactions. General-purpose models can be prompted to translate, but they may still answer questions or follow instructions rather than translate them. They also rely on turn-based interaction, requiring speakers to pause while the model generates the translated audio, which does not work well for fluent interpretation.
+
+These have been the main blockers to the high accuracy and low latency required for natural live interpretation, and what we're solving for with `gpt-realtime-translate`.
+
+## How to build with Realtime Translation
+
+This model is unique in that it is primarily about **empowering humans to be multilingual as opposed to building AI voice agents**. If you're building voice agents, use the new `gpt-realtime-2` model.
+
+We see two main patterns for `gpt-realtime-translate`. The first is **broadcast-style translation**: livestreams, webinars, lectures, earnings calls, conference keynotes, and other cases where many listeners need translated audio from one primary source to another. The second is **conversational translation**, where two or more participants speak with each other across languages: call centers, video chat, or other phone-based workflows.
+
+This cookbook focuses on these patterns: We'll start by covering the basics, then build a web app for **one-way live translation** from any browser tab audio, use Twilio to build translation into **phone calls**, and create a **multilingual group video chat** room with LiveKit. Lastly, we'll cover production best practices, model limitations, and evals.
+
+## What you will build
+
+You will build three ways to add live translation to existing audio paths:
+
+1. **Browser tab translation:** Capture tab audio with `getDisplayMedia()`, send it to Realtime Translation over WebRTC, and play translated speech plus captions in the browser.
+2. **Phone-call translation:** Use Twilio Media Streams to receive phone audio over WebSockets, bridge it into Realtime Translation, and send translated audio back to the other caller.
+3. **Video-call translation:** Subscribe to remote LiveKit microphone tracks, translate each remote speaker for the listener, and render translated audio and captions locally.
+
+The complete demo apps live in the accompanying folders:
+
+- [Browser tab translation](https://github.com/openai/openai-cookbook/tree/main/examples/voice_solutions/realtime_translation_guide/browser-translation-demo)
+- [Twilio phone translation](https://github.com/openai/openai-cookbook/tree/main/examples/voice_solutions/realtime_translation_guide/twilio-translation-demo)
+- [LiveKit video translation](https://github.com/openai/openai-cookbook/tree/main/examples/voice_solutions/realtime_translation_guide/livekit-translation-demo)
+
+## Prerequisites
+
+You need:
+
+- An OpenAI API key.
+- Node.js for the browser and Twilio demos.
+- A Twilio phone number if you want to run the phone-call demo.
+- A LiveKit project or self-hosted LiveKit server if you want to run the video-room demo.
+
+Keep your OpenAI API key on a server. Browser examples should use short-lived client secrets rather than exposing the API key to client code.
+
+## API & Session Basics
+
+See our [Live Translation docs](https://developers.openai.com/api/docs/guides/realtime-translation) for full details on setting up WebRTC and WebSocket sessions, client and server events, and configuration options.
+
+### Key differences
+
+Realtime Translation sessions are configured around the target output language. Set the target language with `session.audio.output.language`. The model currently supports over 70 input languages and 13 output languages. This model does not currently support custom prompting or voice selection parameters.
+
+If you want source-language transcripts alongside translated audio, configure input transcription with `gpt-realtime-whisper`.
+
+Realtime Translation uses **dynamic voice adaptation**. Instead of selecting a fixed output voice, translated speech follows the source speaker's general tone, pitch, and speaking style. In a multi-speaker session, the translated voice will change as new speaker audio comes in.
+
+### Session lifecycle
+
+The session lifecycle is also different from a standard Realtime voice session:
+
+- **Dedicated endpoint:** Connect to `/v1/realtime/translations`.
+- **Continuous audio in**: Stream 24 kHz PCM16 audio with `session.input_audio_buffer.append`, including silence between phrases.
+- **Continuous translation out**: The model emits translated audio in 200 ms PCM16 chunks, plus target-language transcript deltas.
+- **No turn lifecycle**: Translation starts from the incoming audio stream itself. There is no `response.create`, assistant turn, tool call, or conversation state to manage.
+
+### Protocols
+
+For browser-based apps, use WebRTC. The browser sends microphone, tab, or remote participant audio as a media track and receives translated speech as a remote audio track. Use the `oai-events` data channel for session updates, transcript deltas, and errors. See the Browser Tab Translation or LiveKit sections for implementation examples.
+
+For backend media pipelines, use WebSockets. This is the right fit when your server already receives raw audio, such as Twilio Media Streams, SIP, broadcast ingest, or a media worker. Send base64 24 kHz PCM16 audio with `session.input_audio_buffer.append`, including silence between spoken phrases. See the Phone Calls with Twilio section for an example.
+
+## Browser tab translation
+
+Let's start with a small browser app for one-way live translation. The app captures audio from a browser tab, starts a Realtime Translation session over WebRTC, and plays translated speech with subtitles as the model emits them.
+
+This pattern is useful when the original experience is already happening in the browser: a public meeting, livestream, conference talk, online class, or video without built-in live dubbing. Instead of rebuilding the player or publishing separate language feeds, the app sits alongside the page and gives listeners translated audio and subtitles in real time.
+
+![Browser tab translation architecture](https://github.com/openai/openai-cookbook/blob/main/images/realtime_translation_guide/browser-tab-translation.png?raw=true)
+
+### How it works
+
+1. Your server creates a short-lived translation client secret.
+2. The browser captures tab audio with `getDisplayMedia()`.
+3. The browser creates an `RTCPeerConnection`, adds the captured audio track, and opens an `oai-events` data channel.
+4. The browser posts its SDP offer to the Realtime Translation call endpoint with the client secret.
+5. The model returns translated audio on the remote WebRTC audio track and sends transcript deltas on the data channel.
+
+### Create the translation client secret
+
+Create the client secret on your server so your standard OpenAI API key never reaches the browser. The model and output language live in the client-secret request.
+
+```ts
+const TRANSLATION_CLIENT_SECRET_URL =
+  "https://api.openai.com/v1/realtime/translations/client_secrets";
+
+app.post("/session", async (req, res) => {
+  const language = req.body.targetLanguage ?? "es";
+
+  const response = await fetch(TRANSLATION_CLIENT_SECRET_URL, {
+    method: "POST",
+    headers: {
+      Authorization: `Bearer ${process.env.OPENAI_API_KEY}`,
+      "Content-Type": "application/json",
+    },
+    body: JSON.stringify({
+      session: {
+        model: "gpt-realtime-translate",
+        audio: {
+          input: {
+            transcription: { model: "gpt-realtime-whisper" },
+            noise_reduction: { type: "near_field" },
+          },
+          output: { language },
+        },
+      },
+    }),
+  });
+
+  res.status(response.status).json(await response.json());
+});
+```
+
+The complete browser demo validates target language codes before making the OpenAI request and returns only the short-lived client secret to the browser.
+
+### Capture tab audio
+
+Use `getDisplayMedia()` so the user explicitly picks the source tab. When supported, request `suppressLocalAudioPlayback` so the listener does not hear the original and translated audio at the same time.
+
+```ts
+async function captureTabAudio() {
+  const audio = {
+    echoCancellation: false,
+    noiseSuppression: false,
+    autoGainControl: false,
+  };
+
+  if (navigator.mediaDevices.getSupportedConstraints?.().suppressLocalAudioPlayback) {
+    audio.suppressLocalAudioPlayback = true;
+  }
+
+  const stream = await navigator.mediaDevices.getDisplayMedia({
+    video: true,
+    audio,
+  });
+
+  if (!stream.getAudioTracks().length) {
+    stream.getTracks().forEach((track) => track.stop());
+    throw new Error("Choose a browser tab and enable tab audio.");
+  }
+
+  return stream;
+}
+```
+
+### Open the WebRTC translation session
+
+Use the short-lived client secret to post the browser's SDP offer to the Realtime Translation call endpoint. Audio output arrives as a remote track. Translation and input transcript deltas arrive on the data channel.
+
+```ts
+const sessionResponse = await fetch("/session", {
+  method: "POST",
+  headers: { "Content-Type": "application/json" },
+  body: JSON.stringify({ targetLanguage }),
+});
+
+const session = await sessionResponse.json();
+
+const pc = new RTCPeerConnection();
+const events = pc.createDataChannel("oai-events");
+
+for (const track of sourceStream.getAudioTracks()) {
+  pc.addTrack(track, sourceStream);
+}
+
+pc.ontrack = ({ streams }) => {
+  translatedAudio.srcObject = streams[0];
+};
+
+events.onmessage = ({ data }) => {
+  const event = JSON.parse(data);
+
+  if (event.type === "session.output_transcript.delta") {
+    translatedSubtitles.textContent += event.delta;
+  }
+
+  if (event.type === "session.input_transcript.delta") {
+    sourceTranscript.textContent += event.delta;
+  }
+};
+
+const offer = await pc.createOffer();
+await pc.setLocalDescription(offer);
+
+const sdpResponse = await fetch(
+  "https://api.openai.com/v1/realtime/translations/calls",
+  {
+    method: "POST",
+    headers: {
+      Authorization: `Bearer ${session.client_secret}`,
+      "Content-Type": "application/sdp",
+    },
+    body: offer.sdp,
+  }
+);
+
+await pc.setRemoteDescription({
+  type: "answer",
+  sdp: await sdpResponse.text(),
+});
+```
+
+Run the complete demo:
+
+```bash
+cd examples/voice_solutions/realtime_translation_guide/browser-translation-demo
+npm install
+npm run dev
+```
+
+Then open the local URL, choose a tab with audio, pick the target language, and start translation.
+
+## Phone calls with Twilio
+
+Next, let's put `gpt-realtime-translate` into a Twilio call path. Conversational translation works best when each participant has a distinct audio stream. Twilio Media Streams gives your backend a server-side WebSocket for phone audio, and your server handles the format boundary: receiving caller audio, converting it for Realtime Translation, then converting translated audio back into Twilio media messages.
+
+![Twilio phone translation architecture](https://github.com/openai/openai-cookbook/blob/main/images/realtime_translation_guide/twilio-phone-translation.png?raw=true)
+
+### How it works
+
+1. A caller joins and says their preferred output language.
+2. Twilio streams that caller's audio to your backend.
+3. Your backend converts Twilio audio into the audio format expected by Realtime Translation.
+4. For each translation direction, your backend opens a Realtime Translation session with the listener's target language.
+5. As translated audio comes back from OpenAI, your backend converts it back into Twilio media messages.
+6. Twilio plays the translated audio to the other participant.
+
+For a two-person call, this usually means two translation sessions: A-to-B and B-to-A. For larger calls, create translation sessions based on who needs to hear which source speaker in which language rather than mixing all participants into one shared stream.
+
+> **Production note:** `gpt-realtime-translate` may not translate audio that is already in the listener's selected output language. Because this demo does not pass original Twilio audio through to the other participant, same-language speech may lead to silence. Production phone bridges should add original-audio passthrough or mixing. This demo pairs callers one-to-one; additional callers wait for another caller and form a separate pair.
+
+### Configure the Twilio webhook
+
+Create a public endpoint for your server, then set the Twilio phone number's [Voice webhook](https://www.twilio.com/docs/usage/webhooks/voice-webhooks) to route inbound calls to your application. For local development, expose the server with a tunnel or deploy it somewhere Twilio can reach over port 443. The same host must serve the HTTP webhook routes and the WebSocket Media Stream route.
+
+### Ask the caller for a target language
+
+When a caller dials in, return [TwiML](https://www.twilio.com/docs/voice/twiml) that asks which language they want for the translation.
+
+```xml
+<Response>
+  <Gather input="speech" timeout="10" speechTimeout="auto" action="/choose-language" method="POST">
+    <Say>What language do you want to hear?</Say>
+  </Gather>
+  <Redirect method="POST">/choose-language</Redirect>
+</Response>
+```
+
+### Start the Twilio Media Stream
+
+After the caller chooses a supported language, return a bidirectional Media Stream. Pass the selected language as a custom parameter so the WebSocket handler can register the caller with their preferred output language.
+
+```xml
+<Response>
+  <Say>You chose Spanish. Wait for the other caller, then begin speaking.</Say>
+  <Connect>
+    <Stream url="wss://YOUR_PUBLIC_HOST/media-stream">
+      <Parameter name="callSid" value="CALL_SID" />
+      <Parameter name="language" value="es" />
+      <Parameter name="languageLabel" value="Spanish" />
+    </Stream>
+  </Connect>
+</Response>
+```
+
+### Open a server-side translation session
+
+Because this integration runs on your backend, you do not need browser client secrets. Open the Translation WebSocket directly from the server with your OpenAI API key and select the model in the URL.
+
+```ts
+import WebSocket from "ws";
+
+function openTranslationSession({ targetLanguage }) {
+  const ws = new WebSocket(
+    "wss://api.openai.com/v1/realtime/translations?model=gpt-realtime-translate",
+    {
+      headers: {
+        Authorization: `Bearer ${process.env.OPENAI_API_KEY}`,
+      },
+    }
+  );
+
+  ws.on("open", () => {
+    ws.send(JSON.stringify({
+      type: "session.update",
+      session: {
+        audio: {
+          input: {
+            transcription: { model: "gpt-realtime-whisper" },
+            noise_reduction: { type: "near_field" },
+          },
+          output: { language: targetLanguage },
+        },
+      },
+    }));
+  });
+
+  return ws;
+}
+```
+
+### Bridge Twilio audio into Realtime Translation
+
+Twilio sends base64 `audio/x-mulaw` at 8 kHz. Realtime Translation expects base64 little-endian PCM16 at 24 kHz, so the bridge decodes u-law, resamples to 24 kHz, and appends the audio buffer. Keep sending audio continuously, including silence, since translation sessions are not turn-based and do not wait for `response.create`.
+
+```ts
+function sendTwilioAudioToTranslation(realtimeWs, twilioMessage) {
+  if (twilioMessage.event !== "media") return;
+
+  const realtimeAudio = twilioMediaToRealtimeAudio(
+    twilioMessage.media.payload
+  );
+
+  realtimeWs.send(JSON.stringify({
+    type: "session.input_audio_buffer.append",
+    audio: realtimeAudio,
+  }));
+}
+```
+
+### Bridge translated audio back to Twilio
+
+Realtime Translation emits translated audio as base64 24 kHz PCM16 in `session.output_audio.delta`. Before sending it to Twilio, convert it back to 8 kHz u-law and wrap it in a Twilio media message.
+
+```ts
+function sendTranslationToTwilio(twilioWs, streamSid, realtimeEvent) {
+  if (realtimeEvent.type !== "session.output_audio.delta") return;
+
+  const twilioPayload = realtimeAudioToTwilioMedia(realtimeEvent.delta);
+
+  twilioWs.send(JSON.stringify({
+    event: "media",
+    streamSid,
+    media: {
+      payload: twilioPayload,
+    },
+  }));
+}
+```
+
+### Pair callers and create one session per direction
+
+Once two callers are waiting, pair them and open two Realtime Translation sessions. Each session's output language is the language selected by the listener, not the speaker.
+
+```ts
+function pairCallers(a, b) {
+  const aToB = openTranslationSession({ targetLanguage: b.language });
+  const bToA = openTranslationSession({ targetLanguage: a.language });
+
+  a.onAudio = (message) => sendTwilioAudioToTranslation(aToB, message);
+  b.onAudio = (message) => sendTwilioAudioToTranslation(bToA, message);
+
+  aToB.on("message", (data) => {
+    sendTranslationToTwilio(b.ws, b.streamSid, JSON.parse(data));
+  });
+
+  bToA.on("message", (data) => {
+    sendTranslationToTwilio(a.ws, a.streamSid, JSON.parse(data));
+  });
+}
+```
+
+Run the complete demo:
+
+```bash
+cd examples/voice_solutions/realtime_translation_guide/twilio-translation-demo
+npm install
+npm run dev
+```
+
+Configure your Twilio phone number's Voice webhook to call `POST https://YOUR_PUBLIC_HOST/incoming-call`.
+
+## Video chat with LiveKit
+
+Finally, let's integrate `gpt-realtime-translate` into a group video conference. Use this pattern when you already have a video room and want to add live interpretation to the conversation. [LiveKit](https://docs.livekit.io/) handles rooms, participants, microphone tracks, camera tracks, device selection, and reconnect behavior. Realtime Translation acts as an interpreter layer attached to the audio tracks that each listener receives.
+
+![LiveKit video translation architecture](https://github.com/openai/openai-cookbook/blob/main/images/realtime_translation_guide/livekit-video-translation.png?raw=true)
+
+### How it works
+
+1. A participant publishes microphone and camera tracks into the LiveKit room.
+2. A listener subscribes to the remote participant's microphone track through LiveKit.
+3. The listener's browser passes that remote `MediaStreamTrack` into a Realtime Translation sidecar.
+4. The sidecar opens a WebRTC Realtime Translation session for the listener's selected output language.
+5. Realtime Translation returns translated audio as a remote audio track and transcript deltas over the `oai-events` data channel.
+6. The listener's browser plays the translated audio, renders captions, and ducks or mixes the original LiveKit audio locally.
+
+In this demo, translated audio stays local to the listener's browser; it is not published back into the LiveKit room.
+
+### Attach translation to a remote participant track
+
+Once the listener joins a LiveKit room, find each remote participant's microphone track and pass the underlying `MediaStreamTrack` into a translation helper.
+
+```ts
+function getParticipantAudioMediaStreamTrack(participant: Participant) {
+  const publication = participant.getTrackPublication(Track.Source.Microphone);
+  return publication?.audioTrack?.mediaStreamTrack ?? null;
+}
+```
+
+### Create one translation sidecar per remote speaker
+
+A translated participant tile can keep the original LiveKit media path intact while adding translation output beside it. The tile still renders the participant's video and original audio, but it also starts a Realtime Translation sidecar for the participant's microphone track when translation is enabled.
+
+```tsx
+function TranslatedParticipantTile({
+  participant,
+  language,
+  translationEnabled,
+}: {
+  participant: Participant;
+  language: string;
+  translationEnabled: boolean;
+}) {
+  const sourceTrack = getParticipantAudioMediaStreamTrack(participant);
+
+  const translation = useRemoteTranslation({
+    enabled: translationEnabled && Boolean(sourceTrack),
+    sourceTrack,
+    language,
+  });
+
+  return (
+    <MeetingTile
+      participant={participant}
+      sourceVolume={translation.hasOutputAudio ? 0.15 : 1}
+      translatedSubtitle={translation.translatedSubtitle}
+      sourceSubtitle={translation.sourceSubtitle}
+    />
+  );
+}
+```
+
+### Open the translation sidecar
+
+The helper creates a short-lived Realtime Translation client secret on your server, opens a WebRTC sidecar from the browser, attaches the remote LiveKit microphone `MediaStreamTrack` to an `RTCPeerConnection`, and plays translated audio from the returned remote track.
+
+```ts
+async function startTranslationSidecar({ sourceTrack, clientSecret }) {
+  const pc = new RTCPeerConnection();
+  pc.addTrack(sourceTrack, new MediaStream([sourceTrack]));
+
+  const translatedAudio = new Audio();
+  translatedAudio.autoplay = true;
+  pc.ontrack = ({ streams }) => {
+    translatedAudio.srcObject = streams[0];
+  };
+
+  const events = pc.createDataChannel("oai-events");
+  events.onmessage = ({ data }) => {
+    const event = JSON.parse(data);
+    if (event.type === "session.output_transcript.delta") {
+      subtitles.textContent += event.delta;
+    }
+  };
+
+  const offer = await pc.createOffer();
+  await pc.setLocalDescription(offer);
+
+  const response = await fetch(
+    "https://api.openai.com/v1/realtime/translations/calls",
+    {
+      method: "POST",
+      headers: {
+        Authorization: `Bearer ${clientSecret}`,
+        "Content-Type": "application/sdp",
+      },
+      body: offer.sdp,
+    }
+  );
+
+  await pc.setRemoteDescription({
+    type: "answer",
+    sdp: await response.text(),
+  });
+
+  return pc;
+}
+```
+
+### Plan session fanout by listener language
+
+For a two-person room, each participant translates the other participant's microphone track into their own preferred language. For a group room, the number of active translation sessions depends on the number of active remote speakers and the number of distinct target languages listeners need.
+
+Browser-side translation is the simplest architecture: each listener creates translation sidecars for the remote speakers they want translated. For larger rooms in production, move the work into a LiveKit worker or server-side participant that subscribes to room audio, translates each source speaker once per target language, and republishes translated tracks back into the room.
+
+Run the complete demo:
+
+```bash
+cd examples/voice_solutions/realtime_translation_guide/livekit-translation-demo
+pnpm install
+pnpm dev
+```
+
+Use the same meeting code in two browser windows to join the same LiveKit room. Enable translation in one window, choose the language that listener wants to hear, and speak from the other window.
+
+## Production readiness
+
+Before launching Realtime Translation, test the full experience with the same audio, languages, network conditions, and user flows you expect in production. Translation quality is only one part of the experience: latency, speaker routing, captions, reconnect behavior, and audio controls all impact production readiness.
+
+### Choose the architecture based on the media path
+
+Use browser WebRTC for client-side media like microphones, tab audio, or LiveKit participant tracks. Use server-side WebSockets for telephony, broadcast ingest, or backend media pipelines.
+
+For multi-party calls, route translation by source speaker and target language. Keep speaker tracks separate when possible, then fan out the translated output to listeners who share the same target language. Mixing all speakers into one stream makes captions, speaker identity, and overlapping speech harder to handle.
+
+### Test terminology and names directly
+
+The model does not currently support custom prompts, glossaries, or pronunciation guides. If your use case depends on specific vocabulary, names, legal or medical terms, or other domain language, test those terms directly. The model can sometimes substitute incorrect names or entities while translating, so include these cases in your launch evaluation set.
+
+### Account for mixed-language speech
+
+Realtime Translation tries not to translate speech that is already in the selected output language. For example, if the output language is Spanish and the speaker switches into Spanish, the model may not produce translated audio for that segment.
+
+This matters for mixed-language speech. Spanglish to German should work as expected because both the English and Spanish parts need to be translated into German. Spanglish to English can feel choppier because the model may translate the Spanish parts but stay quiet during the English parts.
+
+This behavior is usually helpful, but it can be confusing if your app fully mutes the original audio. If you expect speakers to mix languages, keep the original audio available. A good pattern is to duck the original audio while translated audio is playing rather than fully muting it. You can also offer source-language captions or an original/translated audio mix control.
+
+### Supported languages
+
+Realtime Translation currently supports 13 target output languages: Spanish, Portuguese, French, Japanese, Russian, Chinese, German, Korean, Hindi, Indonesian, Vietnamese, Italian, and English.
+
+The model currently supports over 70 input languages. It can dynamically detect and translate from Arabic, Afrikaans, Azerbaijani, Belarusian, Bengali, Bosnian, Bulgarian, Catalan, Chinese, Croatian, Czech, Danish, Dutch, Dzongkha, English, Esperanto, Estonian, Basque, Persian / Farsi, Finnish, Filipino, French, Galician, German, Greek, Gujarati, Haitian Creole, Hawaiian, Hebrew, Hindi, Hungarian, Armenian, Indonesian, Italian, Japanese, Javanese, Georgian, Kazakh, Korean, Kurdish, Latin, Latvian, Lithuanian, Macedonian, Malay, Malayalam, Maori, Mongolian, Burmese / Myanmar, Nepali, Norwegian, Nynorsk, Polish, Portuguese, Punjabi, Romanian, Russian, Serbian, Shona, Slovak, Slovenian, Albanian, Spanish, Swahili, Swedish, Tagalog, Telugu, Thai, Turkish, Ukrainian, Uzbek, Vietnamese, Welsh, and Yoruba.
+
+### Evaluate meaning and latency separately
+
+For evaluations, keep the source audio, generated translated audio, generated transcript, and reference text together for each run. You want to be able to answer three questions later:
+
+- What did the model hear?
+- What did it say?
+- What should it have said?
+
+Use the best human reference you can get, such as human-edited subtitles, a professional interpreter transcript, a call transcript reviewed by a bilingual speaker, or a human dub of the source material. Automatic captions and transcripts are useful for quick smoke tests, but they are weaker as the source of truth.
+
+If your reference has timestamps, use them. Time-aligned subtitles or transcripts let you evaluate not just translation quality, but also when the translated audio and captions arrived.
+
+Score translations by meaning, not exact wording. A good translation may use different words, so evaluate whether the important facts, nuance, entities, numbers, and tone are preserved. Track the full distribution of misses, not just the average score, because a few bad errors can matter a lot in live translation.
+
+Traditional text metrics like BLEU can help with quick comparisons, but they are a weak proxy for speech-to-speech quality because they miss semantic similarity.
+
+Measure latency separately from quality. Track source speech to translated audio and source speech to displayed captions. Only use segments where the translation is meaningfully aligned when calculating delay; otherwise, bad matches can make timing data misleading.
+
+Finally, review low-scoring examples manually. Listen to the original source, the generated translation, and the reference segment side by side. This is where you catch the issues aggregate scores miss, especially names, numbers, partial translations, tone, and cases where the model skipped or delayed content.
+
+For a deeper treatment of Realtime evaluation, see the [Realtime eval guide](https://developers.openai.com/cookbook/examples/realtime_eval_guide).
+
+## Conclusion
+
+Realtime Translation changes what it means to build applications for multilingual users. It turns live interpretation into a native part of the product experience, so multilingual conversations can feel less like using a translation tool and more like simply understanding each other in real time. With a dedicated translation session, audio can move through browsers, phone calls, and video rooms as part of the experience itself.
+
+By making language a smaller barrier, these applications can help more people participate, collaborate, and connect.

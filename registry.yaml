@@ -2806,6 +2806,21 @@
     - responses
     - speech
 
+- title: Build Live Translation Apps with gpt-realtime-translate
+  path: examples/voice_solutions/realtime_translation_guide.mdx
+  slug: realtime-translation-guide
+  description: Cookbook for building browser, phone, and video-call translation experiences with Realtime Translation.
+  date: 2026-05-07
+  authors:
+    - erikakettleson-openai
+  tags:
+    - realtime
+    - audio
+    - speech
+    - translation
+    - webrtc
+    - websockets
+
 - title: Multi-Language One-Way Translation with the Realtime API
   path: examples/voice_solutions/one_way_translation_using_realtime_api.mdx
   slug: one-way-translation-using-realtime-api

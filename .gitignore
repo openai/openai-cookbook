@@ -15,6 +15,8 @@ downloads/
 eggs/
 .eggs/
 lib/
+!examples/voice_solutions/realtime_translation_guide/livekit-translation-demo/lib/
+!examples/voice_solutions/realtime_translation_guide/livekit-translation-demo/lib/**
 lib64
 parts/
 sdist/
@@ -103,6 +105,8 @@ celerybeat.pid
 
 # Environments
 .env
+.env.*
+!.env.example
 .venv
 env/
 venv/

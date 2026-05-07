@@ -47,7 +47,8 @@ Editing cases:
 
 ## Required assets (editing harness)
 
-The editing harness expects these files in `images/`:
+The editing harness reads required assets from the repository's top-level
+`images/` directory (resolved relative to the repo root, not this folder):
 
 - `images/base_woman.png`
 - `images/jacket.png`

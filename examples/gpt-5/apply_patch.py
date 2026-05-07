@@ -65,9 +65,6 @@ class Patch(BaseModel):
     actions: dict[str, PatchAction] = Field(default_factory=dict)
 
 
-from pydantic import BaseModel, Field
-
-
 class Parser(BaseModel):
     current_files: dict[str, str] = Field(default_factory=dict)
     lines: list[str] = Field(default_factory=list)

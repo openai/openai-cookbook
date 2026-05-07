@@ -591,4 +591,9 @@ sophiaqin-openai:
 PASFIELD-OAI:
   name: "Wesley Pasfield"
   website: "https://github.com/PASFIELD-OAI"
-  avatar: "https://avatars.githubusercontent.com/u/276116382?v=4"  
+  avatar: "https://avatars.githubusercontent.com/u/276116382?v=4"
+
+shreekant-openai:
+  name: "Shreekant Agrawal"
+  website: "https://www.linkedin.com/in/shreeagrawal/"
+  avatar: "https://avatars.githubusercontent.com/u/263776704?v=4"

@@ -3142,3 +3142,15 @@
     - cost
     - responses
     - realtime
+
+- title: Build iterative repair loops with Codex
+  path: examples/codex/Build iterative repair loops with Codex.ipynb
+  slug: build-iterative-repair-loops-with-codex
+  description: A Codex cookbook showing how to use review, repair, and validation loops to improve technical documentation artifacts.
+  date: 2026-05-07
+  authors:
+    - shreekant-openai
+  tags:
+    - codex
+    - agents
+    - evals

@@ -139,6 +139,7 @@ tmp_*
 examples/fine-tuned_qa/local_cache/*
 examples/multimodal/.local_cache/*
 examples/coding-agent-workspace
+examples/codex/outputs/
 
 # PyCharm files
 .idea/

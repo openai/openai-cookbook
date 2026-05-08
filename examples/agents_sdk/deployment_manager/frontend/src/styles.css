@@ -950,6 +950,11 @@ button:focus-visible,
   font-weight: 650;
 }
 
+.doc-image a {
+  display: block;
+  cursor: zoom-in;
+}
+
 .doc-image img {
   display: block;
   width: 100%;
@@ -2968,6 +2973,10 @@ body[data-view="logs"] .workspace {
   box-shadow: none;
 }
 
+.agent-list {
+  border-color: var(--line);
+}
+
 .trace-time-grid {
   width: 100%;
   max-width: 100%;
@@ -3022,6 +3031,10 @@ body[data-view="logs"] .workspace {
   border-top: 1px solid var(--alpha-05);
   background: var(--gray-0);
   color: var(--gray-750);
+}
+
+.agent-row {
+  border-top-color: var(--line);
 }
 
 .agent-row:first-of-type,
@@ -3694,6 +3707,8 @@ body[data-view="app-runs"] .trace-events,
 body[data-view="runs"] .trace-events,
 body[data-view="traces"] .trace-events,
 body[data-view="sessions"] .timeline {
+  align-content: start;
+  grid-auto-rows: minmax(48px, max-content);
   max-height: calc(100vh - 338px);
   overflow: auto;
   margin-top: 18px;
@@ -4578,13 +4593,13 @@ body.resizing-detail-pane {
     row-gap: 10px;
     column-gap: 12px;
     align-items: start;
-    border: 1px solid var(--alpha-05);
+    border: 1px solid var(--line);
     border-radius: var(--radius-md);
     padding: 16px;
   }
 
   .agent-row + .agent-row {
-    border-top: 1px solid var(--alpha-05);
+    border-top: 1px solid var(--line);
   }
 
   .agent-status {

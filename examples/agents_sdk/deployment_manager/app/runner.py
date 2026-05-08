@@ -91,7 +91,7 @@ def _container_name(project: Project, deployment: Deployment) -> str:
     display_name = (
         project.name if deployment.name == f"{project.name} local" else deployment.name
     )
-    return deployment.container_name or f"{_slug(display_name)}-orchestrator"
+    return _slug(display_name)
 
 
 def _image_tag(project: Project, deployment: Deployment) -> str:
@@ -123,6 +123,30 @@ def _container_is_running(container_id: str | None) -> bool:
     except (FileNotFoundError, subprocess.TimeoutExpired):
         return False
     return completed.returncode == 0 and completed.stdout.strip() == "true"
+
+
+def _remove_managed_container(container: str | None, deployment_id: str) -> None:
+    if not container:
+        return
+    try:
+        completed = _docker_output(
+            [
+                "inspect",
+                "-f",
+                "{{ index .Config.Labels \"agents-sdk.manager\" }} {{ index .Config.Labels \"agents-sdk.deployment-id\" }}",
+                container,
+            ]
+        )
+    except (FileNotFoundError, subprocess.TimeoutExpired):
+        return
+    if completed.returncode != 0:
+        return
+    if completed.stdout.strip() != f"true {deployment_id}":
+        return
+    try:
+        _docker_output(["rm", "-f", container], timeout=20)
+    except (FileNotFoundError, subprocess.TimeoutExpired):
+        pass
 
 
 def refresh_status(deployment: Deployment) -> Deployment:
@@ -239,7 +263,7 @@ def start_local_docker(
             read_log(str(log_path), limit=12000) or "docker build failed"
         )
 
-    _docker_output(["rm", "-f", container_name], timeout=20)
+    _remove_managed_container(container_name, deployment.id)
 
     env_args = [
         "-e",
@@ -355,12 +379,10 @@ def stop_local_process(deployment: Deployment) -> Deployment:
 
 
 def stop_local_docker(deployment: Deployment) -> Deployment:
-    container = deployment.container_id or deployment.container_name
-    if container:
-        try:
-            _docker_output(["rm", "-f", container], timeout=20)
-        except (FileNotFoundError, subprocess.TimeoutExpired):
-            pass
+    _remove_managed_container(
+        deployment.container_id or deployment.container_name,
+        deployment.id,
+    )
     deployment.status = "stopped"
     deployment.stopped_at = now_iso()
     return deployment

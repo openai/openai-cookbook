@@ -42,6 +42,19 @@
     - security
     - evals
 
+- title: Migrate from the Claude Agent SDK to the OpenAI Agents SDK
+  path: examples/agents_sdk/migrate-from-claude-agent-sdk/README.md
+  slug: migrate-from-claude-agent-sdk
+  description: Learn how to migrate Claude Agent SDK applications to the OpenAI Agents SDK, including tool mapping, guardrails, handoffs, approvals, and sandbox boundaries.
+  date: 2026-05-07
+  authors:
+    - anshgupta-oai
+  tags:
+    - agents-sdk
+    - agents
+    - migration
+    - sandbox
+
 - title: Agents SDK Deployment Manager
   path: examples/agents_sdk/deployment_manager/README.md
   slug: agents-sdk-deployment-manager

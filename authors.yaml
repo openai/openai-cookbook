@@ -591,4 +591,8 @@ sophiaqin-openai:
 PASFIELD-OAI:
   name: "Wesley Pasfield"
   website: "https://github.com/PASFIELD-OAI"
-  avatar: "https://avatars.githubusercontent.com/u/276116382?v=4"  
+  avatar: "https://avatars.githubusercontent.com/u/276116382?v=4"
+ripper:
+  name: Ripper
+  website: https://tensorfeed.ai
+

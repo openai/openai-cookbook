@@ -3232,3 +3232,15 @@
     - agents
     - memory
     - compaction
+- title: Cross-Database CVE Verification with TensorFeed (Hosted MCP)
+  path: examples/mcp/tensorfeed_cve_verification.ipynb
+  slug: tensorfeed-cve-verification
+  description: Compose three independent vulnerability databases (MITRE / CISA KEV / FIRST.org EPSS) via TensorFeed.ai's hosted MCP server using the Responses API's native MCP tool. Anti-hallucination corroboration pattern for security agents in a single Responses call.
+  date: 2026-05-09
+  authors:
+    - ripper
+  tags:
+    - mcp
+    - agents
+    - security
+

@@ -42,6 +42,19 @@
     - security
     - evals
 
+- title: Agents SDK Deployment Manager
+  path: examples/agents_sdk/deployment_manager/README.md
+  slug: agents-sdk-deployment-manager
+  description: Run, inspect, and trace local Agents SDK demo apps from a browser-based deployment manager.
+  date: 2026-05-05
+  authors:
+    - alfozan
+  tags:
+    - agents-sdk
+    - agents
+    - tracing
+    - deployment
+
 - title: Getting the Most out of GPT-5.4 for Vision and Document Understanding
   path: examples/multimodal/document_and_multimodal_understanding_tips.ipynb
   slug: vision-understanding
@@ -2792,6 +2805,21 @@
     - audio
     - responses
     - speech
+
+- title: Build Live Translation Apps with gpt-realtime-translate
+  path: examples/voice_solutions/realtime_translation_guide.mdx
+  slug: realtime-translation-guide
+  description: Cookbook for building browser, phone, and video-call translation experiences with Realtime Translation.
+  date: 2026-05-07
+  authors:
+    - erikakettleson-openai
+  tags:
+    - realtime
+    - audio
+    - speech
+    - translation
+    - webrtc
+    - websockets
 
 - title: Multi-Language One-Way Translation with the Realtime API
   path: examples/voice_solutions/one_way_translation_using_realtime_api.mdx

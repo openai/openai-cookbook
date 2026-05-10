@@ -3236,7 +3236,7 @@
   path: examples/codex/Build_iterative_repair_loops_with_Codex.ipynb
   slug: build-iterative-repair-loops-with-codex
   description: A Codex cookbook showing how to use review, repair, and validation loops to improve technical documentation artifacts.
-  date: 2025-05-11
+  date: 2026-05-11
   authors:
     - shreekant-openai
   tags:

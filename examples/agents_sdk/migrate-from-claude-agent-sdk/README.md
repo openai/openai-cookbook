@@ -611,6 +611,7 @@ async def add_checked_bag(booking_id: str, bags: int) -> dict:
     }
 
 
+# `agent` should include `add_checked_bag` in its `tools` list.
 first = await Runner.run(agent, "Add one checked bag to booking AS-301.")
 state = first.to_state()
 

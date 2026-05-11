@@ -3,7 +3,7 @@
 This example shows how to build a semantic search workflow using:
 
 - **OpenAI embeddings** for turning text into vector representations
-- **LangChain’s Oracle vector store integration** for working with vectors through a familiar framework abstraction
+- **LangChain's Oracle vector store integration** for working with vectors through a familiar framework abstraction
 - **Oracle AI Database Vector Search** for storing embeddings and retrieving relevant content with similarity search
 
 If you are looking for a practical starting point for **LangChain + Oracle AI Database**, **OpenAI embeddings with Oracle Vector Search**, or a developer-friendly example of semantic retrieval that integrates directly with data stored in Oracle AI Database, this notebook is designed to be easy to read, run, and adapt.
@@ -36,7 +36,7 @@ By working through the notebook, you will learn how to:
 
 - connect to Oracle AI Database from Python
 - configure OpenAI embeddings for semantic search
-- initialize LangChain’s Oracle vector store integration
+- initialize LangChain's Oracle vector store integration
 - store sample documents and embeddings in Oracle AI Database
 - run vector similarity search against indexed content
 - inspect how LangChain retrieval maps to Oracle AI Database Vector Search
@@ -91,8 +91,8 @@ pip install python-dotenv
 
 ## Files in this example
 
-- `oracle_vector_search_langchain.ipynb` — the main notebook demonstrating semantic search with LangChain, OpenAI, and Oracle AI Database
-- `.env` — local configuration file for OpenAI and Oracle connection settings
+- `oracle_vector_search_langchain.ipynb` - the main notebook demonstrating semantic search with LangChain, OpenAI, and Oracle AI Database
+- `.env` - local configuration file for OpenAI and Oracle connection settings
 
 
 

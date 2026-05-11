@@ -3208,7 +3208,6 @@
     - cost
     - responses
     - realtime
-    
 - title: GPT Image Generation Models Prompting Guide
   path: examples/multimodal/image-gen-models-prompting-guide.ipynb
   slug: image-gen-models-prompting-guide
@@ -3245,3 +3244,31 @@
     - agents
     - memory
     - compaction
+
+- title: Build iterative repair loops with Codex
+  path: examples/codex/Build_iterative_repair_loops_with_Codex.ipynb
+  slug: build-iterative-repair-loops-with-codex
+  description: A Codex cookbook showing how to use review, repair, and validation loops to improve technical documentation artifacts.
+  date: 2026-05-11
+  authors:
+    - shreekant-openai
+  tags:
+    - codex
+    - agents
+    - evals
+
+- title: Build an Agent Improvement Loop with Traces, Evals, and Codex
+  path: examples/agents_sdk/agent_improvement_loop.ipynb
+  slug: agent-improvement-loop
+  description: Build a trace-driven improvement loop that turns human and model feedback into Promptfoo evals, HALO-ranked harness changes, and a Codex handoff.
+  date: 2026-05-01
+  authors:
+    - PASFIELD-OAI
+  tags:
+    - agents-sdk
+    - agents
+    - evals
+    - promptfoo
+    - tracing
+    - codex
+    - halo

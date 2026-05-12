@@ -46,11 +46,11 @@ This solution uses a Node.js Azure Function to, based on the logged in user:
 
 2. For each file that is found, convert it to a consistent readable format and retrieve all the text.
 
-3. Use GPT 3.5-turbo (gpt-3.5-turbo-0125) to extract the relevant text from the files based on the initial user’s question. Note the pricing of GPT 3.5 turbo [here](https://openai.com/pricing#language-models) - since we are dealing with small token chunks, the cost of this step is nominal.  
+3. Use gpt-4o-mini with the Responses API to extract the relevant text from the files based on the initial user’s question. Since we are dealing with small token chunks, the cost of this step is nominal.  
 
 4. Returns that data to ChatGPT. The GPT then uses that information to respond to the user's initial question.
 
-As you can see from the below architecture diagram, the first three steps are the same as Solution 1. The main difference is that this solution converts the file to text instead of a base64 string, and then summarizes that text using GPT 3.5 Turbo.
+As you can see from the below architecture diagram, the first three steps are the same as Solution 1. The main difference is that this solution converts the file to text instead of a base64 string, and then summarizes that text using gpt-4o-mini.
 
 
 ![](../../../images/solution_2_architecture.png)
@@ -70,7 +70,7 @@ As you can see from the below architecture diagram, the first three steps are th
 
     2. convert that Binary stream to human readable text using [pdf-parse](https://www.npmjs.com/package/pdf-parse)
 
-    3. Then, we can optimize further by summarizing using gpt-3.5-turbo in the function to help with the 100,000 character limit we impose on Actions today. 
+    3. Then, we can optimize further by summarizing using gpt-4o-mini in the function to help with the 100,000 character limit we impose on Actions today. 
 
 
 ## Prerequisites
@@ -431,7 +431,7 @@ module.exports = async function (context, req) {
        // This is where we are doing the search
        const list = await client.api('/search/query').post(requestBody);
        const processList = async () => {
-           // This will go through and for each search response, grab the contents of the file and summarize with gpt-3.5-turbo
+           // This will go through and for each search response, grab the contents of the file and summarize with gpt-4o-mini
            const results = [];
            await Promise.all(list.value[0].hitsContainers.map(async (container) => {
                for (const hit of container.hits) {
@@ -639,7 +639,7 @@ const getDriveItemContent = async (client, driveId, itemId, name) => {
 };
 ```
 
-#### Integrating GPT 3.5-Turbo for Text Analysis
+#### Integrating gpt-4o-mini for Text Analysis
 
 This function utilizes the OpenAI SDK to analyze text extracted from documents and find relevant information based on a user query. This helps to ensure only relevant text to the user’s question is returned to the GPT. 
 
@@ -651,19 +651,19 @@ const getRelevantParts = async (text, query) => {
         const openai = new OpenAI({
             apiKey: openAIKey,
         });
-        const response = await openai.chat.completions.create({
-            // Using gpt-3.5-turbo due to speed to prevent timeouts. You can tweak this prompt as needed
-            model: "gpt-3.5-turbo-0125",
-            messages: [
+        const response = await openai.responses.create({
+            // Using gpt-4o-mini due to speed to prevent timeouts. You can tweak this prompt as needed
+            model: "gpt-4o-mini",
+            input: [
                 {"role": "system", "content": "You are a helpful assistant that finds relevant content in text based on a query. You only return the relevant sentences, and you return a maximum of 10 sentences"},
                 {"role": "user", "content": `Based on this question: **"${query}"**, get the relevant parts from the following text:*****\n\n${text}*****. If you cannot answer the question based on the text, respond with 'No information provided'`}
             ],
             // using temperature of 0 since we want to just extract the relevant content
             temperature: 0,
-            // using max_tokens of 1000, but you can customize this based on the number of documents you are searching. 
-            max_tokens: 1000
+            // using max_output_tokens of 1000, but you can customize this based on the number of documents you are searching.
+            max_output_tokens: 1000
         });
-        return response.choices[0].message.content;
+        return response.output_text;
     } catch (error) {
         console.error('Error with OpenAI:', error);
         return 'Error processing text with OpenAI' + error;
@@ -739,7 +739,7 @@ module.exports = async function (context, req) {
             return content.split(/\s+/);
         };
 
-        // Function to break tokens into 10k token windows for gpt-3.5-turbo
+        // Function to break tokens into 10k token windows for gpt-4o-mini
         const breakIntoTokenWindows = (tokens) => {
             const tokenWindows = []
             const maxWindowTokens = 10000; // 10k tokens
@@ -757,7 +757,7 @@ module.exports = async function (context, req) {
         const list = await client.api('/search/query').post(requestBody);
 
         const processList = async () => {
-            // This will go through and for each search response, grab the contents of the file and summarize with gpt-3.5-turbo
+            // This will go through and for each search response, grab the contents of the file and summarize with gpt-4o-mini
             const results = [];
 
             await Promise.all(list.value[0].hitsContainers.map(async (container) => {
@@ -951,7 +951,3 @@ paths:
   - To address this, the function requests a new token scoped to Files.Read.All within the app using the [On Behalf Of flow](https://learn.microsoft.com/en-us/entra/identity-platform/v2-oauth2-on-behalf-of-flow). This will inherit the permissions of the logged in user, meaning this function will only search through files the logged-in user has access to. 
 
   - We are purposefully requesting a new On Behalf Of token with each request, because Azure Function Apps are meant to be stateless. You could potentially integrate this with Azure Key Vault to store the secret and retrieve programmatically. 
-
-
-
-

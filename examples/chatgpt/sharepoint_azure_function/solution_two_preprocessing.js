@@ -88,7 +88,7 @@ const getDriveItemContent = async (client, driveId, itemId, name) => {
     }
 };
 
-// Function to get relevant parts of text using got-4o-mini. 
+// Function to get relevant parts of text using gpt-4o-mini.
 const getRelevantParts = async (text, query) => {
     try {
         // We use your OpenAI key to initialize the OpenAI client
@@ -96,19 +96,19 @@ const getRelevantParts = async (text, query) => {
         const openai = new OpenAI({
             apiKey: openAIKey,
         });
-        const response = await openai.chat.completions.create({
+        const response = await openai.responses.create({
             // Using gpt-4o-mini due to speed to prevent timeouts. You can tweak this prompt as needed
             model: "gpt-4o-mini",
-            messages: [
+            input: [
                 {"role": "system", "content": "You are a helpful assistant that finds relevant content in text based on a query. You only return the relevant sentences, and you return a maximum of 10 sentences"},
                 {"role": "user", "content": `Based on this question: **"${query}"**, get the relevant parts from the following text:*****\n\n${text}*****. If you cannot answer the question based on the text, respond with 'No information provided'`}
             ],
             // using temperature of 0 since we want to just extract the relevant content
             temperature: 0,
-            // using max_tokens of 1000, but you can customize this based on the number of documents you are searching. 
-            max_tokens: 1000
+            // using max_output_tokens of 1000, but you can customize this based on the number of documents you are searching.
+            max_output_tokens: 1000
         });
-        return response.choices[0].message.content;
+        return response.output_text;
     } catch (error) {
         console.error('Error with OpenAI:', error);
         return 'Error processing text with OpenAI' + error;
@@ -162,7 +162,7 @@ module.exports = async function (context, req) {
             return content.split(/\s+/);
         };
 
-        // Function to break tokens into 10k token windows for got-4o-mini
+        // Function to break tokens into 10k token windows for gpt-4o-mini
         const breakIntoTokenWindows = (tokens) => {
             const tokenWindows = []
             const maxWindowTokens = 10000; // 10k tokens
@@ -180,7 +180,7 @@ module.exports = async function (context, req) {
         const list = await client.api('/search/query').post(requestBody);
 
         const processList = async () => {
-            // This will go through and for each search response, grab the contents of the file and summarize with got-4o-mini
+            // This will go through and for each search response, grab the contents of the file and summarize with gpt-4o-mini
             const results = [];
 
             await Promise.all(list.value[0].hitsContainers.map(async (container) => {
@@ -237,4 +237,3 @@ module.exports = async function (context, req) {
         };
     }
 };
-

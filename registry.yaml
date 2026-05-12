@@ -1840,7 +1840,9 @@
   authors:
     - ted-at-openai
   tags:
-    - completions
+    - prompt
+    - responses
+    - evals
 
 - title: How to work with large language models
   path: articles/how_to_work_with_large_language_models.md

@@ -42,6 +42,19 @@
     - security
     - evals
 
+- title: Agents SDK Deployment Manager
+  path: examples/agents_sdk/deployment_manager/README.md
+  slug: agents-sdk-deployment-manager
+  description: Run, inspect, and trace local Agents SDK demo apps from a browser-based deployment manager.
+  date: 2026-05-05
+  authors:
+    - alfozan
+  tags:
+    - agents-sdk
+    - agents
+    - tracing
+    - deployment
+
 - title: Getting the Most out of GPT-5.4 for Vision and Document Understanding
   path: examples/multimodal/document_and_multimodal_understanding_tips.ipynb
   slug: vision-understanding
@@ -214,7 +227,7 @@
     - gpt-5
     - prompt-optimization
 
-- title: Context Engineering - Short-Term Memory Management with Sessions from OpenAI Agents SDK
+- title: Context Engineering - Short-Term Memory Management with Sessions
   path: examples/agents_sdk/session_memory.ipynb
   slug: session-memory
   date: 2025-09-09
@@ -2793,6 +2806,21 @@
     - responses
     - speech
 
+- title: Build Live Translation Apps with gpt-realtime-translate
+  path: examples/voice_solutions/realtime_translation_guide.mdx
+  slug: realtime-translation-guide
+  description: Cookbook for building browser, phone, and video-call translation experiences with Realtime Translation.
+  date: 2026-05-07
+  authors:
+    - erikakettleson-openai
+  tags:
+    - realtime
+    - audio
+    - speech
+    - translation
+    - webrtc
+    - websockets
+
 - title: Multi-Language One-Way Translation with the Realtime API
   path: examples/voice_solutions/one_way_translation_using_realtime_api.mdx
   slug: one-way-translation-using-realtime-api
@@ -3027,7 +3055,7 @@
   tags:
     - codex
 
-- title: Context Engineering for Personalization - State Management with Long-Term Memory Notes using OpenAI Agents SDK
+- title: Context Engineering for Personalization - State Management with Long-Term Memory Notes
   path: examples/agents_sdk/context_personalization.ipynb
   slug: context-personalization
   description: Cookbook to build personalized agents with long-term memory state using the Agents SDK.
@@ -3167,7 +3195,6 @@
     - cost
     - responses
     - realtime
-    
 - title: GPT Image Generation Models Prompting Guide
   path: examples/multimodal/image-gen-models-prompting-guide.ipynb
   slug: image-gen-models-prompting-guide
@@ -3190,3 +3217,45 @@
     - aaronwilkowitz-openai
   tags:
     - chatgpt
+
+- title: Building Reliable Agents with Memory and Compaction
+  path: examples/agents_sdk/building_reliable_agents_memory_compaction.ipynb
+  slug: building-reliable-agents-memory-compaction
+  description: Cookbook for building evidence review agent that uses compaction and memory from Agents SDK.
+  date: 2026-05-01
+  authors:
+    - PASFIELD-OAI
+    - emreokcular
+  tags:
+    - agents-sdk
+    - agents
+    - memory
+    - compaction
+
+- title: Build iterative repair loops with Codex
+  path: examples/codex/Build_iterative_repair_loops_with_Codex.ipynb
+  slug: build-iterative-repair-loops-with-codex
+  description: A Codex cookbook showing how to use review, repair, and validation loops to improve technical documentation artifacts.
+  date: 2026-05-11
+  authors:
+    - shreekant-openai
+  tags:
+    - codex
+    - agents
+    - evals
+
+- title: Build an Agent Improvement Loop with Traces, Evals, and Codex
+  path: examples/agents_sdk/agent_improvement_loop.ipynb
+  slug: agent-improvement-loop
+  description: Build a trace-driven improvement loop that turns human and model feedback into Promptfoo evals, HALO-ranked harness changes, and a Codex handoff.
+  date: 2026-05-12
+  authors:
+    - PASFIELD-OAI
+  tags:
+    - agents-sdk
+    - agents
+    - evals
+    - promptfoo
+    - tracing
+    - codex
+    - halo

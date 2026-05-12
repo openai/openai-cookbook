@@ -1,0 +1,143 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>In-browser Realtime Translation</title>
+    <link rel="stylesheet" href="/styles.css" />
+  </head>
+  <body>
+    <main class="shell">
+      <section class="hero">
+        <div>
+          <p class="eyebrow">Browser demo</p>
+          <h1>In-browser Realtime Translation</h1>
+          <p class="summary">
+            Capture audio from a browser tab, send it to Realtime Translation
+            over WebRTC, and play translated speech back locally.
+          </p>
+        </div>
+        <div class="status-card" aria-live="polite">
+          <p class="panel-label">Session status</p>
+          <div class="status-panel">
+            <span class="status-dot" id="statusDot"></span>
+            <span id="statusText">Stopped</span>
+          </div>
+        </div>
+      </section>
+
+      <section class="control-dock" aria-label="Translation controls">
+        <div class="dock-section field">
+          <label for="targetLanguage">Target language</label>
+          <select id="targetLanguage">
+            <option value="es">Spanish</option>
+            <option value="pt">Portuguese</option>
+            <option value="fr">French</option>
+            <option value="ja">Japanese</option>
+            <option value="ru">Russian</option>
+            <option value="zh">Chinese</option>
+            <option value="de">German</option>
+            <option value="ko">Korean</option>
+            <option value="hi">Hindi</option>
+            <option value="id">Indonesian</option>
+            <option value="vi">Vietnamese</option>
+            <option value="it">Italian</option>
+            <option value="en">English</option>
+          </select>
+        </div>
+
+        <div class="dock-section mix-control">
+          <div class="mix-heading">
+            <label class="range-label" for="audioMix">Audio mix</label>
+            <span id="mixValue">85% translated</span>
+          </div>
+          <input
+            id="audioMix"
+            type="range"
+            min="0"
+            max="100"
+            step="1"
+            value="85"
+          />
+          <div class="mix-scale" aria-hidden="true">
+            <span id="originalMixLabel">Original 15%</span>
+            <span id="translatedMixLabel">Translated 85%</span>
+          </div>
+        </div>
+
+        <div class="dock-section button-row">
+          <button id="startButton" type="button">
+            Choose tab to start translating
+          </button>
+          <button id="stopButton" type="button" class="secondary" disabled>
+            Stop
+          </button>
+        </div>
+      </section>
+
+      <section class="meters" aria-label="Audio status">
+        <div class="meter-card">
+          <span>Captured tab audio</span>
+          <meter id="inputMeter" min="0" max="1" value="0"></meter>
+        </div>
+        <div class="meter-card">
+          <span>WebRTC connection</span>
+          <progress id="queueProgress" max="1" value="0"></progress>
+        </div>
+      </section>
+
+      <section class="workspace">
+        <article class="guide-card">
+          <h2>How to test</h2>
+          <ol>
+            <li>Open any browser tab that is playing audio.</li>
+            <li>Return here and choose that tab from the browser picker.</li>
+            <li>Enable tab audio in the picker, then listen for translation.</li>
+          </ol>
+          <dl class="diagnostics">
+            <div>
+              <dt>Capture</dt>
+              <dd id="captureState">Not started</dd>
+            </div>
+            <div>
+              <dt>WebRTC state</dt>
+              <dd id="chunksSent">new</dd>
+            </div>
+            <div>
+              <dt>Data channel</dt>
+              <dd id="activeInputFrames">connecting</dd>
+            </div>
+            <div>
+              <dt>Peak level</dt>
+              <dd id="peakInputLevel">0.000</dd>
+            </div>
+            <div>
+              <dt>Remote audio</dt>
+              <dd><span id="outputAudioDeltas">0</span> tracks</dd>
+            </div>
+            <div>
+              <dt>Transcript</dt>
+              <dd><span id="transcriptDeltas">0</span> deltas</dd>
+            </div>
+            <div>
+              <dt>Last event</dt>
+              <dd id="lastEventType">none</dd>
+            </div>
+          </dl>
+        </article>
+
+        <article class="transcript-card">
+          <h2>Translated transcript</h2>
+          <div id="translatedTranscript" class="transcript" aria-live="polite"></div>
+        </article>
+
+        <article class="log-card">
+          <h2>Event log</h2>
+          <div id="eventLog" class="log" aria-live="polite"></div>
+        </article>
+      </section>
+    </main>
+
+    <script src="/app.js" type="module"></script>
+  </body>
+</html>

@@ -4,6 +4,21 @@
 # should build pages for, and indicates metadata such as tags, creation date and
 # authors for each page.
 
+- title: Grounded Spatial Reasoning with Structured Layout Specs
+  path: examples/multimodal/grounded_spatial_reasoning_layouts.ipynb
+  slug: grounded-spatial-reasoning-layouts
+  description: Build a spec-first floorplan layout workflow with vision, structured outputs, and deterministic spatial evals.
+  date: 2026-05-11
+  authors:
+    - sidrampally-oai
+    - kathylau-oai
+  tags:
+    - images
+    - vision
+    - reasoning
+    - structured-outputs
+    - evals
+
 - title: Building workspace agents in ChatGPT to complete repeatable, end-to-end work
   path: articles/chatgpt-agents-sales-meeting-prep.md
   slug: chatgpt-agents-sales-meeting-prep

@@ -1,51 +1,83 @@
-# Text comparison examples
+# Use cases for embeddings
 
-The [OpenAI API embeddings endpoint](https://beta.openai.com/docs/guides/embeddings) can be used to measure relatedness or similarity between pieces of text.
+OpenAI embeddings represent text as vectors that can be compared by distance.
+They are useful when an application needs to search, group, rank, recommend, or
+classify text by meaning rather than exact keyword overlap.
 
-By leveraging GPT-3's understanding of text, these embeddings [achieved state-of-the-art results](https://arxiv.org/abs/2201.10005) on benchmarks in unsupervised learning and transfer learning settings.
+For current model details, API parameters, pricing, and limits, see the
+[embeddings guide](https://developers.openai.com/api/docs/guides/embeddings)
+and [embeddings API reference](https://developers.openai.com/api/docs/api-reference/embeddings).
+Most examples in this cookbook use `text-embedding-3-small` as a good default;
+use `text-embedding-3-large` when higher retrieval quality is worth the larger
+vectors. Both models also support the `dimensions` parameter, which can shorten
+vectors when storage, latency, or vector database limits matter.
 
-Embeddings can be used for semantic search, recommendations, cluster analysis, near-duplicate detection, and more.
+## Basic workflow
 
-For more information, read OpenAI's blog post announcements:
+1. Split source text into chunks that fit within the embedding model's input
+   limit.
+2. Create one embedding per chunk, item, label, or query.
+3. Store each vector with the text and metadata needed to show or filter
+   results.
+4. For a live query or item, create a new embedding with the same model.
+5. Compare vectors with cosine similarity, dot product, or the distance metric
+   supported by your vector database.
+6. Return the best matches, use them as ranking features, or pass the retrieved
+   text into a model as context.
 
-- [Introducing Text and Code Embeddings (Jan 2022)](https://openai.com/blog/introducing-text-and-code-embeddings/)
-- [New and Improved Embedding Model (Dec 2022)](https://openai.com/blog/new-and-improved-embedding-model/)
-
-For comparison with other embedding models, see [Massive Text Embedding Benchmark (MTEB) Leaderboard](https://huggingface.co/spaces/mteb/leaderboard)
+For larger corpora, store embeddings in a vector database or search service.
+The cookbook's [vector database examples](../examples/vector_databases/README.md)
+show integrations for common providers.
 
 ## Semantic search
 
-Embeddings can be used for search either by themselves or as a feature in a larger system.
+Embeddings let search systems find text with similar meaning even when the
+query and result do not share the same words. A typical semantic search pipeline
+embeds documents ahead of time, embeds the user's query at request time, and
+ranks documents by vector similarity.
 
-The simplest way to use embeddings for search is as follows:
+See [Semantic_text_search_using_embeddings.ipynb](../examples/Semantic_text_search_using_embeddings.ipynb)
+for a minimal search example.
 
-- Before the search (precompute):
-  - Split your text corpus into chunks smaller than the token limit (8,191 tokens for `text-embedding-3-small`)
-  - Embed each chunk of text
-  - Store those embeddings in your own database or in a vector search provider like [Pinecone](https://www.pinecone.io), [Weaviate](https://weaviate.io) or [Qdrant](https://qdrant.tech)
-- At the time of the search (live compute):
-  - Embed the search query
-  - Find the closest embeddings in your database
-  - Return the top results
+## Question answering over source material
 
-An example of how to use embeddings for search is shown in [Semantic_text_search_using_embeddings.ipynb](../examples/Semantic_text_search_using_embeddings.ipynb).
+For question answering over private or domain-specific content, use embeddings
+to retrieve the most relevant source passages, then provide those passages to a
+text generation model as context. This pattern is often called retrieval
+augmented generation.
 
-In more advanced search systems, the cosine similarity of embeddings can be used as one feature among many in ranking search results.
+See [Question_answering_using_embeddings.ipynb](../examples/Question_answering_using_embeddings.ipynb)
+for an example that answers questions from retrieved source text.
 
-## Question answering
+## Recommendations and similarity ranking
 
-The best way to get reliably honest answers from GPT-3 is to give it source documents in which it can locate correct answers. Using the semantic search procedure above, you can cheaply search through a corpus of documents for relevant information and then give that information to GPT-3 via the prompt to answer a question. We demonstrate this in [Question_answering_using_embeddings.ipynb](../examples/Question_answering_using_embeddings.ipynb).
+Recommendations use the same distance idea as search, but the query is an item
+instead of a free-form text string. Embed the items, compare one item embedding
+against the others, and rank the nearest neighbors.
 
-## Recommendations
+See [Recommendation_using_embeddings.ipynb](../examples/Recommendation_using_embeddings.ipynb)
+for a nearest-neighbor recommendation example.
 
-Recommendations are quite similar to search, except that instead of a free-form text query, the inputs are items in a set.
+## Classification, clustering, and regression
 
-An example of how to use embeddings for recommendations is shown in [Recommendation_using_embeddings.ipynb](../examples/Recommendation_using_embeddings.ipynb).
+Embeddings can be used as compact text features for machine learning workflows.
+You can cluster related items, classify text by comparing it to embedded labels,
+or train lightweight models on top of embedding vectors.
 
-Similar to search, these cosine similarity scores can either be used on their own to rank items or as features in larger ranking algorithms.
+Relevant examples:
 
-## Customizing Embeddings
+- [Classification_using_embeddings.ipynb](../examples/Classification_using_embeddings.ipynb)
+- [Zero-shot_classification_with_embeddings.ipynb](../examples/Zero-shot_classification_with_embeddings.ipynb)
+- [Clustering.ipynb](../examples/Clustering.ipynb)
+- [Regression_using_embeddings.ipynb](../examples/Regression_using_embeddings.ipynb)
 
-Although OpenAI's embedding model weights cannot be fine-tuned, you can nevertheless use training data to customize embeddings to your application.
+## Customizing embedding behavior
 
-In [Customizing_embeddings.ipynb](../examples/Customizing_embeddings.ipynb), we provide an example method for customizing your embeddings using training data. The idea of the method is to train a custom matrix to multiply embedding vectors by in order to get new customized embeddings. With good training data, this custom matrix will help emphasize the features relevant to your training labels. You can equivalently consider the matrix multiplication as (a) a modification of the embeddings or (b) a modification of the distance function used to measure the distances between embeddings.
+If raw vector similarity does not match your product's notion of relevance, use
+labeled examples to learn a task-specific threshold, reranker, classifier, or
+linear transformation on top of embeddings. This keeps the base embedding model
+unchanged while adapting the distance function to your use case.
+
+See [Customizing_embeddings.ipynb](../examples/Customizing_embeddings.ipynb)
+for an example of learning a custom matrix that changes how embedding vectors
+are compared.

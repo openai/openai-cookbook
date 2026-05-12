@@ -3248,7 +3248,7 @@
   path: examples/agents_sdk/agent_improvement_loop.ipynb
   slug: agent-improvement-loop
   description: Build a trace-driven improvement loop that turns human and model feedback into Promptfoo evals, HALO-ranked harness changes, and a Codex handoff.
-  date: 2026-05-01
+  date: 2026-05-12
   authors:
     - PASFIELD-OAI
   tags:

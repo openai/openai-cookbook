@@ -4,6 +4,19 @@
 # should build pages for, and indicates metadata such as tags, creation date and
 # authors for each page.
 
+- title: Hallucination detection for OpenAI responses with styxx
+  path: examples/evaluation/hallucination_detection_with_styxx.ipynb
+  slug: hallucination-detection-with-styxx
+  description: Wrap any OpenAI call with `@trust` for runtime hallucination detection. Cross-validated across 8 public benchmarks (AUC 0.998 on HaluEval-QA, 0.807 on HaluBench-RAGTruth), with two declared failure modes published openly.
+  date: 2026-04-23
+  authors:
+    - fathomlab
+  tags:
+    - evaluation
+    - hallucination
+    - reliability
+    - rag
+
 - title: Building workspace agents in ChatGPT to complete repeatable, end-to-end work
   path: articles/chatgpt-agents-sales-meeting-prep.md
   slug: chatgpt-agents-sales-meeting-prep

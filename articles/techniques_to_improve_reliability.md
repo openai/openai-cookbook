@@ -1,200 +1,203 @@
 # Techniques to improve reliability
 
-When a model gives an unreliable answer, do not jump straight to "the model cannot do this" or "we need fine-tuning." First ask a narrower question: what part of the task was underspecified, unsupported, too complex, or unchecked?
+When a model gives an unreliable answer, the fix is rarely one clever prompt. Reliability comes from designing the whole interaction: clear instructions, the right context, constrained outputs, tools for facts or actions, and checks that catch mistakes.
 
-Most reliability work is not one magic prompt. It is the process of turning a single model call into a small, testable system with clear instructions, relevant context, constrained outputs, and verification.
+This guide focuses on practical techniques that reduce failure rates. They do not make model output perfect or guaranteed, but they make failures easier to prevent, detect, and debug.
 
 ## Why models can be unreliable
 
-Large language models generate output one token at a time from the context they are given. They are powerful pattern matchers and reasoners, but their default behavior is still probabilistic generation, not guaranteed truth.
+Large language models generate likely continuations from the context they receive. They can reason, summarize, classify, write code, and use tools, but they are not automatically verifying every statement against a source of truth.
 
-That creates a few predictable failure modes:
+Common reliability problems come from several places:
 
-- **Missing context.** If the prompt does not include the needed facts, the model may fill gaps with a plausible answer.
-- **Ambiguous instructions.** If several interpretations fit the request, the model may choose a reasonable one that is not the one you intended.
-- **Long reasoning chains.** Multi-step tasks compound error. Even if each step is likely to be correct, a long sequence has more chances to go wrong. A ten-step process where each step is 95% reliable is only about 60% reliable end to end.
-- **Weak constraints.** Free-form text gives the model room to drift, omit required fields, or mix answer formats.
-- **Sampling variation.** Temperature, tie-breaking, and small context changes can produce different outputs.
-- **World knowledge limits.** A model is not a live database. It may not know private, recent, or domain-specific facts unless you provide them through context or tools.
+- **Likely text is not always true text.** A fluent answer can still contain a wrong fact, invalid assumption, or skipped step.
+- **Ambiguous prompts allow multiple plausible interpretations.** If the prompt does not define the task, audience, constraints, or output format, the model has to choose.
+- **Missing context forces inference.** If the needed policy, document, customer record, or current fact is absent, the model may guess instead of saying it does not know.
+- **Training data can be incomplete, conflicting, or outdated.** Models may have seen many versions of a fact, and they do not automatically know which one applies now.
+- **Long tasks accumulate errors.** A workflow with many small judgments has more chances to drift than a single narrow classification.
+- **Tools and retrieval help, but they are not magic.** Search results can be irrelevant, retrieved passages can be stale, and tool outputs still need validation.
 
-Lowering temperature can reduce variation, but it does not solve missing context, ambiguous goals, or faulty reasoning. Asking for an explanation can help on reasoning tasks, but an explanation is not proof. For production systems, reliability comes from design and evaluation.
+The goal is to make the model's job narrower and more checkable.
 
-## A practical reliability loop
+## A reliability workflow
 
-Use this loop before reaching for heavier solutions:
+Use this order when improving a model-powered feature:
 
-1. **Define success.** Write down the exact output shape, acceptable uncertainty, and failure cases.
-2. **Create a small eval set.** Include easy, hard, ambiguous, adversarial, and real failed examples.
-3. **Start simple.** Use a capable model, a clear prompt, and representative examples.
-4. **Inspect failures.** Identify whether each miss is caused by missing context, unclear instructions, invalid structure, reasoning depth, or external knowledge.
-5. **Add the smallest control that targets the failure.** Use structured outputs, retrieval, tools, decomposition, examples, or verification as needed.
-6. **Run the eval again.** Keep changes that improve the target metric without creating regressions.
+1. **Give clear task instructions and constraints.**
+2. **Provide relevant context and examples.**
+3. **Ask for structured output when consistency matters.**
+4. **Break complex tasks into smaller steps.**
+5. **Use retrieval, tools, or grounding for factual work.**
+6. **Add checks, evals, or human review where mistakes matter.**
 
-## Write the task as a specification
+Start with the smallest change that targets the failure you actually see. If the model is missing facts, add context or retrieval. If it returns inconsistent JSON, add structured outputs. If it makes multi-step mistakes, split the task.
 
-A reliable prompt reads more like a compact task spec than a clever phrase. Include:
+## Give clear instructions and constraints
 
-- The role or task
-- The input the model should use
-- The output format
-- The decision rules
-- What to do when information is missing
-- A few examples when judgment is subtle
+A reliable prompt should read like a compact task specification. State the task, valid outputs, decision rules, and what to do when the answer is uncertain.
 
-For example:
+For production applications, put durable behavior in `instructions` and put the user's task-specific request in `input`:
 
-```text
-Classify the support ticket into one of these categories:
-Billing, Technical issue, Account access, Other.
+```python
+from openai import OpenAI
 
-Rules:
-- Use Other when the ticket does not clearly fit one category.
-- If the ticket has multiple issues, choose the category that blocks the user first.
-- Return only JSON with keys: category, confidence, rationale.
-- Keep rationale under 20 words.
+client = OpenAI()
 
-Ticket:
-"""
-I was charged twice and now I cannot log in to check the invoice.
-"""
+response = client.responses.create(
+    model="gpt-5.5",
+    instructions=(
+        "You classify support tickets. Return exactly one label: "
+        "Billing, Technical support, Account access, or Other. "
+        "Use Other when the ticket does not contain enough information. "
+        "If the ticket has multiple issues, choose the issue blocking the user first."
+    ),
+    input="I was charged twice and now I cannot log in to check the invoice.",
+)
+
+print(response.output_text)
 ```
 
-This prompt is more reliable than "Classify this ticket" because it removes hidden choices: the label set, tie-breaking rule, uncertainty behavior, and output shape are explicit.
+The important part is not the wording. It is that the hidden choices are no longer hidden: the label set, uncertainty behavior, and tie-breaking rule are explicit.
 
-## Provide the facts the model needs
+## Provide relevant context and examples
 
-If the answer depends on private documents, current facts, account state, prices, laws, policies, or database records, do not rely on the model's memory. Give the model the relevant context or a tool that can fetch it.
+Models perform better when the prompt includes the information and judgment patterns needed for the task.
 
-Common patterns:
+Add context when the answer depends on:
 
-- Use retrieval or file search for private or long documents.
-- Use web search or a trusted API for current facts.
-- Use database queries for account-specific state.
-- Ask the model to cite the source span or record ID it used.
-- Tell the model to say when the provided context is insufficient.
+- Private documents
+- Customer, account, or transaction state
+- Product policies
+- Current facts
+- Domain-specific terminology
+- A required writing style or decision standard
 
-Fine-tuning is usually not the right way to add changing facts. Fine-tuning changes behavior; retrieval supplies knowledge.
+Add examples when the model understands the general task but misses edge cases. Good examples are representative, not numerous. Include a typical case, a borderline case, a missing-information case, and a case that previously failed.
 
-## Split complex tasks into smaller steps
+Avoid dumping large documents into the prompt without selection. More context can help, but irrelevant context can distract the model and increase cost. Retrieve or pass the smallest useful set of facts.
 
-Models are more reliable when each step has a clear local objective. Instead of asking for a final answer from a large mixed task, split the work into smaller operations:
+## Ask for structured output when consistency matters
 
-- Extract relevant facts.
-- Identify constraints.
-- Resolve conflicts or missing information.
-- Compute or compare.
-- Produce the final answer in the required format.
+If another program consumes the result, use Structured Outputs or a schema instead of asking for "valid JSON" in prose. A schema makes the contract explicit and gives your application something deterministic to validate.
 
-For example, a legal, policy, or troubleshooting assistant might use this sequence:
+```python
+import json
+from openai import OpenAI
 
-1. Retrieve candidate source passages.
-2. Extract the passages that directly apply.
+client = OpenAI()
+
+response = client.responses.create(
+    model="gpt-5.5",
+    instructions=(
+        "Extract a support ticket. Use only these categories: "
+        "Billing, Technical support, Account access, Other. "
+        "Use Low, Medium, or High for urgency."
+    ),
+    input="I cannot log in and the password reset link says it expired.",
+    text={
+        "format": {
+            "type": "json_schema",
+            "name": "support_ticket",
+            "strict": True,
+            "schema": {
+                "type": "object",
+                "additionalProperties": False,
+                "properties": {
+                    "category": {
+                        "type": "string",
+                        "enum": [
+                            "Billing",
+                            "Technical support",
+                            "Account access",
+                            "Other",
+                        ],
+                    },
+                    "urgency": {
+                        "type": "string",
+                        "enum": ["Low", "Medium", "High"],
+                    },
+                    "summary": {"type": "string"},
+                },
+                "required": ["category", "urgency", "summary"],
+            },
+        }
+    },
+)
+
+ticket = json.loads(response.output_text)
+print(ticket["category"])
+```
+
+Structured output reduces parsing failures and label drift. It does not prove that the content is correct, so keep validating values that matter.
+
+## Break complex tasks into smaller steps
+
+Long, mixed tasks are harder to get right. Split them into smaller operations with clear inputs and outputs.
+
+For example, instead of asking a model to answer a policy question directly, use a pipeline:
+
+1. Retrieve candidate policy passages.
+2. Select the passages that directly apply.
 3. Decide whether the question is answerable from those passages.
 4. Draft the answer with citations.
-5. Run a verifier that checks whether every claim is supported.
+5. Check that each claim is supported by the cited text.
 
-This works because each step narrows the model's job. It also gives you intermediate artifacts to test, log, and debug.
+This makes each step easier to test. It also gives you intermediate artifacts to inspect when the final answer is wrong.
 
-## Ask for useful intermediate work
+For reasoning tasks, ask for useful intermediate work rather than a long explanation for its own sake. A checklist, evidence table, assumptions list, calculation inputs, or short rationale is easier to verify than a free-form chain of reasoning.
 
-For reasoning-heavy tasks, give the model room to work, but ask for intermediate artifacts that are useful to your application:
+## Use retrieval and tools for factual work
 
-- A checklist of criteria and whether each one is met
-- A table of evidence and source references
-- A list of assumptions
-- A calculation with named inputs and outputs
-- A short rationale for the final decision
+When correctness depends on external facts, give the model a way to get those facts. Do not expect the model to remember private, current, or account-specific information.
 
-Avoid depending on long hidden reasoning transcripts as the product output. A concise rationale, evidence table, or trace of tool calls is easier to verify and easier for users to trust.
+Use retrieval or file search for documents. Use web search or a trusted API for current public facts. Use application tools for customer records, inventory, order status, calculations, or business rules.
 
-## Constrain the output
+Then validate the grounding:
 
-If another program will consume the answer, do not rely on prose conventions. Use Structured Outputs or a schema so the model must return fields your code can validate.
+- Ask the model to cite source passages or record IDs.
+- Check that cited sources actually support the answer.
+- Handle empty or low-quality retrieval results explicitly.
+- Keep tool permissions narrow.
+- Log tool inputs and outputs for debugging.
 
-Good candidates for structured outputs:
+Tool use can improve accuracy, but it also adds new failure modes: bad queries, stale documents, partial results, incorrect tool arguments, or unsafe actions. Treat tool-using systems as software systems that need tests and guardrails.
 
-- Classification labels
-- Extracted entities
-- Routing decisions
-- Tool arguments
-- Evaluation results
-- Summaries with required sections
+## Add checks, evals, and review
 
-Constraints are especially useful when the valid answer space is small. An enum is easier to verify than a paragraph. A schema is easier to test than "return JSON if possible."
+Reliability work needs measurement. Build a small eval set before making repeated prompt changes.
 
-## Use tools for deterministic work
+Start with 10 to 30 examples:
 
-Language models are not calculators, databases, browsers, or permission systems. When correctness depends on an external operation, let the model call a tool and let the tool do the deterministic part.
+- Normal successful cases
+- Ambiguous requests
+- Missing-context requests
+- Known failures
+- Adversarial or prompt-injection attempts
+- High-impact edge cases
 
-Use tools for:
+Use deterministic checks whenever possible: schema validation, allowed labels, required citations, numeric ranges, exact-match fields, or business-rule checks. Use model-graded evals when human judgment is required, and sample those grades for quality. Add human review for high-stakes domains such as legal, medical, financial, hiring, security, or destructive actions.
 
-- Arithmetic, code execution, and data analysis
-- Search and retrieval
-- Looking up customer, order, or inventory records
-- Creating, updating, or deleting records
-- Calling business logic that already exists in your application
+Run evals when you change the prompt, model, retrieval settings, tool definitions, schemas, or decoding parameters. The eval set should grow every time you find a meaningful production failure.
 
-Keep tool permissions narrow. A model should only have access to the actions and data needed for the current task.
+## Common fixes
 
-## Generate, then verify
-
-Sometimes the cheapest reliability gain is to separate generation from checking.
-
-Useful patterns:
-
-- **Self-consistency:** sample several answers and choose the answer that appears most often. This works best when the answer space is limited.
-- **Verifier model:** ask a second model call to check whether the answer follows the prompt, uses the provided evidence, and matches the requested format.
-- **Code-based checks:** validate JSON schemas, required citations, numeric constraints, policy labels, or exact-match fields with deterministic code.
-- **Human review:** route low-confidence or high-impact cases to a person.
-
-Verification costs extra latency and tokens, so reserve it for tasks where the quality gain is worth the cost.
-
-## Tune model settings deliberately
-
-Model choice and decoding settings matter, but they should be tuned against evals rather than guessed.
-
-- Use a stronger model for ambiguous, high-stakes, or multi-step tasks.
-- Use smaller models for high-volume tasks after evals show they are good enough.
-- Lower temperature when you want less variation.
-- Increase reasoning effort only when the task benefits from deeper reasoning.
-- Cap output length when concise answers are part of correctness.
-
-Change one variable at a time and measure the result.
-
-## Fine-tune when behavior is the bottleneck
-
-Fine-tuning can improve reliability when you already know the task, have high-quality examples, and can measure success. It is often useful for stable style, domain-specific formatting, classification behavior, or repeated workflows where prompting alone is not enough.
-
-Before fine-tuning, try:
-
-1. Clearer instructions
-2. Better examples
-3. Structured outputs
-4. Retrieval or tools for missing facts
-5. A verifier or deterministic validation
-6. A representative eval set
-
-Fine-tuning should make a working system better. It should not be the first response to unclear requirements or missing data.
-
-## Common reliability playbook
-
-| Problem | First thing to try |
+| Failure | Try first |
 | --- | --- |
-| The model invents facts | Provide retrieval, source passages, or a lookup tool; require citations |
-| The answer is plausible but not what you wanted | Rewrite the prompt as a task spec with decision rules and examples |
-| JSON is invalid or inconsistent | Use Structured Outputs or stricter schema validation |
-| The model misses a step | Split the task into smaller stages with intermediate outputs |
-| Math or data analysis is wrong | Use code execution, a calculator, or deterministic business logic |
-| Labels drift over time | Add examples, enum constraints, and evals for edge cases |
-| Long prompts cause missed details | Retrieve only relevant context or summarize before answering |
-| Quality changes after a prompt or model update | Run regression evals before shipping |
-| The task is high impact | Add abstention rules, verification, logging, and human review |
+| Invented or stale facts | Add retrieval, source passages, or a trusted API |
+| Plausible but wrong interpretation | Add task constraints, decision rules, and examples |
+| Inconsistent JSON | Use Structured Outputs and schema validation |
+| Missed steps in a long task | Split the workflow into smaller model calls |
+| Bad math or data analysis | Use code execution or deterministic business logic |
+| Unsupported claims | Require citations and verify source support |
+| Overconfident answers | Add abstention rules and missing-context evals |
+| Quality regresses after a change | Run regression evals before shipping |
+| High-stakes decision | Add verification and human review |
 
 ## Closing thoughts
 
-The central idea is simple: do not ask one model call to be a complete reliable system by itself. Give the model the right context, narrow the job, constrain the output, use tools for deterministic work, and measure behavior with evals.
+Reliability is system design. A model call is one component inside a larger workflow that supplies context, constrains outputs, invokes tools, checks results, and escalates uncertain cases.
 
-Most reliability improvements are not exotic. They are the same engineering habits used everywhere else: specify the contract, reduce ambiguity, isolate failure modes, test representative cases, and add checks where mistakes matter.
+These techniques reduce risk; they do not remove it. The right standard is not "can the model answer this once?" The right standard is "does the system behave acceptably on the cases we expect, the edge cases we know about, and the failures we can afford to catch?"
 
 ## Further reading
 
@@ -204,11 +207,8 @@ Most reliability improvements are not exotic. They are the same engineering habi
 - [Function calling guide][Function calling]
 - [Working with evals][Evals]
 - [Supervised fine-tuning guide][Fine-tuning]
-- [Chain-of-Thought Prompting Elicits Reasoning in Large Language Models](https://arxiv.org/abs/2201.11903)
-- [Large Language Models are Zero-Shot Reasoners](https://arxiv.org/abs/2205.11916)
 - [Self-Consistency Improves Chain of Thought Reasoning in Language Models](https://arxiv.org/abs/2203.11171)
 - [Training Verifiers to Solve Math Word Problems](https://arxiv.org/abs/2110.14168)
-- [Least-to-most Prompting Enables Complex Reasoning in Large Language Models](https://arxiv.org/abs/2205.10625)
 - [Language Model Cascades](https://arxiv.org/abs/2207.10342)
 
 [Evals]: https://developers.openai.com/api/docs/guides/evals

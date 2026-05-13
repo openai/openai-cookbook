@@ -4,6 +4,21 @@
 # should build pages for, and indicates metadata such as tags, creation date and
 # authors for each page.
 
+- title: Authority Routing for Tool-Using Agents
+  path: examples/agents/authority_routing.ipynb
+  slug: authority-routing-for-tool-using-agents
+  description: Classify user-authorized work before tool selection using structured outputs and deterministic checks.
+  date: "2026-05-12"
+  authors:
+    - droptops
+  tags:
+    - agents
+    - evals
+    - guardrails
+    - responses
+    - structured-outputs
+    - tool calling
+
 - title: Evaluating Grounded Spatial Reasoning with GPT-5.5
   path: examples/multimodal/grounded_spatial_reasoning_layouts.ipynb
   slug: grounded-spatial-reasoning-layouts

@@ -575,8 +575,13 @@ annikab-oai:
 
 kathylau-oai:
   name: "Kathy Lau"
-  website: "https://github.com/kathylau-oai"
+  website: "https://www.linkedin.com/in/kathy-lau-nyc/"
   avatar: "https://avatars.githubusercontent.com/u/247463782"
+
+sidrampally-oai:
+  name: "Sid Rampally"
+  website: "https://www.linkedin.com/in/sidrampally/"
+  avatar: "https://avatars.githubusercontent.com/u/274336082?v=4"
 
 nsingaraju-oai:
   name: "Nishanth Singaraju"

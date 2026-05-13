@@ -4,6 +4,21 @@
 # should build pages for, and indicates metadata such as tags, creation date and
 # authors for each page.
 
+- title: Evaluating Grounded Spatial Reasoning with GPT-5.5
+  path: examples/multimodal/grounded_spatial_reasoning_layouts.ipynb
+  slug: grounded-spatial-reasoning-layouts
+  description: Build a spec-first floorplan layout workflow with vision, structured outputs, and deterministic spatial evals.
+  date: 2026-05-11
+  authors:
+    - sidrampally-oai
+    - kathylau-oai
+  tags:
+    - images
+    - vision
+    - reasoning
+    - structured-outputs
+    - evals
+
 - title: Building workspace agents in ChatGPT to complete repeatable, end-to-end work
   path: articles/chatgpt-agents-sales-meeting-prep.md
   slug: chatgpt-agents-sales-meeting-prep
@@ -3195,7 +3210,6 @@
     - cost
     - responses
     - realtime
-    
 - title: GPT Image Generation Models Prompting Guide
   path: examples/multimodal/image-gen-models-prompting-guide.ipynb
   slug: image-gen-models-prompting-guide
@@ -3232,3 +3246,31 @@
     - agents
     - memory
     - compaction
+
+- title: Build iterative repair loops with Codex
+  path: examples/codex/Build_iterative_repair_loops_with_Codex.ipynb
+  slug: build-iterative-repair-loops-with-codex
+  description: A Codex cookbook showing how to use review, repair, and validation loops to improve technical documentation artifacts.
+  date: 2026-05-11
+  authors:
+    - shreekant-openai
+  tags:
+    - codex
+    - agents
+    - evals
+
+- title: Build an Agent Improvement Loop with Traces, Evals, and Codex
+  path: examples/agents_sdk/agent_improvement_loop.ipynb
+  slug: agent-improvement-loop
+  description: Build a trace-driven improvement loop that turns human and model feedback into Promptfoo evals, HALO-ranked harness changes, and a Codex handoff.
+  date: 2026-05-12
+  authors:
+    - PASFIELD-OAI
+  tags:
+    - agents-sdk
+    - agents
+    - evals
+    - promptfoo
+    - tracing
+    - codex
+    - halo

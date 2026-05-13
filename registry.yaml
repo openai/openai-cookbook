@@ -4,7 +4,7 @@
 # should build pages for, and indicates metadata such as tags, creation date and
 # authors for each page.
 
-- title: Grounded Spatial Reasoning with Structured Layout Specs
+- title: Evaluating Grounded Spatial Reasoning with GPT-5.5
   path: examples/multimodal/grounded_spatial_reasoning_layouts.ipynb
   slug: grounded-spatial-reasoning-layouts
   description: Build a spec-first floorplan layout workflow with vision, structured outputs, and deterministic spatial evals.

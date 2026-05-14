@@ -21,6 +21,22 @@
     - promptfoo
     - clustering
 
+- title: Paying for APIs with x402 — an Agents SDK example
+  path: examples/agents_sdk/paying_apis_with_x402.ipynb
+  slug: paying-apis-with-x402
+  description: Build an OpenAI Agents SDK agent that calls paid HTTP APIs without an API key — pays per call in USDC from a Base wallet via the x402 protocol, with two real tools (sanctions screen + dual-chain on-chain anchor) and a dual-chain transaction receipt for every run.
+  date: 2026-05-13
+  authors:
+    - hypeprinter007-stack
+  tags:
+    - agents
+    - agents-sdk
+    - function-calling
+    - tools
+    - x402
+    - payments
+    - web3
+
 - title: Evaluating Grounded Spatial Reasoning with GPT-5.5
   path: examples/multimodal/grounded_spatial_reasoning_layouts.ipynb
   slug: grounded-spatial-reasoning-layouts

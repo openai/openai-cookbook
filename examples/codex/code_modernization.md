@@ -18,7 +18,7 @@ We’ll use a COBOL-based [investment portfolio system](https://github.com/senti
 
 We’ve broken it down into 5 different phases that revolve around an executive plan (ExecPlan in short), which is a design document that the agent can follow to deliver the system change.
 
-![Code Modernization Phases](../../images/code-modernization-phases.png)
+<img src="../../images/code-modernization-phases.png" alt="Code Modernization Phases" width="700"/>
 
 We will create 4 types of documents for the pilot flow we choose:
 

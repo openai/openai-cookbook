@@ -18,14 +18,14 @@ We’ll use a COBOL-based [investment portfolio system](https://github.com/senti
 
 We’ve broken it down into 5 different phases that revolve around an executive plan (ExecPlan in short), which is a design document that the agent can follow to deliver the system change.
 
-<img src="../../images/code-modernization-phases.png" alt="Code Modernization Phases" width="700"/>
+![Code Modernization Phases](../../images/code-modernization-phases.png)
 
 We will create 4 types of documents for the pilot flow we choose:
 
 * **pilot_execplan.md** - ExecPlan that orchestrates the pilot that answers: what’s in scope, why it matters, what steps we’ll take, and how we’ll know we’re done.
-* **pilot_overview.md** - Which legacy programs (COBOL in our example), orchestration jobs (JCL here), and data sources are involved, how data flows between them, and what the business flow actually does.
-* **pilot_design.md** - Target shape of the system: the service/module that will own this flow, the new data model, and the public APIs or batch entry points.
-* **pilot_validation.md** - Defines how we’ll prove parity: key scenarios, shared input datasets, how to run legacy vs modern side-by-side, and what “matching outputs” means in practice.
+* **pilot_reporting_overview.md** - Which legacy programs (COBOL in our example), orchestration jobs (JCL here), and data sources are involved, how data flows between them, and what the business flow actually does.
+* **pilot_reporting_design.md** - Target shape of the system: the service/module that will own this flow, the new data model, and the public APIs or batch entry points.
+* **pilot_reporting_validation.md** - Defines how we’ll prove parity: key scenarios, shared input datasets, how to run legacy vs modern side-by-side, and what “matching outputs” means in practice.
 
 These 4 files help lay out what code is being changed, what the new system should look like, and exactly how to check that behavior hasn’t regressed.
 

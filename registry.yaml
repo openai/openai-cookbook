@@ -4,6 +4,35 @@
 # should build pages for, and indicates metadata such as tags, creation date and
 # authors for each page.
 
+- title: Evaluating Grounded Spatial Reasoning with GPT-5.5
+  path: examples/multimodal/grounded_spatial_reasoning_layouts.ipynb
+  slug: grounded-spatial-reasoning-layouts
+  description: Build a spec-first floorplan layout workflow with vision, structured outputs, and deterministic spatial evals.
+  date: 2026-05-11
+  authors:
+    - sidrampally-oai
+    - kathylau-oai
+  tags:
+    - images
+    - vision
+    - reasoning
+    - structured-outputs
+    - evals
+
+- title: Using Goals in Codex
+  path: examples/codex/using_goals_in_codex.ipynb
+  slug: using-goals-in-codex
+  description: Use Goals in Codex to keep long-running work moving toward a persistent, evidence-checked outcome across turns.
+  date: 2026-05-09
+  authors:
+    - rajpathak-openai
+    - stefanofabbri-oai
+  tags:
+    - codex
+    - goals
+    - agents
+    - planning
+
 - title: Building workspace agents in ChatGPT to complete repeatable, end-to-end work
   path: articles/chatgpt-agents-sales-meeting-prep.md
   slug: chatgpt-agents-sales-meeting-prep
@@ -41,6 +70,19 @@
     - sandbox
     - security
     - evals
+
+- title: Agents SDK Deployment Manager
+  path: examples/agents_sdk/deployment_manager/README.md
+  slug: agents-sdk-deployment-manager
+  description: Run, inspect, and trace local Agents SDK demo apps from a browser-based deployment manager.
+  date: 2026-05-05
+  authors:
+    - alfozan
+  tags:
+    - agents-sdk
+    - agents
+    - tracing
+    - deployment
 
 - title: Getting the Most out of GPT-5.4 for Vision and Document Understanding
   path: examples/multimodal/document_and_multimodal_understanding_tips.ipynb
@@ -2793,6 +2835,21 @@
     - responses
     - speech
 
+- title: Build Live Translation Apps with gpt-realtime-translate
+  path: examples/voice_solutions/realtime_translation_guide.mdx
+  slug: realtime-translation-guide
+  description: Cookbook for building browser, phone, and video-call translation experiences with Realtime Translation.
+  date: 2026-05-07
+  authors:
+    - erikakettleson-openai
+  tags:
+    - realtime
+    - audio
+    - speech
+    - translation
+    - webrtc
+    - websockets
+
 - title: Multi-Language One-Way Translation with the Realtime API
   path: examples/voice_solutions/one_way_translation_using_realtime_api.mdx
   slug: one-way-translation-using-realtime-api
@@ -3167,7 +3224,6 @@
     - cost
     - responses
     - realtime
-    
 - title: GPT Image Generation Models Prompting Guide
   path: examples/multimodal/image-gen-models-prompting-guide.ipynb
   slug: image-gen-models-prompting-guide
@@ -3204,3 +3260,31 @@
     - agents
     - memory
     - compaction
+
+- title: Build iterative repair loops with Codex
+  path: examples/codex/Build_iterative_repair_loops_with_Codex.ipynb
+  slug: build-iterative-repair-loops-with-codex
+  description: A Codex cookbook showing how to use review, repair, and validation loops to improve technical documentation artifacts.
+  date: 2026-05-11
+  authors:
+    - shreekant-openai
+  tags:
+    - codex
+    - agents
+    - evals
+
+- title: Build an Agent Improvement Loop with Traces, Evals, and Codex
+  path: examples/agents_sdk/agent_improvement_loop.ipynb
+  slug: agent-improvement-loop
+  description: Build a trace-driven improvement loop that turns human and model feedback into Promptfoo evals, HALO-ranked harness changes, and a Codex handoff.
+  date: 2026-05-12
+  authors:
+    - PASFIELD-OAI
+  tags:
+    - agents-sdk
+    - agents
+    - evals
+    - promptfoo
+    - tracing
+    - codex
+    - halo

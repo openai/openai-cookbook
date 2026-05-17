@@ -4,6 +4,18 @@
 # should build pages for, and indicates metadata such as tags, creation date and
 # authors for each page.
 
+- title: Auditable Agent Completion Receipts
+  path: examples/agents_sdk/auditable_agent_completion_receipts.md
+  slug: auditable-agent-completion-receipts
+  description: Add a lightweight receipt pattern for separating agent completion claims from evidence, ownership, and human approval boundaries.
+  date: 2026-05-17
+  authors:
+    - aDragon0707
+  tags:
+    - agents-sdk
+    - agents
+    - tracing
+    - guardrails
 - title: Evaluating Grounded Spatial Reasoning with GPT-5.5
   path: examples/multimodal/grounded_spatial_reasoning_layouts.ipynb
   slug: grounded-spatial-reasoning-layouts

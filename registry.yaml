@@ -33,6 +33,18 @@
     - agents
     - planning
 
+- title: Use TokRepo from Codex CLI
+  path: examples/codex/use_tokrepo_from_codex_cli.md
+  slug: use-tokrepo-from-codex-cli
+  description: Connect TokRepo's MCP server to Codex CLI so repositories can discover, verify, and plan installs for reusable agent assets.
+  date: 2026-05-19
+  authors:
+    - henu-wang
+  tags:
+    - codex
+    - mcp
+    - agents
+
 - title: Building workspace agents in ChatGPT to complete repeatable, end-to-end work
   path: articles/chatgpt-agents-sales-meeting-prep.md
   slug: chatgpt-agents-sales-meeting-prep

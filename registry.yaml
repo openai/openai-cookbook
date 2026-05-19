@@ -4,6 +4,18 @@
 # should build pages for, and indicates metadata such as tags, creation date and
 # authors for each page.
 
+- title: Hard-Cap Your openai-agents Bill With Out-of-Process Budget Guardrails
+  path: examples/agents_sdk/budget_guardrails_with_spendguard/budget_guardrails_with_spendguard.ipynb
+  slug: budget-guardrails-with-spendguard
+  description: Add a fail-closed, cryptographically-audited budget cap to an openai-agents agent using Agentic SpendGuard — as an input guardrail or via OPENAI_BASE_URL passthrough.
+  date: 2026-05-19
+  authors:
+    - m24927605
+  tags:
+    - agents-sdk
+    - agents
+    - guardrails
+
 - title: Evaluating Grounded Spatial Reasoning with GPT-5.5
   path: examples/multimodal/grounded_spatial_reasoning_layouts.ipynb
   slug: grounded-spatial-reasoning-layouts

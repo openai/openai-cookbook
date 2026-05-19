@@ -91,6 +91,7 @@ Most migrations come down to ten decisions:
 | Multi-agent ownership     | Use `agent.as_tool(...)` to keep the orchestrator in control, or pass control to specialist via `handoffs=[...]` |
 | Conversation continuation | Choose separate strategies for conversation context, paused-run resume, and sandbox-session resume               |
 | Approvals                 | Gate side effects behind human approval and resume from interruptions                                            |
+| Lifecycle callbacks       | Move logging/tracing to `RunHooks` or `AgentHooks`. Move blocking, approval, or execution-shaping logic to guardrails, approvals, or filters |
 
 Start by identifying the behavior each Claude capability provided, then choose the OpenAI surface that preserves that behavior with the right execution and safety boundary.
 
@@ -312,8 +313,6 @@ Expected result: The assistant should recommend AS-301 because it's SFO to JFK o
 
 ## Migration path: Claude baseline to OpenAI
 
-Use the [Claude to OpenAI Agents migrator skill](https://skillbook.app.openai.org/hillarydanan/claude-to-openai-agents-migrator) to generate a dry-run migration plan before applying this guide manually. The migrator analyzes a local repository and produces a migration plan, including targeted file-by-file edits to make.
-
 | Claude Agent SDK                          | OpenAI Agents SDK                                                         | Migration-safe rule                                                                                                                                                                            |
 | ----------------------------------------- | ------------------------------------------------------------------------- | ---------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
 | `ClaudeAgentOptions` + `system_prompt`    | `Agent(name, instructions, model, tools)`                                 | Define one responsibility per agent.                                                                                                                                                           |
@@ -363,10 +362,16 @@ def check_travel_policy(flight_id: str, max_price_usd: int) -> dict:
 
 ### OpenAI migrated agent and run loop
 
+Set `MODEL` and `GUARDRAIL_MODEL` to any current Responses-capable models that support the Agents SDK features your app uses.
+
 ```python
+MODEL = "gpt-5.5"
+GUARDRAIL_MODEL = "gpt-5.5-mini"
+
+
 agent = Agent(
     name="Flight Booking Assistant",
-    model="gpt-5.5",
+    model=MODEL,
     instructions=(
         "You help users evaluate flight options. "
         "Always search flights and check travel policy before recommending. "
@@ -384,7 +389,7 @@ result = await Runner.run(
 print(result.final_output)
 ```
 
-Expected result: The final response should still recommend AS-301 or explain escalation if the request changes so no compliant option exists.
+Expected result: The assistant should recommend AS-301 because it's SFO to JFK on the requested date, costs $642, and is refundable. It shouldn't recommend DL-441 even though it's under $700 because the policy requires refundable fares.
 
 ## Step-by-step migration
 
@@ -421,9 +426,9 @@ Use `@function_tool` for business or domain actions. Use hosted tools for OpenAI
 | Web search or external lookup                  | Use `WebSearchTool` for web search, `HostedMCPTool` for remote MCP tools, or a typed `@function_tool` when the lookup is a business-system action.              |
 | Retrieval over indexed files or knowledge base | Use `FileSearchTool` for retrieval over OpenAI vector stores.                                                                                                   |
 | Business system call                           | Use `@function_tool` or MCP in the trusted runtime.                                                                                                             |
-| Shell command or script                        | Use hosted/local `ShellTool` for occasional shell access. Use `SandboxAgent` with `Shell()` when commands should run inside an isolated or resumable workspace. |
-| File read, edit, or search                     | Use `SandboxAgent` with `Shell()` and, when needed, `Filesystem()` for workspace file inspection, search, or generated artifacts.                               |
-| Patch or code edit                             | Use `SandboxAgent` with `ApplyPatch()` and `Shell()` for sandbox code edits and validation. Use `ApplyPatchTool` when implementing outside a sandbox.           |
+| Shell command or script                        | Use hosted/local `ShellTool` for occasional shell access. Use [`SandboxAgent`](https://developers.openai.com/api/docs/guides/agents/sandboxes) with `Shell()` when commands should run inside an isolated or resumable workspace. |
+| File read, edit, or search                     | Use [`SandboxAgent`](https://developers.openai.com/api/docs/guides/agents/sandboxes) with `Shell()` and, when needed, `Filesystem()` for workspace file inspection, search, or generated artifacts.                               |
+| Patch or code edit                             | Use [`SandboxAgent`](https://developers.openai.com/api/docs/guides/agents/sandboxes) with `ApplyPatch()` and `Shell()` for sandbox code edits and validation. Use `ApplyPatchTool` when implementing outside a sandbox.           |
 
 Note: if the Claude app defines custom helpers such as `read_file`, `write_file`, `grep_files`, or `run_bash`, avoid porting them 1:1. Map file reads, edits, search, and shell commands to the closest built-in OpenAI tool with a sandbox workspace.
 
@@ -442,7 +447,8 @@ Use guardrails for validation that should happen before the run starts, the tool
 
 Example: require core booking fields before tools run.
 
-Define the guardrail first, then attach it to the flight-booking agent. Setting the guardrail to run in blocking mode checks the request before the main agent can call any tools.
+Define the guardrail first, then attach it to the flight-booking agent. Setting the guardrail to run in blocking mode checks the request before the main agent can call any tools. By default, input guardrails run in parallel with the main agent for lower latency. Here we set `run_in_parallel=False` because this validation must complete before the agent is allowed to begin tool use.
+
 
 ```python
 from pydantic import BaseModel
@@ -466,7 +472,7 @@ class BookingRequestCheck(BaseModel):
 
 booking_guardrail_agent = Agent(
     name="Booking request guardrail",
-    model="gpt-5.5-mini",
+    model=GUARDRAIL_MODEL,
     instructions=(
         "Decide whether the user is asking for a flight-booking recommendation. "
         "The request is ready only if it includes a route, travel date, and budget."
@@ -501,7 +507,7 @@ async def require_ready_booking_request(
 
 agent = Agent(
     name="Flight Booking Assistant",
-    model="gpt-5.5",
+    model=MODEL,
     instructions=(
         "You help users evaluate flight options. "
         "Always search flights and check travel policy before recommending. "
@@ -533,13 +539,13 @@ from agents import Agent, ModelSettings, Runner
 
 pricing_specialist = Agent(
     name="Pricing Specialist",
-    model="gpt-5.5",
+    model=MODEL,
     instructions="Analyze candidate flights and return a short pricing verdict.",
 )
 
 manager = Agent(
     name="Travel Manager",
-    model="gpt-5.5",
+    model=MODEL,
     instructions=(
         "Call pricing_tool first, then give the final customer-facing recommendation yourself."
     ),
@@ -562,13 +568,13 @@ Use this pattern when the specialist agent should take over. The orchestrator ha
 ```python
 booking_specialist = Agent(
     name="Booking Specialist",
-    model="gpt-5.5",
+    model=MODEL,
     instructions="You own final flight-booking recommendations once transferred.",
 )
 
 triage = Agent(
     name="Travel Triage",
-    model="gpt-5.5",
+    model=MODEL,
     instructions="Always hand off flight-booking tasks to Booking Specialist.",
     handoffs=[booking_specialist],
     model_settings=ModelSettings(tool_choice="required"),
@@ -611,7 +617,6 @@ async def add_checked_bag(booking_id: str, bags: int) -> dict:
     }
 
 
-# `agent` should include `add_checked_bag` in its `tools` list.
 first = await Runner.run(agent, "Add one checked bag to booking AS-301.")
 state = first.to_state()
 
@@ -636,7 +641,7 @@ Check the migration one building block at a time before composing the full app.
 | Multi-agent ownership | `agent.as_tool(...)` preserves parent ownership; handoff transfers ownership.                                                                                               |
 | Continuation          | Prior turns carry through the chosen strategy consistently.                                                                                                                 |
 | Approvals             | Approval-gated actions pause, surface interruptions, then resume or reject cleanly.                                                                                         |
-| Sandbox               | Agent access stays limited to the intended workspace and execution surface.                                                                                                 |
+| [Sandbox](https://developers.openai.com/api/docs/guides/agents/sandboxes) | Agent access stays limited to the intended workspace and execution surface.                                                                                                 |
 | Lifecycle callbacks   | Logging and tracking callbacks map to `RunHooks` or `AgentHooks`. Callbacks that block, approve, or reshape execution map to guardrails, approvals, or filters.             |
 | Subagents             | Each subagent maps to `agent.as_tool(...)` or `handoffs=[...]` with explicit ownership.                                                                                     |
 | End-to-end behavior   | The migrated app preserves original Claude business behavior.                                                                                                               |
@@ -658,9 +663,6 @@ Check the migration one building block at a time before composing the full app.
 
 A successful migration preserves the business task and updates the execution model.
 
-- **Start with the migration skill.**
-  Before applying this guide manually, use the [Claude to OpenAI Agents migrator skill](https://skillbook.app.openai.org/hillarydanan/claude-to-openai-agents-migrator) to generate a dry-run plan.
-
 - **Add sandboxing where isolation matters.**
   OpenAI's Agents SDK separates the trusted application from the workspace where risky or stateful work happens. Use the sandbox when the agent needs scoped files, command execution, artifacts, or resumable workspace state.
 
@@ -675,3 +677,7 @@ A successful migration preserves the business task and updates the execution mod
 
 - **For multi-agent ownership, use `agent.as_tool(...)` when the main agent should stay in charge.**
   Use `handoffs=[...]` when a specialist should own the final response.
+
+## Community resources
+
+- [Claude to OpenAI Agents migrator skill](https://skillbook.app.openai.org/hillarydanan/claude-to-openai-agents-migrator) can generate a dry-run migration plan for a local repository. Community-authored: review the skill before applying it to production code.

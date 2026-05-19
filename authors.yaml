@@ -575,13 +575,8 @@ annikab-oai:
 
 kathylau-oai:
   name: "Kathy Lau"
-  website: "https://www.linkedin.com/in/kathy-lau-nyc/"
+  website: "https://github.com/kathylau-oai"
   avatar: "https://avatars.githubusercontent.com/u/247463782"
-
-sidrampally-oai:
-  name: "Sid Rampally"
-  website: "https://www.linkedin.com/in/sidrampally/"
-  avatar: "https://avatars.githubusercontent.com/u/274336082?v=4"
 
 nsingaraju-oai:
   name: "Nishanth Singaraju"
@@ -596,10 +591,9 @@ sophiaqin-openai:
 PASFIELD-OAI:
   name: "Wesley Pasfield"
   website: "https://github.com/PASFIELD-OAI"
-  avatar: "https://avatars.githubusercontent.com/u/276116382?v=4"
+  avatar: "https://avatars.githubusercontent.com/u/276116382?v=4"  
 
-
-shreekant-openai:
-  name: "Shreekant Agrawal"
-  website: "https://www.linkedin.com/in/shreeagrawal/"
-  avatar: "https://avatars.githubusercontent.com/u/263776704?v=4"
+anshgupta-oai:
+  name: "Ansh Gupta"
+  website: "https://github.com/anshgupta-oai"
+  avatar: "https://avatars.githubusercontent.com/u/269039830?v=4"

@@ -4,6 +4,23 @@
 # should build pages for, and indicates metadata such as tags, creation date and
 # authors for each page.
 
+- title: Macro Evals for Agentic Systems
+  path: examples/partners/macro_evals_for_agentic_systems/macro_evals_for_agentic_systems.ipynb
+  slug: macro-evals-for-agentic-systems
+  description: A partner cookbook from OpenAI and Slalom showing how to evaluate multi-agent systems by clustering trace-level eval signals into recurring behavior patterns and drilling into high-impact patterns.
+  date: 2026-05-19
+  authors:
+    - Will Thieme
+    - Bradley
+    - Shikhar
+  tags:
+    - partners
+    - agents
+    - evals
+    - tracing
+    - promptfoo
+    - clustering
+
 - title: Long horizon tasks with Codex
   path: examples/codex/long_horizon_tasks.md
   slug: long-horizon-tasks

@@ -19,6 +19,20 @@
     - structured-outputs
     - evals
 
+- title: Using Goals in Codex
+  path: examples/codex/using_goals_in_codex.ipynb
+  slug: using-goals-in-codex
+  description: Use Goals in Codex to keep long-running work moving toward a persistent, evidence-checked outcome across turns.
+  date: 2026-05-09
+  authors:
+    - rajpathak-openai
+    - stefanofabbri-oai
+  tags:
+    - codex
+    - goals
+    - agents
+    - planning
+
 - title: Building workspace agents in ChatGPT to complete repeatable, end-to-end work
   path: articles/chatgpt-agents-sales-meeting-prep.md
   slug: chatgpt-agents-sales-meeting-prep

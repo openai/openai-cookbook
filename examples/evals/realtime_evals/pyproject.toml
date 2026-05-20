@@ -1,0 +1,33 @@
+[project]
+name = "realtime-evals"
+version = "0.1.0"
+description = "Real-time evaluation examples using the OpenAI Realtime API"
+readme = "README.md"
+requires-python = ">=3.12"
+dependencies = [
+    "matplotlib==3.10.7",
+    "openai[realtime]==2.15.0",
+    "pandas==2.3.3",
+    "seaborn==0.13.2",
+]
+
+[dependency-groups]
+dev = [
+  "ruff",
+  "mypy",
+  "pandas-stubs",
+  "pytest",
+  "streamlit",
+  "types-seaborn",
+  "types-tqdm",
+]
+
+[tool.ruff.lint]
+ignore = ["E402"]
+
+[tool.mypy]
+explicit_package_bases = true
+
+[[tool.mypy.overrides]]
+module = ["streamlit", "streamlit.*"]
+ignore_missing_imports = true

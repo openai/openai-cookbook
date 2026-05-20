@@ -29,7 +29,6 @@ from typing import Any, Dict, List, cast
 import pandas as pd
 from openai import AsyncOpenAI, OpenAI
 from openai.types.realtime import (
-    RealtimeResponseCreateParamsParam,
     RealtimeSessionCreateRequestParam,
 )
 from tqdm import tqdm
@@ -40,12 +39,26 @@ if str(ROOT_DIR) not in sys.path:
 
 from shared.graders import compute_tool_call_grade
 from shared.metrics_utils import add_numeric_summaries, order_columns
+from shared.plotting_utils import build_realtime_eval_plots
 from shared.realtime_harness_utils import (
+    RealtimeResponseError,
     audio_format_config,
     collect_realtime_response,
     ensure_dir,
     stream_audio_to_connection,
     write_pcm16_wav,
+)
+from shared.result_types import (
+    CrawlEvalResult,
+    CrawlEvalRunConfig,
+    CrawlEvalRunSummary,
+    EvalErrorInfo,
+    ExpectedToolCall,
+    OutputTokenUsage,
+    ResultArtifactPaths,
+    ResultLatencies,
+    ToolCallGrade,
+    ToolCallRecord,
 )
 
 SHARED_DIR = ROOT_DIR / "shared"
@@ -96,6 +109,11 @@ def parse_args() -> argparse.Namespace:
         default=0,
         help="Limit number of examples for quick checks.",
     )
+    parser.add_argument(
+        "--skip-plots",
+        action="store_true",
+        help="Skip rendering styled summary plots into results/<run_id>/plots/.",
+    )
     return parser.parse_args()
 
 
@@ -131,6 +149,56 @@ def tts_to_pcm_bytes(client: OpenAI, text: str, model: str, voice: str) -> bytes
         audio_chunks = [chunk for chunk in response.iter_bytes()]
     return b"".join(audio_chunks)
 
+
+def build_error_info(exc: Exception, default_stage: str) -> EvalErrorInfo:
+    failure_stage = default_stage
+    if isinstance(exc, RealtimeResponseError) and exc.failure_stage:
+        failure_stage = exc.failure_stage
+    return EvalErrorInfo(
+        status="failed",
+        failure_stage=failure_stage,
+        error_type=type(exc).__name__,
+        error_message=str(exc),
+    )
+
+
+def build_failed_result(
+    row: pd.Series,
+    run_audio_dir: Path,
+    run_events_dir: Path,
+    error_info: EvalErrorInfo,
+) -> CrawlEvalResult:
+    example_id = str(row["example_id"])
+    user_text = str(row["user_text"])
+    expected_tool_call = (
+        "" if bool(pd.isna(row["gt_tool_call"])) else str(row["gt_tool_call"])
+    )
+    expected_tool_call_arg = (
+        "" if bool(pd.isna(row["gt_tool_call_arg"])) else str(row["gt_tool_call_arg"])
+    )
+    example_audio_dir = run_audio_dir / example_id
+    input_audio_path = example_audio_dir / "input.wav"
+    event_log_path = run_events_dir / f"{example_id}.jsonl"
+    return CrawlEvalResult(
+        example_id=example_id,
+        user_text=user_text,
+        expected_tool_call=ExpectedToolCall(
+            name=expected_tool_call, arguments_json=expected_tool_call_arg
+        ),
+        assistant_text="",
+        tool_calls=[],
+        tool_call_grade=ToolCallGrade(),
+        artifact_paths=ResultArtifactPaths(
+            input_audio_path=input_audio_path,
+            event_log_path=event_log_path,
+            output_audio_path=None,
+        ),
+        latencies=ResultLatencies(),
+        output_tokens=OutputTokenUsage(),
+        error_info=error_info,
+    )
+
+
 async def run_single_eval(
     async_client: AsyncOpenAI,
     tts_client: OpenAI,
@@ -140,7 +208,7 @@ async def run_single_eval(
     run_audio_dir: Path,
     run_events_dir: Path,
     config: Dict[str, Any],
-) -> Dict[str, Any]:
+) -> CrawlEvalResult:
     example_id = str(row["example_id"])
     user_text = str(row["user_text"])
     expected_tool_call = (
@@ -195,7 +263,7 @@ async def run_single_eval(
             config["real_time"],
         )
 
-        response_payload: RealtimeResponseCreateParamsParam = {}
+        response_payload: Dict[str, Any] = {}
         events_path = run_events_dir / f"{example_id}.jsonl"
         with events_path.open("w", encoding="utf-8") as log_file:
             # Record the full event stream so regressions are easy to debug later.
@@ -204,21 +272,20 @@ async def run_single_eval(
             )
 
     assistant_text = response_result["assistant_text"]
-    tool_calls = response_result["tool_calls"]
+    raw_tool_calls = response_result["tool_calls"]
+    tool_calls = [
+        ToolCallRecord.from_mapping(tool_call) for tool_call in raw_tool_calls
+    ]
     output_audio_bytes = response_result["output_audio_bytes"]
     tool_call_grade_data = compute_tool_call_grade(
         expected_tool_call, expected_tool_call_arg, tool_calls
     )
-    tool_call_correctness = tool_call_grade_data["tool_call_correctness"]
-    tool_call_arg_correctness = tool_call_grade_data["tool_call_arg_correctness"]
-    grade = 1 if tool_call_correctness == 1 and tool_call_arg_correctness == 1 else 0
+    tool_call_grade = ToolCallGrade.from_mapping(tool_call_grade_data)
 
-    output_audio_path = ""
+    output_audio_path: Path | None = None
     if output_audio_bytes:
-        output_audio_path = str(example_audio_dir / "output.wav")
-        write_pcm16_wav(
-            Path(output_audio_path), output_audio_bytes, config["sample_rate_hz"]
-        )
+        output_audio_path = example_audio_dir / "output.wav"
+        write_pcm16_wav(output_audio_path, output_audio_bytes, config["sample_rate_hz"])
 
     usage_data = response_result["usage"]
     usage_output_tokens = usage_data.get("output_tokens", None)
@@ -229,34 +296,47 @@ async def run_single_eval(
         usage_output_audio_tokens = output_details.get("audio_tokens")
         usage_output_text_tokens = output_details.get("text_tokens")
 
-    return {
-        "example_id": example_id,
-        "user_text": user_text,
-        "gt_tool_call": expected_tool_call,
-        "gt_tool_call_arg": expected_tool_call_arg,
-        "input_audio_path": str(input_audio_path),
-        "assistant_text": assistant_text,
-        "output_audio_path": output_audio_path,
-        "event_log_path": str(events_path),
-        "tool_calls": json.dumps(tool_calls),
-        "pred_tool_call": tool_call_grade_data["pred_tool_call"],
-        "pred_tool_call_arg": tool_call_grade_data["pred_tool_call_arg"],
-        "tool_call_correctness": tool_call_correctness,
-        "tool_call_arg_correctness": tool_call_arg_correctness,
-        "grade": grade,
-        "latency_first_audio_ms": response_result["first_audio_time_ms"],
-        "latency_first_text_ms": response_result["first_text_time_ms"],
-        "latency_response_done_ms": response_result["response_done_time_ms"],
-        "output_tokens": usage_output_tokens,
-        "output_audio_tokens": usage_output_audio_tokens,
-        "output_text_tokens": usage_output_text_tokens,
-    }
+    return CrawlEvalResult(
+        example_id=example_id,
+        user_text=user_text,
+        expected_tool_call=ExpectedToolCall(
+            name=expected_tool_call, arguments_json=expected_tool_call_arg
+        ),
+        assistant_text=assistant_text,
+        tool_calls=tool_calls,
+        tool_call_grade=tool_call_grade,
+        artifact_paths=ResultArtifactPaths(
+            input_audio_path=input_audio_path,
+            event_log_path=events_path,
+            output_audio_path=output_audio_path,
+        ),
+        latencies=ResultLatencies(
+            first_audio_ms=response_result["first_audio_time_ms"],
+            first_text_ms=response_result["first_text_time_ms"],
+            response_done_ms=response_result["response_done_time_ms"],
+        ),
+        output_tokens=OutputTokenUsage(
+            output_tokens=usage_output_tokens,
+            output_audio_tokens=usage_output_audio_tokens,
+            output_text_tokens=usage_output_text_tokens,
+        ),
+    )
 
 
-def compute_summary(results: pd.DataFrame) -> Dict[str, Any]:
+def compute_summary(
+    results: pd.DataFrame, config: CrawlEvalRunConfig
+) -> CrawlEvalRunSummary:
+    failed_examples = 0
+    if "status" in results.columns:
+        failed_examples = int((results["status"] == "failed").sum())
     summary: Dict[str, Any] = {
         "total_examples": int(results.shape[0]),
-        "grade_mean": float(results["grade"].mean()) if not results.empty else 0.0,
+        "failed_examples": failed_examples,
+        "grade_mean": (
+            float(results["grade"].mean())
+            if "grade" in results.columns and not results.empty
+            else 0.0
+        ),
     }
     if "tool_call_correctness" in results.columns and not results.empty:
         summary["tool_call_correctness_mean"] = float(
@@ -280,22 +360,26 @@ def compute_summary(results: pd.DataFrame) -> Dict[str, Any]:
         ],
     )
 
-    return summary
+    return CrawlEvalRunSummary.from_flat_summary(summary, config)
 
 
 def order_result_columns(results: pd.DataFrame) -> pd.DataFrame:
     preferred = [
         "example_id",
         "user_text",
+        "assistant_text",
         "gt_tool_call",
         "pred_tool_call",
+        "tool_call_correctness",
         "gt_tool_call_arg",
         "pred_tool_call_arg",
-        "tool_call_correctness",
         "tool_call_arg_correctness",
         "grade",
-        "assistant_text",
         "tool_calls",
+        "status",
+        "failure_stage",
+        "error_type",
+        "error_message",
         "event_log_path",
         "input_audio_path",
         "output_audio_path",
@@ -340,52 +424,75 @@ async def run_evals() -> None:
     async_client = AsyncOpenAI()
     tts_client = OpenAI()
 
-    results: List[Dict[str, Any]] = []
+    results: List[CrawlEvalResult] = []
     total_examples = int(dataset.shape[0])
     print(f"Running crawl evals: {total_examples} examples -> {run_dir}")
     for _, row in tqdm(dataset.iterrows(), total=total_examples, desc="Crawl evals"):
-        result = await run_single_eval(
-            async_client,
-            tts_client,
-            row,
-            system_prompt,
-            tools,
-            run_audio_dir,
-            run_events_dir,
-            config,
-        )
+        try:
+            result = await run_single_eval(
+                async_client,
+                tts_client,
+                row,
+                system_prompt,
+                tools,
+                run_audio_dir,
+                run_events_dir,
+                config,
+            )
+        except Exception as exc:
+            error_info = build_error_info(exc, "example_execution")
+            tqdm.write(f"[crawl] example {row['example_id']} failed: {exc}")
+            result = build_failed_result(row, run_audio_dir, run_events_dir, error_info)
         results.append(result)
 
-    results_df = pd.DataFrame(results)
+    results_df = pd.DataFrame(
+        [
+            result.to_csv_row(
+                include_tool_call_columns=True,
+                include_tool_call_arg_columns=True,
+            )
+            for result in results
+        ]
+    )
     results_df = order_result_columns(results_df)
     results_csv_path = run_dir / "results.csv"
     results_df.to_csv(results_csv_path, index=False)
 
-    summary = compute_summary(results_df)
-    summary.update(
-        {
-            "run_name": run_name,
-            "model": args.model,
-            "tts_model": args.tts_model,
-            "voice": args.voice,
-            "chunk_ms": args.chunk_ms,
-            "sample_rate_hz": args.sample_rate_hz,
-            "input_audio_format": args.input_audio_format,
-            "output_audio_format": args.output_audio_format,
-            "real_time": args.real_time,
-            "data_csv": str(args.data_csv),
-            "system_prompt_file": str(args.system_prompt_file),
-            "tools_file": str(args.tools_file),
-        }
+    summary = compute_summary(
+        results_df,
+        CrawlEvalRunConfig(
+            run_name=run_name,
+            model=args.model,
+            tts_model=args.tts_model,
+            voice=args.voice,
+            chunk_ms=args.chunk_ms,
+            sample_rate_hz=args.sample_rate_hz,
+            input_audio_format=args.input_audio_format,
+            output_audio_format=args.output_audio_format,
+            real_time=args.real_time,
+            data_csv=args.data_csv,
+            system_prompt_file=args.system_prompt_file,
+            tools_file=args.tools_file,
+        ),
     )
 
     summary_path = run_dir / "summary.json"
-    summary_path.write_text(json.dumps(summary, indent=2), encoding="utf-8")
+    summary_dict = summary.to_flat_summary()
+    summary_path.write_text(json.dumps(summary_dict, indent=2), encoding="utf-8")
+    if not args.skip_plots:
+        plot_paths = build_realtime_eval_plots(
+            results=results_df,
+            summary=summary_dict,
+            output_dir=run_dir / "plots",
+            harness_label="crawl harness",
+            run_name=run_name,
+        )
+        print(f"Wrote {len(plot_paths)} plot(s) to {run_dir / 'plots'}")
     print(
         "Summary:"
-        f" grade_mean={summary.get('grade_mean', 0):.3f}"
-        f" tool_call_correctness_mean={summary.get('tool_call_correctness_mean', 0):.3f}"
-        f" tool_call_arg_correctness_mean={summary.get('tool_call_arg_correctness_mean', 0):.3f}"
+        f" grade_mean={summary.grade_mean:.3f}"
+        f" tool_call_correctness_mean={summary.tool_call_correctness_mean or 0:.3f}"
+        f" tool_call_arg_correctness_mean={summary.tool_call_arg_correctness_mean or 0:.3f}"
     )
     print(f"Wrote results to {run_dir}")
 

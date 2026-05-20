@@ -3,6 +3,8 @@
 
 ## Flagship models
 
+GPT-Reatime-1.5 is our flagship audio model for voice agents & customer support.
+
 
 
 ## Models overview

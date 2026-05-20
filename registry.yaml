@@ -7,12 +7,12 @@
 - title: Macro Evals for Agentic Systems
   path: examples/partners/macro_evals_for_agentic_systems/macro_evals_for_agentic_systems.ipynb
   slug: macro-evals-for-agentic-systems
-  description: A partner cookbook from OpenAI and Slalom showing how to evaluate multi-agent systems by clustering trace-level eval signals into recurring behavior patterns and drilling into high-impact patterns.
+  description: A cookbook showing how to evaluate multi-agent systems by clustering trace-level eval signals into recurring behavior patterns and drilling into high-impact patterns.
   date: 2026-05-19
   authors:
+    - Shikhar Kwatra
     - Will Thieme
-    - Bradley
-    - Shikhar
+    - Bradley Strauss
   tags:
     - partners
     - agents

@@ -1,0 +1,9 @@
+# Use the Agents SDK 2.0 preview branch while this launch cookbook is being drafted.
+# Replace this with the published Agents SDK 2.0 package pin before publication.
+openai-agents[cloudflare,docker,e2b]
+docker==7.1.0
+pandas==3.0.2
+pytest==9.0.2
+python-dotenv==1.2.2
+PyYAML==6.0.3
+ruff==0.15.9

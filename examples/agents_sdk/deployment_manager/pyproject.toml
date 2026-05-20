@@ -1,0 +1,18 @@
+[project]
+name = "agents-sdk-deployment-manager"
+version = "0.1.0"
+description = "Local deployment manager for Agents SDK demos"
+requires-python = ">=3.12"
+dependencies = [
+    "flask>=3.1.0",
+    "pydantic>=2.12.0",
+    "python-dotenv>=1.2.0",
+]
+
+[dependency-groups]
+dev = [
+    "ruff>=0.15.6",
+]
+
+[tool.setuptools.packages.find]
+include = ["app"]

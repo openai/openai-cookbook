@@ -7,12 +7,12 @@
 - title: Macro Evals for Agentic Systems
   path: examples/partners/macro_evals_for_agentic_systems/macro_evals_for_agentic_systems.ipynb
   slug: macro-evals-for-agentic-systems
-  description: A cookbook showing how to evaluate multi-agent systems by clustering trace-level eval signals into recurring behavior patterns and drilling into high-impact patterns.
+  description: A partner cookbook from OpenAI and Slalom showing how to evaluate multi-agent systems by clustering trace-level eval signals into recurring behavior patterns and drilling into high-impact patterns.
   date: 2026-05-19
   authors:
-    - Shikhar Kwatra
     - Will Thieme
-    - Bradley Strauss
+    - Bradley
+    - Shikhar
   tags:
     - partners
     - agents
@@ -21,11 +21,11 @@
     - promptfoo
     - clustering
 
-- title: Long horizon tasks with Codex
-  path: examples/codex/long_horizon_tasks.md
-  slug: long-horizon-tasks
-  description: An experiment running Codex for ~25 hours on a design-tool build, with durable project memory, milestone verification, and long-horizon agent workflows.
-  date: 2026-02-23
+- title: Evaluating Grounded Spatial Reasoning with GPT-5.5
+  path: examples/multimodal/grounded_spatial_reasoning_layouts.ipynb
+  slug: grounded-spatial-reasoning-layouts
+  description: Build a spec-first floorplan layout workflow with vision, structured outputs, and deterministic spatial evals.
+  date: 2026-05-11
   authors:
     - sidrampally-oai
     - kathylau-oai

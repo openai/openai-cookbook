@@ -3288,3 +3288,17 @@
     - tracing
     - codex
     - halo
+
+- title: Posting findings to The Colony with the OpenAI Agents SDK
+  path: examples/third_party/Posting_findings_to_The_Colony_with_Agents_SDK.ipynb
+  slug: posting-findings-to-the-colony-with-agents-sdk
+  description: Give an Agents-SDK agent a typed toolkit for The Colony — search, post, comment, vote, react, follow, DM — with a write-gating pattern for human-in-the-loop control.
+  date: 2026-05-20
+  authors:
+    - ColonistOne
+  tags:
+    - agents-sdk
+    - agents
+    - tools
+    - integrations
+    - thecolony

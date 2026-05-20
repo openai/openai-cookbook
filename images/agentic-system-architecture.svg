@@ -1,0 +1,246 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="1600" height="1040" viewBox="0 0 1600 1040" role="img" aria-labelledby="title desc">
+  <title id="title">End-to-end macro evals architecture for an agentic system</title>
+  <desc id="desc">A four-column architecture diagram showing simulation inputs, agent swarm runtime, saved evidence, notebook workflow outputs, and the feedback loop.</desc>
+  <defs>
+    <marker id="arrow-blue" markerWidth="11" markerHeight="11" refX="9" refY="3.5" orient="auto" markerUnits="strokeWidth">
+      <path d="M0,0 L0,7 L9,3.5 z" fill="#2563eb"/>
+    </marker>
+    <marker id="arrow-slate" markerWidth="10" markerHeight="10" refX="8" refY="3" orient="auto" markerUnits="strokeWidth">
+      <path d="M0,0 L0,6 L8,3 z" fill="#475569"/>
+    </marker>
+    <style>
+      text { font-family: Inter, Avenir Next, Arial, sans-serif; fill: #0f172a; }
+      .title { font-size: 34px; font-weight: 700; }
+      .subtitle { font-size: 17px; fill: #475569; }
+      .band-title { font-size: 18px; font-weight: 700; }
+      .band-note { font-size: 13px; fill: #64748b; }
+      .box-title { font-size: 15px; font-weight: 700; }
+      .box-text { font-size: 12.5px; fill: #334155; }
+      .legend-title { font-size: 13px; font-weight: 700; }
+      .legend-text { font-size: 12px; fill: #475569; }
+      .feedback-label { font-size: 13px; font-weight: 700; fill: #475569; }
+      .feedback-text { font-size: 12px; fill: #475569; }
+      .band { fill: #f8fafc; stroke: #cbd5e1; stroke-width: 1.3; }
+      .input { fill: #ecfeff; stroke: #0891b2; stroke-width: 1.6; }
+      .runtime { fill: #eff6ff; stroke: #2563eb; stroke-width: 1.6; }
+      .agent { fill: #ffffff; stroke: #60a5fa; stroke-width: 1.35; }
+      .evidence { fill: #f0fdf4; stroke: #16a34a; stroke-width: 1.6; }
+      .notebook { fill: #f5f3ff; stroke: #7c3aed; stroke-width: 1.6; }
+      .output { fill: #ffffff; stroke: #7c3aed; stroke-width: 1.6; }
+      .bus { stroke: #2563eb; stroke-width: 2.2; fill: none; stroke-linecap: round; stroke-linejoin: round; }
+      .flow { stroke: #2563eb; stroke-width: 2.2; fill: none; marker-end: url(#arrow-blue); stroke-linecap: round; stroke-linejoin: round; }
+      .route { stroke: #475569; stroke-width: 1.8; fill: none; marker-end: url(#arrow-slate); stroke-linecap: round; stroke-linejoin: round; }
+      .feedback { stroke: #64748b; stroke-width: 1.8; fill: none; stroke-dasharray: 7 6; marker-end: url(#arrow-slate); stroke-linecap: round; stroke-linejoin: round; }
+      .label-bg { fill: #ffffff; stroke: #cbd5e1; stroke-width: 1; }
+    </style>
+  </defs>
+
+  <rect width="1600" height="1040" fill="#ffffff"/>
+
+  <text x="56" y="56" class="title">End-to-end macro evals for an agentic system</text>
+  <text x="56" y="86" class="subtitle">How changing-world scenarios become agent traces, saved Promptfoo labels, macro-discovery views, and review actions.</text>
+
+  <rect x="40" y="124" width="262" height="760" rx="14" class="band"/>
+  <text x="64" y="156" class="band-title">1. Simulation Inputs</text>
+  <text x="64" y="178" class="band-note">The contract defines each scenario.</text>
+
+  <rect x="70" y="210" width="202" height="124" rx="10" class="input"/>
+  <text x="90" y="240" class="box-title">Scenario contract</text>
+  <text x="90" y="265" class="box-text">scenario_family</text>
+  <text x="90" y="284" class="box-text">market_regime</text>
+  <text x="90" y="303" class="box-text">price_regime</text>
+  <text x="90" y="322" class="box-text">schedule_regime</text>
+
+  <rect x="70" y="392" width="202" height="82" rx="10" class="input"/>
+  <text x="90" y="420" class="box-title">Order cases</text>
+  <text x="90" y="444" class="box-text">clean, validation block,</text>
+  <text x="90" y="463" class="box-text">capacity hold, compound risks</text>
+
+  <rect x="70" y="528" width="202" height="104" rx="10" class="input"/>
+  <text x="90" y="556" class="box-title">Market drift</text>
+  <text x="90" y="580" class="box-text">tariffs, incentives, launch</text>
+  <text x="90" y="599" class="box-text">pressure, competitor moves,</text>
+  <text x="90" y="618" class="box-text">pricing and demand shifts</text>
+
+  <rect x="70" y="678" width="202" height="104" rx="10" class="input"/>
+  <text x="90" y="706" class="box-title">Operational constraints</text>
+  <text x="90" y="730" class="box-text">stockouts, capacity,</text>
+  <text x="90" y="749" class="box-text">factory release, scheduling,</text>
+  <text x="90" y="768" class="box-text">customer ambiguity</text>
+
+  <rect x="340" y="124" width="420" height="760" rx="14" class="band"/>
+  <text x="364" y="156" class="band-title">2. Agent Swarm Runtime</text>
+  <text x="364" y="178" class="band-note">The spine routes work through specialists.</text>
+
+  <rect x="378" y="210" width="344" height="84" rx="12" class="runtime"/>
+  <text x="404" y="240" class="box-title">Orchestration spine</text>
+  <text x="404" y="264" class="box-text">PostConfigOrchestrator, shadow mode,</text>
+  <text x="404" y="283" class="box-text">swarm monitor, routing policy</text>
+
+  <rect x="370" y="350" width="170" height="100" rx="10" class="agent"/>
+  <text x="392" y="376" class="box-title">Pricing and</text>
+  <text x="392" y="397" class="box-title">market</text>
+  <text x="392" y="421" class="box-text">PricingAndOffer</text>
+  <text x="392" y="440" class="box-text">PromotionStrategy</text>
+
+  <rect x="560" y="350" width="170" height="100" rx="10" class="agent"/>
+  <text x="582" y="376" class="box-title">Supply and</text>
+  <text x="582" y="397" class="box-title">capacity</text>
+  <text x="582" y="421" class="box-text">SupplierRisk</text>
+  <text x="582" y="440" class="box-text">SupplyAllocation</text>
+
+  <rect x="370" y="484" width="170" height="108" rx="10" class="agent"/>
+  <text x="392" y="512" class="box-title">Validation</text>
+  <text x="392" y="536" class="box-text">Buildability</text>
+  <text x="392" y="555" class="box-text">Compliance</text>
+  <text x="392" y="574" class="box-text">Design review</text>
+
+  <rect x="560" y="484" width="170" height="108" rx="10" class="agent"/>
+  <text x="582" y="512" class="box-title">Fulfillment</text>
+  <text x="582" y="536" class="box-text">FactoryRouting</text>
+  <text x="582" y="555" class="box-text">ProductionScheduling</text>
+  <text x="582" y="574" class="box-text">FactoryRelease</text>
+
+  <rect x="370" y="636" width="170" height="108" rx="10" class="agent"/>
+  <text x="392" y="664" class="box-title">Customer handling</text>
+  <text x="392" y="688" class="box-text">CustomerComms</text>
+  <text x="392" y="707" class="box-text">Clarification</text>
+  <text x="392" y="726" class="box-text">Config exceptions</text>
+
+  <rect x="560" y="636" width="170" height="108" rx="10" class="agent"/>
+  <text x="582" y="664" class="box-title">Review path</text>
+  <text x="582" y="688" class="box-text">HumanEscalation</text>
+  <text x="582" y="707" class="box-text">review packet</text>
+  <text x="582" y="726" class="box-text">approve or changes</text>
+
+  <rect x="378" y="790" width="344" height="80" rx="10" class="runtime"/>
+  <text x="404" y="815" class="box-title">Observable runtime events</text>
+  <text x="404" y="839" class="box-text">agent spans, handoffs, function calls,</text>
+  <text x="404" y="858" class="box-text">responses, findings, terminal states</text>
+
+  <rect x="800" y="124" width="260" height="760" rx="14" class="band"/>
+  <text x="824" y="156" class="band-title">3. Saved Evidence</text>
+  <text x="824" y="178" class="band-note">GitHub carries the offline evidence.</text>
+
+  <rect x="832" y="220" width="196" height="92" rx="10" class="evidence"/>
+  <text x="852" y="248" class="box-title">trace_bundles.zip</text>
+  <text x="852" y="272" class="box-text">992 bundle-backed traces</text>
+  <text x="852" y="291" class="box-text">spans, handoffs, tools</text>
+
+  <rect x="832" y="360" width="196" height="86" rx="10" class="evidence"/>
+  <text x="852" y="388" class="box-title">trace_results.jsonl</text>
+  <text x="852" y="412" class="box-text">1,000 result rows</text>
+  <text x="852" y="431" class="box-text">8 runner-error rows</text>
+
+  <rect x="832" y="496" width="196" height="86" rx="10" class="evidence"/>
+  <text x="852" y="524" class="box-title">eval_labels.jsonl</text>
+  <text x="852" y="548" class="box-text">saved Promptfoo labels</text>
+  <text x="852" y="567" class="box-text">rubric checks and findings</text>
+
+  <rect x="832" y="632" width="196" height="84" rx="10" class="evidence"/>
+  <text x="852" y="660" class="box-title">run_summary.json</text>
+  <text x="852" y="684" class="box-text">batch profile, coverage,</text>
+  <text x="852" y="703" class="box-text">source counts</text>
+
+  <rect x="832" y="766" width="196" height="70" rx="10" class="evidence"/>
+  <text x="852" y="794" class="box-title">Optional SQLite</text>
+  <text x="852" y="818" class="box-text">local enrichment only</text>
+
+  <rect x="1100" y="124" width="460" height="760" rx="14" class="band"/>
+  <text x="1124" y="156" class="band-title">4. Notebook Workflow</text>
+  <text x="1124" y="178" class="band-note">Promptfoo labels join before discovery; outputs close the loop.</text>
+
+  <rect x="1134" y="216" width="390" height="64" rx="10" class="notebook"/>
+  <text x="1156" y="243" class="box-title">Load packaged data and expand</text>
+  <text x="1156" y="264" class="box-title">bundles</text>
+
+  <rect x="1134" y="306" width="390" height="54" rx="10" class="notebook"/>
+  <text x="1156" y="339" class="box-title">Normalize traces and events</text>
+
+  <rect x="1134" y="386" width="390" height="54" rx="10" class="notebook"/>
+  <text x="1156" y="419" class="box-title">Join saved Promptfoo labels</text>
+
+  <rect x="1134" y="466" width="390" height="68" rx="10" class="notebook"/>
+  <text x="1156" y="494" class="box-title">Build analysis documents</text>
+  <text x="1156" y="516" class="box-text">trace sketch, failure window, state summary</text>
+
+  <rect x="1134" y="560" width="390" height="68" rx="10" class="notebook"/>
+  <text x="1156" y="588" class="box-title">Discover patterns</text>
+  <text x="1156" y="610" class="box-text">clusters, slices, heatmaps, leaderboard</text>
+
+  <rect x="1134" y="654" width="390" height="68" rx="10" class="notebook"/>
+  <text x="1156" y="682" class="box-title">Diagnose focus pattern</text>
+  <text x="1156" y="704" class="box-text">suspects, swimlane, story strip</text>
+
+  <rect x="1134" y="748" width="390" height="118" rx="10" class="output"/>
+  <text x="1156" y="778" class="box-title">Outputs and review targets</text>
+  <text x="1156" y="802" class="box-text">• Queues: high-risk cases to inspect first</text>
+  <text x="1156" y="821" class="box-text">• Views: heatmaps and swimlanes for evidence</text>
+  <text x="1156" y="840" class="box-text">• Owners: likely specialist or workflow owner</text>
+  <text x="1156" y="859" class="box-text">• Actions: debug, remediate, and rerun</text>
+
+  <rect x="70" y="915" width="1434" height="80" rx="12" fill="#ffffff" stroke="#cbd5e1" stroke-width="1.2"/>
+  <text x="94" y="946" class="legend-title">Color legend</text>
+  <rect x="210" y="932" width="18" height="18" rx="4" class="input"/><text x="238" y="946" class="legend-text">simulation contract and inputs</text>
+  <rect x="438" y="932" width="18" height="18" rx="4" class="runtime"/><text x="466" y="946" class="legend-text">runtime orchestration and agent work</text>
+  <rect x="730" y="932" width="18" height="18" rx="4" class="evidence"/><text x="758" y="946" class="legend-text">saved offline evidence, including Promptfoo labels</text>
+  <rect x="1084" y="932" width="18" height="18" rx="4" class="notebook"/><text x="1112" y="946" class="legend-text">notebook transformation and outputs</text>
+
+  <path d="M171 334 L171 392" class="route"/>
+  <path d="M70 268 L50 268 L50 576 L70 576" class="route"/>
+  <path d="M70 268 L44 268 L44 726 L70 726" class="route"/>
+
+  <path d="M272 433 L314 433" class="bus"/>
+  <path d="M272 576 L314 576" class="bus"/>
+  <path d="M272 726 L314 726" class="bus"/>
+  <path d="M314 252 L314 726" class="bus"/>
+  <path d="M314 252 L378 252" class="flow"/>
+
+  <path d="M550 294 L550 322" class="bus"/>
+  <path d="M455 322 L645 322" class="bus"/>
+  <path d="M455 322 L455 350" class="route"/>
+  <path d="M645 322 L645 350" class="route"/>
+  <path d="M550 322 L550 456" class="bus"/>
+  <path d="M455 450 L455 456" class="bus"/>
+  <path d="M645 450 L645 456" class="bus"/>
+  <path d="M455 456 L645 456" class="bus"/>
+  <path d="M455 456 L455 484" class="route"/>
+  <path d="M645 456 L645 484" class="route"/>
+  <path d="M550 456 L550 608" class="bus"/>
+  <path d="M455 592 L455 608" class="bus"/>
+  <path d="M645 592 L645 608" class="bus"/>
+  <path d="M455 608 L645 608" class="bus"/>
+  <path d="M455 608 L455 636" class="route"/>
+  <path d="M645 608 L645 636" class="route"/>
+  <path d="M455 744 L455 770 L550 770" class="bus"/>
+  <path d="M645 744 L645 770 L550 770" class="bus"/>
+  <path d="M550 770 L550 790" class="route"/>
+
+  <path d="M722 828 L780 828" class="bus"/>
+  <path d="M780 266 L780 828" class="bus"/>
+  <path d="M780 266 L832 266" class="flow"/>
+  <path d="M780 403 L832 403" class="flow"/>
+  <path d="M780 674 L832 674" class="flow"/>
+
+  <path d="M1028 266 L1082 266" class="bus"/>
+  <path d="M1028 403 L1082 403" class="bus"/>
+  <path d="M1028 539 L1082 539" class="bus"/>
+  <path d="M1028 674 L1082 674" class="bus"/>
+  <path d="M1082 248 L1082 674" class="bus"/>
+  <path d="M1082 248 L1134 248" class="flow"/>
+  <path d="M1082 333 L1134 333" class="flow"/>
+  <path d="M1082 413 L1134 413" class="flow"/>
+  <path d="M1082 500 L1134 500" class="flow"/>
+
+  <path d="M1329 280 L1329 306" class="route"/>
+  <path d="M1329 360 L1329 386" class="route"/>
+  <path d="M1329 440 L1329 466" class="route"/>
+  <path d="M1329 534 L1329 560" class="route"/>
+  <path d="M1329 628 L1329 654" class="route"/>
+  <path d="M1329 722 L1329 748" class="route"/>
+
+  <path d="M1329 866 L1329 900 L550 900 L550 870" class="feedback"/>
+  <rect x="774" y="881" width="154" height="32" rx="16" class="label-bg"/>
+  <text x="798" y="902" class="feedback-label">feedback loop</text>
+  <text x="94" y="974" class="feedback-text">Review findings update scenario design, routing policy, specialist prompts, and evaluation rubrics.</text>
+</svg>

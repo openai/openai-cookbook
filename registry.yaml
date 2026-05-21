@@ -4,6 +4,19 @@
 # should build pages for, and indicates metadata such as tags, creation date and
 # authors for each page.
 
+- title: Trust-Gated MCP Tool Calls in the Agents SDK
+  path: examples/agents_sdk/mcp_trust_verification.ipynb
+  slug: mcp-trust-verification
+  description: Add pre-call trust verification for MCP server tools using the Agents SDK and Dominion Observatory
+  date: 2026-05-21
+  authors:
+    - dineshkumar
+  tags:
+    - agents
+    - mcp
+    - safety
+    - tools
+
 - title: Macro Evals for Agentic Systems
   path: examples/partners/macro_evals_for_agentic_systems/macro_evals_for_agentic_systems.ipynb
   slug: macro-evals-for-agentic-systems

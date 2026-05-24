@@ -4,6 +4,23 @@
 # should build pages for, and indicates metadata such as tags, creation date and
 # authors for each page.
 
+- title: Macro Evals for Agentic Systems
+  path: examples/partners/macro_evals_for_agentic_systems/macro_evals_for_agentic_systems.ipynb
+  slug: macro-evals-for-agentic-systems
+  description: A cookbook showing how to evaluate multi-agent systems by clustering trace-level eval signals into recurring behavior patterns and drilling into high-impact patterns.
+  date: 2026-05-19
+  authors:
+    - shikhar-cyber
+    - Will Thieme
+    - Bradley Strauss
+  tags:
+    - partners
+    - agents
+    - evals
+    - tracing
+    - promptfoo
+    - clustering
+
 - title: Evaluating Grounded Spatial Reasoning with GPT-5.5
   path: examples/multimodal/grounded_spatial_reasoning_layouts.ipynb
   slug: grounded-spatial-reasoning-layouts

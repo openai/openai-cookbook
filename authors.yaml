@@ -3,6 +3,16 @@
 # You can optionally customize how your information shows up cookbook.openai.com over here.
 # If your information is not present here, it will be pulled from your GitHub profile.
 
+kkahadze-oai:
+  name: "Konstantine Kahadze"
+  website: "https://www.linkedin.com/in/kahadze/"
+  avatar: "https://avatars.githubusercontent.com/kkahadze-oai"
+
+lpesut-daytona:
+  name: "Lovre Pesut"
+  website: "https://github.com/rovle"
+  avatar: "https://avatars.githubusercontent.com/rovle"
+
 zhenweig-cerebras:
   name: "Zhenwei Gao"
   website: "https://www.linkedin.com/in/zhenwei-gao/"
@@ -222,6 +232,11 @@ aaronwilkowitz-openai:
   name: "Aaron Wilkowitz"
   website: "https://www.linkedin.com/in/aaronwilkowitz/"
   avatar: "https://avatars.githubusercontent.com/u/157151487"
+
+stefanofabbri-oai:
+  name: "Stefano Fabbri"
+  website: "https://www.linkedin.com/in/stefano-fabbri-633a1895/"
+  avatar: "https://media.licdn.com/dms/image/v2/C5603AQGekzEY9dhxXA/profile-displayphoto-shrink_400_400/profile-displayphoto-shrink_400_400/0/1639500546853?e=1779926400&v=beta&t=siVg-MLpr70UfpUYhcEg86sxqcKSOU-jC7V4iT4FtK0"
 
 charuj:
   name: "Charu Jaiswal"
@@ -565,10 +580,31 @@ annikab-oai:
 
 kathylau-oai:
   name: "Kathy Lau"
-  website: "https://github.com/kathylau-oai"
+  website: "https://www.linkedin.com/in/kathy-lau-nyc/"
   avatar: "https://avatars.githubusercontent.com/u/247463782"
+
+sidrampally-oai:
+  name: "Sid Rampally"
+  website: "https://www.linkedin.com/in/sidrampally/"
+  avatar: "https://avatars.githubusercontent.com/u/274336082?v=4"
 
 nsingaraju-oai:
   name: "Nishanth Singaraju"
   website: "https://github.com/nsingaraju-oai"
   avatar: "https://avatars.githubusercontent.com/u/232978332"
+
+sophiaqin-openai:
+  name: "Sophia Qin"
+  website: "https://github.com/sophiaqin-openai"
+  avatar: "https://avatars.githubusercontent.com/u/205098674?v=4"
+
+PASFIELD-OAI:
+  name: "Wesley Pasfield"
+  website: "https://github.com/PASFIELD-OAI"
+  avatar: "https://avatars.githubusercontent.com/u/276116382?v=4"
+
+
+shreekant-openai:
+  name: "Shreekant Agrawal"
+  website: "https://www.linkedin.com/in/shreeagrawal/"
+  avatar: "https://avatars.githubusercontent.com/u/263776704?v=4"

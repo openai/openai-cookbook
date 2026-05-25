@@ -4,13 +4,26 @@
 # should build pages for, and indicates metadata such as tags, creation date and
 # authors for each page.
 
+- title: Build an OpenAI agent that edits formula WorkPapers with Bilig MCP
+  path: examples/mcp/bilig_workpaper_mcp_agent/README.md
+  slug: bilig-workpaper-mcp-agent
+  description: Connect an OpenAI Agents SDK agent to a local Bilig WorkPaper MCP server for formula-backed workbook edits, recalculation, JSON persistence, and readback verification.
+  date: 2026-05-21
+  authors:
+    - gregkonush
+  tags:
+    - agents-sdk
+    - agents
+    - mcp
+    - tools
+
 - title: Macro Evals for Agentic Systems
   path: examples/partners/macro_evals_for_agentic_systems/macro_evals_for_agentic_systems.ipynb
   slug: macro-evals-for-agentic-systems
   description: A cookbook showing how to evaluate multi-agent systems by clustering trace-level eval signals into recurring behavior patterns and drilling into high-impact patterns.
   date: 2026-05-19
   authors:
-    - shikhar-cyber
+    - Shikhar Kwatra
     - Will Thieme
     - Bradley Strauss
   tags:

@@ -23,7 +23,7 @@
   description: A cookbook showing how to evaluate multi-agent systems by clustering trace-level eval signals into recurring behavior patterns and drilling into high-impact patterns.
   date: 2026-05-19
   authors:
-    - Shikhar Kwatra
+    - shikhar-cyber
     - Will Thieme
     - Bradley Strauss
   tags:

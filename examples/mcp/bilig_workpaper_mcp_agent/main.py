@@ -10,7 +10,7 @@ from agents.mcp import MCPServerStdio, create_static_tool_filter
 from agents.model_settings import ModelSettings
 
 
-BILIG_PACKAGE = "@bilig/workpaper@0.94.0"
+BILIG_PACKAGE = "@bilig/workpaper@0.96.0"
 SUMMARY_RANGE = "Summary!A1:B5"
 INPUT_SHEET = "Inputs"
 INPUT_CELL = "B3"

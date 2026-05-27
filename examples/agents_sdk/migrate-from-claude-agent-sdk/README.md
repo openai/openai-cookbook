@@ -677,7 +677,3 @@ A successful migration preserves the business task and updates the execution mod
 
 - **For multi-agent ownership, use `agent.as_tool(...)` when the main agent should stay in charge.**
   Use `handoffs=[...]` when a specialist should own the final response.
-
-## Community resources
-
-- [Claude to OpenAI Agents migrator skill](https://skillbook.app.openai.org/hillarydanan/claude-to-openai-agents-migrator) can generate a dry-run migration plan for a local repository. Community-authored: review the skill before applying it to production code.

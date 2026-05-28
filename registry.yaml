@@ -4,6 +4,18 @@
 # should build pages for, and indicates metadata such as tags, creation date and
 # authors for each page.
 
+- title: Building a custom MCP server from scratch with FastMCP
+  path: examples/mcp/mcp_custom_server.ipynb
+  slug: mcp-custom-server-fastmcp
+  description: A hands-on guide to creating your own Model Context Protocol (MCP) server from scratch using FastMCP, then wiring it into an OpenAI agent with tool calling and multi-agent handoffs.
+  date: 2026-05-27
+  authors:
+    - Aaryan Tajanpure
+  tags:
+    - mcp
+    - agents-sdk
+    - fastmcp
+
 - title: Macro Evals for Agentic Systems
   path: examples/partners/macro_evals_for_agentic_systems/macro_evals_for_agentic_systems.ipynb
   slug: macro-evals-for-agentic-systems

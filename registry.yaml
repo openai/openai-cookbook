@@ -4,6 +4,20 @@
 # should build pages for, and indicates metadata such as tags, creation date and
 # authors for each page.
 
+- title: Getting Started with OpenAI Models on Amazon Bedrock
+  path: examples/partners/AWS/openai_models_with_amazon_bedrock.ipynb
+  slug: openai-models-with-amazon-bedrock
+  description: Learn how to invoke an OpenAI-compatible Amazon Bedrock endpoint using the OpenAI Python SDK, along with equivalent cURL examples, and leverage Responses API capabilities available through Amazon Bedrock.
+  date: 2026-05-31
+  authors:
+    - shikhar-cyber
+    - sudee-oai
+  tags:
+    - partners
+    - responses
+    - api
+    - bedrock
+
 - title: Build an OpenAI agent that edits formula WorkPapers with Bilig MCP
   path: examples/mcp/bilig_workpaper_mcp_agent/README.md
   slug: bilig-workpaper-mcp-agent
@@ -100,6 +114,19 @@
     - sandbox
     - security
     - evals
+
+- title: Migrate from the Claude Agent SDK to the OpenAI Agents SDK
+  path: examples/agents_sdk/migrate-from-claude-agent-sdk/README.md
+  slug: migrate-from-claude-agent-sdk
+  description: Learn how to migrate Claude Agent SDK applications to the OpenAI Agents SDK, including tool mapping, guardrails, handoffs, approvals, and sandbox boundaries.
+  date: 2026-05-07
+  authors:
+    - anshgupta-oai
+  tags:
+    - agents-sdk
+    - agents
+    - migration
+    - sandbox
 
 - title: Agents SDK Deployment Manager
   path: examples/agents_sdk/deployment_manager/README.md

@@ -196,3 +196,32 @@ def test_validate_output_rejects_missing_run_grade_mean(tmp_path: Path) -> None:
 
     with pytest.raises(ValueError, match="instruction_following_grade_mean"):
         validate_output("run", run_dir)
+
+
+def test_validate_walk_results_skips_missing_audio_for_failed_rows(tmp_path: Path) -> None:
+    """A failed walk row may reference a missing audio_path; validation must skip it.
+
+    Regression test: _validate_walk_results hard-coded row_status="ok" for the
+    audio_path existence check, so failed rows (whose audio_path legitimately
+    points to a non-existent file) raised ValueError instead of being skipped.
+    """
+    from shared.scripts.validate_eval_output import _validate_walk_results
+
+    missing_audio = str(tmp_path / "missing_audio.wav")
+    failed_row = {
+        "example_id": "ex_1",
+        "user_text": "hello",
+        "assistant_text": "",
+        "tool_calls": "[]",
+        "audio_path": missing_audio,
+        "event_log_path": "",
+        "status": "failed",
+    }
+
+    # Failed row with a missing audio file must validate without raising.
+    _validate_walk_results(pd.DataFrame([failed_row]), tmp_path / "results.csv")
+
+    # Control: the same missing path on an "ok" row must still be rejected.
+    ok_row = {**failed_row, "status": "ok"}
+    with pytest.raises(ValueError, match="audio_path"):
+        _validate_walk_results(pd.DataFrame([ok_row]), tmp_path / "results.csv")

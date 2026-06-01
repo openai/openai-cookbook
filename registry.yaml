@@ -4,6 +4,131 @@
 # should build pages for, and indicates metadata such as tags, creation date and
 # authors for each page.
 
+- title: Getting Started with OpenAI Models on Amazon Bedrock
+  path: examples/partners/AWS/openai_models_with_amazon_bedrock.ipynb
+  slug: openai-models-with-amazon-bedrock
+  description: Learn how to invoke an OpenAI-compatible Amazon Bedrock endpoint using the OpenAI Python SDK, along with equivalent cURL examples, and leverage Responses API capabilities available through Amazon Bedrock.
+  date: 2026-05-31
+  authors:
+    - shikhar-cyber
+    - sudee-oai
+  tags:
+    - partners
+    - responses
+    - api
+    - bedrock
+
+
+- title: Macro Evals for Agentic Systems
+  path: examples/partners/macro_evals_for_agentic_systems/macro_evals_for_agentic_systems.ipynb
+  slug: macro-evals-for-agentic-systems
+  description: A cookbook showing how to evaluate multi-agent systems by clustering trace-level eval signals into recurring behavior patterns and drilling into high-impact patterns.
+  date: 2026-05-19
+  authors:
+    - shikhar-cyber
+    - Will Thieme
+    - Bradley Strauss
+  tags:
+    - partners
+    - agents
+    - evals
+    - tracing
+    - promptfoo
+    - clustering
+
+- title: Evaluating Grounded Spatial Reasoning with GPT-5.5
+  path: examples/multimodal/grounded_spatial_reasoning_layouts.ipynb
+  slug: grounded-spatial-reasoning-layouts
+  description: Build a spec-first floorplan layout workflow with vision, structured outputs, and deterministic spatial evals.
+  date: 2026-05-11
+  authors:
+    - sidrampally-oai
+    - kathylau-oai
+  tags:
+    - images
+    - vision
+    - reasoning
+    - structured-outputs
+    - evals
+
+- title: Using Goals in Codex
+  path: examples/codex/using_goals_in_codex.ipynb
+  slug: using-goals-in-codex
+  description: Use Goals in Codex to keep long-running work moving toward a persistent, evidence-checked outcome across turns.
+  date: 2026-05-09
+  authors:
+    - rajpathak-openai
+    - stefanofabbri-oai
+  tags:
+    - codex
+    - goals
+    - agents
+    - planning
+
+- title: Building workspace agents in ChatGPT to complete repeatable, end-to-end work
+  path: articles/chatgpt-agents-sales-meeting-prep.md
+  slug: chatgpt-agents-sales-meeting-prep
+  description: Build, test, schedule, and share a ChatGPT workspace agent that prepares sales meeting briefs with calendar, SharePoint, and web search context.
+  date: 2026-04-22
+  authors:
+    - nikhils-oai
+  tags:
+    - chatgpt
+    - agents
+    - enterprise
+
+- title: Computer Use Agents in Daytona Sandboxes
+  path: examples/agents_sdk/computer_use_with_daytona/computer_use_with_daytona.ipynb
+  slug: computer-use-with-daytona
+  description: Build an Agents SDK agent that uses Computer Use on a Daytona sandbox desktop to fill a multi-section web form end to end.
+  date: 2026-04-19
+  authors:
+    - lpesut-daytona
+  tags:
+    - agents-sdk
+    - agents
+    - sandbox
+
+- title: Migrate a Legacy Codebase with Sandbox Agents
+  path: examples/agents_sdk/sandboxed-code-migration/sandboxed_code_migration_agent.ipynb
+  slug: sandboxed-code-migration-agent
+  description: Build a sandboxed code-migration agent that splits a modernization campaign into isolated tasks and returns validated patch bundles.
+  date: 2026-04-07
+  authors:
+    - kkahadze-oai
+  tags:
+    - agents-sdk
+    - agents
+    - sandbox
+    - security
+    - evals
+
+- title: Migrate from the Claude Agent SDK to the OpenAI Agents SDK
+  path: examples/agents_sdk/migrate-from-claude-agent-sdk/README.md
+  slug: migrate-from-claude-agent-sdk
+  description: Learn how to migrate Claude Agent SDK applications to the OpenAI Agents SDK, including tool mapping, guardrails, handoffs, approvals, and sandbox boundaries.
+  date: 2026-05-07
+  authors:
+    - anshgupta-oai
+  tags:
+    - agents-sdk
+    - agents
+    - migration
+    - sandbox
+
+- title: Agents SDK Deployment Manager
+  path: examples/agents_sdk/deployment_manager/README.md
+  slug: agents-sdk-deployment-manager
+  description: Run, inspect, and trace local Agents SDK demo apps from a browser-based deployment manager.
+  date: 2026-05-05
+  authors:
+    - alfozan
+  tags:
+    - agents-sdk
+    - agents
+    - tracing
+    - deployment
+
 - title: Getting the Most out of GPT-5.4 for Vision and Document Understanding
   path: examples/multimodal/document_and_multimodal_understanding_tips.ipynb
   slug: vision-understanding
@@ -176,7 +301,7 @@
     - gpt-5
     - prompt-optimization
 
-- title: Context Engineering - Short-Term Memory Management with Sessions from OpenAI Agents SDK
+- title: Context Engineering - Short-Term Memory Management with Sessions
   path: examples/agents_sdk/session_memory.ipynb
   slug: session-memory
   date: 2025-09-09
@@ -2755,6 +2880,21 @@
     - responses
     - speech
 
+- title: Build Live Translation Apps with gpt-realtime-translate
+  path: examples/voice_solutions/realtime_translation_guide.mdx
+  slug: realtime-translation-guide
+  description: Cookbook for building browser, phone, and video-call translation experiences with Realtime Translation.
+  date: 2026-05-07
+  authors:
+    - erikakettleson-openai
+  tags:
+    - realtime
+    - audio
+    - speech
+    - translation
+    - webrtc
+    - websockets
+
 - title: Multi-Language One-Way Translation with the Realtime API
   path: examples/voice_solutions/one_way_translation_using_realtime_api.mdx
   slug: one-way-translation-using-realtime-api
@@ -2985,10 +3125,11 @@
   date: 2025-10-21
   authors:
     - charlie-openai
+    - joanneshin-openai
   tags:
     - codex
 
-- title: Context Engineering for Personalization - State Management with Long-Term Memory Notes using OpenAI Agents SDK
+- title: Context Engineering for Personalization - State Management with Long-Term Memory Notes
   path: examples/agents_sdk/context_personalization.ipynb
   slug: context-personalization
   description: Cookbook to build personalized agents with long-term memory state using the Agents SDK.
@@ -3150,3 +3291,68 @@
     - agents
     - functions
     - third-party
+
+- title: GPT Image Generation Models Prompting Guide
+  path: examples/multimodal/image-gen-models-prompting-guide.ipynb
+  slug: image-gen-models-prompting-guide
+  description: Cookbook to prompt gpt-image models for reliable image generation results.
+  date: 2026-04-21
+  authors:
+    - msingh-openai
+    - emreokcular
+  tags:
+    - images
+    - vision
+
+- title: ChatGPT Enterprise Prompting Guide
+  path: examples/chatgpt/chatgpt_prompt_guide/chatgpt_prompt_guide.md
+  slug: chatgpt_prompt_engineering
+  description: Cookbook for writing better prompts for everyday work in ChatGPT Enterprise.  
+  date: 2026-04-27
+  authors:
+    - sophiaqin-openai
+    - aaronwilkowitz-openai
+  tags:
+    - chatgpt
+
+- title: Building Reliable Agents with Memory and Compaction
+  path: examples/agents_sdk/building_reliable_agents_memory_compaction.ipynb
+  slug: building-reliable-agents-memory-compaction
+  description: Cookbook for building evidence review agent that uses compaction and memory from Agents SDK.
+  date: 2026-05-01
+  authors:
+    - PASFIELD-OAI
+    - emreokcular
+  tags:
+    - agents-sdk
+    - agents
+    - memory
+    - compaction
+
+- title: Build iterative repair loops with Codex
+  path: examples/codex/Build_iterative_repair_loops_with_Codex.ipynb
+  slug: build-iterative-repair-loops-with-codex
+  description: A Codex cookbook showing how to use review, repair, and validation loops to improve technical documentation artifacts.
+  date: 2026-05-11
+  authors:
+    - shreekant-openai
+  tags:
+    - codex
+    - agents
+    - evals
+
+- title: Build an Agent Improvement Loop with Traces, Evals, and Codex
+  path: examples/agents_sdk/agent_improvement_loop.ipynb
+  slug: agent-improvement-loop
+  description: Build a trace-driven improvement loop that turns human and model feedback into Promptfoo evals, HALO-ranked harness changes, and a Codex handoff.
+  date: 2026-05-12
+  authors:
+    - PASFIELD-OAI
+  tags:
+    - agents-sdk
+    - agents
+    - evals
+    - promptfoo
+    - tracing
+    - codex
+    - halo

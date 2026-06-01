@@ -2,9 +2,9 @@
 
 With [Code Review](https://chatgpt.com/codex/settings/code-review) in Codex Cloud, you can connect your team's cloud hosted GitHub repository to Codex and receive automated code reviews on every PR. But what if your code is hosted on-prem, or you don't have GitHub as an SCM?
 
-Luckily, we can replicate Codex's cloud hosted review process in our own CI/CD runners. In this guide, we'll build our own Code Review action using the Codex CLI headless mode with both GitHub Actions and Jenkins.
+Luckily, we can replicate Codex's cloud hosted review process in our own CI/CD runners. In this guide, we'll build our own Code Review action using the Codex CLI headless mode with GitHub Actions, GitLab CI/CD, Azure DevOps Pipelines, and Jenkins.
 
-Model recommendation: use `gpt-5.2-codex` for the strongest code review accuracy and consistency in these workflows.
+Model recommendation: use `gpt-5.5` for the strongest code review accuracy and consistency in these workflows.
 
 To build our own Code review, we'll take the following steps and adhere to them closely:
 
@@ -18,7 +18,7 @@ Once implemented, Codex will be able to leave inline code review comments:
 
 ## The Code Review Prompt
 
-GPT-5.2-Codex has received specific training to improve its code review abilities. You can steer GPT-5.2-Codex to conduct a code review with the following prompt:
+GPT-5.5 is the recommended model for complex coding workflows in Codex. You can steer GPT-5.5 to conduct a code review with the following prompt:
 
 ```
 You are acting as a reviewer for a proposed code change made by another engineer.
@@ -85,7 +85,7 @@ jobs:
     env:
       OPENAI_API_KEY: ${{ secrets.OPENAI_API_KEY }}
       GITHUB_TOKEN: ${{ github.token }}
-      CODEX_MODEL: ${{ vars.CODEX_MODEL || 'o4-mini' }}
+      CODEX_MODEL: ${{ vars.CODEX_MODEL || 'gpt-5.5' }}
       PR_NUMBER: ${{ github.event.pull_request.number }}
       HEAD_SHA: ${{ github.event.pull_request.head.sha }}
       BASE_SHA: ${{ github.event.pull_request.base.sha }}
@@ -338,7 +338,7 @@ jobs:
         shell: bash
 ```
 
-## Gitlab Example
+## GitLab Example
 GitLab doesn’t have a direct equivalent to the GitHub Action, but you can run codex exec inside GitLab CI/CD to perform automated code reviews.
 
 However, the GitHub Action includes an important [safety strategy](https://github.com/openai/codex-action?tab=readme-ov-file#safety-strategy): it drops sudo permissions so Codex cannot access its own OpenAI API key. This isolation is critical—especially for public repositories where sensitive secrets (like your OpenAI API key) may be present—because it prevents Codex from reading or exfiltrating credentials during execution.
@@ -602,6 +602,198 @@ codex-structured-review:
 ```
 
 
+## Azure DevOps Pipelines Example
+
+Azure DevOps does not use GitHub Actions or GitLab CI/CD, but the same Codex review pattern applies: run Codex in an Azure Pipeline, provide the pull request diff, request structured output, and publish the resulting findings back to the Azure DevOps pull request as review threads.
+
+Before running this job, configure your Azure DevOps project:
+
+1. Store `OPENAI_API_KEY` as a secret pipeline variable or in a variable group.
+2. Enable script access to the OAuth token if you plan to use `$(System.AccessToken)` for Azure DevOps REST API calls.
+3. For Azure Repos Git, configure a **Build validation** branch policy on the target branch so the pipeline runs for pull requests.
+4. Ensure the build service identity has permission to contribute to pull requests.
+5. Add an Azure Pipelines YAML file similar to the example below.
+
+Please be mindful with your API key on public repositories. For public or untrusted pull requests, use the same isolation mindset described in the GitLab section: Codex should not be able to read or exfiltrate credentials while reviewing arbitrary code.
+
+This example assumes `review_prompt.md` and `codex-output-schema.json` are committed next to the pipeline. The schema should include `code_location.relative_file_path`, which the Azure DevOps publishing step uses to map findings back to repository paths.
+
+```yaml
+trigger: none
+pr: none # Azure Repos PR validation is configured with branch policies.
+
+pool:
+  vmImage: ubuntu-latest
+
+variables:
+  CODEX_MODEL: gpt-5.5
+
+steps:
+  - checkout: self
+    fetchDepth: 0
+    persistCredentials: true
+
+  - script: |
+      set -euo pipefail
+      npm install -g @openai/codex
+      command -v jq >/dev/null || {
+        sudo apt-get update -y
+        sudo apt-get install -y jq
+      }
+    displayName: Install Codex CLI and jq
+
+  - script: |
+      set -euo pipefail
+      TARGET_BRANCH="${SYSTEM_PULLREQUEST_TARGETBRANCH#refs/heads/}"
+      SOURCE_BRANCH="${SYSTEM_PULLREQUEST_SOURCEBRANCH#refs/heads/}"
+
+      git fetch --no-tags origin \
+        "+refs/heads/${TARGET_BRANCH}:refs/remotes/origin/${TARGET_BRANCH}" \
+        "+refs/heads/${SOURCE_BRANCH}:refs/remotes/origin/${SOURCE_BRANCH}"
+
+      BASE_SHA="$(git merge-base "origin/${TARGET_BRANCH}" "origin/${SOURCE_BRANCH}")"
+      HEAD_SHA="${SYSTEM_PULLREQUEST_SOURCECOMMITID:-$(git rev-parse "origin/${SOURCE_BRANCH}")}"
+
+      cp review_prompt.md codex-prompt.md
+      {
+        echo ""
+        echo "Repository: $(Build.Repository.Name)"
+        echo "Pull Request ID: $(System.PullRequest.PullRequestId)"
+        echo "Base ref: ${TARGET_BRANCH}"
+        echo "Head ref: ${SOURCE_BRANCH}"
+        echo "Base SHA: ${BASE_SHA}"
+        echo "Head SHA: ${HEAD_SHA}"
+        echo "Changed files:"
+        git --no-pager diff --name-status "${BASE_SHA}" "${HEAD_SHA}"
+        echo ""
+        echo "Unified diff (context=5):"
+        git --no-pager diff --unified=5 --stat=200 "${BASE_SHA}" "${HEAD_SHA}" > /tmp/diffstat.txt
+        git --no-pager diff --unified=5 "${BASE_SHA}" "${HEAD_SHA}" > /tmp/full.diff
+        cat /tmp/diffstat.txt
+        cat /tmp/full.diff
+      } >> codex-prompt.md
+    displayName: Build Codex review prompt
+
+  - script: |
+      set -euo pipefail
+      codex exec \
+        --model "${CODEX_MODEL}" \
+        --output-schema codex-output-schema.json \
+        -o codex-output.json \
+        --sandbox read-only \
+        - < codex-prompt.md
+    env:
+      CODEX_API_KEY: $(OPENAI_API_KEY)
+    displayName: Run Codex structured review
+
+  - script: |
+      set -euo pipefail
+      if [ -s codex-output.json ]; then
+        jq '.' codex-output.json || true
+      else
+        echo "Codex output file missing"
+      fi
+    displayName: Inspect structured Codex output
+    condition: always()
+
+  - script: |
+      set -euo pipefail
+      [ -s codex-output.json ] || exit 0
+
+      org_url="$(System.CollectionUri)"
+      project="$(jq -rn --arg v "$(System.TeamProject)" '$v|@uri')"
+      repo_id="$(Build.Repository.ID)"
+      pr_id="$(System.PullRequest.PullRequestId)"
+      api_version="7.1"
+      api_base="${org_url}${project}/_apis/git/repositories/${repo_id}/pullRequests/${pr_id}"
+      headers=(-H "Authorization: Bearer ${SYSTEM_ACCESSTOKEN}" -H "Content-Type: application/json")
+
+      ado_get() { curl -fsS "${headers[@]}" "$1"; }
+      ado_post() { curl -fsS -X POST "${headers[@]}" "$1" -d @"$2"; }
+
+      iterations_json="$(ado_get "${api_base}/iterations?api-version=${api_version}")"
+      last_iteration="$(echo "$iterations_json" | jq -r '(.value // .) | map(.id) | max')"
+
+      if [ -n "$last_iteration" ] && [ "$last_iteration" != "null" ]; then
+        ado_get "${api_base}/iterations/${last_iteration}/changes?\$top=2000&api-version=${api_version}" |
+          jq '(.changeEntries // .value // [])
+            | map({
+                key: (.item.path // .sourceServerItem),
+                value: {
+                  id: .changeTrackingId,
+                  type: (.changeType // "")
+                }
+              })
+            | map(select(.key != null))
+            | from_entries' > azure-devops-changes.json
+
+        jq -c '.findings[]?' codex-output.json | while IFS= read -r finding; do
+          path="$(echo "$finding" | jq -r '.code_location.relative_file_path // empty')"
+          start_line="$(echo "$finding" | jq -r '.code_location.line_range.start')"
+          end_line="$(echo "$finding" | jq -r '.code_location.line_range.end')"
+          ado_path="/${path#/}"
+          change="$(jq -c --arg path "$ado_path" '.[$path] // empty' azure-devops-changes.json)"
+
+          if [ -z "$path" ] || [ -z "$change" ] || ! [[ "$start_line" =~ ^[0-9]+$ && "$end_line" =~ ^[0-9]+$ ]]; then
+            echo "Skipping finding that cannot be safely anchored."
+            continue
+          fi
+
+          change_type="$(echo "$change" | jq -r '.type')"
+          [ "$change_type" != "delete" ] || continue
+
+          jq -n \
+            --arg content "$(echo "$finding" | jq -r '"\(.title)\n\n\(.body)\n\nConfidence: \(.confidence_score)\nPriority: P\(.priority)"')" \
+            --arg filePath "$ado_path" \
+            --argjson start "$start_line" \
+            --argjson end "$end_line" \
+            --argjson changeTrackingId "$(echo "$change" | jq -r '.id')" \
+            --argjson iteration "$last_iteration" \
+            '{
+              comments: [{ parentCommentId: 0, content: $content, commentType: 1 }],
+              status: 1,
+              threadContext: {
+                filePath: $filePath,
+                rightFileStart: { line: $start, offset: 1 },
+                rightFileEnd: { line: $end, offset: 1 }
+              },
+              pullRequestThreadContext: {
+                changeTrackingId: $changeTrackingId,
+                iterationContext: {
+                  firstComparingIteration: 1,
+                  secondComparingIteration: $iteration
+                }
+              }
+            }' > inline-comment.json
+
+          ado_post "${api_base}/threads?api-version=${api_version}" inline-comment.json || true
+        done
+      fi
+
+      jq -n --slurpfile review codex-output.json '{
+        comments: [{
+          parentCommentId: 0,
+          commentType: 1,
+          content: "**Codex automated review**\n\nVerdict: \($review[0].overall_correctness)\nConfidence: \($review[0].overall_confidence_score)\n\n\($review[0].overall_explanation)"
+        }],
+        status: 1
+      }' > summary-comment.json
+
+      ado_post "${api_base}/threads?api-version=${api_version}" summary-comment.json
+    displayName: Publish Azure DevOps comments
+    condition: always()
+    env:
+      SYSTEM_ACCESSTOKEN: $(System.AccessToken)
+```
+
+This is a minimal practical Azure Repos example, with explicit caveats around inline comment anchoring.
+
+This example assumes a same-repository Azure Repos PR; forked or cross-repository PRs may need to fetch from `System.PullRequest.SourceRepositoryUri`.
+
+The Azure DevOps-specific step is publishing Codex findings through the [Pull Request Threads API](https://learn.microsoft.com/en-us/rest/api/azure/devops/git/pull-request-threads/create?view=azure-devops-rest-7.1). Inline comments are attached with `threadContext.filePath`, `threadContext.rightFileStart`, `threadContext.rightFileEnd`, and `pullRequestThreadContext.changeTrackingId`. The example resolves `changeTrackingId` from the latest pull request iteration changes before posting a comment.
+
+Validate inline anchoring behavior in your own Azure DevOps project before depending on it in a required branch policy. In particular, test new files, modified files, renamed files, deleted files, and multi-line findings. If a finding cannot be safely anchored to the right side of the diff, prefer skipping the inline comment and relying on the overall summary instead of posting a misleading line comment.
+
 ## Jenkins Example
 
 We can use the same approach to scripting a job with Jenkins. Once again, comments highlight key stages of the workflow:
@@ -619,7 +811,7 @@ pipeline {
 
   environment {
     // Default model like your GHA (can be overridden at job/env level)
-    CODEX_MODEL = "${env.CODEX_MODEL ?: 'o4-mini'}"
+    CODEX_MODEL = "${env.CODEX_MODEL ?: 'gpt-5.5'}"
 
     // Filled in during Init
     PR_NUMBER   = ''
@@ -926,4 +1118,4 @@ pipeline {
 
 # Wrap Up
 
-With the Codex SDK, you can build your own GitHub Code Review in on-prem environments. However, the pattern of triggering Codex with a prompt, receiving a structured output, and then acting on that output with an API call extends far beyond Code Review. For example, we could use this pattern to trigger a root-cause analysis when an incident is created and post a structured report into a Slack channel. Or we could create a code quality report on each PR and post results into a dashboard.
+With the Codex SDK, you can build your own automated code review workflow in CI/CD environments that are not directly connected to Codex Cloud. However, the pattern of triggering Codex with a prompt, receiving a structured output, and then acting on that output with an API call extends far beyond Code Review. For example, we could use this pattern to trigger a root-cause analysis when an incident is created and post a structured report into a Slack channel. Or we could create a code quality report on each PR and post results into a dashboard.

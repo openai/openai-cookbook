@@ -108,11 +108,11 @@ See [RediSearch on Redis Enterprise](https://redis.com/modules/redisearch/) for 
 
 ### Examples
 
-- [Product Search](https://github.com/RedisVentures/redis-product-search) - eCommerce product search (with image and text)
+- [Product Search](https://github.com/redis-developer/redis-product-search) - eCommerce product search (with image and text)
 - [Product Recommendations with DocArray / Jina](https://github.com/jina-ai/product-recommendation-redis-docarray) - Content-based product recommendations example with Redis and DocArray.
-- [Redis VSS in RecSys](https://github.com/RedisVentures/Redis-Recsys) - 3 end-to-end Redis & NVIDIA Merlin Recommendation System Architectures.
+- [Redis VSS in RecSys](https://github.com/redis-developer/redis-nvidia-recsys) - 3 end-to-end Redis & NVIDIA Merlin Recommendation System Architectures.
 - [Azure OpenAI Embeddings Q&A](https://github.com/ruoccofabrizio/azure-open-ai-embeddings-qna) - OpenAI and Redis as a Q&A service on Azure.
-- [ArXiv Paper Search](https://github.com/RedisVentures/redis-arXiv-search) - Semantic search over arXiv scholarly papers
+- [ArXiv Paper Search](https://github.com/redis-developer/redis-arXiv-search) - Semantic search over arXiv scholarly papers
 
 
 ### More Resources

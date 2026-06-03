@@ -4,6 +4,21 @@
 # should build pages for, and indicates metadata such as tags, creation date and
 # authors for each page.
 
+- title: Getting Started with OpenAI Models on Amazon Bedrock
+  path: examples/partners/AWS/openai_models_with_amazon_bedrock.ipynb
+  slug: openai-models-with-amazon-bedrock
+  description: Learn how to invoke an OpenAI-compatible Amazon Bedrock endpoint using the OpenAI Python SDK, along with equivalent cURL examples, and leverage Responses API capabilities available through Amazon Bedrock.
+  date: 2026-05-31
+  authors:
+    - shikhar-cyber
+    - sudee-oai
+  tags:
+    - partners
+    - responses
+    - api
+    - bedrock
+
+
 - title: Macro Evals for Agentic Systems
   path: examples/partners/macro_evals_for_agentic_systems/macro_evals_for_agentic_systems.ipynb
   slug: macro-evals-for-agentic-systems

@@ -4,6 +4,21 @@
 # should build pages for, and indicates metadata such as tags, creation date and
 # authors for each page.
 
+- title: Production NL2SQL with Guardrails
+  path: examples/Production_NL2SQL_with_guardrails.ipynb
+  slug: production-nl2sql-with-guardrails
+  description: Build a production-safe natural-language-to-SQL pipeline using GPT-4o with 7 guardrail layers including schema filtering, RBAC, SQL injection defense, hallucination detection, and PII masking.
+  date: 2026-06-01
+  authors:
+    - sohammmmm10
+  tags:
+    - gpt-4o
+    - sql
+    - guardrails
+    - structured-outputs
+    - safety
+    - completions
+
 - title: Getting Started with OpenAI Models on Amazon Bedrock
   path: examples/partners/AWS/openai_models_with_amazon_bedrock.ipynb
   slug: openai-models-with-amazon-bedrock

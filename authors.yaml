@@ -3,6 +3,11 @@
 # You can optionally customize how your information shows up cookbook.openai.com over here.
 # If your information is not present here, it will be pulled from your GitHub profile.
 
+nagasatish007:
+  name: "Naga Satish"
+  website: "https:tealtiger.ai"
+  company: "TealTiger"
+
 kkahadze-oai:
   name: "Konstantine Kahadze"
   website: "https://kahadze.com"

@@ -3333,3 +3333,14 @@
     - tracing
     - codex
     - halo
+
+- title: Moving from OpenAI Evals to Promptfoo
+  path: examples/evaluation/moving-from-openai-evals-to-promptfoo.md
+  slug: moving-from-openai-evals-to-promptfoo
+  description: Migrate supported OpenAI Evals evaluations to runnable Promptfoo configurations and preserve historical results.
+  date: 2026-06-03
+  authors:
+    - kkahadze-oai
+  tags:
+    - evals
+    - promptfoo

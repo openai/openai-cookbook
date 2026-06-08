@@ -4,6 +4,41 @@
 # should build pages for, and indicates metadata such as tags, creation date and
 # authors for each page.
 
+- title: "SchemaFlow: Agentic Database Change Impact Analysis, SQL Generation, and Eval Guardrails"
+  path: examples/partners/schemaflow_design_guide/schemaflow_cookbook.ipynb
+  slug: schemaflow-design-guide
+  description: Build a staged SchemaFlow pipeline with the OpenAI Agents SDK for database change parsing, impact analysis, rollout planning, SQL generation, guardrails, artifacts, optional File Search grounding, and Promptfoo evals.
+  date: 2026-06-05
+  authors:
+    - shikhar-cyber
+    - Atharva Joshi
+    - Mohan Kocherlakota
+    - Adam Horvath
+  tags:
+    - partners
+    - agents-sdk
+    - agents
+    - evals
+    - tracing
+    - promptfoo
+    - RAG
+    - structured-outputs
+
+- title: Getting Started with OpenAI Models on Amazon Bedrock
+  path: examples/partners/AWS/openai_models_with_amazon_bedrock.ipynb
+  slug: openai-models-with-amazon-bedrock
+  description: Learn how to invoke an OpenAI-compatible Amazon Bedrock endpoint using the OpenAI Python SDK, along with equivalent cURL examples, and leverage Responses API capabilities available through Amazon Bedrock.
+  date: 2026-05-31
+  authors:
+    - shikhar-cyber
+    - sudee-oai
+  tags:
+    - partners
+    - responses
+    - api
+    - bedrock
+
+
 - title: Macro Evals for Agentic Systems
   path: examples/partners/macro_evals_for_agentic_systems/macro_evals_for_agentic_systems.ipynb
   slug: macro-evals-for-agentic-systems
@@ -87,6 +122,19 @@
     - sandbox
     - security
     - evals
+
+- title: Migrate from the Claude Agent SDK to the OpenAI Agents SDK
+  path: examples/agents_sdk/migrate-from-claude-agent-sdk/README.md
+  slug: migrate-from-claude-agent-sdk
+  description: Learn how to migrate Claude Agent SDK applications to the OpenAI Agents SDK, including tool mapping, guardrails, handoffs, approvals, and sandbox boundaries.
+  date: 2026-05-07
+  authors:
+    - anshgupta-oai
+  tags:
+    - agents-sdk
+    - agents
+    - migration
+    - sandbox
 
 - title: Agents SDK Deployment Manager
   path: examples/agents_sdk/deployment_manager/README.md
@@ -3321,3 +3369,14 @@
     - tracing
     - codex
     - halo
+
+- title: Moving from OpenAI Evals to Promptfoo
+  path: examples/evaluation/moving-from-openai-evals-to-promptfoo.md
+  slug: moving-from-openai-evals-to-promptfoo
+  description: Migrate supported OpenAI Evals evaluations to runnable Promptfoo configurations and preserve historical results.
+  date: 2026-06-03
+  authors:
+    - kkahadze-oai
+  tags:
+    - evals
+    - promptfoo

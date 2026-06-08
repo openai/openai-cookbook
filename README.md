@@ -15,6 +15,21 @@ Most code examples are written in Python, though the concepts can be applied in 
 
 For other useful tools, guides and courses, check out these [related resources from around the web](https://cookbook.openai.com/related_resources).
 
+## Table of Contents
+
+- [Getting Started](#getting-started)
+- [Usage](#usage)
+- [Contributing](#contributing)
+- [License](#license)
 ## License
 
+<p align="center">
+  <a href="https://github.com/openai/openai-cookbook/stargazers"><img src="https://img.shields.io/github/stars/openai/openai-cookbook?style=social" alt="Stars"/></a>
+  <a href="https://github.com/openai/openai-cookbook/blob/main/LICENSE"><img src="https://img.shields.io/badge/license-MIT-blue" alt="License"/></a>
+</p>
+
 MIT License
+
+## Contributing
+
+We welcome contributions! Please open an issue or pull request.

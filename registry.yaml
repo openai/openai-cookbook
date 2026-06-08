@@ -4,6 +4,26 @@
 # should build pages for, and indicates metadata such as tags, creation date and
 # authors for each page.
 
+- title: "SchemaFlow: Agentic Database Change Impact Analysis, SQL Generation, and Eval Guardrails"
+  path: examples/partners/schemaflow_design_guide/schemaflow_cookbook.ipynb
+  slug: schemaflow-design-guide
+  description: Build a staged SchemaFlow pipeline with the OpenAI Agents SDK for database change parsing, impact analysis, rollout planning, SQL generation, guardrails, artifacts, optional File Search grounding, and Promptfoo evals.
+  date: 2026-06-05
+  authors:
+    - shikhar-cyber
+    - Atharva Joshi
+    - Mohan Kocherlakota
+    - Adam Horvath
+  tags:
+    - partners
+    - agents-sdk
+    - agents
+    - evals
+    - tracing
+    - promptfoo
+    - RAG
+    - structured-outputs
+
 - title: Getting Started with OpenAI Models on Amazon Bedrock
   path: examples/partners/AWS/openai_models_with_amazon_bedrock.ipynb
   slug: openai-models-with-amazon-bedrock

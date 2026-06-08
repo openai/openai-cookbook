@@ -19,7 +19,10 @@ For other useful tools, guides and courses, check out these [related resources f
 
 - [Getting Started](#getting-started)
 - [Usage](#usage)
+- [## Table of Contents
+- [License](#license)
 - [Contributing](#contributing)
+](#contributing)
 - [License](#license)
 ## License
 
@@ -30,6 +33,9 @@ For other useful tools, guides and courses, check out these [related resources f
 
 MIT License
 
-## Contributing
+## ## Table of Contents
+- [License](#license)
+- [Contributing](#contributing)
+
 
 We welcome contributions! Please open an issue or pull request.

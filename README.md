@@ -18,3 +18,16 @@ For other useful tools, guides and courses, check out these [related resources f
 ## License
 
 MIT License
+<p align="center">
+  <a href="https://github.com/openai/openai-cookbook/stargazers"><img src="https://img.shields.io/github/stars/openai/openai-cookbook?style=social" alt="Stars"/></a>
+  <a href="https://github.com/openai/openai-cookbook/blob/main/LICENSE"><img src="https://img.shields.io/badge/license-MIT-blue" alt="License"/></a>
+</p>
+
+## Table of Contents
+
+- [License](#license)
+- [Contributing](#contributing)
+
+## Contributing
+
+We welcome contributions! Please open an issue or pull request.

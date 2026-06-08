@@ -5,7 +5,7 @@
 
 kkahadze-oai:
   name: "Konstantine Kahadze"
-  website: "https://www.linkedin.com/in/kahadze/"
+  website: "https://kahadze.com"
   avatar: "https://avatars.githubusercontent.com/kkahadze-oai"
 
 lpesut-daytona:
@@ -107,6 +107,11 @@ shikhar-cyber:
   name: "Shikhar Kwatra"
   website: "https://www.linkedin.com/in/shikharkwatra/"
   avatar: "https://avatars.githubusercontent.com/u/189049238?v=4"
+  
+sudee-oai:
+  name: "Sudeesh Sasidharan"
+  website: "https://www.linkedin.com/in/sudeesh-sasidharan/"
+  avatar: "https://avatars.githubusercontent.com/sudee-oai"
 
 danbell-openai:
   name: "Dan Bell"

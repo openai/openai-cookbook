@@ -159,7 +159,8 @@ See the documentation [here](https://learn.microsoft.com/en-us/azure/azure-funct
 
 6) Click on **“Authentication”** on the left hand menu under **Manage**
 
-   1. Under the **Web** section, you’ll notice one callback URI was added automatically. Add the Postman redirect URI (<https://oauth.pstmn.io/v1/callback> and <https://oauth.pstmn.io/v1/browser-callback> ) for testing.
+   1. Under the **Web** section, you’ll notice one callback URI was added automatically. Add the Postman redirect URI (<https://oauth.pstmn.io/v1/callback>
+   2. Under the **Web** section, add (<https://oauth.pstmn.io/v1/browser-callback> ) for enabling postman browser testing.
 
 7) On the left-hand side, go to **Overview**. Copy the **application (client) ID** and and the **directory (tenant) ID** and **save for later as** `CLIENT_ID` **and** `TENANT_ID`**.**
 

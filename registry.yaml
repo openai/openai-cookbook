@@ -1585,6 +1585,7 @@
   tags:
     - embeddings
     - completions
+  archived: true
 
 - title: Elasticsearch
   path: examples/vector_databases/elasticsearch/README.md

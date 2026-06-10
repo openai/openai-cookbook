@@ -1023,6 +1023,7 @@
 - title: How to use functions with a knowledge base
   path: examples/How_to_call_functions_for_knowledge_retrieval.ipynb
   slug: how-to-call-functions-for-knowledge-retrieval
+  archived: true
   date: 2023-06-14
   authors:
     - colin-openai
@@ -3026,6 +3027,7 @@
 - title: GPT Actions library - Salesforce & Gong
   path: examples/chatgpt/gpt_actions_library/gpt_action_salesforce_gong.md
   slug: gpt-action-salesforce-gong
+  archived: true
   date: 2025-04-07
   authors:
     - girishd

@@ -2023,6 +2023,7 @@
 - title: How to automate AWS tasks with function calling
   path: examples/third_party/How_to_automate_S3_storage_with_functions.ipynb
   slug: how-to-automate-s3-storage-with-functions
+  archived: true
   date: 2023-09-27
   authors:
     - Barqawiz

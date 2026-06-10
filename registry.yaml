@@ -2755,7 +2755,6 @@
     - msingh-openai
   tags:
     - completions
-  archived: true
 
 - title: Prompt Caching 101
   path: examples/Prompt_Caching101.ipynb
@@ -2806,7 +2805,6 @@
   tags:
     - completions
     - audio
-  archived: true
 
 - title: Enhance your prompts with meta prompting
   path: examples/Enhance_your_prompts_with_meta_prompting.ipynb
@@ -2887,7 +2885,6 @@
   tags:
     - completions
     - vision
-  archived: true
 
 - title: GPT Actions library - Workday
   path: examples/chatgpt/gpt_actions_library/gpt_action_workday.md

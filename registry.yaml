@@ -2428,6 +2428,7 @@
     - gpt-actions-library
     - chatgpt
     - chatgpt-data
+  archived: true
 
 - title: Data Extraction and Transformation in ELT Workflows using GPT-4o as an OCR Alternative
   path: examples/Data_extraction_transformation.ipynb

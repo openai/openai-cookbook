@@ -2338,6 +2338,7 @@
   tags:
     - chat
     - vision
+  archived: true
 
 - title: Synthetic data generation (Part 1)
   path: examples/SDG1.ipynb

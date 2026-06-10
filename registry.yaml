@@ -1043,6 +1043,7 @@
   tags:
     - completions
     - functions
+  archived: true
 
 - title: How to count tokens with Tiktoken
   path: examples/How_to_count_tokens_with_tiktoken.ipynb

@@ -674,6 +674,7 @@
   path: examples/o-series/o3o4-mini_prompting_guide.ipynb
   slug: o3o4-mini-prompting-guide
   description: Cookbook to improve o3/o4-mini function calling with prompt best practices.
+  archived: true
   date: 2025-05-26
   authors:
     - billchen-openai

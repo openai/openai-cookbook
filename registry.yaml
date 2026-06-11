@@ -841,6 +841,7 @@
 - title: Automating Dispute Management with Agents SDK and Stripe API
   path: examples/agents_sdk/dispute_agent.ipynb
   slug: dispute-agent
+  archived: true
   date: 2025-03-17
   authors:
     - danbell-openai

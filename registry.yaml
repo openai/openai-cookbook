@@ -182,6 +182,34 @@
     - promptfoo
     - partners
 
+- title: Building Compliant Multi-Agent Systems with OpenAI Swarm and Kakunin
+  path: examples/partners/kakunin_agent_compliance/swarm_playground.ipynb
+  slug: swarm-agent-compliance
+  description: Secure your OpenAI Swarm agents by enforcing cryptographic scope limits and active status checks.
+  date: 2026-06-11
+  authors:
+    - nqzai
+  tags:
+    - agents
+    - swarm
+    - governance
+    - compliance
+    - partners
+
+- title: Secure Tool Runs in OpenAI Assistants API with Kakunin
+  path: examples/partners/kakunin_agent_compliance/assistants_playground.ipynb
+  slug: assistants-agent-compliance
+  description: Secure tool execution and manage runtime scope compliance automatically in the Assistants API.
+  date: 2026-06-11
+  authors:
+    - nqzai
+  tags:
+    - agents
+    - assistants
+    - governance
+    - compliance
+    - partners
+
 - title: Realtime Eval Guide
   path: examples/Realtime_eval_guide.ipynb
   slug: realtime-eval-guide

@@ -17,6 +17,26 @@
     - guardrails
     - governance
     - partners
+- title: "SchemaFlow: Agentic Database Change Impact Analysis, SQL Generation, and Eval Guardrails"
+  path: examples/partners/schemaflow_design_guide/schemaflow_cookbook.ipynb
+  slug: schemaflow-design-guide
+  description: Build a staged SchemaFlow pipeline with the OpenAI Agents SDK for database change parsing, impact analysis, rollout planning, SQL generation, guardrails, artifacts, optional File Search grounding, and Promptfoo evals.
+  date: 2026-06-05
+  authors:
+    - shikhar-cyber
+    - Atharva Joshi
+    - Mohan Kocherlakota
+    - Adam Horvath
+    - Shashwat Jha
+  tags:
+    - partners
+    - agents-sdk
+    - agents
+    - evals
+    - tracing
+    - promptfoo
+    - RAG
+    - structured-outputs
 
 - title: Getting Started with OpenAI Models on Amazon Bedrock
   path: examples/partners/AWS/openai_models_with_amazon_bedrock.ipynb
@@ -319,6 +339,7 @@
   path: examples/agents_sdk/session_memory.ipynb
   slug: session-memory
   date: 2025-09-09
+  archived: true
   authors:
     - emreokcular
   tags:
@@ -445,6 +466,7 @@
 - title: Using NVIDIA TensorRT-LLM to run gpt-oss-20b
   path: articles/gpt-oss/run-nvidia.ipynb
   slug: run-nvidia
+  archived: true
   date: 2025-08-05
   authors:
     - jayrodge
@@ -667,6 +689,7 @@
   path: examples/o-series/o3o4-mini_prompting_guide.ipynb
   slug: o3o4-mini-prompting-guide
   description: Cookbook to improve o3/o4-mini function calling with prompt best practices.
+  archived: true
   date: 2025-05-26
   authors:
     - billchen-openai
@@ -832,6 +855,7 @@
 - title: Automating Dispute Management with Agents SDK and Stripe API
   path: examples/agents_sdk/dispute_agent.ipynb
   slug: dispute-agent
+  archived: true
   date: 2025-03-17
   authors:
     - danbell-openai
@@ -883,6 +907,7 @@
     - completions
     - tiktoken
     - fine-tuning
+  archived: true
 
 - title: Classification using embeddings
   path: examples/Classification_using_embeddings.ipynb
@@ -987,6 +1012,7 @@
   tags:
     - completions
     - functions
+  archived: true
 
 - title: Using embeddings
   path: examples/Using_embeddings.ipynb
@@ -1014,6 +1040,7 @@
 - title: How to use functions with a knowledge base
   path: examples/How_to_call_functions_for_knowledge_retrieval.ipynb
   slug: how-to-call-functions-for-knowledge-retrieval
+  archived: true
   date: 2023-06-14
   authors:
     - colin-openai
@@ -1032,6 +1059,7 @@
   tags:
     - completions
     - functions
+  archived: true
 
 - title: How to count tokens with Tiktoken
   path: examples/How_to_count_tokens_with_tiktoken.ipynb
@@ -1053,6 +1081,7 @@
   tags:
     - completions
     - fine-tuning
+  archived: true
 
 - title: How to format inputs to ChatGPT models
   path: examples/How_to_format_inputs_to_ChatGPT_models.ipynb
@@ -1115,6 +1144,7 @@
   tags:
     - embeddings
     - completions
+  archived: true
 
 - title: Question answering using embeddings-based search
   path: examples/Question_answering_using_embeddings.ipynb
@@ -1158,6 +1188,7 @@
   tags:
     - embeddings
     - completions
+  archived: true
 
 - title: Semantic text search using embeddings
   path: examples/Semantic_text_search_using_embeddings.ipynb
@@ -1299,6 +1330,7 @@
     - kristapratico
   tags:
     - completions
+  archived: true
 
 - title: Azure embeddings example
   path: examples/azure/embeddings.ipynb
@@ -1321,6 +1353,7 @@
   tags:
     - completions
     - functions
+  archived: true
 
 - title: Translate a book writen in LaTeX from Slovenian into English
   path: examples/book_translation/translate_latex_book.ipynb
@@ -1363,6 +1396,7 @@
   tags:
     - embeddings
     - completions
+  archived: true
 
 - title: Getting Started with OpenAI Evals
   path: examples/evaluation/Getting_Started_with_OpenAI_Evals.ipynb
@@ -1373,6 +1407,7 @@
     - shyamal-anadkat
   tags:
     - completions
+  archived: true
 
 - title: Developing Hallucination Guardrails
   path: examples/Developing_hallucination_guardrails.ipynb
@@ -1383,6 +1418,7 @@
     - royziv11
   tags:
     - guardrails
+  archived: true
 
 - title: Fine-Tuned Q&A - collect data
   path: examples/fine-tuned_qa/olympics-1-collect-data.ipynb
@@ -1439,6 +1475,7 @@
   tags:
     - embeddings
     - completions
+  archived: true
 
 - title: Vector databases
   path: examples/vector_databases/README.md
@@ -1449,6 +1486,7 @@
     - moizsajid
   tags:
     - embeddings
+  archived: true
 
 - title: Using PolarDB-PG as a vector database for OpenAI embeddings
   path: >-
@@ -1511,6 +1549,7 @@
     - farzad528
   tags:
     - embeddings
+  archived: true
 
 - title: Philosophy with vector embeddings, OpenAI and Cassandra / Astra DB
   path: examples/vector_databases/cassandra_astradb/Philosophical_Quotes_CQL.ipynb
@@ -1551,6 +1590,7 @@
     - atroyn
   tags:
     - embeddings
+  archived: true
 
 - title: Robust question answering with Chroma and OpenAI
   path: examples/vector_databases/chroma/hyde-with-chroma-and-openai.ipynb
@@ -1562,6 +1602,7 @@
   tags:
     - embeddings
     - completions
+  archived: true
 
 - title: Elasticsearch
   path: examples/vector_databases/elasticsearch/README.md
@@ -1572,6 +1613,7 @@
   tags:
     - embeddings
     - completions
+  archived: true
 
 - title: Retrieval augmented generation using Elasticsearch and OpenAI
   path: >-
@@ -1583,6 +1625,7 @@
   tags:
     - embeddings
     - completions
+  archived: true
 
 - title: Semantic search using Elasticsearch and OpenAI
   path: examples/vector_databases/elasticsearch/elasticsearch-semantic-search.ipynb
@@ -1592,6 +1635,7 @@
     - leemthompo
   tags:
     - embeddings
+  archived: true
 
 - title: Using Hologres as a vector database for OpenAI embeddings
   path: >-
@@ -1710,6 +1754,7 @@
     - colin-openai
   tags:
     - embeddings
+  archived: true
 
 - title: Using Qdrant as a vector database for OpenAI embeddings
   path: >-
@@ -1739,6 +1784,7 @@
     - kacperlukawski
   tags:
     - embeddings
+  archived: true
 
 - title: Redis
   path: examples/vector_databases/redis/README.md
@@ -1759,6 +1805,7 @@
     - colin-openai
   tags:
     - embeddings
+  archived: true
 
 - title: Using Redis as a vector database with OpenAI
   path: examples/vector_databases/redis/getting-started-with-redis-and-openai.ipynb
@@ -1994,6 +2041,7 @@
 - title: How to automate AWS tasks with function calling
   path: examples/third_party/How_to_automate_S3_storage_with_functions.ipynb
   slug: how-to-automate-s3-storage-with-functions
+  archived: true
   date: 2023-09-27
   authors:
     - Barqawiz
@@ -2019,6 +2067,7 @@
     - danieltprice
   tags:
     - embeddings
+  archived: true
 
 - title: Question answering with LangChain, Deep Lake, & OpenAI
   path: examples/vector_databases/deeplake/deeplake_langchain_qa.ipynb
@@ -2028,6 +2077,7 @@
     - FayazRahman
   tags:
     - embeddings
+  archived: true
 
 - title: Fine-tuning OpenAI models with Weights & Biases
   path: examples/third_party/GPT_finetuning_with_wandb.ipynb
@@ -2039,6 +2089,7 @@
     - tiktoken
     - completions
     - fine-tuning
+  archived: true
 
 - title: OpenAI API Monitoring with Weights & Biases Weave
   path: examples/third_party/Openai_monitoring_with_wandb_weave.ipynb
@@ -2060,6 +2111,7 @@
     - completions
     - functions
     - agents
+  archived: true
 
 - title: Named Entity Recognition to Enrich Text
   path: examples/Named_Entity_Recognition_to_enrich_text.ipynb
@@ -2070,6 +2122,7 @@
   tags:
     - completions
     - functions
+  archived: true
 
 - title: What makes documentation good
   path: articles/what_makes_documentation_good.md
@@ -2091,6 +2144,7 @@
   tags:
     - completions
     - functions
+  archived: true
 
 - title: Fine tuning for function calling
   path: examples/Fine_tuning_for_function_calling.ipynb
@@ -2105,6 +2159,7 @@
     - completions
     - functions
     - fine-tuning
+  archived: true
 
 - title: Processing and narrating a video with GPT-4.1-mini's visual capabilities and GPT-4o TTS API
   path: examples/GPT_with_vision_for_video_understanding.ipynb
@@ -2136,6 +2191,7 @@
     - shyamal-anadkat
   tags:
     - completions
+  archived: true
 
 - title: Assistants API Overview (Python SDK)
   path: examples/Assistants_API_overview_python.ipynb
@@ -2159,6 +2215,7 @@
     - completions
     - functions
     - agents
+  archived: true
 
 - title: MongoDB Atlas Vector Search
   path: examples/vector_databases/mongodb_atlas/README.md
@@ -2179,6 +2236,7 @@
   tags:
     - embeddings
     - completions
+  archived: true
 
 - title: Evaluate RAG with LlamaIndex
   path: examples/evaluation/Evaluate_RAG_with_LlamaIndex.ipynb
@@ -2189,6 +2247,7 @@
   tags:
     - embeddings
     - completions
+  archived: true
 
 - title: RAG with a Graph database
   path: examples/RAG_with_graph_db.ipynb
@@ -2199,6 +2258,7 @@
   tags:
     - embeddings
     - completions
+  archived: true
 
 - title: Supabase Vector Database
   path: examples/vector_databases/supabase/README.md
@@ -2208,6 +2268,7 @@
     - ggrn
   tags:
     - embeddings
+  archived: true
 
 - title: Semantic search using Supabase Vector
   path: examples/vector_databases/supabase/semantic-search.mdx
@@ -2217,6 +2278,7 @@
     - ggrn
   tags:
     - embeddings
+  archived: true
 
 - title: How to implement LLM guardrails
   path: examples/How_to_use_guardrails.ipynb
@@ -2226,6 +2288,7 @@
     - colin-openai
   tags:
     - guardrails
+  archived: true
 
 - title: How to combine GPT4o mini with RAG to create a clothing matchmaker app
   path: examples/How_to_combine_GPT4o_with_RAG_Outfit_Assistant.ipynb
@@ -2236,6 +2299,7 @@
   tags:
     - vision
     - embeddings
+  archived: true
 
 - title: How to parse PDF docs for RAG
   path: examples/Parse_PDF_docs_for_RAG.ipynb
@@ -2247,6 +2311,7 @@
   tags:
     - vision
     - embeddings
+  archived: true
 
 - title: Using GPT4o mini to tag and caption images
   path: examples/Tag_caption_images_with_GPT4V.ipynb
@@ -2257,6 +2322,7 @@
   tags:
     - vision
     - embeddings
+  archived: true
 
 - title: How to use the moderation API
   path: examples/How_to_use_moderation.ipynb
@@ -2266,6 +2332,7 @@
     - teomusatoiu
   tags:
     - moderation
+  archived: true
 
 - title: Summarizing Long Documents
   path: examples/Summarizing_long_documents.ipynb
@@ -2275,6 +2342,7 @@
     - joe-at-openai
   tags:
     - chat
+  archived: true
 
 - title: Using GPT4 Vision with Function Calling
   path: examples/multimodal/Using_GPT4_Vision_With_Function_Calling.ipynb
@@ -2286,6 +2354,7 @@
   tags:
     - chat
     - vision
+  archived: true
 
 - title: Synthetic data generation (Part 1)
   path: examples/SDG1.ipynb
@@ -2295,6 +2364,7 @@
     - dylanra-openai
   tags:
     - completions
+  archived: true
 
 - title: CLIP embeddings to improve multimodal RAG with GPT-4 Vision
   path: examples/custom_image_embedding_search.ipynb
@@ -2305,6 +2375,7 @@
   tags:
     - vision
     - embeddings
+  archived: true
 
 - title: Batch processing with the Batch API
   path: examples/batch_processing.ipynb
@@ -2315,6 +2386,7 @@
   tags:
     - batch
     - completions
+  archived: true
 
 - title: Using tool required for customer service
   path: examples/Using_tool_required_for_customer_service.ipynb
@@ -2325,6 +2397,7 @@
   tags:
     - completions
     - functions
+  archived: true
 
 - title: Introduction to GPT-4o and GPT-4o mini
   path: examples/gpt4o/introduction_to_gpt4o.ipynb
@@ -2336,6 +2409,7 @@
     - completions
     - vision
     - whisper
+  archived: true
 
 - title: Azure AI Search with Azure Functions and GPT Actions in ChatGPT
   path: examples/chatgpt/rag-quickstart/azure/Azure_AI_Search_with_Azure_Functions_and_GPT_Actions_in_ChatGPT.ipynb
@@ -2349,6 +2423,7 @@
     - tiktoken
     - completions
     - chatgpt-and-api
+  archived: true
 
 - title: GPT Actions library - getting started
   path: examples/chatgpt/gpt_actions_library/.gpt_action_getting_started.ipynb
@@ -2359,6 +2434,7 @@
   tags:
     - gpt-actions-library
     - chatgpt
+  archived: true
 
 - title: GPT Actions library - BigQuery
   path: examples/chatgpt/gpt_actions_library/gpt_action_bigquery.ipynb
@@ -2370,6 +2446,7 @@
     - gpt-actions-library
     - chatgpt
     - chatgpt-data
+  archived: true
 
 - title: Data Extraction and Transformation in ELT Workflows using GPT-4o as an OCR Alternative
   path: examples/Data_extraction_transformation.ipynb
@@ -2380,6 +2457,7 @@
   tags:
     - completions
     - vision
+  archived: true
 
 - title: GPT Actions library - Outlook
   path: examples/chatgpt/gpt_actions_library/gpt_action_outlook.ipynb
@@ -2391,6 +2469,7 @@
     - gpt-actions-library
     - chatgpt
     - chatgpt-communication
+  archived: true
 
 - title: GPT Actions library - Sharepoint (Return Docs)
   path: examples/chatgpt/gpt_actions_library/gpt_action_sharepoint_doc.ipynb
@@ -2402,6 +2481,7 @@
     - gpt-actions-library
     - chatgpt
     - chatgpt-productivity
+  archived: true
 
 - title: GPT Actions library - Sharepoint (Return Text)
   path: examples/chatgpt/gpt_actions_library/gpt_action_sharepoint_text.ipynb
@@ -2413,6 +2493,7 @@
     - gpt-actions-library
     - chatgpt
     - chatgpt-productivity
+  archived: true
 
 - title: GPT Actions library (Middleware) - Azure Functions
   path: examples/chatgpt/gpt_actions_library/gpt_middleware_azure_function.ipynb
@@ -2424,6 +2505,7 @@
     - gpt-actions-library
     - chatgpt
     - chatgpt-middleware
+  archived: true
 
 - title: GPT Actions library - Canvas Learning Management System
   path: examples/chatgpt/gpt_actions_library/gpt_action_canvas.md
@@ -2435,6 +2517,7 @@
   tags:
     - gpt-actions-library
     - chatgpt
+  archived: true
 
 - title: GPT Actions library - Salesforce
   path: examples/chatgpt/gpt_actions_library/gpt_action_salesforce.ipynb
@@ -2445,6 +2528,7 @@
   tags:
     - gpt-actions-library
     - chatgpt
+  archived: true
 
 - title: GPT Actions library - Gmail
   path: examples/chatgpt/gpt_actions_library/gpt_action_gmail.ipynb
@@ -2456,6 +2540,7 @@
     - gpt-actions-library
     - chatgpt
     - chatgpt-communication
+  archived: true
 
 - title: GPT Actions library - Jira
   path: examples/chatgpt/gpt_actions_library/gpt_action_jira.ipynb
@@ -2467,6 +2552,7 @@
     - gpt-actions-library
     - chatgpt
     - chatgpt-productivity
+  archived: true
 
 - title: GPT Actions library - Notion
   path: examples/chatgpt/gpt_actions_library/gpt_action_notion.ipynb
@@ -2478,6 +2564,7 @@
     - gpt-actions-library
     - chatgpt
     - chatgpt-productivity
+  archived: true
 
 - title: GPT Actions library - Confluence
   path: examples/chatgpt/gpt_actions_library/gpt_action_confluence.ipynb
@@ -2489,6 +2576,7 @@
     - gpt-actions-library
     - chatgpt
     - chatgpt-productivity
+  archived: true
 
 - title: GPT Actions library - SQL Database
   path: examples/chatgpt/gpt_actions_library/gpt_action_sql_database.ipynb
@@ -2500,6 +2588,7 @@
     - chatgpt
     - gpt-actions-library
     - chatgpt-data
+  archived: true
 
 - title: GPT Actions library - Box
   path: examples/chatgpt/gpt_actions_library/gpt_action_box.ipynb
@@ -2511,6 +2600,7 @@
     - gpt-actions-library
     - chatgpt
     - chatgpt-productivity
+  archived: true
 
 - title: GCP BigQuery Vector Search with GCP Functions and GPT Actions in ChatGPT
   path: examples/chatgpt/rag-quickstart/gcp/Getting_started_with_bigquery_vector_search_and_openai.ipynb
@@ -2525,6 +2615,7 @@
     - tiktoken
     - completions
     - chatgpt-and-api
+  archived: true
 
 - title: GPT Actions library - Zapier
   path: examples/chatgpt/gpt_actions_library/gpt_action_zapier.ipynb
@@ -2536,6 +2627,7 @@
     - gpt-actions-library
     - chatgpt
     - chatgpt-middleware
+  archived: true
 
 - title: Structured Outputs for Multi-Agent Systems
   path: examples/Structured_outputs_multi_agent.ipynb
@@ -2547,6 +2639,7 @@
     - completions
     - functions
     - agents
+  archived: true
 
 - title: Introduction to Structured Outputs
   path: examples/Structured_Outputs_Intro.ipynb
@@ -2568,6 +2661,7 @@
     - chatgpt
     - gpt-actions-library
     - chatgpt-middleware
+  archived: true
 
 - title: GPT Actions library - AWS Redshift
   path: examples/chatgpt/gpt_actions_library/gpt_action_redshift.ipynb
@@ -2579,6 +2673,7 @@
     - gpt-actions-library
     - chatgpt
     - chatgpt-data
+  archived: true
 
 - title: GPT Actions library - AWS Middleware
   path: examples/chatgpt/gpt_actions_library/gpt_middleware_aws_function.ipynb
@@ -2590,6 +2685,7 @@
     - gpt-actions-library
     - chatgpt
     - chatgpt-middleware
+  archived: true
 
 - title: GPT Actions library - Google Drive
   path: examples/chatgpt/gpt_actions_library/gpt_action_google_drive.ipynb
@@ -2601,6 +2697,7 @@
     - gpt-actions-library
     - chatgpt
     - chatgpt-productivity
+  archived: true
 
 - title: GPT Actions library - Snowflake Direct
   path: examples/chatgpt/gpt_actions_library/gpt_action_snowflake_direct.ipynb
@@ -2623,6 +2720,7 @@
     - gpt-actions-library
     - chatgpt
     - chatgpt-data
+  archived: true
 
 - title: GPT Actions library - Retool Workflow
   path: examples/chatgpt/gpt_actions_library/gpt_action_retool_workflow.md
@@ -2634,6 +2732,7 @@
     - gpt-actions-library
     - chatgpt
     - chatgpt-middleware
+  archived: true
 
 - title: Using reasoning for data validation
   path: examples/o1/Using_reasoning_for_data_validation.ipynb
@@ -2644,6 +2743,7 @@
   tags:
     - completions
     - reasoning
+  archived: true
 
 - title: Using reasoning for routine generation
   path: examples/o1/Using_reasoning_for_routine_generation.ipynb
@@ -2654,6 +2754,7 @@
   tags:
     - completions
     - reasoning
+  archived: true
 
 - title: Using chained calls for o1 structured outputs
   path: examples/o1/Using_chained_calls_for_o1_structured_outputs.ipynb
@@ -2664,6 +2765,7 @@
   tags:
     - completions
     - reasoning
+  archived: true
 
 - title: Building a Bring Your Own Browser (BYOB) Tool for Web Browsing and Summarization
   path: examples/third_party/Web_search_with_google_api_bring_your_own_browser_tool.ipynb
@@ -2686,6 +2788,7 @@
     - cost
     - prompt caching
     - completions
+  archived: true
 
 - title: GPT Actions library - Google Ads via Adzviser
   path: examples/chatgpt/gpt_actions_library/gpt_action_googleads_adzviser.ipynb
@@ -2699,6 +2802,7 @@
     - chatgpt-data
     - chatgpt-productivity
     - chatgpt-middleware
+  archived: true
 
 - title: Leveraging model distillation to fine-tune a model
   path: examples/Leveraging_model_distillation_to_fine-tune_a_model.ipynb
@@ -2710,6 +2814,7 @@
   tags:
     - completions
     - fine-tuning
+  archived: true
 
 - title: Voice Translation into Different Languages
   path: examples/voice_solutions/voice_translation_into_different_languages_using_GPT-4o.ipynb
@@ -2730,6 +2835,7 @@
   tags:
     - completions
     - reasoning
+  archived: true
 
 - title: GPT Actions library - GitHub
   path: examples/chatgpt/gpt_actions_library/gpt_action_github.md
@@ -2752,6 +2858,7 @@
   tags:
     - evals
     - completions
+  archived: true
 
 - title: Vision Fine-tuning on GPT-4o for Visual Question Answering
   path: examples/multimodal/Vision_Fine_tuning_on_GPT4o_for_Visual_Question_Answering.ipynb
@@ -2774,6 +2881,7 @@
   tags:
     - completions
     - audio
+  archived: true
 
 - title: Pinecone Vector Database and Retool Workflow with GPT Actions
   path: examples/chatgpt/rag-quickstart/pinecone-retool/gpt-action-pinecone-retool-rag.ipynb
@@ -2786,6 +2894,7 @@
     - embeddings
     - chatgpt
     - chatgpt-and-api
+  archived: true
 
 - title: Optimizing Retrieval-Augmented Generation using GPT-4o Vision Modality
   path: examples/vector_databases/pinecone/Using_vision_modality_for_RAG_with_Pinecone.ipynb
@@ -2808,6 +2917,7 @@
     - gpt-actions-library
     - chatgpt-productivity
     - chatgpt
+  archived: true
 
 - title: GPT Actions library - Google Calendar
   path: examples/chatgpt/gpt_actions_library/gpt_action_google_calendar.md
@@ -2819,6 +2929,7 @@
     - gpt-actions-library
     - chatgpt
     - chatgpt-communication
+  archived: true
 
 - title: GPT Actions library - Tray.ai APIM
   path: examples/chatgpt/gpt_actions_library/gpt_action_trayai_apim.md
@@ -2830,6 +2941,7 @@
     - gpt-actions-library
     - chatgpt
     - chatgpt-middleware
+  archived: true
 
 - title: Reasoning over Code Quality and Security in GitHub Pull Requests
   path: examples/third_party/Code_quality_and_security_scan_with_GitHub_Actions.md
@@ -2850,6 +2962,7 @@
     - colin-openai
   tags:
     - guardrails
+  archived: true
 
 - title: How to use the Usage API and Cost API to monitor your OpenAI usage
   path: examples/completions_usage_api.ipynb
@@ -2933,6 +3046,7 @@
 - title: GPT Actions library - Salesforce & Gong
   path: examples/chatgpt/gpt_actions_library/gpt_action_salesforce_gong.md
   slug: gpt-action-salesforce-gong
+  archived: true
   date: 2025-04-07
   authors:
     - girishd
@@ -3148,6 +3262,7 @@
   slug: context-personalization
   description: Cookbook to build personalized agents with long-term memory state using the Agents SDK.
   date: 2026-01-05
+  archived: true
   authors:
     - emreokcular
   tags:

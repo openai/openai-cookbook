@@ -795,6 +795,7 @@
     - evals
     - completions
 
+  archived: true
 - title: Evals API Use-case - Bulk model and prompt experimentation
   path: examples/evaluation/use-cases/bulk-experimentation.ipynb
   slug: bulk-experimentation
@@ -805,6 +806,7 @@
     - evals
     - completions
 
+  archived: true
 - title: Evals API Use-case - Monitoring stored completions
   path: examples/evaluation/use-cases/completion-monitoring.ipynb
   slug: completion-monitoring
@@ -815,6 +817,7 @@
     - evals
     - completions
 
+  archived: true
 - title: Evals API Use-case - Responses Evaluation
   path: examples/evaluation/use-cases/responses-evaluation.ipynb
   slug: responses-evaluation

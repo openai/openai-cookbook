@@ -1146,6 +1146,7 @@
   tags:
     - embeddings
     - completions
+  archived: true
 
 - title: Recommendation using embeddings and nearest neighbor search
   path: examples/Recommendation_using_embeddings.ipynb
@@ -2162,6 +2163,7 @@
     - responses
     - vision
     - speech
+  archived: true
 
 - title: What's new with DALL·E 3?
   path: articles/what_is_new_with_dalle_3.mdx
@@ -2699,6 +2701,7 @@
     - gpt-actions-library
     - chatgpt
     - chatgpt-data
+  archived: true
 
 - title: GPT Actions library - Snowflake Middleware
   path: examples/chatgpt/gpt_actions_library/gpt_action_snowflake_middleware.ipynb
@@ -2996,6 +2999,7 @@
     - audio
     - responses
     - speech
+  archived: true
 
 - title: Build Live Translation Apps with gpt-realtime-translate
   path: examples/voice_solutions/realtime_translation_guide.mdx
@@ -3077,6 +3081,7 @@
     - functions
     - responses
     - api
+  archived: true
 
 - title: Parallel Agents with the OpenAI Agents SDK
   path: examples/agents_sdk/parallel_agents.ipynb
@@ -3127,7 +3132,6 @@
     - evals
     - mcp
 
-  archived: true
 - title: Evals API Use-case - Structured Outputs Evaluation
   path: examples/evaluation/use-cases/structured-outputs-evaluation.ipynb
   slug: structured-outputs-evaluation
@@ -3140,7 +3144,6 @@
     - responses
     - evals
 
-  archived: true
 - title: Evals API Use-case - Tools Evaluation
   path: examples/evaluation/use-cases/tools-evaluation.ipynb
   slug: tools-evaluation
@@ -3153,7 +3156,6 @@
     - responses
     - evals
 
-  archived: true
 - title: Evals API Use-case - Web Search Evaluation
   path: examples/evaluation/use-cases/web-search-evaluation.ipynb
   slug: web-search-evaluation
@@ -3166,7 +3168,6 @@
     - responses
     - evals
 
-  archived: true
 - title: Introduction to deep research in the OpenAI API
   path: examples/deep_research_api/introduction_to_deep_research_api.ipynb
   slug: introduction-to-deep-research-api

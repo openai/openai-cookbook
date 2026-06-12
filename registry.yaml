@@ -449,6 +449,7 @@
     - gpt-oss
     - open-models
     - gpt-oss-server
+  archived: true
 
 - title: Using NVIDIA TensorRT-LLM to run gpt-oss-20b
   path: articles/gpt-oss/run-nvidia.ipynb
@@ -1314,6 +1315,7 @@
     - kristapratico
   tags:
     - completions
+  archived: true
 
 - title: Azure Chat Completion models with your own data (preview)
   path: examples/azure/chat_with_your_own_data.ipynb
@@ -1336,6 +1338,7 @@
     - kristapratico
   tags:
     - embeddings
+  archived: true
 
 - title: Azure functions example
   path: examples/azure/functions.ipynb
@@ -3120,6 +3123,7 @@
     - evals
     - stripe
     - conversion
+  archived: true
 
 - title: Evals API Use-case - MCP Evaluation
   path: examples/evaluation/use-cases/mcp_eval_notebook.ipynb

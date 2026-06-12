@@ -2016,6 +2016,7 @@
     - esp32
     - iot
     - arduino
+  archived: true
 
 - title: Related resources from around the web
   path: articles/related_resources.md

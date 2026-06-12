@@ -3127,6 +3127,7 @@
     - evals
     - mcp
 
+  archived: true
 - title: Evals API Use-case - Structured Outputs Evaluation
   path: examples/evaluation/use-cases/structured-outputs-evaluation.ipynb
   slug: structured-outputs-evaluation
@@ -3139,6 +3140,7 @@
     - responses
     - evals
 
+  archived: true
 - title: Evals API Use-case - Tools Evaluation
   path: examples/evaluation/use-cases/tools-evaluation.ipynb
   slug: tools-evaluation
@@ -3151,6 +3153,7 @@
     - responses
     - evals
 
+  archived: true
 - title: Evals API Use-case - Web Search Evaluation
   path: examples/evaluation/use-cases/web-search-evaluation.ipynb
   slug: web-search-evaluation
@@ -3163,6 +3166,7 @@
     - responses
     - evals
 
+  archived: true
 - title: Introduction to deep research in the OpenAI API
   path: examples/deep_research_api/introduction_to_deep_research_api.ipynb
   slug: introduction-to-deep-research-api

@@ -1493,6 +1493,7 @@
     - liuchengshan-lcs
   tags:
     - embeddings
+  archived: true
 
 - title: Semantic search with SingleStoreDB
   path: >-
@@ -1556,6 +1557,7 @@
   tags:
     - embeddings
     - completions
+  archived: true
 
 - title: Philosophy with vector embeddings, OpenAI and Cassandra / Astra DB
   path: >-
@@ -1567,6 +1569,7 @@
   tags:
     - embeddings
     - completions
+  archived: true
 
 - title: Cassandra / Astra DB
   path: examples/vector_databases/cassandra_astradb/README.md
@@ -1576,6 +1579,7 @@
     - hemidactylus
   tags:
     - embeddings
+  archived: true
 
 - title: Using Chroma for embeddings search
   path: examples/vector_databases/chroma/Using_Chroma_for_embeddings_search.ipynb
@@ -1700,6 +1704,7 @@
     - colin-openai
   tags:
     - embeddings
+  archived: true
 
 - title: Retrieval augmentation for GPT-4 using Pinecone
   path: examples/vector_databases/pinecone/GPT4_Retrieval_Augmentation.ipynb
@@ -1848,6 +1853,7 @@
     - dongqqcom
   tags:
     - embeddings
+  archived: true
 
 - title: Question answering with Langchain, Tair and OpenAI
   path: examples/vector_databases/tair/QA_with_Langchain_Tair_and_OpenAI.ipynb
@@ -1859,6 +1865,7 @@
     - embeddings
     - tiktoken
     - completions
+  archived: true
 
 - title: Typesense
   path: examples/vector_databases/typesense/README.md
@@ -1899,6 +1906,7 @@
     - colin-openai
   tags:
     - embeddings
+  archived: true
 
 - title: Using Weaviate with generative OpenAI module for generative search
   path: >-
@@ -2054,6 +2062,7 @@
     - Barqawiz
   tags:
     - embeddings
+  archived: true
 
 - title: Vector similarity search using Neon Postgres
   path: examples/vector_databases/neon/neon-postgres-vector-search-pgvector.ipynb
@@ -2223,6 +2232,7 @@
   tags:
     - embeddings
     - completions
+  archived: true
 
 - title: Semantic search using MongoDB Atlas Vector Search and OpenAI
   path: examples/vector_databases/mongodb_atlas/semantic_search_using_mongodb_atlas_vector_search.ipynb

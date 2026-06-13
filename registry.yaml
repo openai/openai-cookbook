@@ -462,6 +462,7 @@
     - gpt-oss
     - open-models
     - gpt-oss-server
+  archived: true
 
 - title: Using NVIDIA TensorRT-LLM to run gpt-oss-20b
   path: articles/gpt-oss/run-nvidia.ipynb
@@ -571,6 +572,7 @@
   tags:
     - evals
     - images
+  archived: true
 
 - title: Using Evals API on Audio Inputs
   path: examples/evaluation/use-cases/EvalsAPI_Audio_Inputs.ipynb
@@ -808,6 +810,7 @@
     - evals
     - completions
 
+  archived: true
 - title: Evals API Use-case - Bulk model and prompt experimentation
   path: examples/evaluation/use-cases/bulk-experimentation.ipynb
   slug: bulk-experimentation
@@ -818,6 +821,7 @@
     - evals
     - completions
 
+  archived: true
 - title: Evals API Use-case - Monitoring stored completions
   path: examples/evaluation/use-cases/completion-monitoring.ipynb
   slug: completion-monitoring
@@ -828,6 +832,7 @@
     - evals
     - completions
 
+  archived: true
 - title: Evals API Use-case - Responses Evaluation
   path: examples/evaluation/use-cases/responses-evaluation.ipynb
   slug: responses-evaluation
@@ -838,6 +843,7 @@
   tags:
     - evals
     - responses
+  archived: true
 
 - title: Multi-Tool Orchestration with RAG approach using OpenAI's Responses API
   path: examples/responses_api/responses_api_tool_orchestration.ipynb
@@ -1156,6 +1162,7 @@
   tags:
     - embeddings
     - completions
+  archived: true
 
 - title: Recommendation using embeddings and nearest neighbor search
   path: examples/Recommendation_using_embeddings.ipynb
@@ -1321,6 +1328,7 @@
     - kristapratico
   tags:
     - completions
+  archived: true
 
 - title: Azure Chat Completion models with your own data (preview)
   path: examples/azure/chat_with_your_own_data.ipynb
@@ -1343,6 +1351,7 @@
     - kristapratico
   tags:
     - embeddings
+  archived: true
 
 - title: Azure functions example
   path: examples/azure/functions.ipynb
@@ -1497,6 +1506,7 @@
     - liuchengshan-lcs
   tags:
     - embeddings
+  archived: true
 
 - title: Semantic search with SingleStoreDB
   path: >-
@@ -1560,6 +1570,7 @@
   tags:
     - embeddings
     - completions
+  archived: true
 
 - title: Philosophy with vector embeddings, OpenAI and Cassandra / Astra DB
   path: >-
@@ -1571,6 +1582,7 @@
   tags:
     - embeddings
     - completions
+  archived: true
 
 - title: Cassandra / Astra DB
   path: examples/vector_databases/cassandra_astradb/README.md
@@ -1580,6 +1592,7 @@
     - hemidactylus
   tags:
     - embeddings
+  archived: true
 
 - title: Using Chroma for embeddings search
   path: examples/vector_databases/chroma/Using_Chroma_for_embeddings_search.ipynb
@@ -1704,6 +1717,7 @@
     - colin-openai
   tags:
     - embeddings
+  archived: true
 
 - title: Retrieval augmentation for GPT-4 using Pinecone
   path: examples/vector_databases/pinecone/GPT4_Retrieval_Augmentation.ipynb
@@ -1852,6 +1866,7 @@
     - dongqqcom
   tags:
     - embeddings
+  archived: true
 
 - title: Question answering with Langchain, Tair and OpenAI
   path: examples/vector_databases/tair/QA_with_Langchain_Tair_and_OpenAI.ipynb
@@ -1863,6 +1878,7 @@
     - embeddings
     - tiktoken
     - completions
+  archived: true
 
 - title: Typesense
   path: examples/vector_databases/typesense/README.md
@@ -1903,6 +1919,7 @@
     - colin-openai
   tags:
     - embeddings
+  archived: true
 
 - title: Using Weaviate with generative OpenAI module for generative search
   path: >-
@@ -2012,6 +2029,7 @@
     - esp32
     - iot
     - arduino
+  archived: true
 
 - title: Related resources from around the web
   path: articles/related_resources.md
@@ -2058,6 +2076,7 @@
     - Barqawiz
   tags:
     - embeddings
+  archived: true
 
 - title: Vector similarity search using Neon Postgres
   path: examples/vector_databases/neon/neon-postgres-vector-search-pgvector.ipynb
@@ -2172,6 +2191,7 @@
     - responses
     - vision
     - speech
+  archived: true
 
 - title: What's new with DALL·E 3?
   path: articles/what_is_new_with_dalle_3.mdx
@@ -2226,6 +2246,7 @@
   tags:
     - embeddings
     - completions
+  archived: true
 
 - title: Semantic search using MongoDB Atlas Vector Search and OpenAI
   path: examples/vector_databases/mongodb_atlas/semantic_search_using_mongodb_atlas_vector_search.ipynb
@@ -2709,6 +2730,7 @@
     - gpt-actions-library
     - chatgpt
     - chatgpt-data
+  archived: true
 
 - title: GPT Actions library - Snowflake Middleware
   path: examples/chatgpt/gpt_actions_library/gpt_action_snowflake_middleware.ipynb
@@ -2775,6 +2797,7 @@
     - msingh-openai
   tags:
     - completions
+  archived: true
 
 - title: Prompt Caching 101
   path: examples/Prompt_Caching101.ipynb
@@ -2825,6 +2848,7 @@
   tags:
     - completions
     - audio
+  archived: true
 
 - title: Enhance your prompts with meta prompting
   path: examples/Enhance_your_prompts_with_meta_prompting.ipynb
@@ -3006,6 +3030,7 @@
     - audio
     - responses
     - speech
+  archived: true
 
 - title: Build Live Translation Apps with gpt-realtime-translate
   path: examples/voice_solutions/realtime_translation_guide.mdx
@@ -3087,6 +3112,7 @@
     - functions
     - responses
     - api
+  archived: true
 
 - title: Parallel Agents with the OpenAI Agents SDK
   path: examples/agents_sdk/parallel_agents.ipynb
@@ -3123,6 +3149,7 @@
     - evals
     - stripe
     - conversion
+  archived: true
 
 - title: Evals API Use-case - MCP Evaluation
   path: examples/evaluation/use-cases/mcp_eval_notebook.ipynb
@@ -3136,6 +3163,7 @@
     - responses
     - evals
     - mcp
+  archived: true
 
 - title: Evals API Use-case - Structured Outputs Evaluation
   path: examples/evaluation/use-cases/structured-outputs-evaluation.ipynb
@@ -3160,6 +3188,7 @@
     - evals-api
     - responses
     - evals
+  archived: true
 
 - title: Evals API Use-case - Web Search Evaluation
   path: examples/evaluation/use-cases/web-search-evaluation.ipynb
@@ -3172,6 +3201,7 @@
     - evals-api
     - responses
     - evals
+  archived: true
 
 - title: Introduction to deep research in the OpenAI API
   path: examples/deep_research_api/introduction_to_deep_research_api.ipynb

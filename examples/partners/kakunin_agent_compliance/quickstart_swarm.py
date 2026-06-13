@@ -46,7 +46,7 @@ async def main() -> None:
             model="gpt-4o",
             version="1.0.0",
             model_hash="sha256:e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
-            metadata={"scopes": ["market.read", "trade.execute"]},
+            metadata={"permitted_actions": ["market.read", "trade.execute"]},
         )
         await kakunin_client.agents.certify(agent_record.id)
         

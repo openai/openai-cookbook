@@ -220,7 +220,6 @@
   tags:
     - realtime
     - transcription
-    - voice
     - speech
     - audio
 
@@ -627,7 +626,7 @@
     - Sibon li
   tags:
     - mcp
-    - voice
+    - speech
     - agents-sdk
     - functions
     - tracing

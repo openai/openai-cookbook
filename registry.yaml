@@ -1271,6 +1271,7 @@
     - prestontuggle
   tags:
     - whisper
+    - audio
     - completions
   archived: true
 
@@ -1282,6 +1283,7 @@
     - prestontuggle
   tags:
     - whisper
+    - audio
   archived: true
 
 - title: Whisper prompting guide
@@ -1292,6 +1294,7 @@
     - prestontuggle
   tags:
     - whisper
+    - audio
     - completions
   archived: true
 
@@ -2420,6 +2423,7 @@
     - completions
     - vision
     - whisper
+    - audio
   archived: true
 
 - title: Azure AI Search with Azure Functions and GPT Actions in ChatGPT

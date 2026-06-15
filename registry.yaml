@@ -3180,6 +3180,7 @@
     - evals-api
     - responses
     - evals
+  archived: true
 
 - title: Evals API Use-case - Tools Evaluation
   path: examples/evaluation/use-cases/tools-evaluation.ipynb

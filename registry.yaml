@@ -570,6 +570,7 @@
   tags:
     - evals
     - audio
+  archived: true
 
 - title: Optimize Prompts
   path: examples/Optimize_Prompts.ipynb
@@ -2916,6 +2917,7 @@
   tags:
     - completions
     - vision
+  archived: true
 
 - title: GPT Actions library - Workday
   path: examples/chatgpt/gpt_actions_library/gpt_action_workday.md
@@ -3123,6 +3125,7 @@
   tags:
     - audio
     - speech
+  archived: true
 
 - title: Selecting a Model Based on Stripe Conversion – A Practical Eval for Startups
   path: examples/stripe_model_eval/selecting_a_model_based_on_stripe_conversion.ipynb

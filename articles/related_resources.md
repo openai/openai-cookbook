@@ -34,7 +34,7 @@ People are writing great tools and papers for improving outputs from GPT. Here a
 ## Prompting guides
 
 - [Brex's Prompt Engineering Guide](https://github.com/brexhq/prompt-engineering): Brex's introduction to language models and prompt engineering.
-- [learnprompting.org](https://learnprompting.org/): An introductory course to prompt engineering.
+- [learnprompting.org](https://learnprompting.org/): An introductory course on prompt engineering.
 - [Lil'Log Prompt Engineering](https://lilianweng.github.io/posts/2023-03-15-prompt-engineering/): An OpenAI researcher's review of the prompt engineering literature (as of March 2023).
 - [OpenAI Cookbook: Techniques to improve reliability](https://cookbook.openai.com/articles/techniques_to_improve_reliability): A slightly dated (Sep 2022) review of techniques for prompting language models.
 - [promptingguide.ai](https://www.promptingguide.ai/): A prompt engineering guide that demonstrates many techniques.

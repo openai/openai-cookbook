@@ -1,4 +1,4 @@
-# Contributing the the cookbook
+# Contributing to the cookbook
 
 The OpenAI Cookbook is a collection of useful patterns and examples of working with the OpenAI platform, provided as a community resource.
 

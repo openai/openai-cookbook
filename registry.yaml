@@ -1461,6 +1461,7 @@
     - dsblank
   tags:
     - embeddings
+  archived: true
 
 - title: Financial document analysis with LlamaIndex
   path: >-
@@ -2107,6 +2108,7 @@
   tags:
     - tiktoken
     - completions
+  archived: true
 
 - title: How to build an agent with the OpenAI Node.js SDK
   path: examples/How_to_build_an_agent_with_the_node_sdk.mdx

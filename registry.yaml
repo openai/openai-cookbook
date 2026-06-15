@@ -97,6 +97,7 @@
     - chatgpt
     - agents
     - enterprise
+    - security
 
 - title: Computer Use Agents in Daytona Sandboxes
   path: examples/agents_sdk/computer_use_with_daytona/computer_use_with_daytona.ipynb
@@ -109,6 +110,7 @@
     - agents-sdk
     - agents
     - sandbox
+    - security
 
 - title: Migrate a Legacy Codebase with Sandbox Agents
   path: examples/agents_sdk/sandboxed-code-migration/sandboxed_code_migration_agent.ipynb
@@ -136,6 +138,7 @@
     - agents
     - migration
     - sandbox
+    - security
 
 - title: Agents SDK Deployment Manager
   path: examples/agents_sdk/deployment_manager/README.md
@@ -181,6 +184,7 @@
     - evals
     - promptfoo
     - partners
+    - security
 
 - title: Realtime Eval Guide
   path: examples/Realtime_eval_guide.ipynb
@@ -340,6 +344,7 @@
     - pap-openai
   tags:
     - codex
+    - security
 
 - title: Realtime Prompting Guide
   path: examples/Realtime_prompting_guide.ipynb
@@ -641,6 +646,7 @@
     - agents-sdk
     - mcp
     - tracing
+    - security
 
 - title: Eval Driven System Design - From Prototype to Production
   path: examples/partners/eval_driven_system_design/receipt_inspection.ipynb
@@ -722,6 +728,7 @@
     - charuj
   tags:
     - mcp
+    - security
 
 - title: Image Understanding with RAG
   path: examples/multimodal/image_understanding_with_rag.ipynb
@@ -2971,6 +2978,7 @@
     - SDLC
     - reasoning
     - completions
+    - security
 
 - title: How to evaluate LLMs for SQL generation
   path: examples/evaluation/How_to_evaluate_LLMs_for_SQL_generation.ipynb
@@ -3002,6 +3010,7 @@
     - msingh-openai
   tags:
     - completions
+    - security
 
 - title: Doing RAG on PDFs using File Search in the Responses API
   path: examples/File_Search_Responses.ipynb
@@ -3281,6 +3290,7 @@
     - joanneshin-openai
   tags:
     - codex
+    - security
 
 - title: Context Engineering for Personalization - State Management with Long-Term Memory Notes
   path: examples/agents_sdk/context_personalization.ipynb
@@ -3300,6 +3310,7 @@
     - katiagg
   tags:
     - agents-sdk
+    - security
 
 - title: GPT-5.1 Prompting Guide
   path: examples/gpt-5/gpt-5-1_prompting_guide.ipynb
@@ -3409,6 +3420,7 @@
 
   tags:
     - responses
+    - security
 
 - title: Prompt Caching 201
   path: examples/Prompt_Caching_201.ipynb

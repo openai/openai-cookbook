@@ -4,6 +4,20 @@
 # should build pages for, and indicates metadata such as tags, creation date and
 # authors for each page.
 
+- title: Adding a trust layer around Responses API agent calls
+  path: examples/agents/trust_layer_responses_api_agents.ipynb
+  slug: trust-layer-responses-api-agent-calls
+  description: Wrap a Responses API tool-calling loop with deterministic tool policy, HITL escalation, and traceable audit evidence using Pramagent.
+  date: 2026-06-16
+  authors:
+    - sriram7737
+  tags:
+    - responses
+    - agents
+    - guardrails
+    - tools
+    - tracing
+
 - title: "SchemaFlow: Agentic Database Change Impact Analysis, SQL Generation, and Eval Guardrails"
   path: examples/partners/schemaflow_design_guide/schemaflow_cookbook.ipynb
   slug: schemaflow-design-guide

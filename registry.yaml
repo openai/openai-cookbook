@@ -4,6 +4,20 @@
 # should build pages for, and indicates metadata such as tags, creation date and
 # authors for each page.
 
+- title: Agent Regression Tests with Foundry Evaluators
+  path: examples/evaluation/agent_regression_tests_with_foundry_evaluators/agent_regression_tests_with_foundry_evaluators.ipynb
+  slug: agent-regression-tests-with-foundry-evaluators
+  description: A CI-friendly micro-eval regression suite for an OpenAI Responses API agent, using the open-source azure-ai-evaluation evaluator catalog with an OpenAI judge model.
+  date: 2026-05-23
+  authors:
+    - jluocsa
+  tags:
+    - agents
+    - evals
+    - evaluation
+    - tool-calling
+    - responses-api
+
 - title: "SchemaFlow: Agentic Database Change Impact Analysis, SQL Generation, and Eval Guardrails"
   path: examples/partners/schemaflow_design_guide/schemaflow_cookbook.ipynb
   slug: schemaflow-design-guide
@@ -38,7 +52,6 @@
     - responses
     - api
     - bedrock
-
 
 - title: Macro Evals for Agentic Systems
   path: examples/partners/macro_evals_for_agentic_systems/macro_evals_for_agentic_systems.ipynb

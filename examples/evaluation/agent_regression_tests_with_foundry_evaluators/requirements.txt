@@ -1,0 +1,4 @@
+openai>=1.60.0
+azure-ai-evaluation>=1.0.0
+pandas>=2.2.0
+python-dotenv>=1.0.1

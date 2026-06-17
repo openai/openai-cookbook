@@ -1,0 +1,13 @@
+apiVersion: 1
+
+providers:
+  - name: codex-opentelemetry
+    orgId: 1
+    folder: Codex OpenTelemetry
+    type: file
+    disableDeletion: true
+    updateIntervalSeconds: 10
+    allowUiUpdates: false
+    options:
+      path: /etc/grafana/dashboards
+      foldersFromFilesStructure: false

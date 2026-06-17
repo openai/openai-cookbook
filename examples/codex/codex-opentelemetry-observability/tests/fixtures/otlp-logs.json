@@ -1,0 +1,42 @@
+{
+  "resourceLogs": [
+    {
+      "resource": {
+        "attributes": [
+          {"key": "service.name", "value": {"stringValue": "codex"}},
+          {"key": "env", "value": {"stringValue": "__SMOKE_ENVIRONMENT__"}}
+        ]
+      },
+      "scopeLogs": [
+        {
+          "scope": {"name": "codex.telemetry"},
+          "logRecords": [
+            {
+              "timeUnixNano": "__TIME_UNIX_NANO__",
+              "severityNumber": 9,
+              "severityText": "INFO",
+              "body": {"stringValue": "__PRIVACY_SENTINEL__"},
+              "attributes": [
+                {"key": "event.name", "value": {"stringValue": "codex.api_request"}},
+                {"key": "success", "value": {"boolValue": true}},
+                {"key": "duration_ms", "value": {"intValue": "1"}},
+                {"key": "error.message", "value": {"stringValue": "__PRIVACY_SENTINEL__"}}
+              ]
+            },
+            {
+              "timeUnixNano": "__TIME_UNIX_NANO__",
+              "severityNumber": 9,
+              "severityText": "INFO",
+              "body": {"stringValue": "__PRIVACY_SENTINEL__"},
+              "attributes": [
+                {"key": "event.name", "value": {"stringValue": "codex.tool_result"}},
+                {"key": "tool.output", "value": {"stringValue": "__PRIVACY_SENTINEL__"}},
+                {"key": "success", "value": {"boolValue": true}}
+              ]
+            }
+          ]
+        }
+      ]
+    }
+  ]
+}

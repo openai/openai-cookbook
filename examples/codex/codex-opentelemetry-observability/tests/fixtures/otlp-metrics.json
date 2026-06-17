@@ -1,0 +1,72 @@
+{
+  "resourceMetrics": [
+    {
+      "resource": {
+        "attributes": [
+          {"key": "service.name", "value": {"stringValue": "codex"}},
+          {"key": "env", "value": {"stringValue": "__SMOKE_ENVIRONMENT__"}}
+        ]
+      },
+      "scopeMetrics": [
+        {
+          "scope": {
+            "name": "__PRIVACY_SENTINEL__",
+            "version": "__PRIVACY_SENTINEL__"
+          },
+          "metrics": [
+            {
+              "name": "codex.api_request",
+              "description": "__PRIVACY_SENTINEL__",
+              "unit": "__PRIVACY_SENTINEL__",
+              "sum": {
+                "aggregationTemporality": 2,
+                "isMonotonic": true,
+                "dataPoints": [
+                  {
+                    "timeUnixNano": "__TIME_UNIX_NANO__",
+                    "asInt": "1",
+                    "attributes": [
+                      {"key": "success", "value": {"boolValue": true}},
+                      {"key": "tool.output", "value": {"stringValue": "__PRIVACY_SENTINEL__"}}
+                    ]
+                  },
+                  {
+                    "timeUnixNano": "__TIME_UNIX_NANO__",
+                    "asInt": "1",
+                    "attributes": [
+                      {"key": "success", "value": {"boolValue": true}}
+                    ],
+                    "exemplars": [
+                      {
+                        "filteredAttributes": [
+                          {"key": "tool.output", "value": {"stringValue": "__PRIVACY_SENTINEL__"}}
+                        ],
+                        "timeUnixNano": "__TIME_UNIX_NANO__",
+                        "asInt": "1",
+                        "spanId": "__SPAN_ID__",
+                        "traceId": "__TRACE_ID__"
+                      }
+                    ]
+                  }
+                ]
+              }
+            },
+            {
+              "name": "unknown.__PRIVACY_SENTINEL__",
+              "description": "Unknown metric that must be dropped",
+              "unit": "1",
+              "gauge": {
+                "dataPoints": [
+                  {
+                    "timeUnixNano": "__TIME_UNIX_NANO__",
+                    "asInt": "1"
+                  }
+                ]
+              }
+            }
+          ]
+        }
+      ]
+    }
+  ]
+}

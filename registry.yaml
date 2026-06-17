@@ -3460,3 +3460,17 @@
   tags:
     - evals
     - promptfoo
+
+- title: Observe Codex with OpenTelemetry and Grafana LGTM
+  path: examples/codex/codex-opentelemetry-observability/README.md
+  slug: codex-opentelemetry-observability
+  description: Run a local Docker OpenTelemetry stack for Codex logs, traces, and metrics, explore them in Grafana, and adapt the pattern for an existing LGTM environment.
+  date: 2026-06-11
+  authors:
+    - henzelmann-oai
+  tags:
+    - codex
+    - opentelemetry
+    - observability
+    - tracing
+    - open-source

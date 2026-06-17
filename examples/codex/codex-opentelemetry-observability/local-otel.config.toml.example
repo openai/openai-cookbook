@@ -1,0 +1,21 @@
+# Copy this file to ~/.codex/local-otel.config.toml.
+# Select it for a Codex invocation with --profile local-otel.
+
+[analytics]
+enabled = true
+
+[otel]
+environment = "local-demo"
+log_user_prompt = false
+
+[otel.exporter."otlp-http"]
+endpoint = "http://127.0.0.1:4318/v1/logs"
+protocol = "binary"
+
+[otel.trace_exporter."otlp-http"]
+endpoint = "http://127.0.0.1:4318/v1/traces"
+protocol = "binary"
+
+[otel.metrics_exporter."otlp-http"]
+endpoint = "http://127.0.0.1:4318/v1/metrics"
+protocol = "binary"

@@ -1,0 +1,53 @@
+{
+  "resourceSpans": [
+    {
+      "resource": {
+        "attributes": [
+          {"key": "service.name", "value": {"stringValue": "codex"}},
+          {"key": "env", "value": {"stringValue": "__SMOKE_ENVIRONMENT__"}}
+        ]
+      },
+      "scopeSpans": [
+        {
+          "scope": {"name": "codex.telemetry"},
+          "spans": [
+            {
+              "traceId": "__TRACE_ID__",
+              "spanId": "__SPAN_ID__",
+              "name": "codex.turn",
+              "kind": 1,
+              "startTimeUnixNano": "__START_TIME_UNIX_NANO__",
+              "endTimeUnixNano": "__END_TIME_UNIX_NANO__",
+              "attributes": [
+                {"key": "event.name", "value": {"stringValue": "codex.turn"}},
+                {"key": "tool.output", "value": {"stringValue": "__PRIVACY_SENTINEL__"}}
+              ],
+              "status": {"code": 1, "message": "__PRIVACY_SENTINEL__"}
+            },
+            {
+              "traceId": "__TRACE_ID__",
+              "spanId": "2222222222222222",
+              "name": "codex.linked_operation",
+              "kind": 1,
+              "startTimeUnixNano": "__START_TIME_UNIX_NANO__",
+              "endTimeUnixNano": "__END_TIME_UNIX_NANO__",
+              "attributes": [
+                {"key": "event.name", "value": {"stringValue": "codex.linked_operation"}}
+              ],
+              "links": [
+                {
+                  "traceId": "__TRACE_ID__",
+                  "spanId": "__SPAN_ID__",
+                  "attributes": [
+                    {"key": "tool.output", "value": {"stringValue": "__PRIVACY_SENTINEL__"}}
+                  ]
+                }
+              ],
+              "status": {"code": 1}
+            }
+          ]
+        }
+      ]
+    }
+  ]
+}

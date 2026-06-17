@@ -1,0 +1,199 @@
+extensions:
+  health_check:
+    endpoint: 0.0.0.0:13133
+
+receivers:
+  otlp:
+    protocols:
+      http:
+        endpoint: 0.0.0.0:4318
+
+processors:
+  memory_limiter:
+    check_interval: 1s
+    limit_mib: 384
+    spike_limit_mib: 96
+
+  filter/drop_sensitive_logs:
+    error_mode: propagate
+    log_conditions:
+      - log.attributes["event.name"] == "codex.tool_result"
+
+  # Collector 0.153 cannot redact individual span-link or metric-exemplar
+  # attributes. Drop telemetry carrying either surface before allowlisting.
+  filter/drop_sensitive_traces:
+    error_mode: propagate
+    trace_conditions:
+      - Len(span.links) > 0
+
+  filter/drop_sensitive_metrics:
+    error_mode: propagate
+    metric_conditions:
+      - >-
+        metric.name != "codex.api_request" and
+        metric.name != "codex.api_request.duration_ms" and
+        metric.name != "codex.sse_event" and
+        metric.name != "codex.thread.started" and
+        metric.name != "codex.tool.call" and
+        metric.name != "codex.tool.call.duration_ms" and
+        metric.name != "codex.turn.e2e_duration_ms" and
+        metric.name != "codex.turn.token_usage"
+      - Len(datapoint.exemplars) > 0
+
+  transform/privacy:
+    error_mode: propagate
+    log_statements:
+      - set(log.body, "codex.event")
+      - delete_matching_keys(log.attributes, "(?i)(prompt|arguments?|output|account|email|conversation|call[._]?id|request[._]?id|host[._]?name|endpoint|error[._]?message|auth_mode|terminal|slug|event[._]?timestamp)")
+      - keep_keys(log.attributes, ["event.name", "app.version", "model", "sandbox_policy", "approval_policy", "http.response.status_code", "status_code", "success", "attempt", "kind", "decision", "source", "tool_name", "duration_ms"])
+      - delete_matching_keys(resource.attributes, "(?i)(account|email|conversation|call[._]?id|request[._]?id|host[._]?name|endpoint)")
+      - keep_keys(resource.attributes, ["service.name", "service.version", "env"])
+      - keep_keys(scope.attributes, [])
+    trace_statements:
+      - context: span
+        statements:
+          - delete_matching_keys(span.attributes, "(?i)(prompt|arguments?|output|account|email|conversation|call[._]?id|request[._]?id|host[._]?name|endpoint|error[._]?message|auth_mode|terminal|slug|event[._]?timestamp)")
+          - keep_keys(span.attributes, ["event.name", "app.version", "model", "sandbox_policy", "approval_policy", "http.response.status_code", "status_code", "success", "attempt", "kind", "decision", "source", "tool_name", "duration_ms"])
+          - set(span.name, "codex.operation")
+          - set(span.trace_state, "")
+          - set(span.status.message, "")
+          - delete_matching_keys(resource.attributes, "(?i)(account|email|conversation|call[._]?id|request[._]?id|host[._]?name|endpoint)")
+          - keep_keys(resource.attributes, ["service.name", "service.version", "env"])
+          - keep_keys(scope.attributes, [])
+      - context: spanevent
+        statements:
+          - set(spanevent.name, "codex.event")
+          - keep_keys(spanevent.attributes, [])
+    metric_statements:
+      - context: metric
+        statements:
+          - set(metric.description, "")
+          - set(metric.unit, "")
+          - set(scope.name, "codex.telemetry")
+          - set(scope.version, "")
+      - context: datapoint
+        statements:
+          - delete_matching_keys(datapoint.attributes, "(?i)(prompt|arguments?|output|account|email|conversation|call[._]?id|request[._]?id|host[._]?name|endpoint|error[._]?message|auth_mode|terminal|slug|event[._]?timestamp)")
+          - keep_keys(datapoint.attributes, ["http.response.status_code", "status_code", "status", "success", "kind", "tool_name", "tool", "model", "environment", "sandbox", "sandbox_policy", "approval_policy", "app.version", "decision", "source", "token_type"])
+          - delete_matching_keys(resource.attributes, "(?i)(account|email|conversation|call[._]?id|request[._]?id|host[._]?name|endpoint)")
+          - keep_keys(resource.attributes, ["service.name", "service.version", "env"])
+          - keep_keys(scope.attributes, [])
+
+  redaction/privacy:
+    allow_all_keys: false
+    allowed_keys:
+      - event.name
+      - app.version
+      - model
+      - sandbox_policy
+      - approval_policy
+      - http.response.status_code
+      - status_code
+      - status
+      - success
+      - attempt
+      - kind
+      - decision
+      - source
+      - tool_name
+      - tool
+      - duration_ms
+      - environment
+      - sandbox
+      - token_type
+      - service.name
+      - service.version
+      - env
+    redact_all_types: true
+    blocked_key_patterns:
+      - '(?i).*(password|secret|api[_-]?key|authorization|cookie).*'
+    blocked_values:
+      - '(?i)[a-z0-9._%+-]+@[a-z0-9.-]+\.[a-z]{2,}'
+      - '(?i)\b[0-9a-f]{8}-[0-9a-f]{4}-[1-5][0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}\b'
+      - '(?i)(api[_-]?key|token|secret|password)[=: ]+[^\s]+'
+      - '\b(?:[0-9]{1,3}\.){3}[0-9]{1,3}\b'
+      - '\b(?:\d[ -]*?){13,19}\b'
+    summary: silent
+
+  batch:
+    timeout: 5s
+    send_batch_size: 512
+    send_batch_max_size: 1024
+
+exporters:
+  otlp_http/logs:
+    logs_endpoint: http://loki:3100/otlp/v1/logs
+    compression: gzip
+    timeout: 10s
+    retry_on_failure:
+      enabled: true
+      initial_interval: 1s
+      max_interval: 10s
+      max_elapsed_time: 60s
+    sending_queue:
+      enabled: true
+      num_consumers: 2
+      queue_size: 256
+      sizer: requests
+
+  otlp_http/traces:
+    traces_endpoint: http://tempo:4318/v1/traces
+    compression: gzip
+    timeout: 10s
+    retry_on_failure:
+      enabled: true
+      initial_interval: 1s
+      max_interval: 10s
+      max_elapsed_time: 60s
+    sending_queue:
+      enabled: true
+      num_consumers: 2
+      queue_size: 256
+      sizer: requests
+
+  prometheus:
+    endpoint: 0.0.0.0:9464
+    resource_to_telemetry_conversion:
+      enabled: true
+
+service:
+  extensions:
+    - health_check
+  telemetry:
+    logs:
+      level: info
+    metrics:
+      readers:
+        - pull:
+            exporter:
+              prometheus:
+                host: 0.0.0.0
+                port: 8888
+  pipelines:
+    logs:
+      receivers: [otlp]
+      processors:
+        - memory_limiter
+        - filter/drop_sensitive_logs
+        - transform/privacy
+        - redaction/privacy
+        - batch
+      exporters: [otlp_http/logs]
+    traces:
+      receivers: [otlp]
+      processors:
+        - memory_limiter
+        - filter/drop_sensitive_traces
+        - transform/privacy
+        - redaction/privacy
+        - batch
+      exporters: [otlp_http/traces]
+    metrics:
+      receivers: [otlp]
+      processors:
+        - memory_limiter
+        - filter/drop_sensitive_metrics
+        - transform/privacy
+        - redaction/privacy
+        - batch
+      exporters: [prometheus]

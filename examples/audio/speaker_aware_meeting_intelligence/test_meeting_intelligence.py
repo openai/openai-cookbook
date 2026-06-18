@@ -21,6 +21,7 @@ import sys
 import tempfile
 import unittest
 from pathlib import Path
+from types import SimpleNamespace
 
 
 EXAMPLE_DIR = Path(__file__).resolve().parent
@@ -226,6 +227,50 @@ class GuardrailUnitTests(unittest.TestCase):
         )
         pii_check = next(check for check in report_with_redaction["checks"] if check["name"] == "basic_pii_scan")
         self.assertIn("remain after redaction", pii_check["detail"])
+
+    def test_generate_meeting_intelligence_uses_responses_api_json_schema(self) -> None:
+        payload = minimal_intelligence("Seller [00:00.000-00:03.000]")
+        calls = []
+
+        class FakeResponses:
+            def create(self, **kwargs):
+                calls.append(kwargs)
+                return SimpleNamespace(output_text=json.dumps(payload))
+
+        class FakeClient:
+            def __init__(self):
+                self.responses = FakeResponses()
+
+        original_openai = sys.modules.get("openai")
+        sys.modules["openai"] = SimpleNamespace(OpenAI=lambda: FakeClient())
+        try:
+            result = meeting_intelligence.generate_meeting_intelligence(
+                [
+                    meeting_intelligence.Segment(
+                        speaker="Seller",
+                        start=0.0,
+                        end=3.0,
+                        text="I will send the notes.",
+                    )
+                ],
+                "gpt-test",
+            )
+        finally:
+            if original_openai is None:
+                del sys.modules["openai"]
+            else:
+                sys.modules["openai"] = original_openai
+
+        self.assertEqual(result, payload)
+        self.assertEqual(len(calls), 1)
+        request = calls[0]
+        self.assertEqual(request["model"], "gpt-test")
+        self.assertEqual(request["text"]["format"]["type"], "json_schema")
+        self.assertEqual(request["text"]["format"]["name"], "meeting_intelligence")
+        self.assertTrue(request["text"]["format"]["strict"])
+        self.assertIn("schema", request["text"]["format"])
+        self.assertNotIn("response_format", request)
+        self.assertNotIn("messages", request)
 
     def test_fail_on_guardrail_exits_nonzero_for_demo(self) -> None:
         with tempfile.TemporaryDirectory() as tmpdir:

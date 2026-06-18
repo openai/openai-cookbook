@@ -427,11 +427,10 @@ def generate_meeting_intelligence(segments: list[Segment], model: str) -> dict[s
     client = OpenAI()
     transcript = transcript_for_model(segments)
 
-    completion = client.chat.completions.create(
+    completion = client.responses.create(
         model=model,
         temperature=0,
-        response_format={"type": "json_schema", "json_schema": MEETING_INTELLIGENCE_SCHEMA},
-        messages=[
+        input=[
             {
                 "role": "system",
                 "content": (
@@ -450,9 +449,17 @@ def generate_meeting_intelligence(segments: list[Segment], model: str) -> dict[s
                 ),
             },
         ],
+        text={
+            "format": {
+                "type": "json_schema",
+                "name": MEETING_INTELLIGENCE_SCHEMA["name"],
+                "strict": MEETING_INTELLIGENCE_SCHEMA["strict"],
+                "schema": MEETING_INTELLIGENCE_SCHEMA["schema"],
+            }
+        },
     )
 
-    content = completion.choices[0].message.content
+    content = completion.output_text.strip()
     if not content:
         raise RuntimeError("The model returned an empty response.")
     return json.loads(content)

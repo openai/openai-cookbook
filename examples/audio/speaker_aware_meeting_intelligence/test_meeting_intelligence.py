@@ -99,6 +99,15 @@ class EndToEndCliTests(unittest.TestCase):
 
 
 class GuardrailUnitTests(unittest.TestCase):
+    def test_parse_known_speakers_trims_path_whitespace(self) -> None:
+        with tempfile.TemporaryDirectory() as tmpdir:
+            reference = Path(tmpdir) / "speaker.wav"
+            reference.write_bytes(b"RIFF....WAVEfmt ")
+
+            speakers = meeting_intelligence.parse_known_speakers([f" Agent = {reference} "])
+
+            self.assertEqual(speakers, [("Agent", reference)])
+
     def test_to_data_url_accepts_path_or_string(self) -> None:
         with tempfile.TemporaryDirectory() as tmpdir:
             reference = Path(tmpdir) / "speaker.wav"
@@ -166,6 +175,8 @@ class GuardrailUnitTests(unittest.TestCase):
     def test_evidence_anchor_requires_timestamp_not_speaker_name_only(self) -> None:
         self.assertFalse(meeting_intelligence.evidence_has_anchor("Customer described the escalation path."))
         self.assertTrue(meeting_intelligence.evidence_has_anchor("Customer [00:00.000-00:03.000]"))
+        self.assertEqual(meeting_intelligence.format_timestamp(6000), "100:00.000")
+        self.assertTrue(meeting_intelligence.evidence_has_anchor("Customer [100:00.000-100:03.000]"))
 
 
 class SyntheticCaseTests(unittest.TestCase):

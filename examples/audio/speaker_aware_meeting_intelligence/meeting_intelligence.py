@@ -38,7 +38,7 @@ from typing import Any
 DEFAULT_TRANSCRIPTION_MODEL = "gpt-4o-transcribe-diarize"
 DEFAULT_SUMMARY_MODEL = os.getenv("OPENAI_MEETING_INTELLIGENCE_MODEL", "gpt-4.1-mini")
 DEFAULT_MODERATION_MODEL = "omni-moderation-latest"
-TIMESTAMP_PATTERN = re.compile(r"\b\d{2}:\d{2}\.\d{3}\b")
+TIMESTAMP_PATTERN = re.compile(r"\b\d{2,}:\d{2}\.\d{3}\b")
 
 
 @dataclass(frozen=True)
@@ -275,9 +275,12 @@ def parse_known_speakers(entries: list[str]) -> list[tuple[str, Path]]:
             raise ValueError(f"Expected --known-speaker NAME=PATH, got: {entry}")
         name, raw_path = entry.split("=", 1)
         name = name.strip()
-        path = Path(raw_path).expanduser()
+        raw_path = raw_path.strip()
         if not name:
             raise ValueError(f"Known speaker name cannot be empty: {entry}")
+        if not raw_path:
+            raise ValueError(f"Known speaker reference path cannot be empty: {entry}")
+        path = Path(raw_path).expanduser()
         if not path.exists():
             raise FileNotFoundError(f"Known speaker reference does not exist: {path}")
         speakers.append((name, path))

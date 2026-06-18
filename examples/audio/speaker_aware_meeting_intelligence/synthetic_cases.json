@@ -1,0 +1,209 @@
+[
+  {
+    "name": "clean_handoff_passes",
+    "description": "A clean customer handoff with anchored evidence and no medium or high risks.",
+    "segments": [
+      {
+        "speaker": "Seller",
+        "start": 0.0,
+        "end": 7.4,
+        "text": "Thanks for joining. I want to confirm the pilot success criteria."
+      },
+      {
+        "speaker": "Customer",
+        "start": 7.5,
+        "end": 18.2,
+        "text": "The pilot is successful if support managers can review action items and customer blockers within an hour of each call."
+      },
+      {
+        "speaker": "Seller",
+        "start": 18.3,
+        "end": 29.8,
+        "text": "I will send a sample output package and a review checklist by Friday."
+      }
+    ],
+    "intelligence": {
+      "summary": "The customer wants a pilot that turns calls into reviewable action items and blockers within an hour.",
+      "participants": [
+        {
+          "speaker": "Seller",
+          "inferred_role": "Vendor owner",
+          "evidence": "Seller [00:00.000-00:07.400]"
+        },
+        {
+          "speaker": "Customer",
+          "inferred_role": "Support operations stakeholder",
+          "evidence": "Customer [00:07.500-00:18.200]"
+        }
+      ],
+      "customer_context": [
+        {
+          "fact": "The customer needs action items and blockers within one hour of each call.",
+          "evidence": "Customer [00:07.500-00:18.200]"
+        }
+      ],
+      "decisions": [],
+      "action_items": [
+        {
+          "owner_speaker": "Seller",
+          "task": "Send a sample output package and review checklist.",
+          "due_date_or_trigger": "By Friday",
+          "evidence": "Seller [00:18.300-00:29.800]"
+        }
+      ],
+      "risks": [],
+      "open_questions": [],
+      "notable_quotes": [
+        {
+          "speaker": "Customer",
+          "quote": "Support managers can review action items and customer blockers within an hour of each call.",
+          "timestamp": "00:07.500"
+        }
+      ],
+      "follow_up_email": {
+        "subject": "Pilot output package",
+        "body": "Hi,\n\nThanks for the call. I will send the sample output package and review checklist by Friday.\n\nBest,\n[Your name]"
+      }
+    },
+    "expected_status": "pass"
+  },
+  {
+    "name": "pii_requires_review",
+    "description": "Transcript contains email and phone details when redaction is disabled.",
+    "segments": [
+      {
+        "speaker": "Customer",
+        "start": 0.0,
+        "end": 8.0,
+        "text": "Please send the notes to alex@example.com and call me at 415-555-0100 if the pilot slips."
+      }
+    ],
+    "intelligence": {
+      "summary": "The customer shared contact details and asked for notice if the pilot slips.",
+      "participants": [
+        {
+          "speaker": "Customer",
+          "inferred_role": "Customer stakeholder",
+          "evidence": "Customer [00:00.000-00:08.000]"
+        }
+      ],
+      "customer_context": [
+        {
+          "fact": "The customer requested contact if the pilot slips.",
+          "evidence": "Customer [00:00.000-00:08.000]"
+        }
+      ],
+      "decisions": [],
+      "action_items": [],
+      "risks": [],
+      "open_questions": [],
+      "notable_quotes": [],
+      "follow_up_email": {
+        "subject": "Pilot follow-up",
+        "body": "Hi,\n\nI will follow up if the pilot timeline changes.\n\nBest,\n[Your name]"
+      }
+    },
+    "expected_status": "review_required"
+  },
+  {
+    "name": "weak_evidence_requires_review",
+    "description": "Structured output includes evidence without a speaker or timestamp anchor.",
+    "segments": [
+      {
+        "speaker": "Customer",
+        "start": 0.0,
+        "end": 11.5,
+        "text": "We need the handoff to include blockers and next steps."
+      }
+    ],
+    "intelligence": {
+      "summary": "The customer needs blockers and next steps in the handoff.",
+      "participants": [
+        {
+          "speaker": "Customer",
+          "inferred_role": "Customer stakeholder",
+          "evidence": "The stakeholder explained the need."
+        }
+      ],
+      "customer_context": [
+        {
+          "fact": "The handoff needs blockers and next steps.",
+          "evidence": "The customer explained the requirement."
+        }
+      ],
+      "decisions": [],
+      "action_items": [],
+      "risks": [],
+      "open_questions": [],
+      "notable_quotes": [],
+      "follow_up_email": {
+        "subject": "Handoff requirements",
+        "body": "Hi,\n\nThanks for clarifying the handoff requirements.\n\nBest,\n[Your name]"
+      }
+    },
+    "expected_status": "review_required"
+  },
+  {
+    "name": "medium_risk_requires_review",
+    "description": "A medium compliance risk should require human review before downstream writes.",
+    "segments": [
+      {
+        "speaker": "Customer",
+        "start": 0.0,
+        "end": 12.0,
+        "text": "We cannot store raw recordings longer than seven days."
+      },
+      {
+        "speaker": "Seller",
+        "start": 12.1,
+        "end": 21.0,
+        "text": "I will confirm the retention settings before we connect this to the CRM."
+      }
+    ],
+    "intelligence": {
+      "summary": "The customer has a seven-day raw recording retention limit.",
+      "participants": [
+        {
+          "speaker": "Customer",
+          "inferred_role": "Customer stakeholder",
+          "evidence": "Customer [00:00.000-00:12.000]"
+        },
+        {
+          "speaker": "Seller",
+          "inferred_role": "Vendor owner",
+          "evidence": "Seller [00:12.100-00:21.000]"
+        }
+      ],
+      "customer_context": [
+        {
+          "fact": "Raw recordings cannot be stored longer than seven days.",
+          "evidence": "Customer [00:00.000-00:12.000]"
+        }
+      ],
+      "decisions": [],
+      "action_items": [
+        {
+          "owner_speaker": "Seller",
+          "task": "Confirm retention settings before CRM connection.",
+          "due_date_or_trigger": "Before CRM connection",
+          "evidence": "Seller [00:12.100-00:21.000]"
+        }
+      ],
+      "risks": [
+        {
+          "risk": "CRM integration could violate the customer's raw recording retention limit.",
+          "severity": "medium",
+          "evidence": "Customer [00:00.000-00:12.000]",
+          "mitigation": "Confirm retention settings and avoid raw audio sync."
+        }
+      ],
+      "open_questions": [],
+      "notable_quotes": [],
+      "follow_up_email": {
+        "subject": "Retention settings before CRM connection",
+        "body": "Hi,\n\nI will confirm the retention settings before we connect the workflow to CRM.\n\nBest,\n[Your name]"
+      }
+    },
+    "expected_status": "review_required"
+  }
+]

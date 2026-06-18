@@ -133,6 +133,21 @@ class GuardrailUnitTests(unittest.TestCase):
             )
             self.assertTrue(meeting_intelligence.to_data_url(reference).startswith("data:audio/"))
 
+    def test_to_data_url_preserves_video_reference_mime_type(self) -> None:
+        with tempfile.TemporaryDirectory() as tmpdir:
+            reference = Path(tmpdir) / "speaker.webm"
+            reference.write_bytes(b"webm")
+
+            self.assertTrue(meeting_intelligence.to_data_url(reference).startswith("data:video/webm;"))
+
+    def test_to_data_url_rejects_non_media_mime_type(self) -> None:
+        with tempfile.TemporaryDirectory() as tmpdir:
+            reference = Path(tmpdir) / "speaker.txt"
+            reference.write_text("not a reference clip")
+
+            with self.assertRaises(ValueError):
+                meeting_intelligence.to_data_url(reference)
+
     def test_redact_segments_removes_basic_email_and_phone(self) -> None:
         segments = [
             meeting_intelligence.Segment(
@@ -144,6 +159,41 @@ class GuardrailUnitTests(unittest.TestCase):
         ]
         redacted = meeting_intelligence.redact_segments(segments)
         self.assertEqual(redacted[0].text, "Email me at [email] or call [phone].")
+
+    def test_pii_detail_reflects_whether_redaction_ran(self) -> None:
+        segments = [
+            meeting_intelligence.Segment(
+                speaker="Customer",
+                start=0.0,
+                end=3.0,
+                text="Email me at alex@example.com.",
+            )
+        ]
+        intelligence = minimal_intelligence("Customer [00:00.000-00:03.000]")
+        brief = meeting_intelligence.render_meeting_brief(intelligence)
+
+        report_without_redaction = meeting_intelligence.build_guardrail_report(
+            segments=segments,
+            intelligence=intelligence,
+            meeting_brief=brief,
+            redaction_enabled=False,
+            raw_saved=False,
+            moderation_results={},
+        )
+        pii_check = next(check for check in report_without_redaction["checks"] if check["name"] == "basic_pii_scan")
+        self.assertIn("run with --redact", pii_check["detail"])
+        self.assertNotIn("after redaction", pii_check["detail"])
+
+        report_with_redaction = meeting_intelligence.build_guardrail_report(
+            segments=segments,
+            intelligence=intelligence,
+            meeting_brief=brief,
+            redaction_enabled=True,
+            raw_saved=False,
+            moderation_results={},
+        )
+        pii_check = next(check for check in report_with_redaction["checks"] if check["name"] == "basic_pii_scan")
+        self.assertIn("remain after redaction", pii_check["detail"])
 
     def test_fail_on_guardrail_exits_nonzero_for_demo(self) -> None:
         with tempfile.TemporaryDirectory() as tmpdir:

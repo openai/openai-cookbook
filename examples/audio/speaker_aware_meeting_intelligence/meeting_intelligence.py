@@ -39,6 +39,7 @@ DEFAULT_TRANSCRIPTION_MODEL = "gpt-4o-transcribe-diarize"
 DEFAULT_SUMMARY_MODEL = os.getenv("OPENAI_MEETING_INTELLIGENCE_MODEL", "gpt-4.1-mini")
 DEFAULT_MODERATION_MODEL = "omni-moderation-latest"
 TIMESTAMP_PATTERN = re.compile(r"\b\d{2,}:\d{2}\.\d{3}\b")
+SUPPORTED_REFERENCE_MIME_PREFIXES = ("audio/", "video/")
 
 
 @dataclass(frozen=True)
@@ -292,8 +293,10 @@ def parse_known_speakers(entries: list[str]) -> list[tuple[str, Path]]:
 def to_data_url(path: Path | str) -> str:
     path = Path(path)
     mime_type, _ = mimetypes.guess_type(path)
-    if mime_type is None or not mime_type.startswith("audio/"):
+    if mime_type is None:
         mime_type = "audio/wav"
+    elif not mime_type.startswith(SUPPORTED_REFERENCE_MIME_PREFIXES):
+        raise ValueError(f"Reference clip must be an audio or video file, got {mime_type}: {path}")
     encoded = base64.b64encode(path.read_bytes()).decode("utf-8")
     return f"data:{mime_type};base64,{encoded}"
 
@@ -725,15 +728,16 @@ def build_guardrail_report(
     )
 
     pii_found = pii_matches(transcript_text + "\n" + meeting_brief)
+    pii_detail = (
+        "Basic PII patterns remain after redaction."
+        if redaction_enabled
+        else "Basic PII patterns were detected; run with --redact or review before storage."
+    )
     add_guardrail_check(
         checks,
         "basic_pii_scan",
         "review" if pii_found else "pass",
-        (
-            "Basic PII patterns remain after redaction."
-            if pii_found
-            else "No basic email or phone patterns detected."
-        ),
+        pii_detail if pii_found else "No basic email or phone patterns detected.",
         {"matches": pii_found, "redaction_enabled": redaction_enabled},
     )
 

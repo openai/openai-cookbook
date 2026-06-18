@@ -139,9 +139,20 @@ python examples/audio/speaker_aware_meeting_intelligence/meeting_intelligence.py
 The core diarization request is intentionally small:
 
 ```python
+import base64
+import mimetypes
 from pathlib import Path
 
 from openai import OpenAI
+
+
+def to_data_url(path: Path) -> str:
+    mime_type, _ = mimetypes.guess_type(path)
+    if mime_type is None:
+        mime_type = "audio/wav"
+    encoded = base64.b64encode(path.read_bytes()).decode("utf-8")
+    return f"data:{mime_type};base64,{encoded}"
+
 
 client = OpenAI()
 

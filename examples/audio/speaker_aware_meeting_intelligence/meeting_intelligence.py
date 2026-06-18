@@ -1,7 +1,7 @@
 #!/usr/bin/env python3
 """Build speaker-aware meeting intelligence from recorded audio.
 
-This sample does two things:
+This sample does three things:
 1. Uses the OpenAI Transcriptions API with gpt-4o-transcribe-diarize to
    produce speaker-labeled transcript segments.
 2. Sends the speaker-labeled transcript to a text model for structured meeting

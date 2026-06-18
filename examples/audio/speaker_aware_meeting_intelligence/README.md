@@ -54,7 +54,7 @@ Treat meeting intelligence as a sensitive-data pipeline, not just a summarizatio
 | Recording or speaker-reference misuse | Require consent and policy approval before recording, diarization, or reference-clip use. Treat speaker references as sensitive biometric-adjacent data. |
 | Over-retention of raw audio | Do not save the raw transcription response by default. Keep raw audio and reference clips only as long as needed. Encrypt and restrict access if retained. |
 | Prompt injection inside transcripts | Treat transcript text as untrusted evidence. Keep instructions in the system message and require the model to use only transcript-backed facts. |
-| Unsupported action items or decisions | Use strict structured outputs and require evidence fields with speaker or timestamp anchors. |
+| Unsupported action items or decisions | Use strict structured outputs and require timestamp anchors in evidence fields. |
 | Sensitive content in generated notes | Run redaction before summarization where possible, then run post-generation checks on the transcript and brief. |
 | Harmful or policy-sensitive content | Optionally call the Moderation API with `omni-moderation-latest` on transcript text and generated brief text. Moderation detects harmful content; it is not a replacement for privacy review. |
 | Unsafe downstream writes | Do not write directly to CRM, ticketing, or analytics systems from the model output. Put a human review gate in front of medium/high risks, missing evidence, moderation flags, or raw-response retention. |
@@ -64,7 +64,7 @@ The sample writes a `guardrail_report.json` with local checks for:
 
 - normalized transcript segments;
 - basic email and phone PII patterns;
-- evidence fields without a timestamp or speaker anchor;
+- evidence fields without a timestamp anchor;
 - medium/high risk outputs;
 - optional moderation flags;
 - raw transcription response storage.
@@ -207,7 +207,7 @@ The system instruction is deliberately conservative:
 ```text
 Use only the transcript as evidence. Do not invent names, dates, decisions, or commitments.
 If evidence is missing, leave the relevant array empty.
-Include timestamps or speaker evidence in every evidence field.
+Include timestamps in every evidence field.
 ```
 
 This matters. Meeting intelligence often feeds systems of record. The safest default is to produce empty arrays instead of plausible but unsupported CRM notes.
@@ -260,7 +260,7 @@ Use this checklist before turning the sample into a customer workflow:
 | Consent | Make sure call recording, diarization, and known-speaker references are permitted in your product, policy, and region. |
 | Raw audio retention | Store raw audio only as long as needed. Persist normalized transcript segments when possible. |
 | Speaker references | Treat reference clips as sensitive data. Store minimally, encrypt at rest, and rotate/delete when no longer needed. |
-| Evidence | Require timestamps or quotes on decisions, risks, and action items. |
+| Evidence | Require timestamped evidence on decisions, risks, and action items. |
 | Human review | Route high-risk summaries, compliance promises, pricing claims, or contractual terms for review. |
 | Moderation | Use the Moderation API for harmful-content classification when notes may contain unsafe content. Keep privacy and compliance checks separate. |
 | Retry behavior | Retry transient API errors with backoff. Avoid duplicating downstream CRM writes by using idempotency keys. |

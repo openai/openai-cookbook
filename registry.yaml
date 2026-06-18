@@ -4,6 +4,20 @@
 # should build pages for, and indicates metadata such as tags, creation date and
 # authors for each page.
 
+- title: Trigger a Workspace Agent from the API
+  path: examples/chatgpt/workspace_agents/workspace-agents-api-trigger.ipynb
+  slug: workspace-agents-api-trigger
+  description: Configure a Workspace Agent, add an API channel, and send a live trigger that writes to the agent's configured destination.
+  date: 2026-06-17
+  authors:
+    - neilh-oai
+  tags:
+    - chatgpt
+    - agents
+    - enterprise
+    - api
+    - workspace-agents
+
 - title: "SchemaFlow: Agentic Database Change Impact Analysis, SQL Generation, and Eval Guardrails"
   path: examples/partners/schemaflow_design_guide/schemaflow_cookbook.ipynb
   slug: schemaflow-design-guide

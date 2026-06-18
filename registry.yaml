@@ -8,11 +8,12 @@
   path: examples/chatgpt/workspace_agents/workspace-agents-api-trigger.ipynb
   slug: workspace-agents-api-trigger
   description: Configure a Workspace Agent, add an API channel, and send a live trigger that writes to the agent's configured destination.
-  date: 2026-06-17
+  date: 2026-06-18
   authors:
     - neilh-oai
   tags:
     - chatgpt
+    - chatgpt-and-api
     - agents
     - enterprise
     - api

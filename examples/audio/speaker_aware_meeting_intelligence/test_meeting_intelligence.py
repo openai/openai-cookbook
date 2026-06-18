@@ -75,8 +75,41 @@ class EndToEndCliTests(unittest.TestCase):
                 any(check["name"] == "risk_outputs" and check["status"] == "review" for check in report["checks"])
             )
 
+    def test_demo_save_raw_does_not_report_missing_raw_artifact_as_saved(self) -> None:
+        with tempfile.TemporaryDirectory() as tmpdir:
+            subprocess.run(
+                [
+                    sys.executable,
+                    str(SCRIPT_PATH),
+                    "--demo",
+                    "--save-raw",
+                    "--output-dir",
+                    tmpdir,
+                ],
+                check=True,
+                text=True,
+                capture_output=True,
+            )
+
+            output_dir = Path(tmpdir)
+            self.assertFalse((output_dir / "raw_transcription_response.json").exists())
+            report = json.loads((output_dir / "guardrail_report.json").read_text())
+            raw_check = next(check for check in report["checks"] if check["name"] == "raw_response_storage")
+            self.assertEqual(raw_check["status"], "pass")
+
 
 class GuardrailUnitTests(unittest.TestCase):
+    def test_to_data_url_accepts_path_or_string(self) -> None:
+        with tempfile.TemporaryDirectory() as tmpdir:
+            reference = Path(tmpdir) / "speaker.wav"
+            reference.write_bytes(b"RIFF....WAVEfmt ")
+
+            self.assertEqual(
+                meeting_intelligence.to_data_url(reference),
+                meeting_intelligence.to_data_url(str(reference)),
+            )
+            self.assertTrue(meeting_intelligence.to_data_url(reference).startswith("data:audio/"))
+
     def test_redact_segments_removes_basic_email_and_phone(self) -> None:
         segments = [
             meeting_intelligence.Segment(
@@ -129,6 +162,10 @@ class GuardrailUnitTests(unittest.TestCase):
         self.assertTrue(
             any(check["name"] == "raw_response_storage" and check["status"] == "review" for check in report["checks"])
         )
+
+    def test_evidence_anchor_requires_timestamp_not_speaker_name_only(self) -> None:
+        self.assertFalse(meeting_intelligence.evidence_has_anchor("Customer described the escalation path."))
+        self.assertTrue(meeting_intelligence.evidence_has_anchor("Customer [00:00.000-00:03.000]"))
 
 
 class SyntheticCaseTests(unittest.TestCase):

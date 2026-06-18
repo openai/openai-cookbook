@@ -139,6 +139,8 @@ python examples/audio/speaker_aware_meeting_intelligence/meeting_intelligence.py
 The core diarization request is intentionally small:
 
 ```python
+from pathlib import Path
+
 from openai import OpenAI
 
 client = OpenAI()
@@ -151,7 +153,7 @@ with open("meeting.wav", "rb") as audio_file:
         chunking_strategy="auto",
         extra_body={
             "known_speaker_names": ["Agent"],
-            "known_speaker_references": [to_data_url("agent_reference.wav")],
+            "known_speaker_references": [to_data_url(Path("agent_reference.wav"))],
         },
     )
 ```

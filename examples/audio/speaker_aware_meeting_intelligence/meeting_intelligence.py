@@ -284,7 +284,8 @@ def parse_known_speakers(entries: list[str]) -> list[tuple[str, Path]]:
     return speakers
 
 
-def to_data_url(path: Path) -> str:
+def to_data_url(path: Path | str) -> str:
+    path = Path(path)
     mime_type, _ = mimetypes.guess_type(path)
     if mime_type is None or not mime_type.startswith("audio/"):
         mime_type = "audio/wav"
@@ -429,7 +430,7 @@ def generate_meeting_intelligence(segments: list[Segment], model: str) -> dict[s
                     "You create meeting intelligence from speaker-labeled transcripts. "
                     "Use only the transcript as evidence. Do not invent names, dates, decisions, "
                     "or commitments. If evidence is missing, leave the relevant array empty. "
-                    "Include timestamps or speaker evidence in every evidence field. "
+                    "Include timestamps in every evidence field. "
                     "If the follow-up email signer is unknown, end with [Your name]."
                 ),
             },
@@ -683,11 +684,8 @@ def iter_evidence_fields(value: Any, path: str = "$") -> list[tuple[str, str]]:
     return found
 
 
-def evidence_has_anchor(evidence: str, speaker_names: set[str]) -> bool:
-    if TIMESTAMP_PATTERN.search(evidence):
-        return True
-    lowered = evidence.lower()
-    return any(speaker.lower() in lowered for speaker in speaker_names if speaker)
+def evidence_has_anchor(evidence: str) -> bool:
+    return bool(TIMESTAMP_PATTERN.search(evidence))
 
 
 def add_guardrail_check(
@@ -712,7 +710,6 @@ def build_guardrail_report(
     moderation_results: dict[str, Any],
 ) -> dict[str, Any]:
     checks: list[dict[str, Any]] = []
-    speaker_names = {segment.speaker for segment in segments}
     transcript_text = transcript_for_model(segments)
 
     add_guardrail_check(
@@ -739,16 +736,16 @@ def build_guardrail_report(
     weak_evidence = [
         {"path": path, "value": value}
         for path, value in evidence_fields
-        if not evidence_has_anchor(value, speaker_names)
+        if not evidence_has_anchor(value)
     ]
     add_guardrail_check(
         checks,
         "evidence_anchors",
         "review" if weak_evidence else "pass",
         (
-            "Some evidence fields do not include a timestamp or speaker anchor."
+            "Some evidence fields do not include a timestamp anchor."
             if weak_evidence
-            else "All evidence fields include a timestamp or speaker anchor."
+            else "All evidence fields include a timestamp anchor."
         ),
         {"weak_evidence_count": len(weak_evidence), "examples": weak_evidence[:5]},
     )
@@ -866,12 +863,13 @@ def main() -> None:
     if args.moderate:
         moderation_results["meeting_brief"] = moderate_text(meeting_brief)
 
+    raw_response_will_be_saved = args.save_raw and raw_payload is not None
     guardrail_report = build_guardrail_report(
         segments=segments,
         intelligence=intelligence,
         meeting_brief=meeting_brief,
         redaction_enabled=args.redact,
-        raw_saved=args.save_raw,
+        raw_saved=raw_response_will_be_saved,
         moderation_results=moderation_results,
     )
 
@@ -888,7 +886,7 @@ def main() -> None:
     )
     write_json(args.output_dir / "guardrail_report.json", guardrail_report)
 
-    if args.save_raw and raw_payload is not None:
+    if raw_response_will_be_saved:
         write_json(args.output_dir / "raw_transcription_response.json", to_plain(raw_payload))
 
     print(f"Wrote meeting intelligence artifacts to {args.output_dir}")

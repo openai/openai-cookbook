@@ -281,8 +281,10 @@ def parse_known_speakers(entries: list[str]) -> list[tuple[str, Path]]:
         if not raw_path:
             raise ValueError(f"Known speaker reference path cannot be empty: {entry}")
         path = Path(raw_path).expanduser()
-        if not path.exists():
-            raise FileNotFoundError(f"Known speaker reference does not exist: {path}")
+        if not path.is_file():
+            raise FileNotFoundError(
+                f"Known speaker reference does not exist or is not a regular file: {path}"
+            )
         speakers.append((name, path))
     return speakers
 
@@ -301,8 +303,8 @@ def transcribe_with_diarization(
     known_speakers: list[tuple[str, Path]],
     model: str = DEFAULT_TRANSCRIPTION_MODEL,
 ) -> Any:
-    if not audio_file.exists():
-        raise FileNotFoundError(f"Audio file does not exist: {audio_file}")
+    if not audio_file.is_file():
+        raise FileNotFoundError(f"Audio file does not exist or is not a regular file: {audio_file}")
 
     from openai import OpenAI
 

@@ -108,6 +108,20 @@ class GuardrailUnitTests(unittest.TestCase):
 
             self.assertEqual(speakers, [("Agent", reference)])
 
+    def test_parse_known_speakers_rejects_directory_reference(self) -> None:
+        with tempfile.TemporaryDirectory() as tmpdir:
+            with self.assertRaises(FileNotFoundError) as error:
+                meeting_intelligence.parse_known_speakers([f"Agent={tmpdir}"])
+
+            self.assertIn("regular file", str(error.exception))
+
+    def test_transcribe_with_diarization_rejects_directory_audio(self) -> None:
+        with tempfile.TemporaryDirectory() as tmpdir:
+            with self.assertRaises(FileNotFoundError) as error:
+                meeting_intelligence.transcribe_with_diarization(Path(tmpdir), [])
+
+            self.assertIn("regular file", str(error.exception))
+
     def test_to_data_url_accepts_path_or_string(self) -> None:
         with tempfile.TemporaryDirectory() as tmpdir:
             reference = Path(tmpdir) / "speaker.wav"

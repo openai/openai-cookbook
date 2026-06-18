@@ -10,7 +10,7 @@ This sample does three things:
    and optional content moderation.
 
 Run without an API key:
-    python meeting_intelligence.py --demo --output-dir /tmp/meeting-demo
+    python meeting_intelligence.py --demo --output-dir /tmp/meeting-intelligence-demo
 
 Run with real audio:
     export OPENAI_API_KEY="..."
@@ -19,7 +19,7 @@ Run with real audio:
       --known-speaker "Agent=agent_reference.wav" \
       --known-speaker "Customer=customer_reference.wav" \
       --redact \
-      --output-dir /tmp/meeting-real
+      --output-dir /tmp/meeting-intelligence-real
 """
 
 from __future__ import annotations

@@ -851,6 +851,8 @@ def main() -> None:
         segments = DEMO_SEGMENTS
         intelligence = demo_meeting_intelligence()
         raw_payload: Any | None = None
+        if args.redact:
+            segments = redact_segments(segments)
         if args.moderate:
             moderation_results["transcript"] = moderate_text(transcript_for_model(segments))
     else:

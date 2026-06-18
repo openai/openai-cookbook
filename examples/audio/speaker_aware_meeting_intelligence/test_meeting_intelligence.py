@@ -97,6 +97,38 @@ class EndToEndCliTests(unittest.TestCase):
             raw_check = next(check for check in report["checks"] if check["name"] == "raw_response_storage")
             self.assertEqual(raw_check["status"], "pass")
 
+    def test_demo_redact_applies_to_demo_segments(self) -> None:
+        with tempfile.TemporaryDirectory() as tmpdir:
+            output_dir = Path(tmpdir)
+            original_segments = meeting_intelligence.DEMO_SEGMENTS
+            original_argv = sys.argv
+            meeting_intelligence.DEMO_SEGMENTS = [
+                meeting_intelligence.Segment(
+                    speaker="Customer",
+                    start=0.0,
+                    end=3.0,
+                    text="Email me at alex@example.com or call 415-555-0100.",
+                )
+            ]
+            sys.argv = [
+                str(SCRIPT_PATH),
+                "--demo",
+                "--redact",
+                "--output-dir",
+                str(output_dir),
+            ]
+            try:
+                meeting_intelligence.main()
+            finally:
+                meeting_intelligence.DEMO_SEGMENTS = original_segments
+                sys.argv = original_argv
+
+            transcript = (output_dir / "speaker_labeled_transcript.md").read_text()
+            self.assertIn("[email]", transcript)
+            self.assertIn("[phone]", transcript)
+            self.assertNotIn("alex@example.com", transcript)
+            self.assertNotIn("415-555-0100", transcript)
+
 
 class GuardrailUnitTests(unittest.TestCase):
     def test_parse_known_speakers_trims_path_whitespace(self) -> None:

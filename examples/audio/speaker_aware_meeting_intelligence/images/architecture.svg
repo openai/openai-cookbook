@@ -1,0 +1,138 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="1600" height="900" viewBox="0 0 1600 900" role="img" aria-labelledby="title desc">
+  <title id="title">Speaker-aware meeting intelligence architecture</title>
+  <desc id="desc">A request-based audio pipeline that accepts meeting audio and optional speaker reference clips, sends the audio to the OpenAI Transcriptions API with gpt-4o-transcribe-diarize, stores diarized JSON, generates a speaker-labeled transcript, and sends it to a text model for structured meeting intelligence.</desc>
+  <defs>
+    <marker id="arrow" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="8" markerHeight="8" orient="auto-start-reverse">
+      <path d="M 0 0 L 10 5 L 0 10 z" fill="#20201d"/>
+    </marker>
+    <filter id="soft-shadow" x="-10%" y="-10%" width="120%" height="130%">
+      <feDropShadow dx="0" dy="10" stdDeviation="14" flood-color="#111111" flood-opacity="0.10"/>
+    </filter>
+    <style>
+      .bg { fill: #f7f6f1; }
+      .panel { fill: #ffffff; stroke: #d7d4ca; stroke-width: 1.5; rx: 22; filter: url(#soft-shadow); }
+      .lane { fill: #edebe3; stroke: #d7d4ca; stroke-width: 1.2; rx: 18; }
+      .title { font: 700 28px Inter, Arial, sans-serif; fill: #111111; }
+      .subtitle { font: 400 17px Inter, Arial, sans-serif; fill: #55524a; }
+      .label { font: 700 19px Inter, Arial, sans-serif; fill: #111111; }
+      .small { font: 400 15px Inter, Arial, sans-serif; fill: #5c594f; }
+      .tiny { font: 400 13px Inter, Arial, sans-serif; fill: #6f6b61; }
+      .mono { font: 600 14px "SFMono-Regular", Consolas, monospace; fill: #111111; }
+      .accent { fill: #10a37f; }
+      .accent-stroke { stroke: #10a37f; }
+      .line { stroke: #20201d; stroke-width: 2.2; fill: none; marker-end: url(#arrow); }
+      .thin { stroke: #908c82; stroke-width: 1.6; fill: none; }
+      .icon { stroke: #20201d; stroke-width: 2.4; fill: none; stroke-linecap: round; stroke-linejoin: round; }
+      .icon-fill { fill: #f1faf6; stroke: #10a37f; stroke-width: 1.8; }
+    </style>
+  </defs>
+
+  <rect class="bg" width="1600" height="900"/>
+
+  <text class="title" x="92" y="82">Speaker-Aware Meeting Intelligence Pipeline</text>
+  <text class="subtitle" x="92" y="116">Request-based diarization, structured extraction, and customer-ready outputs from meeting audio</text>
+
+  <rect class="lane" x="78" y="154" width="1444" height="682"/>
+  <text class="tiny" x="104" y="186">Core data path</text>
+
+  <!-- Input panel -->
+  <rect class="panel" x="112" y="220" width="220" height="300"/>
+  <circle class="icon-fill" cx="222" cy="290" r="40"/>
+  <path class="icon" d="M196 292 c8 -25 16 -25 24 0 c8 25 16 25 24 0"/>
+  <path class="icon" d="M187 310 h70"/>
+  <text class="label" text-anchor="middle" x="222" y="366">Meeting audio</text>
+  <text class="small" text-anchor="middle" x="222" y="396">Recorded call,</text>
+  <text class="small" text-anchor="middle" x="222" y="418">webinar, or support</text>
+  <text class="small" text-anchor="middle" x="222" y="440">conversation</text>
+  <rect x="142" y="462" width="160" height="34" rx="17" fill="#f7f6f1" stroke="#d7d4ca"/>
+  <text class="mono" text-anchor="middle" x="222" y="484">meeting.wav</text>
+
+  <!-- Speaker refs -->
+  <rect class="panel" x="112" y="562" width="300" height="76"/>
+  <path class="icon" d="M152 603 h34 m-17 -17 v34"/>
+  <text class="label" x="206" y="590">Optional references</text>
+  <text class="small" x="206" y="612">2-10 second clips</text>
+  <text class="small" x="206" y="632">Up to 4 speakers</text>
+
+  <!-- Orchestrator panel -->
+  <rect class="panel" x="430" y="220" width="240" height="300"/>
+  <circle class="icon-fill" cx="550" cy="290" r="40"/>
+  <path class="icon" d="M530 278 h40 v26 h-40 z"/>
+  <path class="icon" d="M538 270 h24"/>
+  <path class="icon" d="M538 313 h24"/>
+  <text class="label" text-anchor="middle" x="550" y="366">Pipeline runner</text>
+  <text class="small" text-anchor="middle" x="550" y="396">Validates inputs,</text>
+  <text class="small" text-anchor="middle" x="550" y="418">encodes references,</text>
+  <text class="small" text-anchor="middle" x="550" y="440">writes artifacts</text>
+  <rect x="466" y="462" width="168" height="34" rx="17" fill="#f7f6f1" stroke="#d7d4ca"/>
+  <text class="mono" text-anchor="middle" x="550" y="484">Python CLI</text>
+
+  <!-- Diarization model panel -->
+  <rect class="panel" x="768" y="220" width="270" height="300"/>
+  <circle class="icon-fill" cx="903" cy="290" r="40"/>
+  <path class="icon" d="M886 290 a17 17 0 1 1 34 0 a17 17 0 1 1 -34 0"/>
+  <path class="icon" d="M872 290 h12 m38 0 h12"/>
+  <path class="icon" d="M903 273 v-14 m0 48 v14"/>
+  <text class="label" text-anchor="middle" x="903" y="356">OpenAI Transcriptions API</text>
+  <text class="small" text-anchor="middle" x="903" y="388">Speaker diarization with</text>
+  <text class="mono" text-anchor="middle" x="903" y="416">gpt-4o-transcribe-diarize</text>
+  <rect x="807" y="462" width="192" height="34" rx="17" fill="#f7f6f1" stroke="#d7d4ca"/>
+  <text class="mono" text-anchor="middle" x="903" y="484">diarized_json</text>
+
+  <!-- Transcript panel -->
+  <rect class="panel" x="1138" y="220" width="270" height="300"/>
+  <circle class="icon-fill" cx="1273" cy="290" r="40"/>
+  <path class="icon" d="M1252 266 h34 l12 12 v36 h-46 z"/>
+  <path class="icon" d="M1286 266 v13 h12"/>
+  <path class="icon" d="M1262 292 h24 m-24 14 h42"/>
+  <text class="label" text-anchor="middle" x="1273" y="356">Speaker transcript</text>
+  <text class="small" text-anchor="middle" x="1273" y="388">Segments with speaker,</text>
+  <text class="small" text-anchor="middle" x="1273" y="410">start time, end time,</text>
+  <text class="small" text-anchor="middle" x="1273" y="432">and utterance text</text>
+  <rect x="1179" y="462" width="188" height="34" rx="17" fill="#f7f6f1" stroke="#d7d4ca"/>
+  <text class="mono" text-anchor="middle" x="1273" y="484">segments.json</text>
+
+  <!-- Intelligence panel -->
+  <rect class="panel" x="768" y="590" width="270" height="220"/>
+  <circle class="icon-fill" cx="903" cy="652" r="34"/>
+  <path class="icon" d="M886 650 h34 m-27 -13 h20 m-20 26 h20"/>
+  <text class="label" text-anchor="middle" x="903" y="716">Structured intelligence</text>
+  <text class="small" text-anchor="middle" x="903" y="746">Summary, actions,</text>
+  <text class="small" text-anchor="middle" x="903" y="768">risks, decisions,</text>
+  <text class="small" text-anchor="middle" x="903" y="790">follow-up draft</text>
+
+  <!-- Output panel -->
+  <rect class="panel" x="1138" y="590" width="270" height="220"/>
+  <circle class="icon-fill" cx="1273" cy="652" r="34"/>
+  <path class="icon" d="M1253 637 h40 v34 h-40 z"/>
+  <path class="icon" d="M1262 648 h22 m-22 10 h28"/>
+  <text class="label" text-anchor="middle" x="1273" y="716">Customer-ready outputs</text>
+  <text class="small" text-anchor="middle" x="1273" y="746">Meeting brief, CRM notes,</text>
+  <text class="small" text-anchor="middle" x="1273" y="768">support handoff, analytics,</text>
+  <text class="small" text-anchor="middle" x="1273" y="790">and review queues</text>
+
+  <!-- Quality lane -->
+  <rect class="lane" x="112" y="718" width="558" height="92"/>
+  <path class="icon" d="M151 764 l15 15 l34 -39"/>
+  <text class="label" x="220" y="754">Guardrails and review gate</text>
+  <text class="small" x="220" y="780">Redact PII, validate evidence, and optionally moderate text.</text>
+  <text class="small" x="220" y="802">Require human approval before CRM or support writes.</text>
+
+  <!-- Arrows -->
+  <path class="line" d="M332 370 C372 370 390 370 430 370"/>
+  <path class="line" d="M670 370 C710 370 728 370 768 370"/>
+  <path class="line" d="M1038 370 C1080 370 1096 370 1138 370"/>
+  <path class="line" d="M1273 520 C1273 560 1078 560 1005 612"/>
+  <path class="line" d="M1038 700 C1080 700 1096 700 1138 700"/>
+  <path class="thin" d="M222 562 C222 538 502 548 550 520"/>
+  <path class="line" d="M670 764 C704 764 724 754 768 728"/>
+
+  <!-- API call badge -->
+  <rect x="692" y="326" width="54" height="88" rx="27" fill="#20201d"/>
+  <text class="tiny" text-anchor="middle" x="719" y="356" fill="#ffffff">POST</text>
+  <text class="tiny" text-anchor="middle" x="719" y="380" fill="#ffffff">/audio/</text>
+  <text class="tiny" text-anchor="middle" x="719" y="402" fill="#ffffff">transcriptions</text>
+
+  <!-- Footer -->
+  <text class="tiny" x="92" y="860">Design note: use request-based diarization, then gate generated intelligence with evidence checks, moderation signals, and human review before downstream writes.</text>
+</svg>

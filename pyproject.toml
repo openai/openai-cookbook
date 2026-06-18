@@ -1,0 +1,51 @@
+[build-system]
+requires = ["setuptools>=68", "wheel"]
+build-backend = "setuptools.build_meta"
+
+[project]
+name = "topoattack"
+version = "0.1.0"
+description = "Topology-driven adversarial-prompt evaluation example for OpenAI Cookbook"
+readme = "examples/topology/README.md"
+requires-python = ">=3.10"
+license = { text = "MIT" }
+authors = [{ name = "Topoattack Contributors" }]
+dependencies = [
+  "numpy>=1.26",
+  "scipy>=1.11",
+  "scikit-learn>=1.3",
+  "sentence-transformers>=2.2",
+  "transformers>=4.40",
+  "torch>=2.1",
+  "openai>=1.30",
+  "typer>=0.12",
+  "pydantic>=2.6",
+  "ripser>=0.6.4",
+  "matplotlib>=3.8",
+  "tqdm>=4.66",
+  "tenacity>=8.2",
+  "pyyaml>=6.0",
+]
+
+[project.optional-dependencies]
+dev = [
+  "pytest>=8.0",
+  "pytest-cov>=4.1",
+  "ruff>=0.4",
+  "mypy>=1.10",
+  "jupyter>=1.0",
+  "nbconvert>=7.16",
+  "ipykernel>=6.29",
+  "types-PyYAML",
+]
+
+[project.scripts]
+topoattack = "topoattack.cli:app"
+
+[tool.setuptools.packages.find]
+include = ["topoattack*"]
+
+[tool.pytest.ini_options]
+testpaths = ["tests"]
+addopts = "-ra --strict-markers"
+filterwarnings = ["error"]

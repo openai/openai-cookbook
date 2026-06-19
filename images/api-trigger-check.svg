@@ -1,0 +1,71 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1280 720" role="img" aria-labelledby="title desc">
+  <title id="title">Check an API-triggered run</title>
+  <desc id="desc">The backend sends a trigger request. The API accepts the request. The agent writes the result to the destination.</desc>
+  <defs>
+    <pattern id="dot-grid" width="8" height="8" patternUnits="userSpaceOnUse">
+      <rect width="8" height="8" fill="#0b0b0b"/>
+      <circle cx="1.5" cy="1.5" r="0.6" fill="#1d1d1d"/>
+    </pattern>
+    <pattern id="green-dots" width="8" height="8" patternUnits="userSpaceOnUse">
+      <rect width="8" height="8" fill="#11190e"/>
+      <circle cx="1.5" cy="1.5" r="0.8" fill="#5f8f35"/>
+    </pattern>
+    <marker id="arrow-green" markerWidth="12" markerHeight="12" refX="10" refY="6" orient="auto" markerUnits="strokeWidth">
+      <path d="M2,2 L10,6 L2,10 Z" fill="#8fbd5f"/>
+    </marker>
+    <style>
+      .bg { fill: #070707; }
+      .title { fill: #f3f3f3; font: 700 30px Arial, sans-serif; }
+      .subtitle { fill: #bdbdbd; font: 400 16px Arial, sans-serif; }
+      .panel { fill: #090909; stroke: #f0f0f0; stroke-width: 2; }
+      .panel-dots { fill: url(#dot-grid); opacity: 0.16; }
+      .pill { fill: #111111; stroke: #f0f0f0; stroke-width: 2; }
+      .pill-green { fill: #11190e; stroke: #8fbd5f; stroke-width: 2.5; }
+      .mono { fill: #f3f3f3; font: 700 18px Menlo, Consolas, monospace; letter-spacing: 0.3px; }
+      .mono-small { fill: #b7b7b7; font: 400 15px Menlo, Consolas, monospace; }
+      .mono-green { fill: #9bd56a; font: 700 15px Menlo, Consolas, monospace; }
+      .label { fill: #f3f3f3; font: 700 16px Arial, sans-serif; }
+      .body { fill: #c8c8c8; font: 400 15px Arial, sans-serif; }
+      .arrow { stroke: #8fbd5f; stroke-width: 2.5; fill: none; marker-end: url(#arrow-green); }
+      .thin { stroke: #4a4a4a; stroke-width: 2; }
+    </style>
+  </defs>
+
+  <rect class="bg" x="0" y="0" width="1280" height="720"/>
+
+  <text class="title" x="56" y="66">Check an API-triggered run</text>
+  <text class="subtitle" x="56" y="96">The API confirms the trigger. The destination shows the outcome.</text>
+
+  <rect class="panel" x="64" y="144" width="1152" height="438" rx="18"/>
+  <rect class="panel-dots" x="64" y="144" width="1152" height="438" rx="18"/>
+
+  <rect class="pill" x="112" y="204" width="230" height="78" rx="32"/>
+  <text class="mono" x="227" y="243" text-anchor="middle" dominant-baseline="middle">BACKEND</text>
+
+  <rect class="pill-green" x="526" y="204" width="230" height="78" rx="32"/>
+  <text class="mono" x="641" y="243" text-anchor="middle" dominant-baseline="middle">API TRIGGER</text>
+
+  <rect class="pill" x="938" y="204" width="230" height="78" rx="32"/>
+  <text class="mono" x="1053" y="243" text-anchor="middle" dominant-baseline="middle">DESTINATION</text>
+
+  <line class="thin" x1="227" y1="282" x2="227" y2="500"/>
+  <line class="thin" x1="641" y1="282" x2="641" y2="500"/>
+  <line class="thin" x1="1053" y1="282" x2="1053" y2="500"/>
+
+  <path class="arrow" d="M227 348 L628 348"/>
+  <text class="mono-small" x="310" y="336">POST /trigger</text>
+  <text class="mono-small" x="310" y="364">input + idempotency key</text>
+
+  <path class="arrow" d="M641 420 L240 420"/>
+  <text class="mono-green" x="360" y="408">202 Accepted</text>
+  <text class="mono-small" x="360" y="436">queued, no response body</text>
+
+  <path class="arrow" d="M641 492 L1040 492"/>
+  <text class="mono-small" x="748" y="480">agent writes result</text>
+  <text class="mono-small" x="748" y="508">check here next</text>
+
+  <g id="note">
+    <rect class="pill-green" x="340" y="612" width="600" height="58" rx="26"/>
+    <text class="mono" x="640" y="641" text-anchor="middle" dominant-baseline="middle">accepted does not mean finished</text>
+  </g>
+</svg>

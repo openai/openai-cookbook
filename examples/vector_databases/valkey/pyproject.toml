@@ -1,0 +1,12 @@
+[project]
+name = "valkey-vector-example"
+version = "0.1.0"
+requires-python = ">=3.13"
+dependencies = [
+    "valkey-glide>=1.0.0",
+    "openai>=1.0.0", 
+    "pandas>=1.5.0",
+    "numpy>=1.21.0",
+    "wget>=3.2",
+    "jupyter>=1.0.0"
+]

@@ -16,7 +16,7 @@ This guide shows how to integrate Codex CLI into a GitLab pipeline for both use 
 
 Codex CLI is an open-source command-line tool for bringing OpenAI’s reasoning models into your development workflow. For installation, usage, and full documentation, refer to the official repository: [github.com/openai/codex](https://github.com/openai/codex?utm_source=chatgpt.com).
 
-In this cookbook, we’ll use **Full Auto mode** in an ephemeral GitLab runner to generate a standards-compliant JSON report.
+In this cookbook, we’ll run Codex with `--dangerously-bypass-approvals-and-sandbox` in an ephemeral GitLab runner to generate a standards-compliant JSON report. This flag disables Codex’s kernel-level sandbox (landlock/seccomp), which is unavailable in containerized CI environments like Kubernetes pods and Docker-based runners. Since the runner itself provides isolation, this is safe.
 
 ### Pre-requisites
 
@@ -97,6 +97,7 @@ codex_review:
     - apt-get update && apt-get install -y --no-install-recommends curl ca-certificates git lsb-release
     - npm -g i @openai/codex@latest
     - codex --version && git --version
+    - printenv OPENAI_API_KEY | codex login --with-api-key
     # Build a real-file allowlist to guide Codex to valid paths/lines
     - FILE_LIST="$(git ls-files | sed 's/^/- /')"
     - |
@@ -106,7 +107,7 @@ codex_review:
     # Run Codex; allow non-zero exit but capture output for extraction
     - |
       set +o pipefail
-      script -q -c 'codex exec --full-auto "$CODEX_PROMPT"' | tee "${CODEX_RAW_LOG}" >/dev/null
+      codex exec --dangerously-bypass-approvals-and-sandbox "$CODEX_PROMPT" | tee "${CODEX_RAW_LOG}" >/dev/null
       CODEX_RC=${PIPESTATUS[0]}
       set -o pipefail
       echo "Codex exit code: ${CODEX_RC}"
@@ -256,6 +257,7 @@ codex_recommendations:
    - apt-get update && apt-get install -y --no-install-recommends curl ca-certificates git lsb-release
    - npm -g i @openai/codex@latest
    - codex --version && git --version
+   - printenv OPENAI_API_KEY | codex login --with-api-key
 
    - |
      if [ ! -s "${CODEX_SAST_PATH}" ]; then
@@ -272,7 +274,7 @@ codex_recommendations:
    # Run Codex and capture raw output (preserve Codex's exit code via PIPESTATUS)
    - |
      set +o pipefail
-     codex exec --full-auto "$CODEX_PROMPT" | tee "${CODEX_RAW_LOG}" >/dev/null
+     codex exec --dangerously-bypass-approvals-and-sandbox "$CODEX_PROMPT" | tee "${CODEX_RAW_LOG}" >/dev/null
      CODEX_RC=${PIPESTATUS[0]}
      set -o pipefail
      echo "Codex exit code: ${CODEX_RC}"
@@ -427,6 +429,7 @@ codex_resolution:
     - apt-get update && apt-get install -y --no-install-recommends bash git jq curl ca-certificates
     - npm -g i @openai/codex@latest
     - git --version && codex --version || true
+    - printenv OPENAI_API_KEY | codex login --with-api-key
 
     # Require SAST report; no-op if missing
     - |
@@ -476,7 +479,7 @@ codex_resolution:
 
         : > "$CODEX_DIFF_RAW"
         set +o pipefail
-        codex exec --full-auto "$PER_FINDING_PROMPT" | tee -a "$CODEX_DIFF_RAW" >/dev/null
+        codex exec --dangerously-bypass-approvals-and-sandbox "$PER_FINDING_PROMPT" | tee -a "$CODEX_DIFF_RAW" >/dev/null
         RC=${PIPESTATUS[0]}
         set -o pipefail
         echo "Codex (diff) exit code: ${RC}"

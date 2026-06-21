@@ -4,6 +4,21 @@
 # should build pages for, and indicates metadata such as tags, creation date and
 # authors for each page.
 
+- title: Production-Grade Error Handling and Retry Patterns for the OpenAI API
+  path: examples/error_handling_and_retry.ipynb
+  slug: error-handling-and-retry
+  description: Build resilient OpenAI API clients with exponential back-off, rate-limit header inspection, proactive throttling, timeout configuration, async concurrent retry, fallback model strategy, and structured error logging.
+  date: 2026-06-21
+  authors:
+    - RudrenduPaul
+  tags:
+    - errors
+    - retry
+    - rate-limits
+    - async
+    - tenacity
+    - completions
+
 - title: Trigger a Workspace Agent from the API
   path: examples/chatgpt/workspace_agents/workspace-agents-api-trigger.ipynb
   slug: workspace-agents-api-trigger

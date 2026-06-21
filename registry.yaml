@@ -4,6 +4,46 @@
 # should build pages for, and indicates metadata such as tags, creation date and
 # authors for each page.
 
+- title: Getting Started with the OpenAI Agents SDK
+  path: examples/agents_sdk/getting_started_with_agents_sdk.ipynb
+  slug: getting-started-with-agents-sdk
+  description: End-to-end introduction to the Agents SDK covering Agent, function_tool, structured outputs, streaming, handoffs, and input guardrails.
+  date: 2026-06-21
+  authors:
+    - tahirkhan05
+  tags:
+    - agents-sdk
+    - agents
+    - functions
+    - streaming
+    - guardrails
+
+- title: Tracking Token Usage and Costs Across Multi-Agent Runs
+  path: examples/agents_sdk/tracking_token_usage_and_costs.ipynb
+  slug: tracking-token-usage-and-costs
+  description: Read usage from RunResult, build a cost calculator, aggregate usage across multi-agent pipelines, observe per-call token counts via RunHooks, and enforce a hard token budget.
+  date: 2026-06-21
+  authors:
+    - tahirkhan05
+  tags:
+    - agents-sdk
+    - agents
+    - functions
+    - cost
+
+- title: Building a Production Whisper Transcription Pipeline
+  path: examples/agents_sdk/whisper_production_transcription_pipeline.ipynb
+  slug: whisper-production-transcription-pipeline
+  description: Production-ready Whisper pipeline with progress callbacks, chunked transcription for large files, per-chunk retry with exponential backoff, cost estimation, and structured post-processing with an Agents SDK agent.
+  date: 2026-06-21
+  authors:
+    - tahirkhan05
+  tags:
+    - agents-sdk
+    - agents
+    - speech
+    - functions
+
 - title: Trigger a Workspace Agent from the API
   path: examples/chatgpt/workspace_agents/workspace-agents-api-trigger.ipynb
   slug: workspace-agents-api-trigger

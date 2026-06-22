@@ -4,6 +4,20 @@
 # should build pages for, and indicates metadata such as tags, creation date and
 # authors for each page.
 
+- title: Multi-Agent Task Decomposition with asyncio.gather
+  path: examples/multi_agent_task_decomposition.ipynb
+  slug: multi-agent-task-decomposition
+  description: Break a complex research task into parallel specialist calls using asyncio.gather, then synthesize the results with a higher-capability model. Demonstrates partial-failure handling with return_exceptions=True and a mock mode that runs without an API key.
+  date: 2026-06-21
+  authors:
+    - RudrenduPaul
+  tags:
+    - agents
+    - async
+    - gpt-4o
+    - gpt-4o-mini
+    - completions
+
 - title: Trigger a Workspace Agent from the API
   path: examples/chatgpt/workspace_agents/workspace-agents-api-trigger.ipynb
   slug: workspace-agents-api-trigger

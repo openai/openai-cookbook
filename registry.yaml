@@ -4,6 +4,19 @@
 # should build pages for, and indicates metadata such as tags, creation date and
 # authors for each page.
 
+- title: Cost-Optimized Model Routing for OpenAI's Model Tiers
+  path: examples/model_routing_openai.ipynb
+  slug: model-routing-openai
+  description: Build a ModelRouter that classifies incoming prompts and dispatches them to the cheapest OpenAI model capable of handling the task, with automatic upgrade fallback and tiktoken cost logging.
+  date: 2026-06-21
+  authors:
+    - RudrenduPaul
+  tags:
+    - cost-optimization
+    - model-routing
+    - completions
+    - tiktoken
+
 - title: Trigger a Workspace Agent from the API
   path: examples/chatgpt/workspace_agents/workspace-agents-api-trigger.ipynb
   slug: workspace-agents-api-trigger

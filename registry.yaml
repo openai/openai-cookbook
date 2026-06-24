@@ -5,7 +5,7 @@
 # authors for each page.
 
 - title: Build a Speaker-Aware Meeting Intelligence Pipeline with Audio Diarization
-  path: examples/audio/speaker_aware_meeting_intelligence/README.md
+  path: examples/audio/speaker_aware_meeting_intelligence/speaker_aware_meeting_intelligence.ipynb
   slug: speaker-aware-meeting-intelligence
   date: 2026-06-18
   authors:

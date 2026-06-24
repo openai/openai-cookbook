@@ -188,7 +188,7 @@ def _validate_walk_results(results: pd.DataFrame, results_path: Path) -> None:
         _parse_json_list(row.get("tool_calls", "[]"), field_name="tool_calls", row_number=row_number)
         _optional_existing_path(
             row.get("audio_path", ""),
-            row_status="ok",
+            row_status=row_status,
             field_name="audio_path",
             row_number=row_number,
         )

@@ -2011,13 +2011,21 @@
 - title: How to work with large language models
   path: articles/how_to_work_with_large_language_models.md
   slug: how-to-work-with-large-language-models
+  description: A first-time user guide to large language models, covering the Responses API, model choice, prompting, structured outputs, retrieval, tools, evals, safety, optimization, and fine-tuning.
   redirects:
     - how_to_work_with_large_language_models
-  date: 2023-01-20
+  date: 2026-05-12
   authors:
     - ted-at-openai
+    - paytonison
   tags:
-    - completions
+    - responses
+    - prompt-engineering
+    - reasoning
+    - evals
+    - functions
+    - fine-tuning
+    - guardrails
 
 - title: Use cases for embeddings
   path: articles/text_comparison_examples.md

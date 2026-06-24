@@ -1,0 +1,216 @@
+[
+    {
+        "hotel_information": {
+            "name": "Hampton by Hilton Hamburg City Centre",
+            "address": "Nordkanalstrasse 18, 20097 Hamburg",
+            "phone": "+49(0)40-302372-0",
+            "fax": "+49(0)40-302372-100"
+        },
+        "guest_information": {
+            "name": "APIMEISTER CONSULTING GMBH",
+            "address": "FRIEDRICHSTR. 123, 10117 BERLIN, GERMANY",
+            "guest_name": "JENS WALTER"
+        },
+        "invoice_information": {
+            "VAT_invoice_number": "25789",
+            "confirmation_number": "5296853",
+            "VAT": "DE289859636",
+            "folio_number": "111090A"
+        },
+        "stay_information": {
+            "room_number": "511 /NUX",
+            "arrival_date": "02/06/2019 02:00:00",
+            "departure_date": "07/06/2019",
+            "adults_children": "1/0",
+            "room_rate": "156.56",
+            "rate_plan": "2D2"
+        },
+        "charges": [
+            {
+                "date": "03/06/2019",
+                "description": "CREDIT CARD - ADVANCE DEPOSIT *5052",
+                "cashier_id": "ANPE",
+                "ref_no": "351221",
+                "guest_charges": null,
+                "credit": "€776.56",
+                "balance": null
+            },
+            {
+                "date": "03/06/2019",
+                "description": "CANCELLATION CHARGE",
+                "cashier_id": "ANPE",
+                "ref_no": "351222",
+                "guest_charges": "€155.00",
+                "credit": null,
+                "balance": null
+            },
+            {
+                "date": "03/06/2019",
+                "description": "CANCELLATION CHARGE",
+                "cashier_id": "ERLO",
+                "ref_no": "351229",
+                "guest_charges": null,
+                "credit": "€155.00",
+                "balance": null
+            },
+            {
+                "date": "03/06/2019",
+                "description": "GUEST ROOM",
+                "cashier_id": "ERLO",
+                "ref_no": "351277",
+                "guest_charges": "€150.05",
+                "credit": null,
+                "balance": null
+            },
+            {
+                "date": "03/06/2019",
+                "description": "BREAKFAST",
+                "cashier_id": "ERLO",
+                "ref_no": "351297",
+                "guest_charges": "€9.45",
+                "credit": null,
+                "balance": null
+            },
+            {
+                "date": "04/06/2019",
+                "description": "GUEST ROOM",
+                "cashier_id": "JONER",
+                "ref_no": "352209",
+                "guest_charges": "€150.05",
+                "credit": null,
+                "balance": null
+            },
+            {
+                "date": "04/06/2019",
+                "description": "BREAKFAST",
+                "cashier_id": "JONER",
+                "ref_no": "352276",
+                "guest_charges": "€9.45",
+                "credit": null,
+                "balance": null
+            },
+            {
+                "date": "05/06/2019",
+                "description": "GUEST ROOM",
+                "cashier_id": "ERLO",
+                "ref_no": "352767",
+                "guest_charges": "€150.05",
+                "credit": null,
+                "balance": null
+            },
+            {
+                "date": "05/06/2019",
+                "description": "BREAKFAST",
+                "cashier_id": "ERLO",
+                "ref_no": "352769",
+                "guest_charges": "€9.45",
+                "credit": null,
+                "balance": null
+            },
+            {
+                "date": "06/06/2019",
+                "description": "GUEST ROOM",
+                "cashier_id": "JONER",
+                "ref_no": "353331",
+                "guest_charges": "€161.61",
+                "credit": null,
+                "balance": null
+            },
+            {
+                "date": "06/06/2019",
+                "description": "BREAKFAST",
+                "cashier_id": "JONER",
+                "ref_no": "353331",
+                "guest_charges": "€9.45",
+                "credit": null,
+                "balance": null
+            },
+            {
+                "date": "07/06/2019",
+                "description": "GUEST ROOM",
+                "cashier_id": "ANPE",
+                "ref_no": "353477",
+                "guest_charges": "€150.05",
+                "credit": null,
+                "balance": null
+            }
+        ]
+    },
+    {
+        "hotel_information": {
+            "name": "Hampton by Hilton Hamburg City Centre",
+            "address": "Nordkanalstraße 18, 20097 Hamburg",
+            "contact": {
+                "phone": "+49(0)40-302372-0",
+                "fax": "+49(0)40-302372-100"
+            }
+        },
+        "guest_information": {
+            "company": "APIMEISTER CONSULTING GMBH",
+            "address": {
+                "street": "FRIEDRICHSTR. 123",
+                "city": "BERLIN",
+                "postal_code": "10117",
+                "country": "GERMANY"
+            },
+            "name": "JENS WALTER"
+        },
+        "invoice_information": {
+            "invoice_number": "25789",
+            "confirmation_number": "52966853",
+            "vat_number": "DE259895536",
+            "folio_number": "111903 A"
+        },
+        "stay_information": {
+            "room_number": "511 /NUX",
+            "arrival_date": "02/06/2019 02:00:00",
+            "departure_date": "07/06/2019",
+            "adults_children": "1/0",
+            "room_rate": "156.56",
+            "rate_plan": "202",
+            "al": "null",
+            "h": "null",
+            "i": "null"
+        },
+        "charges": [
+            {
+                "date": "07/06/2019",
+                "description": "BREAKFAST",
+                "cashier_id": "ANPE",
+                "ref_no": "353477",
+                "guest_charges": "€4.95",
+                "credit": "null",
+                "balance": "€60.00"
+            }
+        ],
+        "tax_summary": {
+            "trade_receivable_net_19%": "€20.80",
+            "trade_receivable_net_7%": "€0.00",
+            "trade_receivable_net_7.00%": "€702.61",
+            "vat_1%": "€3.95",
+            "fsb_vat_7%": "€0.00",
+            "vat_at_7%": "€49.20",
+            "trade_receivables_incl_vat": "€776.56"
+        },
+        "approval_amount": {
+            "transaction_id": "\"BALANCE\"",
+            "appr_code": "-€776.56"
+        },
+        "signature": {
+            "guest_signature": "null",
+            "debit_related_verbiage": "null"
+        },
+        "footer": {
+            "company": "Foremost Hospitality Management GmbH",
+            "address": "Str. Berlin | Joachimsthaler Str. 34, 10719 Berlin",
+            "registration": "Amtsgericht Charlottenburg, Berlin HRB 112538 B",
+            "vat_number": "DE259895536",
+            "managing_directors": "Hubert van de Loo, Timo Künner",
+            "bank_details": {
+                "bank": "Commerzbank",
+                "iban": "DE19 1004 0002 0230 7036 08",
+                "bic_swift": "COBADEFFXXX"
+            }
+        }
+    }
+]

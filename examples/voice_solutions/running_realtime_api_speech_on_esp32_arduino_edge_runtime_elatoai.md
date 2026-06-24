@@ -2,7 +2,7 @@
 
 ## 👾 ElatoAI: Running OpenAI Realtime API Speech on ESP32 on Arduino with Deno Edge Functions
 
-This guide shows how to build a AI voice agent device with Realtime AI Speech powered by OpenAI Realtime API, ESP32, Secure WebSockets, and Deno Edge Functions for >10-minute uninterrupted global conversations.
+This guide shows how to build an AI voice agent device with Realtime AI Speech powered by OpenAI Realtime API, ESP32, Secure WebSockets, and Deno Edge Functions for >10-minute uninterrupted global conversations.
 
 An active version of this README is available at [ElatoAI](https://github.com/akdeb/ElatoAI).
 

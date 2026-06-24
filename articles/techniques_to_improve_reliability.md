@@ -285,7 +285,7 @@ In general, to eke out maximum performance on a task, you'll need to fine-tune a
 In 2022, Eric Zelikman and Yuhuai Wu et al. published a clever procedure for using a few-shot prompt to generate a dataset of explanations that could be used to fine-tune a model. The idea is to use a few-shot prompt to generate candidate explanations, and only keep the explanations that produce the correct answer. Then, to get additional explanations for some of the incorrect answers, retry the few-shot prompt but with correct answers given as part of the question. The authors called their procedure STaR (Self-taught Reasoner):
 
 [![STaR procedure](/images/star_fig1.png)
-<br>Source: _STaR: Bootstrapping Reasoning With Reasoning_ by Eric Zelikman and Yujuai Wu et al. (2022)](https://arxiv.org/abs/2203.14465)
+<br>Source: _STaR: Bootstrapping Reasoning With Reasoning_ by Eric Zelikman and Yuhuai Wu et al. (2022)](https://arxiv.org/abs/2203.14465)
 
 With this technique, you can combine the benefits of fine-tuning with the benefits of chain-of-thought prompting without needing to write thousands of example explanations.
 
@@ -294,7 +294,7 @@ With this technique, you can combine the benefits of fine-tuning with the benefi
 When the authors applied this technique to a Common Sense Q&A dataset, they found that STaR outperformed both chain-of-thought prompting alone (73% > 37%) and fine-tuning alone (73% > 60%):
 
 [![STaR results](/images/star_tab1.png)
-<br>Source: _STaR: Bootstrapping Reasoning With Reasoning_ by Eric Zelikman and Yujuai Wu et al. (2022)](https://arxiv.org/abs/2203.14465)
+<br>Source: _STaR: Bootstrapping Reasoning With Reasoning_ by Eric Zelikman and Yuhuai Wu et al. (2022)](https://arxiv.org/abs/2203.14465)
 
 To learn more, read the [full paper](https://arxiv.org/abs/2203.14465).
 

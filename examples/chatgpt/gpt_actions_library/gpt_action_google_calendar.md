@@ -26,7 +26,7 @@ This GPT Action provides an overview of how to connect to your **Google Calendar
 
 ### Application Prerequisites
 
-Before you get started, ensure you can meet the following pre-requistes.
+Before you get started, ensure you can meet the following prerequisites.
 
  - A Google account with Google Calendar access. 
  - Permissions to access the Google Calendar API and use the Google Cloud Console to configure your OAuth credentials. 

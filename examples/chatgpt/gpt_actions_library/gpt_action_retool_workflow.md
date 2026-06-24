@@ -7,7 +7,7 @@ This page provides an instruction & guide for developers building a GPT Action f
 - [Introduction to GPT Actions Library](https://platform.openai.com/docs/actions/actions-library)
 - [Example of Building a GPT Action from Scratch](https://platform.openai.com/docs/actions/getting-started)
 
-This particular GPT Action provides an overview of how to connect to a **Retool Workflow**. This Action takes a users input and sends it to the workflow in Retool using a webhook trigger. Retool then performns the configured workflow and sends a response back to ChatGPT as a JSON object.
+This particular GPT Action provides an overview of how to connect to a **Retool Workflow**. This Action takes a users input and sends it to the workflow in Retool using a webhook trigger. Retool then performs the configured workflow and sends a response back to ChatGPT as a JSON object.
 
 ### Value + Example Business Use Cases
 

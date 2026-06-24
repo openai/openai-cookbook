@@ -22,7 +22,7 @@ def create_context(
     :param search_file_id: The file id of the search file
     :param max_len: The maximum length of the returned context (in tokens)
     :param search_model: The search model to use
-    :param max_rerank: The maximum number of reranking
+    :param max_rerank: The maximum number of documents to rerank
     :return: The context
     """
     # TODO: openai.Engine(search_model) is deprecated
@@ -57,11 +57,11 @@ def answer_question(
     """
     Answer a question based on the most similar context from the search file, using your fine-tuned model.
     :param question: The question
-    :param fine_tuned_qa_model: The fine tuned QA model
+    :param fine_tuned_qa_model: The fine-tuned QA model
     :param search_file_id: The file id of the search file
     :param max_len: The maximum length of the returned context (in tokens)
     :param search_model: The search model to use
-    :param max_rerank: The maximum number of reranking
+    :param max_rerank: The maximum number of documents to rerank
     :param debug: Whether to output debug information
     :param stop_sequence: The stop sequence for Q&A model
     :param max_tokens: The maximum number of tokens to return

@@ -29,7 +29,7 @@ class FileAccessAgent(BaseAgent):
                  Instructions:
                  1. When the user provides the CSV file name, use the 'safe_read_file' tool to read and display the first 15 lines of that file.
                  2. If the specified file does not exist in the provided directory, return an appropriate error message (e.g., "Error: The specified file does not exist in the provided directory").
-                 3. The user may request data analysis based on the file’s contents, but you should NOT perform or write code for any data analysis. Your only task is to read and return the first 6 lines of the file.
+                 3. The user may request data analysis based on the file’s contents, but you should NOT perform or write code for any data analysis. Your only task is to read and return the first 15 lines of the file.
 
                  Do not include any additional commentary or code not related to reading the file.
                  """,

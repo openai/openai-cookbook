@@ -1,5 +1,6 @@
+import os
 from enum import Enum
-from typing import Optional
+from typing import Callable, Optional
 
 from pydantic import BaseModel, Field
 
@@ -221,7 +222,6 @@ class Parser(BaseModel):
 
 def find_context_core(lines: list[str], context: list[str], start: int) -> tuple[int, int]:
     if not context:
-        print("context is empty")
         return start, 0
 
     # Prefer identical
@@ -407,10 +407,6 @@ def patch_to_commit(patch: Patch, orig: dict[str, str]) -> Commit:
 
 class DiffError(ValueError):
     pass
-
-
-import os
-from typing import Callable
 
 
 def load_files(paths: list[str], open_fn: Callable) -> dict[str, str]:

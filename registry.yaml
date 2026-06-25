@@ -4,6 +4,19 @@
 # should build pages for, and indicates metadata such as tags, creation date and
 # authors for each page.
 
+- title: Deterministic Governance for OpenAI Function Calling
+  path: examples/partners/tealtiger_governance/deterministic_governance_for_function_calling.ipynb
+  slug: deterministic-governance-for-function-calling
+  description: Add deterministic policy enforcement to OpenAI function calling — tool allowlists, FREEZE rules, cost budgets, and audit trails without any LLM in the governance path.
+  date: 2026-06-05
+  authors:
+    - nagasatish007
+  tags:
+    - functions
+    - agents
+    - guardrails
+    - governance
+    - partners
 - title: Trigger a Workspace Agent from the API
   path: examples/chatgpt/workspace_agents/workspace-agents-api-trigger.ipynb
   slug: workspace-agents-api-trigger

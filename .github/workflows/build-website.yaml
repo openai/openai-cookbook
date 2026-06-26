@@ -11,4 +11,13 @@ jobs:
 
     steps:
       - name: Call Deploy Hook
-        run: curl -X POST ${{ secrets.WEBSITE_DEPLOY_HOOK_URL }}
+        env:
+          WEBSITE_DEPLOY_HOOK_URL: ${{ secrets.WEBSITE_DEPLOY_HOOK_URL }}
+        run: |
+          if [ -z "$WEBSITE_DEPLOY_HOOK_URL" ]; then
+            echo "WEBSITE_DEPLOY_HOOK_URL is not configured for this fork; skipping website rebuild."
+            exit 0
+          fi
+
+          curl --fail-with-body --show-error --silent \
+            -X POST "$WEBSITE_DEPLOY_HOOK_URL"

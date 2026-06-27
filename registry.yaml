@@ -2174,3 +2174,11 @@
     - evals-api
     - responses
     - evals
+
+- title: Azure Services for a Florida Tax Resolution Firm
+  path: examples/azure/azure_services_for_tax_resolution.ipynb
+  date: 2026-06-27
+  authors:
+    - keithjonescpa
+  tags:
+    - completions

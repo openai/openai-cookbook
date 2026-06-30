@@ -1,25 +1,206 @@
 <!doctype html>
 <html lang="en">
 <head>
-<meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1">
-<title>AUMARA — Private Costa Blanca Houses</title>
-<meta name="description" content="AUMARA private Costa Blanca houses hosted by EL CID. Direct booking, Booking.com and Airbnb opening layer, seasonal rates, food and slow stays in Benidoleig, Alicante.">
-<style>
-:root{--olive:#1f2b21;--gold:#c7a15b;--ivory:#f4efe5;--paper:#fffaf1;--ink:#111611;--muted:#667064;--line:rgba(31,43,33,.16)}*{box-sizing:border-box}html{scroll-behavior:smooth}body{margin:0;font-family:Inter,system-ui,-apple-system,BlinkMacSystemFont,"Segoe UI",sans-serif;color:var(--ink);background:var(--ivory)}a{text-decoration:none;color:inherit}h1,h2,h3,h4{font-family:Georgia,serif;line-height:.95;margin:0}h1{font-size:clamp(50px,8.8vw,110px);letter-spacing:-.06em;max-width:1100px}h2{font-size:clamp(36px,5vw,72px);letter-spacing:-.045em}h3{font-size:34px;letter-spacing:-.025em}p{line-height:1.65}.header{position:fixed;top:0;left:0;right:0;z-index:30;padding:20px 34px;display:flex;justify-content:space-between;align-items:center;color:var(--ivory);mix-blend-mode:difference}.brand{display:flex;gap:12px;align-items:center;font-weight:800;letter-spacing:.1em}.mark{width:42px;height:42px;border:1px solid currentColor;border-radius:50%;display:grid;place-items:center;font-family:Georgia,serif;font-size:28px}.nav{display:flex;gap:20px;align-items:center;font-size:14px;font-weight:700}.nav a:last-child{border:1px solid currentColor;border-radius:999px;padding:10px 15px}.hero{min-height:100vh;background:var(--olive);position:relative;color:var(--ivory);display:flex;align-items:flex-end;padding:140px 34px 54px;overflow:hidden}.hero:before{content:"";position:absolute;inset:0;background:radial-gradient(circle at 76% 18%,rgba(199,161,91,.42),transparent 28%),linear-gradient(125deg,rgba(12,17,13,.98),rgba(31,43,33,.84),rgba(199,161,91,.28))}.hero:after{content:"";position:absolute;inset:0;background:linear-gradient(to top,rgba(17,22,17,.75),transparent 58%),linear-gradient(to right,rgba(17,22,17,.86),transparent 73%)}.hero-content{position:relative;z-index:2}.eyebrow{font-size:12px;text-transform:uppercase;letter-spacing:.18em;font-weight:800;color:var(--gold);margin:0 0 18px}.lead{font-size:clamp(18px,2vw,25px);color:rgba(244,239,229,.84);max-width:710px;margin:26px 0 0}.actions{display:flex;flex-wrap:wrap;gap:12px;margin-top:32px}.btn{display:inline-flex;justify-content:center;align-items:center;border-radius:999px;padding:15px 22px;font-weight:800;border:1px solid transparent}.btn.primary{background:var(--gold);color:#171712}.btn.secondary{color:var(--ivory);border-color:rgba(244,239,229,.45)}.hero-card{position:absolute;right:34px;bottom:54px;z-index:3;width:min(390px,calc(100vw - 68px));padding:28px;border:1px solid rgba(244,239,229,.24);border-radius:30px;background:rgba(244,239,229,.08);backdrop-filter:blur(16px)}.hero-card strong{display:block;font:700 25px Georgia,serif;margin:8px 0}.hero-card p{margin:0;color:rgba(244,239,229,.72)}.section{max-width:1320px;margin:0 auto;padding:105px 34px}.two{display:grid;grid-template-columns:minmax(280px,1fr) minmax(280px,610px);gap:64px;align-items:start}.two p.big{font-size:21px;color:var(--muted);margin:0}.section-head{max-width:830px;margin-bottom:44px}.section-head p:last-child{color:var(--muted);font-size:18px}.grid2{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:24px}.grid3{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:18px}.grid4{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:18px}.card{background:var(--paper);border:1px solid var(--line);border-radius:30px;overflow:hidden;box-shadow:0 22px 70px rgba(31,43,33,.07)}.photo{min-height:300px;background:radial-gradient(circle at 24% 24%,rgba(244,239,229,.45),transparent 24%),linear-gradient(145deg,rgba(31,43,33,.95),rgba(199,161,91,.34))}.photo.b{background:radial-gradient(circle at 76% 22%,rgba(244,239,229,.38),transparent 24%),linear-gradient(145deg,rgba(14,20,15,.93),rgba(91,104,77,.42))}.body{padding:32px}.tag{color:var(--gold);font-size:12px;text-transform:uppercase;letter-spacing:.13em;font-weight:900;margin:0 0 10px}.body p{color:var(--muted)}.body ul{line-height:1.8;color:#354535;padding-left:20px}.strip{margin-top:24px;border:1px solid var(--line);border-radius:24px;overflow:hidden;display:grid;grid-template-columns:repeat(4,1fr);gap:1px;background:var(--line)}.strip div{background:rgba(255,250,241,.78);padding:21px}.strip strong{display:block;font:700 24px Georgia,serif}.strip span{display:block;color:var(--muted);margin-top:6px;font-size:14px;line-height:1.5}.rate-table{width:100%;border-collapse:collapse;border:1px solid var(--line);background:var(--paper);border-radius:28px;overflow:hidden;display:table}.rate-table th,.rate-table td{text-align:left;padding:17px;border-bottom:1px solid var(--line);vertical-align:top}.rate-table th{font-size:12px;text-transform:uppercase;letter-spacing:.12em;color:var(--gold);background:#f7f0e4}.rate-table td{color:var(--muted)}.rate-table strong{color:var(--ink)}.booking{background:var(--olive);color:var(--ivory);max-width:none}.booking-inner{max-width:1320px;margin:0 auto;padding:105px 34px}.booking .section-head p:last-child{color:rgba(244,239,229,.72)}.booking-card{border:1px solid rgba(244,239,229,.18);border-radius:26px;background:rgba(244,239,229,.07);padding:26px}.booking-card p{color:rgba(244,239,229,.72);line-height:1.65}.booking-card strong{color:var(--ivory)}.matrix{display:grid;grid-template-columns:repeat(3,1fr);gap:1px;border:1px solid var(--line);border-radius:28px;overflow:hidden;background:var(--line)}.matrix div{background:var(--paper);padding:24px}.matrix strong{display:block;margin-bottom:10px}.matrix span{color:var(--muted);line-height:1.55}.info{border-top:1px solid var(--line);padding-top:28px}.info .num{color:var(--gold);font-weight:900}.info p{color:var(--muted)}.food-panel{border-radius:42px;min-height:520px;display:flex;flex-direction:column;justify-content:flex-end;padding:76px;color:var(--ivory);background:linear-gradient(135deg,rgba(12,17,13,.95),rgba(31,43,33,.65)),radial-gradient(circle at 70% 20%,rgba(199,161,91,.34),transparent 28%)}.food-panel p:not(.eyebrow){max-width:650px;color:rgba(244,239,229,.76);font-size:20px}.contact-card{background:var(--olive);color:var(--ivory);border-radius:42px;padding:clamp(36px,7vw,76px);text-align:center}.contact-card p:not(.eyebrow){max-width:760px;margin-left:auto;margin-right:auto;color:rgba(244,239,229,.75);font-size:19px}.footer{display:flex;justify-content:space-between;gap:20px;padding:34px;border-top:1px solid var(--line);color:var(--muted)}.footer strong{color:var(--ink);margin-right:10px}@media(max-width:930px){.nav{display:none}.hero{display:block;min-height:920px}.hero-content{margin-top:140px}.hero-card{position:relative;right:auto;bottom:auto;margin-top:34px}.two,.grid2,.grid3,.grid4,.matrix{grid-template-columns:1fr}.strip{grid-template-columns:1fr 1fr}.rate-table{display:block;overflow-x:auto}.food-panel{border-radius:0;padding:56px 34px}.booking-inner,.section{padding-left:22px;padding-right:22px}}@media(max-width:540px){.header{padding:18px}.hero{padding-left:22px;padding-right:22px}.strip{grid-template-columns:1fr}.footer{flex-direction:column}}
-</style>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width,initial-scale=1">
+  <title>AUMARA — Geodesic Wooden Houses in Costa Blanca</title>
+  <meta name="description" content="AUMARA is a collection of private geodesic wooden houses in Benidoleig, Costa Blanca. Discover AUMARA 7 and AUMARA 9, check live availability and book on Booking.com.">
+  <link rel="canonical" href="https://elcidspain.github.io/openai-cookbook/">
+  <meta property="og:type" content="website">
+  <meta property="og:title" content="AUMARA — Geodesic Wooden Houses in Costa Blanca">
+  <meta property="og:description" content="Private wooden dome houses in Benidoleig, hosted by EL CID.">
+  <meta property="og:url" content="https://elcidspain.github.io/openai-cookbook/">
+  <meta property="og:image" content="https://lh3.googleusercontent.com/d/1CaAzLCyqhhPS0NB7x61muYi5qL-XkM_A=w1600">
+  <style>
+    :root{
+      --pine:#17231d;--pine2:#24352b;--gold:#c9a267;--sand:#efe8db;--paper:#fbf7ef;
+      --ink:#151a17;--muted:#68736b;--line:rgba(23,35,29,.16);--white:#fffdf8;
+    }
+    *{box-sizing:border-box}
+    html{scroll-behavior:smooth}
+    body{margin:0;background:var(--sand);color:var(--ink);font-family:Inter,system-ui,-apple-system,BlinkMacSystemFont,"Segoe UI",sans-serif}
+    a{text-decoration:none;color:inherit}
+    img{display:block;width:100%;height:100%;object-fit:cover}
+    h1,h2,h3{font-family:Georgia,serif;line-height:.98;margin:0;font-weight:500;letter-spacing:-.045em}
+    h1{font-size:clamp(50px,8.4vw,112px);max-width:1050px}
+    h2{font-size:clamp(38px,5.4vw,76px)}
+    h3{font-size:clamp(28px,3vw,42px)}
+    p{line-height:1.65}
+    .wrap{width:min(1240px,calc(100% - 40px));margin:auto}
+    .header{position:fixed;inset:0 0 auto;z-index:30;padding:18px 28px;display:flex;align-items:center;justify-content:space-between;color:#fff;mix-blend-mode:difference}
+    .brand{display:flex;align-items:center;gap:12px;font-size:13px;font-weight:900;letter-spacing:.18em}
+    .mark{width:42px;height:42px;border:1px solid currentColor;border-radius:50%;display:grid;place-items:center;font:500 27px Georgia,serif}
+    .nav{display:flex;gap:22px;align-items:center;font-size:14px;font-weight:750}
+    .nav .book{padding:10px 16px;border:1px solid currentColor;border-radius:999px}
+    .hero{min-height:100vh;position:relative;color:#fff;display:flex;align-items:flex-end;overflow:hidden;background:var(--pine)}
+    .hero-media{position:absolute;inset:0}
+    .hero-media img{filter:saturate(.9) contrast(1.04)}
+    .hero:after{content:"";position:absolute;inset:0;background:linear-gradient(90deg,rgba(12,20,15,.92) 0%,rgba(12,20,15,.6) 50%,rgba(12,20,15,.18) 100%),linear-gradient(0deg,rgba(12,20,15,.58),transparent 48%)}
+    .hero-inner{position:relative;z-index:2;width:100%;padding:150px 0 54px}
+    .eyebrow{margin:0 0 16px;text-transform:uppercase;letter-spacing:.18em;font-size:12px;font-weight:900;color:var(--gold)}
+    .lead{max-width:720px;font-size:clamp(18px,2vw,24px);color:rgba(255,255,255,.84);margin:26px 0 0}
+    .actions{display:flex;flex-wrap:wrap;gap:12px;margin-top:30px}
+    .btn{display:inline-flex;align-items:center;justify-content:center;padding:14px 21px;border-radius:999px;font-weight:850;border:1px solid transparent}
+    .btn.primary{background:var(--gold);color:#1b1b16}
+    .btn.secondary{border-color:rgba(255,255,255,.55);color:#fff;background:rgba(255,255,255,.06);backdrop-filter:blur(10px)}
+    .hero-note{position:absolute;right:0;bottom:0;width:min(360px,100%);padding:25px;border:1px solid rgba(255,255,255,.22);border-radius:28px;background:rgba(17,29,22,.55);backdrop-filter:blur(14px)}
+    .hero-note strong{display:block;font:500 25px Georgia,serif;margin:7px 0}
+    .hero-note p{margin:0;color:rgba(255,255,255,.72)}
+    .section{padding:100px 0}
+    .section-head{max-width:820px;margin-bottom:40px}
+    .section-head p:last-child{color:var(--muted);font-size:18px}
+    .intro{display:grid;grid-template-columns:1fr 1fr;gap:64px;align-items:start}
+    .intro p{font-size:20px;color:var(--muted);margin:0}
+    .house-grid{display:grid;grid-template-columns:1fr 1fr;gap:24px}
+    .house{background:var(--paper);border:1px solid var(--line);border-radius:30px;overflow:hidden;box-shadow:0 24px 70px rgba(23,35,29,.08)}
+    .house-photo{height:410px}
+    .house-body{padding:30px}
+    .tag{margin:0 0 10px;text-transform:uppercase;letter-spacing:.13em;font-size:12px;font-weight:900;color:var(--gold)}
+    .house-body p{color:var(--muted)}
+    .facts{display:flex;flex-wrap:wrap;gap:9px;margin-top:20px}
+    .fact{padding:9px 12px;border-radius:999px;background:#eee7da;color:#405046;font-size:13px;font-weight:750}
+    .gallery{display:grid;grid-template-columns:1.35fr .65fr .65fr;grid-auto-rows:250px;gap:12px}
+    .gallery figure{margin:0;border-radius:24px;overflow:hidden;position:relative;background:var(--pine2)}
+    .gallery figure:first-child{grid-row:span 2}
+    .gallery figcaption{position:absolute;left:16px;bottom:14px;color:#fff;font-size:12px;font-weight:800;letter-spacing:.08em;text-transform:uppercase;text-shadow:0 1px 14px #000}
+    .booking{background:var(--pine);color:#fff}
+    .booking .section-head p:last-child{color:rgba(255,255,255,.7)}
+    .booking-grid{display:grid;grid-template-columns:1.3fr .7fr;gap:22px}
+    .booking-card{padding:34px;border:1px solid rgba(255,255,255,.18);border-radius:30px;background:rgba(255,255,255,.07)}
+    .booking-card p{color:rgba(255,255,255,.72)}
+    .booking-card .btn{margin-top:8px}
+    .experience{display:grid;grid-template-columns:repeat(4,1fr);gap:1px;background:var(--line);border:1px solid var(--line);border-radius:28px;overflow:hidden}
+    .experience div{background:rgba(251,247,239,.88);padding:25px}
+    .experience strong{display:block;font:500 25px Georgia,serif;margin:8px 0}
+    .experience p{color:var(--muted);margin:0}
+    .rules{display:grid;grid-template-columns:repeat(3,1fr);gap:1px;background:var(--line);border:1px solid var(--line);border-radius:28px;overflow:hidden}
+    .rules div{background:var(--paper);padding:22px}
+    .rules strong{display:block;margin-bottom:8px}
+    .rules span{color:var(--muted);line-height:1.55}
+    .contact{background:var(--pine);color:#fff;border-radius:42px;padding:clamp(38px,7vw,78px);text-align:center}
+    .contact p{max-width:760px;margin-left:auto;margin-right:auto;color:rgba(255,255,255,.72);font-size:18px}
+    .contact .actions{justify-content:center}
+    .footer{display:flex;justify-content:space-between;gap:20px;padding:32px 0;color:var(--muted);font-size:14px}
+    .footer strong{color:var(--ink);margin-right:8px}
+    @media(max-width:900px){
+      .nav{display:none}.intro,.house-grid,.booking-grid,.experience,.rules{grid-template-columns:1fr}.hero-note{position:relative;margin-top:30px}.gallery{grid-template-columns:1fr 1fr}.gallery figure:first-child{grid-column:span 2;grid-row:auto}.house-photo{height:320px}
+    }
+    @media(max-width:560px){
+      .header{padding:16px 18px}.wrap{width:min(100% - 28px,1240px)}.hero-inner{padding-top:120px}.gallery{grid-template-columns:1fr}.gallery figure:first-child{grid-column:auto}.footer{flex-direction:column}
+    }
+  </style>
 </head>
 <body>
-<header class="header"><a class="brand" href="#top"><span class="mark">A</span><span>AUMARA</span></a><nav class="nav"><a href="#houses">Houses</a><a href="#rates">Rates</a><a href="#booking">Booking</a><a href="#policies">Rules</a><a href="#contact">Enquire</a></nav></header>
+<header class="header">
+  <a class="brand" href="#top"><span class="mark">A</span><span>AUMARA</span></a>
+  <nav class="nav">
+    <a href="#houses">Houses</a><a href="#gallery">Gallery</a><a href="#experience">Experience</a><a href="#rules">Rules</a>
+    <a class="book" href="https://www.booking.com/hotel/es/aumara.html" target="_blank" rel="noopener">Book</a>
+  </nav>
+</header>
+
 <main id="top">
-<section class="hero"><div class="hero-content"><p class="eyebrow">Benidoleig · Costa Blanca · Hosted by EL CID</p><h1>Private houses for slower days in the quiet inland Costa Blanca.</h1><p class="lead">AUMARA is a collection of private houses connected to EL CID hospitality: food, nature, family stays, retreats and a softer rhythm of travel.</p><div class="actions"><a class="btn primary" href="#contact">Request availability</a><a class="btn secondary" href="#rates">View stay formats</a></div></div><div class="hero-card"><span class="eyebrow">Opening layer</span><strong>Direct · Booking · Airbnb</strong><p>We are opening calendars carefully: direct first, then OTA once mapping is clean.</p></div></section>
-<section class="section two"><div><p class="eyebrow">What AUMARA is</p><h2>Not a hotel room. Not a random villa. A hosted private-house stay.</h2></div><p class="big">AUMARA sits inside the wider EL CID ecosystem: private houses, outdoor space, nearby mountains and sea, restaurant access, practical hospitality and retreat programming. The product is simple: privacy of a house, warmth of a host layer, and a slower Costa Blanca rhythm.</p></section>
-<section id="houses" class="section"><div class="section-head"><p class="eyebrow">Houses</p><h2>Two house families. Several stay formats.</h2><p>The commercial structure is already there: S7 houses for compact stays, S9 houses for larger / superior stays, with differentiated minimum nights and long-stay logic.</p></div><div class="grid2"><article class="card"><div class="photo"></div><div class="body"><p class="tag">S7 · Compact houses</p><h3>AUMARA 7 Houses</h3><p>Compact private houses for couples, small families and quiet long weekends.</p><ul><li>AUMARA Madrid 7 — base S7, 2-night logic</li><li>AUMARA Sevilla 7 — 3+ night slow stay</li><li>AUMARA Granada 7 — 3+ night slow stay</li><li>AUMARA Valencia 7 — 6+ night long-stay format</li></ul></div></article><article class="card"><div class="photo b"></div><div class="body"><p class="tag">S9 · Superior houses</p><h3>AUMARA 9 Houses</h3><p>Larger private houses for families, retreats and slower hosted weeks.</p><ul><li>AUMARA Verde 9 — superior 3+ night format</li><li>AUMARA Oro 9 — superior 3+ night format</li><li>Higher privacy / higher price band</li><li>Good for retreat, family and premium stay demand</li></ul></div></article></div><div class="strip"><div><strong>Madrid 7</strong><span>2 nights · base compact product</span></div><div><strong>Sevilla / Granada 7</strong><span>3–5 nights and 6+ night discount logic</span></div><div><strong>Valencia 7</strong><span>6+ night long-stay product</span></div><div><strong>Verde / Oro 9</strong><span>Superior 3+ night product</span></div></div></section>
-<section id="rates" class="section"><div class="section-head"><p class="eyebrow">Stay formats & rates</p><h2>Clear enough for guests. Structured enough for channels.</h2><p>These are working 2026 channel rates from the AUMARA source grid. Public language can show “from” prices while Booking/Beds24 keeps the full daily matrix.</p></div><table class="rate-table"><thead><tr><th>House family</th><th>Season</th><th>Base nightly</th><th>Weekend</th><th>Stay logic</th></tr></thead><tbody><tr><td><strong>S7 compact houses</strong><br>Madrid / Sevilla / Granada / Valencia</td><td>Jan–Mar</td><td>€200</td><td>+10% Fri/Sat</td><td>2 nights / 3+ nights / 6+ nights depending on unit</td></tr><tr><td><strong>S7 compact houses</strong></td><td>Apr–Jun</td><td>€250</td><td>+10% Fri/Sat</td><td>3–5 night discounts on selected units; 6+ long-stay discount on Valencia</td></tr><tr><td><strong>S7 compact houses</strong></td><td>Jul–Sep</td><td>€320</td><td>+10% Fri/Sat</td><td>Peak season protected; calendar discipline required</td></tr><tr><td><strong>S7 compact houses</strong></td><td>Oct–Dec</td><td>€250</td><td>+10% Fri/Sat</td><td>Good for long weekends, retreats and low-season stays</td></tr><tr><td><strong>S9 superior houses</strong><br>Verde / Oro</td><td>Jan–Mar</td><td>€320</td><td>+10% Fri/Sat</td><td>Minimum 3 nights; 6+ nights -10%</td></tr><tr><td><strong>S9 superior houses</strong></td><td>Apr–Jun</td><td>€350</td><td>+10% Fri/Sat</td><td>Family / premium stay positioning</td></tr><tr><td><strong>S9 superior houses</strong></td><td>Jul–Sep</td><td>€512</td><td>+10% Fri/Sat</td><td>Peak season premium product</td></tr><tr><td><strong>S9 superior houses</strong></td><td>Oct–Dec</td><td>€400</td><td>+10% Fri/Sat</td><td>Retreat / slow hosted week potential</td></tr></tbody></table></section>
-<section id="booking" class="booking"><div class="booking-inner"><div class="section-head"><p class="eyebrow">Booking path</p><h2>We open demand without losing control of the calendar.</h2><p>Direct enquiry stays active while Booking.com / Airbnb calendars and channel mapping are cleaned.</p></div><div class="grid3"><div class="booking-card"><p class="tag">01 · Direct</p><h3>Direct enquiry</h3><p><strong>Best for now.</strong> Guests send dates, number of guests, children/pets and preferred house type. We match the right house manually while calendars are being finalised.</p></div><div class="booking-card"><p class="tag">02 · Booking.com</p><h3>OTA visibility</h3><p>Booking.com exists as a channel layer, but mapping must be clean. No public push until the forbidden hotel ID / access issue is cleared.</p></div><div class="booking-card"><p class="tag">03 · Airbnb</p><h3>Private-house demand</h3><p>Airbnb is useful for the private-house audience: families, couples, longer weekends and flexible Costa Blanca stays. Copy and photos must feel hosted, not generic.</p></div></div></div></section>
-<section class="section"><div class="section-head"><p class="eyebrow">Experience</p><h2>A softer way to use Costa Blanca.</h2></div><div class="grid4"><div class="info"><span class="num">01</span><h3>Quiet mornings</h3><p>Coffee, light, terrace, no rush. The first product is not a bed. It is the right beginning of the day.</p></div><div class="info"><span class="num">02</span><h3>Hosted privacy</h3><p>Enough hospitality to feel supported. Enough independence to remain completely yours.</p></div><div class="info"><span class="num">03</span><h3>Food connection</h3><p>Breakfasts, dinners and retreat F&B can become part of the stay instead of an afterthought.</p></div><div class="info"><span class="num">04</span><h3>Reset potential</h3><p>AUMARA is built for family time, women’s reset programmes, sports residencies and slow hosted weeks.</p></div></div></section>
-<section class="section"><div class="food-panel"><p class="eyebrow">Food & fire</p><h2>Connected to EL CID and Wabi-Sabi kitchen.</h2><p>The food layer is part of the experience: breakfasts, terrace dinners, seasonal produce, fire, simple Mediterranean depth and future retreat menus.</p><div class="actions"><a class="btn secondary" href="#contact">Ask about food options</a></div></div></section>
-<section id="policies" class="section"><div class="section-head"><p class="eyebrow">Stay rules</p><h2>Warm hospitality. Clear boundaries.</h2><p>These rules protect the houses, neighbours, guests and team. The tone is calm, but the boundaries are real.</p></div><div class="matrix"><div><strong>Minimum stay</strong><span>Normally 2 or 3 nights depending on house; 6+ night product exists for longer stays.</span></div><div><strong>Check-in</strong><span>Self check-in or hosted check-in, depending on house and timing. Instructions sent before arrival.</span></div><div><strong>Quiet stay</strong><span>No parties, no uncontrolled events, no disruptive noise.</span></div><div><strong>Pets</strong><span>By approval only, house by house and dates by dates.</span></div><div><strong>Deposit</strong><span>Damage guarantee may apply depending on channel, stay length and house type.</span></div><div><strong>Food</strong><span>Breakfast, restaurant dinner or retreat menu by request and subject to kitchen schedule.</span></div></div></section>
-<section class="section two"><div><p class="eyebrow">Location</p><h2>Inland Costa Blanca, close to the sea, held by the mountain rhythm.</h2></div><p class="big">Benidoleig gives AUMARA its balance: quieter than the coast, close enough for beaches, markets, restaurants and day trips. A stay that can be private, social, active or deeply slow.</p></section>
-<section id="contact" class="section"><div class="contact-card"><p class="eyebrow">Direct enquiry</p><h2>Tell us your dates. We will match the right house.</h2><p>Send preferred dates, number of guests, children or pets, and whether you prefer a compact house or a larger superior house.</p><div class="actions" style="justify-content:center"><a class="btn primary" href="mailto:elcidspain@gmail.com?subject=AUMARA%20stay%20enquiry">Email AUMARA</a><a class="btn secondary" href="https://wa.me/34622914323?text=Hello%20AUMARA%2C%20I%20would%20like%20to%20ask%20about%20availability." target="_blank">WhatsApp</a></div></div></section>
-</main><footer class="footer"><div><strong>AUMARA</strong><span>Private Costa Blanca Houses · Hosted by EL CID</span></div><a href="mailto:elcidspain@gmail.com">elcidspain@gmail.com</a></footer>
-</body></html>
+  <section class="hero">
+    <div class="hero-media"><img src="https://lh3.googleusercontent.com/d/1CaAzLCyqhhPS0NB7x61muYi5qL-XkM_A=w2200" alt="AUMARA geodesic wooden house in Benidoleig"></div>
+    <div class="hero-inner">
+      <div class="wrap" style="position:relative">
+        <p class="eyebrow">Benidoleig · Marina Alta · Costa Blanca</p>
+        <h1>Private geodesic wooden houses between mountain and sea.</h1>
+        <p class="lead">AUMARA is a small collection of distinctive wooden dome houses hosted by EL CID — private space, nature, food and a slower rhythm of travel.</p>
+        <div class="actions">
+          <a class="btn primary" href="https://www.booking.com/hotel/es/aumara.html" target="_blank" rel="noopener">View live availability</a>
+          <a class="btn secondary" href="#houses">Explore AUMARA 7 & 9</a>
+        </div>
+        <aside class="hero-note">
+          <span class="eyebrow">Booking now</span>
+          <strong>Booking.com is live.</strong>
+          <p>Rates and availability are shown in real time. Direct enquiries remain open for longer stays, retreats and special requests.</p>
+        </aside>
+      </div>
+    </div>
+  </section>
+
+  <section class="section">
+    <div class="wrap intro">
+      <div><p class="eyebrow">What AUMARA is</p><h2>Not a hotel room. Not a generic villa.</h2></div>
+      <p>AUMARA brings together the privacy of a complete house with the support of a hosted stay. The houses sit inside the wider EL CID ecosystem: outdoor space, restaurant access, practical hospitality, family stays and retreat potential.</p>
+    </div>
+  </section>
+
+  <section id="houses" class="section">
+    <div class="wrap">
+      <div class="section-head"><p class="eyebrow">Two house families</p><h2>AUMARA 7 and AUMARA 9.</h2><p>Two distinct geodesic wooden-house formats, each booked as a complete private house.</p></div>
+      <div class="house-grid">
+        <article class="house">
+          <div class="house-photo"><img src="https://lh3.googleusercontent.com/d/19rqTnIAHh-LyW-dXrUotPGzsHEsu4J_c=w1600" alt="AUMARA 7 private wooden house"></div>
+          <div class="house-body"><p class="tag">AUMARA 7</p><h3>Compact private dome houses.</h3><p>Designed for couples, small families and quiet long weekends, with a complete-house format and a close connection to the landscape.</p><div class="facts"><span class="fact">Up to 4 guests</span><span class="fact">Private house</span><span class="fact">Terrace</span><span class="fact">Shared pool</span></div></div>
+        </article>
+        <article class="house">
+          <div class="house-photo"><img src="https://lh3.googleusercontent.com/d/16yNmLl-1O2Oj5VY2gQBSelCKIWfpQL52=w1600" alt="AUMARA 9 superior geodesic wooden house"></div>
+          <div class="house-body"><p class="tag">AUMARA 9</p><h3>Larger superior dome houses.</h3><p>More space for families, small groups and premium hosted stays, with the same distinctive wooden geodesic architecture.</p><div class="facts"><span class="fact">Up to 6 guests</span><span class="fact">Private house</span><span class="fact">More space</span><span class="fact">Family & retreat use</span></div></div>
+        </article>
+      </div>
+    </div>
+  </section>
+
+  <section id="gallery" class="section">
+    <div class="wrap">
+      <div class="section-head"><p class="eyebrow">AUMARA atmosphere</p><h2>Wood, light and quiet.</h2><p>The visual language is real architecture, natural textures and the transition from Mediterranean daylight into warm evening light.</p></div>
+      <div class="gallery">
+        <figure><img src="https://lh3.googleusercontent.com/d/1k7W4R0LuI6L4vJ9kBqNUx8QDrkLKTksV=w1800" alt="AUMARA dome houses at dusk"><figcaption>Dusk at AUMARA</figcaption></figure>
+        <figure><img src="https://lh3.googleusercontent.com/d/1vmrzxPo1oCDHf04ykoGEpbtp5HdM_a4U=w1200" alt="Path between AUMARA houses"><figcaption>Between the houses</figcaption></figure>
+        <figure><img src="https://lh3.googleusercontent.com/d/1Y0Nb6Lfob8dwzJBdkMQPDsoaKtMQj29b=w1200" alt="AUMARA dome houses at night"><figcaption>Night light</figcaption></figure>
+        <figure><img src="https://lh3.googleusercontent.com/d/1Dx3SLonThui5jca3C9fadr9RrboaBGdJ=w1200" alt="AUMARA under moonlight"><figcaption>Moonlight</figcaption></figure>
+        <figure><img src="https://lh3.googleusercontent.com/d/1A5__kXss4W_K4SM72pyW2fuFjUCYPsDZ=w1200" alt="Starry sky above AUMARA"><figcaption>Starry sky</figcaption></figure>
+      </div>
+    </div>
+  </section>
+
+  <section class="section booking" id="booking">
+    <div class="wrap">
+      <div class="section-head"><p class="eyebrow">Booking path</p><h2>Live availability first. Personal support when needed.</h2><p>Booking.com is the active transactional channel today. Direct contact remains available for special requests, longer stays, retreats and group questions.</p></div>
+      <div class="booking-grid">
+        <div class="booking-card"><p class="tag">Primary</p><h3>Book on Booking.com</h3><p>See current dates, live prices, occupancy options and confirmed booking conditions.</p><a class="btn primary" href="https://www.booking.com/hotel/es/aumara.html" target="_blank" rel="noopener">Open Booking.com</a></div>
+        <div class="booking-card"><p class="tag">Secondary</p><h3>Ask AUMARA directly</h3><p>Use direct contact for retreats, extended stays, special family configurations or questions before booking.</p><div class="actions"><a class="btn secondary" href="mailto:elcidspain@gmail.com?subject=AUMARA%20stay%20enquiry">Email</a><a class="btn secondary" href="https://wa.me/34622914323?text=Hello%20AUMARA%2C%20I%20would%20like%20to%20ask%20about%20availability." target="_blank" rel="noopener">WhatsApp</a></div></div>
+      </div>
+    </div>
+  </section>
+
+  <section id="experience" class="section">
+    <div class="wrap">
+      <div class="section-head"><p class="eyebrow">The experience</p><h2>More than a place to sleep.</h2></div>
+      <div class="experience">
+        <div><span class="tag">01</span><strong>Quiet mornings</strong><p>Coffee, light, terrace and time without rush.</p></div>
+        <div><span class="tag">02</span><strong>Hosted privacy</strong><p>Support when needed, space and privacy when not.</p></div>
+        <div><span class="tag">03</span><strong>Food connection</strong><p>Access to EL CID and Wabi-Sabi food experiences as available.</p></div>
+        <div><span class="tag">04</span><strong>Retreat potential</strong><p>Suitable for selected family, sports and hosted retreat formats.</p></div>
+      </div>
+    </div>
+  </section>
+
+  <section id="rules" class="section">
+    <div class="wrap">
+      <div class="section-head"><p class="eyebrow">Stay rules</p><h2>Warm hospitality. Clear boundaries.</h2><p>Final conditions are always those shown in the confirmed Booking.com reservation.</p></div>
+      <div class="rules">
+        <div><strong>Minimum stay</strong><span>Normally 2 or 3 nights, depending on dates and house type.</span></div>
+        <div><strong>Check-in</strong><span>Arrival instructions are sent before the stay. Self check-in may be used depending on the house.</span></div>
+        <div><strong>Quiet stay</strong><span>No parties, uncontrolled events or disruptive noise.</span></div>
+        <div><strong>Pets</strong><span>Only where expressly approved for the selected house and dates.</span></div>
+        <div><strong>Damage policy</strong><span>Channel conditions and a damage guarantee may apply.</span></div>
+        <div><strong>Food</strong><span>Breakfast or restaurant options are subject to confirmation and operating schedule.</span></div>
+      </div>
+    </div>
+  </section>
+
+  <section class="section">
+    <div class="wrap contact">
+      <p class="eyebrow">Ready to stay</p><h2>Choose your dates. Choose your AUMARA house.</h2>
+      <p>For standard stays, Booking.com is the fastest path. For a longer stay or a special format, contact the AUMARA team directly.</p>
+      <div class="actions"><a class="btn primary" href="https://www.booking.com/hotel/es/aumara.html" target="_blank" rel="noopener">Book AUMARA</a><a class="btn secondary" href="mailto:elcidspain@gmail.com?subject=AUMARA%20stay%20enquiry">Direct enquiry</a></div>
+    </div>
+  </section>
+</main>
+
+<footer><div class="wrap footer"><div><strong>AUMARA</strong><span>Geodesic wooden houses · Benidoleig · Hosted by EL CID</span></div><a href="mailto:elcidspain@gmail.com">elcidspain@gmail.com</a></div></footer>
+</body>
+</html>

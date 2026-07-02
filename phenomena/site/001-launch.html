@@ -13,6 +13,21 @@
     .platform h2 { margin:0 0 12px; font-size:1.5rem; font-weight:500; }
     .copybox { white-space:pre-wrap; background:rgba(255,255,255,.28); border:1px solid var(--line); padding:20px; margin:14px 0; font-family:Arial,Helvetica,sans-serif; line-height:1.55; }
     .note { color:var(--muted); }
+    .publish-button {
+      display:block;
+      width:100%;
+      margin:18px 0 10px;
+      padding:18px 22px;
+      border:0;
+      background:var(--ink);
+      color:var(--paper);
+      font:700 1rem Arial,Helvetica,sans-serif;
+      letter-spacing:.06em;
+      text-transform:uppercase;
+      cursor:pointer;
+    }
+    .publish-button:hover { opacity:.86; }
+    .publish-help { font-family:Arial,Helvetica,sans-serif; font-size:.9rem; color:var(--muted); }
   </style>
 </head>
 <body>
@@ -21,8 +36,27 @@
     <header class="article-head">
       <div class="eyebrow">Служебная страница · выпуск 001</div>
       <h1>Launch Console</h1>
-      <p>Открыл → скопировал → вставил. Канонический текст остаётся на сайте.</p>
+      <p>Открыл → нажал кнопку → вставил текст → опубликовал.</p>
     </header>
+
+    <section class="platform">
+      <h2>LinkedIn · English</h2>
+      <p class="note">Готовый нативный пост со ссылкой на полное эссе.</p>
+      <div class="copybox" id="linkedin">Marcus Aurelius had a rule about complaining. The difficult part was never keeping quiet around other people.
+
+The real show starts inside, where the Committee for the Quality of Reality gathers for another emergency meeting. People could think before acting. Money could arrive when promised. A government website could open the page you actually need without demanding three passwords, a Java update, and the baptism record of the system administrator.
+
+The committee is absolutely right.
+
+Reality, meanwhile, has already left the building.
+
+Our first PHENOMENA essay is about the second arrow, the heavy suitcase, and the moment we stop negotiating with a fact.
+
+Read the full essay: {{SITE_URL}}/001-en.html</div>
+      <button class="publish-button" id="linkedin-publish" onclick="publishLinkedIn(this)">Опубликовать в LinkedIn</button>
+      <p class="publish-help">Кнопка копирует готовый текст и открывает LinkedIn с прикреплённой страницей. В открывшемся окне нажмите поле текста → «Вставить» → Post.</p>
+      <button class="copy-button" onclick="copyBlock('linkedin', this)">Только скопировать текст</button>
+    </section>
 
     <section class="platform">
       <h2>Threads · русский вход</h2>
@@ -35,23 +69,6 @@
 
 Полный текст: {{SITE_URL}}/001-ru.html</div>
       <button class="copy-button" onclick="copyBlock('threads', this)">Скопировать для Threads</button>
-    </section>
-
-    <section class="platform">
-      <h2>LinkedIn · English</h2>
-      <p class="note">Founder voice, without turning Marcus Aurelius into five productivity tips.</p>
-      <div class="copybox" id="linkedin">Marcus Aurelius had a rule about complaining. The difficult part was never keeping quiet around other people.
-
-The real show starts inside, where the Committee for the Quality of Reality gathers for another emergency meeting. People could think before acting. Money could arrive when promised. A government website could open the page you actually need without demanding three passwords, a Java update, and the baptism record of the system administrator.
-
-The committee is absolutely right.
-
-Reality, meanwhile, has already left the building.
-
-Our first PHENOMENA essay is about the second arrow, the heavy suitcase, and the moment we stop negotiating with a fact.
-
-Read: {{SITE_URL}}/001-en.html</div>
-      <button class="copy-button" onclick="copyBlock('linkedin', this)">Copy for LinkedIn</button>
     </section>
 
     <section class="platform">
@@ -97,14 +114,35 @@ Read: {{SITE_URL}}/001-en.html</div>
 
   <script>
     const siteUrl = 'https://elcidspain.github.io/openai-cookbook';
+    const essayUrl = siteUrl + '/001-en.html';
+
     document.querySelectorAll('.copybox').forEach(el => {
       el.textContent = el.textContent.replaceAll('{{SITE_URL}}', siteUrl);
     });
+
     async function copyBlock(id, button) {
       await navigator.clipboard.writeText(document.getElementById(id).innerText);
       const original = button.textContent;
       button.textContent = 'Готово';
       setTimeout(() => button.textContent = original, 1600);
+    }
+
+    async function publishLinkedIn(button) {
+      const original = button.textContent;
+      const linkedinWindow = window.open('about:blank', '_blank');
+      try {
+        await navigator.clipboard.writeText(document.getElementById('linkedin').innerText);
+        button.textContent = 'Текст скопирован — LinkedIn открыт';
+      } catch (error) {
+        button.textContent = 'LinkedIn открыт — скопируйте текст ниже';
+      }
+      const shareUrl = 'https://www.linkedin.com/sharing/share-offsite/?url=' + encodeURIComponent(essayUrl);
+      if (linkedinWindow) {
+        linkedinWindow.location.href = shareUrl;
+      } else {
+        window.location.href = shareUrl;
+      }
+      setTimeout(() => button.textContent = original, 3500);
     }
   </script>
 </body>

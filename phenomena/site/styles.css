@@ -1,0 +1,192 @@
+:root {
+  --ink: #1d1c19;
+  --paper: #f4f0e7;
+  --muted: #6d685f;
+  --line: #c8c0b2;
+  --accent: #8a6d3b;
+}
+
+* { box-sizing: border-box; }
+
+html { scroll-behavior: smooth; }
+
+body {
+  margin: 0;
+  background: var(--paper);
+  color: var(--ink);
+  font-family: Georgia, 'Times New Roman', serif;
+  line-height: 1.65;
+}
+
+.shell {
+  width: min(920px, calc(100% - 40px));
+  margin: 0 auto;
+}
+
+.hero {
+  padding: 84px 0 48px;
+  border-bottom: 1px solid var(--line);
+}
+
+.eyebrow,
+.issue-number,
+.section-head span,
+footer {
+  font-family: Arial, Helvetica, sans-serif;
+  letter-spacing: .12em;
+  text-transform: uppercase;
+  font-size: .75rem;
+  color: var(--muted);
+}
+
+h1 {
+  margin: 18px 0 24px;
+  font-size: clamp(3.4rem, 10vw, 7.8rem);
+  line-height: .88;
+  font-weight: 500;
+  letter-spacing: -.055em;
+}
+
+h1 span {
+  color: var(--accent);
+  font-style: italic;
+}
+
+.lead {
+  max-width: 760px;
+  margin: 0;
+  font-size: clamp(1.25rem, 2.4vw, 1.8rem);
+  line-height: 1.45;
+}
+
+.manifesto {
+  padding: 44px 0;
+  border-bottom: 1px solid var(--line);
+  font-size: 1.18rem;
+  color: var(--muted);
+}
+
+.manifesto p { max-width: 720px; margin: 0; }
+
+.issues { padding: 56px 0 80px; }
+
+.section-head {
+  display: flex;
+  align-items: baseline;
+  justify-content: space-between;
+  margin-bottom: 24px;
+}
+
+.section-head h2 {
+  margin: 0;
+  font-size: 2rem;
+  font-weight: 500;
+}
+
+.issue-card {
+  display: grid;
+  grid-template-columns: 90px 1fr;
+  gap: 28px;
+  padding: 34px 0;
+  border-top: 1px solid var(--line);
+  border-bottom: 1px solid var(--line);
+}
+
+.issue-copy h3 {
+  margin: 0 0 14px;
+  font-size: clamp(1.8rem, 4vw, 3rem);
+  line-height: 1.1;
+  font-weight: 500;
+}
+
+.issue-copy p {
+  max-width: 680px;
+  margin: 0 0 22px;
+  color: var(--muted);
+  font-size: 1.06rem;
+}
+
+.actions {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 12px;
+}
+
+.actions a,
+.back-link,
+.copy-button {
+  display: inline-block;
+  border: 1px solid var(--ink);
+  padding: 10px 14px;
+  color: var(--ink);
+  text-decoration: none;
+  font-family: Arial, Helvetica, sans-serif;
+  font-size: .88rem;
+  background: transparent;
+  cursor: pointer;
+}
+
+.actions a:hover,
+.back-link:hover,
+.copy-button:hover {
+  background: var(--ink);
+  color: var(--paper);
+}
+
+.article-shell {
+  width: min(760px, calc(100% - 40px));
+  margin: 0 auto;
+  padding: 50px 0 90px;
+}
+
+.article-head {
+  padding: 38px 0 30px;
+  border-bottom: 1px solid var(--line);
+  margin-bottom: 38px;
+}
+
+.article-head h1 {
+  font-size: clamp(2.6rem, 7vw, 5.6rem);
+  line-height: .98;
+  margin: 18px 0;
+}
+
+.article-head p {
+  margin: 0;
+  color: var(--muted);
+  font-family: Arial, Helvetica, sans-serif;
+}
+
+.article-body {
+  font-size: clamp(1.08rem, 1.5vw, 1.28rem);
+}
+
+.article-body p {
+  margin: 0 0 1.25em;
+}
+
+.article-body blockquote {
+  margin: 2em 0;
+  padding-left: 1.2em;
+  border-left: 2px solid var(--accent);
+  font-style: italic;
+}
+
+.article-tools {
+  display: flex;
+  gap: 12px;
+  flex-wrap: wrap;
+  margin-top: 46px;
+  padding-top: 24px;
+  border-top: 1px solid var(--line);
+}
+
+footer {
+  padding: 26px 0 50px;
+}
+
+@media (max-width: 620px) {
+  .hero { padding-top: 54px; }
+  .issue-card { grid-template-columns: 1fr; gap: 12px; }
+  .issue-number { margin-bottom: 2px; }
+}

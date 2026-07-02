@@ -1,0 +1,91 @@
+<!doctype html>
+<html lang="ru">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="robots" content="noindex,nofollow">
+  <title>PHENOMENA 001 — Publish full LinkedIn article</title>
+  <link rel="stylesheet" href="styles.css">
+  <style>
+    .console { width:min(860px,calc(100% - 36px)); margin:0 auto; padding:44px 0 90px; }
+    .console h1 { font-size:clamp(2.5rem,7vw,5rem); }
+    .step { padding:28px 0; border-top:1px solid var(--line); }
+    .step h2 { margin:0 0 12px; font-size:1.45rem; font-weight:500; }
+    .value { white-space:pre-wrap; background:rgba(255,255,255,.32); border:1px solid var(--line); padding:18px; margin:14px 0; font-family:Arial,Helvetica,sans-serif; line-height:1.55; max-height:360px; overflow:auto; }
+    .big-button { display:block; width:100%; border:0; background:var(--ink); color:var(--paper); padding:18px 20px; font:700 1rem Arial,Helvetica,sans-serif; text-transform:uppercase; letter-spacing:.05em; cursor:pointer; margin:12px 0; }
+    .big-button.secondary { background:transparent; color:var(--ink); border:1px solid var(--ink); }
+    .note { color:var(--muted); font-family:Arial,Helvetica,sans-serif; font-size:.94rem; }
+    .status { min-height:1.5em; color:var(--accent); font-family:Arial,Helvetica,sans-serif; font-weight:700; }
+  </style>
+</head>
+<body>
+  <main class="console">
+    <a class="back-link" href="001-launch.html">← Launch Console</a>
+    <header class="article-head">
+      <div class="eyebrow">PHENOMENA · 001 · LinkedIn Article</div>
+      <h1>Full native LinkedIn publication</h1>
+      <p>Три действия. Заголовок → полный текст → редактор LinkedIn.</p>
+    </header>
+
+    <section class="step">
+      <h2>1. Скопировать заголовок</h2>
+      <div class="value" id="title">The Committee for the Quality of Reality</div>
+      <button class="big-button" onclick="copyText('title', this)">Copy title</button>
+    </section>
+
+    <section class="step">
+      <h2>2. Скопировать полный английский текст</h2>
+      <p class="note">Это именно полный текст, а не короткий LinkedIn-вход. Страница загружает каноническую английскую версию автоматически.</p>
+      <div class="value" id="body">Загружаю полный текст…</div>
+      <button class="big-button" id="copy-body" onclick="copyText('body', this)" disabled>Copy full article</button>
+      <p class="status" id="status"></p>
+    </section>
+
+    <section class="step">
+      <h2>3. Открыть редактор LinkedIn Article</h2>
+      <p class="note">В редакторе вставьте заголовок в поле Title, полный текст — в основное поле, затем нажмите Publish. На iPhone LinkedIn иногда открывает обычную ленту; тогда откройте ссылку в Safari и запросите настольную версию сайта.</p>
+      <button class="big-button" onclick="openEditor()">Open LinkedIn article editor</button>
+      <a class="big-button secondary" href="001-en.html" target="_blank" rel="noopener">Open canonical English essay</a>
+    </section>
+  </main>
+
+  <script>
+    async function loadEssay() {
+      const status = document.getElementById('status');
+      try {
+        const response = await fetch('001-en.html', {cache: 'no-store'});
+        if (!response.ok) throw new Error('HTTP ' + response.status);
+        const html = await response.text();
+        const doc = new DOMParser().parseFromString(html, 'text/html');
+        const essay = doc.getElementById('essay');
+        if (!essay) throw new Error('Essay body not found');
+        document.getElementById('body').innerText = essay.innerText.trim();
+        document.getElementById('copy-body').disabled = false;
+        status.textContent = 'Полный текст загружен.';
+      } catch (error) {
+        document.getElementById('body').innerText = 'Откройте каноническую английскую версию кнопкой ниже и нажмите Copy text.';
+        status.textContent = 'Автозагрузка не сработала; используйте резервную кнопку.';
+      }
+    }
+
+    async function copyText(id, button) {
+      const value = document.getElementById(id).innerText.trim();
+      await navigator.clipboard.writeText(value);
+      const original = button.textContent;
+      button.textContent = 'Copied';
+      setTimeout(() => button.textContent = original, 1600);
+    }
+
+    function openEditor() {
+      const urls = [
+        'https://www.linkedin.com/article/new/',
+        'https://www.linkedin.com/pulse/article/new/'
+      ];
+      const opened = window.open(urls[0], '_blank');
+      if (!opened) window.location.href = urls[0];
+    }
+
+    loadEssay();
+  </script>
+</body>
+</html>

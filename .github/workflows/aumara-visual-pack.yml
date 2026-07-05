@@ -1,0 +1,84 @@
+name: AUMARA Visual Pack
+
+on:
+  workflow_dispatch:
+    inputs:
+      pack:
+        description: Prompt pack to generate
+        required: true
+        default: concept
+        type: choice
+        options:
+          - concept
+          - dayparts
+          - marketing
+          - all
+      quality:
+        description: GPT Image output quality
+        required: true
+        default: medium
+        type: choice
+        options:
+          - low
+          - medium
+          - high
+      size:
+        description: Optional global size override; leave blank to use each prompt size
+        required: false
+        default: ""
+        type: string
+      only:
+        description: Optional single prompt ID
+        required: false
+        default: ""
+        type: string
+
+permissions:
+  contents: read
+
+jobs:
+  generate:
+    runs-on: ubuntu-latest
+    timeout-minutes: 30
+    steps:
+      - name: Check out repository
+        uses: actions/checkout@v4
+
+      - name: Set up Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+
+      - name: Install OpenAI SDK
+        run: python -m pip install --upgrade openai
+
+      - name: Validate API secret
+        env:
+          OPENAI_API_KEY: ${{ secrets.OPENAI_API_KEY }}
+        run: |
+          if [ -z "$OPENAI_API_KEY" ]; then
+            echo "OPENAI_API_KEY repository secret is missing" >&2
+            exit 1
+          fi
+
+      - name: Generate visual pack
+        env:
+          OPENAI_API_KEY: ${{ secrets.OPENAI_API_KEY }}
+        shell: bash
+        run: |
+          args=(--pack "${{ inputs.pack }}" --quality "${{ inputs.quality }}")
+          if [ -n "${{ inputs.size }}" ]; then
+            args+=(--size "${{ inputs.size }}")
+          fi
+          if [ -n "${{ inputs.only }}" ]; then
+            args+=(--only "${{ inputs.only }}")
+          fi
+          python aumara-site/scripts/generate_visual_pack.py "${args[@]}"
+
+      - name: Upload review artifact
+        uses: actions/upload-artifact@v4
+        with:
+          name: aumara-visual-pack-${{ github.run_number }}
+          path: aumara-site/creative/output_images/
+          if-no-files-found: error
+          retention-days: 14

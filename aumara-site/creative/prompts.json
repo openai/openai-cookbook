@@ -1,0 +1,64 @@
+{
+  "model": "gpt-image-2",
+  "default_size": "1536x1024",
+  "default_quality": "medium",
+  "packs": {
+    "concept": [
+      {
+        "id": "aumara_home_desktop_concept",
+        "mode": "generate",
+        "size": "2560x1440",
+        "prompt": "PURPOSE: premium desktop website concept for AUMARA, a boutique nature hospitality campus in Benidoleig, Spain.\nSCENE: cinematic dawn gradually revealing six geodesic wooden houses among Mediterranean trees on sloping terrain.\nINTERFACE: elegant minimal navigation, an ENTER AUMARA control, small paths leading toward clickable houses, subtle Dawn / Day / Sunset / Night selector, and clear routes for STAY, RETREATS, PRIVATE GATHERINGS.\nSTYLE: photorealistic architectural hospitality campaign, natural materials, warm restrained palette, sophisticated editorial typography, generous negative space, no fantasy architecture.\nCONSTRAINTS: this is a CONCEPT MOCKUP, not documentary photography. No fake sustainability badges, no invented awards, no visible third-party logos, no watermarks. The exact brand name must appear once as \"AUMARA\"."
+      },
+      {
+        "id": "aumara_mobile_route_concept",
+        "mode": "generate",
+        "size": "1024x1536",
+        "prompt": "PURPOSE: mobile-first interactive website concept for AUMARA.\nVIEW: first-person walking perspective on a landscaped path between geodesic wooden houses.\nINTERACTION: three subtle destination hotspots integrated into the scene, a compact map icon, a sound control labelled \"LISTEN\", and a persistent BOOK A STAY button.\nATMOSPHERE: early morning light, real Mediterranean vegetation, calm high-end hospitality, believable scale.\nCONSTRAINTS: concept UI only, not a claim of an exact existing view. Render the word \"AUMARA\" exactly once. No extra text, no logos, no watermark."
+      },
+      {
+        "id": "retreat_storyboard_concept",
+        "mode": "generate",
+        "size": "1536x1024",
+        "prompt": "PURPOSE: editorial storyboard frame for the AUMARA Retreat Campus website.\nSCENE: a small mixed adult group seated around a simple outdoor wooden table near geodesic houses, notebooks and water present, natural relaxed conversation, facilitator at equal level with the group.\nMOOD: attentive, calm, intelligent, non-performative, Mediterranean evening light.\nCONSTRAINTS: no yoga clichés, no guru pose, no sexualised practices, no psychoactive substances, no cult symbolism, no medical or therapeutic claims, no text, no watermark. This is conceptual campaign imagery, not documentary evidence of a past event."
+      }
+    ],
+    "dayparts": [
+      {
+        "id": "hero_dawn_edit",
+        "mode": "edit",
+        "input": "aumara-site/creative/input_images/hero_base.jpg",
+        "size": "2560x1440",
+        "prompt": "PURPOSE: website hero at dawn.\nCHANGE ONLY: natural early-dawn lighting, cool blue ambient sky with the first warm sunlight touching the houses and trees, light atmospheric depth.\nPRESERVE EXACTLY: architecture, number and position of houses, paths, terrain, vegetation, camera angle, crop, proportions and all real objects.\nCONSTRAINTS: photorealistic, natural camera look, no new buildings, no removed objects, no people, no text, no logos, no excessive purple sky, no cinematic fantasy grading."
+      },
+      {
+        "id": "hero_sunset_edit",
+        "mode": "edit",
+        "input": "aumara-site/creative/input_images/hero_base.jpg",
+        "size": "2560x1440",
+        "prompt": "PURPOSE: website hero at golden hour.\nCHANGE ONLY: believable warm sunset light from the side, natural long shadows, slightly warmer house interiors where lights are already visible.\nPRESERVE EXACTLY: architecture, geometry, paths, terrain, trees, object placement, camera angle and crop.\nCONSTRAINTS: photorealistic, restrained color, no invented sun in frame, no new lamps, no people, no text, no logos, no oversaturated orange or purple sky."
+      },
+      {
+        "id": "hero_night_edit",
+        "mode": "edit",
+        "input": "aumara-site/creative/input_images/hero_base.jpg",
+        "size": "2560x1440",
+        "prompt": "PURPOSE: calm night version of the same AUMARA website hero.\nCHANGE ONLY: realistic blue-hour-to-night environment, subtle warm light visible from existing windows and existing exterior fixtures, believable dark Mediterranean landscape.\nPRESERVE EXACTLY: all architecture, house positions, terrain, paths, vegetation, camera angle and object placement.\nCONSTRAINTS: no added fixtures, no fantasy moon, no star overload, no neon, no new structures, no people, no text, no logos, no excessive purple."
+      }
+    ],
+    "marketing": [
+      {
+        "id": "aumara_private_gathering_concept",
+        "mode": "generate",
+        "size": "1536x1024",
+        "prompt": "PURPOSE: premium editorial concept image for AUMARA private gatherings.\nSCENE: a small private dinner for eight adults at one long natural-wood table outdoors near geodesic houses, restrained table setting, warm practical lighting, quiet conversation, no stage and no crowd.\nSTYLE: realistic hospitality photography, human scale, refined but not luxury-theatre, Mediterranean blue hour.\nCONSTRAINTS: conceptual image, not documentary evidence. No wedding clichés, no balloons, no branded products, no logos, no text, no watermark."
+      },
+      {
+        "id": "aumara_social_story_concept",
+        "mode": "generate",
+        "size": "1024x1536",
+        "prompt": "PURPOSE: vertical AUMARA social story concept.\nSCENE: one geodesic wooden house emerging through trees at sunrise, close enough to feel inhabitable, with a path inviting the viewer forward.\nTEXT, EXACT: \"ENTER AUMARA\".\nTYPOGRAPHY: elegant high-contrast serif, centered in the lower third, perfectly legible, no other words.\nSTYLE: photorealistic hospitality editorial, natural light, restrained colors.\nCONSTRAINTS: no third-party logos, no watermark, no invented eco labels, no excessive purple sky."
+      }
+    ]
+  }
+}

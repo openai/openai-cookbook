@@ -1,4 +1,4 @@
-# AUMARA TTLock Gateway Mesh v0.1
+# AUMARA TTLock Gateway Mesh v0.2
 
 Date: 2026-07-05
 Owner: Ilya / Onsite Tech
@@ -7,38 +7,49 @@ Owner: Ilya / Onsite Tech
 
 Use a distributed TTLock gateway layout, not one central gateway.
 
-The AUMARA houses are separate buildings spread across roughly 30 metres. TTLock documents a maximum G2 range of about 10 metres with no obstruction, so the operating design should target 5–8 metres and no more than one major wall between a gateway and a lock.
+AUMARA has six physical houses. Five are currently rented. The far-left ordinary chalet at approximately the 9 o'clock position on the site plan is not currently rented, but it must still be connected to the access system.
+
+The houses are separate buildings spread across roughly 30 metres. The selected G2 product states a nominal maximum connection distance of 32 feet, approximately 9.75 metres, so the operating design should target about 5 to 8 metres with as few walls as possible between gateway and lock.
 
 ## Target architecture
 
-- Three active TTLock G2 Wi-Fi gateways across the AUMARA house cluster.
+- Three active TTLock G2 Wi-Fi gateways across the six-house AUMARA cluster.
 - One additional unit kept as a spare or used for a common entrance if the missing original gateway is recovered.
 - Every gateway connects independently to stable 2.4 GHz property Wi-Fi.
 - Each gateway bridges nearby locks to the TTLock cloud; gateways do not relay through one another.
 
 ## Procurement
 
-Buy two additional gateways now. Required specification:
+Buy two units of the selected G2 Smart Lock WiFi Gateway now.
 
-- explicit TTLock app compatibility;
-- G2 Wi-Fi Gateway or seller-confirmed TTLock G2 equivalent;
-- 2.4 GHz Wi-Fi;
-- EU-compatible USB power;
-- not Tuya-only, TTHotel-only, Zigbee-only or proprietary-brand-only.
+- unit price: EUR 46.79;
+- quantity: 2;
+- total: EUR 93.58.
+
+The selected listing explicitly states TT Lock app compatibility, 2.4 GHz Wi-Fi, remote lock control, real-time status, remote custom password setup and support for multiple locks on the same account.
+
+## Provisional placement
+
+- Gateway A: by the Superior Chalet cluster.
+- Gateway B: under or near Chalet 2 or Chalet 3, depending on actual Bluetooth reach.
+- Existing gateway: placed to cover the remaining lower or far-left chalet cluster.
+
+Final placement is determined onsite by real signal testing, not only by the site plan.
 
 ## Deployment
 
-1. Resolve the physical five-versus-six house map.
-2. Confirm the existing white device model.
-3. Add all gateways to the corporate TTLock master account.
-4. Place gateways by real signal tests, not by drawing alone.
+1. Label all six physical houses and their locks.
+2. Confirm the existing white device is a TTLock G2 gateway.
+3. Add the two new gateways to the corporate TTLock master account.
+4. Place one gateway by the Superior Chalets and one by Chalet 2 or Chalet 3.
 5. Test every lock remotely with phone Bluetooth disabled and phone on mobile data.
-6. Record the final house, lock and gateway mapping.
-7. Run the Beds24 create, modify and cancel booking test.
+6. Move gateways until all six houses have stable remote control.
+7. Record the final house, lock and gateway mapping.
+8. Run the Beds24 create, modify and cancel booking test.
 
 ## Acceptance criteria
 
-Every live house must have:
+Every one of the six houses must have:
 
 - confirmed physical identity;
 - correct TTLock name;
@@ -50,4 +61,4 @@ Every live house must have:
 - mechanical key fallback recorded;
 - correct Beds24 mapping and lifecycle test passed.
 
-Beds24 to TTLock automation remains RED until all tests pass.
+Beds24 to TTLock automation remains RED until all six houses pass.

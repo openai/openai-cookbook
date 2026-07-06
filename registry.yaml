@@ -285,6 +285,7 @@
   path: examples/building_w_rt_mini/building_w_rt_mini.ipynb
   slug: building-w-rt-mini
   date: 2025-10-11
+  archived: true
   authors:
     - carter-oai
   tags:

@@ -47,13 +47,6 @@
   <rect x="142" y="462" width="160" height="34" rx="17" fill="#f7f6f1" stroke="#d7d4ca"/>
   <text class="mono" text-anchor="middle" x="222" y="484">meeting.wav</text>
 
-  <!-- Speaker refs -->
-  <rect class="panel" x="112" y="562" width="300" height="76"/>
-  <path class="icon" d="M152 603 h34 m-17 -17 v34"/>
-  <text class="label" x="206" y="590">Optional references</text>
-  <text class="small" x="206" y="612">2-10 second clips</text>
-  <text class="small" x="206" y="632">Up to 4 speakers</text>
-
   <!-- Orchestrator panel -->
   <rect class="panel" x="430" y="220" width="240" height="300"/>
   <circle class="icon-fill" cx="550" cy="290" r="40"/>
@@ -61,8 +54,8 @@
   <path class="icon" d="M538 270 h24"/>
   <path class="icon" d="M538 313 h24"/>
   <text class="label" text-anchor="middle" x="550" y="366">Pipeline runner</text>
-  <text class="small" text-anchor="middle" x="550" y="396">Validates inputs,</text>
-  <text class="small" text-anchor="middle" x="550" y="418">encodes references,</text>
+  <text class="small" text-anchor="middle" x="550" y="396">Validates audio,</text>
+  <text class="small" text-anchor="middle" x="550" y="418">encodes optional refs,</text>
   <text class="small" text-anchor="middle" x="550" y="440">writes artifacts</text>
   <rect x="466" y="462" width="168" height="34" rx="17" fill="#f7f6f1" stroke="#d7d4ca"/>
   <text class="mono" text-anchor="middle" x="550" y="484">Python CLI</text>
@@ -124,15 +117,9 @@
   <path class="line" d="M1038 370 C1080 370 1096 370 1138 370"/>
   <path class="line" d="M1273 520 C1273 560 1078 560 1005 612"/>
   <path class="line" d="M1038 700 C1080 700 1096 700 1138 700"/>
-  <path class="thin" d="M222 562 C222 538 502 548 550 520"/>
   <path class="line" d="M670 764 C704 764 724 754 768 728"/>
 
   <!-- API call badge -->
-  <rect x="692" y="326" width="54" height="88" rx="27" fill="#20201d"/>
-  <text class="tiny" text-anchor="middle" x="719" y="356" fill="#ffffff">POST</text>
-  <text class="tiny" text-anchor="middle" x="719" y="380" fill="#ffffff">/audio/</text>
-  <text class="tiny" text-anchor="middle" x="719" y="402" fill="#ffffff">transcriptions</text>
-
-  <!-- Footer -->
-  <text class="tiny" x="92" y="860">Design note: use request-based diarization, then gate generated intelligence with evidence checks, moderation signals, and human review before downstream writes.</text>
+  <rect x="682" y="310" width="82" height="40" rx="20" fill="#ffffff" stroke="#d7d4ca" stroke-width="1.5"/>
+  <text class="mono" text-anchor="middle" x="723" y="335">POST API</text>
 </svg>

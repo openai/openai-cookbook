@@ -3072,6 +3072,7 @@
   slug: one-way-translation-using-realtime-api
   description: Cookbook to build one-way speech translation with the Realtime API.
   date: 2025-03-24
+  archived: true
   authors:
     - erikakettleson-openai
   tags:

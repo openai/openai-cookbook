@@ -1,0 +1,15 @@
+{
+  "name": "aumara-control-tower",
+  "version": "0.1.0",
+  "private": true,
+  "type": "module",
+  "scripts": {
+    "start": "node src/server.mjs",
+    "health": "node src/healthcheck.mjs",
+    "test:email": "node src/send-test-email.mjs"
+  },
+  "dependencies": {
+    "@resend/node": "latest",
+    "dotenv": "latest"
+  }
+}

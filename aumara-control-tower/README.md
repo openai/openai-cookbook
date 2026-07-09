@@ -1,91 +1,59 @@
 # AUMARA Control Tower
 
-This folder is the first operational kernel for AUMARA execution work.
+Working transactional email/webhook service for AUMARA El Cid.
 
-Purpose:
-- keep context structured;
-- turn work into small command packets;
-- preserve decisions and review trails;
-- separate intent, execution, and approval.
+## Run locally
 
-Operating rule:
-The human owner keeps intent and responsibility. Tools execute bounded tasks. Every important output should be reviewable.
-
-Initial folders:
-- docs
-- prompts
-- issues
-- workflows
-
-Status: Phase 0 initialized.
-
----
-
-## Operating Formula
-
-Owner of intent -> Control Tower -> bounded agent task -> review -> merge / release.
-
-No magic. No waiting. No chaos.
-
-## Immediate Backlog
-
-1. Build repository skeleton.
-2. Write control tower manifest.
-3. Write agent rules.
-4. Write Copilot / Claude execution prompt.
-5. Create X / Twitter reply workflow archive.
-6. Create AUMARA / EL CID command packet index.
-7. Define document intake flow.
-8. Define review and approval rules.
-
-## Agent Rules Draft
-
-- Give the agent a bounded task, not the whole project.
-- Include context, expected output, constraints, and acceptance criteria.
-- Require a reviewable result.
-- Never treat agent output as final without human approval.
-- Keep the source of truth in GitHub / Drive, not in a disappearing chat.
-
-## First Command Packet Template
-
-```md
-# Command Packet
-
-## Objective
-
-## Context
-
-## Inputs
-
-## Constraints
-
-## Output Required
-
-## Acceptance Criteria
-
-## Review Notes
+```bash
+cd aumara-control-tower
+cp .env.example .env
+npm install
+npm run health
+npm run test:email
+npm start
 ```
 
----
+## Endpoints
 
-## Action Log
+### GET /health
 
-### Tesla mobility pilot outreach
+Returns service status.
 
-Status: sent.
+### POST /send
 
-Channel: Gmail to Tesla Bilbao Sales.
+Generic send endpoint. Auth: `Authorization: Bearer $AUMARA_WEBHOOK_TOKEN`.
 
-Purpose: open a commercial route for AUMARA / EL CID Tesla vehicle pilot in Costa Blanca.
+```bash
+curl -X POST http://localhost:8787/send \
+  -H "content-type: application/json" \
+  -H "authorization: Bearer change-this-token" \
+  -d '{
+    "to":"elcidspain@gmail.com",
+    "guestName":"Test Guest",
+    "property":"AUMARA El Cid",
+    "checkIn":"2026-07-10",
+    "checkOut":"2026-07-12",
+    "accessCode":"123456",
+    "bookingRef":"TEST-001"
+  }'
+```
 
-Requested route: business purchase, company leasing, fleet terms, hospitality-use structure, and charging / Wall Connector coordination.
+### POST /webhooks/beds24
 
-Initial target: 2 to 4 Tesla Model Y vehicles, with possible expansion to 6.
+Beds24-style webhook receiver. It accepts flexible fields: `email`, `guestEmail`, `guest_email`, `mail`, `guestName`, `property`, `checkIn`, `checkOut`, `accessCode`, `pin`, `code`, `bookingRef`.
 
-Follow-up rule: no outbound calls for now. Continue only by written materials and inbound Tesla reply.
+## Current mail routing
 
-Support material sent: AUMARA Tesla Mobility Pilot Deck v0.1, 9-slide discussion deck.
+- Provider: Resend
+- Reply-to: `elcidspain@gmail.com`
+- Test recipient: `elcidspain@gmail.com`
+- Temporary sender: `AUMARA El Cid <onboarding@resend.dev>` until the domain sender is verified.
 
-Current state: written outreach sent; deck sent as attachment; waiting for inbound Tesla reply.
+## Production next step
 
-Next step: if Tesla replies, route the conversation to the correct Tesla Spain fleet / business contact and adapt the deck into a shorter one-pager if requested.
+Deploy this folder as a Node service, set environment variables, then connect Beds24 action/webhook to:
+
+```text
+POST https://YOUR-SERVICE/webhooks/beds24
+Authorization: Bearer AUMARA_WEBHOOK_TOKEN
+```

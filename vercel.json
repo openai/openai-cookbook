@@ -1,0 +1,12 @@
+{
+  "rewrites": [
+    {
+      "source": "/aumara",
+      "destination": "/aumara-site/prototype-v01.html"
+    },
+    {
+      "source": "/aumara/",
+      "destination": "/aumara-site/prototype-v01.html"
+    }
+  ]
+}

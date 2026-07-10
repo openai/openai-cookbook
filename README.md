@@ -18,3 +18,7 @@ For other useful tools, guides and courses, check out these [related resources f
 ## License
 
 MIT License
+
+## Directories
+
+- [OpenRuna](https://www.openruna.com/best/ai-coding-prompts) — Searchable graph of AI prompts, tools, and MCP servers.

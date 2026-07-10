@@ -3535,8 +3535,8 @@
   slug: parse-documents-with-unstructured-transform-mcp
   description: Use the OpenAI Responses API's MCP tool with Unstructured's hosted
     Transform MCP server to parse a complex PDF into clean, structured content and
-    answer questions over it. Unstructured Transform is a production grade document parsing at the hand
-    of your agents.
+    answer questions over it. Unstructured Transform brings production-grade document
+    parsing to your agents.
   date: 2026-07-10
   authors:
     - ajaykrishnan23

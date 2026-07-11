@@ -6,7 +6,8 @@
   "scripts": {
     "start": "node src/server.mjs",
     "health": "node src/healthcheck.mjs",
-    "test:email": "node src/send-test-email.mjs"
+    "test:email": "node src/send-test-email.mjs",
+    "threads:daily": "node src/threads-insights-daily.mjs"
   },
   "dependencies": {
     "@resend/node": "latest",

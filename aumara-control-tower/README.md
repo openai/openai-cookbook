@@ -1,6 +1,6 @@
 # AUMARA Control Tower
 
-Working transactional email/webhook service for AUMARA El Cid.
+Working transactional email/webhook service for AUMARA El Cid, plus a Threads Insights collector for the Content Studio.
 
 ## Run locally
 
@@ -42,6 +42,25 @@ curl -X POST http://localhost:8787/send \
 
 Beds24-style webhook receiver. It accepts flexible fields: `email`, `guestEmail`, `guest_email`, `mail`, `guestName`, `property`, `checkIn`, `checkOut`, `accessCode`, `pin`, `code`, `bookingRef`.
 
+## Threads Content Studio automation
+
+The collector reads the account's own Threads posts and insights, separates content views from profile views, calculates the remaining pace for the 100,000-view sprint, writes a verified checkpoint to the Airtable `Threads Metrics` table, and emails a concise metric summary.
+
+Required Meta permissions:
+
+- `threads_basic`
+- `threads_manage_insights`
+
+Configure the Threads and Airtable values in `.env`, then run:
+
+```bash
+npm run threads:daily
+```
+
+The script is read-only toward Threads. It does not publish, reply, like, follow, unfollow, archive or delete anything.
+
+For production, schedule `npm run threads:daily` once per day after the Threads token and Airtable PAT are installed as secrets. The sprint dates are anchored by default to 26 June–25 July 2026 and can be changed through environment variables.
+
 ## Current mail routing
 
 - Provider: Resend
@@ -51,7 +70,7 @@ Beds24-style webhook receiver. It accepts flexible fields: `email`, `guestEmail`
 
 ## Production next step
 
-Deploy this folder as a Node service, set environment variables, then connect Beds24 action/webhook to:
+Deploy this folder as a Node service, set environment variables, connect the Beds24 action/webhook, and add a daily scheduler for `npm run threads:daily`.
 
 ```text
 POST https://YOUR-SERVICE/webhooks/beds24

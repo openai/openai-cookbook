@@ -62,3 +62,6 @@ People are writing great tools and papers for improving outputs from GPT. Here a
 - [Reflexion: an autonomous agent with dynamic memory and self-reflection (2023)](https://arxiv.org/abs/2303.11366): Retrying tasks with memory of prior failures improves subsequent performance.
 - [Demonstrate-Search-Predict: Composing retrieval and language models for knowledge-intensive NLP (2023)](https://arxiv.org/abs/2212.14024): Models augmented with knowledge via a "retrieve-then-read" can be improved with multi-hop chains of searches.
 - [Improving Factuality and Reasoning in Language Models through Multiagent Debate (2023)](https://arxiv.org/abs/2305.14325): Generating debates between a few ChatGPT agents over a few rounds improves scores on various benchmarks. Math word problem scores rise from 77% to 85%.
+### RAG Troubleshooting
+
+- [WFGY RAG 16 Problem Map](https://github.com/onestardao/WFGY/blob/main/ProblemMap/README.md): A framework-agnostic troubleshooting checklist for diagnosing common RAG issues such as retrieval misses, stale or mismatched context, chunking problems, citation instability, and inconsistent answers.

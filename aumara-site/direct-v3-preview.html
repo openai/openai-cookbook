@@ -14,65 +14,36 @@
 .section{padding:96px 0}.intro{display:grid;grid-template-columns:1fr 1fr;gap:58px;align-items:start}.intro p{font-size:20px;color:var(--muted);margin:0}.manifesto{font:500 clamp(30px,4vw,58px)/1.12 Georgia,serif;letter-spacing:-.04em;margin:0}.manifesto em{color:#a8783e;font-style:normal}
 .grid{display:grid;grid-template-columns:repeat(3,1fr);gap:14px;margin-top:38px}.tile{min-height:440px;position:relative;border-radius:28px;overflow:hidden;background:#142018}.tile:after{content:"";position:absolute;inset:0;background:linear-gradient(0deg,#08100bd0,transparent 58%)}.tile-copy{position:absolute;z-index:2;left:24px;right:24px;bottom:22px;color:#fff}.tile-copy p{margin:7px 0 0;color:#ffffffbf}
 .dark{background:var(--night);color:#fff}.film{display:grid;grid-template-columns:1.12fr .88fr;gap:24px;align-items:stretch}.film-media{min-height:560px;border-radius:34px;overflow:hidden;background:#172019}.film-copy{border:1px solid #ffffff24;border-radius:34px;padding:clamp(34px,5vw,64px);display:flex;flex-direction:column;justify-content:center;background:#ffffff0a}.film-copy p{font-size:18px;color:#ffffffb8}.facts{display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-top:22px}.facts div{border:1px solid #ffffff22;border-radius:16px;padding:16px;background:#ffffff08;font-weight:800}
-.stay{display:grid;grid-template-columns:1fr 1fr;gap:24px}.card{background:var(--paper);border:1px solid var(--line);border-radius:30px;overflow:hidden}.card .photo{height:390px}.card .body{padding:29px}.card .body p{color:var(--muted)}.tag{text-transform:uppercase;letter-spacing:.14em;font-size:12px;font-weight:900;color:#a8783e;margin:0 0 10px}
-.booking{background:var(--forest);color:#fff;border-radius:42px;padding:clamp(40px,7vw,78px);text-align:center}.booking p{max-width:760px;margin:18px auto;color:#ffffffbd;font-size:18px}.booking .actions{justify-content:center}.legal{margin-top:24px;font-size:13px;color:#ffffff8f}
-.footer{display:flex;justify-content:space-between;gap:18px;padding:30px 0;color:var(--muted);font-size:14px}
+.booking{background:var(--forest);color:#fff;border-radius:42px;padding:clamp(40px,7vw,78px);text-align:center}.booking p{max-width:760px;margin:18px auto;color:#ffffffbd;font-size:18px}.booking .actions{justify-content:center}.legal{margin-top:24px;font-size:13px;color:#ffffff8f}.footer{display:flex;justify-content:space-between;gap:18px;padding:30px 0;color:var(--muted);font-size:14px}
 [data-lang]{display:none}html[data-language="en"] [data-lang="en"],html[data-language="es"] [data-lang="es"]{display:block}
-@media(max-width:900px){.intro,.film,.stay{grid-template-columns:1fr}.grid{grid-template-columns:1fr 1fr}.film-media{min-height:440px}}
-@media(max-width:620px){.header{padding:12px 14px}.brand span:last-child{display:none}.controls{gap:6px}.lang{padding:7px 9px}.book{padding:9px 12px}.hero-inner{padding-top:110px}.grid{grid-template-columns:1fr}.tile{min-height:370px}.facts{grid-template-columns:1fr}.card .photo{height:300px}.footer{flex-direction:column}}
+@media(max-width:900px){.intro,.film{grid-template-columns:1fr}.grid{grid-template-columns:1fr 1fr}.film-media{min-height:440px}}
+@media(max-width:620px){.header{padding:12px 14px}.brand span:last-child{display:none}.controls{gap:6px}.lang{padding:7px 9px}.book{padding:9px 12px}.hero-inner{padding-top:110px}.grid{grid-template-columns:1fr}.tile{min-height:370px}.facts{grid-template-columns:1fr}.footer{flex-direction:column}}
 </style>
 </head>
 <body>
-<header class="header">
-<a class="brand" href="#top"><span class="mark">A</span><span>AUMARA</span></a>
-<div class="controls"><button class="lang active" data-setlang="en">EN</button><button class="lang" data-setlang="es">ES</button><a class="book" href="https://beds24.com/booking2.php?propid=324882" target="_blank" rel="noopener"><span data-lang="en">Book</span><span data-lang="es">Reservar</span></a></div>
-</header>
-
+<header class="header"><a class="brand" href="#top"><span class="mark">A</span><span>AUMARA</span></a><div class="controls"><button class="lang active" data-setlang="en">EN</button><button class="lang" data-setlang="es">ES</button><a class="book" href="https://beds24.com/booking2.php?propid=324882" target="_blank" rel="noopener"><span data-lang="en">Book</span><span data-lang="es">Reservar</span></a></div></header>
 <main id="top">
 <section class="hero">
-<img src="https://drive.google.com/uc?export=view&id=1L8oePUeTfB0EFXhyXW3J6R82LF2ob6tt" alt="AUMARA at blue hour">
+<img src="https://lh3.googleusercontent.com/d/1YS1G4mkfsjMFaiapcTY6fG--67OgkSdq=w2200" alt="AUMARA at blue hour">
 <div class="hero-inner"><div class="wrap">
 <div data-lang="en"><p class="eyebrow">Benidoleig · Marina Alta · Costa Blanca</p><h1>Some places give you more.<br>AUMARA gives you back to yourself.</h1><p class="lead">Private geodesic houses among pine trees, between mountain and sea.</p><div class="actions"><a class="btn primary" href="https://beds24.com/booking2.php?propid=324882" target="_blank" rel="noopener">Check availability</a><a class="btn secondary" href="#place">See the place</a></div><p class="micro">Five houses currently open for short stays. Secure direct booking through Beds24.</p></div>
 <div data-lang="es"><p class="eyebrow">Benidoleig · Marina Alta · Costa Blanca</p><h1>Hay lugares que te dan más.<br>AUMARA te devuelve a ti.</h1><p class="lead">Casas geodésicas privadas entre pinos, montaña y mar.</p><div class="actions"><a class="btn primary" href="https://beds24.com/booking2.php?propid=324882" target="_blank" rel="noopener">Ver disponibilidad</a><a class="btn secondary" href="#place">Conocer el lugar</a></div><p class="micro">Cinco casas abiertas actualmente para estancias cortas. Reserva directa y segura con Beds24.</p></div>
-</div></div>
-</section>
-
-<section class="section" id="place"><div class="wrap">
-<div class="intro">
+</div></div></section>
+<section class="section" id="place"><div class="wrap"><div class="intro">
 <div data-lang="en"><p class="eyebrow">The place</p><p class="manifesto">Not a hotel corridor. Not a row of identical rooms. A small landscape of <em>private round houses</em>, open views and paths that slow the day down.</p></div>
 <div data-lang="es"><p class="eyebrow">El lugar</p><p class="manifesto">No es un pasillo de hotel. Ni una fila de habitaciones iguales. Es un pequeño paisaje de <em>casas redondas privadas</em>, vistas abiertas y caminos que bajan el ritmo del día.</p></div>
 <div data-lang="en"><p>The architecture is unusual, but the feeling is simple: privacy when you need it, air and landscape around you, and enough distance between houses to feel that the place is yours.</p></div>
 <div data-lang="es"><p>La arquitectura es inusual, pero la sensación es sencilla: privacidad cuando la necesitas, aire y paisaje alrededor, y suficiente distancia entre las casas para sentir que el lugar es tuyo.</p></div>
-</div>
-<div class="grid">
+</div><div class="grid">
 <article class="tile"><img src="https://lh3.googleusercontent.com/d/1YS1G4mkfsjMFaiapcTY6fG--67OgkSdq=w1600" alt="AUMARA houses facing the valley"><div class="tile-copy"><h3 data-lang="en">Open views</h3><h3 data-lang="es">Vistas abiertas</h3><p data-lang="en">The valley and mountain line are part of the room.</p><p data-lang="es">El valle y la montaña forman parte de la estancia.</p></div></article>
 <article class="tile"><img src="https://lh3.googleusercontent.com/d/1__ZQsgsgz4oFtc5wa3m-SFh8w9prFm9H=w1600" alt="AUMARA houses among pines"><div class="tile-copy"><h3 data-lang="en">Human distance</h3><h3 data-lang="es">Distancia humana</h3><p data-lang="en">Close enough to belong. Far enough to breathe.</p><p data-lang="es">Cerca para sentirte parte. Lejos para poder respirar.</p></div></article>
 <article class="tile"><img src="https://lh3.googleusercontent.com/d/1G5ikxbP-rw3UjB2nDSl1nwH8PY1qmtLq=w1600" alt="AUMARA path at blue hour"><div class="tile-copy"><h3 data-lang="en">Blue hour</h3><h3 data-lang="es">La hora azul</h3><p data-lang="en">Warm light, pine trees and the quiet after sunset.</p><p data-lang="es">Luz cálida, pinos y la calma después del atardecer.</p></div></article>
-</div>
-</div></section>
-
-<section class="section dark" id="walk"><div class="wrap">
-<div class="film">
-<div class="film-media"><video muted autoplay loop playsinline preload="metadata"><source src="https://drive.google.com/uc?export=download&id=1L8oePUeTfB0EFXhyXW3J6R82LF2ob6tt" type="video/quicktime"></video></div>
-<div class="film-copy">
-<div data-lang="en"><p class="eyebrow">A short walk</p><h2>The place explains itself better in motion.</h2><p>This is real AUMARA footage, filmed at blue hour: the path, the lights, the houses and the scale between them.</p><div class="facts"><div>6 physical houses</div><div>5 currently bookable</div><div>3 Chalet</div><div>2 Superior Chalet</div></div></div>
-<div data-lang="es"><p class="eyebrow">Un paseo corto</p><h2>El lugar se explica mejor en movimiento.</h2><p>Imágenes reales de AUMARA durante la hora azul: el camino, las luces, las casas y la escala entre ellas.</p><div class="facts"><div>6 casas físicas</div><div>5 disponibles</div><div>3 Chalet</div><div>2 Superior Chalet</div></div></div>
-</div>
-</div>
-</div></section>
-
-<section class="section"><div class="wrap"><div class="booking">
-<div data-lang="en"><p class="eyebrow">Stay at AUMARA</p><h2>Choose the dates. Keep the feeling.</h2><p>Live availability, confirmation and secure payment continue in the AUMARA Beds24 booking engine.</p><div class="actions"><a class="btn primary" href="https://beds24.com/booking2.php?propid=324882" target="_blank" rel="noopener">Book direct</a></div></div>
-<div data-lang="es"><p class="eyebrow">Alójate en AUMARA</p><h2>Elige las fechas. Quédate con la sensación.</h2><p>La disponibilidad, confirmación y el pago seguro continúan en el motor de reservas de AUMARA en Beds24.</p><div class="actions"><a class="btn primary" href="https://beds24.com/booking2.php?propid=324882" target="_blank" rel="noopener">Reservar directamente</a></div></div>
-<p class="legal">AUMARA · EL CID VENTURES BENIDOLEIG S.L. · CIF B53816989 · Benidoleig, Alicante</p>
 </div></div></section>
-</main>
-<footer><div class="wrap footer"><strong>AUMARA</strong><span>Benidoleig · Marina Alta · Costa Blanca</span></div></footer>
-<script>
-const root=document.documentElement;
-function setLang(lang){root.dataset.language=lang;document.querySelectorAll('[data-setlang]').forEach(b=>b.classList.toggle('active',b.dataset.setlang===lang));localStorage.setItem('aumara-lang',lang)}
-document.querySelectorAll('[data-setlang]').forEach(b=>b.addEventListener('click',()=>setLang(b.dataset.setlang)));
-setLang(localStorage.getItem('aumara-lang')||((navigator.language||'en').toLowerCase().startsWith('es')?'es':'en'));
-</script>
-</body>
-</html>
+<section class="section dark" id="walk"><div class="wrap"><div class="film">
+<div class="film-media"><video muted autoplay loop playsinline preload="metadata" poster="https://lh3.googleusercontent.com/d/1G5ikxbP-rw3UjB2nDSl1nwH8PY1qmtLq=w1600"><source src="https://drive.google.com/uc?export=download&id=1NHcnRxopO4RbqKtNSCA9rR0yx8A6EN6H" type="video/mp4"></video></div>
+<div class="film-copy"><div data-lang="en"><p class="eyebrow">A short walk</p><h2>The place explains itself better in motion.</h2><p>Real AUMARA footage: the path, the lights, the houses and the scale between them.</p><div class="facts"><div>6 physical houses</div><div>5 currently bookable</div><div>3 Chalet</div><div>2 Superior Chalet</div></div></div><div data-lang="es"><p class="eyebrow">Un paseo corto</p><h2>El lugar se explica mejor en movimiento.</h2><p>Imágenes reales de AUMARA: el camino, las luces, las casas y la escala entre ellas.</p><div class="facts"><div>6 casas físicas</div><div>5 disponibles</div><div>3 Chalet</div><div>2 Superior Chalet</div></div></div></div>
+</div></div></section>
+<section class="section"><div class="wrap"><div class="booking"><div data-lang="en"><p class="eyebrow">Stay at AUMARA</p><h2>Choose the dates. Keep the feeling.</h2><p>Live availability, confirmation and secure payment continue in the AUMARA Beds24 booking engine.</p><div class="actions"><a class="btn primary" href="https://beds24.com/booking2.php?propid=324882" target="_blank" rel="noopener">Book direct</a></div></div><div data-lang="es"><p class="eyebrow">Alójate en AUMARA</p><h2>Elige las fechas. Quédate con la sensación.</h2><p>La disponibilidad, confirmación y el pago seguro continúan en el motor de reservas de AUMARA en Beds24.</p><div class="actions"><a class="btn primary" href="https://beds24.com/booking2.php?propid=324882" target="_blank" rel="noopener">Reservar directamente</a></div></div><p class="legal">AUMARA · EL CID VENTURES BENIDOLEIG S.L. · CIF B53816989 · Benidoleig, Alicante</p></div></div></section>
+</main><footer><div class="wrap footer"><strong>AUMARA</strong><span>Benidoleig · Marina Alta · Costa Blanca</span></div></footer>
+<script>const root=document.documentElement;function setLang(lang){root.dataset.language=lang;document.querySelectorAll('[data-setlang]').forEach(b=>b.classList.toggle('active',b.dataset.setlang===lang));localStorage.setItem('aumara-lang',lang)}document.querySelectorAll('[data-setlang]').forEach(b=>b.addEventListener('click',()=>setLang(b.dataset.setlang)));setLang(localStorage.getItem('aumara-lang')||((navigator.language||'en').toLowerCase().startsWith('es')?'es':'en'));</script>
+</body></html>

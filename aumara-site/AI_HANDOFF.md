@@ -8,12 +8,18 @@ Repository: `elcidspain/openai-cookbook`
 
 The compressed v3 landing-page direction is dismissed.
 
-Return to the first interactive concept:
+Return to the original AUMARA foundation as the visual and structural baseline:
 
-- Source file: `aumara-site/prototype-v01.html`
-- Preview URL: `https://elcidspain.github.io/openai-cookbook/prototype-v01.html`
-- The old v3 preview URL now redirects to this file.
+- Baseline file: `aumara-site/index.html`
+- Baseline preview: `https://elcidspain.github.io/openai-cookbook/`
+- The old v3 preview URL redirects to the baseline.
 - Production is not switched automatically.
+
+The first interactive map prototype remains useful only as a feature source:
+
+- Map prototype: `aumara-site/prototype-v01.html`
+
+Do not replace the original site with the map prototype. Integrate the map and route logic into the original visual system.
 
 ## Core product idea
 
@@ -21,28 +27,31 @@ The website is not a short brochure with one clipped video.
 
 It is an interactive digital visit to AUMARA:
 
-1. See the territory as a map.
-2. Tap a point or house.
-3. Open the real view, short route clip, house facts and booking path for that point.
-4. Move point-to-point through the property.
-5. Expand from the exterior route into each house, terrace, interior and view.
+1. Emotional full-screen arrival.
+2. Clear facts and two house types.
+3. Interactive territory map.
+4. Tap a location or house.
+5. Open the real view, short route clip, house facts and booking path.
+6. Move point-to-point through the property.
+7. Expand from exterior route into each house, terrace, interior and view.
 
 The uploaded full walkthrough is source material for route nodes, not a single decorative hero video.
 
 ## Visual baseline
 
-Keep the first version's editorial direction:
+Keep the original version's direction:
 
-- atmospheric full-screen opening
-- large typography
-- cream editorial sections
-- dark forest / warm gold palette
-- interactive territory as the main product feature
-- category cards and booking as supporting layers
+- immersive full-screen hero
+- large editorial typography
+- dark forest / warm gold / cream palette
+- real AUMARA imagery
+- Dawn / Day / Sunset / Night logic
+- rich page depth, not a compressed brochure
+- booking visible but not allowed to flatten the experience
 
-Do not reduce the site to a short generic hospitality landing page.
+The screenshot approved by Ilya is the visual reference for the opening experience: atmospheric hero, strong editorial hierarchy, rounded controls, warm cream cards and a premium mobile rhythm.
 
-## Approved wording to preserve for later integration
+## Approved wording to integrate into the original structure
 
 English:
 
@@ -54,8 +63,6 @@ Spanish:
 > Hay lugares que te dan más.  
 > En AUMARA, vuelves a encontrarte contigo mismo.
 
-The wording may be integrated into the first-version structure after the map and route logic are working.
-
 ## Verified factual baseline
 
 - 6 physical houses on site
@@ -66,15 +73,32 @@ The wording may be integrated into the first-version structure after the map and
 - Do not guess which exact numbered unit is unavailable when that fact is not verified.
 - Use real AUMARA media.
 
-## Work order
+## Build order
 
-### Stage 1 — Territory map
+### Stage 1 — Preserve and restore the original page
 
-Replace abstract road geometry with the cleaned real site plan. Preserve six clickable locations and make the plan usable on iPhone.
+Work from `aumara-site/index.html`. Do not redesign from scratch and do not shorten it into v3.
 
-### Stage 2 — Route nodes
+### Stage 2 — Territory map
 
-Cut the full walkthrough into point-specific clips:
+Take the interaction model from `prototype-v01.html`, replace abstract geometry with the cleaned real site plan, and embed it into the original page.
+
+Map points:
+
+- arrival
+- parking
+- 3 Chalet locations
+- 2 Superior Chalet locations
+- sixth physical house / non-bookable status only if factually clear
+- pool
+- EL CID / restaurant
+- viewpoint / nature route
+
+Each point opens a real image or clip, factual text and the next action.
+
+### Stage 3 — Route nodes from the full walkthrough
+
+Cut the full video into route-specific clips:
 
 - arrival / first reveal
 - upper path
@@ -85,35 +109,43 @@ Cut the full walkthrough into point-specific clips:
 - lower route
 - final house / end of route
 
-Each node must have a still poster, a short clip, next/previous route controls and a link back to the map.
+Each node has:
 
-### Stage 3 — House layers
+- poster frame
+- short clip
+- previous / next controls
+- return to map
+- linked house or place section
 
-For each house or category:
+### Stage 4 — House layers
+
+For each house type:
 
 - exterior
 - entrance
 - interior sequence
 - terrace / view
+- layout / dimensions where verified
 - capacity and factual description
 - availability / Beds24
 
-### Stage 4 — Expanded virtual visit
+### Stage 5 — Expanded virtual visit
 
-Create a point-to-point tour interface. It can feel like moving through the property, but must not pretend to be a true 360° capture when the source is ordinary phone video.
+Create a point-to-point tour that feels like moving through the property. Do not claim true 360° until actual 360° source material exists.
 
 ## Roles
 
 ### ChatGPT / AI Ops
 
-- Maintain the GitHub implementation.
+- Maintain GitHub implementation.
+- Preserve the original visual baseline.
 - Build map, hotspots, route nodes and media integration.
 - Keep changes reversible.
 - Verify facts and links.
 
 ### Claude
 
-Claude review work is paused for now. No parallel prototype work and no independent redesign.
+Parallel redesign work is paused. Claude may review only after the restored original plus map module is visible.
 
 ### Ilya
 

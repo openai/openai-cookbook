@@ -1,0 +1,19 @@
+{
+  "source": {
+    "driveId": "1L8oePUeTfB0EFXhyXW3J6R82LF2ob6tt",
+    "title": "IMG_8063.MOV",
+    "duration": 181.083,
+    "resolution": "1920x1080",
+    "fps": 30
+  },
+  "nodes": [
+    {"id":1,"start":0,"end":12,"x":46,"y":54,"title_en":"First panorama","title_es":"Primera panorámica","copy_en":"Valley, pine trees and the first reading of the houses together.","copy_es":"El valle, los pinos y la primera lectura conjunta de las casas."},
+    {"id":2,"start":13,"end":32,"x":37,"y":48,"title_en":"Red house approach","title_es":"Camino hacia la casa roja","copy_en":"The illuminated path turns the house into the next destination.","copy_es":"El camino iluminado convierte la casa en el siguiente destino."},
+    {"id":3,"start":33,"end":58,"x":28,"y":57,"title_en":"Upper cluster and green entrance","title_es":"Conjunto superior y entrada verde","copy_en":"The route passes between houses and reveals the spacing between them.","copy_es":"La ruta pasa entre las casas y muestra la distancia real entre ellas."},
+    {"id":4,"start":59,"end":74,"x":57,"y":61,"title_en":"Valley viewpoint","title_es":"Mirador al valle","copy_en":"The landscape opens between the houses instead of sitting behind them.","copy_es":"El paisaje se abre entre las casas, no solamente detrás de ellas."},
+    {"id":5,"start":75,"end":96,"x":68,"y":54,"title_en":"Upper lane and yellow entrance","title_es":"Camino superior y entrada amarilla","copy_en":"Path lights, stone edges and the entrance sequence at blue hour.","copy_es":"Luces del camino, bordes de piedra y la secuencia de entrada en la hora azul."},
+    {"id":6,"start":97,"end":122,"x":53,"y":48,"title_en":"Central junction","title_es":"Cruce central","copy_en":"Several houses become visible at once and the territory starts to make sense.","copy_es":"Varias casas aparecen a la vez y la lógica del lugar empieza a entenderse."},
+    {"id":7,"start":123,"end":154,"x":71,"y":64,"title_en":"Lower route and steps","title_es":"Ruta inferior y escaleras","copy_en":"The walk descends between red, yellow and green houses.","copy_es":"El recorrido desciende entre las casas rojas, amarillas y verdes."},
+    {"id":8,"start":162,"end":180,"x":31,"y":64,"title_en":"Return route","title_es":"Ruta de regreso","copy_en":"The final stretch returns past the green house toward the open valley.","copy_es":"El tramo final regresa junto a la casa verde hacia el valle abierto."}
+  ]
+}

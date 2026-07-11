@@ -15,10 +15,24 @@ jobs:
       - name: Checkout repository
         uses: actions/checkout@v4
 
+      - name: Check Nominalia FTP secret
+        id: ftp_check
+        shell: bash
+        env:
+          FTP_PASSWORD: ${{ secrets.NOMINALIA_FTP_PASSWORD }}
+        run: |
+          if [ -z "$FTP_PASSWORD" ]; then
+            echo "ready=false" >> "$GITHUB_OUTPUT"
+            echo "NOMINALIA_FTP_PASSWORD is not configured. Preview remains on GitHub Pages; production was not changed."
+          else
+            echo "ready=true" >> "$GITHUB_OUTPUT"
+          fi
+
       - name: Deploy AUMARA site to Nominalia FTP
+        if: steps.ftp_check.outputs.ready == 'true'
         uses: SamKirkland/FTP-Deploy-Action@v4.3.5
         with:
-          server: elcidt.ftp.tb-hosting.com
+          server: elcids.ftp.tb-hosting.com
           username: elcidspaincom@elcidspaincom
           password: ${{ secrets.NOMINALIA_FTP_PASSWORD }}
           protocol: ftp

@@ -1,20 +1,48 @@
-# AUMARA WEB — AI handoff and source of truth
+# AUMARA WEB — source of truth
 
-Updated: 2026-07-11
+Updated: 2026-07-12
 Owner / final approval: Ilya Doroshenko
 Repository: `elcidspain/openai-cookbook`
 
-## Current source of truth
+## Reset decision
 
-- Preview file: `aumara-site/direct-v3-preview.html`
-- Current production route: `aumara-site/direct-v2.html`
-- GitHub Pages workflow uploads `./aumara-site` as the site root.
-- Therefore the valid preview URL is:
-  `https://elcidspain.github.io/openai-cookbook/direct-v3-preview.html`
-- Legacy URL is redirected:
-  `https://elcidspain.github.io/openai-cookbook/aumara-site/direct-v3-preview.html`
+The compressed v3 landing-page direction is dismissed.
 
-## Approved wording
+Return to the first interactive concept:
+
+- Source file: `aumara-site/prototype-v01.html`
+- Preview URL: `https://elcidspain.github.io/openai-cookbook/prototype-v01.html`
+- The old v3 preview URL now redirects to this file.
+- Production is not switched automatically.
+
+## Core product idea
+
+The website is not a short brochure with one clipped video.
+
+It is an interactive digital visit to AUMARA:
+
+1. See the territory as a map.
+2. Tap a point or house.
+3. Open the real view, short route clip, house facts and booking path for that point.
+4. Move point-to-point through the property.
+5. Expand from the exterior route into each house, terrace, interior and view.
+
+The uploaded full walkthrough is source material for route nodes, not a single decorative hero video.
+
+## Visual baseline
+
+Keep the first version's editorial direction:
+
+- atmospheric full-screen opening
+- large typography
+- cream editorial sections
+- dark forest / warm gold palette
+- interactive territory as the main product feature
+- category cards and booking as supporting layers
+
+Do not reduce the site to a short generic hospitality landing page.
+
+## Approved wording to preserve for later integration
 
 English:
 
@@ -26,54 +54,67 @@ Spanish:
 > Hay lugares que te dan más.  
 > En AUMARA, vuelves a encontrarte contigo mismo.
 
-Do not revert to `AUMARA te devuelve a ti`.
+The wording may be integrated into the first-version structure after the map and route logic are working.
 
-## Approved factual baseline
+## Verified factual baseline
 
 - 6 physical houses on site
 - 5 currently bookable
 - 3 Chalet
 - 2 Superior Chalet
 - Direct booking CTA: `https://beds24.com/booking2.php?propid=324882`
-- Languages for this version: EN and ES
-- Use real AUMARA media when available; do not replace it with generic AI imagery.
 - Do not guess which exact numbered unit is unavailable when that fact is not verified.
+- Use real AUMARA media.
+
+## Work order
+
+### Stage 1 — Territory map
+
+Replace abstract road geometry with the cleaned real site plan. Preserve six clickable locations and make the plan usable on iPhone.
+
+### Stage 2 — Route nodes
+
+Cut the full walkthrough into point-specific clips:
+
+- arrival / first reveal
+- upper path
+- red house approach
+- green house approach
+- central crossing
+- valley viewpoint
+- lower route
+- final house / end of route
+
+Each node must have a still poster, a short clip, next/previous route controls and a link back to the map.
+
+### Stage 3 — House layers
+
+For each house or category:
+
+- exterior
+- entrance
+- interior sequence
+- terrace / view
+- capacity and factual description
+- availability / Beds24
+
+### Stage 4 — Expanded virtual visit
+
+Create a point-to-point tour interface. It can feel like moving through the property, but must not pretend to be a true 360° capture when the source is ordinary phone video.
 
 ## Roles
 
-### Claude
-- Review copy, hierarchy, mobile readability and visual rhythm.
-- Propose changes against the current GitHub file, not against an isolated artifact.
-- Return exact file-level edits or a complete replacement file.
-- Do not publish, rename routes, alter booking URLs or change factual inventory without Ilya approval.
-
 ### ChatGPT / AI Ops
-- Maintain GitHub source, deployment paths, redirects, media links and booking integration.
-- Reconcile Claude proposals with the approved baseline.
-- Verify URLs and preserve a reversible commit history.
-- Do not switch production from v2 to v3 without Ilya approval.
 
-## Change protocol
+- Maintain the GitHub implementation.
+- Build map, hotspots, route nodes and media integration.
+- Keep changes reversible.
+- Verify facts and links.
 
-Every proposed change must include:
+### Claude
 
-1. File path
-2. Current wording / code
-3. Proposed wording / code
-4. Reason
-5. Verification URL
-6. Whether the change is preview-only or production
+Claude review work is paused for now. No parallel prototype work and no independent redesign.
 
-Never let two agents overwrite the same file independently. Claude proposes; AI Ops integrates; Ilya approves production.
+### Ilya
 
-## Current task for Claude
-
-Review `aumara-site/direct-v3-preview.html` as it exists in GitHub now. Focus only on:
-
-- first-screen hierarchy on iPhone
-- EN/ES wording quality
-- whether the slogan remains readable over the hero image
-- CTA clarity
-- which sections are essential before booking
-
-Return a concise audit and exact replacement snippets. Do not create a separate prototype, do not change routes, and do not publish.
+Approves visual direction and production switch.

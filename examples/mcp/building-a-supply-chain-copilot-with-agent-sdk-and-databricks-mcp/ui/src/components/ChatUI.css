@@ -1,0 +1,109 @@
+.dbx-chat-root {
+  max-width: 540px;
+  margin: 40px auto;
+  background: #fff;
+  border-radius: 18px;
+  box-shadow: 0 2px 24px 0 rgba(200,0,0,0.10);
+  display: flex;
+  flex-direction: column;
+  height: 80vh;
+  border: 2px solid #e53935;
+}
+
+.dbx-chat-header {
+  background: #e53935;
+  color: #fff;
+  padding: 18px 24px;
+  font-size: 1.25rem;
+  font-weight: 700;
+  display: flex;
+  align-items: center;
+  border-radius: 16px 16px 0 0;
+  letter-spacing: 1px;
+}
+.dbx-logo {
+  font-size: 1.7rem;
+  margin-right: 12px;
+}
+.dbx-title {
+  font-family: 'Inter', 'Arial', sans-serif;
+}
+
+.dbx-chat-messages {
+  flex: 1;
+  overflow-y: auto;
+  background: #fff5f5;
+  padding: 24px 18px;
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+}
+
+.dbx-chat-msg {
+  display: flex;
+}
+.dbx-chat-msg--user {
+  justify-content: flex-end;
+}
+.dbx-chat-msg--assistant {
+  justify-content: flex-start;
+}
+.dbx-chat-bubble {
+  padding: 12px 18px;
+  border-radius: 16px;
+  font-size: 1.05rem;
+  line-height: 1.45;
+  max-width: 70%;
+  box-shadow: 0 1px 6px 0 rgba(229,57,53,0.07);
+  word-break: break-word;
+}
+.dbx-chat-msg--user .dbx-chat-bubble {
+  background: #e53935;
+  color: #fff;
+  border-bottom-right-radius: 4px;
+}
+.dbx-chat-msg--assistant .dbx-chat-bubble {
+  background: #fff;
+  color: #b71c1c;
+  border-bottom-left-radius: 4px;
+  border: 1.5px solid #e53935;
+}
+
+.dbx-chat-input-bar {
+  display: flex;
+  padding: 18px;
+  border-top: 1.5px solid #e53935;
+  background: #fff;
+  border-radius: 0 0 16px 16px;
+}
+.dbx-chat-input {
+  flex: 1;
+  border: 1.5px solid #e53935;
+  border-radius: 8px;
+  padding: 10px 14px;
+  font-size: 1rem;
+  outline: none;
+  margin-right: 10px;
+  background: #fff5f5;
+  color: #b71c1c;
+  transition: border 0.2s;
+}
+.dbx-chat-input:focus {
+  border: 2px solid #b71c1c;
+}
+.dbx-chat-send-btn {
+  background: #e53935;
+  color: #fff;
+  border: none;
+  border-radius: 8px;
+  padding: 0 22px;
+  font-size: 1rem;
+  font-weight: 600;
+  cursor: pointer;
+  transition: background 0.15s;
+}
+.dbx-chat-send-btn:disabled {
+  background: #ffcdd2;
+  color: #fff;
+  cursor: not-allowed;
+}

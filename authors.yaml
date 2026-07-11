@@ -2,10 +2,76 @@
 
 # You can optionally customize how your information shows up cookbook.openai.com over here.
 # If your information is not present here, it will be pulled from your GitHub profile.
+
+neilh-oai:
+  name: "Neil Hansaria"
+  website: "https://www.linkedin.com/in/neilhansaria"
+  avatar: "https://avatars.githubusercontent.com/u/274336127?v=4"
+
+kkahadze-oai:
+  name: "Konstantine Kahadze"
+  website: "https://kahadze.com"
+  avatar: "https://avatars.githubusercontent.com/kkahadze-oai"
+
+lpesut-daytona:
+  name: "Lovre Pesut"
+  website: "https://github.com/rovle"
+  avatar: "https://avatars.githubusercontent.com/rovle"
+
+zhenweig-cerebras:
+  name: "Zhenwei Gao"
+  website: "https://www.linkedin.com/in/zhenwei-gao/"
+  avatar: "https://avatars.githubusercontent.com/u/240548509?v=4"
+
+joanneshin-openai:
+  name: "Joanne Shin"
+  website: "https://www.linkedin.com/in/jeongminshin"
+  avatar: "https://avatars.githubusercontent.com/u/206945323?v=4"
+
+daveleo-openai:
+  name: "Dave Leo"
+  website: "https://www.linkedin.com/in/davidanthonyleo/"
+  avatar: "https://media.licdn.com/dms/image/v2/C5603AQF2Kg-D7XJKNw/profile-displayphoto-shrink_800_800/profile-displayphoto-shrink_800_800/0/1612654752234?e=1761782400&v=beta&t=RkO9jCbJrY6Ox9YRbMA6HAAZhxfYJV1OsZeIT3YatBM"
+
+jonlim-openai:
+  name: "Jonathan Lim"
+  website: "https://www.linkedin.com/in/jonlmr"
+  avatar: "https://avatars.githubusercontent.com/u/189068472?v=4"
+
+WJPBProjects:
+  name: "Wulfie Bain"
+  website: "https://www.linkedin.com/in/wulfie-bain/"
+  avatar: "https://avatars.githubusercontent.com/u/76624567?v=4"
+
+anoop-openai:
+  name: "Anoop Kotha"
+  website: "https://x.com/anoopkotha"
+  avatar: "https://pbs.twimg.com/profile_images/1953388055190224896/vHZ5CVPs_400x400.jpg"
+
+erinkav-openai:
+  name: "Erin Kavanaugh"
+  website: "https://www.linkedin.com/in/erinkavanaugh/"
+  avatar: "https://media.licdn.com/dms/image/v2/D5603AQFBeFl_GBWRww/profile-displayphoto-scale_400_400/B56ZiCtx6zHcAg-/0/1754539697289?e=1757548800&v=beta&t=e3znvOjyDV9MBdp2AABxGtvdCx1LzyrBR75cjOSh5h8"
+
+ericzakariasson:
+  name: "Eric Zakariasson"
+  website: "https://x.com/ericzakariasson"
+  avatar: "https://pbs.twimg.com/profile_images/1841151626456801283/HnXqy3TQ_400x400.jpg"
+
+jayrodge:
+  name: "Jay Rodge"
+  website: "https://www.linkedin.com/in/jayrodge/"
+  avatar: "https://developer-blogs.nvidia.com/wp-content/uploads/2024/05/Jay-Rodge.png"
+
 rajpathak-openai:
   name: "Raj Pathak"
   website: "https://www.linkedin.com/in/rajpathakopenai/"
   avatar: "https://avatars.githubusercontent.com/u/208723614?s=400&u=c852eed3be082f7fbd402b5a45e9b89a0bfed1b8&v=4"
+
+emreokcular:
+  name: "Emre Okcular"
+  website: "https://www.linkedin.com/in/emreokcular/"
+  avatar: "https://avatars.githubusercontent.com/u/26163154?v=4"
 
 chelseahu-openai:
   name: "Chelsea Hu"
@@ -22,6 +88,16 @@ theophile-oai:
   website: "https://www.linkedin.com/in/theophilesautory"
   avatar: "https://avatars.githubusercontent.com/u/206768658?v=4"
 
+bfioca-openai:
+  name: "Brian Fioca"
+  website: "https://www.linkedin.com/in/brian-fioca/"
+  avatar: "https://avatars.githubusercontent.com/u/206814564?v=4"
+
+carter-oai:
+  name: "Carter Mcclellan"
+  website: "https://www.linkedin.com/in/carter-mcclellan/"
+  avatar: "https://avatars.githubusercontent.com/u/219906258?v=4"
+
 robert-tinn:
   name: "Robert Tinn"
   website: "https://www.linkedin.com/in/robert-tinn/"
@@ -36,6 +112,11 @@ shikhar-cyber:
   name: "Shikhar Kwatra"
   website: "https://www.linkedin.com/in/shikharkwatra/"
   avatar: "https://avatars.githubusercontent.com/u/189049238?v=4"
+  
+sudee-oai:
+  name: "Sudeesh Sasidharan"
+  website: "https://www.linkedin.com/in/sudeesh-sasidharan/"
+  avatar: "https://avatars.githubusercontent.com/sudee-oai"
 
 danbell-openai:
   name: "Dan Bell"
@@ -61,6 +142,11 @@ shyamal-anadkat:
   name: "Shyamal Anadkat"
   website: "https://twitter.com/shyamalanadkat"
   avatar: "https://pbs.twimg.com/profile_images/1590564338682560512/3bbZJqxZ_400x400.jpg"
+
+aaronfriel:
+  name: "Aaron Friel"
+  website: "https://www.github.com/aaronfriel"
+  avatar: "https://avatars.githubusercontent.com/aaronfriel"
 
 simonpfish:
   name: "Simón Fishman"
@@ -156,6 +242,11 @@ aaronwilkowitz-openai:
   name: "Aaron Wilkowitz"
   website: "https://www.linkedin.com/in/aaronwilkowitz/"
   avatar: "https://avatars.githubusercontent.com/u/157151487"
+
+stefanofabbri-oai:
+  name: "Stefano Fabbri"
+  website: "https://www.linkedin.com/in/stefano-fabbri-633a1895/"
+  avatar: "https://media.licdn.com/dms/image/v2/C5603AQGekzEY9dhxXA/profile-displayphoto-shrink_400_400/profile-displayphoto-shrink_400_400/0/1639500546853?e=1779926400&v=beta&t=siVg-MLpr70UfpUYhcEg86sxqcKSOU-jC7V4iT4FtK0"
 
 charuj:
   name: "Charu Jaiswal"
@@ -275,7 +366,7 @@ MW-OAI:
 dwigg-openai:
   name: "Danny Wigg"
   website: "https://www.linkedin.com/in/dannywigg/"
-  avatar: "https://media.licdn.com/dms/image/v2/C4D03AQEjMSl0pMR_qw/profile-displayphoto-shrink_800_800/profile-displayphoto-shrink_800_800/0/1587647134114?e=1743033600&v=beta&t=XmULCSmk6V6YFmlyBggxj5uJeoYYuaYUKgcByKlS0K0"
+  avatar: "https://avatars.githubusercontent.com/u/4661060?v=4"
 
 msingh-openai:
   name: "Mandeep Singh"
@@ -359,8 +450,8 @@ phundal-openai:
 
 rkoenig-openai:
   name: "Robin Koenig"
-  website: "https://www.linkedin.com/in/robinkoenig/"
-  avatar: "https://media.licdn.com/dms/image/v2/C5603AQEqUVtbts8Huw/profile-displayphoto-shrink_400_400/profile-displayphoto-shrink_400_400/0/1558137883581?e=1753920000&v=beta&t=jcm-qNJfmgVJsS6uNHxHu5T2nQoUWkXivthzxTJMWqA"
+  website: "https://robinkoenig.com"
+  avatar: "https://avatars.githubusercontent.com/u/208886811?v=4"
 
 joshbickett:
   name: "Josh Bickett"
@@ -371,3 +462,163 @@ lupie:
   name: "Lucie Lozinski"
   website: "https://twitter.com/thisloops"
   avatar: "https://avatars.githubusercontent.com/u/6293148"
+
+alexl-oai:
+  name: "Alex Lowden"
+  website: "https://www.linkedin.com/in/alex-lowden01/"
+  avatar: "https://avatars.githubusercontent.com/u/215167546"
+
+lara-openai:
+  name: "Lara Rachidi"
+  website: "https://www.linkedin.com/in/lara-rachidi/"
+  avatar: "https://avatars.githubusercontent.com/u/208707651?v=4"
+
+glojain:
+  name: "Glory Jain"
+  website: "https://www.linkedin.com/in/gloryjain/"
+  avatar: "https://media.licdn.com/dms/image/v2/C4E03AQH72n6Sm5q69Q/profile-displayphoto-shrink_400_400/profile-displayphoto-shrink_400_400/0/1557995338725?e=1756339200&v=beta&t=FGTXiCZwTZvqHCY-wd8It15EDf11Rex1oLlBKRGHNtY"
+
+corwin:
+  name: "Corwin Cheung"
+  website: "https://www.linkedin.com/in/corwincubes/"
+  avatar: "https://avatars.githubusercontent.com/u/85517581?v=4"
+
+daisyshe-oai:
+  name: "Daisy Sheng"
+  website: "https://www.linkedin.com/in/daisysheng/"
+  avatar: "https://avatars.githubusercontent.com/u/212609991?v=4"
+
+dkundel-openai:
+  name: "Dominik Kundel"
+  website: "https://www.linkedin.com/in/dkundel/"
+  avatar: "https://avatars.githubusercontent.com/u/200841172?v=4"
+
+edbeeching:
+  name: "Edward Beeching"
+  website: "https://huggingface.co/edbeeching"
+  avatar: "https://cdn-avatars.huggingface.co/v1/production/uploads/1644220542819-noauth.jpeg"
+
+qgallouedec:
+  name: "Quentin Gallouédec"
+  website: "https://huggingface.co/qgallouedec"
+  avatar: "https://cdn-avatars.huggingface.co/v1/production/uploads/1677431596830-631ce4b244503b72277fc89f.jpeg"
+
+lewtun:
+  name: "Lewis Tunstall"
+  website: "https://huggingface.co/lewtun"
+  avatar: "https://cdn-avatars.huggingface.co/v1/production/uploads/1594651707950-noauth.jpeg"
+
+pcuenca:
+  name: "Pedro Cuenca"
+  website: "https://huggingface.co/pcuenq"
+  avatar: "https://cdn-avatars.huggingface.co/v1/production/uploads/1617264212503-603d25b75f9d390ab190b777.jpeg"
+
+Vaibhavs10:
+  name: "vb"
+  website: "https://huggingface.co/reach-vb"
+  avatar: "https://cdn-avatars.huggingface.co/v1/production/uploads/1655385361868-61b85ce86eb1f2c5e6233736.jpeg"
+
+yagil:
+  name: "Yagil Burowski"
+  website: "https://x.com/yagilb"
+  avatar: "https://avatars.lmstudio.com/profile-images/yagil"
+
+hendrytl:
+  name: "Todd Hendry"
+  website: "https://www.linkedin.com/in/todd-hendry-962aa577/"
+  avatar: "https://avatars.githubusercontent.com/u/36863669"
+
+heejingithub:
+  name: "Heejin Cho"
+  website: "https://www.linkedin.com/in/heejc/"
+  avatar: "https://avatars.githubusercontent.com/u/169293861"
+
+himadri518:
+  name: "Himadri Acharya"
+  website: "https://www.linkedin.com/in/himadri-acharya-086ba261/"
+  avatar: "https://avatars.githubusercontent.com/u/14100684?v=4"
+
+neelk-oai:
+  name: "Neel Kapse"
+  website: "https://www.linkedin.com/in/neel-kapse/"
+  avatar: "https://media.licdn.com/dms/image/v2/D4E03AQEegSR4W4Ylmg/profile-displayphoto-scale_400_400/B4EZkLjdrcIQAk-/0/1756835470622?e=1762387200&v=beta&t=HETTFnoh3nV_Yc84tHGkahKgOFdvnPlesfi3ki8mWFg"
+
+hamel:
+  name: "Hamel Husain"
+  website: "https://www.linkedin.com/in/hamelhusain/"
+  avatar: "https://media.licdn.com/dms/image/v2/C5603AQGoyHYtA2QIXw/profile-displayphoto-shrink_400_400/profile-displayphoto-shrink_400_400/0/1572471557655?e=1762387200&v=beta&t=wZrq-Nfc8-4Xq-nJ5g2jt9gZ1KLTg23KOIBGHk2xkZ0"
+
+jhall-openai:
+  name: "Josh Hall"
+  website: "https://www.linkedin.com/in/jhall14/"
+  avatar: "https://avatars.githubusercontent.com/u/198997750?v=4"
+
+charlie-openai:
+  name: "Charlie Weems"
+  website: "https://wee.ms"
+  avatar: "https://avatars.githubusercontent.com/u/181146176?v=4"
+
+nikhils-oai:
+  name: "Nikhil Srivastava"
+  website: "https://www.linkedin.com/in/nsrivast/"
+  avatar: "https://avatars.githubusercontent.com/u/231350150"
+
+roost:
+  name: "ROOST"
+  website: "https://roost.tools"
+  avatar: "https://avatars.githubusercontent.com/u/189051351?v=4"
+
+samarth-oai:
+  name: "Samarth Madduru"
+  website: "https://x.com/samarthmadduru"
+  avatar: "https://pbs.twimg.com/profile_images/1911309450368970752/6IFoTpmu_400x400.jpg"
+
+derrickchoi-openai:
+  name: "Derrick Choi"
+  website: "https://www.linkedin.com/in/derrickchoi/"
+  avatar: "https://avatars.githubusercontent.com/u/211427900"
+
+kevinv-openai:
+  name: "Kevin Verdieck"
+  website: "https://www.linkedin.com/in/kevinverdieck/"
+  avatar: "https://avatars.githubusercontent.com/u/197816265?v=4"
+
+annikab-oai:
+  name: "Annika Brundyn"
+  website: "https://github.com/annikab-oai"
+  avatar: "https://avatars.githubusercontent.com/u/231350694"
+
+kathylau-oai:
+  name: "Kathy Lau"
+  website: "https://www.linkedin.com/in/kathy-lau-nyc/"
+  avatar: "https://avatars.githubusercontent.com/u/247463782"
+
+sidrampally-oai:
+  name: "Sid Rampally"
+  website: "https://www.linkedin.com/in/sidrampally/"
+  avatar: "https://avatars.githubusercontent.com/u/274336082?v=4"
+
+nsingaraju-oai:
+  name: "Nishanth Singaraju"
+  website: "https://github.com/nsingaraju-oai"
+  avatar: "https://avatars.githubusercontent.com/u/232978332"
+
+sophiaqin-openai:
+  name: "Sophia Qin"
+  website: "https://github.com/sophiaqin-openai"
+  avatar: "https://avatars.githubusercontent.com/u/205098674?v=4"
+
+PASFIELD-OAI:
+  name: "Wesley Pasfield"
+  website: "https://github.com/PASFIELD-OAI"
+  avatar: "https://avatars.githubusercontent.com/u/276116382?v=4"
+
+shreekant-openai:
+  name: "Shreekant Agrawal"
+  website: "https://www.linkedin.com/in/shreeagrawal/"
+  avatar: "https://avatars.githubusercontent.com/u/263776704?v=4"
+
+anshgupta-oai:
+  name: "Ansh Gupta"
+  website: "https://github.com/anshgupta-oai"
+  avatar: "https://avatars.githubusercontent.com/u/269039830?v=4"

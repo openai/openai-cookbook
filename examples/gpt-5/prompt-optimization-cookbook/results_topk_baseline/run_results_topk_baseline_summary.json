@@ -1,0 +1,13 @@
+{
+  "total_runs": 30,
+  "successes": 30,
+  "avg_exec_time_s": 7.906391266701151,
+  "avg_peak_mem_kb": 3626.25537109375,
+  "exact_matches": 30,
+  "sorted_correctly": 30,
+  "violations": 0,
+  "csv": "results_topk_baseline/run_results_topk_baseline.csv",
+  "folder": "results_topk_baseline",
+  "k": 500,
+  "scale_tokens": 5000000
+}

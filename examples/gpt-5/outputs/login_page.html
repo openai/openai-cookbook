@@ -1,0 +1,306 @@
+Here’s a self‑contained login page (single HTML file) that matches the light cream/amber theme, rounded cards, thin borders, and subtle shadows from your dashboard. Drop this in as login.html or adapt the variables to your design system.
+
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>Acumen Finance — Sign In</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+  <style>
+    :root{
+      /* Theme (tuned to match the screenshot) */
+      --bg: #fbf1d9;          /* page background (warm cream) */
+      --panel: #fff4c7;       /* card/panel fill */
+      --panel-2: #fff0b3;     /* slightly deeper card (hover/focus) */
+      --line: #e7d8a9;        /* thin borders */
+      --text: #2a2a2a;        /* primary text */
+      --muted: #6f6a57;       /* secondary text */
+      --accent: #f1b414;      /* amber */
+      --accent-600:#e19e07;
+      --accent-700:#c38603;
+      --focus: rgba(241,180,20,.35);
+      --radius: 12px;
+      --shadow: 0 1px 0 rgba(30, 15, 0, .03), 0 6px 20px rgba(30, 15, 0, .06);
+    }
+
+    * { box-sizing: border-box; }
+    html, body { height: 100%; }
+    body{
+      margin:0;
+      font-family: Inter, ui-sans-serif, system-ui, -apple-system, Segoe UI, Roboto, "Helvetica Neue", Arial, "Apple Color Emoji","Segoe UI Emoji";
+      color: var(--text);
+      background: radial-gradient(1200px 600px at 20% -10%, #fff7dc 0%, transparent 60%),
+                  radial-gradient(900px 500px at 110% 110%, #fff1c9 0%, transparent 60%),
+                  var(--bg);
+    }
+
+    /* Subtle top nav strip (echoing app layout) */
+    .bar{
+      height: 56px;
+      border-bottom: 1px solid var(--line);
+      background: color-mix(in oklab, var(--panel) 70%, white 30%);
+      display:flex; align-items:center; justify-content:space-between;
+      padding: 0 20px;
+    }
+    .brand{
+      display:flex; align-items:center; gap:12px; font-weight:600;
+    }
+    .logo{
+      width:28px; height:28px; border-radius:50%;
+      background: radial-gradient(circle at 30% 30%, #ffe59a 0 45%, #f5c648 46% 100%);
+      border:1px solid var(--line);
+      display:grid; place-items:center; color:#7a5a00; font-size:14px; font-weight:700;
+      box-shadow: 0 1px 0 #fff inset;
+    }
+    .bar .meta{
+      display:flex; align-items:center; gap:10px; color:var(--muted); font-size:14px;
+    }
+
+    /* Layout */
+    .wrap{
+      min-height: calc(100% - 56px);
+      display:grid;
+      place-items:center;
+      padding: 32px 16px;
+    }
+    .card{
+      width: 100%;
+      max-width: 420px;
+      background: var(--panel);
+      border: 1px solid var(--line);
+      border-radius: var(--radius);
+      box-shadow: var(--shadow);
+      padding: 28px;
+    }
+    .card header{
+      margin-bottom: 18px;
+    }
+    .title{
+      margin:0;
+      font-size: 22px;
+      line-height: 1.2;
+      letter-spacing: -0.01em;
+    }
+    .subtitle{
+      margin:6px 0 0;
+      color: var(--muted);
+      font-size: 14px;
+    }
+
+    form .field{
+      margin: 14px 0;
+    }
+    label{
+      display:block;
+      font-size: 13px;
+      color: var(--muted);
+      margin-bottom: 6px;
+    }
+    .input{
+      display:flex; align-items:center;
+      background: #fffdf4;
+      border:1px solid var(--line);
+      border-radius: 10px;
+      padding: 10px 12px;
+      gap: 8px;
+      transition: background .2s, border-color .2s, box-shadow .2s;
+    }
+    .input input{
+      border:0; outline:0; background:transparent; width:100%;
+      font-size: 15px; color: var(--text);
+    }
+    .input:focus-within{
+      background: #fff;
+      border-color: var(--accent);
+      box-shadow: 0 0 0 3px var(--focus);
+    }
+    .hint{
+      display:flex; justify-content:space-between; align-items:center;
+      margin-top: 10px;
+      font-size: 13px; color: var(--muted);
+    }
+    .link{
+      color: var(--accent-700);
+      text-decoration: none;
+    }
+    .link:hover{ text-decoration: underline; }
+
+    .btn{
+      width: 100%;
+      appearance: none;
+      border:1px solid transparent;
+      border-radius: 10px;
+      padding: 12px 14px;
+      font-weight: 600;
+      font-size: 15px;
+      cursor: pointer;
+      transition: transform .02s ease, background .2s, box-shadow .2s, border-color .2s;
+    }
+    .btn:active{ transform: translateY(1px); }
+
+    .btn-primary{
+      background: linear-gradient(180deg, #ffd56b, #f3b418);
+      border-color: color-mix(in oklab, var(--accent) 70%, #c48e03 30%);
+      color: #372a00;
+      box-shadow: 0 1px 0 #fff inset, 0 6px 14px rgba(194, 137, 3, .20);
+    }
+    .btn-primary:hover{
+      background: linear-gradient(180deg, #ffe081, #f0ae0d);
+    }
+    .btn-ghost{
+      background: #fffdf4;
+      border-color: var(--line);
+      color: #5f5225;
+    }
+    .btn-ghost:hover{
+      background: #fff;
+      border-color: #e8d8a6;
+    }
+
+    .row{ display:flex; gap:10px; }
+    .or{
+      display:flex; align-items:center; gap:12px; color:var(--muted); font-size:12px; margin:16px 0;
+    }
+    .or:before, .or:after{
+      content:""; height:1px; flex:1; background: var(--line);
+    }
+
+    .error{
+      margin-top: 8px;
+      font-size: 13px;
+      color: #7a1a00;
+      background: #fff0e6;
+      border: 1px solid #f2c4b2;
+      padding: 8px 10px;
+      border-radius: 8px;
+      display:none;
+    }
+
+    .foot{
+      text-align:center; margin-top:16px; color:var(--muted); font-size:12px;
+    }
+
+    /* Tiny decorative chart echoes */
+    .chips{
+      display:flex; gap:8px; margin-top:10px;
+    }
+    .chip{
+      height:8px; border-radius:999px; background: #ffe7a1; border:1px solid var(--line);
+      box-shadow: inset 0 1px 0 #fff;
+    }
+    .chip:nth-child(1){ width:26%; }
+    .chip:nth-child(2){ width:38%; }
+    .chip:nth-child(3){ width:18%; background:#ffd36f; }
+  </style>
+</head>
+<body>
+  <div class="bar" role="banner">
+    <div class="brand" aria-label="Acumen Finance">
+      <div class="logo" aria-hidden="true">A</div>
+      <div>Acumen Finance</div>
+    </div>
+    <div class="meta">Secure Sign In</div>
+  </div>
+
+  <main class="wrap">
+    <section class="card" role="dialog" aria-labelledby="title" aria-describedby="subtitle">
+      <header>
+        <h1 class="title" id="title">Welcome back</h1>
+        <p class="subtitle" id="subtitle">Sign in to continue to your dashboard</p>
+        <div class="chips" aria-hidden="true">
+          <div class="chip"></div><div class="chip"></div><div class="chip"></div>
+        </div>
+      </header>
+
+      <form id="loginForm" novalidate>
+        <div class="field">
+          <label for="email">Email</label>
+          <div class="input">
+            <input id="email" name="email" type="email" inputmode="email" autocomplete="username" placeholder="you@company.com" required />
+          </div>
+        </div>
+
+        <div class="field">
+          <label for="password">Password</label>
+          <div class="input">
+            <input id="password" name="password" type="password" autocomplete="current-password" placeholder="••••••••" required minlength="8" />
+            <button type="button" id="togglePw" class="link" style="border:0;background:transparent;padding:0 2px;">Show</button>
+          </div>
+          <div class="hint">
+            <label style="display:flex;align-items:center;gap:8px;">
+              <input type="checkbox" id="remember" name="remember" /> Remember me
+            </label>
+            <a href="#" class="link">Forgot password?</a>
+          </div>
+        </div>
+
+        <div class="error" id="errorBox" role="alert" aria-live="polite"></div>
+
+        <div class="field">
+          <button class="btn btn-primary" type="submit" id="submitBtn">Sign In</button>
+        </div>
+
+        <div class="or">or</div>
+
+        <div class="row">
+          <button class="btn btn-ghost" type="button" aria-label="Sign in with Google">Sign in with Google</button>
+          <button class="btn btn-ghost" type="button" aria-label="Sign in with SSO">Company SSO</button>
+        </div>
+
+        <p class="foot">Don’t have an account? <a class="link" href="#">Create one</a></p>
+      </form>
+    </section>
+
+    <p class="foot" style="margin-top:18px;">© 2025 Acumen</p>
+  </main>
+
+  <script>
+    const form = document.getElementById('loginForm');
+    const errorBox = document.getElementById('errorBox');
+    const submitBtn = document.getElementById('submitBtn');
+    const togglePw = document.getElementById('togglePw');
+    const pw = document.getElementById('password');
+
+    togglePw.addEventListener('click', () => {
+      const isPw = pw.type === 'password';
+      pw.type = isPw ? 'text' : 'password';
+      togglePw.textContent = isPw ? 'Hide' : 'Show';
+      pw.focus();
+    });
+
+    form.addEventListener('submit', (e) => {
+      e.preventDefault();
+      errorBox.style.display = 'none';
+      const email = form.email.value.trim();
+      const password = form.password.value;
+
+      const emailValid = /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email);
+      if (!emailValid) return showError('Please enter a valid email address.');
+      if (password.length < 8) return showError('Your password must be at least 8 characters.');
+
+      submitBtn.disabled = true;
+      submitBtn.textContent = 'Signing in…';
+
+      // Replace with real request
+      setTimeout(() => {
+        // Demo success redirect
+        window.location.href = '/';
+      }, 800);
+    });
+
+    function showError(msg){
+      errorBox.textContent = msg;
+      errorBox.style.display = 'block';
+    }
+  </script>
+</body>
+</html>
+
+Notes to adapt:
+- Colors are controlled via CSS variables at the top. If you already have tokens, map them there.
+- Buttons, borders, and radii mirror the dashboard’s soft, rounded, amber-accented style.
+- Includes password show/hide, basic client validation, Remember me, and placeholders for Google/SSO.
+- Replace window.location redirect and the SSO/Google handlers with your auth logic.

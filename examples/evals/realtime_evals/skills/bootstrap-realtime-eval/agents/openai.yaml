@@ -1,0 +1,4 @@
+interface:
+  display_name: "Bootstrap Realtime Eval"
+  short_description: "Scaffold a repo-local realtime eval folder with the right harness, data, and README"
+  default_prompt: "Use $bootstrap-realtime-eval to create a new realtime eval folder in this cookbook repo, choose the right harness, scaffold prompt/tools/data, and validate it with smoke, full eval, and test runs."

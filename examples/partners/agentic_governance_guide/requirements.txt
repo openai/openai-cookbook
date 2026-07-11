@@ -1,0 +1,11 @@
+# Core OpenAI packages
+openai
+openai-agents
+openai-guardrails[benchmark]
+
+# Environment and async utilities
+python-dotenv
+nest_asyncio
+
+# Data validation
+pydantic

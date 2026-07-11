@@ -1,0 +1,38 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="1280" height="720" viewBox="0 0 1280 720">
+  <rect width="100%" height="100%" fill="#ffffff"/>
+
+  <text x="32" y="44" font-size="28" font-family="Arial, sans-serif" fill="#111827">Batch API vs Flex Processing</text>
+  <text x="32" y="74" font-size="16" font-family="Arial, sans-serif" fill="#374151">Comparison: batch vs responses (flex + 24hr cache)</text>
+
+  <line x1="140" y1="100" x2="140" y2="560" stroke="#111827" stroke-width="1.5"/>
+  <line x1="140" y1="560" x2="1180" y2="560" stroke="#111827" stroke-width="1.5"/>
+
+  <line x1="136" y1="100" x2="1180" y2="100" stroke="#e5e7eb" stroke-width="1"/>
+  <line x1="136" y1="215" x2="1180" y2="215" stroke="#e5e7eb" stroke-width="1"/>
+  <line x1="136" y1="330" x2="1180" y2="330" stroke="#e5e7eb" stroke-width="1"/>
+  <line x1="136" y1="445" x2="1180" y2="445" stroke="#e5e7eb" stroke-width="1"/>
+  <line x1="136" y1="560" x2="1180" y2="560" stroke="#e5e7eb" stroke-width="1"/>
+
+  <text x="90" y="104" font-size="13" font-family="Arial, sans-serif" fill="#374151">100%</text>
+  <text x="96" y="219" font-size="13" font-family="Arial, sans-serif" fill="#374151">75%</text>
+  <text x="96" y="334" font-size="13" font-family="Arial, sans-serif" fill="#374151">50%</text>
+  <text x="96" y="449" font-size="13" font-family="Arial, sans-serif" fill="#374151">25%</text>
+  <text x="101" y="564" font-size="13" font-family="Arial, sans-serif" fill="#374151">0%</text>
+
+
+  <rect x="260" y="100" width="280" height="116.585" fill="#e5e7eb" stroke="#9ca3af" stroke-width="1"/>
+  <rect x="260" y="216.585" width="280" height="343.415" fill="#16a34a" opacity="0.9"/>
+
+  <text x="400" y="164" text-anchor="middle" font-size="16" font-family="Arial, sans-serif" fill="#111827">uncached 25.34%</text>
+  <text x="400" y="344" text-anchor="middle" font-size="17" font-family="Arial, sans-serif" fill="#ffffff">cached 74.66%</text>
+
+  <text x="400" y="586" text-anchor="middle" font-size="16" font-family="Arial, sans-serif" fill="#111827">batch</text>
+
+  <rect x="740" y="100" width="280" height="77.049" fill="#e5e7eb" stroke="#9ca3af" stroke-width="1"/>
+  <rect x="740" y="177.049" width="280" height="382.951" fill="#16a34a" opacity="0.9"/>
+
+  <text x="880" y="146" text-anchor="middle" font-size="16" font-family="Arial, sans-serif" fill="#111827">uncached 16.75%</text>
+  <text x="880" y="350" text-anchor="middle" font-size="17" font-family="Arial, sans-serif" fill="#ffffff">cached 83.25%</text>
+
+  <text x="880" y="586" text-anchor="middle" font-size="16" font-family="Arial, sans-serif" fill="#111827">responses (flex + 24hr cache)</text>
+</svg>

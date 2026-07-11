@@ -1,0 +1,65 @@
+{
+  "simulation_id": "sim_cs_order_status",
+  "scenario": "User asks for the status of a specific order and wants the estimated delivery date.",
+  "assistant": {
+    "system_prompt_file": "shared/system_prompt.txt",
+    "tools_file": "shared/tools.json",
+    "model": "gpt-realtime"
+  },
+  "simulator": {
+    "system_prompt": "You are the user in a voice call. Stay in character and only say what the user would say. Never answer as the assistant.\n\nUser persona:\n- Name: Jordan Lee\n- Order ID: ORD-1001\n- Email: jordan.lee@example.com\n- Goal: Get the latest status and estimated delivery date for the order.\n- Style: Polite, brief, direct.\n\nRules:\n- Reply in 1-2 short sentences as the user.\n- Only use persona facts when asked. Do not invent new details.\n- Do not mention tools or system messages.\n- When the goal is satisfied, reply with exactly the single token: END_CALL (no other words or punctuation).",
+    "model": "gpt-realtime",
+    "voice": "marin"
+  },
+  "audio": {
+    "input_format": "pcm16",
+    "output_format": "pcm16",
+    "sample_rate_hz": 24000,
+    "chunk_ms": 20,
+    "real_time": true
+  },
+  "turns": {
+    "fixed_first_user_turn": "Hi, can you check the status of order ORD-1001?",
+    "max_turns": 6
+  },
+  "tool_mocks": [
+    {
+      "name": "get_order_status",
+      "output": {
+        "order_id": "ORD-1001",
+        "status": "In transit",
+        "estimated_delivery": "2026-01-25"
+      }
+    }
+  ],
+  "expected_tool_call": {
+    "name": "get_order_status",
+    "arguments": {
+      "order_id": "ORD-1001"
+    }
+  },
+  "graders": {
+    "turn_level": [
+      {
+        "id": "order_status_tool_call",
+        "type": "tool_call"
+      },
+      {
+        "id": "order_status_tool_call_args",
+        "type": "tool_call_args"
+      },
+      {
+        "id": "status_response_quality",
+        "type": "llm_as_judge",
+        "criteria": "Assistant clearly states the order status and delivery estimate after tool results."
+      }
+    ],
+    "trace_level": [
+      {
+        "id": "goal_completion",
+        "type": "llm_as_judge",
+        "criteria": "User goal is satisfied and conversation ends politely."
+      }
+    ]
+  }
+}

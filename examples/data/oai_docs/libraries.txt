@@ -139,7 +139,7 @@ Please note that OpenAI does not verify the correctness or security of these pro
 
 ### Julia
 
--   [OpenAI.jl](https://github.com/rory-linehan/OpenAI.jl) by [rory-linehan](https://github.com/rory-linehan)
+-   [OpenAI.jl](https://github.com/JuliaML/OpenAI.jl) by [the JuliaML community](https://github.com/JuliaML)
 
 ### Kotlin
 

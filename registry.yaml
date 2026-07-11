@@ -4,6 +4,20 @@
 # should build pages for, and indicates metadata such as tags, creation date and
 # authors for each page.
 
+- title: Adding a trust layer around Responses API agent calls
+  path: examples/agents/trust_layer_responses_api_agents.ipynb
+  slug: trust-layer-responses-api-agent-calls
+  description: Wrap a Responses API tool-calling loop with deterministic tool policy, HITL escalation, and traceable audit evidence using Pramagent.
+  date: 2026-06-16
+  authors:
+    - sriram7737
+  tags:
+    - responses
+    - agents
+    - guardrails
+    - tools
+    - tracing
+
 - title: Trigger a Workspace Agent from the API
   path: examples/chatgpt/workspace_agents/workspace-agents-api-trigger.ipynb
   slug: workspace-agents-api-trigger

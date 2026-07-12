@@ -17,24 +17,27 @@ concurrency:
 jobs:
   deploy:
     runs-on: ubuntu-latest
-    timeout-minutes: 20
+    timeout-minutes: 30
     environment: NOMINALIA_FTP_PASSWORD
     env:
       FTP_HOST: elcidt.ftp.tb-hosting.com
       FTP_USER: elcidspaincom@elcidspaincom
       FTP_PASSWORD: ${{ secrets.NOMINALIA_FTP_PASSWORD || secrets.NOMINALIAFTPPASSWORD }}
       PREVIEW_DRIVE_ID: 1AIMUmuLsfidwjUhgMODGLEQYvMl4C_a3
+      SOURCE_DRIVE_ID: 1L8oePUeTfB0EFXhyXW3J6R82LF2ob6tt
       FTP_TARGET: /www/aumara
-      PAGE_URL: https://elcidspain.com/aumara/video-preview.html
-      VIDEO_URL: https://elcidspain.com/aumara/media/AUMARA_walkthrough_preview_v1.mp4
+      PAGE_URL: https://elcidspain.com/aumara/
+      NODE_URL: https://elcidspain.com/aumara/media/nodes/node-01.mp4
+      BEDS24_URL: https://beds24.com/booking2.php?propid=324882
+
     steps:
       - name: Checkout
         uses: actions/checkout@v4
 
-      - name: Install deployment tools
+      - name: Install deployment and media tools
         run: |
           sudo apt-get update
-          sudo apt-get install -y lftp
+          sudo apt-get install -y lftp ffmpeg
           python -m pip install --disable-pip-version-check gdown
 
       - name: Validate FTP secret
@@ -54,41 +57,62 @@ jobs:
           printf 'AUMARA write test %s\n' "$(date -u +%FT%TZ)" > /tmp/aumara-write-test.txt
           lftp -u "$FTP_USER","$FTP_PASSWORD" "$FTP_HOST" -e "set cmd:fail-exit yes; set ftp:ssl-allow no; set ftp:passive-mode yes; cd $FTP_TARGET; put /tmp/aumara-write-test.txt -o .aumara-write-test.txt; cls -l .aumara-write-test.txt; rm .aumara-write-test.txt; bye"
 
-      - name: Download ready walkthrough MP4
+      - name: Download ready walkthrough preview
         shell: bash
         run: |
           set -euo pipefail
           mkdir -p aumara-site/media
           gdown "$PREVIEW_DRIVE_ID" -O aumara-site/media/AUMARA_walkthrough_preview_v1.mp4
           test -s aumara-site/media/AUMARA_walkthrough_preview_v1.mp4
-          test "$(stat -c%s aumara-site/media/AUMARA_walkthrough_preview_v1.mp4)" -gt 5000000
-          file aumara-site/media/AUMARA_walkthrough_preview_v1.mp4
 
-      - name: Upload AUMARA site and video
+      - name: Build interactive walkthrough points
+        shell: bash
+        run: |
+          set -euo pipefail
+          gdown "$SOURCE_DRIVE_ID" -O /tmp/IMG_8063.MOV
+          test -s /tmp/IMG_8063.MOV
+          chmod +x aumara-site/scripts/build_walkthrough_nodes.sh
+          aumara-site/scripts/build_walkthrough_nodes.sh /tmp/IMG_8063.MOV aumara-site/media/nodes
+          test -s aumara-site/media/nodes/node-01.mp4
+          test -s aumara-site/media/nodes/node-08.mp4
+          test -s aumara-site/media/nodes/manifest.json
+
+      - name: Upload complete AUMARA site
         shell: bash
         run: |
           set -euo pipefail
           lftp -u "$FTP_USER","$FTP_PASSWORD" "$FTP_HOST" -e "set cmd:fail-exit yes; set ftp:ssl-allow no; set ftp:passive-mode yes; mirror --reverse --verbose --parallel=2 --no-perms --exclude-glob scripts/ ./aumara-site/ $FTP_TARGET/; bye"
 
-      - name: Verify uploaded files on FTP
+      - name: Verify uploaded interactive files on FTP
         shell: bash
         run: |
           set -euo pipefail
-          lftp -u "$FTP_USER","$FTP_PASSWORD" "$FTP_HOST" -e "set cmd:fail-exit yes; set ftp:ssl-allow no; set ftp:passive-mode yes; cls -l $FTP_TARGET/video-preview.html; cls -l $FTP_TARGET/media/AUMARA_walkthrough_preview_v1.mp4; bye"
+          lftp -u "$FTP_USER","$FTP_PASSWORD" "$FTP_HOST" -e "set cmd:fail-exit yes; set ftp:ssl-allow no; set ftp:passive-mode yes; cls -l $FTP_TARGET/index.html; cls -l $FTP_TARGET/media/nodes/node-01.mp4; cls -l $FTP_TARGET/media/nodes/node-08.mp4; cls -l $FTP_TARGET/media/nodes/manifest.json; bye"
 
-      - name: Verify public page and MP4
+      - name: Verify public site and first movement point
         id: external
         shell: bash
         run: |
           set -euo pipefail
-          page_code="$(curl -sS -L -o /dev/null -w '%{http_code}' --max-time 30 --retry 3 --retry-delay 5 "$PAGE_URL")"
-          video_code="$(curl -sS -L -o /dev/null -w '%{http_code}' --max-time 60 --retry 3 --retry-delay 5 -r 0-1023 "$VIDEO_URL")"
+          page_code="$(curl -sS -L -o /dev/null -w '%{http_code}' --max-time 45 --retry 4 --retry-delay 5 "$PAGE_URL")"
+          node_code="$(curl -sS -L -o /dev/null -w '%{http_code}' --max-time 60 --retry 4 --retry-delay 5 -r 0-2047 "$NODE_URL")"
           echo "page_code=$page_code" >> "$GITHUB_OUTPUT"
-          echo "video_code=$video_code" >> "$GITHUB_OUTPUT"
-          echo "Public page HTTP: $page_code"
-          echo "Public video HTTP: $video_code"
+          echo "node_code=$node_code" >> "$GITHUB_OUTPUT"
+          echo "Public AUMARA HTTP: $page_code"
+          echo "Movement node HTTP: $node_code"
           test "$page_code" = "200"
-          case "$video_code" in 200|206) ;; *) exit 1 ;; esac
+          case "$node_code" in 200|206) ;; *) exit 1 ;; esac
+
+      - name: Check Beds24 direct booking endpoint
+        id: beds24
+        continue-on-error: true
+        shell: bash
+        run: |
+          set -euo pipefail
+          beds24_code="$(curl -sS -L -o /dev/null -w '%{http_code}' --max-time 45 --retry 2 --retry-delay 4 "$BEDS24_URL")"
+          echo "code=$beds24_code" >> "$GITHUB_OUTPUT"
+          echo "Beds24 direct booking HTTP: $beds24_code"
+          case "$beds24_code" in 200|201|202|204|301|302|303|307|308) ;; *) exit 1 ;; esac
 
       - name: Deployment summary
         if: always()
@@ -99,6 +123,7 @@ jobs:
             echo ""
             echo "- Commit: \`${GITHUB_SHA}\`"
             echo "- FTP target: \`${FTP_TARGET}\`"
-            echo "- Page HTTP: \`${{ steps.external.outputs.page_code || 'not_run' }}\`"
-            echo "- Video HTTP: \`${{ steps.external.outputs.video_code || 'not_run' }}\`"
+            echo "- Main page HTTP: \`${{ steps.external.outputs.page_code || 'not_run' }}\`"
+            echo "- Walkthrough node HTTP: \`${{ steps.external.outputs.node_code || 'not_run' }}\`"
+            echo "- Beds24 endpoint HTTP: \`${{ steps.beds24.outputs.code || 'not_run' }}\`"
           } >> "$GITHUB_STEP_SUMMARY"

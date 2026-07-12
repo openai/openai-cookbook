@@ -1,4 +1,4 @@
-timestamp_utc=2026-07-12T01:47:15Z
+timestamp_utc=2026-07-12T01:52:02Z
 username=elcidspaincom@elcidspaincom
 secret=present
 candidate_elcids_ftp_tb_hosting_com_dns=failed
@@ -9,8 +9,7 @@ candidate_elcidt_ftp_tb_hosting_com_root=ok
 selected_server=elcidt.ftp.tb-hosting.com
 www_curl_code=0
 www=ok
-aumara_curl_code=9
-aumara=failed
-aumara_error=curl: (9) Server denied you to change to the given directory 
-classification=FTP_OK_WWW_EXISTS_AUMARA_MISSING
+aumara_curl_code=0
+aumara=ok
+classification=FTP_OK_WWW_AUMARA_EXISTS
 server_dir=/www/aumara/

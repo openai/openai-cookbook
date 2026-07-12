@@ -1,0 +1,10 @@
+timestamp_utc=2026-07-12T14:14:47Z
+commit=b8c9d5961e78c3cd9a2004bb14f12fdafce4c9d0
+job_status=failure
+ftp_host=elcidt.ftp.tb-hosting.com
+ftp_user=elcidspaincom@elcidspaincom
+ftp_target=/www/aumara
+page_url=https://elcidspain.com/aumara/video-preview.html
+page_http=404
+video_url=https://elcidspain.com/aumara/media/AUMARA_walkthrough_preview_v1.mp4
+video_http=404

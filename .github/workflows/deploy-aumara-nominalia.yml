@@ -16,14 +16,13 @@ jobs:
     runs-on: ubuntu-latest
     environment: NOMINALIA_FTP_PASSWORD
     env:
-      FTP_SERVER: elcids.ftp.tb-hosting.com
       FTP_USERNAME: elcidspaincom@elcidspaincom
       FTP_PASSWORD: ${{ secrets.NOMINALIA_FTP_PASSWORD || secrets.NOMINALIAFTPPASSWORD }}
     steps:
       - name: Checkout repository
         uses: actions/checkout@v4
 
-      - name: Diagnose Nominalia FTP without exposing the password
+      - name: Diagnose Nominalia FTP endpoints without exposing the password
         id: ftp_diag
         shell: bash
         run: |
@@ -32,7 +31,6 @@ jobs:
           RESULT_FILE="diagnostics/nominalia-ftp.txt"
           {
             echo "timestamp_utc=$(date -u +%Y-%m-%dT%H:%M:%SZ)"
-            echo "server=$FTP_SERVER"
             echo "username=$FTP_USERNAME"
           } > "$RESULT_FILE"
 
@@ -45,77 +43,98 @@ jobs:
           fi
           echo "secret=present" >> "$RESULT_FILE"
 
-          if getent ahostsv4 "$FTP_SERVER" > /tmp/ftp_dns.txt 2>/tmp/ftp_dns_err.txt; then
-            echo "dns=ok" >> "$RESULT_FILE"
-            head -n 1 /tmp/ftp_dns.txt | awk '{print "resolved_ip=" $1}' >> "$RESULT_FILE"
-          else
-            echo "dns=failed" >> "$RESULT_FILE"
-            echo "classification=DNS_RESOLUTION_FAILED" >> "$RESULT_FILE"
+          CANDIDATES=(
+            "elcids.ftp.tb-hosting.com"
+            "elcidt.ftp.tb-hosting.com"
+            "213.158.94.137"
+          )
+
+          SELECTED=""
+          for HOST in "${CANDIDATES[@]}"; do
+            SAFE_LABEL=$(echo "$HOST" | tr '.-' '__')
+            if [[ "$HOST" =~ ^[0-9]+\.[0-9]+\.[0-9]+\.[0-9]+$ ]]; then
+              echo "candidate_${SAFE_LABEL}_dns=ip_literal" >> "$RESULT_FILE"
+            elif getent ahostsv4 "$HOST" > "/tmp/dns_${SAFE_LABEL}.txt" 2>/dev/null; then
+              echo "candidate_${SAFE_LABEL}_dns=ok" >> "$RESULT_FILE"
+              head -n 1 "/tmp/dns_${SAFE_LABEL}.txt" | awk -v p="candidate_${SAFE_LABEL}_resolved_ip=" '{print p $1}' >> "$RESULT_FILE"
+            else
+              echo "candidate_${SAFE_LABEL}_dns=failed" >> "$RESULT_FILE"
+              continue
+            fi
+
+            curl --silent --show-error --fail --ftp-pasv --connect-timeout 15 --max-time 35 \
+              --user "$FTP_USERNAME:$FTP_PASSWORD" "ftp://$HOST/" --list-only \
+              >"/tmp/root_${SAFE_LABEL}_out.txt" 2>"/tmp/root_${SAFE_LABEL}_err.txt"
+            CODE=$?
+            echo "candidate_${SAFE_LABEL}_root_curl_code=$CODE" >> "$RESULT_FILE"
+            if [ "$CODE" -eq 0 ]; then
+              echo "candidate_${SAFE_LABEL}_root=ok" >> "$RESULT_FILE"
+              SELECTED="$HOST"
+              break
+            else
+              ERR=$(tail -n 1 "/tmp/root_${SAFE_LABEL}_err.txt" | tr '\n' ' ' | sed 's/[[:space:]]\+/ /g')
+              echo "candidate_${SAFE_LABEL}_root=failed" >> "$RESULT_FILE"
+              echo "candidate_${SAFE_LABEL}_error=$ERR" >> "$RESULT_FILE"
+            fi
+          done
+
+          if [ -z "$SELECTED" ]; then
+            echo "classification=NO_WORKING_FTP_ENDPOINT_WITH_CURRENT_USERNAME" >> "$RESULT_FILE"
             echo "deploy_ready=false" >> "$GITHUB_OUTPUT"
-            echo "::error::Nominalia FTP host does not resolve"
+            echo "::error::The GitHub secret is present. None of the known Nominalia FTP endpoints accepted the current FTP username/account."
             exit 0
           fi
 
-          test_ftp_path() {
+          echo "selected_server=$SELECTED" >> "$RESULT_FILE"
+          echo "server=$SELECTED" >> "$GITHUB_OUTPUT"
+
+          test_path() {
             LABEL="$1"
             URL="$2"
-            curl --silent --show-error --fail --ftp-pasv --connect-timeout 20 --max-time 45 \
+            curl --silent --show-error --fail --ftp-pasv --connect-timeout 15 --max-time 35 \
               --user "$FTP_USERNAME:$FTP_PASSWORD" "$URL" --list-only \
-              >/tmp/ftp_${LABEL}_out.txt 2>/tmp/ftp_${LABEL}_err.txt
+              >"/tmp/path_${LABEL}_out.txt" 2>"/tmp/path_${LABEL}_err.txt"
             CODE=$?
             echo "${LABEL}_curl_code=$CODE" >> "$RESULT_FILE"
             if [ "$CODE" -eq 0 ]; then
               echo "${LABEL}=ok" >> "$RESULT_FILE"
             else
+              ERR=$(tail -n 1 "/tmp/path_${LABEL}_err.txt" | tr '\n' ' ' | sed 's/[[:space:]]\+/ /g')
               echo "${LABEL}=failed" >> "$RESULT_FILE"
-              ERROR_LINE=$(tail -n 1 /tmp/ftp_${LABEL}_err.txt | tr '\n' ' ' | sed 's/[[:space:]]\+/ /g')
-              echo "${LABEL}_error=$ERROR_LINE" >> "$RESULT_FILE"
+              echo "${LABEL}_error=$ERR" >> "$RESULT_FILE"
             fi
             return "$CODE"
           }
 
-          test_ftp_path root "ftp://$FTP_SERVER/"
-          ROOT_CODE=$?
-
-          if [ "$ROOT_CODE" -eq 67 ]; then
-            echo "classification=FTP_LOGIN_DENIED_USERNAME_OR_ACCOUNT" >> "$RESULT_FILE"
-            echo "deploy_ready=false" >> "$GITHUB_OUTPUT"
-            echo "::error::FTP login denied. The secret is present; verify the FTP username/account, not GitHub secret creation."
-            exit 0
-          elif [ "$ROOT_CODE" -eq 6 ]; then
-            echo "classification=DNS_RESOLUTION_FAILED" >> "$RESULT_FILE"
-            echo "deploy_ready=false" >> "$GITHUB_OUTPUT"
-            exit 0
-          elif [ "$ROOT_CODE" -eq 7 ] || [ "$ROOT_CODE" -eq 28 ]; then
-            echo "classification=FTP_CONNECTION_FAILED" >> "$RESULT_FILE"
-            echo "deploy_ready=false" >> "$GITHUB_OUTPUT"
-            echo "::error::FTP server could not be reached"
-            exit 0
-          elif [ "$ROOT_CODE" -ne 0 ]; then
-            echo "classification=FTP_ROOT_ACCESS_FAILED" >> "$RESULT_FILE"
-            echo "deploy_ready=false" >> "$GITHUB_OUTPUT"
-            echo "::error::FTP connection reached the server but root listing failed"
-            exit 0
-          fi
-
-          test_ftp_path www "ftp://$FTP_SERVER/www/"
+          test_path www "ftp://$SELECTED/www/"
           WWW_CODE=$?
-          test_ftp_path aumara "ftp://$FTP_SERVER/www/aumara/"
+          test_path aumara "ftp://$SELECTED/www/aumara/"
           AUMARA_CODE=$?
 
           if [ "$AUMARA_CODE" -eq 0 ]; then
             echo "classification=FTP_OK_WWW_AUMARA_EXISTS" >> "$RESULT_FILE"
             echo "server_dir=/www/aumara/" >> "$RESULT_FILE"
+            echo "server_dir=/www/aumara/" >> "$GITHUB_OUTPUT"
             echo "deploy_ready=true" >> "$GITHUB_OUTPUT"
           elif [ "$WWW_CODE" -eq 0 ]; then
             echo "classification=FTP_OK_WWW_EXISTS_AUMARA_MISSING" >> "$RESULT_FILE"
             echo "server_dir=/www/aumara/" >> "$RESULT_FILE"
+            echo "server_dir=/www/aumara/" >> "$GITHUB_OUTPUT"
             echo "deploy_ready=true" >> "$GITHUB_OUTPUT"
           else
-            echo "classification=FTP_LOGIN_OK_BUT_WWW_PATH_INVALID" >> "$RESULT_FILE"
-            echo "server_dir=unverified" >> "$RESULT_FILE"
-            echo "deploy_ready=false" >> "$GITHUB_OUTPUT"
-            echo "::error::FTP login works, but /www/aumara/ is not the verified remote path"
+            test_path root_aumara "ftp://$SELECTED/aumara/"
+            ROOT_AUMARA_CODE=$?
+            if [ "$ROOT_AUMARA_CODE" -eq 0 ]; then
+              echo "classification=FTP_OK_ROOT_AUMARA_EXISTS" >> "$RESULT_FILE"
+              echo "server_dir=/aumara/" >> "$RESULT_FILE"
+              echo "server_dir=/aumara/" >> "$GITHUB_OUTPUT"
+              echo "deploy_ready=true" >> "$GITHUB_OUTPUT"
+            else
+              echo "classification=FTP_LOGIN_OK_REMOTE_PATH_UNVERIFIED" >> "$RESULT_FILE"
+              echo "server_dir=unverified" >> "$RESULT_FILE"
+              echo "deploy_ready=false" >> "$GITHUB_OUTPUT"
+              echo "::error::FTP login works, but neither /www/aumara/ nor /aumara/ is a verified remote path"
+            fi
           fi
 
       - name: Save sanitized FTP diagnostic
@@ -132,10 +151,10 @@ jobs:
         if: steps.ftp_diag.outputs.deploy_ready == 'true'
         uses: SamKirkland/FTP-Deploy-Action@v4.3.5
         with:
-          server: ${{ env.FTP_SERVER }}
+          server: ${{ steps.ftp_diag.outputs.server }}
           username: ${{ env.FTP_USERNAME }}
           password: ${{ env.FTP_PASSWORD }}
           protocol: ftp
           local-dir: ./aumara-site/
-          server-dir: /www/aumara/
+          server-dir: ${{ steps.ftp_diag.outputs.server_dir }}
           dangerous-clean-slate: false

@@ -1,0 +1,6 @@
+timestamp_utc=2026-07-12T01:04:15Z
+server=elcids.ftp.tb-hosting.com
+username=elcidspaincom@elcidspaincom
+secret=present
+dns=failed
+classification=DNS_RESOLUTION_FAILED

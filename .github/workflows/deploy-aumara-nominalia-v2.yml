@@ -17,6 +17,7 @@ jobs:
       FTP_USER: elcidspaincom@elcidspaincom
       FTP_PASSWORD: ${{ secrets.NOMINALIA_FTP_PASSWORD || secrets.NOMINALIAFTPPASSWORD }}
       PREVIEW_DRIVE_ID: 1AIMUmuLsfidwjUhgMODGLEQYvMl4C_a3
+      FTP_TARGET: /aumara
     steps:
       - name: Checkout
         uses: actions/checkout@v4
@@ -31,32 +32,18 @@ jobs:
         run: |
           test -n "$FTP_PASSWORD" || { echo "NOMINALIA FTP password secret is empty"; exit 1; }
 
-      - name: Connect and identify web root
-        id: remote
+      - name: Connect to confirmed FTP root
         shell: bash
         run: |
           set -euo pipefail
-          lftp -u "$FTP_USER","$FTP_PASSWORD" "$FTP_HOST" -e "set cmd:fail-exit yes; set ftp:ssl-allow no; set ftp:passive-mode yes; cls -la /; bye"
+          lftp -u "$FTP_USER","$FTP_PASSWORD" "$FTP_HOST" -e "set cmd:fail-exit yes; set ftp:ssl-allow no; set ftp:passive-mode yes; pwd; cls -la /; bye"
 
-          BASE=""
-          for candidate in /www /public_html /htdocs; do
-            if lftp -u "$FTP_USER","$FTP_PASSWORD" "$FTP_HOST" -e "set cmd:fail-exit yes; set ftp:ssl-allow no; set ftp:passive-mode yes; cd $candidate; bye" >/dev/null 2>&1; then
-              BASE="$candidate"
-              break
-            fi
-          done
-
-          TARGET="${BASE}/aumara"
-          [ -n "$BASE" ] || TARGET="/aumara"
-          echo "target=$TARGET" >> "$GITHUB_OUTPUT"
-          echo "Selected remote target: $TARGET"
-
-      - name: Prove remote write access
+      - name: Prove remote write access in AUMARA folder
         shell: bash
         run: |
           set -euo pipefail
           printf 'AUMARA write test %s\n' "$(date -u +%FT%TZ)" > /tmp/aumara-write-test.txt
-          lftp -u "$FTP_USER","$FTP_PASSWORD" "$FTP_HOST" -e "set cmd:fail-exit yes; set ftp:ssl-allow no; set ftp:passive-mode yes; mkdir -p '${{ steps.remote.outputs.target }}'; cd '${{ steps.remote.outputs.target }}'; put /tmp/aumara-write-test.txt -o .aumara-write-test.txt; cls -l .aumara-write-test.txt; rm .aumara-write-test.txt; bye"
+          lftp -u "$FTP_USER","$FTP_PASSWORD" "$FTP_HOST" -e "set cmd:fail-exit yes; set ftp:ssl-allow no; set ftp:passive-mode yes; mkdir -p $FTP_TARGET; cd $FTP_TARGET; put /tmp/aumara-write-test.txt -o .aumara-write-test.txt; cls -l .aumara-write-test.txt; rm .aumara-write-test.txt; bye"
 
       - name: Download ready walkthrough MP4
         shell: bash
@@ -72,13 +59,13 @@ jobs:
         shell: bash
         run: |
           set -euo pipefail
-          lftp -u "$FTP_USER","$FTP_PASSWORD" "$FTP_HOST" -e "set cmd:fail-exit yes; set ftp:ssl-allow no; set ftp:passive-mode yes; mirror --reverse --verbose --parallel=2 --no-perms --exclude-glob scripts/ ./aumara-site/ '${{ steps.remote.outputs.target }}/'; bye"
+          lftp -u "$FTP_USER","$FTP_PASSWORD" "$FTP_HOST" -e "set cmd:fail-exit yes; set ftp:ssl-allow no; set ftp:passive-mode yes; mirror --reverse --verbose --parallel=2 --no-perms --exclude-glob scripts/ ./aumara-site/ $FTP_TARGET/; bye"
 
       - name: Verify uploaded files
         shell: bash
         run: |
           set -euo pipefail
-          lftp -u "$FTP_USER","$FTP_PASSWORD" "$FTP_HOST" -e "set cmd:fail-exit yes; set ftp:ssl-allow no; set ftp:passive-mode yes; cls -l '${{ steps.remote.outputs.target }}/video-preview.html'; cls -l '${{ steps.remote.outputs.target }}/media/AUMARA_walkthrough_preview_v1.mp4'; bye"
+          lftp -u "$FTP_USER","$FTP_PASSWORD" "$FTP_HOST" -e "set cmd:fail-exit yes; set ftp:ssl-allow no; set ftp:passive-mode yes; cls -l $FTP_TARGET/video-preview.html; cls -l $FTP_TARGET/media/AUMARA_walkthrough_preview_v1.mp4; bye"
 
       - name: External URL check
         continue-on-error: true

@@ -10,16 +10,77 @@ on:
 jobs:
   deploy:
     runs-on: ubuntu-latest
+    timeout-minutes: 30
     environment: NOMINALIA_FTP_PASSWORD
+    env:
+      FTP_HOST: elcidt.ftp.tb-hosting.com
+      FTP_USER: elcidspaincom@elcidspaincom
+      FTP_PASSWORD: ${{ secrets.NOMINALIA_FTP_PASSWORD || secrets.NOMINALIAFTPPASSWORD }}
     steps:
-      - uses: actions/checkout@v4
-      - name: Deploy AUMARA
-        uses: SamKirkland/FTP-Deploy-Action@v4.3.5
-        with:
-          server: elcidt.ftp.tb-hosting.com
-          username: ID29270161-NOMI
-          password: ${{ secrets.NOMINALIA_FTP_PASSWORD || secrets.NOMINALIAFTPPASSWORD }}
-          protocol: ftp
-          local-dir: ./aumara-site/
-          server-dir: /www/aumara/
-          dangerous-clean-slate: false
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Install deployment tools
+        run: |
+          sudo apt-get update
+          sudo apt-get install -y lftp ffmpeg
+          python -m pip install --disable-pip-version-check gdown
+
+      - name: Validate secret
+        run: |
+          test -n "$FTP_PASSWORD" || { echo "NOMINALIA FTP password secret is empty"; exit 1; }
+
+      - name: Build lightweight walkthrough MP4
+        run: |
+          mkdir -p aumara-site/media
+          gdown --id 1L8oePUeTfB0EFXhyXW3J6R82LF2ob6tt -O /tmp/IMG_8063.MOV
+          test -s /tmp/IMG_8063.MOV
+          chmod +x aumara-site/scripts/build_walkthrough_preview.sh
+          aumara-site/scripts/build_walkthrough_preview.sh \
+            /tmp/IMG_8063.MOV \
+            aumara-site/media/AUMARA_walkthrough_preview_v1.mp4
+          test -s aumara-site/media/AUMARA_walkthrough_preview_v1.mp4
+
+      - name: Connect and identify web root
+        id: remote
+        shell: bash
+        run: |
+          set -euo pipefail
+          lftp -u "$FTP_USER","$FTP_PASSWORD" "$FTP_HOST" -e "set cmd:fail-exit yes; set ftp:ssl-allow no; set ftp:passive-mode yes; cls -la /; bye"
+
+          BASE=""
+          for candidate in /public_html /www /htdocs; do
+            if lftp -u "$FTP_USER","$FTP_PASSWORD" "$FTP_HOST" -e "set cmd:fail-exit yes; set ftp:ssl-allow no; set ftp:passive-mode yes; cd $candidate; bye" >/dev/null 2>&1; then
+              BASE="$candidate"
+              break
+            fi
+          done
+
+          TARGET="${BASE}/aumara"
+          [ -n "$BASE" ] || TARGET="/aumara"
+          echo "target=$TARGET" >> "$GITHUB_OUTPUT"
+          echo "Selected remote target: $TARGET"
+
+      - name: Prove remote write access
+        shell: bash
+        run: |
+          set -euo pipefail
+          printf 'AUMARA write test %s\n' "$(date -u +%FT%TZ)" > /tmp/aumara-write-test.txt
+          lftp -u "$FTP_USER","$FTP_PASSWORD" "$FTP_HOST" -e "set cmd:fail-exit yes; set ftp:ssl-allow no; set ftp:passive-mode yes; mkdir -p '${{ steps.remote.outputs.target }}'; cd '${{ steps.remote.outputs.target }}'; put /tmp/aumara-write-test.txt -o .aumara-write-test.txt; cls -l .aumara-write-test.txt; rm .aumara-write-test.txt; bye"
+
+      - name: Upload AUMARA site and video
+        shell: bash
+        run: |
+          set -euo pipefail
+          lftp -u "$FTP_USER","$FTP_PASSWORD" "$FTP_HOST" -e "set cmd:fail-exit yes; set ftp:ssl-allow no; set ftp:passive-mode yes; mirror --reverse --verbose --parallel=2 --no-perms --exclude-glob scripts/ ./aumara-site/ '${{ steps.remote.outputs.target }}/'; bye"
+
+      - name: Verify uploaded files
+        shell: bash
+        run: |
+          set -euo pipefail
+          lftp -u "$FTP_USER","$FTP_PASSWORD" "$FTP_HOST" -e "set cmd:fail-exit yes; set ftp:ssl-allow no; set ftp:passive-mode yes; cls -l '${{ steps.remote.outputs.target }}/video-preview.html'; cls -l '${{ steps.remote.outputs.target }}/media/AUMARA_walkthrough_preview_v1.mp4'; bye"
+
+      - name: External URL check
+        continue-on-error: true
+        run: |
+          curl -I --max-time 30 --retry 3 --retry-delay 5 https://elcidspain.com/aumara/video-preview.html

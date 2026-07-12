@@ -1,0 +1,68 @@
+name: Deploy EL CID main site to Nominalia
+
+on:
+  workflow_dispatch:
+  push:
+    branches: [main]
+    paths:
+      - 'elcid-site/**'
+      - '.github/workflows/deploy-elcid-nominalia.yml'
+
+permissions:
+  contents: read
+
+concurrency:
+  group: elcid-nominalia-root
+  cancel-in-progress: true
+
+jobs:
+  deploy:
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+    environment: NOMINALIA_FTP_PASSWORD
+    env:
+      FTP_HOST: elcidt.ftp.tb-hosting.com
+      FTP_USER: elcidspaincom@elcidspaincom
+      FTP_PASSWORD: ${{ secrets.NOMINALIA_FTP_PASSWORD || secrets.NOMINALIAFTPPASSWORD }}
+      ROOT_TARGET: /www
+      PAGE_URL: https://elcidspain.com/
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Install FTP client
+        run: |
+          sudo apt-get update
+          sudo apt-get install -y lftp
+
+      - name: Validate FTP secret
+        run: |
+          test -n "$FTP_PASSWORD" || { echo "NOMINALIA FTP password secret is empty"; exit 1; }
+
+      - name: Upload EL CID root page
+        shell: bash
+        run: |
+          set -euo pipefail
+          test -s elcid-site/index.html
+          lftp -u "$FTP_USER","$FTP_PASSWORD" "$FTP_HOST" -e "set cmd:fail-exit yes; set ftp:ssl-allow no; set ftp:passive-mode yes; cd $ROOT_TARGET; put elcid-site/index.html -o index.html; cls -l index.html; bye"
+
+      - name: Verify public root page
+        id: external
+        shell: bash
+        run: |
+          set -euo pipefail
+          code="$(curl -sS -L -o /dev/null -w '%{http_code}' --max-time 45 --retry 4 --retry-delay 5 "$PAGE_URL")"
+          echo "code=$code" >> "$GITHUB_OUTPUT"
+          echo "EL CID public HTTP: $code"
+          test "$code" = "200"
+
+      - name: Deployment summary
+        if: always()
+        run: |
+          {
+            echo "## EL CID main site deployment"
+            echo ""
+            echo "- Commit: \`${GITHUB_SHA}\`"
+            echo "- FTP target: \`${ROOT_TARGET}/index.html\`"
+            echo "- Public HTTP: \`${{ steps.external.outputs.code || 'not_run' }}\`"
+          } >> "$GITHUB_STEP_SUMMARY"

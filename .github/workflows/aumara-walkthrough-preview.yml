@@ -1,0 +1,65 @@
+name: Build AUMARA walkthrough preview
+
+on:
+  workflow_dispatch:
+  push:
+    paths:
+      - 'aumara-site/scripts/build_walkthrough_preview.sh'
+      - '.github/workflows/aumara-walkthrough-preview.yml'
+
+permissions:
+  contents: write
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    timeout-minutes: 30
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+
+      - name: Install downloader
+        run: python -m pip install --disable-pip-version-check gdown
+
+      - name: Download real AUMARA walkthrough source
+        run: |
+          gdown --id 1L8oePUeTfB0EFXhyXW3J6R82LF2ob6tt -O /tmp/IMG_8063.MOV
+          test -s /tmp/IMG_8063.MOV
+
+      - name: Build lightweight point-to-point MP4
+        run: |
+          chmod +x aumara-site/scripts/build_walkthrough_preview.sh
+          aumara-site/scripts/build_walkthrough_preview.sh \
+            /tmp/IMG_8063.MOV \
+            aumara-site/media/AUMARA_walkthrough_preview_v1.mp4
+
+      - name: Verify playable output
+        run: |
+          test -s aumara-site/media/AUMARA_walkthrough_preview_v1.mp4
+          ffprobe -v error \
+            -show_entries format=duration,size \
+            -show_entries stream=codec_name,width,height \
+            -of json \
+            aumara-site/media/AUMARA_walkthrough_preview_v1.mp4
+
+      - name: Upload preview artifact
+        uses: actions/upload-artifact@v4
+        with:
+          name: AUMARA-walkthrough-preview-v1
+          path: aumara-site/media/AUMARA_walkthrough_preview_v1.mp4
+          if-no-files-found: error
+          retention-days: 30
+
+      - name: Commit playable MP4 to repository
+        run: |
+          git config user.name "AUMARA Control Tower"
+          git config user.email "elcidspain@gmail.com"
+          git add aumara-site/media/AUMARA_walkthrough_preview_v1.mp4
+          if git diff --cached --quiet; then
+            echo "Preview already current"
+          else
+            git commit -m "Add playable AUMARA walkthrough preview [skip ci]"
+            git push
+          fi

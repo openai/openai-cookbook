@@ -7,6 +7,9 @@ on:
     paths:
       - 'aumara-site/**'
 
+permissions:
+  contents: write
+
 jobs:
   deploy:
     runs-on: ubuntu-latest
@@ -17,7 +20,9 @@ jobs:
       FTP_USER: elcidspaincom@elcidspaincom
       FTP_PASSWORD: ${{ secrets.NOMINALIA_FTP_PASSWORD || secrets.NOMINALIAFTPPASSWORD }}
       PREVIEW_DRIVE_ID: 1AIMUmuLsfidwjUhgMODGLEQYvMl4C_a3
-      FTP_TARGET: /aumara
+      FTP_TARGET: /www/aumara
+      PAGE_URL: https://elcidspain.com/aumara/video-preview.html
+      VIDEO_URL: https://elcidspain.com/aumara/media/AUMARA_walkthrough_preview_v1.mp4
     steps:
       - name: Checkout
         uses: actions/checkout@v4
@@ -38,12 +43,12 @@ jobs:
           set -euo pipefail
           lftp -u "$FTP_USER","$FTP_PASSWORD" "$FTP_HOST" -e "set cmd:fail-exit yes; set ftp:ssl-allow no; set ftp:passive-mode yes; pwd; cls -la /; bye"
 
-      - name: Prove remote write access in AUMARA folder
+      - name: Prove remote write access in confirmed web folder
         shell: bash
         run: |
           set -euo pipefail
           printf 'AUMARA write test %s\n' "$(date -u +%FT%TZ)" > /tmp/aumara-write-test.txt
-          lftp -u "$FTP_USER","$FTP_PASSWORD" "$FTP_HOST" -e "set cmd:fail-exit yes; set ftp:ssl-allow no; set ftp:passive-mode yes; mkdir -p $FTP_TARGET; cd $FTP_TARGET; put /tmp/aumara-write-test.txt -o .aumara-write-test.txt; cls -l .aumara-write-test.txt; rm .aumara-write-test.txt; bye"
+          lftp -u "$FTP_USER","$FTP_PASSWORD" "$FTP_HOST" -e "set cmd:fail-exit yes; set ftp:ssl-allow no; set ftp:passive-mode yes; cd $FTP_TARGET; put /tmp/aumara-write-test.txt -o .aumara-write-test.txt; cls -l .aumara-write-test.txt; rm .aumara-write-test.txt; bye"
 
       - name: Download ready walkthrough MP4
         shell: bash
@@ -61,13 +66,52 @@ jobs:
           set -euo pipefail
           lftp -u "$FTP_USER","$FTP_PASSWORD" "$FTP_HOST" -e "set cmd:fail-exit yes; set ftp:ssl-allow no; set ftp:passive-mode yes; mirror --reverse --verbose --parallel=2 --no-perms --exclude-glob scripts/ ./aumara-site/ $FTP_TARGET/; bye"
 
-      - name: Verify uploaded files
+      - name: Verify uploaded files on FTP
         shell: bash
         run: |
           set -euo pipefail
           lftp -u "$FTP_USER","$FTP_PASSWORD" "$FTP_HOST" -e "set cmd:fail-exit yes; set ftp:ssl-allow no; set ftp:passive-mode yes; cls -l $FTP_TARGET/video-preview.html; cls -l $FTP_TARGET/media/AUMARA_walkthrough_preview_v1.mp4; bye"
 
-      - name: External URL check
-        continue-on-error: true
+      - name: Verify public page and MP4
+        id: external
+        shell: bash
         run: |
-          curl -I --max-time 30 --retry 3 --retry-delay 5 https://elcidspain.com/aumara/video-preview.html
+          set -euo pipefail
+          page_code="$(curl -sS -L -o /dev/null -w '%{http_code}' --max-time 30 --retry 3 --retry-delay 5 "$PAGE_URL")"
+          video_code="$(curl -sS -L -o /dev/null -w '%{http_code}' --max-time 60 --retry 3 --retry-delay 5 -r 0-1023 "$VIDEO_URL")"
+          echo "page_code=$page_code" >> "$GITHUB_OUTPUT"
+          echo "video_code=$video_code" >> "$GITHUB_OUTPUT"
+          echo "Public page HTTP: $page_code"
+          echo "Public video HTTP: $video_code"
+          test "$page_code" = "200"
+          case "$video_code" in 200|206) ;; *) exit 1 ;; esac
+
+      - name: Record deploy status
+        if: always()
+        shell: bash
+        run: |
+          set -euo pipefail
+          page_code='${{ steps.external.outputs.page_code }}'
+          video_code='${{ steps.external.outputs.video_code }}'
+          [ -n "$page_code" ] || page_code=not_run
+          [ -n "$video_code" ] || video_code=not_run
+          job_status='${{ job.status }}'
+          mkdir -p diagnostics
+          cat > diagnostics/nominalia-deploy-status.txt <<EOF
+          timestamp_utc=$(date -u +%FT%TZ)
+          commit=${GITHUB_SHA}
+          job_status=${job_status}
+          ftp_host=${FTP_HOST}
+          ftp_user=${FTP_USER}
+          ftp_target=${FTP_TARGET}
+          page_url=${PAGE_URL}
+          page_http=${page_code}
+          video_url=${VIDEO_URL}
+          video_http=${video_code}
+          EOF
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git add diagnostics/nominalia-deploy-status.txt
+          git commit -m "Record Nominalia deploy result [skip ci]" || exit 0
+          git pull --rebase origin main
+          git push origin HEAD:main

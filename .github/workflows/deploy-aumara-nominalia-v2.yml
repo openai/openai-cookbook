@@ -63,7 +63,7 @@ jobs:
         run: |
           set -euo pipefail
           mkdir -p aumara-site/media
-          gdown --id "$PREVIEW_DRIVE_ID" -O aumara-site/media/AUMARA_walkthrough_preview_v1.mp4
+          gdown "$PREVIEW_DRIVE_ID" -O aumara-site/media/AUMARA_walkthrough_preview_v1.mp4
           test -s aumara-site/media/AUMARA_walkthrough_preview_v1.mp4
           test "$(stat -c%s aumara-site/media/AUMARA_walkthrough_preview_v1.mp4)" -gt 5000000
           file aumara-site/media/AUMARA_walkthrough_preview_v1.mp4

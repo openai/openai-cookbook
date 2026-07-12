@@ -72,6 +72,7 @@ Spanish:
 - Direct booking CTA: `https://beds24.com/booking2.php?propid=324882`
 - Do not guess which exact numbered unit is unavailable when that fact is not verified.
 - Use real AUMARA media.
+- Production deployment workflow refreshed after FTP account verification.
 
 ## Build order
 

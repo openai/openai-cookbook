@@ -11,6 +11,9 @@ on:
 jobs:
   deploy:
     runs-on: ubuntu-latest
+    environment: NOMINALIA_FTP_PASSWORD
+    env:
+      FTP_PASSWORD: ${{ secrets.NOMINALIA_FTP_PASSWORD || secrets.NOMINALIAFTPPASSWORD }}
     steps:
       - name: Checkout repository
         uses: actions/checkout@v4
@@ -18,12 +21,10 @@ jobs:
       - name: Check Nominalia FTP secret
         id: ftp_check
         shell: bash
-        env:
-          FTP_PASSWORD: ${{ secrets.NOMINALIA_FTP_PASSWORD }}
         run: |
           if [ -z "$FTP_PASSWORD" ]; then
             echo "ready=false" >> "$GITHUB_OUTPUT"
-            echo "NOMINALIA_FTP_PASSWORD is not configured. Preview remains on GitHub Pages; production was not changed."
+            echo "No Nominalia FTP password was found in the environment. Production was not changed."
           else
             echo "ready=true" >> "$GITHUB_OUTPUT"
           fi
@@ -34,7 +35,7 @@ jobs:
         with:
           server: elcids.ftp.tb-hosting.com
           username: elcidspaincom@elcidspaincom
-          password: ${{ secrets.NOMINALIA_FTP_PASSWORD }}
+          password: ${{ env.FTP_PASSWORD }}
           protocol: ftp
           local-dir: ./aumara-site/
           server-dir: /www/aumara/

@@ -88,6 +88,7 @@ jobs:
 
       - name: Record deploy status
         if: always()
+        continue-on-error: true
         shell: bash
         run: |
           set -euo pipefail
@@ -113,5 +114,5 @@ jobs:
           git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
           git add diagnostics/nominalia-deploy-status.txt
           git commit -m "Record Nominalia deploy result [skip ci]" || exit 0
-          git pull --rebase origin main
-          git push origin HEAD:main
+          git pull --rebase origin main || true
+          git push origin HEAD:main || true

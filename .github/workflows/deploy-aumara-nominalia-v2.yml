@@ -8,7 +8,11 @@ on:
       - 'aumara-site/**'
 
 permissions:
-  contents: write
+  contents: read
+
+concurrency:
+  group: aumara-nominalia-production
+  cancel-in-progress: true
 
 jobs:
   deploy:
@@ -86,33 +90,15 @@ jobs:
           test "$page_code" = "200"
           case "$video_code" in 200|206) ;; *) exit 1 ;; esac
 
-      - name: Record deploy status
+      - name: Deployment summary
         if: always()
-        continue-on-error: true
         shell: bash
         run: |
-          set -euo pipefail
-          page_code='${{ steps.external.outputs.page_code }}'
-          video_code='${{ steps.external.outputs.video_code }}'
-          [ -n "$page_code" ] || page_code=not_run
-          [ -n "$video_code" ] || video_code=not_run
-          job_status='${{ job.status }}'
-          mkdir -p diagnostics
-          cat > diagnostics/nominalia-deploy-status.txt <<EOF
-          timestamp_utc=$(date -u +%FT%TZ)
-          commit=${GITHUB_SHA}
-          job_status=${job_status}
-          ftp_host=${FTP_HOST}
-          ftp_user=${FTP_USER}
-          ftp_target=${FTP_TARGET}
-          page_url=${PAGE_URL}
-          page_http=${page_code}
-          video_url=${VIDEO_URL}
-          video_http=${video_code}
-          EOF
-          git config user.name "github-actions[bot]"
-          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
-          git add diagnostics/nominalia-deploy-status.txt
-          git commit -m "Record Nominalia deploy result [skip ci]" || exit 0
-          git pull --rebase origin main || true
-          git push origin HEAD:main || true
+          {
+            echo "## AUMARA Nominalia deployment"
+            echo ""
+            echo "- Commit: \`${GITHUB_SHA}\`"
+            echo "- FTP target: \`${FTP_TARGET}\`"
+            echo "- Page HTTP: \`${{ steps.external.outputs.page_code || 'not_run' }}\`"
+            echo "- Video HTTP: \`${{ steps.external.outputs.video_code || 'not_run' }}\`"
+          } >> "$GITHUB_STEP_SUMMARY"

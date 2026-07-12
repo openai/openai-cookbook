@@ -1,0 +1,25 @@
+name: Deploy AUMARA to Nominalia v2
+
+on:
+  workflow_dispatch:
+  push:
+    branches: [main]
+    paths:
+      - 'aumara-site/**'
+
+jobs:
+  deploy:
+    runs-on: ubuntu-latest
+    environment: NOMINALIA_FTP_PASSWORD
+    steps:
+      - uses: actions/checkout@v4
+      - name: Deploy AUMARA
+        uses: SamKirkland/FTP-Deploy-Action@v4.3.5
+        with:
+          server: elcidt.ftp.tb-hosting.com
+          username: ID29270161-NOMI
+          password: ${{ secrets.NOMINALIA_FTP_PASSWORD || secrets.NOMINALIAFTPPASSWORD }}
+          protocol: ftp
+          local-dir: ./aumara-site/
+          server-dir: /www/aumara/
+          dangerous-clean-slate: false

@@ -3529,3 +3529,16 @@
   tags:
     - evals
     - promptfoo
+
+- title: Avian magnetoreception as a quantum-computing co-scientist
+  path: examples/avian_magnetoreception_quantum/avian_magnetoreception.ipynb
+  slug: avian-magnetoreception-quantum
+  description: GPT designs a Trotterized radical-pair circuit for the bird "quantum compass", runs it on a simulator against pre-recorded IBM quantum hardware data, interprets the compass-survival sweep, and gives an honest verdict on whether a quantum computer is actually needed.
+  date: 2026-07-08
+  authors:
+    - steps-re
+  tags:
+    - responses
+    - reasoning
+    - agents
+    - science

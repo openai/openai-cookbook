@@ -26,7 +26,7 @@ jobs:
       FTP_PASSWORD: ${{ secrets.NOMINALIA_FTP_PASSWORD || secrets.NOMINALIAFTPPASSWORD }}
       ROOT_TARGET: /www
       PAGE_URL: https://elcidspain.com/
-      PAGE_MARKER: EL CID Country Club — Stay, eat and discover AUMARA on the Costa Blanca
+      PAGE_MARKER: A country club built around the way a place feels.
     steps:
       - name: Checkout
         uses: actions/checkout@v4
@@ -55,22 +55,28 @@ jobs:
         run: |
           set -euo pipefail
           test -s elcid-site/index.html
+          grep -Fq "$PAGE_MARKER" elcid-site/index.html
           cp elcid-site/index.html /tmp/index.php
           lftp -u "$FTP_USER","$FTP_PASSWORD" "$FTP_HOST" -e "set cmd:fail-exit yes; set ftp:ssl-allow no; set ftp:passive-mode yes; cd $ROOT_TARGET; put elcid-site/index.html -o index.html; put /tmp/index.php -o index.php; cls -l index.html; cls -l index.php; bye"
 
-      - name: Verify the new EL CID content, not merely HTTP 200
+      - name: Verify the expanded EL CID release on production
         id: external
         shell: bash
         run: |
           set -euo pipefail
           curl -sS -L --max-time 45 --retry 5 --retry-delay 5 "$PAGE_URL" -o /tmp/elcid-live.html
           code="$(curl -sS -L -o /dev/null -w '%{http_code}' --max-time 45 --retry 3 --retry-delay 5 "$PAGE_URL")"
+          bytes="$(wc -c < /tmp/elcid-live.html | tr -d ' ')"
           echo "code=$code" >> "$GITHUB_OUTPUT"
+          echo "bytes=$bytes" >> "$GITHUB_OUTPUT"
           echo "EL CID public HTTP: $code"
+          echo "EL CID public bytes: $bytes"
           test "$code" = "200"
           grep -Fq "$PAGE_MARKER" /tmp/elcid-live.html
+          grep -Fq 'One place. More than one way to stay.' /tmp/elcid-live.html
           grep -Fq '/aumara/#explore' /tmp/elcid-live.html
-          echo "Verified exact EL CID static release marker and AUMARA walkthrough link."
+          test "$bytes" -gt 30000
+          echo "Verified expanded EL CID root release and AUMARA route."
 
       - name: Deployment summary
         if: always()
@@ -81,6 +87,7 @@ jobs:
             echo "- Commit: \`${GITHUB_SHA}\`"
             echo "- FTP target: \`${ROOT_TARGET}/index.html + index.php\`"
             echo "- Public HTTP: \`${{ steps.external.outputs.code || 'not_run' }}\`"
-            echo "- Content marker: \`verified by exact title\`"
+            echo "- Public bytes: \`${{ steps.external.outputs.bytes || 'not_run' }}\`"
+            echo "- Expanded release marker: \`verified\`"
             echo "- Original WordPress index: \`index-wordpress-original-backup.php\`"
           } >> "$GITHUB_STEP_SUMMARY"

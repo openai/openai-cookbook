@@ -1,1 +1,1 @@
-Beds24 direct token rejected with HTTP 401
+Beds24 refresh authentication failed HTTP 401

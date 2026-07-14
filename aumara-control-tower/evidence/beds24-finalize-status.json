@@ -1,0 +1,11 @@
+{
+  "verified_at_utc": "2026-07-14T23:27:44.234155+00:00",
+  "status": "AUTH_FAILED",
+  "http_status": 401,
+  "response": {
+    "success": false,
+    "type": "error",
+    "code": "[REDACTED]",
+    "error": "Token not valid"
+  }
+}

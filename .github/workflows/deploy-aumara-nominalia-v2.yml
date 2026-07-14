@@ -6,6 +6,7 @@ on:
     branches: [main]
     paths:
       - 'aumara-site/**'
+      - '.github/workflows/deploy-aumara-nominalia-v2.yml'
 
 permissions:
   contents: read
@@ -27,8 +28,10 @@ jobs:
       SOURCE_DRIVE_ID: 1L8oePUeTfB0EFXhyXW3J6R82LF2ob6tt
       FTP_TARGET: /www/aumara
       PAGE_URL: https://elcidspain.com/aumara/
-      NODE_URL: https://elcidspain.com/aumara/media/nodes/node-01.mp4
+      NODE01_URL: https://elcidspain.com/aumara/media/nodes/node-01.mp4
+      NODE08_URL: https://elcidspain.com/aumara/media/nodes/node-08.mp4
       BEDS24_URL: https://beds24.com/booking2.php?propid=324882
+      PAGE_MARKER: Walk the place before you choose the house.
 
     steps:
       - name: Checkout
@@ -73,8 +76,7 @@ jobs:
           test -s /tmp/IMG_8063.MOV
           chmod +x aumara-site/scripts/build_walkthrough_nodes.sh
           aumara-site/scripts/build_walkthrough_nodes.sh /tmp/IMG_8063.MOV aumara-site/media/nodes
-          test -s aumara-site/media/nodes/node-01.mp4
-          test -s aumara-site/media/nodes/node-08.mp4
+          for n in 01 02 03 04 05 06 07 08; do test -s "aumara-site/media/nodes/node-$n.mp4"; done
           test -s aumara-site/media/nodes/manifest.json
 
       - name: Upload complete AUMARA site
@@ -89,27 +91,34 @@ jobs:
           set -euo pipefail
           lftp -u "$FTP_USER","$FTP_PASSWORD" "$FTP_HOST" -e "set cmd:fail-exit yes; set ftp:ssl-allow no; set ftp:passive-mode yes; cls -l $FTP_TARGET/index.html; cls -l $FTP_TARGET/media/nodes/node-01.mp4; cls -l $FTP_TARGET/media/nodes/node-08.mp4; cls -l $FTP_TARGET/media/nodes/manifest.json; bye"
 
-      - name: Verify public site and first movement point
+      - name: Verify exact AUMARA release and both ends of walkthrough
         id: external
         shell: bash
         run: |
           set -euo pipefail
-          page_code="$(curl -sS -L -o /dev/null -w '%{http_code}' --max-time 45 --retry 4 --retry-delay 5 "$PAGE_URL")"
-          node_code="$(curl -sS -L -o /dev/null -w '%{http_code}' --max-time 60 --retry 4 --retry-delay 5 -r 0-2047 "$NODE_URL")"
+          curl -sS -L --max-time 45 --retry 5 --retry-delay 5 "$PAGE_URL" -o /tmp/aumara-live.html
+          page_code="$(curl -sS -L -o /dev/null -w '%{http_code}' --max-time 45 --retry 3 --retry-delay 5 "$PAGE_URL")"
+          node01_code="$(curl -sS -L -o /dev/null -w '%{http_code}' --max-time 60 --retry 4 --retry-delay 5 -r 0-2047 "$NODE01_URL")"
+          node08_code="$(curl -sS -L -o /dev/null -w '%{http_code}' --max-time 60 --retry 4 --retry-delay 5 -r 0-2047 "$NODE08_URL")"
           echo "page_code=$page_code" >> "$GITHUB_OUTPUT"
-          echo "node_code=$node_code" >> "$GITHUB_OUTPUT"
+          echo "node01_code=$node01_code" >> "$GITHUB_OUTPUT"
+          echo "node08_code=$node08_code" >> "$GITHUB_OUTPUT"
           echo "Public AUMARA HTTP: $page_code"
-          echo "Movement node HTTP: $node_code"
+          echo "Walkthrough node 01 HTTP: $node01_code"
+          echo "Walkthrough node 08 HTTP: $node08_code"
           test "$page_code" = "200"
-          case "$node_code" in 200|206) ;; *) exit 1 ;; esac
+          grep -Fq "$PAGE_MARKER" /tmp/aumara-live.html
+          grep -Fq 'media/nodes/node-01.mp4' /tmp/aumara-live.html
+          grep -Fq 'https://beds24.com/booking2.php?propid=324882' /tmp/aumara-live.html
+          case "$node01_code" in 200|206) ;; *) exit 1 ;; esac
+          case "$node08_code" in 200|206) ;; *) exit 1 ;; esac
 
-      - name: Check Beds24 direct booking endpoint
+      - name: Verify Beds24 direct booking endpoint
         id: beds24
-        continue-on-error: true
         shell: bash
         run: |
           set -euo pipefail
-          beds24_code="$(curl -sS -L -o /dev/null -w '%{http_code}' --max-time 45 --retry 2 --retry-delay 4 "$BEDS24_URL")"
+          beds24_code="$(curl -sS -L -o /dev/null -w '%{http_code}' --max-time 45 --retry 3 --retry-delay 4 "$BEDS24_URL")"
           echo "code=$beds24_code" >> "$GITHUB_OUTPUT"
           echo "Beds24 direct booking HTTP: $beds24_code"
           case "$beds24_code" in 200|201|202|204|301|302|303|307|308) ;; *) exit 1 ;; esac
@@ -124,6 +133,7 @@ jobs:
             echo "- Commit: \`${GITHUB_SHA}\`"
             echo "- FTP target: \`${FTP_TARGET}\`"
             echo "- Main page HTTP: \`${{ steps.external.outputs.page_code || 'not_run' }}\`"
-            echo "- Walkthrough node HTTP: \`${{ steps.external.outputs.node_code || 'not_run' }}\`"
+            echo "- Walkthrough node 01 HTTP: \`${{ steps.external.outputs.node01_code || 'not_run' }}\`"
+            echo "- Walkthrough node 08 HTTP: \`${{ steps.external.outputs.node08_code || 'not_run' }}\`"
             echo "- Beds24 endpoint HTTP: \`${{ steps.beds24.outputs.code || 'not_run' }}\`"
           } >> "$GITHUB_STEP_SUMMARY"

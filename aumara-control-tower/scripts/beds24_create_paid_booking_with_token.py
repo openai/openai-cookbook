@@ -14,9 +14,9 @@ BOOKING_EVIDENCE = EVIDENCE_DIR / "beds24-AUMARA-MEDINA-20260718-660.json"
 AUTH_EVIDENCE = EVIDENCE_DIR / "beds24-token-auth-status.json"
 
 EVIDENCE_DIR.mkdir(parents=True, exist_ok=True)
-TOKEN = "".join(os.environ.get("BEDS24_TOKEN_CREDENTIAL", "").split())
+TOKEN = "".join((os.environ.get("BEDS24_TOKEN_CREDENTIAL") or os.environ.get("BEDS24_BOOTSTRAP_CREDENTIAL") or "").split())
 if not TOKEN:
-    raise SystemExit("Missing BEDS24_TOKEN_CREDENTIAL")
+    raise SystemExit("Missing Beds24 token credential")
 
 
 def now() -> str:
@@ -153,7 +153,7 @@ BOOKING_EVIDENCE.write_text(
         {
             "verified_at_utc": now(),
             "outcome": outcome,
-            "auth_source": "BEDS24_TOKEN_CREDENTIAL",
+            "auth_source": "direct_token_credential",
             "api_reference": api_reference,
             "booking_id": booking.get("id"),
             "property_id": booking.get("propertyId"),

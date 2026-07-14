@@ -1,0 +1,35 @@
+{
+  "verified_at_utc": "2026-07-14T23:19:18.224231+00:00",
+  "status": "AUTH_FAILED",
+  "api_base": "https://beds24.com/api/v2",
+  "attempts": [
+    {
+      "mode": "bootstrap_as_refresh",
+      "method": "GET",
+      "status": 401
+    },
+    {
+      "mode": "bootstrap_as_invite_code",
+      "method": "GET",
+      "status": 401,
+      "response": {
+        "success": false,
+        "type": "error",
+        "code": "[REDACTED]",
+        "error": "Token not valid"
+      }
+    },
+    {
+      "mode": "bootstrap_as_invite_code",
+      "method": "POST",
+      "status": 500,
+      "response": {
+        "success": false,
+        "code": "[REDACTED]",
+        "error": "Could not process request"
+      }
+    }
+  ],
+  "secret_present": true,
+  "plaintext_secret_committed": false
+}

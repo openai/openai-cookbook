@@ -14,9 +14,11 @@ BOOKING_EVIDENCE = EVIDENCE_DIR / "beds24-AUMARA-MEDINA-20260718-660.json"
 EXECUTION_EVIDENCE = EVIDENCE_DIR / "beds24-finalize-status.json"
 
 EVIDENCE_DIR.mkdir(parents=True, exist_ok=True)
-REFRESH = "".join(os.environ.get("BEDS24_BOOTSTRAP_CREDENTIAL", "").split())
-if not REFRESH:
-    raise SystemExit("Missing mapped Beds24 refresh credential")
+CREDENTIAL = "".join(os.environ.get("BEDS24_BOOTSTRAP_CREDENTIAL", "").split())
+if not CREDENTIAL:
+    raise SystemExit("Missing mapped Beds24 credential")
+
+req = json.loads(REQUEST_FILE.read_text())
 
 
 def now():
@@ -30,9 +32,11 @@ def request_json(method, path, headers=None, payload=None):
     if payload is not None:
         body = json.dumps(payload).encode("utf-8")
         hdrs["content-type"] = "application/json"
-    req = urllib.request.Request(f"{API_BASE}{path}", data=body, headers=hdrs, method=method)
+    elif method == "POST":
+        body = b""
+    request = urllib.request.Request(f"{API_BASE}{path}", data=body, headers=hdrs, method=method)
     try:
-        with urllib.request.urlopen(req, timeout=45) as response:
+        with urllib.request.urlopen(request, timeout=45) as response:
             raw = response.read().decode("utf-8", "replace")
             return response.status, json.loads(raw) if raw else {}
     except urllib.error.HTTPError as exc:
@@ -46,32 +50,13 @@ def request_json(method, path, headers=None, payload=None):
 
 def safe(obj):
     if isinstance(obj, dict):
-        return {k: ("[REDACTED]" if k.lower() in {"token", "refreshtoken", "code"} else v) for k, v in obj.items()}
+        return {
+            key: ("[REDACTED]" if key.lower() in {"token", "refreshtoken", "code"} else value)
+            for key, value in obj.items()
+        }
+    if isinstance(obj, list):
+        return [safe(item) for item in obj[:10]]
     return str(obj)[:500]
-
-
-status, auth = request_json("GET", "/authentication/token", headers={"refreshToken": REFRESH})
-TOKEN = auth.get("token") if isinstance(auth, dict) else None
-if not (200 <= status < 300 and TOKEN):
-    EXECUTION_EVIDENCE.write_text(json.dumps({"verified_at_utc": now(), "status": "AUTH_FAILED", "http_status": status, "response": safe(auth)}, indent=2))
-    raise SystemExit(f"Beds24 refresh authentication failed HTTP {status}")
-
-req = json.loads(REQUEST_FILE.read_text())
-headers = {"token": TOKEN}
-
-
-def api(method, path, payload=None):
-    st, obj = request_json(method, path, headers=headers, payload=payload)
-    if not (200 <= st < 300):
-        raise RuntimeError(f"Beds24 {method} {path} failed HTTP {st}: {safe(obj)}")
-    return obj
-
-
-def invoice_totals(booking):
-    items = booking.get("invoiceItems") or []
-    charge = sum(float(i.get("amount") or 0) * float(i.get("qty") or 1) for i in items if i.get("type") == "charge")
-    payment = sum(float(i.get("amount") or 0) * float(i.get("qty") or 1) for i in items if i.get("type") == "payment")
-    return charge, payment
 
 
 exact_q = urllib.parse.urlencode([
@@ -81,8 +66,91 @@ exact_q = urllib.parse.urlencode([
     ("includeInvoiceItems", "true"),
     ("includeGuests", "true"),
 ])
-rows = api("GET", f"/bookings?{exact_q}").get("data") or []
 
+auth_attempts = []
+TOKEN = None
+auth_source = None
+
+# 1. The stored value may already be a normal API token.
+status, direct_probe = request_json("GET", f"/bookings?{exact_q}", headers={"token": CREDENTIAL})
+auth_attempts.append({"mode": "direct_token", "status": status})
+if 200 <= status < 300:
+    TOKEN = CREDENTIAL
+    auth_source = "direct_token"
+
+# 2. The stored value may be a refresh token.
+if not TOKEN:
+    status, auth = request_json("GET", "/authentication/token", headers={"refreshToken": CREDENTIAL})
+    candidate = auth.get("token") if isinstance(auth, dict) else None
+    auth_attempts.append({"mode": "refresh_token", "status": status})
+    if 200 <= status < 300 and candidate:
+        TOKEN = candidate
+        auth_source = "refresh_token"
+
+# 3. The stored value may be a one-time invite code. Exchange and use the returned token immediately.
+if not TOKEN:
+    status, setup = request_json(
+        "GET",
+        "/authentication/setup",
+        headers={"code": CREDENTIAL, "deviceName": "AUMARA-Control-Tower"},
+    )
+    candidate = setup.get("token") if isinstance(setup, dict) else None
+    auth_attempts.append({"mode": "invite_code", "status": status, "response": safe(setup)})
+    if 200 <= status < 300 and candidate:
+        TOKEN = candidate
+        auth_source = "invite_code"
+
+if not TOKEN:
+    EXECUTION_EVIDENCE.write_text(json.dumps({
+        "verified_at_utc": now(),
+        "status": "AUTH_FAILED",
+        "attempts": auth_attempts,
+        "secret_present": True,
+        "plaintext_secret_committed": False,
+    }, indent=2))
+    raise SystemExit("Beds24 credential was rejected as direct token, refresh token and invite code")
+
+headers = {"token": TOKEN}
+
+
+def api(method, path, payload=None):
+    status, obj = request_json(method, path, headers=headers, payload=payload)
+    if not (200 <= status < 300):
+        raise RuntimeError(f"Beds24 {method} {path} failed HTTP {status}: {safe(obj)}")
+    return obj
+
+
+def invoice_totals(booking):
+    items = booking.get("invoiceItems") or []
+    charge = sum(float(item.get("amount") or 0) * float(item.get("qty") or 1) for item in items if item.get("type") == "charge")
+    payment = sum(float(item.get("amount") or 0) * float(item.get("qty") or 1) for item in items if item.get("type") == "payment")
+    return charge, payment
+
+
+def find_created_booking_id(response_item):
+    new_part = response_item.get("new") if isinstance(response_item, dict) else None
+
+    def walk(value):
+        if isinstance(value, dict):
+            for key in ("id", "bookingId"):
+                candidate = value.get(key)
+                if isinstance(candidate, int) or (isinstance(candidate, str) and candidate.isdigit()):
+                    return int(candidate)
+            for child in value.values():
+                found = walk(child)
+                if found:
+                    return found
+        elif isinstance(value, list):
+            for child in value:
+                found = walk(child)
+                if found:
+                    return found
+        return None
+
+    return walk(new_part)
+
+
+rows = api("GET", f"/bookings?{exact_q}").get("data") or []
 wanted_first = req["first_name"].strip().casefold()
 wanted_last = req["last_name"].strip().casefold()
 matching = []
@@ -120,14 +188,23 @@ else:
     created = api("POST", "/bookings", payload)
     if not isinstance(created, list) or not created or not created[0].get("success"):
         raise RuntimeError(f"Unexpected Beds24 create result: {safe(created)}")
-    booking_id = created[0].get("id")
-    if not booking_id:
-        raise RuntimeError(f"Beds24 created booking but returned no booking id: {safe(created)}")
+    booking_id = find_created_booking_id(created[0])
     outcome = "created_new"
-    read_q = urllib.parse.urlencode([("id", booking_id), ("includeInvoiceItems", "true"), ("includeGuests", "true")])
-    created_rows = api("GET", f"/bookings?{read_q}").get("data") or []
+
+    if booking_id:
+        read_q = urllib.parse.urlencode([("id", booking_id), ("includeInvoiceItems", "true"), ("includeGuests", "true")])
+        created_rows = api("GET", f"/bookings?{read_q}").get("data") or []
+    else:
+        created_rows = api("GET", f"/bookings?{exact_q}").get("data") or []
+        created_rows = [
+            row for row in created_rows
+            if row.get("status") != "cancelled"
+            and str(row.get("firstName") or "").strip().casefold() == wanted_first
+            and str(row.get("lastName") or "").strip().casefold() == wanted_last
+        ]
+
     if len(created_rows) != 1:
-        raise RuntimeError(f"Created booking read-back by id {booking_id} returned {len(created_rows)} rows")
+        raise RuntimeError(f"Created booking read-back returned {len(created_rows)} exact rows; response={safe(created)}")
     booking = created_rows[0]
 
 booking_id = booking.get("id")
@@ -141,13 +218,17 @@ if charge_total < float(req["total_price"]):
 if payment_total < float(req["amount_paid"]):
     missing_items.append({"type": "payment", "description": req["payment_description"], "qty": 1, "amount": float(req["amount_paid"]) - payment_total})
 
-update = {"id": booking_id, "status": "confirmed", "price": req["total_price"], "apiReference": req["request_id"], "comment": req["comments"]}
+update = {
+    "id": booking_id,
+    "status": "confirmed",
+    "price": req["total_price"],
+    "apiReference": req["request_id"],
+    "comment": req["comments"],
+}
 if missing_items:
     update["invoiceItems"] = missing_items
-    api("POST", "/bookings", [update])
     outcome += "+financials_completed"
-else:
-    api("POST", "/bookings", [update])
+api("POST", "/bookings", [update])
 
 verify_q = urllib.parse.urlencode([("id", booking_id), ("includeInvoiceItems", "true"), ("includeGuests", "true")])
 verified_rows = api("GET", f"/bookings?{verify_q}").get("data") or []
@@ -155,7 +236,6 @@ if len(verified_rows) != 1:
     raise RuntimeError(f"Final read-back by id {booking_id} returned {len(verified_rows)} rows")
 booking = verified_rows[0]
 charge_total, payment_total = invoice_totals(booking)
-
 checks = {
     "room": str(booking.get("roomId")) == str(req["room_id"]),
     "arrival": booking.get("arrival") == req["arrival"],
@@ -170,7 +250,7 @@ if not all(checks.values()):
 BOOKING_EVIDENCE.write_text(json.dumps({
     "verified_at_utc": now(),
     "outcome": outcome,
-    "auth_source": "BEDS24_TOKEN_CREDENTIAL_as_refresh_token",
+    "auth_source": auth_source,
     "api_reference": req["request_id"],
     "booking_id": booking_id,
     "property_id": booking.get("propertyId"),
@@ -186,5 +266,11 @@ BOOKING_EVIDENCE.write_text(json.dumps({
     "checks": checks,
     "plaintext_secret_committed": False,
 }, indent=2))
-EXECUTION_EVIDENCE.write_text(json.dumps({"verified_at_utc": now(), "status": "BOOKING_VERIFIED", "booking_id": booking_id, "outcome": outcome}, indent=2))
-print(json.dumps({"status": "BOOKING_VERIFIED", "booking_id": booking_id, "outcome": outcome}))
+EXECUTION_EVIDENCE.write_text(json.dumps({
+    "verified_at_utc": now(),
+    "status": "BOOKING_VERIFIED",
+    "booking_id": booking_id,
+    "outcome": outcome,
+    "auth_source": auth_source,
+}, indent=2))
+print(json.dumps({"status": "BOOKING_VERIFIED", "booking_id": booking_id, "outcome": outcome, "auth_source": auth_source}))

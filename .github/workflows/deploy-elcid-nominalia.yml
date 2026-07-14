@@ -9,7 +9,7 @@ on:
       - '.github/workflows/deploy-elcid-nominalia.yml'
 
 permissions:
-  contents: read
+  contents: write
 
 concurrency:
   group: elcid-nominalia-root
@@ -29,18 +29,22 @@ jobs:
       PAGE_MARKER: A country club built around the way a place feels.
     steps:
       - name: Checkout
+        id: checkout
         uses: actions/checkout@v4
 
       - name: Install FTP client
+        id: install
         run: |
           sudo apt-get update
           sudo apt-get install -y lftp
 
       - name: Validate FTP secret
+        id: secret
         run: |
           test -n "$FTP_PASSWORD" || { echo "NOMINALIA FTP password secret is empty"; exit 1; }
 
       - name: Back up existing WordPress front controller once
+        id: backup
         shell: bash
         run: |
           set -euo pipefail
@@ -51,13 +55,14 @@ jobs:
           fi
 
       - name: Publish EL CID as the actual root page
+        id: publish
         shell: bash
         run: |
           set -euo pipefail
           test -s elcid-site/index.html
           grep -Fq "$PAGE_MARKER" elcid-site/index.html
           cp elcid-site/index.html /tmp/index.php
-          lftp -u "$FTP_USER","$FTP_PASSWORD" "$FTP_HOST" -e "set cmd:fail-exit yes; set ftp:ssl-allow no; set ftp:passive-mode yes; cd $ROOT_TARGET; put elcid-site/index.html -o index.html; put /tmp/index.php -o index.php; cls -l index.html; cls -l index.php; bye"
+          lftp -u "$FTP_USER","$FTP_PASSWORD" "$FTP_HOST" -e "set cmd:fail-exit yes; set ftp:ssl-allow no; set ftp:passive-mode yes; cd $ROOT_TARGET; put elcid-site/index.html -o index.html; put /tmp/index.php -o index.php; cls -l index.html; cls -l index.php; bye" 2>&1 | tee /tmp/elcid-publish.log
 
       - name: Verify the expanded EL CID release on production
         id: external
@@ -86,8 +91,43 @@ jobs:
             echo ""
             echo "- Commit: \`${GITHUB_SHA}\`"
             echo "- FTP target: \`${ROOT_TARGET}/index.html + index.php\`"
+            echo "- Secret check: \`${{ steps.secret.outcome || 'not_run' }}\`"
+            echo "- FTP publish: \`${{ steps.publish.outcome || 'not_run' }}\`"
+            echo "- Public verification: \`${{ steps.external.outcome || 'not_run' }}\`"
             echo "- Public HTTP: \`${{ steps.external.outputs.code || 'not_run' }}\`"
             echo "- Public bytes: \`${{ steps.external.outputs.bytes || 'not_run' }}\`"
-            echo "- Expanded release marker: \`verified\`"
             echo "- Original WordPress index: \`index-wordpress-original-backup.php\`"
           } >> "$GITHUB_STEP_SUMMARY"
+
+      - name: Persist deployment evidence in repository
+        if: always()
+        shell: bash
+        run: |
+          set -euo pipefail
+          git config user.name 'github-actions[bot]'
+          git config user.email '41898282+github-actions[bot]@users.noreply.github.com'
+          git pull --rebase origin main
+          mkdir -p ops
+          {
+            echo '# EL CID root deployment evidence'
+            echo
+            echo "- Checked UTC: $(date -u +%FT%TZ)"
+            echo "- Source commit: $GITHUB_SHA"
+            echo "- Run: https://github.com/${GITHUB_REPOSITORY}/actions/runs/${GITHUB_RUN_ID}"
+            echo "- Secret check: **${{ steps.secret.outcome || 'not_run' }}**"
+            echo "- WordPress backup: **${{ steps.backup.outcome || 'not_run' }}**"
+            echo "- FTP publish: **${{ steps.publish.outcome || 'not_run' }}**"
+            echo "- Public verification: **${{ steps.external.outcome || 'not_run' }}**"
+            echo "- Public HTTP: **${{ steps.external.outputs.code || 'not_run' }}**"
+            echo "- Public bytes: **${{ steps.external.outputs.bytes || 'not_run' }}**"
+            echo "- Expected marker: \`$PAGE_MARKER\`"
+            echo
+            echo '## Publish log tail'
+            echo '```text'
+            if [ -f /tmp/elcid-publish.log ]; then tail -n 30 /tmp/elcid-publish.log; else echo 'Publish step did not create a log.'; fi
+            echo '```'
+          } > ops/elcid-root-deploy.md
+          git add ops/elcid-root-deploy.md
+          git diff --cached --quiet && exit 0
+          git commit -m 'Record EL CID root deployment evidence [skip ci]'
+          git push

@@ -1,11 +1,26 @@
 {
-  "verified_at_utc": "2026-07-14T23:27:44.234155+00:00",
+  "verified_at_utc": "2026-07-14T23:31:40.349548+00:00",
   "status": "AUTH_FAILED",
-  "http_status": 401,
-  "response": {
-    "success": false,
-    "type": "error",
-    "code": "[REDACTED]",
-    "error": "Token not valid"
-  }
+  "attempts": [
+    {
+      "mode": "direct_token",
+      "status": 401
+    },
+    {
+      "mode": "refresh_token",
+      "status": 401
+    },
+    {
+      "mode": "invite_code",
+      "status": 401,
+      "response": {
+        "success": false,
+        "type": "error",
+        "code": "[REDACTED]",
+        "error": "Token not valid"
+      }
+    }
+  ],
+  "secret_present": true,
+  "plaintext_secret_committed": false
 }

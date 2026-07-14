@@ -1,1 +1,1 @@
-Beds24 refresh authentication failed HTTP 401
+Beds24 credential was rejected as direct token, refresh token and invite code

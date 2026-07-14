@@ -2,6 +2,11 @@ name: Probe EL CID production endpoints
 
 on:
   workflow_dispatch:
+  workflow_run:
+    workflows:
+      - Deploy EL CID main site to Nominalia
+      - Deploy AUMARA to Nominalia v2
+    types: [completed]
   push:
     branches: [main]
     paths:
@@ -17,10 +22,12 @@ concurrency:
 jobs:
   probe:
     runs-on: ubuntu-latest
-    timeout-minutes: 10
+    timeout-minutes: 12
     steps:
-      - name: Checkout
+      - name: Checkout main
         uses: actions/checkout@v4
+        with:
+          ref: main
 
       - name: Probe live production release
         shell: bash
@@ -33,6 +40,16 @@ jobs:
           NODE01_URL='https://elcidspain.com/aumara/media/nodes/node-01.mp4'
           NODE08_URL='https://elcidspain.com/aumara/media/nodes/node-08.mp4'
           BEDS24_URL='https://beds24.com/booking2.php?propid=324882'
+          ROOT_MARKER='A country club built around the way a place feels.'
+
+          for attempt in $(seq 1 30); do
+            curl -sS -L --max-time 45 "$ROOT_URL" -o /tmp/root-wait.html || true
+            if grep -Fq "$ROOT_MARKER" /tmp/root-wait.html 2>/dev/null; then
+              echo "Expanded EL CID release visible on attempt $attempt"
+              break
+            fi
+            if [ "$attempt" -lt 30 ]; then sleep 5; fi
+          done
 
           fetch_html() {
             local url="$1" body="$2" meta="$3"
@@ -57,12 +74,14 @@ jobs:
           fetch_html "$BEDS24_URL" /tmp/beds24.html /tmp/beds24.meta
 
           root_marker=no
+          root_secondary=no
           root_link=no
           aumara_marker=no
           aumara_node01_ref=no
           aumara_node08_ref=no
           aumara_beds24_ref=no
-          grep -Fq 'EL CID Country Club — Stay, eat and discover AUMARA on the Costa Blanca' /tmp/root.html && root_marker=yes
+          grep -Fq "$ROOT_MARKER" /tmp/root.html && root_marker=yes
+          grep -Fq 'One place. More than one way to stay.' /tmp/root.html && root_secondary=yes
           grep -Fq '/aumara/#explore' /tmp/root.html && root_link=yes
           grep -Fq 'Walk the place before you choose the house.' /tmp/aumara.html && aumara_marker=yes
           grep -Fq 'media/nodes/node-01.mp4' /tmp/aumara.html && aumara_node01_ref=yes
@@ -80,9 +99,11 @@ jobs:
           node01_code="$(printf '%s' "$node01_meta" | cut -d'|' -f2)"
           node08_code="$(printf '%s' "$node08_meta" | cut -d'|' -f2)"
           beds24_code="$(printf '%s' "$beds24_meta" | cut -d'|' -f2)"
+          root_bytes="$(printf '%s' "$root_meta" | cut -d'|' -f5)"
 
           fully_operational=no
-          if [ "$root_code" = 200 ] && [ "$root_marker" = yes ] && [ "$root_link" = yes ] \
+          if [ "$root_code" = 200 ] && [ "$root_marker" = yes ] && [ "$root_secondary" = yes ] && [ "$root_link" = yes ] \
+             && [ "${root_bytes:-0}" -gt 30000 ] \
              && [ "$aumara_code" = 200 ] && [ "$aumara_marker" = yes ] \
              && [ "$aumara_node01_ref" = yes ] && [ "$aumara_node08_ref" = yes ] && [ "$aumara_beds24_ref" = yes ]; then
             case "$node01_code" in 200|206) node01_ok=yes ;; *) node01_ok=no ;; esac
@@ -96,12 +117,14 @@ jobs:
             echo
             echo "- Checked UTC: $(date -u +%FT%TZ)"
             echo "- Commit: $GITHUB_SHA"
+            echo "- Trigger: ${GITHUB_EVENT_NAME}"
             echo "- Fully operational: **$fully_operational**"
             echo
             echo '## Root'
             echo "- URL: $ROOT_URL"
             echo "- curl_exit|http|final_url|content_type|bytes: \`$root_meta\`"
-            echo "- exact release marker: **$root_marker**"
+            echo "- expanded release marker: **$root_marker**"
+            echo "- secondary section marker: **$root_secondary**"
             echo "- AUMARA walkthrough link: **$root_link**"
             echo
             echo '## AUMARA'

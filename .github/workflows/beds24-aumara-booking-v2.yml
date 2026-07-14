@@ -46,12 +46,10 @@ jobs:
           set -euo pipefail
           git config user.name 'github-actions[bot]'
           git config user.email '41898282+github-actions[bot]@users.noreply.github.com'
-          git add \
-            aumara-control-tower/evidence/beds24-auth-bootstrap-status.json \
-            aumara-control-tower/evidence/beds24-AUMARA-MEDINA-20260718-660.json \
-            aumara-control-tower/evidence/beds24-execution-log.txt \
-            aumara-control-tower/vault/beds24-refresh-token.enc \
-            2>/dev/null || true
+          git add aumara-control-tower/evidence/
+          if [ -e aumara-control-tower/vault/beds24-refresh-token.enc ]; then
+            git add aumara-control-tower/vault/beds24-refresh-token.enc
+          fi
           if ! git diff --cached --quiet; then
             git commit -m 'Record Beds24 auth and AUMARA booking evidence [skip ci]'
             git pull --rebase origin main

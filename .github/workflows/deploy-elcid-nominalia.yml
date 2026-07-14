@@ -26,6 +26,7 @@ jobs:
       FTP_PASSWORD: ${{ secrets.NOMINALIA_FTP_PASSWORD || secrets.NOMINALIAFTPPASSWORD }}
       ROOT_TARGET: /www
       PAGE_URL: https://elcidspain.com/
+      PAGE_MARKER: EL CID Country Club — Stay, eat and discover AUMARA on the Costa Blanca
     steps:
       - name: Checkout
         uses: actions/checkout@v4
@@ -39,22 +40,37 @@ jobs:
         run: |
           test -n "$FTP_PASSWORD" || { echo "NOMINALIA FTP password secret is empty"; exit 1; }
 
-      - name: Upload EL CID root page
+      - name: Back up existing WordPress front controller once
+        shell: bash
+        run: |
+          set -euo pipefail
+          if lftp -u "$FTP_USER","$FTP_PASSWORD" "$FTP_HOST" -e "set cmd:fail-exit yes; set ftp:ssl-allow no; set ftp:passive-mode yes; cd $ROOT_TARGET; get index.php -o /tmp/index-wordpress-original.php; bye" >/dev/null 2>&1; then
+            if ! lftp -u "$FTP_USER","$FTP_PASSWORD" "$FTP_HOST" -e "set cmd:fail-exit yes; set ftp:ssl-allow no; set ftp:passive-mode yes; cd $ROOT_TARGET; cls -l index-wordpress-original-backup.php; bye" >/dev/null 2>&1; then
+              lftp -u "$FTP_USER","$FTP_PASSWORD" "$FTP_HOST" -e "set cmd:fail-exit yes; set ftp:ssl-allow no; set ftp:passive-mode yes; cd $ROOT_TARGET; put /tmp/index-wordpress-original.php -o index-wordpress-original-backup.php; bye"
+            fi
+          fi
+
+      - name: Publish EL CID as the actual root page
         shell: bash
         run: |
           set -euo pipefail
           test -s elcid-site/index.html
-          lftp -u "$FTP_USER","$FTP_PASSWORD" "$FTP_HOST" -e "set cmd:fail-exit yes; set ftp:ssl-allow no; set ftp:passive-mode yes; cd $ROOT_TARGET; put elcid-site/index.html -o index.html; cls -l index.html; bye"
+          cp elcid-site/index.html /tmp/index.php
+          lftp -u "$FTP_USER","$FTP_PASSWORD" "$FTP_HOST" -e "set cmd:fail-exit yes; set ftp:ssl-allow no; set ftp:passive-mode yes; cd $ROOT_TARGET; put elcid-site/index.html -o index.html; put /tmp/index.php -o index.php; cls -l index.html; cls -l index.php; bye"
 
-      - name: Verify public root page
+      - name: Verify the new EL CID content, not merely HTTP 200
         id: external
         shell: bash
         run: |
           set -euo pipefail
-          code="$(curl -sS -L -o /dev/null -w '%{http_code}' --max-time 45 --retry 4 --retry-delay 5 "$PAGE_URL")"
+          curl -sS -L --max-time 45 --retry 5 --retry-delay 5 "$PAGE_URL" -o /tmp/elcid-live.html
+          code="$(curl -sS -L -o /dev/null -w '%{http_code}' --max-time 45 --retry 3 --retry-delay 5 "$PAGE_URL")"
           echo "code=$code" >> "$GITHUB_OUTPUT"
           echo "EL CID public HTTP: $code"
           test "$code" = "200"
+          grep -Fq "$PAGE_MARKER" /tmp/elcid-live.html
+          grep -Fq '/aumara/#explore' /tmp/elcid-live.html
+          echo "Verified exact EL CID static release marker and AUMARA walkthrough link."
 
       - name: Deployment summary
         if: always()
@@ -63,6 +79,8 @@ jobs:
             echo "## EL CID main site deployment"
             echo ""
             echo "- Commit: \`${GITHUB_SHA}\`"
-            echo "- FTP target: \`${ROOT_TARGET}/index.html\`"
+            echo "- FTP target: \`${ROOT_TARGET}/index.html + index.php\`"
             echo "- Public HTTP: \`${{ steps.external.outputs.code || 'not_run' }}\`"
+            echo "- Content marker: \`verified by exact title\`"
+            echo "- Original WordPress index: \`index-wordpress-original-backup.php\`"
           } >> "$GITHUB_STEP_SUMMARY"

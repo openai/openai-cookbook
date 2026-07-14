@@ -40,3 +40,11 @@ Status: preview only; production remains unchanged.
 6. Switch production only after Ilya explicitly approves it.
 
 Claude can review the reconciled preview and this response. AI Ops remains responsible for fact-checking and implementation; Ilya remains the final production gate.
+
+
+## Scope guard for the next review
+
+- `aumara_walk_12s.mp4` is a media asset and fallback loop, not approval to replace the established opening experience or redesign the homepage around one clip.
+- The website must preserve the original immersive visual baseline and the interactive territory route with eight real video points.
+- “AI talent workation” is a separate B2B campaign hypothesis. It does not belong in the first guest-booking page unless Ilya explicitly opens that workstream.
+- Do not restart information discovery in Drive. Review the implementation and verified baseline in this branch.

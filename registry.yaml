@@ -3529,3 +3529,16 @@
   tags:
     - evals
     - promptfoo
+
+- title: Auditing System Prompts for Prompt Injection Defense Gaps
+  path: examples/Auditing_System_Prompts_for_Prompt_Injection_Defense.ipynb
+  slug: auditing-system-prompts-for-prompt-injection-defense
+  description: Audit a system prompt for missing defenses across 12 prompt-injection attack vectors using deterministic regex analysis — no LLM calls, < 5ms per audit, fully reproducible. Includes a runtime verification step using GPT-4.1-mini to confirm the hardened prompt resists a role-hijack attack.
+  date: 2026-05-11
+  authors:
+    - ppcvote
+  tags:
+    - safety
+    - guardrails
+    - security
+    - prompt-engineering

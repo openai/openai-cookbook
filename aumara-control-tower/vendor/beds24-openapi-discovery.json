@@ -1,0 +1,40 @@
+{
+  "found_url": null,
+  "diagnostics": [
+    {
+      "url": "https://beds24.com/api/v2/",
+      "status": 200,
+      "content_type": "text/html; charset=UTF-8"
+    },
+    {
+      "url": "https://beds24.com/api/v2/openapi.json",
+      "status": 401,
+      "error": "HTTP Error 401: Unauthorized"
+    },
+    {
+      "url": "https://beds24.com/api/v2/swagger.json",
+      "status": 401,
+      "error": "HTTP Error 401: Unauthorized"
+    },
+    {
+      "url": "https://beds24.com/api/v2/swagger/v1/swagger.json",
+      "status": 401,
+      "error": "HTTP Error 401: Unauthorized"
+    },
+    {
+      "url": "https://beds24.com/api/v2/api-docs",
+      "status": 401,
+      "error": "HTTP Error 401: Unauthorized"
+    },
+    {
+      "url": "https://api.beds24.com/v2/openapi.json",
+      "status": 401,
+      "error": "HTTP Error 401: Unauthorized"
+    },
+    {
+      "url": "https://api.beds24.com/v2/swagger.json",
+      "status": 401,
+      "error": "HTTP Error 401: Unauthorized"
+    }
+  ]
+}

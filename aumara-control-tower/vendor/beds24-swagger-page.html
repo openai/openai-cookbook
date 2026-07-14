@@ -1,0 +1,101 @@
+<!-- HTML for static distribution bundle build -->
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+  <meta charset="UTF-8">
+  <title>Swagger UI</title>
+  <link rel="stylesheet" type="text/css" href="./swagger-ui.css" />
+  <link rel="icon" type="image/png" href="./favicon-32x32.png" sizes="32x32" />
+  <link rel="icon" type="image/png" href="./favicon-16x16.png" sizes="16x16" />
+  <style>
+    html {
+      box-sizing: border-box;
+      overflow: -moz-scrollbars-vertical;
+      overflow-y: scroll;
+    }
+
+    *,
+    *:before,
+    *:after {
+      box-sizing: inherit;
+    }
+
+    body {
+      margin: 0;
+      background: #fafafa;
+    }
+
+    .example {
+      background: #565656 !important;
+    }
+
+    .servers, .servers-title {
+      display: none
+    }
+
+    .information-container .link {
+      display: none;
+    }
+  </style>
+</head>
+
+<body>
+  <div id="swagger-ui"></div>
+
+  <script src="./swagger-ui-bundle.js" charset="UTF-8"> </script>
+  <script src="./swagger-ui-standalone-preset.js" charset="UTF-8"> </script>
+  <script>
+    window.onload = function () {
+      // Begin Swagger UI call region
+      const ui = SwaggerUIBundle({
+        url: "apiV2.yaml",
+        dom_id: '#swagger-ui',
+        deepLinking: true,
+        syntaxHighlight: false,
+        operationsSorter: function (a, b) { const order = { 'get': '0', 'post': '1', 'patch': '2', 'put': '3', 'delete': '4', 'head': '5', 'options': '6', 'connect': '7', 'trace': '8' }; return ( order[a.get("method")].localeCompare(order[b.get("method")]) || a.get("path").localeCompare(b.get("path")) ); },
+        presets: [
+          SwaggerUIBundle.presets.apis,
+        ],
+        plugins: [
+          SwaggerUIBundle.plugins.DownloadUrl,
+          {
+            statePlugins: {
+              spec: {
+                wrapActions: {
+                  updateJsonSpec: function (oriAction, system) {
+                    return (spec) => {
+                      if (window.location.pathname.startsWith("/api")) {
+                        spec.servers = [{ url: "/api/v2" }]
+                      } else if (window.location.pathname.startsWith("/beds24.com/public/api/v2")) {
+                        // For test server only
+                        spec.servers = [{ url: "/beds24.com/public/api/v2" }]
+                      }
+
+                      // Make descriptions whitelabel friendly if not on beds24.com
+                      if (!window.location.host.includes("beds24")) {
+                        spec.info.description = "";
+                        spec.paths["/authentication/setup"].get.description = "";
+                      }
+                      return oriAction(spec);
+                    }
+                  }
+                }
+              }
+            }
+          }
+        ],
+        onComplete: function() {
+          const downloadLink = document.querySelector('.information-container .link');
+          if (downloadLink && window.location.host.includes("beds24")) {
+            downloadLink.style.display = 'inline';  // Show the yaml link if on beds24.com
+          }
+        }
+      });
+      // End Swagger UI call region
+      window.ui = ui;
+    };
+  </script>
+</body>
+
+</html>

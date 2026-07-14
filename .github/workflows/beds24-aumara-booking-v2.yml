@@ -20,7 +20,7 @@ jobs:
   execute:
     runs-on: ubuntu-latest
     env:
-      BEDS24_BOOTSTRAP_CREDENTIAL: ${{ secrets.BEDS24_BOOTSTRAP_CREDENTIAL }}
+      BEDS24_BOOTSTRAP_CREDENTIAL: ${{ secrets.BEDS24_TOKEN_CREDENTIAL }}
 
     steps:
       - uses: actions/checkout@v4

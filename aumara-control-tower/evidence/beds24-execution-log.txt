@@ -1,4 +1,1 @@
-Traceback (most recent call last):
-  File "/home/runner/work/openai-cookbook/openai-cookbook/aumara-control-tower/scripts/beds24_create_paid_booking.py", line 288, in <module>
-    raise RuntimeError(f"Expected exactly one active booking for {api_reference}; found {len(active)}")
-RuntimeError: Expected exactly one active booking for AUMARA-MEDINA-20260718-660; found 0
+Beds24 direct token rejected with HTTP 401

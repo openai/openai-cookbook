@@ -22,5 +22,6 @@
   "payment_description": "Bank transfer received 14 Jul 2026",
   "comments": "Direct AUMARA reservation. Full payment of EUR 660 received by bank transfer on 14 July 2026. Guest contact details are pending. Special dinner and terrace breakfasts were requested separately and are not included in EUR 660.",
   "notes": "AUMARA direct booking request created from verified bank payment evidence. Superior Chalet, 18-20 July 2026, 2 nights, EUR 660 paid in full by bank transfer. Contact email, phone and final guest count pending.",
-  "execution_requested": true
+  "execution_requested": true,
+  "execution_trigger": "2026-07-15T01:42:00+02:00"
 }

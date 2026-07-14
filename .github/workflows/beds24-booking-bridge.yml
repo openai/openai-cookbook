@@ -33,22 +33,37 @@ jobs:
 
       - name: Prepare directories
         shell: bash
-        run: mkdir -p /tmp/beds24 aumara-control-tower/evidence
+        run: mkdir -p /tmp/beds24 aumara-control-tower/evidence aumara-control-tower/secure
 
       - name: Resolve refresh token
         id: resolve
         shell: bash
         run: |
           set -euo pipefail
+          RECOVERY_FILE="aumara-control-tower/secure/beds24-refresh-token.enc"
+
           if [ -n "${BEDS24_REFRESH_TOKEN:-}" ]; then
             printf '%s' "$BEDS24_REFRESH_TOKEN" > /tmp/beds24/refresh.txt
             echo "source=existing_secret" >> "$GITHUB_OUTPUT"
             exit 0
           fi
+
+          if [ -f "$RECOVERY_FILE" ] && [ -n "${BEDS24_INVITE_CODE:-}" ]; then
+            printf '%s' "$BEDS24_INVITE_CODE" > /tmp/beds24/recovery-passphrase.txt
+            openssl enc -d -aes-256-cbc -pbkdf2 -iter 200000 \
+              -in "$RECOVERY_FILE" \
+              -out /tmp/beds24/refresh.txt \
+              -pass file:/tmp/beds24/recovery-passphrase.txt
+            test -s /tmp/beds24/refresh.txt
+            echo "source=encrypted_recovery" >> "$GITHUB_OUTPUT"
+            exit 0
+          fi
+
           if [ -z "${BEDS24_INVITE_CODE:-}" ]; then
             echo "source=missing_credentials" >> "$GITHUB_OUTPUT"
             exit 0
           fi
+
           curl --fail-with-body --silent --show-error \
             -H "code: ${BEDS24_INVITE_CODE}" \
             -H "deviceName: AUMARA-Control-Tower" \
@@ -62,9 +77,15 @@ jobs:
               raise SystemExit('Beds24 setup did not return refreshToken')
           pathlib.Path('/tmp/beds24/refresh.txt').write_text(token)
           PY
+
+          printf '%s' "$BEDS24_INVITE_CODE" > /tmp/beds24/recovery-passphrase.txt
+          openssl enc -aes-256-cbc -salt -pbkdf2 -iter 200000 \
+            -in /tmp/beds24/refresh.txt \
+            -out "$RECOVERY_FILE" \
+            -pass file:/tmp/beds24/recovery-passphrase.txt
           echo "source=invite_code" >> "$GITHUB_OUTPUT"
 
-      - name: Persist refresh token as repository secret
+      - name: Attempt to persist refresh token as repository secret
         id: persist
         if: steps.resolve.outputs.source == 'invite_code'
         continue-on-error: true
@@ -92,7 +113,7 @@ jobs:
           {
             "status": "WAITING_FOR_BEDS24_INVITE_CODE_SECRET",
             "required_secret": "BEDS24_INVITE_CODE",
-            "next_action": "Add the one-time Beds24 API V2 invite code as a GitHub Actions repository secret. The hourly bridge will then exchange it, create pending booking requests, and attempt to persist BEDS24_REFRESH_TOKEN."
+            "next_action": "Add the one-time Beds24 API V2 invite code as a GitHub Actions repository secret. The hourly bridge will exchange it, create pending booking requests, and preserve the resulting refresh token as encrypted recovery material for later runs."
           }
           JSON
 
@@ -227,19 +248,20 @@ jobs:
             'checked_at_utc': datetime.datetime.now(datetime.timezone.utc).isoformat(),
             'credential_source': '${{ steps.resolve.outputs.source }}',
             'refresh_secret_persistence_step': '${{ steps.persist.outcome }}',
+            'encrypted_recovery_material_present': pathlib.Path('aumara-control-tower/secure/beds24-refresh-token.enc').exists(),
             'plaintext_credentials_committed': False
           }
           pathlib.Path('aumara-control-tower/evidence/beds24-booking-bridge-status.json').write_text(json.dumps(status, indent=2))
           PY
 
-      - name: Commit evidence
+      - name: Commit evidence and encrypted recovery material
         if: always()
         shell: bash
         run: |
           set -euo pipefail
           git config user.name 'github-actions[bot]'
           git config user.email '41898282+github-actions[bot]@users.noreply.github.com'
-          git add aumara-control-tower/evidence/
+          git add aumara-control-tower/evidence/ aumara-control-tower/secure/
           git diff --cached --quiet || git commit -m 'Update Beds24 booking bridge evidence [skip ci]'
           git pull --rebase origin main
           git push origin HEAD:main

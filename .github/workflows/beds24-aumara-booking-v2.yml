@@ -32,10 +32,14 @@ jobs:
         continue-on-error: true
         shell: bash
         run: |
-          set -euo pipefail
-          python aumara-control-tower/scripts/beds24_create_paid_booking.py
+          set +e
+          mkdir -p aumara-control-tower/evidence
+          python aumara-control-tower/scripts/beds24_create_paid_booking.py > aumara-control-tower/evidence/beds24-execution-log.txt 2>&1
+          RC=$?
+          cat aumara-control-tower/evidence/beds24-execution-log.txt
+          exit "$RC"
 
-      - name: Commit sanitized auth, encrypted vault and booking evidence
+      - name: Commit auth, encrypted vault and booking evidence
         if: always()
         shell: bash
         run: |
@@ -45,6 +49,7 @@ jobs:
           git add \
             aumara-control-tower/evidence/beds24-auth-bootstrap-status.json \
             aumara-control-tower/evidence/beds24-AUMARA-MEDINA-20260718-660.json \
+            aumara-control-tower/evidence/beds24-execution-log.txt \
             aumara-control-tower/vault/beds24-refresh-token.enc \
             2>/dev/null || true
           if ! git diff --cached --quiet; then
@@ -57,5 +62,5 @@ jobs:
         if: steps.execute.outcome != 'success'
         shell: bash
         run: |
-          echo 'Beds24 booking execution failed. Sanitized evidence was committed for diagnosis.' >&2
+          echo 'Beds24 booking execution failed. Evidence was committed for diagnosis.' >&2
           exit 1

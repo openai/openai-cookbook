@@ -4,6 +4,21 @@
 # should build pages for, and indicates metadata such as tags, creation date and
 # authors for each page.
 
+- title: Structured Extraction from PDFs with Validation Loops
+  path: examples/structured_extraction_from_pdfs.ipynb
+  slug: structured-extraction-from-pdfs
+  description: Extract structured invoice data from PDF images using GPT-4o vision and Pydantic v2. A validate-and-retry loop feeds specific errors back to the model (up to 3 attempts), then routes low-confidence or failed pages to a human review queue. Includes parallel multi-page processing via asyncio.gather.
+  date: 2026-06-21
+  authors:
+    - RudrenduPaul
+  tags:
+    - vision
+    - gpt-4o
+    - structured-outputs
+    - pydantic
+    - async
+    - completions
+
 - title: Trigger a Workspace Agent from the API
   path: examples/chatgpt/workspace_agents/workspace-agents-api-trigger.ipynb
   slug: workspace-agents-api-trigger

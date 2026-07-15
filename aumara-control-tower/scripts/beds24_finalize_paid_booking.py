@@ -7,7 +7,11 @@ import urllib.error
 import urllib.parse
 import urllib.request
 
-API_BASE = "https://beds24.com/api/v2"
+API_BASE_CANDIDATES = [
+    "https://api.beds24.com/v2",
+    "https://beds24.com/v2",
+    "https://beds24.com/api/v2",
+]
 ROOT = pathlib.Path(__file__).resolve().parents[1]
 REQUEST_FILE = ROOT / "beds24-requests" / "AUMARA-MEDINA-20260718-660.json"
 EVIDENCE_DIR = ROOT / "evidence"
@@ -43,7 +47,7 @@ def now():
     return dt.datetime.now(dt.timezone.utc).isoformat()
 
 
-def request_json(method, path, headers=None, payload=None):
+def request_json(base, method, path, headers=None, payload=None):
     body = None
     hdrs = {"accept": "application/json"}
     hdrs.update(headers or {})
@@ -52,11 +56,15 @@ def request_json(method, path, headers=None, payload=None):
         hdrs["content-type"] = "application/json"
     elif method == "POST":
         body = b""
-    request = urllib.request.Request(f"{API_BASE}{path}", data=body, headers=hdrs, method=method)
+    request = urllib.request.Request(f"{base}{path}", data=body, headers=hdrs, method=method)
     try:
         with urllib.request.urlopen(request, timeout=45) as response:
             raw = response.read().decode("utf-8", "replace")
-            return response.status, json.loads(raw) if raw else {}
+            try:
+                parsed = json.loads(raw) if raw else {}
+            except Exception:
+                parsed = {"raw": raw[:500]}
+            return response.status, parsed
     except urllib.error.HTTPError as exc:
         raw = exc.read().decode("utf-8", "replace")
         try:
@@ -64,17 +72,21 @@ def request_json(method, path, headers=None, payload=None):
         except Exception:
             parsed = {"raw": raw[:500]}
         return exc.code, parsed
+    except Exception as exc:
+        return 0, {"network_error": type(exc).__name__, "message": str(exc)[:300]}
 
 
 def safe(obj):
     if isinstance(obj, dict):
         return {
-            key: ("[REDACTED]" if key.lower() in {"token", "refreshtoken", "code"} else value)
+            key: ("[REDACTED]" if key.lower() in {"token", "refreshtoken", "code"} else safe(value))
             for key, value in obj.items()
         }
     if isinstance(obj, list):
         return [safe(item) for item in obj[:10]]
-    return str(obj)[:500]
+    if isinstance(obj, str):
+        return obj[:500]
+    return obj
 
 
 exact_q = urllib.parse.urlencode([
@@ -89,61 +101,80 @@ auth_attempts = []
 TOKEN = None
 auth_source = None
 resolved_refresh = None
+API_BASE = None
 
-for credential_label, credential in credential_candidates:
-    # 1. Normal API token.
-    status, direct_probe = request_json("GET", f"/bookings?{exact_q}", headers={"token": credential})
-    auth_attempts.append({"credential": credential_label, "mode": "direct_token", "status": status})
-    if 200 <= status < 300:
-        TOKEN = credential
-        auth_source = f"{credential_label}:direct_token"
+for base in API_BASE_CANDIDATES:
+    for credential_label, credential in credential_candidates:
+        status, direct_probe = request_json(base, "GET", f"/bookings?{exact_q}", headers={"token": credential})
+        auth_attempts.append({
+            "api_base": base,
+            "credential": credential_label,
+            "mode": "direct_token",
+            "status": status,
+            "response": safe(direct_probe) if not (200 <= status < 300) else {"success": True},
+        })
+        if 200 <= status < 300:
+            TOKEN = credential
+            API_BASE = base
+            auth_source = f"{credential_label}:direct_token"
+            break
+
+        status, auth = request_json(base, "GET", "/authentication/token", headers={"refreshToken": credential})
+        candidate = auth.get("token") if isinstance(auth, dict) else None
+        auth_attempts.append({
+            "api_base": base,
+            "credential": credential_label,
+            "mode": "refresh_token",
+            "status": status,
+            "response": safe(auth) if not (200 <= status < 300) else {"success": True},
+        })
+        if 200 <= status < 300 and candidate:
+            TOKEN = candidate
+            API_BASE = base
+            resolved_refresh = credential
+            auth_source = f"{credential_label}:refresh_token"
+            break
+
+        status, setup = request_json(
+            base,
+            "GET",
+            "/authentication/setup",
+            headers={"code": credential, "deviceName": "AUMARA-Control-Tower"},
+        )
+        candidate = setup.get("token") if isinstance(setup, dict) else None
+        refresh = setup.get("refreshToken") if isinstance(setup, dict) else None
+        auth_attempts.append({
+            "api_base": base,
+            "credential": credential_label,
+            "mode": "invite_code",
+            "status": status,
+            "response": safe(setup),
+        })
+        if 200 <= status < 300 and candidate:
+            TOKEN = candidate
+            API_BASE = base
+            resolved_refresh = refresh
+            auth_source = f"{credential_label}:invite_code"
+            break
+    if TOKEN:
         break
 
-    # 2. Refresh token.
-    status, auth = request_json("GET", "/authentication/token", headers={"refreshToken": credential})
-    candidate = auth.get("token") if isinstance(auth, dict) else None
-    auth_attempts.append({"credential": credential_label, "mode": "refresh_token", "status": status})
-    if 200 <= status < 300 and candidate:
-        TOKEN = candidate
-        resolved_refresh = credential
-        auth_source = f"{credential_label}:refresh_token"
-        break
-
-    # 3. One-time invite code.
-    status, setup = request_json(
-        "GET",
-        "/authentication/setup",
-        headers={"code": credential, "deviceName": "AUMARA-Control-Tower"},
-    )
-    candidate = setup.get("token") if isinstance(setup, dict) else None
-    refresh = setup.get("refreshToken") if isinstance(setup, dict) else None
-    auth_attempts.append({
-        "credential": credential_label,
-        "mode": "invite_code",
-        "status": status,
-        "response": safe(setup),
-    })
-    if 200 <= status < 300 and candidate:
-        TOKEN = candidate
-        resolved_refresh = refresh
-        auth_source = f"{credential_label}:invite_code"
-        break
-
-if not TOKEN:
+if not TOKEN or not API_BASE:
     EXECUTION_EVIDENCE.write_text(json.dumps({
         "verified_at_utc": now(),
         "status": "AUTH_FAILED",
+        "api_bases_checked": API_BASE_CANDIDATES,
         "attempts": auth_attempts,
         "credential_anchors_checked": [label for label, _ in credential_candidates],
         "plaintext_secret_committed": False,
     }, indent=2))
-    raise SystemExit("Beds24 rejected every persisted credential anchor")
+    raise SystemExit("Beds24 rejected every persisted credential anchor on every API base candidate")
 
 headers = {"token": TOKEN}
 
 
 def api(method, path, payload=None):
-    status, obj = request_json(method, path, headers=headers, payload=payload)
+    status, obj = request_json(API_BASE, method, path, headers=headers, payload=payload)
     if not (200 <= status < 300):
         raise RuntimeError(f"Beds24 {method} {path} failed HTTP {status}: {safe(obj)}")
     return obj
@@ -307,6 +338,7 @@ if not all(checks.values()):
 BOOKING_EVIDENCE.write_text(json.dumps({
     "verified_at_utc": now(),
     "outcome": outcome,
+    "api_base": API_BASE,
     "auth_source": auth_source,
     "api_reference": req["request_id"],
     "booking_id": booking_id,
@@ -327,12 +359,14 @@ BOOKING_EVIDENCE.write_text(json.dumps({
 EXECUTION_EVIDENCE.write_text(json.dumps({
     "verified_at_utc": now(),
     "status": "BOOKING_VERIFIED",
+    "api_base": API_BASE,
     "booking_id": booking_id,
     "outcome": outcome,
     "auth_source": auth_source,
 }, indent=2))
 print(json.dumps({
     "status": "BOOKING_VERIFIED",
+    "api_base": API_BASE,
     "booking_id": booking_id,
     "outcome": outcome,
     "auth_source": auth_source,

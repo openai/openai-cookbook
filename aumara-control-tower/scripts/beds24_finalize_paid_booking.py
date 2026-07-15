@@ -2,6 +2,7 @@ import datetime as dt
 import json
 import os
 import pathlib
+import unicodedata
 import urllib.error
 import urllib.parse
 import urllib.request
@@ -14,11 +15,28 @@ BOOKING_EVIDENCE = EVIDENCE_DIR / "beds24-AUMARA-MEDINA-20260718-660.json"
 EXECUTION_EVIDENCE = EVIDENCE_DIR / "beds24-finalize-status.json"
 
 EVIDENCE_DIR.mkdir(parents=True, exist_ok=True)
-CREDENTIAL = "".join(os.environ.get("BEDS24_BOOTSTRAP_CREDENTIAL", "").split())
-if not CREDENTIAL:
-    raise SystemExit("Missing mapped Beds24 credential")
-
 req = json.loads(REQUEST_FILE.read_text())
+
+
+def normalize(value):
+    value = (value or "").strip().strip('"').strip("'")
+    return "".join(
+        ch for ch in value
+        if not ch.isspace() and unicodedata.category(ch) not in {"Cc", "Cf"}
+    )
+
+
+credential_candidates = []
+for label, env_name in (
+    ("token_secret", "BEDS24_BOOTSTRAP_CREDENTIAL"),
+    ("bootstrap_fallback_secret", "BEDS24_FALLBACK_CREDENTIAL"),
+):
+    value = normalize(os.environ.get(env_name, ""))
+    if value and all(value != existing[1] for existing in credential_candidates):
+        credential_candidates.append((label, value))
+
+if not credential_candidates:
+    raise SystemExit("No Beds24 credential anchors are available")
 
 
 def now():
@@ -70,45 +88,56 @@ exact_q = urllib.parse.urlencode([
 auth_attempts = []
 TOKEN = None
 auth_source = None
+resolved_refresh = None
 
-# 1. The stored value may already be a normal API token.
-status, direct_probe = request_json("GET", f"/bookings?{exact_q}", headers={"token": CREDENTIAL})
-auth_attempts.append({"mode": "direct_token", "status": status})
-if 200 <= status < 300:
-    TOKEN = CREDENTIAL
-    auth_source = "direct_token"
+for credential_label, credential in credential_candidates:
+    # 1. Normal API token.
+    status, direct_probe = request_json("GET", f"/bookings?{exact_q}", headers={"token": credential})
+    auth_attempts.append({"credential": credential_label, "mode": "direct_token", "status": status})
+    if 200 <= status < 300:
+        TOKEN = credential
+        auth_source = f"{credential_label}:direct_token"
+        break
 
-# 2. The stored value may be a refresh token.
-if not TOKEN:
-    status, auth = request_json("GET", "/authentication/token", headers={"refreshToken": CREDENTIAL})
+    # 2. Refresh token.
+    status, auth = request_json("GET", "/authentication/token", headers={"refreshToken": credential})
     candidate = auth.get("token") if isinstance(auth, dict) else None
-    auth_attempts.append({"mode": "refresh_token", "status": status})
+    auth_attempts.append({"credential": credential_label, "mode": "refresh_token", "status": status})
     if 200 <= status < 300 and candidate:
         TOKEN = candidate
-        auth_source = "refresh_token"
+        resolved_refresh = credential
+        auth_source = f"{credential_label}:refresh_token"
+        break
 
-# 3. The stored value may be a one-time invite code. Exchange and use the returned token immediately.
-if not TOKEN:
+    # 3. One-time invite code.
     status, setup = request_json(
         "GET",
         "/authentication/setup",
-        headers={"code": CREDENTIAL, "deviceName": "AUMARA-Control-Tower"},
+        headers={"code": credential, "deviceName": "AUMARA-Control-Tower"},
     )
     candidate = setup.get("token") if isinstance(setup, dict) else None
-    auth_attempts.append({"mode": "invite_code", "status": status, "response": safe(setup)})
+    refresh = setup.get("refreshToken") if isinstance(setup, dict) else None
+    auth_attempts.append({
+        "credential": credential_label,
+        "mode": "invite_code",
+        "status": status,
+        "response": safe(setup),
+    })
     if 200 <= status < 300 and candidate:
         TOKEN = candidate
-        auth_source = "invite_code"
+        resolved_refresh = refresh
+        auth_source = f"{credential_label}:invite_code"
+        break
 
 if not TOKEN:
     EXECUTION_EVIDENCE.write_text(json.dumps({
         "verified_at_utc": now(),
         "status": "AUTH_FAILED",
         "attempts": auth_attempts,
-        "secret_present": True,
+        "credential_anchors_checked": [label for label, _ in credential_candidates],
         "plaintext_secret_committed": False,
     }, indent=2))
-    raise SystemExit("Beds24 credential was rejected as direct token, refresh token and invite code")
+    raise SystemExit("Beds24 rejected every persisted credential anchor")
 
 headers = {"token": TOKEN}
 
@@ -122,8 +151,14 @@ def api(method, path, payload=None):
 
 def invoice_totals(booking):
     items = booking.get("invoiceItems") or []
-    charge = sum(float(item.get("amount") or 0) * float(item.get("qty") or 1) for item in items if item.get("type") == "charge")
-    payment = sum(float(item.get("amount") or 0) * float(item.get("qty") or 1) for item in items if item.get("type") == "payment")
+    charge = sum(
+        float(item.get("amount") or 0) * float(item.get("qty") or 1)
+        for item in items if item.get("type") == "charge"
+    )
+    payment = sum(
+        float(item.get("amount") or 0) * float(item.get("qty") or 1)
+        for item in items if item.get("type") == "payment"
+    )
     return charge, payment
 
 
@@ -164,7 +199,9 @@ for row in rows:
 
 outcome = "reused_existing_exact_match"
 if len(matching) > 1:
-    raise RuntimeError(f"Duplicate-risk stop: found {len(matching)} exact active bookings for same guest, room and dates")
+    raise RuntimeError(
+        f"Duplicate-risk stop: found {len(matching)} exact active bookings for same guest, room and dates"
+    )
 
 if matching:
     booking = matching[0]
@@ -192,7 +229,11 @@ else:
     outcome = "created_new"
 
     if booking_id:
-        read_q = urllib.parse.urlencode([("id", booking_id), ("includeInvoiceItems", "true"), ("includeGuests", "true")])
+        read_q = urllib.parse.urlencode([
+            ("id", booking_id),
+            ("includeInvoiceItems", "true"),
+            ("includeGuests", "true"),
+        ])
         created_rows = api("GET", f"/bookings?{read_q}").get("data") or []
     else:
         created_rows = api("GET", f"/bookings?{exact_q}").get("data") or []
@@ -204,7 +245,9 @@ else:
         ]
 
     if len(created_rows) != 1:
-        raise RuntimeError(f"Created booking read-back returned {len(created_rows)} exact rows; response={safe(created)}")
+        raise RuntimeError(
+            f"Created booking read-back returned {len(created_rows)} exact rows; response={safe(created)}"
+        )
     booking = created_rows[0]
 
 booking_id = booking.get("id")
@@ -214,9 +257,19 @@ if not booking_id:
 charge_total, payment_total = invoice_totals(booking)
 missing_items = []
 if charge_total < float(req["total_price"]):
-    missing_items.append({"type": "charge", "description": req["charge_description"], "qty": 1, "amount": float(req["total_price"]) - charge_total})
+    missing_items.append({
+        "type": "charge",
+        "description": req["charge_description"],
+        "qty": 1,
+        "amount": float(req["total_price"]) - charge_total,
+    })
 if payment_total < float(req["amount_paid"]):
-    missing_items.append({"type": "payment", "description": req["payment_description"], "qty": 1, "amount": float(req["amount_paid"]) - payment_total})
+    missing_items.append({
+        "type": "payment",
+        "description": req["payment_description"],
+        "qty": 1,
+        "amount": float(req["amount_paid"]) - payment_total,
+    })
 
 update = {
     "id": booking_id,
@@ -230,7 +283,11 @@ if missing_items:
     outcome += "+financials_completed"
 api("POST", "/bookings", [update])
 
-verify_q = urllib.parse.urlencode([("id", booking_id), ("includeInvoiceItems", "true"), ("includeGuests", "true")])
+verify_q = urllib.parse.urlencode([
+    ("id", booking_id),
+    ("includeInvoiceItems", "true"),
+    ("includeGuests", "true"),
+])
 verified_rows = api("GET", f"/bookings?{verify_q}").get("data") or []
 if len(verified_rows) != 1:
     raise RuntimeError(f"Final read-back by id {booking_id} returned {len(verified_rows)} rows")
@@ -264,6 +321,7 @@ BOOKING_EVIDENCE.write_text(json.dumps({
     "invoice_payment_total": payment_total,
     "paid_bank_transfer": payment_total >= float(req["amount_paid"]),
     "checks": checks,
+    "resolved_refresh_available_in_memory": bool(resolved_refresh),
     "plaintext_secret_committed": False,
 }, indent=2))
 EXECUTION_EVIDENCE.write_text(json.dumps({
@@ -273,4 +331,9 @@ EXECUTION_EVIDENCE.write_text(json.dumps({
     "outcome": outcome,
     "auth_source": auth_source,
 }, indent=2))
-print(json.dumps({"status": "BOOKING_VERIFIED", "booking_id": booking_id, "outcome": outcome, "auth_source": auth_source}))
+print(json.dumps({
+    "status": "BOOKING_VERIFIED",
+    "booking_id": booking_id,
+    "outcome": outcome,
+    "auth_source": auth_source,
+}))

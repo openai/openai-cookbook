@@ -21,35 +21,35 @@ jobs:
     runs-on: ubuntu-latest
     env:
       BEDS24_BOOTSTRAP_CREDENTIAL: ${{ secrets.BEDS24_TOKEN_CREDENTIAL }}
+      BEDS24_FALLBACK_CREDENTIAL: ${{ secrets.BEDS24_BOOTSTRAP_CREDENTIAL }}
 
     steps:
       - uses: actions/checkout@v4
         with:
           fetch-depth: 0
 
-      - name: Normalize credential without exposing it
+      - name: Record credential shape without exposing secrets
         shell: bash
         run: |
           set -euo pipefail
           mkdir -p aumara-control-tower/evidence
           python - <<'PY'
           import json, os, unicodedata, pathlib
-          raw = os.environ.get('BEDS24_BOOTSTRAP_CREDENTIAL', '')
-          trimmed = raw.strip().strip('"').strip("'")
-          clean = ''.join(
-              ch for ch in trimmed
-              if not ch.isspace() and unicodedata.category(ch) not in {'Cc', 'Cf'}
-          )
-          if not clean:
-              raise SystemExit('Missing BEDS24_TOKEN_CREDENTIAL')
-          with open(os.environ['GITHUB_ENV'], 'a', encoding='utf-8') as f:
-              f.write('BEDS24_BOOTSTRAP_CREDENTIAL=' + clean + '\n')
+          def shape(value):
+              raw = value or ''
+              trimmed = raw.strip().strip('"').strip("'")
+              clean = ''.join(ch for ch in trimmed if not ch.isspace() and unicodedata.category(ch) not in {'Cc','Cf'})
+              return {
+                  'present': bool(clean),
+                  'raw_length': len(raw),
+                  'normalized_length': len(clean),
+                  'removed_characters': len(raw) - len(clean),
+                  'had_control_or_format_characters': any(unicodedata.category(ch) in {'Cc','Cf'} for ch in raw),
+                  'had_whitespace': any(ch.isspace() for ch in raw),
+              }
           evidence = {
-              'raw_length': len(raw),
-              'normalized_length': len(clean),
-              'removed_characters': len(raw) - len(clean),
-              'had_control_or_format_characters': any(unicodedata.category(ch) in {'Cc','Cf'} for ch in raw),
-              'had_whitespace': any(ch.isspace() for ch in raw),
+              'token_secret': shape(os.environ.get('BEDS24_BOOTSTRAP_CREDENTIAL')),
+              'bootstrap_fallback_secret': shape(os.environ.get('BEDS24_FALLBACK_CREDENTIAL')),
               'plaintext_secret_committed': False,
           }
           pathlib.Path('aumara-control-tower/evidence/beds24-credential-shape.json').write_text(json.dumps(evidence, indent=2))

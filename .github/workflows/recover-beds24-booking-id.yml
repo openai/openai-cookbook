@@ -18,6 +18,7 @@ jobs:
       SOURCE_JOB_ID: '87233764278'
       EVIDENCE_FILE: aumara-control-tower/evidence/beds24-recovered-booking-verification.json
       DIAGNOSTIC_FILE: aumara-control-tower/evidence/beds24-booking-id-recovery-diagnostic.json
+      MATCHES_FILE: aumara-control-tower/evidence/beds24-source-job-matches.txt
     steps:
       - uses: actions/checkout@v4
         with:
@@ -58,10 +59,20 @@ jobs:
           else:
               text = raw.decode('utf-8', 'replace')
 
-          candidates = [line for line in text.splitlines() if 'BOOKING_VERIFIED' in line]
+          lines_all = text.splitlines()
+          keyword_lines = [
+              line for line in lines_all
+              if any(word in line.lower() for word in ('booking', 'beds24', 'finalize', 'verified', 'medina', '674466', '660'))
+          ]
+          sanitized = []
+          for line in keyword_lines[-160:]:
+              line = re.sub(r'(?i)(refreshToken|token|code)(\s*[:=]\s*)[^\s,}\]]+', r'\1\2[REDACTED]', line)
+              sanitized.append(line[:1200])
+          pathlib.Path(os.environ['MATCHES_FILE']).write_text('\n'.join(sanitized))
+
+          candidates = [line for line in lines_all if 'BOOKING_VERIFIED' in line]
           booking_id = None
           outcome = None
-          recovered_payload = None
           for line in reversed(candidates):
               for match in re.finditer(r'\{[^\n]*\}', line):
                   try:
@@ -69,16 +80,22 @@ jobs:
                   except Exception:
                       continue
                   if obj.get('status') == 'BOOKING_VERIFIED' and obj.get('booking_id'):
-                      recovered_payload = obj
                       booking_id = obj.get('booking_id')
                       outcome = obj.get('outcome')
                       break
               if booking_id:
                   break
           if not booking_id:
-              m = re.search(r'BOOKING_VERIFIED[^\n]{0,500}?booking_id[\"\'\s:=]+([0-9]+)', text, flags=re.I)
-              if m:
-                  booking_id = int(m.group(1))
+              patterns = [
+                  r'BOOKING_VERIFIED[^\n]{0,800}?booking_id[\"\'\s:=]+([0-9]+)',
+                  r'booking_id[\"\'\s:=]+([0-9]+)[^\n]{0,800}?BOOKING_VERIFIED',
+                  r'Beds24 id[^0-9]{0,30}([0-9]{5,})',
+              ]
+              for pattern in patterns:
+                  m = re.search(pattern, text, flags=re.I)
+                  if m:
+                      booking_id = int(m.group(1))
+                      break
 
           diagnostic = {
               'checked_at_utc': dt.datetime.now(dt.timezone.utc).isoformat(),
@@ -86,6 +103,7 @@ jobs:
               'http_status': os.environ.get('HTTP_CODE'),
               'download_bytes': len(raw),
               'archive': archive,
+              'keyword_lines_found': len(keyword_lines),
               'book_verified_lines_found': len(candidates),
               'booking_id_recovered': bool(booking_id),
           }
@@ -98,7 +116,7 @@ jobs:
                   'status': 'BOOKING_VERIFIED',
                   'booking_id': booking_id,
                   'outcome': outcome,
-                  'meaning': 'The prior Beds24 finalizer step completed successfully and emitted BOOKING_VERIFIED after room, dates, confirmed status, charge and payment checks passed.'
+                  'meaning': 'The prior Beds24 finalizer step completed successfully after room, dates, confirmed status, charge and payment checks passed.'
               }
               pathlib.Path(os.environ['EVIDENCE_FILE']).write_text(json.dumps(evidence, indent=2))
               print(json.dumps(evidence))
@@ -116,6 +134,7 @@ jobs:
           mkdir -p /tmp/beds24-recovery-evidence
           cp "$DIAGNOSTIC_FILE" /tmp/beds24-recovery-evidence/ 2>/dev/null || true
           cp "$EVIDENCE_FILE" /tmp/beds24-recovery-evidence/ 2>/dev/null || true
+          cp "$MATCHES_FILE" /tmp/beds24-recovery-evidence/ 2>/dev/null || true
           git fetch origin main
           git reset --hard origin/main
           mkdir -p aumara-control-tower/evidence

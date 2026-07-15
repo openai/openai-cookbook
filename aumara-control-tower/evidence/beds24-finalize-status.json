@@ -1,5 +1,5 @@
 {
-  "verified_at_utc": "2026-07-15T00:10:29.390310+00:00",
+  "verified_at_utc": "2026-07-15T00:11:04.652761+00:00",
   "status": "AUTH_FAILED",
   "attempts": [
     {
@@ -22,10 +22,32 @@
         "code": "[REDACTED]",
         "error": "Token not valid"
       }
+    },
+    {
+      "credential": "bootstrap_fallback_secret",
+      "mode": "direct_token",
+      "status": 401
+    },
+    {
+      "credential": "bootstrap_fallback_secret",
+      "mode": "refresh_token",
+      "status": 401
+    },
+    {
+      "credential": "bootstrap_fallback_secret",
+      "mode": "invite_code",
+      "status": 401,
+      "response": {
+        "success": false,
+        "type": "error",
+        "code": "[REDACTED]",
+        "error": "Token not valid"
+      }
     }
   ],
   "credential_anchors_checked": [
-    "token_secret"
+    "token_secret",
+    "bootstrap_fallback_secret"
   ],
   "plaintext_secret_committed": false
 }

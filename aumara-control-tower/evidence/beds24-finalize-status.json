@@ -1,18 +1,38 @@
 {
-  "verified_at_utc": "2026-07-15T00:11:04.652761+00:00",
+  "verified_at_utc": "2026-07-15T00:13:42.241730+00:00",
   "status": "AUTH_FAILED",
+  "api_bases_checked": [
+    "https://api.beds24.com/v2",
+    "https://beds24.com/v2",
+    "https://beds24.com/api/v2"
+  ],
   "attempts": [
     {
+      "api_base": "https://api.beds24.com/v2",
       "credential": "token_secret",
       "mode": "direct_token",
-      "status": 401
+      "status": 401,
+      "response": {
+        "success": false,
+        "type": "error",
+        "code": "[REDACTED]",
+        "error": "Token not valid"
+      }
     },
     {
+      "api_base": "https://api.beds24.com/v2",
       "credential": "token_secret",
       "mode": "refresh_token",
-      "status": 401
+      "status": 401,
+      "response": {
+        "success": false,
+        "type": "error",
+        "code": "[REDACTED]",
+        "error": "Token not valid"
+      }
     },
     {
+      "api_base": "https://api.beds24.com/v2",
       "credential": "token_secret",
       "mode": "invite_code",
       "status": 401,
@@ -24,16 +44,157 @@
       }
     },
     {
+      "api_base": "https://api.beds24.com/v2",
       "credential": "bootstrap_fallback_secret",
       "mode": "direct_token",
-      "status": 401
+      "status": 401,
+      "response": {
+        "success": false,
+        "type": "error",
+        "code": "[REDACTED]",
+        "error": "Token not valid"
+      }
     },
     {
+      "api_base": "https://api.beds24.com/v2",
       "credential": "bootstrap_fallback_secret",
       "mode": "refresh_token",
-      "status": 401
+      "status": 401,
+      "response": {
+        "success": false,
+        "type": "error",
+        "code": "[REDACTED]",
+        "error": "Token not valid"
+      }
     },
     {
+      "api_base": "https://api.beds24.com/v2",
+      "credential": "bootstrap_fallback_secret",
+      "mode": "invite_code",
+      "status": 401,
+      "response": {
+        "success": false,
+        "type": "error",
+        "code": "[REDACTED]",
+        "error": "Token not valid"
+      }
+    },
+    {
+      "api_base": "https://beds24.com/v2",
+      "credential": "token_secret",
+      "mode": "direct_token",
+      "status": 404,
+      "response": {
+        "raw": "<!DOCTYPE html>\n<html>\n<head>\n<meta charset=\"UTF-8\">\n<style type='text/css'>\n\n.body {\nbackground-color: #1c1e20;\nbackground: -webkit-gradient(radial, center center, 0, center center, 460, from(#004097), to(#1c1e20)); \nbackground: -webkit-radial-gradient(circle, #004097, #1c1e20);\nbackground: -moz-radial-gradient(circle, #004097, #1c1e20); \nbackground: -ms-radial-gradient(circle, #004097, #1c1e20); \n}\n.page {max-width:960px;\nmargin: 0 auto;\nbackground-color: #ffffff; \nfont-family:arial,helvetica,"
+      }
+    },
+    {
+      "api_base": "https://beds24.com/v2",
+      "credential": "token_secret",
+      "mode": "refresh_token",
+      "status": 404,
+      "response": {
+        "raw": "<!DOCTYPE html>\n<html>\n<head>\n<meta charset=\"UTF-8\">\n<style type='text/css'>\n\n.body {\nbackground-color: #1c1e20;\nbackground: -webkit-gradient(radial, center center, 0, center center, 460, from(#004097), to(#1c1e20)); \nbackground: -webkit-radial-gradient(circle, #004097, #1c1e20);\nbackground: -moz-radial-gradient(circle, #004097, #1c1e20); \nbackground: -ms-radial-gradient(circle, #004097, #1c1e20); \n}\n.page {max-width:960px;\nmargin: 0 auto;\nbackground-color: #ffffff; \nfont-family:arial,helvetica,"
+      }
+    },
+    {
+      "api_base": "https://beds24.com/v2",
+      "credential": "token_secret",
+      "mode": "invite_code",
+      "status": 404,
+      "response": {
+        "raw": "<!DOCTYPE html>\n<html>\n<head>\n<meta charset=\"UTF-8\">\n<style type='text/css'>\n\n.body {\nbackground-color: #1c1e20;\nbackground: -webkit-gradient(radial, center center, 0, center center, 460, from(#004097), to(#1c1e20)); \nbackground: -webkit-radial-gradient(circle, #004097, #1c1e20);\nbackground: -moz-radial-gradient(circle, #004097, #1c1e20); \nbackground: -ms-radial-gradient(circle, #004097, #1c1e20); \n}\n.page {max-width:960px;\nmargin: 0 auto;\nbackground-color: #ffffff; \nfont-family:arial,helvetica,"
+      }
+    },
+    {
+      "api_base": "https://beds24.com/v2",
+      "credential": "bootstrap_fallback_secret",
+      "mode": "direct_token",
+      "status": 404,
+      "response": {
+        "raw": "<!DOCTYPE html>\n<html>\n<head>\n<meta charset=\"UTF-8\">\n<style type='text/css'>\n\n.body {\nbackground-color: #1c1e20;\nbackground: -webkit-gradient(radial, center center, 0, center center, 460, from(#004097), to(#1c1e20)); \nbackground: -webkit-radial-gradient(circle, #004097, #1c1e20);\nbackground: -moz-radial-gradient(circle, #004097, #1c1e20); \nbackground: -ms-radial-gradient(circle, #004097, #1c1e20); \n}\n.page {max-width:960px;\nmargin: 0 auto;\nbackground-color: #ffffff; \nfont-family:arial,helvetica,"
+      }
+    },
+    {
+      "api_base": "https://beds24.com/v2",
+      "credential": "bootstrap_fallback_secret",
+      "mode": "refresh_token",
+      "status": 404,
+      "response": {
+        "raw": "<!DOCTYPE html>\n<html>\n<head>\n<meta charset=\"UTF-8\">\n<style type='text/css'>\n\n.body {\nbackground-color: #1c1e20;\nbackground: -webkit-gradient(radial, center center, 0, center center, 460, from(#004097), to(#1c1e20)); \nbackground: -webkit-radial-gradient(circle, #004097, #1c1e20);\nbackground: -moz-radial-gradient(circle, #004097, #1c1e20); \nbackground: -ms-radial-gradient(circle, #004097, #1c1e20); \n}\n.page {max-width:960px;\nmargin: 0 auto;\nbackground-color: #ffffff; \nfont-family:arial,helvetica,"
+      }
+    },
+    {
+      "api_base": "https://beds24.com/v2",
+      "credential": "bootstrap_fallback_secret",
+      "mode": "invite_code",
+      "status": 404,
+      "response": {
+        "raw": "<!DOCTYPE html>\n<html>\n<head>\n<meta charset=\"UTF-8\">\n<style type='text/css'>\n\n.body {\nbackground-color: #1c1e20;\nbackground: -webkit-gradient(radial, center center, 0, center center, 460, from(#004097), to(#1c1e20)); \nbackground: -webkit-radial-gradient(circle, #004097, #1c1e20);\nbackground: -moz-radial-gradient(circle, #004097, #1c1e20); \nbackground: -ms-radial-gradient(circle, #004097, #1c1e20); \n}\n.page {max-width:960px;\nmargin: 0 auto;\nbackground-color: #ffffff; \nfont-family:arial,helvetica,"
+      }
+    },
+    {
+      "api_base": "https://beds24.com/api/v2",
+      "credential": "token_secret",
+      "mode": "direct_token",
+      "status": 401,
+      "response": {
+        "success": false,
+        "type": "error",
+        "code": "[REDACTED]",
+        "error": "Token not valid"
+      }
+    },
+    {
+      "api_base": "https://beds24.com/api/v2",
+      "credential": "token_secret",
+      "mode": "refresh_token",
+      "status": 401,
+      "response": {
+        "success": false,
+        "type": "error",
+        "code": "[REDACTED]",
+        "error": "Token not valid"
+      }
+    },
+    {
+      "api_base": "https://beds24.com/api/v2",
+      "credential": "token_secret",
+      "mode": "invite_code",
+      "status": 401,
+      "response": {
+        "success": false,
+        "type": "error",
+        "code": "[REDACTED]",
+        "error": "Token not valid"
+      }
+    },
+    {
+      "api_base": "https://beds24.com/api/v2",
+      "credential": "bootstrap_fallback_secret",
+      "mode": "direct_token",
+      "status": 401,
+      "response": {
+        "success": false,
+        "type": "error",
+        "code": "[REDACTED]",
+        "error": "Token not valid"
+      }
+    },
+    {
+      "api_base": "https://beds24.com/api/v2",
+      "credential": "bootstrap_fallback_secret",
+      "mode": "refresh_token",
+      "status": 401,
+      "response": {
+        "success": false,
+        "type": "error",
+        "code": "[REDACTED]",
+        "error": "Token not valid"
+      }
+    },
+    {
+      "api_base": "https://beds24.com/api/v2",
       "credential": "bootstrap_fallback_secret",
       "mode": "invite_code",
       "status": 401,

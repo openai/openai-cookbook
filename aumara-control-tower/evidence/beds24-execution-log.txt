@@ -1,1 +1,1 @@
-Beds24 credential was rejected as direct token, refresh token and invite code
+Beds24 rejected every persisted credential anchor

@@ -1,16 +1,19 @@
 {
-  "verified_at_utc": "2026-07-15T00:08:40.083694+00:00",
+  "verified_at_utc": "2026-07-15T00:10:29.390310+00:00",
   "status": "AUTH_FAILED",
   "attempts": [
     {
+      "credential": "token_secret",
       "mode": "direct_token",
       "status": 401
     },
     {
+      "credential": "token_secret",
       "mode": "refresh_token",
       "status": 401
     },
     {
+      "credential": "token_secret",
       "mode": "invite_code",
       "status": 401,
       "response": {
@@ -21,6 +24,8 @@
       }
     }
   ],
-  "secret_present": true,
+  "credential_anchors_checked": [
+    "token_secret"
+  ],
   "plaintext_secret_committed": false
 }

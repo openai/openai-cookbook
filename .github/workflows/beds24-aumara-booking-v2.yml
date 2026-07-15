@@ -27,13 +27,40 @@ jobs:
         with:
           fetch-depth: 0
 
+      - name: Normalize credential without exposing it
+        shell: bash
+        run: |
+          set -euo pipefail
+          mkdir -p aumara-control-tower/evidence
+          python - <<'PY'
+          import json, os, unicodedata, pathlib
+          raw = os.environ.get('BEDS24_BOOTSTRAP_CREDENTIAL', '')
+          trimmed = raw.strip().strip('"').strip("'")
+          clean = ''.join(
+              ch for ch in trimmed
+              if not ch.isspace() and unicodedata.category(ch) not in {'Cc', 'Cf'}
+          )
+          if not clean:
+              raise SystemExit('Missing BEDS24_TOKEN_CREDENTIAL')
+          with open(os.environ['GITHUB_ENV'], 'a', encoding='utf-8') as f:
+              f.write('BEDS24_BOOTSTRAP_CREDENTIAL=' + clean + '\n')
+          evidence = {
+              'raw_length': len(raw),
+              'normalized_length': len(clean),
+              'removed_characters': len(raw) - len(clean),
+              'had_control_or_format_characters': any(unicodedata.category(ch) in {'Cc','Cf'} for ch in raw),
+              'had_whitespace': any(ch.isspace() for ch in raw),
+              'plaintext_secret_committed': False,
+          }
+          pathlib.Path('aumara-control-tower/evidence/beds24-credential-shape.json').write_text(json.dumps(evidence, indent=2))
+          PY
+
       - name: Finalize and verify paid AUMARA booking
         id: execute
         continue-on-error: true
         shell: bash
         run: |
           set +e
-          mkdir -p aumara-control-tower/evidence
           python aumara-control-tower/scripts/beds24_finalize_paid_booking.py > aumara-control-tower/evidence/beds24-execution-log.txt 2>&1
           RC=$?
           cat aumara-control-tower/evidence/beds24-execution-log.txt

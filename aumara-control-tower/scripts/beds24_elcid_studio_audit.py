@@ -108,6 +108,36 @@ def decrypt_refresh(passphrase: str) -> str:
         return normalize(output.read_text(errors="replace"))
 
 
+def encrypt_refresh(refresh_token: str, passphrase: str) -> None:
+    """Persist a refresh token only as an AES-encrypted repository vault."""
+    ENCRYPTED_REFRESH.parent.mkdir(parents=True, exist_ok=True)
+    with tempfile.TemporaryDirectory(prefix="elcid-beds24-") as directory:
+        source = pathlib.Path(directory) / "refresh.txt"
+        source.write_text(refresh_token)
+        environment = os.environ.copy()
+        environment["BEDS24_VAULT_PASSPHRASE_VALUE"] = passphrase
+        subprocess.run(
+            [
+                "openssl",
+                "enc",
+                "-aes-256-cbc",
+                "-salt",
+                "-pbkdf2",
+                "-iter",
+                "200000",
+                "-pass",
+                "env:BEDS24_VAULT_PASSPHRASE_VALUE",
+                "-in",
+                str(source),
+                "-out",
+                str(ENCRYPTED_REFRESH),
+            ],
+            env=environment,
+            capture_output=True,
+            check=True,
+        )
+
+
 def credential_candidates() -> list[tuple[str, str]]:
     """Collect configured and encrypted credential candidates safely."""
     names = (
@@ -134,7 +164,7 @@ def credential_candidates() -> list[tuple[str, str]]:
     return candidates
 
 
-def get_access_token() -> tuple[str, str, str, str]:
+def get_access_token() -> tuple[str, str, str, str, bool]:
     """Accept an access/refresh token or the existing encrypted vault."""
     candidates = credential_candidates()
     if not candidates:
@@ -152,7 +182,7 @@ def get_access_token() -> tuple[str, str, str, str]:
             )
             last_status = status
             if 200 <= status < 300:
-                return credential, "access_token", api_base, source
+                return credential, "access_token", api_base, source, False
 
             status, response = request_json(
                 "GET",
@@ -164,7 +194,50 @@ def get_access_token() -> tuple[str, str, str, str]:
             if 200 <= status < 300 and isinstance(response, dict):
                 token = normalize(str(response.get("token") or ""))
                 if token:
-                    return token, "refresh_token", api_base, source
+                    return token, "refresh_token", api_base, source, False
+
+    if os.environ.get("BEDS24_ALLOW_INVITE_BOOTSTRAP") == "1":
+        configured = [
+            item for item in candidates if not item[0].startswith("vault_via_")
+        ]
+        for source, credential in configured:
+            for api_base in API_BASES:
+                status, response = request_json(
+                    "GET",
+                    "/authentication/setup",
+                    headers={
+                        "code": credential,
+                        "deviceName": "ELCID-Studio-Automation",
+                    },
+                    api_base=api_base,
+                )
+                last_status = status
+                if not (200 <= status < 300) or not isinstance(response, dict):
+                    continue
+                refresh_token = normalize(str(response.get("refreshToken") or ""))
+                access_token = normalize(str(response.get("token") or ""))
+                if not refresh_token:
+                    continue
+                encrypt_refresh(refresh_token, credential)
+                if not access_token:
+                    status, token_response = request_json(
+                        "GET",
+                        "/authentication/token",
+                        headers={"refreshToken": refresh_token},
+                        api_base=api_base,
+                    )
+                    if 200 <= status < 300 and isinstance(token_response, dict):
+                        access_token = normalize(
+                            str(token_response.get("token") or "")
+                        )
+                if access_token:
+                    return (
+                        access_token,
+                        "invite_bootstrap",
+                        api_base,
+                        source,
+                        True,
+                    )
 
     raise AuditError(
         "The configured credential is neither a valid access token nor a "
@@ -389,7 +462,7 @@ def main() -> None:
     today = dt.date.fromisoformat(
         os.environ.get("AUDIT_TODAY", dt.datetime.now(dt.timezone.utc).date().isoformat())
     )
-    token, auth_mode, api_base, auth_source = get_access_token()
+    token, auth_mode, api_base, auth_source, bootstrap = get_access_token()
     bookings = fetch_bookings(token, today, api_base)
 
     inventory: dict[tuple[int, dt.date], int | None] = {}
@@ -437,6 +510,7 @@ def main() -> None:
         "readOnly": True,
         "authMode": auth_mode,
         "authSource": auth_source,
+        "authBootstrapPerformed": bootstrap,
         "apiHost": urllib.parse.urlparse(api_base).netloc,
         "propertyId": PROPERTY_ID,
         "studioRoomId": STUDIO_ROOM_ID,

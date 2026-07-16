@@ -29,6 +29,25 @@ def now():
     return dt.datetime.now(dt.timezone.utc).isoformat()
 
 
+# Live Beds24 state is managed by Beds24 itself (booking status, Auto Actions,
+# API Arrivals and Remotelock). This obsolete V2 recovery script previously
+# attempted to create/deduplicate live bookings with the wrong credential type.
+# Keep it hard-disabled so a GitHub retry cannot create, cancel or modify a stay.
+EXECUTION_EVIDENCE.write_text(json.dumps({
+    "verified_at_utc": now(),
+    "status": "DISABLED_REDUNDANT_V2_BRIDGE",
+    "request_id": req.get("request_id"),
+    "reason": "Use native Beds24 booking and guest-action flow; external live writes are disabled.",
+    "live_booking_mutations": False,
+}, indent=2))
+print(json.dumps({
+    "status": "DISABLED_REDUNDANT_V2_BRIDGE",
+    "request_id": req.get("request_id"),
+    "live_booking_mutations": False,
+}))
+raise SystemExit(0)
+
+
 def normalize(value):
     value = (value or "").strip().strip('"').strip("'")
     return "".join(

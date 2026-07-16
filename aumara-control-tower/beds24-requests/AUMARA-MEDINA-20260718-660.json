@@ -9,6 +9,7 @@
   "arrival": "2026-07-18",
   "departure": "2026-07-20",
   "nights": 2,
+  "adults": 6,
   "total_price": 660,
   "amount_paid": 660,
   "currency": "EUR",
@@ -16,12 +17,14 @@
   "payment_verified_date": "2026-07-14",
   "country": "Spain",
   "country2": "ES",
-  "contact_details_status": "pending",
+  "email": "expositoelvi@gmail.com",
+  "phone": "+34 633 60 71 79",
+  "contact_details_status": "complete",
   "flag_text": "PAID EUR 660",
   "charge_description": "AUMARA Superior Chalet - 18-20 Jul 2026",
   "payment_description": "Bank transfer received 14 Jul 2026",
-  "comments": "Direct AUMARA reservation. Full payment of EUR 660 received by bank transfer on 14 July 2026. Guest contact details are pending. Special dinner and terrace breakfasts were requested separately and are not included in EUR 660.",
-  "notes": "AUMARA direct booking request created from verified bank payment evidence. Superior Chalet, 18-20 July 2026, 2 nights, EUR 660 paid in full by bank transfer. Contact email, phone and final guest count pending.",
+  "comments": "Direct AUMARA reservation for 6 adults. Full payment of EUR 660 received by bank transfer on 14 July 2026. Guest email: expositoelvi@gmail.com. Guest phone: +34 633 60 71 79. Bed, second refrigerator and toaster to be provided. Special dinner and terrace breakfasts were requested separately and are not included in EUR 660.",
+  "notes": "AUMARA direct booking. Superior Chalet, 18-20 July 2026, 2 nights, 6 adults, EUR 660 paid in full by bank transfer. Contact details complete. Bed, second refrigerator and toaster confirmed.",
   "execution_requested": true,
-  "execution_trigger": "2026-07-15T01:42:00+02:00"
+  "execution_trigger": "2026-07-16T14:20:00+02:00"
 }

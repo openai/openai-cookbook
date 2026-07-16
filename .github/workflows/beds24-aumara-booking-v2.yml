@@ -59,6 +59,7 @@ jobs:
         shell: bash
         run: |
           set +e
+          sed -i 's#https://beds24.com/api/v2#https://api.beds24.com/v2#' aumara-control-tower/scripts/beds24_finalize_paid_booking.py
           python aumara-control-tower/scripts/beds24_finalize_paid_booking.py > aumara-control-tower/evidence/beds24-execution-log.txt 2>&1
           RC=$?
           cat aumara-control-tower/evidence/beds24-execution-log.txt

@@ -1,0 +1,61 @@
+name: Beds24 El Cid auto replies
+
+on:
+  workflow_dispatch:
+    inputs:
+      execute:
+        description: Send replies instead of dry-run
+        required: true
+        type: boolean
+        default: false
+  schedule:
+    - cron: '*/5 * * * *'
+  push:
+    branches: [main]
+    paths:
+      - '.github/workflows/beds24-elcid-auto-replies.yml'
+      - 'aumara-control-tower/scripts/beds24_elcid_auto_replies.py'
+      - 'aumara-control-tower/scripts/tests/test_beds24_elcid_auto_replies.py'
+
+permissions:
+  contents: read
+
+concurrency:
+  group: beds24-elcid-auto-replies
+  cancel-in-progress: true
+
+jobs:
+  reply:
+    runs-on: ubuntu-latest
+    env:
+      BEDS24_TOKEN_CREDENTIAL: ${{ secrets.BEDS24_TOKEN_CREDENTIAL }}
+      BEDS24_BOOTSTRAP_CREDENTIAL: ${{ secrets.BEDS24_BOOTSTRAP_CREDENTIAL }}
+      BEDS24_REFRESH_TOKEN: ${{ secrets.BEDS24_REFRESH_TOKEN }}
+      BEDS24_AUTO_REPLY_OUTPUT: aumara-control-tower/evidence/elcid-auto-replies.json
+
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Test auto-reply safety rules
+        run: python -m unittest aumara-control-tower/scripts/tests/test_beds24_elcid_auto_replies.py
+
+      - name: Plan replies without sending
+        if: github.event_name == 'push' || (github.event_name == 'workflow_dispatch' && !inputs.execute)
+        env:
+          BEDS24_AUTO_REPLY_EXECUTE: '0'
+        run: python aumara-control-tower/scripts/beds24_elcid_auto_replies.py
+
+      - name: Send idempotent replies
+        if: github.event_name == 'schedule' || (github.event_name == 'workflow_dispatch' && inputs.execute)
+        env:
+          BEDS24_AUTO_REPLY_EXECUTE: '1'
+        run: python aumara-control-tower/scripts/beds24_elcid_auto_replies.py
+
+      - name: Upload sanitized result
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: elcid-auto-replies
+          path: aumara-control-tower/evidence/elcid-auto-replies.json
+          if-no-files-found: warn
+          retention-days: 7

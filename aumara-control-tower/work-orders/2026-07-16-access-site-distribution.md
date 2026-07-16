@@ -16,25 +16,37 @@ Do not treat conversational memory as operational state. Read this file, the Sys
 - Check-out: 2026-07-20.
 - Beds24 generated a `LOCK_PIN` booking info code.
 - A physical test was performed on 2026-07-16, before the booking access period, and the PIN was rejected.
+- Verified Beds24 TTLock property settings on 2026-07-16:
+  - Passcode Strategy: `Offline`.
+  - Start Time: `16:00`.
+  - End Time: `12:00`.
+  - Days in Advance: `3`.
+  - Synchronize: enabled for Chalet and Superior Chalet.
+  - Chalet room `674465`: Unit 1 -> lock `23903424`; Unit 2 -> `23903418`; Unit 3 -> `23903386`.
+  - Superior Chalet room `674466`: Unit 1 -> lock `23903314`; Unit 2 -> `23903360`.
 
 ### Correct diagnosis
-Beds24 TTLock codes can only be used during the booking period. PIN generation and guest-message timing are separate from physical validity. A rejection before check-in is expected and is not proof that the PIN is wrong.
+Beds24 TTLock codes can only be used during the booking period. `Days in Advance = 3` means Beds24 generates/sends the offline credential three days before arrival; it does **not** make the code physically valid three days early. For booking `89850330`, the generated offline PIN is expected to become valid at 16:00 on 2026-07-18 and stop at 12:00 on 2026-07-20.
 
-Online PIN strategy requires the mapped TTLock to be connected to the internet through a commissioned gateway. Offline strategy does not require a gateway, but codes cannot be customised, updated or deleted and must first be used within 24 hours of their start time.
+With `Offline` strategy, TTLock generates a unique 6–9 digit code. It cannot be customised, updated, deleted or forced to remain the same across bookings. It must be used at least once within 24 hours after its start time or it becomes invalid. Therefore a fixed repeated PIN or “last phone digits” strategy is not available until the mapped locks are online through commissioned gateways.
+
+### Interim operating policy — no gateways
+1. Keep Passcode Strategy = `Offline`.
+2. Keep Start Time = `16:00`, End Time = `12:00`, Days in Advance = `3`.
+3. Do not manually replace the generated `LOCK_PIN` and do not promise one permanent common guest code.
+4. Auto-send the generated per-booking PIN using `[BOOKINGINFOCODETEXT:LOCK_PIN]` only after the PIN exists and before check-in. Default target: one Spanish access message 24 hours before arrival.
+5. Require first physical use of every offline PIN within 24 hours after its start time.
+6. Keep the mechanical-key/manual-access fallback for every arrival.
+7. Duplicate booking `89851675` must be cancelled; offline credentials cannot be remotely revoked, so duplicate prevention is mandatory.
+8. Test the current guest PIN only at or after 16:00 on 2026-07-18. Do not interpret an earlier rejection as a defect.
 
 ### Immediate action
-1. In Beds24 TTLock settings record, without secrets:
-   - lock mapped to Superior Chalet Unit 1;
-   - current PIN strategy;
-   - Start Time / End Time;
-   - Days in Advance;
-   - gateway/cloud state.
-2. Create a separate temporary test PIN in TTLock valid immediately for 30 minutes. Do not modify or expose the guest PIN.
-3. Test the physical green-house lock, revoke the temporary PIN and record the audit result.
-4. If the gateway is not commissioned, use the offline-PIN runbook for the current arrival and retain the mechanical-key fallback.
-5. At the configured start time on 2026-07-18, verify the booking PIN on the physical door.
-6. Only after physical proof, send one Spanish guest-access message containing the PIN, map, address, check-in/check-out times and support contact.
-7. Confirm duplicate booking `89851675` is cancelled and cannot retain a second active access credential.
+1. Confirm duplicate booking `89851675` is cancelled and cannot retain a second active access credential.
+2. Verify Auto Action email/SMS template contains `[BOOKINGINFOCODETEXT:LOCK_PIN]`, the map/address, check-in 16:00, check-out 12:00 and monitored support contact.
+3. Schedule the guest-access message for 24 hours before check-in, after code generation.
+4. At 16:00 on 2026-07-18, test the guest PIN on Superior Chalet Unit 1 / lock `23903314`.
+5. Record physical-open result and first-use timestamp.
+6. If the PIN fails within its valid window, use the mechanical key/manual procedure and inspect mapping, lock clock, room/unit assignment and offline-code collision.
 
 ### Permanent target
 - Two TTLock gateways commissioned and monitored.
@@ -44,9 +56,10 @@ Online PIN strategy requires the mapped TTLock to be connected to the internet t
 - End-to-end evidence: booking -> PIN -> correct physical house -> checkout expiry -> cancellation revoke.
 
 ### Definition of done
-- Temporary PIN opens and is revoked.
 - Guest PIN opens only in the correct validity window.
+- First use occurs within 24 hours of the start time.
 - One booking maps to one house and one active access credential.
+- Guest message contains the actual generated PIN and arrival instructions.
 - Non-secret evidence is stored in Control Tower.
 
 ---

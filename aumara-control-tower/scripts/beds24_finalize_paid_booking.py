@@ -9,10 +9,7 @@ import urllib.error
 import urllib.parse
 import urllib.request
 
-API_BASE_CANDIDATES = [
-    "https://beds24.com/api/v2",
-    "https://api.beds24.com/v2",
-]
+API_BASE = "https://beds24.com/api/v2"
 ROOT = pathlib.Path(__file__).resolve().parents[1]
 REQUEST_FILE = ROOT / "beds24-requests" / "AUMARA-MEDINA-20260718-660.json"
 EVIDENCE_DIR = ROOT / "evidence"
@@ -40,20 +37,12 @@ def normalize(value):
     )
 
 
-credential_candidates = []
-for label, env_name in (
-    ("token_secret", "BEDS24_BOOTSTRAP_CREDENTIAL"),
-    ("bootstrap_fallback_secret", "BEDS24_FALLBACK_CREDENTIAL"),
-):
-    value = normalize(os.environ.get(env_name, ""))
-    if value and all(value != existing[1] for existing in credential_candidates):
-        credential_candidates.append((label, value))
-
-if not credential_candidates:
-    raise SystemExit("No Beds24 credential anchors are available")
+credential = normalize(os.environ.get("BEDS24_BOOTSTRAP_CREDENTIAL", ""))
+if not credential:
+    raise SystemExit("Missing BEDS24_TOKEN_CREDENTIAL GitHub secret")
 
 
-def request_json(base, method, path, headers=None, payload=None):
+def request_json(method, path, headers=None, payload=None):
     body = None
     hdrs = {"accept": "application/json"}
     hdrs.update(headers or {})
@@ -63,7 +52,7 @@ def request_json(base, method, path, headers=None, payload=None):
     elif method == "POST":
         body = b""
     request = urllib.request.Request(
-        f"{base}{path}",
+        f"{API_BASE}{path}",
         data=body,
         headers=hdrs,
         method=method,
@@ -83,11 +72,6 @@ def request_json(base, method, path, headers=None, payload=None):
         except Exception:
             parsed = {"raw": raw[:500]}
         return exc.code, parsed
-    except Exception as exc:
-        return 0, {
-            "network_error": type(exc).__name__,
-            "message": str(exc)[:300],
-        }
 
 
 def safe(obj):
@@ -101,44 +85,34 @@ def safe(obj):
             for key, value in obj.items()
         }
     if isinstance(obj, list):
-        return [safe(item) for item in obj[:10]]
+        return [safe(item) for item in obj[:20]]
     if isinstance(obj, str):
         return obj[:500]
     return obj
 
 
-def decrypt_vault(passphrase, label):
+def decrypt_vault(passphrase):
     if not ENCRYPTED_REFRESH.exists() or ENCRYPTED_REFRESH.stat().st_size == 0:
-        return None, "missing"
-    out = TMP_DIR / f"refresh-{label}.txt"
+        return None
+    out = TMP_DIR / "refresh.txt"
     out.unlink(missing_ok=True)
     env = os.environ.copy()
     env["BEDS24_VAULT_PASSPHRASE"] = passphrase
     proc = subprocess.run(
         [
-            "openssl",
-            "enc",
-            "-d",
-            "-aes-256-cbc",
-            "-pbkdf2",
-            "-iter",
-            "200000",
-            "-pass",
-            "env:BEDS24_VAULT_PASSPHRASE",
-            "-in",
-            str(ENCRYPTED_REFRESH),
-            "-out",
-            str(out),
+            "openssl", "enc", "-d", "-aes-256-cbc", "-pbkdf2",
+            "-iter", "200000", "-pass", "env:BEDS24_VAULT_PASSPHRASE",
+            "-in", str(ENCRYPTED_REFRESH), "-out", str(out),
         ],
         env=env,
         capture_output=True,
         text=True,
     )
     if proc.returncode != 0 or not out.exists():
-        return None, "decrypt_failed"
+        return None
     value = normalize(out.read_text(errors="replace"))
     out.unlink(missing_ok=True)
-    return (value or None), ("decrypted" if value else "empty")
+    return value or None
 
 
 def encrypt_vault(refresh_token, passphrase):
@@ -148,19 +122,9 @@ def encrypt_vault(refresh_token, passphrase):
     env["BEDS24_VAULT_PASSPHRASE"] = passphrase
     subprocess.run(
         [
-            "openssl",
-            "enc",
-            "-aes-256-cbc",
-            "-salt",
-            "-pbkdf2",
-            "-iter",
-            "200000",
-            "-pass",
-            "env:BEDS24_VAULT_PASSPHRASE",
-            "-in",
-            str(src),
-            "-out",
-            str(ENCRYPTED_REFRESH),
+            "openssl", "enc", "-aes-256-cbc", "-salt", "-pbkdf2",
+            "-iter", "200000", "-pass", "env:BEDS24_VAULT_PASSPHRASE",
+            "-in", str(src), "-out", str(ENCRYPTED_REFRESH),
         ],
         env=env,
         check=True,
@@ -170,183 +134,86 @@ def encrypt_vault(refresh_token, passphrase):
     src.unlink(missing_ok=True)
 
 
-stable_vault_passphrase = next(
-    (
-        value
-        for label, value in credential_candidates
-        if label == "bootstrap_fallback_secret"
-    ),
-    credential_candidates[0][1],
-)
+def token_from_refresh(refresh_token):
+    status, obj = request_json(
+        "GET",
+        "/authentication/token",
+        headers={"refreshToken": refresh_token},
+    )
+    token = obj.get("token") if isinstance(obj, dict) else None
+    return token if 200 <= status < 300 else None, status, obj
 
-vault_attempts = []
-refresh_candidates = []
-for label, passphrase in credential_candidates:
-    refresh, result = decrypt_vault(passphrase, label)
-    vault_attempts.append({
-        "passphrase_anchor": label,
-        "result": result,
-        "refresh_recovered": bool(refresh),
-    })
-    if refresh and all(refresh != existing[1] for existing in refresh_candidates):
-        refresh_candidates.append((f"encrypted_vault:{label}", refresh))
-
-exact_q = urllib.parse.urlencode([
-    ("roomId", req["room_id"]),
-    ("arrival", req["arrival"]),
-    ("departure", req["departure"]),
-    ("includeInvoiceItems", "true"),
-    ("includeGuests", "true"),
-])
 
 auth_attempts = []
-TOKEN = None
-API_BASE = None
+refresh_token = decrypt_vault(credential)
+access_token = None
 auth_source = None
-resolved_refresh = None
 
-for base in API_BASE_CANDIDATES:
-    for refresh_label, refresh_value in refresh_candidates:
-        status, auth = request_json(
-            base,
-            "GET",
-            "/authentication/token",
-            headers={"refreshToken": refresh_value},
-        )
-        candidate = auth.get("token") if isinstance(auth, dict) else None
-        auth_attempts.append({
-            "api_base": base,
-            "credential": refresh_label,
-            "mode": "refresh_token",
-            "status": status,
-            "response": safe(auth) if not (200 <= status < 300) else {"success": True},
-        })
-        if 200 <= status < 300 and candidate:
-            TOKEN = candidate
-            API_BASE = base
-            auth_source = refresh_label
-            resolved_refresh = refresh_value
-            break
-    if TOKEN:
-        break
+if refresh_token:
+    access_token, status, obj = token_from_refresh(refresh_token)
+    auth_attempts.append({
+        "mode": "encrypted_refresh",
+        "status": status,
+        "response": safe(obj) if not access_token else {"success": True},
+    })
+    if access_token:
+        auth_source = "encrypted_refresh"
 
-    for credential_label, credential in credential_candidates:
-        status, auth = request_json(
-            base,
-            "GET",
-            "/authentication/token",
-            headers={"refreshToken": credential},
-        )
-        candidate = auth.get("token") if isinstance(auth, dict) else None
-        auth_attempts.append({
-            "api_base": base,
-            "credential": credential_label,
-            "mode": "refresh_token",
-            "status": status,
-            "response": safe(auth) if not (200 <= status < 300) else {"success": True},
-        })
-        if 200 <= status < 300 and candidate:
-            TOKEN = candidate
-            API_BASE = base
-            auth_source = f"{credential_label}:refresh_token"
-            resolved_refresh = credential
-            break
+if not access_token:
+    access_token, status, obj = token_from_refresh(credential)
+    auth_attempts.append({
+        "mode": "secret_as_refresh",
+        "status": status,
+        "response": safe(obj) if not access_token else {"success": True},
+    })
+    if access_token:
+        refresh_token = credential
+        auth_source = "secret_as_refresh"
 
-        status, direct_probe = request_json(
-            base,
-            "GET",
-            f"/bookings?{exact_q}",
-            headers={"token": credential},
-        )
-        auth_attempts.append({
-            "api_base": base,
-            "credential": credential_label,
-            "mode": "direct_token",
-            "status": status,
-            "response": safe(direct_probe) if not (200 <= status < 300) else {"success": True},
-        })
-        if 200 <= status < 300:
-            TOKEN = credential
-            API_BASE = base
-            auth_source = f"{credential_label}:direct_token"
-            break
+if not access_token:
+    status, setup = request_json(
+        "GET",
+        "/authentication/setup",
+        headers={"code": credential, "deviceName": "AUMARA-Control-Tower"},
+    )
+    setup_refresh = setup.get("refreshToken") if isinstance(setup, dict) else None
+    setup_token = setup.get("token") if isinstance(setup, dict) else None
+    auth_attempts.append({
+        "mode": "secret_as_invite_code",
+        "status": status,
+        "response": safe(setup),
+    })
+    if 200 <= status < 300 and setup_refresh:
+        refresh_token = normalize(setup_refresh)
+        access_token = setup_token
+        auth_source = "secret_as_invite_code"
+        if not access_token:
+            access_token, status2, obj2 = token_from_refresh(refresh_token)
+            auth_attempts.append({
+                "mode": "new_refresh_exchange",
+                "status": status2,
+                "response": safe(obj2) if not access_token else {"success": True},
+            })
 
-        status, setup = request_json(
-            base,
-            "GET",
-            "/authentication/setup",
-            headers={
-                "code": credential,
-                "deviceName": "AUMARA-Control-Tower",
-            },
-        )
-        setup_refresh = setup.get("refreshToken") if isinstance(setup, dict) else None
-        setup_token = setup.get("token") if isinstance(setup, dict) else None
-        auth_attempts.append({
-            "api_base": base,
-            "credential": credential_label,
-            "mode": "invite_code",
-            "status": status,
-            "response": safe(setup),
-        })
-        if 200 <= status < 300 and setup_refresh:
-            resolved_refresh = normalize(setup_refresh)
-            if setup_token:
-                TOKEN = setup_token
-            else:
-                token_status, token_obj = request_json(
-                    base,
-                    "GET",
-                    "/authentication/token",
-                    headers={"refreshToken": resolved_refresh},
-                )
-                TOKEN = token_obj.get("token") if isinstance(token_obj, dict) else None
-                auth_attempts.append({
-                    "api_base": base,
-                    "credential": credential_label,
-                    "mode": "invite_refresh_exchange",
-                    "status": token_status,
-                    "response": safe(token_obj) if not (200 <= token_status < 300) else {"success": True},
-                })
-            if TOKEN:
-                API_BASE = base
-                auth_source = f"{credential_label}:invite_code"
-                break
-    if TOKEN:
-        break
-
-if not TOKEN or not API_BASE:
+if not access_token:
     EXECUTION_EVIDENCE.write_text(json.dumps({
         "verified_at_utc": now(),
         "status": "AUTH_FAILED",
-        "api_bases_checked": API_BASE_CANDIDATES,
-        "vault_attempts": vault_attempts,
         "attempts": auth_attempts,
-        "credential_anchors_checked": [label for label, _ in credential_candidates],
         "plaintext_secret_committed": False,
     }, indent=2))
-    raise SystemExit(
-        "Beds24 rejected the encrypted refresh vault and every current credential anchor"
-    )
+    raise SystemExit("Beds24 authentication failed")
 
-if resolved_refresh:
-    encrypt_vault(resolved_refresh, stable_vault_passphrase)
+if refresh_token:
+    encrypt_vault(refresh_token, credential)
 
-headers = {"token": TOKEN}
+headers = {"token": access_token}
 
 
 def api(method, path, payload=None):
-    status, obj = request_json(
-        API_BASE,
-        method,
-        path,
-        headers=headers,
-        payload=payload,
-    )
+    status, obj = request_json(method, path, headers=headers, payload=payload)
     if not (200 <= status < 300):
-        raise RuntimeError(
-            f"Beds24 {method} {path} failed HTTP {status}: {safe(obj)}"
-        )
+        raise RuntimeError(f"Beds24 {method} {path} failed HTTP {status}: {safe(obj)}")
     return obj
 
 
@@ -354,13 +221,11 @@ def invoice_totals(booking):
     items = booking.get("invoiceItems") or []
     charge = sum(
         abs(float(item.get("amount") or 0) * float(item.get("qty") or 1))
-        for item in items
-        if item.get("type") == "charge"
+        for item in items if item.get("type") == "charge"
     )
     payment = sum(
         abs(float(item.get("amount") or 0) * float(item.get("qty") or 1))
-        for item in items
-        if item.get("type") == "payment"
+        for item in items if item.get("type") == "payment"
     )
     return charge, payment
 
@@ -368,23 +233,15 @@ def invoice_totals(booking):
 def find_created_booking_id(response_item):
     if not isinstance(response_item, dict):
         return None
-
     for key in ("bookingId", "id"):
-        candidate = response_item.get(key)
-        if isinstance(candidate, int) or (
-            isinstance(candidate, str) and candidate.isdigit()
-        ):
-            return int(candidate)
-
-    new_part = response_item.get("new")
-
+        value = response_item.get(key)
+        if isinstance(value, int) or (isinstance(value, str) and value.isdigit()):
+            return int(value)
     def walk(value):
         if isinstance(value, dict):
             for key in ("bookingId", "id"):
                 candidate = value.get(key)
-                if isinstance(candidate, int) or (
-                    isinstance(candidate, str) and candidate.isdigit()
-                ):
+                if isinstance(candidate, int) or (isinstance(candidate, str) and candidate.isdigit()):
                     return int(candidate)
             for child in value.values():
                 found = walk(child)
@@ -396,9 +253,16 @@ def find_created_booking_id(response_item):
                 if found:
                     return found
         return None
+    return walk(response_item.get("new"))
 
-    return walk(new_part)
 
+exact_q = urllib.parse.urlencode([
+    ("roomId", req["room_id"]),
+    ("arrival", req["arrival"]),
+    ("departure", req["departure"]),
+    ("includeInvoiceItems", "true"),
+    ("includeGuests", "true"),
+])
 
 wanted_first = req["first_name"].strip().casefold()
 wanted_last = req["last_name"].strip().casefold()
@@ -413,26 +277,38 @@ def exact_matches(rows):
         first = str(row.get("firstName") or "").strip().casefold()
         last = str(row.get("lastName") or "").strip().casefold()
         email = str(row.get("email") or "").strip().casefold()
-        same_name = first == wanted_first and last == wanted_last
-        same_email = bool(wanted_email and email == wanted_email)
-        if same_name or same_email:
+        if (first == wanted_first and last == wanted_last) or (wanted_email and email == wanted_email):
             matches.append(row)
     return matches
+
+
+def score_booking(booking):
+    charge, payment = invoice_totals(booking)
+    score = 0
+    if booking.get("apiReference") == req["request_id"]:
+        score += 100
+    if str(booking.get("email") or "").strip().casefold() == wanted_email:
+        score += 50
+    if (
+        str(booking.get("firstName") or "").strip().casefold() == wanted_first
+        and str(booking.get("lastName") or "").strip().casefold() == wanted_last
+    ):
+        score += 30
+    if booking.get("status") == "confirmed":
+        score += 10
+    if charge >= float(req["total_price"]):
+        score += 5
+    if payment >= float(req["amount_paid"]):
+        score += 5
+    return score
 
 
 rows = api("GET", f"/bookings?{exact_q}").get("data") or []
 matching = exact_matches(rows)
 outcome = "reused_existing_exact_match"
+duplicate_ids_cancelled = []
 
-if len(matching) > 1:
-    raise RuntimeError(
-        f"Duplicate-risk stop: found {len(matching)} exact active bookings "
-        "for the same room and dates"
-    )
-
-if matching:
-    booking = matching[0]
-else:
+if not matching:
     payload = [{
         "roomId": req["room_id"],
         "status": "confirmed",
@@ -448,28 +324,16 @@ else:
         "price": req["total_price"],
         "comment": req["comments"],
         "invoiceItems": [
-            {
-                "type": "charge",
-                "description": req["charge_description"],
-                "qty": 1,
-                "amount": req["total_price"],
-            },
-            {
-                "type": "payment",
-                "description": req["payment_description"],
-                "qty": 1,
-                "amount": req["amount_paid"],
-            },
+            {"type": "charge", "description": req["charge_description"], "qty": 1, "amount": req["total_price"]},
+            {"type": "payment", "description": req["payment_description"], "qty": 1, "amount": req["amount_paid"]},
         ],
     }]
     created = api("POST", "/bookings", payload)
     if not isinstance(created, list) or not created or not created[0].get("success"):
         raise RuntimeError(f"Unexpected Beds24 create result: {safe(created)}")
-
     booking_id = find_created_booking_id(created[0])
     outcome = "created_new"
-    created_rows = []
-
+    matching = []
     for _ in range(6):
         if booking_id:
             read_q = urllib.parse.urlencode([
@@ -477,25 +341,61 @@ else:
                 ("includeInvoiceItems", "true"),
                 ("includeGuests", "true"),
             ])
-            created_rows = api("GET", f"/bookings?{read_q}").get("data") or []
+            matching = api("GET", f"/bookings?{read_q}").get("data") or []
         else:
-            created_rows = exact_matches(
-                api("GET", f"/bookings?{exact_q}").get("data") or []
-            )
-        if len(created_rows) == 1:
+            matching = exact_matches(api("GET", f"/bookings?{exact_q}").get("data") or [])
+        if len(matching) == 1:
             break
         time.sleep(2)
+    if len(matching) != 1:
+        raise RuntimeError(f"Created booking read-back returned {len(matching)} rows")
 
-    if len(created_rows) != 1:
-        raise RuntimeError(
-            f"Created booking read-back returned {len(created_rows)} exact rows; "
-            f"response={safe(created)}"
-        )
-    booking = created_rows[0]
+if len(matching) > 1:
+    ranked = sorted(
+        matching,
+        key=lambda b: (-score_booking(b), int(b.get("id") or 9999999999)),
+    )
+    booking = ranked[0]
+    canonical_id = booking.get("id")
+    for duplicate in ranked[1:]:
+        duplicate_id = duplicate.get("id")
+        if not duplicate_id:
+            continue
+        removable_items = []
+        for item in duplicate.get("invoiceItems") or []:
+            item_id = item.get("id")
+            description = str(item.get("description") or "")
+            if item_id and description in {req["charge_description"], req["payment_description"]}:
+                removable_items.append({"id": item_id})
+        duplicate_update = {
+            "id": duplicate_id,
+            "status": "cancelled",
+            "comment": (
+                f"Duplicate created during API recovery; canonical Beds24 booking {canonical_id}. "
+                f"Cancelled automatically {now()}."
+            ),
+        }
+        if removable_items:
+            duplicate_update["invoiceItems"] = removable_items
+        api("POST", "/bookings", [duplicate_update])
+        duplicate_ids_cancelled.append(duplicate_id)
+    outcome = "deduplicated_existing_records"
+else:
+    booking = matching[0]
 
 booking_id = booking.get("id")
 if not booking_id:
-    raise RuntimeError("Resolved booking has no Beds24 id")
+    raise RuntimeError("Canonical booking has no Beds24 id")
+
+read_q = urllib.parse.urlencode([
+    ("id", booking_id),
+    ("includeInvoiceItems", "true"),
+    ("includeGuests", "true"),
+])
+booking_rows = api("GET", f"/bookings?{read_q}").get("data") or []
+if len(booking_rows) != 1:
+    raise RuntimeError(f"Canonical read-back returned {len(booking_rows)} rows")
+booking = booking_rows[0]
 
 charge_total, payment_total = invoice_totals(booking)
 missing_items = []
@@ -514,7 +414,7 @@ if payment_total < float(req["amount_paid"]):
         "amount": float(req["amount_paid"]) - payment_total,
     })
 
-update = {
+canonical_update = {
     "id": booking_id,
     "status": "confirmed",
     "numAdult": req.get("adults", 1),
@@ -528,23 +428,16 @@ update = {
     "comment": req["comments"],
 }
 if missing_items:
-    update["invoiceItems"] = missing_items
+    canonical_update["invoiceItems"] = missing_items
     outcome += "+financials_completed"
-api("POST", "/bookings", [update])
+api("POST", "/bookings", [canonical_update])
 
-verify_q = urllib.parse.urlencode([
-    ("id", booking_id),
-    ("includeInvoiceItems", "true"),
-    ("includeGuests", "true"),
-])
-verified_rows = api("GET", f"/bookings?{verify_q}").get("data") or []
+verified_rows = api("GET", f"/bookings?{read_q}").get("data") or []
 if len(verified_rows) != 1:
-    raise RuntimeError(
-        f"Final read-back by id {booking_id} returned {len(verified_rows)} rows"
-    )
-
+    raise RuntimeError(f"Final canonical read-back returned {len(verified_rows)} rows")
 booking = verified_rows[0]
 charge_total, payment_total = invoice_totals(booking)
+
 checks = {
     "room": str(booking.get("roomId")) == str(req["room_id"]),
     "arrival": booking.get("arrival") == req["arrival"],
@@ -558,6 +451,12 @@ checks = {
 if not all(checks.values()):
     raise RuntimeError(f"Final Beds24 verification failed: {checks}")
 
+for duplicate_id in duplicate_ids_cancelled:
+    q = urllib.parse.urlencode([("id", duplicate_id)])
+    rows = api("GET", f"/bookings?{q}").get("data") or []
+    if len(rows) != 1 or rows[0].get("status") != "cancelled":
+        raise RuntimeError(f"Duplicate {duplicate_id} cancellation verification failed")
+
 BOOKING_EVIDENCE.write_text(json.dumps({
     "verified_at_utc": now(),
     "outcome": outcome,
@@ -565,6 +464,7 @@ BOOKING_EVIDENCE.write_text(json.dumps({
     "auth_source": auth_source,
     "api_reference": req["request_id"],
     "booking_id": booking_id,
+    "duplicate_booking_ids_cancelled": duplicate_ids_cancelled,
     "property_id": booking.get("propertyId"),
     "room_id": booking.get("roomId"),
     "guest_name": req["guest_name"],
@@ -579,25 +479,23 @@ BOOKING_EVIDENCE.write_text(json.dumps({
     "invoice_payment_total": payment_total,
     "paid_bank_transfer": payment_total >= float(req["amount_paid"]),
     "checks": checks,
-    "encrypted_refresh_vault": bool(
-        ENCRYPTED_REFRESH.exists() and ENCRYPTED_REFRESH.stat().st_size
-    ),
+    "encrypted_refresh_vault": bool(ENCRYPTED_REFRESH.exists() and ENCRYPTED_REFRESH.stat().st_size),
     "plaintext_secret_committed": False,
 }, indent=2))
 
 EXECUTION_EVIDENCE.write_text(json.dumps({
     "verified_at_utc": now(),
     "status": "BOOKING_VERIFIED",
-    "api_base": API_BASE,
     "booking_id": booking_id,
+    "duplicate_booking_ids_cancelled": duplicate_ids_cancelled,
     "outcome": outcome,
     "auth_source": auth_source,
 }, indent=2))
 
 print(json.dumps({
     "status": "BOOKING_VERIFIED",
-    "api_base": API_BASE,
     "booking_id": booking_id,
+    "duplicate_booking_ids_cancelled": duplicate_ids_cancelled,
     "outcome": outcome,
     "auth_source": auth_source,
 }))

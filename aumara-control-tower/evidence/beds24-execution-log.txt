@@ -1,1 +1,1 @@
-Beds24 rejected every persisted credential anchor on every API base candidate
+Beds24 rejected the encrypted refresh vault and every current credential anchor

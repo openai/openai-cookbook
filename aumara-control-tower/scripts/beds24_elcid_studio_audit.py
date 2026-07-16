@@ -11,6 +11,8 @@ import datetime as dt
 import json
 import os
 import pathlib
+import subprocess
+import tempfile
 import urllib.error
 import urllib.parse
 import urllib.request
@@ -34,6 +36,8 @@ OUTPUT = pathlib.Path(
         "aumara-control-tower/evidence/elcid-studio-audit.json",
     )
 )
+ROOT = pathlib.Path(__file__).resolve().parents[1]
+ENCRYPTED_REFRESH = ROOT / "vault" / "beds24-refresh-token.enc"
 
 
 class AuditError(RuntimeError):
@@ -71,39 +75,96 @@ def request_json(
         return exc.code, parsed
 
 
-def get_access_token() -> tuple[str, str, str]:
-    """Accept either an access token or a refresh token from one secret."""
-    credential = normalize(
-        os.environ.get("BEDS24_TOKEN_CREDENTIAL")
-        or os.environ.get("BEDS24_BOOTSTRAP_CREDENTIAL")
+def decrypt_refresh(passphrase: str) -> str:
+    """Read the existing encrypted refresh-token vault without logging it."""
+    if not ENCRYPTED_REFRESH.exists() or ENCRYPTED_REFRESH.stat().st_size == 0:
+        return ""
+    with tempfile.TemporaryDirectory(prefix="elcid-beds24-") as directory:
+        output = pathlib.Path(directory) / "refresh.txt"
+        environment = os.environ.copy()
+        environment["BEDS24_VAULT_PASSPHRASE_VALUE"] = passphrase
+        process = subprocess.run(
+            [
+                "openssl",
+                "enc",
+                "-d",
+                "-aes-256-cbc",
+                "-pbkdf2",
+                "-iter",
+                "200000",
+                "-pass",
+                "env:BEDS24_VAULT_PASSPHRASE_VALUE",
+                "-in",
+                str(ENCRYPTED_REFRESH),
+                "-out",
+                str(output),
+            ],
+            env=environment,
+            capture_output=True,
+            check=False,
+        )
+        if process.returncode != 0 or not output.exists():
+            return ""
+        return normalize(output.read_text(errors="replace"))
+
+
+def credential_candidates() -> list[tuple[str, str]]:
+    """Collect configured and encrypted credential candidates safely."""
+    names = (
+        "BEDS24_TOKEN_CREDENTIAL",
+        "BEDS24_BOOTSTRAP_CREDENTIAL",
+        "BEDS24_REFRESH_TOKEN",
     )
-    if not credential:
+    configured = [
+        (name.lower(), normalize(os.environ.get(name)))
+        for name in names
+        if normalize(os.environ.get(name))
+    ]
+    candidates: list[tuple[str, str]] = []
+    seen: set[str] = set()
+    for source, credential in configured:
+        decrypted = decrypt_refresh(credential)
+        for candidate_source, candidate in (
+            (f"vault_via_{source}", decrypted),
+            (source, credential),
+        ):
+            if candidate and candidate not in seen:
+                seen.add(candidate)
+                candidates.append((candidate_source, candidate))
+    return candidates
+
+
+def get_access_token() -> tuple[str, str, str, str]:
+    """Accept an access/refresh token or the existing encrypted vault."""
+    candidates = credential_candidates()
+    if not candidates:
         raise AuditError("BEDS24_TOKEN_CREDENTIAL is missing")
 
     probe_query = urllib.parse.urlencode({"id": PROPERTY_ID})
     last_status = 0
-    for api_base in API_BASES:
-        status, _ = request_json(
-            "GET",
-            f"/properties?{probe_query}",
-            headers={"token": credential},
-            api_base=api_base,
-        )
-        last_status = status
-        if 200 <= status < 300:
-            return credential, "access_token", api_base
+    for source, credential in candidates:
+        for api_base in API_BASES:
+            status, _ = request_json(
+                "GET",
+                f"/properties?{probe_query}",
+                headers={"token": credential},
+                api_base=api_base,
+            )
+            last_status = status
+            if 200 <= status < 300:
+                return credential, "access_token", api_base, source
 
-        status, response = request_json(
-            "GET",
-            "/authentication/token",
-            headers={"refreshToken": credential},
-            api_base=api_base,
-        )
-        last_status = status
-        if 200 <= status < 300 and isinstance(response, dict):
-            token = normalize(str(response.get("token") or ""))
-            if token:
-                return token, "refresh_token", api_base
+            status, response = request_json(
+                "GET",
+                "/authentication/token",
+                headers={"refreshToken": credential},
+                api_base=api_base,
+            )
+            last_status = status
+            if 200 <= status < 300 and isinstance(response, dict):
+                token = normalize(str(response.get("token") or ""))
+                if token:
+                    return token, "refresh_token", api_base, source
 
     raise AuditError(
         "The configured credential is neither a valid access token nor a "
@@ -328,7 +389,7 @@ def main() -> None:
     today = dt.date.fromisoformat(
         os.environ.get("AUDIT_TODAY", dt.datetime.now(dt.timezone.utc).date().isoformat())
     )
-    token, auth_mode, api_base = get_access_token()
+    token, auth_mode, api_base, auth_source = get_access_token()
     bookings = fetch_bookings(token, today, api_base)
 
     inventory: dict[tuple[int, dt.date], int | None] = {}
@@ -375,6 +436,7 @@ def main() -> None:
         "today": today.isoformat(),
         "readOnly": True,
         "authMode": auth_mode,
+        "authSource": auth_source,
         "apiHost": urllib.parse.urlparse(api_base).netloc,
         "propertyId": PROPERTY_ID,
         "studioRoomId": STUDIO_ROOM_ID,

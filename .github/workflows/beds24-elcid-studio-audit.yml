@@ -1,0 +1,42 @@
+name: Beds24 El Cid Studio read-only audit
+
+on:
+  workflow_dispatch:
+  push:
+    branches: [main]
+    paths:
+      - '.github/workflows/beds24-elcid-studio-audit.yml'
+      - 'aumara-control-tower/scripts/beds24_elcid_studio_audit.py'
+
+permissions:
+  contents: read
+
+concurrency:
+  group: beds24-elcid-studio-audit
+  cancel-in-progress: true
+
+jobs:
+  audit:
+    runs-on: ubuntu-latest
+    env:
+      BEDS24_TOKEN_CREDENTIAL: ${{ secrets.BEDS24_TOKEN_CREDENTIAL }}
+      AUDIT_TODAY: '2026-07-16'
+      BEDS24_STUDIO_AUDIT_OUTPUT: aumara-control-tower/evidence/elcid-studio-audit.json
+
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Test read-only audit logic
+        run: python -m unittest aumara-control-tower/scripts/tests/test_beds24_elcid_studio_audit.py
+
+      - name: Audit Studio bookings, alternatives, and website
+        run: python aumara-control-tower/scripts/beds24_elcid_studio_audit.py
+
+      - name: Upload sanitized audit
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: elcid-studio-read-only-audit
+          path: aumara-control-tower/evidence/elcid-studio-audit.json
+          if-no-files-found: warn
+          retention-days: 7

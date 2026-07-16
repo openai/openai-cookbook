@@ -16,7 +16,10 @@ import urllib.parse
 import urllib.request
 
 
-API_BASE = "https://api.beds24.com/v2"
+API_BASES = (
+    "https://api.beds24.com/v2",
+    "https://beds24.com/api/v2",
+)
 PROPERTY_ID = 324903
 STUDIO_ROOM_ID = 674486
 ROOMS = {
@@ -47,10 +50,11 @@ def request_json(
     path: str,
     *,
     headers: dict[str, str] | None = None,
+    api_base: str | None = None,
 ) -> tuple[int, object]:
     """Call Beds24 and return the HTTP status plus decoded JSON."""
     request = urllib.request.Request(
-        f"{API_BASE}{path}",
+        f"{api_base or API_BASES[0]}{path}",
         headers={"accept": "application/json", **(headers or {})},
         method=method,
     )
@@ -67,7 +71,7 @@ def request_json(
         return exc.code, parsed
 
 
-def get_access_token() -> tuple[str, str]:
+def get_access_token() -> tuple[str, str, str]:
     """Accept either an access token or a refresh token from one secret."""
     credential = normalize(
         os.environ.get("BEDS24_TOKEN_CREDENTIAL")
@@ -77,27 +81,33 @@ def get_access_token() -> tuple[str, str]:
         raise AuditError("BEDS24_TOKEN_CREDENTIAL is missing")
 
     probe_query = urllib.parse.urlencode({"id": PROPERTY_ID})
-    status, _ = request_json(
-        "GET",
-        f"/properties?{probe_query}",
-        headers={"token": credential},
-    )
-    if 200 <= status < 300:
-        return credential, "access_token"
+    last_status = 0
+    for api_base in API_BASES:
+        status, _ = request_json(
+            "GET",
+            f"/properties?{probe_query}",
+            headers={"token": credential},
+            api_base=api_base,
+        )
+        last_status = status
+        if 200 <= status < 300:
+            return credential, "access_token", api_base
 
-    status, response = request_json(
-        "GET",
-        "/authentication/token",
-        headers={"refreshToken": credential},
-    )
-    if 200 <= status < 300 and isinstance(response, dict):
-        token = normalize(str(response.get("token") or ""))
-        if token:
-            return token, "refresh_token"
+        status, response = request_json(
+            "GET",
+            "/authentication/token",
+            headers={"refreshToken": credential},
+            api_base=api_base,
+        )
+        last_status = status
+        if 200 <= status < 300 and isinstance(response, dict):
+            token = normalize(str(response.get("token") or ""))
+            if token:
+                return token, "refresh_token", api_base
 
     raise AuditError(
         "The configured credential is neither a valid access token nor a "
-        f"refresh token (last HTTP status {status})"
+        f"refresh token (last HTTP status {last_status})"
     )
 
 
@@ -123,12 +133,17 @@ def booking_query(today: dt.date) -> str:
     return "/bookings?" + urllib.parse.urlencode(params)
 
 
-def fetch_bookings(token: str, today: dt.date) -> list[dict[str, object]]:
+def fetch_bookings(
+    token: str,
+    today: dt.date,
+    api_base: str,
+) -> list[dict[str, object]]:
     """Fetch future Studio bookings and enforce the expected room scope."""
     status, response = request_json(
         "GET",
         booking_query(today),
         headers={"token": token},
+        api_base=api_base,
     )
     if not 200 <= status < 300:
         raise AuditError(f"Booking audit failed with HTTP {status}")
@@ -156,6 +171,7 @@ def fetch_calendar(
     token: str,
     start: dt.date,
     end: dt.date,
+    api_base: str,
 ) -> list[dict[str, object]]:
     """Read inventory for all El Cid rooms over the affected date span."""
     params: list[tuple[str, object]] = [
@@ -170,6 +186,7 @@ def fetch_calendar(
         "GET",
         f"/inventory/rooms/calendar?{query}",
         headers={"token": token},
+        api_base=api_base,
     )
     if not 200 <= status < 300:
         raise AuditError(f"Inventory audit failed with HTTP {status}")
@@ -261,13 +278,18 @@ def candidates_for(
     return candidates, warnings
 
 
-def fetch_message_count(token: str, booking_id: int) -> int | None:
+def fetch_message_count(
+    token: str,
+    booking_id: int,
+    api_base: str,
+) -> int | None:
     """Read message history when the endpoint is available for the channel."""
     query = urllib.parse.urlencode({"bookingId": booking_id})
     status, response = request_json(
         "GET",
         f"/bookings/messages?{query}",
         headers={"token": token},
+        api_base=api_base,
     )
     if not 200 <= status < 300:
         return None
@@ -306,8 +328,8 @@ def main() -> None:
     today = dt.date.fromisoformat(
         os.environ.get("AUDIT_TODAY", dt.datetime.now(dt.timezone.utc).date().isoformat())
     )
-    token, auth_mode = get_access_token()
-    bookings = fetch_bookings(token, today)
+    token, auth_mode, api_base = get_access_token()
+    bookings = fetch_bookings(token, today, api_base)
 
     inventory: dict[tuple[int, dt.date], int | None] = {}
     if bookings:
@@ -315,7 +337,12 @@ def main() -> None:
         final_departure = max(
             dt.date.fromisoformat(str(row["departure"])) for row in bookings
         )
-        calendar = fetch_calendar(token, start, final_departure - dt.timedelta(days=1))
+        calendar = fetch_calendar(
+            token,
+            start,
+            final_departure - dt.timedelta(days=1),
+            api_base,
+        )
         inventory = expand_inventory(calendar)
 
     sanitized: list[dict[str, object]] = []
@@ -332,7 +359,11 @@ def main() -> None:
                 "channel": booking.get("channel") or booking.get("referer"),
                 "externalReference": booking.get("bookingRef")
                 or booking.get("apiReference"),
-                "existingMessageCount": fetch_message_count(token, booking_id),
+                "existingMessageCount": fetch_message_count(
+                    token,
+                    booking_id,
+                    api_base,
+                ),
                 "availableAlternatives": candidates,
                 "warnings": warnings,
             }
@@ -344,6 +375,7 @@ def main() -> None:
         "today": today.isoformat(),
         "readOnly": True,
         "authMode": auth_mode,
+        "apiHost": urllib.parse.urlparse(api_base).netloc,
         "propertyId": PROPERTY_ID,
         "studioRoomId": STUDIO_ROOM_ID,
         "activeStudioBookingCount": len(sanitized),

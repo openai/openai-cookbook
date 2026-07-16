@@ -30,7 +30,7 @@ jobs:
         shell: bash
         run: |
           set -euo pipefail
-          mkdir -p aumara-control-tower/evidence
+          mkdir -p aumara-control-tower/evidence aumara-control-tower/vault
           python - <<'PY'
           import json, os, unicodedata, pathlib
           def shape(value):
@@ -69,25 +69,29 @@ jobs:
         uses: actions/upload-artifact@v4
         with:
           name: beds24-aumara-medina-evidence
-          path: aumara-control-tower/evidence/
+          path: |
+            aumara-control-tower/evidence/
+            aumara-control-tower/vault/beds24-refresh-token.enc
           if-no-files-found: warn
           retention-days: 30
 
-      - name: Commit auth and booking evidence safely
+      - name: Commit auth, booking evidence and encrypted vault safely
         if: always()
         shell: bash
         run: |
           set -euo pipefail
-          rm -rf /tmp/beds24-evidence
-          mkdir -p /tmp/beds24-evidence
-          cp -a aumara-control-tower/evidence/. /tmp/beds24-evidence/ 2>/dev/null || true
+          rm -rf /tmp/beds24-state
+          mkdir -p /tmp/beds24-state/evidence /tmp/beds24-state/vault
+          cp -a aumara-control-tower/evidence/. /tmp/beds24-state/evidence/ 2>/dev/null || true
+          cp aumara-control-tower/vault/beds24-refresh-token.enc /tmp/beds24-state/vault/ 2>/dev/null || true
           git fetch origin main
           git reset --hard origin/main
-          mkdir -p aumara-control-tower/evidence
-          cp -a /tmp/beds24-evidence/. aumara-control-tower/evidence/ 2>/dev/null || true
+          mkdir -p aumara-control-tower/evidence aumara-control-tower/vault
+          cp -a /tmp/beds24-state/evidence/. aumara-control-tower/evidence/ 2>/dev/null || true
+          cp /tmp/beds24-state/vault/beds24-refresh-token.enc aumara-control-tower/vault/ 2>/dev/null || true
           git config user.name 'github-actions[bot]'
           git config user.email '41898282+github-actions[bot]@users.noreply.github.com'
-          git add aumara-control-tower/evidence/
+          git add aumara-control-tower/evidence/ aumara-control-tower/vault/beds24-refresh-token.enc
           if ! git diff --cached --quiet; then
             git commit -m 'Record Beds24 final booking verification [skip ci]'
             git push origin HEAD:main

@@ -1,4 +1,4 @@
-name: Beds24 El Cid auto replies
+name: Beds24 El Cid auto replies (manual API fallback)
 
 on:
   workflow_dispatch:
@@ -8,14 +8,6 @@ on:
         required: true
         type: boolean
         default: false
-  schedule:
-    - cron: '*/5 * * * *'
-  push:
-    branches: [main]
-    paths:
-      - '.github/workflows/beds24-elcid-auto-replies.yml'
-      - 'aumara-control-tower/scripts/beds24_elcid_auto_replies.py'
-      - 'aumara-control-tower/scripts/tests/test_beds24_elcid_auto_replies.py'
 
 permissions:
   contents: read
@@ -40,13 +32,13 @@ jobs:
         run: python -m unittest aumara-control-tower/scripts/tests/test_beds24_elcid_auto_replies.py
 
       - name: Plan replies without sending
-        if: github.event_name == 'push' || (github.event_name == 'workflow_dispatch' && !inputs.execute)
+        if: ${{ !inputs.execute }}
         env:
           BEDS24_AUTO_REPLY_EXECUTE: '0'
         run: python aumara-control-tower/scripts/beds24_elcid_auto_replies.py
 
       - name: Send idempotent replies
-        if: github.event_name == 'schedule' || (github.event_name == 'workflow_dispatch' && inputs.execute)
+        if: ${{ inputs.execute }}
         env:
           BEDS24_AUTO_REPLY_EXECUTE: '1'
         run: python aumara-control-tower/scripts/beds24_elcid_auto_replies.py

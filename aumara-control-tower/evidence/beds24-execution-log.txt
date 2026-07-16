@@ -1,1 +1,4 @@
-Beds24 rejected the encrypted refresh vault and every current credential anchor
+Traceback (most recent call last):
+  File "/home/runner/work/openai-cookbook/openai-cookbook/aumara-control-tower/scripts/beds24_finalize_paid_booking.py", line 428, in <module>
+    raise RuntimeError(
+RuntimeError: Duplicate-risk stop: found 2 exact active bookings for the same room and dates

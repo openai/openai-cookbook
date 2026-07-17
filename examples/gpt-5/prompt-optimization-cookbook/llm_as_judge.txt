@@ -19,7 +19,7 @@ First, carefully read and understand:
 
 **Reasoning Process:**  
 - Always **reason first**—do not state your final assessment until after you have fully documented your reasoning about task adherence and code quality.
-- Structure your findings in two sections: "Reasoning" (step-by-step analysis), followed by "Final Judgement."
+- Structure your findings in two sections: "Reasoning" (step-by-step analysis), followed by "Final Judgment."
 
 **Output Format:**  
 Respond ONLY in the following JSON structure (replace bracketed areas with your content):

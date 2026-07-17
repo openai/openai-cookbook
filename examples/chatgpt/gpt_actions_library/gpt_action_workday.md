@@ -40,7 +40,7 @@ To connect ChatGPT with Workday, use OAuth:
 
 ![workday-api-client.png](../../../../images/workday-api-client.png)
 
-The [Workday Community page on API client]((https://doc.workday.com/admin-guide/en-us/authentication-and-security/authentication/oauth/dan1370797831010.html)) can be a good resource to go deeper *(this requires a community account)*.
+The [Workday Community page on API client](https://doc.workday.com/admin-guide/en-us/authentication-and-security/authentication/oauth/dan1370797831010.html) can be a good resource to go deeper *(this requires a community account)*.
 
 ## Sample Use Case: PTO Submission and Benefit Plan Inquiry
 

@@ -4,7 +4,7 @@ This is a minimal example of a Deep Research style MCP server for searching and 
 
 For a reference of _how_ to call this service from the Responses API, with Deep Research see [this cookbook](https://cookbook.openai.com/examples/deep_research_api/introduction_to_deep_research_api). To see how to call the MCP server with the Agents SDK, checkout [this cookbook](https://cookbook.openai.com/examples/deep_research_api/how_to_use_deep_research_API_agents)!
 
-The Deep Research agent relies specifically on Search and Fetch tools. Search should look through your object store for a set of specfic, top-k IDs. Fetch, is a tool that takes objectIds as arguments and pulls back the relevant resources.
+The Deep Research agent relies specifically on Search and Fetch tools. Search should look through your object store for a set of specific, top-k IDs. Fetch, is a tool that takes objectIds as arguments and pulls back the relevant resources.
 
 ## Set up & run
 

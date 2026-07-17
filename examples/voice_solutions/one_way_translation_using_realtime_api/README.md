@@ -119,10 +119,10 @@ To add a new language to the codebase, follow these steps:
 
    - Click "Connect" and wait for the WebSocket connections to be established with the Realtime API.
    - Choose between VAD (Voice Activity Detection) and Manual push-to-talk mode.
-   - the speaker should ensure they pause to allow the translation to catch up - the model is turn based and cannot constantly stream translations. 
+   - The speaker should ensure they pause to allow the translation to catch up - the model is turn based and cannot constantly stream translations.
    - The speaker can view live translations in the Speaker App for each language. 
 
 2. **Select Language in the Listener App:**
 
    - Select the language from the dropdown menu.
-   - The listener app will play the translated audio. The app translates all audio streams simultaneously, but only the selected language is played. You can switch languages at any time. 
+   - The listener app will play the translated audio. The app translates all audio streams simultaneously, but only the selected language is played. You can switch languages at any time.

@@ -708,7 +708,7 @@
     - agents-sdk
     - functions
     - responses
-    - mutli-agent-collaboration
+    - multi-agent-collaboration
 
 - title: o3/o4-mini Function Calling Guide
   path: examples/o-series/o3o4-mini_prompting_guide.ipynb
@@ -1391,7 +1391,7 @@
     - functions
   archived: true
 
-- title: Translate a book writen in LaTeX from Slovenian into English
+- title: Translate a book written in LaTeX from Slovenian into English
   path: examples/book_translation/translate_latex_book.ipynb
   slug: translate-latex-book
   date: 2022-03-10

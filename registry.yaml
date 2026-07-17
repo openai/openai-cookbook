@@ -17,6 +17,21 @@
     - memory
     - deep-research
 
+- title: Build a Speaker-Aware Meeting Intelligence Pipeline with Audio Diarization
+  path: examples/audio/speaker_aware_meeting_intelligence/speaker_aware_meeting_intelligence.ipynb
+  slug: speaker-aware-meeting-intelligence
+  date: 2026-06-18
+  authors:
+    - saptob
+  tags:
+    - audio
+    - speech-to-text
+    - transcription
+    - diarization
+    - meetings
+    - structured-outputs
+  description: Build a production-style reference pipeline that turns recorded audio into speaker-labeled transcripts, summaries, decisions, risks, and follow-up actions.
+
 - title: Trigger a Workspace Agent from the API
   path: examples/chatgpt/workspace_agents/workspace-agents-api-trigger.ipynb
   slug: workspace-agents-api-trigger

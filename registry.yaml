@@ -17,7 +17,7 @@
     - diarization
     - meetings
     - structured-outputs
-  description: Build a production-ready meeting intelligence pipeline that turns recorded audio into speaker-labeled transcripts, summaries, decisions, risks, and follow-up actions.
+  description: Build a production-style reference pipeline that turns recorded audio into speaker-labeled transcripts, summaries, decisions, risks, and follow-up actions.
 
 - title: Trigger a Workspace Agent from the API
   path: examples/chatgpt/workspace_agents/workspace-agents-api-trigger.ipynb

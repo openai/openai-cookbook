@@ -4,6 +4,18 @@
 # should build pages for, and indicates metadata such as tags, creation date and
 # authors for each page.
 
+- title: Build a Repository Configuration for Codex
+  path: examples/codex/codex_repository_configuration/README.md
+  slug: codex-repository-configuration
+  description: Configure a repository with real Codex instructions, project settings, hooks, custom agents, command rules, and skills.
+  date: 2026-07-17
+  authors:
+    - charlesgong-openai
+  tags:
+    - codex
+    - agents
+    - configuration
+
 - title: Enabling Long-Term Agent Memory with Oracle AI Agent Memory
   path: examples/agents_sdk/deep_research_openai_agents.ipynb
   slug: deep-research-openai-agents

@@ -1,0 +1,9 @@
+approval_policy = "on-request"
+sandbox_mode = "workspace-write"
+
+[agents]
+max_threads = 4
+max_depth = 1
+
+[mcp_servers.openaiDeveloperDocs]
+url = "https://developers.openai.com/mcp"

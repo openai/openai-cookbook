@@ -1,112 +1,84 @@
 ---
 name: docs-editor
-description: Review and edit technical documentation (Markdown/MDX) with Chicago Manual of Style + Microsoft Writing Style Guide alignment. Use when asked to review, edit, or QA docs for clarity, grammar, consistency, and style; to run Vale linting with a repo .vale.ini; to identify and prioritize doc issues and fixes; or to write or edit Ads docs using the repo's Ads-specific docs style guidance.
-metadata:
-  short-description: Review and edit docs
+description: Review and edit OpenAI Cookbook notebooks, Markdown, and MDX for technical accuracy, clarity, grammar, consistency, runnable examples, and repository publication requirements. Use for editorial reviews, pre-merge documentation checks, or notebook Markdown-cell sweeps in openai-cookbook.
 ---
 
-# Docs Editor
+# OpenAI Cookbook docs editor
 
-## Overview
+## Objective
 
-Review technical documentation for style, clarity, and consistency. Run Vale when available, then perform a human review, fix easy issues, and report remaining issues by priority.
+Review Cookbook content conservatively. Improve correctness and readability without changing the author's intent, inventing facts, or creating unrelated churn.
 
 ## Workflow
 
-### 1) Gather inputs
+### 1. Define the scope
 
-- Prefer a specific file path. If none is provided, confirm scope.
-- Accept a glob for MD/MDX when the user wants a sweep (for example: `--glob='*.{mdx,md}'`).
-- Never invent or add new factual content.
+- Prefer explicit paths or the files changed in the pull request.
+- For pull requests, review changed `.md` and `.mdx` files plus Markdown cells in changed `.ipynb` files.
+- Review `registry.yaml` and `authors.yaml` when content is added, moved, removed, or attributed to a new author.
+- Stay within the requested content. Do not turn a focused review into a repository-wide rewrite.
 
-### 2) Run repository Vale
+### 2. Protect notebook integrity
 
-- Check for `.vale.ini` in the project root. If it is missing, note that and proceed with manual review.
-- Run `pnpm run setup` when Vale 3 or newer, or synchronized packages, are unavailable. This is the repository's supported bootstrap path.
-- Run `pnpm run vale -- <path...>` with explicit Markdown or MDX paths. Resolve globs to paths before invoking the command.
-- Don't call global Vale directly for repository files. The wrapper enforces repository configuration, package checks, exclusions, and `--no-global` behavior.
+- When the request is editorial, edit only notebook Markdown cells.
+- Preserve code cells, outputs, execution counts, attachments, cell order, cell IDs, and notebook and cell metadata.
+- Avoid reserializing an entire notebook for a small prose change. Inspect the diff for unintended JSON churn.
+- Do not execute notebook code unless the user requests it or code changes are in scope. Markdown-only edits require structural validation, not calls to external services.
+- Never add hard-coded secrets. Document required environment variables such as `OPENAI_API_KEY`.
 
-### 2a) Astro partials via stdin
+### 3. Review the content
 
-The repository wrapper accepts files, not stdin. If content lives in an `.astro` file and only a subset of copy should be linted, extract the relevant Markdown or MDX and pass it to Vale with the same repository flags:
+Load `resources/style-guide.md` and check:
+
+- Technical claims, API names, model names, identifiers, commands, paths, and URLs.
+- Agreement between prose, code, sample inputs, and expected outputs.
+- Prerequisites, dependencies, environment variables, and steps needed to run an example.
+- File and notebook names, headings, lists, numbering, cross-references, and links.
+- Grammar, spelling, punctuation, terminology, capitalization, and concise wording.
+- Publication metadata in `registry.yaml` and author metadata in `authors.yaml` when applicable.
+
+Verify uncertain technical claims from an authoritative source or flag them for review. Do not guess.
+
+### 4. Prioritize findings
+
+Use the repository's review bar:
+
+- **P0**: Broken notebook JSON; hard-coded secrets; materially false or unsafe guidance; or any repository-defined P0 issue, including naming violations, typos, broken links, inconsistent formatting, placeholder identifiers, undocumented environment variables, or out-of-sync publication metadata.
+- **P1**: Misleading instructions, prose that contradicts code or output, missing prerequisites, or a required link that does not work.
+- **P2**: Clear improvements to grammar, consistency, organization, or readability that do not affect correctness.
+- **P3**: Optional polish with little effect on comprehension.
+
+### 5. Make safe edits
+
+- Fix obvious typos, grammar, punctuation, broken local references, and clear prose/code mismatches.
+- Keep changes minimal, local, and reversible.
+- Preserve exact literals, code identifiers, commands, values, counts, conditions, modality, negation, and uncertainty markers.
+- Tighten prose only when meaning stays unchanged. Prefer concrete nouns, strong verbs, short introductions, and direct instructions.
+- Flag any change that depends on product knowledge or could alter meaning instead of guessing.
+- Do not make file-wide formatting or stylistic changes solely for uniformity.
+
+### 6. Validate the result
+
+For any changed notebook, run the repository validator:
 
 ```bash
-printf '%s\n' "*This* is Markdown" | vale --no-global --no-wrap --ext=.mdx
+env -u VIRTUAL_ENV uv run --with nbformat python .github/scripts/check_notebooks.py
 ```
 
-### 3) Triage findings
+Then:
 
-- Parse Vale output and map each alert to a priority.
-- Apply the repo rule: any spelling or grammar issues in `.mdx` are **P0/P1**.
-- If Vale reports vocabulary/spelling errors, ask the user first whether any terms should be added to the appropriate `accept.txt` vocabulary list before editing content.
-- Use this priority scale:
-  - **P0**: Critical correctness or meaning issues; spelling/grammar in `.mdx`.
-  - **P1**: Major clarity, ambiguity, or misleading statements.
-  - **P2**: Consistency, tone, minor grammar, or style issues.
-  - **P3**: Nits and optional improvements.
+- Run `git diff --check`.
+- Inspect the diff and confirm that notebook changes are limited to intended Markdown cells.
+- Run an available YAML linter if `registry.yaml` or `authors.yaml` changed.
+- Run the relevant example or test only when executable content changed and its dependencies are available.
 
-### 4) Manual review (Chicago + Microsoft style)
+### 7. Report the review
 
-Focus on:
+Provide:
 
-- Clarity and brevity (tighten wordiness, active voice).
-- Consistent terminology and capitalization.
-- Parallel structure in lists and headings.
-- Consistent punctuation, spacing, and heading styles.
-- Logical consistency: list counts, referenced items, numbering, examples, and cross-references.
-- For detailed developer-doc rules, load `resources/style-guide.md` and apply the checklist.
+- A short summary of the scope and edits.
+- Auto-fixed items.
+- Remaining findings grouped by priority with file and cell or line references.
+- The validation commands run and their results.
 
-### 4a) Developer content checks
-
-Apply Microsoft Writing Style Guide guidance that targets developer documentation:
-
-- **Audience + voice**: Assume baseline dev knowledge; skip basics and focus on product-specific goals. Keep the voice warm, crisp, and helpful.
-- **Reference documentation**: Favor consistent structure and predictable headings. Ensure a concise description, syntax/signature, requirements/applies-to, examples, exceptions/permissions where applicable, and “See also” links. Don’t repeat the element name in the description.
-- **Code examples**: Make examples task-based, concise, and practical; start simple, avoid contrived scenarios, list prerequisites, show expected output, and ensure secure, tested code. Don’t add exception handling unless intrinsic to the example.
-- **Formatting developer text**: Use code style for programmatic elements; match capitalization used in code and language conventions. Use code style for commands, options, identifiers, and markup.
-- **Instructions**: Use imperative verbs, complete sentences, and consistent step structure; cap the first word, end steps with periods, and keep procedures short. Use sentence-style capitalization for headings and UI labels.
-- **UI labels in prose**: When referring to UI text, either describe the action without a label, or clearly set off the label; use quotes or bold sparingly and consistently.
-
-### 4b) Ads docs checks
-
-When writing or editing Ads docs:
-
-- Write for marketing developers: assume technical fluency, but explain Ads concepts in plain, direct, practical language before implementation details.
-- Start with the job to be done: setup measurement, create campaigns, sync audiences, query insights, or debug delivery.
-- Use concrete, workflow-shaped examples with realistic advertiser scenarios, short steps, and small happy-path code snippets.
-- Build mental models around outcomes: data flow, update timing, defaults, and how choices affect reporting, targeting, or optimization.
-- Stay crisp and direct: short sections, short paragraphs, practical bullets, useful tables and snippets, no marketing fluff.
-- For Ads API docs, use the API when possible to confirm behavior; ask the human for an API key if needed.
-- Do not add Ads changelog entries under `/content/changelogs`. For API-impacting Ads changes, update `/ads/api-overview#changelog`.
-
-### 4c) Tighten prose without changing meaning
-
-- Put accuracy first, clarity second, and cadence third. Before rewriting, identify protected actors, actions, objects, values, counts, sequences, conditions, scope, modality, negation, literals, and uncertainty markers. Compare them with the revision before finishing. Revert any introduced drift. If the source is ambiguous, preserve the original wording and flag the ambiguity for review.
-- Lead with the point. Prefer concrete nouns, strong verbs, and the plainest accurate wording.
-- Apply a literal-action test to abstract phrasing only when the source supplies the answer: who or what acts, what changes, and what happens next? Never invent or broaden an actor to avoid passive voice. Keep process-focused passive voice when the actor is unknown, irrelevant, or intentionally omitted.
-- Treat phrases such as “not just X but Y,” “leverage,” “unlock,” “seamless,” “at scale,” “drive alignment,” “move work forward,” and “operationalize” as review prompts, not banned words. Replace them only when plainer wording is more specific.
-- Cut throat-clearing, filler, repeated conclusions, vague praise, and ornamental transitions. Read the result once for natural cadence without flattening useful warmth or nuance.
-- Correct a count or logical mismatch only when the surrounding source establishes the intended value or logic. A list-count mismatch alone is not enough evidence to choose a correction. Otherwise, preserve the original wording and flag the mismatch for review.
-- Preserve exact product terminology, UI labels, error messages, commands, paths, code identifiers, normative keywords, negation, and security conditions. Repository mechanics and Vale remain constraints.
-- Keep this pass local to the requested or already-touched prose. Don't create formatting, structural, or file-wide churn solely for rhythm.
-
-### 5) Fix what is safe
-
-- Auto-fix obvious typos, punctuation, spacing, and clear grammar errors.
-- Keep edits minimal and reversible.
-- If a fix could change meaning or requires product knowledge, flag it instead of editing.
-- After edits, re-run Vale on the same scope when available.
-
-### 6) Report results
-
-- Provide a short summary, then list issues by priority with file/line references.
-- Clearly separate:
-  - **Auto-fixed** items (already changed)
-  - **Needs review** items (awaiting user decision)
-- Ask for confirmation before making non-trivial rewrites or meaning-altering edits.
-
-## Output expectations
-
-- Default to concise, reviewer-style feedback.
-- Highlight inconsistencies (for example: “list says three items but shows two”).
-- If no issues are found, say so explicitly and mention whether Vale ran.
+If no issues remain, say so explicitly.

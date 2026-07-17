@@ -18,16 +18,4 @@ concurrency:
 jobs:
   validate:
     name: Validate existing B24 credential safely
-    runs-on: ubuntu-latest
-    env:
-      B24_TOKEN_CREDENTIAL: ${{ secrets.B24_TOKEN_CREDENTIAL }}
-      BEDS24_ACCESS_TOKEN_FILE: ${{ runner.temp }}/beds24-access-token
-
-    steps:
-      - name: Check out repository
-        uses: actions/checkout@v4
-
-      - name: Validate B24 token credential
-        run: python aumara-control-tower/scripts/beds24_auth_check.py validate
-
-      - name: Exchange refresh
+    runs-on

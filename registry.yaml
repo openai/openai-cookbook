@@ -3542,3 +3542,32 @@
   tags:
     - evals
     - promptfoo
+
+- title: Parse documents with the Unstructured Transform MCP server
+  path: examples/mcp/unstructured-transform/parse_documents_with_unstructured_transform_mcp.ipynb
+  slug: parse-documents-with-unstructured-transform-mcp
+  description: Use the OpenAI Responses API's MCP tool with Unstructured's hosted
+    Transform MCP server to parse a complex PDF into clean, structured content and
+    answer questions over it. Unstructured Transform brings production-grade document
+    parsing to your agents.
+  date: 2026-07-10
+  authors:
+    - ajaykrishnan23
+  tags:
+    - mcp
+    - responses
+
+- title: Parse documents with the Unstructured Transform MCP server (Agents SDK)
+  path: examples/agents_sdk/parse_documents_with_unstructured_transform_agents_sdk.ipynb
+  slug: parse-documents-with-unstructured-transform-agents-sdk
+  description: Connect Unstructured's hosted Transform MCP server to the OpenAI Agents
+    SDK as a client-managed streamable HTTP server, so an agent can parse a complex
+    PDF into clean, structured content and a second agent answers questions over it.
+    Unstructured Transform brings production-grade document parsing to your agents.
+  date: 2026-07-16
+  authors:
+    - ajaykrishnan23
+  tags:
+    - agents-sdk
+    - mcp
+    - agents

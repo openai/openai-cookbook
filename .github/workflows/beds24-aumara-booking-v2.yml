@@ -2,12 +2,17 @@ name: Beds24 AUMARA credential check
 
 on:
   workflow_dispatch:
+  pull_request:
+    branches: [main]
+    paths:
+      - '.github/workflows/beds24-aumara-booking-v2.yml'
+      - 'aumara-control-tower/scripts/beds24_auth_check.py'
 
 permissions:
   contents: read
 
 concurrency:
-  group: beds24-aumara-credential-check
+  group: beds24-aumara-credential-check-${{ github.ref }}
   cancel-in-progress: true
 
 jobs:
@@ -25,22 +30,4 @@ jobs:
       - name: Validate B24 token credential
         run: python aumara-control-tower/scripts/beds24_auth_check.py validate
 
-      - name: Exchange refresh token
-        run: python aumara-control-tower/scripts/beds24_auth_check.py exchange
-
-      - name: Run read-only Beds24 probe
-        run: python aumara-control-tower/scripts/beds24_auth_check.py probe
-
-      - name: Upload authentication evidence
-        if: always()
-        uses: actions/upload-artifact@v4
-        with:
-          name: beds24-authentication-evidence
-          path: aumara-control-tower/evidence/beds24-auth-check.json
-          if-no-files-found: error
-          retention-days: 30
-
-      - name: Remove temporary access token
-        if: always()
-        shell: bash
-        run: rm -f "$BEDS24_ACCESS_TOKEN_FILE"
+      - name: Exchange refresh

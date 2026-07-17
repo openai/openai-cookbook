@@ -4,6 +4,19 @@
 # should build pages for, and indicates metadata such as tags, creation date and
 # authors for each page.
 
+- title: Enabling Long-Term Agent Memory with Oracle AI Agent Memory
+  path: examples/agents_sdk/deep_research_openai_agents.ipynb
+  slug: deep-research-openai-agents
+  description: Build a deep-research agent with the OpenAI Agents SDK, Oracle-backed session persistence, durable memory, and Tavily web search.
+  date: 2026-07-16
+  authors:
+    - Ela689
+  tags:
+    - agents-sdk
+    - agents
+    - memory
+    - deep-research
+
 - title: Build a Speaker-Aware Meeting Intelligence Pipeline with Audio Diarization
   path: examples/audio/speaker_aware_meeting_intelligence/speaker_aware_meeting_intelligence.ipynb
   slug: speaker-aware-meeting-intelligence
@@ -300,6 +313,7 @@
   path: examples/building_w_rt_mini/building_w_rt_mini.ipynb
   slug: building-w-rt-mini
   date: 2025-10-11
+  archived: true
   authors:
     - carter-oai
   tags:
@@ -3086,6 +3100,7 @@
   slug: one-way-translation-using-realtime-api
   description: Cookbook to build one-way speech translation with the Realtime API.
   date: 2025-03-24
+  archived: true
   authors:
     - erikakettleson-openai
   tags:

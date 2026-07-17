@@ -11,7 +11,7 @@ symlinks, one shared skill, one shared hook implementation, generated Claude
 and Codex reviewer agents, and provider-native settings and rules.
 
 The complete sample lives in [`example-project/`](./example-project/). It uses
-only Node.js, Python, and POSIX shell tools.
+only Node.js, Python 3.11 or newer, and POSIX shell tools.
 
 ## What you will build
 
@@ -21,7 +21,7 @@ example-project/
 ├── CLAUDE.md -> AGENTS.md            # Claude projection of identical text
 ├── .agents/
 │   ├── agent-prompts/reviewer.md     # canonical reviewer prompt
-│   ├── agent-specs/reviewer.yaml     # canonical reviewer metadata
+│   ├── agent-specs/reviewer.toml     # canonical reviewer metadata
 │   ├── hooks/session_start.py        # shared executable hook logic
 │   ├── policies/review.md            # shared review policy
 │   └── skills/test-changes/
@@ -129,7 +129,7 @@ readlink .claude/skills
 ## Generate provider-native agents
 
 Agent roles share meaning but not file schemas. This example keeps neutral
-metadata in [`.agents/agent-specs/reviewer.yaml`](./example-project/.agents/agent-specs/reviewer.yaml)
+metadata in [`.agents/agent-specs/reviewer.toml`](./example-project/.agents/agent-specs/reviewer.toml)
 and the prompt in [`.agents/agent-prompts/reviewer.md`](./example-project/.agents/agent-prompts/reviewer.md).
 
 Run the generator after changing either source:
@@ -146,8 +146,9 @@ It renders:
   with Codex fields and a read-only sandbox.
 
 The checked-in projections make review easy and work without a bootstrap step.
-The `check` script regenerates both files and fails if either projection has
-drifted from the source.
+The `check` script renders the expected files in memory, compares their exact
+bytes without changing the worktree, validates the native JSON and TOML files,
+and fails with a diff if either projection has drifted from the source.
 
 ## Share hook logic, not hook registration
 

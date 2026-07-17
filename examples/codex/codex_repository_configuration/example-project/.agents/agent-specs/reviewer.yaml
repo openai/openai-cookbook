@@ -1,3 +1,0 @@
-name: reviewer
-description: Review changes for correctness, security, and missing tests.
-prompt: .agents/agent-prompts/reviewer.md

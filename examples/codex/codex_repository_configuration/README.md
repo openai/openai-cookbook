@@ -1,217 +1,204 @@
-# Build a Repository Configuration for Codex
+# Build a co-home repository for Claude Code, Codex, and Cursor
 
-Codex can read repository instructions, project configuration, lifecycle hooks,
-custom agents, command rules, and skills directly from your working tree. This
-example assembles those pieces in one small repository and gives every file a
-real job to do.
+A co-home repository gives multiple coding agents one reliable place to work
+without maintaining three copies of the same instructions and workflows. The
+design rule is simple:
+
+> Share content as much as possible. Split configuration by provider.
+
+This example is a working JavaScript repository. It uses real relative
+symlinks, one shared skill, one shared hook implementation, generated Claude
+and Codex reviewer agents, and provider-native settings and rules.
 
 The complete sample lives in [`example-project/`](./example-project/). It uses
-only Node.js and the Python standard library, so you can copy it and exercise
-the configuration without installing application dependencies.
+only Node.js, Python, and POSIX shell tools.
 
 ## What you will build
 
 ```text
 example-project/
-├── AGENTS.md
+├── AGENTS.md                         # canonical repository guidance
+├── CLAUDE.md -> AGENTS.md            # Claude projection of identical text
 ├── .agents/
-│   └── skills/
-│       └── test-changes/
-│           ├── SKILL.md
-│           └── scripts/
-│               └── run-tests.sh
+│   ├── agent-prompts/reviewer.md     # canonical reviewer prompt
+│   ├── agent-specs/reviewer.yaml     # canonical reviewer metadata
+│   ├── hooks/session_start.py        # shared executable hook logic
+│   ├── policies/review.md            # shared review policy
+│   └── skills/test-changes/
+│       ├── SKILL.md
+│       └── scripts/run-tests.sh
+├── .claude/
+│   ├── skills -> ../.agents/skills   # Claude projection of shared skills
+│   ├── agents/reviewer.md            # generated Claude agent
+│   ├── rules/testing.md              # Claude-native path rule
+│   └── settings.json                 # Claude-native hook registration
 ├── .codex/
-│   ├── agents/
-│   │   └── reviewer.toml
-│   ├── hooks/
-│   │   └── session_start.py
-│   ├── rules/
-│   │   └── default.rules
-│   ├── config.toml
-│   └── hooks.json
-├── src/
-│   └── sum.js
-├── test/
-│   └── sum.test.js
+│   ├── agents/reviewer.toml          # generated Codex agent
+│   ├── rules/default.rules           # Codex-native command rule
+│   ├── config.toml                   # Codex-native project settings
+│   └── hooks.json                    # Codex-native hook registration
+├── .cursor/rules/testing.mdc         # Cursor-native path rule
+├── tools/agent-config/
+│   ├── generate                      # renders native agent files
+│   └── check                         # detects projection drift
+├── src/sum.js
+├── test/sum.test.js
 └── package.json
 ```
 
-The files under `.codex/` are project-scoped. Codex activates project config,
-hooks, and rules only after you trust the repository. Read them before granting
-trust, especially when you did not create the repository yourself.
+The example uses four sharing strategies:
+
+| Strategy | Use it when | Files in this example |
+| --- | --- | --- |
+| Canonical | The content and meaning are shared | `AGENTS.md`, `.agents/**` |
+| Relative symlink | Providers can consume the exact same bytes | `CLAUDE.md`, `.claude/skills` |
+| Generated projection | The meaning is shared but schemas differ | `.claude/agents/reviewer.md`, `.codex/agents/reviewer.toml` |
+| Provider-native | Schema or behavior is genuinely provider-specific | `.claude/settings.json`, `.codex/config.toml`, `.cursor/rules/testing.mdc` |
 
 ## Run the sample
 
-Copy the sample to a temporary directory so you can change it freely:
+Copy the sample while preserving its symlinks, then create a temporary Git
+index so the drift check can compare generated files:
 
 ```bash
 cp -R examples/codex/codex_repository_configuration/example-project \
-  /tmp/codex-configuration-example
-cd /tmp/codex-configuration-example
+  /tmp/code-home-example
+cd /tmp/code-home-example
 git init
+git add -A
 ```
 
-Run the application test directly:
+Run the application tests through the shared skill script:
 
 ```bash
-npm test
+.agents/skills/test-changes/scripts/run-tests.sh
 ```
 
-Exercise the hook implementation with a minimal `SessionStart` JSON payload
-containing the current working directory:
+Check that the symlinks point to the canonical files and that regenerating the
+provider agents produces no diff:
 
 ```bash
-printf '{"cwd":"/tmp/codex-configuration-example"}\n' \
-  | python3 .codex/hooks/session_start.py \
+tools/agent-config/check
+```
+
+Exercise the shared hook implementation directly with a representative
+`SessionStart` event:
+
+```bash
+printf '{"cwd":"/tmp/code-home-example"}\n' \
+  | python3 .agents/hooks/session_start.py \
   | python3 -m json.tool
 ```
 
-The output includes `hookSpecificOutput`, the `SessionStart` event name, and the
-repository context that Codex should add to the new session.
+Both `.claude/settings.json` and `.codex/hooks.json` register this script. The
+registration schemas remain native, while the executable behavior stays in one
+reviewed file.
 
-After you inspect the configuration files, start Codex from the example root:
+## Keep shared guidance canonical
+
+[`AGENTS.md`](./example-project/AGENTS.md) owns repository-wide instructions.
+[`CLAUDE.md`](./example-project/CLAUDE.md) is an actual relative symlink to that
+file, so Claude Code and Codex receive the same rules without duplicated prose.
+
+Relative symlinks survive different checkout paths. Verify the link itself,
+not just the resolved content:
 
 ```bash
-codex "Explain the repository instructions you loaded, then run the smallest relevant test."
+readlink CLAUDE.md
+# AGENTS.md
 ```
 
-## `AGENTS.md`: shared repository instructions
+If your source-control or packaging environment cannot preserve symlinks, use a
+small Claude adapter containing `@AGENTS.md` and make CI verify the adapter.
 
-[`AGENTS.md`](./example-project/AGENTS.md) tells Codex how to work in the
-repository before it starts a task. Commit rules that should apply to every
-contributor, such as the test command, source layout, and boundaries around
-generated files.
+## Share skills through a provider projection
 
-The example intentionally keeps these instructions short and verifiable:
+The canonical [`test-changes` skill](./example-project/.agents/skills/test-changes/SKILL.md)
+lives under `.agents/skills`, where Codex discovers repository skills. The
+`.claude/skills` symlink exposes that same directory at Claude Code's native
+project-skill path.
 
-```md
-# Repository guide
+The skill calls a real shell script that finds the Git root and runs `npm test`.
+There is only one workflow to update and one command to verify.
 
-- Run `npm test` after changing JavaScript.
-- Keep public functions in `src/` and their tests in `test/`.
-- Do not commit generated coverage or dependency directories.
+```bash
+readlink .claude/skills
+# ../.agents/skills
 ```
 
-For directory-specific rules, add another `AGENTS.md` or
-`AGENTS.override.md` closer to the files it governs. Codex combines the files
-from the repository root down to the current working directory.
+## Generate provider-native agents
 
-## `.codex/config.toml`: project defaults
+Agent roles share meaning but not file schemas. This example keeps neutral
+metadata in [`.agents/agent-specs/reviewer.yaml`](./example-project/.agents/agent-specs/reviewer.yaml)
+and the prompt in [`.agents/agent-prompts/reviewer.md`](./example-project/.agents/agent-prompts/reviewer.md).
 
-[`config.toml`](./example-project/.codex/config.toml) sets portable defaults for
-a trusted project. This example keeps approval prompts enabled, limits writes
-to the workspace, caps subagent fan-out, and registers the public OpenAI
-documentation MCP server:
+Run the generator after changing either source:
 
-```toml
-approval_policy = "on-request"
-sandbox_mode = "workspace-write"
-
-[agents]
-max_threads = 4
-max_depth = 1
-
-[mcp_servers.openaiDeveloperDocs]
-url = "https://developers.openai.com/mcp"
+```bash
+tools/agent-config/generate
 ```
 
-Do not put API keys or machine-specific credentials in a committed project
-config. Keep secrets in environment variables or an approved credential store.
+It renders:
 
-## `.codex/hooks.json`: lifecycle hook registration
+- [`.claude/agents/reviewer.md`](./example-project/.claude/agents/reviewer.md)
+  with Claude frontmatter and tool names;
+- [`.codex/agents/reviewer.toml`](./example-project/.codex/agents/reviewer.toml)
+  with Codex fields and a read-only sandbox.
 
-[`hooks.json`](./example-project/.codex/hooks.json) registers deterministic
-commands at Codex lifecycle events. The sample runs one Python script when a
-session starts. It resolves the script from the Git root, so starting Codex in
-a nested directory still finds the same file.
+The checked-in projections make review easy and work without a bootstrap step.
+The `check` script regenerates both files and fails if either projection has
+drifted from the source.
 
-The hook is not trusted merely because it is committed. Codex asks you to review
-new or changed non-managed hooks before running them.
+## Share hook logic, not hook registration
 
-## `.codex/hooks/session_start.py`: hook implementation
+The Python hook under [`.agents/hooks`](./example-project/.agents/hooks/session_start.py)
+reads a JSON event and returns concise repository context. Claude and Codex
+each point to it from their native registration file:
 
-[`session_start.py`](./example-project/.codex/hooks/session_start.py) reads a
-JSON event from standard input and returns JSON on standard output. The
-`additionalContext` value becomes context for the new Codex session.
+- [`.claude/settings.json`](./example-project/.claude/settings.json)
+- [`.codex/hooks.json`](./example-project/.codex/hooks.json)
 
-Codex does not auto-discover scripts in `.codex/hooks/`; the adjacent
-`hooks.json` file is what invokes this script.
+Review hook files before trusting a repository. Hooks execute commands and can
+change local state. Keep credentials out of hook input, output, and source.
 
-## `.codex/agents/reviewer.toml`: custom subagent
+## Keep provider configuration native
 
-[`reviewer.toml`](./example-project/.codex/agents/reviewer.toml) defines a
-read-only reviewer that focuses on behavioral regressions and test coverage.
-The `name`, `description`, and `developer_instructions` fields are required.
-Runtime settings that are not present inherit from the parent session.
+Do not symlink files merely because their purpose sounds similar. These files
+have provider-owned syntax and semantics:
 
-Ask Codex to use it directly:
+- Claude Code uses [`.claude/settings.json`](./example-project/.claude/settings.json)
+  for project permissions and hooks, plus
+  [`.claude/rules/testing.md`](./example-project/.claude/rules/testing.md) for a
+  path-scoped testing rule.
+- Codex uses [`.codex/config.toml`](./example-project/.codex/config.toml) for
+  trusted project settings, [`.codex/hooks.json`](./example-project/.codex/hooks.json)
+  for hooks, and [`.codex/rules/default.rules`](./example-project/.codex/rules/default.rules)
+  for command-execution policy.
+- Cursor uses [`.cursor/rules/testing.mdc`](./example-project/.cursor/rules/testing.mdc)
+  for a glob-scoped project rule.
 
-```text
-Use the reviewer agent to inspect the current diff. Return only actionable findings.
-```
+The text “run `npm test` after changing JavaScript” is shared intent. The JSON,
+TOML, Starlark, Markdown frontmatter, and MDC wrappers are native integration
+layers.
 
-## `.codex/rules/default.rules`: command policy
+## What not to commit
 
-[`default.rules`](./example-project/.codex/rules/default.rules) allows a narrow
-set of read-only Git commands to run outside the sandbox. The `match` and
-`not_match` cases are inline checks that Codex evaluates when it loads the
-rule.
+Repository configuration should travel with the team. Personal and runtime
+state should not. Keep credentials, literal MCP secrets, local overrides,
+agent memories, transcripts, sessions, prompt history, logs, and installed
+plugin caches out of the repository.
 
-Rules control command execution; they are not a replacement for repository
-instructions. Keep workflow guidance in `AGENTS.md` and reserve `.rules` files
-for command policy.
+Use environment-variable references for secrets. Put durable team guidance in
+`AGENTS.md`, skills, policies, or checked-in documentation.
 
-## `.agents/skills/test-changes/`: reusable workflow
+## References
 
-[`SKILL.md`](./example-project/.agents/skills/test-changes/SKILL.md) packages a
-repeatable workflow. Codex sees the skill's `name` and `description` during
-discovery, then reads the full instructions only when the skill is selected.
-
-The skill calls
-[`scripts/run-tests.sh`](./example-project/.agents/skills/test-changes/scripts/run-tests.sh),
-which anchors itself at the Git root and runs the dependency-free Node test.
-Supporting scripts are not loaded or executed during skill discovery.
-
-Invoke the skill explicitly:
-
-```text
-Use the test-changes skill to verify this branch.
-```
-
-## Project files and personal files
-
-The sample uses only project files so it is safe to copy as a repository. Keep
-personal defaults in your home directories instead:
-
-| Purpose | Project location | Personal location |
-| --- | --- | --- |
-| Instructions | `AGENTS.md` | `~/.codex/AGENTS.md` |
-| Base configuration | `.codex/config.toml` | `~/.codex/config.toml` |
-| Profile configuration | Not project-scoped | `~/.codex/<profile>.config.toml` |
-| Hooks | `.codex/hooks.json` | `~/.codex/hooks.json` |
-| Custom agents | `.codex/agents/*.toml` | `~/.codex/agents/*.toml` |
-| Command rules | `.codex/rules/*.rules` | `~/.codex/rules/*.rules` |
-| Skills | `.agents/skills/<name>/` | `~/.agents/skills/<name>/` |
-
-Keep `~/.codex/auth.json`, histories, sessions, memories, logs, and caches out of
-repositories. They are credentials or Codex-managed state, not portable
-configuration examples.
-
-## Extend the example
-
-Start with the smallest configuration that changes a real workflow. Then:
-
-1. Add nested `AGENTS.md` files only where a directory needs different rules.
-2. Add project config values only when they should apply to every contributor.
-3. Keep hooks deterministic, fast, and easy to audit.
-4. Give each custom agent one clear responsibility.
-5. Package repeated multi-step work as a skill with narrow helper scripts.
-6. Include `match` and `not_match` cases with every command rule.
-
-For the complete contracts and current availability, see the Codex documentation
-for [custom instructions](https://learn.chatgpt.com/docs/agent-configuration/agents-md),
-[configuration](https://learn.chatgpt.com/docs/config-file/config-basic),
-[hooks](https://learn.chatgpt.com/docs/hooks),
-[custom agents](https://learn.chatgpt.com/docs/agent-configuration/subagents),
-[rules](https://learn.chatgpt.com/docs/agent-configuration/rules), and
-[skills](https://learn.chatgpt.com/docs/build-skills).
+- [Design a co-home repository](https://learn.chatgpt.com/docs/configuration-files)
+- [Claude Code `.claude` directory](https://code.claude.com/docs/en/claude-directory)
+- [Claude Code settings](https://code.claude.com/docs/en/settings)
+- [Codex `AGENTS.md`](https://developers.openai.com/codex/agent-configuration/agents-md)
+- [Codex skills](https://developers.openai.com/codex/build-skills)
+- [Codex subagents](https://developers.openai.com/codex/agent-configuration/subagents)
+- [Codex hooks](https://developers.openai.com/codex/hooks)
+- [Codex rules](https://developers.openai.com/codex/agent-configuration/rules)
+- [Cursor rules](https://docs.cursor.com/context/rules)

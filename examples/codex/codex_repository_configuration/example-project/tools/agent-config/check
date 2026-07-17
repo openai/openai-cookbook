@@ -1,0 +1,11 @@
+#!/usr/bin/env bash
+set -euo pipefail
+
+repo_root="$(git rev-parse --show-toplevel)"
+cd "$repo_root"
+
+test "$(readlink CLAUDE.md)" = "AGENTS.md"
+test "$(readlink .claude/skills)" = "../.agents/skills"
+
+tools/agent-config/generate
+git diff --exit-code -- .claude/agents .codex/agents

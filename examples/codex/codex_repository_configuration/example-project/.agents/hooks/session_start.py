@@ -1,5 +1,5 @@
 #!/usr/bin/env python3
-"""Return concise repository context for a Codex SessionStart hook."""
+"""Return concise repository context for Claude Code or Codex SessionStart."""
 
 import json
 import sys

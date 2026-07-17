@@ -1,0 +1,8 @@
+---
+description: JavaScript test policy
+globs: "{src,test}/**/*.js"
+alwaysApply: false
+---
+
+Run `npm test` after changing JavaScript. Add a focused regression test for
+every bug fix.

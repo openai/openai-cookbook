@@ -6,7 +6,7 @@
         "hooks": [
           {
             "type": "command",
-            "command": "python3 \"$(git rev-parse --show-toplevel)/.codex/hooks/session_start.py\"",
+            "command": "python3 \"$(git rev-parse --show-toplevel)/.agents/hooks/session_start.py\"",
             "statusMessage": "Loading repository notes"
           }
         ]

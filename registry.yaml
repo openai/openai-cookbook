@@ -4,6 +4,25 @@
 # should build pages for, and indicates metadata such as tags, creation date and
 # authors for each page.
 
+- title: "Regulatory Compliance Guardrails for AI Agents: A Pan-African Fintech Example"
+  path: examples/Regulatory_compliance_for_AI_agents_Pan_African.ipynb
+  slug: regulatory-compliance-guardrails-pan-african
+  description: >-
+    Enforce jurisdiction-specific regulatory rules at the tool layer using policy-as-code.
+    Demonstrates three African regulatory frameworks — Nigerian CBN NIP Framework, Kenya
+    DPA 2019, and South Africa POPIA — with the OpenAI Agents SDK. Shows why Rego-based
+    tool-layer enforcement is immune to prompt injection, unlike system-prompt rules.
+  date: 2026-07-18
+  authors:
+    - kingztech2019
+  tags:
+    - agents-sdk
+    - agents
+    - guardrails
+    - compliance
+    - fintech
+    - policy-as-code
+
 - title: Enabling Long-Term Agent Memory with Oracle AI Agent Memory
   path: examples/agents_sdk/deep_research_openai_agents.ipynb
   slug: deep-research-openai-agents

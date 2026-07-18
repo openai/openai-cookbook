@@ -1,0 +1,11 @@
+name: Beds24 credential check
+on: [workflow_dispatch, pull_request]
+jobs:
+  validate:
+    runs-on: ubuntu-latest
+    env:
+      B24_TOKEN_CREDENTIAL: ${{ secrets.BEDS24_TOKEN_CREDENTIAL }}
+      BEDS24_ACCESS_TOKEN_FILE: /tmp/beds24-access-token
+    steps:
+      - uses: actions/checkout@v4
+      - run: python aumara-control-tower/scripts/beds24_auth_check.py validate && python aumara-control-tower/scripts/beds24_auth_check.py exchange && python aumara-control-tower/scripts/beds24_auth_check.py probe

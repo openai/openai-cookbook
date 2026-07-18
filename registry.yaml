@@ -5,7 +5,7 @@
 # authors for each page.
 
 - title: "Regulatory Compliance Guardrails for AI Agents: A Pan-African Fintech Example"
-  path: examples/Regulatory_compliance_for_AI_agents_Pan_African.ipynb
+  path: examples/regulatory_compliance_for_ai_agents_pan_african.ipynb
   slug: regulatory-compliance-guardrails-pan-african
   description: >-
     Enforce jurisdiction-specific regulatory rules at the tool layer using policy-as-code.

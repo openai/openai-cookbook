@@ -25,6 +25,16 @@ EVIDENCE_PATH = ROOT / "evidence" / "beds24-auth-check.json"
 ACCESS_TOKEN_FILE = pathlib.Path(
     os.environ.get("BEDS24_ACCESS_TOKEN_FILE", "/tmp/beds24-access-token")
 )
+REDACTED = "[REDACTED]"
+DIAGNOSTIC_FIELDS = (
+    "message",
+    "error",
+    "detail",
+    "error_description",
+    "code",
+    "status",
+    "type",
+)
 
 
 def now_utc() -> str:
@@ -38,6 +48,66 @@ def normalize_secret(value: str | None) -> str:
         for char in raw
         if not char.isspace() and unicodedata.category(char) not in {"Cc", "Cf"}
     )
+
+
+def redact_text(value: str, secrets: tuple[str, ...]) -> str:
+    redacted = value
+    for secret in secrets:
+        normalized = normalize_secret(secret)
+        if normalized:
+            redacted = redacted.replace(normalized, REDACTED)
+    return redacted
+
+
+def sanitize_value(value: Any, secrets: tuple[str, ...]) -> Any:
+    if isinstance(value, dict):
+        sanitized: dict[str, Any] = {}
+        for key, item in value.items():
+            if str(key).lower() in {"token", "refreshtoken", "accesstoken", "secret"}:
+                sanitized[str(key)] = REDACTED
+            else:
+                sanitized[str(key)] = sanitize_value(item, secrets)
+        return sanitized
+    if isinstance(value, list):
+        return [sanitize_value(item, secrets) for item in value]
+    if isinstance(value, str):
+        return redact_text(value, secrets)
+    return value
+
+
+def decode_response(raw: bytes, secrets: tuple[str, ...]) -> dict[str, Any]:
+    text = raw.decode("utf-8", "replace")
+    if not text:
+        return {}
+    try:
+        body = json.loads(text)
+    except json.JSONDecodeError:
+        return {"message": redact_text(text, secrets)}
+    sanitized = sanitize_value(body, secrets)
+    if isinstance(sanitized, dict):
+        return sanitized
+    return {"message": json.dumps(sanitized, ensure_ascii=False)}
+
+
+def extract_diagnostics(body: dict[str, Any]) -> dict[str, Any]:
+    diagnostics = {
+        key: value
+        for key in DIAGNOSTIC_FIELDS
+        if (value := body.get(key)) not in (None, "", [], {})
+    }
+    if diagnostics:
+        return diagnostics
+    if body:
+        return {"body_keys": sorted(body.keys())}
+    return {}
+
+
+def primary_diagnostic(diagnostics: dict[str, Any]) -> str | None:
+    for key in ("message", "detail", "error", "error_description"):
+        value = diagnostics.get(key)
+        if isinstance(value, str) and value:
+            return value
+    return None
 
 
 def load_evidence() -> dict[str, Any]:
@@ -54,6 +124,9 @@ def load_evidence() -> dict[str, Any]:
         "credential_source": "B24_TOKEN_CREDENTIAL",
         "token_exchange_http_status": None,
         "readonly_probe_http_status": None,
+        "token_exchange_diagnostics": {},
+        "readonly_probe_diagnostics": {},
+        "failure_stage": None,
         "secret_present": False,
         "secret_length": 0,
         "secret_exposed": False,
@@ -70,7 +143,9 @@ def save_evidence(evidence: dict[str, Any]) -> None:
     )
 
 
-def request_json(url: str, headers: dict[str, str]) -> tuple[int, dict[str, Any]]:
+def request_json(
+    url: str, headers: dict[str, str], secrets: tuple[str, ...] = ()
+) -> tuple[int, dict[str, Any]]:
     request = urllib.request.Request(
         url,
         headers={"accept": "application/json", **headers},
@@ -78,15 +153,10 @@ def request_json(url: str, headers: dict[str, str]) -> tuple[int, dict[str, Any]
     )
     try:
         with urllib.request.urlopen(request, timeout=45) as response:
-            raw = response.read().decode("utf-8", "replace")
-            try:
-                body = json.loads(raw) if raw else {}
-            except json.JSONDecodeError:
-                body = {}
-            return response.status, body if isinstance(body, dict) else {}
+            raw = response.read()
+            return response.status, decode_response(raw, secrets)
     except urllib.error.HTTPError as exc:
-        exc.read()
-        return exc.code, {}
+        return exc.code, decode_response(exc.read(), secrets)
     except urllib.error.URLError:
         return 0, {}
 
@@ -100,6 +170,9 @@ def command_validate() -> int:
             "credential_source": "B24_TOKEN_CREDENTIAL",
             "token_exchange_http_status": None,
             "readonly_probe_http_status": None,
+            "token_exchange_diagnostics": {},
+            "readonly_probe_diagnostics": {},
+            "failure_stage": None,
             "secret_present": bool(credential),
             "secret_length": len(credential),
         }
@@ -118,12 +191,18 @@ def command_exchange() -> int:
     evidence.update(
         {
             "credential_source": "B24_TOKEN_CREDENTIAL",
+            "token_exchange_http_status": None,
+            "readonly_probe_http_status": None,
             "secret_present": bool(credential),
             "secret_length": len(credential),
+            "token_exchange_diagnostics": {},
+            "readonly_probe_diagnostics": {},
+            "failure_stage": None,
         }
     )
     if not credential:
         evidence["status"] = "AUTH_FAILED"
+        evidence["failure_stage"] = "validate"
         save_evidence(evidence)
         print("Missing GitHub Actions secret B24_TOKEN_CREDENTIAL", file=sys.stderr)
         return 1
@@ -131,14 +210,22 @@ def command_exchange() -> int:
     status, body = request_json(
         f"{API_BASE}/authentication/token",
         {"refreshToken": credential},
+        secrets=(credential,),
     )
     evidence["token_exchange_http_status"] = status
+    evidence["token_exchange_diagnostics"] = extract_diagnostics(body)
     token = body.get("token") if isinstance(body, dict) else None
     if not (200 <= status < 300 and isinstance(token, str) and token):
         evidence["status"] = "AUTH_FAILED"
+        evidence["failure_stage"] = "exchange"
         save_evidence(evidence)
+        detail = primary_diagnostic(evidence["token_exchange_diagnostics"])
         print(
-            f"Beds24 refresh-token exchange failed with HTTP status {status}.",
+            (
+                f"Beds24 refresh-token exchange failed with HTTP status {status}: {detail}."
+                if detail
+                else f"Beds24 refresh-token exchange failed with HTTP status {status}."
+            ),
             file=sys.stderr,
         )
         return 1
@@ -147,6 +234,7 @@ def command_exchange() -> int:
     ACCESS_TOKEN_FILE.write_text(token, encoding="utf-8")
     ACCESS_TOKEN_FILE.chmod(stat.S_IRUSR | stat.S_IWUSR)
     evidence["status"] = "TOKEN_EXCHANGED"
+    evidence["failure_stage"] = None
     save_evidence(evidence)
     print("Beds24 access token created in a protected temporary file.")
     return 0
@@ -157,6 +245,7 @@ def command_probe() -> int:
     try:
         if not ACCESS_TOKEN_FILE.exists():
             evidence["status"] = "AUTH_FAILED"
+            evidence["failure_stage"] = "probe"
             save_evidence(evidence)
             print("Temporary Beds24 access token file is missing.", file=sys.stderr)
             return 1
@@ -164,25 +253,35 @@ def command_probe() -> int:
         access_token = normalize_secret(ACCESS_TOKEN_FILE.read_text(encoding="utf-8"))
         if not access_token:
             evidence["status"] = "AUTH_FAILED"
+            evidence["failure_stage"] = "probe"
             save_evidence(evidence)
             print("Temporary Beds24 access token file is empty.", file=sys.stderr)
             return 1
 
-        status, _ = request_json(
+        status, body = request_json(
             f"{API_BASE}/authentication/details",
             {"token": access_token},
+            secrets=(access_token,),
         )
         evidence["readonly_probe_http_status"] = status
+        evidence["readonly_probe_diagnostics"] = extract_diagnostics(body)
         if 200 <= status < 300:
             evidence["status"] = "AUTH_OK"
+            evidence["failure_stage"] = None
             save_evidence(evidence)
             print("Beds24 read-only authentication probe succeeded.")
             return 0
 
         evidence["status"] = "AUTH_FAILED"
+        evidence["failure_stage"] = "probe"
         save_evidence(evidence)
+        detail = primary_diagnostic(evidence["readonly_probe_diagnostics"])
         print(
-            f"Beds24 read-only authentication probe failed with HTTP status {status}.",
+            (
+                f"Beds24 read-only authentication probe failed with HTTP status {status}: {detail}."
+                if detail
+                else f"Beds24 read-only authentication probe failed with HTTP status {status}."
+            ),
             file=sys.stderr,
         )
         return 1

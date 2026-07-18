@@ -6,6 +6,7 @@ on:
     branches: [main]
     paths:
       - '.github/workflows/beds24-auth-check.yml'
+      - 'aumara-control-tower/scripts/beds24_auth_check.py'
 
 permissions:
   contents: read
@@ -14,9 +15,79 @@ jobs:
   validate:
     runs-on: ubuntu-latest
     env:
-      B24_TOKEN_CREDENTIAL: ${{ secrets.B24_TOKEN_CREDENTIAL }}
+      B24_TOKEN_CREDENTIAL: ${{ secrets.BEDS24_TOKEN_CREDENTIAL }}
+      BEDS24_ACCESS_TOKEN_FILE: /tmp/beds24-access-token
+
     steps:
+      - uses: actions/checkout@v4
+
       - name: Validate existing Beds24 credential
-        shell: bash
+        id: validate
+        continue-on-error: true
+        run: python aumara-control-tower/scripts/beds24_auth_check.py validate
+
+      - name: Exchange refresh credential for temporary access token
+        id: exchange
+        if: ${{ steps.validate.outcome == 'success' }}
+        continue-on-error: true
+        run: python aumara-control-tower/scripts/beds24_auth_check.py exchange
+
+      - name: Probe Beds24 with the temporary access token
+        id: probe
+        if: ${{ steps.exchange.outcome == 'success' }}
+        continue-on-error: true
+        run: python aumara-control-tower/scripts/beds24_auth_check.py probe
+
+      - name: Upload redacted authentication evidence
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: beds24-authentication-evidence
+          path: aumara-control-tower/evidence/beds24-auth-check.json
+          if-no-files-found: warn
+          retention-days: 7
+
+      - name: Report Beds24 authentication result
+        if: always()
         run: |
-          set -
+          python - <<'PY'
+          import json
+          import pathlib
+          import sys
+
+          path = pathlib.Path("aumara-control-tower/evidence/beds24-auth-check.json")
+          if not path.exists():
+              print("Beds24 authentication evidence was not created.", file=sys.stderr)
+              sys.exit(1)
+
+          evidence = json.loads(path.read_text(encoding="utf-8"))
+          status = evidence.get("status")
+          if status == "AUTH_OK":
+              print("Beds24 authentication probe succeeded.")
+              sys.exit(0)
+
+          stage = evidence.get("failure_stage") or "unknown"
+          if stage == "exchange":
+              http_status = evidence.get("token_exchange_http_status")
+              diagnostics = evidence.get("token_exchange_diagnostics") or {}
+          elif stage == "probe":
+              http_status = evidence.get("readonly_probe_http_status")
+              diagnostics = evidence.get("readonly_probe_diagnostics") or {}
+          else:
+              http_status = None
+              diagnostics = {}
+
+          summary = ", ".join(
+              f"{key}={json.dumps(value, ensure_ascii=False)}"
+              for key, value in diagnostics.items()
+          )
+          if not summary:
+              summary = "no Beds24 diagnostics returned"
+
+          print(
+              f"Beds24 authentication failed during {stage} "
+              f"(HTTP status: {http_status}); {summary}.",
+              file=sys.stderr,
+          )
+          sys.exit(1)
+          PY

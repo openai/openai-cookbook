@@ -61,6 +61,7 @@ def redact_text(value: str, secrets: tuple[str, ...]) -> str:
 
 
 def sanitize_value(value: Any, secrets: tuple[str, ...]) -> Any:
+    """Recursively redact secret-bearing keys and secret text from response data."""
     if isinstance(value, dict):
         sanitized: dict[str, Any] = {}
         for key, item in value.items():
@@ -104,6 +105,7 @@ def extract_diagnostics(body: dict[str, Any]) -> dict[str, Any]:
 
 
 def primary_diagnostic(diagnostics: dict[str, Any]) -> str | None:
+    """Return the highest-priority human-readable diagnostic string, if any."""
     for key in ("message", "detail", "error", "error_description"):
         value = diagnostics.get(key)
         if isinstance(value, str) and value:

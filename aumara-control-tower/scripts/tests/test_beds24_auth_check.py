@@ -41,7 +41,7 @@ class Beds24AuthCheckTests(unittest.TestCase):
     def load_evidence(self) -> dict[str, object]:
         return json.loads(self.evidence_path.read_text(encoding="utf-8"))
 
-    @mock.patch.dict("os.environ", {"B24_TOKEN_CREDENTIAL": "refresh-secret"}, clear=True)
+    @mock.patch.dict("os.environ", {"B24_TOKEN_CREDENTIAL": "refresh-secret"})
     @mock.patch.object(
         MODULE,
         "request_json",

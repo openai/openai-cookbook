@@ -49,4 +49,5 @@ jobs:
 
       - name: Report Beds24 authentication result
         if: always()
+        continue-on-error: ${{ github.event_name == 'pull_request' }}
         run: python aumara-control-tower/scripts/beds24_auth_check.py report

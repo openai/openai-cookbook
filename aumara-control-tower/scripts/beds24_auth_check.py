@@ -184,9 +184,9 @@ def resolve_refresh_token(
     if not ENCRYPTED_REFRESH_FILE.exists():
         return source, credential, None
 
-    with tempfile.NamedTemporaryFile(prefix="beds24-refresh-", delete=False) as handle:
-        output_path = pathlib.Path(handle.name)
-    output_path.chmod(stat.S_IRUSR | stat.S_IWUSR)
+    fd, output_name = tempfile.mkstemp(prefix="beds24-refresh-")
+    os.close(fd)
+    output_path = pathlib.Path(output_name)
     try:
         environment = os.environ.copy()
         environment["BEDS24_VAULT_PASSPHRASE"] = credential
@@ -210,12 +210,17 @@ def resolve_refresh_token(
             capture_output=True,
             text=True,
         )
-        if proc.returncode != 0 or not output_path.exists():
+        if proc.returncode != 0:
             diagnostics: dict[str, Any] = {"message": DECRYPT_FAILED_MESSAGE}
             detail = redact_text((proc.stderr or "").strip(), (credential,))
             if detail:
                 diagnostics["detail"] = detail
             return source, None, diagnostics
+        if not output_path.exists():
+            return source, None, {
+                "message": DECRYPT_FAILED_MESSAGE,
+                "detail": "OpenSSL did not produce a decrypted vault file.",
+            }
         try:
             refresh_token = normalize_secret(output_path.read_text(encoding="utf-8"))
         except UnicodeDecodeError:

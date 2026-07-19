@@ -158,6 +158,7 @@ def save_evidence(evidence: dict[str, Any]) -> None:
 def request_json(
     url: str, headers: dict[str, str], secrets: tuple[str, ...] = ()
 ) -> tuple[int, dict[str, Any]]:
+    """Fetch a JSON response and optionally redact provided secrets from the body."""
     request = urllib.request.Request(
         url,
         headers={"accept": "application/json", **headers},

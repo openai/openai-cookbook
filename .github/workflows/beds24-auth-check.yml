@@ -20,7 +20,7 @@ jobs:
   validate:
     runs-on: ubuntu-latest
     env:
-      B24_TOKEN_CREDENTIAL: ${{ secrets.BEDS24_TOKEN_CREDENTIAL }}
+      BEDS24_TOKEN_CREDENTIAL: ${{ secrets.BEDS24_TOKEN_CREDENTIAL }}
       BEDS24_ACCESS_TOKEN_FILE: /tmp/beds24-access-token
 
     steps:

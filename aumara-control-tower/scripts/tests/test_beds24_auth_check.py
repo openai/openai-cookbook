@@ -44,7 +44,7 @@ class Beds24AuthCheckTests(unittest.TestCase):
     def load_evidence(self) -> dict[str, object]:
         return json.loads(self.evidence_path.read_text(encoding="utf-8"))
 
-    @mock.patch.dict("os.environ", {"B24_TOKEN_CREDENTIAL": "refresh-secret"})
+    @mock.patch.dict("os.environ", {"BEDS24_TOKEN_CREDENTIAL": "refresh-secret"})
     @mock.patch.object(
         MODULE,
         "request_json",
@@ -112,7 +112,7 @@ class Beds24AuthCheckTests(unittest.TestCase):
         self.assertEqual(body["status"], 401)
         self.assertEqual(body["message"], "Denied [REDACTED]")
 
-    @mock.patch.dict("os.environ", {"B24_TOKEN_CREDENTIAL": "refresh-secret"})
+    @mock.patch.dict("os.environ", {"BEDS24_TOKEN_CREDENTIAL": "refresh-secret"})
     def test_exchange_probe_success_persists_auth_ok_and_cleans_up(self):
         observed_headers: list[dict[str, str]] = []
 
@@ -168,7 +168,7 @@ class Beds24AuthCheckTests(unittest.TestCase):
         self.assertFalse(self.token_path.exists())
         self.assertNotIn("access-secret", json.dumps(evidence))
 
-    @mock.patch.dict("os.environ", {"B24_TOKEN_CREDENTIAL": "vault-passphrase"})
+    @mock.patch.dict("os.environ", {"BEDS24_TOKEN_CREDENTIAL": "vault-passphrase"})
     def test_exchange_uses_repository_credential_directly(self):
         observed_headers: list[dict[str, str]] = []
         self.vault_path.parent.mkdir(parents=True, exist_ok=True)
@@ -211,11 +211,11 @@ class Beds24AuthCheckTests(unittest.TestCase):
         self.assertEqual(probe_result, 0)
         run.assert_not_called()
         self.assertEqual(observed_headers[0]["refreshtoken"], "vault-passphrase")
-        self.assertEqual(evidence["credential_source"], "B24_TOKEN_CREDENTIAL")
+        self.assertEqual(evidence["credential_source"], "BEDS24_TOKEN_CREDENTIAL")
         self.assertEqual(evidence["status"], "AUTH_OK")
         self.assertFalse(self.token_path.exists())
 
-    @mock.patch.dict("os.environ", {"B24_TOKEN_CREDENTIAL": "vault-passphrase"})
+    @mock.patch.dict("os.environ", {"BEDS24_TOKEN_CREDENTIAL": "vault-passphrase"})
     def test_exchange_never_attempts_vault_decryption(self):
         self.vault_path.parent.mkdir(parents=True, exist_ok=True)
         self.vault_path.write_text("encrypted", encoding="utf-8")
@@ -244,16 +244,32 @@ class Beds24AuthCheckTests(unittest.TestCase):
         self.vault_path.parent.mkdir(parents=True, exist_ok=True)
         self.vault_path.write_text("encrypted", encoding="utf-8")
         self.assertTrue(self.vault_path.exists())
-        source, token, decrypt_diagnostics = MODULE.resolve_refresh_token("refresh-secret")
+        source, token, decrypt_diagnostics = MODULE.resolve_refresh_token(
+            "refresh-secret",
+            MODULE.PRIMARY_CREDENTIAL_SOURCE,
+        )
         self.assertEqual(source, MODULE.CREDENTIAL_SOURCE)
         self.assertEqual(token, "refresh-secret")
         self.assertIsNone(decrypt_diagnostics)
         self.vault_path.unlink()
         self.assertFalse(self.vault_path.exists())
-        source, token, decrypt_diagnostics = MODULE.resolve_refresh_token("refresh-secret")
+        source, token, decrypt_diagnostics = MODULE.resolve_refresh_token(
+            "refresh-secret",
+            MODULE.PRIMARY_CREDENTIAL_SOURCE,
+        )
         self.assertEqual(source, MODULE.CREDENTIAL_SOURCE)
         self.assertEqual(token, "refresh-secret")
         self.assertIsNone(decrypt_diagnostics)
+
+    @mock.patch.dict(
+        "os.environ",
+        {"B24_TOKEN_CREDENTIAL": "legacy-refresh-token"},
+        clear=True,
+    )
+    def test_resolve_credential_falls_back_to_legacy_variable(self):
+        credential, source = MODULE.resolve_credential()
+        self.assertEqual(credential, "legacy-refresh-token")
+        self.assertEqual(source, MODULE.LEGACY_CREDENTIAL_SOURCE)
 
     def test_report_failure_summarizes_exchange_diagnostics(self):
         MODULE.save_evidence(
@@ -267,7 +283,7 @@ class Beds24AuthCheckTests(unittest.TestCase):
                 },
                 "readonly_probe_http_status": None,
                 "readonly_probe_diagnostics": {},
-                "credential_source": "B24_TOKEN_CREDENTIAL",
+                "credential_source": "BEDS24_TOKEN_CREDENTIAL",
                 "secret_present": True,
                 "secret_length": 16,
                 "secret_exposed": False,

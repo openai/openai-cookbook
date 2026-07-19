@@ -168,8 +168,8 @@ class Beds24AuthCheckTests(unittest.TestCase):
         self.assertFalse(self.token_path.exists())
         self.assertNotIn("access-secret", json.dumps(evidence))
 
-    @mock.patch.dict("os.environ", {"BEDS24_TOKEN_CREDENTIAL": "vault-passphrase"})
-    def test_exchange_uses_repository_credential_directly(self):
+    @mock.patch.dict("os.environ", {"BEDS24_TOKEN_CREDENTIAL": "refresh-token"})
+    def test_exchange_uses_credential_directly(self):
         observed_headers: list[dict[str, str]] = []
         self.vault_path.parent.mkdir(parents=True, exist_ok=True)
         self.vault_path.write_text("encrypted", encoding="utf-8")
@@ -193,7 +193,7 @@ class Beds24AuthCheckTests(unittest.TestCase):
             headers = {key.lower(): value for key, value in request.header_items()}
             observed_headers.append(headers)
             if request.full_url.endswith("/authentication/token"):
-                self.assertEqual(headers["refreshtoken"], "vault-passphrase")
+                self.assertEqual(headers["refreshtoken"], "refresh-token")
                 return FakeResponse(200, {"token": "access-secret", "expiresIn": 3600})
             self.assertEqual(request.full_url, f"{MODULE.API_BASE}/authentication/details")
             self.assertEqual(headers["token"], "access-secret")
@@ -210,13 +210,13 @@ class Beds24AuthCheckTests(unittest.TestCase):
         self.assertEqual(exchange_result, 0)
         self.assertEqual(probe_result, 0)
         run.assert_not_called()
-        self.assertEqual(observed_headers[0]["refreshtoken"], "vault-passphrase")
+        self.assertEqual(observed_headers[0]["refreshtoken"], "refresh-token")
         self.assertEqual(evidence["credential_source"], "BEDS24_TOKEN_CREDENTIAL")
         self.assertEqual(evidence["status"], "AUTH_OK")
         self.assertFalse(self.token_path.exists())
 
-    @mock.patch.dict("os.environ", {"BEDS24_TOKEN_CREDENTIAL": "vault-passphrase"})
-    def test_exchange_never_attempts_vault_decryption(self):
+    @mock.patch.dict("os.environ", {"BEDS24_TOKEN_CREDENTIAL": "invalid-token"})
+    def test_exchange_fails_with_invalid_token(self):
         self.vault_path.parent.mkdir(parents=True, exist_ok=True)
         self.vault_path.write_text("encrypted", encoding="utf-8")
 
@@ -239,27 +239,6 @@ class Beds24AuthCheckTests(unittest.TestCase):
         self.assertIn("HTTP status 401: Token not valid", stderr.getvalue())
         run.assert_not_called()
         request_json.assert_called_once()
-
-    def test_resolve_refresh_token_uses_repository_secret_with_or_without_vault(self):
-        self.vault_path.parent.mkdir(parents=True, exist_ok=True)
-        self.vault_path.write_text("encrypted", encoding="utf-8")
-        self.assertTrue(self.vault_path.exists())
-        source, token, decrypt_diagnostics = MODULE.resolve_refresh_token(
-            "refresh-secret",
-            MODULE.PRIMARY_CREDENTIAL_SOURCE,
-        )
-        self.assertEqual(source, MODULE.CREDENTIAL_SOURCE)
-        self.assertEqual(token, "refresh-secret")
-        self.assertIsNone(decrypt_diagnostics)
-        self.vault_path.unlink()
-        self.assertFalse(self.vault_path.exists())
-        source, token, decrypt_diagnostics = MODULE.resolve_refresh_token(
-            "refresh-secret",
-            MODULE.PRIMARY_CREDENTIAL_SOURCE,
-        )
-        self.assertEqual(source, MODULE.CREDENTIAL_SOURCE)
-        self.assertEqual(token, "refresh-secret")
-        self.assertIsNone(decrypt_diagnostics)
 
     @mock.patch.dict(
         "os.environ",

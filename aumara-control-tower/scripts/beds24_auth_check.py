@@ -27,7 +27,7 @@ EVIDENCE_PATH = ROOT / "evidence" / "beds24-auth-check.json"
 ENCRYPTED_REFRESH_FILE = ROOT / "vault" / "beds24-refresh-token.enc"
 PRIMARY_CREDENTIAL_SOURCE = "BEDS24_TOKEN_CREDENTIAL"
 LEGACY_CREDENTIAL_SOURCE = "B24_TOKEN_CREDENTIAL"
-CREDENTIAL_SOURCE = PRIMARY_CREDENTIAL_SOURCE
+DEFAULT_CREDENTIAL_SOURCE = PRIMARY_CREDENTIAL_SOURCE
 ACCESS_TOKEN_FILE = pathlib.Path(
     os.environ.get("BEDS24_ACCESS_TOKEN_FILE", "/tmp/beds24-access-token")
 )
@@ -149,7 +149,7 @@ def load_evidence() -> dict[str, Any]:
     return {
         "checked_at_utc": now_utc(),
         "status": "NOT_RUN",
-        "credential_source": CREDENTIAL_SOURCE,
+        "credential_source": DEFAULT_CREDENTIAL_SOURCE,
         "token_exchange_http_status": None,
         "readonly_probe_http_status": None,
         "token_exchange_diagnostics": {},
@@ -178,14 +178,7 @@ def resolve_credential() -> tuple[str, str]:
     credential = normalize_secret(os.environ.get(LEGACY_CREDENTIAL_SOURCE))
     if credential:
         return credential, LEGACY_CREDENTIAL_SOURCE
-    return "", CREDENTIAL_SOURCE
-
-
-def resolve_refresh_token(
-    credential: str,
-    credential_source: str,
-) -> tuple[str, str | None, dict[str, Any] | None]:
-    return credential_source, credential, None
+    return "", DEFAULT_CREDENTIAL_SOURCE
 
 
 def request_json(
@@ -240,7 +233,7 @@ def command_validate() -> int:
             file=sys.stderr,
         )
         return 1
-    print(f"{credential_source} is present; value was not printed.")
+    print("Beds24 credential is present; value was not printed.")
     return 0
 
 
@@ -269,34 +262,19 @@ def command_exchange() -> int:
         )
         return 1
 
-    source, refresh_token, decrypt_diagnostics = resolve_refresh_token(
-        credential,
-        credential_source,
-    )
-    evidence["credential_source"] = source
-    if decrypt_diagnostics:
-        evidence["status"] = "AUTH_FAILED"
-        evidence["failure_stage"] = "decrypt"
-        evidence["token_exchange_diagnostics"] = decrypt_diagnostics
-        save_evidence(evidence)
-        message = decrypt_diagnostics.get("message") or DECRYPT_FAILED_MESSAGE
-        if message == DECRYPT_EMPTY_MESSAGE:
-            print(DECRYPT_EMPTY_MESSAGE, file=sys.stderr)
-        else:
-            print(DECRYPT_FAILED_MESSAGE, file=sys.stderr)
-        return 1
+    evidence["credential_source"] = credential_source
 
     status, body = request_json(
         f"{API_BASE}/authentication/token",
-        {"refreshToken": refresh_token},
-        secrets=(refresh_token,),
+        {"refreshToken": credential},
+        secrets=(credential,),
         redact=False,
     )
     evidence["token_exchange_http_status"] = status
     token = body.get("token") if isinstance(body, dict) else None
     secrets = tuple(
         secret
-        for secret in (refresh_token, token)
+        for secret in (credential, token)
         if isinstance(secret, str) and secret
     )
     evidence["token_exchange_diagnostics"] = extract_diagnostics(

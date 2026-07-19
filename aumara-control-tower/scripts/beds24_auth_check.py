@@ -21,7 +21,7 @@ from typing import Any
 API_BASE = "https://api.beds24.com/v2"
 ROOT = pathlib.Path(__file__).resolve().parents[1]
 EVIDENCE_PATH = ROOT / "evidence" / "beds24-auth-check.json"
-CREDENTIAL_SOURCE = "BEDS24_TOKEN_CREDENTIAL"
+REQUIRED_CREDENTIAL_SOURCE = "BEDS24_TOKEN_CREDENTIAL"
 REDACTED = "[REDACTED]"
 DIAGNOSTIC_FIELDS = (
     "message",
@@ -40,6 +40,7 @@ def now_utc() -> str:
 
 
 def normalize_secret(value: str | None) -> str:
+    """Normalize user-pasted credentials by trimming quotes and invisible whitespace."""
     raw = (value or "").strip().strip('"').strip("'")
     return "".join(
         char
@@ -138,7 +139,7 @@ def load_evidence() -> dict[str, Any]:
     return {
         "checked_at_utc": now_utc(),
         "status": "NOT_RUN",
-        "credential_source": CREDENTIAL_SOURCE,
+        "credential_source": REQUIRED_CREDENTIAL_SOURCE,
         "readonly_probe_http_status": None,
         "readonly_probe_diagnostics": {},
         "failure_stage": None,
@@ -159,7 +160,7 @@ def save_evidence(evidence: dict[str, Any]) -> None:
 
 
 def get_credential() -> str:
-    return normalize_secret(os.environ.get(CREDENTIAL_SOURCE))
+    return normalize_secret(os.environ.get(REQUIRED_CREDENTIAL_SOURCE, ""))
 
 
 def request_json(
@@ -197,7 +198,7 @@ def command_validate() -> int:
     evidence.update(
         {
             "status": "CREDENTIAL_PRESENT" if credential else "AUTH_FAILED",
-            "credential_source": CREDENTIAL_SOURCE,
+            "credential_source": REQUIRED_CREDENTIAL_SOURCE,
             "readonly_probe_http_status": None,
             "readonly_probe_diagnostics": {},
             "failure_stage": None,
@@ -221,7 +222,7 @@ def command_probe() -> int:
     access_token = get_credential()
     evidence.update(
         {
-            "credential_source": CREDENTIAL_SOURCE,
+            "credential_source": REQUIRED_CREDENTIAL_SOURCE,
             "secret_present": bool(access_token),
             "secret_length": len(access_token),
         }

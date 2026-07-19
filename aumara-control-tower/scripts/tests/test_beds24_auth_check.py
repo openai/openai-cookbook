@@ -46,7 +46,7 @@ class Beds24AuthCheckTests(unittest.TestCase):
         evidence = self.load_evidence()
         self.assertEqual(result, 0)
         self.assertEqual(evidence["status"], "CREDENTIAL_PRESENT")
-        self.assertEqual(evidence["credential_source"], MODULE.CREDENTIAL_SOURCE)
+        self.assertEqual(evidence["credential_source"], MODULE.REQUIRED_CREDENTIAL_SOURCE)
         self.assertTrue(evidence["secret_present"])
         self.assertEqual(evidence["secret_length"], len("access-secret"))
 
@@ -134,7 +134,7 @@ class Beds24AuthCheckTests(unittest.TestCase):
                     args = MODULE.parse_args()
                 self.assertEqual(args.command, command)
 
-    @mock.patch.dict("os.environ", {"BEDS24_TOKEN_CREDENTIAL": "access-secret"})
+    @mock.patch.dict("os.environ", {"BEDS24_TOKEN_CREDENTIAL": " access-secret \n"})
     def test_probe_success_persists_auth_ok_without_token_exchange(self):
         observed_headers: list[dict[str, str]] = []
 
@@ -186,7 +186,7 @@ class Beds24AuthCheckTests(unittest.TestCase):
                     "detail": "Access token [REDACTED] rejected",
                     "type": "error",
                 },
-                "credential_source": MODULE.CREDENTIAL_SOURCE,
+                "credential_source": MODULE.REQUIRED_CREDENTIAL_SOURCE,
                 "secret_present": True,
                 "secret_length": 16,
                 "secret_exposed": False,

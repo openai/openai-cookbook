@@ -31,7 +31,7 @@ jobs:
         continue-on-error: true
         run: python aumara-control-tower/scripts/beds24_auth_check.py validate
 
-      - name: Probe Beds24 with the configured access token
+      - name: Probe Beds24 with BEDS24_TOKEN_CREDENTIAL
         id: probe
         if: steps.validate.outcome == 'success'
         continue-on-error: true

@@ -26,9 +26,11 @@ class Beds24AuthCheckTests(unittest.TestCase):
         self.root = pathlib.Path(self.temp_dir.name)
         self.evidence_path = self.root / "beds24-auth-check.json"
         self.token_path = self.root / "beds24-access-token"
+        self.vault_path = self.root / "vault" / "beds24-refresh-token.enc"
         self.path_patches = [
             mock.patch.object(MODULE, "EVIDENCE_PATH", self.evidence_path),
             mock.patch.object(MODULE, "ACCESS_TOKEN_FILE", self.token_path),
+            mock.patch.object(MODULE, "ENCRYPTED_REFRESH_FILE", self.vault_path),
         ]
         for patcher in self.path_patches:
             patcher.start()
@@ -165,6 +167,86 @@ class Beds24AuthCheckTests(unittest.TestCase):
         self.assertEqual(evidence["readonly_probe_http_status"], 200)
         self.assertFalse(self.token_path.exists())
         self.assertNotIn("access-secret", json.dumps(evidence))
+
+    @mock.patch.dict("os.environ", {"B24_TOKEN_CREDENTIAL": "vault-passphrase"})
+    def test_exchange_uses_decrypted_vault_refresh_token(self):
+        observed_headers: list[dict[str, str]] = []
+        self.vault_path.parent.mkdir(parents=True, exist_ok=True)
+        self.vault_path.write_text("encrypted", encoding="utf-8")
+
+        class FakeResponse:
+            def __init__(self, status: int, payload: dict[str, object]):
+                self.status = status
+                self._payload = payload
+
+            def __enter__(self):
+                return self
+
+            def __exit__(self, exc_type, exc, tb):
+                return False
+
+            def read(self):
+                return json.dumps(self._payload).encode("utf-8")
+
+        def fake_run(args, env, capture_output, text):
+            self.assertEqual(env["BEDS24_VAULT_PASSPHRASE"], "vault-passphrase")
+            out_path = pathlib.Path(args[args.index("-out") + 1])
+            out_path.write_text("  refresh-from-vault \n", encoding="utf-8")
+            return mock.Mock(returncode=0)
+
+        def fake_urlopen(request, timeout=45):
+            self.assertEqual(timeout, 45)
+            headers = {key.lower(): value for key, value in request.header_items()}
+            observed_headers.append(headers)
+            if request.full_url.endswith("/authentication/token"):
+                self.assertEqual(headers["refreshtoken"], "refresh-from-vault")
+                return FakeResponse(200, {"token": "access-secret", "expiresIn": 3600})
+            self.assertEqual(request.full_url, f"{MODULE.API_BASE}/authentication/details")
+            self.assertEqual(headers["token"], "access-secret")
+            return FakeResponse(200, {"status": "ok"})
+
+        with (
+            mock.patch.object(MODULE.subprocess, "run", side_effect=fake_run),
+            mock.patch.object(MODULE.urllib.request, "urlopen", side_effect=fake_urlopen),
+        ):
+            exchange_result = MODULE.command_exchange()
+            probe_result = MODULE.command_probe()
+
+        evidence = self.load_evidence()
+        self.assertEqual(exchange_result, 0)
+        self.assertEqual(probe_result, 0)
+        self.assertEqual(observed_headers[0]["refreshtoken"], "refresh-from-vault")
+        self.assertTrue(evidence["credential_source"].endswith("vault/beds24-refresh-token.enc"))
+        self.assertEqual(evidence["status"], "AUTH_OK")
+        self.assertFalse(self.token_path.exists())
+
+    @mock.patch.dict("os.environ", {"B24_TOKEN_CREDENTIAL": "vault-passphrase"})
+    def test_exchange_fails_with_decrypt_stage_when_vault_decrypts_empty(self):
+        self.vault_path.parent.mkdir(parents=True, exist_ok=True)
+        self.vault_path.write_text("encrypted", encoding="utf-8")
+
+        def fake_run(args, env, capture_output, text):
+            out_path = pathlib.Path(args[args.index("-out") + 1])
+            out_path.write_text(" \n\t ", encoding="utf-8")
+            return mock.Mock(returncode=0)
+
+        with (
+            mock.patch.object(MODULE.subprocess, "run", side_effect=fake_run),
+            mock.patch.object(MODULE.urllib.request, "urlopen") as urlopen,
+            mock.patch("sys.stderr", new_callable=io.StringIO) as stderr,
+        ):
+            result = MODULE.command_exchange()
+
+        evidence = self.load_evidence()
+        self.assertEqual(result, 1)
+        self.assertEqual(evidence["status"], "AUTH_FAILED")
+        self.assertEqual(evidence["failure_stage"], "decrypt")
+        self.assertEqual(
+            evidence["token_exchange_diagnostics"]["message"],
+            "Beds24 refresh token vault decrypted to an empty value.",
+        )
+        self.assertIn("decrypted to an empty value", stderr.getvalue())
+        urlopen.assert_not_called()
 
     def test_report_failure_summarizes_exchange_diagnostics(self):
         MODULE.save_evidence(

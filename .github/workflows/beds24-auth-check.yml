@@ -5,10 +5,53 @@ on:
   pull_request:
     branches: [main]
     paths:
-      - '.github/workflows/beds24-auth-check.yml'
-      - 'aumara-control-tower/scripts/beds24_auth_check.py'
+      - ".github/workflows/beds24-auth-check.yml"
+      - "aumara-control-tower/scripts/beds24_auth_check.py"
   push:
     branches: [main]
     paths:
-      - '.github/workflows/beds24-auth-check.yml'
-      - 'aumara-control-tower/scripts/beds24_auth_check.py
+      - ".github/workflows/beds24-auth-check.yml"
+      - "aumara-control-tower/scripts/beds24_auth_check.py"
+
+permissions:
+  contents: read
+
+jobs:
+  validate:
+    runs-on: ubuntu-latest
+    env:
+      B24_TOKEN_CREDENTIAL: ${{ secrets.BEDS24_TOKEN_CREDENTIAL }}
+      BEDS24_ACCESS_TOKEN_FILE: /tmp/beds24-access-token
+
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Validate existing Beds24 credential
+        id: validate
+        continue-on-error: true
+        run: python aumara-control-tower/scripts/beds24_auth_check.py validate
+
+      - name: Exchange refresh credential for temporary access token
+        id: exchange
+        if: steps.validate.outcome == 'success'
+        continue-on-error: true
+        run: python aumara-control-tower/scripts/beds24_auth_check.py exchange
+
+      - name: Probe Beds24 with the temporary access token
+        id: probe
+        if: steps.exchange.outcome == 'success'
+        continue-on-error: true
+        run: python aumara-control-tower/scripts/beds24_auth_check.py probe
+
+      - name: Upload redacted authentication evidence
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: beds24-authentication-evidence
+          path: aumara-control-tower/evidence/beds24-auth-check.json
+          if-no-files-found: warn
+          retention-days: 7
+
+      - name: Report Beds24 authentication result
+        if: always()
+        run: python aumara-control-tower/scripts/beds24_auth_check.py report

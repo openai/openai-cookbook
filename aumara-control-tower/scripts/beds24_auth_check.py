@@ -48,11 +48,6 @@ def now_utc() -> str:
 
 
 def credential_source() -> str:
-    if ENCRYPTED_REFRESH_FILE.exists():
-        try:
-            return str(ENCRYPTED_REFRESH_FILE.relative_to(ROOT))
-        except ValueError:
-            return str(ENCRYPTED_REFRESH_FILE)
     return "B24_TOKEN_CREDENTIAL"
 
 
@@ -180,59 +175,7 @@ def save_evidence(evidence: dict[str, Any]) -> None:
 def resolve_refresh_token(
     credential: str,
 ) -> tuple[str, str | None, dict[str, Any] | None]:
-    source = credential_source()
-    if not ENCRYPTED_REFRESH_FILE.exists():
-        return source, credential, None
-
-    fd, output_name = tempfile.mkstemp(prefix="beds24-refresh-")
-    os.close(fd)
-    output_path = pathlib.Path(output_name)
-    try:
-        environment = os.environ.copy()
-        environment["BEDS24_VAULT_PASSPHRASE"] = credential
-        proc = subprocess.run(
-            [
-                "openssl",
-                "enc",
-                "-d",
-                "-aes-256-cbc",
-                "-pbkdf2",
-                "-iter",
-                "200000",
-                "-pass",
-                "env:BEDS24_VAULT_PASSPHRASE",
-                "-in",
-                str(ENCRYPTED_REFRESH_FILE),
-                "-out",
-                str(output_path),
-            ],
-            env=environment,
-            capture_output=True,
-            text=True,
-        )
-        if proc.returncode != 0:
-            diagnostics: dict[str, Any] = {"message": DECRYPT_FAILED_MESSAGE}
-            detail = redact_text((proc.stderr or "").strip(), (credential,))
-            if detail:
-                diagnostics["detail"] = detail
-            return source, None, diagnostics
-        if not output_path.exists():
-            return source, None, {
-                "message": DECRYPT_FAILED_MESSAGE,
-                "detail": "OpenSSL did not produce a decrypted vault file.",
-            }
-        try:
-            refresh_token = normalize_secret(output_path.read_text(encoding="utf-8"))
-        except UnicodeDecodeError:
-            return source, None, {
-                "message": DECRYPT_FAILED_MESSAGE,
-                "detail": "Decrypted vault content was not valid UTF-8.",
-            }
-        if not refresh_token:
-            return source, None, {"message": DECRYPT_EMPTY_MESSAGE}
-        return source, refresh_token, None
-    finally:
-        output_path.unlink(missing_ok=True)
+    return credential_source(), credential, None
 
 
 def request_json(

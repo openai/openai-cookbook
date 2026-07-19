@@ -55,6 +55,18 @@ class Beds24AuthCheckTests(unittest.TestCase):
 
         self.assertEqual(normalized, "abc")
 
+    def test_normalize_secret_handles_empty_and_none_inputs(self):
+        cases = {
+            None: "",
+            "": "",
+            " \t\n ": "",
+            "\u200b\r\n": "",
+        }
+
+        for raw, expected in cases.items():
+            with self.subTest(raw=raw):
+                self.assertEqual(MODULE.normalize_secret(raw), expected)
+
     @mock.patch.object(
         MODULE,
         "request_json",
@@ -150,6 +162,7 @@ class Beds24AuthCheckTests(unittest.TestCase):
             observed_headers.append(headers)
             self.assertEqual(headers["token"], "access-secret")
             self.assertNotIn("refreshtoken", headers)
+            self.assertEqual(set(headers), {"accept", "token"})
             return FakeResponse(200, {"status": "ok"})
 
         with mock.patch.object(MODULE.urllib.request, "urlopen", side_effect=fake_urlopen):

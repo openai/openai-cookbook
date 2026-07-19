@@ -2,6 +2,7 @@ import importlib.util
 import io
 import json
 import pathlib
+import stat
 import sys
 import tempfile
 import unittest
@@ -108,6 +109,60 @@ class Beds24AuthCheckTests(unittest.TestCase):
         self.assertEqual(status, 401)
         self.assertEqual(body["status"], 401)
         self.assertEqual(body["message"], "Denied [REDACTED]")
+
+    @mock.patch.dict("os.environ", {"B24_TOKEN_CREDENTIAL": "refresh-secret"})
+    def test_exchange_probe_success_persists_auth_ok_and_cleans_up(self):
+        observed_headers: list[dict[str, str]] = []
+
+        class FakeResponse:
+            def __init__(self, status: int, payload: dict[str, object]):
+                self.status = status
+                self._payload = payload
+
+            def __enter__(self):
+                return self
+
+            def __exit__(self, exc_type, exc, tb):
+                return False
+
+            def read(self):
+                return json.dumps(self._payload).encode("utf-8")
+
+        def fake_urlopen(request, timeout=45):
+            del timeout
+            headers = {key.lower(): value for key, value in request.header_items()}
+            observed_headers.append(headers)
+            if request.full_url.endswith("/authentication/token"):
+                self.assertEqual(headers["refreshtoken"], "refresh-secret")
+                return FakeResponse(200, {"token": "access-secret", "expiresIn": 3600})
+            self.assertEqual(request.full_url, f"{MODULE.API_BASE}/authentication/details")
+            self.assertEqual(headers["token"], "access-secret")
+            return FakeResponse(200, {"status": "ok"})
+
+        with mock.patch.object(MODULE.urllib.request, "urlopen", side_effect=fake_urlopen):
+            exchange_result = MODULE.command_exchange()
+            self.assertEqual(exchange_result, 0)
+            self.assertTrue(self.token_path.exists())
+            self.assertEqual(
+                stat.S_IMODE(self.token_path.stat().st_mode),
+                stat.S_IRUSR | stat.S_IWUSR,
+            )
+            self.assertEqual(
+                self.token_path.read_text(encoding="utf-8"),
+                "access-secret",
+            )
+
+            probe_result = MODULE.command_probe()
+
+        evidence = self.load_evidence()
+        self.assertEqual(probe_result, 0)
+        self.assertEqual(observed_headers[1]["token"], "access-secret")
+        self.assertEqual(evidence["status"], "AUTH_OK")
+        self.assertIsNone(evidence["failure_stage"])
+        self.assertEqual(evidence["token_exchange_http_status"], 200)
+        self.assertEqual(evidence["readonly_probe_http_status"], 200)
+        self.assertFalse(self.token_path.exists())
+        self.assertNotIn("access-secret", json.dumps(evidence))
 
     def test_report_failure_summarizes_exchange_diagnostics(self):
         MODULE.save_evidence(

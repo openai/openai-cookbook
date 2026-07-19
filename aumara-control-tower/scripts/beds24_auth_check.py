@@ -77,14 +77,17 @@ def sanitize_value(value: Any, secrets: tuple[str, ...]) -> Any:
     return value
 
 
-def decode_response(raw: bytes, secrets: tuple[str, ...]) -> dict[str, Any]:
+def decode_response(raw: bytes) -> Any:
     text = raw.decode("utf-8", "replace")
     if not text:
         return {}
     try:
-        body = json.loads(text)
+        return json.loads(text)
     except json.JSONDecodeError:
-        return {"message": redact_text(text, secrets)}
+        return {"message": text}
+
+
+def sanitize_response_body(body: Any, secrets: tuple[str, ...]) -> dict[str, Any]:
     sanitized = sanitize_value(body, secrets)
     if isinstance(sanitized, dict):
         return sanitized
@@ -156,7 +159,11 @@ def save_evidence(evidence: dict[str, Any]) -> None:
 
 
 def request_json(
-    url: str, headers: dict[str, str], secrets: tuple[str, ...] = ()
+    url: str,
+    headers: dict[str, str],
+    secrets: tuple[str, ...] = (),
+    *,
+    redact: bool = True,
 ) -> tuple[int, dict[str, Any]]:
     """Fetch a JSON response and optionally redact provided secrets from the body."""
     request = urllib.request.Request(
@@ -167,9 +174,19 @@ def request_json(
     try:
         with urllib.request.urlopen(request, timeout=45) as response:
             raw = response.read()
-            return response.status, decode_response(raw, secrets)
+            body = decode_response(raw)
+            if redact:
+                return response.status, sanitize_response_body(body, secrets)
+            if isinstance(body, dict):
+                return response.status, body
+            return response.status, {"message": json.dumps(body, ensure_ascii=False)}
     except urllib.error.HTTPError as exc:
-        return exc.code, decode_response(exc.read(), secrets)
+        body = decode_response(exc.read())
+        if redact:
+            return exc.code, sanitize_response_body(body, secrets)
+        if isinstance(body, dict):
+            return exc.code, body
+        return exc.code, {"message": json.dumps(body, ensure_ascii=False)}
     except urllib.error.URLError:
         return 0, {}
 
@@ -224,10 +241,18 @@ def command_exchange() -> int:
         f"{API_BASE}/authentication/token",
         {"refreshToken": credential},
         secrets=(credential,),
+        redact=False,
     )
     evidence["token_exchange_http_status"] = status
-    evidence["token_exchange_diagnostics"] = extract_diagnostics(body)
     token = body.get("token") if isinstance(body, dict) else None
+    diagnostics_secrets = tuple(
+        secret
+        for secret in (credential, token if isinstance(token, str) else None)
+        if isinstance(secret, str) and secret
+    )
+    evidence["token_exchange_diagnostics"] = extract_diagnostics(
+        sanitize_response_body(body, diagnostics_secrets)
+    )
     if not (200 <= status < 300 and isinstance(token, str) and token):
         evidence["status"] = "AUTH_FAILED"
         evidence["failure_stage"] = "exchange"

@@ -1,37 +1,7 @@
 {
-  "verified_at_utc": "2026-07-16T13:42:43.392873+00:00",
-  "status": "AUTH_FAILED",
-  "attempts": [
-    {
-      "mode": "encrypted_refresh",
-      "status": 401,
-      "response": {
-        "success": false,
-        "type": "error",
-        "code": "[REDACTED]",
-        "error": "Token not valid"
-      }
-    },
-    {
-      "mode": "secret_as_refresh",
-      "status": 401,
-      "response": {
-        "success": false,
-        "type": "error",
-        "code": "[REDACTED]",
-        "error": "Token not valid"
-      }
-    },
-    {
-      "mode": "secret_as_invite_code",
-      "status": 401,
-      "response": {
-        "success": false,
-        "type": "error",
-        "code": "[REDACTED]",
-        "error": "Token not valid"
-      }
-    }
-  ],
-  "plaintext_secret_committed": false
+  "verified_at_utc": "2026-07-17T02:50:11.293412+00:00",
+  "status": "DISABLED_REDUNDANT_V2_BRIDGE",
+  "request_id": "AUMARA-MEDINA-20260718-660",
+  "reason": "Use native Beds24 booking and guest-action flow; external live writes are disabled.",
+  "live_booking_mutations": false
 }

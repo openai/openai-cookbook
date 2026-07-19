@@ -169,7 +169,7 @@ class Beds24AuthCheckTests(unittest.TestCase):
         self.assertNotIn("access-secret", json.dumps(evidence))
 
     @mock.patch.dict("os.environ", {"B24_TOKEN_CREDENTIAL": "vault-passphrase"})
-    def test_exchange_uses_repository_credential_when_vault_exists(self):
+    def test_exchange_uses_repository_credential_directly(self):
         observed_headers: list[dict[str, str]] = []
         self.vault_path.parent.mkdir(parents=True, exist_ok=True)
         self.vault_path.write_text("encrypted", encoding="utf-8")
@@ -216,7 +216,7 @@ class Beds24AuthCheckTests(unittest.TestCase):
         self.assertFalse(self.token_path.exists())
 
     @mock.patch.dict("os.environ", {"B24_TOKEN_CREDENTIAL": "vault-passphrase"})
-    def test_exchange_skips_vault_decryption_when_vault_exists(self):
+    def test_exchange_never_attempts_vault_decryption(self):
         self.vault_path.parent.mkdir(parents=True, exist_ok=True)
         self.vault_path.write_text("encrypted", encoding="utf-8")
 
@@ -243,8 +243,10 @@ class Beds24AuthCheckTests(unittest.TestCase):
     def test_credential_source_always_returns_repository_secret(self):
         self.vault_path.parent.mkdir(parents=True, exist_ok=True)
         self.vault_path.write_text("encrypted", encoding="utf-8")
+        self.assertTrue(self.vault_path.exists())
         self.assertEqual(MODULE.credential_source(), "B24_TOKEN_CREDENTIAL")
         self.vault_path.unlink()
+        self.assertFalse(self.vault_path.exists())
         self.assertEqual(MODULE.credential_source(), "B24_TOKEN_CREDENTIAL")
 
     def test_report_failure_summarizes_exchange_diagnostics(self):

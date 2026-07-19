@@ -77,7 +77,8 @@ def sanitize_value(value: Any, secrets: tuple[str, ...]) -> Any:
     return value
 
 
-def decode_response(raw: bytes) -> Any:
+def parse_response(raw: bytes) -> Any:
+    """Parse an HTTP response body into JSON when possible, else plain text."""
     text = raw.decode("utf-8", "replace")
     if not text:
         return {}
@@ -88,6 +89,7 @@ def decode_response(raw: bytes) -> Any:
 
 
 def sanitize_response_body(body: Any, secrets: tuple[str, ...]) -> dict[str, Any]:
+    """Convert a response payload into a persisted diagnostic dict with redactions."""
     sanitized = sanitize_value(body, secrets)
     if isinstance(sanitized, dict):
         return sanitized
@@ -174,14 +176,14 @@ def request_json(
     try:
         with urllib.request.urlopen(request, timeout=45) as response:
             raw = response.read()
-            body = decode_response(raw)
+            body = parse_response(raw)
             if redact:
                 return response.status, sanitize_response_body(body, secrets)
             if isinstance(body, dict):
                 return response.status, body
             return response.status, {"message": json.dumps(body, ensure_ascii=False)}
     except urllib.error.HTTPError as exc:
-        body = decode_response(exc.read())
+        body = parse_response(exc.read())
         if redact:
             return exc.code, sanitize_response_body(body, secrets)
         if isinstance(body, dict):
@@ -245,13 +247,13 @@ def command_exchange() -> int:
     )
     evidence["token_exchange_http_status"] = status
     token = body.get("token") if isinstance(body, dict) else None
-    diagnostics_secrets = tuple(
+    secrets_to_redact = tuple(
         secret
         for secret in (credential, token if isinstance(token, str) else None)
         if isinstance(secret, str) and secret
     )
     evidence["token_exchange_diagnostics"] = extract_diagnostics(
-        sanitize_response_body(body, diagnostics_secrets)
+        sanitize_response_body(body, secrets_to_redact)
     )
     if not (200 <= status < 300 and isinstance(token, str) and token):
         evidence["status"] = "AUTH_FAILED"

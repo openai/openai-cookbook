@@ -160,7 +160,7 @@ def save_evidence(evidence: dict[str, Any]) -> None:
     )
 
 
-def load_credential() -> str:
+def get_credential() -> str:
     return normalize_secret(os.environ.get(CREDENTIAL_SOURCE))
 
 
@@ -194,7 +194,7 @@ def request_json(
 
 
 def command_validate() -> int:
-    credential = load_credential()
+    credential = get_credential()
     evidence = load_evidence()
     evidence.update(
         {
@@ -222,7 +222,7 @@ def command_validate() -> int:
 
 def command_probe() -> int:
     evidence = load_evidence()
-    access_token = load_credential()
+    access_token = get_credential()
     evidence.update(
         {
             "credential_source": CREDENTIAL_SOURCE,

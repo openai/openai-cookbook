@@ -78,8 +78,11 @@ class Beds24AuthCheckTests(unittest.TestCase):
         )
 
     def test_request_json_parses_http_error_body(self):
+        test_secret = "test-access-token"
         error_response = mock.Mock()
-        error_response.read.return_value = b'{"message":"Denied access-secret","status":403}'
+        error_response.read.return_value = json.dumps(
+            {"message": f"Denied {test_secret}", "status": 403}
+        ).encode("utf-8")
         error = MODULE.urllib.error.HTTPError(
             url="https://example.test",
             code=403,
@@ -91,13 +94,30 @@ class Beds24AuthCheckTests(unittest.TestCase):
         with mock.patch.object(MODULE.urllib.request, "urlopen", side_effect=error):
             status, body = MODULE.request_json(
                 "https://example.test",
-                {"token": "access-secret"},
-                secrets=("access-secret",),
+                {"token": test_secret},
+                secrets=(test_secret,),
             )
 
         self.assertEqual(status, 403)
         self.assertEqual(body["status"], 403)
         self.assertEqual(body["message"], "Denied [REDACTED]")
+
+    def test_parse_args_rejects_removed_exchange_command(self):
+        with (
+            mock.patch.object(sys, "argv", ["beds24_auth_check.py", "exchange"]),
+            mock.patch("sys.stderr", new_callable=io.StringIO),
+        ):
+            with self.assertRaises(SystemExit) as exc:
+                MODULE.parse_args()
+
+        self.assertEqual(exc.exception.code, 2)
+
+    def test_parse_args_accepts_supported_commands(self):
+        for command in ("validate", "probe", "report"):
+            with self.subTest(command=command):
+                with mock.patch.object(sys, "argv", ["beds24_auth_check.py", command]):
+                    args = MODULE.parse_args()
+                self.assertEqual(args.command, command)
 
     @mock.patch.dict("os.environ", {"BEDS24_TOKEN_CREDENTIAL": "access-secret"})
     def test_probe_success_persists_auth_ok_without_token_exchange(self):

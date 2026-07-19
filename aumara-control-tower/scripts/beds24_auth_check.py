@@ -248,7 +248,7 @@ def command_exchange() -> int:
     token = body.get("token") if isinstance(body, dict) else None
     secrets_to_redact = tuple(
         secret
-        for secret in (credential, token if isinstance(token, str) else None)
+        for secret in (credential, token)
         if isinstance(secret, str) and secret
     )
     evidence["token_exchange_diagnostics"] = extract_diagnostics(

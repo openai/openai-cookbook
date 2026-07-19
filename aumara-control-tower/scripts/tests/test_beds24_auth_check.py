@@ -129,7 +129,7 @@ class Beds24AuthCheckTests(unittest.TestCase):
                 return json.dumps(self._payload).encode("utf-8")
 
         def fake_urlopen(request, timeout=45):
-            del timeout
+            self.assertEqual(timeout, 45)
             headers = {key.lower(): value for key, value in request.header_items()}
             observed_headers.append(headers)
             if request.full_url.endswith("/authentication/token"):

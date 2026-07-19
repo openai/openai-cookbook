@@ -139,9 +139,7 @@ def load_evidence() -> dict[str, Any]:
         "checked_at_utc": now_utc(),
         "status": "NOT_RUN",
         "credential_source": CREDENTIAL_SOURCE,
-        "token_exchange_http_status": None,
         "readonly_probe_http_status": None,
-        "token_exchange_diagnostics": {},
         "readonly_probe_diagnostics": {},
         "failure_stage": None,
         "secret_present": False,
@@ -200,9 +198,7 @@ def command_validate() -> int:
         {
             "status": "CREDENTIAL_PRESENT" if credential else "AUTH_FAILED",
             "credential_source": CREDENTIAL_SOURCE,
-            "token_exchange_http_status": None,
             "readonly_probe_http_status": None,
-            "token_exchange_diagnostics": {},
             "readonly_probe_diagnostics": {},
             "failure_stage": None,
             "secret_present": bool(credential),
@@ -226,8 +222,6 @@ def command_probe() -> int:
     evidence.update(
         {
             "credential_source": CREDENTIAL_SOURCE,
-            "token_exchange_http_status": None,
-            "token_exchange_diagnostics": {},
             "secret_present": bool(access_token),
             "secret_length": len(access_token),
         }

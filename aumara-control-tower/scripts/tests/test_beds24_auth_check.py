@@ -50,6 +50,11 @@ class Beds24AuthCheckTests(unittest.TestCase):
         self.assertTrue(evidence["secret_present"])
         self.assertEqual(evidence["secret_length"], len("access-secret"))
 
+    def test_normalize_secret_removes_wrapping_whitespace_and_control_chars(self):
+        normalized = MODULE.normalize_secret(" \" a\tb c\n\" ")
+
+        self.assertEqual(normalized, "abc")
+
     @mock.patch.object(
         MODULE,
         "request_json",
@@ -65,8 +70,6 @@ class Beds24AuthCheckTests(unittest.TestCase):
         self.assertEqual(evidence["status"], "AUTH_FAILED")
         self.assertEqual(evidence["failure_stage"], "probe")
         self.assertEqual(evidence["readonly_probe_http_status"], 403)
-        self.assertIsNone(evidence["token_exchange_http_status"])
-        self.assertEqual(evidence["token_exchange_diagnostics"], {})
         diagnostics = evidence["readonly_probe_diagnostics"]
         self.assertNotIn("access-secret", diagnostics["detail"])
         self.assertIn(MODULE.REDACTED, diagnostics["detail"])
@@ -158,8 +161,6 @@ class Beds24AuthCheckTests(unittest.TestCase):
         self.assertEqual(evidence["status"], "AUTH_OK")
         self.assertIsNone(evidence["failure_stage"])
         self.assertEqual(evidence["readonly_probe_http_status"], 200)
-        self.assertIsNone(evidence["token_exchange_http_status"])
-        self.assertEqual(evidence["token_exchange_diagnostics"], {})
         self.assertNotIn("access-secret", json.dumps(evidence))
 
     def test_report_failure_summarizes_probe_diagnostics(self):
@@ -167,8 +168,6 @@ class Beds24AuthCheckTests(unittest.TestCase):
             {
                 "status": "AUTH_FAILED",
                 "failure_stage": "probe",
-                "token_exchange_http_status": None,
-                "token_exchange_diagnostics": {},
                 "readonly_probe_http_status": 403,
                 "readonly_probe_diagnostics": {
                     "detail": "Access token [REDACTED] rejected",

@@ -77,7 +77,7 @@ def sanitize_value(value: Any, secrets: tuple[str, ...]) -> Any:
     return value
 
 
-def parse_response(raw: bytes) -> dict[str, Any]:
+def parse_response(raw: bytes, secrets: tuple[str, ...] = ()) -> dict[str, Any]:
     """Parse an HTTP response body into a dictionary for downstream handling."""
     text = raw.decode("utf-8", "replace")
     if not text:
@@ -85,7 +85,7 @@ def parse_response(raw: bytes) -> dict[str, Any]:
     try:
         body = json.loads(text)
     except json.JSONDecodeError:
-        return {"message": text}
+        return {"message": redact_text(text, secrets)}
     if isinstance(body, dict):
         return body
     return {"message": json.dumps(body, ensure_ascii=False)}
@@ -179,12 +179,12 @@ def request_json(
     try:
         with urllib.request.urlopen(request, timeout=45) as response:
             raw = response.read()
-            body = parse_response(raw)
+            body = parse_response(raw, secrets)
             if redact:
                 return response.status, sanitize_response_body(body, secrets)
             return response.status, body
     except urllib.error.HTTPError as exc:
-        body = parse_response(exc.read())
+        body = parse_response(exc.read(), secrets)
         if redact:
             return exc.code, sanitize_response_body(body, secrets)
         return exc.code, body
@@ -246,13 +246,13 @@ def command_exchange() -> int:
     )
     evidence["token_exchange_http_status"] = status
     token = body.get("token") if isinstance(body, dict) else None
-    secrets_to_redact = tuple(
+    secrets = tuple(
         secret
         for secret in (credential, token)
         if isinstance(secret, str) and secret
     )
     evidence["token_exchange_diagnostics"] = extract_diagnostics(
-        sanitize_response_body(body, secrets_to_redact)
+        sanitize_response_body(body, secrets)
     )
     if not (200 <= status < 300 and isinstance(token, str) and token):
         evidence["status"] = "AUTH_FAILED"

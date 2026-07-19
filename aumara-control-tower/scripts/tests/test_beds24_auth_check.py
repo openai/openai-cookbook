@@ -88,14 +88,14 @@ class Beds24AuthCheckTests(unittest.TestCase):
         self.assertFalse(self.token_path.exists())
 
     def test_request_json_parses_http_error_body(self):
-        response = mock.Mock()
-        response.read.return_value = b'{"message":"Denied refresh-secret","status":401}'
+        error_response = mock.Mock()
+        error_response.read.return_value = b'{"message":"Denied refresh-secret","status":401}'
         error = MODULE.urllib.error.HTTPError(
             url="https://example.test",
             code=401,
             msg="Unauthorized",
             hdrs=None,
-            fp=response,
+            fp=error_response,
         )
 
         with mock.patch.object(MODULE.urllib.request, "urlopen", side_effect=error):
@@ -108,6 +108,34 @@ class Beds24AuthCheckTests(unittest.TestCase):
         self.assertEqual(status, 401)
         self.assertEqual(body["status"], 401)
         self.assertEqual(body["message"], "Denied [REDACTED]")
+
+    def test_report_failure_summarizes_exchange_diagnostics(self):
+        MODULE.save_evidence(
+            {
+                "status": "AUTH_FAILED",
+                "failure_stage": "exchange",
+                "token_exchange_http_status": 401,
+                "token_exchange_diagnostics": {
+                    "message": "Credential [REDACTED] is invalid",
+                    "code": "unauthorized",
+                },
+                "readonly_probe_http_status": None,
+                "readonly_probe_diagnostics": {},
+                "credential_source": "B24_TOKEN_CREDENTIAL",
+                "secret_present": True,
+                "secret_length": 16,
+                "secret_exposed": False,
+            }
+        )
+
+        with mock.patch("sys.stderr", new_callable=io.StringIO) as stderr:
+            result = MODULE.command_report()
+
+        self.assertEqual(result, 1)
+        output = stderr.getvalue()
+        self.assertIn("failed during exchange", output)
+        self.assertIn("HTTP status: 401", output)
+        self.assertIn('code="unauthorized"', output)
 
 
 if __name__ == "__main__":

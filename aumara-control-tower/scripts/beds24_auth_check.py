@@ -35,6 +35,7 @@ DIAGNOSTIC_FIELDS = (
     "status",
     "type",
 )
+SENSITIVE_KEYS = {"token", "refreshtoken", "accesstoken", "secret"}
 
 
 def now_utc() -> str:
@@ -63,7 +64,7 @@ def sanitize_value(value: Any, secrets: tuple[str, ...]) -> Any:
     if isinstance(value, dict):
         sanitized: dict[str, Any] = {}
         for key, item in value.items():
-            if str(key).lower() in {"token", "refreshtoken", "accesstoken", "secret"}:
+            if str(key).lower() in SENSITIVE_KEYS:
                 sanitized[str(key)] = REDACTED
             else:
                 sanitized[str(key)] = sanitize_value(item, secrets)
@@ -108,6 +109,15 @@ def primary_diagnostic(diagnostics: dict[str, Any]) -> str | None:
         if isinstance(value, str) and value:
             return value
     return None
+
+
+def summarize_diagnostics(diagnostics: dict[str, Any]) -> str:
+    if not diagnostics:
+        return "no Beds24 diagnostics returned"
+    return ", ".join(
+        f"{key}={json.dumps(value, ensure_ascii=False)}"
+        for key, value in diagnostics.items()
+    )
 
 
 def load_evidence() -> dict[str, Any]:
@@ -292,9 +302,40 @@ def command_probe() -> int:
             pass
 
 
+def command_report() -> int:
+    if not EVIDENCE_PATH.exists():
+        print("Beds24 authentication evidence was not created.", file=sys.stderr)
+        return 1
+
+    evidence = load_evidence()
+    if evidence.get("status") == "AUTH_OK":
+        print("Beds24 authentication probe succeeded.")
+        return 0
+
+    stage = evidence.get("failure_stage") or "unknown"
+    if stage == "exchange":
+        http_status = evidence.get("token_exchange_http_status")
+        diagnostics = evidence.get("token_exchange_diagnostics") or {}
+    elif stage == "probe":
+        http_status = evidence.get("readonly_probe_http_status")
+        diagnostics = evidence.get("readonly_probe_diagnostics") or {}
+    else:
+        http_status = None
+        diagnostics = {}
+
+    print(
+        (
+            f"Beds24 authentication failed during {stage} "
+            f"(HTTP status: {http_status}); {summarize_diagnostics(diagnostics)}."
+        ),
+        file=sys.stderr,
+    )
+    return 1
+
+
 def parse_args() -> argparse.Namespace:
     parser = argparse.ArgumentParser()
-    parser.add_argument("command", choices=("validate", "exchange", "probe"))
+    parser.add_argument("command", choices=("validate", "exchange", "probe", "report"))
     return parser.parse_args()
 
 
@@ -304,7 +345,9 @@ def main() -> int:
         return command_validate()
     if command == "exchange":
         return command_exchange()
-    return command_probe()
+    if command == "probe":
+        return command_probe()
+    return command_report()
 
 
 if __name__ == "__main__":

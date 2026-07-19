@@ -240,14 +240,20 @@ class Beds24AuthCheckTests(unittest.TestCase):
         run.assert_not_called()
         request_json.assert_called_once()
 
-    def test_credential_source_always_returns_repository_secret(self):
+    def test_resolve_refresh_token_uses_repository_secret_with_or_without_vault(self):
         self.vault_path.parent.mkdir(parents=True, exist_ok=True)
         self.vault_path.write_text("encrypted", encoding="utf-8")
         self.assertTrue(self.vault_path.exists())
-        self.assertEqual(MODULE.credential_source(), "B24_TOKEN_CREDENTIAL")
+        source, token, decrypt_diagnostics = MODULE.resolve_refresh_token("refresh-secret")
+        self.assertEqual(source, MODULE.CREDENTIAL_SOURCE)
+        self.assertEqual(token, "refresh-secret")
+        self.assertIsNone(decrypt_diagnostics)
         self.vault_path.unlink()
         self.assertFalse(self.vault_path.exists())
-        self.assertEqual(MODULE.credential_source(), "B24_TOKEN_CREDENTIAL")
+        source, token, decrypt_diagnostics = MODULE.resolve_refresh_token("refresh-secret")
+        self.assertEqual(source, MODULE.CREDENTIAL_SOURCE)
+        self.assertEqual(token, "refresh-secret")
+        self.assertIsNone(decrypt_diagnostics)
 
     def test_report_failure_summarizes_exchange_diagnostics(self):
         MODULE.save_evidence(

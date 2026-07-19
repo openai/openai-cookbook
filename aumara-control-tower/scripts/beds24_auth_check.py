@@ -25,6 +25,7 @@ API_BASE = "https://api.beds24.com/v2"
 ROOT = pathlib.Path(__file__).resolve().parents[1]
 EVIDENCE_PATH = ROOT / "evidence" / "beds24-auth-check.json"
 ENCRYPTED_REFRESH_FILE = ROOT / "vault" / "beds24-refresh-token.enc"
+CREDENTIAL_SOURCE = "B24_TOKEN_CREDENTIAL"
 ACCESS_TOKEN_FILE = pathlib.Path(
     os.environ.get("BEDS24_ACCESS_TOKEN_FILE", "/tmp/beds24-access-token")
 )
@@ -45,10 +46,6 @@ SENSITIVE_KEYS = {"token", "refreshtoken", "accesstoken", "secret"}
 
 def now_utc() -> str:
     return dt.datetime.now(dt.timezone.utc).isoformat()
-
-
-def credential_source() -> str:
-    return "B24_TOKEN_CREDENTIAL"
 
 
 def normalize_secret(value: str | None) -> str:
@@ -150,7 +147,7 @@ def load_evidence() -> dict[str, Any]:
     return {
         "checked_at_utc": now_utc(),
         "status": "NOT_RUN",
-        "credential_source": "B24_TOKEN_CREDENTIAL",
+        "credential_source": CREDENTIAL_SOURCE,
         "token_exchange_http_status": None,
         "readonly_probe_http_status": None,
         "token_exchange_diagnostics": {},
@@ -175,7 +172,7 @@ def save_evidence(evidence: dict[str, Any]) -> None:
 def resolve_refresh_token(
     credential: str,
 ) -> tuple[str, str | None, dict[str, Any] | None]:
-    return credential_source(), credential, None
+    return CREDENTIAL_SOURCE, credential, None
 
 
 def request_json(
@@ -213,7 +210,7 @@ def command_validate() -> int:
     evidence.update(
         {
             "status": "CREDENTIAL_PRESENT" if credential else "AUTH_FAILED",
-            "credential_source": credential_source(),
+            "credential_source": CREDENTIAL_SOURCE,
             "token_exchange_http_status": None,
             "readonly_probe_http_status": None,
             "token_exchange_diagnostics": {},
@@ -236,7 +233,7 @@ def command_exchange() -> int:
     evidence = load_evidence()
     evidence.update(
         {
-            "credential_source": credential_source(),
+            "credential_source": CREDENTIAL_SOURCE,
             "token_exchange_http_status": None,
             "readonly_probe_http_status": None,
             "secret_present": bool(credential),

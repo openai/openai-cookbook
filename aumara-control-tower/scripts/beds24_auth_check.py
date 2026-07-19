@@ -216,9 +216,13 @@ def resolve_refresh_token(
             if detail:
                 diagnostics["detail"] = detail
             return source, None, diagnostics
-        refresh_token = normalize_secret(
-            output_path.read_text(encoding="utf-8", errors="replace")
-        )
+        try:
+            refresh_token = normalize_secret(output_path.read_text(encoding="utf-8"))
+        except UnicodeDecodeError:
+            return source, None, {
+                "message": DECRYPT_FAILED_MESSAGE,
+                "detail": "Decrypted vault content was not valid UTF-8.",
+            }
         if not refresh_token:
             return source, None, {"message": DECRYPT_EMPTY_MESSAGE}
         return source, refresh_token, None

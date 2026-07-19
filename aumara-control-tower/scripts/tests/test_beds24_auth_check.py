@@ -293,6 +293,8 @@ class Beds24AuthCheckTests(unittest.TestCase):
             evidence["token_exchange_diagnostics"]["detail"],
             "bad decrypt [REDACTED]",
         )
+        self.assertNotIn("vault-passphrase", json.dumps(evidence))
+        self.assertIn("[REDACTED]", json.dumps(evidence))
         self.assertEqual(stderr.getvalue().strip(), MODULE.DECRYPT_FAILED_MESSAGE)
         urlopen.assert_not_called()
 

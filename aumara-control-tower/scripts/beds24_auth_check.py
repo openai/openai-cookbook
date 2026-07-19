@@ -25,6 +25,9 @@ API_BASE = "https://api.beds24.com/v2"
 ROOT = pathlib.Path(__file__).resolve().parents[1]
 EVIDENCE_PATH = ROOT / "evidence" / "beds24-auth-check.json"
 ENCRYPTED_REFRESH_FILE = ROOT / "vault" / "beds24-refresh-token.enc"
+PRIMARY_CREDENTIAL_SOURCE = "BEDS24_TOKEN_CREDENTIAL"
+LEGACY_CREDENTIAL_SOURCE = "B24_TOKEN_CREDENTIAL"
+DEFAULT_CREDENTIAL_SOURCE = PRIMARY_CREDENTIAL_SOURCE
 ACCESS_TOKEN_FILE = pathlib.Path(
     os.environ.get("BEDS24_ACCESS_TOKEN_FILE", "/tmp/beds24-access-token")
 )
@@ -45,15 +48,6 @@ SENSITIVE_KEYS = {"token", "refreshtoken", "accesstoken", "secret"}
 
 def now_utc() -> str:
     return dt.datetime.now(dt.timezone.utc).isoformat()
-
-
-def credential_source() -> str:
-    if ENCRYPTED_REFRESH_FILE.exists():
-        try:
-            return str(ENCRYPTED_REFRESH_FILE.relative_to(ROOT))
-        except ValueError:
-            return str(ENCRYPTED_REFRESH_FILE)
-    return "B24_TOKEN_CREDENTIAL"
 
 
 def normalize_secret(value: str | None) -> str:
@@ -155,7 +149,7 @@ def load_evidence() -> dict[str, Any]:
     return {
         "checked_at_utc": now_utc(),
         "status": "NOT_RUN",
-        "credential_source": "B24_TOKEN_CREDENTIAL",
+        "credential_source": DEFAULT_CREDENTIAL_SOURCE,
         "token_exchange_http_status": None,
         "readonly_probe_http_status": None,
         "token_exchange_diagnostics": {},
@@ -177,62 +171,14 @@ def save_evidence(evidence: dict[str, Any]) -> None:
     )
 
 
-def resolve_refresh_token(
-    credential: str,
-) -> tuple[str, str | None, dict[str, Any] | None]:
-    source = credential_source()
-    if not ENCRYPTED_REFRESH_FILE.exists():
-        return source, credential, None
-
-    fd, output_name = tempfile.mkstemp(prefix="beds24-refresh-")
-    os.close(fd)
-    output_path = pathlib.Path(output_name)
-    try:
-        environment = os.environ.copy()
-        environment["BEDS24_VAULT_PASSPHRASE"] = credential
-        proc = subprocess.run(
-            [
-                "openssl",
-                "enc",
-                "-d",
-                "-aes-256-cbc",
-                "-pbkdf2",
-                "-iter",
-                "200000",
-                "-pass",
-                "env:BEDS24_VAULT_PASSPHRASE",
-                "-in",
-                str(ENCRYPTED_REFRESH_FILE),
-                "-out",
-                str(output_path),
-            ],
-            env=environment,
-            capture_output=True,
-            text=True,
-        )
-        if proc.returncode != 0:
-            diagnostics: dict[str, Any] = {"message": DECRYPT_FAILED_MESSAGE}
-            detail = redact_text((proc.stderr or "").strip(), (credential,))
-            if detail:
-                diagnostics["detail"] = detail
-            return source, None, diagnostics
-        if not output_path.exists():
-            return source, None, {
-                "message": DECRYPT_FAILED_MESSAGE,
-                "detail": "OpenSSL did not produce a decrypted vault file.",
-            }
-        try:
-            refresh_token = normalize_secret(output_path.read_text(encoding="utf-8"))
-        except UnicodeDecodeError:
-            return source, None, {
-                "message": DECRYPT_FAILED_MESSAGE,
-                "detail": "Decrypted vault content was not valid UTF-8.",
-            }
-        if not refresh_token:
-            return source, None, {"message": DECRYPT_EMPTY_MESSAGE}
-        return source, refresh_token, None
-    finally:
-        output_path.unlink(missing_ok=True)
+def resolve_credential() -> tuple[str, str]:
+    credential = normalize_secret(os.environ.get(PRIMARY_CREDENTIAL_SOURCE))
+    if credential:
+        return credential, PRIMARY_CREDENTIAL_SOURCE
+    credential = normalize_secret(os.environ.get(LEGACY_CREDENTIAL_SOURCE))
+    if credential:
+        return credential, LEGACY_CREDENTIAL_SOURCE
+    return "", DEFAULT_CREDENTIAL_SOURCE
 
 
 def request_json(
@@ -265,12 +211,12 @@ def request_json(
 
 
 def command_validate() -> int:
-    credential = normalize_secret(os.environ.get("B24_TOKEN_CREDENTIAL"))
+    credential, credential_source = resolve_credential()
     evidence = load_evidence()
     evidence.update(
         {
             "status": "CREDENTIAL_PRESENT" if credential else "AUTH_FAILED",
-            "credential_source": credential_source(),
+            "credential_source": credential_source,
             "token_exchange_http_status": None,
             "readonly_probe_http_status": None,
             "token_exchange_diagnostics": {},
@@ -282,18 +228,21 @@ def command_validate() -> int:
     )
     save_evidence(evidence)
     if not credential:
-        print("Missing GitHub Actions secret B24_TOKEN_CREDENTIAL", file=sys.stderr)
+        print(
+            "Missing GitHub Actions secret BEDS24_TOKEN_CREDENTIAL",
+            file=sys.stderr,
+        )
         return 1
-    print("B24_TOKEN_CREDENTIAL is present; value was not printed.")
+    print("Beds24 credential is present; value was not printed.")
     return 0
 
 
 def command_exchange() -> int:
-    credential = normalize_secret(os.environ.get("B24_TOKEN_CREDENTIAL"))
+    credential, credential_source = resolve_credential()
     evidence = load_evidence()
     evidence.update(
         {
-            "credential_source": credential_source(),
+            "credential_source": credential_source,
             "token_exchange_http_status": None,
             "readonly_probe_http_status": None,
             "secret_present": bool(credential),
@@ -307,34 +256,25 @@ def command_exchange() -> int:
         evidence["status"] = "AUTH_FAILED"
         evidence["failure_stage"] = "validate"
         save_evidence(evidence)
-        print("Missing GitHub Actions secret B24_TOKEN_CREDENTIAL", file=sys.stderr)
+        print(
+            "Missing GitHub Actions secret BEDS24_TOKEN_CREDENTIAL",
+            file=sys.stderr,
+        )
         return 1
 
-    source, refresh_token, decrypt_diagnostics = resolve_refresh_token(credential)
-    evidence["credential_source"] = source
-    if decrypt_diagnostics:
-        evidence["status"] = "AUTH_FAILED"
-        evidence["failure_stage"] = "decrypt"
-        evidence["token_exchange_diagnostics"] = decrypt_diagnostics
-        save_evidence(evidence)
-        message = decrypt_diagnostics.get("message") or DECRYPT_FAILED_MESSAGE
-        if message == DECRYPT_EMPTY_MESSAGE:
-            print(DECRYPT_EMPTY_MESSAGE, file=sys.stderr)
-        else:
-            print(DECRYPT_FAILED_MESSAGE, file=sys.stderr)
-        return 1
+    evidence["credential_source"] = credential_source
 
     status, body = request_json(
         f"{API_BASE}/authentication/token",
-        {"refreshToken": refresh_token},
-        secrets=(refresh_token,),
+        {"refreshToken": credential},
+        secrets=(credential,),
         redact=False,
     )
     evidence["token_exchange_http_status"] = status
     token = body.get("token") if isinstance(body, dict) else None
     secrets = tuple(
         secret
-        for secret in (refresh_token, token)
+        for secret in (credential, token)
         if isinstance(secret, str) and secret
     )
     evidence["token_exchange_diagnostics"] = extract_diagnostics(

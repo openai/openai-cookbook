@@ -233,11 +233,8 @@ def command_exchange() -> int:
         save_evidence(evidence)
         detail = primary_diagnostic(evidence["token_exchange_diagnostics"])
         print(
-            (
-                f"Beds24 refresh-token exchange failed with HTTP status {status}: {detail}."
-                if detail
-                else f"Beds24 refresh-token exchange failed with HTTP status {status}."
-            ),
+            f"Beds24 refresh-token exchange failed with HTTP status {status}"
+            f"{': ' + detail if detail else ''}.",
             file=sys.stderr,
         )
         return 1
@@ -289,11 +286,8 @@ def command_probe() -> int:
         save_evidence(evidence)
         detail = primary_diagnostic(evidence["readonly_probe_diagnostics"])
         print(
-            (
-                f"Beds24 read-only authentication probe failed with HTTP status {status}: {detail}."
-                if detail
-                else f"Beds24 read-only authentication probe failed with HTTP status {status}."
-            ),
+            f"Beds24 read-only authentication probe failed with HTTP status {status}"
+            f"{': ' + detail if detail else ''}.",
             file=sys.stderr,
         )
         return 1

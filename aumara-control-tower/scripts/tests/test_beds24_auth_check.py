@@ -8,11 +8,11 @@ import unittest
 from unittest import mock
 
 
-SCRIPTS = pathlib.Path(__file__).resolve().parents[1]
-sys.path.insert(0, str(SCRIPTS))
+SCRIPTS_DIR = pathlib.Path(__file__).resolve().parents[1]
+sys.path.insert(0, str(SCRIPTS_DIR))
 SPEC = importlib.util.spec_from_file_location(
     "beds24_auth_check",
-    SCRIPTS / "beds24_auth_check.py",
+    SCRIPTS_DIR / "beds24_auth_check.py",
 )
 MODULE = importlib.util.module_from_spec(SPEC)
 assert SPEC.loader is not None

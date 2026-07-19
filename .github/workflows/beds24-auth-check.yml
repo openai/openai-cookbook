@@ -31,15 +31,9 @@ jobs:
         continue-on-error: true
         run: python aumara-control-tower/scripts/beds24_auth_check.py validate
 
-      - name: Exchange refresh credential for temporary access token
-        id: exchange
-        if: steps.validate.outcome == 'success'
-        continue-on-error: true
-        run: python aumara-control-tower/scripts/beds24_auth_check.py exchange
-
-      - name: Probe Beds24 with the temporary access token
+      - name: Probe Beds24 with the configured access token
         id: probe
-        if: steps.exchange.outcome == 'success'
+        if: steps.validate.outcome == 'success'
         continue-on-error: true
         run: python aumara-control-tower/scripts/beds24_auth_check.py probe
 

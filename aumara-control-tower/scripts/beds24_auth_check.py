@@ -1,5 +1,5 @@
 #!/usr/bin/env python3
-"""Safely validate the existing Beds24 refresh credential.
+"""Safely validate the existing Beds24 access credential.
 
 This script only performs read-only authentication checks. It never calls
 /authentication/setup and never creates, changes, or cancels bookings.
@@ -12,10 +12,7 @@ import datetime as dt
 import json
 import os
 import pathlib
-import stat
-import subprocess
 import sys
-import tempfile
 import unicodedata
 import urllib.error
 import urllib.request
@@ -24,16 +21,8 @@ from typing import Any
 API_BASE = "https://api.beds24.com/v2"
 ROOT = pathlib.Path(__file__).resolve().parents[1]
 EVIDENCE_PATH = ROOT / "evidence" / "beds24-auth-check.json"
-ENCRYPTED_REFRESH_FILE = ROOT / "vault" / "beds24-refresh-token.enc"
-PRIMARY_CREDENTIAL_SOURCE = "BEDS24_TOKEN_CREDENTIAL"
-LEGACY_CREDENTIAL_SOURCE = "B24_TOKEN_CREDENTIAL"
-DEFAULT_CREDENTIAL_SOURCE = PRIMARY_CREDENTIAL_SOURCE
-ACCESS_TOKEN_FILE = pathlib.Path(
-    os.environ.get("BEDS24_ACCESS_TOKEN_FILE", "/tmp/beds24-access-token")
-)
+CREDENTIAL_SOURCE = "BEDS24_TOKEN_CREDENTIAL"
 REDACTED = "[REDACTED]"
-DECRYPT_FAILED_MESSAGE = "Failed to decrypt Beds24 refresh token vault."
-DECRYPT_EMPTY_MESSAGE = "Beds24 refresh token vault decrypted to an empty value."
 DIAGNOSTIC_FIELDS = (
     "message",
     "error",
@@ -149,7 +138,7 @@ def load_evidence() -> dict[str, Any]:
     return {
         "checked_at_utc": now_utc(),
         "status": "NOT_RUN",
-        "credential_source": DEFAULT_CREDENTIAL_SOURCE,
+        "credential_source": CREDENTIAL_SOURCE,
         "token_exchange_http_status": None,
         "readonly_probe_http_status": None,
         "token_exchange_diagnostics": {},
@@ -171,14 +160,8 @@ def save_evidence(evidence: dict[str, Any]) -> None:
     )
 
 
-def resolve_credential() -> tuple[str, str]:
-    credential = normalize_secret(os.environ.get(PRIMARY_CREDENTIAL_SOURCE))
-    if credential:
-        return credential, PRIMARY_CREDENTIAL_SOURCE
-    credential = normalize_secret(os.environ.get(LEGACY_CREDENTIAL_SOURCE))
-    if credential:
-        return credential, LEGACY_CREDENTIAL_SOURCE
-    return "", DEFAULT_CREDENTIAL_SOURCE
+def load_credential() -> str:
+    return normalize_secret(os.environ.get(CREDENTIAL_SOURCE))
 
 
 def request_json(
@@ -211,12 +194,12 @@ def request_json(
 
 
 def command_validate() -> int:
-    credential, credential_source = resolve_credential()
+    credential = load_credential()
     evidence = load_evidence()
     evidence.update(
         {
             "status": "CREDENTIAL_PRESENT" if credential else "AUTH_FAILED",
-            "credential_source": credential_source,
+            "credential_source": CREDENTIAL_SOURCE,
             "token_exchange_http_status": None,
             "readonly_probe_http_status": None,
             "token_exchange_diagnostics": {},
@@ -237,118 +220,51 @@ def command_validate() -> int:
     return 0
 
 
-def command_exchange() -> int:
-    credential, credential_source = resolve_credential()
-    evidence = load_evidence()
-    evidence.update(
-        {
-            "credential_source": credential_source,
-            "token_exchange_http_status": None,
-            "readonly_probe_http_status": None,
-            "secret_present": bool(credential),
-            "secret_length": len(credential),
-            "token_exchange_diagnostics": {},
-            "readonly_probe_diagnostics": {},
-            "failure_stage": None,
-        }
-    )
-    if not credential:
-        evidence["status"] = "AUTH_FAILED"
-        evidence["failure_stage"] = "validate"
-        save_evidence(evidence)
-        print(
-            "Missing GitHub Actions secret BEDS24_TOKEN_CREDENTIAL",
-            file=sys.stderr,
-        )
-        return 1
-
-    evidence["credential_source"] = credential_source
-
-    status, body = request_json(
-        f"{API_BASE}/authentication/token",
-        {"refreshToken": credential},
-        secrets=(credential,),
-        redact=False,
-    )
-    evidence["token_exchange_http_status"] = status
-    token = body.get("token") if isinstance(body, dict) else None
-    secrets = tuple(
-        secret
-        for secret in (credential, token)
-        if isinstance(secret, str) and secret
-    )
-    evidence["token_exchange_diagnostics"] = extract_diagnostics(
-        sanitize_response_body(body, secrets)
-    )
-    if not (200 <= status < 300 and isinstance(token, str) and token):
-        evidence["status"] = "AUTH_FAILED"
-        evidence["failure_stage"] = "exchange"
-        save_evidence(evidence)
-        detail = primary_diagnostic(evidence["token_exchange_diagnostics"])
-        print(
-            f"Beds24 refresh-token exchange failed with HTTP status {status}"
-            f"{': ' + detail if detail else ''}.",
-            file=sys.stderr,
-        )
-        return 1
-
-    ACCESS_TOKEN_FILE.parent.mkdir(parents=True, exist_ok=True)
-    ACCESS_TOKEN_FILE.write_text(token, encoding="utf-8")
-    ACCESS_TOKEN_FILE.chmod(stat.S_IRUSR | stat.S_IWUSR)
-    evidence["status"] = "TOKEN_EXCHANGED"
-    evidence["failure_stage"] = None
-    save_evidence(evidence)
-    print("Beds24 access token created in a protected temporary file.")
-    return 0
-
-
 def command_probe() -> int:
     evidence = load_evidence()
-    try:
-        if not ACCESS_TOKEN_FILE.exists():
-            evidence["status"] = "AUTH_FAILED"
-            evidence["failure_stage"] = "probe"
-            save_evidence(evidence)
-            print("Temporary Beds24 access token file is missing.", file=sys.stderr)
-            return 1
-
-        access_token = normalize_secret(ACCESS_TOKEN_FILE.read_text(encoding="utf-8"))
-        if not access_token:
-            evidence["status"] = "AUTH_FAILED"
-            evidence["failure_stage"] = "probe"
-            save_evidence(evidence)
-            print("Temporary Beds24 access token file is empty.", file=sys.stderr)
-            return 1
-
-        status, body = request_json(
-            f"{API_BASE}/authentication/details",
-            {"token": access_token},
-            secrets=(access_token,),
-        )
-        evidence["readonly_probe_http_status"] = status
-        evidence["readonly_probe_diagnostics"] = extract_diagnostics(body)
-        if 200 <= status < 300:
-            evidence["status"] = "AUTH_OK"
-            evidence["failure_stage"] = None
-            save_evidence(evidence)
-            print("Beds24 read-only authentication probe succeeded.")
-            return 0
-
+    access_token = load_credential()
+    evidence.update(
+        {
+            "credential_source": CREDENTIAL_SOURCE,
+            "token_exchange_http_status": None,
+            "token_exchange_diagnostics": {},
+            "secret_present": bool(access_token),
+            "secret_length": len(access_token),
+        }
+    )
+    if not access_token:
         evidence["status"] = "AUTH_FAILED"
         evidence["failure_stage"] = "probe"
         save_evidence(evidence)
-        detail = primary_diagnostic(evidence["readonly_probe_diagnostics"])
-        print(
-            f"Beds24 read-only authentication probe failed with HTTP status {status}"
-            f"{': ' + detail if detail else ''}.",
-            file=sys.stderr,
-        )
+        print("Missing GitHub Actions secret BEDS24_TOKEN_CREDENTIAL", file=sys.stderr)
         return 1
-    finally:
-        try:
-            ACCESS_TOKEN_FILE.unlink(missing_ok=True)
-        except OSError:
-            pass
+
+    status, body = request_json(
+        f"{API_BASE}/authentication/details",
+        {"token": access_token},
+        secrets=(access_token,),
+    )
+    evidence["readonly_probe_http_status"] = status
+    evidence["readonly_probe_diagnostics"] = extract_diagnostics(
+        sanitize_response_body(body, (access_token,))
+    )
+    if 200 <= status < 300:
+        evidence["status"] = "AUTH_OK"
+        evidence["failure_stage"] = None
+        save_evidence(evidence)
+        print("Beds24 read-only authentication probe succeeded.")
+        return 0
+
+    evidence["status"] = "AUTH_FAILED"
+    evidence["failure_stage"] = "probe"
+    save_evidence(evidence)
+    detail = primary_diagnostic(evidence["readonly_probe_diagnostics"])
+    print(
+        f"Beds24 read-only authentication probe failed with HTTP status {status}"
+        f"{': ' + detail if detail else ''}.",
+        file=sys.stderr,
+    )
+    return 1
 
 
 def command_report() -> int:
@@ -362,10 +278,7 @@ def command_report() -> int:
         return 0
 
     stage = evidence.get("failure_stage") or "unknown"
-    if stage in {"decrypt", "exchange"}:
-        http_status = evidence.get("token_exchange_http_status")
-        diagnostics = evidence.get("token_exchange_diagnostics") or {}
-    elif stage == "probe":
+    if stage == "probe":
         http_status = evidence.get("readonly_probe_http_status")
         diagnostics = evidence.get("readonly_probe_diagnostics") or {}
     else:
@@ -384,7 +297,7 @@ def command_report() -> int:
 
 def parse_args() -> argparse.Namespace:
     parser = argparse.ArgumentParser()
-    parser.add_argument("command", choices=("validate", "exchange", "probe", "report"))
+    parser.add_argument("command", choices=("validate", "probe", "report"))
     return parser.parse_args()
 
 
@@ -392,8 +305,6 @@ def main() -> int:
     command = parse_args().command
     if command == "validate":
         return command_validate()
-    if command == "exchange":
-        return command_exchange()
     if command == "probe":
         return command_probe()
     return command_report()

@@ -155,8 +155,10 @@ class Beds24AuthCheckTests(unittest.TestCase):
             probe_result = MODULE.command_probe()
 
         evidence = self.load_evidence()
+        exchange_headers, probe_headers = observed_headers
         self.assertEqual(probe_result, 0)
-        self.assertEqual(observed_headers[1]["token"], "access-secret")
+        self.assertEqual(exchange_headers["refreshtoken"], "refresh-secret")
+        self.assertEqual(probe_headers["token"], "access-secret")
         self.assertEqual(evidence["status"], "AUTH_OK")
         self.assertIsNone(evidence["failure_stage"])
         self.assertEqual(evidence["token_exchange_http_status"], 200)

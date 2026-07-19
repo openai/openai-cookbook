@@ -76,7 +76,7 @@ jobs:
           if-no-files-found: warn
           retention-days: 30
 
-      - name: Commit auth, booking evidence and encrypted vault safely
+      - name: Commit booking evidence and encrypted vault safely
         if: always()
         shell: bash
         run: |

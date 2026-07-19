@@ -77,18 +77,21 @@ def sanitize_value(value: Any, secrets: tuple[str, ...]) -> Any:
     return value
 
 
-def parse_response(raw: bytes) -> Any:
-    """Parse an HTTP response body into JSON when possible, else plain text."""
+def parse_response(raw: bytes) -> dict[str, Any]:
+    """Parse an HTTP response body into a dictionary for downstream handling."""
     text = raw.decode("utf-8", "replace")
     if not text:
         return {}
     try:
-        return json.loads(text)
+        body = json.loads(text)
     except json.JSONDecodeError:
         return {"message": text}
+    if isinstance(body, dict):
+        return body
+    return {"message": json.dumps(body, ensure_ascii=False)}
 
 
-def sanitize_response_body(body: Any, secrets: tuple[str, ...]) -> dict[str, Any]:
+def sanitize_response_body(body: dict[str, Any], secrets: tuple[str, ...]) -> dict[str, Any]:
     """Convert a response payload into a persisted diagnostic dict with redactions."""
     sanitized = sanitize_value(body, secrets)
     if isinstance(sanitized, dict):
@@ -179,16 +182,12 @@ def request_json(
             body = parse_response(raw)
             if redact:
                 return response.status, sanitize_response_body(body, secrets)
-            if isinstance(body, dict):
-                return response.status, body
-            return response.status, {"message": json.dumps(body, ensure_ascii=False)}
+            return response.status, body
     except urllib.error.HTTPError as exc:
         body = parse_response(exc.read())
         if redact:
             return exc.code, sanitize_response_body(body, secrets)
-        if isinstance(body, dict):
-            return exc.code, body
-        return exc.code, {"message": json.dumps(body, ensure_ascii=False)}
+        return exc.code, body
     except urllib.error.URLError:
         return 0, {}
 

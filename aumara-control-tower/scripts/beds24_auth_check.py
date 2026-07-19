@@ -29,6 +29,8 @@ ACCESS_TOKEN_FILE = pathlib.Path(
     os.environ.get("BEDS24_ACCESS_TOKEN_FILE", "/tmp/beds24-access-token")
 )
 REDACTED = "[REDACTED]"
+DECRYPT_FAILED_MESSAGE = "Failed to decrypt Beds24 refresh token vault."
+DECRYPT_EMPTY_MESSAGE = "Beds24 refresh token vault decrypted to an empty value."
 DIAGNOSTIC_FIELDS = (
     "message",
     "error",
@@ -175,13 +177,16 @@ def save_evidence(evidence: dict[str, Any]) -> None:
     )
 
 
-def resolve_refresh_token(credential: str) -> tuple[str, str | None, str | None]:
+def resolve_refresh_token(
+    credential: str,
+) -> tuple[str, str | None, dict[str, Any] | None]:
     source = credential_source()
     if not ENCRYPTED_REFRESH_FILE.exists():
         return source, credential, None
 
     with tempfile.NamedTemporaryFile(prefix="beds24-refresh-", delete=False) as handle:
         output_path = pathlib.Path(handle.name)
+    output_path.chmod(stat.S_IRUSR | stat.S_IWUSR)
     try:
         environment = os.environ.copy()
         environment["BEDS24_VAULT_PASSPHRASE"] = credential
@@ -206,12 +211,16 @@ def resolve_refresh_token(credential: str) -> tuple[str, str | None, str | None]
             text=True,
         )
         if proc.returncode != 0 or not output_path.exists():
-            return source, None, "Failed to decrypt Beds24 refresh token vault."
+            diagnostics: dict[str, Any] = {"message": DECRYPT_FAILED_MESSAGE}
+            detail = redact_text((proc.stderr or "").strip(), (credential,))
+            if detail:
+                diagnostics["detail"] = detail
+            return source, None, diagnostics
         refresh_token = normalize_secret(
             output_path.read_text(encoding="utf-8", errors="replace")
         )
         if not refresh_token:
-            return source, None, "Beds24 refresh token vault decrypted to an empty value."
+            return source, None, {"message": DECRYPT_EMPTY_MESSAGE}
         return source, refresh_token, None
     finally:
         output_path.unlink(missing_ok=True)
@@ -292,14 +301,18 @@ def command_exchange() -> int:
         print("Missing GitHub Actions secret B24_TOKEN_CREDENTIAL", file=sys.stderr)
         return 1
 
-    source, refresh_token, decrypt_error = resolve_refresh_token(credential)
+    source, refresh_token, decrypt_diagnostics = resolve_refresh_token(credential)
     evidence["credential_source"] = source
-    if decrypt_error:
+    if decrypt_diagnostics:
         evidence["status"] = "AUTH_FAILED"
         evidence["failure_stage"] = "decrypt"
-        evidence["token_exchange_diagnostics"] = {"message": decrypt_error}
+        evidence["token_exchange_diagnostics"] = decrypt_diagnostics
         save_evidence(evidence)
-        print(decrypt_error, file=sys.stderr)
+        message = decrypt_diagnostics.get("message") or DECRYPT_FAILED_MESSAGE
+        if message == DECRYPT_EMPTY_MESSAGE:
+            print(DECRYPT_EMPTY_MESSAGE, file=sys.stderr)
+        else:
+            print(DECRYPT_FAILED_MESSAGE, file=sys.stderr)
         return 1
 
     status, body = request_json(

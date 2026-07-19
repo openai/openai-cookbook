@@ -190,6 +190,23 @@ class Beds24AuthCheckTests(unittest.TestCase):
 
         def fake_run(args, env, capture_output, text):
             self.assertEqual(env["BEDS24_VAULT_PASSPHRASE"], "vault-passphrase")
+            self.assertEqual(
+                args[:10],
+                [
+                    "openssl",
+                    "enc",
+                    "-d",
+                    "-aes-256-cbc",
+                    "-pbkdf2",
+                    "-iter",
+                    "200000",
+                    "-pass",
+                    "env:BEDS24_VAULT_PASSPHRASE",
+                    "-in",
+                ],
+            )
+            self.assertEqual(args[10], str(self.vault_path))
+            self.assertEqual(args[11], "-out")
             out_path = pathlib.Path(args[args.index("-out") + 1])
             out_path.write_text("  refresh-from-vault \n", encoding="utf-8")
             return mock.Mock(returncode=0)
@@ -246,6 +263,37 @@ class Beds24AuthCheckTests(unittest.TestCase):
             "Beds24 refresh token vault decrypted to an empty value.",
         )
         self.assertIn("decrypted to an empty value", stderr.getvalue())
+        urlopen.assert_not_called()
+
+    @mock.patch.dict("os.environ", {"B24_TOKEN_CREDENTIAL": "vault-passphrase"})
+    def test_exchange_fails_with_decrypt_stage_when_vault_command_fails(self):
+        self.vault_path.parent.mkdir(parents=True, exist_ok=True)
+        self.vault_path.write_text("encrypted", encoding="utf-8")
+
+        with (
+            mock.patch.object(
+                MODULE.subprocess,
+                "run",
+                return_value=mock.Mock(returncode=1, stderr="bad decrypt vault-passphrase"),
+            ),
+            mock.patch.object(MODULE.urllib.request, "urlopen") as urlopen,
+            mock.patch("sys.stderr", new_callable=io.StringIO) as stderr,
+        ):
+            result = MODULE.command_exchange()
+
+        evidence = self.load_evidence()
+        self.assertEqual(result, 1)
+        self.assertEqual(evidence["status"], "AUTH_FAILED")
+        self.assertEqual(evidence["failure_stage"], "decrypt")
+        self.assertEqual(
+            evidence["token_exchange_diagnostics"]["message"],
+            MODULE.DECRYPT_FAILED_MESSAGE,
+        )
+        self.assertEqual(
+            evidence["token_exchange_diagnostics"]["detail"],
+            "bad decrypt [REDACTED]",
+        )
+        self.assertEqual(stderr.getvalue().strip(), MODULE.DECRYPT_FAILED_MESSAGE)
         urlopen.assert_not_called()
 
     def test_report_failure_summarizes_exchange_diagnostics(self):

@@ -241,9 +241,12 @@ class Beds24AuthCheckTests(unittest.TestCase):
         request_json.assert_called_once()
 
     @mock.patch.dict("os.environ", {"B24_TOKEN_CREDENTIAL": "vault-passphrase"})
-    def test_credential_source_reports_repository_secret(self):
+    def test_credential_source_returns_repository_secret_when_vault_exists(self):
         self.vault_path.parent.mkdir(parents=True, exist_ok=True)
         self.vault_path.write_text("encrypted", encoding="utf-8")
+        self.assertEqual(MODULE.credential_source(), "B24_TOKEN_CREDENTIAL")
+
+    def test_credential_source_returns_repository_secret_when_vault_is_absent(self):
         self.assertEqual(MODULE.credential_source(), "B24_TOKEN_CREDENTIAL")
 
     def test_report_failure_summarizes_exchange_diagnostics(self):

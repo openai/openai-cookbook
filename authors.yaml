@@ -3,6 +3,11 @@
 # You can optionally customize how your information shows up cookbook.openai.com over here.
 # If your information is not present here, it will be pulled from your GitHub profile.
 
+neilh-oai:
+  name: "Neil Hansaria"
+  website: "https://www.linkedin.com/in/neilhansaria"
+  avatar: "https://avatars.githubusercontent.com/u/274336127?v=4"
+
 kkahadze-oai:
   name: "Konstantine Kahadze"
   website: "https://kahadze.com"
@@ -617,3 +622,8 @@ anshgupta-oai:
   name: "Ansh Gupta"
   website: "https://github.com/anshgupta-oai"
   avatar: "https://avatars.githubusercontent.com/u/269039830?v=4"
+
+saptob:
+  name: "Saptarshi Banerjee"
+  website: "https://www.linkedin.com/in/saptarshi-banerjee-83472679"
+  avatar: "https://avatars.githubusercontent.com/saptob"

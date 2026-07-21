@@ -386,7 +386,6 @@
   path: examples/agents_sdk/session_memory.ipynb
   slug: session-memory
   date: 2025-09-09
-  archived: true
   authors:
     - emreokcular
   tags:
@@ -3356,7 +3355,6 @@
   slug: context-personalization
   description: Cookbook to build personalized agents with long-term memory state using the Agents SDK.
   date: 2026-01-05
-  archived: true
   authors:
     - emreokcular
   tags:

@@ -28,14 +28,19 @@ TRACE_CAPTURE_RUNTIME = (
 )
 
 
-def _is_running(pid: int | None) -> bool:
+def _is_running(pid: int | None, deployment_id: str) -> bool:
     if not pid:
         return False
     try:
         os.kill(pid, 0)
     except OSError:
         return False
-    return True
+    try:
+        environ = Path(f"/proc/{pid}/environ").read_bytes().split(b"\0")
+    except OSError:
+        return False
+    marker = f"AGENTS_SDK_DEPLOYMENT_ID={deployment_id}".encode()
+    return marker in environ
 
 
 def _port_is_open(port: int) -> bool:
@@ -158,7 +163,7 @@ def refresh_status(deployment: Deployment) -> Deployment:
             deployment.stopped_at = deployment.stopped_at or now_iso()
         return deployment
     if deployment.process_pid and deployment.status == "running":
-        if not _is_running(deployment.process_pid):
+        if not _is_running(deployment.process_pid, deployment.id):
             deployment.status = "stopped"
             deployment.stopped_at = deployment.stopped_at or now_iso()
     return deployment
@@ -170,7 +175,9 @@ def start_local_process(
     deployment: Deployment,
 ) -> Deployment:
     deployment = refresh_status(deployment)
-    if deployment.status == "running" and _is_running(deployment.process_pid):
+    if deployment.status == "running" and _is_running(
+        deployment.process_pid, deployment.id
+    ):
         return deployment
     if not project.run_command:
         raise RuntimeError("project does not have a runnable command")
@@ -368,7 +375,9 @@ def start_local_docker(
 
 
 def stop_local_process(deployment: Deployment) -> Deployment:
-    if deployment.process_pid and _is_running(deployment.process_pid):
+    if deployment.process_pid and _is_running(
+        deployment.process_pid, deployment.id
+    ):
         try:
             os.killpg(deployment.process_pid, signal.SIGTERM)
         except ProcessLookupError:

@@ -4,6 +4,18 @@
 # should build pages for, and indicates metadata such as tags, creation date and
 # authors for each page.
 
+- title: Build a self-correcting 3D collectible set with three.ws text-to-3D, function calling, and vision
+  path: examples/third_party/text_to_3d_with_function_calling.ipynb
+  slug: three-ws-self-correcting-3d-function-calling-vision
+  description: An AI art director turns a one-line brief into a themed set of real 3D models with parallel function calls to the free, keyless three.ws text-to-3D API, then inspects a render of each model with vision, grades it against the brief with structured outputs, and rebuilds any prop that misses. Ends with an interactive model-viewer gallery inline in the notebook.
+  date: 2026-07-21
+  authors:
+    - nirholas
+  tags:
+    - responses
+    - functions
+    - vision
+
 - title: Enabling Long-Term Agent Memory with Oracle AI Agent Memory
   path: examples/vector_databases/oracle_db/deep_research_openai_agents.ipynb
   slug: deep-research-openai-agents

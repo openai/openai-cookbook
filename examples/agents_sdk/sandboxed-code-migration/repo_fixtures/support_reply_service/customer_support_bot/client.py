@@ -14,4 +14,6 @@ def complete_support_prompt(
         messages=messages,
         temperature=0,
     )
+    if not completion.choices:
+        raise ValueError("No choices returned from the API")
     return completion.choices[0].message.content

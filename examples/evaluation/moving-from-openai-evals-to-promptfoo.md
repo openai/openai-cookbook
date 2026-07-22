@@ -1,5 +1,7 @@
 OpenAI is winding down the Evals product and recommends [Promptfoo](https://www.promptfoo.dev/) for continuing and extending your evaluation workflows. OpenAI Evals lets you export supported evaluations as runnable Promptfoo configs and separately preserve results from past runs.
 
+> **Note:** This guide covers exports from the OpenAI Platform Evals dashboard. It does not cover migrations for workflows that use the Evals API.
+
 Promptfoo is an open-source CLI and library for evaluating and red-teaming AI apps and agents. It gives you a more flexible way to run, maintain, and extend your evals locally or in CI.
 
 ## What Changes When You Move to Promptfoo

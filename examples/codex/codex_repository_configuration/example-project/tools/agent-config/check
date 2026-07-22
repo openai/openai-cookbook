@@ -1,0 +1,48 @@
+#!/usr/bin/env bash
+set -euo pipefail
+
+repo_root="$(cd -- "$(dirname -- "$0")/../.." && pwd)"
+cd "$repo_root"
+
+check_link() {
+  local link="$1"
+  local expected="$2"
+  if [[ ! -L "$link" ]]; then
+    printf 'agent-config: %s must be a symbolic link\n' "$link" >&2
+    return 1
+  fi
+  if [[ "$(readlink "$link")" != "$expected" ]]; then
+    printf 'agent-config: %s must point to %s, found %s\n' \
+      "$link" "$expected" "$(readlink "$link")" >&2
+    return 1
+  fi
+}
+
+check_link CLAUDE.md AGENTS.md
+check_link .claude/skills ../.agents/skills
+
+# --check renders in memory and compares bytes; it never rewrites tracked files.
+tools/agent-config/generate --check
+
+python3 - <<'PY'
+import json
+import tomllib
+from pathlib import Path
+
+for path in sorted([
+    Path(".claude/settings.json"),
+    Path(".codex/hooks.json"),
+]):
+    with path.open(encoding="utf-8") as handle:
+        json.load(handle)
+
+for path in sorted([
+    *Path(".agents/agent-specs").glob("*.toml"),
+    *Path(".codex/agents").glob("*.toml"),
+    Path(".codex/config.toml"),
+]):
+    with path.open("rb") as handle:
+        tomllib.load(handle)
+PY
+
+printf 'agent-config: configuration is valid and generated files are current\n'

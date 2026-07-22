@@ -1,0 +1,13 @@
+{
+  "name": "coding-agent-co-home-example",
+  "private": true,
+  "type": "module",
+  "scripts": {
+    "config:check": "tools/agent-config/check",
+    "config:generate": "tools/agent-config/generate",
+    "test": "node --test"
+  },
+  "engines": {
+    "node": ">=20"
+  }
+}

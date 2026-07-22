@@ -1,0 +1,16 @@
+{
+  "hooks": {
+    "SessionStart": [
+      {
+        "matcher": "startup|resume",
+        "hooks": [
+          {
+            "type": "command",
+            "command": "python3 \"$(git rev-parse --show-toplevel)/.agents/hooks/session_start.py\"",
+            "statusMessage": "Loading repository notes"
+          }
+        ]
+      }
+    ]
+  }
+}

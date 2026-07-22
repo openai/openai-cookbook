@@ -1,0 +1,14 @@
+name = "reviewer"
+description = "Review changes for correctness, security, and missing tests."
+prompt = ".agents/agent-prompts/reviewer.md"
+
+[claude]
+output = ".claude/agents/reviewer.md"
+tools = ["Read", "Grep", "Glob"]
+model = "inherit"
+
+[codex]
+output = ".codex/agents/reviewer.toml"
+nickname_candidates = ["Lens", "Prism"]
+model_reasoning_effort = "medium"
+sandbox_mode = "read-only"

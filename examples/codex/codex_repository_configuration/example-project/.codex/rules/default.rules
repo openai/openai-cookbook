@@ -1,0 +1,13 @@
+prefix_rule(
+    pattern = ["git", ["status", "diff", "log"]],
+    decision = "allow",
+    justification = "These Git commands only inspect the repository",
+    match = [
+        "git status --short",
+        "git diff --stat",
+        "git log -5 --oneline",
+    ],
+    not_match = [
+        "git push origin main",
+    ],
+)

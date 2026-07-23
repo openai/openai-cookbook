@@ -1,0 +1,32 @@
+REGISTRANT INFORMATION
+======================
+Name:            Dr. Emmy Vasquez-Chen
+Email:           e.vasquez.chen@nullstellensatz.io
+Phone:           +1 (415) 555-0173
+Date of Birth:   1988-03-14
+
+PROFESSIONAL DETAILS
+Company:         Nullstellensatz Labs
+Job Title:       Principal Research Scientist
+Department:      Engineering
+Experience:      11-15 years
+
+CONFERENCE PREFERENCES
+Ticket Type:     Premium ($599)
+T-Shirt Size:    M
+Dietary Needs:   Vegetarian, Gluten-free
+Workshops:       "Advanced Prompt Engineering"
+                 "Computer Use & Automation"
+
+TRAVEL & ACCOMMODATION
+Arriving From:   Zurich, Switzerland
+Hotel Needed:    Yes
+Check-in:        2026-06-15
+Check-out:       2026-06-18
+Room Type:       Standard Double
+
+OTHER
+Heard About Us:  Email Newsletter
+Additional Requests: Requires a power outlet near the seat for a laptop.
+                     Prefers a quiet room away from the main hallway.
+Terms:           Accepted

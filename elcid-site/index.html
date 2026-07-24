@@ -3,9 +3,9 @@
 <head>
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
-  <meta name="theme-color" content="#351316">
+  <meta name="theme-color" content="#f5f0e7">
   <meta name="robots" content="noindex,nofollow">
-  <meta name="description" content="EL CID Country Club: hotel rural, restaurante Wabi-Sabi, piscina, terrazas y estancias privadas en Benidoleig, Marina Alta.">
+  <meta name="description" content="EL CID Country Club: hotel rural, restaurante, piscina, terrazas y estancias privadas en Benidoleig, Marina Alta.">
   <link rel="canonical" href="https://elcidspain.com/">
   <link rel="stylesheet" href="styles.css">
   <title>EL CID Country Club — Hotel rural en Benidoleig</title>
@@ -14,45 +14,134 @@
 <body>
 <a class="skip" href="#main">Saltar al contenido</a>
 <header id="header" class="header">
-  <a class="brand" href="#top" aria-label="EL CID Country Club">
-    <span class="official-logo" role="img" aria-label="EL CID Country Club"></span>
-  </a>
+  <a class="brand" href="#top" aria-label="EL CID Country Club"><span class="official-logo" aria-hidden="true"></span></a>
   <nav class="nav" aria-label="Principal">
-    <a href="#stay" data-i18n="navStay">Alojamiento</a><a href="#food" data-i18n="navFood">Wabi-Sabi</a><a href="#place" data-i18n="navPlace">El lugar</a><a href="#contact" data-i18n="navContact">Contacto</a>
+    <a href="#stay" data-i18n="navStay">Alojamiento</a>
+    <a href="#restaurant" data-i18n="navRestaurant">Restaurante</a>
+    <a href="#place" data-i18n="navPlace">El lugar</a>
+    <a href="#contact" data-i18n="navContact">Contacto</a>
   </nav>
-  <div class="actions"><button id="languageToggle" class="utility" type="button">EN</button><button id="menuButton" class="utility menu" type="button" aria-expanded="false">Menú</button></div>
+  <div class="header-actions">
+    <button id="languageToggle" class="utility" type="button">EN</button>
+    <button class="header-book" type="button" data-open-booking data-i18n="book">Reservar</button>
+    <button id="menuButton" class="utility menu" type="button" aria-expanded="false">Menú</button>
+  </div>
 </header>
 <div id="mobilePanel" class="mobile-panel" aria-label="Navegación móvil">
-  <a href="#stay" data-i18n="navStay">Alojamiento</a><a href="#food" data-i18n="navFood">Wabi-Sabi</a><a href="#place" data-i18n="navPlace">El lugar</a><a href="#events" data-i18n="navEvents">Encuentros</a><a href="#contact" data-i18n="navContact">Contacto</a>
+  <a href="#stay" data-i18n="navStay">Alojamiento</a>
+  <a href="#restaurant" data-i18n="navRestaurant">Restaurante</a>
+  <a href="#place" data-i18n="navPlace">El lugar</a>
+  <a href="#events" data-i18n="navEvents">Encuentros</a>
+  <a href="#contact" data-i18n="navContact">Contacto</a>
+  <button type="button" data-open-booking data-i18n="book">Reservar</button>
 </div>
 <main id="main">
-<section id="top" class="hero">
-  <div class="hero-bg" role="img" aria-label="Piscina y edificio principal de EL CID Country Club"></div>
-  <div class="hero-copy wrap">
-    <p class="eyebrow" data-i18n="heroEyebrow">Benidoleig · Marina Alta · Costa Blanca</p>
-    <h1 data-i18n="heroTitle">Un pequeño hotel rural con mesa, terrazas y tiempo.</h1>
-    <p class="lead" data-i18n="heroLead">EL CID Country Club reúne habitaciones con carácter, restaurante Wabi-Sabi, piscina exterior y un lugar tranquilo entre montaña y mar.</p>
-    <div class="buttons"><a class="button primary" href="https://www.booking.com/hotel/es/el-cid-country-club.html" rel="noopener" data-i18n="checkAvailability">Consultar disponibilidad</a><a class="button ghost" href="#stay" data-i18n="discoverHotel">Descubrir el hotel</a></div>
-    <div class="facts"><div><strong>5</strong><span data-i18n="factRooms">habitaciones de hotel</span></div><div><strong>1</strong><span data-i18n="factStudio">estudio independiente</span></div><div><strong>Wabi-Sabi</strong><span data-i18n="factRestaurant">restaurante en el lugar</span></div><div><strong>CV H01453 A</strong><span data-i18n="factLicense">licencia publicada</span></div></div>
-  </div>
-</section>
-<section class="identity"><div class="wrap identity-grid"><article><b data-i18n="identityStay">Dormir</b><span data-i18n="identityStayText">habitaciones, terrazas y estudio</span></article><article><b data-i18n="identityEat">Comer</b><span data-i18n="identityEatText">desayuno, mesa y Wabi-Sabi</span></article><article><b data-i18n="identityMove">Moverse</b><span data-i18n="identityMoveText">tenis, caminos y piscina</span></article><article><b data-i18n="identityGather">Reunirse</b><span data-i18n="identityGatherText">formatos pequeños y privados</span></article></div></section>
-<section id="stay" class="section paper"><div class="wrap">
-  <div class="section-head"><div><p class="eyebrow" data-i18n="stayEyebrow">EL CID Hotel</p><h2 data-i18n="stayTitle">Tres formas sencillas de alojarse.</h2></div><p data-i18n="stayIntro">El hotel y AUMARA no son el mismo producto. Aquí la experiencia es compacta: habitaciones junto al edificio principal, el restaurante y las zonas comunes del Country Club.</p></div>
-  <div class="rooms">
-    <article class="room room-main"><img src="https://drive.google.com/thumbnail?id=1Tcug1LE7FnA8ThqXeBWc60SQzO1fXSkB&sz=w1200" alt="Habitación doble de EL CID Country Club" loading="lazy" width="1000" height="666"><div><small data-i18n="roomTerraceTag">4 habitaciones</small><h3 data-i18n="roomTerraceTitle">Doble con terraza</h3><p data-i18n="roomTerraceText">Habitación privada y terraza propia para empezar o terminar el día fuera.</p></div></article>
-    <article class="room room-triple"><img src="https://drive.google.com/thumbnail?id=1SNf6UhH4IMEDrAPa7cKp59yQxlPTAVSI&sz=w1200" alt="Habitación amplia de EL CID Country Club" loading="lazy" width="750" height="1000"><div><small data-i18n="roomTripleTag">1 habitación</small><h3 data-i18n="roomTripleTitle">Triple</h3><p data-i18n="roomTripleText">Más capacidad para familias o pequeños grupos.</p></div></article>
-    <article class="room room-studio"><img src="https://drive.google.com/thumbnail?id=1K193G_S440Ic2-K9xeWHMNlRV2-UWHav&sz=w1200" alt="Terraza de EL CID Country Club" loading="lazy" width="666" height="1000"><div><small data-i18n="roomStudioTag">Estancia independiente</small><h3 data-i18n="roomStudioTitle">Estudio con cocina</h3><p data-i18n="roomStudioText">Una opción separada para quien necesita más autonomía.</p></div></article>
-  </div>
-  <div class="buttons center"><a class="button dark" href="https://www.booking.com/hotel/es/el-cid-country-club.html" rel="noopener" data-i18n="viewRooms">Ver habitaciones y fechas</a><a class="button outline" href="mailto:reservas@elcidspain.com?subject=EL%20CID%20Country%20Club" data-i18n="askDirect">Preguntar directamente</a></div>
-</div></section>
-<section id="food" class="feature"><div class="feature-img food-img" role="img" aria-label="Comedor de EL CID Country Club"></div><div class="feature-copy"><p class="eyebrow">Wabi-Sabi</p><h2 data-i18n="foodTitle">La comida forma parte de la estancia.</h2><p data-i18n="foodText">Wabi-Sabi es la identidad gastronómica de EL CID: producto mediterráneo, fuego, tiempo y hospitalidad sin prisa. El servicio, los horarios y las mesas disponibles se confirman al reservar.</p><ul><li data-i18n="foodBreakfast">Desayuno continental</li><li data-i18n="foodLunch">Formato de día cambiante</li><li data-i18n="foodDinner">Cenas y mesas privadas</li><li data-i18n="foodEvents">Experiencias gastronómicas</li></ul><a class="button primary" href="mailto:reservas@elcidspain.com?subject=Mesa%20Wabi-Sabi" data-i18n="reserveTable">Consultar una mesa</a></div></section>
-<section id="place" class="section cream"><div class="wrap section-head"><div><p class="eyebrow" data-i18n="placeEyebrow">El Country Club</p><h2 data-i18n="placeTitle">Piscina, terrazas y espacio para moverse.</h2></div><p data-i18n="placeText">EL CID se vive alrededor del edificio principal: piscina exterior de temporada, zonas de terraza, restaurante y una zona deportiva con tenis. Las rutas de Marina Alta empiezan muy cerca.</p></div><div class="wrap place-grid"><div class="pool-photo" role="img" aria-label="Piscina exterior de EL CID Country Club"></div><div class="amenities"><article><b>01</b><span data-i18n="placePool">Piscina exterior de temporada</span></article><article><b>02</b><span data-i18n="placeTerrace">Terrazas y comedor exterior</span></article><article><b>03</b><span data-i18n="placeTennis">Pista y equipamiento de tenis</span></article><article><b>04</b><span data-i18n="placeRoutes">Senderismo y ciclismo en el entorno</span></article></div></div></section>
-<section id="events" class="section wine"><div class="wrap"><div class="section-head light"><div><p class="eyebrow" data-i18n="eventsEyebrow">Encuentros privados</p><h2 data-i18n="eventsTitle">No hace falta convertirlo en un gran evento.</h2></div><p data-i18n="eventsIntro">EL CID funciona mejor para formatos pequeños que necesitan alojamiento, comida y espacios exteriores en una sola dirección. Cada propuesta se revisa según fechas, operación y capacidad real.</p></div><div class="event-grid"><article><span>01</span><h3 data-i18n="eventFamily">Fines de semana familiares</h3><p data-i18n="eventFamilyText">Habitaciones, mesa y tiempo compartido sin la escala de un resort.</p></article><article><span>02</span><h3 data-i18n="eventTeams">Reuniones de equipos</h3><p data-i18n="eventTeamsText">Trabajo, comida y descanso en un formato pequeño y manejable.</p></article><article><span>03</span><h3 data-i18n="eventCelebrations">Celebraciones cuidadas</h3><p data-i18n="eventCelebrationsText">Comidas privadas y encuentros con alcance definido antes de confirmar.</p></article></div></div></section>
-<section class="aumara"><div class="wrap aumara-grid"><div><p class="eyebrow">AUMARA</p><h2 data-i18n="aumaraTitle">Otro alojamiento. Otra identidad. En el mismo entorno.</h2><p data-i18n="aumaraText">AUMARA no es una categoría de habitación de EL CID. Es un producto independiente de casas privadas, con su propio lenguaje visual, recorrido interactivo, inventario y reserva.</p><a class="button outline-light" href="/aumara/" data-i18n="exploreAumara">Entrar en AUMARA</a></div><div class="aumara-line" aria-hidden="true"><span>EL CID</span><i></i><span>AUMARA</span></div></div></section>
-<section id="contact" class="section paper"><div class="wrap contact-grid"><div><p class="eyebrow" data-i18n="contactEyebrow">Reservas y contacto</p><h2 data-i18n="contactTitle">Una ruta clara para cada consulta.</h2><p data-i18n="contactText">Para hotel, restaurante y encuentros privados, contacte directamente con EL CID. La disponibilidad externa se muestra en Booking.com; la confirmación final depende de las fechas y condiciones seleccionadas.</p><div class="buttons"><a class="button dark" href="https://www.booking.com/hotel/es/el-cid-country-club.html" rel="noopener" data-i18n="checkAvailability">Consultar disponibilidad</a><a class="button outline" href="mailto:reservas@elcidspain.com">reservas@elcidspain.com</a></div></div><address><div><small data-i18n="phoneLabel">Teléfono</small><a href="tel:+34966579970">+34 966 579 970</a></div><div><small>Email</small><a href="mailto:reservas@elcidspain.com">reservas@elcidspain.com</a></div><div><small data-i18n="addressLabel">Dirección</small><a href="https://www.google.com/maps/search/?api=1&query=El+Cid+Country+Club+Benidoleig" rel="noopener">Carrer Rincón del Silencio, 3<br>03759 Benidoleig, Alicante</a></div></address></div></section>
+  <section id="top" class="hero">
+    <div class="hero-bg" aria-hidden="true"></div>
+    <div class="hero-copy wrap">
+      <p class="eyebrow" data-i18n="heroEyebrow">Benidoleig · Marina Alta · Costa Blanca</p>
+      <h1 data-i18n="heroTitle">Un hotel pequeño para vivir despacio.</h1>
+      <p class="lead" data-i18n="heroLead">Habitaciones luminosas, piscina, terrazas, restaurante y una base tranquila entre montaña y mar.</p>
+      <div class="buttons">
+        <button class="button primary" type="button" data-open-booking data-i18n="checkAvailability">Consultar fechas</button>
+        <a class="button glass" href="#stay" data-i18n="discoverHotel">Descubrir EL CID</a>
+      </div>
+      <div class="hero-note"><span></span><p data-i18n="heroNote">Hotel, restaurante y espacios exteriores en una sola dirección.</p></div>
+    </div>
+    <a class="scroll-cue" href="#intro" aria-label="Scroll"><span></span></a>
+  </section>
+
+  <section id="intro" class="intro section-light">
+    <div class="wrap intro-grid" data-reveal>
+      <p class="eyebrow" data-i18n="introEyebrow">EL CID Country Club</p>
+      <p class="intro-statement" data-i18n="introStatement">Dormir bien. Desayunar junto a la piscina. Salir a la montaña. Volver a una terraza que se siente propia.</p>
+    </div>
+  </section>
+
+  <section id="stay" class="stay section-light">
+    <div class="wrap">
+      <div class="section-head" data-reveal>
+        <div><p class="eyebrow" data-i18n="stayEyebrow">Alojamiento</p><h2 data-i18n="stayTitle">Tres maneras de quedarse.</h2></div>
+        <p data-i18n="stayIntro">EL CID es el hotel principal. AUMARA es otro producto, con casas y una identidad separada.</p>
+      </div>
+      <div class="room-flow">
+        <article class="room-panel room-wide" data-reveal>
+          <img src="https://drive.google.com/thumbnail?id=1Tcug1LE7FnA8ThqXeBWc60SQzO1fXSkB&sz=w1800" alt="Habitación doble de EL CID Country Club" loading="lazy">
+          <div class="room-copy"><p data-i18n="roomTerraceTag">Hotel</p><h3 data-i18n="roomTerraceTitle">Doble con terraza</h3><span data-i18n="roomTerraceText">Luz suave, salida al exterior y espacio para bajar el ritmo.</span></div>
+        </article>
+        <article class="room-panel room-tall" data-reveal>
+          <img src="https://drive.google.com/thumbnail?id=1SNf6UhH4IMEDrAPa7cKp59yQxlPTAVSI&sz=w1500" alt="Habitación amplia de EL CID Country Club" loading="lazy">
+          <div class="room-copy"><p data-i18n="roomTripleTag">Hotel</p><h3 data-i18n="roomTripleTitle">Habitación familiar</h3><span data-i18n="roomTripleText">Una opción más amplia para familias o pequeños grupos.</span></div>
+        </article>
+        <article class="room-panel room-tall" data-reveal>
+          <img src="https://drive.google.com/thumbnail?id=1K193G_S440Ic2-K9xeWHMNlRV2-UWHav&sz=w1500" alt="Terraza de EL CID Country Club" loading="lazy">
+          <div class="room-copy"><p data-i18n="roomStudioTag">Estancia independiente</p><h3 data-i18n="roomStudioTitle">Estudio con cocina</h3><span data-i18n="roomStudioText">Más autonomía para estancias que necesitan su propio ritmo.</span></div>
+        </article>
+      </div>
+      <div class="center-action" data-reveal><button class="text-link" type="button" data-open-booking><span data-i18n="viewRooms">Ver fechas y opciones</span><b>↗</b></button></div>
+    </div>
+  </section>
+
+  <section id="restaurant" class="restaurant">
+    <div class="restaurant-media" data-reveal><img src="https://drive.google.com/thumbnail?id=14Wj2g4z-E0cthrgCUpWDiZqZk1DxLd4d&sz=w1800" alt="Desayuno junto a la piscina de EL CID" loading="lazy"></div>
+    <div class="restaurant-copy" data-reveal>
+      <p class="eyebrow" data-i18n="restaurantEyebrow">Restaurante</p>
+      <h2 data-i18n="restaurantTitle">La mesa también forma parte del viaje.</h2>
+      <p data-i18n="restaurantText">Desayunos, comidas y cenas en un formato cercano, conectado con la terraza y el ritmo del hotel. Horarios y servicio se confirman con la reserva.</p>
+      <div class="restaurant-list"><span data-i18n="foodBreakfast">Desayuno continental</span><span data-i18n="foodLunch">Servicio de día</span><span data-i18n="foodDinner">Cenas y mesas privadas</span></div>
+      <a class="text-link light-link" href="mailto:reservas@elcidspain.com?subject=Restaurante%20EL%20CID"><span data-i18n="reserveTable">Consultar una mesa</span><b>↗</b></a>
+    </div>
+  </section>
+
+  <section id="place" class="place section-light">
+    <div class="wrap">
+      <div class="section-head" data-reveal><div><p class="eyebrow" data-i18n="placeEyebrow">El lugar</p><h2 data-i18n="placeTitle">Más exterior. Menos ruido.</h2></div><p data-i18n="placeText">Piscina, terrazas, tenis y rutas de Marina Alta. El día puede ser activo o no tener ningún plan.</p></div>
+      <div class="gallery-strip" aria-label="Galería EL CID">
+        <figure data-reveal><img src="https://drive.google.com/thumbnail?id=1WseSi-ges1Zsw9PpolGfIJChA3f9VelG&sz=w1800" alt="Fachada y piscina de EL CID" loading="lazy"><figcaption data-i18n="galleryPool">Piscina y edificio principal</figcaption></figure>
+        <figure data-reveal><img src="https://drive.google.com/thumbnail?id=1K193G_S440Ic2-K9xeWHMNlRV2-UWHav&sz=w1400" alt="Terraza de una habitación" loading="lazy"><figcaption data-i18n="galleryTerrace">Terrazas privadas</figcaption></figure>
+        <figure data-reveal><img src="https://drive.google.com/thumbnail?id=1BLwA1yccCoFYiRMEof3e1nOUVbzVcT7N&sz=w1400" alt="Detalle de habitación" loading="lazy"><figcaption data-i18n="galleryDetail">Detalles tranquilos</figcaption></figure>
+        <figure data-reveal><img src="https://drive.google.com/thumbnail?id=1ygdmXGP_Xkqd_k9bq3QhKJIS4LBPwifJ&sz=w1400" alt="Habitación de EL CID" loading="lazy"><figcaption data-i18n="galleryRoom">Habitaciones luminosas</figcaption></figure>
+      </div>
+      <div class="amenity-line" data-reveal><span data-i18n="placePool">Piscina exterior</span><i></i><span data-i18n="placeTerrace">Terrazas</span><i></i><span data-i18n="placeTennis">Tenis</span><i></i><span data-i18n="placeRoutes">Senderismo y ciclismo</span></div>
+    </div>
+  </section>
+
+  <section id="events" class="events">
+    <div class="wrap events-grid" data-reveal>
+      <div><p class="eyebrow" data-i18n="eventsEyebrow">Encuentros privados</p><h2 data-i18n="eventsTitle">Pequeños formatos. Todo cerca.</h2></div>
+      <div class="events-copy"><p data-i18n="eventsIntro">Alojamiento, comida y espacios exteriores en el mismo lugar para reuniones, celebraciones cuidadas y fines de semana compartidos.</p><a class="text-link light-link" href="mailto:reservas@elcidspain.com?subject=Encuentro%20privado%20EL%20CID"><span data-i18n="discussEvent">Hablar de una fecha</span><b>↗</b></a></div>
+    </div>
+  </section>
+
+  <section class="aumara-gateway">
+    <div class="wrap gateway-grid" data-reveal>
+      <div><p class="eyebrow">AUMARA</p><h2 data-i18n="aumaraTitle">Casas privadas. Otra experiencia.</h2><p data-i18n="aumaraText">AUMARA tiene su propio lenguaje, casas, recorrido y reserva. Está cerca, pero no es una categoría del hotel.</p><a class="text-link" href="/aumara/"><span data-i18n="exploreAumara">Entrar en AUMARA</span><b>↗</b></a></div>
+      <img src="https://drive.google.com/thumbnail?id=1wdC_rqzts2T_PRgF3fNWdCOm_7pn3oRO&sz=w1500" alt="Casas AUMARA" loading="lazy">
+    </div>
+  </section>
+
+  <section id="contact" class="contact section-light">
+    <div class="wrap contact-grid" data-reveal>
+      <div><p class="eyebrow" data-i18n="contactEyebrow">Reservas y contacto</p><h2 data-i18n="contactTitle">¿Qué fechas tienes en mente?</h2><p data-i18n="contactText">Consulta disponibilidad en Booking o escríbenos para una pregunta concreta sobre EL CID.</p><div class="buttons"><button class="button green" type="button" data-open-booking data-i18n="checkAvailability">Consultar fechas</button><a class="button outline" href="mailto:reservas@elcidspain.com">reservas@elcidspain.com</a></div></div>
+      <address><div><small data-i18n="phoneLabel">Teléfono</small><a href="tel:+34966579970">+34 966 579 970</a></div><div><small data-i18n="addressLabel">Dirección</small><a href="https://www.google.com/maps/search/?api=1&query=El+Cid+Country+Club+Benidoleig" rel="noopener">Carrer Rincón del Silencio, 3<br>03759 Benidoleig, Alicante</a></div></address>
+    </div>
+  </section>
 </main>
-<footer><div class="wrap footer-grid"><div class="brand footer-brand"><span class="official-logo footer-logo" role="img" aria-label="EL CID Country Club"></span></div><p>EL CID VENTURES BENIDOLEIG S.L. · CIF B53816989<br>Registro turístico publicado: CV H01453 A</p><nav><a href="legal.html" data-i18n="legal">Aviso legal</a><a href="privacy.html" data-i18n="privacy">Privacidad</a><a href="cookies.html" data-i18n="cookies">Cookies</a></nav></div></footer>
+
+<footer><div class="wrap footer-grid"><span class="official-logo footer-logo" aria-hidden="true"></span><p>EL CID VENTURES BENIDOLEIG S.L. · CIF B53816989<br>Registro turístico publicado: CV H01453 A</p><nav><a href="legal.html" data-i18n="legal">Aviso legal</a><a href="privacy.html" data-i18n="privacy">Privacidad</a><a href="cookies.html" data-i18n="cookies">Cookies</a></nav></div></footer>
+
+<button class="floating-book" type="button" data-open-booking><span data-i18n="bookStay">Reservar estancia</span><b>↗</b></button>
+<div id="bookingNudge" class="booking-nudge" hidden><button type="button" aria-label="Cerrar">×</button><p data-i18n="nudgeText">¿Buscas fechas?</p><button class="nudge-action" type="button" data-open-booking data-i18n="nudgeAction">Abrir opciones</button></div>
+<div id="bookingBackdrop" class="booking-backdrop" hidden></div>
+<aside id="bookingDrawer" class="booking-drawer" aria-hidden="true" aria-labelledby="bookingTitle">
+  <button id="closeBooking" class="drawer-close" type="button" aria-label="Cerrar">×</button>
+  <p class="eyebrow">EL CID COUNTRY CLUB</p>
+  <h2 id="bookingTitle" data-i18n="drawerTitle">Elige cómo continuar.</h2>
+  <p data-i18n="drawerText">Consulta disponibilidad en Booking.com o escríbenos por WhatsApp para una pregunta antes de reservar.</p>
+  <a class="drawer-option booking-option" href="https://www.booking.com/hotel/es/el-cid-country-club.html" target="_blank" rel="noopener"><span><small>BOOKING.COM</small><strong data-i18n="drawerBooking">Ver precios y disponibilidad</strong></span><b>↗</b></a>
+  <a id="whatsappBooking" class="drawer-option whatsapp-option" href="#" target="_blank" rel="noopener"><span><small>WHATSAPP</small><strong data-i18n="drawerWhatsapp">Preguntar antes de reservar</strong></span><b>↗</b></a>
+  <small class="drawer-note" data-i18n="drawerNote">Review: el número de WhatsApp se validará antes de publicar.</small>
+</aside>
 <script src="site.js" defer></script>
 </body>
 </html>

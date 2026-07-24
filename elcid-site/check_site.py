@@ -56,6 +56,10 @@ if "official-logo" not in html or "official-logo" not in css:
     fail("official EL CID logo missing")
 if "Wabi-Sabi" in html or "Wabi-Sabi" in js or "Wabi‑Sabi" in html or "Wabi‑Sabi" in js:
     fail("retired restaurant working name remains")
+if "reservas@elcidspain.com" in html or "reservas@elcidspain.com" in js:
+    fail("broken domain mailbox remains in guest-facing review page")
+if "elcidspain@gmail.com" not in html:
+    fail("operational email fallback missing")
 
 for required in ("stay", "restaurant", "place", "events", "contact"):
     if required not in p.ids:
@@ -80,10 +84,20 @@ if any("beds24" in x.lower() for x in p.links):
     fail("unverified EL CID Beds24 CTA present")
 if "wa.me/" not in js:
     fail("WhatsApp review CTA missing")
-if "34690380231" not in js:
-    fail("review WhatsApp candidate is not explicit")
+if "34622914323" not in js or "34622914323" not in html:
+    fail("verified review WhatsApp number is not explicit")
 if "data-open-booking" not in html or "booking-drawer" not in css:
     fail("booking drawer trigger or styling missing")
+
+studio_assets = (
+    "1sNBC9u1rsO0CiOksJ93RqkzWeZF7tLBF",
+    "1G3pNSIQbQR8oLtgpyC9qXkXxAHG7V-AH",
+    "1fZjB7E5wNfaurAu0AWlfaHjuEx6BuKVn",
+    "1MjonXzcIpvqPn4jNnyPjYUBiPFj8it_o",
+)
+for asset_id in studio_assets:
+    if asset_id not in html:
+        fail(f"verified studio asset missing: {asset_id}")
 
 keys = set(re.findall(r'data-i18n="([^"]+)"', html))
 for key in keys:
@@ -112,6 +126,8 @@ print(
     f"scripts={len(p.scripts)} styles={len(p.styles)}"
 )
 print("external_hosts=" + ",".join(hosts))
-print("conversion=booking drawer + Booking.com + WhatsApp review CTA")
+print("conversion=booking drawer + Booking.com + verified WhatsApp")
+print("studio=verified kitchen + living area + bedroom + bathroom")
+print("email=operational Gmail fallback; broken domain mailbox excluded")
 print("routes=/->EL CID, /aumara/->AUMARA")
 print("EL CID v2 static site checks: PASS")

@@ -42,21 +42,27 @@ def fail(msg):
 
 html = (ROOT / "index.html").read_text(encoding="utf-8")
 css = (ROOT / "styles.css").read_text(encoding="utf-8")
+js = (ROOT / "site.js").read_text(encoding="utf-8")
 p = Audit()
 p.feed(html)
 
 if "AUMARA_Explore" in html or "08_AUMARA_Domes" in html:
-    fail("AUMARA image assets leaked into EL CID page")
+    fail("AUMARA primary image assets leaked into EL CID page")
 if "noindex,nofollow" not in html:
     fail("review page must remain noindex")
 if "cf.bstatic.com" in html or "cf.bstatic.com" in css:
     fail("Booking CDN image hotlink remains")
 if "official-logo" not in html or "official-logo" not in css:
     fail("official EL CID logo missing")
+if "Wabi-Sabi" in html or "Wabi-Sabi" in js or "Wabi‑Sabi" in html or "Wabi‑Sabi" in js:
+    fail("retired restaurant working name remains")
 
-for required in ("stay", "food", "place", "events", "contact"):
+for required in ("stay", "restaurant", "place", "events", "contact"):
     if required not in p.ids:
         fail(f"missing section #{required}")
+for required in ("bookingDrawer", "bookingBackdrop", "bookingNudge", "whatsappBooking"):
+    if required not in p.ids:
+        fail(f"missing conversion element #{required}")
 
 for path in p.links + p.scripts + p.styles:
     if path.startswith(("http://", "https://", "mailto:", "tel:", "#", "/")):
@@ -65,15 +71,20 @@ for path in p.links + p.scripts + p.styles:
         fail(f"missing local target {path}")
 
 for href in p.links:
-    if href.startswith("#") and href[1:] not in p.ids:
+    if href.startswith("#") and href != "#" and href[1:] not in p.ids:
         fail(f"broken anchor {href}")
 
 if not any("booking.com/hotel/es/el-cid-country-club" in x for x in p.links):
     fail("missing EL CID Booking CTA")
 if any("beds24" in x.lower() for x in p.links):
-    fail("unverified Beds24 CTA present")
+    fail("unverified EL CID Beds24 CTA present")
+if "wa.me/" not in js:
+    fail("WhatsApp review CTA missing")
+if "34690380231" not in js:
+    fail("review WhatsApp candidate is not explicit")
+if "data-open-booking" not in html or "booking-drawer" not in css:
+    fail("booking drawer trigger or styling missing")
 
-js = (ROOT / "site.js").read_text(encoding="utf-8")
 keys = set(re.findall(r'data-i18n="([^"]+)"', html))
 for key in keys:
     if not re.search(rf"\b{re.escape(key)}\s*:", js):
@@ -101,5 +112,6 @@ print(
     f"scripts={len(p.scripts)} styles={len(p.styles)}"
 )
 print("external_hosts=" + ",".join(hosts))
+print("conversion=booking drawer + Booking.com + WhatsApp review CTA")
 print("routes=/->EL CID, /aumara/->AUMARA")
-print("EL CID static site checks: PASS")
+print("EL CID v2 static site checks: PASS")

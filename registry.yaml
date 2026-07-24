@@ -32,6 +32,22 @@
     - structured-outputs
   description: Build a production-style reference pipeline that turns recorded audio into speaker-labeled transcripts, summaries, decisions, risks, and follow-up actions.
 
+- title: Build an Evidence-Grounded AML Investigation Agent on Amazon Bedrock
+  path: examples/partners/AWS/evidence_grounded_aml_agent_with_bedrock.ipynb
+  slug: evidence-grounded-aml-agent-amazon-bedrock
+  description: Build a bounded AML investigation assistant with the OpenAI Agents SDK, GPT-5.6 Sol on Amazon Bedrock, read-only evidence tools, structured outputs, and behavioral evals.
+  date: 2026-07-23
+  authors:
+    - deepakjain108
+  tags:
+    - partners
+    - agents-sdk
+    - agents
+    - evals
+    - structured-outputs
+    - bedrock
+    - security
+
 - title: Trigger a Workspace Agent from the API
   path: examples/chatgpt/workspace_agents/workspace-agents-api-trigger.ipynb
   slug: workspace-agents-api-trigger

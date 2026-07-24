@@ -1,5 +1,33 @@
 {
+  "$schema": "https://openapi.vercel.sh/vercel.json",
+  "framework": null,
+  "outputDirectory": ".",
+  "trailingSlash": true,
   "rewrites": [
+    {
+      "source": "/",
+      "destination": "/elcid-site/index.html"
+    },
+    {
+      "source": "/styles.css",
+      "destination": "/elcid-site/styles.css"
+    },
+    {
+      "source": "/site.js",
+      "destination": "/elcid-site/site.js"
+    },
+    {
+      "source": "/legal.html",
+      "destination": "/elcid-site/legal.html"
+    },
+    {
+      "source": "/privacy.html",
+      "destination": "/elcid-site/privacy.html"
+    },
+    {
+      "source": "/cookies.html",
+      "destination": "/elcid-site/cookies.html"
+    },
     {
       "source": "/aumara",
       "destination": "/aumara-site/direct-v2.html"

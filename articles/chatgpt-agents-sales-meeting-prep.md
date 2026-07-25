@@ -97,7 +97,7 @@ Skills package instructions, resources, and scripts to help our agent reliably c
   <img src="https://cdn.openai.com/cookbook/chatgpt-agents-sales-meeting-prep/img5.png" alt="Creating a skill for our agent" width="336" />
 </p>
 
-Our assistant will read the meeting template we've provided, and help us create a customized skill that matches the output format we want. In order to polish our skill, we can either click into the skill and edit it directly within the agent builder, and we can upload additional files that the agent can use when it decides to use the skill.
+Our assistant will read the meeting template and help us create a custom skill that matches the output format we want. To refine the skill, edit it directly in the agent builder or upload files it can use.
 
 <p align="center">
   <img src="https://cdn.openai.com/cookbook/chatgpt-agents-sales-meeting-prep/img6.png" alt="Editing a skill for our agent" width="60%" />

@@ -1,0 +1,43 @@
+{
+  "schema_version": "1.0",
+  "policy_version": "2026.07.27.1",
+  "property": "shared",
+  "policies": [
+    {
+      "policy_id": "shared.product-boundary",
+      "property": "shared",
+      "category": "routing",
+      "rule": "Resolve the guest product before policy selection and fail closed when it cannot be resolved.",
+      "source": "approved_internal_document",
+      "source_reference": "REQUEST:PRODUCT_BOUNDARY:2026-07-27",
+      "verified_at": "2026-07-27",
+      "status": "verified",
+      "allowed_auto_reply": false,
+      "allowed_beds24_action": [],
+      "escalation_conditions": [
+        "property_unresolved",
+        "property_conflict"
+      ],
+      "response_template_ids": [],
+      "policy_version": "2026.07.27.1"
+    },
+    {
+      "policy_id": "shared.private-values-boundary",
+      "property": "shared",
+      "category": "data_governance",
+      "rule": "Keep private operational values outside this registry and resolve them from approved sources at runtime.",
+      "source": "approved_internal_document",
+      "source_reference": "REQUEST:POLICY_REGISTRY_SCOPE:2026-07-27",
+      "verified_at": "2026-07-27",
+      "status": "verified",
+      "allowed_auto_reply": false,
+      "allowed_beds24_action": [],
+      "escalation_conditions": [
+        "private_value_present",
+        "source_reference_missing"
+      ],
+      "response_template_ids": [],
+      "policy_version": "2026.07.27.1"
+    }
+  ]
+}

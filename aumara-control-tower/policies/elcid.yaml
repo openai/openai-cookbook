@@ -1,0 +1,43 @@
+{
+  "schema_version": "1.0",
+  "policy_version": "2026.07.27.1",
+  "property": "elcid",
+  "policies": [
+    {
+      "policy_id": "elcid.property-configuration-placeholder",
+      "property": "elcid",
+      "category": "property_configuration",
+      "rule": "Resolve EL CID property facts and operational policy values from the approved source before use.",
+      "source": "verified_beds24_configuration",
+      "source_reference": "BEDS24:ELCID:PROPERTY_CONFIGURATION:PENDING",
+      "verified_at": null,
+      "status": "pending",
+      "allowed_auto_reply": false,
+      "allowed_beds24_action": [],
+      "escalation_conditions": [
+        "source_not_verified",
+        "value_conflict"
+      ],
+      "response_template_ids": [],
+      "policy_version": "2026.07.27.1"
+    },
+    {
+      "policy_id": "elcid.guest-template-placeholder",
+      "property": "elcid",
+      "category": "guest_templates",
+      "rule": "Use only EL CID-approved guest templates after their source reference is verified.",
+      "source": "approved_internal_document",
+      "source_reference": "INTERNAL_DOC:ELCID:GUEST_TEMPLATES:PENDING",
+      "verified_at": null,
+      "status": "pending",
+      "allowed_auto_reply": false,
+      "allowed_beds24_action": [],
+      "escalation_conditions": [
+        "template_not_verified",
+        "cross_property_template"
+      ],
+      "response_template_ids": [],
+      "policy_version": "2026.07.27.1"
+    }
+  ]
+}

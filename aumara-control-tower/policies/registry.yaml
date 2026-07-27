@@ -1,0 +1,17 @@
+{
+  "schema_version": "1.0",
+  "policy_version": "2026.07.27.1",
+  "schema_file": "schema.json",
+  "registries": {
+    "shared": "shared.yaml",
+    "elcid": "elcid.yaml",
+    "aumara": "aumara.yaml"
+  },
+  "source_precedence": [
+    "verified_beds24_configuration",
+    "verified_booking_com_configuration",
+    "official_property_documentation",
+    "approved_internal_document",
+    "confirmed_guest_reply"
+  ]
+}

@@ -1,0 +1,36 @@
+name: Policy registry
+
+on:
+  pull_request:
+    paths:
+      - "aumara-control-tower/policies/**"
+      - "aumara-control-tower/scripts/validate_policy_registry.py"
+      - "aumara-control-tower/tests/test_policy_registry_schema.py"
+      - ".github/workflows/policy-registry.yml"
+  push:
+    branches:
+      - main
+    paths:
+      - "aumara-control-tower/policies/**"
+      - "aumara-control-tower/scripts/validate_policy_registry.py"
+      - "aumara-control-tower/tests/test_policy_registry_schema.py"
+      - ".github/workflows/policy-registry.yml"
+
+permissions:
+  contents: read
+
+jobs:
+  validate:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+      - name: Validate registry schema
+        run: python aumara-control-tower/scripts/validate_policy_registry.py
+      - name: Run focused tests
+        run: >-
+          python -m unittest discover
+          -s aumara-control-tower/tests
+          -p 'test_policy_registry_schema.py'

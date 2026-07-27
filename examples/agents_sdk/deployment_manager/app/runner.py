@@ -35,12 +35,18 @@ def _is_running(pid: int | None, deployment_id: str) -> bool:
         os.kill(pid, 0)
     except OSError:
         return False
-    try:
-        environ = Path(f"/proc/{pid}/environ").read_bytes().split(b"\0")
-    except OSError:
-        return False
     marker = f"AGENTS_SDK_DEPLOYMENT_ID={deployment_id}".encode()
-    return marker in environ
+    environ_path = Path(f"/proc/{pid}/environ")
+    for attempt in range(5):
+        try:
+            environ = environ_path.read_bytes().split(b"\0")
+        except OSError:
+            return False
+        if marker in environ:
+            return True
+        if attempt < 4:
+            time.sleep(0.01)
+    return False
 
 
 def _port_is_open(port: int) -> bool:

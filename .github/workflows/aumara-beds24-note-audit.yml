@@ -1,0 +1,38 @@
+name: AUMARA Beds24 guest-note safety
+
+on:
+  workflow_dispatch:
+  pull_request:
+    paths:
+      - '.github/workflows/aumara-beds24-note-audit.yml'
+      - 'aumara-control-tower/scripts/beds24_guest_note_sync.py'
+      - 'aumara-control-tower/scripts/guest_request_dry_run.py'
+      - 'aumara-control-tower/tests/test_beds24_guest_note_sync.py'
+      - 'aumara-control-tower/tests/test_guest_request_dry_run.py'
+  push:
+    branches: [main]
+    paths:
+      - '.github/workflows/aumara-beds24-note-audit.yml'
+      - 'aumara-control-tower/scripts/beds24_guest_note_sync.py'
+      - 'aumara-control-tower/scripts/guest_request_dry_run.py'
+      - 'aumara-control-tower/tests/test_beds24_guest_note_sync.py'
+      - 'aumara-control-tower/tests/test_guest_request_dry_run.py'
+
+permissions:
+  contents: read
+
+concurrency:
+  group: aumara-beds24-note-audit
+  cancel-in-progress: true
+
+jobs:
+  test:
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    steps:
+      - uses: actions/checkout@v4
+      - name: Test note planner without credentials or network
+        run: |
+          python -m unittest \
+            aumara-control-tower/tests/test_beds24_guest_note_sync.py \
+            aumara-control-tower/tests/test_guest_request_dry_run.py

@@ -46,6 +46,37 @@ send a second copy during Resend's retention window.
 The generic Beds24 auto-reply workflow is audit-only. Gmail is the sole current
 live guest-reply path, preventing duplicate replies.
 
+## Beds24 guest-note audit
+
+`scripts/beds24_guest_note_sync.py` reads recent guest-side Beds24 messages,
+classifies approved operational requests, resolves the existing booking with
+`includeInfoItems=true`, and proposes a single `GUESTREQUEST` info item per
+booking/request type. CI uses synthetic data only, receives no Beds24
+credentials, makes no network call, and uploads no guest-data artifact. A
+runtime that processes private Beds24 data is deliberately not scheduled until
+that destination is explicitly approved.
+
+The future write payload is deliberately limited to:
+
+```json
+[
+  {
+    "id": 1234567,
+    "infoItems": [
+      {
+        "code": "GUESTREQUEST",
+        "text": "[AUMARA:BED_REQUEST:...] BED REQUEST — ..."
+      }
+    ]
+  }
+]
+```
+
+Live note mode is not scheduled. It requires the booking-mutation kill switch
+to be off, `AUMARA_LIVE_BOOKING_WRITES_CONFIRMED=true`, the exact
+`AUMARA_BEDS24_NOTE_WRITE_CONFIRMATION=INFOITEMS_ONLY_PROPERTY_324903`, and an
+explicit validated info code. It contains no guest-message send path.
+
 ## Guest-request dry run
 
 The first automation stage creates reviewable reply and booking-note proposals

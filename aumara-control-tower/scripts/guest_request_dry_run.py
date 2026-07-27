@@ -77,6 +77,50 @@ EVENT_PATTERNS: tuple[tuple[str, tuple[str, ...]], ...] = (
         ),
     ),
     (
+        "parking_request",
+        (
+            "parking",
+            "car park",
+            "aparcamiento",
+            "estacionamiento",
+            "парков",
+        ),
+    ),
+    (
+        "late_checkout",
+        (
+            "late check-out",
+            "late checkout",
+            "check out late",
+            "salida tardía",
+            "salida tarde",
+            "поздний выезд",
+        ),
+    ),
+    (
+        "early_checkin",
+        (
+            "early check-in",
+            "early check in",
+            "check in early",
+            "arrive early",
+            "llegada anticipada",
+            "entrada temprana",
+            "ранний заезд",
+        ),
+    ),
+    (
+        "late_checkin",
+        (
+            "late check-in",
+            "late check in",
+            "arrive late",
+            "late arrival",
+            "llegada tardía",
+            "поздний заезд",
+        ),
+    ),
+    (
         "pricing_or_availability",
         (
             "what price",
@@ -95,6 +139,10 @@ SUPPORTED_AUTO_PROPOSALS = {
     "bed_request",
     "cot_request",
     "pet_request",
+    "parking_request",
+    "early_checkin",
+    "late_checkin",
+    "late_checkout",
     "cancellation",
 }
 
@@ -156,6 +204,10 @@ def classify_event(event: dict[str, Any]) -> str:
         "cancellation",
         "pricing_or_availability",
         "booking_notification",
+        "parking_request",
+        "early_checkin",
+        "late_checkin",
+        "late_checkout",
     }:
         return explicit
 
@@ -280,6 +332,29 @@ def cancellation_reply(language: str, name: str) -> str:
     )
 
 
+def operational_request_reply(
+    language: str,
+    name: str,
+    request_name_en: str,
+    request_name_es: str,
+) -> str:
+    if language == "es":
+        return (
+            f"Hola {name}:\n\n"
+            f"Hemos registrado su solicitud de {request_name_es}. "
+            "La confirmación depende de la disponibilidad operativa. "
+            "Por favor, confírmelo también en recepción.\n\n"
+            f"Un cordial saludo,\n{signature()}"
+        )
+    return (
+        f"Hello {name},\n\n"
+        f"We have recorded your {request_name_en} request. Final confirmation "
+        "depends on operational availability. Please also confirm it at "
+        "reception.\n\n"
+        f"Kind regards,\n{signature()}"
+    )
+
+
 def proposed_reply(event_type: str, language: str, name: str) -> str | None:
     if event_type == "bed_request":
         return bed_reply(language, name)
@@ -289,6 +364,15 @@ def proposed_reply(event_type: str, language: str, name: str) -> str | None:
         return pet_reply(language, name)
     if event_type == "cancellation":
         return cancellation_reply(language, name)
+    operational = {
+        "parking_request": ("parking", "aparcamiento"),
+        "early_checkin": ("early check-in", "entrada anticipada"),
+        "late_checkin": ("late check-in", "llegada tardía"),
+        "late_checkout": ("late check-out", "salida tardía"),
+    }
+    if event_type in operational:
+        english, spanish = operational[event_type]
+        return operational_request_reply(language, name, english, spanish)
     return None
 
 
@@ -303,6 +387,19 @@ def proposed_booking_note(event_type: str) -> str | None:
         ),
         "pet_request": (
             "PET REQUEST — small/medium pet, €35 fee; pending property validation."
+        ),
+        "parking_request": (
+            "PARKING REQUEST — confirm a parking space at reception; "
+            "subject to availability."
+        ),
+        "early_checkin": (
+            "EARLY CHECK-IN REQUEST — confirm operational availability before arrival."
+        ),
+        "late_checkin": (
+            "LATE CHECK-IN REQUEST — coordinate arrival time with reception."
+        ),
+        "late_checkout": (
+            "LATE CHECK-OUT REQUEST — confirm operational availability at reception."
         ),
     }
     return notes.get(event_type)

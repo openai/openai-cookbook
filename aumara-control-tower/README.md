@@ -1,6 +1,8 @@
 # AUMARA Control Tower
 
-Working transactional email/webhook service for AUMARA El Cid.
+Staged transactional email/webhook service for AUMARA El Cid. It starts in
+`off`, supports a zero-send `audit` stage, and requires a separately confirmed
+`live` cutover.
 
 ## Run locally
 
@@ -8,8 +10,7 @@ Working transactional email/webhook service for AUMARA El Cid.
 cd aumara-control-tower
 cp .env.example .env
 npm install
-npm run health
-npm run test:email
+npm test
 npm start
 ```
 
@@ -17,30 +18,33 @@ npm start
 
 ### GET /health
 
-Returns service status.
+Returns the operating mode and safety status without exposing sender addresses,
+tokens, booking references, or guest data.
 
 ### POST /send
 
-Generic send endpoint. Auth: `Authorization: Bearer $AUMARA_WEBHOOK_TOKEN`.
-
-```bash
-curl -X POST http://localhost:8787/send \
-  -H "content-type: application/json" \
-  -H "authorization: Bearer change-this-token" \
-  -d '{
-    "to":"elcidspain@gmail.com",
-    "guestName":"Test Guest",
-    "property":"AUMARA El Cid",
-    "checkIn":"2026-07-10",
-    "checkOut":"2026-07-12",
-    "accessCode":"123456",
-    "bookingRef":"TEST-001"
-  }'
-```
+Retired. It always returns HTTP 410 so arbitrary recipients, subjects, and HTML
+cannot bypass the event policy.
 
 ### POST /webhooks/beds24
 
-Beds24-style webhook receiver. It accepts flexible fields: `email`, `guestEmail`, `guest_email`, `mail`, `guestName`, `property`, `checkIn`, `checkOut`, `accessCode`, `pin`, `code`, `bookingRef`.
+Beds24-style webhook receiver. Every non-off request requires
+`Authorization: Bearer $AUMARA_WEBHOOK_TOKEN`. The only candidate event types
+are `access_ready` and `pre_arrival_access`; they also require a recipient,
+booking reference, and access code.
+
+- `off`: HTTP 503; no processing.
+- `audit`: redacted decision and TTL deduplication; mail transport is not loaded.
+- `live`: additionally requires `AUMARA_LIVE_SEND_CONFIRMED=true`, a verified
+  non-Resend-onboarding sender, a Resend key, and
+  `AUMARA_ALLOW_ACCESS_CODES=true`.
+
+Every candidate has a deterministic key. It is checked in-process and also sent
+to Resend as an idempotency key, so concurrent/retried provider requests cannot
+send a second copy during Resend's retention window.
+
+The generic Beds24 auto-reply workflow is audit-only. Gmail is the sole current
+live guest-reply path, preventing duplicate replies.
 
 ## Guest-request dry run
 
@@ -73,17 +77,21 @@ email, or booking action occurred.
 - Provider: Resend
 - Reply-to: `elcidspain@gmail.com`
 - Test recipient: `elcidspain@gmail.com`
-- Temporary sender: `AUMARA El Cid <onboarding@resend.dev>` until the domain sender is verified.
+- The Resend onboarding sender is forbidden in live mode.
 
 ## Production next step
 
-Deploy this folder as a Node service, set environment variables, then connect Beds24 action/webhook to:
+Before deployment, provision a durable external idempotency store. The in-memory
+store is sufficient for local and single-instance audit validation but is not a
+production cutover dependency.
+
+After that dependency is reviewed, deploy this folder in `audit`, set
+environment variables, then connect the Beds24 webhook to:
 
 ```text
 POST https://YOUR-SERVICE/webhooks/beds24
 Authorization: Bearer AUMARA_WEBHOOK_TOKEN
 ```
 
-The guest-request classifier is not yet authorized for production sends or
-booking mutations. Live execution requires a separate reviewed change and
-explicit approval.
+No booking mutation exists in this service. Live email execution requires a
+separate reviewed configuration change and explicit approval.

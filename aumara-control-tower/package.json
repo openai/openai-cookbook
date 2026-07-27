@@ -3,13 +3,16 @@
   "version": "0.1.0",
   "private": true,
   "type": "module",
+  "engines": {
+    "node": ">=22"
+  },
   "scripts": {
-    "start": "node src/server.mjs",
-    "health": "node src/healthcheck.mjs",
-    "test:email": "node src/send-test-email.mjs"
+    "start": "node --env-file-if-exists=.env src/server.mjs",
+    "health": "node --env-file-if-exists=.env src/healthcheck.mjs",
+    "test": "node --test src/*.test.mjs",
+    "test:email": "node --env-file-if-exists=.env src/send-test-email.mjs"
   },
   "dependencies": {
-    "@resend/node": "latest",
-    "dotenv": "latest"
+    "@resend/node": "latest"
   }
 }

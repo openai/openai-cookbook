@@ -1,13 +1,7 @@
-name: Beds24 El Cid auto replies (manual API fallback)
+name: Beds24 El Cid reply audit (manual, no send)
 
 on:
   workflow_dispatch:
-    inputs:
-      execute:
-        description: Send replies instead of dry-run
-        required: true
-        type: boolean
-        default: false
 
 permissions:
   contents: read
@@ -32,15 +26,8 @@ jobs:
         run: python -m unittest aumara-control-tower/scripts/tests/test_beds24_elcid_auto_replies.py
 
       - name: Plan replies without sending
-        if: ${{ !inputs.execute }}
         env:
           BEDS24_AUTO_REPLY_EXECUTE: '0'
-        run: python aumara-control-tower/scripts/beds24_elcid_auto_replies.py
-
-      - name: Send idempotent replies
-        if: ${{ inputs.execute }}
-        env:
-          BEDS24_AUTO_REPLY_EXECUTE: '1'
         run: python aumara-control-tower/scripts/beds24_elcid_auto_replies.py
 
       - name: Upload sanitized result

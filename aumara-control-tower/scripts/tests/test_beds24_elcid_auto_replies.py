@@ -42,8 +42,7 @@ class AutoReplyTests(unittest.TestCase):
         )
 
     @mock.patch.object(MODULE, "fetch_messages", return_value=[])
-    @mock.patch.object(MODULE, "send_message")
-    def test_dry_run_never_sends(self, send_message, _fetch_messages):
+    def test_dry_run_only_proposes(self, _fetch_messages):
         booking = {
             "id": 89955894,
             "propertyId": 324903,
@@ -56,13 +55,9 @@ class AutoReplyTests(unittest.TestCase):
         )
         self.assertEqual(result["wouldSend"], 1)
         self.assertEqual(result["sent"], 0)
-        send_message.assert_not_called()
 
     @mock.patch.object(MODULE, "fetch_messages", return_value=[])
-    @mock.patch.object(MODULE, "send_message")
-    def test_execute_sends_one_reviewed_message(
-        self, send_message, _fetch_messages
-    ):
+    def test_execute_is_structurally_refused(self, _fetch_messages):
         booking = {
             "id": 89952542,
             "propertyId": 324903,
@@ -70,11 +65,13 @@ class AutoReplyTests(unittest.TestCase):
             "channel": "booking",
             "status": "confirmed",
         }
-        result = MODULE.run(
-            [booking], token="token", api_base="https://example.test", execute=True
-        )
-        self.assertEqual(result["sent"], 1)
-        send_message.assert_called_once()
+        with self.assertRaisesRegex(MODULE.AuditError, "Live Beds24 replies are retired"):
+            MODULE.run(
+                [booking],
+                token="token",
+                api_base="https://example.test",
+                execute=True,
+            )
 
 
 if __name__ == "__main__":

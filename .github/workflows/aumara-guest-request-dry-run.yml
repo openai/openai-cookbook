@@ -1,0 +1,75 @@
+name: AUMARA guest request dry run
+
+on:
+  workflow_dispatch:
+  pull_request:
+    branches: [main]
+    paths:
+      - ".github/workflows/aumara-guest-request-dry-run.yml"
+      - "aumara-control-tower/scripts/guest_request_dry_run.py"
+      - "aumara-control-tower/tests/test_guest_request_dry_run.py"
+      - "aumara-control-tower/fixtures/guest-request-dry-run.json"
+
+permissions:
+  contents: read
+
+concurrency:
+  group: aumara-guest-request-dry-run-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  dry-run:
+    runs-on: ubuntu-latest
+    env:
+      AUMARA_DRY_RUN: "true"
+      AUMARA_DISABLE_EMAIL_SEND: "true"
+      AUMARA_DISABLE_BOOKING_MUTATIONS: "true"
+
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Run unit tests
+        run: |
+          python -m unittest discover \
+            -s aumara-control-tower/tests \
+            -p "test_guest_request_dry_run.py" \
+            -v
+
+      - name: Build dry-run proposals
+        run: |
+          mkdir -p /tmp/aumara-guest-request-dry-run
+          python aumara-control-tower/scripts/guest_request_dry_run.py \
+            --input aumara-control-tower/fixtures/guest-request-dry-run.json \
+            --output /tmp/aumara-guest-request-dry-run/report.json \
+            --csv /tmp/aumara-guest-request-dry-run/audit.csv
+
+      - name: Verify zero external actions
+        run: |
+          python - <<'PY'
+          import json
+          import pathlib
+
+          report = json.loads(
+              pathlib.Path(
+                  "/tmp/aumara-guest-request-dry-run/report.json"
+              ).read_text(encoding="utf-8")
+          )
+          assert report["mode"] == "dry-run"
+          assert report["summary"]["emails_sent"] == 0
+          assert report["summary"]["booking_mutations"] == 0
+          assert report["safety"]["external_network_calls"] == 0
+          assert all(
+              event["email_send_requested"] is False
+              and event["booking_mutation_requested"] is False
+              for event in report["events"]
+          )
+          PY
+
+      - name: Upload dry-run audit
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: aumara-guest-request-dry-run
+          path: /tmp/aumara-guest-request-dry-run/
+          if-no-files-found: error
+          retention-days: 7

@@ -1,106 +1,59 @@
-name: Beds24 AUMARA booking bridge v2
+name: Beds24 AUMARA legacy bridge safety check
 
 on:
   workflow_dispatch:
-  push:
+  pull_request:
     branches: [main]
     paths:
-      - 'aumara-control-tower/beds24-requests/AUMARA-MEDINA-20260718-660.json'
+      - ".github/workflows/beds24-aumara-booking-v2.yml"
+      - "aumara-control-tower/scripts/beds24_finalize_paid_booking.py"
 
 permissions:
-  contents: write
+  contents: read
 
 concurrency:
-  group: beds24-aumara-booking-v2
+  group: beds24-aumara-legacy-safety-${{ github.ref }}
   cancel-in-progress: true
 
 jobs:
-  execute:
+  dry-run:
     runs-on: ubuntu-latest
     env:
-      BEDS24_BOOTSTRAP_CREDENTIAL: ${{ secrets.BEDS24_TOKEN_CREDENTIAL }}
-      BEDS24_FALLBACK_CREDENTIAL: ${{ secrets.BEDS24_BOOTSTRAP_CREDENTIAL }}
+      AUMARA_DRY_RUN: "true"
+      AUMARA_DISABLE_EMAIL_SEND: "true"
+      AUMARA_DISABLE_BOOKING_MUTATIONS: "true"
 
     steps:
       - uses: actions/checkout@v4
-        with:
-          fetch-depth: 0
 
-      - name: Record credential shape without exposing secrets
-        shell: bash
+      - name: Run hard-disabled legacy bridge
         run: |
-          set -euo pipefail
-          mkdir -p aumara-control-tower/evidence aumara-control-tower/vault
+          python aumara-control-tower/scripts/beds24_finalize_paid_booking.py \
+            --output /tmp/aumara-legacy-evidence/beds24-finalize-status.json
+
+      - name: Verify zero-action evidence
+        run: |
           python - <<'PY'
-          import json, os, unicodedata, pathlib
-          def shape(value):
-              raw = value or ''
-              trimmed = raw.strip().strip('"').strip("'")
-              clean = ''.join(ch for ch in trimmed if not ch.isspace() and unicodedata.category(ch) not in {'Cc','Cf'})
-              return {
-                  'present': bool(clean),
-                  'raw_length': len(raw),
-                  'normalized_length': len(clean),
-                  'removed_characters': len(raw) - len(clean),
-                  'had_control_or_format_characters': any(unicodedata.category(ch) in {'Cc','Cf'} for ch in raw),
-                  'had_whitespace': any(ch.isspace() for ch in raw),
-              }
-          evidence = {
-              'token_secret': shape(os.environ.get('BEDS24_BOOTSTRAP_CREDENTIAL')),
-              'bootstrap_fallback_secret': shape(os.environ.get('BEDS24_FALLBACK_CREDENTIAL')),
-              'plaintext_secret_committed': False,
-          }
-          pathlib.Path('aumara-control-tower/evidence/beds24-credential-shape.json').write_text(json.dumps(evidence, indent=2))
+          import json
+          import pathlib
+
+          path = pathlib.Path(
+              "/tmp/aumara-legacy-evidence/beds24-finalize-status.json"
+          )
+          evidence = json.loads(path.read_text(encoding="utf-8"))
+          assert evidence["status"] == "DISABLED_REDUNDANT_V2_BRIDGE"
+          assert evidence["dry_run"] is True
+          assert evidence["email_send_disabled"] is True
+          assert evidence["booking_mutations_disabled"] is True
+          assert evidence["external_network_calls"] == 0
+          assert evidence["live_booking_mutations"] is False
           PY
 
-      - name: Finalize and verify paid AUMARA booking
-        id: execute
-        continue-on-error: true
-        shell: bash
-        run: |
-          set +e
-          sed -i 's#https://beds24.com/api/v2#https://api.beds24.com/v2#' aumara-control-tower/scripts/beds24_finalize_paid_booking.py
-          python aumara-control-tower/scripts/beds24_finalize_paid_booking.py > aumara-control-tower/evidence/beds24-execution-log.txt 2>&1
-          RC=$?
-          cat aumara-control-tower/evidence/beds24-execution-log.txt
-          exit "$RC"
-
-      - name: Upload Beds24 evidence artifact
+      - name: Upload safety evidence
         if: always()
         uses: actions/upload-artifact@v4
         with:
-          name: beds24-aumara-medina-evidence
-          path: |
-            aumara-control-tower/evidence/
-            aumara-control-tower/vault/beds24-refresh-token.enc
-          if-no-files-found: warn
-          retention-days: 30
-
-      - name: Commit auth, booking evidence and encrypted vault safely
-        if: always()
-        shell: bash
-        run: |
-          set -euo pipefail
-          rm -rf /tmp/beds24-state
-          mkdir -p /tmp/beds24-state/evidence /tmp/beds24-state/vault
-          cp -a aumara-control-tower/evidence/. /tmp/beds24-state/evidence/ 2>/dev/null || true
-          cp aumara-control-tower/vault/beds24-refresh-token.enc /tmp/beds24-state/vault/ 2>/dev/null || true
-          git fetch origin main
-          git reset --hard origin/main
-          mkdir -p aumara-control-tower/evidence aumara-control-tower/vault
-          cp -a /tmp/beds24-state/evidence/. aumara-control-tower/evidence/ 2>/dev/null || true
-          cp /tmp/beds24-state/vault/beds24-refresh-token.enc aumara-control-tower/vault/ 2>/dev/null || true
-          git config user.name 'github-actions[bot]'
-          git config user.email '41898282+github-actions[bot]@users.noreply.github.com'
-          git add aumara-control-tower/evidence/ aumara-control-tower/vault/beds24-refresh-token.enc
-          if ! git diff --cached --quiet; then
-            git commit -m 'Record Beds24 final booking verification [skip ci]'
-            git push origin HEAD:main
-          fi
-
-      - name: Fail if booking execution did not complete
-        if: steps.execute.outcome != 'success'
-        shell: bash
-        run: |
-          echo 'Beds24 booking execution failed. Evidence was persisted for diagnosis.' >&2
-          exit 1
+          name: beds24-aumara-legacy-safety-evidence
+          path: /tmp/aumara-legacy-evidence/beds24-finalize-status.json
+          if-no-files-found: error
+          retention-days: 7

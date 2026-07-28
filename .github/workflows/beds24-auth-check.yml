@@ -7,11 +7,13 @@ on:
     paths:
       - ".github/workflows/beds24-auth-check.yml"
       - "aumara-control-tower/scripts/beds24_auth_check.py"
+      - "aumara-control-tower/scripts/tests/test_beds24_auth_check.py"
   push:
     branches: [main]
     paths:
       - ".github/workflows/beds24-auth-check.yml"
       - "aumara-control-tower/scripts/beds24_auth_check.py"
+      - "aumara-control-tower/scripts/tests/test_beds24_auth_check.py"
 
 permissions:
   contents: read
@@ -21,21 +23,23 @@ jobs:
     runs-on: ubuntu-latest
     env:
       BEDS24_TOKEN_CREDENTIAL: ${{ secrets.BEDS24_TOKEN_CREDENTIAL }}
-      BEDS24_ACCESS_TOKEN_FILE: /tmp/beds24-access-token
 
     steps:
       - uses: actions/checkout@v4
+
+      - name: Run deterministic Beds24 auth tests
+        run: python -m unittest aumara-control-tower/scripts/tests/test_beds24_auth_check.py -v
 
       - name: Validate existing Beds24 credential
         id: validate
         continue-on-error: true
         run: python aumara-control-tower/scripts/beds24_auth_check.py validate
 
-      - name: Probe Beds24 with BEDS24_TOKEN_CREDENTIAL
-        id: probe
+      - name: Detect credential mode and run read-only probe
+        id: authenticate
         if: steps.validate.outcome == 'success'
         continue-on-error: true
-        run: python aumara-control-tower/scripts/beds24_auth_check.py probe
+        run: python aumara-control-tower/scripts/beds24_auth_check.py authenticate
 
       - name: Upload redacted authentication evidence
         if: always()

@@ -4,6 +4,22 @@
 # should build pages for, and indicates metadata such as tags, creation date and
 # authors for each page.
 
+- title: Build an Evidence-Grounded, Human-Supervised AML Investigation Workflow on Amazon Bedrock
+  path: examples/partners/AWS/evidence_grounded_aml_agent_with_bedrock.ipynb
+  slug: evidence-grounded-aml-agent-amazon-bedrock
+  description: Build a human-supervised AML investigation workflow with the OpenAI Agents SDK, GPT-5.6 Sol on Amazon Bedrock, bounded specialists, evidence validation, an application-owned review gate, and an AgentCore reference architecture.
+  date: 2026-07-23
+  authors:
+    - deepakjain108
+  tags:
+    - partners
+    - agents-sdk
+    - agents
+    - evals
+    - structured-outputs
+    - bedrock
+    - security
+
 - title: Enabling Long-Term Agent Memory with Oracle AI Agent Memory
   path: examples/vector_databases/oracle_db/deep_research_openai_agents.ipynb
   slug: deep-research-openai-agents
@@ -31,22 +47,6 @@
     - meetings
     - structured-outputs
   description: Build a production-style reference pipeline that turns recorded audio into speaker-labeled transcripts, summaries, decisions, risks, and follow-up actions.
-
-- title: Build an Evidence-Grounded, Human-Supervised AML Investigation Workflow on Amazon Bedrock
-  path: examples/partners/AWS/evidence_grounded_aml_agent_with_bedrock.ipynb
-  slug: evidence-grounded-aml-agent-amazon-bedrock
-  description: Build a human-supervised AML investigation workflow with the OpenAI Agents SDK, GPT-5.6 Sol on Amazon Bedrock, bounded specialists, evidence validation, an application-owned review gate, and an AgentCore reference architecture.
-  date: 2026-07-23
-  authors:
-    - deepakjain108
-  tags:
-    - partners
-    - agents-sdk
-    - agents
-    - evals
-    - structured-outputs
-    - bedrock
-    - security
 
 - title: Trigger a Workspace Agent from the API
   path: examples/chatgpt/workspace_agents/workspace-agents-api-trigger.ipynb

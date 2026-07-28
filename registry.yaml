@@ -4,6 +4,20 @@
 # should build pages for, and indicates metadata such as tags, creation date and
 # authors for each page.
 
+- title: Migrate from Whisper to GPT-Transcribe and GPT-Live-Transcribe
+  path: examples/migrating_from_whisper_to_gpt_transcribe.ipynb
+  slug: migrating-from-whisper-to-gpt-transcribe
+  description: Migrate existing Whisper integrations to GPT-Transcribe and GPT-Live-Transcribe with before-and-after examples for file, streaming, and Realtime transcription.
+  date: 2026-07-28
+  authors:
+    - cguo-oai
+  tags:
+    - audio
+    - transcription
+    - realtime
+    - migration
+    - whisper
+
 - title: Enabling Long-Term Agent Memory with Oracle AI Agent Memory
   path: examples/vector_databases/oracle_db/deep_research_openai_agents.ipynb
   slug: deep-research-openai-agents

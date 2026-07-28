@@ -4,13 +4,13 @@ Teach [openai/gpt-oss-20b](https://huggingface.co/openai/gpt-oss-20b) to solve m
 
 ## A framework built for post-training
 
-[Halo](https://github.com/whitecircle/halo) is the post-training framework we build at White Circle. We extend the HuggingFace stack with the parallelism and alignment methods that large post-training runs need, and we keep the model in its original HuggingFace form the whole way through.
+[Halo](https://github.com/whitecircle/halo) is the post-training framework we build at White Circle. It does one thing differently: your model stays a plain HuggingFace model the whole way through.
 
-That last part is the practical difference. Most frameworks that can shard a Mixture-of-Experts model ask you to port it to a separate model definition with its own checkpoint format. We attach Expert, Context, Tensor and Expert-Tensor Parallelism as wrappers around the existing modules. The model stays a `transformers` module and the checkpoint reloads with `from_pretrained`.
+Most frameworks that can train a big Mixture-of-Experts model make you convert it first. You port it to their model definition. You learn their checkpoint format. You hope it converts back. Halo skips all of that. We add Expert, Context, Tensor and Expert-Tensor Parallelism as thin wrappers around the modules you already have. Nothing gets rewritten. The model stays a `transformers` module, and the checkpoint loads with `from_pretrained`. It is the same line you always use.
 
-The runs are also faster. On gpt-oss-20b we reach ~3 times the tokens per second per GPU of the stock TRL `SFTTrainer` at lower peak memory. We walk through the full benchmarks in our release blogpost, including the comparison against NeMo AutoModel, Axolotl, ms-swift and Megatron-LM, and a breakdown of where the speedup comes from.
+It is also fast. On gpt-oss-20b we hit about 3× the tokens per second per GPU of the stock TRL `SFTTrainer`, and we use less memory doing it. We beat NeMo AutoModel, Axolotl, ms-swift and Megatron-LM in the same benchmarks. Full numbers are in our release blogpost.
 
-One more reason for this recipe in particular: Supervised fine-tuning, LoRA and reinforcement learning all run from the same config surface. Moving between the three sections below is a config change rather than a new codebase.
+And it is one tool, not three. SFT, LoRA and RL all read the same config. Moving between the sections below is a config change, not a new codebase.
 
 ---
 
@@ -20,7 +20,7 @@ gpt-oss reasons before it answers. That makes it a strong base for mathematics, 
 
 The main path is a full fine-tune. Every weight is updated rather than an adapter, because stronger reasoning changes what the model computes and not how it phrases things. gpt-oss-20b trains on a single B300. Distributing its 32 experts across an 8-GPU node with Expert Parallelism trains it several times faster at a fraction of the per-GPU memory. Two shorter sections follow. One covers a single-GPU [LoRA](https://arxiv.org/abs/2106.09685) variant for quick iteration. The other covers an online reinforcement-learning pass that rewards correct answers directly.
 
-> 🖥️ **8×B300** — The full fine-tune uses one 8-GPU B300 node, and every figure in this cookbook is measured on B300. The LoRA section runs on a single GPU. The RL section needs one extra GPU to serve rollouts.
+> 🖥️ **8×B300.** The full fine-tune uses one 8-GPU B300 node, and every figure in this cookbook is measured on B300. The LoRA section runs on a single GPU. The RL section needs one extra GPU to serve rollouts.
 
 ## Build and start the training image
 
@@ -257,7 +257,7 @@ After each optimizer step we push the updated weights to the vLLM server over NC
 
 Online GRPO is one of several reinforcement-learning paths we support. **Offline GRPO** trains from completions you have already scored, so it needs no live generation. **Environmental GRPO** runs multi-turn rollouts against a tool-using environment with Ray actors driving the episodes, which suits code contests, search and other agentic tasks. On the preference side, **DPO**, **SMPO** and **KTO** optimize against pairs or labels instead of a reward function. All of them share the config surface used above.
 
-> ✅ **Verifiable reward** — A math answer can be checked, so the reward is an exact-match grade rather than a learned reward model. That removes the usual reward-hacking surface and optimizes the policy against ground truth.
+> ✅ **Verifiable reward.** A math answer can be checked, so the reward is an exact-match grade rather than a learned reward model. That removes the usual reward-hacking surface and optimizes the policy against ground truth.
 
 ## Where to go from here
 

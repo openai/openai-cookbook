@@ -6,7 +6,7 @@ Teach [openai/gpt-oss-20b](https://huggingface.co/openai/gpt-oss-20b) to solve m
 
 [Halo](https://github.com/whitecircle/halo) is the post-training framework we build at White Circle. It does one thing differently: your model stays a plain HuggingFace model the whole way through.
 
-Most frameworks that can train a big Mixture-of-Experts model make you convert it first. You port it to their model definition. You learn their checkpoint format. You hope it converts back. Halo skips all of that. We add Expert, Context, Tensor and Expert-Tensor Parallelism as thin wrappers around the modules you already have. Nothing gets rewritten. The model stays a `transformers` module, and the checkpoint loads with `from_pretrained`. It is the same line you always use.
+Most frameworks that can train a big Moe model make you convert it first. You port it to their model definition. You learn their checkpoint format. You hope it converts back. Halo skips all of that. We add Expert, Context, Tensor and Expert-Tensor Parallelism as thin wrappers around the modules you already have. Nothing gets rewritten. The model stays a `transformers` module, and the checkpoint loads with `from_pretrained`. It is the same line you always use.
 
 It is also fast. On gpt-oss-20b we hit about 3× the tokens per second per GPU of the stock TRL `SFTTrainer`, and we use less memory doing it. We beat NeMo AutoModel, Axolotl, ms-swift and Megatron-LM in the same benchmarks. Full numbers are in our release blogpost.
 

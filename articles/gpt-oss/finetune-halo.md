@@ -1,16 +1,12 @@
 # Fine-tune gpt-oss with Halo
 
-Teach [openai/gpt-oss-20b](https://huggingface.co/openai/gpt-oss-20b) to solve math step by step and give a checkable final answer. A full fine-tune across 8 GPUs with Expert Parallelism, then a single-GPU LoRA variant and an online reinforcement-learning pass that rewards correct answers directly.
+This guide fine-tunes [gpt-oss-20b](https://huggingface.co/openai/gpt-oss-20b) with [Halo](https://github.com/whitecircle/halo), an open-source distributed training framework by [White Circle](https://whitecircle.com/). Halo lets you fine-tune Hugging Face models at scale without leaving the Hugging Face ecosystem. No model porting, no checkpoint conversion, no custom model definitions. gpt-oss stays a standard `transformers` model throughout training, and checkpoints load back with `from_pretrained`.
 
-## A framework built for post-training
+Halo is designed for large-scale training workloads where a single GPU is no longer enough and efficient parallelism becomes essential. It brings expert parallelism for MoE models alongside fused kernels, a bf16 optimizer, sequence packing, async RL, and other optimizations required for high-throughput training.
 
-[Halo](https://github.com/whitecircle/halo) is the post-training framework we build at White Circle. It does one thing differently: your model stays a plain HuggingFace model the whole way through.
+On the same hardware, Halo trains gpt-oss-20b at 2.3–2.8× the throughput of stock TRL while using less peak memory. Full benchmarks are available in the [release blog post](https://whitecircle.com/research/halo-preview).
 
-Most frameworks that can train a big Moe model make you convert it first. You port it to their model definition. You learn their checkpoint format. You hope it converts back. Halo skips all of that. We add Expert, Context, Tensor and Expert-Tensor Parallelism as thin wrappers around the modules you already have. Nothing gets rewritten. The model stays a `transformers` module, and the checkpoint loads with `from_pretrained`. It is the same line you always use.
-
-It is also fast. On gpt-oss-20b we hit about 3× the tokens per second per GPU of the stock TRL `SFTTrainer`, and we use less memory doing it. We beat NeMo AutoModel, Axolotl, ms-swift and Megatron-LM in the same benchmarks. Full numbers are in our release blogpost.
-
-And it is one tool, not three. SFT, LoRA and RL all read the same config. Moving between the sections below is a config change, not a new codebase.
+The rest of this guide walks through fine-tuning gpt-oss-20b end to end with Halo, covering a full fine-tune, LoRA and RL.
 
 ---
 

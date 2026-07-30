@@ -38,6 +38,29 @@
       ],
       "response_template_ids": [],
       "policy_version": "2026.07.27.1"
+    },
+    {
+      "policy_id": "elcid.baby-cot-infoitem",
+      "property": "elcid",
+      "category": "beds24_guest_note",
+      "rule": "Record one baby-cot preparation request only when the booked Twin category, one infant, age, active booking state and adult capacity are all proven; change only the Beds24 guest-request info item and verify the exact note by read-back.",
+      "source": "approved_internal_document",
+      "source_reference": "REQUEST:ELCID_BABY_COT:2026-07-30",
+      "verified_at": "2026-07-30",
+      "status": "verified",
+      "allowed_auto_reply": false,
+      "allowed_beds24_action": [
+        "record_guest_request"
+      ],
+      "escalation_conditions": [
+        "cot_not_explicitly_requested",
+        "infant_age_not_proved",
+        "room_or_occupancy_not_proved",
+        "multiple_safe_candidates",
+        "read_back_failed"
+      ],
+      "response_template_ids": [],
+      "policy_version": "2026.07.27.1"
     }
   ]
 }

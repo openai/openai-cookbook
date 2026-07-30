@@ -1,0 +1,64 @@
+name: Beds24 guest-message ingestion (read-only)
+
+on:
+  workflow_dispatch:
+  pull_request:
+    branches: [main]
+    paths:
+      - ".github/workflows/beds24-guest-message-ingest.yml"
+      - "aumara-control-tower/scripts/beds24_guest_message_ingest.py"
+      - "aumara-control-tower/tests/test_beds24_guest_message_ingest.py"
+      - "aumara-control-tower/README.md"
+  push:
+    branches: [agent/beds24-guest-message-ingestion]
+    paths:
+      - ".github/workflows/beds24-guest-message-ingest.yml"
+      - "aumara-control-tower/scripts/beds24_guest_message_ingest.py"
+      - "aumara-control-tower/tests/test_beds24_guest_message_ingest.py"
+      - "aumara-control-tower/README.md"
+
+permissions:
+  contents: read
+
+jobs:
+  deterministic-tests:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Run read-only ingestion tests
+        run: >-
+          python -m unittest
+          aumara-control-tower/tests/test_beds24_guest_message_ingest.py -v
+
+      - name: Compile ingestion worker
+        run: >-
+          python -m py_compile
+          aumara-control-tower/scripts/beds24_guest_message_ingest.py
+          aumara-control-tower/tests/test_beds24_guest_message_ingest.py
+
+  live-readonly-proof:
+    if: github.event_name == 'workflow_dispatch' || github.event_name == 'push'
+    runs-on: ubuntu-latest
+    env:
+      BEDS24_TOKEN_CREDENTIAL: ${{ secrets.BEDS24_TOKEN_CREDENTIAL }}
+      BEDS24_MESSAGE_MAX_AGE_DAYS: '3'
+      BEDS24_MESSAGE_INGEST_OUTPUT: >-
+        aumara-control-tower/evidence/beds24-guest-message-ingest.json
+
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Read and normalize Beds24 messages without writes
+        run: >-
+          python
+          aumara-control-tower/scripts/beds24_guest_message_ingest.py
+
+      - name: Upload redacted ingestion evidence
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: beds24-guest-message-ingestion-evidence
+          path: aumara-control-tower/evidence/beds24-guest-message-ingest.json
+          if-no-files-found: warn
+          retention-days: 7

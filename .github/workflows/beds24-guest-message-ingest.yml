@@ -7,14 +7,18 @@ on:
     paths:
       - ".github/workflows/beds24-guest-message-ingest.yml"
       - "aumara-control-tower/scripts/beds24_guest_message_ingest.py"
+      - "aumara-control-tower/scripts/beds24_guest_message_ingest_entry.py"
       - "aumara-control-tower/tests/test_beds24_guest_message_ingest.py"
+      - "aumara-control-tower/tests/test_beds24_guest_message_ingest_entry.py"
       - "aumara-control-tower/README.md"
   push:
     branches: [agent/beds24-guest-message-ingestion]
     paths:
       - ".github/workflows/beds24-guest-message-ingest.yml"
       - "aumara-control-tower/scripts/beds24_guest_message_ingest.py"
+      - "aumara-control-tower/scripts/beds24_guest_message_ingest_entry.py"
       - "aumara-control-tower/tests/test_beds24_guest_message_ingest.py"
+      - "aumara-control-tower/tests/test_beds24_guest_message_ingest_entry.py"
       - "aumara-control-tower/README.md"
 
 permissions:
@@ -29,13 +33,16 @@ jobs:
       - name: Run read-only ingestion tests
         run: >-
           python -m unittest
-          aumara-control-tower/tests/test_beds24_guest_message_ingest.py -v
+          aumara-control-tower/tests/test_beds24_guest_message_ingest.py
+          aumara-control-tower/tests/test_beds24_guest_message_ingest_entry.py -v
 
-      - name: Compile ingestion worker
+      - name: Compile ingestion workers
         run: >-
           python -m py_compile
           aumara-control-tower/scripts/beds24_guest_message_ingest.py
+          aumara-control-tower/scripts/beds24_guest_message_ingest_entry.py
           aumara-control-tower/tests/test_beds24_guest_message_ingest.py
+          aumara-control-tower/tests/test_beds24_guest_message_ingest_entry.py
 
   live-readonly-proof:
     if: >-
@@ -56,7 +63,7 @@ jobs:
       - name: Read and normalize Beds24 messages without writes
         run: >-
           python
-          aumara-control-tower/scripts/beds24_guest_message_ingest.py
+          aumara-control-tower/scripts/beds24_guest_message_ingest_entry.py
 
       - name: Upload redacted ingestion evidence
         if: always()

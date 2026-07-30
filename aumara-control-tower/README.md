@@ -77,6 +77,25 @@ to be off, `AUMARA_LIVE_BOOKING_WRITES_CONFIRMED=true`, the exact
 `AUMARA_BEDS24_NOTE_WRITE_CONFIRMATION=INFOITEMS_ONLY_PROPERTY_324903`, and an
 explicit validated info code. It contains no guest-message send path.
 
+## Beds24 guest-message ingestion
+
+`scripts/beds24_guest_message_ingest.py` provides the read-only ingestion stage
+for the Guest Ops ledger. It retrieves recent `guest` and `host` messages from
+Beds24 API V2 with GET requests, resolves reduced booking metadata, and emits a
+normalized event stream plus one conversation-health record per booking.
+
+The persisted artifact contains hashed message/booking identifiers, direction,
+event type, timestamps, response lag, unanswered age, booking status, channel,
+and stay dates. It never stores raw message text, guest names, email addresses,
+phone numbers, payment data, access codes, or raw booking identifiers. The
+worker has no send, note-write, or booking-mutation path and fails if a non-GET
+request is attempted.
+
+The workflow runs deterministic tests on pull requests. Credential-backed
+reading is limited to manual dispatch and the dedicated verification branch;
+no schedule or production destination is configured. Only the redacted artifact
+is uploaded.
+
 ## Guest-request dry run
 
 The first automation stage creates reviewable reply and booking-note proposals

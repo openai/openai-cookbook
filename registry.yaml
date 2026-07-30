@@ -4,6 +4,48 @@
 # should build pages for, and indicates metadata such as tags, creation date and
 # authors for each page.
 
+- title: Migrate from Whisper to GPT-Transcribe and GPT-Live-Transcribe
+  path: examples/migrating_from_whisper_to_gpt_transcribe.ipynb
+  slug: migrating-from-whisper-to-gpt-transcribe
+  description: Migrate existing Whisper integrations to GPT-Transcribe and GPT-Live-Transcribe with before-and-after examples for file, streaming, and Realtime transcription.
+  date: 2026-07-28
+  authors:
+    - cguo-oai
+  tags:
+    - audio
+    - transcription
+    - realtime
+    - migration
+    - whisper
+
+- title: Enabling Long-Term Agent Memory with Oracle AI Agent Memory
+  path: examples/vector_databases/oracle_db/deep_research_openai_agents.ipynb
+  slug: deep-research-openai-agents
+  description: Build a deep-research agent with the OpenAI Agents SDK, Oracle-backed session persistence, durable memory, and Tavily web search.
+  date: 2026-07-16
+  authors:
+    - Ela689
+  tags:
+    - agents-sdk
+    - agents
+    - memory
+    - deep-research
+
+- title: Build a Speaker-Aware Meeting Intelligence Pipeline with Audio Diarization
+  path: examples/audio/speaker_aware_meeting_intelligence/speaker_aware_meeting_intelligence.ipynb
+  slug: speaker-aware-meeting-intelligence
+  date: 2026-06-18
+  authors:
+    - saptob
+  tags:
+    - audio
+    - speech-to-text
+    - transcription
+    - diarization
+    - meetings
+    - structured-outputs
+  description: Build a production-style reference pipeline that turns recorded audio into speaker-labeled transcripts, summaries, decisions, risks, and follow-up actions.
+
 - title: Trigger a Workspace Agent from the API
   path: examples/chatgpt/workspace_agents/workspace-agents-api-trigger.ipynb
   slug: workspace-agents-api-trigger
@@ -346,7 +388,6 @@
   path: examples/agents_sdk/session_memory.ipynb
   slug: session-memory
   date: 2025-09-09
-  archived: true
   authors:
     - emreokcular
   tags:
@@ -3332,7 +3373,6 @@
   slug: context-personalization
   description: Cookbook to build personalized agents with long-term memory state using the Agents SDK.
   date: 2026-01-05
-  archived: true
   authors:
     - emreokcular
   tags:

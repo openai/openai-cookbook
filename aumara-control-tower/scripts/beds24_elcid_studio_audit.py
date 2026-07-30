@@ -170,13 +170,12 @@ def get_access_token() -> tuple[str, str, str, str, bool]:
     if not candidates:
         raise AuditError("BEDS24_TOKEN_CREDENTIAL is missing")
 
-    probe_query = urllib.parse.urlencode({"id": PROPERTY_ID})
     last_status = 0
     for source, credential in candidates:
         for api_base in API_BASES:
             status, _ = request_json(
                 "GET",
-                f"/properties?{probe_query}",
+                "/authentication/details",
                 headers={"token": credential},
                 api_base=api_base,
             )

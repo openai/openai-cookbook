@@ -2,6 +2,7 @@ import datetime as dt
 import importlib.util
 import pathlib
 import unittest
+from unittest import mock
 
 
 SCRIPT = pathlib.Path(__file__).resolve().parents[1] / "beds24_elcid_studio_audit.py"
@@ -12,6 +13,29 @@ SPEC.loader.exec_module(MODULE)
 
 
 class StudioAuditTests(unittest.TestCase):
+    @mock.patch.object(
+        MODULE,
+        "credential_candidates",
+        return_value=[("beds24_token_credential", "long-life-token")],
+    )
+    @mock.patch.object(MODULE, "request_json", return_value=(200, {"scopes": []}))
+    def test_access_token_probe_does_not_require_properties_scope(
+        self, request_json, _credential_candidates
+    ):
+        token, mode, api_base, source, bootstrap = MODULE.get_access_token()
+
+        self.assertEqual(token, "long-life-token")
+        self.assertEqual(mode, "access_token")
+        self.assertEqual(api_base, MODULE.API_BASES[0])
+        self.assertEqual(source, "beds24_token_credential")
+        self.assertFalse(bootstrap)
+        request_json.assert_called_once_with(
+            "GET",
+            "/authentication/details",
+            headers={"token": "long-life-token"},
+            api_base=MODULE.API_BASES[0],
+        )
+
     def test_booking_query_is_narrow_and_read_only(self):
         path = MODULE.booking_query(dt.date(2026, 7, 16))
         self.assertTrue(path.startswith("/bookings?"))

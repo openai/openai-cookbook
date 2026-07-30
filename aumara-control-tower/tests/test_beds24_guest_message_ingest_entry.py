@@ -12,21 +12,35 @@ import beds24_guest_message_ingest_entry as entry  # noqa: E402
 
 
 class EntryTests(unittest.TestCase):
+    def test_scope_names_are_extracted_without_other_diagnostics(self):
+        details = {
+            "diagnostics": {
+                "scopes": ["bookings", "bookings-personal", "unknown-scope"],
+                "note": "properties inventory",
+                "account": "private-value",
+            }
+        }
+        self.assertEqual(
+            entry.extract_scope_names(details),
+            ["bookings", "bookings-personal", "inventory", "properties"],
+        )
+
     def test_existing_access_token_is_reused_after_readonly_probe(self):
         calls = []
 
         def request(url, headers, secrets=(), redact=True):
             calls.append((url, headers, secrets, redact))
-            return 200, {"status": "ok"}
+            return 200, {"diagnostics": {"scopes": ["bookings-personal"]}}
 
         with mock.patch.object(entry.auth, "get_credential", return_value="access"), \
              mock.patch.object(entry.auth, "request_json", side_effect=request):
-            token, mode, api_base, source = entry.resolve_access_token()
+            token, mode, api_base, source, scopes = entry.resolve_access_token()
 
         self.assertEqual(token, "access")
         self.assertEqual(mode, "access_token")
         self.assertEqual(api_base, entry.auth.API_BASE)
         self.assertEqual(source, entry.auth.CREDENTIAL_SOURCE)
+        self.assertEqual(scopes, ["bookings-personal"])
         self.assertEqual(len(calls), 1)
         self.assertTrue(calls[0][0].endswith("/authentication/details"))
         self.assertEqual(calls[0][1], {"token": "access"})
@@ -35,7 +49,7 @@ class EntryTests(unittest.TestCase):
         responses = [
             (401, {"message": "not access"}),
             (200, {"token": " temporary-token "}),
-            (200, {"status": "ok"}),
+            (200, {"diagnostics": {"scopes": ["bookings-personal"]}}),
         ]
         calls = []
 
@@ -45,10 +59,11 @@ class EntryTests(unittest.TestCase):
 
         with mock.patch.object(entry.auth, "get_credential", return_value="refresh"), \
              mock.patch.object(entry.auth, "request_json", side_effect=request):
-            token, mode, _, _ = entry.resolve_access_token()
+            token, mode, _, _, scopes = entry.resolve_access_token()
 
         self.assertEqual(token, "temporary-token")
         self.assertEqual(mode, "refresh_token")
+        self.assertEqual(scopes, ["bookings-personal"])
         self.assertEqual(len(calls), 3)
         self.assertTrue(calls[1][0].endswith("/authentication/token"))
         self.assertEqual(calls[1][1], {"refreshToken": "refresh"})
@@ -61,8 +76,6 @@ class EntryTests(unittest.TestCase):
 
         def request(url, headers, secrets=(), redact=True):
             calls.append(url)
-            if url.endswith("/authentication/details"):
-                return 401, {}
             return 401, {}
 
         with mock.patch.object(entry.auth, "get_credential", return_value="bad"), \
@@ -94,16 +107,70 @@ class EntryTests(unittest.TestCase):
                 "access_token",
                 "https://api.beds24.com/v2",
                 "BEDS24_TOKEN_CREDENTIAL",
+                ["bookings", "bookings-personal"],
             ),
         ), mock.patch.object(entry.ingest, "run", return_value=report) as run:
             result = entry.build_report(3)
 
         run.assert_called_once()
+        self.assertEqual(result["status"], "OK")
         self.assertEqual(result["authentication"]["mode"], "access_token")
         self.assertEqual(result["authentication"]["source"], "BEDS24_TOKEN_CREDENTIAL")
         self.assertEqual(result["authentication"]["apiHost"], "api.beds24.com")
+        self.assertEqual(
+            result["authentication"]["scopes"],
+            ["bookings", "bookings-personal"],
+        )
+        self.assertTrue(result["authentication"]["bookingsPersonalScopePresent"])
         self.assertFalse(result["authentication"]["secretLogged"])
         self.assertNotIn("secret-access-token", str(result))
+
+    def test_401_message_access_creates_exact_blocker_report(self):
+        with mock.patch.object(
+            entry,
+            "resolve_access_token",
+            return_value=(
+                "secret-access-token",
+                "access_token",
+                "https://api.beds24.com/v2",
+                "BEDS24_TOKEN_CREDENTIAL",
+                ["bookings"],
+            ),
+        ), mock.patch.object(
+            entry.ingest,
+            "run",
+            side_effect=entry.ingest.IngestError(
+                "Guest-message lookup failed with HTTP 401"
+            ),
+        ):
+            result = entry.build_report(3)
+
+        self.assertEqual(result["status"], "BLOCKED")
+        self.assertEqual(result["blocker"]["code"], "MISSING_BOOKINGS_PERSONAL_SCOPE")
+        self.assertEqual(result["blocker"]["requiredScope"], "bookings-personal")
+        self.assertEqual(result["blocker"]["httpStatus"], 401)
+        self.assertFalse(
+            result["authentication"]["bookingsPersonalScopePresent"]
+        )
+        self.assertEqual(result["safety"]["guestMessagesSent"], 0)
+        self.assertEqual(result["safety"]["bookingMutations"], 0)
+        self.assertNotIn("secret-access-token", str(result))
+
+    def test_unknown_scope_list_reports_access_denied_not_missing(self):
+        report = entry.blocked_report(
+            error="Guest-message lookup failed with HTTP 401",
+            auth_mode="access_token",
+            api_base="https://api.beds24.com/v2",
+            auth_source="BEDS24_TOKEN_CREDENTIAL",
+            scopes=[],
+            max_age_days=3,
+        )
+        self.assertEqual(
+            report["blocker"]["code"], "BOOKINGS_PERSONAL_ACCESS_DENIED"
+        )
+        self.assertIsNone(
+            report["authentication"]["bookingsPersonalScopePresent"]
+        )
 
 
 if __name__ == "__main__":

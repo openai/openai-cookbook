@@ -26,6 +26,8 @@ export function loadRuntimeConfig(env = process.env) {
     allowAccessCodes: truthy(env.AUMARA_ALLOW_ACCESS_CODES),
     mailFrom: String(env.AUMARA_MAIL_FROM || '').trim(),
     mailReplyTo: String(env.AUMARA_MAIL_REPLY_TO || '').trim(),
+    dashboardToken: String(env.AUMARA_DASHBOARD_TOKEN || '').trim(),
+    dailyOpsSnapshotPath: String(env.AUMARA_DAILY_OPS_SNAPSHOT || '').trim(),
     maxBodyBytes: positiveInteger(
       env.AUMARA_MAX_BODY_BYTES,
       65536,
@@ -37,6 +39,13 @@ export function loadRuntimeConfig(env = process.env) {
       'AUMARA_IDEMPOTENCY_TTL_SECONDS'
     ) * 1000
   };
+
+  if (
+    config.dashboardToken &&
+    (config.dashboardToken.length < 32 || config.dashboardToken === 'change-this-token')
+  ) {
+    throw new Error('AUMARA_DASHBOARD_TOKEN must be a strong token');
+  }
 
   if (mode !== 'off' && !config.webhookToken) {
     throw new Error('AUMARA_WEBHOOK_TOKEN is required outside off mode');

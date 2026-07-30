@@ -22,6 +22,8 @@ function config(mode, overrides = {}) {
     allowAccessCodes: true,
     mailFrom: 'AUMARA <stay@example.test>',
     mailReplyTo: 'ops@example.test',
+    dashboardToken: '',
+    dailyOpsSnapshotPath: '',
     maxBodyBytes: 65536,
     idempotencyTtlMs: 60000,
     ...overrides
@@ -50,6 +52,11 @@ function post(base, path, body, token = TOKEN) {
     },
     body: JSON.stringify(body)
   });
+}
+
+function get(base, path, token) {
+  const headers = token ? { authorization: `Bearer ${token}` } : {};
+  return fetch(`${base}${path}`, { headers });
 }
 
 test('off mode cannot process webhook events', async () => {
@@ -138,6 +145,65 @@ test('generic send endpoint is permanently retired', async () => {
   });
 });
 
+test('daily ops shell is data-free and snapshot API fails closed when unconfigured', async () => {
+  await withServer({ config: config('audit') }, async (base) => {
+    const page = await get(base, '/daily-ops');
+    assert.equal(page.status, 200);
+    assert.match(page.headers.get('content-security-policy'), /connect-src 'self'/);
+    assert.doesNotMatch(await page.text(), /guest@example\\.test/);
+
+    const response = await get(base, '/api/daily-ops/latest');
+    assert.equal(response.status, 503);
+    assert.equal((await response.json()).code, 'dashboard_not_configured');
+  });
+});
+
+test('daily ops snapshot requires its own token and is read-only', async () => {
+  const dashboardToken = 'dashboard-token-with-at-least-32-characters';
+  const synthetic = {
+    schema: 'aumara-daily-ops-v1',
+    businessDate: '2026-07-30',
+    timezone: 'Europe/Madrid',
+    generatedAtUtc: '2026-07-30T21:00:00Z',
+    dataQuality: { status: 'ready', issues: [] },
+    sources: [],
+    metrics: { guestEvents: 2 },
+    events: []
+  };
+  let reads = 0;
+  await withServer({
+    config: config('audit', {
+      dashboardToken,
+      dailyOpsSnapshotPath: '/approved/runtime/latest.json'
+    }),
+    dailyOpsReader: async (path) => {
+      reads += 1;
+      assert.equal(path, '/approved/runtime/latest.json');
+      return synthetic;
+    }
+  }, async (base) => {
+    const unauthorised = await get(base, '/api/daily-ops/latest', TOKEN);
+    assert.equal(unauthorised.status, 401);
+
+    const authorised = await get(
+      base,
+      '/api/daily-ops/latest',
+      dashboardToken
+    );
+    assert.equal(authorised.status, 200);
+    assert.deepEqual(await authorised.json(), synthetic);
+
+    const mutation = await post(
+      base,
+      '/api/daily-ops/latest',
+      synthetic,
+      dashboardToken
+    );
+    assert.equal(mutation.status, 404);
+  });
+  assert.equal(reads, 1);
+});
+
 test('runtime configuration requires live confirmation and verified sender', () => {
   const base = {
     AUMARA_AUTOMATION_MODE: 'live',
@@ -152,4 +218,14 @@ test('runtime configuration requires live confirmation and verified sender', () 
     AUMARA_LIVE_SEND_CONFIRMED: 'true',
     AUMARA_MAIL_FROM: 'AUMARA <onboarding@resend.dev>'
   }), /onboarding sender/);
+});
+
+test('runtime configuration rejects weak dashboard tokens', () => {
+  assert.throws(
+    () => loadRuntimeConfig({
+      AUMARA_AUTOMATION_MODE: 'off',
+      AUMARA_DASHBOARD_TOKEN: 'weak'
+    }),
+    /DASHBOARD_TOKEN must be a strong token/
+  );
 });

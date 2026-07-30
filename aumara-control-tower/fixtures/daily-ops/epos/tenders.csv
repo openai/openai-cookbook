@@ -1,0 +1,4 @@
+TenderID,TransactionID,TenderTypeID,TenderType,Amount,Change,NetTender,DataClassification
+1,1,1,Cash,142.50,0.00,142.50,TEST_ONLY
+2,2,2,Visa,490.00,0.00,490.00,TEST_ONLY
+3,3,2,Visa,-10.00,0.00,-10.00,TEST_ONLY

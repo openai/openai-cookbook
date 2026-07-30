@@ -1,6 +1,8 @@
 import { timingSafeEqual } from 'node:crypto';
 import http from 'node:http';
 import { pathToFileURL } from 'node:url';
+import { readDailyOpsSnapshot } from './daily-ops.mjs';
+import { dailyOpsPage } from './daily-ops-page.mjs';
 import {
   eventIdempotencyKey,
   hashForAudit,
@@ -24,6 +26,27 @@ function json(res, status, body) {
     'x-content-type-options': 'nosniff'
   });
   res.end(data);
+}
+
+function html(res, status, body) {
+  res.writeHead(status, {
+    'content-type': 'text/html; charset=utf-8',
+    'cache-control': 'no-store',
+    'x-content-type-options': 'nosniff',
+    'x-frame-options': 'DENY',
+    'referrer-policy': 'no-referrer',
+    'content-security-policy': [
+      "default-src 'self'",
+      "script-src 'self' 'unsafe-inline'",
+      "style-src 'self' 'unsafe-inline'",
+      "img-src 'self' data:",
+      "connect-src 'self'",
+      "frame-ancestors 'none'",
+      "base-uri 'none'",
+      "form-action 'self'"
+    ].join('; ')
+  });
+  res.end(body);
 }
 
 async function readJson(req, maxBodyBytes) {
@@ -52,11 +75,16 @@ function secureEqual(left, right) {
 
 function authorised(req, config) {
   if (!config.webhookToken) return false;
+  return authorisedWithToken(req, config.webhookToken);
+}
+
+function authorisedWithToken(req, expectedToken) {
+  if (!expectedToken) return false;
   const header = String(req.headers.authorization || '');
   const supplied = header.startsWith('Bearer ')
     ? header.slice(7)
     : req.headers['x-aumara-token'];
-  return secureEqual(supplied, config.webhookToken);
+  return secureEqual(supplied, expectedToken);
 }
 
 function classifyAccessEvent(body, config) {
@@ -105,6 +133,7 @@ export function createRequestHandler({
   idempotencyStore = new MemoryIdempotencyStore({
     ttlMs: config.idempotencyTtlMs
   }),
+  dailyOpsReader = readDailyOpsSnapshot,
   auditSink = (record) => console.log(JSON.stringify(record))
 }) {
   return async function handler(req, res) {
@@ -119,8 +148,42 @@ export function createRequestHandler({
           mode: config.mode,
           webhookAuthConfigured: Boolean(config.webhookToken),
           liveSendEnabled: config.mode === 'live' && config.liveSendConfirmed,
+          dailyOpsConfigured: Boolean(
+            config.dashboardToken && config.dailyOpsSnapshotPath
+          ),
           idempotencyStore: 'memory'
         });
+      }
+
+      if (req.method === 'GET' && url.pathname === '/daily-ops') {
+        return html(res, 200, dailyOpsPage());
+      }
+
+      if (req.method === 'GET' && url.pathname === '/api/daily-ops/latest') {
+        if (!config.dashboardToken || !config.dailyOpsSnapshotPath) {
+          return json(res, 503, {
+            ok: false,
+            code: 'dashboard_not_configured',
+            error: 'Daily Ops dashboard is not configured'
+          });
+        }
+        if (!authorisedWithToken(req, config.dashboardToken)) {
+          return json(res, 401, {
+            ok: false,
+            code: 'unauthorised',
+            error: 'Unauthorised'
+          });
+        }
+        try {
+          const snapshot = await dailyOpsReader(config.dailyOpsSnapshotPath);
+          return json(res, 200, snapshot);
+        } catch (error) {
+          return json(res, 503, {
+            ok: false,
+            code: error.code || 'snapshot_unavailable',
+            error: 'Daily Ops snapshot is unavailable'
+          });
+        }
       }
 
       if (req.method === 'POST' && url.pathname === '/send') {

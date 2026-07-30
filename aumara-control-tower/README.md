@@ -21,6 +21,18 @@ npm start
 Returns the operating mode and safety status without exposing sender addresses,
 tokens, booking references, or guest data.
 
+### GET /daily-ops
+
+Data-free shell for the internal AUMARA / EL CID operating dashboard. The page
+requests the separate dashboard viewer token and reads only the authenticated
+snapshot API.
+
+### GET /api/daily-ops/latest
+
+Returns the latest validated `aumara-daily-ops-v1` snapshot. It is disabled
+unless both `AUMARA_DASHBOARD_TOKEN` and `AUMARA_DAILY_OPS_SNAPSHOT` are
+configured. It has no write method and does not reuse the webhook token.
+
 ### POST /send
 
 Retired. It always returns HTTP 410 so arbitrary recipients, subjects, and HTML
@@ -45,6 +57,33 @@ send a second copy during Resend's retention window.
 
 The generic Beds24 auto-reply workflow is audit-only. Gmail is the sole current
 live guest-reply path, preventing duplicate replies.
+
+## Daily Ops dashboard
+
+Dashboard v1 reuses the existing Gmail summary, Beds24 reads, Epos Now export
+and Bitrix24 task read. It creates no new monitoring or database and reports
+missing sources as unavailable instead of zero.
+
+Build a synthetic local preview:
+
+```bash
+python scripts/daily_ops_snapshot.py \
+  --date 2026-07-30 \
+  --now 2026-07-30T21:00:00Z \
+  --gmail fixtures/daily-ops/gmail.json \
+  --beds24 fixtures/daily-ops/beds24.json \
+  --epos-dir fixtures/daily-ops/epos \
+  --b24 fixtures/daily-ops/b24.json \
+  --output /tmp/aumara-daily-ops/latest.json \
+  --history-dir /tmp/aumara-daily-ops/history
+```
+
+Then point `AUMARA_DAILY_OPS_SNAPSHOT` at `latest.json`, configure a separate
+strong `AUMARA_DASHBOARD_TOKEN`, start the existing service and open
+`/daily-ops`.
+
+The complete source contract and production boundary are documented in
+[`docs/daily-ops-dashboard-v1.md`](docs/daily-ops-dashboard-v1.md).
 
 ## Beds24 guest-note audit
 
@@ -106,8 +145,9 @@ email, or booking action occurred.
 ## Current mail routing
 
 - Provider: Resend
-- Reply-to: `elcidspain@gmail.com`
-- Test recipient: `elcidspain@gmail.com`
+- Reply-to: configured only through the approved secret/runtime environment.
+- Test recipient: configured only through the approved secret/runtime
+  environment.
 - The Resend onboarding sender is forbidden in live mode.
 
 ## Production next step

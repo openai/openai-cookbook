@@ -9,6 +9,7 @@
   "scripts": {
     "start": "node --env-file-if-exists=.env src/server.mjs",
     "health": "node --env-file-if-exists=.env src/healthcheck.mjs",
+    "build:daily-ops": "python scripts/daily_ops_snapshot.py",
     "test": "node --test src/*.test.mjs",
     "test:email": "node --env-file-if-exists=.env src/send-test-email.mjs"
   },

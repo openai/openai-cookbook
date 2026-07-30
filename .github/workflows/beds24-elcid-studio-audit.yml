@@ -23,7 +23,6 @@ jobs:
       BEDS24_BOOTSTRAP_CREDENTIAL: ${{ secrets.BEDS24_BOOTSTRAP_CREDENTIAL }}
       BEDS24_REFRESH_TOKEN: ${{ secrets.BEDS24_REFRESH_TOKEN }}
       BEDS24_ALLOW_INVITE_BOOTSTRAP: '1'
-      AUDIT_TODAY: '2026-07-16'
       BEDS24_STUDIO_AUDIT_OUTPUT: aumara-control-tower/evidence/elcid-studio-audit.json
 
     steps:

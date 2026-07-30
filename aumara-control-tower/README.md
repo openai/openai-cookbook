@@ -92,17 +92,21 @@ fails closed with a redacted `BOOKINGS_PERSONAL_ACCESS_DENIED` or
 It never creates an invite code, calls `/authentication/setup`, rotates a
 credential, or expands token permissions.
 
-The persisted artifact contains hashed message/booking identifiers, direction,
-event type, timestamps, response lag, unanswered age, booking status, channel,
-and stay dates. It never stores raw message text, guest names, email addresses,
-phone numbers, payment data, access codes, or raw booking identifiers. The
-worker has no send, note-write, or booking-mutation path and fails if a non-GET
+The persisted artifact contains HMAC-redacted message/booking identifiers,
+direction, event type, timestamps, response lag, unanswered age, booking
+status, channel, and stay dates. The existing runtime credential is used only
+in memory as the HMAC key; the key is never stored in the artifact. The
+artifact never stores raw message text, guest names, email addresses, phone
+numbers, payment data, access codes, or raw booking identifiers. The worker
+has no send, note-write, or booking-mutation path and fails if a non-GET
 request is attempted.
 
-The workflow runs deterministic tests on pull requests. Credential-backed
-reading is limited to manual dispatch, the dedicated verification branch, and
-trusted same-repository pull requests; no schedule or production destination is
-configured. Only the redacted artifact is uploaded.
+The workflow runs deterministic tests on pull requests and branch pushes
+without exposing Beds24 credentials. Credential-backed reading is available
+only through a manual workflow dispatch with the exact confirmation
+`RUN_BEDS24_READONLY_PROOF`; no pull-request or push event can enter that job.
+No schedule or production destination is configured. Only the redacted
+artifact is uploaded.
 
 ## Guest-request dry run
 

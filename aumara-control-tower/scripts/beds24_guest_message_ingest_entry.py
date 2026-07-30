@@ -52,7 +52,7 @@ def extract_scope_names(value: Any) -> list[str]:
     return sorted(found)
 
 
-def resolve_access_token() -> tuple[str, str, str, str, list[str]]:
+def resolve_access_token() -> tuple[str, str, str, str, list[str], str]:
     """Resolve the existing credential without printing or replacing it."""
     credential = auth.get_credential()
     if not credential:
@@ -70,6 +70,7 @@ def resolve_access_token() -> tuple[str, str, str, str, list[str]]:
             auth.API_BASE,
             auth.CREDENTIAL_SOURCE,
             extract_scope_names(direct_body),
+            credential,
         )
 
     exchange_status, exchange_body = auth.request_json(
@@ -105,6 +106,7 @@ def resolve_access_token() -> tuple[str, str, str, str, list[str]]:
         auth.API_BASE,
         auth.CREDENTIAL_SOURCE,
         extract_scope_names(probe_body),
+        credential,
     )
 
 
@@ -181,10 +183,21 @@ def blocked_report(
 
 
 def build_report(max_age_days: int) -> dict[str, Any]:
-    token, auth_mode, api_base, auth_source, scopes = resolve_access_token()
+    (
+        token,
+        auth_mode,
+        api_base,
+        auth_source,
+        scopes,
+        redaction_key,
+    ) = resolve_access_token()
     client = ingest.Beds24ReadOnlyClient(token, api_base)
     try:
-        report = ingest.run(client, max_age_days=max_age_days)
+        report = ingest.run(
+            client,
+            max_age_days=max_age_days,
+            redaction_key=redaction_key,
+        )
     except ingest.IngestError as exc:
         text = str(exc)
         if "message lookup failed with HTTP 401" in text:

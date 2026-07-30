@@ -10,6 +10,7 @@ from __future__ import annotations
 
 import datetime as dt
 import hashlib
+import hmac
 import json
 import os
 import pathlib
@@ -38,9 +39,12 @@ class IngestError(RuntimeError):
     """Raised when the read-only ingestion cannot establish reliable state."""
 
 
-def stable_hash(namespace: str, value: object) -> str:
+def keyed_hash(redaction_key: str, namespace: str, value: object) -> str:
+    key = redaction_key.encode("utf-8")
+    if not key:
+        raise IngestError("A non-empty redaction key is required")
     material = f"{namespace}|{value}".encode("utf-8")
-    return hashlib.sha256(material).hexdigest()[:16]
+    return hmac.new(key, material, hashlib.sha256).hexdigest()[:16]
 
 
 def parse_timestamp(value: object) -> dt.datetime | None:
@@ -176,9 +180,10 @@ def booking_metadata(booking: dict[str, Any] | None) -> dict[str, Any]:
 def first_later_host(
     host_rows: list[tuple[dt.datetime, int]],
     guest_time: dt.datetime,
+    guest_id: int,
 ) -> tuple[dt.datetime, int] | None:
     for host_time, host_id in host_rows:
-        if host_time >= guest_time:
+        if (host_time, host_id) > (guest_time, guest_id):
             return host_time, host_id
     return None
 
@@ -188,6 +193,7 @@ def normalize_messages(
     bookings: dict[int, dict[str, Any]],
     *,
     now: dt.datetime,
+    redaction_key: str,
 ) -> tuple[list[dict[str, Any]], list[dict[str, Any]], dict[str, int]]:
     current = now.astimezone(dt.timezone.utc)
     deduplicated: dict[tuple[str, int], dict[str, Any]] = {}
@@ -220,7 +226,7 @@ def normalize_messages(
             continue
         grouped[booking_id].append(message)
 
-    events: list[dict[str, Any]] = []
+    event_rows: list[tuple[dt.datetime, int, int, dict[str, Any]]] = []
     conversations: list[dict[str, Any]] = []
 
     for booking_id, rows in sorted(grouped.items()):
@@ -252,7 +258,7 @@ def normalize_messages(
             assert timestamp is not None
             text = str(message.get("message") or "")
             response = (
-                first_later_host(typed_host_rows, timestamp)
+                first_later_host(typed_host_rows, timestamp, message_id)
                 if source == "guest"
                 else None
             )
@@ -263,12 +269,17 @@ def normalize_messages(
                 else None
             )
             event = {
-                "eventId": stable_hash(
+                "eventId": keyed_hash(
+                    redaction_key,
                     "beds24-event",
                     f"{booking_id}|{message_id}|{source}|{timestamp.isoformat()}",
                 ),
-                "messageHash": stable_hash("beds24-message", message_id),
-                "bookingHash": stable_hash("beds24-booking", booking_id),
+                "messageHash": keyed_hash(
+                    redaction_key, "beds24-message", message_id
+                ),
+                "bookingHash": keyed_hash(
+                    redaction_key, "beds24-booking", booking_id
+                ),
                 "propertyId": PROPERTY_ID,
                 "direction": source,
                 "eventType": (
@@ -281,7 +292,7 @@ def normalize_messages(
                 "responseLagSeconds": response_lag,
                 **booking_metadata(bookings.get(booking_id)),
             }
-            events.append(event)
+            event_rows.append((timestamp, booking_id, message_id, event))
             normalized_for_booking.append(event)
 
         latest = normalized_for_booking[-1]
@@ -303,8 +314,12 @@ def normalize_messages(
         )
         conversations.append(
             {
-                "conversationId": stable_hash("beds24-conversation", booking_id),
-                "bookingHash": stable_hash("beds24-booking", booking_id),
+                "conversationId": keyed_hash(
+                    redaction_key, "beds24-conversation", booking_id
+                ),
+                "bookingHash": keyed_hash(
+                    redaction_key, "beds24-booking", booking_id
+                ),
                 "propertyId": PROPERTY_ID,
                 "lastDirection": latest["direction"],
                 "lastEventType": latest["eventType"],
@@ -317,7 +332,13 @@ def normalize_messages(
             }
         )
 
-    events.sort(key=lambda item: (str(item["occurredAtUtc"]), str(item["eventId"])))
+    events = [
+        event
+        for _, _, _, event in sorted(
+            event_rows,
+            key=lambda item: (item[0], item[1], item[2]),
+        )
+    ]
     conversations.sort(
         key=lambda item: (str(item["lastMessageAtUtc"]), str(item["conversationId"]))
     )
@@ -335,6 +356,7 @@ def run(
     *,
     max_age_days: int,
     now: dt.datetime | None = None,
+    redaction_key: str,
 ) -> dict[str, Any]:
     if not 1 <= max_age_days <= 7:
         raise IngestError("BEDS24_MESSAGE_MAX_AGE_DAYS must be between 1 and 7")
@@ -347,7 +369,10 @@ def run(
     booking_ids = [int(item.get("bookingId") or 0) for item in messages]
     bookings = fetch_bookings(client, booking_ids) if any(booking_ids) else {}
     events, conversations, counters = normalize_messages(
-        messages, bookings, now=current
+        messages,
+        bookings,
+        now=current,
+        redaction_key=redaction_key,
     )
     report = {
         "schema": "aumara-beds24-guest-message-ingest-v1",
@@ -394,7 +419,14 @@ def main() -> int:
         max_age_days = int(os.environ.get("BEDS24_MESSAGE_MAX_AGE_DAYS", "3"))
         token, auth_mode, api_base, auth_source, _ = get_access_token()
         client = Beds24ReadOnlyClient(token, api_base)
-        report = run(client, max_age_days=max_age_days)
+        configured_key = "".join(
+            (os.environ.get("BEDS24_TOKEN_CREDENTIAL") or token).split()
+        )
+        report = run(
+            client,
+            max_age_days=max_age_days,
+            redaction_key=configured_key,
+        )
         report["authentication"] = {
             "mode": auth_mode,
             "source": auth_source,

@@ -6,12 +6,40 @@ import unittest
 from unittest import mock
 
 SCRIPTS = pathlib.Path(__file__).resolve().parents[1] / "scripts"
+REPOSITORY_ROOT = pathlib.Path(__file__).resolve().parents[2]
 sys.path.insert(0, str(SCRIPTS))
 
 import beds24_guest_message_ingest_entry as entry  # noqa: E402
 
 
 class EntryTests(unittest.TestCase):
+    def test_workflow_keeps_secret_out_of_pull_request_and_push_jobs(self):
+        workflow = (
+            REPOSITORY_ROOT
+            / ".github"
+            / "workflows"
+            / "beds24-guest-message-ingest.yml"
+        ).read_text(encoding="utf-8")
+        live_job = workflow.split("  live-readonly-proof:\n", 1)[1]
+
+        self.assertIn(
+            "github.event_name == 'workflow_dispatch'",
+            live_job,
+        )
+        self.assertIn(
+            "RUN_BEDS24_READONLY_PROOF",
+            live_job,
+        )
+        self.assertNotIn("github.event_name == 'push'", live_job)
+        self.assertNotIn("github.event_name == 'pull_request'", live_job)
+        self.assertEqual(
+            workflow.count(
+                "BEDS24_TOKEN_CREDENTIAL: "
+                "${{ secrets.BEDS24_TOKEN_CREDENTIAL }}"
+            ),
+            1,
+        )
+
     def test_scope_names_are_extracted_without_other_diagnostics(self):
         details = {
             "diagnostics": {
@@ -34,13 +62,21 @@ class EntryTests(unittest.TestCase):
 
         with mock.patch.object(entry.auth, "get_credential", return_value="access"), \
              mock.patch.object(entry.auth, "request_json", side_effect=request):
-            token, mode, api_base, source, scopes = entry.resolve_access_token()
+            (
+                token,
+                mode,
+                api_base,
+                source,
+                scopes,
+                redaction_key,
+            ) = entry.resolve_access_token()
 
         self.assertEqual(token, "access")
         self.assertEqual(mode, "access_token")
         self.assertEqual(api_base, entry.auth.API_BASE)
         self.assertEqual(source, entry.auth.CREDENTIAL_SOURCE)
         self.assertEqual(scopes, ["bookings-personal"])
+        self.assertEqual(redaction_key, "access")
         self.assertEqual(len(calls), 1)
         self.assertTrue(calls[0][0].endswith("/authentication/details"))
         self.assertEqual(calls[0][1], {"token": "access"})
@@ -59,11 +95,14 @@ class EntryTests(unittest.TestCase):
 
         with mock.patch.object(entry.auth, "get_credential", return_value="refresh"), \
              mock.patch.object(entry.auth, "request_json", side_effect=request):
-            token, mode, _, _, scopes = entry.resolve_access_token()
+            token, mode, _, _, scopes, redaction_key = (
+                entry.resolve_access_token()
+            )
 
         self.assertEqual(token, "temporary-token")
         self.assertEqual(mode, "refresh_token")
         self.assertEqual(scopes, ["bookings-personal"])
+        self.assertEqual(redaction_key, "refresh")
         self.assertEqual(len(calls), 3)
         self.assertTrue(calls[1][0].endswith("/authentication/token"))
         self.assertEqual(calls[1][1], {"refreshToken": "refresh"})
@@ -108,11 +147,16 @@ class EntryTests(unittest.TestCase):
                 "https://api.beds24.com/v2",
                 "BEDS24_TOKEN_CREDENTIAL",
                 ["bookings", "bookings-personal"],
+                "stable-redaction-key",
             ),
         ), mock.patch.object(entry.ingest, "run", return_value=report) as run:
             result = entry.build_report(3)
 
         run.assert_called_once()
+        self.assertEqual(
+            run.call_args.kwargs["redaction_key"],
+            "stable-redaction-key",
+        )
         self.assertEqual(result["status"], "OK")
         self.assertEqual(result["authentication"]["mode"], "access_token")
         self.assertEqual(result["authentication"]["source"], "BEDS24_TOKEN_CREDENTIAL")
@@ -124,6 +168,7 @@ class EntryTests(unittest.TestCase):
         self.assertTrue(result["authentication"]["bookingsPersonalScopePresent"])
         self.assertFalse(result["authentication"]["secretLogged"])
         self.assertNotIn("secret-access-token", str(result))
+        self.assertNotIn("stable-redaction-key", str(result))
 
     def test_401_message_access_creates_exact_blocker_report(self):
         with mock.patch.object(
@@ -135,6 +180,7 @@ class EntryTests(unittest.TestCase):
                 "https://api.beds24.com/v2",
                 "BEDS24_TOKEN_CREDENTIAL",
                 ["bookings"],
+                "stable-redaction-key",
             ),
         ), mock.patch.object(
             entry.ingest,

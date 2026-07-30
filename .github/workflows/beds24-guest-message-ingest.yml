@@ -2,6 +2,11 @@ name: Beds24 guest-message ingestion (read-only)
 
 on:
   workflow_dispatch:
+    inputs:
+      confirmation:
+        description: "Type RUN_BEDS24_READONLY_PROOF"
+        required: true
+        type: string
   pull_request:
     branches: [main]
     paths:
@@ -46,10 +51,8 @@ jobs:
 
   live-readonly-proof:
     if: >-
-      github.event_name == 'workflow_dispatch' ||
-      github.event_name == 'push' ||
-      (github.event_name == 'pull_request' &&
-      github.event.pull_request.head.repo.full_name == github.repository)
+      github.event_name == 'workflow_dispatch' &&
+      github.event.inputs.confirmation == 'RUN_BEDS24_READONLY_PROOF'
     runs-on: ubuntu-latest
     env:
       BEDS24_TOKEN_CREDENTIAL: ${{ secrets.BEDS24_TOKEN_CREDENTIAL }}

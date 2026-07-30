@@ -84,6 +84,14 @@ for the Guest Ops ledger. It retrieves recent `guest` and `host` messages from
 Beds24 API V2 with GET requests, resolves reduced booking metadata, and emits a
 normalized event stream plus one conversation-health record per booking.
 
+Message reads require the Beds24 API V2 `bookings-personal` scope in addition
+to normal booking access. The credential-backed entrypoint uses the existing
+`BEDS24_TOKEN_CREDENTIAL`, detects access-token versus refresh-token mode, and
+fails closed with a redacted `BOOKINGS_PERSONAL_ACCESS_DENIED` or
+`MISSING_BOOKINGS_PERSONAL_SCOPE` artifact when the endpoint returns HTTP 401.
+It never creates an invite code, calls `/authentication/setup`, rotates a
+credential, or expands token permissions.
+
 The persisted artifact contains hashed message/booking identifiers, direction,
 event type, timestamps, response lag, unanswered age, booking status, channel,
 and stay dates. It never stores raw message text, guest names, email addresses,
@@ -92,9 +100,9 @@ worker has no send, note-write, or booking-mutation path and fails if a non-GET
 request is attempted.
 
 The workflow runs deterministic tests on pull requests. Credential-backed
-reading is limited to manual dispatch and the dedicated verification branch;
-no schedule or production destination is configured. Only the redacted artifact
-is uploaded.
+reading is limited to manual dispatch, the dedicated verification branch, and
+trusted same-repository pull requests; no schedule or production destination is
+configured. Only the redacted artifact is uploaded.
 
 ## Guest-request dry run
 

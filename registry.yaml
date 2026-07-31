@@ -4,6 +4,19 @@
 # should build pages for, and indicates metadata such as tags, creation date and
 # authors for each page.
 
+- title: Run a Standalone Sales Demo with Codex
+  path: examples/codex/standalone-sales-demo/SKILL.md
+  slug: standalone-sales-demo
+  description: Run a complete connector-free sales walkthrough from one portable Codex skill, including executive and seller dashboards and reviewed customer follow-up.
+  date: 2026-07-31
+  authors:
+    - nm-openai
+  tags:
+    - codex
+    - agents
+    - sales
+    - workflows
+
 - title: Migrate from Whisper to GPT-Transcribe and GPT-Live-Transcribe
   path: examples/migrating_from_whisper_to_gpt_transcribe.ipynb
   slug: migrating-from-whisper-to-gpt-transcribe

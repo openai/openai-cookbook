@@ -1,0 +1,69 @@
+name: Beds24 AUMARA access audit (read-only)
+
+on:
+  workflow_dispatch:
+    inputs:
+      arrival:
+        description: Arrival date (YYYY-MM-DD); blank means tomorrow in Madrid
+        required: false
+        type: string
+      booking_id:
+        description: Optional exact Beds24 booking ID
+        required: false
+        type: string
+  schedule:
+    - cron: "5 12 * * *"
+  pull_request:
+    branches: [main]
+    paths:
+      - ".github/workflows/beds24-aumara-access-audit.yml"
+      - "aumara-control-tower/scripts/beds24_aumara_access_audit.py"
+      - "aumara-control-tower/scripts/beds24_elcid_studio_audit.py"
+      - "aumara-control-tower/scripts/tests/test_beds24_aumara_access_audit.py"
+      - "aumara-control-tower/scripts/tests/test_beds24_elcid_studio_audit.py"
+  push:
+    branches: [main]
+    paths:
+      - ".github/workflows/beds24-aumara-access-audit.yml"
+      - "aumara-control-tower/scripts/beds24_aumara_access_audit.py"
+      - "aumara-control-tower/scripts/beds24_elcid_studio_audit.py"
+      - "aumara-control-tower/scripts/tests/test_beds24_aumara_access_audit.py"
+      - "aumara-control-tower/scripts/tests/test_beds24_elcid_studio_audit.py"
+
+permissions:
+  contents: read
+
+concurrency:
+  group: beds24-aumara-access-audit
+  cancel-in-progress: true
+
+jobs:
+  audit:
+    runs-on: ubuntu-latest
+    env:
+      BEDS24_TOKEN_CREDENTIAL: ${{ secrets.BEDS24_TOKEN_CREDENTIAL }}
+      BEDS24_ALLOW_INVITE_BOOTSTRAP: "0"
+      AUMARA_AUDIT_ARRIVAL: ${{ inputs.arrival || '' }}
+      AUMARA_AUDIT_BOOKING_ID: ${{ inputs.booking_id || '' }}
+
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Test AUMARA access audit
+        run: |
+          python -m unittest \
+            aumara-control-tower/scripts/tests/test_beds24_aumara_access_audit.py \
+            aumara-control-tower/scripts/tests/test_beds24_elcid_studio_audit.py \
+            -v
+
+      - name: Read AUMARA arrival and access evidence
+        run: python aumara-control-tower/scripts/beds24_aumara_access_audit.py
+
+      - name: Upload sanitized evidence
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: aumara-access-audit
+          path: aumara-control-tower/evidence/aumara-access-audit.json
+          if-no-files-found: warn
+          retention-days: 7

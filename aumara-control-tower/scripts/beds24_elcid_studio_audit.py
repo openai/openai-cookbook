@@ -173,14 +173,18 @@ def get_access_token() -> tuple[str, str, str, str, bool]:
     last_status = 0
     for source, credential in candidates:
         for api_base in API_BASES:
-            status, _ = request_json(
+            status, details = request_json(
                 "GET",
                 "/authentication/details",
                 headers={"token": credential},
                 api_base=api_base,
             )
             last_status = status
-            if 200 <= status < 300:
+            if (
+                200 <= status < 300
+                and isinstance(details, dict)
+                and details.get("validToken") is True
+            ):
                 return credential, "access_token", api_base, source, False
 
             status, response = request_json(

@@ -18,7 +18,11 @@ class StudioAuditTests(unittest.TestCase):
         "credential_candidates",
         return_value=[("beds24_token_credential", "long-life-token")],
     )
-    @mock.patch.object(MODULE, "request_json", return_value=(200, {"scopes": []}))
+    @mock.patch.object(
+        MODULE,
+        "request_json",
+        return_value=(200, {"validToken": True, "scopes": []}),
+    )
     def test_access_token_probe_does_not_require_properties_scope(
         self, request_json, _credential_candidates
     ):
@@ -35,6 +39,27 @@ class StudioAuditTests(unittest.TestCase):
             headers={"token": "long-life-token"},
             api_base=MODULE.API_BASES[0],
         )
+
+    @mock.patch.object(
+        MODULE,
+        "credential_candidates",
+        return_value=[("beds24_token_credential", "refresh-token")],
+    )
+    def test_http_200_invalid_details_falls_through_to_refresh_exchange(
+        self, _credential_candidates
+    ):
+        responses = [
+            (200, {"validToken": False}),
+            (200, {"token": "temporary-access"}),
+        ]
+        with mock.patch.object(MODULE, "request_json", side_effect=responses) as request:
+            token, mode, api_base, source, bootstrap = MODULE.get_access_token()
+        self.assertEqual(token, "temporary-access")
+        self.assertEqual(mode, "refresh_token")
+        self.assertEqual(api_base, MODULE.API_BASES[0])
+        self.assertEqual(source, "beds24_token_credential")
+        self.assertFalse(bootstrap)
+        self.assertEqual(request.call_count, 2)
 
     def test_booking_query_is_narrow_and_read_only(self):
         path = MODULE.booking_query(dt.date(2026, 7, 16))

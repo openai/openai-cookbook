@@ -55,8 +55,7 @@ jobs:
     needs: test
     runs-on: ubuntu-latest
     env:
-      BEDS24_TOKEN_CREDENTIAL: ${{ secrets.BEDS24_TOKEN_CREDENTIAL }}
-      BEDS24_ALLOW_INVITE_BOOTSTRAP: "0"
+      BEDS24_REFRESH_TOKEN: ${{ secrets.BEDS24_REFRESH_TOKEN }}
       AUMARA_AUDIT_ARRIVAL: ${{ inputs.arrival || '' }}
       AUMARA_AUDIT_BOOKING_ID: ${{ inputs.booking_id || '' }}
 

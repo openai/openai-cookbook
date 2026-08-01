@@ -13,6 +13,28 @@ SPEC.loader.exec_module(MODULE)
 
 
 class StudioAuditTests(unittest.TestCase):
+    def test_runtime_uses_only_the_durable_refresh_secret(self):
+        with mock.patch.dict(
+            "os.environ",
+            {
+                "BEDS24_REFRESH_TOKEN": " refresh-token ",
+                "BEDS24_TOKEN_CREDENTIAL": "invite-or-long-life-token",
+                "BEDS24_BOOTSTRAP_CREDENTIAL": "legacy-bootstrap",
+            },
+            clear=True,
+        ):
+            self.assertEqual(
+                MODULE.credential_candidates(),
+                [("beds24_refresh_token", "refresh-token")],
+            )
+
+    def test_missing_refresh_secret_fails_closed(self):
+        with mock.patch.dict("os.environ", {}, clear=True):
+            with self.assertRaisesRegex(
+                MODULE.AuditError, "BEDS24_REFRESH_TOKEN is missing"
+            ):
+                MODULE.get_access_token()
+
     @mock.patch.object(
         MODULE,
         "credential_candidates",

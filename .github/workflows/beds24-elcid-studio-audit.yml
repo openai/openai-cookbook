@@ -9,7 +9,7 @@ on:
       - 'aumara-control-tower/scripts/beds24_elcid_studio_audit.py'
 
 permissions:
-  contents: write
+  contents: read
 
 concurrency:
   group: beds24-elcid-studio-audit
@@ -19,10 +19,7 @@ jobs:
   audit:
     runs-on: ubuntu-latest
     env:
-      BEDS24_TOKEN_CREDENTIAL: ${{ secrets.BEDS24_TOKEN_CREDENTIAL }}
-      BEDS24_BOOTSTRAP_CREDENTIAL: ${{ secrets.BEDS24_BOOTSTRAP_CREDENTIAL }}
       BEDS24_REFRESH_TOKEN: ${{ secrets.BEDS24_REFRESH_TOKEN }}
-      BEDS24_ALLOW_INVITE_BOOTSTRAP: '1'
       BEDS24_STUDIO_AUDIT_OUTPUT: aumara-control-tower/evidence/elcid-studio-audit.json
 
     steps:
@@ -33,17 +30,6 @@ jobs:
 
       - name: Audit Studio bookings, alternatives, and website
         run: python aumara-control-tower/scripts/beds24_elcid_studio_audit.py
-
-      - name: Persist only an encrypted refresh-token vault after bootstrap
-        if: success()
-        run: |
-          git config user.name 'github-actions[bot]'
-          git config user.email '41898282+github-actions[bot]@users.noreply.github.com'
-          git add aumara-control-tower/vault/beds24-refresh-token.enc
-          if ! git diff --cached --quiet; then
-            git commit -m 'Refresh encrypted Beds24 credential vault [skip ci]'
-            git push origin HEAD:main
-          fi
 
       - name: Upload sanitized audit
         if: always()

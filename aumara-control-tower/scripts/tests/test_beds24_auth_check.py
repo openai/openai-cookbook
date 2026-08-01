@@ -29,7 +29,7 @@ class Beds24AuthCheckTests(unittest.TestCase):
     def evidence(self):
         return json.loads(self.evidence_path.read_text(encoding="utf-8"))
 
-    @mock.patch.dict("os.environ", {"BEDS24_TOKEN_CREDENTIAL": " secret \n"})
+    @mock.patch.dict("os.environ", {"BEDS24_REFRESH_TOKEN": " secret \n"})
     def test_validate_present(self):
         self.assertEqual(MODULE.command_validate(), 0)
         self.assertEqual(self.evidence()["status"], "CREDENTIAL_PRESENT")
@@ -40,7 +40,7 @@ class Beds24AuthCheckTests(unittest.TestCase):
                 self.assertEqual(MODULE.command_validate(), 1)
         self.assertEqual(self.evidence()["failure_stage"], "validate")
 
-    @mock.patch.dict("os.environ", {"BEDS24_TOKEN_CREDENTIAL": "access-secret"})
+    @mock.patch.dict("os.environ", {"BEDS24_REFRESH_TOKEN": "access-secret"})
     def test_access_token_mode_succeeds_without_exchange(self):
         with mock.patch.object(
             MODULE,
@@ -54,7 +54,7 @@ class Beds24AuthCheckTests(unittest.TestCase):
         self.assertNotIn("access-secret", json.dumps(evidence))
         request.assert_called_once()
 
-    @mock.patch.dict("os.environ", {"BEDS24_TOKEN_CREDENTIAL": "refresh-secret"})
+    @mock.patch.dict("os.environ", {"BEDS24_REFRESH_TOKEN": "refresh-secret"})
     def test_refresh_token_mode_exchanges_then_probes(self):
         responses = [
             (401, {"error": "Token not valid"}),
@@ -77,7 +77,7 @@ class Beds24AuthCheckTests(unittest.TestCase):
             request.call_args_list[2].args[1], {"token": "temporary-access"}
         )
 
-    @mock.patch.dict("os.environ", {"BEDS24_TOKEN_CREDENTIAL": "invalid-access"})
+    @mock.patch.dict("os.environ", {"BEDS24_REFRESH_TOKEN": "invalid-access"})
     def test_http_200_with_valid_token_false_is_not_auth_ok(self):
         responses = [
             (200, {"validToken": False, "diagnostics": {"requestIp": "127.0.0.1"}}),
@@ -91,7 +91,7 @@ class Beds24AuthCheckTests(unittest.TestCase):
         self.assertFalse(evidence["direct_probe_valid_token"])
         self.assertEqual(evidence["failure_stage"], "credential")
 
-    @mock.patch.dict("os.environ", {"BEDS24_TOKEN_CREDENTIAL": "bad-secret"})
+    @mock.patch.dict("os.environ", {"BEDS24_REFRESH_TOKEN": "bad-secret"})
     def test_both_modes_invalid_fail_honestly_and_redacted(self):
         responses = [
             (401, {"error": "Token bad-secret not valid"}),
@@ -108,7 +108,7 @@ class Beds24AuthCheckTests(unittest.TestCase):
         self.assertNotIn("bad-secret", json.dumps(evidence))
         self.assertIn(MODULE.REDACTED, json.dumps(evidence))
 
-    @mock.patch.dict("os.environ", {"BEDS24_TOKEN_CREDENTIAL": "refresh-secret"})
+    @mock.patch.dict("os.environ", {"BEDS24_REFRESH_TOKEN": "refresh-secret"})
     def test_exchanged_access_token_probe_failure_is_redacted(self):
         responses = [
             (401, {"error": "not access"}),

@@ -2,7 +2,7 @@
 """Read-only AUMARA arrival and access-message audit.
 
 The audit is deliberately non-mutating.  It authenticates with the single
-``BEDS24_TOKEN_CREDENTIAL`` secret, reads arrivals for AUMARA property 324882,
+``BEDS24_REFRESH_TOKEN`` secret, reads arrivals for AUMARA property 324882,
 and checks whether Beds24 exposes both a generated ``LOCK_PIN`` and a host
 access-message marker.  The PIN value and message body are never written to
 logs or artifacts.

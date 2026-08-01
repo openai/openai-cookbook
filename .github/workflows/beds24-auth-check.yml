@@ -19,16 +19,24 @@ permissions:
   contents: read
 
 jobs:
-  validate:
+  test:
     runs-on: ubuntu-latest
-    env:
-      BEDS24_TOKEN_CREDENTIAL: ${{ secrets.BEDS24_TOKEN_CREDENTIAL }}
 
     steps:
       - uses: actions/checkout@v4
 
       - name: Run deterministic Beds24 auth tests
         run: python -m unittest aumara-control-tower/scripts/tests/test_beds24_auth_check.py -v
+
+  live-auth:
+    if: github.event_name != 'pull_request'
+    needs: test
+    runs-on: ubuntu-latest
+    env:
+      BEDS24_REFRESH_TOKEN: ${{ secrets.BEDS24_REFRESH_TOKEN }}
+
+    steps:
+      - uses: actions/checkout@v4
 
       - name: Validate existing Beds24 credential
         id: validate

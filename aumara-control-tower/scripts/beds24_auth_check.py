@@ -24,7 +24,7 @@ from typing import Any
 API_BASE = "https://api.beds24.com/v2"
 ROOT = pathlib.Path(__file__).resolve().parents[1]
 EVIDENCE_PATH = ROOT / "evidence" / "beds24-auth-check.json"
-CREDENTIAL_SOURCE = "BEDS24_TOKEN_CREDENTIAL"
+CREDENTIAL_SOURCE = "BEDS24_REFRESH_TOKEN"
 REDACTED = "[REDACTED]"
 DIAGNOSTIC_FIELDS = (
     "diagnostics",
@@ -213,7 +213,7 @@ def command_validate() -> int:
     )
     save_evidence(evidence)
     if not credential:
-        print("Missing GitHub Actions secret BEDS24_TOKEN_CREDENTIAL", file=sys.stderr)
+        print(f"Missing GitHub Actions secret {CREDENTIAL_SOURCE}", file=sys.stderr)
         return 1
     print("Beds24 credential is present; value was not printed.")
     return 0
@@ -243,7 +243,7 @@ def command_authenticate() -> int:
         evidence["status"] = "AUTH_FAILED"
         evidence["failure_stage"] = "validate"
         save_evidence(evidence)
-        print("Missing GitHub Actions secret BEDS24_TOKEN_CREDENTIAL", file=sys.stderr)
+        print(f"Missing GitHub Actions secret {CREDENTIAL_SOURCE}", file=sys.stderr)
         return 1
 
     direct_status, direct_body = request_json(

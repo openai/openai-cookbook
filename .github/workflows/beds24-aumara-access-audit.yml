@@ -51,7 +51,7 @@ jobs:
             -v
 
   live-audit:
-    if: github.event_name != 'pull_request'
+    if: github.event_name == 'workflow_dispatch' || github.event_name == 'schedule'
     needs: test
     runs-on: ubuntu-latest
     env:
@@ -62,11 +62,22 @@ jobs:
     steps:
       - uses: actions/checkout@v4
 
+      - name: Check durable Beds24 credential
+        id: credential
+        run: |
+          if [ -n "$BEDS24_REFRESH_TOKEN" ]; then
+            echo "available=true" >> "$GITHUB_OUTPUT"
+          else
+            echo "available=false" >> "$GITHUB_OUTPUT"
+            echo "::warning::BEDS24_REFRESH_TOKEN is not configured; live audit skipped."
+          fi
+
       - name: Read AUMARA arrival and access evidence
+        if: steps.credential.outputs.available == 'true'
         run: python aumara-control-tower/scripts/beds24_aumara_access_audit.py
 
       - name: Upload sanitized evidence
-        if: always()
+        if: always() && steps.credential.outputs.available == 'true'
         uses: actions/upload-artifact@v4
         with:
           name: aumara-access-audit

@@ -74,7 +74,7 @@ jobs:
     runs-on: ubuntu-latest
     timeout-minutes: 10
     env:
-      BEDS24_REFRESH_TOKEN: ${{ secrets.BEDS24_REFRESH_TOKEN }}
+      BEDS24_REFRESH_TOKEN: ${{ secrets.BEDS24_REFRESH_CREDENTIAL }}
       BEDS24_COT_NOTE_MODE: live
       AUMARA_DISABLE_BOOKING_MUTATIONS: 'false'
       AUMARA_LIVE_BOOKING_WRITES_CONFIRMED: 'true'

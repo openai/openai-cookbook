@@ -33,7 +33,7 @@ jobs:
     needs: test
     runs-on: ubuntu-latest
     env:
-      BEDS24_REFRESH_TOKEN: ${{ secrets.BEDS24_REFRESH_TOKEN }}
+      BEDS24_REFRESH_TOKEN: ${{ secrets.BEDS24_REFRESH_CREDENTIAL }}
 
     steps:
       - uses: actions/checkout@v4

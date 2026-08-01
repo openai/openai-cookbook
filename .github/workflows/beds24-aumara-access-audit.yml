@@ -55,7 +55,7 @@ jobs:
     needs: test
     runs-on: ubuntu-latest
     env:
-      BEDS24_REFRESH_TOKEN: ${{ secrets.BEDS24_REFRESH_TOKEN }}
+      BEDS24_REFRESH_TOKEN: ${{ secrets.BEDS24_REFRESH_CREDENTIAL }}
       AUMARA_AUDIT_ARRIVAL: ${{ inputs.arrival || '' }}
       AUMARA_AUDIT_BOOKING_ID: ${{ inputs.booking_id || '' }}
 

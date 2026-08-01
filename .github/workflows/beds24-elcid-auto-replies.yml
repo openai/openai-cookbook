@@ -14,7 +14,7 @@ jobs:
   reply:
     runs-on: ubuntu-latest
     env:
-      BEDS24_REFRESH_TOKEN: ${{ secrets.BEDS24_REFRESH_TOKEN }}
+      BEDS24_REFRESH_TOKEN: ${{ secrets.BEDS24_REFRESH_CREDENTIAL }}
       BEDS24_AUTO_REPLY_OUTPUT: aumara-control-tower/evidence/elcid-auto-replies.json
 
     steps:

@@ -38,7 +38,21 @@ concurrency:
   cancel-in-progress: true
 
 jobs:
-  audit:
+  test:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Test AUMARA access audit without credentials or network
+        run: |
+          python -m unittest \
+            aumara-control-tower/scripts/tests/test_beds24_aumara_access_audit.py \
+            aumara-control-tower/scripts/tests/test_beds24_elcid_studio_audit.py \
+            -v
+
+  live-audit:
+    if: github.event_name != 'pull_request'
+    needs: test
     runs-on: ubuntu-latest
     env:
       BEDS24_TOKEN_CREDENTIAL: ${{ secrets.BEDS24_TOKEN_CREDENTIAL }}
@@ -48,13 +62,6 @@ jobs:
 
     steps:
       - uses: actions/checkout@v4
-
-      - name: Test AUMARA access audit
-        run: |
-          python -m unittest \
-            aumara-control-tower/scripts/tests/test_beds24_aumara_access_audit.py \
-            aumara-control-tower/scripts/tests/test_beds24_elcid_studio_audit.py \
-            -v
 
       - name: Read AUMARA arrival and access evidence
         run: python aumara-control-tower/scripts/beds24_aumara_access_audit.py

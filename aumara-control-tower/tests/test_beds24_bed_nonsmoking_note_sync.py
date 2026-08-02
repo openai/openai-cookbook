@@ -39,7 +39,7 @@ LIVE_ENV = {
     "AUMARA_BEDS24_BED_NONSMOKING_CONFIRMATION": worker.LIVE_CONFIRMATION,
     "BEDS24_BED_NONSMOKING_MAX_WRITES": "4",
     "BEDS24_BED_NONSMOKING_EXPECTED_RESOLVED": "4",
-    "BEDS24_BED_NONSMOKING_MESSAGE_MAX_AGE_DAYS": "7",
+    "BEDS24_BED_NONSMOKING_BOOKING_MAX_AGE_DAYS": "7",
     "BEDS24_BED_NONSMOKING_POLICY_ID": worker.POLICY_ID,
     "BEDS24_BED_NONSMOKING_POLICY_VERSION": worker.POLICY_VERSION,
     "BEDS24_BED_NONSMOKING_POLICY_PATH": str(POLICY),
@@ -53,6 +53,7 @@ def booking(
     room_id=None,
     status="confirmed",
     include_requests=True,
+    booking_time="2026-07-30 10:00:00",
 ):
     return {
         "id": booking_id,
@@ -60,6 +61,7 @@ def booking(
         "roomId": room_id or worker.TWIN_ROOM_ID,
         "status": status,
         "arrival": "2026-09-10",
+        "bookingTime": booking_time,
         "guestComments": (
             "BED PREFERENCE:Twin Room with Terrace: 1 extra-large double\n"
             "Non Smoking Requested"
@@ -70,29 +72,13 @@ def booking(
     }
 
 
-def guest_message(message_id: int, booking_id: int):
-    return {
-        "id": message_id,
-        "bookingId": booking_id,
-        "propertyId": worker.PROPERTY_ID,
-        "source": "guest",
-        "message": (
-            "BED PREFERENCE:Twin Room with Terrace: 1 extra-large double\n"
-            "Non Smoking Requested"
-        ),
-    }
-
-
 class FakeClient:
-    def __init__(self, bookings, *, messages=None, post_ok=True):
+    def __init__(self, bookings, *, post_ok=True):
         self.bookings = {int(row["id"]): dict(row) for row in bookings}
-        self.messages = messages or []
         self.post_ok = post_ok
         self.post_requests = 0
 
     def request_json(self, method, path, body=None):
-        if method == "GET" and path.startswith("/bookings/messages?"):
-            return 200, {"data": self.messages}
         if method == "GET" and path.startswith("/bookings?"):
             return 200, {"data": list(self.bookings.values())}
         if method == "POST" and path == "/bookings":
@@ -112,7 +98,7 @@ class BedNonSmokingNoteTests(unittest.TestCase):
         with self.assertRaisesRegex(worker.BedNonSmokingNoteError, "exactly four"):
             worker.require_live_guards(unsafe)
         unsafe_window = dict(
-            LIVE_ENV, BEDS24_BED_NONSMOKING_MESSAGE_MAX_AGE_DAYS="90"
+            LIVE_ENV, BEDS24_BED_NONSMOKING_BOOKING_MAX_AGE_DAYS="90"
         )
         with self.assertRaisesRegex(worker.BedNonSmokingNoteError, "7 days"):
             worker.require_live_guards(unsafe_window)
@@ -121,18 +107,11 @@ class BedNonSmokingNoteTests(unittest.TestCase):
         valid = booking(1)
         wrong_room = booking(2, room_id=999)
         one_request = booking(3)
+        one_request["guestComments"] = "Non Smoking Requested"
         cancelled = booking(4, status="cancelled")
-        one_request_message = guest_message(12, 3)
-        one_request_message["message"] = "Non Smoking Requested"
         candidates, audit = worker.plan_notes(
             [valid, wrong_room, one_request, cancelled],
             today=TODAY,
-            messages_by_booking={
-                1: [guest_message(10, 1)],
-                2: [guest_message(11, 2)],
-                3: [one_request_message],
-                4: [guest_message(13, 4)],
-            },
         )
         self.assertEqual([item["bookingId"] for item in candidates], [1])
         self.assertEqual(audit, [{"action": "pending_write", "reason": "safe_rule_proved"}])
@@ -142,34 +121,25 @@ class BedNonSmokingNoteTests(unittest.TestCase):
         candidates, audit = worker.plan_notes(
             [booking(1, info_items=existing)],
             today=TODAY,
-            messages_by_booking={1: [guest_message(10, 1)]},
         )
         self.assertEqual(candidates, [])
         self.assertEqual(audit[0]["action"], "duplicate")
 
-    def test_personal_guest_messages_supply_the_request_text(self):
-        row = booking(1, include_requests=False)
+    def test_old_booking_is_not_part_of_current_queue(self):
         candidates, _ = worker.plan_notes(
-            [row],
-            today=TODAY,
-            messages_by_booking={1: [guest_message(10, 1)]},
+            [booking(1, booking_time="2026-07-20 10:00:00")], today=TODAY
         )
-        self.assertEqual([item["bookingId"] for item in candidates], [1])
-
-    def test_booking_payload_alone_is_not_an_authoritative_message_source(self):
-        candidates, _ = worker.plan_notes([booking(1)], today=TODAY)
         self.assertEqual(candidates, [])
 
     def test_four_notes_are_written_and_exactly_read_back(self):
         client = FakeClient(
-            [booking(value, include_requests=False) for value in range(1, 5)],
-            messages=[guest_message(100 + value, value) for value in range(1, 5)],
+            [booking(value) for value in range(1, 5)],
         )
         report = worker.run(client, today=TODAY, values=LIVE_ENV)
         self.assertEqual(report["summary"]["requestsResolved"], 4)
         self.assertEqual(report["summary"]["notesWritten"], 4)
         self.assertEqual(report["summary"]["notesReadBackVerified"], 4)
-        self.assertEqual(report["summary"]["guestMessageMaxAgeDays"], 7)
+        self.assertEqual(report["summary"]["bookingMaxAgeDays"], 7)
         self.assertEqual(report["summary"]["manualReview"], 0)
         self.assertEqual(report["safety"]["guestMessagesSent"], 0)
         self.assertEqual(report["safety"]["bookingFieldsChanged"], ["infoItems"])
@@ -180,8 +150,7 @@ class BedNonSmokingNoteTests(unittest.TestCase):
 
     def test_count_mismatch_refuses_all_writes(self):
         client = FakeClient(
-            [booking(value, include_requests=False) for value in range(1, 4)],
-            messages=[guest_message(100 + value, value) for value in range(1, 4)],
+            [booking(value) for value in range(1, 4)],
         )
         with self.assertRaisesRegex(
             worker.BedNonSmokingNoteError, "Resolved request count 3"
@@ -191,8 +160,7 @@ class BedNonSmokingNoteTests(unittest.TestCase):
 
     def test_incomplete_post_result_fails(self):
         client = FakeClient(
-            [booking(value, include_requests=False) for value in range(1, 5)],
-            messages=[guest_message(100 + value, value) for value in range(1, 5)],
+            [booking(value) for value in range(1, 5)],
             post_ok=False,
         )
         with self.assertRaisesRegex(

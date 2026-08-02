@@ -5,7 +5,7 @@ The worker is deliberately fail-closed:
 
 * property 324903 and Twin Room with Terrace only;
 * active future bookings only;
-* both requests must exist in a personal-scope guest message from the last 7 days;
+* both requests must exist on a booking created in the last 7 days;
 * only the Beds24 ``infoItems`` field is changed;
 * no more than four live writes are allowed;
 * exactly four current requests must be resolved by a write or a duplicate;
@@ -24,7 +24,6 @@ import pathlib
 import re
 import sys
 import urllib.parse
-from collections import defaultdict
 from typing import Any, Iterable
 
 from beds24_elcid_studio_audit import AuditError, data_rows, get_access_token
@@ -36,9 +35,9 @@ TWIN_ROOM_ID = 674485
 NOTE_CODE = "GUESTREQUEST"
 ACTIVE_STATUSES = {"confirmed", "new", "request"}
 POLICY_ID = "elcid.bed-and-nonsmoking-infoitem"
-POLICY_VERSION = "2026.08.02.1"
-LIVE_CONFIRMATION = "INFOITEMS_ONLY_ELCID_BED_NONSMOKING_2026_08_02_2"
-MESSAGE_MAX_AGE_DAYS = 7
+POLICY_VERSION = "2026.08.02.2"
+LIVE_CONFIRMATION = "INFOITEMS_ONLY_ELCID_BED_NONSMOKING_2026_08_02_3"
+BOOKING_MAX_AGE_DAYS = 7
 NOTE_MARKER = "BED + NON-SMOKING REQUEST"
 TRUE_VALUES = {"1", "true", "yes", "on"}
 DEFAULT_POLICY_PATH = (
@@ -91,9 +90,9 @@ def max_writes(values: dict[str, str]) -> int:
     return int(values.get("BEDS24_BED_NONSMOKING_MAX_WRITES") or "0")
 
 
-def message_max_age_days(values: dict[str, str]) -> int:
+def booking_max_age_days(values: dict[str, str]) -> int:
     return int(
-        values.get("BEDS24_BED_NONSMOKING_MESSAGE_MAX_AGE_DAYS") or "0"
+        values.get("BEDS24_BED_NONSMOKING_BOOKING_MAX_AGE_DAYS") or "0"
     )
 
 
@@ -116,8 +115,8 @@ def require_live_guards(values: dict[str, str]) -> None:
         raise BedNonSmokingNoteError("Maximum writes must be exactly four")
     if expected_resolved(values) != 4:
         raise BedNonSmokingNoteError("Expected resolved requests must be exactly four")
-    if message_max_age_days(values) != MESSAGE_MAX_AGE_DAYS:
-        raise BedNonSmokingNoteError("Guest-message lookback must be exactly 7 days")
+    if booking_max_age_days(values) != BOOKING_MAX_AGE_DAYS:
+        raise BedNonSmokingNoteError("Booking lookback must be exactly 7 days")
     if str(values.get("BEDS24_BED_NONSMOKING_POLICY_ID") or "") != POLICY_ID:
         raise BedNonSmokingNoteError("The approved policy ID is missing")
     if (
@@ -174,19 +173,12 @@ def iter_strings(value: object, *, parent_key: str = "") -> Iterable[str]:
 
 
 def explicit_combined_request(
-    _row: dict[str, Any],
+    row: dict[str, Any],
     messages: Iterable[dict[str, Any]] = (),
 ) -> bool:
-    """Require both requests in the bounded personal-message source."""
-    text = "\n".join(
-        str(
-            message.get("message")
-            or message.get("text")
-            or message.get("body")
-            or ""
-        )
-        for message in messages
-    )
+    """Require both requests in the current booking notification payload."""
+    del messages
+    text = "\n".join(iter_strings(row))
     return bool(BED_RE.search(text) and NONSMOKING_RE.search(text))
 
 
@@ -220,19 +212,37 @@ def active_future_twin(row: dict[str, Any], today: dt.date) -> bool:
     return arrival >= today
 
 
+def recently_created_booking(
+    row: dict[str, Any], *, today: dt.date, max_age_days: int
+) -> bool:
+    raw = str(row.get("bookingTime") or "").strip()
+    match = re.match(r"^(\d{4}-\d{2}-\d{2})", raw)
+    if not match:
+        return False
+    try:
+        booked_on = dt.date.fromisoformat(match.group(1))
+    except ValueError:
+        return False
+    oldest = today - dt.timedelta(days=max_age_days - 1)
+    return oldest <= booked_on <= today
+
+
 def plan_notes(
     bookings: list[dict[str, Any]],
     *,
     today: dt.date,
-    messages_by_booking: dict[int, list[dict[str, Any]]] | None = None,
+    max_age_days: int = BOOKING_MAX_AGE_DAYS,
 ) -> tuple[list[dict[str, Any]], list[dict[str, str]]]:
     candidates: list[dict[str, Any]] = []
     audit: list[dict[str, str]] = []
-    message_map = messages_by_booking or {}
     for row in sorted(bookings, key=lambda item: integer(item, "id")):
         booking_id = integer(row, "id")
-        if not active_future_twin(row, today) or not explicit_combined_request(
-            row, message_map.get(booking_id, [])
+        if (
+            not active_future_twin(row, today)
+            or not recently_created_booking(
+                row, today=today, max_age_days=max_age_days
+            )
+            or not explicit_combined_request(row)
         ):
             continue
         if note_already_exists(row.get("infoItems")):
@@ -284,48 +294,6 @@ def fetch_future_twins(
         if not isinstance(pages, dict) or not pages.get("nextPageExists"):
             return rows
     raise BedNonSmokingNoteError("Booking pagination exceeded the safety limit")
-
-
-def fetch_guest_messages(
-    client: Beds24Client,
-    *,
-    max_age_days: int = MESSAGE_MAX_AGE_DAYS,
-) -> list[dict[str, Any]]:
-    """Read personal-scope guest messages without retaining their contents."""
-    rows: list[dict[str, Any]] = []
-    for page in range(1, 21):
-        params: list[tuple[str, object]] = [
-            ("propertyId", PROPERTY_ID),
-            ("maxAge", max_age_days),
-            ("source", "guest"),
-        ]
-        if page > 1:
-            params.append(("page", page))
-        status, response = client.request_json(
-            "GET", f"/bookings/messages?{urllib.parse.urlencode(params)}"
-        )
-        if not 200 <= status < 300:
-            raise BedNonSmokingNoteError(
-                f"Guest-message lookup failed with HTTP {status}"
-            )
-        rows.extend(data_rows(response, "Message"))
-        pages = response.get("pages") if isinstance(response, dict) else None
-        if not isinstance(pages, dict) or not pages.get("nextPageExists"):
-            return rows
-    raise BedNonSmokingNoteError("Message pagination exceeded the safety limit")
-
-
-def messages_by_booking(
-    messages: list[dict[str, Any]],
-) -> dict[int, list[dict[str, Any]]]:
-    grouped: dict[int, list[dict[str, Any]]] = defaultdict(list)
-    for message in messages:
-        if str(message.get("source") or "").strip().lower() != "guest":
-            continue
-        booking_id = integer(message, "bookingId")
-        if booking_id:
-            grouped[booking_id].append(message)
-    return dict(grouped)
 
 
 def fetch_by_ids(
@@ -400,13 +368,10 @@ def run(
     require_live_guards(values)
     policy = load_approved_policy(values)
     bookings = fetch_future_twins(client, today=today)
-    messages = fetch_guest_messages(
-        client, max_age_days=message_max_age_days(values)
-    )
     candidates, audit = plan_notes(
         bookings,
         today=today,
-        messages_by_booking=messages_by_booking(messages),
+        max_age_days=booking_max_age_days(values),
     )
     duplicates = sum(item["action"] == "duplicate" for item in audit)
     resolved = len(candidates) + duplicates
@@ -428,8 +393,7 @@ def run(
         "policy": policy,
         "summary": {
             "bookingsScanned": len(bookings),
-            "guestMessagesScanned": len(messages),
-            "guestMessageMaxAgeDays": message_max_age_days(values),
+            "bookingMaxAgeDays": booking_max_age_days(values),
             "requestsResolved": resolved,
             "safeCandidates": len(candidates),
             "notesWritten": notes_written,

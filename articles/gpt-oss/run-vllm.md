@@ -146,7 +146,7 @@ async def main(model: str, api_key: str):
                 base_url="http://localhost:8000/v1",
                 api_key="EMPTY",
             ),
-        )
+        ),
         tools=[get_weather],
     )
 

@@ -1,0 +1,109 @@
+name: AUMARA Beds24 bed/non-smoking note reconciliation
+
+on:
+  issue_comment:
+    types: [created]
+  pull_request:
+    branches: [main]
+    paths:
+      - '.github/workflows/beds24-bed-nonsmoking-note-write.yml'
+      - 'aumara-control-tower/scripts/beds24_bed_nonsmoking_note_sync.py'
+      - 'aumara-control-tower/policies/elcid-bed-nonsmoking.json'
+      - 'aumara-control-tower/tests/test_beds24_bed_nonsmoking_note_sync.py'
+
+permissions:
+  contents: read
+
+concurrency:
+  group: >-
+    ${{
+      github.event_name == 'issue_comment' &&
+      github.event.comment.body == '/execute-beds24-bed-nonsmoking-notes' &&
+      'beds24-bed-nonsmoking-live-write' ||
+      'beds24-bed-nonsmoking-test'
+    }}
+  cancel-in-progress: >-
+    ${{
+      !(
+        github.event_name == 'issue_comment' &&
+        github.event.comment.body == '/execute-beds24-bed-nonsmoking-notes'
+      )
+    }}
+
+jobs:
+  test:
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    steps:
+      - uses: actions/checkout@v4
+      - name: Test fail-closed reconciliation without credentials or network
+        run: |
+          python -m unittest \
+            aumara-control-tower/tests/test_beds24_bed_nonsmoking_note_sync.py \
+            -v
+
+  verified-bed-nonsmoking-note-write:
+    if: >-
+      github.event_name == 'issue_comment' &&
+      github.event.issue.pull_request &&
+      github.event.comment.body == '/execute-beds24-bed-nonsmoking-notes' &&
+      github.event.comment.author_association == 'OWNER'
+    needs: test
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    env:
+      BEDS24_REFRESH_TOKEN: ${{ secrets.BEDS24_REFRESH_CREDENTIAL }}
+      BEDS24_BED_NONSMOKING_MODE: live
+      AUMARA_DISABLE_BOOKING_MUTATIONS: 'false'
+      AUMARA_LIVE_BOOKING_WRITES_CONFIRMED: 'true'
+      AUMARA_BEDS24_BED_NONSMOKING_CONFIRMATION: INFOITEMS_ONLY_ELCID_BED_NONSMOKING_2026_08_02_1
+      BEDS24_BED_NONSMOKING_MAX_WRITES: '4'
+      BEDS24_BED_NONSMOKING_EXPECTED_RESOLVED: '4'
+      BEDS24_BED_NONSMOKING_POLICY_ID: elcid.bed-and-nonsmoking-infoitem
+      BEDS24_BED_NONSMOKING_POLICY_VERSION: 2026.07.27.1
+      BEDS24_BED_NONSMOKING_OUTPUT: aumara-control-tower/evidence/beds24-bed-nonsmoking-write.json
+    steps:
+      - name: Require the merged reviewed reconciliation pull request
+        env:
+          GH_TOKEN: ${{ github.token }}
+          PR_API_URL: ${{ github.event.issue.pull_request.url }}
+        run: |
+          python - <<'PY'
+          import json
+          import os
+          import urllib.request
+
+          request = urllib.request.Request(
+              os.environ["PR_API_URL"],
+              headers={
+                  "accept": "application/vnd.github+json",
+                  "authorization": f"Bearer {os.environ['GH_TOKEN']}",
+                  "x-github-api-version": "2022-11-28",
+              },
+          )
+          with urllib.request.urlopen(request, timeout=30) as response:
+              pull_request = json.load(response)
+          expected = {
+              "base": "main",
+              "head": "agent/beds24-bed-nonsmoking-notes",
+          }
+          actual = {
+              "base": (pull_request.get("base") or {}).get("ref"),
+              "head": (pull_request.get("head") or {}).get("ref"),
+          }
+          if actual != expected or not pull_request.get("merged_at"):
+              raise SystemExit(
+                  "Execution requires the merged reviewed bed/non-smoking PR"
+              )
+          PY
+      - uses: actions/checkout@v4
+      - name: Write at most four safe infoItems and verify every read-back
+        run: python aumara-control-tower/scripts/beds24_bed_nonsmoking_note_sync.py
+      - name: Upload sanitized read-back evidence
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: beds24-bed-nonsmoking-write-evidence
+          path: aumara-control-tower/evidence/beds24-bed-nonsmoking-write.json
+          if-no-files-found: warn
+          retention-days: 7

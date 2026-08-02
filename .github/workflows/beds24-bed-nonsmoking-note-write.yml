@@ -56,11 +56,12 @@ jobs:
       BEDS24_BED_NONSMOKING_MODE: live
       AUMARA_DISABLE_BOOKING_MUTATIONS: 'false'
       AUMARA_LIVE_BOOKING_WRITES_CONFIRMED: 'true'
-      AUMARA_BEDS24_BED_NONSMOKING_CONFIRMATION: INFOITEMS_ONLY_ELCID_BED_NONSMOKING_2026_08_02_1
+      AUMARA_BEDS24_BED_NONSMOKING_CONFIRMATION: INFOITEMS_ONLY_ELCID_BED_NONSMOKING_2026_08_02_2
       BEDS24_BED_NONSMOKING_MAX_WRITES: '4'
       BEDS24_BED_NONSMOKING_EXPECTED_RESOLVED: '4'
+      BEDS24_BED_NONSMOKING_MESSAGE_MAX_AGE_DAYS: '7'
       BEDS24_BED_NONSMOKING_POLICY_ID: elcid.bed-and-nonsmoking-infoitem
-      BEDS24_BED_NONSMOKING_POLICY_VERSION: 2026.07.27.1
+      BEDS24_BED_NONSMOKING_POLICY_VERSION: 2026.08.02.1
       BEDS24_BED_NONSMOKING_OUTPUT: aumara-control-tower/evidence/beds24-bed-nonsmoking-write.json
     steps:
       - name: Require the merged reviewed reconciliation pull request
@@ -85,7 +86,7 @@ jobs:
               pull_request = json.load(response)
           expected = {
               "base": "main",
-              "head": "agent/beds24-bed-nonsmoking-notes-v2",
+              "head": "agent/beds24-bed-nonsmoking-notes-v3",
           }
           actual = {
               "base": (pull_request.get("base") or {}).get("ref"),

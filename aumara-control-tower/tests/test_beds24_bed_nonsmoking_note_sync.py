@@ -39,6 +39,7 @@ LIVE_ENV = {
     "AUMARA_BEDS24_BED_NONSMOKING_CONFIRMATION": worker.LIVE_CONFIRMATION,
     "BEDS24_BED_NONSMOKING_MAX_WRITES": "4",
     "BEDS24_BED_NONSMOKING_EXPECTED_RESOLVED": "4",
+    "BEDS24_BED_NONSMOKING_MESSAGE_MAX_AGE_DAYS": "7",
     "BEDS24_BED_NONSMOKING_POLICY_ID": worker.POLICY_ID,
     "BEDS24_BED_NONSMOKING_POLICY_VERSION": worker.POLICY_VERSION,
     "BEDS24_BED_NONSMOKING_POLICY_PATH": str(POLICY),
@@ -110,6 +111,11 @@ class BedNonSmokingNoteTests(unittest.TestCase):
         unsafe = dict(LIVE_ENV, BEDS24_BED_NONSMOKING_MAX_WRITES="5")
         with self.assertRaisesRegex(worker.BedNonSmokingNoteError, "exactly four"):
             worker.require_live_guards(unsafe)
+        unsafe_window = dict(
+            LIVE_ENV, BEDS24_BED_NONSMOKING_MESSAGE_MAX_AGE_DAYS="90"
+        )
+        with self.assertRaisesRegex(worker.BedNonSmokingNoteError, "7 days"):
+            worker.require_live_guards(unsafe_window)
 
     def test_only_active_future_twin_with_both_requests_is_selected(self):
         valid = booking(1)
@@ -149,6 +155,7 @@ class BedNonSmokingNoteTests(unittest.TestCase):
         self.assertEqual(report["summary"]["requestsResolved"], 4)
         self.assertEqual(report["summary"]["notesWritten"], 4)
         self.assertEqual(report["summary"]["notesReadBackVerified"], 4)
+        self.assertEqual(report["summary"]["guestMessageMaxAgeDays"], 7)
         self.assertEqual(report["summary"]["manualReview"], 0)
         self.assertEqual(report["safety"]["guestMessagesSent"], 0)
         self.assertEqual(report["safety"]["bookingFieldsChanged"], ["infoItems"])

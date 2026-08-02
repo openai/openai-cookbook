@@ -5,7 +5,7 @@ The worker is deliberately fail-closed:
 
 * property 324903 and Twin Room with Terrace only;
 * active future bookings only;
-* both an extra-large-double-bed request and a non-smoking request must exist;
+* both requests must exist in a personal-scope guest message from the last 7 days;
 * only the Beds24 ``infoItems`` field is changed;
 * no more than four live writes are allowed;
 * exactly four current requests must be resolved by a write or a duplicate;
@@ -36,8 +36,9 @@ TWIN_ROOM_ID = 674485
 NOTE_CODE = "GUESTREQUEST"
 ACTIVE_STATUSES = {"confirmed", "new", "request"}
 POLICY_ID = "elcid.bed-and-nonsmoking-infoitem"
-POLICY_VERSION = "2026.07.27.1"
-LIVE_CONFIRMATION = "INFOITEMS_ONLY_ELCID_BED_NONSMOKING_2026_08_02_1"
+POLICY_VERSION = "2026.08.02.1"
+LIVE_CONFIRMATION = "INFOITEMS_ONLY_ELCID_BED_NONSMOKING_2026_08_02_2"
+MESSAGE_MAX_AGE_DAYS = 7
 NOTE_MARKER = "BED + NON-SMOKING REQUEST"
 TRUE_VALUES = {"1", "true", "yes", "on"}
 DEFAULT_POLICY_PATH = (
@@ -90,6 +91,12 @@ def max_writes(values: dict[str, str]) -> int:
     return int(values.get("BEDS24_BED_NONSMOKING_MAX_WRITES") or "0")
 
 
+def message_max_age_days(values: dict[str, str]) -> int:
+    return int(
+        values.get("BEDS24_BED_NONSMOKING_MESSAGE_MAX_AGE_DAYS") or "0"
+    )
+
+
 def require_live_guards(values: dict[str, str]) -> None:
     if (
         str(values.get("BEDS24_BED_NONSMOKING_MODE") or "").strip().lower()
@@ -109,6 +116,8 @@ def require_live_guards(values: dict[str, str]) -> None:
         raise BedNonSmokingNoteError("Maximum writes must be exactly four")
     if expected_resolved(values) != 4:
         raise BedNonSmokingNoteError("Expected resolved requests must be exactly four")
+    if message_max_age_days(values) != MESSAGE_MAX_AGE_DAYS:
+        raise BedNonSmokingNoteError("Guest-message lookback must be exactly 7 days")
     if str(values.get("BEDS24_BED_NONSMOKING_POLICY_ID") or "") != POLICY_ID:
         raise BedNonSmokingNoteError("The approved policy ID is missing")
     if (
@@ -284,7 +293,7 @@ def fetch_future_twins(
 def fetch_guest_messages(
     client: Beds24Client,
     *,
-    max_age_days: int = 90,
+    max_age_days: int = MESSAGE_MAX_AGE_DAYS,
 ) -> list[dict[str, Any]]:
     """Read personal-scope guest messages without retaining their contents."""
     rows: list[dict[str, Any]] = []
@@ -395,7 +404,9 @@ def run(
     require_live_guards(values)
     policy = load_approved_policy(values)
     bookings = fetch_future_twins(client, today=today)
-    messages = fetch_guest_messages(client)
+    messages = fetch_guest_messages(
+        client, max_age_days=message_max_age_days(values)
+    )
     candidates, audit = plan_notes(
         bookings,
         today=today,
@@ -422,6 +433,7 @@ def run(
         "summary": {
             "bookingsScanned": len(bookings),
             "guestMessagesScanned": len(messages),
+            "guestMessageMaxAgeDays": message_max_age_days(values),
             "requestsResolved": resolved,
             "safeCandidates": len(candidates),
             "notesWritten": notes_written,

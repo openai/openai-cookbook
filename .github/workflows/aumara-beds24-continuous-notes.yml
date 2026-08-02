@@ -83,7 +83,7 @@ jobs:
           BEDS24_NOTE_MAX_AGE_DAYS: '7'
           BEDS24_NOTE_POLICY_ID: elcid.direct-guest-request-infoitem
           BEDS24_NOTE_POLICY_VERSION: 2026.08.02.1
-          BEDS24_NOTE_OUTPUT: aumara-control-tower/evidence/beds24-direct-guest-note-write.json
+          BEDS24_NOTE_AUDIT_OUTPUT: aumara-control-tower/evidence/beds24-direct-guest-note-write.json
         run: python aumara-control-tower/scripts/beds24_guest_note_sync.py
 
       - name: Write and verify safe cot infoItems

@@ -7,7 +7,7 @@ guest requests with a scheduled, idempotent Beds24 `infoItems` writer.
 
 ## Status
 
-Implementation ready for reviewed pull request and first live workflow run.
+Deployed to `main`; the first live workflow run completed successfully.
 
 ## Scope
 
@@ -26,6 +26,9 @@ Implementation ready for reviewed pull request and first live workflow run.
   evidence.
 - The production workflow is single-concurrency and runs the workers
   sequentially.
+- Live run `30726680043` wrote and exactly read back two direct-request notes,
+  found four existing bed/non-smoking notes without duplicating them, and
+  completed with no manual-review cases.
 
 ## Changes
 

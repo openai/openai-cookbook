@@ -296,6 +296,19 @@
     - sandbox
     - security
 
+- title: Add Accountable Receipts to Agents SDK Approvals
+  path: examples/agents_sdk/executor_bound_approval_receipts/README.md
+  slug: executor-bound-approval-receipts
+  description: Bind native Agents SDK approvals to exact tool calls with expiring, single-use, application-owned receipts and a pre-execution tool guardrail.
+  date: 2026-08-01
+  authors:
+    - FutureEnterprises
+  tags:
+    - agents-sdk
+    - agents
+    - security
+    - guardrails
+
 - title: Agents SDK Deployment Manager
   path: examples/agents_sdk/deployment_manager/README.md
   slug: agents-sdk-deployment-manager

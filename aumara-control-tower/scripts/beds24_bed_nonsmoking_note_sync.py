@@ -24,6 +24,7 @@ import pathlib
 import re
 import sys
 import urllib.parse
+from collections import defaultdict
 from typing import Any, Iterable
 
 from beds24_elcid_studio_audit import AuditError, data_rows, get_access_token
@@ -163,8 +164,24 @@ def iter_strings(value: object, *, parent_key: str = "") -> Iterable[str]:
             yield from iter_strings(child, parent_key=parent_key)
 
 
-def explicit_combined_request(row: dict[str, Any]) -> bool:
-    text = "\n".join(iter_strings(row))
+def explicit_combined_request(
+    row: dict[str, Any],
+    messages: Iterable[dict[str, Any]] = (),
+) -> bool:
+    text = "\n".join(
+        [
+            *iter_strings(row),
+            *(
+                str(
+                    message.get("message")
+                    or message.get("text")
+                    or message.get("body")
+                    or ""
+                )
+                for message in messages
+            ),
+        ]
+    )
     return bool(BED_RE.search(text) and NONSMOKING_RE.search(text))
 
 
@@ -202,16 +219,20 @@ def plan_notes(
     bookings: list[dict[str, Any]],
     *,
     today: dt.date,
+    messages_by_booking: dict[int, list[dict[str, Any]]] | None = None,
 ) -> tuple[list[dict[str, Any]], list[dict[str, str]]]:
     candidates: list[dict[str, Any]] = []
     audit: list[dict[str, str]] = []
+    message_map = messages_by_booking or {}
     for row in sorted(bookings, key=lambda item: integer(item, "id")):
-        if not active_future_twin(row, today) or not explicit_combined_request(row):
+        booking_id = integer(row, "id")
+        if not active_future_twin(row, today) or not explicit_combined_request(
+            row, message_map.get(booking_id, [])
+        ):
             continue
         if note_already_exists(row.get("infoItems")):
             audit.append({"action": "duplicate", "reason": "note_already_exists"})
             continue
-        booking_id = integer(row, "id")
         if not booking_id:
             audit.append({"action": "manual_review", "reason": "booking_id_missing"})
             continue
@@ -240,6 +261,7 @@ def fetch_future_twins(
             ("propertyId", PROPERTY_ID),
             ("roomId", TWIN_ROOM_ID),
             ("arrivalFrom", today.isoformat()),
+            ("includeGuests", "true"),
             ("includeBookingGroup", "true"),
             ("includeInfoItems", "true"),
         ]
@@ -257,6 +279,48 @@ def fetch_future_twins(
         if not isinstance(pages, dict) or not pages.get("nextPageExists"):
             return rows
     raise BedNonSmokingNoteError("Booking pagination exceeded the safety limit")
+
+
+def fetch_guest_messages(
+    client: Beds24Client,
+    *,
+    max_age_days: int = 90,
+) -> list[dict[str, Any]]:
+    """Read personal-scope guest messages without retaining their contents."""
+    rows: list[dict[str, Any]] = []
+    for page in range(1, 21):
+        params: list[tuple[str, object]] = [
+            ("propertyId", PROPERTY_ID),
+            ("maxAge", max_age_days),
+            ("source", "guest"),
+        ]
+        if page > 1:
+            params.append(("page", page))
+        status, response = client.request_json(
+            "GET", f"/bookings/messages?{urllib.parse.urlencode(params)}"
+        )
+        if not 200 <= status < 300:
+            raise BedNonSmokingNoteError(
+                f"Guest-message lookup failed with HTTP {status}"
+            )
+        rows.extend(data_rows(response, "Message"))
+        pages = response.get("pages") if isinstance(response, dict) else None
+        if not isinstance(pages, dict) or not pages.get("nextPageExists"):
+            return rows
+    raise BedNonSmokingNoteError("Message pagination exceeded the safety limit")
+
+
+def messages_by_booking(
+    messages: list[dict[str, Any]],
+) -> dict[int, list[dict[str, Any]]]:
+    grouped: dict[int, list[dict[str, Any]]] = defaultdict(list)
+    for message in messages:
+        if str(message.get("source") or "").strip().lower() != "guest":
+            continue
+        booking_id = integer(message, "bookingId")
+        if booking_id:
+            grouped[booking_id].append(message)
+    return dict(grouped)
 
 
 def fetch_by_ids(
@@ -331,12 +395,18 @@ def run(
     require_live_guards(values)
     policy = load_approved_policy(values)
     bookings = fetch_future_twins(client, today=today)
-    candidates, audit = plan_notes(bookings, today=today)
+    messages = fetch_guest_messages(client)
+    candidates, audit = plan_notes(
+        bookings,
+        today=today,
+        messages_by_booking=messages_by_booking(messages),
+    )
     duplicates = sum(item["action"] == "duplicate" for item in audit)
     resolved = len(candidates) + duplicates
     if resolved != expected_resolved(values):
         raise BedNonSmokingNoteError(
-            "The exact expected request count was not proved; refusing all writes"
+            f"Resolved request count {resolved}, expected "
+            f"{expected_resolved(values)}; refusing all writes"
         )
     notes_written = write_and_verify(
         client, candidates, limit=max_writes(values)
@@ -351,6 +421,7 @@ def run(
         "policy": policy,
         "summary": {
             "bookingsScanned": len(bookings),
+            "guestMessagesScanned": len(messages),
             "requestsResolved": resolved,
             "safeCandidates": len(candidates),
             "notesWritten": notes_written,

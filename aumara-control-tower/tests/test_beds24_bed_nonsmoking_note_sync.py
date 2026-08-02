@@ -45,7 +45,14 @@ LIVE_ENV = {
 }
 
 
-def booking(booking_id: int, *, info_items=None, room_id=None, status="confirmed"):
+def booking(
+    booking_id: int,
+    *,
+    info_items=None,
+    room_id=None,
+    status="confirmed",
+    include_requests=True,
+):
     return {
         "id": booking_id,
         "propertyId": worker.PROPERTY_ID,
@@ -55,18 +62,36 @@ def booking(booking_id: int, *, info_items=None, room_id=None, status="confirmed
         "guestComments": (
             "BED PREFERENCE:Twin Room with Terrace: 1 extra-large double\n"
             "Non Smoking Requested"
+            if include_requests
+            else ""
         ),
         "infoItems": info_items or [],
     }
 
 
+def guest_message(message_id: int, booking_id: int):
+    return {
+        "id": message_id,
+        "bookingId": booking_id,
+        "propertyId": worker.PROPERTY_ID,
+        "source": "guest",
+        "message": (
+            "BED PREFERENCE:Twin Room with Terrace: 1 extra-large double\n"
+            "Non Smoking Requested"
+        ),
+    }
+
+
 class FakeClient:
-    def __init__(self, bookings, *, post_ok=True):
+    def __init__(self, bookings, *, messages=None, post_ok=True):
         self.bookings = {int(row["id"]): dict(row) for row in bookings}
+        self.messages = messages or []
         self.post_ok = post_ok
         self.post_requests = 0
 
     def request_json(self, method, path, body=None):
+        if method == "GET" and path.startswith("/bookings/messages?"):
+            return 200, {"data": self.messages}
         if method == "GET" and path.startswith("/bookings?"):
             return 200, {"data": list(self.bookings.values())}
         if method == "POST" and path == "/bookings":
@@ -106,8 +131,20 @@ class BedNonSmokingNoteTests(unittest.TestCase):
         self.assertEqual(candidates, [])
         self.assertEqual(audit[0]["action"], "duplicate")
 
+    def test_personal_guest_messages_supply_the_request_text(self):
+        row = booking(1, include_requests=False)
+        candidates, _ = worker.plan_notes(
+            [row],
+            today=TODAY,
+            messages_by_booking={1: [guest_message(10, 1)]},
+        )
+        self.assertEqual([item["bookingId"] for item in candidates], [1])
+
     def test_four_notes_are_written_and_exactly_read_back(self):
-        client = FakeClient([booking(value) for value in range(1, 5)])
+        client = FakeClient(
+            [booking(value, include_requests=False) for value in range(1, 5)],
+            messages=[guest_message(100 + value, value) for value in range(1, 5)],
+        )
         report = worker.run(client, today=TODAY, values=LIVE_ENV)
         self.assertEqual(report["summary"]["requestsResolved"], 4)
         self.assertEqual(report["summary"]["notesWritten"], 4)
@@ -121,16 +158,21 @@ class BedNonSmokingNoteTests(unittest.TestCase):
         self.assertNotIn(worker.NOTE_MARKER, durable)
 
     def test_count_mismatch_refuses_all_writes(self):
-        client = FakeClient([booking(value) for value in range(1, 4)])
+        client = FakeClient(
+            [booking(value, include_requests=False) for value in range(1, 4)],
+            messages=[guest_message(100 + value, value) for value in range(1, 4)],
+        )
         with self.assertRaisesRegex(
-            worker.BedNonSmokingNoteError, "refusing all writes"
+            worker.BedNonSmokingNoteError, "Resolved request count 3"
         ):
             worker.run(client, today=TODAY, values=LIVE_ENV)
         self.assertEqual(client.post_requests, 0)
 
     def test_incomplete_post_result_fails(self):
         client = FakeClient(
-            [booking(value) for value in range(1, 5)], post_ok=False
+            [booking(value, include_requests=False) for value in range(1, 5)],
+            messages=[guest_message(100 + value, value) for value in range(1, 5)],
+            post_ok=False,
         )
         with self.assertRaisesRegex(
             worker.BedNonSmokingNoteError, "incomplete write result"

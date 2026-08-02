@@ -4,7 +4,7 @@ on:
   workflow_dispatch:
     inputs:
       arrival:
-        description: Arrival date (YYYY-MM-DD); blank means tomorrow in Madrid
+        description: Exact arrival date (YYYY-MM-DD); blank means today and tomorrow in Madrid
         required: false
         type: string
       booking_id:
@@ -51,7 +51,7 @@ jobs:
             -v
 
   live-audit:
-    if: github.event_name == 'workflow_dispatch' || github.event_name == 'schedule'
+    if: github.event_name == 'workflow_dispatch' || github.event_name == 'schedule' || github.event_name == 'push'
     needs: test
     runs-on: ubuntu-latest
     env:
@@ -72,7 +72,7 @@ jobs:
             echo "::warning::BEDS24_REFRESH_TOKEN is not configured; live audit skipped."
           fi
 
-      - name: Read AUMARA arrival and access evidence
+      - name: Audit current PIN distribution for today and tomorrow
         if: steps.credential.outputs.available == 'true'
         run: python aumara-control-tower/scripts/beds24_aumara_access_audit.py
 

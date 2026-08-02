@@ -23,14 +23,19 @@ LIVE_ENV = {
     "AUMARA_LIVE_BOOKING_WRITES_CONFIRMED": "true",
     "AUMARA_BEDS24_NOTE_WRITE_CONFIRMATION": worker.LIVE_CONFIRMATION,
     "BEDS24_NOTE_CODE": "GUESTREQUEST",
+    "BEDS24_NOTE_MAX_WRITES": str(worker.MAX_WRITES_CAP),
+    "BEDS24_NOTE_MAX_AGE_DAYS": str(worker.MAX_AGE_DAYS),
+    "BEDS24_NOTE_POLICY_ID": worker.POLICY_ID,
+    "BEDS24_NOTE_POLICY_VERSION": worker.POLICY_VERSION,
 }
 
 
 class FakeClient:
-    def __init__(self, messages, bookings, post_response=None):
+    def __init__(self, messages, bookings, post_response=None, read_back=True):
         self.messages = messages
         self.bookings = bookings
         self.post_response = post_response
+        self.read_back = read_back
         self.get_requests = 0
         self.post_requests = 0
         self.payloads = []
@@ -48,6 +53,11 @@ class FakeClient:
             response = self.post_response
             if response is None:
                 response = [{"success": True} for _ in body]
+            if self.read_back and all(item.get("success") is True for item in response):
+                by_id = {int(item["id"]): item for item in self.bookings}
+                for update in body:
+                    target = by_id[int(update["id"])]
+                    target.setdefault("infoItems", []).extend(update["infoItems"])
             return 201, response
         raise AssertionError(f"Unexpected request: {method} {path}")
 
@@ -135,7 +145,8 @@ class NoteSyncTests(unittest.TestCase):
         self.assertEqual(report["safety"]["postRequests"], 0)
         self.assertNotIn("guest@example.com", serialized)
         self.assertNotIn("code 1234", serialized)
-        self.assertIn("BED REQUEST", serialized)
+        self.assertNotIn("noteText", report["events"][0])
+        self.assertFalse(report["safety"]["noteTextPersisted"])
 
     def test_existing_type_is_idempotently_deduplicated(self):
         existing = [{
@@ -183,7 +194,7 @@ class NoteSyncTests(unittest.TestCase):
             client,
             mode="live",
             code="GUESTREQUEST",
-            max_age_days=3,
+            max_age_days=worker.MAX_AGE_DAYS,
             env=LIVE_ENV,
         )
         self.assertEqual(report["summary"]["notesWritten"], 1)
@@ -192,6 +203,8 @@ class NoteSyncTests(unittest.TestCase):
         self.assertEqual(path, "/bookings")
         self.assertEqual(set(payload[0]), {"id", "infoItems"})
         self.assertEqual(set(payload[0]["infoItems"][0]), {"code", "text"})
+        self.assertEqual(report["summary"]["notesReadBackVerified"], 1)
+        self.assertEqual(client.get_requests, 3)
 
     def test_failed_live_response_is_not_reported_as_success(self):
         client = FakeClient(
@@ -204,9 +217,66 @@ class NoteSyncTests(unittest.TestCase):
                 client,
                 mode="live",
                 code="GUESTREQUEST",
-                max_age_days=3,
+                max_age_days=worker.MAX_AGE_DAYS,
                 env=LIVE_ENV,
             )
+
+    def test_cot_is_delegated_to_specialized_worker(self):
+        client = FakeClient([message(text="baby cot please")], [booking()])
+        report = worker.run(
+            client,
+            mode="live",
+            code="GUESTREQUEST",
+            max_age_days=worker.MAX_AGE_DAYS,
+            env=LIVE_ENV,
+        )
+        self.assertEqual(report["summary"]["noteCandidates"], 0)
+        self.assertEqual(report["summary"]["notesWritten"], 0)
+        self.assertEqual(client.post_requests, 0)
+        self.assertEqual(
+            report["events"][0]["reason"],
+            "cot_requires_specialized_worker",
+        )
+
+    def test_live_batch_above_cap_is_refused_before_post(self):
+        messages = [
+            message(message_id=index, booking_id=index, text="large double bed")
+            for index in range(1, worker.MAX_WRITES_CAP + 2)
+        ]
+        bookings = [booking(booking_id=index) for index in range(1, len(messages) + 1)]
+        client = FakeClient(messages, bookings)
+        with self.assertRaisesRegex(worker.NoteSyncError, "exceeds"):
+            worker.run(
+                client,
+                mode="live",
+                code="GUESTREQUEST",
+                max_age_days=worker.MAX_AGE_DAYS,
+                env=LIVE_ENV,
+            )
+        self.assertEqual(client.post_requests, 0)
+
+    def test_live_write_requires_exact_get_read_back(self):
+        client = FakeClient([message()], [booking()], read_back=False)
+        with self.assertRaisesRegex(worker.NoteSyncError, "read-back"):
+            worker.run(
+                client,
+                mode="live",
+                code="GUESTREQUEST",
+                max_age_days=worker.MAX_AGE_DAYS,
+                env=LIVE_ENV,
+            )
+
+    def test_new_info_item_does_not_replace_existing_items(self):
+        existing = {"id": 88, "code": "KEEP", "text": "existing operational note"}
+        client = FakeClient([message()], [booking(info_items=[existing])])
+        worker.run(
+            client,
+            mode="live",
+            code="GUESTREQUEST",
+            max_age_days=worker.MAX_AGE_DAYS,
+            env=LIVE_ENV,
+        )
+        self.assertIn(existing, client.bookings[0]["infoItems"])
 
 
 if __name__ == "__main__":

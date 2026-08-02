@@ -85,15 +85,16 @@ strong `AUMARA_DASHBOARD_TOKEN`, start the existing service and open
 The complete source contract and production boundary are documented in
 [`docs/daily-ops-dashboard-v1.md`](docs/daily-ops-dashboard-v1.md).
 
-## Beds24 guest-note audit
+## Beds24 continuous guest notes
 
-`scripts/beds24_guest_note_sync.py` reads recent guest-side Beds24 messages,
-classifies approved operational requests, resolves the existing booking with
-`includeInfoItems=true`, and proposes a single `GUESTREQUEST` info item per
-booking/request type. CI uses synthetic data only, receives no Beds24
-credentials, makes no network call, and uploads no guest-data artifact. A
-runtime that processes private Beds24 data is deliberately not scheduled until
-that destination is explicitly approved.
+The scheduled `AUMARA Beds24 continuous guest notes` workflow runs hourly and
+uses the existing refresh credential. It processes three independent,
+fail-closed workers sequentially: direct guest-message requests, safe cot
+requests with room/infant/occupancy proof, and recent combined bed/non-smoking
+booking requests. Every run is bounded and idempotent, changes only
+`infoItems`, and requires an exact GET read-back after each successful POST.
+Zero-candidate runs are successful. CI pull-request runs use synthetic data
+only and receive no Beds24 credential.
 
 The future write payload is deliberately limited to:
 
@@ -111,10 +112,12 @@ The future write payload is deliberately limited to:
 ]
 ```
 
-Live note mode is not scheduled. It requires the booking-mutation kill switch
-to be off, `AUMARA_LIVE_BOOKING_WRITES_CONFIRMED=true`, the exact
-`AUMARA_BEDS24_NOTE_WRITE_CONFIRMATION=INFOITEMS_ONLY_PROPERTY_324903`, and an
-explicit validated info code. It contains no guest-message send path.
+The direct-message worker accepts only explicit bed, pet, parking, early
+check-in, late check-in and late check-out requests on active EL CID bookings.
+Cot requests are excluded from that generic worker and handled only by the
+stricter cot policy. Unsupported, ambiguous, financial and access-code cases
+remain outside the writer. None of these workers contains a guest-message send
+path.
 
 ## Guest-request dry run
 

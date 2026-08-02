@@ -1,5 +1,5 @@
 #!/usr/bin/env python3
-"""Write verified baby-cot infoItems for safe El Cid bookings.
+"""Continuously write verified baby-cot infoItems for safe El Cid bookings.
 
 This worker is deliberately narrow:
 
@@ -7,7 +7,9 @@ This worker is deliberately narrow:
 * Twin Room with Terrace only;
 * one infant cot request with no adult-capacity breach;
 * infoItems only;
-* at most one live write per run;
+* bookings carrying the request must have been created in the last 7 days;
+* at most five live writes per run;
+* zero-candidate runs are successful and every write is idempotent;
 * mandatory GET read-back after POST.
 
 It never sends guest messages or changes booking dates, room, occupancy,
@@ -37,6 +39,8 @@ ACTIVE_STATUSES = {"confirmed", "new", "request"}
 POLICY_ID = "elcid.baby-cot-infoitem"
 POLICY_VERSION = "2026.07.27.1"
 LIVE_CONFIRMATION = "INFOITEMS_ONLY_ELCID_COT_POLICY_2026_07_30_1"
+BOOKING_MAX_AGE_DAYS = 7
+MAX_WRITES_CAP = 5
 TRUE_VALUES = {"1", "true", "yes", "on"}
 DEFAULT_POLICY_PATH = (
     pathlib.Path(__file__).resolve().parents[1] / "policies" / "elcid.yaml"
@@ -77,8 +81,13 @@ def require_live_guards(values: dict[str, str]) -> None:
     )
     if confirmation != LIVE_CONFIRMATION:
         raise CotNoteError("The exact cot infoItems confirmation is missing")
-    if int(values.get("BEDS24_COT_NOTE_MAX_WRITES") or "0") != 1:
-        raise CotNoteError("BEDS24_COT_NOTE_MAX_WRITES must be exactly 1")
+    if int(values.get("BEDS24_COT_NOTE_MAX_WRITES") or "0") != MAX_WRITES_CAP:
+        raise CotNoteError("BEDS24_COT_NOTE_MAX_WRITES must be exactly 5")
+    if (
+        int(values.get("BEDS24_COT_NOTE_MAX_AGE_DAYS") or "0")
+        != BOOKING_MAX_AGE_DAYS
+    ):
+        raise CotNoteError("BEDS24_COT_NOTE_MAX_AGE_DAYS must be exactly 7")
     if str(values.get("BEDS24_COT_NOTE_POLICY_ID") or "") != POLICY_ID:
         raise CotNoteError("The approved cot policy ID is missing")
     if str(values.get("BEDS24_COT_NOTE_POLICY_VERSION") or "") != POLICY_VERSION:
@@ -154,6 +163,21 @@ def canonical_group_id(row: dict[str, Any]) -> int:
     return integer(row, "masterId") or integer(row, "id")
 
 
+def recently_created_booking(
+    row: dict[str, Any], *, today: dt.date, max_age_days: int
+) -> bool:
+    raw = str(row.get("bookingTime") or "").strip()
+    match = re.match(r"^(\d{4}-\d{2}-\d{2})", raw)
+    if not match:
+        return False
+    try:
+        booked_on = dt.date.fromisoformat(match.group(1))
+    except ValueError:
+        return False
+    oldest = today - dt.timedelta(days=max_age_days - 1)
+    return oldest <= booked_on <= today
+
+
 def info_item_has_cot_note(info_items: object) -> bool:
     if not isinstance(info_items, list):
         return False
@@ -204,6 +228,9 @@ def target_booking(rows: list[dict[str, Any]]) -> dict[str, Any] | None:
 
 def plan_cot_notes(
     bookings: list[dict[str, Any]],
+    *,
+    today: dt.date,
+    max_age_days: int = BOOKING_MAX_AGE_DAYS,
 ) -> tuple[list[dict[str, Any]], list[dict[str, Any]]]:
     grouped: dict[int, list[dict[str, Any]]] = defaultdict(list)
     for booking in bookings:
@@ -214,6 +241,13 @@ def plan_cot_notes(
     candidates: list[dict[str, Any]] = []
     audit: list[dict[str, Any]] = []
     for group_id, rows in sorted(grouped.items()):
+        if not any(
+            recently_created_booking(
+                row, today=today, max_age_days=max_age_days
+            )
+            for row in rows
+        ):
+            continue
         text = request_text(rows)
         if not text:
             continue
@@ -304,12 +338,13 @@ def fetch_by_ids(
 def write_and_verify(
     client: Beds24Client,
     candidates: list[dict[str, Any]],
+    *,
+    limit: int,
 ) -> int:
-    if len(candidates) > 1:
-        raise CotNoteError("More than one cot note candidate; refusing live write")
+    if len(candidates) > limit:
+        raise CotNoteError("Cot candidate count exceeds the live write limit")
     if not candidates:
         return 0
-    candidate = candidates[0]
     payload = [
         {
             "id": int(candidate["bookingId"]),
@@ -320,28 +355,32 @@ def write_and_verify(
                 }
             ],
         }
+        for candidate in candidates
     ]
     status, response = client.request_json("POST", "/bookings", payload)
     if status != 201 or not isinstance(response, list):
         raise CotNoteError(f"Beds24 infoItem write failed with HTTP {status}")
-    if len(response) != 1 or not isinstance(response[0], dict):
-        raise CotNoteError("Beds24 returned an incomplete write response")
-    if response[0].get("success") is not True:
-        raise CotNoteError("Beds24 rejected the cot infoItem")
-
-    booking_id = int(candidate["bookingId"])
-    read_back = fetch_by_ids(client, [booking_id]).get(booking_id)
-    if not read_back:
-        raise CotNoteError("Written booking was absent from read-back")
-    expected = str(candidate["text"])
-    if not any(
-        isinstance(item, dict)
-        and str(item.get("code") or "").strip().upper() == NOTE_CODE
-        and str(item.get("text") or "") == expected
-        for item in (read_back.get("infoItems") or [])
+    if len(response) != len(payload) or not all(
+        isinstance(item, dict) and item.get("success") is True
+        for item in response
     ):
-        raise CotNoteError("Cot infoItem was not confirmed by read-back")
-    return 1
+        raise CotNoteError("Beds24 returned an incomplete write response")
+
+    expected = {
+        int(candidate["bookingId"]): str(candidate["text"])
+        for candidate in candidates
+    }
+    read_back = fetch_by_ids(client, sorted(expected))
+    for booking_id, note_text in expected.items():
+        row = read_back.get(booking_id)
+        if not row or not any(
+            isinstance(item, dict)
+            and str(item.get("code") or "").strip().upper() == NOTE_CODE
+            and str(item.get("text") or "") == note_text
+            for item in (row.get("infoItems") or [])
+        ):
+            raise CotNoteError("Cot infoItem was not confirmed by read-back")
+    return len(candidates)
 
 
 def run(
@@ -353,11 +392,17 @@ def run(
     require_live_guards(values)
     policy = load_approved_policy(values)
     bookings = fetch_future_bookings(client, today=today)
-    candidates, audit = plan_cot_notes(bookings)
+    candidates, audit = plan_cot_notes(
+        bookings,
+        today=today,
+        max_age_days=int(values["BEDS24_COT_NOTE_MAX_AGE_DAYS"]),
+    )
     duplicates = sum(item["action"] == "duplicate" for item in audit)
-    if not candidates and not duplicates:
-        raise CotNoteError("No safe cot request was resolved")
-    notes_written = write_and_verify(client, candidates)
+    notes_written = write_and_verify(
+        client,
+        candidates,
+        limit=int(values["BEDS24_COT_NOTE_MAX_WRITES"]),
+    )
     for item in audit:
         if item["action"] == "pending_write":
             item["action"] = "written_and_verified"
@@ -368,6 +413,9 @@ def run(
         "policy": policy,
         "summary": {
             "bookingsScanned": len(bookings),
+            "bookingMaxAgeDays": int(
+                values["BEDS24_COT_NOTE_MAX_AGE_DAYS"]
+            ),
             "safeCandidates": len(candidates),
             "notesWritten": notes_written,
             "notesReadBackVerified": notes_written,
@@ -379,7 +427,7 @@ def run(
         "safety": {
             "guestMessagesSent": 0,
             "bookingFieldsChanged": ["infoItems"] if notes_written else [],
-            "maximumWrites": 1,
+            "maximumWrites": int(values["BEDS24_COT_NOTE_MAX_WRITES"]),
             "rawGuestDataPersisted": False,
             "noteTextPersisted": False,
         },

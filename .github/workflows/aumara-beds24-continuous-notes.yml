@@ -1,0 +1,136 @@
+name: AUMARA Beds24 continuous guest notes
+
+on:
+  workflow_dispatch:
+  schedule:
+    - cron: '17 * * * *'
+  pull_request:
+    branches: [main]
+    paths:
+      - '.github/workflows/aumara-beds24-continuous-notes.yml'
+      - 'aumara-control-tower/scripts/beds24_guest_note_sync.py'
+      - 'aumara-control-tower/scripts/beds24_cot_note_sync.py'
+      - 'aumara-control-tower/scripts/beds24_bed_nonsmoking_note_sync.py'
+      - 'aumara-control-tower/scripts/guest_request_dry_run.py'
+      - 'aumara-control-tower/policies/elcid.yaml'
+      - 'aumara-control-tower/policies/elcid-direct-guest-notes.json'
+      - 'aumara-control-tower/policies/elcid-bed-nonsmoking.json'
+      - 'aumara-control-tower/tests/test_beds24_guest_note_sync.py'
+      - 'aumara-control-tower/tests/test_beds24_cot_note_sync.py'
+      - 'aumara-control-tower/tests/test_beds24_bed_nonsmoking_note_sync.py'
+      - 'aumara-control-tower/tests/test_guest_request_dry_run.py'
+  push:
+    branches: [main]
+    paths:
+      - '.github/workflows/aumara-beds24-continuous-notes.yml'
+      - 'aumara-control-tower/scripts/beds24_guest_note_sync.py'
+      - 'aumara-control-tower/scripts/beds24_cot_note_sync.py'
+      - 'aumara-control-tower/scripts/beds24_bed_nonsmoking_note_sync.py'
+      - 'aumara-control-tower/scripts/guest_request_dry_run.py'
+      - 'aumara-control-tower/policies/elcid.yaml'
+      - 'aumara-control-tower/policies/elcid-direct-guest-notes.json'
+      - 'aumara-control-tower/policies/elcid-bed-nonsmoking.json'
+      - 'aumara-control-tower/tests/test_beds24_guest_note_sync.py'
+      - 'aumara-control-tower/tests/test_beds24_cot_note_sync.py'
+      - 'aumara-control-tower/tests/test_beds24_bed_nonsmoking_note_sync.py'
+      - 'aumara-control-tower/tests/test_guest_request_dry_run.py'
+
+permissions:
+  contents: read
+
+concurrency:
+  group: aumara-beds24-continuous-guest-notes
+  cancel-in-progress: false
+
+jobs:
+  test:
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    steps:
+      - uses: actions/checkout@v4
+      - name: Test all note workers without credentials or network
+        run: |
+          python -m unittest \
+            aumara-control-tower/tests/test_beds24_guest_note_sync.py \
+            aumara-control-tower/tests/test_beds24_cot_note_sync.py \
+            aumara-control-tower/tests/test_beds24_bed_nonsmoking_note_sync.py \
+            aumara-control-tower/tests/test_guest_request_dry_run.py \
+            -v
+
+  write-and-verify:
+    if: >-
+      github.event_name == 'schedule' ||
+      github.event_name == 'workflow_dispatch' ||
+      github.event_name == 'push'
+    needs: test
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+    env:
+      BEDS24_REFRESH_TOKEN: ${{ secrets.BEDS24_REFRESH_CREDENTIAL }}
+      AUMARA_DISABLE_BOOKING_MUTATIONS: 'false'
+      AUMARA_LIVE_BOOKING_WRITES_CONFIRMED: 'true'
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Write and verify direct guest-request infoItems
+        id: direct
+        continue-on-error: true
+        env:
+          BEDS24_NOTE_MODE: live
+          AUMARA_BEDS24_NOTE_WRITE_CONFIRMATION: INFOITEMS_ONLY_ELCID_DIRECT_GUEST_REQUESTS_2026_08_02_1
+          BEDS24_NOTE_CODE: GUESTREQUEST
+          BEDS24_NOTE_MAX_WRITES: '10'
+          BEDS24_NOTE_MAX_AGE_DAYS: '7'
+          BEDS24_NOTE_POLICY_ID: elcid.direct-guest-request-infoitem
+          BEDS24_NOTE_POLICY_VERSION: 2026.08.02.1
+          BEDS24_NOTE_OUTPUT: aumara-control-tower/evidence/beds24-direct-guest-note-write.json
+        run: python aumara-control-tower/scripts/beds24_guest_note_sync.py
+
+      - name: Write and verify safe cot infoItems
+        id: cot
+        continue-on-error: true
+        env:
+          BEDS24_COT_NOTE_MODE: live
+          AUMARA_BEDS24_COT_WRITE_CONFIRMATION: INFOITEMS_ONLY_ELCID_COT_POLICY_2026_07_30_1
+          BEDS24_COT_NOTE_MAX_WRITES: '5'
+          BEDS24_COT_NOTE_MAX_AGE_DAYS: '7'
+          BEDS24_COT_NOTE_POLICY_ID: elcid.baby-cot-infoitem
+          BEDS24_COT_NOTE_POLICY_VERSION: 2026.07.27.1
+          BEDS24_COT_NOTE_OUTPUT: aumara-control-tower/evidence/beds24-cot-note-write.json
+        run: python aumara-control-tower/scripts/beds24_cot_note_sync.py
+
+      - name: Write and verify bed/non-smoking booking infoItems
+        id: bed
+        continue-on-error: true
+        env:
+          BEDS24_BED_NONSMOKING_MODE: live
+          AUMARA_BEDS24_BED_NONSMOKING_CONFIRMATION: INFOITEMS_ONLY_ELCID_BED_NONSMOKING_CONTINUOUS_2026_08_02_1
+          BEDS24_BED_NONSMOKING_MAX_WRITES: '10'
+          BEDS24_BED_NONSMOKING_BOOKING_MAX_AGE_DAYS: '7'
+          BEDS24_BED_NONSMOKING_POLICY_ID: elcid.bed-and-nonsmoking-infoitem
+          BEDS24_BED_NONSMOKING_POLICY_VERSION: 2026.08.02.3
+          BEDS24_BED_NONSMOKING_OUTPUT: aumara-control-tower/evidence/beds24-bed-nonsmoking-write.json
+        run: python aumara-control-tower/scripts/beds24_bed_nonsmoking_note_sync.py
+
+      - name: Upload sanitized exact-read-back evidence
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: aumara-beds24-continuous-note-evidence
+          path: |
+            aumara-control-tower/evidence/beds24-direct-guest-note-write.json
+            aumara-control-tower/evidence/beds24-cot-note-write.json
+            aumara-control-tower/evidence/beds24-bed-nonsmoking-write.json
+          if-no-files-found: warn
+          retention-days: 7
+
+      - name: Require every independent worker to finish safely
+        if: always()
+        env:
+          DIRECT_OUTCOME: ${{ steps.direct.outcome }}
+          COT_OUTCOME: ${{ steps.cot.outcome }}
+          BED_OUTCOME: ${{ steps.bed.outcome }}
+        run: |
+          test "$DIRECT_OUTCOME" = success
+          test "$COT_OUTCOME" = success
+          test "$BED_OUTCOME" = success

@@ -1,13 +1,13 @@
 {
   "schema_version": "1.0",
-  "policy_version": "2026.08.02.2",
+  "policy_version": "2026.08.02.3",
   "property": "elcid",
   "policies": [
     {
       "policy_id": "elcid.bed-and-nonsmoking-infoitem",
       "property": "elcid",
       "category": "beds24_guest_note",
-      "rule": "Record a combined bed and non-smoking operational request only for an active future EL CID Twin booking created in the preceding seven days when both requests are explicit in the booking notification payload; change only the Beds24 guest-request info item and verify the exact note by read-back.",
+      "rule": "Continuously record a combined bed and non-smoking operational request only for an active future EL CID Twin booking created in the preceding seven days when both requests are explicit in the booking notification payload; use an idempotent bounded batch, change only the Beds24 guest-request info item and verify every note by exact read-back.",
       "source": "approved_internal_instruction",
       "source_reference": "REQUEST:ELCID_BED_NONSMOKING:2026-08-02",
       "verified_at": "2026-08-02",
@@ -21,11 +21,12 @@
         "non_smoking_request_not_explicit",
         "booking_not_active_or_future",
         "room_scope_not_proved",
-        "expected_request_count_mismatch",
+        "candidate_batch_exceeds_limit",
+        "candidate_requires_manual_review",
         "read_back_failed"
       ],
       "response_template_ids": [],
-      "policy_version": "2026.08.02.2"
+      "policy_version": "2026.08.02.3"
     }
   ]
 }

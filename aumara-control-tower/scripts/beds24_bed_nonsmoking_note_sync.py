@@ -1,5 +1,5 @@
 #!/usr/bin/env python3
-"""Write and verify safe EL CID bed/non-smoking guest-request notes.
+"""Continuously write and verify safe EL CID bed/non-smoking request notes.
 
 The worker is deliberately fail-closed:
 
@@ -7,8 +7,8 @@ The worker is deliberately fail-closed:
 * active future bookings only;
 * both requests must exist on a booking created in the last 7 days;
 * only the Beds24 ``infoItems`` field is changed;
-* no more than four live writes are allowed;
-* exactly four current requests must be resolved by a write or a duplicate;
+* no more than ten live writes are allowed in one run;
+* zero-candidate runs are successful and every write is idempotent;
 * every write is confirmed by an exact GET read-back.
 
 It never sends a guest message or changes booking dates, rooms, occupancy,
@@ -35,9 +35,12 @@ TWIN_ROOM_ID = 674485
 NOTE_CODE = "GUESTREQUEST"
 ACTIVE_STATUSES = {"confirmed", "new", "request"}
 POLICY_ID = "elcid.bed-and-nonsmoking-infoitem"
-POLICY_VERSION = "2026.08.02.2"
-LIVE_CONFIRMATION = "INFOITEMS_ONLY_ELCID_BED_NONSMOKING_2026_08_02_3"
+POLICY_VERSION = "2026.08.02.3"
+LIVE_CONFIRMATION = (
+    "INFOITEMS_ONLY_ELCID_BED_NONSMOKING_CONTINUOUS_2026_08_02_1"
+)
 BOOKING_MAX_AGE_DAYS = 7
+MAX_WRITES_CAP = 10
 NOTE_MARKER = "BED + NON-SMOKING REQUEST"
 TRUE_VALUES = {"1", "true", "yes", "on"}
 DEFAULT_POLICY_PATH = (
@@ -82,10 +85,6 @@ def enabled(values: dict[str, str], name: str) -> bool:
     return str(values.get(name) or "").strip().lower() in TRUE_VALUES
 
 
-def expected_resolved(values: dict[str, str]) -> int:
-    return int(values.get("BEDS24_BED_NONSMOKING_EXPECTED_RESOLVED") or "0")
-
-
 def max_writes(values: dict[str, str]) -> int:
     return int(values.get("BEDS24_BED_NONSMOKING_MAX_WRITES") or "0")
 
@@ -111,10 +110,8 @@ def require_live_guards(values: dict[str, str]) -> None:
         != LIVE_CONFIRMATION
     ):
         raise BedNonSmokingNoteError("The exact infoItems confirmation is missing")
-    if max_writes(values) != 4:
-        raise BedNonSmokingNoteError("Maximum writes must be exactly four")
-    if expected_resolved(values) != 4:
-        raise BedNonSmokingNoteError("Expected resolved requests must be exactly four")
+    if max_writes(values) != MAX_WRITES_CAP:
+        raise BedNonSmokingNoteError("Maximum writes must be exactly ten")
     if booking_max_age_days(values) != BOOKING_MAX_AGE_DAYS:
         raise BedNonSmokingNoteError("Booking lookback must be exactly 7 days")
     if str(values.get("BEDS24_BED_NONSMOKING_POLICY_ID") or "") != POLICY_ID:
@@ -373,13 +370,13 @@ def run(
         today=today,
         max_age_days=booking_max_age_days(values),
     )
+    manual_review = sum(item["action"] == "manual_review" for item in audit)
+    if manual_review:
+        raise BedNonSmokingNoteError(
+            "A candidate requires manual review; refusing all writes"
+        )
     duplicates = sum(item["action"] == "duplicate" for item in audit)
     resolved = len(candidates) + duplicates
-    if resolved != expected_resolved(values):
-        raise BedNonSmokingNoteError(
-            f"Resolved request count {resolved}, expected "
-            f"{expected_resolved(values)}; refusing all writes"
-        )
     notes_written = write_and_verify(
         client, candidates, limit=max_writes(values)
     )
@@ -399,9 +396,7 @@ def run(
             "notesWritten": notes_written,
             "notesReadBackVerified": notes_written,
             "duplicates": duplicates,
-            "manualReview": sum(
-                item["action"] == "manual_review" for item in audit
-            ),
+            "manualReview": manual_review,
         },
         "safety": {
             "guestMessagesSent": 0,

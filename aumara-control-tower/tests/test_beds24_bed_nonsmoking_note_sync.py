@@ -5,25 +5,13 @@ import importlib.util
 import json
 import pathlib
 import sys
-import types
 import unittest
 
 
 ROOT = pathlib.Path(__file__).resolve().parents[1]
 SCRIPT = ROOT / "scripts" / "beds24_bed_nonsmoking_note_sync.py"
 POLICY = ROOT / "policies" / "elcid-bed-nonsmoking.json"
-
-
-audit_stub = types.ModuleType("beds24_elcid_studio_audit")
-audit_stub.AuditError = RuntimeError
-audit_stub.data_rows = lambda response, _label: response["data"]
-audit_stub.get_access_token = lambda: ("token", "refresh_token", "https://api", "stub", False)
-sys.modules["beds24_elcid_studio_audit"] = audit_stub
-
-notes_stub = types.ModuleType("beds24_guest_note_sync")
-notes_stub.Beds24Client = object
-notes_stub.NoteSyncError = RuntimeError
-sys.modules["beds24_guest_note_sync"] = notes_stub
+sys.path.insert(0, str(ROOT / "scripts"))
 
 spec = importlib.util.spec_from_file_location("bed_note_worker", SCRIPT)
 worker = importlib.util.module_from_spec(spec)
@@ -37,8 +25,7 @@ LIVE_ENV = {
     "AUMARA_DISABLE_BOOKING_MUTATIONS": "false",
     "AUMARA_LIVE_BOOKING_WRITES_CONFIRMED": "true",
     "AUMARA_BEDS24_BED_NONSMOKING_CONFIRMATION": worker.LIVE_CONFIRMATION,
-    "BEDS24_BED_NONSMOKING_MAX_WRITES": "4",
-    "BEDS24_BED_NONSMOKING_EXPECTED_RESOLVED": "4",
+    "BEDS24_BED_NONSMOKING_MAX_WRITES": "10",
     "BEDS24_BED_NONSMOKING_BOOKING_MAX_AGE_DAYS": "7",
     "BEDS24_BED_NONSMOKING_POLICY_ID": worker.POLICY_ID,
     "BEDS24_BED_NONSMOKING_POLICY_VERSION": worker.POLICY_VERSION,
@@ -92,10 +79,10 @@ class FakeClient:
 
 
 class BedNonSmokingNoteTests(unittest.TestCase):
-    def test_live_guards_require_exact_four_write_boundary(self):
+    def test_live_guards_require_exact_ten_write_boundary(self):
         worker.require_live_guards(LIVE_ENV)
-        unsafe = dict(LIVE_ENV, BEDS24_BED_NONSMOKING_MAX_WRITES="5")
-        with self.assertRaisesRegex(worker.BedNonSmokingNoteError, "exactly four"):
+        unsafe = dict(LIVE_ENV, BEDS24_BED_NONSMOKING_MAX_WRITES="11")
+        with self.assertRaisesRegex(worker.BedNonSmokingNoteError, "exactly ten"):
             worker.require_live_guards(unsafe)
         unsafe_window = dict(
             LIVE_ENV, BEDS24_BED_NONSMOKING_BOOKING_MAX_AGE_DAYS="90"
@@ -114,7 +101,10 @@ class BedNonSmokingNoteTests(unittest.TestCase):
             today=TODAY,
         )
         self.assertEqual([item["bookingId"] for item in candidates], [1])
-        self.assertEqual(audit, [{"action": "pending_write", "reason": "safe_rule_proved"}])
+        self.assertEqual(
+            audit,
+            [{"action": "pending_write", "reason": "safe_rule_proved"}],
+        )
 
     def test_existing_combined_note_is_deduplicated(self):
         existing = [{"code": "GUESTREQUEST", "text": worker.NOTE_MARKER}]
@@ -148,12 +138,17 @@ class BedNonSmokingNoteTests(unittest.TestCase):
         self.assertNotIn('"bookingId"', durable)
         self.assertNotIn(worker.NOTE_MARKER, durable)
 
-    def test_count_mismatch_refuses_all_writes(self):
-        client = FakeClient(
-            [booking(value) for value in range(1, 4)],
-        )
+    def test_empty_queue_is_a_successful_noop(self):
+        client = FakeClient([])
+        report = worker.run(client, today=TODAY, values=LIVE_ENV)
+        self.assertEqual(report["summary"]["requestsResolved"], 0)
+        self.assertEqual(report["summary"]["notesWritten"], 0)
+        self.assertEqual(client.post_requests, 0)
+
+    def test_batch_above_cap_refuses_all_writes(self):
+        client = FakeClient([booking(value) for value in range(1, 12)])
         with self.assertRaisesRegex(
-            worker.BedNonSmokingNoteError, "Resolved request count 3"
+            worker.BedNonSmokingNoteError, "exceeds the live write limit"
         ):
             worker.run(client, today=TODAY, values=LIVE_ENV)
         self.assertEqual(client.post_requests, 0)

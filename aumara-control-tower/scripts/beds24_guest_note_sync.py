@@ -1,10 +1,11 @@
 #!/usr/bin/env python3
-"""Audit and optionally write idempotent guest-request infoItems in Beds24.
+"""Continuously write idempotent direct guest-request infoItems in Beds24.
 
-The scheduled workflow fixes this worker in audit mode. Live mode is available
-only for a separately reviewed cutover and requires two exact write guards.
-It never sends guest messages, changes dates, rooms, prices, status, inventory,
-payments, or any other booking field.
+Live mode is deliberately narrow: only approved operational request types are
+eligible, every run is bounded, and every new infoItem must be confirmed by an
+exact GET read-back. Cot requests remain delegated to the stricter worker that
+also proves infant age, room and occupancy. This worker never sends guest
+messages or changes dates, rooms, prices, status, inventory or payments.
 """
 
 from __future__ import annotations
@@ -29,7 +30,7 @@ from guest_request_dry_run import classify_event, proposed_booking_note
 PROPERTY_ID = 324903
 DEFAULT_NOTE_CODE = "GUESTREQUEST"
 ACTIVE_STATUSES = {"confirmed", "new", "request"}
-SUPPORTED_EVENT_TYPES = {
+CLASSIFIED_EVENT_TYPES = {
     "bed_request",
     "cot_request",
     "pet_request",
@@ -38,8 +39,18 @@ SUPPORTED_EVENT_TYPES = {
     "late_checkin",
     "late_checkout",
 }
+LIVE_SUPPORTED_EVENT_TYPES = CLASSIFIED_EVENT_TYPES - {"cot_request"}
 TRUE_VALUES = {"1", "true", "yes", "on"}
-LIVE_CONFIRMATION = "INFOITEMS_ONLY_PROPERTY_324903"
+POLICY_ID = "elcid.direct-guest-request-infoitem"
+POLICY_VERSION = "2026.08.02.1"
+LIVE_CONFIRMATION = "INFOITEMS_ONLY_ELCID_DIRECT_GUEST_REQUESTS_2026_08_02_1"
+MAX_WRITES_CAP = 10
+MAX_AGE_DAYS = 7
+DEFAULT_POLICY_PATH = (
+    pathlib.Path(__file__).resolve().parents[1]
+    / "policies"
+    / "elcid-direct-guest-notes.json"
+)
 NOTE_CODE_RE = re.compile(r"^[A-Z0-9]{1,20}$")
 OUTPUT = pathlib.Path(
     os.environ.get(
@@ -66,14 +77,61 @@ def operating_mode(env: dict[str, str] | None = None) -> str:
         raise NoteSyncError("Audit mode requires AUMARA_DISABLE_BOOKING_MUTATIONS=true")
     if mode == "live":
         if enabled(values, "AUMARA_DISABLE_BOOKING_MUTATIONS"):
-            raise NoteSyncError("Live mode conflicts with the booking mutation kill switch")
+            raise NoteSyncError(
+                "Live mode conflicts with the booking mutation kill switch"
+            )
         if not enabled(values, "AUMARA_LIVE_BOOKING_WRITES_CONFIRMED"):
-            raise NoteSyncError("Live mode requires AUMARA_LIVE_BOOKING_WRITES_CONFIRMED=true")
-        if values.get("AUMARA_BEDS24_NOTE_WRITE_CONFIRMATION") != LIVE_CONFIRMATION:
-            raise NoteSyncError("Live mode requires the exact infoItems-only confirmation")
+            raise NoteSyncError(
+                "Live mode requires AUMARA_LIVE_BOOKING_WRITES_CONFIRMED=true"
+            )
+        if (
+            values.get("AUMARA_BEDS24_NOTE_WRITE_CONFIRMATION")
+            != LIVE_CONFIRMATION
+        ):
+            raise NoteSyncError(
+                "Live mode requires the exact infoItems-only confirmation"
+            )
         if not str(values.get("BEDS24_NOTE_CODE") or "").strip():
             raise NoteSyncError("Live mode requires an explicit BEDS24_NOTE_CODE")
+        if int(values.get("BEDS24_NOTE_MAX_WRITES") or "0") != MAX_WRITES_CAP:
+            raise NoteSyncError("BEDS24_NOTE_MAX_WRITES must be exactly 10")
+        if int(values.get("BEDS24_NOTE_MAX_AGE_DAYS") or "0") != MAX_AGE_DAYS:
+            raise NoteSyncError("BEDS24_NOTE_MAX_AGE_DAYS must be exactly 7")
+        if str(values.get("BEDS24_NOTE_POLICY_ID") or "") != POLICY_ID:
+            raise NoteSyncError("The approved direct-note policy ID is missing")
+        if str(values.get("BEDS24_NOTE_POLICY_VERSION") or "") != POLICY_VERSION:
+            raise NoteSyncError("The approved direct-note policy version is missing")
     return mode
+
+
+def load_approved_policy(env: dict[str, str]) -> dict[str, str]:
+    path = pathlib.Path(env.get("BEDS24_NOTE_POLICY_PATH") or DEFAULT_POLICY_PATH)
+    try:
+        document = json.loads(path.read_text(encoding="utf-8"))
+    except (OSError, json.JSONDecodeError) as exc:
+        raise NoteSyncError("The approved direct-note policy cannot be loaded") from exc
+    policies = document.get("policies") if isinstance(document, dict) else None
+    policy = next(
+        (
+            item
+            for item in (policies or [])
+            if isinstance(item, dict) and item.get("policy_id") == POLICY_ID
+        ),
+        None,
+    )
+    if (
+        document.get("property") != "elcid"
+        or document.get("policy_version") != POLICY_VERSION
+        or not policy
+        or policy.get("property") != "elcid"
+        or policy.get("policy_version") != POLICY_VERSION
+        or policy.get("status") != "verified"
+        or not policy.get("verified_at")
+        or "record_guest_request"
+        not in (policy.get("allowed_beds24_action") or [])
+    ):
+        raise NoteSyncError("The approved direct-note policy boundary is invalid")
+    return {"id": POLICY_ID, "version": POLICY_VERSION}
 
 
 def note_code(env: dict[str, str] | None = None) -> str:
@@ -243,7 +301,9 @@ def plan_notes(
             record["reason"] = "not_guest_source"
         elif int(message.get("propertyId") or 0) != PROPERTY_ID:
             record["reason"] = "outside_property_scope"
-        elif event_type not in SUPPORTED_EVENT_TYPES:
+        elif event_type == "cot_request":
+            record["reason"] = "cot_requires_specialized_worker"
+        elif event_type not in LIVE_SUPPORTED_EVENT_TYPES:
             record["reason"] = "unsupported_guest_message"
         elif not message_id:
             record.update(action="manual_review", reason="message_id_missing")
@@ -267,11 +327,13 @@ def plan_notes(
                 record.update(action="duplicate", reason="info_item_already_exists")
             else:
                 seen_types.add((booking_id, event_type))
-                text = f"{marker(event_type, message_id)} {proposed_booking_note(event_type)}"
+                text = (
+                    f"{marker(event_type, message_id)} "
+                    f"{proposed_booking_note(event_type)}"
+                )
                 record.update(
                     action="would_write" if mode == "audit" else "pending_write",
                     reason="approved_request_type",
-                    noteText=text,
                 )
                 candidates.append(
                     {
@@ -289,7 +351,11 @@ def plan_notes(
 def write_notes(
     client: Beds24Client,
     candidates: list[dict[str, Any]],
+    *,
+    limit: int,
 ) -> int:
+    if len(candidates) > limit:
+        raise NoteSyncError("Direct-note candidate count exceeds the live write limit")
     grouped: dict[int, list[dict[str, str]]] = defaultdict(list)
     for item in candidates:
         grouped[int(item["bookingId"])].append(
@@ -309,6 +375,25 @@ def write_notes(
         for item in response
     ):
         raise NoteSyncError("Beds24 returned an incomplete infoItem write result")
+
+    expected: dict[int, set[tuple[str, str]]] = defaultdict(set)
+    for item in candidates:
+        expected[int(item["bookingId"])].add(
+            (str(item["code"]).strip().upper(), str(item["text"]))
+        )
+    read_back = fetch_bookings(client, sorted(expected))
+    for booking_id, expected_items in expected.items():
+        row = read_back.get(booking_id)
+        actual = {
+            (
+                str(info_item.get("code") or "").strip().upper(),
+                str(info_item.get("text") or ""),
+            )
+            for info_item in ((row or {}).get("infoItems") or [])
+            if isinstance(info_item, dict)
+        }
+        if not row or not expected_items.issubset(actual):
+            raise NoteSyncError("Exact direct-note read-back was not confirmed")
     return len(candidates)
 
 
@@ -327,9 +412,13 @@ def run(
     if guarded_mode != mode:
         raise NoteSyncError("Requested mode does not match the guarded environment")
     if note_code(values) != code:
-        raise NoteSyncError("Requested note code does not match the guarded environment")
+        raise NoteSyncError(
+            "Requested note code does not match the guarded environment"
+        )
     if not 1 <= max_age_days <= 7:
         raise NoteSyncError("BEDS24_NOTE_MAX_AGE_DAYS must be between 1 and 7")
+
+    policy = load_approved_policy(values)
 
     messages = fetch_guest_messages(client, max_age_days=max_age_days)
     booking_ids = sorted(
@@ -344,21 +433,27 @@ def run(
 
     notes_written = 0
     if mode == "live":
-        notes_written = write_notes(client, candidates)
+        notes_written = write_notes(
+            client,
+            candidates,
+            limit=int(values["BEDS24_NOTE_MAX_WRITES"]),
+        )
         for item in audit:
             if item["action"] == "pending_write":
-                item["action"] = "written"
+                item["action"] = "written_and_verified"
 
     report = {
         "schema": "aumara-beds24-guest-note-sync-v1",
         "generatedAtUtc": dt.datetime.now(dt.timezone.utc).isoformat(),
         "mode": mode,
         "propertyId": PROPERTY_ID,
+        "policy": policy,
         "summary": {
             "messagesScanned": len(messages),
             "bookingsResolved": len(bookings),
             "noteCandidates": len(candidates),
             "notesWritten": notes_written,
+            "notesReadBackVerified": notes_written,
             "manualReview": sum(item["action"] == "manual_review" for item in audit),
             "duplicates": sum(item["action"] == "duplicate" for item in audit),
         },
@@ -369,6 +464,12 @@ def run(
             "postRequests": client.post_requests,
             "rawGuestMessagePersisted": False,
             "guestContactDataPersisted": False,
+            "noteTextPersisted": False,
+            "maximumWrites": (
+                int(values.get("BEDS24_NOTE_MAX_WRITES") or "0")
+                if mode == "live"
+                else 0
+            ),
         },
         "events": audit,
     }

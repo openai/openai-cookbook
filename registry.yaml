@@ -4,6 +4,22 @@
 # should build pages for, and indicates metadata such as tags, creation date and
 # authors for each page.
 
+- title: Build a Resilient Realtime Voice Session in React Native with WebRTC
+  path: examples/voice_solutions/react_native_realtime_webrtc.mdx
+  slug: react-native-realtime-webrtc
+  description: Build a React Native Realtime voice session with short-lived credentials, idempotent lifecycle handling, bounded reconnects, deterministic teardown, and consent-gated tools.
+  date: 2026-08-02
+  authors:
+    - MarshallBear1
+  tags:
+    - realtime
+    - audio
+    - speech
+    - react-native
+    - webrtc
+    - mobile
+    - security
+
 - title: Migrate from Whisper to GPT-Transcribe and GPT-Live-Transcribe
   path: examples/migrating_from_whisper_to_gpt_transcribe.ipynb
   slug: migrating-from-whisper-to-gpt-transcribe

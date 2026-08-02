@@ -48,6 +48,7 @@ class AumaraAccessAuditTests(unittest.TestCase):
             "id": 90754013,
             "arrival": "2026-08-02",
             "departure": "2026-08-04",
+            "roomId": 674465,
             "infoItems": [{"code": "LOCK_PIN", "value": "123456"}],
         }
         messages = [
@@ -61,6 +62,8 @@ class AumaraAccessAuditTests(unittest.TestCase):
         self.assertEqual(result["status"], "PIN_MESSAGE_MATCHED")
         self.assertTrue(result["hostMessageMatchesCurrentPin"])
         self.assertTrue(result["distributionIntegrityVerified"])
+        self.assertEqual(result["assignedUnitIds"], [674465])
+        self.assertTrue(result["hostMessageContainsPinLikeValue"])
         self.assertFalse(result["physicalDoorOperationVerified"])
         self.assertNotIn("123456", json.dumps(result))
 
@@ -78,6 +81,19 @@ class AumaraAccessAuditTests(unittest.TestCase):
         serialized = json.dumps(result)
         self.assertNotIn("123456", serialized)
         self.assertNotIn("654321", serialized)
+
+    def test_message_code_without_beds24_pin_is_explicit_exception(self):
+        booking = {
+            "id": 90754013,
+            "roomId": 674466,
+            "infoItems": [],
+        }
+        messages = [{"source": "host", "message": "Door PIN 654321"}]
+        result = MODULE.audit_booking(booking, messages)
+        self.assertEqual(result["status"], "PIN_NOT_FOUND_MESSAGE_CONTAINS_CODE")
+        self.assertEqual(result["assignedUnitIds"], [674466])
+        self.assertTrue(result["hostMessageContainsPinLikeValue"])
+        self.assertNotIn("654321", json.dumps(result))
 
     def test_guest_message_cannot_confirm_distribution(self):
         booking = {"infoItems": [{"code": "LOCK_PIN", "value": "123456"}]}

@@ -166,6 +166,7 @@ def current_lock_pins(booking: dict[str, Any]) -> tuple[bool, set[str]]:
                 pins.update(_pin_candidates(value))
 
     if descriptor and not pins:
+        # Beds24 can store descriptor and value in sibling fields inside one item.
         for item in items if isinstance(items, list) else []:
             if not isinstance(item, dict):
                 continue
@@ -181,13 +182,31 @@ def lock_pin_state(booking: dict[str, Any]) -> tuple[bool, bool]:
     return descriptor, bool(pins)
 
 
+def assigned_unit_ids(booking: dict[str, Any]) -> list[int]:
+    """Return non-secret physical room/unit identifiers without guest data."""
+    keys = {"roomid", "unitid", "subroomid", "physicalunitid"}
+    values: set[int] = set()
+    for path, value in _walk(booking):
+        if not path or path[-1].casefold() not in keys:
+            continue
+        candidates = value if isinstance(value, list) else [value]
+        for candidate in candidates:
+            try:
+                parsed = int(candidate)
+            except (TypeError, ValueError):
+                continue
+            if parsed > 0:
+                values.add(parsed)
+    return sorted(values)
+
+
 def access_message_state(
     messages: list[dict[str, Any]],
     current_pins: set[str] | None = None,
-) -> tuple[bool, bool, str | None]:
-    """Return marker, exact-current-PIN match and timestamp without returning content."""
+) -> tuple[bool, bool, bool, str | None]:
+    """Return marker, PIN-like presence, exact match and timestamp without content."""
     current_pins = current_pins or set()
-    evidence: list[tuple[dict[str, Any], bool]] = []
+    evidence: list[tuple[dict[str, Any], bool, bool]] = []
     for message in messages:
         source = str(message.get("source") or message.get("sender") or "").casefold()
         body = str(
@@ -200,34 +219,39 @@ def access_message_state(
             continue
         folded = body.casefold()
         marker_found = any(marker in folded for marker in ACCESS_MARKERS)
+        pin_like = bool(_pin_candidates(body))
         exact_match = bool(current_pins) and any(pin in body for pin in current_pins)
-        if marker_found or exact_match:
-            evidence.append((message, exact_match))
+        if marker_found or pin_like or exact_match:
+            evidence.append((message, pin_like, exact_match))
     if not evidence:
-        return False, False, None
-    latest, latest_match = evidence[-1]
+        return False, False, False, None
+    latest, latest_pin_like, latest_match = evidence[-1]
     sent_at = latest.get("time") or latest.get("createdAt") or latest.get("date")
-    return True, latest_match, str(sent_at) if sent_at else None
+    return True, latest_pin_like, latest_match, str(sent_at) if sent_at else None
 
 
 def audit_booking(booking: dict[str, Any], messages: list[dict[str, Any]]) -> dict[str, Any]:
     descriptor, pins = current_lock_pins(booking)
-    message_found, message_matches, message_at = access_message_state(messages, pins)
+    message_found, message_has_pin, message_matches, message_at = access_message_state(messages, pins)
     if pins and message_matches:
         status = "PIN_MESSAGE_MATCHED"
     elif pins and message_found:
         status = "PIN_MESSAGE_MISMATCH"
     elif pins:
         status = "PIN_PRESENT_SEND_UNCONFIRMED"
+    elif message_has_pin:
+        status = "PIN_NOT_FOUND_MESSAGE_CONTAINS_CODE"
     else:
         status = "PIN_NOT_FOUND"
     return {
         "bookingId": int(booking.get("id") or 0),
         "arrival": booking.get("arrival"),
         "departure": booking.get("departure"),
+        "assignedUnitIds": assigned_unit_ids(booking),
         "lockPinDescriptorPresent": descriptor,
         "lockPinValuePresent": bool(pins),
         "hostAccessMessagePresent": message_found,
+        "hostMessageContainsPinLikeValue": message_has_pin,
         "hostMessageMatchesCurrentPin": message_matches,
         "hostAccessMessageAt": message_at,
         "distributionIntegrityVerified": status == "PIN_MESSAGE_MATCHED",

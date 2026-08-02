@@ -1,0 +1,12 @@
+{
+  "schema_version": "1.0",
+  "snapshot_version": "2026.08.02.1",
+  "property": "elcid",
+  "registry_policy_version": "2026.07.27.1",
+  "policy_ids": [
+    "elcid.bed-request-reply-fragment",
+    "elcid.parking-request-reply-fragment",
+    "elcid.non-smoking-room-reply-fragment",
+    "elcid.send-failure-content-stability"
+  ]
+}

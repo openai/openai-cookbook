@@ -61,6 +61,99 @@
       ],
       "response_template_ids": [],
       "policy_version": "2026.07.27.1"
+    },
+    {
+      "policy_id": "elcid.bed-request-reply-fragment",
+      "property": "elcid",
+      "category": "guest_reply_fragment",
+      "rule": "A large-double-bed request is a recorded preference. Confirm that it has been noted without promising a room-category change and without adding subject-to-availability wording.",
+      "source": "approved_internal_document",
+      "source_reference": "REQUEST:ELCID_BED_REPLY:2026-08-02",
+      "verified_at": "2026-08-02",
+      "status": "verified",
+      "allowed_auto_reply": true,
+      "allowed_beds24_action": [],
+      "escalation_conditions": [
+        "room_category_change_required",
+        "booking_data_conflict"
+      ],
+      "response_template_ids": [
+        "elcid.bed-request-reply-fragment"
+      ],
+      "response_templates": {
+        "en": "We have noted your request for one large double bed.",
+        "es": "Hemos registrado su solicitud de una cama doble grande.",
+        "et": "Oleme märkinud teie soovi ühe suure kaheinimesevoodi kohta."
+      },
+      "policy_version": "2026.07.27.1"
+    },
+    {
+      "policy_id": "elcid.parking-request-reply-fragment",
+      "property": "elcid",
+      "category": "guest_reply_fragment",
+      "rule": "A parking request may be recorded automatically. Do not promise a particular space, price or other unverified condition.",
+      "source": "approved_internal_document",
+      "source_reference": "REQUEST:ELCID_PARKING_REPLY:2026-08-02",
+      "verified_at": "2026-08-02",
+      "status": "verified",
+      "allowed_auto_reply": true,
+      "allowed_beds24_action": [],
+      "escalation_conditions": [
+        "specific_parking_commitment_required",
+        "parking_terms_conflict"
+      ],
+      "response_template_ids": [
+        "elcid.parking-request-reply-fragment"
+      ],
+      "response_templates": {
+        "en": "We have noted your parking request.",
+        "es": "Hemos registrado su solicitud de aparcamiento.",
+        "et": "Oleme märkinud teie parkimissoovi."
+      },
+      "policy_version": "2026.07.27.1"
+    },
+    {
+      "policy_id": "elcid.non-smoking-room-reply-fragment",
+      "property": "elcid",
+      "category": "property_fact",
+      "rule": "All EL CID guest rooms are non-smoking. State this as a confirmed property fact, never as a preference and never subject to availability.",
+      "source": "approved_internal_document",
+      "source_reference": "REQUEST:ELCID_NON_SMOKING_ROOMS:2026-08-02",
+      "verified_at": "2026-08-02",
+      "status": "verified",
+      "allowed_auto_reply": true,
+      "allowed_beds24_action": [],
+      "escalation_conditions": [
+        "property_configuration_conflict"
+      ],
+      "response_template_ids": [
+        "elcid.non-smoking-room-reply-fragment"
+      ],
+      "response_templates": {
+        "en": "All rooms at El Cid Country Club are non-smoking.",
+        "es": "Todas las habitaciones de El Cid Country Club son para no fumadores.",
+        "et": "Kõik El Cid Country Clubi toad on mittesuitsetajatele."
+      },
+      "policy_version": "2026.07.27.1"
+    },
+    {
+      "policy_id": "elcid.send-failure-content-stability",
+      "property": "elcid",
+      "category": "delivery_failure",
+      "rule": "A workspace, Gmail or connector send failure changes only delivery state. It must not rewrite the approved reply, add generic caveats or revert to an older draft.",
+      "source": "approved_internal_document",
+      "source_reference": "REQUEST:ELCID_SEND_FAILURE_CONTENT:2026-08-02",
+      "verified_at": "2026-08-02",
+      "status": "verified",
+      "allowed_auto_reply": false,
+      "allowed_beds24_action": [],
+      "escalation_conditions": [
+        "send_not_confirmed",
+        "workspace_limit",
+        "connector_failure"
+      ],
+      "response_template_ids": [],
+      "policy_version": "2026.07.27.1"
     }
   ]
 }

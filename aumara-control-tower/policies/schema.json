@@ -177,6 +177,24 @@
             "pattern": "^(shared|elcid|aumara)\\.[a-z0-9][a-z0-9.-]*$"
           }
         },
+        "response_templates": {
+          "type": "object",
+          "additionalProperties": false,
+          "properties": {
+            "en": {
+              "type": "string",
+              "minLength": 1
+            },
+            "es": {
+              "type": "string",
+              "minLength": 1
+            },
+            "et": {
+              "type": "string",
+              "minLength": 1
+            }
+          }
+        },
         "policy_version": {
           "$ref": "#/$defs/version"
         }

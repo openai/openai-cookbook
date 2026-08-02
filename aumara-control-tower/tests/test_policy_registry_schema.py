@@ -105,6 +105,17 @@ class PolicyRegistrySchemaTests(unittest.TestCase):
         with self.assertRaisesRegex(RegistryValidationError, "operational value"):
             validate_registry(self.root)
 
+    def test_multilingual_templates_are_allowed_for_verified_policy(self) -> None:
+        document = self._read("elcid.yaml")
+        policy = next(
+            item
+            for item in document["policies"]
+            if item["policy_id"] == "elcid.non-smoking-room-reply-fragment"
+        )
+        self.assertTrue(policy["allowed_auto_reply"])
+        self.assertIn("en", policy["response_templates"])
+        validate_registry(self.root)
+
 
 if __name__ == "__main__":
     unittest.main()

@@ -86,7 +86,7 @@ jobs:
               pull_request = json.load(response)
           expected = {
               "base": "main",
-              "head": "agent/beds24-bed-nonsmoking-notes-v3",
+              "head": "agent/beds24-bed-nonsmoking-notes-v4",
           }
           actual = {
               "base": (pull_request.get("base") or {}).get("ref"),

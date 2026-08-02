@@ -174,22 +174,18 @@ def iter_strings(value: object, *, parent_key: str = "") -> Iterable[str]:
 
 
 def explicit_combined_request(
-    row: dict[str, Any],
+    _row: dict[str, Any],
     messages: Iterable[dict[str, Any]] = (),
 ) -> bool:
+    """Require both requests in the bounded personal-message source."""
     text = "\n".join(
-        [
-            *iter_strings(row),
-            *(
-                str(
-                    message.get("message")
-                    or message.get("text")
-                    or message.get("body")
-                    or ""
-                )
-                for message in messages
-            ),
-        ]
+        str(
+            message.get("message")
+            or message.get("text")
+            or message.get("body")
+            or ""
+        )
+        for message in messages
     )
     return bool(BED_RE.search(text) and NONSMOKING_RE.search(text))
 

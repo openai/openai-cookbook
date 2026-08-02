@@ -121,10 +121,18 @@ class BedNonSmokingNoteTests(unittest.TestCase):
         valid = booking(1)
         wrong_room = booking(2, room_id=999)
         one_request = booking(3)
-        one_request["guestComments"] = "Non Smoking Requested"
         cancelled = booking(4, status="cancelled")
+        one_request_message = guest_message(12, 3)
+        one_request_message["message"] = "Non Smoking Requested"
         candidates, audit = worker.plan_notes(
-            [valid, wrong_room, one_request, cancelled], today=TODAY
+            [valid, wrong_room, one_request, cancelled],
+            today=TODAY,
+            messages_by_booking={
+                1: [guest_message(10, 1)],
+                2: [guest_message(11, 2)],
+                3: [one_request_message],
+                4: [guest_message(13, 4)],
+            },
         )
         self.assertEqual([item["bookingId"] for item in candidates], [1])
         self.assertEqual(audit, [{"action": "pending_write", "reason": "safe_rule_proved"}])
@@ -132,7 +140,9 @@ class BedNonSmokingNoteTests(unittest.TestCase):
     def test_existing_combined_note_is_deduplicated(self):
         existing = [{"code": "GUESTREQUEST", "text": worker.NOTE_MARKER}]
         candidates, audit = worker.plan_notes(
-            [booking(1, info_items=existing)], today=TODAY
+            [booking(1, info_items=existing)],
+            today=TODAY,
+            messages_by_booking={1: [guest_message(10, 1)]},
         )
         self.assertEqual(candidates, [])
         self.assertEqual(audit[0]["action"], "duplicate")
@@ -145,6 +155,10 @@ class BedNonSmokingNoteTests(unittest.TestCase):
             messages_by_booking={1: [guest_message(10, 1)]},
         )
         self.assertEqual([item["bookingId"] for item in candidates], [1])
+
+    def test_booking_payload_alone_is_not_an_authoritative_message_source(self):
+        candidates, _ = worker.plan_notes([booking(1)], today=TODAY)
+        self.assertEqual(candidates, [])
 
     def test_four_notes_are_written_and_exactly_read_back(self):
         client = FakeClient(

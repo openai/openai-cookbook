@@ -24,7 +24,10 @@ from typing import Any
 API_BASE = "https://api.beds24.com/v2"
 ROOT = pathlib.Path(__file__).resolve().parents[1]
 EVIDENCE_PATH = ROOT / "evidence" / "beds24-auth-check.json"
-CREDENTIAL_SOURCE = "BEDS24_REFRESH_TOKEN"
+# Prefer the secret name that already exists in the repository Actions secrets.
+# Fall back to the legacy name for compatibility.
+CREDENTIAL_SOURCE_PRIMARY = "BEDS24_REFRESH_CREDENTIAL"
+CREDENTIAL_SOURCE_LEGACY = "BEDS24_REFRESH_TOKEN"
 REDACTED = "[REDACTED]"
 DIAGNOSTIC_FIELDS = (
     "diagnostics",
@@ -132,7 +135,7 @@ def load_evidence() -> dict[str, Any]:
     return {
         "checked_at_utc": now_utc(),
         "status": "NOT_RUN",
-        "credential_source": CREDENTIAL_SOURCE,
+        "credential_source": CREDENTIAL_SOURCE_PRIMARY,
         "credential_mode": None,
         "direct_probe_http_status": None,
         "direct_probe_valid_token": None,
@@ -159,8 +162,15 @@ def save_evidence(evidence: dict[str, Any]) -> None:
     )
 
 
-def get_credential() -> str:
-    return normalize_secret(os.environ.get(CREDENTIAL_SOURCE))
+def get_credential() -> tuple[str, str]:
+    """Return (credential, source_name). Prefer the repository secret that already exists."""
+    primary = normalize_secret(os.environ.get(CREDENTIAL_SOURCE_PRIMARY))
+    if primary:
+        return primary, CREDENTIAL_SOURCE_PRIMARY
+    legacy = normalize_secret(os.environ.get(CREDENTIAL_SOURCE_LEGACY))
+    if legacy:
+        return legacy, CREDENTIAL_SOURCE_LEGACY
+    return "", CREDENTIAL_SOURCE_PRIMARY
 
 
 def request_json(
@@ -191,12 +201,12 @@ def request_json(
 
 
 def command_validate() -> int:
-    credential = get_credential()
+    credential, source = get_credential()
     evidence = load_evidence()
     evidence.update(
         {
             "status": "CREDENTIAL_PRESENT" if credential else "AUTH_FAILED",
-            "credential_source": CREDENTIAL_SOURCE,
+            "credential_source": source,
             "credential_mode": None,
             "direct_probe_http_status": None,
             "direct_probe_valid_token": None,
@@ -213,18 +223,18 @@ def command_validate() -> int:
     )
     save_evidence(evidence)
     if not credential:
-        print(f"Missing GitHub Actions secret {CREDENTIAL_SOURCE}", file=sys.stderr)
+        print(f"Missing GitHub Actions secret {CREDENTIAL_SOURCE_PRIMARY} (or legacy {CREDENTIAL_SOURCE_LEGACY})", file=sys.stderr)
         return 1
-    print("Beds24 credential is present; value was not printed.")
+    print(f"Beds24 credential is present from {source}; value was not printed.")
     return 0
 
 
 def command_authenticate() -> int:
-    credential = get_credential()
+    credential, source = get_credential()
     evidence = load_evidence()
     evidence.update(
         {
-            "credential_source": CREDENTIAL_SOURCE,
+            "credential_source": source,
             "credential_mode": None,
             "direct_probe_http_status": None,
             "direct_probe_valid_token": None,
@@ -243,7 +253,7 @@ def command_authenticate() -> int:
         evidence["status"] = "AUTH_FAILED"
         evidence["failure_stage"] = "validate"
         save_evidence(evidence)
-        print(f"Missing GitHub Actions secret {CREDENTIAL_SOURCE}", file=sys.stderr)
+        print(f"Missing GitHub Actions secret {CREDENTIAL_SOURCE_PRIMARY} (or legacy {CREDENTIAL_SOURCE_LEGACY})", file=sys.stderr)
         return 1
 
     direct_status, direct_body = request_json(

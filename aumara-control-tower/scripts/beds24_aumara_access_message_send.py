@@ -8,6 +8,8 @@ API. This worker does the part that IS available over API V2:
 * POST /bookings/messages for OTA bookings (Booking.com / Airbnb path)
 
 Direct SMTP email from Auto Actions remains a Beds24 UI-only configuration.
+
+Guest times: check-in 14:00, check-out 12:00.
 """
 
 from __future__ import annotations
@@ -26,6 +28,8 @@ from beds24_elcid_studio_audit import AuditError, data_rows, get_access_token
 
 PROPERTY_ID = 324882
 FIXED_PIN = (os.environ.get("AUMARA_FIXED_GUEST_PIN") or "1531").strip()
+CHECK_IN_TIME = "14:00"
+CHECK_OUT_TIME = "12:00"
 MADRID = ZoneInfo("Europe/Madrid")
 LIVE_CONFIRMATION = "AUMARA_ACCESS_MESSAGE_SEND_1531_2026_08_03"
 OUTPUT = pathlib.Path(
@@ -39,7 +43,7 @@ TRUE = {"1", "true", "yes", "on"}
 ACCESS_MESSAGE = (
     f"Codigo de acceso al chalet: {FIXED_PIN}\r\n"
     f"Introduzca {FIXED_PIN} y pulse #\r\n"
-    "Check-in: 16:00 · Check-out: 12:00\r\n"
+    f"Check-in: {CHECK_IN_TIME} · Check-out: {CHECK_OUT_TIME}\r\n"
     "Si necesita ayuda, responda a este mensaje."
 )
 
@@ -179,7 +183,6 @@ def send_message(api_base: str, token: str, booking_id: int) -> tuple[bool, str]
         if 200 <= status < 300:
             return True, f"http_{status}"
         last_error = f"http_{status}:{json.dumps(response, ensure_ascii=False)[:180]}"
-        # 400 with schema hint — try next shape
         if status in {401, 403}:
             return False, last_error
     return False, last_error
@@ -242,6 +245,8 @@ def main() -> int:
         "windowStart": start.isoformat(),
         "windowEnd": end.isoformat(),
         "fixedPinConfigured": True,
+        "checkInTime": CHECK_IN_TIME,
+        "checkOutTime": CHECK_OUT_TIME,
         "pinValueExposed": False,
         "messageBodyExposed": False,
         "bookingsScanned": len(bookings),
@@ -257,7 +262,8 @@ def main() -> int:
         "status": "OK",
         "platformNote": (
             "Beds24 Auto Action email templates are UI-only; "
-            "this job uses POST /bookings/messages (OTA) + LOCK_PIN seed."
+            "this job uses POST /bookings/messages (OTA) + LOCK_PIN seed. "
+            "OTA message endpoint may require bookings-personal scope."
         ),
     }
     OUTPUT.parent.mkdir(parents=True, exist_ok=True)

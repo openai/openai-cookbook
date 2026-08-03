@@ -19,6 +19,9 @@ SPEC.loader.exec_module(MODULE)
 
 
 class AumaraAccessAuditTests(unittest.TestCase):
+    def setUp(self):
+        MODULE.FIXED_GUEST_PIN = "1531"
+
     def test_query_covers_today_and_tomorrow_and_is_read_only(self):
         path = MODULE.booking_query(
             MODULE.dt.date(2026, 8, 2),
@@ -37,10 +40,10 @@ class AumaraAccessAuditTests(unittest.TestCase):
         self.assertEqual(end, MODULE.dt.date(2026, 8, 2))
 
     def test_lock_pin_is_detected_without_returning_value(self):
-        booking = {"infoItems": [{"code": "LOCK_PIN", "value": "123456"}]}
+        booking = {"infoItems": [{"code": "LOCK_PIN", "value": "1531"}]}
         self.assertEqual(MODULE.lock_pin_state(booking), (True, True))
         result = MODULE.audit_booking(booking, [])
-        self.assertNotIn("123456", json.dumps(result))
+        self.assertNotIn("1531", json.dumps(result))
         self.assertEqual(result["status"], "PIN_PRESENT_SEND_UNCONFIRMED")
 
     def test_exact_current_pin_in_latest_host_message_is_matched(self):
@@ -49,12 +52,12 @@ class AumaraAccessAuditTests(unittest.TestCase):
             "arrival": "2026-08-02",
             "departure": "2026-08-04",
             "roomId": 674465,
-            "infoItems": [{"code": "LOCK_PIN", "value": "123456"}],
+            "infoItems": [{"code": "LOCK_PIN", "value": "1531"}],
         }
         messages = [
             {
                 "source": "host",
-                "message": "Sus instrucciones de acceso: PIN 123456.",
+                "message": "Sus instrucciones de acceso: PIN 1531.",
                 "createdAt": "2026-08-01T18:00:00Z",
             }
         ]
@@ -65,12 +68,12 @@ class AumaraAccessAuditTests(unittest.TestCase):
         self.assertEqual(result["assignedUnitIds"], [674465])
         self.assertTrue(result["hostMessageContainsPinLikeValue"])
         self.assertFalse(result["physicalDoorOperationVerified"])
-        self.assertNotIn("123456", json.dumps(result))
+        self.assertNotIn("1531", json.dumps(result))
 
     def test_stale_pin_in_latest_host_message_is_mismatch(self):
         booking = {
             "id": 90754013,
-            "infoItems": [{"code": "LOCK_PIN", "value": "123456"}],
+            "infoItems": [{"code": "LOCK_PIN", "value": "1531"}],
         }
         messages = [
             {"source": "host", "message": "Access code PIN 654321."}
@@ -79,7 +82,7 @@ class AumaraAccessAuditTests(unittest.TestCase):
         self.assertEqual(result["status"], "PIN_MESSAGE_MISMATCH")
         self.assertFalse(result["hostMessageMatchesCurrentPin"])
         serialized = json.dumps(result)
-        self.assertNotIn("123456", serialized)
+        self.assertNotIn("1531", serialized)
         self.assertNotIn("654321", serialized)
 
     def test_message_code_without_beds24_pin_is_explicit_exception(self):
@@ -90,16 +93,25 @@ class AumaraAccessAuditTests(unittest.TestCase):
         }
         messages = [{"source": "host", "message": "Door PIN 654321"}]
         result = MODULE.audit_booking(booking, messages)
-        self.assertEqual(result["status"], "PIN_NOT_FOUND_MESSAGE_CONTAINS_CODE")
+        # Fixed policy still expects 1531; wrong code in message is mismatch
+        self.assertEqual(result["status"], "PIN_MESSAGE_MISMATCH")
         self.assertEqual(result["assignedUnitIds"], [674466])
         self.assertTrue(result["hostMessageContainsPinLikeValue"])
         self.assertNotIn("654321", json.dumps(result))
 
     def test_guest_message_cannot_confirm_distribution(self):
-        booking = {"infoItems": [{"code": "LOCK_PIN", "value": "123456"}]}
-        messages = [{"source": "guest", "message": "My PIN 123456 does not work"}]
+        booking = {"infoItems": [{"code": "LOCK_PIN", "value": "1531"}]}
+        messages = [{"source": "guest", "message": "My PIN 1531 does not work"}]
         result = MODULE.audit_booking(booking, messages)
         self.assertEqual(result["status"], "PIN_PRESENT_SEND_UNCONFIRMED")
+
+    def test_fixed_pin_message_matches_without_stored_lock_pin(self):
+        booking = {"id": 1, "infoItems": []}
+        messages = [{"source": "host", "message": "Código de acceso: 1531. Pulse #."}]
+        result = MODULE.audit_booking(booking, messages)
+        self.assertEqual(result["status"], "PIN_MESSAGE_MATCHED")
+        self.assertTrue(result["fixedGuestPinPolicy"])
+        self.assertNotIn("1531", json.dumps(result))
 
     def test_no_arrivals_is_a_successful_audited_state(self):
         with tempfile.TemporaryDirectory() as directory:

@@ -128,6 +128,34 @@ class AumaraAccessAuditTests(unittest.TestCase):
         self.assertEqual(payload["results"], [])
         self.assertFalse(payload["pinValueExposed"])
 
+    def test_requested_booking_not_found_is_non_failing_audited_state(self):
+        with tempfile.TemporaryDirectory() as directory:
+            output = pathlib.Path(directory) / "evidence.json"
+            with (
+                mock.patch.object(MODULE, "OUTPUT", output),
+                mock.patch.object(
+                    MODULE,
+                    "target_window",
+                    return_value=(
+                        MODULE.dt.date(2026, 8, 2),
+                        MODULE.dt.date(2026, 8, 3),
+                    ),
+                ),
+                mock.patch.object(MODULE, "target_booking_id", return_value=90754013),
+                mock.patch.object(
+                    MODULE,
+                    "get_access_token",
+                    return_value=("token", "refresh_token", "https://api.beds24.com/v2", "secret", False),
+                ),
+                mock.patch.object(MODULE, "fetch_arrivals", return_value=[]),
+            ):
+                exit_code = MODULE.main()
+            payload = json.loads(output.read_text(encoding="utf-8"))
+        self.assertEqual(exit_code, 0)
+        self.assertEqual(payload["status"], "BOOKING_NOT_FOUND")
+        self.assertEqual(payload["requestedBookingId"], 90754013)
+        self.assertEqual(payload["results"], [])
+
 
 if __name__ == "__main__":
     unittest.main()

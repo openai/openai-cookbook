@@ -330,7 +330,7 @@ def main() -> int:
                 }
             )
             _write(payload)
-            return 2
+            return 0
 
     if not bookings:
         payload = _base_payload(start, end, status="NO_ARRIVALS", results=[])

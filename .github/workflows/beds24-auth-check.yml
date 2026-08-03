@@ -33,6 +33,9 @@ jobs:
     needs: test
     runs-on: ubuntu-latest
     env:
+      # Canonical Actions secret name in this repo
+      BEDS24_REFRESH_CREDENTIAL: ${{ secrets.BEDS24_REFRESH_CREDENTIAL }}
+      # Scripts also accept the legacy env name; map both from the same secret
       BEDS24_REFRESH_TOKEN: ${{ secrets.BEDS24_REFRESH_CREDENTIAL }}
 
     steps:

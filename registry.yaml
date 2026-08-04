@@ -4,6 +4,23 @@
 # should build pages for, and indicates metadata such as tags, creation date and
 # authors for each page.
 
+- title: Testing Agent Recovery from Tool Failures with the OpenAI Agents SDK
+  path: examples/agents_sdk/testing_agent_recovery_from_tool_failures.ipynb
+  slug: testing-agent-recovery-from-tool-failures
+  description: Build and evaluate an Agents SDK workflow that recovers safely from transient, permanent, and ambiguous tool failures without duplicating side effects.
+  date: 2026-07-29
+  authors:
+    - saptob
+    - aijinggao
+    - the-OAI
+  tags:
+    - agents-sdk
+    - agents
+    - evals
+    - guardrails
+    - promptfoo
+    - idempotency
+
 - title: Migrate from Whisper to GPT-Transcribe and GPT-Live-Transcribe
   path: examples/migrating_from_whisper_to_gpt_transcribe.ipynb
   slug: migrating-from-whisper-to-gpt-transcribe

@@ -10,7 +10,7 @@
   <meta name="format-detection" content="telephone=no">
   <link rel="manifest" href="/staff/manifest.webmanifest">
   <link rel="icon" href="/staff/icon.svg" type="image/svg+xml">
-  <link rel="stylesheet" href="/staff/styles.css?v=210">
+  <link rel="stylesheet" href="/staff/styles.css?v=220">
   <title>AUMARA Staff</title>
 </head>
 <body>
@@ -23,7 +23,7 @@
       </div>
       <div class="statusbox">
         <span id="net" class="pill">—</span>
-        <span id="version" class="pill">PWA 2.1</span>
+        <span id="version" class="pill">PWA 2.2</span>
       </div>
     </header>
 
@@ -111,10 +111,11 @@
     </div>
   </div>
 
-  <script src="/staff/app.js?v=210" defer></script>
-  <script src="/staff/patch.js?v=211" defer></script>
+  <script src="/staff/app.js?v=220" defer></script>
+  <script src="/staff/patch.js?v=220" defer></script>
+  <script src="/staff/legacy.js?v=220" defer></script>
   <script>
-    if('serviceWorker' in navigator){addEventListener('load',()=>navigator.serviceWorker.register('/staff/sw.js?v=211').catch(()=>{}));}
+    if('serviceWorker' in navigator){addEventListener('load',()=>navigator.serviceWorker.register('/staff/sw.js?v=220').catch(()=>{}));}
   </script>
 </body>
 </html>

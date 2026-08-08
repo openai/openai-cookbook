@@ -40,6 +40,7 @@ jobs:
         run: |
           set -euo pipefail
           node --check staff/app.js
+          node --check staff/sw.js
           grep -Fq 'AUMARA Staff' staff/index.html
           grep -Fq 'PWA 2.1' staff/index.html
           grep -Fq "aumara-staff-pwa-v2.1.0" staff/sw.js
@@ -62,11 +63,11 @@ jobs:
           set -euo pipefail
           lftp -u "$FTP_USER","$FTP_PASSWORD" "$FTP_HOST" -e "set cmd:fail-exit yes; set ftp:ssl-allow no; set ftp:passive-mode yes; pwd; cls -la /www; bye"
 
-      - name: Create Staff web root
+      - name: Verify Staff web root
         shell: bash
         run: |
           set -euo pipefail
-          lftp -u "$FTP_USER","$FTP_PASSWORD" "$FTP_HOST" -e "set cmd:fail-exit yes; set ftp:ssl-allow no; set ftp:passive-mode yes; mkdir -p $FTP_TARGET; bye"
+          lftp -u "$FTP_USER","$FTP_PASSWORD" "$FTP_HOST" -e "set cmd:fail-exit yes; set ftp:ssl-allow no; set ftp:passive-mode yes; cd $FTP_TARGET; pwd; bye"
 
       - name: Upload AUMARA Staff PWA
         shell: bash
@@ -104,6 +105,8 @@ jobs:
           grep -Fq 'aumara-staff-api' /tmp/app.js
           grep -Fq "aumara-staff-pwa-v2.1.0" /tmp/sw.js
           grep -Fq '"start_url": "/staff/"' /tmp/manifest.webmanifest
+          node --check /tmp/app.js
+          node --check /tmp/sw.js
 
       - name: Deployment summary
         if: always()

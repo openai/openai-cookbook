@@ -18,6 +18,22 @@
     - migration
     - whisper
 
+- title: AML Analysis with the Agents SDK on Amazon Bedrock
+  path: examples/partners/AWS/evidence_grounded_aml_agent_with_bedrock.ipynb
+  slug: evidence-grounded-aml-agent-amazon-bedrock
+  description: Run a synthetic AML analysis with the OpenAI Agents SDK and GPT-5.6 Sol on Amazon Bedrock, verify structured claims against deterministic evidence, test failure cases, and enforce an application-owned human review gate.
+  date: 2026-07-23
+  authors:
+    - deepakjain108
+  tags:
+    - partners
+    - agents-sdk
+    - agents
+    - evals
+    - structured-outputs
+    - bedrock
+    - security
+
 - title: Enabling Long-Term Agent Memory with Oracle AI Agent Memory
   path: examples/vector_databases/oracle_db/deep_research_openai_agents.ipynb
   slug: deep-research-openai-agents

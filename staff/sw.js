@@ -1,5 +1,5 @@
-const CACHE='aumara-staff-pwa-v2.1.1';
-const SHELL=['/staff/','/staff/index.html','/staff/styles.css?v=210','/staff/app.js?v=210','/staff/patch.js?v=211','/staff/manifest.webmanifest','/staff/icon.svg'];
+const CACHE='aumara-staff-pwa-v2.2.0';
+const SHELL=['/staff/','/staff/index.html','/staff/styles.css?v=220','/staff/app.js?v=220','/staff/patch.js?v=220','/staff/legacy.js?v=220','/staff/manifest.webmanifest','/staff/icon.svg'];
 self.addEventListener('install',event=>{
   event.waitUntil(caches.open(CACHE).then(cache=>cache.addAll(SHELL)).then(()=>self.skipWaiting()));
 });

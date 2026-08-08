@@ -1,0 +1,100 @@
+name: Deploy AUMARA Staff to Nominalia
+
+on:
+  workflow_dispatch:
+  push:
+    branches: [main]
+    paths:
+      - 'staff/**'
+      - '.github/workflows/deploy-staff-nominalia.yml'
+
+permissions:
+  contents: read
+
+concurrency:
+  group: aumara-staff-nominalia-production
+  cancel-in-progress: true
+
+jobs:
+  deploy:
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+    environment: NOMINALIA_FTP_PASSWORD
+    env:
+      FTP_HOST: elcidt.ftp.tb-hosting.com
+      FTP_USER: elcidspaincom@elcidspaincom
+      FTP_PASSWORD: ${{ secrets.NOMINALIA_FTP_PASSWORD || secrets.NOMINALIAFTPPASSWORD }}
+      FTP_TARGET: /www/staff
+      PAGE_URL: https://elcidspain.com/staff/
+      MANIFEST_URL: https://elcidspain.com/staff/manifest.webmanifest
+      SW_URL: https://elcidspain.com/staff/sw.js
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Install FTP client
+        run: |
+          sudo apt-get update
+          sudo apt-get install -y lftp
+
+      - name: Validate deployment secret
+        run: |
+          test -n "$FTP_PASSWORD" || { echo "Nominalia FTP password secret is empty"; exit 1; }
+
+      - name: Connect to Nominalia
+        shell: bash
+        run: |
+          set -euo pipefail
+          lftp -u "$FTP_USER","$FTP_PASSWORD" "$FTP_HOST" -e "set cmd:fail-exit yes; set ftp:ssl-allow no; set ftp:passive-mode yes; pwd; cls -la /www; bye"
+
+      - name: Create Staff web root
+        shell: bash
+        run: |
+          set -euo pipefail
+          lftp -u "$FTP_USER","$FTP_PASSWORD" "$FTP_HOST" -e "set cmd:fail-exit yes; set ftp:ssl-allow no; set ftp:passive-mode yes; mkdir -p $FTP_TARGET; bye"
+
+      - name: Upload AUMARA Staff PWA
+        shell: bash
+        run: |
+          set -euo pipefail
+          lftp -u "$FTP_USER","$FTP_PASSWORD" "$FTP_HOST" -e "set cmd:fail-exit yes; set ftp:ssl-allow no; set ftp:passive-mode yes; mirror --reverse --delete --verbose --parallel=2 --no-perms ./staff/ $FTP_TARGET/; bye"
+
+      - name: Verify files on FTP
+        shell: bash
+        run: |
+          set -euo pipefail
+          lftp -u "$FTP_USER","$FTP_PASSWORD" "$FTP_HOST" -e "set cmd:fail-exit yes; set ftp:ssl-allow no; set ftp:passive-mode yes; cls -l $FTP_TARGET/index.html; cls -l $FTP_TARGET/manifest.webmanifest; cls -l $FTP_TARGET/sw.js; bye"
+
+      - name: Verify public PWA
+        id: verify
+        shell: bash
+        run: |
+          set -euo pipefail
+          page_code="$(curl -sS -L -o /tmp/staff.html -w '%{http_code}' --max-time 45 --retry 5 --retry-delay 3 "$PAGE_URL")"
+          manifest_code="$(curl -sS -L -o /tmp/manifest.webmanifest -w '%{http_code}' --max-time 30 --retry 4 --retry-delay 3 "$MANIFEST_URL")"
+          sw_code="$(curl -sS -L -o /tmp/sw.js -w '%{http_code}' --max-time 30 --retry 4 --retry-delay 3 "$SW_URL")"
+          echo "page_code=$page_code" >> "$GITHUB_OUTPUT"
+          echo "manifest_code=$manifest_code" >> "$GITHUB_OUTPUT"
+          echo "sw_code=$sw_code" >> "$GITHUB_OUTPUT"
+          test "$page_code" = "200"
+          test "$manifest_code" = "200"
+          test "$sw_code" = "200"
+          grep -Fq 'AUMARA Staff' /tmp/staff.html
+          grep -Fq 'elcidspain.com/staff/' /tmp/staff.html
+          grep -Fq '"start_url": "/staff/"' /tmp/manifest.webmanifest
+          grep -Fq "aumara-staff-shell-v1" /tmp/sw.js
+
+      - name: Deployment summary
+        if: always()
+        shell: bash
+        run: |
+          {
+            echo "## AUMARA Staff Nominalia deployment"
+            echo ""
+            echo "- Commit: \`${GITHUB_SHA}\`"
+            echo "- FTP target: \`${FTP_TARGET}\`"
+            echo "- Page: \`${PAGE_URL}\` — HTTP \`${{ steps.verify.outputs.page_code || 'not_run' }}\`"
+            echo "- Manifest: HTTP \`${{ steps.verify.outputs.manifest_code || 'not_run' }}\`"
+            echo "- Service worker: HTTP \`${{ steps.verify.outputs.sw_code || 'not_run' }}\`"
+          } >> "$GITHUB_STEP_SUMMARY"

@@ -4,6 +4,19 @@
 # should build pages for, and indicates metadata such as tags, creation date and
 # authors for each page.
 
+- title: Integrate Codex Security CLI with GitLab CI/CD and optimize scan cost
+  path: examples/codex/gitlab_ci_codex_security.md
+  slug: gitlab-ci-codex-security
+  description: Integrate Codex Security CLI with GitLab CI/CD, publish SARIF findings, preserve scan evidence, and optimize scan scope, effort, cadence, and cost.
+  date: 2026-08-07
+  authors:
+    - OAI-JB
+  tags:
+    - codex
+    - security
+    - gitlab
+    - ci-cd
+
 - title: Migrate from Whisper to GPT-Transcribe and GPT-Live-Transcribe
   path: examples/migrating_from_whisper_to_gpt_transcribe.ipynb
   slug: migrating-from-whisper-to-gpt-transcribe

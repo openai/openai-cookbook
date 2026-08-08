@@ -1,6 +1,6 @@
 # Integrate Codex Security CLI with GitLab CI/CD and optimize scan cost
 
-A platform team maintains a Next.js SaaS application in GitLab. The team wants security feedback on every trusted merge request, broader coverage after changes reach the default branch, and the option to run deeper reviews for high-risk releases. At the same time, it does not want every commit to trigger the broadest and most expensive scan configuration.
+A platform team maintains a Next.js SaaS application in GitLab. The team wants security feedback on eligible merge requests between protected branches, broader coverage after changes reach the default branch, and the option to run deeper reviews for high-risk releases. At the same time, it does not want every commit to trigger the broadest and most expensive scan configuration.
 
 In this cookbook, you will integrate the dedicated [`@openai/codex-security`](https://learn.chatgpt.com/docs/security/cli) package with GitLab CI/CD. You will start with three scan profiles, preserve the structured security evidence, publish SARIF to GitLab, and add controls for scope, model, reasoning effort, severity, and estimated cost.
 
@@ -10,7 +10,7 @@ The example was validated with a Docker-based runner and a Next.js SaaS demo app
 
 You will create a GitLab pipeline that:
 
-1. Runs a committed-diff scan for trusted merge requests.
+1. Runs a committed-diff scan for eligible merge requests between protected branches.
 2. Runs a full standard scan on the default branch.
 3. Supports an optional scheduled deep scan.
 4. Assigns effort by profile and documents optional model, knowledge-base, severity, and cost controls.
@@ -38,14 +38,17 @@ You need:
 
 Make the Codex Security credential available only to trusted scan jobs without committing it to the repository.
 
-Create a [masked and hidden GitLab CI/CD variable](https://docs.gitlab.com/ci/variables/#define-a-cicd-variable-in-the-ui):
+Create a [masked, hidden, and protected GitLab CI/CD variable](https://docs.gitlab.com/ci/variables/#define-a-cicd-variable-in-the-ui):
 
 - Key: `CODEX_SECURITY_API_KEY`
 - Value: an OpenAI Platform API key with Codex Security access
+- Protect variable: enabled
 
 The value is not a GitLab token, runner token, npm token, ChatGPT session token, or a shell assignment.
 
-The example maps the variable to `OPENAI_API_KEY` only for the scan process. It skips fork merge requests because untrusted CI configuration must not receive the credential. You are ready to continue when the project has a masked and hidden `CODEX_SECURITY_API_KEY` variable that only trusted pipelines can access for the duration of the scan.
+The example maps the variable to `OPENAI_API_KEY` only for the scan process. Its job rule excludes fork merge requests and requires protected source and target branches. This does not make every same-project merge request trusted: code in a merge request can also change `.gitlab-ci.yml` and attempt to expose variables available to its pipeline. Masking and hiding reduce accidental disclosure in the UI and job logs, but they are not access controls for untrusted CI code.
+
+For an eligible merge request job to receive the protected variable, both branches must belong to the same project and be protected, the user who starts the pipeline must have push or merge access to the target branch, and **Allow merge request pipelines to access protected variables and runners** must be enabled. GitLab documents these requirements under [protected merge request resources](https://docs.gitlab.com/ci/pipelines/merge_request_pipelines/#control-access-to-protected-variables-and-runners). If your workflow uses ordinary unprotected feature branches, run the secret-bearing scan after merge on the protected default branch instead. Larger deployments can enforce an immutable job through a [pipeline execution policy](https://docs.gitlab.com/user/application_security/policies/pipeline_execution_policies/) and retrieve a scoped, short-lived credential from an [external secrets provider](https://docs.gitlab.com/ci/secrets/). You are ready to continue when the protected `CODEX_SECURITY_API_KEY` is available only to approved scan jobs.
 
 ## Step 2: Choose initial scan profiles
 
@@ -55,25 +58,25 @@ Start with profiles that map to distinct development decisions:
 
 | Profile | Trigger | Target | Effort | Security question |
 | --- | --- | --- | --- | --- |
-| Merge request | Trusted same-project MR | Committed diff | `low` | What risk does this change introduce? |
+| Merge request | Eligible protected same-project MR | Committed diff | `low` | What risk does this change introduce? |
 | Default branch | Push to default branch | Full repository, `standard` | `high` | What risks exist in the integrated codebase? |
 | Deep review | Scheduled pipeline | Full repository, `deep` | `xhigh` | What additional issues appear under deeper review? |
 
-These effort levels are starting points, not universal recommendations. Measure representative repositories before setting organization-wide defaults. With these profiles in place, trusted merge requests receive focused feedback, the default branch receives a full standard scan, and scheduled pipelines run a deeper repository review. Complete coverage for a selected merge request diff applies only to that change, not to the entire repository. This keeps the tradeoff between feedback time, repository coverage, and cost explicit.
+These effort levels are starting points, not universal recommendations. Measure representative repositories before setting organization-wide defaults. With these profiles in place, eligible protected merge requests receive focused feedback, the default branch receives a full standard scan, and scheduled pipelines run a deeper repository review. Complete coverage for a selected merge request diff applies only to that change, not to the entire repository. This keeps the tradeoff between feedback time, repository coverage, and cost explicit.
 
 ## Step 3: Add the GitLab pipeline
 
 Install Codex Security in a trusted location, select the appropriate scan profile, preserve structured artifacts, export SARIF, and return the final scan or export status from the same job.
 
-The example keeps only the variables required by the working pipeline. Optional model, policy, context, and cost controls are covered later in Step 8 and documented in the [Security CLI reference](https://learn.chatgpt.com/docs/security/cli/reference). Pin the CLI to a version you have tested. This example pins `0.1.7` for reproducibility.
+The example keeps only the variables required by the working pipeline. Optional model, policy, context, and cost controls are covered later in Step 8 and documented in the [Security CLI reference](https://learn.chatgpt.com/docs/security/cli/reference). It installs `@openai/codex-security` without a version specifier, so npm resolves the current `latest` release for each job. The job logs the installed version to make pipeline results traceable.
 
-The job rules are self-contained so the example can be added to an existing pipeline without replacing its global `workflow`. If the project already uses [`workflow: rules`](https://docs.gitlab.com/ci/yaml/workflow/), make sure it permits trusted [merge request pipelines](https://docs.gitlab.com/ci/pipelines/merge_request_pipelines/), pushes to the default branch, and scheduled pipelines.
+The job rules are self-contained so the example can be added to an existing pipeline without replacing its global `workflow`. If the project already uses [`workflow: rules`](https://docs.gitlab.com/ci/yaml/workflow/), make sure it permits eligible [merge request pipelines](https://docs.gitlab.com/ci/pipelines/merge_request_pipelines/), pushes to the default branch, and scheduled pipelines.
 
 The pipeline is easier to adapt when each part has one clear responsibility.
 
-### Route trusted pipeline events to scan profiles
+### Route eligible pipeline events to scan profiles
 
-The hidden `.codex-security-rules` job maps each supported GitLab event to the profiles selected in Step 2. A scheduled pipeline receives a deep repository scan, a push to the default branch receives a standard repository scan, and a same-project merge request receives a focused diff scan. The merge-request condition also prevents fork pipelines from receiving the API key.
+The hidden `.codex-security-rules` job maps each supported GitLab event to the profiles selected in Step 2. A scheduled pipeline receives a deep repository scan, a push to the default branch receives a standard repository scan, and an eligible merge request between protected branches in the same project receives a focused diff scan. The protected variable and GitLab's protected-resource checks still determine whether the job receives the credential.
 
 If the repository already defines stages, add `security_scan` to the existing list instead of replacing test, build, or deployment stages.
 
@@ -90,7 +93,7 @@ stages:
         CODEX_SECURITY_TARGET: "repository"
         CODEX_SECURITY_MODE: "deep"
         CODEX_SECURITY_EFFORT: "xhigh"
-    - if: '$CI_PIPELINE_SOURCE == "merge_request_event" && $CI_MERGE_REQUEST_SOURCE_PROJECT_ID == $CI_PROJECT_ID'
+    - if: '$CI_PIPELINE_SOURCE == "merge_request_event" && $CI_MERGE_REQUEST_SOURCE_PROJECT_ID == $CI_PROJECT_ID && $CI_MERGE_REQUEST_SOURCE_BRANCH_PROTECTED == "true" && $CI_MERGE_REQUEST_TARGET_BRANCH_PROTECTED == "true"'
       variables:
         CODEX_SECURITY_TARGET: "diff"
         CODEX_SECURITY_MODE: "standard"
@@ -102,9 +105,9 @@ stages:
         CODEX_SECURITY_EFFORT: "high"
 ```
 
-### Install a pinned CLI outside the checkout
+### Install the latest CLI outside the checkout
 
-The scan job uses a Node.js image and installs the pinned Security CLI under `/tmp`. Installing it outside the checked-out repository and invoking its absolute path prevents repository-controlled executables from replacing the command. `--ignore-scripts` prevents dependency lifecycle scripts from running during installation. Git, Python, ripgrep, certificates, and `util-linux` provide the runtime and sandbox prerequisites used by the CLI.
+The scan job uses a Node.js image and installs the latest Security CLI release under `/tmp`. Installing it outside the checked-out repository and invoking its absolute path prevents repository-controlled executables from replacing the command. `--ignore-scripts` prevents dependency lifecycle scripts from running during installation. Git, Python, ripgrep, certificates, and `util-linux` provide the runtime and sandbox prerequisites used by the CLI.
 
 The YAML intentionally omits `tags` so GitLab can select any eligible runner configured for the project. If your organization requires tagged runners, add its trusted security-runner tag to this job. The `unshare` check fails before a paid scan when the selected runner cannot start the Codex sandbox.
 
@@ -138,7 +141,7 @@ codex-security:
         --no-audit \
         --no-fund \
         --loglevel=error \
-        "@openai/codex-security@$CODEX_SECURITY_VERSION"
+        "@openai/codex-security"
 
       export CODEX_SECURITY_BIN="$CLI_DIR/node_modules/.bin/codex-security"
       "$CODEX_SECURITY_BIN" --version
@@ -148,7 +151,7 @@ codex-security:
 
 `GIT_DEPTH: "0"` gives the job enough history to calculate the merge base for a merge request. For a diff scan, the script resolves the merge base and passes both the base and `CI_COMMIT_SHA` to the CLI. This ensures that the result describes the committed change GitLab is reviewing instead of an ambiguous working tree.
 
-The script also hashes the deterministic binary Git diff and exports `CODEX_SECURITY_TARGET_SNAPSHOT_DIGEST`. A `git_diff` result needs this value to bind the scan manifest to the exact reviewed content and produce a sealed scan. The variable is cleared before target selection and set only for diff scans, because a clean repository scan is identified by its Git revision instead.
+The pipeline tested for this cookbook also hashes the deterministic binary Git diff and exports `CODEX_SECURITY_TARGET_SNAPSHOT_DIGEST`. This compatibility step binds the scan manifest to the exact reviewed content so the observed `git_diff` result can be sealed. It is not a general configuration option in the public CLI reference. After the installed CLI changes, rerun a known diff scan without the variable and remove the workaround if the scan seals successfully. The variable is cleared before target selection and set only for diff scans, because a clean repository scan is identified by its Git revision instead.
 
 Repository profiles do not calculate a diff. They pass the selected `standard` or `deep` mode directly to the CLI.
 
@@ -225,7 +228,7 @@ The second excerpt runs preflight and the paid scan with process-scoped credenti
 
 The scan writes canonical artifacts to its private result directory and structured JSON to a separate file. The job copies available output into `codex-security-artifacts` even when the CLI returns a non-zero status. This is important because exit `1` or `2` can still accompany useful findings or coverage evidence.
 
-When a scan manifest exists, `codex-security export` attempts to create SARIF from the completed, sealed result. GitLab retains the full artifact directory for seven days and ingests `results.sarif` through `artifacts:reports:sarif` when export succeeds. Because report artifacts are uploaded regardless of job success or failure, the same job can return the final scan or export status without an additional job.
+When a scan manifest exists, `codex-security export` attempts to create SARIF from the completed, sealed result. GitLab retains the full artifact directory for seven days and ingests `results.sarif` through `artifacts:reports:sarif` when export succeeds. `artifacts:access: maintainer` restricts downloads because the retained evidence can contain source excerpts and vulnerability details; adjust the role only if your project's access model requires it. Because report artifacts are uploaded regardless of job success or failure, the same job can return the final scan or export status without an additional job.
 
 This block preserves available evidence, attempts export, and publishes the artifact paths:
 
@@ -243,7 +246,7 @@ This block preserves available evidence, attempts export, and publishes the arti
         export_exit="$?"
         set -e
 
-        if test "$export_exit" -ne 0; then
+        if test "$export_exit" -ne 0 && test "$final_exit" -eq 0; then
           final_exit=2
         fi
       elif test "$final_exit" -eq 0; then
@@ -254,6 +257,7 @@ This block preserves available evidence, attempts export, and publishes the arti
       exit "$final_exit"
   artifacts:
     when: always
+    access: maintainer
     expire_in: 7 days
     paths:
       - codex-security-artifacts/
@@ -261,14 +265,11 @@ This block preserves available evidence, attempts export, and publishes the arti
       sarif: codex-security-artifacts/results.sarif
 ```
 
-During initial calibration, `allow_failure` keeps exit `2` advisory while authentication, sandboxing, coverage, sealing, and SARIF export are being validated. Remove this temporary rule when those technical outcomes should block the pipeline. Exit `1` remains blocking and is available for a later `--fail-on-severity` policy.
+During initial calibration, `allow_failure` keeps exit `2` advisory while authentication, sandboxing, coverage, sealing, and SARIF export are being validated. An export failure changes a successful scan to exit `2` but never replaces an existing non-zero scan status. Remove the temporary rule when those technical outcomes should block the pipeline. Exit `1` remains blocking and is available for a later `--fail-on-severity` policy.
 
 The complete file below combines these responsibilities. Copy it into the repository root as `.gitlab-ci.yml`, or merge its stage, hidden rules, and job into an existing pipeline.
 
 ```yaml
-variables:
-  CODEX_SECURITY_VERSION: "0.1.7"
-
 stages:
   - security_scan
 
@@ -279,7 +280,7 @@ stages:
         CODEX_SECURITY_TARGET: "repository"
         CODEX_SECURITY_MODE: "deep"
         CODEX_SECURITY_EFFORT: "xhigh"
-    - if: '$CI_PIPELINE_SOURCE == "merge_request_event" && $CI_MERGE_REQUEST_SOURCE_PROJECT_ID == $CI_PROJECT_ID'
+    - if: '$CI_PIPELINE_SOURCE == "merge_request_event" && $CI_MERGE_REQUEST_SOURCE_PROJECT_ID == $CI_PROJECT_ID && $CI_MERGE_REQUEST_SOURCE_BRANCH_PROTECTED == "true" && $CI_MERGE_REQUEST_TARGET_BRANCH_PROTECTED == "true"'
       variables:
         CODEX_SECURITY_TARGET: "diff"
         CODEX_SECURITY_MODE: "standard"
@@ -317,7 +318,7 @@ codex-security:
         --no-audit \
         --no-fund \
         --loglevel=error \
-        "@openai/codex-security@$CODEX_SECURITY_VERSION"
+        "@openai/codex-security"
 
       export CODEX_SECURITY_BIN="$CLI_DIR/node_modules/.bin/codex-security"
       "$CODEX_SECURITY_BIN" --version
@@ -379,8 +380,9 @@ codex-security:
       echo "Codex Security mode: $CODEX_SECURITY_MODE"
       echo "Codex Security effort: $CODEX_SECURITY_EFFORT"
 
-      # Validate repository, target, output, and authentication configuration
-      # without starting a paid scan. Scope the key to this process only.
+      # Validate the repository, target, output directory, and Codex
+      # configuration without starting a paid scan. Scope the key to this
+      # process only.
       OPENAI_API_KEY="$CODEX_SECURITY_API_KEY" \
         "$CODEX_SECURITY_BIN" scan . "$@" --dry-run
 
@@ -406,7 +408,7 @@ codex-security:
         export_exit="$?"
         set -e
 
-        if test "$export_exit" -ne 0; then
+        if test "$export_exit" -ne 0 && test "$final_exit" -eq 0; then
           final_exit=2
         fi
       elif test "$final_exit" -eq 0; then
@@ -417,6 +419,7 @@ codex-security:
       exit "$final_exit"
   artifacts:
     when: always
+    access: maintainer
     expire_in: 7 days
     paths:
       - codex-security-artifacts/
@@ -428,7 +431,7 @@ codex-security:
 
 Confirm that GitLab selects the intended profile, the runner can start the Codex sandbox, the scan produces canonical artifacts, and the job returns the correct scan or export status.
 
-Create a trusted same-project merge request and inspect the `codex-security` job log. Confirm that it reports the `diff` target and the configured effort. Then inspect the `codex-security-artifacts` artifact and verify that a completed scan contains:
+Create an eligible merge request between protected branches in the same project and inspect the `codex-security` job log. Confirm that it reports the `diff` target and the configured effort. Then inspect the `codex-security-artifacts` artifact and verify that a completed scan contains:
 
 - `scan-manifest.json`
 - `findings.json`
@@ -437,7 +440,7 @@ Create a trusted same-project merge request and inspect the `codex-security` job
 - `codex-security.json`
 - `results.sarif` when export succeeded
 
-The pipeline runs [`--dry-run`](https://learn.chatgpt.com/docs/security/cli/reference) before starting a paid scan. It validates the required GitLab variable itself and scopes `OPENAI_API_KEY` to the dry-run and paid scan processes. If the namespace preflight fails, no canonical scan artifacts are expected; fix the runner before retrying. For other preflight failures, fix the repository target, output directory, or CLI configuration. The integration is verified when the merge request pipeline completes a committed-diff scan, retains its structured evidence, publishes available SARIF, and returns the scan or export status directly. A green job without these artifacts is not sufficient evidence of a working security integration.
+The pipeline checks that the required GitLab variable is present and runs [`--dry-run`](https://learn.chatgpt.com/docs/security/cli/reference) before starting a paid scan. It scopes `OPENAI_API_KEY` to the dry-run and paid scan processes. If the namespace preflight fails, no canonical scan artifacts are expected; fix the runner before retrying. For other preflight failures, fix the repository target, output directory, or CLI configuration. The integration is verified when the merge request pipeline completes a committed-diff scan, retains its structured evidence, publishes available SARIF, and returns the scan or export status directly. A green job without these artifacts is not sufficient evidence of a working security integration.
 
 ## Step 5: Optimize cost in the right order
 
@@ -506,7 +509,7 @@ Step 3 already exports the sealed scan, retains `results.sarif`, and declares it
 
 ![GitLab vulnerability report populated with Codex Security SARIF findings](../../images/gitlab-vulnerability-report-pipeline-21.png)
 
-*An earlier scan imported by pipeline `#21` populated the demo project's vulnerability report with 14 Codex Security findings: 2 high, 8 medium, and 4 low. This report is separate from the zero-finding merge request run shown in Step 4.*
+*An earlier scan imported by pipeline `#21` populated the demo project's vulnerability report with 14 Codex Security findings: 2 high, 8 medium, and 4 low. This observed demo result is illustrative; finding counts vary by repository and scan profile.*
 
 GitLab skips findings that do not contain `ruleId` or `physicalLocation`. If severity or report type is incorrect, inspect the SARIF mapping before changing the scan: preserve numeric severity information, stable identifiers, locations, and CWE tags. The integration is verified when GitLab displays the expected supported findings without ingestion errors and users can still download the retained SARIF artifact.
 
@@ -528,7 +531,7 @@ Exit `2` does not always mean that no results exist. A scan can produce findings
 
 Roll out the policy in three stages:
 
-1. **Integration validation:** Run `--dry-run`, validate secrets and runner behavior, and confirm artifact and SARIF publication.
+1. **Integration validation:** Confirm that the secret is configured, run `--dry-run`, validate runner behavior, and confirm artifact and SARIF publication.
 2. **Advisory calibration:** Run representative diff and full scans, measure cost and quality, and allow exit `2` while investigating incomplete coverage.
 3. **Policy enforcement:** Add `--fail-on-severity`, choose blocking coverage behavior, and document exceptions and ownership.
 
@@ -572,7 +575,7 @@ Identify whether a failed or inconclusive job comes from Git history, the runner
 
 ### Fix user-namespace failures on Docker executors
 
-Runner configuration is environment-specific and therefore is not part of the portable `.gitlab-ci.yml`. For the Docker executor used to validate this example, the default seccomp profile blocked the user namespace required by the Codex Linux sandbox. The following narrow runner setting allowed the namespace while keeping privileged mode disabled:
+Runner configuration is environment-specific and therefore is not part of the portable `.gitlab-ci.yml`. For the Docker executor used to validate this example, the default seccomp profile blocked the user namespace required by the Codex Linux sandbox. The following last-resort runner setting allowed the namespace while keeping privileged mode disabled:
 
 ```toml
 [runners.docker]
@@ -580,7 +583,7 @@ Runner configuration is environment-specific and therefore is not part of the po
   privileged = false
 ```
 
-Apply this setting only when the `unshare` preflight or the scan reports a namespace-permission error. Validate the narrowest configuration allowed by your platform controls, restart only the affected runner, and confirm that `unshare -Ur true` succeeds before retrying the scan.
+`seccomp=unconfined` disables Docker's default seccomp profile, so do not treat it as a least-privilege configuration. First prefer a tailored seccomp profile that permits the required user-namespace operation. If `unconfined` is the only available workaround, apply it only to a dedicated trusted runner, keep privileged mode disabled, and prevent unrelated or untrusted jobs from using that runner. Restart only the affected runner and confirm that `unshare -Ur true` succeeds before retrying the scan.
 
 Start with the presence or absence of canonical artifacts, then inspect coverage and the job's exit code. This separates jobs that never produced a scan from completed but inconclusive scans and avoids applying the wrong remediation to the same non-zero exit code.
 
@@ -599,10 +602,10 @@ Begin with a correct, report-only integration. Measure representative scans. The
 
 Use the working pipeline as a baseline, then complete these steps in the target GitLab project:
 
-1. Validate one same-project merge request end to end. Confirm the intended base and head revisions, complete coverage, a sealed `scan-manifest.json`, successful SARIF ingestion, and the complete artifact directory. Resolve authentication, sandbox, `snapshotDigest`, coverage, and export-related exit `2` outcomes before enforcement; do not rely on `allow_failure` to hide incomplete results.
+1. Validate one eligible merge request between protected branches end to end. Confirm that the protected variable is available, the intended base and head revisions are selected, coverage is complete, `scan-manifest.json` is sealed, SARIF ingestion succeeds, and the artifact directory is complete. Resolve authentication, sandbox, target-sealing, coverage, and export-related exit `2` outcomes before enforcement; do not rely on `allow_failure` to hide incomplete results.
 2. Calibrate all three profiles with representative changes. Run focused merge requests with low effort, a default-branch repository scan with high effort, and a scheduled deep scan with xhigh effort. Record duration, estimated cost, coverage, findings, and reviewer disposition.
-3. Choose and enforce the production policy. Keep merge-request scans focused, reserve broader scans for the default branch or a schedule, and enable `--fail-on-severity` only after reviewers understand result quality and false positives. When the pipeline is stable, remove the temporary exit `2` allowance, protect the job and API-key variable, and require the result in the merge policy.
+3. Choose and enforce the production policy. Keep merge-request scans focused, reserve broader scans for the default branch or a schedule, and enable `--fail-on-severity` only after reviewers understand result quality and false positives. When the pipeline is stable, remove the temporary exit `2` allowance, apply the project's chosen trust controls to the job and API-key variable, and require the result in the merge policy.
 4. Assign operational ownership. Name the team that reviews findings, define who investigates coverage or export failures, set response expectations for critical and high findings, and document the exception process and approvers.
-5. Maintain the integration. Review the pinned CLI version, supported models, pricing assumptions, GitLab SARIF support, runner image, and artifact retention regularly. After each version change, rerun a known merge request and verify sealed artifacts, SARIF ingestion, exit-code behavior, runtime, and cost before broader rollout.
+5. Maintain the integration. Review the installed CLI version, supported models, pricing assumptions, GitLab SARIF support, runner image, and artifact retention regularly. When the resolved CLI version changes, rerun a known merge request and verify sealed artifacts, SARIF ingestion, exit-code behavior, runtime, and cost before broader rollout.
 
 At that point, the integration has an owner, a tested operating model, measurable cost, and an explicit enforcement policy instead of being only a working CI example.

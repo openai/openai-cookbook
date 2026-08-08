@@ -1,10 +1,15 @@
 {
   "name": "AUMARA Staff",
   "short_name": "AUMARA",
+  "id": "/staff/",
   "start_url": "/staff/",
   "scope": "/staff/",
   "display": "standalone",
-  "background_color": "#f6f0e4",
-  "theme_color": "#285746",
-  "description": "AUMARA Staff operations app"
+  "orientation": "portrait-primary",
+  "background_color": "#f5efe4",
+  "theme_color": "#2c5b49",
+  "description": "AUMARA Staff local-first operations app",
+  "icons": [
+    {"src":"/staff/icon.svg","sizes":"any","type":"image/svg+xml","purpose":"any maskable"}
+  ]
 }

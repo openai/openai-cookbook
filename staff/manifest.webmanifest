@@ -1,0 +1,10 @@
+{
+  "name": "AUMARA Staff",
+  "short_name": "AUMARA",
+  "start_url": "/staff/",
+  "scope": "/staff/",
+  "display": "standalone",
+  "background_color": "#f6f0e4",
+  "theme_color": "#285746",
+  "description": "AUMARA Staff operations app"
+}

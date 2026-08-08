@@ -29,6 +29,7 @@ jobs:
       MANIFEST_URL: https://elcidspain.com/staff/manifest.webmanifest
       SW_URL: https://elcidspain.com/staff/sw.js
       APP_URL: https://elcidspain.com/staff/app.js
+      BOOTFIX_URL: https://elcidspain.com/staff/bootfix231.js
       PATCH_URL: https://elcidspain.com/staff/patch.js
       LEGACY_URL: https://elcidspain.com/staff/legacy.js
       PLANNER_URL: https://elcidspain.com/staff/planner23.js
@@ -43,15 +44,18 @@ jobs:
         run: |
           set -euo pipefail
           node --check staff/app.js
+          node --check staff/bootfix231.js
           node --check staff/patch.js
           node --check staff/legacy.js
           node --check staff/planner23.js
           node --check staff/sw.js
           grep -Fq 'AUMARA Staff' staff/index.html
-          grep -Fq 'PWA 2.3' staff/index.html
-          grep -Fq '/staff/planner23.js?v=230' staff/index.html
-          grep -Fq "aumara-staff-pwa-v2.3.0" staff/sw.js
-          grep -Fq '/staff/planner23.js?v=230' staff/sw.js
+          grep -Fq 'PWA 2.3.1' staff/index.html
+          grep -Fq '/staff/bootfix231.js?v=231' staff/index.html
+          grep -Fq '/staff/planner23.js?v=231' staff/index.html
+          grep -Fq "aumara-staff-pwa-v2.3.1" staff/sw.js
+          grep -Fq '/staff/bootfix231.js?v=231' staff/sw.js
+          grep -Fq '/staff/planner23.js?v=231' staff/sw.js
           grep -Fq 'v23-grid' staff/planner23.js
           grep -Fq 'pointerdown' staff/planner23.js
           grep -Fq "tab('schedule','Мой график')" staff/planner23.js
@@ -97,7 +101,7 @@ jobs:
         shell: bash
         run: |
           set -euo pipefail
-          lftp -u "$FTP_USER","$FTP_PASSWORD" "$FTP_HOST" -e "set cmd:fail-exit yes; set ftp:ssl-allow no; set ftp:passive-mode yes; cls -l $FTP_TARGET/index.html; cls -l $FTP_TARGET/app.js; cls -l $FTP_TARGET/patch.js; cls -l $FTP_TARGET/legacy.js; cls -l $FTP_TARGET/planner23.js; cls -l $FTP_TARGET/styles.css; cls -l $FTP_TARGET/manifest.webmanifest; cls -l $FTP_TARGET/sw.js; cls -l $FTP_TARGET/icon.svg; bye"
+          lftp -u "$FTP_USER","$FTP_PASSWORD" "$FTP_HOST" -e "set cmd:fail-exit yes; set ftp:ssl-allow no; set ftp:passive-mode yes; cls -l $FTP_TARGET/index.html; cls -l $FTP_TARGET/app.js; cls -l $FTP_TARGET/bootfix231.js; cls -l $FTP_TARGET/patch.js; cls -l $FTP_TARGET/legacy.js; cls -l $FTP_TARGET/planner23.js; cls -l $FTP_TARGET/styles.css; cls -l $FTP_TARGET/manifest.webmanifest; cls -l $FTP_TARGET/sw.js; cls -l $FTP_TARGET/icon.svg; bye"
 
       - name: Verify public PWA
         id: verify
@@ -108,6 +112,7 @@ jobs:
           manifest_code="$(curl -sS -L -o /tmp/manifest.webmanifest -w '%{http_code}' --max-time 30 --retry 4 --retry-delay 3 "$MANIFEST_URL")"
           sw_code="$(curl -sS -L -o /tmp/sw.js -w '%{http_code}' --max-time 30 --retry 4 --retry-delay 3 "$SW_URL")"
           app_code="$(curl -sS -L -o /tmp/app.js -w '%{http_code}' --max-time 30 --retry 4 --retry-delay 3 "$APP_URL")"
+          bootfix_code="$(curl -sS -L -o /tmp/bootfix231.js -w '%{http_code}' --max-time 30 --retry 4 --retry-delay 3 "$BOOTFIX_URL")"
           patch_code="$(curl -sS -L -o /tmp/patch.js -w '%{http_code}' --max-time 30 --retry 4 --retry-delay 3 "$PATCH_URL")"
           legacy_code="$(curl -sS -L -o /tmp/legacy.js -w '%{http_code}' --max-time 30 --retry 4 --retry-delay 3 "$LEGACY_URL")"
           planner_code="$(curl -sS -L -o /tmp/planner23.js -w '%{http_code}' --max-time 30 --retry 4 --retry-delay 3 "$PLANNER_URL")"
@@ -116,6 +121,7 @@ jobs:
           echo "manifest_code=$manifest_code" >> "$GITHUB_OUTPUT"
           echo "sw_code=$sw_code" >> "$GITHUB_OUTPUT"
           echo "app_code=$app_code" >> "$GITHUB_OUTPUT"
+          echo "bootfix_code=$bootfix_code" >> "$GITHUB_OUTPUT"
           echo "patch_code=$patch_code" >> "$GITHUB_OUTPUT"
           echo "legacy_code=$legacy_code" >> "$GITHUB_OUTPUT"
           echo "planner_code=$planner_code" >> "$GITHUB_OUTPUT"
@@ -124,22 +130,26 @@ jobs:
           test "$manifest_code" = "200"
           test "$sw_code" = "200"
           test "$app_code" = "200"
+          test "$bootfix_code" = "200"
           test "$patch_code" = "200"
           test "$legacy_code" = "200"
           test "$planner_code" = "200"
           test "$style_code" = "200"
-          grep -Fq 'PWA 2.3' /tmp/staff.html
-          grep -Fq '/staff/planner23.js?v=230' /tmp/staff.html
+          grep -Fq 'PWA 2.3.1' /tmp/staff.html
+          grep -Fq '/staff/bootfix231.js?v=231' /tmp/staff.html
+          grep -Fq '/staff/planner23.js?v=231' /tmp/staff.html
           grep -Fq 'aumara-staff-api' /tmp/app.js
+          grep -Fq 'BOOT_TIMEOUT_MS=12000' /tmp/bootfix231.js
           grep -Fq 'saveReview2' /tmp/patch.js
           grep -Fq "rpc('getChat'" /tmp/legacy.js
           grep -Fq 'v23-grid' /tmp/planner23.js
           grep -Fq 'pointerdown' /tmp/planner23.js
           grep -Fq "rpc('createShiftsBatch'" /tmp/planner23.js
           grep -Fq "rpc('submitRequest'" /tmp/planner23.js
-          grep -Fq "aumara-staff-pwa-v2.3.0" /tmp/sw.js
+          grep -Fq "aumara-staff-pwa-v2.3.1" /tmp/sw.js
           grep -Fq '"start_url": "/staff/"' /tmp/manifest.webmanifest
           node --check /tmp/app.js
+          node --check /tmp/bootfix231.js
           node --check /tmp/patch.js
           node --check /tmp/legacy.js
           node --check /tmp/planner23.js
@@ -156,6 +166,7 @@ jobs:
             echo "- FTP target: \`${FTP_TARGET}\`"
             echo "- Page HTTP: \`${{ steps.verify.outputs.page_code || 'not_run' }}\`"
             echo "- App JS HTTP: \`${{ steps.verify.outputs.app_code || 'not_run' }}\`"
+            echo "- Bootstrap JS HTTP: \`${{ steps.verify.outputs.bootfix_code || 'not_run' }}\`"
             echo "- Patch JS HTTP: \`${{ steps.verify.outputs.patch_code || 'not_run' }}\`"
             echo "- Legacy JS HTTP: \`${{ steps.verify.outputs.legacy_code || 'not_run' }}\`"
             echo "- Planner JS HTTP: \`${{ steps.verify.outputs.planner_code || 'not_run' }}\`"

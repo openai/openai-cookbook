@@ -10,7 +10,7 @@
   <meta name="format-detection" content="telephone=no">
   <link rel="manifest" href="/staff/manifest.webmanifest">
   <link rel="icon" href="/staff/icon.svg" type="image/svg+xml">
-  <link rel="stylesheet" href="/staff/styles.css?v=230">
+  <link rel="stylesheet" href="/staff/styles.css?v=231">
   <title>AUMARA Staff</title>
 </head>
 <body>
@@ -23,7 +23,7 @@
       </div>
       <div class="statusbox">
         <span id="net" class="pill">—</span>
-        <span id="version" class="pill">PWA 2.3</span>
+        <span id="version" class="pill">PWA 2.3.1</span>
       </div>
     </header>
 
@@ -111,12 +111,13 @@
     </div>
   </div>
 
-  <script src="/staff/app.js?v=230" defer></script>
-  <script src="/staff/patch.js?v=230" defer></script>
-  <script src="/staff/legacy.js?v=230" defer></script>
-  <script src="/staff/planner23.js?v=230" defer></script>
+  <script src="/staff/app.js?v=231" defer></script>
+  <script src="/staff/bootfix231.js?v=231" defer></script>
+  <script src="/staff/patch.js?v=231" defer></script>
+  <script src="/staff/legacy.js?v=231" defer></script>
+  <script src="/staff/planner23.js?v=231" defer></script>
   <script>
-    if('serviceWorker' in navigator){addEventListener('load',()=>navigator.serviceWorker.register('/staff/sw.js?v=230').catch(()=>{}));}
+    if('serviceWorker' in navigator){addEventListener('load',()=>navigator.serviceWorker.register('/staff/sw.js?v=231').catch(()=>{}));}
   </script>
 </body>
 </html>

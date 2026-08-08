@@ -1,0 +1,54 @@
+<!doctype html>
+<html lang="ru">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+  <meta name="theme-color" content="#285746">
+  <meta name="apple-mobile-web-app-capable" content="yes">
+  <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+  <meta name="apple-mobile-web-app-title" content="AUMARA Staff">
+  <link rel="manifest" href="/staff/manifest.webmanifest">
+  <title>AUMARA Staff</title>
+  <style>
+    :root{--green:#285746;--ink:#21342e;--cream:#f6f0e4;--card:#fffdf8;--line:#ded3bd;--muted:#707a75}
+    *{box-sizing:border-box}body{margin:0;background:var(--cream);color:var(--ink);font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",sans-serif}
+    .wrap{max-width:620px;margin:auto;padding:calc(28px + env(safe-area-inset-top)) 18px calc(36px + env(safe-area-inset-bottom))}
+    .brand{display:flex;align-items:center;gap:14px;margin-bottom:22px}.mark{width:58px;height:58px;border-radius:17px;background:#cbb58b;display:grid;place-items:center;color:white;font-weight:800;font-size:13px;letter-spacing:.08em}.brand h1{font-size:30px;margin:0}.brand p{margin:4px 0 0;color:var(--muted)}
+    .card{background:var(--card);border:1px solid var(--line);border-radius:24px;padding:22px;box-shadow:0 8px 28px rgba(47,54,47,.07);margin-bottom:16px}
+    h2{font-size:22px;margin:0 0 10px}p{font-size:17px;line-height:1.45;margin:8px 0;color:#56615c}.small{font-size:14px;color:var(--muted)}
+    .btn{display:block;width:100%;border:0;border-radius:17px;padding:17px 16px;margin-top:12px;font-size:18px;font-weight:800;text-align:center;text-decoration:none;cursor:pointer;background:var(--green);color:white}.btn.alt{background:#eadfca;color:var(--green)}
+    .status{min-height:22px;margin-top:10px;font-size:14px;color:var(--muted)}.pill{display:inline-block;border-radius:999px;padding:7px 11px;background:#e0f1e9;color:#17643f;font-weight:800;font-size:14px}
+    code{font-size:12px;word-break:break-all;color:#6b716e}
+  </style>
+</head>
+<body>
+<main class="wrap">
+  <div class="brand"><div class="mark">AUMARA</div><div><h1>AUMARA Staff</h1><p>Постоянный вход</p></div></div>
+  <section class="card">
+    <span class="pill" id="net">проверяю сеть…</span>
+    <h2 style="margin-top:14px">Этот адрес уже постоянный</h2>
+    <p>Сохраняйте <b>elcidspain.com/staff</b>. Это наш собственный адрес. Мы будем обновлять приложение здесь без смены ссылки и иконки.</p>
+    <a class="btn" id="open" href="https://script.google.com/macros/s/AKfycbwei9-3zmiec_Mu7Bb81FpMMlaLNZ-ZBipDFEBot5ucnNp6IFAe97NEBg-IM_UafoU/exec" rel="noopener noreferrer">Открыть текущую AUMARA</a>
+    <button class="btn alt" id="copy">Скопировать прямую рабочую ссылку</button>
+    <div class="status" id="status"></div>
+  </section>
+  <section class="card">
+    <h2>На iPhone</h2>
+    <p>Откройте этот адрес в Safari → «Поделиться» → «На экран Домой». Эту иконку потом менять не понадобится.</p>
+    <p class="small">Важно: сама оболочка уже кэшируется офлайн. Команда, финансы, смены и задачи пока работают через текущий Google backend; их перенос на local-first синхронизацию — следующий этап.</p>
+  </section>
+  <section class="card">
+    <h2>Если iPhone снова открывает старую Google-иконку</h2>
+    <p>Не пытайтесь заставить её открыть Safari. Установите именно <b>elcidspain.com/staff</b> как новую постоянную иконку. Старую Google-иконку после проверки можно удалить.</p>
+  </section>
+</main>
+<script>
+const target='https://script.google.com/macros/s/AKfycbwei9-3zmiec_Mu7Bb81FpMMlaLNZ-ZBipDFEBot5ucnNp6IFAe97NEBg-IM_UafoU/exec';
+const net=document.getElementById('net');
+function netState(){net.textContent=navigator.onLine?'в сети':'офлайн';net.style.background=navigator.onLine?'#e0f1e9':'#f5dfdc';net.style.color=navigator.onLine?'#17643f':'#8a3027'}
+netState();addEventListener('online',netState);addEventListener('offline',netState);
+document.getElementById('copy').onclick=async()=>{const s=document.getElementById('status');try{await navigator.clipboard.writeText(target);s.textContent='Рабочая ссылка скопирована.'}catch(e){s.innerHTML='Не удалось скопировать автоматически. Удерживайте ссылку: <code>'+target+'</code>'}};
+if('serviceWorker' in navigator){navigator.serviceWorker.register('/staff/sw.js').catch(()=>{});}
+</script>
+</body>
+</html>

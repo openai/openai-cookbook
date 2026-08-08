@@ -19,7 +19,7 @@ from agents import ModelSettings, Runner
 from agents.mcp import MCPServer, MCPServerStreamableHttp
 from agents.run import RunConfig
 from agents.sandbox import Manifest, SandboxAgent, SandboxRunConfig
-from agents.sandbox.capabilities import ApplyPatch, Shell
+from agents.sandbox.capabilities import Filesystem, Shell
 from agents.sandbox.entries import LocalDir, LocalFile
 from agents.sandbox.sandboxes.docker import DockerSandboxClient, DockerSandboxClientOptions
 from docker import from_env as docker_from_env
@@ -149,7 +149,7 @@ def build_agent(
         instructions=AGENT_INSTRUCTIONS,
         developer_instructions=DEVELOPER_INSTRUCTIONS,
         default_manifest=manifest,
-        capabilities=[Shell(), ApplyPatch()],
+        capabilities=[Shell(), Filesystem()],
         mcp_servers=list(mcp_servers or []),
         model_settings=ModelSettings(tool_choice="required"),
         output_type=MigrationResult,

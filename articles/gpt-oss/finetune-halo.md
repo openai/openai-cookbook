@@ -74,7 +74,7 @@ The final answer is wrapped in `\boxed{...}` so one regex can extract it, and th
 The run is one YAML file. gpt-oss-20b holds 32 experts per MoE layer. We place 4 experts on each of 8 GPUs and route tokens to them with [DeepEP](https://github.com/deepseek-ai/DeepEP) all-to-all, while every GPU keeps its own batch. The effective batch is the per-device batch times the accumulation steps times all 8 data-parallel ranks.
 
 ```yaml
-# training_configs/sft/gptoss/oss-20b-math-reasoner.yaml
+# examples/sft/gptoss/oss-20b-math-reasoner.yaml
 model_name_or_path: openai/gpt-oss-20b
 trust_remote_code: true
 model_init_kwargs:
@@ -127,7 +127,7 @@ report_to: wandb
 `halo launch` resolves the method to its training script. With `--nproc 8` it launches under `torchrun`, which Expert Parallelism requires.
 
 ```bash
-halo launch sft training_configs/sft/gptoss/oss-20b-math-reasoner.yaml --nproc 8
+halo launch sft examples/sft/gptoss/oss-20b-math-reasoner.yaml --nproc 8
 ```
 
 We apply some defaults for you. `bf16` and Liger fused kernels are on unless disabled. The bf16 optimizer holds weights and both Adam moments at 6 bytes per parameter, half of fp32 Adam. Peak memory per GPU falls as the expert degree rises.
@@ -188,7 +188,7 @@ learning_rate: 1.0e-04               # LoRA band, about 10x the full-FT rate
 gpt-oss stores its experts as fused 3D tensors rather than `nn.Linear` modules, so PEFT's usual `all-linear` target cannot reach them. Listing `experts` in `lora_target_modules` routes those projections to the grouped LoRA adapters we build inside the MoE wrapper. They adapt every layer's experts and train in the same grouped-GEMM kernel as the base. `merge_expert_lora_on_save: true` folds the deltas into the base at save time. LoRA trains far fewer parameters and wants roughly 10× the full fine-tuning rate. 1e-4 is a good start.
 
 ```bash
-halo launch sft training_configs/sft/gptoss/oss-20b-math-reasoner-lora.yaml
+halo launch sft examples/sft/gptoss/oss-20b-math-reasoner-lora.yaml
 ```
 
 If you train an attention-only adapter instead, with no `experts` entry and no merge flag, fold it into the base afterward with the merge tool.
@@ -208,7 +208,7 @@ Supervised fine-tuning imitates worked solutions. It does not directly reward ge
 The reward has two parts. The accuracy reward extracts the `\boxed{...}` answer and returns 1.0 when it matches the gold answer and 0.0 otherwise. A small format reward pays for emitting a well-formed boxed answer at all, which stops early and badly formatted samples from starving the accuracy signal. This stage needs only problems and answers. The reasoning is generated and graded rather than supervised.
 
 ```yaml
-# training_configs/grpo/online/oss-20b-math-rlvr.yaml
+# examples/grpo/online/oss-20b-math-rlvr.yaml
 model_name_or_path: checkpoints/oss-20b-math-reasoner   # start from the SFT model
 attn_implementation: flash_attention_4
 
@@ -232,6 +232,12 @@ temperature: 1.0
 loss_type: grpo
 max_prompt_length: 1024
 max_completion_length: 1024
+
+# --- vLLM generation: rollouts come from the server, not in-process ---
+use_vllm: true                       # required — the online GRPO trainer raises on false
+vllm_mode: server
+vllm_server_host: 127.0.0.1
+vllm_server_port: 8000
 
 # --- Training ---
 expert_parallel_size: 4              # 4 training GPUs; vLLM holds the rest
@@ -258,7 +264,7 @@ docker run --gpus all -e CUDA_VISIBLE_DEVICES=4 --network=host --ipc=host \
 
 ```bash
 # GPUs 0-3: Expert-Parallel training, weights synced to the vLLM server over NCCL
-halo launch rlvr training_configs/grpo/online/oss-20b-math-rlvr.yaml --nproc 4
+halo launch online-grpo examples/grpo/online/oss-20b-math-rlvr.yaml --nproc 4
 ```
 
 After each optimizer step we push the updated weights to the vLLM server over NCCL, so rollouts always come from the current policy. `num_generations: 8` sets the group size. Larger groups give a lower-variance advantage estimate at higher rollout cost. Keep the learning rate below the SFT rate, 1e-6 here, because RL updates are noisier and the policy should move slowly. Start RL from the SFT checkpoint rather than the base. The model must already emit the boxed format for the accuracy reward to have signal.
@@ -267,4 +273,4 @@ Online GRPO is one of several reinforcement-learning paths we support. **Offline
 
 ## Where to go from here
 
-The YAML blocks used here cover the model, dataset, parallelism, PEFT, schedule and reward. They are shared across our trainers, so moving to another method is a config change rather than new code. For harder benchmarks, scale the dataset and raise `max_completion_length` so the model has room to reason. The recipe index in the [documentation](https://github.com/whitecircle/halo/tree/main/docs) lists a ready config for each method.
+The YAML blocks used here cover the model, dataset, parallelism, PEFT, schedule and reward. They are shared across our trainers, so moving to another method is a config change rather than new code. For harder benchmarks, scale the dataset and raise `max_completion_length` so the model has room to reason. The recipe index in the [documentation](https://github.com/whitecircle/halo/tree/main/human-docs) lists a ready config for each method.

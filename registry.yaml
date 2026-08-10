@@ -959,16 +959,17 @@
   tags:
     - completions
 
-- title: Creating slides with the Assistants API and DALL·E 3
-  path: examples/Creating_slides_with_Assistants_API_and_DALL-E3.ipynb
-  slug: creating-slides-with-assistants-api-and-dall-e3
+- title: Create slides with the Responses API and GPT Image
+  path: examples/creating_slides_with_responses_api_and_gpt_image.ipynb
+  slug: creating-slides-with-responses-api-and-gpt-image
+  redirects:
+    - creating-slides-with-assistants-api-and-dall-e3
   date: 2023-12-08
   authors:
     - jhills20
   tags:
-    - assistants
-    - dall-e
-  archived: true
+    - responses
+    - image-generation
 
 - title: Data preparation and analysis for chat model fine-tuning
   path: examples/Chat_finetuning_data_prep.ipynb
@@ -2286,16 +2287,17 @@
     - completions
   archived: true
 
-- title: Assistants API Overview (Python SDK)
-  path: examples/Assistants_API_overview_python.ipynb
-  slug: assistants-api-overview-python
+- title: Responses API Overview (Python SDK)
+  path: examples/responses_api_overview_python.ipynb
+  slug: responses-api-overview-python
+  redirects:
+    - assistants-api-overview-python
   date: 2023-11-10
   authors:
     - ibigio
   tags:
-    - assistants
+    - responses
     - functions
-  archived: true
 
 - title: "Orchestrating Agents: Routines and Handoffs"
   path: examples/Orchestrating_agents.ipynb

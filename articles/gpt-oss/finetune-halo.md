@@ -80,6 +80,10 @@ trust_remote_code: true
 model_init_kwargs:
   output_router_logits: true        # enable the MoE router auxiliary loss
   router_aux_loss_coef: 0.001
+  torch_dtype: bfloat16
+  quantization_config:              # the released gpt-oss weights are MXFP4;
+    quant_method: mxfp4             # dequantize to BF16 so EP can train the experts
+    dequantize: true
 
 # --- Dataset ---
 dataset:
@@ -94,6 +98,8 @@ expert_parallel_size: 8
 ep_scope: node                       # one NVLink domain
 use_grouped_gemm: true
 save_sharded_ep: false               # gather to a standard HF checkpoint
+ep_lazy_loading: false               # full load so the MXFP4 dequant runs before experts are sharded;
+                                     # set true if you point at a pre-dequantized BF16 checkpoint
 
 # --- Kernels & precision ---
 attn_implementation: flash_attention_4
@@ -234,7 +240,7 @@ max_prompt_length: 1024
 max_completion_length: 1024
 
 # --- vLLM generation: rollouts come from the server, not in-process ---
-use_vllm: true                       # required — the online GRPO trainer raises on false
+use_vllm: true                       # required; the online GRPO trainer raises on false
 vllm_mode: server
 vllm_server_host: 127.0.0.1
 vllm_server_port: 8000

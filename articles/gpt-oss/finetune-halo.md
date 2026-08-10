@@ -20,7 +20,16 @@ The main path is a full fine-tune. Every weight is updated rather than an adapte
 
 ## Build and start the training image
 
-We run everything inside a Docker image that pins the full stack. PyTorch 2.11 on CUDA 13, [Transformers](https://github.com/huggingface/transformers), [TRL](https://github.com/huggingface/trl), [PEFT](https://github.com/huggingface/peft), [Liger](https://github.com/linkedin/Liger-Kernel), [DeepEP](https://github.com/deepseek-ai/DeepEP) and [Flash Attention](https://github.com/Dao-AILab/flash-attention). There is nothing to `pip install`. Build the image for your GPU architecture once.
+We run everything inside a Docker image that pins the full stack. PyTorch 2.11 on CUDA 13, [Transformers](https://github.com/huggingface/transformers), [TRL](https://github.com/huggingface/trl), [PEFT](https://github.com/huggingface/peft), [Liger](https://github.com/linkedin/Liger-Kernel), [DeepEP](https://github.com/deepseek-ai/DeepEP) and [Flash Attention](https://github.com/Dao-AILab/flash-attention). There is nothing to `pip install`.
+
+Pull a prebuilt image from Amazon ECR Public. No login and no AWS account needed.
+
+```bash
+docker pull public.ecr.aws/whitecircle/halo:blackwell   # B200 / B300
+docker pull public.ecr.aws/whitecircle/halo:hopper       # H100 / H200
+```
+
+Or build it yourself for your GPU architecture.
 
 ```bash
 git clone --recurse-submodules https://github.com/whitecircle/halo
@@ -39,7 +48,7 @@ docker run --rm -it --gpus all \
   -e TMPDIR=/mnt/tmp -e PYTHONPATH=/workspace \
   -e CUDA_DEVICE_MAX_CONNECTIONS=1 \
   -v $(pwd):/workspace -v /mnt:/mnt -w /workspace \
-  halo:blackwell
+  public.ecr.aws/whitecircle/halo:blackwell
 ```
 
 Everything below runs inside this container. The `-v /mnt:/mnt` mount points the model cache and checkpoints at a large volume. Adjust it to your disk layout.
@@ -238,10 +247,13 @@ output_dir: checkpoints/oss-20b-math-reasoner-rl
 Online GRPO generates from a [vLLM](https://github.com/vllm-project/vllm) server that runs in a separate container. vLLM's dependency set is incompatible with the training image, so we keep them apart and sync weights over NCCL. Start the server on a spare GPU, then launch Expert-Parallel training on four.
 
 ```bash
-# GPU 4: serve the current policy for rollouts (built from Dockerfile.vllm)
-docker run --gpus '"device=4"' --network=host --ipc=host \
-    vllm-server:0.20 checkpoints/oss-20b-math-reasoner --port 8000 \
-    --weight-transfer-config '{"backend": "nccl"}'
+# GPU 4: serve the current policy for rollouts
+docker run --gpus all -e CUDA_VISIBLE_DEVICES=4 --network=host --ipc=host \
+    -v $(pwd):/workspace -w /workspace \
+    public.ecr.aws/whitecircle/halo:vllm-0.25.1 \
+    checkpoints/oss-20b-math-reasoner --port 8000 \
+    --weight-transfer-config '{"backend": "nccl"}' \
+    --moe-backend triton --return-tokens-as-token-ids
 ```
 
 ```bash
@@ -252,8 +264,6 @@ halo launch rlvr training_configs/grpo/online/oss-20b-math-rlvr.yaml --nproc 4
 After each optimizer step we push the updated weights to the vLLM server over NCCL, so rollouts always come from the current policy. `num_generations: 8` sets the group size. Larger groups give a lower-variance advantage estimate at higher rollout cost. Keep the learning rate below the SFT rate, 1e-6 here, because RL updates are noisier and the policy should move slowly. Start RL from the SFT checkpoint rather than the base. The model must already emit the boxed format for the accuracy reward to have signal.
 
 Online GRPO is one of several reinforcement-learning paths we support. **Offline GRPO** trains from completions you have already scored, so it needs no live generation. **Environmental GRPO** runs multi-turn rollouts against a tool-using environment with Ray actors driving the episodes, which suits code contests, search and other agentic tasks. On the preference side, **DPO**, **SMPO** and **KTO** optimize against pairs or labels instead of a reward function. All of them share the config surface used above.
-
-> ✅ **Verifiable reward.** A math answer can be checked, so the reward is an exact-match grade rather than a learned reward model. That removes the usual reward-hacking surface and optimizes the policy against ground truth.
 
 ## Where to go from here
 

@@ -27,7 +27,7 @@ The finished workflow selects a scan profile from the GitLab pipeline event:
 You need:
 
 - A GitLab project and trusted GitLab Runner that can create the user namespace required by the Codex sandbox.
-- Node.js 22 or later, as required by the [Security CLI quickstart](https://learn.chatgpt.com/docs/security/cli).
+- Node.js 22.13.0 or later, as required by the [Security CLI quickstart](https://learn.chatgpt.com/docs/security/cli).
 - Python 3.10 or later for scans and exports.
 - The public `@openai/codex-security` package.
 - An OpenAI API key from a project with Codex Security access.
@@ -187,9 +187,9 @@ The target-selection block implements both paths:
 
 ### Validate configuration before starting the scan
 
-The job validates that `CODEX_SECURITY_API_KEY` is present, creates private job-specific state and result directories under `/tmp`, and then runs [`--dry-run`](https://learn.chatgpt.com/docs/security/cli/reference). The dry run checks the repository, target, output directory, and Codex configuration before model usage begins.
+The job validates that `CODEX_SECURITY_API_KEY` is present, creates private job-specific state and result directories under `/tmp`, and then runs [`--dry-run`](https://learn.chatgpt.com/docs/security/cli/reference). The dry run checks the repository, target, output directory, and Codex configuration without loading credentials or starting Codex.
 
-`CODEX_SECURITY_API_KEY` is mapped to `OPENAI_API_KEY` only for the dry-run and paid scan processes. The job removes all supported credential variables immediately after the scan so later artifact and export commands do not inherit them.
+`CODEX_SECURITY_API_KEY` is mapped to `OPENAI_API_KEY` only for the paid scan process. The job removes all supported credential variables immediately after the scan so later artifact and export commands do not inherit them.
 
 The first excerpt validates the secret and creates private, job-specific paths:
 
@@ -208,11 +208,10 @@ The first excerpt validates the secret and creates private, job-specific paths:
       install -d -m 700 "$STATE_DIR" "$RESULTS_DIR" "$ARTIFACT_DIR/results"
 ```
 
-The second excerpt runs preflight and the paid scan with process-scoped credentials:
+The second excerpt runs the credential-free preflight and then the paid scan with a process-scoped credential:
 
 ```text
-      OPENAI_API_KEY="$CODEX_SECURITY_API_KEY" \
-        "$CODEX_SECURITY_BIN" scan . "$@" --dry-run
+      "$CODEX_SECURITY_BIN" scan . "$@" --dry-run
 
       set +e
       OPENAI_API_KEY="$CODEX_SECURITY_API_KEY" \
@@ -381,10 +380,8 @@ codex-security:
       echo "Codex Security effort: $CODEX_SECURITY_EFFORT"
 
       # Validate the repository, target, output directory, and Codex
-      # configuration without starting a paid scan. Scope the key to this
-      # process only.
-      OPENAI_API_KEY="$CODEX_SECURITY_API_KEY" \
-        "$CODEX_SECURITY_BIN" scan . "$@" --dry-run
+      # configuration without loading credentials or starting Codex.
+      "$CODEX_SECURITY_BIN" scan . "$@" --dry-run
 
       set +e
       OPENAI_API_KEY="$CODEX_SECURITY_API_KEY" \
@@ -440,7 +437,7 @@ Create an eligible merge request between protected branches in the same project 
 - `codex-security.json`
 - `results.sarif` when export succeeded
 
-The pipeline checks that the required GitLab variable is present and runs [`--dry-run`](https://learn.chatgpt.com/docs/security/cli/reference) before starting a paid scan. It scopes `OPENAI_API_KEY` to the dry-run and paid scan processes. If the namespace preflight fails, no canonical scan artifacts are expected; fix the runner before retrying. For other preflight failures, fix the repository target, output directory, or CLI configuration. The integration is verified when the merge request pipeline completes a committed-diff scan, retains its structured evidence, publishes available SARIF, and returns the scan or export status directly. A green job without these artifacts is not sufficient evidence of a working security integration.
+The pipeline checks that the required GitLab variable is present and runs [`--dry-run`](https://learn.chatgpt.com/docs/security/cli/reference) before starting a paid scan. The dry run does not load credentials, and `OPENAI_API_KEY` is scoped to the paid scan process. If the namespace preflight fails, no canonical scan artifacts are expected; fix the runner before retrying. For other preflight failures, fix the repository target, output directory, or CLI configuration. The integration is verified when the merge request pipeline completes a committed-diff scan, retains its structured evidence, publishes available SARIF, and returns the scan or export status directly. A green job without these artifacts is not sufficient evidence of a working security integration.
 
 ## Step 5: Optimize cost in the right order
 
@@ -450,7 +447,7 @@ Cost optimization should preserve the security question the pipeline needs to an
 
 ### 1. Remove unnecessary pipeline executions
 
-Integrate the required conditions into the project's existing [`workflow: rules`](https://docs.gitlab.com/ci/yaml/workflow/) when duplicate branch and merge request pipelines are possible. Skip fork merge requests that cannot safely receive the API key. In monorepos, use [`rules:changes`](https://docs.gitlab.com/ci/jobs/job_rules/#skip-jobs-if-the-branch-is-empty) to avoid starting a service-specific scan when that service did not change.
+Integrate the required conditions into the project's existing [`workflow: rules`](https://docs.gitlab.com/ci/yaml/workflow/) when duplicate branch and merge request pipelines are possible. Skip fork and unprotected merge requests that cannot receive the protected API key. In monorepos, use [`rules:changes`](https://docs.gitlab.com/ci/jobs/job_rules/#skip-jobs-if-the-branch-is-empty) to avoid starting a service-specific scan when that service did not change.
 
 This is often the cleanest cost reduction because it removes scans that provide no new decision value.
 
@@ -545,7 +542,7 @@ The working pipeline already sets authentication, target selection, effort, outp
 
 | Setting | Use it for | Guidance |
 | --- | --- | --- |
-| `--diff BASE --head HEAD` | Trusted merge request scans | Pin both revisions to the committed change GitLab is reviewing |
+| `--diff BASE --head HEAD` | Eligible protected merge request scans | Pin both revisions to the committed change GitLab is reviewing |
 | `--path PATH` | Independently owned monorepo services | Repeat for related paths and retain enough context for a complete review |
 | `--mode standard` or `--mode deep` | Routine scans or scheduled high-risk reviews | Start with standard; reserve deep mode for repository or path scans |
 | `--effort LEVEL` | Quality, latency, and cost calibration | Compare effort levels on the same revision and target |

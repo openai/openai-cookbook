@@ -28,9 +28,10 @@ You need:
 
 - A GitLab project and trusted GitLab Runner that can create the user namespace required by the Codex sandbox.
 - Node.js 22.13.0 or later, as required by the [Security CLI quickstart](https://learn.chatgpt.com/docs/security/cli).
-- Python 3.10 or later for scans and exports.
+- Python 3.10 or later for scans and exports; Python 3.10 also requires `tomli`.
 - The public `@openai/codex-security` package.
 - An OpenAI API key from a project with Codex Security access.
+- [Trusted Access for Cyber](https://chatgpt.com/cyber) if your account and repository require it for full-repository scans.
 - Full Git history when calculating merge request diffs.
 - GitLab Ultimate 19.2 or later for generally available [SARIF ingestion](https://docs.gitlab.com/user/application_security/detect/sarif/).
 
@@ -227,7 +228,7 @@ The second excerpt runs the credential-free preflight and then the paid scan wit
 
 The scan writes canonical artifacts to its private result directory and structured JSON to a separate file. The job copies available output into `codex-security-artifacts` even when the CLI returns a non-zero status. This is important because exit `1` or `2` can still accompany useful findings or coverage evidence.
 
-When a scan manifest exists, `codex-security export` attempts to create SARIF from the completed, sealed result. GitLab retains the full artifact directory for seven days and ingests `results.sarif` through `artifacts:reports:sarif` when export succeeds. `artifacts:access: maintainer` restricts downloads because the retained evidence can contain source excerpts and vulnerability details; adjust the role only if your project's access model requires it. Because report artifacts are uploaded regardless of job success or failure, the same job can return the final scan or export status without an additional job.
+When a scan manifest exists, `codex-security export` attempts to create SARIF from the completed, sealed result. GitLab retains the full artifact directory for seven days and ingests `results.sarif` through `artifacts:reports:sarif` when export succeeds. [`artifacts:access: maintainer`](https://docs.gitlab.com/ci/yaml/#artifactsaccess) restricts UI and API downloads to Maintainers and Owners because the retained evidence can contain source excerpts and vulnerability details. It does not block access through CI/CD job tokens or prevent artifacts from being forwarded to downstream pipelines, so configure project visibility and pipeline access separately. Because report artifacts are uploaded regardless of job success or failure, the same job can return the final scan or export status without an additional job.
 
 This block preserves available evidence, attempts export, and publishes the artifact paths:
 
@@ -447,7 +448,7 @@ Cost optimization should preserve the security question the pipeline needs to an
 
 ### 1. Remove unnecessary pipeline executions
 
-Integrate the required conditions into the project's existing [`workflow: rules`](https://docs.gitlab.com/ci/yaml/workflow/) when duplicate branch and merge request pipelines are possible. Skip fork and unprotected merge requests that cannot receive the protected API key. In monorepos, use [`rules:changes`](https://docs.gitlab.com/ci/jobs/job_rules/#skip-jobs-if-the-branch-is-empty) to avoid starting a service-specific scan when that service did not change.
+Integrate the required conditions into the project's existing [`workflow: rules`](https://docs.gitlab.com/ci/yaml/workflow/) when duplicate branch and merge request pipelines are possible. Skip fork and unprotected merge requests that cannot receive the protected API key. In monorepos, use [`rules:changes`](https://docs.gitlab.com/ci/yaml/#ruleschanges) to avoid starting a service-specific scan when that service did not change.
 
 This is often the cleanest cost reduction because it removes scans that provide no new decision value.
 
@@ -600,7 +601,7 @@ Begin with a correct, report-only integration. Measure representative scans. The
 Use the working pipeline as a baseline, then complete these steps in the target GitLab project:
 
 1. Validate one eligible merge request between protected branches end to end. Confirm that the protected variable is available, the intended base and head revisions are selected, coverage is complete, `scan-manifest.json` is sealed, SARIF ingestion succeeds, and the artifact directory is complete. Resolve authentication, sandbox, target-sealing, coverage, and export-related exit `2` outcomes before enforcement; do not rely on `allow_failure` to hide incomplete results.
-2. Calibrate all three profiles with representative changes. Run focused merge requests with low effort, a default-branch repository scan with high effort, and a scheduled deep scan with xhigh effort. Record duration, estimated cost, coverage, findings, and reviewer disposition.
+2. Calibrate all three profiles with representative changes. Run focused merge requests with `low` effort, a default-branch repository scan with `high` effort, and a scheduled deep scan with `xhigh` effort. Record duration, estimated cost, coverage, findings, and reviewer disposition.
 3. Choose and enforce the production policy. Keep merge-request scans focused, reserve broader scans for the default branch or a schedule, and enable `--fail-on-severity` only after reviewers understand result quality and false positives. When the pipeline is stable, remove the temporary exit `2` allowance, apply the project's chosen trust controls to the job and API-key variable, and require the result in the merge policy.
 4. Assign operational ownership. Name the team that reviews findings, define who investigates coverage or export failures, set response expectations for critical and high findings, and document the exception process and approvers.
 5. Maintain the integration. Review the installed CLI version, supported models, pricing assumptions, GitLab SARIF support, runner image, and artifact retention regularly. When the resolved CLI version changes, rerun a known merge request and verify sealed artifacts, SARIF ingestion, exit-code behavior, runtime, and cost before broader rollout.

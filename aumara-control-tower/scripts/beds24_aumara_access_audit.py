@@ -51,6 +51,7 @@ ACCESS_MARKERS = (
 )
 HOST_SOURCES = {"host", "property", "owner"}
 HEALTHY_STATUSES = {"PIN_MESSAGE_MATCHED"}
+INACTIVE_BOOKING_STATUSES = {"cancelled", "canceled", "black", "inquiry"}
 
 
 class AccessAuditError(AuditError):
@@ -106,7 +107,13 @@ def fetch_arrivals(
         suffix = f"; diagnostics={json.dumps(details, ensure_ascii=False)}" if details else ""
         raise AccessAuditError(f"AUMARA booking lookup failed with HTTP {status}{suffix}")
     rows = data_rows(response, "AUMARA booking")
-    return [row for row in rows if int(row.get("propertyId") or PROPERTY_ID) == PROPERTY_ID]
+    return [
+        row
+        for row in rows
+        if int(row.get("propertyId") or PROPERTY_ID) == PROPERTY_ID
+        and str(row.get("status") or "").strip().lower()
+        not in INACTIVE_BOOKING_STATUSES
+    ]
 
 
 

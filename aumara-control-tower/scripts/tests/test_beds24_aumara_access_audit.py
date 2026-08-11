@@ -39,6 +39,26 @@ class AumaraAccessAuditTests(unittest.TestCase):
         self.assertEqual(start, MODULE.dt.date(2026, 8, 2))
         self.assertEqual(end, MODULE.dt.date(2026, 8, 2))
 
+    def test_fetch_arrivals_excludes_inactive_booking_statuses(self):
+        response = {
+            "data": [
+                {"id": 1, "propertyId": 324882, "status": "confirmed"},
+                {"id": 2, "propertyId": 324882, "status": "cancelled"},
+                {"id": 3, "propertyId": 324882, "status": "canceled"},
+                {"id": 4, "propertyId": 324882, "status": "black"},
+                {"id": 5, "propertyId": 324882, "status": "inquiry"},
+                {"id": 6, "propertyId": 999999, "status": "confirmed"},
+            ]
+        }
+        with mock.patch.object(MODULE, "request_json", return_value=(200, response)):
+            rows = MODULE.fetch_arrivals(
+                "token",
+                "https://api.beds24.com/v2",
+                MODULE.dt.date(2026, 8, 11),
+                MODULE.dt.date(2026, 8, 12),
+            )
+        self.assertEqual([row["id"] for row in rows], [1])
+
     def test_lock_pin_is_detected_without_returning_value(self):
         booking = {"infoItems": [{"code": "LOCK_PIN", "value": "1531"}]}
         self.assertEqual(MODULE.lock_pin_state(booking), (True, True))

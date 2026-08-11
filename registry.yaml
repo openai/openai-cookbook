@@ -7,7 +7,7 @@
 - title: "Policy-to-Review: A Human-Governed Prior Authorization Agent with the OpenAI Agents SDK and Amazon Bedrock AgentCore"
   path: examples/partners/AWS/policy_to_review_prior_authorization_agents_sdk_agentcore.ipynb
   slug: policy-to-review-prior-authorization-agentcore
-  description: Build a human-governed prior authorization workflow with public CMS policy retrieval, the OpenAI Agents SDK on Amazon Bedrock, deterministic citation validation, and Amazon Bedrock AgentCore Runtime.
+  description: Build a human-governed prior authorization workflow with synthetic provider PDF extraction, public CMS policy retrieval, the OpenAI Agents SDK on Amazon Bedrock, deterministic citation validation, and Amazon Bedrock AgentCore Runtime.
   date: 2026-08-10
   authors:
     - sks-oai

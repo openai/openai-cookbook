@@ -62,30 +62,29 @@ jobs:
           script_path.write_text(script, encoding="utf-8")
 
           tests = test_path.read_text(encoding="utf-8")
-          anchor = (
-              '    def test_lock_pin_is_detected_without_returning_value(self):\n'
+          anchor = '    def test_lock_pin_is_detected_without_returning_value(self):\n'
+          new_test = (
+              '    def test_fetch_arrivals_excludes_inactive_booking_statuses(self):\n'
+              '        response = {\n'
+              '            "data": [\n'
+              '                {"id": 1, "propertyId": 324882, "status": "confirmed"},\n'
+              '                {"id": 2, "propertyId": 324882, "status": "cancelled"},\n'
+              '                {"id": 3, "propertyId": 324882, "status": "canceled"},\n'
+              '                {"id": 4, "propertyId": 324882, "status": "black"},\n'
+              '                {"id": 5, "propertyId": 324882, "status": "inquiry"},\n'
+              '                {"id": 6, "propertyId": 999999, "status": "confirmed"},\n'
+              '            ]\n'
+              '        }\n'
+              '        with mock.patch.object(MODULE, "request_json", return_value=(200, response)):\n'
+              '            rows = MODULE.fetch_arrivals(\n'
+              '                "token",\n'
+              '                "https://api.beds24.com/v2",\n'
+              '                MODULE.dt.date(2026, 8, 11),\n'
+              '                MODULE.dt.date(2026, 8, 12),\n'
+              '            )\n'
+              '        self.assertEqual([row["id"] for row in rows], [1])\n'
+              '\n'
           )
-          new_test = '''    def test_fetch_arrivals_excludes_inactive_booking_statuses(self):
-        response = {
-            "data": [
-                {"id": 1, "propertyId": 324882, "status": "confirmed"},
-                {"id": 2, "propertyId": 324882, "status": "cancelled"},
-                {"id": 3, "propertyId": 324882, "status": "canceled"},
-                {"id": 4, "propertyId": 324882, "status": "black"},
-                {"id": 5, "propertyId": 324882, "status": "inquiry"},
-                {"id": 6, "propertyId": 999999, "status": "confirmed"},
-            ]
-        }
-        with mock.patch.object(MODULE, "request_json", return_value=(200, response)):
-            rows = MODULE.fetch_arrivals(
-                "token",
-                "https://api.beds24.com/v2",
-                MODULE.dt.date(2026, 8, 11),
-                MODULE.dt.date(2026, 8, 12),
-            )
-        self.assertEqual([row["id"] for row in rows], [1])
-
-'''
           if "test_fetch_arrivals_excludes_inactive_booking_statuses" not in tests:
               if anchor not in tests:
                   raise SystemExit("expected test insertion anchor not found")

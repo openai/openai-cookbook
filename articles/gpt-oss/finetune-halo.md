@@ -155,7 +155,7 @@ import re
 path = "checkpoints/oss-20b-math-reasoner"
 tok = AutoTokenizer.from_pretrained(path)
 model = AutoModelForCausalLM.from_pretrained(
-    path, torch_dtype="bfloat16", device_map="cuda"
+    path, dtype="bfloat16", device_map="cuda"
 )
 
 SYSTEM = ("You are a math tutor. Solve the problem step by step, then give the "
@@ -216,7 +216,9 @@ The reward has two parts. The accuracy reward extracts the `\boxed{...}` answer 
 ```yaml
 # examples/grpo/online/oss-20b-math-rlvr.yaml
 model_name_or_path: checkpoints/oss-20b-math-reasoner   # start from the SFT model
-attn_implementation: flash_attention_4
+attn_implementation: flash_attention_4   # carries gpt-oss attention sinks; RL needs this
+reset_sinks: false                       # keep and freeze the pretrained sinks so the trainer's logprobs
+                                         # match the vLLM generator (default true resets them and desyncs the policy)
 
 # --- Dataset: problem + gold answer, no worked solution needed ---
 dataset: whitecircle/math-reasoning-sft:labeled@train   # {"question": ..., "answer": ...}

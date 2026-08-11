@@ -538,6 +538,17 @@
     - gpt-oss
     - gpt-oss-fine-tuning
 
+- title: Fine-tune gpt-oss with Halo
+  path: articles/gpt-oss/finetune-halo.md
+  slug: finetune-halo
+  date: 2026-08-11
+  authors:
+    - MekkCyber
+  tags:
+    - open-models
+    - gpt-oss
+    - gpt-oss-fine-tuning
+
 - title: How to handle the raw chain of thought in gpt-oss
   path: articles/gpt-oss/handle-raw-cot.md
   slug: handle-raw-cot

@@ -1,0 +1,207 @@
+name: TEMP Repair stale Beds24 cancellation 6220304666
+
+on:
+  push:
+    branches: [main]
+    paths:
+      - ".github/workflows/tmp-repair-beds24-cancel-6220304666.yml"
+
+permissions:
+  contents: read
+
+concurrency:
+  group: tmp-repair-beds24-cancel-6220304666
+  cancel-in-progress: false
+
+jobs:
+  repair:
+    runs-on: ubuntu-latest
+    env:
+      BEDS24_REFRESH_TOKEN: ${{ secrets.BEDS24_REFRESH_CREDENTIAL }}
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Verify credential exists
+        run: |
+          if [ -z "$BEDS24_REFRESH_TOKEN" ]; then
+            echo "::error::BEDS24_REFRESH_CREDENTIAL missing"
+            exit 1
+          fi
+
+      - name: Verify mapping, cancel stale booking, verify read-back
+        run: |
+          python - <<'PY'
+          import json
+          import pathlib
+          import sys
+          import urllib.error
+          import urllib.parse
+          import urllib.request
+
+          SCRIPTS = pathlib.Path("aumara-control-tower/scripts")
+          sys.path.insert(0, str(SCRIPTS.resolve()))
+          from beds24_elcid_studio_audit import AuditError, data_rows, get_access_token
+
+          PROPERTY_ID = 324882
+          INTERNAL_ID = 89395880
+          EXTERNAL_REF = "6220304666"
+          ARRIVAL = "2026-08-11"
+          DEPARTURE = "2026-08-16"
+          ALL_STATUSES = ("confirmed", "request", "new", "cancelled", "black", "inquiry")
+          MUTABLE_STATUSES = {"confirmed", "request", "new"}
+          OUT = pathlib.Path("aumara-control-tower/evidence/beds24-cancel-6220304666.json")
+          OUT.parent.mkdir(parents=True, exist_ok=True)
+
+          evidence = {
+              "schema": "aumara-beds24-cancellation-repair-v1",
+              "propertyId": PROPERTY_ID,
+              "beds24BookingId": INTERNAL_ID,
+              "bookingComReservationId": EXTERNAL_REF,
+              "arrival": ARRIVAL,
+              "departure": DEPARTURE,
+              "mappingVerified": False,
+              "mutationApplied": False,
+              "readBackVerified": False,
+              "secretExposed": False,
+          }
+
+          def write_and_exit(code, **extra):
+              evidence.update(extra)
+              OUT.write_text(json.dumps(evidence, ensure_ascii=False, indent=2) + "\n", encoding="utf-8")
+              print(json.dumps(evidence, ensure_ascii=False, separators=(",", ":")))
+              raise SystemExit(code)
+
+          try:
+              token, auth_mode, api_base, auth_source, _ = get_access_token()
+          except AuditError as exc:
+              write_and_exit(1, status="AUTH_FAILED", error=str(exc))
+
+          evidence.update({
+              "authMode": auth_mode,
+              "authSource": auth_source,
+              "apiHost": urllib.parse.urlparse(api_base).netloc,
+          })
+
+          def get_rows(params, label):
+              query = urllib.parse.urlencode(params)
+              req = urllib.request.Request(
+                  f"{api_base}/bookings?{query}",
+                  headers={"accept": "application/json", "token": token},
+                  method="GET",
+              )
+              try:
+                  with urllib.request.urlopen(req, timeout=45) as response:
+                      raw = response.read().decode("utf-8", "replace")
+                      payload = json.loads(raw) if raw else {}
+                      return data_rows(payload, label)
+              except urllib.error.HTTPError as exc:
+                  raw = exc.read().decode("utf-8", "replace")
+                  write_and_exit(1, status="READ_FAILED", httpStatus=exc.code, error=raw[:300])
+
+          def all_status_params():
+              return [("status", value) for value in ALL_STATUSES]
+
+          exact_rows = get_rows(
+              [("id", INTERNAL_ID), ("propertyId", PROPERTY_ID), *all_status_params()],
+              "exact booking",
+          )
+          if len(exact_rows) != 1:
+              write_and_exit(2, status="EXACT_BOOKING_NOT_UNIQUE", exactMatches=len(exact_rows))
+          booking = exact_rows[0]
+
+          channel = str(booking.get("channel") or booking.get("referer") or "").strip().lower()
+          current_status = str(booking.get("status") or "").strip().lower()
+          stored_api_ref = str(booking.get("apiReference") or "").strip()
+          stored_ref = str(booking.get("reference") or "").strip()
+          if (
+              int(booking.get("propertyId") or 0) != PROPERTY_ID
+              or str(booking.get("arrival") or "") != ARRIVAL
+              or str(booking.get("departure") or "") != DEPARTURE
+              or not channel.startswith("booking")
+          ):
+              write_and_exit(
+                  2,
+                  status="IDENTITY_GUARD_FAILED",
+                  bookingStatus=current_status,
+                  channel=channel,
+              )
+
+          ref_rows = get_rows(
+              [("apiReference", EXTERNAL_REF), ("propertyId", PROPERTY_ID), *all_status_params()],
+              "api reference",
+          )
+          ref_ids = {int(row.get("id") or 0) for row in ref_rows}
+          direct_ref_match = EXTERNAL_REF in {stored_api_ref, stored_ref}
+          query_ref_match = INTERNAL_ID in ref_ids
+
+          if not (direct_ref_match or query_ref_match):
+              search_rows = get_rows(
+                  [("searchString", EXTERNAL_REF), ("propertyId", PROPERTY_ID), *all_status_params()],
+                  "reference search",
+              )
+              search_ids = {int(row.get("id") or 0) for row in search_rows}
+              query_ref_match = INTERNAL_ID in search_ids
+
+          if not (direct_ref_match or query_ref_match):
+              write_and_exit(
+                  2,
+                  status="EXTERNAL_REFERENCE_NOT_MAPPED",
+                  bookingStatus=current_status,
+              )
+
+          evidence["mappingVerified"] = True
+          evidence["statusBefore"] = current_status
+
+          if current_status == "cancelled":
+              evidence["statusAfter"] = "cancelled"
+              evidence["readBackVerified"] = True
+              write_and_exit(0, status="ALREADY_CANCELLED")
+
+          if current_status not in MUTABLE_STATUSES:
+              write_and_exit(2, status="UNEXPECTED_STATUS_NO_MUTATION", bookingStatus=current_status)
+
+          body = json.dumps([{"id": INTERNAL_ID, "status": "cancelled"}]).encode("utf-8")
+          req = urllib.request.Request(
+              f"{api_base}/bookings",
+              data=body,
+              headers={
+                  "accept": "application/json",
+                  "content-type": "application/json",
+                  "token": token,
+              },
+              method="POST",
+          )
+          try:
+              with urllib.request.urlopen(req, timeout=45) as response:
+                  response.read()
+                  if response.status not in (200, 201):
+                      write_and_exit(1, status="MUTATION_FAILED", httpStatus=response.status)
+          except urllib.error.HTTPError as exc:
+              raw = exc.read().decode("utf-8", "replace")
+              write_and_exit(1, status="MUTATION_FAILED", httpStatus=exc.code, error=raw[:300])
+
+          evidence["mutationApplied"] = True
+
+          verify_rows = get_rows(
+              [("id", INTERNAL_ID), ("propertyId", PROPERTY_ID), *all_status_params()],
+              "read-back booking",
+          )
+          if len(verify_rows) != 1:
+              write_and_exit(1, status="READBACK_NOT_UNIQUE", readBackMatches=len(verify_rows))
+          final_status = str(verify_rows[0].get("status") or "").strip().lower()
+          evidence["statusAfter"] = final_status
+          if final_status != "cancelled":
+              write_and_exit(1, status="READBACK_STATUS_MISMATCH")
+
+          evidence["readBackVerified"] = True
+          write_and_exit(0, status="CANCELLED_AND_VERIFIED")
+          PY
+
+      - name: Upload sanitized repair evidence
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: beds24-cancel-6220304666
+          path: aumara-control-tower/evidence/beds24-cancel-6220304666.json
+          if-no-files-found: warn
+          retention-days: 7

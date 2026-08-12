@@ -3,6 +3,11 @@
 # You can optionally customize how your information shows up cookbook.openai.com over here.
 # If your information is not present here, it will be pulled from your GitHub profile.
 
+rdpatilds:
+  name: "Rudragouda Patil"
+  website: "https://www.linkedin.com/in/rdpatilds"
+  avatar: "https://avatars.githubusercontent.com/u/50579750?v=4"
+
 neilh-oai:
   name: "Neil Hansaria"
   website: "https://www.linkedin.com/in/neilhansaria"

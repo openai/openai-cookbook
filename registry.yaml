@@ -4,6 +4,18 @@
 # should build pages for, and indicates metadata such as tags, creation date and
 # authors for each page.
 
+- title: Calibrating an LLM Judge Against Human Labels
+  path: examples/evaluation/calibrating_llm_judges.ipynb
+  slug: calibrating-llm-judges-against-human-labels
+  description: Measure whether your LLM judge agrees with human labels, and discover that the first calibration run usually finds a specification gap rather than a model defect. Three judge prompts scored against two human labelling policies over the same 45 examples - and the best prompt flips.
+  date: 2026-08-12
+  authors:
+    - rdpatilds
+  tags:
+    - evals
+    - evals-api
+    - responses
+
 - title: Migrate from Whisper to GPT-Transcribe and GPT-Live-Transcribe
   path: examples/migrating_from_whisper_to_gpt_transcribe.ipynb
   slug: migrating-from-whisper-to-gpt-transcribe

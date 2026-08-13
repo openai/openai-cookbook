@@ -1,34 +1,31 @@
-# Complete native Windows enterprise requirements for Codex 0.138.0 or later.
+# Complete native Windows regulated-enterprise requirements for Codex 0.138.0+.
 # Deploy through enterprise-managed configuration or:
 # %ProgramData%\OpenAI\Codex\requirements.toml
-# The workspace itself must be a local approved directory, not a network share.
+# Select an approved workspace and enforce prohibited network shares externally.
 
-allowed_approval_policies = ["never"]
+allowed_approval_policies = ["on-request", "untrusted"]
 allowed_approvals_reviewers = ["user"]
-allowed_web_search_modes = ["disabled"]
+allowed_sandbox_modes = ["read-only", "workspace-write"]
+allowed_web_search_modes = ["disabled", "cached"]
 default_permissions = "regulated_workspace"
 allow_managed_hooks_only = true
 allow_appshots = false
 mcp_servers = {}
 
 [allowed_permission_profiles]
+":read-only" = true
 regulated_workspace = true
 
-# Do not extend :workspace. Its inherited broad-read behavior conflicts with a
-# strict local-workspace-only boundary.
+# Extend the standard workspace profile for general engineering compatibility.
+# Define explicit filesystem roots when shared-drive isolation is mandatory.
 [permissions.regulated_workspace]
-description = "Edit the selected local Windows workspace while denying broader filesystem, network-share, and command-network access."
+description = "Use the elevated Windows workspace sandbox with human oversight, protected secrets, and restricted command networking."
+extends = ":workspace"
 
 [permissions.regulated_workspace.filesystem]
-":minimal" = "read"
 glob_scan_max_depth = 6
 
 [permissions.regulated_workspace.filesystem.":workspace_roots"]
-"." = "write"
-".git" = "read"
-".codex" = "read"
-".agents" = "read"
-".devcontainer" = "read"
 ".env" = "deny"
 ".env.local" = "deny"
 "**/.env" = "deny"
@@ -42,8 +39,7 @@ glob_scan_max_depth = 6
 [permissions.regulated_workspace.network]
 enabled = false
 
-# The elevated backend can enforce explicit readable roots. Never fall back to
-# the weaker unelevated backend for this Windows baseline.
+# Require the stronger Windows sandbox backend and prevent unelevated fallback.
 [windows]
 allowed_sandbox_implementations = ["elevated"]
 
@@ -61,11 +57,11 @@ skill_mcp_dependency_install = false
 
 [rules]
 prefix_rules = [
-  { pattern = [{ any_of = ["rm", "rmdir", "Remove-Item", "del", "erase"] }], decision = "forbidden", justification = "Destructive filesystem operations require approved controls outside Codex." },
-  { pattern = [{ token = "net" }, { any_of = ["use", "view"] }], decision = "forbidden", justification = "Network-share mapping and enumeration are not permitted." },
-  { pattern = [{ token = "New-PSDrive" }], decision = "forbidden", justification = "Network-drive mapping is not permitted." },
-  { pattern = [{ any_of = ["curl", "wget", "Invoke-WebRequest", "iwr", "Invoke-RestMethod", "irm"] }], decision = "forbidden", justification = "External data transfers require an approved enterprise workflow." },
-  { pattern = [{ token = "git" }, { any_of = ["commit", "push"] }], decision = "forbidden", justification = "Repository publication remains a human-controlled action outside Codex." },
+  { pattern = [{ any_of = ["rm", "rmdir", "Remove-Item", "del", "erase"] }], decision = "prompt", justification = "A human must review destructive filesystem operations." },
+  { pattern = [{ token = "net" }, { any_of = ["use", "view"] }], decision = "prompt", justification = "A human must review network-share enumeration or mapping." },
+  { pattern = [{ token = "New-PSDrive" }], decision = "prompt", justification = "A human must review new filesystem or network-drive mappings." },
+  { pattern = [{ any_of = ["curl", "wget", "Invoke-WebRequest", "iwr", "Invoke-RestMethod", "irm"] }], decision = "prompt", justification = "A human must review attempted network access or data transfer." },
+  { pattern = [{ token = "git" }, { any_of = ["commit", "push"] }], decision = "prompt", justification = "A human must approve repository commits and publication." },
   { pattern = [{ token = "kubectl" }, { any_of = ["apply", "delete", "patch", "exec", "edit"] }], decision = "forbidden", justification = "Production changes require approved deployment pipelines." },
   { pattern = [{ token = "terraform" }, { any_of = ["apply", "destroy"] }], decision = "forbidden", justification = "Infrastructure changes require approved change management." },
   { pattern = [{ token = "gh" }, { token = "pr" }, { token = "merge" }], decision = "forbidden", justification = "Pull-request merges remain human-controlled actions outside Codex." },

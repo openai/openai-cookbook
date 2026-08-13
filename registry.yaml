@@ -4,10 +4,10 @@
 # should build pages for, and indicates metadata such as tags, creation date and
 # authors for each page.
 
-- title: Configure Codex for regulated industries on macOS and Windows
+- title: Configure Codex for regulated enterprise environments
   path: examples/codex/regulated_industry_configuration.md
   slug: codex-regulated-industry-configuration
-  description: Configure enterprise-managed Codex requirements and client defaults for regulated industries, with validated least-privilege macOS and Windows deployment blueprints.
+  description: Configure enterprise-managed Codex requirements and client defaults for regulated environments, covering identity, approvals, integrations, data handling, observability, and macOS or Windows deployment.
   date: 2026-08-13
   authors:
     - OAI-JB

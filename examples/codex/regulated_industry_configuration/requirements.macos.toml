@@ -1,31 +1,28 @@
-# Complete macOS enterprise requirements for Codex 0.138.0 or later.
+# Complete macOS regulated-enterprise requirements for Codex 0.138.0 or later.
 # Deploy through enterprise-managed configuration, /etc/codex/requirements.toml,
 # or the com.openai.codex requirements_toml_base64 MDM preference.
 
-allowed_approval_policies = ["never"]
+allowed_approval_policies = ["on-request", "untrusted"]
 allowed_approvals_reviewers = ["user"]
-allowed_web_search_modes = ["disabled"]
+allowed_sandbox_modes = ["read-only", "workspace-write"]
+allowed_web_search_modes = ["disabled", "cached"]
 default_permissions = "regulated_workspace"
 allow_managed_hooks_only = true
 allow_appshots = false
 mcp_servers = {}
 
 [allowed_permission_profiles]
+":read-only" = true
 regulated_workspace = true
 
 [permissions.regulated_workspace]
-description = "Edit the selected local macOS workspace while denying broader filesystem and network access."
+description = "Use the macOS workspace sandbox with human oversight, protected secrets, and restricted command networking."
+extends = ":workspace"
 
 [permissions.regulated_workspace.filesystem]
-":minimal" = "read"
 glob_scan_max_depth = 6
 
 [permissions.regulated_workspace.filesystem.":workspace_roots"]
-"." = "write"
-".git" = "read"
-".codex" = "read"
-".agents" = "read"
-".devcontainer" = "read"
 ".env" = "deny"
 ".env.local" = "deny"
 "**/.env" = "deny"
@@ -53,9 +50,9 @@ skill_mcp_dependency_install = false
 
 [rules]
 prefix_rules = [
-  { pattern = [{ any_of = ["rm", "rmdir"] }], decision = "forbidden", justification = "Destructive filesystem operations require approved controls outside Codex." },
-  { pattern = [{ any_of = ["curl", "wget", "scp", "sftp", "rsync", "ssh"] }], decision = "forbidden", justification = "Remote access and data transfers require an approved enterprise workflow." },
-  { pattern = [{ token = "git" }, { any_of = ["commit", "push"] }], decision = "forbidden", justification = "Repository publication remains a human-controlled action outside Codex." },
+  { pattern = [{ any_of = ["rm", "rmdir"] }], decision = "prompt", justification = "A human must review destructive filesystem operations." },
+  { pattern = [{ any_of = ["curl", "wget", "scp", "sftp", "rsync", "ssh"] }], decision = "prompt", justification = "A human must review remote access and attempted data transfer." },
+  { pattern = [{ token = "git" }, { any_of = ["commit", "push"] }], decision = "prompt", justification = "A human must approve repository commits and publication." },
   { pattern = [{ token = "kubectl" }, { any_of = ["apply", "delete", "patch", "exec", "edit"] }], decision = "forbidden", justification = "Production changes require approved deployment pipelines." },
   { pattern = [{ token = "terraform" }, { any_of = ["apply", "destroy"] }], decision = "forbidden", justification = "Infrastructure changes require approved change management." },
   { pattern = [{ token = "gh" }, { token = "pr" }, { token = "merge" }], decision = "forbidden", justification = "Pull-request merges remain human-controlled actions outside Codex." },

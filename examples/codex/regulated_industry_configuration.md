@@ -1,84 +1,82 @@
-# Configure Codex for regulated industries
+# Configure Codex for regulated environments
 
-Financial services, healthcare, public-sector, and other regulated teams need a clear answer to a practical deployment question: which Codex settings are enforceable, which are only defaults, and how do those controls differ between macOS and Windows?
+Financial services, healthcare, public-sector, and other regulated organizations need more than a filesystem policy when they introduce an AI coding assistant. They need an operating model that covers identity, human oversight, permitted execution modes, network access, integrations, sensitive data, monitoring, change management, and device deployment.
 
-This cookbook provides complete starter configurations for Codex `0.138.0` or later. The examples restrict filesystem access to an approved local workspace, disable command-network access, reject user-approved sandbox escalation, and show how to deploy equivalent controls on macOS and native Windows.
+This cookbook provides a general-purpose starting point for supported local Codex desktop, CLI, and IDE clients running version `0.138.0` or later. It includes complete enterprise `requirements.toml` and client `config.toml` examples, deployment variants for macOS and native Windows, and executable checks that keep those files aligned.
 
-These examples are a technical starting point. They are not a compliance certification, a legal interpretation, or a substitute for operating-system permissions, endpoint security, identity controls, data-governance policy, or an organization-specific threat model.
+The examples are technical deployment guidance, not a compliance certification, legal interpretation, contractual data-processing commitment, or substitute for an organization-specific risk assessment.
 
-## Understand the two configuration layers
+## Separate enterprise requirements from client defaults
 
-Codex uses two different configuration layers:
+Codex configuration operates across two layers:
 
-| File | Purpose | Can a user override it? | Use it for |
+| Layer | File | Purpose | Can the user override it? |
 | --- | --- | --- | --- |
-| `requirements.toml` | Enterprise-managed requirements. | Supported constraints are enforced and cannot be overridden by user configuration. | Allowed permission profiles, approval policies, managed features, approved MCP servers, and Windows sandbox requirements. |
-| `config.toml` | User or device configuration. | Yes, unless a corresponding enterprise requirement constrains the setting. | Recommended defaults, authentication preferences, credential storage, local history, telemetry, and platform-specific client settings. |
+| Enterprise requirements | `requirements.toml` | Establish supported, non-overridable policy boundaries. | No, when delivered through a supported managed-requirements source. |
+| Client configuration | `config.toml` | Establish client behavior, preferred defaults, and platform settings. | Yes, unless a matching requirement or external administrative control constrains the setting. |
 
-Managed defaults from `managed_config.toml` or mobile device management (MDM) configure the starting state, but do not replace enforced requirements. Use the [managed configuration documentation](https://learn.chatgpt.com/docs/enterprise/managed-configuration) to confirm the exact precedence for the clients and deployment method in your fleet.
+Managed defaults delivered through `managed_config.toml` or macOS mobile device management (MDM) remain defaults. They do not automatically become enforced enterprise requirements.
 
-The managed permission-profile controls in this cookbook require Codex `0.138.0` or later. Clients running `0.137.0` or earlier do not enforce `allowed_permission_profiles` or managed `default_permissions`. Upgrade every supported local desktop, CLI, or IDE client before assigning a policy that depends on those controls. Remote or cloud-hosted execution environments need their own separately verified controls.
+Some controls also belong outside TOML. Identity-provider policies, single sign-on, endpoint restrictions, firewall rules, approved model access, contractual retention terms, and enterprise data-residency commitments must be enforced through the corresponding administrative, contractual, or operating-system control. Remote or cloud-hosted execution environments also require separately verified controls.
 
-## Define the security boundary first
+Managed permission-profile allowlists and managed default permission profiles require Codex `0.138.0` or later. Earlier clients do not enforce those controls, so verify the minimum version across the entire device fleet before rollout.
 
-The reference configuration makes the following choices:
+## Define the regulated operating model
 
-- Only a named enterprise-managed permission profile is selectable.
-- Commands can read the selected workspace and the minimal operating-system paths needed to run common tools.
-- Commands can modify files inside the workspace, except for protected metadata and explicitly denied secret-bearing files.
-- Commands cannot use the network.
-- Users cannot approve an operation that would execute outside the configured sandbox.
-- Browser use, computer use, apps, automatic approval review, unapproved Model Context Protocol (MCP) servers, and remote control are disabled.
-- Native Windows devices must use the stronger `elevated` sandbox implementation.
+Use this control matrix when translating security and compliance requirements into Codex configuration:
 
-This boundary is intentionally restrictive. Review the workflow impact before rolling it out to a full organization.
+| Governance area | Enterprise requirements | Client defaults and operational controls |
+| --- | --- | --- |
+| Identity and tenancy | Apply the correct managed policy to the intended enterprise users or groups. | Require enterprise ChatGPT sign-in, optionally bind a verified workspace ID, and enforce identity-provider controls. |
+| Human oversight | Allow only approved approval policies and human reviewers. | Default to human-reviewed `on-request` execution. |
+| Execution boundaries | Allow read-only and workspace-write modes; exclude full access. | Select an approved managed permission profile. |
+| Network and web search | Allow only reviewed web-search modes and restrict command-network access. | Default to cached search and disable command networking. |
+| Apps, MCP, and plugins | Deny unapproved MCP identities and disable high-risk managed features. | Disable apps by default and enable integrations only after review. |
+| Credentials and secrets | Protect sensitive files through the approved permission profile. | Store credentials in the operating-system keyring and restrict inherited shell variables. |
+| Data handling | Enforce only supported product requirements; do not invent residency values. | Minimize local history, disable analytics where appropriate, and suppress prompt logging. |
+| Monitoring and support | Review managed hooks and change-control rules. | Configure approved OpenTelemetry settings and retain the ability to submit `/feedback`. |
+| Production safety | Require approval for sensitive development actions and forbid protected production changes. | Route deployment, infrastructure, and merge actions through approved workflows. |
+| Device security | Require the elevated Windows sandbox where native Windows is used. | Deploy platform-specific defaults and verify effective device policy. |
 
-> A workspace is trusted by definition. If a user opens a network share as the workspace, that share becomes a workspace root. Use endpoint, identity, or operating-system policy to restrict which directories can become approved workspaces.
+The baseline below is supervised, not maximally restrictive. It supports normal engineering work while reserving sensitive actions for human review. Organizations that cannot allow user-approved exceptions should adopt the stricter approval model described later.
 
-## Start with the general enterprise blueprint
+## Create the enterprise requirements file
 
-The complete cross-platform starter files are:
-
-- [Enterprise requirements](regulated_industry_configuration/requirements.toml)
-- [Client configuration](regulated_industry_configuration/config.toml)
-
-The general pair explains the shared control model. For native Windows, deploy the complete Windows-specific pair below so the managed policy also requires the elevated sandbox implementation.
-
-### Enforce the enterprise policy
-
-The managed requirements select one profile, disable escalation approvals and web search, and deny configurable MCP servers until an organization explicitly approves one:
+The complete portable managed policy is available as [requirements.toml](regulated_industry_configuration/requirements.toml):
 
 ```toml
-allowed_approval_policies = ["never"]
+# Cross-platform regulated-enterprise requirements for Codex 0.138.0 or later.
+# Deploy through enterprise-managed configuration or the system policy path.
+# These requirements establish governance boundaries, not user defaults.
+
+allowed_approval_policies = ["on-request", "untrusted"]
 allowed_approvals_reviewers = ["user"]
-allowed_web_search_modes = ["disabled"]
+allowed_sandbox_modes = ["read-only", "workspace-write"]
+allowed_web_search_modes = ["disabled", "cached"]
 default_permissions = "regulated_workspace"
 allow_managed_hooks_only = true
 allow_appshots = false
+
+# An explicit empty allowlist disables configurable MCP servers. Replace it
+# only after approving an exact server name and its verified identity.
 mcp_servers = {}
 
+# Permit inspection-only work and the approved engineering profile, but not
+# unrestricted full access or unmanaged custom profiles.
 [allowed_permission_profiles]
+":read-only" = true
 regulated_workspace = true
-```
 
-The explicit empty `mcp_servers` table blocks configurable MCP servers. If the table is omitted, MCP servers are not constrained by this requirement. Add a server only after the security team verifies its exact name, identity, data access, and approval model.
-
-The managed profile grants read access to essential runtime paths and limits the writable area to the current workspace:
-
-```toml
+# Extend the standard workspace profile for normal engineering compatibility.
+# Organizations that require narrower reads should define explicit roots instead.
 [permissions.regulated_workspace]
-description = "Edit an approved local workspace without broad filesystem reads."
+description = "Use the standard workspace sandbox with human oversight, protected secrets, and restricted command networking."
+extends = ":workspace"
 
 [permissions.regulated_workspace.filesystem]
-":minimal" = "read"
 glob_scan_max_depth = 6
 
 [permissions.regulated_workspace.filesystem.":workspace_roots"]
-"." = "write"
-".git" = "read"
-".codex" = "read"
-".agents" = "read"
-".devcontainer" = "read"
 ".env" = "deny"
 ".env.local" = "deny"
 "**/.env" = "deny"
@@ -91,28 +89,58 @@ glob_scan_max_depth = 6
 
 [permissions.regulated_workspace.network]
 enabled = false
+
+[features]
+browser_use = false
+browser_use_external = false
+computer_use = false
+enable_mcp_apps = false
+guardian_approval = false
+in_app_browser = false
+memories = false
+memory_tool = false
+remote_control = false
+skill_mcp_dependency_install = false
+
+# Require human review for sensitive development actions. Block production and
+# infrastructure changes that belong in an approved deployment workflow.
+[rules]
+prefix_rules = [
+  { pattern = [{ any_of = ["rm", "rmdir"] }], decision = "prompt", justification = "A human must review destructive filesystem operations." },
+  { pattern = [{ any_of = ["curl", "wget"] }], decision = "prompt", justification = "A human must review attempted network access or data transfer." },
+  { pattern = [{ token = "git" }, { any_of = ["commit", "push"] }], decision = "prompt", justification = "A human must approve repository commits and publication." },
+  { pattern = [{ token = "kubectl" }, { any_of = ["apply", "delete", "patch", "exec", "edit"] }], decision = "forbidden", justification = "Production changes require approved deployment pipelines." },
+  { pattern = [{ token = "terraform" }, { any_of = ["apply", "destroy"] }], decision = "forbidden", justification = "Infrastructure changes require approved change management." },
+  { pattern = [{ token = "gh" }, { token = "pr" }, { token = "merge" }], decision = "forbidden", justification = "Pull-request merges remain human-controlled actions outside Codex." },
+]
 ```
 
-The profile does not extend the built-in `:workspace` profile because that profile includes broader filesystem reads. Instead, it explicitly grants `:minimal` and the selected `:workspace_roots`. The recursive deny patterns set a bounded scan depth for platforms that pre-expand filesystem matches. On Windows and other platforms that use bounded expansion, files below the configured depth may not be covered. Inspect repository nesting and raise the limit or enumerate protected paths before deployment.
+This file establishes the organization-wide guardrails:
 
-On Windows, deny globs are expanded against files that already exist when the sandbox initializes. The explicit `.env` and `.env.local` entries also protect those known paths if they do not exist yet, but newly created files that match only a glob may not receive the same protection. Keep sensitive files outside approved workspaces when possible and enforce operating-system access controls.
+- Human reviewers approve sensitive operations; automated approval review is not permitted.
+- Full-access execution modes and unapproved permission profiles are unavailable.
+- Live web search is unavailable, but the organization can choose cached search or disable search entirely.
+- Configurable MCP servers are blocked until an exact approved server identity is added.
+- Browser control, computer use, persistent memory, remote control, unmanaged hooks, and other high-risk features are restricted.
+- Repository publication and destructive operations require review, while protected infrastructure and production actions are forbidden.
 
-`".git" = "read"` prevents Codex from modifying Git metadata directly. In this strict operating model, repository commits, pushes, and pull-request merges remain human-controlled steps outside Codex.
+An explicit empty `mcp_servers = {}` allowlist blocks MCP servers. Omitting `mcp_servers` does not create the same restriction. Add an integration only after verifying its exact server identity, data access, ownership, and approval model.
 
-The full requirements file also disables optional high-risk features and blocks common destructive, infrastructure-changing, and data-transfer command prefixes. Prefix rules are defense in depth, not a complete semantic inspection of shell scripts.
+## Create the matching client configuration
 
-Disabled profile networking applies to sandboxed commands. It does not disable the Codex client's authenticated connection to model services, login, or enterprise configuration. Govern those client connections through the organization's approved proxy, identity, and egress controls.
-
-### Set matching client defaults
-
-The corresponding `config.toml` selects the same permission profile and approval model:
+The complete portable client configuration is available as [config.toml](regulated_industry_configuration/config.toml):
 
 ```toml
-approval_policy = "never"
+#:schema https://developers.openai.com/codex/config-schema.json
+# Cross-platform device or user defaults for Codex 0.138.0 or later.
+# Pair this file with the corresponding enforced requirements.toml.
+
+approval_policy = "on-request"
 approvals_reviewer = "user"
 default_permissions = "regulated_workspace"
-web_search = "disabled"
+web_search = "cached"
 allow_login_shell = false
+model_reasoning_effort = "medium"
 
 forced_login_method = "chatgpt"
 cli_auth_credentials_store = "keyring"
@@ -122,6 +150,9 @@ mcp_oauth_credentials_store = "keyring"
 enabled = false
 destructive_enabled = false
 open_world_enabled = false
+
+[analytics]
+enabled = false
 
 [feedback]
 enabled = true
@@ -134,31 +165,80 @@ inherit = "core"
 ignore_default_excludes = false
 exclude = ["*PASSWORD*", "*CREDENTIAL*", "*PRIVATE*"]
 
+[sandbox_workspace_write]
+network_access = false
+
 [otel]
-environment = "regulated"
+environment = "regulated-production"
 log_user_prompt = false
 ```
 
-`approval_policy = "never"` means Codex cannot ask a user to approve an action that needs additional sandbox permissions. It does not mean Codex never acts: operations already permitted by the active profile can continue without an approval prompt.
+Use the client settings to establish a consistent starting experience across devices:
 
-`cli_auth_credentials_store = "keyring"` and `mcp_oauth_credentials_store = "keyring"` require the operating-system credential store. A device without a functioning credential store needs an approved deployment-specific alternative.
+- `forced_login_method = "chatgpt"` selects the enterprise ChatGPT authentication flow.
+- Add `forced_chatgpt_workspace_id` only after obtaining and verifying the organization's actual workspace identifier.
+- Keyring-backed credential storage avoids silently falling back to a local credentials file.
+- Cached web search avoids live search, but search queries must still be permitted by the organization's data-handling policy.
+- Disabled analytics and local history reduce optional local or product telemetry, while approved OpenTelemetry settings can support enterprise observability.
+- `log_user_prompt = false` avoids including raw prompts in the configured OpenTelemetry stream.
+- Keeping feedback enabled supports current-session troubleshooting without requiring persistent local history.
 
-`history.persistence = "none"` reduces local retention of session history. It can also make later incident reconstruction harder. Configure an approved audit or telemetry destination if your retention policy requires one, and do not enable raw prompt logging unless that data collection has been explicitly approved.
+Identity restrictions, credential-storage preferences, analytics, local history, telemetry, login-shell behavior, and Windows private-desktop settings remain client defaults unless a supported managed requirement or external administrative control enforces them.
 
-Settings that appear only in `config.toml` remain client defaults unless another supported enterprise requirement or external control enforces them. For this Codex `0.138.0` baseline, treat credential-storage preferences, local history, login-shell behavior, telemetry choices, and Windows private-desktop configuration as defaults that still require device-management review.
+## Review the major governance decisions
 
-The supplied files intentionally do not contain an example workspace UUID, MCP URL, API token, telemetry collector URL, or other organization-specific identifier. Add only verified values from your own environment.
+### Identity, workspace, and model access
 
-## Deploy the macOS blueprint
+Bind deployment to the correct enterprise tenant through the organization's identity provider, provisioning process, and approved ChatGPT workspace. If workspace binding is required, configure `forced_chatgpt_workspace_id` with the verified production identifier instead of copying a placeholder value.
 
-Use these complete files for macOS:
+Keep `model_reasoning_effort` aligned with latency, cost, and workload needs. Model availability, provider approval, account entitlements, and contractual data-processing conditions require their own supported administrative controls. Do not add an invented `allowed_models` requirement to this Codex `0.138.0` baseline.
 
-- [macOS requirements](regulated_industry_configuration/requirements.macos.toml)
+### Approval policies and separation of duties
+
+| Operating model | Managed approval policy | Result |
+| --- | --- | --- |
+| Supervised engineering | `on-request` or `untrusted`, with reviewer `user`. | Sensitive actions can be approved by a human; `prompt` execution rules remain usable. |
+| Non-overridable sandbox boundary | `never`, with matching client configuration. | Actions requiring additional approval are rejected instead of presented to a user. |
+| Fine-grained control | A supported granular approval configuration. | Some prompt categories can remain available while other categories are rejected; verify support across the deployed client and management surface. |
+
+`on-request` can allow a user to approve execution outside the normal sandbox. It is appropriate only when user-approved exceptions are part of the operating model. When that is unacceptable, set `allowed_approval_policies = ["never"]`, set `approval_policy = "never"`, and replace `prompt` command rules with `forbidden` rules where required.
+
+The supplied validator checks the supervised reference baseline. If you intentionally create a stricter no-exception variant, update its approval-policy and command-rule assertions before using it to validate that separate profile.
+
+### Network access, search, and integrations
+
+The example disables network access for sandboxed commands and live web search. It does not disable the Codex client's authenticated model-service connection, enterprise configuration, or account sign-in. Govern those connections through approved identity, proxy, and egress policies.
+
+If engineering teams need package registries, source-control services, or internal APIs, introduce a reviewed network allowlist and test the installed client's managed-network controls. Approve MCP servers and apps individually based on verified ownership, reachable systems, data exposure, and write permissions.
+
+### Data retention, telemetry, and residency
+
+`history.persistence = "none"` reduces local session-history retention. It can also make incident reconstruction harder, so pair the setting with an approved enterprise audit or observability process when your retention policy requires one.
+
+Configure an OpenTelemetry exporter only after the destination, authentication, data classification, retention, and access controls have been approved. The example intentionally omits collector URLs, bearer tokens, workspace identifiers, and other organization-specific values.
+
+In the exact Codex `0.138.0` requirements schema, `enforce_residency` accepts `"us"`; `"eu"` is not an accepted value. Do not assume a TOML setting establishes EU residency or satisfies a contractual residency commitment. Validate supported residency controls separately with the applicable enterprise administrators and legal or security owners.
+
+### Filesystem access as one part of the policy
+
+The example extends the built-in `:workspace` profile for compatibility with ordinary development tools. That profile can inherit broader filesystem reads than a dedicated read-isolation policy. When an organization must prevent access to network shares or other directories, define explicit readable roots with a stricter custom profile and enforce the same boundary through operating-system and endpoint controls.
+
+A selected workspace is trusted by its workspace profile. If a prohibited network share is selected as the workspace, the profile includes that share by definition. Prevent prohibited workspace selection through identity, endpoint, operating-system, or file-share policy.
+
+On Windows, wildcard deny rules are expanded against existing files and use the configured scan depth. The explicit `.env` and `.env.local` entries protect known paths, but deeper files or newly created wildcard-only matches require additional review and operating-system controls.
+
+Command-prefix rules provide an additional review boundary, but they do not semantically inspect every possible shell script. Do not treat those rules as a replacement for sandbox, endpoint, or identity controls.
+
+## Deploy on macOS
+
+Use the complete macOS-specific files:
+
+- [macOS enterprise requirements](regulated_industry_configuration/requirements.macos.toml)
 - [macOS client configuration](regulated_industry_configuration/config.macos.toml)
 
-macOS uses the native operating-system sandbox to enforce the resolved permission profile. The macOS example also blocks common remote-transfer commands such as `scp`, `sftp`, `rsync`, and `ssh` through managed command rules.
+The macOS baseline preserves the shared governance model and adds review rules for common remote-access and file-transfer commands.
 
-### Option 1: Install managed requirements as a system file
+### Install managed requirements as a system file
 
 From the cookbook repository root:
 
@@ -176,16 +256,13 @@ install -m 0600 \
   "$HOME/.codex/config.toml"
 ```
 
-For centrally managed defaults, deploy the same configuration content to `/etc/codex/managed_config.toml` through your device-management workflow. Keep the enforced policy in the requirements layer.
+For centrally managed defaults, deploy the client configuration to `/etc/codex/managed_config.toml` through the organization's device-management workflow. Keep enforceable controls in the requirements layer.
 
-### Option 2: Distribute the policy through macOS MDM
+### Distribute policy through macOS MDM
 
-The macOS managed-preferences domain is `com.openai.codex`. It supports these payload keys:
+The managed-preferences domain is `com.openai.codex`. Use `requirements_toml_base64` for enterprise requirements and `config_toml_base64` for managed defaults.
 
-- `requirements_toml_base64` for enterprise-enforced requirements.
-- `config_toml_base64` for managed defaults.
-
-Prepare the requirements payload without line wrapping:
+Create the requirements payload without line wrapping:
 
 ```bash
 base64 -i \
@@ -193,7 +270,7 @@ base64 -i \
   | tr -d '\n'
 ```
 
-Prepare the defaults payload separately:
+Create the defaults payload separately:
 
 ```bash
 base64 -i \
@@ -201,23 +278,23 @@ base64 -i \
   | tr -d '\n'
 ```
 
-Install each payload under the corresponding managed-preferences key through the organization's existing MDM product. Do not include secrets in either payload.
+Install each value under the corresponding managed-preferences key. Existing MDM policies can take precedence over other managed sources, so inspect the effective configuration before expanding deployment.
 
-## Deploy the native Windows blueprint
+## Deploy on native Windows
 
-Use these complete files for native Windows:
+Use the complete Windows-specific files:
 
-- [Windows requirements](regulated_industry_configuration/requirements.windows.toml)
+- [Windows enterprise requirements](regulated_industry_configuration/requirements.windows.toml)
 - [Windows client configuration](regulated_industry_configuration/config.windows.toml)
 
-The Windows managed requirements add a platform-specific constraint:
+The Windows requirements add an enforced sandbox-implementation restriction:
 
 ```toml
 [windows]
 allowed_sandbox_implementations = ["elevated"]
 ```
 
-The Windows client selects that implementation and keeps private-desktop isolation enabled:
+The corresponding client configuration selects that implementation and keeps private-desktop isolation enabled:
 
 ```toml
 [windows]
@@ -225,11 +302,7 @@ sandbox = "elevated"
 sandbox_private_desktop = true
 ```
 
-`elevated` describes the Windows sandbox implementation and its setup. It does not grant the agent unrestricted administrator privileges. This implementation uses dedicated lower-privilege sandbox users, filesystem boundaries, and firewall rules. Setup can require an administrator to approve local user creation, firewall configuration, or other endpoint-policy changes.
-
-The enterprise requirement prevents a user from falling back to the weaker `unelevated` implementation. If the elevated sandbox cannot be initialized, work with endpoint administrators to resolve the setup issue before enabling the profile.
-
-### Install the Windows files
+`elevated` describes the Windows sandbox implementation and setup; it does not grant the agent unrestricted administrator privileges. Administrators may need to approve endpoint prerequisites, local sandbox-user creation, or firewall configuration.
 
 From an approved administrative PowerShell session at the cookbook repository root:
 
@@ -253,50 +326,24 @@ Copy-Item `
     (Join-Path $userDirectory "config.toml")
 ```
 
-Deploy the files through endpoint-management tooling when possible. The Windows system requirements path is `%ProgramData%\OpenAI\Codex\requirements.toml`; the user configuration path is `%USERPROFILE%\.codex\config.toml`.
+The system requirements path is `%ProgramData%\OpenAI\Codex\requirements.toml`; the user configuration path is `%USERPROFILE%\.codex\config.toml`. Prefer the organization's standard endpoint-management tooling for production rollout.
 
-### Understand the network-share boundary
+At Codex `0.138.0`, `allowed_sandbox_implementations` belongs in Windows managed requirements, while `sandbox_private_desktop` belongs in client configuration. Do not place private-desktop settings inside `[windows]` in `requirements.toml` for that version.
 
-On native Windows, the older `read-only` and `workspace-write` sandbox modes can provide broader filesystem read access than a regulated organization expects. A user approval can also authorize a specific operation outside a normal sandbox when the selected approval policy permits it.
+## Compare deployment approaches
 
-The Windows blueprint addresses those risks by combining:
-
-1. A managed custom profile that grants only minimal runtime reads and the selected workspace.
-2. An enterprise allowlist that prevents selecting broader built-in profiles.
-3. `approval_policy = "never"`, which blocks user-approved sandbox escalation.
-4. A mandatory elevated Windows sandbox implementation.
-5. Disabled network access for sandboxed commands.
-
-Do not rely on `[permissions.filesystem].deny_read` alone to block access to Windows network shares. Managed `deny_read` applies to direct file tools on native Windows, but shell subprocess reads do not use that same requirement. The explicit managed permission profile and elevated sandbox address a different control layer.
-
-Also keep the underlying Server Message Block (SMB) permissions, endpoint policy, execution identity, and network segmentation aligned with the same security goal. A network share selected as the workspace is inside the profile's workspace boundary, so an organization that prohibits network-share workspaces needs an external control that prevents that selection.
-
-## Compare deployment locations
-
-| Configuration layer | macOS | Native Windows |
+| Configuration source | macOS | Native Windows |
 | --- | --- | --- |
 | Enforced system requirements | `/etc/codex/requirements.toml` | `%ProgramData%\OpenAI\Codex\requirements.toml` |
 | User configuration | `~/.codex/config.toml` | `%USERPROFILE%\.codex\config.toml` |
 | Managed defaults | `/etc/codex/managed_config.toml` or macOS MDM | `~/.codex/managed_config.toml` or approved device management |
-| macOS MDM requirements | `com.openai.codex:requirements_toml_base64` | Not applicable |
-| macOS MDM defaults | `com.openai.codex:config_toml_base64` | Not applicable |
-| Platform sandbox | Native macOS sandbox | Required `elevated` Windows sandbox |
+| MDM requirements | `com.openai.codex:requirements_toml_base64` | Not applicable |
+| MDM defaults | `com.openai.codex:config_toml_base64` | Not applicable |
+| Platform sandbox | Native macOS sandbox | Required elevated Windows sandbox |
 
-Cloud-managed enterprise requirements can also be assigned through the supported administration surface. Apply policies to a pilot group before assigning them to an entire fleet, and verify the highest-precedence effective policy on each platform.
+Where supported, enterprise administrators can also assign cloud-managed requirements to specific user groups. Start with a pilot group, verify the effective policy for pilot and non-pilot users, and resolve precedence between cloud-managed, system, and MDM sources before broader deployment.
 
-## Choose the right approval model
-
-| Approval model | Appropriate when | Security tradeoff |
-| --- | --- | --- |
-| `never` | Sandbox boundaries must not be widened by user approval. | Legitimate tasks requiring additional permission are rejected. Actions already allowed by the sandbox can still run. |
-| `on-request` with `approvals_reviewer = "user"` | Human reviewers may approve individually justified exceptions. | A user can approve a request that executes outside the normal sandbox. It is not a non-overridable network-share prohibition. |
-| Granular approvals | The installed client and enterprise policy support separately controlling sandbox, rule, skill, MCP, and permission prompts. | Support and managed-policy representation vary by client version and administration surface; validate the deployed combination before relying on it. |
-
-For the strict blueprint, managed command rules use `decision = "forbidden"`. Do not use `decision = "prompt"` while also setting `approval_policy = "never"` and expect an interactive review: approval prompts are intentionally disabled.
-
-If a supervised operating model requires `on-request`, update both the managed `allowed_approval_policies` setting and the client `approval_policy`. Treat user-approved exceptions as a deliberate security decision and preserve an operating-system control for resources that must never be accessed.
-
-## Validate before rollout
+## Validate the examples and rollout
 
 The example directory includes a validator that requires Python `3.11` or later and uses only the standard library:
 
@@ -313,9 +360,9 @@ PASS windows: requirements.windows.toml, config.windows.toml
 Validated 3 regulated-industry blueprint pairs for Codex 0.138.0 or later.
 ```
 
-The validator checks TOML parsing, matching permission profiles, restricted filesystem roots, denied secret patterns, disabled command-network access, disabled approval escalation, MCP deny-by-default behavior, and the Windows elevated-sandbox requirement.
+The validator checks enterprise approval boundaries, allowed operating modes, web-search governance, permission profiles, MCP restrictions, managed features, change-control rules, identity and credential defaults, analytics, history, observability, and Windows sandbox settings.
 
-To also validate the client files and managed permission profiles against the exact deployed Codex release, save a trusted copy of that release's `config.schema.json` in the current directory and install `jsonschema`:
+To validate client configuration and managed permission profiles against the exact deployed release, save a trusted copy of its `config.schema.json` in the current directory:
 
 ```bash
 python -m pip install jsonschema
@@ -323,7 +370,7 @@ python examples/codex/regulated_industry_configuration/validate_blueprints.py \
   --schema ./config.schema.json
 ```
 
-Run the regression tests:
+Run the regression suite:
 
 ```bash
 python -m unittest discover \
@@ -331,29 +378,28 @@ python -m unittest discover \
   -p 'test_*.py'
 ```
 
-After deployment:
+After deploying a pilot:
 
-1. Start a new supported local Codex session.
-2. Open `/debug-config` and confirm the expected requirements source, approval policy, and permission profile.
-3. On Windows, confirm the elevated sandbox initialized without fallback.
-4. Confirm the selected workspace is an approved local directory.
-5. Review the active authentication, credential-storage, MCP, history, and telemetry settings.
-6. If troubleshooting is needed, run `/feedback` in the current session and share the resulting feedback ID through an approved support process.
+1. Confirm every local client meets the minimum supported version.
+2. Open `/debug-config` and verify the active requirements source, approval settings, and selected permission profile.
+3. Confirm the correct enterprise authentication flow, workspace, credential store, and permitted integrations.
+4. Check web-search mode, command networking, analytics, local history, and approved telemetry settings.
+5. Validate that sensitive development actions prompt for review and protected production actions are forbidden.
+6. On Windows, confirm the elevated sandbox initializes without fallback.
+7. If investigation is required, run `/feedback` in the active session and share the resulting feedback ID through the approved support process.
 
-Avoid placing raw credentials, customer data, sensitive logs, or confidential source code in support messages or feedback descriptions.
+Do not include raw credentials, customer data, confidential source code, or other sensitive material in support messages.
 
-## Understand the operational tradeoffs
+## Adapt the baseline to the organization
 
-The default policy intentionally disables networked development workflows, configurable MCP integrations, automatic approvals, repository publication from Codex, and persistent local history. It also withholds write access to temporary directories outside the selected workspace and can interfere with linked Git worktrees or tools that keep their caches elsewhere. That may be appropriate for an initial security review but too restrictive for a production engineering team.
+Use one managed baseline as the starting point, then create reviewed variations for distinct risk groups. A software engineering group might permit cached search and approved repository integrations, while a production-support group could use read-only permissions and a no-exception approval policy.
 
-Relax controls only after documenting the business need and enforcing the replacement boundary. Typical adjustments include approving a specific internal MCP server, permitting a reviewed network domain, enabling centrally governed telemetry, or adopting a supervised approval model for a lower-risk group.
-
-Keep requirements and defaults synchronized, avoid unverified placeholders, review changes with security and platform owners, and rerun the validator for each platform-specific variant.
+Review each change across the full operating model: identity, human oversight, execution, network access, integrations, sensitive data, auditability, and endpoint controls. Keep enterprise requirements and client defaults synchronized, avoid unverified identifiers, and rerun validation for every platform-specific variant.
 
 ## References
 
 - [Managed configuration and enterprise requirements](https://learn.chatgpt.com/docs/enterprise/managed-configuration)
-- [Permission profiles and filesystem access](https://learn.chatgpt.com/docs/permissions)
+- [Permission profiles and execution boundaries](https://learn.chatgpt.com/docs/permissions)
 - [Native Windows sandbox](https://learn.chatgpt.com/docs/windows/windows-sandbox)
 - [Configuration reference](https://learn.chatgpt.com/docs/config-file/config-reference)
 - [Managed execution rules](https://learn.chatgpt.com/docs/agent-configuration/rules)

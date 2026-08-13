@@ -3,10 +3,10 @@
 # Deploy as %USERPROFILE%\.codex\config.toml or through approved device
 # management. Pair this file with requirements.windows.toml.
 
-approval_policy = "never"
+approval_policy = "on-request"
 approvals_reviewer = "user"
 default_permissions = "regulated_workspace"
-web_search = "disabled"
+web_search = "cached"
 allow_login_shell = false
 model_reasoning_effort = "medium"
 
@@ -19,6 +19,9 @@ enabled = false
 destructive_enabled = false
 open_world_enabled = false
 
+[analytics]
+enabled = false
+
 [feedback]
 enabled = true
 
@@ -29,6 +32,9 @@ persistence = "none"
 inherit = "core"
 ignore_default_excludes = false
 exclude = ["*PASSWORD*", "*CREDENTIAL*", "*PRIVATE*"]
+
+[sandbox_workspace_write]
+network_access = false
 
 [otel]
 environment = "regulated-windows"

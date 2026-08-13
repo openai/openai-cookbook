@@ -18,6 +18,9 @@ import tomllib
 
 MINIMUM_CODEX_VERSION = "0.138.0"
 PROFILE_NAME = "regulated_workspace"
+ALLOWED_APPROVAL_POLICIES = frozenset({"on-request", "untrusted"})
+ALLOWED_SANDBOX_MODES = frozenset({"read-only", "workspace-write"})
+ALLOWED_WEB_SEARCH_MODES = frozenset({"disabled", "cached"})
 REQUIRED_SECRET_PATTERNS = frozenset(
     {
         ".env",
@@ -103,18 +106,24 @@ def validate_requirements(requirements: dict[str, Any], platform: str) -> list[s
     if unsupported:
         findings.append(f"unsupported managed requirement keys: {unsupported}")
 
-    if requirements.get("allowed_approval_policies") != ["never"]:
-        findings.append(
-            "sandbox escalation must be blocked with approval policy 'never'"
-        )
+    policies = requirements.get("allowed_approval_policies", [])
+    if not policies or not set(policies).issubset(ALLOWED_APPROVAL_POLICIES):
+        findings.append("approval policies must require supervised human review")
     if requirements.get("allowed_approvals_reviewers") != ["user"]:
         findings.append("the only allowed approvals reviewer must be 'user'")
-    if requirements.get("allowed_web_search_modes") != ["disabled"]:
-        findings.append("web search must be disabled")
+    sandbox_modes = requirements.get("allowed_sandbox_modes", [])
+    if not sandbox_modes or not set(sandbox_modes).issubset(ALLOWED_SANDBOX_MODES):
+        findings.append("sandbox modes must exclude unrestricted full access")
+    search_modes = requirements.get("allowed_web_search_modes", [])
+    if not search_modes or not set(search_modes).issubset(ALLOWED_WEB_SEARCH_MODES):
+        findings.append("web search must be restricted to disabled or cached modes")
     if requirements.get("default_permissions") != PROFILE_NAME:
         findings.append("the managed default must select the regulated profile")
-    if requirements.get("allowed_permission_profiles") != {PROFILE_NAME: True}:
-        findings.append("the regulated profile must be the only selectable profile")
+    if requirements.get("allowed_permission_profiles") != {
+        ":read-only": True,
+        PROFILE_NAME: True,
+    }:
+        findings.append("only read-only and regulated permission profiles may be used")
     if requirements.get("allow_managed_hooks_only") is not True:
         findings.append("only enterprise-managed hooks may be enabled")
     if requirements.get("allow_appshots") is not False:
@@ -126,19 +135,12 @@ def validate_requirements(requirements: dict[str, Any], platform: str) -> list[s
     filesystem = profile.get("filesystem", {})
     workspace = filesystem.get(":workspace_roots", {})
 
-    if profile.get("extends"):
-        findings.append("the regulated profile must not inherit a broader profile")
-    if filesystem.get(":root") in {"read", "write"}:
-        findings.append("the regulated profile must not grant broad filesystem access")
-    if filesystem.get(":minimal") != "read":
-        findings.append("minimal platform runtime paths must be readable")
-    if workspace.get(".") != "write":
-        findings.append("the selected workspace must be writable")
-    if not all(
-        workspace.get(path) == "read"
-        for path in (".git", ".codex", ".agents", ".devcontainer")
-    ):
-        findings.append("workspace metadata and configuration paths must be read-only")
+    if profile.get("extends") != ":workspace":
+        findings.append(
+            "the general baseline must extend the standard workspace profile"
+        )
+    if filesystem.get(":root") == "write":
+        findings.append("the regulated profile must not grant root filesystem writes")
     if not all(
         workspace.get(pattern) == "deny" for pattern in REQUIRED_SECRET_PATTERNS
     ):
@@ -158,9 +160,14 @@ def validate_requirements(requirements: dict[str, Any], platform: str) -> list[s
     rules = requirements.get("rules", {}).get("prefix_rules", [])
     if not rules:
         findings.append("managed execution rules must not be empty")
+    decisions = {rule.get("decision") for rule in rules}
+    if "prompt" not in decisions or "forbidden" not in decisions:
+        findings.append(
+            "execution rules must include human review and forbidden actions"
+        )
     for rule in rules:
-        if rule.get("decision") != "forbidden":
-            findings.append("strict approval mode requires forbidden execution rules")
+        if rule.get("decision") not in {"prompt", "forbidden"}:
+            findings.append("execution rules must either prompt or forbid the action")
         if not rule.get("justification"):
             findings.append("every managed execution rule needs a justification")
         for token in rule.get("pattern", []):
@@ -187,17 +194,16 @@ def validate_config(
     """Return mismatches between client defaults and enforced requirements."""
 
     findings: list[str] = []
-    if (
-        config.get("approval_policy")
-        != requirements.get("allowed_approval_policies", [None])[0]
+    if config.get("approval_policy") not in requirements.get(
+        "allowed_approval_policies", []
     ):
         findings.append("client approval policy must match enterprise requirements")
     if config.get("approvals_reviewer") != "user":
         findings.append("client approvals reviewer must remain 'user'")
     if config.get("default_permissions") != requirements.get("default_permissions"):
         findings.append("client and enterprise permission profiles must match")
-    if config.get("web_search") != "disabled":
-        findings.append("client web search must be disabled")
+    if config.get("web_search") not in requirements.get("allowed_web_search_modes", []):
+        findings.append("client web search must match the allowed enterprise modes")
     if config.get("allow_login_shell") is not False:
         findings.append("login shell execution must be disabled")
     if config.get("forced_login_method") != "chatgpt":
@@ -213,6 +219,8 @@ def validate_config(
         for setting in ("enabled", "destructive_enabled", "open_world_enabled")
     ):
         findings.append("apps and destructive or open-world app tools must be disabled")
+    if config.get("analytics", {}).get("enabled") is not False:
+        findings.append("optional product analytics must be disabled")
     if config.get("feedback", {}).get("enabled") is not True:
         findings.append(
             "feedback must stay available for current-session investigation"
@@ -221,6 +229,10 @@ def validate_config(
         findings.append("local history persistence must be disabled")
     if config.get("otel", {}).get("log_user_prompt") is not False:
         findings.append("OpenTelemetry must not export raw user prompts")
+    if not config.get("otel", {}).get("environment"):
+        findings.append("OpenTelemetry events need an environment classification")
+    if config.get("sandbox_workspace_write", {}).get("network_access") is not False:
+        findings.append("workspace sandbox defaults must disable command networking")
 
     environment = config.get("shell_environment_policy", {})
     if environment.get("inherit") != "core":

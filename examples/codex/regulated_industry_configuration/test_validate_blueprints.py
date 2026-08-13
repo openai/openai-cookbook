@@ -17,7 +17,7 @@ BLUEPRINT_DIRECTORY = Path(__file__).resolve().parent
 
 
 class RegulatedBlueprintTests(unittest.TestCase):
-    """Keep every supported platform on the same least-privilege baseline."""
+    """Keep every platform on the same supervised enterprise-governance baseline."""
 
     def setUp(self) -> None:
         self.requirements = load_toml(BLUEPRINT_DIRECTORY / "requirements.windows.toml")
@@ -35,22 +35,62 @@ class RegulatedBlueprintTests(unittest.TestCase):
                     validate_config(config, requirements, blueprint.platform), []
                 )
 
-    def test_broad_filesystem_reads_are_rejected(self) -> None:
+    def test_root_filesystem_writes_are_rejected(self) -> None:
         requirements = copy.deepcopy(self.requirements)
-        requirements["permissions"][PROFILE_NAME]["filesystem"][":root"] = "read"
+        requirements["permissions"][PROFILE_NAME]["filesystem"][":root"] = "write"
         self.assertTrue(
             any(
-                "broad filesystem" in finding
+                "root filesystem writes" in finding
                 for finding in validate_requirements(requirements, "windows")
             )
         )
 
-    def test_inheriting_the_workspace_profile_is_rejected(self) -> None:
+    def test_unapproved_base_permission_profile_is_rejected(self) -> None:
         requirements = copy.deepcopy(self.requirements)
-        requirements["permissions"][PROFILE_NAME]["extends"] = ":workspace"
+        requirements["permissions"][PROFILE_NAME]["extends"] = ":danger-full-access"
         self.assertTrue(
             any(
-                "inherit a broader profile" in finding
+                "standard workspace profile" in finding
+                for finding in validate_requirements(requirements, "windows")
+            )
+        )
+
+    def test_unsupervised_approval_policy_is_rejected(self) -> None:
+        requirements = copy.deepcopy(self.requirements)
+        requirements["allowed_approval_policies"].append("never")
+        self.assertTrue(
+            any(
+                "supervised human review" in finding
+                for finding in validate_requirements(requirements, "windows")
+            )
+        )
+
+    def test_automatic_approval_reviewer_is_rejected(self) -> None:
+        requirements = copy.deepcopy(self.requirements)
+        requirements["allowed_approvals_reviewers"].append("auto_review")
+        self.assertTrue(
+            any(
+                "approvals reviewer" in finding
+                for finding in validate_requirements(requirements, "windows")
+            )
+        )
+
+    def test_full_access_sandbox_mode_is_rejected(self) -> None:
+        requirements = copy.deepcopy(self.requirements)
+        requirements["allowed_sandbox_modes"].append("danger-full-access")
+        self.assertTrue(
+            any(
+                "unrestricted full access" in finding
+                for finding in validate_requirements(requirements, "windows")
+            )
+        )
+
+    def test_live_web_search_is_rejected(self) -> None:
+        requirements = copy.deepcopy(self.requirements)
+        requirements["allowed_web_search_modes"].append("live")
+        self.assertTrue(
+            any(
+                "disabled or cached" in finding
                 for finding in validate_requirements(requirements, "windows")
             )
         )
@@ -131,22 +171,93 @@ class RegulatedBlueprintTests(unittest.TestCase):
             )
         )
 
-    def test_interactive_command_exception_is_rejected(self) -> None:
+    def test_automatic_execution_rule_is_rejected(self) -> None:
         requirements = copy.deepcopy(self.requirements)
-        requirements["rules"]["prefix_rules"][0]["decision"] = "prompt"
+        requirements["rules"]["prefix_rules"][0]["decision"] = "allow"
         self.assertTrue(
             any(
-                "forbidden execution rules" in finding
+                "prompt or forbid" in finding
+                for finding in validate_requirements(requirements, "windows")
+            )
+        )
+
+    def test_missing_production_change_prohibition_is_rejected(self) -> None:
+        requirements = copy.deepcopy(self.requirements)
+        for rule in requirements["rules"]["prefix_rules"]:
+            rule["decision"] = "prompt"
+        self.assertTrue(
+            any(
+                "human review and forbidden actions" in finding
                 for finding in validate_requirements(requirements, "windows")
             )
         )
 
     def test_approval_policy_mismatch_is_rejected(self) -> None:
         config = copy.deepcopy(self.config)
-        config["approval_policy"] = "on-request"
+        config["approval_policy"] = "never"
         self.assertTrue(
             any(
                 "approval policy" in finding
+                for finding in validate_config(config, self.requirements, "windows")
+            )
+        )
+
+    def test_personal_authentication_mode_is_rejected(self) -> None:
+        config = copy.deepcopy(self.config)
+        config["forced_login_method"] = "api"
+        self.assertTrue(
+            any(
+                "enterprise ChatGPT login" in finding
+                for finding in validate_config(config, self.requirements, "windows")
+            )
+        )
+
+    def test_file_backed_credentials_are_rejected(self) -> None:
+        config = copy.deepcopy(self.config)
+        config["cli_auth_credentials_store"] = "file"
+        self.assertTrue(
+            any(
+                "operating-system keyring" in finding
+                for finding in validate_config(config, self.requirements, "windows")
+            )
+        )
+
+    def test_client_live_search_is_rejected(self) -> None:
+        config = copy.deepcopy(self.config)
+        config["web_search"] = "live"
+        self.assertTrue(
+            any(
+                "allowed enterprise modes" in finding
+                for finding in validate_config(config, self.requirements, "windows")
+            )
+        )
+
+    def test_enabled_optional_analytics_is_rejected(self) -> None:
+        config = copy.deepcopy(self.config)
+        config["analytics"]["enabled"] = True
+        self.assertTrue(
+            any(
+                "optional product analytics" in finding
+                for finding in validate_config(config, self.requirements, "windows")
+            )
+        )
+
+    def test_raw_prompt_telemetry_is_rejected(self) -> None:
+        config = copy.deepcopy(self.config)
+        config["otel"]["log_user_prompt"] = True
+        self.assertTrue(
+            any(
+                "raw user prompts" in finding
+                for finding in validate_config(config, self.requirements, "windows")
+            )
+        )
+
+    def test_default_workspace_network_access_is_rejected(self) -> None:
+        config = copy.deepcopy(self.config)
+        config["sandbox_workspace_write"]["network_access"] = True
+        self.assertTrue(
+            any(
+                "disable command networking" in finding
                 for finding in validate_config(config, self.requirements, "windows")
             )
         )

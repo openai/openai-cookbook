@@ -2,10 +2,10 @@
 # Cross-platform device or user defaults for Codex 0.138.0 or later.
 # Pair this file with the corresponding enforced requirements.toml.
 
-approval_policy = "never"
+approval_policy = "on-request"
 approvals_reviewer = "user"
 default_permissions = "regulated_workspace"
-web_search = "disabled"
+web_search = "cached"
 allow_login_shell = false
 model_reasoning_effort = "medium"
 
@@ -18,6 +18,9 @@ enabled = false
 destructive_enabled = false
 open_world_enabled = false
 
+[analytics]
+enabled = false
+
 [feedback]
 enabled = true
 
@@ -29,6 +32,9 @@ inherit = "core"
 ignore_default_excludes = false
 exclude = ["*PASSWORD*", "*CREDENTIAL*", "*PRIVATE*"]
 
+[sandbox_workspace_write]
+network_access = false
+
 [otel]
-environment = "regulated"
+environment = "regulated-production"
 log_user_prompt = false

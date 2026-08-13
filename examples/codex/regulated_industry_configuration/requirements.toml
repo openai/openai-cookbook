@@ -1,0 +1,71 @@
+# Cross-platform enterprise requirements for Codex 0.138.0 or later.
+# Deploy this file through enterprise-managed configuration or the operating
+# system requirements location. It is an enforced policy, not a user default.
+
+allowed_approval_policies = ["never"]
+allowed_approvals_reviewers = ["user"]
+allowed_web_search_modes = ["disabled"]
+default_permissions = "regulated_workspace"
+allow_managed_hooks_only = true
+allow_appshots = false
+
+# An explicit empty allowlist disables configurable MCP servers. Replace it
+# only after approving an exact server name and its verified identity.
+mcp_servers = {}
+
+# Omitted built-in profiles, including :workspace and :danger-full-access,
+# cannot be selected when this complete allowlist is active.
+[allowed_permission_profiles]
+regulated_workspace = true
+
+# Define the filesystem grants directly instead of extending :workspace,
+# which would inherit broader filesystem read access.
+[permissions.regulated_workspace]
+description = "Edit the selected local workspace without broad filesystem reads, command-network access, or approval-based sandbox escalation."
+
+[permissions.regulated_workspace.filesystem]
+":minimal" = "read"
+glob_scan_max_depth = 6
+
+[permissions.regulated_workspace.filesystem.":workspace_roots"]
+"." = "write"
+".git" = "read"
+".codex" = "read"
+".agents" = "read"
+".devcontainer" = "read"
+".env" = "deny"
+".env.local" = "deny"
+"**/.env" = "deny"
+"**/.env.*" = "deny"
+"**/*.env" = "deny"
+"**/*.key" = "deny"
+"**/*.pem" = "deny"
+"**/*.p12" = "deny"
+"**/*.pfx" = "deny"
+
+[permissions.regulated_workspace.network]
+enabled = false
+
+[features]
+browser_use = false
+browser_use_external = false
+computer_use = false
+enable_mcp_apps = false
+guardian_approval = false
+in_app_browser = false
+memories = false
+memory_tool = false
+remote_control = false
+skill_mcp_dependency_install = false
+
+# Rules add defense in depth. Prefix rules do not inspect every possible shell
+# script and must not replace the filesystem sandbox or operating-system policy.
+[rules]
+prefix_rules = [
+  { pattern = [{ any_of = ["rm", "rmdir"] }], decision = "forbidden", justification = "Destructive filesystem operations require approved controls outside Codex." },
+  { pattern = [{ any_of = ["curl", "wget"] }], decision = "forbidden", justification = "External data transfers require an approved enterprise workflow." },
+  { pattern = [{ token = "git" }, { any_of = ["commit", "push"] }], decision = "forbidden", justification = "Repository publication remains a human-controlled action outside Codex." },
+  { pattern = [{ token = "kubectl" }, { any_of = ["apply", "delete", "patch", "exec", "edit"] }], decision = "forbidden", justification = "Production changes require approved deployment pipelines." },
+  { pattern = [{ token = "terraform" }, { any_of = ["apply", "destroy"] }], decision = "forbidden", justification = "Infrastructure changes require approved change management." },
+  { pattern = [{ token = "gh" }, { token = "pr" }, { token = "merge" }], decision = "forbidden", justification = "Pull-request merges remain human-controlled actions outside Codex." },
+]

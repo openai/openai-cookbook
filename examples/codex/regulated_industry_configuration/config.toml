@@ -1,0 +1,34 @@
+#:schema https://developers.openai.com/codex/config-schema.json
+# Cross-platform device or user defaults for Codex 0.138.0 or later.
+# Pair this file with the corresponding enforced requirements.toml.
+
+approval_policy = "never"
+approvals_reviewer = "user"
+default_permissions = "regulated_workspace"
+web_search = "disabled"
+allow_login_shell = false
+model_reasoning_effort = "medium"
+
+forced_login_method = "chatgpt"
+cli_auth_credentials_store = "keyring"
+mcp_oauth_credentials_store = "keyring"
+
+[apps._default]
+enabled = false
+destructive_enabled = false
+open_world_enabled = false
+
+[feedback]
+enabled = true
+
+[history]
+persistence = "none"
+
+[shell_environment_policy]
+inherit = "core"
+ignore_default_excludes = false
+exclude = ["*PASSWORD*", "*CREDENTIAL*", "*PRIVATE*"]
+
+[otel]
+environment = "regulated"
+log_user_prompt = false

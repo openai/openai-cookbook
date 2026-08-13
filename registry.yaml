@@ -34,7 +34,22 @@
     - bedrock
     - security
 
-- title: Enabling Long-Term Agent Memory with Oracle AI Agent Memory
+- title: Controlled Agentic Commerce with AgentCore Payments
+  path: examples/partners/AWS/controlled_agentic_commerce_with_agentcore_payments/controlled_agentic_commerce.ipynb
+  slug: controlled-agentic-commerce-agentcore-payments
+  description: Build a controlled agentic-commerce workflow with the OpenAI Agents SDK, x402, application-owned payment authority, deterministic validation, and an optional gated Amazon Bedrock AgentCore Payments testnet path.
+  date: 2026-08-13
+  authors:
+    - deepakjain108
+    - sidrampally-oai
+  tags:
+    - partners
+    - agents-sdk
+    - agents
+    - bedrock
+    - security
+    - payments
+    - title: Enabling Long-Term Agent Memory with Oracle AI Agent Memory
   path: examples/vector_databases/oracle_db/deep_research_openai_agents.ipynb
   slug: deep-research-openai-agents
   description: Build a deep-research agent with the OpenAI Agents SDK, Oracle-backed session persistence, durable memory, and Tavily web search.

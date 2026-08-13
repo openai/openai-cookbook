@@ -3,6 +3,9 @@
 from __future__ import annotations
 
 import copy
+import subprocess
+import sys
+import tempfile
 import unittest
 from pathlib import Path
 
@@ -20,8 +23,22 @@ class RegulatedBlueprintTests(unittest.TestCase):
     """Keep every platform on the same supervised enterprise-governance baseline."""
 
     def setUp(self) -> None:
-        self.requirements = load_toml(BLUEPRINT_DIRECTORY / "requirements.windows.toml")
-        self.config = load_toml(BLUEPRINT_DIRECTORY / "config.windows.toml")
+        self.requirements = load_toml(BLUEPRINT_DIRECTORY / "requirements.toml")
+        self.config = load_toml(BLUEPRINT_DIRECTORY / "config.toml")
+
+    def windows_requirements(self) -> dict:
+        """Add the documented optional Windows requirement to the shared policy."""
+
+        requirements = copy.deepcopy(self.requirements)
+        requirements["windows"] = {"allowed_sandbox_implementations": ["elevated"]}
+        return requirements
+
+    def windows_config(self) -> dict:
+        """Add the documented optional Windows client settings to shared defaults."""
+
+        config = copy.deepcopy(self.config)
+        config["windows"] = {"sandbox": "elevated", "sandbox_private_desktop": True}
+        return config
 
     def test_all_reference_blueprints_are_valid(self) -> None:
         for blueprint in BLUEPRINTS:
@@ -35,13 +52,49 @@ class RegulatedBlueprintTests(unittest.TestCase):
                     validate_config(config, requirements, blueprint.platform), []
                 )
 
+    def test_optional_windows_settings_are_valid(self) -> None:
+        requirements = self.windows_requirements()
+        config = self.windows_config()
+        self.assertEqual(validate_requirements(requirements, "windows"), [])
+        self.assertEqual(validate_config(config, requirements, "windows"), [])
+
+    def test_validator_accepts_separate_deployed_windows_files(self) -> None:
+        with tempfile.TemporaryDirectory() as directory:
+            deployed = Path(directory)
+            requirements_path = deployed / "requirements.toml"
+            config_path = deployed / "config.toml"
+            requirements_path.write_text(
+                (BLUEPRINT_DIRECTORY / "requirements.toml").read_text()
+                + '\n[windows]\nallowed_sandbox_implementations = ["elevated"]\n'
+            )
+            config_path.write_text(
+                (BLUEPRINT_DIRECTORY / "config.toml").read_text()
+                + '\n[windows]\nsandbox = "elevated"\nsandbox_private_desktop = true\n'
+            )
+            result = subprocess.run(
+                [
+                    sys.executable,
+                    str(BLUEPRINT_DIRECTORY / "validate_blueprints.py"),
+                    "--platform",
+                    "windows",
+                    "--requirements",
+                    str(requirements_path),
+                    "--config",
+                    str(config_path),
+                ],
+                capture_output=True,
+                text=True,
+            )
+            self.assertEqual(result.returncode, 0, result.stderr)
+            self.assertIn("PASS windows: requirements.toml, config.toml", result.stdout)
+
     def test_root_filesystem_writes_are_rejected(self) -> None:
         requirements = copy.deepcopy(self.requirements)
         requirements["permissions"][PROFILE_NAME]["filesystem"][":root"] = "write"
         self.assertTrue(
             any(
                 "root filesystem writes" in finding
-                for finding in validate_requirements(requirements, "windows")
+                for finding in validate_requirements(requirements, "general")
             )
         )
 
@@ -51,7 +104,7 @@ class RegulatedBlueprintTests(unittest.TestCase):
         self.assertTrue(
             any(
                 "standard workspace profile" in finding
-                for finding in validate_requirements(requirements, "windows")
+                for finding in validate_requirements(requirements, "general")
             )
         )
 
@@ -61,7 +114,7 @@ class RegulatedBlueprintTests(unittest.TestCase):
         self.assertTrue(
             any(
                 "supervised human review" in finding
-                for finding in validate_requirements(requirements, "windows")
+                for finding in validate_requirements(requirements, "general")
             )
         )
 
@@ -71,7 +124,7 @@ class RegulatedBlueprintTests(unittest.TestCase):
         self.assertTrue(
             any(
                 "approvals reviewer" in finding
-                for finding in validate_requirements(requirements, "windows")
+                for finding in validate_requirements(requirements, "general")
             )
         )
 
@@ -81,7 +134,7 @@ class RegulatedBlueprintTests(unittest.TestCase):
         self.assertTrue(
             any(
                 "unrestricted full access" in finding
-                for finding in validate_requirements(requirements, "windows")
+                for finding in validate_requirements(requirements, "general")
             )
         )
 
@@ -91,7 +144,7 @@ class RegulatedBlueprintTests(unittest.TestCase):
         self.assertTrue(
             any(
                 "disabled or cached" in finding
-                for finding in validate_requirements(requirements, "windows")
+                for finding in validate_requirements(requirements, "general")
             )
         )
 
@@ -101,7 +154,7 @@ class RegulatedBlueprintTests(unittest.TestCase):
         self.assertTrue(
             any(
                 "command-network access" in finding
-                for finding in validate_requirements(requirements, "windows")
+                for finding in validate_requirements(requirements, "general")
             )
         )
 
@@ -113,7 +166,7 @@ class RegulatedBlueprintTests(unittest.TestCase):
         self.assertTrue(
             any(
                 "secret-bearing" in finding
-                for finding in validate_requirements(requirements, "windows")
+                for finding in validate_requirements(requirements, "general")
             )
         )
 
@@ -125,7 +178,7 @@ class RegulatedBlueprintTests(unittest.TestCase):
         self.assertTrue(
             any(
                 "secret-bearing" in finding
-                for finding in validate_requirements(requirements, "windows")
+                for finding in validate_requirements(requirements, "general")
             )
         )
 
@@ -137,7 +190,7 @@ class RegulatedBlueprintTests(unittest.TestCase):
         self.assertTrue(
             any(
                 "positive glob scan depth" in finding
-                for finding in validate_requirements(requirements, "windows")
+                for finding in validate_requirements(requirements, "general")
             )
         )
 
@@ -147,12 +200,12 @@ class RegulatedBlueprintTests(unittest.TestCase):
         self.assertTrue(
             any(
                 "MCP allowlist" in finding
-                for finding in validate_requirements(requirements, "windows")
+                for finding in validate_requirements(requirements, "general")
             )
         )
 
     def test_windows_sandbox_fallback_is_rejected(self) -> None:
-        requirements = copy.deepcopy(self.requirements)
+        requirements = self.windows_requirements()
         requirements["windows"]["allowed_sandbox_implementations"].append("unelevated")
         self.assertTrue(
             any(
@@ -162,7 +215,7 @@ class RegulatedBlueprintTests(unittest.TestCase):
         )
 
     def test_unsupported_windows_requirement_is_rejected(self) -> None:
-        requirements = copy.deepcopy(self.requirements)
+        requirements = self.windows_requirements()
         requirements["windows"]["sandbox_private_desktop"] = True
         self.assertTrue(
             any(
@@ -177,7 +230,7 @@ class RegulatedBlueprintTests(unittest.TestCase):
         self.assertTrue(
             any(
                 "prompt or forbid" in finding
-                for finding in validate_requirements(requirements, "windows")
+                for finding in validate_requirements(requirements, "general")
             )
         )
 
@@ -188,7 +241,7 @@ class RegulatedBlueprintTests(unittest.TestCase):
         self.assertTrue(
             any(
                 "human review and forbidden actions" in finding
-                for finding in validate_requirements(requirements, "windows")
+                for finding in validate_requirements(requirements, "general")
             )
         )
 
@@ -198,7 +251,7 @@ class RegulatedBlueprintTests(unittest.TestCase):
         self.assertTrue(
             any(
                 "approval policy" in finding
-                for finding in validate_config(config, self.requirements, "windows")
+                for finding in validate_config(config, self.requirements, "general")
             )
         )
 
@@ -208,7 +261,7 @@ class RegulatedBlueprintTests(unittest.TestCase):
         self.assertTrue(
             any(
                 "enterprise ChatGPT login" in finding
-                for finding in validate_config(config, self.requirements, "windows")
+                for finding in validate_config(config, self.requirements, "general")
             )
         )
 
@@ -218,7 +271,7 @@ class RegulatedBlueprintTests(unittest.TestCase):
         self.assertTrue(
             any(
                 "operating-system keyring" in finding
-                for finding in validate_config(config, self.requirements, "windows")
+                for finding in validate_config(config, self.requirements, "general")
             )
         )
 
@@ -228,7 +281,7 @@ class RegulatedBlueprintTests(unittest.TestCase):
         self.assertTrue(
             any(
                 "allowed enterprise modes" in finding
-                for finding in validate_config(config, self.requirements, "windows")
+                for finding in validate_config(config, self.requirements, "general")
             )
         )
 
@@ -238,7 +291,7 @@ class RegulatedBlueprintTests(unittest.TestCase):
         self.assertTrue(
             any(
                 "optional product analytics" in finding
-                for finding in validate_config(config, self.requirements, "windows")
+                for finding in validate_config(config, self.requirements, "general")
             )
         )
 
@@ -248,7 +301,7 @@ class RegulatedBlueprintTests(unittest.TestCase):
         self.assertTrue(
             any(
                 "raw user prompts" in finding
-                for finding in validate_config(config, self.requirements, "windows")
+                for finding in validate_config(config, self.requirements, "general")
             )
         )
 
@@ -258,27 +311,29 @@ class RegulatedBlueprintTests(unittest.TestCase):
         self.assertTrue(
             any(
                 "disable command networking" in finding
-                for finding in validate_config(config, self.requirements, "windows")
+                for finding in validate_config(config, self.requirements, "general")
             )
         )
 
     def test_unelevated_windows_client_is_rejected(self) -> None:
-        config = copy.deepcopy(self.config)
+        config = self.windows_config()
         config["windows"]["sandbox"] = "unelevated"
+        requirements = self.windows_requirements()
         self.assertTrue(
             any(
                 "elevated sandbox" in finding
-                for finding in validate_config(config, self.requirements, "windows")
+                for finding in validate_config(config, requirements, "windows")
             )
         )
 
     def test_windows_private_desktop_disable_is_rejected(self) -> None:
-        config = copy.deepcopy(self.config)
+        config = self.windows_config()
         config["windows"]["sandbox_private_desktop"] = False
+        requirements = self.windows_requirements()
         self.assertTrue(
             any(
                 "private desktop" in finding
-                for finding in validate_config(config, self.requirements, "windows")
+                for finding in validate_config(config, requirements, "windows")
             )
         )
 
@@ -288,7 +343,7 @@ class RegulatedBlueprintTests(unittest.TestCase):
         self.assertTrue(
             any(
                 "feedback must stay available" in finding
-                for finding in validate_config(config, self.requirements, "windows")
+                for finding in validate_config(config, self.requirements, "general")
             )
         )
 
@@ -298,7 +353,7 @@ class RegulatedBlueprintTests(unittest.TestCase):
         self.assertTrue(
             any(
                 "unsupported in 0.138.0" in finding
-                for finding in validate_config(config, self.requirements, "windows")
+                for finding in validate_config(config, self.requirements, "general")
             )
         )
 

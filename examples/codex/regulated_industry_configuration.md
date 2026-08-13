@@ -2,7 +2,7 @@
 
 Financial services, healthcare, public-sector, and other regulated organizations need more than a filesystem policy when they introduce an AI coding assistant. They need an operating model that covers identity, human oversight, permitted execution modes, network access, integrations, sensitive data, monitoring, change management, and device deployment.
 
-This cookbook provides a general-purpose starting point for supported local Codex desktop, CLI, and IDE clients running version `0.138.0` or later. It includes complete enterprise `requirements.toml` and client `config.toml` examples, deployment variants for macOS and native Windows, and executable checks that keep those files aligned.
+This cookbook provides a general-purpose starting point for supported local Codex desktop, CLI, and IDE clients running version `0.138.0` or later. It includes one complete enterprise `requirements.toml`, one matching client `config.toml`, deployment instructions for macOS and native Windows, and executable checks that keep the two files aligned.
 
 The examples are technical deployment guidance, not a compliance certification, legal interpretation, contractual data-processing commitment, or substitute for an organization-specific risk assessment.
 
@@ -36,7 +36,7 @@ Use this control matrix when translating security and compliance requirements in
 | Data handling | Enforce only supported product requirements; do not invent residency values. | Minimize local history, disable analytics where appropriate, and suppress prompt logging. |
 | Monitoring and support | Review managed hooks and change-control rules. | Configure approved OpenTelemetry settings and retain the ability to submit `/feedback`. |
 | Production safety | Require approval for sensitive development actions and forbid protected production changes. | Route deployment, infrastructure, and merge actions through approved workflows. |
-| Device security | Require the elevated Windows sandbox where native Windows is used. | Deploy platform-specific defaults and verify effective device policy. |
+| Device security | Add the elevated Windows sandbox requirement where native Windows is used. | Add the matching Windows client settings and verify effective device policy. |
 
 The baseline below is supervised, not maximally restrictive. It supports normal engineering work while reserving sensitive actions for human review. Organizations that cannot allow user-approved exceptions should adopt the stricter approval model described later.
 
@@ -231,12 +231,7 @@ Command-prefix rules provide an additional review boundary, but they do not sema
 
 ## Deploy on macOS
 
-Use the complete macOS-specific files:
-
-- [macOS enterprise requirements](regulated_industry_configuration/requirements.macos.toml)
-- [macOS client configuration](regulated_industry_configuration/config.macos.toml)
-
-The macOS baseline preserves the shared governance model and adds review rules for common remote-access and file-transfer commands.
+Deploy the same portable [requirements.toml](regulated_industry_configuration/requirements.toml) and [config.toml](regulated_industry_configuration/config.toml) shown above. No additional macOS-specific TOML files are required.
 
 ### Install managed requirements as a system file
 
@@ -247,12 +242,12 @@ BLUEPRINT_DIR="examples/codex/regulated_industry_configuration"
 
 sudo install -d -m 0755 /etc/codex
 sudo install -m 0644 \
-  "$BLUEPRINT_DIR/requirements.macos.toml" \
+  "$BLUEPRINT_DIR/requirements.toml" \
   /etc/codex/requirements.toml
 
 mkdir -p "$HOME/.codex"
 install -m 0600 \
-  "$BLUEPRINT_DIR/config.macos.toml" \
+  "$BLUEPRINT_DIR/config.toml" \
   "$HOME/.codex/config.toml"
 ```
 
@@ -266,7 +261,7 @@ Create the requirements payload without line wrapping:
 
 ```bash
 base64 -i \
-  examples/codex/regulated_industry_configuration/requirements.macos.toml \
+  examples/codex/regulated_industry_configuration/requirements.toml \
   | tr -d '\n'
 ```
 
@@ -274,7 +269,7 @@ Create the defaults payload separately:
 
 ```bash
 base64 -i \
-  examples/codex/regulated_industry_configuration/config.macos.toml \
+  examples/codex/regulated_industry_configuration/config.toml \
   | tr -d '\n'
 ```
 
@@ -282,19 +277,14 @@ Install each value under the corresponding managed-preferences key. Existing MDM
 
 ## Deploy on native Windows
 
-Use the complete Windows-specific files:
-
-- [Windows enterprise requirements](regulated_industry_configuration/requirements.windows.toml)
-- [Windows client configuration](regulated_industry_configuration/config.windows.toml)
-
-The Windows requirements add an enforced sandbox-implementation restriction:
+Start with the same portable [requirements.toml](regulated_industry_configuration/requirements.toml) and [config.toml](regulated_industry_configuration/config.toml). For Windows deployments that require the stronger native sandbox, add the following section to the deployed `requirements.toml`:
 
 ```toml
 [windows]
 allowed_sandbox_implementations = ["elevated"]
 ```
 
-The corresponding client configuration selects that implementation and keeps private-desktop isolation enabled:
+Add the matching section to the deployed `config.toml` to select that implementation and keep private-desktop isolation enabled:
 
 ```toml
 [windows]
@@ -303,6 +293,8 @@ sandbox_private_desktop = true
 ```
 
 `elevated` describes the Windows sandbox implementation and setup; it does not grant the agent unrestricted administrator privileges. Administrators may need to approve endpoint prerequisites, local sandbox-user creation, or firewall configuration.
+
+Keep these Windows-only additions in the Windows deployment workflow. The shared reference files remain platform-neutral and can also be deployed unchanged on macOS.
 
 From an approved administrative PowerShell session at the cookbook repository root:
 
@@ -313,17 +305,32 @@ $blueprintDirectory = Join-Path `
 
 $managedDirectory = Join-Path $env:ProgramData "OpenAI\Codex"
 $userDirectory = Join-Path $env:USERPROFILE ".codex"
+$deployedRequirements = Join-Path $managedDirectory "requirements.toml"
+$deployedConfig = Join-Path $userDirectory "config.toml"
 
 New-Item -ItemType Directory -Path $managedDirectory -Force
 New-Item -ItemType Directory -Path $userDirectory -Force
 
 Copy-Item `
-    (Join-Path $blueprintDirectory "requirements.windows.toml") `
-    (Join-Path $managedDirectory "requirements.toml")
+    (Join-Path $blueprintDirectory "requirements.toml") `
+    $deployedRequirements
 
 Copy-Item `
-    (Join-Path $blueprintDirectory "config.windows.toml") `
-    (Join-Path $userDirectory "config.toml")
+    (Join-Path $blueprintDirectory "config.toml") `
+    $deployedConfig
+
+Add-Content -Path $deployedRequirements -Value @'
+
+[windows]
+allowed_sandbox_implementations = ["elevated"]
+'@
+
+Add-Content -Path $deployedConfig -Value @'
+
+[windows]
+sandbox = "elevated"
+sandbox_private_desktop = true
+'@
 ```
 
 The system requirements path is `%ProgramData%\OpenAI\Codex\requirements.toml`; the user configuration path is `%USERPROFILE%\.codex\config.toml`. Prefer the organization's standard endpoint-management tooling for production rollout.
@@ -355,12 +362,19 @@ Expected output:
 
 ```text
 PASS general: requirements.toml, config.toml
-PASS macos: requirements.macos.toml, config.macos.toml
-PASS windows: requirements.windows.toml, config.windows.toml
-Validated 3 regulated-industry blueprint pairs for Codex 0.138.0 or later.
+Validated 1 regulated-industry blueprint pair for Codex 0.138.0 or later.
 ```
 
-The validator checks enterprise approval boundaries, allowed operating modes, web-search governance, permission profiles, MCP restrictions, managed features, change-control rules, identity and credential defaults, analytics, history, observability, and Windows sandbox settings.
+The validator checks enterprise approval boundaries, allowed operating modes, web-search governance, permission profiles, MCP restrictions, managed features, change-control rules, identity and credential defaults, analytics, history, and observability.
+
+After adding the Windows-specific sections to the two deployed files, validate their effective content from PowerShell:
+
+```powershell
+python examples/codex/regulated_industry_configuration/validate_blueprints.py `
+  --platform windows `
+  --requirements "$env:ProgramData\OpenAI\Codex\requirements.toml" `
+  --config "$env:USERPROFILE\.codex\config.toml"
+```
 
 To validate client configuration and managed permission profiles against the exact deployed release, save a trusted copy of its `config.schema.json` in the current directory:
 
@@ -394,7 +408,7 @@ Do not include raw credentials, customer data, confidential source code, or othe
 
 Use one managed baseline as the starting point, then create reviewed variations for distinct risk groups. A software engineering group might permit cached search and approved repository integrations, while a production-support group could use read-only permissions and a no-exception approval policy.
 
-Review each change across the full operating model: identity, human oversight, execution, network access, integrations, sensitive data, auditability, and endpoint controls. Keep enterprise requirements and client defaults synchronized, avoid unverified identifiers, and rerun validation for every platform-specific variant.
+Review each change across the full operating model: identity, human oversight, execution, network access, integrations, sensitive data, auditability, and endpoint controls. Keep the two shared files synchronized, avoid unverified identifiers, and validate any Windows-only settings added during deployment.
 
 ## References
 

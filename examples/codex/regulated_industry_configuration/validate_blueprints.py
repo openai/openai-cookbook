@@ -84,11 +84,7 @@ class Blueprint:
     config: str
 
 
-BLUEPRINTS = (
-    Blueprint("general", "requirements.toml", "config.toml"),
-    Blueprint("macos", "requirements.macos.toml", "config.macos.toml"),
-    Blueprint("windows", "requirements.windows.toml", "config.windows.toml"),
-)
+BLUEPRINTS = (Blueprint("general", "requirements.toml", "config.toml"),)
 
 
 def load_toml(path: Path) -> dict[str, Any]:
@@ -289,15 +285,34 @@ def main() -> int:
         type=Path,
         help="Optional Codex config.schema.json for the deployed client version.",
     )
+    parser.add_argument(
+        "--platform",
+        choices=("general", "macos", "windows"),
+        default="general",
+        help="Validate optional platform-specific settings added to the shared files.",
+    )
+    parser.add_argument(
+        "--requirements",
+        type=Path,
+        help="Optional path to a deployed enterprise requirements.toml file.",
+    )
+    parser.add_argument(
+        "--config",
+        type=Path,
+        help="Optional path to a deployed client config.toml file.",
+    )
     options = parser.parse_args()
     directory = Path(__file__).resolve().parent
     failures = 0
 
     for blueprint in BLUEPRINTS:
-        requirements = load_toml(directory / blueprint.requirements)
-        config = load_toml(directory / blueprint.config)
-        findings = validate_requirements(requirements, blueprint.platform)
-        findings.extend(validate_config(config, requirements, blueprint.platform))
+        requirements_path = options.requirements or directory / blueprint.requirements
+        config_path = options.config or directory / blueprint.config
+        requirements = load_toml(requirements_path)
+        config = load_toml(config_path)
+        platform = options.platform
+        findings = validate_requirements(requirements, platform)
+        findings.extend(validate_config(config, requirements, platform))
 
         if options.schema:
             try:
@@ -307,21 +322,19 @@ def main() -> int:
 
         if findings:
             failures += 1
-            print(f"FAIL {blueprint.platform}")
+            print(f"FAIL {platform}")
             for finding in findings:
                 print(f"  - {finding}")
             continue
 
-        print(
-            f"PASS {blueprint.platform}: {blueprint.requirements}, {blueprint.config}"
-        )
+        print(f"PASS {platform}: {requirements_path.name}, {config_path.name}")
 
     if failures:
         print(f"Validation failed for {failures} blueprint pair(s).")
         return 1
 
     print(
-        f"Validated {len(BLUEPRINTS)} regulated-industry blueprint pairs "
+        f"Validated {len(BLUEPRINTS)} regulated-industry blueprint pair "
         f"for Codex {MINIMUM_CODEX_VERSION} or later."
     )
     return 0

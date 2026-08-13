@@ -10,6 +10,10 @@ default_permissions = "regulated_workspace"
 allow_managed_hooks_only = true
 allow_appshots = false
 
+# Optional on Codex 0.146.0 or later: enforce an approved local model catalog.
+# Deploy and protect the catalog on each device before enabling this requirement.
+# model_catalog_json = "/etc/codex/approved-models.json"
+
 # An explicit empty allowlist disables configurable MCP servers. Replace it
 # only after approving an exact server name and its verified identity.
 mcp_servers = {}

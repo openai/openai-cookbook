@@ -7,7 +7,7 @@
 - title: Configure Codex for regulated enterprise environments
   path: examples/codex/regulated_industry_configuration.md
   slug: codex-regulated-industry-configuration
-  description: Configure one enterprise-managed requirements.toml and one matching config.toml for regulated environments, covering identity, approvals, integrations, data handling, observability, and deployment.
+  description: Configure one enterprise-managed requirements.toml and one matching config.toml for regulated environments, covering approved models, identity, approvals, integrations, data handling, observability, and deployment.
   date: 2026-08-13
   authors:
     - OAI-JB

@@ -10,13 +10,14 @@ from __future__ import annotations
 import argparse
 import json
 from dataclasses import dataclass
-from pathlib import Path
+from pathlib import Path, PurePosixPath, PureWindowsPath
 from typing import Any
 
 import tomllib
 
 
 MINIMUM_CODEX_VERSION = "0.138.0"
+MINIMUM_MANAGED_MODEL_CATALOG_VERSION = "0.146.0"
 PROFILE_NAME = "regulated_workspace"
 ALLOWED_APPROVAL_POLICIES = frozenset({"on-request", "untrusted"})
 ALLOWED_SANDBOX_MODES = frozenset({"read-only", "workspace-write"})
@@ -94,13 +95,52 @@ def load_toml(path: Path) -> dict[str, Any]:
         return tomllib.load(source)
 
 
-def validate_requirements(requirements: dict[str, Any], platform: str) -> list[str]:
+def parse_codex_version(version: str) -> tuple[int, int, int]:
+    """Parse a released Codex version without adding a packaging dependency."""
+
+    components = version.split(".")
+    if len(components) != 3 or any(not part.isdecimal() for part in components):
+        raise ValueError("Codex versions must use the format MAJOR.MINOR.PATCH")
+    return int(components[0]), int(components[1]), int(components[2])
+
+
+def is_absolute_local_path(value: Any) -> bool:
+    """Accept absolute device paths and reject remote URLs or network shares."""
+
+    if not isinstance(value, str) or not value or "://" in value:
+        return False
+    if value.startswith(("//", "\\\\")):
+        return False
+    return PurePosixPath(value).is_absolute() or PureWindowsPath(value).is_absolute()
+
+
+def validate_requirements(
+    requirements: dict[str, Any],
+    platform: str,
+    codex_version: str = MINIMUM_CODEX_VERSION,
+) -> list[str]:
     """Return security or compatibility findings for one requirements file."""
 
     findings: list[str] = []
-    unsupported = sorted(set(requirements) - SUPPORTED_REQUIREMENT_KEYS)
+    supports_managed_model_catalog = parse_codex_version(
+        codex_version
+    ) >= parse_codex_version(MINIMUM_MANAGED_MODEL_CATALOG_VERSION)
+    supported_keys = set(SUPPORTED_REQUIREMENT_KEYS)
+    if supports_managed_model_catalog:
+        supported_keys.add("model_catalog_json")
+    unsupported = sorted(set(requirements) - supported_keys)
     if unsupported:
         findings.append(f"unsupported managed requirement keys: {unsupported}")
+
+    model_catalog = requirements.get("model_catalog_json")
+    if model_catalog is not None:
+        if not supports_managed_model_catalog:
+            findings.append(
+                "managed model catalogs require Codex "
+                f"{MINIMUM_MANAGED_MODEL_CATALOG_VERSION} or later"
+            )
+        elif not is_absolute_local_path(model_catalog):
+            findings.append("managed model catalogs must use an absolute local path")
 
     policies = requirements.get("allowed_approval_policies", [])
     if not policies or not set(policies).issubset(ALLOWED_APPROVAL_POLICIES):
@@ -209,6 +249,19 @@ def validate_config(
     if config.get("mcp_oauth_credentials_store") != "keyring":
         findings.append("MCP OAuth credentials must use the operating-system keyring")
 
+    required_model_catalog = requirements.get("model_catalog_json")
+    configured_model_catalog = config.get("model_catalog_json")
+    if configured_model_catalog is not None and not is_absolute_local_path(
+        configured_model_catalog
+    ):
+        findings.append("client model catalogs must use an absolute local path")
+    if (
+        required_model_catalog is not None
+        and configured_model_catalog is not None
+        and configured_model_catalog != required_model_catalog
+    ):
+        findings.append("client model catalog must match the managed requirement")
+
     apps = config.get("apps", {}).get("_default", {})
     if any(
         apps.get(setting) is not False
@@ -249,6 +302,72 @@ def validate_config(
     elif windows:
         findings.append("non-Windows client defaults must not include Windows settings")
 
+    return findings
+
+
+def validate_model_catalog(
+    catalog: dict[str, Any], config: dict[str, Any]
+) -> list[str]:
+    """Validate approved model choices and supported reasoning defaults."""
+
+    models = catalog.get("models")
+    if not isinstance(models, list) or not models:
+        return ["the approved model catalog must contain at least one model"]
+
+    findings: list[str] = []
+    models_by_slug: dict[str, dict[str, Any]] = {}
+    for model in models:
+        if not isinstance(model, dict) or not isinstance(model.get("slug"), str):
+            findings.append("every approved model needs a valid model slug")
+            continue
+
+        slug = model["slug"]
+        if not slug:
+            findings.append("every approved model needs a valid model slug")
+            continue
+        if slug in models_by_slug:
+            findings.append(f"the approved model catalog repeats model {slug!r}")
+            continue
+        models_by_slug[slug] = model
+
+        reasoning_levels = model.get("supported_reasoning_levels")
+        if not isinstance(reasoning_levels, list) or not reasoning_levels:
+            findings.append(f"approved model {slug!r} needs supported reasoning levels")
+            continue
+        efforts = {
+            level.get("effort")
+            for level in reasoning_levels
+            if isinstance(level, dict) and isinstance(level.get("effort"), str)
+        }
+        if len(efforts) != len(reasoning_levels):
+            findings.append(f"approved model {slug!r} has invalid reasoning levels")
+            continue
+        if model.get("default_reasoning_level") not in efforts:
+            findings.append(
+                f"approved model {slug!r} needs an approved default reasoning level"
+            )
+
+    selected_model = config.get("model")
+    if selected_model is None:
+        return findings
+    if selected_model not in models_by_slug:
+        findings.append(
+            "the configured default model must appear in the approved catalog"
+        )
+        return findings
+
+    supported_levels = models_by_slug[selected_model].get(
+        "supported_reasoning_levels", []
+    )
+    if not isinstance(supported_levels, list):
+        return findings
+    supported_efforts = {
+        level.get("effort") for level in supported_levels if isinstance(level, dict)
+    }
+    if config.get("model_reasoning_effort") not in supported_efforts:
+        findings.append(
+            "the configured reasoning effort must be approved for the default model"
+        )
     return findings
 
 
@@ -301,7 +420,24 @@ def main() -> int:
         type=Path,
         help="Optional path to a deployed client config.toml file.",
     )
+    parser.add_argument(
+        "--codex-version",
+        default=MINIMUM_CODEX_VERSION,
+        help="Deployed Codex release in MAJOR.MINOR.PATCH format.",
+    )
+    parser.add_argument(
+        "--model-catalog",
+        type=Path,
+        help="Optional approved model catalog to validate against client defaults.",
+    )
     options = parser.parse_args()
+    try:
+        codex_version = parse_codex_version(options.codex_version)
+    except ValueError as error:
+        parser.error(str(error))
+    if codex_version < parse_codex_version(MINIMUM_CODEX_VERSION):
+        parser.error(f"this blueprint requires Codex {MINIMUM_CODEX_VERSION} or later")
+
     directory = Path(__file__).resolve().parent
     failures = 0
 
@@ -311,8 +447,18 @@ def main() -> int:
         requirements = load_toml(requirements_path)
         config = load_toml(config_path)
         platform = options.platform
-        findings = validate_requirements(requirements, platform)
+        findings = validate_requirements(requirements, platform, options.codex_version)
         findings.extend(validate_config(config, requirements, platform))
+
+        if options.model_catalog:
+            try:
+                with options.model_catalog.open(encoding="utf-8") as source:
+                    catalog = json.load(source)
+                if not isinstance(catalog, dict):
+                    raise ValueError("the model catalog root must be a JSON object")
+                findings.extend(validate_model_catalog(catalog, config))
+            except (OSError, ValueError) as error:
+                findings.append(f"model catalog validation failed: {error}")
 
         if options.schema:
             try:
@@ -335,7 +481,7 @@ def main() -> int:
 
     print(
         f"Validated {len(BLUEPRINTS)} regulated-industry blueprint pair "
-        f"for Codex {MINIMUM_CODEX_VERSION} or later."
+        f"for Codex {options.codex_version} or later."
     )
     return 0
 

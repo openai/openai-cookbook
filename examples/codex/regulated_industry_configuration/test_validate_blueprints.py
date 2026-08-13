@@ -3,6 +3,7 @@
 from __future__ import annotations
 
 import copy
+import json
 import subprocess
 import sys
 import tempfile
@@ -13,6 +14,7 @@ from validate_blueprints import BLUEPRINTS
 from validate_blueprints import PROFILE_NAME
 from validate_blueprints import load_toml
 from validate_blueprints import validate_config
+from validate_blueprints import validate_model_catalog
 from validate_blueprints import validate_requirements
 
 
@@ -39,6 +41,22 @@ class RegulatedBlueprintTests(unittest.TestCase):
         config = copy.deepcopy(self.config)
         config["windows"] = {"sandbox": "elevated", "sandbox_private_desktop": True}
         return config
+
+    def approved_model_catalog(self) -> dict:
+        """Create a small catalog with one approved model and reasoning level."""
+
+        return {
+            "models": [
+                {
+                    "slug": "gpt-5.6-luna",
+                    "default_reasoning_level": "medium",
+                    "supported_reasoning_levels": [
+                        {"effort": "low", "description": "Faster responses"},
+                        {"effort": "medium", "description": "Balanced responses"},
+                    ],
+                }
+            ]
+        }
 
     def test_all_reference_blueprints_are_valid(self) -> None:
         for blueprint in BLUEPRINTS:
@@ -87,6 +105,155 @@ class RegulatedBlueprintTests(unittest.TestCase):
             )
             self.assertEqual(result.returncode, 0, result.stderr)
             self.assertIn("PASS windows: requirements.toml, config.toml", result.stdout)
+
+    def test_managed_model_catalog_requires_version_0146(self) -> None:
+        requirements = copy.deepcopy(self.requirements)
+        requirements["model_catalog_json"] = "/etc/codex/approved-models.json"
+        self.assertTrue(
+            any(
+                "require Codex 0.146.0 or later" in finding
+                for finding in validate_requirements(requirements, "general")
+            )
+        )
+
+    def test_managed_model_catalog_is_valid_on_version_0146(self) -> None:
+        requirements = copy.deepcopy(self.requirements)
+        requirements["model_catalog_json"] = "/etc/codex/approved-models.json"
+        self.assertEqual(validate_requirements(requirements, "general", "0.146.0"), [])
+
+    def test_windows_managed_model_catalog_accepts_device_path(self) -> None:
+        requirements = self.windows_requirements()
+        requirements["model_catalog_json"] = (
+            r"C:\ProgramData\OpenAI\Codex\approved-models.json"
+        )
+        self.assertEqual(validate_requirements(requirements, "windows", "0.146.0"), [])
+
+    def test_remote_managed_model_catalog_is_rejected(self) -> None:
+        requirements = copy.deepcopy(self.requirements)
+        requirements["model_catalog_json"] = "https://example.com/approved-models.json"
+        self.assertTrue(
+            any(
+                "absolute local path" in finding
+                for finding in validate_requirements(requirements, "general", "0.146.0")
+            )
+        )
+
+    def test_network_share_model_catalog_is_rejected(self) -> None:
+        requirements = self.windows_requirements()
+        requirements["model_catalog_json"] = r"\\server\share\approved-models.json"
+        self.assertTrue(
+            any(
+                "absolute local path" in finding
+                for finding in validate_requirements(requirements, "windows", "0.146.0")
+            )
+        )
+
+    def test_client_model_catalog_must_match_managed_catalog(self) -> None:
+        requirements = copy.deepcopy(self.requirements)
+        requirements["model_catalog_json"] = "/etc/codex/approved-models.json"
+        config = copy.deepcopy(self.config)
+        config["model_catalog_json"] = "/etc/codex/other-models.json"
+        self.assertTrue(
+            any(
+                "match the managed requirement" in finding
+                for finding in validate_config(config, requirements, "general")
+            )
+        )
+
+    def test_remote_client_model_catalog_is_rejected(self) -> None:
+        config = copy.deepcopy(self.config)
+        config["model_catalog_json"] = "https://example.com/approved-models.json"
+        self.assertTrue(
+            any(
+                "absolute local path" in finding
+                for finding in validate_config(config, self.requirements, "general")
+            )
+        )
+
+    def test_approved_model_catalog_matches_client_defaults(self) -> None:
+        config = copy.deepcopy(self.config)
+        config["model"] = "gpt-5.6-luna"
+        self.assertEqual(
+            validate_model_catalog(self.approved_model_catalog(), config), []
+        )
+
+    def test_empty_approved_model_catalog_is_rejected(self) -> None:
+        self.assertTrue(
+            any(
+                "at least one model" in finding
+                for finding in validate_model_catalog({"models": []}, self.config)
+            )
+        )
+
+    def test_unapproved_default_model_is_rejected(self) -> None:
+        config = copy.deepcopy(self.config)
+        config["model"] = "unapproved-model"
+        self.assertTrue(
+            any(
+                "default model must appear" in finding
+                for finding in validate_model_catalog(
+                    self.approved_model_catalog(), config
+                )
+            )
+        )
+
+    def test_unapproved_reasoning_effort_is_rejected(self) -> None:
+        config = copy.deepcopy(self.config)
+        config["model"] = "gpt-5.6-luna"
+        config["model_reasoning_effort"] = "xhigh"
+        self.assertTrue(
+            any(
+                "reasoning effort must be approved" in finding
+                for finding in validate_model_catalog(
+                    self.approved_model_catalog(), config
+                )
+            )
+        )
+
+    def test_unapproved_catalog_reasoning_default_is_rejected(self) -> None:
+        catalog = self.approved_model_catalog()
+        catalog["models"][0]["default_reasoning_level"] = "xhigh"
+        self.assertTrue(
+            any(
+                "approved default reasoning level" in finding
+                for finding in validate_model_catalog(catalog, self.config)
+            )
+        )
+
+    def test_validator_accepts_managed_model_catalog_deployment(self) -> None:
+        with tempfile.TemporaryDirectory() as directory:
+            deployed = Path(directory)
+            requirements_path = deployed / "requirements.toml"
+            config_path = deployed / "config.toml"
+            catalog_path = deployed / "approved-models.json"
+            catalog_path.write_text(json.dumps(self.approved_model_catalog()))
+            requirements_path.write_text(
+                f'model_catalog_json = "{catalog_path}"\n'
+                + (BLUEPRINT_DIRECTORY / "requirements.toml").read_text()
+            )
+            config_path.write_text(
+                'model = "gpt-5.6-luna"\n'
+                + f'model_catalog_json = "{catalog_path}"\n'
+                + (BLUEPRINT_DIRECTORY / "config.toml").read_text()
+            )
+            result = subprocess.run(
+                [
+                    sys.executable,
+                    str(BLUEPRINT_DIRECTORY / "validate_blueprints.py"),
+                    "--codex-version",
+                    "0.146.0",
+                    "--requirements",
+                    str(requirements_path),
+                    "--config",
+                    str(config_path),
+                    "--model-catalog",
+                    str(catalog_path),
+                ],
+                capture_output=True,
+                text=True,
+            )
+            self.assertEqual(result.returncode, 0, result.stderr)
+            self.assertIn("for Codex 0.146.0 or later", result.stdout)
 
     def test_root_filesystem_writes_are_rejected(self) -> None:
         requirements = copy.deepcopy(self.requirements)

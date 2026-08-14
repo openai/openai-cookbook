@@ -1,0 +1,33 @@
+name: Activate AUMARA post-stay voucher
+
+on:
+  workflow_dispatch:
+  push:
+    branches: [main]
+    paths:
+      - ".github/workflows/aumara-voucher-activate.yml"
+      - "aumara-control-tower/scripts/beds24_aumara_voucher_activate.py"
+
+permissions:
+  contents: read
+
+concurrency:
+  group: aumara-voucher-activate
+  cancel-in-progress: false
+
+jobs:
+  activate:
+    runs-on: ubuntu-latest
+    env:
+      BEDS24_REFRESH_TOKEN: ${{ secrets.BEDS24_REFRESH_CREDENTIAL }}
+      AUMARA_VOUCHER_CODE: AUMGIB90045089
+      AUMARA_VOUCHER_PERCENT: "10"
+      AUMARA_VOUCHER_APPLY: "1"
+    steps:
+      - uses: actions/checkout@v5
+      - name: Validate script
+        run: python -m py_compile aumara-control-tower/scripts/beds24_aumara_voucher_activate.py
+      - name: Verify existing Beds24 credential is present
+        run: test -n "$BEDS24_REFRESH_TOKEN"
+      - name: Activate and verify AUMARA voucher
+        run: python aumara-control-tower/scripts/beds24_aumara_voucher_activate.py

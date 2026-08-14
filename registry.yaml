@@ -4,10 +4,10 @@
 # should build pages for, and indicates metadata such as tags, creation date and
 # authors for each page.
 
-- title: Testing Agent Recovery from Tool Failures with the OpenAI Agents SDK
+- title: Testing agent recovery from tool failures with the OpenAI Agents SDK
   path: examples/agents_sdk/testing_agent_recovery_from_tool_failures.ipynb
   slug: testing-agent-recovery-from-tool-failures
-  description: Build and evaluate an Agents SDK workflow that recovers safely from transient, permanent, and ambiguous tool failures without duplicating side effects.
+  description: Build and evaluate an Agents SDK workflow with account-scoped recovery, approved idempotent writes, and deterministic tool-failure tests.
   date: 2026-07-29
   authors:
     - saptob
@@ -17,7 +17,6 @@
     - agents-sdk
     - agents
     - evals
-    - guardrails
     - promptfoo
     - idempotency
 
@@ -35,6 +34,37 @@
     - migration
     - whisper
 
+- title: AML Analysis with the Agents SDK on Amazon Bedrock
+  path: examples/partners/AWS/evidence_grounded_aml_agent_with_bedrock.ipynb
+  slug: evidence-grounded-aml-agent-amazon-bedrock
+  description: Run a synthetic AML analysis with the OpenAI Agents SDK and GPT-5.6 Sol on Amazon Bedrock, verify structured claims against deterministic evidence, test failure cases, and enforce an application-owned human review gate.
+  date: 2026-07-23
+  authors:
+    - deepakjain108
+  tags:
+    - partners
+    - agents-sdk
+    - agents
+    - evals
+    - structured-outputs
+    - bedrock
+    - security
+
+- title: Controlled Agentic Commerce with AgentCore Payments
+  path: examples/partners/AWS/controlled_agentic_commerce_with_agentcore_payments/controlled_agentic_commerce.ipynb
+  slug: controlled-agentic-commerce-agentcore-payments
+  description: Build a controlled agentic-commerce workflow with the OpenAI Agents SDK, x402, application-owned payment authority, deterministic validation, and an optional gated Amazon Bedrock AgentCore Payments testnet path.
+  date: 2026-08-13
+  authors:
+    - deepakjain108
+    - sidrampally-oai
+  tags:
+    - partners
+    - agents-sdk
+    - agents
+    - bedrock
+    - security
+    - payments
 - title: Enabling Long-Term Agent Memory with Oracle AI Agent Memory
   path: examples/vector_databases/oracle_db/deep_research_openai_agents.ipynb
   slug: deep-research-openai-agents

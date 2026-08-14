@@ -17,7 +17,7 @@ You will create a GitLab pipeline that:
 5. Preserves `scan-manifest.json`, `findings.json`, `coverage.json`, `report.md`, and structured JSON output.
 6. Exports SARIF through a successful report job so GitLab can ingest the findings.
 7. Preserves the original scanner status and enforces it in a separate final policy gate.
-8. Optionally validates and patches one high- or critical-severity finding from a trusted default-branch scan.
+8. Optionally validates and patches one high- or critical-severity finding, or one explicitly approved finding identified by its exact rule ID, from a trusted default-branch scan.
 9. Retains the patch and before-and-after verification evidence, then optionally creates a draft GitLab merge request without automatically merging it.
 10. Runs focused, credential-free tests on unprotected automatic-remediation merge requests.
 
@@ -552,16 +552,21 @@ codex-security-remediate:
       fi
 
       set +e
-      python3 - "$RESULTS_DIR" "$CI_COMMIT_SHA" "$SELECTED_FINDING" <<'PY'
+      python3 - "$RESULTS_DIR" "$CI_COMMIT_SHA" "$SELECTED_FINDING" \
+        "${CODEX_SECURITY_REMEDIATION_RULE_ID:-}" <<'PY'
       import json
       import pathlib
+      import re
       import sys
 
       results = pathlib.Path(sys.argv[1])
       expected_revision = sys.argv[2]
       destination = pathlib.Path(sys.argv[3])
+      remediation_rule = sys.argv[4]
 
       try:
+          if remediation_rule and not re.fullmatch(r"[A-Za-z0-9][A-Za-z0-9._-]{0,199}", remediation_rule):
+              raise ValueError("configured remediation rule ID is invalid")
           manifest = json.loads((results / "scan-manifest.json").read_text())
           coverage = json.loads((results / "coverage.json").read_text())
           document = json.loads((results / "findings.json").read_text())
@@ -576,27 +581,33 @@ codex-security-remediate:
           if not isinstance(document.get("findings"), list):
               raise ValueError("findings.json does not contain a findings array")
 
-          ranks = {"critical": 2, "high": 1}
+          ranks = {"critical": 4, "high": 3, "medium": 2, "low": 1, "info": 0}
           candidates = []
           for finding in document["findings"]:
               if not isinstance(finding, dict):
                   raise ValueError("finding must be a JSON object")
               severity = finding.get("severity", {})
               level = severity.get("level") if isinstance(severity, dict) else None
-              if level not in ranks:
+              policy_match = bool(remediation_rule) and finding.get("ruleId") == remediation_rule
+              if level not in {"critical", "high"} and not policy_match:
                   continue
+              if level not in ranks:
+                  raise ValueError("selected finding has an unsupported severity")
               occurrence_id = finding.get("occurrenceId")
               if not isinstance(occurrence_id, str) or not occurrence_id:
-                  raise ValueError("high-severity finding has no occurrenceId")
+                  raise ValueError("selected remediation finding has no occurrenceId")
               candidates.append((-ranks[level], occurrence_id, finding))
 
           if not candidates:
-              print("No high- or critical-severity finding requires remediation.")
+              print("No high-severity or explicitly configured finding requires remediation.")
               sys.exit(10)
 
           _, occurrence_id, finding = min(candidates)
           destination.write_text(json.dumps(finding, indent=2) + "\n")
-          print(f"Selected Codex Security finding {occurrence_id}.")
+          print(
+              f"Selected Codex Security finding {occurrence_id} "
+              f"with severity {finding['severity']['level']}."
+          )
       except (KeyError, OSError, TypeError, ValueError) as error:
           print(f"Cannot safely select a remediation finding: {error}", file=sys.stderr)
           sys.exit(2)
@@ -1057,7 +1068,7 @@ The pipeline checks that the required GitLab variable is present and runs [`--dr
 
 ## Step 5: Enable guarded vulnerability remediation
 
-Keep scanning separate from repository writes. The optional remediation job processes one high- or critical-severity finding from a completed default-branch scan, while the optional publishing job receives the GitLab write credential only after a focused regression check passes.
+Keep scanning separate from repository writes. By default, the optional remediation job processes one high- or critical-severity finding from a completed default-branch scan. A protected project variable can also approve one finding by its exact rule ID when the reported severity changes between scans. The optional publishing job receives the GitLab write credential only after a focused regression check passes.
 
 The [Security CLI reference](https://learn.chatgpt.com/docs/security/cli/reference) provides the two commands used by the pipeline:
 
@@ -1081,10 +1092,13 @@ Add these protected project CI/CD variables before enabling remediation:
 | --- | --- | --- | --- |
 | `CODEX_SECURITY_ENABLE_REMEDIATION` | Yes | `true` | Enable remediation only for protected default-branch push, manual, or scheduled pipelines |
 | `CODEX_SECURITY_VERIFICATION_COMMAND` | Yes | `npm test -- --runInBand tests/security-regression.test.ts` | Run an existing focused regression check that exits `1` before the fix and `0` afterward |
+| `CODEX_SECURITY_REMEDIATION_RULE_ID` | No | `missing-authorization.team-owner-actions` | Additionally approve one exact stable finding rule ID without enabling remediation for other medium- or low-severity findings |
 | `CODEX_SECURITY_SETUP_COMMAND` | No | `npm ci` | Install project dependencies before running the regression check |
 | `CODEX_SECURITY_REMEDIATION_EFFORT` | No | `high` | Override the remediation job's default reasoning effort |
 | `CODEX_SECURITY_MAX_CHANGED_FILES` | No | `8` | Limit the patch to between one and 20 reviewed source and test files |
 | `CODEX_SECURITY_GITLAB_INTERNAL_URL` | No | `http://gitlab` | Override the GitLab API and Git push URL only when a container cannot reach the advertised server URL |
+
+Model-assigned severity can vary between complete scans even when a finding's stable `ruleId`, vulnerable code, and reproducible regression are unchanged. Leave `CODEX_SECURITY_REMEDIATION_RULE_ID` unset to keep the default high-and-critical policy. If your security team has independently approved a specific finding for remediation, set this protected variable to its single exact, non-empty rule ID. The pipeline rejects malformed identifiers, does not interpret prefixes, globs, regular expressions, or lists, and never enables remediation for unrelated medium-severity findings. Critical and high findings retain priority. Your security team owns this exception and should remove it when it is no longer required.
 
 Use a security regression test that already exists on the vulnerable revision. Test the security invariant, not one prescribed implementation: a complete authorization fix might enforce an owner check in a shared wrapper or protect every affected sink independently. A command that passes before remediation cannot demonstrate the original issue, and an exit such as `127` usually indicates a missing tool rather than a reproduced vulnerability. Repository setup and verification run with known OpenAI, GitLab job, repository, container-registry, and deployment credentials removed from their child-process environments. Validation and patching receive only a process-scoped `CODEX_API_KEY` and do not inherit those GitLab credentials. Scope additional project-specific secrets to the jobs that require them, and keep credentials out of both command variables.
 
@@ -1093,14 +1107,14 @@ Set `CODEX_SECURITY_MAX_CHANGED_FILES` to the smallest bounded value that allows
 The remediation job checks that:
 
 1. The scan manifest is complete, the scan revision matches `CI_COMMIT_SHA`, and coverage is `complete`.
-2. The finding comes from `findings.json`, has severity `high` or `critical`, and has an `occurrenceId`.
+2. The finding comes from `findings.json`, has severity `high` or `critical` or exactly matches the protected approved rule ID, and has an `occurrenceId`.
 3. No GitLab repository-write token is available to the remediation process.
 4. The regression check fails with exit `1` on the original revision.
 5. Codex Security validates the finding and generates a focused source or test change.
 6. The patch stays within the changed-file limit and does not modify CI configuration, Git metadata, environment files, private keys, or binary files.
 7. The same regression check passes after the fix, and revalidation does not modify the verified patch.
 
-The job stores `finding.json`, `fix.patch`, both validation reports, the patch report, and before-and-after regression logs in `codex-security-remediation/`. Artifact downloads are restricted to project Maintainers and Owners. A clean scan with no high- or critical-severity findings exits successfully without generating a patch.
+The job stores `finding.json`, `fix.patch`, both validation reports, the patch report, and before-and-after regression logs in `codex-security-remediation/`. Artifact downloads are restricted to project Maintainers and Owners. A scan with no high- or critical-severity finding and no explicitly approved rule match exits successfully without generating a patch.
 
 ### Optionally create a draft merge request
 

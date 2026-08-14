@@ -1,31 +1,40 @@
-# Cross-platform regulated-enterprise requirements for Codex 0.138.0 or later.
+# Cross-platform regulated-enterprise requirements for the latest Codex release.
 # Deploy through enterprise-managed configuration or the system policy path.
 # These requirements establish governance boundaries, not user defaults.
 
+allowed_login_methods = ["chatgpt"]
 allowed_approval_policies = ["on-request", "untrusted"]
 allowed_approvals_reviewers = ["user"]
-allowed_sandbox_modes = ["read-only", "workspace-write"]
 allowed_web_search_modes = ["disabled", "cached"]
 default_permissions = "regulated_workspace"
+allow_login_shell = false
 allow_managed_hooks_only = true
 allow_appshots = false
+allow_remote_control = false
 
-# Optional on Codex 0.146.0 or later: enforce an approved local model catalog.
-# Deploy and protect the catalog on each device before enabling this requirement.
+# Optionally enforce an approved model catalog installed on each managed device.
 # model_catalog_json = "/etc/codex/approved-models.json"
 
-# An explicit empty allowlist disables configurable MCP servers. Replace it
-# only after approving an exact server name and its verified identity.
+# Explicit empty allowlists block standalone and plugin-bundled MCP servers.
+# Add only approved, verified server and plugin identities.
 mcp_servers = {}
+plugins = {}
 
-# Permit inspection-only work and the approved engineering profile, but not
-# unrestricted full access or unmanaged custom profiles.
+# Pin approved enterprise workspace IDs only after independently verifying them.
+# Configure allowed_chatgpt_workspaces through the managed deployment workflow.
+
 [allowed_permission_profiles]
 ":read-only" = true
+regulated_read_only = true
 regulated_workspace = true
 
-# Extend the standard workspace profile for normal engineering compatibility.
-# Organizations that require narrower reads should define explicit roots instead.
+[permissions.regulated_read_only]
+description = "Inspect approved files without modifying the workspace or using command networking."
+extends = ":read-only"
+
+[permissions.regulated_read_only.network]
+enabled = false
+
 [permissions.regulated_workspace]
 description = "Use the standard workspace sandbox with human oversight, protected secrets, and restricted command networking."
 extends = ":workspace"
@@ -47,6 +56,28 @@ glob_scan_max_depth = 6
 [permissions.regulated_workspace.network]
 enabled = false
 
+# Protect sensitive credentials across approved profiles, not only inside roots.
+# Native Windows shell reads also require operating-system and endpoint controls.
+[permissions.filesystem]
+deny_read = [
+  "~/.ssh/id_rsa",
+  "~/.ssh/id_ed25519",
+  "~/.aws/credentials",
+  "~/.azure",
+  "~/.config/gcloud",
+  "~/.kube/config",
+  "~/.docker/config.json",
+  "~/.npmrc",
+  "~/.pypirc",
+  "~/.netrc",
+  "/**/.env",
+  "/**/*.env",
+  "/**/*.pem",
+  "/**/*.key",
+  "/**/*.p12",
+  "/**/*.pfx",
+]
+
 [features]
 browser_use = false
 browser_use_external = false
@@ -56,17 +87,32 @@ guardian_approval = false
 in_app_browser = false
 memories = false
 memory_tool = false
+plugin_sharing = false
 remote_control = false
+remote_plugin = false
 skill_mcp_dependency_install = false
 
-# Require human review for sensitive development actions. Block production and
-# infrastructure changes that belong in an approved deployment workflow.
+# Prompt for reviewable engineering actions and forbid high-risk operations.
 [rules]
 prefix_rules = [
-  { pattern = [{ any_of = ["rm", "rmdir"] }], decision = "prompt", justification = "A human must review destructive filesystem operations." },
-  { pattern = [{ any_of = ["curl", "wget"] }], decision = "prompt", justification = "A human must review attempted network access or data transfer." },
-  { pattern = [{ token = "git" }, { any_of = ["commit", "push"] }], decision = "prompt", justification = "A human must approve repository commits and publication." },
-  { pattern = [{ token = "kubectl" }, { any_of = ["apply", "delete", "patch", "exec", "edit"] }], decision = "forbidden", justification = "Production changes require approved deployment pipelines." },
+  { pattern = [{ token = "rm" }, { any_of = ["-rf", "-fr", "-Rf", "-fR"] }], decision = "forbidden", justification = "Forced recursive deletion is not allowed." },
+  { pattern = [{ token = "Remove-Item" }, { token = "-Recurse" }, { token = "-Force" }], decision = "forbidden", justification = "Forced recursive deletion is not allowed." },
+  { pattern = [{ token = "Remove-Item" }, { token = "-Force" }, { token = "-Recurse" }], decision = "forbidden", justification = "Forced recursive deletion is not allowed." },
+  { pattern = [{ any_of = ["rm", "rmdir", "del", "Remove-Item"] }], decision = "prompt", justification = "A human must review destructive filesystem operations." },
+  { pattern = [{ token = "git" }, { token = "reset" }, { token = "--hard" }], decision = "forbidden", justification = "A hard reset can discard uncommitted work." },
+  { pattern = [{ token = "git" }, { any_of = ["commit", "push", "clean", "rebase", "checkout", "switch"] }], decision = "prompt", justification = "A human must approve repository mutations and publication." },
+  { pattern = [{ any_of = ["curl", "wget", "Invoke-WebRequest", "Invoke-RestMethod"] }], decision = "prompt", justification = "A human must review attempted data transfer." },
+  { pattern = [{ any_of = ["npm", "pnpm", "yarn", "pip", "pip3", "uv"] }, { any_of = ["install", "add"] }], decision = "prompt", justification = "Dependency changes require approved package sources and human review." },
+  { pattern = [{ any_of = ["docker", "podman"] }, { any_of = ["run", "pull", "build", "push"] }], decision = "prompt", justification = "Container execution and registry changes require human review." },
+  { pattern = [{ any_of = ["ngrok", "localtunnel", "devtunnel"] }], decision = "forbidden", justification = "Public tunneling is not allowed; use an approved internal environment." },
+  { pattern = [{ token = "cloudflared" }, { token = "tunnel" }], decision = "forbidden", justification = "Public tunneling is not allowed; use an approved internal environment." },
+  { pattern = [{ token = "code" }, { token = "tunnel" }], decision = "forbidden", justification = "Editor tunnels are not allowed without an approved exception." },
+  { pattern = [{ token = "ssh" }, { any_of = ["-R", "-L", "-D"] }], decision = "forbidden", justification = "SSH port forwarding and tunnels require an approved external workflow." },
+  { pattern = [{ any_of = ["sudo", "su", "runas", "pkexec"] }], decision = "forbidden", justification = "Privilege escalation is not allowed from agent-managed sessions." },
+  { pattern = [{ any_of = ["mimikatz", "procdump", "procdump.exe"] }], decision = "forbidden", justification = "Credential extraction and process-memory dumping are not allowed." },
+  { pattern = [{ any_of = ["reg", "reg.exe"] }, { any_of = ["add", "delete", "import"] }], decision = "forbidden", justification = "Windows registry changes require approved endpoint-management workflows." },
+  { pattern = [{ any_of = ["sc", "sc.exe"] }, { any_of = ["create", "config", "delete"] }], decision = "forbidden", justification = "Windows service changes require approved endpoint-management workflows." },
+  { pattern = [{ token = "kubectl" }, { any_of = ["apply", "delete", "patch", "exec", "edit", "port-forward"] }], decision = "forbidden", justification = "Production changes and service exposure require approved deployment pipelines." },
   { pattern = [{ token = "terraform" }, { any_of = ["apply", "destroy"] }], decision = "forbidden", justification = "Infrastructure changes require approved change management." },
   { pattern = [{ token = "gh" }, { token = "pr" }, { token = "merge" }], decision = "forbidden", justification = "Pull-request merges remain human-controlled actions outside Codex." },
 ]

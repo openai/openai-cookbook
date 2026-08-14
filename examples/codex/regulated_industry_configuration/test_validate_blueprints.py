@@ -12,6 +12,7 @@ from pathlib import Path
 
 from validate_blueprints import BLUEPRINTS
 from validate_blueprints import PROFILE_NAME
+from validate_blueprints import READ_ONLY_PROFILE_NAME
 from validate_blueprints import load_toml
 from validate_blueprints import validate_config
 from validate_blueprints import validate_model_catalog
@@ -32,7 +33,10 @@ class RegulatedBlueprintTests(unittest.TestCase):
         """Add the documented optional Windows requirement to the shared policy."""
 
         requirements = copy.deepcopy(self.requirements)
-        requirements["windows"] = {"allowed_sandbox_implementations": ["elevated"]}
+        requirements["windows"] = {
+            "allowed_sandbox_implementations": ["elevated"],
+            "sandbox_private_desktop": True,
+        }
         return requirements
 
     def windows_config(self) -> dict:
@@ -84,6 +88,7 @@ class RegulatedBlueprintTests(unittest.TestCase):
             requirements_path.write_text(
                 (BLUEPRINT_DIRECTORY / "requirements.toml").read_text()
                 + '\n[windows]\nallowed_sandbox_implementations = ["elevated"]\n'
+                + "sandbox_private_desktop = true\n"
             )
             config_path.write_text(
                 (BLUEPRINT_DIRECTORY / "config.toml").read_text()
@@ -106,27 +111,17 @@ class RegulatedBlueprintTests(unittest.TestCase):
             self.assertEqual(result.returncode, 0, result.stderr)
             self.assertIn("PASS windows: requirements.toml, config.toml", result.stdout)
 
-    def test_managed_model_catalog_requires_version_0146(self) -> None:
+    def test_managed_model_catalog_is_valid_on_latest_release(self) -> None:
         requirements = copy.deepcopy(self.requirements)
         requirements["model_catalog_json"] = "/etc/codex/approved-models.json"
-        self.assertTrue(
-            any(
-                "require Codex 0.146.0 or later" in finding
-                for finding in validate_requirements(requirements, "general")
-            )
-        )
-
-    def test_managed_model_catalog_is_valid_on_version_0146(self) -> None:
-        requirements = copy.deepcopy(self.requirements)
-        requirements["model_catalog_json"] = "/etc/codex/approved-models.json"
-        self.assertEqual(validate_requirements(requirements, "general", "0.146.0"), [])
+        self.assertEqual(validate_requirements(requirements, "general"), [])
 
     def test_windows_managed_model_catalog_accepts_device_path(self) -> None:
         requirements = self.windows_requirements()
         requirements["model_catalog_json"] = (
             r"C:\ProgramData\OpenAI\Codex\approved-models.json"
         )
-        self.assertEqual(validate_requirements(requirements, "windows", "0.146.0"), [])
+        self.assertEqual(validate_requirements(requirements, "windows"), [])
 
     def test_remote_managed_model_catalog_is_rejected(self) -> None:
         requirements = copy.deepcopy(self.requirements)
@@ -134,7 +129,7 @@ class RegulatedBlueprintTests(unittest.TestCase):
         self.assertTrue(
             any(
                 "absolute local path" in finding
-                for finding in validate_requirements(requirements, "general", "0.146.0")
+                for finding in validate_requirements(requirements, "general")
             )
         )
 
@@ -144,7 +139,7 @@ class RegulatedBlueprintTests(unittest.TestCase):
         self.assertTrue(
             any(
                 "absolute local path" in finding
-                for finding in validate_requirements(requirements, "windows", "0.146.0")
+                for finding in validate_requirements(requirements, "windows")
             )
         )
 
@@ -240,8 +235,6 @@ class RegulatedBlueprintTests(unittest.TestCase):
                 [
                     sys.executable,
                     str(BLUEPRINT_DIRECTORY / "validate_blueprints.py"),
-                    "--codex-version",
-                    "0.146.0",
                     "--requirements",
                     str(requirements_path),
                     "--config",
@@ -253,7 +246,7 @@ class RegulatedBlueprintTests(unittest.TestCase):
                 text=True,
             )
             self.assertEqual(result.returncode, 0, result.stderr)
-            self.assertIn("for Codex 0.146.0 or later", result.stdout)
+            self.assertIn("for the latest Codex release", result.stdout)
 
     def test_root_filesystem_writes_are_rejected(self) -> None:
         requirements = copy.deepcopy(self.requirements)
@@ -297,7 +290,7 @@ class RegulatedBlueprintTests(unittest.TestCase):
 
     def test_full_access_sandbox_mode_is_rejected(self) -> None:
         requirements = copy.deepcopy(self.requirements)
-        requirements["allowed_sandbox_modes"].append("danger-full-access")
+        requirements["allowed_sandbox_modes"] = ["danger-full-access"]
         self.assertTrue(
             any(
                 "unrestricted full access" in finding
@@ -381,12 +374,12 @@ class RegulatedBlueprintTests(unittest.TestCase):
             )
         )
 
-    def test_unsupported_windows_requirement_is_rejected(self) -> None:
+    def test_missing_windows_private_desktop_requirement_is_rejected(self) -> None:
         requirements = self.windows_requirements()
-        requirements["windows"]["sandbox_private_desktop"] = True
+        requirements["windows"]["sandbox_private_desktop"] = False
         self.assertTrue(
             any(
-                "unsupported 0.138.0" in finding
+                "enforce a private desktop" in finding
                 for finding in validate_requirements(requirements, "windows")
             )
         )
@@ -408,6 +401,38 @@ class RegulatedBlueprintTests(unittest.TestCase):
         self.assertTrue(
             any(
                 "human review and forbidden actions" in finding
+                for finding in validate_requirements(requirements, "general")
+            )
+        )
+
+    def test_missing_tunnel_prohibition_is_rejected(self) -> None:
+        requirements = copy.deepcopy(self.requirements)
+        requirements["rules"]["prefix_rules"] = [
+            rule
+            for rule in requirements["rules"]["prefix_rules"]
+            if not any(
+                "ngrok" in matcher.get("any_of", []) for matcher in rule["pattern"]
+            )
+        ]
+        self.assertTrue(
+            any(
+                "high-risk command must be forbidden: ngrok" in finding
+                for finding in validate_requirements(requirements, "general")
+            )
+        )
+
+    def test_missing_privilege_escalation_prohibition_is_rejected(self) -> None:
+        requirements = copy.deepcopy(self.requirements)
+        requirements["rules"]["prefix_rules"] = [
+            rule
+            for rule in requirements["rules"]["prefix_rules"]
+            if not any(
+                "sudo" in matcher.get("any_of", []) for matcher in rule["pattern"]
+            )
+        ]
+        self.assertTrue(
+            any(
+                "high-risk command must be forbidden: sudo" in finding
                 for finding in validate_requirements(requirements, "general")
             )
         )
@@ -472,12 +497,12 @@ class RegulatedBlueprintTests(unittest.TestCase):
             )
         )
 
-    def test_default_workspace_network_access_is_rejected(self) -> None:
+    def test_legacy_workspace_sandbox_settings_are_rejected(self) -> None:
         config = copy.deepcopy(self.config)
-        config["sandbox_workspace_write"]["network_access"] = True
+        config["sandbox_workspace_write"] = {"network_access": False}
         self.assertTrue(
             any(
-                "disable command networking" in finding
+                "legacy sandbox settings" in finding
                 for finding in validate_config(config, self.requirements, "general")
             )
         )
@@ -514,13 +539,136 @@ class RegulatedBlueprintTests(unittest.TestCase):
             )
         )
 
-    def test_unsupported_shell_filter_format_is_rejected(self) -> None:
+    def test_mixed_shell_filter_formats_are_rejected(self) -> None:
         config = copy.deepcopy(self.config)
         config["shell_environment_policy"]["filters"] = {"*PASSWORD*": "exclude"}
         self.assertTrue(
             any(
-                "unsupported in 0.138.0" in finding
+                "must not mix keyed filters" in finding
                 for finding in validate_config(config, self.requirements, "general")
+            )
+        )
+
+    def test_non_enterprise_managed_login_is_rejected(self) -> None:
+        requirements = copy.deepcopy(self.requirements)
+        requirements["allowed_login_methods"] = ["api"]
+        self.assertTrue(
+            any(
+                "only enterprise ChatGPT" in finding
+                for finding in validate_requirements(requirements, "general")
+            )
+        )
+
+    def test_unverified_workspace_identifier_is_rejected(self) -> None:
+        requirements = copy.deepcopy(self.requirements)
+        requirements["allowed_chatgpt_workspaces"] = ["not-a-workspace-id"]
+        self.assertTrue(
+            any(
+                "valid UUIDs" in finding
+                for finding in validate_requirements(requirements, "general")
+            )
+        )
+
+    def test_approved_workspace_identifier_is_accepted(self) -> None:
+        requirements = copy.deepcopy(self.requirements)
+        requirements["allowed_chatgpt_workspaces"] = [
+            "2b14bd54-a607-4c40-a0bd-90c3269a7d55"
+        ]
+        self.assertEqual(validate_requirements(requirements, "general"), [])
+
+    def test_client_workspace_must_match_managed_allowlist(self) -> None:
+        requirements = copy.deepcopy(self.requirements)
+        requirements["allowed_chatgpt_workspaces"] = [
+            "2b14bd54-a607-4c40-a0bd-90c3269a7d55"
+        ]
+        config = copy.deepcopy(self.config)
+        config["forced_chatgpt_workspace_id"] = "1c276944-966e-451c-8563-09eb1890b937"
+        self.assertTrue(
+            any(
+                "managed workspace allowlist" in finding
+                for finding in validate_config(config, requirements, "general")
+            )
+        )
+
+    def test_enabled_managed_login_shell_is_rejected(self) -> None:
+        requirements = copy.deepcopy(self.requirements)
+        requirements["allow_login_shell"] = True
+        self.assertTrue(
+            any(
+                "disable login shells" in finding
+                for finding in validate_requirements(requirements, "general")
+            )
+        )
+
+    def test_enabled_remote_control_is_rejected(self) -> None:
+        requirements = copy.deepcopy(self.requirements)
+        requirements["allow_remote_control"] = True
+        self.assertTrue(
+            any(
+                "remote control" in finding
+                for finding in validate_requirements(requirements, "general")
+            )
+        )
+
+    def test_unrestricted_plugin_servers_are_rejected(self) -> None:
+        requirements = copy.deepcopy(self.requirements)
+        del requirements["plugins"]
+        self.assertTrue(
+            any(
+                "plugin allowlist" in finding
+                for finding in validate_requirements(requirements, "general")
+            )
+        )
+
+    def test_missing_global_credential_denial_is_rejected(self) -> None:
+        requirements = copy.deepcopy(self.requirements)
+        requirements["permissions"]["filesystem"]["deny_read"].remove(
+            "~/.aws/credentials"
+        )
+        self.assertTrue(
+            any(
+                "global deny-read" in finding
+                for finding in validate_requirements(requirements, "general")
+            )
+        )
+
+    def test_non_read_only_inspection_profile_is_rejected(self) -> None:
+        requirements = copy.deepcopy(self.requirements)
+        requirements["permissions"][READ_ONLY_PROFILE_NAME]["extends"] = ":workspace"
+        self.assertTrue(
+            any(
+                "inspection profile must extend" in finding
+                for finding in validate_requirements(requirements, "general")
+            )
+        )
+
+    def test_network_enabled_inspection_profile_is_rejected(self) -> None:
+        requirements = copy.deepcopy(self.requirements)
+        requirements["permissions"][READ_ONLY_PROFILE_NAME]["network"]["enabled"] = True
+        self.assertTrue(
+            any(
+                "inspection profile must disable" in finding
+                for finding in validate_requirements(requirements, "general")
+            )
+        )
+
+    def test_reviewed_windows_fallback_requires_explicit_opt_in(self) -> None:
+        requirements = self.windows_requirements()
+        requirements["windows"]["allowed_sandbox_implementations"] = ["unelevated"]
+        config = self.windows_config()
+        config["windows"]["sandbox"] = "unelevated"
+        self.assertTrue(validate_requirements(requirements, "windows"))
+        self.assertTrue(validate_config(config, requirements, "windows"))
+        self.assertEqual(validate_requirements(requirements, "windows", True), [])
+        self.assertEqual(validate_config(config, requirements, "windows", True), [])
+
+    def test_unknown_windows_requirement_is_rejected(self) -> None:
+        requirements = self.windows_requirements()
+        requirements["windows"]["unknown_setting"] = True
+        self.assertTrue(
+            any(
+                "unsupported managed settings" in finding
+                for finding in validate_requirements(requirements, "windows")
             )
         )
 

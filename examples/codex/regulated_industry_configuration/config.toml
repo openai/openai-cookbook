@@ -1,5 +1,5 @@
 #:schema https://developers.openai.com/codex/config-schema.json
-# Cross-platform device or user defaults for Codex 0.138.0 or later.
+# Cross-platform device or user defaults for the latest Codex release.
 # Pair this file with the corresponding enforced requirements.toml.
 
 approval_policy = "on-request"
@@ -36,9 +36,6 @@ persistence = "none"
 inherit = "core"
 ignore_default_excludes = false
 exclude = ["*PASSWORD*", "*CREDENTIAL*", "*PRIVATE*"]
-
-[sandbox_workspace_write]
-network_access = false
 
 [otel]
 environment = "regulated-production"

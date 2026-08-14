@@ -1,25 +1,19 @@
 # Detect and remediate vulnerabilities in GitLab CI with Codex Security
 
-A platform team maintains a Next.js SaaS application in GitLab. The team wants security feedback on eligible merge requests between protected branches, broader coverage after changes reach the default branch, and the option to run deeper reviews for high-risk releases. When a trusted default-branch scan discovers a serious vulnerability, it also wants a focused, verified fix without automatically merging code or giving repository-write credentials to the scanner.
+Use [`@openai/codex-security`](https://learn.chatgpt.com/docs/security/cli) with GitLab CI/CD to scan protected merge requests, review the default branch, publish SARIF findings, and optionally propose verified security fixes as draft merge requests.
 
-In this cookbook, you will integrate the dedicated [`@openai/codex-security`](https://learn.chatgpt.com/docs/security/cli) package with GitLab CI/CD. You will start with three scan profiles, preserve structured security evidence, publish SARIF to GitLab, and optionally validate and fix one serious finding. A separate, opt-in publishing job can open a draft merge request after a configured regression check fails before the fix and passes afterward.
-
-The example was validated with a Docker-based runner and a Next.js SaaS demo application. The YAML does not hard-code a runner tag, so the same pipeline pattern can use any eligible trusted runner on GitLab.com, GitLab Self-Managed, or GitLab Dedicated. Add an organization-specific runner tag only when your project requires one, and adapt the image and security controls to your environment.
+The scanner never receives repository-write credentials, and generated fixes require human review. The example was validated with a Docker-based runner and a Next.js SaaS application, but the pipeline can use any eligible trusted runner on GitLab.com, GitLab Self-Managed, or GitLab Dedicated.
 
 ## What you will build
 
 You will create a GitLab pipeline that:
 
-1. Runs a committed-diff scan for eligible merge requests between protected branches.
-2. Runs a full standard scan on the default branch.
-3. Supports an optional scheduled deep scan.
-4. Assigns effort by profile and documents optional model, knowledge-base, severity, and cost controls.
-5. Preserves `scan-manifest.json`, `findings.json`, `coverage.json`, `report.md`, and structured JSON output.
-6. Exports SARIF through a successful report job so GitLab can ingest the findings.
-7. Preserves the original scanner status and enforces it in a separate final policy gate.
-8. Optionally validates and patches one high- or critical-severity finding from a trusted default-branch scan.
-9. Retains the patch and before-and-after verification evidence, then optionally creates a draft GitLab merge request without automatically merging it.
-10. Runs focused, credential-free tests on unprotected automatic-remediation merge requests.
+1. Scans protected merge request diffs and the default branch, with optional scheduled deep reviews.
+2. Preserves structured findings, coverage, scan metadata, and human-readable reports.
+3. Publishes SARIF through a successful report job and enforces scanner status in a separate gate.
+4. Optionally validates and patches one high- or critical-severity finding.
+5. Creates an optional draft merge request after a focused regression check verifies the fix.
+6. Tests unprotected remediation merge requests without exposing protected credentials.
 
 The finished workflow selects a scan profile from the GitLab pipeline event:
 
@@ -82,90 +76,17 @@ The example pins `@openai/codex-security` to the tested `0.1.11` release with `C
 
 The job rules are self-contained so the example can be added to an existing pipeline without replacing its global `workflow`. If the project already uses [`workflow: rules`](https://docs.gitlab.com/ci/yaml/workflow/), make sure it permits eligible [merge request pipelines](https://docs.gitlab.com/ci/pipelines/merge_request_pipelines/), default-branch pushes and manual runs, and scheduled pipelines.
 
-The pipeline is easier to adapt when each part has one clear responsibility.
-
 ### Route eligible pipeline events to scan profiles
 
-The hidden `.codex-security-rules` job maps each supported GitLab event to the profiles selected in Step 2. A scheduled pipeline receives a deep repository scan, a protected default-branch push or manual run receives a standard repository scan, and an eligible merge request between protected branches in the same project receives a focused diff scan. The protected variable and GitLab's protected-resource checks still determine whether the job receives the credential.
+The hidden `.codex-security-rules` job maps each supported GitLab event to a scan profile. Scheduled pipelines receive deep repository scans, protected default-branch pushes and manual runs share the standard repository profile, and eligible merge requests between protected branches receive focused diff scans. The protected variable and GitLab's protected-resource checks still determine whether a job receives the credential.
 
 If the repository already defines stages, add `security_scan`, `security_remediation`, `security_publish`, and `security_gate` to the existing list instead of replacing test, build, or deployment stages. The remediation and publishing stages remain empty unless remediation is explicitly enabled.
-
-This part of the file defines the shared routing logic:
-
-```text
-variables:
-  CODEX_SECURITY_VERSION: "0.1.11"
-
-stages:
-  - security_scan
-  - security_remediation
-  - security_publish
-  - security_gate
-
-.codex-security-rules:
-  rules:
-    - if: '$CI_PIPELINE_SOURCE == "schedule"'
-      variables:
-        CODEX_SECURITY_TARGET: "repository"
-        CODEX_SECURITY_MODE: "deep"
-        CODEX_SECURITY_EFFORT: "xhigh"
-    - if: '$CI_PIPELINE_SOURCE == "merge_request_event" && $CI_MERGE_REQUEST_SOURCE_PROJECT_ID == $CI_PROJECT_ID && $CI_MERGE_REQUEST_SOURCE_BRANCH_PROTECTED == "true" && $CI_MERGE_REQUEST_TARGET_BRANCH_PROTECTED == "true"'
-      variables:
-        CODEX_SECURITY_TARGET: "diff"
-        CODEX_SECURITY_MODE: "standard"
-        CODEX_SECURITY_EFFORT: "low"
-    - if: '$CI_PIPELINE_SOURCE == "push" && $CI_COMMIT_BRANCH == $CI_DEFAULT_BRANCH'
-      variables:
-        CODEX_SECURITY_TARGET: "repository"
-        CODEX_SECURITY_MODE: "standard"
-        CODEX_SECURITY_EFFORT: "high"
-    - if: '$CI_PIPELINE_SOURCE == "web" && $CI_COMMIT_REF_PROTECTED == "true" && $CI_COMMIT_BRANCH == $CI_DEFAULT_BRANCH'
-      variables:
-        CODEX_SECURITY_TARGET: "repository"
-        CODEX_SECURITY_MODE: "standard"
-        CODEX_SECURITY_EFFORT: "high"
-```
 
 ### Install the tested CLI outside the checkout
 
 The scan and remediation jobs share a Node.js image and install the pinned Security CLI release under `/tmp`. Installing it outside the checked-out repository and invoking its absolute path prevents repository-controlled executables from replacing the command. `--ignore-scripts` prevents dependency lifecycle scripts from running during installation. Git, Python, ripgrep, certificates, and `util-linux` provide the runtime and sandbox prerequisites used by the CLI.
 
-The YAML intentionally omits `tags` so GitLab can select any eligible runner configured for the project. If your organization requires tagged runners, add its trusted security-runner tag to this job. The `unshare` check fails before a paid scan when the selected runner cannot start the Codex sandbox.
-
-This hidden job and `before_script` prepare the trusted runtime:
-
-```text
-.codex-security-runtime:
-  image: node:26-bookworm-slim
-  variables:
-    GIT_DEPTH: "0"
-  before_script:
-    - |
-      set -eu
-
-      CLI_DIR="/tmp/codex-security-cli"
-
-      apt-get update -qq > /dev/null
-      apt-get install -y -qq --no-install-recommends \
-        ca-certificates git python3 ripgrep util-linux
-
-      npm install \
-        --prefix "$CLI_DIR" \
-        --ignore-scripts \
-        --no-audit \
-        --no-fund \
-        --loglevel=error \
-        "@openai/codex-security@$CODEX_SECURITY_VERSION"
-
-      export CODEX_SECURITY_BIN="$CLI_DIR/node_modules/.bin/codex-security"
-      "$CODEX_SECURITY_BIN" --version
-
-codex-security:
-  extends:
-    - .codex-security-runtime
-    - .codex-security-rules
-  stage: security_scan
-```
+The YAML omits `tags` so GitLab can select any eligible runner configured for the project. Add your organization's trusted security-runner tag only when required. The `unshare` check fails before a paid scan when the selected runner cannot start the Codex sandbox.
 
 ### Build an exact and reproducible scan target
 
@@ -175,74 +96,11 @@ The pipeline tested for this cookbook also hashes the deterministic binary Git d
 
 Repository profiles do not calculate a diff. They pass the selected `standard` or `deep` mode directly to the CLI.
 
-The target-selection block implements both paths:
-
-```text
-      unset CODEX_SECURITY_TARGET_SNAPSHOT_DIGEST
-
-      case "$CODEX_SECURITY_TARGET" in
-        diff)
-          BASE_REVISION="$(git merge-base \
-            "$CI_MERGE_REQUEST_DIFF_BASE_SHA" \
-            "$CI_COMMIT_SHA")"
-
-          DIFF_DIGEST="$(
-            git diff --binary --full-index --no-ext-diff --no-textconv \
-              "$BASE_REVISION" "$CI_COMMIT_SHA" \
-              | python3 -c 'import hashlib, sys; print(hashlib.sha256(sys.stdin.buffer.read()).hexdigest())'
-          )"
-          export CODEX_SECURITY_TARGET_SNAPSHOT_DIGEST="codex-security-snapshot/v1:sha256:$DIFF_DIGEST"
-
-          set -- --diff "$BASE_REVISION" --head "$CI_COMMIT_SHA"
-          ;;
-        repository)
-          set -- --mode "$CODEX_SECURITY_MODE"
-          ;;
-        *)
-          echo "Unsupported scan target: ${CODEX_SECURITY_TARGET:-unset}" >&2
-          exit 2
-          ;;
-      esac
-```
-
 ### Validate configuration before starting the scan
 
 The job validates that `CODEX_SECURITY_API_KEY` is present, creates private job-specific state and result directories under `/tmp`, and then runs [`--dry-run`](https://learn.chatgpt.com/docs/security/cli/reference). With `--auth api-key`, Security CLI `0.1.11` requires a process-scoped `OPENAI_API_KEY` even for this preflight. The dry run checks the repository, target, output directory, and configuration without starting a paid scan, but its `verified: false` result does not establish key entitlement, model access, available quota, or current rate-limit capacity.
 
-`CODEX_SECURITY_API_KEY` is mapped to `OPENAI_API_KEY` separately for the dry run and the paid scan. The job removes supported credential variables immediately after the scan so later artifact and export commands do not inherit them.
-
-The first excerpt validates the secret and creates private, job-specific paths:
-
-```text
-      if test -z "${CODEX_SECURITY_API_KEY:-}"; then
-        echo "Missing required GitLab CI/CD variable: CODEX_SECURITY_API_KEY" >&2
-        exit 2
-      fi
-
-      STATE_DIR="/tmp/codex-security-state-$CI_JOB_ID"
-      RESULTS_DIR="/tmp/codex-security-results-$CI_JOB_ID"
-      JSON_FILE="/tmp/codex-security-$CI_JOB_ID.json"
-      ARTIFACT_DIR="codex-security-artifacts"
-      SARIF_FILE="$ARTIFACT_DIR/results.sarif"
-
-      install -d -m 700 "$STATE_DIR" "$RESULTS_DIR" "$ARTIFACT_DIR/results"
-```
-
-The second excerpt runs both the preflight and the paid scan with process-scoped credentials:
-
-```text
-      OPENAI_API_KEY="$CODEX_SECURITY_API_KEY" \
-        "$CODEX_SECURITY_BIN" scan . "$@" --dry-run
-
-      set +e
-      OPENAI_API_KEY="$CODEX_SECURITY_API_KEY" \
-      CODEX_SECURITY_STATE_DIR="$STATE_DIR" \
-        "$CODEX_SECURITY_BIN" scan . "$@" > "$JSON_FILE"
-      scan_exit="$?"
-      set -e
-
-      unset OPENAI_API_KEY CODEX_API_KEY CODEX_ACCESS_TOKEN CODEX_SECURITY_API_KEY
-```
+`CODEX_SECURITY_API_KEY` is mapped to `OPENAI_API_KEY` separately for the dry run and the paid scan. The job removes supported credential variables immediately afterward so artifact and export commands do not inherit them.
 
 ### Publish SARIF before enforcing scan policy
 
@@ -252,69 +110,6 @@ GitLab can upload a SARIF artifact from a failed report job without ingesting it
 
 GitLab retains the full artifact directory for seven days and ingests `results.sarif` through `artifacts:reports:sarif` when the report job succeeds. [`artifacts:access: maintainer`](https://docs.gitlab.com/ci/yaml/#artifactsaccess) restricts UI and API downloads to Maintainers and Owners because the retained evidence can contain source excerpts and vulnerability details. It does not block access through CI/CD job tokens or prevent artifacts from being forwarded to downstream pipelines, so configure project visibility and pipeline access separately.
 
-This block verifies available evidence, publishes the report, and preserves the original scan status:
-
-```text
-      cp -R "$RESULTS_DIR"/. "$ARTIFACT_DIR/results/"
-      test ! -s "$JSON_FILE" || cp "$JSON_FILE" "$ARTIFACT_DIR/codex-security.json"
-
-      if ! test -s "$RESULTS_DIR/scan-manifest.json"; then
-        echo "The scan did not produce a sealed manifest." >&2
-        exit 2
-      fi
-
-      set +e
-      "$CODEX_SECURITY_BIN" export "$RESULTS_DIR" \
-        --export-format sarif \
-        --source-root "$CI_PROJECT_DIR" \
-        --output "$SARIF_FILE"
-      export_exit="$?"
-      set -e
-
-      if test "$export_exit" -ne 0 || ! test -s "$SARIF_FILE"; then
-        echo "The sealed scan did not produce a non-empty SARIF report." >&2
-        exit 2
-      fi
-
-      case "$scan_exit" in
-        0|1) ;;
-        2)
-          if ! python3 - "$RESULTS_DIR/scan-manifest.json" "$RESULTS_DIR/coverage.json" <<'PY'
-      import json
-      import pathlib
-      import sys
-
-      try:
-          manifest = json.loads(pathlib.Path(sys.argv[1]).read_text())
-          coverage = json.loads(pathlib.Path(sys.argv[2]).read_text())
-          valid = (
-              manifest.get("scan", {}).get("status") == "completed"
-              and coverage.get("completeness") == "partial"
-          )
-          sys.exit(0 if valid else 1)
-      except (OSError, TypeError, ValueError):
-          sys.exit(1)
-      PY
-          then
-            echo "Exit 2 is not a completed partial scan with valid evidence." >&2
-            exit 2
-          fi
-          ;;
-        *) echo "Unexpected Codex Security exit code: $scan_exit" >&2; exit 2 ;;
-      esac
-
-      printf '%s\n' "$scan_exit" > "$ARTIFACT_DIR/scan-exit-code.txt"
-      exit 0
-  artifacts:
-    when: always
-    access: maintainer
-    expire_in: 7 days
-    paths:
-      - codex-security-artifacts/
-    reports:
-      sarif: codex-security-artifacts/results.sarif
-```
-
 During initial calibration, only the final policy gate uses `allow_failure: exit_codes: [2]` to make a verified partial-coverage result advisory. The report job never masks missing credentials, sandbox failures, missing evidence, export errors, or unexplained scanner exit `2`. Remove the gate's temporary allowance when incomplete coverage must block the pipeline.
 
 The complete file below combines scanning with optional remediation and draft merge request publication. Copy it into the repository root as `.gitlab-ci.yml`, or merge its stages, hidden templates, and jobs into an existing pipeline. The remediation jobs are excluded until you configure the opt-in variables described in Step 5.
@@ -322,6 +117,7 @@ The complete file below combines scanning with optional remediation and draft me
 ```yaml
 variables:
   CODEX_SECURITY_VERSION: "0.1.11"
+  CODEX_SECURITY_MAX_CHANGED_FILES: "8"
 
 stages:
   - security_scan
@@ -341,12 +137,7 @@ stages:
         CODEX_SECURITY_TARGET: "diff"
         CODEX_SECURITY_MODE: "standard"
         CODEX_SECURITY_EFFORT: "low"
-    - if: '$CI_PIPELINE_SOURCE == "push" && $CI_COMMIT_BRANCH == $CI_DEFAULT_BRANCH'
-      variables:
-        CODEX_SECURITY_TARGET: "repository"
-        CODEX_SECURITY_MODE: "standard"
-        CODEX_SECURITY_EFFORT: "high"
-    - if: '$CI_PIPELINE_SOURCE == "web" && $CI_COMMIT_REF_PROTECTED == "true" && $CI_COMMIT_BRANCH == $CI_DEFAULT_BRANCH'
+    - if: '$CI_COMMIT_REF_PROTECTED == "true" && $CI_COMMIT_BRANCH == $CI_DEFAULT_BRANCH && ($CI_PIPELINE_SOURCE == "push" || $CI_PIPELINE_SOURCE == "web")'
       variables:
         CODEX_SECURITY_TARGET: "repository"
         CODEX_SECURITY_MODE: "standard"
@@ -524,7 +315,6 @@ codex-security-remediate:
     name: codex-security/remediate
   variables:
     CODEX_SECURITY_REMEDIATION_EFFORT: "high"
-    CODEX_SECURITY_MAX_CHANGED_FILES: "8"
   rules:
     - if: '$CODEX_SECURITY_ENABLE_REMEDIATION == "true" && $CI_COMMIT_REF_PROTECTED == "true" && $CI_COMMIT_BRANCH == $CI_DEFAULT_BRANCH && ($CI_PIPELINE_SOURCE == "push" || $CI_PIPELINE_SOURCE == "schedule" || $CI_PIPELINE_SOURCE == "web")'
   needs:
@@ -759,8 +549,6 @@ codex-security-draft-mr:
   image: python:3.13-slim
   environment:
     name: codex-security/publish
-  variables:
-    CODEX_SECURITY_MAX_CHANGED_FILES: "8"
   rules:
     - if: '$CODEX_SECURITY_ENABLE_REMEDIATION == "true" && $CODEX_SECURITY_CREATE_MR == "true" && $CI_COMMIT_REF_PROTECTED == "true" && $CI_COMMIT_BRANCH == $CI_DEFAULT_BRANCH && ($CI_PIPELINE_SOURCE == "push" || $CI_PIPELINE_SOURCE == "schedule" || $CI_PIPELINE_SOURCE == "web")'
   needs:
@@ -1144,8 +932,6 @@ Use a committed diff for merge request feedback. Use repeated `--path` arguments
 ### 3. Use standard mode for routine scans
 
 Start with standard mode for full repository and path scans. Run deep mode on a schedule, manually, or for specifically identified high-risk components.
-
-There is no documented `--fast` mode. Faster configurations come from target selection, effort, model selection, and cadence.
 
 ### 4. Tune reasoning effort with evidence
 

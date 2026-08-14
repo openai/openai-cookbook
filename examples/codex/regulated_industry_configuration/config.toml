@@ -35,7 +35,11 @@ persistence = "none"
 [shell_environment_policy]
 inherit = "core"
 ignore_default_excludes = false
-exclude = ["*PASSWORD*", "*CREDENTIAL*", "*PRIVATE*"]
+
+[shell_environment_policy.filters]
+"*PASSWORD*" = "exclude"
+"*CREDENTIAL*" = "exclude"
+"*PRIVATE*" = "exclude"
 
 [otel]
 environment = "regulated-production"

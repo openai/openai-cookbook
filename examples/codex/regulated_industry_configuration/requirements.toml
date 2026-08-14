@@ -2,7 +2,6 @@
 # Deploy through enterprise-managed configuration or the system policy path.
 # These requirements establish governance boundaries, not user defaults.
 
-allowed_login_methods = ["chatgpt"]
 allowed_approval_policies = ["on-request", "untrusted"]
 allowed_approvals_reviewers = ["user"]
 allowed_web_search_modes = ["disabled", "cached"]
@@ -19,9 +18,6 @@ allow_remote_control = false
 # Add only approved, verified server and plugin identities.
 mcp_servers = {}
 plugins = {}
-
-# Pin approved enterprise workspace IDs only after independently verifying them.
-# Configure allowed_chatgpt_workspaces through the managed deployment workflow.
 
 [allowed_permission_profiles]
 ":read-only" = true

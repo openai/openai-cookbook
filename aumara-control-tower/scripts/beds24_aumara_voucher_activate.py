@@ -69,6 +69,25 @@ def fetch_property(token: str, api_base: str) -> dict:
     return rows[0]
 
 
+def normalize_credential(value: str | None) -> str:
+    return "".join((value or "").strip().strip('"').strip("'").split())
+
+
+def exchange_refresh_token(refresh_credential: str, api_base: str) -> str:
+    status, response = request_json(
+        "GET",
+        "/authentication/token",
+        headers={"refreshToken": refresh_credential},
+        api_base=api_base,
+    )
+    token = normalize_credential(
+        response.get("token") if isinstance(response, dict) else ""
+    )
+    if not token:
+        raise VoucherError(f"Beds24 token exchange failed: HTTP {status}")
+    return token
+
+
 def plan(vouchers: list[dict]) -> tuple[list[dict], int, bool]:
     occurrences = [(row, phrases(row)) for row in vouchers if CODE in phrases(row)]
     if occurrences:
@@ -97,7 +116,16 @@ def main() -> int:
     if not re.fullmatch(r"[A-Za-z0-9]+", CODE):
         raise VoucherError("Voucher code must be strictly alphanumeric")
     token, _, api_base, _, _ = get_access_token()
-    prop = fetch_property(token, api_base)
+    try:
+        prop = fetch_property(token, api_base)
+    except VoucherError as exc:
+        if "HTTP 401" not in str(exc) and "HTTP 403" not in str(exc):
+            raise
+        refresh_credential = normalize_credential(os.environ.get("BEDS24_REFRESH_TOKEN"))
+        if not refresh_credential:
+            raise
+        token = exchange_refresh_token(refresh_credential, api_base)
+        prop = fetch_property(token, api_base)
     existing = prop.get("discountVouchers") or []
     if not isinstance(existing, list) or not all(isinstance(row, dict) for row in existing):
         raise VoucherError("Beds24 discountVouchers is not a valid array")

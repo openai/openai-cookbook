@@ -91,6 +91,7 @@ skill_mcp_dependency_install = false
 # Prompt for reviewable engineering actions and forbid high-risk operations.
 [rules]
 prefix_rules = [
+  { pattern = [{ any_of = ["bash", "sh", "zsh", "pwsh", "powershell", "cmd"] }], decision = "prompt", justification = "Nested shell entry points require explicit human review." },
   { pattern = [{ token = "rm" }, { any_of = ["-rf", "-fr", "-Rf", "-fR"] }], decision = "forbidden", justification = "Forced recursive deletion is not allowed." },
   { pattern = [{ token = "Remove-Item" }, { token = "-Recurse" }, { token = "-Force" }], decision = "forbidden", justification = "Forced recursive deletion is not allowed." },
   { pattern = [{ token = "Remove-Item" }, { token = "-Force" }, { token = "-Recurse" }], decision = "forbidden", justification = "Forced recursive deletion is not allowed." },

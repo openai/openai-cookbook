@@ -23,7 +23,9 @@ APPLY = os.environ.get("AUMARA_VOUCHER_APPLY", "0") == "1"
 
 
 class VoucherError(AuditError):
-    pass
+    def __init__(self, message: str, *, status: int | None = None):
+        super().__init__(message)
+        self.status = status
 
 
 def request_json_body(method: str, path: str, token: str, api_base: str, payload: object):
@@ -62,7 +64,7 @@ def compatible(row: dict) -> bool:
 def fetch_property(token: str, api_base: str) -> dict:
     status, response = request_json("GET", f"/properties?id={PROPERTY_ID}", headers={"token": token}, api_base=api_base)
     if not 200 <= status < 300:
-        raise VoucherError(f"Beds24 property GET failed: HTTP {status}")
+        raise VoucherError(f"Beds24 property GET failed: HTTP {status}", status=status)
     rows = data_rows(response, "AUMARA property")
     if len(rows) != 1 or int(rows[0].get("id") or 0) != PROPERTY_ID:
         raise VoucherError("AUMARA property response was not uniquely scoped")
@@ -80,11 +82,13 @@ def exchange_refresh_token(refresh_credential: str, api_base: str) -> str:
         headers={"refreshToken": refresh_credential},
         api_base=api_base,
     )
+    if not 200 <= status < 300:
+        raise VoucherError(f"Beds24 token exchange failed: HTTP {status}", status=status)
     token = normalize_credential(
         response.get("token") if isinstance(response, dict) else ""
     )
     if not token:
-        raise VoucherError(f"Beds24 token exchange failed: HTTP {status}")
+        raise VoucherError("Beds24 token exchange returned an empty token")
     return token
 
 
@@ -119,7 +123,7 @@ def main() -> int:
     try:
         prop = fetch_property(token, api_base)
     except VoucherError as exc:
-        if "HTTP 401" not in str(exc) and "HTTP 403" not in str(exc):
+        if exc.status not in {401, 403}:
             raise
         refresh_credential = normalize_credential(os.environ.get("BEDS24_REFRESH_TOKEN"))
         if not refresh_credential:

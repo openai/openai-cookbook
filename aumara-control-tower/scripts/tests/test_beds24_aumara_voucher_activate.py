@@ -6,11 +6,17 @@ from unittest import mock
 
 
 SCRIPT = pathlib.Path(__file__).resolve().parents[1] / "beds24_aumara_voucher_activate.py"
-sys.path.insert(0, str(SCRIPT.parent))
-SPEC = importlib.util.spec_from_file_location("voucher_activate", SCRIPT)
-MODULE = importlib.util.module_from_spec(SPEC)
-assert SPEC.loader is not None
-SPEC.loader.exec_module(MODULE)
+MODULE = None
+
+
+def setUpModule():
+    global MODULE
+    sys.path.insert(0, str(SCRIPT.parent))
+    spec = importlib.util.spec_from_file_location("voucher_activate", SCRIPT)
+    module = importlib.util.module_from_spec(spec)
+    assert spec.loader is not None
+    spec.loader.exec_module(module)
+    MODULE = module
 
 
 class VoucherActivateTests(unittest.TestCase):

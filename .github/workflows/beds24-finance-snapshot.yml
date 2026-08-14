@@ -1,0 +1,72 @@
+name: Beds24 finance snapshot (read-only)
+
+on:
+  workflow_dispatch:
+  pull_request:
+    branches: [main]
+    paths:
+      - ".github/workflows/beds24-finance-snapshot.yml"
+      - "aumara-control-tower/scripts/beds24_finance_snapshot.py"
+      - "aumara-control-tower/scripts/tests/test_beds24_finance_snapshot.py"
+  push:
+    branches: [main]
+    paths:
+      - ".github/workflows/beds24-finance-snapshot.yml"
+      - "aumara-control-tower/scripts/beds24_finance_snapshot.py"
+      - "aumara-control-tower/scripts/tests/test_beds24_finance_snapshot.py"
+
+permissions:
+  contents: read
+
+concurrency:
+  group: beds24-finance-snapshot
+  cancel-in-progress: true
+
+jobs:
+  test:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - name: Run focused finance snapshot tests
+        run: python -m unittest aumara-control-tower/scripts/tests/test_beds24_finance_snapshot.py -v
+
+  live-snapshot:
+    if: github.event_name == 'push' || github.event_name == 'workflow_dispatch'
+    needs: test
+    runs-on: ubuntu-latest
+    env:
+      BEDS24_REFRESH_TOKEN: ${{ secrets.BEDS24_REFRESH_CREDENTIAL }}
+      BEDS24_FINANCE_AS_OF: "2026-08-14"
+      BEDS24_FINANCE_FROM: "2026-06-01"
+      BEDS24_FINANCE_TO: "2026-09-30"
+      BEDS24_FINANCE_OUTPUT: aumara-control-tower/evidence/beds24-finance-snapshot-2026-08-14.json
+    steps:
+      - uses: actions/checkout@v4
+      - name: Verify durable Beds24 credential is present
+        run: |
+          test -n "$BEDS24_REFRESH_TOKEN"
+      - name: Build read-only Beds24 finance snapshot
+        run: python aumara-control-tower/scripts/beds24_finance_snapshot.py
+      - name: Verify sanitized zero-write evidence
+        run: |
+          python - <<'PY'
+          import json
+          from pathlib import Path
+          p = Path('aumara-control-tower/evidence/beds24-finance-snapshot-2026-08-14.json')
+          x = json.loads(p.read_text())
+          assert x['read_only'] is True
+          assert x['guest_pii_included'] is False
+          assert x['booking_mutations'] == 0
+          assert x['message_sends'] == 0
+          assert x['booking_count'] >= 0
+          for row in x['bookings']:
+              for forbidden in ('firstName','lastName','email','phone','mobile','guest_name'):
+                  assert forbidden not in row
+          PY
+      - name: Upload sanitized finance evidence
+        uses: actions/upload-artifact@v4
+        with:
+          name: beds24-finance-snapshot-2026-08-14
+          path: aumara-control-tower/evidence/beds24-finance-snapshot-2026-08-14.json
+          if-no-files-found: error
+          retention-days: 7

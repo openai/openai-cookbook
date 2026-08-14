@@ -4,6 +4,22 @@
 # should build pages for, and indicates metadata such as tags, creation date and
 # authors for each page.
 
+- title: Generate transparent image assets for campaigns and presentations
+  path: examples/multimodal/transparent-image-assets-for-campaigns-and-presentations.ipynb
+  slug: transparent-image-assets-for-campaigns-and-presentations
+  description: Generate reusable transparent PNG assets for seasonal ecommerce campaigns and branded PowerPoint presentations.
+  date: 2026-08-14
+  authors:
+    - the-OAI
+  tags:
+    - image-generation
+    - images
+    - multimodal
+    - transparency
+    - ecommerce
+    - presentations
+    - codex
+
 - title: Migrate from Whisper to GPT-Transcribe and GPT-Live-Transcribe
   path: examples/migrating_from_whisper_to_gpt_transcribe.ipynb
   slug: migrating-from-whisper-to-gpt-transcribe

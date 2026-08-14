@@ -4,10 +4,10 @@
 # should build pages for, and indicates metadata such as tags, creation date and
 # authors for each page.
 
-- title: Integrate Codex Security CLI with GitLab CI/CD and optimize scan cost
+- title: Detect and remediate vulnerabilities in GitLab CI with Codex Security
   path: examples/codex/gitlab_ci_codex_security.md
   slug: gitlab-ci-codex-security
-  description: Integrate Codex Security CLI with GitLab CI/CD, publish SARIF findings, preserve scan evidence, and optimize scan scope, effort, cadence, and cost.
+  description: Scan GitLab projects with Codex Security, publish SARIF findings, verify focused fixes, optionally create draft merge requests, and control scan cost.
   date: 2026-08-07
   authors:
     - OAI-JB

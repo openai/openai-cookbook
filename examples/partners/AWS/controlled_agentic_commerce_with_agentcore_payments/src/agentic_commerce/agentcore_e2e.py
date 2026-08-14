@@ -8,7 +8,7 @@ import importlib.metadata
 import json
 import os
 from collections.abc import Awaitable, Callable, Mapping, Sequence
-from decimal import Decimal, InvalidOperation
+from decimal import Decimal
 from pathlib import Path
 
 from agents.models.openai_responses import OpenAIResponsesModel
@@ -20,6 +20,7 @@ from .agentcore_payments import (
     _REQUIRED_CONFIGURATION,
     _SUPPORTED_AGENTCORE_PAYMENT_REGIONS,
     AgentCorePaymentsSettings,
+    _positive_integer_text,
     _proxy_environment_clear,
     _reject_proxy_environment,
     _resolve_agentcore_region,
@@ -155,14 +156,12 @@ async def _execute_combined(
 
 
 def _session_budget(values: Mapping[str, str]) -> Decimal | None:
-    try:
-        amount_atomic = Decimal(values.get("X402_MAX_APPROVED_AMOUNT_ATOMIC", ""))
-        if not amount_atomic.is_finite():
-            return None
-        budget = amount_atomic / _USDC_ATOMIC_SCALE
-        if budget <= 0 or budget > _MAX_SESSION_BUDGET_USD:
-            return None
-    except InvalidOperation:
+    raw_amount_atomic = values.get("X402_MAX_APPROVED_AMOUNT_ATOMIC", "").strip()
+    if not _positive_integer_text(raw_amount_atomic):
+        return None
+    amount_atomic = Decimal(int(raw_amount_atomic))
+    budget = amount_atomic / _USDC_ATOMIC_SCALE
+    if budget <= 0 or budget > _MAX_SESSION_BUDGET_USD:
         return None
     return budget
 

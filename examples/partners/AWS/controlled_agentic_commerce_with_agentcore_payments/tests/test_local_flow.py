@@ -1,8 +1,12 @@
 from __future__ import annotations
 
+import base64
+import json
 from datetime import UTC, datetime, timedelta
 from decimal import Decimal
+from typing import Any
 
+import httpx
 import pytest
 
 from agentic_commerce.application import CommerceApplication
@@ -98,6 +102,21 @@ def approval(
     )
 
 
+def payment_required_client(payload: dict[str, Any]) -> httpx.Client:
+    encoded = base64.b64encode(
+        json.dumps(payload, separators=(",", ":")).encode("utf-8")
+    ).decode("ascii")
+
+    def handle(_: httpx.Request) -> httpx.Response:
+        return httpx.Response(
+            402,
+            headers={PAYMENT_REQUIRED_HEADER: encoded},
+            json={"error": "payment_required"},
+        )
+
+    return httpx.Client(transport=httpx.MockTransport(handle))
+
+
 def test_approved_purchase_completes_full_402_sequence() -> None:
     app, merchant, payments = make_system()
     purchase = request()
@@ -167,10 +186,9 @@ def test_challenge_merchant_mismatch_is_denied_before_payment() -> None:
             "accepts": (
                 merchant.requirement.model_copy(
                     update={
-                        "extra": {
-                            **merchant.requirement.extra,
-                            "merchantDomain": "unapproved.invalid",
-                        }
+                        "extra": merchant.requirement.extra.model_copy(
+                            update={"merchant_domain": "unapproved.invalid"}
+                        )
                     }
                 ),
             )
@@ -245,10 +263,9 @@ def test_expired_challenge_denies_before_payment() -> None:
     app, merchant, payments = make_system()
     expired = merchant.requirement.model_copy(
         update={
-            "extra": {
-                **merchant.requirement.extra,
-                "expiresAt": (NOW - timedelta(seconds=1)).isoformat(),
-            }
+            "extra": merchant.requirement.extra.model_copy(
+                update={"expires_at": NOW - timedelta(seconds=1)}
+            )
         }
     )
     merchant.payment_required = merchant.payment_required.model_copy(
@@ -287,6 +304,51 @@ def test_malformed_payment_required_header_fails_safely() -> None:
         app.purchase(request(), now=NOW)
 
     assert exc_info.value.code == "malformed_protocol_header"
+    assert payments.charge_count == 0
+
+
+@pytest.mark.parametrize(
+    "field_name",
+    ["decimals", "currency", "merchantDomain", "challengeId", "expiresAt"],
+)
+def test_missing_payment_requirement_metadata_fails_safely(
+    field_name: str,
+) -> None:
+    app, merchant, payments = make_system()
+    payload = merchant.payment_required.model_dump(mode="json", by_alias=True)
+    del payload["accepts"][0]["extra"][field_name]
+    app.client = payment_required_client(payload)
+
+    with pytest.raises(ProtocolError) as exc_info:
+        app.purchase(request(), now=NOW)
+
+    assert exc_info.value.code == "invalid_payment_requirement"
+    assert payments.charge_count == 0
+
+
+@pytest.mark.parametrize(
+    ("field_name", "value"),
+    [
+        ("decimals", "6"),
+        ("currency", 6),
+        ("merchantDomain", 6),
+        ("challengeId", 6),
+        ("expiresAt", 6),
+    ],
+)
+def test_typed_payment_requirement_metadata_fails_safely(
+    field_name: str,
+    value: object,
+) -> None:
+    app, merchant, payments = make_system()
+    payload = merchant.payment_required.model_dump(mode="json", by_alias=True)
+    payload["accepts"][0]["extra"][field_name] = value
+    app.client = payment_required_client(payload)
+
+    with pytest.raises(ProtocolError) as exc_info:
+        app.purchase(request(), now=NOW)
+
+    assert exc_info.value.code == "invalid_payment_requirement"
     assert payments.charge_count == 0
 
 

@@ -7,7 +7,16 @@ from decimal import Decimal
 from enum import StrEnum
 from typing import Any, Literal
 
-from pydantic import BaseModel, ConfigDict, Field, HttpUrl, computed_field
+from pydantic import (
+    AwareDatetime,
+    BaseModel,
+    ConfigDict,
+    Field,
+    HttpUrl,
+    computed_field,
+    field_validator,
+)
+from pydantic_core import PydanticCustomError
 
 
 class FrozenModel(BaseModel):
@@ -72,6 +81,40 @@ class ResourceInfo(FrozenModel):
     mime_type: str = Field(alias="mimeType")
 
 
+class PaymentRequirementExtra(FrozenModel):
+    """Validated x402 metadata used by local policy computed fields."""
+
+    model_config = ConfigDict(frozen=True, populate_by_name=True, extra="forbid")
+
+    decimals: int = Field(strict=True, ge=0)
+    currency: Literal["USDC"]
+    merchant_domain: str = Field(
+        alias="merchantDomain",
+        strict=True,
+        min_length=1,
+    )
+    challenge_id: str = Field(
+        alias="challengeId",
+        strict=True,
+        min_length=1,
+    )
+    issued_at: AwareDatetime | None = Field(default=None, alias="issuedAt")
+    expires_at: AwareDatetime = Field(alias="expiresAt")
+    simulation: bool | None = Field(default=None, strict=True)
+
+    @field_validator("issued_at", "expires_at", mode="before")
+    @classmethod
+    def require_iso_timestamp_text(cls, value: object) -> object:
+        if value is None:
+            return value
+        if not isinstance(value, str):
+            raise PydanticCustomError(
+                "x402_timestamp_type",
+                "x402 timestamps must be ISO 8601 strings.",
+            )
+        return value
+
+
 class PaymentRequirement(FrozenModel):
     """Protocol-shaped x402 V2 exact-payment requirement.
 
@@ -85,33 +128,32 @@ class PaymentRequirement(FrozenModel):
     asset: str
     pay_to: str = Field(alias="payTo")
     max_timeout_seconds: int = Field(alias="maxTimeoutSeconds", gt=0)
-    extra: dict[str, Any]
+    extra: PaymentRequirementExtra
 
     @computed_field
     @property
     def decimal_amount(self) -> Decimal:
-        decimals = int(self.extra["decimals"])
-        return Decimal(self.amount) / (Decimal(10) ** decimals)
+        return Decimal(self.amount) / (Decimal(10) ** self.extra.decimals)
 
     @computed_field
     @property
-    def currency(self) -> str:
-        return str(self.extra["currency"])
+    def currency(self) -> Literal["USDC"]:
+        return self.extra.currency
 
     @computed_field
     @property
     def merchant_domain(self) -> str:
-        return str(self.extra["merchantDomain"])
+        return self.extra.merchant_domain
 
     @computed_field
     @property
     def challenge_id(self) -> str:
-        return str(self.extra["challengeId"])
+        return self.extra.challenge_id
 
     @computed_field
     @property
     def expires_at(self) -> datetime:
-        return datetime.fromisoformat(str(self.extra["expiresAt"]))
+        return self.extra.expires_at
 
 
 class PaymentRequired(FrozenModel):

@@ -107,6 +107,12 @@ def _safe_symbol(value: object) -> str | None:
     return value
 
 
+def _positive_integer_text(value: str) -> bool:
+    """Accept only non-empty ASCII decimal integer text."""
+
+    return bool(value) and value.isascii() and value.isdecimal()
+
+
 def _safe_payment_diagnostics(exc: Exception) -> dict[str, object]:
     """Extract non-secret failure metadata without rendering exceptions."""
 
@@ -303,13 +309,15 @@ class AgentCorePaymentsSettings(FrozenModel):
                 "agentcore_configuration_invalid",
                 "X402_MAX_PAYMENT_ATTEMPTS must be an integer.",
             ) from exc
-        try:
-            max_approved_amount_atomic = int(values["X402_MAX_APPROVED_AMOUNT_ATOMIC"])
-        except ValueError as exc:
+        raw_max_approved_amount_atomic = values[
+            "X402_MAX_APPROVED_AMOUNT_ATOMIC"
+        ].strip()
+        if not _positive_integer_text(raw_max_approved_amount_atomic):
             raise AgentCorePaymentError(
                 "agentcore_configuration_invalid",
                 "X402_MAX_APPROVED_AMOUNT_ATOMIC must be a positive integer.",
-            ) from exc
+            )
+        max_approved_amount_atomic = int(raw_max_approved_amount_atomic)
         if max_approved_amount_atomic <= 0:
             raise AgentCorePaymentError(
                 "agentcore_configuration_invalid",

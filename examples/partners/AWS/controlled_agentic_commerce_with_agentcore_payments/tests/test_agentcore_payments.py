@@ -707,6 +707,26 @@ def test_agentcore_region_is_separate_from_model_region() -> None:
     assert configured.aws_region == "us-east-1"
 
 
+@pytest.mark.parametrize("value", ["2e3", "2000.0", "+2000"])
+def test_non_integer_max_amount_configuration_fails_closed(value: str) -> None:
+    environment = {
+        "AGENTCORE_AWS_REGION": "us-east-1",
+        "PAYMENT_MANAGER_ARN": "manager",
+        "PAYMENT_INSTRUMENT_ID": "instrument",
+        "PAYMENT_SESSION_ID": "session",
+        "PAYMENT_USER_ID": "user",
+        "X402_ALLOWED_MERCHANTS": "merchant.example",
+        "X402_APPROVED_ASSET": BASE_SEPOLIA_USDC,
+        "X402_APPROVED_PAY_TO": APPROVED_PAY_TO,
+        "X402_MAX_APPROVED_AMOUNT_ATOMIC": value,
+    }
+
+    with pytest.raises(AgentCorePaymentError) as exc_info:
+        AgentCorePaymentsSettings.from_env(environment)
+
+    assert exc_info.value.code == "agentcore_configuration_invalid"
+
+
 def test_runtime_profile_is_passed_to_payment_manager(
     monkeypatch: pytest.MonkeyPatch,
 ) -> None:

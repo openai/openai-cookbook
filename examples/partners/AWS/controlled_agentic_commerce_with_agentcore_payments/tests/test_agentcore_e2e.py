@@ -127,8 +127,8 @@ def test_readiness_rejects_proxy_environment(
     assert report["merchant_proxy_environment_clear"] is False
 
 
-@pytest.mark.parametrize("value", ["NaN", "Infinity", "-Infinity"])
-def test_readiness_rejects_nonfinite_session_budget(
+@pytest.mark.parametrize("value", ["NaN", "Infinity", "-Infinity", "2e3"])
+def test_readiness_rejects_invalid_session_budget(
     value: str,
     tmp_path: Path,
     monkeypatch: pytest.MonkeyPatch,

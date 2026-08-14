@@ -105,7 +105,10 @@ service call is enabled by default.
 
 ## Run the tests
 
+From the repository root, change into the example directory first:
+
 ```bash
+cd examples/partners/AWS/controlled_agentic_commerce_with_agentcore_payments
 uv run --group dev pytest -q
 uv run --group dev ruff check src tests
 uv run --group dev ruff format --check src tests

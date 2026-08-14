@@ -331,10 +331,10 @@ The [Security CLI reference](https://learn.chatgpt.com/docs/security/cli/referen
 
 ```bash
 CODEX_API_KEY="$CODEX_SECURITY_API_KEY" \
-  npx @openai/codex-security@0.1.11 validate finding.json --effort high
+  npx "@openai/codex-security@$CODEX_SECURITY_VERSION" validate finding.json --effort high
 
 CODEX_API_KEY="$CODEX_SECURITY_API_KEY" \
-  npx @openai/codex-security@0.1.11 patch finding.json --effort high
+  npx "@openai/codex-security@$CODEX_SECURITY_VERSION" patch finding.json --effort high
 ```
 
 Each command accepts a finding as literal text or a file. The pipeline passes only the selected finding, so one run cannot accidentally request fixes for every issue in the original scan. `validate` returns a human-readable assessment, not a machine-readable proof that the vulnerability was fixed. Review the before-and-after validation reports together with the deterministic regression check.

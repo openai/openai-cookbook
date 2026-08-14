@@ -1,4 +1,4 @@
-# Iterating Development Workflows with Codex
+# Iterating development workflows with Codex
 
 ## Introduction
 
@@ -35,9 +35,9 @@ Below is the completed structure based on the design of a simple to-do list appl
 ```
 </details>
 
-## Create Harness and Build Phase Files
+## Create harness and build phase files
 
-### Agents and Plans
+### Agents and plans
 
 For new projects, the best place to start is by populating the [`AGENTS.md`](https://learn.chatgpt.com/docs/agent-configuration/agents-md) file. When present, Codex reads this file as persistent repository guidance before performing work. It is an optional convention for work that benefits from durable execution. In general, agents files should contain items like:
 
@@ -64,7 +64,7 @@ For plan execution, creating a [`PLANS.md`](https://developers.openai.com/cookbo
 > Creating smaller build files not only improves readability but supports
 > human gating to manually review code quality and other outputs.
 
-### Harness Files
+### Harness files
 
 In addition to the agents and plans files, it is also possible to create individual files to specify the desired outcomes, success conditions and boundaries (`GOALS.md`) and for the instructions to initiate planned work (`PROMPTS.md`). These can be either manually written or derived from the agents and plans file using a prompt like the one below:
 
@@ -156,7 +156,7 @@ After writing:
 ```
 </details>
 
-### Build Phase Files
+### Build phase files
 
 Once the files the harness will use for context have been generated, the next step is to break down the stages of each build into individual files to identify:
 
@@ -165,7 +165,7 @@ Once the files the harness will use for context have been generated, the next st
 - Acceptance criteria
 - Boundaries
 
-For discoverability, it is recommended to keep these files in a manually created `harness/build/` folder in the root project directory, typically in the format <phase-number>-<phase-title>.md. The corresponding file, along with the prompt and goal from the harness context files can then be provided to Codex at the beginning of each phase. This helps prevent agent drift and creates a clear, human-gated development history that, when combined with version control, creates an easy-to-read audit trail for future use including debugging.
+For discoverability, it is recommended to keep these files in a manually created `harness/build/` folder in the root project directory, typically in the format `<phase-number>-<phase-title>.md`. The corresponding file, along with the prompt and goal from the harness context files can then be provided to Codex at the beginning of each phase. This helps prevent agent drift and creates a clear, human-gated development history that, when combined with version control, creates an easy-to-read audit trail for future use including debugging.
 
 <details>
 <summary><strong>Generate Build Phase Files</strong></summary>
@@ -301,7 +301,7 @@ overwrite recorded decisions or evidence.
 ```
 </details>
 
-## Context Files
+## Context files
 
 In addition to development framework files, capture the session-specific decisions made during each phase that materially affect the project.
 
@@ -399,7 +399,7 @@ it before closing the phase. Before handoff:
 ```
 </details>
 
-## Build Log
+## Build log
 
 A file named `harness/build-log.md` acts as the source of truth for project progress. While human-readable, it is primarily intended for Codex consumption and can also be used to generate user-facing changelogs and other documentation.
 
@@ -578,7 +578,9 @@ follow-up rather than modifying it.
 
 ## After writing
 
-1. Confirm that only `harness/build-log.md` changed.
+1. Confirm that the logging task changed only `harness/build-log.md` and
+   preserved any pre-existing phase implementation, test, or other worktree
+   changes.
 2. Confirm that every status transition has supporting evidence.
 3. Confirm that planned work is not represented as completed work.
 4. Confirm that failures, skipped checks, and limitations remain visible.
@@ -592,7 +594,7 @@ follow-up rather than modifying it.
 ```
 </details>
 
-## Automate with Skills
+## Automate with skills
 
 Given the size of each prompt and the number of files involved, it should seem obvious that such a manual process would become unwieldy, error-prone and unpredictable. To make such work reusable and more consistent, Codex provides [skills](https://learn.chatgpt.com/docs/build-skills) as a way of creating workflows that can be reused for projects of any scale.
 
@@ -614,7 +616,7 @@ Before writing, determine where the skill should be installed.
 
 Default to:
 
-`${CODEX_HOME:-~/.codex}/skills/harness-author`
+`${CODEX_HOME:-$HOME/.codex}/skills/harness-author`
 
 If the destination is ambiguous or an existing `harness-author` skill is
 present, report the exact path and ask whether to update it or choose another
@@ -880,7 +882,7 @@ Finish by reporting:
 > - Watching for the latest change to merge in remote, then preparing the next feature branch
 > - Identifying the current phase from the build log, loading the goal and prompt for the phase, summarizing purpose and acceptance criteria, then waiting for a human gate.
 
-### Skill Tuning
+### Skill tuning
 
 Skills may not behave exactly as expected upon creation. For example, when asked to create harness context and build-phase files, the `$harness-author` skill proposed the following, omitting `PLANS.md` and `harness/build-log.md`:
 

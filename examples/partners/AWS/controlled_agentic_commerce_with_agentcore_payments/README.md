@@ -235,7 +235,7 @@ and [bounded sessions](https://docs.aws.amazon.com/bedrock-agentcore/latest/devg
 
 ## Source and credit
 
-Nick's AWS [paid-research sample](https://github.com/awslabs/agentcore-samples/pull/1869)
+Nick's AWS paid-research sample
 provides a broader multi-agent live testnet reference. Its wallet-neutral setup
 and bounded-session exercise informed this example. No source code was copied.
 See `SOURCE_ATTRIBUTION.md` for the fixed revision and license.

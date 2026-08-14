@@ -2974,6 +2974,7 @@
     - gpt-actions-library
     - chatgpt
     - chatgpt-productivity
+  archived: true
 
 - title: Custom LLM as a Judge to Detect Hallucinations with Braintrust
   path: examples/Custom-LLM-as-a-Judge.ipynb
@@ -3082,6 +3083,7 @@
     - reasoning
     - completions
     - security
+  archived: true
 
 - title: How to evaluate LLMs for SQL generation
   path: examples/evaluation/How_to_evaluate_LLMs_for_SQL_generation.ipynb

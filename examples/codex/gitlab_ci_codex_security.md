@@ -1,6 +1,6 @@
 # Detect and remediate vulnerabilities in GitLab CI with Codex Security
 
-Use [`@openai/codex-security`](https://learn.chatgpt.com/docs/security/cli) with GitLab CI/CD to scan protected merge requests, review the default branch, publish SARIF findings, and optionally propose verified security fixes as draft merge requests.
+Use [`@openai/codex-security`](https://learn.chatgpt.com/docs/security/cli) with GitLab CI/CD to scan protected merge requests, review the default branch, publish SARIF findings, and automatically create draft merge requests with verified fixes when optional remediation is enabled.
 
 The scanner never receives repository-write credentials, and generated fixes require human review. The example was validated with a Docker-based runner and a Next.js SaaS application, but the pipeline can use any eligible trusted runner on GitLab.com, GitLab Self-Managed, or GitLab Dedicated.
 
@@ -12,12 +12,27 @@ You will create a GitLab pipeline that:
 2. Preserves structured findings, coverage, scan metadata, and human-readable reports.
 3. Publishes SARIF through a successful report job and enforces scanner status in a separate gate.
 4. Optionally validates and patches one high- or critical-severity finding.
-5. Creates an optional draft merge request after a focused regression check verifies the fix.
+5. Automatically creates a draft merge request when publishing is enabled and a focused regression check verifies the fix.
 6. Tests unprotected remediation merge requests without exposing protected credentials.
 
 The finished workflow selects a scan profile from the GitLab pipeline event:
 
 ![GitLab CI/CD workflow with merge request, default branch, and scheduled Codex Security scan profiles](../../images/gitlab-codex-security-workflow.png)
+
+## How automatic vulnerability remediation creates a merge request
+
+When remediation and merge request publication are enabled, a protected default-branch pipeline can turn one eligible vulnerability into a reviewable fix without a webhook or a separate manually triggered job:
+
+| Step | GitLab job | What happens |
+| --- | --- | --- |
+| 1. Find a vulnerability | `codex-security` | Scans the protected default branch, stores findings and coverage evidence, and publishes SARIF to GitLab |
+| 2. Select a trusted finding | `codex-security-remediate` | Requires a completed scan of the current revision with complete coverage, then selects one `high`- or `critical`-severity finding |
+| 3. Reproduce and fix it | `codex-security-remediate` | Confirms the configured regression test fails on the vulnerable revision, validates the finding, and generates a focused patch |
+| 4. Verify the fix | `codex-security-remediate` | Rejects protected paths and oversized changes, reruns the regression test, and retains before-and-after evidence |
+| 5. Open a draft merge request | `codex-security-draft-mr` | Applies the verified patch, pushes a dedicated `codex-security/fix-*` branch using a scoped project token, and creates or reuses a draft merge request |
+| 6. Test and review | `codex-security-remediation-mr-check` | Runs ordinary regression checks on the unprotected fix branch without protected secrets; a human reviews and merges the fix |
+
+This workflow is opt-in and limited to protected default-branch pipelines. Merge request diff scans do not create remediation merge requests, and no fix is published for incomplete coverage, medium- or low-severity findings, failed verification, or unsafe changes. If an open draft already exists for the same finding, the pipeline reuses it instead of creating a duplicate. The pipeline never automatically merges code.
 
 ## Prerequisites
 
@@ -361,7 +376,7 @@ The remediation job checks that:
 
 The job stores `finding.json`, `fix.patch`, both validation reports, the patch report, and before-and-after regression logs in `codex-security-remediation/`. Artifact downloads are restricted to project Maintainers and Owners. A clean scan with no high- or critical-severity findings exits successfully without generating a patch.
 
-### Optionally create a draft merge request
+### Automatically create a draft merge request
 
 Patch artifacts work without a GitLab write credential. To also create a draft merge request, create a [project access token](https://docs.gitlab.com/user/project/settings/project_access_tokens/) with the Developer role and permission to push a remediation branch and create merge requests. The verified workflow did not require Maintainer access. Select both [access token scopes](https://docs.gitlab.com/security/tokens/access_token_scopes/):
 
@@ -385,7 +400,9 @@ codex-security-draft-mr:
       artifacts: true
 ```
 
-Finally, add the protected variable `CODEX_SECURITY_CREATE_MR=true`. The publishing job then applies the verified patch to a clean checkout, checks the protected-path policy again, and calls the [GitLab merge requests API](https://docs.gitlab.com/api/merge_requests/#create-a-merge-request). Its base branch name is `codex-security/fix-<finding-hash>`. An existing open merge request for that branch or a pipeline-suffixed variant is reused instead of duplicated. If a previous merge request was closed but its source branch still exists, the job appends `-$CI_PIPELINE_ID` before pushing, preventing a non-fast-forward collision while keeping the finding identity stable.
+Finally, add the protected variable `CODEX_SECURITY_CREATE_MR=true`. Together with `CODEX_SECURITY_ENABLE_REMEDIATION=true`, the configured verification command, and the scoped token, this enables the complete finding-to-merge-request workflow. No webhook or additional automation service is required: a qualifying protected default-branch pipeline runs the scan, remediation, and publishing jobs in order.
+
+The publishing job applies the verified patch to a clean checkout, checks the protected-path policy again, and calls the [GitLab merge requests API](https://docs.gitlab.com/api/merge_requests/#create-a-merge-request). It pushes a `codex-security/fix-<finding-hash>` branch and creates a merge request titled `Draft: Fix Codex Security finding <finding-hash>`. An existing open merge request for that branch or a pipeline-suffixed variant is reused instead of duplicated. If a previous merge request was closed but its source branch still exists, the job appends `-$CI_PIPELINE_ID` before pushing, preventing a non-fast-forward collision while keeping the finding identity stable.
 
 Do not substitute `CI_JOB_TOKEN` for the GitLab project token. GitLab's documented [job token permissions](https://docs.gitlab.com/ci/jobs/ci_job_token/) allow reading merge requests but do not include the API operation needed to create one. GitLab Runner can also inject a local `include.path` that rewrites repository URLs to embed the job token and sets `credential.interactive=never`. Before pushing, the publishing job removes that checkout-only include, clears inherited GitLab job credentials, and explicitly permits the protected `askpass` flow with `credential.interactive=true`. This keeps authentication on the Developer-scoped project token. The example never automatically merges a fix and never gives the publishing token to the scanner, patching process, or project setup and test commands.
 

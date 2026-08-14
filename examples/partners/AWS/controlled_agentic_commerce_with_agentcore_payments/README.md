@@ -226,6 +226,8 @@ The recorded August 10, 2026 validation returned `PASSED` for one bounded
 `0.002` test-USDC attempt. Any future live run requires a fresh review, approval,
 short-lived session, and testnet-only configuration.
 
+For product context, see AWS's
+[Agents that transact: Introducing Amazon Bedrock AgentCore Payments, built with Coinbase and Stripe](https://aws.amazon.com/blogs/machine-learning/agents-that-transact-introducing-amazon-bedrock-agentcore-payments-built-with-coinbase-and-stripe/).
 AWS documents the [x402 payment flow](https://docs.aws.amazon.com/bedrock-agentcore/latest/devguide/payments-how-it-works.html)
 and recommends [separate IAM roles for session administration and payment execution](https://docs.aws.amazon.com/bedrock-agentcore/latest/devguide/payments-iam-roles.html).
 Also review the current AWS guidance for

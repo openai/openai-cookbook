@@ -52,6 +52,31 @@ The example maps this project variable to `OPENAI_API_KEY` only for scan and dry
 
 For an eligible merge request job to receive the protected variable, both branches must belong to the same project and be protected, the user who starts the pipeline must have push or merge access to the target branch, and **Allow merge request pipelines to access protected variables and runners** must be enabled. GitLab documents these requirements under [protected merge request resources](https://docs.gitlab.com/ci/pipelines/merge_request_pipelines/#control-access-to-protected-variables-and-runners). If your workflow uses ordinary unprotected feature branches, run the secret-bearing scan after merge on the protected default branch instead. Larger deployments can enforce an immutable job through a [pipeline execution policy](https://docs.gitlab.com/user/application_security/policies/pipeline_execution_policies/) and retrieve a scoped, short-lived credential from an [external secrets provider](https://docs.gitlab.com/ci/secrets/). You are ready to continue when the protected `CODEX_SECURITY_API_KEY` is available only to approved scan jobs.
 
+### Configure only the variables your workflow needs
+
+Scanning and SARIF publication require only one project variable: `CODEX_SECURITY_API_KEY`. All other settings are either already defined in the downloadable pipeline or apply only when you enable optional remediation and draft merge requests.
+
+| Variable | When to configure | Default | Purpose and scope |
+| --- | --- | --- | --- |
+| `CODEX_SECURITY_API_KEY` | Required for every scan | None | Protected, masked, hidden OpenAI API key with Codex Security access |
+| `CODEX_SECURITY_VERSION` | Optional | `0.1.11` | Pinned CLI version already defined in the pipeline; change only after retesting |
+| `CODEX_SECURITY_ENABLE_REMEDIATION` | Required to generate patches | Disabled | Set the protected variable to `true` to enable trusted default-branch remediation |
+| `CODEX_SECURITY_VERIFICATION_COMMAND` | Required when remediation is enabled | None | Protected command that fails with exit `1` before the fix and passes with exit `0` afterward |
+| `CODEX_SECURITY_SETUP_COMMAND` | Optional for remediation | Unset | Protected setup command, such as `npm ci`, run before the regression check |
+| `CODEX_SECURITY_REMEDIATION_EFFORT` | Optional for remediation | `high` | Reasoning effort for finding validation and patch generation |
+| `CODEX_SECURITY_MAX_CHANGED_FILES` | Optional for remediation | `8` | Maximum number of changed source and test files; allowed values are `1` through `20` |
+| `CODEX_SECURITY_CREATE_MR` | Required to create draft merge requests | Disabled | Set the protected variable to `true` to publish an already verified patch |
+| `GITLAB_REMEDIATION_TOKEN` | Required when draft merge requests are enabled | None | Protected, masked, hidden Developer-level token with `api` and `write_repository` scopes; limit it to the `codex-security/publish` environment |
+| `CODEX_SECURITY_GITLAB_INTERNAL_URL` | Optional for self-hosted publishing | Unset | Protected GitLab URL override for runners that cannot reach the advertised server address |
+| `CODEX_SECURITY_MR_TEST_COMMAND` | Optional for remediation merge request checks | `npm test` | Non-secret test command available to unprotected remediation branches |
+| `CODEX_SECURITY_MR_SETUP_COMMAND` | Optional for remediation merge request checks | Unset | Non-secret dependency setup command available to unprotected remediation branches |
+
+For a scan-only integration, configure the OpenAI API key and leave every other project variable unset. To generate a verified patch, additionally set `CODEX_SECURITY_ENABLE_REMEDIATION=true` and `CODEX_SECURITY_VERIFICATION_COMMAND`. To also create a draft merge request, add `CODEX_SECURITY_CREATE_MR=true` and the environment-scoped `GITLAB_REMEDIATION_TOKEN`.
+
+Keep secret-bearing and remediation-control variables protected. `CODEX_SECURITY_MR_TEST_COMMAND` and `CODEX_SECURITY_MR_SETUP_COMMAND` are different: they contain no credentials and must be available to the unprotected remediation merge request job.
+
+Do not create separate `OPENAI_API_KEY` or `CODEX_API_KEY` project variables. The pipeline derives those process-scoped credentials from `CODEX_SECURITY_API_KEY`. GitLab provides `CI_*` variables automatically, while the pipeline sets `GIT_DEPTH`, `CODEX_SECURITY_TARGET`, `CODEX_SECURITY_MODE`, `CODEX_SECURITY_EFFORT`, `CODEX_SECURITY_BIN`, `CODEX_SECURITY_STATE_DIR`, and `CODEX_SECURITY_TARGET_SNAPSHOT_DIGEST` as needed. Paths such as `RESULTS_DIR`, `ARTIFACT_DIR`, and `PATCH_FILE` are temporary shell variables, not GitLab project settings.
+
 ## Step 2: Choose initial scan profiles
 
 Use GitLab [job rules](https://docs.gitlab.com/ci/jobs/job_rules/) to match each pipeline event to the smallest scan that answers its security question while retaining periodic broad coverage.
@@ -318,16 +343,7 @@ The two subcommands invoke the bundled Codex executable directly. In Security CL
 
 ### Configure patch generation
 
-Add these protected project CI/CD variables before enabling remediation:
-
-| Variable | Required | Example | Purpose |
-| --- | --- | --- | --- |
-| `CODEX_SECURITY_ENABLE_REMEDIATION` | Yes | `true` | Enable remediation only for protected default-branch push, manual, or scheduled pipelines |
-| `CODEX_SECURITY_VERIFICATION_COMMAND` | Yes | `npm test -- --runInBand tests/security-regression.test.ts` | Run an existing focused regression check that exits `1` before the fix and `0` afterward |
-| `CODEX_SECURITY_SETUP_COMMAND` | No | `npm ci` | Install project dependencies before running the regression check |
-| `CODEX_SECURITY_REMEDIATION_EFFORT` | No | `high` | Override the remediation job's default reasoning effort |
-| `CODEX_SECURITY_MAX_CHANGED_FILES` | No | `8` | Limit the patch to between one and 20 reviewed source and test files |
-| `CODEX_SECURITY_GITLAB_INTERNAL_URL` | No | `http://gitlab` | Override the GitLab API and Git push URL only when a container cannot reach the advertised server URL |
+Enable patch generation by setting the protected variable `CODEX_SECURITY_ENABLE_REMEDIATION=true` and configuring `CODEX_SECURITY_VERIFICATION_COMMAND`, for example `npm test -- --runInBand tests/security-regression.test.ts`. The other remediation settings in the variable reference are optional and already have safe defaults where applicable.
 
 Use a security regression test that already exists on the vulnerable revision. Test the security invariant, not one prescribed implementation: a complete authorization fix might enforce an owner check in a shared wrapper or protect every affected sink independently. A command that passes before remediation cannot demonstrate the original issue, and an exit such as `127` usually indicates a missing tool rather than a reproduced vulnerability. Repository setup and verification run with known OpenAI, GitLab job, repository, container-registry, and deployment credentials removed from their child-process environments. Validation and patching receive only a process-scoped `CODEX_API_KEY` and do not inherit those GitLab credentials. Scope additional project-specific secrets to the jobs that require them, and keep credentials out of both command variables.
 

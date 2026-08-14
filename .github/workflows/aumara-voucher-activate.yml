@@ -19,6 +19,7 @@ jobs:
   activate:
     runs-on: ubuntu-latest
     env:
+      BEDS24_PROPERTIES_TOKEN: ${{ secrets.BEDS24_TOKEN_CREDENTIAL }}
       BEDS24_REFRESH_TOKEN: ${{ secrets.BEDS24_REFRESH_CREDENTIAL }}
       AUMARA_VOUCHER_CODE: AUMGIB90045089
       AUMARA_VOUCHER_PERCENT: "10"
@@ -27,7 +28,7 @@ jobs:
       - uses: actions/checkout@v5
       - name: Validate script
         run: python -m py_compile aumara-control-tower/scripts/beds24_aumara_voucher_activate.py
-      - name: Verify existing Beds24 credential is present
-        run: test -n "$BEDS24_REFRESH_TOKEN"
+      - name: Verify an existing Beds24 credential is present
+        run: test -n "$BEDS24_PROPERTIES_TOKEN" || test -n "$BEDS24_REFRESH_TOKEN"
       - name: Activate and verify AUMARA voucher
         run: python aumara-control-tower/scripts/beds24_aumara_voucher_activate.py

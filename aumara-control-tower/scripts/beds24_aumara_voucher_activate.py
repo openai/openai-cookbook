@@ -1,7 +1,7 @@
 #!/usr/bin/env python3
 """Idempotently activate one AUMARA guest percentage voucher in Beds24.
 
-Uses the existing BEDS24_REFRESH_TOKEN. Never prints credentials. Preserves all
+Uses an existing Beds24 credential only. Never prints credentials. Preserves all
 existing voucher slots and only appends the requested code to a compatible
 percentage slot or creates one free slot.
 """
@@ -14,7 +14,14 @@ import re
 import urllib.error
 import urllib.request
 
-from beds24_elcid_studio_audit import AuditError, data_rows, get_access_token, request_json
+from beds24_elcid_studio_audit import (
+    API_BASES,
+    AuditError,
+    data_rows,
+    get_access_token,
+    normalize,
+    request_json,
+)
 
 PROPERTY_ID = 324882
 CODE = os.environ.get("AUMARA_VOUCHER_CODE", "AUMGIB90045089").strip()
@@ -45,6 +52,28 @@ def request_json_body(method: str, path: str, token: str, api_base: str, payload
         except json.JSONDecodeError:
             parsed = {"error": body[:300]}
         return exc.code, parsed
+
+
+def resolve_access() -> tuple[str, str, str]:
+    """Prefer the existing long-life token, then fall back to the refresh credential."""
+    direct = normalize(os.environ.get("BEDS24_PROPERTIES_TOKEN"))
+    if direct:
+        for api_base in API_BASES:
+            status, details = request_json(
+                "GET",
+                "/authentication/details",
+                headers={"token": direct},
+                api_base=api_base,
+            )
+            if (
+                200 <= status < 300
+                and isinstance(details, dict)
+                and details.get("validToken") is True
+            ):
+                return direct, api_base, "long_life_token"
+
+    token, credential_mode, api_base, _, _ = get_access_token()
+    return token, api_base, credential_mode
 
 
 def phrases(row: dict) -> list[str]:
@@ -96,7 +125,7 @@ def plan(vouchers: list[dict]) -> tuple[list[dict], int, bool]:
 def main() -> int:
     if not re.fullmatch(r"[A-Za-z0-9]+", CODE):
         raise VoucherError("Voucher code must be strictly alphanumeric")
-    token, _, api_base, _, _ = get_access_token()
+    token, api_base, credential_mode = resolve_access()
     prop = fetch_property(token, api_base)
     existing = prop.get("discountVouchers") or []
     if not isinstance(existing, list) or not all(isinstance(row, dict) for row in existing):
@@ -124,6 +153,7 @@ def main() -> int:
         "discount_percent": DISCOUNT,
         "slot": slot,
         "voucher_type": "percentage",
+        "credential_mode": credential_mode,
         "credentials_exposed": False,
     }, separators=(",", ":")))
     return 0

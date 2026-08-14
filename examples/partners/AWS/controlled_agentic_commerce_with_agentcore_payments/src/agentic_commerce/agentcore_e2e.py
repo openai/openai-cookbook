@@ -169,6 +169,8 @@ def _session_budget(values: Mapping[str, str]) -> Decimal | None:
 
 def readiness_report(
     environ: Mapping[str, str] | None = None,
+    *,
+    session_file: Path | None = None,
 ) -> dict[str, object]:
     """Return presence and gate status without making a live call."""
 
@@ -196,7 +198,7 @@ def readiness_report(
     one_payment_attempt = values.get("X402_MAX_PAYMENT_ATTEMPTS") == "1"
     session_budget = _session_budget(values)
     proxy_environment_clear = _proxy_environment_clear(values)
-    path = _session_file(values, None)
+    path = _session_file(values, session_file)
     try:
         state = _read_session_state(path)
         session_state_valid = True
@@ -260,7 +262,7 @@ async def run_managed_e2e(
     """Create, use, and delete one bounded session around one live run."""
 
     values = dict(environ if environ is not None else os.environ)
-    readiness = readiness_report(values)
+    readiness = readiness_report(values, session_file=session_file)
     if readiness["result"] != "READY":
         return {
             **readiness,

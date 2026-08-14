@@ -174,6 +174,33 @@ def test_readiness_requires_distinct_model_and_payment_profiles(
     assert report["aws_profiles_are_distinct"] is False
 
 
+def test_managed_e2e_checks_the_overridden_session_file(
+    tmp_path: Path,
+    monkeypatch: pytest.MonkeyPatch,
+) -> None:
+    sdk_available(monkeypatch)
+    values = environment(tmp_path)
+    override = tmp_path / "override.env"
+    override.write_text(
+        "PAYMENT_SESSION_ID=existing-session\n",
+        encoding="utf-8",
+    )
+    manager = FakeSessionManager()
+
+    report = asyncio.run(
+        run_managed_e2e(
+            values,
+            manager_factory=lambda _: manager,
+            session_file=override,
+        )
+    )
+
+    assert report["result"] == "SKIPPED"
+    assert report["recorded_session_present"] is True
+    assert manager.create_calls == []
+    assert manager.delete_calls == []
+
+
 def test_check_cli_never_starts_managed_workflow(
     monkeypatch: pytest.MonkeyPatch,
     capsys: pytest.CaptureFixture[str],

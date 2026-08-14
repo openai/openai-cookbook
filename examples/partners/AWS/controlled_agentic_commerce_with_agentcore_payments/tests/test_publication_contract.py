@@ -29,10 +29,13 @@ def _attribution_path() -> Path:
     return next(path for path in candidates if path.is_file())
 
 
-def test_frozen_commands_have_a_tracked_lockfile() -> None:
-    assert (ROOT / "uv.lock").is_file()
-    ignored = (ROOT / ".gitignore").read_text(encoding="utf-8").splitlines()
-    assert "uv.lock" not in ignored
+def test_documented_uv_commands_do_not_require_a_lockfile() -> None:
+    readme = (ROOT / "README.md").read_text(encoding="utf-8")
+    notebook = _notebook_path().read_text(encoding="utf-8")
+
+    assert "uv run" in readme
+    assert "--frozen" not in readme
+    assert "--frozen" not in notebook
 
 
 def test_notebook_is_committed_without_outputs() -> None:

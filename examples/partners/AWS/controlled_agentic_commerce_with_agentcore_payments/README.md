@@ -1,4 +1,4 @@
-# Build an AI Agent That Can Pay for APIs Using AgentCore Payments
+# Build an AI agent that can pay for APIs using AgentCore Payments
 
 **Authors:** Deepak Jain and Sid Rampally
 
@@ -84,7 +84,7 @@ direct network environment; do not bypass a required corporate proxy.
 ```bash
 cd /path/to/openai-cookbook
 unset VIRTUAL_ENV
-uv run --frozen \
+uv run \
   --project examples/partners/AWS/controlled_agentic_commerce_with_agentcore_payments \
   --group dev --with jupyter \
   jupyter lab --port=8899 \
@@ -106,9 +106,9 @@ service call is enabled by default.
 ## Run the tests
 
 ```bash
-uv run --frozen --group dev pytest -q
-uv run --frozen --group dev ruff check src tests
-uv run --frozen --group dev ruff format --check src tests
+uv run --group dev pytest -q
+uv run --group dev ruff check src tests
+uv run --group dev ruff format --check src tests
 ```
 
 The expected result is that all tests pass and Ruff reports no selected errors.
@@ -157,7 +157,7 @@ macOS or Linux.
    manager, asset, challenge timeout, and idempotency values.
    Keep `PAYMENT_SESSION_ID` empty; the managed runner injects it privately.
    Install the live-only SDK with
-   `uv sync --frozen --extra agentcore --group dev`.
+   `uv sync --extra agentcore --group dev`.
 4. Set only `ALLOW_AGENTCORE_READ_ONLY=1` and run
    `agentic-commerce-agentcore-infrastructure`. Confirm that the instrument is
    `ACTIVE`, its wallet network is `ETHEREUM`, and the balance query reports
@@ -165,7 +165,7 @@ macOS or Linux.
    AWS calls do not report the balance amount and cannot create a session,
    generate a proof, contact a merchant, or transfer value.
 5. Run the shipped deterministic insufficient-budget check:
-   `uv run --frozen --group dev pytest -q tests/test_agentcore_payments.py -k insufficient_session_budget`.
+   `uv run --group dev pytest -q tests/test_agentcore_payments.py -k insufficient_session_budget`.
    It must pass without AWS, merchant, wallet, or payment calls. This example
    does not ship a separate live below-price runner.
 6. Enable all five transaction gates only for one reviewed run:
@@ -206,7 +206,7 @@ If cleanup reports `FAILED`, do not rerun the purchase. Use the distinct
 session-administration role to delete the recorded session first:
 
 ```bash
-uv run --frozen --extra agentcore agentic-commerce-agentcore-session delete
+uv run --extra agentcore agentic-commerce-agentcore-session delete
 ```
 
 The application reuses one stable idempotency token across payment retries.

@@ -457,7 +457,7 @@ def _parser() -> argparse.ArgumentParser:
     parser.add_argument(
         "--session-file",
         type=Path,
-        help="Ignored local state file for the session ID and client token.",
+        help="Local state file for the session ID and client token.",
     )
     subparsers = parser.add_subparsers(dest="operation", required=True)
     create = subparsers.add_parser("create")

@@ -1,1 +1,226 @@
-PLACEHOLDER
+<!doctype html>
+<html lang="es">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+  <meta name="robots" content="noindex,nofollow">
+  <meta name="theme-color" content="#213329">
+  <title>AUMARA — Tu vale 10%</title>
+  <style>
+    :root{--forest:#213329;--gold:#c49a64;--cream:#f3ecde;--paper:#fffaf2;--ink:#182019;--muted:#687168;--line:rgba(24,32,25,.14);--danger:#9b3b32;--ok:#31483a;--shadow:0 18px 48px rgba(25,45,33,.14)}
+    *{box-sizing:border-box}html{scroll-behavior:smooth}
+    body{margin:0;background:var(--cream);color:var(--ink);font-family:Inter,system-ui,-apple-system,"Segoe UI",sans-serif}
+    button,input,textarea,select{font:inherit}button{cursor:pointer}a{color:inherit}
+    .shell{min-height:100svh;display:grid;grid-template-columns:minmax(280px,.78fr) minmax(0,1.22fr)}
+    .visual{position:sticky;top:0;height:100svh;overflow:hidden;background:var(--forest);color:#fff}
+    .visual img{position:absolute;inset:0;width:100%;height:100%;object-fit:cover}
+    .visual:after{content:"";position:absolute;inset:0;background:linear-gradient(180deg,rgba(8,17,11,.2),rgba(8,17,11,.88))}
+    .brand{position:absolute;z-index:2;top:24px;left:24px;display:flex;align-items:center;gap:10px;font-size:12px;font-weight:900;letter-spacing:.18em}
+    .mark{width:40px;height:40px;border:1px solid #ffffffb8;border-radius:50%;display:grid;place-items:center;font:500 24px Georgia,serif}
+    .visual-copy{position:absolute;z-index:2;left:28px;right:28px;bottom:40px}
+    .eyebrow{margin:0 0 10px;color:#efc68d;font-size:11px;font-weight:900;letter-spacing:.16em;text-transform:uppercase}
+    .visual h1{margin:0;font:500 clamp(36px,5vw,68px)/.98 Georgia,serif;letter-spacing:-.04em}
+    .visual p{max-width:520px;color:#ffffffd0;font-size:17px;line-height:1.55}
+    .panel{min-width:0;padding:max(20px,env(safe-area-inset-top)) clamp(16px,4vw,56px) max(36px,env(safe-area-inset-bottom))}
+    .top{display:flex;align-items:center;justify-content:space-between;gap:12px;margin-bottom:22px}
+    .home{font-size:12px;font-weight:900;letter-spacing:.16em;text-decoration:none}
+    .langs{display:flex;gap:4px;padding:4px;border:1px solid var(--line);border-radius:999px;background:#fffaf2b8}
+    .lang{min-width:36px;padding:8px;border:0;border-radius:999px;background:transparent;color:var(--muted);font-size:11px;font-weight:900}
+    .lang.active{background:var(--forest);color:#fff}
+    .content{max-width:720px;margin:auto}
+    .card{background:var(--paper);border:1px solid var(--line);border-radius:24px;box-shadow:var(--shadow);padding:clamp(22px,4vw,36px);margin-bottom:14px}
+    .kicker{margin:0 0 8px;color:#9a7340;font-size:11px;font-weight:900;letter-spacing:.16em;text-transform:uppercase}
+    h2{margin:0;font:500 clamp(28px,4vw,44px)/1.05 Georgia,serif;letter-spacing:-.035em}
+    .lead{margin:12px 0 0;color:var(--muted);font-size:16px;line-height:1.6}
+    .code{margin:18px 0 8px;font:500 clamp(28px,5vw,42px)/1 Georgia,serif;letter-spacing:.02em;word-break:break-all}
+    .terms{display:flex;flex-wrap:wrap;gap:8px;margin-top:14px}
+    .term{padding:8px 11px;border-radius:999px;background:#e8e1d4;color:#405047;font-size:12px;font-weight:800}
+    .dates{display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-top:18px}
+    label.field{display:block;font-size:12px;font-weight:800;color:#3e4b42}
+    input[type=date],textarea{width:100%;margin-top:6px;padding:12px 13px;border:1px solid var(--line);border-radius:14px;background:#fff;color:var(--ink)}
+    textarea{min-height:96px;resize:vertical;line-height:1.5}
+    .nights{margin-top:10px;font-size:13px;color:var(--muted);font-weight:700}
+    .nights.bad{color:var(--danger)}
+    .actions{display:grid;gap:9px;margin-top:18px}
+    .btn{display:flex;align-items:center;justify-content:center;min-height:52px;padding:12px 18px;border-radius:999px;font-weight:900;text-decoration:none;border:1px solid var(--line);background:#fff;color:var(--forest)}
+    .btn.primary{background:var(--forest);border-color:var(--forest);color:#fff}
+    .btn:disabled{opacity:.45}
+    .voice{display:flex;gap:8px;align-items:center;margin-top:8px}
+    .mic{min-width:52px;height:44px;border-radius:999px;border:1px solid var(--line);background:#fff;color:var(--forest);font-size:12px;font-weight:900}
+    .mic.live{background:#9b3b32;border-color:#9b3b32;color:#fff}
+    .hint{margin:6px 0 0;color:var(--muted);font-size:12px;line-height:1.45}
+    .q{margin-top:16px}
+    .chips{display:flex;flex-wrap:wrap;gap:8px;margin-top:8px}
+    .chip{padding:10px 13px;border-radius:999px;border:1px solid var(--line);background:#fff;color:var(--forest);font-size:13px;font-weight:800}
+    .chip.on{background:var(--forest);border-color:var(--forest);color:#fff}
+    .sign{margin-top:8px;padding-top:16px;border-top:1px solid var(--line);font-size:14px;line-height:1.55}
+    .sign b{display:block;font:500 22px Georgia,serif}
+    .sign span{color:var(--muted);font-size:13px}
+    .ok{padding:12px 14px;border-radius:14px;background:#dfe8d8;color:var(--ok);font-size:14px;line-height:1.5}
+    .err{color:var(--danger);font-size:13px;font-weight:800}
+    @media(max-width:860px){.shell{display:block}.visual{position:relative;height:38svh;min-height:240px}.visual-copy{bottom:22px;left:18px;right:18px}.dates{grid-template-columns:1fr}}
+  </style>
+</head>
+<body>
+<main class="shell">
+  <aside class="visual" aria-hidden="true">
+    <img src="https://lh3.googleusercontent.com/d/1wdC_rqzts2T_PRgF3fNWdCOm_7pn3oRO=w1800" alt="" referrerpolicy="no-referrer">
+    <div class="brand"><span class="mark">A</span><span>AUMARA</span></div>
+    <div class="visual-copy">
+      <p class="eyebrow">Benidoleig · Costa Blanca</p>
+      <h1 id="vTitle"></h1>
+      <p id="vText"></p>
+    </div>
+  </aside>
+  <section class="panel">
+    <div class="top">
+      <a class="home" href="/aumara/">AUMARA</a>
+      <div class="langs" aria-label="Idioma">
+        <button class="lang" data-lang="es">ES</button>
+        <button class="lang" data-lang="en">EN</button>
+        <button class="lang" data-lang="ru">RU</button>
+      </div>
+    </div>
+    <div class="content" id="app"></div>
+  </section>
+</main>
+<script>
+const API="https://cguutkghsnhmwzghkmnc.supabase.co/functions/v1/aumara-feedback";
+const PROP=324882;
+const ROOM=674465;
+const MIN=5;
+const params=new URLSearchParams(location.search);
+const CODE=(params.get("code")||"").toUpperCase().replace(/[^A-Z0-9]/g,"");
+const T={
+  es:{title:"Vuestra casa os espera.",text:"Un 10% privado para volver. Elegís las fechas aquí — el calendario de hoy no vale.",kicker:"Vale AUMARA",hello:"Hola",lead:"Este código aplica un 10% en reserva directa. Mínimo 5 noches. Un solo uso.",t1:"Mín. 5 noches",t2:"Un uso",t3:"Directo AUMARA",in:"Llegada",out:"Salida",nights:"noches",need:"Hace falta un mínimo de 5 noches.",book:"Reservar con el 10%",copy:"Copiar código",copied:"Copiado",ask:"Cinco preguntas, o hablad. La voz no se guarda — solo el texto.",q1:"¿Cómo fue la estancia?",q2:"¿Qué os gustó?",q3:"¿Qué mejoraríais?",q4:"¿Volveríais?",q5:"¿Qué os gustaría encontrar la próxima vez?",speak:"Hablar",stop:"Parar",ph:"Escribid o pulsad Hablar. En vuestro idioma.",send:"Enviar a Ilia",sent:"Gracias. Lo hemos recibido.",signN:"Ilia Doroshenko",signR:"Administración · AUMARA El Cid",miss:"Este enlace no tiene un vale activo."},
+  en:{title:"Your house is waiting.",text:"A private 10% to come back. Pick dates here — today's calendar is not the offer.",kicker:"AUMARA voucher",hello:"Hello",lead:"This code applies 10% on a direct booking. Minimum 5 nights. One use.",t1:"Min. 5 nights",t2:"One use",t3:"Direct AUMARA",in:"Arrival",out:"Departure",nights:"nights",need:"A minimum of 5 nights is required.",book:"Book with 10% off",copy:"Copy code",copied:"Copied",ask:"Five questions, or just speak. Voice is not stored — only the text.",q1:"How was the stay?",q2:"What did you enjoy?",q3:"What should we improve?",q4:"Would you return?",q5:"What would you like next time?",speak:"Speak",stop:"Stop",ph:"Type or tap Speak. Any language.",send:"Send to Ilia",sent:"Thank you. We have it.",signN:"Ilia Doroshenko",signR:"Administration · AUMARA El Cid",miss:"This link has no active voucher."},
+  ru:{title:"Ваш дом ждёт.",text:"Личные 10%, чтобы вернуться. Даты выбираете здесь — сегодняшний календарь не считается.",kicker:"Ваучер AUMARA",hello:"Здравствуйте",lead:"Код даёт 10% на прямую бронь. Минимум 5 ночей. Один раз.",t1:"От 5 ночей",t2:"Один раз",t3:"Напрямую AUMARA",in:"Заезд",out:"Выезд",nights:"ночей",need:"Нужен минимум 5 ночей.",book:"Бронировать со скидкой 10%",copy:"Скопировать код",copied:"Скопировано",ask:"Пять вопросов или просто скажите. Голос не сохраняется — только текст.",q1:"Как прошло проживание?",q2:"Что понравилось?",q3:"Что улучшить?",q4:"Вернётесь?",q5:"Что хотели бы в следующий раз?",speak:"Говорить",stop:"Стоп",ph:"Напишите или нажмите Говорить. На своём языке.",send:"Отправить Илье",sent:"Спасибо. Получили.",signN:"Ilia Doroshenko",signR:"Администрация · AUMARA El Cid",miss:"У этой ссылки нет активного ваучера."}
+};
+const CHIPS={es:["Casa","Vistas","Naturaleza","Calma","Desayuno","Limpieza"],en:["House","Views","Nature","Quiet","Breakfast","Cleanliness"],ru:["Дом","Виды","Природа","Тишина","Завтрак","Чистота"]};
+let lang=localStorage.getItem("aumara-vale-lang")||"es";
+if(!T[lang]) lang="es";
+const app=document.getElementById("app");
+const tr=()=>T[lang];
+const esc=v=>String(v??"").replace(/[&<>\"']/g,c=>({"&":"&","<":"<",">":">","\"":"""}[c]));
+function isoPlus(days){const d=new Date();d.setDate(d.getDate()+days);return d.toISOString().slice(0,10)}
+function nightsBetween(a,b){return Math.round((new Date(b+"T12:00:00")-new Date(a+"T12:00:00"))/86400000)}
+function setLang(l){lang=T[l]?l:"es";localStorage.setItem("aumara-vale-lang",lang);document.documentElement.lang=lang;document.querySelectorAll(".lang").forEach(b=>b.classList.toggle("active",b.dataset.lang===lang));document.getElementById("vTitle").textContent=tr().title;document.getElementById("vText").textContent=tr().text}
+document.querySelectorAll(".lang").forEach(b=>b.addEventListener("click",()=>{setLang(b.dataset.lang);draw()}));
+
+function bookUrl(code,inD,outD){
+  const n=nightsBetween(inD,outD);
+  const [y,m,d]=inD.split("-");
+  const checkin=`${Number(y)}-${Number(m)}-${Number(d)}`;
+  return `https://beds24.com/booking2.php?propid=${PROP}&voucher=${encodeURIComponent(code)}&referer=${encodeURIComponent(code)}&checkin=${checkin}&numnight=${n}&numadult=2&roomid=${ROOM}&lang=${lang==="ru"?"en":lang}&mobile=1`;
+}
+
+function draw(offer){
+  setLang(lang);
+  if(!CODE){app.innerHTML=`<section class="card"><p class="kicker">AUMARA</p><h2>${esc(tr().miss)}</h2></section>`;return}
+  const inn=isoPlus(21);
+  const out=isoPlus(26);
+  const chips=(CHIPS[lang]||CHIPS.es).map(c=>`<button class="chip" type="button">${esc(c)}</button>`).join("");
+  app.innerHTML=`
+    <section class="card">
+      <p class="kicker">${esc(tr().kicker)}</p>
+      <h2>${esc(tr().hello)}</h2>
+      <p class="lead">${esc(tr().lead)}</p>
+      <div class="code" id="code">${esc(CODE)}</div>
+      <div class="terms"><span class="term">${esc(tr().t1)}</span><span class="term">${esc(tr().t2)}</span><span class="term">${esc(tr().t3)}</span>${offer&&offer.discountPercent?`<span class="term">${offer.discountPercent}%</span>`:""}</div>
+      <div class="dates">
+        <label class="field">${esc(tr().in)}<input type="date" id="inn" value="${inn}" min="${isoPlus(1)}"></label>
+        <label class="field">${esc(tr().out)}<input type="date" id="out" value="${out}" min="${isoPlus(MIN+1)}"></label>
+      </div>
+      <p class="nights" id="nlab"></p>
+      <div class="actions">
+        <a class="btn primary" id="book" href="#">${esc(tr().book)}</a>
+        <button class="btn" type="button" id="copy">${esc(tr().copy)}</button>
+      </div>
+    </section>
+    <section class="card">
+      <p class="kicker">AUMARA</p>
+      <h2>${esc(tr().ask)}</h2>
+      <div class="q"><label class="field">${esc(tr().q1)}</label><div class="chips" id="q1">${[1,2,3,4,5].map(n=>`<button class="chip" type="button" data-v="${n}">${n}</button>`).join("")}</div></div>
+      <div class="q"><label class="field">${esc(tr().q2)}</label><div class="chips" id="liked">${chips}</div></div>
+      <div class="q"><label class="field">${esc(tr().q3)}</label>
+        <div class="voice"><textarea id="improve" maxlength="1200" placeholder="${esc(tr().ph)}"></textarea></div>
+        <div class="voice"><button class="mic" type="button" id="mic">${esc(tr().speak)}</button><p class="hint">${esc(tr().ask)}</p></div>
+      </div>
+      <div class="q"><label class="field">${esc(tr().q4)}</label><div class="chips" id="back"><button class="chip" type="button">Sí</button><button class="chip" type="button">Tal vez</button><button class="chip" type="button">No</button></div></div>
+      <div class="q"><label class="field">${esc(tr().q5)}</label><textarea id="next" maxlength="800" placeholder="${esc(tr().ph)}"></textarea></div>
+      <div class="actions"><button class="btn primary" type="button" id="send">${esc(tr().send)}</button></div>
+      <p class="hint" id="smsg"></p>
+      <div class="sign">
+        <b>${esc(tr().signN)}</b>
+        <span>${esc(tr().signR)}</span><br>
+        <span>+34 622 914 323 · elcidspain@gmail.com</span>
+      </div>
+    </section>`;
+  const innEl=document.getElementById("inn");
+  const outEl=document.getElementById("out");
+  const nlab=document.getElementById("nlab");
+  const book=document.getElementById("book");
+  function sync(){
+    const n=nightsBetween(innEl.value,outEl.value);
+    const ok=n>=MIN;
+    nlab.textContent=Number.isFinite(n)?`${n} ${tr().nights}`:"";
+    nlab.classList.toggle("bad",!ok);
+    book.classList.toggle("disabled",!ok);
+    if(ok){book.href=bookUrl(CODE,innEl.value,outEl.value);book.removeAttribute("aria-disabled")}
+    else {book.href="#";book.setAttribute("aria-disabled","true")}
+    if(!ok && Number.isFinite(n)) nlab.textContent=tr().need;
+  }
+  innEl.addEventListener("change",()=>{const d=new Date(innEl.value+"T12:00:00");d.setDate(d.getDate()+MIN);outEl.min=d.toISOString().slice(0,10);if(nightsBetween(innEl.value,outEl.value)<MIN) outEl.value=outEl.min;sync()});
+  outEl.addEventListener("change",sync);
+  sync();
+  document.getElementById("copy").onclick=async(e)=>{await navigator.clipboard.writeText(CODE);e.currentTarget.textContent=tr().copied};
+  document.querySelectorAll(".chips").forEach(g=>g.querySelectorAll(".chip").forEach(b=>b.onclick=()=>{
+    if(g.id==="q1"||g.id==="back") g.querySelectorAll(".chip").forEach(x=>x.classList.remove("on"));
+    b.classList.toggle("on");
+  }));
+  const SR=window.SpeechRecognition||window.webkitSpeechRecognition;
+  const mic=document.getElementById("mic");
+  let rec=null,live=false;
+  mic.onclick=()=>{
+    if(!SR){mic.textContent="—";return}
+    if(live){rec&&rec.stop();return}
+    rec=new SR();rec.lang=lang==="ru"?"ru-RU":lang==="en"?"en-US":"es-ES";rec.interimResults=false;
+    rec.onstart=()=>{live=true;mic.classList.add("live");mic.textContent=tr().stop};
+    rec.onend=()=>{live=false;mic.classList.remove("live");mic.textContent=tr().speak};
+    rec.onresult=e=>{const t=e.results[0][0].transcript;const box=document.getElementById("improve");box.value=(box.value?box.value+" ":"")+t};
+    rec.start();
+  };
+  document.getElementById("send").onclick=async()=>{
+    const payload={
+      code:CODE,locale:lang,
+      rating:[...document.querySelectorAll("#q1 .chip.on")].map(x=>x.dataset.v)[0]||"",
+      liked:[...document.querySelectorAll("#liked .chip.on")].map(x=>x.textContent),
+      improve:document.getElementById("improve").value.trim(),
+      return:[...document.querySelectorAll("#back .chip.on")].map(x=>x.textContent)[0]||"",
+      next:document.getElementById("next").value.trim(),
+      voiceStored:false
+    };
+    const msg=document.getElementById("smsg");
+    try{
+      await fetch(`${API}?action=note`,{method:"POST",headers:{"content-type":"application/json"},body:JSON.stringify(payload)}).catch(()=>{});
+    }catch{}
+    msg.innerHTML=`<span class="ok">${esc(tr().sent)}</span>`;
+  };
+}
+
+async function init(){
+  setLang(lang);
+  let offer=null;
+  if(CODE){
+    try{
+      const r=await fetch(`${API}?action=offer&code=${encodeURIComponent(CODE)}`);
+      const j=await r.json();
+      if(r.ok&&j.ok) offer=j.offer;
+    }catch{}
+  }
+  draw(offer);
+}
+init();
+</script>
+</body>
+</html>

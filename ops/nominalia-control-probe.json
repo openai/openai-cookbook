@@ -1,5 +1,6 @@
 {
   "status": "AUTH_FAILED",
+  "login_alias": "email",
   "final_host": "controlpanel.nominalia.com",
   "final_path": "/welcome.html",
   "page_title": "Panel de Control",

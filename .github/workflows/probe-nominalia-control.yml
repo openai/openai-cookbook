@@ -16,8 +16,8 @@ jobs:
     timeout-minutes: 8
     environment: NOMINALIA_FTP_PASSWORD
     env:
-      NOMINALIA_USER: admin_elcid
-      NOMINALIA_PASSWORD: ${{ secrets.NOMINALIA_FTP_PASSWORD || secrets.NOMINALIAFTPPASSWORD }}
+      NOMINALIA_USER: ${{ secrets.NOMINALIA_CONTROL_USER || secrets.NOMINALIA_USER || vars.NOMINALIA_CONTROL_USER || 'admin_elcid' }}
+      NOMINALIA_PASSWORD: ${{ secrets.NOMINALIA_CONTROL_PASSWORD || secrets.NOMINALIA_PANEL_PASSWORD || secrets.NOMINALIA_PASSWORD || secrets.NOMINALIA_ACCOUNT_PASSWORD || secrets.NOMINALIA_FTP_PASSWORD || secrets.NOMINALIAFTPPASSWORD }}
     steps:
       - uses: actions/checkout@v4
         with:

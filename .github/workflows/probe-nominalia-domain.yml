@@ -1,0 +1,98 @@
+name: Probe AUMARA Nominalia domain routing
+
+on:
+  push:
+    branches: [main]
+    paths:
+      - '.github/workflows/probe-nominalia-domain.yml'
+  workflow_dispatch:
+
+permissions:
+  contents: write
+
+jobs:
+  probe:
+    runs-on: ubuntu-latest
+    timeout-minutes: 8
+    environment: NOMINALIA_FTP_PASSWORD
+    env:
+      FTP_HOST: elcidt.ftp.tb-hosting.com
+      FTP_USER: elcidspaincom@elcidspaincom
+      FTP_PASSWORD: ${{ secrets.NOMINALIA_FTP_PASSWORD || secrets.NOMINALIAFTPPASSWORD }}
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          ref: main
+
+      - name: Resolve DNS and prove hosting target
+        shell: bash
+        run: |
+          set -euo pipefail
+          sudo apt-get update -qq
+          sudo apt-get install -y -qq dnsutils lftp >/dev/null
+          mkdir -p ops
+
+          dig_short() { dig +short "$1" "$2" | paste -sd ',' -; }
+          ELCID_A="$(dig_short elcidspain.com A)"
+          AUMARA_A="$(dig_short aumara.me A)"
+          WWW_A="$(dig_short www.aumara.me A)"
+          WWW_CNAME="$(dig_short www.aumara.me CNAME)"
+          FTP_A="$(dig_short "$FTP_HOST" A)"
+          AUMARA_NS="$(dig_short aumara.me NS)"
+
+          test -n "$FTP_PASSWORD"
+          FTP_PWD="$(lftp -u "$FTP_USER","$FTP_PASSWORD" "$FTP_HOST" -e 'set cmd:fail-exit yes; set ftp:ssl-allow no; set ftp:passive-mode yes; pwd; bye' 2>&1 | tail -1)"
+          FTP_AUMARA="$(lftp -u "$FTP_USER","$FTP_PASSWORD" "$FTP_HOST" -e 'set cmd:fail-exit yes; set ftp:ssl-allow no; set ftp:passive-mode yes; cls -ld /www /www/aumara; bye' 2>&1 | tr '\n' ' ' | sed 's/`/'"'"'/g')"
+
+          probe_url() {
+            local url="$1"
+            curl -k -sS -L --max-time 30 -o /tmp/body -w '%{http_code}|%{url_effective}|%{remote_ip}|%{content_type}|%{size_download}' "$url" 2>/tmp/curl.err || true
+          }
+          AUMARA_HTTP="$(probe_url http://aumara.me/)"
+          AUMARA_HTTPS="$(probe_url https://aumara.me/)"
+          WWW_HTTP="$(probe_url http://www.aumara.me/)"
+          WWW_HTTPS="$(probe_url https://www.aumara.me/)"
+          ELCID_HTTP="$(probe_url https://elcidspain.com/)"
+
+          HOST_TEST='not_run'
+          FIRST_FTP_IP="$(printf '%s' "$FTP_A" | cut -d, -f1)"
+          if [ -n "$FIRST_FTP_IP" ]; then
+            HOST_TEST="$(curl -k -sS --max-time 30 --resolve aumara.me:443:${FIRST_FTP_IP} -o /tmp/hosttest -w '%{http_code}|%{remote_ip}|%{content_type}|%{size_download}' https://aumara.me/ 2>/tmp/hosttest.err || true)"
+          fi
+
+          {
+            echo '# AUMARA Nominalia domain routing probe'
+            echo
+            echo "- UTC: $(date -u +%FT%TZ)"
+            echo "- EL CID A: \`$ELCID_A\`"
+            echo "- AUMARA apex A: \`$AUMARA_A\`"
+            echo "- AUMARA www A: \`$WWW_A\`"
+            echo "- AUMARA www CNAME: \`$WWW_CNAME\`"
+            echo "- AUMARA NS: \`$AUMARA_NS\`"
+            echo "- Nominalia FTP host A: \`$FTP_A\`"
+            echo "- FTP pwd: \`$FTP_PWD\`"
+            echo "- FTP web roots: \`$FTP_AUMARA\`"
+            echo
+            echo '## Public HTTP'
+            echo "- http://aumara.me/: \`$AUMARA_HTTP\`"
+            echo "- https://aumara.me/: \`$AUMARA_HTTPS\`"
+            echo "- http://www.aumara.me/: \`$WWW_HTTP\`"
+            echo "- https://www.aumara.me/: \`$WWW_HTTPS\`"
+            echo "- https://elcidspain.com/: \`$ELCID_HTTP\`"
+            echo
+            echo '## Direct host-header test against Nominalia FTP/server IP'
+            echo "- aumara.me -> first FTP IP: \`$HOST_TEST\`"
+          } > ops/aumara-domain-network-probe.md
+
+          cat ops/aumara-domain-network-probe.md
+
+      - name: Commit routing evidence
+        shell: bash
+        run: |
+          set -euo pipefail
+          git config user.name 'github-actions[bot]'
+          git config user.email '41898282+github-actions[bot]@users.noreply.github.com'
+          git add ops/aumara-domain-network-probe.md
+          git diff --cached --quiet && exit 0
+          git commit -m 'Record AUMARA Nominalia routing probe [skip ci]'
+          git push

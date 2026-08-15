@@ -1,7 +1,7 @@
 # EL CID / AUMARA production probe
 
-- Checked UTC: 2026-08-15T08:26:06Z
-- Commit: 791cdf9a8d923396e9e9c007c98cf60877f97ca5
+- Checked UTC: 2026-08-15T08:29:33Z
+- Commit: 006253a5145d0460328f7545eecca9ee02fa812f
 - Trigger: workflow_run
 - Fully operational: **no**
 
@@ -14,10 +14,10 @@
 
 ## AUMARA
 - URL: https://elcidspain.com/aumara/
-- curl_exit|http|final_url|content_type|bytes: `0|200|https://elcidspain.com/aumara/|text/html|36656`
-- exact page marker: **yes**
-- node-01 reference: **yes**
-- node-08 reference: **yes**
+- curl_exit|http|final_url|content_type|bytes: `0|200|https://elcidspain.com/aumara/|text/html|16661`
+- exact page marker: **no**
+- node-01 reference: **no**
+- node-08 reference: **no**
 - Beds24 reference: **yes**
 
 ## Walkthrough clips

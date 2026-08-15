@@ -101,4 +101,5 @@ jobs:
           git add ops/aumara-domain-network-probe.md
           git diff --cached --quiet && exit 0
           git commit -m 'Record AUMARA Nominalia routing probe [skip ci]'
+          git pull --rebase origin main
           git push

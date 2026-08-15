@@ -16,8 +16,8 @@ jobs:
     timeout-minutes: 8
     environment: NOMINALIA_FTP_PASSWORD
     env:
-      NOMINALIA_USER: ${{ secrets.NOMINALIA_CONTROL_USER || secrets.NOMINALIA_USER || vars.NOMINALIA_CONTROL_USER || 'admin_elcid' }}
-      NOMINALIA_PASSWORD: ${{ secrets.NOMINALIA_CONTROL_PASSWORD || secrets.NOMINALIA_PANEL_PASSWORD || secrets.NOMINALIA_PASSWORD || secrets.NOMINALIA_ACCOUNT_PASSWORD || secrets.NOMINALIA_FTP_PASSWORD || secrets.NOMINALIAFTPPASSWORD }}
+      NOMINALIA_USER: elcidspain@gmail.com
+      NOMINALIA_PASSWORD: ${{ secrets.NOMINALIAFTPPASSWORD }}
     steps:
       - uses: actions/checkout@v4
         with:
@@ -74,7 +74,7 @@ jobs:
                   k=(x['text'],x['url'])
                   if k not in seen: seen.add(k); out.append(x)
               links=out[:40]
-          report={'status':status,'final_host':urlparse(final).netloc,'final_path':urlparse(final).path,'page_title':title[:200],'candidate_control_links':links}
+          report={'status':status,'login_alias':'email','final_host':urlparse(final).netloc,'final_path':urlparse(final).path,'page_title':title[:200],'candidate_control_links':links}
           open('ops/nominalia-control-probe.json','w').write(json.dumps(report,ensure_ascii=False,indent=2))
           print(json.dumps(report,ensure_ascii=False,indent=2))
           PY

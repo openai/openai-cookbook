@@ -5,7 +5,6 @@ import re
 from pathlib import Path
 
 ROOT = Path(__file__).resolve().parents[1]
-UPSTREAM_REVISION = "85aa4e5ca9a2d55ad7c412f2d015011095b2222d"
 DIAGRAMS = (
     "controlled-agentic-commerce-overview.png",
     "controlled-agentic-commerce-local-and-testnet.png",
@@ -17,14 +16,6 @@ def _notebook_path() -> Path:
     candidates = (
         ROOT / "controlled_agentic_commerce.ipynb",
         ROOT / "cookbook/controlled_agentic_commerce.ipynb",
-    )
-    return next(path for path in candidates if path.is_file())
-
-
-def _attribution_path() -> Path:
-    candidates = (
-        ROOT / "SOURCE_ATTRIBUTION.md",
-        ROOT / "docs/UPSTREAM_SOURCES.md",
     )
     return next(path for path in candidates if path.is_file())
 
@@ -93,14 +84,6 @@ def test_live_opt_ins_are_disabled_by_default() -> None:
     assert settings["BEDROCK_AWS_PROFILE"] == ""
     assert settings["AGENTCORE_SESSION_AWS_PROFILE"] == ""
     assert settings["AGENTCORE_RUNTIME_AWS_PROFILE"] == ""
-
-
-def test_upstream_source_is_pinned_and_licensed() -> None:
-    attribution = _attribution_path().read_text(encoding="utf-8")
-
-    assert UPSTREAM_REVISION in attribution
-    assert "Apache" in attribution
-    assert "No source code from the AWS sample is copied" in attribution
 
 
 def test_publishable_text_has_no_high_confidence_credentials() -> None:

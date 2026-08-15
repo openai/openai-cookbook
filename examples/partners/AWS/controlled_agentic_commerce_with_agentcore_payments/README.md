@@ -234,10 +234,3 @@ Also review the current AWS guidance for
 [prerequisites](https://docs.aws.amazon.com/bedrock-agentcore/latest/devguide/payments-prerequisites.html),
 [payment instruments](https://docs.aws.amazon.com/bedrock-agentcore/latest/devguide/payments-create-instrument.html),
 and [bounded sessions](https://docs.aws.amazon.com/bedrock-agentcore/latest/devguide/payments-create-session.html).
-
-## Source and credit
-
-Nick's AWS paid-research sample
-provides a broader multi-agent live testnet reference. Its wallet-neutral setup
-and bounded-session exercise informed this example. No source code was copied.
-See `SOURCE_ATTRIBUTION.md` for the fixed revision and license.

@@ -41,8 +41,8 @@ jobs:
           AUMARA_NS="$(dig_short aumara.me NS)"
 
           test -n "$FTP_PASSWORD"
-          FTP_PWD="$(lftp -u "$FTP_USER","$FTP_PASSWORD" "$FTP_HOST" -e 'set cmd:fail-exit yes; set ftp:ssl-allow no; set ftp:passive-mode yes; pwd; bye' 2>&1 | tail -1)"
-          FTP_AUMARA="$(lftp -u "$FTP_USER","$FTP_PASSWORD" "$FTP_HOST" -e 'set cmd:fail-exit yes; set ftp:ssl-allow no; set ftp:passive-mode yes; cls -ld /www /www/aumara; bye' 2>&1 | tr '\n' ' ' | sed 's/`/'"'"'/g')"
+          lftp -u "$FTP_USER","$FTP_PASSWORD" "$FTP_HOST" -e 'set cmd:fail-exit yes; set ftp:ssl-allow no; set ftp:passive-mode yes; cd /www/aumara; cls -l index.html; bye' >/tmp/ftp-check.txt 2>/tmp/ftp-check.err
+          FTP_OK=yes
 
           probe_url() {
             local url="$1"
@@ -54,11 +54,17 @@ jobs:
           WWW_HTTPS="$(probe_url https://www.aumara.me/)"
           ELCID_HTTP="$(probe_url https://elcidspain.com/)"
 
-          HOST_TEST='not_run'
-          FIRST_FTP_IP="$(printf '%s' "$FTP_A" | cut -d, -f1)"
-          if [ -n "$FIRST_FTP_IP" ]; then
-            HOST_TEST="$(curl -k -sS --max-time 30 --resolve aumara.me:443:${FIRST_FTP_IP} -o /tmp/hosttest -w '%{http_code}|%{remote_ip}|%{content_type}|%{size_download}' https://aumara.me/ 2>/tmp/hosttest.err || true)"
+          HOST80='not_run'
+          HOST443='not_run'
+          ELCID_IP="$(printf '%s' "$ELCID_A" | cut -d, -f1)"
+          if [ -n "$ELCID_IP" ]; then
+            HOST80="$(curl -sS --max-time 30 --resolve aumara.me:80:${ELCID_IP} -o /tmp/host80 -w '%{http_code}|%{remote_ip}|%{content_type}|%{size_download}' http://aumara.me/ 2>/tmp/host80.err || true)"
+            HOST443="$(curl -k -sS --max-time 30 --resolve aumara.me:443:${ELCID_IP} -o /tmp/host443 -w '%{http_code}|%{remote_ip}|%{content_type}|%{size_download}' https://aumara.me/ 2>/tmp/host443.err || true)"
           fi
+          HOST80_AUMARA=no
+          HOST443_AUMARA=no
+          grep -Fq 'Walk the place before you choose the house.' /tmp/host80 2>/dev/null && HOST80_AUMARA=yes
+          grep -Fq 'Walk the place before you choose the house.' /tmp/host443 2>/dev/null && HOST443_AUMARA=yes
 
           {
             echo '# AUMARA Nominalia domain routing probe'
@@ -70,8 +76,7 @@ jobs:
             echo "- AUMARA www CNAME: \`$WWW_CNAME\`"
             echo "- AUMARA NS: \`$AUMARA_NS\`"
             echo "- Nominalia FTP host A: \`$FTP_A\`"
-            echo "- FTP pwd: \`$FTP_PWD\`"
-            echo "- FTP web roots: \`$FTP_AUMARA\`"
+            echo "- FTP /www/aumara access: **$FTP_OK**"
             echo
             echo '## Public HTTP'
             echo "- http://aumara.me/: \`$AUMARA_HTTP\`"
@@ -80,8 +85,9 @@ jobs:
             echo "- https://www.aumara.me/: \`$WWW_HTTPS\`"
             echo "- https://elcidspain.com/: \`$ELCID_HTTP\`"
             echo
-            echo '## Direct host-header test against Nominalia FTP/server IP'
-            echo "- aumara.me -> first FTP IP: \`$HOST_TEST\`"
+            echo '## Direct vhost test against EL CID production IP'
+            echo "- HTTP aumara.me -> EL CID IP: \`$HOST80\`; AUMARA marker: **$HOST80_AUMARA**"
+            echo "- HTTPS aumara.me -> EL CID IP: \`$HOST443\`; AUMARA marker: **$HOST443_AUMARA**"
           } > ops/aumara-domain-network-probe.md
 
           cat ops/aumara-domain-network-probe.md

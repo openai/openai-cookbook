@@ -57,7 +57,7 @@ def test_notebook_has_publishable_boundaries_and_diagrams() -> None:
     assert "### Using the Responses API directly" in source
     assert "responses_client.responses.create" in source
     assert '"function_call_output"' in source
-    assert "**Authors:** Deepak Jain and Sid Rampally" in source
+    assert "**Authors:** Deepak Jain and Sid Rampally" not in source
     assert "AgentCore Runtime is not used by this notebook" in source
     assert "RUN_AGENTCORE_E2E" in source
     assert "run_managed_e2e" in source

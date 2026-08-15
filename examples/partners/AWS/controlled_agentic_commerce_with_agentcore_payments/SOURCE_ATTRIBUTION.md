@@ -3,7 +3,6 @@
 ## AWS paid-research companion sample
 
 - Contributor: Nick (`mccartnick`), AWS Solutions Architect
-- Pull request: [AWS AgentCore paid-research sample PR #1869](https://github.com/awslabs/agentcore-samples/pull/1869)
 - Reviewed revision: `85aa4e5ca9a2d55ad7c412f2d015011095b2222d`
 - Review date: August 5, 2026
 - License: Apache-2.0

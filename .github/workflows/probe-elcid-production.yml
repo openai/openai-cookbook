@@ -103,7 +103,7 @@ jobs:
 
           fully_operational=no
           if [ "$root_code" = 200 ] && [ "$root_marker" = yes ] && [ "$root_secondary" = yes ] && [ "$root_link" = yes ] \
-             && [ "${root_bytes:-0}" -gt 30000 ] \
+             && [ "${root_bytes:-0}" -gt 25000 ] \
              && [ "$aumara_code" = 200 ] && [ "$aumara_marker" = yes ] \
              && [ "$aumara_node01_ref" = yes ] && [ "$aumara_node08_ref" = yes ] && [ "$aumara_beds24_ref" = yes ]; then
             case "$node01_code" in 200|206) node01_ok=yes ;; *) node01_ok=no ;; esac

@@ -4,6 +4,20 @@
 # should build pages for, and indicates metadata such as tags, creation date and
 # authors for each page.
 
+- title: Gating Risky Agent Actions with RelayShield
+  path: examples/agents_sdk/gating_risky_agent_actions_with_relayshield.ipynb
+  slug: gating-risky-agent-actions-with-relayshield
+  description: Use tool input guardrails in the Agents SDK to make an MCP registry-risk check mandatory before an agent connects to or installs a third-party MCP server.
+  date: 2026-08-15
+  authors:
+    - nzdsf2-gif
+  tags:
+    - agents-sdk
+    - agents
+    - mcp
+    - guardrails
+    - security
+
 - title: Enabling Long-Term Agent Memory with Oracle AI Agent Memory
   path: examples/vector_databases/oracle_db/deep_research_openai_agents.ipynb
   slug: deep-research-openai-agents

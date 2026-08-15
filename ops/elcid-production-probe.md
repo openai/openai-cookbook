@@ -1,9 +1,9 @@
 # EL CID / AUMARA production probe
 
-- Checked UTC: 2026-08-15T12:07:48Z
-- Commit: 5573c4b23d357f6fac3757089535e8ac086efb0d
-- Trigger: workflow_run
-- Fully operational: **no**
+- Checked UTC: 2026-08-15T12:08:35Z
+- Commit: 3a7a72cc190350ba4be4936c2a029331b00f26d4
+- Trigger: push
+- Fully operational: **yes**
 
 ## Root
 - URL: https://elcidspain.com/

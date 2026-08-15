@@ -1,17 +1,18 @@
 # EL CID root deployment evidence
 
-- Checked UTC: 2026-07-14T21:00:55Z
-- Source commit: 9551c1f099f568de4f1c92e38d3c0f2a7b7298eb
-- Run: https://github.com/elcidspain/openai-cookbook/actions/runs/29367896583
+- Checked UTC: 2026-08-15T08:25:34Z
+- Source commit: bf5b5117f65d95d052070074c23c56ce728506ef
+- Run: https://github.com/elcidspain/openai-cookbook/actions/runs/31874420539
 - Secret check: **success**
 - WordPress backup: **success**
-- FTP publish: **failure**
-- Public verification: **skipped**
-- Public HTTP: **not_run**
-- Public bytes: **not_run**
+- FTP publish: **success**
+- Public verification: **failure**
+- Public HTTP: **200**
+- Public bytes: **28107**
 - Expected marker: `A country club built around the way a place feels.`
 
 ## Publish log tail
 ```text
-Publish step did not create a log.
+-rw-r--r-- 179495   179495      28107 Aug 15 08:25 index.html
+-rw-r--r-- 179495   179495      28107 Aug 15 08:25 index.php
 ```

@@ -1,6 +1,6 @@
 # AUMARA Nominalia domain routing probe
 
-- UTC: 2026-08-15T13:10:58Z
+- UTC: 2026-08-15T13:59:37Z
 - EL CID A: `213.158.93.19`
 - AUMARA apex A: `81.88.48.71`
 - AUMARA www A: `aumara.me.,81.88.48.71`

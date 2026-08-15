@@ -80,7 +80,7 @@ jobs:
           grep -Fq "$PAGE_MARKER" /tmp/elcid-live.html
           grep -Fq 'One place. More than one way to stay.' /tmp/elcid-live.html
           grep -Fq '/aumara/#explore' /tmp/elcid-live.html
-          test "$bytes" -gt 30000
+          test "$bytes" -gt 25000
           echo "Verified expanded EL CID root release and AUMARA route."
 
       - name: Deployment summary

@@ -16,7 +16,7 @@ jobs:
     timeout-minutes: 8
     environment: NOMINALIA_FTP_PASSWORD
     env:
-      NOMINALIA_USER: elcidspain@gmail.com
+      NOMINALIA_USER: admin_elcid
       NOMINALIA_PASSWORD: ${{ secrets.NOMINALIA_FTP_PASSWORD || secrets.NOMINALIAFTPPASSWORD }}
     steps:
       - uses: actions/checkout@v4
@@ -30,7 +30,7 @@ jobs:
           python -m pip install --disable-pip-version-check -q requests beautifulsoup4
           mkdir -p ops
           python - <<'PY'
-          import os, re, json
+          import os, json
           from urllib.parse import urljoin, urlparse, parse_qsl, urlencode, urlunparse
           import requests
           from bs4 import BeautifulSoup
@@ -38,86 +38,44 @@ jobs:
           user=os.environ['NOMINALIA_USER']
           password=os.environ['NOMINALIA_PASSWORD']
           assert user and password
-
-          s=requests.Session()
-          s.headers['User-Agent']='Mozilla/5.0 AUMARA authorized control probe'
-          start='https://controlpanel.nominalia.com/welcome.html'
-          r=s.get(start,timeout=30,allow_redirects=True)
-          r.raise_for_status()
+          s=requests.Session(); s.headers['User-Agent']='Mozilla/5.0 AUMARA authorized control probe'
+          r=s.get('https://controlpanel.nominalia.com/welcome.html',timeout=30,allow_redirects=True); r.raise_for_status()
           soup=BeautifulSoup(r.text,'html.parser')
-          forms=soup.find_all('form')
-          login_form=None
-          for f in forms:
-              if f.find('input',{'type':'password'}):
-                  login_form=f; break
+          login_form=next((f for f in soup.find_all('form') if f.find('input',{'type':'password'})),None)
           if not login_form:
-              status='NO_LOGIN_FORM'
-              final=r.url
-              title=(soup.title.string.strip() if soup.title and soup.title.string else '')
-              links=[]
+              status='NO_LOGIN_FORM'; final=r.url; ss=soup
           else:
-              data={}
-              for inp in login_form.find_all('input'):
-                  name=inp.get('name')
-                  if not name: continue
-                  data[name]=inp.get('value','')
-              p=login_form.find('input',{'type':'password'})
-              p_name=p.get('name')
+              data={i.get('name'):i.get('value','') for i in login_form.find_all('input') if i.get('name')}
+              p=login_form.find('input',{'type':'password'}); p_name=p.get('name')
               text_inputs=[i for i in login_form.find_all('input') if i.get('name') and i.get('type','text') in ('text','email')]
               u_name=text_inputs[0].get('name') if text_inputs else None
-              if not (u_name and p_name):
-                  raise SystemExit('Unable to identify login field names safely')
-              data[u_name]=user
-              data[p_name]=password
+              if not (u_name and p_name): raise SystemExit('Unable to identify login fields safely')
+              data[u_name]=user; data[p_name]=password
               action=urljoin(r.url,login_form.get('action') or r.url)
-              method=(login_form.get('method') or 'post').lower()
-              if method=='get':
-                  rr=s.get(action,params=data,timeout=30,allow_redirects=True)
-              else:
-                  rr=s.post(action,data=data,timeout=30,allow_redirects=True)
-              final=rr.url
-              ss=BeautifulSoup(rr.text,'html.parser')
-              title=(ss.title.string.strip() if ss.title and ss.title.string else '')
+              rr=s.post(action,data=data,timeout=30,allow_redirects=True) if (login_form.get('method') or 'post').lower()!='get' else s.get(action,params=data,timeout=30,allow_redirects=True)
+              final=rr.url; ss=BeautifulSoup(rr.text,'html.parser')
+              lower=ss.get_text(' ',strip=True).lower()
               still_login=bool(ss.find('input',{'type':'password'})) and ('welcome' in final.lower() or 'login' in final.lower())
-              lower=(ss.get_text(' ',strip=True) or '').lower()
               stepup=any(x in lower for x in ['verification code','código de verificación','two-factor','2fa','autenticación de dos factores','one-time code'])
-              if stepup:
-                  status='AUTH_STEPUP_REQUIRED'
-              elif still_login:
-                  status='AUTH_FAILED'
-              else:
-                  status='AUTHENTICATED'
-              links=[]
-              if status=='AUTHENTICATED':
-                  for a in ss.find_all('a',href=True):
-                      txt=' '.join(a.stripped_strings)
-                      href=urljoin(final,a['href'])
-                      key=(txt+' '+href).lower()
-                      if any(k in key for k in ['domain','dominio','dns','hosting','ssl','website','sitio web']):
-                          pu=urlparse(href)
-                          safe_q=[]
-                          for k,v in parse_qsl(pu.query,keep_blank_values=True):
-                              if k.lower() in {'token','sid','session','auth','key','csrf','code'}:
-                                  v='REDACTED'
-                              safe_q.append((k,v))
-                          href=urlunparse((pu.scheme,pu.netloc,pu.path,pu.params,urlencode(safe_q),''))
-                          links.append({'text':txt[:120],'url':href[:500]})
-                  uniq=[]; seen=set()
-                  for item in links:
-                      k=(item['text'],item['url'])
-                      if k not in seen:
-                          seen.add(k); uniq.append(item)
-                  links=uniq[:40]
-
-          report={
-              'status':status,
-              'final_host':urlparse(final).netloc,
-              'final_path':urlparse(final).path,
-              'page_title':title[:200],
-              'candidate_control_links':links
-          }
-          with open('ops/nominalia-control-probe.json','w') as f:
-              json.dump(report,f,ensure_ascii=False,indent=2)
+              status='AUTH_STEPUP_REQUIRED' if stepup else ('AUTH_FAILED' if still_login else 'AUTHENTICATED')
+          title=(ss.title.string.strip() if ss.title and ss.title.string else '')
+          links=[]
+          if status=='AUTHENTICATED':
+              for a in ss.find_all('a',href=True):
+                  txt=' '.join(a.stripped_strings); href=urljoin(final,a['href']); key=(txt+' '+href).lower()
+                  if any(k in key for k in ['domain','dominio','dns','hosting','ssl','website','sitio web']):
+                      pu=urlparse(href); safe=[]
+                      for k,v in parse_qsl(pu.query,keep_blank_values=True):
+                          if k.lower() in {'token','sid','session','auth','key','csrf','code'}: v='REDACTED'
+                          safe.append((k,v))
+                      links.append({'text':txt[:120],'url':urlunparse((pu.scheme,pu.netloc,pu.path,pu.params,urlencode(safe),''))[:500]})
+              out=[]; seen=set()
+              for x in links:
+                  k=(x['text'],x['url'])
+                  if k not in seen: seen.add(k); out.append(x)
+              links=out[:40]
+          report={'status':status,'final_host':urlparse(final).netloc,'final_path':urlparse(final).path,'page_title':title[:200],'candidate_control_links':links}
+          open('ops/nominalia-control-probe.json','w').write(json.dumps(report,ensure_ascii=False,indent=2))
           print(json.dumps(report,ensure_ascii=False,indent=2))
           PY
 

@@ -148,6 +148,73 @@ codex-security:
         exit 2
       fi
 
+      if ! python3 - "$RESULTS_DIR/findings.json" "$SARIF_FILE" <<'PY'
+      import json
+      import pathlib
+      import sys
+
+      ranks = {
+          "critical": 95.0,
+          "high": 80.0,
+          "medium": 55.0,
+          "low": 25.0,
+          "informational": 5.0,
+      }
+
+      try:
+          findings = json.loads(pathlib.Path(sys.argv[1]).read_text())
+          report_path = pathlib.Path(sys.argv[2])
+          report = json.loads(report_path.read_text())
+
+          if report.get("version") != "2.1.0":
+              raise ValueError("SARIF report must use version 2.1.0")
+          if not isinstance(findings.get("findings"), list):
+              raise ValueError("findings.json does not contain a findings array")
+          if not isinstance(report.get("runs"), list):
+              raise ValueError("SARIF report does not contain a runs array")
+
+          indexed = {}
+          for finding in findings["findings"]:
+              if not isinstance(finding, dict):
+                  raise ValueError("finding must be a JSON object")
+              occurrence = finding.get("occurrenceId")
+              if not isinstance(occurrence, str) or not occurrence:
+                  raise ValueError("finding has no occurrenceId")
+              if occurrence in indexed:
+                  raise ValueError(f"duplicate finding occurrenceId: {occurrence}")
+              indexed[occurrence] = finding
+
+          normalized = 0
+          for run in report["runs"]:
+              if not isinstance(run, dict) or not isinstance(run.get("results", []), list):
+                  raise ValueError("SARIF run does not contain a results array")
+              for result in run.get("results", []):
+                  if not isinstance(result, dict):
+                      raise ValueError("SARIF result must be a JSON object")
+                  properties = result.get("properties")
+                  occurrence = properties.get("occurrenceId") if isinstance(properties, dict) else None
+                  if occurrence not in indexed:
+                      raise ValueError("SARIF result does not match a finding occurrenceId")
+                  finding = indexed[occurrence]
+                  if result.get("ruleId") != finding.get("ruleId"):
+                      raise ValueError(f"SARIF rule does not match finding {occurrence}")
+                  severity = finding.get("severity")
+                  level = severity.get("level") if isinstance(severity, dict) else None
+                  if level not in ranks:
+                      raise ValueError(f"unsupported severity for finding {occurrence}: {level}")
+                  result["rank"] = ranks[level]
+                  normalized += 1
+
+          report_path.write_text(json.dumps(report, indent=2) + "\n")
+          print(f"Preserved scanner severity for {normalized} GitLab SARIF findings.")
+      except (KeyError, OSError, TypeError, ValueError) as error:
+          print(f"Cannot safely preserve GitLab SARIF severity: {error}", file=sys.stderr)
+          sys.exit(1)
+      PY
+      then
+        exit 2
+      fi
+
       case "$scan_exit" in
         0|1)
           ;;
@@ -290,11 +357,18 @@ codex-security-remediate:
         exit 2
       fi
 
+      if test "$(id -u)" -ne 0; then
+        echo "Repository setup and verification require an isolated unprivileged UID." >&2
+        echo "Use the root-in-container runtime or move verification to a secret-free job." >&2
+        exit 2
+      fi
+
       if test -n "${CODEX_SECURITY_SETUP_COMMAND:-}"; then
         env -u OPENAI_API_KEY -u CODEX_API_KEY -u CODEX_ACCESS_TOKEN \
           -u CODEX_SECURITY_API_KEY -u GITLAB_REMEDIATION_TOKEN \
           -u CI_JOB_TOKEN -u CI_REPOSITORY_URL -u CI_REGISTRY_PASSWORD \
           -u CI_DEPLOY_PASSWORD \
+          setpriv --reuid 65534 --regid 65534 --clear-groups \
           sh -c "$CODEX_SECURITY_SETUP_COMMAND"
       fi
 
@@ -308,6 +382,7 @@ codex-security-remediate:
         -u CODEX_SECURITY_API_KEY -u GITLAB_REMEDIATION_TOKEN \
         -u CI_JOB_TOKEN -u CI_REPOSITORY_URL -u CI_REGISTRY_PASSWORD \
         -u CI_DEPLOY_PASSWORD \
+        setpriv --reuid 65534 --regid 65534 --clear-groups \
         sh -c "$CODEX_SECURITY_VERIFICATION_COMMAND" \
         > "$ARTIFACT_DIR/verification-before.log" 2>&1
       baseline_exit="$?"
@@ -357,7 +432,7 @@ codex-security-remediate:
               raise ValueError("changed-file limit must be between 1 and 20")
 
           raw = subprocess.check_output(
-              ["git", "diff", "--name-only", "-z", "HEAD", "--"]
+              ["git", "diff", "--no-renames", "--name-only", "-z", "HEAD", "--"]
           )
           paths = [path.decode() for path in raw.split(b"\0") if path]
           if not paths:
@@ -394,6 +469,7 @@ codex-security-remediate:
         -u CODEX_SECURITY_API_KEY -u GITLAB_REMEDIATION_TOKEN \
         -u CI_JOB_TOKEN -u CI_REPOSITORY_URL -u CI_REGISTRY_PASSWORD \
         -u CI_DEPLOY_PASSWORD \
+        setpriv --reuid 65534 --regid 65534 --clear-groups \
         sh -c "$CODEX_SECURITY_VERIFICATION_COMMAND" \
         > "$ARTIFACT_DIR/verification-after.log" 2>&1
 
@@ -599,7 +675,9 @@ codex-security-draft-mr:
           limit = int(sys.argv[1])
           if not 1 <= limit <= 20:
               raise ValueError("changed-file limit must be between 1 and 20")
-          raw = subprocess.check_output(["git", "diff", "--cached", "--name-only", "-z"])
+          raw = subprocess.check_output(
+              ["git", "diff", "--cached", "--no-renames", "--name-only", "-z"]
+          )
           paths = [path.decode() for path in raw.split(b"\0") if path]
           if not paths or len(paths) > limit:
               raise ValueError("patch does not satisfy the changed-file policy")

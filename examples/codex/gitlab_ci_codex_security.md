@@ -39,6 +39,7 @@ This workflow is opt-in and limited to protected default-branch pipelines. Merge
 You need:
 
 - A GitLab project and trusted GitLab Runner that can create the user namespace required by the Codex sandbox.
+- For optional remediation, a job container that can run repository-controlled setup and tests under a separate unprivileged user.
 - Node.js 22.13.0 or later, as required by the [Security CLI quickstart](https://learn.chatgpt.com/docs/security/cli).
 - Python 3.10 or later for scans and exports; Python 3.10 also requires `tomli`.
 - The public `@openai/codex-security` package.
@@ -106,7 +107,7 @@ Start with profiles that map to distinct development decisions:
 
 These effort levels are starting points, not universal recommendations. Measure representative repositories before setting organization-wide defaults. With these profiles in place, eligible protected merge requests receive focused feedback, the default branch receives a full standard scan, and scheduled pipelines run a deeper repository review. Complete coverage for a selected merge request diff applies only to that change, not to the entire repository. This keeps the tradeoff between feedback time, repository coverage, and cost explicit.
 
-Start with a focused diff or a lower-effort smoke test before running a full default-branch scan. In the validation project, one complete 58-file scan at `high` effort took 777 seconds and reported an estimated cost of USD 9.29. That observation is not a prediction for another repository. Consider adding `--max-cost` before the first paid full scan, and remember that it is an estimate guardrail rather than a hard billing cap.
+Start with a focused diff or a lower-effort smoke test before running a full default-branch scan. In the validation project, a two-file `low`-effort diff took 334 seconds and reported an estimated cost of USD 2.76; a complete 63-file `high`-effort scan took 656 seconds and reported USD 11.67. These observations are not predictions for another repository. Consider adding `--max-cost` before the first paid full scan, and remember that it is an estimate guardrail rather than a hard billing cap.
 
 ## Step 3: Add the GitLab pipeline
 
@@ -258,6 +259,8 @@ The scan writes canonical artifacts to its private result directory and structur
 
 GitLab can upload a SARIF artifact from a failed report job without ingesting its findings, even when `allow_failure` is enabled. The report job must therefore verify a completed manifest, export a non-empty SARIF report, save the actual scanner status in `scan-exit-code.txt`, and return success. Scanner exit `2` is accepted only when the sealed result is completed and `coverage.json` explicitly reports `partial`; missing evidence, export errors, unrelated scanner errors, and unexpected statuses remain blocking. A separate final gate returns the stored scanner status after remediation and publication have finished.
 
+After export, the pipeline matches each SARIF result to its canonical finding by `occurrenceId` and `ruleId`, then assigns GitLab-compatible severity ranks. This preserves `critical`, `high`, `medium`, `low`, and `informational` classifications without changing finding fingerprints or locations. Malformed reports, unmatched findings, and unknown severity values fail before publication.
+
 GitLab retains the full artifact directory for seven days and ingests `results.sarif` through `artifacts:reports:sarif` when the report job succeeds. [`artifacts:access: maintainer`](https://docs.gitlab.com/ci/yaml/#artifactsaccess) restricts UI and API downloads to Maintainers and Owners because the retained evidence can contain source excerpts and vulnerability details. It does not block access through CI/CD job tokens or prevent artifacts from being forwarded to downstream pipelines, so configure project visibility and pipeline access separately.
 
 Register the SARIF report on the successful scan job:
@@ -360,7 +363,7 @@ The two subcommands invoke the bundled Codex executable directly. In Security CL
 
 Enable patch generation by setting the protected variable `CODEX_SECURITY_ENABLE_REMEDIATION=true` and configuring `CODEX_SECURITY_VERIFICATION_COMMAND`, for example `npm test -- --runInBand tests/security-regression.test.ts`. The other remediation settings in the variable reference are optional and already have safe defaults where applicable.
 
-Use a security regression test that already exists on the vulnerable revision. Test the security invariant, not one prescribed implementation: a complete authorization fix might enforce an owner check in a shared wrapper or protect every affected sink independently. A command that passes before remediation cannot demonstrate the original issue, and an exit such as `127` usually indicates a missing tool rather than a reproduced vulnerability. Repository setup and verification run with known OpenAI, GitLab job, repository, container-registry, and deployment credentials removed from their child-process environments. Validation and patching receive only a process-scoped `CODEX_API_KEY` and do not inherit those GitLab credentials. Scope additional project-specific secrets to the jobs that require them, and keep credentials out of both command variables.
+Use a security regression test that already exists on the vulnerable revision. Test the security invariant, not one prescribed implementation: a complete authorization fix might enforce an owner check in a shared wrapper or protect every affected sink independently. A command that passes before remediation cannot demonstrate the original issue, and an exit such as `127` usually indicates a missing tool rather than a reproduced vulnerability. Repository setup and verification run under a separate unprivileged user with known OpenAI, GitLab job, repository, container-registry, and deployment credentials removed from their child-process environments. The separate user cannot inspect the credential-bearing parent process through `/proc`; removing environment variables without this boundary is insufficient. The example's unprivileged Docker container runs its job shell as root and uses `setpriv` only to drop repository-controlled commands to UID `65534`. Non-root runner deployments must instead perform verification in a separate credential-free job. Validation and patching receive only a process-scoped `CODEX_API_KEY` and do not inherit those GitLab credentials. Scope additional project-specific secrets to the jobs that require them, and keep credentials out of both command variables.
 
 Set `CODEX_SECURITY_MAX_CHANGED_FILES` to the smallest bounded value that allows a complete fix and its regression tests. In the verified application, a complete authorization fix required five implementation files and two focused test files, so a five-file limit incorrectly rejected it. The example defaults to eight and rejects values outside the inclusive range from one to 20.
 
@@ -371,7 +374,7 @@ The remediation job checks that:
 3. No GitLab repository-write token is available to the remediation process.
 4. The regression check fails with exit `1` on the original revision.
 5. Codex Security validates the finding and generates a focused source or test change.
-6. The patch stays within the changed-file limit and does not modify CI configuration, Git metadata, environment files, private keys, or binary files.
+6. The patch stays within the changed-file limit and does not modify or rename CI configuration, Git metadata, environment files, private keys, or binary files.
 7. The same regression check passes after the fix, and revalidation does not modify the verified patch.
 
 The job stores `finding.json`, `fix.patch`, both validation reports, the patch report, and before-and-after regression logs in `codex-security-remediation/`. Artifact downloads are restricted to project Maintainers and Owners. A clean scan with no high- or critical-severity findings exits successfully without generating a patch.
@@ -484,20 +487,20 @@ The optimization is complete when each profile has a target, cadence, effort lev
 
 Step 3 already exports the sealed scan, retains `results.sarif`, and declares it as a GitLab report artifact. This step confirms that GitLab accepted the report and mapped its findings into the security workflow.
 
-[GitLab Ultimate 19.2 or later](https://docs.gitlab.com/user/application_security/detect/sarif/) can display supported SARIF 2.1.0 findings in the pipeline Security tab, merge request security widget, project vulnerability report, and security dashboard. After the pipeline completes:
+[GitLab Ultimate 19.2 or later](https://docs.gitlab.com/user/application_security/detect/sarif/) can display supported SARIF 2.1.0 findings in the pipeline Security tab and merge request security widget. Findings populate the project vulnerability report and security dashboard after a successful default-branch scan; merge-request findings alone do not create project-wide vulnerability records. After the pipeline completes:
 
 1. Open the pipeline Security tab and check for ingestion warnings.
 2. Confirm that each finding has the expected scanner name, severity, file location, and identifier.
-3. Open the project vulnerability report and verify that the findings are available for triage.
+3. For a default-branch pipeline, open the project vulnerability report and verify that the findings are available for triage. For a merge-request pipeline, inspect its Security tab or merge-request security widget instead.
 4. Download `results.sarif` from the job artifacts and retain it for debugging and audit evidence.
 
 ![GitLab vulnerability report populated with Codex Security SARIF findings](../../images/gitlab-vulnerability-report-pipeline-21.png)
 
 *An earlier scan imported by pipeline `#21` populated the demo project's vulnerability report with 14 Codex Security findings: 2 high, 8 medium, and 4 low. This observed demo result is illustrative; finding counts vary by repository and scan profile.*
 
-The live validation of the corrected report-and-gate pattern produced 10 findings from a complete 58-file scan: one high, four medium, and five low. GitLab ingested all 10 from the successful report job without processing warnings. It did not test a critical finding.
+The live validation of the corrected report-and-gate pattern produced 10 findings from a complete 58-file default-branch scan: one high, four medium, and five low. A separate protected merge-request scan identified a critical command-injection finding with complete coverage and no GitLab processing warnings.
 
-GitLab skips findings that do not contain `ruleId` or `physicalLocation`. Under [GitLab's SARIF severity resolution](https://docs.gitlab.com/user/application_security/detect/sarif/#severity-resolution), `level: error` alone maps to high severity. Verify critical findings independently: GitLab needs `result.rank` of at least `90` or `security-severity` of at least `9.0` to preserve critical severity. If the exporter does not provide the required value, add a reviewed normalization step before report publication. Preserve stable identifiers, locations, and CWE tags when adapting SARIF. The integration is verified only when GitLab displays the expected supported findings without ingestion errors and users can download the retained artifact.
+GitLab skips findings that do not contain `ruleId` or `physicalLocation`. Under [GitLab's SARIF severity resolution](https://docs.gitlab.com/user/application_security/detect/sarif/#severity-resolution), `level: error` alone maps to high severity even when the scanner classifies a finding as critical. The downloadable pipeline therefore matches SARIF results to `findings.json` and sets `result.rank` to `95` for critical findings, `80` for high, `55` for medium, `25` for low, and `5` for informational. Preserve stable identifiers, locations, and CWE tags when adapting SARIF. The integration is verified only when GitLab displays the expected supported findings and severities without ingestion errors and users can download the retained artifact.
 
 ## Step 8: Apply coverage and severity policy
 

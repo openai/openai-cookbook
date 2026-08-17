@@ -512,6 +512,7 @@
   path: examples/gpt-5/gpt-5_frontend.ipynb
   slug: gpt-5-frontend
   date: 2025-08-07
+  archived: true
   authors:
     - WJPBProjects
     - anoop-openai

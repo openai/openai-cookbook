@@ -4,6 +4,21 @@
 # should build pages for, and indicates metadata such as tags, creation date and
 # authors for each page.
 
+- title: Configure Codex for regulated enterprise environments
+  path: examples/codex/regulated_industry_configuration.ipynb
+  slug: codex-regulated-industry-configuration
+  description: Configure one enterprise-managed requirements.toml and one matching config.toml for regulated environments, covering approved models, identity, approvals, integrations, data handling, observability, and deployment.
+  date: 2026-08-13
+  authors:
+    - OAI-JB
+  tags:
+    - codex
+    - enterprise
+    - security
+    - configuration
+    - compliance
+    - sandbox
+
 - title: Migrate from Whisper to GPT-Transcribe and GPT-Live-Transcribe
   path: examples/migrating_from_whisper_to_gpt_transcribe.ipynb
   slug: migrating-from-whisper-to-gpt-transcribe

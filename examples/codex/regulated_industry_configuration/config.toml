@@ -1,0 +1,46 @@
+#:schema https://developers.openai.com/codex/config-schema.json
+# Cross-platform device or user defaults for the latest Codex release.
+# Pair this file with the corresponding enforced requirements.toml.
+
+approval_policy = "on-request"
+approvals_reviewer = "user"
+default_permissions = "regulated_workspace"
+web_search = "cached"
+allow_login_shell = false
+model_reasoning_effort = "medium"
+
+# Optional approved-model defaults. Verify model access and install the catalog
+# before enabling these settings; enforce the catalog through requirements.
+# model = "gpt-5.6-luna"
+# model_catalog_json = "/etc/codex/approved-models.json"
+
+forced_login_method = "chatgpt"
+cli_auth_credentials_store = "keyring"
+mcp_oauth_credentials_store = "keyring"
+
+[apps._default]
+enabled = false
+destructive_enabled = false
+open_world_enabled = false
+
+[analytics]
+enabled = false
+
+[feedback]
+enabled = true
+
+[history]
+persistence = "none"
+
+[shell_environment_policy]
+inherit = "core"
+ignore_default_excludes = false
+
+[shell_environment_policy.filters]
+"*PASSWORD*" = "exclude"
+"*CREDENTIAL*" = "exclude"
+"*PRIVATE*" = "exclude"
+
+[otel]
+environment = "regulated-production"
+log_user_prompt = false

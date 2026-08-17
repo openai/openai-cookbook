@@ -97,11 +97,11 @@ are rejected before the claim or POST boundary. Logs and output contain only
 aggregate counters.
 
 The manual workflow additionally requires confirmation text
-`AUMARA-324882-LIVE`, repository secrets `BEDS24_REFRESH_CREDENTIAL`,
-`AWS_ACCESS_KEY_ID`, `AWS_SECRET_ACCESS_KEY`, and `DYNAMODB_TABLE`, plus the
-repository variable `AWS_REGION`. The table must already exist with TTL enabled
-on attribute `ttl`; this repository workflow does not create infrastructure or
-credentials.
+`AUMARA-324882-LIVE`, repository secret `BEDS24_REFRESH_CREDENTIAL`, and the
+GitHub Actions `Production` environment secrets `AWS_ACCESS_KEY_ID`,
+`AWS_SECRET_ACCESS_KEY`, and `DYNAMODB_TABLE`, plus the environment variable
+`AWS_REGION`. The table must already exist with TTL enabled on attribute `ttl`;
+this repository workflow does not create infrastructure or credentials.
 
 ## Source boundary
 

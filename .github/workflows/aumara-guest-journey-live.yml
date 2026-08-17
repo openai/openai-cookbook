@@ -19,6 +19,7 @@ jobs:
   live-canary:
     runs-on: ubuntu-latest
     timeout-minutes: 10
+    environment: Production
     env:
       BEDS24_GUEST_JOURNEY_MODE: live
       BEDS24_LIVE_SEND_AUTHORIZED: "true"

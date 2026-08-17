@@ -498,6 +498,7 @@
   path: examples/gpt-5/gpt-5_prompting_guide.ipynb
   slug: gpt-5-prompting-guide
   date: 2025-08-07
+  archived: true
   authors:
     - anoop-openai
     - julian-openai

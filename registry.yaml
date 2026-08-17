@@ -3110,6 +3110,7 @@
   slug: file-search-responses
   description: Cookbook to search PDFs with the Responses API file search tool.
   date: 2025-03-11
+  archived: true
   authors:
     - pap-openai
   tags:

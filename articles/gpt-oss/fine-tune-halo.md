@@ -146,7 +146,7 @@ We apply some defaults for you. `bf16` and Liger fused kernels are on unless dis
 
 Figures for gpt-oss-20b on 8×B300 at this sequence length. They grow with `max_length`. If your solutions run long, raise `max_length` or add `--context_parallel_size 2` to split the sequence across GPU pairs, which composes with Expert Parallelism.
 
-On save, we gather the distributed experts into a standard HuggingFace checkpoint. We write sharded safetensors with an index that `from_pretrained` can load, which takes about a minute for the 20B model. The result is an ordinary gpt-oss model, so inference is stock Transformers. Extract the boxed answer and compare it to held-out gold.
+On save, we gather the distributed experts into a standard Hugging Face checkpoint. We write sharded safetensors with an index that `from_pretrained` can load, which takes about a minute for the 20B model. The result is an ordinary gpt-oss model, so inference is stock Transformers. Extract the boxed answer and compare it to held-out gold.
 
 ```python
 from transformers import AutoModelForCausalLM, AutoTokenizer

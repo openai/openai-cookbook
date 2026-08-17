@@ -539,8 +539,8 @@
     - gpt-oss-fine-tuning
 
 - title: Fine-tune gpt-oss with Halo
-  path: articles/gpt-oss/finetune-halo.md
-  slug: finetune-halo
+  path: articles/gpt-oss/fine-tune-halo.md
+  slug: fine-tune-halo
   date: 2026-08-11
   authors:
     - MekkCyber

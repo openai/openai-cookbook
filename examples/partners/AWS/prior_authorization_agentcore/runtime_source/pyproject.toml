@@ -1,0 +1,19 @@
+[build-system]
+requires = ["hatchling>=1.27,<2"]
+build-backend = "hatchling.build"
+
+[project]
+name = "policy-to-review-agent"
+version = "0.2.0"
+description = "Prior authorization review with live Bedrock Knowledge Base retrieval"
+requires-python = ">=3.12,<3.13"
+dependencies = [
+  "bedrock-agentcore==1.19.0",
+  "boto3==1.43.62",
+  "openai[bedrock]==2.53.0",
+  "openai-agents==0.19.2",
+  "pydantic==2.12.5",
+]
+
+[tool.hatch.build.targets.wheel]
+packages = ["policy_to_review"]

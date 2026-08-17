@@ -4,6 +4,24 @@
 # should build pages for, and indicates metadata such as tags, creation date and
 # authors for each page.
 
+- title: Build a prior authorization review assistant with the OpenAI Agents SDK and Amazon Bedrock AgentCore
+  path: examples/partners/AWS/policy_to_review_prior_authorization_agents_sdk_agentcore.ipynb
+  slug: prior-authorization-review-agentcore
+  description: Build and deploy a prior authorization review assistant that retrieves public CMS policy documents, maps submitted evidence to policy criteria with the OpenAI Agents SDK, validates citations and review routing in code, and runs on Amazon Bedrock AgentCore.
+  date: 2026-08-10
+  authors:
+    - sks-oai
+  tags:
+    - partners
+    - agents-sdk
+    - agents
+    - bedrock
+    - agentcore
+    - healthcare
+    - retrieval
+    - structured-outputs
+    - security
+
 - title: Migrate from Whisper to GPT-Transcribe and GPT-Live-Transcribe
   path: examples/migrating_from_whisper_to_gpt_transcribe.ipynb
   slug: migrating-from-whisper-to-gpt-transcribe

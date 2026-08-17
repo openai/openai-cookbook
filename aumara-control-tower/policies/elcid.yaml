@@ -154,6 +154,65 @@
       ],
       "response_template_ids": [],
       "policy_version": "2026.07.27.1"
+    },
+    {
+      "policy_id": "elcid.post-checkin-care",
+      "property": "elcid",
+      "category": "guest_journey",
+      "rule": "Prepare one short care check between sixty and one hundred eighty minutes after verified check-in. Ask only about current comfort and do not request a rating or promise an unverified response time.",
+      "source": "approved_internal_document",
+      "source_reference": "REQUEST:CUSTOMER_SERVICE_COORDINATES:2026-08-17",
+      "verified_at": "2026-08-17",
+      "status": "verified",
+      "allowed_auto_reply": false,
+      "allowed_beds24_action": [],
+      "escalation_conditions": [
+        "booking_not_in_house",
+        "outside_send_window",
+        "negative_guest_signal",
+        "open_issue"
+      ],
+      "response_template_ids": [
+        "elcid.post-checkin-care"
+      ],
+      "response_templates": {
+        "en": "Hi {guest_first_name}, is everything going well since you arrived at El Cid Country Club? Is your room comfortable, and are the Wi-Fi and air conditioning working as expected? Message us here if anything needs attention.",
+        "es": "Hola {guest_first_name}, ¿va todo bien desde vuestra llegada a El Cid Country Club? ¿La habitación es cómoda? ¿Funcionan bien el Wi-Fi y el aire acondicionado? Si necesitáis algo, escribidnos por aquí.",
+        "fr": "Bonjour {guest_first_name}, tout se passe bien depuis votre arrivée à El Cid Country Club ? Votre chambre est-elle confortable ? Le Wi-Fi et la climatisation fonctionnent-ils correctement ? Écrivez-nous ici si quelque chose nécessite notre attention.",
+        "de": "Hallo {guest_first_name}, ist seit Ihrer Ankunft im El Cid Country Club alles in Ordnung? Ist Ihr Zimmer angenehm, und funktionieren WLAN und Klimaanlage einwandfrei? Schreiben Sie uns hier, wenn wir uns um etwas kümmern sollen.",
+        "nl": "Hallo {guest_first_name}, gaat alles goed sinds jullie aankomst bij El Cid Country Club? Is de kamer comfortabel en werken wifi en airconditioning naar behoren? Laat het ons hier weten als we ergens naar moeten kijken."
+      },
+      "policy_version": "2026.07.27.1"
+    },
+    {
+      "policy_id": "elcid.first-morning-care",
+      "property": "elcid",
+      "category": "guest_journey",
+      "rule": "Prepare one first-morning comfort check only for stays of at least two nights, between zero eight thirty and eleven thirty local time, and never on departure day.",
+      "source": "approved_internal_document",
+      "source_reference": "REQUEST:CUSTOMER_SERVICE_COORDINATES:2026-08-17",
+      "verified_at": "2026-08-17",
+      "status": "verified",
+      "allowed_auto_reply": false,
+      "allowed_beds24_action": [],
+      "escalation_conditions": [
+        "stay_too_short",
+        "departure_day",
+        "outside_send_window",
+        "negative_guest_signal",
+        "open_issue"
+      ],
+      "response_template_ids": [
+        "elcid.first-morning-care"
+      ],
+      "response_templates": {
+        "en": "Good morning {guest_first_name}. Did you sleep well? If anything could make your room or stay more comfortable, tell us here. We can also recommend a beach or restaurant for today.",
+        "es": "Buenos días {guest_first_name}. ¿Habéis descansado bien? Si podemos hacer algo para que vuestra habitación o estancia sea más cómoda, decídnoslo por aquí. También podemos recomendaros una playa o un restaurante para hoy.",
+        "fr": "Bonjour {guest_first_name}. Avez-vous bien dormi ? Si quelque chose peut rendre votre chambre ou votre séjour plus confortable, dites-le-nous ici. Nous pouvons aussi vous recommander une plage ou un restaurant pour aujourd’hui.",
+        "de": "Guten Morgen {guest_first_name}. Haben Sie gut geschlafen? Wenn wir etwas tun können, um Ihr Zimmer oder Ihren Aufenthalt angenehmer zu machen, schreiben Sie uns hier. Gern empfehlen wir Ihnen auch einen Strand oder ein Restaurant für heute.",
+        "nl": "Goedemorgen {guest_first_name}. Hebben jullie goed geslapen? Laat het ons hier weten als we iets kunnen doen om jullie kamer of verblijf comfortabeler te maken. We kunnen ook een strand of restaurant voor vandaag aanraden."
+      },
+      "policy_version": "2026.07.27.1"
     }
   ]
 }

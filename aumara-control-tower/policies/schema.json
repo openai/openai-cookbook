@@ -192,6 +192,18 @@
             "et": {
               "type": "string",
               "minLength": 1
+            },
+            "fr": {
+              "type": "string",
+              "minLength": 1
+            },
+            "de": {
+              "type": "string",
+              "minLength": 1
+            },
+            "nl": {
+              "type": "string",
+              "minLength": 1
             }
           }
         },

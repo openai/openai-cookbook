@@ -38,6 +38,65 @@
       ],
       "response_template_ids": [],
       "policy_version": "2026.07.27.1"
+    },
+    {
+      "policy_id": "aumara.post-checkin-care",
+      "property": "aumara",
+      "category": "guest_journey",
+      "rule": "Prepare one short care check between sixty and one hundred eighty minutes after verified check-in. Do not request a rating, promise a response time or send when an issue is already open.",
+      "source": "approved_internal_document",
+      "source_reference": "REQUEST:CUSTOMER_SERVICE_COORDINATES:2026-08-17",
+      "verified_at": "2026-08-17",
+      "status": "verified",
+      "allowed_auto_reply": false,
+      "allowed_beds24_action": [],
+      "escalation_conditions": [
+        "booking_not_in_house",
+        "outside_send_window",
+        "negative_guest_signal",
+        "open_issue"
+      ],
+      "response_template_ids": [
+        "aumara.post-checkin-care"
+      ],
+      "response_templates": {
+        "en": "Hi {guest_first_name}, is everything going well in your AUMARA house since you arrived? If anything needs attention, message us here.",
+        "es": "Hola {guest_first_name}, ¿va todo bien en vuestra casa AUMARA desde que llegasteis? Si necesitáis algo, escribidnos por aquí.",
+        "fr": "Bonjour {guest_first_name}, tout se passe bien dans votre maison AUMARA depuis votre arrivée ? Si vous avez besoin de quoi que ce soit, écrivez-nous ici.",
+        "de": "Hallo {guest_first_name}, ist seit Ihrer Ankunft in Ihrem AUMARA-Haus alles in Ordnung? Wenn wir uns um etwas kümmern sollen, schreiben Sie uns hier.",
+        "nl": "Hallo {guest_first_name}, gaat alles goed in jullie AUMARA-huis sinds jullie aankomst? Laat het ons hier weten als we ergens naar moeten kijken."
+      },
+      "policy_version": "2026.07.27.1"
+    },
+    {
+      "policy_id": "aumara.first-morning-care",
+      "property": "aumara",
+      "category": "guest_journey",
+      "rule": "Prepare one first-morning comfort check only for stays of at least two nights, between zero eight thirty and eleven thirty local time, and never on departure day.",
+      "source": "approved_internal_document",
+      "source_reference": "REQUEST:CUSTOMER_SERVICE_COORDINATES:2026-08-17",
+      "verified_at": "2026-08-17",
+      "status": "verified",
+      "allowed_auto_reply": false,
+      "allowed_beds24_action": [],
+      "escalation_conditions": [
+        "stay_too_short",
+        "departure_day",
+        "outside_send_window",
+        "negative_guest_signal",
+        "open_issue"
+      ],
+      "response_template_ids": [
+        "aumara.first-morning-care"
+      ],
+      "response_templates": {
+        "en": "Good morning {guest_first_name}. Did you sleep well? If anything could make your stay more comfortable, tell us here. We can also recommend a beach or restaurant for today.",
+        "es": "Buenos días {guest_first_name}. ¿Habéis descansado bien? Si podemos hacer algo para que vuestra estancia sea más cómoda, decídnoslo por aquí. También podemos recomendaros una playa o un restaurante para hoy.",
+        "fr": "Bonjour {guest_first_name}. Avez-vous bien dormi ? Si quelque chose peut rendre votre séjour plus confortable, dites-le-nous ici. Nous pouvons aussi vous recommander une plage ou un restaurant pour aujourd’hui.",
+        "de": "Guten Morgen {guest_first_name}. Haben Sie gut geschlafen? Wenn wir etwas tun können, um Ihren Aufenthalt angenehmer zu machen, schreiben Sie uns hier. Gern empfehlen wir Ihnen auch einen Strand oder ein Restaurant für heute.",
+        "nl": "Goedemorgen {guest_first_name}. Hebben jullie goed geslapen? Laat het ons hier weten als we iets kunnen doen om jullie verblijf comfortabeler te maken. We kunnen ook een strand of restaurant voor vandaag aanraden."
+      },
+      "policy_version": "2026.07.27.1"
     }
   ]
 }

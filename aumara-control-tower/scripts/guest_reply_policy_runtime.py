@@ -182,3 +182,4 @@ def build_elcid_reply(
         f"Hello {safe_name},\n\n{body}\n\n"
         "Kind regards,\nEl Cid Country Club"
     )
+

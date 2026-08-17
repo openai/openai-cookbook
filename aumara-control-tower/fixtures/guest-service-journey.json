@@ -1,0 +1,54 @@
+{
+  "events": [
+    {
+      "property": "aumara",
+      "booking_ref": "FIXTURE-AUMARA-1",
+      "event_type": "post_checkin",
+      "status": "checked_in",
+      "guest_first_name": "Lucía",
+      "language": "es",
+      "check_in_at": "2026-08-17T15:00:00+02:00",
+      "departure_at": "2026-08-20T11:00:00+02:00",
+      "now": "2026-08-17T16:30:00+02:00",
+      "nights": 3,
+      "sent_dedupe_keys": [],
+      "last_guest_message": "",
+      "open_issue": false
+    },
+    {
+      "property": "elcid",
+      "booking_ref": "FIXTURE-ELCID-1",
+      "event_type": "first_morning",
+      "status": "in_house",
+      "guest_first_name": "Marie",
+      "language": "fr",
+      "check_in_at": "2026-08-17T17:00:00+02:00",
+      "departure_at": "2026-08-20T11:00:00+02:00",
+      "now": "2026-08-18T09:15:00+02:00",
+      "nights": 3,
+      "sent_dedupe_keys": [],
+      "last_guest_message": "",
+      "open_issue": false
+    },
+    {
+      "property": "aumara",
+      "booking_ref": "FIXTURE-AUMARA-2",
+      "event_type": "post_checkin",
+      "status": "checked_in",
+      "guest_first_name": "Jan",
+      "language": "nl",
+      "check_in_at": "2026-08-17T15:00:00+02:00",
+      "departure_at": "2026-08-20T11:00:00+02:00",
+      "now": "2026-08-17T16:30:00+02:00",
+      "nights": 3,
+      "sent_dedupe_keys": [],
+      "last_guest_message": "De wifi werkt niet",
+      "open_issue": false
+    },
+    {
+      "property": "aumara",
+      "booking_ref": "FIXTURE-AUMARA-3",
+      "event_type": "checkout_reminder"
+    }
+  ]
+}

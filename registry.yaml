@@ -958,6 +958,7 @@
   path: examples/responses_api/responses_example.ipynb
   slug: responses-example
   date: 2025-03-11
+  archived: true
   authors:
     - billchen-openai
   tags:

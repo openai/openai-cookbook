@@ -3194,6 +3194,7 @@
   slug: generate-images-with-gpt-image
   description: Cookbook to generate and edit images with GPT Image capabilities.
   date: 2025-04-23
+  archived: true
   authors:
     - katiagg
   tags:

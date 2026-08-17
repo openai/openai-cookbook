@@ -1,0 +1,104 @@
+name: AUMARA and El Cid guest journey shadow
+
+on:
+  workflow_dispatch:
+  schedule:
+    - cron: "37 * * * *"
+  pull_request:
+    branches: [main]
+    paths:
+      - ".github/workflows/aumara-guest-journey-shadow.yml"
+      - "aumara-control-tower/scripts/beds24_guest_journey_shadow.py"
+      - "aumara-control-tower/scripts/beds24_guest_journey_mcp.py"
+      - "aumara-control-tower/scripts/beds24_guest_journey_live.py"
+      - "aumara-control-tower/scripts/beds24_aumara_access_audit.py"
+      - "aumara-control-tower/scripts/beds24_elcid_studio_audit.py"
+      - "aumara-control-tower/scripts/guest_service_journey.py"
+      - "aumara-control-tower/scripts/tests/test_beds24_aumara_access_audit.py"
+      - "aumara-control-tower/scripts/tests/test_beds24_elcid_studio_audit.py"
+      - "aumara-control-tower/tests/test_beds24_guest_journey_shadow.py"
+      - "aumara-control-tower/tests/test_beds24_guest_journey_mcp.py"
+      - "aumara-control-tower/tests/test_guest_service_journey.py"
+      - "aumara-control-tower/config/copilot-mcp.json"
+      - "aumara-control-tower/policies/**"
+
+permissions:
+  contents: read
+
+concurrency:
+  group: aumara-guest-journey-shadow
+  cancel-in-progress: true
+
+jobs:
+  shadow:
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    env:
+      BEDS24_GUEST_JOURNEY_MODE: shadow
+      AUMARA_GUEST_JOURNEY_MODE: proposal
+      AUMARA_DISABLE_GUEST_SEND: "true"
+      AUMARA_DISABLE_EMAIL_SEND: "true"
+      AUMARA_DISABLE_BOOKING_MUTATIONS: "true"
+      BEDS24_AUTO_REPLY_EXECUTE: "0"
+      BEDS24_NOTE_MODE: "off"
+
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+
+      - name: Test shadow mapper and policy runtime without network
+        run: |
+          python -m unittest \
+            aumara-control-tower/scripts/tests/test_beds24_aumara_access_audit.py \
+            aumara-control-tower/scripts/tests/test_beds24_elcid_studio_audit.py \
+            aumara-control-tower/tests/test_beds24_guest_journey_mcp.py \
+            aumara-control-tower/tests/test_beds24_guest_journey_shadow.py \
+            aumara-control-tower/tests/test_guest_service_journey.py \
+            -v
+          python aumara-control-tower/scripts/validate_policy_registry.py
+
+      - name: Require existing Beds24 credential
+        if: github.event_name != 'pull_request'
+        env:
+          BEDS24_REFRESH_TOKEN: ${{ secrets.BEDS24_REFRESH_CREDENTIAL }}
+        run: |
+          test -n "$BEDS24_REFRESH_TOKEN"
+
+      - name: Read live bookings and build PII-free shadow summary
+        if: github.event_name != 'pull_request'
+        env:
+          BEDS24_REFRESH_TOKEN: ${{ secrets.BEDS24_REFRESH_CREDENTIAL }}
+        run: |
+          python aumara-control-tower/scripts/beds24_guest_journey_shadow.py \
+            --output /tmp/aumara-guest-journey-shadow/summary.json
+
+      - name: Verify the persisted shadow boundary
+        if: github.event_name != 'pull_request'
+        run: |
+          python - <<'PY'
+          import json
+          import pathlib
+
+          summary = json.loads(
+              pathlib.Path(
+                  "/tmp/aumara-guest-journey-shadow/summary.json"
+              ).read_text(encoding="utf-8")
+          )
+          assert summary["postRequests"] == 0
+          assert summary["guestMessagesSent"] == 0
+          assert summary["bookingMutations"] == 0
+          assert summary["durableClaimsWritten"] == 0
+          assert summary["containsGuestPii"] is False
+          PY
+
+      - name: Upload PII-free shadow summary
+        if: github.event_name != 'pull_request'
+        uses: actions/upload-artifact@v4
+        with:
+          name: aumara-guest-journey-shadow
+          path: /tmp/aumara-guest-journey-shadow/summary.json
+          if-no-files-found: error
+          retention-days: 7

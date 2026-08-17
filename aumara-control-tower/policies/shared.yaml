@@ -38,6 +38,43 @@
       ],
       "response_template_ids": [],
       "policy_version": "2026.07.27.1"
+    },
+    {
+      "policy_id": "shared.lifecycle-checkout-reminder-block",
+      "property": "shared",
+      "category": "guest_journey",
+      "rule": "Never produce a checkout, vacate, departure-deadline or leave-faster message. Departure operations remain internal unless a guest explicitly asks for help.",
+      "source": "approved_internal_document",
+      "source_reference": "REQUEST:CUSTOMER_SERVICE_COORDINATES:2026-08-17",
+      "verified_at": "2026-08-17",
+      "status": "verified",
+      "allowed_auto_reply": false,
+      "allowed_beds24_action": [],
+      "escalation_conditions": [
+        "checkout_reminder_requested",
+        "departure_pressure_detected"
+      ],
+      "response_template_ids": [],
+      "policy_version": "2026.07.27.1"
+    },
+    {
+      "policy_id": "shared.lifecycle-negative-signal-escalation",
+      "property": "shared",
+      "category": "guest_journey",
+      "rule": "When a guest message signals a safety, access, cleanliness, noise, climate, connectivity, payment or service problem, suppress routine lifecycle copy and route the stay to human review.",
+      "source": "approved_internal_document",
+      "source_reference": "REQUEST:CUSTOMER_SERVICE_COORDINATES:2026-08-17",
+      "verified_at": "2026-08-17",
+      "status": "verified",
+      "allowed_auto_reply": false,
+      "allowed_beds24_action": [],
+      "escalation_conditions": [
+        "negative_guest_signal",
+        "open_issue",
+        "safety_or_payment_signal"
+      ],
+      "response_template_ids": [],
+      "policy_version": "2026.07.27.1"
     }
   ]
 }

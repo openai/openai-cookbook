@@ -8,6 +8,8 @@ on:
     branches: [main]
     paths:
       - ".github/workflows/aumara-guest-journey-shadow.yml"
+      - ".github/workflows/aumara-guest-journey-live.yml"
+      - "aumara_control_tower/**"
       - "aumara-control-tower/scripts/beds24_guest_journey_shadow.py"
       - "aumara-control-tower/scripts/beds24_guest_journey_mcp.py"
       - "aumara-control-tower/scripts/beds24_guest_journey_live.py"
@@ -17,6 +19,7 @@ on:
       - "aumara-control-tower/scripts/tests/test_beds24_aumara_access_audit.py"
       - "aumara-control-tower/scripts/tests/test_beds24_elcid_studio_audit.py"
       - "aumara-control-tower/tests/test_beds24_guest_journey_shadow.py"
+      - "aumara-control-tower/tests/test_dynamodb_claim_atomic.py"
       - "aumara-control-tower/tests/test_beds24_guest_journey_mcp.py"
       - "aumara-control-tower/tests/test_guest_service_journey.py"
       - "aumara-control-tower/config/copilot-mcp.json"
@@ -56,6 +59,7 @@ jobs:
             aumara-control-tower/scripts/tests/test_beds24_elcid_studio_audit.py \
             aumara-control-tower/tests/test_beds24_guest_journey_mcp.py \
             aumara-control-tower/tests/test_beds24_guest_journey_shadow.py \
+            aumara-control-tower/tests/test_dynamodb_claim_atomic.py \
             aumara-control-tower/tests/test_guest_service_journey.py \
             -v
           python aumara-control-tower/scripts/validate_policy_registry.py

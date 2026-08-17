@@ -3,8 +3,8 @@
 ## Decision
 
 The existing Control Tower remains the policy and audit boundary. Make.com is
-not introduced as a second reply brain. This stage produces deterministic,
-reviewable message proposals and performs zero external actions.
+not introduced as a second reply brain. Shadow execution remains proposal-only.
+The live boundary is a separate, manual AUMARA-only canary.
 
 ## Enabled proposal moments
 
@@ -60,12 +60,27 @@ value belongs in the repository or MCP JSON.
 
 ## Live Beds24 sender boundary
 
-`scripts/beds24_guest_journey_live.py` is a separate, unscheduled execution
-boundary. It reuses `guest_service_journey.build_report()` and accepts only its
-`proposal` decisions for `post_checkin` and `first_morning`. Before each POST it
-claims `{property}:{booking_ref.lower()}:{event_type}` with either an atomic
-filesystem create under `/tmp/claims` (or `BEDS24_CLAIM_DIR`) or a DynamoDB
-conditional `PutItem` when `BEDS24_CLAIM_DYNAMODB_TABLE` is configured.
+`scripts/beds24_guest_journey_live.py` is a separate execution boundary. The
+workflow is `workflow_dispatch` only and accepts only property `324882`. That
+property is fetched without a `roomId` filter and covers six physical AUMARA
+units: four SL and two Chalet Super. Property `324903` remains shadow-only.
+
+The sender reads current bookings and recent messages through the GET-only
+requester, requires an actual Beds24 check-in timestamp, reuses
+`guest_service_journey.build_report()`, and accepts only its `proposal`
+decisions for `post_checkin` and `first_morning`.
+
+Before each POST it writes
+`324882:{booking_ref.lower()}:{event_type}` to DynamoDB table
+`aumara-guest-journey-claims` with one conditional `PutItem`:
+
+- partition key `dedupe_key` (String);
+- `created_at` (UTC ISO timestamp);
+- `ttl` (epoch seconds, seven days after creation);
+- condition `attribute_not_exists(dedupe_key)`.
+
+A conditional conflict skips the send. Any other claim failure aborts before
+the POST. There is no local-file or `/tmp` fallback.
 
 Live execution fails closed unless all guards are exact:
 
@@ -81,6 +96,13 @@ rating/review language, response-time promises, and mattress/linen/satin claims
 are rejected before the claim or POST boundary. Logs and output contain only
 aggregate counters.
 
+The manual workflow additionally requires confirmation text
+`AUMARA-324882-LIVE`, repository secrets `BEDS24_REFRESH_CREDENTIAL`,
+`AWS_ACCESS_KEY_ID`, `AWS_SECRET_ACCESS_KEY`, and `DYNAMODB_TABLE`, plus the
+repository variable `AWS_REGION`. The table must already exist with TTL enabled
+on attribute `ttl`; this repository workflow does not create infrastructure or
+credentials.
+
 ## Source boundary
 
 The attached mattress, linen, response-time and amenity claims are not emitted
@@ -90,7 +112,6 @@ service guarantees.
 
 ## Cutover gate
 
-Live delivery is a separate execution. It requires a verified reservation
-source, recent-message readback, a centralized atomic claim for the emitted
-dedupe key, channel ownership, named staff escalation and explicit send
-authorization.
+Live delivery is manual and AUMARA-only. EL CID expansion, scheduling, table
+creation, secret creation, IAM changes, and automatic retries remain separate
+authorized cutovers.

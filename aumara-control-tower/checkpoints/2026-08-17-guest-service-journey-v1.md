@@ -40,6 +40,9 @@ live delivery remains blocked.
   a canonical Copilot MCP configuration using an Agents-scoped secret reference.
 - Verified that El Cid is queried by property with no room filter, covering all
   registered El Cid rooms rather than only the Studio.
+- Added an unscheduled live Beds24 sender with exact authorization guards,
+  atomic filesystem/DynamoDB claims, hard checkout-pressure blocks and
+  aggregate-only output. Deployment and live scheduling remain excluded.
 - Extended registry schema support for French, German and Dutch templates.
 
 ## Tests
@@ -52,7 +55,7 @@ live delivery remains blocked.
 Results:
 
 - Registry validation: PASS — 17 policies across 3 registries.
-- Unit tests: PASS — 40/40.
+- Unit tests: PASS — 53/53.
 - Dry-run: PASS — 2 proposals, 1 manual review, 1 hard block.
 - External calls in policy dry-run, guest sends, booking mutations and durable
   claims: 0.

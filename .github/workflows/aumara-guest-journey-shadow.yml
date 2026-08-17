@@ -10,6 +10,7 @@ on:
       - ".github/workflows/aumara-guest-journey-shadow.yml"
       - "aumara-control-tower/scripts/beds24_guest_journey_shadow.py"
       - "aumara-control-tower/scripts/beds24_guest_journey_mcp.py"
+      - "aumara-control-tower/scripts/beds24_guest_journey_live.py"
       - "aumara-control-tower/scripts/beds24_aumara_access_audit.py"
       - "aumara-control-tower/scripts/beds24_elcid_studio_audit.py"
       - "aumara-control-tower/scripts/guest_service_journey.py"

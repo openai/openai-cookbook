@@ -4,18 +4,29 @@ import datetime as dt
 import json
 import pathlib
 import sys
+import tempfile
 import unittest
+import urllib.request
+from unittest import mock
 
 
 ROOT = pathlib.Path(__file__).resolve().parents[1]
 sys.path.insert(0, str(ROOT / "scripts"))
 
 import beds24_guest_journey_shadow as shadow  # noqa: E402
+import beds24_guest_journey_live as live  # noqa: E402
 import guest_service_journey as journey  # noqa: E402
 
 
 NOW = dt.datetime(2026, 8, 18, 7, 15, tzinfo=dt.timezone.utc)
 PROPERTY_MAP = {101: "aumara", 202: "elcid"}
+LIVE_ENV = {
+    "BEDS24_GUEST_JOURNEY_MODE": "live",
+    "BEDS24_LIVE_SEND_AUTHORIZED": "true",
+    "AUMARA_DISABLE_GUEST_SEND": "false",
+    "AUMARA_DISABLE_EMAIL_SEND": "true",
+    "AUMARA_DISABLE_BOOKING_MUTATIONS": "true",
+}
 
 
 def booking(**updates):
@@ -215,6 +226,144 @@ class Beds24GuestJourneyShadowTests(unittest.TestCase):
             shadow.ShadowFeedError, "non-GET attempt"
         ):
             shadow.sanitized_summary(report, run_at=NOW, post_requests=1)
+
+    def test_live_sender_rejects_non_atomic_claim_backend(self) -> None:
+        class NonAtomicClaimBackend:
+            def claim_once(self, dedupe_key: str) -> bool:
+                return True
+
+        with self.assertRaisesRegex(
+            live.LiveJourneyError, "atomic claim backend"
+        ):
+            live.execute_live(
+                [],
+                claim_backend=NonAtomicClaimBackend(),
+                message_client=mock.Mock(),
+                env=LIVE_ENV,
+                policy_root=ROOT / "policies",
+            )
+
+    def test_live_guards_require_guest_send_to_be_explicitly_enabled(self) -> None:
+        guarded = {**LIVE_ENV, "AUMARA_DISABLE_GUEST_SEND": "true"}
+        with self.assertRaisesRegex(live.LiveJourneyError, "live mode"):
+            live.assert_live_guards(guarded)
+
+    def test_file_claim_is_atomic_and_contains_no_booking_reference(self) -> None:
+        with tempfile.TemporaryDirectory() as directory:
+            backend = live.FileAtomicClaimBackend(pathlib.Path(directory))
+            key = "aumara:9001:post_checkin"
+            self.assertTrue(backend.claim_once(key))
+            self.assertFalse(backend.claim_once(key))
+            files = list(pathlib.Path(directory).iterdir())
+            self.assertEqual(len(files), 1)
+            self.assertNotIn("9001", files[0].name)
+            self.assertNotIn("9001", files[0].read_text(encoding="ascii"))
+
+    def test_live_claim_precedes_post_and_duplicate_is_skipped(self) -> None:
+        order = []
+
+        class RecordingClaims(live.AtomicClaimBackend):
+            def __init__(self) -> None:
+                self.keys = set()
+
+            def claim_once(self, dedupe_key: str) -> bool:
+                order.append("claim")
+                if dedupe_key in self.keys:
+                    return False
+                self.keys.add(dedupe_key)
+                return True
+
+        class RecordingClient:
+            auth_get_requests = 0
+
+            def send_message(self, booking_id: int, message: str) -> None:
+                order.append("post")
+
+        events = [
+            {
+                "property": "aumara",
+                "booking_ref": "9001",
+                "event_type": "post_checkin",
+                "status": "checked_in",
+                "guest_first_name": "Lucía",
+                "language": "es",
+                "check_in_at": "2026-08-17T15:00:00+02:00",
+                "departure_at": "2026-08-20T11:00:00+02:00",
+                "now": "2026-08-17T16:30:00+02:00",
+                "nights": 3,
+                "sent_dedupe_keys": [],
+                "last_guest_message": "",
+                "open_issue": False,
+            }
+        ]
+        claims = RecordingClaims()
+        client = RecordingClient()
+        first = live.execute_live(
+            events,
+            claim_backend=claims,
+            message_client=client,
+            env=LIVE_ENV,
+            policy_root=ROOT / "policies",
+        )
+        second = live.execute_live(
+            events,
+            claim_backend=claims,
+            message_client=client,
+            env=LIVE_ENV,
+            policy_root=ROOT / "policies",
+        )
+        self.assertEqual(order, ["claim", "post", "claim"])
+        self.assertEqual(first["messagesSent"], 1)
+        self.assertEqual(second["messagesSent"], 0)
+        self.assertEqual(second["claimConflicts"], 1)
+        encoded = json.dumps(first, ensure_ascii=False)
+        self.assertNotIn("Lucía", encoded)
+        self.assertNotIn("9001", encoded)
+
+    def test_live_hard_block_aborts_before_claim_or_post(self) -> None:
+        claims = mock.create_autospec(live.AtomicClaimBackend, instance=True)
+        client = mock.Mock()
+        with self.assertRaisesRegex(live.LiveJourneyError, "hard-blocked"):
+            live.execute_live(
+                [{"event_type": "checkout_reminder"}],
+                claim_backend=claims,
+                message_client=client,
+                env=LIVE_ENV,
+                policy_root=ROOT / "policies",
+            )
+        claims.claim_once.assert_not_called()
+        client.send_message.assert_not_called()
+
+    def test_beds24_live_client_posts_only_official_message_payload(self) -> None:
+        captured = {}
+
+        class Response:
+            status = 201
+
+            def __enter__(self):
+                return self
+
+            def __exit__(self, *args):
+                return False
+
+            def read(self):
+                return b'[{"success":true}]'
+
+        def fake_urlopen(request, timeout):
+            captured["request"] = request
+            captured["timeout"] = timeout
+            return Response()
+
+        client = live.Beds24MessageClient("token", "https://api.example.invalid/v2")
+        with mock.patch.object(urllib.request, "urlopen", side_effect=fake_urlopen):
+            client.send_message(9001, "Hello")
+        request = captured["request"]
+        self.assertEqual(request.get_method(), "POST")
+        self.assertEqual(request.full_url, "https://api.example.invalid/v2/bookings/messages")
+        self.assertEqual(
+            json.loads(request.data.decode("utf-8")),
+            [{"bookingId": 9001, "message": "Hello"}],
+        )
 
 
 if __name__ == "__main__":

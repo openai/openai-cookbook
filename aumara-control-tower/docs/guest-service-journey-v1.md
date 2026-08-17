@@ -58,6 +58,29 @@ value belongs in the repository or MCP JSON.
 - No rating or public-review request is included during the stay.
 - The runtime has no Beds24, Gmail, WhatsApp, HTTP or database client.
 
+## Live Beds24 sender boundary
+
+`scripts/beds24_guest_journey_live.py` is a separate, unscheduled execution
+boundary. It reuses `guest_service_journey.build_report()` and accepts only its
+`proposal` decisions for `post_checkin` and `first_morning`. Before each POST it
+claims `{property}:{booking_ref.lower()}:{event_type}` with either an atomic
+filesystem create under `/tmp/claims` (or `BEDS24_CLAIM_DIR`) or a DynamoDB
+conditional `PutItem` when `BEDS24_CLAIM_DYNAMODB_TABLE` is configured.
+
+Live execution fails closed unless all guards are exact:
+
+- `BEDS24_GUEST_JOURNEY_MODE=live`
+- `BEDS24_LIVE_SEND_AUTHORIZED=true`
+- `AUMARA_DISABLE_GUEST_SEND=false`
+- `AUMARA_DISABLE_EMAIL_SEND=true`
+- `AUMARA_DISABLE_BOOKING_MUTATIONS=true`
+
+The only mutation endpoint is Beds24 `POST /bookings/messages`, using the
+official array payload with `bookingId` and `message`. Checkout-pressure events,
+rating/review language, response-time promises, and mattress/linen/satin claims
+are rejected before the claim or POST boundary. Logs and output contain only
+aggregate counters.
+
 ## Source boundary
 
 The attached mattress, linen, response-time and amenity claims are not emitted

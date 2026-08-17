@@ -38,8 +38,8 @@ PROPERTY_MAP = {
 }
 PROPERTY_ROOM_SCOPE = {
     324882: (
-        {"roomId": 674465, "name": "Chalet", "physicalUnits": 3},
-        {"roomId": 674466, "name": "Superior Chalet", "physicalUnits": 2},
+        {"roomId": 674465, "name": "SL", "physicalUnits": 4},
+        {"roomId": 674466, "name": "Chalet Super", "physicalUnits": 2},
     ),
     324903: (
         {"roomId": 674484, "name": "Triple Room", "physicalUnits": 1},

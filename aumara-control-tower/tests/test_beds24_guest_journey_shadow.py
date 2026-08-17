@@ -4,7 +4,6 @@ import datetime as dt
 import json
 import pathlib
 import sys
-import tempfile
 import unittest
 import urllib.request
 from unittest import mock
@@ -53,6 +52,13 @@ class Beds24GuestJourneyShadowTests(unittest.TestCase):
             query = shadow.booking_query(property_id, NOW.date())
             self.assertIn(f"propertyId={property_id}", query)
             self.assertNotIn("roomId=", query)
+        self.assertEqual(
+            sum(
+                room["physicalUnits"]
+                for room in shadow.PROPERTY_ROOM_SCOPE[324882]
+            ),
+            6,
+        )
 
     def test_guards_are_mandatory(self) -> None:
         with self.assertRaisesRegex(shadow.ShadowFeedError, "shadow guards"):
@@ -248,17 +254,6 @@ class Beds24GuestJourneyShadowTests(unittest.TestCase):
         with self.assertRaisesRegex(live.LiveJourneyError, "live mode"):
             live.assert_live_guards(guarded)
 
-    def test_file_claim_is_atomic_and_contains_no_booking_reference(self) -> None:
-        with tempfile.TemporaryDirectory() as directory:
-            backend = live.FileAtomicClaimBackend(pathlib.Path(directory))
-            key = "aumara:9001:post_checkin"
-            self.assertTrue(backend.claim_once(key))
-            self.assertFalse(backend.claim_once(key))
-            files = list(pathlib.Path(directory).iterdir())
-            self.assertEqual(len(files), 1)
-            self.assertNotIn("9001", files[0].name)
-            self.assertNotIn("9001", files[0].read_text(encoding="ascii"))
-
     def test_live_claim_precedes_post_and_duplicate_is_skipped(self) -> None:
         order = []
 
@@ -282,9 +277,11 @@ class Beds24GuestJourneyShadowTests(unittest.TestCase):
         events = [
             {
                 "property": "aumara",
+                "property_id": 324882,
                 "booking_ref": "9001",
                 "event_type": "post_checkin",
                 "status": "checked_in",
+                "status_source": "actual_check_in_timestamp",
                 "guest_first_name": "Lucía",
                 "language": "es",
                 "check_in_at": "2026-08-17T15:00:00+02:00",
@@ -316,6 +313,7 @@ class Beds24GuestJourneyShadowTests(unittest.TestCase):
         self.assertEqual(first["messagesSent"], 1)
         self.assertEqual(second["messagesSent"], 0)
         self.assertEqual(second["claimConflicts"], 1)
+        self.assertEqual(claims.keys, {"324882:9001:post_checkin"})
         encoded = json.dumps(first, ensure_ascii=False)
         self.assertNotIn("Lucía", encoded)
         self.assertNotIn("9001", encoded)

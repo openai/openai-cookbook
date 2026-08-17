@@ -1,0 +1,68 @@
+name: AUMARA guest journey live canary
+
+on:
+  workflow_dispatch:
+    inputs:
+      confirmation:
+        description: "Type AUMARA-324882-LIVE to authorize this one canary run"
+        required: true
+        type: string
+
+permissions:
+  contents: read
+
+concurrency:
+  group: aumara-guest-journey-live-324882
+  cancel-in-progress: false
+
+jobs:
+  live-canary:
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    env:
+      BEDS24_GUEST_JOURNEY_MODE: live
+      BEDS24_LIVE_SEND_AUTHORIZED: "true"
+      AUMARA_DISABLE_GUEST_SEND: "false"
+      AUMARA_DISABLE_EMAIL_SEND: "true"
+      AUMARA_DISABLE_BOOKING_MUTATIONS: "true"
+      BEDS24_AUTO_REPLY_EXECUTE: "0"
+      BEDS24_NOTE_MODE: "off"
+      AWS_EC2_METADATA_DISABLED: "true"
+      PYTHONDONTWRITEBYTECODE: "1"
+
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+
+      - name: Verify manual canary authorization and secret presence
+        env:
+          CANARY_CONFIRMATION: ${{ inputs.confirmation }}
+          BEDS24_REFRESH_TOKEN: ${{ secrets.BEDS24_REFRESH_CREDENTIAL }}
+          AWS_ACCESS_KEY_ID: ${{ secrets.AWS_ACCESS_KEY_ID }}
+          AWS_SECRET_ACCESS_KEY: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
+          AWS_REGION: ${{ vars.AWS_REGION }}
+          DYNAMODB_TABLE: ${{ secrets.DYNAMODB_TABLE }}
+        run: |
+          test "$CANARY_CONFIRMATION" = "AUMARA-324882-LIVE"
+          test -n "$BEDS24_REFRESH_TOKEN"
+          test -n "$AWS_ACCESS_KEY_ID"
+          test -n "$AWS_SECRET_ACCESS_KEY"
+          test -n "$AWS_REGION"
+          test "$DYNAMODB_TABLE" = "aumara-guest-journey-claims"
+
+      - name: Install DynamoDB client
+        run: python -m pip install "boto3>=1.34,<2"
+
+      - name: Run AUMARA 324882 live canary
+        env:
+          BEDS24_REFRESH_TOKEN: ${{ secrets.BEDS24_REFRESH_CREDENTIAL }}
+          AWS_ACCESS_KEY_ID: ${{ secrets.AWS_ACCESS_KEY_ID }}
+          AWS_SECRET_ACCESS_KEY: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
+          AWS_REGION: ${{ vars.AWS_REGION }}
+          DYNAMODB_TABLE: ${{ secrets.DYNAMODB_TABLE }}
+        run: |
+          python -m aumara_control_tower.scripts.beds24_guest_journey_live \
+            --property 324882

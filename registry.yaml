@@ -4,7 +4,7 @@
 # should build pages for, and indicates metadata such as tags, creation date and
 # authors for each page.
 
-- title: Generate transparent image assets for campaigns and presentations
+- title: Generate Transparent Image Assets for Campaigns and Presentations
   path: examples/multimodal/transparent-image-assets-for-campaigns-and-presentations.ipynb
   slug: transparent-image-assets-for-campaigns-and-presentations
   description: Generate reusable transparent PNG assets for seasonal ecommerce campaigns and branded PowerPoint presentations.

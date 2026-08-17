@@ -194,6 +194,7 @@ class DynamoClaimAtomicTests(unittest.TestCase):
         ).read_text(encoding="utf-8")
         self.assertIn("workflow_dispatch:", workflow)
         self.assertNotIn("schedule:", workflow)
+        self.assertIn("environment: Production", workflow)
         self.assertIn("BEDS24_GUEST_JOURNEY_MODE: live", workflow)
         self.assertIn('BEDS24_LIVE_SEND_AUTHORIZED: "true"', workflow)
         self.assertIn('AUMARA_DISABLE_GUEST_SEND: "false"', workflow)

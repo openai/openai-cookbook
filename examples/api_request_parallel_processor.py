@@ -119,6 +119,11 @@ async def process_api_requests_from_file(
     logging_level: int,
 ):
     """Processes API requests in parallel, throttling to stay under rate limits."""
+    if not max_requests_per_minute >= 1:
+        raise ValueError("max_requests_per_minute must be at least 1")
+    if not max_tokens_per_minute > 0:
+        raise ValueError("max_tokens_per_minute must be greater than 0")
+
     # constants
     seconds_to_pause_after_rate_limit_error = 15
     seconds_to_sleep_each_loop = (
@@ -173,12 +178,20 @@ async def process_api_requests_from_file(
                         try:
                             # get new request
                             request_json = json.loads(next(requests))
+                            token_consumption = num_tokens_consumed_from_request(
+                                request_json, api_endpoint, token_encoding_name
+                            )
+                            if token_consumption > max_tokens_per_minute:
+                                raise ValueError(
+                                    "Request requires an estimated "
+                                    f"{token_consumption} tokens, exceeding "
+                                    f"max_tokens_per_minute ({max_tokens_per_minute}). "
+                                    "Increase the limit or split the request."
+                                )
                             next_request = APIRequest(
                                 task_id=next(task_id_generator),
                                 request_json=request_json,
-                                token_consumption=num_tokens_consumed_from_request(
-                                    request_json, api_endpoint, token_encoding_name
-                                ),
+                                token_consumption=token_consumption,
                                 attempts_left=max_attempts,
                                 metadata=request_json.pop("metadata", None),
                             )

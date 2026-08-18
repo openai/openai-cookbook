@@ -3,13 +3,13 @@ on:
   workflow_dispatch:
     inputs:
       confirmation:
-        description: "Type AUMARA-324882-LIVE to authorize this one canary run"
+        description: "Type AUMARA-ZEM882-LIVE to authorize this one canary run"
         required: true
         type: string
 permissions:
   contents: read
 concurrency:
-  group: aumara-guest-journey-live-324882
+  group: aumara-guest-journey-live-zem882
   cancel-in-progress: false
 jobs:
   live-canary:
@@ -42,8 +42,8 @@ jobs:
       - name: Verify manual canary authorization and secret presence
         run: |
           echo "Checking confirmation..."
-          if [ "$CANARY_CONFIRMATION" != "AUMARA-324882-LIVE" ]; then
-            echo "ERROR: Expected AUMARA-324882-LIVE, got $CANARY_CONFIRMATION"
+          if [ "$CANARY_CONFIRMATION" != "AUMARA-ZEM882-LIVE" ]; then
+            echo "ERROR: Expected AUMARA-ZEM882-LIVE, got $CANARY_CONFIRMATION"
             exit 1
           fi
           echo "All checks passed!"

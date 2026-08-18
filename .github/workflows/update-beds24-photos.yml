@@ -11,18 +11,15 @@ permissions:
   contents: write
 
 concurrency:
-  group: beds24-ui-photo-upload-324882
+  group: beds24-legacy-picture-probe-324882
   cancel-in-progress: true
 
 jobs:
   update-photos:
     runs-on: ubuntu-latest
-    timeout-minutes: 20
+    timeout-minutes: 15
     env:
       PROPERTY_ID: "324882"
-      SESSION_GENERATION: "3"
-      SESSION_ROOT: "aumara-control-tower/evidence/beds24-ui-session"
-      RUNTIME_DIR: ".runtime/beds24-ui"
     steps:
       - uses: actions/checkout@v4
         with:
@@ -32,30 +29,24 @@ jobs:
         with:
           python-version: "3.11"
 
-      - name: Install browser and transfer dependencies
-        run: python -m pip install --disable-pip-version-check playwright gdown pillow
-
-      - name: Materialize authenticated UI controller
+      - name: Materialize read-only legacy API probe
         shell: bash
         run: |
-          awk '/beds24_ui_upload.py.gz.b64 <<.B64./{capture=1; next} capture && /^[[:space:]]*B64[[:space:]]*$/{exit} capture{sub(/^[[:space:]]+/, ""); print}' \
-            .github/workflows/beds24-ui-photo-upload.yml > /tmp/beds24_ui_upload.py.gz.b64
-          test -s /tmp/beds24_ui_upload.py.gz.b64
-          base64 -d /tmp/beds24_ui_upload.py.gz.b64 | gzip -d > /tmp/beds24_ui_upload.py
-          sed -i '/^[[:space:]]*fuzzy=False,[[:space:]]*$/d' /tmp/beds24_ui_upload.py
-          chmod 700 /tmp/beds24_ui_upload.py
-          python -m py_compile /tmp/beds24_ui_upload.py
+          awk '/beds24_legacy_probe.py.gz.b64 <<.B64./{capture=1; next} capture && /^[[:space:]]*B64[[:space:]]*$/{exit} capture{sub(/^[[:space:]]+/, ""); print}' \
+            .github/workflows/beds24-legacy-picture-probe.yml > /tmp/beds24_legacy_probe.py.gz.b64
+          test -s /tmp/beds24_legacy_probe.py.gz.b64
+          base64 -d /tmp/beds24_legacy_probe.py.gz.b64 | gzip -d > /tmp/beds24_legacy_probe.py
+          chmod 700 /tmp/beds24_legacy_probe.py
+          python -m py_compile /tmp/beds24_legacy_probe.py
 
-      - name: Open Beds24, authenticate, and upload the approved photo set
-        run: python /tmp/beds24_ui_upload.py
+      - name: Probe existing legacy picture access without writes
+        run: python /tmp/beds24_legacy_probe.py
 
-      - name: Upload screenshots and diagnostic evidence
+      - name: Upload sanitized probe evidence
         if: always()
         uses: actions/upload-artifact@v4
         with:
-          name: beds24-ui-photo-upload-${{ github.run_id }}-${{ github.run_attempt }}
-          path: |
-            .runtime/beds24-ui/*.png
-            aumara-control-tower/evidence/beds24-ui-session/status.json
+          name: beds24-legacy-picture-probe-${{ github.run_id }}
+          path: aumara-control-tower/evidence/beds24-legacy-probe/${{ github.run_id }}/status.json
           if-no-files-found: warn
           retention-days: 3

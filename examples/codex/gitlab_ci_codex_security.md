@@ -6,11 +6,15 @@ The pipeline keeps scanning credentials separate from repository-write access an
 
 ![GitLab pipeline scans code, reports security findings, verifies a fix, and opens a draft merge request for human review](../../images/gitlab-codex-security-workflow.svg)
 
+Start with scan-only reporting, then enable optional remediation after you have validated the runner, findings, and security boundaries. The complete implementation is provided as a downloadable GitLab CI configuration.
+
 ## Prerequisites
 
 You need a GitLab project with a trusted runner that supports the Codex sandbox's user namespace, an OpenAI API key with Codex Security access, Node.js 22.13.0 or later, Python 3.10 or later, and full Git history for merge request scans. Python 3.10 additionally requires `tomli`.
 
 GitLab Ultimate 19.2 or later supports [SARIF ingestion](https://docs.gitlab.com/user/application_security/detect/sarif/). Some accounts or repositories also require [Trusted Access for Cyber](https://chatgpt.com/cyber) for full-repository scans.
+
+Automated remediation additionally requires an existing regression test and a runner capable of executing repository-controlled commands without access to protected credentials. Publishing a draft merge request requires a separate, narrowly scoped GitLab project access token.
 
 ## Step 1: Add the API key and pipeline
 
@@ -20,9 +24,13 @@ Scanning and SARIF publication require only one project variable: `CODEX_SECURIT
 
 [Download the complete `.gitlab-ci.yml`](./gitlab_ci_codex_security/.gitlab-ci.yml) and place it in your GitLab repository's root. If you already have a pipeline, merge its stages, hidden templates, and jobs into your existing configuration.
 
+The example adds `security_scan`, `security_remediation`, `security_publish`, and `security_gate` stages. Preserve your existing build, test, and deployment stages when integrating it. If your project defines `workflow: rules`, confirm they allow the pipeline events you intend to scan.
+
 The pipeline scans protected default-branch commits and same-project merge requests between protected branches. Merge request pipelines can access protected credentials only when GitLab's [protected merge request resource requirements](https://docs.gitlab.com/ci/pipelines/merge_request_pipelines/#control-access-to-protected-variables-and-runners) are satisfied.
 
-Review who can modify `.gitlab-ci.yml` or run secret-bearing jobs. If feature branches are unprotected, scan after merging to the protected default branch instead.
+Both branches must belong to the same project, both must be protected, and the project must permit merge request pipelines to access protected variables and runners. The user triggering the pipeline also needs permission to push or merge into the target branch.
+
+Review who can modify `.gitlab-ci.yml` or run secret-bearing jobs: masking and hiding a variable do not make untrusted CI code safe. If feature branches are unprotected, scan after merging to the protected default branch instead.
 
 ## Step 2: Run a scan and verify GitLab findings
 
@@ -38,6 +46,8 @@ Open the `codex-security` job and confirm that its artifacts include `scan-manif
 
 GitLab creates project vulnerability records after default-branch scans; merge-request findings alone do not create project-wide vulnerability records.
 
+The manifest identifies the scanned revision, `findings.json` contains canonical findings, and `coverage.json` records whether the selected target was completely reviewed. If these artifacts are missing, investigate authentication, runner setup, or sandbox permissions before retrying a paid scan.
+
 ## Step 3: Understand the pipeline
 
 The downloadable pipeline selects one of three profiles:
@@ -47,6 +57,8 @@ The downloadable pipeline selects one of three profiles:
 | Protected same-project merge request | Committed diff | `standard` | `low` |
 | Protected default-branch push or manual run | Full repository | `standard` | `high` |
 | Scheduled pipeline | Full repository | `deep` | `xhigh` |
+
+Merge request scans prioritize quick feedback on the committed change. Default-branch scans review the integrated repository, while scheduled deep scans provide broader periodic coverage. A completed diff scan applies only to that change and must not be treated as proof that the entire repository is clean.
 
 The routing rules pin the CLI version with `CODEX_SECURITY_VERSION` and exclude forked or unprotected merge requests:
 
@@ -82,6 +94,10 @@ stages:
 
 The scanner installs outside the repository, checks the sandbox, runs a dry-run preflight, and scans the exact committed target. CLI `0.1.11` requires a process-scoped `OPENAI_API_KEY` for both the dry run and paid scan; the pipeline derives it from `CODEX_SECURITY_API_KEY`.
 
+For merge requests, full Git history allows the pipeline to calculate the merge base and bind the scan to the reviewed base and head revisions. The tested CLI also uses an internal snapshot digest to seal diff results; repository scans instead use their Git revision.
+
+The dry run checks configuration without starting a paid scan, but it does not prove account entitlement, available quota, or model access. Retest authentication and report handling before changing the pinned CLI version.
+
 The completed scan publishes SARIF from a successful report job:
 
 ```yaml
@@ -97,6 +113,8 @@ codex-security:
 ```
 
 GitLab does not ingest SARIF findings from a failed job, even with `allow_failure`. The pipeline therefore publishes a successful report first, then restores the scanner's exit status in a separate final gate. Partial coverage is accepted only when the completed scan, coverage evidence, and non-empty SARIF are verified; remediation still requires complete coverage.
+
+This separation means an eligible finding can appear in GitLab and produce a verified draft fix before the final policy gate blocks the pipeline. Restrict artifact access because reports may contain source excerpts and vulnerability details.
 
 To preserve GitLab severities, the pipeline matches SARIF results to `findings.json` and assigns rank `95` for critical findings, `80` for high, `55` for medium, `25` for low, and `5` for informational.
 
@@ -122,6 +140,8 @@ Merge request diff scans do not create remediation merge requests. The workflow 
 ### Configure verified patch generation
 
 Set protected `CODEX_SECURITY_ENABLE_REMEDIATION=true` and define `CODEX_SECURITY_VERIFICATION_COMMAND` as an existing regression test. That test must fail with exit `1` before the fix and pass with exit `0` afterward.
+
+Choose a test that checks the underlying security invariant rather than one specific implementation. Set optional `CODEX_SECURITY_SETUP_COMMAND` if dependencies must be installed first. A passing test before remediation does not demonstrate the vulnerability, while exit `127` usually indicates a missing executable.
 
 The remediation job runs only on the protected default branch:
 
@@ -152,6 +172,8 @@ CODEX_API_KEY="$CODEX_SECURITY_API_KEY" \
 
 Repository-controlled setup and tests run under a separate unprivileged user without OpenAI, GitLab, registry, or deployment credentials. Non-root runners must run verification in a separate credential-free job.
 
+The patch must preserve protected files and remain within `CODEX_SECURITY_MAX_CHANGED_FILES`. The default allows eight changed files; adjust it only when a complete fix and its focused tests require a different reviewed limit.
+
 ### Automatically create a draft merge request
 
 Create a [GitLab project access token](https://docs.gitlab.com/user/project/settings/project_access_tokens/) with the Developer role and the `api` and `write_repository` scopes. Store it as protected, masked, hidden `GITLAB_REMEDIATION_TOKEN` scoped only to the `codex-security/publish` environment.
@@ -173,7 +195,9 @@ codex-security-draft-mr:
 
 The publisher creates `codex-security/fix-<finding-hash>` and opens `Draft: Fix Codex Security finding <finding-hash>`. It reuses existing drafts and handles source branches left behind by closed merge requests.
 
-The resulting unprotected merge request runs `codex-security-remediation-mr-check` without protected secrets. Review and merge the proposed fix manually.
+Do not substitute `CI_JOB_TOKEN` for the scoped project token: it cannot perform the required merge request creation operation. The publisher also isolates its Git credentials from runner-injected checkout credentials before pushing the fix branch.
+
+The resulting unprotected merge request runs `codex-security-remediation-mr-check` without protected secrets. Configure its ordinary regression command with non-secret `CODEX_SECURITY_MR_TEST_COMMAND` when `npm test` is not appropriate. Review and merge the proposed fix manually.
 
 ## Step 5: Configure optional variables
 
@@ -196,6 +220,8 @@ Only the API key is required for scanning. Configure additional variables only w
 
 GitLab supplies `CI_*` variables. The pipeline manages internal `CODEX_SECURITY_BIN`, `CODEX_SECURITY_EFFORT`, `CODEX_SECURITY_MODE`, `CODEX_SECURITY_STATE_DIR`, `CODEX_SECURITY_TARGET`, and `CODEX_SECURITY_TARGET_SNAPSHOT_DIGEST`; do not configure them as project variables.
 
+For scan-only usage, add only `CODEX_SECURITY_API_KEY`. Patch generation additionally needs the remediation opt-in and verification command. Draft publication adds the separate publishing opt-in and environment-scoped project token.
+
 ## Step 6: Tune cost and enforcement
 
 Use focused diffs for merge request feedback, standard repository scans for the default branch, and scheduled deep scans for broader coverage. Compare effort and model changes independently, and retain periodic full scans.
@@ -203,6 +229,8 @@ Use focused diffs for merge request feedback, standard repository scans for the 
 One validation project reported estimated costs of USD 2.76 for a two-file diff and USD 11.67 for a 63-file repository scan. These are examples, not predictions. `--max-cost` provides an estimated-cost guardrail, not a hard billing cap.
 
 Scanner exit `0` indicates a passing scan, exit `1` indicates a configured severity-policy failure, and exit `2` requires investigating coverage or infrastructure. The final gate temporarily allows verified partial coverage during calibration; remove that allowance when incomplete coverage must block.
+
+When a job fails, begin with the available evidence: missing scan artifacts suggest a configuration or runner issue, while existing artifacts with partial coverage require reviewing the completion summary. If GitLab displays no findings, confirm the report job itself succeeded. If remediation does not run, check the protected branch, both opt-ins, complete coverage, finding severity, and the publishing token's environment scope.
 
 Consult the [Security CLI reference](https://learn.chatgpt.com/docs/security/cli/reference) for target selection, effort, model, budget, and severity-policy options.
 

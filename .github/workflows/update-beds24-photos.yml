@@ -18,7 +18,7 @@ permissions:
 
 concurrency:
   group: beds24-photos-324882
-  cancel-in-progress: false
+  cancel-in-progress: true
 
 jobs:
   update-photos:
@@ -33,6 +33,23 @@ jobs:
 
     steps:
       - uses: actions/checkout@v4
+
+      - name: Initialize sanitized execution evidence
+        shell: bash
+        run: |
+          mkdir -p "$(dirname "$EVIDENCE_PATH")"
+          cat > "$EVIDENCE_PATH" <<JSON
+          {
+            "checked_at_utc": "$(date -u +%Y-%m-%dT%H:%M:%SZ)",
+            "status": "RUNNING",
+            "property_id": "$PROP_ID",
+            "drive_folder": "$DRIVE_FOLDER",
+            "selected_file_count": 10,
+            "failure_stage": null,
+            "diagnostic": null,
+            "secret_exposed": false
+          }
+          JSON
 
       - name: Setup Python
         uses: actions/setup-python@v5

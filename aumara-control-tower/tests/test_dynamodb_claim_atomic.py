@@ -204,6 +204,8 @@ class DynamoClaimAtomicTests(unittest.TestCase):
         self.assertIn("secrets.AWS_ACCESS_KEY_ID", workflow)
         self.assertIn("secrets.AWS_SECRET_ACCESS_KEY", workflow)
         self.assertIn("secrets.DYNAMODB_TABLE", workflow)
+        self.assertIn("python -m pip install --upgrade pip boto3", workflow)
+        self.assertNotIn("pip install -r requirements.txt", workflow)
 
     def test_documented_module_entrypoint_resolves(self) -> None:
         result = subprocess.run(

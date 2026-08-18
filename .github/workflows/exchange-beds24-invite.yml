@@ -43,6 +43,7 @@ jobs:
           import json
           import os
           import pathlib
+          import urllib.error
           import urllib.request
           import zipfile
 
@@ -60,11 +61,25 @@ jobs:
               "User-Agent": "AUMARA-Beds24-Green-Artifact-Recovery/1.0",
           }
 
+          class NoRedirect(urllib.request.HTTPRedirectHandler):
+              def redirect_request(self, req, fp, code, msg, response_headers, newurl):
+                  return None
+
           request = urllib.request.Request(
               f"{api}/repos/{repo}/actions/artifacts/{source_artifact_id}/zip",
               headers=headers,
           )
-          with urllib.request.urlopen(request, timeout=60) as response:
+          opener = urllib.request.build_opener(NoRedirect())
+          try:
+              opener.open(request, timeout=60)
+              raise RuntimeError("Artifact download endpoint did not redirect")
+          except urllib.error.HTTPError as exc:
+              if exc.code not in {301, 302, 303, 307, 308}:
+                  raise
+              download_url = exc.headers.get("Location")
+          if not download_url:
+              raise RuntimeError("Artifact download redirect lacked Location header")
+          with urllib.request.urlopen(download_url, timeout=60) as response:
               archive = response.read()
 
           with zipfile.ZipFile(io.BytesIO(archive)) as bundle:

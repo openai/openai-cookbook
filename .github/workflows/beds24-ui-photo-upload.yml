@@ -32,6 +32,28 @@ jobs:
           import os
           import sys
           from playwright.sync_api import sync_playwright
+
+          def wait_for_first_visible(page, selectors, timeout_ms=30000):
+              last_error = None
+              for selector in selectors:
+                  locator = page.locator(selector).first
+                  try:
+                      locator.wait_for(state="visible", timeout=timeout_ms)
+                      return locator
+                  except Exception as exc:
+                      last_error = exc
+              raise RuntimeError(
+                  f"Unable to locate any visible selector from {selectors}"
+              ) from last_error
+
+          def click_first_available(page, selectors):
+              for selector in selectors:
+                  locator = page.locator(selector).first
+                  if locator.count() > 0:
+                      locator.click()
+                      return
+              raise RuntimeError(f"Unable to locate clickable selector from {selectors}")
+
           username=os.environ.get("BEDS24_USERNAME", "").strip()
           password=os.environ.get("BEDS24_PASSWORD", "").strip()
           if not username or not password:
@@ -46,9 +68,36 @@ jobs:
               b=p.chromium.launch(headless=True)
               pg=b.new_page()
               pg.goto("https://beds24.com/control3.php")
-              pg.fill("input[name='username']", username)
-              pg.fill("input[name='password']", password)
-              pg.click("input[type='submit']")
+              username_input = wait_for_first_visible(
+                  pg,
+                  [
+                      "input[name='username']",
+                      "input[name='email']",
+                      "input[autocomplete='username']",
+                      "input[type='email']",
+                      "input[type='text']",
+                  ],
+              )
+              password_input = wait_for_first_visible(
+                  pg,
+                  [
+                      "input[name='password']",
+                      "input[autocomplete='current-password']",
+                      "input[type='password']",
+                  ],
+              )
+              username_input.fill(username)
+              password_input.fill(password)
+              click_first_available(
+                  pg,
+                  [
+                      "input[type='submit']",
+                      "button[type='submit']",
+                      "button:has-text('Log in')",
+                      "button:has-text('Login')",
+                      "button:has-text('Sign in')",
+                  ],
+              )
               pg.wait_for_load_state("networkidle")
               pg.goto("https://beds24.com/control3.php?pagetype=propcontent&propid=324882")
               pg.wait_for_timeout(3000)

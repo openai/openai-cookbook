@@ -1,0 +1,316 @@
+name: Update Beds24 Photos AUMARA 324882
+
+on:
+  workflow_dispatch:
+    inputs:
+      delete_old:
+        description: "Delete old photos before upload? (unsupported; keep false)"
+        required: false
+        default: "false"
+        type: string
+  push:
+    branches: [main]
+    paths:
+      - ".github/workflows/update-beds24-photos.yml"
+
+permissions:
+  contents: write
+
+concurrency:
+  group: beds24-photos-324882
+  cancel-in-progress: true
+
+jobs:
+  update-photos:
+    runs-on: ubuntu-latest
+    timeout-minutes: 20
+    env:
+      BEDS24_REFRESH_CREDENTIAL: ${{ secrets.BEDS24_REFRESH_CREDENTIAL }}
+      PROP_ID: "324882"
+      DRIVE_FOLDER: "1apf9xnyInfhZSI0NfNA3n0OhEgiN8HXS"
+      DELETE_OLD: ${{ inputs.delete_old || 'false' }}
+      EVIDENCE_PATH: "aumara-control-tower/evidence/beds24-photo-upload-324882.json"
+
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Initialize sanitized execution evidence
+        shell: bash
+        run: |
+          mkdir -p "$(dirname "$EVIDENCE_PATH")"
+          cat > "$EVIDENCE_PATH" <<JSON
+          {
+            "checked_at_utc": "$(date -u +%Y-%m-%dT%H:%M:%SZ)",
+            "status": "RUNNING",
+            "property_id": "$PROP_ID",
+            "drive_folder": "$DRIVE_FOLDER",
+            "selected_file_count": 10,
+            "failure_stage": null,
+            "diagnostic": null,
+            "secret_exposed": false
+          }
+          JSON
+
+      - name: Setup Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: "3.11"
+
+      - name: Install dependencies
+        run: python -m pip install --disable-pip-version-check requests gdown
+
+      - name: Download exact 10 photos and upload with strict verification
+        shell: bash
+        run: |
+          python - <<'PY'
+          from __future__ import annotations
+
+          import datetime as dt
+          import hashlib
+          import json
+          import mimetypes
+          import os
+          import pathlib
+          import sys
+          import time
+          from typing import Any
+
+          import gdown
+          import requests
+
+          API_BASE = "https://api.beds24.com/v2"
+          PROPERTY_ID = os.environ.get("PROP_ID", "324882")
+          DRIVE_FOLDER = os.environ.get("DRIVE_FOLDER", "")
+          EVIDENCE_PATH = pathlib.Path(
+              os.environ.get(
+                  "EVIDENCE_PATH",
+                  "aumara-control-tower/evidence/beds24-photo-upload-324882.json",
+              )
+          )
+          DOWNLOAD_DIR = pathlib.Path("download/beds24-324882")
+          TIMEOUT = 60
+
+          PHOTO_MANIFEST = [
+              ("01_FULL_no_crop.jpg", "1MAcqpC0veE8DNJuQvViQzCvUqwnlKbY_"),
+              ("02_FULL_no_crop.jpg", "19jTCi6FThY584Iebs4vvlPujojSdudQD"),
+              ("03_FULL_no_crop.jpg", "1WHAIG1Pz7w0rUwciC7O5dAMbB7WSEKKd"),
+              ("04_FULL_no_crop.jpg", "1robOjhdVs12hp6XLbD5AuJsjW84bCxBc"),
+              ("06_FULL_no_crop.jpg", "13c7-i9mzpIpX2JJnyyB406T9jp7EMFmV"),
+              ("IMG_0005.JPG", "1Cg4Y-skeJ6VNAnfsRPwPEED9RlQ8IIlV"),
+              ("IMG_0006.JPG", "1UJaAE4Z9DpVFi67xAG7iZ33l4_xMUS9o"),
+              ("IMG_0007.JPG", "17Amun9sFTFpogCN459bhysRkgKCSaMo1"),
+              ("IMG_0009.JPG", "1z80jRlJkLwdLkZlLlGv1zNB4i79JhSh8"),
+              ("IMG_0011.JPG", "1cqP3azFyywT0jcNO8SfNbQ8lMAoOAtMj"),
+          ]
+
+          evidence: dict[str, Any] = {
+              "checked_at_utc": None,
+              "status": "STARTED",
+              "property_id": PROPERTY_ID,
+              "drive_folder": DRIVE_FOLDER,
+              "selected_file_count": len(PHOTO_MANIFEST),
+              "selected_files": [name for name, _ in PHOTO_MANIFEST],
+              "downloaded_files": [],
+              "auth_mode": None,
+              "auth_details_http_status": None,
+              "token_exchange_http_status": None,
+              "property_probe_http_status": None,
+              "image_endpoint": None,
+              "image_endpoint_get_http_status": None,
+              "image_endpoint_options_http_status": None,
+              "image_endpoint_allow": None,
+              "uploads": [],
+              "failure_stage": None,
+              "diagnostic": None,
+              "secret_exposed": False,
+          }
+
+          def now_utc() -> str:
+              return dt.datetime.now(dt.timezone.utc).isoformat()
+
+          def safe_json(response: requests.Response) -> dict[str, Any]:
+              try:
+                  body = response.json()
+              except ValueError:
+                  return {}
+              return body if isinstance(body, dict) else {}
+
+          def sanitized_diagnostic(response: requests.Response) -> dict[str, Any]:
+              body = safe_json(response)
+              allowed = {}
+              for key in ("code", "status", "type", "message", "error", "detail"):
+                  value = body.get(key)
+                  if value not in (None, "", [], {}):
+                      text = str(value)
+                      allowed[key] = text[:240]
+              if not allowed and body:
+                  allowed["body_keys"] = sorted(str(key) for key in body.keys())[:30]
+              return allowed
+
+          def write_evidence() -> None:
+              evidence["checked_at_utc"] = now_utc()
+              EVIDENCE_PATH.parent.mkdir(parents=True, exist_ok=True)
+              EVIDENCE_PATH.write_text(
+                  json.dumps(evidence, indent=2, sort_keys=True) + "\n",
+                  encoding="utf-8",
+              )
+
+          def fail(stage: str, message: str, exit_code: int = 1) -> None:
+              evidence["status"] = "FAILED"
+              evidence["failure_stage"] = stage
+              evidence["diagnostic"] = message[:500]
+              write_evidence()
+              print(f"ERROR [{stage}]: {message}", file=sys.stderr)
+              raise SystemExit(exit_code)
+
+          credential = (os.environ.get("BEDS24_REFRESH_CREDENTIAL") or "").strip()
+          if not credential:
+              fail("credential", "GitHub Actions secret BEDS24_REFRESH_CREDENTIAL is absent")
+
+          if os.environ.get("DELETE_OLD", "false").strip().lower() == "true":
+              fail(
+                  "delete_old",
+                  "Old-image deletion is not exposed by the verified Beds24 API contract; upload aborted before mutation",
+              )
+
+          DOWNLOAD_DIR.mkdir(parents=True, exist_ok=True)
+          total_bytes = 0
+          for filename, file_id in PHOTO_MANIFEST:
+              destination = DOWNLOAD_DIR / filename
+              print(f"Downloading {filename} from the approved Drive manifest...")
+              result = gdown.download(
+                  id=file_id,
+                  output=str(destination),
+                  quiet=False,
+                  fuzzy=False,
+              )
+              if not result or not destination.is_file():
+                  fail("download", f"Google Drive download failed for {filename}")
+              size = destination.stat().st_size
+              if size <= 0:
+                  fail("download", f"Downloaded file is empty: {filename}")
+              digest = hashlib.sha256(destination.read_bytes()).hexdigest()
+              total_bytes += size
+              evidence["downloaded_files"].append(
+                  {
+                      "filename": filename,
+                      "bytes": size,
+                      "sha256": digest,
+                  }
+              )
+
+          if len(evidence["downloaded_files"]) != 10:
+              fail("manifest", "Exact 10-file invariant failed")
+          if total_bytes > 100_000_000:
+              fail("manifest", f"Selected files exceed 100 MB total: {total_bytes} bytes")
+
+          session = requests.Session()
+          session.headers.update({"accept": "application/json"})
+
+          details = session.get(
+              f"{API_BASE}/authentication/details",
+              headers={"token": credential},
+              timeout=TIMEOUT,
+          )
+          evidence["auth_details_http_status"] = details.status_code
+          details_body = safe_json(details)
+          if details.ok and details_body.get("validToken") is True:
+              access_token = credential
+              evidence["auth_mode"] = "access_token"
+          else:
+              exchange = session.get(
+                  f"{API_BASE}/authentication/token",
+                  headers={"refreshToken": credential},
+                  timeout=TIMEOUT,
+              )
+              evidence["token_exchange_http_status"] = exchange.status_code
+              exchange_body = safe_json(exchange)
+              access_token = exchange_body.get("token")
+              if not exchange.ok or not isinstance(access_token, str) or not access_token:
+                  evidence["diagnostic"] = sanitized_diagnostic(exchange)
+                  fail("authentication", "Beds24 credential could not produce a valid access token")
+              evidence["auth_mode"] = "refresh_token"
+
+          auth_headers = {"token": access_token, "accept": "application/json"}
+          property_probe = session.get(
+              f"{API_BASE}/properties",
+              params={"id": PROPERTY_ID},
+              headers=auth_headers,
+              timeout=TIMEOUT,
+          )
+          evidence["property_probe_http_status"] = property_probe.status_code
+          if not property_probe.ok:
+              evidence["diagnostic"] = sanitized_diagnostic(property_probe)
+              fail("property_probe", f"Beds24 property {PROPERTY_ID} is not readable with the stored credential")
+
+          endpoint = f"{API_BASE}/properties/{PROPERTY_ID}/images"
+          evidence["image_endpoint"] = endpoint
+
+          endpoint_get = session.get(endpoint, headers=auth_headers, timeout=TIMEOUT)
+          endpoint_options = session.options(endpoint, headers=auth_headers, timeout=TIMEOUT)
+          evidence["image_endpoint_get_http_status"] = endpoint_get.status_code
+          evidence["image_endpoint_options_http_status"] = endpoint_options.status_code
+          evidence["image_endpoint_allow"] = endpoint_options.headers.get("allow")
+
+          allow_header = (endpoint_options.headers.get("allow") or "").upper()
+          endpoint_recognized = (
+              endpoint_get.status_code in {200, 400, 405}
+              or endpoint_options.status_code in {200, 204}
+              or "POST" in allow_header
+          )
+          if not endpoint_recognized:
+              evidence["diagnostic"] = {
+                  "get": sanitized_diagnostic(endpoint_get),
+                  "options": sanitized_diagnostic(endpoint_options),
+              }
+              fail(
+                  "image_endpoint",
+                  "Beds24 API did not expose a writable property-images endpoint; no photo was uploaded",
+                  exit_code=2,
+              )
+
+          for filename, _ in PHOTO_MANIFEST:
+              path = DOWNLOAD_DIR / filename
+              mime_type = mimetypes.guess_type(filename)[0] or "application/octet-stream"
+              print(f"Uploading {filename} ({path.stat().st_size} bytes)...")
+              with path.open("rb") as handle:
+                  response = session.post(
+                      endpoint,
+                      headers=auth_headers,
+                      files={"file": (filename, handle, mime_type)},
+                      data={"propertyId": PROPERTY_ID, "propId": PROPERTY_ID},
+                      timeout=TIMEOUT,
+                  )
+              upload_record = {
+                  "filename": filename,
+                  "http_status": response.status_code,
+              }
+              if not response.ok:
+                  upload_record["diagnostic"] = sanitized_diagnostic(response)
+                  evidence["uploads"].append(upload_record)
+                  fail("upload", f"Beds24 rejected {filename} with HTTP {response.status_code}")
+              evidence["uploads"].append(upload_record)
+              time.sleep(1)
+
+          evidence["status"] = "SUCCESS"
+          evidence["failure_stage"] = None
+          evidence["diagnostic"] = None
+          write_evidence()
+          print(f"Verified upload complete: {len(evidence['uploads'])} photos for property {PROPERTY_ID}.")
+          PY
+
+      - name: Commit sanitized execution evidence
+        if: always()
+        shell: bash
+        run: |
+          if [ ! -f "$EVIDENCE_PATH" ]; then
+            echo "No evidence file was produced."
+            exit 0
+          fi
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git add "$EVIDENCE_PATH"
+          git diff --cached --quiet && exit 0
+          git commit -m "Record Beds24 photo upload evidence [skip ci]"
+          git pull --rebase origin main
+          git push origin HEAD:main

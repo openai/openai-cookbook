@@ -100,7 +100,7 @@ jobs:
                   )
               refresh = bundle.read(candidates[0]).decode("utf-8").strip()
 
-          if not refresh or len(refresh.splitlines()) != 1 or not refresh.startswith("rt_"):
+          if not refresh or len(refresh.splitlines()) != 1 or len(refresh) < 32:
               raise RuntimeError("Recovered refresh token failed shape validation")
 
           print(f"::add-mask::{refresh}")
@@ -121,7 +121,8 @@ jobs:
               "target_token_filename": "beds24-refresh-token.txt",
               "token_file_bytes": output_file.stat().st_size,
               "token_single_line": True,
-              "token_prefix_shape_valid": True,
+              "token_shape_valid": True,
+              "token_length": len(refresh),
               "verified": True,
           }
           evidence_file.write_text(

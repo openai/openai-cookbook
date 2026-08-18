@@ -11,56 +11,295 @@ permissions:
   contents: write
 
 concurrency:
-  group: beds24-v2-picture-structure-324882
+  group: beds24-production-credential-resolution-324882
   cancel-in-progress: true
 
 jobs:
   update-photos:
     runs-on: ubuntu-latest
     timeout-minutes: 10
+    environment: Production
     env:
-      BEDS24_REFRESH_CREDENTIAL: ${{ secrets.BEDS24_REFRESH_CREDENTIAL }}
+      BEDS24_REFRESH_TOKEN_SLOT: ${{ secrets.BEDS24_REFRESH_TOKEN }}
+      BEDS24_REFRESH_CREDENTIAL_SLOT: ${{ secrets.BEDS24_REFRESH_CREDENTIAL }}
       PROPERTY_ID: "324882"
     steps:
       - uses: actions/checkout@v4
         with:
           fetch-depth: 0
 
-      - name: Publish sanitized run marker
+      - name: Resolve valid Production credential and read picture structure
         shell: bash
         run: |
-          mkdir -p aumara-control-tower/evidence/beds24-v2-picture-structure
-          cat > "aumara-control-tower/evidence/beds24-v2-picture-structure/${GITHUB_RUN_ID}-started.json" <<JSON
-          {
-            "run_id": "${GITHUB_RUN_ID}",
-            "run_attempt": "${GITHUB_RUN_ATTEMPT}",
-            "property_id": "324882",
-            "state": "RUNNING",
-            "secret_exposed": false
+          python3 - <<'PY'
+          from __future__ import annotations
+
+          import datetime as dt
+          import json
+          import os
+          import pathlib
+          import subprocess
+          import urllib.error
+          import urllib.parse
+          import urllib.request
+          from typing import Any
+
+          API_BASE = "https://api.beds24.com/v2"
+          PROPERTY_ID = os.environ.get("PROPERTY_ID", "324882")
+          RUN_ID = os.environ.get("GITHUB_RUN_ID", "unknown")
+          EVIDENCE_PATH = pathlib.Path(
+              f"aumara-control-tower/evidence/beds24-production-auth/{RUN_ID}.json"
+          )
+          SLOT_VALUES = [
+              ("BEDS24_REFRESH_TOKEN", (os.environ.get("BEDS24_REFRESH_TOKEN_SLOT") or "").strip()),
+              ("BEDS24_REFRESH_CREDENTIAL", (os.environ.get("BEDS24_REFRESH_CREDENTIAL_SLOT") or "").strip()),
+          ]
+          secrets = tuple(value for _, value in SLOT_VALUES if value)
+          selected_access_token = ""
+
+          def now_utc() -> str:
+              return dt.datetime.now(dt.timezone.utc).isoformat()
+
+          def request_json(
+              url: str,
+              *,
+              headers: dict[str, str],
+              method: str = "GET",
+              payload: Any | None = None,
+          ) -> tuple[int, dict[str, str], Any]:
+              data = None
+              request_headers = {"accept": "application/json", **headers}
+              if payload is not None:
+                  data = json.dumps(payload).encode("utf-8")
+                  request_headers["content-type"] = "application/json"
+              request = urllib.request.Request(
+                  url,
+                  headers=request_headers,
+                  data=data,
+                  method=method,
+              )
+              try:
+                  with urllib.request.urlopen(request, timeout=60) as response:
+                      raw = response.read()
+                      status = response.status
+                      response_headers = dict(response.headers.items())
+              except urllib.error.HTTPError as exc:
+                  raw = exc.read()
+                  status = exc.code
+                  response_headers = dict(exc.headers.items())
+              try:
+                  body = json.loads(raw.decode("utf-8", "replace")) if raw else {}
+              except json.JSONDecodeError:
+                  body = {"non_json_bytes": len(raw)}
+              return status, response_headers, body
+
+          def redact_text(value: str) -> str:
+              result = value
+              for secret in (*secrets, selected_access_token):
+                  if secret:
+                      result = result.replace(secret, "[REDACTED]")
+              return result[:3000]
+
+          def sanitize(value: Any, depth: int = 0) -> Any:
+              if depth > 10:
+                  return "[DEPTH_LIMIT]"
+              if isinstance(value, dict):
+                  output: dict[str, Any] = {}
+                  for key, item in value.items():
+                      normalized = str(key).lower()
+                      if any(token in normalized for token in ("token", "secret", "password", "credential")):
+                          output[str(key)] = "[REDACTED]"
+                      else:
+                          output[str(key)] = sanitize(item, depth + 1)
+                  return output
+              if isinstance(value, list):
+                  return [sanitize(item, depth + 1) for item in value[:300]]
+              if isinstance(value, str):
+                  return redact_text(value)
+              return value
+
+          def diagnostics(body: Any) -> Any:
+              if not isinstance(body, dict):
+                  return {"response_type": type(body).__name__}
+              result: dict[str, Any] = {}
+              for key in ("code", "status", "type", "message", "error", "detail", "error_description"):
+                  if key in body and body[key] not in (None, "", [], {}):
+                      result[key] = sanitize(body[key])
+              if not result:
+                  result["body_keys"] = sorted(str(key) for key in body.keys())[:50]
+              return result
+
+          def property_url() -> str:
+              query = urllib.parse.urlencode(
+                  {
+                      "id": PROPERTY_ID,
+                      "includePictures": "true",
+                      "includeAllRooms": "true",
+                      "includeOffers": "true",
+                      "includeTexts": "property",
+                  }
+              )
+              return f"{API_BASE}/properties?{query}"
+
+          def extract_property(body: Any) -> dict[str, Any] | None:
+              if not isinstance(body, dict):
+                  return None
+              data = body.get("data")
+              if not isinstance(data, list):
+                  return None
+              for item in data:
+                  if not isinstance(item, dict):
+                      continue
+                  item_id = item.get("id") or item.get("propertyId")
+                  if str(item_id) == PROPERTY_ID:
+                      return item
+              if len(data) == 1 and isinstance(data[0], dict):
+                  return data[0]
+              return None
+
+          def collect_picture_paths(value: Any, path: str = "$", output: list[dict[str, Any]] | None = None):
+              if output is None:
+                  output = []
+              if isinstance(value, dict):
+                  for key, item in value.items():
+                      child = f"{path}.{key}"
+                      if any(token in str(key).lower() for token in ("picture", "image", "photo")):
+                          output.append({"path": child, "value": sanitize(item)})
+                      collect_picture_paths(item, child, output)
+              elif isinstance(value, list):
+                  for index, item in enumerate(value[:200]):
+                      collect_picture_paths(item, f"{path}[{index}]", output)
+              return output
+
+          evidence: dict[str, Any] = {
+              "checked_at_utc": now_utc(),
+              "run_id": RUN_ID,
+              "run_attempt": os.environ.get("GITHUB_RUN_ATTEMPT"),
+              "environment": "Production",
+              "property_id": PROPERTY_ID,
+              "status": "STARTING",
+              "slots": [],
+              "selected_slot": None,
+              "selected_mode": None,
+              "property_http_status": None,
+              "property_keys": [],
+              "room_keys": [],
+              "picture_paths": [],
+              "property_snapshot": None,
+              "diagnostic": None,
+              "secret_exposed": False,
           }
-          JSON
-          git config user.name "github-actions[bot]"
-          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
-          git add "aumara-control-tower/evidence/beds24-v2-picture-structure/${GITHUB_RUN_ID}-started.json"
-          git commit -m "Open Beds24 V2 picture probe ${GITHUB_RUN_ID} [skip ci]"
-          git pull --rebase origin main
-          git push origin HEAD:main
 
-      - name: Materialize exact V2 picture structure probe
-        shell: bash
-        run: |
-          python3 - <<'EXTRACT'
-          from pathlib import Path
-          import textwrap
+          selected_property: dict[str, Any] | None = None
+          seen_values: set[str] = set()
 
-          source = Path('.github/workflows/beds24-v2-picture-structure.yml').read_text(encoding='utf-8').splitlines()
-          start = next(index for index, line in enumerate(source) if "python3 - <<'PY'" in line) + 1
-          end = next(index for index in range(start, len(source)) if source[index].strip() == 'PY')
-          script = textwrap.dedent('\n'.join(source[start:end])) + '\n'
-          target = Path('/tmp/beds24_v2_picture_structure.py')
-          target.write_text(script, encoding='utf-8')
-          EXTRACT
-          python3 -m py_compile /tmp/beds24_v2_picture_structure.py
+          for slot_name, credential in SLOT_VALUES:
+              slot: dict[str, Any] = {
+                  "slot": slot_name,
+                  "present": bool(credential),
+                  "duplicate_of_prior_slot": False,
+                  "direct_property_http_status": None,
+                  "refresh_http_status": None,
+                  "refreshed_property_http_status": None,
+                  "accepted_mode": None,
+                  "diagnostic": None,
+              }
+              evidence["slots"].append(slot)
+              if not credential:
+                  continue
+              if credential in seen_values:
+                  slot["duplicate_of_prior_slot"] = True
+                  continue
+              seen_values.add(credential)
 
-      - name: Read current property picture structure
-        run: python3 /tmp/beds24_v2_picture_structure.py
+              direct_status, _, direct_body = request_json(
+                  property_url(),
+                  headers={"token": credential},
+              )
+              slot["direct_property_http_status"] = direct_status
+              direct_property = extract_property(direct_body)
+              if 200 <= direct_status < 300 and direct_property is not None:
+                  selected_access_token = credential
+                  selected_property = direct_property
+                  slot["accepted_mode"] = "access_token"
+                  evidence["selected_slot"] = slot_name
+                  evidence["selected_mode"] = "access_token"
+                  evidence["property_http_status"] = direct_status
+                  break
+
+              refresh_status, _, refresh_body = request_json(
+                  f"{API_BASE}/authentication/token",
+                  headers={"refreshToken": credential},
+              )
+              slot["refresh_http_status"] = refresh_status
+              candidate = refresh_body.get("token") if isinstance(refresh_body, dict) else None
+              if 200 <= refresh_status < 300 and isinstance(candidate, str) and candidate:
+                  selected_access_token = candidate
+                  refreshed_status, _, refreshed_body = request_json(
+                      property_url(),
+                      headers={"token": selected_access_token},
+                  )
+                  slot["refreshed_property_http_status"] = refreshed_status
+                  refreshed_property = extract_property(refreshed_body)
+                  if 200 <= refreshed_status < 300 and refreshed_property is not None:
+                      selected_property = refreshed_property
+                      slot["accepted_mode"] = "refresh_token"
+                      evidence["selected_slot"] = slot_name
+                      evidence["selected_mode"] = "refresh_token"
+                      evidence["property_http_status"] = refreshed_status
+                      break
+                  slot["diagnostic"] = {
+                      "stage": "property_after_refresh",
+                      "response": diagnostics(refreshed_body),
+                  }
+              else:
+                  slot["diagnostic"] = {
+                      "stage": "direct_and_refresh",
+                      "direct": diagnostics(direct_body),
+                      "refresh": diagnostics(refresh_body),
+                  }
+
+          if selected_property is None:
+              evidence["status"] = "FAILED"
+              evidence["diagnostic"] = "No Production Beds24 secret slot produced readable property 324882"
+          else:
+              evidence["property_keys"] = sorted(str(key) for key in selected_property.keys())
+              rooms = selected_property.get("roomTypes")
+              if isinstance(rooms, list) and rooms and isinstance(rooms[0], dict):
+                  evidence["room_keys"] = sorted(str(key) for key in rooms[0].keys())
+              evidence["picture_paths"] = collect_picture_paths(selected_property)
+              evidence["property_snapshot"] = sanitize(selected_property)
+              evidence["status"] = "SUCCESS"
+
+          EVIDENCE_PATH.parent.mkdir(parents=True, exist_ok=True)
+          EVIDENCE_PATH.write_text(
+              json.dumps(evidence, indent=2, sort_keys=True) + "\n",
+              encoding="utf-8",
+          )
+
+          subprocess.run(["git", "config", "user.name", "github-actions[bot]"], check=True)
+          subprocess.run(
+              ["git", "config", "user.email", "41898282+github-actions[bot]@users.noreply.github.com"],
+              check=True,
+          )
+          subprocess.run(["git", "add", str(EVIDENCE_PATH)], check=True)
+          diff = subprocess.run(["git", "diff", "--cached", "--quiet"], check=False)
+          if diff.returncode != 0:
+              subprocess.run(
+                  ["git", "commit", "-m", f"Record Production Beds24 auth resolution {RUN_ID} [skip ci]"],
+                  check=True,
+              )
+              subprocess.run(["git", "pull", "--rebase", "origin", "main"], check=True)
+              subprocess.run(["git", "push", "origin", "HEAD:main"], check=True)
+
+          print(json.dumps({
+              "status": evidence["status"],
+              "selected_slot": evidence["selected_slot"],
+              "selected_mode": evidence["selected_mode"],
+              "property_http_status": evidence["property_http_status"],
+              "picture_path_count": len(evidence["picture_paths"]),
+              "evidence_path": str(EVIDENCE_PATH),
+          }, ensure_ascii=False))
+          if evidence["status"] != "SUCCESS":
+              raise SystemExit(1)
+          PY

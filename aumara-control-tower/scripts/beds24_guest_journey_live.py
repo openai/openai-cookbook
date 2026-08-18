@@ -593,7 +593,7 @@ if __name__ == "__main__":
         raise SystemExit(main())
     except SystemExit:
         raise
-    except Exception as _exc:
-        print(f"ERROR: live guest journey aborted: {_exc}", file=sys.stderr)
+    except Exception as exc:
+        print(f"ERROR: live guest journey aborted: {exc}", file=sys.stderr)
         traceback.print_exc()
         sys.exit(2)

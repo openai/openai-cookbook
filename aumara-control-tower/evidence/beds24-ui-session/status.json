@@ -1,9 +1,9 @@
 {
   "challenge_detected": false,
-  "checked_at_utc": "2026-08-18T04:22:03.391311+00:00",
-  "diagnostic": null,
+  "checked_at_utc": "2026-08-18T04:22:38.588746+00:00",
+  "diagnostic": "TypeError: download() got an unexpected keyword argument 'fuzzy'",
   "downloaded_count": 0,
-  "failure_stage": null,
+  "failure_stage": "download",
   "file_input_accept": null,
   "login_page_url": null,
   "pictures_page_url": null,
@@ -23,7 +23,7 @@
     "IMG_0009.JPG",
     "IMG_0011.JPG"
   ],
-  "state": "WAITING_LOGIN_PAYLOAD",
+  "state": "FAILED",
   "submitted_count": 0,
   "success_signal": null,
   "upload_format": null,

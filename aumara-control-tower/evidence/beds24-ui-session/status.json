@@ -1,15 +1,15 @@
 {
   "challenge_detected": false,
-  "checked_at_utc": "2026-08-18T04:22:38.588746+00:00",
-  "diagnostic": "TypeError: download() got an unexpected keyword argument 'fuzzy'",
+  "checked_at_utc": "2026-08-18T04:26:37.223790+00:00",
+  "diagnostic": null,
   "downloaded_count": 0,
-  "failure_stage": "download",
+  "failure_stage": null,
   "file_input_accept": null,
   "login_page_url": null,
   "pictures_page_url": null,
   "property_id": "324882",
   "run_attempt": "1",
-  "run_id": "32098827663",
+  "run_id": "32099125681",
   "secret_exposed": false,
   "selected_files": [
     "01_FULL_no_crop.jpg",
@@ -23,7 +23,7 @@
     "IMG_0009.JPG",
     "IMG_0011.JPG"
   ],
-  "state": "FAILED",
+  "state": "WAITING_LOGIN_PAYLOAD",
   "submitted_count": 0,
   "success_signal": null,
   "upload_format": null,

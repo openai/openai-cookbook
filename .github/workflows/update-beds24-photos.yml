@@ -11,42 +11,36 @@ permissions:
   contents: write
 
 concurrency:
-  group: beds24-legacy-picture-probe-324882
+  group: beds24-v2-picture-structure-324882
   cancel-in-progress: true
 
 jobs:
   update-photos:
     runs-on: ubuntu-latest
-    timeout-minutes: 15
+    timeout-minutes: 10
     env:
+      BEDS24_REFRESH_CREDENTIAL: ${{ secrets.BEDS24_REFRESH_CREDENTIAL }}
       PROPERTY_ID: "324882"
     steps:
       - uses: actions/checkout@v4
         with:
           fetch-depth: 0
 
-      - uses: actions/setup-python@v5
-        with:
-          python-version: "3.11"
-
-      - name: Materialize read-only legacy API probe
+      - name: Materialize exact V2 picture structure probe
         shell: bash
         run: |
-          awk '/beds24_legacy_probe.py.gz.b64 <<.B64./{capture=1; next} capture && /^[[:space:]]*B64[[:space:]]*$/{exit} capture{sub(/^[[:space:]]+/, ""); print}' \
-            .github/workflows/beds24-legacy-picture-probe.yml > /tmp/beds24_legacy_probe.py.gz.b64
-          test -s /tmp/beds24_legacy_probe.py.gz.b64
-          base64 -d /tmp/beds24_legacy_probe.py.gz.b64 | gzip -d > /tmp/beds24_legacy_probe.py
-          chmod 700 /tmp/beds24_legacy_probe.py
-          python -m py_compile /tmp/beds24_legacy_probe.py
+          python3 - <<'EXTRACT'
+          from pathlib import Path
+          import textwrap
 
-      - name: Probe existing legacy picture access without writes
-        run: python /tmp/beds24_legacy_probe.py
+          source = Path('.github/workflows/beds24-v2-picture-structure.yml').read_text(encoding='utf-8').splitlines()
+          start = next(index for index, line in enumerate(source) if "python3 - <<'PY'" in line) + 1
+          end = next(index for index in range(start, len(source)) if source[index].strip() == 'PY')
+          script = textwrap.dedent('\n'.join(source[start:end])) + '\n'
+          target = Path('/tmp/beds24_v2_picture_structure.py')
+          target.write_text(script, encoding='utf-8')
+          EXTRACT
+          python3 -m py_compile /tmp/beds24_v2_picture_structure.py
 
-      - name: Upload sanitized probe evidence
-        if: always()
-        uses: actions/upload-artifact@v4
-        with:
-          name: beds24-legacy-picture-probe-${{ github.run_id }}
-          path: aumara-control-tower/evidence/beds24-legacy-probe/${{ github.run_id }}/status.json
-          if-no-files-found: warn
-          retention-days: 3
+      - name: Read current property picture structure
+        run: python3 /tmp/beds24_v2_picture_structure.py

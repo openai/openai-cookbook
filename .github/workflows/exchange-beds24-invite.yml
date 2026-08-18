@@ -7,58 +7,146 @@ on:
         description: "One-time Beds24 invite code from SETTINGS > MARKETPLACE > API (expires in 24h)"
         required: true
         type: string
-  push:
-    branches: [main]
-    paths:
-      - ".github/workflows/beds24-ui-photo-upload.yml"
+  issues:
+    types: [opened]
 
 permissions:
-  contents: read
+  actions: read
+  contents: write
+  issues: write
 
 concurrency:
   group: beds24-invite-exchange
-  cancel-in-progress: true
+  cancel-in-progress: false
 
 jobs:
   exchange:
-    if: ${{ github.event_name == 'workflow_dispatch' || contains(github.event.head_commit.message, 'support invite ') }}
+    if: >-
+      github.event_name == 'workflow_dispatch' ||
+      (github.event_name == 'issues' &&
+       github.event.issue.title == 'AUMARA control: finalize Beds24 invite exchange' &&
+       github.event.issue.user.login == 'elcidspain')
     name: Exchange invite for refreshToken
     runs-on: ubuntu-latest
-    timeout-minutes: 5
+    timeout-minutes: 10
+    env:
+      TARGET_SHA: "868d8df92140db824e3439699cd562bb8e3a79a3"
+      ORIGINAL_PARENT_SHA: "00ab4f98f1d2d21bc54e0bed17ec8b5b857cee1f"
+      ONE_TIME_INVITE_CODE: "jagxI4-waqtit-cesseg"
+      GITHUB_TOKEN: ${{ github.token }}
     steps:
-      - name: Exchange one-time invite and write refresh token
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+
+      - name: Reuse a verified artifact or exchange the one-time invite
+        id: exchange
         shell: bash
         run: |
           python3 - <<'PY'
+          from __future__ import annotations
+
+          import io
           import json
           import os
           import pathlib
-          import re
           import subprocess
           import sys
           import tempfile
+          import urllib.parse
+          import urllib.request
+          import zipfile
 
-          event_path = pathlib.Path(os.environ["GITHUB_EVENT_PATH"])
-          event = json.loads(event_path.read_text(encoding="utf-8"))
-          invite = str((event.get("inputs") or {}).get("invite_code") or "").strip()
-          if not invite:
-              message = str(((event.get("head_commit") or {}).get("message")) or "")
-              match = re.search(r"support invite\s+([A-Za-z0-9-]+)", message)
-              invite = match.group(1) if match else ""
+          repo = os.environ["GITHUB_REPOSITORY"]
+          api = os.environ.get("GITHUB_API_URL", "https://api.github.com")
+          event = json.loads(pathlib.Path(os.environ["GITHUB_EVENT_PATH"]).read_text(encoding="utf-8"))
+          target_sha = os.environ["TARGET_SHA"]
+          github_token = os.environ["GITHUB_TOKEN"]
+          output_dir = pathlib.Path(os.environ.get("RUNNER_TEMP", "/tmp")) / "beds24-exchange"
+          output_dir.mkdir(parents=True, exist_ok=True)
+          output_file = output_dir / "beds24-refresh-token.txt"
+          evidence_file = output_dir / "beds24-exchange-evidence.json"
 
-          if not invite:
-              print("ERROR: No Beds24 invite code found in workflow input or commit message", file=sys.stderr)
-              raise SystemExit(1)
+          headers = {
+              "Accept": "application/vnd.github+json",
+              "Authorization": f"Bearer {github_token}",
+              "X-GitHub-Api-Version": "2022-11-28",
+              "User-Agent": "AUMARA-Beds24-Exchange-Finalizer/1.0",
+          }
 
-          print(f"::add-mask::{invite}")
+          evidence: dict[str, object] = {
+              "current_run_id": os.environ.get("GITHUB_RUN_ID"),
+              "current_run_attempt": os.environ.get("GITHUB_RUN_ATTEMPT"),
+              "event": os.environ.get("GITHUB_EVENT_NAME"),
+              "target_sha": target_sha,
+              "artifact_name": "beds24-refresh-token",
+              "token_file": "beds24-refresh-token.txt",
+              "verified": False,
+              "source": None,
+              "diagnostic": None,
+          }
 
-          def call_setup(url: str):
+          def mask(value: str) -> None:
+              if value:
+                  print(f"::add-mask::{value}", flush=True)
+
+          def request_json(url: str) -> dict:
+              request = urllib.request.Request(url, headers=headers)
+              with urllib.request.urlopen(request, timeout=60) as response:
+                  return json.loads(response.read().decode("utf-8"))
+
+          def download_artifact(artifact: dict) -> str:
+              request = urllib.request.Request(str(artifact["archive_download_url"]), headers=headers)
+              with urllib.request.urlopen(request, timeout=60) as response:
+                  archive = response.read()
+              with zipfile.ZipFile(io.BytesIO(archive)) as bundle:
+                  matches = [
+                      name for name in bundle.namelist()
+                      if pathlib.PurePosixPath(name).name == "beds24-refresh-token.txt"
+                  ]
+                  if len(matches) != 1:
+                      raise RuntimeError("Existing artifact lacks exactly one beds24-refresh-token.txt")
+                  refresh = bundle.read(matches[0]).decode("utf-8").strip()
+              if not refresh or len(refresh.splitlines()) != 1 or not refresh.startswith("rt_"):
+                  raise RuntimeError("Existing refresh-token file failed shape validation")
+              return refresh
+
+          def find_existing_refresh() -> tuple[str, dict, dict] | None:
+              workflow = urllib.parse.quote("exchange-beds24-invite.yml", safe="")
+              runs = request_json(
+                  f"{api}/repos/{repo}/actions/workflows/{workflow}/runs"
+                  "?event=push&branch=main&per_page=50"
+              ).get("workflow_runs", [])
+              candidates = sorted(
+                  [
+                      run for run in runs
+                      if run.get("head_sha") == target_sha and run.get("conclusion") == "success"
+                  ],
+                  key=lambda run: run.get("created_at", ""),
+                  reverse=True,
+              )
+              for run in candidates:
+                  artifacts = request_json(
+                      f"{api}/repos/{repo}/actions/runs/{int(run['id'])}/artifacts?per_page=100"
+                  ).get("artifacts", [])
+                  matches = [
+                      artifact for artifact in artifacts
+                      if artifact.get("name") == "beds24-refresh-token" and not artifact.get("expired")
+                  ]
+                  for artifact in sorted(matches, key=lambda item: item.get("created_at", ""), reverse=True):
+                      try:
+                          return download_artifact(artifact), run, artifact
+                      except Exception:
+                          continue
+              return None
+
+          def call_setup(invite: str, url: str) -> tuple[int, str]:
               with tempfile.NamedTemporaryFile(delete=False) as handle:
-                  body_path = handle.name
+                  body_path = pathlib.Path(handle.name)
               try:
                   process = subprocess.run(
                       [
-                          "curl", "-sS", "-o", body_path, "-w", "%{http_code}",
+                          "curl", "-sS", "-o", str(body_path), "-w", "%{http_code}",
                           "-H", f"code: {invite}", url,
                       ],
                       text=True,
@@ -68,72 +156,180 @@ jobs:
                   if process.returncode != 0:
                       raise RuntimeError(f"curl failed with exit code {process.returncode}")
                   status = int((process.stdout or "0").strip() or "0")
-                  body = pathlib.Path(body_path).read_text(encoding="utf-8", errors="replace")
-                  return status, body
+                  return status, body_path.read_text(encoding="utf-8", errors="replace")
               finally:
-                  pathlib.Path(body_path).unlink(missing_ok=True)
+                  body_path.unlink(missing_ok=True)
 
-          primary = "https://beds24.com/api/v2/authentication/setup"
-          fallback = "https://api.beds24.com/v2/authentication/setup"
-          status, raw = call_setup(primary)
-          used_url = primary
-          if status == 404:
-              status, raw = call_setup(fallback)
-              used_url = fallback
-
+          exit_code = 0
           try:
-              payload = json.loads(raw)
-          except json.JSONDecodeError:
-              print(f"ERROR: Beds24 returned non-JSON response (HTTP {status})", file=sys.stderr)
-              raise SystemExit(1)
+              existing = find_existing_refresh()
+              if existing:
+                  refresh, source_run, source_artifact = existing
+                  mask(refresh)
+                  output_file.write_text(refresh + "\n", encoding="utf-8")
+                  evidence.update({
+                      "verified": True,
+                      "source": "existing_verified_artifact",
+                      "source_run_id": source_run.get("id"),
+                      "source_run_number": source_run.get("run_number"),
+                      "source_artifact_id": source_artifact.get("id"),
+                      "source_artifact_created_at": source_artifact.get("created_at"),
+                      "token_file_bytes": output_file.stat().st_size,
+                      "token_single_line": True,
+                      "token_prefix_shape_valid": True,
+                      "diagnostic": "SUCCESS",
+                  })
+                  print(json.dumps({
+                      "status": "SUCCESS",
+                      "source": "existing_verified_artifact",
+                      "artifact": "beds24-refresh-token",
+                      "file": "beds24-refresh-token.txt",
+                  }))
+              else:
+                  invite = str((event.get("inputs") or {}).get("invite_code") or "").strip()
+                  if not invite:
+                      invite = os.environ.get("ONE_TIME_INVITE_CODE", "").strip()
+                  if not invite:
+                      raise RuntimeError("No Beds24 invite code available")
+                  mask(invite)
 
-          token = str(payload.get("token") or "")
-          refresh = str(payload.get("refreshToken") or "")
-          if token:
-              print(f"::add-mask::{token}")
-          if refresh:
-              print(f"::add-mask::{refresh}")
+                  primary = "https://beds24.com/api/v2/authentication/setup"
+                  fallback = "https://api.beds24.com/v2/authentication/setup"
+                  status, raw = call_setup(invite, primary)
+                  endpoint = primary
+                  if status == 404:
+                      status, raw = call_setup(invite, fallback)
+                      endpoint = fallback
 
-          if not (200 <= status < 300) or not token or not refresh:
-              safe_keys = sorted(str(key) for key in payload.keys()) if isinstance(payload, dict) else []
-              print(
-                  json.dumps(
-                      {
-                          "status": "FAILED",
-                          "http_status": status,
-                          "endpoint": used_url,
-                          "response_keys": safe_keys,
-                          "has_token": bool(token),
-                          "has_refresh_token": bool(refresh),
-                      }
-                  ),
-                  file=sys.stderr,
-              )
-              raise SystemExit(1)
+                  try:
+                      payload = json.loads(raw)
+                  except json.JSONDecodeError as exc:
+                      raise RuntimeError(f"Beds24 returned non-JSON response (HTTP {status})") from exc
 
-          output_dir = pathlib.Path(os.environ.get("RUNNER_TEMP", "/tmp")) / "beds24-exchange"
-          output_dir.mkdir(parents=True, exist_ok=True)
-          output_file = output_dir / "beds24-refresh-token.txt"
-          output_file.write_text(refresh + "\n", encoding="utf-8")
+                  token = str(payload.get("token") or "")
+                  refresh = str(payload.get("refreshToken") or "")
+                  mask(token)
+                  mask(refresh)
+                  if not (200 <= status < 300) or not token or not refresh:
+                      keys = sorted(str(key) for key in payload.keys()) if isinstance(payload, dict) else []
+                      raise RuntimeError(
+                          f"Beds24 setup failed safely: HTTP {status}; keys={keys}; "
+                          f"has_token={bool(token)}; has_refresh_token={bool(refresh)}"
+                      )
+                  if len(refresh.splitlines()) != 1 or not refresh.startswith("rt_"):
+                      raise RuntimeError("Beds24 refresh token failed shape validation")
 
-          print(
-              json.dumps(
-                  {
+                  output_file.write_text(refresh + "\n", encoding="utf-8")
+                  evidence.update({
+                      "verified": True,
+                      "source": "new_invite_exchange",
+                      "http_status": status,
+                      "endpoint": endpoint,
+                      "access_token_prefix_logged": True,
+                      "token_file_bytes": output_file.stat().st_size,
+                      "token_single_line": True,
+                      "token_prefix_shape_valid": True,
+                      "diagnostic": "SUCCESS",
+                  })
+                  print(json.dumps({
                       "status": "SUCCESS",
                       "http_status": status,
-                      "endpoint": used_url,
+                      "endpoint": endpoint,
                       "token_prefix": token[:10],
                       "artifact": "beds24-refresh-token",
                       "file": "beds24-refresh-token.txt",
-                  }
+                  }))
+          except Exception as exc:
+              evidence["diagnostic"] = str(exc)[:700]
+              print(json.dumps({
+                  "status": "FAILED",
+                  "diagnostic": evidence["diagnostic"],
+              }), file=sys.stderr)
+              exit_code = 1
+          finally:
+              evidence_file.write_text(
+                  json.dumps(evidence, indent=2, sort_keys=True) + "\n",
+                  encoding="utf-8",
               )
-          )
+              with open(os.environ["GITHUB_OUTPUT"], "a", encoding="utf-8") as handle:
+                  handle.write(f"verified={str(bool(evidence.get('verified'))).lower()}\n")
+
+          raise SystemExit(exit_code)
           PY
 
       - name: Upload refresh token artifact
+        if: steps.exchange.outputs.verified == 'true'
         uses: actions/upload-artifact@v4
         with:
           name: beds24-refresh-token
           path: ${{ runner.temp }}/beds24-exchange/beds24-refresh-token.txt
           if-no-files-found: error
           retention-days: 3
+
+      - name: Restore exact manual workflows, record safe evidence, and remove temporary audit
+        if: ${{ always() && github.event_name == 'issues' }}
+        shell: bash
+        run: |
+          set -euo pipefail
+          EVIDENCE="${RUNNER_TEMP}/beds24-exchange/beds24-exchange-evidence.json"
+          test -s "$EVIDENCE"
+
+          for attempt in 1 2 3; do
+            git fetch origin main
+            git reset --hard origin/main
+
+            git show "${TARGET_SHA}:.github/workflows/beds24-ui-photo-upload.yml" > .github/workflows/beds24-ui-photo-upload.yml
+            git show "${ORIGINAL_PARENT_SHA}:.github/workflows/exchange-beds24-invite.yml" > .github/workflows/exchange-beds24-invite.yml
+            git rm -f --ignore-unmatch .github/workflows/beds24-exchange-audit.yml
+
+            mkdir -p aumara-control-tower/evidence/beds24-exchange
+            cp "$EVIDENCE" aumara-control-tower/evidence/beds24-exchange/latest.json
+
+            git add .github/workflows/beds24-ui-photo-upload.yml \
+                    .github/workflows/exchange-beds24-invite.yml \
+                    aumara-control-tower/evidence/beds24-exchange/latest.json
+            git config user.name "github-actions[bot]"
+            git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+
+            if git diff --cached --quiet; then
+              exit 0
+            fi
+
+            git commit -m "chore: finalize Beds24 exchange and restore exact manual workflows"
+            if git push origin HEAD:main; then
+              exit 0
+            fi
+          done
+
+          exit 1
+
+      - name: Close the one-shot control issue
+        if: ${{ always() && github.event_name == 'issues' }}
+        shell: bash
+        run: |
+          python3 - <<'PY'
+          import json
+          import os
+          import pathlib
+          import urllib.request
+
+          event = json.loads(pathlib.Path(os.environ["GITHUB_EVENT_PATH"]).read_text(encoding="utf-8"))
+          issue_number = int(event["issue"]["number"])
+          repo = os.environ["GITHUB_REPOSITORY"]
+          api = os.environ.get("GITHUB_API_URL", "https://api.github.com")
+          request = urllib.request.Request(
+              f"{api}/repos/{repo}/issues/{issue_number}",
+              data=json.dumps({"state": "closed", "state_reason": "completed"}).encode("utf-8"),
+              headers={
+                  "Accept": "application/vnd.github+json",
+                  "Authorization": f"Bearer {os.environ['GITHUB_TOKEN']}",
+                  "Content-Type": "application/json",
+                  "X-GitHub-Api-Version": "2022-11-28",
+                  "User-Agent": "AUMARA-Beds24-Exchange-Finalizer/1.0",
+              },
+              method="PATCH",
+          )
+          with urllib.request.urlopen(request, timeout=60) as response:
+              if response.status != 200:
+                  raise RuntimeError(f"Issue close returned HTTP {response.status}")
+          PY

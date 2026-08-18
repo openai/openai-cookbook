@@ -1,5 +1,18 @@
 """Reusable building blocks for the agent tool-failure recovery cookbook."""
 
+from .agent import (
+    DEFAULT_ESCALATION_REASON,
+    DeliveryAgentContext,
+    EscalationApproval,
+    SafeSupportResult,
+    build_escalation_request,
+    build_support_agent,
+    create_delivery_escalation_operation,
+    finalize_support_response,
+    get_order_status_operation,
+    run_support_agent,
+    search_orders_operation,
+)
 from .core import (
     EscalationRequest,
     FaultKind,
@@ -18,18 +31,29 @@ from .core import (
 from .offline import run_offline_recovery_suite
 
 __all__ = [
+    "DEFAULT_ESCALATION_REASON",
+    "DeliveryAgentContext",
+    "EscalationApproval",
     "EscalationRequest",
     "FaultKind",
     "FaultPlan",
     "FaultStep",
     "RecoveryPolicy",
+    "SafeSupportResult",
     "SyntheticDeliveryService",
     "ToolOutcome",
+    "build_escalation_request",
+    "build_support_agent",
+    "create_delivery_escalation_operation",
+    "finalize_support_response",
+    "get_order_status_operation",
     "make_fault_plan",
     "make_slow_then_success_plan",
     "run_offline_recovery_suite",
     "run_order_search_with_recovery",
     "run_read_with_recovery",
+    "run_support_agent",
     "run_unsafe_read",
     "run_write_with_reconciliation",
+    "search_orders_operation",
 ]

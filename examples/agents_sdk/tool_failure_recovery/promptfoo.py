@@ -10,6 +10,7 @@ import shutil
 import subprocess
 import sys
 import tempfile
+import uuid
 from pathlib import Path
 from typing import Any
 
@@ -31,9 +32,11 @@ promptfoo_artifacts: dict[str, Path] | None = None
 def build_promptfoo_provider_source(
     *,
     model: str = DEFAULT_MODEL,
+    run_id: str | None = None,
 ) -> str:
     """Generate a small provider that imports the shared package directly."""
     package_parent = Path(__file__).resolve().parent.parent
+    run_id = run_id or uuid.uuid4().hex
     lines = [
         "import json",
         "import os",
@@ -48,11 +51,18 @@ def build_promptfoo_provider_source(
         "    run_live_agent_scenario,",
         ")",
         f"MODEL = os.getenv('OPENAI_MODEL', {model!r})",
+        f"RUN_ID = {run_id!r}",
         "live_agent_scenarios = LIVE_AGENT_SCENARIOS",
         "SCENARIOS_BY_NAME = {scenario.name: scenario for scenario in LIVE_AGENT_SCENARIOS}",
         "",
         "async def call_api(prompt: str, options: dict, context: dict) -> dict:",
         "    variables = context.get('vars') or {}",
+        "    if variables.get('run_id') != RUN_ID:",
+        "        return {'output': '', 'error': 'Evaluation run identity mismatch.'}",
+        "    if variables.get('suite_version') != RECOVERY_EVAL_SUITE_VERSION:",
+        "        return {'output': '', 'error': 'Evaluation suite identity mismatch.'}",
+        "    if variables.get('expected_model') != MODEL:",
+        "        return {'output': '', 'error': 'Evaluation model identity mismatch.'}",
         "    case_id = str(variables['case_id'])",
         "    scenario = SCENARIOS_BY_NAME[case_id]",
         "    if prompt.strip() != scenario.prompt:",
@@ -62,9 +72,12 @@ def build_promptfoo_provider_source(
         "        raise ValueError('Promptfoo repeatIndex must be non-negative.')",
         "    trial = repeat_index + 1",
         "    result = await run_live_agent_scenario(scenario, trial, model=MODEL)",
+        "    provider_output = result.model_dump(mode='json')",
+        "    provider_output.update({'model': MODEL, 'run_id': RUN_ID})",
         "    return {",
-        "        'output': json.dumps(result.model_dump(mode='json'), sort_keys=True),",
+        "        'output': json.dumps(provider_output, sort_keys=True),",
         "        'metadata': {",
+        "            'run_id': RUN_ID,",
         "            'suite_version': RECOVERY_EVAL_SUITE_VERSION,",
         "            'case_id': case_id,",
         "            'repeat_index': repeat_index,",
@@ -270,17 +283,22 @@ def write_promptfoo_recovery_artifacts(
         PROMPTFOO_TEMP_DIR = tempfile.TemporaryDirectory(
             prefix="tool-failure-recovery-promptfoo-"
         )
-    directory = Path(PROMPTFOO_TEMP_DIR.name)
+    run_id = uuid.uuid4().hex
+    directory = Path(PROMPTFOO_TEMP_DIR.name) / f"run-{run_id}"
+    directory.mkdir(mode=0o700, exist_ok=False)
     artifacts = {
         "dir": directory,
         "provider": directory / "recovery_provider.py",
         "assertions": directory / "recovery_assertions.py",
         "tests": directory / "recovery_cases.json",
         "config": directory / "promptfooconfig.yaml",
-        "results": directory / "promptfoo_results.json",
+        "results": directory / f"promptfoo_results-{run_id}.json",
     }
+    if artifacts["results"].exists():
+        raise RuntimeError("The fresh Promptfoo result path already exists.")
     artifacts["provider"].write_text(
-        build_promptfoo_provider_source(model=model), encoding="utf-8"
+        build_promptfoo_provider_source(model=model, run_id=run_id),
+        encoding="utf-8",
     )
     artifacts["assertions"].write_text(
         PROMPTFOO_ASSERTIONS, encoding="utf-8"
@@ -292,11 +310,15 @@ def write_promptfoo_recovery_artifacts(
                 "prompt": scenario.prompt,
                 "case_id": scenario.name,
                 "suite_version": RECOVERY_EVAL_SUITE_VERSION,
+                "run_id": run_id,
+                "expected_model": model,
                 "expected_disposition": scenario.expected_disposition,
                 "expected_side_effects": scenario.expected_side_effects,
             },
             "metadata": {
                 "suite_version": RECOVERY_EVAL_SUITE_VERSION,
+                "run_id": run_id,
+                "model": model,
                 "category": "tool-failure-recovery",
             },
         }
@@ -366,7 +388,9 @@ async def assert_provider_runtime_error_classification(
 def build_promptfoo_environment(
     *,
     model: str = DEFAULT_MODEL,
+    include_credentials: bool = False,
 ) -> dict[str, str]:
+    """Isolate child processes; disclose one API key only to approved evals."""
     if promptfoo_artifacts is not None:
         isolation_dir = promptfoo_artifacts["dir"]
     elif PROMPTFOO_TEMP_DIR is not None:
@@ -394,12 +418,6 @@ def build_promptfoo_environment(
         "http_proxy",
         "https_proxy",
         "no_proxy",
-        "OPENAI_API_KEY",
-        "OPENAI_BASE_URL",
-        "OPENAI_ORG_ID",
-        "OPENAI_ORGANIZATION",
-        "OPENAI_PROJECT",
-        "OPENAI_PROJECT_ID",
     }
     environment = {
         name: value
@@ -438,14 +456,24 @@ def build_promptfoo_environment(
             "PROMPTFOO_SELF_HOSTED": "true",
             "RUN_LIVE_AGENT": "false",
             "EXPORT_AGENTS_TRACES": "false",
-            "OPENAI_MODEL": model,
             "FORCE_COLOR": "0",
         }
     )
+    if include_credentials:
+        api_key = os.getenv("OPENAI_API_KEY")
+        if not api_key:
+            raise EnvironmentError(
+                "Set OPENAI_API_KEY before starting a Promptfoo evaluation."
+            )
+        environment["OPENAI_API_KEY"] = api_key
+        environment["OPENAI_MODEL"] = model
     return environment
 
 
-def validate_promptfoo_node_runtime() -> None:
+def validate_promptfoo_node_runtime(
+    *,
+    model: str = DEFAULT_MODEL,
+) -> None:
     node_path = shutil.which("node")
     if node_path is None:
         raise RuntimeError(
@@ -453,6 +481,7 @@ def validate_promptfoo_node_runtime() -> None:
         )
     node_version = subprocess.run(
         [node_path, "--version"],
+        env=build_promptfoo_environment(model=model),
         capture_output=True,
         text=True,
         timeout=10,
@@ -483,25 +512,11 @@ def resolve_promptfoo_command(
     version: str = PROMPTFOO_VERSION,
     model: str = DEFAULT_MODEL,
 ) -> list[str]:
-    validate_promptfoo_node_runtime()
-    if shutil.which("npx"):
-        return [
-            "npx",
-            "--yes",
-            f"promptfoo@{version}",
-        ]
-    if shutil.which("pnpm"):
-        return [
-            "pnpm",
-            "dlx",
-            f"promptfoo@{version}",
-        ]
+    """Accept only a separately audited, exact-version installed executable."""
+    validate_promptfoo_node_runtime(model=model)
     global_promptfoo = shutil.which("promptfoo")
     if global_promptfoo:
         version_environment = build_promptfoo_environment(model=model)
-        for name in tuple(version_environment):
-            if name.startswith("OPENAI_"):
-                version_environment.pop(name, None)
         installed_version = subprocess.run(
             [global_promptfoo, "--version"],
             env=version_environment,
@@ -520,8 +535,8 @@ def resolve_promptfoo_command(
             )
         return [global_promptfoo]
     raise RuntimeError(
-        "Install Node.js and make npx, pnpm, or promptfoo "
-        "available on PATH."
+        "Preinstall and audit the exact pinned Promptfoo version "
+        f"{version}; automatic npx, pnpm, and npm installation is disabled."
     )
 
 
@@ -544,7 +559,12 @@ def run_promptfoo_command(
         )
     if promptfoo_artifacts is None:
         raise RuntimeError("Prepare Promptfoo artifacts before running it.")
-    environment = build_promptfoo_environment(model=model)
+    if not arguments or arguments[0] not in {"validate", "eval"}:
+        raise ValueError("Only Promptfoo validate and eval commands are allowed.")
+    environment = build_promptfoo_environment(
+        model=model,
+        include_credentials=arguments[0] == "eval",
+    )
     command = [
         *resolve_promptfoo_command(version=version, model=model),
         *arguments,
@@ -566,7 +586,20 @@ def promptfoo_result_summary(
     *,
     model: str = DEFAULT_MODEL,
     repeats: int = 1,
+    run_id: str | None = None,
 ) -> dict[str, Any]:
+    expected_run_id = run_id or path.stem.removeprefix(
+        "promptfoo_results-"
+    )
+    try:
+        parsed_run_id = uuid.UUID(hex=expected_run_id)
+    except (ValueError, AttributeError) as error:
+        raise AssertionError(
+            "Promptfoo results require a fresh, UUID-scoped run identity."
+        ) from error
+    if parsed_run_id.hex != expected_run_id:
+        raise AssertionError("Promptfoo run identity is not canonical.")
+
     data = json.loads(path.read_text())
     result_container = data.get("results") or {}
     outputs = (
@@ -582,18 +615,69 @@ def promptfoo_result_summary(
         raw_output = output.get("output")
         if raw_output is None:
             raw_output = (output.get("response") or {}).get("output")
-        provider_result = {}
-        if isinstance(raw_output, str):
-            try:
-                provider_result = json.loads(raw_output)
-            except json.JSONDecodeError:
-                provider_result = {}
+        if not isinstance(raw_output, str):
+            raise AssertionError("Promptfoo provider returned no JSON result.")
+        try:
+            provider_result = json.loads(raw_output)
+        except json.JSONDecodeError as error:
+            raise AssertionError(
+                "Promptfoo provider returned malformed JSON evidence."
+            ) from error
+        if not isinstance(provider_result, dict):
+            raise AssertionError("Promptfoo provider result must be an object.")
+
+        provenance_checks = {
+            "run identity": (
+                provider_result.get("run_id") == expected_run_id
+                and variables.get("run_id") == expected_run_id
+            ),
+            "model identity": (
+                provider_result.get("model") == model
+                and variables.get("expected_model") == model
+            ),
+            "suite identity": (
+                provider_result.get("suite_version")
+                == RECOVERY_EVAL_SUITE_VERSION
+                and variables.get("suite_version")
+                == RECOVERY_EVAL_SUITE_VERSION
+            ),
+            "case identity": (
+                provider_result.get("scenario") == variables.get("case_id")
+            ),
+        }
+        invalid_provenance = [
+            label for label, passed in provenance_checks.items() if not passed
+        ]
+        if invalid_provenance:
+            raise AssertionError(
+                "Promptfoo provider evidence failed provenance checks: "
+                + ", ".join(invalid_provenance)
+                + "."
+            )
+
+        raw_metadata = output.get("metadata") or (
+            output.get("response") or {}
+        ).get("metadata")
+        if isinstance(raw_metadata, dict):
+            for field, expected_value in (
+                ("run_id", expected_run_id),
+                ("model", model),
+                ("suite_version", RECOVERY_EVAL_SUITE_VERSION),
+                ("case_id", variables.get("case_id")),
+                ("trial", provider_result.get("trial")),
+            ):
+                if field in raw_metadata and raw_metadata[field] != expected_value:
+                    raise AssertionError(
+                        f"Promptfoo provider metadata disagrees on {field}."
+                    )
         passed = bool(output.get("success"))
         rows.append(
             {
                 "suite_version": provider_result.get("suite_version"),
                 "case_id": provider_result.get("scenario"),
                 "declared_case_id": variables.get("case_id"),
+                "run_id": provider_result.get("run_id"),
+                "model": provider_result.get("model"),
                 "trial": provider_result.get("trial"),
                 "passed": passed,
                 "disposition": provider_result.get("disposition"),
@@ -606,6 +690,7 @@ def promptfoo_result_summary(
         "backend": "promptfoo",
         "suite_version": RECOVERY_EVAL_SUITE_VERSION,
         "model": model,
+        "run_id": expected_run_id,
         "repeats": repeats,
         "total": len(rows),
         "passed": sum(row["passed"] for row in rows),
@@ -627,6 +712,19 @@ def assert_promptfoo_eval_coverage(
     summary: dict[str, Any],
 ) -> None:
     rows = pd.DataFrame(summary.get("rows", []))
+    expected_run_id = summary.get("run_id")
+    expected_model = summary.get("model")
+    if expected_run_id is not None or expected_model is not None:
+        if not expected_run_id or not expected_model:
+            raise AssertionError("Promptfoo summary lacks complete run provenance.")
+        for column, expected_value in (
+            ("run_id", expected_run_id),
+            ("model", expected_model),
+        ):
+            if column not in rows.columns or not (rows[column] == expected_value).all():
+                raise AssertionError(
+                    f"Promptfoo results contain inconsistent {column} evidence."
+                )
     if "declared_case_id" in rows.columns and not (
         rows["case_id"] == rows["declared_case_id"]
     ).all():
@@ -665,6 +763,9 @@ async def run_promptfoo_evaluation(
         raise ValueError("Promptfoo repeats must be between 1 and 10.")
 
     artifacts = write_promptfoo_recovery_artifacts(model=model)
+    run_id = artifacts["results"].stem.removeprefix(
+        "promptfoo_results-"
+    )
     await assert_provider_runtime_error_classification(
         artifacts["provider"]
     )
@@ -704,7 +805,10 @@ async def run_promptfoo_evaluation(
             "Promptfoo did not write results:\n" + evaluation.stdout[-4000:]
         )
     summary = promptfoo_result_summary(
-        artifacts["results"], model=model, repeats=repeats
+        artifacts["results"],
+        model=model,
+        repeats=repeats,
+        run_id=run_id,
     )
     assert_promptfoo_eval_coverage(summary)
     if summary["runtime_errors"]:

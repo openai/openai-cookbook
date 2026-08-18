@@ -28,9 +28,14 @@ from .agent import (
     EXPECTED_TOOL_NAMES,
     DeliveryAgentContext,
     EscalationApproval,
+    ObservedToolOutcome,
     SupportResponse,
+    ToolName,
     build_support_agent,
     escalation_idempotency_key,
+    extract_tool_outcomes,
+    render_customer_message,
+    run_support_agent,
 )
 from .core import FaultKind, OrderStatus, StrictModel, ToolOutcome, make_fault_plan
 
@@ -38,13 +43,6 @@ TRACE_WORKFLOW_NAME = "Tool failure recovery evaluation"
 
 
 RECOVERY_EVAL_SUITE_VERSION = "2.0.0"
-
-
-ToolName = Literal[
-    "get_order_status",
-    "search_orders",
-    "create_delivery_escalation",
-]
 
 
 class LiveAgentScenario(StrictModel):
@@ -307,15 +305,6 @@ def build_live_run_config(
     )
 
 
-class ObservedToolOutcome(StrictModel):
-    tool_name: ToolName
-    status: Literal["success", "handoff_required"]
-    attempts: int = Field(ge=1)
-    confirmed_side_effect: bool
-    data: dict[str, Any] | None = None
-    error_code: str | None = None
-
-
 class LiveScenarioResult(StrictModel):
     suite_version: str
     scenario: str
@@ -340,6 +329,8 @@ class LiveScenarioResult(StrictModel):
         "contract_error",
     ]
     customer_message: str | None = None
+    expected_customer_message: str | None = None
+    verified_escalation_id: str | None = None
     side_effects: int = Field(ge=0)
     tool_sequence_passed: bool | None
     tool_outcome_passed: bool | None
@@ -352,148 +343,34 @@ class LiveScenarioResult(StrictModel):
     failed_rules: str
 
 
-def extract_tool_outcomes(
-    result: RunResult,
-) -> tuple[list[ObservedToolOutcome], list[str]]:
-    tool_calls: dict[str, ToolName] = {}
-    call_order: list[str] = []
-    outputs_by_call: dict[str, ToolOutcome] = {}
-    raw_tool_events: list[tuple[str, str]] = []
-
-    for item in result.new_items:
-        if isinstance(item, ToolCallItem):
-            if item.call_id is None or item.tool_name is None:
-                raise ValueError("Function-tool call lacks identity")
-            if item.tool_name not in EXPECTED_TOOL_NAMES:
-                raise ValueError(f"Unexpected tool: {item.tool_name}")
-            if item.call_id in tool_calls:
-                raise ValueError("Duplicate tool call ID")
-            tool_calls[item.call_id] = item.tool_name
-            call_order.append(item.call_id)
-            raw_tool_events.append(("call", item.call_id))
-        elif isinstance(item, ToolCallOutputItem):
-            if item.call_id is None or not isinstance(item.output, str):
-                raise ValueError("Function-tool output is not JSON text")
-            if item.call_id in outputs_by_call:
-                raise ValueError("Duplicate tool output ID")
-            outputs_by_call[item.call_id] = (
-                ToolOutcome.model_validate_json(item.output)
-            )
-            raw_tool_events.append(("output", item.call_id))
-
-    if set(tool_calls) != set(outputs_by_call):
-        raise ValueError("Tool calls and outputs do not pair one-to-one")
-
-    observed_outcomes = [
-        ObservedToolOutcome(
-            tool_name=tool_calls[call_id],
-            status=outputs_by_call[call_id].status,
-            attempts=outputs_by_call[call_id].attempts,
-            confirmed_side_effect=(
-                outputs_by_call[call_id].confirmed_side_effect
-            ),
-            data=outputs_by_call[call_id].data,
-            error_code=outputs_by_call[call_id].error_code,
-        )
-        for call_id in call_order
-    ]
-    tool_events = [
-        f"{event_kind}:{tool_calls[call_id]}"
-        for event_kind, call_id in raw_tool_events
-    ]
-    return observed_outcomes, tool_events
-
-
-def render_customer_message(
-    response: SupportResponse,
-    context: DeliveryAgentContext,
-    tool_outcomes: list[ObservedToolOutcome],
+def expected_customer_message_for_scenario(
+    scenario: LiveAgentScenario,
+    context: DeliveryAgentContext | None = None,
+    *,
+    escalation_id: str | None = None,
 ) -> str:
-    if not tool_outcomes:
-        raise ValueError("A customer response requires tool evidence.")
-    terminal_outcome = tool_outcomes[-1]
-    confirmed_write_exists = any(
-        outcome.tool_name == "create_delivery_escalation"
-        and outcome.confirmed_side_effect
-        for outcome in tool_outcomes
-    )
-    if (
-        response.disposition != "escalation_created"
-        and confirmed_write_exists
-    ):
-        raise ValueError(
-            "A confirmed escalation cannot be hidden by another outcome."
-        )
+    """Independent scenario oracle; never reuse the production renderer."""
 
-    if response.disposition == "status_reported":
+    if scenario.expected_disposition == "status_reported":
         if (
-            terminal_outcome.tool_name
-            not in {"get_order_status", "search_orders"}
-            or terminal_outcome.status != "success"
+            scenario.expected_order_id is None
+            or scenario.expected_order_status is None
         ):
-            raise ValueError(
-                "The terminal tool result does not support order status."
-            )
-        if terminal_outcome.data is None:
-            raise ValueError("The terminal order result contains no data.")
-        matching_orders: list[OrderStatus] = []
-        if terminal_outcome.tool_name == "get_order_status":
-            matching_orders.append(
-                OrderStatus.model_validate(terminal_outcome.data)
-            )
-        else:
-            matching_orders.extend(
-                OrderStatus.model_validate(order)
-                for order in terminal_outcome.data.get("orders", [])
-            )
-        verified_order = next(
-            (
-                order
-                for order in matching_orders
-                if order.order_id == response.order_id
-                and order.status == response.order_status
-            ),
-            None,
-        )
-        if verified_order is None:
-            raise ValueError("No verified order supports the response.")
+            raise ValueError("A status scenario requires an expected order.")
         return (
-            f"Order {verified_order.order_id} is currently "
-            f"{verified_order.status.replace('_', ' ')}."
+            f"Order {scenario.expected_order_id} is currently "
+            f"{scenario.expected_order_status.replace('_', ' ')}."
         )
-
-    if response.disposition == "no_orders_found":
-        authorized_empty_search = (
-            terminal_outcome.tool_name == "search_orders"
-            and terminal_outcome.status == "success"
-            and terminal_outcome.data is not None
-            and terminal_outcome.data.get("result_count") == 0
-        )
-        if not authorized_empty_search:
-            raise ValueError("No authorized empty search was observed.")
+    if scenario.expected_disposition == "no_orders_found":
         return "No orders matched your requested filters."
-
-    if response.disposition == "handoff_required":
-        verified_handoff = (
-            terminal_outcome.status == "handoff_required"
-            and terminal_outcome.error_code == response.error_code
-        )
-        if not verified_handoff:
-            raise ValueError("No verified tool handoff was observed.")
-        verified_order = (
-            context.verified_order_reads.get(response.order_id)
-            if response.order_id is not None
-            else None
-        )
-        if response.order_status is not None and (
-            verified_order is None
-            or verified_order.status != response.order_status
+    if scenario.expected_disposition == "handoff_required":
+        if (
+            scenario.expected_order_id is not None
+            and scenario.expected_order_status is not None
         ):
-            raise ValueError("Handoff status is not independently verified.")
-        if verified_order is not None:
             return (
-                f"Order {verified_order.order_id} is "
-                f"{verified_order.status.replace('_', ' ')}, "
+                f"Order {scenario.expected_order_id} is "
+                f"{scenario.expected_order_status.replace('_', ' ')}, "
                 "but the requested action needs support review."
             )
         return (
@@ -501,37 +378,21 @@ def render_customer_message(
             "A support specialist will review it."
         )
 
-    if response.order_id is None:
-        raise ValueError("A confirmed escalation requires an order.")
-    if (
-        terminal_outcome.tool_name != "create_delivery_escalation"
-        or terminal_outcome.status != "success"
-        or not terminal_outcome.confirmed_side_effect
-    ):
-        raise ValueError(
-            "The terminal tool result did not confirm an escalation."
+    if scenario.expected_order_id is None:
+        raise ValueError("An escalation scenario requires an expected order.")
+    if context is not None:
+        record = context.service.get_escalation_by_key(
+            context.account_id,
+            escalation_idempotency_key(context, scenario.expected_order_id),
         )
-    idempotency_key = escalation_idempotency_key(
-        context, response.order_id
-    )
-    record = context.service.get_escalation_by_key(
-        context.account_id, idempotency_key
-    )
-    verified_write = (
-        terminal_outcome.data is not None
-        and terminal_outcome.data.get("escalation_id")
-        == response.escalation_id
-    )
-    if (
-        record is None
-        or record.order_id != response.order_id
-        or record.escalation_id != response.escalation_id
-        or not verified_write
-    ):
-        raise ValueError("No authoritative committed escalation exists.")
+        if record is None:
+            raise ValueError("The expected escalation was not committed.")
+        escalation_id = record.escalation_id
+    if not isinstance(escalation_id, str) or not escalation_id:
+        raise ValueError("An escalation oracle requires its verified record.")
     return (
-        f"A support escalation ({record.escalation_id}) was created "
-        f"for order {record.order_id}."
+        f"A support escalation ({escalation_id}) was created "
+        f"for order {scenario.expected_order_id}."
     )
 
 
@@ -548,6 +409,7 @@ async def run_live_agent_scenario(
         workflow_id=f"live-{scenario.name}-trial-{trial}",
         account_id=scenario.account_id,
         inferred_search_filters=dict(scenario.inferred_search_filters),
+        authorized_search_filters=dict(scenario.expected_search_filters),
         escalation_approval=(
             EscalationApproval(
                 account_id=scenario.account_id,
@@ -624,10 +486,11 @@ async def run_live_agent_scenario(
         )
 
     try:
-        run_result = await Runner.run(
-            agent,
+        safe_result = await run_support_agent(
             scenario.prompt,
-            context=context,
+            context,
+            model=model,
+            agent=agent,
             max_turns=6,
             run_config=build_live_run_config(
                 scenario,
@@ -647,20 +510,19 @@ async def run_live_agent_scenario(
         MaxTurnsExceeded,
         ModelBehaviorError,
         ModelRefusalError,
+        TypeError,
+        ValueError,
+        ValidationError,
     ) as error:
         return failed_result("contract_error", error)
 
-    try:
-        response = run_result.final_output_as(
-            SupportResponse,
-            raise_if_incorrect_type=True,
-        )
-        tool_outcomes, tool_events = extract_tool_outcomes(run_result)
-        customer_message = render_customer_message(
-            response, context, tool_outcomes
-        )
-    except (TypeError, ValueError, ValidationError) as error:
-        return failed_result("contract_error", error)
+    response = safe_result.response
+    tool_outcomes = list(safe_result.observed_tool_outcomes)
+    tool_events = list(safe_result.tool_events)
+    customer_message = safe_result.customer_message
+    expected_customer_message = expected_customer_message_for_scenario(
+        scenario, context
+    )
 
     observed_tools = tuple(item.tool_name for item in tool_outcomes)
     observed_statuses = tuple(item.status for item in tool_outcomes)
@@ -720,10 +582,8 @@ async def run_live_agent_scenario(
                 == scenario.expected_confirmed_side_effect
             ),
             "application_rendered_customer_message": (
-                customer_message
-                == render_customer_message(
-                    response, context, tool_outcomes
-                )
+                customer_message == expected_customer_message
+                and response.message == expected_customer_message
             ),
         },
         "side_effect_safety": {
@@ -844,6 +704,8 @@ async def run_live_agent_scenario(
         tool_attempts=list(observed_attempts),
         disposition=response.disposition,
         customer_message=customer_message,
+        expected_customer_message=expected_customer_message,
+        verified_escalation_id=response.escalation_id,
         side_effects=context.service.escalation_count,
         tool_sequence_passed=grade_results["tool_sequence"],
         tool_outcome_passed=grade_results["tool_outcome"],
@@ -867,6 +729,12 @@ def assert_exact_eval_coverage(
     expected_repeats: int,
     case_column: str = "scenario",
 ) -> None:
+    if (
+        isinstance(expected_repeats, bool)
+        or not isinstance(expected_repeats, int)
+        or expected_repeats <= 0
+    ):
+        raise ValueError("expected_repeats must be a positive integer.")
     identity_columns = [
         "suite_version", case_column, "trial"
     ]
@@ -910,6 +778,14 @@ def assert_live_eval_release_gate(
     *,
     expected_repeats: int = 1,
 ) -> None:
+    if (
+        isinstance(expected_repeats, bool)
+        or not isinstance(expected_repeats, int)
+        or expected_repeats <= 0
+    ):
+        raise ValueError("expected_repeats must be a positive integer.")
+    if "disposition" not in results.columns:
+        raise AssertionError("Eval results lack a verified disposition.")
     runtime_errors = results[
         results["disposition"] == "runtime_error"
     ]
@@ -921,11 +797,95 @@ def assert_live_eval_release_gate(
     assert_exact_eval_coverage(
         results, expected_repeats=expected_repeats
     )
-    failures = results[~results["passed"]]
-    if not failures.empty:
+    component_columns = (
+        "tool_sequence_passed",
+        "tool_outcome_passed",
+        "recovery_policy_passed",
+        "response_contract_passed",
+        "side_effect_safety_passed",
+    )
+    required_columns = {
+        "expected_disposition",
+        "expected_side_effects",
+        "observed_tools",
+        "tool_events",
+        "tool_statuses",
+        "tool_attempts",
+        "customer_message",
+        "expected_customer_message",
+        "verified_escalation_id",
+        "side_effects",
+        "passed",
+        "failed_rules",
+        *component_columns,
+    }
+    missing_columns = required_columns - set(results.columns)
+    if missing_columns:
         raise AssertionError(
-            "One or more live agent contract graders failed."
+            "Eval results lack security-critical evidence: "
+            + ", ".join(sorted(missing_columns))
         )
+
+    cases_by_name = {
+        scenario.name: scenario for scenario in LIVE_AGENT_SCENARIOS
+    }
+    for row in results.to_dict(orient="records"):
+        scenario = cases_by_name[row["scenario"]]
+        if row["passed"] is not True or row["failed_rules"]:
+            raise AssertionError("A live agent contract grader failed.")
+        if any(row[column] is not True for column in component_columns):
+            raise AssertionError("An individual security grader did not pass.")
+        if (
+            row["expected_disposition"] != scenario.expected_disposition
+            or row["disposition"] != scenario.expected_disposition
+            or row["expected_side_effects"]
+            != scenario.expected_side_effects
+            or row["side_effects"] != scenario.expected_side_effects
+            or row["side_effects"] not in {0, 1}
+        ):
+            raise AssertionError("Eval disposition or side effects are unsafe.")
+        expected_tool_events = tuple(
+            event
+            for tool_name in scenario.expected_tools
+            for event in (
+                f"call:{tool_name}",
+                f"output:{tool_name}",
+            )
+        )
+        if (
+            tuple(row["observed_tools"]) != scenario.expected_tools
+            or tuple(row["tool_events"]) != expected_tool_events
+            or tuple(row["tool_statuses"])
+            != scenario.expected_tool_statuses
+            or tuple(row["tool_attempts"])
+            != scenario.expected_tool_attempts
+        ):
+            raise AssertionError("Eval tool execution evidence is invalid.")
+        if (
+            not isinstance(row["customer_message"], str)
+            or row["customer_message"]
+            != row["expected_customer_message"]
+        ):
+            raise AssertionError("The customer message failed its oracle.")
+        verified_escalation_id = row["verified_escalation_id"]
+        if pd.isna(verified_escalation_id):
+            verified_escalation_id = None
+        if (
+            scenario.expected_disposition != "escalation_created"
+            and verified_escalation_id is not None
+        ):
+            raise AssertionError("A nonwrite result fabricated an escalation.")
+        try:
+            oracle_message = expected_customer_message_for_scenario(
+                scenario,
+                escalation_id=verified_escalation_id,
+            )
+        except ValueError as error:
+            raise AssertionError(
+                "The customer message lacks independent verified facts."
+            ) from error
+        if row["customer_message"] != oracle_message:
+            raise AssertionError("The customer message differs from its oracle.")
 
 
 def make_rate_metric(

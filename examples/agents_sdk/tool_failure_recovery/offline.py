@@ -2,11 +2,17 @@
 
 from __future__ import annotations
 
+import asyncio
+from datetime import datetime, timedelta, timezone
+from email.utils import format_datetime
 from typing import Any
 
 import pandas as pd
 
+from .adapter import CallableDeliveryServiceAdapter
 from .core import (
+    DeliveryServiceAdapter,
+    EscalationRecord,
     EscalationRequest,
     FaultKind,
     FaultPlan,
@@ -25,7 +31,11 @@ from .core import (
 
 async def run_offline_recovery_suite() -> pd.DataFrame:
     """Run all account-scope, retry, reconciliation, and search scenarios."""
-    policy = RecoveryPolicy(max_attempts=3)
+    policy = RecoveryPolicy(
+        max_attempts=3,
+        base_delay_seconds=0,
+        jitter_ratio=0,
+    )
     scenario_results: list[dict[str, Any]] = []
 
     # Verify backoff without adding real delay to the notebook.
@@ -34,6 +44,34 @@ async def run_offline_recovery_suite() -> pd.DataFrame:
 
     async def record_delay(delay_seconds: float) -> None:
         recorded_delays.append(delay_seconds)
+
+
+    production_policy = RecoveryPolicy()
+    assert production_policy.base_delay_seconds > 0
+    assert production_policy.jitter_ratio > 0
+    production_backoff = await run_read_with_recovery(
+        SyntheticDeliveryService(),
+        "ACCOUNT-001",
+        "ORDER-1001",
+        make_fault_plan(
+            FaultKind.TIMEOUT,
+            FaultKind.TIMEOUT,
+            FaultKind.SUCCESS,
+        ),
+        production_policy,
+        sleep_fn=record_delay,
+        random_seed=7,
+    )
+    assert production_backoff.status == "success"
+    assert len(recorded_delays) == 2
+    for attempt, delay in enumerate(recorded_delays, start=1):
+        base = production_policy.base_delay_seconds * 2 ** (
+            attempt - 1
+        )
+        assert base <= delay <= base * (
+            1 + production_policy.jitter_ratio
+        )
+    recorded_delays.clear()
 
 
     backoff_policy = RecoveryPolicy(
@@ -143,7 +181,7 @@ async def run_offline_recovery_suite() -> pd.DataFrame:
             "order_id": "ORDER-2002",
             "faults": [FaultKind.SUCCESS],
             "status": "handoff_required",
-            "error_code": "forbidden",
+            "error_code": "order_not_found",
             "attempts": 1,
         },
         {
@@ -193,6 +231,19 @@ async def run_offline_recovery_suite() -> pd.DataFrame:
                 "passed": True,
             }
         )
+
+    scoped_read_errors = {
+        row["scenario"]: row["error_code"]
+        for row in scenario_results
+        if row["scenario"] in {
+            "foreign_order_direct_read_rejected",
+            "unknown_owned_order_not_found",
+        }
+    }
+    assert scoped_read_errors == {
+        "foreign_order_direct_read_rejected": "order_not_found",
+        "unknown_owned_order_not_found": "order_not_found",
+    }
 
     # A real wall-clock deadline becomes a retryable timeout event.
     service = SyntheticDeliveryService()
@@ -348,7 +399,7 @@ async def run_offline_recovery_suite() -> pd.DataFrame:
     def record_security_scenario(
         name: str,
         outcome: ToolOutcome,
-        service: SyntheticDeliveryService,
+        service: SyntheticDeliveryService | DeliveryServiceAdapter,
     ) -> None:
         assert name not in security_scenario_names, name
         security_scenario_names.add(name)
@@ -362,6 +413,85 @@ async def run_offline_recovery_suite() -> pd.DataFrame:
                 "passed": True,
             }
         )
+
+
+    # A non-retryable error after dispatch must still prove commit state.
+    service = SyntheticDeliveryService()
+    permanent_commit_plan = make_fault_plan(
+        FaultKind.PERMANENT_AFTER_COMMIT, FaultKind.SUCCESS
+    )
+    permanent_commit = await run_write_with_reconciliation(
+        service,
+        "ACCOUNT-001",
+        request,
+        permanent_commit_plan,
+        policy,
+        write_authorized=True,
+    )
+    assert permanent_commit.status == "success"
+    assert permanent_commit.confirmed_side_effect is True
+    assert permanent_commit.events[0].result == (
+        "reconciled_permanent_error"
+    )
+    assert permanent_commit.events[0].error_code == (
+        "post_commit_permanent_failure"
+    )
+    assert permanent_commit_plan.attempts == 1
+    assert service.escalation_count == 1
+    record_security_scenario(
+        "permanent_failure_after_commit_reconciled",
+        permanent_commit,
+        service,
+    )
+
+    service = SyntheticDeliveryService()
+    failed_permanent_plan = make_fault_plan(
+        FaultKind.PERMANENT_AFTER_COMMIT, FaultKind.SUCCESS
+    )
+    failed_lookup_plan = make_fault_plan(FaultKind.UNAVAILABLE)
+    unverified_permanent_commit = await run_write_with_reconciliation(
+        service,
+        "ACCOUNT-001",
+        request,
+        failed_permanent_plan,
+        policy,
+        write_authorized=True,
+        reconciliation_fault_plan=failed_lookup_plan,
+    )
+    assert unverified_permanent_commit.error_code == "ambiguous_write"
+    assert unverified_permanent_commit.confirmed_side_effect is False
+    assert failed_permanent_plan.attempts == 1
+    assert failed_lookup_plan.attempts == 1
+    assert service.escalation_count == 1
+    record_security_scenario(
+        "permanent_post_commit_lookup_failure_never_replays",
+        unverified_permanent_commit,
+        service,
+    )
+
+    service = SyntheticDeliveryService()
+    permanent_precommit_plan = make_fault_plan(
+        FaultKind.FORBIDDEN, FaultKind.SUCCESS
+    )
+    skipped_lookup_plan = make_fault_plan(FaultKind.SUCCESS)
+    definitive_precommit_failure = await run_write_with_reconciliation(
+        service,
+        "ACCOUNT-001",
+        request,
+        permanent_precommit_plan,
+        policy,
+        write_authorized=True,
+        reconciliation_fault_plan=skipped_lookup_plan,
+    )
+    assert definitive_precommit_failure.error_code == "forbidden"
+    assert permanent_precommit_plan.attempts == 1
+    assert skipped_lookup_plan.attempts == 0
+    assert service.escalation_count == 0
+    record_security_scenario(
+        "definitive_precommit_permanent_failure_skips_lookup",
+        definitive_precommit_failure,
+        service,
+    )
 
 
     authorization_cases = [
@@ -381,7 +511,7 @@ async def run_offline_recovery_suite() -> pd.DataFrame:
         {
             "name": "foreign_order_write_rejected",
             "order_id": "ORDER-2002",
-            "error_code": "forbidden",
+            "error_code": "order_not_found",
             "dependency_attempts": 1,
         },
         {
@@ -762,6 +892,529 @@ async def run_offline_recovery_suite() -> pd.DataFrame:
         raise AssertionError("Cross-account reconciliation was allowed.")
 
 
+    class BackendHTTPError(Exception):
+        def __init__(
+            self,
+            status_code: int,
+            headers: dict[str, str] | None = None,
+        ) -> None:
+            super().__init__(f"HTTP {status_code}")
+            self.status_code = status_code
+            self.headers = headers or {}
+
+
+    backend_orders = {
+        ("ACCOUNT-001", "ORDER-1001"): {
+            "order_id": "ORDER-1001",
+            "status": "delayed",
+            "carrier": "Example Carrier",
+            "last_scan": "Regional sorting facility",
+        },
+        ("ACCOUNT-002", "ORDER-2002"): {
+            "order_id": "ORDER-2002",
+            "status": "delayed",
+            "carrier": "Other Carrier",
+            "last_scan": "Another customer's sorting facility",
+        },
+    }
+    backend_records: dict[
+        tuple[str, str], EscalationRecord
+    ] = {}
+    backend_state: dict[str, Any] = {
+        "read_attempts": 0,
+        "search_attempts": 0,
+        "write_attempts": 0,
+        "lookup_attempts": 0,
+        "next_read_error": None,
+        "next_search_error": None,
+        "next_write_error": None,
+        "post_commit_error": None,
+        "tamper_reason": False,
+    }
+
+
+    async def backend_authorizes_order(
+        account_id: str, order_id: str
+    ) -> bool:
+        return (account_id, order_id) in backend_orders
+
+
+    async def backend_reads_order(
+        account_id: str, order_id: str
+    ) -> dict[str, Any]:
+        backend_state["read_attempts"] += 1
+        pending_error = backend_state["next_read_error"]
+        if pending_error is not None:
+            backend_state["next_read_error"] = None
+            raise pending_error
+        return dict(backend_orders[(account_id, order_id)])
+
+
+    async def backend_searches_orders(
+        account_id: str, filters: dict[str, str]
+    ) -> list[dict[str, Any]]:
+        backend_state["search_attempts"] += 1
+        pending_error = backend_state["next_search_error"]
+        if pending_error is not None:
+            backend_state["next_search_error"] = None
+            raise pending_error
+        return [
+            dict(order)
+            for (owner_account_id, _), order in backend_orders.items()
+            if owner_account_id == account_id
+            and all(
+                order.get(name) == value
+                for name, value in filters.items()
+            )
+        ]
+
+
+    async def backend_creates_escalation(
+        account_id: str,
+        request: EscalationRequest,
+    ) -> dict[str, Any]:
+        backend_state["write_attempts"] += 1
+        pending_error = backend_state["next_write_error"]
+        if pending_error is not None:
+            backend_state["next_write_error"] = None
+            raise pending_error
+        ledger_key = (account_id, request.idempotency_key)
+        existing = backend_records.get(ledger_key)
+        if existing is not None:
+            return existing.model_dump(mode="json")
+        if backend_orders[(account_id, request.order_id)][
+            "status"
+        ] != "delayed":
+            raise PermanentToolError(
+                "write_precondition_failed",
+                retryable=False,
+                committed=False,
+            )
+        record = EscalationRecord(
+            escalation_id=f"BACKEND-{len(backend_records) + 1:04d}",
+            account_id=account_id,
+            order_id=request.order_id,
+            reason=request.reason,
+            idempotency_key=request.idempotency_key,
+        )
+        backend_records[ledger_key] = record
+        pending_error = backend_state["post_commit_error"]
+        if pending_error is not None:
+            backend_state["post_commit_error"] = None
+            raise pending_error
+        return record.model_dump(mode="json")
+
+
+    async def backend_looks_up_escalation(
+        account_id: str, idempotency_key: str
+    ) -> dict[str, Any] | None:
+        backend_state["lookup_attempts"] += 1
+        record = backend_records.get((account_id, idempotency_key))
+        if record is None:
+            return None
+        serialized = record.model_dump(mode="json")
+        if backend_state["tamper_reason"]:
+            serialized["reason"] = "Another operation's investigation."
+        return serialized
+
+
+    production_adapter = CallableDeliveryServiceAdapter(
+        authenticated_account_id="ACCOUNT-001",
+        authorize_order_fn=backend_authorizes_order,
+        read_order_fn=backend_reads_order,
+        search_orders_fn=backend_searches_orders,
+        create_escalation_fn=backend_creates_escalation,
+        lookup_escalation_fn=backend_looks_up_escalation,
+    )
+    assert isinstance(production_adapter, DeliveryServiceAdapter)
+
+    for name, transport_error, expected_error_code, expected_delay in (
+        (
+            "http_429_honors_retry_after_within_budget",
+            BackendHTTPError(429, {"Retry-After": "1.25"}),
+            "rate_limited",
+            1.25,
+        ),
+        (
+            "http_503_recovers",
+            BackendHTTPError(503),
+            "dependency_unavailable",
+            0,
+        ),
+        (
+            "async_transport_timeout_recovers",
+            asyncio.TimeoutError(),
+            "timeout",
+            0,
+        ),
+    ):
+        backend_state["next_read_error"] = transport_error
+        recorded_delays.clear()
+        adapter_read = await run_read_with_recovery(
+            production_adapter,
+            "ACCOUNT-001",
+            "ORDER-1001",
+            policy=policy,
+            sleep_fn=record_delay,
+        )
+        assert adapter_read.status == "success", name
+        assert adapter_read.attempts == 2, name
+        assert adapter_read.events[0].error_code == (
+            expected_error_code
+        ), name
+        assert recorded_delays == [expected_delay], name
+        record_security_scenario(
+            f"production_adapter_{name}",
+            adapter_read,
+            production_adapter,
+        )
+
+    retry_after_date = format_datetime(
+        datetime.now(timezone.utc) + timedelta(seconds=60),
+        usegmt=True,
+    )
+    backend_state["next_read_error"] = BackendHTTPError(
+        429, {"retry-after": retry_after_date}
+    )
+    recorded_delays.clear()
+    date_policy = policy.model_copy(
+        update={"max_delay_seconds": 90.0}
+    )
+    date_retry = await run_read_with_recovery(
+        production_adapter,
+        "ACCOUNT-001",
+        "ORDER-1001",
+        policy=date_policy,
+        sleep_fn=record_delay,
+    )
+    assert date_retry.status == "success"
+    assert date_retry.attempts == 2
+    assert len(recorded_delays) == 1
+    assert 58 <= recorded_delays[0] <= 60
+    record_security_scenario(
+        "production_adapter_honors_http_date_retry_after",
+        date_retry,
+        production_adapter,
+    )
+
+    backend_state["next_read_error"] = BackendHTTPError(
+        429, {"Retry-After": "60"}
+    )
+    attempts_before = backend_state["read_attempts"]
+    recorded_delays.clear()
+    over_budget_read = await run_read_with_recovery(
+        production_adapter,
+        "ACCOUNT-001",
+        "ORDER-1001",
+        policy=policy,
+        sleep_fn=record_delay,
+    )
+    assert over_budget_read.status == "handoff_required"
+    assert over_budget_read.error_code == "rate_limited"
+    assert over_budget_read.attempts == 1
+    assert over_budget_read.events[0].retryable is False
+    assert backend_state["read_attempts"] == attempts_before + 1
+    assert not recorded_delays
+    record_security_scenario(
+        "production_adapter_read_rejects_excessive_retry_after",
+        over_budget_read,
+        production_adapter,
+    )
+
+    backend_state["next_search_error"] = BackendHTTPError(
+        429, {"Retry-After": "60"}
+    )
+    attempts_before = backend_state["search_attempts"]
+    over_budget_search = await run_order_search_with_recovery(
+        production_adapter,
+        "ACCOUNT-001",
+        {"status": "delayed"},
+        {},
+        policy,
+        sleep_fn=record_delay,
+    )
+    assert over_budget_search.status == "handoff_required"
+    assert over_budget_search.error_code == "rate_limited"
+    assert over_budget_search.attempts == 1
+    assert over_budget_search.events[0].retryable is False
+    assert backend_state["search_attempts"] == attempts_before + 1
+    assert not recorded_delays
+    record_security_scenario(
+        "production_adapter_search_rejects_excessive_retry_after",
+        over_budget_search,
+        production_adapter,
+    )
+
+    backend_state["next_write_error"] = BackendHTTPError(
+        429, {"Retry-After": "60"}
+    )
+    over_budget_write = await run_write_with_reconciliation(
+        production_adapter,
+        "ACCOUNT-001",
+        request.model_copy(
+            update={"idempotency_key": "rate-limited-write-operation"}
+        ),
+        policy=policy,
+        write_authorized=True,
+        sleep_fn=record_delay,
+    )
+    assert over_budget_write.status == "handoff_required"
+    assert over_budget_write.error_code == "rate_limited"
+    assert over_budget_write.attempts == 1
+    assert over_budget_write.events[0].retryable is False
+    assert backend_state["write_attempts"] == 1
+    assert backend_state["lookup_attempts"] == 1
+    assert not recorded_delays
+    record_security_scenario(
+        "production_adapter_write_rejects_excessive_retry_after",
+        over_budget_write,
+        production_adapter,
+    )
+    backend_state["write_attempts"] = 0
+    backend_state["lookup_attempts"] = 0
+
+    foreign_backend_order = await run_read_with_recovery(
+        production_adapter,
+        "ACCOUNT-001",
+        "ORDER-2002",
+        policy=policy,
+    )
+    missing_backend_order = await run_read_with_recovery(
+        production_adapter,
+        "ACCOUNT-001",
+        "ORDER-9999",
+        policy=policy,
+    )
+    assert foreign_backend_order.error_code == "order_not_found"
+    assert missing_backend_order.error_code == (
+        foreign_backend_order.error_code
+    )
+    record_security_scenario(
+        "production_adapter_hides_foreign_order_existence",
+        foreign_backend_order,
+        production_adapter,
+    )
+
+    adapter_search = await run_order_search_with_recovery(
+        production_adapter,
+        "ACCOUNT-001",
+        {"status": "delayed"},
+        {"carrier": "Unavailable Carrier"},
+        policy,
+    )
+    assert adapter_search.status == "success"
+    assert adapter_search.attempts == 2
+    assert adapter_search.data is not None
+    assert adapter_search.data["order_ids"] == ["ORDER-1001"]
+    record_security_scenario(
+        "production_adapter_false_empty_search_recovers",
+        adapter_search,
+        production_adapter,
+    )
+
+    backend_state["post_commit_error"] = BackendHTTPError(409)
+    adapter_write = await run_write_with_reconciliation(
+        production_adapter,
+        "ACCOUNT-001",
+        request,
+        policy=policy,
+        write_authorized=True,
+    )
+    assert adapter_write.status == "success"
+    assert adapter_write.events[0].result == (
+        "reconciled_permanent_error"
+    )
+    assert adapter_write.events[0].error_code == (
+        "dependency_http_409"
+    )
+    assert backend_state["write_attempts"] == 1
+    assert backend_state["lookup_attempts"] == 1
+    verified_backend_record = (
+        production_adapter.get_escalation_by_key(
+            "ACCOUNT-001", request.idempotency_key
+        )
+    )
+    assert verified_backend_record is not None
+    assert production_adapter.escalation_count == 1
+    record_security_scenario(
+        "production_adapter_post_commit_http_409_reconciled",
+        adapter_write,
+        production_adapter,
+    )
+
+    tampered_request = request.model_copy(
+        update={"idempotency_key": "a-tampered-backend-operation"}
+    )
+    backend_state["post_commit_error"] = BackendHTTPError(422)
+    backend_state["tamper_reason"] = True
+    tampered_backend_write = await run_write_with_reconciliation(
+        production_adapter,
+        "ACCOUNT-001",
+        tampered_request,
+        policy=policy,
+        write_authorized=True,
+    )
+    assert tampered_backend_write.error_code == (
+        "idempotency_key_conflict"
+    )
+    assert tampered_backend_write.attempts == 1
+    assert backend_state["write_attempts"] == 2
+    assert production_adapter.escalation_count == 1
+    assert production_adapter.get_escalation_by_key(
+        "ACCOUNT-001", tampered_request.idempotency_key
+    ) is None
+    record_security_scenario(
+        "production_adapter_never_caches_unverified_lookup",
+        tampered_backend_write,
+        production_adapter,
+    )
+    try:
+        production_adapter.get_escalation_by_key(
+            "ACCOUNT-002", request.idempotency_key
+        )
+    except PermanentToolError as error:
+        assert error.code == "forbidden"
+    else:
+        raise AssertionError("The verified adapter cache leaked tenants.")
+
+    deadline_policy = policy.model_copy(
+        update={"max_attempts": 1}
+    )
+
+    def delayed_authorization_adapter(
+        delayed_call: int,
+    ) -> tuple[CallableDeliveryServiceAdapter, dict[str, int]]:
+        authorization_state = {"calls": 0}
+
+        async def delayed_ownership(
+            account_id: str, order_id: str
+        ) -> bool:
+            authorization_state["calls"] += 1
+            if authorization_state["calls"] == delayed_call:
+                await asyncio.sleep(0.05)
+            return await backend_authorizes_order(
+                account_id, order_id
+            )
+
+        return (
+            CallableDeliveryServiceAdapter(
+                authenticated_account_id="ACCOUNT-001",
+                authorize_order_fn=delayed_ownership,
+                read_order_fn=backend_reads_order,
+                search_orders_fn=backend_searches_orders,
+                create_escalation_fn=backend_creates_escalation,
+                lookup_escalation_fn=backend_looks_up_escalation,
+            ),
+            authorization_state,
+        )
+
+    delayed_read_adapter, read_authorization = (
+        delayed_authorization_adapter(3)
+    )
+    delayed_read = await run_read_with_recovery(
+        delayed_read_adapter,
+        "ACCOUNT-001",
+        "ORDER-1001",
+        policy=deadline_policy,
+        attempt_timeout_seconds=0.01,
+    )
+    assert delayed_read.status == "handoff_required"
+    assert delayed_read.error_code == "timeout"
+    assert delayed_read.data is None
+    assert delayed_read.attempts == 1
+    assert read_authorization["calls"] == 3
+    record_security_scenario(
+        "production_adapter_bounds_read_ownership_recheck",
+        delayed_read,
+        delayed_read_adapter,
+    )
+
+    delayed_search_adapter, search_authorization = (
+        delayed_authorization_adapter(1)
+    )
+    delayed_search = await run_order_search_with_recovery(
+        delayed_search_adapter,
+        "ACCOUNT-001",
+        {"status": "delayed"},
+        {},
+        deadline_policy,
+        attempt_timeout_seconds=0.01,
+    )
+    assert delayed_search.status == "handoff_required"
+    assert delayed_search.error_code == "timeout"
+    assert delayed_search.data is None
+    assert delayed_search.attempts == 1
+    assert search_authorization["calls"] == 1
+    record_security_scenario(
+        "production_adapter_bounds_search_ownership_recheck",
+        delayed_search,
+        delayed_search_adapter,
+    )
+
+    delayed_write_adapter, write_authorization = (
+        delayed_authorization_adapter(2)
+    )
+    delayed_write_request = request.model_copy(
+        update={"idempotency_key": "delayed-write-authorization"}
+    )
+    writes_before = backend_state["write_attempts"]
+    delayed_write = await run_write_with_reconciliation(
+        delayed_write_adapter,
+        "ACCOUNT-001",
+        delayed_write_request,
+        policy=deadline_policy,
+        write_authorized=True,
+        attempt_timeout_seconds=0.01,
+    )
+    assert delayed_write.status == "handoff_required"
+    assert delayed_write.error_code == "timeout"
+    assert delayed_write.attempts == 1
+    assert write_authorization["calls"] == 2
+    assert backend_state["write_attempts"] == writes_before
+    assert (
+        "ACCOUNT-001", delayed_write_request.idempotency_key
+    ) not in backend_records
+    record_security_scenario(
+        "production_adapter_bounds_prewrite_authorization",
+        delayed_write,
+        delayed_write_adapter,
+    )
+
+    backend_state["tamper_reason"] = False
+    backend_state["post_commit_error"] = BackendHTTPError(409)
+    delayed_lookup_adapter, lookup_authorization = (
+        delayed_authorization_adapter(3)
+    )
+    delayed_lookup_request = request.model_copy(
+        update={"idempotency_key": "delayed-lookup-authorization"}
+    )
+    writes_before = backend_state["write_attempts"]
+    delayed_lookup = await run_write_with_reconciliation(
+        delayed_lookup_adapter,
+        "ACCOUNT-001",
+        delayed_lookup_request,
+        policy=deadline_policy,
+        write_authorized=True,
+        attempt_timeout_seconds=0.01,
+        reconciliation_timeout_seconds=0.01,
+    )
+    assert delayed_lookup.status == "handoff_required"
+    assert delayed_lookup.error_code == "ambiguous_write"
+    assert delayed_lookup.confirmed_side_effect is False
+    assert delayed_lookup.attempts == 1
+    assert lookup_authorization["calls"] == 3
+    assert backend_state["write_attempts"] == writes_before + 1
+    assert (
+        "ACCOUNT-001", delayed_lookup_request.idempotency_key
+    ) in backend_records
+    assert delayed_lookup_adapter.escalation_count == 0
+    record_security_scenario(
+        "production_adapter_bounds_postcommit_ownership_recheck",
+        delayed_lookup,
+        delayed_lookup_adapter,
+    )
+
+
     class MalformedSearchContainerService(SyntheticDeliveryService):
         def __init__(self, malformed_response: Any) -> None:
             super().__init__()
@@ -883,7 +1536,7 @@ async def run_offline_recovery_suite() -> pd.DataFrame:
             "substitution": "foreign_order",
             "count": None,
             "attempts": 1,
-            "error_code": "forbidden",
+            "error_code": "order_not_found",
         },
         {
             "name": "unknown_search_result_identity_rejected",
@@ -1044,8 +1697,12 @@ async def run_offline_recovery_suite() -> pd.DataFrame:
         fault_plan = case.get("fault_plan") or make_fault_plan(
             *case.get("faults", (FaultKind.SUCCESS,))
         )
-        case_policy = RecoveryPolicy(
-            max_attempts=case.get("max_attempts", policy.max_attempts)
+        case_policy = policy.model_copy(
+            update={
+                "max_attempts": case.get(
+                    "max_attempts", policy.max_attempts
+                )
+            }
         )
         service = (
             UntrustedSearchResultService(case["substitution"])

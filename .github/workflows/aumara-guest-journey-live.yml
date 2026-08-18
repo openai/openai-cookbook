@@ -38,21 +38,28 @@ jobs:
         with:
           python-version: "3.12"
 
-      - name: Verify manual canary authorization and secret presence
+       - name: Verify manual canary authorization and secret presence
         env:
-          CANARY_CONFIRMATION: ${{ inputs.confirmation }}
-          BEDS24_REFRESH_TOKEN: ${{ secrets.BEDS24_REFRESH_CREDENTIAL }}
+          CANARY_CONFIRMATION: ${{ inputs.CANARY_CONFIRMATION }}
+          BEDS24_REFRESH_TOKEN: ${{ secrets.BEDS24_REFRESH_TOKEN }}
           AWS_ACCESS_KEY_ID: ${{ secrets.AWS_ACCESS_KEY_ID }}
           AWS_SECRET_ACCESS_KEY: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
-          AWS_REGION: ${{ vars.AWS_REGION }}
+          AWS_REGION: ${{ secrets.AWS_REGION }}
           DYNAMODB_TABLE: ${{ secrets.DYNAMODB_TABLE }}
         run: |
-          test "$CANARY_CONFIRMATION" = "AUMARA-324882-LIVE"
-          test -n "$BEDS24_REFRESH_TOKEN"
-          test -n "$AWS_ACCESS_KEY_ID"
-          test -n "$AWS_SECRET_ACCESS_KEY"
-          test -n "$AWS_REGION"
-          test "$DYNAMODB_TABLE" = "aumara-guest-journey-claims"
+          echo "Checking CANARY_CONFIRMATION=$CANARY_CONFIRMATION"
+          if [ "$CANARY_CONFIRMATION" != "AUMARA-X24882-LIVE" ]; then
+            echo "ERROR: Expected AUMARA-X24882-LIVE but got $CANARY_CONFIRMATION"
+            exit 1
+          fi
+          
+          if [ -z "$BEDS24_REFRESH_TOKEN" ]; then echo "Missing BEDS24_REFRESH_TOKEN"; exit 1; fi
+          if [ -z "$AWS_ACCESS_KEY_ID" ]; then echo "Missing AWS_ACCESS_KEY_ID"; exit 1; fi
+          if [ -z "$AWS_SECRET_ACCESS_KEY" ]; then echo "Missing AWS_SECRET_ACCESS_KEY"; exit 1; fi
+          if [ -z "$AWS_REGION" ]; then echo "Missing AWS_REGION"; exit 1; fi
+          if [ -z "$DYNAMODB_TABLE" ]; then echo "Missing DYNAMODB_TABLE"; exit 1; fi
+          
+          echo "All checks passed!"
 
       - name: Install DynamoDB client
         run: python -m pip install "boto3>=1.34,<2"

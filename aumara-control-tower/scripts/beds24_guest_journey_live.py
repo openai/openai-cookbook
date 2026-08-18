@@ -9,6 +9,8 @@ import datetime as dt
 import json
 import os
 import pathlib
+import sys
+import traceback
 import unicodedata
 import urllib.error
 import urllib.request
@@ -551,7 +553,26 @@ def run_aumara_canary(
     return summary
 
 
+_REQUIRED_ENV_VARS = (
+    "BEDS24_REFRESH_TOKEN",
+    "BEDS24_REFRESH_CREDENTIAL",
+    "AWS_ACCESS_KEY_ID",
+    "AWS_SECRET_ACCESS_KEY",
+    "AWS_REGION",
+    "DYNAMODB_TABLE",
+)
+
+
+def _validate_required_env() -> None:
+    missing = [v for v in _REQUIRED_ENV_VARS if not os.environ.get(v, "").strip()]
+    if missing:
+        raise RuntimeError(
+            "missing required environment variable(s): " + ", ".join(missing)
+        )
+
+
 def main() -> int:
+    _validate_required_env()
     parser = argparse.ArgumentParser(description=__doc__)
     parser.add_argument("--property", required=True, type=int)
     parser.add_argument("--output", type=pathlib.Path)
@@ -570,6 +591,9 @@ def main() -> int:
 if __name__ == "__main__":
     try:
         raise SystemExit(main())
-    except Exception:
-        print("ERROR: live guest journey aborted", file=__import__("sys").stderr)
-        raise SystemExit(2)
+    except SystemExit:
+        raise
+    except Exception as _exc:
+        print(f"ERROR: live guest journey aborted: {_exc}", file=sys.stderr)
+        traceback.print_exc()
+        sys.exit(2)

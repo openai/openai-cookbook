@@ -51,7 +51,24 @@ jobs:
       - name: Install dependencies
         working-directory: aumara-control-tower
         run: |
-          pip install -r requirements.txt 2>/dev/null || pip install boto3 requests
+          python -m pip install --upgrade pip
+          pip install -r requirements.txt
+      - name: Preflight env validation
+        working-directory: aumara-control-tower
+        run: |
+          python - <<'PY'
+          import os, sys
+          required = [
+            "BEDS24_REFRESH_TOKEN", "BEDS24_REFRESH_CREDENTIAL",
+            "AWS_ACCESS_KEY_ID", "AWS_SECRET_ACCESS_KEY",
+            "AWS_REGION", "DYNAMODB_TABLE", "AUMARA_CANARY_PROPERTY_ID",
+          ]
+          missing = [k for k in required if not os.environ.get(k, "").strip()]
+          if missing:
+              print("ERROR: missing required env vars: " + ", ".join(missing))
+              sys.exit(1)
+          print("Preflight OK")
+          PY
       - name: Run live canary
         working-directory: aumara-control-tower
         run: |

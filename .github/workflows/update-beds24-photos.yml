@@ -41,6 +41,7 @@ jobs:
             .github/workflows/beds24-ui-photo-upload.yml > /tmp/beds24_ui_upload.py.gz.b64
           test -s /tmp/beds24_ui_upload.py.gz.b64
           base64 -d /tmp/beds24_ui_upload.py.gz.b64 | gzip -d > /tmp/beds24_ui_upload.py
+          sed -i '/^[[:space:]]*fuzzy=False,[[:space:]]*$/d' /tmp/beds24_ui_upload.py
           chmod 700 /tmp/beds24_ui_upload.py
           python -m py_compile /tmp/beds24_ui_upload.py
 

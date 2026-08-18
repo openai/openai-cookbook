@@ -18,6 +18,11 @@ forced_login_method = "chatgpt"
 cli_auth_credentials_store = "keyring"
 mcp_oauth_credentials_store = "keyring"
 
+# Match the managed native Windows sandbox and isolated-desktop requirements.
+[windows]
+sandbox = "elevated"
+sandbox_private_desktop = true
+
 [apps._default]
 enabled = false
 destructive_enabled = false

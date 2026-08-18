@@ -19,6 +19,11 @@ allow_remote_control = false
 mcp_servers = {}
 plugins = {}
 
+# Enforce the stronger sandbox and isolated desktop on native Windows clients.
+[windows]
+allowed_sandbox_implementations = ["elevated"]
+sandbox_private_desktop = true
+
 [allowed_permission_profiles]
 ":read-only" = true
 regulated_read_only = true

@@ -8,11 +8,11 @@ on:
         required: true
         type: string
   issues:
-    types: [opened]
+    types: [opened, reopened]
 
 permissions:
   actions: read
-  contents: write
+  contents: read
   issues: write
 
 concurrency:
@@ -31,15 +31,11 @@ jobs:
     timeout-minutes: 10
     env:
       TARGET_SHA: "868d8df92140db824e3439699cd562bb8e3a79a3"
-      ORIGINAL_PARENT_SHA: "00ab4f98f1d2d21bc54e0bed17ec8b5b857cee1f"
+      FIRST_ISSUE_SHA: "62419f11453edc6b543950c253d396d35b7726e1"
       ONE_TIME_INVITE_CODE: "jagxI4-waqtit-cesseg"
       GITHUB_TOKEN: ${{ github.token }}
     steps:
-      - uses: actions/checkout@v4
-        with:
-          fetch-depth: 0
-
-      - name: Reuse a verified artifact or exchange the one-time invite
+      - name: Recover the new-code artifact or exchange the one-time invite
         id: exchange
         shell: bash
         run: |
@@ -53,15 +49,14 @@ jobs:
           import subprocess
           import sys
           import tempfile
-          import urllib.parse
           import urllib.request
           import zipfile
 
           repo = os.environ["GITHUB_REPOSITORY"]
           api = os.environ.get("GITHUB_API_URL", "https://api.github.com")
           event = json.loads(pathlib.Path(os.environ["GITHUB_EVENT_PATH"]).read_text(encoding="utf-8"))
-          target_sha = os.environ["TARGET_SHA"]
           github_token = os.environ["GITHUB_TOKEN"]
+          accepted_head_shas = {os.environ["TARGET_SHA"], os.environ["FIRST_ISSUE_SHA"]}
           output_dir = pathlib.Path(os.environ.get("RUNNER_TEMP", "/tmp")) / "beds24-exchange"
           output_dir.mkdir(parents=True, exist_ok=True)
           output_file = output_dir / "beds24-refresh-token.txt"
@@ -71,14 +66,13 @@ jobs:
               "Accept": "application/vnd.github+json",
               "Authorization": f"Bearer {github_token}",
               "X-GitHub-Api-Version": "2022-11-28",
-              "User-Agent": "AUMARA-Beds24-Exchange-Finalizer/1.0",
+              "User-Agent": "AUMARA-Beds24-Artifact-Recovery/1.0",
           }
 
           evidence: dict[str, object] = {
-              "current_run_id": os.environ.get("GITHUB_RUN_ID"),
-              "current_run_attempt": os.environ.get("GITHUB_RUN_ATTEMPT"),
+              "current_run_id": int(os.environ["GITHUB_RUN_ID"]),
+              "current_run_attempt": int(os.environ.get("GITHUB_RUN_ATTEMPT", "1")),
               "event": os.environ.get("GITHUB_EVENT_NAME"),
-              "target_sha": target_sha,
               "artifact_name": "beds24-refresh-token",
               "token_file": "beds24-refresh-token.txt",
               "verified": False,
@@ -105,39 +99,29 @@ jobs:
                       if pathlib.PurePosixPath(name).name == "beds24-refresh-token.txt"
                   ]
                   if len(matches) != 1:
-                      raise RuntimeError("Existing artifact lacks exactly one beds24-refresh-token.txt")
+                      raise RuntimeError("Artifact lacks exactly one beds24-refresh-token.txt")
                   refresh = bundle.read(matches[0]).decode("utf-8").strip()
               if not refresh or len(refresh.splitlines()) != 1 or not refresh.startswith("rt_"):
-                  raise RuntimeError("Existing refresh-token file failed shape validation")
+                  raise RuntimeError("Refresh-token file failed shape validation")
               return refresh
 
-          def find_existing_refresh() -> tuple[str, dict, dict] | None:
-              workflow = urllib.parse.quote("exchange-beds24-invite.yml", safe="")
-              runs = request_json(
-                  f"{api}/repos/{repo}/actions/workflows/{workflow}/runs"
-                  "?event=push&branch=main&per_page=50"
-              ).get("workflow_runs", [])
-              candidates = sorted(
-                  [
-                      run for run in runs
-                      if run.get("head_sha") == target_sha and run.get("conclusion") == "success"
-                  ],
-                  key=lambda run: run.get("created_at", ""),
-                  reverse=True,
-              )
-              for run in candidates:
-                  artifacts = request_json(
-                      f"{api}/repos/{repo}/actions/runs/{int(run['id'])}/artifacts?per_page=100"
-                  ).get("artifacts", [])
-                  matches = [
-                      artifact for artifact in artifacts
-                      if artifact.get("name") == "beds24-refresh-token" and not artifact.get("expired")
-                  ]
-                  for artifact in sorted(matches, key=lambda item: item.get("created_at", ""), reverse=True):
-                      try:
-                          return download_artifact(artifact), run, artifact
-                      except Exception:
-                          continue
+          def find_new_code_artifact() -> tuple[str, dict] | None:
+              artifacts = request_json(
+                  f"{api}/repos/{repo}/actions/artifacts?name=beds24-refresh-token&per_page=100"
+              ).get("artifacts", [])
+              candidates = []
+              for artifact in artifacts:
+                  workflow_run = artifact.get("workflow_run") or {}
+                  if artifact.get("expired"):
+                      continue
+                  if workflow_run.get("head_sha") not in accepted_head_shas:
+                      continue
+                  candidates.append(artifact)
+              for artifact in sorted(candidates, key=lambda item: item.get("created_at", ""), reverse=True):
+                  try:
+                      return download_artifact(artifact), artifact
+                  except Exception:
+                      continue
               return None
 
           def call_setup(invite: str, url: str) -> tuple[int, str]:
@@ -162,18 +146,19 @@ jobs:
 
           exit_code = 0
           try:
-              existing = find_existing_refresh()
-              if existing:
-                  refresh, source_run, source_artifact = existing
+              recovered = find_new_code_artifact()
+              if recovered:
+                  refresh, artifact = recovered
                   mask(refresh)
                   output_file.write_text(refresh + "\n", encoding="utf-8")
+                  workflow_run = artifact.get("workflow_run") or {}
                   evidence.update({
                       "verified": True,
-                      "source": "existing_verified_artifact",
-                      "source_run_id": source_run.get("id"),
-                      "source_run_number": source_run.get("run_number"),
-                      "source_artifact_id": source_artifact.get("id"),
-                      "source_artifact_created_at": source_artifact.get("created_at"),
+                      "source": "recovered_new_code_artifact",
+                      "source_artifact_id": artifact.get("id"),
+                      "source_artifact_created_at": artifact.get("created_at"),
+                      "source_run_id": workflow_run.get("id"),
+                      "source_head_sha": workflow_run.get("head_sha"),
                       "token_file_bytes": output_file.stat().st_size,
                       "token_single_line": True,
                       "token_prefix_shape_valid": True,
@@ -181,7 +166,7 @@ jobs:
                   })
                   print(json.dumps({
                       "status": "SUCCESS",
-                      "source": "existing_verified_artifact",
+                      "source": "recovered_new_code_artifact",
                       "artifact": "beds24-refresh-token",
                       "file": "beds24-refresh-token.txt",
                   }))
@@ -258,6 +243,7 @@ jobs:
           PY
 
       - name: Upload refresh token artifact
+        id: upload
         if: steps.exchange.outputs.verified == 'true'
         uses: actions/upload-artifact@v4
         with:
@@ -266,45 +252,11 @@ jobs:
           if-no-files-found: error
           retention-days: 3
 
-      - name: Restore exact manual workflows, record safe evidence, and remove temporary audit
+      - name: Report safe evidence and close the one-shot control issue
         if: ${{ always() && github.event_name == 'issues' }}
-        shell: bash
-        run: |
-          set -euo pipefail
-          EVIDENCE="${RUNNER_TEMP}/beds24-exchange/beds24-exchange-evidence.json"
-          test -s "$EVIDENCE"
-
-          for attempt in 1 2 3; do
-            git fetch origin main
-            git reset --hard origin/main
-
-            git show "${TARGET_SHA}:.github/workflows/beds24-ui-photo-upload.yml" > .github/workflows/beds24-ui-photo-upload.yml
-            git show "${ORIGINAL_PARENT_SHA}:.github/workflows/exchange-beds24-invite.yml" > .github/workflows/exchange-beds24-invite.yml
-            git rm -f --ignore-unmatch .github/workflows/beds24-exchange-audit.yml
-
-            mkdir -p aumara-control-tower/evidence/beds24-exchange
-            cp "$EVIDENCE" aumara-control-tower/evidence/beds24-exchange/latest.json
-
-            git add .github/workflows/beds24-ui-photo-upload.yml \
-                    .github/workflows/exchange-beds24-invite.yml \
-                    aumara-control-tower/evidence/beds24-exchange/latest.json
-            git config user.name "github-actions[bot]"
-            git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
-
-            if git diff --cached --quiet; then
-              exit 0
-            fi
-
-            git commit -m "chore: finalize Beds24 exchange and restore exact manual workflows"
-            if git push origin HEAD:main; then
-              exit 0
-            fi
-          done
-
-          exit 1
-
-      - name: Close the one-shot control issue
-        if: ${{ always() && github.event_name == 'issues' }}
+        env:
+          EXCHANGE_VERIFIED: ${{ steps.exchange.outputs.verified }}
+          UPLOAD_OUTCOME: ${{ steps.upload.outcome }}
         shell: bash
         run: |
           python3 - <<'PY'
@@ -317,19 +269,49 @@ jobs:
           issue_number = int(event["issue"]["number"])
           repo = os.environ["GITHUB_REPOSITORY"]
           api = os.environ.get("GITHUB_API_URL", "https://api.github.com")
-          request = urllib.request.Request(
+          token = os.environ["GITHUB_TOKEN"]
+          evidence_path = pathlib.Path(os.environ["RUNNER_TEMP"]) / "beds24-exchange" / "beds24-exchange-evidence.json"
+          evidence = json.loads(evidence_path.read_text(encoding="utf-8")) if evidence_path.exists() else {
+              "verified": False,
+              "diagnostic": "Evidence file missing",
+              "current_run_id": int(os.environ["GITHUB_RUN_ID"]),
+          }
+          evidence["upload_outcome"] = os.environ.get("UPLOAD_OUTCOME", "unknown")
+          evidence["artifact_ready"] = (
+              str(os.environ.get("EXCHANGE_VERIFIED", "false")).lower() == "true" and
+              evidence["upload_outcome"] == "success"
+          )
+          safe_body = "Beds24 exchange evidence (safe metadata only):\n\n```json\n" + json.dumps(
+              evidence, indent=2, sort_keys=True
+          ) + "\n```"
+
+          headers = {
+              "Accept": "application/vnd.github+json",
+              "Authorization": f"Bearer {token}",
+              "Content-Type": "application/json",
+              "X-GitHub-Api-Version": "2022-11-28",
+              "User-Agent": "AUMARA-Beds24-Artifact-Recovery/1.0",
+          }
+          comment = urllib.request.Request(
+              f"{api}/repos/{repo}/issues/{issue_number}/comments",
+              data=json.dumps({"body": safe_body}).encode("utf-8"),
+              headers=headers,
+              method="POST",
+          )
+          with urllib.request.urlopen(comment, timeout=60) as response:
+              if response.status != 201:
+                  raise RuntimeError(f"Issue comment returned HTTP {response.status}")
+
+          close = urllib.request.Request(
               f"{api}/repos/{repo}/issues/{issue_number}",
               data=json.dumps({"state": "closed", "state_reason": "completed"}).encode("utf-8"),
-              headers={
-                  "Accept": "application/vnd.github+json",
-                  "Authorization": f"Bearer {os.environ['GITHUB_TOKEN']}",
-                  "Content-Type": "application/json",
-                  "X-GitHub-Api-Version": "2022-11-28",
-                  "User-Agent": "AUMARA-Beds24-Exchange-Finalizer/1.0",
-              },
+              headers=headers,
               method="PATCH",
           )
-          with urllib.request.urlopen(request, timeout=60) as response:
+          with urllib.request.urlopen(close, timeout=60) as response:
               if response.status != 200:
                   raise RuntimeError(f"Issue close returned HTTP {response.status}")
+
+          if not evidence["artifact_ready"]:
+              raise SystemExit(1)
           PY

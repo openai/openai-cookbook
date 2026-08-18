@@ -4,6 +4,20 @@
 # should build pages for, and indicates metadata such as tags, creation date and
 # authors for each page.
 
+- title: Iterating Development Workflows with Codex
+  path: examples/codex/iterating-development-workflows-with-codex.md
+  slug: iterating-development-workflows-with-codex
+  description: Build and improve Codex development workflows using repository harnesses, phased implementation plans, approval gates, reusable skills, and evidence-backed retrospectives.
+  date: 2026-08-03
+  authors:
+    - talaniz-oai
+  tags:
+    - codex
+    - agents
+    - planning
+    - automation
+    - documentation
+
 - title: Build a per-run spending controller with the Responses API
   path: articles/per_run_spending_controller_responses_api.md
   slug: per-run-spending-controller-responses-api

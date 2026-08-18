@@ -20,6 +20,7 @@ jobs:
     timeout-minutes: 20
     env:
       PROPERTY_ID: "324882"
+      SESSION_GENERATION: "3"
       SESSION_ROOT: "aumara-control-tower/evidence/beds24-ui-session"
       RUNTIME_DIR: ".runtime/beds24-ui"
     steps:

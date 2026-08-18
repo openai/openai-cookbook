@@ -6,6 +6,7 @@ permissions:
 jobs:
   upload-through-control-panel:
     runs-on: ubuntu-latest
+    environment: Production
     steps:
       - uses: actions/checkout@v4
       - uses: actions/setup-python@v5

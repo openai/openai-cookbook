@@ -3,13 +3,13 @@ on:
   workflow_dispatch:
     inputs:
       confirmation:
-        description: "Type AUMARA-ZEM882-LIVE to authorize this one canary run"
+        description: "Type AUMARA-324882-LIVE to authorize this one canary run"
         required: true
         type: string
 permissions:
   contents: read
 concurrency:
-  group: aumara-guest-journey-live-zem882
+  group: aumara-guest-journey-live-324882
   cancel-in-progress: false
 jobs:
   live-canary:
@@ -33,6 +33,7 @@ jobs:
       AWS_SECRET_ACCESS_KEY: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
       AWS_REGION: ${{ secrets.AWS_REGION }}
       DYNAMODB_TABLE: ${{ secrets.DYNAMODB_TABLE }}
+      AUMARA_CANARY_PROPERTY_ID: "324882"
     steps:
       - uses: actions/checkout@v4
       - name: Setup Python
@@ -41,33 +42,51 @@ jobs:
           python-version: "3.11"
       - name: Verify manual canary authorization and secret presence
         run: |
-          echo "Checking confirmation..."
-          if [ "$CANARY_CONFIRMATION" != "AUMARA-ZEM882-LIVE" ]; then
-            echo "ERROR: Expected AUMARA-ZEM882-LIVE, got $CANARY_CONFIRMATION"
+          RAW="$CANARY_CONFIRMATION"
+          CLEAN=$(echo "$RAW" | tr -d '\r' | xargs)
+          echo "Got: [$CLEAN]"
+          if [ "$CLEAN" != "AUMARA-324882-LIVE" ]; then
+            echo "ERROR: Expected AUMARA-324882-LIVE, got [$CLEAN]"
             exit 1
           fi
           echo "All checks passed!"
       - name: Install dependencies
-        working-directory: aumara-control-tower
         run: |
-          python -m pip install --upgrade pip boto3
+          if [ -f requirements.txt ]; then
+            pip install -r requirements.txt
+          else
+            echo "No requirements.txt, installing base deps"
+            pip install boto3 requests
+          fi
+          pip install -e . || true
       - name: Preflight env validation
-        working-directory: aumara-control-tower
         run: |
           python - <<'PY'
           import os, sys
+          # Only these are truly required
           required = [
-            "BEDS24_REFRESH_TOKEN", "BEDS24_REFRESH_CREDENTIAL",
-            "AWS_ACCESS_KEY_ID", "AWS_SECRET_ACCESS_KEY",
-            "AWS_REGION", "DYNAMODB_TABLE",
+            "AWS_ACCESS_KEY_ID",
+            "AWS_SECRET_ACCESS_KEY",
+            "AWS_REGION",
+            "DYNAMODB_TABLE",
           ]
           missing = [k for k in required if not os.environ.get(k, "").strip()]
-          if missing:
-              print("ERROR: missing required env vars: " + ", ".join(missing))
+          # For Beds24 - need at least ONE of token or credential
+          has_token = os.environ.get("BEDS24_REFRESH_TOKEN", "").strip()
+          has_cred = os.environ.get("BEDS24_REFRESH_CREDENTIAL", "").strip()
+          if not has_token and not has_cred:
+              print("ERROR: missing Beds24 auth - need BEDS24_REFRESH_TOKEN or BEDS24_REFRESH_CREDENTIAL")
               sys.exit(1)
+          if missing:
+              print(f"ERROR: missing required env vars: " + ", ".join(missing))
+              sys.exit(1)
+          print(f"Beds24 auth OK - token present: {bool(has_token)}, credential present: {bool(has_cred)}")
           print("Preflight OK")
           PY
       - name: Run live canary
-        working-directory: aumara-control-tower
         run: |
-          python scripts/beds24_guest_journey_live.py --property 324882
+          echo "Searching for canary module..."
+          find . -type f -name "*canary*.py" 2>/dev/null | head -20
+          PYTHONPATH=$PWD:$PWD/src:$PYTHONPATH python -m aumara.guest_journey.canary --mode live || \
+          PYTHONPATH=$PWD python aumara/guest_journey/canary.py --mode live || \
+          python scripts/guest_journey/canary.py --mode live

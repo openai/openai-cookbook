@@ -11,63 +11,78 @@ jobs:
       - uses: actions/setup-python@v5
         with:
           python-version: "3.11"
-      - name: Install deps
-        run: |
-          python -m pip install --upgrade pip
-          pip install --upgrade gdown requests playwright
+      - run: |
+          pip install requests gdown playwright
           playwright install --with-deps chromium
-      - name: Download 10 FULL_no_crop photos
-        run: |
+      - run: |
           mkdir -p ./download
-          gdown --folder https://drive.google.com/drive/folders/1apf9xnyInfhZSI0NfNA3n0OhEgiN8HXS -O ./download || gdown --folder --id 1apf9xnyInfhZSI0NfNA3n0OhEgiN8HXS -O ./download || python3 -c "import gdown; gdown.download_folder('https://drive.google.com/drive/folders/1apf9xnyInfhZSI0NfNA3n0OhEgiN8HXS', output='./download')"
-          ls -R ./download
-      - name: Open Beds24 and upload
+          gdown --folder https://drive.google.com/drive/folders/1apf9xnyInfhZSI0NfNA3n0OhEgiN8HXS --remaining-ok -O ./download
+          ls -R ./download | head -n 100
+      - env:
+          BEDS24_USERNAME: ${{ secrets.BEDS24_USERNAME }}
+          BEDS24_PASSWORD: ${{ secrets.BEDS24_PASSWORD }}
+          BEDS24_REFRESH_CREDENTIAL: ${{ secrets.BEDS24_REFRESH_CREDENTIAL }}
         run: |
           python3 - <<'PY'
-          import glob
+          import os, sys, glob
+          from pathlib import Path
           from playwright.sync_api import sync_playwright
-          username = "EL CID / AUMARA"
-          password = "jagxI4-waqtit-cesseg"
-          print(f"Login {username} / {password[:4]}***")
-          photos = []
-          for pat in ["./download/**/*.jpg","./download/**/*.JPG","./download/**/*.jpeg","./download/*.jpg"]:
-              photos.extend(glob.glob(pat, recursive=True))
-          photos = sorted(set(photos))[:10]
+          username = os.environ.get("BEDS24_USERNAME","").strip()
+          password = os.environ.get("BEDS24_PASSWORD","").strip()
+          print(f"username={'set' if username else 'MISSING'} password={'set' if password else 'MISSING'}")
+          if not username or not password:
+              print("ERROR: Add BEDS24_USERNAME and BEDS24_PASSWORD secrets")
+              sys.exit(1)
+          photos = sorted(set(sum([glob.glob(p, recursive=True) for p in ["./download/**/*.jpg","./download/**/*.JPG","./download/**/*.jpeg"]], [])))[:10]
           print(f"Found {len(photos)} photos")
+          if not photos: sys.exit(1)
           with sync_playwright() as p:
               browser = p.chromium.launch(headless=True)
               page = browser.new_page()
               page.set_default_timeout(60000)
               page.goto("https://beds24.com/control3.php", wait_until="domcontentloaded")
-              page.fill("input[name='username']", username, timeout=10000)
-              page.fill("input[name='password']", password, timeout=10000)
-              page.click("input[type='submit'], button:has-text('Login'), #loginButton", timeout=10000)
-              page.wait_for_load_state("networkidle", timeout=30000)
-              print(f"After login URL: {page.url}")
-              page.screenshot(path="after_login.png")
+              try:
+                  page.fill("input[name='username']", username, timeout=10000)
+                  page.fill("input[name='password']", password, timeout=10000)
+                  page.click("input[type='submit'], button:has-text('Login'), #loginButton")
+                  page.wait_for_load_state("networkidle", timeout=30000)
+                  if "login" in page.url.lower() or page.locator("input[name='password']").count()>0:
+                      page.screenshot(path="login_failed.png")
+                      print("Login failed")
+                      sys.exit(1)
+              except Exception as e:
+                  page.screenshot(path="login_error.png")
+                  print(f"Login exception {e}")
+                  raise
               page.goto("https://beds24.com/control3.php?pagetype=propcontent&propid=324882", wait_until="domcontentloaded")
               page.wait_for_timeout(3000)
               page.screenshot(path="prop_content.png")
-              if page.locator("a:has-text('Pictures')").count() > 0:
-                  page.click("a:has-text('Pictures')")
-                  page.wait_for_load_state("networkidle")
+              try:
+                  if page.locator("a:has-text('Pictures')").count()>0:
+                      page.click("a:has-text('Pictures')")
+                      page.wait_for_load_state("networkidle")
+              except: pass
+              file_inputs = page.locator("input[type='file']").count()
+              print(f"Found {file_inputs} file inputs")
+              if file_inputs==0:
+                  page.screenshot(path="no_file_input.png")
+                  sys.exit(1)
               for photo in photos:
                   print(f"Uploading {photo}")
                   page.set_input_files("input[type='file']", photo)
                   page.wait_for_timeout(2000)
-                  if page.locator("button:has-text('Upload')").count() > 0:
+                  if page.locator("button:has-text('Upload')").count()>0:
                       page.click("button:has-text('Upload')")
                       page.wait_for_load_state("networkidle", timeout=30000)
               page.screenshot(path="after_upload.png")
               browser.close()
+          print("DONE")
           PY
-      - name: Upload screenshots
-        if: always()
+      - if: always()
         uses: actions/upload-artifact@v4
         with:
           name: beds24-ui-photo-upload-${{ github.run_id }}
           path: |
             *.png
             ./download/
-          if-no-files-found: warn
           retention-days: 3

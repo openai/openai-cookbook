@@ -9,6 +9,15 @@ on:
       - "aumara-control-tower/scripts/guest_request_dry_run.py"
       - "aumara-control-tower/tests/test_guest_request_dry_run.py"
       - "aumara-control-tower/fixtures/guest-request-dry-run.json"
+      - "aumara-control-tower/scripts/guest_service_journey.py"
+      - "aumara-control-tower/tests/test_guest_service_journey.py"
+      - "aumara-control-tower/fixtures/guest-service-journey.json"
+      - "aumara-control-tower/policies/guest_journey_runtime.json"
+      - "aumara-control-tower/policies/registry.yaml"
+      - "aumara-control-tower/policies/shared.yaml"
+      - "aumara-control-tower/policies/aumara.yaml"
+      - "aumara-control-tower/policies/elcid.yaml"
+      - "aumara-control-tower/policies/schema.json"
 
 permissions:
   contents: read
@@ -24,9 +33,15 @@ jobs:
       AUMARA_DRY_RUN: "true"
       AUMARA_DISABLE_EMAIL_SEND: "true"
       AUMARA_DISABLE_BOOKING_MUTATIONS: "true"
+      AUMARA_GUEST_JOURNEY_MODE: "proposal"
+      AUMARA_DISABLE_GUEST_SEND: "true"
 
     steps:
       - uses: actions/checkout@v4
+
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
 
       - name: Run unit tests
         run: |
@@ -34,6 +49,12 @@ jobs:
             -s aumara-control-tower/tests \
             -p "test_guest_request_dry_run.py" \
             -v
+          python -m unittest \
+            aumara-control-tower/tests/test_policy_registry_schema.py \
+            aumara-control-tower/tests/test_guest_reply_policy_runtime.py \
+            aumara-control-tower/tests/test_guest_service_journey.py \
+            -v
+          python aumara-control-tower/scripts/validate_policy_registry.py
 
       - name: Build dry-run proposals
         run: |
@@ -42,6 +63,9 @@ jobs:
             --input aumara-control-tower/fixtures/guest-request-dry-run.json \
             --output /tmp/aumara-guest-request-dry-run/report.json \
             --csv /tmp/aumara-guest-request-dry-run/audit.csv
+          python aumara-control-tower/scripts/guest_service_journey.py \
+            --input aumara-control-tower/fixtures/guest-service-journey.json \
+            --output /tmp/aumara-guest-request-dry-run/journey-report.json
 
       - name: Verify zero external actions
         run: |
@@ -62,6 +86,23 @@ jobs:
               event["email_send_requested"] is False
               and event["booking_mutation_requested"] is False
               for event in report["events"]
+          )
+          journey = json.loads(
+              pathlib.Path(
+                  "/tmp/aumara-guest-request-dry-run/journey-report.json"
+              ).read_text(encoding="utf-8")
+          )
+          assert journey["mode"] == "proposal_only"
+          assert journey["guest_messages_sent"] == 0
+          assert journey["booking_mutations"] == 0
+          assert journey["external_network_calls"] == 0
+          assert journey["durable_claims_written"] == 0
+          assert all(
+              item["email_send_requested"] is False
+              and item["beds24_send_requested"] is False
+              and item["whatsapp_send_requested"] is False
+              and item["booking_mutation_requested"] is False
+              for item in journey["decisions"]
           )
           PY
 

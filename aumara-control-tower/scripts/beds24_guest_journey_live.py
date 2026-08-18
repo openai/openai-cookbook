@@ -572,11 +572,11 @@ def _validate_required_env() -> None:
 
 
 def main() -> int:
-    _validate_required_env()
     parser = argparse.ArgumentParser(description=__doc__)
     parser.add_argument("--property", required=True, type=int)
     parser.add_argument("--output", type=pathlib.Path)
     args = parser.parse_args()
+    _validate_required_env()
     summary = run_aumara_canary(args.property)
     if args.output:
         args.output.parent.mkdir(parents=True, exist_ok=True)

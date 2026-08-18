@@ -33,6 +33,7 @@ jobs:
       AWS_SECRET_ACCESS_KEY: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
       AWS_REGION: ${{ secrets.AWS_REGION }}
       DYNAMODB_TABLE: ${{ secrets.DYNAMODB_TABLE }}
+      AUMARA_CANARY_PROPERTY_ID: "324882"
     steps:
       - uses: actions/checkout@v4
       - name: Setup Python
@@ -48,8 +49,10 @@ jobs:
           fi
           echo "All checks passed!"
       - name: Install dependencies
+        working-directory: aumara-control-tower
         run: |
-          pip install -r requirements.txt || pip install boto3 requests
+          pip install -r requirements.txt 2>/dev/null || pip install boto3 requests
       - name: Run live canary
+        working-directory: aumara-control-tower
         run: |
-          python -m aumara.guest_journey.canary --mode live || python scripts/guest_journey_canary.py --live
+          python scripts/beds24_guest_journey_live.py --property "$AUMARA_CANARY_PROPERTY_ID"

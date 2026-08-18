@@ -14,7 +14,7 @@ if 200 <= setup_status < 300 and isinstance(setup_body, dict):
     refresh_candidate = setup_body.get("refreshToken")
     if isinstance(candidate, str) and candidate:
         access_token = candidate
-        evidence["auth_mode"] = "setup_code"
+        evidence["auth_mode"] = "curl -X GET 'https://beds24.com/api/v2/authentication/setup' -H 'code:Vh8xW4l3faWCtu6Lw0QeW7YLJpk6ibQXYTmCmbz36sU5iwHqmFXX9V/w1Vuk4otXtaZqV4b7/ywiukuzafNY4oLTGFOPCJHFzok42j30rbmYMJ+QTz8zzBHdClE/LzOSpGNSZAEjRRpYi3UDmtozQDjpv6qjsGMkSYK0rFNoRsk="
         evidence["token_exchange_http_status"] = setup_status
         if isinstance(refresh_candidate, str) and refresh_candidate:
             evidence["received_refresh_token"] = True

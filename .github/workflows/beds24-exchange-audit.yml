@@ -13,7 +13,7 @@ permissions:
 
 concurrency:
   group: beds24-exchange-audit-cleanup
-  cancel-in-progress: false
+  cancel-in-progress: true
 
 jobs:
   verify-and-clean:
@@ -48,15 +48,13 @@ jobs:
           api = os.environ.get("GITHUB_API_URL", "https://api.github.com")
           token = os.environ["GITHUB_TOKEN"]
           target_sha = os.environ["TARGET_SHA"]
-          out_dir = pathlib.Path("aumara-control-tower/evidence/beds24-exchange")
-          out_dir.mkdir(parents=True, exist_ok=True)
-          evidence_path = out_dir / "latest.json"
+          evidence_path = pathlib.Path(os.environ["RUNNER_TEMP"]) / "beds24-exchange-evidence.json"
 
           headers = {
               "Accept": "application/vnd.github+json",
               "Authorization": f"Bearer {token}",
               "X-GitHub-Api-Version": "2022-11-28",
-              "User-Agent": "AUMARA-Beds24-Exchange-Audit/1.0",
+              "User-Agent": "AUMARA-Beds24-Exchange-Audit/2.0",
           }
 
           def request_json(url: str) -> dict:
@@ -78,7 +76,7 @@ jobs:
                   f"{api}/repos/{repo}/actions/workflows/{workflow}/runs"
                   "?event=push&branch=main&per_page=50"
               )
-              for _ in range(48):
+              for _ in range(36):
                   payload = request_json(runs_url)
                   candidates = [
                       item for item in payload.get("workflow_runs", [])
@@ -133,8 +131,10 @@ jobs:
               with urllib.request.urlopen(download, timeout=60) as response:
                   archive = response.read()
               with zipfile.ZipFile(io.BytesIO(archive)) as bundle:
-                  names = bundle.namelist()
-                  expected = [name for name in names if pathlib.PurePosixPath(name).name == "beds24-refresh-token.txt"]
+                  expected = [
+                      name for name in bundle.namelist()
+                      if pathlib.PurePosixPath(name).name == "beds24-refresh-token.txt"
+                  ]
                   if len(expected) != 1:
                       raise RuntimeError("Artifact does not contain exactly one beds24-refresh-token.txt")
                   raw = bundle.read(expected[0])
@@ -175,17 +175,42 @@ jobs:
                       handle.write(f"run_id={evidence['run_id']}\n")
           PY
 
-      - name: Restore manual-only exchange workflow, commit evidence, and self-delete
+      - name: Restore exact UI workflow, restore manual-only exchange, commit evidence, and self-delete
         if: always()
         shell: bash
         run: |
-          git show "${ORIGINAL_PARENT_SHA}:.github/workflows/exchange-beds24-invite.yml" > .github/workflows/exchange-beds24-invite.yml
-          git rm .github/workflows/beds24-exchange-audit.yml
-          git add .github/workflows/exchange-beds24-invite.yml aumara-control-tower/evidence/beds24-exchange/latest.json
-          git config user.name "github-actions[bot]"
-          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
-          git commit -m "chore: verify Beds24 exchange artifact and restore manual-only trigger"
-          git push origin HEAD:main
+          set -euo pipefail
+          EVIDENCE="${RUNNER_TEMP}/beds24-exchange-evidence.json"
+          test -s "$EVIDENCE"
+
+          for attempt in 1 2 3; do
+            git fetch origin main
+            git reset --hard origin/main
+
+            git show "${TARGET_SHA}:.github/workflows/beds24-ui-photo-upload.yml" > .github/workflows/beds24-ui-photo-upload.yml
+            git show "${ORIGINAL_PARENT_SHA}:.github/workflows/exchange-beds24-invite.yml" > .github/workflows/exchange-beds24-invite.yml
+            git rm -f --ignore-unmatch .github/workflows/beds24-exchange-audit.yml
+
+            mkdir -p aumara-control-tower/evidence/beds24-exchange
+            cp "$EVIDENCE" aumara-control-tower/evidence/beds24-exchange/latest.json
+
+            git add .github/workflows/beds24-ui-photo-upload.yml \
+                    .github/workflows/exchange-beds24-invite.yml \
+                    aumara-control-tower/evidence/beds24-exchange/latest.json
+            git config user.name "github-actions[bot]"
+            git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+
+            if git diff --cached --quiet; then
+              exit 0
+            fi
+
+            git commit -m "chore: verify Beds24 exchange artifact and restore exact manual workflows"
+            if git push origin HEAD:main; then
+              exit 0
+            fi
+          done
+
+          exit 1
 
       - name: Fail audit if verification did not pass
         if: steps.audit.outputs.verified != 'true'

@@ -1,0 +1,52 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<svg xmlns="http://www.w3.org/2000/svg" width="1920" height="1080" viewBox="0 0 1920 1080" role="img" aria-labelledby="diagram-title diagram-description">
+<title id="diagram-title">Per-run Responses API spending control</title>
+<desc id="diagram-description">Count input tokens, check and reserve the maximum cost atomically, call the model only when the budget allows, and record the actual cost; stop without a model request when the reservation does not fit.</desc>
+<rect width="1920" height="1080" fill="#f8f9f5"/>
+<path d="M 484.0000237358941,370.0000127156576L 530.9999932183159,370.0000127156576" fill="none" stroke="#000944" stroke-width="3.5" stroke-linecap="round" stroke-linejoin="round"/>
+<polygon points="531,370 513,378 513,362" fill="#000944"/>
+<path d="M 934.000023735894,370.0000127156576L 980.9999932183159,370.0000127156576" fill="none" stroke="#002e03" stroke-width="3.5" stroke-linecap="round" stroke-linejoin="round"/>
+<polygon points="981,370 963,378 963,362" fill="#002e03"/>
+<path d="M 1384.000023735894,370.0000127156576L 1430.999993218316,370.0000127156576" fill="none" stroke="#002e03" stroke-width="3.5" stroke-linecap="round" stroke-linejoin="round"/>
+<polygon points="1431,370 1413,378 1413,362" fill="#002e03"/>
+<path d="M 732.5000508626302,499.00001102023657L 732.5000678168403,670.9999932183159" fill="none" stroke="#6b241d" stroke-width="3.5" stroke-linecap="round" stroke-linejoin="round"/>
+<polygon points="732.5,671 724.5,653 740.5,653" fill="#6b241d"/>
+<g aria-label="Count input tokens">
+<title>Count input tokens</title>
+<rect x="85" y="245" width="395" height="250" rx="8" fill="#b7d4fe" stroke="#000944" stroke-width="2.5"/>
+<rect x="96" y="247" width="10" height="246" fill="#80b6fd" stroke="#000944" stroke-width="1"/>
+<rect x="459" y="247" width="10" height="246" fill="#80b6fd" stroke="#000944" stroke-width="1"/>
+<text x="282.5" y="352" fill="#000944" font-family="OpenAI Sans, Helvetica Neue, Arial, sans-serif" font-size="48" font-weight="650" text-anchor="middle">Count input</text>
+<text x="282.5" y="414" fill="#000944" font-family="OpenAI Sans, Helvetica Neue, Arial, sans-serif" font-size="48" font-weight="650" text-anchor="middle">tokens</text>
+</g>
+<g aria-label="Check and reserve">
+<title>Check and reserve</title>
+<rect x="535" y="245" width="395" height="250" rx="8" fill="#b7d4fe" stroke="#000944" stroke-width="2.5"/>
+<rect x="546" y="247" width="10" height="246" fill="#80b6fd" stroke="#000944" stroke-width="1"/>
+<rect x="909" y="247" width="10" height="246" fill="#80b6fd" stroke="#000944" stroke-width="1"/>
+<text x="732.5" y="352" fill="#000944" font-family="OpenAI Sans, Helvetica Neue, Arial, sans-serif" font-size="48" font-weight="650" text-anchor="middle">Check and</text>
+<text x="732.5" y="414" fill="#000944" font-family="OpenAI Sans, Helvetica Neue, Arial, sans-serif" font-size="48" font-weight="650" text-anchor="middle">reserve</text>
+</g>
+<g aria-label="Call the model">
+<title>Call the model</title>
+<rect x="985" y="245" width="395" height="250" rx="8" fill="#cef4c6" stroke="#002e03" stroke-width="2.5"/>
+<rect x="996" y="247" width="10" height="246" fill="#85df7b" stroke="#002e03" stroke-width="1"/>
+<rect x="1359" y="247" width="10" height="246" fill="#85df7b" stroke="#002e03" stroke-width="1"/>
+<text x="1182.5" y="352" fill="#002e03" font-family="OpenAI Sans, Helvetica Neue, Arial, sans-serif" font-size="48" font-weight="650" text-anchor="middle">Call the</text>
+<text x="1182.5" y="414" fill="#002e03" font-family="OpenAI Sans, Helvetica Neue, Arial, sans-serif" font-size="48" font-weight="650" text-anchor="middle">model</text>
+</g>
+<g aria-label="Record actual cost">
+<title>Record actual cost</title>
+<rect x="1435" y="245" width="395" height="250" rx="8" fill="#cef4c6" stroke="#002e03" stroke-width="2.5"/>
+<rect x="1446" y="247" width="10" height="246" fill="#85df7b" stroke="#002e03" stroke-width="1"/>
+<rect x="1809" y="247" width="10" height="246" fill="#85df7b" stroke="#002e03" stroke-width="1"/>
+<text x="1632.5" y="352" fill="#002e03" font-family="OpenAI Sans, Helvetica Neue, Arial, sans-serif" font-size="48" font-weight="650" text-anchor="middle">Record actual</text>
+<text x="1632.5" y="414" fill="#002e03" font-family="OpenAI Sans, Helvetica Neue, Arial, sans-serif" font-size="48" font-weight="650" text-anchor="middle">cost</text>
+</g>
+<g aria-label="NO — STOP">
+<title>NO — STOP</title>
+<rect x="475" y="675" width="515" height="180" rx="90" fill="#f9e7e4" stroke="#6b241d" stroke-width="2.5"/>
+<text x="732.5" y="754" fill="#6b241d" font-family="OpenAI Sans, Helvetica Neue, Arial, sans-serif" font-size="52" font-weight="740" text-anchor="middle">NO — STOP</text>
+<text x="732.5" y="810" fill="#6b241d" font-family="OpenAI Sans, Helvetica Neue, Arial, sans-serif" font-size="38" font-weight="520" text-anchor="middle">No model request</text>
+</g>
+</svg>

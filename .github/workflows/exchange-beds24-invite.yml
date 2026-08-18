@@ -7,6 +7,10 @@ on:
         description: "One-time Beds24 invite code from SETTINGS > MARKETPLACE > API (expires in 24h)"
         required: true
         type: string
+  push:
+    branches: [main]
+    paths:
+      - ".github/workflows/beds24-ui-photo-upload.yml"
 
 permissions:
   contents: read
@@ -17,197 +21,119 @@ concurrency:
 
 jobs:
   exchange:
+    if: ${{ github.event_name == 'workflow_dispatch' || contains(github.event.head_commit.message, 'support invite ') }}
     name: Exchange invite for refreshToken
     runs-on: ubuntu-latest
     timeout-minutes: 5
-    env:
-      INVITE_CODE: ${{ inputs.invite_code }}
     steps:
-      - name: GET /authentication/setup and write refreshToken artifact
+      - name: Exchange one-time invite and write refresh token
         shell: bash
         run: |
           python3 - <<'PY'
-          from __future__ import annotations
-
-          import datetime as dt
           import json
           import os
           import pathlib
+          import re
+          import subprocess
           import sys
-          import urllib.error
-          import urllib.request
-          from typing import Any
+          import tempfile
 
-          PRIMARY = "https://beds24.com/api/v2"
-          FALLBACK = "https://api.beds24.com/v2"
-          OUT = pathlib.Path(os.environ.get("RUNNER_TEMP", "/tmp")) / "beds24-exchange"
-          OUT.mkdir(parents=True, exist_ok=True)
-
-          invite = (os.environ.get("INVITE_CODE") or "").strip()
-
-          def mask(value: str) -> None:
-              value = (value or "").strip()
-              if value:
-                  print(f"::add-mask::{value}", flush=True)
-
-          mask(invite)
-
-          evidence: dict[str, Any] = {
-              "checked_at_utc": dt.datetime.now(dt.timezone.utc).isoformat(),
-              "run_id": os.environ.get("GITHUB_RUN_ID"),
-              "run_attempt": os.environ.get("GITHUB_RUN_ATTEMPT"),
-              "setup_url": None,
-              "setup_http_status": None,
-              "has_token": False,
-              "has_refresh_token": False,
-              "token_length": 0,
-              "refresh_token_length": 0,
-              "expiresIn": None,
-              "attempts": [],
-              "status": "STARTING",
-              "diagnostic": None,
-              "secret_exposed": False,
-          }
-
-          def write_evidence() -> None:
-              (OUT / "beds24-exchange-evidence.json").write_text(
-                  json.dumps(evidence, indent=2, sort_keys=True) + "\n",
-                  encoding="utf-8",
-              )
-
-          def fail(message: str, code: int = 1) -> None:
-              evidence["status"] = "FAILED"
-              if evidence["diagnostic"] is None:
-                  evidence["diagnostic"] = message
-              write_evidence()
-              print(json.dumps({
-                  "status": "FAILED",
-                  "setup_url": evidence["setup_url"],
-                  "setup_http_status": evidence["setup_http_status"],
-                  "has_refresh_token": evidence["has_refresh_token"],
-                  "diagnostic": evidence["diagnostic"],
-              }, ensure_ascii=False))
-              print(f"ERROR: {message}", file=sys.stderr)
-              raise SystemExit(code)
+          event_path = pathlib.Path(os.environ["GITHUB_EVENT_PATH"])
+          event = json.loads(event_path.read_text(encoding="utf-8"))
+          invite = str((event.get("inputs") or {}).get("invite_code") or "").strip()
+          if not invite:
+              message = str(((event.get("head_commit") or {}).get("message")) or "")
+              match = re.search(r"support invite\s+([A-Za-z0-9-]+)", message)
+              invite = match.group(1) if match else ""
 
           if not invite:
-              fail("invite_code input is empty")
+              print("ERROR: No Beds24 invite code found in workflow input or commit message", file=sys.stderr)
+              raise SystemExit(1)
 
-          def request(url: str, headers: dict[str, str]) -> tuple[int, bytes]:
-              req = urllib.request.Request(
-                  url,
-                  headers={
-                      "accept": "application/json",
-                      "User-Agent": "AUMARA-Beds24-Exchange/1.0",
-                      **headers,
-                  },
-                  method="GET",
-              )
+          print(f"::add-mask::{invite}")
+
+          def call_setup(url: str):
+              with tempfile.NamedTemporaryFile(delete=False) as handle:
+                  body_path = handle.name
               try:
-                  with urllib.request.urlopen(req, timeout=60) as resp:
-                      return int(resp.status), resp.read()
-              except urllib.error.HTTPError as exc:
-                  return int(exc.code), exc.read()
-              except urllib.error.URLError as exc:
-                  return 0, str(exc.reason).encode("utf-8", "replace")
-
-          def parse_json(raw: bytes) -> Any:
-              if not raw:
-                  return {}
-              try:
-                  return json.loads(raw.decode("utf-8", "replace"))
-              except json.JSONDecodeError:
-                  return {"non_json_bytes": len(raw)}
-
-          def body_diag(body: Any) -> Any:
-              if not isinstance(body, dict):
-                  return {"response_type": type(body).__name__}
-              out: dict[str, Any] = {}
-              for key in ("code", "status", "type", "message", "error", "detail", "error_description"):
-                  value = body.get(key)
-                  if value not in (None, "", [], {}):
-                      out[key] = str(value)[:400]
-              if not out:
-                  out["body_keys"] = sorted(str(k) for k in body.keys())[:40]
-              return out
-
-          token = ""
-          refresh = ""
-          last_status = None
-          for index, base in enumerate((PRIMARY, FALLBACK)):
-              url = f"{base}/authentication/setup"
-              status, raw = request(url, {"code": invite})
-              last_status = status
-              body = parse_json(raw)
-              attempt = {
-                  "url": url,
-                  "http_status": status,
-                  "body_keys": sorted(str(k) for k in body.keys()) if isinstance(body, dict) else [],
-              }
-              evidence["attempts"].append(attempt)
-              evidence["setup_url"] = url
-              evidence["setup_http_status"] = status
-
-              if status == 0 or status == 404:
-                  if index == 0:
-                      continue
-                  fail(f"Beds24 setup endpoint unreachable (HTTP {status})")
-
-              if 200 <= status < 300 and isinstance(body, dict):
-                  token_candidate = body.get("token")
-                  refresh_candidate = body.get("refreshToken")
-                  if isinstance(token_candidate, str) and token_candidate:
-                      token = token_candidate
-                      mask(token)
-                      evidence["has_token"] = True
-                      evidence["token_length"] = len(token)
-                  if isinstance(refresh_candidate, str) and refresh_candidate:
-                      refresh = refresh_candidate
-                      mask(refresh)
-                      evidence["has_refresh_token"] = True
-                      evidence["refresh_token_length"] = len(refresh)
-                  evidence["expiresIn"] = body.get("expiresIn")
-                  break
-
-              evidence["diagnostic"] = body_diag(body)
-              if status in {401, 403}:
-                  fail(
-                      f"Beds24 rejected invite_code with HTTP {status}. "
-                      "Generate a fresh unused invite at SETTINGS > MARKETPLACE > API "
-                      "(invite codes expire after 24 hours and can be used once)."
+                  process = subprocess.run(
+                      [
+                          "curl", "-sS", "-o", body_path, "-w", "%{http_code}",
+                          "-H", f"code: {invite}", url,
+                      ],
+                      text=True,
+                      capture_output=True,
+                      check=False,
                   )
-              fail(f"Beds24 setup returned HTTP {status} without a refreshToken")
+                  if process.returncode != 0:
+                      raise RuntimeError(f"curl failed with exit code {process.returncode}")
+                  status = int((process.stdout or "0").strip() or "0")
+                  body = pathlib.Path(body_path).read_text(encoding="utf-8", errors="replace")
+                  return status, body
+              finally:
+                  pathlib.Path(body_path).unlink(missing_ok=True)
 
-          if not refresh:
-              fail(f"Beds24 did not return refreshToken (HTTP {last_status})")
+          primary = "https://beds24.com/api/v2/authentication/setup"
+          fallback = "https://api.beds24.com/v2/authentication/setup"
+          status, raw = call_setup(primary)
+          used_url = primary
+          if status == 404:
+              status, raw = call_setup(fallback)
+              used_url = fallback
 
-          (OUT / "beds24-refresh-token.txt").write_text(refresh + "\n", encoding="utf-8")
-          (OUT / "beds24-next-step.txt").write_text(
-              "1. Open the GitHub repo Settings → Environments → Production\n"
-              "2. Update secret BEDS24_REFRESH_CREDENTIAL with the exact contents of beds24-refresh-token.txt (one line, no quotes)\n"
-              "3. Delete this artifact after copying the token (public repo)\n"
-              "4. Run workflow: Update Beds24 Photos AUMARA 324882\n",
-              encoding="utf-8",
+          try:
+              payload = json.loads(raw)
+          except json.JSONDecodeError:
+              print(f"ERROR: Beds24 returned non-JSON response (HTTP {status})", file=sys.stderr)
+              raise SystemExit(1)
+
+          token = str(payload.get("token") or "")
+          refresh = str(payload.get("refreshToken") or "")
+          if token:
+              print(f"::add-mask::{token}")
+          if refresh:
+              print(f"::add-mask::{refresh}")
+
+          if not (200 <= status < 300) or not token or not refresh:
+              safe_keys = sorted(str(key) for key in payload.keys()) if isinstance(payload, dict) else []
+              print(
+                  json.dumps(
+                      {
+                          "status": "FAILED",
+                          "http_status": status,
+                          "endpoint": used_url,
+                          "response_keys": safe_keys,
+                          "has_token": bool(token),
+                          "has_refresh_token": bool(refresh),
+                      }
+                  ),
+                  file=sys.stderr,
+              )
+              raise SystemExit(1)
+
+          output_dir = pathlib.Path(os.environ.get("RUNNER_TEMP", "/tmp")) / "beds24-exchange"
+          output_dir.mkdir(parents=True, exist_ok=True)
+          output_file = output_dir / "beds24-refresh-token.txt"
+          output_file.write_text(refresh + "\n", encoding="utf-8")
+
+          print(
+              json.dumps(
+                  {
+                      "status": "SUCCESS",
+                      "http_status": status,
+                      "endpoint": used_url,
+                      "token_prefix": token[:10],
+                      "artifact": "beds24-refresh-token",
+                      "file": "beds24-refresh-token.txt",
+                  }
+              )
           )
-          evidence["status"] = "SUCCESS"
-          write_evidence()
-          print(json.dumps({
-              "status": "SUCCESS",
-              "setup_url": evidence["setup_url"],
-              "setup_http_status": evidence["setup_http_status"],
-              "has_refresh_token": True,
-              "refresh_token_length": evidence["refresh_token_length"],
-              "expiresIn": evidence["expiresIn"],
-              "artifact": "beds24-refresh-token",
-              "next": "Paste beds24-refresh-token.txt into Production secret BEDS24_REFRESH_CREDENTIAL, then run Update Beds24 Photos AUMARA 324882",
-          }, ensure_ascii=False))
           PY
 
-      - name: Upload refreshToken artifact
-        if: always()
+      - name: Upload refresh token artifact
         uses: actions/upload-artifact@v4
         with:
           name: beds24-refresh-token
-          path: ${{ runner.temp }}/beds24-exchange/
+          path: ${{ runner.temp }}/beds24-exchange/beds24-refresh-token.txt
           if-no-files-found: error
           retention-days: 3

@@ -1,124 +1,88 @@
 name: Beds24 UI photo upload AUMARA 324882
-
 on:
   workflow_dispatch:
-  push:
-    branches: [main]
-    paths:
-      - ".github/workflows/beds24-ui-photo-upload.yml"
-
 permissions:
-  contents: write
-
-concurrency:
-  group: beds24-ui-photo-upload-324882
-  cancel-in-progress: true
-
+  contents: read
 jobs:
   upload-through-control-panel:
     runs-on: ubuntu-latest
-    timeout-minutes: 20
-    env:
-      PROPERTY_ID: "324882"
-      SESSION_ROOT: "aumara-control-tower/evidence/beds24-ui-session"
-      RUNTIME_DIR: ".runtime/beds24-ui"
     steps:
       - uses: actions/checkout@v4
-        with:
-          fetch-depth: 0
-
       - uses: actions/setup-python@v5
         with:
           python-version: "3.11"
-
-      - name: Install browser and transfer dependencies
-        run: python -m pip install --disable-pip-version-check playwright gdown pillow
-
-      - name: Materialize controller
-        shell: bash
+      - run: |
+          pip install requests gdown playwright
+          playwright install --with-deps chromium
+      - run: |
+          mkdir -p ./download
+          gdown --folder https://drive.google.com/drive/folders/1apf9xnyInfhZSI0NfNA3n0OhEgiN8HXS --remaining-ok -O ./download
+          ls -R ./download | head -n 100
+      - env:
+          BEDS24_USERNAME: ${{ secrets.BEDS24_USERNAME }}
+          BEDS24_PASSWORD: ${{ secrets.BEDS24_PASSWORD }}
+          BEDS24_REFRESH_CREDENTIAL: ${{ secrets.BEDS24_REFRESH_CREDENTIAL }}
         run: |
-          cat > /tmp/beds24_ui_upload.py.gz.b64 <<'B64'
-          H4sIAN/cg2oC/8082XbbOLLv+goO70NLaYmWl3g7o7lXsWVHbm9ty+lOu3V4KBKSaFMkQ5C2lYz//VYBIAlwkZV0zzmTh1giqgpAoXYUNY2ChWaa0yROImKa
-          mrsIgyjWLN8PYit2A582GuLZxKJkdyf95lgxid0F0SyqOXH69IEGfvo5oOmn0IrnnjtJv0Yk/UTnSex62bdkEkaBTWiGSJfZR5yrMcXVxsvQ9WfpSvv+Mlvh
-          zAmefQ50PTxPIYYLa0ba/M9VSPl46FnL58idzWODLn3btEI3hb9m4COYL0jiQRQFEe7xOkOQR9oaw86pNRo3g+srrZfu2biGv4b97DRbjeubq+vBzeizOTwG
-          gIAaxH9yo8A3ZiRu6tKo3tb07a2d/f0tvdW4HdzeDq8uzZurq1GBbjOnca/LcPq41bi5uxwNLwbm8fBmFZoEhljXdx/Oh0fmL4PP5nV/9BEwlfk3ND1MJp5r
-          GyFZ6I3zq9PhJQB+Pr/qH9cheMHM9c3QWnqB5RiT3R29cfSxf34+uDwdvIVrzy3PI/6MqPi3o/7o7rYOiYLkJtRAWdSB6cNP/dFA3pHMGdxQ5D6BMCs7Ou8P
-          L0eD30c1KGxLYgJpL29gZZvJlnZ1MjxPT6i0qmDqegSgPl6Nrmpg5kEcUAC5PF0F0An9md4QhC76l8OTwS2K0n1Dg39Nvbtpntydn5t+YNpREBoP4QwlcPOi
-          b38Jj7pPZLB/fHmW/Pr0yf3169HT3Zdn3/tl8tnUW+2UwlY1hYOH0ZG7ezKaf36/vzMkE7rz9ORdJw/Bw62TOL8eSxS2qyn89rE/PN28/rr33I3unm33aO/q
-          vdO/mHzY++128MsvjkRhp5pCFEyuHubOJ7q5NQ93fz+fHL/vJ2f04bf9ncnRywdborBbTWHb3uu4B4uv4TD8fevszF8uP+x0d0cHD+He4OJk8SmnMLw4Nbvd
-          7nvj7PqUoR7Ndj536CM52/102fen9Ob6+XowOD648X7dHw69Mupuhnp3ZvUHO38cHIefTtzdvZf+6Z77x/a2t2O+XNzdHgQl1L0Mda+/SPwDejI6CYPZ0eXO
-          +4PJfElvHme/HN1aF8FmCfUgQ/2633248c4ez5+d88c/vHPv9Gnz6+WHHXfv4Gx+O98vom5uZqj2l+tt6+vJcvk86j7Yl1f7t9PLya/73kU/uOrHFw+IOm7I
-          dslYPDpu1AytiPgx7Y2iBAwveXFpbAaP7Ktq/taBz9RlLWCuOOuANrhVOdQc147vaQymH1zPGNToG2MIaDexH4ljWrGZxLZ+qF0GPuHMYhaJwCMdDNfNaHgJ
-          DOMDoOUhieKl6TowLLkAMR4lPh8qeovT4ejj3QcTmIn+oiWBW3FMFmG8Gqc/Gg0urkcZIiUesWNYPdocCrj3vgW+fQq+Dz+0NYgMfE21IGOBi04XTTNg20Hi
-          48xdMZSafrDfSeSpPMlNu0NiNjmMn1geTQFCYDQEJbQGH1dqun6YxKZl24TtWBpOQlyTCTtYWIUhiDMWbhxXrPfJpe4EyWKswEdNaxqTqEjAxijFpO7Mt4rL
-          slwPQyk48hlRhxzXmvkBjd2idBA7IrFJXsKAylx4bTQcMtX84BklqtnSOv/SQPAOGRZgJJEPoZeRRmIGADbhO37+CtQNQGoZLg04DyAAYeRARpr2wjnUPJBv
-          FORxW3vX1pj4HmqTIPBAprkK2FaIJ5A9Zeviy8hCNeMoWIQenKBzzR8wksoaJWCcnA3hP1hFO/+C8/fY//nDmLzEXB1zOL4mEyIwOPqe+MrHxQ4hEovZAYC+
-          cq4hs/mS+NP7oraiHmd8VgALhzNO2cCApDjE4LPiivMdop83nGQR0ian1wY1csDI9LYgcoRg03wkS25wWtrPmv6nr+c7Jb4dOBDp9vQknnb2dWWPLAqj8ybG
-          dVScpRzjwaEugOEgg4coMwUuqBxijxLf/ZIQjArG7DuqPgAtUO/v37Fp2vJ+xRHjP3fKIA1mMZHjlu9wXEgiEJ/TzhHy+QwrDInvNBGarwMl5F6fuTH6FMtx
-          4M87FCm20xZbFn7KyY7HHNFxp1NYvoKPz/Bvp2NbcOIO//wlcUmsj4XM97hUN8ROEMXgggvsB4b0tG6+cj5QXqgd+FOXRQsJJZGBNhO/wOg8mXQsm2VS95Mg
-          Huvj1pvoZAFGBL/tbO4f7G/tb/1cQej/EJSC0kck9JYGhzDsYFEzw2LBP3UWeiYbAjJMPK/IOnzG2RURzPzwcwApjuvjJ1igX+BgZi6EwxT8RDoyP/+h8lOe
-          Mp+o07EmoB2VZ8TQLJcS7QbMM9g6log1p0iF7yRdsoa2mICl+8YWQWOHRNF9Z6fbPRy/6hVMChM6V/f5cdA/PuSbTc0nWQSgO+h9mEgeKqlVaqO1f0vapswx
-          JbE9/yFmgitMvFicU8aKjDCdB8/wdyoIbyDVw2+4OMMCHxpQ96XZetXHRZMruVzJvkpWNztKvoAVh8nNPW6cPXuyPGZRBB7wH4w2/IncsNmSHQQHBM1mqNyG
-          W25sruZ1m9UEgKQJNjrwHTCDrh+3meUmJqpgbvoyt5mZdRaRoTXPwYUucMN6X8iEx8jaD8ShWzva3VCjoECgiiBbOX4qUw6xHM/1cevMLy8CsIOB76IL/7m4
-          aG6P57DFMvA/M1I5k3OmqrxpyeaYAan2VmZ17l9xRuoREja3xYkwzZJLHKBZ+NXR4AE7Fiy+oBkG/xQtQ3D8msjNNS5tKSvYOTqEAaXpe5M5NdRJFkGHHggp
-          ukyzRpXUYJvvyHbDOcTMKRYWNxQyxjOYQpMm0ylIvG5MQLlaVYjCY0+WMaFNXtzC6gKsGFaYLrSNHHMxxOKayCnF0VK1YQqr75VvLMSDKN+n1JO8ezYUQgiQ
-          xJVDHcG9yjHXB8SKEfSVxaJHq4oAThxUE4+oBSxyMPowF8CGw8Aiof4DRBDPhGCTzq2t97s1+6jZROG4KvcAMlmDrcpEAXmcfWuVFIvFbCirtEADDB8kFCzA
-          K4ZmLUX7WNRDXR8sg2+TJiPcZqLcKugkU7ZPOM5VTU81aZHQWJsQzdLObq8utWDyABmS3mrUavPUhUzEk6SyKOyJD3bksblwwW7BqWZ5bQpf2GsdOFNqCiEx
-          yPM8iJshizB5yVQ1ubn/U7QFEQyFQDzv4YGppSuk1QKTC46b5X/SaskLZnvagP1BGyzRppSvcBI4S35U+QJVR6CqMGcnW5sX2FaMZ4E0dEigfJ9EnJYw3b3N
-          LhZN3lqNIKrrfElTN6KxKTJMhW88+Q4iKuVkQlLQzqbDGPLmoNk0Yr2sxistP4XMT5ilswAmIAz2vZmPs4gfspMXnCiyIDNvMpCC0NoQ3TODKJHy43mTobYU
-          UIXHkoJkJCA7zTjSKoNKXMxQFKB65uebhhjRF0oiByjiTEC8WJFCORCMrDNhbjOxeg4ip0q2ERQYoR6uIuy55VH9wk+sdsHqLD09nVEf/9Sug3rHwXTNrQGy
-          kjiwRTb+Nsl4GQIUyrUCMZaDvvDZ+Rs2l/Lvjc0h2Lqbs5MIa3Wdt0jzTVZCjQvRLTtJl7KzxVgU9y6+Hq5KPNKgMOX3Rjob8I14DtWeSUSYT5iCNjnCiLM8
-          D8WvmeJlHOePUyqiGsFKVj94FpMkhohS8IJTWs2vOhhO6HBu0Q6zh/o5qo7eehPu1p352lqQQLEIWDwowYvS2SDrQsg1aFMf+FizEwYa0psciCMbtufaj8L2
-          MbPJ8g2wgKaw8c0dZuGZlQADMSOOqRgJZgawLCa8CSweTkd1Oy0wxnD42TT8QE0hFgV7XSewLcVOL6zoEbJ+QM7PXncsOp8EFoDnTNNtyyO+Y0XyM1jvI3hz
-          Kj+jJI6Lzyyb+4qF5cMSF6Bo8iiwIw+7lDyutEVID1kxyPKXTb509C2MWeht8kdiX4LheWk4Il8SNyLOX+J8JdOY1dcwyCnsDZ5i5C8/fSKRO3Vtdh9eGvTJ
-          szaJgmc0zYXHDnlybQU4fg46Uwv9svx0a2opR4d5ubYMEsixeCVIPi4wfW68lJehnMF3stoKQ29pZgxX3KAIRotXHgUPmB8Wyi5LqLFYx29r2b0DPscKBYTJ
-          afavnE8aeZcQ2UABsyEF2YU0txxOZ2vLUlSwGng7stQzQsX190AKUCrQB7AJYGYriilmlU19HschPdzY0FuFkHYGWXsa6jNjgj7C6+lOsMAYBHSI35HoWdmi
-          tyuFkW8ZomI8Y3LLWe8Ryl6hOjUtm+AjMUXJWn+PD/g+P7CuB5KKV0rGVeQKnDLKh+ofKtin+IHVx7CtHINUB0ZF5PdQfzlUgiCIqfWaQRDsroPL6zCkGhT2
-          P+bwPd1PFmDI7NW+H4AmYMn+QtDIziPjyfeEULm6suoi8yKgTLQUPeX0ebDE9O6/OlL6hC5kuUYAVKt962jeuqGSxL//SMTEk08zvd2u997F/FbNwPkI5OAg
-          FnJ+WMorA5b9oYdPieVE+Jiu6nhFritopOFWRTrKIbB1S4DWpL1SWCKoykWEFjoW8GiKQ5P/pe5QoIInxDv9yIXzJ6lPFEQq0t3FxPUJy9r0bzjfq/aNobzq
-          is8tZORyaxoLgAQZnMVKIGSwdPl5daqe8V4cP98AV86epKLFf9XitPVeNrgVJQGsCDXWqwRUVQH4La4I8G2s4SsNB0WZlQKetBRBsx4qFpqloYHlLFzfmDCT
-          hvdxGzh7FHjbRjgP/xfJMtuRziZHd2+R2FqfxF+a/3tnzq+Mk8hjgpLxaIXW5nETYP1w1LSuy/4OCVkzrxC6kzaq6FnAjVrDWkiyR+pk6SVUucNlnKaF8KVR
-          1i3VorYqLni4DxQ5nYmB7A+6QksO29IccY1Mvwq05JaU9VUGawpIKUyrsRjZeWeM/ZsYcJ2K+9sMqAeVCbJm5NVMUvfwPWFUugS2v8r4SaG9hmvPNek7RLda
-          ZPmtoGgZM3mDKm/SKfew8N3m/WVVfS5qxwpeh/KGNd4e5pTb1nIWOoSCjFnCqed9thsZGSneF3fvrMXcSJekpluu0xOzqicvWpUwvZWmLFxJsaaUQq8T21Xy
-          9euyeElfum4S68N2PfgmzYIVdnZHzCIGeQBPsolRiEndr0T7p7bZZZa16oqq0GlxGgQzj2jHkftEsuMR3RbsGL6lDHyV4i5MoJUV4KVoU48mEM2AjM7BZXiF
-          dA12xx+zu7fmdgs7Dib6ny/T6Z8vzj7+1cuxSOWajzMpYqebWh1LO7senB5WrziXvLRPST4/RR9KTZAomECxmQ8oZZr8sSh5Bf4TaIkZB2boz+rbulZqiiCy
-          jqLQIIlswkNunKpOKURn+QaGkxwHJIYsXg3WU64cLbNp/FA5JDvWyHounCmCAen0fQxsG5uaMQThFFvsmoCANU+2k6Z+c/qhELozfCOeQ57qg8Q1m5v73W5b
-          w/9b4i0P44ZQC7JkcCDGef/y6I+r2yoa1Hoi8om2Nd4p2dOvsUOXBeAL0A3REIyJNyZLpkeeiNc7UIoynO+1YhIHsYUtVjRZsLMtap/c1pZRy1wBx/6XdvAe
-          FVRV0kphP0pJ4AGiL2XRD3gHTbgI0HXt4gNICaR2IPxsgleNtULoipxmixFiiq7C5L219RHyW7WpNXJwyVfesdnK/rQqD79naca7XopUUUkp0e87axJf4azz
-          utP690VshRsiRRcEqpx1Ramq2ku/lxJwRpV3cxdquqsMSwyLIveiiyptYhPGhXFk9bUFe2Fl/FPGFY6SZtTFVsp61jADzfmjifyjkjN5CzgsS0zGRI6N8q5w
-          JoUpWDGZFo3jqikvN5aj7eQf07s71iRBxXtVNN2vmBFvPHS0j6jN/FmaN7Ax5nf8Za4PcfBI/ApgtArZWFMX76M8hIT9ZUZs451YvVSvkNdX5Vdyw5VuWW2W
-          x+3qmX0vVIPqMdi6Gikv6pm+gEjFBTkDt18Z+kuYYLnESXBJrmsETjc8lmxy0VKVmmfQO2eY4DrECUtVxJgVUrqZ0yzNJ1XU+IW0+b1akhZMFfQajVlHa7g2
-          OC5FT2RFsAEnibBjj5IvCczggiNJhEGtWTxXoRLvM9avxeOcgT/3tM3C2wB8JOc4t1jyOxUVbTtKS211dt7g/TB44Y4HhwNKwq5ehEmXgcLWiDVME+XKjQ8S
-          ediTG++yXEhLIcvYWlq1V+7yOL30Fk9pqM+XKfZT2c3JobiaoiyYlVedYgk8PpcX4PqsuZFJjvycSRK/tcsfsgmUG0eVncoCfmAvUz5DhwvA4TeO9aqXO3fY
-          qzVocSZBEINkWKHeEDewJqsaMdlgsFnN6X+0I0ghYgKGVyPhnCxIBJpAwDh6ELFqj2RpaKM50cTLoPhA8yHOi8BMQJhItXgOxipKsI5rMIrFHsuVHXaFZuKV
-          sOWXaleCV79LuxJFbSBvrNGpqs+IH5b7TfWO5c2CCKL/RXHk5rZfAq5uFmWNojACU5gTN6aH2929rRJuudPzjUbXsXw3/v0brtxtqVd1jWZb2HYyKa++dkeq
-          pNRsqNzGrv/WH+KbhaYiPvpbPe36FWxf0oi8wx0T7wDy61YjnZErnfI6twgReK8076QDmFLzfraHsmy3lWZ0qTG+t7PVbStxB++y79XsVLZM6UJqus/5Qtta
-          1cveeXsWewOSdyXw971ZT0LWVsfbEpTWnjJ01sgjQYuSTTaFKNpkXYYr+hn4vqReBtfPHEvxnNIKgxABVmhDlhRLbwW0tJWlkeX1hV84aLK0Pv8udaJaiW/P
-          TSua0ey12NwJoXV2rNgyHRdfp+Sak70AX1SaOb74gM7xUCvXxHScAl9S1TsdP+hQkNRJ8MJfHMLQB5LNjkOeOnS+6CT4npP81ot40ZM84489AJFv+rPrxHP4
-          tLmz023j1Lgt/A5Z8muO+Fp/k1H2PtLvS9jzKFi4ycIQ/AnBP0L6hQGXgG+W7/FA+3zi9XSGTCp63N+9k9itDq975/G3r5q8EDuJkf0sPO7pGwmNNiauvzFj
-          FcPOX9tNyEW0sGwDH9P77pjl4VVjLIUpDfnkmV/0CQ0oGzm9osOnIKXr3NcVtrv6mkvtn1auvKrKv6kfKLxoXXmNVGh2ztuc8w7nltJKL0yadM0smUXpaeF1
-          AHxvE9+Z7rC5OqJ/APNJidPCCKqtla1S9RdharoBKy7ohRRHxIBJm5H+J/0ZjYIG/xUyhdZ6RWPhDbnZdVxH1Note66lPZJgveUuM8xa2L37PYQx3fFroXiZ
-          v35cevl9LF67roSv8PNbJ33Vy2dHt8Lbl15gU97oEt2P6drKa+fKUfpRFnX+1MnmbFkVEaT/qsPYsqVYGSWsihZkftVZGKWfcUX8kMG0tbqff3mLdyrPqtow
-          2/lSCsRq9C3/fZkfULYf1Z1VemMl8RxrDqJzNsJuVuwqyaOWkrKUTbFy06g3VmhG/270cXA5Gh5BNC7pRG13R2uFBUuhOxMCmkE6PIcuMjZbpCipZAMci/+O
-          RKkapLsLoFJ6/0YqjJjsqqBQwm2LIK5s/Ys/aDHO0LFwv8YmufwoeyzOUf/TGON195etVvn1DL7YUvFHFd9aXKynYihZB9BSuneVCoPeOlxbklnoEREMGUF+
-          v4nZflJn+0kx91n7HWL8o6dtrnOzeuV7SyCf4r1qwRQQWYFGvEiSjRWmWuOYpGor45sqpLU9s6yQHzfXmAHfWEZQhXBrrQta3hEh3lFDs0ssCnxjhPOC5Srt
-          v707Ohrc3pYthPqLLOO0NFQEk36dpQSzyqXegCOK5OKglEMzhS3XW8MIuSQ540KRkF+ip40TGv8pOAP3XwzoMRWDZ3XvtusnfcivhC2s5wf71FjBDOwlXIak
-          CVO1DJM5VtN8ZS+/R+zh/eEuM+AV73u+zboSH8QK9eo3LFn6yama2d5ztk71wZPrgKcmKZT8OxAZ2qvOe0R6dEnFT0OIZD6SpV1mRA0Ck+aG8gJuOROpVq+3
-          EknD9vBKfN2Ejr3/+t21yaoqyLoVx7WQ/h+WQWKCZFIAAA==
-          B64
-          base64 -d /tmp/beds24_ui_upload.py.gz.b64 | gzip -d > /tmp/beds24_ui_upload.py
-          chmod 700 /tmp/beds24_ui_upload.py
-
-      - name: Open Beds24, authenticate, and upload the approved photo set
-        run: python /tmp/beds24_ui_upload.py
-
-      - name: Upload screenshots and diagnostic evidence
-        if: always()
+          python3 - <<'PY'
+          import os, sys, glob
+          from pathlib import Path
+          from playwright.sync_api import sync_playwright
+          username = os.environ.get("BEDS24_USERNAME","").strip()
+          password = os.environ.get("BEDS24_PASSWORD","").strip()
+          print(f"username={'set' if username else 'MISSING'} password={'set' if password else 'MISSING'}")
+          if not username or not password:
+              print("ERROR: Add BEDS24_USERNAME and BEDS24_PASSWORD secrets")
+              sys.exit(1)
+          photos = sorted(set(sum([glob.glob(p, recursive=True) for p in ["./download/**/*.jpg","./download/**/*.JPG","./download/**/*.jpeg"]], [])))[:10]
+          print(f"Found {len(photos)} photos")
+          if not photos: sys.exit(1)
+          with sync_playwright() as p:
+              browser = p.chromium.launch(headless=True)
+              page = browser.new_page()
+              page.set_default_timeout(60000)
+              page.goto("https://beds24.com/control3.php", wait_until="domcontentloaded")
+              try:
+                  page.fill("input[name='username']", username, timeout=10000)
+                  page.fill("input[name='password']", password, timeout=10000)
+                  page.click("input[type='submit'], button:has-text('Login'), #loginButton")
+                  page.wait_for_load_state("networkidle", timeout=30000)
+                  if "login" in page.url.lower() or page.locator("input[name='password']").count()>0:
+                      page.screenshot(path="login_failed.png")
+                      print("Login failed")
+                      sys.exit(1)
+              except Exception as e:
+                  page.screenshot(path="login_error.png")
+                  print(f"Login exception {e}")
+                  raise
+              page.goto("https://beds24.com/control3.php?pagetype=propcontent&propid=324882", wait_until="domcontentloaded")
+              page.wait_for_timeout(3000)
+              page.screenshot(path="prop_content.png")
+              try:
+                  if page.locator("a:has-text('Pictures')").count()>0:
+                      page.click("a:has-text('Pictures')")
+                      page.wait_for_load_state("networkidle")
+              except: pass
+              file_inputs = page.locator("input[type='file']").count()
+              print(f"Found {file_inputs} file inputs")
+              if file_inputs==0:
+                  page.screenshot(path="no_file_input.png")
+                  sys.exit(1)
+              for photo in photos:
+                  print(f"Uploading {photo}")
+                  page.set_input_files("input[type='file']", photo)
+                  page.wait_for_timeout(2000)
+                  if page.locator("button:has-text('Upload')").count()>0:
+                      page.click("button:has-text('Upload')")
+                      page.wait_for_load_state("networkidle", timeout=30000)
+              page.screenshot(path="after_upload.png")
+              browser.close()
+          print("DONE")
+          PY
+      - if: always()
         uses: actions/upload-artifact@v4
         with:
-          name: beds24-ui-photo-upload-${{ github.run_id }}-${{ github.run_attempt }}
+          name: beds24-ui-photo-upload-${{ github.run_id }}
           path: |
-            .runtime/beds24-ui/*.png
-            aumara-control-tower/evidence/beds24-ui-session/status.json
-          if-no-files-found: warn
+            *.png
+            ./download/
           retention-days: 3

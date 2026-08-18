@@ -1,9 +1,9 @@
 {
   "challenge_detected": false,
-  "checked_at_utc": "2026-08-18T05:57:04.097336+00:00",
-  "diagnostic": null,
+  "checked_at_utc": "2026-08-18T06:04:05.980156+00:00",
+  "diagnostic": "TimeoutError: Timed out waiting for encrypted payload login_payload.b64",
   "downloaded_count": 0,
-  "failure_stage": null,
+  "failure_stage": "login_payload",
   "file_input_accept": null,
   "login_page_url": null,
   "pictures_page_url": null,
@@ -23,7 +23,7 @@
     "IMG_0009.JPG",
     "IMG_0011.JPG"
   ],
-  "state": "WAITING_LOGIN_PAYLOAD",
+  "state": "FAILED",
   "submitted_count": 0,
   "success_signal": null,
   "upload_format": null,

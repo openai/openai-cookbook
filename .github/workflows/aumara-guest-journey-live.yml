@@ -33,7 +33,6 @@ jobs:
       AWS_SECRET_ACCESS_KEY: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
       AWS_REGION: ${{ secrets.AWS_REGION }}
       DYNAMODB_TABLE: ${{ secrets.DYNAMODB_TABLE }}
-      AUMARA_CANARY_PROPERTY_ID: "324882"
     steps:
       - uses: actions/checkout@v4
       - name: Setup Python
@@ -51,8 +50,25 @@ jobs:
       - name: Install dependencies
         working-directory: aumara-control-tower
         run: |
-          pip install -r requirements.txt 2>/dev/null || pip install boto3 requests
+          python -m pip install --upgrade pip
+          pip install -r requirements.txt
+      - name: Preflight env validation
+        working-directory: aumara-control-tower
+        run: |
+          python - <<'PY'
+          import os, sys
+          required = [
+            "BEDS24_REFRESH_TOKEN", "BEDS24_REFRESH_CREDENTIAL",
+            "AWS_ACCESS_KEY_ID", "AWS_SECRET_ACCESS_KEY",
+            "AWS_REGION", "DYNAMODB_TABLE",
+          ]
+          missing = [k for k in required if not os.environ.get(k, "").strip()]
+          if missing:
+              print("ERROR: missing required env vars: " + ", ".join(missing))
+              sys.exit(1)
+          print("Preflight OK")
+          PY
       - name: Run live canary
         working-directory: aumara-control-tower
         run: |
-          python scripts/beds24_guest_journey_live.py --property "$AUMARA_CANARY_PROPERTY_ID"
+          python scripts/beds24_guest_journey_live.py --property 324882

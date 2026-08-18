@@ -18,6 +18,18 @@
     - automation
     - documentation
 
+- title: Build a per-run spending controller with the Responses API
+  path: articles/per_run_spending_controller_responses_api.md
+  slug: per-run-spending-controller-responses-api
+  description: Enforce an application-owned model-token budget for each Responses API run using token counts, maximum-cost estimates, usage tracking, and safe error handling.
+  date: 2026-08-17
+  authors:
+    - alexey-openai
+  tags:
+    - responses
+    - agents
+    - cost-management
+
 - title: Migrate from Whisper to GPT-Transcribe and GPT-Live-Transcribe
   path: examples/migrating_from_whisper_to_gpt_transcribe.ipynb
   slug: migrating-from-whisper-to-gpt-transcribe
@@ -512,6 +524,7 @@
   path: examples/gpt-5/gpt-5_prompting_guide.ipynb
   slug: gpt-5-prompting-guide
   date: 2025-08-07
+  archived: true
   authors:
     - anoop-openai
     - julian-openai
@@ -526,6 +539,7 @@
   path: examples/gpt-5/gpt-5_frontend.ipynb
   slug: gpt-5-frontend
   date: 2025-08-07
+  archived: true
   authors:
     - WJPBProjects
     - anoop-openai
@@ -971,6 +985,7 @@
   path: examples/responses_api/responses_example.ipynb
   slug: responses-example
   date: 2025-03-11
+  archived: true
   authors:
     - billchen-openai
   tags:
@@ -3122,6 +3137,7 @@
   slug: file-search-responses
   description: Cookbook to search PDFs with the Responses API file search tool.
   date: 2025-03-11
+  archived: true
   authors:
     - pap-openai
   tags:
@@ -3205,6 +3221,7 @@
   slug: generate-images-with-gpt-image
   description: Cookbook to generate and edit images with GPT Image capabilities.
   date: 2025-04-23
+  archived: true
   authors:
     - katiagg
   tags:

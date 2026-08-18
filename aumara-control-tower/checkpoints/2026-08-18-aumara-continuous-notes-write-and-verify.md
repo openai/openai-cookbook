@@ -61,7 +61,7 @@ targeted validations pass.
 
 ## Recovery point
 
-Branch `codex/write-and-verify` from commit `90e538d0469ed20d5f0f9e3ac36a61c15b071649`.
+Branch `codex/write-and-verify`.
 Next safe action: review the workflow diff, then manually dispatch the workflow
 with `confirm_live_writes=YES` only when live Beds24 writes are intentionally
 authorized.

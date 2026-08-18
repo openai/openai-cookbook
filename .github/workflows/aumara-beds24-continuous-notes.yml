@@ -2,8 +2,12 @@ name: AUMARA Beds24 continuous guest notes
 
 on:
   workflow_dispatch:
-  schedule:
-    - cron: '17 * * * *'
+    inputs:
+      confirm_live_writes:
+        description: "Type YES to allow live booking writes"
+        required: false
+        default: "NO"
+        type: string
   pull_request:
     branches: [main]
     paths:
@@ -58,19 +62,61 @@ jobs:
             -v
 
   write-and-verify:
-    if: >-
-      github.event_name == 'schedule' ||
-      github.event_name == 'workflow_dispatch' ||
-      github.event_name == 'push'
+    if: github.event_name == 'workflow_dispatch'
     needs: test
     runs-on: ubuntu-latest
     timeout-minutes: 15
     env:
       BEDS24_REFRESH_TOKEN: ${{ secrets.BEDS24_REFRESH_CREDENTIAL }}
       AUMARA_DISABLE_BOOKING_MUTATIONS: 'false'
-      AUMARA_LIVE_BOOKING_WRITES_CONFIRMED: 'true'
+      AUMARA_LIVE_BOOKING_WRITES_CONFIRMED: ${{ github.event.inputs.confirm_live_writes == 'YES' && 'true' || 'false' }}
     steps:
       - uses: actions/checkout@v4
+      - name: Setup Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: '3.11'
+      - name: Require exact manual confirmation
+        env:
+          CONFIRM_LIVE_WRITES: ${{ github.event.inputs.confirm_live_writes || 'NO' }}
+        run: |
+          CLEAN="$(printf '%s' "$CONFIRM_LIVE_WRITES" | tr -d '\r' | xargs)"
+          echo "Received confirmation: [$CLEAN]"
+          test "$CLEAN" = "YES"
+      - name: Preflight Beds24 authentication
+        run: python aumara-control-tower/scripts/beds24_auth_check.py authenticate
+      - name: Preflight El Cid property access
+        run: |
+          python - <<'PY'
+          import os
+          import sys
+
+          sys.path.insert(0, os.path.join(os.getcwd(), "aumara-control-tower", "scripts"))
+
+          from beds24_elcid_studio_audit import PROPERTY_ID, AuditError, get_access_token, request_json
+
+          try:
+              token, _mode, api_base, _source, _bootstrap = get_access_token()
+          except AuditError as exc:
+              raise SystemExit(f"Beds24 auth preflight failed: {exc}") from exc
+
+          status, _response = request_json(
+              "GET",
+              f"/properties/{PROPERTY_ID}",
+              headers={"token": token},
+              api_base=api_base,
+          )
+          print(f"Property {PROPERTY_ID} access check: {status}")
+          if status == 401:
+              raise SystemExit(
+                  f"Property {PROPERTY_ID} access 401 - credential does not match the El Cid account"
+              )
+          if not 200 <= status < 300:
+              raise SystemExit(
+                  f"Property {PROPERTY_ID} access check failed with HTTP {status}"
+              )
+          print(f"Beds24 auth preflight OK for property {PROPERTY_ID}")
+          PY
 
       - name: Write and verify direct guest-request infoItems
         id: direct
@@ -118,6 +164,7 @@ jobs:
         with:
           name: aumara-beds24-continuous-note-evidence
           path: |
+            aumara-control-tower/evidence/beds24-auth-check.json
             aumara-control-tower/evidence/beds24-direct-guest-note-write.json
             aumara-control-tower/evidence/beds24-cot-note-write.json
             aumara-control-tower/evidence/beds24-bed-nonsmoking-write.json
@@ -131,6 +178,9 @@ jobs:
           COT_OUTCOME: ${{ steps.cot.outcome }}
           BED_OUTCOME: ${{ steps.bed.outcome }}
         run: |
+          echo "DIRECT_OUTCOME=$DIRECT_OUTCOME"
+          echo "COT_OUTCOME=$COT_OUTCOME"
+          echo "BED_OUTCOME=$BED_OUTCOME"
           test "$DIRECT_OUTCOME" = success
           test "$COT_OUTCOME" = success
           test "$BED_OUTCOME" = success

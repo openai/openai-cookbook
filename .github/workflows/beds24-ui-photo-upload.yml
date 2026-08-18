@@ -1,10 +1,6 @@
 name: Beds24 UI photo upload AUMARA 324882
 on:
   workflow_dispatch:
-  push:
-    branches: [main]
-    paths:
-      - ".github/workflows/beds24-ui-photo-upload.yml"
 permissions:
   contents: read
 jobs:

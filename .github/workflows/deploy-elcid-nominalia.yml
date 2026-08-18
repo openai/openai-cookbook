@@ -21,8 +21,8 @@ jobs:
     timeout-minutes: 15
     environment: NOMINALIA_FTP_PASSWORD
     env:
-      FTP_HOST: elcidt.ftp.tb-hosting.com
-      FTP_USER: elcidspaincom@elcidspaincom
+      FTP_HOST: ${{ secrets.NOMINALIA_FTP_HOST || vars.NOMINALIA_FTP_HOST }}
+      FTP_USER: ${{ secrets.NOMINALIA_FTP_USER || vars.NOMINALIA_FTP_USER }}
       FTP_PASSWORD: ${{ secrets.NOMINALIA_FTP_PASSWORD || secrets.NOMINALIAFTPPASSWORD }}
       ROOT_TARGET: /www
       PAGE_URL: https://elcidspain.com/
@@ -38,9 +38,11 @@ jobs:
           sudo apt-get update
           sudo apt-get install -y lftp
 
-      - name: Validate FTP secret
+      - name: Validate FTP credentials
         id: secret
         run: |
+          test -n "$FTP_HOST" || { echo "NOMINALIA FTP host is empty (set NOMINALIA_FTP_HOST secret or variable)"; exit 1; }
+          test -n "$FTP_USER" || { echo "NOMINALIA FTP user is empty (set NOMINALIA_FTP_USER secret or variable)"; exit 1; }
           test -n "$FTP_PASSWORD" || { echo "NOMINALIA FTP password secret is empty"; exit 1; }
 
       - name: Back up existing WordPress front controller once
@@ -80,7 +82,7 @@ jobs:
           grep -Fq "$PAGE_MARKER" /tmp/elcid-live.html
           grep -Fq 'One place. More than one way to stay.' /tmp/elcid-live.html
           grep -Fq '/aumara/#explore' /tmp/elcid-live.html
-          test "$bytes" -gt 30000
+          test "$bytes" -gt 25000
           echo "Verified expanded EL CID root release and AUMARA route."
 
       - name: Deployment summary

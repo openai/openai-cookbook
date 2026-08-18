@@ -1,0 +1,36 @@
+[
+  {
+    "method": "post",
+    "action_path": "/welcome.html",
+    "fields": [
+      {
+        "tag": "input",
+        "type": "text",
+        "name": "userName",
+        "value": null,
+        "text": ""
+      },
+      {
+        "tag": "input",
+        "type": "password",
+        "name": "password",
+        "value": null,
+        "text": ""
+      },
+      {
+        "tag": "button",
+        "type": "submit",
+        "name": null,
+        "value": null,
+        "text": "Entrar"
+      },
+      {
+        "tag": "input",
+        "type": "hidden",
+        "name": "logged",
+        "value": "[redacted]",
+        "text": ""
+      }
+    ]
+  }
+]

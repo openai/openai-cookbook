@@ -1,0 +1,475 @@
+name: Update Beds24 Photos AUMARA 324882
+
+on:
+  workflow_dispatch:
+    inputs:
+      delete_old:
+        description: "Delete old photos before upload? (unsupported; keep false)"
+        required: false
+        default: "false"
+        type: string
+  push:
+    branches: [main]
+    paths:
+      - ".github/workflows/update-beds24-photos.yml"
+
+permissions:
+  contents: write
+
+concurrency:
+  group: beds24-photos-324882
+  cancel-in-progress: true
+
+jobs:
+  update-photos:
+    runs-on: ubuntu-latest
+    timeout-minutes: 20
+    env:
+      BEDS24_REFRESH_CREDENTIAL: ${{ secrets.BEDS24_REFRESH_CREDENTIAL }}
+      PROP_ID: "324882"
+      DRIVE_FOLDER: "1apf9xnyInfhZSI0NfNA3n0OhEgiN8HXS"
+      DELETE_OLD: ${{ inputs.delete_old || 'false' }}
+      EVIDENCE_PATH: "aumara-control-tower/evidence/beds24-photo-upload-324882.json"
+
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Initialize sanitized execution evidence
+        shell: bash
+        run: |
+          mkdir -p "$(dirname "$EVIDENCE_PATH")"
+          python3 - <<'PY'
+          import datetime as dt
+          import json
+          import os
+          import pathlib
+
+          evidence = {
+              "checked_at_utc": dt.datetime.now(dt.timezone.utc).isoformat(),
+              "status": "RUNNING",
+              "property_id": os.environ.get("PROP_ID", "324882"),
+              "drive_folder": os.environ.get("DRIVE_FOLDER", ""),
+              "selected_file_count": 10,
+              "run_id": os.environ.get("GITHUB_RUN_ID"),
+              "run_attempt": os.environ.get("GITHUB_RUN_ATTEMPT"),
+              "failure_stage": None,
+              "diagnostic": None,
+              "secret_exposed": False,
+          }
+          path = pathlib.Path(os.environ["EVIDENCE_PATH"])
+          path.write_text(json.dumps(evidence, indent=2, sort_keys=True) + "\n", encoding="utf-8")
+          PY
+
+      - name: Execute verified Drive to Beds24 photo transfer
+        id: transfer
+        shell: bash
+        run: |
+          python3 - <<'PY'
+          from __future__ import annotations
+
+          import datetime as dt
+          import hashlib
+          import http.cookiejar
+          import json
+          import mimetypes
+          import os
+          import pathlib
+          import re
+          import sys
+          import urllib.error
+          import urllib.parse
+          import urllib.request
+          import uuid
+          from typing import Any
+
+          API_BASE = "https://api.beds24.com/v2"
+          PROPERTY_ID = os.environ.get("PROP_ID", "324882")
+          EVIDENCE_PATH = pathlib.Path(os.environ["EVIDENCE_PATH"])
+          DOWNLOAD_DIR = pathlib.Path("download/beds24-324882")
+          TIMEOUT = 60
+          MAX_IMAGE_BYTES = 15_000_000
+
+          PHOTO_MANIFEST = [
+              ("01_FULL_no_crop.jpg", "1MAcqpC0veE8DNJuQvViQzCvUqwnlKbY_"),
+              ("02_FULL_no_crop.jpg", "19jTCi6FThY584Iebs4vvlPujojSdudQD"),
+              ("03_FULL_no_crop.jpg", "1WHAIG1Pz7w0rUwciC7O5dAMbB7WSEKKd"),
+              ("04_FULL_no_crop.jpg", "1robOjhdVs12hp6XLbD5AuJsjW84bCxBc"),
+              ("06_FULL_no_crop.jpg", "13c7-i9mzpIpX2JJnyyB406T9jp7EMFmV"),
+              ("IMG_0005.JPG", "1Cg4Y-skeJ6VNAnfsRPwPEED9RlQ8IIlV"),
+              ("IMG_0006.JPG", "1UJaAE4Z9DpVFi67xAG7iZ33l4_xMUS9o"),
+              ("IMG_0007.JPG", "17Amun9sFTFpogCN459bhysRkgKCSaMo1"),
+              ("IMG_0009.JPG", "1z80jRlJkLwdLkZlLlGv1zNB4i79JhSh8"),
+              ("IMG_0011.JPG", "1cqP3azFyywT0jcNO8SfNbQ8lMAoOAtMj"),
+          ]
+
+          def now_utc() -> str:
+              return dt.datetime.now(dt.timezone.utc).isoformat()
+
+          def load_evidence() -> dict[str, Any]:
+              try:
+                  value = json.loads(EVIDENCE_PATH.read_text(encoding="utf-8"))
+              except (OSError, json.JSONDecodeError):
+                  value = {}
+              return value if isinstance(value, dict) else {}
+
+          evidence = load_evidence()
+          evidence.update(
+              {
+                  "selected_files": [name for name, _ in PHOTO_MANIFEST],
+                  "downloaded_files": [],
+                  "auth_mode": None,
+                  "auth_details_http_status": None,
+                  "token_exchange_http_status": None,
+                  "property_probe_http_status": None,
+                  "image_endpoint": None,
+                  "image_endpoint_get_http_status": None,
+                  "image_endpoint_options_http_status": None,
+                  "image_endpoint_allow": None,
+                  "uploads": [],
+                  "skipped_existing": [],
+              }
+          )
+
+          credential = (os.environ.get("BEDS24_REFRESH_CREDENTIAL") or "").strip()
+          access_token = ""
+
+          def redact(text: str) -> str:
+              value = text
+              for secret in (credential, access_token):
+                  if secret:
+                      value = value.replace(secret, "[REDACTED]")
+              return value[:600]
+
+          def save_evidence() -> None:
+              evidence["checked_at_utc"] = now_utc()
+              evidence["secret_exposed"] = False
+              EVIDENCE_PATH.parent.mkdir(parents=True, exist_ok=True)
+              EVIDENCE_PATH.write_text(
+                  json.dumps(evidence, indent=2, sort_keys=True) + "\n",
+                  encoding="utf-8",
+              )
+
+          def fail(stage: str, message: str, code: int = 1) -> None:
+              evidence["status"] = "FAILED"
+              evidence["failure_stage"] = stage
+              evidence["diagnostic"] = redact(message)
+              save_evidence()
+              print(f"ERROR [{stage}]: {redact(message)}", file=sys.stderr)
+              raise SystemExit(code)
+
+          def parse_json(raw: bytes) -> Any:
+              if not raw:
+                  return {}
+              try:
+                  return json.loads(raw.decode("utf-8", "replace"))
+              except json.JSONDecodeError:
+                  return {}
+
+          def request_bytes(
+              url: str,
+              *,
+              method: str = "GET",
+              headers: dict[str, str] | None = None,
+              data: bytes | None = None,
+          ) -> tuple[int, dict[str, str], bytes]:
+              request = urllib.request.Request(
+                  url,
+                  data=data,
+                  headers={"User-Agent": "AUMARA-Beds24-Photos/1.0", **(headers or {})},
+                  method=method,
+              )
+              try:
+                  with urllib.request.urlopen(request, timeout=TIMEOUT) as response:
+                      return response.status, dict(response.headers.items()), response.read()
+              except urllib.error.HTTPError as exc:
+                  return exc.code, dict(exc.headers.items()), exc.read()
+              except urllib.error.URLError as exc:
+                  raise RuntimeError(f"Network error for {url}: {exc.reason}") from exc
+
+          def response_diagnostic(raw: bytes) -> dict[str, Any]:
+              body = parse_json(raw)
+              if isinstance(body, dict):
+                  allowed = {}
+                  for key in ("code", "status", "type", "message", "error", "detail"):
+                      value = body.get(key)
+                      if value not in (None, "", [], {}):
+                          allowed[key] = redact(str(value))
+                  if allowed:
+                      return allowed
+                  if body:
+                      return {"body_keys": sorted(str(key) for key in body.keys())[:30]}
+              return {}
+
+          def download_drive_file(file_id: str, destination: pathlib.Path) -> None:
+              cookie_jar = http.cookiejar.CookieJar()
+              opener = urllib.request.build_opener(urllib.request.HTTPCookieProcessor(cookie_jar))
+              urls = [
+                  f"https://drive.usercontent.google.com/download?id={urllib.parse.quote(file_id)}&export=download&confirm=t",
+                  f"https://drive.google.com/uc?export=download&id={urllib.parse.quote(file_id)}&confirm=t",
+              ]
+              last_error = "no response"
+              for url in urls:
+                  request = urllib.request.Request(url, headers={"User-Agent": "Mozilla/5.0"})
+                  try:
+                      with opener.open(request, timeout=TIMEOUT) as response:
+                          raw = response.read(MAX_IMAGE_BYTES + 1)
+                  except (urllib.error.HTTPError, urllib.error.URLError) as exc:
+                      last_error = str(exc)
+                      continue
+                  if len(raw) > MAX_IMAGE_BYTES:
+                      last_error = "download exceeded 15 MB safety limit"
+                      continue
+                  if len(raw) > 100_000 and raw.startswith(b"\xff\xd8\xff"):
+                      destination.write_bytes(raw)
+                      return
+                  text = raw[:5000].decode("utf-8", "ignore")
+                  token_match = re.search(r"confirm=([0-9A-Za-z_-]+)", text)
+                  if token_match:
+                      confirm = urllib.parse.quote(token_match.group(1))
+                      retry_url = f"https://drive.google.com/uc?export=download&id={urllib.parse.quote(file_id)}&confirm={confirm}"
+                      try:
+                          with opener.open(
+                              urllib.request.Request(retry_url, headers={"User-Agent": "Mozilla/5.0"}),
+                              timeout=TIMEOUT,
+                          ) as response:
+                              retry_raw = response.read(MAX_IMAGE_BYTES + 1)
+                      except (urllib.error.HTTPError, urllib.error.URLError) as exc:
+                          last_error = str(exc)
+                          continue
+                      if len(retry_raw) <= MAX_IMAGE_BYTES and len(retry_raw) > 100_000 and retry_raw.startswith(b"\xff\xd8\xff"):
+                          destination.write_bytes(retry_raw)
+                          return
+                  last_error = "Google Drive returned non-JPEG content"
+              raise RuntimeError(last_error)
+
+          def multipart_body(filename: str, payload: bytes) -> tuple[str, bytes]:
+              boundary = f"----AUMARA{uuid.uuid4().hex}"
+              chunks: list[bytes] = []
+
+              def add_field(name: str, value: str) -> None:
+                  chunks.extend(
+                      [
+                          f"--{boundary}\r\n".encode(),
+                          f'Content-Disposition: form-data; name="{name}"\r\n\r\n'.encode(),
+                          value.encode(),
+                          b"\r\n",
+                      ]
+                  )
+
+              add_field("propertyId", PROPERTY_ID)
+              add_field("propId", PROPERTY_ID)
+              mime_type = mimetypes.guess_type(filename)[0] or "image/jpeg"
+              chunks.extend(
+                  [
+                      f"--{boundary}\r\n".encode(),
+                      f'Content-Disposition: form-data; name="file"; filename="{filename}"\r\n'.encode(),
+                      f"Content-Type: {mime_type}\r\n\r\n".encode(),
+                      payload,
+                      b"\r\n",
+                      f"--{boundary}--\r\n".encode(),
+                  ]
+              )
+              return boundary, b"".join(chunks)
+
+          def collect_strings(value: Any) -> set[str]:
+              found: set[str] = set()
+              if isinstance(value, dict):
+                  for key, item in value.items():
+                      found.add(str(key))
+                      found.update(collect_strings(item))
+              elif isinstance(value, list):
+                  for item in value:
+                      found.update(collect_strings(item))
+              elif isinstance(value, str):
+                  found.add(value)
+              return found
+
+          stage = "preflight"
+          try:
+              if not credential:
+                  fail("credential", "GitHub Actions secret BEDS24_REFRESH_CREDENTIAL is absent")
+              if os.environ.get("DELETE_OLD", "false").strip().lower() == "true":
+                  fail("delete_old", "Old-image deletion is not available in the verified API contract")
+
+              stage = "download"
+              DOWNLOAD_DIR.mkdir(parents=True, exist_ok=True)
+              total_bytes = 0
+              for filename, file_id in PHOTO_MANIFEST:
+                  destination = DOWNLOAD_DIR / filename
+                  print(f"Downloading {filename} from approved Drive ID...")
+                  download_drive_file(file_id, destination)
+                  size = destination.stat().st_size
+                  digest = hashlib.sha256(destination.read_bytes()).hexdigest()
+                  total_bytes += size
+                  evidence["downloaded_files"].append(
+                      {"filename": filename, "bytes": size, "sha256": digest}
+                  )
+                  save_evidence()
+
+              if len(evidence["downloaded_files"]) != 10:
+                  fail("manifest", "Exact 10-file invariant failed")
+              if total_bytes > 100_000_000:
+                  fail("manifest", f"Selected files exceed 100 MB total: {total_bytes} bytes")
+
+              stage = "authentication"
+              details_status, _, details_raw = request_bytes(
+                  f"{API_BASE}/authentication/details",
+                  headers={"accept": "application/json", "token": credential},
+              )
+              evidence["auth_details_http_status"] = details_status
+              details_body = parse_json(details_raw)
+              if (
+                  200 <= details_status < 300
+                  and isinstance(details_body, dict)
+                  and details_body.get("validToken") is True
+              ):
+                  access_token = credential
+                  evidence["auth_mode"] = "access_token"
+              else:
+                  exchange_status, _, exchange_raw = request_bytes(
+                      f"{API_BASE}/authentication/token",
+                      headers={"accept": "application/json", "refreshToken": credential},
+                  )
+                  evidence["token_exchange_http_status"] = exchange_status
+                  exchange_body = parse_json(exchange_raw)
+                  candidate = exchange_body.get("token") if isinstance(exchange_body, dict) else None
+                  if not (200 <= exchange_status < 300 and isinstance(candidate, str) and candidate):
+                      evidence["diagnostic"] = response_diagnostic(exchange_raw)
+                      fail("authentication", "Beds24 credential could not produce a valid access token")
+                  access_token = candidate
+                  evidence["auth_mode"] = "refresh_token"
+              save_evidence()
+
+              auth_headers = {"accept": "application/json", "token": access_token}
+              stage = "property_probe"
+              query = urllib.parse.urlencode({"id": PROPERTY_ID})
+              property_status, _, property_raw = request_bytes(
+                  f"{API_BASE}/properties?{query}",
+                  headers=auth_headers,
+              )
+              evidence["property_probe_http_status"] = property_status
+              if not 200 <= property_status < 300:
+                  evidence["diagnostic"] = response_diagnostic(property_raw)
+                  fail("property_probe", f"Beds24 property {PROPERTY_ID} is not readable")
+
+              stage = "image_endpoint"
+              endpoint = f"{API_BASE}/properties/{PROPERTY_ID}/images"
+              evidence["image_endpoint"] = endpoint
+              get_status, _, get_raw = request_bytes(endpoint, headers=auth_headers)
+              options_status, options_headers, options_raw = request_bytes(
+                  endpoint,
+                  method="OPTIONS",
+                  headers=auth_headers,
+              )
+              evidence["image_endpoint_get_http_status"] = get_status
+              evidence["image_endpoint_options_http_status"] = options_status
+              allow_header = options_headers.get("Allow") or options_headers.get("allow")
+              evidence["image_endpoint_allow"] = allow_header
+              endpoint_recognized = (
+                  get_status in {200, 400, 405}
+                  or options_status in {200, 204}
+                  or "POST" in (allow_header or "").upper()
+              )
+              if not endpoint_recognized:
+                  evidence["diagnostic"] = {
+                      "get": response_diagnostic(get_raw),
+                      "options": response_diagnostic(options_raw),
+                  }
+                  fail("image_endpoint", "Beds24 did not expose a writable property-images endpoint", 2)
+
+              existing_strings = collect_strings(parse_json(get_raw))
+              stage = "upload"
+              for filename, _ in PHOTO_MANIFEST:
+                  if any(filename.lower() in value.lower() for value in existing_strings):
+                      evidence["skipped_existing"].append(filename)
+                      continue
+                  path = DOWNLOAD_DIR / filename
+                  boundary, body = multipart_body(filename, path.read_bytes())
+                  upload_status, _, upload_raw = request_bytes(
+                      endpoint,
+                      method="POST",
+                      headers={
+                          "accept": "application/json",
+                          "token": access_token,
+                          "Content-Type": f"multipart/form-data; boundary={boundary}",
+                          "Content-Length": str(len(body)),
+                      },
+                      data=body,
+                  )
+                  record: dict[str, Any] = {
+                      "filename": filename,
+                      "http_status": upload_status,
+                  }
+                  if not 200 <= upload_status < 300:
+                      record["diagnostic"] = response_diagnostic(upload_raw)
+                      evidence["uploads"].append(record)
+                      fail("upload", f"Beds24 rejected {filename} with HTTP {upload_status}")
+                  evidence["uploads"].append(record)
+                  save_evidence()
+
+              evidence["status"] = "SUCCESS"
+              evidence["failure_stage"] = None
+              evidence["diagnostic"] = None
+              evidence["uploaded_count"] = len(evidence["uploads"])
+              evidence["skipped_existing_count"] = len(evidence["skipped_existing"])
+              save_evidence()
+              print(
+                  f"Verified API acceptance: uploaded={len(evidence['uploads'])}, "
+                  f"skipped_existing={len(evidence['skipped_existing'])}, property={PROPERTY_ID}."
+              )
+          except SystemExit:
+              raise
+          except Exception as exc:
+              fail(stage, f"{type(exc).__name__}: {exc}")
+          PY
+
+      - name: Finalize sanitized evidence
+        if: always()
+        shell: bash
+        env:
+          TRANSFER_OUTCOME: ${{ steps.transfer.outcome }}
+          JOB_STATUS: ${{ job.status }}
+        run: |
+          python3 - <<'PY'
+          import datetime as dt
+          import json
+          import os
+          import pathlib
+
+          path = pathlib.Path(os.environ["EVIDENCE_PATH"])
+          try:
+              evidence = json.loads(path.read_text(encoding="utf-8"))
+          except (OSError, json.JSONDecodeError):
+              evidence = {}
+          evidence["checked_at_utc"] = dt.datetime.now(dt.timezone.utc).isoformat()
+          evidence["run_id"] = os.environ.get("GITHUB_RUN_ID")
+          evidence["run_attempt"] = os.environ.get("GITHUB_RUN_ATTEMPT")
+          evidence["job_status"] = os.environ.get("JOB_STATUS")
+          evidence["transfer_step_outcome"] = os.environ.get("TRANSFER_OUTCOME")
+          evidence["secret_exposed"] = False
+          if evidence.get("status") == "RUNNING":
+              evidence["status"] = "FAILED"
+              evidence["failure_stage"] = "runner_step"
+              evidence["diagnostic"] = (
+                  "Transfer step ended before controlled evidence update; "
+                  f"outcome={os.environ.get('TRANSFER_OUTCOME')}"
+              )
+          path.parent.mkdir(parents=True, exist_ok=True)
+          path.write_text(json.dumps(evidence, indent=2, sort_keys=True) + "\n", encoding="utf-8")
+          PY
+
+      - name: Commit sanitized execution evidence
+        if: always()
+        shell: bash
+        run: |
+          if [ ! -f "$EVIDENCE_PATH" ]; then
+            echo "No evidence file was produced."
+            exit 1
+          fi
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git add "$EVIDENCE_PATH"
+          git diff --cached --quiet && exit 0
+          git commit -m "Record Beds24 photo upload evidence [skip ci]"
+          git pull --rebase origin main
+          git push origin HEAD:main

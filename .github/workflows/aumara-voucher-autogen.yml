@@ -1,0 +1,53 @@
+name: Generate AUMARA post-stay vouchers
+
+on:
+  workflow_dispatch:
+  schedule:
+    - cron: "0 6 * * *"
+  push:
+    branches: [main]
+    paths:
+      - ".github/workflows/aumara-voucher-autogen.yml"
+      - "aumara-control-tower/scripts/beds24_aumara_voucher_autogen.py"
+      - "aumara-control-tower/scripts/tests/test_beds24_aumara_voucher_autogen.py"
+
+permissions:
+  contents: read
+
+concurrency:
+  group: aumara-voucher-autogen
+  cancel-in-progress: false
+
+jobs:
+  test:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v5
+      - name: Unit tests
+        run: python -m unittest aumara-control-tower/scripts/tests/test_beds24_aumara_voucher_autogen.py -v
+
+  generate:
+    if: github.event_name != 'push'
+    needs: test
+    runs-on: ubuntu-latest
+    env:
+      BEDS24_PROPERTIES_TOKEN: ${{ secrets.BEDS24_TOKEN_CREDENTIAL }}
+      BEDS24_REFRESH_TOKEN: ${{ secrets.BEDS24_REFRESH_CREDENTIAL }}
+      AUMARA_VOUCHER_APPLY: "1"
+      AUMARA_VOUCHER_LOOKBACK_DAYS: "30"
+      AUMARA_VOUCHER_OUT: aumara-control-tower/evidence/vouchers
+    steps:
+      - uses: actions/checkout@v5
+      - name: Install QR renderer
+        run: pip install qrcode
+      - name: Verify a Beds24 credential is present
+        run: test -n "$BEDS24_PROPERTIES_TOKEN" || test -n "$BEDS24_REFRESH_TOKEN"
+      - name: Generate and register one-time vouchers
+        run: python aumara-control-tower/scripts/beds24_aumara_voucher_autogen.py
+      - name: Upload voucher cards
+        uses: actions/upload-artifact@v4
+        with:
+          name: aumara-vouchers
+          path: aumara-control-tower/evidence/vouchers/
+          if-no-files-found: error
+          retention-days: 30

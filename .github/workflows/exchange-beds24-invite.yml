@@ -1,0 +1,52 @@
+stage = "authentication"
+
+setup_status, _, setup_raw = request_bytes(
+    f"{API_BASE}/authentication/setup",
+    headers={
+        "accept": "application/json",
+        "code": credential,
+    },
+)
+setup_body = parse_json(setup_raw)
+
+if 200 <= setup_status < 300 and isinstance(setup_body, dict):
+    candidate = setup_body.get("token")
+    refresh_candidate = setup_body.get("refreshToken")
+    if isinstance(candidate, str) and candidate:
+        access_token = candidate
+        evidence["auth_mode"] = "setup_code"
+        evidence["token_exchange_http_status"] = setup_status
+        if isinstance(refresh_candidate, str) and refresh_candidate:
+            evidence["received_refresh_token"] = True
+    else:
+        evidence["diagnostic"] = response_diagnostic(setup_raw)
+        fail("authentication", "Beds24 setup code did not return a valid access token")
+else:
+    details_status, _, details_raw = request_bytes(
+        f"{API_BASE}/authentication/details",
+        headers={"accept": "application/json", "token": credential},
+    )
+    evidence["auth_details_http_status"] = details_status
+    details_body = parse_json(details_raw)
+    if (
+        200 <= details_status < 300
+        and isinstance(details_body, dict)
+        and details_body.get("validToken") is True
+    ):
+        access_token = credential
+        evidence["auth_mode"] = "access_token"
+    else:
+        exchange_status, _, exchange_raw = request_bytes(
+            f"{API_BASE}/authentication/token",
+            headers={"accept": "application/json", "refreshToken": credential},
+        )
+        evidence["token_exchange_http_status"] = exchange_status
+        exchange_body = parse_json(exchange_raw)
+        candidate = exchange_body.get("token") if isinstance(exchange_body, dict) else None
+        if not (200 <= exchange_status < 300 and isinstance(candidate, str) and candidate):
+            evidence["diagnostic"] = response_diagnostic(exchange_raw)
+            fail("authentication", "Beds24 credential could not produce a valid access token")
+        access_token = candidate
+        evidence["auth_mode"] = "refresh_token"
+
+save_evidence()

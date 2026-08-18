@@ -226,7 +226,7 @@ For scan-only usage, add only `CODEX_SECURITY_API_KEY`. Patch generation additio
 
 Use focused diffs for merge request feedback, standard repository scans for the default branch, and scheduled deep scans for broader coverage. Compare effort and model changes independently, and retain periodic full scans.
 
-One validation project reported estimated costs of USD 2.76 for a two-file diff and USD 11.67 for a 63-file repository scan. These are examples, not predictions. `--max-cost` provides an estimated-cost guardrail, not a hard billing cap.
+Scan costs depend on the repository, target, model, and reasoning effort. Measure representative runs before setting a budget, and use `--max-cost` as an estimated-cost guardrail rather than a hard billing cap.
 
 Scanner exit `0` indicates a passing scan, exit `1` indicates a configured severity-policy failure, and exit `2` requires investigating coverage or infrastructure. The final gate temporarily allows verified partial coverage during calibration; remove that allowance when incomplete coverage must block.
 

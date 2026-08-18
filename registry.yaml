@@ -4,6 +4,18 @@
 # should build pages for, and indicates metadata such as tags, creation date and
 # authors for each page.
 
+- title: Build a per-run spending controller with the Responses API
+  path: articles/per_run_spending_controller_responses_api.md
+  slug: per-run-spending-controller-responses-api
+  description: Enforce an application-owned model-token budget for each Responses API run using token counts, maximum-cost estimates, usage tracking, and safe error handling.
+  date: 2026-08-17
+  authors:
+    - alexey-openai
+  tags:
+    - responses
+    - agents
+    - cost-management
+
 - title: Detect and remediate vulnerabilities in GitLab CI with Codex Security
   path: examples/codex/gitlab_ci_codex_security.md
   slug: gitlab-ci-codex-security
@@ -47,6 +59,21 @@
     - bedrock
     - security
 
+- title: Controlled Agentic Commerce with AgentCore Payments
+  path: examples/partners/AWS/controlled_agentic_commerce_with_agentcore_payments/controlled_agentic_commerce.ipynb
+  slug: controlled-agentic-commerce-agentcore-payments
+  description: Build a controlled agentic-commerce workflow with the OpenAI Agents SDK, x402, application-owned payment authority, deterministic validation, and an optional gated Amazon Bedrock AgentCore Payments testnet path.
+  date: 2026-08-13
+  authors:
+    - deepakjain108
+    - sidrampally-oai
+  tags:
+    - partners
+    - agents-sdk
+    - agents
+    - bedrock
+    - security
+    - payments
 - title: Enabling Long-Term Agent Memory with Oracle AI Agent Memory
   path: examples/vector_databases/oracle_db/deep_research_openai_agents.ipynb
   slug: deep-research-openai-agents
@@ -496,6 +523,7 @@
   path: examples/gpt-5/gpt-5_prompting_guide.ipynb
   slug: gpt-5-prompting-guide
   date: 2025-08-07
+  archived: true
   authors:
     - anoop-openai
     - julian-openai
@@ -510,6 +538,7 @@
   path: examples/gpt-5/gpt-5_frontend.ipynb
   slug: gpt-5-frontend
   date: 2025-08-07
+  archived: true
   authors:
     - WJPBProjects
     - anoop-openai
@@ -955,6 +984,7 @@
   path: examples/responses_api/responses_example.ipynb
   slug: responses-example
   date: 2025-03-11
+  archived: true
   authors:
     - billchen-openai
   tags:
@@ -2958,6 +2988,7 @@
     - gpt-actions-library
     - chatgpt
     - chatgpt-productivity
+  archived: true
 
 - title: Custom LLM as a Judge to Detect Hallucinations with Braintrust
   path: examples/Custom-LLM-as-a-Judge.ipynb
@@ -3066,6 +3097,7 @@
     - reasoning
     - completions
     - security
+  archived: true
 
 - title: How to evaluate LLMs for SQL generation
   path: examples/evaluation/How_to_evaluate_LLMs_for_SQL_generation.ipynb
@@ -3104,6 +3136,7 @@
   slug: file-search-responses
   description: Cookbook to search PDFs with the Responses API file search tool.
   date: 2025-03-11
+  archived: true
   authors:
     - pap-openai
   tags:
@@ -3187,6 +3220,7 @@
   slug: generate-images-with-gpt-image
   description: Cookbook to generate and edit images with GPT Image capabilities.
   date: 2025-04-23
+  archived: true
   authors:
     - katiagg
   tags:

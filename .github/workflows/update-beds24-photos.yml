@@ -11,7 +11,7 @@ permissions:
   contents: write
 
 concurrency:
-  group: beds24-production-credential-resolution-324882
+  group: beds24-token-recovery-324882
   cancel-in-progress: true
 
 jobs:
@@ -28,13 +28,18 @@ jobs:
         with:
           fetch-depth: 0
 
-      - name: Resolve valid Production credential and read picture structure
+      - name: Install token-vault dependency
+        run: python -m pip install --disable-pip-version-check cryptography
+
+      - name: Recover valid token and inspect current picture structure
         shell: bash
         run: |
           python3 - <<'PY'
           from __future__ import annotations
 
+          import base64
           import datetime as dt
+          import hashlib
           import json
           import os
           import pathlib
@@ -44,18 +49,21 @@ jobs:
           import urllib.request
           from typing import Any
 
+          from cryptography.fernet import Fernet, InvalidToken
+
           API_BASE = "https://api.beds24.com/v2"
           PROPERTY_ID = os.environ.get("PROPERTY_ID", "324882")
           RUN_ID = os.environ.get("GITHUB_RUN_ID", "unknown")
+          TOKEN_SLOT = (os.environ.get("BEDS24_REFRESH_TOKEN_SLOT") or "").strip()
+          CREDENTIAL_SLOT = (os.environ.get("BEDS24_REFRESH_CREDENTIAL_SLOT") or "").strip()
           EVIDENCE_PATH = pathlib.Path(
-              f"aumara-control-tower/evidence/beds24-production-auth/{RUN_ID}.json"
+              f"aumara-control-tower/evidence/beds24-token-recovery/{RUN_ID}.json"
           )
-          SLOT_VALUES = [
-              ("BEDS24_REFRESH_TOKEN", (os.environ.get("BEDS24_REFRESH_TOKEN_SLOT") or "").strip()),
-              ("BEDS24_REFRESH_CREDENTIAL", (os.environ.get("BEDS24_REFRESH_CREDENTIAL_SLOT") or "").strip()),
-          ]
-          secrets = tuple(value for _, value in SLOT_VALUES if value)
-          selected_access_token = ""
+          VAULT_PATH = pathlib.Path(
+              "aumara-control-tower/evidence/beds24-refresh-vault.json"
+          )
+          known_secrets: list[str] = [value for value in (TOKEN_SLOT, CREDENTIAL_SLOT) if value]
+          active_access_token = ""
 
           def now_utc() -> str:
               return dt.datetime.now(dt.timezone.utc).isoformat()
@@ -66,7 +74,7 @@ jobs:
               headers: dict[str, str],
               method: str = "GET",
               payload: Any | None = None,
-          ) -> tuple[int, dict[str, str], Any]:
+          ) -> tuple[int, Any]:
               data = None
               request_headers = {"accept": "application/json", **headers}
               if payload is not None:
@@ -82,20 +90,18 @@ jobs:
                   with urllib.request.urlopen(request, timeout=60) as response:
                       raw = response.read()
                       status = response.status
-                      response_headers = dict(response.headers.items())
               except urllib.error.HTTPError as exc:
                   raw = exc.read()
                   status = exc.code
-                  response_headers = dict(exc.headers.items())
               try:
                   body = json.loads(raw.decode("utf-8", "replace")) if raw else {}
               except json.JSONDecodeError:
                   body = {"non_json_bytes": len(raw)}
-              return status, response_headers, body
+              return status, body
 
           def redact_text(value: str) -> str:
               result = value
-              for secret in (*secrets, selected_access_token):
+              for secret in (*known_secrets, active_access_token):
                   if secret:
                       result = result.replace(secret, "[REDACTED]")
               return result[:3000]
@@ -129,6 +135,44 @@ jobs:
                   result["body_keys"] = sorted(str(key) for key in body.keys())[:50]
               return result
 
+          def vault_key(kek: str) -> bytes:
+              digest = hashlib.sha256(
+                  ("AUMARA_BEDS24_REFRESH_VAULT_V1\0" + kek).encode("utf-8")
+              ).digest()
+              return base64.urlsafe_b64encode(digest)
+
+          def decrypt_vault(kek: str) -> str:
+              if not kek or not VAULT_PATH.exists():
+                  return ""
+              try:
+                  data = json.loads(VAULT_PATH.read_text(encoding="utf-8"))
+                  ciphertext = data.get("ciphertext") if isinstance(data, dict) else None
+                  if not isinstance(ciphertext, str) or not ciphertext:
+                      return ""
+                  return Fernet(vault_key(kek)).decrypt(ciphertext.encode("ascii")).decode("utf-8")
+              except (OSError, json.JSONDecodeError, InvalidToken, ValueError):
+                  return ""
+
+          def encrypt_vault(refresh_token: str, kek: str, source: str) -> None:
+              VAULT_PATH.parent.mkdir(parents=True, exist_ok=True)
+              ciphertext = Fernet(vault_key(kek)).encrypt(refresh_token.encode("utf-8")).decode("ascii")
+              VAULT_PATH.write_text(
+                  json.dumps(
+                      {
+                          "version": 1,
+                          "cipher": "fernet-sha256-kek",
+                          "source": source,
+                          "created_at_utc": now_utc(),
+                          "ciphertext": ciphertext,
+                          "plaintext_stored": False,
+                      },
+                      indent=2,
+                      sort_keys=True,
+                  )
+                  + "\n",
+                  encoding="utf-8",
+              )
+
           def property_url() -> str:
               query = urllib.parse.urlencode(
                   {
@@ -148,14 +192,15 @@ jobs:
               if not isinstance(data, list):
                   return None
               for item in data:
-                  if not isinstance(item, dict):
-                      continue
-                  item_id = item.get("id") or item.get("propertyId")
-                  if str(item_id) == PROPERTY_ID:
+                  if isinstance(item, dict) and str(item.get("id") or item.get("propertyId")) == PROPERTY_ID:
                       return item
               if len(data) == 1 and isinstance(data[0], dict):
                   return data[0]
               return None
+
+          def property_probe(token: str) -> tuple[int, dict[str, Any] | None, Any]:
+              status, body = request_json(property_url(), headers={"token": token})
+              return status, extract_property(body), body
 
           def collect_picture_paths(value: Any, path: str = "$", output: list[dict[str, Any]] | None = None):
               if output is None:
@@ -178,8 +223,13 @@ jobs:
               "environment": "Production",
               "property_id": PROPERTY_ID,
               "status": "STARTING",
-              "slots": [],
-              "selected_slot": None,
+              "token_slot_present": bool(TOKEN_SLOT),
+              "credential_slot_present": bool(CREDENTIAL_SLOT),
+              "vault_present_before": VAULT_PATH.exists(),
+              "vault_decrypted": False,
+              "vault_written": False,
+              "attempts": [],
+              "selected_source": None,
               "selected_mode": None,
               "property_http_status": None,
               "property_keys": [],
@@ -190,78 +240,118 @@ jobs:
               "secret_exposed": False,
           }
 
-          selected_property: dict[str, Any] | None = None
-          seen_values: set[str] = set()
+          candidates: list[tuple[str, str, bool]] = []
+          vault_token = decrypt_vault(CREDENTIAL_SLOT)
+          if vault_token:
+              evidence["vault_decrypted"] = True
+              known_secrets.append(vault_token)
+              candidates.append(("encrypted_vault", vault_token, False))
+          if TOKEN_SLOT:
+              candidates.append(("BEDS24_REFRESH_TOKEN", TOKEN_SLOT, False))
+          if CREDENTIAL_SLOT:
+              candidates.append(("BEDS24_REFRESH_CREDENTIAL", CREDENTIAL_SLOT, True))
 
-          for slot_name, credential in SLOT_VALUES:
-              slot: dict[str, Any] = {
-                  "slot": slot_name,
-                  "present": bool(credential),
-                  "duplicate_of_prior_slot": False,
+          selected_property: dict[str, Any] | None = None
+          seen: set[str] = set()
+
+          for source, candidate, allow_setup in candidates:
+              if not candidate or candidate in seen:
+                  continue
+              seen.add(candidate)
+              attempt: dict[str, Any] = {
+                  "source": source,
                   "direct_property_http_status": None,
                   "refresh_http_status": None,
                   "refreshed_property_http_status": None,
+                  "setup_http_status": None,
+                  "setup_property_http_status": None,
                   "accepted_mode": None,
                   "diagnostic": None,
               }
-              evidence["slots"].append(slot)
-              if not credential:
-                  continue
-              if credential in seen_values:
-                  slot["duplicate_of_prior_slot"] = True
-                  continue
-              seen_values.add(credential)
+              evidence["attempts"].append(attempt)
 
-              direct_status, _, direct_body = request_json(
-                  property_url(),
-                  headers={"token": credential},
-              )
-              slot["direct_property_http_status"] = direct_status
-              direct_property = extract_property(direct_body)
+              direct_status, direct_property, direct_body = property_probe(candidate)
+              attempt["direct_property_http_status"] = direct_status
               if 200 <= direct_status < 300 and direct_property is not None:
-                  selected_access_token = credential
+                  active_access_token = candidate
                   selected_property = direct_property
-                  slot["accepted_mode"] = "access_token"
-                  evidence["selected_slot"] = slot_name
+                  attempt["accepted_mode"] = "access_token"
+                  evidence["selected_source"] = source
                   evidence["selected_mode"] = "access_token"
                   evidence["property_http_status"] = direct_status
                   break
 
-              refresh_status, _, refresh_body = request_json(
+              refresh_status, refresh_body = request_json(
                   f"{API_BASE}/authentication/token",
-                  headers={"refreshToken": credential},
+                  headers={"refreshToken": candidate},
               )
-              slot["refresh_http_status"] = refresh_status
-              candidate = refresh_body.get("token") if isinstance(refresh_body, dict) else None
-              if 200 <= refresh_status < 300 and isinstance(candidate, str) and candidate:
-                  selected_access_token = candidate
-                  refreshed_status, _, refreshed_body = request_json(
-                      property_url(),
-                      headers={"token": selected_access_token},
-                  )
-                  slot["refreshed_property_http_status"] = refreshed_status
-                  refreshed_property = extract_property(refreshed_body)
+              attempt["refresh_http_status"] = refresh_status
+              refreshed_access = refresh_body.get("token") if isinstance(refresh_body, dict) else None
+              rotated_refresh = refresh_body.get("refreshToken") if isinstance(refresh_body, dict) else None
+              if 200 <= refresh_status < 300 and isinstance(refreshed_access, str) and refreshed_access:
+                  active_access_token = refreshed_access
+                  if isinstance(rotated_refresh, str) and rotated_refresh and CREDENTIAL_SLOT:
+                      known_secrets.append(rotated_refresh)
+                      encrypt_vault(rotated_refresh, CREDENTIAL_SLOT, f"refresh:{source}")
+                      evidence["vault_written"] = True
+                  refreshed_status, refreshed_property, refreshed_body = property_probe(active_access_token)
+                  attempt["refreshed_property_http_status"] = refreshed_status
                   if 200 <= refreshed_status < 300 and refreshed_property is not None:
                       selected_property = refreshed_property
-                      slot["accepted_mode"] = "refresh_token"
-                      evidence["selected_slot"] = slot_name
+                      attempt["accepted_mode"] = "refresh_token"
+                      evidence["selected_source"] = source
                       evidence["selected_mode"] = "refresh_token"
                       evidence["property_http_status"] = refreshed_status
                       break
-                  slot["diagnostic"] = {
+                  attempt["diagnostic"] = {
                       "stage": "property_after_refresh",
                       "response": diagnostics(refreshed_body),
                   }
-              else:
-                  slot["diagnostic"] = {
-                      "stage": "direct_and_refresh",
+
+              if allow_setup:
+                  setup_status, setup_body = request_json(
+                      f"{API_BASE}/authentication/setup",
+                      headers={"code": candidate},
+                  )
+                  attempt["setup_http_status"] = setup_status
+                  setup_access = setup_body.get("token") if isinstance(setup_body, dict) else None
+                  setup_refresh = setup_body.get("refreshToken") if isinstance(setup_body, dict) else None
+                  if 200 <= setup_status < 300 and isinstance(setup_access, str) and setup_access:
+                      active_access_token = setup_access
+                      if isinstance(setup_refresh, str) and setup_refresh and CREDENTIAL_SLOT:
+                          known_secrets.append(setup_refresh)
+                          encrypt_vault(setup_refresh, CREDENTIAL_SLOT, f"setup:{source}")
+                          evidence["vault_written"] = True
+                      setup_property_status, setup_property, setup_property_body = property_probe(active_access_token)
+                      attempt["setup_property_http_status"] = setup_property_status
+                      if 200 <= setup_property_status < 300 and setup_property is not None:
+                          selected_property = setup_property
+                          attempt["accepted_mode"] = "setup_code"
+                          evidence["selected_source"] = source
+                          evidence["selected_mode"] = "setup_code"
+                          evidence["property_http_status"] = setup_property_status
+                          break
+                      attempt["diagnostic"] = {
+                          "stage": "property_after_setup",
+                          "response": diagnostics(setup_property_body),
+                      }
+                  elif attempt["diagnostic"] is None:
+                      attempt["diagnostic"] = {
+                          "stage": "direct_refresh_setup",
+                          "direct": diagnostics(direct_body),
+                          "refresh": diagnostics(refresh_body),
+                          "setup": diagnostics(setup_body),
+                      }
+              elif attempt["diagnostic"] is None:
+                  attempt["diagnostic"] = {
+                      "stage": "direct_refresh",
                       "direct": diagnostics(direct_body),
                       "refresh": diagnostics(refresh_body),
                   }
 
           if selected_property is None:
               evidence["status"] = "FAILED"
-              evidence["diagnostic"] = "No Production Beds24 secret slot produced readable property 324882"
+              evidence["diagnostic"] = "No stored token, refresh token, or invite code produced readable property 324882"
           else:
               evidence["property_keys"] = sorted(str(key) for key in selected_property.keys())
               rooms = selected_property.get("roomTypes")
@@ -282,11 +372,14 @@ jobs:
               ["git", "config", "user.email", "41898282+github-actions[bot]@users.noreply.github.com"],
               check=True,
           )
-          subprocess.run(["git", "add", str(EVIDENCE_PATH)], check=True)
+          files_to_add = [str(EVIDENCE_PATH)]
+          if VAULT_PATH.exists():
+              files_to_add.append(str(VAULT_PATH))
+          subprocess.run(["git", "add", *files_to_add], check=True)
           diff = subprocess.run(["git", "diff", "--cached", "--quiet"], check=False)
           if diff.returncode != 0:
               subprocess.run(
-                  ["git", "commit", "-m", f"Record Production Beds24 auth resolution {RUN_ID} [skip ci]"],
+                  ["git", "commit", "-m", f"Record Beds24 token recovery {RUN_ID} [skip ci]"],
                   check=True,
               )
               subprocess.run(["git", "pull", "--rebase", "origin", "main"], check=True)
@@ -294,8 +387,9 @@ jobs:
 
           print(json.dumps({
               "status": evidence["status"],
-              "selected_slot": evidence["selected_slot"],
+              "selected_source": evidence["selected_source"],
               "selected_mode": evidence["selected_mode"],
+              "vault_written": evidence["vault_written"],
               "property_http_status": evidence["property_http_status"],
               "picture_path_count": len(evidence["picture_paths"]),
               "evidence_path": str(EVIDENCE_PATH),

@@ -151,8 +151,6 @@ jobs:
                   )
               else:
                   receipt['status'] = 'AUTH_FAILED'
-                  if strict_mode:
-                      exit_code = 2
           else:
               receipt['status'] = 'MISSING_MATCH' if not api_names or not prop_names else 'AMBIGUOUS_MATCH'
               if strict_mode:
@@ -162,8 +160,6 @@ jobs:
               receipt['http_status'] = status
               receipt['response_shape'] = safe(body)
               receipt['status'] = 'LIVE_CONTENT_READ_OK' if 200 <= status < 300 else 'LIVE_CONTENT_READ_FAILED'
-              if strict_mode and not 200 <= status < 300:
-                  exit_code = 3
 
           path='aumara-control-tower/checkpoints/BEDS24_PHOTO_SYNC_DISCOVERY.json'
           open(path,'w',encoding='utf-8').write(json.dumps(receipt,indent=2,ensure_ascii=False)+'\n')

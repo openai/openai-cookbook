@@ -79,6 +79,21 @@ direct network environment; do not bypass a required corporate proxy.
 | AgentCore Payments | Payment-header generation inside a bounded session | Business authorization |
 | Testnet wallet provider | Delegated testnet signing | Model reasoning or approval policy |
 
+### Approval authenticity and unattended operation
+
+`ApprovalGrant` is an application-level contract, not proof of who approved a
+request. The policy engine validates the grant's request binding, amount,
+currency, and expiry, but this example does not authenticate `approved_by` or
+attach a digital signature. A production application must obtain the grant
+from an authenticated approval or identity service before passing it to the
+policy engine.
+
+Requests above `approval_threshold` fail closed when no valid grant is
+available. A missing, expired, scope-mismatched, currency-mismatched, or
+over-limit grant is denied; there is no unattended fallback that silently
+authorizes the purchase. This is intentional for the example's safety model:
+if no authenticated human approval is available, the request remains denied.
+
 ## Run the local notebook
 
 ```bash

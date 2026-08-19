@@ -70,9 +70,10 @@ jobs:
           finally:
               d.quit()
       - name: Upload screenshot
-        if: always()
+        if: failure()
         uses: actions/upload-artifact@v4
         with:
           name: staff-prod-smoke
           path: /tmp/staff.png
+          retention-days: 2
           if-no-files-found: ignore

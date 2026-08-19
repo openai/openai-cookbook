@@ -2,13 +2,16 @@ name: Beds24 Photo Sync Discovery
 
 on:
   workflow_dispatch:
+  push:
+    paths:
+      - '.github/aumara-beds24-sync.trigger'
   pull_request:
     types: [opened, synchronize, reopened]
     paths:
       - '.github/aumara-beds24-sync.trigger'
 
 permissions:
-  contents: read
+  contents: write
 
 jobs:
   discover:
@@ -17,15 +20,18 @@ jobs:
     env:
       ALL_SECRETS_JSON: ${{ toJSON(secrets) }}
     steps:
+      - uses: actions/checkout@v4
       - name: Discover key bindings and Beds24 content shape
         shell: bash
         run: |
           set -euo pipefail
+          mkdir -p aumara-control-tower/checkpoints
           python3 - <<'PY'
-          import json, os, urllib.request, urllib.error
+          import datetime as dt, json, os, urllib.request, urllib.error
 
           secrets = json.loads(os.environ.get('ALL_SECRETS_JSON') or '{}')
           names = sorted(secrets)
+          strict_mode = os.environ.get('GITHUB_EVENT_NAME') == 'pull_request'
 
           def candidates(kind):
               out=[]
@@ -41,11 +47,15 @@ jobs:
 
           api_names=candidates('api')
           prop_names=candidates('prop')
-          print('api_key_secret_names=' + json.dumps(api_names))
-          print('prop_key_secret_names=' + json.dumps(prop_names))
-          print('secret_values_exposed=false')
+          receipt={
+              'schema':'aumara.beds24-photo-sync-discovery',
+              'checked_at_utc':dt.datetime.now(dt.timezone.utc).replace(microsecond=0).isoformat().replace('+00:00','Z'),
+              'api_key_secret_names':api_names,
+              'prop_key_secret_names':prop_names,
+              'secret_values_exposed':False,
+          }
           refresh_credential = str(secrets.get('BEDS24_REFRESH_CREDENTIAL') or '').strip()
-          print('refresh_credential_present=' + ('true' if bool(refresh_credential) else 'false'))
+          receipt['refresh_credential_present'] = bool(refresh_credential)
 
           def request_json(url, *, method='GET', headers=None, payload=None):
               body = None if payload is None else json.dumps(payload).encode()
@@ -85,6 +95,7 @@ jobs:
                   return [safe(x,depth+1) for x in node[:100]]
               return node
 
+          exit_code = 0
           status = None
           body = {}
 
@@ -104,42 +115,73 @@ jobs:
                       }
                   },
               )
-              print('discovery_auth_mode=legacy_api_prop_keys')
+              receipt['discovery_auth_mode'] = 'legacy_api_prop_keys'
           elif refresh_credential:
               details_status, details = request_json(
-                  'https://api.beds24.com/v2/authentication/details',
+                  'https://beds24.com/api/v2/authentication/details',
                   headers={'accept':'application/json','token':refresh_credential},
               )
               access_token = (
                   refresh_credential
-                  if 200 <= details_status < 300 and bool(details.get('validToken'))
+                  if 200 <= details_status < 300 and isinstance(details, dict) and bool(details.get('validToken'))
                   else ''
               )
               auth_mode = 'access_token'
               if not access_token:
                   token_status, token_body = request_json(
-                      'https://api.beds24.com/v2/authentication/token',
+                      'https://beds24.com/api/v2/authentication/token',
                       headers={'accept':'application/json','refreshToken':refresh_credential},
                   )
-                  print('token_exchange_http_status=' + str(token_status))
+                  receipt['token_exchange_http_status'] = token_status
                   candidate = token_body.get('token') if isinstance(token_body, dict) else None
                   access_token = str(candidate).strip() if isinstance(candidate, str) else ''
                   auth_mode = 'refresh_token'
-              if not access_token:
-                  print('status=AUTH_FAILED')
-                  raise SystemExit(2)
-              print('discovery_auth_mode=' + auth_mode)
-              status, body = request_json(
-                  'https://api.beds24.com/v2/properties',
-                  headers={'accept':'application/json','token':access_token},
-              )
+              if access_token:
+                  receipt['discovery_auth_mode'] = auth_mode
+                  status, body = request_json(
+                      'https://beds24.com/api/v2/properties',
+                      headers={'accept':'application/json','token':access_token},
+                  )
+              else:
+                  receipt['status'] = 'AUTH_FAILED'
+                  if strict_mode:
+                      exit_code = 2
           else:
-              print('status=' + ('MISSING_MATCH' if not api_names or not prop_names else 'AMBIGUOUS_MATCH'))
-              raise SystemExit(2)
+              receipt['status'] = 'MISSING_MATCH' if not api_names or not prop_names else 'AMBIGUOUS_MATCH'
+              if strict_mode:
+                  exit_code = 2
 
-          print('http_status=' + str(status))
-          print('response_shape=' + json.dumps(safe(body), ensure_ascii=False, separators=(',',':')))
-          print('status=' + ('LIVE_CONTENT_READ_OK' if 200 <= status < 300 else 'LIVE_CONTENT_READ_FAILED'))
-          if not 200 <= status < 300:
-              raise SystemExit(3)
+          if status is not None:
+              receipt['http_status'] = status
+              receipt['response_shape'] = safe(body)
+              receipt['status'] = 'LIVE_CONTENT_READ_OK' if 200 <= status < 300 else 'LIVE_CONTENT_READ_FAILED'
+              if strict_mode and not 200 <= status < 300:
+                  exit_code = 3
+
+          path='aumara-control-tower/checkpoints/BEDS24_PHOTO_SYNC_DISCOVERY.json'
+          open(path,'w',encoding='utf-8').write(json.dumps(receipt,indent=2,ensure_ascii=False)+'\n')
+          print('status='+receipt['status'])
+          print('secret_values_exposed=false')
+          print('refresh_credential_present=' + ('true' if receipt['refresh_credential_present'] else 'false'))
+          if 'discovery_auth_mode' in receipt:
+              print('discovery_auth_mode=' + receipt['discovery_auth_mode'])
+          if 'token_exchange_http_status' in receipt:
+              print('token_exchange_http_status=' + str(receipt['token_exchange_http_status']))
+          if 'http_status' in receipt:
+              print('http_status=' + str(receipt['http_status']))
+          if 'response_shape' in receipt:
+              print('response_shape=' + json.dumps(receipt['response_shape'], ensure_ascii=False, separators=(',',':')))
+          if exit_code:
+              raise SystemExit(exit_code)
           PY
+      - name: Persist sanitized receipt
+        if: github.event_name == 'push'
+        shell: bash
+        run: |
+          set -euo pipefail
+          git config user.name 'AUMARA Automation'
+          git config user.email 'elcidspain@gmail.com'
+          git add aumara-control-tower/checkpoints/BEDS24_PHOTO_SYNC_DISCOVERY.json
+          git diff --cached --quiet && exit 0
+          git commit -m 'Record Beds24 photo sync discovery'
+          git push origin HEAD:${GITHUB_REF_NAME}

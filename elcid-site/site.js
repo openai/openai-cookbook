@@ -4,7 +4,7 @@ const dictionary={
 };
 let lang=localStorage.getItem('elcid-language')||'es';
 const $=(s,c=document)=>c.querySelector(s),$$=(s,c=document)=>[...c.querySelectorAll(s)];
-function applyLanguage(){document.documentElement.dataset.language=lang;document.documentElement.lang=lang;$$('[data-i18n]').forEach(el=>{const v=dictionary[lang][el.dataset.i18n];if(v)el.textContent=v});$('#languageToggle').textContent=lang==='es'?'EN':'ES';localStorage.setItem('elcid-language',lang);updateWhatsApp()}
+function applyLanguage(){document.documentElement.dataset.language=lang;document.documentElement.lang=lang;$$('[data-i18n]').forEach(el=>{const v=dictionary[lang][el.dataset.i18n];if(v)el.textContent=v});$('#languageToggle').textContent=lang==='es'?'EN':'ES';const m=$('#menuButton');if(m)m.textContent=lang==='es'?'Menú':'Menu';localStorage.setItem('elcid-language',lang);updateWhatsApp()}
 function updateWhatsApp(){const number='34622914323';const text=lang==='es'?'Hola, quiero consultar una estancia en EL CID Country Club.':'Hello, I would like to ask about a stay at EL CID Country Club.';$('#whatsappBooking').href=`https://wa.me/${number}?text=${encodeURIComponent(text)}`}
 $('#languageToggle').addEventListener('click',()=>{lang=lang==='es'?'en':'es';applyLanguage()});
 const header=$('#header');addEventListener('scroll',()=>{header.classList.toggle('solid',scrollY>60);const bg=$('.hero-bg');if(bg&&matchMedia('(prefers-reduced-motion:no-preference)').matches)bg.style.transform=`scale(1.04) translateY(${Math.min(scrollY*.08,45)}px)`},{passive:true});

@@ -1,0 +1,30 @@
+<!doctype html>
+<html lang="ru">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+  <meta name="theme-color" content="#2c5b49">
+  <title>AUMARA Staff — обновление</title>
+  <style>body{font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",sans-serif;background:#f5f0e7;color:#204b3c;margin:0;display:grid;place-items:center;min-height:100vh;padding:24px;box-sizing:border-box}.card{max-width:420px;background:#fff;border-radius:22px;padding:24px;box-shadow:0 12px 35px #0001}h1{font-size:22px;margin:0 0 10px}p{line-height:1.45;margin:0}.small{font-size:13px;color:#67746e;margin-top:12px}</style>
+</head>
+<body>
+  <div class="card"><h1>Обновляю AUMARA Staff</h1><p>Очищаю только старый кэш приложения. Ваш вход и данные устройства сохраняются.</p><p class="small" id="status">Подготовка…</p></div>
+  <script>
+    (async()=>{
+      const status=document.getElementById('status');
+      try{
+        if('serviceWorker' in navigator){
+          const regs=await navigator.serviceWorker.getRegistrations();
+          await Promise.all(regs.filter(r=>String(r.scope||'').includes('/staff/')).map(r=>r.unregister()));
+        }
+        if('caches' in window){
+          const keys=await caches.keys();
+          await Promise.all(keys.filter(k=>k.startsWith('aumara-staff-pwa-')).map(k=>caches.delete(k)));
+        }
+        status.textContent='Готово. Открываю свежую версию…';
+      }catch(e){status.textContent='Открываю свежую версию…'}
+      location.replace('/staff/?fresh=232&t='+Date.now());
+    })();
+  </script>
+</body>
+</html>

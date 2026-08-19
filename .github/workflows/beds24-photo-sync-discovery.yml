@@ -27,7 +27,7 @@ jobs:
           set -euo pipefail
           mkdir -p aumara-control-tower/checkpoints
           python3 - <<'PY'
-          import datetime as dt, json, os, urllib.request, urllib.error
+          import datetime as dt, json, os, unicodedata, urllib.request, urllib.error
 
           secrets = json.loads(os.environ.get('ALL_SECRETS_JSON') or '{}')
           names = sorted(secrets)
@@ -54,7 +54,14 @@ jobs:
               'prop_key_secret_names':prop_names,
               'secret_values_exposed':False,
           }
-          refresh_credential = str(secrets.get('BEDS24_REFRESH_CREDENTIAL') or '').strip()
+          def normalize_secret(value):
+              raw = str(value or '').strip().strip('"').strip("'")
+              return ''.join(
+                  ch for ch in raw
+                  if not ch.isspace() and unicodedata.category(ch) not in {'Cc', 'Cf'}
+              )
+
+          refresh_credential = normalize_secret(secrets.get('BEDS24_REFRESH_CREDENTIAL'))
           receipt['refresh_credential_present'] = bool(refresh_credential)
 
           def request_json(url, *, method='GET', headers=None, payload=None):
@@ -110,8 +117,8 @@ jobs:
                   },
                   payload={
                       'authentication':{
-                          'apiKey':str(secrets[api_names[0]]).strip(),
-                          'propKey':str(secrets[prop_names[0]]).strip(),
+                          'apiKey':normalize_secret(secrets[api_names[0]]),
+                          'propKey':normalize_secret(secrets[prop_names[0]]),
                       }
                   },
               )
@@ -134,7 +141,7 @@ jobs:
                   )
                   receipt['token_exchange_http_status'] = token_status
                   candidate = token_body.get('token') if isinstance(token_body, dict) else None
-                  access_token = str(candidate).strip() if isinstance(candidate, str) else ''
+                  access_token = normalize_secret(candidate) if isinstance(candidate, str) else ''
                   auth_mode = 'refresh_token'
               if access_token:
                   receipt['discovery_auth_mode'] = auth_mode

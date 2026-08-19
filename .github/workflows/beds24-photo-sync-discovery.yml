@@ -2,8 +2,7 @@ name: Beds24 Photo Sync Discovery
 
 on:
   workflow_dispatch:
-  pull_request:
-    types: [opened, synchronize, reopened]
+  push:
     paths:
       - '.github/aumara-beds24-sync.trigger'
 

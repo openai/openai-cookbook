@@ -8,6 +8,7 @@ on:
       - '.github/workflows/aumara-provider-binding-discovery.yml'
 
 permissions:
+  actions: read
   contents: write
 
 jobs:
@@ -19,16 +20,33 @@ jobs:
       - uses: actions/checkout@v4
       - name: Discover provider-related secret names only
         env:
-          ALL_SECRETS_JSON: ${{ toJSON(secrets) }}
+          GITHUB_TOKEN: ${{ github.token }}
         shell: bash
         run: |
           set -euo pipefail
           mkdir -p aumara-control-tower/checkpoints
           python3 - <<'PY'
-          import json, os, re, datetime
-          raw=os.environ.get('ALL_SECRETS_JSON') or '{}'
-          data=json.loads(raw)
-          names=sorted(data.keys())
+          import datetime, json, os, re, urllib.parse, urllib.request
+
+          api_url = os.environ.get('GITHUB_API_URL', 'https://api.github.com').rstrip('/')
+          repo = os.environ['GITHUB_REPOSITORY']
+          token = os.environ['GITHUB_TOKEN']
+          headers = {
+             'Accept': 'application/vnd.github+json',
+             'Authorization': 'Bearer ' + token,
+             'X-GitHub-Api-Version': '2022-11-28',
+          }
+
+          def fetch_names(path):
+             request = urllib.request.Request(f'{api_url}{path}', headers=headers)
+             with urllib.request.urlopen(request, timeout=30) as response:
+                 payload = json.loads(response.read().decode('utf-8'))
+             return [entry['name'] for entry in payload.get('secrets', [])]
+
+          names = set(fetch_names(f'/repos/{repo}/actions/secrets'))
+          environment = urllib.parse.quote('Production', safe='')
+          names.update(fetch_names(f'/repos/{repo}/environments/{environment}/secrets'))
+          names = sorted(names)
           patterns={
             'xai_grok': re.compile(r'(XAI|GROK|X_AI)', re.I),
             'gemini_google_ai': re.compile(r'(GEMINI|GENAI|GENERATIVE.*AI|GOOGLE.*AI|AI.*GOOGLE)', re.I),
@@ -52,7 +70,7 @@ jobs:
         run: |
           set -euo pipefail
           git config user.name 'AUMARA Automation'
-          git config user.email 'elcidspain@gmail.com'
+          git config user.email '41898282+github-actions[bot]@users.noreply.github.com'
           git add aumara-control-tower/checkpoints/AUMARA_PROVIDER_BINDING_NAMES.json
           git commit -m 'Record AUMARA provider binding names'
           git push origin HEAD:main

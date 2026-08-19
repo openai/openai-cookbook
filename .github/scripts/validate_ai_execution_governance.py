@@ -155,7 +155,7 @@ def self_test(root: pathlib.Path = REPOSITORY_ROOT) -> None:
         _copy_governance_files(root, fixture)
 
         template = fixture / ".github/pull_request_template.md"
-        test_secret = "gh" + "p_" + ("x" * 20)
+        test_secret = "ops@example.invalid"
         template.write_text(
             template.read_text(encoding="utf-8") + f"\n{test_secret}\n",
             encoding="utf-8",

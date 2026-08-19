@@ -2,8 +2,7 @@ name: Beds24 Photo Sync Discovery
 
 on:
   workflow_dispatch:
-  pull_request_target:
-    types: [opened, synchronize, reopened]
+  push:
     paths:
       - '.github/aumara-beds24-sync.trigger'
 
@@ -13,14 +12,11 @@ permissions:
 jobs:
   discover:
     runs-on: ubuntu-latest
-    environment: Production
     timeout-minutes: 5
     env:
       ALL_SECRETS_JSON: ${{ toJSON(secrets) }}
     steps:
       - uses: actions/checkout@v4
-        with:
-          ref: main
       - name: Discover key bindings and Beds24 content shape
         shell: bash
         run: |
@@ -52,30 +48,19 @@ jobs:
               'api_key_secret_names':api_names,
               'prop_key_secret_names':prop_names,
               'secret_values_exposed':False,
-              'status':'DISCOVERED_NAMES',
           }
 
           if len(api_names)==1 and len(prop_names)==1:
-              api_key=secrets[api_names[0]].strip()
-              prop_key=secrets[prop_names[0]].strip()
-              payload=json.dumps({
-                  'authentication':{'apiKey':api_key,'propKey':prop_key},
-                  'bookingData':True,
-                  'images':True,
-                  'roomIds':True,
-                  'texts':True
-              }).encode()
+              payload=json.dumps({'authentication':{'apiKey':secrets[api_names[0]].strip(),'propKey':secrets[prop_names[0]].strip()}}).encode()
               req=urllib.request.Request('https://api.beds24.com/json/getPropertyContent', data=payload, headers={'Content-Type':'application/json','Accept':'application/json','User-Agent':'AUMARA-photo-sync/1.0'}, method='POST')
               try:
                   with urllib.request.urlopen(req, timeout=45) as r:
-                      raw=r.read(); receipt['http_status']=int(r.status)
+                      raw=r.read(); status=int(r.status)
               except urllib.error.HTTPError as e:
-                  raw=e.read(); receipt['http_status']=int(e.code)
-              except Exception as e:
-                  raw=b''; receipt['http_status']=0; receipt['error_type']=type(e).__name__
-
+                  raw=e.read(); status=int(e.code)
+              receipt['http_status']=status
               try: body=json.loads(raw.decode('utf-8','replace')) if raw else {}
-              except Exception: body={'_non_json_bytes':len(raw)}
+              except Exception: body={}
 
               def safe(node, depth=0):
                   if depth>8: return '[depth]'
@@ -89,15 +74,13 @@ jobs:
                               out[str(k)]=safe(v,depth+1)
                           elif any(x in ku for x in ('id','name','title','status','picture','image','photo','url','room','property','display')):
                               out[str(k)]=v
-                          else:
-                              out[str(k)]=f'[{type(v).__name__}]'
                       return out
                   if isinstance(node,list):
                       return [safe(x,depth+1) for x in node[:100]]
                   return node
 
               receipt['response_shape']=safe(body)
-              receipt['status']='LIVE_CONTENT_READ_OK' if 200 <= receipt['http_status'] < 300 else 'LIVE_CONTENT_READ_FAILED'
+              receipt['status']='LIVE_CONTENT_READ_OK' if 200 <= status < 300 else 'LIVE_CONTENT_READ_FAILED'
           elif not api_names or not prop_names:
               receipt['status']='MISSING_MATCH'
           else:
@@ -106,11 +89,9 @@ jobs:
           path='aumara-control-tower/checkpoints/BEDS24_PHOTO_SYNC_DISCOVERY.json'
           open(path,'w',encoding='utf-8').write(json.dumps(receipt,indent=2,ensure_ascii=False)+'\n')
           print('status='+receipt['status'])
-          print('api_key_name_matches='+str(len(api_names)))
-          print('prop_key_name_matches='+str(len(prop_names)))
           print('secret_values_exposed=false')
           PY
-      - name: Persist sanitized discovery receipt
+      - name: Persist sanitized receipt
         shell: bash
         run: |
           set -euo pipefail
@@ -119,4 +100,4 @@ jobs:
           git add aumara-control-tower/checkpoints/BEDS24_PHOTO_SYNC_DISCOVERY.json
           git diff --cached --quiet && exit 0
           git commit -m 'Record Beds24 photo sync discovery'
-          git push origin HEAD:main
+          git push origin HEAD:${GITHUB_REF_NAME}

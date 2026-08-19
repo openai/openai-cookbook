@@ -1,2 +1,4 @@
-trigger=2026-08-19T12:41:00+02:00
-scope=property-324882-photo-sync
+BEDS24_PHOTO_SYNC_DISCOVERY
+property=324882
+trigger=2026-08-19T15:17:00+02:00
+mode=existing-secrets-only

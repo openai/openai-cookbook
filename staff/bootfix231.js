@@ -17,6 +17,12 @@
     return nativeFetch(input,{...init,signal:controller.signal}).finally(()=>clearTimeout(timer));
   };
 
+  const baseLoadLoginOptions=loadLoginOptions;
+  loadLoginOptions=function(){
+    const pending=baseLoadLoginOptions();
+    if(pending&&typeof pending.catch==='function')pending.catch(()=>{});
+  };
+
   const baseCtx=ctx;
   ctx=function(){return {...baseCtx(),pwaVersion:'2.3.1'}};
 

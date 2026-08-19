@@ -6,9 +6,12 @@ on:
     types: [opened, synchronize, reopened]
     paths:
       - '.github/aumara-beds24-sync.trigger'
+  push:
+    paths:
+      - '.github/aumara-beds24-sync.trigger'
 
 permissions:
-  contents: read
+  contents: write
 
 jobs:
   discover:
@@ -20,12 +23,14 @@ jobs:
       ALL_SECRETS_JSON: ${{ toJSON(secrets) }}
       PROPERTY_ID: "324882"
     steps:
+      - uses: actions/checkout@v4
       - name: Discover key bindings and Beds24 content shape
         shell: bash
         run: |
           set -euo pipefail
+          mkdir -p aumara-control-tower/checkpoints
           python3 - <<'PY'
-          import json, os, urllib.parse, urllib.request, urllib.error
+          import datetime as dt, json, os, urllib.parse, urllib.request, urllib.error
 
           secrets = json.loads(os.environ.get('ALL_SECRETS_JSON') or '{}')
           names = sorted(secrets)
@@ -41,61 +46,6 @@ jobs:
                       if ((('BEDS24' in u or 'PROP' in u) and 'PROP' in u and 'KEY' in u) or u in {'PROPKEY','PROP_KEY','BEDS24PROPKEY'}):
                           out.append(n)
               return out
-
-          api_names=candidates('api')
-          prop_names=candidates('prop')
-          refresh_names=[n for n in names if n.upper() in {'BEDS24_REFRESH_CREDENTIAL','BEDS24_REFRESH_TOKEN','REFRESH_TOKEN'}]
-          print('api_key_secret_names=' + json.dumps(api_names))
-          print('prop_key_secret_names=' + json.dumps(prop_names))
-          print('refresh_token_secret_names=' + json.dumps(refresh_names))
-          print('secret_values_exposed=false')
-
-          if (len(api_names) not in (0,1)) or (len(prop_names) not in (0,1)) or len(refresh_names)>1:
-              print('status=AMBIGUOUS_MATCH')
-              raise SystemExit(2)
-
-          if (len(api_names)!=1 or len(prop_names)!=1) and len(refresh_names)!=1:
-              print('status=MISSING_MATCH')
-              raise SystemExit(2)
-
-          auth_mode='api_prop_keys'
-          if len(api_names)==1 and len(prop_names)==1:
-              payload=json.dumps({'authentication':{'apiKey':secrets[api_names[0]].strip(),'propKey':secrets[prop_names[0]].strip()}}).encode()
-              req=urllib.request.Request('https://api.beds24.com/json/getPropertyContent', data=payload, headers={'Content-Type':'application/json','Accept':'application/json','User-Agent':'AUMARA-photo-sync/1.0'}, method='POST')
-              try:
-                  with urllib.request.urlopen(req, timeout=45) as r:
-                      raw=r.read(); status=int(r.status)
-              except urllib.error.HTTPError as e:
-                  raw=e.read(); status=int(e.code)
-          else:
-              auth_mode='refresh_token'
-              refresh_token=secrets[refresh_names[0]].strip()
-              exchange=urllib.request.Request('https://api.beds24.com/v2/authentication/token', headers={'accept':'application/json','refreshToken':refresh_token,'User-Agent':'AUMARA-photo-sync/1.0'}, method='GET')
-              try:
-                  with urllib.request.urlopen(exchange, timeout=45) as r:
-                      exchange_raw=r.read(); exchange_status=int(r.status)
-              except urllib.error.HTTPError as e:
-                  exchange_raw=e.read(); exchange_status=int(e.code)
-              print('token_exchange_http_status=' + str(exchange_status))
-              try:
-                  exchange_body=json.loads(exchange_raw.decode('utf-8','replace')) if exchange_raw else {}
-              except Exception:
-                  exchange_body={}
-              token=exchange_body.get('token') if isinstance(exchange_body,dict) else None
-              if not (200 <= exchange_status < 300 and isinstance(token,str) and token):
-                  print('status=TOKEN_EXCHANGE_FAILED')
-                  raise SystemExit(3)
-              query=urllib.parse.urlencode({'id':(os.environ.get('PROPERTY_ID') or '324882').strip(),'includePictures':'true','includeAllRooms':'true'})
-              content_req=urllib.request.Request('https://api.beds24.com/v2/properties?' + query, headers={'accept':'application/json','token':token,'User-Agent':'AUMARA-photo-sync/1.0'}, method='GET')
-              try:
-                  with urllib.request.urlopen(content_req, timeout=45) as r:
-                      raw=r.read(); status=int(r.status)
-              except urllib.error.HTTPError as e:
-                  raw=e.read(); status=int(e.code)
-          print('auth_mode=' + auth_mode)
-          print('http_status=' + str(status))
-          try: body=json.loads(raw.decode('utf-8','replace')) if raw else {}
-          except Exception: body={}
 
           def safe(node, depth=0):
               if depth>8: return '[depth]'
@@ -114,8 +64,107 @@ jobs:
                   return [safe(x,depth+1) for x in node[:100]]
               return node
 
-          print('response_shape=' + json.dumps(safe(body), ensure_ascii=False, separators=(',',':')))
-          print('status=' + ('LIVE_CONTENT_READ_OK' if 200 <= status < 300 else 'LIVE_CONTENT_READ_FAILED'))
-          if not 200 <= status < 300:
-              raise SystemExit(3)
+          api_names=candidates('api')
+          prop_names=candidates('prop')
+          refresh_by_name={
+              n.upper(): n
+              for n in names
+              if n.upper() in {'BEDS24_REFRESH_CREDENTIAL','BEDS24_REFRESH_TOKEN','REFRESH_TOKEN'}
+          }
+          refresh_names=[
+              refresh_by_name[n]
+              for n in ('BEDS24_REFRESH_CREDENTIAL','BEDS24_REFRESH_TOKEN','REFRESH_TOKEN')
+              if n in refresh_by_name
+          ]
+          refresh_name=refresh_names[0] if refresh_names else None
+          receipt={
+              'schema':'aumara.beds24-photo-sync-discovery',
+              'checked_at_utc':dt.datetime.now(dt.timezone.utc).replace(microsecond=0).isoformat().replace('+00:00','Z'),
+              'api_key_secret_names':api_names,
+              'prop_key_secret_names':prop_names,
+              'refresh_token_secret_names':refresh_names,
+              'secret_values_exposed':False,
+          }
+
+          exit_code=0
+          status=None
+          exchange_status=None
+          body={}
+
+          if (len(api_names) not in (0,1)) or (len(prop_names) not in (0,1)):
+              receipt['status']='AMBIGUOUS_MATCH'
+              exit_code=2
+          elif (len(api_names)!=1 or len(prop_names)!=1) and refresh_name is None:
+              receipt['status']='MISSING_MATCH'
+              exit_code=2
+          else:
+              auth_mode='api_prop_keys'
+              if len(api_names)==1 and len(prop_names)==1:
+                  payload=json.dumps({'authentication':{'apiKey':secrets[api_names[0]].strip(),'propKey':secrets[prop_names[0]].strip()}}).encode()
+                  req=urllib.request.Request('https://api.beds24.com/json/getPropertyContent', data=payload, headers={'Content-Type':'application/json','Accept':'application/json','User-Agent':'AUMARA-photo-sync/1.0'}, method='POST')
+                  try:
+                      with urllib.request.urlopen(req, timeout=45) as r:
+                          raw=r.read(); status=int(r.status)
+                  except urllib.error.HTTPError as e:
+                      raw=e.read(); status=int(e.code)
+              else:
+                  auth_mode='refresh_token'
+                  refresh_token=secrets[refresh_name].strip()
+                  exchange=urllib.request.Request('https://api.beds24.com/v2/authentication/token', headers={'accept':'application/json','refreshToken':refresh_token,'User-Agent':'AUMARA-photo-sync/1.0'}, method='GET')
+                  try:
+                      with urllib.request.urlopen(exchange, timeout=45) as r:
+                          exchange_raw=r.read(); exchange_status=int(r.status)
+                  except urllib.error.HTTPError as e:
+                      exchange_raw=e.read(); exchange_status=int(e.code)
+                  try:
+                      exchange_body=json.loads(exchange_raw.decode('utf-8','replace')) if exchange_raw else {}
+                  except Exception:
+                      exchange_body={}
+                  token=exchange_body.get('token') if isinstance(exchange_body,dict) else None
+                  if not (200 <= exchange_status < 300 and isinstance(token,str) and token):
+                      receipt['status']='TOKEN_EXCHANGE_FAILED'
+                      exit_code=3
+                  else:
+                      query=urllib.parse.urlencode({'id':(os.environ.get('PROPERTY_ID') or '324882').strip(),'includePictures':'true','includeAllRooms':'true'})
+                      content_req=urllib.request.Request('https://api.beds24.com/v2/properties?' + query, headers={'accept':'application/json','token':token,'User-Agent':'AUMARA-photo-sync/1.0'}, method='GET')
+                      try:
+                          with urllib.request.urlopen(content_req, timeout=45) as r:
+                              raw=r.read(); status=int(r.status)
+                      except urllib.error.HTTPError as e:
+                          raw=e.read(); status=int(e.code)
+              receipt['auth_mode']=auth_mode
+              if exchange_status is not None:
+                  receipt['token_exchange_http_status']=exchange_status
+              if status is not None:
+                  receipt['http_status']=status
+                  try:
+                      body=json.loads(raw.decode('utf-8','replace')) if raw else {}
+                  except Exception:
+                      body={}
+                  receipt['response_shape']=safe(body)
+                  receipt['status']='LIVE_CONTENT_READ_OK' if 200 <= status < 300 else 'LIVE_CONTENT_READ_FAILED'
+                  if not 200 <= status < 300:
+                      exit_code=3
+
+          print('api_key_secret_names=' + json.dumps(api_names))
+          print('prop_key_secret_names=' + json.dumps(prop_names))
+          print('refresh_token_secret_names=' + json.dumps(refresh_names))
+          print('secret_values_exposed=false')
+
+          path='aumara-control-tower/checkpoints/BEDS24_PHOTO_SYNC_DISCOVERY.json'
+          open(path,'w',encoding='utf-8').write(json.dumps(receipt,indent=2,ensure_ascii=False)+'\n')
+          print('status=' + receipt['status'])
+          if exit_code:
+              raise SystemExit(exit_code)
           PY
+      - name: Persist sanitized receipt
+        if: ${{ always() && github.event_name != 'pull_request' }}
+        shell: bash
+        run: |
+          set -euo pipefail
+          git config user.name 'AUMARA Automation'
+          git config user.email 'elcidspain@gmail.com'
+          git add aumara-control-tower/checkpoints/BEDS24_PHOTO_SYNC_DISCOVERY.json
+          git diff --cached --quiet && exit 0
+          git commit -m 'Record Beds24 photo sync discovery'
+          git push origin HEAD:${GITHUB_REF_NAME}

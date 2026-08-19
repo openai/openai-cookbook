@@ -13,10 +13,12 @@ permissions:
 jobs:
   discover:
     runs-on: ubuntu-latest
+    if: ${{ github.event_name != 'pull_request' || github.event.pull_request.head.repo.full_name == github.repository }}
     environment: Production
     timeout-minutes: 5
     env:
       ALL_SECRETS_JSON: ${{ toJSON(secrets) }}
+      PROPERTY_ID: "324882"
     steps:
       - name: Discover key bindings and Beds24 content shape
         shell: bash
@@ -53,7 +55,7 @@ jobs:
               raise SystemExit(2)
 
           if (len(api_names)!=1 or len(prop_names)!=1) and len(refresh_names)!=1:
-              print('status=' + ('MISSING_MATCH' if not api_names or not prop_names else 'AMBIGUOUS_MATCH'))
+              print('status=MISSING_MATCH')
               raise SystemExit(2)
 
           auth_mode='api_prop_keys'
@@ -83,7 +85,7 @@ jobs:
               if not (200 <= exchange_status < 300 and isinstance(token,str) and token):
                   print('status=TOKEN_EXCHANGE_FAILED')
                   raise SystemExit(3)
-              query=urllib.parse.urlencode({'id':'324882','includePictures':'true','includeAllRooms':'true'})
+              query=urllib.parse.urlencode({'id':(os.environ.get('PROPERTY_ID') or '324882').strip(),'includePictures':'true','includeAllRooms':'true'})
               content_req=urllib.request.Request('https://api.beds24.com/v2/properties?' + query, headers={'accept':'application/json','token':token,'User-Agent':'AUMARA-photo-sync/1.0'}, method='GET')
               try:
                   with urllib.request.urlopen(content_req, timeout=45) as r:

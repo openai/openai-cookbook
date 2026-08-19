@@ -40,11 +40,11 @@ def fail(msg):
     sys.exit(1)
 
 
-def external_hosts_in(text):
-    return {
-        urlparse(url).netloc
-        for url in re.findall(r"https?://[^\"')\s]+", text)
-    }
+def contains_external_host(text, host):
+    for url in re.findall(r"https?://[^\"')\s]+", text):
+        if urlparse(url).hostname == host:
+            return True
+    return False
 
 
 html = (ROOT / "index.html").read_text(encoding="utf-8")
@@ -57,7 +57,9 @@ if "AUMARA_Explore" in html or "08_AUMARA_Domes" in html:
     fail("AUMARA primary image assets leaked into EL CID page")
 if "noindex,nofollow" not in html:
     fail("review page must remain noindex")
-if "cf.bstatic.com" in external_hosts_in(html) | external_hosts_in(css):
+if contains_external_host(html, "cf.bstatic.com") or contains_external_host(
+    css, "cf.bstatic.com"
+):
     fail("Booking CDN image hotlink remains")
 if "official-logo" not in html or "official-logo" not in css:
     fail("official EL CID logo missing")

@@ -103,11 +103,13 @@ jobs:
           set -euo pipefail
           lftp -u "$FTP_USER","$FTP_PASSWORD" "$FTP_HOST" -e "set cmd:fail-exit yes; set ftp:ssl-allow no; set ftp:passive-mode yes; pwd; cls -la /www; bye"
 
-      - name: Verify Staff web root
+      - name: Ensure Staff web root
         shell: bash
         run: |
           set -euo pipefail
-          lftp -u "$FTP_USER","$FTP_PASSWORD" "$FTP_HOST" -e "set cmd:fail-exit yes; set ftp:ssl-allow no; set ftp:passive-mode yes; cd $FTP_TARGET; pwd; bye"
+          if ! lftp -u "$FTP_USER","$FTP_PASSWORD" "$FTP_HOST" -e "set cmd:fail-exit yes; set ftp:ssl-allow no; set ftp:passive-mode yes; cd $FTP_TARGET; pwd; bye"; then
+            lftp -u "$FTP_USER","$FTP_PASSWORD" "$FTP_HOST" -e "set cmd:fail-exit yes; set ftp:ssl-allow no; set ftp:passive-mode yes; mkdir $FTP_TARGET; cd $FTP_TARGET; pwd; bye"
+          fi
 
       - name: Upload AUMARA Staff PWA
         shell: bash

@@ -23,7 +23,7 @@ jobs:
         run: |
           set -euo pipefail
           python3 - <<'PY'
-          import json, os, urllib.request, urllib.error
+          import json, os, urllib.parse, urllib.request, urllib.error
 
           secrets = json.loads(os.environ.get('ALL_SECRETS_JSON') or '{}')
           names = sorted(secrets)
@@ -42,21 +42,55 @@ jobs:
 
           api_names=candidates('api')
           prop_names=candidates('prop')
+          refresh_names=[n for n in names if n.upper() in {'BEDS24_REFRESH_CREDENTIAL','BEDS24_REFRESH_TOKEN','REFRESH_TOKEN'}]
           print('api_key_secret_names=' + json.dumps(api_names))
           print('prop_key_secret_names=' + json.dumps(prop_names))
+          print('refresh_token_secret_names=' + json.dumps(refresh_names))
           print('secret_values_exposed=false')
 
-          if len(api_names)!=1 or len(prop_names)!=1:
+          if (len(api_names) not in (0,1)) or (len(prop_names) not in (0,1)) or len(refresh_names)>1:
+              print('status=AMBIGUOUS_MATCH')
+              raise SystemExit(2)
+
+          if (len(api_names)!=1 or len(prop_names)!=1) and len(refresh_names)!=1:
               print('status=' + ('MISSING_MATCH' if not api_names or not prop_names else 'AMBIGUOUS_MATCH'))
               raise SystemExit(2)
 
-          payload=json.dumps({'authentication':{'apiKey':secrets[api_names[0]].strip(),'propKey':secrets[prop_names[0]].strip()}}).encode()
-          req=urllib.request.Request('https://api.beds24.com/json/getPropertyContent', data=payload, headers={'Content-Type':'application/json','Accept':'application/json','User-Agent':'AUMARA-photo-sync/1.0'}, method='POST')
-          try:
-              with urllib.request.urlopen(req, timeout=45) as r:
-                  raw=r.read(); status=int(r.status)
-          except urllib.error.HTTPError as e:
-              raw=e.read(); status=int(e.code)
+          auth_mode='api_prop_keys'
+          if len(api_names)==1 and len(prop_names)==1:
+              payload=json.dumps({'authentication':{'apiKey':secrets[api_names[0]].strip(),'propKey':secrets[prop_names[0]].strip()}}).encode()
+              req=urllib.request.Request('https://api.beds24.com/json/getPropertyContent', data=payload, headers={'Content-Type':'application/json','Accept':'application/json','User-Agent':'AUMARA-photo-sync/1.0'}, method='POST')
+              try:
+                  with urllib.request.urlopen(req, timeout=45) as r:
+                      raw=r.read(); status=int(r.status)
+              except urllib.error.HTTPError as e:
+                  raw=e.read(); status=int(e.code)
+          else:
+              auth_mode='refresh_token'
+              refresh_token=secrets[refresh_names[0]].strip()
+              exchange=urllib.request.Request('https://api.beds24.com/v2/authentication/token', headers={'accept':'application/json','refreshToken':refresh_token,'User-Agent':'AUMARA-photo-sync/1.0'}, method='GET')
+              try:
+                  with urllib.request.urlopen(exchange, timeout=45) as r:
+                      exchange_raw=r.read(); exchange_status=int(r.status)
+              except urllib.error.HTTPError as e:
+                  exchange_raw=e.read(); exchange_status=int(e.code)
+              print('token_exchange_http_status=' + str(exchange_status))
+              try:
+                  exchange_body=json.loads(exchange_raw.decode('utf-8','replace')) if exchange_raw else {}
+              except Exception:
+                  exchange_body={}
+              token=exchange_body.get('token') if isinstance(exchange_body,dict) else None
+              if not (200 <= exchange_status < 300 and isinstance(token,str) and token):
+                  print('status=TOKEN_EXCHANGE_FAILED')
+                  raise SystemExit(3)
+              query=urllib.parse.urlencode({'id':'324882','includePictures':'true','includeAllRooms':'true'})
+              content_req=urllib.request.Request('https://api.beds24.com/v2/properties?' + query, headers={'accept':'application/json','token':token,'User-Agent':'AUMARA-photo-sync/1.0'}, method='GET')
+              try:
+                  with urllib.request.urlopen(content_req, timeout=45) as r:
+                      raw=r.read(); status=int(r.status)
+              except urllib.error.HTTPError as e:
+                  raw=e.read(); status=int(e.code)
+          print('auth_mode=' + auth_mode)
           print('http_status=' + str(status))
           try: body=json.loads(raw.decode('utf-8','replace')) if raw else {}
           except Exception: body={}

@@ -1,11 +1,11 @@
 name: Beds24 Photo Sync Discovery
 
 on:
-  push:
-    branches: [main]
-    paths:
-      - '.github/workflows/beds24-photo-sync-discovery.yml'
   workflow_dispatch:
+  pull_request_target:
+    types: [opened, synchronize, reopened]
+    paths:
+      - '.github/aumara-beds24-sync.trigger'
 
 permissions:
   contents: write
@@ -19,13 +19,15 @@ jobs:
       ALL_SECRETS_JSON: ${{ toJSON(secrets) }}
     steps:
       - uses: actions/checkout@v4
+        with:
+          ref: main
       - name: Discover key bindings and Beds24 content shape
         shell: bash
         run: |
           set -euo pipefail
           mkdir -p aumara-control-tower/checkpoints
           python3 - <<'PY'
-          import datetime as dt, json, os, re, urllib.request, urllib.error
+          import datetime as dt, json, os, urllib.request, urllib.error
 
           secrets = json.loads(os.environ.get('ALL_SECRETS_JSON') or '{}')
           names = sorted(secrets)
@@ -56,12 +58,17 @@ jobs:
           if len(api_names)==1 and len(prop_names)==1:
               api_key=secrets[api_names[0]].strip()
               prop_key=secrets[prop_names[0]].strip()
-              payload=json.dumps({'authentication':{'apiKey':api_key,'propKey':prop_key}}).encode()
+              payload=json.dumps({
+                  'authentication':{'apiKey':api_key,'propKey':prop_key},
+                  'bookingData':True,
+                  'images':True,
+                  'roomIds':True,
+                  'texts':True
+              }).encode()
               req=urllib.request.Request('https://api.beds24.com/json/getPropertyContent', data=payload, headers={'Content-Type':'application/json','Accept':'application/json','User-Agent':'AUMARA-photo-sync/1.0'}, method='POST')
               try:
                   with urllib.request.urlopen(req, timeout=45) as r:
-                      raw=r.read()
-                      receipt['http_status']=int(r.status)
+                      raw=r.read(); receipt['http_status']=int(r.status)
               except urllib.error.HTTPError as e:
                   raw=e.read(); receipt['http_status']=int(e.code)
               except Exception as e:
@@ -70,26 +77,26 @@ jobs:
               try: body=json.loads(raw.decode('utf-8','replace')) if raw else {}
               except Exception: body={'_non_json_bytes':len(raw)}
 
-              def shape(node, depth=0):
-                  if depth>5: return '[depth]'
+              def safe(node, depth=0):
+                  if depth>8: return '[depth]'
                   if isinstance(node, dict):
                       out={}
                       for k,v in node.items():
                           ku=str(k).lower()
-                          if any(x in ku for x in ('key','token','password','secret','email','phone','address')):
+                          if any(x in ku for x in ('apikey','propkey','token','password','secret','email','phone','address')):
                               out[str(k)]='[redacted]'
                           elif isinstance(v,(dict,list)):
-                              out[str(k)]=shape(v,depth+1)
-                          elif any(x in ku for x in ('id','name','title','status','picture','image','photo','url','room','property')):
+                              out[str(k)]=safe(v,depth+1)
+                          elif any(x in ku for x in ('id','name','title','status','picture','image','photo','url','room','property','display')):
                               out[str(k)]=v
                           else:
                               out[str(k)]=f'[{type(v).__name__}]'
                       return out
                   if isinstance(node,list):
-                      return [shape(x,depth+1) for x in node[:20]]
+                      return [safe(x,depth+1) for x in node[:100]]
                   return node
 
-              receipt['response_shape']=shape(body)
+              receipt['response_shape']=safe(body)
               receipt['status']='LIVE_CONTENT_READ_OK' if 200 <= receipt['http_status'] < 300 else 'LIVE_CONTENT_READ_FAILED'
           elif not api_names or not prop_names:
               receipt['status']='MISSING_MATCH'

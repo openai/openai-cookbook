@@ -1,0 +1,24 @@
+name: EL CID site checks
+
+on:
+  pull_request:
+    paths:
+      - "elcid-site/**"
+      - ".github/workflows/elcid-site-check.yml"
+  push:
+    paths:
+      - "elcid-site/**"
+      - ".github/workflows/elcid-site-check.yml"
+
+permissions:
+  contents: read
+
+jobs:
+  static-site:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - name: Run EL CID static checks
+        run: python elcid-site/check_site.py
+      - name: Compile checker
+        run: python -m py_compile elcid-site/check_site.py

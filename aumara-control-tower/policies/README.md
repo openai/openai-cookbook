@@ -8,8 +8,11 @@ EL CID guest products.
 - `elcid.yaml` contains EL CID facts, reply fragments, action policy and source references.
 - `aumara.yaml` contains AUMARA policy placeholders and source references.
 - `guest_reply_runtime.json` pins the independently deployable EL CID guest-reply snapshot.
+- `guest_journey_runtime.json` pins the dual-property, proposal-only care-message snapshot.
 - `schema.json` is the shared machine-readable schema.
 - `../scripts/guest_reply_policy_runtime.py` loads only snapshot-approved EL CID reply fragments and fails closed on registry or snapshot drift.
+- `../scripts/beds24_guest_journey_shadow.py` maps live Beds24 reads into
+  proposal-only decisions and emits only PII-free aggregate evidence.
 
 The `.yaml` files use JSON-compatible YAML so validation requires only the
 Python standard library. Private operational values, guest data, credentials,
@@ -29,6 +32,13 @@ change cannot silently disable a working cot or note writer. The ChatGPT
 automation prompt must declare the same guest-reply snapshot version. A
 delivery failure changes only delivery state; it must not rewrite the approved
 reply or restore a stale generic template.
+
+The guest-journey snapshot is a separate zero-send boundary. It may render
+post-check-in and first-morning proposals for AUMARA and EL CID, but it cannot
+authorize a channel send or a Beds24 mutation. Checkout-pressure events are
+hard-blocked before booking or recipient data is evaluated. Guest complaints
+override lifecycle deduplication; a live sender must atomically claim the
+stable booking/event key before delivery.
 
 Validate locally:
 

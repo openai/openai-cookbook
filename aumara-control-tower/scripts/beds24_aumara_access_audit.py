@@ -4,8 +4,9 @@
 The audit never changes a booking, sends a message, calls TTLock, or exposes a
 PIN. It verifies two distinct things for AUMARA property 324882:
 
-* Beds24 currently contains a ``LOCK_PIN`` value for each audited arrival;
-* the latest host access message contains that exact current PIN.
+* Fixed guest PIN policy: expected code is ``1531`` (see systems/aumara-fixed-guest-pin.md);
+* Beds24 ``LOCK_PIN`` should equal that fixed code when present;
+* the latest host access message contains the fixed PIN.
 
 A matching message proves distribution integrity only. It does not prove that
 the physical lock accepted the PIN; physical opening still requires an on-site
@@ -27,6 +28,8 @@ from beds24_elcid_studio_audit import AuditError, data_rows, get_access_token, r
 
 
 PROPERTY_ID = 324882
+# Permanent shared guest PIN while gateways are offline (do not log in results).
+FIXED_GUEST_PIN = (os.environ.get("AUMARA_FIXED_GUEST_PIN") or "1531").strip()
 MADRID = ZoneInfo("Europe/Madrid")
 OUTPUT = pathlib.Path(
     os.environ.get(
@@ -34,7 +37,7 @@ OUTPUT = pathlib.Path(
         "aumara-control-tower/evidence/aumara-access-audit.json",
     )
 )
-PIN_RE = re.compile(r"(?<!\d)(\d{6,9})(?!\d)")
+PIN_RE = re.compile(r"(?<!\d)(\d{4,9})(?!\d)")
 ACCESS_MARKERS = (
     "lock_pin",
     "pin",
@@ -48,6 +51,7 @@ ACCESS_MARKERS = (
 )
 HOST_SOURCES = {"host", "property", "owner"}
 HEALTHY_STATUSES = {"PIN_MESSAGE_MATCHED"}
+INACTIVE_BOOKING_STATUSES = {"cancelled", "canceled", "black", "inquiry"}
 
 
 class AccessAuditError(AuditError):
@@ -103,7 +107,41 @@ def fetch_arrivals(
         suffix = f"; diagnostics={json.dumps(details, ensure_ascii=False)}" if details else ""
         raise AccessAuditError(f"AUMARA booking lookup failed with HTTP {status}{suffix}")
     rows = data_rows(response, "AUMARA booking")
-    return [row for row in rows if int(row.get("propertyId") or PROPERTY_ID) == PROPERTY_ID]
+    return [
+        row
+        for row in rows
+        if int(row.get("propertyId") or PROPERTY_ID) == PROPERTY_ID
+        and str(row.get("status") or "").strip().lower()
+        not in INACTIVE_BOOKING_STATUSES
+    ]
+
+
+
+def fetch_booking_by_id(token: str, api_base: str, booking_id: int) -> dict[str, Any] | None:
+    """Load one booking by id without an arrival-date window."""
+    query = urllib.parse.urlencode(
+        [
+            ("id", booking_id),
+            ("propertyId", PROPERTY_ID),
+            ("includeGuests", "true"),
+            ("includeBookingGroup", "true"),
+        ]
+    )
+    status, response = request_json(
+        "GET",
+        f"/bookings?{query}",
+        headers={"token": token},
+        api_base=api_base,
+    )
+    if not 200 <= status < 300:
+        raise AccessAuditError(f"AUMARA booking id lookup failed with HTTP {status}")
+    rows = [
+        row
+        for row in data_rows(response, "AUMARA booking")
+        if int(row.get("id") or 0) == booking_id
+        and int(row.get("propertyId") or PROPERTY_ID) == PROPERTY_ID
+    ]
+    return rows[0] if rows else None
 
 
 def fetch_messages(token: str, api_base: str, booking_id: int) -> list[dict[str, Any]]:
@@ -230,15 +268,30 @@ def access_message_state(
     return True, latest_pin_like, latest_match, str(sent_at) if sent_at else None
 
 
+def expected_guest_pins(booking: dict[str, Any]) -> set[str]:
+    """Fixed-PIN policy: the only guest code is FIXED_GUEST_PIN (default 1531)."""
+    del booking  # booking-specific LOCK_PIN is no longer the source of truth
+    pin = (FIXED_GUEST_PIN or "").strip()
+    return {pin} if pin else set()
+
+
 def audit_booking(booking: dict[str, Any], messages: list[dict[str, Any]]) -> dict[str, Any]:
-    descriptor, pins = current_lock_pins(booking)
-    message_found, message_has_pin, message_matches, message_at = access_message_state(messages, pins)
+    descriptor, stored_pins = current_lock_pins(booking)
+    pins = expected_guest_pins(booking)
+    stored_matches_fixed = bool(stored_pins) and stored_pins == pins
+    message_found, message_has_pin, message_matches, message_at = access_message_state(
+        messages, pins
+    )
     if pins and message_matches:
         status = "PIN_MESSAGE_MATCHED"
     elif pins and message_found:
         status = "PIN_MESSAGE_MISMATCH"
-    elif pins:
+    elif pins and stored_matches_fixed:
         status = "PIN_PRESENT_SEND_UNCONFIRMED"
+    elif pins and descriptor and stored_pins and not stored_matches_fixed:
+        status = "PIN_MESSAGE_MISMATCH"
+    elif pins:
+        status = "PIN_PRESENT_SEND_UNCONFIRMED" if descriptor else "PIN_NOT_FOUND"
     elif message_has_pin:
         status = "PIN_NOT_FOUND_MESSAGE_CONTAINS_CODE"
     else:
@@ -249,7 +302,9 @@ def audit_booking(booking: dict[str, Any], messages: list[dict[str, Any]]) -> di
         "departure": booking.get("departure"),
         "assignedUnitIds": assigned_unit_ids(booking),
         "lockPinDescriptorPresent": descriptor,
-        "lockPinValuePresent": bool(pins),
+        "lockPinValuePresent": bool(stored_pins) or bool(pins),
+        "fixedGuestPinPolicy": True,
+        "storedLockPinMatchesFixed": stored_matches_fixed if stored_pins else False,
         "hostAccessMessagePresent": message_found,
         "hostMessageContainsPinLikeValue": message_has_pin,
         "hostMessageMatchesCurrentPin": message_matches,
@@ -277,6 +332,7 @@ def _base_payload(
         "pinValueExposed": False,
         "messageBodyExposed": False,
         "physicalDoorOperationVerified": False,
+        "fixedGuestPinPolicy": True,
         "status": status,
         "results": results,
     }
@@ -303,7 +359,11 @@ def main() -> int:
         return 1
 
     try:
-        bookings = fetch_arrivals(token, api_base, start, end)
+        if requested_id is not None:
+            row = fetch_booking_by_id(token, api_base, requested_id)
+            bookings = [row] if row else []
+        else:
+            bookings = fetch_arrivals(token, api_base, start, end)
     except AuditError as exc:
         payload = _base_payload(start, end, status="BOOKINGS_READ_FAILED", results=[])
         payload.update(
@@ -317,20 +377,18 @@ def main() -> int:
         _write(payload)
         return 1
 
-    if requested_id is not None:
-        bookings = [row for row in bookings if int(row.get("id") or 0) == requested_id]
-        if not bookings:
-            payload = _base_payload(start, end, status="BOOKING_NOT_FOUND", results=[])
-            payload.update(
-                {
-                    "authMode": auth_mode,
-                    "authSource": auth_source,
-                    "apiHost": urllib.parse.urlparse(api_base).netloc,
-                    "requestedBookingId": requested_id,
-                }
-            )
-            _write(payload)
-            return 0
+    if requested_id is not None and not bookings:
+        payload = _base_payload(start, end, status="BOOKING_NOT_FOUND", results=[])
+        payload.update(
+            {
+                "authMode": auth_mode,
+                "authSource": auth_source,
+                "apiHost": urllib.parse.urlparse(api_base).netloc,
+                "requestedBookingId": requested_id,
+            }
+        )
+        _write(payload)
+        return 0
 
     if not bookings:
         payload = _base_payload(start, end, status="NO_ARRIVALS", results=[])

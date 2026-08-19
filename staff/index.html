@@ -1,0 +1,123 @@
+<!doctype html>
+<html lang="ru">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+  <meta name="theme-color" content="#2c5b49">
+  <meta name="apple-mobile-web-app-capable" content="yes">
+  <meta name="apple-mobile-web-app-status-bar-style" content="default">
+  <meta name="apple-mobile-web-app-title" content="AUMARA Staff">
+  <meta name="format-detection" content="telephone=no">
+  <link rel="manifest" href="/staff/manifest.webmanifest">
+  <link rel="icon" href="/staff/icon.svg" type="image/svg+xml">
+  <link rel="stylesheet" href="/staff/styles.css?v=231">
+  <title>AUMARA Staff</title>
+</head>
+<body>
+  <div class="shell">
+    <header class="topbar">
+      <div class="brandmark">AUMARA</div>
+      <div class="brandtext">
+        <h1>AUMARA Staff</h1>
+        <div class="sub"><span id="who">локальный режим</span> · <span id="lastSync">—</span></div>
+      </div>
+      <div class="statusbox">
+        <span id="net" class="pill">—</span>
+        <span id="version" class="pill">PWA 2.3.1</span>
+      </div>
+    </header>
+
+    <div id="queuebar" class="queuebar hidden"></div>
+
+    <section id="login" class="login-wrap">
+      <div class="login-card">
+        <h2>Вход в AUMARA</h2>
+        <p class="muted">На этом устройстве PIN нужен один раз. После входа устройство сохраняется локально и приложение открывает последний срез сразу, даже без сети.</p>
+        <div class="field">
+          <label for="staffId">Сотрудник</label>
+          <select id="staffId"><option value="">Загрузка…</option></select>
+        </div>
+        <div class="field">
+          <label for="pin">PIN</label>
+          <input id="pin" type="password" inputmode="numeric" autocomplete="one-time-code" maxlength="12" placeholder="••••••">
+        </div>
+        <button id="loginBtn" class="btn" type="button">Войти и закрепить устройство</button>
+        <p class="small muted">AUMARA не хранит PIN на телефоне. После входа сохраняется только device-session.</p>
+      </div>
+    </section>
+
+    <section id="app" class="hidden">
+      <nav class="tabs">
+        <button class="tab active" data-tab="home">Сегодня</button>
+        <span id="ownerTabs" style="display:contents">
+          <button class="tab" data-tab="team">Команда <span id="teamCount"></span></button>
+          <button class="tab" data-tab="finance">Финансы</button>
+        </span>
+        <button class="tab" data-tab="tasks">Задачи <span id="taskCount"></span></button>
+      </nav>
+
+      <main class="main">
+        <div class="row wrap" style="justify-content:flex-end;margin-bottom:8px">
+          <span id="syncLabel" class="syncnote"></span>
+          <button id="syncNow" class="btn sm alt" type="button">Синхронизировать</button>
+          <button id="logoutBtn" class="btn sm outline" type="button">Сбросить вход</button>
+        </div>
+
+        <section id="sec-home" class="section">
+          <div class="section-head"><h2>Сегодня</h2><span class="syncnote">локальный срез + фон</span></div>
+          <div id="homeBody"></div>
+        </section>
+
+        <section id="sec-team" class="section hidden">
+          <div class="section-head"><h2>Команда</h2><span class="syncnote">раскрой сотрудника</span></div>
+          <div id="teamBody" class="accordion"></div>
+        </section>
+
+        <section id="sec-finance" class="section hidden">
+          <div class="section-head"><h2>Финансы</h2><span class="syncnote">факт + план</span></div>
+          <div class="period">
+            <div class="field"><label for="fromDate">С</label><input id="fromDate" type="date"></div>
+            <div class="field"><label for="toDate">По</label><input id="toDate" type="date"></div>
+          </div>
+          <div class="toolbar">
+            <button class="quick" data-period="7">7 дней</button>
+            <button class="quick" data-period="30">30 дней</button>
+            <button class="quick" data-period="month">Месяц</button>
+            <button class="quick" data-period="future14">+14 дней</button>
+            <button class="quick" data-period="future30">+30 дней</button>
+            <button class="quick" data-period="all">История + план</button>
+            <button id="applyPeriod" class="btn sm">Применить</button>
+          </div>
+          <div id="financeTotals" class="finance-totals"></div>
+          <div id="financeBody" class="accordion" style="margin-top:12px"></div>
+        </section>
+
+        <section id="sec-tasks" class="section hidden">
+          <div class="section-head">
+            <h2>Задачи</h2>
+            <button id="newTask" class="btn sm hidden" type="button">+ Задача</button>
+          </div>
+          <div id="tasksBody" class="accordion"></div>
+        </section>
+      </main>
+    </section>
+  </div>
+
+  <div id="toast" class="toast hidden"></div>
+  <div id="modal" class="modal hidden" role="dialog" aria-modal="true">
+    <div class="modal-card">
+      <div class="row" style="justify-content:flex-end"><button id="closeModal" class="btn sm alt" type="button">Закрыть</button></div>
+      <div id="modalBody"></div>
+    </div>
+  </div>
+
+  <script src="/staff/app.js?v=231" defer></script>
+  <script src="/staff/bootfix231.js?v=231" defer></script>
+  <script src="/staff/patch.js?v=231" defer></script>
+  <script src="/staff/legacy.js?v=231" defer></script>
+  <script src="/staff/planner23.js?v=231" defer></script>
+  <script>
+    if('serviceWorker' in navigator){addEventListener('load',()=>navigator.serviceWorker.register('/staff/sw.js?v=231').catch(()=>{}));}
+  </script>
+</body>
+</html>

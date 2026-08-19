@@ -1,0 +1,219 @@
+name: Beds24 V2 picture structure 324882
+
+on:
+  workflow_dispatch:
+  push:
+    branches: [main]
+    paths:
+      - ".github/workflows/beds24-v2-picture-structure.yml"
+
+permissions:
+  contents: write
+
+concurrency:
+  group: beds24-v2-picture-structure-324882
+  cancel-in-progress: true
+
+jobs:
+  probe:
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    env:
+      BEDS24_REFRESH_CREDENTIAL: ${{ secrets.BEDS24_REFRESH_CREDENTIAL }}
+      PROPERTY_ID: "324882"
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+
+      - name: Read current property picture structure
+        shell: bash
+        run: |
+          python3 - <<'PY'
+          from __future__ import annotations
+
+          import datetime as dt
+          import json
+          import os
+          import pathlib
+          import subprocess
+          import urllib.error
+          import urllib.parse
+          import urllib.request
+          from typing import Any
+
+          API_BASE = "https://api.beds24.com/v2"
+          credential = (os.environ.get("BEDS24_REFRESH_CREDENTIAL") or "").strip()
+          property_id = os.environ.get("PROPERTY_ID", "324882")
+          run_id = os.environ.get("GITHUB_RUN_ID", "unknown")
+          evidence_path = pathlib.Path(
+              f"aumara-control-tower/evidence/beds24-v2-picture-structure/{run_id}.json"
+          )
+          access_token = ""
+
+          def request_json(url: str, headers: dict[str, str]) -> tuple[int, Any]:
+              req = urllib.request.Request(
+                  url,
+                  headers={"accept": "application/json", **headers},
+                  method="GET",
+              )
+              try:
+                  with urllib.request.urlopen(req, timeout=60) as response:
+                      raw = response.read()
+                      status = response.status
+              except urllib.error.HTTPError as exc:
+                  raw = exc.read()
+                  status = exc.code
+              try:
+                  return status, json.loads(raw.decode("utf-8", "replace")) if raw else {}
+              except json.JSONDecodeError:
+                  return status, {"non_json_bytes": len(raw)}
+
+          def sanitize(value: Any, depth: int = 0) -> Any:
+              if depth > 8:
+                  return "[DEPTH_LIMIT]"
+              if isinstance(value, dict):
+                  result: dict[str, Any] = {}
+                  for key, item in value.items():
+                      normalized = str(key).lower()
+                      if any(token in normalized for token in ("token", "secret", "password", "credential")):
+                          result[str(key)] = "[REDACTED]"
+                      else:
+                          result[str(key)] = sanitize(item, depth + 1)
+                  return result
+              if isinstance(value, list):
+                  return [sanitize(item, depth + 1) for item in value[:200]]
+              if isinstance(value, str):
+                  redacted = value
+                  for secret in (credential, access_token):
+                      if secret:
+                          redacted = redacted.replace(secret, "[REDACTED]")
+                  return redacted[:2000]
+              return value
+
+          def collect_picture_paths(value: Any, path: str = "$", out: list[dict[str, Any]] | None = None):
+              if out is None:
+                  out = []
+              if isinstance(value, dict):
+                  for key, item in value.items():
+                      child = f"{path}.{key}"
+                      key_lower = str(key).lower()
+                      if any(token in key_lower for token in ("picture", "image", "photo")):
+                          out.append({"path": child, "value": sanitize(item)})
+                      collect_picture_paths(item, child, out)
+              elif isinstance(value, list):
+                  for index, item in enumerate(value[:100]):
+                      collect_picture_paths(item, f"{path}[{index}]", out)
+              return out
+
+          evidence: dict[str, Any] = {
+              "checked_at_utc": dt.datetime.now(dt.timezone.utc).isoformat(),
+              "run_id": run_id,
+              "property_id": property_id,
+              "status": "STARTING",
+              "auth_mode": None,
+              "auth_details_http_status": None,
+              "token_exchange_http_status": None,
+              "properties_http_status": None,
+              "response_type": None,
+              "top_level_keys": [],
+              "property_keys": [],
+              "room_keys": [],
+              "picture_paths": [],
+              "property_snapshot": None,
+              "diagnostic": None,
+              "secret_exposed": False,
+          }
+
+          if not credential:
+              raise SystemExit("BEDS24_REFRESH_CREDENTIAL is absent")
+
+          details_status, details_body = request_json(
+              f"{API_BASE}/authentication/details",
+              {"token": credential},
+          )
+          evidence["auth_details_http_status"] = details_status
+          if (
+              200 <= details_status < 300
+              and isinstance(details_body, dict)
+              and details_body.get("validToken") is True
+          ):
+              access_token = credential
+              evidence["auth_mode"] = "access_token"
+          else:
+              exchange_status, exchange_body = request_json(
+                  f"{API_BASE}/authentication/token",
+                  {"refreshToken": credential},
+              )
+              evidence["token_exchange_http_status"] = exchange_status
+              if not isinstance(exchange_body, dict):
+                  raise SystemExit("Beds24 token exchange returned invalid JSON")
+              candidate = exchange_body.get("token")
+              if not (200 <= exchange_status < 300 and isinstance(candidate, str) and candidate):
+                  evidence["diagnostic"] = sanitize(exchange_body)
+                  raise SystemExit("Beds24 credential did not produce an access token")
+              access_token = candidate
+              evidence["auth_mode"] = "refresh_token"
+
+          query = urllib.parse.urlencode(
+              {
+                  "id": property_id,
+                  "includePictures": "true",
+                  "includeAllRooms": "true",
+                  "includeOffers": "true",
+                  "includeTexts": "property",
+              }
+          )
+          properties_status, body = request_json(
+              f"{API_BASE}/properties?{query}",
+              {"token": access_token},
+          )
+          evidence["properties_http_status"] = properties_status
+          evidence["response_type"] = type(body).__name__
+          if isinstance(body, dict):
+              evidence["top_level_keys"] = sorted(str(key) for key in body.keys())
+          if not 200 <= properties_status < 300:
+              evidence["status"] = "FAILED"
+              evidence["diagnostic"] = sanitize(body)
+          else:
+              data = body.get("data") if isinstance(body, dict) else None
+              property_obj = data[0] if isinstance(data, list) and data and isinstance(data[0], dict) else {}
+              evidence["property_keys"] = sorted(str(key) for key in property_obj.keys())
+              rooms = property_obj.get("roomTypes")
+              if isinstance(rooms, list) and rooms and isinstance(rooms[0], dict):
+                  evidence["room_keys"] = sorted(str(key) for key in rooms[0].keys())
+              evidence["picture_paths"] = collect_picture_paths(property_obj)
+              # Keep a bounded sanitized snapshot so undocumented picture fields are visible.
+              evidence["property_snapshot"] = sanitize(property_obj)
+              evidence["status"] = "SUCCESS"
+
+          evidence_path.parent.mkdir(parents=True, exist_ok=True)
+          evidence_path.write_text(
+              json.dumps(evidence, indent=2, sort_keys=True) + "\n",
+              encoding="utf-8",
+          )
+
+          subprocess.run(["git", "config", "user.name", "github-actions[bot]"], check=True)
+          subprocess.run(
+              ["git", "config", "user.email", "41898282+github-actions[bot]@users.noreply.github.com"],
+              check=True,
+          )
+          subprocess.run(["git", "add", str(evidence_path)], check=True)
+          diff = subprocess.run(["git", "diff", "--cached", "--quiet"], check=False)
+          if diff.returncode != 0:
+              subprocess.run(
+                  ["git", "commit", "-m", f"Record Beds24 V2 picture structure {run_id} [skip ci]"],
+                  check=True,
+              )
+              subprocess.run(["git", "pull", "--rebase", "origin", "main"], check=True)
+              subprocess.run(["git", "push", "origin", "HEAD:main"], check=True)
+
+          print(json.dumps({
+              "status": evidence["status"],
+              "properties_http_status": evidence["properties_http_status"],
+              "picture_path_count": len(evidence["picture_paths"]),
+              "evidence_path": str(evidence_path),
+          }))
+          if evidence["status"] != "SUCCESS":
+              raise SystemExit(1)
+          PY

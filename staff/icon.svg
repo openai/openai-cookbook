@@ -1,0 +1,6 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512">
+  <rect width="512" height="512" rx="120" fill="#c8b087"/>
+  <circle cx="256" cy="206" r="86" fill="none" stroke="#fff" stroke-width="16" opacity=".95"/>
+  <path d="M162 320c31-54 73-81 94-81s63 27 94 81" fill="none" stroke="#fff" stroke-width="16" stroke-linecap="round"/>
+  <text x="256" y="404" text-anchor="middle" font-family="Arial,Helvetica,sans-serif" font-size="52" font-weight="700" fill="#fff" letter-spacing="6">AUMARA</text>
+</svg>

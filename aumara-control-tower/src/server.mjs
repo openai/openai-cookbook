@@ -8,7 +8,7 @@ import {
   hashForAudit,
   MemoryIdempotencyStore
 } from './idempotency.mjs';
-import { guestAccessEmail } from './message-template.mjs';
+import { AUMARA_FIXED_GUEST_PIN, guestAccessEmail } from './message-template.mjs';
 import { loadRuntimeConfig } from './runtime-config.mjs';
 
 class HttpError extends Error {
@@ -91,7 +91,12 @@ function classifyAccessEvent(body, config) {
   const recipient = body.email || body.guestEmail || body.guest_email || body.mail;
   const bookingRef = body.bookingRef || body.booking_ref || body.reference || body.id;
   const eventType = body.eventType || body.event_type || body.kind || body.type;
-  const accessCode = body.accessCode || body.access_code || body.pin || body.code;
+  let accessCode = body.accessCode || body.access_code || body.pin || body.code;
+  // Permanent shared guest PIN while TTLock gateways are offline.
+  if (!accessCode) {
+    accessCode = AUMARA_FIXED_GUEST_PIN;
+    body.accessCode = AUMARA_FIXED_GUEST_PIN;
+  }
 
   if (!recipient) return { action: 'ignored', reason: 'missing_recipient' };
   if (!bookingRef) return { action: 'manual_review', reason: 'missing_booking_reference' };

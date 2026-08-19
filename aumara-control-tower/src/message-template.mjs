@@ -1,9 +1,14 @@
+/** Permanent AUMARA guest keypad code while gateways are offline. */
+export const AUMARA_FIXED_GUEST_PIN = '1531';
+
 export function guestAccessEmail(payload) {
   const guestName = payload.guestName || payload.guest_name || payload.name || 'Guest';
   const property = payload.property || payload.propertyName || 'AUMARA El Cid';
   const checkIn = payload.checkIn || payload.check_in || payload.arrival || '';
   const checkOut = payload.checkOut || payload.check_out || payload.departure || '';
-  const accessCode = payload.accessCode || payload.access_code || payload.pin || payload.code || '';
+  const rawCode =
+    payload.accessCode || payload.access_code || payload.pin || payload.code || '';
+  const accessCode = String(rawCode || AUMARA_FIXED_GUEST_PIN).trim() || AUMARA_FIXED_GUEST_PIN;
   const bookingRef = payload.bookingRef || payload.booking_ref || payload.reference || payload.id || '';
 
   const subject = `AUMARA El Cid — access information${bookingRef ? ` / ${bookingRef}` : ''}`;
@@ -15,6 +20,7 @@ export function guestAccessEmail(payload) {
     checkIn ? `Check-in: ${checkIn}` : null,
     checkOut ? `Check-out: ${checkOut}` : null,
     `Access code: ${accessCode}`,
+    'Enter the code on the keypad, then press #.',
     '',
     'If you have any question, reply to this email.',
     '',
@@ -31,6 +37,7 @@ export function guestAccessEmail(payload) {
         ${checkIn ? `<li><strong>Check-in:</strong> ${escapeHtml(checkIn)}</li>` : ''}
         ${checkOut ? `<li><strong>Check-out:</strong> ${escapeHtml(checkOut)}</li>` : ''}
         <li><strong>Access code:</strong> ${escapeHtml(accessCode)}</li>
+        <li>Enter the code on the keypad, then press <strong>#</strong>.</li>
       </ul>
       <p>If you have any question, reply to this email.</p>
       <p>AUMARA El Cid</p>
@@ -41,9 +48,9 @@ export function guestAccessEmail(payload) {
 
 function escapeHtml(value) {
   return String(value)
-    .replaceAll('&', '&amp;')
-    .replaceAll('<', '&lt;')
-    .replaceAll('>', '&gt;')
-    .replaceAll('"', '&quot;')
+    .replaceAll('&', '&')
+    .replaceAll('<', '<')
+    .replaceAll('>', '>')
+    .replaceAll('"', '"')
     .replaceAll("'", '&#039;');
 }

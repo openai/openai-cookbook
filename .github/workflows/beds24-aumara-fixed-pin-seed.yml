@@ -1,0 +1,53 @@
+name: Beds24 AUMARA fixed guest PIN seed
+
+on:
+  workflow_dispatch:
+    inputs:
+      mode:
+        description: audit (default) or live
+        required: false
+        default: audit
+        type: choice
+        options:
+          - audit
+          - live
+      horizon_days:
+        description: Arrival horizon days from today
+        required: false
+        default: "45"
+        type: string
+
+permissions:
+  contents: read
+
+concurrency:
+  group: beds24-aumara-fixed-pin-seed
+  cancel-in-progress: false
+
+jobs:
+  seed:
+    runs-on: ubuntu-latest
+    env:
+      BEDS24_REFRESH_TOKEN: ${{ secrets.BEDS24_REFRESH_CREDENTIAL }}
+      AUMARA_FIXED_GUEST_PIN: "1531"
+      AUMARA_FIXED_PIN_MODE: ${{ inputs.mode || 'audit' }}
+      AUMARA_FIXED_PIN_HORIZON_DAYS: ${{ inputs.horizon_days || '45' }}
+      AUMARA_LIVE_BOOKING_WRITES_CONFIRMED: ${{ inputs.mode == 'live' && 'true' || 'false' }}
+      AUMARA_FIXED_PIN_WRITE_CONFIRMATION: ${{ inputs.mode == 'live' && 'AUMARA_FIXED_GUEST_PIN_1531_2026_08_03' || '' }}
+    steps:
+      - uses: actions/checkout@v4
+      - name: Require credential
+        run: |
+          if [ -z "$BEDS24_REFRESH_TOKEN" ]; then
+            echo "::error::BEDS24_REFRESH_CREDENTIAL missing"
+            exit 1
+          fi
+      - name: Seed fixed LOCK_PIN
+        run: python aumara-control-tower/scripts/beds24_aumara_fixed_pin_seed.py
+      - uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: aumara-fixed-pin-seed
+          path: aumara-control-tower/evidence/aumara-fixed-pin-seed.json
+          if-no-files-found: warn
+          retention-days: 7

@@ -1,0 +1,62 @@
+name: Validate AUMARA post-stay feedback
+
+on:
+  pull_request:
+    paths:
+      - 'aumara-site/feedback.html'
+      - 'aumara-control-tower/policies/aumara-poststay-followup.json'
+      - 'aumara-control-tower/tests/test_aumara_poststay_feedback.py'
+      - 'supabase/functions/aumara-feedback/**'
+      - 'supabase/migrations/*aumara_poststay_feedback.sql'
+      - '.github/workflows/aumara-feedback-validate.yml'
+  push:
+    branches: [main]
+    paths:
+      - 'aumara-site/feedback.html'
+      - 'aumara-control-tower/policies/aumara-poststay-followup.json'
+      - 'aumara-control-tower/tests/test_aumara_poststay_feedback.py'
+      - 'supabase/functions/aumara-feedback/**'
+      - 'supabase/migrations/*aumara_poststay_feedback.sql'
+      - '.github/workflows/aumara-feedback-validate.yml'
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  validate:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v5
+
+      - name: Run policy and security tests
+        run: python -m unittest aumara-control-tower/tests/test_aumara_poststay_feedback.py
+
+      - name: Validate HTML and JavaScript syntax
+        shell: bash
+        run: |
+          python - <<'PY'
+          from html.parser import HTMLParser
+          from pathlib import Path
+          import re
+
+          source = Path('aumara-site/feedback.html').read_text(encoding='utf-8')
+          HTMLParser().feed(source)
+          match = re.search(r'<script>(.*?)</script>', source, re.S)
+          if not match:
+              raise SystemExit('inline script not found')
+          Path('/tmp/aumara-feedback.js').write_text(match.group(1), encoding='utf-8')
+          PY
+          node --check /tmp/aumara-feedback.js
+
+      - name: Verify deployed API health
+        shell: bash
+        run: |
+          payload="$(curl --fail --silent --show-error --max-time 20 \
+            'https://cguutkghsnhmwzghkmnc.supabase.co/functions/v1/aumara-feedback?action=health')"
+          python - "$payload" <<'PY'
+          import json, sys
+          payload = json.loads(sys.argv[1])
+          assert payload.get('ok') is True
+          assert payload.get('api') == 'aumara-feedback'
+          PY

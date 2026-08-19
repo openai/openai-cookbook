@@ -31,6 +31,11 @@ Beds24 TTLock codes can only be used during the booking period. `Days in Advance
 With `Offline` strategy, TTLock generates a unique 6–9 digit code. It cannot be customised, updated, deleted or forced to remain the same across bookings. It must be used at least once within 24 hours after its start time or it becomes invalid. Therefore a fixed repeated PIN or “last phone digits” strategy is not available until the mapped locks are online through commissioned gateways.
 
 ### Interim operating policy — no gateways
+
+**UPDATE 2026-08-03:** shared permanent guest PIN **`1531`** (+ `#`) for every AUMARA house.
+See `systems/aumara-fixed-guest-pin.md` and `systems/ttlock-lock-registry.md`.
+Offline unique TTLock codes are no longer the guest-message source of truth.
+
 1. Keep Passcode Strategy = `Offline`.
 2. Keep Start Time = `16:00`, End Time = `12:00`, Days in Advance = `3`.
 3. Do not manually replace the generated `LOCK_PIN` and do not promise one permanent common guest code.

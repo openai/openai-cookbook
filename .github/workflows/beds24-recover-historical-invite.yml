@@ -1,0 +1,311 @@
+name: Recover historical Beds24 invite for AUMARA 324882
+
+on:
+  workflow_dispatch:
+  push:
+    branches: [main]
+    paths:
+      - ".github/workflows/beds24-recover-historical-invite.yml"
+
+permissions:
+  contents: write
+
+concurrency:
+  group: beds24-historical-invite-recovery-324882
+  cancel-in-progress: true
+
+jobs:
+  recover:
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    environment: Production
+    env:
+      BEDS24_VAULT_KEK: ${{ secrets.BEDS24_REFRESH_CREDENTIAL }}
+      PROPERTY_ID: "324882"
+      SOURCE_COMMIT: "c969415c52597a06750036b8b2899f31e1e8cd1d^1"
+      SOURCE_PATH: ".github/workflows/exchange-beds24-invite.yml"
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+
+      - name: Install encrypted-vault dependency
+        run: python -m pip install --disable-pip-version-check cryptography
+
+      - name: Consume historical invite without exposing it
+        shell: bash
+        run: |
+          python3 - <<'PY'
+          from __future__ import annotations
+
+          import base64
+          import datetime as dt
+          import hashlib
+          import json
+          import os
+          import pathlib
+          import re
+          import subprocess
+          import urllib.error
+          import urllib.parse
+          import urllib.request
+          from typing import Any
+
+          from cryptography.fernet import Fernet
+
+          API_BASE = "https://api.beds24.com/v2"
+          PROPERTY_ID = os.environ.get("PROPERTY_ID", "324882")
+          RUN_ID = os.environ.get("GITHUB_RUN_ID", "unknown")
+          SOURCE_COMMIT = os.environ["SOURCE_COMMIT"]
+          SOURCE_PATH = os.environ["SOURCE_PATH"]
+          KEK = (os.environ.get("BEDS24_VAULT_KEK") or "").strip()
+          EVIDENCE_PATH = pathlib.Path(
+              f"aumara-control-tower/evidence/beds24-historical-invite/{RUN_ID}.json"
+          )
+          VAULT_PATH = pathlib.Path(
+              "aumara-control-tower/evidence/beds24-refresh-vault.json"
+          )
+          access_token = ""
+          refresh_token = ""
+          invite_code = ""
+
+          def now_utc() -> str:
+              return dt.datetime.now(dt.timezone.utc).isoformat()
+
+          def request_json(url: str, headers: dict[str, str]) -> tuple[int, Any]:
+              request = urllib.request.Request(
+                  url,
+                  headers={"accept": "application/json", **headers},
+                  method="GET",
+              )
+              try:
+                  with urllib.request.urlopen(request, timeout=60) as response:
+                      raw = response.read()
+                      status = response.status
+              except urllib.error.HTTPError as exc:
+                  raw = exc.read()
+                  status = exc.code
+              try:
+                  body = json.loads(raw.decode("utf-8", "replace")) if raw else {}
+              except json.JSONDecodeError:
+                  body = {"non_json_bytes": len(raw)}
+              return status, body
+
+          def redact(value: Any, depth: int = 0) -> Any:
+              if depth > 8:
+                  return "[DEPTH_LIMIT]"
+              if isinstance(value, dict):
+                  output: dict[str, Any] = {}
+                  for key, item in value.items():
+                      if any(token in str(key).lower() for token in ("token", "secret", "password", "credential", "code")):
+                          output[str(key)] = "[REDACTED]"
+                      else:
+                          output[str(key)] = redact(item, depth + 1)
+                  return output
+              if isinstance(value, list):
+                  return [redact(item, depth + 1) for item in value[:300]]
+              if isinstance(value, str):
+                  result = value
+                  for secret in (invite_code, access_token, refresh_token, KEK):
+                      if secret:
+                          result = result.replace(secret, "[REDACTED]")
+                  return result[:3000]
+              return value
+
+          def diagnostics(body: Any) -> Any:
+              if not isinstance(body, dict):
+                  return {"response_type": type(body).__name__}
+              result: dict[str, Any] = {}
+              for key in ("status", "type", "message", "error", "detail", "error_description"):
+                  if key in body and body[key] not in (None, "", [], {}):
+                      result[key] = redact(body[key])
+              if not result:
+                  result["body_keys"] = sorted(str(key) for key in body.keys())[:50]
+              return result
+
+          def vault_key(kek: str) -> bytes:
+              digest = hashlib.sha256(
+                  ("AUMARA_BEDS24_REFRESH_VAULT_V1\0" + kek).encode("utf-8")
+              ).digest()
+              return base64.urlsafe_b64encode(digest)
+
+          def write_vault(token: str) -> None:
+              VAULT_PATH.parent.mkdir(parents=True, exist_ok=True)
+              ciphertext = Fernet(vault_key(KEK)).encrypt(token.encode("utf-8")).decode("ascii")
+              VAULT_PATH.write_text(
+                  json.dumps(
+                      {
+                          "version": 1,
+                          "cipher": "fernet-sha256-kek",
+                          "source": "historical_invite_setup",
+                          "created_at_utc": now_utc(),
+                          "ciphertext": ciphertext,
+                          "plaintext_stored": False,
+                      },
+                      indent=2,
+                      sort_keys=True,
+                  )
+                  + "\n",
+                  encoding="utf-8",
+              )
+
+          def property_url() -> str:
+              query = urllib.parse.urlencode(
+                  {
+                      "id": PROPERTY_ID,
+                      "includePictures": "true",
+                      "includeAllRooms": "true",
+                      "includeOffers": "true",
+                      "includeTexts": "property",
+                  }
+              )
+              return f"{API_BASE}/properties?{query}"
+
+          def extract_property(body: Any) -> dict[str, Any] | None:
+              if not isinstance(body, dict) or not isinstance(body.get("data"), list):
+                  return None
+              for item in body["data"]:
+                  if isinstance(item, dict) and str(item.get("id") or item.get("propertyId")) == PROPERTY_ID:
+                      return item
+              if len(body["data"]) == 1 and isinstance(body["data"][0], dict):
+                  return body["data"][0]
+              return None
+
+          def collect_picture_paths(value: Any, path: str = "$", output: list[dict[str, Any]] | None = None):
+              if output is None:
+                  output = []
+              if isinstance(value, dict):
+                  for key, item in value.items():
+                      child = f"{path}.{key}"
+                      if any(token in str(key).lower() for token in ("picture", "image", "photo")):
+                          output.append({"path": child, "value": redact(item)})
+                      collect_picture_paths(item, child, output)
+              elif isinstance(value, list):
+                  for index, item in enumerate(value[:200]):
+                      collect_picture_paths(item, f"{path}[{index}]", output)
+              return output
+
+          evidence: dict[str, Any] = {
+              "checked_at_utc": now_utc(),
+              "run_id": RUN_ID,
+              "property_id": PROPERTY_ID,
+              "source_commit": SOURCE_COMMIT,
+              "source_path": SOURCE_PATH,
+              "historical_file_found": False,
+              "invite_pattern_found": False,
+              "setup_http_status": None,
+              "access_token_received": False,
+              "refresh_token_received": False,
+              "vault_written": False,
+              "property_http_status": None,
+              "property_keys": [],
+              "room_keys": [],
+              "picture_paths": [],
+              "property_snapshot": None,
+              "status": "STARTING",
+              "diagnostic": None,
+              "secret_exposed": False,
+          }
+
+          try:
+              if not KEK:
+                  raise RuntimeError("Production BEDS24_REFRESH_CREDENTIAL is absent; vault encryption unavailable")
+
+              historic = subprocess.run(
+                  ["git", "show", f"{SOURCE_COMMIT}:{SOURCE_PATH}"],
+                  check=False,
+                  text=True,
+                  capture_output=True,
+              )
+              if historic.returncode != 0:
+                  raise RuntimeError("Historical invite source file could not be read")
+              evidence["historical_file_found"] = True
+
+              match = re.search(r"code:([A-Za-z0-9+/=_-]{40,})", historic.stdout)
+              if not match:
+                  raise RuntimeError("Historical invite pattern was not found")
+              invite_code = match.group(1)
+              evidence["invite_pattern_found"] = True
+
+              setup_status, setup_body = request_json(
+                  f"{API_BASE}/authentication/setup",
+                  {"code": invite_code},
+              )
+              evidence["setup_http_status"] = setup_status
+              access_candidate = setup_body.get("token") if isinstance(setup_body, dict) else None
+              refresh_candidate = setup_body.get("refreshToken") if isinstance(setup_body, dict) else None
+              if not (200 <= setup_status < 300 and isinstance(access_candidate, str) and access_candidate):
+                  evidence["diagnostic"] = {
+                      "stage": "setup",
+                      "response": diagnostics(setup_body),
+                  }
+                  raise RuntimeError("Historical invite code was rejected by Beds24")
+
+              access_token = access_candidate
+              evidence["access_token_received"] = True
+              if isinstance(refresh_candidate, str) and refresh_candidate:
+                  refresh_token = refresh_candidate
+                  evidence["refresh_token_received"] = True
+                  write_vault(refresh_token)
+                  evidence["vault_written"] = True
+
+              property_status, property_body = request_json(
+                  property_url(),
+                  {"token": access_token},
+              )
+              evidence["property_http_status"] = property_status
+              property_obj = extract_property(property_body)
+              if not (200 <= property_status < 300 and property_obj is not None):
+                  evidence["diagnostic"] = {
+                      "stage": "property",
+                      "response": diagnostics(property_body),
+                  }
+                  raise RuntimeError("Recovered token cannot read property 324882")
+
+              evidence["property_keys"] = sorted(str(key) for key in property_obj.keys())
+              rooms = property_obj.get("roomTypes")
+              if isinstance(rooms, list) and rooms and isinstance(rooms[0], dict):
+                  evidence["room_keys"] = sorted(str(key) for key in rooms[0].keys())
+              evidence["picture_paths"] = collect_picture_paths(property_obj)
+              evidence["property_snapshot"] = redact(property_obj)
+              evidence["status"] = "SUCCESS"
+          except Exception as exc:
+              evidence["status"] = "FAILED"
+              if evidence["diagnostic"] is None:
+                  evidence["diagnostic"] = f"{type(exc).__name__}: {str(exc)[:500]}"
+
+          EVIDENCE_PATH.parent.mkdir(parents=True, exist_ok=True)
+          EVIDENCE_PATH.write_text(
+              json.dumps(evidence, indent=2, sort_keys=True) + "\n",
+              encoding="utf-8",
+          )
+
+          subprocess.run(["git", "config", "user.name", "github-actions[bot]"], check=True)
+          subprocess.run(
+              ["git", "config", "user.email", "41898282+github-actions[bot]@users.noreply.github.com"],
+              check=True,
+          )
+          add_paths = [str(EVIDENCE_PATH)]
+          if VAULT_PATH.exists():
+              add_paths.append(str(VAULT_PATH))
+          subprocess.run(["git", "add", *add_paths], check=True)
+          if subprocess.run(["git", "diff", "--cached", "--quiet"], check=False).returncode != 0:
+              subprocess.run(
+                  ["git", "commit", "-m", f"Record historical Beds24 invite recovery {RUN_ID} [skip ci]"],
+                  check=True,
+              )
+              subprocess.run(["git", "pull", "--rebase", "origin", "main"], check=True)
+              subprocess.run(["git", "push", "origin", "HEAD:main"], check=True)
+
+          print(json.dumps({
+              "status": evidence["status"],
+              "setup_http_status": evidence["setup_http_status"],
+              "refresh_token_received": evidence["refresh_token_received"],
+              "vault_written": evidence["vault_written"],
+              "property_http_status": evidence["property_http_status"],
+              "picture_path_count": len(evidence["picture_paths"]),
+              "evidence_path": str(EVIDENCE_PATH),
+          }))
+          if evidence["status"] != "SUCCESS":
+              raise SystemExit(1)
+          PY

@@ -1,0 +1,596 @@
+name: Update Beds24 Photos AUMARA 324882
+
+on:
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+concurrency:
+  group: beds24-photos-324882
+  cancel-in-progress: true
+
+jobs:
+  update-photos:
+    name: Upload 10 approved photos to property 324882
+    runs-on: ubuntu-latest
+    timeout-minutes: 25
+    environment: Production
+    env:
+      BEDS24_REFRESH_CREDENTIAL: ${{ secrets.BEDS24_REFRESH_CREDENTIAL }}
+      BEDS24_REFRESH_TOKEN: ${{ secrets.BEDS24_REFRESH_TOKEN }}
+      PROPERTY_ID: "324882"
+    steps:
+      - name: Authenticate, download 10 photos, upload to Beds24
+        id: transfer
+        shell: bash
+        run: |
+          python3 - <<'PY'
+          from __future__ import annotations
+
+          import datetime as dt
+          import hashlib
+          import http.cookiejar
+          import json
+          import mimetypes
+          import os
+          import pathlib
+          import re
+          import sys
+          import urllib.error
+          import urllib.parse
+          import urllib.request
+          import uuid
+          from typing import Any
+
+          PRIMARY = "https://beds24.com/api/v2"
+          FALLBACK = "https://api.beds24.com/v2"
+          PROPERTY_ID = os.environ.get("PROPERTY_ID", "324882")
+          WORK = pathlib.Path(os.environ.get("RUNNER_TEMP", "/tmp")) / "beds24-324882"
+          WORK.mkdir(parents=True, exist_ok=True)
+          EVIDENCE_PATH = WORK / "evidence.json"
+          DOWNLOAD_DIR = WORK / "photos"
+          TIMEOUT = 90
+          MAX_IMAGE_BYTES = 15_000_000
+          FAQ = (
+              "Beds24 FAQ: 'Can I use API V2 to send pictures or webhooks? "
+              "Currently no, however these features are coming soon.'"
+          )
+
+          PHOTO_MANIFEST = [
+              ("01_FULL_no_crop.jpg", "1MAcqpC0veE8DNJuQvViQzCvUqwnlKbY_"),
+              ("02_FULL_no_crop.jpg", "19jTCi6FThY584Iebs4vvlPujojSdudQD"),
+              ("03_FULL_no_crop.jpg", "1WHAIG1Pz7w0rUwciC7O5dAMbB7WSEKKd"),
+              ("04_FULL_no_crop.jpg", "1robOjhdVs12hp6XLbD5AuJsjW84bCxBc"),
+              ("06_FULL_no_crop.jpg", "13c7-i9mzpIpX2JJnyyB406T9jp7EMFmV"),
+              ("IMG_0005.JPG", "1Cg4Y-skeJ6VNAnfsRPwPEED9RlQ8IIlV"),
+              ("IMG_0006.JPG", "1UJaAE4Z9DpVFi67xAG7iZ33l4_xMUS9o"),
+              ("IMG_0007.JPG", "17Amun9sFTFpogCN459bhysRkgKCSaMo1"),
+              ("IMG_0009.JPG", "1z80jRlJkLwdLkZlLlGv1zNB4i79JhSh8"),
+              ("IMG_0011.JPG", "1cqP3azFyywT0jcNO8SfNbQ8lMAoOAtMj"),
+          ]
+
+          credential = (
+              (os.environ.get("BEDS24_REFRESH_CREDENTIAL") or "").strip()
+              or (os.environ.get("BEDS24_REFRESH_TOKEN") or "").strip()
+          )
+          access_token = ""
+          api_base = PRIMARY
+
+          def now_utc() -> str:
+              return dt.datetime.now(dt.timezone.utc).isoformat()
+
+          def mask(value: str) -> None:
+              value = (value or "").strip()
+              if value:
+                  print(f"::add-mask::{value}", flush=True)
+
+          mask(credential)
+
+          evidence: dict[str, Any] = {
+              "checked_at_utc": now_utc(),
+              "run_id": os.environ.get("GITHUB_RUN_ID"),
+              "run_attempt": os.environ.get("GITHUB_RUN_ATTEMPT"),
+              "property_id": PROPERTY_ID,
+              "status": "STARTING",
+              "failure_stage": None,
+              "diagnostic": None,
+              "credential_present": bool(credential),
+              "auth_mode": None,
+              "auth_http_status": None,
+              "api_base": None,
+              "property_http_status": None,
+              "picture_count_before": None,
+              "picture_count_after": None,
+              "property_keys": [],
+              "downloaded_files": [],
+              "write_attempts": [],
+              "uploads": [],
+              "accepted_count": 0,
+              "secret_exposed": False,
+          }
+
+          def redact(text: str) -> str:
+              value = text
+              for secret in (credential, access_token):
+                  if secret:
+                      value = value.replace(secret, "[REDACTED]")
+              return value[:800]
+
+          def sanitize(value: Any, depth: int = 0) -> Any:
+              if depth > 8:
+                  return "[DEPTH_LIMIT]"
+              if isinstance(value, dict):
+                  out: dict[str, Any] = {}
+                  for key, item in value.items():
+                      if any(tok in str(key).lower() for tok in ("token", "secret", "password", "credential")):
+                          out[str(key)] = "[REDACTED]"
+                      else:
+                          out[str(key)] = sanitize(item, depth + 1)
+                  return out
+              if isinstance(value, list):
+                  return [sanitize(item, depth + 1) for item in value[:200]]
+              if isinstance(value, str):
+                  return redact(value)
+              return value
+
+          def save_evidence() -> None:
+              evidence["checked_at_utc"] = now_utc()
+              evidence["secret_exposed"] = False
+              EVIDENCE_PATH.write_text(
+                  json.dumps(evidence, indent=2, sort_keys=True) + "\n",
+                  encoding="utf-8",
+              )
+
+          def fail(stage: str, message: str, code: int = 1) -> None:
+              evidence["status"] = "FAILED"
+              evidence["failure_stage"] = stage
+              evidence["diagnostic"] = redact(message)
+              save_evidence()
+              print(json.dumps({
+                  "status": "FAILED",
+                  "failure_stage": stage,
+                  "diagnostic": evidence["diagnostic"],
+                  "auth_mode": evidence["auth_mode"],
+                  "auth_http_status": evidence["auth_http_status"],
+                  "picture_count_before": evidence["picture_count_before"],
+                  "picture_count_after": evidence["picture_count_after"],
+                  "accepted_count": evidence["accepted_count"],
+              }, ensure_ascii=False))
+              print(f"ERROR [{stage}]: {redact(message)}", file=sys.stderr)
+              raise SystemExit(code)
+
+          def parse_json(raw: bytes) -> Any:
+              if not raw:
+                  return {}
+              try:
+                  return json.loads(raw.decode("utf-8", "replace"))
+              except json.JSONDecodeError:
+                  return {"non_json_bytes": len(raw)}
+
+          def request_bytes(
+              url: str,
+              *,
+              method: str = "GET",
+              headers: dict[str, str] | None = None,
+              data: bytes | None = None,
+          ) -> tuple[int, dict[str, str], bytes]:
+              req = urllib.request.Request(
+                  url,
+                  data=data,
+                  headers={"User-Agent": "AUMARA-Beds24-Photos/2.0", **(headers or {})},
+                  method=method,
+              )
+              try:
+                  with urllib.request.urlopen(req, timeout=TIMEOUT) as resp:
+                      return int(resp.status), dict(resp.headers.items()), resp.read()
+              except urllib.error.HTTPError as exc:
+                  return int(exc.code), dict(exc.headers.items()), exc.read()
+              except urllib.error.URLError as exc:
+                  return 0, {}, str(exc.reason).encode("utf-8", "replace")
+
+          def request_json(
+              url: str,
+              *,
+              method: str = "GET",
+              headers: dict[str, str] | None = None,
+              payload: Any | None = None,
+          ) -> tuple[int, Any, bytes]:
+              data = None
+              hdrs = {"accept": "application/json", **(headers or {})}
+              if payload is not None:
+                  data = json.dumps(payload).encode("utf-8")
+                  hdrs["content-type"] = "application/json"
+              status, _, raw = request_bytes(url, method=method, headers=hdrs, data=data)
+              return status, parse_json(raw), raw
+
+          def body_diag(body: Any) -> Any:
+              if not isinstance(body, dict):
+                  return {"response_type": type(body).__name__}
+              out: dict[str, Any] = {}
+              for key in ("code", "status", "type", "message", "error", "detail", "error_description"):
+                  value = body.get(key)
+                  if value not in (None, "", [], {}):
+                      out[key] = redact(str(value))
+              if not out:
+                  out["body_keys"] = sorted(str(k) for k in body.keys())[:40]
+              return out
+
+          def download_drive_file(file_id: str, destination: pathlib.Path) -> None:
+              cookie_jar = http.cookiejar.CookieJar()
+              opener = urllib.request.build_opener(urllib.request.HTTPCookieProcessor(cookie_jar))
+              urls = [
+                  f"https://drive.usercontent.google.com/download?id={urllib.parse.quote(file_id)}&export=download&confirm=t",
+                  f"https://drive.google.com/uc?export=download&id={urllib.parse.quote(file_id)}&confirm=t",
+              ]
+              last_error = "no response"
+              for url in urls:
+                  req = urllib.request.Request(url, headers={"User-Agent": "Mozilla/5.0"})
+                  try:
+                      with opener.open(req, timeout=TIMEOUT) as resp:
+                          raw = resp.read(MAX_IMAGE_BYTES + 1)
+                  except (urllib.error.HTTPError, urllib.error.URLError) as exc:
+                      last_error = str(exc)
+                      continue
+                  if len(raw) > MAX_IMAGE_BYTES:
+                      last_error = "download exceeded 15 MB safety limit"
+                      continue
+                  if len(raw) > 100_000 and raw.startswith(b"\xff\xd8\xff"):
+                      destination.write_bytes(raw)
+                      return
+                  text = raw[:5000].decode("utf-8", "ignore")
+                  token_match = re.search(r"confirm=([0-9A-Za-z_-]+)", text)
+                  if token_match:
+                      confirm = urllib.parse.quote(token_match.group(1))
+                      retry_url = (
+                          f"https://drive.google.com/uc?export=download&id="
+                          f"{urllib.parse.quote(file_id)}&confirm={confirm}"
+                      )
+                      try:
+                          with opener.open(
+                              urllib.request.Request(retry_url, headers={"User-Agent": "Mozilla/5.0"}),
+                              timeout=TIMEOUT,
+                          ) as resp:
+                              retry_raw = resp.read(MAX_IMAGE_BYTES + 1)
+                      except (urllib.error.HTTPError, urllib.error.URLError) as exc:
+                          last_error = str(exc)
+                          continue
+                      if (
+                          len(retry_raw) <= MAX_IMAGE_BYTES
+                          and len(retry_raw) > 100_000
+                          and retry_raw.startswith(b"\xff\xd8\xff")
+                      ):
+                          destination.write_bytes(retry_raw)
+                          return
+                  last_error = "Google Drive returned non-JPEG content"
+              raise RuntimeError(last_error)
+
+          def extract_property(body: Any) -> dict[str, Any] | None:
+              if not isinstance(body, dict):
+                  return None
+              data = body.get("data")
+              if not isinstance(data, list):
+                  return None
+              for item in data:
+                  if isinstance(item, dict) and str(item.get("id") or item.get("propertyId")) == PROPERTY_ID:
+                      return item
+              if len(data) == 1 and isinstance(data[0], dict):
+                  return data[0]
+              return None
+
+          def collect_pictures(value: Any, path: str = "$") -> list[dict[str, Any]]:
+              found: list[dict[str, Any]] = []
+
+              def walk(node: Any, current: str) -> None:
+                  if isinstance(node, dict):
+                      leaf_name = current.rsplit(".", 1)[-1].lower()
+                      if any(tok in leaf_name for tok in ("picture", "image", "photo")):
+                          found.append({"path": current, "value": sanitize(node)})
+                      for key, item in node.items():
+                          walk(item, f"{current}.{key}")
+                  elif isinstance(node, list):
+                      leaf_name = current.rsplit(".", 1)[-1].lower()
+                      if any(tok in leaf_name for tok in ("picture", "image", "photo")):
+                          for index, item in enumerate(node[:200]):
+                              found.append({"path": f"{current}[{index}]", "value": sanitize(item)})
+                      else:
+                          for index, item in enumerate(node[:200]):
+                              walk(item, f"{current}[{index}]")
+
+              walk(value, path)
+              return found
+
+          def property_url(base: str) -> str:
+              query = urllib.parse.urlencode(
+                  {
+                      "id": PROPERTY_ID,
+                      "includePictures": "true",
+                      "includeAllRooms": "true",
+                  }
+              )
+              return f"{base}/properties?{query}"
+
+          def load_property(base: str, token: str) -> tuple[int, dict[str, Any] | None, Any]:
+              status, body, _ = request_json(property_url(base), headers={"token": token})
+              return status, extract_property(body), body
+
+          def multipart(field_name: str, filename: str, payload: bytes, extra: dict[str, str]) -> tuple[str, bytes]:
+              boundary = f"----AUMARA{uuid.uuid4().hex}"
+              chunks: list[bytes] = []
+
+              def add_field(name: str, value: str) -> None:
+                  chunks.extend(
+                      [
+                          f"--{boundary}\r\n".encode(),
+                          f'Content-Disposition: form-data; name="{name}"\r\n\r\n'.encode(),
+                          value.encode(),
+                          b"\r\n",
+                      ]
+                  )
+
+              for name, value in extra.items():
+                  add_field(name, value)
+              mime_type = mimetypes.guess_type(filename)[0] or "image/jpeg"
+              chunks.extend(
+                  [
+                      f"--{boundary}\r\n".encode(),
+                      (
+                          f'Content-Disposition: form-data; name="{field_name}"; '
+                          f'filename="{filename}"\r\n'
+                      ).encode(),
+                      f"Content-Type: {mime_type}\r\n\r\n".encode(),
+                      payload,
+                      b"\r\n",
+                      f"--{boundary}--\r\n".encode(),
+                  ]
+              )
+              return boundary, b"".join(chunks)
+
+          stage = "credential"
+          if not credential:
+              fail(
+                  "credential",
+                  "Production secret BEDS24_REFRESH_CREDENTIAL is empty. "
+                  "Run Exchange Beds24 invite code with a fresh invite, then paste refreshToken into that secret.",
+              )
+
+          stage = "authentication"
+          auth_attempts: list[dict[str, Any]] = []
+          selected_property: dict[str, Any] | None = None
+          for base in (PRIMARY, FALLBACK):
+              details_status, details_body, _ = request_json(
+                  f"{base}/authentication/details",
+                  headers={"token": credential},
+              )
+              auth_attempts.append({"base": base, "mode": "access_token", "http_status": details_status})
+              if 200 <= details_status < 300 and isinstance(details_body, dict) and details_body.get("validToken") is True:
+                  access_token = credential
+                  api_base = base
+                  evidence["auth_mode"] = "access_token"
+                  evidence["auth_http_status"] = details_status
+                  break
+
+              refresh_status, refresh_body, _ = request_json(
+                  f"{base}/authentication/token",
+                  headers={"refreshToken": credential},
+              )
+              auth_attempts.append({"base": base, "mode": "refresh_token", "http_status": refresh_status})
+              candidate = refresh_body.get("token") if isinstance(refresh_body, dict) else None
+              if 200 <= refresh_status < 300 and isinstance(candidate, str) and candidate:
+                  access_token = candidate
+                  mask(access_token)
+                  rotated = refresh_body.get("refreshToken") if isinstance(refresh_body, dict) else None
+                  if isinstance(rotated, str) and rotated:
+                      mask(rotated)
+                  api_base = base
+                  evidence["auth_mode"] = "refresh_token"
+                  evidence["auth_http_status"] = refresh_status
+                  break
+
+              if refresh_status in {401, 403} or details_status in {401, 403}:
+                  evidence["auth_http_status"] = refresh_status or details_status
+                  evidence["diagnostic"] = {
+                      "details": body_diag(details_body),
+                      "refresh": body_diag(refresh_body),
+                  }
+                  if base == PRIMARY:
+                      continue
+                  fail(
+                      "authentication",
+                      f"BLOCKED_AT_AUTH: Beds24 returned HTTP {evidence['auth_http_status']}. "
+                      "The stored BEDS24_REFRESH_CREDENTIAL is not a valid access or refresh token. "
+                      "Generate a fresh invite and run Exchange Beds24 invite code.",
+                  )
+
+          evidence["auth_attempts"] = auth_attempts
+          evidence["api_base"] = api_base
+          if not access_token:
+              fail(
+                  "authentication",
+                  "BLOCKED_AT_AUTH: credential did not produce a Beds24 access token. "
+                  "Generate a fresh invite and run Exchange Beds24 invite code.",
+              )
+          save_evidence()
+
+          stage = "property_probe"
+          prop_status, selected_property, prop_body = load_property(api_base, access_token)
+          evidence["property_http_status"] = prop_status
+          if not (200 <= prop_status < 300 and selected_property is not None):
+              evidence["diagnostic"] = body_diag(prop_body)
+              fail("property_probe", f"Authenticated token cannot read property {PROPERTY_ID} (HTTP {prop_status})")
+          evidence["property_keys"] = sorted(str(k) for k in selected_property.keys())
+          pictures_before = collect_pictures(selected_property)
+          evidence["picture_count_before"] = len(pictures_before)
+          evidence["picture_paths_before"] = [item["path"] for item in pictures_before[:50]]
+          save_evidence()
+
+          stage = "download"
+          DOWNLOAD_DIR.mkdir(parents=True, exist_ok=True)
+          total_bytes = 0
+          for filename, file_id in PHOTO_MANIFEST:
+              destination = DOWNLOAD_DIR / filename
+              print(f"Downloading {filename}...", flush=True)
+              download_drive_file(file_id, destination)
+              payload = destination.read_bytes()
+              size = len(payload)
+              digest = hashlib.sha256(payload).hexdigest()
+              total_bytes += size
+              evidence["downloaded_files"].append(
+                  {"filename": filename, "bytes": size, "sha256": digest, "drive_id": file_id}
+              )
+              save_evidence()
+          if len(evidence["downloaded_files"]) != 10:
+              fail("download", "Exact 10-file invariant failed")
+          if total_bytes > 100_000_000:
+              fail("download", f"Selected files exceed 100 MB total: {total_bytes} bytes")
+
+          stage = "upload"
+          auth_headers = {"accept": "application/json", "token": access_token}
+          extra_fields = {"propertyId": PROPERTY_ID, "propId": PROPERTY_ID, "id": PROPERTY_ID}
+          write_surfaces = [
+              f"{api_base}/properties/{PROPERTY_ID}/images",
+              f"{api_base}/properties/{PROPERTY_ID}/pictures",
+              f"{api_base}/properties/images",
+              f"{api_base}/properties/pictures",
+          ]
+          accepted_files: list[str] = []
+          working_surface: str | None = None
+
+          for filename, _ in PHOTO_MANIFEST:
+              path = DOWNLOAD_DIR / filename
+              payload = path.read_bytes()
+              uploaded = False
+              file_attempts: list[dict[str, Any]] = []
+              surfaces = [working_surface] if working_surface else write_surfaces
+              for surface in surfaces:
+                  if not surface:
+                      continue
+                  for field_name in ("file", "image", "picture"):
+                      boundary, body = multipart(field_name, filename, payload, extra_fields)
+                      status, _, raw = request_bytes(
+                          surface,
+                          method="POST",
+                          headers={
+                              **auth_headers,
+                              "Content-Type": f"multipart/form-data; boundary={boundary}",
+                              "Content-Length": str(len(body)),
+                          },
+                          data=body,
+                      )
+                      record = {
+                          "filename": filename,
+                          "url": surface,
+                          "field": field_name,
+                          "http_status": status,
+                          "diagnostic": body_diag(parse_json(raw)) if not (200 <= status < 300) else None,
+                      }
+                      file_attempts.append(record)
+                      evidence["write_attempts"].append(record)
+                      if 200 <= status < 300:
+                          working_surface = surface
+                          uploaded = True
+                          accepted_files.append(filename)
+                          break
+                  if uploaded:
+                      break
+              evidence["uploads"].append({
+                  "filename": filename,
+                  "accepted": uploaded,
+                  "attempts": file_attempts,
+              })
+              save_evidence()
+
+          if len(accepted_files) < 10:
+              pictures_field = None
+              for key in selected_property.keys():
+                  if str(key).lower() in {"pictures", "images", "photos"}:
+                      pictures_field = key
+                      break
+              if pictures_field is not None:
+                  existing = selected_property.get(pictures_field)
+                  additions: list[Any] = []
+                  for filename, file_id in PHOTO_MANIFEST:
+                      url = f"https://lh3.googleusercontent.com/d/{file_id}"
+                      if isinstance(existing, list) and existing and isinstance(existing[0], dict):
+                          additions.append({"url": url, "name": filename})
+                      else:
+                          additions.append(url)
+                  if isinstance(existing, list):
+                      payload_pictures = list(existing) + additions
+                  else:
+                      payload_pictures = additions
+                  json_payload = [{"id": int(PROPERTY_ID), pictures_field: payload_pictures}]
+                  status, body, _ = request_json(
+                      f"{api_base}/properties",
+                      method="POST",
+                      headers=auth_headers,
+                      payload=json_payload,
+                  )
+                  record = {
+                      "filename": "ALL_10",
+                      "url": f"{api_base}/properties",
+                      "field": pictures_field,
+                      "http_status": status,
+                      "diagnostic": body_diag(body) if not (200 <= status < 300) else None,
+                  }
+                  evidence["write_attempts"].append(record)
+                  if 200 <= status < 300:
+                      accepted_files = [name for name, _ in PHOTO_MANIFEST]
+                      evidence["uploads"].append({"filename": "ALL_10_JSON", "accepted": True, "attempts": [record]})
+                  save_evidence()
+
+          evidence["accepted_count"] = len(accepted_files)
+
+          stage = "verify"
+          after_status, after_property, after_body = load_property(api_base, access_token)
+          if not (200 <= after_status < 300 and after_property is not None):
+              evidence["diagnostic"] = body_diag(after_body)
+              fail("verify", f"Re-GET property {PROPERTY_ID} failed after upload (HTTP {after_status})")
+          pictures_after = collect_pictures(after_property)
+          evidence["picture_count_after"] = len(pictures_after)
+          evidence["picture_paths_after"] = [item["path"] for item in pictures_after[:50]]
+          save_evidence()
+
+          before = evidence["picture_count_before"] or 0
+          after = evidence["picture_count_after"] or 0
+          increased = after - before
+          if after < before + 10 and len(accepted_files) < 10:
+              fail(
+                  "upload",
+                  "Beds24 did not accept the 10 photos. "
+                  f"HTTP write attempts recorded={len(evidence['write_attempts'])}, "
+                  f"2xx accepted_files={len(accepted_files)}, "
+                  f"picture_count {before} -> {after} (delta {increased}). "
+                  f"{FAQ} Do not treat this as success.",
+              )
+          if after < before + 10:
+              fail(
+                  "verify",
+                  "Some write calls returned 2xx but property picture count did not increase by 10. "
+                  f"picture_count {before} -> {after}. Refusing simulated success.",
+              )
+
+          evidence["status"] = "SUCCESS"
+          evidence["failure_stage"] = None
+          evidence["diagnostic"] = None
+          save_evidence()
+          print(json.dumps({
+              "status": "SUCCESS",
+              "property_id": PROPERTY_ID,
+              "api_base": api_base,
+              "auth_mode": evidence["auth_mode"],
+              "downloaded": len(evidence["downloaded_files"]),
+              "accepted_count": len(accepted_files),
+              "picture_count_before": before,
+              "picture_count_after": after,
+          }, ensure_ascii=False))
+          PY
+
+      - name: Upload sanitized evidence
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: beds24-photo-upload-324882
+          path: ${{ runner.temp }}/beds24-324882/evidence.json
+          if-no-files-found: warn
+          retention-days: 7

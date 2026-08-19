@@ -1,0 +1,88 @@
+{
+  "auth_details_http_status": 200,
+  "auth_mode": null,
+  "checked_at_utc": "2026-08-18T03:41:16.344301+00:00",
+  "diagnostic": "Beds24 credential could not produce a valid access token",
+  "downloaded_files": [
+    {
+      "bytes": 2802631,
+      "filename": "01_FULL_no_crop.jpg",
+      "sha256": "f62422b9e309ffce795cf04105b46071271a534f273dad2fee31c4bd8048db10"
+    },
+    {
+      "bytes": 4920149,
+      "filename": "02_FULL_no_crop.jpg",
+      "sha256": "3520b82c995f2913e7ca782c125e5617b24d7cd61714e78ee80ae3008552ea4d"
+    },
+    {
+      "bytes": 3573974,
+      "filename": "03_FULL_no_crop.jpg",
+      "sha256": "097aadc9c934ccb9b12db3c7c871e4834208e90cd492bf28b89fcf9bb4073b07"
+    },
+    {
+      "bytes": 5017736,
+      "filename": "04_FULL_no_crop.jpg",
+      "sha256": "728d6c75d4dea85c3b6b93928275054b4ac3e80c19522b54d127bb232d213cbd"
+    },
+    {
+      "bytes": 4005292,
+      "filename": "06_FULL_no_crop.jpg",
+      "sha256": "2188177531c5654f22894dd6aa1af771ecf71ccb846721996d8a85da33681172"
+    },
+    {
+      "bytes": 3521326,
+      "filename": "IMG_0005.JPG",
+      "sha256": "5559a3502a2d8a7812baddfbc15cc6284dd605d6aa7e52845e6cbd3b3646eeb6"
+    },
+    {
+      "bytes": 4386186,
+      "filename": "IMG_0006.JPG",
+      "sha256": "b43ed0465e09fca5f6a8fd2f07d92a198fcca31c7fae792e20f8b56e1db24ff9"
+    },
+    {
+      "bytes": 3093951,
+      "filename": "IMG_0007.JPG",
+      "sha256": "75ef558d247a8133866b4a715a1d23b05b80d3abd97e465982bbd34d464a95f4"
+    },
+    {
+      "bytes": 3181650,
+      "filename": "IMG_0009.JPG",
+      "sha256": "450e0f196c84e3bea30d622f8a70067acc8528c5bb41d9b94de14d4343d22e3f"
+    },
+    {
+      "bytes": 4317611,
+      "filename": "IMG_0011.JPG",
+      "sha256": "258870ae2d64b2883d40d1cf4f27f070fd0f01bd1d988e8ea7139305ab991d46"
+    }
+  ],
+  "drive_folder": "1apf9xnyInfhZSI0NfNA3n0OhEgiN8HXS",
+  "failure_stage": "authentication",
+  "image_endpoint": null,
+  "image_endpoint_allow": null,
+  "image_endpoint_get_http_status": null,
+  "image_endpoint_options_http_status": null,
+  "job_status": "failure",
+  "property_id": "324882",
+  "property_probe_http_status": null,
+  "run_attempt": "1",
+  "run_id": "32096334372",
+  "secret_exposed": false,
+  "selected_file_count": 10,
+  "selected_files": [
+    "01_FULL_no_crop.jpg",
+    "02_FULL_no_crop.jpg",
+    "03_FULL_no_crop.jpg",
+    "04_FULL_no_crop.jpg",
+    "06_FULL_no_crop.jpg",
+    "IMG_0005.JPG",
+    "IMG_0006.JPG",
+    "IMG_0007.JPG",
+    "IMG_0009.JPG",
+    "IMG_0011.JPG"
+  ],
+  "skipped_existing": [],
+  "status": "FAILED",
+  "token_exchange_http_status": 401,
+  "transfer_step_outcome": "failure",
+  "uploads": []
+}

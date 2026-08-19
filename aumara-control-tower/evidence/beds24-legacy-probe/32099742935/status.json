@@ -1,0 +1,34 @@
+{
+  "checked_at_utc": "2026-08-18T04:37:32.294696+00:00",
+  "content_probe": {
+    "reason": "legacy keys not returned by read-only XML API",
+    "skipped": true
+  },
+  "diagnostic": null,
+  "failure_stage": null,
+  "key_candidates": [],
+  "legacy_api_key_found": false,
+  "legacy_prop_key_found": false,
+  "property_id": "324882",
+  "run_id": "32099742935",
+  "secret_exposed": false,
+  "state": "SUCCESS",
+  "xml_get_account": {
+    "bytes": 39,
+    "content_type": "text/xml; charset=utf-8",
+    "endpoint": "https://api.beds24.com/xml/getAccount",
+    "error_codes": [],
+    "http_status": 200,
+    "root": "error",
+    "top_level_tags": []
+  },
+  "xml_get_properties": {
+    "bytes": 39,
+    "content_type": "text/xml; charset=utf-8",
+    "endpoint": "https://api.beds24.com/xml/getProperties",
+    "error_codes": [],
+    "http_status": 200,
+    "root": "error",
+    "top_level_tags": []
+  }
+}

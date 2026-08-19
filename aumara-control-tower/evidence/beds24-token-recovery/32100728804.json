@@ -1,0 +1,51 @@
+{
+  "attempts": [
+    {
+      "accepted_mode": null,
+      "diagnostic": {
+        "direct": {
+          "code": 401,
+          "error": "Token not valid",
+          "type": "error"
+        },
+        "refresh": {
+          "code": 401,
+          "error": "Token not valid",
+          "type": "error"
+        },
+        "setup": {
+          "code": 401,
+          "error": "Token not valid",
+          "type": "error"
+        },
+        "stage": "direct_refresh_setup"
+      },
+      "direct_property_http_status": 401,
+      "refresh_http_status": 401,
+      "refreshed_property_http_status": null,
+      "setup_http_status": 401,
+      "setup_property_http_status": null,
+      "source": "BEDS24_REFRESH_CREDENTIAL"
+    }
+  ],
+  "checked_at_utc": "2026-08-18T04:53:05.213766+00:00",
+  "credential_slot_present": true,
+  "diagnostic": "No stored token, refresh token, or invite code produced readable property 324882",
+  "environment": "Production",
+  "picture_paths": [],
+  "property_http_status": null,
+  "property_id": "324882",
+  "property_keys": [],
+  "property_snapshot": null,
+  "room_keys": [],
+  "run_attempt": "1",
+  "run_id": "32100728804",
+  "secret_exposed": false,
+  "selected_mode": null,
+  "selected_source": null,
+  "status": "FAILED",
+  "token_slot_present": false,
+  "vault_decrypted": false,
+  "vault_present_before": false,
+  "vault_written": false
+}

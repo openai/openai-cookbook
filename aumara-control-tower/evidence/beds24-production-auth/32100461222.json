@@ -1,0 +1,51 @@
+{
+  "checked_at_utc": "2026-08-18T04:48:29.971558+00:00",
+  "diagnostic": "No Production Beds24 secret slot produced readable property 324882",
+  "environment": "Production",
+  "picture_paths": [],
+  "property_http_status": null,
+  "property_id": "324882",
+  "property_keys": [],
+  "property_snapshot": null,
+  "room_keys": [],
+  "run_attempt": "1",
+  "run_id": "32100461222",
+  "secret_exposed": false,
+  "selected_mode": null,
+  "selected_slot": null,
+  "slots": [
+    {
+      "accepted_mode": null,
+      "diagnostic": null,
+      "direct_property_http_status": null,
+      "duplicate_of_prior_slot": false,
+      "present": false,
+      "refresh_http_status": null,
+      "refreshed_property_http_status": null,
+      "slot": "BEDS24_REFRESH_TOKEN"
+    },
+    {
+      "accepted_mode": null,
+      "diagnostic": {
+        "direct": {
+          "code": 401,
+          "error": "Token not valid",
+          "type": "error"
+        },
+        "refresh": {
+          "code": 401,
+          "error": "Token not valid",
+          "type": "error"
+        },
+        "stage": "direct_and_refresh"
+      },
+      "direct_property_http_status": 401,
+      "duplicate_of_prior_slot": false,
+      "present": true,
+      "refresh_http_status": 401,
+      "refreshed_property_http_status": null,
+      "slot": "BEDS24_REFRESH_CREDENTIAL"
+    }
+  ],
+  "status": "FAILED"
+}

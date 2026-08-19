@@ -95,8 +95,8 @@ jobs:
         shell: bash
         run: |
           set -euo pipefail
-          git config user.name 'AUMARA Automation'
-          git config user.email 'elcidspain@gmail.com'
+          git config user.name 'github-actions[bot]'
+          git config user.email '41898282+github-actions[bot]@users.noreply.github.com'
           git add aumara-control-tower/checkpoints/BEDS24_PHOTO_SYNC_DISCOVERY.json
           git diff --cached --quiet && exit 0
           git commit -m 'Record Beds24 photo sync discovery'

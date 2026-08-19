@@ -17,6 +17,10 @@
       "destination": "/elcid-site/site.js"
     },
     {
+      "source": "/official-logo.svg",
+      "destination": "/elcid-site/official-logo.svg"
+    },
+    {
       "source": "/legal.html",
       "destination": "/elcid-site/legal.html"
     },
@@ -43,6 +47,28 @@
     {
       "source": "/staff/",
       "destination": "/staff/index.html"
+    }
+  ],
+  "routes": [
+    {
+      "src": "^/$",
+      "dest": "/elcid-site/index.html"
+    },
+    {
+      "src": "^/(styles\\.css|site\\.js|official-logo\\.svg|legal\\.html|privacy\\.html|cookies\\.html)$",
+      "dest": "/elcid-site/$1"
+    },
+    {
+      "src": "^/aumara/?$",
+      "dest": "/aumara-site/direct-v2.html"
+    },
+    {
+      "src": "^/staff/?$",
+      "dest": "/staff/index.html"
+    },
+    {
+      "src": "^/.*$",
+      "status": 404
     }
   ]
 }

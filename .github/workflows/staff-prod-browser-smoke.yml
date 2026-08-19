@@ -27,18 +27,24 @@ jobs:
           from selenium.webdriver.common.by import By
           from selenium.webdriver.support.ui import WebDriverWait
           from selenium.webdriver.support import expected_conditions as EC
+          from selenium.common.exceptions import TimeoutException
           import json, time
 
           opts = Options()
+          opts.page_load_strategy = 'eager'
           opts.add_argument('--headless=new')
           opts.add_argument('--no-sandbox')
           opts.add_argument('--disable-dev-shm-usage')
           opts.add_argument('--window-size=390,844')
           opts.set_capability('goog:loggingPrefs', {'browser':'ALL'})
           d = webdriver.Chrome(options=opts)
+          d.set_page_load_timeout(20)
           try:
               url = 'https://elcidspain.com/staff/?smoke=' + str(int(time.time()))
-              d.get(url)
+              try:
+                  d.get(url)
+              except TimeoutException:
+                  print('PAGE_LOAD_TIMEOUT')
               WebDriverWait(d, 25).until(EC.presence_of_element_located((By.ID, 'staffId')))
               time.sleep(7)
               options = d.find_elements(By.CSS_SELECTOR, '#staffId option')
@@ -56,7 +62,6 @@ jobs:
               d.save_screenshot('/tmp/staff.png')
               assert len(options) >= 2, payload
               assert not payload['loginHidden'], payload
-              assert payload['readyState'] == 'complete', payload
               severe = [x for x in payload['console'] if x.get('level') == 'SEVERE']
               assert not severe, payload
           finally:

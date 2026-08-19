@@ -1,0 +1,11 @@
+{
+  "schema": "aumara.agent-connectivity-receipt",
+  "checked_at_utc": "2026-08-19T04:10:49Z",
+  "xai_secret_present": false,
+  "gemini_secret_present": false,
+  "xai_api_outcome": "skipped",
+  "gemini_api_outcome": "skipped",
+  "connectivity_pass": false,
+  "secrets_exposed": false,
+  "generation_performed": false
+}

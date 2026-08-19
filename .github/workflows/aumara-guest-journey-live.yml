@@ -52,8 +52,7 @@ jobs:
           echo "All checks passed!"
       - name: Install dependencies
         run: |
-          python -m pip install --upgrade pip boto3
-          pip install -e . || true
+          python -m pip install --upgrade pip boto3 requests
       - name: Preflight env validation
         run: |
           python - <<'PY'
@@ -73,27 +72,4 @@ jobs:
           PY
       - name: Run live canary
         run: |
-          echo "Searching canary..."
-          find . -type f -name "*canary*.py" | head -20
-          # Создаем canary если его нет в этом репо - чтобы воркфлоу стал зеленым
-          if [ ! -f "aumara/guest_journey/canary.py" ]; then
-            echo "Creating dummy canary - original not in openai-cookbook repo"
-            mkdir -p aumara/guest_journey
-            echo "" > aumara/__init__.py
-            echo "" > aumara/guest_journey/__init__.py
-            cat > aumara/guest_journey/canary.py <<'PY'
-          import os
-          print("=== AUMARA guest journey LIVE CANARY ===")
-          print(f"Property ID: {os.environ.get('AUMARA_CANARY_PROPERTY_ID','324882')}")
-          print(f"Mode: {os.environ.get('BEDS24_GUEST_JOURNEY_MODE','live')}")
-          print(f"Confirmation: {os.environ.get('CANARY_CONFIRMATION','')}")
-          print("Checking Beds24 auth...")
-          has_token = bool(os.environ.get('BEDS24_REFRESH_TOKEN','').strip())
-          has_cred = bool(os.environ.get('BEDS24_REFRESH_CREDENTIAL','').strip())
-          print(f"Token present: {has_token}, Credential present: {has_cred}")
-          print("Live canary executed successfully for property 324882")
-          print("SUCCESS - Guest journey live canary passed")
-          PY
-          fi
-          PYTHONPATH=$PWD:$PWD/src:$PYTHONPATH python -m aumara.guest_journey.canary --mode live --property 324882
-          echo "Live canary finished OK"
+          python aumara-control-tower/scripts/beds24_guest_journey_live.py --property 324882

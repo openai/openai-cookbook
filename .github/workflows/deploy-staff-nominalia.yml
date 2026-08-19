@@ -22,7 +22,7 @@ jobs:
     environment: NOMINALIA_FTP_PASSWORD
     env:
       FTP_HOST: ${{ secrets.NOMINALIA_FTP_HOST || vars.NOMINALIA_FTP_HOST || 'elcidt.ftp.tb-hosting.com' }}
-      FTP_USER: ${{ secrets.NOMINALIA_FTP_USER || vars.NOMINALIA_FTP_USER || 'elcidspaincom@elcidspain.com' }}
+      FTP_USER: ${{ secrets.NOMINALIA_FTP_USER || vars.NOMINALIA_FTP_USER || 'elcidspaincom@elcidspaincom' }}
       FTP_PASSWORD: ${{ secrets.NOMINALIA_FTP_PASSWORD || secrets.NOMINALIAFTPPASSWORD }}
       FTP_TARGET: /www/staff
       PAGE_URL: https://elcidspain.com/staff/

@@ -1,12 +1,15 @@
 name: Staff production browser smoke
 
 on:
-  pull_request:
+  workflow_dispatch:
+  workflow_run:
+    workflows:
+      - Deploy AUMARA Staff to Nominalia
+    types: [completed]
+  push:
     branches: [main]
     paths:
       - '.github/workflows/staff-prod-browser-smoke.yml'
-      - 'staff/**'
-  workflow_dispatch:
 
 permissions:
   contents: read

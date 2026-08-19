@@ -1,0 +1,323 @@
+<!doctype html>
+<html lang="es" data-lang="es">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+<meta name="robots" content="noindex,nofollow">
+<meta name="theme-color" content="#f2eee6">
+<meta name="description" content="AUMARA: casas privadas entre montaña y mar, recorrido real y reserva directa en Benidoleig, Costa Blanca.">
+<title>AUMARA — Vuelves a encontrarte contigo mismo</title>
+<style>
+:root{
+  --milk:#f2eee6;
+  --paper:#faf8f3;
+  --stone:#d8d0c3;
+  --sand:#bda98b;
+  --sage:#76806b;
+  --olive:#465044;
+  --forest:#263028;
+  --brand-red:#a5372f;
+  --ink:#20251f;
+  --muted:#6e7269;
+  --line:rgba(32,37,31,.15);
+  --line-light:rgba(255,255,255,.28);
+  --shadow:0 24px 80px rgba(37,43,35,.13);
+  --serif:"Iowan Old Style","Baskerville","Times New Roman",serif;
+  --sans:Inter,ui-sans-serif,system-ui,-apple-system,"Segoe UI",sans-serif;
+}
+*{box-sizing:border-box}
+html{scroll-behavior:smooth;background:var(--milk)}
+body{margin:0;background:var(--milk);color:var(--ink);font-family:var(--sans);font-size:16px;overflow-x:hidden}
+body.lock{overflow:hidden}
+a{color:inherit;text-decoration:none}
+button,input{font:inherit}
+button{color:inherit}
+img,video{display:block;width:100%;height:100%;object-fit:cover}
+.wrap{width:min(1320px,calc(100% - 54px));margin-inline:auto}
+.eyebrow{margin:0 0 18px;color:var(--olive);font-size:10px;font-weight:700;letter-spacing:.24em;text-transform:uppercase}
+h1,h2,h3{margin:0;font-family:var(--serif);font-weight:400;letter-spacing:-.045em;line-height:.96}
+h1{max-width:1040px;font-size:clamp(54px,8.1vw,118px)}
+h2{font-size:clamp(43px,5.8vw,82px)}
+h3{font-size:clamp(30px,3.2vw,46px)}
+p{line-height:1.7}
+.header{position:fixed;z-index:80;inset:0 0 auto;display:grid;grid-template-columns:1fr auto 1fr;align-items:center;padding:18px max(24px,env(safe-area-inset-left));color:#fff;transition:background .3s,color .3s,padding .3s,border-color .3s;background:linear-gradient(180deg,rgba(16,20,16,.52),transparent)}
+.header.solid{padding-top:9px;padding-bottom:9px;color:var(--ink);background:rgba(242,238,230,.92);border-bottom:1px solid var(--line);backdrop-filter:blur(18px)}
+.logo-link{justify-self:center;display:block}
+.logo{width:clamp(220px,19vw,310px);height:88px;object-fit:contain;filter:brightness(0) invert(1);transition:width .3s,height .3s,filter .3s}
+.header.solid .logo{width:190px;height:68px;filter:none}
+.nav,.tools{display:flex;align-items:center;gap:22px}
+.nav{justify-self:start;font-size:12px;font-weight:650;letter-spacing:.03em}
+.tools{justify-self:end}
+.nav a{position:relative;padding:8px 0}
+.nav a:after{content:"";position:absolute;left:0;right:100%;bottom:3px;height:1px;background:currentColor;transition:right .2s}
+.nav a:hover:after{right:0}
+.pill,.btn{display:inline-flex;align-items:center;justify-content:center;border:1px solid currentColor;border-radius:999px;background:transparent;cursor:pointer;text-transform:uppercase;letter-spacing:.12em;font-size:10px;font-weight:750;transition:background .2s,color .2s,border-color .2s,transform .2s}
+.pill{min-height:38px;padding:9px 13px}
+.btn{min-height:40px;padding:10px 17px}
+.pill:hover,.btn:hover{transform:translateY(-1px)}
+.book,.primary{border-color:var(--brand-red);background:var(--brand-red);color:#fff}
+.header:not(.solid) .book{border-color:rgba(255,255,255,.75);background:rgba(255,255,255,.1)}
+.secondary{border-color:rgba(255,255,255,.65);color:#fff;background:rgba(255,255,255,.04)}
+.secondary.dark{border-color:var(--olive);color:var(--olive)}
+.menu{display:none}
+.mobile{display:none;position:fixed;z-index:79;top:88px;right:18px;width:min(340px,calc(100% - 36px));padding:20px;background:var(--paper);border:1px solid var(--line);box-shadow:var(--shadow)}
+.mobile.open{display:grid;gap:4px}
+.mobile a,.mobile button{border:0;border-bottom:1px solid var(--line);padding:15px 4px;background:transparent;text-align:left;text-transform:uppercase;letter-spacing:.12em;font-size:11px}
+.hero{position:relative;min-height:100svh;display:flex;align-items:flex-end;overflow:hidden;color:#fff;background:#111712}
+.hero-media{position:absolute;inset:-3%;overflow:hidden}
+.hero-media video{transform:scale(1.06);filter:saturate(.72) contrast(1.02) brightness(.87)}
+.hero:before{content:"";position:absolute;z-index:1;inset:0;background:linear-gradient(90deg,rgba(14,19,14,.72),rgba(14,19,14,.25) 63%,rgba(14,19,14,.04)),linear-gradient(0deg,rgba(14,19,14,.78),transparent 58%)}
+.hero-copy{position:relative;z-index:2;padding:170px 0 58px}
+.hero .eyebrow{color:rgba(255,255,255,.76)}
+.hero h1 span{display:block}
+.hero h1 span+span{margin-top:.12em}
+.lead{max-width:640px;margin:28px 0 0;color:rgba(255,255,255,.84);font-size:clamp(17px,1.7vw,23px);font-weight:350}
+.actions{display:flex;flex-wrap:wrap;gap:9px;margin-top:30px}
+.hero-meta{display:flex;justify-content:space-between;align-items:flex-end;gap:30px;margin-top:62px;padding-top:18px;border-top:1px solid var(--line-light);font-size:10px;letter-spacing:.16em;text-transform:uppercase;color:rgba(255,255,255,.7)}
+.scroll-mark{display:inline-flex;align-items:center;gap:10px}
+.scroll-mark:before{content:"";width:42px;height:1px;background:currentColor}
+.section{padding:clamp(86px,10vw,150px) 0}
+.intro{background:var(--paper)}
+.statement{display:grid;grid-template-columns:.45fr 1.55fr;gap:70px;align-items:start}
+.statement .big{margin:0;max-width:1000px;font:400 clamp(38px,5.4vw,76px)/1.08 var(--serif);letter-spacing:-.045em}
+.statement .aside{align-self:end;max-width:360px;color:var(--muted);font-size:15px}
+.panorama{position:relative;min-height:82svh;display:grid;align-items:end;overflow:hidden;background:url('https://drive.google.com/thumbnail?id=1wdC_rqzts2T_PRgF3fNWdCOm_7pn3oRO&sz=w2400') center/cover fixed}
+.panorama:after{content:"";position:absolute;inset:0;background:linear-gradient(0deg,rgba(20,27,20,.82),rgba(20,27,20,.1) 70%)}
+.panorama-copy{position:relative;z-index:2;padding-bottom:72px;color:#fff}
+.panorama-copy h2{max-width:970px}
+.panorama-copy p{max-width:620px;margin:24px 0 0;color:rgba(255,255,255,.78);font-size:18px}
+.houses{background:var(--milk)}
+.section-head{display:grid;grid-template-columns:1.15fr .65fr;gap:64px;align-items:end;margin-bottom:48px}
+.section-head>p{margin:0;color:var(--muted);font-size:17px}
+.house-grid{display:grid;grid-template-columns:1.08fr .92fr;gap:22px;align-items:start}
+.house{position:relative;min-height:760px;overflow:hidden;background:#1c231d;box-shadow:var(--shadow)}
+.house:nth-child(2){min-height:660px;margin-top:100px}
+.house img{transition:transform 1.1s ease,filter .7s ease;filter:saturate(.8)}
+.house:hover img{transform:scale(1.025);filter:saturate(.95)}
+.house:after{content:"";position:absolute;inset:0;background:linear-gradient(0deg,rgba(18,24,19,.9),rgba(18,24,19,.04) 68%)}
+.house-copy{position:absolute;z-index:2;inset:auto 0 0;padding:34px;color:#fff}
+.house-copy .eyebrow{color:rgba(255,255,255,.7)}
+.house-copy p{max-width:500px;margin:15px 0;color:rgba(255,255,255,.76)}
+.facts{display:flex;flex-wrap:wrap;gap:7px;margin:18px 0 22px}
+.facts span{padding:7px 9px;border:1px solid rgba(255,255,255,.35);border-radius:999px;font-size:10px;letter-spacing:.08em;text-transform:uppercase}
+.walk{background:var(--forest);color:#fff}
+.walk .eyebrow{color:#bcc5b2}
+.walk .section-head>p{color:rgba(255,255,255,.62)}
+.walk-layout{display:grid;grid-template-columns:1.48fr .52fr;gap:18px;align-items:stretch}
+.map-wrap{overflow:auto;background:#d7d0c3;min-height:560px}
+.map{position:relative;min-width:860px;height:100%;min-height:560px}
+.map>img{position:absolute;inset:0;filter:saturate(.68) contrast(.98)}
+.node{position:absolute;z-index:4;transform:translate(-50%,-50%);border:0;background:none;cursor:pointer}
+.node span{width:42px;height:42px;display:grid;place-items:center;border:1px solid var(--forest);border-radius:50%;background:rgba(250,248,243,.92);color:var(--forest);font-size:11px;font-weight:800;box-shadow:0 8px 24px rgba(0,0,0,.2);transition:.2s}
+.node:hover span,.node.active span{background:var(--forest);color:#fff;transform:scale(1.08)}
+.n1{left:48%;top:55%}.n2{left:31%;top:59%}.n3{left:22%;top:65%}.n4{left:40%;top:54%}.n5{left:49%;top:47%}.n6{left:58%;top:38%}.n7{left:63%;top:61%}.n8{left:35%;top:57%}
+.walk-card{display:grid;grid-template-rows:1fr auto;overflow:hidden;background:var(--paper);color:var(--ink)}
+.walk-media{min-height:320px}
+.walk-media img{filter:saturate(.75)}
+.walk-body{padding:28px}
+.walk-body p{color:var(--muted)}
+.gallery-section{background:var(--paper)}
+.gallery{display:grid;grid-template-columns:1.3fr .7fr .7fr;grid-auto-rows:260px;gap:10px}
+.gallery figure{position:relative;margin:0;overflow:hidden;background:var(--stone)}
+.gallery figure:first-child{grid-row:span 2}
+.gallery img{filter:saturate(.78);transition:transform .8s ease,filter .8s ease}
+.gallery figure:hover img{transform:scale(1.025);filter:saturate(.95)}
+.gallery figcaption{position:absolute;left:16px;bottom:14px;color:#fff;text-transform:uppercase;letter-spacing:.14em;font-size:9px;font-weight:750;text-shadow:0 2px 14px rgba(0,0,0,.65)}
+.final-wrap{background:var(--milk)}
+.final{display:grid;grid-template-columns:1.2fr .8fr;gap:54px;align-items:end;padding:clamp(46px,7vw,92px);background:var(--stone)}
+.final h2{max-width:760px}
+.final .right{max-width:430px;justify-self:end}
+.final p{color:#565d54;margin:0 0 25px}
+.footer{display:flex;justify-content:space-between;gap:20px;padding:30px 0;color:var(--muted);font-size:11px;letter-spacing:.06em;text-transform:uppercase}
+.float{position:fixed;z-index:73;right:18px;bottom:max(16px,env(safe-area-inset-bottom));border:1px solid var(--olive);border-radius:999px;padding:11px 17px;background:rgba(70,80,68,.94);color:#fff;text-transform:uppercase;letter-spacing:.12em;font-size:10px;font-weight:750;box-shadow:0 12px 34px rgba(38,48,40,.25);cursor:pointer;backdrop-filter:blur(12px)}
+.backdrop{position:fixed;z-index:100;inset:0;background:rgba(23,29,24,.58);backdrop-filter:blur(6px)}
+.drawer{position:fixed;z-index:101;right:0;top:0;bottom:0;width:min(470px,100%);padding:38px;background:var(--paper);transform:translateX(105%);transition:.28s;overflow:auto}
+.drawer.open{transform:none}
+.close{float:right;border:1px solid var(--line);border-radius:50%;width:42px;height:42px;background:transparent;font-size:24px;cursor:pointer}
+.drawer h2{font-size:clamp(40px,8vw,64px)}
+.drawer label{display:block;margin:13px 0;color:var(--muted);font-size:11px;text-transform:uppercase;letter-spacing:.12em}
+.drawer input{width:100%;margin-top:7px;padding:13px;border:1px solid var(--line);border-radius:0;background:#fff}
+.option{display:flex;justify-content:space-between;align-items:center;gap:15px;padding:18px;margin-top:9px;border:1px solid var(--line);background:transparent}
+.option.primary-option{background:var(--olive);border-color:var(--olive);color:#fff}
+.option small{display:block;font-size:9px;letter-spacing:.16em}
+.option strong{display:block;margin-top:5px;font-family:var(--serif);font-size:20px;font-weight:400}
+.viewer{display:none;position:fixed;z-index:140;inset:0;background:#090d0a;color:#fff}
+.viewer.open{display:grid;grid-template-rows:auto 1fr auto}
+.viewer-head,.viewer-foot{display:flex;justify-content:space-between;align-items:center;gap:15px;padding:15px 18px;background:#151c16}
+.viewer-head div{display:grid;gap:4px}.viewer-head small{color:rgba(255,255,255,.58);letter-spacing:.14em;text-transform:uppercase}.viewer-head strong{font-family:var(--serif);font-size:23px;font-weight:400}
+.viewer-stage{position:relative;min-height:0}.viewer-stage video{object-fit:contain;background:#000}
+.viewer-arrow{position:absolute;top:50%;transform:translateY(-50%);width:44px;height:44px;border:1px solid rgba(255,255,255,.45);border-radius:50%;background:rgba(12,17,13,.65);color:#fff;font-size:26px;cursor:pointer}.prev{left:13px}.next{right:13px}
+.reveal [data-reveal]{opacity:0;transform:translateY(24px);transition:opacity .8s ease,transform .8s ease}.reveal [data-reveal].visible{opacity:1;transform:none}
+@media(max-width:980px){
+  .header{grid-template-columns:1fr auto}.logo-link{justify-self:start}.nav{display:none}.tools{justify-self:end}.menu{display:inline-flex}.logo{width:210px;height:76px}.header.solid .logo{width:170px;height:60px}
+  .statement,.section-head,.final{grid-template-columns:1fr}.statement{gap:38px}.statement .aside{max-width:600px}.house-grid{grid-template-columns:1fr}.house:nth-child(2){margin-top:0}.walk-layout{grid-template-columns:1fr}.walk-card{grid-template-columns:.9fr 1.1fr;grid-template-rows:none}.final .right{justify-self:start}.panorama{background-attachment:scroll}
+}
+@media(max-width:700px){
+  .wrap{width:min(100% - 30px,1320px)}.header{padding:10px 15px}.header .book{display:none}.logo{width:176px;height:66px}.header.solid .logo{width:150px;height:54px}.hero-copy{padding:132px 0 32px}.hero h1{font-size:clamp(46px,15vw,74px)}.hero-meta{margin-top:42px}.hero-meta span:last-child{display:none}.section{padding:80px 0}.statement .big{font-size:clamp(38px,12vw,56px)}.house{min-height:590px}.house:nth-child(2){min-height:590px}.house-copy{padding:24px}.map-wrap,.map{min-height:470px}.walk-card{grid-template-columns:1fr}.walk-media{min-height:240px}.gallery{grid-template-columns:1fr 1fr;grid-auto-rows:210px}.gallery figure:first-child{grid-row:span 1;grid-column:span 2}.gallery figure:nth-child(4){grid-column:span 2}.final{padding:36px 24px}.footer{display:grid}.float{left:14px;right:14px;text-align:center}.drawer{padding:28px 22px}.viewer-foot span{display:none}
+}
+@media(prefers-reduced-motion:reduce){html{scroll-behavior:auto}.reveal [data-reveal]{opacity:1;transform:none;transition:none}.drawer{transition:none}.house img,.gallery img{transition:none}}
+</style>
+</head>
+<body>
+<header id="header" class="header">
+  <nav class="nav"><a href="#houses">Casas</a><a href="#walk">Recorrido</a><a href="#contact">Contacto</a></nav>
+  <a class="logo-link" href="#top"><img class="logo" src="https://drive.google.com/thumbnail?id=1jjVtjk4uT7RaInTQCab6DrAha1VXiqml&sz=w1000" alt="AUMARA"></a>
+  <div class="tools"><button id="lang" class="pill">EN</button><button class="pill book" data-open>Reservar</button><button id="menu" class="pill menu">Menú</button></div>
+</header>
+<div id="mobile" class="mobile"><a href="#houses">Casas</a><a href="#walk">Recorrido</a><a href="#contact">Contacto</a><button data-open>Reservar</button></div>
+<main>
+<section id="top" class="hero">
+  <div class="hero-media"><video autoplay muted playsinline loop poster="https://drive.google.com/thumbnail?id=1wdC_rqzts2T_PRgF3fNWdCOm_7pn3oRO&sz=w2400"><source src="media/nodes/node-01.mp4" type="video/mp4"></video></div>
+  <div class="wrap hero-copy">
+    <p class="eyebrow">AUMARA · Benidoleig · Marina Alta</p>
+    <h1><span data-es="Hay lugares que te dan más." data-en="There are places that give you more.">Hay lugares que te dan más.</span><span data-es="En AUMARA, vuelves a encontrarte contigo mismo." data-en="At AUMARA, you find your way back to yourself.">En AUMARA, vuelves a encontrarte contigo mismo.</span></h1>
+    <p class="lead" data-es="Casas privadas, paisaje abierto y el espacio suficiente para volver a encontrarte contigo." data-en="Private houses, open landscape and enough space to find your way back to yourself.">Casas privadas, paisaje abierto y el espacio suficiente para volver a encontrarte contigo.</p>
+    <div class="actions"><button class="btn primary" data-open>Ver disponibilidad</button><a class="btn secondary" href="#walk">Entrar en AUMARA</a></div>
+    <div class="hero-meta"><span class="scroll-mark">Descubrir</span><span>Casas completas · Valle abierto · Recorrido real</span></div>
+  </div>
+</section>
+<section class="section intro">
+  <div class="wrap statement" data-reveal>
+    <div><p class="eyebrow">AUMARA</p><p class="aside" data-es="Una estancia pensada desde el espacio, la luz y la libertad de habitar una casa completa." data-en="A stay shaped by space, light and the freedom of having a complete house.">Una estancia pensada desde el espacio, la luz y la libertad de habitar una casa completa.</p></div>
+    <p class="big" data-es="No se trata de tener más. Se trata de elegir mejor. Mejor descanso. Mejor tiempo. Mejor compañía. Y el resto, que se quede fuera." data-en="It is not about having more. It is about choosing better. Better rest. Better time. Better company. And leaving the rest outside.">No se trata de tener más. Se trata de elegir mejor. Mejor descanso. Mejor tiempo. Mejor compañía. Y el resto, que se quede fuera.</p>
+  </div>
+</section>
+<section class="panorama">
+  <div class="wrap panorama-copy" data-reveal><p class="eyebrow">Marina Alta</p><h2 data-es="Lo más bonito no es el lugar. Es cómo te hace sentir." data-en="The most beautiful thing is not the place. It is how the place makes you feel.">Lo más bonito no es el lugar. Es cómo te hace sentir.</h2><p data-es="Luz natural, caminos entre árboles y un paisaje que no necesita explicación." data-en="Natural light, paths between trees and a landscape that needs no explanation.">Luz natural, caminos entre árboles y un paisaje que no necesita explicación.</p></div>
+</section>
+<section id="houses" class="section houses">
+  <div class="wrap">
+    <div class="section-head" data-reveal><div><p class="eyebrow">Casas</p><h2 data-es="Dos formas de habitar el mismo paisaje." data-en="Two ways to inhabit the same landscape.">Dos formas de habitar el mismo paisaje.</h2></div><p data-es="Cada reserva es una casa completa: entrada propia, espacio exterior y relación directa con el lugar." data-en="Every booking is a complete house with its own entrance, outdoor space and direct relationship with the place.">Cada reserva es una casa completa: entrada propia, espacio exterior y relación directa con el lugar.</p></div>
+    <div class="house-grid">
+      <article class="house" data-reveal><img src="https://lh3.googleusercontent.com/d/1uFRe8MsXd5IoiQT5Ph7jWaN2Ey_Fj2Vs=w1800" alt="AUMARA Chalet"><div class="house-copy"><p class="eyebrow">4 Chalet</p><h3>AUMARA Chalet</h3><p>Hasta cuatro huéspedes, altillo abierto, grandes ventanas y una escala íntima.</p><div class="facts"><span>Hasta 4 huéspedes</span><span>Casa completa</span><span>Entrada privada</span></div><a class="btn secondary" href="https://beds24.com/booking2.php?propid=324882&roomid=674465" target="_blank" rel="noopener">Ver fechas</a></div></article>
+      <article class="house" data-reveal><img src="https://lh3.googleusercontent.com/d/1rDKUNOQxzJcxoGXy2eRQ5bKJedoOuaxI=w1800" alt="AUMARA Superior Chalet"><div class="house-copy"><p class="eyebrow">2 Superior Chalet</p><h3>AUMARA Superior Chalet</h3><p>Más amplitud para hasta seis huéspedes, con dos dormitorios y dos baños.</p><div class="facts"><span>Hasta 6 huéspedes</span><span>2 dormitorios</span><span>2 baños</span></div><a class="btn secondary" href="https://beds24.com/booking2.php?propid=324882&roomid=674466" target="_blank" rel="noopener">Ver fechas</a></div></article>
+    </div>
+  </div>
+</section>
+<section id="walk" class="section walk">
+  <div class="wrap">
+    <div class="section-head" data-reveal><div><p class="eyebrow">Recorrido</p><h2 data-es="Antes de llegar, empieza a recorrerlo." data-en="Begin the journey before you arrive.">Antes de llegar, empieza a recorrerlo.</h2></div><p data-es="Ocho puntos reales permiten seguir los caminos, reconocer las casas y sentir la escala antes de reservar." data-en="Eight real points let you follow the paths, recognise the houses and feel the scale before booking.">Ocho puntos reales permiten seguir los caminos, reconocer las casas y sentir la escala antes de reservar.</p></div>
+    <div class="walk-layout">
+      <div class="map-wrap" data-reveal><div class="map"><img src="https://lh3.googleusercontent.com/d/1xU4ln5OyvuE-HWw91LRm9Mxv8eK4kloe=w2200" alt="Plano AUMARA"><button class="node n1 active" data-node="0" aria-label="Punto 1"><span>1</span></button><button class="node n2" data-node="1" aria-label="Punto 2"><span>2</span></button><button class="node n3" data-node="2" aria-label="Punto 3"><span>3</span></button><button class="node n4" data-node="3" aria-label="Punto 4"><span>4</span></button><button class="node n5" data-node="4" aria-label="Punto 5"><span>5</span></button><button class="node n6" data-node="5" aria-label="Punto 6"><span>6</span></button><button class="node n7" data-node="6" aria-label="Punto 7"><span>7</span></button><button class="node n8" data-node="7" aria-label="Punto 8"><span>8</span></button></div></div>
+      <aside class="walk-card" data-reveal><div class="walk-media"><img src="https://lh3.googleusercontent.com/d/1SQqw9ZAzOIag6wu6ME1Rr6mCu1hVpqCD=w1200" alt="AUMARA"></div><div class="walk-body"><p id="point" class="eyebrow">Punto 01</p><h3 id="pointTitle">Vista central</h3><p>Avanza por el lugar como si ya estuvieras caminando entre las casas.</p><button id="openViewer" class="btn primary">Abrir este punto</button></div></aside>
+    </div>
+  </div>
+</section>
+<section class="section gallery-section">
+  <div class="wrap">
+    <div class="section-head" data-reveal><div><p class="eyebrow">Luz y paisaje</p><h2>La arquitectura abre la puerta. El paisaje hace el resto.</h2></div><p>Ventanas panorámicas, árboles maduros y caminos que conectan las casas con el valle.</p></div>
+    <div class="gallery"><figure data-reveal><img src="https://lh3.googleusercontent.com/d/1wdC_rqzts2T_PRgF3fNWdCOm_7pn3oRO=w1800" alt="Valle AUMARA"><figcaption>Valle abierto</figcaption></figure><figure data-reveal><img src="https://lh3.googleusercontent.com/d/1xauueEm6ahvJjRm2103AYmCZow45deQa=w1200" alt="Casa AUMARA"><figcaption>Casa oeste</figcaption></figure><figure data-reveal><img src="https://lh3.googleusercontent.com/d/1SQqw9ZAzOIag6wu6ME1Rr6mCu1hVpqCD=w1200" alt="Camino AUMARA"><figcaption>Camino central</figcaption></figure><figure data-reveal><img src="https://lh3.googleusercontent.com/d/1qAkaNt_W-ISyVfpU2IlN3r6_c60Ts5Mh=w1200" alt="Vegetación AUMARA"><figcaption>Caminos y vegetación</figcaption></figure><figure data-reveal><img src="https://lh3.googleusercontent.com/d/1uFRe8MsXd5IoiQT5Ph7jWaN2Ey_Fj2Vs=w1200" alt="Entrada Chalet"><figcaption>Entrada privada</figcaption></figure></div>
+  </div>
+</section>
+<section id="contact" class="section final-wrap">
+  <div class="wrap final" data-reveal><div><p class="eyebrow">AUMARA</p><h2>Elige tu casa. El resto puede esperar.</h2></div><div class="right"><p>Consulta las fechas reales en Beds24 o escríbenos por WhatsApp antes de reservar.</p><div class="actions"><a class="btn secondary dark" href="https://wa.me/34622914323" target="_blank" rel="noopener">WhatsApp</a><button class="btn primary" data-open>Reservar directamente</button></div></div></div>
+</section>
+</main>
+<footer><div class="wrap footer"><div>AUMARA · EL CID VENTURES BENIDOLEIG S.L. · B53816989</div><div><a href="mailto:elcidspain@gmail.com">elcidspain@gmail.com</a> · <a href="https://wa.me/34622914323">+34 622 914 323</a></div></div></footer>
+<button class="float" data-open>Reservar directamente</button>
+<div id="backdrop" class="backdrop" hidden></div>
+<aside id="drawer" class="drawer" aria-hidden="true"><button id="close" class="close" aria-label="Cerrar">×</button><p class="eyebrow">AUMARA</p><h2>Elige cómo continuar.</h2><p>Abre disponibilidad directa en Beds24 o pregúntanos por WhatsApp.</p><label>Entrada<input id="checkin" type="date"></label><label>Salida<input id="checkout" type="date"></label><a id="beds" class="option primary-option" href="https://beds24.com/booking2.php?propid=324882" target="_blank" rel="noopener"><span><small>BEDS24</small><strong>Ver disponibilidad y precios</strong></span><b>↗</b></a><a id="wa" class="option" href="https://wa.me/34622914323" target="_blank" rel="noopener"><span><small>WHATSAPP</small><strong>Preguntar antes de reservar</strong></span><b>↗</b></a></aside>
+<div id="viewer" class="viewer" role="dialog" aria-modal="true" aria-hidden="true"><div class="viewer-head"><div><small id="viewerIndex">Punto 01 de 08</small><strong id="viewerTitle">Vista central</strong></div><button id="viewerClose" class="close" aria-label="Cerrar">×</button></div><div class="viewer-stage"><video id="video" muted playsinline loop controls></video><button id="prev" class="viewer-arrow prev" aria-label="Anterior">‹</button><button id="next" class="viewer-arrow next" aria-label="Siguiente">›</button></div><div class="viewer-foot"><span>Vídeo real grabado en AUMARA</span><a class="btn primary" href="https://beds24.com/booking2.php?propid=324882" target="_blank" rel="noopener">Reservar</a></div></div>
+<script>
+let lang='es';
+const $=(s,c=document)=>c.querySelector(s),$$=(s,c=document)=>[...c.querySelectorAll(s)];
+const i18nText=[
+  ['.nav a[href="#houses"]','Casas','Houses'],
+  ['.nav a[href="#walk"]','Recorrido','Tour'],
+  ['.nav a[href="#contact"]','Contacto','Contact'],
+  ['.tools .book','Reservar','Book'],
+  ['#menu','Menú','Menu'],
+  ['#mobile a[href="#houses"]','Casas','Houses'],
+  ['#mobile a[href="#walk"]','Recorrido','Tour'],
+  ['#mobile a[href="#contact"]','Contacto','Contact'],
+  ['#mobile button[data-open]','Reservar','Book'],
+  ['.hero .actions .btn.primary','Ver disponibilidad','Check availability'],
+  ['.hero .actions .btn.secondary','Entrar en AUMARA','Enter AUMARA'],
+  ['.hero-meta .scroll-mark','Descubrir','Discover'],
+  ['.hero-meta span:last-child','Casas completas · Valle abierto · Recorrido real','Whole homes · Open valley · Real tour'],
+  ['#houses .section-head .eyebrow','Casas','Houses'],
+  ['.house:nth-child(1) h3','AUMARA Chalet','AUMARA Chalet'],
+  ['.house:nth-child(1) .house-copy p:nth-of-type(2)','Hasta cuatro huéspedes, altillo abierto, grandes ventanas y una escala íntima.','Up to four guests, open loft, large windows and an intimate scale.'],
+  ['.house:nth-child(1) .facts span:nth-child(1)','Hasta 4 huéspedes','Up to 4 guests'],
+  ['.house:nth-child(1) .facts span:nth-child(2)','Casa completa','Whole home'],
+  ['.house:nth-child(1) .facts span:nth-child(3)','Entrada privada','Private entrance'],
+  ['.house:nth-child(1) .btn.secondary','Ver fechas','View dates'],
+  ['.house:nth-child(2) h3','AUMARA Superior Chalet','AUMARA Superior Chalet'],
+  ['.house:nth-child(2) .house-copy p:nth-of-type(2)','Más amplitud para hasta seis huéspedes, con dos dormitorios y dos baños.','More space for up to six guests, with two bedrooms and two bathrooms.'],
+  ['.house:nth-child(2) .facts span:nth-child(1)','Hasta 6 huéspedes','Up to 6 guests'],
+  ['.house:nth-child(2) .facts span:nth-child(2)','2 dormitorios','2 bedrooms'],
+  ['.house:nth-child(2) .facts span:nth-child(3)','2 baños','2 bathrooms'],
+  ['.house:nth-child(2) .btn.secondary','Ver fechas','View dates'],
+  ['#walk .section-head .eyebrow','Recorrido','Tour'],
+  ['#point','Punto 01','Point 01'],
+  ['#pointTitle','Vista central','Central viewpoint'],
+  ['.walk-body p','Avanza por el lugar como si ya estuvieras caminando entre las casas.','Move through the place as if you were already walking between the homes.'],
+  ['#openViewer','Abrir este punto','Open this point'],
+  ['.gallery-section .section-head .eyebrow','Luz y paisaje','Light and landscape'],
+  ['.gallery-section h2','La arquitectura abre la puerta. El paisaje hace el resto.','Architecture opens the door. The landscape does the rest.'],
+  ['.gallery-section .section-head>p','Ventanas panorámicas, árboles maduros y caminos que conectan las casas con el valle.','Panoramic windows, mature trees and paths connecting the homes to the valley.'],
+  ['.gallery figure:nth-child(1) figcaption','Valle abierto','Open valley'],
+  ['.gallery figure:nth-child(2) figcaption','Casa oeste','West house'],
+  ['.gallery figure:nth-child(3) figcaption','Camino central','Central path'],
+  ['.gallery figure:nth-child(4) figcaption','Caminos y vegetación','Paths and vegetation'],
+  ['.gallery figure:nth-child(5) figcaption','Entrada privada','Private entrance'],
+  ['#contact h2','Elige tu casa. El resto puede esperar.','Choose your house. The rest can wait.'],
+  ['#contact .right>p','Consulta las fechas reales en Beds24 o escríbenos por WhatsApp antes de reservar.','Check live dates in Beds24 or message us on WhatsApp before booking.'],
+  ['#contact .actions .btn.secondary.dark','WhatsApp','WhatsApp'],
+  ['#contact .actions .btn.primary','Reservar directamente','Book directly'],
+  ['.float','Reservar directamente','Book directly'],
+  ['#drawer h2','Elige cómo continuar.','Choose how to continue.'],
+  ['#drawer .eyebrow + h2 + p','Abre disponibilidad directa en Beds24 o pregúntanos por WhatsApp.','Open live availability in Beds24 or ask us on WhatsApp.'],
+  ['#beds strong','Ver disponibilidad y precios','View availability and prices'],
+  ['#wa strong','Preguntar antes de reservar','Ask before booking'],
+  ['#viewerIndex','Punto 01 de 08','Point 01 of 08'],
+  ['#viewerTitle','Vista central','Central viewpoint'],
+  ['.viewer-foot span','Vídeo real grabado en AUMARA','Real video filmed at AUMARA'],
+  ['.viewer-foot .btn.primary','Reservar','Book']
+];
+const i18nAttr=[
+  ['#close','aria-label','Cerrar','Close'],
+  ['#viewerClose','aria-label','Cerrar','Close'],
+  ['#prev','aria-label','Anterior','Previous'],
+  ['#next','aria-label','Siguiente','Next']
+];
+function apply(){
+  document.documentElement.dataset.lang=lang;
+  document.documentElement.lang=lang;
+  $$('[data-es]').forEach(x=>x.textContent=x.dataset[lang]);
+  i18nText.forEach(([s,es,en])=>{const el=$(s);if(el)el.textContent=lang==='es'?es:en});
+  i18nAttr.forEach(([s,a,es,en])=>{const el=$(s);if(el)el.setAttribute(a,lang==='es'?es:en)});
+  $$('.node').forEach((node,i)=>node.setAttribute('aria-label',(lang==='es'?'Punto ':'Point ')+(i+1)));
+  const checkinLabel=ci?.parentElement,checkoutLabel=co?.parentElement;
+  if(checkinLabel?.firstChild)checkinLabel.firstChild.textContent=lang==='es'?'Entrada':'Check-in';
+  if(checkoutLabel?.firstChild)checkoutLabel.firstChild.textContent=lang==='es'?'Salida':'Check-out';
+  $('#lang').textContent=lang==='es'?'EN':'ES';
+}
+$('#lang').onclick=()=>{lang=lang==='es'?'en':'es';apply();select(current)};
+const header=$('#header'),heroVideo=$('.hero-media video');
+addEventListener('scroll',()=>{header.classList.toggle('solid',scrollY>48);if(heroVideo&&matchMedia('(prefers-reduced-motion:no-preference)').matches)heroVideo.style.transform=`scale(${1.06+Math.min(scrollY/6000,.06)}) translateY(${Math.min(scrollY*.025,18)}px)`},{passive:true});
+$('#menu').onclick=()=>$('#mobile').classList.toggle('open');
+$$('#mobile a,#mobile button').forEach(x=>x.onclick=()=>$('#mobile').classList.remove('open'));
+const drawer=$('#drawer'),back=$('#backdrop');
+function openDrawer(){drawer.classList.add('open');drawer.setAttribute('aria-hidden','false');back.hidden=false;document.body.classList.add('lock')}
+function closeDrawer(){drawer.classList.remove('open');drawer.setAttribute('aria-hidden','true');back.hidden=true;document.body.classList.remove('lock')}
+$$('[data-open]').forEach(x=>x.onclick=openDrawer);$('#close').onclick=closeDrawer;back.onclick=closeDrawer;
+const ci=$('#checkin'),co=$('#checkout'),today=new Date();today.setHours(0,0,0,0);
+const iso=d=>{const y=d.getFullYear(),m=String(d.getMonth()+1).padStart(2,'0'),day=String(d.getDate()).padStart(2,'0');return `${y}-${m}-${day}`};
+const start=new Date(today),end=new Date(today);start.setDate(start.getDate()+1);end.setDate(end.getDate()+3);ci.min=iso(today);ci.value=iso(start);co.min=iso(start);co.value=iso(end);
+function syncBeds(){const u=new URL('https://beds24.com/booking2.php?propid=324882');u.searchParams.set('checkin',ci.value);u.searchParams.set('checkout',co.value);$('#beds').href=u}
+ci.onchange=()=>{const d=new Date(ci.value+'T00:00:00');d.setDate(d.getDate()+1);co.min=iso(d);if(co.value<=ci.value)co.value=iso(d);syncBeds()};co.onchange=syncBeds;syncBeds();
+$('#wa').href='https://wa.me/34622914323?text='+encodeURIComponent('Hola, quiero consultar una estancia en AUMARA.');
+const nodes=[['Vista central','Central viewpoint'],['Acceso oeste','West approach'],['Casa oeste','Western house'],['Casa central','Central house'],['Descenso','Descent'],['Camino superior','Upper path'],['Ruta inferior','Lower route'],['Regreso oeste','Return west']].map((t,i)=>({t,video:`https://elcidspain.com/aumara/media/nodes/node-${String(i+1).padStart(2,'0')}.mp4`}));
+let current=0;const viewer=$('#viewer'),video=$('#video');
+function select(i){current=(i+nodes.length)%nodes.length;$$('.node').forEach((n,j)=>n.classList.toggle('active',j===current));$('#point').textContent=(lang==='es'?'Punto ':'Point ')+String(current+1).padStart(2,'0');$('#pointTitle').textContent=nodes[current].t[lang==='es'?0:1]}
+function openViewer(){select(current);video.src=nodes[current].video;viewer.classList.add('open');viewer.setAttribute('aria-hidden','false');document.body.classList.add('lock');$('#viewerIndex').textContent=(lang==='es'?'Punto ':'Point ')+String(current+1).padStart(2,'0')+(lang==='es'?' de 08':' of 08');$('#viewerTitle').textContent=nodes[current].t[lang==='es'?0:1];video.play().catch(()=>{})}
+function closeViewer(){viewer.classList.remove('open');viewer.setAttribute('aria-hidden','true');video.pause();document.body.classList.remove('lock')}
+$$('.node').forEach((n,i)=>n.onclick=()=>{select(i);openViewer()});$('#openViewer').onclick=openViewer;$('#viewerClose').onclick=closeViewer;$('#prev').onclick=()=>{select(current-1);openViewer()};$('#next').onclick=()=>{select(current+1);openViewer()};
+addEventListener('keydown',e=>{if(e.key==='Escape'){closeDrawer();closeViewer()}});
+document.documentElement.classList.add('reveal');
+const obs=new IntersectionObserver(es=>es.forEach(e=>{if(e.isIntersecting){e.target.classList.add('visible');obs.unobserve(e.target)}}),{threshold:.1});$$('[data-reveal]').forEach(x=>obs.observe(x));
+apply();select(0);
+</script>
+</body>
+</html>

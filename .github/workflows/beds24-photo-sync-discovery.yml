@@ -7,6 +7,8 @@ on:
     paths:
       - '.github/aumara-beds24-sync.trigger'
   push:
+    branches:
+      - main
     paths:
       - '.github/aumara-beds24-sync.trigger'
 
@@ -152,7 +154,8 @@ jobs:
           print('secret_values_exposed=false')
 
           path='aumara-control-tower/checkpoints/BEDS24_PHOTO_SYNC_DISCOVERY.json'
-          open(path,'w',encoding='utf-8').write(json.dumps(receipt,indent=2,ensure_ascii=False)+'\n')
+          with open(path,'w',encoding='utf-8') as f:
+              f.write(json.dumps(receipt,indent=2,ensure_ascii=False)+'\n')
           print('status=' + receipt['status'])
           if exit_code:
               raise SystemExit(exit_code)

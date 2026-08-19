@@ -2,11 +2,11 @@
   "rewrites": [
     {
       "source": "/aumara",
-      "destination": "/aumara-site/direct-v5-review.html"
+      "destination": "/aumara-site/direct-v2.html"
     },
     {
       "source": "/aumara/",
-      "destination": "/aumara-site/direct-v5-review.html"
+      "destination": "/aumara-site/direct-v2.html"
     },
     {
       "source": "/staff",

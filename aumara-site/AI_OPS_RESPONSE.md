@@ -10,8 +10,8 @@ Status: preview only; production remains unchanged.
 - Rebuilt `direct-v3-preview.html` from the current live experience instead of from the stale compressed v3 branch.
 - Kept the first commercial page focused on stays: houses, capacities, plan, pool, practical rules and direct booking.
 - Removed the deeper Retreats / Gatherings / Safe depth material from the first sales page.
-- Replaced the old Gmail contact with `reservas@elcidspain.com`.
-- Added the verified inventory baseline: 6 physical houses, 5 bookable; 3 Chalet up to 4 guests and 2 Superior Chalet up to 6 guests.
+- Replaced the rejected domain mailbox with the temporary operational contact `elcidspain@gmail.com`.
+- Added the verified inventory baseline: 4 Chalet and 2 Superior Chalet.
 - Clarified that the pool is shared exclusively by staying AUMARA guests.
 - Clarified pets and meals without inventing availability or inclusions.
 - Kept access instructions private and avoided promising fully automated personal TTLock codes.

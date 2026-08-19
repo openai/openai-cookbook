@@ -22,7 +22,7 @@ The Spanish wording is approved. Do not replace it with a new interpretation wit
 Expanded version preserved from earlier work:
 
 > **Mejor gente.**  
-> **Mejor proyectos.**  
+> **Mejores proyectos.**  
 > **Mejor vida.**  
 > **Y el resto… que se quede fuera.**
 

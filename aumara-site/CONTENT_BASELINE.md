@@ -14,10 +14,9 @@ The first release must sell the stay clearly before it introduces retreats, even
 
 - Location: Benidoleig, Marina Alta, Alicante, Spain.
 - Six physical houses are present on the site.
-- Five houses are currently bookable.
-- One physical house is kept out of sale as an operational reserve. Do not guess or publish its exact internal number.
+- Six houses are currently bookable.
 - Bookable inventory:
-  - 3 × Chalet Ø7.5, maximum 4 guests each.
+  - 4 × Chalet Ø7.5, maximum 4 guests each.
   - 2 × Superior Chalet Ø9, maximum 6 guests each.
 - A Chalet is a complete independent house with its own entrance, a sleeping zone and an open mezzanine level.
 - A Superior Chalet is a larger complete independent house with two separate bedrooms and two bathrooms.
@@ -30,7 +29,7 @@ The first release must sell the stay clearly before it introduces retreats, even
 - Room-specific direct booking:
   - Chalet: room `674465`.
   - Superior Chalet: room `674466`.
-- Guest contact: `reservas@elcidspain.com`.
+- Guest contact: `elcidspain@gmail.com`.
 - Legal operator: EL CID VENTURES BENIDOLEIG S.L., CIF B53816989.
 
 ## 3. Do not publish until verified
@@ -46,7 +45,7 @@ The first release must sell the stay clearly before it introduces retreats, even
 - A personal automatic door code.
 - Unverified universal amenity claims: parking, Wi-Fi, air conditioning, fully equipped kitchen or accessibility.
 - Any therapeutic outcome or medical/psychological claim for retreat programmes.
-- Old internal house names or a guessed identity for the reserve unit.
+- Old internal house names.
 
 ## 4. Operational facts deliberately withheld from public copy
 
@@ -57,7 +56,7 @@ The first release must sell the stay clearly before it introduces retreats, even
 ## 5. First-release page structure
 
 1. Hero and direct availability CTA.
-2. Six physical houses / five currently bookable.
+2. Six physical houses / six currently bookable.
 3. Two house formats with capacity.
 4. Interactive plan and eight real video points.
 5. Territory, paths, trees, valley and shared guest pool.
@@ -77,11 +76,11 @@ Retreats, gatherings, `Safe depth` and long operator explanations stay outside t
 # Hay lugares que te dan más.  
 # En AUMARA, vuelves a encontrarte contigo mismo.
 
-Cinco casas geodésicas completas e independientes entre pinos, abiertas al valle: tres Chalet Ø7,5 y dos Chalet Superior Ø9.
+Seis casas geodésicas completas e independientes entre pinos, abiertas al valle: cuatro Chalet Ø7,5 y dos Chalet Superior Ø9.
 
 **[Recorrer el lugar] [Consultar disponibilidad]**
 
-Seis casas forman parte de AUMARA. Cinco están disponibles para alojarse y una permanece fuera del alquiler como reserva operativa.
+Seis casas forman parte de AUMARA. Las seis están disponibles para alojarse.
 
 ### Positioning
 
@@ -91,11 +90,10 @@ Abra el plano, entre en cualquiera de los ocho puntos de vídeo y vea cómo se r
 
 ### Inventory
 
-## Seis casas en el terreno. Cinco disponibles para alojarse.
+## Seis casas en el terreno. Seis disponibles para alojarse.
 
-- 3 Chalet Ø7,5 · hasta 4 huéspedes.
+- 4 Chalet Ø7,5 · hasta 4 huéspedes.
 - 2 Chalet Superior Ø9 · hasta 6 huéspedes.
-- 1 casa de reserva · fuera del inventario.
 
 ### Chalet
 
@@ -146,7 +144,7 @@ Antes de la llegada enviamos de forma privada la ubicación exacta y las instruc
 ### FAQ
 
 **¿Cuántas casas hay?**  
-Hay seis casas físicas. Actualmente se pueden reservar cinco; la sexta permanece fuera del alquiler.
+Hay seis casas físicas. Actualmente se pueden reservar las seis.
 
 **¿Cuál es la capacidad?**  
 El Chalet admite hasta 4 huéspedes. El Chalet Superior admite hasta 6.
@@ -183,11 +181,11 @@ La disponibilidad, el precio y las condiciones vigentes se muestran directamente
 # Some places give you more.  
 # AUMARA gives you back to yourself.
 
-Five complete, independent geodesic houses among pine trees and open to the valley: three Ø7.5 Chalets and two Ø9 Superior Chalets.
+Six complete, independent geodesic houses among pine trees and open to the valley: four Ø7.5 Chalets and two Ø9 Superior Chalets.
 
 **[Walk the place] [Check availability]**
 
-Six houses form AUMARA. Five are available for stays and one remains out of sale as an operational reserve.
+Six houses form AUMARA. All six are available for stays.
 
 ### Positioning
 
@@ -197,11 +195,10 @@ Open the plan and enter any of the eight real video points to understand how the
 
 ### Inventory
 
-## Six houses on the site. Five available for stays.
+## Six houses on the site. Six available for stays.
 
-- 3 × Ø7.5 Chalet · up to 4 guests.
+- 4 × Ø7.5 Chalet · up to 4 guests.
 - 2 × Ø9 Superior Chalet · up to 6 guests.
-- 1 reserve house · outside the bookable inventory.
 
 ### Chalet
 
@@ -252,7 +249,7 @@ We send the exact location and access instructions privately before arrival. Eve
 ### FAQ
 
 **How many houses are there?**  
-There are six physical houses. Five are currently bookable; the sixth remains outside the rental inventory.
+There are six physical houses. All six are currently bookable.
 
 **What is the capacity?**  
 The Chalet accommodates up to 4 guests. The Superior Chalet accommodates up to 6.
@@ -284,7 +281,7 @@ Current availability, rates and booking conditions are shown directly in AUMARA�
 
 1. Daylight hero loop, 8–15 seconds, desktop.
 2. Lightweight vertical/mobile hero plus a WebP poster.
-3. Clean guest-facing site-plan SVG: 6 physical houses, 5 bookable, 1 reserve.
+3. Clean guest-facing site-plan SVG: 6 physical houses, 6 bookable.
 4. Chalet daylight exterior.
 5. Chalet living area and panoramic window.
 6. Chalet sleeping/mezzanine image with human scale.

@@ -72,5 +72,6 @@ jobs:
           git config user.name 'AUMARA Automation'
           git config user.email '41898282+github-actions[bot]@users.noreply.github.com'
           git add aumara-control-tower/checkpoints/AUMARA_PROVIDER_BINDING_NAMES.json
+          git diff --cached --quiet && exit 0
           git commit -m 'Record AUMARA provider binding names'
           git push origin HEAD:main

@@ -8,7 +8,7 @@
       "property": "elcid",
       "category": "beds24_guest_note",
       "rule": "Continuously record a combined bed and non-smoking operational request only for an active future EL CID Twin booking created in the preceding seven days when both requests are explicit in the booking notification payload; use an idempotent bounded batch, change only the Beds24 guest-request info item and verify every note by exact read-back.",
-      "source": "approved_internal_instruction",
+      "source": "approved_internal_document",
       "source_reference": "REQUEST:ELCID_BED_NONSMOKING:2026-08-02",
       "verified_at": "2026-08-02",
       "status": "verified",

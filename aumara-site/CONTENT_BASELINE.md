@@ -14,10 +14,11 @@ The first release must sell the stay clearly before it introduces retreats, even
 
 - Location: Benidoleig, Marina Alta, Alicante, Spain.
 - Six physical houses are present on the site.
-- Six houses are currently bookable.
+- Current commercial source inventory is 4 Chalet + 2 Superior Chalet.
 - Bookable inventory:
   - 4 × Chalet Ø7.5, maximum 4 guests each.
   - 2 × Superior Chalet Ø9, maximum 6 guests each.
+- Recovery snapshots may still show the older 3 + 2 configuration; use this 4 + 2 baseline as the current commercial source.
 - A Chalet is a complete independent house with its own entrance, a sleeping zone and an open mezzanine level.
 - A Superior Chalet is a larger complete independent house with two separate bedrooms and two bathrooms.
 - The swimming pool is shared exclusively by staying AUMARA guests. It is not open to the public and is not private to an individual house.
@@ -39,7 +40,6 @@ The first release must sell the stay clearly before it introduces retreats, even
 - Exact distance between houses.
 - Absolute privacy, complete silence, no neighbours or exclusive-resort claims.
 - A private pool for any individual house.
-- Six bookable houses.
 - Fixed or included breakfast, daily restaurant service, guaranteed paella or fixed meal prices.
 - A standard early check-in promise.
 - A personal automatic door code.
@@ -56,7 +56,7 @@ The first release must sell the stay clearly before it introduces retreats, even
 ## 5. First-release page structure
 
 1. Hero and direct availability CTA.
-2. Six physical houses / six currently bookable.
+2. Six physical houses / current commercial source: 4 Chalet + 2 Superior Chalet.
 3. Two house formats with capacity.
 4. Interactive plan and eight real video points.
 5. Territory, paths, trees, valley and shared guest pool.
@@ -80,7 +80,7 @@ Seis casas geodésicas completas e independientes entre pinos, abiertas al valle
 
 **[Recorrer el lugar] [Consultar disponibilidad]**
 
-Seis casas forman parte de AUMARA. Las seis están disponibles para alojarse.
+Seis casas forman parte de AUMARA. El inventario comercial actual es de cuatro Chalet y dos Chalet Superior.
 
 ### Positioning
 
@@ -90,7 +90,7 @@ Abra el plano, entre en cualquiera de los ocho puntos de vídeo y vea cómo se r
 
 ### Inventory
 
-## Seis casas en el terreno. Seis disponibles para alojarse.
+## Seis casas en el terreno. Inventario comercial actual: cuatro Chalet y dos Chalet Superior.
 
 - 4 Chalet Ø7,5 · hasta 4 huéspedes.
 - 2 Chalet Superior Ø9 · hasta 6 huéspedes.
@@ -144,7 +144,7 @@ Antes de la llegada enviamos de forma privada la ubicación exacta y las instruc
 ### FAQ
 
 **¿Cuántas casas hay?**  
-Hay seis casas físicas. Actualmente se pueden reservar las seis.
+Hay seis casas físicas. El inventario comercial actual refleja cuatro Chalet y dos Chalet Superior.
 
 **¿Cuál es la capacidad?**  
 El Chalet admite hasta 4 huéspedes. El Chalet Superior admite hasta 6.
@@ -185,7 +185,7 @@ Six complete, independent geodesic houses among pine trees and open to the valle
 
 **[Walk the place] [Check availability]**
 
-Six houses form AUMARA. All six are available for stays.
+Six houses form AUMARA. The current commercial inventory is four Chalets and two Superior Chalets.
 
 ### Positioning
 
@@ -195,7 +195,7 @@ Open the plan and enter any of the eight real video points to understand how the
 
 ### Inventory
 
-## Six houses on the site. Six available for stays.
+## Six houses on the site. Current commercial inventory: four Chalets and two Superior Chalets.
 
 - 4 × Ø7.5 Chalet · up to 4 guests.
 - 2 × Ø9 Superior Chalet · up to 6 guests.
@@ -249,7 +249,7 @@ We send the exact location and access instructions privately before arrival. Eve
 ### FAQ
 
 **How many houses are there?**  
-There are six physical houses. All six are currently bookable.
+There are six physical houses. The current commercial inventory reflects four Chalets and two Superior Chalets.
 
 **What is the capacity?**  
 The Chalet accommodates up to 4 guests. The Superior Chalet accommodates up to 6.

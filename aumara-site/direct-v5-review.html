@@ -220,7 +220,78 @@ p{line-height:1.7}
 <script>
 let lang='es';
 const $=(s,c=document)=>c.querySelector(s),$$=(s,c=document)=>[...c.querySelectorAll(s)];
-function apply(){document.documentElement.dataset.lang=lang;$$('[data-es]').forEach(x=>x.textContent=x.dataset[lang]);$('#lang').textContent=lang==='es'?'EN':'ES'}
+const i18nText=[
+  ['.nav a[href="#houses"]','Casas','Houses'],
+  ['.nav a[href="#walk"]','Recorrido','Tour'],
+  ['.nav a[href="#contact"]','Contacto','Contact'],
+  ['.tools .book','Reservar','Book'],
+  ['#menu','Menú','Menu'],
+  ['#mobile a[href="#houses"]','Casas','Houses'],
+  ['#mobile a[href="#walk"]','Recorrido','Tour'],
+  ['#mobile a[href="#contact"]','Contacto','Contact'],
+  ['#mobile button[data-open]','Reservar','Book'],
+  ['.hero .actions .btn.primary','Ver disponibilidad','Check availability'],
+  ['.hero .actions .btn.secondary','Entrar en AUMARA','Enter AUMARA'],
+  ['.hero-meta .scroll-mark','Descubrir','Discover'],
+  ['.hero-meta span:last-child','Casas completas · Valle abierto · Recorrido real','Whole homes · Open valley · Real tour'],
+  ['#houses .section-head .eyebrow','Casas','Houses'],
+  ['.house:nth-child(1) h3','AUMARA Chalet','AUMARA Chalet'],
+  ['.house:nth-child(1) .house-copy p:nth-of-type(2)','Hasta cuatro huéspedes, altillo abierto, grandes ventanas y una escala íntima.','Up to four guests, open loft, large windows and an intimate scale.'],
+  ['.house:nth-child(1) .facts span:nth-child(1)','Hasta 4 huéspedes','Up to 4 guests'],
+  ['.house:nth-child(1) .facts span:nth-child(2)','Casa completa','Whole home'],
+  ['.house:nth-child(1) .facts span:nth-child(3)','Entrada privada','Private entrance'],
+  ['.house:nth-child(1) .btn.secondary','Ver fechas','View dates'],
+  ['.house:nth-child(2) h3','AUMARA Superior Chalet','AUMARA Superior Chalet'],
+  ['.house:nth-child(2) .house-copy p:nth-of-type(2)','Más amplitud para hasta seis huéspedes, con dos dormitorios y dos baños.','More space for up to six guests, with two bedrooms and two bathrooms.'],
+  ['.house:nth-child(2) .facts span:nth-child(1)','Hasta 6 huéspedes','Up to 6 guests'],
+  ['.house:nth-child(2) .facts span:nth-child(2)','2 dormitorios','2 bedrooms'],
+  ['.house:nth-child(2) .facts span:nth-child(3)','2 baños','2 bathrooms'],
+  ['.house:nth-child(2) .btn.secondary','Ver fechas','View dates'],
+  ['#walk .section-head .eyebrow','Recorrido','Tour'],
+  ['#point','Punto 01','Point 01'],
+  ['#pointTitle','Vista central','Central viewpoint'],
+  ['.walk-body p','Avanza por el lugar como si ya estuvieras caminando entre las casas.','Move through the place as if you were already walking between the homes.'],
+  ['#openViewer','Abrir este punto','Open this point'],
+  ['.gallery-section .section-head .eyebrow','Luz y paisaje','Light and landscape'],
+  ['.gallery-section h2','La arquitectura abre la puerta. El paisaje hace el resto.','Architecture opens the door. The landscape does the rest.'],
+  ['.gallery-section .section-head>p','Ventanas panorámicas, árboles maduros y caminos que conectan las casas con el valle.','Panoramic windows, mature trees and paths connecting the homes to the valley.'],
+  ['.gallery figure:nth-child(1) figcaption','Valle abierto','Open valley'],
+  ['.gallery figure:nth-child(2) figcaption','Casa oeste','West house'],
+  ['.gallery figure:nth-child(3) figcaption','Camino central','Central path'],
+  ['.gallery figure:nth-child(4) figcaption','Caminos y vegetación','Paths and vegetation'],
+  ['.gallery figure:nth-child(5) figcaption','Entrada privada','Private entrance'],
+  ['#contact h2','Elige tu casa. El resto puede esperar.','Choose your house. The rest can wait.'],
+  ['#contact .right>p','Consulta las fechas reales en Beds24 o escríbenos por WhatsApp antes de reservar.','Check live dates in Beds24 or message us on WhatsApp before booking.'],
+  ['#contact .actions .btn.secondary.dark','WhatsApp','WhatsApp'],
+  ['#contact .actions .btn.primary','Reservar directamente','Book directly'],
+  ['.float','Reservar directamente','Book directly'],
+  ['#drawer h2','Elige cómo continuar.','Choose how to continue.'],
+  ['#drawer .eyebrow + h2 + p','Abre disponibilidad directa en Beds24 o pregúntanos por WhatsApp.','Open live availability in Beds24 or ask us on WhatsApp.'],
+  ['#beds strong','Ver disponibilidad y precios','View availability and prices'],
+  ['#wa strong','Preguntar antes de reservar','Ask before booking'],
+  ['#viewerIndex','Punto 01 de 08','Point 01 of 08'],
+  ['#viewerTitle','Vista central','Central viewpoint'],
+  ['.viewer-foot span','Vídeo real grabado en AUMARA','Real video filmed at AUMARA'],
+  ['.viewer-foot .btn.primary','Reservar','Book']
+];
+const i18nAttr=[
+  ['#close','aria-label','Cerrar','Close'],
+  ['#viewerClose','aria-label','Cerrar','Close'],
+  ['#prev','aria-label','Anterior','Previous'],
+  ['#next','aria-label','Siguiente','Next']
+];
+function apply(){
+  document.documentElement.dataset.lang=lang;
+  document.documentElement.lang=lang;
+  $$('[data-es]').forEach(x=>x.textContent=x.dataset[lang]);
+  i18nText.forEach(([s,es,en])=>{const el=$(s);if(el)el.textContent=lang==='es'?es:en});
+  i18nAttr.forEach(([s,a,es,en])=>{const el=$(s);if(el)el.setAttribute(a,lang==='es'?es:en)});
+  $$('.node').forEach((node,i)=>node.setAttribute('aria-label',(lang==='es'?'Punto ':'Point ')+(i+1)));
+  const checkinLabel=ci?.parentElement,checkoutLabel=co?.parentElement;
+  if(checkinLabel?.firstChild)checkinLabel.firstChild.textContent=lang==='es'?'Entrada':'Check-in';
+  if(checkoutLabel?.firstChild)checkoutLabel.firstChild.textContent=lang==='es'?'Salida':'Check-out';
+  $('#lang').textContent=lang==='es'?'EN':'ES';
+}
 $('#lang').onclick=()=>{lang=lang==='es'?'en':'es';apply();select(current)};
 const header=$('#header'),heroVideo=$('.hero-media video');
 addEventListener('scroll',()=>{header.classList.toggle('solid',scrollY>48);if(heroVideo&&matchMedia('(prefers-reduced-motion:no-preference)').matches)heroVideo.style.transform=`scale(${1.06+Math.min(scrollY/6000,.06)}) translateY(${Math.min(scrollY*.025,18)}px)`},{passive:true});

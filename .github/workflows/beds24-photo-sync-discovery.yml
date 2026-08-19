@@ -13,7 +13,6 @@ permissions:
 jobs:
   discover:
     runs-on: ubuntu-latest
-    environment: Production
     timeout-minutes: 5
     env:
       ALL_SECRETS_JSON: ${{ toJSON(secrets) }}

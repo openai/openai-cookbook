@@ -51,6 +51,7 @@ jobs:
               WebDriverWait(d, 25).until(EC.presence_of_element_located((By.ID, 'staffId')))
               WebDriverWait(d, 45).until(lambda _d: _d.execute_script("return document.readyState") == "complete")
               WebDriverWait(d, 45).until(lambda _d: len(_d.find_elements(By.CSS_SELECTOR, '#staffId option')) >= 2)
+              options = d.find_elements(By.CSS_SELECTOR, '#staffId option')
               payload = {
                   'url': d.current_url,
                   'title': d.title,

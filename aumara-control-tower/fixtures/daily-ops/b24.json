@@ -1,0 +1,23 @@
+{
+  "schema": "aumara-b24-task-status-v1",
+  "synthetic": true,
+  "dataClassification": "TEST_ONLY",
+  "status": "OK",
+  "generatedAtUtc": "2026-07-30T20:35:00Z",
+  "summary": {
+    "openTasks": 7,
+    "closedToday": 4,
+    "overdueTasks": 1
+  },
+  "events": [
+    {
+      "eventId": "b24-task-001",
+      "occurredAtUtc": "2026-07-30T16:10:00Z",
+      "property": "EL CID Country Club",
+      "eventType": "task_overdue",
+      "status": "attention",
+      "summary": "Synthetic arrival-preparation task is overdue",
+      "requiresDecision": true
+    }
+  ]
+}

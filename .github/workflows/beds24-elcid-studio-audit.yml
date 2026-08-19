@@ -2,29 +2,29 @@ name: Beds24 El Cid Studio read-only audit
 
 on:
   workflow_dispatch:
+  pull_request:
+    branches: [main]
+    paths:
+      - '.github/workflows/beds24-elcid-studio-audit.yml'
+      - 'aumara-control-tower/scripts/beds24_elcid_studio_audit.py'
+      - 'aumara-control-tower/scripts/tests/test_beds24_elcid_studio_audit.py'
   push:
     branches: [main]
     paths:
       - '.github/workflows/beds24-elcid-studio-audit.yml'
       - 'aumara-control-tower/scripts/beds24_elcid_studio_audit.py'
+      - 'aumara-control-tower/scripts/tests/test_beds24_elcid_studio_audit.py'
 
 permissions:
-  contents: write
+  contents: read
 
 concurrency:
   group: beds24-elcid-studio-audit
   cancel-in-progress: true
 
 jobs:
-  audit:
+  test:
     runs-on: ubuntu-latest
-    env:
-      BEDS24_TOKEN_CREDENTIAL: ${{ secrets.BEDS24_TOKEN_CREDENTIAL }}
-      BEDS24_BOOTSTRAP_CREDENTIAL: ${{ secrets.BEDS24_BOOTSTRAP_CREDENTIAL }}
-      BEDS24_REFRESH_TOKEN: ${{ secrets.BEDS24_REFRESH_TOKEN }}
-      BEDS24_ALLOW_INVITE_BOOTSTRAP: '1'
-      AUDIT_TODAY: '2026-07-16'
-      BEDS24_STUDIO_AUDIT_OUTPUT: aumara-control-tower/evidence/elcid-studio-audit.json
 
     steps:
       - uses: actions/checkout@v4
@@ -32,19 +32,19 @@ jobs:
       - name: Test read-only audit logic
         run: python -m unittest aumara-control-tower/scripts/tests/test_beds24_elcid_studio_audit.py
 
+  audit:
+    if: github.event_name == 'workflow_dispatch'
+    needs: test
+    runs-on: ubuntu-latest
+    env:
+      BEDS24_REFRESH_TOKEN: ${{ secrets.BEDS24_REFRESH_CREDENTIAL }}
+      BEDS24_STUDIO_AUDIT_OUTPUT: aumara-control-tower/evidence/elcid-studio-audit.json
+
+    steps:
+      - uses: actions/checkout@v4
+
       - name: Audit Studio bookings, alternatives, and website
         run: python aumara-control-tower/scripts/beds24_elcid_studio_audit.py
-
-      - name: Persist only an encrypted refresh-token vault after bootstrap
-        if: success()
-        run: |
-          git config user.name 'github-actions[bot]'
-          git config user.email '41898282+github-actions[bot]@users.noreply.github.com'
-          git add aumara-control-tower/vault/beds24-refresh-token.enc
-          if ! git diff --cached --quiet; then
-            git commit -m 'Refresh encrypted Beds24 credential vault [skip ci]'
-            git push origin HEAD:main
-          fi
 
       - name: Upload sanitized audit
         if: always()

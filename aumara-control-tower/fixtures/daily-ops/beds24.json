@@ -1,0 +1,26 @@
+{
+  "schema": "aumara-beds24-daily-v1",
+  "synthetic": true,
+  "dataClassification": "TEST_ONLY",
+  "status": "OK",
+  "generatedAtUtc": "2026-07-30T20:40:00Z",
+  "summary": {
+    "newBookings": 2,
+    "modifiedBookings": 1,
+    "cancelledBookings": 1,
+    "bookedRevenueAddedEur": 360.0,
+    "bookedRevenueCancelledEur": 78.4,
+    "arrivals": 1,
+    "departures": 2,
+    "occupiedRoomNights": 5
+  },
+  "conversations": [
+    {
+      "conversationId": "synthetic-conversation-001",
+      "bookingHash": "synthetic-booking-hash",
+      "lastMessageAtUtc": "2026-07-30T20:00:00Z",
+      "lastEventType": "bed_request",
+      "unanswered": true
+    }
+  ]
+}

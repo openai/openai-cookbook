@@ -1,12 +1,12 @@
 #!/usr/bin/env python3
-"""Idempotent Booking.com guest replies for El Cid Country Club.
+"""Audit-only Booking.com guest-reply planner for El Cid Country Club.
 
 The script is deliberately narrow:
 - property 324903 only;
 - Booking.com bookings only;
 - messages only (it never changes prices, availability, status or payments);
-- dry-run unless BEDS24_AUTO_REPLY_EXECUTE=1;
-- an identical host message is never sent twice.
+- permanently refuses BEDS24_AUTO_REPLY_EXECUTE=1;
+- an identical host message is never proposed twice.
 """
 
 from __future__ import annotations
@@ -23,7 +23,6 @@ from beds24_elcid_studio_audit import AuditError, data_rows, get_access_token
 
 
 PROPERTY_ID = 324903
-STUDIO_ROOM_ID = 674486
 ACTIVE_STATUSES = {"confirmed", "new", "request"}
 OUTPUT = pathlib.Path(
     os.environ.get(
@@ -32,8 +31,8 @@ OUTPUT = pathlib.Path(
     )
 )
 
-# These four bookings were reviewed from the Beds24 notification and get a
-# precise reply. Future bookings receive a conservative language template.
+# These four historical bookings were individually reviewed. Future bookings
+# deliberately receive no generic proposal from this retired fallback.
 TARGET_MESSAGES = {
     89955894: (
         "Hola Manuel:\n\nGracias por tu reserva. Hemos anotado tu preferencia "
@@ -64,76 +63,15 @@ TARGET_MESSAGES = {
     ),
 }
 
-GENERIC_MESSAGES = {
-    "es": (
-        "Hola:\n\nGracias por reservar en El Cid Country Club. Hemos recibido "
-        "y confirmado tu reserva. Revisaremos cualquier petición especial y te "
-        "contactaremos si necesitamos aclarar algún detalle. Las preferencias de "
-        "cama y parking dependen de la configuración y disponibilidad existentes."
-        "\n\nSaludos,\nEl Cid Country Club"
-    ),
-    "pl": (
-        "Dzień dobry,\n\ndziękujemy za rezerwację w El Cid Country Club. "
-        "Otrzymaliśmy i potwierdziliśmy rezerwację. Sprawdzimy wszystkie prośby "
-        "specjalne i skontaktujemy się, jeśli potrzebne będą dodatkowe informacje. "
-        "Preferencje dotyczące łóżka i parkingu zależą od dostępności.\n\n"
-        "Pozdrawiamy,\nEl Cid Country Club"
-    ),
-    "en": (
-        "Hello,\n\nThank you for booking El Cid Country Club. We have received "
-        "and confirmed your reservation. We will review any special requests and "
-        "contact you if clarification is needed. Bed and parking preferences are "
-        "subject to the existing room configuration and availability.\n\n"
-        "Kind regards,\nEl Cid Country Club"
-    ),
-}
-
-STUDIO_MESSAGES = {
-    "es": (
-        "Hola:\n\nGracias por tu reserva. Estamos verificando la disponibilidad "
-        "operativa del Studio para tus fechas. Si fuera necesario un cambio, te "
-        "ofreceremos una alternativa en El Cid Country Club y pediremos tu "
-        "confirmación antes de modificar la reserva.\n\nSaludos,\n"
-        "El Cid Country Club"
-    ),
-    "en": (
-        "Hello,\n\nThank you for your reservation. We are verifying the Studio's "
-        "operational availability for your dates. If a change is required, we will "
-        "offer an alternative at El Cid Country Club and ask for your confirmation "
-        "before modifying the reservation.\n\nKind regards,\nEl Cid Country Club"
-    ),
-}
-
-
 def normalize_text(value: object) -> str:
     """Normalize a message for reliable duplicate checks."""
     return " ".join(str(value or "").split()).casefold()
 
 
-def language_for(booking: dict[str, object]) -> str:
-    """Resolve a small supported language set without guessing from a name."""
-    raw = str(
-        booking.get("language")
-        or booking.get("lang")
-        or booking.get("country")
-        or ""
-    ).strip().lower()
-    if raw.startswith("es"):
-        return "es"
-    if raw.startswith("pl"):
-        return "pl"
-    return "en"
-
-
 def reply_for(booking: dict[str, object]) -> str | None:
-    """Return the reviewed or conservative message for one booking."""
+    """Return only an individually reviewed historical message."""
     booking_id = int(booking.get("id") or 0)
-    if booking_id in TARGET_MESSAGES:
-        return TARGET_MESSAGES[booking_id]
-    language = language_for(booking)
-    if int(booking.get("roomId") or 0) == STUDIO_ROOM_ID:
-        return STUDIO_MESSAGES.get(language, STUDIO_MESSAGES["en"])
-    return GENERIC_MESSAGES.get(language, GENERIC_MESSAGES["en"])
+    return TARGET_MESSAGES.get(booking_id)
 
 
 def booking_in_scope(booking: dict[str, object]) -> bool:
@@ -226,23 +164,6 @@ def already_sent(messages: list[dict[str, object]], reply: str) -> bool:
     return False
 
 
-def send_message(
-    token: str, api_base: str, booking_id: int, reply: str
-) -> None:
-    """Send one documented host message."""
-    status, _ = request_json(
-        "POST",
-        "/bookings/messages",
-        token,
-        api_base,
-        [{"bookingId": booking_id, "message": reply}],
-    )
-    if status != 201:
-        raise AuditError(
-            f"Message send failed for booking {booking_id} with HTTP {status}"
-        )
-
-
 def run(
     bookings: list[dict[str, object]],
     *,
@@ -250,7 +171,11 @@ def run(
     api_base: str,
     execute: bool,
 ) -> dict[str, object]:
-    """Plan or execute idempotent replies and return sanitized results."""
+    """Plan idempotent replies and return sanitized results."""
+    if execute:
+        raise AuditError(
+            "Live Beds24 replies are retired; use the reviewed Gmail automation"
+        )
     results: list[dict[str, object]] = []
     for booking in bookings:
         booking_id = int(booking.get("id") or 0)
@@ -275,12 +200,10 @@ def run(
             item["reason"] = "already_sent"
             results.append(item)
             continue
-        item["action"] = "would_send" if not execute else "sent"
+        item["action"] = "would_send"
         item["template"] = (
-            "reviewed" if booking_id in TARGET_MESSAGES else "generic"
+            "reviewed"
         )
-        if execute:
-            send_message(token, api_base, booking_id, reply)
         results.append(item)
     return {
         "schema": "elcid-auto-replies-v1",
@@ -296,6 +219,10 @@ def run(
 def main() -> None:
     """Authenticate, process new bookings and write a sanitized audit artifact."""
     execute = os.environ.get("BEDS24_AUTO_REPLY_EXECUTE") == "1"
+    if execute:
+        raise AuditError(
+            "Live Beds24 replies are retired; use the reviewed Gmail automation"
+        )
     token, auth_mode, api_base, auth_source, _ = get_access_token()
     bookings = fetch_new_bookings(token, api_base)
     result = run(

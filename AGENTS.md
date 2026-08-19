@@ -25,6 +25,28 @@ Execute notebooks top-to-bottom after installing dependencies and clear lingerin
 
 Use concise, imperative commit messages that describe the change scope (e.g., "Add agent portfolio collaboration demo"). Every PR should provide a summary, motivation, and self-review, and must tick the registry and authors checklist from `.github/pull_request_template.md`. Link issues when applicable and attach screenshots or output snippets for UI-heavy content. Confirm CI notebook validation passes locally before requesting review.
 
+## AI Execution Governance
+
+All AI-assisted executions must follow
+[`docs/AI_EXECUTION_POLICY.md`](docs/AI_EXECUTION_POLICY.md) and
+[`docs/CHECKPOINT_PROTOCOL.md`](docs/CHECKPOINT_PROTOCOL.md).
+
+- One execution has one narrowly scoped objective, and one task produces one
+  pull request.
+- Before creating work, inspect the targeted existing work and reuse a
+  recoverable branch, commit, pull request, or checkpoint.
+- Do not rescan the whole repository unless the checkpoint documents why the
+  targeted inspection was insufficient.
+- Define scope, evidence, tests, stop condition, and recovery point before
+  implementation.
+- Stop when the requested artifact is produced; do not begin a follow-on task.
+- Never place secrets or private operational values in code, prompts, logs,
+  commits, or pull request text.
+- Do not change Gmail, Beds24, monitoring, deployment, access, payments, legal,
+  tax, or external messaging without explicit task-specific authorization.
+- Leave a compact checkpoint that reduces the context required by the next
+  execution.
+
 ## Metadata & Publication Workflow
 
 New or relocated content must have an entry in `registry.yaml` with an accurate path, date, and tag set so the static site generator includes it. When collaborating, coordinate author slugs in `authors.yaml` to avoid duplicates, and run `python -m yaml lint registry.yaml` (or your preferred YAML linter) to catch syntax errors before submitting.

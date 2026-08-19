@@ -1,0 +1,49 @@
+name: AUMARA webhook safety
+
+on:
+  pull_request:
+    paths:
+      - 'aumara-control-tower/src/**'
+      - 'aumara-control-tower/package.json'
+      - 'aumara-control-tower/.env.example'
+      - '.github/workflows/aumara-webhook-safety.yml'
+      - '.github/workflows/beds24-elcid-auto-replies.yml'
+      - 'aumara-control-tower/scripts/beds24_elcid_auto_replies.py'
+      - 'aumara-control-tower/scripts/tests/test_beds24_elcid_auto_replies.py'
+  push:
+    branches: [main]
+    paths:
+      - 'aumara-control-tower/src/**'
+      - 'aumara-control-tower/package.json'
+      - 'aumara-control-tower/.env.example'
+      - '.github/workflows/aumara-webhook-safety.yml'
+      - '.github/workflows/beds24-elcid-auto-replies.yml'
+      - 'aumara-control-tower/scripts/beds24_elcid_auto_replies.py'
+      - 'aumara-control-tower/scripts/tests/test_beds24_elcid_auto_replies.py'
+
+permissions:
+  contents: read
+
+jobs:
+  safety:
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+
+      - name: Test fail-closed webhook service
+        working-directory: aumara-control-tower
+        run: npm test
+
+      - name: Test retired Beds24 sender
+        run: python -m unittest aumara-control-tower/scripts/tests/test_beds24_elcid_auto_replies.py
+
+      - name: Prove no secrets are exposed to this job
+        run: |
+          test -z "${RESEND_API_KEY:-}"
+          test -z "${AUMARA_WEBHOOK_TOKEN:-}"
+          test -z "${BEDS24_REFRESH_TOKEN:-}"

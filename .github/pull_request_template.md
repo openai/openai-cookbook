@@ -6,6 +6,31 @@ Briefly describe the changes and the goal of this PR. Make sure the PR title sum
 
 Why are these changes necessary? How do they improve the cookbook?
 
+## Execution contract
+
+- **Scope:** <!-- One narrowly scoped objective, allowed paths, and exclusions -->
+- **Evidence:** <!-- Existing work inspected and any branch/commit/PR/checkpoint reused -->
+- **Tests:** <!-- Exact focused commands and results -->
+- **Stop condition:** <!-- Artifact or exact blocker that ends this execution -->
+- **Recovery point:** <!-- Branch, commit, PR, checkpoint, or clean base for resumption -->
+
+## AI execution governance
+
+- [ ] This execution has one narrowly scoped objective and this task has one PR.
+- [ ] I inspected targeted existing work before creating new work and reused a
+      recoverable branch, commit, PR, or checkpoint where available.
+- [ ] I did not rescan the whole repository, or I documented why targeted
+      inspection was insufficient in **Evidence**.
+- [ ] Scope, evidence, tests, stop condition, and recovery point are recorded
+      above.
+- [ ] No secrets or private operational values appear in code, prompts, logs,
+      commits, or PR text.
+- [ ] Gmail, Beds24, monitoring, deployment, access, payments, legal, tax, and
+      external messaging are unchanged, or explicit task-specific authorization
+      is cited in **Scope**.
+- [ ] The requested artifact is complete, no follow-on task was started, and
+      the recovery point reduces context required by the next task.
+
 ---
 
 ## For new content

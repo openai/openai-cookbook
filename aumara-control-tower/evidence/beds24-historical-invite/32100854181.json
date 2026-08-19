@@ -1,0 +1,27 @@
+{
+  "access_token_received": false,
+  "checked_at_utc": "2026-08-18T04:55:12.851148+00:00",
+  "diagnostic": {
+    "response": {
+      "error": "Token not valid",
+      "type": "error"
+    },
+    "stage": "setup"
+  },
+  "historical_file_found": true,
+  "invite_pattern_found": true,
+  "picture_paths": [],
+  "property_http_status": null,
+  "property_id": "324882",
+  "property_keys": [],
+  "property_snapshot": null,
+  "refresh_token_received": false,
+  "room_keys": [],
+  "run_id": "32100854181",
+  "secret_exposed": false,
+  "setup_http_status": 401,
+  "source_commit": "c969415c52597a06750036b8b2899f31e1e8cd1d^1",
+  "source_path": ".github/workflows/exchange-beds24-invite.yml",
+  "status": "FAILED",
+  "vault_written": false
+}

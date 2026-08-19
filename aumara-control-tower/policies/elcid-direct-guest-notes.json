@@ -1,0 +1,32 @@
+{
+  "schema_version": "1.0",
+  "policy_version": "2026.08.02.1",
+  "property": "elcid",
+  "policies": [
+    {
+      "policy_id": "elcid.direct-guest-request-infoitem",
+      "property": "elcid",
+      "category": "beds24_guest_note",
+      "rule": "Continuously record a bounded idempotent operational info item for an active EL CID booking when a direct guest message explicitly requests a bed preference, pet, parking, early check-in, late check-in or late check-out; change only infoItems and verify every exact note by GET read-back. Cot requests use the separate room, infant-age and occupancy worker.",
+      "source": "approved_internal_instruction",
+      "source_reference": "REQUEST:ELCID_DIRECT_GUEST_NOTES:2026-08-02",
+      "verified_at": "2026-08-02",
+      "status": "verified",
+      "allowed_auto_reply": false,
+      "allowed_beds24_action": [
+        "record_guest_request"
+      ],
+      "escalation_conditions": [
+        "message_not_from_guest",
+        "request_type_not_explicit",
+        "booking_not_active",
+        "booking_not_resolved",
+        "cot_requires_specialized_worker",
+        "candidate_batch_exceeds_limit",
+        "read_back_failed"
+      ],
+      "response_template_ids": [],
+      "policy_version": "2026.08.02.1"
+    }
+  ]
+}

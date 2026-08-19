@@ -1,0 +1,208 @@
+---
+name: Beds24 UI photo upload AUMARA 324882
+run-name: Upload approved full-frame photos to Beds24 324882
+
+on:
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+concurrency:
+  group: beds24-ui-photo-upload-324882
+  cancel-in-progress: false
+
+jobs:
+  upload:
+    runs-on: ubuntu-latest
+    timeout-minutes: 25
+    environment: Production
+    env:
+      BEDS24_USERNAME: ${{ secrets.BEDS24_USERNAME }}
+      BEDS24_PASSWORD: ${{ secrets.BEDS24_PASSWORD }}
+    steps:
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.11"
+
+      - name: Install
+        run: |
+          pip install "gdown>=5.2,<6" "pillow>=11,<12" "playwright>=1.55,<2"
+          playwright install --with-deps chromium
+
+      - name: Download exact approved originals without cropping
+        run: |
+          python3 - <<'PY'
+          import hashlib, json
+          from pathlib import Path
+          import gdown
+          from PIL import Image, ImageOps
+
+          manifest = [
+              ("01_FULL_no_crop.jpg", "1MAcqpC0veE8DNJuQvViQzCvUqwnlKbY_"),
+              ("02_FULL_no_crop.jpg", "19jTCi6FThY584Iebs4vvlPujojSdudQD"),
+              ("03_FULL_no_crop.jpg", "1WHAIG1Pz7w0rUwciC7O5dAMbB7WSEKKd"),
+              ("04_FULL_no_crop.jpg", "1robOjhdVs12hp6XLbD5AuJsjW84bCxBc"),
+              ("06_FULL_no_crop.jpg", "13c7-i9mzpIpX2JJnyyB406T9jp7EMFmV"),
+              ("IMG_0005.JPG", "1Cg4Y-skeJ6VNAnfsRPwPEED9RlQ8IIlV"),
+              ("IMG_0006.JPG", "1UJaAE4Z9DpVFi67xAG7iZ33l4_xMUS9o"),
+              ("IMG_0007.JPG", "17Amun9sFTFpogCN459bhysRkgKCSaMo1"),
+              ("IMG_0009.JPG", "1z80jRlJkLwdLkZlLlGv1zNB4i79JhSh8"),
+              ("IMG_0011.JPG", "1cqP3azFyywT0jcNO8SfNbQ8lMAoOAtMj"),
+          ]
+          src, out, evidence = Path("source"), Path("upload"), Path("evidence")
+          for path in (src, out, evidence): path.mkdir(exist_ok=True)
+          records = []
+          for number, (name, file_id) in enumerate(manifest, 1):
+              source = src / name
+              if not gdown.download(id=file_id, output=str(source), quiet=False):
+                  raise SystemExit(f"Drive download failed: {name}")
+              raw = source.read_bytes()
+              if len(raw) < 50000 or not raw.startswith(b"\xff\xd8\xff"):
+                  raise SystemExit(f"Invalid approved JPEG: {name}")
+              with Image.open(source) as opened:
+                  image = ImageOps.exif_transpose(opened).convert("RGB")
+                  original = image.size
+              if max(image.size) > 2560:
+                  image.thumbnail((2560, 2560), Image.Resampling.LANCZOS)
+              target = out / f"{number:02d}_{source.stem}.png"
+              while True:
+                  image.save(target, "PNG", optimize=True, compress_level=9)
+                  if target.stat().st_size <= 4_800_000: break
+                  if min(image.size) <= 900: raise SystemExit(f"PNG too large: {name}")
+                  image = image.resize(
+                      (int(image.width * .9), int(image.height * .9)),
+                      Image.Resampling.LANCZOS,
+                  )
+              records.append({
+                  "source": name,
+                  "upload": target.name,
+                  "sha256": hashlib.sha256(raw).hexdigest(),
+                  "source_size": original,
+                  "upload_size": image.size,
+                  "crop": False,
+              })
+          if len(list(out.glob("*.png"))) != 10: raise SystemExit("Expected exactly 10 photos")
+          (evidence / "manifest.json").write_text(json.dumps(records, indent=2) + "\n")
+          print("PREPARED 10 APPROVED FULL-FRAME PHOTOS")
+          PY
+
+      - name: Upload and verify in Beds24
+        run: |
+          python3 - <<'PY'
+          import json, os, sys
+          from pathlib import Path
+          from urllib.parse import parse_qsl, urljoin, urlsplit, urlunsplit
+          from playwright.sync_api import sync_playwright, TimeoutError as PwTimeout
+
+          evidence, photos = Path("evidence"), sorted(Path("upload").glob("*.png"))
+          username = (os.getenv("BEDS24_USERNAME") or "").strip() or "EL CID / AUMARA"
+          password = (os.getenv("BEDS24_PASSWORD") or "").strip()
+          if password: print(f"::add-mask::{password}")
+          report = {"property_id": 324882, "photos": len(photos), "status": "STARTING"}
+
+          def safe_url(value):
+              parts = urlsplit(value)
+              keys = sorted({key for key, _ in parse_qsl(parts.query, keep_blank_values=True)})
+              return urlunsplit((parts.scheme, parts.netloc, parts.path,
+                                  "&".join(f"{key}=[REDACTED]" for key in keys), ""))[:500]
+          def save():
+              (evidence / "result.json").write_text(json.dumps(report, indent=2) + "\n")
+          def fail(stage, message):
+              report.update(status="FAILED", stage=stage, diagnostic=message); save()
+              print(f"ERROR [{stage}]: {message}", file=sys.stderr); raise SystemExit(1)
+
+          if len(photos) != 10: fail("manifest", f"Expected 10 photos, found {len(photos)}")
+          if not password: fail("credentials", "Production secret BEDS24_PASSWORD is empty")
+
+          with sync_playwright() as p:
+              browser = p.chromium.launch(headless=True)
+              page = browser.new_page(viewport={"width": 1440, "height": 1100})
+              page.set_default_timeout(30000)
+              writes = []
+              page.on("response", lambda r: writes.append({
+                  "method": r.request.method, "status": r.status, "url": safe_url(r.url)
+              }) if r.request.method in ("POST", "PUT", "PATCH") else None)
+              try:
+                  page.goto("https://beds24.com/control3.php", wait_until="domcontentloaded", timeout=60000)
+                  user = page.locator("input[name='username'], input[name='user'], input[type='email']").first
+                  if not user.count(): user = page.locator("input[type='text']").first
+                  secret = page.locator("input[name='password'], input[type='password']").first
+                  if not user.count() or not secret.count(): fail("login_form", "Login fields not found")
+                  user.fill(username); secret.fill(password)
+                  submit = page.locator("button[type='submit'], input[type='submit'], #loginButton").first
+                  if not submit.count(): fail("login_form", "Login button not found")
+                  submit.click(); page.wait_for_timeout(4000)
+                  if "login" in page.url.lower() or page.locator("input[type='password']").count():
+                      page.screenshot(path=str(evidence / "login-failed.png"), full_page=True)
+                      fail("login", "Beds24 rejected the control-panel login")
+
+                  property_url = "https://beds24.com/control3.php?pagetype=propcontent&propid=324882"
+                  page.goto(property_url, wait_until="domcontentloaded", timeout=60000)
+                  links = page.locator("a").evaluate_all(
+                      "els => els.map(a => ({text:(a.innerText||'').trim(), href:a.href||''}))"
+                  )
+                  picture = next((x["href"] for x in links
+                                  if any(k in x["text"].lower() for k in ("picture","photo","image"))), None)
+                  candidates = ([urljoin(page.url, picture)] if picture else []) + [
+                      "https://beds24.com/control2.php?pagetype=pictures&propid=324882",
+                      "https://beds24.com/control2.php?pagetype=picture&propid=324882",
+                      "https://beds24.com/control3.php?pagetype=pictures&propid=324882",
+                      property_url,
+                  ]
+                  for candidate in dict.fromkeys(candidates):
+                      page.goto(candidate, wait_until="domcontentloaded", timeout=60000)
+                      page.wait_for_timeout(1500)
+                      if page.locator("input[type='file']").count(): break
+                  else:
+                      page.screenshot(path=str(evidence / "pictures-not-found.png"), full_page=True)
+                      fail("pictures_page", "Pictures upload input not found")
+
+                  file_input = page.locator("input[type='file']").first
+                  selector = "img[src*='picture' i], img[src*='image' i], .picture img, .pictures img"
+                  before = page.locator(selector).count()
+                  report.update(login=True, pictures_url=safe_url(page.url), images_before=before,
+                                input_accept=file_input.get_attribute("accept"))
+                  writes.clear()
+                  upload_button = "button:has-text('Upload'), input[value*='Upload' i], button:has-text('Save'), input[value*='Save' i]"
+                  if file_input.get_attribute("multiple") is not None:
+                      file_input.set_input_files([str(photo) for photo in photos])
+                      button = page.locator(upload_button).first
+                      if button.count() and button.is_visible(): button.click()
+                      page.wait_for_timeout(12000)
+                  else:
+                      for photo in photos:
+                          page.locator("input[type='file']").first.set_input_files(str(photo))
+                          button = page.locator(upload_button).first
+                          if button.count() and button.is_visible(): button.click()
+                          page.wait_for_timeout(4000)
+
+                  try: page.reload(wait_until="domcontentloaded", timeout=60000)
+                  except PwTimeout: pass
+                  page.wait_for_timeout(3000)
+                  page.screenshot(path=str(evidence / "pictures-after.png"), full_page=True)
+                  after = page.locator(selector).count()
+                  text = page.locator("body").inner_text().lower()
+                  success_writes = [x for x in writes if 200 <= x["status"] < 400]
+                  hits = [photo.name for photo in photos if photo.name.lower() in text]
+                  report.update(images_after=after, successful_writes=success_writes,
+                                failed_writes=[x for x in writes if x["status"] >= 400],
+                                filename_hits=hits)
+                  if not (after >= before + 10 or len(hits) == 10 or len(success_writes) >= 10):
+                      fail("verify", "Upload was not proven by image count, filenames, or 10 successful writes")
+                  report.update(status="SUCCESS", uploaded=10); save()
+                  print(json.dumps(report, indent=2))
+              except PwTimeout as exc:
+                  page.screenshot(path=str(evidence / "timeout.png"), full_page=True)
+                  fail("timeout", str(exc))
+              finally:
+                  save(); browser.close()
+          PY
+
+      - name: Upload sanitized evidence
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: beds24-ui-photo-upload-${{ github.run_id }}
+          path: evidence/
+          retention-days: 3

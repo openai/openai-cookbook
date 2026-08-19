@@ -1,0 +1,48 @@
+{
+  "source": "anonymized-ci-fixture",
+  "events": [
+    {
+      "message_id": "fixture-bed-1",
+      "thread_id": "fixture-thread-1",
+      "booking_ref": "10000001",
+      "event_type": "bed_request",
+      "language": "et",
+      "guest_first_name": "Guest",
+      "reply_already_sent": false
+    },
+    {
+      "message_id": "fixture-cancel-1",
+      "thread_id": "fixture-thread-2",
+      "booking_ref": "10000002",
+      "subject": "Booking Cancelled",
+      "body": "This Booking has been cancelled by the guest. BED PREFERENCE: 1 extra-large double",
+      "language": "es",
+      "guest_first_name": "Guest",
+      "reply_already_sent": false
+    },
+    {
+      "message_id": "fixture-price-1",
+      "thread_id": "fixture-thread-3",
+      "subject": "Price question",
+      "body": "¿Qué precio tiene una noche para dos personas?",
+      "language": "es",
+      "existing_draft": true
+    },
+    {
+      "message_id": "fixture-booking-1",
+      "thread_id": "fixture-thread-4",
+      "booking_ref": "10000004",
+      "event_type": "booking_notification",
+      "language": "en"
+    },
+    {
+      "message_id": "fixture-pet-1",
+      "thread_id": "fixture-thread-5",
+      "booking_ref": "10000005",
+      "event_type": "pet_request",
+      "language": "es",
+      "guest_first_name": "Guest",
+      "reply_already_sent": false
+    }
+  ]
+}

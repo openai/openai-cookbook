@@ -1,0 +1,52 @@
+name: Beds24 legacy picture access probe 324882
+
+on:
+  workflow_dispatch:
+  push:
+    branches: [main]
+    paths:
+      - ".github/workflows/beds24-legacy-picture-probe.yml"
+
+permissions:
+  contents: write
+
+concurrency:
+  group: beds24-legacy-picture-probe-324882
+  cancel-in-progress: true
+
+jobs:
+  probe:
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+    env:
+      PROPERTY_ID: "324882"
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.11"
+
+      - name: Materialize read-only legacy API probe
+        shell: bash
+        run: |
+          cat > /tmp/beds24_legacy_probe.py.gz.b64 <<'B64'
+          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
+          B64
+          base64 -d /tmp/beds24_legacy_probe.py.gz.b64 | gzip -d > /tmp/beds24_legacy_probe.py
+          chmod 700 /tmp/beds24_legacy_probe.py
+          python -m py_compile /tmp/beds24_legacy_probe.py
+
+      - name: Probe existing legacy picture access without writes
+        run: python /tmp/beds24_legacy_probe.py
+
+      - name: Upload sanitized probe evidence
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: beds24-legacy-picture-probe-${{ github.run_id }}
+          path: aumara-control-tower/evidence/beds24-legacy-probe/${{ github.run_id }}/status.json
+          if-no-files-found: warn
+          retention-days: 3

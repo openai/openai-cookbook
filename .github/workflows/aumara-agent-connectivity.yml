@@ -8,7 +8,7 @@ on:
       - '.github/workflows/aumara-agent-connectivity.yml'
 
 permissions:
-  contents: read
+  contents: write
 
 env:
   AUMARA_AGENT_SMOKE: '1'
@@ -20,6 +20,9 @@ jobs:
     environment: Production
     timeout-minutes: 5
     steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
       - name: Resolve configured secret names without exposing values
         id: secrets
         shell: bash
@@ -50,6 +53,7 @@ jobs:
       - name: Verify xAI Grok Imagine Video API
         id: xai
         if: steps.secrets.outputs.XAI_KEY_MISSING == 'false'
+        continue-on-error: true
         shell: bash
         run: |
           set -euo pipefail
@@ -73,6 +77,7 @@ jobs:
       - name: Verify Gemini multimodal API
         id: gemini
         if: steps.secrets.outputs.GEMINI_KEY_MISSING == 'false'
+        continue-on-error: true
         shell: bash
         run: |
           set -euo pipefail
@@ -101,27 +106,50 @@ jobs:
           XAI_OUTCOME: ${{ steps.xai.outcome }}
           GEMINI_OUTCOME: ${{ steps.gemini.outcome }}
         run: |
+          mkdir -p aumara-control-tower/checkpoints
           python3 - <<'PY'
-          import json, os
+          import json, os, datetime
+          xai_missing=os.getenv('XAI_MISSING')
+          gemini_missing=os.getenv('GEMINI_MISSING')
+          xai_outcome=os.getenv('XAI_OUTCOME') or 'not_run'
+          gemini_outcome=os.getenv('GEMINI_OUTCOME') or 'not_run'
           r={
             'schema':'aumara.agent-connectivity-receipt',
-            'xai_secret_present': os.getenv('XAI_MISSING') == 'false',
-            'gemini_secret_present': os.getenv('GEMINI_MISSING') == 'false',
-            'xai_api_outcome': os.getenv('XAI_OUTCOME') or 'not_run',
-            'gemini_api_outcome': os.getenv('GEMINI_OUTCOME') or 'not_run',
+            'checked_at_utc': datetime.datetime.now(datetime.timezone.utc).replace(microsecond=0).isoformat().replace('+00:00','Z'),
+            'xai_secret_present': xai_missing == 'false',
+            'gemini_secret_present': gemini_missing == 'false',
+            'xai_api_outcome': xai_outcome,
+            'gemini_api_outcome': gemini_outcome,
+            'connectivity_pass': xai_missing == 'false' and gemini_missing == 'false' and xai_outcome == 'success' and gemini_outcome == 'success',
             'secrets_exposed': False,
             'generation_performed': False,
           }
-          open('AUMARA_AGENT_CONNECTIVITY_RECEIPT.json','w',encoding='utf-8').write(json.dumps(r,indent=2)+'\n')
+          path='aumara-control-tower/checkpoints/AUMARA_AGENT_CONNECTIVITY_RECEIPT.json'
+          open(path,'w',encoding='utf-8').write(json.dumps(r,indent=2)+'\n')
           print(json.dumps(r))
           PY
+
+      - name: Persist non-secret receipt to main
+        if: always()
+        shell: bash
+        run: |
+          set -euo pipefail
+          git config user.name 'AUMARA Automation'
+          git config user.email 'elcidspain@gmail.com'
+          git add aumara-control-tower/checkpoints/AUMARA_AGENT_CONNECTIVITY_RECEIPT.json
+          if git diff --cached --quiet; then
+            echo 'receipt unchanged'
+          else
+            git commit -m 'Record AUMARA agent connectivity receipt'
+            git push origin HEAD:main
+          fi
 
       - name: Upload connectivity receipt
         if: always()
         uses: actions/upload-artifact@v4
         with:
           name: aumara-agent-connectivity-receipt
-          path: AUMARA_AGENT_CONNECTIVITY_RECEIPT.json
+          path: aumara-control-tower/checkpoints/AUMARA_AGENT_CONNECTIVITY_RECEIPT.json
           if-no-files-found: error
 
       - name: Fail if either real API is unavailable

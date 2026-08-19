@@ -92,7 +92,8 @@ Requests above `approval_threshold` fail closed when no valid grant is
 available. A missing, expired, scope-mismatched, currency-mismatched, or
 over-limit grant is denied; there is no unattended fallback that silently
 authorizes the purchase. This is intentional for the example's safety model:
-if no authenticated human approval is available, the request remains denied.
+when the external approval or identity service has not authenticated a grant,
+the application must withhold it, so the request remains denied.
 
 ## Run the local notebook
 

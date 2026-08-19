@@ -7,7 +7,7 @@ on:
       - '.github/aumara-beds24-sync.trigger'
 
 permissions:
-  contents: read
+  contents: write
 
 jobs:
   discover:
@@ -16,12 +16,14 @@ jobs:
     env:
       ALL_SECRETS_JSON: ${{ toJSON(secrets) }}
     steps:
+      - uses: actions/checkout@v4
       - name: Discover key bindings and Beds24 content shape
         shell: bash
         run: |
           set -euo pipefail
+          mkdir -p aumara-control-tower/checkpoints
           python3 - <<'PY'
-          import json, os, urllib.request, urllib.error
+          import datetime as dt, json, os, urllib.request, urllib.error
 
           secrets = json.loads(os.environ.get('ALL_SECRETS_JSON') or '{}')
           names = sorted(secrets)
@@ -40,44 +42,62 @@ jobs:
 
           api_names=candidates('api')
           prop_names=candidates('prop')
-          print('api_key_secret_names=' + json.dumps(api_names))
-          print('prop_key_secret_names=' + json.dumps(prop_names))
+          receipt={
+              'schema':'aumara.beds24-photo-sync-discovery',
+              'checked_at_utc':dt.datetime.now(dt.timezone.utc).replace(microsecond=0).isoformat().replace('+00:00','Z'),
+              'api_key_secret_names':api_names,
+              'prop_key_secret_names':prop_names,
+              'secret_values_exposed':False,
+          }
+
+          if len(api_names)==1 and len(prop_names)==1:
+              payload=json.dumps({'authentication':{'apiKey':secrets[api_names[0]].strip(),'propKey':secrets[prop_names[0]].strip()}}).encode()
+              req=urllib.request.Request('https://api.beds24.com/json/getPropertyContent', data=payload, headers={'Content-Type':'application/json','Accept':'application/json','User-Agent':'AUMARA-photo-sync/1.0'}, method='POST')
+              try:
+                  with urllib.request.urlopen(req, timeout=45) as r:
+                      raw=r.read(); status=int(r.status)
+              except urllib.error.HTTPError as e:
+                  raw=e.read(); status=int(e.code)
+              receipt['http_status']=status
+              try: body=json.loads(raw.decode('utf-8','replace')) if raw else {}
+              except Exception: body={}
+
+              def safe(node, depth=0):
+                  if depth>8: return '[depth]'
+                  if isinstance(node, dict):
+                      out={}
+                      for k,v in node.items():
+                          ku=str(k).lower()
+                          if any(x in ku for x in ('apikey','propkey','token','password','secret','email','phone','address')):
+                              out[str(k)]='[redacted]'
+                          elif isinstance(v,(dict,list)):
+                              out[str(k)]=safe(v,depth+1)
+                          elif any(x in ku for x in ('id','name','title','status','picture','image','photo','url','room','property','display')):
+                              out[str(k)]=v
+                      return out
+                  if isinstance(node,list):
+                      return [safe(x,depth+1) for x in node[:100]]
+                  return node
+
+              receipt['response_shape']=safe(body)
+              receipt['status']='LIVE_CONTENT_READ_OK' if 200 <= status < 300 else 'LIVE_CONTENT_READ_FAILED'
+          elif not api_names or not prop_names:
+              receipt['status']='MISSING_MATCH'
+          else:
+              receipt['status']='AMBIGUOUS_MATCH'
+
+          path='aumara-control-tower/checkpoints/BEDS24_PHOTO_SYNC_DISCOVERY.json'
+          open(path,'w',encoding='utf-8').write(json.dumps(receipt,indent=2,ensure_ascii=False)+'\n')
+          print('status='+receipt['status'])
           print('secret_values_exposed=false')
-
-          if len(api_names)!=1 or len(prop_names)!=1:
-              print('status=' + ('MISSING_MATCH' if not api_names or not prop_names else 'AMBIGUOUS_MATCH'))
-              raise SystemExit(2)
-
-          payload=json.dumps({'authentication':{'apiKey':secrets[api_names[0]].strip(),'propKey':secrets[prop_names[0]].strip()}}).encode()
-          req=urllib.request.Request('https://api.beds24.com/json/getPropertyContent', data=payload, headers={'Content-Type':'application/json','Accept':'application/json','User-Agent':'AUMARA-photo-sync/1.0'}, method='POST')
-          try:
-              with urllib.request.urlopen(req, timeout=45) as r:
-                  raw=r.read(); status=int(r.status)
-          except urllib.error.HTTPError as e:
-              raw=e.read(); status=int(e.code)
-          print('http_status=' + str(status))
-          try: body=json.loads(raw.decode('utf-8','replace')) if raw else {}
-          except Exception: body={}
-
-          def safe(node, depth=0):
-              if depth>8: return '[depth]'
-              if isinstance(node, dict):
-                  out={}
-                  for k,v in node.items():
-                      ku=str(k).lower()
-                      if any(x in ku for x in ('apikey','propkey','token','password','secret','email','phone','address')):
-                          out[str(k)]='[redacted]'
-                      elif isinstance(v,(dict,list)):
-                          out[str(k)]=safe(v,depth+1)
-                      elif any(x in ku for x in ('id','name','title','status','picture','image','photo','url','room','property','display')):
-                          out[str(k)]=v
-                  return out
-              if isinstance(node,list):
-                  return [safe(x,depth+1) for x in node[:100]]
-              return node
-
-          print('response_shape=' + json.dumps(safe(body), ensure_ascii=False, separators=(',',':')))
-          print('status=' + ('LIVE_CONTENT_READ_OK' if 200 <= status < 300 else 'LIVE_CONTENT_READ_FAILED'))
-          if not 200 <= status < 300:
-              raise SystemExit(3)
           PY
+      - name: Persist sanitized receipt
+        shell: bash
+        run: |
+          set -euo pipefail
+          git config user.name 'AUMARA Automation'
+          git config user.email 'elcidspain@gmail.com'
+          git add aumara-control-tower/checkpoints/BEDS24_PHOTO_SYNC_DISCOVERY.json
+          git diff --cached --quiet && exit 0
+          git commit -m 'Record Beds24 photo sync discovery'
+          git push origin HEAD:${GITHUB_REF_NAME}

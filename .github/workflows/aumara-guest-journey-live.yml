@@ -52,12 +52,7 @@ jobs:
           echo "All checks passed!"
       - name: Install dependencies
         run: |
-          if [ -f requirements.txt ]; then
-            pip install -r requirements.txt
-          else
-            echo "No requirements.txt - installing base deps"
-            pip install boto3 requests
-          fi
+          python -m pip install --upgrade pip boto3
           pip install -e . || true
       - name: Preflight env validation
         run: |
@@ -100,5 +95,5 @@ jobs:
           print("SUCCESS - Guest journey live canary passed")
           PY
           fi
-          PYTHONPATH=$PWD:$PWD/src:$PYTHONPATH python -m aumara.guest_journey.canary --mode live
+          PYTHONPATH=$PWD:$PWD/src:$PYTHONPATH python -m aumara.guest_journey.canary --mode live --property 324882
           echo "Live canary finished OK"

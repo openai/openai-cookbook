@@ -13,12 +13,14 @@ on:
       - '.github/aumara-beds24-sync.trigger'
 
 permissions:
-  contents: write
+  contents: read
 
 jobs:
   discover:
     runs-on: ubuntu-latest
     if: ${{ github.event_name != 'pull_request' || github.event.pull_request.head.repo.full_name == github.repository }}
+    permissions:
+      contents: read
     environment: Production
     timeout-minutes: 5
     env:
@@ -160,8 +162,28 @@ jobs:
           if exit_code:
               raise SystemExit(exit_code)
           PY
+      - name: Upload sanitized receipt
+        if: ${{ always() }}
+        uses: actions/upload-artifact@v4
+        with:
+          name: beds24-photo-sync-discovery-receipt
+          path: aumara-control-tower/checkpoints/BEDS24_PHOTO_SYNC_DISCOVERY.json
+          if-no-files-found: error
+
+  persist-receipt:
+    needs: discover
+    if: ${{ always() && github.event_name != 'pull_request' && needs.discover.result != 'cancelled' }}
+    runs-on: ubuntu-latest
+    permissions:
+      contents: write
+    steps:
+      - uses: actions/checkout@v4
+      - name: Download sanitized receipt
+        uses: actions/download-artifact@v4
+        with:
+          name: beds24-photo-sync-discovery-receipt
+          path: aumara-control-tower/checkpoints
       - name: Persist sanitized receipt
-        if: ${{ always() && github.event_name != 'pull_request' }}
         shell: bash
         run: |
           set -euo pipefail

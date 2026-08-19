@@ -475,6 +475,12 @@ function App() {
     updateSelectedSessionId(nextSelected?.id || null);
     if (nextSelected) {
       await loadTimeline(nextSelected, { eventId: urlState.eventId });
+      if (currentViewRef.current === "traces" && !urlState.traceId && !urlState.sessionId) {
+        writeUrlState({
+          view: "traces",
+          ...sessionUrlPatch(nextSelected),
+        }, { replace: true });
+      }
     } else {
       setTimelineEvents([]);
       setSelectedEventKey(null);
@@ -483,6 +489,9 @@ function App() {
     const showingLogs =
       currentViewRef.current === "logs"
       || (currentViewRef.current === "apps" && currentAppTabRef.current === "logs");
+    if (currentViewRef.current === "logs" && latestDeployment && !urlState.appId) {
+      writeUrlState({ view: "logs", appId: latestDeployment.id }, { replace: true });
+    }
     if (showingLogs && !keepDetail) {
       await loadLogs(latestDeployment, latestProject);
     }
@@ -1356,7 +1365,7 @@ function SystemPanel({ project, deployment, containers, runtimeUrl, managerOnlin
           </div>
           <span className="panel-count">{containers.length} total</span>
         </div>
-        <ContainerList containers={containers} />
+        <ContainerList containers={containers} appName={title} />
       </section>
     </section>
   );
@@ -1690,7 +1699,13 @@ function DocImage({ title, src }) {
   return (
     <figure className="doc-image">
       <figcaption>{title}</figcaption>
-      {src ? <img src={src} alt={title} /> : <div>No image found</div>}
+      {src ? (
+        <a href={src} target="_blank" rel="noreferrer" title={`Open ${title}`}>
+          <img src={src} alt={title} />
+        </a>
+      ) : (
+        <div>No image found</div>
+      )}
     </figure>
   );
 }
@@ -1820,8 +1835,8 @@ function AgentsList({
         ) : (
           <div className="agent-empty">
             <strong>No apps deployed</strong>
-            <span>Deploy an Agents SDK app to inspect traces, logs, and runtime state here.</span>
-            <code>make deploy PROJECT_PATH=/path/to/agents-sdk-app</code>
+            <span>Use the Agents SDK skill from Codex to deploy an app.</span>
+            <span>Deployed apps will appear here with traces, logs, and runtime state.</span>
           </div>
         )}
       </div>
@@ -2427,7 +2442,7 @@ function SessionLanes({ sessions, selectedSession, onSelectSession }) {
   );
 }
 
-function ContainerList({ containers }) {
+function ContainerList({ containers, appName }) {
   if (!containers.length) {
     return <div className="container-list">No Docker containers observed.</div>;
   }
@@ -2436,7 +2451,7 @@ function ContainerList({ containers }) {
       {containers.map((container) => (
         <div key={container.id} className="container">
           <div>
-            <strong>{displayContainerName(container)}</strong>
+            <strong>{displayContainerName(container, appName)}</strong>
             <small>{container.role === "orchestrator" ? "app container" : container.role}</small>
           </div>
           <div>
@@ -2716,11 +2731,8 @@ function formatContainerLabels(labels = {}) {
     .join(" ");
 }
 
-function displayContainerName(container) {
-  if (container.role === "orchestrator" && container.name.endsWith("-orchestrator")) {
-    return container.name.replace(/-orchestrator$/, " orchestrator").replaceAll("-", " ");
-  }
-  return container.name;
+function displayContainerName(container, appName) {
+  return appName || container.name;
 }
 
 function buildAgentRows({ projects, deployments, sessions, containerCounts }) {
@@ -2745,27 +2757,6 @@ function buildAgentRows({ projects, deployments, sessions, containerCounts }) {
       executor: project?.executor_entrypoint,
     };
   });
-
-  const deployedProjectIds = new Set(deployments.map((item) => item.project_id));
-  for (const project of projects) {
-    if (deployedProjectIds.has(project.id)) continue;
-    rows.push({
-      id: project.id,
-      name: project.name,
-      deployment: null,
-      project,
-      status: "imported",
-      target: "not deployed",
-      sandbox: project.uses_docker_sandbox ? "docker" : "local",
-      port: project.port,
-      appUrl: project.app_url,
-      sessionCount: 0,
-      containerCount: null,
-      latestSession: null,
-      orchestrator: project.orchestrator_entrypoint,
-      executor: project.executor_entrypoint,
-    });
-  }
 
   return rows;
 }

@@ -1,0 +1,80 @@
+name: Staff production browser smoke
+
+on:
+  workflow_dispatch:
+  workflow_run:
+    workflows:
+      - Deploy AUMARA Staff to Nominalia
+    types: [completed]
+  push:
+    branches: [main]
+    paths:
+      - '.github/workflows/staff-prod-browser-smoke.yml'
+
+permissions:
+  contents: read
+
+jobs:
+  smoke:
+    runs-on: ubuntu-latest
+    timeout-minutes: 8
+    steps:
+      - uses: actions/checkout@v4
+      - name: Install Selenium
+        run: python -m pip install --quiet selenium
+      - name: Browser smoke production Staff
+        shell: python
+        run: |
+          from selenium import webdriver
+          from selenium.webdriver.chrome.options import Options
+          from selenium.webdriver.common.by import By
+          from selenium.webdriver.support.ui import WebDriverWait
+          from selenium.webdriver.support import expected_conditions as EC
+          from selenium.common.exceptions import TimeoutException
+          import json, time
+
+          opts = Options()
+          opts.page_load_strategy = 'eager'
+          opts.add_argument('--headless=new')
+          opts.add_argument('--no-sandbox')
+          opts.add_argument('--disable-dev-shm-usage')
+          opts.add_argument('--window-size=390,844')
+          opts.set_capability('goog:loggingPrefs', {'browser':'ALL'})
+          d = webdriver.Chrome(options=opts)
+          d.set_page_load_timeout(20)
+          try:
+              url = 'https://elcidspain.com/staff/?smoke=' + str(int(time.time()))
+              try:
+                  d.get(url)
+              except TimeoutException:
+                  print('PAGE_LOAD_TIMEOUT')
+              WebDriverWait(d, 25).until(EC.presence_of_element_located((By.ID, 'staffId')))
+              WebDriverWait(d, 45).until(lambda _d: _d.execute_script("return document.readyState") == "complete")
+              WebDriverWait(d, 45).until(lambda _d: len(_d.find_elements(By.CSS_SELECTOR, '#staffId option')) >= 2)
+              options = d.find_elements(By.CSS_SELECTOR, '#staffId option')
+              payload = {
+                  'url': d.current_url,
+                  'title': d.title,
+                  'readyState': d.execute_script('return document.readyState'),
+                  'options': [o.text for o in options],
+                  'loginHidden': 'hidden' in d.find_element(By.ID, 'login').get_attribute('class').split(),
+                  'appHidden': 'hidden' in d.find_element(By.ID, 'app').get_attribute('class').split(),
+                  'version': d.find_element(By.ID, 'version').text,
+                  'console': d.get_log('browser'),
+              }
+              print(json.dumps(payload, ensure_ascii=False, indent=2))
+              d.save_screenshot('/tmp/staff.png')
+              assert len(options) >= 2, payload
+              assert not payload['loginHidden'], payload
+              severe = [x for x in payload['console'] if x.get('level') == 'SEVERE']
+              assert not severe, payload
+          finally:
+              d.quit()
+      - name: Upload screenshot
+        if: failure()
+        uses: actions/upload-artifact@v4
+        with:
+          name: staff-prod-smoke
+          path: /tmp/staff.png
+          retention-days: 2
+          if-no-files-found: ignore

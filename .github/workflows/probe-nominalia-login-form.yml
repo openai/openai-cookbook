@@ -1,0 +1,50 @@
+name: Probe Nominalia login form
+
+on:
+  push:
+    branches: [main]
+    paths:
+      - '.github/workflows/probe-nominalia-login-form.yml'
+  workflow_dispatch:
+
+permissions:
+  contents: write
+
+jobs:
+  probe:
+    runs-on: ubuntu-latest
+    timeout-minutes: 5
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          ref: main
+          fetch-depth: 0
+      - run: python -m pip install --disable-pip-version-check -q requests beautifulsoup4
+      - name: Capture sanitized login contract
+        shell: bash
+        run: |
+          python - <<'PY'
+          import json, requests
+          from bs4 import BeautifulSoup
+          from urllib.parse import urljoin, urlparse
+          r=requests.get('https://controlpanel.nominalia.com/welcome.html',timeout=30)
+          r.raise_for_status()
+          s=BeautifulSoup(r.text,'html.parser')
+          out=[]
+          for f in s.find_all('form'):
+              fields=[]
+              for i in f.find_all(['input','button']):
+                  fields.append({'tag':i.name,'type':i.get('type'),'name':i.get('name'),'value':('[redacted]' if (i.get('type') or '').lower()=='hidden' and i.get('value') else i.get('value')),'text':i.get_text(' ',strip=True)[:80]})
+              out.append({'method':(f.get('method') or 'get').lower(),'action_path':urlparse(urljoin(r.url,f.get('action') or r.url)).path,'fields':fields})
+          open('ops/nominalia-login-form.json','w').write(json.dumps(out,ensure_ascii=False,indent=2))
+          print(json.dumps(out,ensure_ascii=False,indent=2))
+          PY
+      - name: Commit sanitized probe
+        run: |
+          git config user.name 'github-actions[bot]'
+          git config user.email '41898282+github-actions[bot]@users.noreply.github.com'
+          git add ops/nominalia-login-form.json
+          git diff --cached --quiet && exit 0
+          git commit -m 'Record sanitized Nominalia login form [skip ci]'
+          git pull --rebase origin main
+          git push

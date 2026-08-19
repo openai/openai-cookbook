@@ -1,0 +1,43 @@
+{
+  "schema": "aumara.content-team-state",
+  "updated_at_utc": "2026-08-19T04:18:00Z",
+  "orchestrator": "GPT",
+  "goal": "verified real photo library -> Gemini spatial/source QA -> Grok Imagine.2 source-conditioned motion -> GPT truth QA -> website content",
+  "status": "ACTIVE_WITH_PROVIDER_BINDING_BLOCKER",
+  "transport": {
+    "github_actions": "PASS",
+    "github_repo": "elcidspain/openai-cookbook",
+    "drive_collab_inbox": "1kdGDC3-kr0WRnLLsbC4CxBYMGKLSbE0k",
+    "drive_content_factory": "1j7AjGTjAsrxPoP5AOMYm4JZlV_dLk9be"
+  },
+  "workers": {
+    "GEMINI": {
+      "role": "CONTENT_QA_AND_SPATIAL_LOCALIZATION",
+      "dispatch": "STAGED",
+      "execution": "BLOCKED_PROVIDER_BINDING",
+      "generate_media": false
+    },
+    "GROK": {
+      "role": "IMAGINE2_SOURCE_CONDITIONED_VIDEO",
+      "dispatch": "STAGED_WAITING_GEMINI",
+      "execution": "BLOCKED_PROVIDER_BINDING",
+      "depends_on": "GEMINI_SPATIAL_PASS"
+    },
+    "META": {
+      "role": "ASSEMBLY",
+      "status": "HOLD_BY_OWNER"
+    }
+  },
+  "verified_runtime": {
+    "github_actions_heartbeat": "PASS",
+    "provider_connectivity_receipt": "FAIL_NO_SECRET_BINDINGS",
+    "provider_generation_started": false
+  },
+  "provider_binding_search": {
+    "xai_candidate_names_checked": ["XAI_API_KEY", "GROK_API_KEY", "XAI_KEY", "GROK_KEY", "XAI_TOKEN", "GROK_TOKEN", "GROK_API_TOKEN", "XAI_API_TOKEN", "X_API_KEY"],
+    "gemini_candidate_names_checked": ["GEMINI_API_KEY", "GOOGLE_API_KEY", "GOOGLE_GENERATIVE_AI_API_KEY", "GOOGLE_GENAI_API_KEY", "GOOGLE_AI_API_KEY", "GEMINI_KEY", "GEMINI_TOKEN", "GEMINI_API_TOKEN", "GOOGLE_GEMINI_API_KEY"],
+    "match": "NONE_IN_OPENAI_COOKBOOK_PRODUCTION"
+  },
+  "release": "HOLD",
+  "single_next_action": "Resolve the location or exact existing binding names for the xAI/Grok and Gemini API credentials so the GitHub Actions worker can authenticate without exposing values."
+}

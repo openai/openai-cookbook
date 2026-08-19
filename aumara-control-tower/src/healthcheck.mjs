@@ -1,4 +1,3 @@
-import 'dotenv/config';
 import { client } from './mailer.mjs';
 
 const resend = client();

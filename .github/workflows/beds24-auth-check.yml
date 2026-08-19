@@ -1,0 +1,66 @@
+name: Beds24 credential check
+
+on:
+  workflow_dispatch:
+  pull_request:
+    branches: [main]
+    paths:
+      - ".github/workflows/beds24-auth-check.yml"
+      - "aumara-control-tower/scripts/beds24_auth_check.py"
+      - "aumara-control-tower/scripts/tests/test_beds24_auth_check.py"
+  push:
+    branches: [main]
+    paths:
+      - ".github/workflows/beds24-auth-check.yml"
+      - "aumara-control-tower/scripts/beds24_auth_check.py"
+      - "aumara-control-tower/scripts/tests/test_beds24_auth_check.py"
+
+permissions:
+  contents: read
+
+jobs:
+  test:
+    runs-on: ubuntu-latest
+
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Run deterministic Beds24 auth tests
+        run: python -m unittest aumara-control-tower/scripts/tests/test_beds24_auth_check.py -v
+
+  live-auth:
+    if: github.event_name == 'workflow_dispatch'
+    needs: test
+    runs-on: ubuntu-latest
+    env:
+      # Canonical Actions secret name in this repo
+      BEDS24_REFRESH_CREDENTIAL: ${{ secrets.BEDS24_REFRESH_CREDENTIAL }}
+      # Scripts also accept the legacy env name; map both from the same secret
+      BEDS24_REFRESH_TOKEN: ${{ secrets.BEDS24_REFRESH_CREDENTIAL }}
+
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Validate existing Beds24 credential
+        id: validate
+        continue-on-error: true
+        run: python aumara-control-tower/scripts/beds24_auth_check.py validate
+
+      - name: Detect credential mode and run read-only probe
+        id: authenticate
+        if: steps.validate.outcome == 'success'
+        continue-on-error: true
+        run: python aumara-control-tower/scripts/beds24_auth_check.py authenticate
+
+      - name: Upload redacted authentication evidence
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: beds24-authentication-evidence
+          path: aumara-control-tower/evidence/beds24-auth-check.json
+          if-no-files-found: warn
+          retention-days: 7
+
+      - name: Report Beds24 authentication result
+        if: always()
+        run: python aumara-control-tower/scripts/beds24_auth_check.py report

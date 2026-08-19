@@ -1,0 +1,163 @@
+name: Probe EL CID production endpoints
+
+on:
+  workflow_dispatch:
+  workflow_run:
+    workflows:
+      - Deploy EL CID main site to Nominalia
+      - Deploy AUMARA to Nominalia v2
+    types: [completed]
+  push:
+    branches: [main]
+    paths:
+      - '.github/workflows/probe-elcid-production.yml'
+
+permissions:
+  contents: write
+
+concurrency:
+  group: elcid-production-probe
+  cancel-in-progress: true
+
+jobs:
+  probe:
+    runs-on: ubuntu-latest
+    timeout-minutes: 12
+    steps:
+      - name: Checkout main
+        uses: actions/checkout@v4
+        with:
+          ref: main
+
+      - name: Probe live production release
+        shell: bash
+        run: |
+          set -u
+          mkdir -p ops
+
+          ROOT_URL='https://elcidspain.com/'
+          AUMARA_URL='https://elcidspain.com/aumara/'
+          NODE01_URL='https://elcidspain.com/aumara/media/nodes/node-01.mp4'
+          NODE08_URL='https://elcidspain.com/aumara/media/nodes/node-08.mp4'
+          BEDS24_URL='https://beds24.com/booking2.php?propid=324882'
+          ROOT_MARKER='A country club built around the way a place feels.'
+
+          for attempt in $(seq 1 30); do
+            curl -sS -L --max-time 45 "$ROOT_URL" -o /tmp/root-wait.html || true
+            if grep -Fq "$ROOT_MARKER" /tmp/root-wait.html 2>/dev/null; then
+              echo "Expanded EL CID release visible on attempt $attempt"
+              break
+            fi
+            if [ "$attempt" -lt 30 ]; then sleep 5; fi
+          done
+
+          fetch_html() {
+            local url="$1" body="$2" meta="$3"
+            local result exit_code
+            result="$(curl -sS -L --max-time 60 --retry 3 --retry-delay 3 -o "$body" -w '%{http_code}|%{url_effective}|%{content_type}|%{size_download}' "$url" 2>"$meta.err")"
+            exit_code=$?
+            printf '%s|%s' "$exit_code" "$result" > "$meta"
+          }
+
+          fetch_range() {
+            local url="$1" body="$2" meta="$3"
+            local result exit_code
+            result="$(curl -sS -L --max-time 90 --retry 3 --retry-delay 3 -r 0-2047 -o "$body" -w '%{http_code}|%{url_effective}|%{content_type}|%{size_download}' "$url" 2>"$meta.err")"
+            exit_code=$?
+            printf '%s|%s' "$exit_code" "$result" > "$meta"
+          }
+
+          fetch_html "$ROOT_URL" /tmp/root.html /tmp/root.meta
+          fetch_html "$AUMARA_URL" /tmp/aumara.html /tmp/aumara.meta
+          fetch_range "$NODE01_URL" /tmp/node01.bin /tmp/node01.meta
+          fetch_range "$NODE08_URL" /tmp/node08.bin /tmp/node08.meta
+          fetch_html "$BEDS24_URL" /tmp/beds24.html /tmp/beds24.meta
+
+          root_marker=no
+          root_secondary=no
+          root_link=no
+          aumara_marker=no
+          aumara_node01_ref=no
+          aumara_node08_ref=no
+          aumara_beds24_ref=no
+          grep -Fq "$ROOT_MARKER" /tmp/root.html && root_marker=yes
+          grep -Fq 'One place. More than one way to stay.' /tmp/root.html && root_secondary=yes
+          grep -Fq '/aumara/#explore' /tmp/root.html && root_link=yes
+          grep -Fq 'Walk the place before you choose the house.' /tmp/aumara.html && aumara_marker=yes
+          grep -Fq 'media/nodes/node-01.mp4' /tmp/aumara.html && aumara_node01_ref=yes
+          grep -Fq 'media/nodes/node-08.mp4' /tmp/aumara.html && aumara_node08_ref=yes
+          grep -Fq 'https://beds24.com/booking2.php?propid=324882' /tmp/aumara.html && aumara_beds24_ref=yes
+
+          root_meta="$(cat /tmp/root.meta)"
+          aumara_meta="$(cat /tmp/aumara.meta)"
+          node01_meta="$(cat /tmp/node01.meta)"
+          node08_meta="$(cat /tmp/node08.meta)"
+          beds24_meta="$(cat /tmp/beds24.meta)"
+
+          root_code="$(printf '%s' "$root_meta" | cut -d'|' -f2)"
+          aumara_code="$(printf '%s' "$aumara_meta" | cut -d'|' -f2)"
+          node01_code="$(printf '%s' "$node01_meta" | cut -d'|' -f2)"
+          node08_code="$(printf '%s' "$node08_meta" | cut -d'|' -f2)"
+          beds24_code="$(printf '%s' "$beds24_meta" | cut -d'|' -f2)"
+          root_bytes="$(printf '%s' "$root_meta" | cut -d'|' -f5)"
+
+          fully_operational=no
+          if [ "$root_code" = 200 ] && [ "$root_marker" = yes ] && [ "$root_secondary" = yes ] && [ "$root_link" = yes ] \
+             && [ "${root_bytes:-0}" -gt 25000 ] \
+             && [ "$aumara_code" = 200 ] && [ "$aumara_marker" = yes ] \
+             && [ "$aumara_node01_ref" = yes ] && [ "$aumara_node08_ref" = yes ] && [ "$aumara_beds24_ref" = yes ]; then
+            case "$node01_code" in 200|206) node01_ok=yes ;; *) node01_ok=no ;; esac
+            case "$node08_code" in 200|206) node08_ok=yes ;; *) node08_ok=no ;; esac
+            case "$beds24_code" in 200|201|202|204|301|302|303|307|308) beds24_ok=yes ;; *) beds24_ok=no ;; esac
+            if [ "$node01_ok" = yes ] && [ "$node08_ok" = yes ] && [ "$beds24_ok" = yes ]; then fully_operational=yes; fi
+          fi
+
+          {
+            echo '# EL CID / AUMARA production probe'
+            echo
+            echo "- Checked UTC: $(date -u +%FT%TZ)"
+            echo "- Commit: $GITHUB_SHA"
+            echo "- Trigger: ${GITHUB_EVENT_NAME}"
+            echo "- Fully operational: **$fully_operational**"
+            echo
+            echo '## Root'
+            echo "- URL: $ROOT_URL"
+            echo "- curl_exit|http|final_url|content_type|bytes: \`$root_meta\`"
+            echo "- expanded release marker: **$root_marker**"
+            echo "- secondary section marker: **$root_secondary**"
+            echo "- AUMARA walkthrough link: **$root_link**"
+            echo
+            echo '## AUMARA'
+            echo "- URL: $AUMARA_URL"
+            echo "- curl_exit|http|final_url|content_type|bytes: \`$aumara_meta\`"
+            echo "- exact page marker: **$aumara_marker**"
+            echo "- node-01 reference: **$aumara_node01_ref**"
+            echo "- node-08 reference: **$aumara_node08_ref**"
+            echo "- Beds24 reference: **$aumara_beds24_ref**"
+            echo
+            echo '## Walkthrough clips'
+            echo "- node-01 curl_exit|http|final_url|content_type|bytes: \`$node01_meta\`"
+            echo "- node-08 curl_exit|http|final_url|content_type|bytes: \`$node08_meta\`"
+            echo
+            echo '## Beds24'
+            echo "- URL: $BEDS24_URL"
+            echo "- curl_exit|http|final_url|content_type|bytes: \`$beds24_meta\`"
+            echo
+            echo '## Errors'
+            for name in root aumara node01 node08 beds24; do
+              if [ -s "/tmp/$name.meta.err" ]; then echo "- $name: \`$(tr '\n' ' ' < "/tmp/$name.meta.err" | sed 's/`/'"'"'/g')\`"; fi
+            done
+          } > ops/elcid-production-probe.md
+
+          cat ops/elcid-production-probe.md
+
+      - name: Commit probe evidence
+        shell: bash
+        run: |
+          set -euo pipefail
+          git config user.name 'github-actions[bot]'
+          git config user.email '41898282+github-actions[bot]@users.noreply.github.com'
+          git add ops/elcid-production-probe.md
+          git diff --cached --quiet && exit 0
+          git commit -m 'Record EL CID production probe [skip ci]'
+          git push

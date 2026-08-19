@@ -1,0 +1,46 @@
+{
+  "mcpServers": {
+    "beds24-shadow": {
+      "type": "stdio",
+      "command": "python",
+      "args": [
+        "aumara-control-tower/scripts/beds24_guest_journey_mcp.py"
+      ],
+      "env": {
+        "BEDS24_REFRESH_TOKEN": "$COPILOT_MCP_BEDS24_REFRESH_CREDENTIAL",
+        "BEDS24_GUEST_JOURNEY_MODE": "shadow",
+        "AUMARA_GUEST_JOURNEY_MODE": "proposal",
+        "AUMARA_DISABLE_GUEST_SEND": "true",
+        "AUMARA_DISABLE_EMAIL_SEND": "true",
+        "AUMARA_DISABLE_BOOKING_MUTATIONS": "true",
+        "BEDS24_AUTO_REPLY_EXECUTE": "0",
+        "BEDS24_NOTE_MODE": "off"
+      },
+      "tools": [
+        "get_guest_journey_scope",
+        "get_guest_journey_shadow"
+      ]
+    },
+    "policy-tower": {
+      "type": "stdio",
+      "command": "npx",
+      "args": [
+        "-y",
+        "@modelcontextprotocol/server-filesystem",
+        "/home/runner/work/openai-cookbook/openai-cookbook/aumara-control-tower/policies",
+        "/home/runner/work/openai-cookbook/openai-cookbook/aumara-control-tower/docs",
+        "/home/runner/work/openai-cookbook/openai-cookbook/aumara-control-tower/checkpoints"
+      ],
+      "tools": [
+        "read_text_file",
+        "read_multiple_files",
+        "list_directory",
+        "list_directory_with_sizes",
+        "directory_tree",
+        "search_files",
+        "get_file_info",
+        "list_allowed_directories"
+      ]
+    }
+  }
+}

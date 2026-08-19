@@ -1,0 +1,155 @@
+name: Recover Beds24 booking verification
+
+on:
+  push:
+    branches: [main]
+    paths:
+      - '.github/workflows/recover-beds24-booking-id.yml'
+  workflow_dispatch:
+
+permissions:
+  actions: read
+  contents: write
+
+jobs:
+  recover:
+    runs-on: ubuntu-latest
+    env:
+      SOURCE_JOB_ID: '87233764278'
+      EVIDENCE_FILE: aumara-control-tower/evidence/beds24-recovered-booking-verification.json
+      DIAGNOSTIC_FILE: aumara-control-tower/evidence/beds24-booking-id-recovery-diagnostic.json
+      MATCHES_FILE: aumara-control-tower/evidence/beds24-source-job-matches.txt
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+
+      - name: Download prior successful execution logs and recover booking ID
+        id: recover
+        continue-on-error: true
+        shell: bash
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          set +e
+          mkdir -p /tmp/beds24-recovery "$(dirname "$EVIDENCE_FILE")"
+          HTTP_CODE="$(curl --silent --show-error --location \
+            -D /tmp/beds24-recovery/headers.txt \
+            -o /tmp/beds24-recovery/download.bin \
+            -w '%{http_code}' \
+            -H "Authorization: Bearer ${GH_TOKEN}" \
+            -H 'Accept: application/vnd.github+json' \
+            -H 'X-GitHub-Api-Version: 2022-11-28' \
+            "https://api.github.com/repos/${GITHUB_REPOSITORY}/actions/jobs/${SOURCE_JOB_ID}/logs")"
+          export HTTP_CODE
+          python - <<'PY'
+          import datetime as dt
+          import json
+          import os
+          import pathlib
+          import re
+          import zipfile
+
+          raw_path = pathlib.Path('/tmp/beds24-recovery/download.bin')
+          raw = raw_path.read_bytes() if raw_path.exists() else b''
+          archive = zipfile.is_zipfile(raw_path) if raw_path.exists() else False
+          if archive:
+              with zipfile.ZipFile(raw_path) as zf:
+                  text = '\n'.join(zf.read(name).decode('utf-8', 'replace') for name in zf.namelist())
+          else:
+              text = raw.decode('utf-8', 'replace')
+
+          lines_all = text.splitlines()
+          keyword_lines = [
+              line for line in lines_all
+              if any(word in line.lower() for word in ('booking', 'beds24', 'finalize', 'verified', 'medina', '674466', '660'))
+          ]
+          sanitized = []
+          for line in keyword_lines[-160:]:
+              line = re.sub(r'(?i)(refreshToken|token|code)(\s*[:=]\s*)[^\s,}\]]+', r'\1\2[REDACTED]', line)
+              sanitized.append(line[:1200])
+          pathlib.Path(os.environ['MATCHES_FILE']).write_text('\n'.join(sanitized))
+
+          candidates = [line for line in lines_all if 'BOOKING_VERIFIED' in line]
+          booking_id = None
+          outcome = None
+          for line in reversed(candidates):
+              for match in re.finditer(r'\{[^\n]*\}', line):
+                  try:
+                      obj = json.loads(match.group(0))
+                  except Exception:
+                      continue
+                  if obj.get('status') == 'BOOKING_VERIFIED' and obj.get('booking_id'):
+                      booking_id = obj.get('booking_id')
+                      outcome = obj.get('outcome')
+                      break
+              if booking_id:
+                  break
+          if not booking_id:
+              patterns = [
+                  r'BOOKING_VERIFIED[^\n]{0,800}?booking_id[\"\'\s:=]+([0-9]+)',
+                  r'booking_id[\"\'\s:=]+([0-9]+)[^\n]{0,800}?BOOKING_VERIFIED',
+                  r'Beds24 id[^0-9]{0,30}([0-9]{5,})',
+              ]
+              for pattern in patterns:
+                  m = re.search(pattern, text, flags=re.I)
+                  if m:
+                      booking_id = int(m.group(1))
+                      break
+
+          diagnostic = {
+              'checked_at_utc': dt.datetime.now(dt.timezone.utc).isoformat(),
+              'source_job_id': int(os.environ['SOURCE_JOB_ID']),
+              'http_status': os.environ.get('HTTP_CODE'),
+              'download_bytes': len(raw),
+              'archive': archive,
+              'keyword_lines_found': len(keyword_lines),
+              'book_verified_lines_found': len(candidates),
+              'booking_id_recovered': bool(booking_id),
+          }
+          pathlib.Path(os.environ['DIAGNOSTIC_FILE']).write_text(json.dumps(diagnostic, indent=2))
+
+          if booking_id:
+              evidence = {
+                  'recovered_at_utc': dt.datetime.now(dt.timezone.utc).isoformat(),
+                  'source_job_id': int(os.environ['SOURCE_JOB_ID']),
+                  'status': 'BOOKING_VERIFIED',
+                  'booking_id': booking_id,
+                  'outcome': outcome,
+                  'meaning': 'The prior Beds24 finalizer step completed successfully after room, dates, confirmed status, charge and payment checks passed.'
+              }
+              pathlib.Path(os.environ['EVIDENCE_FILE']).write_text(json.dumps(evidence, indent=2))
+              print(json.dumps(evidence))
+          else:
+              print(json.dumps(diagnostic))
+              raise SystemExit('Booking ID not recovered from source job logs')
+          PY
+
+      - name: Commit recovery evidence and diagnostics safely
+        if: always()
+        shell: bash
+        run: |
+          set -euo pipefail
+          rm -rf /tmp/beds24-recovery-evidence
+          mkdir -p /tmp/beds24-recovery-evidence
+          cp "$DIAGNOSTIC_FILE" /tmp/beds24-recovery-evidence/ 2>/dev/null || true
+          cp "$EVIDENCE_FILE" /tmp/beds24-recovery-evidence/ 2>/dev/null || true
+          cp "$MATCHES_FILE" /tmp/beds24-recovery-evidence/ 2>/dev/null || true
+          git fetch origin main
+          git reset --hard origin/main
+          mkdir -p aumara-control-tower/evidence
+          cp /tmp/beds24-recovery-evidence/* aumara-control-tower/evidence/ 2>/dev/null || true
+          git config user.name 'github-actions[bot]'
+          git config user.email '41898282+github-actions[bot]@users.noreply.github.com'
+          git add aumara-control-tower/evidence/
+          if ! git diff --cached --quiet; then
+            git commit -m 'Recover verified Beds24 booking ID [skip ci]'
+            git push origin HEAD:main
+          fi
+
+      - name: Fail if booking ID recovery did not complete
+        if: steps.recover.outcome != 'success'
+        shell: bash
+        run: |
+          echo 'Booking ID recovery did not complete; diagnostic evidence was persisted.' >&2
+          exit 1

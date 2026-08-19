@@ -1,0 +1,151 @@
+name: AUMARA Agent Connectivity
+
+on:
+  workflow_dispatch:
+  push:
+    branches: [main]
+    paths:
+      - '.github/workflows/aumara-agent-connectivity.yml'
+
+permissions:
+  contents: write
+
+jobs:
+  connectivity:
+    name: Gemini + Grok Imagine connectivity
+    runs-on: ubuntu-latest
+    environment: Production
+    timeout-minutes: 5
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Resolve existing provider secret bindings without exposing values
+        id: secrets
+        shell: bash
+        env:
+          XAI_C1: ${{ secrets.XAI_API_KEY }}
+          XAI_C2: ${{ secrets.GROK_API_KEY }}
+          XAI_C3: ${{ secrets.XAI_KEY }}
+          XAI_C4: ${{ secrets.GROK_KEY }}
+          XAI_C5: ${{ secrets.XAI_TOKEN }}
+          XAI_C6: ${{ secrets.GROK_TOKEN }}
+          XAI_C7: ${{ secrets.GROK_API_TOKEN }}
+          XAI_C8: ${{ secrets.XAI_API_TOKEN }}
+          XAI_C9: ${{ secrets.X_API_KEY }}
+          GEM_C1: ${{ secrets.GEMINI_API_KEY }}
+          GEM_C2: ${{ secrets.GOOGLE_API_KEY }}
+          GEM_C3: ${{ secrets.GOOGLE_GENERATIVE_AI_API_KEY }}
+          GEM_C4: ${{ secrets.GOOGLE_GENAI_API_KEY }}
+          GEM_C5: ${{ secrets.GOOGLE_AI_API_KEY }}
+          GEM_C6: ${{ secrets.GEMINI_KEY }}
+          GEM_C7: ${{ secrets.GEMINI_TOKEN }}
+          GEM_C8: ${{ secrets.GEMINI_API_TOKEN }}
+          GEM_C9: ${{ secrets.GOOGLE_GEMINI_API_KEY }}
+        run: |
+          set -euo pipefail
+          XAI_NAMES=(XAI_API_KEY GROK_API_KEY XAI_KEY GROK_KEY XAI_TOKEN GROK_TOKEN GROK_API_TOKEN XAI_API_TOKEN X_API_KEY)
+          GEM_NAMES=(GEMINI_API_KEY GOOGLE_API_KEY GOOGLE_GENERATIVE_AI_API_KEY GOOGLE_GENAI_API_KEY GOOGLE_AI_API_KEY GEMINI_KEY GEMINI_TOKEN GEMINI_API_TOKEN GOOGLE_GEMINI_API_KEY)
+          XAI_KEY=''; XAI_NAME=''
+          GEMINI_KEY=''; GEMINI_NAME=''
+          for i in $(seq 1 9); do
+            v="XAI_C${i}"; val="${!v:-}"
+            if [ -z "$XAI_KEY" ] && [ -n "$val" ]; then XAI_KEY="$val"; XAI_NAME="${XAI_NAMES[$((i-1))]}"; fi
+            v="GEM_C${i}"; val="${!v:-}"
+            if [ -z "$GEMINI_KEY" ] && [ -n "$val" ]; then GEMINI_KEY="$val"; GEMINI_NAME="${GEM_NAMES[$((i-1))]}"; fi
+          done
+          if [ -z "$XAI_KEY" ]; then echo 'XAI_KEY_MISSING=true' >> "$GITHUB_OUTPUT"; else echo 'XAI_KEY_MISSING=false' >> "$GITHUB_OUTPUT"; fi
+          if [ -z "$GEMINI_KEY" ]; then echo 'GEMINI_KEY_MISSING=true' >> "$GITHUB_OUTPUT"; else echo 'GEMINI_KEY_MISSING=false' >> "$GITHUB_OUTPUT"; fi
+          echo "XAI_SECRET_NAME=$XAI_NAME" >> "$GITHUB_OUTPUT"
+          echo "GEMINI_SECRET_NAME=$GEMINI_NAME" >> "$GITHUB_OUTPUT"
+          printf '%s' "$XAI_KEY" > "$RUNNER_TEMP/xai.key"
+          printf '%s' "$GEMINI_KEY" > "$RUNNER_TEMP/gemini.key"
+          chmod 600 "$RUNNER_TEMP/xai.key" "$RUNNER_TEMP/gemini.key"
+
+      - name: Verify xAI Grok Imagine Video API
+        id: xai
+        if: steps.secrets.outputs.XAI_KEY_MISSING == 'false'
+        continue-on-error: true
+        shell: bash
+        run: |
+          set -euo pipefail
+          KEY="$(cat "$RUNNER_TEMP/xai.key")"
+          code=$(curl -sS -o "$RUNNER_TEMP/xai-models.json" -w '%{http_code}' https://api.x.ai/v1/video-generation-models -H "Authorization: Bearer $KEY")
+          test "$code" = '200'
+          python3 - <<'PY'
+          import json, os
+          data=json.load(open(os.path.join(os.environ['RUNNER_TEMP'],'xai-models.json'),encoding='utf-8'))
+          ids=[m.get('id','') for m in data.get('models',[])]
+          if not any(x.startswith('grok-imagine-video') for x in ids): raise SystemExit('GROK_IMAGINE_VIDEO_MODEL_NOT_AVAILABLE')
+          print('GROK_IMAGINE_VIDEO_API_PASS')
+          PY
+
+      - name: Verify Gemini multimodal API
+        id: gemini
+        if: steps.secrets.outputs.GEMINI_KEY_MISSING == 'false'
+        continue-on-error: true
+        shell: bash
+        run: |
+          set -euo pipefail
+          KEY="$(cat "$RUNNER_TEMP/gemini.key")"
+          code=$(curl -sS -o "$RUNNER_TEMP/gemini-models.json" -w '%{http_code}' "https://generativelanguage.googleapis.com/v1beta/models?key=${KEY}")
+          test "$code" = '200'
+          python3 - <<'PY'
+          import json, os
+          data=json.load(open(os.path.join(os.environ['RUNNER_TEMP'],'gemini-models.json'),encoding='utf-8'))
+          names=[m.get('name','') for m in data.get('models',[])]
+          if not any('gemini' in x.lower() for x in names): raise SystemExit('GEMINI_MODEL_NOT_AVAILABLE')
+          print('GEMINI_API_PASS')
+          PY
+
+      - name: Build non-secret connectivity receipt
+        if: always()
+        shell: bash
+        env:
+          XAI_MISSING: ${{ steps.secrets.outputs.XAI_KEY_MISSING }}
+          GEMINI_MISSING: ${{ steps.secrets.outputs.GEMINI_KEY_MISSING }}
+          XAI_SECRET_NAME: ${{ steps.secrets.outputs.XAI_SECRET_NAME }}
+          GEMINI_SECRET_NAME: ${{ steps.secrets.outputs.GEMINI_SECRET_NAME }}
+          XAI_OUTCOME: ${{ steps.xai.outcome }}
+          GEMINI_OUTCOME: ${{ steps.gemini.outcome }}
+        run: |
+          mkdir -p aumara-control-tower/checkpoints
+          python3 - <<'PY'
+          import json, os, datetime
+          xm=os.getenv('XAI_MISSING'); gm=os.getenv('GEMINI_MISSING'); xo=os.getenv('XAI_OUTCOME') or 'not_run'; go=os.getenv('GEMINI_OUTCOME') or 'not_run'
+          r={'schema':'aumara.agent-connectivity-receipt','checked_at_utc':datetime.datetime.now(datetime.timezone.utc).replace(microsecond=0).isoformat().replace('+00:00','Z'),'xai_secret_present':xm=='false','xai_secret_name':os.getenv('XAI_SECRET_NAME') or None,'gemini_secret_present':gm=='false','gemini_secret_name':os.getenv('GEMINI_SECRET_NAME') or None,'xai_api_outcome':xo,'gemini_api_outcome':go,'connectivity_pass':xm=='false' and gm=='false' and xo=='success' and go=='success','secrets_exposed':False,'generation_performed':False}
+          open('aumara-control-tower/checkpoints/AUMARA_AGENT_CONNECTIVITY_RECEIPT.json','w',encoding='utf-8').write(json.dumps(r,indent=2)+'\n')
+          print(json.dumps(r))
+          PY
+
+      - name: Persist non-secret receipt to main
+        if: always()
+        shell: bash
+        run: |
+          set -euo pipefail
+          git config user.name 'AUMARA Automation'
+          git config user.email 'elcidspain@gmail.com'
+          git add aumara-control-tower/checkpoints/AUMARA_AGENT_CONNECTIVITY_RECEIPT.json
+          if ! git diff --cached --quiet; then git commit -m 'Record AUMARA agent connectivity receipt'; git push origin HEAD:main; fi
+
+      - name: Upload connectivity receipt
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: aumara-agent-connectivity-receipt
+          path: aumara-control-tower/checkpoints/AUMARA_AGENT_CONNECTIVITY_RECEIPT.json
+
+      - name: Enforce real provider connectivity
+        if: always()
+        shell: bash
+        env:
+          XAI_MISSING: ${{ steps.secrets.outputs.XAI_KEY_MISSING }}
+          GEMINI_MISSING: ${{ steps.secrets.outputs.GEMINI_KEY_MISSING }}
+          XAI_OUTCOME: ${{ steps.xai.outcome }}
+          GEMINI_OUTCOME: ${{ steps.gemini.outcome }}
+        run: |
+          set -euo pipefail
+          test "$XAI_MISSING" = 'false' || { echo 'BLOCKER: XAI/GROK secret binding not found'; exit 21; }
+          test "$GEMINI_MISSING" = 'false' || { echo 'BLOCKER: Gemini secret binding not found'; exit 22; }
+          test "$XAI_OUTCOME" = 'success' || { echo 'BLOCKER: xAI API authentication/model access failed'; exit 23; }
+          test "$GEMINI_OUTCOME" = 'success' || { echo 'BLOCKER: Gemini API authentication/model access failed'; exit 24; }
+          echo 'AUMARA_AGENT_CONNECTIVITY_PASS'

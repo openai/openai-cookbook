@@ -1,0 +1,13 @@
+{
+  "verified_at_utc": "2026-07-14T23:26:07.464717+00:00",
+  "status": "TOKEN_REJECTED",
+  "http_status": 401,
+  "response": {
+    "success": false,
+    "type": "error",
+    "code": "[REDACTED]",
+    "error": "Token not valid"
+  },
+  "secret_present": true,
+  "plaintext_secret_committed": false
+}

@@ -1,0 +1,7 @@
+{
+  "verified_at_utc": "2026-07-17T02:50:11.293412+00:00",
+  "status": "DISABLED_REDUNDANT_V2_BRIDGE",
+  "request_id": "AUMARA-MEDINA-20260718-660",
+  "reason": "Use native Beds24 booking and guest-action flow; external live writes are disabled.",
+  "live_booking_mutations": false
+}

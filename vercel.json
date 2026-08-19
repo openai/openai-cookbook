@@ -7,6 +7,14 @@
     {
       "source": "/aumara/",
       "destination": "/aumara-site/direct-v5-review.html"
+    },
+    {
+      "source": "/staff",
+      "destination": "/staff/index.html"
+    },
+    {
+      "source": "/staff/",
+      "destination": "/staff/index.html"
     }
   ]
 }

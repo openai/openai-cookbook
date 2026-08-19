@@ -1,0 +1,53 @@
+{
+  "schema": "aumara-gmail-daily-v1",
+  "synthetic": true,
+  "dataClassification": "TEST_ONLY",
+  "generatedAtUtc": "2026-07-30T20:45:00Z",
+  "businessDate": "2026-07-30",
+  "counters": {
+    "eventsReceived": 3,
+    "confirmedSentReplies": 2,
+    "cancellationFollowUps": 1,
+    "opsLogged": 3,
+    "needsDecision": 0,
+    "beds24NotesPending": 1,
+    "lostReplies": 0,
+    "deliveryErrors": 0,
+    "draftReplies": 0
+  },
+  "events": [
+    {
+      "eventId": "gmail-booking-001",
+      "occurredAtUtc": "2026-07-30T08:05:00Z",
+      "property": "EL CID Country Club",
+      "guest": "Synthetic Guest",
+      "bookingRef": "TEST-BOOKING-001",
+      "eventType": "new_booking",
+      "status": "ops_logged",
+      "amountEur": 120.0,
+      "summary": "Synthetic booking event"
+    },
+    {
+      "eventId": "gmail-reply-001",
+      "occurredAtUtc": "2026-07-30T10:15:00Z",
+      "property": "AUMARA",
+      "guest": "Example Guest",
+      "bookingRef": "TEST-BOOKING-002",
+      "eventType": "guest_reply_sent",
+      "status": "sent_verified",
+      "recipient": "relay@example.test",
+      "summary": "Synthetic guest request acknowledged"
+    },
+    {
+      "eventId": "gmail-cancel-001",
+      "occurredAtUtc": "2026-07-30T15:30:00Z",
+      "property": "EL CID Country Club",
+      "guest": "Test Cancellation",
+      "bookingRef": "TEST-BOOKING-003",
+      "eventType": "cancellation_follow_up",
+      "status": "sent_verified",
+      "recipient": "relay@example.test",
+      "summary": "Synthetic cancellation follow-up verified in SENT"
+    }
+  ]
+}

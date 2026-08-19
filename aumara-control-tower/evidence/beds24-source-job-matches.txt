@@ -1,0 +1,15 @@
+2026-07-14T23:53:32.6709660Z   BEDS24_BOOTSTRAP_CREDENTIAL: ***
+2026-07-14T23:53:52.7008376Z  * [new branch]      aumara/ttlock-beds24-control-plane -> origin/aumara/ttlock-beds24-control-plane
+2026-07-14T23:53:54.6648886Z Updating files:  55% (1660/3017)
+2026-07-14T23:53:54.8660752Z Updating files:  73% (2203/3017)
+2026-07-14T23:53:56.6230569Z [36;1mpython aumara-control-tower/scripts/beds24_finalize_paid_booking.py > aumara-control-tower/evidence/beds24-execution-log.txt 2>&1[0m
+2026-07-14T23:53:56.6231509Z [36;1mcat aumara-control-tower/evidence/beds24-execution-log.txt[0m
+2026-07-14T23:53:56.6430396Z   BEDS24_BOOTSTRAP_CREDENTIAL: ***
+2026-07-14T23:53:58.8232911Z Beds24 credential was rejected as direct token, refresh token and invite code
+2026-07-14T23:53:58.8308495Z [36;1m  git commit -m 'Record Beds24 final booking verification [skip ci]'[0m
+2026-07-14T23:53:58.8343993Z   BEDS24_BOOTSTRAP_CREDENTIAL: ***
+2026-07-14T23:53:59.3823893Z [main f6177eb] Record Beds24 final booking verification [skip ci]
+2026-07-14T23:53:59.7681744Z Auto-merging aumara-control-tower/evidence/beds24-finalize-status.json
+2026-07-14T23:53:59.7682432Z CONFLICT (content): Merge conflict in aumara-control-tower/evidence/beds24-finalize-status.json
+2026-07-14T23:53:59.7699624Z error: could not apply f6177eb... Record Beds24 final booking verification [skip ci]
+2026-07-14T23:53:59.7704695Z Could not apply f6177eb... # Record Beds24 final booking verification [skip ci]

@@ -1,0 +1,42 @@
+name: AUMARA Actions Heartbeat
+
+on:
+  workflow_dispatch:
+  push:
+    branches: [main]
+    paths:
+      - '.github/workflows/aumara-actions-heartbeat.yml'
+
+permissions:
+  contents: write
+
+jobs:
+  heartbeat:
+    runs-on: ubuntu-latest
+    timeout-minutes: 2
+    steps:
+      - uses: actions/checkout@v4
+      - name: Write heartbeat
+        run: |
+          set -euo pipefail
+          mkdir -p aumara-control-tower/checkpoints
+          python3 - <<'PY'
+          import json, datetime, os
+          r={
+            'schema':'aumara.actions-heartbeat',
+            'status':'PASS',
+            'run_id': os.getenv('GITHUB_RUN_ID'),
+            'sha': os.getenv('GITHUB_SHA'),
+            'checked_at_utc': datetime.datetime.now(datetime.timezone.utc).replace(microsecond=0).isoformat().replace('+00:00','Z')
+          }
+          open('aumara-control-tower/checkpoints/AUMARA_ACTIONS_HEARTBEAT.json','w',encoding='utf-8').write(json.dumps(r,indent=2)+'\n')
+          print(json.dumps(r))
+          PY
+      - name: Persist heartbeat
+        run: |
+          set -euo pipefail
+          git config user.name 'AUMARA Automation'
+          git config user.email 'elcidspain@gmail.com'
+          git add aumara-control-tower/checkpoints/AUMARA_ACTIONS_HEARTBEAT.json
+          git commit -m 'Record AUMARA Actions heartbeat'
+          git push origin HEAD:main

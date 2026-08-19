@@ -1,0 +1,19 @@
+{
+  "schema": "elcid-eposnow-reporting-v1",
+  "synthetic": true,
+  "dataClassification": "TEST_ONLY",
+  "read_only": true,
+  "generated_at_utc": "2026-07-30T20:30:00Z",
+  "start_inclusive": "2026-07-30",
+  "end_exclusive": "2026-07-31",
+  "counts": {
+    "transactions": 18,
+    "items": 43,
+    "tenders": 20
+  },
+  "totals": {
+    "transaction_total": "642.50",
+    "item_vat": "58.41"
+  },
+  "warnings": []
+}

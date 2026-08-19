@@ -1,0 +1,83 @@
+name: Beds24 OpenAPI sync
+
+on:
+  push:
+    branches: [main]
+    paths:
+      - '.github/workflows/beds24-openapi-sync.yml'
+  workflow_dispatch:
+
+permissions:
+  contents: write
+
+concurrency:
+  group: beds24-openapi-sync
+  cancel-in-progress: true
+
+jobs:
+  sync:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - name: Discover and fetch public Beds24 API schema
+        shell: bash
+        run: |
+          python - <<'PY'
+          import json, os, re, urllib.request, urllib.error
+          os.makedirs('aumara-control-tower/vendor', exist_ok=True)
+          candidates = [
+            'https://beds24.com/api/v2/openapi.json',
+            'https://beds24.com/api/v2/swagger.json',
+            'https://beds24.com/api/v2/swagger/v1/swagger.json',
+            'https://beds24.com/api/v2/api-docs',
+            'https://api.beds24.com/v2/openapi.json',
+            'https://api.beds24.com/v2/swagger.json',
+          ]
+          diagnostics=[]
+          page=''
+          try:
+            with urllib.request.urlopen('https://beds24.com/api/v2/', timeout=30) as r:
+              page=r.read().decode('utf-8','replace')
+              diagnostics.append({'url':'https://beds24.com/api/v2/','status':r.status,'content_type':r.headers.get('content-type')})
+          except Exception as e:
+            diagnostics.append({'url':'https://beds24.com/api/v2/','error':str(e)})
+          for m in re.findall(r'https?://[^\"\'\s<>]+(?:json|yaml|yml)', page):
+            if m not in candidates:
+              candidates.insert(0,m)
+          found=None
+          for url in candidates:
+            try:
+              req=urllib.request.Request(url, headers={'Accept':'application/json, application/yaml, text/yaml, */*','User-Agent':'AUMARA-Control-Tower/1.0'})
+              with urllib.request.urlopen(req, timeout=30) as r:
+                raw=r.read()
+                ctype=r.headers.get('content-type','')
+                diagnostics.append({'url':url,'status':r.status,'content_type':ctype,'bytes':len(raw)})
+                text=raw.decode('utf-8','replace')
+                try:
+                  data=json.loads(text)
+                except Exception:
+                  data=None
+                if isinstance(data,dict) and ('openapi' in data or 'swagger' in data or 'paths' in data):
+                  found=(url,data)
+                  break
+            except urllib.error.HTTPError as e:
+              diagnostics.append({'url':url,'status':e.code,'error':str(e)})
+            except Exception as e:
+              diagnostics.append({'url':url,'error':str(e)})
+          with open('aumara-control-tower/vendor/beds24-openapi-discovery.json','w') as f:
+            json.dump({'found_url': found[0] if found else None, 'diagnostics': diagnostics},f,indent=2)
+          if found:
+            with open('aumara-control-tower/vendor/beds24-openapi.json','w') as f:
+              json.dump(found[1],f,indent=2)
+          else:
+            with open('aumara-control-tower/vendor/beds24-swagger-page.html','w') as f:
+              f.write(page)
+          PY
+      - name: Commit public API schema evidence
+        shell: bash
+        run: |
+          git config user.name 'github-actions[bot]'
+          git config user.email '41898282+github-actions[bot]@users.noreply.github.com'
+          git add aumara-control-tower/vendor/
+          git diff --cached --quiet || git commit -m 'Sync public Beds24 API schema [skip ci]'
+          git push

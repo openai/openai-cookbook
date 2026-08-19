@@ -113,12 +113,15 @@ if "aumara-site" in root_html.lower():
     fail("repository root fallback still points to AUMARA")
 
 vercel = json.loads((REPO / "vercel.json").read_text(encoding="utf-8"))
-routes = {item.get("source"): item.get("destination") for item in vercel.get("rewrites", [])}
-if routes.get("/") != "/elcid-site/index.html":
+routes = {item.get("src"): item for item in vercel.get("routes", [])}
+root_route = routes.get("^/$")
+if not root_route or root_route.get("dest") != "/elcid-site/index.html":
     fail("preview root / does not resolve to EL CID")
-for source in ("/aumara", "/aumara/"):
-    if routes.get(source) != "/aumara-site/direct-v2.html":
-        fail(f"{source} does not resolve to the separate AUMARA page")
+aumara_route = routes.get("^/aumara/?$")
+if not aumara_route or aumara_route.get("dest") != "/aumara-site/direct-v2.html":
+    fail("/aumara/ does not resolve to the separate AUMARA page")
+if not any(item.get("src") == "^/.*$" and item.get("status") == 404 for item in vercel.get("routes", [])):
+    fail("preview routing does not block direct access to other repository files")
 
 hosts = sorted({urlparse(x).netloc for x in p.links if x.startswith("http")})
 print(

@@ -1,0 +1,788 @@
+variables:
+  CODEX_SECURITY_VERSION: "0.1.11"
+  CODEX_SECURITY_MAX_CHANGED_FILES: "8"
+
+stages:
+  - security_scan
+  - security_remediation
+  - security_publish
+  - security_gate
+
+.codex-security-rules:
+  rules:
+    - if: '$CI_PIPELINE_SOURCE == "schedule"'
+      variables:
+        CODEX_SECURITY_TARGET: "repository"
+        CODEX_SECURITY_MODE: "deep"
+        CODEX_SECURITY_EFFORT: "xhigh"
+    - if: '$CI_PIPELINE_SOURCE == "merge_request_event" && $CI_MERGE_REQUEST_SOURCE_PROJECT_ID == $CI_PROJECT_ID && $CI_MERGE_REQUEST_SOURCE_BRANCH_PROTECTED == "true" && $CI_MERGE_REQUEST_TARGET_BRANCH_PROTECTED == "true"'
+      variables:
+        CODEX_SECURITY_TARGET: "diff"
+        CODEX_SECURITY_MODE: "standard"
+        CODEX_SECURITY_EFFORT: "low"
+    - if: '$CI_COMMIT_REF_PROTECTED == "true" && $CI_COMMIT_BRANCH == $CI_DEFAULT_BRANCH && ($CI_PIPELINE_SOURCE == "push" || $CI_PIPELINE_SOURCE == "web")'
+      variables:
+        CODEX_SECURITY_TARGET: "repository"
+        CODEX_SECURITY_MODE: "standard"
+        CODEX_SECURITY_EFFORT: "high"
+
+.codex-security-runtime:
+  image: node:26-bookworm-slim
+  variables:
+    GIT_DEPTH: "0"
+  before_script:
+    - |
+      set -eu
+
+      CLI_DIR="/tmp/codex-security-cli"
+
+      apt-get update -qq > /dev/null
+      apt-get install -y -qq --no-install-recommends \
+        ca-certificates git python3 ripgrep util-linux
+
+      npm install \
+        --prefix "$CLI_DIR" \
+        --ignore-scripts \
+        --no-audit \
+        --no-fund \
+        --loglevel=error \
+        "@openai/codex-security@$CODEX_SECURITY_VERSION"
+
+      export CODEX_SECURITY_BIN="$CLI_DIR/node_modules/.bin/codex-security"
+      "$CODEX_SECURITY_BIN" --version
+
+codex-security:
+  extends:
+    - .codex-security-runtime
+    - .codex-security-rules
+  stage: security_scan
+  script:
+    - |
+      set -eu
+
+      if test -z "${CODEX_SECURITY_API_KEY:-}"; then
+        echo "Missing required GitLab CI/CD variable: CODEX_SECURITY_API_KEY" >&2
+        exit 2
+      fi
+
+      STATE_DIR="/tmp/codex-security-state-$CI_JOB_ID"
+      RESULTS_DIR="/tmp/codex-security-results-$CI_JOB_ID"
+      JSON_FILE="/tmp/codex-security-$CI_JOB_ID.json"
+      ARTIFACT_DIR="codex-security-artifacts"
+      SARIF_FILE="$ARTIFACT_DIR/results.sarif"
+
+      install -d -m 700 "$STATE_DIR" "$RESULTS_DIR" "$ARTIFACT_DIR/results"
+
+      if ! unshare -Ur true; then
+        echo 'The runner must allow the Codex sandbox user namespace.' >&2
+        exit 2
+      fi
+
+      unset CODEX_SECURITY_TARGET_SNAPSHOT_DIGEST
+
+      case "$CODEX_SECURITY_TARGET" in
+        diff)
+          BASE_REVISION="$(git merge-base \
+            "$CI_MERGE_REQUEST_DIFF_BASE_SHA" \
+            "$CI_COMMIT_SHA")"
+
+          DIFF_DIGEST="$(
+            git diff --binary --full-index --no-ext-diff --no-textconv \
+              "$BASE_REVISION" "$CI_COMMIT_SHA" \
+              | python3 -c 'import hashlib, sys; print(hashlib.sha256(sys.stdin.buffer.read()).hexdigest())'
+          )"
+          export CODEX_SECURITY_TARGET_SNAPSHOT_DIGEST="codex-security-snapshot/v1:sha256:$DIFF_DIGEST"
+
+          set -- --diff "$BASE_REVISION" --head "$CI_COMMIT_SHA"
+          ;;
+        repository)
+          set -- --mode "$CODEX_SECURITY_MODE"
+          ;;
+        *)
+          echo "Unsupported scan target: ${CODEX_SECURITY_TARGET:-unset}" >&2
+          exit 2
+          ;;
+      esac
+
+      set -- "$@" \
+        --auth api-key \
+        --effort "$CODEX_SECURITY_EFFORT" \
+        --output-dir "$RESULTS_DIR" \
+        --json
+
+      echo "Codex Security target: $CODEX_SECURITY_TARGET"
+      echo "Codex Security mode: $CODEX_SECURITY_MODE"
+      echo "Codex Security effort: $CODEX_SECURITY_EFFORT"
+
+      # API-key authentication requires a credential even in dry-run mode.
+      OPENAI_API_KEY="$CODEX_SECURITY_API_KEY" \
+        "$CODEX_SECURITY_BIN" scan . "$@" --dry-run
+
+      set +e
+      OPENAI_API_KEY="$CODEX_SECURITY_API_KEY" \
+      CODEX_SECURITY_STATE_DIR="$STATE_DIR" \
+        "$CODEX_SECURITY_BIN" scan . "$@" > "$JSON_FILE"
+      scan_exit="$?"
+      set -e
+
+      unset OPENAI_API_KEY CODEX_API_KEY CODEX_ACCESS_TOKEN CODEX_SECURITY_API_KEY
+
+      cp -R "$RESULTS_DIR"/. "$ARTIFACT_DIR/results/"
+      test ! -s "$JSON_FILE" || cp "$JSON_FILE" "$ARTIFACT_DIR/codex-security.json"
+
+      if ! test -s "$RESULTS_DIR/scan-manifest.json"; then
+        echo "The scan did not produce a sealed manifest." >&2
+        exit 2
+      fi
+
+      set +e
+      "$CODEX_SECURITY_BIN" export "$RESULTS_DIR" \
+        --export-format sarif \
+        --source-root "$CI_PROJECT_DIR" \
+        --output "$SARIF_FILE"
+      export_exit="$?"
+      set -e
+
+      if test "$export_exit" -ne 0 || ! test -s "$SARIF_FILE"; then
+        echo "The sealed scan did not produce a non-empty SARIF report." >&2
+        exit 2
+      fi
+
+      if ! python3 - "$RESULTS_DIR/findings.json" "$SARIF_FILE" <<'PY'
+      import json
+      import pathlib
+      import sys
+
+      ranks = {
+          "critical": 95.0,
+          "high": 80.0,
+          "medium": 55.0,
+          "low": 25.0,
+          "informational": 5.0,
+      }
+
+      try:
+          findings = json.loads(pathlib.Path(sys.argv[1]).read_text())
+          report_path = pathlib.Path(sys.argv[2])
+          report = json.loads(report_path.read_text())
+
+          if report.get("version") != "2.1.0":
+              raise ValueError("SARIF report must use version 2.1.0")
+          if not isinstance(findings.get("findings"), list):
+              raise ValueError("findings.json does not contain a findings array")
+          if not isinstance(report.get("runs"), list):
+              raise ValueError("SARIF report does not contain a runs array")
+
+          indexed = {}
+          for finding in findings["findings"]:
+              if not isinstance(finding, dict):
+                  raise ValueError("finding must be a JSON object")
+              occurrence = finding.get("occurrenceId")
+              if not isinstance(occurrence, str) or not occurrence:
+                  raise ValueError("finding has no occurrenceId")
+              if occurrence in indexed:
+                  raise ValueError(f"duplicate finding occurrenceId: {occurrence}")
+              indexed[occurrence] = finding
+
+          normalized = 0
+          for run in report["runs"]:
+              if not isinstance(run, dict) or not isinstance(run.get("results", []), list):
+                  raise ValueError("SARIF run does not contain a results array")
+              for result in run.get("results", []):
+                  if not isinstance(result, dict):
+                      raise ValueError("SARIF result must be a JSON object")
+                  properties = result.get("properties")
+                  occurrence = properties.get("occurrenceId") if isinstance(properties, dict) else None
+                  if occurrence not in indexed:
+                      raise ValueError("SARIF result does not match a finding occurrenceId")
+                  finding = indexed[occurrence]
+                  if result.get("ruleId") != finding.get("ruleId"):
+                      raise ValueError(f"SARIF rule does not match finding {occurrence}")
+                  severity = finding.get("severity")
+                  level = severity.get("level") if isinstance(severity, dict) else None
+                  if level not in ranks:
+                      raise ValueError(f"unsupported severity for finding {occurrence}: {level}")
+                  result["rank"] = ranks[level]
+                  normalized += 1
+
+          report_path.write_text(json.dumps(report, indent=2) + "\n")
+          print(f"Preserved scanner severity for {normalized} GitLab SARIF findings.")
+      except (KeyError, OSError, TypeError, ValueError) as error:
+          print(f"Cannot safely preserve GitLab SARIF severity: {error}", file=sys.stderr)
+          sys.exit(1)
+      PY
+      then
+        exit 2
+      fi
+
+      case "$scan_exit" in
+        0|1)
+          ;;
+        2)
+          if ! python3 - "$RESULTS_DIR/scan-manifest.json" "$RESULTS_DIR/coverage.json" <<'PY'
+      import json
+      import pathlib
+      import sys
+
+      try:
+          manifest = json.loads(pathlib.Path(sys.argv[1]).read_text())
+          coverage = json.loads(pathlib.Path(sys.argv[2]).read_text())
+          valid = (
+              manifest.get("scan", {}).get("status") == "completed"
+              and coverage.get("completeness") == "partial"
+          )
+          sys.exit(0 if valid else 1)
+      except (OSError, TypeError, ValueError):
+          sys.exit(1)
+      PY
+          then
+            echo "Exit 2 is not a completed partial scan with valid evidence." >&2
+            exit 2
+          fi
+          echo "Publishing findings from a completed scan with partial coverage." >&2
+          ;;
+        *)
+          echo "Unexpected Codex Security exit code: $scan_exit" >&2
+          exit 2
+          ;;
+      esac
+
+      printf '%s\n' "$scan_exit" > "$ARTIFACT_DIR/scan-exit-code.txt"
+      exit 0
+  artifacts:
+    when: always
+    access: maintainer
+    expire_in: 7 days
+    paths:
+      - codex-security-artifacts/
+    reports:
+      sarif: codex-security-artifacts/results.sarif
+
+codex-security-remediate:
+  extends: .codex-security-runtime
+  stage: security_remediation
+  environment:
+    name: codex-security/remediate
+  variables:
+    CODEX_SECURITY_REMEDIATION_EFFORT: "high"
+  rules:
+    - if: '$CODEX_SECURITY_ENABLE_REMEDIATION == "true" && $CI_COMMIT_REF_PROTECTED == "true" && $CI_COMMIT_BRANCH == $CI_DEFAULT_BRANCH && ($CI_PIPELINE_SOURCE == "push" || $CI_PIPELINE_SOURCE == "schedule" || $CI_PIPELINE_SOURCE == "web")'
+  needs:
+    - job: codex-security
+      artifacts: true
+  script:
+    - |
+      set -eu
+
+      RESULTS_DIR="codex-security-artifacts/results"
+      ARTIFACT_DIR="codex-security-remediation"
+      SELECTED_FINDING="$ARTIFACT_DIR/finding.json"
+      PATCH_FILE="$ARTIFACT_DIR/fix.patch"
+      install -d -m 700 "$ARTIFACT_DIR"
+
+      if test -z "${CODEX_SECURITY_API_KEY:-}"; then
+        echo "Missing required GitLab CI/CD variable: CODEX_SECURITY_API_KEY" >&2
+        exit 2
+      fi
+
+      if test -n "${GITLAB_REMEDIATION_TOKEN:-}"; then
+        echo "The GitLab write token must not be available to remediation." >&2
+        echo "Limit its environment scope to codex-security/publish." >&2
+        exit 2
+      fi
+
+      set +e
+      python3 - "$RESULTS_DIR" "$CI_COMMIT_SHA" "$SELECTED_FINDING" <<'PY'
+      import json
+      import pathlib
+      import sys
+
+      results = pathlib.Path(sys.argv[1])
+      expected_revision = sys.argv[2]
+      destination = pathlib.Path(sys.argv[3])
+
+      try:
+          manifest = json.loads((results / "scan-manifest.json").read_text())
+          coverage = json.loads((results / "coverage.json").read_text())
+          document = json.loads((results / "findings.json").read_text())
+          scan = manifest["scan"]
+
+          if scan["status"] != "completed":
+              raise ValueError("scan manifest is not completed")
+          if scan["target"]["revision"] != expected_revision:
+              raise ValueError("scan revision does not match the current commit")
+          if coverage["completeness"] != "complete":
+              raise ValueError("scan coverage is not complete")
+          if not isinstance(document.get("findings"), list):
+              raise ValueError("findings.json does not contain a findings array")
+
+          ranks = {"critical": 2, "high": 1}
+          candidates = []
+          for finding in document["findings"]:
+              if not isinstance(finding, dict):
+                  raise ValueError("finding must be a JSON object")
+              severity = finding.get("severity", {})
+              level = severity.get("level") if isinstance(severity, dict) else None
+              if level not in ranks:
+                  continue
+              occurrence_id = finding.get("occurrenceId")
+              if not isinstance(occurrence_id, str) or not occurrence_id:
+                  raise ValueError("high-severity finding has no occurrenceId")
+              candidates.append((-ranks[level], occurrence_id, finding))
+
+          if not candidates:
+              print("No high- or critical-severity finding requires remediation.")
+              sys.exit(10)
+
+          _, occurrence_id, finding = min(candidates)
+          destination.write_text(json.dumps(finding, indent=2) + "\n")
+          print(f"Selected Codex Security finding {occurrence_id}.")
+      except (KeyError, OSError, TypeError, ValueError) as error:
+          print(f"Cannot safely select a remediation finding: {error}", file=sys.stderr)
+          sys.exit(2)
+      PY
+      selection_exit="$?"
+      set -e
+
+      if test "$selection_exit" -eq 10; then
+        printf '%s\n' 'no-high-severity-findings' > "$ARTIFACT_DIR/status.txt"
+        exit 0
+      fi
+      if test "$selection_exit" -ne 0; then
+        exit "$selection_exit"
+      fi
+
+      if test -z "${CODEX_SECURITY_VERIFICATION_COMMAND:-}"; then
+        echo "Set CODEX_SECURITY_VERIFICATION_COMMAND before enabling remediation." >&2
+        exit 2
+      fi
+
+      if test "$(id -u)" -ne 0; then
+        echo "Repository setup and verification require an isolated unprivileged UID." >&2
+        echo "Use the root-in-container runtime or move verification to a secret-free job." >&2
+        exit 2
+      fi
+
+      if test -n "${CODEX_SECURITY_SETUP_COMMAND:-}"; then
+        env -u OPENAI_API_KEY -u CODEX_API_KEY -u CODEX_ACCESS_TOKEN \
+          -u CODEX_SECURITY_API_KEY -u GITLAB_REMEDIATION_TOKEN \
+          -u CI_JOB_TOKEN -u CI_REPOSITORY_URL -u CI_REGISTRY_PASSWORD \
+          -u CI_DEPLOY_PASSWORD \
+          setpriv --reuid 65534 --regid 65534 --clear-groups \
+          sh -c "$CODEX_SECURITY_SETUP_COMMAND"
+      fi
+
+      if ! git diff --quiet HEAD --; then
+        echo "Repository setup modified tracked files before remediation." >&2
+        exit 2
+      fi
+
+      set +e
+      env -u OPENAI_API_KEY -u CODEX_API_KEY -u CODEX_ACCESS_TOKEN \
+        -u CODEX_SECURITY_API_KEY -u GITLAB_REMEDIATION_TOKEN \
+        -u CI_JOB_TOKEN -u CI_REPOSITORY_URL -u CI_REGISTRY_PASSWORD \
+        -u CI_DEPLOY_PASSWORD \
+        setpriv --reuid 65534 --regid 65534 --clear-groups \
+        sh -c "$CODEX_SECURITY_VERIFICATION_COMMAND" \
+        > "$ARTIFACT_DIR/verification-before.log" 2>&1
+      baseline_exit="$?"
+      set -e
+
+      if test "$baseline_exit" -ne 1; then
+        echo "The vulnerable revision must fail verification with exit 1." >&2
+        echo "Observed verification exit: $baseline_exit" >&2
+        exit 2
+      fi
+
+      # These subcommands invoke Codex directly and require CODEX_API_KEY.
+      env -u OPENAI_API_KEY -u CODEX_ACCESS_TOKEN -u CODEX_SECURITY_API_KEY \
+        -u GITLAB_REMEDIATION_TOKEN -u CI_JOB_TOKEN -u CI_REPOSITORY_URL \
+        -u CI_REGISTRY_PASSWORD -u CI_DEPLOY_PASSWORD \
+        "CODEX_API_KEY=$CODEX_SECURITY_API_KEY" \
+        "$CODEX_SECURITY_BIN" validate "$SELECTED_FINDING" \
+        --effort "$CODEX_SECURITY_REMEDIATION_EFFORT" \
+        > "$ARTIFACT_DIR/validation-before.md"
+
+      if ! git diff --quiet HEAD --; then
+        echo "Finding validation unexpectedly modified tracked source files." >&2
+        exit 2
+      fi
+
+      env -u OPENAI_API_KEY -u CODEX_ACCESS_TOKEN -u CODEX_SECURITY_API_KEY \
+        -u GITLAB_REMEDIATION_TOKEN -u CI_JOB_TOKEN -u CI_REPOSITORY_URL \
+        -u CI_REGISTRY_PASSWORD -u CI_DEPLOY_PASSWORD \
+        "CODEX_API_KEY=$CODEX_SECURITY_API_KEY" \
+        "$CODEX_SECURITY_BIN" patch "$SELECTED_FINDING" \
+        --effort "$CODEX_SECURITY_REMEDIATION_EFFORT" \
+        > "$ARTIFACT_DIR/patch-report.md"
+
+      git ls-files --others --exclude-standard -z -- . \
+        ':(exclude)codex-security-artifacts/**' \
+        ':(exclude)codex-security-remediation/**' \
+        | xargs -0 -r git add --intent-to-add --
+
+      python3 - "$CODEX_SECURITY_MAX_CHANGED_FILES" <<'PY'
+      import pathlib
+      import subprocess
+      import sys
+
+      try:
+          limit = int(sys.argv[1])
+          if not 1 <= limit <= 20:
+              raise ValueError("changed-file limit must be between 1 and 20")
+
+          raw = subprocess.check_output(
+              ["git", "diff", "--no-renames", "--name-only", "-z", "HEAD", "--"]
+          )
+          paths = [path.decode() for path in raw.split(b"\0") if path]
+          if not paths:
+              raise ValueError("remediation did not produce a source change")
+          if len(paths) > limit:
+              raise ValueError(f"patch changes {len(paths)} files; limit is {limit}")
+
+          for path in paths:
+              filename = pathlib.PurePosixPath(path).name
+              if (
+                  path == ".gitlab-ci.yml"
+                  or path.startswith((".gitlab/", ".github/", ".git/"))
+                  or filename == ".env"
+                  or filename.startswith(".env.")
+                  or filename.endswith((".pem", ".key", ".p12", ".pfx"))
+              ):
+                  raise ValueError(f"patch touches a protected path: {path}")
+
+          numstat = subprocess.check_output(
+              ["git", "diff", "--numstat", "HEAD", "--"], text=True
+          )
+          if any(line.startswith("-\t-\t") for line in numstat.splitlines()):
+              raise ValueError("binary remediation changes are not allowed")
+
+          print(f"Accepted {len(paths)} changed source or test files.")
+      except (OSError, subprocess.CalledProcessError, UnicodeError, ValueError) as error:
+          print(f"Unsafe remediation patch: {error}", file=sys.stderr)
+          sys.exit(2)
+      PY
+
+      git diff --check HEAD --
+
+      env -u OPENAI_API_KEY -u CODEX_API_KEY -u CODEX_ACCESS_TOKEN \
+        -u CODEX_SECURITY_API_KEY -u GITLAB_REMEDIATION_TOKEN \
+        -u CI_JOB_TOKEN -u CI_REPOSITORY_URL -u CI_REGISTRY_PASSWORD \
+        -u CI_DEPLOY_PASSWORD \
+        setpriv --reuid 65534 --regid 65534 --clear-groups \
+        sh -c "$CODEX_SECURITY_VERIFICATION_COMMAND" \
+        > "$ARTIFACT_DIR/verification-after.log" 2>&1
+
+      BEFORE_REVALIDATION="/tmp/codex-security-patch-$CI_JOB_ID.diff"
+      git diff --binary HEAD -- > "$BEFORE_REVALIDATION"
+
+      env -u OPENAI_API_KEY -u CODEX_ACCESS_TOKEN -u CODEX_SECURITY_API_KEY \
+        -u GITLAB_REMEDIATION_TOKEN -u CI_JOB_TOKEN -u CI_REPOSITORY_URL \
+        -u CI_REGISTRY_PASSWORD -u CI_DEPLOY_PASSWORD \
+        "CODEX_API_KEY=$CODEX_SECURITY_API_KEY" \
+        "$CODEX_SECURITY_BIN" validate "$SELECTED_FINDING" \
+        --effort "$CODEX_SECURITY_REMEDIATION_EFFORT" \
+        > "$ARTIFACT_DIR/validation-after.md"
+
+      git diff --binary HEAD -- > "$PATCH_FILE"
+      if ! cmp -s "$BEFORE_REVALIDATION" "$PATCH_FILE"; then
+        echo "Revalidation modified the patch after verification completed." >&2
+        exit 2
+      fi
+
+      test -s "$PATCH_FILE"
+      printf '%s\n' "$CODEX_SECURITY_VERIFICATION_COMMAND" \
+        > "$ARTIFACT_DIR/verification-command.txt"
+      printf '%s\n' 'verified-patch-ready' > "$ARTIFACT_DIR/status.txt"
+      unset OPENAI_API_KEY CODEX_API_KEY CODEX_ACCESS_TOKEN CODEX_SECURITY_API_KEY
+      echo "Verified remediation patch saved to $PATCH_FILE."
+  artifacts:
+    when: always
+    access: maintainer
+    expire_in: 7 days
+    paths:
+      - codex-security-remediation/
+
+codex-security-draft-mr:
+  stage: security_publish
+  image: python:3.13-slim
+  environment:
+    name: codex-security/publish
+  rules:
+    - if: '$CODEX_SECURITY_ENABLE_REMEDIATION == "true" && $CODEX_SECURITY_CREATE_MR == "true" && $CI_COMMIT_REF_PROTECTED == "true" && $CI_COMMIT_BRANCH == $CI_DEFAULT_BRANCH && ($CI_PIPELINE_SOURCE == "push" || $CI_PIPELINE_SOURCE == "schedule" || $CI_PIPELINE_SOURCE == "web")'
+  needs:
+    - job: codex-security-remediate
+      artifacts: true
+  script:
+    - |
+      set -eu
+      unset OPENAI_API_KEY CODEX_API_KEY CODEX_ACCESS_TOKEN CODEX_SECURITY_API_KEY
+
+      ARTIFACT_DIR="codex-security-remediation"
+      PATCH_FILE="$ARTIFACT_DIR/fix.patch"
+      FINDING_FILE="$ARTIFACT_DIR/finding.json"
+
+      if ! test -s "$PATCH_FILE"; then
+        echo "No verified remediation patch is available."
+        exit 0
+      fi
+
+      if test -z "${GITLAB_REMEDIATION_TOKEN:-}"; then
+        echo "Missing protected, environment-scoped GITLAB_REMEDIATION_TOKEN." >&2
+        exit 2
+      fi
+
+      env -u GITLAB_REMEDIATION_TOKEN apt-get update -qq > /dev/null
+      env -u GITLAB_REMEDIATION_TOKEN apt-get install -y -qq \
+        --no-install-recommends ca-certificates git > /dev/null
+
+      FINDING_KEY="$(python3 - "$FINDING_FILE" <<'PY'
+      import hashlib
+      import json
+      import sys
+
+      finding = json.load(open(sys.argv[1], encoding="utf-8"))
+      print(hashlib.sha256(finding["occurrenceId"].encode()).hexdigest()[:16])
+      PY
+      )"
+      REMEDIATION_BRANCH="codex-security/fix-$FINDING_KEY"
+
+      API_HELPER="$(mktemp /tmp/codex-security-api.XXXXXX.py)"
+      ASKPASS_FILE="$(mktemp /tmp/codex-security-askpass.XXXXXX)"
+      trap 'rm -f "$API_HELPER" "$ASKPASS_FILE"' EXIT
+
+      cat > "$API_HELPER" <<'PY'
+      import hashlib
+      import json
+      import os
+      import sys
+      import urllib.error
+      import urllib.parse
+      import urllib.request
+
+      mode, branch, finding_path = sys.argv[1:]
+      project = urllib.parse.quote(os.environ["CI_PROJECT_ID"], safe="")
+      internal_url = os.environ.get("CODEX_SECURITY_GITLAB_INTERNAL_URL", "").rstrip("/")
+      api_base = (
+          f"{internal_url}/api/v4"
+          if internal_url
+          else os.environ["CI_API_V4_URL"].rstrip("/")
+      )
+      endpoint = f"{api_base}/projects/{project}/merge_requests"
+      headers = {"PRIVATE-TOKEN": os.environ["GITLAB_REMEDIATION_TOKEN"]}
+
+      try:
+          if mode == "check":
+              page = 1
+              while True:
+                  query = urllib.parse.urlencode(
+                      {"state": "opened", "per_page": 100, "page": page}
+                  )
+                  request = urllib.request.Request(f"{endpoint}?{query}", headers=headers)
+                  with urllib.request.urlopen(request, timeout=30) as response:
+                      existing = json.load(response)
+                      next_page = response.headers.get("X-Next-Page", "")
+                  for candidate in existing:
+                      source_branch = candidate.get("source_branch", "")
+                      if source_branch == branch or source_branch.startswith(f"{branch}-"):
+                          print(f'Existing remediation merge request: {candidate["web_url"]}')
+                          sys.exit(10)
+                  if not next_page:
+                      break
+                  if not next_page.isdigit():
+                      raise ValueError("GitLab returned an invalid merge request page")
+                  page = int(next_page)
+
+              encoded_branch = urllib.parse.quote(branch, safe="")
+              branch_endpoint = (
+                  f"{api_base}/projects/{project}/repository/branches/{encoded_branch}"
+              )
+              request = urllib.request.Request(branch_endpoint, headers=headers)
+              try:
+                  with urllib.request.urlopen(request, timeout=30):
+                      pass
+              except urllib.error.HTTPError as error:
+                  if error.code != 404:
+                      raise
+                  print(branch)
+                  sys.exit(0)
+
+              pipeline_id = os.environ["CI_PIPELINE_ID"]
+              if not pipeline_id.isdigit():
+                  raise ValueError("The GitLab pipeline ID must be numeric")
+              print(f"{branch}-{pipeline_id}")
+              sys.exit(0)
+
+          if mode != "create":
+              raise ValueError(f"Unsupported merge request operation: {mode}")
+
+          with open(finding_path, encoding="utf-8") as source:
+              finding = json.load(source)
+          finding_key = hashlib.sha256(finding["occurrenceId"].encode()).hexdigest()[:16]
+          occurrence = str(finding["occurrenceId"]).replace("`", "'")
+          occurrence = occurrence.replace("\n", " ")[:160]
+          payload = {
+              "source_branch": branch,
+              "target_branch": os.environ["CI_DEFAULT_BRANCH"],
+              "title": f"Draft: Fix Codex Security finding {finding_key}",
+              "description": (
+                  f"Codex Security finding: `{occurrence}`\n\n"
+                  f'Original scan revision: `{os.environ["CI_COMMIT_SHA"]}`\n\n'
+                  "The configured regression check failed before the focused fix and "
+                  "passed afterward. Validation reports, patch output, and verification "
+                  "logs are available in the remediation job artifacts.\n\n"
+                  "Human security review is required. Do not automatically merge."
+              ),
+              "remove_source_branch": True,
+          }
+          headers["Content-Type"] = "application/json"
+          request = urllib.request.Request(
+              endpoint,
+              data=json.dumps(payload).encode(),
+              headers=headers,
+              method="POST",
+          )
+          with urllib.request.urlopen(request, timeout=30) as response:
+              created = json.load(response)
+          print(f'Created draft remediation merge request: {created["web_url"]}')
+      except (KeyError, OSError, ValueError, urllib.error.URLError) as error:
+          print(f"GitLab merge request operation failed: {error}", file=sys.stderr)
+          sys.exit(2)
+      PY
+
+      set +e
+      REMEDIATION_BRANCH="$(python3 "$API_HELPER" check "$REMEDIATION_BRANCH" "$FINDING_FILE")"
+      existing_exit="$?"
+      set -e
+      if test "$existing_exit" -eq 10; then
+        echo "$REMEDIATION_BRANCH"
+        exit 0
+      fi
+      if test "$existing_exit" -ne 0; then
+        exit "$existing_exit"
+      fi
+      echo "Using remediation branch: $REMEDIATION_BRANCH"
+
+      git apply --check --index "$PATCH_FILE"
+      git apply --index "$PATCH_FILE"
+
+      python3 - "$CODEX_SECURITY_MAX_CHANGED_FILES" <<'PY'
+      import pathlib
+      import subprocess
+      import sys
+
+      try:
+          limit = int(sys.argv[1])
+          if not 1 <= limit <= 20:
+              raise ValueError("changed-file limit must be between 1 and 20")
+          raw = subprocess.check_output(
+              ["git", "diff", "--cached", "--no-renames", "--name-only", "-z"]
+          )
+          paths = [path.decode() for path in raw.split(b"\0") if path]
+          if not paths or len(paths) > limit:
+              raise ValueError("patch does not satisfy the changed-file policy")
+          for path in paths:
+              filename = pathlib.PurePosixPath(path).name
+              if (
+                  path == ".gitlab-ci.yml"
+                  or path.startswith((".gitlab/", ".github/", ".git/"))
+                  or filename == ".env"
+                  or filename.startswith(".env.")
+                  or filename.endswith((".pem", ".key", ".p12", ".pfx"))
+              ):
+                  raise ValueError(f"patch touches a protected path: {path}")
+      except (OSError, subprocess.CalledProcessError, UnicodeError, ValueError) as error:
+          print(f"Refusing to publish an unsafe patch: {error}", file=sys.stderr)
+          sys.exit(2)
+      PY
+
+      git -c core.hooksPath=/dev/null \
+        -c user.name="Codex Security" \
+        -c user.email="codex-security@example.invalid" \
+        commit -m "Fix Codex Security finding $FINDING_KEY"
+
+      cat > "$ASKPASS_FILE" <<'SH'
+      #!/bin/sh
+      case "$1" in
+        *Username*) printf '%s\n' oauth2 ;;
+        *Password*) printf '%s\n' "$GITLAB_REMEDIATION_TOKEN" ;;
+        *) exit 1 ;;
+      esac
+      SH
+      chmod 700 "$ASKPASS_FILE"
+
+      # Ignore checkout-only GitLab Runner URL rewrites and job credentials.
+      if git config --local --get-all include.path > /dev/null 2>&1; then
+        git config --local --unset-all include.path
+      fi
+      unset CI_JOB_TOKEN CI_REPOSITORY_URL CI_REGISTRY_PASSWORD CI_DEPLOY_PASSWORD
+
+      GITLAB_SERVER_ENDPOINT="${CODEX_SECURITY_GITLAB_INTERNAL_URL:-$CI_SERVER_URL}"
+      GIT_TERMINAL_PROMPT=0 git \
+        -c core.hooksPath=/dev/null \
+        -c credential.helper= \
+        -c credential.interactive=true \
+        -c core.askPass="$ASKPASS_FILE" \
+        push "${GITLAB_SERVER_ENDPOINT%/}/$CI_PROJECT_PATH.git" \
+        "HEAD:refs/heads/$REMEDIATION_BRANCH"
+
+      python3 "$API_HELPER" create "$REMEDIATION_BRANCH" "$FINDING_FILE"
+
+codex-security-remediation-mr-check:
+  stage: security_gate
+  image: node:26-bookworm-slim
+  variables:
+    CODEX_SECURITY_MR_TEST_COMMAND: "npm test"
+  rules:
+    - if: '$CI_PIPELINE_SOURCE == "merge_request_event" && $CI_MERGE_REQUEST_SOURCE_PROJECT_ID == $CI_PROJECT_ID && $CI_MERGE_REQUEST_SOURCE_BRANCH_NAME =~ /^codex-security\/fix-/ && $CI_MERGE_REQUEST_SOURCE_BRANCH_PROTECTED != "true" && $CI_MERGE_REQUEST_TARGET_BRANCH_NAME == $CI_DEFAULT_BRANCH'
+  script:
+    - |
+      set -eu
+
+      if test -n "${CODEX_SECURITY_API_KEY:-}"; then
+        echo "The protected scan credential must not be available to MR checks." >&2
+        exit 2
+      fi
+      if test -n "${GITLAB_REMEDIATION_TOKEN:-}"; then
+        echo "The protected publishing token must not be available to MR checks." >&2
+        exit 2
+      fi
+
+      unset OPENAI_API_KEY CODEX_API_KEY CODEX_ACCESS_TOKEN CODEX_SECURITY_API_KEY \
+        GITLAB_REMEDIATION_TOKEN CI_JOB_TOKEN CI_REPOSITORY_URL \
+        CI_REGISTRY_PASSWORD CI_DEPLOY_PASSWORD
+
+      if test -n "${CODEX_SECURITY_MR_SETUP_COMMAND:-}"; then
+        sh -c "$CODEX_SECURITY_MR_SETUP_COMMAND"
+      fi
+
+      if test -z "${CODEX_SECURITY_MR_TEST_COMMAND:-}"; then
+        echo "Configure a non-secret CODEX_SECURITY_MR_TEST_COMMAND." >&2
+        exit 2
+      fi
+
+      sh -c "$CODEX_SECURITY_MR_TEST_COMMAND"
+      echo "Remediation merge request passed without protected credentials."
+
+codex-security-gate:
+  extends: .codex-security-rules
+  stage: security_gate
+  image: alpine:3.20
+  dependencies:
+    - codex-security
+  # Remove this calibration-only allowance when partial coverage must block.
+  allow_failure:
+    exit_codes:
+      - 2
+  script:
+    - |
+      set -eu
+      unset OPENAI_API_KEY CODEX_API_KEY CODEX_ACCESS_TOKEN CODEX_SECURITY_API_KEY
+
+      scan_exit="$(cat codex-security-artifacts/scan-exit-code.txt)"
+      echo "Codex Security scan exit code: $scan_exit"
+
+      case "$scan_exit" in
+        0|1|2) exit "$scan_exit" ;;
+        *) echo "Invalid Codex Security scan exit code: $scan_exit" >&2; exit 2 ;;
+      esac

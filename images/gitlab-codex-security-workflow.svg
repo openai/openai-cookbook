@@ -1,0 +1,110 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="1440" height="470" viewBox="0 0 1440 470" role="img" aria-labelledby="title description">
+  <title id="title">GitLab security scanning and reviewed remediation workflow</title>
+  <desc id="description">A protected GitLab pipeline scans source code with Codex Security, reports findings, verifies a fix, opens a draft merge request, and waits for human approval.</desc>
+  <defs>
+    <marker id="arrow" markerWidth="8" markerHeight="8" refX="7" refY="4" orient="auto">
+      <path d="M1 1l6 3-6 3" fill="none" stroke="#A3A3A3" stroke-width="1.4" stroke-linecap="round" stroke-linejoin="round"/>
+    </marker>
+    <style>
+      text { font-family: Inter, -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif; }
+      .heading { fill: #171717; font-size: 30px; font-weight: 600; letter-spacing: -0.65px; }
+      .subtitle { fill: #737373; font-size: 16px; }
+      .step { fill: #737373; font-size: 12px; font-weight: 600; letter-spacing: 1px; }
+      .label { fill: #171717; font-size: 17px; font-weight: 600; }
+      .detail { fill: #737373; font-size: 13px; }
+      .badge { fill: #404040; font-size: 12px; font-weight: 500; }
+      .card { fill: #FFFFFF; stroke: #E5E5E5; stroke-width: 1; }
+      .connector { stroke: #A3A3A3; stroke-width: 1.4; marker-end: url(#arrow); }
+      .icon { fill: none; stroke: #2563EB; stroke-width: 1.7; stroke-linecap: round; stroke-linejoin: round; }
+      .review-icon { fill: none; stroke: #16803C; stroke-width: 1.7; stroke-linecap: round; stroke-linejoin: round; }
+    </style>
+  </defs>
+
+  <rect width="1440" height="470" rx="18" fill="#FAFAFA"/>
+  <text x="52" y="73" class="heading">From security finding to reviewed fix</text>
+  <text x="52" y="103" class="subtitle">Codex Security runs inside GitLab CI/CD. Generated changes are never merged automatically.</text>
+
+  <g transform="translate(52 151)">
+    <rect width="194" height="170" rx="12" class="card"/>
+    <rect x="17" y="17" width="38" height="38" rx="9" fill="#EFF6FF"/>
+    <path d="M28 28h16v16H28zM32 34h8M32 38h5" class="icon"/>
+    <text x="18" y="84" class="step">01  TRIGGER</text>
+    <text x="18" y="112" class="label">GitLab pipeline</text>
+    <text x="18" y="136" class="detail">Protected branch or</text>
+    <text x="18" y="154" class="detail">eligible merge request</text>
+  </g>
+
+  <path d="M252 235h22" class="connector"/>
+
+  <g transform="translate(281 151)">
+    <rect width="194" height="170" rx="12" class="card"/>
+    <rect x="17" y="17" width="38" height="38" rx="9" fill="#EFF6FF"/>
+    <circle cx="34" cy="34" r="7" class="icon"/>
+    <path d="M39 39l5 5M32 34h4M34 32v4" class="icon"/>
+    <text x="18" y="84" class="step">02  DETECT</text>
+    <text x="18" y="112" class="label">Codex Security</text>
+    <text x="18" y="136" class="detail">Review the committed</text>
+    <text x="18" y="154" class="detail">diff or repository</text>
+  </g>
+
+  <path d="M481 235h22" class="connector"/>
+
+  <g transform="translate(510 151)">
+    <rect width="194" height="170" rx="12" class="card"/>
+    <rect x="17" y="17" width="38" height="38" rx="9" fill="#EFF6FF"/>
+    <path d="M29 27h12l4 4v14H29zM41 27v5h5M33 37h8M33 41h6" class="icon"/>
+    <text x="18" y="84" class="step">03  REPORT</text>
+    <text x="18" y="112" class="label">GitLab findings</text>
+    <text x="18" y="136" class="detail">Publish SARIF and</text>
+    <text x="18" y="154" class="detail">preserve scan evidence</text>
+  </g>
+
+  <path d="M710 235h22" class="connector"/>
+
+  <g transform="translate(739 151)">
+    <rect width="194" height="170" rx="12" class="card"/>
+    <rect x="17" y="17" width="38" height="38" rx="9" fill="#EFF6FF"/>
+    <path d="M27 36l6 6 13-14M27 30h8M39 42h7" class="icon"/>
+    <text x="18" y="84" class="step">04  VERIFY</text>
+    <text x="18" y="112" class="label">Verified fix</text>
+    <text x="18" y="136" class="detail">Generate a patch and</text>
+    <text x="18" y="154" class="detail">run its regression test</text>
+  </g>
+
+  <path d="M939 235h22" class="connector"/>
+
+  <g transform="translate(968 151)">
+    <rect width="194" height="170" rx="12" class="card"/>
+    <rect x="17" y="17" width="38" height="38" rx="9" fill="#EFF6FF"/>
+    <circle cx="31" cy="29" r="3" class="icon"/>
+    <circle cx="43" cy="42" r="3" class="icon"/>
+    <path d="M31 32v9M31 38c0-5 12-5 12 1" class="icon"/>
+    <text x="18" y="84" class="step">05  PROPOSE</text>
+    <text x="18" y="112" class="label">Draft merge request</text>
+    <text x="18" y="136" class="detail">Publish with a scoped</text>
+    <text x="18" y="154" class="detail">project access token</text>
+  </g>
+
+  <path d="M1168 235h22" class="connector"/>
+
+  <g transform="translate(1197 151)">
+    <rect width="194" height="170" rx="12" class="card"/>
+    <rect x="17" y="17" width="38" height="38" rx="9" fill="#F0FDF4"/>
+    <circle cx="36" cy="31" r="4" class="review-icon"/>
+    <path d="M28 44c0-5 4-8 8-8s8 3 8 8" class="review-icon"/>
+    <text x="18" y="84" class="step">06  APPROVE</text>
+    <text x="18" y="112" class="label">Human review</text>
+    <text x="18" y="136" class="detail">Review, approve, and</text>
+    <text x="18" y="154" class="detail">merge intentionally</text>
+  </g>
+
+  <rect x="52" y="357" width="250" height="34" rx="17" fill="#FFFFFF" stroke="#E5E5E5"/>
+  <circle cx="70" cy="374" r="4" fill="#2563EB"/>
+  <text x="82" y="379" class="badge">Protected credentials stay isolated</text>
+
+  <rect x="314" y="357" width="190" height="34" rx="17" fill="#FFFFFF" stroke="#E5E5E5"/>
+  <circle cx="332" cy="374" r="4" fill="#16803C"/>
+  <text x="344" y="379" class="badge">Human approval required</text>
+
+  <text x="52" y="432" class="detail">Automated remediation is optional and runs only on the protected default branch.</text>
+</svg>

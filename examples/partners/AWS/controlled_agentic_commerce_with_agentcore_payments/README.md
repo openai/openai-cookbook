@@ -222,6 +222,36 @@ merchant returned a successful paid response. It does not independently prove
 on-chain settlement; that requires separate AgentCore, merchant, or testnet
 evidence.
 
+### Verify acceptance, delivery, settlement, and finality separately
+
+A successful managed payment flow establishes that AgentCore produced a proof
+within an approved session and that the allowlisted merchant returned a
+response. It does not make every downstream claim true. Keep payment proofs,
+session identifiers, wallet addresses, and provider diagnostics out of model
+context and public output.
+
+After the single paid retry, track each evidence level separately:
+
+- `merchant_accepted`: the allowlisted merchant returned the expected HTTP
+  success after exactly one proof and one retry.
+- `delivery_verified`: a signed merchant receipt binds the approved method,
+  resource, amount, network, asset, and response digest, and the application
+  independently hashes the delivered product to the same digest.
+- `settlement_verified`: independent chain or merchant evidence confirms the
+  transaction, network, asset, recipient, and exact amount.
+- `block_inclusion_verified`: an independent chain receipt reports success and
+  inclusion in a block.
+- `finality_verified`: the transaction satisfies an explicitly chosen
+  confirmation or finality rule. A mined receipt alone is not deep finality.
+
+If no independent settlement evidence is checked, retain
+`settlement_verified=false`. If only block inclusion is checked, report
+`block_inclusion_verified=true` and `finality_verified=false`. Do not let the
+model infer a stronger status from HTTP `200` or payment lifecycle logs. Stop
+after one approved economic action; any later paid action needs a new approval
+and session. Delete the temporary session in a `finally` path, and treat cleanup
+failure as blocking a rerun.
+
 The recorded August 10, 2026 validation returned `PASSED` for one bounded
 `0.002` test-USDC attempt. Any future live run requires a fresh review, approval,
 short-lived session, and testnet-only configuration.

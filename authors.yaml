@@ -3,6 +3,11 @@
 # You can optionally customize how your information shows up cookbook.openai.com over here.
 # If your information is not present here, it will be pulled from your GitHub profile.
 
+the-OAI:
+  name: "Tiger He"
+  website: "https://www.linkedin.com/in/tiger-he-b71842164/"
+  avatar: "https://avatars.githubusercontent.com/u/286157113?v=4"
+
 talaniz-oai:
   name: "Tony Alaniz"
   website: "https://github.com/talaniz-oai"

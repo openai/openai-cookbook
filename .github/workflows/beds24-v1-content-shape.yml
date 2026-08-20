@@ -1,0 +1,166 @@
+name: Beds24 V1 Content Shape 324882
+
+on:
+  workflow_dispatch:
+  push:
+    branches: [main]
+    paths:
+      - '.github/workflows/beds24-v1-content-shape.yml'
+
+permissions:
+  contents: write
+
+concurrency:
+  group: beds24-v1-content-shape-324882
+  cancel-in-progress: true
+
+jobs:
+  probe:
+    runs-on: ubuntu-latest
+    timeout-minutes: 12
+    env:
+      ALL_SECRETS_JSON: ${{ toJSON(secrets) }}
+      PROPERTY_ID: '324882'
+      ROOM_STANDARD: '674465'
+      ROOM_SUPERIOR: '674466'
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.11'
+      - name: Install browser
+        run: |
+          pip install 'playwright>=1.55,<2'
+          playwright install --with-deps chromium
+      - name: Recover existing V1 bindings and read current picture shape
+        shell: bash
+        run: |
+          set -euo pipefail
+          mkdir -p aumara-control-tower/checkpoints
+          python3 - <<'PY'
+          import datetime as dt, json, os, urllib.error, urllib.request
+          from pathlib import Path
+          from playwright.sync_api import sync_playwright
+
+          PROPERTY_ID=os.environ['PROPERTY_ID']
+          ROOM_IDS=[os.environ['ROOM_STANDARD'], os.environ['ROOM_SUPERIOR']]
+          secrets=json.loads(os.environ.get('ALL_SECRETS_JSON') or '{}')
+          names=sorted(secrets)
+          receipt={'schema':'aumara.beds24-v1-content-shape','checked_at_utc':dt.datetime.now(dt.timezone.utc).replace(microsecond=0).isoformat().replace('+00:00','Z'),'property_id':int(PROPERTY_ID),'target_room_ids':[int(x) for x in ROOM_IDS],'secret_values_exposed':False,'status':'STARTING'}
+
+          def mask(v):
+            if v: print('::add-mask::'+v)
+          def pick(patterns):
+            for wanted in patterns:
+              for n in names:
+                if n.upper()==wanted:
+                  v=(secrets.get(n) or '').strip()
+                  if v: return n,v
+            return None,''
+
+          api_name,api_key=pick(['BEDS24_API_KEY','BEDS24APIKEY','API_KEY','APIKEY'])
+          prop_name,prop_key=pick(['BEDS24_PROP_KEY','BEDS24_PROPKEY','BEDS24PROPKEY','PROP_KEY','PROPKEY'])
+          user_name,username=pick(['BEDS24_USERNAME','BEDS24_USER','BEDS24_LOGIN'])
+          pass_name,password=pick(['BEDS24_PASSWORD','BEDS24_PASS'])
+          if not username: username='EL CID / AUMARA'
+          for v in (api_key,prop_key,username,password): mask(v)
+          receipt['repo_secret_names_seen']=[n for n in names if any(x in n.upper() for x in ('BEDS24','PROPKEY','PROP_KEY','APIKEY','API_KEY'))]
+
+          def candidate_value(page,kind):
+            tokens=('apikey','api key','api_key') if kind=='api' else ('propkey','prop key','prop_key')
+            for el in page.locator('input').all():
+              try:
+                meta=' '.join(filter(None,[el.get_attribute('name'),el.get_attribute('id'),el.get_attribute('placeholder'),el.get_attribute('title'),el.get_attribute('aria-label')])).lower()
+                eid=el.get_attribute('id') or ''
+                if eid:
+                  lab=page.locator(f'label[for="{eid}"]')
+                  if lab.count(): meta+=' '+(lab.first.inner_text() or '').lower()
+                try: meta+=' '+(el.locator('xpath=..').inner_text() or '').lower()[:400]
+                except Exception: pass
+                if any(t in meta for t in tokens):
+                  val=(el.input_value() or '').strip()
+                  if 16 <= len(val) <= 128: return val
+              except Exception: pass
+            return ''
+
+          if not (api_key and prop_key) and password:
+            receipt['credential_source']='beds24_ui'
+            with sync_playwright() as p:
+              browser=p.chromium.launch(headless=True)
+              page=browser.new_page(viewport={'width':1440,'height':1100})
+              page.set_default_timeout(20000)
+              page.goto('https://beds24.com/control2.php?lang=EN&pagetype=dashboard',wait_until='domcontentloaded',timeout=60000)
+              pwd=page.locator("input[type='password']").first
+              if pwd.count():
+                usr=page.locator("input[autocomplete='username'], input[name='username'], input[name='user'], input[type='email']").first
+                if not usr.count(): usr=page.locator("input[type='text']").first
+                if not usr.count(): raise RuntimeError('LOGIN_USERNAME_FIELD_NOT_FOUND')
+                usr.fill(username); pwd.fill(password)
+                btn=page.locator("button[type='submit'], input[type='submit'], button:has-text('Log in'), button:has-text('Login'), button:has-text('Sign in')").first
+                if not btn.count(): raise RuntimeError('LOGIN_SUBMIT_NOT_FOUND')
+                btn.click(); page.wait_for_timeout(5000)
+              if page.locator("input[type='password']").count(): raise RuntimeError('LOGIN_NOT_ACCEPTED_OR_2FA')
+              def scan(kind,direct_urls,terms):
+                for url in direct_urls:
+                  try:
+                    page.goto(url,wait_until='domcontentloaded',timeout=45000); page.wait_for_timeout(1000)
+                    v=candidate_value(page,kind)
+                    if v:return v
+                  except Exception: pass
+                try:
+                  page.goto('https://beds24.com/control2.php?lang=EN&pagetype=settings',wait_until='domcontentloaded',timeout=45000)
+                  links=page.locator('a').evaluate_all("els => els.map(a => ({t:(a.innerText||'').trim().toLowerCase(),h:a.href||''}))")
+                  for x in [x for x in links if x['h'] and any(t in (x['t']+' '+x['h'].lower()) for t in terms)][:30]:
+                    try:
+                      page.goto(x['h'],wait_until='domcontentloaded',timeout=45000); page.wait_for_timeout(700)
+                      v=candidate_value(page,kind)
+                      if v:return v
+                    except Exception: pass
+                except Exception: pass
+                return ''
+              if not api_key: api_key=scan('api',['https://beds24.com/control2.php?pagetype=accountaccess','https://beds24.com/control2.php?pagetype=account'],['account','access','api'])
+              if not prop_key: prop_key=scan('prop',[f'https://beds24.com/control2.php?pagetype=propertyaccess&propid={PROPERTY_ID}',f'https://beds24.com/control2.php?pagetype=propertiesaccess&propid={PROPERTY_ID}',f'https://beds24.com/control2.php?pagetype=properties&propid={PROPERTY_ID}'],['property','access','propkey',PROPERTY_ID])
+              browser.close()
+            mask(api_key);mask(prop_key)
+
+          if api_key and prop_key:
+            receipt['credential_source']=receipt.get('credential_source') or 'github_secrets'; receipt['api_key_found']=True; receipt['prop_key_found']=True
+            payload=json.dumps({'authentication':{'apiKey':api_key,'propKey':prop_key},'images':True,'roomIds':[int(x) for x in ROOM_IDS]}).encode()
+            req=urllib.request.Request('https://www.beds24.com/api/json/getPropertyContent',data=payload,headers={'Content-Type':'application/json','Accept':'application/json','User-Agent':'AUMARA-photo-publish/1.0'},method='POST')
+            try:
+              with urllib.request.urlopen(req,timeout=45) as r: raw=r.read(); status=int(r.status)
+            except urllib.error.HTTPError as e: raw=e.read(); status=int(e.code)
+            receipt['http_status']=status
+            try: body=json.loads(raw.decode('utf-8','replace')) if raw else {}
+            except Exception: body={}
+            def safe(node,depth=0):
+              if depth>8:return '[depth]'
+              if isinstance(node,dict):
+                out={}
+                for k,v in node.items():
+                  kl=str(k).lower()
+                  if any(t in kl for t in ('apikey','propkey','password','token','secret','email','phone','address')): out[str(k)]='[redacted]'
+                  elif isinstance(v,(dict,list)): out[str(k)]=safe(v,depth+1)
+                  elif any(t in kl for t in ('image','picture','photo','url','room','id','name','title','display','status','success','error')): out[str(k)]=v
+                return out
+              if isinstance(node,list):return [safe(x,depth+1) for x in node[:120]]
+              return node
+            receipt['response_shape']=safe(body); receipt['status']='V1_CONTENT_READ_OK' if 200 <= status < 300 else 'V1_CONTENT_READ_FAILED'
+          else:
+            receipt['api_key_found']=bool(api_key); receipt['prop_key_found']=bool(prop_key); receipt['username_secret_present']=bool(user_name); receipt['password_secret_present']=bool(pass_name)
+            receipt['status']='V1_BINDINGS_NOT_RECOVERED'
+
+          Path('aumara-control-tower/checkpoints/BEDS24_V1_CONTENT_SHAPE.json').write_text(json.dumps(receipt,indent=2,ensure_ascii=False)+'\n',encoding='utf-8')
+          print('status='+receipt['status']); print('secret_values_exposed=false')
+          PY
+      - name: Persist sanitized shape receipt
+        if: always()
+        shell: bash
+        run: |
+          set -euo pipefail
+          git config user.name 'github-actions[bot]'
+          git config user.email '41898282+github-actions[bot]@users.noreply.github.com'
+          git add aumara-control-tower/checkpoints/BEDS24_V1_CONTENT_SHAPE.json || true
+          git diff --cached --quiet && exit 0
+          git commit -m 'Record Beds24 V1 content shape [skip ci]'
+          git push

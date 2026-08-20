@@ -2,6 +2,8 @@ name: Beds24 Photo Sync Discovery
 
 on:
   workflow_dispatch:
+  schedule:
+    - cron: '*/5 * * * *'
   pull_request:
     types: [opened, synchronize, reopened]
     paths:
@@ -104,7 +106,7 @@ jobs:
           else:
               auth_mode='api_prop_keys'
               if len(api_names)==1 and len(prop_names)==1:
-                  payload=json.dumps({'authentication':{'apiKey':secrets[api_names[0]].strip(),'propKey':secrets[prop_names[0]].strip()}}).encode()
+                  payload=json.dumps({'authentication':{'apiKey':secrets[api_names[0]].strip(),'propKey':secrets[prop_names[0]].strip()},'bookingData':True,'images':True,'roomIds':True,'texts':True}).encode()
                   req=urllib.request.Request('https://api.beds24.com/json/getPropertyContent', data=payload, headers={'Content-Type':'application/json','Accept':'application/json','User-Agent':'AUMARA-photo-sync/1.0'}, method='POST')
                   try:
                       with urllib.request.urlopen(req, timeout=45) as r:
@@ -191,5 +193,5 @@ jobs:
           git config user.email '41898282+github-actions[bot]@users.noreply.github.com'
           git add aumara-control-tower/checkpoints/BEDS24_PHOTO_SYNC_DISCOVERY.json
           git diff --cached --quiet && exit 0
-          git commit -m 'Record Beds24 photo sync discovery'
+          git commit -m 'Record Beds24 photo sync discovery [skip ci]'
           git push origin HEAD:${GITHUB_REF_NAME}

@@ -1,0 +1,4 @@
+BEDS24_BINDING_INVENTORY
+property=324882
+trigger=2026-08-20T19:12:00+02:00
+mode=names-only

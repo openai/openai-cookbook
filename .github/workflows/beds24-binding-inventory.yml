@@ -1,0 +1,58 @@
+name: Beds24 Binding Inventory
+
+on:
+  workflow_dispatch:
+  push:
+    branches: [main]
+    paths:
+      - '.github/aumara-beds24-binding-inventory.trigger'
+
+permissions:
+  contents: write
+
+jobs:
+  inventory:
+    runs-on: ubuntu-latest
+    environment: Production
+    timeout-minutes: 5
+    env:
+      ALL_SECRETS_JSON: ${{ toJSON(secrets) }}
+      ALL_VARS_JSON: ${{ toJSON(vars) }}
+    steps:
+      - uses: actions/checkout@v4
+      - name: Inventory binding names only
+        shell: bash
+        run: |
+          set -euo pipefail
+          mkdir -p aumara-control-tower/checkpoints
+          python3 - <<'PY'
+          import datetime as dt, json, os, re
+          secrets=json.loads(os.environ.get('ALL_SECRETS_JSON') or '{}')
+          vars_=json.loads(os.environ.get('ALL_VARS_JSON') or '{}')
+          rx=re.compile(r'(BEDS|BOOKING|PMS|PROP|PROMPT|API|KEY|TOKEN|CREDENTIAL|REFRESH)', re.I)
+          out={
+            'schema':'aumara.beds24-binding-inventory',
+            'checked_at_utc':dt.datetime.now(dt.timezone.utc).replace(microsecond=0).isoformat().replace('+00:00','Z'),
+            'interesting_secret_names':sorted([k for k in secrets if rx.search(k)]),
+            'interesting_variable_names':sorted([k for k in vars_ if rx.search(k)]),
+            'secret_name_count':len(secrets),
+            'variable_name_count':len(vars_),
+            'secret_values_exposed':False,
+            'variable_values_exposed':False
+          }
+          path='aumara-control-tower/checkpoints/BEDS24_BINDING_INVENTORY.json'
+          open(path,'w',encoding='utf-8').write(json.dumps(out,indent=2,ensure_ascii=False)+'\n')
+          print('inventory_ready')
+          print('secret_values_exposed=false')
+          print('variable_values_exposed=false')
+          PY
+      - name: Persist inventory receipt
+        shell: bash
+        run: |
+          set -euo pipefail
+          git config user.name 'github-actions[bot]'
+          git config user.email '41898282+github-actions[bot]@users.noreply.github.com'
+          git add aumara-control-tower/checkpoints/BEDS24_BINDING_INVENTORY.json
+          git diff --cached --quiet && exit 0
+          git commit -m 'Record Beds24 binding inventory [skip ci]'
+          git push origin HEAD:${GITHUB_REF_NAME}

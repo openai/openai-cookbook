@@ -121,15 +121,6 @@ async function airtableUpsert(fields) {
 
 async function sendSummary(summary) {
   if (!process.env.RESEND_API_KEY) return { skipped: true };
-  if (String(process.env.AUMARA_AUTOMATION_MODE || '').toLowerCase() !== 'live') {
-    return { skipped: true, reason: 'AUMARA_AUTOMATION_MODE is not live' };
-  }
-  if (!/^(1|true|yes)$/i.test(String(process.env.AUMARA_LIVE_SEND_CONFIRMED || ''))) {
-    return { skipped: true, reason: 'AUMARA_LIVE_SEND_CONFIRMED is not true' };
-  }
-  if (/onboarding@resend\.dev/i.test(String(process.env.AUMARA_MAIL_FROM || ''))) {
-    return { skipped: true, reason: 'Resend onboarding sender is forbidden' };
-  }
 
   return sendMail({
     to: process.env.AUMARA_TEST_TO || 'elcidspain@gmail.com',

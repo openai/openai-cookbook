@@ -19,7 +19,7 @@
       "token_file_found": false
     }
   ],
-  "checked_at_utc": "2026-08-21T03:53:40.163710+00:00",
+  "checked_at_utc": "2026-08-21T03:54:20.218805+00:00",
   "diagnostic": "No non-expired successful exchange artifact contained a still-valid credential",
   "live_artifacts_seen": 2,
   "picture_path_count": null,

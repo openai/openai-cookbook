@@ -207,6 +207,30 @@ class DynamoClaimAtomicTests(unittest.TestCase):
         self.assertIn("python -m pip install --upgrade pip boto3", workflow)
         self.assertNotIn("pip install -r requirements.txt", workflow)
 
+    def test_photo_sync_discovery_fails_only_on_secret_name_matching(self) -> None:
+        workflow = (
+            ROOT.parent / ".github" / "workflows" / "beds24-photo-sync-discovery.yml"
+        ).read_text(encoding="utf-8")
+
+        self.assertIn("receipt['status']='AMBIGUOUS_MATCH'", workflow)
+        self.assertIn("receipt['status']='MISSING_MATCH'", workflow)
+        self.assertIn("exit_code=2", workflow)
+        self.assertIn("receipt['status']='TOKEN_EXCHANGE_FAILED'", workflow)
+        self.assertIn("receipt['status']='LIVE_CONTENT_READ_OK' if 200 <= status < 300 else 'LIVE_CONTENT_READ_FAILED'", workflow)
+        self.assertNotIn("exit_code=3", workflow)
+    def test_shadow_workflow_tolerates_auth_drift_with_degraded_summary(self) -> None:
+        workflow = (
+            ROOT.parent / ".github" / "workflows" / "aumara-guest-journey-shadow.yml"
+        ).read_text(encoding="utf-8")
+        self.assertIn("auth-error.log", workflow)
+        self.assertIn(
+            'grep -q "Beds24 authentication failed with HTTP status"',
+            workflow,
+        )
+        self.assertIn('"reasons": {"beds24_auth_unavailable": 1}', workflow)
+        self.assertIn('"authStatus": "unavailable"', workflow)
+        self.assertIn("/tmp/aumara-guest-journey-shadow/summary.json", workflow)
+
     def test_documented_module_entrypoint_resolves(self) -> None:
         result = subprocess.run(
             [

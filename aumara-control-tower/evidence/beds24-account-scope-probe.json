@@ -1,0 +1,30 @@
+{
+  "accounts_http_status": 200,
+  "accounts_read_ok": true,
+  "accounts_response": {
+    "count": 1,
+    "data": [
+      {
+        "controlLanguage": "en",
+        "id": 165022,
+        "username": "EL CID / AUMARA"
+      }
+    ],
+    "pages": {
+      "nextPageExists": false,
+      "nextPageLink": null
+    },
+    "success": true,
+    "type": "account"
+  },
+  "auth_details": {
+    "diagnostics": {
+      "requestIp": "20.168.93.83"
+    },
+    "token": "[REDACTED]",
+    "validToken": "[REDACTED]"
+  },
+  "auth_details_http_status": 200,
+  "checked_at_utc": "2026-08-21T04:06:49.650527+00:00",
+  "secret_exposed": false
+}

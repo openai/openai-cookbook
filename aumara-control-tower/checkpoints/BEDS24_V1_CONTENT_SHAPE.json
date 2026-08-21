@@ -1,0 +1,18 @@
+{
+  "schema": "aumara.beds24-v1-content-shape",
+  "checked_at_utc": "2026-08-20T21:12:04Z",
+  "property_id": 324882,
+  "target_room_ids": [
+    674465,
+    674466
+  ],
+  "secret_values_exposed": false,
+  "status": "V1_BINDINGS_NOT_RECOVERED",
+  "repo_secret_names_seen": [
+    "BEDS24_REFRESH_CREDENTIAL"
+  ],
+  "api_key_found": false,
+  "prop_key_found": false,
+  "username_secret_present": false,
+  "password_secret_present": false
+}

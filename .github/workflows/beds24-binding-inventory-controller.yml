@@ -1,0 +1,64 @@
+name: AUMARA one-shot controller Beds24 binding inventory
+
+on:
+  issues:
+    types: [opened]
+
+permissions:
+  actions: write
+  contents: read
+  issues: write
+
+jobs:
+  control:
+    if: >-
+      github.event.issue.title == 'AUMARA control: inventory Beds24 bindings 324882' &&
+      github.event.issue.user.login == 'elcidspain'
+    runs-on: ubuntu-latest
+    timeout-minutes: 20
+    env:
+      GITHUB_TOKEN: ${{ github.token }}
+      TARGET_WORKFLOW: beds24-ui-photo-upload-handshake.yml
+    steps:
+      - name: Dispatch inventory and report safe metadata
+        shell: bash
+        run: |
+          set -euo pipefail
+          python3 - <<'PY'
+          import datetime as dt, json, os, pathlib, time, urllib.error, urllib.parse, urllib.request
+          repo=os.environ['GITHUB_REPOSITORY']; api=os.environ.get('GITHUB_API_URL','https://api.github.com'); token=os.environ['GITHUB_TOKEN']; wf=os.environ['TARGET_WORKFLOW']
+          event=json.loads(pathlib.Path(os.environ['GITHUB_EVENT_PATH']).read_text(encoding='utf-8')); issue=int(event['issue']['number'])
+          headers={'Accept':'application/vnd.github+json','Authorization':f'Bearer {token}','Content-Type':'application/json','X-GitHub-Api-Version':'2022-11-28','User-Agent':'AUMARA-Beds24-Binding-Controller/1.0'}
+          def call(path,method='GET',payload=None):
+              data=None if payload is None else json.dumps(payload).encode()
+              req=urllib.request.Request(f'{api}{path}',data=data,headers=headers,method=method)
+              try:
+                  with urllib.request.urlopen(req,timeout=60) as r:
+                      raw=r.read(); return json.loads(raw.decode()) if raw else {}
+              except urllib.error.HTTPError as e:
+                  raise RuntimeError(f'GitHub API {method} {path} HTTP {e.code}: '+e.read().decode('utf-8','replace')[:500])
+          enc=urllib.parse.quote(wf,safe='')
+          before=call(f'/repos/{repo}/actions/workflows/{enc}/runs?branch=main&per_page=50').get('workflow_runs',[])
+          before_ids={int(x['id']) for x in before}
+          start=dt.datetime.now(dt.timezone.utc)
+          call(f'/repos/{repo}/actions/workflows/{enc}/dispatches','POST',{'ref':'main'})
+          run=None
+          deadline=time.time()+180
+          while time.time()<deadline and run is None:
+              for x in call(f'/repos/{repo}/actions/workflows/{enc}/runs?branch=main&per_page=50').get('workflow_runs',[]):
+                  if int(x['id']) in before_ids or x.get('event')!='workflow_dispatch': continue
+                  created=dt.datetime.fromisoformat(str(x['created_at']).replace('Z','+00:00'))
+                  if created >= start-dt.timedelta(seconds=10): run=x; break
+              if run is None: time.sleep(4)
+          if run is None: raise RuntimeError('DISPATCHED_RUN_NOT_FOUND')
+          deadline=time.time()+900
+          while time.time()<deadline:
+              run=call(f"/repos/{repo}/actions/runs/{int(run['id'])}")
+              if run.get('status')=='completed': break
+              time.sleep(5)
+          report={'workflow':wf,'run_id':run.get('id'),'status':run.get('status'),'conclusion':run.get('conclusion'),'html_url':run.get('html_url'),'credentials_exposed':False}
+          body='Beds24 secure UI upload controller result (safe metadata only):\n\n```json\n'+json.dumps(report,indent=2,sort_keys=True)+'\n```'
+          call(f'/repos/{repo}/issues/{issue}/comments','POST',{'body':body})
+          call(f'/repos/{repo}/issues/{issue}','PATCH',{'state':'closed','state_reason':'completed'})
+          if run.get('conclusion')!='success': raise SystemExit(1)
+          PY

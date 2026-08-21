@@ -1,0 +1,8 @@
+{
+  "cipher": "fernet-sha256-kek",
+  "ciphertext": "gAAAAABqh86t9Rl0REMx3keRsO6ULAG0cOpN15dBdVacPBSHwoksVXkCNP8S_shCUliQ9_FhAM2AWgtvrSyhao9L0brLI0GQx7E7U5i48G01kH4BOAztl5ENhHe0P57J3lz3cOmDKlKkDpRAj-eMaWpsx2v2z6E7nq2tWoffCeWRMNhNnuKXP-hW44-aRQmrYCRFN8KL5skDN0xlWvMOV1xp0t6fAQHrH1OpWQLXbmBOZ2-wazQxmi7NDyIBMnonKM75KuoOX2rpl6oQlZ03QLTB55DhEiuScTYUPiCebQdgvHwAV20W6Tw=",
+  "created_at_utc": "2026-08-21T04:06:05.731835+00:00",
+  "plaintext_stored": false,
+  "source": "rotation_safe_photo_sync",
+  "version": 1
+}

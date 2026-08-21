@@ -1,0 +1,101 @@
+name: Beds24 account scope read-only probe
+
+on:
+  workflow_dispatch:
+  push:
+    branches: [main]
+    paths:
+      - '.github/workflows/beds24-account-scope-probe.trigger'
+
+permissions:
+  contents: write
+
+concurrency:
+  group: beds24-account-scope-probe
+  cancel-in-progress: true
+
+jobs:
+  probe:
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    environment: Production
+    env:
+      BEDS24_VAULT_KEK: ${{ secrets.BEDS24_REFRESH_CREDENTIAL }}
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+
+      - name: Install vault dependency
+        run: python -m pip install --disable-pip-version-check cryptography
+
+      - name: Probe auth details and accounts read only
+        shell: bash
+        run: |
+          set -euo pipefail
+          python3 - <<'PY'
+          import base64, datetime as dt, hashlib, json, os, pathlib, subprocess, urllib.error, urllib.request
+          from cryptography.fernet import Fernet
+
+          API='https://api.beds24.com/v2'
+          KEK=(os.environ.get('BEDS24_VAULT_KEK') or '').strip()
+          VAULT=pathlib.Path('aumara-control-tower/evidence/beds24-refresh-vault.json')
+          OUT=pathlib.Path('aumara-control-tower/evidence/beds24-account-scope-probe.json')
+          if KEK: print(f'::add-mask::{KEK}', flush=True)
+          def key(value): return base64.urlsafe_b64encode(hashlib.sha256(('AUMARA_BEDS24_REFRESH_VAULT_V1\0'+value).encode()).digest())
+          def req(path, headers):
+              r=urllib.request.Request(API+path,headers={'accept':'application/json','User-Agent':'AUMARA-Beds24-Scope-Probe/1.0',**headers},method='GET')
+              try:
+                  with urllib.request.urlopen(r,timeout=60) as resp: raw=resp.read(); status=int(resp.status)
+              except urllib.error.HTTPError as exc: raw=exc.read(); status=int(exc.code)
+              try: body=json.loads(raw.decode('utf-8','replace')) if raw else {}
+              except Exception: body={'non_json_bytes':len(raw)}
+              return status,body
+          def sanitize(v, depth=0):
+              if depth>8: return '[DEPTH_LIMIT]'
+              if isinstance(v,dict):
+                  out={}
+                  for k,x in v.items():
+                      lk=str(k).lower()
+                      if any(s in lk for s in ('token','secret','password','credential','apikey','api_key')): out[str(k)]='[REDACTED]'
+                      else: out[str(k)]=sanitize(x,depth+1)
+                  return out
+              if isinstance(v,list): return [sanitize(x,depth+1) for x in v[:100]]
+              if isinstance(v,str): return v[:1000]
+              return v
+          if not KEK: raise SystemExit('Production vault KEK absent')
+          vd=json.loads(VAULT.read_text(encoding='utf-8'))
+          refresh=Fernet(key(KEK)).decrypt(vd['ciphertext'].encode()).decode().strip()
+          print(f'::add-mask::{refresh}', flush=True)
+          ds,db=req('/authentication/details',{'token':refresh})
+          access=''
+          refresh_status=None; refresh_body={}
+          if 200<=ds<300 and isinstance(db,dict) and db.get('validToken') is True:
+              access=refresh
+          else:
+              refresh_status,refresh_body=req('/authentication/token',{'refreshToken':refresh})
+              if isinstance(refresh_body,dict) and isinstance(refresh_body.get('token'),str): access=refresh_body['token']
+          if access: print(f'::add-mask::{access}', flush=True)
+          if not access: raise SystemExit('Could not obtain access token from encrypted vault')
+          ads,adb=req('/authentication/details',{'token':access})
+          ast,ab=req('/accounts',{'token':access})
+          evidence={
+              'checked_at_utc':dt.datetime.now(dt.timezone.utc).isoformat(),
+              'auth_details_http_status':ads,
+              'auth_details':sanitize(adb),
+              'accounts_http_status':ast,
+              'accounts_response':sanitize(ab),
+              'accounts_read_ok':bool(200<=ast<300),
+              'secret_exposed':False,
+          }
+          OUT.parent.mkdir(parents=True,exist_ok=True)
+          OUT.write_text(json.dumps(evidence,indent=2,sort_keys=True)+'\n',encoding='utf-8')
+          subprocess.run(['git','config','user.name','github-actions[bot]'],check=True)
+          subprocess.run(['git','config','user.email','41898282+github-actions[bot]@users.noreply.github.com'],check=True)
+          subprocess.run(['git','add',str(OUT)],check=True)
+          if subprocess.run(['git','diff','--cached','--quiet'],check=False).returncode!=0:
+              subprocess.run(['git','commit','-m',f"Record Beds24 account scope probe {os.environ.get('GITHUB_RUN_ID','')} [skip ci]"],check=True)
+              subprocess.run(['git','pull','--rebase','origin','main'],check=True)
+              subprocess.run(['git','push','origin','HEAD:main'],check=True)
+          print(json.dumps({'auth_details_http_status':ads,'accounts_http_status':ast,'accounts_read_ok':evidence['accounts_read_ok']}))
+          PY

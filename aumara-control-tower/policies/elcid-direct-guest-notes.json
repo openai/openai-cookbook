@@ -8,7 +8,7 @@
       "property": "elcid",
       "category": "beds24_guest_note",
       "rule": "Continuously record a bounded idempotent operational info item for an active EL CID booking when a direct guest message explicitly requests a bed preference, pet, parking, early check-in, late check-in or late check-out; change only infoItems and verify every exact note by GET read-back. Cot requests use the separate room, infant-age and occupancy worker.",
-      "source": "approved_internal_instruction",
+      "source": "approved_internal_document",
       "source_reference": "REQUEST:ELCID_DIRECT_GUEST_NOTES:2026-08-02",
       "verified_at": "2026-08-02",
       "status": "verified",

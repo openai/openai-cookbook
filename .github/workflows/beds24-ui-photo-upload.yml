@@ -125,12 +125,22 @@ jobs:
               }) if r.request.method in ("POST", "PUT", "PATCH") else None)
               try:
                   page.goto("https://beds24.com/control3.php", wait_until="domcontentloaded", timeout=60000)
-                  user = page.locator("input[name='username'], input[name='user'], input[type='email']").first
+                  user = page.locator(
+                      "input[name='username'], input[name='user'], input[name='email'], "
+                      "input[autocomplete='username'], input[type='email']"
+                  ).first
                   if not user.count(): user = page.locator("input[type='text']").first
-                  secret = page.locator("input[name='password'], input[type='password']").first
+                  secret = page.locator(
+                      "input[name='password'], input[autocomplete='current-password'], "
+                      "input[type='password']"
+                  ).first
                   if not user.count() or not secret.count(): fail("login_form", "Login fields not found")
                   user.fill(username); secret.fill(password)
-                  submit = page.locator("button[type='submit'], input[type='submit'], #loginButton").first
+                  submit = page.locator(
+                      "button[type='submit'], input[type='submit'], #loginButton, "
+                      "button:has-text('Log in'), button:has-text('Login'), "
+                      "button:has-text('Sign in')"
+                  ).first
                   if not submit.count(): fail("login_form", "Login button not found")
                   submit.click(); page.wait_for_timeout(4000)
                   if "login" in page.url.lower() or page.locator("input[type='password']").count():

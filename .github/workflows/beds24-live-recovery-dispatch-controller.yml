@@ -1,0 +1,45 @@
+name: AUMARA one-shot Beds24 dispatcher
+
+on:
+  issues:
+    types: [opened]
+
+permissions:
+  actions: write
+  issues: write
+
+jobs:
+  dispatch:
+    if: >-
+      github.event.issue.user.login == 'elcidspain' &&
+      (github.event.issue.title == 'AUMARA control: run live Beds24 recovery' ||
+       github.event.issue.title == 'AUMARA control: run Beds24 photo vault sync')
+    runs-on: ubuntu-latest
+    steps:
+      - name: Dispatch approved target workflow
+        shell: bash
+        env:
+          GH_TOKEN: ${{ github.token }}
+          ISSUE: ${{ github.event.issue.number }}
+          ISSUE_TITLE: ${{ github.event.issue.title }}
+          REPO: ${{ github.repository }}
+        run: |
+          set -euo pipefail
+          python3 - <<'PY'
+          import json, os, urllib.request
+          repo=os.environ['REPO']; issue=int(os.environ['ISSUE']); token=os.environ['GH_TOKEN']; title=os.environ['ISSUE_TITLE']
+          targets={
+              'AUMARA control: run live Beds24 recovery':'beds24-recover-live-exchange-artifacts.yml',
+              'AUMARA control: run Beds24 photo vault sync':'beds24-photo-sync-vault-controller.yml',
+          }
+          workflow=targets[title]
+          headers={'Accept':'application/vnd.github+json','Authorization':f'Bearer {token}','Content-Type':'application/json','X-GitHub-Api-Version':'2022-11-28','User-Agent':'AUMARA-Beds24-Dispatcher/2.0'}
+          def call(path,method='POST',payload=None):
+              data=None if payload is None else json.dumps(payload).encode()
+              req=urllib.request.Request(f'https://api.github.com{path}',headers=headers,data=data,method=method)
+              with urllib.request.urlopen(req,timeout=60) as r:
+                  raw=r.read(); return r.status, raw
+          status,_=call(f'/repos/{repo}/actions/workflows/{workflow}/dispatches','POST',{'ref':'main'})
+          call(f'/repos/{repo}/issues/{issue}/comments','POST',{'body':f'Dispatched `{workflow}`. HTTP {status}.'})
+          call(f'/repos/{repo}/issues/{issue}','PATCH',{'state':'closed','state_reason':'completed'})
+          PY

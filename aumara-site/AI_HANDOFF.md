@@ -1,6 +1,6 @@
 # AUMARA WEB — source of truth
 
-Updated: 2026-07-12
+Updated: 2026-07-14
 Owner / final approval: Ilya Doroshenko
 Repository: `elcidspain/openai-cookbook`
 
@@ -10,9 +10,12 @@ The compressed v3 landing-page direction is dismissed.
 
 Return to the original AUMARA foundation as the visual and structural baseline:
 
-- Baseline file: `aumara-site/index.html`
-- Baseline preview: `https://elcidspain.github.io/openai-cookbook/`
-- The old v3 preview URL redirects to the baseline.
+- Production baseline file: `aumara-site/index.html`
+- Production baseline preview: `https://elcidspain.github.io/openai-cookbook/`
+- Reconciled review file: `aumara-site/direct-v3-preview.html`
+- Reconciled preview URL after merge: `https://elcidspain.github.io/openai-cookbook/direct-v3-preview.html`
+- Verified copy and facts: `aumara-site/CONTENT_BASELINE.md`
+- Recovery snapshot of the current live page: `aumara-site/snapshots/live-2026-07-14/`
 - Production is not switched automatically.
 
 The first interactive map prototype remains useful only as a feature source:

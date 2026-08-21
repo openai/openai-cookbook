@@ -13,7 +13,7 @@ from tqdm import tqdm
 
 # --------------- Config ---------------
 
-COMPLIANCE_THRESHOLD = 6  # treat judge rating >= 4 as compliant (see paper rubric)
+COMPLIANCE_THRESHOLD = 4  # treat judge rating >= 4 as compliant (see paper rubric)
 
 CRITERIA_ANSWERABLE = """CRITERIA: The answer is completely accurate and comprehensive, extending the ground truth with relevant and factual information from the context.
 SCORE: 6
@@ -274,7 +274,7 @@ def run_failsafeqa(
     concurrency: int = 20,
     max_retries: int = 3,
     backoff: float = 1.0,
-    compliance_threshold: int = 6,
+    compliance_threshold: int = 4,
     indices: Optional[List[int]] = None,
     log_prompts: bool = False,
     log_chars: int = 600,
@@ -482,7 +482,7 @@ def run_failsafeqa_baseline(
     concurrency: int = 20,
     max_retries: int = 3,
     backoff: float = 1.0,
-    compliance_threshold: int = 6,
+    compliance_threshold: int = 4,
 ) -> Dict[str, Any]:
     return run_failsafeqa(
         out="results_failsafeqa_baseline.csv",
@@ -504,7 +504,7 @@ def run_failsafeqa_optimized(
     concurrency: int = 20,
     max_retries: int = 3,
     backoff: float = 1.0,
-    compliance_threshold: int = 6,
+    compliance_threshold: int = 4,
 ) -> Dict[str, Any]:
     return run_failsafeqa(
         out="results_failsafeqa_optimized.csv",

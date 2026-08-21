@@ -166,7 +166,7 @@ await airtableCreate({
   Source: 'Threads API',
   'Recent views': contentViews,
   Followers: Number(user.followers_count || 0),
-  Verified: true,
+  Verified: enriched.every((row) => !row.insight_error),
   Notes: notes,
 });
 

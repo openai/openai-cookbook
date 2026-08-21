@@ -28,7 +28,13 @@ async function getJson(url) {
   const response = await fetch(url);
   const body = await response.json().catch(() => ({}));
   if (!response.ok) {
-    throw new Error(`HTTP ${response.status} for ${url}: ${JSON.stringify(body)}`);
+    let safeUrl = url;
+    try {
+      const parsed = new URL(url);
+      parsed.searchParams.delete('access_token');
+      safeUrl = parsed.toString();
+    } catch {}
+    throw new Error(`HTTP ${response.status} for ${safeUrl}: ${JSON.stringify(body)}`);
   }
   return body;
 }

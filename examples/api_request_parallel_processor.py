@@ -35,7 +35,6 @@ Inputs:
     - e.g., {"model": "text-embedding-3-small", "input": "embed me", "metadata": {"row_id": 1}}
     - as with all jsonl files, take care that newlines in the content are properly escaped (json.dumps does this automatically)
     - an example file is provided at examples/data/example_requests_to_parallel_process.jsonl
-    - the code to generate the example file is appended to the bottom of this script
 - save_filepath : str, optional
     - path to the file where the results will be saved
     - file will be a jsonl file, where each line is an array with the original request plus the API response
@@ -119,6 +118,13 @@ async def process_api_requests_from_file(
     logging_level: int,
 ):
     """Processes API requests in parallel, throttling to stay under rate limits."""
+    if max_requests_per_minute <= 0:
+        raise ValueError("max_requests_per_minute must be positive")
+    if max_tokens_per_minute <= 0:
+        raise ValueError("max_tokens_per_minute must be positive")
+    if max_attempts < 1:
+        raise ValueError("max_attempts must be at least 1")
+
     # constants
     seconds_to_pause_after_rate_limit_error = 15
     seconds_to_sleep_each_loop = (

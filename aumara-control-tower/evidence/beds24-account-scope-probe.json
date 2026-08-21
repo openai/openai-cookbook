@@ -19,12 +19,12 @@
   },
   "auth_details": {
     "diagnostics": {
-      "requestIp": "57.154.3.241"
+      "requestIp": "20.168.93.83"
     },
     "token": "[REDACTED]",
     "validToken": "[REDACTED]"
   },
   "auth_details_http_status": 200,
-  "checked_at_utc": "2026-08-21T04:05:52.571919+00:00",
+  "checked_at_utc": "2026-08-21T04:06:49.650527+00:00",
   "secret_exposed": false
 }

@@ -1,9 +1,8 @@
 {
   "cipher": "fernet-sha256-kek",
-  "ciphertext": "gAAAAABqh8xfcQ7th47d5dzHk27UcOEN_sea7FTOWwL89jev1rnfKfpFxjfY5-tGXp9SECpeUu8x_32dJjflJbXHWtVCXo91w1Kd_VnLnceXnIPVW4BfGNbjBwcKbs-QkwM0mbiZBln5CFB45J4KH9L2M7dNfOsQyL0UCdpeGAF5cbpZnOUyGgpjlB00Rx0lohbiFGZgTcajKPSTxlOItVl_Q1Wdhjb0F5aA74bTD4dQ-EIiLWrL3bg3WWIs_5h6yGDuB981wxaxDYMQAeoE4wo_SkmReqObxBp2u_ch3ASJTUGLcU9spWc=",
-  "created_at_utc": "2026-08-21T03:56:15.387610+00:00",
+  "ciphertext": "gAAAAABqh82k5gAAE27gMS_RGH-myZ34UHtE2JnXCayOgiiBazq0F6RBslv_c_MAVOXVnnFS898xU9bd0EXl1tDDe-sp7N4HMZHvyWWKyNGyW1HtdXxtFZA8c8H1fp5ystnbURwCSKC-JFiCbAzfKR_XbfqFgVBjMfq2Dk4FydqqBgP1jb7MpegpIUbdTtvaLJJiMgYYjrO8Jes0xc6DyrjVq9DRJ6YVCsiKRh3XeQUNTMlZGfVOtxecqcUy6su9hhHj09oSLW3G-yUOeKXFPbFLVxt8VBPLUIhtlGQ6f5hIm_GK-Qd8Ky0=",
+  "created_at_utc": "2026-08-21T04:01:40.284998+00:00",
   "plaintext_stored": false,
-  "source": "live_exchange_artifact_recovery",
-  "source_exchange_run_id": "32107182412",
+  "source": "rotation_safe_photo_sync",
   "version": 1
 }

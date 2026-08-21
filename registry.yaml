@@ -1974,6 +1974,25 @@
     - completions
     - embeddings
 
+- title: Using Amazon DynamoDB as a vector database with OpenAI
+  path: examples/vector_databases/dynamodb/getting-started-with-amazon-dynamodb-and-openai.ipynb
+  slug: getting-started-with-amazon-dynamodb-and-openai
+  date: 2026-08-20
+  authors:
+    - leeroyhannigan
+  tags:
+    - embeddings
+    - completions
+
+- title: Amazon DynamoDB
+  path: examples/vector_databases/dynamodb/README.md
+  slug: amazon-dynamodb-vector-database
+  date: 2026-08-20
+  authors:
+    - leeroyhannigan
+  tags:
+    - embeddings
+
 - title: Using Tair as a vector database for OpenAI embeddings
   path: examples/vector_databases/tair/Getting_started_with_Tair_and_OpenAI.ipynb
   slug: getting-started-with-tair-and-openai

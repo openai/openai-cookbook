@@ -1,0 +1,9 @@
+{
+  "cipher": "fernet-sha256-kek",
+  "ciphertext": "gAAAAABqh8whG41LNLuRLRgYcEn2v1YSSi68MTxo3ybky69TgbBOH404oyxG8iNj6v2k6zGIJt0F1RDSga41OqMOFRvOmOrukk0oXORJOQDUC5BzYSQVvX4iuFf-NQhQhJ5JVGaQACJwfjJoSbVy5dXnUBBbWu0hmYcECJYNPb3SEB951W0U9rq20v3SeqIoTOpP1zAytkAl1k8wiG7YNV_FEy4GF4vS0RfrlscbsQj3ChSHHpXjJTUytYm-7NzYvUzL_UYNEERx_CgIuxdpmE6w4GMutDYvvyhyM4_aeQguQRhCl7TcNEA=",
+  "created_at_utc": "2026-08-21T03:55:14.296648+00:00",
+  "plaintext_stored": false,
+  "source": "live_exchange_artifact_recovery",
+  "source_exchange_run_id": "32107182412",
+  "version": 1
+}

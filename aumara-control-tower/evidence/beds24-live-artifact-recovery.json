@@ -1,0 +1,23 @@
+{
+  "access_probe_http_status": 200,
+  "access_probe_valid": true,
+  "candidates": [
+    {
+      "diagnostic": null,
+      "direct_http_status": 200,
+      "file_found": true,
+      "refresh_http_status": 200,
+      "source_exchange_run_id": "32107182412"
+    }
+  ],
+  "checked_at_utc": "2026-08-21T03:55:10.889126+00:00",
+  "property_http_status": 200,
+  "property_id": "324882",
+  "recovered": true,
+  "rotated_refresh_received": false,
+  "run_id": "32445042671",
+  "secret_exposed": false,
+  "source_exchange_run_id": "32107182412",
+  "status": "SUCCESS",
+  "vault_written": true
+}

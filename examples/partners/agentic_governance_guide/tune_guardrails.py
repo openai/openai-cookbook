@@ -5,10 +5,10 @@ This script runs the guardrail feedback loop to automatically tune
 confidence_threshold values based on evaluation metrics.
 
 Example:
-    python tune_guardrails.py \\
-        --config eval_data/eval_config.json \\
-        --dataset eval_data/guardrail_test_data.jsonl \\
-        --precision-target 0.90 \\
+    python tune_guardrails.py \
+        --config eval_data/eval_config.json \
+        --dataset eval_data/guardrail_test_data.jsonl \
+        --precision-target 0.90 \
         --recall-target 0.90
 """
 
@@ -31,11 +31,11 @@ Examples:
   python tune_guardrails.py --config config.json --dataset test_data.jsonl
 
   # Custom targets prioritizing precision
-  python tune_guardrails.py --config config.json --dataset test_data.jsonl \\
+  python tune_guardrails.py --config config.json --dataset test_data.jsonl \
       --precision-target 0.95 --recall-target 0.85 --priority precision
 
   # More iterations with smaller steps
-  python tune_guardrails.py --config config.json --dataset test_data.jsonl \\
+  python tune_guardrails.py --config config.json --dataset test_data.jsonl \
       --max-iterations 20 --step-size 0.02
         """,
     )
@@ -104,6 +104,10 @@ Examples:
 
     if not args.dataset.exists():
         print(f"Error: Dataset file not found: {args.dataset}", file=sys.stderr)
+        sys.exit(1)
+
+    if args.step_size <= 0:
+        print("Error: --step-size must be greater than 0.", file=sys.stderr)
         sys.exit(1)
 
     # Setup logging

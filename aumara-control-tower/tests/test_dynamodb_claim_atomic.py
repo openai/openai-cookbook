@@ -218,6 +218,39 @@ class DynamoClaimAtomicTests(unittest.TestCase):
         self.assertIn("receipt['status']='TOKEN_EXCHANGE_FAILED'", workflow)
         self.assertIn("receipt['status']='LIVE_CONTENT_READ_OK' if 200 <= status < 300 else 'LIVE_CONTENT_READ_FAILED'", workflow)
         self.assertNotIn("exit_code=3", workflow)
+
+    def test_photo_vault_dispatcher_accepts_owner_retry_comment(self) -> None:
+        workflow = (
+            ROOT.parent
+            / ".github"
+            / "workflows"
+            / "beds24-live-recovery-dispatch-controller.yml"
+        ).read_text(encoding="utf-8")
+
+        self.assertIn("issue_comment:", workflow)
+        self.assertIn("types: [created]", workflow)
+        self.assertIn("github.event.comment.user.login == 'elcidspain'", workflow)
+        self.assertIn(
+            "contains(github.event.comment.body, 'run Beds24 photo vault sync')",
+            workflow,
+        )
+        self.assertIn(
+            "'AUMARA control: run Beds24 photo vault sync':'beds24-photo-sync-vault-controller.yml'",
+            workflow,
+        )
+
+    def test_photo_vault_controller_accepts_registered_retry_title(self) -> None:
+        workflow = (
+            ROOT.parent
+            / ".github"
+            / "workflows"
+            / "beds24-photo-sync-vault-controller.yml"
+        ).read_text(encoding="utf-8")
+        self.assertIn(
+            "github.event.issue.title == 'AUMARA control: run Beds24 photo vault sync'",
+            workflow,
+        )
+
     def test_shadow_workflow_tolerates_auth_drift_with_degraded_summary(self) -> None:
         workflow = (
             ROOT.parent / ".github" / "workflows" / "aumara-guest-journey-shadow.yml"

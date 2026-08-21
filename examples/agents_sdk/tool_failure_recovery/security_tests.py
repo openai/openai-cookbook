@@ -4,7 +4,9 @@ from __future__ import annotations
 
 import asyncio
 import json
+import socket
 from unittest.mock import patch
+from urllib.error import HTTPError, URLError
 
 import pandas as pd
 from agents import (
@@ -17,6 +19,7 @@ from agents import (
 )
 from pydantic import ValidationError
 
+from .adapter import CallableDeliveryServiceAdapter
 from .agent import (
     DEFAULT_ESCALATION_REASON,
     DEFAULT_MODEL,
@@ -43,6 +46,8 @@ from .core import (
     FaultKind,
     FaultPlan,
     FaultStep,
+    PermanentToolError,
+    RecoveryPolicy,
     SyntheticDeliveryService,
     ToolOutcome,
     make_slow_then_success_plan,
@@ -464,6 +469,227 @@ async def run_security_checks(
     assert foreign_order_read.error_code == "order_not_found"
     assert unknown_order_read.error_code == foreign_order_read.error_code
     assert not foreign_order_context.verified_order_reads
+
+    production_account_id = "org_8d92f4"
+    production_order_id = "550e8400-e29b-41d4-a716-446655440000"
+    for invalid_identifier in (
+        "org/other", "org\\other", "org other", "org+other",
+        "org|other", "org\nother", "a" * 257,
+    ):
+        try:
+            EscalationRequest(
+                account_id=invalid_identifier,
+                order_id=production_order_id,
+                reason=DEFAULT_ESCALATION_REASON,
+                idempotency_key="safe-operation-id",
+            )
+        except ValidationError:
+            pass
+        else:
+            raise AssertionError("An unsafe account identifier was accepted.")
+
+    production_state: dict[str, object] = {
+        "authorization_calls": 0,
+        "authorization_error": None,
+        "read_error": None,
+        "tenant_id": production_account_id,
+        "authorization_delay": 0.09,
+    }
+    production_records: dict[str, dict[str, object]] = {}
+
+    async def production_authorize(account_id: str, order_id: str) -> bool:
+        production_state["authorization_calls"] = int(
+            production_state["authorization_calls"]
+        ) + 1
+        await asyncio.sleep(float(production_state["authorization_delay"]))
+        pending_error = production_state["authorization_error"]
+        if isinstance(pending_error, Exception):
+            raise pending_error
+        return (
+            account_id == production_account_id
+            and order_id == production_order_id
+        )
+
+    async def production_read(
+        account_id: str, order_id: str
+    ) -> dict[str, object]:
+        if production_state["authorization_delay"]:
+            await asyncio.sleep(0.01)
+        pending_error = production_state["read_error"]
+        production_state["read_error"] = None
+        if isinstance(pending_error, Exception):
+            raise pending_error
+        return {
+            "order_id": order_id,
+            "status": "delayed",
+            "carrier": "Production Carrier",
+            "last_scan": "Regional distribution center",
+            "account_id": account_id,
+            "tenant_id": production_state["tenant_id"],
+            "internal_notes": "private-backend-value",
+        }
+
+    async def production_search(
+        account_id: str, _filters: dict[str, str]
+    ) -> list[dict[str, object]]:
+        return [await production_read(account_id, production_order_id)]
+
+    async def production_create(
+        account_id: str, request: EscalationRequest
+    ) -> dict[str, object]:
+        record = {
+            "escalation_id": "ESC-PRODUCTION-001",
+            "account_id": account_id,
+            "order_id": request.order_id,
+            "reason": request.reason,
+            "idempotency_key": request.idempotency_key,
+            "status": "open",
+            "tenant_id": production_state["tenant_id"],
+            "internal_notes": "private-backend-value",
+        }
+        production_records[request.idempotency_key] = record
+        return record
+
+    async def production_lookup(
+        _account_id: str, idempotency_key: str
+    ) -> dict[str, object] | None:
+        return production_records.get(idempotency_key)
+
+    production_adapter = CallableDeliveryServiceAdapter(
+        authenticated_account_id=production_account_id,
+        authorize_order_fn=production_authorize,
+        read_order_fn=production_read,
+        search_orders_fn=production_search,
+        create_escalation_fn=production_create,
+        lookup_escalation_fn=production_lookup,
+    )
+    production_context = DeliveryAgentContext(
+        account_id=production_account_id,
+        service=production_adapter,
+        authorized_search_filters={"status": "delayed"},
+        escalation_approval=EscalationApproval(
+            account_id=production_account_id,
+            order_id=production_order_id,
+        ),
+        policy=RecoveryPolicy(base_delay_seconds=0),
+    )
+    production_outcome = await get_order_status_operation(
+        production_context, production_order_id
+    )
+    assert production_outcome.status == "success"
+    assert production_state["authorization_calls"] == 2
+    assert "private-backend-value" not in serialize_outcome(production_outcome)
+    production_state["authorization_delay"] = 0
+    production_search_outcome = await search_orders_operation(
+        production_context, status="delayed"
+    )
+    assert production_search_outcome.status == "success"
+    assert "private-backend-value" not in serialize_outcome(
+        production_search_outcome
+    )
+    production_request = build_escalation_request(
+        production_context, production_order_id, DEFAULT_ESCALATION_REASON
+    )
+    production_write = await create_delivery_escalation_operation(
+        production_context, production_request
+    )
+    assert production_write.status == "success"
+    assert "private-backend-value" not in serialize_outcome(production_write)
+    production_lookup_result = await production_adapter.lookup_escalation(
+        production_account_id, production_request.idempotency_key
+    )
+    assert production_lookup_result is not None
+    assert "internal_notes" not in production_lookup_result
+
+    production_state["tenant_id"] = "org_foreign"
+    mismatched_tenant = await get_order_status_operation(
+        production_context, production_order_id
+    )
+    assert mismatched_tenant.error_code == "forbidden"
+    mismatched_search_tenant = await search_orders_operation(
+        production_context, status="delayed"
+    )
+    assert mismatched_search_tenant.error_code == "forbidden"
+    production_state["tenant_id"] = production_account_id
+    production_state["read_error"] = socket.gaierror(
+        socket.EAI_NONAME, "Name resolution failed."
+    )
+    recovered_dns = await get_order_status_operation(
+        production_context, production_order_id
+    )
+    assert recovered_dns.status == "success"
+    assert recovered_dns.attempts == 2
+    assert recovered_dns.events[0].error_code == "dependency_unavailable"
+
+    for status, expected_code, retryable in (
+        (401, "forbidden", False),
+        (403, "forbidden", False),
+        (404, "order_not_found", False),
+        (429, "rate_limited", True),
+        (503, "dependency_unavailable", True),
+    ):
+        http_error = HTTPError(
+            "https://example.invalid/orders", status, "fixture",
+            {"Retry-After": "0.5"}, None,
+        )
+        normalized = production_adapter._normalize_dependency_error(http_error)
+        assert normalized.code == expected_code
+        assert normalized.retryable is retryable
+        if status == 429:
+            assert normalized.retry_after_seconds == 0.5
+    assert production_adapter._normalize_dependency_error(
+        URLError("Name resolution failed.")
+    ).retryable
+    for module_name, error_name, expected_code in (
+        ("httpx", "ConnectError", "dependency_unavailable"),
+        ("httpcore", "ReadTimeout", "timeout"),
+        ("aiohttp.client_exceptions", "ClientConnectorError", "dependency_unavailable"),
+    ):
+        transport_type = type(
+            error_name, (Exception,), {"__module__": module_name}
+        )
+        normalized = production_adapter._normalize_dependency_error(
+            transport_type("offline transport fixture")
+        )
+        assert normalized.code == expected_code
+        assert normalized.retryable
+    aiohttp_response_type = type(
+        "ClientResponseError",
+        (Exception,),
+        {"__module__": "aiohttp.client_exceptions", "status": 503},
+    )
+    assert production_adapter._normalize_dependency_error(
+        aiohttp_response_type("offline HTTP response fixture")
+    ).code == "dependency_unavailable"
+
+    production_state["authorization_error"] = HTTPError(
+        "https://example.invalid/orders", 403, "fixture", {}, None
+    )
+    foreign_production_order = await get_order_status_operation(
+        production_context, "order_foreign"
+    )
+    production_state["authorization_error"] = None
+    missing_production_order = await get_order_status_operation(
+        production_context, "order_missing"
+    )
+    assert foreign_production_order.error_code == "order_not_found"
+    assert missing_production_order.error_code == (
+        foreign_production_order.error_code
+    )
+    production_state["authorization_error"] = HTTPError(
+        "https://example.invalid/orders", 401, "fixture", {}, None
+    )
+    unauthenticated_production_order = await get_order_status_operation(
+        production_context, production_order_id
+    )
+    assert unauthenticated_production_order.error_code == "forbidden"
+    production_state["authorization_error"] = None
+    try:
+        production_adapter.authorize_account("org_foreign")
+    except PermanentToolError as error:
+        assert error.code == "forbidden"
+    else:
+        raise AssertionError("An authenticated account mismatch was accepted.")
 
     no_search_grant_context = DeliveryAgentContext()
     unapproved_unfiltered_search = await search_orders_operation(
@@ -1030,6 +1256,32 @@ async def run_security_checks(
     assert custom_finalized_result.response.disposition == (
         "escalation_created"
     )
+    committed_custom_evidence = ObservedToolOutcome(
+        tool_name="create_delivery_escalation",
+        status="success",
+        attempts=1,
+        confirmed_side_effect=True,
+        data={
+            "escalation_id": custom_finalized_result.response.escalation_id
+        },
+        order_id="ORDER-1001",
+    )
+    for unverified_order_status in ("delivered", None):
+        forged_status_response = custom_finalized_result.response.model_copy(
+            update={"order_status": unverified_order_status}
+        )
+        try:
+            render_customer_message(
+                forged_status_response,
+                custom_approval_context,
+                [committed_custom_evidence],
+            )
+        except ValueError:
+            pass
+        else:
+            raise AssertionError(
+                "A committed escalation exposed an unverified order status."
+            )
     assert "refund" not in custom_finalized_result.customer_message
     assert custom_approval_context.service.escalation_count == 1
     assert custom_approval_context.escalation_approval is not None

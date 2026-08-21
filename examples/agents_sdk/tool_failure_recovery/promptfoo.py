@@ -390,7 +390,7 @@ def build_promptfoo_environment(
     model: str = DEFAULT_MODEL,
     include_credentials: bool = False,
 ) -> dict[str, str]:
-    """Isolate child processes; disclose one API key only to approved evals."""
+    """Disclose approved OpenAI credentials and routing only to evaluation."""
     if promptfoo_artifacts is not None:
         isolation_dir = promptfoo_artifacts["dir"]
     elif PROMPTFOO_TEMP_DIR is not None:
@@ -467,6 +467,10 @@ def build_promptfoo_environment(
             )
         environment["OPENAI_API_KEY"] = api_key
         environment["OPENAI_MODEL"] = model
+        for name in ("OPENAI_BASE_URL", "OPENAI_ORG_ID", "OPENAI_PROJECT_ID"):
+            value = os.getenv(name)
+            if value:
+                environment[name] = value
     return environment
 
 
@@ -786,6 +790,7 @@ async def run_promptfoo_evaluation(
         [
             "eval",
             "--no-cache",
+            "--no-write",
             "--no-share",
             "--no-table",
             "--no-progress-bar",

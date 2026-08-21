@@ -19,6 +19,9 @@ from typing import (
 from pydantic import BaseModel, ConfigDict, Field, ValidationError
 
 
+IDENTIFIER_PATTERN = r"^[A-Za-z0-9][A-Za-z0-9._:@-]{0,255}$"
+
+
 # Strict operation and outcome contracts.
 class StrictModel(BaseModel):
     """Reject fields that are not part of the documented tool contract."""
@@ -27,7 +30,7 @@ class StrictModel(BaseModel):
 
 
 class OrderStatus(StrictModel):
-    order_id: str = Field(pattern=r"^ORDER-[0-9]{4}$")
+    order_id: str = Field(pattern=IDENTIFIER_PATTERN)
     status: Literal["in_transit", "delayed", "delivered"]
     carrier: str
     last_scan: str
@@ -35,16 +38,16 @@ class OrderStatus(StrictModel):
 
 
 class EscalationRequest(StrictModel):
-    account_id: str = Field(pattern=r"^ACCOUNT-[0-9]{3}$")
-    order_id: str = Field(pattern=r"^ORDER-[0-9]{4}$")
+    account_id: str = Field(pattern=IDENTIFIER_PATTERN)
+    order_id: str = Field(pattern=IDENTIFIER_PATTERN)
     reason: str = Field(min_length=10)
     idempotency_key: str = Field(min_length=8)
 
 
 class EscalationRecord(StrictModel):
     escalation_id: str
-    account_id: str = Field(pattern=r"^ACCOUNT-[0-9]{3}$")
-    order_id: str
+    account_id: str = Field(pattern=IDENTIFIER_PATTERN)
+    order_id: str = Field(pattern=IDENTIFIER_PATTERN)
     reason: str
     idempotency_key: str
     status: Literal["open"] = "open"
@@ -635,9 +638,12 @@ async def get_order_status_once(
     account_id: str,
     order_id: str,
     fault_plan: FaultPlan,
+    *,
+    skip_pre_read_authorization: bool = False,
 ) -> dict[str, Any]:
     step = fault_plan.next_step()
-    await authorize_service_order(service, account_id, order_id)
+    if not skip_pre_read_authorization:
+        await authorize_service_order(service, account_id, order_id)
     if isinstance(service, SyntheticDeliveryService):
         await asyncio.sleep(step.delay_seconds)
         return service.execute_order_status_step(
@@ -706,6 +712,7 @@ async def run_read_with_recovery(
     attempt_timeout_seconds: float = 1.0,
     sleep_fn: Callable[[float], Awaitable[None]] = asyncio.sleep,
     random_seed: int | None = None,
+    skip_pre_read_authorization: bool = False,
 ) -> ToolOutcome:
     fault_plan = fault_plan or make_fault_plan(FaultKind.SUCCESS)
     policy = policy or RecoveryPolicy()
@@ -714,7 +721,11 @@ async def run_read_with_recovery(
 
     async def read_verified_order() -> OrderStatus:
         raw_result = await get_order_status_once(
-            service, account_id, order_id, fault_plan
+            service,
+            account_id,
+            order_id,
+            fault_plan,
+            skip_pre_read_authorization=skip_pre_read_authorization,
         )
         order = OrderStatus.model_validate(raw_result)
         if order.order_id != order_id:

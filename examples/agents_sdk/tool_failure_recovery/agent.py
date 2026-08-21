@@ -21,7 +21,9 @@ from agents import (
 )
 from pydantic import Field, model_validator
 
+from .adapter import CallableDeliveryServiceAdapter
 from .core import (
+    IDENTIFIER_PATTERN,
     AttemptEvent,
     EscalationRequest,
     FaultKind,
@@ -48,8 +50,8 @@ EXPECTED_TOOL_NAMES = (
     "create_delivery_escalation",
 )
 
-ATTEMPT_TIMEOUT_SECONDS = 0.25
-TOOL_TIMEOUT_SECONDS = 2.0
+ATTEMPT_TIMEOUT_SECONDS = 1.0
+TOOL_TIMEOUT_SECONDS = 5.0
 
 
 ToolName = Literal[
@@ -291,6 +293,9 @@ async def get_order_status_operation(
         context.read_fault_plan,
         context.policy,
         attempt_timeout_seconds=context.attempt_timeout_seconds,
+        skip_pre_read_authorization=isinstance(
+            context.service, CallableDeliveryServiceAdapter
+        ),
     )
     if outcome.status == "success" and outcome.data is not None:
         verified_order = OrderStatus.model_validate(outcome.data)
@@ -513,7 +518,7 @@ async def create_delivery_escalation_operation(
 )
 async def get_order_status_tool(
     ctx: RunContextWrapper[DeliveryAgentContext],
-    order_id: Annotated[str, Field(pattern=r"^ORDER-[0-9]{4}$")],
+    order_id: Annotated[str, Field(pattern=IDENTIFIER_PATTERN)],
 ) -> str:
     """Look up an order using bounded recovery and validated output."""
     outcome = await get_order_status_operation(ctx.context, order_id)
@@ -546,7 +551,7 @@ async def search_orders_tool(
 )
 async def create_delivery_escalation_tool(
     ctx: RunContextWrapper[DeliveryAgentContext],
-    order_id: Annotated[str, Field(pattern=r"^ORDER-[0-9]{4}$")],
+    order_id: Annotated[str, Field(pattern=IDENTIFIER_PATTERN)],
     reason: Annotated[str, Field(min_length=10)],
 ) -> str:
     """Create an escalation using the exact application-approved reason."""
@@ -568,7 +573,7 @@ class SupportResponse(StrictModel):
         "handoff_required",
     ]
     order_id: str | None = Field(
-        default=None, pattern=r"^ORDER-[0-9]{4}$"
+        default=None, pattern=IDENTIFIER_PATTERN
     )
     message: str = Field(min_length=1)
     order_status: Literal[
@@ -978,6 +983,12 @@ def render_customer_message(
 
     if response.order_id is None:
         raise ValueError("A confirmed escalation requires an order.")
+    verified_order = context.verified_order_reads.get(response.order_id)
+    if (
+        verified_order is None
+        or response.order_status != verified_order.status
+    ):
+        raise ValueError("Escalation status is not independently verified.")
     if (
         terminal_outcome.tool_name != "create_delivery_escalation"
         or terminal_outcome.status != "success"

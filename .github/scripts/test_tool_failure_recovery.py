@@ -2,9 +2,11 @@
 
 from __future__ import annotations
 
+import ast
 import asyncio
 import importlib
 import importlib.util
+import inspect
 import json
 import os
 import pkgutil
@@ -15,6 +17,7 @@ from pathlib import Path
 from typing import Any
 from unittest.mock import AsyncMock, patch
 
+import nbformat
 import pandas as pd
 
 import tool_failure_recovery
@@ -188,10 +191,44 @@ class OfflineRecoveryTests(unittest.IsolatedAsyncioTestCase):
         with patch.object(socket.socket, "connect", side_effect=network_error):
             offline_results = await run_offline_recovery_suite()
             security_results = await run_security_checks()
+            notebook_path = (
+                Path(__file__).resolve().parents[2]
+                / "examples"
+                / "agents_sdk"
+                / "testing_agent_recovery_from_tool_failures.ipynb"
+            )
+            notebook = nbformat.read(notebook_path, as_version=4)
+            namespace: dict[str, Any] = {
+                "__name__": "__main__",
+                "display": lambda value: value,
+            }
+            offline_environment = {
+                "RUN_LIVE_AGENT": "false",
+                "RUN_PROMPTFOO_EVAL": "false",
+                "PROMPTFOO_ALLOW_EXTERNAL_EGRESS": "false",
+                "EXPORT_AGENTS_TRACES": "false",
+            }
+            with patch.dict(os.environ, offline_environment):
+                for cell in notebook.cells:
+                    if cell.cell_type != "code" or cell.id == "install-dependencies":
+                        continue
+                    executable = compile(
+                        cell.source,
+                        f"{notebook_path}:{cell.id}",
+                        "exec",
+                        flags=ast.PyCF_ALLOW_TOP_LEVEL_AWAIT,
+                    )
+                    result = eval(executable, namespace)
+                    if inspect.isawaitable(result):
+                        await result
         self.assertGreaterEqual(len(offline_results), 64)
         self.assertTrue(offline_results["passed"].all())
         self.assertTrue(security_results["check"].is_unique)
         self.assertTrue(security_results["passed"].all())
+        self.assertTrue(namespace["offline_results"]["passed"].all())
+        self.assertTrue(namespace["security_results"]["passed"].all())
+        self.assertFalse(namespace["RUN_LIVE_AGENT"])
+        self.assertFalse(namespace["RUN_PROMPTFOO_EVAL"])
 
     async def test_real_sdk_trajectories_and_fail_closed_release_gate(self) -> None:
         agent = build_support_agent(model=MODEL)
@@ -310,22 +347,31 @@ class PromptfooSecurityTests(unittest.IsolatedAsyncioTestCase):
 
         self.assertNotIn("npx", which_queries)
         self.assertNotIn("pnpm", which_queries)
+        evaluation_children = []
         for command, kwargs in captured:
             environment = kwargs["env"]
             self.assertNotIn("GITHUB_TOKEN", environment)
             self.assertNotIn("AWS_SECRET_ACCESS_KEY", environment)
-            self.assertNotIn("OPENAI_BASE_URL", environment)
-            self.assertNotIn("OPENAI_ORG_ID", environment)
             self.assertNotIn("OPENAI_ORGANIZATION", environment)
             self.assertNotIn("OPENAI_PROJECT", environment)
-            self.assertNotIn("OPENAI_PROJECT_ID", environment)
             self.assertEqual(environment["PROMPTFOO_DISABLE_TELEMETRY"], "true")
             self.assertEqual(environment["PROMPTFOO_DISABLE_UPDATE"], "true")
             if len(command) > 1 and command[1] == "eval":
+                evaluation_children.append(command)
                 self.assertEqual(environment["OPENAI_API_KEY"], DUMMY_API_KEY)
                 self.assertEqual(environment["OPENAI_MODEL"], MODEL)
+                self.assertEqual(
+                    environment["OPENAI_BASE_URL"],
+                    "https://private.example.invalid",
+                )
+                self.assertEqual(environment["OPENAI_ORG_ID"], "private-org-id")
+                self.assertEqual(
+                    environment["OPENAI_PROJECT_ID"],
+                    "private-project-id",
+                )
             else:
                 self.assertFalse(any(name.startswith("OPENAI_") for name in environment))
+        self.assertEqual(len(evaluation_children), 1)
 
     def test_missing_global_binary_never_falls_back_to_package_installers(self) -> None:
         subprocess_commands: list[list[str]] = []
@@ -566,9 +612,16 @@ class PromptfooSecurityTests(unittest.IsolatedAsyncioTestCase):
             **kwargs: Any,
         ) -> subprocess.CompletedProcess[str]:
             if arguments[0] == "eval":
+                self.assertIn("--no-cache", arguments)
+                self.assertIn("--no-write", arguments)
+                self.assertIn("-o", arguments)
                 artifacts = promptfoo.promptfoo_artifacts
                 if artifacts is None:
                     raise AssertionError("Promptfoo artifacts were not prepared.")
+                self.assertEqual(
+                    arguments[arguments.index("-o") + 1],
+                    str(artifacts["results"]),
+                )
                 artifacts["results"].write_text(
                     json.dumps(exported_promptfoo_results(artifacts)),
                     encoding="utf-8",

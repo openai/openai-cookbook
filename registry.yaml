@@ -20,7 +20,7 @@
   path: examples/agents_sdk/testing_agent_recovery_from_tool_failures.ipynb
   slug: testing-agent-recovery-from-tool-failures
   description: Build and evaluate an Agents SDK workflow with account-scoped recovery, approved idempotent writes, and deterministic tool-failure tests.
-  date: 2026-07-29
+  date: 2026-08-20
   authors:
     - saptob
     - aijinggao

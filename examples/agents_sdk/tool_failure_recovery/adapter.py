@@ -3,15 +3,18 @@
 from __future__ import annotations
 
 import asyncio
+import socket
 from dataclasses import dataclass, field
 from datetime import datetime, timezone
 from email.utils import parsedate_to_datetime
 from math import isfinite
 from typing import Any, Awaitable, Callable, TypeVar
+from urllib.error import URLError
 
 from .core import (
     EscalationRecord,
     EscalationRequest,
+    OrderStatus,
     PermanentToolError,
     SyntheticToolError,
     TransientToolError,
@@ -86,18 +89,53 @@ class CallableDeliveryServiceAdapter:
     ) -> SyntheticToolError:
         if isinstance(error, SyntheticToolError):
             return error
-        if isinstance(error, (asyncio.TimeoutError, TimeoutError)):
-            return TransientToolError("timeout", retryable=True)
-        if isinstance(error, ConnectionError):
-            return TransientToolError(
-                "dependency_unavailable", retryable=True
-            )
 
         response = getattr(error, "response", None)
-        status_code = getattr(error, "status_code", None)
-        if status_code is None and response is not None:
-            status_code = getattr(response, "status_code", None)
+        status_code = next(
+            (
+                value
+                for source in (error, response)
+                if source is not None
+                for attribute in ("status_code", "status", "code")
+                if isinstance(
+                    value := getattr(source, attribute, None), int
+                )
+                and not isinstance(value, bool)
+            ),
+            None,
+        )
         if not isinstance(status_code, int):
+            if isinstance(error, (asyncio.TimeoutError, TimeoutError)):
+                return TransientToolError("timeout", retryable=True)
+            if isinstance(error, (ConnectionError, socket.gaierror, URLError)):
+                return TransientToolError(
+                    "timeout"
+                    if isinstance(getattr(error, "reason", None), TimeoutError)
+                    else "dependency_unavailable",
+                    retryable=True,
+                )
+
+            module_name = type(error).__module__.split(".", 1)[0]
+            error_name = type(error).__name__
+            if module_name in {"httpx", "httpcore", "aiohttp"}:
+                if "Timeout" in error_name:
+                    return TransientToolError("timeout", retryable=True)
+                if isinstance(error, OSError) or any(
+                    marker in error_name
+                    for marker in (
+                        "Connect",
+                        "Network",
+                        "Transport",
+                        "Protocol",
+                        "Disconnected",
+                        "ReadError",
+                        "WriteError",
+                        "ProxyError",
+                    )
+                ):
+                    return TransientToolError(
+                        "dependency_unavailable", retryable=True
+                    )
             return PermanentToolError(
                 "dependency_error", retryable=False
             )
@@ -168,14 +206,66 @@ class CallableDeliveryServiceAdapter:
                 committed=False,
             )
 
+    @staticmethod
+    def _validate_record_scope(
+        record: dict[str, Any], account_id: str
+    ) -> None:
+        for scope_field in ("account_id", "tenant_id"):
+            if scope_field in record and record[scope_field] != account_id:
+                raise PermanentToolError(
+                    "forbidden", retryable=False, status_code=403
+                )
+
+    def _normalize_order_record(
+        self,
+        account_id: str,
+        record: dict[str, Any],
+        *,
+        order_id: str | None = None,
+    ) -> dict[str, Any]:
+        if not isinstance(record, dict):
+            return record
+        self._validate_record_scope(record, account_id)
+        if order_id is not None and record.get("order_id") != order_id:
+            raise PermanentToolError(
+                "unexpected_order_identity", retryable=False
+            )
+        return {
+            name: record[name]
+            for name in OrderStatus.model_fields
+            if name in record
+        }
+
+    def _normalize_escalation_record(
+        self, account_id: str, record: dict[str, Any]
+    ) -> EscalationRecord:
+        if isinstance(record, dict):
+            self._validate_record_scope(record, account_id)
+            record = {
+                name: record[name]
+                for name in EscalationRecord.model_fields
+                if name in record
+            }
+        return EscalationRecord.model_validate(record)
+
     async def authorize_order(
         self, account_id: str, order_id: str
     ) -> None:
         self.authorize_account(account_id)
-        order_is_authorized = await self._call_dependency(
-            lambda: self.authorize_order_fn(account_id, order_id),
-            definitively_not_committed=True,
-        )
+        try:
+            order_is_authorized = await self._call_dependency(
+                lambda: self.authorize_order_fn(account_id, order_id),
+                definitively_not_committed=True,
+            )
+        except PermanentToolError as error:
+            if error.code != "forbidden" or error.status_code != 403:
+                raise
+            raise PermanentToolError(
+                "order_not_found",
+                retryable=False,
+                status_code=404,
+                committed=False,
+            ) from error
         if order_is_authorized is not True:
             raise PermanentToolError(
                 "order_not_found",
@@ -188,17 +278,26 @@ class CallableDeliveryServiceAdapter:
         self, account_id: str, order_id: str
     ) -> dict[str, Any]:
         await self.authorize_order(account_id, order_id)
-        return await self._call_dependency(
+        raw_record = await self._call_dependency(
             lambda: self.read_order_fn(account_id, order_id)
+        )
+        return self._normalize_order_record(
+            account_id, raw_record, order_id=order_id
         )
 
     async def find_orders(
         self, account_id: str, filters: dict[str, str]
     ) -> list[dict[str, Any]]:
         self.authorize_account(account_id)
-        return await self._call_dependency(
+        raw_records = await self._call_dependency(
             lambda: self.search_orders_fn(account_id, dict(filters))
         )
+        if not isinstance(raw_records, list):
+            return raw_records
+        return [
+            self._normalize_order_record(account_id, record)
+            for record in raw_records
+        ]
 
     async def create_escalation(
         self, account_id: str, request: EscalationRequest
@@ -214,7 +313,9 @@ class CallableDeliveryServiceAdapter:
         raw_record = await self._call_dependency(
             lambda: self.create_escalation_fn(account_id, request)
         )
-        record = EscalationRecord.model_validate(raw_record)
+        record = self._normalize_escalation_record(
+            account_id, raw_record
+        )
         self.remember_escalation(record, request)
         return record.model_dump(mode="json")
 
@@ -229,7 +330,9 @@ class CallableDeliveryServiceAdapter:
         )
         if raw_record is None:
             return None
-        record = EscalationRecord.model_validate(raw_record)
+        record = self._normalize_escalation_record(
+            account_id, raw_record
+        )
         if (
             record.account_id != account_id
             or record.idempotency_key != idempotency_key

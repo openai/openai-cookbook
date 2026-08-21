@@ -4,6 +4,22 @@
 # should build pages for, and indicates metadata such as tags, creation date and
 # authors for each page.
 
+- title: Generate Transparent Image Assets for Campaigns and Presentations
+  path: examples/multimodal/transparent-image-assets-for-campaigns-and-presentations.ipynb
+  slug: transparent-image-assets-for-campaigns-and-presentations
+  description: Generate reusable transparent PNG assets for seasonal ecommerce campaigns and branded PowerPoint presentations.
+  date: 2026-08-20
+  authors:
+    - the-OAI
+  tags:
+    - image-generation
+    - images
+    - multimodal
+    - transparency
+    - ecommerce
+    - presentations
+    - codex
+
 - title: Iterating Development Workflows with Codex
   path: examples/codex/iterating-development-workflows-with-codex.md
   slug: iterating-development-workflows-with-codex
@@ -3585,6 +3601,7 @@
   authors:
     - msingh-openai
     - emreokcular
+    - the-OAI
   tags:
     - images
     - vision

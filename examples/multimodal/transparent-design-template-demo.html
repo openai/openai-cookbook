@@ -1,0 +1,221 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>Transparent Assets in a Design Template</title>
+    <style>
+      :root {
+        color-scheme: light;
+        font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+        color: #20213a;
+        background: #fbfaf8;
+        font-synthesis: none;
+        text-rendering: optimizeLegibility;
+        -webkit-font-smoothing: antialiased;
+      }
+
+      * { box-sizing: border-box; }
+      body { margin: 0; }
+
+      main {
+        width: min(1100px, calc(100% - 80px));
+        margin: 0 auto;
+        padding: 38px 0 54px;
+      }
+
+      header, .section-heading, .template-caption, .themes {
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+      }
+
+      header {
+        padding-bottom: 29px;
+        border-bottom: 1px solid #eae7e3;
+      }
+
+      .brand { font-size: 19px; font-weight: 750; letter-spacing: -0.7px; }
+      .brand span { color: #8672d4; }
+
+      .eyebrow, .template-caption, .asset-label, .theme-button {
+        font-size: 12px;
+        font-weight: 600;
+        letter-spacing: 0.02em;
+      }
+
+      .eyebrow { color: #767489; }
+      h1 { margin: 43px 0 7px; font-size: 39px; letter-spacing: -1.7px; }
+      .intro { margin: 0 0 31px; color: #6d6b77; font-size: 16px; }
+      .section-heading { margin: 0 0 14px; }
+      h2 { margin: 0; font-size: 14px; letter-spacing: -0.1px; }
+      .section-note { color: #878490; font-size: 12px; }
+
+      .assets {
+        display: grid;
+        grid-template-columns: repeat(3, 1fr);
+        gap: 18px;
+        margin-bottom: 29px;
+      }
+
+      .asset-card {
+        position: relative;
+        height: 174px;
+        overflow: hidden;
+        border-radius: 16px;
+      }
+
+      .asset-card.icon { background: #ece9fb; }
+      .asset-card.sticker { background: #f8ebe6; }
+      .asset-card.decoration { background: #e8f0e9; }
+
+      .asset-card img {
+        position: absolute;
+        inset: 8px 0 27px;
+        width: 100%;
+        height: calc(100% - 35px);
+        object-fit: contain;
+      }
+
+      .asset-label {
+        position: absolute;
+        left: 16px;
+        bottom: 12px;
+        color: #514f64;
+      }
+
+      .template {
+        position: relative;
+        height: 376px;
+        overflow: hidden;
+        border-radius: 22px;
+        background: linear-gradient(125deg, #f3c4a9 3%, #f8dacd 48%, #ead4df 100%);
+        transition: background 180ms ease;
+      }
+
+      .template[data-theme="mint"] {
+        background: linear-gradient(125deg, #b4d8c6 3%, #cce5d9 48%, #d8e4dc 100%);
+      }
+
+      .template[data-theme="lavender"] {
+        background: linear-gradient(125deg, #beb8e9 3%, #d2cdf1 48%, #e2d6e8 100%);
+      }
+
+      .template-copy { position: absolute; left: 8.7%; top: 25%; z-index: 1; }
+
+      .template-copy .eyebrow { color: #545169; }
+
+      .template-copy h3 {
+        margin: 17px 0 11px;
+        max-width: 470px;
+        color: #272641;
+        font-size: 53px;
+        line-height: 1.02;
+        letter-spacing: -2.5px;
+      }
+
+      .template-copy p { color: #57546a; font-size: 15px; }
+
+      .template-art { position: absolute; object-fit: contain; }
+      .template-art.icon { width: 195px; right: 7%; top: 4%; }
+      .template-art.sticker { width: 202px; right: 15%; bottom: -13%; transform: rotate(-12deg); }
+      .template-art.decoration { width: 277px; right: -7%; bottom: -11%; transform: rotate(-7deg); }
+
+      .template-caption { margin-top: 16px; color: #716e7d; }
+      .themes { gap: 8px; }
+
+      .theme-button {
+        width: 22px;
+        height: 22px;
+        padding: 0;
+        border: 1px solid #ffffff;
+        border-radius: 100%;
+        box-shadow: 0 0 0 1px #dedbdf;
+        cursor: pointer;
+      }
+
+      .theme-button[data-theme="peach"] { background: #edbca8; }
+      .theme-button[data-theme="mint"] { background: #afd2bd; }
+      .theme-button[data-theme="lavender"] { background: #bbb4e4; }
+
+      @media (max-width: 680px) {
+        main { width: calc(100% - 36px); padding-top: 24px; }
+        h1 { margin-top: 31px; font-size: 30px; }
+        .assets { gap: 9px; }
+        .asset-card { height: 138px; }
+        .asset-label { left: 9px; font-size: 10px; }
+        .template { height: 445px; }
+        .template-copy { left: 8%; top: 10%; }
+        .template-copy h3 { max-width: 340px; font-size: 45px; }
+        .template-art.icon { top: 45%; right: 9%; width: 150px; }
+        .template-art.sticker { right: 20%; bottom: -6%; width: 170px; }
+        .template-art.decoration { right: -12%; bottom: -6%; width: 225px; }
+      }
+    </style>
+  </head>
+  <body>
+    <main>
+      <header>
+        <div class="brand">design<span>studio</span></div>
+        <div class="eyebrow">Transparent assets · Sample project</div>
+      </header>
+
+      <h1>Everything belongs on the canvas.</h1>
+      <p class="intro">Generate once. Drop onto any template, theme, or background.</p>
+
+      <div class="section-heading">
+        <h2>Your generated assets</h2>
+        <span class="section-note">Three reusable transparent PNGs</span>
+      </div>
+
+      <section class="assets" aria-label="Generated transparent design assets">
+        <div class="asset-card icon">
+          <img src="images/transparent-image-assets/design-app-icon.png" alt="Abstract folded-bird app icon" />
+          <span class="asset-label">App icon</span>
+        </div>
+        <div class="asset-card sticker">
+          <img src="images/transparent-image-assets/design-sticker.png" alt="Die-cut strawberry sticker" />
+          <span class="asset-label">Transparent sticker</span>
+        </div>
+        <div class="asset-card decoration">
+          <img src="images/transparent-image-assets/design-decoration.png" alt="Delicate illustrated botanical sprig" />
+          <span class="asset-label">Decorative element</span>
+        </div>
+      </section>
+
+      <div class="section-heading">
+        <h2>Drop them into a design</h2>
+        <span class="section-note">No background removal required</span>
+      </div>
+
+      <section class="template" data-theme="peach" aria-label="Design template preview">
+        <div class="template-copy">
+          <div class="eyebrow">A FRESH LITTLE START</div>
+          <h3>Make space for your next idea.</h3>
+          <p>Build something that feels like you.</p>
+        </div>
+        <img class="template-art icon" src="images/transparent-image-assets/design-app-icon.png" alt="" />
+        <img class="template-art sticker" src="images/transparent-image-assets/design-sticker.png" alt="" />
+        <img class="template-art decoration" src="images/transparent-image-assets/design-decoration.png" alt="" />
+      </section>
+
+      <div class="template-caption">
+        <span>Same PNG assets, any background.</span>
+        <div class="themes" aria-label="Choose a template color">
+          <button class="theme-button" data-theme="peach" aria-label="Peach background"></button>
+          <button class="theme-button" data-theme="mint" aria-label="Mint background"></button>
+          <button class="theme-button" data-theme="lavender" aria-label="Lavender background"></button>
+        </div>
+      </div>
+    </main>
+
+    <script>
+      const template = document.querySelector(".template");
+      for (const button of document.querySelectorAll(".theme-button")) {
+        button.addEventListener("click", () => {
+          template.dataset.theme = button.dataset.theme;
+        });
+      }
+    </script>
+  </body>
+</html>

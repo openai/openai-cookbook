@@ -290,9 +290,15 @@ def insert_entity(conn: sqlite3.Connection, entity: dict[str, Any]) -> None:
     c = conn.cursor()
     c.execute(
         """
-              INSERT OR IGNORE INTO entities (id, name, type, description)
-              VALUES (?, ?, ?, ?)""",
-        (entity["id"], entity["name"], entity.get("type"), entity.get("description")),
+              INSERT OR IGNORE INTO entities (id, name, type, description, resolved_id)
+              VALUES (?, ?, ?, ?, ?)""",
+        (
+            entity["id"],
+            entity["name"],
+            entity.get("type"),
+            entity.get("description"),
+            entity.get("resolved_id"),
+        ),
     )
 
 
@@ -302,7 +308,10 @@ def get_all_canonical_entities(conn: sqlite3.Connection) -> list[Entity]:
     Returns a list of dicts with id, name, type, and description.
     """
     c = conn.cursor()
-    c.execute("SELECT id, name, type, description FROM entities WHERE resolved_id IS NULL")
+    c.execute(
+        "SELECT id, name, type, description FROM entities "
+        "WHERE resolved_id IS NULL OR resolved_id = id"
+    )
     rows = c.fetchall()
     return [
         Entity(

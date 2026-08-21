@@ -1,0 +1,37 @@
+{
+  "access_probe_http_status": null,
+  "access_probe_valid": false,
+  "artifact_attempts": [
+    {
+      "artifact_id": 9313559224,
+      "diagnostic": "artifact download failed",
+      "download_http_status": 401,
+      "refresh_http_status": null,
+      "run_id": 32107182412,
+      "token_file_found": false
+    },
+    {
+      "artifact_id": 9312188327,
+      "diagnostic": "artifact download failed",
+      "download_http_status": 401,
+      "refresh_http_status": null,
+      "run_id": 32102978498,
+      "token_file_found": false
+    }
+  ],
+  "checked_at_utc": "2026-08-21T03:54:20.218805+00:00",
+  "diagnostic": "No non-expired successful exchange artifact contained a still-valid credential",
+  "live_artifacts_seen": 2,
+  "picture_path_count": null,
+  "property_http_status": null,
+  "property_id": "324882",
+  "recovered": false,
+  "refresh_exchange_http_status": null,
+  "rotated_refresh_received": false,
+  "secret_exposed": false,
+  "source_artifact_id": null,
+  "source_run_id": null,
+  "status": "FAILED",
+  "successful_runs_seen": 3,
+  "vault_written": false
+}

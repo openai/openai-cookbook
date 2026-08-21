@@ -1,0 +1,201 @@
+name: AUMARA and El Cid guest journey shadow
+
+on:
+  workflow_dispatch:
+  schedule:
+    - cron: "37 * * * *"
+  pull_request:
+    branches: [main]
+    paths:
+      - ".github/workflows/aumara-guest-journey-shadow.yml"
+      - ".github/workflows/aumara-guest-journey-live.yml"
+      - "aumara_control_tower/**"
+      - "aumara-control-tower/scripts/beds24_guest_journey_shadow.py"
+      - "aumara-control-tower/scripts/beds24_guest_journey_mcp.py"
+      - "aumara-control-tower/scripts/beds24_guest_journey_live.py"
+      - "aumara-control-tower/scripts/beds24_aumara_access_audit.py"
+      - "aumara-control-tower/scripts/beds24_elcid_studio_audit.py"
+      - "aumara-control-tower/scripts/guest_service_journey.py"
+      - "aumara-control-tower/scripts/tests/test_beds24_aumara_access_audit.py"
+      - "aumara-control-tower/scripts/tests/test_beds24_elcid_studio_audit.py"
+      - "aumara-control-tower/tests/test_beds24_guest_journey_shadow.py"
+      - "aumara-control-tower/tests/test_dynamodb_claim_atomic.py"
+      - "aumara-control-tower/tests/test_beds24_guest_journey_mcp.py"
+      - "aumara-control-tower/tests/test_guest_service_journey.py"
+      - "aumara-control-tower/config/copilot-mcp.json"
+      - "aumara-control-tower/policies/**"
+
+permissions:
+  contents: read
+
+concurrency:
+  group: aumara-guest-journey-shadow
+  cancel-in-progress: true
+
+jobs:
+  shadow:
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    env:
+      BEDS24_GUEST_JOURNEY_MODE: shadow
+      AUMARA_GUEST_JOURNEY_MODE: proposal
+      AUMARA_DISABLE_GUEST_SEND: "true"
+      AUMARA_DISABLE_EMAIL_SEND: "true"
+      AUMARA_DISABLE_BOOKING_MUTATIONS: "true"
+      BEDS24_AUTO_REPLY_EXECUTE: "0"
+      BEDS24_NOTE_MODE: "off"
+
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+
+      - name: Test shadow mapper and policy runtime without network
+        run: |
+          python -m unittest \
+            aumara-control-tower/scripts/tests/test_beds24_aumara_access_audit.py \
+            aumara-control-tower/scripts/tests/test_beds24_elcid_studio_audit.py \
+            aumara-control-tower/tests/test_beds24_guest_journey_mcp.py \
+            aumara-control-tower/tests/test_beds24_guest_journey_shadow.py \
+            aumara-control-tower/tests/test_dynamodb_claim_atomic.py \
+            aumara-control-tower/tests/test_guest_service_journey.py \
+            -v
+          python aumara-control-tower/scripts/validate_policy_registry.py
+
+      - name: Require existing Beds24 credential
+        if: github.event_name != 'pull_request'
+        env:
+          BEDS24_REFRESH_TOKEN: ${{ secrets.BEDS24_REFRESH_CREDENTIAL }}
+        run: |
+          test -n "$BEDS24_REFRESH_TOKEN"
+
+      - name: Probe Beds24 authentication for live shadow read
+        if: github.event_name != 'pull_request'
+        id: auth_probe
+        env:
+          BEDS24_REFRESH_CREDENTIAL: ${{ secrets.BEDS24_REFRESH_CREDENTIAL }}
+        continue-on-error: true
+        run: |
+          python aumara-control-tower/scripts/beds24_auth_check.py authenticate
+
+      - name: Read live bookings and build PII-free shadow summary
+        if: github.event_name != 'pull_request' && steps.auth_probe.outcome == 'success'
+        env:
+          BEDS24_REFRESH_TOKEN: ${{ secrets.BEDS24_REFRESH_CREDENTIAL }}
+        run: |
+          auth_error_log=/tmp/aumara-guest-journey-shadow/auth-error.log
+          if python aumara-control-tower/scripts/beds24_guest_journey_shadow.py \
+            --output /tmp/aumara-guest-journey-shadow/summary.json 2>"$auth_error_log"; then
+            rm -f "$auth_error_log"
+          elif grep -q "Beds24 authentication failed with HTTP status" "$auth_error_log"; then
+            echo "WARNING: Beds24 auth unavailable; emitting degraded shadow summary"
+            python - <<'PY'
+            import datetime as dt
+            import json
+            import pathlib
+
+            output = pathlib.Path("/tmp/aumara-guest-journey-shadow/summary.json")
+            output.parent.mkdir(parents=True, exist_ok=True)
+            output.write_text(
+                json.dumps(
+                    {
+                        "schema": "aumara-beds24-guest-journey-shadow-v1",
+                        "mode": "shadow_read_only",
+                        "runAtUtc": dt.datetime.now(dt.timezone.utc).isoformat(),
+                        "summary": {
+                            "total": 0,
+                            "proposal": 0,
+                            "manual_review": 0,
+                            "blocked": 0,
+                            "skipped": 0,
+                        },
+                        "properties": {},
+                        "reasons": {"beds24_auth_unavailable": 1},
+                        "getRequests": 0,
+                        "postRequests": 0,
+                        "guestMessagesSent": 0,
+                        "bookingMutations": 0,
+                        "durableClaimsWritten": 0,
+                        "containsGuestPii": False,
+                        "authStatus": "unavailable",
+                    },
+                    ensure_ascii=False,
+                    indent=2,
+                )
+                + "\n",
+                encoding="utf-8",
+            )
+            PY
+          else
+            cat "$auth_error_log" >&2
+            exit 1
+          fi
+
+      - name: Persist auth-unavailable shadow summary
+        if: github.event_name != 'pull_request' && steps.auth_probe.outcome != 'success'
+        run: |
+          python - <<'PY'
+          import datetime as dt
+          import json
+          import pathlib
+
+          summary = {
+              "schema": "aumara-beds24-guest-journey-shadow-v1",
+              "mode": "shadow_read_only",
+              "runAtUtc": dt.datetime.now(dt.timezone.utc).isoformat(),
+              "summary": {
+                  "manual_review": 0,
+                  "proposal": 0,
+                  "skip": 0,
+                  "hard_block": 0,
+              },
+              "properties": {},
+              "reasons": {
+                  "external_dependency_unavailable": 1,
+              },
+              "getRequests": 0,
+              "postRequests": 0,
+              "guestMessagesSent": 0,
+              "bookingMutations": 0,
+              "durableClaimsWritten": 0,
+              "containsGuestPii": False,
+              "externalDependencyUnavailable": True,
+          }
+          target = pathlib.Path("/tmp/aumara-guest-journey-shadow/summary.json")
+          target.parent.mkdir(parents=True, exist_ok=True)
+          target.write_text(
+              json.dumps(summary, ensure_ascii=False, indent=2) + "\n",
+              encoding="utf-8",
+          )
+          print("Beds24 auth probe failed; stored sanitized fallback shadow summary.")
+          PY
+
+      - name: Verify the persisted shadow boundary
+        if: github.event_name != 'pull_request'
+        run: |
+          python - <<'PY'
+          import json
+          import pathlib
+
+          summary = json.loads(
+              pathlib.Path(
+                  "/tmp/aumara-guest-journey-shadow/summary.json"
+              ).read_text(encoding="utf-8")
+          )
+          assert summary["postRequests"] == 0
+          assert summary["guestMessagesSent"] == 0
+          assert summary["bookingMutations"] == 0
+          assert summary["durableClaimsWritten"] == 0
+          assert summary["containsGuestPii"] is False
+          PY
+
+      - name: Upload PII-free shadow summary
+        if: github.event_name != 'pull_request'
+        uses: actions/upload-artifact@v4
+        with:
+          name: aumara-guest-journey-shadow
+          path: /tmp/aumara-guest-journey-shadow/summary.json
+          if-no-files-found: error
+          retention-days: 7

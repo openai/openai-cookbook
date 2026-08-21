@@ -1,0 +1,59 @@
+name: Beds24 AUMARA legacy bridge safety check
+
+on:
+  workflow_dispatch:
+  pull_request:
+    branches: [main]
+    paths:
+      - ".github/workflows/beds24-aumara-booking-v2.yml"
+      - "aumara-control-tower/scripts/beds24_finalize_paid_booking.py"
+
+permissions:
+  contents: read
+
+concurrency:
+  group: beds24-aumara-legacy-safety-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  dry-run:
+    runs-on: ubuntu-latest
+    env:
+      AUMARA_DRY_RUN: "true"
+      AUMARA_DISABLE_EMAIL_SEND: "true"
+      AUMARA_DISABLE_BOOKING_MUTATIONS: "true"
+
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Run hard-disabled legacy bridge
+        run: |
+          python aumara-control-tower/scripts/beds24_finalize_paid_booking.py \
+            --output /tmp/aumara-legacy-evidence/beds24-finalize-status.json
+
+      - name: Verify zero-action evidence
+        run: |
+          python - <<'PY'
+          import json
+          import pathlib
+
+          path = pathlib.Path(
+              "/tmp/aumara-legacy-evidence/beds24-finalize-status.json"
+          )
+          evidence = json.loads(path.read_text(encoding="utf-8"))
+          assert evidence["status"] == "DISABLED_REDUNDANT_V2_BRIDGE"
+          assert evidence["dry_run"] is True
+          assert evidence["email_send_disabled"] is True
+          assert evidence["booking_mutations_disabled"] is True
+          assert evidence["external_network_calls"] == 0
+          assert evidence["live_booking_mutations"] is False
+          PY
+
+      - name: Upload safety evidence
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: beds24-aumara-legacy-safety-evidence
+          path: /tmp/aumara-legacy-evidence/beds24-finalize-status.json
+          if-no-files-found: error
+          retention-days: 7

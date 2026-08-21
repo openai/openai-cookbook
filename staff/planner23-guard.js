@@ -1,0 +1,10 @@
+(()=>{
+  if(window.__aumaraNativeMutationObserver)return;
+  window.__aumaraNativeMutationObserver=window.MutationObserver;
+  window.MutationObserver=class{
+    constructor(callback){this.callback=callback}
+    observe(){}
+    disconnect(){}
+    takeRecords(){return[]}
+  };
+})();

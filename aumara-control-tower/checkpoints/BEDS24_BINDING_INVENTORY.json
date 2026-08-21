@@ -1,0 +1,17 @@
+{
+  "schema": "aumara.beds24-binding-inventory",
+  "checked_at_utc": "2026-08-21T22:39:58Z",
+  "interesting_secret_names": [
+    "AWS_ACCESS_KEY_ID",
+    "AWS_SECRET_ACCESS_KEY",
+    "BEDS24_PASSWORD",
+    "BEDS24_REFRESH_CREDENTIAL",
+    "BEDS24_USERNAME",
+    "github_token"
+  ],
+  "interesting_variable_names": [],
+  "secret_name_count": 9,
+  "variable_name_count": 1,
+  "secret_values_exposed": false,
+  "variable_values_exposed": false
+}

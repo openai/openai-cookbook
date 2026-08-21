@@ -1,0 +1,3 @@
+AUMARA interactive map v1 production checkpoint
+Explore page: /aumara/explore.html
+Legacy Nominalia workflow removed

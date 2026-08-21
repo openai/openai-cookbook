@@ -1,0 +1,50 @@
+name: AUMARA rotation-safe Beds24 photo sync from vault
+
+on:
+  workflow_dispatch:
+  issues:
+    types: [opened]
+
+permissions:
+  contents: write
+  issues: write
+
+jobs:
+  sync:
+    if: >-
+      github.event_name == 'workflow_dispatch' ||
+      (github.event.issue.title == 'AUMARA control: sync Beds24 photos from vault' &&
+       github.event.issue.user.login == 'elcidspain')
+    runs-on: ubuntu-latest
+    timeout-minutes: 30
+    environment: Production
+    env:
+      BEDS24_VAULT_KEK: ${{ secrets.BEDS24_REFRESH_CREDENTIAL }}
+      PROPERTY_ID: '324882'
+      ISSUE_NUMBER: ${{ github.event.issue.number || '' }}
+      GH_TOKEN: ${{ github.token }}
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+
+      - name: Install vault dependency
+        run: python -m pip install --disable-pip-version-check cryptography
+
+      - name: Run canonical photo transfer with rotation-safe vault credential
+        id: transfer
+        continue-on-error: true
+        run: python aumara-control-tower/scripts/beds24_photo_vault_sync.py
+
+      - name: Upload sanitized transfer evidence
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: beds24-photo-vault-sync-${{ github.run_id }}
+          path: ${{ runner.temp }}/beds24-324882/evidence.json
+          if-no-files-found: warn
+          retention-days: 3
+
+      - name: Enforce transfer result
+        if: steps.transfer.outcome != 'success'
+        run: exit 1

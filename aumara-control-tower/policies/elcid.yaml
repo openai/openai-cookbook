@@ -1,0 +1,218 @@
+{
+  "schema_version": "1.0",
+  "policy_version": "2026.07.27.1",
+  "property": "elcid",
+  "policies": [
+    {
+      "policy_id": "elcid.property-configuration-placeholder",
+      "property": "elcid",
+      "category": "property_configuration",
+      "rule": "Resolve EL CID property facts and operational policy values from the approved source before use.",
+      "source": "verified_beds24_configuration",
+      "source_reference": "BEDS24:ELCID:PROPERTY_CONFIGURATION:PENDING",
+      "verified_at": null,
+      "status": "pending",
+      "allowed_auto_reply": false,
+      "allowed_beds24_action": [],
+      "escalation_conditions": [
+        "source_not_verified",
+        "value_conflict"
+      ],
+      "response_template_ids": [],
+      "policy_version": "2026.07.27.1"
+    },
+    {
+      "policy_id": "elcid.guest-template-placeholder",
+      "property": "elcid",
+      "category": "guest_templates",
+      "rule": "Use only EL CID-approved guest templates after their source reference is verified.",
+      "source": "approved_internal_document",
+      "source_reference": "INTERNAL_DOC:ELCID:GUEST_TEMPLATES:PENDING",
+      "verified_at": null,
+      "status": "pending",
+      "allowed_auto_reply": false,
+      "allowed_beds24_action": [],
+      "escalation_conditions": [
+        "template_not_verified",
+        "cross_property_template"
+      ],
+      "response_template_ids": [],
+      "policy_version": "2026.07.27.1"
+    },
+    {
+      "policy_id": "elcid.baby-cot-infoitem",
+      "property": "elcid",
+      "category": "beds24_guest_note",
+      "rule": "Record one baby-cot preparation request only when the booked Twin category, one infant, age, active booking state and adult capacity are all proven; change only the Beds24 guest-request info item and verify the exact note by read-back.",
+      "source": "approved_internal_document",
+      "source_reference": "REQUEST:ELCID_BABY_COT:2026-07-30",
+      "verified_at": "2026-07-30",
+      "status": "verified",
+      "allowed_auto_reply": false,
+      "allowed_beds24_action": [
+        "record_guest_request"
+      ],
+      "escalation_conditions": [
+        "cot_not_explicitly_requested",
+        "infant_age_not_proved",
+        "room_or_occupancy_not_proved",
+        "multiple_safe_candidates",
+        "read_back_failed"
+      ],
+      "response_template_ids": [],
+      "policy_version": "2026.07.27.1"
+    },
+    {
+      "policy_id": "elcid.bed-request-reply-fragment",
+      "property": "elcid",
+      "category": "guest_reply_fragment",
+      "rule": "A large-double-bed request is a recorded preference. Confirm that it has been noted without promising a room-category change and without adding subject-to-availability wording.",
+      "source": "approved_internal_document",
+      "source_reference": "REQUEST:ELCID_BED_REPLY:2026-08-02",
+      "verified_at": "2026-08-02",
+      "status": "verified",
+      "allowed_auto_reply": true,
+      "allowed_beds24_action": [],
+      "escalation_conditions": [
+        "room_category_change_required",
+        "booking_data_conflict"
+      ],
+      "response_template_ids": [
+        "elcid.bed-request-reply-fragment"
+      ],
+      "response_templates": {
+        "en": "We have noted your request for one large double bed.",
+        "es": "Hemos registrado su solicitud de una cama doble grande.",
+        "et": "Oleme märkinud teie soovi ühe suure kaheinimesevoodi kohta."
+      },
+      "policy_version": "2026.07.27.1"
+    },
+    {
+      "policy_id": "elcid.parking-request-reply-fragment",
+      "property": "elcid",
+      "category": "guest_reply_fragment",
+      "rule": "A parking request may be recorded automatically. Do not promise a particular space, price or other unverified condition.",
+      "source": "approved_internal_document",
+      "source_reference": "REQUEST:ELCID_PARKING_REPLY:2026-08-02",
+      "verified_at": "2026-08-02",
+      "status": "verified",
+      "allowed_auto_reply": true,
+      "allowed_beds24_action": [],
+      "escalation_conditions": [
+        "specific_parking_commitment_required",
+        "parking_terms_conflict"
+      ],
+      "response_template_ids": [
+        "elcid.parking-request-reply-fragment"
+      ],
+      "response_templates": {
+        "en": "We have noted your parking request.",
+        "es": "Hemos registrado su solicitud de aparcamiento.",
+        "et": "Oleme märkinud teie parkimissoovi."
+      },
+      "policy_version": "2026.07.27.1"
+    },
+    {
+      "policy_id": "elcid.non-smoking-room-reply-fragment",
+      "property": "elcid",
+      "category": "property_fact",
+      "rule": "All EL CID guest rooms are non-smoking. State this as a confirmed property fact, never as a preference and never subject to availability.",
+      "source": "approved_internal_document",
+      "source_reference": "REQUEST:ELCID_NON_SMOKING_ROOMS:2026-08-02",
+      "verified_at": "2026-08-02",
+      "status": "verified",
+      "allowed_auto_reply": true,
+      "allowed_beds24_action": [],
+      "escalation_conditions": [
+        "property_configuration_conflict"
+      ],
+      "response_template_ids": [
+        "elcid.non-smoking-room-reply-fragment"
+      ],
+      "response_templates": {
+        "en": "All rooms at El Cid Country Club are non-smoking.",
+        "es": "Todas las habitaciones de El Cid Country Club son para no fumadores.",
+        "et": "Kõik El Cid Country Clubi toad on mittesuitsetajatele."
+      },
+      "policy_version": "2026.07.27.1"
+    },
+    {
+      "policy_id": "elcid.send-failure-content-stability",
+      "property": "elcid",
+      "category": "delivery_failure",
+      "rule": "A workspace, Gmail or connector send failure changes only delivery state. It must not rewrite the approved reply, add generic caveats or revert to an older draft.",
+      "source": "approved_internal_document",
+      "source_reference": "REQUEST:ELCID_SEND_FAILURE_CONTENT:2026-08-02",
+      "verified_at": "2026-08-02",
+      "status": "verified",
+      "allowed_auto_reply": false,
+      "allowed_beds24_action": [],
+      "escalation_conditions": [
+        "send_not_confirmed",
+        "workspace_limit",
+        "connector_failure"
+      ],
+      "response_template_ids": [],
+      "policy_version": "2026.07.27.1"
+    },
+    {
+      "policy_id": "elcid.post-checkin-care",
+      "property": "elcid",
+      "category": "guest_journey",
+      "rule": "Prepare one short care check between sixty and one hundred eighty minutes after verified check-in. Ask only about current comfort and do not request a rating or promise an unverified response time.",
+      "source": "approved_internal_document",
+      "source_reference": "REQUEST:CUSTOMER_SERVICE_COORDINATES:2026-08-17",
+      "verified_at": "2026-08-17",
+      "status": "verified",
+      "allowed_auto_reply": false,
+      "allowed_beds24_action": [],
+      "escalation_conditions": [
+        "booking_not_in_house",
+        "outside_send_window",
+        "negative_guest_signal",
+        "open_issue"
+      ],
+      "response_template_ids": [
+        "elcid.post-checkin-care"
+      ],
+      "response_templates": {
+        "en": "Hi {guest_first_name}, is everything going well since you arrived at El Cid Country Club? Is your room comfortable, and are the Wi-Fi and air conditioning working as expected? Message us here if anything needs attention.",
+        "es": "Hola {guest_first_name}, ¿va todo bien desde vuestra llegada a El Cid Country Club? ¿La habitación es cómoda? ¿Funcionan bien el Wi-Fi y el aire acondicionado? Si necesitáis algo, escribidnos por aquí.",
+        "fr": "Bonjour {guest_first_name}, tout se passe bien depuis votre arrivée à El Cid Country Club ? Votre chambre est-elle confortable ? Le Wi-Fi et la climatisation fonctionnent-ils correctement ? Écrivez-nous ici si quelque chose nécessite notre attention.",
+        "de": "Hallo {guest_first_name}, ist seit Ihrer Ankunft im El Cid Country Club alles in Ordnung? Ist Ihr Zimmer angenehm, und funktionieren WLAN und Klimaanlage einwandfrei? Schreiben Sie uns hier, wenn wir uns um etwas kümmern sollen.",
+        "nl": "Hallo {guest_first_name}, gaat alles goed sinds jullie aankomst bij El Cid Country Club? Is de kamer comfortabel en werken wifi en airconditioning naar behoren? Laat het ons hier weten als we ergens naar moeten kijken."
+      },
+      "policy_version": "2026.07.27.1"
+    },
+    {
+      "policy_id": "elcid.first-morning-care",
+      "property": "elcid",
+      "category": "guest_journey",
+      "rule": "Prepare one first-morning comfort check only for stays of at least two nights, between zero eight thirty and eleven thirty local time, and never on departure day.",
+      "source": "approved_internal_document",
+      "source_reference": "REQUEST:CUSTOMER_SERVICE_COORDINATES:2026-08-17",
+      "verified_at": "2026-08-17",
+      "status": "verified",
+      "allowed_auto_reply": false,
+      "allowed_beds24_action": [],
+      "escalation_conditions": [
+        "stay_too_short",
+        "departure_day",
+        "outside_send_window",
+        "negative_guest_signal",
+        "open_issue"
+      ],
+      "response_template_ids": [
+        "elcid.first-morning-care"
+      ],
+      "response_templates": {
+        "en": "Good morning {guest_first_name}. Did you sleep well? If anything could make your room or stay more comfortable, tell us here. We can also recommend a beach or restaurant for today.",
+        "es": "Buenos días {guest_first_name}. ¿Habéis descansado bien? Si podemos hacer algo para que vuestra habitación o estancia sea más cómoda, decídnoslo por aquí. También podemos recomendaros una playa o un restaurante para hoy.",
+        "fr": "Bonjour {guest_first_name}. Avez-vous bien dormi ? Si quelque chose peut rendre votre chambre ou votre séjour plus confortable, dites-le-nous ici. Nous pouvons aussi vous recommander une plage ou un restaurant pour aujourd’hui.",
+        "de": "Guten Morgen {guest_first_name}. Haben Sie gut geschlafen? Wenn wir etwas tun können, um Ihr Zimmer oder Ihren Aufenthalt angenehmer zu machen, schreiben Sie uns hier. Gern empfehlen wir Ihnen auch einen Strand oder ein Restaurant für heute.",
+        "nl": "Goedemorgen {guest_first_name}. Hebben jullie goed geslapen? Laat het ons hier weten als we iets kunnen doen om jullie kamer of verblijf comfortabeler te maken. We kunnen ook een strand of restaurant voor vandaag aanraden."
+      },
+      "policy_version": "2026.07.27.1"
+    }
+  ]
+}

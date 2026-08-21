@@ -1,0 +1,15 @@
+name: Beds24 AUMARA booking bridge (retired)
+
+on:
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  retired:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Retired execution path
+        run: |
+          echo 'This legacy Beds24 bridge is retired. Canonical execution: .github/workflows/beds24-aumara-booking-v2.yml'

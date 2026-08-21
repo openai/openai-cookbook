@@ -147,3 +147,4 @@ examples/coding-agent-workspace
 # VS Code files
 .vscode/
 .cursorignore
+aumara-control-tower/evidence/vouchers/

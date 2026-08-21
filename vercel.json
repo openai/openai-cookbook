@@ -1,12 +1,26 @@
 {
-  "rewrites": [
+  "$schema": "https://openapi.vercel.sh/vercel.json",
+  "trailingSlash": true,
+  "routes": [
     {
-      "source": "/aumara",
-      "destination": "/aumara-site/direct-v2.html"
+      "src": "^/$",
+      "dest": "/elcid-site/index.html"
     },
     {
-      "source": "/aumara/",
-      "destination": "/aumara-site/direct-v2.html"
+      "src": "^/(styles\\.css|site\\.js|official-logo\\.svg|legal\\.html|privacy\\.html|cookies\\.html)$",
+      "dest": "/elcid-site/$1"
+    },
+    {
+      "src": "^/aumara/?$",
+      "dest": "/aumara-site/direct-v2.html"
+    },
+    {
+      "src": "^/staff/?$",
+      "dest": "/staff/index.html"
+    },
+    {
+      "src": "^/.*$",
+      "status": 404
     }
   ]
 }

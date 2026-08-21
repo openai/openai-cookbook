@@ -1,0 +1,56 @@
+{
+  "schemaVersion": "1.0",
+  "policyId": "aumara.poststay.followup.v1",
+  "property": "AUMARA",
+  "propertyId": 324882,
+  "effectiveDate": "2026-08-14",
+  "checkoutReminder": {
+    "enabled": false,
+    "hardBlock": true,
+    "prohibitedIntents": [
+      "ask_guest_to_vacate",
+      "ask_guest_to_leave_faster",
+      "remind_guest_to_free_the_house",
+      "send_departure_deadline_message"
+    ]
+  },
+  "postStayFollowup": {
+    "enabled": true,
+    "templateVersion": "AUMARA_POSTSTAY_SURVEY_V1",
+    "eligibleStatus": ["confirmed", "completed"],
+    "excludedStatus": ["cancelled", "no_show", "request"],
+    "sendWindowHoursAfterDeparture": {
+      "minimum": 2,
+      "maximum": 72
+    },
+    "maxMessagesPerBooking": 1,
+    "dedupeKey": "propertyId:bookingRef:templateVersion",
+    "requiredEvidence": [
+      "property_id_is_324882",
+      "departure_is_in_the_past",
+      "booking_not_cancelled",
+      "no_later_sent_followup",
+      "survey_link_resolves_http_200"
+    ],
+    "languageSource": "guest_language",
+    "personalisation": ["guest_first_name", "stay_dates", "room_type"]
+  },
+  "incentive": {
+    "discountPercent": 10,
+    "minimumNights": 5,
+    "transferable": true,
+    "stackableWithActiveAumaraOffers": true,
+    "maximumRedemptions": 1,
+    "uniqueCodeRequired": true,
+    "qrRequired": true,
+    "bookingTrackingField": "referer"
+  },
+  "publicationGate": {
+    "sendGuestMessageOnlyWhen": [
+      "voucher_exists_in_beds24",
+      "database_beds24_status_is_active",
+      "live_survey_page_verified",
+      "live_booking_redirect_verified"
+    ]
+  }
+}

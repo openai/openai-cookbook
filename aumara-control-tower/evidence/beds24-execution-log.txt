@@ -1,0 +1,1 @@
+{"status": "DISABLED_REDUNDANT_V2_BRIDGE", "request_id": "AUMARA-MEDINA-20260718-660", "live_booking_mutations": false}

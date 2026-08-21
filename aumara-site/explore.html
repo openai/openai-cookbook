@@ -1,0 +1,204 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+  <title>Explore AUMARA — choose your house</title>
+  <meta name="description" content="Explore the AUMARA site in Benidoleig, compare five private houses and follow the route to each entrance before booking.">
+  <link rel="canonical" href="https://elcidspain.com/aumara/explore.html">
+  <meta property="og:title" content="Explore AUMARA — choose your house">
+  <meta property="og:description" content="A real site plan, five private houses and the route to each entrance.">
+  <meta property="og:image" content="https://lh3.googleusercontent.com/d/1wdC_rqzts2T_PRgF3fNWdCOm_7pn3oRO=w1600">
+  <meta name="theme-color" content="#f5f0e6">
+  <style>
+    :root{--paper:#f7f3e9;--white:#fffdf8;--ink:#20251f;--muted:#667064;--forest:#314735;--forest2:#49644d;--sage:#dce5d4;--gold:#c29252;--line:rgba(32,37,31,.15);--shadow:0 22px 70px rgba(38,51,40,.16)}
+    *{box-sizing:border-box}
+    html{scroll-behavior:smooth}
+    body{margin:0;background:var(--paper);color:var(--ink);font-family:Inter,system-ui,-apple-system,"Segoe UI",sans-serif}
+    button,a{font:inherit}
+    a{text-decoration:none;color:inherit}
+    img{display:block;max-width:100%}
+    .topbar{position:fixed;z-index:50;inset:0 0 auto;display:flex;align-items:center;justify-content:space-between;padding:13px max(16px,env(safe-area-inset-left));background:rgba(255,253,248,.9);backdrop-filter:blur(16px);border-bottom:1px solid var(--line)}
+    .brand{display:flex;align-items:center;gap:10px;font-weight:900;letter-spacing:.15em;font-size:13px}
+    .brand-mark{width:34px;height:34px;border-radius:50%;display:grid;place-items:center;background:var(--forest);color:#fff;font-family:Georgia,serif;font-size:20px}
+    .top-actions{display:flex;align-items:center;gap:8px}
+    .lang{border:0;background:transparent;color:var(--muted);font-weight:800;padding:8px}
+    .lang.active{color:var(--ink)}
+    .book-small,.primary,.secondary{display:inline-flex;align-items:center;justify-content:center;border-radius:999px;font-weight:850;border:1px solid transparent;cursor:pointer}
+    .book-small{padding:10px 14px;background:var(--forest);color:#fff;font-size:13px}
+    .hero{min-height:74svh;position:relative;display:flex;align-items:flex-end;overflow:hidden;background:#dfe9dc}
+    .hero img{position:absolute;inset:0;width:100%;height:100%;object-fit:cover;object-position:center 50%}
+    .hero:after{content:"";position:absolute;inset:0;background:linear-gradient(180deg,rgba(18,25,19,.04),rgba(18,25,19,.18) 48%,rgba(18,25,19,.82))}
+    .hero-copy{position:relative;z-index:2;color:#fff;width:min(1180px,calc(100% - 32px));margin:0 auto;padding:130px 0 44px}
+    .eyebrow{text-transform:uppercase;letter-spacing:.17em;font-size:11px;font-weight:900;color:#f0cf9b;margin:0 0 12px}
+    h1,h2,h3{font-family:Georgia,serif;font-weight:500;letter-spacing:-.04em;line-height:.98;margin:0}
+    h1{font-size:clamp(48px,9vw,96px);max-width:920px}
+    h2{font-size:clamp(36px,6vw,66px)}
+    h3{font-size:clamp(28px,4vw,40px)}
+    .hero-copy>p:not(.eyebrow){font-size:clamp(17px,2.2vw,22px);line-height:1.5;max-width:720px;color:rgba(255,255,255,.86)}
+    .hero-actions{display:flex;flex-wrap:wrap;gap:10px;margin-top:22px}
+    .primary{padding:14px 20px;background:var(--gold);color:#1f1b15}
+    .secondary{padding:14px 20px;border-color:rgba(255,255,255,.65);color:#fff;background:rgba(255,255,255,.08)}
+    main{overflow:hidden}
+    .facts{display:grid;grid-template-columns:repeat(5,1fr);gap:1px;background:var(--line);border-bottom:1px solid var(--line)}
+    .fact{background:var(--white);padding:22px 18px;text-align:center}
+    .fact strong{display:block;font:500 27px Georgia,serif;margin-bottom:4px}
+    .fact span{font-size:13px;color:var(--muted)}
+    .section{padding:82px 0}
+    .wrap{width:min(1180px,calc(100% - 32px));margin:auto}
+    .intro{display:grid;grid-template-columns:.8fr 1.2fr;gap:56px;align-items:end;margin-bottom:30px}
+    .intro p{font-size:18px;line-height:1.65;color:var(--muted);margin:0}
+    .map-shell{display:grid;grid-template-columns:minmax(0,1.45fr) minmax(310px,.55fr);gap:18px;align-items:stretch}
+    .map-stage{position:relative;border-radius:30px;overflow:hidden;background:#e7ecdf;border:1px solid var(--line);box-shadow:var(--shadow);min-height:560px;isolation:isolate}
+    .map-stage>img{position:absolute;inset:0;width:100%;height:100%;object-fit:contain;background:#f4f1e7;filter:saturate(1.04) contrast(1.02)}
+    .map-stage:after{content:"";position:absolute;inset:0;pointer-events:none;box-shadow:inset 0 0 80px rgba(43,65,46,.11)}
+    .route-layer{position:absolute;inset:0;width:100%;height:100%;z-index:2;pointer-events:none}
+    .route-shadow{fill:none;stroke:rgba(255,255,255,.9);stroke-width:11;stroke-linecap:round;stroke-dasharray:2 18}
+    .route{fill:none;stroke:var(--forest);stroke-width:5;stroke-linecap:round;stroke-dasharray:2 18;animation:walk 1.4s linear infinite}
+    @keyframes walk{to{stroke-dashoffset:-40}}
+    .gate{position:absolute;left:76%;top:88%;z-index:4;transform:translate(-50%,-50%);padding:8px 10px;border-radius:999px;background:#fff;border:1px solid var(--line);font-size:11px;font-weight:900;box-shadow:0 8px 24px rgba(0,0,0,.14)}
+    .marker{position:absolute;z-index:5;transform:translate(-50%,-50%);border:0;background:transparent;padding:0;cursor:pointer;text-align:center;color:var(--ink)}
+    .marker .bubble{width:54px;height:54px;border-radius:50%;display:grid;place-items:center;background:rgba(255,253,248,.94);border:2px solid var(--forest);box-shadow:0 9px 26px rgba(32,47,34,.22);transition:.2s transform,.2s background}
+    .marker:hover .bubble,.marker:focus-visible .bubble,.marker.active .bubble{transform:scale(1.12);background:var(--forest);color:#fff}
+    .marker .dome{width:27px;height:19px;border-radius:27px 27px 6px 6px;background:linear-gradient(145deg,#b46f45,#6c3c2b);position:relative;box-shadow:inset 0 -4px rgba(0,0,0,.16)}
+    .marker .dome:after{content:"";position:absolute;width:7px;height:11px;left:10px;bottom:0;background:#d6e9df;border-radius:5px 5px 0 0}
+    .marker.active .dome{background:linear-gradient(145deg,#e1a765,#a8683f)}
+    .marker .label{display:inline-block;margin-top:5px;padding:5px 8px;border-radius:999px;background:rgba(255,253,248,.92);font-size:10px;font-weight:900;white-space:nowrap;box-shadow:0 5px 18px rgba(0,0,0,.1)}
+    .marker.disabled{opacity:.48;cursor:default}
+    .marker.disabled .bubble{border-style:dashed}
+    .b{left:40%;top:53%}.c{left:51%;top:38%}.d{left:55%;top:59%}.e{left:65%;top:44%}.f{left:73%;top:61%}.a{left:22%;top:62%}
+    .map-hint{position:absolute;z-index:6;left:14px;top:14px;background:rgba(255,253,248,.9);backdrop-filter:blur(12px);padding:10px 12px;border-radius:14px;font-size:12px;color:var(--muted);box-shadow:0 8px 30px rgba(0,0,0,.1)}
+    .house-panel{background:var(--white);border:1px solid var(--line);border-radius:30px;overflow:hidden;box-shadow:var(--shadow);display:flex;flex-direction:column;min-height:560px}
+    .house-photo{height:238px;background:#d8dfd3;position:relative}
+    .house-photo img{width:100%;height:100%;object-fit:cover}
+    .house-photo:after{content:"";position:absolute;inset:auto 0 0;height:50%;background:linear-gradient(transparent,rgba(20,28,21,.45))}
+    .house-code{position:absolute;z-index:2;left:17px;bottom:14px;color:#fff;text-transform:uppercase;letter-spacing:.13em;font-size:11px;font-weight:900}
+    .house-body{padding:26px;display:flex;flex-direction:column;flex:1}
+    .house-type{margin:0 0 9px;color:var(--gold);text-transform:uppercase;letter-spacing:.13em;font-size:11px;font-weight:900}
+    .house-description{line-height:1.62;color:var(--muted);font-size:15px}
+    .chips{display:flex;flex-wrap:wrap;gap:7px;margin:17px 0}
+    .chip{padding:8px 10px;border-radius:999px;background:var(--sage);font-size:12px;font-weight:800;color:#435044}
+    .panel-actions{display:grid;gap:9px;margin-top:auto}
+    .panel-actions a,.panel-actions button{padding:13px 16px;border-radius:999px;text-align:center;font-weight:850;border:1px solid var(--line);cursor:pointer;background:#fff;color:var(--ink)}
+    .panel-actions .book-house{background:var(--forest);color:#fff;border-color:var(--forest)}
+    .house-list{display:grid;grid-template-columns:repeat(5,1fr);gap:10px;margin-top:18px}
+    .house-pill{border:1px solid var(--line);background:var(--white);border-radius:18px;padding:13px;text-align:left;cursor:pointer}
+    .house-pill.active{border-color:var(--forest);box-shadow:inset 0 0 0 1px var(--forest)}
+    .house-pill strong{display:block;font-size:13px}.house-pill span{display:block;color:var(--muted);font-size:11px;margin-top:4px}
+    .story{display:grid;grid-template-columns:1fr 1fr;gap:18px;margin-top:72px}
+    .story-card{border-radius:28px;overflow:hidden;background:var(--white);border:1px solid var(--line)}
+    .story-card img{width:100%;height:310px;object-fit:cover}
+    .story-card div{padding:25px}.story-card p{color:var(--muted);line-height:1.6}
+    .final{background:var(--forest);color:#fff;border-radius:34px;padding:clamp(34px,7vw,72px);text-align:center;margin-top:72px}
+    .final p{max-width:680px;margin:18px auto;color:rgba(255,255,255,.75);line-height:1.6}
+    .final .hero-actions{justify-content:center}
+    .mobile-book{display:none;position:fixed;z-index:60;left:14px;right:14px;bottom:max(12px,env(safe-area-inset-bottom));padding:15px 18px;border-radius:999px;background:var(--forest);color:#fff;text-align:center;font-weight:900;box-shadow:0 14px 42px rgba(19,35,22,.34)}
+    footer{padding:28px 16px 90px;text-align:center;color:var(--muted);font-size:12px}
+    @media(max-width:900px){.map-shell{grid-template-columns:1fr}.map-stage{min-height:auto;aspect-ratio:16/10}.house-panel{min-height:0}.intro{grid-template-columns:1fr;gap:18px}.house-list{grid-template-columns:1fr 1fr}.story{grid-template-columns:1fr}.facts{grid-template-columns:1fr 1fr}}
+    @media(max-width:620px){.topbar{padding-top:max(10px,env(safe-area-inset-top))}.top-actions .book-small{display:none}.hero{min-height:68svh}.hero-copy{padding-bottom:34px}.hero-actions .secondary{display:none}.section{padding:58px 0}.map-stage{width:calc(100% + 12px);margin-left:-6px;border-radius:22px;aspect-ratio:1/1}.marker .bubble{width:44px;height:44px}.marker .dome{width:23px;height:16px}.marker .label{font-size:9px;padding:4px 6px}.house-list{grid-template-columns:1fr}.story-card img{height:240px}.mobile-book{display:block}.facts .fact{padding:17px 10px}.fact strong{font-size:23px}.gate{font-size:9px}.map-hint{font-size:10px;max-width:180px}.facts{grid-template-columns:1fr 1fr}}
+  </style>
+</head>
+<body>
+  <header class="topbar">
+    <a class="brand" href="./index.html"><span class="brand-mark">A</span><span>AUMARA</span></a>
+    <div class="top-actions"><button class="lang active" type="button" data-lang="en">EN</button><button class="lang" type="button" data-lang="es">ES</button><a class="book-small" href="https://beds24.com/booking2.php?propid=324882" target="_blank" rel="noopener">Book</a></div>
+  </header>
+
+  <section class="hero">
+    <img src="https://lh3.googleusercontent.com/d/1wdC_rqzts2T_PRgF3fNWdCOm_7pn3oRO=w2000" alt="AUMARA houses among pine trees with open valley views" fetchpriority="high">
+    <div class="hero-copy">
+      <p class="eyebrow" data-i18n="location">Benidoleig · Marina Alta · Costa Blanca</p>
+      <h1 data-i18n="heroTitle">Choose the house before you arrive.</h1>
+      <p data-i18n="heroText">See the real layout of AUMARA, compare the five houses currently open for stays and follow the path to each entrance.</p>
+      <div class="hero-actions"><a class="primary" href="#map" data-i18n="choose">Choose a house</a><a class="secondary" href="https://beds24.com/booking2.php?propid=324882" target="_blank" rel="noopener" data-i18n="availability">Check availability</a></div>
+    </div>
+  </section>
+
+  <main>
+    <div class="facts">
+      <div class="fact"><strong>5</strong><span data-i18n="fact1">houses open for stays</span></div>
+      <div class="fact"><strong>3</strong><span>Chalet</span></div>
+      <div class="fact"><strong>2</strong><span>Superior Chalet</span></div>
+      <div class="fact"><strong>14:00</strong><span data-i18n="factCheckin">check-in</span></div>
+      <div class="fact"><strong>12:00</strong><span data-i18n="factCheckout">check-out</span></div>
+    </div>
+
+    <section class="section" id="map">
+      <div class="wrap">
+        <div class="intro">
+          <div><p class="eyebrow" data-i18n="mapEyebrow">The place, not a catalogue</p><h2 data-i18n="mapTitle">Walk the site. Pick your house.</h2></div>
+          <p data-i18n="mapText">Tap a house on the real site plan. The selected house is highlighted and the walking line shows the route from the arrival point to its entrance.</p>
+        </div>
+
+        <div class="map-shell">
+          <div class="map-stage" id="mapStage">
+            <img src="https://lh3.googleusercontent.com/d/1xU4ln5OyvuE-HWw91LRm9Mxv8eK4kloe=w2000" alt="AUMARA site plan with houses and paths">
+            <svg class="route-layer" viewBox="0 0 1000 562" preserveAspectRatio="none" aria-hidden="true"><path id="routeShadow" class="route-shadow" d="M760 520 C700 450 650 390 555 335"></path><path id="routePath" class="route" d="M760 520 C700 450 650 390 555 335"></path></svg>
+            <div class="map-hint" data-i18n="hint">Tap any available house</div>
+            <div class="gate" data-i18n="arrival">Arrival</div>
+            <button class="marker a disabled" type="button" aria-label="Private house, not in short-stay inventory" disabled><span class="bubble"><span class="dome"></span></span><span class="label" data-i18n="private">Private</span></button>
+            <button class="marker b" type="button" data-house="olive" aria-label="Casa Olivo"><span class="bubble"><span class="dome"></span></span><span class="label">Casa Olivo</span></button>
+            <button class="marker c" type="button" data-house="pine" aria-label="Casa Pino"><span class="bubble"><span class="dome"></span></span><span class="label">Casa Pino</span></button>
+            <button class="marker d active" type="button" data-house="mirador" aria-label="Casa Mirador"><span class="bubble"><span class="dome"></span></span><span class="label">Casa Mirador</span></button>
+            <button class="marker e" type="button" data-house="forest" aria-label="Casa Bosque"><span class="bubble"><span class="dome"></span></span><span class="label">Casa Bosque</span></button>
+            <button class="marker f" type="button" data-house="valley" aria-label="Casa Valle"><span class="bubble"><span class="dome"></span></span><span class="label">Casa Valle</span></button>
+          </div>
+
+          <article class="house-panel" aria-live="polite">
+            <div class="house-photo"><img id="houseImage" src="https://lh3.googleusercontent.com/d/1rDKUNOQxzJcxoGXy2eRQ5bKJedoOuaxI=w1200" alt="Casa Mirador"><span class="house-code" id="houseCode">House D · central path</span></div>
+            <div class="house-body">
+              <p class="house-type" id="houseType">Superior Chalet</p>
+              <h3 id="houseName">Casa Mirador</h3>
+              <p class="house-description" id="houseDescription">A larger private house in the central part of the site, with a direct path and open views through the trees.</p>
+              <div class="chips" id="houseChips"><span class="chip">Larger house</span><span class="chip">Private entrance</span><span class="chip">Open views</span></div>
+              <div class="panel-actions"><button id="routeButton" type="button" data-i18n="route">Show route to entrance</button><a class="book-house" id="houseBooking" href="https://beds24.com/booking2.php?propid=324882" target="_blank" rel="noopener" data-i18n="bookHouse">Book direct</a><a id="houseBookingFallback" href="https://www.booking.com/hotel/es/aumara.html" target="_blank" rel="noopener" data-i18n="bookFallback">Booking.com</a></div>
+            </div>
+          </article>
+        </div>
+
+        <div class="house-list" id="houseList">
+          <button class="house-pill" data-house="olive"><strong>Casa Olivo</strong><span>Superior Chalet · B</span></button>
+          <button class="house-pill" data-house="pine"><strong>Casa Pino</strong><span>Chalet · C</span></button>
+          <button class="house-pill active" data-house="mirador"><strong>Casa Mirador</strong><span>Superior Chalet · D</span></button>
+          <button class="house-pill" data-house="forest"><strong>Casa Bosque</strong><span>Chalet · E</span></button>
+          <button class="house-pill" data-house="valley"><strong>Casa Valle</strong><span>Chalet · F</span></button>
+        </div>
+
+        <div class="story">
+          <article class="story-card"><img src="https://lh3.googleusercontent.com/d/1qAkaNt_W-ISyVfpU2IlN3r6_c60Ts5Mh=w1200" alt="Path through AUMARA" loading="lazy"><div><p class="eyebrow" data-i18n="pathEyebrow">From arrival to your door</p><h3 data-i18n="pathTitle">The route is part of the place.</h3><p data-i18n="pathText">Paths move between pine trees, planted areas and changing views. The map helps guests understand the terrain before arrival.</p></div></article>
+          <article class="story-card"><img src="https://lh3.googleusercontent.com/d/1uFRe8MsXd5IoiQT5Ph7jWaN2Ey_Fj2Vs=w1200" alt="AUMARA Chalet" loading="lazy"><div><p class="eyebrow" data-i18n="houseEyebrow">A private house, not a room</p><h3 data-i18n="houseTitle">Your own entrance and outdoor space.</h3><p data-i18n="houseText">Each bookable unit is a separate architectural house placed within the AUMARA landscape. Check-in from 14:00, check-out by 12:00.</p></div></article>
+        </div>
+
+        <div class="final"><p class="eyebrow" data-i18n="finalEyebrow">Ready to stay</p><h2 data-i18n="finalTitle">Choose the place first. Then choose the dates.</h2><p data-i18n="finalText">Live availability and prices come from Beds24. Booking.com stays available as a secondary channel.</p><div class="hero-actions"><a class="primary" href="https://beds24.com/booking2.php?propid=324882" target="_blank" rel="noopener" data-i18n="availability">Book direct</a><a class="secondary" href="./index.html" data-i18n="more">More about AUMARA</a></div></div>
+      </div>
+    </section>
+  </main>
+
+  <a class="mobile-book" href="https://beds24.com/booking2.php?propid=324882" target="_blank" rel="noopener" data-i18n="availability">Book direct</a>
+  <footer>AUMARA · Benidoleig · Operated by EL CID VENTURES BENIDOLEIG S.L. · Check-in 14:00 · Check-out 12:00</footer>
+
+  <script>
+  (function(){
+    const beds24='https://beds24.com/booking2.php?propid=324882';
+    const bookingCom='https://www.booking.com/hotel/es/aumara.html';
+    const houses={
+      olive:{name:'Casa Olivo',type:'Superior Chalet',code:'House B · west path',image:'https://lh3.googleusercontent.com/d/1rDKUNOQxzJcxoGXy2eRQ5bKJedoOuaxI=w1200',description:'A larger private house on the western side of the site, surrounded by mature trees and reached by the upper path.',chips:['Larger house','Private entrance','Among trees'],route:'M760 520 C650 450 530 390 460 340 C435 322 415 310 400 300'},
+      pine:{name:'Casa Pino',type:'Chalet',code:'House C · upper grove',image:'https://lh3.googleusercontent.com/d/1uFRe8MsXd5IoiQT5Ph7jWaN2Ey_Fj2Vs=w1200',description:'A private Chalet in the upper grove, set back from the central route and framed by pine trees.',chips:['Chalet','Upper grove','Private entrance'],route:'M760 520 C700 430 620 360 560 290 C535 260 520 230 510 210'},
+      mirador:{name:'Casa Mirador',type:'Superior Chalet',code:'House D · central path',image:'https://lh3.googleusercontent.com/d/1rDKUNOQxzJcxoGXy2eRQ5bKJedoOuaxI=w1200',description:'A larger private house in the central part of the site, with a direct path and open views through the trees.',chips:['Larger house','Private entrance','Open views'],route:'M760 520 C700 450 650 390 555 335'},
+      forest:{name:'Casa Bosque',type:'Chalet',code:'House E · upper east',image:'https://lh3.googleusercontent.com/d/1uFRe8MsXd5IoiQT5Ph7jWaN2Ey_Fj2Vs=w1200',description:'A Chalet in the upper eastern part of AUMARA, surrounded by dense planting and separated from the lower route.',chips:['Chalet','Garden setting','Quiet position'],route:'M760 520 C750 430 710 350 690 305 C675 275 665 255 650 245'},
+      valley:{name:'Casa Valle',type:'Chalet',code:'House F · valley edge',image:'https://lh3.googleusercontent.com/d/1wdC_rqzts2T_PRgF3fNWdCOm_7pn3oRO=w1200',description:'A Chalet close to the eastern edge of the site, with the shortest arrival route and views toward the valley.',chips:['Chalet','Valley side','Shorter route'],route:'M760 520 C750 450 730 400 725 340'}
+    };
+    const translations={
+      es:{location:'Benidoleig · Marina Alta · Costa Blanca',heroTitle:'Elige tu casa antes de llegar.',heroText:'Descubre la distribución real de AUMARA, compara las cinco casas disponibles y sigue el camino hasta cada entrada.',choose:'Elegir una casa',availability:'Reservar directo',fact1:'casas disponibles',factCheckin:'entrada',factCheckout:'salida',mapEyebrow:'El lugar, no un catálogo',mapTitle:'Recorre el espacio. Elige tu casa.',mapText:'Pulsa una casa en el plano real. La casa elegida se ilumina y la línea muestra el recorrido desde la llegada hasta su entrada.',hint:'Pulsa una casa disponible',arrival:'Llegada',private:'Privada',route:'Ver ruta hasta la entrada',bookHouse:'Reservar directo',bookFallback:'Booking.com',pathEyebrow:'Desde la llegada hasta tu puerta',pathTitle:'El recorrido forma parte del lugar.',pathText:'Los caminos atraviesan pinos, zonas plantadas y vistas cambiantes. El mapa ayuda a entender el terreno antes de llegar.',houseEyebrow:'Una casa privada, no una habitación',houseTitle:'Tu propia entrada y espacio exterior.',houseText:'Cada unidad reservable es una casa arquitectónica independiente dentro del paisaje de AUMARA. Entrada desde las 14:00, salida antes de las 12:00.',finalEyebrow:'Preparado para alojarte',finalTitle:'Primero elige el lugar. Después las fechas.',finalText:'La disponibilidad y los precios en vivo vienen de Beds24. Booking.com queda como canal secundario.',more:'Más sobre AUMARA'},
+      en:{location:'Benidoleig · Marina Alta · Costa Blanca',heroTitle:'Choose the house before you arrive.',heroText:'See the real layout of AUMARA, compare the five houses currently open for stays and follow the path to each entrance.',choose:'Choose a house',availability:'Book direct',fact1:'houses open for stays',factCheckin:'check-in',factCheckout:'check-out',mapEyebrow:'The place, not a catalogue',mapTitle:'Walk the site. Pick your house.',mapText:'Tap a house on the real site plan. The selected house is highlighted and the walking line shows the route from the arrival point to its entrance.',hint:'Tap any available house',arrival:'Arrival',private:'Private',route:'Show route to entrance',bookHouse:'Book direct',bookFallback:'Booking.com',pathEyebrow:'From arrival to your door',pathTitle:'The route is part of the place.',pathText:'Paths move between pine trees, planted areas and changing views. The map helps guests understand the terrain before arrival.',houseEyebrow:'A private house, not a room',houseTitle:'Your own entrance and outdoor space.',houseText:'Each bookable unit is a separate architectural house placed within the AUMARA landscape. Check-in from 14:00, check-out by 12:00.',finalEyebrow:'Ready to stay',finalTitle:'Choose the place first. Then choose the dates.',finalText:'Live availability and prices come from Beds24. Booking.com stays available as a secondary channel.',more:'More about AUMARA'}
+    };
+    const image=document.getElementById('houseImage'),code=document.getElementById('houseCode'),type=document.getElementById('houseType'),name=document.getElementById('houseName'),description=document.getElementById('houseDescription'),chips=document.getElementById('houseChips'),route=document.getElementById('routePath'),shadow=document.getElementById('routeShadow');
+    function selectHouse(id,scroll){const h=houses[id];if(!h)return;document.querySelectorAll('[data-house]').forEach(el=>el.classList.toggle('active',el.dataset.house===id));image.src=h.image;image.alt=h.name;code.textContent=h.code;type.textContent=h.type;name.textContent=h.name;description.textContent=h.description;chips.innerHTML=h.chips.map(x=>'<span class="chip">'+x+'</span>').join('');route.setAttribute('d',h.route);shadow.setAttribute('d',h.route);document.getElementById('houseBooking').href=beds24+'&label=aumara-map-'+encodeURIComponent(id);document.getElementById('houseBookingFallback').href=bookingCom+'?label=aumara-map-'+encodeURIComponent(id);history.replaceState(null,'','?house='+id+'#map');if(scroll&&matchMedia('(max-width:900px)').matches)document.querySelector('.house-panel').scrollIntoView({behavior:'smooth',block:'start'})}
+    document.querySelectorAll('[data-house]').forEach(el=>{if(!el.disabled)el.addEventListener('click',()=>selectHouse(el.dataset.house,el.classList.contains('house-pill')))});
+    document.getElementById('routeButton').addEventListener('click',()=>document.getElementById('mapStage').scrollIntoView({behavior:'smooth',block:'center'}));
+    document.querySelectorAll('[data-lang]').forEach(btn=>btn.addEventListener('click',()=>{const lang=btn.dataset.lang;document.documentElement.lang=lang;document.querySelectorAll('[data-lang]').forEach(x=>x.classList.toggle('active',x===btn));document.querySelectorAll('[data-i18n]').forEach(el=>{const key=el.dataset.i18n;if(translations[lang][key])el.textContent=translations[lang][key]})}));
+    const selected=new URLSearchParams(location.search).get('house');selectHouse(houses[selected]?selected:'mirador',false);
+  })();
+  </script>
+</body>
+</html>

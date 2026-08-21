@@ -1,0 +1,30 @@
+{
+  "schema_version": "1.0",
+  "snapshot_version": "2026.08.17.2",
+  "registry_policy_version": "2026.07.27.1",
+  "mode": "proposal_only",
+  "supported_languages": ["en", "es", "fr", "de", "nl"],
+  "property_timezones": {
+    "aumara": "Europe/Madrid",
+    "elcid": "Europe/Madrid"
+  },
+  "hard_blocked_event_types": [
+    "checkout_reminder",
+    "departure_deadline",
+    "vacate_request"
+  ],
+  "event_policy_ids": {
+    "aumara:post_checkin": "aumara.post-checkin-care",
+    "aumara:first_morning": "aumara.first-morning-care",
+    "elcid:post_checkin": "elcid.post-checkin-care",
+    "elcid:first_morning": "elcid.first-morning-care"
+  },
+  "policy_ids": [
+    "shared.lifecycle-checkout-reminder-block",
+    "shared.lifecycle-negative-signal-escalation",
+    "aumara.post-checkin-care",
+    "aumara.first-morning-care",
+    "elcid.post-checkin-care",
+    "elcid.first-morning-care"
+  ]
+}

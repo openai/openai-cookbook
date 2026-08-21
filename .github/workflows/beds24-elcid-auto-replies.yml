@@ -1,0 +1,38 @@
+name: Beds24 El Cid reply audit (manual, no send)
+
+on:
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+concurrency:
+  group: beds24-elcid-auto-replies
+  cancel-in-progress: true
+
+jobs:
+  reply:
+    runs-on: ubuntu-latest
+    env:
+      BEDS24_REFRESH_TOKEN: ${{ secrets.BEDS24_REFRESH_CREDENTIAL }}
+      BEDS24_AUTO_REPLY_OUTPUT: aumara-control-tower/evidence/elcid-auto-replies.json
+
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Test auto-reply safety rules
+        run: python -m unittest aumara-control-tower/scripts/tests/test_beds24_elcid_auto_replies.py
+
+      - name: Plan replies without sending
+        env:
+          BEDS24_AUTO_REPLY_EXECUTE: '0'
+        run: python aumara-control-tower/scripts/beds24_elcid_auto_replies.py
+
+      - name: Upload sanitized result
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: elcid-auto-replies
+          path: aumara-control-tower/evidence/elcid-auto-replies.json
+          if-no-files-found: warn
+          retention-days: 7

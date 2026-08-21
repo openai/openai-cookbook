@@ -1,0 +1,15 @@
+{
+  "checked_at_utc": "2026-08-18T04:35:52.992656+00:00",
+  "content_probe": {},
+  "diagnostic": null,
+  "failure_stage": null,
+  "key_candidates": [],
+  "legacy_api_key_found": false,
+  "legacy_prop_key_found": false,
+  "property_id": "324882",
+  "run_id": "32099692814",
+  "secret_exposed": false,
+  "state": "WAITING_LOGIN_PAYLOAD",
+  "xml_get_account": {},
+  "xml_get_properties": {}
+}

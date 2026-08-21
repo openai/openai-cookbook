@@ -76,8 +76,53 @@ jobs:
         env:
           BEDS24_REFRESH_TOKEN: ${{ secrets.BEDS24_REFRESH_CREDENTIAL }}
         run: |
-          python aumara-control-tower/scripts/beds24_guest_journey_shadow.py \
-            --output /tmp/aumara-guest-journey-shadow/summary.json
+          auth_error_log=/tmp/aumara-guest-journey-shadow/auth-error.log
+          if python aumara-control-tower/scripts/beds24_guest_journey_shadow.py \
+            --output /tmp/aumara-guest-journey-shadow/summary.json 2>"$auth_error_log"; then
+            rm -f "$auth_error_log"
+          elif grep -q "Beds24 authentication failed with HTTP status" "$auth_error_log"; then
+            echo "WARNING: Beds24 auth unavailable; emitting degraded shadow summary"
+            python - <<'PY'
+            import datetime as dt
+            import json
+            import pathlib
+
+            output = pathlib.Path("/tmp/aumara-guest-journey-shadow/summary.json")
+            output.parent.mkdir(parents=True, exist_ok=True)
+            output.write_text(
+                json.dumps(
+                    {
+                        "schema": "aumara-beds24-guest-journey-shadow-v1",
+                        "mode": "shadow_read_only",
+                        "runAtUtc": dt.datetime.now(dt.timezone.utc).isoformat(),
+                        "summary": {
+                            "total": 0,
+                            "proposal": 0,
+                            "manual_review": 0,
+                            "blocked": 0,
+                            "skipped": 0,
+                        },
+                        "properties": {},
+                        "reasons": {"beds24_auth_unavailable": 1},
+                        "getRequests": 0,
+                        "postRequests": 0,
+                        "guestMessagesSent": 0,
+                        "bookingMutations": 0,
+                        "durableClaimsWritten": 0,
+                        "containsGuestPii": False,
+                        "authStatus": "unavailable",
+                    },
+                    ensure_ascii=False,
+                    indent=2,
+                )
+                + "\n",
+                encoding="utf-8",
+            )
+            PY
+          else
+            cat "$auth_error_log" >&2
+            exit 1
+          fi
 
       - name: Verify the persisted shadow boundary
         if: github.event_name != 'pull_request'

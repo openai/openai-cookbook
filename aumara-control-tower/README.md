@@ -1,6 +1,6 @@
 # AUMARA Control Tower
 
-Working transactional email/webhook service for AUMARA El Cid, plus a Threads Insights collector for the Content Studio.
+Transactional email/webhook service for AUMARA El Cid, plus a Threads Insights collector for the Content Studio.
 Staged transactional email/webhook service for AUMARA El Cid. It starts in
 `off`, supports a zero-send `audit` stage, and requires a separately confirmed
 `live` cutover.

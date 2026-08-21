@@ -43,6 +43,22 @@ def booking(**updates):
 
 
 class Beds24GuestJourneyShadowTests(unittest.TestCase):
+    def test_shadow_workflow_handles_auth_drift_with_fallback_summary(self) -> None:
+        workflow = (
+            ROOT.parent / ".github" / "workflows" / "aumara-guest-journey-shadow.yml"
+        ).read_text(encoding="utf-8")
+        self.assertIn("id: auth_probe", workflow)
+        self.assertIn("continue-on-error: true", workflow)
+        self.assertIn(
+            "steps.auth_probe.outcome == 'success'",
+            workflow,
+        )
+        self.assertIn(
+            "steps.auth_probe.outcome != 'success'",
+            workflow,
+        )
+        self.assertIn("externalDependencyUnavailable", workflow)
+
     def test_shadow_maps_both_property_ids_without_room_filters(self) -> None:
         self.assertEqual(
             shadow.PROPERTY_MAP,

@@ -71,8 +71,17 @@ jobs:
         run: |
           test -n "$BEDS24_REFRESH_TOKEN"
 
-      - name: Read live bookings and build PII-free shadow summary
+      - name: Probe Beds24 authentication for live shadow read
         if: github.event_name != 'pull_request'
+        id: auth_probe
+        env:
+          BEDS24_REFRESH_CREDENTIAL: ${{ secrets.BEDS24_REFRESH_CREDENTIAL }}
+        continue-on-error: true
+        run: |
+          python aumara-control-tower/scripts/beds24_auth_check.py authenticate
+
+      - name: Read live bookings and build PII-free shadow summary
+        if: github.event_name != 'pull_request' && steps.auth_probe.outcome == 'success'
         env:
           BEDS24_REFRESH_TOKEN: ${{ secrets.BEDS24_REFRESH_CREDENTIAL }}
         run: |
@@ -123,6 +132,45 @@ jobs:
             cat "$auth_error_log" >&2
             exit 1
           fi
+
+      - name: Persist auth-unavailable shadow summary
+        if: github.event_name != 'pull_request' && steps.auth_probe.outcome != 'success'
+        run: |
+          python - <<'PY'
+          import datetime as dt
+          import json
+          import pathlib
+
+          summary = {
+              "schema": "aumara-beds24-guest-journey-shadow-v1",
+              "mode": "shadow_read_only",
+              "runAtUtc": dt.datetime.now(dt.timezone.utc).isoformat(),
+              "summary": {
+                  "manual_review": 0,
+                  "proposal": 0,
+                  "skip": 0,
+                  "hard_block": 0,
+              },
+              "properties": {},
+              "reasons": {
+                  "external_dependency_unavailable": 1,
+              },
+              "getRequests": 0,
+              "postRequests": 0,
+              "guestMessagesSent": 0,
+              "bookingMutations": 0,
+              "durableClaimsWritten": 0,
+              "containsGuestPii": False,
+              "externalDependencyUnavailable": True,
+          }
+          target = pathlib.Path("/tmp/aumara-guest-journey-shadow/summary.json")
+          target.parent.mkdir(parents=True, exist_ok=True)
+          target.write_text(
+              json.dumps(summary, ensure_ascii=False, indent=2) + "\n",
+              encoding="utf-8",
+          )
+          print("Beds24 auth probe failed; stored sanitized fallback shadow summary.")
+          PY
 
       - name: Verify the persisted shadow boundary
         if: github.event_name != 'pull_request'

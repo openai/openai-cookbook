@@ -27,7 +27,6 @@ def _summarize_rag_response(rag_output: str) -> str:
     """
     response = client.responses.create(
         model="gpt-4.1-mini",
-        tools=[{"type": "web_search_preview"}],
         input="Summarize the following text concisely: \n\n" + rag_output,
     )
     return response.output_text

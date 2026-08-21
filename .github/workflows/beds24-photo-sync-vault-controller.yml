@@ -13,7 +13,8 @@ jobs:
   sync:
     if: >-
       github.event_name == 'workflow_dispatch' ||
-      (github.event.issue.title == 'AUMARA control: sync Beds24 photos from vault' &&
+      ((github.event.issue.title == 'AUMARA control: sync Beds24 photos from vault' ||
+        github.event.issue.title == 'AUMARA control: run Beds24 photo vault sync') &&
        github.event.issue.user.login == 'elcidspain')
     runs-on: ubuntu-latest
     timeout-minutes: 30

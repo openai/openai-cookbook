@@ -3,6 +3,8 @@ name: AUMARA one-shot Beds24 dispatcher
 on:
   issues:
     types: [opened]
+  issue_comment:
+    types: [created]
 
 permissions:
   actions: write
@@ -11,9 +13,22 @@ permissions:
 jobs:
   dispatch:
     if: >-
-      github.event.issue.user.login == 'elcidspain' &&
-      (github.event.issue.title == 'AUMARA control: run live Beds24 recovery' ||
-       github.event.issue.title == 'AUMARA control: run Beds24 photo vault sync')
+      (
+        github.event_name == 'issues' &&
+        github.event.issue.user.login == 'elcidspain' &&
+        (github.event.issue.title == 'AUMARA control: run live Beds24 recovery' ||
+         github.event.issue.title == 'AUMARA control: run Beds24 photo vault sync')
+      ) ||
+      (
+        github.event_name == 'issue_comment' &&
+        github.event.issue.user.login == 'elcidspain' &&
+        github.event.comment.user.login == 'elcidspain' &&
+        github.event.issue.title == 'AUMARA control: run Beds24 photo vault sync' &&
+        (
+          contains(github.event.comment.body, 'run Beds24 photo vault sync') ||
+          contains(github.event.comment.body, 'Dispatch rotation-safe Beds24 photo sync from the encrypted recovered vault')
+        )
+      )
     runs-on: ubuntu-latest
     steps:
       - name: Dispatch approved target workflow

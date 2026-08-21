@@ -1,0 +1,177 @@
+name: Recover live Beds24 exchange artifacts safely
+
+on:
+  workflow_dispatch:
+  push:
+    branches: [main]
+    paths:
+      - '.github/workflows/beds24-recover-live-exchange-artifacts.yml'
+
+permissions:
+  actions: read
+  contents: write
+
+concurrency:
+  group: beds24-live-exchange-artifact-recovery
+  cancel-in-progress: true
+
+jobs:
+  recover:
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    environment: Production
+    env:
+      BEDS24_VAULT_KEK: ${{ secrets.BEDS24_REFRESH_CREDENTIAL }}
+      PROPERTY_ID: '324882'
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+
+      - name: Download newest successful exchange artifact
+        id: newest
+        continue-on-error: true
+        uses: actions/download-artifact@v4
+        with:
+          name: beds24-refresh-token
+          path: /tmp/beds24-artifact-32107182412
+          github-token: ${{ github.token }}
+          repository: ${{ github.repository }}
+          run-id: 32107182412
+
+      - name: Download previous successful exchange artifact
+        id: previous
+        continue-on-error: true
+        uses: actions/download-artifact@v4
+        with:
+          name: beds24-refresh-token
+          path: /tmp/beds24-artifact-32102978498
+          github-token: ${{ github.token }}
+          repository: ${{ github.repository }}
+          run-id: 32102978498
+
+      - name: Install encrypted-vault dependency
+        run: python -m pip install --disable-pip-version-check cryptography
+
+      - name: Validate candidates and persist current rotated refresh token
+        shell: bash
+        run: |
+          set -euo pipefail
+          python3 - <<'PY'
+          from __future__ import annotations
+          import base64, datetime as dt, hashlib, json, os, pathlib, subprocess
+          import urllib.error, urllib.parse, urllib.request
+          from cryptography.fernet import Fernet
+
+          API='https://api.beds24.com/v2'
+          PROPERTY_ID=os.environ.get('PROPERTY_ID','324882')
+          KEK=(os.environ.get('BEDS24_VAULT_KEK') or '').strip()
+          RUN_ID=os.environ.get('GITHUB_RUN_ID','unknown')
+          VAULT=pathlib.Path('aumara-control-tower/evidence/beds24-refresh-vault.json')
+          EVIDENCE=pathlib.Path('aumara-control-tower/evidence/beds24-live-artifact-recovery.json')
+          if KEK: print(f'::add-mask::{KEK}', flush=True)
+
+          def now(): return dt.datetime.now(dt.timezone.utc).isoformat()
+          def request(url, headers):
+              req=urllib.request.Request(url,headers={'accept':'application/json','User-Agent':'AUMARA-Beds24-Recovery/1.0',**headers},method='GET')
+              try:
+                  with urllib.request.urlopen(req,timeout=60) as r: raw=r.read(); status=int(r.status)
+              except urllib.error.HTTPError as e: raw=e.read(); status=int(e.code)
+              try: body=json.loads(raw.decode('utf-8','replace')) if raw else {}
+              except Exception: body={'non_json_bytes':len(raw)}
+              return status,body
+          def diag(body):
+              if not isinstance(body,dict): return {'response_type':type(body).__name__}
+              out={}
+              for k in ('code','status','type','message','error','detail','error_description'):
+                  if body.get(k) not in (None,'',[],{}): out[k]=str(body[k])[:300]
+              return out or {'body_keys':sorted(str(k) for k in body.keys())[:30]}
+          def key(kek):
+              return base64.urlsafe_b64encode(hashlib.sha256(('AUMARA_BEDS24_REFRESH_VAULT_V1\0'+kek).encode()).digest())
+
+          result={
+              'checked_at_utc':now(),'run_id':RUN_ID,'property_id':PROPERTY_ID,'status':'STARTING',
+              'candidates':[],'recovered':False,'source_exchange_run_id':None,
+              'rotated_refresh_received':False,'property_http_status':None,
+              'vault_written':False,'secret_exposed':False,
+          }
+          candidates=[
+              ('32107182412',pathlib.Path('/tmp/beds24-artifact-32107182412/beds24-refresh-token.txt')),
+              ('32102978498',pathlib.Path('/tmp/beds24-artifact-32102978498/beds24-refresh-token.txt')),
+          ]
+          recovered_refresh=''; recovered_access=''
+          for source_run,path in candidates:
+              rec={'source_exchange_run_id':source_run,'file_found':path.exists(),'direct_http_status':None,'refresh_http_status':None,'diagnostic':None}
+              if not path.exists(): result['candidates'].append(rec); continue
+              candidate=path.read_text(encoding='utf-8').strip()
+              if not candidate:
+                  rec['diagnostic']='empty artifact token file'; result['candidates'].append(rec); continue
+              print(f'::add-mask::{candidate}', flush=True)
+              ds,db=request(f'{API}/authentication/details',{'token':candidate})
+              rec['direct_http_status']=ds
+              if 200 <= ds < 300 and isinstance(db,dict) and db.get('validToken') is True:
+                  recovered_access=candidate
+                  rec['diagnostic']='valid direct access credential'
+                  result['source_exchange_run_id']=source_run
+                  result['candidates'].append(rec)
+                  break
+              rs,rb=request(f'{API}/authentication/token',{'refreshToken':candidate})
+              rec['refresh_http_status']=rs
+              access=rb.get('token') if isinstance(rb,dict) else None
+              rotated=rb.get('refreshToken') if isinstance(rb,dict) else None
+              if isinstance(access,str) and access: print(f'::add-mask::{access}', flush=True)
+              if isinstance(rotated,str) and rotated: print(f'::add-mask::{rotated}', flush=True)
+              if 200 <= rs < 300 and isinstance(access,str) and access:
+                  recovered_access=access
+                  recovered_refresh=rotated if isinstance(rotated,str) and rotated else candidate
+                  result['rotated_refresh_received']=bool(isinstance(rotated,str) and rotated)
+                  result['source_exchange_run_id']=source_run
+                  result['candidates'].append(rec)
+                  break
+              rec['diagnostic']=diag(rb)
+              result['candidates'].append(rec)
+
+          if recovered_access:
+              ps,pb=request(f'{API}/authentication/details',{'token':recovered_access})
+              valid=bool(200 <= ps < 300 and isinstance(pb,dict) and pb.get('validToken') is True)
+              result['access_probe_http_status']=ps
+              result['access_probe_valid']=valid
+              if valid:
+                  q=urllib.parse.urlencode({'id':PROPERTY_ID,'includePictures':'true','includeAllRooms':'true'})
+                  prop_status,prop_body=request(f'{API}/properties?{q}',{'token':recovered_access})
+                  result['property_http_status']=prop_status
+                  if recovered_refresh:
+                      if not KEK: raise RuntimeError('Production KEK is absent')
+                      VAULT.parent.mkdir(parents=True,exist_ok=True)
+                      ciphertext=Fernet(key(KEK)).encrypt(recovered_refresh.encode()).decode('ascii')
+                      VAULT.write_text(json.dumps({
+                          'version':1,'cipher':'fernet-sha256-kek','source':'live_exchange_artifact_recovery',
+                          'source_exchange_run_id':result['source_exchange_run_id'],'created_at_utc':now(),
+                          'ciphertext':ciphertext,'plaintext_stored':False
+                      },indent=2,sort_keys=True)+'\n',encoding='utf-8')
+                      result['vault_written']=True
+                  result['recovered']=True; result['status']='SUCCESS'
+              else:
+                  result['status']='FAILED'; result['diagnostic']='candidate produced an access token but details validation failed'
+          else:
+              result['status']='FAILED'; result['diagnostic']='both live exchange artifacts are already invalid/consumed'
+
+          EVIDENCE.parent.mkdir(parents=True,exist_ok=True)
+          EVIDENCE.write_text(json.dumps(result,indent=2,sort_keys=True)+'\n',encoding='utf-8')
+          subprocess.run(['git','config','user.name','github-actions[bot]'],check=True)
+          subprocess.run(['git','config','user.email','41898282+github-actions[bot]@users.noreply.github.com'],check=True)
+          paths=[str(EVIDENCE)] + ([str(VAULT)] if VAULT.exists() else [])
+          subprocess.run(['git','add',*paths],check=True)
+          if subprocess.run(['git','diff','--cached','--quiet'],check=False).returncode != 0:
+              subprocess.run(['git','commit','-m',f'Record live Beds24 artifact recovery {RUN_ID} [skip ci]'],check=True)
+              subprocess.run(['git','pull','--rebase','origin','main'],check=True)
+              subprocess.run(['git','push','origin','HEAD:main'],check=True)
+          print(json.dumps({
+              'status':result['status'],'recovered':result['recovered'],
+              'source_exchange_run_id':result['source_exchange_run_id'],
+              'rotated_refresh_received':result['rotated_refresh_received'],
+              'property_http_status':result['property_http_status'],
+              'vault_written':result['vault_written'],
+          }))
+          if result['status']!='SUCCESS': raise SystemExit(1)
+          PY

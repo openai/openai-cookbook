@@ -25,7 +25,7 @@ DISALLOWED_IMPORTS = {
     "socket": "network",
 }
 DISALLOWED_PATTERNS = [
-    ("file_io", re.compile(r"(?<![\w\.])open\s*\(")),
+    ("file_io", re.compile(r"(?<![\w\.])open[ \t]*\(")),
 ]
 
 

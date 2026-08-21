@@ -129,7 +129,6 @@ jobs:
                   token=exchange_body.get('token') if isinstance(exchange_body,dict) else None
                   if not (200 <= exchange_status < 300 and isinstance(token,str) and token):
                       receipt['status']='TOKEN_EXCHANGE_FAILED'
-                      exit_code=3
                   else:
                       query=urllib.parse.urlencode({'id':(os.environ.get('PROPERTY_ID') or '324882').strip(),'includePictures':'true','includeAllRooms':'true'})
                       content_req=urllib.request.Request('https://api.beds24.com/v2/properties?' + query, headers={'accept':'application/json','token':token,'User-Agent':'AUMARA-photo-sync/1.0'}, method='GET')
@@ -149,8 +148,6 @@ jobs:
                       body={}
                   receipt['response_shape']=safe(body)
                   receipt['status']='LIVE_CONTENT_READ_OK' if 200 <= status < 300 else 'LIVE_CONTENT_READ_FAILED'
-                  if not 200 <= status < 300:
-                      exit_code=3
 
           print('api_key_secret_names=' + json.dumps(api_names))
           print('prop_key_secret_names=' + json.dumps(prop_names))

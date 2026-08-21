@@ -302,7 +302,7 @@ def get_all_canonical_entities(conn: sqlite3.Connection) -> list[Entity]:
     Returns a list of dicts with id, name, type, and description.
     """
     c = conn.cursor()
-    c.execute("SELECT id, name, type, description FROM entities")
+    c.execute("SELECT id, name, type, description FROM entities WHERE resolved_id IS NULL")
     rows = c.fetchall()
     return [
         Entity(

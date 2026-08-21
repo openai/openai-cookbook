@@ -1,0 +1,59 @@
+name: Beds24 secure UI handshake init
+
+on:
+  workflow_dispatch:
+  push:
+    branches: [main]
+    paths:
+      - '.github/workflows/beds24-ui-handshake-init.trigger'
+
+permissions:
+  contents: write
+
+jobs:
+  init:
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    environment: Production
+    env:
+      BEDS24_VAULT_KEK: ${{ secrets.BEDS24_REFRESH_CREDENTIAL }}
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+      - name: Install crypto
+        run: python -m pip install --disable-pip-version-check cryptography
+      - name: Generate one-time RSA handshake key
+        shell: bash
+        run: |
+          set -euo pipefail
+          python3 - <<'PY'
+          import base64, datetime as dt, hashlib, json, os, pathlib, subprocess
+          from cryptography.fernet import Fernet
+          from cryptography.hazmat.primitives import serialization
+          from cryptography.hazmat.primitives.asymmetric import rsa
+
+          kek=(os.environ.get('BEDS24_VAULT_KEK') or '').strip()
+          if not kek: raise SystemExit('Production KEK missing')
+          print(f'::add-mask::{kek}', flush=True)
+          root=pathlib.Path('aumara-control-tower/evidence/beds24-ui-handshake')
+          root.mkdir(parents=True,exist_ok=True)
+          for name in ('password.enc','login-link.enc'):
+              p=root/name
+              if p.exists(): p.unlink()
+          private=rsa.generate_private_key(public_exponent=65537,key_size=3072)
+          priv=private.private_bytes(serialization.Encoding.PEM,serialization.PrivateFormat.PKCS8,serialization.NoEncryption())
+          pub=private.public_key().public_bytes(serialization.Encoding.PEM,serialization.PublicFormat.SubjectPublicKeyInfo)
+          key=base64.urlsafe_b64encode(hashlib.sha256(('AUMARA_BEDS24_UI_HANDSHAKE_V1\0'+kek).encode()).digest())
+          private_enc=Fernet(key).encrypt(priv).decode('ascii')
+          (root/'public.pem').write_bytes(pub)
+          (root/'private.enc').write_text(private_enc+'\n',encoding='utf-8')
+          state={'status':'READY_FOR_PASSWORD_CIPHERTEXT','created_at_utc':dt.datetime.now(dt.timezone.utc).isoformat(),'public_key':'RSA-3072-OAEP-SHA256','private_key_encrypted':True,'secret_exposed':False}
+          (root/'state.json').write_text(json.dumps(state,indent=2,sort_keys=True)+'\n',encoding='utf-8')
+          subprocess.run(['git','config','user.name','github-actions[bot]'],check=True)
+          subprocess.run(['git','config','user.email','41898282+github-actions[bot]@users.noreply.github.com'],check=True)
+          subprocess.run(['git','add',str(root)],check=True)
+          subprocess.run(['git','commit','-m',f"Initialize Beds24 UI encrypted handshake {os.environ.get('GITHUB_RUN_ID','')} [skip ci]"],check=True)
+          subprocess.run(['git','pull','--rebase','origin','main'],check=True)
+          subprocess.run(['git','push','origin','HEAD:main'],check=True)
+          PY

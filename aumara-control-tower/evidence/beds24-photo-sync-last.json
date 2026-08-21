@@ -1,0 +1,9 @@
+{
+  "checked_at_utc": "2026-08-21T04:06:05.732064+00:00",
+  "child_returncode": 1,
+  "property_id": "324882",
+  "secret_exposed": false,
+  "status": "TRANSFER_FAILED",
+  "vault_loaded": true,
+  "vault_refreshed": false
+}

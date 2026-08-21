@@ -1,0 +1,8 @@
+{
+  "diagnostic": "Beds24 rejected username/password before second factor",
+  "property_id": 324882,
+  "secret_exposed": false,
+  "stage": "login",
+  "status": "FAILED",
+  "updated_at_utc": "2026-08-21T04:20:06.307783+00:00"
+}

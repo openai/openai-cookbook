@@ -1,0 +1,229 @@
+name: Beds24 secure UI photo upload AUMARA 324882
+
+on:
+  workflow_dispatch:
+  push:
+    branches: [main]
+    paths:
+      - 'aumara-control-tower/evidence/beds24-ui-handshake/password.enc'
+
+permissions:
+  contents: write
+
+concurrency:
+  group: beds24-secure-ui-photo-upload-324882
+  cancel-in-progress: false
+
+jobs:
+  upload:
+    runs-on: ubuntu-latest
+    timeout-minutes: 30
+    environment: Production
+    env:
+      BEDS24_VAULT_KEK: ${{ secrets.BEDS24_REFRESH_CREDENTIAL }}
+      BEDS24_USERNAME: 'EL CID / AUMARA'
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+      - name: Install browser and crypto
+        run: |
+          pip install --disable-pip-version-check 'gdown>=5.2,<6' 'pillow>=11,<12' 'playwright>=1.55,<2' cryptography
+          playwright install --with-deps chromium
+      - name: Login, wait for encrypted second factor, upload and verify
+        shell: bash
+        run: |
+          set -euo pipefail
+          python3 - <<'PY'
+          from __future__ import annotations
+          import base64, datetime as dt, hashlib, json, os, pathlib, re, subprocess, sys, time
+          from urllib.parse import parse_qsl, urljoin, urlsplit, urlunsplit
+          import gdown
+          from PIL import Image, ImageOps
+          from cryptography.fernet import Fernet
+          from cryptography.hazmat.primitives import hashes, serialization
+          from cryptography.hazmat.primitives.asymmetric import padding
+          from playwright.sync_api import sync_playwright, TimeoutError as PwTimeout
+
+          ROOT=pathlib.Path.cwd()
+          HS=ROOT/'aumara-control-tower/evidence/beds24-ui-handshake'
+          EVIDENCE=ROOT/'aumara-control-tower/evidence/beds24-ui-upload'
+          UPLOAD=ROOT/'upload'
+          SOURCE=ROOT/'source'
+          for p in (EVIDENCE,UPLOAD,SOURCE): p.mkdir(parents=True,exist_ok=True)
+          KEK=(os.environ.get('BEDS24_VAULT_KEK') or '').strip()
+          USER=(os.environ.get('BEDS24_USERNAME') or 'EL CID / AUMARA').strip()
+          if not KEK: raise SystemExit('Production handshake KEK missing')
+          print(f'::add-mask::{KEK}',flush=True)
+
+          def now(): return dt.datetime.now(dt.timezone.utc).isoformat()
+          def fkey(value): return base64.urlsafe_b64encode(hashlib.sha256(('AUMARA_BEDS24_UI_HANDSHAKE_V1\0'+value).encode()).digest())
+          def safe_url(value):
+              parts=urlsplit(value); keys=sorted({k for k,_ in parse_qsl(parts.query,keep_blank_values=True)})
+              return urlunsplit((parts.scheme,parts.netloc,parts.path,'&'.join(f'{k}=[REDACTED]' for k in keys),''))[:500]
+          def git_push(paths, message):
+              subprocess.run(['git','config','user.name','github-actions[bot]'],check=True)
+              subprocess.run(['git','config','user.email','41898282+github-actions[bot]@users.noreply.github.com'],check=True)
+              subprocess.run(['git','add',*map(str,paths)],check=True)
+              if subprocess.run(['git','diff','--cached','--quiet'],check=False).returncode!=0:
+                  subprocess.run(['git','commit','-m',message],check=True)
+                  subprocess.run(['git','pull','--rebase','origin','main'],check=True)
+                  subprocess.run(['git','push','origin','HEAD:main'],check=True)
+          def write_state(status, **extra):
+              state={'status':status,'updated_at_utc':now(),'property_id':324882,'secret_exposed':False,**extra}
+              (HS/'state.json').write_text(json.dumps(state,indent=2,sort_keys=True)+'\n',encoding='utf-8')
+              git_push([HS/'state.json'],f'Beds24 UI handshake state {status} [skip ci]')
+          def fail(stage,msg,page=None):
+              result.update(status='FAILED',stage=stage,diagnostic=msg,finished_at_utc=now())
+              (EVIDENCE/'result.json').write_text(json.dumps(result,indent=2,sort_keys=True)+'\n',encoding='utf-8')
+              if page is not None:
+                  try: page.screenshot(path=str(EVIDENCE/f'{stage}.png'),full_page=True)
+                  except Exception: pass
+              write_state('FAILED',stage=stage,diagnostic=msg[:500])
+              raise SystemExit(1)
+
+          # Decrypt one-time private key and password ciphertext.
+          private_pem=Fernet(fkey(KEK)).decrypt((HS/'private.enc').read_text().strip().encode())
+          private=serialization.load_pem_private_key(private_pem,password=None)
+          pwd_ct=base64.b64decode((HS/'password.enc').read_text().strip())
+          password=private.decrypt(pwd_ct,padding.OAEP(mgf=padding.MGF1(algorithm=hashes.SHA256()),algorithm=hashes.SHA256(),label=None)).decode().strip()
+          if not password: raise SystemExit('Decrypted password empty')
+          print(f'::add-mask::{password}',flush=True)
+
+          # Exact approved media manifest.
+          manifest=[
+              ('01_FULL_no_crop.jpg','1MAcqpC0veE8DNJuQvViQzCvUqwnlKbY_'),
+              ('02_FULL_no_crop.jpg','19jTCi6FThY584Iebs4vvlPujojSdudQD'),
+              ('03_FULL_no_crop.jpg','1WHAIG1Pz7w0rUwciC7O5dAMbB7WSEKKd'),
+              ('04_FULL_no_crop.jpg','1robOjhdVs12hp6XLbD5AuJsjW84bCxBc'),
+              ('06_FULL_no_crop.jpg','13c7-i9mzpIpX2JJnyyB406T9jp7EMFmV'),
+              ('IMG_0005.JPG','1Cg4Y-skeJ6VNAnfsRPwPEED9RlQ8IIlV'),
+              ('IMG_0006.JPG','1UJaAE4Z9DpVFi67xAG7iZ33l4_xMUS9o'),
+              ('IMG_0007.JPG','17Amun9sFTFpogCN459bhysRkgKCSaMo1'),
+              ('IMG_0009.JPG','1z80jRlJkLwdLkZlLlGv1zNB4i79JhSh8'),
+              ('IMG_0011.JPG','1cqP3azFyywT0jcNO8SfNbQ8lMAoOAtMj'),
+          ]
+          records=[]
+          for number,(name,file_id) in enumerate(manifest,1):
+              src=SOURCE/name
+              if not gdown.download(id=file_id,output=str(src),quiet=False): raise SystemExit(f'Drive download failed: {name}')
+              raw=src.read_bytes()
+              if len(raw)<50000 or not raw.startswith(b'\xff\xd8\xff'): raise SystemExit(f'Invalid JPEG: {name}')
+              with Image.open(src) as opened: image=ImageOps.exif_transpose(opened).convert('RGB'); original=image.size
+              if max(image.size)>2560: image.thumbnail((2560,2560),Image.Resampling.LANCZOS)
+              target=UPLOAD/f'{number:02d}_{src.stem}.png'
+              while True:
+                  image.save(target,'PNG',optimize=True,compress_level=9)
+                  if target.stat().st_size<=4_800_000: break
+                  if min(image.size)<=900: raise SystemExit(f'PNG too large: {name}')
+                  image=image.resize((int(image.width*.9),int(image.height*.9)),Image.Resampling.LANCZOS)
+              records.append({'source':name,'upload':target.name,'source_size':original,'upload_size':image.size,'crop':False})
+          if len(list(UPLOAD.glob('*.png')))!=10: raise SystemExit('Expected exactly 10 photos')
+          (EVIDENCE/'manifest.json').write_text(json.dumps(records,indent=2)+'\n',encoding='utf-8')
+
+          result={'property_id':324882,'photos':10,'status':'STARTING','started_at_utc':now(),'secret_exposed':False}
+          with sync_playwright() as p:
+              browser=p.chromium.launch(headless=True)
+              context=browser.new_context(viewport={'width':1440,'height':1100})
+              page=context.new_page(); page.set_default_timeout(30000)
+              writes=[]
+              page.on('response',lambda r: writes.append({'method':r.request.method,'status':r.status,'url':safe_url(r.url)}) if r.request.method in ('POST','PUT','PATCH') else None)
+              try:
+                  page.goto('https://beds24.com/control2.php',wait_until='domcontentloaded',timeout=60000)
+                  user=page.locator("input[name='username'], input[name='user'], input[autocomplete='username'], input[type='email']").first
+                  if not user.count(): user=page.locator("input[type='text']").first
+                  secret=page.locator("input[name='password'], input[autocomplete='current-password'], input[type='password']").first
+                  if not user.count() or not secret.count(): fail('login_form','Login fields not found',page)
+                  user.fill(USER); secret.fill(password)
+                  submit=page.locator("button[type='submit'], input[type='submit'], #loginButton, button:has-text('Log in'), button:has-text('Login'), button:has-text('Sign in')").first
+                  if not submit.count(): fail('login_form','Login button not found',page)
+                  submit.click(); page.wait_for_timeout(5000)
+
+                  # If the login page has produced an OTP/link challenge, keep this exact browser context alive.
+                  body=(page.locator('body').inner_text() or '').lower()
+                  otp=page.locator("input[name*='code' i], input[name*='two' i], input[autocomplete='one-time-code'], input[inputmode='numeric']").first
+                  challenged=bool(otp.count()) or any(x in body for x in ('two factor','2 factor','login code','verification code','email code','check your email','login link'))
+                  still_password=bool(page.locator("input[type='password']").count())
+                  if challenged:
+                      # Clear an old second-factor ciphertext so we never consume a stale code.
+                      subprocess.run(['git','fetch','origin','main'],check=True)
+                      write_state('AWAITING_SECOND_FACTOR',challenge_detected=True,login_url=safe_url(page.url))
+                      deadline=time.time()+600; second=''
+                      while time.time()<deadline:
+                          subprocess.run(['git','fetch','origin','main'],check=True,stdout=subprocess.DEVNULL,stderr=subprocess.DEVNULL)
+                          show=subprocess.run(['git','show','origin/main:aumara-control-tower/evidence/beds24-ui-handshake/second-factor.enc'],capture_output=True,text=True,check=False)
+                          if show.returncode==0 and show.stdout.strip():
+                              try:
+                                  ct=base64.b64decode(show.stdout.strip())
+                                  second=private.decrypt(ct,padding.OAEP(mgf=padding.MGF1(algorithm=hashes.SHA256()),algorithm=hashes.SHA256(),label=None)).decode().strip()
+                                  if second: break
+                              except Exception: pass
+                          page.wait_for_timeout(5000)
+                      if not second: fail('second_factor','Timed out waiting for encrypted second factor',page)
+                      print(f'::add-mask::{second}',flush=True)
+                      if second.startswith('http://') or second.startswith('https://'):
+                          page.goto(second,wait_until='domcontentloaded',timeout=60000); page.wait_for_timeout(4000)
+                      else:
+                          otp=page.locator("input[name*='code' i], input[name*='two' i], input[autocomplete='one-time-code'], input[inputmode='numeric']").first
+                          if not otp.count(): fail('second_factor','Second-factor field not found',page)
+                          otp.fill(second)
+                          verify=page.locator("button[type='submit'], input[type='submit'], button:has-text('Verify'), button:has-text('Login'), button:has-text('Continue')").first
+                          if not verify.count(): fail('second_factor','Second-factor submit not found',page)
+                          verify.click(); page.wait_for_timeout(5000)
+                  elif still_password:
+                      fail('login','Beds24 rejected username/password before second factor',page)
+
+                  # Prove control-panel session before touching pictures.
+                  page.goto('https://beds24.com/control3.php?pagetype=propcontent&propid=324882',wait_until='domcontentloaded',timeout=60000)
+                  page.wait_for_timeout(2000)
+                  if page.locator("input[type='password']").count(): fail('session','Control-panel session was not established',page)
+                  result['login']=True
+
+                  links=page.locator('a').evaluate_all("els => els.map(a => ({text:(a.innerText||'').trim(), href:a.href||''}))")
+                  picture=next((x['href'] for x in links if any(k in x['text'].lower() for k in ('picture','photo','image'))),None)
+                  candidates=([urljoin(page.url,picture)] if picture else [])+[
+                      'https://beds24.com/control2.php?pagetype=pictures&propid=324882',
+                      'https://beds24.com/control2.php?pagetype=picture&propid=324882',
+                      'https://beds24.com/control3.php?pagetype=pictures&propid=324882',
+                      'https://beds24.com/control3.php?pagetype=propcontent&propid=324882',
+                  ]
+                  for candidate in dict.fromkeys(candidates):
+                      page.goto(candidate,wait_until='domcontentloaded',timeout=60000); page.wait_for_timeout(1500)
+                      if page.locator("input[type='file']").count(): break
+                  else: fail('pictures_page','Pictures upload input not found',page)
+                  file_input=page.locator("input[type='file']").first
+                  selector="img[src*='picture' i], img[src*='image' i], .picture img, .pictures img"
+                  before=page.locator(selector).count(); writes.clear()
+                  upload_button="button:has-text('Upload'), input[value*='Upload' i], button:has-text('Save'), input[value*='Save' i]"
+                  photos=sorted(UPLOAD.glob('*.png'))
+                  if file_input.get_attribute('multiple') is not None:
+                      file_input.set_input_files([str(x) for x in photos]); button=page.locator(upload_button).first
+                      if button.count() and button.is_visible(): button.click()
+                      page.wait_for_timeout(15000)
+                  else:
+                      for photo in photos:
+                          page.locator("input[type='file']").first.set_input_files(str(photo)); button=page.locator(upload_button).first
+                          if button.count() and button.is_visible(): button.click()
+                          page.wait_for_timeout(5000)
+                  try: page.reload(wait_until='domcontentloaded',timeout=60000)
+                  except PwTimeout: pass
+                  page.wait_for_timeout(3000)
+                  after=page.locator(selector).count(); text=(page.locator('body').inner_text() or '').lower()
+                  success_writes=[x for x in writes if 200<=x['status']<400]; hits=[x.name for x in photos if x.name.lower() in text]
+                  result.update(images_before=before,images_after=after,successful_writes=success_writes,failed_writes=[x for x in writes if x['status']>=400],filename_hits=hits)
+                  if not (after>=before+10 or len(hits)==10 or len(success_writes)>=10): fail('verify','Upload was not proven by image count, filenames, or 10 successful writes',page)
+                  result.update(status='SUCCESS',uploaded=10,finished_at_utc=now())
+                  (EVIDENCE/'result.json').write_text(json.dumps(result,indent=2,sort_keys=True)+'\n',encoding='utf-8')
+                  write_state('SUCCESS',uploaded=10,images_before=before,images_after=after)
+              except PwTimeout as exc:
+                  fail('timeout',str(exc),page)
+              finally:
+                  try: browser.close()
+                  except Exception: pass
+
+          # Persist only sanitized result/manifest. Never persist credentials/second factor.
+          subprocess.run(['git','fetch','origin','main'],check=True)
+          subprocess.run(['git','pull','--rebase','origin','main'],check=True)
+          git_push([EVIDENCE/'result.json',EVIDENCE/'manifest.json'],f"Record Beds24 UI photo upload {os.environ.get('GITHUB_RUN_ID','')} [skip ci]")
+          print(json.dumps({'status':result['status'],'uploaded':result.get('uploaded',0),'property_id':324882}))
+          PY

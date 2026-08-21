@@ -11,7 +11,7 @@ from .models import Project
 
 ENV_PATTERN = re.compile(r"os\.environ\.(?:get|__getitem__)\(\s*[\"']([A-Z0-9_]+)[\"']")
 ENV_SUBSCRIPT_PATTERN = re.compile(
-    r"os\.environ\[\s*[\"']([A-Z0-9_]+)[\"']\s*\]"
+    r"os\.environ\s*\[\s*[\"']([A-Z0-9_]+)[\"']\s*\]"
 )
 GETENV_PATTERN = re.compile(r"os\.getenv\(\s*[\"']([A-Z0-9_]+)[\"']")
 PORT_PATTERN = re.compile(r"os\.environ\.get\(\s*[\"']PORT[\"']\s*,\s*[\"'](\d+)[\"']")

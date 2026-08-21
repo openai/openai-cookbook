@@ -192,10 +192,19 @@ def wait_for_app(app_url: str) -> None:
 
 def api_ok(manager_url: str) -> bool:
     try:
-        payload = get_json(manager_url, "/api/health")
-    except urllib.error.URLError:
+        payload = json.loads(
+            request(f"{manager_url}/api/health", timeout=1).decode("utf-8")
+        )
+    except (
+        urllib.error.URLError,
+        TimeoutError,
+        http.client.HTTPException,
+        OSError,
+        UnicodeDecodeError,
+        json.JSONDecodeError,
+    ):
         return False
-    return payload.get("ok") == "true"
+    return isinstance(payload, dict) and payload.get("ok") == "true"
 
 
 def get_json(base_url: str, path: str) -> dict[str, Any]:

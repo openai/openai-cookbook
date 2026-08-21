@@ -1,8 +1,13 @@
 {
   "schema": "aumara.beds24-photo-sync-discovery",
-  "checked_at_utc": "2026-08-19T20:34:06Z",
+  "checked_at_utc": "2026-08-21T20:58:14Z",
   "api_key_secret_names": [],
   "prop_key_secret_names": [],
+  "refresh_token_secret_names": [
+    "BEDS24_REFRESH_CREDENTIAL"
+  ],
   "secret_values_exposed": false,
-  "status": "MISSING_MATCH"
+  "status": "TOKEN_EXCHANGE_FAILED",
+  "auth_mode": "refresh_token",
+  "token_exchange_http_status": 401
 }

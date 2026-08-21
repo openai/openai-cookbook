@@ -1,4 +1,3 @@
-import 'dotenv/config';
 import { Resend } from '@resend/node';
 
 const required = [

@@ -9,6 +9,7 @@ REPOSITORY_ROOT = pathlib.Path(__file__).resolve().parents[2]
 
 class Beds24PhotoSyncDiscoveryWorkflowTests(unittest.TestCase):
     def test_only_secret_name_validation_is_fatal(self) -> None:
+    def test_only_secret_name_discovery_errors_hard_fail(self) -> None:
         workflow = (
             REPOSITORY_ROOT
             / ".github"
@@ -26,3 +27,9 @@ class Beds24PhotoSyncDiscoveryWorkflowTests(unittest.TestCase):
             workflow,
         )
         self.assertNotIn("exit_code=3", workflow)
+        self.assertEqual(workflow.count("exit_code=2"), 2)
+        self.assertNotIn("exit_code=3", workflow)
+
+
+if __name__ == "__main__":
+    unittest.main()

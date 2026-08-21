@@ -113,6 +113,11 @@ def summarize_groups(
         qrows = _read_quant_csv(qpath)
         jrows = _read_judge_csv(judge_paths[name]) if name in judge_paths and judge_paths[name].exists() else []
         jmap = {Path(j.file).stem: j for j in jrows}
+        jrows = [
+            jmap[Path(q.file).stem]
+            for q in qrows
+            if Path(q.file).stem in jmap
+        ]
 
         n_total = len(qrows)
         n_success = sum(1 for r in qrows if r.compiled)

@@ -1,0 +1,141 @@
+name: AUMARA rotation-safe Beds24 photo sync from vault
+
+on:
+  issues:
+    types: [opened]
+
+permissions:
+  contents: write
+  issues: write
+
+jobs:
+  sync:
+    if: >-
+      github.event.issue.title == 'AUMARA control: sync Beds24 photos from vault' &&
+      github.event.issue.user.login == 'elcidspain'
+    runs-on: ubuntu-latest
+    timeout-minutes: 30
+    environment: Production
+    env:
+      BEDS24_VAULT_KEK: ${{ secrets.BEDS24_REFRESH_CREDENTIAL }}
+      PROPERTY_ID: '324882'
+      ISSUE_NUMBER: ${{ github.event.issue.number }}
+      GH_TOKEN: ${{ github.token }}
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+
+      - name: Install vault dependency
+        run: python -m pip install --disable-pip-version-check cryptography
+
+      - name: Run existing photo transfer with vault credential and persist refresh safely
+        id: transfer
+        continue-on-error: true
+        shell: bash
+        run: |
+          python3 - <<'PY'
+          from __future__ import annotations
+          import base64, datetime as dt, hashlib, json, os, pathlib, re, subprocess, sys, textwrap
+          import urllib.request
+          from cryptography.fernet import Fernet
+
+          kek=(os.environ.get('BEDS24_VAULT_KEK') or '').strip()
+          if kek: print(f'::add-mask::{kek}', flush=True)
+          vault=pathlib.Path('aumara-control-tower/evidence/beds24-refresh-vault.json')
+          last=pathlib.Path('aumara-control-tower/evidence/beds24-photo-sync-last.json')
+          rotated_path=pathlib.Path('/tmp/beds24-rotated-refresh.txt')
+          source=pathlib.Path('.github/workflows/update-beds24-photos.yml')
+          issue=int(os.environ['ISSUE_NUMBER']); repo=os.environ['GITHUB_REPOSITORY']; gh_token=os.environ['GH_TOKEN']
+
+          def now(): return dt.datetime.now(dt.timezone.utc).isoformat()
+          def vault_key(value):
+              return base64.urlsafe_b64encode(hashlib.sha256(('AUMARA_BEDS24_REFRESH_VAULT_V1\0'+value).encode()).digest())
+          def comment(body):
+              req=urllib.request.Request(
+                  f'https://api.github.com/repos/{repo}/issues/{issue}/comments',
+                  headers={'Accept':'application/vnd.github+json','Authorization':f'Bearer {gh_token}','Content-Type':'application/json','X-GitHub-Api-Version':'2022-11-28','User-Agent':'AUMARA-Beds24-Vault-Sync/1.0'},
+                  data=json.dumps({'body':body}).encode(),method='POST')
+              with urllib.request.urlopen(req,timeout=60): pass
+          def close_issue():
+              req=urllib.request.Request(
+                  f'https://api.github.com/repos/{repo}/issues/{issue}',
+                  headers={'Accept':'application/vnd.github+json','Authorization':f'Bearer {gh_token}','Content-Type':'application/json','X-GitHub-Api-Version':'2022-11-28','User-Agent':'AUMARA-Beds24-Vault-Sync/1.0'},
+                  data=json.dumps({'state':'closed','state_reason':'completed'}).encode(),method='PATCH')
+              with urllib.request.urlopen(req,timeout=60): pass
+
+          result={'checked_at_utc':now(),'property_id':'324882','status':'STARTING','child_returncode':None,'vault_loaded':False,'vault_refreshed':False,'secret_exposed':False}
+          rc=1
+          try:
+              if not kek: raise RuntimeError('Production vault KEK missing')
+              data=json.loads(vault.read_text(encoding='utf-8'))
+              cipher=data.get('ciphertext')
+              if not isinstance(cipher,str) or not cipher: raise RuntimeError('Encrypted refresh vault missing ciphertext')
+              credential=Fernet(vault_key(kek)).decrypt(cipher.encode()).decode().strip()
+              print(f'::add-mask::{credential}', flush=True)
+              result['vault_loaded']=True
+
+              raw=source.read_text(encoding='utf-8')
+              match=re.search(r"python3 - <<'PY'\n(.*?)\n\s+PY\n",raw,re.S)
+              if not match: raise RuntimeError('Could not extract canonical photo-transfer Python from workflow')
+              code=textwrap.dedent(match.group(1))
+              pattern=r"(?m)^(\s*)if isinstance\(rotated, str\) and rotated:\n\1    mask\(rotated\)"
+              replacement=(
+                  r"\1if isinstance(rotated, str) and rotated:\n"
+                  r"\1    mask(rotated)\n"
+                  r"\1    pathlib.Path(os.environ['BEDS24_ROTATED_OUT']).write_text(rotated, encoding='utf-8')"
+              )
+              code,count=re.subn(pattern,replacement,code,count=1)
+              if count!=1: raise RuntimeError('Could not install rotation persistence hook into canonical transfer')
+
+              child_env=dict(os.environ)
+              child_env['BEDS24_REFRESH_CREDENTIAL']=credential
+              child_env['BEDS24_REFRESH_TOKEN']=''
+              child_env['BEDS24_ROTATED_OUT']=str(rotated_path)
+              proc=subprocess.run([sys.executable,'-c',code],env=child_env,check=False)
+              rc=int(proc.returncode); result['child_returncode']=rc
+
+              refresh_to_keep=credential
+              if rotated_path.exists():
+                  rotated=rotated_path.read_text(encoding='utf-8').strip()
+                  if rotated:
+                      print(f'::add-mask::{rotated}', flush=True)
+                      refresh_to_keep=rotated
+                      result['vault_refreshed']=True
+              ciphertext=Fernet(vault_key(kek)).encrypt(refresh_to_keep.encode()).decode('ascii')
+              vault.write_text(json.dumps({
+                  'version':1,'cipher':'fernet-sha256-kek','source':'rotation_safe_photo_sync',
+                  'created_at_utc':now(),'ciphertext':ciphertext,'plaintext_stored':False
+              },indent=2,sort_keys=True)+'\n',encoding='utf-8')
+              result['status']='SUCCESS' if rc==0 else 'TRANSFER_FAILED'
+          except Exception as exc:
+              result['status']='CONTROLLER_FAILED'; result['diagnostic']=f'{type(exc).__name__}: {str(exc)[:500]}'
+              rc=1
+
+          result['checked_at_utc']=now(); last.parent.mkdir(parents=True,exist_ok=True)
+          last.write_text(json.dumps(result,indent=2,sort_keys=True)+'\n',encoding='utf-8')
+          subprocess.run(['git','config','user.name','github-actions[bot]'],check=True)
+          subprocess.run(['git','config','user.email','41898282+github-actions[bot]@users.noreply.github.com'],check=True)
+          subprocess.run(['git','add',str(vault),str(last)],check=True)
+          if subprocess.run(['git','diff','--cached','--quiet'],check=False).returncode != 0:
+              subprocess.run(['git','commit','-m',f"Record rotation-safe Beds24 photo sync {os.environ.get('GITHUB_RUN_ID','')} [skip ci]"],check=True)
+              subprocess.run(['git','pull','--rebase','origin','main'],check=True)
+              subprocess.run(['git','push','origin','HEAD:main'],check=True)
+
+          body='Beds24 vault photo-sync result (no credentials):\n\n```json\n'+json.dumps(result,indent=2,sort_keys=True)+'\n```'
+          comment(body); close_issue()
+          raise SystemExit(rc)
+          PY
+
+      - name: Upload sanitized transfer evidence
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: beds24-photo-vault-sync-${{ github.run_id }}
+          path: ${{ runner.temp }}/beds24-324882/evidence.json
+          if-no-files-found: warn
+          retention-days: 3
+
+      - name: Enforce transfer result
+        if: steps.transfer.outcome != 'success'
+        run: exit 1

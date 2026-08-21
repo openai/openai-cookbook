@@ -1,4 +1,4 @@
-import { Resend } from '@resend/node';
+import { sendMail } from './mailer.mjs';
 
 const required = [
   'THREADS_ACCESS_TOKEN',
@@ -117,13 +117,15 @@ async function airtableCreate(fields) {
 
 async function sendSummary(summary) {
   if (!process.env.RESEND_API_KEY) return { skipped: true };
-  const resend = new Resend(process.env.RESEND_API_KEY);
-  return resend.emails.send({
-    from: process.env.AUMARA_MAIL_FROM || 'AUMARA El Cid <onboarding@resend.dev>',
+  return sendMail({
     to: process.env.AUMARA_TEST_TO || 'elcidspain@gmail.com',
-    replyTo: process.env.AUMARA_MAIL_REPLY_TO || 'elcidspain@gmail.com',
     subject: `Threads Metrics — ${summary.date}`,
     text: summary.text,
+    tags: [
+      { name: 'project', value: 'aumara' },
+      { name: 'source', value: 'threads-insights-daily' }
+    ],
+    idempotencyKey: `threads-insights-daily-${summary.date}`
   });
 }
 

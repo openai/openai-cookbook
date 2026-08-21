@@ -18,7 +18,7 @@ jobs:
     timeout-minutes: 35
     env:
       GITHUB_TOKEN: ${{ github.token }}
-      TARGET_WORKFLOW: update-beds24-photos.yml
+      TARGET_WORKFLOW: beds24-photo-sync-vault-controller.yml
     steps:
       - name: Dispatch photo sync and report safe metadata
         shell: bash
@@ -28,7 +28,7 @@ jobs:
           import datetime as dt, json, os, pathlib, time, urllib.error, urllib.parse, urllib.request
           repo=os.environ['GITHUB_REPOSITORY']; api=os.environ.get('GITHUB_API_URL','https://api.github.com'); token=os.environ['GITHUB_TOKEN']; wf=os.environ['TARGET_WORKFLOW']
           event=json.loads(pathlib.Path(os.environ['GITHUB_EVENT_PATH']).read_text(encoding='utf-8')); issue=int(event['issue']['number'])
-          headers={'Accept':'application/vnd.github+json','Authorization':f'Bearer {token}','Content-Type':'application/json','X-GitHub-Api-Version':'2022-11-28','User-Agent':'AUMARA-Beds24-Photo-Sync-Controller/1.0'}
+          headers={'Accept':'application/vnd.github+json','Authorization':f'Bearer {token}','Content-Type':'application/json','X-GitHub-Api-Version':'2022-11-28','User-Agent':'AUMARA-Beds24-Photo-Sync-Controller/2.0'}
           def call(path,method='GET',payload=None):
               data=None if payload is None else json.dumps(payload).encode()
               req=urllib.request.Request(f'{api}{path}',data=data,headers=headers,method=method)

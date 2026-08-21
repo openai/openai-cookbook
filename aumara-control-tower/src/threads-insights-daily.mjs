@@ -156,7 +156,7 @@ const topPosts = [...enriched]
   .slice(0, 5);
 
 const capturedAt = new Date().toISOString();
-const checkpointName = `${capturedAt.slice(0, 10)} Threads API checkpoint`;
+const checkpointName = capturedAt.slice(0, 10);
 const notes = [
   `Sprint: ${sprintStart}–${sprintEnd}`,
   `Content views: ${contentViews}`,

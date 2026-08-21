@@ -98,15 +98,19 @@ async function fetchUserInsights() {
   return metrics;
 }
 
-async function airtableCreate(fields) {
+async function airtableUpsert(fields) {
   const endpoint = `https://api.airtable.com/v0/${process.env.AIRTABLE_BASE_ID}/${process.env.AIRTABLE_THREADS_TABLE_ID}`;
   const response = await fetch(endpoint, {
-    method: 'POST',
+    method: 'PATCH',
     headers: {
       Authorization: `Bearer ${process.env.AIRTABLE_PAT}`,
       'Content-Type': 'application/json',
     },
-    body: JSON.stringify({ records: [{ fields }], typecast: true }),
+    body: JSON.stringify({
+      performUpsert: { fieldsToMergeOn: ['Checkpoint'] },
+      records: [{ fields }],
+      typecast: true,
+    }),
   });
   const body = await response.json().catch(() => ({}));
   if (!response.ok) {
@@ -117,6 +121,16 @@ async function airtableCreate(fields) {
 
 async function sendSummary(summary) {
   if (!process.env.RESEND_API_KEY) return { skipped: true };
+  if (String(process.env.AUMARA_AUTOMATION_MODE || '').toLowerCase() !== 'live') {
+    return { skipped: true, reason: 'AUMARA_AUTOMATION_MODE is not live' };
+  }
+  if (!/^(1|true|yes)$/i.test(String(process.env.AUMARA_LIVE_SEND_CONFIRMED || ''))) {
+    return { skipped: true, reason: 'AUMARA_LIVE_SEND_CONFIRMED is not true' };
+  }
+  if (/onboarding@resend\.dev/i.test(String(process.env.AUMARA_MAIL_FROM || ''))) {
+    return { skipped: true, reason: 'Resend onboarding sender is forbidden' };
+  }
+
   return sendMail({
     to: process.env.AUMARA_TEST_TO || 'elcidspain@gmail.com',
     subject: `Threads Metrics — ${summary.date}`,
@@ -162,7 +176,7 @@ const notes = [
   `Top posts: ${topPosts.map((p) => `${p.insights.views || 0} — ${(p.text || '').replace(/\s+/g, ' ').slice(0, 90)}`).join(' | ')}`,
 ].join('\n');
 
-await airtableCreate({
+await airtableUpsert({
   Checkpoint: checkpointName,
   'Captured at': capturedAt,
   Source: 'Threads API',

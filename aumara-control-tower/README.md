@@ -179,7 +179,7 @@ email, or booking action occurred.
 
 ## Threads Content Studio automation
 
-The collector reads the account's own Threads posts and insights, separates content views from profile views, calculates the remaining pace for the 100,000-view sprint, writes a verified checkpoint to the Airtable `Threads Metrics` table, and emails a concise metric summary.
+The collector reads the account's own Threads posts and insights, separates content views from profile views, calculates the remaining pace for the 100,000-view sprint, writes a checkpoint to the Airtable `Threads Metrics` table, and emails a concise metric summary when live sending is enabled.
 
 Required Meta permissions:
 

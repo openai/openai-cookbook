@@ -51,6 +51,14 @@ PROPERTY_ROOM_SCOPE = {
         {"roomId": 674486, "name": "Studio", "physicalUnits": 1},
     ),
 }
+RECOVERABLE_SHADOW_ERROR_PREFIXES = (
+    "Beds24 authentication failed",
+    "Beds24 GET request failed",
+    "booking lookup failed",
+    "booking lookup returned no data array",
+    "message lookup failed",
+    "message lookup returned no data array",
+)
 
 
 class ShadowFeedError(RuntimeError):
@@ -426,6 +434,36 @@ def configured_scope() -> dict[str, Any]:
     }
 
 
+def is_recoverable_shadow_error(exc: ShadowFeedError) -> bool:
+    message = str(exc)
+    return message.startswith(RECOVERABLE_SHADOW_ERROR_PREFIXES)
+
+
+def degraded_summary(*, run_at: dt.datetime, reason: str) -> dict[str, Any]:
+    return {
+        "schema": "aumara-beds24-guest-journey-shadow-v1",
+        "mode": "shadow_read_only",
+        "runAtUtc": run_at.astimezone(dt.timezone.utc).isoformat(),
+        "summary": {
+            "proposal": 0,
+            "manual_review": 0,
+            "skip": 0,
+            "blocked": 0,
+            "degraded": 1,
+        },
+        "properties": {},
+        "reasons": {},
+        "getRequests": 0,
+        "postRequests": 0,
+        "guestMessagesSent": 0,
+        "bookingMutations": 0,
+        "durableClaimsWritten": 0,
+        "containsGuestPii": False,
+        "degraded": True,
+        "degradedReason": reason,
+    }
+
+
 def build_live_shadow_summary() -> dict[str, Any]:
     """Read Beds24 through the GET-only boundary and return aggregate output."""
     assert_shadow_guards()
@@ -477,7 +515,15 @@ def main() -> int:
     parser = argparse.ArgumentParser(description=__doc__)
     parser.add_argument("--output", required=True, type=pathlib.Path)
     args = parser.parse_args()
-    summary = build_live_shadow_summary()
+    try:
+        summary = build_live_shadow_summary()
+    except ShadowFeedError as exc:
+        if not is_recoverable_shadow_error(exc):
+            raise
+        summary = degraded_summary(
+            run_at=dt.datetime.now(dt.timezone.utc),
+            reason=str(exc),
+        )
     args.output.parent.mkdir(parents=True, exist_ok=True)
     args.output.write_text(
         json.dumps(summary, ensure_ascii=False, indent=2) + "\n",

@@ -4,6 +4,7 @@ import datetime as dt
 import json
 import pathlib
 import sys
+import tempfile
 import unittest
 import urllib.request
 from unittest import mock
@@ -232,6 +233,54 @@ class Beds24GuestJourneyShadowTests(unittest.TestCase):
             shadow.ShadowFeedError, "non-GET attempt"
         ):
             shadow.sanitized_summary(report, run_at=NOW, post_requests=1)
+
+    def test_main_writes_degraded_summary_on_beds24_auth_failure(self) -> None:
+        with tempfile.TemporaryDirectory() as tmpdir:
+            output = pathlib.Path(tmpdir) / "summary.json"
+            argv = [
+                "beds24_guest_journey_shadow.py",
+                "--output",
+                str(output),
+            ]
+            with mock.patch.object(
+                shadow,
+                "build_live_shadow_summary",
+                side_effect=shadow.ShadowFeedError(
+                    "Beds24 authentication failed with HTTP status 401"
+                ),
+            ):
+                with mock.patch.object(sys, "argv", argv):
+                    exit_code = shadow.main()
+            self.assertEqual(exit_code, 0)
+            payload = json.loads(output.read_text(encoding="utf-8"))
+            self.assertTrue(payload["degraded"])
+            self.assertEqual(
+                payload["degradedReason"],
+                "Beds24 authentication failed with HTTP status 401",
+            )
+            self.assertEqual(payload["postRequests"], 0)
+            self.assertFalse(payload["containsGuestPii"])
+
+    def test_main_keeps_shadow_guard_failure_as_hard_error(self) -> None:
+        with tempfile.TemporaryDirectory() as tmpdir:
+            output = pathlib.Path(tmpdir) / "summary.json"
+            argv = [
+                "beds24_guest_journey_shadow.py",
+                "--output",
+                str(output),
+            ]
+            with mock.patch.object(
+                shadow,
+                "build_live_shadow_summary",
+                side_effect=shadow.ShadowFeedError(
+                    "refusing to run without shadow guards: AUMARA_DISABLE_GUEST_SEND"
+                ),
+            ):
+                with mock.patch.object(sys, "argv", argv):
+                    with self.assertRaisesRegex(
+                        shadow.ShadowFeedError, "shadow guards"
+                    ):
+                        shadow.main()
 
     def test_live_sender_rejects_non_atomic_claim_backend(self) -> None:
         class NonAtomicClaimBackend:

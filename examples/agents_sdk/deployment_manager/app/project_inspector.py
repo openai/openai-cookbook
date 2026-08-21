@@ -10,6 +10,9 @@ from .models import Project
 
 
 ENV_PATTERN = re.compile(r"os\.environ\.(?:get|__getitem__)\(\s*[\"']([A-Z0-9_]+)[\"']")
+ENV_SUBSCRIPT_PATTERN = re.compile(
+    r"os\.environ\s*\[\s*[\"']([A-Z0-9_]+)[\"']\s*\]"
+)
 GETENV_PATTERN = re.compile(r"os\.getenv\(\s*[\"']([A-Z0-9_]+)[\"']")
 PORT_PATTERN = re.compile(r"os\.environ\.get\(\s*[\"']PORT[\"']\s*,\s*[\"'](\d+)[\"']")
 
@@ -39,6 +42,7 @@ def _find_env_vars(files: list[Path]) -> tuple[list[str], list[str]]:
     for path in files:
         text = _read(path)
         names.update(ENV_PATTERN.findall(text))
+        names.update(ENV_SUBSCRIPT_PATTERN.findall(text))
         names.update(GETENV_PATTERN.findall(text))
     optional = {"HOST", "PORT", "SANDBOX_BACKEND", "SANDBOX_IMAGE"}
     manager = {

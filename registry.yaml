@@ -46,6 +46,22 @@
     - agents
     - cost-management
 
+- title: Testing agent recovery from tool failures with the OpenAI Agents SDK
+  path: examples/agents_sdk/testing_agent_recovery_from_tool_failures.ipynb
+  slug: testing-agent-recovery-from-tool-failures
+  description: Build and evaluate an Agents SDK workflow with account-scoped recovery, approved idempotent writes, and deterministic tool-failure tests.
+  date: 2026-08-20
+  authors:
+    - saptob
+    - aijinggao
+    - the-OAI
+  tags:
+    - agents-sdk
+    - agents
+    - evals
+    - promptfoo
+    - idempotency
+
 - title: Migrate from Whisper to GPT-Transcribe and GPT-Live-Transcribe
   path: examples/migrating_from_whisper_to_gpt_transcribe.ipynb
   slug: migrating-from-whisper-to-gpt-transcribe

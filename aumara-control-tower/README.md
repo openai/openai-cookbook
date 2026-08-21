@@ -1,5 +1,6 @@
 # AUMARA Control Tower
 
+Transactional email/webhook service for AUMARA El Cid, plus a Threads Insights collector for the Content Studio.
 Staged transactional email/webhook service for AUMARA El Cid. It starts in
 `off`, supports a zero-send `audit` stage, and requires a separately confirmed
 `live` cutover.
@@ -176,6 +177,25 @@ The legacy paid-booking recovery workflow is retired and hard-disabled. Its
 safety check only writes a local artifact proving that no external network,
 email, or booking action occurred.
 
+## Threads Content Studio automation
+
+The collector reads the account's own Threads posts and insights, separates content views from profile views, calculates the remaining pace for the 100,000-view sprint, writes a checkpoint to the Airtable `Threads Metrics` table, and emails a concise metric summary when live sending is enabled.
+
+Required Meta permissions:
+
+- `threads_basic`
+- `threads_manage_insights`
+
+Configure the Threads and Airtable values in `.env`, then run:
+
+```bash
+npm run threads:daily
+```
+
+The script is read-only toward Threads. It does not publish, reply, like, follow, unfollow, archive or delete anything.
+
+For production, schedule `npm run threads:daily` once per day after the Threads token and Airtable PAT are installed as secrets. The sprint dates are anchored by default to 26 June–25 July 2026 and can be changed through environment variables.
+
 ## Current mail routing
 
 - Provider: Resend
@@ -186,6 +206,7 @@ email, or booking action occurred.
 
 ## Production next step
 
+Deploy this folder as a Node service, set environment variables, connect the Beds24 action/webhook, and add a daily scheduler for `npm run threads:daily`.
 Before deployment, provision a durable external idempotency store. The in-memory
 store is sufficient for local and single-instance audit validation but is not a
 production cutover dependency.

@@ -11,7 +11,8 @@
     "health": "node --env-file-if-exists=.env src/healthcheck.mjs",
     "build:daily-ops": "python scripts/daily_ops_snapshot.py",
     "test": "node --test src/*.test.mjs",
-    "test:email": "node --env-file-if-exists=.env src/send-test-email.mjs"
+    "test:email": "node --env-file-if-exists=.env src/send-test-email.mjs",
+    "threads:daily": "node --env-file-if-exists=.env src/threads-insights-daily.mjs"
   },
   "dependencies": {
     "@resend/node": "latest"

@@ -25,7 +25,7 @@ jobs:
 
       - name: Download real AUMARA walkthrough source
         run: |
-          gdown --id 1L8oePUeTfB0EFXhyXW3J6R82LF2ob6tt -O /tmp/IMG_8063.MOV
+          gdown 1L8oePUeTfB0EFXhyXW3J6R82LF2ob6tt -O /tmp/IMG_8063.MOV
           test -s /tmp/IMG_8063.MOV
 
       - name: Build lightweight point-to-point MP4

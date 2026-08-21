@@ -1,0 +1,7 @@
+{
+  "created_at_utc": "2026-08-21T04:10:13.254869+00:00",
+  "private_key_encrypted": true,
+  "public_key": "RSA-3072-OAEP-SHA256",
+  "secret_exposed": false,
+  "status": "READY_FOR_PASSWORD_CIPHERTEXT"
+}

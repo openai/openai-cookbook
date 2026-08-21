@@ -15,10 +15,10 @@ jobs:
       github.event.issue.title == 'AUMARA control: inventory Beds24 bindings 324882' &&
       github.event.issue.user.login == 'elcidspain'
     runs-on: ubuntu-latest
-    timeout-minutes: 15
+    timeout-minutes: 20
     env:
       GITHUB_TOKEN: ${{ github.token }}
-      TARGET_WORKFLOW: beds24-binding-inventory.yml
+      TARGET_WORKFLOW: beds24-ui-photo-upload-handshake.yml
     steps:
       - name: Dispatch inventory and report safe metadata
         shell: bash
@@ -51,13 +51,13 @@ jobs:
                   if created >= start-dt.timedelta(seconds=10): run=x; break
               if run is None: time.sleep(4)
           if run is None: raise RuntimeError('DISPATCHED_RUN_NOT_FOUND')
-          deadline=time.time()+600
+          deadline=time.time()+900
           while time.time()<deadline:
               run=call(f"/repos/{repo}/actions/runs/{int(run['id'])}")
               if run.get('status')=='completed': break
               time.sleep(5)
           report={'workflow':wf,'run_id':run.get('id'),'status':run.get('status'),'conclusion':run.get('conclusion'),'html_url':run.get('html_url'),'credentials_exposed':False}
-          body='Beds24 binding inventory controller result (safe metadata only):\n\n```json\n'+json.dumps(report,indent=2,sort_keys=True)+'\n```'
+          body='Beds24 secure UI upload controller result (safe metadata only):\n\n```json\n'+json.dumps(report,indent=2,sort_keys=True)+'\n```'
           call(f'/repos/{repo}/issues/{issue}/comments','POST',{'body':body})
           call(f'/repos/{repo}/issues/{issue}','PATCH',{'state':'closed','state_reason':'completed'})
           if run.get('conclusion')!='success': raise SystemExit(1)

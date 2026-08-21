@@ -1,0 +1,38 @@
+name: AUMARA one-shot Beds24 live recovery dispatcher
+
+on:
+  issues:
+    types: [opened]
+
+permissions:
+  actions: write
+  issues: write
+
+jobs:
+  dispatch:
+    if: >-
+      github.event.issue.title == 'AUMARA control: run live Beds24 recovery' &&
+      github.event.issue.user.login == 'elcidspain'
+    runs-on: ubuntu-latest
+    steps:
+      - name: Dispatch recovery workflow
+        shell: bash
+        env:
+          GH_TOKEN: ${{ github.token }}
+          ISSUE: ${{ github.event.issue.number }}
+          REPO: ${{ github.repository }}
+        run: |
+          set -euo pipefail
+          python3 - <<'PY'
+          import json, os, urllib.request
+          repo=os.environ['REPO']; issue=int(os.environ['ISSUE']); token=os.environ['GH_TOKEN']
+          headers={'Accept':'application/vnd.github+json','Authorization':f'Bearer {token}','Content-Type':'application/json','X-GitHub-Api-Version':'2022-11-28','User-Agent':'AUMARA-Beds24-Live-Recovery-Dispatcher/1.0'}
+          def call(path,method='POST',payload=None):
+              data=None if payload is None else json.dumps(payload).encode()
+              req=urllib.request.Request(f'https://api.github.com{path}',headers=headers,data=data,method=method)
+              with urllib.request.urlopen(req,timeout=60) as r:
+                  raw=r.read(); return r.status, raw
+          status,_=call(f'/repos/{repo}/actions/workflows/beds24-recover-live-exchange-artifacts.yml/dispatches','POST',{'ref':'main'})
+          call(f'/repos/{repo}/issues/{issue}/comments','POST',{'body':f'Dispatched live Beds24 recovery workflow. HTTP {status}.'})
+          call(f'/repos/{repo}/issues/{issue}','PATCH',{'state':'closed','state_reason':'completed'})
+          PY

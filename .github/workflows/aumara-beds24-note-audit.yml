@@ -53,6 +53,13 @@ concurrency:
 
 jobs:
   test:
+    if: >-
+      github.event_name != 'issue_comment' ||
+      (
+        github.event.issue.pull_request &&
+        github.event.issue.number == 16 &&
+        github.event.comment.body == '/execute-beds24-cot-note'
+      )
     runs-on: ubuntu-latest
     timeout-minutes: 10
     steps:

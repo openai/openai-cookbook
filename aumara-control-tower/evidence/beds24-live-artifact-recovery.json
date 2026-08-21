@@ -10,12 +10,12 @@
       "source_exchange_run_id": "32107182412"
     }
   ],
-  "checked_at_utc": "2026-08-21T03:55:10.889126+00:00",
+  "checked_at_utc": "2026-08-21T03:56:13.196771+00:00",
   "property_http_status": 200,
   "property_id": "324882",
   "recovered": true,
   "rotated_refresh_received": false,
-  "run_id": "32445042671",
+  "run_id": "32445108016",
   "secret_exposed": false,
   "source_exchange_run_id": "32107182412",
   "status": "SUCCESS",

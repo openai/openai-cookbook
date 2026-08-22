@@ -1,0 +1,196 @@
+# Build a resilient Realtime voice session in React Native with WebRTC
+
+Mobile voice sessions fail in ways that happy-path browser demos rarely expose: an app moves to the background, connectivity changes while an SDP exchange is in flight, two UI events call `connect()` together, or an old promise resolves after the user has already left the screen. This example builds a small React Native-compatible Realtime client that treats those lifecycle events as normal state transitions.
+
+The demo is a low-stakes, hands-free task-capture assistant. It uses `gpt-realtime-2.1`, sends microphone audio over WebRTC, receives model audio as a remote track, and asks the native UI to approve a proposed note before any save occurs.
+
+The complete TypeScript example and tests are in [`react_native_realtime_webrtc`](https://github.com/openai/openai-cookbook/tree/main/examples/voice_solutions/react_native_realtime_webrtc).
+
+## What you will build
+
+The example has three deliberately separate layers:
+
+1. A trusted Node server creates a short-lived Realtime client secret. The standard OpenAI API key never enters the mobile bundle.
+2. A React Native WebRTC transport owns the microphone, peer connection, `oai-events` data channel, and SDP exchange.
+3. A pure TypeScript controller owns idempotent start/stop, foreground/background behavior, bounded reconnects, and stale-promise protection.
+
+WebRTC is the recommended transport for client-side browser and mobile connections because it gives the media path congestion control and a remote audio track, while the data channel carries Realtime events.
+
+## Mint a short-lived client secret on a trusted server
+
+The server calls `/v1/realtime/client_secrets` with the standard API key. It binds the session model, instructions, and tool declaration to the token, then returns only the short-lived client secret to the app.
+
+```ts
+const openAIResponse = await fetch(
+  "https://api.openai.com/v1/realtime/client_secrets",
+  {
+    method: "POST",
+    headers: {
+      Authorization: `Bearer ${process.env.OPENAI_API_KEY}`,
+      "Content-Type": "application/json",
+      "OpenAI-Safety-Identifier": safetyIdentifier,
+    },
+    body: JSON.stringify({
+      expires_after: { anchor: "created_at", seconds: 60 },
+      session: {
+        type: "realtime",
+        model: "gpt-realtime-2.1",
+        output_modalities: ["audio"],
+        instructions:
+          "You are a concise, low-stakes task-capture assistant. Ask for confirmation before proposing a save.",
+        tools: [saveTaskNoteTool],
+        tool_choice: "auto",
+      },
+    }),
+  },
+);
+```
+
+The sample derives `safetyIdentifier` with HMAC-SHA256 from an authenticated principal and a server-only secret. This produces a stable, privacy-preserving value without sending an email address or raw account ID. Replace the demo authentication headers with your normal server-side authentication before production use.
+
+## Inject the native WebRTC implementation
+
+`react-native-webrtc` exposes the primitives needed by the transport. The included typed adapter wraps them in the small dependency object used by the example. This keeps lifecycle tests independent from a simulator or device while type-checking the adapter against the native package.
+
+```ts
+import {
+  reactNativeWebRtcBindings as webRtc,
+} from "./src/mobile/react-native-webrtc-bindings";
+```
+
+This native module is not available in Expo Go. Use a development build or a bare React Native app, configure microphone permissions for iOS and Android, and test audio routing on physical devices.
+
+## Open the WebRTC call
+
+Ask for microphone permission before requesting the short-lived token so the token does not expire while a permission sheet is waiting. Then create a peer connection, add the microphone track, and create the `oai-events` data channel.
+
+```ts
+const localStream = await webRtc.getUserMedia({
+  audio: true,
+  video: false,
+});
+
+const session = await fetchSessionFromYourServer();
+const peer = webRtc.createPeerConnection();
+const events = peer.createDataChannel("oai-events");
+
+for (const track of localStream.getAudioTracks()) {
+  peer.addTrack(track, localStream);
+}
+
+peer.setTrackHandler(({ streams }) => {
+  const remoteStream = streams[0];
+  if (remoteStream) handleRemoteAudio(remoteStream);
+});
+```
+
+Create the SDP offer locally, then post it directly to `/v1/realtime/calls` with the short-lived token. A standard API key is never used by this request.
+
+```ts
+const offer = await peer.createOffer();
+await peer.setLocalDescription(offer);
+
+const sdpResponse = await fetch(
+  "https://api.openai.com/v1/realtime/calls",
+  {
+    method: "POST",
+    headers: {
+      Authorization: `Bearer ${session.client_secret}`,
+      "Content-Type": "application/sdp",
+    },
+    body: offer.sdp,
+  },
+);
+
+await peer.setRemoteDescription(
+  webRtc.createSessionDescription({
+    type: "answer",
+    sdp: await sdpResponse.text(),
+  }),
+);
+```
+
+The complete transport also checks both HTTP responses, validates the token shape, waits for the data channel to open, applies a timeout, and closes every partially created resource if setup fails.
+
+## Make lifecycle behavior explicit
+
+The controller distinguishes desired state from current state. Calling `start()` twice shares one in-flight promise. Calling `stop()` increments a generation counter, so a late SDP result cannot revive an abandoned session. Backgrounding closes the microphone, data channel, and peer connection but preserves the user's desire to resume. Returning to the foreground creates exactly one fresh session.
+
+```ts
+import { AppState } from "react-native";
+
+const controller = new RealtimeSessionController({
+  createTransport: () =>
+    new OpenAIWebRtcTransport({
+      backendSessionUrl: `${API_BASE_URL}/session`,
+      getBackendAccessToken,
+      demoUserId,
+      webRtc,
+      onRemoteStream: handleRemoteAudio,
+      onToolApprovalRequest: showApprovalSheet,
+    }),
+  retryDelaysMs: [500, 1_000, 2_000],
+  onStatus: setVoiceStatus,
+});
+
+const subscription = AppState.addEventListener("change", (nextState) => {
+  void controller.setAppActive(nextState === "active");
+});
+
+// On screen teardown:
+subscription.remove();
+void controller.stop();
+```
+
+A transient `disconnected` WebRTC state gets a three-second grace period. A persistent disconnect or `failed` state triggers a fresh connection. Retries stop after the configured schedule instead of looping forever.
+
+## Gate side effects behind native UI approval
+
+The model may propose `save_task_note`, but the transport does not save anything. It parses and bounds the arguments, then hands the request to the UI. Only the user's explicit action should run the local save and return a tool result.
+
+```ts
+function showApprovalSheet(request: ToolApprovalRequest) {
+  showNativeConfirmation({
+    title: request.title,
+    details: request.details,
+    onApprove: async () => {
+      await saveTaskNoteLocally(request.title, request.details);
+      request.respond({ saved: true });
+    },
+    onReject: () => request.respond({ saved: false }),
+  });
+}
+```
+
+After the UI responds, the transport sends a `function_call_output` item followed by `response.create`, allowing the model to report the actual result. Never tell the model a side effect succeeded before the application confirms it.
+
+## Teardown checklist
+
+On every stop, failed setup, or abandoned generation:
+
+- Clear data-channel and peer callbacks.
+- Close the data channel and peer connection.
+- Stop every local media track so the microphone indicator turns off.
+- Cancel disconnect and retry timers.
+- Reject or dismiss approval UI tied to the old session.
+- Avoid logging tokens, raw event payloads, transcripts, or user identifiers.
+
+The included Vitest suite verifies concurrent-start deduplication, background/foreground replacement, stale-open protection, bounded retries, malformed event rejection, and tool allow-listing without making a live API call.
+
+```bash
+cd examples/voice_solutions/react_native_realtime_webrtc
+npm install
+npm run check
+```
+
+## Production considerations
+
+Use real authentication and authorization on the token endpoint, rate-limit token minting, and keep the standard API key in a managed secret store. Handle iOS audio sessions and Android audio focus according to your app's calling behavior. Test interruptions, Bluetooth changes, permission denial, airplane mode, and network handoff on physical devices.
+
+This example is intentionally low stakes. Applications in medical, legal, financial, employment, or other high-impact contexts need domain-specific safeguards and human review beyond this transport pattern.
+
+## References
+
+- [Connect to the Realtime API with WebRTC](https://developers.openai.com/api/docs/guides/realtime-webrtc)
+- [Build a speech-to-speech voice agent](https://developers.openai.com/api/docs/guides/voice-agents#build-a-speech-to-speech-voice-agent)
+- [Safety best practices: safety identifiers](https://developers.openai.com/api/docs/guides/safety-best-practices#implement-safety-identifiers)

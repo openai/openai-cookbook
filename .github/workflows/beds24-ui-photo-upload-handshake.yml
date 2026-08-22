@@ -60,6 +60,7 @@ jobs:
                 'EL CID / AUMARA')
           if not KEK: raise SystemExit('Production handshake KEK missing')
           print(f'::add-mask::{KEK}',flush=True)
+          print(f'::add-mask::{USER}',flush=True)
 
           def now(): return dt.datetime.now(dt.timezone.utc).isoformat()
           def fkey(value): return base64.urlsafe_b64encode(hashlib.sha256(('AUMARA_BEDS24_UI_HANDSHAKE_V1\0'+value).encode()).digest())

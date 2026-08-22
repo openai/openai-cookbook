@@ -219,6 +219,19 @@ class DynamoClaimAtomicTests(unittest.TestCase):
         self.assertIn("receipt['status']='LIVE_CONTENT_READ_OK' if 200 <= status < 300 else 'LIVE_CONTENT_READ_FAILED'", workflow)
         self.assertNotIn("exit_code=3", workflow)
 
+    def test_beds24_ui_handshake_workflow_accepts_username_secret_fallbacks(self) -> None:
+        workflow = (
+            ROOT.parent
+            / ".github"
+            / "workflows"
+            / "beds24-ui-photo-upload-handshake.yml"
+        ).read_text(encoding="utf-8")
+        self.assertIn("BEDS24_USERNAME: ${{ secrets.BEDS24_USERNAME }}", workflow)
+        self.assertIn("BEDS24_USER: ${{ secrets.BEDS24_USER }}", workflow)
+        self.assertIn("BEDS24_LOGIN: ${{ secrets.BEDS24_LOGIN }}", workflow)
+        self.assertIn("os.environ.get('BEDS24_USER')", workflow)
+        self.assertIn("os.environ.get('BEDS24_LOGIN')", workflow)
+
     def test_photo_vault_dispatcher_accepts_owner_retry_comment(self) -> None:
         workflow = (
             ROOT.parent

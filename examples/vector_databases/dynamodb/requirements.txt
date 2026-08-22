@@ -1,5 +1,5 @@
 boto3>=1.43.64
-openai>=1.0.0
+openai>=1.66.0
 pandas>=1.5.0
 numpy>=1.21.0
 wget>=3.2

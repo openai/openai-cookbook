@@ -4,7 +4,7 @@
 
 ## What's here
 
-- [`getting-started-with-amazon-dynamodb-and-openai.ipynb`](getting-started-with-amazon-dynamodb-and-openai.ipynb): create a table with a vector index, load Wikipedia articles with OpenAI embeddings, run similarity searches, enforce tenant isolation with search schemas, and feed retrieved context to a completion.
+- [`getting-started-with-amazon-dynamodb-and-openai.ipynb`](getting-started-with-amazon-dynamodb-and-openai.ipynb): create a table with a vector index, load Wikipedia articles with OpenAI embeddings, run similarity searches, use search schemas for mandatory query scoping and filtering, and feed retrieved context to a completion.
 - [`docker-compose.yml`](docker-compose.yml): optional local backend for running the notebook without an AWS account.
 - [`nbutils.py`](nbutils.py): helper to download the shared cookbook embeddings dataset.
 
@@ -30,8 +30,8 @@ Then set `USE_LOCAL = True` in the notebook's configuration cell. The emulator e
 | Index declaration | `VectorIndexes` on `CreateTable` or `UpdateTable` |
 | Distance functions | `COSINE`, `DOT_PRODUCT`, `EUCLIDEAN` |
 | Query API | `SearchVectors` with `SearchVector`, `TopK`, optional `SearchConditionExpression` |
-| Scoring | `Score` is the distance: lower is more similar |
-| Isolation | `HASH` search schema elements make scoping mandatory; unscoped searches are rejected |
+| Scoring | `COSINE` and `EUCLIDEAN`: lower `Score` is more similar. `DOT_PRODUCT`: higher is more similar |
+| Scoping | `HASH` search schema elements make scoping mandatory; unscoped searches are rejected. Not an authorization boundary: enforce tenant access control separately |
 | Filtering | `INLINE_FILTER` search schema elements support conditions during search |
 
 ## More resources

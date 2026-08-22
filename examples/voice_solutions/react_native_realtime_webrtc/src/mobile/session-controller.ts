@@ -74,6 +74,22 @@ export class RealtimeSessionController {
       this.connectPromise = null;
       this.cancelRetry();
       await this.closeCurrentTransport();
+
+      // AppState notifications are intentionally fire-and-forget in the
+      // integration example. If a foreground notification arrived while the
+      // asynchronous close was settling, reconnect now instead of overwriting
+      // that newer state with "paused".
+      if (this.appActive) {
+        if (this.desired) {
+          this.retryIndex = 0;
+          this.setStatus("paused");
+          await this.ensureConnected();
+        } else {
+          this.setStatus("idle");
+        }
+        return;
+      }
+
       this.setStatus(this.desired ? "paused" : "idle");
       return;
     }
@@ -129,8 +145,14 @@ export class RealtimeSessionController {
   }
 
   private async handleUnexpectedClose(error?: Error): Promise<void> {
+    const pendingAttempt = this.connectPromise;
     this.generation += 1;
     await this.closeCurrentTransport();
+
+    // A data-channel close can be reported before open() settles. Waiting for
+    // that attempt prevents a retry timer from firing while connectPromise
+    // still points at the stale attempt and then being lost permanently.
+    await pendingAttempt;
     if (this.desired && this.appActive) {
       this.scheduleRetry(error ?? new Error("Realtime transport closed"));
     }

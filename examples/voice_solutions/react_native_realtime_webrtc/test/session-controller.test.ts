@@ -9,14 +9,18 @@ class FakeTransport implements RealtimeTransport {
   closeCount = 0;
   private unexpectedClose: (error?: Error) => void = () => {};
 
-  constructor(private readonly openResult: () => Promise<void>) {}
+  constructor(
+    private readonly openResult: () => Promise<void>,
+    private readonly closeResult: () => Promise<void> | void = () => {},
+  ) {}
 
   open(): Promise<void> {
     return this.openResult();
   }
 
-  close(): void {
+  close(): Promise<void> | void {
     this.closeCount += 1;
+    return this.closeResult();
   }
 
   setUnexpectedCloseHandler(handler: (error?: Error) => void): void {
@@ -113,5 +117,58 @@ describe("RealtimeSessionController", () => {
     expect(controller.currentStatus).toBe("failed");
     expect(statuses).toContain("reconnecting");
     vi.useRealTimers();
+  });
+
+  it("retries after an unexpected close during the current open attempt", async () => {
+    vi.useFakeTimers();
+    const firstOpen = deferred();
+    const transports: FakeTransport[] = [];
+    const controller = new RealtimeSessionController({
+      createTransport: () => {
+        const transport = new FakeTransport(
+          transports.length === 0 ? () => firstOpen.promise : async () => {},
+        );
+        transports.push(transport);
+        return transport;
+      },
+      retryDelaysMs: [10],
+    });
+
+    const opening = controller.start();
+    transports[0]?.fail();
+    await vi.advanceTimersByTimeAsync(10);
+    expect(transports).toHaveLength(1);
+
+    firstOpen.resolve();
+    await opening;
+    await vi.advanceTimersByTimeAsync(10);
+
+    expect(transports).toHaveLength(2);
+    expect(controller.currentStatus).toBe("connected");
+    vi.useRealTimers();
+  });
+
+  it("honors a foreground event that arrives while background close settles", async () => {
+    const firstClose = deferred();
+    const transports: FakeTransport[] = [];
+    const controller = new RealtimeSessionController({
+      createTransport: () => {
+        const transport = new FakeTransport(
+          async () => {},
+          transports.length === 0 ? () => firstClose.promise : () => {},
+        );
+        transports.push(transport);
+        return transport;
+      },
+    });
+
+    await controller.start();
+    const backgrounding = controller.setAppActive(false);
+    const foregrounding = controller.setAppActive(true);
+    firstClose.resolve();
+    await Promise.all([backgrounding, foregrounding]);
+
+    expect(transports).toHaveLength(2);
+    expect(controller.currentStatus).toBe("connected");
   });
 });

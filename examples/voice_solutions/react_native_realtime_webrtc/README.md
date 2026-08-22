@@ -25,6 +25,10 @@ cp .env.example .env
 npm run dev:server
 ```
 
+The server binds to `127.0.0.1` by default. For a physical device on your local
+network, set `HOST=0.0.0.0`, use the computer's LAN address in
+`backendSessionUrl`, and keep the port protected from untrusted networks.
+
 The fixed bearer token and `X-Demo-User` header are local-demo authentication only. In a real app, derive the safety identifier from the authenticated server-side principal and replace the demo bearer token with your existing login/session mechanism.
 
 ## Bind React Native WebRTC

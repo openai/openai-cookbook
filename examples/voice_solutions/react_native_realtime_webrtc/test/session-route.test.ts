@@ -66,4 +66,22 @@ describe("session route", () => {
     expect(response.status).toBe(502);
     expect(JSON.stringify(response.body)).not.toContain("network detail");
   });
+
+  it("returns a generic gateway error for a malformed successful response", async () => {
+    const fetchImpl = vi.fn<typeof fetch>(async () =>
+      new Response("{", {
+        status: 200,
+        headers: { "Content-Type": "application/json" },
+      }),
+    );
+    const response = await request(buildApp(fetchImpl))
+      .post("/session")
+      .set("Authorization", "Bearer local-app-token")
+      .set("X-Demo-User", "user_123");
+
+    expect(response.status).toBe(502);
+    expect(response.body).toEqual({
+      error: "Could not create a Realtime client secret",
+    });
+  });
 });

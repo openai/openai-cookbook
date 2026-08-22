@@ -78,10 +78,10 @@ for (const track of localStream.getAudioTracks()) {
   peer.addTrack(track, localStream);
 }
 
-peer.ontrack = ({ streams }) => {
+peer.setTrackHandler(({ streams }) => {
   const remoteStream = streams[0];
   if (remoteStream) handleRemoteAudio(remoteStream);
-};
+});
 ```
 
 Create the SDP offer locally, then post it directly to `/v1/realtime/calls` with the short-lived token. A standard API key is never used by this request.

@@ -36,6 +36,7 @@ export function createSessionHandler(config: SessionRouteConfig) {
       .digest("hex");
 
     let openAIResponse: globalThis.Response;
+    let payload: { value?: unknown; expires_at?: unknown };
     try {
       openAIResponse = await fetchImpl(CLIENT_SECRETS_URL, {
         method: "POST",
@@ -73,6 +74,15 @@ export function createSessionHandler(config: SessionRouteConfig) {
           },
         }),
       });
+
+      if (!openAIResponse.ok) {
+        throw new Error("Realtime client-secret request failed");
+      }
+
+      payload = (await openAIResponse.json()) as {
+        value?: unknown;
+        expires_at?: unknown;
+      };
     } catch {
       response
         .status(502)
@@ -80,17 +90,6 @@ export function createSessionHandler(config: SessionRouteConfig) {
       return;
     }
 
-    if (!openAIResponse.ok) {
-      response
-        .status(502)
-        .json({ error: "Could not create a Realtime client secret" });
-      return;
-    }
-
-    const payload = (await openAIResponse.json()) as {
-      value?: unknown;
-      expires_at?: unknown;
-    };
     if (typeof payload.value !== "string") {
       response.status(502).json({ error: "Invalid Realtime response" });
       return;

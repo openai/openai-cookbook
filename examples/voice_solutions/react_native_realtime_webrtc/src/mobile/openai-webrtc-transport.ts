@@ -121,6 +121,8 @@ export class OpenAIWebRtcTransport implements RealtimeTransport {
       throw new Error("Session endpoint did not return a client secret");
     }
 
+    this.throwIfClosing();
+
     const peer = this.options.webRtc.createPeerConnection();
     this.peer = peer;
     const channel = peer.createDataChannel("oai-events");
@@ -133,7 +135,9 @@ export class OpenAIWebRtcTransport implements RealtimeTransport {
     }
 
     const offer = await peer.createOffer();
+    this.throwIfClosing();
     await peer.setLocalDescription(offer);
+    this.throwIfClosing();
     if (!offer.sdp) throw new Error("WebRTC offer did not contain SDP");
 
     const sdpResponse = await this.fetchImpl(
@@ -153,20 +157,22 @@ export class OpenAIWebRtcTransport implements RealtimeTransport {
     }
 
     const answer = await sdpResponse.text();
+    this.throwIfClosing();
     await peer.setRemoteDescription(
       this.options.webRtc.createSessionDescription({
         type: "answer",
         sdp: answer,
       }),
     );
+    this.throwIfClosing();
     await waitForChannelOpen(
       channel,
       this.options.openTimeoutMs ?? 15_000,
+      this.abortController.signal,
     );
   }
 
   close(): void {
-    if (this.closing) return;
     this.closing = true;
     this.abortController?.abort();
     this.abortController = null;
@@ -190,6 +196,12 @@ export class OpenAIWebRtcTransport implements RealtimeTransport {
 
     for (const track of this.localStream?.getTracks() ?? []) track.stop();
     this.localStream = null;
+  }
+
+  private throwIfClosing(): void {
+    if (this.closing || this.abortController?.signal.aborted) {
+      throw new Error("Realtime connection was cancelled");
+    }
   }
 
   private attachPeerHandlers(peer: PeerConnectionLike): void {
@@ -274,17 +286,34 @@ export class OpenAIWebRtcTransport implements RealtimeTransport {
 function waitForChannelOpen(
   channel: DataChannelLike,
   timeoutMs: number,
+  signal: AbortSignal,
 ): Promise<void> {
   if (channel.readyState === "open") return Promise.resolve();
 
   return new Promise((resolve, reject) => {
-    const timeout = setTimeout(
-      () => reject(new Error("Timed out opening Realtime data channel")),
-      timeoutMs,
-    );
+    let timeout: ReturnType<typeof setTimeout> | null = null;
+    const settle = (error?: Error) => {
+      if (timeout) clearTimeout(timeout);
+      timeout = null;
+      signal.removeEventListener("abort", handleAbort);
+      channel.setOpenHandler(null);
+      if (error) reject(error);
+      else resolve();
+    };
+    const handleAbort = () =>
+      settle(new Error("Realtime connection was cancelled"));
+
+    if (signal.aborted) {
+      handleAbort();
+      return;
+    }
+
+    signal.addEventListener("abort", handleAbort, { once: true });
+    timeout = setTimeout(() => {
+      settle(new Error("Timed out opening Realtime data channel"));
+    }, timeoutMs);
     channel.setOpenHandler(() => {
-      clearTimeout(timeout);
-      resolve();
+      settle();
     });
   });
 }

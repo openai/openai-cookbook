@@ -24,6 +24,7 @@ app.post(
 );
 
 const port = Number(process.env.PORT ?? 3000);
-app.listen(port, "127.0.0.1", () => {
-  console.log(`Local session server listening on http://127.0.0.1:${port}`);
+const host = process.env.HOST ?? "127.0.0.1";
+app.listen(port, host, () => {
+  console.log(`Local session server listening on http://${host}:${port}`);
 });

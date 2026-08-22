@@ -21,7 +21,9 @@ jobs:
     environment: Production
     env:
       BEDS24_VAULT_KEK: ${{ secrets.BEDS24_REFRESH_CREDENTIAL }}
-      BEDS24_USERNAME: 'EL CID / AUMARA'
+      BEDS24_USERNAME: ${{ secrets.BEDS24_USERNAME }}
+      BEDS24_USER: ${{ secrets.BEDS24_USER }}
+      BEDS24_LOGIN: ${{ secrets.BEDS24_LOGIN }}
     steps:
       - uses: actions/checkout@v4
         with:
@@ -52,7 +54,10 @@ jobs:
           SOURCE=ROOT/'source'
           for p in (EVIDENCE,UPLOAD,SOURCE): p.mkdir(parents=True,exist_ok=True)
           KEK=(os.environ.get('BEDS24_VAULT_KEK') or '').strip()
-          USER=(os.environ.get('BEDS24_USERNAME') or 'EL CID / AUMARA').strip()
+          USER=((os.environ.get('BEDS24_USERNAME') or '').strip() or
+                (os.environ.get('BEDS24_USER') or '').strip() or
+                (os.environ.get('BEDS24_LOGIN') or '').strip() or
+                'EL CID / AUMARA')
           if not KEK: raise SystemExit('Production handshake KEK missing')
           print(f'::add-mask::{KEK}',flush=True)
 

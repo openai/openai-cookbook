@@ -1,0 +1,113 @@
+name: Beds24 UI auth diagnostic
+
+on:
+  push:
+    branches:
+      - diag/beds24-ui-auth-20260822
+    paths:
+      - '.github/workflows/beds24-ui-auth-diagnostic.yml'
+
+permissions:
+  contents: read
+
+jobs:
+  auth_probe:
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    environment: Production
+    env:
+      BEDS24_VAULT_KEK: ${{ secrets.BEDS24_REFRESH_CREDENTIAL }}
+      BEDS24_USERNAME: 'EL CID / AUMARA'
+    steps:
+      - uses: actions/checkout@v4
+      - name: Install browser crypto
+        run: |
+          pip install --disable-pip-version-check 'playwright>=1.55,<2' cryptography
+          playwright install --with-deps chromium
+      - name: Probe Beds24 login without PMS writes
+        shell: bash
+        run: |
+          set -euo pipefail
+          python3 - <<'PY'
+          import base64, hashlib, json, os, pathlib
+          from urllib.parse import urlsplit, urlunsplit
+          from cryptography.fernet import Fernet
+          from cryptography.hazmat.primitives import hashes, serialization
+          from cryptography.hazmat.primitives.asymmetric import padding
+          from playwright.sync_api import sync_playwright
+
+          root = pathlib.Path.cwd()
+          hs = root / 'aumara-control-tower/evidence/beds24-ui-handshake'
+          kek = (os.environ.get('BEDS24_VAULT_KEK') or '').strip()
+          user = (os.environ.get('BEDS24_USERNAME') or '').strip()
+          if not kek or not user:
+              raise SystemExit('missing auth inputs')
+          print(f'::add-mask::{kek}')
+
+          key = base64.urlsafe_b64encode(hashlib.sha256(('AUMARA_BEDS24_UI_HANDSHAKE_V1\0' + kek).encode()).digest())
+          private_pem = Fernet(key).decrypt((hs / 'private.enc').read_text().strip().encode())
+          private = serialization.load_pem_private_key(private_pem, password=None)
+          password = private.decrypt(
+              base64.b64decode((hs / 'password.enc').read_text().strip()),
+              padding.OAEP(mgf=padding.MGF1(algorithm=hashes.SHA256()), algorithm=hashes.SHA256(), label=None),
+          ).decode().strip()
+          if not password:
+              raise SystemExit('decrypted password empty')
+          print(f'::add-mask::{password}')
+
+          def safe_url(value: str) -> str:
+              p = urlsplit(value)
+              return urlunsplit((p.scheme, p.netloc, p.path, '', ''))
+
+          result = {'login_submit': False, 'challenge': False, 'session': False, 'error_hint': None}
+          with sync_playwright() as p:
+              browser = p.chromium.launch(headless=True)
+              page = browser.new_page(viewport={'width': 1440, 'height': 1100})
+              page.set_default_timeout(30000)
+              page.goto('https://beds24.com/control2.php?pagetype=login', wait_until='domcontentloaded', timeout=60000)
+
+              user_box = page.get_by_label('User Name', exact=False).first
+              if not user_box.count():
+                  user_box = page.locator("input[name='username'], input[name='user'], input[type='text']").first
+              pass_box = page.get_by_label('Password', exact=False).first
+              if not pass_box.count():
+                  pass_box = page.locator("input[type='password']").first
+              if not user_box.count() or not pass_box.count():
+                  raise SystemExit('login fields not found')
+
+              user_box.fill(user)
+              pass_box.fill(password)
+              button = page.get_by_role('button', name='Login').first
+              if not button.count():
+                  button = page.locator("button[type='submit'], input[type='submit']").first
+              if not button.count():
+                  raise SystemExit('login submit not found')
+              button.click()
+              page.wait_for_timeout(5000)
+              result['login_submit'] = True
+
+              body = (page.locator('body').inner_text() or '').lower()
+              challenge_terms = ('check your email', 'login link', 'verification code', 'two factor', '2 factor', 'one-time code', 'security code')
+              invalid_terms = ('invalid password', 'wrong password', 'invalid user', 'unknown user', 'login failed', 'incorrect password', 'incorrect user')
+              result['challenge'] = any(x in body for x in challenge_terms)
+              if any(x in body for x in invalid_terms):
+                  result['error_hint'] = 'credential_rejected_text_detected'
+
+              result['post_submit_url'] = safe_url(page.url)
+              result['post_submit_title'] = page.title()[:120]
+              result['post_submit_password_field'] = bool(page.locator("input[type='password']").count())
+
+              page.goto('https://beds24.com/control3.php?pagetype=propcontent&propid=324882', wait_until='domcontentloaded', timeout=60000)
+              page.wait_for_timeout(2500)
+              probe_body = (page.locator('body').inner_text() or '').lower()
+              probe_password = bool(page.locator("input[type='password']").count())
+              result['probe_url'] = safe_url(page.url)
+              result['probe_title'] = page.title()[:120]
+              result['probe_password_field'] = probe_password
+              result['session'] = (not probe_password) and ('beds24.com login' not in probe_body)
+              if not result['session'] and not result['challenge'] and not result['error_hint']:
+                  result['error_hint'] = 'session_not_established_no_explicit_error_text'
+              browser.close()
+
+          print('BEDS24_AUTH_DIAGNOSTIC=' + json.dumps(result, sort_keys=True))
+          PY

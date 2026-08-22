@@ -207,6 +207,23 @@ class DynamoClaimAtomicTests(unittest.TestCase):
         self.assertIn("python -m pip install --upgrade pip boto3", workflow)
         self.assertNotIn("pip install -r requirements.txt", workflow)
 
+    def test_aumara_nominalia_workflow_has_host_and_user_fallbacks(self) -> None:
+        workflow = (
+            ROOT.parent / ".github" / "workflows" / "deploy-aumara-nominalia-v2.yml"
+        ).read_text(encoding="utf-8")
+        self.assertIn(
+            "FTP_HOST: ${{ secrets.NOMINALIA_FTP_HOST || vars.NOMINALIA_FTP_HOST || 'elcidt.ftp.tb-hosting.com' }}",
+            workflow,
+        )
+        self.assertIn(
+            "FTP_USER: ${{ secrets.NOMINALIA_FTP_USER || vars.NOMINALIA_FTP_USER || 'elcidspaincom@elcidspaincom' }}",
+            workflow,
+        )
+        self.assertIn(
+            "FTP_PASSWORD: ${{ secrets.NOMINALIA_FTP_PASSWORD || secrets.NOMINALIAFTPPASSWORD }}",
+            workflow,
+        )
+
     def test_photo_sync_discovery_fails_only_on_secret_name_matching(self) -> None:
         workflow = (
             ROOT.parent / ".github" / "workflows" / "beds24-photo-sync-discovery.yml"

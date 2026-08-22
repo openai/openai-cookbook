@@ -21,8 +21,8 @@ jobs:
     timeout-minutes: 30
     environment: NOMINALIA_FTP_PASSWORD
     env:
-      FTP_HOST: ${{ secrets.NOMINALIA_FTP_HOST || vars.NOMINALIA_FTP_HOST }}
-      FTP_USER: ${{ secrets.NOMINALIA_FTP_USER || vars.NOMINALIA_FTP_USER }}
+      FTP_HOST: ${{ secrets.NOMINALIA_FTP_HOST || vars.NOMINALIA_FTP_HOST || 'elcidt.ftp.tb-hosting.com' }}
+      FTP_USER: ${{ secrets.NOMINALIA_FTP_USER || vars.NOMINALIA_FTP_USER || 'elcidspaincom@elcidspaincom' }}
       FTP_PASSWORD: ${{ secrets.NOMINALIA_FTP_PASSWORD || secrets.NOMINALIAFTPPASSWORD }}
       PREVIEW_DRIVE_ID: 1AIMUmuLsfidwjUhgMODGLEQYvMl4C_a3
       SOURCE_DRIVE_ID: 1L8oePUeTfB0EFXhyXW3J6R82LF2ob6tt

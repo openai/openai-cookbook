@@ -5,7 +5,7 @@ build-backend = "hatchling.build"
 [project]
 name = "policy-to-review-agent"
 version = "0.2.0"
-description = "Prior authorization review with live Bedrock Knowledge Base retrieval"
+description = "Prior authorization review with managed hybrid retrieval"
 requires-python = ">=3.12,<3.13"
 dependencies = [
   "bedrock-agentcore==1.19.0",

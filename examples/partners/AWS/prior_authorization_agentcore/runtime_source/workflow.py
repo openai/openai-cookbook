@@ -100,7 +100,7 @@ def configure_bedrock_client() -> None:
     region = (
         os.getenv("AWS_REGION")
         or os.getenv("AWS_DEFAULT_REGION")
-        or "us-east-2"
+        or "us-east-1"
     )
     profile = os.getenv("AWS_PROFILE") or None
     client = AsyncOpenAI(

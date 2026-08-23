@@ -1,5 +1,6 @@
 """Deterministic policy retrieval from Amazon Bedrock Knowledge Bases."""
 
+import math
 import os
 from datetime import UTC, datetime
 from typing import Any
@@ -15,7 +16,7 @@ from .models import (
     PriorAuthorizationCase,
 )
 
-DEFAULT_REGION = "us-east-2"
+DEFAULT_REGION = "us-east-1"
 DEFAULT_MINIMUM_SCORE = 0.65
 DEFAULT_RESULT_COUNT = 6
 CMS_AUTHORITY = "Centers for Medicare & Medicaid Services"
@@ -132,9 +133,10 @@ def retrieve_policy(
         knowledgeBaseId=knowledge_base_id,
         retrievalQuery={"text": query},
         retrievalConfiguration={
-            "vectorSearchConfiguration": {
+            "managedSearchConfiguration": {
                 "numberOfResults": result_count,
                 "filter": {"andAll": filters},
+                "rerankingModelType": "MANAGED",
             }
         },
     )
@@ -216,6 +218,10 @@ def retrieve_policy(
     minimum_score = float(
         os.getenv("BEDROCK_KB_MIN_SCORE", str(DEFAULT_MINIMUM_SCORE))
     )
+    if not math.isfinite(minimum_score) or not 0 <= minimum_score <= 1:
+        raise ValueError(
+            "BEDROCK_KB_MIN_SCORE must be a finite number between 0 and 1."
+        )
     if top_score < minimum_score:
         raise ValueError(
             f"Top retrieval score {top_score:.3f} is below "
@@ -228,9 +234,10 @@ def retrieve_policy(
         query=query,
         filters=filters,
         selectionRule=(
-            "Exact metadata establishes eligibility; the application then "
-            "requires the expected mapped policy ID and version, official CMS "
-            "authority and URL, and the configured minimum retrieval score."
+            "Exact metadata establishes eligibility before managed hybrid "
+            "retrieval and managed reranking. The application then requires "
+            "the expected mapped policy ID and version, official CMS authority "
+            "and URL, and the configured minimum retrieval score."
         ),
         policyId=policy.policyId,
         version=policy.version,

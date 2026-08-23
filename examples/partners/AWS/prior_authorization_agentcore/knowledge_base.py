@@ -33,7 +33,8 @@ KB_TEMPLATE = {
             "Type": "String",
             "Default": "",
             "AllowedPattern": (
-                "^$|^arn:aws(-[a-z]+)?:iam::[0-9]{12}:policy/.+$"
+                "^$|^arn:aws(-[a-z]+)?:iam::"
+                "(?:[0-9]{12}|aws):policy/.+$"
             ),
         },
     },

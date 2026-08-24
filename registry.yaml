@@ -516,6 +516,7 @@
   path: articles/gpt-oss/run-locally-lmstudio.md
   slug: run-locally-lmstudio
   date: 2025-08-07
+  archived: true
   authors:
     - yagil
   tags:

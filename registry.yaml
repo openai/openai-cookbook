@@ -3644,7 +3644,7 @@
 - title: Moving from OpenAI Evals to Promptfoo
   path: examples/evaluation/moving-from-openai-evals-to-promptfoo.md
   slug: moving-from-openai-evals-to-promptfoo
-  description: Migrate supported OpenAI Evals evaluations to runnable Promptfoo configurations and preserve historical results.
+  description: Manually recreate OpenAI Evals evaluations in Promptfoo, then run and validate them.
   date: 2026-06-03
   authors:
     - kkahadze-oai

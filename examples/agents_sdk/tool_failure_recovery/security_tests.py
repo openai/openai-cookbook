@@ -5,6 +5,7 @@ from __future__ import annotations
 import asyncio
 import json
 import socket
+from collections import UserDict
 from typing import Any
 from urllib.error import HTTPError, URLError
 
@@ -89,11 +90,22 @@ def _adapter_fixture() -> tuple[CallableDeliveryServiceAdapter, dict[str, Any]]:
         error = state.pop("read_error", None)
         if error is not None:
             raise error
-        return next(
+        record = next(
             dict(record)
             for record in state["records"]
             if record["order_id"] == order_id
         )
+        if state.pop("transfer_during_read", False):
+            state["authorized_order_ids"].discard(order_id)
+        if state.pop("return_user_dict", False):
+            return UserDict(
+                {
+                    name: value
+                    for name, value in record.items()
+                    if name != "internal_notes"
+                }
+            )
+        return record
 
     async def search(
         account_id: str, filters: dict[str, str]
@@ -155,6 +167,35 @@ async def _check_account_scoped_reads_and_writes() -> None:
     assert state["authorization_calls"] == 1
     assert "private-backend-value" not in serialize_outcome(outcome)
 
+    scoped_record = dict(state["records"][0])
+    state["records"][0] = {
+        name: value
+        for name, value in scoped_record.items()
+        if name not in {"account_id", "tenant_id"}
+    }
+    for return_user_dict in (False, True):
+        state["authorization_calls"] = 0
+        state["return_user_dict"] = return_user_dict
+        unscoped = await get_order_status_operation(context, PRODUCTION_ORDER_ID)
+        assert unscoped.status == "success"
+        assert state["authorization_calls"] == 2
+
+    state["records"][0]["carrier"] = "foreign-private-carrier"
+    for return_user_dict in (False, True):
+        state["authorized_order_ids"].add(PRODUCTION_ORDER_ID)
+        state["authorization_calls"] = 0
+        state["transfer_during_read"] = True
+        state["return_user_dict"] = return_user_dict
+        transferred = await get_order_status_operation(context, PRODUCTION_ORDER_ID)
+        assert transferred.status == "handoff_required"
+        assert transferred.error_code == "order_not_found"
+        assert transferred.data is None
+        assert state["authorization_calls"] == 2
+        assert PRODUCTION_ORDER_ID not in context.verified_order_reads
+        assert "foreign-private" not in serialize_outcome(transferred)
+
+    state["records"][0] = scoped_record
+    state["authorized_order_ids"].add(PRODUCTION_ORDER_ID)
     state["read_error"] = socket.gaierror(socket.EAI_NONAME, "Unknown host")
     recovered = await get_order_status_operation(context, PRODUCTION_ORDER_ID)
     assert recovered.status == "success" and recovered.attempts == 2

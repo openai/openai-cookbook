@@ -43,8 +43,8 @@ class CallableDeliveryServiceAdapter:
     The application owns account identity and the order-authorization
     callback. The create callback must enforce its current business
     precondition and idempotency key atomically in the backing service.
-    Search records must identify their account or tenant; records without
-    either scope field receive an explicit ownership check instead.
+    Read and search records must identify their account or tenant; records
+    without either scope field receive an explicit ownership check instead.
     """
 
     read_results_are_authorized: ClassVar[bool] = True
@@ -286,9 +286,14 @@ class CallableDeliveryServiceAdapter:
         raw_record = await self._call_dependency(
             lambda: self.read_order_fn(account_id, order_id)
         )
-        return self._normalize_order_record(
+        normalized_record = self._normalize_order_record(
             account_id, raw_record, order_id=order_id
         )
+        if not isinstance(raw_record, dict) or not any(
+            field in raw_record for field in ("account_id", "tenant_id")
+        ):
+            await self.authorize_order(account_id, order_id)
+        return normalized_record
 
     async def find_orders(
         self, account_id: str, filters: dict[str, str]

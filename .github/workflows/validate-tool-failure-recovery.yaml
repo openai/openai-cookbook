@@ -22,8 +22,6 @@ jobs:
     env:
       PYTHONPATH: examples/agents_sdk
       RUN_LIVE_AGENT: 'false'
-      RUN_PROMPTFOO_EVAL: 'false'
-      PROMPTFOO_ALLOW_EXTERNAL_EGRESS: 'false'
       EXPORT_AGENTS_TRACES: 'false'
     steps:
       - name: Checkout repository

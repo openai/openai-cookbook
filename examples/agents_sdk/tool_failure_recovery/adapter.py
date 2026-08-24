@@ -8,12 +8,13 @@ from dataclasses import dataclass, field
 from datetime import datetime, timezone
 from email.utils import parsedate_to_datetime
 from math import isfinite
-from typing import Any, Awaitable, Callable, TypeVar
+from typing import Any, Awaitable, Callable, ClassVar, TypeVar
 from urllib.error import URLError
 
 from .core import (
     EscalationRecord,
     EscalationRequest,
+    MAX_SEARCH_RESULTS,
     OrderStatus,
     PermanentToolError,
     SyntheticToolError,
@@ -42,8 +43,12 @@ class CallableDeliveryServiceAdapter:
     The application owns account identity and the order-authorization
     callback. The create callback must enforce its current business
     precondition and idempotency key atomically in the backing service.
+    Search records must identify their account or tenant; records without
+    either scope field receive an explicit ownership check instead.
     """
 
+    read_results_are_authorized: ClassVar[bool] = True
+    search_results_are_authorized: ClassVar[bool] = True
     authenticated_account_id: str
     authorize_order_fn: AuthorizeOrder
     read_order_fn: ReadOrder
@@ -294,10 +299,21 @@ class CallableDeliveryServiceAdapter:
         )
         if not isinstance(raw_records, list):
             return raw_records
-        return [
-            self._normalize_order_record(account_id, record)
-            for record in raw_records
-        ]
+        if len(raw_records) > MAX_SEARCH_RESULTS:
+            raise PermanentToolError(
+                "search_result_limit_exceeded", retryable=False
+            )
+
+        normalized_records = []
+        for record in raw_records:
+            normalized = self._normalize_order_record(account_id, record)
+            if isinstance(record, dict) and not any(
+                field in record for field in ("account_id", "tenant_id")
+            ):
+                order = OrderStatus.model_validate(normalized)
+                await self.authorize_order(account_id, order.order_id)
+            normalized_records.append(normalized)
+        return normalized_records
 
     async def create_escalation(
         self, account_id: str, request: EscalationRequest

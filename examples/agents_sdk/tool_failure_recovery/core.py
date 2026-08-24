@@ -20,6 +20,7 @@ from pydantic import BaseModel, ConfigDict, Field, ValidationError
 
 
 IDENTIFIER_PATTERN = r"^[A-Za-z0-9][A-Za-z0-9._:@-]{0,255}$"
+MAX_SEARCH_RESULTS = 50
 
 
 # Strict operation and outcome contracts.
@@ -732,9 +733,15 @@ async def run_read_with_recovery(
             raise PermanentToolError(
                 "unexpected_order_identity", retryable=False
             )
-        await authorize_service_order(
-            service, account_id, order.order_id
-        )
+        if not (
+            skip_pre_read_authorization
+            and not isinstance(service, SyntheticDeliveryService)
+            and getattr(service, "read_results_are_authorized", False)
+            is True
+        ):
+            await authorize_service_order(
+                service, account_id, order.order_id
+            )
         return order
 
     for attempt in range(1, policy.max_attempts + 1):
@@ -870,14 +877,24 @@ async def run_order_search_with_recovery(
         raw_orders = await search_orders_once(
             service, account_id, filters, fault_plan
         )
+        if isinstance(raw_orders, list) and len(raw_orders) > MAX_SEARCH_RESULTS:
+            raise PermanentToolError(
+                "search_result_limit_exceeded", retryable=False
+            )
         orders = OrderSearchResults.model_validate(
             {"orders": raw_orders}
         ).orders
+        results_are_authorized = (
+            not isinstance(service, SyntheticDeliveryService)
+            and getattr(service, "search_results_are_authorized", False)
+            is True
+        )
         seen_order_ids: set[str] = set()
         for order in orders:
-            await authorize_service_order(
-                service, account_id, order.order_id
-            )
+            if not results_are_authorized:
+                await authorize_service_order(
+                    service, account_id, order.order_id
+                )
             if order.order_id in seen_order_ids:
                 raise PermanentToolError(
                     "duplicate_search_result", retryable=False

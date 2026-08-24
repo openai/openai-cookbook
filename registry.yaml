@@ -421,6 +421,7 @@
 
 - title: Using PLANS.md for multi-hour problem solving
   path: articles/codex_exec_plans.md
+  archived: true
   slug: codex-exec-plans
   date: 2025-10-07
   authors:

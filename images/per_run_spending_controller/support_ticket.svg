@@ -1,0 +1,54 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<svg xmlns="http://www.w3.org/2000/svg" width="1920" height="1080" viewBox="0 0 1920 1080" role="img" aria-labelledby="diagram-title diagram-description">
+<title id="diagram-title">Support ticket #4821 spending decision</title>
+<desc id="diagram-description">A support ticket starts with a $0.02 budget, reserves at most $0.0146, spends $0.01 on its first response, and has $0.01 left; its next request is blocked because $0.0146 exceeds the remaining $0.01.</desc>
+<rect width="1920" height="1080" fill="#f8f9f5"/>
+<path d="M 484.0000237358941,370.0000127156576L 530.9999932183159,370.0000127156576" fill="none" stroke="#000944" stroke-width="3.5" stroke-linecap="round" stroke-linejoin="round"/>
+<polygon points="531,370 513,378 513,362" fill="#000944"/>
+<path d="M 934.000023735894,370.0000127156576L 980.9999932183159,370.0000127156576" fill="none" stroke="#002e03" stroke-width="3.5" stroke-linecap="round" stroke-linejoin="round"/>
+<polygon points="981,370 963,378 963,362" fill="#002e03"/>
+<path d="M 1384.000023735894,370.0000127156576L 1430.999993218316,370.0000127156576" fill="none" stroke="#002e03" stroke-width="3.5" stroke-linecap="round" stroke-linejoin="round"/>
+<polygon points="1431,370 1413,378 1413,362" fill="#002e03"/>
+<path d="M 1632.4999660915798 499.00001102023657 L 1632.4999660915798 590 L 1632 590 L 913 590 Q 905 590 904.9999982153462 597.9999999999998 L 904.99998304579 665.9999932183159" fill="none" stroke="#6b241d" stroke-width="3.5" stroke-linecap="round" stroke-linejoin="round"/>
+<polygon points="905,666 897,648 913,648" fill="#6b241d"/>
+<g aria-label="Budget">
+<title>Budget</title>
+<rect x="85" y="245" width="395" height="250" rx="8" fill="#b7d4fe" stroke="#000944" stroke-width="2.5"/>
+<rect x="96" y="247" width="10" height="246" fill="#80b6fd" stroke="#000944" stroke-width="1"/>
+<rect x="459" y="247" width="10" height="246" fill="#80b6fd" stroke="#000944" stroke-width="1"/>
+<text x="282.5" y="339" fill="#000944" font-family="OpenAI Sans, Helvetica Neue, Arial, sans-serif" font-size="42" font-weight="600" text-anchor="middle">Budget</text>
+<text x="282.5" y="422" fill="#000944" font-family="OpenAI Sans, Helvetica Neue, Arial, sans-serif" font-size="64" font-weight="750" text-anchor="middle">$0.02</text>
+</g>
+<g aria-label="Reserve">
+<title>Reserve</title>
+<rect x="535" y="245" width="395" height="250" rx="8" fill="#b7d4fe" stroke="#000944" stroke-width="2.5"/>
+<rect x="546" y="247" width="10" height="246" fill="#80b6fd" stroke="#000944" stroke-width="1"/>
+<rect x="909" y="247" width="10" height="246" fill="#80b6fd" stroke="#000944" stroke-width="1"/>
+<text x="732.5" y="339" fill="#000944" font-family="OpenAI Sans, Helvetica Neue, Arial, sans-serif" font-size="42" font-weight="600" text-anchor="middle">Reserve</text>
+<text x="732.5" y="422" fill="#000944" font-family="OpenAI Sans, Helvetica Neue, Arial, sans-serif" font-size="64" font-weight="750" text-anchor="middle">$0.0146</text>
+</g>
+<g aria-label="Spent">
+<title>Spent</title>
+<rect x="985" y="245" width="395" height="250" rx="8" fill="#cef4c6" stroke="#002e03" stroke-width="2.5"/>
+<rect x="996" y="247" width="10" height="246" fill="#85df7b" stroke="#002e03" stroke-width="1"/>
+<rect x="1359" y="247" width="10" height="246" fill="#85df7b" stroke="#002e03" stroke-width="1"/>
+<text x="1182.5" y="339" fill="#002e03" font-family="OpenAI Sans, Helvetica Neue, Arial, sans-serif" font-size="42" font-weight="600" text-anchor="middle">Spent</text>
+<text x="1182.5" y="422" fill="#002e03" font-family="OpenAI Sans, Helvetica Neue, Arial, sans-serif" font-size="64" font-weight="750" text-anchor="middle">$0.01</text>
+</g>
+<g aria-label="Remaining">
+<title>Remaining</title>
+<rect x="1435" y="245" width="395" height="250" rx="8" fill="#cef4c6" stroke="#002e03" stroke-width="2.5"/>
+<rect x="1446" y="247" width="10" height="246" fill="#85df7b" stroke="#002e03" stroke-width="1"/>
+<rect x="1809" y="247" width="10" height="246" fill="#85df7b" stroke="#002e03" stroke-width="1"/>
+<text x="1632.5" y="339" fill="#002e03" font-family="OpenAI Sans, Helvetica Neue, Arial, sans-serif" font-size="42" font-weight="600" text-anchor="middle">Remaining</text>
+<text x="1632.5" y="422" fill="#002e03" font-family="OpenAI Sans, Helvetica Neue, Arial, sans-serif" font-size="64" font-weight="750" text-anchor="middle">$0.01</text>
+</g>
+<g aria-label="$0.0146 exceeds $0.01">
+<title>$0.0146 exceeds $0.01</title>
+<rect x="410" y="670" width="990" height="200" rx="8" fill="#f9e7e4" stroke="#6b241d" stroke-width="2.5"/>
+<rect x="421" y="672" width="10" height="196" fill="#d89a92" stroke="#6b241d" stroke-width="1"/>
+<rect x="1379" y="672" width="10" height="196" fill="#d89a92" stroke="#6b241d" stroke-width="1"/>
+<text x="905" y="757" fill="#6b241d" font-family="OpenAI Sans, Helvetica Neue, Arial, sans-serif" font-size="56" font-weight="720" text-anchor="middle">$0.0146 exceeds $0.01</text>
+<text x="905" y="821" fill="#6b241d" font-family="OpenAI Sans, Helvetica Neue, Arial, sans-serif" font-size="42" font-weight="650" text-anchor="middle">STOP — no next model call</text>
+</g>
+</svg>

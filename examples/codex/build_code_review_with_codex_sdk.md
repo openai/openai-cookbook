@@ -4,7 +4,7 @@ With [Code Review](https://chatgpt.com/codex/settings/code-review) in Codex Clou
 
 Luckily, we can replicate Codex's cloud hosted review process in our own CI/CD runners. In this guide, we'll build our own Code Review action using the Codex CLI headless mode with GitHub Actions, GitLab CI/CD, Azure DevOps Pipelines, and Jenkins.
 
-Model recommendation: use `gpt-5.5` for the strongest code review accuracy and consistency in these workflows.
+Model recommendation: use `gpt-5.6-sol` for the strongest code review accuracy and consistency in these workflows.
 
 To build our own Code review, we'll take the following steps and adhere to them closely:
 

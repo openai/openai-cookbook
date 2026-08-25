@@ -802,6 +802,7 @@
     - responses
     - functions
     - tracing
+  archived: true
 
 - title: Multi-Agent Portfolio Collaboration with OpenAI Agents SDK
   path: examples/agents_sdk/multi-agent-portfolio-collaboration/multi_agent_portfolio_collaboration.ipynb

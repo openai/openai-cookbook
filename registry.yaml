@@ -749,6 +749,7 @@
     - prompt
     - completions
     - responses
+  archived: true
 
 - title: Fine-Tuning Techniques - Choosing Between SFT, DPO, and RFT (With a Guide to DPO)
   path: examples/Fine_tuning_direct_preference_optimization_guide.ipynb

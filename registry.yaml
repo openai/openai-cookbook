@@ -878,6 +878,7 @@
     - images
     - RAG
     - vision
+  archived: true
 
 - title: Better performance from reasoning models using the Responses API
   path: examples/responses_api/reasoning_items.ipynb

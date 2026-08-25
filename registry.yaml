@@ -3401,6 +3401,7 @@
     - deep-research
     - agents
     - agents-sdk
+  archived: true
 
 - title: Building a Deep Research MCP Server
   path: examples/deep_research_api/how_to_build_a_deep_research_mcp_server/README.md

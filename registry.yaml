@@ -648,6 +648,7 @@
     - open-models
     - gpt-oss
     - gpt-oss-server
+  archived: true
 
 - title: How to run gpt-oss locally with Ollama
   path: articles/gpt-oss/run-locally-ollama.md
@@ -1020,6 +1021,7 @@
     - shyamal-anadkat
   tags:
     - completions
+  archived: true
 
 - title: Creating slides with the Assistants API and DALL·E 3
   path: examples/Creating_slides_with_Assistants_API_and_DALL-E3.ipynb
@@ -1107,6 +1109,7 @@
   tags:
     - embeddings
     - completions
+  archived: true
 
 - title: Embedding texts that are longer than the model's maximum context length
   path: examples/Embedding_long_inputs.ipynb
@@ -2287,6 +2290,7 @@
   authors:
     - ted-at-openai
   tags: []
+  archived: true
 
 - title: Function calling with an OpenAPI specification
   path: examples/Function_calling_with_an_OpenAPI_spec.ipynb
@@ -2807,6 +2811,7 @@
   tags:
     - completions
     - functions
+  archived: true
 
 - title: GPT Actions library (Middleware) - Google Cloud Function
   path: examples/chatgpt/gpt_actions_library/gpt_middleware_google_cloud_function.md
@@ -3031,6 +3036,7 @@
     - vision
     - fine-tuning
     - completions
+  archived: true
 
 - title: Steering Text-to-Speech for more dynamic audio generation
   path: examples/voice_solutions/steering_tts.ipynb

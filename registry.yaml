@@ -759,6 +759,7 @@
     - alexl-oai
   tags:
     - fine-tuning
+  archived: true
 
 - title: MCP-Powered Agentic Voice Framework
   path: examples/partners/mcp_powered_voice_agents/mcp_powered_agents_cookbook.ipynb

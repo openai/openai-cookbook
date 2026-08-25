@@ -910,6 +910,7 @@
     - audio
     - speech
     - agents-sdk
+  archived: true
 
 - title: Practical Guide for Model Selection for Real‑World Use Cases
   path: examples/partners/model_selection_guide/model_selection_guide.ipynb

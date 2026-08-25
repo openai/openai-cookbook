@@ -930,6 +930,7 @@
     - insurance
     - legal
     - pharma
+  archived: true
 
 - title: Evals API Use-case - Detecting prompt regressions
   path: examples/evaluation/use-cases/regression.ipynb

@@ -3386,6 +3386,7 @@
     - responses
     - mcp
     - deep-research
+  archived: true
 
 - title: Deep Research API with the Agents SDK
   path: examples/deep_research_api/introduction_to_deep_research_api_agents.ipynb

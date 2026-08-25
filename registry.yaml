@@ -898,6 +898,7 @@
     - audio
     - speech
     - tiktoken
+  archived: true
 
 - title: Comparing Speech-to-Text Methods with the OpenAI API
   path: examples/Speech_transcription_methods.ipynb

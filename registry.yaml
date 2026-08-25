@@ -374,6 +374,7 @@
     - llmops
     - prompt-engineering
     - agent-retraining
+  archived: true
 
 - title: User guide for gpt-oss-safeguard
   path: articles/gpt-oss-safeguard-guide.md

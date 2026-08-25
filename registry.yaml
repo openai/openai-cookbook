@@ -49,7 +49,7 @@
 - title: Handle backend failures inside an OpenAI Agents SDK tool
   path: examples/agents_sdk/testing_agent_recovery_from_tool_failures.ipynb
   slug: testing-agent-recovery-from-tool-failures
-  description: Handle timeouts and false-empty results inside an account-scoped Agents SDK tool using bounded retries, inferred-only filter correction, and validated, sanitized output.
+  description: Use an Agents SDK tool to retry order searches, remove a guessed carrier filter when needed, and check results while keeping the customer's account and requested status unchanged.
   date: 2026-08-24
   authors:
     - saptob

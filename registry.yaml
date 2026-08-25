@@ -418,6 +418,7 @@
   tags:
     - sora
     - prompt
+  archived: true
 
 - title: Using PLANS.md for multi-hour problem solving
   path: articles/codex_exec_plans.md

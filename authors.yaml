@@ -3,6 +3,11 @@
 # You can optionally customize how your information shows up cookbook.openai.com over here.
 # If your information is not present here, it will be pulled from your GitHub profile.
 
+MarshallBear1:
+  name: "Marshall Gould"
+  website: "https://junocompanion.com"
+  avatar: "https://avatars.githubusercontent.com/MarshallBear1"
+
 the-OAI:
   name: "Tiger He"
   website: "https://www.linkedin.com/in/tiger-he-b71842164/"

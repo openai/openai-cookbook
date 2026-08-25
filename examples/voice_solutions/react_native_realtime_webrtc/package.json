@@ -1,0 +1,31 @@
+{
+  "name": "openai-react-native-realtime-webrtc-example",
+  "version": "1.0.0",
+  "private": true,
+  "type": "module",
+  "scripts": {
+    "check": "npm run typecheck && npm test",
+    "dev:server": "tsx --env-file=.env src/server/app.ts",
+    "test": "vitest run",
+    "typecheck": "tsc --noEmit"
+  },
+  "dependencies": {
+    "express": "^5.1.0"
+  },
+  "peerDependencies": {
+    "react-native-webrtc": "^124.0.7"
+  },
+  "devDependencies": {
+    "@types/express": "^5.0.3",
+    "@types/node": "^24.1.0",
+    "@types/supertest": "^6.0.3",
+    "react-native-webrtc": "^124.0.7",
+    "supertest": "^7.1.4",
+    "tsx": "^4.20.3",
+    "typescript": "^5.8.3",
+    "vitest": "^3.2.4"
+  },
+  "engines": {
+    "node": ">=20"
+  }
+}

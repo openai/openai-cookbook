@@ -842,6 +842,7 @@
     - reinforcement-learning
     - fine-tuning
     - reinforcement-learning-graders
+  archived: true
 
 - title: Reinforcement Fine-Tuning for Conversational Reasoning with the OpenAI API
   path: examples/fine-tuned_qa/reinforcement_finetuning_healthbench.ipynb

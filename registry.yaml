@@ -19,6 +19,22 @@
     - guardrails
     - codex
 
+- title: Generate Transparent Image Assets for Campaigns and Presentations
+  path: examples/multimodal/transparent-image-assets-for-campaigns-and-presentations.ipynb
+  slug: transparent-image-assets-for-campaigns-and-presentations
+  description: Generate reusable transparent PNG assets for seasonal ecommerce campaigns and branded PowerPoint presentations.
+  date: 2026-08-20
+  authors:
+    - the-OAI
+  tags:
+    - image-generation
+    - images
+    - multimodal
+    - transparency
+    - ecommerce
+    - presentations
+    - codex
+
 - title: Iterating Development Workflows with Codex
   path: examples/codex/iterating-development-workflows-with-codex.md
   slug: iterating-development-workflows-with-codex
@@ -420,6 +436,7 @@
 
 - title: Using PLANS.md for multi-hour problem solving
   path: articles/codex_exec_plans.md
+  archived: true
   slug: codex-exec-plans
   date: 2025-10-07
   authors:
@@ -515,6 +532,7 @@
   path: articles/gpt-oss/run-locally-lmstudio.md
   slug: run-locally-lmstudio
   date: 2025-08-07
+  archived: true
   authors:
     - yagil
   tags:
@@ -645,6 +663,7 @@
     - open-models
     - gpt-oss
     - gpt-oss-server
+  archived: true
 
 - title: How to run gpt-oss locally with Ollama
   path: articles/gpt-oss/run-locally-ollama.md
@@ -1017,6 +1036,7 @@
     - shyamal-anadkat
   tags:
     - completions
+  archived: true
 
 - title: Creating slides with the Assistants API and DALL·E 3
   path: examples/Creating_slides_with_Assistants_API_and_DALL-E3.ipynb
@@ -1104,6 +1124,7 @@
   tags:
     - embeddings
     - completions
+  archived: true
 
 - title: Embedding texts that are longer than the model's maximum context length
   path: examples/Embedding_long_inputs.ipynb
@@ -2284,6 +2305,7 @@
   authors:
     - ted-at-openai
   tags: []
+  archived: true
 
 - title: Function calling with an OpenAPI specification
   path: examples/Function_calling_with_an_OpenAPI_spec.ipynb
@@ -2804,6 +2826,7 @@
   tags:
     - completions
     - functions
+  archived: true
 
 - title: GPT Actions library (Middleware) - Google Cloud Function
   path: examples/chatgpt/gpt_actions_library/gpt_middleware_google_cloud_function.md
@@ -3028,6 +3051,7 @@
     - vision
     - fine-tuning
     - completions
+  archived: true
 
 - title: Steering Text-to-Speech for more dynamic audio generation
   path: examples/voice_solutions/steering_tts.ipynb
@@ -3490,6 +3514,7 @@
   path: examples/chatgpt/compliance_api/logs_platform.ipynb
   slug: logs-platform
   date: 2025-12-11
+  archived: true
   authors:
     - kevinv-openai
   tags:
@@ -3581,6 +3606,7 @@
   authors:
     - msingh-openai
     - emreokcular
+    - the-OAI
   tags:
     - images
     - vision
@@ -3641,7 +3667,7 @@
 - title: Moving from OpenAI Evals to Promptfoo
   path: examples/evaluation/moving-from-openai-evals-to-promptfoo.md
   slug: moving-from-openai-evals-to-promptfoo
-  description: Migrate supported OpenAI Evals evaluations to runnable Promptfoo configurations and preserve historical results.
+  description: Manually recreate OpenAI Evals evaluations in Promptfoo, then run and validate them.
   date: 2026-06-03
   authors:
     - kkahadze-oai

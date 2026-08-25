@@ -888,6 +888,7 @@
   tags:
     - responses
     - functions
+  archived: true
 
 - title: Context Summarization with Realtime API
   path: examples/Context_summarization_with_realtime_api.ipynb

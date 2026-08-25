@@ -736,6 +736,7 @@
   tags:
     - codex
     - automation
+  archived: true
 
 - title: Prompt Migration Guide
   path: examples/Prompt_migration_guide.ipynb

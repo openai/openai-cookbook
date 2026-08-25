@@ -46,10 +46,10 @@
     - agents
     - cost-management
 
-- title: Recover a failed agent tool call with the OpenAI Agents SDK
+- title: Handle backend failures inside an OpenAI Agents SDK tool
   path: examples/agents_sdk/testing_agent_recovery_from_tool_failures.ipynb
   slug: testing-agent-recovery-from-tool-failures
-  description: Recover an account-scoped Agents SDK search from timeouts and false-empty results without weakening customer-approved filters or tenant isolation.
+  description: Handle timeouts and false-empty results inside an account-scoped Agents SDK tool using bounded retries, inferred-only filter correction, and validated, sanitized output.
   date: 2026-08-24
   authors:
     - saptob

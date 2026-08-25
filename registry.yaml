@@ -866,6 +866,7 @@
   tags:
     - mcp
     - security
+  archived: true
 
 - title: Image Understanding with RAG
   path: examples/multimodal/image_understanding_with_rag.ipynb

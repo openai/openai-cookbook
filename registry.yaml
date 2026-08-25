@@ -3432,6 +3432,7 @@
     - katiagg
   tags:
     - images
+  archived: true
 
 - title: Use Codex CLI to automatically fix CI failures
   path: examples/codex/Autofix-github-actions.ipynb

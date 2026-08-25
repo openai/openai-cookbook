@@ -3280,6 +3280,7 @@
     - agents
     - agents-sdk
     - parallel-agents
+  archived: true
 
 - title: Practical guide to data-intensive apps with the Realtime API
   path: examples/Data-intensive-Realtime-apps.ipynb

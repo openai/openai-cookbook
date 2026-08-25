@@ -727,6 +727,7 @@
     - responses
     - agents-sdk
     - tracing
+  archived: true
 
 - title: Automate Jira ↔ GitHub with Codex
   path: examples/codex/jira-github.ipynb

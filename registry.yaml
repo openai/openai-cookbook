@@ -791,6 +791,7 @@
     - mcp
     - tracing
     - security
+  archived: true
 
 - title: Eval Driven System Design - From Prototype to Production
   path: examples/partners/eval_driven_system_design/receipt_inspection.ipynb

@@ -775,6 +775,7 @@
     - agents-sdk
     - functions
     - tracing
+  archived: true
 
 - title: Building a Supply-Chain Copilot with OpenAI Agent SDK and Databricks MCP Servers
   path: examples/mcp/databricks_mcp_cookbook.ipynb

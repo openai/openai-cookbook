@@ -3414,6 +3414,7 @@
     - deep-research
     - agents
     - agents-sdk
+  archived: true
 
 - title: Generate images with high input fidelity
   path: examples/Generate_Images_With_High_Input_Fidelity.ipynb

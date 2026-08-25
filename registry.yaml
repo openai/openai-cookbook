@@ -395,6 +395,7 @@
   tags:
     - agentkit
     - evals
+  archived: true
 
 - title: Building with Realtime Mini
   path: examples/building_w_rt_mini/building_w_rt_mini.ipynb

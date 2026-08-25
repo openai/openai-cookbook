@@ -987,6 +987,7 @@
     - functions
     - pinecone
     - web-search
+  archived: true
 
 - title: Automating Dispute Management with Agents SDK and Stripe API
   path: examples/agents_sdk/dispute_agent.ipynb
@@ -1242,6 +1243,7 @@
   tags:
     - completions
     - embeddings
+  archived: true
 
 - title: How to stream completions
   path: examples/How_to_stream_completions.ipynb
@@ -3155,6 +3157,7 @@
   tags:
     - completions
     - security
+  archived: true
 
 - title: Doing RAG on PDFs using File Search in the Responses API
   path: examples/File_Search_Responses.ipynb
@@ -3216,6 +3219,7 @@
   tags:
     - evals
     - agents-sdk
+  archived: true
 
 - title: GPT Actions library - Salesforce & Gong
   path: examples/chatgpt/gpt_actions_library/gpt_action_salesforce_gong.md
@@ -3239,6 +3243,7 @@
   tags:
     - responses
     - api
+  archived: true
 
 - title: Generate images with GPT Image
   path: examples/Generate_Images_With_GPT_Image.ipynb

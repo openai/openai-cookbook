@@ -285,6 +285,7 @@
     - promptfoo
     - partners
     - security
+  archived: true
 
 - title: Realtime Eval Guide
   path: examples/Realtime_eval_guide.ipynb
@@ -326,6 +327,7 @@
     - transcription
     - speech
     - audio
+  archived: true
 
 - title: Self-Evolving Agents - A Cookbook for Autonomous Agent Retraining
   path: examples/partners/self_evolving_agents/autonomous_agent_retraining.ipynb
@@ -344,6 +346,7 @@
     - llmops
     - prompt-engineering
     - agent-retraining
+  archived: true
 
 - title: User guide for gpt-oss-safeguard
   path: articles/gpt-oss-safeguard-guide.md
@@ -365,6 +368,7 @@
   tags:
     - agentkit
     - evals
+  archived: true
 
 - title: Building with Realtime Mini
   path: examples/building_w_rt_mini/building_w_rt_mini.ipynb
@@ -388,9 +392,11 @@
   tags:
     - sora
     - prompt
+  archived: true
 
 - title: Using PLANS.md for multi-hour problem solving
   path: articles/codex_exec_plans.md
+  archived: true
   slug: codex-exec-plans
   date: 2025-10-07
   authors:
@@ -486,6 +492,7 @@
   path: articles/gpt-oss/run-locally-lmstudio.md
   slug: run-locally-lmstudio
   date: 2025-08-07
+  archived: true
   authors:
     - yagil
   tags:
@@ -544,6 +551,7 @@
     - gpt-5
     - functions
     - reasoning
+  archived: true
 
 - title: How to run gpt-oss-20b on Google Colab
   path: articles/gpt-oss/run-colab.ipynb
@@ -616,6 +624,7 @@
     - open-models
     - gpt-oss
     - gpt-oss-server
+  archived: true
 
 - title: How to run gpt-oss locally with Ollama
   path: articles/gpt-oss/run-locally-ollama.md
@@ -691,6 +700,7 @@
     - responses
     - agents-sdk
     - tracing
+  archived: true
 
 - title: Automate Jira ↔ GitHub with Codex
   path: examples/codex/jira-github.ipynb
@@ -702,6 +712,7 @@
   tags:
     - codex
     - automation
+  archived: true
 
 - title: Prompt Migration Guide
   path: examples/Prompt_migration_guide.ipynb
@@ -714,6 +725,7 @@
     - prompt
     - completions
     - responses
+  archived: true
 
 - title: Fine-Tuning Techniques - Choosing Between SFT, DPO, and RFT (With a Guide to DPO)
   path: examples/Fine_tuning_direct_preference_optimization_guide.ipynb
@@ -723,6 +735,7 @@
     - alexl-oai
   tags:
     - fine-tuning
+  archived: true
 
 - title: MCP-Powered Agentic Voice Framework
   path: examples/partners/mcp_powered_voice_agents/mcp_powered_agents_cookbook.ipynb
@@ -738,6 +751,7 @@
     - agents-sdk
     - functions
     - tracing
+  archived: true
 
 - title: Building a Supply-Chain Copilot with OpenAI Agent SDK and Databricks MCP Servers
   path: examples/mcp/databricks_mcp_cookbook.ipynb
@@ -750,6 +764,7 @@
     - mcp
     - tracing
     - security
+  archived: true
 
 - title: Eval Driven System Design - From Prototype to Production
   path: examples/partners/eval_driven_system_design/receipt_inspection.ipynb
@@ -768,6 +783,7 @@
     - responses
     - functions
     - tracing
+  archived: true
 
 - title: Multi-Agent Portfolio Collaboration with OpenAI Agents SDK
   path: examples/agents_sdk/multi-agent-portfolio-collaboration/multi_agent_portfolio_collaboration.ipynb
@@ -782,6 +798,7 @@
     - functions
     - responses
     - mutli-agent-collaboration
+  archived: true
 
 - title: o3/o4-mini Function Calling Guide
   path: examples/o-series/o3o4-mini_prompting_guide.ipynb
@@ -808,6 +825,7 @@
     - reinforcement-learning
     - fine-tuning
     - reinforcement-learning-graders
+  archived: true
 
 - title: Reinforcement Fine-Tuning for Conversational Reasoning with the OpenAI API
   path: examples/fine-tuned_qa/reinforcement_finetuning_healthbench.ipynb
@@ -821,6 +839,7 @@
     - qa
     - evals
     - reinforcement
+  archived: true
 
 - title: Guide to Using the Responses API's MCP Tool
   path: examples/mcp/mcp_tool_guide.ipynb
@@ -832,6 +851,7 @@
   tags:
     - mcp
     - security
+  archived: true
 
 - title: Image Understanding with RAG
   path: examples/multimodal/image_understanding_with_rag.ipynb
@@ -844,6 +864,7 @@
     - images
     - RAG
     - vision
+  archived: true
 
 - title: Better performance from reasoning models using the Responses API
   path: examples/responses_api/reasoning_items.ipynb
@@ -854,6 +875,7 @@
   tags:
     - responses
     - functions
+  archived: true
 
 - title: Context Summarization with Realtime API
   path: examples/Context_summarization_with_realtime_api.ipynb
@@ -865,6 +887,7 @@
     - audio
     - speech
     - tiktoken
+  archived: true
 
 - title: Comparing Speech-to-Text Methods with the OpenAI API
   path: examples/Speech_transcription_methods.ipynb
@@ -877,6 +900,7 @@
     - audio
     - speech
     - agents-sdk
+  archived: true
 
 - title: Practical Guide for Model Selection for Real‑World Use Cases
   path: examples/partners/model_selection_guide/model_selection_guide.ipynb
@@ -896,6 +920,7 @@
     - insurance
     - legal
     - pharma
+  archived: true
 
 - title: Evals API Use-case - Detecting prompt regressions
   path: examples/evaluation/use-cases/regression.ipynb
@@ -954,6 +979,7 @@
     - functions
     - pinecone
     - web-search
+  archived: true
 
 - title: Automating Dispute Management with Agents SDK and Stripe API
   path: examples/agents_sdk/dispute_agent.ipynb
@@ -988,6 +1014,7 @@
     - shyamal-anadkat
   tags:
     - completions
+  archived: true
 
 - title: Creating slides with the Assistants API and DALL·E 3
   path: examples/Creating_slides_with_Assistants_API_and_DALL-E3.ipynb
@@ -1075,6 +1102,7 @@
   tags:
     - embeddings
     - completions
+  archived: true
 
 - title: Embedding texts that are longer than the model's maximum context length
   path: examples/Embedding_long_inputs.ipynb
@@ -1207,6 +1235,7 @@
   tags:
     - completions
     - embeddings
+  archived: true
 
 - title: How to stream completions
   path: examples/How_to_stream_completions.ipynb
@@ -2255,6 +2284,7 @@
   authors:
     - ted-at-openai
   tags: []
+  archived: true
 
 - title: Function calling with an OpenAPI specification
   path: examples/Function_calling_with_an_OpenAPI_spec.ipynb
@@ -2775,6 +2805,7 @@
   tags:
     - completions
     - functions
+  archived: true
 
 - title: GPT Actions library (Middleware) - Google Cloud Function
   path: examples/chatgpt/gpt_actions_library/gpt_middleware_google_cloud_function.md
@@ -2999,6 +3030,7 @@
     - vision
     - fine-tuning
     - completions
+  archived: true
 
 - title: Steering Text-to-Speech for more dynamic audio generation
   path: examples/voice_solutions/steering_tts.ipynb
@@ -3117,6 +3149,7 @@
   tags:
     - completions
     - security
+  archived: true
 
 - title: Doing RAG on PDFs using File Search in the Responses API
   path: examples/File_Search_Responses.ipynb
@@ -3178,6 +3211,7 @@
   tags:
     - evals
     - agents-sdk
+  archived: true
 
 - title: GPT Actions library - Salesforce & Gong
   path: examples/chatgpt/gpt_actions_library/gpt_action_salesforce_gong.md
@@ -3201,6 +3235,7 @@
   tags:
     - responses
     - api
+  archived: true
 
 - title: Generate images with GPT Image
   path: examples/Generate_Images_With_GPT_Image.ipynb
@@ -3236,6 +3271,7 @@
     - agents
     - agents-sdk
     - parallel-agents
+  archived: true
 
 - title: Practical guide to data-intensive apps with the Realtime API
   path: examples/Data-intensive-Realtime-apps.ipynb
@@ -3329,6 +3365,7 @@
     - responses
     - mcp
     - deep-research
+  archived: true
 
 - title: Deep Research API with the Agents SDK
   path: examples/deep_research_api/introduction_to_deep_research_api_agents.ipynb
@@ -3343,6 +3380,7 @@
     - deep-research
     - agents
     - agents-sdk
+  archived: true
 
 - title: Building a Deep Research MCP Server
   path: examples/deep_research_api/how_to_build_a_deep_research_mcp_server/README.md
@@ -3358,6 +3396,7 @@
     - deep-research
     - agents
     - agents-sdk
+  archived: true
 
 - title: Generate images with high input fidelity
   path: examples/Generate_Images_With_High_Input_Fidelity.ipynb
@@ -3368,6 +3407,7 @@
     - katiagg
   tags:
     - images
+  archived: true
 
 - title: Use Codex CLI to automatically fix CI failures
   path: examples/codex/Autofix-github-actions.ipynb
@@ -3401,6 +3441,7 @@
   tags:
     - codex
     - security
+  archived: true
 
 - title: Context Engineering for Personalization - State Management with Long-Term Memory Notes
   path: examples/agents_sdk/context_personalization.ipynb
@@ -3420,6 +3461,7 @@
   tags:
     - agents-sdk
     - security
+  archived: true
 
 - title: GPT-5.1 Prompting Guide
   path: examples/gpt-5/gpt-5-1_prompting_guide.ipynb
@@ -3429,6 +3471,7 @@
     - samarth-oai
   tags:
     - gpt-5.1
+  archived: true
 
 - title: Codex Prompting Guide
   path: examples/gpt-5/codex_prompting_guide.ipynb
@@ -3461,6 +3504,7 @@
   path: examples/chatgpt/compliance_api/logs_platform.ipynb
   slug: logs-platform
   date: 2025-12-11
+  archived: true
   authors:
     - kevinv-openai
   tags:
@@ -3480,6 +3524,7 @@
     - emreokcular
   tags:
     - gpt-5.2
+  archived: true
 
 - title: Gpt-image-1.5 Prompting Guide
   path: examples/multimodal/image-gen-1.5-prompting_guide.ipynb
@@ -3493,6 +3538,7 @@
   tags:
     - images
     - vision
+  archived: true
 
 - title: Prompt Personalities
   path: examples/gpt-5/prompt_personalities.ipynb
@@ -3613,7 +3659,7 @@
 - title: Moving from OpenAI Evals to Promptfoo
   path: examples/evaluation/moving-from-openai-evals-to-promptfoo.md
   slug: moving-from-openai-evals-to-promptfoo
-  description: Migrate supported OpenAI Evals evaluations to runnable Promptfoo configurations and preserve historical results.
+  description: Manually recreate OpenAI Evals evaluations in Promptfoo, then run and validate them.
   date: 2026-06-03
   authors:
     - kkahadze-oai

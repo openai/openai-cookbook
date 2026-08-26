@@ -3550,6 +3550,7 @@
     - emreokcular
   tags:
     - gpt-5.2
+  archived: true
 
 - title: Gpt-image-1.5 Prompting Guide
   path: examples/multimodal/image-gen-1.5-prompting_guide.ipynb
@@ -3563,6 +3564,7 @@
   tags:
     - images
     - vision
+  archived: true
 
 - title: Prompt Personalities
   path: examples/gpt-5/prompt_personalities.ipynb

@@ -356,6 +356,7 @@
     - transcription
     - speech
     - audio
+  archived: true
 
 - title: Self-Evolving Agents - A Cookbook for Autonomous Agent Retraining
   path: examples/partners/self_evolving_agents/autonomous_agent_retraining.ipynb

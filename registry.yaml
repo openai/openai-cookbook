@@ -3470,6 +3470,7 @@
   tags:
     - codex
     - security
+  archived: true
 
 - title: Context Engineering for Personalization - State Management with Long-Term Memory Notes
   path: examples/agents_sdk/context_personalization.ipynb

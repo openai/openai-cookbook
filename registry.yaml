@@ -3497,6 +3497,7 @@
     - samarth-oai
   tags:
     - gpt-5.1
+  archived: true
 
 - title: Codex Prompting Guide
   path: examples/gpt-5/codex_prompting_guide.ipynb

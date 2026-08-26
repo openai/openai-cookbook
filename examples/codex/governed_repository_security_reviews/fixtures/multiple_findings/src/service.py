@@ -1,0 +1,6 @@
+"""Synthetic multi-finding fixture; markers are inert comments."""
+
+# SYNTHETIC_SQL_INJECTION
+# SYNTHETIC_SQL_INJECTION
+# SYNTHETIC_MISSING_AUTH
+# SYNTHETIC_UNSAFE_DESERIALIZE

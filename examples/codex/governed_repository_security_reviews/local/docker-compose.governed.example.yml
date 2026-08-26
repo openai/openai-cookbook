@@ -1,0 +1,86 @@
+# Local-only, bounded synthetic supervisor. No active workflow, image pull,
+# provider credential, daemon socket, customer repository or live scan exists.
+# A separately trusted HOST orchestrator must own any restricted Docker workers.
+name: governed-security-supervisor
+
+services:
+  governed-security-supervisor:
+    image: python:3.12-alpine
+    pull_policy: never
+    user: "${GOVERNED_UID:?Set GOVERNED_UID to the trusted state owner}:${GOVERNED_GID:?Set GOVERNED_GID to the trusted state owner group}"
+    network_mode: none
+    read_only: true
+    cap_drop:
+      - ALL
+    security_opt:
+      - no-new-privileges:true
+    pids_limit: 64
+    mem_limit: 256m
+    memswap_limit: 256m
+    cpus: 0.50
+    ulimits:
+      nofile:
+        soft: 128
+        hard: 128
+      fsize:
+        soft: 1048576
+        hard: 1048576
+    tmpfs:
+      - /tmp:rw,noexec,nosuid,nodev,size=33554432,mode=1777
+    environment:
+      PYTHONDONTWRITEBYTECODE: "1"
+      PYTHONIOENCODING: utf-8
+      CODEX_SECURITY_SCHEMA_ROOT: /opt/governed/contracts/codex-security-schemas
+    working_dir: /opt/governed
+    volumes:
+      # Never mount the checkout root: Git metadata and ignored dotenv files
+      # must remain inaccessible even to the trusted synthetic control plane.
+      - type: bind
+        source: "${GOVERNED_CHECKOUT:?Set GOVERNED_CHECKOUT to the reviewed source}/src"
+        target: /opt/governed/src
+        read_only: true
+      - type: bind
+        source: "${GOVERNED_CHECKOUT:?Set GOVERNED_CHECKOUT to the reviewed source}/scripts"
+        target: /opt/governed/scripts
+        read_only: true
+      - type: bind
+        source: "${GOVERNED_CHECKOUT:?Set GOVERNED_CHECKOUT to the reviewed source}/fixtures"
+        target: /opt/governed/fixtures
+        read_only: true
+      - type: bind
+        source: "${GOVERNED_CHECKOUT:?Set GOVERNED_CHECKOUT to the reviewed source}/contracts"
+        target: /opt/governed/contracts
+        read_only: true
+      - type: bind
+        source: "${GOVERNED_PRIVATE_INPUTS:?Set GOVERNED_PRIVATE_INPUTS to the 0700 trusted input directory}"
+        target: /inputs
+        read_only: true
+      - type: bind
+        source: "${GOVERNED_PRIVATE_STATE:?Set GOVERNED_PRIVATE_STATE to the 0700 external durable state directory}"
+        target: /state
+    command:
+      - python3
+      - -I
+      - -B
+      - scripts/run_bounded_security_supervisor.py
+      - --config
+      - /inputs/configuration.json
+      - --inventory
+      - /inputs/inventory.json
+      - --approvals
+      - /inputs/approvals.json
+      - --events
+      - /inputs/events.jsonl
+      - --state-dir
+      - /state
+      - --max-cycles
+      - "${GOVERNED_MAX_CYCLES:-2}"
+      - --interval-seconds
+      - "${GOVERNED_INTERVAL_SECONDS:-0}"
+      - --max-events-per-cycle
+      - "${GOVERNED_MAX_EVENTS_PER_CYCLE:-128}"
+      - --max-pending-events
+      - "${GOVERNED_MAX_PENDING_EVENTS:-32}"
+      - --runtime-label
+      - restricted_service_container
+      - --require-container-isolation

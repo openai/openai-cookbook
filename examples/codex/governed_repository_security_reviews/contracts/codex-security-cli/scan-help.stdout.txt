@@ -1,0 +1,60 @@
+codex-security scan — Run a Codex Security scan.
+
+Usage: codex-security scan [repository] [options]
+
+Arguments:
+  repository  Repository root to scan (default: current directory).
+
+Options:
+  --auth <auto|chatgpt|api-key>                            Select ChatGPT, OPENAI_API_KEY/CODEX_API_KEY, or automatic authentication. (default: auto)
+  --verbose                                                Print scan diagnostics to stderr.
+  --safety-identifier <string>                             Stable hashed end-user ID for this scan's model requests (1–64 characters).
+  --path <array>                                           Scan only PATH; repeat for multiple repository-relative paths.
+  --knowledge-base <array>                                 Add security-context files or directories; repeat for multiple paths.
+  --scan-prompt-file <string>                              Append scan instructions from FILE.
+  --validation-prompt-file <string>                        Replace final validation with the workflow in FILE (not Deep).
+  --post-scan-prompt-file <string>                         Run FILE after each scan, including failures.
+  --diff <string>                                          Scan committed Git changes from BASE to --head.
+  --working-tree                                           Scan staged and unstaged changes against --base.
+  --head <string>                                          Git head ref for --diff (default: HEAD).
+  --base <string>                                          Git base ref for --working-tree (default: HEAD).
+  --mode <standard|deep>                                   Scan mode; deep supports repository and path targets. (default: standard)
+  --workers <number>                                       Maximum concurrent deep-scan discovery workers.
+  --subagents <number>                                     Subagents available to each deep-scan worker.
+  --stop-after-no-new <number>                             Stop after this many runs find no new issues.
+  --max-discovery-runs <number>                            Maximum deep-scan discovery runs.
+  --max-time-hours <number>                                Maximum deep-scan discovery hours (default: 96; maximum: 96).
+  --model <string>                                         OpenAI model to use (default: gpt-5.6-sol).
+  --effort <minimal|low|medium|high|xhigh|max>             Model reasoning effort (default: xhigh).
+  --provider <openai|openrouter|fireworks|amazon-bedrock>  Inference provider for scans. (default: openai)
+  --output-dir <string>                                    Artifact directory outside the repository (default: Codex Security state; CODEX_SECURITY_STATE_DIR).
+  --archive-existing                                       Archive existing results; requires --output-dir.
+  --plugin-path <string>                                   Codex Security plugin directory or ZIP (default: bundled plugin).
+  --python <string>                                        Python interpreter (default: PYTHON or automatic discovery).
+  --codex <array>                                          Repeat TOML KEY=VALUE; e.g. model_reasoning_effort="high" or features.multi_agent_v2.max_concurrent_threads_per_session=4.
+  --fail-on-severity <critical|high|medium|low>            Exit 1 for findings at or above LEVEL.
+  --patch                                                  Patch and verify confirmed findings after the scan.
+  --patch-severity <critical|high|medium|low>              Patch findings at or above LEVEL; requires --patch.
+  --create-pr                                              Create a draft GitHub pull request after verified patches.
+  --max-cost <number>                                      Stop the scan if estimated USD cost exceeds AMOUNT.
+  --headless                                               Use plain text progress instead of the interactive dashboard.
+  --dry-run                                                Validate local scan inputs without starting a scan.
+
+Examples:
+  codex-security scan .
+  codex-security scan . --model gpt-5.6-terra
+  codex-security scan . --model gpt-5.6-terra --effort high
+  codex-security scan . --path src
+  codex-security scan . --diff origin/main
+  codex-security scan . --codex features.multi_agent_v2.max_concurrent_threads_per_session=4
+
+Global Options:
+  --filter-output <keys>              Filter output by key paths (e.g. foo,bar.baz,a[0,3])
+  --format <toon|json|yaml|md|jsonl>  Output format
+  --full-output                       Show full output envelope
+  --help                              Show help
+  --llms, --llms-full                 Print LLM-readable manifest
+  --schema                            Show JSON Schema for command
+  --token-count                       Print token count of output (instead of output)
+  --token-limit <n>                   Limit output to n tokens
+  --token-offset <n>                  Skip first n tokens of output

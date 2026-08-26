@@ -315,6 +315,7 @@
     - promptfoo
     - partners
     - security
+  archived: true
 
 - title: Realtime Eval Guide
   path: examples/Realtime_eval_guide.ipynb

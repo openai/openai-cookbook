@@ -411,6 +411,7 @@
 - title: Building Consistent Workflows with Codex CLI & Agents SDK
   path: examples/codex/codex_mcp_agents_sdk/building_consistent_workflows_codex_cli_agents_sdk.ipynb
   slug: building-consistent-workflows-codex-cli-agents-sdk
+  archived: true
   date: 2025-10-01
   authors:
     - jhall-openai
@@ -456,6 +457,7 @@
 - title: Realtime Prompting Guide
   path: examples/Realtime_prompting_guide.ipynb
   slug: realtime-prompting-guide
+  archived: true
   date: 2026-02-25
   authors:
     - minh-hoque
@@ -468,6 +470,7 @@
 - title: "Fine-tune gpt-oss for better Korean language performance"
   path: articles/gpt-oss/fine-tune-korean.ipynb
   slug: fine-tune-korean
+  archived: true
   date: 2025-08-26
   authors:
     - heejingithub
@@ -3412,6 +3415,7 @@
 - title: Use Codex CLI to automatically fix CI failures
   path: examples/codex/Autofix-github-actions.ipynb
   slug: autofix-github-actions
+  archived: true
   date: 2025-09-30
   authors:
     - himadri518
@@ -3423,6 +3427,7 @@
 - title: Building resilient prompts using an evaluation flywheel
   path: examples/evaluation/Building_resilient_prompts_using_an_evaluation_flywheel.md
   slug: building-resilient-prompts-using-an-evaluation-flywheel
+  archived: true
   date: 2025-10-06
   authors:
     - neelk-oai
@@ -3568,6 +3573,7 @@
 - title: Skills in OpenAI API
   path: examples/skills_in_api.ipynb
   slug: skills-in-api
+  archived: true
   description: Cookbook for building skills with the OpenAI API.
   date: 2026-02-10
   authors:
@@ -3580,6 +3586,7 @@
 - title: Prompt Caching 201
   path: examples/Prompt_Caching_201.ipynb
   slug: prompt-caching-201
+  archived: true
   description: Cookbook for improving prompt caching hit rate, latency, and cost.
   date: 2026-02-18
   authors:

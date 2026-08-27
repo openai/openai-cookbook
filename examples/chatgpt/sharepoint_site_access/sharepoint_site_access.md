@@ -8,7 +8,8 @@ workspace allowlist through the ChatGPT Admin API.
 The accompanying [administration script](sharepoint_site_access_admin.py) uses
 only the Python standard library. It accepts multiple URLs or a CSV/text file,
 deduplicates site collections, preserves existing allowlist entries when adding
-new collections, and requires explicit confirmation before clearing a policy.
+new collections, supports optional idempotency keys, and requires explicit
+confirmation before clearing a policy.
 
 > An empty allowlist permits access to all SharePoint sites that the individual
 > user can access. Clearing the allowlist removes the site restriction; it does
@@ -94,7 +95,8 @@ python3 sharepoint_site_access_admin.py inspect \
 
 This command calls Microsoft Graph and prints each resolved site identifier and
 the deduplicated collection GUIDs. It does not read or modify the ChatGPT
-workspace allowlist.
+workspace allowlist. Tenant-root URLs and percent-encoded paths, such as
+`https://contoso.sharepoint.com/sites/Finance%20Team`, are both supported.
 
 ## Prepare a list of sites
 
@@ -109,8 +111,8 @@ https://contoso.sharepoint.com/sites/Operations
 ```
 
 A text file containing one URL per line also works. Blank lines and lines
-starting with `#` are ignored. Each request supports up to 10,000 unique site
-collections.
+starting with `#` are ignored, as are CSV rows without a site URL. Each request
+supports up to 10,000 unique site collections.
 
 ## Read the existing allowlist
 
@@ -208,6 +210,26 @@ The command sends:
 DELETE /v1/manage/workspaces/<workspace-id>/sharepoint/site-access/allow-list
 ```
 
+## Retry a policy update safely
+
+If idempotent policy writes are enabled for your workspace, provide a UUID when
+adding, removing, or clearing site collections:
+
+```bash
+python3 sharepoint_site_access_admin.py add \
+  --workspace-id <workspace-id> \
+  --sites-file sites.csv \
+  --idempotency-key 3b5e9666-f01e-4f8b-9336-e70b67c07cf5
+```
+
+The script sends this value in the optional `Idempotency-Key` header. Reuse the
+same key only when retrying the same logical write. When a removal includes
+multiple site collections, the script derives a distinct, stable key for each
+collection so separate deletion requests do not conflict.
+
+Do not provide `--idempotency-key` unless idempotency support is enabled for your
+workspace. Omitting the option preserves the standard request behavior.
+
 ## Troubleshooting
 
 - **HTTP 401 or 403:** Verify your workspace Admin API key, the selected
@@ -215,6 +237,8 @@ DELETE /v1/manage/workspaces/<workspace-id>/sharepoint/site-access/allow-list
   feature is enabled for your workspace.
 - **Microsoft Graph HTTP 404:** Verify the SharePoint URL and the Microsoft
   Graph token's site permissions.
+- **HTTP 409:** Review conflicting policy changes or confirm that an
+  idempotency key was not reused for a different request.
 - **HTTP 429 or 503:** The script retries throttling and temporary service
   failures up to two times.
 - **Multiple URLs resolve to one GUID:** Those URLs belong to the same

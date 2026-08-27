@@ -6,6 +6,7 @@ import io
 import json
 import tempfile
 import unittest
+import uuid
 from pathlib import Path
 from unittest import mock
 from urllib.error import HTTPError
@@ -16,6 +17,7 @@ WORKSPACE_ID = "2a171a87-9cc8-453c-b7c4-0e0316903eb3"
 COLLECTION_GUID = "da60e844-ba1d-49bc-b4d4-d5e36bae9019"
 WEB_GUID = "712a596e-90a1-49e3-9b48-bfa80bee8740"
 SITE_URL = "https://contoso.sharepoint.com/sites/Finance"
+IDEMPOTENCY_KEY = "3b5e9666-f01e-4f8b-9336-e70b67c07cf5"
 ALLOWLIST_URL = (
     f"https://api.chatgpt.com/v1/manage/workspaces/{WORKSPACE_ID}"
     "/sharepoint/site-access/allow-list"
@@ -30,6 +32,32 @@ def graph_site(*, web_guid: str = WEB_GUID) -> dict[str, str]:
 
 
 class RequestJsonTests(unittest.TestCase):
+    @mock.patch.object(site_access, "urlopen")
+    def test_sends_idempotency_header_only_when_provided(
+        self, urlopen: mock.Mock
+    ) -> None:
+        response = mock.MagicMock()
+        response.__enter__.return_value.read.return_value = b'{"ok":true}'
+        urlopen.return_value = response
+
+        site_access.request_json(
+            "PUT",
+            "https://api.chatgpt.com/example",
+            "admin-token",
+            body={"collection_guids": [COLLECTION_GUID]},
+            idempotency_key=IDEMPOTENCY_KEY,
+        )
+
+        request = urlopen.call_args.args[0]
+        self.assertEqual(request.get_header("Idempotency-key"), IDEMPOTENCY_KEY)
+
+        site_access.request_json(
+            "GET", "https://api.chatgpt.com/example", "admin-token"
+        )
+
+        request_without_key = urlopen.call_args.args[0]
+        self.assertFalse(request_without_key.has_header("Idempotency-key"))
+
     @mock.patch.object(site_access.time, "sleep")
     @mock.patch.object(site_access, "urlopen")
     def test_retries_temporary_rate_limit(
@@ -96,6 +124,40 @@ class ResolveSharePointUrlTests(unittest.TestCase):
             "graph-token",
         )
 
+    @mock.patch.object(site_access, "request_json")
+    def test_preserves_percent_encoded_sharepoint_paths(
+        self, request_json: mock.Mock
+    ) -> None:
+        request_json.return_value = graph_site()
+
+        site_access.resolve_sharepoint_url(
+            "https://contoso.sharepoint.com/sites/Finance%20Team", "graph-token"
+        )
+
+        request_json.assert_called_once_with(
+            "GET",
+            "https://graph.microsoft.com/v1.0/sites/contoso.sharepoint.com:"
+            "/sites/Finance%20Team?%24select=id%2CwebUrl",
+            "graph-token",
+        )
+
+    @mock.patch.object(site_access, "request_json")
+    def test_uses_by_path_syntax_for_tenant_root_site(
+        self, request_json: mock.Mock
+    ) -> None:
+        request_json.return_value = graph_site()
+
+        site_access.resolve_sharepoint_url(
+            "https://contoso.sharepoint.com/", "graph-token"
+        )
+
+        request_json.assert_called_once_with(
+            "GET",
+            "https://graph.microsoft.com/v1.0/sites/contoso.sharepoint.com:/"
+            "?%24select=id%2CwebUrl",
+            "graph-token",
+        )
+
     def test_rejects_non_https_urls(self) -> None:
         with self.assertRaisesRegex(SystemExit, "valid HTTPS URLs"):
             site_access.resolve_sharepoint_url(
@@ -141,6 +203,18 @@ class ReadSiteUrlsTests(unittest.TestCase):
         with tempfile.TemporaryDirectory() as directory:
             sites_file = Path(directory) / "sites.txt"
             sites_file.write_text(f"# Approved sites\n\n{SITE_URL}\n", encoding="utf-8")
+
+            result = site_access.read_site_urls([], str(sites_file))
+
+        self.assertEqual(result, [SITE_URL])
+
+    def test_skips_csv_rows_with_missing_or_empty_site_urls(self) -> None:
+        with tempfile.TemporaryDirectory() as directory:
+            sites_file = Path(directory) / "sites.csv"
+            sites_file.write_text(
+                f"name,site_url\nFinance\nEmpty,\nResearch,{SITE_URL}\n",
+                encoding="utf-8",
+            )
 
             result = site_access.read_site_urls([], str(sites_file))
 
@@ -216,6 +290,33 @@ class AllowlistCommandTests(unittest.TestCase):
                 ALLOWLIST_URL,
                 "admin-token",
                 body={"collection_guids": [COLLECTION_GUID]},
+                idempotency_key=None,
+            ),
+        )
+
+    def test_add_forwards_optional_idempotency_key(self) -> None:
+        result, request_json = self.run_command(
+            [
+                "add",
+                "--workspace-id",
+                WORKSPACE_ID,
+                "--site-url",
+                SITE_URL,
+                "--idempotency-key",
+                IDEMPOTENCY_KEY,
+            ],
+            responses=[graph_site(), {"allow_list": {}}, {"allow_list": {}}],
+        )
+
+        self.assertEqual(result["processed_count"], 1)
+        self.assertEqual(
+            request_json.call_args,
+            mock.call(
+                "PUT",
+                ALLOWLIST_URL,
+                "admin-token",
+                body={"collection_guids": [COLLECTION_GUID]},
+                idempotency_key=IDEMPOTENCY_KEY,
             ),
         )
 
@@ -279,7 +380,56 @@ class AllowlistCommandTests(unittest.TestCase):
         self.assertEqual(result["processed_count"], 1)
         self.assertEqual(
             request_json.call_args,
-            mock.call("DELETE", f"{ALLOWLIST_URL}/{COLLECTION_GUID}", "admin-token"),
+            mock.call(
+                "DELETE",
+                f"{ALLOWLIST_URL}/{COLLECTION_GUID}",
+                "admin-token",
+                idempotency_key=None,
+            ),
+        )
+
+    def test_remove_derives_distinct_stable_keys_for_each_collection(self) -> None:
+        other_collection_guid = "b70d36d6-06d8-4591-964a-848f46c56b40"
+        other_url = "https://contoso.sharepoint.com/sites/Research"
+        other_site = {
+            "id": f"contoso.sharepoint.com,{other_collection_guid},{WEB_GUID}",
+            "webUrl": other_url,
+        }
+        result, request_json = self.run_command(
+            [
+                "remove",
+                "--workspace-id",
+                WORKSPACE_ID,
+                "--site-url",
+                SITE_URL,
+                "--site-url",
+                other_url,
+                "--idempotency-key",
+                IDEMPOTENCY_KEY,
+            ],
+            responses=[
+                graph_site(),
+                other_site,
+                {"allow_list": {}},
+                {"allow_list": {}},
+                {"allow_list": {}},
+            ],
+        )
+
+        self.assertEqual(result["processed_count"], 2)
+        delete_calls = request_json.call_args_list[-2:]
+        self.assertEqual(
+            [call.kwargs["idempotency_key"] for call in delete_calls],
+            [
+                str(
+                    uuid.uuid5(uuid.UUID(IDEMPOTENCY_KEY), f"remove:{COLLECTION_GUID}")
+                ),
+                str(
+                    uuid.uuid5(
+                        uuid.UUID(IDEMPOTENCY_KEY), f"remove:{other_collection_guid}"
+                    )
+                ),
+            ],
         )
 
     def test_clear_requires_explicit_confirmation(self) -> None:
@@ -307,7 +457,29 @@ class AllowlistCommandTests(unittest.TestCase):
 
         self.assertEqual(result["action"], "clear")
         self.assertEqual(
-            request_json.call_args, mock.call("DELETE", ALLOWLIST_URL, "admin-token")
+            request_json.call_args,
+            mock.call("DELETE", ALLOWLIST_URL, "admin-token", idempotency_key=None),
+        )
+
+    def test_clear_forwards_optional_idempotency_key(self) -> None:
+        result, request_json = self.run_command(
+            [
+                "clear",
+                "--workspace-id",
+                WORKSPACE_ID,
+                "--yes",
+                "--idempotency-key",
+                IDEMPOTENCY_KEY,
+            ],
+            responses=[{"allow_list": {COLLECTION_GUID: {}}}, {"allow_list": {}}],
+        )
+
+        self.assertEqual(result["action"], "clear")
+        self.assertEqual(
+            request_json.call_args,
+            mock.call(
+                "DELETE", ALLOWLIST_URL, "admin-token", idempotency_key=IDEMPOTENCY_KEY
+            ),
         )
 
     def test_clear_dry_run_does_not_require_confirmation_or_write(self) -> None:
@@ -333,6 +505,25 @@ class AllowlistCommandTests(unittest.TestCase):
             site_access.main()
 
         request_json.assert_not_called()
+
+
+class MutationKeyTests(unittest.TestCase):
+    def test_omitted_key_leaves_existing_behavior_unchanged(self) -> None:
+        self.assertIsNone(site_access.mutation_key(None, "add"))
+
+    def test_rejects_invalid_idempotency_uuid(self) -> None:
+        with self.assertRaisesRegex(
+            SystemExit, "--idempotency-key must be a valid UUID"
+        ):
+            site_access.mutation_key("not-a-uuid", "add")
+
+    def test_remove_keys_are_stable_and_unique_per_identifier(self) -> None:
+        first = site_access.mutation_key(IDEMPOTENCY_KEY, "remove", COLLECTION_GUID)
+        repeated = site_access.mutation_key(IDEMPOTENCY_KEY, "remove", COLLECTION_GUID)
+        second = site_access.mutation_key(IDEMPOTENCY_KEY, "remove", WEB_GUID)
+
+        self.assertEqual(first, repeated)
+        self.assertNotEqual(first, second)
 
 
 if __name__ == "__main__":

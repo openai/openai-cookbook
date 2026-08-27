@@ -12,7 +12,7 @@ import uuid
 from pathlib import Path
 from typing import Any
 from urllib.error import HTTPError, URLError
-from urllib.parse import quote, urlencode, urlparse
+from urllib.parse import quote, unquote, urlencode, urlparse
 from urllib.request import Request, urlopen
 
 CHATGPT_API_BASE_URL = "https://api.chatgpt.com"
@@ -26,6 +26,7 @@ def request_json(
     token: str,
     *,
     body: dict[str, Any] | None = None,
+    idempotency_key: str | None = None,
 ) -> dict[str, Any]:
     """Send an authenticated JSON request and retry temporary failures."""
     headers = {"Authorization": f"Bearer {token}", "Accept": "application/json"}
@@ -33,6 +34,8 @@ def request_json(
     if body is not None:
         headers["Content-Type"] = "application/json"
         data = json.dumps(body).encode("utf-8")
+    if idempotency_key is not None:
+        headers["Idempotency-Key"] = idempotency_key
 
     for attempt in range(3):
         try:
@@ -63,12 +66,8 @@ def resolve_sharepoint_url(site_url: str, graph_token: str) -> dict[str, str]:
     if parsed.scheme != "https" or not parsed.hostname or parsed.username:
         raise SystemExit(f"SharePoint URLs must be valid HTTPS URLs: {site_url!r}")
 
-    site_path = parsed.path.rstrip("/")
-    site_resource = (
-        parsed.hostname
-        if not site_path
-        else f"{parsed.hostname}:{quote(site_path, safe='/')}"
-    )
+    site_path = unquote(parsed.path.rstrip("/") or "/")
+    site_resource = f"{parsed.hostname}:{quote(site_path, safe='/')}"
     graph_url = f"{MICROSOFT_GRAPH_BASE_URL}/sites/{site_resource}?" + urlencode(
         {"$select": "id,webUrl"}
     )
@@ -116,9 +115,10 @@ def read_site_urls(inline_urls: list[str], sites_file: str | None) -> list[str]:
                     raise SystemExit(
                         "The CSV file must contain a site_url or url column"
                     )
-                values.extend(
-                    row[field].strip() for row in reader if row.get(field, "").strip()
-                )
+                for row in reader:
+                    site_url = row.get(field)
+                    if site_url and site_url.strip():
+                        values.append(site_url.strip())
             else:
                 values.extend(
                     line.strip()
@@ -127,6 +127,21 @@ def read_site_urls(inline_urls: list[str], sites_file: str | None) -> list[str]:
                 )
 
     return list(dict.fromkeys(value.strip() for value in values if value.strip()))
+
+
+def mutation_key(
+    seed: str | None, action: str, identifier: str | None = None
+) -> str | None:
+    """Return a stable optional key, unique for each multi-site deletion."""
+    if seed is None:
+        return None
+
+    try:
+        root = uuid.UUID(seed)
+    except ValueError as error:
+        raise SystemExit("--idempotency-key must be a valid UUID") from error
+
+    return str(uuid.uuid5(root, f"{action}:{identifier}")) if identifier else str(root)
 
 
 def main() -> None:
@@ -152,6 +167,10 @@ def main() -> None:
         "--yes",
         action="store_true",
         help="Confirm that clearing the allowlist restores access",
+    )
+    parser.add_argument(
+        "--idempotency-key",
+        help="Optional UUID for safe write retries when workspace support is enabled",
     )
     args = parser.parse_args()
 
@@ -228,13 +247,19 @@ def main() -> None:
                 "Clearing the allowlist restores access to all permitted SharePoint sites; "
                 "repeat with --yes to confirm"
             )
-        response = request_json("DELETE", allowlist_url, admin_token)
+        response = request_json(
+            "DELETE",
+            allowlist_url,
+            admin_token,
+            idempotency_key=mutation_key(args.idempotency_key, "clear"),
+        )
     elif args.action == "add":
         response = request_json(
             "PUT",
             allowlist_url,
             admin_token,
             body={"collection_guids": collection_guids},
+            idempotency_key=mutation_key(args.idempotency_key, "add"),
         )
     else:
         response = current_policy
@@ -243,6 +268,9 @@ def main() -> None:
                 "DELETE",
                 f"{allowlist_url}/{quote(collection_guid, safe='')}",
                 admin_token,
+                idempotency_key=mutation_key(
+                    args.idempotency_key, "remove", collection_guid
+                ),
             )
 
     print(

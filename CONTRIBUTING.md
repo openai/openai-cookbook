@@ -4,4 +4,4 @@ The OpenAI Cookbook is a collection of useful patterns and examples of working w
 
 > Contributions are reviewed on a best-effort basis - we can't provide guarantees around when or if content contributions will be reviewed or merged.
 
-Stay tuned to this page for further guidance on cookbook contributions as they become available 🐒
+Stay tuned to this page for further guidance on cookbook contributions as they become available 🙏

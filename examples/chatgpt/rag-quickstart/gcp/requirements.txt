@@ -1,3 +1,0 @@
-google-cloud-bigquery
-functions-framework
-openai

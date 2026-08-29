@@ -1,8 +1,0 @@
-{
-  "not_travel_related": true,
-  "amount_over_limit": true,
-  "math_error": false,
-  "handwritten_x": false,
-  "reasoning": "1. NOT_TRAVEL_RELATED: The receipt is for home goods and cleaning supplies, which are not travel-related expenses. Therefore, this criterion is TRUE.\n\n2. AMOUNT_OVER_LIMIT: The total of the receipt is $273.52, which is over the $50 limit, making this criterion TRUE.\n\n3. MATH_ERROR: The subtotal adds up correctly when calculated with tax. The subtotal $252.67 plus tax $20.85 equals the total $273.52. Thus, there is no math error, and this is FALSE.\n\n4. HANDWRITTEN_X: There is no 'X' in the handwritten notes provided. Thus, this is FALSE.\n\nSince two of the criteria (AMOUNT_OVER_LIMIT and MATH_ERROR) are TRUE, the final determination is that this receipt needs to be audited.",
-  "needs_audit": true
-}

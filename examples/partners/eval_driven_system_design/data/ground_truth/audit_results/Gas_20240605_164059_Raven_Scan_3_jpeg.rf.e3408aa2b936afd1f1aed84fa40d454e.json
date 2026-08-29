@@ -1,8 +1,0 @@
-{
-  "not_travel_related": false,
-  "amount_over_limit": false,
-  "math_error": false,
-  "handwritten_x": false,
-  "reasoning": "1. The receipt is for gas (E-85 fuel), which is a travel-related expense. Therefore, NOT_TRAVEL_RELATED is FALSE. \n2. The total amount of the receipt is $36.16, which does not exceed $50. Therefore, AMOUNT_OVER_LIMIT is FALSE. \n3. The subtotal of $36.16 matches the total of $36.16, indicating no math errors. Therefore, MATH_ERROR is FALSE. \n4. The handwritten notes do not contain an 'X'. Therefore, HANDWRITTEN_X is FALSE.",
-  "needs_audit": false
-}

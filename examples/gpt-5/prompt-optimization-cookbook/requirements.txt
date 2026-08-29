@@ -1,4 +1,0 @@
-openai
-matplotlib 
-seaborn
-datasets

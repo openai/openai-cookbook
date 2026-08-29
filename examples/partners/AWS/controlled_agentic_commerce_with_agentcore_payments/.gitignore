@@ -1,9 +1,0 @@
-.venv/
-uv.lock
-.pytest_cache/
-__pycache__/
-*.py[cod]
-.env
-.agentcore-session.env
-.agentcore-session.env.lock
-*-Copy*.ipynb

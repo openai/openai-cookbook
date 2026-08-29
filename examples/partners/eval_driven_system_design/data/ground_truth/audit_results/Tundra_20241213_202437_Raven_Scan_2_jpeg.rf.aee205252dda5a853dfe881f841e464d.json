@@ -1,8 +1,0 @@
-{
-  "not_travel_related": false,
-  "amount_over_limit": false,
-  "math_error": false,
-  "handwritten_x": false,
-  "reasoning": "The receipt from O'Reilly Auto Parts is for an automotive item (SNOWBROOM). A snow broom could be required to for safe driving in snowy conditions, so this is plausibly a valid travel-related expense, so NOT_TRAVEL_RELATED is false. The total amount of the receipt is $35.55, which does not exceed the $50 limit, thus AMOUNT_OVER_LIMIT is false. There are no discrepancies in the math as the subtotal plus tax equals the total, so MATH_ERROR is false. The handwritten notes section is empty, therefore HANDWRITTEN_X is false.",
-  "needs_audit": false
-}

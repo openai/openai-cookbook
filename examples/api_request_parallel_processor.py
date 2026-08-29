@@ -150,6 +150,7 @@ async def process_api_requests_from_file(
         StatusTracker()
     )  # single instance to track a collection of variables
     next_request = None  # variable to hold the next request to call
+    oversized_request_error = None
 
     # initialize available capacity counts
     available_request_capacity = max_requests_per_minute
@@ -182,12 +183,14 @@ async def process_api_requests_from_file(
                                 request_json, api_endpoint, token_encoding_name
                             )
                             if token_consumption > max_tokens_per_minute:
-                                raise ValueError(
+                                oversized_request_error = ValueError(
                                     "Request requires an estimated "
                                     f"{token_consumption} tokens, exceeding "
                                     f"max_tokens_per_minute ({max_tokens_per_minute}). "
                                     "Increase the limit or split the request."
                                 )
+                                file_not_finished = False
+                                continue
                             next_request = APIRequest(
                                 task_id=next(task_id_generator),
                                 request_json=request_json,
@@ -247,6 +250,8 @@ async def process_api_requests_from_file(
 
                 # if all tasks are finished, break
                 if status_tracker.num_tasks_in_progress == 0:
+                    if oversized_request_error:
+                        raise oversized_request_error
                     break
 
                 # main loop sleeps briefly so concurrent tasks can run

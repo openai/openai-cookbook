@@ -161,7 +161,7 @@ See the documentation [here](https://learn.microsoft.com/en-us/azure/azure-funct
 
    1. Under the **Web** section, you’ll notice one callback URI was added automatically. Add the Postman redirect URI (<https://oauth.pstmn.io/v1/callback>) for testing.
 
-7) On the left-hand side, go to **Overview**. Copy the **application (client) ID** and and the **directory (tenant) ID** and **save for later as** `CLIENT_ID` **and** `TENANT_ID`**.**
+7) On the left-hand side, go to **Overview**. Copy the **application (client) ID** and the **directory (tenant) ID** and **save for later as** `CLIENT_ID` **and** `TENANT_ID`**.**
 
 
 ##### Part 3: Set up Test Function

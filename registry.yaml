@@ -4,20 +4,16 @@
 # should build pages for, and indicates metadata such as tags, creation date and
 # authors for each page.
 
-- title: Building an Evidence-Grounded Security Review Swarm with the OpenAI Agents SDK
-  path: examples/agents_sdk/evidence_grounded_security_review_swarm.ipynb
+- title: Combining security scanners with the Agents SDK
+  path: examples/agents_sdk/security_scanners_with_agents_sdk.ipynb
   slug: evidence-grounded-security-review-swarm
-  description: Build an adaptive, evidence-grounded security review workflow with deterministic scanner selection, model-directed specialist routing, and provenance-gated remediation handoff.
+  description: Use the OpenAI Agents SDK to route scanner findings to specialist agents, check source evidence, and prepare a Codex prompt for human review.
   date: 2026-08-05
   authors:
     - hreh-oai
   tags:
     - agents-sdk
-    - agents
     - security
-    - structured-outputs
-    - guardrails
-    - codex
 
 - title: Generate Transparent Image Assets for Campaigns and Presentations
   path: examples/multimodal/transparent-image-assets-for-campaigns-and-presentations.ipynb

@@ -1,4 +1,4 @@
-"""Small, standalone evidence runtime for the security-swarm Cookbook."""
+"""Bounded scanner and evidence helpers for the security review Cookbook."""
 
 from __future__ import annotations
 
@@ -1126,7 +1126,9 @@ def render_codex_goal(bundle: ReviewBundle) -> str:
         raise EvidenceError("Review provenance or confirmed groups were modified after adjudication.")
     lines = [f"/goal Remediate confirmed findings in {bundle.target_id}", "",
         f"Work only in repository {bundle.snapshot.source_url} at revision {bundle.snapshot.source_revision}.",
-        "Keep changes limited to the approved source paths listed below. Do not alter unrelated behavior.", ""]
+        "Keep production changes limited to the approved source paths listed below.",
+        "You may add or update only the test files needed to cover those fixes with focused regression tests.",
+        "Ask for approval before changing any other files. Do not alter unrelated behavior.", ""]
     for index, group in enumerate(groups, 1):
         lines.extend([f"{index}. {group.title} ({group.priority})",
             f"   Paths: {', '.join(group.source_paths)}",

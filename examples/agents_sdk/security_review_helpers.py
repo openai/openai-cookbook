@@ -1,9 +1,10 @@
-"""Bounded scanner and evidence helpers for the security review Cookbook."""
+"""Bounded scanner, evidence, and display helpers for the security review Cookbook."""
 
 from __future__ import annotations
 
 import ast
 import hashlib
+import html
 import json
 import os
 import platform
@@ -17,9 +18,11 @@ import time
 import urllib.request
 from collections.abc import Iterable, Mapping, Sequence
 from pathlib import Path, PurePosixPath
+from textwrap import dedent
 from typing import Any, Literal
 from urllib.parse import quote, urlsplit
 
+from IPython.display import Markdown, display
 from pydantic import BaseModel, ConfigDict, Field, create_model, field_validator, model_validator
 
 class EvidenceError(ValueError):
@@ -1143,3 +1146,83 @@ def render_codex_goal(bundle: ReviewBundle) -> str:
     if len(goal) >= 4000:
         raise EvidenceError("Deterministic goal exceeds the 4,000-character handoff limit.")
     return goal
+
+
+def prompt_text(*sections: str) -> str:
+    return "\n".join(dedent(part).strip() for part in sections if part.strip())
+
+def _text(value: Any, limit: int | None = 170) -> str:
+    if isinstance(value, Markdown):
+        return value.data  # Only caller-authored links use this wrapper.
+    if isinstance(value, (list, tuple, set, frozenset)):
+        value = ", ".join(str(item) for item in value) or "none"
+    if value == "not_authorized":
+        value = "not requested"
+    value = str(value).replace("\n", " ")
+    if limit is not None and len(value) > limit:
+        value = value[: limit - 1] + "…"
+    value = html.escape(value, quote=False)
+    # Model text stays literal; it cannot create Markdown links or images.
+    return "".join("\\" + char if char in "\\`*_{}[]()#+-.!|~$" else char for char in value)
+
+def show_table(title: str, rows: Sequence[Mapping[str, Any]], columns: Sequence[str]):
+    rows = list(rows)
+    lines = [f"**{_text(title)}**", "",
+             "| " + " | ".join(map(_text, columns)) + " |",
+             "| " + " | ".join("---" for _ in columns) + " |"]
+    body = ["| " + " | ".join(_text(row.get(column, "")) for column in columns)
+            + " |" for row in rows]
+    display(Markdown("\n".join((*lines, *body))))
+
+def show_review_details(reviews: Mapping[str, Any]):
+    pending = [
+        (target, finding)
+        for target, bundle in reviews.items()
+        for finding in (bundle.provenance.findings if bundle.provenance else ())
+        if finding.disposition == "needs_review"
+    ]
+    if not pending:
+        return
+    lines = ["**Findings that need more evidence**", ""]
+    for target, finding in pending:
+        location = f"{finding.source_path}:{finding.line}"
+        lines.extend([
+            f"**{_text(target)} — {_text(location, None)}**", "",
+            f"Candidate: {_text(finding.candidate_id, None)}", "",
+            _text(finding.reason, None), "",
+            *(f"- Proof gap: {_text(gap, None)}" for gap in finding.proof_gaps), "",
+        ])
+    display(Markdown("\n".join(lines)))
+
+def result_rows(target: str, bundle: Any):
+    label = f"{target} / {', '.join(bundle.selected_scanners) or 'none'}"
+    role_by_candidate = {
+        assessment.candidate_id: review.role
+        for review in bundle.specialist_reviews
+        for assessment in review.assessments
+    }
+    proposed = {item.candidate_id: item for item in
+                (bundle.model_report.findings if bundle.model_report else ())}
+    final = {item.candidate_id: item for item in
+             (bundle.provenance.findings if bundle.provenance else ())}
+    rows = []
+    for candidate in bundle.candidates:
+        model_finding = proposed.get(candidate.candidate_id)
+        final_finding = final.get(candidate.candidate_id)
+        reason = getattr(final_finding, "reason", None) or getattr(model_finding, "reason", "not reviewed")
+        gaps = getattr(final_finding, "proof_gaps", ()) or getattr(model_finding, "proof_gaps", ())
+        rows.append({
+            "target / scanners": label,
+            "signal": f"{candidate.priority} / {candidate.category}",
+            "source": f"{candidate.source_path}:{candidate.line}",
+            "specialist": role_by_candidate.get(candidate.candidate_id, "not run"),
+            "validator": getattr(model_finding, "disposition", "not run"),
+            "final": getattr(final_finding, "disposition", "not adjudicated"),
+            "reason or gap": f"{reason} Proof gap: {', '.join(gaps)}" if gaps else reason,
+        })
+    if not rows:
+        rows.append({"target / scanners": label, "signal": bundle.status,
+            "source": "none", "specialist": "not run", "validator": "not run",
+            "final": "not adjudicated",
+            "reason or gap": bundle.error or "No candidates were reviewed."})
+    return rows

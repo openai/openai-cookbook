@@ -4,6 +4,17 @@
 # should build pages for, and indicates metadata such as tags, creation date and
 # authors for each page.
 
+- title: Combining security scanners with the Agents SDK
+  path: examples/agents_sdk/security_scanners_with_agents_sdk.ipynb
+  slug: evidence-grounded-security-review-swarm
+  description: Use the OpenAI Agents SDK to route scanner findings to specialist agents, check source evidence, and prepare a Codex prompt for human review.
+  date: 2026-08-05
+  authors:
+    - hreh-oai
+  tags:
+    - agents-sdk
+    - security
+
 - title: Manage SharePoint site access with the ChatGPT Admin API
   path: examples/chatgpt/sharepoint_site_access/sharepoint_site_access.md
   slug: manage-sharepoint-site-access-chatgpt-admin-api

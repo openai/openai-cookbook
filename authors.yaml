@@ -3,6 +3,11 @@
 # You can optionally customize how your information shows up cookbook.openai.com over here.
 # If your information is not present here, it will be pulled from your GitHub profile.
 
+hreh-oai:
+  name: "Hunter Reh"
+  website: "https://www.linkedin.com/in/hreh"
+  avatar: "https://avatars.githubusercontent.com/u/284132605?v=4"
+
 the-OAI:
   name: "Tiger He"
   website: "https://www.linkedin.com/in/tiger-he-b71842164/"

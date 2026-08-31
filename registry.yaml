@@ -4,6 +4,21 @@
 # should build pages for, and indicates metadata such as tags, creation date and
 # authors for each page.
 
+- title: Manage SharePoint site access with the ChatGPT Admin API
+  path: examples/chatgpt/sharepoint_site_access/sharepoint_site_access.md
+  slug: manage-sharepoint-site-access-chatgpt-admin-api
+  description: Resolve SharePoint URLs into site-collection identifiers and safely manage a ChatGPT workspace allowlist with the Admin API.
+  date: 2026-08-27
+  authors:
+    - hmittal-oai
+  tags:
+    - chatgpt
+    - chatgpt-and-api
+    - enterprise
+    - api
+    - sharepoint
+    - security
+
 - title: Generate Transparent Image Assets for Campaigns and Presentations
   path: examples/multimodal/transparent-image-assets-for-campaigns-and-presentations.ipynb
   slug: transparent-image-assets-for-campaigns-and-presentations

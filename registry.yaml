@@ -102,7 +102,7 @@
     - bedrock
     - security
 
-- title: Controlled Agentic Commerce with AgentCore Payments
+- title: Controlled agentic micropayments with stablecoins and AgentCore Payments
   path: examples/partners/AWS/controlled_agentic_commerce_with_agentcore_payments/controlled_agentic_commerce.ipynb
   slug: controlled-agentic-commerce-agentcore-payments
   description: Build a controlled agentic-commerce workflow with the OpenAI Agents SDK, x402, application-owned payment authority, deterministic validation, and an optional gated Amazon Bedrock AgentCore Payments testnet path.

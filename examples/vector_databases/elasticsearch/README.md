@@ -27,5 +27,5 @@ In this notebook you'll learn how to:
 This notebooks builds on the semantic search notebook by:
 
 - Selecting the top hit from a semantic search
-- Sending that result to the OpenAI [Chat Completions](https://platform.openai.com/docs/guides/gpt/chat-completions-api) API endpoint for retrieval augmented generation (RAG)
+- Sending that result to the OpenAI [Chat Completions](https://developers.openai.com/api/docs/guides/text) API endpoint for retrieval augmented generation (RAG)
 

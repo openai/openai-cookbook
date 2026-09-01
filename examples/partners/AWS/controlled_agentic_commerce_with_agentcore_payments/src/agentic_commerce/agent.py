@@ -12,8 +12,6 @@ from agents import (
     RunConfig,
     Runner,
 )
-from agents.tracing import set_trace_provider
-from agents.tracing.provider import DefaultTraceProvider
 from openai.types.shared import Reasoning
 from pydantic import BaseModel, ConfigDict
 
@@ -152,9 +150,6 @@ async def run_supplier_research(
     """Run the agent and validate its proposal against tool-observed evidence."""
 
     recorder = PurchaseResultRecorder()
-    trace_provider = DefaultTraceProvider()
-    trace_provider.set_disabled(True)
-    set_trace_provider(trace_provider)
     agent = build_supplier_research_agent(
         application,
         model=model,

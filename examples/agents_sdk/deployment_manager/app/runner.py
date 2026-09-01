@@ -227,7 +227,14 @@ def start_local_process(
                 or "process exited before listening"
             )
         time.sleep(0.25)
-    return deployment
+    try:
+        os.killpg(process.pid, signal.SIGTERM)
+    except ProcessLookupError:
+        pass
+    raise RuntimeError(
+        read_log(str(log_path), limit=12000)
+        or f"process did not listen on port {deployment.port} before startup timeout"
+    )
 
 
 def start_local_docker(
@@ -364,7 +371,12 @@ def start_local_docker(
                 or "container exited before listening"
             )
         time.sleep(0.25)
-    return deployment
+    failure_log = read_deployment_log(deployment, limit=12000)
+    _remove_managed_container(deployment.container_id, deployment.id)
+    raise RuntimeError(
+        failure_log
+        or f"container did not listen on port {deployment.port} before startup timeout"
+    )
 
 
 def stop_local_process(deployment: Deployment) -> Deployment:

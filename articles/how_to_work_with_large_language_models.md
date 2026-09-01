@@ -159,7 +159,7 @@ In general, the input prompt is the best lever for improving model outputs. You 
 - **Ask the model to answer as if it was an expert.** Explicitly asking the model to produce high quality output or output as if it was written by an expert can induce the model to give higher quality answers that it thinks an expert would write. Phrases like "Explain in detail" or "Describe step-by-step" can be effective.
 - **Prompt the model to write down the series of steps explaining its reasoning.** If understanding the 'why' behind an answer is important, prompt the model to include its reasoning. This can be done by simply adding a line like "[Let's think step by step](https://arxiv.org/abs/2205.11916)" before each answer.
 
-[Fine Tuning Docs]: https://platform.openai.com/docs/guides/fine-tuning
+[Fine Tuning Docs]: https://developers.openai.com/api/docs/guides/model-optimization
 [OpenAI Customer Stories]: https://openai.com/customer-stories
 [Large language models Blog Post]: https://openai.com/research/better-language-models
 [GitHub Copilot]: https://github.com/features/copilot/

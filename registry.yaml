@@ -72,6 +72,20 @@
     - agents
     - cost-management
 
+- title: Handle backend failures inside an OpenAI Agents SDK tool
+  path: examples/agents_sdk/testing_agent_recovery_from_tool_failures.ipynb
+  slug: testing-agent-recovery-from-tool-failures
+  description: Use an Agents SDK tool to retry order searches, remove a guessed carrier filter when needed, and check results while keeping the customer's account and requested status unchanged.
+  date: 2026-08-24
+  authors:
+    - saptob
+    - aijinggao
+    - the-OAI
+  tags:
+    - agents-sdk
+    - agents
+    - security
+
 - title: Migrate from Whisper to GPT-Transcribe and GPT-Live-Transcribe
   path: examples/migrating_from_whisper_to_gpt_transcribe.ipynb
   slug: migrating-from-whisper-to-gpt-transcribe

@@ -1,0 +1,10 @@
+services:
+  dynamodb-local-vector:
+    image: extenddb/extenddb-dev:latest
+    ports:
+      - "18080:18080"
+    environment:
+      # In-memory storage: data does not persist across container restarts.
+      # Remove this line to persist to a SQLite file inside the container.
+      EXTENDDB__STORAGE__SQLITE__PATH: ":memory:"
+    # The image defines its own healthcheck; `docker compose ps` shows readiness.

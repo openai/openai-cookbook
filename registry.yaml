@@ -4,6 +4,20 @@
 # should build pages for, and indicates metadata such as tags, creation date and
 # authors for each page.
 
+- title: Manage Google Drive access with the ChatGPT Admin API
+  path: examples/chatgpt/google_drive_access/google_drive_access.md
+  slug: manage-google-drive-access-chatgpt-admin-api
+  description: Inspect shared drives and manage a ChatGPT workspace shared-drive allowlist and My Drive access with the Admin API.
+  date: 2026-09-02
+  authors:
+    - hmittal-oai
+  tags:
+    - chatgpt
+    - chatgpt-and-api
+    - enterprise
+    - admin-api
+    - google-drive
+
 - title: Combining security scanners with the Agents SDK
   path: examples/agents_sdk/security_scanners_with_agents_sdk.ipynb
   slug: evidence-grounded-security-review-swarm

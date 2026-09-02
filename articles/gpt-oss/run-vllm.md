@@ -67,7 +67,7 @@ print(result.choices[0].message.content)
 
 response = client.responses.create(
     model="openai/gpt-oss-120b",
-    instructions="You are a helfpul assistant.",
+    instructions="You are a helpful assistant.",
     input="Explain what MXFP4 quantization is."
 )
 

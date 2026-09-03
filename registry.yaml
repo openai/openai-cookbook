@@ -4,6 +4,21 @@
 # should build pages for, and indicates metadata such as tags, creation date and
 # authors for each page.
 
+- title: Build a ChatGPT plugin with the OpenAI Agents SDK and Amazon Bedrock AgentCore
+  path: examples/partners/AWS/chatgpt_agents_sdk_aws_agentcore_cookbook/notebooks/chatgpt_agents_sdk_aws_agentcore_cookbook.ipynb
+  slug: chatgpt-agents-sdk-aws-agentcore-cookbook
+  description: Connect ChatGPT to a private read-only flight assistant using the OpenAI Agents SDK, an Amazon Bedrock model, Secure MCP Tunnel, and AgentCore observability.
+  date: '2026-09-03'
+  authors:
+    - rohan-eliza
+  tags:
+    - partners
+    - agents-sdk
+    - chatgpt
+    - mcp
+    - bedrock
+    - agentcore
+
 - title: Combining security scanners with the Agents SDK
   path: examples/agents_sdk/security_scanners_with_agents_sdk.ipynb
   slug: evidence-grounded-security-review-swarm

@@ -117,6 +117,26 @@
     - bedrock
     - security
     - payments
+
+- title: Build a ChatGPT plugin with the OpenAI Agents SDK and Amazon Bedrock AgentCore
+  path: examples/partners/AWS/chatgpt_agents_sdk_aws_agentcore_cookbook/notebooks/chatgpt_agents_sdk_aws_agentcore_cookbook.ipynb
+  slug: chatgpt-agents-sdk-amazon-bedrock-agentcore
+  description: Build a private ChatGPT flight-assistant plugin with the OpenAI Agents SDK on Amazon Bedrock, connect it through Secure MCP Tunnel, and validate tracing and Promptfoo evaluations.
+  date: 2026-09-03
+  authors:
+    - rohan-eliza
+    - chuck-eliza
+    - syedahmed-oai
+  tags:
+    - partners
+    - chatgpt
+    - agents-sdk
+    - agents
+    - bedrock
+    - mcp
+    - tracing
+    - evals
+
 - title: Enabling Long-Term Agent Memory with Oracle AI Agent Memory
   path: examples/vector_databases/oracle_db/deep_research_openai_agents.ipynb
   slug: deep-research-openai-agents

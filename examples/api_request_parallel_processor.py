@@ -107,6 +107,20 @@ from dataclasses import (
 )  # for storing API inputs, outputs, and metadata
 
 
+def validate_processing_limits(
+    max_requests_per_minute: float,
+    max_tokens_per_minute: float,
+    max_attempts: int,
+) -> None:
+    """Reject limits that can prevent the processor from making progress."""
+    if max_requests_per_minute <= 0:
+        raise ValueError("max_requests_per_minute must be greater than 0")
+    if max_tokens_per_minute <= 0:
+        raise ValueError("max_tokens_per_minute must be greater than 0")
+    if max_attempts < 1:
+        raise ValueError("max_attempts must be at least 1")
+
+
 async def process_api_requests_from_file(
     requests_filepath: str,
     save_filepath: str,
@@ -119,6 +133,12 @@ async def process_api_requests_from_file(
     logging_level: int,
 ):
     """Processes API requests in parallel, throttling to stay under rate limits."""
+    validate_processing_limits(
+        max_requests_per_minute=max_requests_per_minute,
+        max_tokens_per_minute=max_tokens_per_minute,
+        max_attempts=max_attempts,
+    )
+
     # constants
     seconds_to_pause_after_rate_limit_error = 15
     seconds_to_sleep_each_loop = (

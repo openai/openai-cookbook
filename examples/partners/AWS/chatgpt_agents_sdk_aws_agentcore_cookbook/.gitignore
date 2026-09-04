@@ -1,0 +1,13 @@
+.DS_Store
+.env
+.venv/
+__pycache__/
+.pytest_cache/
+.ruff_cache/
+node_modules/
+dist/
+runtime-agent/evals/results/
+*.log
+*.tmp
+notebooks/*.executed.ipynb
+notebooks/.ipynb_checkpoints/

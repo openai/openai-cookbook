@@ -766,7 +766,7 @@ module.exports = async function (context, req) {
                         const { name, id } = hit.resource;
                         // We use the below to grab the URL of the file to include in the response
                         const webUrl = hit.resource.webUrl.replace(/\s/g, "%20");
-                        // The Microsoft Graph API ranks the reponses, so we use this to order it
+                        // The Microsoft Graph API ranks the responses, so we use this to order it
                         const rank = hit.rank;
                         // The below is where the file lives
                         const driveId = hit.resource.parentReference.driveId;

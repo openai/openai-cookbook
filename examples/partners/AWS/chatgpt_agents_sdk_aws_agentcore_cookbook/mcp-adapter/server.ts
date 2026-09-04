@@ -16,6 +16,7 @@ import { AgentCoreRuntimeFlightProvider } from "./providers/agentcore-runtime-fl
 import { createFlightProvider } from "./providers/create-flight-provider.js";
 import { executionModeFromEnv } from "./providers/execution-mode.js";
 import {
+  AirportCodeSchema,
   ExecutionModeSchema,
   FlightSchema,
   TripStatusSchema
@@ -185,8 +186,8 @@ export function createFlightMcpServer(
       title: "Search flights",
       description: "Use this when the user wants read-only flight options for a route and date.",
       inputSchema: {
-        origin: z.string().length(3).describe("Three-letter origin airport code"),
-        destination: z.string().length(3).describe("Three-letter destination airport code"),
+        origin: AirportCodeSchema.describe("Three-letter uppercase origin airport code"),
+        destination: AirportCodeSchema.describe("Three-letter uppercase destination airport code"),
         travel_date: z.string().regex(/^\d{4}-\d{2}-\d{2}$/).describe("Travel date in YYYY-MM-DD format")
       },
       outputSchema: SearchOutputShape,
@@ -237,8 +238,8 @@ export function createFlightMcpServer(
         "Use this when the user wants read-only live status for a flight number or route. After a search, pass the selected result's flight number, route, and travel date.",
       inputSchema: {
         flight_number: z.string().min(1).optional(),
-        origin: z.string().length(3).optional(),
-        destination: z.string().length(3).optional(),
+        origin: AirportCodeSchema.describe("Three-letter uppercase origin airport code").optional(),
+        destination: AirportCodeSchema.describe("Three-letter uppercase destination airport code").optional(),
         travel_date: z.string().regex(/^\d{4}-\d{2}-\d{2}$/).optional()
       },
       outputSchema: LiveOutputShape,

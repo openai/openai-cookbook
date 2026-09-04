@@ -103,6 +103,7 @@ and rollback. Do not copy local `dist/` artifacts into a Cookbook submission.
 | --- | --- | --- |
 | Local agent and Amazon Bedrock model | Approved AWS login/profile, model entitlement, and an Amazon Bedrock API key for `bedrock-mantle` | AWS account ID, Region, login method, enabled `openai.gpt-oss-120b`, and the API key or permission to create it |
 | AWS telemetry from the local agent | `logs:DescribeLogStreams`, `logs:CreateLogStream`, and `logs:PutLogEvents` for `/aws/bedrock-agentcore/runtimes/chatgpt-agentcore-cookbook-local`; `xray:PutTraceSegments`, `xray:PutTelemetryRecords`, `xray:GetSamplingRules`, `xray:GetSamplingTargets`, and `xray:GetSamplingStatisticSummaries`; `cloudwatch:PutMetricData` restricted to the `bedrock-agentcore` namespace | Create the log group, enable CloudWatch Transaction Search, configure span ingestion and the X-Ray trace destination, and attach the scoped publishing policy from [AWS IAM details](docs/aws-iam.md#local-agent-telemetry-publisher) |
+| Required observability preflight | `xray:GetTraceSegmentDestination`, `logs:DescribeResourcePolicies`, `logs:DescribeLogGroups`, and `servicequotas:ListServiceQuotas` with `Resource: "*"`; `logs:DescribeLogStreams` on the configured verification group (`aws/spans` by default) | Attach the [preflight reader policy](docs/aws-iam.md#observability-preflight-reader) to the identity running preflight, or provide a separate approved reader profile for that command |
 | Existing AgentCore Runtime instead of the local agent | `bedrock-agentcore:InvokeAgentRuntime` on the exact parent Runtime ARN and selected endpoint ARN | Runtime ARN, endpoint ARN, qualifier, Region, assumable invoke-only role, and confirmation that the Runtime owner manages deployment, credentials, and observability |
 | Optional dual-mode OpenAI trace export and OpenAI Traces console | OpenAI organization **Reader**, project **Member** for the project associated with `OPENAI_TRACE_API_KEY`, and that project's trace API key | Add the developer to the organization and project; provide the key or permission to create it. Organization Owner and project Owner are not required for project trace use |
 | Secure MCP Tunnel runtime | Platform principal with **Tunnels Read + Use**, its runtime API key, and ChatGPT Developer mode/plugin creation access | A Platform administrator with **Tunnels Read + Manage** creates the hosted tunnel, associates it with the exact Platform organization and ChatGPT workspace, and returns the complete `tunnel_...` ID |
@@ -284,10 +285,21 @@ If the enterprise uses the default AWS credential chain, omit `AWS_PROFILE`.
 
 Run the read-only observability preflight before a credentialed invocation:
 
+The identity running this command needs the
+[preflight reader policy](docs/aws-iam.md#observability-preflight-reader).
+The telemetry publisher, Runtime invoke-only role, and Logs Insights query
+permissions alone are insufficient.
+
 ```bash
 uv run --project runtime-agent --locked --env-file .env -- \
   ./scripts/aws-observability-preflight.sh
 ```
+
+If your administrator provides a separate reader profile, prefix this command
+with `AWS_PROFILE=agentcore-observability-reader`, using the supplied profile
+name. Apply that override only to preflight, retaining your publisher or
+invoke profile for subsequent smoke calls. Both profiles must use the approved
+account, Region, and verification group.
 
 This loads the cookbook Region and observability settings from the root `.env`
 while preserving `AWS_PROFILE` from the shell. It checks the selected account

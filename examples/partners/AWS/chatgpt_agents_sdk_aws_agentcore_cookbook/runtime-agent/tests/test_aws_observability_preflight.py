@@ -1,5 +1,6 @@
 from __future__ import annotations
 
+import json
 import os
 import subprocess
 from pathlib import Path
@@ -64,6 +65,47 @@ def run_preflight(
         check=False,
     )
     return result, commands.read_text().splitlines() if commands.exists() else []
+
+
+def test_documented_preflight_policy_covers_requested_reads(tmp_path: Path) -> None:
+    docs = (REPOSITORY_ROOT / "docs" / "aws-iam.md").read_text()
+    section = docs.split("## Observability preflight reader\n", 1)[1]
+    policy = json.loads(section.split("```json\n", 1)[1].split("```", 1)[0])
+    permissions = {
+        action: statement
+        for statement in policy["Statement"]
+        for action in (
+            statement["Action"] if isinstance(statement["Action"], list) else [statement["Action"]]
+        )
+    }
+    settings = (REPOSITORY_ROOT / ".env.example").read_text().splitlines()
+    group = next(
+        line.split("=", 1)[1]
+        for line in settings
+        if line.startswith("COOKBOOK_TRACE_VERIFICATION_LOG_GROUP=")
+    )
+    result, commands = run_preflight(
+        tmp_path,
+        environment={"AWS_REGION": "us-west-2", "COOKBOOK_TRACE_VERIFICATION_LOG_GROUP": group},
+    )
+    assert result.returncode == 0
+    requested = set()
+    for command in commands:
+        service, operation = command.split()[1:3]
+        if service == "sts":  # GetCallerIdentity requires no IAM allow statement.
+            continue
+        action = (
+            service.replace("-", "") + ":" + "".join(part.title() for part in operation.split("-"))
+        )
+        requested.add(action)
+        resource = (
+            f"arn:aws:logs:<REGION>:<ACCOUNT_ID>:log-group:{group}:*"
+            if action == "logs:DescribeLogStreams"
+            else "*"
+        )
+        assert permissions[action]["Effect"] == "Allow"
+        assert permissions[action]["Resource"] == resource
+    assert set(permissions) == requested
 
 
 @pytest.mark.parametrize(

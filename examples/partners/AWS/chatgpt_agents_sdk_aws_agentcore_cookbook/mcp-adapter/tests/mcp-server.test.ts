@@ -38,8 +38,9 @@ afterEach(async () => {
   vi.unstubAllEnvs();
 });
 
-async function connectedClient() {
-  const provider = new AgentCoreRuntimeFlightProvider(async () => statusResponse);
+async function connectedClient(
+  provider = new AgentCoreRuntimeFlightProvider(async () => statusResponse)
+) {
   const server = createFlightMcpServer(provider);
   const client = new Client({ name: "cookbook-test-client", version: "0.1.0" });
   const [clientTransport, serverTransport] = InMemoryTransport.createLinkedPair();
@@ -234,6 +235,35 @@ describe("Flight MCP server", () => {
 
     expect(result.isError).toBe(true);
   });
+
+  it.each(["search_flights", "get_live_status"])(
+    "%s advertises and enforces uppercase airport codes",
+    async (name) => {
+      const provider = new AgentCoreRuntimeFlightProvider(async (request) => ({
+        ...statusResponse,
+        action: request.action,
+        data: request.action === "search_flights"
+          ? { flights: [], summary: "No sample flights." }
+          : statusResponse.data
+      }));
+      const call = vi.spyOn(provider, "call");
+      const client = await connectedClient(provider);
+      const { tools } = await client.listTools();
+      expect(tools.find((tool) => tool.name === name)?.inputSchema.properties)
+        .toMatchObject({
+          origin: { pattern: "^[A-Z]{3}$" },
+          destination: { pattern: "^[A-Z]{3}$" }
+        });
+
+      const args = { origin: "lhr", destination: "123", travel_date: "2099-09-21" };
+      expect((await client.callTool({ name, arguments: args })).isError).toBe(true);
+      expect(call).not.toHaveBeenCalled();
+
+      const validArgs = { ...args, origin: "LHR", destination: "JFK" };
+      expect((await client.callTool({ name, arguments: validArgs })).isError).not.toBe(true);
+      expect(call).toHaveBeenCalledOnce();
+    }
+  );
 
   it("serves the MCP protocol over Streamable HTTP", async () => {
     const provider = new AgentCoreRuntimeFlightProvider(async () => statusResponse);

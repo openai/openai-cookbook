@@ -1,6 +1,6 @@
 import { z } from "zod";
 
-const AirportCodeSchema = z.string().length(3).regex(/^[A-Z]{3}$/);
+export const AirportCodeSchema = z.string().length(3).regex(/^[A-Z]{3}$/);
 const TravelDateSchema = z.string().regex(/^\d{4}-\d{2}-\d{2}$/);
 
 export const RuntimeActionSchema = z.enum([

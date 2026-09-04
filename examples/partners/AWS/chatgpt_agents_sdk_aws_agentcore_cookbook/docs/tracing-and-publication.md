@@ -26,13 +26,19 @@ processor configuration.
 
 ## AWS read-only preflight
 
-Before a credentialed run, have the approved AWS identity execute:
+Before a credentialed run, have an approved AWS identity with the
+[preflight reader policy](aws-iam.md#observability-preflight-reader) execute:
 
 ```bash
 export AWS_PROFILE=agentcore-dev
 uv run --project runtime-agent --locked --env-file .env -- \
   ./scripts/aws-observability-preflight.sh
 ```
+
+For a separate approved reader profile, prefix the command with
+`AWS_PROFILE=agentcore-observability-reader` instead of changing the shell's
+exported profile. Use the same approved account, Region, and verification
+group, and retain the publisher or invoke profile for subsequent smoke calls.
 
 The command loads cookbook configuration from the root `.env` and preserves
 `AWS_PROFILE` from the shell. The script only calls read APIs. It records the
@@ -52,8 +58,9 @@ corresponding read permissions. A failed check can mean a missing permission,
 SCP or permissions-boundary restriction, absent service-linked prerequisite,
 quota issue, or unconfigured destination. Route remediation to the AWS account
 or organization administrator; do not make account changes merely to clear a
-cookbook check. See [AWS IAM](aws-iam.md#cloudwatch-smoke-verification) for
-the minimally scoped verification permissions.
+cookbook check. The [preflight permissions](aws-iam.md#observability-preflight-reader)
+are separate from the [Logs Insights permissions](aws-iam.md#cloudwatch-smoke-verification)
+used to verify trace delivery.
 
 ## Trace verification is a separate step
 

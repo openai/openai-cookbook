@@ -85,6 +85,57 @@ has this shape:
 This role publishes telemetry; it does not need permission to read the
 CloudWatch or AgentCore Observability consoles.
 
+## Observability preflight reader
+
+The required `scripts/aws-observability-preflight.sh` diagnostics need the
+following read policy in the selected account and Region. Neither the local
+telemetry publisher, Runtime invoke-only role, nor Logs Insights query policy
+grants all of these permissions. Ask the AWS administrator to attach this
+policy to the identity running preflight, or provide a separate approved
+reader profile for that command.
+
+```json
+{
+  "Version": "2012-10-17",
+  "Statement": [
+    {
+      "Sid": "ReadObservabilityConfiguration",
+      "Effect": "Allow",
+      "Action": [
+        "xray:GetTraceSegmentDestination",
+        "logs:DescribeResourcePolicies",
+        "logs:DescribeLogGroups",
+        "servicequotas:ListServiceQuotas"
+      ],
+      "Resource": "*"
+    },
+    {
+      "Sid": "DescribeVerificationLogStreams",
+      "Effect": "Allow",
+      "Action": "logs:DescribeLogStreams",
+      "Resource": "arn:aws:logs:<REGION>:<ACCOUNT_ID>:log-group:aws/spans:*"
+    }
+  ]
+}
+```
+
+The four configuration reads require `Resource: "*"` because they do not
+support resource-level scoping; see the AWS action tables for
+[X-Ray](https://docs.aws.amazon.com/service-authorization/latest/reference/list_xray.html),
+[CloudWatch Logs](https://docs.aws.amazon.com/service-authorization/latest/reference/list_logs.html),
+and [Service Quotas](https://docs.aws.amazon.com/service-authorization/latest/reference/list_service-quotas.html).
+Stream listing is restricted to the exact verification group. The default in
+`.env.example` is `aws/spans`; replace that group in the policy if
+`COOKBOOK_TRACE_VERIFICATION_LOG_GROUP` selects another approved group. Retain
+the trailing `:*` in the [log-group IAM ARN](https://docs.aws.amazon.com/AmazonCloudWatchLogs/latest/APIReference/API_LogGroup.html).
+
+For a separate profile, prefix only the preflight command with
+`AWS_PROFILE=agentcore-observability-reader`, using the profile supplied by
+your administrator. Keep the same approved account, Region, and verification
+group. This command-scoped override preserves the publisher or invoke profile
+for subsequent smoke calls. Preflight does not require log-content reads,
+publishing, infrastructure writes, or model/Runtime invocation permissions.
+
 ## Existing Runtime invoke-only developer setup
 
 Use this path when an AWS administrator has already created the Runtime and

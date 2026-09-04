@@ -39,7 +39,7 @@ class AuditEventType(StrEnum):
 
 class AuditEvent(FrozenModel):
     sequence: int = Field(ge=1)
-    occurred_at: datetime
+    occurred_at: AwareDatetime
     request_id: str
     event_type: AuditEventType
     detail: dict[str, Any] = Field(default_factory=dict)
@@ -53,7 +53,7 @@ class CommercePolicy(FrozenModel):
     approval_threshold: Decimal = Field(ge=0)
     currency: Literal["USDC"] = "USDC"
     network: Literal["eip155:84532"] = "eip155:84532"
-    session_expires_at: datetime
+    session_expires_at: AwareDatetime
 
 
 class PurchaseRequest(FrozenModel):
@@ -71,8 +71,8 @@ class ApprovalGrant(FrozenModel):
     maximum_amount: Decimal = Field(gt=0)
     currency: Literal["USDC"] = "USDC"
     approved_by: str = Field(min_length=1)
-    approved_at: datetime
-    expires_at: datetime
+    approved_at: AwareDatetime
+    expires_at: AwareDatetime
 
 
 class ResourceInfo(FrozenModel):

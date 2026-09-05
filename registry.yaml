@@ -5,7 +5,7 @@
 # authors for each page.
 
 - title: Migrate from Chat Completions to the Responses API
-  path: examples/Migrate_from_chat_completions_to_responses.ipynb
+  path: examples/migrate_from_chat_completions_to_responses.ipynb
   slug: migrate-from-chat-completions-to-responses
   description: A parameter-by-parameter guide to porting Chat Completions code to the Responses API, including the shape changes for structured outputs and tools, and what to do about parameters that have no equivalent.
   date: 2026-09-05

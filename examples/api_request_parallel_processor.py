@@ -113,10 +113,10 @@ def validate_processing_limits(
     max_attempts: int,
 ) -> None:
     """Reject limits that can prevent the processor from making progress."""
-    if max_requests_per_minute <= 0:
-        raise ValueError("max_requests_per_minute must be greater than 0")
-    if max_tokens_per_minute <= 0:
-        raise ValueError("max_tokens_per_minute must be greater than 0")
+    if max_requests_per_minute < 1:
+        raise ValueError("max_requests_per_minute must be at least 1")
+    if max_tokens_per_minute < 1:
+        raise ValueError("max_tokens_per_minute must be at least 1")
     if max_attempts < 1:
         raise ValueError("max_attempts must be at least 1")
 

@@ -1,4 +1,17 @@
-# LangChain, OpenAI, and Oracle AI Database for Vector Search
+# OpenAI and Oracle AI Database examples
+
+This folder contains OpenAI examples that use Oracle AI Database for vector
+search and durable agent memory.
+
+## Files in this folder
+
+- `deep_research_openai_agents.ipynb` - builds a deep-research agent with the
+  OpenAI Agents SDK, Oracle-backed session persistence, durable memory, and
+  Tavily web search
+- `oracle_vector_search_langchain.ipynb` - demonstrates semantic search with
+  LangChain, OpenAI embeddings, and Oracle AI Database Vector Search
+
+## LangChain, OpenAI, and Oracle AI Database for Vector Search
 
 This example shows how to build a semantic search workflow using:
 

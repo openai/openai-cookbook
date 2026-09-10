@@ -3744,3 +3744,14 @@
     - evals
     - agents
     - responses
+
+- title: Build a storefront against real commerce data before you have a store
+  path: examples/build_a_storefront_against_mock_data.ipynb
+  slug: build-a-storefront-against-mock-data
+  description: Use function calling to have the model pick a mock.shop store that matches the shop you're building, query Shopify's Storefront API for real products, and render a homepage grid, with no store or token.
+  date: 2026-09-10
+  authors:
+    - BobbyNguye
+  tags:
+    - functions
+    - responses

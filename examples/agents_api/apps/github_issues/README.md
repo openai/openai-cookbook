@@ -22,7 +22,7 @@ sequenceDiagram
 
 - Python 3.14+ and `uv`.
 - A sandbox: self-hosted Docker or a [third-party provider](https://developers.openai.com/api/docs/guides/agents-api/environments/self-hosted#sandbox-providers).
-- An OpenAI API key.
+- An OpenAI API key and a separate restricted executor key.
 - A GitHub token and webhook secret when you connect a real repository.
 
 ## 1. Set up the investigator
@@ -34,7 +34,9 @@ cp examples/agents_api/apps/github_issues/.env.example examples/agents_api/apps/
 docker build -t agent-api-sandbox:latest examples/agents_api/sandboxes/application_managed/docker
 ```
 
-Add your OpenAI API key to `examples/agents_api/apps/github_issues/.env`. You can also replace Docker with a compatible [sandbox provider](https://developers.openai.com/api/docs/guides/agents-api/environments/self-hosted#sandbox-providers).
+Set `OPENAI_API_KEY` and `OPENAI_EXECUTOR_API_KEY` in `examples/agents_api/apps/github_issues/.env`. Use keys with the same owner, organization, and project. Only the executor key enters the sandbox. It needs `api.agents.environments.connect` and IP restrictions that allow the sandbox's outbound network. You can also replace Docker with a compatible [sandbox provider](https://developers.openai.com/api/docs/guides/agents-api/environments/self-hosted#sandbox-providers).
+
+To create an executor key with the required permission, open [Agents > Environments > Keys](https://platform.openai.com/agents?tab=environments&environment_view=keys) and select **Create**.
 
 ## 2. Investigate the included issue
 

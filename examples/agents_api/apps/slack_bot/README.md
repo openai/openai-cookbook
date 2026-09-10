@@ -24,7 +24,7 @@ sequenceDiagram
 
 - Python 3.14+ and `uv`.
 - A sandbox: self-hosted Docker or a [third-party provider](https://developers.openai.com/api/docs/guides/agents-api/environments/self-hosted#sandbox-providers).
-- An OpenAI API key.
+- An OpenAI API key and a separate restricted executor key.
 - A Slack workspace where you can install an internal application.
 
 ## 1. Build the sandbox image
@@ -36,7 +36,9 @@ cp examples/agents_api/apps/slack_bot/.env.example examples/agents_api/apps/slac
 docker build -t agent-api-sandbox:latest examples/agents_api/sandboxes/application_managed/docker
 ```
 
-Add your OpenAI API key to `examples/agents_api/apps/slack_bot/.env`. The application loads this file automatically.
+Set `OPENAI_API_KEY` and `OPENAI_EXECUTOR_API_KEY` in `examples/agents_api/apps/slack_bot/.env`. Use keys with the same owner, organization, and project. Only the executor key enters the sandbox. It needs `api.agents.environments.connect` and IP restrictions that allow the sandbox's outbound network. The application loads this file automatically.
+
+To create an executor key with the required permission, open [Agents > Environments > Keys](https://platform.openai.com/agents?tab=environments&environment_view=keys) and select **Create**.
 
 For production, you can replace Docker with a hosted [sandbox provider](https://developers.openai.com/api/docs/guides/agents-api/environments/self-hosted#sandbox-providers).
 

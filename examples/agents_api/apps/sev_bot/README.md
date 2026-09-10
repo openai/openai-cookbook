@@ -33,7 +33,7 @@ sequenceDiagram
 
 - Python 3.14+ and `uv`.
 - A sandbox: self-hosted Docker or a [third-party provider](https://developers.openai.com/api/docs/guides/agents-api/environments/self-hosted#sandbox-providers).
-- An OpenAI API key.
+- An OpenAI API key and a separate restricted executor key.
 - A Slack app installed in `#oncall`, with a bot token, signing secret, and message event subscriptions.
 - PagerDuty, incident.io, or an Alertmanager-compatible monitoring system.
 - Read access to the affected GitHub repository.
@@ -52,11 +52,13 @@ docker build -t agent-api-sev-sandbox:latest examples/agents_api/apps/sev_bot
 
 Create the Slack app from [`slack-app-manifest.yaml`](slack-app-manifest.yaml). Replace `https://your-app.example` with your application's HTTPS address, install the app, and invite it to `#oncall`.
 
-Add `OPENAI_API_KEY`, `SLACK_BOT_TOKEN`, and `SLACK_SIGNING_SECRET` to `examples/agents_api/apps/sev_bot/.env`.
+Add `OPENAI_API_KEY`, `OPENAI_EXECUTOR_API_KEY`, `SLACK_BOT_TOKEN`, and `SLACK_SIGNING_SECRET` to `examples/agents_api/apps/sev_bot/.env`. Use OpenAI keys with the same owner, organization, and project.
 
 The manifest subscribes to `message.channels` and `message.groups` at `/slack/events`, and sends approval actions to `/slack/actions`. Slack must be able to reach both URLs over HTTPS. Posting the initial investigation only needs the bot token; follow-ups and approval buttons also require these callbacks.
 
-Each incident gets a self-hosted sandbox running `codex exec-server`. The app passes your OpenAI API key as `CODEX_API_KEY` at runtime; it does not copy Slack, GitHub, or AWS credentials into the sandbox. Follow-ups reuse the sandbox, and resolution or application shutdown deletes it.
+Each incident gets a self-hosted sandbox running `codex exec-server`. The app passes only `OPENAI_EXECUTOR_API_KEY` as `CODEX_API_KEY`; the application, Slack, GitHub, and AWS credentials stay outside the sandbox. The executor key needs `api.agents.environments.connect` and IP restrictions that allow the sandbox's outbound network. Follow-ups reuse the sandbox, and resolution or application shutdown deletes it.
+
+To create an executor key with the required permission, open [Agents > Environments > Keys](https://platform.openai.com/agents?tab=environments&environment_view=keys) and select **Create**.
 
 The app mounts [`runbooks/`](runbooks/) read-only at `/workspace/runbooks`. The agent reads `checkout-api.md` for mitigation steps and recovery checks. Add a runbook named after each service when connecting your own incidents.
 
@@ -64,7 +66,7 @@ The app mounts [`runbooks/`](runbooks/) read-only at `/workspace/runbooks`. The 
 
 In [Project settings > Webhooks](https://platform.openai.com/settings/project/webhooks), register `https://your-app.example/webhooks/openai`, subscribe to `agent.session.action_required`, and add its signing secret as `OPENAI_WEBHOOK_SECRET` in `.env`.
 
-With all four credentials configured, start the receiver:
+With these credentials configured, start the receiver:
 
 ```bash
 uv run examples/agents_api/apps/sev_bot/main.py

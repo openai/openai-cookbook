@@ -1,0 +1,21 @@
+{
+  "$schema": "node_modules/wrangler/config-schema.json",
+  "name": "agents-api-webhook-cloudflare",
+  "main": "src/index.ts",
+  "compatibility_date": "2026-05-07",
+  "compatibility_flags": ["nodejs_compat"],
+  "vars": { "OPENAI_AGENT_ID": "set-your-agent-id" },
+  "containers": [
+    { "class_name": "Sandbox", "image": "./Dockerfile", "max_instances": 4 },
+  ],
+  "durable_objects": {
+    "bindings": [
+      { "name": "Sandbox", "class_name": "Sandbox" },
+      { "name": "Sessions", "class_name": "SessionController" },
+    ],
+  },
+  "migrations": [
+    { "tag": "v1", "new_sqlite_classes": ["Sandbox", "SessionController"] },
+  ],
+  "observability": { "enabled": true },
+}

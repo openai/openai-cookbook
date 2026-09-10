@@ -78,7 +78,10 @@ export class SessionController extends DurableObject<Env> {
     const response = await fetch(
       `https://api.openai.com/v1/agents/sessions/${encodeURIComponent(sessionId)}`,
       {
-        headers: { Authorization: `Bearer ${this.env.OPENAI_API_KEY}` },
+        headers: {
+          Authorization: `Bearer ${this.env.OPENAI_API_KEY}`,
+          "OpenAI-Beta": "agents=v1",
+        },
         signal: AbortSignal.timeout(30_000),
       },
     );

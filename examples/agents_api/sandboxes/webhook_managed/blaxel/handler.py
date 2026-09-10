@@ -4,7 +4,7 @@
 #     "blaxel",
 #     "fastapi[standard]",
 #     "httpx",
-#     "openai>=3.12.0",
+#     "openai>=3.13.0",
 #     "uvicorn",
 # ]
 # ///

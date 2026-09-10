@@ -1,6 +1,6 @@
 # /// script
 # requires-python = ">=3.11"
-# dependencies = ["openai>=3.12.0"]
+# dependencies = ["openai>=3.13.0"]
 # ///
 
 """Run an Agents API task in an application-managed OCI GenAI Sandbox."""

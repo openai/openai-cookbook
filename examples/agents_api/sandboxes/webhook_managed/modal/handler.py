@@ -1,7 +1,7 @@
 # /// script
 # requires-python = ">=3.11"
 # dependencies = [
-#     "openai>=3.12.0",
+#     "openai>=3.13.0",
 #     "modal>=1.5.4,<2",
 #     "fastapi[standard]",
 # ]
@@ -28,7 +28,7 @@ executor_image = (
     .run_commands("npm install -g @openai/codex@alpha", f"mkdir -p {WORKSPACE}")
     .workdir(WORKSPACE)
 )
-controller_image = executor_image.pip_install("fastapi[standard]", "openai>=3.12.0")
+controller_image = executor_image.pip_install("fastapi[standard]", "openai>=3.13.0")
 
 
 @app.function(

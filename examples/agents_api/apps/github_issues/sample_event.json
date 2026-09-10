@@ -1,0 +1,13 @@
+{
+  "action": "opened",
+  "issue": {
+    "number": 42,
+    "title": "Express shipping becomes free for orders over $100",
+    "body": "Customers who select express shipping are not charged when their order subtotal exceeds $100. Standard shipping should be free above that threshold, but express shipping should always cost $15.",
+    "comments_url": "https://api.github.com/repos/example/store/issues/42/comments"
+  },
+  "repository": {
+    "full_name": "example/store",
+    "clone_url": "https://github.com/example/store.git"
+  }
+}

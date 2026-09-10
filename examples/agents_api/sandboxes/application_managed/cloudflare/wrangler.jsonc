@@ -1,0 +1,15 @@
+{
+  "$schema": "node_modules/wrangler/config-schema.json",
+  "name": "agents-api-application-cloudflare",
+  "main": "src/index.ts",
+  "compatibility_date": "2026-05-07",
+  "compatibility_flags": ["nodejs_compat"],
+  "containers": [
+    { "class_name": "Sandbox", "image": "./Dockerfile", "max_instances": 4 },
+  ],
+  "durable_objects": {
+    "bindings": [{ "name": "Sandbox", "class_name": "Sandbox" }],
+  },
+  "migrations": [{ "tag": "v1", "new_sqlite_classes": ["Sandbox"] }],
+  "observability": { "enabled": true },
+}

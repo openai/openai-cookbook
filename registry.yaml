@@ -4,6 +4,18 @@
 # should build pages for, and indicates metadata such as tags, creation date and
 # authors for each page.
 
+- title: Agents API applications and sandbox integrations
+  path: examples/agents_api/README.md
+  slug: agents-api-examples
+  description: Explore complete Agents API applications and application-managed or webhook-managed sandbox integrations.
+  date: 2026-09-10
+  authors:
+    - alfozan
+  tags:
+    - agents-api
+    - agents
+    - sandbox
+
 - title: Combining security scanners with the Agents SDK
   path: examples/agents_sdk/security_scanners_with_agents_sdk.ipynb
   slug: evidence-grounded-security-review-swarm

@@ -3729,3 +3729,15 @@
   tags:
     - evals
     - promptfoo
+
+- title: Optimizing Customer Support Agents for Cost and Quality
+  path: examples/Optimizing_agents_for_cost_and_quality.ipynb
+  slug: Optimizing_agents_for_cost_and_quality
+  description: Optimzie agents on cost, latency and performance.
+  date: 2026-09-14
+  authors:
+    - emreokcular
+    - lara-openai
+  tags:
+    - evals
+    - agents

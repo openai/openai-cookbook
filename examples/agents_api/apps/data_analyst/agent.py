@@ -3,13 +3,14 @@
 from __future__ import annotations
 
 import asyncio
+import json
 import os
-from collections.abc import Mapping
+import sys
+from collections.abc import Callable, Mapping
 from typing import Any
 from uuid import uuid4
 
 from openai import AsyncOpenAI
-from openai.lib.streaming.agents import AsyncToolHandler
 from openai.types.beta import AgentToolParam
 from openai.types.beta.agent_tool_param import AgentToolConfigParamFunction
 from openai.types.beta.agents.session_create_params import Agent
@@ -110,7 +111,7 @@ class DataAnalyst:
             queries.append(str(result["sql"]))
             return result
 
-        handlers: dict[str, AsyncToolHandler] = {
+        handlers: dict[str, Callable[[dict[str, Any]], dict[str, Any]]] = {
             "search_tables": self.warehouse.search_tables,
             "search_context": lambda arguments: self.warehouse.search_context(
                 arguments, user_id=user_id
@@ -121,9 +122,12 @@ class DataAnalyst:
             ),
         }
 
-        if conversation_id in self.sessions:
-            session = await self.client.beta.agents.sessions.retrieve(
-                self.sessions[conversation_id]
+        first_turn = conversation_id not in self.sessions
+        session_id = self.sessions.get(conversation_id)
+        if session_id is not None:
+            session = await self.client.beta.agents.sessions.retrieve(session_id)
+            events = self.client.beta.agents.sessions.stream(
+                session.id, input=question, tool_handlers=handlers
             )
         else:
             agent: Agent = {
@@ -132,20 +136,57 @@ class DataAnalyst:
                 "reasoning": {"effort": "high"},
                 "tools": TOOLS,
             }
-            session = await self.client.beta.agents.sessions.create(
+            # Conversation-only sessions need input at creation, not in a later call.
+            events = await self.client.beta.agents.sessions.create(
                 agent=agent,
                 environment={"type": "none"},
+                input=question,
+                stream=True,
             )
-            self.sessions[conversation_id] = session.id
-            self.owners[conversation_id] = user_id
 
-        session_id = session.id
         parts: list[str] = []
-        async with self.client.beta.agents.sessions.stream(
-            session_id, input=question, tool_handlers=handlers
-        ) as events:
+        completed = False
+        handled_calls: set[tuple[str, str]] = set()
+        async with events:
             async for event in events:
-                if event.type == "agent.session.turn.output_text.delta":
+                if event.type == "agent.session.created":
+                    session_id = event.session.id
+                    self.sessions[conversation_id] = session_id
+                    self.owners[conversation_id] = user_id
+                elif first_turn and event.type == "agent.session.requires_action":
+                    # Creation streams expose pending calls; follow-ups use SDK handlers.
+                    for action in event.session.required_actions:
+                        if action.type != "function_call":
+                            continue
+                        call = (action.turn_id, action.call_id)
+                        if call in handled_calls:
+                            continue
+                        try:
+                            arguments = action.arguments
+                            if isinstance(arguments, str):
+                                arguments = json.loads(arguments)
+                            if not isinstance(arguments, dict):
+                                raise ValueError("Function arguments must be an object")
+                            output = json.dumps(handlers[action.name](arguments))
+                            success, error = True, None
+                        except Exception:
+                            output, success, error = None, False, "Tool handler failed."
+                        await self.client.beta.agents.sessions.events.create(
+                            event.session.id,
+                            events=[
+                                {
+                                    "type": "agent.session.input.tool_result",
+                                    "turn_id": action.turn_id,
+                                    "call_id": action.call_id,
+                                    "success": success,
+                                    "output": output,
+                                    "error": error,
+                                }
+                            ],
+                            idempotency_key=str(uuid4()),
+                        )
+                        handled_calls.add(call)
+                elif event.type == "agent.session.turn.output_text.delta":
                     parts.append(event.delta)
                 elif event.type == "agent.session.turn.output_text.done" and not parts:
                     parts.append(event.text)
@@ -157,6 +198,13 @@ class DataAnalyst:
                     raise RuntimeError(f"Data investigation failed: {event.to_dict()}")
                 elif event.type == "agent.session.turn.cancelled":
                     raise RuntimeError("Data investigation was cancelled.")
+                elif (
+                    event.type == "agent.session.turn.completed"
+                    and event.turn.subagent_id is None
+                ):
+                    completed = True
+        if not completed or session_id is None:
+            raise RuntimeError("Stream ended without a completed investigation.")
         answer = "".join(parts)
 
         return {
@@ -169,16 +217,20 @@ class DataAnalyst:
         }
 
     async def close(self) -> None:
+        original_error = sys.exception()
+        session_ids = list(set(self.sessions.values()))
         try:
             results = await asyncio.gather(
-                *(
-                    self.client.beta.agents.sessions.delete(sid)
-                    for sid in set(self.sessions.values())
-                ),
+                *(self.client.beta.agents.sessions.delete(sid) for sid in session_ids),
                 return_exceptions=True,
             )
-            for result in results:
+            for session_id, result in zip(session_ids, results):
                 if isinstance(result, BaseException):
+                    if original_error is not None:
+                        original_error.add_note(
+                            f"Could not delete session {session_id}: {result}"
+                        )
+                        continue
                     raise result
         finally:
             self.sessions.clear()

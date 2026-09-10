@@ -1,6 +1,6 @@
 # /// script
 # requires-python = ">=3.11"
-# dependencies = ["openai>=3.12.0", "httpx>=0.27"]
+# dependencies = ["openai>=3.13.0", "httpx>=0.27"]
 # ///
 
 """Provision a Cloudflare sandbox through your Worker, without webhooks."""

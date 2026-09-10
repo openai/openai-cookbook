@@ -8,7 +8,10 @@ export default queue.handleNodeCallback<{ sessionId: string }>(
     const response = await fetch(
       `https://api.openai.com/v1/agents/sessions/${encodeURIComponent(sessionId)}`,
       {
-        headers: { Authorization: `Bearer ${process.env.OPENAI_API_KEY}` },
+        headers: {
+          Authorization: `Bearer ${process.env.OPENAI_API_KEY}`,
+          "OpenAI-Beta": "agents=v1",
+        },
         signal: AbortSignal.timeout(30_000),
       },
     );

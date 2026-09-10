@@ -30,9 +30,8 @@ their dependencies inline for [uv](https://docs.astral.sh/uv/).
 The application examples require Python 3.14. Provider examples declare their
 supported Python version in each script.
 
-These examples target the upcoming OpenAI Python SDK with `client.beta.agents`
-and `sessions.stream()`. The inline dependencies target `openai>=3.12.0`; wait
-for the Agents API SDK release before running them from PyPI.
+These examples use the official OpenAI Python SDK's `client.beta.agents`
+and `sessions.stream()`, available in `openai>=3.13.0` on PyPI.
 
 Create sessions with the standard client:
 
@@ -55,6 +54,8 @@ and clean up. Async applications use `AsyncOpenAI` with the same
 Keep credentials in environment variables or the example's local `.env` file.
 Use a separate restricted `OPENAI_EXECUTOR_API_KEY` for sandbox execution. Follow
 the [executor authentication requirements](https://developers.openai.com/api/docs/guides/agents-api/environments/self-hosted#authentication).
+The executor key needs `api.agents.environments.connect`, and its IP restrictions
+must allow requests from your sandbox's outbound network.
 
 ## Documentation
 

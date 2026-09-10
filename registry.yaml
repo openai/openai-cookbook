@@ -3729,3 +3729,18 @@
   tags:
     - evals
     - promptfoo
+
+- title: GPT-Live evaluation guide
+  path: examples/audio/voice_agent_evaluation.md
+  slug: voice-agent-evaluation
+  description: Evaluate full-duplex voice agents with controlled requests, recorded audio, and simulated conversations, measuring interaction quality and verified task outcomes.
+  date: '2026-09-10'
+  authors:
+    - kait-oai
+    - karsten-oai
+  tags:
+    - audio
+    - speech
+    - evals
+    - agents
+    - responses

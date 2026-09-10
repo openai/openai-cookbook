@@ -1,0 +1,16 @@
+.env
+.env.*
+!.env.example
+.venv/
+node_modules/
+.pytest_cache/
+.ruff_cache/
+__pycache__/
+*.py[cod]
+runs/
+.ipynb_checkpoints/
+.DS_Store
+/crawl_harness/results/
+/walk_harness/results/
+/run_harness/results/
+/crawl_harness/.audio_cache/

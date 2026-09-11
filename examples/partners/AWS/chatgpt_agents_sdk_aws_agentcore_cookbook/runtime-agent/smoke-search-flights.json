@@ -1,0 +1,6 @@
+{
+  "action": "search_flights",
+  "origin": "DAL",
+  "destination": "MDW",
+  "travel_date": "{{COOKBOOK_DEMO_TRAVEL_DATE}}"
+}

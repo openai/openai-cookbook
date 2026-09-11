@@ -1,0 +1,32 @@
+{
+  "name": "chatgpt-agents-sdk-aws-agentcore-runtime",
+  "version": "0.1.0",
+  "private": true,
+  "license": "MIT",
+  "engines": {
+    "node": ">=24"
+  },
+  "description": "Local Agents SDK sample with AWS-default tracing and optional AgentCore evaluation",
+  "overrides": {
+    "@hono/node-server": "2.0.11",
+    "@opentelemetry/exporter-trace-otlp-http": "0.220.0",
+    "adm-zip": "0.6.0",
+    "gaxios": "7.3.0",
+    "gcp-metadata": "8.1.2",
+    "sharp": "0.35.3"
+  },
+  "scripts": {
+    "demo-date": "uv run --locked --env-file ../.env python demo_date.py",
+    "eval:agent": "node --env-file=../.env evals/run-agent-evaluation.cjs",
+    "eval:agent:validate": "node evals/run-promptfoo-command.cjs agent-validate",
+    "eval:aws": "uv run --locked --env-file ../.env python aws_evaluation.py",
+    "eval:aws:validate": "uv run --locked python aws_evaluation.py --validate-only",
+    "eval:run": "node evals/run-promptfoo-command.cjs offline-run",
+    "eval:validate": "node evals/run-promptfoo-command.cjs offline-validate",
+    "test": "node --test evals/*.test.cjs",
+    "trace:run": "npm --prefix ../mcp-adapter run --silent trace:run"
+  },
+  "devDependencies": {
+    "promptfoo": "0.122.0"
+  }
+}

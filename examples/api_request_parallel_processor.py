@@ -119,6 +119,13 @@ async def process_api_requests_from_file(
     logging_level: int,
 ):
     """Processes API requests in parallel, throttling to stay under rate limits."""
+    if max_requests_per_minute <= 0:
+        raise ValueError("max_requests_per_minute must be positive")
+    if max_tokens_per_minute <= 0:
+        raise ValueError("max_tokens_per_minute must be positive")
+    if max_attempts < 1:
+        raise ValueError("max_attempts must be at least 1")
+
     # constants
     seconds_to_pause_after_rate_limit_error = 15
     seconds_to_sleep_each_loop = (

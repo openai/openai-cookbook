@@ -43,7 +43,7 @@ SANDBOX_STARTUP_TIMEOUT_SECONDS = 120.0
 
 async def main() -> int:
     api_key = os.environ["OPENAI_API_KEY"]
-    executor_api_key = os.environ.get("OPENAI_EXECUTOR_API_KEY", api_key)
+    executor_api_key = os.environ["OPENAI_EXECUTOR_API_KEY"]
     sandbox: modal.Sandbox | None = None
     session: AgentSession | None = None
     overall_deadline = time.monotonic() + OVERALL_EXECUTION_TIMEOUT_SECONDS

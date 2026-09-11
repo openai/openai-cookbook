@@ -63,20 +63,30 @@ The source folder and policy skill are mounted read-only; reports are written to
 
 The command logs the session, sandbox, mounted directories, specialist subagents, and generated artifacts as the review progresses.
 
+Invoice reports include extracted line items and a calculation. The application
+checks the arithmetic before returning a report. A person must still verify that
+the extracted amounts match the source document and review the recommendation.
+
 Use an empty output folder for each run and unique document stems, such as `invoice-104.txt` and `contract-208.txt`. The names `summary` and `review-activity` are reserved.
 
 ## Inspect retained command activity
 
-Before deleting the session, the app exports retained commands and their turn IDs to `review-activity.json`. Retained item history currently includes coordinator commands, not the specialists' full activity. A `null` subagent ID identifies the coordinator.
+Before deleting the session, the app exports retained commands from the coordinator
+and each specialist to `review-activity.json`. A `null` subagent ID identifies the
+coordinator. Specialist commands come from their own item histories:
 
 ```python
-turn = await client.beta.agents.sessions.turns.retrieve(
-    command["turn_id"], session_id=session.id
-)
-print(turn.subagent_id, command["command"])
+async for subagent in client.beta.agents.sessions.subagents.list(session.id):
+    async for item in client.beta.agents.sessions.subagents.items.list(
+        subagent.id, session_id=session.id
+    ):
+        if item.type == "command_execution":
+            print(subagent.id, item.command)
 ```
 
-These records come from API history, not model-written reviewer names. They are not a complete audit of specialist work. Protect this file like the reports: commands can contain document content.
+These records come from retained API history, not model-written reviewer names.
+They are not a complete security audit. Protect this file like the reports:
+commands can contain document content.
 
 ## How the policy skill works
 

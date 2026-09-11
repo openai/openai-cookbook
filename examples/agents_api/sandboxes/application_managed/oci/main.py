@@ -250,13 +250,6 @@ async def main() -> None:
                         raise RuntimeError(f"Agent failed: {event.type}")
                     if event.type == "agent.session.turn.output_text.delta":
                         print(event.delta, end="", flush=True)
-                    if (
-                        event.type == "agent.session.turn.completed"
-                        and event.turn.subagent_id is None
-                    ):
-                        break
-                else:
-                    raise RuntimeError("Stream ended without a completed turn")
 
             plan = await asyncio.to_thread(
                 read_text_file, sandbox_client, sandbox_id, f"{WORKSPACE}/plan.md"

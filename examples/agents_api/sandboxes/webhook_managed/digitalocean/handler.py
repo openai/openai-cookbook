@@ -2,7 +2,7 @@
 # requires-python = ">=3.11"
 # dependencies = [
 #     "openai>=3.13.0",
-#     "pydo[aio]>=0.40.0b7,!=0.40.0",
+#     "pydo[aio] @ https://github.com/digitalocean/pydo/releases/download/v0.40.0-beta.7/pydo-0.40.0b7-py3-none-any.whl",
 #     "fastapi[standard]",
 # ]
 # ///

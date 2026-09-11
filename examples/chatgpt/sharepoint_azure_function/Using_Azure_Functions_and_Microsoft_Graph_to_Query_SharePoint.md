@@ -26,7 +26,7 @@ This solution uses a Node.js Azure Function to, based on the logged in user:
 
 2. For each file that is found, convert it to a base64 string.
 
-3. Format the data in the structure ChatGPT is expecting [here](https://platform.openai.com/docs/actions/sending-files/inline-option).
+3. Format the data in the structure ChatGPT is expecting [here](https://platform.openai.com/docs/actions/sending-files).
 
 4. Return that to ChatGPT. The GPT then can use those files as if you had uploaded it to the conversation.
 
@@ -62,7 +62,7 @@ As you can see from the below architecture diagram, the first three steps are th
 
   - **Solution 1: restructure the response for compatibility:** 
 
-    1. We need to restructure the response from that API so that it matches the expected structure in `openaiFileResponse` outlined [here](https://platform.openai.com/docs/actions/getting-started/inline-option).
+    1. We need to restructure the response from that API so that it matches the expected structure in `openaiFileResponse` outlined [here](https://platform.openai.com/docs/actions/getting-started).
 
   - **Solution 2: extract the text from the files directly:**
 
@@ -482,7 +482,7 @@ Below are some potential areas to customize. 
 
 ### Considerations
 
-Note that all the same limitations of Actions apply here, with regards to returning 100K characters or less and the [45 second timeout](https://platform.openai.com/docs/actions/production/timeouts).
+Note that all the same limitations of Actions apply here, with regards to returning 100K characters or less and the [45 second timeout](https://platform.openai.com/docs/actions/production).
 
 - Make sure you read the documentation here around [returning files](https://platform.openai.com/docs/actions/sending-files) and [file uploads](https://help.openai.com/en/articles/8555545-file-uploads-faq), as those limitations apply here.
 
@@ -831,7 +831,7 @@ Below are some potential areas to customize. 
 
 ### Considerations
 
-Note that all the same limitations of Actions apply here, with regards to returning 100K characters or less and the [45 second timeout](https://platform.openai.com/docs/actions/production/timeouts).
+Note that all the same limitations of Actions apply here, with regards to returning 100K characters or less and the [45 second timeout](https://platform.openai.com/docs/actions/production).
 
 
 - This only works for text, not for images. With some additional code in the Azure Function, you could customize this by using GPT-4o to extract summarizations of images.

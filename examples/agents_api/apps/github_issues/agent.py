@@ -4,12 +4,13 @@ from __future__ import annotations
 
 import asyncio
 import os
+import sys
 from pathlib import Path
 from typing import Any
 
 import docker
 from docker.models.containers import Container
-from openai import AsyncOpenAI
+from openai import AsyncOpenAI, NotFoundError
 
 INSTRUCTIONS = """\
 Investigate GitHub issues by inspecting the repository and reproducing problems when practical.
@@ -30,7 +31,7 @@ def start_executor(workspace: Path, environment_id: str, remote_url: str) -> Con
             "--environment-id",
             environment_id,
         ],
-        environment={"CODEX_API_KEY": os.environ["OPENAI_API_KEY"]},
+        environment={"CODEX_API_KEY": os.environ["OPENAI_EXECUTOR_API_KEY"]},
         volumes={str(workspace.resolve()): {"bind": "/workspace", "mode": "rw"}},
         detach=True,
         auto_remove=True,
@@ -99,8 +100,28 @@ Inspect /workspace, run relevant tests, identify the root cause, and write
                 "findings": report.read_text(),
             }
         finally:
+            original_error = sys.exception()
+            cleanup_errors: list[Exception] = []
             try:
                 if container is not None:
-                    await asyncio.to_thread(container.stop)
-            finally:
+                    await asyncio.to_thread(container.remove, force=True)
+            except docker.errors.NotFound:
+                pass
+            except Exception as error:
+                cleanup_errors.append(error)
+            try:
                 await client.beta.agents.sessions.delete(session.id)
+            except NotFoundError:
+                pass
+            except Exception as error:
+                cleanup_errors.append(error)
+            if original_error is not None:
+                for error in cleanup_errors:
+                    original_error.add_note(
+                        f"Cleanup for session {session.id}: {error}"
+                    )
+            elif cleanup_errors:
+                raise ExceptionGroup(
+                    f"Could not clean up session {session.id} and its sandbox",
+                    cleanup_errors,
+                )

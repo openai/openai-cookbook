@@ -4,11 +4,12 @@ from __future__ import annotations
 
 import asyncio
 import os
+import sys
 from collections.abc import AsyncIterator, Awaitable, Callable
 
 import docker
 from docker.models.containers import Container
-from openai import AsyncOpenAI
+from openai import AsyncOpenAI, NotFoundError
 from openai.types.beta import AgentSessionEvent
 from openai.types.beta.agents.session_create_params import Agent
 from slack_sdk.web.async_client import AsyncWebClient
@@ -39,7 +40,7 @@ def start_executor(environment_id: str, remote_url: str) -> Container:
             "--environment-id",
             environment_id,
         ],
-        environment={"CODEX_API_KEY": os.environ["OPENAI_API_KEY"]},
+        environment={"CODEX_API_KEY": os.environ["OPENAI_EXECUTOR_API_KEY"]},
         detach=True,
         auto_remove=True,
         init=True,
@@ -111,8 +112,13 @@ class SlackBot:
                 sandbox = await asyncio.to_thread(
                     start_executor, environment.id, environment.remote_url
                 )
-            except BaseException:
-                await self.client.beta.agents.sessions.delete(session.id)
+            except BaseException as original_error:
+                try:
+                    await self.client.beta.agents.sessions.delete(session.id)
+                except Exception as cleanup_error:
+                    original_error.add_note(
+                        f"Could not delete session {session.id}: {cleanup_error}"
+                    )
                 raise
 
             self.sessions[thread_id] = session.id
@@ -200,17 +206,37 @@ class SlackBot:
         )
 
     async def close(self) -> None:
+        original_error = sys.exception()
         errors: list[Exception] = []
         for thread_id, session_id in self.sessions.items():
             try:
                 await self.client.beta.agents.sessions.delete(session_id)
+            except NotFoundError:
+                pass
             except Exception as error:
+                error.add_note(f"Could not delete session {session_id}.")
+                if original_error is not None:
+                    original_error.add_note(
+                        f"Could not delete session {session_id}: {error}"
+                    )
                 errors.append(error)
             sandbox = self.sandboxes.get(thread_id)
             if sandbox is not None:
                 try:
-                    await asyncio.to_thread(sandbox.stop)
+                    await asyncio.to_thread(sandbox.remove, force=True)
+                except docker.errors.NotFound:
+                    pass
                 except Exception as error:
+                    error.add_note(
+                        f"Could not remove sandbox for session {session_id}."
+                    )
+                    if original_error is not None:
+                        original_error.add_note(
+                            f"Could not remove sandbox for session {session_id}: {error}"
+                        )
                     errors.append(error)
-        if errors:
+        if errors and original_error is None:
             raise ExceptionGroup("Could not close all Slack runtimes", errors)
+        if not errors:
+            self.sessions.clear()
+            self.sandboxes.clear()

@@ -6,6 +6,7 @@ import asyncio
 import json
 import logging
 import os
+import sys
 from collections.abc import AsyncIterator
 from dataclasses import dataclass, field
 from datetime import UTC, datetime
@@ -14,7 +15,7 @@ from typing import Any
 
 import docker
 from docker.models.containers import Container
-from openai import AsyncOpenAI
+from openai import AsyncOpenAI, NotFoundError
 from openai.lib.streaming.agents import AsyncToolHandler
 from openai.types.beta import AgentSessionEvent
 from openai.types.beta.agents.session_create_params import Agent
@@ -47,7 +48,7 @@ def start_executor(environment_id: str, remote_url: str) -> Container:
             "--environment-id",
             environment_id,
         ],
-        environment={"CODEX_API_KEY": os.environ["OPENAI_API_KEY"]},
+        environment={"CODEX_API_KEY": os.environ["OPENAI_EXECUTOR_API_KEY"]},
         volumes={
             str(EXAMPLE_DIR / "runbooks"): {"bind": "/workspace/runbooks", "mode": "ro"}
         },
@@ -537,21 +538,39 @@ If a rollout caused the incident, propose a rollback to the previous healthy ver
             incident.record("Closed the incident session and sandbox.")
 
     async def close_runtime(self, incident: Incident) -> None:
-        try:
-            if (
-                incident.session_id is not None
-                and incident.session_id not in self.closed_sessions
-            ):
-                await self.client.beta.agents.sessions.delete(incident.session_id)
-                self.closed_sessions.add(incident.session_id)
+        original_error = sys.exception()
+        session_id = incident.session_id
+        errors: list[Exception] = []
+        if session_id is not None and session_id not in self.closed_sessions:
+            try:
+                await self.client.beta.agents.sessions.delete(session_id)
+            except NotFoundError:
+                self.closed_sessions.add(session_id)
                 incident.session_id = None
-        finally:
-            if incident.sandbox is not None:
+            except Exception as error:
+                errors.append(error)
+            else:
+                self.closed_sessions.add(session_id)
+                incident.session_id = None
+        if incident.sandbox is not None:
+            try:
                 await asyncio.to_thread(incident.sandbox.remove, force=True)
+            except docker.errors.NotFound:
+                incident.sandbox = None
+            except Exception as error:
+                errors.append(error)
+            else:
                 logger.info(
                     "%s: removed sandbox %s", incident.id, incident.sandbox.short_id
                 )
                 incident.sandbox = None
+        if original_error is not None:
+            for error in errors:
+                original_error.add_note(f"Cleanup for session {session_id}: {error}")
+        elif errors:
+            raise ExceptionGroup(
+                f"Could not clean up session {session_id} and its sandbox", errors
+            )
 
     async def close(self) -> None:
         errors: list[Exception] = []

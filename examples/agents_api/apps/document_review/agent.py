@@ -6,11 +6,13 @@ import asyncio
 import json
 import logging
 import os
+import sys
 from pathlib import Path
 from typing import Any
 
+from docker.errors import NotFound as ContainerNotFound
 from docker.models.containers import Container
-from openai import AsyncOpenAI
+from openai import AsyncOpenAI, NotFoundError
 
 from .sandbox import SKILLS_DIRECTORY, start_executor
 
@@ -218,10 +220,30 @@ and summarize the most important findings for the human approver.
                 "output_directory": str(output_directory),
             }
         finally:
+            original_error = sys.exception()
+            cleanup_errors: list[Exception] = []
             try:
                 if container is not None:
-                    await asyncio.to_thread(container.stop)
-                    logger.info("Sandbox stopped: %s", container.short_id)
-            finally:
+                    await asyncio.to_thread(container.remove, force=True)
+                    logger.info("Sandbox removed: %s", container.short_id)
+            except ContainerNotFound:
+                pass
+            except Exception as error:
+                cleanup_errors.append(error)
+            try:
                 await client.beta.agents.sessions.delete(session.id)
                 logger.info("Session deleted: %s", session.id)
+            except NotFoundError:
+                pass
+            except Exception as error:
+                cleanup_errors.append(error)
+            if original_error is not None:
+                for error in cleanup_errors:
+                    original_error.add_note(
+                        f"Cleanup for session {session.id}: {error}"
+                    )
+            elif cleanup_errors:
+                raise ExceptionGroup(
+                    f"Could not clean up session {session.id} and its sandbox",
+                    cleanup_errors,
+                )

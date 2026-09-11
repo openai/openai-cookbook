@@ -25,7 +25,7 @@ def start_executor(
             "--environment-id",
             environment_id,
         ],
-        environment={"CODEX_API_KEY": os.environ["OPENAI_API_KEY"]},
+        environment={"CODEX_API_KEY": os.environ["OPENAI_EXECUTOR_API_KEY"]},
         volumes={
             str(input_directory.resolve()): {"bind": "/workspace/input", "mode": "ro"},
             str(output_directory.resolve()): {

@@ -91,7 +91,7 @@ export class SessionController extends DurableObject<Env> {
     const session = (await response.json()) as {
       status: string;
       agent: { id: string };
-      environment: { type: string };
+      environment: { type: string; id: string; remote_url: string };
       required_actions: { type: string; environment_id?: string }[];
     };
     if (
@@ -123,9 +123,9 @@ export class SessionController extends DurableObject<Env> {
       "codex",
       "exec-server",
       "--remote",
-      "https://api.openai.com/v1/agents/api",
+      session.environment.remote_url,
       "--environment-id",
-      action.environment_id,
+      session.environment.id,
     ]
       .map((arg) => `'${arg.replaceAll("'", "'\\''")}'`)
       .join(" ");

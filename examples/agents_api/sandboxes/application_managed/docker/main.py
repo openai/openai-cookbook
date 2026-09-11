@@ -62,7 +62,7 @@ _DOCKER_PROVISIONING: ContextVar[_DockerProvisioning | None] = ContextVar(
 
 async def main() -> int:
     api_key = os.environ["OPENAI_API_KEY"]
-    executor_api_key = os.environ.get("OPENAI_EXECUTOR_API_KEY", api_key)
+    executor_api_key = os.environ["OPENAI_EXECUTOR_API_KEY"]
     container_name: str | None = None
     provisioner: asyncio.Task[str] | None = None
     session: AgentSession | None = None

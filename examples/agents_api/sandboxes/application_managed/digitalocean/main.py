@@ -2,9 +2,8 @@
 # requires-python = ">=3.11"
 # dependencies = [
 #     "openai>=3.13.0",
-#     "pydo[aio]>=0.40.0b7",
+#     "pydo[aio] @ https://github.com/digitalocean/pydo/releases/download/v0.40.0-beta.7/pydo-0.40.0b7-py3-none-any.whl",
 # ]
-# pydo = { url = "https://github.com/digitalocean/pydo/releases/download/v0.40.0-beta.7/pydo-0.40.0b7-py3-none-any.whl" }
 # ///
 
 """Run an Agents API task in a DigitalOcean sandbox and clean up both resources."""
@@ -67,13 +66,6 @@ async def main() -> None:
                             raise RuntimeError(f"Agent failed: {event.type}")
                         if event.type == "agent.session.turn.output_text.delta":
                             print(event.delta, end="", flush=True)
-                        if (
-                            event.type == "agent.session.turn.completed"
-                            and event.turn.subagent_id is None
-                        ):
-                            break
-                    else:
-                        raise RuntimeError("Stream ended without a completed turn")
 
                 download = await digitalocean.agents.sessions.workspace_download(
                     sandbox_id, path="plan.md", timeout=60

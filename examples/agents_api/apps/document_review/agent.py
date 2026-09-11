@@ -7,6 +7,7 @@ import json
 import logging
 import os
 import sys
+from decimal import Decimal, InvalidOperation
 from pathlib import Path
 from typing import Any
 
@@ -25,7 +26,9 @@ larger batches. Do not review source documents yourself.
 
 Each specialist must discover and apply $expense-review-policy before inspecting its
 assigned documents. Follow the skill's arithmetic checks, decision rules, and required
-report fields. Each specialist writes /workspace/output/<document-stem>.json.
+report fields. Each specialist writes only its /workspace/output/<document-stem>.json,
+including the extracted line items and calculation for invoices. Specialists must not
+write summary.json. Check their arithmetic and document coverage before summarizing.
 
 Wait for every specialist to finish, then write /workspace/output/summary.json with
 document_count, reviews, and recommendation. Never approve a payment or sign a contract.
@@ -35,28 +38,69 @@ document_count, reviews, and recommendation. Never approve a payment or sign a c
 async def review_activity(client: AsyncOpenAI, session_id: str) -> list[dict[str, Any]]:
     """Export sandbox commands available in retained item history."""
     commands: list[dict[str, Any]] = []
-    owners: dict[str, str | None] = {}
-    async for item in client.beta.agents.sessions.items.list(
-        session_id, limit=100, order="asc"
-    ):
-        if item.type != "command_execution":
-            continue
-        turn_id = item.turn_id
-        if turn_id not in owners:
-            turn = await client.beta.agents.sessions.turns.retrieve(
-                turn_id, session_id=session_id
+    subagent_ids: list[str | None] = [None]
+    subagent_ids.extend(
+        [
+            subagent.id
+            async for subagent in client.beta.agents.sessions.subagents.list(session_id)
+        ]
+    )
+    for subagent_id in subagent_ids:
+        items = (
+            client.beta.agents.sessions.items.list(session_id, limit=100, order="asc")
+            if subagent_id is None
+            else client.beta.agents.sessions.subagents.items.list(
+                subagent_id, session_id=session_id, limit=100, order="asc"
             )
-            owners[turn_id] = turn.subagent_id
-        commands.append(
-            {
-                "item_id": item.id,
-                "turn_id": turn_id,
-                "subagent_id": owners[turn_id],
-                "command": item.command,
-                "status": item.status,
-            }
         )
+        async for item in items:
+            if item.type == "command_execution":
+                commands.append(
+                    {
+                        "item_id": item.id,
+                        "turn_id": item.turn_id,
+                        "subagent_id": subagent_id,
+                        "command": item.command,
+                        "status": item.status,
+                    }
+                )
     return commands
+
+
+def validate_review(report: dict[str, Any], document: str) -> None:
+    """Reject incomplete reports and inconsistent invoice arithmetic."""
+    if (
+        report.get("document") != document
+        or not report.get("policy_id")
+        or report.get("document_type") not in {"invoice", "contract"}
+        or report.get("decision")
+        not in {"needs_info", "escalated", "ready_for_approval"}
+    ):
+        raise ValueError(f"{document}: incomplete policy review")
+    if report["document_type"] != "invoice":
+        return
+    try:
+        calculation = report["calculation"]
+        line_items = calculation["line_items"]
+        if not line_items:
+            raise ValueError("No invoice line items were extracted")
+        amounts = [
+            Decimal(str(item["quantity"])) * Decimal(str(item["unit_price"]))
+            for item in line_items
+        ]
+        shipping = Decimal(str(calculation["shipping"]))
+        stated = Decimal(str(report["amount"]))
+        calculated = Decimal(str(calculation["calculated_total"]))
+        difference = Decimal(str(calculation["difference"]))
+        if not all(
+            value.is_finite()
+            for value in [*amounts, shipping, stated, calculated, difference]
+        ):
+            raise ValueError("Invoice amounts must be finite")
+        if sum(amounts) + shipping != calculated or stated - calculated != difference:
+            raise ValueError("Invoice totals do not match the extracted line items")
+    except (KeyError, TypeError, ValueError, InvalidOperation) as error:
+        raise ValueError(f"{document}: invalid invoice calculation: {error}") from error
 
 
 async def review_documents(
@@ -124,7 +168,7 @@ async def review_documents(
             )
             logger.info("Sandbox started: %s", container.short_id)
             parts: list[str] = []
-            subagents = 0
+            subagents: set[str] = set()
             prompt = f"""\
 Review all {len(documents)} documents in /workspace/input.
 First spawn specialist subagents and assign the documents to them.
@@ -136,10 +180,13 @@ and summarize the most important findings for the human approver.
                 session.id, input=prompt
             ) as events:
                 async for event in events:
-                    if event.type == "agent.session.subagent.created":
-                        subagents += 1
+                    if (
+                        event.type == "agent.session.subagent.created"
+                        and event.subagent.id not in subagents
+                    ):
+                        subagents.add(event.subagent.id)
                         logger.info(
-                            "Specialist started: %s/%s", subagents, len(documents)
+                            "Specialist started: %s/%s", len(subagents), len(documents)
                         )
                     elif (
                         event.type == "agent.session.turn.item.done"
@@ -166,7 +213,7 @@ and summarize the most important findings for the human approver.
                             "Document review was cancelled; reports may be incomplete."
                         )
 
-            if len(documents) > 1 and subagents == 0:
+            if len(documents) > 1 and not subagents:
                 raise RuntimeError(
                     "The document batch was not delegated to specialist subagents."
                 )
@@ -187,10 +234,7 @@ and summarize the most important findings for the human approver.
                         f"The agent did not create {document_report.name}."
                     )
                 report = json.loads(document_report.read_text())
-                if not report.get("policy_id") or not report.get("decision"):
-                    raise RuntimeError(
-                        f"{document_report.name} does not include its policy decision."
-                    )
+                validate_review(report, document.name)
                 reviews.append(
                     {
                         "document": document.name,
@@ -215,7 +259,7 @@ and summarize the most important findings for the human approver.
                 "reviews": reviews,
                 "status": "awaiting_approval",
                 "session_id": session.id,
-                "subagents": subagents,
+                "subagents": len(subagents),
                 "activity": activity,
                 "output_directory": str(output_directory),
             }

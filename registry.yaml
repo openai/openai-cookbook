@@ -4,6 +4,18 @@
 # should build pages for, and indicates metadata such as tags, creation date and
 # authors for each page.
 
+- title: Agents API applications and sandbox integrations
+  path: examples/agents_api/README.md
+  slug: agents-api-examples
+  description: Explore complete Agents API applications and application-managed or webhook-managed sandbox integrations.
+  date: 2026-09-10
+  authors:
+    - alfozan
+  tags:
+    - agents-api
+    - agents
+    - sandbox
+
 - title: Combining security scanners with the Agents SDK
   path: examples/agents_sdk/security_scanners_with_agents_sdk.ipynb
   slug: evidence-grounded-security-review-swarm
@@ -3677,6 +3689,7 @@
 - title: GPT Image Generation Models Prompting Guide
   path: examples/multimodal/image-gen-models-prompting-guide.ipynb
   slug: image-gen-models-prompting-guide
+  archived: true
   description: Cookbook to prompt gpt-image models for reliable image generation results.
   date: 2026-04-21
   authors:
@@ -3750,3 +3763,19 @@
   tags:
     - evals
     - promptfoo
+
+- title: GPT-Live evaluation guide
+  path: examples/audio/voice_agent_evaluation.md
+  slug: voice-agent-evaluation
+  description: Evaluate full-duplex voice agents with controlled requests, recorded audio, and simulated conversations, measuring interaction quality and verified task outcomes.
+  date: '2026-09-10'
+  authors:
+    - kait-oai
+    - karsten-oai
+    - erikakettleson-openai
+  tags:
+    - audio
+    - speech
+    - evals
+    - agents
+    - responses

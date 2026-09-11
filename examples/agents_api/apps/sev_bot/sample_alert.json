@@ -1,0 +1,20 @@
+{
+  "receiver": "sev-bot",
+  "status": "firing",
+  "alerts": [
+    {
+      "status": "firing",
+      "labels": {
+        "alertname": "CheckoutHighErrorRate",
+        "service": "checkout-api",
+        "severity": "critical"
+      },
+      "annotations": {
+        "summary": "Checkout API error rate reached 18.7%",
+        "description": "Customer checkout requests are timing out after a production rollout."
+      },
+      "startsAt": "2026-08-26T10:09:00Z",
+      "fingerprint": "checkout-api-high-error-rate"
+    }
+  ]
+}

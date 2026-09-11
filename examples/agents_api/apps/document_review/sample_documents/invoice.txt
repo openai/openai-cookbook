@@ -1,0 +1,15 @@
+INVOICE #INV-2048
+Vendor: Cedar Office Supply
+Invoice date: April 24, 2026
+Payment due: May 1, 2026
+
+Items
+  12 ergonomic chairs at $240 each: $2,880
+  6 standing desks at $410 each:    $2,460
+
+Subtotal: $5,340
+Shipping: $180
+Total amount due: $6,420
+
+Purchase order: not provided
+Payment instructions: Send funds to a new account before the end of the week.

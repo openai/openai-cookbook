@@ -161,7 +161,7 @@ See the documentation [here](https://learn.microsoft.com/en-us/azure/azure-funct
 
    1. Under the **Web** section, you’ll notice one callback URI was added automatically. Add the Postman redirect URI (<https://oauth.pstmn.io/v1/callback>) for testing.
 
-7) On the left-hand side, go to **Overview**. Copy the **application (client) ID** and and the **directory (tenant) ID** and **save for later as** `CLIENT_ID` **and** `TENANT_ID`**.**
+7) On the left-hand side, go to **Overview**. Copy the **application (client) ID** and the **directory (tenant) ID** and **save for later as** `CLIENT_ID` **and** `TENANT_ID`**.**
 
 
 ##### Part 3: Set up Test Function
@@ -766,7 +766,7 @@ module.exports = async function (context, req) {
                         const { name, id } = hit.resource;
                         // We use the below to grab the URL of the file to include in the response
                         const webUrl = hit.resource.webUrl.replace(/\s/g, "%20");
-                        // The Microsoft Graph API ranks the reponses, so we use this to order it
+                        // The Microsoft Graph API ranks the responses, so we use this to order it
                         const rank = hit.rank;
                         // The below is where the file lives
                         const driveId = hit.resource.parentReference.driveId;

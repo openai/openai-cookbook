@@ -8,6 +8,7 @@ from typing import Any
 
 import httpx
 import pytest
+from pydantic import ValidationError
 
 from agentic_commerce.application import CommerceApplication
 from agentic_commerce.codec import encode_model
@@ -24,6 +25,7 @@ from agentic_commerce.merchant import (
 )
 from agentic_commerce.models import (
     ApprovalGrant,
+    AuditEvent,
     AuditEventType,
     CommercePolicy,
     PurchaseRequest,
@@ -397,6 +399,64 @@ def test_merchant_rejects_unrecognized_proof() -> None:
     assert PAYMENT_REQUIRED_HEADER in response.headers
     assert merchant.invalid_proof_count == 1
     assert payments.charge_count == 0
+
+
+def test_policy_rejects_naive_session_expiry() -> None:
+    """Deadlines the engine compares against `datetime.now(UTC)` must be aware.
+
+    A naive value used to validate here and then raise `TypeError: can't compare
+    offset-naive and offset-aware datetimes` from inside `PolicyEngine.preflight`,
+    with nothing in the traceback naming the field that was wrong.
+    """
+    with pytest.raises(ValidationError) as exc_info:
+        CommercePolicy(
+            allowed_merchants=frozenset({"merchant.invalid"}),
+            allowed_purposes=frozenset({"supplier_due_diligence"}),
+            per_request_limit=Decimal("0.50"),
+            per_run_limit=Decimal("1.00"),
+            approval_threshold=Decimal("0.10"),
+            session_expires_at=NOW.replace(tzinfo=None) + timedelta(minutes=15),
+        )
+
+    assert exc_info.value.errors()[0]["type"] == "timezone_aware"
+    assert exc_info.value.errors()[0]["loc"] == ("session_expires_at",)
+
+
+def test_approval_grant_rejects_naive_expiry() -> None:
+    """The grant expiry is only compared above the approval threshold.
+
+    A naive value therefore left every cheap purchase working and failed only on
+    the expensive ones that actually require a human in the loop.
+    """
+    purchase = request()
+    with pytest.raises(ValidationError) as exc_info:
+        ApprovalGrant(
+            approval_id=f"approval-{purchase.request_id}",
+            request_id=purchase.request_id,
+            resource_url=purchase.resource_url,
+            purpose=purchase.purpose,
+            maximum_amount=Decimal("0.25"),
+            approved_by="synthetic-reviewer",
+            approved_at=NOW,
+            expires_at=NOW.replace(tzinfo=None) + timedelta(minutes=10),
+        )
+
+    assert exc_info.value.errors()[0]["type"] == "timezone_aware"
+    assert exc_info.value.errors()[0]["loc"] == ("expires_at",)
+
+
+def test_audit_event_rejects_naive_timestamp() -> None:
+    """An audit trail is evidence; an unqualified local timestamp is not."""
+    with pytest.raises(ValidationError) as exc_info:
+        AuditEvent(
+            sequence=1,
+            occurred_at=NOW.replace(tzinfo=None),
+            request_id="request-001",
+            event_type=AuditEventType.PAYMENT_ATTEMPTED,
+        )
+
+    assert exc_info.value.errors()[0]["type"] == "timezone_aware"
+    assert exc_info.value.errors()[0]["loc"] == ("occurred_at",)
 
 
 def test_agents_tool_has_prebound_authority_and_expected_name() -> None:

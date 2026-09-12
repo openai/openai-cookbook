@@ -1,0 +1,18 @@
+{
+  "name": "agents-api-webhook-cloudflare",
+  "private": true,
+  "type": "module",
+  "scripts": {
+    "check": "tsc --noEmit",
+    "deploy": "wrangler deploy"
+  },
+  "dependencies": {
+    "@cloudflare/sandbox": ">=0.12.8",
+    "openai": ">=7.5.0"
+  },
+  "devDependencies": {
+    "@cloudflare/workers-types": ">=4.20260702.1",
+    "typescript": "^5.9",
+    "wrangler": ">=4.90.0"
+  }
+}

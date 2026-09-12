@@ -1,0 +1,22 @@
+display_information:
+  name: SRE Agent
+features:
+  bot_user:
+    display_name: SRE Agent
+    always_online: false
+oauth_config:
+  scopes:
+    bot:
+      - chat:write
+      - channels:history
+      - groups:history
+settings:
+  event_subscriptions:
+    request_url: https://your-app.example/slack/events
+    bot_events:
+      - message.channels
+      - message.groups
+  interactivity:
+    is_enabled: true
+    request_url: https://your-app.example/slack/actions
+  socket_mode_enabled: false

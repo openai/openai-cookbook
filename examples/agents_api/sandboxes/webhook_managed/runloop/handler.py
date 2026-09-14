@@ -28,9 +28,11 @@ from fastapi import FastAPI, Request
 from fastapi.responses import JSONResponse
 from openai import AsyncOpenAI, InvalidWebhookSignatureError, NotFoundError, OpenAI
 from runloop_api_client import AsyncRunloopSDK
+from runloop_api_client.lib.polling import PollingConfig
 from runloop_api_client.sdk.async_devbox import AsyncDevbox
 
 DB_PATH = os.environ.get("QUEUE_PATH", "/home/user/pending.sqlite3")
+OPENAI_API_ORIGIN = "https://api.openai.com"
 OPENAI_EXECUTOR_SECRET_NAME = "agents_api_webhook_openai_executor_api_key"
 CODEX = "/home/user/.codex-runtime/node_modules/.bin/codex"
 DevboxStatus: TypeAlias = Literal[
@@ -69,6 +71,8 @@ def remote_path(remote_url: str) -> str:
     parsed = urlsplit(remote_url)
     if not parsed.scheme or not parsed.netloc or not parsed.path.startswith("/"):
         raise ValueError("The Agents API returned an invalid environment remote URL")
+    if f"{parsed.scheme}://{parsed.netloc}" != OPENAI_API_ORIGIN:
+        raise ValueError(f"The environment remote URL does not use {OPENAI_API_ORIGIN}")
     # Keep the executor on its credential-injecting Runloop gateway origin.
     return parsed.path + (f"?{parsed.query}" if parsed.query else "")
 
@@ -125,7 +129,8 @@ async def reconcile(session_id: str) -> None:
             "mkdir -p /home/user/.codex-runtime && "
             f"(test -x {CODEX} || "
             "npm install --prefix /home/user/.codex-runtime @openai/codex@alpha) && "
-            "command -v flock"
+            "command -v flock",
+            polling_config=PollingConfig(timeout_seconds=180),
         )
         if setup.exit_code != 0:
             raise RuntimeError("Executor installation failed")
@@ -151,23 +156,48 @@ async def reconcile(session_id: str) -> None:
         )
 
 
+def initialize_queue(db: sqlite3.Connection) -> None:
+    db.execute(
+        "CREATE TABLE IF NOT EXISTS jobs ("
+        "session_id TEXT PRIMARY KEY, "
+        "attempts INTEGER DEFAULT 0, "
+        "retry_at REAL DEFAULT 0, "
+        "generation INTEGER DEFAULT 0)"
+    )
+    db.commit()
+
+
+def enqueue(db: sqlite3.Connection, session_id: str) -> None:
+    db.execute(
+        "INSERT INTO jobs(session_id) VALUES (?) "
+        "ON CONFLICT(session_id) DO UPDATE SET "
+        "attempts = 0, retry_at = 0, generation = jobs.generation + 1",
+        (session_id,),
+    )
+    db.commit()
+
+
 async def process_next_job(db: sqlite3.Connection) -> bool:
     row = db.execute(
-        "SELECT session_id, attempts FROM jobs WHERE retry_at <= ? LIMIT 1",
+        "SELECT session_id, attempts, generation FROM jobs WHERE retry_at <= ? LIMIT 1",
         (time.time(),),
     ).fetchone()
     if row is None:
         return False
-    session_id, attempts = row
-    db.execute("DELETE FROM jobs WHERE session_id = ?", (session_id,))
-    db.commit()
+    session_id, attempts, generation = row
     try:
         await reconcile(session_id)
     except Exception as error:
-        if attempts < 4:
+        if attempts >= 4:
             db.execute(
-                "INSERT OR IGNORE INTO jobs(session_id, attempts, retry_at) VALUES (?, ?, ?)",
-                (session_id, attempts + 1, time.time() + 10),
+                "DELETE FROM jobs WHERE session_id = ? AND generation = ?",
+                (session_id, generation),
+            )
+        else:
+            db.execute(
+                "UPDATE jobs SET attempts = ?, retry_at = ? "
+                "WHERE session_id = ? AND generation = ?",
+                (attempts + 1, time.time() + 10, session_id, generation),
             )
         print(
             json.dumps(
@@ -182,6 +212,11 @@ async def process_next_job(db: sqlite3.Connection) -> bool:
             ),
             flush=True,
         )
+    else:
+        db.execute(
+            "DELETE FROM jobs WHERE session_id = ? AND generation = ?",
+            (session_id, generation),
+        )
     db.commit()
     return True
 
@@ -195,9 +230,7 @@ async def drain_queue(db: sqlite3.Connection) -> None:
 @asynccontextmanager
 async def lifespan(app: FastAPI) -> AsyncIterator[None]:
     db = sqlite3.connect(DB_PATH)
-    db.execute(
-        "CREATE TABLE IF NOT EXISTS jobs (session_id TEXT PRIMARY KEY, attempts INTEGER DEFAULT 0, retry_at REAL DEFAULT 0)"
-    )
+    initialize_queue(db)
     app.state.db = db
     task = asyncio.create_task(drain_queue(db))
     try:
@@ -232,10 +265,7 @@ async def webhook(request: Request) -> JSONResponse:
         event["type"] == "agent.session.action_required"
         and event["data"]["required_action"]["type"] == "environment_connection"
     ):
-        request.app.state.db.execute(
-            "INSERT OR IGNORE INTO jobs(session_id) VALUES (?)", (event["data"]["id"],)
-        )
-        request.app.state.db.commit()
+        enqueue(request.app.state.db, event["data"]["id"])
         print(
             json.dumps(
                 {

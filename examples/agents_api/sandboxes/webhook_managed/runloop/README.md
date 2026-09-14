@@ -62,6 +62,14 @@ Runloop secrets if they are no longer used.
 Controller logs are available through the controller devbox logs; executor logs
 are in `/tmp/codex-executor.log` inside each worker.
 
+## Development check
+
+Run the focused queue and gateway URL regression tests from the repository root:
+
+```bash
+uv run examples/agents_api/sandboxes/webhook_managed/runloop/test_handler.py
+```
+
 ## References
 
 - [Runloop documentation](https://docs.runloop.ai/)

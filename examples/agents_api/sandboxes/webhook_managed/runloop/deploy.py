@@ -23,14 +23,16 @@ STATE = ROOT / ".controller.json"
 CONTROLLER_NAME = "agents-api-webhook-runloop"
 OPENAI_GATEWAY_NAME = "agents-api-webhook-openai-controller"
 OPENAI_EXECUTOR_GATEWAY_NAME = "agents-api-webhook-openai-executor"
+OPENAI_API_ORIGIN = "https://api.openai.com"
 OPENAI_SECRET_NAME = "agents_api_webhook_openai_api_key"
 OPENAI_EXECUTOR_SECRET_NAME = "agents_api_webhook_openai_executor_api_key"
 RUNLOOP_SECRET_NAME = "agents_api_webhook_runloop_api_key"
 WEBHOOK_SECRET_NAME = "agents_api_webhook_openai_webhook_secret"
 
 
-async def upsert_secret(runloop: AsyncRunloopSDK, name: str, value: str) -> None:
-    names = {secret.name for secret in await runloop.secret.list()}
+async def upsert_secret(
+    runloop: AsyncRunloopSDK, names: set[str], name: str, value: str
+) -> None:
     if name in names:
         await runloop.secret.update(name, value)
     else:
@@ -42,14 +44,14 @@ async def ensure_gateway(runloop: AsyncRunloopSDK, name: str, description: str) 
         info = await gateway.get_info()
         if info.name == name:
             await gateway.update(
-                endpoint="https://api.openai.com",
+                endpoint=OPENAI_API_ORIGIN,
                 auth_mechanism={"type": "bearer"},
             )
             return gateway.id
     return (
         await runloop.gateway_config.create(
             name=name,
-            endpoint="https://api.openai.com",
+            endpoint=OPENAI_API_ORIGIN,
             auth_mechanism={"type": "bearer"},
             description=description,
         )
@@ -91,16 +93,29 @@ async def main() -> None:
         ).encode()
     ).hexdigest()
     async with AsyncRunloopSDK() as runloop:
+        secret_names = {secret.name for secret in await runloop.secret.list()}
         await asyncio.gather(
-            upsert_secret(runloop, OPENAI_SECRET_NAME, values["OPENAI_API_KEY"]),
             upsert_secret(
                 runloop,
+                secret_names,
+                OPENAI_SECRET_NAME,
+                values["OPENAI_API_KEY"],
+            ),
+            upsert_secret(
+                runloop,
+                secret_names,
                 OPENAI_EXECUTOR_SECRET_NAME,
                 values["OPENAI_EXECUTOR_API_KEY"],
             ),
-            upsert_secret(runloop, RUNLOOP_SECRET_NAME, values["RUNLOOP_API_KEY"]),
             upsert_secret(
                 runloop,
+                secret_names,
+                RUNLOOP_SECRET_NAME,
+                values["RUNLOOP_API_KEY"],
+            ),
+            upsert_secret(
+                runloop,
+                secret_names,
                 WEBHOOK_SECRET_NAME,
                 values["OPENAI_WEBHOOK_SECRET"],
             ),
@@ -127,8 +142,13 @@ async def main() -> None:
             info = await controller.get_info()
             if info.status == "suspended":
                 await controller.resume()
-            elif info.status != "running":
+            elif info.status == "suspending":
+                await controller.await_suspended()
+                await controller.resume()
+            elif info.status in {"failure", "shutdown"}:
                 controller = None
+            elif info.status != "running":
+                await controller.await_running()
         elif state is not None:
             previous = runloop.devbox.from_id(state["devbox_id"])
             previous_info = await previous.get_info()
@@ -160,7 +180,8 @@ async def main() -> None:
                 tunnel={"auth_mode": "open"},
                 launch_parameters={
                     "launch_commands": [
-                        "sudo apt-get update && sudo apt-get install -y libsqlite3-0",
+                        "dpkg -s libsqlite3-0 >/dev/null 2>&1 || "
+                        "(sudo apt-get update && sudo apt-get install -y libsqlite3-0)",
                         "command -v uv || python -m pip install uv",
                     ],
                     "lifecycle": {

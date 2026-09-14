@@ -21,8 +21,6 @@ import time
 import traceback
 from collections.abc import AsyncIterator
 from contextlib import asynccontextmanager
-from typing import Literal, TypeAlias
-from urllib.parse import urlsplit
 
 from fastapi import FastAPI, Request
 from fastapi.responses import JSONResponse
@@ -30,91 +28,83 @@ from openai import AsyncOpenAI, InvalidWebhookSignatureError, NotFoundError, Ope
 from runloop_api_client import AsyncRunloopSDK
 from runloop_api_client.lib.polling import PollingConfig
 from runloop_api_client.sdk.async_devbox import AsyncDevbox
+from runloop_api_client.sdk.async_execution import AsyncExecution
 
 DB_PATH = os.environ.get("QUEUE_PATH", "/home/user/pending.sqlite3")
-OPENAI_API_ORIGIN = "https://api.openai.com"
 OPENAI_EXECUTOR_SECRET_NAME = "agents_api_webhook_openai_executor_api_key"
 CODEX = "/home/user/.codex-runtime/node_modules/.bin/codex"
-DevboxStatus: TypeAlias = Literal[
-    "scheduled",
-    "queued",
-    "provisioning",
-    "initializing",
-    "running",
-    "suspending",
-    "suspended",
-    "resuming",
-]
+EXECUTOR_CONNECT_TIMEOUT = 60
+LOCK_BUSY_EXIT_CODE = 75
+
+
+def log(**fields: object) -> None:
+    print(json.dumps(fields), flush=True)
 
 
 async def find_devbox(
     runloop: AsyncRunloopSDK, session_id: str
 ) -> tuple[AsyncDevbox | None, str | None]:
-    statuses: tuple[DevboxStatus, ...] = (
-        "scheduled",
-        "queued",
-        "provisioning",
-        "initializing",
-        "running",
-        "suspending",
-        "suspended",
-        "resuming",
-    )
-    for status in statuses:
-        async for info in await runloop.api.devboxes.list(status=status, limit=100):
-            if info.metadata and info.metadata.get("agents-session-id") == session_id:
-                return runloop.devbox.from_id(info.id), info.status
+    async for info in await runloop.api.devboxes.list(include_total_count=False):
+        if info.status not in {"failure", "shutdown"} and (
+            (info.metadata or {}).get("agents-session-id") == session_id
+        ):
+            return runloop.devbox.from_id(info.id), info.status
     return None, None
 
 
-def remote_path(remote_url: str) -> str:
-    parsed = urlsplit(remote_url)
-    if not parsed.scheme or not parsed.netloc or not parsed.path.startswith("/"):
-        raise ValueError("The Agents API returned an invalid environment remote URL")
-    if f"{parsed.scheme}://{parsed.netloc}" != OPENAI_API_ORIGIN:
-        raise ValueError(f"The environment remote URL does not use {OPENAI_API_ORIGIN}")
-    # Keep the executor on its credential-injecting Runloop gateway origin.
-    return parsed.path + (f"?{parsed.query}" if parsed.query else "")
+async def wait_for_executor(
+    client: AsyncOpenAI, session_id: str, execution: AsyncExecution
+) -> None:
+    async with asyncio.timeout(EXECUTOR_CONNECT_TIMEOUT):
+        while True:
+            session = await client.beta.agents.sessions.retrieve(session_id)
+            if session.status == "failed":
+                raise RuntimeError("Session failed before the executor connected")
+            if not any(
+                action.type == "environment_connection"
+                for action in session.required_actions
+            ):
+                return
+            state = await execution.get_state()
+            # A duplicate launch loses the lock; wait for the existing executor.
+            if state.status == "completed" and state.exit_status != LOCK_BUSY_EXIT_CODE:
+                raise RuntimeError("Executor exited; inspect /tmp/codex-executor.log")
+            await asyncio.sleep(2)
 
 
 async def reconcile(session_id: str) -> None:
-    async with AsyncOpenAI(
-        api_key=os.environ["OPENAI_GATEWAY"],
-        base_url=f"{os.environ['OPENAI_GATEWAY_URL'].rstrip('/')}/v1",
-        timeout=30,
-    ) as client:
+    async with (
+        AsyncOpenAI(
+            api_key=os.environ["OPENAI_GATEWAY"],
+            base_url=f"{os.environ['OPENAI_GATEWAY_URL'].rstrip('/')}/v1",
+            timeout=30,
+        ) as client,
+        AsyncRunloopSDK() as runloop,
+    ):
         try:
             session = await client.beta.agents.sessions.retrieve(session_id)
         except NotFoundError:
             return
-    if (
-        session.environment.type != "self_hosted"
-        or session.agent.id != os.environ["OPENAI_AGENT_ID"]
-    ):
-        return
-    action = next(
-        (a for a in session.required_actions if a.type == "environment_connection"),
-        None,
-    )
-    if session.status != "failed" and action is None:
-        return
-    async with AsyncRunloopSDK() as runloop:
+        if (
+            session.environment.type != "self_hosted"
+            or session.agent.id != os.environ["OPENAI_AGENT_ID"]
+        ):
+            return
+        if session.status != "failed" and not any(
+            action.type == "environment_connection"
+            for action in session.required_actions
+        ):
+            return
         devbox, status = await find_devbox(runloop, session_id)
         if session.status == "failed":
             if devbox is not None:
                 await devbox.shutdown()
             return
-        assert action is not None
         if devbox is None:
             devbox = await runloop.devbox.create(
                 name=f"agents-webhook-{session_id[-24:]}",
                 metadata={"agents-session-id": session_id},
-                gateways={
-                    "OPENAI_GATEWAY": {
-                        "gateway": os.environ["OPENAI_EXECUTOR_GATEWAY_ID"],
-                        "secret": OPENAI_EXECUTOR_SECRET_NAME,
-                    }
-                },
+                secrets={"CODEX_API_KEY": OPENAI_EXECUTOR_SECRET_NAME},
                 launch_parameters={"keep_alive_time_seconds": 1800},
             )
         elif status == "suspended":
@@ -135,25 +125,16 @@ async def reconcile(session_id: str) -> None:
         if setup.exit_code != 0:
             raise RuntimeError("Executor installation failed")
         environment_id = shlex.quote(session.environment.id)
-        path = shlex.quote(remote_path(session.environment.remote_url))
-        await devbox.cmd.exec_async(
-            f"cd /workspace && REMOTE_PATH={path} && "
-            'CODEX_API_KEY="$OPENAI_GATEWAY" flock -n /tmp/codex-executor.lock '
+        remote_url = shlex.quote(session.environment.remote_url)
+        execution = await devbox.cmd.exec_async(
+            f"cd /workspace && flock -n -E {LOCK_BUSY_EXIT_CODE} /tmp/codex-executor.lock "
             f"{CODEX} exec-server "
-            '--remote "$OPENAI_GATEWAY_URL$REMOTE_PATH" '
+            f"--remote {remote_url} "
             f"--environment-id {environment_id} "
             ">> /tmp/codex-executor.log 2>&1"
         )
-        print(
-            json.dumps(
-                {
-                    "session_id": session_id,
-                    "devbox_id": devbox.id,
-                    "action": "started",
-                }
-            ),
-            flush=True,
-        )
+        await wait_for_executor(client, session_id, execution)
+        log(session_id=session_id, devbox_id=devbox.id, action="connected")
 
 
 def initialize_queue(db: sqlite3.Connection) -> None:
@@ -187,7 +168,7 @@ async def process_next_job(db: sqlite3.Connection) -> bool:
     session_id, attempts, generation = row
     try:
         await reconcile(session_id)
-    except Exception as error:
+    except Exception as error:  # noqa: BLE001 - Keep failed jobs in the retry queue.
         if attempts >= 4:
             db.execute(
                 "DELETE FROM jobs WHERE session_id = ? AND generation = ?",
@@ -199,18 +180,13 @@ async def process_next_job(db: sqlite3.Connection) -> bool:
                 "WHERE session_id = ? AND generation = ?",
                 (attempts + 1, time.time() + 10, session_id, generation),
             )
-        print(
-            json.dumps(
-                {
-                    "session_id": session_id,
-                    "error_type": type(error).__name__,
-                    "error_at": [
-                        f"{frame.name}:{frame.lineno}"
-                        for frame in traceback.extract_tb(error.__traceback__)
-                    ],
-                }
-            ),
-            flush=True,
+        log(
+            session_id=session_id,
+            error_type=type(error).__name__,
+            error_at=[
+                f"{frame.name}:{frame.lineno}"
+                for frame in traceback.extract_tb(error.__traceback__)
+            ],
         )
     else:
         db.execute(
@@ -266,16 +242,7 @@ async def webhook(request: Request) -> JSONResponse:
         and event["data"]["required_action"]["type"] == "environment_connection"
     ):
         enqueue(request.app.state.db, event["data"]["id"])
-        print(
-            json.dumps(
-                {
-                    "event_id": event["id"],
-                    "session_id": event["data"]["id"],
-                    "action": "enqueued",
-                }
-            ),
-            flush=True,
-        )
+        log(event_id=event["id"], session_id=event["data"]["id"], action="enqueued")
     return JSONResponse({"ok": True})
 
 

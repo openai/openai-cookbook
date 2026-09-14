@@ -64,7 +64,7 @@ client. For direct provisioning from your application, use
 | Variable | Where it is used |
 | --- | --- |
 | `OPENAI_API_KEY` | Application and controller. The application creates sessions; the controller reads their current state. |
-| `OPENAI_EXECUTOR_API_KEY` | Passed to each worker as `CODEX_API_KEY`. Grant **List models → Read** and set other permissions to **None**. |
+| `OPENAI_EXECUTOR_API_KEY` | An [environment key](https://developers.openai.com/api/docs/guides/agents-api/environments/self-hosted#authentication), passed to each worker as `CODEX_API_KEY`. |
 | `OPENAI_WEBHOOK_SECRET` | Controller only. Verifies deliveries from your OpenAI project. |
 
 The two API keys must have the same organization, project, and user or service-account

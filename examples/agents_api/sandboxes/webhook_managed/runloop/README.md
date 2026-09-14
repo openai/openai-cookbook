@@ -1,45 +1,39 @@
 # Runloop webhook-managed sandbox
 
-A controller Runloop devbox receives signed OpenAI webhooks and queues work in
-SQLite. It starts or resumes a separate worker devbox for each API session.
-OpenAI requests from both controller and workers pass through Runloop's API
-gateway, so the OpenAI key is not exposed inside either devbox.
+A controller in a dedicated Runloop devbox receives signed OpenAI webhooks and
+queues work in SQLite. It starts or resumes a separate worker devbox for each
+API session. Agent commands run only in the worker.
 
 ## Deploy
 
-Create an agent using the [shared setup](../README.md#set-up-once), then set
-`OPENAI_AGENT_ID`, `OPENAI_API_KEY`, `OPENAI_EXECUTOR_API_KEY`, and
-`RUNLOOP_API_KEY` locally. The deployment stores them as namespaced Runloop
-secrets (`agents_api_webhook_openai_api_key`,
-`agents_api_webhook_openai_executor_api_key`, and
-`agents_api_webhook_runloop_api_key`), creates separate OpenAI gateway
-configurations for the controller and executor, and injects the Runloop key only
-into the controller. As in the shared setup, make the executor key restricted to
-**List models → Read** with other permissions set to **None**.
+Create an agent using the [shared setup](../README.md#set-up-once). Set
+`OPENAI_AGENT_ID`, `OPENAI_API_KEY`, `OPENAI_EXECUTOR_API_KEY`, and `RUNLOOP_API_KEY`
+locally. Use an
+[environment key](https://developers.openai.com/api/docs/guides/agents-api/environments/self-hosted#authentication)
+for `OPENAI_EXECUTOR_API_KEY`.
+
+Run from the Cookbook repository root:
 
 ```bash
 uv run examples/agents_api/sandboxes/webhook_managed/runloop/deploy.py
 ```
 
-The deployment saves the controller ID in the ignored `.controller.json` beside
-`deploy.py`. Register the printed URL in **OpenAI project settings → Webhooks**,
-subscribing to `agent.session.action_required` and `agent.session.failed`. Set the
-generated `OPENAI_WEBHOOK_SECRET` locally and deploy again to update its Runloop
-secret. The configured redeployment replaces the bootstrap controller, so update
-the webhook endpoint to the newly printed URL while keeping its signing secret.
-Then use the [shared client](../README.md#run-and-reconnect).
+Register the printed URL in **OpenAI project settings → Webhooks**, subscribing to
+`agent.session.action_required` and `agent.session.failed`. Set the generated
+`OPENAI_WEBHOOK_SECRET` locally and deploy again. **Update the webhook URL to the
+newly printed address**, keeping its signing secret. Then use the
+[shared client](../README.md#run-and-reconnect).
 
-The public tunnel rejects deliveries until the signing secret is installed and
-verifies every signature afterward. The controller suspends after ten idle
-minutes. Its lifecycle sets `resume_triggers.http=true`, so a webhook request
-wakes it through the tunnel; the sender must retry the initial `503` response.
+Deployment stores credentials in Runloop secrets with the `agents_api_webhook_`
+prefix. The controller accesses OpenAI through a Runloop gateway; workers receive
+only the environment key as `CODEX_API_KEY` and connect directly to OpenAI.
+The endpoint rejects deliveries until configured and verifies every signature.
 
-The controller needs `RUNLOOP_API_KEY` to manage worker devboxes. Workers receive
-only a short-lived gateway credential backed by the restricted executor key.
-The gateway adds the real OpenAI bearer credential upstream without placing it
-in either devbox.
+The controller ID is saved in `.controller.json`. Changing the handler, agent ID,
+Runloop key, or signing secret replaces the controller and changes its URL.
+Otherwise deployment reuses it.
 
-## Lifecycle and cleanup
+## Lifecycle
 
 | Current state | Handler action |
 | --- | --- |
@@ -48,27 +42,24 @@ in either devbox.
 | Session failed | Shut down its worker. |
 | Other agent, resolved action, or idle event | Do not provision or stop compute. |
 
-Worker devboxes shut down after 30 minutes. The controller queue survives
-process restarts and suspend/resume, but not controller replacement. Deployment
-reuses it when the handler, agent ID, Runloop key, and webhook secret are unchanged;
-otherwise it replaces the controller and prints a new URL to register.
+The handler waits up to 60 seconds for connection before completing a queued job.
+Failed startup gets up to five attempts. Run one controller process; its queue
+survives process restarts and suspend/resume, but not controller replacement.
+
+## Stop or clean up
+
+Suspend a worker between turns to retain its files. The next input wakes it
+through a webhook. Workers shut down after 30 minutes. The controller suspends
+after ten idle minutes; HTTP requests wake it, with the first request returning
+`503` for OpenAI to retry.
 
 For final cleanup, delete the API session and shut down its worker separately.
 Remove the OpenAI webhook before shutting down the controller. Delete the
-`agents-api-webhook-openai-controller` and
-`agents-api-webhook-openai-executor` gateway configurations and the example's
-Runloop secrets if they are no longer used.
+`agents-api-webhook-openai-controller` gateway and the example's Runloop secrets
+when no longer used.
 
-Controller logs are available through the controller devbox logs; executor logs
-are in `/tmp/codex-executor.log` inside each worker.
-
-## Development check
-
-Run the focused queue and gateway URL regression tests from the repository root:
-
-```bash
-uv run examples/agents_api/sandboxes/webhook_managed/runloop/test_handler.py
-```
+Find controller logs in the Runloop devbox logs and executor logs in
+`/tmp/codex-executor.log` inside each worker.
 
 ## References
 

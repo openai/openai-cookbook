@@ -72,11 +72,3 @@ An earlier page may have been accepted before a failure. The script does not
 retry uploads automatically or track delivery across runs. Re-running can resend
 spans; do not assume the receiver will deduplicate them. This example is not a
 continuous delivery service.
-
-## Test without credentials
-
-The focused tests use mock HTTP responses for pagination and upload failures:
-
-```bash
-uv run --with pytest --with httpx pytest examples/agents_api/traces/test_export_to_braintrust.py
-```

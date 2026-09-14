@@ -4,6 +4,17 @@
 # should build pages for, and indicates metadata such as tags, creation date and
 # authors for each page.
 
+- title: Export Agents API session traces to Braintrust
+  path: examples/agents_api/traces/README.md
+  slug: agents-api-export-traces-braintrust
+  description: Export available traces across Agents API sessions to Braintrust using paginated OTLP uploads.
+  date: 2026-09-14
+  authors:
+    - nezaj-oai
+  tags:
+    - agents-api
+    - observability
+
 - title: Agents API applications and sandbox integrations
   path: examples/agents_api/README.md
   slug: agents-api-examples

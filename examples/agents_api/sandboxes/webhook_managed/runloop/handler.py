@@ -61,7 +61,11 @@ async def find_devbox(
         "resuming",
     )
     for status in statuses:
-        async for info in await runloop.api.devboxes.list(status=status, limit=100):
+        async for info in await runloop.api.devboxes.list(
+            status=status,
+            limit=5000,
+            include_total_count=False,
+        ):
             if info.metadata and info.metadata.get("agents-session-id") == session_id:
                 return runloop.devbox.from_id(info.id), info.status
     return None, None
@@ -140,7 +144,7 @@ async def reconcile(session_id: str) -> None:
             f"cd /workspace && REMOTE_PATH={path} && "
             'CODEX_API_KEY="$OPENAI_GATEWAY" flock -n /tmp/codex-executor.lock '
             f"{CODEX} exec-server "
-            '--remote "$OPENAI_GATEWAY_URL$REMOTE_PATH" '
+            '--remote "${OPENAI_GATEWAY_URL%/}$REMOTE_PATH" '
             f"--environment-id {environment_id} "
             ">> /tmp/codex-executor.log 2>&1"
         )

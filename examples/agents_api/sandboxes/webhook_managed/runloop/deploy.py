@@ -15,7 +15,7 @@ import json
 import os
 from pathlib import Path
 
-from runloop_api_client import AsyncRunloopSDK
+from runloop_api_client import AsyncRunloopSDK, NotFoundError
 from runloop_api_client.sdk.async_devbox import AsyncDevbox
 
 ROOT = Path(__file__).parent
@@ -28,6 +28,12 @@ OPENAI_SECRET_NAME = "agents_api_webhook_openai_api_key"
 OPENAI_EXECUTOR_SECRET_NAME = "agents_api_webhook_openai_executor_api_key"
 RUNLOOP_SECRET_NAME = "agents_api_webhook_runloop_api_key"
 WEBHOOK_SECRET_NAME = "agents_api_webhook_openai_webhook_secret"
+MAX_ACCOUNT_RESOURCES = 5000
+
+
+async def list_secret_names(runloop: AsyncRunloopSDK) -> set[str]:
+    secrets = await runloop.api.secrets.list(limit=MAX_ACCOUNT_RESOURCES)
+    return {secret.name for secret in secrets.secrets}
 
 
 async def upsert_secret(
@@ -40,9 +46,13 @@ async def upsert_secret(
 
 
 async def ensure_gateway(runloop: AsyncRunloopSDK, name: str, description: str) -> str:
-    for gateway in await runloop.gateway_config.list():
-        info = await gateway.get_info()
+    async for info in await runloop.api.gateway_configs.list(
+        name=name,
+        limit=MAX_ACCOUNT_RESOURCES,
+        include_total_count=False,
+    ):
         if info.name == name:
+            gateway = runloop.gateway_config.from_id(info.id)
             await gateway.update(
                 endpoint=OPENAI_API_ORIGIN,
                 auth_mechanism={"type": "bearer"},
@@ -70,7 +80,35 @@ async def wait_for_controller(controller: AsyncDevbox) -> None:
         if health is not None and health.exit_code == 0:
             return
         await asyncio.sleep(2)
-    raise TimeoutError("Controller did not become healthy within 60 seconds")
+    raise TimeoutError("Controller did not become healthy before the retry limit")
+
+
+async def reuse_saved_controller(
+    runloop: AsyncRunloopSDK,
+    state: dict[str, str] | None,
+    fingerprint: str,
+) -> AsyncDevbox | None:
+    if state is None:
+        return None
+    controller = runloop.devbox.from_id(state["devbox_id"])
+    try:
+        info = await controller.get_info()
+    except NotFoundError:
+        return None
+    if state.get("fingerprint") != fingerprint:
+        if info.status not in {"failure", "shutdown"}:
+            await controller.shutdown()
+        return None
+    if info.status == "suspended":
+        await controller.resume()
+    elif info.status == "suspending":
+        await controller.await_suspended()
+        await controller.resume()
+    elif info.status in {"failure", "shutdown"}:
+        return None
+    elif info.status != "running":
+        await controller.await_running()
+    return controller
 
 
 async def main() -> None:
@@ -93,7 +131,7 @@ async def main() -> None:
         ).encode()
     ).hexdigest()
     async with AsyncRunloopSDK() as runloop:
-        secret_names = {secret.name for secret in await runloop.secret.list()}
+        secret_names = await list_secret_names(runloop)
         await asyncio.gather(
             upsert_secret(
                 runloop,
@@ -136,24 +174,7 @@ async def main() -> None:
             f"{fingerprint}\0{gateway_id}\0{executor_gateway_id}".encode()
         ).hexdigest()
         state = json.loads(STATE.read_text()) if STATE.exists() else None
-        controller = None
-        if state is not None and state.get("fingerprint") == fingerprint:
-            controller = runloop.devbox.from_id(state["devbox_id"])
-            info = await controller.get_info()
-            if info.status == "suspended":
-                await controller.resume()
-            elif info.status == "suspending":
-                await controller.await_suspended()
-                await controller.resume()
-            elif info.status in {"failure", "shutdown"}:
-                controller = None
-            elif info.status != "running":
-                await controller.await_running()
-        elif state is not None:
-            previous = runloop.devbox.from_id(state["devbox_id"])
-            previous_info = await previous.get_info()
-            if previous_info.status not in {"failure", "shutdown"}:
-                await previous.shutdown()
+        controller = await reuse_saved_controller(runloop, state, fingerprint)
         if controller is None:
             controller = await runloop.devbox.create(
                 name=CONTROLLER_NAME,

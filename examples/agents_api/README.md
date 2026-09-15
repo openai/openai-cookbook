@@ -21,6 +21,11 @@ Complete applications and sandbox integrations for the Agents API.
 
 See the [sandbox overview](sandboxes/README.md) to choose a provisioning mode.
 
+## Trace export
+
+- [Export session traces to Braintrust](traces/README.md): backfill available traces
+  across sessions into a Braintrust project.
+
 ## Run an example
 
 Run commands from the Cookbook repository root. Each example's README covers

@@ -40,6 +40,9 @@
       },
       "archived": {
         "type": "boolean"
+      },
+      "unlisted": {
+        "type": "boolean"
       }
     },
     "required": ["title", "path", "slug", "tags", "authors"],

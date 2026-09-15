@@ -2,7 +2,7 @@
 
 The [OpenAI API embeddings endpoint](https://platform.openai.com/docs/guides/embeddings) can be used to measure relatedness or similarity between pieces of text.
 
-By leveraging large language model understanding of text, these embeddings [achieved state-of-the-art results](https://arxiv.org/abs/2201.10005) on benchmarks in unsupervised learning and transfer learning settings.
+By leveraging a large language model's understanding of text, these embeddings [achieved state-of-the-art results](https://arxiv.org/abs/2201.10005) on benchmarks in unsupervised learning and transfer learning settings.
 
 Embeddings can be used for semantic search, recommendations, cluster analysis, near-duplicate detection, and more.
 

@@ -18,14 +18,14 @@ def session_ids(client):
         response = client.get("sessions", params=params)
         response.raise_for_status()
         page = response.json()
-        for session in page["page"]:
+        for session in page["data"]:
             yield session["id"]
         if not page["has_more"]:
             return
-        cursor = page["next_cursor"]
-        if not cursor or cursor == params.get("cursor"):
+        after = page["last_id"]
+        if not after or after == params.get("after"):
             raise ValueError("Session pagination did not advance")
-        params["cursor"] = cursor
+        params["after"] = after
 
 
 def export_session(source, destination, session_id, page_size):

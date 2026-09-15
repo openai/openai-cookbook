@@ -17,7 +17,7 @@ The magic of large language models is that by being trained to minimize this pre
 
 They do this by “reading” a large amount of existing text and learning how words tend to appear in context with other words, and uses what it has learned to predict the next most likely word that might appear in response to a user request, and each subsequent word after that.
 
-GPT-3 and GPT-4 power [many software products][OpenAI Customer Stories], including productivity apps, education apps, games, and more.
+GPT-4o and other OpenAI models power [many software products][OpenAI Customer Stories], including productivity apps, education apps, games, and more.
 
 ## How to control a large language model
 
@@ -138,15 +138,15 @@ Output:
 
 ## Code Capabilities
 
-Large language models aren't only great at text - they can be great at code too. OpenAI's [GPT-4][GPT-4 and GPT-4 Turbo] model is a prime example.
+Large language models aren't only great at text - they can be great at code too. OpenAI's [GPT-4o][GPT-4o] model is a prime example.
 
-GPT-4 powers [numerous innovative products][OpenAI Customer Stories], including:
+GPT-4o powers [numerous innovative products][OpenAI Customer Stories], including:
 
 - [GitHub Copilot] (autocompletes code in Visual Studio and other IDEs)
 - [Replit](https://replit.com/) (can complete, explain, edit and generate code)
 - [Cursor](https://cursor.sh/) (build software faster in an editor designed for pair-programming with AI)
 
-GPT-4 is more advanced than previous models like `gpt-3.5-turbo-instruct`. But, to get the best out of GPT-4 for coding tasks, it's still important to give clear and specific instructions. As a result, designing good prompts can take more care.
+GPT-4o is more advanced than previous models like `gpt-4o-mini`. But, to get the best out of GPT-4o for coding tasks, it's still important to give clear and specific instructions. As a result, designing good prompts can take more care.
 
 ### More prompt advice
 
@@ -163,6 +163,5 @@ In general, the input prompt is the best lever for improving model outputs. You 
 [OpenAI Customer Stories]: https://openai.com/customer-stories
 [Large language models Blog Post]: https://openai.com/research/better-language-models
 [GitHub Copilot]: https://github.com/features/copilot/
-[GPT-4 and GPT-4 Turbo]: https://platform.openai.com/docs/models/gpt-4-and-gpt-4-turbo
-[GPT3 Apps Blog Post]: https://openai.com/blog/gpt-3-apps/
+[GPT-4o]: https://platform.openai.com/docs/models
 [OpenAI Examples]: https://platform.openai.com/examples

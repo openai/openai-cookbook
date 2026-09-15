@@ -1,5 +1,7 @@
 # Build an AI teammate for Slack
 
+For the complete walkthrough with executable code cells, open [slack_bot.ipynb](slack_bot.ipynb).
+
 Tag your bot in Slack to search conversations, investigate projects, analyze data,
 or prepare a GitHub pull request. Each Slack thread gets its own Agents API
 session and isolated workspace.

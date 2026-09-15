@@ -1,5 +1,7 @@
 # Data agent
 
+For the complete walkthrough with executable code cells, open [data_analyst.ipynb](data_analyst.ipynb).
+
 Ask questions about your own business data. The agent finds relevant warehouse tables, checks metric definitions and past analyses, runs read-only SQL, and remembers useful corrections for future investigations.
 
 ```mermaid

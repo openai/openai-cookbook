@@ -16,6 +16,79 @@
     - agents
     - sandbox
 
+- title: Build an SRE agent for incident response
+  path: examples/agents_api/apps/sev_bot/sev_bot.ipynb
+  redirects:
+    - examples/agents_api/apps/sev_bot/readme
+    - examples/agents_api/apps/sev_bot/readme.md
+  slug: agents-api-sev-bot
+  description: An SRE agent that investigates production alerts using GitHub, AWS, and incident history before requesting approval for recovery.
+  date: 2026-09-15
+  authors:
+    - alfozan
+  tags:
+    - agents-api
+    - agents
+    - sandbox
+
+- title: Build an AI teammate for Slack
+  path: examples/agents_api/apps/slack_bot/slack_bot.ipynb
+  redirects:
+    - examples/agents_api/apps/slack_bot/readme
+    - examples/agents_api/apps/slack_bot/readme.md
+  slug: agents-api-slack-bot
+  description: A Slack teammate that searches connected workplace tools, investigates requests, and remembers each conversation.
+  date: 2026-09-15
+  authors:
+    - alfozan
+  tags:
+    - agents-api
+    - agents
+    - sandbox
+
+- title: Build a data agent
+  path: examples/agents_api/apps/data_analyst/data_analyst.ipynb
+  redirects:
+    - examples/agents_api/apps/data_analyst/readme
+    - examples/agents_api/apps/data_analyst/readme.md
+  slug: agents-api-data-analyst
+  description: A data agent that finds relevant warehouse tables, verifies answers with read-only SQL, and remembers analyst feedback.
+  date: 2026-09-15
+  authors:
+    - alfozan
+  tags:
+    - agents-api
+    - agents
+- title: Build a GitHub issue investigation agent
+  path: examples/agents_api/apps/github_issues/github_issues.ipynb
+  redirects:
+    - examples/agents_api/apps/github_issues/readme
+    - examples/agents_api/apps/github_issues/readme.md
+  slug: agents-api-github-issues
+  description: An issue investigator that checks out the repository, reproduces reported bugs, and posts evidence-backed findings to GitHub.
+  date: 2026-09-15
+  authors:
+    - alfozan
+  tags:
+    - agents-api
+    - agents
+    - sandbox
+
+- title: Bulk document review with the Agents API
+  path: examples/agents_api/apps/document_review/document_review.ipynb
+  redirects:
+    - examples/agents_api/apps/document_review/readme
+    - examples/agents_api/apps/document_review/readme.md
+  slug: agents-api-document-review
+  description: A document reviewer that applies reusable policy skills, delegates work to specialists, and prepares approval-ready reports.
+  date: 2026-09-15
+  authors:
+    - alfozan
+  tags:
+    - agents-api
+    - agents
+    - sandbox
+
 - title: Combining security scanners with the Agents SDK
   path: examples/agents_sdk/security_scanners_with_agents_sdk.ipynb
   slug: evidence-grounded-security-review-swarm

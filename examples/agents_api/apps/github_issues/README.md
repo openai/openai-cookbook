@@ -1,5 +1,7 @@
 # Turn a new GitHub issue into an investigation
 
+For the complete walkthrough with executable code cells, open [github_issues.ipynb](github_issues.ipynb).
+
 Someone opens an issue. Your agent checks out the repository, reproduces the problem in an isolated sandbox, and posts a useful investigation back to GitHub.
 
 ```mermaid

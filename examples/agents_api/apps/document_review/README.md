@@ -1,5 +1,7 @@
 # Bulk invoice and contract review
 
+For the complete walkthrough with executable code cells, open [document_review.ipynb](document_review.ipynb).
+
 Mount a folder of invoices and contracts alongside a reusable accounts-payable policy skill. A `gpt-5.6-luna` agent delegates each document to a specialist subagent, applies the discovered skill, writes individual reports plus a consolidated summary, and leaves every approval to a person.
 
 ```mermaid

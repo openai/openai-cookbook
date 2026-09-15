@@ -1,5 +1,7 @@
 # SRE agent for incident response
 
+For the complete walkthrough with executable code cells, open [sev_bot.ipynb](sev_bot.ipynb).
+
 An incident alert opens a Slack thread in `#oncall`. The agent investigates production telemetry, GitHub pull requests and commits, AWS infrastructure, and similar past incidents. It posts its findings and asks a responder to approve any rollback.
 
 ```mermaid

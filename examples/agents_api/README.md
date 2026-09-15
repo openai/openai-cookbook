@@ -6,11 +6,11 @@ Complete applications and sandbox integrations for the Agents API.
 
 | Example | What it does |
 | --- | --- |
-| [Incident response](apps/sev_bot/README.md) | Investigate alerts and request approval for recovery actions. |
-| [Slack bot](apps/slack_bot/README.md) | Answer requests using conversation history and connected workplace tools. |
-| [Data analyst](apps/data_analyst/README.md) | Answer questions with read-only warehouse queries. |
-| [GitHub issue investigator](apps/github_issues/README.md) | Reproduce reported bugs and prepare findings for GitHub. |
-| [Document reviewer](apps/document_review/README.md) | Review invoices and contracts with policy skills and specialist agents. |
+| [Incident response](https://developers.openai.com/cookbook/examples/agents_api/apps/sev_bot/sev_bot) | Investigate alerts and request approval for recovery actions. |
+| [Slack bot](https://developers.openai.com/cookbook/examples/agents_api/apps/slack_bot/slack_bot) | Answer requests using conversation history and connected workplace tools. |
+| [Data analyst](https://developers.openai.com/cookbook/examples/agents_api/apps/data_analyst/data_analyst) | Answer questions with read-only warehouse queries. |
+| [GitHub issue investigator](https://developers.openai.com/cookbook/examples/agents_api/apps/github_issues/github_issues) | Reproduce reported bugs and prepare findings for GitHub. |
+| [Document reviewer](https://developers.openai.com/cookbook/examples/agents_api/apps/document_review/document_review) | Review invoices and contracts with policy skills and specialist agents. |
 
 ## Sandbox integrations
 
@@ -23,7 +23,7 @@ See the [sandbox overview](sandboxes/README.md) to choose a provisioning mode.
 
 ## Run an example
 
-Run commands from the Cookbook repository root. Each example's README covers
+Run commands from the Cookbook repository root. Each application notebook and its README cover
 dependencies, credentials, sample inputs, and cleanup. Python entry points declare
 their dependencies inline for [uv](https://docs.astral.sh/uv/).
 

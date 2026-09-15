@@ -1,5 +1,7 @@
 # Build an AI teammate for Slack
 
+For the complete walkthrough with executable code cells, open [slack_bot.ipynb](slack_bot.ipynb).
+
 Tag your bot in Slack to search conversations, investigate projects, analyze data,
 or prepare a GitHub pull request. Each Slack thread gets its own Agents API
 session and isolated workspace.
@@ -19,35 +21,6 @@ sequenceDiagram
     Person->>Slack: @Agent Teammate Open a pull request
     Slack->>Agent: Continue the same session
 ```
-
-## Agents API capabilities
-
-Sandbox, Persistent sessions, MCP, Vaults and OAuth, Multi-agent, Streaming.
-
-### Every Slack thread keeps its own context
-
-One persistent session per Slack thread remembers earlier questions, findings, and files between follow-ups.
-
-### One bot connects your workplace tools
-
-Bot-scoped Slack tools and an optional shared vault connect Notion, Google Drive, and GitHub without requiring each person to authorize every app.
-
-### A sandbox makes the bot capable
-
-Each thread gets an isolated workspace where the agent can run code, analyze data, inspect repositories, and prepare pull requests.
-
-### Users stay informed while work is running
-
-Session events surface tool activity, specialist handoffs, and answers directly in the original Slack conversation.
-
-## Application flow
-
-1. Slack mention.
-2. Slack bot tools.
-3. Shared workplace apps.
-4. Thread sandbox.
-5. Agent progress.
-6. Reply + follow-up.
 
 ## What you need
 
@@ -157,133 +130,9 @@ Use the access token's actual expiration, or leave that field empty if unknown. 
 
 Restarting the bot reuses the stored OAuth credential instead of replacing refreshed tokens with old `.env` values. If this workspace already has a static Google Drive credential, archive it once before switching to OAuth refresh. Renew or revoke an existing grant through the vault credential APIs; editing `.env` does not replace it.
 
-## Implementation walkthrough
-
-This walkthrough connects Slack events to shared tools, one sandbox per thread, and streamed updates.
-
-Follow the setup instructions above, then use the source links below to explore each part of the application.
-
-### 1. Set up the bot and sandbox
-
-Clone the repository, copy the example's environment template, and build the Docker image that runs one Codex executor for each Slack thread.
-
-### 2. Connect the Slack bot
-
-Create and install the Slack app using the example manifest. Its bot token reads channels the bot belongs to and posts replies; the app token receives events through Socket Mode.
-
-Socket Mode requires no public webhook, OAuth callback, or individual Slack user tokens.
-
-Read the implementation in [main.py](https://github.com/openai/openai-cookbook/blob/main/examples/agents_api/apps/slack_bot/main.py).
-
-### 3. Start when someone tags the bot
-
-A Slack mention starts the journey. Use the channel and thread timestamp as the session key, then continue the same Agents API session when teammates follow up.
-
-![A Slack mention connected to a persistent Agents API session.](../../../../images/agents_api/agents-api-slack-bot-message.webp)
-
-Read the implementation in [main.py](https://github.com/openai/openai-cookbook/blob/main/examples/agents_api/apps/slack_bot/main.py).
-
-### 4. Give the agent scoped Slack tools
-
-Run Slack tools inside your application with the bot token. Bind message and file access to the conversation that triggered the request, keeping the token out of the model and sandbox.
-
-The complete example also reads recent messages, finds teammates, and lists files shared in the current channel.
-
-Read the implementation in [tools.py](https://github.com/openai/openai-cookbook/blob/main/examples/agents_api/apps/slack_bot/tools.py).
-
-### 5. Add optional shared workplace credentials
-
-Store shared workplace credentials in a vault. For Google Drive, add an OAuth refresh grant so Agents API can renew access without asking for a new token on every run.
-
-Your Google OAuth app obtains consent and the initial tokens. Add the refresh token, client ID, client secret, and actual access-token expiration to .env. The runnable example reuses existing OAuth credentials without resetting refreshed tokens on restart. Archive an existing static Drive credential before switching auth types. Shared connections must contain only content intended for everyone who can use the bot.
-
-Read the implementation in [connections.py](https://github.com/openai/openai-cookbook/blob/main/examples/agents_api/apps/slack_bot/connections.py).
-
-### 6. Connect workplace apps through MCP
-
-Add only the integrations configured for the bot. Slack remains an application tool; Notion, Google Drive, and GitHub are service-connected MCP tools.
-
-Google Drive's hosted MCP server is in developer preview.
-
-Read the implementation in [connections.py](https://github.com/openai/openai-cookbook/blob/main/examples/agents_api/apps/slack_bot/connections.py).
-
-### 7. Create a self-hosted session for the thread
-
-A persistent Agents API session owns the conversation, connected tools, and workspace. Specialist agents can divide a larger investigation when needed.
-
-![An agent coordinating Slack, connected workplace tools, and an isolated sandbox.](../../../../images/agents_api/agents-api-slack-bot-investigation.webp)
-
-Read the implementation in [agent.py](https://github.com/openai/openai-cookbook/blob/main/examples/agents_api/apps/slack_bot/agent.py).
-
-### 8. Start the thread's sandbox
-
-Launch a Docker container for the session's environment ID. The Codex executor connects back to the Agents API and stays available for later messages in the same Slack thread.
-
-Read the implementation in [agent.py](https://github.com/openai/openai-cookbook/blob/main/examples/agents_api/apps/slack_bot/agent.py).
-
-### 9. Stream progress back into Slack
-
-Once the executor is connected, start a turn and update one Slack message as the agent checks MCP tools, delegates research, or prepares a result.
-
-Read the implementation in [agent.py](https://github.com/openai/openai-cookbook/blob/main/examples/agents_api/apps/slack_bot/agent.py).
-
-### 10. Keep follow-ups in the same thread
-
-Reuse the original session and sandbox for each follow-up. A message received during an active turn can steer the investigation or cancel it.
-
-Everyone in the thread shares the bot's configured permissions. Repository changes require a GitHub credential with write access.
-
-Read the implementation in [agent.py](https://github.com/openai/openai-cookbook/blob/main/examples/agents_api/apps/slack_bot/agent.py).
-
-### 11. Start the bot
-
-Set the bot token and app token, then start receiving Slack events through Socket Mode.
-
-### 12. Try the complete journey in Slack
-
-Invite the bot to a Slack channel and tag it. Continue the conversation in the same thread to research a problem and ask for a real change.
-
-### 13. Clean up when the application shuts down
-
-Keep the thread's session and sandbox alive for follow-ups. The example deletes sessions and stops their Docker containers when the application shuts down. Add an inactive-thread expiration policy when deploying a long-running bot.
-
-Read the implementation in [agent.py](https://github.com/openai/openai-cookbook/blob/main/examples/agents_api/apps/slack_bot/agent.py).
-
-## Example result
-
-A Slack mention now starts a persistent investigation using shared workplace tools and an isolated workspace for completing the task.
-
-The following illustrates a possible result; model-generated findings depend on the inputs and connected sources.
-
-```text
-You: @Agent Teammate What is blocking the Phoenix launch?
-Bot: Searching Slack conversations...
-Bot: Checking GitHub...
-Bot: The checkout accessibility issue is blocking sign-off.
-     Priya owns the launch and Maya is reviewing the fix.
-
-You: Reproduce the issue and prepare a patch.
-Bot: Checking the repository and running the relevant tests...
-Bot: I reproduced the missing focus state and prepared a fix.
-
-You: Open a pull request.
-Bot: Opened a pull request with the fix and test coverage.
-```
-
-## Next steps
-
-- Connect Notion, Google Drive, or GitHub using a dedicated shared account with limited access.
-- Persist thread-to-session mappings so conversations survive application restarts.
-- Replace local Docker with your preferred hosted sandbox provider.
-
-## Related documentation
-
-- [Sandbox providers](https://developers.openai.com/api/docs/guides/agents-api/environments/self-hosted#sandbox-providers): Choose a local or hosted sandbox provider for your agent's isolated workspace.
-
-
 ## Files
 
-- [main.py](https://github.com/openai/openai-cookbook/blob/main/examples/agents_api/apps/slack_bot/main.py): Slack events and application startup.
-- [agent.py](https://github.com/openai/openai-cookbook/blob/main/examples/agents_api/apps/slack_bot/agent.py): Agent sessions, sandboxes, streaming, and cleanup.
-- [tools.py](https://github.com/openai/openai-cookbook/blob/main/examples/agents_api/apps/slack_bot/tools.py): Slack search, channel, teammate, and file tools.
-- [connections.py](https://github.com/openai/openai-cookbook/blob/main/examples/agents_api/apps/slack_bot/connections.py): MCP connections and vault credentials.
+- [main.py](main.py): Slack events and application startup.
+- [agent.py](agent.py): Agent sessions, sandboxes, streaming, and cleanup.
+- [tools.py](tools.py): Slack search, channel, teammate, and file tools.
+- [connections.py](connections.py): MCP connections and vault credentials.

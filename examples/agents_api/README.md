@@ -6,11 +6,11 @@ Complete applications and sandbox integrations for the Agents API.
 
 | Example | What it does |
 | --- | --- |
-| [Incident response](apps/sev_bot/README.md) | Investigate alerts and request approval for recovery actions. |
-| [Slack bot](apps/slack_bot/README.md) | Answer requests using conversation history and connected workplace tools. |
-| [Data analyst](apps/data_analyst/README.md) | Answer questions with read-only warehouse queries. |
-| [GitHub issue investigator](apps/github_issues/README.md) | Reproduce reported bugs and prepare findings for GitHub. |
-| [Document reviewer](apps/document_review/README.md) | Review invoices and contracts with policy skills and specialist agents. |
+| [Incident response](https://developers.openai.com/cookbook/examples/agents_api/apps/sev_bot/readme) | Investigate alerts and request approval for recovery actions. |
+| [Slack bot](https://developers.openai.com/cookbook/examples/agents_api/apps/slack_bot/readme) | Answer requests using conversation history and connected workplace tools. |
+| [Data analyst](https://developers.openai.com/cookbook/examples/agents_api/apps/data_analyst/readme) | Answer questions with read-only warehouse queries. |
+| [GitHub issue investigator](https://developers.openai.com/cookbook/examples/agents_api/apps/github_issues/readme) | Reproduce reported bugs and prepare findings for GitHub. |
+| [Document reviewer](https://developers.openai.com/cookbook/examples/agents_api/apps/document_review/readme) | Review invoices and contracts with policy skills and specialist agents. |
 
 ## Sandbox integrations
 

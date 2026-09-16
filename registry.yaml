@@ -4,10 +4,10 @@
 # should build pages for, and indicates metadata such as tags, creation date and
 # authors for each page.
 
-- title: Agents API applications and sandbox integrations
-  path: examples/agents_api/README.md
-  slug: agents-api-examples
-  description: Explore complete Agents API applications and application-managed or webhook-managed sandbox integrations.
+- title: Build an SRE agent for incident response
+  path: examples/agents_api/apps/sev_bot/README.md
+  slug: agents-api-sev-bot
+  description: Investigate incidents in Slack using service telemetry, GitHub, AWS, and past incident reports, with human review before recovery.
   date: 2026-09-10
   authors:
     - alfozan
@@ -15,6 +15,29 @@
     - agents-api
     - agents
     - sandbox
+
+- title: Build a Slack bot with the Agents API
+  path: examples/agents_api/apps/slack_bot/README.md
+  slug: agents-api-slack-bot
+  description: Connect Slack threads to persistent agent sessions, workplace tools, and isolated sandboxes.
+  date: 2026-09-10
+  authors:
+    - alfozan
+  tags:
+    - agents-api
+    - agents
+    - sandbox
+
+- title: Build a data analyst with the Agents API
+  path: examples/agents_api/apps/data_analyst/README.md
+  slug: agents-api-data-analyst
+  description: Investigate warehouse questions with read-only SQL, business context, and saved analyst corrections.
+  date: 2026-09-10
+  authors:
+    - alfozan
+  tags:
+    - agents-api
+    - agents
 
 - title: Combining security scanners with the Agents SDK
   path: examples/agents_sdk/security_scanners_with_agents_sdk.ipynb

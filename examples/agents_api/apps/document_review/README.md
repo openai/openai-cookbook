@@ -2,6 +2,14 @@
 
 Mount a folder of invoices and contracts alongside a reusable accounts-payable policy skill. A `gpt-5.6-luna` agent delegates each document to a specialist subagent, applies the discovered skill, writes individual reports plus a consolidated summary, and leaves every approval to a person.
 
+## Why use the Agents API?
+
+A batch review needs more than one answer in a chat. The Agents API coordinates
+specialist agents against a shared workspace and retains their command activity.
+Mounted files keep inputs separate from outputs, and a discovered skill gives
+each reviewer the same policy. Your application validates the reports and
+decides what happens next.
+
 ```mermaid
 sequenceDiagram
     participant Person
@@ -69,6 +77,139 @@ the extracted amounts match the source document and review the recommendation.
 
 Use an empty output folder for each run and unique document stems, such as `invoice-104.txt` and `contract-208.txt`. The names `summary` and `review-activity` are reserved.
 
+## Follow the implementation
+
+The excerpts below follow [agent.py](https://github.com/openai/openai-cookbook/blob/main/examples/agents_api/apps/document_review/agent.py) and [sandbox.py](https://github.com/openai/openai-cookbook/blob/main/examples/agents_api/apps/document_review/sandbox.py).
+Run the command above for the complete validation, activity export, and cleanup.
+
+### 1. Create a multi-agent review session
+
+The coordinator delegates documents to specialists. All reviewers discover the
+same mounted policy through `capability_directories`.
+
+```python
+from openai import AsyncOpenAI
+
+client = AsyncOpenAI()
+instructions = """\
+Coordinate a batch review of invoices and contracts in /workspace/input.
+Delegate documents to specialist subagents before reviewing them.
+Each specialist must apply $expense-review-policy and write its JSON report
+to /workspace/output/<document-stem>.json.
+Wait for all reviewers, then write /workspace/output/summary.json.
+Never approve a payment or sign a contract.
+"""
+session = await client.beta.agents.sessions.create(
+    agent={
+        "model": "gpt-5.6-luna",
+        "instructions": instructions,
+        "reasoning": {"effort": "high"},
+        "multi_agent": {"enabled": True, "max_concurrent_subagents": 4},
+    },
+    environment={
+        "type": "self_hosted",
+        "workspace_directory": "/workspace",
+        "capability_directories": ["/workspace/skills"],
+    },
+)
+```
+
+### 2. Mount inputs, policy, and outputs separately
+
+`start_executor` mounts the input folder and `skills/` read-only. Only the output
+folder is writable. The output directory stays on the host after cleanup.
+
+```python
+import asyncio
+from pathlib import Path
+from examples.agents_api.apps.document_review.sandbox import start_executor
+
+input_directory = Path("examples/agents_api/apps/document_review/sample_documents")
+output_directory = Path("review-output")
+output_directory.mkdir(exist_ok=True)
+
+environment = session.environment
+assert environment.type == "self_hosted"
+container = await asyncio.to_thread(
+    start_executor,
+    input_directory,
+    output_directory,
+    environment.id,
+    environment.remote_url,
+)
+```
+
+The helper runs `codex exec-server` with the returned connection values and
+injects `OPENAI_EXECUTOR_API_KEY` as `CODEX_API_KEY`. Replacing the mounted policy
+does not require rebuilding the image.
+
+### 3. Delegate the batch and follow progress
+
+Send the review task and watch for specialist creation and output events:
+
+```python
+prompt = """\
+Review every document in /workspace/input using specialist subagents.
+Each specialist must apply $expense-review-policy and include its policy_id
+and decision in the report. Wait for every review, write the consolidated
+summary, and explain the findings to the human approver.
+"""
+async with client.beta.agents.sessions.stream(session.id, input=prompt) as events:
+    async for event in events:
+        if event.type == "agent.session.subagent.created":
+            print(f"Specialist started: {event.subagent.id}")
+        elif event.type == "agent.session.turn.output_text.delta":
+            print(event.delta, end="", flush=True)
+        elif event.type in {
+            "agent.session.failed", "agent.session.turn.failed", "error",
+            "agent.session.turn.cancelled",
+        }:
+            raise RuntimeError(f"Review did not finish: {event.to_dict()}")
+```
+
+The app checks that specialists were created and that every source document has
+a report. Enabling multi-agent execution is not, by itself, proof that work was
+delegated.
+
+### 4. Validate the reports before presenting them
+
+Load the generated JSON and apply the application's validation:
+
+```python
+import json
+from examples.agents_api.apps.document_review.agent import validate_review
+
+reviews = []
+for document in sorted(input_directory.iterdir()):
+    if not document.is_file():
+        continue
+    report = json.loads((output_directory / f"{document.stem}.json").read_text())
+    validate_review(report, document.name)
+    reviews.append({"report": report, "status": "awaiting_approval"})
+
+summary = json.loads((output_directory / "summary.json").read_text())
+```
+
+For invoices, validation recomputes the total from extracted line items and
+shipping. It cannot establish that extraction matched the original document;
+that still needs review. The included invoice should flag a $900 overcharge,
+a missing purchase order, and changed bank details.
+
+### 5. Keep the artifacts and release compute
+
+Export retained command activity before deleting the session, as shown below.
+Then attempt both cleanup operations:
+
+```python
+try:
+    await client.beta.agents.sessions.delete(session.id)
+finally:
+    await asyncio.to_thread(container.remove, force=True)
+```
+
+Close the OpenAI client after cleanup. Reports remain in `review-output`; a
+person reviews them before any payment or contract decision.
+
 ## Inspect retained command activity
 
 Before deleting the session, the app exports retained commands from the coordinator
@@ -114,6 +255,6 @@ Replace the included skill with your team's own accounts-payable or contract-rev
 
 ## Files
 
-- [main.py](main.py): Command-line arguments and the batch summary.
-- [agent.py](agent.py): Specialist reviews, report validation, and activity export.
-- [sandbox.py](sandbox.py): Document, artifact, and skill mounts.
+- [main.py](https://github.com/openai/openai-cookbook/blob/main/examples/agents_api/apps/document_review/main.py): Command-line arguments and the batch summary.
+- [agent.py](https://github.com/openai/openai-cookbook/blob/main/examples/agents_api/apps/document_review/agent.py): Specialist reviews, report validation, and activity export.
+- [sandbox.py](https://github.com/openai/openai-cookbook/blob/main/examples/agents_api/apps/document_review/sandbox.py): Document, artifact, and skill mounts.

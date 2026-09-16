@@ -1,25 +1,26 @@
 # Agents API examples
 
-Complete applications and sandbox integrations for the Agents API.
+Complete applications and sandbox integrations for the Agents API. Each application
+README walks through the implementation and explains how to run it.
 
 ## Applications
 
 | Example | What it does |
 | --- | --- |
-| [Incident response](apps/sev_bot/README.md) | Investigate alerts and request approval for recovery actions. |
-| [Slack bot](apps/slack_bot/README.md) | Answer requests using conversation history and connected workplace tools. |
-| [Data analyst](apps/data_analyst/README.md) | Answer questions with read-only warehouse queries. |
-| [GitHub issue investigator](apps/github_issues/README.md) | Reproduce reported bugs and prepare findings for GitHub. |
-| [Document reviewer](apps/document_review/README.md) | Review invoices and contracts with policy skills and specialist agents. |
+| [SRE bot](https://github.com/openai/openai-cookbook/tree/main/examples/agents_api/apps/sev_bot) | Investigate alerts and request approval for recovery actions. |
+| [Slack bot](https://github.com/openai/openai-cookbook/tree/main/examples/agents_api/apps/slack_bot) | Answer requests using conversation history and connected workplace tools. |
+| [Data analyst](https://github.com/openai/openai-cookbook/tree/main/examples/agents_api/apps/data_analyst) | Answer questions with read-only warehouse queries. |
+| [GitHub issue investigator](https://github.com/openai/openai-cookbook/tree/main/examples/agents_api/apps/github_issues) | Reproduce reported bugs and prepare findings for GitHub. |
+| [Document reviewer](https://github.com/openai/openai-cookbook/tree/main/examples/agents_api/apps/document_review) | Review invoices and contracts with policy skills and specialist agents. |
 
 ## Sandbox integrations
 
-- [Application-managed](sandboxes/application_managed/README.md): your application
+- [Application-managed](https://github.com/openai/openai-cookbook/tree/main/examples/agents_api/sandboxes/application_managed): your application
   starts and stops the sandbox directly.
-- [Webhook-managed](sandboxes/webhook_managed/README.md): a deployed handler
+- [Webhook-managed](https://github.com/openai/openai-cookbook/tree/main/examples/agents_api/sandboxes/webhook_managed): a deployed handler
   provisions the sandbox while a shared client calls the Agents API.
 
-See the [sandbox overview](sandboxes/README.md) to choose a provisioning mode.
+See the [sandbox overview](https://github.com/openai/openai-cookbook/tree/main/examples/agents_api/sandboxes) to choose a provisioning mode.
 
 ## Run an example
 

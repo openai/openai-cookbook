@@ -1,12 +1,13 @@
 # Agents API examples
 
-Complete applications and sandbox integrations for the Agents API.
+Complete applications and sandbox integrations for the Agents API. Each application
+README walks through the implementation and explains how to run it.
 
 ## Applications
 
 | Example | What it does |
 | --- | --- |
-| [Incident response](apps/sev_bot/README.md) | Investigate alerts and request approval for recovery actions. |
+| [SRE bot](apps/sev_bot/README.md) | Investigate alerts and request approval for recovery actions. |
 | [Slack bot](apps/slack_bot/README.md) | Answer requests using conversation history and connected workplace tools. |
 | [Data analyst](apps/data_analyst/README.md) | Answer questions with read-only warehouse queries. |
 | [GitHub issue investigator](apps/github_issues/README.md) | Reproduce reported bugs and prepare findings for GitHub. |

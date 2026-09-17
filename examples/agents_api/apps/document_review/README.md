@@ -10,23 +10,7 @@ Mounted files keep inputs separate from outputs, and a discovered skill gives
 each reviewer the same policy. Your application validates the reports and
 decides what happens next.
 
-```mermaid
-sequenceDiagram
-    participant Person
-    participant App as Review command
-    participant Agent as Agents API
-    participant Reviewers as Specialist subagents
-    participant Policy as Mounted review skill
-    participant Workspace as Mounted input/output folders
-    Person->>App: Submit a folder of invoices and contracts
-    App->>Agent: Create one multi-agent session
-    App->>Workspace: Mount input and policy read-only; output read-write
-    Agent->>Reviewers: Delegate one document to each specialist
-    Reviewers->>Policy: Discover and apply expense-review-policy
-    Reviewers->>Workspace: Write individual JSON reports
-    Agent->>Workspace: Write the consolidated summary
-    App-->>Person: Write findings for human review
-```
+![Document review workflow: mount documents and a review skill, delegate to specialist subagents, and write individual reports and a consolidated summary.](assets/workflow.svg)
 
 ## What you need
 

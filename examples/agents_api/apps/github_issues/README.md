@@ -9,21 +9,7 @@ An Agents API session gives the agent access to the checked-out repository and
 test commands. Your application verifies the trigger, posts the report, and
 releases the workspace. Each issue gets its own sandbox.
 
-```mermaid
-sequenceDiagram
-    participant User
-    participant GitHub
-    participant App as Webhook receiver
-    participant Agent as Agents API
-    participant Sandbox
-    User->>GitHub: Open a new issue
-    GitHub->>App: Send a signed issues.opened webhook
-    App->>Agent: Create a self-hosted session
-    App->>Sandbox: Clone the repository and start the executor
-    Agent->>Sandbox: Inspect code and reproduce the bug
-    Agent-->>App: Root cause and suggested fix
-    App-->>GitHub: Post the investigation as a comment
-```
+![GitHub investigation workflow: receive an issue webhook, inspect the repository in a sandbox, and post findings on the issue.](assets/workflow.svg)
 
 ## What you need
 

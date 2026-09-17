@@ -11,32 +11,7 @@ deduplication, responder permissions, historical incident records, and cleanup.
 
 This example records rollback approval but never executes a deployment.
 
-```mermaid
-sequenceDiagram
-    participant Alert as PagerDuty / incident.io
-    participant Slack as Slack #oncall
-    participant App as Incident bot
-    participant Agent as Agents API
-    participant Sandbox as Incident sandbox + AWS skills
-    participant Evidence as GitHub + AWS + incident history
-    Alert->>App: Send production incident
-    App->>Slack: Open an incident thread
-    App->>Agent: Create one persistent incident session
-    App->>Sandbox: Start codex exec-server with preinstalled AWS skills
-    Agent->>Sandbox: Read relevant skills and the mounted runbook
-    Agent->>Evidence: Inspect code, infrastructure, and previous incidents
-    Evidence-->>Agent: Return correlated operational evidence
-    Agent-->>App: agent.session.action_required webhook
-    App->>Agent: Retrieve the pending function call
-    App->>Slack: Post rollback approval buttons
-    Slack-->>App: Approve or reject
-    App->>Agent: Submit the decision as a tool result
-    Agent-->>Slack: Explain the decision and next steps
-    Slack-->>App: Ask a follow-up
-    App->>Agent: Reuse the incident session for follow-ups
-    App->>Agent: Save the resolution and close the session
-    App->>Sandbox: Remove the incident sandbox
-```
+![Incident response workflow: receive an alert, investigate evidence, request rollback approval in Slack, save incident memory, and clean up.](assets/workflow.svg)
 
 ## What you need
 

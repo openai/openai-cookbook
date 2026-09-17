@@ -13,24 +13,7 @@ This example draws on [OpenAI's in-house data agent](https://openai.com/index/in
 ground the analysis in real schemas, supply business context, expose the SQL,
 and reuse corrections the team has explicitly saved.
 
-```mermaid
-sequenceDiagram
-    participant Person
-    participant App as Your application
-    participant Agent as Agents API
-    participant Warehouse as Read-only warehouse
-    participant Memory as Analyst memory
-
-    Person->>App: Why did paid conversions drop last week?
-    App->>Agent: Start or resume the user's session
-    Agent->>Warehouse: Discover tables and inspect their schemas
-    Agent->>App: Check definitions, company knowledge, and past queries
-    Agent->>Memory: Find saved analyst corrections
-    Agent->>Warehouse: Execute and verify read-only SQL
-    Agent-->>Person: Explain the findings, sources, and assumptions
-    Person->>Agent: Remember to exclude manually provisioned accounts.
-    Agent->>Memory: Save the correction for future analyses
-```
+![Data analyst workflow: inspect warehouse schemas, verify read-only SQL, explain findings, and save analyst corrections for future questions.](assets/workflow.svg)
 
 ## What you need
 

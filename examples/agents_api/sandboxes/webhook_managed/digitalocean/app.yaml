@@ -1,0 +1,30 @@
+name: agents-api-webhook-digitalocean
+services:
+  - name: controller
+    instance_count: 1
+    instance_size_slug: apps-s-1vcpu-0.5gb
+    http_port: 8080
+    source_dir: /
+    dockerfile_path: examples/agents_api/sandboxes/webhook_managed/digitalocean/Dockerfile
+    github:
+      repo: <your-org>/<your-repo>
+      branch: main
+      deploy_on_push: true
+    health_check:
+      http_path: /health
+    envs:
+      - key: OPENAI_API_KEY
+        type: SECRET
+        scope: RUN_TIME
+      - key: OPENAI_AGENT_ID
+        scope: RUN_TIME
+      - key: OPENAI_EXECUTOR_API_KEY
+        type: SECRET
+        scope: RUN_TIME
+      - key: OPENAI_WEBHOOK_SECRET
+        type: SECRET
+        scope: RUN_TIME
+        value: pending-webhook-registration
+      - key: DIGITALOCEAN_TOKEN
+        type: SECRET
+        scope: RUN_TIME

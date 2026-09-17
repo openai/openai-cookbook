@@ -1,0 +1,17 @@
+[dataset]
+path = "data/scenarios.json"
+
+[execution]
+concurrency = 1
+max_examples = 0
+verbose = false
+response_timeout_seconds = 30.0
+
+[audio]
+chunk_ms = 20
+sample_rate_hz = 24000
+real_time = true
+
+[assistant]
+mode = "responses"
+endpoint = ""

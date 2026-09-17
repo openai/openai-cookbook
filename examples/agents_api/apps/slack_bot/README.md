@@ -12,21 +12,7 @@ application controls Slack access, workplace credentials, and the sandbox
 lifecycle. A follow-up can continue the investigation without repeating the
 original context.
 
-```mermaid
-sequenceDiagram
-    participant Person
-    participant Slack
-    participant Agent as Agents API
-    participant Tools as Slack tools and shared apps
-    participant Sandbox as Thread sandbox
-    Person->>Slack: @Agent Teammate Investigate this issue
-    Slack->>Agent: Create or resume the thread's session
-    Agent->>Tools: Search Slack, Notion, Drive, or GitHub
-    Agent->>Sandbox: Analyze data or prepare repository changes
-    Agent-->>Slack: Stream progress and reply in the thread
-    Person->>Slack: @Agent Teammate Open a pull request
-    Slack->>Agent: Continue the same session
-```
+![Slack bot workflow: create or resume a thread session, search connected tools, work in a sandbox, and respond to follow-up requests.](assets/workflow.svg)
 
 ## What you need
 

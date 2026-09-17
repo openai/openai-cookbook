@@ -3,6 +3,21 @@
 # You can optionally customize how your information shows up cookbook.openai.com over here.
 # If your information is not present here, it will be pulled from your GitHub profile.
 
+hreh-oai:
+  name: "Hunter Reh"
+  website: "https://www.linkedin.com/in/hreh"
+  avatar: "https://avatars.githubusercontent.com/u/284132605?v=4"
+
+the-OAI:
+  name: "Tiger He"
+  website: "https://www.linkedin.com/in/tiger-he-b71842164/"
+  avatar: "https://avatars.githubusercontent.com/u/286157113?v=4"
+
+talaniz-oai:
+  name: "Tony Alaniz"
+  website: "https://github.com/talaniz-oai"
+  avatar: "https://avatars.githubusercontent.com/u/293961948?v=4"
+
 neilh-oai:
   name: "Neil Hansaria"
   website: "https://www.linkedin.com/in/neilhansaria"
@@ -632,3 +647,32 @@ deepakjain108:
   name: "Deepak Jain"
   website: "https://github.com/deepakjain108"
   avatar: "https://avatars.githubusercontent.com/u/301830121?v=4"
+
+rohan-eliza:
+  name: "Rohan Awasthi (Eliza)"
+  website: "https://www.linkedin.com/in/rohan-awasthi-4a5208233/"
+  avatar: "https://avatars.githubusercontent.com/u/289821109?v=4"
+
+chuck-eliza:
+  name: "Chuck Hernandez (Eliza)"
+  website: "https://www.linkedin.com/in/chuck-hernandez/"
+  avatar: "https://avatars.githubusercontent.com/u/275752829?v=4"
+
+syedahmed-oai:
+  name: "Syed Ahmed (OpenAI)"
+  website: "https://www.linkedin.com/in/syed-a-usanaemeaapeastwest/"
+  avatar: "https://avatars.githubusercontent.com/u/276788008?v=4"
+
+smcateer-eliza:
+  name: "Steven McAteer (Eliza)"
+  website: "https://www.linkedin.com/in/steven-mcateer/"
+  avatar: "https://avatars.githubusercontent.com/u/249808607?v=4"
+karsten-oai:
+  name: "Karsten Schroer"
+  website: "https://github.com/karsten-oai"
+  avatar: "https://avatars.githubusercontent.com/u/301073797?v=4"
+
+kait-oai:
+  name: "Kait Healy"
+  website: "https://github.com/kait-oai"
+  avatar: "https://avatars.githubusercontent.com/u/315979790?v=4"

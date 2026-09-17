@@ -1,0 +1,23 @@
+ASSISTANT 1180..3320ms: Hi, I'm John from Acme. How can I help you today?
+USER 4840..8100ms: Hi John! I was hoping to book a table on August 7th, if that's possible.
+DELEGATION 8400ms: target=client
+ASSISTANT 9800..10840ms: Sure, let me check that for you.
+BACKEND 10600ms: target=responses status=completed result="Sure—what time would you like, for how many guests, and under what name?"
+BACKEND 10600ms: target=responses status=completed
+BACKEND 10600ms: target=client status=completed result="Sure—what time would you like, for how many guests, and under what name?"
+ASSISTANT 11640..14780ms: Sure. What time would you like, for how many guests, and under what name?
+USER 16280..19120ms: 7 p.m., please, for two under Maya.
+DELEGATION 19600ms: target=client
+ASSISTANT 20920..21580ms: Checking that now.
+TOOL 21060ms: name=create_reservation status=in_progress
+TOOL 21800ms: name=create_reservation status=completed arguments={"date":"2026-08-07","guest_name":"Maya","party_size":2,"seating":"","time":"19:00"}
+BACKEND 21800ms: target=responses status=completed
+TOOL 21800ms: name=create_reservation status=called arguments={"date":"2026-08-07","guest_name":"Maya","party_size":2,"time":"19:00"}
+TOOL 21820ms: name=create_reservation status=completed arguments={"date":"2026-08-07","guest_name":"Maya","party_size":2,"time":"19:00"} result={"cancelled":false,"date":"2026-08-07","guest_name":"Maya","ok":true,"party_size":2,"reservation_created":true,"reservation_id":"R-001","time":"19:00"}
+BACKEND 23240ms: target=responses status=completed result="Your reservation is confirmed for Maya on August 7 at 7:00 PM for two. Your confirmation number is R-001."
+BACKEND 23260ms: target=responses status=completed
+BACKEND 23280ms: target=client status=completed result="Your reservation is confirmed for Maya on August 7 at 7:00 PM for two. Your confirmation number is R-001."
+ASSISTANT 24240..28360ms: All set, Maya. You're confirmed for August 7th at 7 p.m. for two.
+ASSISTANT 28980..31580ms: Your confirmation number is R-001.
+USER 33300..36400ms: Wonderful. Thanks so much. Have a great day!
+ASSISTANT 37440..38400ms: You're welcome! You too.

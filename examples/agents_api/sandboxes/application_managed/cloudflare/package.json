@@ -1,0 +1,17 @@
+{
+  "name": "agents-api-application-cloudflare",
+  "private": true,
+  "type": "module",
+  "scripts": {
+    "check": "tsc --noEmit",
+    "deploy": "wrangler deploy"
+  },
+  "dependencies": {
+    "@cloudflare/sandbox": ">=0.12.8 <1"
+  },
+  "devDependencies": {
+    "@cloudflare/workers-types": ">=4.20260702.1",
+    "typescript": ">=5.9 <6",
+    "wrangler": ">=4.90.0 <5"
+  }
+}

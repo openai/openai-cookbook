@@ -21,10 +21,10 @@
     - retrieval
     - structured-outputs
 
-- title: Agents API applications and sandbox integrations
-  path: examples/agents_api/README.md
-  slug: agents-api-examples
-  description: Explore complete Agents API applications and application-managed or webhook-managed sandbox integrations.
+- title: Build an SRE agent for incident response
+  path: examples/agents_api/apps/sev_bot/README.md
+  slug: agents-api-sev-bot
+  description: Investigate incidents in Slack using service telemetry, GitHub, AWS, and past incident reports, with human review before recovery.
   date: 2026-09-10
   authors:
     - alfozan
@@ -32,6 +32,29 @@
     - agents-api
     - agents
     - sandbox
+
+- title: Build a Slack bot with the Agents API
+  path: examples/agents_api/apps/slack_bot/README.md
+  slug: agents-api-slack-bot
+  description: Connect Slack threads to persistent agent sessions, workplace tools, and isolated sandboxes.
+  date: 2026-09-10
+  authors:
+    - alfozan
+  tags:
+    - agents-api
+    - agents
+    - sandbox
+
+- title: Build a data analyst with the Agents API
+  path: examples/agents_api/apps/data_analyst/README.md
+  slug: agents-api-data-analyst
+  description: Investigate warehouse questions with read-only SQL, business context, and saved analyst corrections.
+  date: 2026-09-10
+  authors:
+    - alfozan
+  tags:
+    - agents-api
+    - agents
 
 - title: Combining security scanners with the Agents SDK
   path: examples/agents_sdk/security_scanners_with_agents_sdk.ipynb
@@ -146,6 +169,27 @@
     - bedrock
     - security
     - payments
+
+- title: Build a ChatGPT plugin with the OpenAI Agents SDK and Amazon Bedrock AgentCore
+  path: examples/partners/AWS/chatgpt_agents_sdk_aws_agentcore_cookbook/notebooks/chatgpt_agents_sdk_aws_agentcore_cookbook.ipynb
+  slug: chatgpt-agents-sdk-amazon-bedrock-agentcore
+  description: Build a private ChatGPT flight-assistant plugin with the OpenAI Agents SDK on Amazon Bedrock, connect it through Secure MCP Tunnel, and validate tracing and Promptfoo evaluations.
+  date: 2026-09-03
+  authors:
+    - rohan-eliza
+    - chuck-eliza
+    - syedahmed-oai
+    - smcateer-eliza
+  tags:
+    - partners
+    - chatgpt
+    - agents-sdk
+    - agents
+    - bedrock
+    - mcp
+    - tracing
+    - evals
+
 - title: Enabling Long-Term Agent Memory with Oracle AI Agent Memory
   path: examples/vector_databases/oracle_db/deep_research_openai_agents.ipynb
   slug: deep-research-openai-agents

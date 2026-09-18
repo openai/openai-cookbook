@@ -1,0 +1,31 @@
+{
+  "captured_at": "2026-08-25T16:08:05.398360+00:00",
+  "customer_repositories_mounted": 0,
+  "evidence_kind": "offline-version-and-help-only",
+  "format": "recorded-codex-security-cli-help/v1",
+  "installed_on_reader_machine": false,
+  "isolation": {
+    "cap_drop": [
+      "ALL"
+    ],
+    "network": "none",
+    "no_new_privileges": true,
+    "read_only_rootfs": true,
+    "user": "65532:65532"
+  },
+  "licence": "Apache-2.0",
+  "node_version": "24.14.0",
+  "package_name": "@openai/codex-security",
+  "package_version": "0.1.20",
+  "paid_calls": 0,
+  "provider_writes": 0,
+  "recordings_sha256": {
+    "bulk-help.stdout.txt": "9333e09ba90e8b6186ee7ff992464cdb1527ed1f0acd6a28e289fadc104960f4",
+    "scan-help.stdout.txt": "6f467fd3844a7ae0dc18c69406c7054d3cdf2b8b6ab86082afa570bcb09615dc",
+    "version.stdout.txt": "a93167bc7b1e6cf2ffcbba0f51fea8122c7e61252cefe1f5152bee90beacd8b4"
+  },
+  "release_asset_sha256": "dcfa15702674f1bcdbcf979efe9d1a65a843d50e2560e9a695facacded673414",
+  "release_url": "https://github.com/openai/codex-security/releases/tag/npm-v0.1.20",
+  "scans_executed": 0,
+  "source_commit": "59d026a0579af084b419cd7f33b8e1b867338ee8"
+}

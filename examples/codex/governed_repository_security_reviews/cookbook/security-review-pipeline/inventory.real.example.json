@@ -1,0 +1,52 @@
+{
+  "repositories": [
+    {
+      "repo_id": "example-company/payments-api",
+      "repository_url": "https://git.example.invalid/example-company/payments-api.git",
+      "commit_sha": "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa",
+      "owner": "payments-service-owner",
+      "language": "python",
+      "framework": "fastapi",
+      "topology": "container",
+      "data_class": "confidential",
+      "exposure": "private",
+      "authentication": "service_identity",
+      "dependencies": ["payments-core"],
+      "criticality": "high",
+      "controls": ["audit_logging", "encryption_at_rest"],
+      "changed_paths": ["src/service.py"]
+    },
+    {
+      "repo_id": "example-company/edge-auth",
+      "repository_url": "https://git.example.invalid/example-company/edge-auth.git",
+      "commit_sha": "bbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbb",
+      "owner": "edge-service-owner",
+      "language": "typescript",
+      "framework": "express",
+      "topology": "container",
+      "data_class": "restricted",
+      "exposure": "internet",
+      "authentication": "oidc",
+      "dependencies": ["auth-core"],
+      "criticality": "critical",
+      "controls": ["audit_logging", "encryption_at_rest"],
+      "changed_paths": ["src/service.py"]
+    },
+    {
+      "repo_id": "example-company/analytics-worker",
+      "repository_url": "https://git.example.invalid/example-company/analytics-worker.git",
+      "commit_sha": "cccccccccccccccccccccccccccccccccccccccc",
+      "owner": "analytics-service-owner",
+      "language": "go",
+      "framework": "stdlib",
+      "topology": "worker",
+      "data_class": "internal",
+      "exposure": "private",
+      "authentication": "service_identity",
+      "dependencies": ["analytics-core"],
+      "criticality": "medium",
+      "controls": ["audit_logging"],
+      "changed_paths": ["src/service.go"]
+    }
+  ]
+}

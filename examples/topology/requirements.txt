@@ -1,0 +1,7 @@
+topoattack @ ../../.
+sentence-transformers>=2.2
+transformers>=4.40
+openai>=1.30
+ripser>=0.6.4
+matplotlib>=3.8
+jupyter>=1.0

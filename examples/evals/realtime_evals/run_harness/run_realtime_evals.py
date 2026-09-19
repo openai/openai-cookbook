@@ -31,6 +31,7 @@ if str(ROOT_DIR) not in sys.path:
 
 from shared.graders import compute_tool_call_grade
 from shared.metrics_utils import add_grade_means, add_numeric_summaries, order_columns
+from shared.path_utils import InvalidPathComponentError, validate_safe_path_component, validate_safe_relative_path
 from shared.plotting_utils import build_realtime_eval_plots
 from shared.realtime_harness_utils import (
     RealtimeResponseError,
@@ -106,10 +107,8 @@ def parse_args() -> argparse.Namespace:
 def resolve_path(path_value: str, base_dir: Path) -> Path:
     if not path_value:
         raise ValueError("Path value is empty")
-    candidate = Path(path_value)
-    if not candidate.is_absolute():
-        candidate = base_dir / candidate
-    return candidate
+    # Validate that the path is a safe relative path within the base directory
+    return validate_safe_relative_path(path_value, base_dir, "path")
 
 
 def load_system_prompt(path: Path) -> str:
@@ -126,6 +125,9 @@ def load_simulation_index(path: Path) -> pd.DataFrame:
     missing = required_columns.difference(data.columns)
     if missing:
         raise ValueError(f"Missing required columns: {sorted(missing)}")
+    # Validate all simulation_ids upfront to fail fast on bad data
+    for _, row in data.iterrows():
+        validate_safe_path_component(str(row["simulation_id"]), "simulation_id")
     return data
 
 
@@ -164,7 +166,10 @@ def build_failed_simulation_result(
     run_dir: Path,
     error_info: EvalErrorInfo,
 ) -> RunSimulationResult:
-    simulation_id = str(simulation_row.get("simulation_id", "")).strip() or "unknown"
+    simulation_id = validate_safe_path_component(
+        str(simulation_row.get("simulation_id", "")).strip() or "unknown",
+        "simulation_id",
+    )
     run_audio_dir = run_dir / "audio" / simulation_id
     trace_path = run_dir / "events" / f"{simulation_id}.jsonl"
     row = RunTurnResult(
@@ -467,8 +472,9 @@ async def run_simulation(
     )
     simulation = load_simulation(simulation_path)
 
-    simulation_id = simulation.get(
-        "simulation_id", str(simulation_row["simulation_id"])
+    simulation_id = validate_safe_path_component(
+        simulation.get("simulation_id", str(simulation_row["simulation_id"])),
+        "simulation_id",
     )
     scenario = simulation.get("scenario", "")
 

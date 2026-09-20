@@ -1,0 +1,225 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Apportion a 2,000-credit monthly allocation</title>
+  <style>
+    :root { color-scheme: light; font-family: system-ui, sans-serif; color: #172b34; background: #f7f7f4; }
+    * { box-sizing: border-box; }
+    [hidden] { display: none !important; }
+    body { margin: 0; padding: 28px 22px; }
+    main { max-width: 1040px; margin: auto; }
+    h1, h2, p { margin-top: 0; }
+    h1 { font-size: clamp(1.75rem, 2.5vw, 2rem); font-weight: 600; line-height: 1.25; max-width: 36ch; margin-bottom: 16px; letter-spacing: -.02em; }
+    p { line-height: 1.55; }
+    .intro { font-size: 1.12rem; max-width: 70ch; color: #43575e; }
+    .eyebrow { font-size: .8rem; font-weight: 750; text-transform: uppercase; letter-spacing: .09em; color: #526269; margin-bottom: 22px; }
+    .allocation { font-size: .92rem; font-weight: 650; color: #43575e; margin: 3px 0 24px; }
+    .weeks { display: grid; grid-template-columns: repeat(4, 1fr); gap: 14px; margin: 0 0 26px; }
+    .week, .panel { background: white; border: 1px solid #c8d3d4; border-radius: 16px; padding: 22px; }
+    .week.problem { background: #fcebe7; border-color: #d29a8f; }
+    .week h2 { font-size: 1.04rem; margin: 0 0 23px; }
+    .week .number { display: block; font-size: clamp(2rem, 4vw, 2.7rem); font-weight: 750; line-height: 1.1; }
+    .week .label { display: block; margin: 9px 0 19px; }
+    .week.problem .number { color: #9b382b; }
+    .track { background: #e5eaeb; height: 16px; border-radius: 4px; overflow: hidden; }
+    .track .spent { background: #ac4939; width: 100%; height: 100%; }
+    .question { font-size: 1.2rem; font-weight: 650; margin-bottom: 18px; }
+    button { border: 0; border-radius: 8px; padding: 12px 19px; background: #172b34; color: white; font: inherit; font-weight: 650; cursor: pointer; }
+    button.secondary { background: white; color: #172b34; border: 1px solid #9caeb2; }
+    button:disabled { opacity: .45; cursor: default; }
+    :focus-visible { outline: 3px solid #1446b1; outline-offset: 4px; }
+    h1:focus { outline: none; }
+    .actions { display: flex; gap: 12px; flex-wrap: wrap; }
+    .grid { display: grid; grid-template-columns: 1fr 1.15fr; gap: 20px; margin: 0 0 20px; }
+    .panel h2 { font-size: 1.15rem; margin-bottom: 18px; }
+    label { display: block; font-weight: 650; margin: 20px 0 9px; }
+    select, input[type=number] { font: inherit; color: inherit; border: 1px solid #7d969e; border-radius: 7px; padding: 10px; background: white; width: 100%; }
+    input[type=range] { width: 100%; accent-color: #14805e; }
+    .hint { font-size: .9rem; color: #526269; margin: 10px 0 18px; }
+    .figures { display: grid; grid-template-columns: 1fr 1fr; gap: 14px; }
+    .figure { background: #edf5f0; border-radius: 10px; padding: 17px 14px; }
+    .figure .number { display: block; font-size: clamp(1.8rem, 3.2vw, 2.7rem); line-height: 1.15; font-weight: 750; margin: 8px 0; }
+    .figure .label { font-size: .88rem; }
+    .figure.available { background: #e2f3e9; }
+    .meter { display: flex; height: 26px; border-radius: 6px; overflow: hidden; background: #e5eaeb; margin: 24px 0 10px; }
+    .used-color { background: #365d6b; }.available-color { background: #14805e; }
+    .legend { display: flex; flex-wrap: wrap; gap: 13px; margin-bottom: 18px; font-size: .84rem; }
+    .dot { display: inline-block; width: 10px; height: 10px; border-radius: 2px; margin-right: 4px; }
+    .equation { font-size: 1rem; font-weight: 650; margin-bottom: 12px; }
+    .callout { border-left: 4px solid #14805e; padding: 12px 18px; background: #edf5f0; font-size: .95rem; }
+    .error { color: #9b382b; font-weight: 650; }
+    details { margin: 20px 0; }
+    summary { font-weight: 650; cursor: pointer; padding: 8px 0; }
+    table { border-collapse: collapse; width: 100%; font-size: .95rem; }
+    th, td { text-align: left; padding: 10px 12px; border-bottom: 1px solid #cad5d1; }
+    th { background: #edf5f0; }
+    .table-wrap { overflow-x: auto; }
+    .footer { font-size: .86rem; color: #526269; margin-top: 24px; }
+    a { color: #1657a4; }
+    @media (max-width: 730px) { .grid { grid-template-columns: 1fr; } .weeks { grid-template-columns: repeat(2, 1fr); } body { padding: 22px 14px; } .week, .panel { padding: 19px; } }
+    @media (max-width: 380px) { .figures { grid-template-columns: 1fr; } }
+  </style>
+</head>
+<body>
+  <main>
+    <section id="problem" aria-labelledby="problem-title">
+      <div class="eyebrow">1 of 2 · The problem</div>
+      <h1 id="problem-title" tabindex="-1">A monthly allocation can run out in week one.</h1>
+      <p class="intro">One person gets 2,000 credits for the month and uses them all in the first week. There is no capacity left for the rest of the month.</p>
+      <div class="allocation">One person · 2,000 credits per month</div>
+      <div class="weeks" aria-label="Example: all 2,000 credits are used in week one">
+        <div class="week problem"><h2>Week 1</h2><span class="number">2,000</span><span class="label">credits used</span><div class="track" aria-hidden="true"><div class="spent"></div></div></div>
+        <div class="week"><h2>Week 2</h2><span class="number">0</span><span class="label">credits available</span><div class="track" aria-hidden="true"></div></div>
+        <div class="week"><h2>Week 3</h2><span class="number">0</span><span class="label">credits available</span><div class="track" aria-hidden="true"></div></div>
+        <div class="week"><h2>Week 4</h2><span class="number">0</span><span class="label">credits available</span><div class="track" aria-hidden="true"></div></div>
+      </div>
+      <p class="question">What if the same allocation became available in smaller portions?</p>
+      <button id="show-plan" type="button" disabled>Next: choose a release plan →</button>
+      <noscript><p><a href="release-timeline.svg">See how four weekly portions of 500 credits work.</a></p></noscript>
+    </section>
+    <section id="solution" aria-labelledby="solution-title" hidden>
+      <div class="eyebrow">2 of 2 · Choose the amount and cadence</div>
+      <h1 id="solution-title" tabindex="-1">Apportion the same 2,000 credits.</h1>
+      <p class="intro">Release 500 each week, 1,000 every two weeks, or smaller amounts each day. Choose the pattern that fits how your organization works.</p>
+      <div class="allocation">One person · 2,000 credits per month · 30-day example</div>
+      <div class="grid">
+        <section class="panel" aria-labelledby="plan-title">
+          <h2 id="plan-title">Choose a release plan</h2>
+          <label for="preset">Amount and cadence</label>
+          <select id="preset">
+            <option value="weekly" selected>500 credits each week</option>
+            <option value="fortnightly">1,000 credits every two weeks</option>
+            <option value="daily">67 credits each day</option>
+            <option value="custom">Set my own increment</option>
+          </select>
+          <div id="custom-controls" hidden>
+            <label for="interval">Hours between releases</label>
+            <input id="interval" type="number" min="1" max="744" step="1" value="168" required>
+            <label for="start">Initial release in credits</label>
+            <input id="start" type="number" min="1" max="2000" step="1" value="500" required>
+            <label for="increment">Credits per later release</label>
+            <input id="increment" type="number" min="1" max="2000" step="1" value="500" required>
+          </div>
+          <p id="plan-summary" class="hint">500 on days 1, 8, 15, and 22. Total: 2,000 credits.</p>
+          <label for="elapsed">Move through the month: <output id="day" for="elapsed">Day 1</output></label>
+          <input id="elapsed" type="range" min="0" max="719" step="1" value="0">
+          <div class="actions"><button id="advance" type="button">Next release</button><button id="reset" type="button" class="secondary">Back to day 1</button></div>
+        </section>
+        <section class="panel" aria-labelledby="budget-title">
+          <h2 id="budget-title">This person's budget today</h2>
+          <div class="figures">
+            <div class="figure"><span class="label">Released so far</span><span id="released" class="number">500</span><span class="label">of 2,000 credits</span></div>
+            <div class="figure available"><span class="label">Available now</span><span id="available" class="number">500</span><span class="label">credits after usage</span></div>
+          </div>
+          <label for="used">Credits used so far this month</label>
+          <input id="used" type="number" min="0" max="500" step="1" value="0" required>
+          <div class="meter" aria-hidden="true"><span id="used-bar" class="used-color"></span><span id="available-bar" class="available-color"></span></div>
+          <div class="legend" aria-hidden="true"><span><span class="dot used-color"></span>Used</span><span><span class="dot available-color"></span>Available now</span><span><span class="dot" style="background:#e5eaeb"></span>For later release</span></div>
+          <div role="status" aria-live="polite" aria-atomic="true"><p id="equation" class="equation">500 released − 0 used = 500 available</p><p id="next" class="hint">The next 500 credits become available on day 8.</p></div>
+        </section>
+      </div>
+      <p class="callout"><strong>Unused released credits remain available during the month.</strong> Each release adds to the amount this person can use from the same 2,000-credit allocation.</p>
+      <details>
+        <summary>See every release in this plan</summary>
+        <div class="table-wrap"><table><caption class="hint">One person's 2,000-credit monthly allocation</caption><thead><tr><th scope="col">When</th><th scope="col">Newly released</th><th scope="col">Released so far</th></tr></thead><tbody id="schedule"></tbody></table></div>
+      </details>
+      <div class="actions"><button id="show-problem" type="button" class="secondary">← Back to the problem</button></div>
+    </section>
+    <p class="footer">Illustrative credit example · <a id="cookbook-link" href="../README.md">Read the Cookbook</a> · <a href="release-timeline.svg">View the weekly plan</a></p>
+  </main>
+  <script>
+    'use strict';
+    const ALLOCATION = 2000;
+    const MONTH_HOURS = 720;
+    const element = id => document.getElementById(id);
+    if (window.location.pathname.startsWith('/cookbook/assets/')) {
+      element('cookbook-link').href = '/cookbook/examples/chatgpt/daily_usage_limits/readme';
+    }
+    const number = value => value.toLocaleString('en-US');
+    const presets = { weekly: { interval: 168, start: 500, increment: 500 }, fortnightly: { interval: 336, start: 1000, increment: 1000 }, daily: { interval: 24, start: 67, increment: 67 } };
+    const atHour = hour => `day ${Math.floor(hour / 24) + 1}${hour % 24 ? ` at ${String(hour % 24).padStart(2, '0')}:00` : ''}`;
+    function readPlan() {
+      if (element('preset').value !== 'custom') return presets[element('preset').value];
+      if (!['interval', 'start', 'increment'].every(id => element(id).checkValidity() && Number.isInteger(Number(element(id).value)))) return null;
+      return Object.fromEntries(['interval', 'start', 'increment'].map(id => [id, Number(element(id).value)]));
+    }
+    function releases(plan) {
+      const rows = [];
+      let previous = 0;
+      for (let hour = 0; hour < MONTH_HOURS; hour += plan.interval) {
+        const total = Math.min(ALLOCATION, plan.start + Math.floor(hour / plan.interval) * plan.increment);
+        if (total > previous) rows.push({ hour, amount: total - previous, total });
+        previous = total;
+        if (total === ALLOCATION) break;
+      }
+      return rows;
+    }
+    function showFrame(solution) {
+      element('problem').hidden = solution;
+      element('solution').hidden = !solution;
+      element(solution ? 'solution-title' : 'problem-title').focus();
+    }
+    function render() {
+      const plan = readPlan();
+      const elapsed = Number(element('elapsed').value);
+      element('day').textContent = atHour(elapsed).replace('day', 'Day');
+      if (!plan) {
+        element('released').textContent = '—'; element('available').textContent = '—';
+        element('equation').textContent = 'Enter whole credits and a whole-hour interval within the input bounds.';
+        element('equation').classList.add('error'); element('next').textContent = '';
+        element('schedule').replaceChildren(); element('advance').disabled = true;
+        element('used-bar').style.width = '0%'; element('available-bar').style.width = '0%';
+        return;
+      }
+      const rows = releases(plan);
+      const released = Math.min(ALLOCATION, plan.start + Math.floor(elapsed / plan.interval) * plan.increment);
+      const nextRelease = rows.find(row => row.hour > elapsed);
+      element('released').textContent = number(released);
+      element('used').max = String(released);
+      element('advance').disabled = !nextRelease;
+      element('next').textContent = nextRelease ? `The next ${number(nextRelease.amount)} credits become available on ${atHour(nextRelease.hour)}.` : released === ALLOCATION ? 'All 2,000 credits have now been released for this month.' : `${number(ALLOCATION - released)} credits remain unassigned by this month's release plan.`;
+      const selected = element('preset').value;
+      element('plan-summary').textContent = selected === 'weekly' ? '500 on days 1, 8, 15, and 22. Total: 2,000 credits.' : selected === 'fortnightly' ? '1,000 on day 1 and 1,000 on day 15. Total: 2,000 credits.' : selected === 'daily' ? '67 on days 1–29, then the final 57 on day 30. Total: 2,000 credits.' : `${number(plan.start)} initially, then ${number(plan.increment)} every ${plan.interval} ${plan.interval === 1 ? 'hour' : 'hours'}, up to 2,000 this month.`;
+      const used = Number(element('used').value);
+      if (!element('used').checkValidity() || !Number.isInteger(used)) {
+        element('available').textContent = '—'; element('equation').textContent = `Enter used credits from 0 to ${number(released)}.`;
+        element('equation').classList.add('error'); element('used-bar').style.width = '0%'; element('available-bar').style.width = '0%';
+      } else {
+        const available = released - used;
+        element('available').textContent = number(available);
+        element('equation').textContent = `${number(released)} released − ${number(used)} used = ${number(available)} available`;
+        element('equation').classList.remove('error');
+        element('used-bar').style.width = `${used / ALLOCATION * 100}%`;
+        element('available-bar').style.width = `${available / ALLOCATION * 100}%`;
+      }
+      element('schedule').replaceChildren(...rows.map(row => {
+        const tr = document.createElement('tr');
+        for (const text of [atHour(row.hour).replace('day', 'Day'), number(row.amount), number(row.total)]) {
+          const td = document.createElement('td'); td.textContent = text; tr.append(td);
+        }
+        return tr;
+      }));
+    }
+    element('show-plan').disabled = false;
+    element('show-plan').addEventListener('click', () => showFrame(true));
+    element('show-problem').addEventListener('click', () => showFrame(false));
+    element('preset').addEventListener('change', () => {
+      const custom = element('preset').value === 'custom';
+      element('custom-controls').hidden = !custom;
+      if (!custom) for (const [key, value] of Object.entries(presets[element('preset').value])) element(key).value = String(value);
+      element('elapsed').value = '0'; element('used').value = '0'; render();
+    });
+    ['interval', 'start', 'increment', 'elapsed', 'used'].forEach(id => element(id).addEventListener('input', render));
+    element('advance').addEventListener('click', () => {
+      const plan = readPlan(); if (!plan) return;
+      const next = releases(plan).find(row => row.hour > Number(element('elapsed').value));
+      if (next) element('elapsed').value = String(next.hour);
+      render();
+    });
+    element('reset').addEventListener('click', () => { element('elapsed').value = '0'; element('used').value = '0'; render(); });
+    render();
+  </script>
+</body>
+</html>

@@ -1,0 +1,80 @@
+import { DAY, HOUR, amount, format, time, requireThat } from './policy.mjs';
+
+export function creditReleaseForInterval(intervalHours) {
+  requireThat(Number.isInteger(intervalHours) && intervalHours >= 1 && intervalHours <= 744, 'INTERVAL_INVALID');
+  const presets = { 24: 67, 168: 500, 336: 1000 };
+  // Illustrative organization-adjustable amounts, not a credit-to-dollar conversion.
+  // Other cadences use a 30-day reference and round upward to whole credits.
+  return String(presets[intervalHours] ?? Math.min(2000, Math.ceil(2000 * intervalHours / 720)));
+}
+
+export function exampleConfig({ now = new Date().toISOString(), pattern = 'fixed_release', cohort = 'selected', unit = 'credit', intervalHours = 24, synthetic = true } = {}) {
+  const date = new Date(now);
+  const creditRelease = unit === 'credit' ? creditReleaseForInterval(intervalHours) : null;
+  return { version: 1, workspaceId: synthetic ? 'synthetic-workspace' : 'REPLACE_WORKSPACE_ID', unit,
+    period: { kind: 'calendar_month', start: new Date(Date.UTC(date.getUTCFullYear(), date.getUTCMonth(), 1)).toISOString(),
+      end: new Date(Date.UTC(date.getUTCFullYear(), date.getUTCMonth() + 1, 1)).toISOString(), verifiedAt: now,
+      evidence: synthetic ? 'Synthetic fixture; no live counter evidence.' : '', counterScopeConfirmed: synthetic },
+    policy: { pattern, anchor: new Date(Math.floor(time(now) / HOUR) * HOUR).toISOString(), startCap: unit === 'credit' ? creditRelease : '2',
+      increment: unit === 'credit' ? creditRelease : '2', intervalHours, ceiling: unit === 'credit' ? '2000' : '20',
+      lookbackDays: 7, coverageHours: 24, multiplierBps: 15_000 },
+    cohort: { mode: cohort, userIds: cohort === 'all' ? [] : synthetic ? ['synthetic-user-a', 'synthetic-user-b'] : ['REPLACE_USER_ID'] },
+    maxMembers: 25, concurrency: 1, allowInitialReduction: false, liveWrites: false };
+}
+export function createSyntheticApi({ config, clock = () => new Date().toISOString(), saved, persist = async () => {},
+  initialCap = config.unit === 'credit' ? '2000' : '1' }) {
+  requireThat(config.workspaceId === 'synthetic-workspace', 'SYNTHETIC_WORKSPACE_REQUIRED');
+  const users = saved ? structuredClone(saved) : Object.fromEntries(['synthetic-user-a', 'synthetic-user-b', 'synthetic-user-c'].map(userId => {
+    // Tests may pin a smaller fake before-state without changing the public example.
+    const rule = { type: 'limited', limit_amount: { amount: initialCap, unit: config.unit } };
+    const effective = { limit: rule, source: { kind: 'workspace_default' } };
+    return [userId, { workspaceId: config.workspaceId, userId, unit: config.unit, usage: '0',
+      cap: { type: 'limited', amount: rule.limit_amount.amount, unit: config.unit, source: 'workspace_default' },
+      settings: { override: null, effective, inherited: effective }, observedAt: clock() }];
+  }));
+  let fault;
+  const api = {
+    synthetic: true, writes: [], users,
+    injectFault(nextFault) { fault = nextFault; },
+    async listMembers() { return Object.keys(users).sort(); },
+    async readSnapshot(id) {
+      requireThat(users[id], 'SYNTHETIC_USER_UNAVAILABLE');
+      if (fault?.type === 'read' && fault.userId === id) { fault = null; throw Object.assign(new Error('SIMULATED_READ_FAILURE'), {code:'SIMULATED_READ_FAILURE'}); }
+      return structuredClone({ ...users[id], observedAt: clock() });
+    },
+    async readHistory(userId, { start, end, unit }) {
+      return { workspaceId: config.workspaceId, userId, unit, start, end, observedAt: clock(), semantics: 'observed',
+        days: Array.from({ length: (time(end) - time(start)) / DAY }, (_, i) => ({ date: new Date(time(start) + i * DAY).toISOString().slice(0, 10), amount: unit === 'credit' ? '20' : '2' })) };
+    },
+    async setCap(id, target) {
+      const error = fault?.userId === id ? fault : null;
+      if (error) fault = null;
+      if (error?.type === 'before') throw Object.assign(new Error('SIMULATED_WRITE_FAILURE'), {code:'SIMULATED_WRITE_FAILURE', status:error.status, retryAfterMs:error.retryAfterMs});
+      const rule = { type: 'limited', limit_amount: { amount: target.amount, unit: target.unit }, limit_expires_at: target.periodEnd };
+      users[id] = { ...users[id], cap: {type:'limited',amount:target.amount,unit:target.unit,source:'individual_override',expiresAt:target.periodEnd},
+        settings: { ...users[id].settings, override:[rule], effective: {limit:rule,source:{kind:'individual_override'}} } };
+      api.writes.push({ userId:id, ...target });
+      await persist(users);
+      if (error?.type === 'after') throw Object.assign(new Error('SIMULATED_AMBIGUOUS_WRITE'), {code:'SIMULATED_AMBIGUOUS_WRITE'});
+    },
+    async restore(id, {settings}) {
+      const savedSettings = structuredClone(settings);
+      const rule = savedSettings.effective.limit;
+      users[id] = { ...users[id], settings:savedSettings, cap: { type:rule.type, unit:config.unit,
+        ...(rule.type === 'limited' ? {amount:String(rule.limit_amount?.amount ?? rule.limit)} : {}),
+        source:savedSettings.effective.source.kind, ...(rule.limit_expires_at ? {expiresAt:rule.limit_expires_at} : {}) } };
+      api.writes.push({userId:id,restore:true});
+      await persist(users);
+    },
+  };
+  return api;
+}
+
+export class MemoryStore {
+  states = new Map(); receipts = []; locks = new Set();
+  async withLock(key, fn) { requireThat(!this.locks.has(key), 'LEASE_BUSY'); this.locks.add(key); try {return await fn();} finally {this.locks.delete(key);} }
+  async assertLock(key) {requireThat(this.locks.has(key), 'LOCK_REQUIRED');}
+  async getState(key) {return structuredClone(this.states.get(key) ?? null);}
+  async putState(key, value) {await this.assertLock(key); this.states.set(key,structuredClone(value));}
+  async putReceipt(value) {this.receipts.push(structuredClone(value));}
+}

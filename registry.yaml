@@ -4,6 +4,19 @@
 # should build pages for, and indicates metadata such as tags, creation date and
 # authors for each page.
 
+- title: Release ChatGPT usage budgets daily, weekly, or on your own cadence
+  path: examples/chatgpt/daily_usage_limits/README.md
+  slug: chatgpt-interval-usage-limits
+  description: Help users pace a 2,000-credit monthly allocation by releasing it in daily, weekly, or custom increments, for selected power users or a reviewed workspace roster.
+  date: 2026-09-19
+  authors:
+    - sperry-openai
+  tags:
+    - chatgpt
+    - admin-api
+    - usage-limits
+    - automation
+
 - title: Build a prior authorization review assistant with the OpenAI Agents SDK and Amazon Bedrock AgentCore
   path: examples/partners/AWS/policy_to_review_prior_authorization_agents_sdk_agentcore.ipynb
   slug: prior-authorization-review-agentcore

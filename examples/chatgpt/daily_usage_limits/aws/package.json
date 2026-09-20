@@ -1,0 +1,14 @@
+{
+  "name": "cookbook-daily-usage-limits-aws",
+  "version": "1.0.0",
+  "private": true,
+  "type": "module",
+  "engines": { "node": ">=24 <27" },
+  "scripts": { "package": "node package.mjs" },
+  "dependencies": {
+    "@aws-sdk/client-cloudwatch": "3.1130.0",
+    "@aws-sdk/client-dynamodb": "3.1130.0",
+    "@aws-sdk/client-secrets-manager": "3.1130.0",
+    "@aws-sdk/lib-dynamodb": "3.1130.0"
+  }
+}

@@ -1,0 +1,15 @@
+[
+  { "ParameterKey": "DeploymentId", "ParameterValue": "cookbook-usage-limits" },
+  { "ParameterKey": "PilotExpiresAt", "ParameterValue": "REPLACE_WITH_APPROVED_UTC_EXPIRY" },
+  { "ParameterKey": "CodeBucket", "ParameterValue": "REPLACE_WITH_EXISTING_PRIVATE_BUCKET" },
+  { "ParameterKey": "CodeKey", "ParameterValue": "REPLACE_WITH_UPLOADED_OBJECT_KEY" },
+  { "ParameterKey": "CodeObjectVersion", "ParameterValue": "REPLACE_WITH_UPLOADED_VERSION_ID" },
+  { "ParameterKey": "ControlSha256", "ParameterValue": "0000000000000000000000000000000000000000000000000000000000000000" },
+  { "ParameterKey": "AdminSecretArn", "ParameterValue": "REPLACE_WITH_EXISTING_SECRET_ARN" },
+  { "ParameterKey": "SecretKmsKeyArn", "ParameterValue": "" },
+  { "ParameterKey": "AlarmTopicArn", "ParameterValue": "REPLACE_WITH_EXISTING_OPERATIONS_TOPIC_ARN" },
+  { "ParameterKey": "ScheduleState", "ParameterValue": "DISABLED" },
+  { "ParameterKey": "ScheduledAction", "ParameterValue": "preview" },
+  { "ParameterKey": "ApplyEnabled", "ParameterValue": "false" },
+  { "ParameterKey": "ReceiptRetentionDays", "ParameterValue": "30" }
+]

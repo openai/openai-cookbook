@@ -1,0 +1,26 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="1120" height="345" viewBox="0 0 1120 345" role="img" aria-labelledby="title description">
+  <title id="title">Test with a small group, then use managed infrastructure for ongoing operation</title>
+  <desc id="description">Use Codex automation or an individual computer for supervised testing with a small group. For ongoing workspace operation, use organization-managed infrastructure: a managed virtual machine or cloud service, with AWS as a worked example. The same policy controller validates the approved cohort and period, stores a fixed absolute target before writing, reads the API independently, and saves a receipt. Conflicting state or an ended period stops changes.</desc>
+  <defs><style>text{font-family:Arial,Helvetica,sans-serif;fill:#172b34}.title{font-size:27px;font-weight:700}.label{font-size:18px}.small{font-size:16px}</style><marker id="arrow" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse"><path d="M0 0 10 5 0 10" fill="#365d6b"/></marker></defs>
+  <rect width="1120" height="345" rx="24" fill="#f5f8f8"/>
+  <text x="32" y="48" class="title">Prove value with a small group. Plan for ongoing operation.</text>
+  <rect x="32" y="81" width="197" height="87" rx="10" fill="#fff" stroke="#bfd0d3"/>
+  <text x="46" y="106" class="small" font-weight="700">Supervised testing</text>
+  <text x="46" y="131" font-size="15">Codex automation or</text>
+  <text x="46" y="152" font-size="15">individual computer</text>
+  <rect x="32" y="181" width="197" height="107" rx="10" fill="#e3f4ec" stroke="#14805e"/>
+  <text x="46" y="204" font-size="13" font-weight="700">Recommended for ongoing</text>
+  <text x="46" y="229" font-size="15">Organization-managed</text>
+  <text x="46" y="250" font-size="14">Virtual machine or cloud</text>
+  <text x="46" y="272" font-size="14.5">AWS: worked example</text>
+  <g fill="none" stroke="#365d6b" stroke-width="2"><path d="M229 124h26v50h29" marker-end="url(#arrow)"/><path d="M229 234h26v-60"/></g>
+  <rect x="296" y="99" width="245" height="151" rx="14" fill="#e3f4ec" stroke="#14805e"/>
+  <text x="317" y="135" class="label" font-weight="700">Validate and calculate</text><text x="317" y="170" class="small">Cohort · unit · UTC period</text><text x="317" y="197" class="small">Stable slot · finite ceiling</text><text x="317" y="225" class="small">Detect unexpected cap edits</text>
+  <path d="M550 174h32" stroke="#365d6b" stroke-width="2" marker-end="url(#arrow)"/>
+  <rect x="594" y="99" width="224" height="151" rx="14" fill="#fff" stroke="#bfd0d3"/>
+  <text x="615" y="135" class="label" font-weight="700">Record, then write</text><text x="615" y="170" class="small">Durable pending target</text><text x="615" y="197" class="small">Absolute monthly cap</text><text x="615" y="225" class="small">Bounded member changes</text>
+  <path d="M827 174h32" stroke="#365d6b" stroke-width="2" marker-end="url(#arrow)"/>
+  <rect x="871" y="99" width="217" height="151" rx="14" fill="#fff" stroke="#bfd0d3"/>
+  <text x="892" y="135" class="label" font-weight="700">Read back and save</text><text x="892" y="170" class="small">Confirm actual API state</text><text x="892" y="197" class="small">Receipt for each user</text><text x="892" y="225" class="small">Reconcile before retry</text>
+  <text x="32" y="312" class="label">Preview is the default. A conflict, missing evidence, or an ended period stops changes.</text>
+</svg>

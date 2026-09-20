@@ -1,0 +1,61 @@
+import test from 'node:test';
+import assert from 'node:assert/strict';
+import { mkdtemp, readFile, writeFile, mkdir, rm, stat } from 'node:fs/promises';
+import { tmpdir } from 'node:os';
+import { join } from 'node:path';
+import { execFile } from 'node:child_process';
+import { promisify } from 'node:util';
+import { FileStore } from '../src/file-store.mjs';
+import { renderLocal } from '../src/local-templates.mjs';
+
+const exec=promisify(execFile);
+async function temporary(t){const dir=await mkdtemp(join(tmpdir(),'usage-limits-test-'));t.after(()=>rm(dir,{recursive:true,force:true}));return dir;}
+test('fsynced journal is authoritative across process restart and state-cache corruption',async t=>{
+  const dir=await temporary(t),store=new FileStore(dir),key='synthetic:person';
+  await store.withLock(key,()=>store.putState(key,{pending:{amount:'20'}}));
+  await writeFile(store.paths(key).state,'broken cache');
+  assert.equal((await new FileStore(dir).getState(key)).pending.amount,'20');
+  assert.equal((await stat(store.paths(key).journal)).mode&0o077,0);
+});
+test('active and crash-left local locks cannot be stolen',async t=>{
+  const dir=await temporary(t),store=new FileStore(dir),key='synthetic:person';
+  await store.withLock(key,()=>assert.rejects(new FileStore(dir).withLock(key,async()=>{}),{code:'LOCAL_LOCK_HELD_RECONCILE_BEFORE_REMOVAL'}));
+  await mkdir(store.paths(key).lock,{mode:0o700});
+  await assert.rejects(store.withLock(key,async()=>{}),{code:'LOCAL_LOCK_HELD_RECONCILE_BEFORE_REMOVAL'});
+});
+test('partial journal blocks mutation instead of discarding crash evidence',async t=>{
+  const dir=await temporary(t),store=new FileStore(dir),key='synthetic:person';
+  await writeFile(store.paths(key).journal,'{"partial":',{mode:0o600});
+  await assert.rejects(store.withLock(key,()=>store.putState(key,{})),{code:'LOCAL_JOURNAL_INCOMPLETE_REVIEW_REQUIRED'});
+});
+test('local templates use escaped paths and contain preview only, no installation',async t=>{
+  const dir=join(await temporary(t),"folder's space");
+  const files=await renderLocal({directory:dir,nodePath:process.execPath,synthetic:true});
+  assert.equal(files.length,4);
+  const shell=await readFile(join(dir,'run-preview.sh'),'utf8');assert.ok(!shell.includes('--apply'));assert.ok(shell.includes('--synthetic'));
+  await exec('/bin/sh',['-n',join(dir,'run-preview.sh')]);
+  if(process.platform==='darwin')await exec('/usr/bin/plutil',['-lint',join(dir,'launchd.plist.disabled')]);
+  await assert.rejects(renderLocal({directory:dir,nodePath:process.execPath}),{code:'EEXIST'});
+});
+test('exact CLI offline path captures reviews previews applies replays inspects and restores',async t=>{
+  const dir=await temporary(t);
+  const cli=new URL('../src/cli.mjs',import.meta.url).pathname;
+  const run=async args=>JSON.parse((await exec(process.execPath,[decodeURIComponent(cli),...args],{env:{...process.env,CHATGPT_ADMIN_API_KEY:''}})).stdout);
+  await run(['init','--dir',dir,'--synthetic','--cohort','all','--interval-hours','168','--allow-initial-reduction']);
+  const config=join(dir,'config.json'),enrollment=join(dir,'enrollment.json'),state=join(dir,'state');
+  const snapshot=await run(['snapshot','--config',config,'--out',enrollment,'--synthetic']);
+  assert.equal(snapshot.members[0].before.cap.amount,'2000');
+  assert.equal(snapshot.members[0].plan.amount,'500');
+  await run(['approve','--enrollment',enrollment,'--hash',snapshot.hash]);
+  const args=['--config',config,'--enrollment',enrollment,'--state',state,'--synthetic'];
+  assert.equal((await run(['run',...args])).results[0].status,'preview');
+  assert.equal((await run(['run',...args,'--apply'])).results[0].status,'applied');
+  assert.equal((await run(['run',...args,'--apply'])).results[0].status,'duplicate_slot');
+  assert.equal((await run(['inspect','--state',state])).receipts.length,3);
+  assert.equal((await run(['restore',...args])).results[0].status,'restore_preview');
+  const restored=await run(['restore',...args,'--apply']);
+  assert.equal(restored.results[0].status,'restored');
+  assert.equal(restored.results[0].after.cap.amount,'2000');
+  await run(['render-local','--dir',dir,'--node',process.execPath,'--synthetic']);
+  const preview=JSON.parse((await exec('/bin/sh',[join(dir,'run-preview.sh')])).stdout);assert.equal(preview.results[0].status,'restored_stopped');
+});

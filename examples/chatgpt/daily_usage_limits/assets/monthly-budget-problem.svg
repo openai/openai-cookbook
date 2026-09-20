@@ -1,0 +1,43 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="1120" height="500" viewBox="0 0 1120 500" role="img" aria-labelledby="title description">
+  <title id="title">A 2,000-credit monthly allocation can run out in week one</title>
+  <desc id="description">Example for one person: all 2,000 credits are available at the beginning of the month. The person uses all 2,000 during week one. Zero credits remain available in weeks two, three, and four.</desc>
+  <defs><style>text{font-family:Arial,Helvetica,sans-serif;fill:#172b34}.eyebrow{font-size:15px;font-weight:700;letter-spacing:1.3px;fill:#5c6467}.heading{font-size:33px;font-weight:700}.label{font-size:19px}.small{font-size:17px}.value{font-size:40px;font-weight:700}.muted{fill:#53636a}.warm{fill:#9b382b}</style></defs>
+  <rect width="1120" height="500" rx="24" fill="#f7f7f4"/>
+  <text x="40" y="44" class="eyebrow">THE PROBLEM · ONE PERSON'S MONTHLY ALLOCATION</text>
+  <text x="40" y="91" class="heading">2,000 credits for the month. Gone in week one.</text>
+  <text x="40" y="126" class="label muted">When the full allocation is available at once, one busy week can use it all.</text>
+  <g transform="translate(40 166)">
+    <rect width="245" height="230" rx="15" fill="#fcebe7" stroke="#d29a8f"/>
+    <text x="22" y="38" class="label" font-weight="700">Week 1</text>
+    <text x="22" y="99" class="value warm">2,000</text>
+    <text x="22" y="129" class="label">credits used</text>
+    <rect x="22" y="153" width="201" height="20" rx="5" fill="#ac4939"/>
+    <text x="22" y="207" class="small warm">Monthly allocation used</text>
+  </g>
+  <g transform="translate(305 166)">
+    <rect width="245" height="230" rx="15" fill="#fff" stroke="#cbd3d5"/>
+    <text x="22" y="38" class="label" font-weight="700">Week 2</text>
+    <text x="22" y="99" class="value">0</text>
+    <text x="22" y="129" class="label">credits available</text>
+    <rect x="22" y="153" width="201" height="20" rx="5" fill="#e5eaeb"/>
+    <text x="22" y="207" class="small muted">No allocation left</text>
+  </g>
+  <g transform="translate(570 166)">
+    <rect width="245" height="230" rx="15" fill="#fff" stroke="#cbd3d5"/>
+    <text x="22" y="38" class="label" font-weight="700">Week 3</text>
+    <text x="22" y="99" class="value">0</text>
+    <text x="22" y="129" class="label">credits available</text>
+    <rect x="22" y="153" width="201" height="20" rx="5" fill="#e5eaeb"/>
+    <text x="22" y="207" class="small muted">No allocation left</text>
+  </g>
+  <g transform="translate(835 166)">
+    <rect width="245" height="230" rx="15" fill="#fff" stroke="#cbd3d5"/>
+    <text x="22" y="38" class="label" font-weight="700">Week 4</text>
+    <text x="22" y="99" class="value">0</text>
+    <text x="22" y="129" class="label">credits available</text>
+    <rect x="22" y="153" width="201" height="20" rx="5" fill="#e5eaeb"/>
+    <text x="22" y="207" class="small muted">No allocation left</text>
+  </g>
+  <text x="40" y="449" class="label" font-weight="700">The opportunity: choose when portions of the same 2,000 credits become available.</text>
+  <text x="40" y="479" class="small muted">Illustrative scenario for one person.</text>
+</svg>

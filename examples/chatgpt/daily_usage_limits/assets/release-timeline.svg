@@ -1,0 +1,47 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="1120" height="520" viewBox="0 0 1120 520" role="img" aria-labelledby="title description">
+  <title id="title">Release the same 2,000-credit monthly allocation in weekly portions</title>
+  <desc id="description">For one person, release 500 credits on days 1, 8, 15, and 22. The cumulative amount released is 500, 1,000, 1,500, and 2,000 credits. Available credits equal the cumulative amount released minus credits already used. For example, on day 8, 1,000 released minus 300 used leaves 700 available.</desc>
+  <defs><style>text{font-family:Arial,Helvetica,sans-serif;fill:#172b34}.eyebrow{font-size:15px;font-weight:700;letter-spacing:1.3px;fill:#346555}.heading{font-size:33px;font-weight:700}.label{font-size:19px}.small{font-size:17px}.value{font-size:40px;font-weight:700}.muted{fill:#53636a}.green{fill:#116447}</style></defs>
+  <rect width="1120" height="520" rx="24" fill="#f0f7f3"/>
+  <text x="40" y="44" class="eyebrow">THE SOLUTION · SAME PERSON · SAME 2,000-CREDIT ALLOCATION</text>
+  <text x="40" y="91" class="heading">Release 500 credits each week.</text>
+  <text x="40" y="126" class="label muted">Your organization chooses the amount and cadence. This example uses four weekly portions.</text>
+  <g transform="translate(40 164)">
+    <rect width="245" height="224" rx="15" fill="#fff" stroke="#a9c9b9"/>
+    <text x="22" y="36" class="label" font-weight="700">Day 1</text>
+    <text x="22" y="68" class="small green">Release 500</text>
+    <text x="22" y="124" class="value">500</text>
+    <text x="22" y="153" class="label">released so far</text>
+    <rect x="22" y="179" width="201" height="20" rx="5" fill="#e2ece6"/>
+    <rect x="22" y="179" width="50.25" height="20" rx="5" fill="#14805e"/>
+  </g>
+  <g transform="translate(305 164)">
+    <rect width="245" height="224" rx="15" fill="#fff" stroke="#a9c9b9"/>
+    <text x="22" y="36" class="label" font-weight="700">Day 8</text>
+    <text x="22" y="68" class="small green">Release another 500</text>
+    <text x="22" y="124" class="value">1,000</text>
+    <text x="22" y="153" class="label">released so far</text>
+    <rect x="22" y="179" width="201" height="20" rx="5" fill="#e2ece6"/>
+    <rect x="22" y="179" width="100.5" height="20" rx="5" fill="#14805e"/>
+  </g>
+  <g transform="translate(570 164)">
+    <rect width="245" height="224" rx="15" fill="#fff" stroke="#a9c9b9"/>
+    <text x="22" y="36" class="label" font-weight="700">Day 15</text>
+    <text x="22" y="68" class="small green">Release another 500</text>
+    <text x="22" y="124" class="value">1,500</text>
+    <text x="22" y="153" class="label">released so far</text>
+    <rect x="22" y="179" width="201" height="20" rx="5" fill="#e2ece6"/>
+    <rect x="22" y="179" width="150.75" height="20" rx="5" fill="#14805e"/>
+  </g>
+  <g transform="translate(835 164)">
+    <rect width="245" height="224" rx="15" fill="#fff" stroke="#a9c9b9"/>
+    <text x="22" y="36" class="label" font-weight="700">Day 22</text>
+    <text x="22" y="68" class="small green">Release the final 500</text>
+    <text x="22" y="124" class="value">2,000</text>
+    <text x="22" y="153" class="label">released so far</text>
+    <rect x="22" y="179" width="201" height="20" rx="5" fill="#14805e"/>
+  </g>
+  <text x="40" y="435" class="label" font-weight="700">Available now = credits released so far − credits already used.</text>
+  <text x="40" y="468" class="label">Example on day 8: 1,000 released − 300 used = 700 credits available.</text>
+  <text x="40" y="501" class="small muted">Unused released credits remain available during the month.</text>
+</svg>

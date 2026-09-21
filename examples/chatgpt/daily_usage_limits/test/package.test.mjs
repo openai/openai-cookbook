@@ -7,6 +7,18 @@ import { inflateRawSync } from 'node:zlib';
 import { buildPackage, dependencyPath, resolveNpmCli } from '../aws/package.mjs';
 import { createZip } from '../aws/zip.mjs';
 
+test('every locked AWS dependency resolves through the public HTTPS npm registry', () => {
+  const lock = JSON.parse(readFileSync(new URL('../aws/package-lock.json', import.meta.url), 'utf8'));
+  const dependencies = Object.entries(lock.packages).filter(([name]) => name !== '');
+  assert.ok(dependencies.length > 0);
+  for (const [name, metadata] of dependencies) {
+    const url = new URL(metadata.resolved);
+    assert.equal(url.origin, 'https://registry.npmjs.org', `${name} must use the public npm registry`);
+    assert.equal(url.username + url.password + url.search + url.hash, '', `${name} must have a plain public download URL`);
+    assert.ok(url.pathname.endsWith('.tgz'), `${name} must resolve to its package tarball`);
+  }
+});
+
 function temporary(t) {
   const root = mkdtempSync(join(tmpdir(), 'cookbook package '));
   t.after(() => rmSync(root, { recursive: true, force: true }));

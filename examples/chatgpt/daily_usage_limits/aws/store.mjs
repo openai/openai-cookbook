@@ -15,6 +15,7 @@ export function createDynamoStore({ send, tableName, deploymentId,
   // Do not include period or deployment in a lock key: writers sharing a table must serialize a user.
   const stateKey = key => ({ PK: `STATE#${hash(key)}`, SK: 'CURRENT' });
   const lockKey = key => ({ PK: `LOCK#${hash(key)}`, SK: 'LEASE' });
+  const runKey = (runId, SK = 'PROGRESS') => ({ PK: `RUN#${deploymentId}#${runId}`, SK });
   const get = async Key => (await send('Get', { TableName: tableName, Key, ConsistentRead: true })).Item;
   const condition = key => {
     const owner = locks.get(key);
@@ -26,6 +27,72 @@ export function createDynamoStore({ send, tableName, deploymentId,
   return {
     async getControl() {
       return (await get({ PK: `CONTROL#${deploymentId}`, SK: 'REVIEWED' }))?.document;
+    },
+    async getControlPart(partHash) {
+      if (!/^[a-f0-9]{64}$/.test(partHash)) throw new Error('INVALID_CONTROL_PART');
+      return (await get({ PK: `CONTROL#${deploymentId}`, SK: `PART#${partHash}` }))?.document;
+    },
+    async getRun(runId) { return await get(runKey(runId)); },
+    async cancelRun(runId) {
+      await send('Update', { TableName: tableName, Key: runKey(runId),
+        UpdateExpression: 'SET cancelled = :cancelled, updatedAt = :now',
+        ConditionExpression: 'attribute_exists(PK)',
+        ExpressionAttributeValues: { ':cancelled': true, ':now': clock().toISOString() } });
+    },
+    async createRun(run) {
+      try {
+        await send('Put', { TableName: tableName, Item: { ...runKey(run.runId), ...run,
+          cursor: 0, completed: 0, succeeded: 0, attention: 0,
+          expiresAt: Math.floor(Date.parse(run.validUntil) / 1000) + receiptRetentionDays * 86400 },
+          ConditionExpression: 'attribute_not_exists(PK)' });
+      } catch (error) { if (error.name !== 'ConditionalCheckFailedException') throw error; }
+      return await get(runKey(run.runId));
+    },
+    async setRunCursor(runId, cursor, leaseKey) {
+      await send('TransactWrite', { TransactItems: [
+        { ConditionCheck: condition(leaseKey) },
+        { Update: { TableName: tableName, Key: runKey(runId),
+          UpdateExpression: 'SET #cursor = :cursor, updatedAt = :now',
+          ConditionExpression: 'attribute_exists(PK) AND #cursor <= :cursor',
+          ExpressionAttributeNames: { '#cursor': 'cursor' },
+          ExpressionAttributeValues: { ':cursor': cursor, ':now': clock().toISOString() } } },
+      ] });
+    },
+    async getMemberResult(runId, index) { return await get(runKey(runId, `MEMBER#${index}`)); },
+    async completeMember(runId, index, outcome) {
+      const run = await get(runKey(runId));
+      if (!run) throw new Error('RUN_NOT_FOUND');
+      try {
+        await send('TransactWrite', { TransactItems: [
+          { Put: { TableName: tableName, Item: { ...runKey(runId, `MEMBER#${index}`), ...outcome,
+            checkedAt: clock().toISOString(), expiresAt: run.expiresAt },
+            ConditionExpression: 'attribute_not_exists(PK)' } },
+          { Update: { TableName: tableName, Key: runKey(runId),
+            UpdateExpression: 'SET updatedAt = :now ADD completed :one, succeeded :success, attention :attention',
+            ConditionExpression: 'attribute_exists(PK)',
+            ExpressionAttributeValues: { ':now': clock().toISOString(), ':one': 1,
+              ':success': outcome.ok ? 1 : 0, ':attention': outcome.ok ? 0 : 1 } } },
+        ] });
+        return true;
+      } catch (error) {
+        if (error.name === 'TransactionCanceledException' && await get(runKey(runId, `MEMBER#${index}`))) return false;
+        throw error;
+      }
+    },
+    async getRetry(runId, index) { return (await get(runKey(runId, `RETRY#${index}`)))?.notBefore; },
+    async putRetry(runId, index, notBefore) {
+      const run = await get(runKey(runId));
+      if (!run) throw new Error('RUN_NOT_FOUND');
+      await send('Put', { TableName: tableName, Item: { ...runKey(runId, `RETRY#${index}`), notBefore,
+        expiresAt: run.expiresAt } });
+    },
+    async pauseRun(runId, notBefore) {
+      try {
+        await send('Update', { TableName: tableName, Key: runKey(runId),
+          UpdateExpression: 'SET notBefore = :until',
+          ConditionExpression: 'attribute_exists(PK) AND (attribute_not_exists(notBefore) OR notBefore < :until)',
+          ExpressionAttributeValues: { ':until': notBefore } });
+      } catch (error) { if (error.name !== 'ConditionalCheckFailedException') throw error; }
     },
     async getState(key) { return (await get(stateKey(key)))?.payload; },
     async assertLock(key) {

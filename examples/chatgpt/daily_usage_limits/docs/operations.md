@@ -34,31 +34,59 @@ For example, a person has used 800 credits and currently has a 900-credit limit.
 
 This pattern requires reported usage for each day in the selected lookback window. The [API contract](api-contract.md) explains data freshness and how the controller handles missing or corrected history.
 
+## Choose the workspace and people
+
+Set `workspaceId` to the workspace you administer. With `cohort.mode: "selected"`, combine user IDs, email addresses, and workspace group IDs. The snapshot resolves them to user IDs and removes duplicate people.
+
+The following selection is illustrative. Replace its identifiers and address with values from your workspace:
+
+```json
+{
+  "cohort": {
+    "mode": "selected",
+    "userIds": ["user_123"],
+    "emails": ["alex@example.com"],
+    "groupIds": ["group_456"]
+  }
+}
+```
+
+To capture every current member, use `"mode": "all"` with empty `userIds`, `emails`, and `groupIds` arrays. The enrollment fixes the reviewed list. Later joiners require a new enrollment. Missing or ambiguous email matches, unavailable groups, and empty groups stop capture. At the start of a run, email and group matches must still agree with the enrollment. A changed match stops new grants for review. Restoration continues to use the original enrolled user IDs.
+
+Use separate configurations for populations with different budgets or schedules, and keep each person in one active configuration.
+
 ## Prepare a reviewed enrollment
 
 An enrollment records the people included in the plan and their original settings. Save it, the configuration, and receipts in a private, access-controlled directory.
 
 Confirm each person's current limit before including them. The [API contract](api-contract.md) covers supported settings. To capture a fresh snapshot, use a new output filename and that filename in subsequent `--enrollment` arguments.
 
-1. Create a local configuration template:
+1. Create a local configuration template. This example combines all three selection types. Replace the example values and omit any selector you do not need:
 
    ```bash
-   node src/cli.mjs init --dir .private/pilot --pattern fixed_release --cohort selected --unit credit --interval-hours 168
+   node src/cli.mjs init --dir .private/pilot --workspace-id WORKSPACE_ID --pattern fixed_release --cohort selected --user-id USER_ID --email alex@example.com --group-id GROUP_ID --unit credit --interval-hours 168
    ```
+
+   Repeat `--user-id`, `--email`, or `--group-id` to add selections. To capture all current members, use `--cohort all` and omit those three flags. You can also edit the arrays in `config.json` before capture.
 
 2. Complete `.private/pilot/config.json` with your workspace and policy details. Confirm these choices before taking a snapshot:
 
    | Setting | What to review |
    | --- | --- |
    | `workspaceId`, `unit` | The intended workspace and its native `credit` or `usd` unit. Amounts are decimal strings. Credit caps use whole credits; USD caps use cents. Never convert between units. |
-   | `cohort.mode`, `cohort.userIds` | `selected` uses an explicit approved user list. For all current members, use `all` with an empty user list. Review the resulting roster. Later joiners require a new reviewed enrollment. |
+   | `cohort` | Choose `selected` with `userIds`, `emails`, and/or `groupIds`, or `all` with empty selector arrays. Review the resolved user IDs and saved email/group matches. |
    | `period` | Copy the current UTC start and end shown in Admin Console, confirm whether it is `calendar_month` or `billing_cycle`, and record the verification time and source in `verifiedAt` and `evidence`. Set `counterScopeConfirmed: true` only after confirming the counter covers that range. The API response omits period boundaries. |
    | `policy` | Pattern, UTC anchor, interval, starting cap, increment, and finite ceiling. For a mid-period start, review consumption already recorded: a starting cap at or below that usage can block additional eligible work. |
    | `allowInitialReduction` | Leave `false` unless the reviewed first target is allowed to lower a current cap, including an unlimited cap. Inspect every affected user before authorizing a reduction. |
-   | `maxMembers`, `concurrency` | A reviewed batch limit of at most 500 members and at most five concurrent member operations. Split larger workspaces into selected cohorts with separate approvals and disjoint users. |
+   | `maxMembers` | An optional positive member-count guard. The default `null` adds no cohort-size ceiling. |
+   | `concurrency`, `captureConcurrency` | Simultaneous member operations and snapshot reads, respectively. Both start at `1`; increase gradually against observed API throughput. |
+   | `initialReviewMaxAgeMinutes` | Time allowed from capture start to first application. The default is `15`; choose a positive whole number no longer than the confirmed period. Capture, review, upload, and queued processing must fit this window and the same release interval. Changing it requires a new policy review. |
+   | `apiLimits` | Optional positive `maxPages` and `maxRows` guards for paginated reads. The adapter defaults are 1,000 pages and 100,000 rows. Reaching a guard stops the read instead of using a partial list. |
    | `liveWrites` | Leave `false` during setup and preview. |
 
-3. Obtain a workspace-scoped ChatGPT Admin key through your approved credential process. Use Usage limits read and Users read for the snapshot; add Usage limits write only for an authorized live change. The headroom pattern also needs `enterprise.analytics.usage.read`. Supply the key as `CHATGPT_ADMIN_API_KEY` from a secure runtime secret store. Keep it out of prompts, source files, commands, and receipts. API Platform inference keys cannot authenticate these requests. See [Admin key setup and permissions](https://help.openai.com/en/articles/20001407-managing-admin-keys-in-admin-console/).
+   The initializer also accepts `--max-members none|POSITIVE_INTEGER`, `--concurrency`, `--capture-concurrency`, `--initial-review-max-age-minutes`, `--api-max-pages`, and `--api-max-rows`. The last five take positive whole numbers. Choose a review window that covers measured capture, review, and initial processing time; a window never extends the confirmed period or release interval.
+
+3. Obtain a workspace-scoped ChatGPT Admin key through your approved credential process. Use Usage limits read and Users read for the snapshot; add Usage limits write only for an authorized live change. Group selection also needs `chatgpt.enterprise.directory.read`. The headroom pattern needs `enterprise.analytics.usage.read`. Supply the key as `CHATGPT_ADMIN_API_KEY` from a secure runtime secret store. Keep it out of prompts, source files, commands, and receipts. API Platform inference keys cannot authenticate these requests. See [Admin key setup and permissions](https://help.openai.com/en/articles/20001407-managing-admin-keys-in-admin-console/).
 
 4. Read the cohort and current settings, then inspect the saved enrollment and its printed hash. This command performs read-only API requests:
 
@@ -73,7 +101,7 @@ Confirm each person's current limit before including them. The [API contract](ap
    node src/cli.mjs run --config .private/pilot/config.json --enrollment .private/pilot/enrollment.json --state .private/pilot/state
    ```
 
-   `approve` records the review locally. `run` without `--apply` previews targets. Review its before and after values before proceeding. The first apply must occur within 15 minutes of capture and in the same interval slot. If it expires before any operation was saved, capture and review a new snapshot. A saved, unapplied initial reduction also expires: use the [read-only cancellation procedure](local.md#cancel-an-unapplied-initial-operation) before a new review. Reconcile any already-committed change. After a controller has applied changes, stop and restore before changing its policy or enrollment. Retain that state and use a new private pilot directory for the new review.
+   `approve` records the review locally. `run` without `--apply` previews targets. Review its before and after values before proceeding. The first apply must occur within `initialReviewMaxAgeMinutes` of capture start and in the same interval slot. The default is 15 minutes. Capture records both its start and completion times; a slow capture does not extend the review deadline. A new initial operation checks freshness through its first write attempt. Recovery can retry an already saved exact increase after that window, while an initial reduction remains bound to both the review age and its original slot. If it expires before any operation was saved, capture and review a new snapshot. A saved, unapplied initial reduction also expires: use the [read-only cancellation procedure](local.md#cancel-an-unapplied-initial-operation) before a new review. Reconcile any already-committed change. After a controller has applied changes, stop and restore before changing its policy or enrollment. Retain that state and use a new private pilot directory for the new review.
 
 ## Stop, restore, and renew
 

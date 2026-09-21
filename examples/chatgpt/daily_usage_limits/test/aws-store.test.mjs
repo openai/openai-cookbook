@@ -96,3 +96,34 @@ test('a lease shorter than the Lambda timeout safety margin is rejected', () => 
   assert.throws(() => createDynamoStore({ send() {}, tableName: 'table', deploymentId: 'demo-one', leaseSeconds: 120 }),
     /INVALID_STORE_CONFIGURATION/);
 });
+
+test('member completion is a single conditional transaction and retains dedupe through the parent run TTL', async () => {
+  const runId = 'a'.repeat(64), expiresAt = 1_909_411_200;
+  const calls = [];
+  const store = createDynamoStore({ tableName: 'synthetic-table', deploymentId: 'synthetic-demo', receiptRetentionDays: 7,
+    clock: () => new Date('2030-04-02T00:00:00Z'),
+    async send(operation, input) {
+      calls.push({ operation, input });
+      if (operation === 'Get') return { Item: { expiresAt } };
+      return {};
+    } });
+  assert.equal(await store.completeMember(runId, 999, { ok: true, status: 'applied' }), true);
+  const transaction = calls.find(call => call.operation === 'TransactWrite').input.TransactItems;
+  assert.equal(transaction[0].Put.Item.SK, 'MEMBER#999');
+  assert.equal(transaction[0].Put.Item.expiresAt, expiresAt);
+  assert.equal(transaction[0].Put.ConditionExpression, 'attribute_not_exists(PK)');
+  assert.equal(transaction[1].Update.Key.SK, 'PROGRESS');
+  assert.match(transaction[1].Update.UpdateExpression, /ADD completed :one, succeeded :success, attention :attention/);
+  assert.equal(transaction[1].Update.ExpressionAttributeValues[':success'], 1);
+  await store.putRetry(runId, 999, '2030-04-03T00:00:00Z');
+  assert.equal(calls.at(-1).input.Item.expiresAt, expiresAt);
+});
+
+test('an already committed member result makes a duplicate counter transaction a no-op', async () => {
+  const store = createDynamoStore({ tableName: 'synthetic-table', deploymentId: 'synthetic-demo',
+    async send(operation, input) {
+      if (operation === 'TransactWrite') throw Object.assign(new Error('conditional transaction'), { name: 'TransactionCanceledException' });
+      if (operation === 'Get') return { Item: input.Key.SK === 'PROGRESS' ? { expiresAt: 1_909_411_200 } : { ok: true } };
+    } });
+  assert.equal(await store.completeMember('a'.repeat(64), 0, { ok: true }), false);
+});

@@ -1,4 +1,5 @@
 import { createHash } from 'node:crypto';
+import { normalizeCohort } from './selection.mjs';
 
 export const HOUR = 3_600_000;
 export const DAY = 24 * HOUR;
@@ -41,7 +42,13 @@ export function configDigest(config) {
   const { liveWrites, ...reviewed } = config;
   return digest(reviewed);
 }
-export function validateConfig(config, now) {
+export function approvalWindowMs(config) {
+  const minutes = config.initialReviewMaxAgeMinutes ?? 15;
+  requireThat(Number.isSafeInteger(minutes) && minutes > 0 &&
+    minutes <= (time(config.period.end) - time(config.period.start)) / 60_000, 'INITIAL_REVIEW_WINDOW_INVALID');
+  return minutes * 60_000;
+}
+export function validatePolicy(config, now) {
   requireThat(config?.version === 1, 'CONFIG_VERSION_INVALID');
   requireThat(typeof config.workspaceId === 'string' && config.workspaceId.length > 0, 'WORKSPACE_REQUIRED');
   requireThat(['credit', 'usd'].includes(config.unit), 'UNIT_INVALID');
@@ -72,13 +79,22 @@ export function validateConfig(config, now) {
     requireThat(Number.isInteger(p.coverageHours) && p.coverageHours >= 1 && p.coverageHours <= 744, 'COVERAGE_HOURS_INVALID');
     requireThat(Number.isInteger(p.multiplierBps) && p.multiplierBps > 0 && p.multiplierBps <= 100_000, 'MULTIPLIER_INVALID');
   }
-  requireThat(['selected', 'all'].includes(config.cohort?.mode), 'COHORT_MODE_INVALID');
-  const ids = config.cohort.userIds;
-  requireThat(Array.isArray(ids) && ids.every(id => typeof id === 'string' && id.length > 0) && new Set(ids).size === ids.length, 'USER_IDS_INVALID');
-  requireThat(config.cohort.mode === 'all' ? ids.length === 0 : ids.length > 0, 'COHORT_IDS_INVALID');
-  requireThat(Number.isInteger(config.maxMembers) && config.maxMembers > 0 && config.maxMembers <= 500, 'MAX_MEMBERS_INVALID');
-  requireThat(Number.isInteger(config.concurrency) && config.concurrency > 0 && config.concurrency <= 5, 'CONCURRENCY_INVALID');
+  approvalWindowMs(config);
   return { slot: Math.floor((current - anchor) / (p.intervalHours * HOUR)), current, start, end, ceiling };
+}
+export function validateConfig(config, now) {
+  const context = validatePolicy(config, now);
+  normalizeCohort(config.cohort);
+  requireThat(config.maxMembers == null || (Number.isSafeInteger(config.maxMembers) && config.maxMembers > 0), 'MAX_MEMBERS_INVALID');
+  requireThat(Number.isSafeInteger(config.concurrency) && config.concurrency > 0, 'CONCURRENCY_INVALID');
+  const captureConcurrency = config.captureConcurrency ?? config.concurrency;
+  requireThat(Number.isSafeInteger(captureConcurrency) && captureConcurrency > 0, 'CAPTURE_CONCURRENCY_INVALID');
+  if (config.apiLimits !== undefined) {
+    requireThat(config.apiLimits && typeof config.apiLimits === 'object' && !Array.isArray(config.apiLimits) &&
+      Object.entries(config.apiLimits).every(([key, value]) => ['maxPages', 'maxRows'].includes(key) &&
+        Number.isSafeInteger(value) && value > 0), 'API_LIMITS_INVALID');
+  }
+  return context;
 }
 export function validateSnapshot(snapshot, config, userId, now) {
   requireThat(snapshot.workspaceId === config.workspaceId && snapshot.userId === userId, 'IDENTITY_MISMATCH');
@@ -97,7 +113,7 @@ export function historyRange(config, now) {
   return { start: new Date(end - config.policy.lookbackDays * DAY).toISOString(), end: new Date(end).toISOString(), unit: config.unit };
 }
 export function planTarget(config, snapshot, now, history) {
-  const { slot, ceiling } = validateConfig(config, now);
+  const { slot, ceiling } = validatePolicy(config, now);
   const p = config.policy;
   let desired;
   let observedDailyAverage;

@@ -18,8 +18,9 @@ export function exampleConfig({ now = new Date().toISOString(), pattern = 'fixed
     policy: { pattern, anchor: new Date(Math.floor(time(now) / HOUR) * HOUR).toISOString(), startCap: unit === 'credit' ? creditRelease : '2',
       increment: unit === 'credit' ? creditRelease : '2', intervalHours, ceiling: unit === 'credit' ? '2000' : '20',
       lookbackDays: 7, coverageHours: 24, multiplierBps: 15_000 },
-    cohort: { mode: cohort, userIds: cohort === 'all' ? [] : synthetic ? ['synthetic-user-a', 'synthetic-user-b'] : ['REPLACE_USER_ID'] },
-    maxMembers: 25, concurrency: 1, allowInitialReduction: false, liveWrites: false };
+    cohort: { mode: cohort, userIds: cohort === 'all' ? [] : synthetic ? ['synthetic-user-a', 'synthetic-user-b'] : ['REPLACE_USER_ID'], emails: [], groupIds: [] },
+    maxMembers: null, concurrency: 1, captureConcurrency: 1, initialReviewMaxAgeMinutes: 15,
+    allowInitialReduction: false, liveWrites: false };
 }
 export function createSyntheticApi({ config, clock = () => new Date().toISOString(), saved, persist = async () => {},
   initialCap = config.unit === 'credit' ? '2000' : '1' }) {
@@ -28,15 +29,27 @@ export function createSyntheticApi({ config, clock = () => new Date().toISOStrin
     // Tests may pin a smaller fake before-state without changing the public example.
     const rule = { type: 'limited', limit_amount: { amount: initialCap, unit: config.unit } };
     const effective = { limit: rule, source: { kind: 'workspace_default' } };
-    return [userId, { workspaceId: config.workspaceId, userId, unit: config.unit, usage: '0',
+    return [userId, { workspaceId: config.workspaceId, userId, email: `${userId}@example.invalid`, unit: config.unit, usage: '0',
       cap: { type: 'limited', amount: rule.limit_amount.amount, unit: config.unit, source: 'workspace_default' },
       settings: { override: null, effective, inherited: effective }, observedAt: clock() }];
   }));
   let fault;
   const api = {
     synthetic: true, writes: [], users,
+    groups: { 'synthetic-group-a': ['synthetic-user-a', 'synthetic-user-b'], 'synthetic-group-b': ['synthetic-user-b', 'synthetic-user-c'] },
     injectFault(nextFault) { fault = nextFault; },
     async listMembers() { return Object.keys(users).sort(); },
+    async listMemberDirectory() { return (await api.listMembers()).map(userId => ({ userId, email: users[userId].email ?? null })); },
+    async resolveEmail(email) {
+      const matches = Object.entries(users).filter(([, user]) => user.email?.trim().toLowerCase() === email.trim().toLowerCase());
+      requireThat(matches.length === 1, matches.length ? 'EMAIL_RESOLUTION_AMBIGUOUS' : 'EMAIL_NOT_FOUND');
+      return { userId: matches[0][0], email: matches[0][1].email };
+    },
+    async listGroupMembers(groupId) {
+      requireThat(Object.hasOwn(api.groups, groupId), 'GROUP_NOT_FOUND');
+      return [...api.groups[groupId]].sort();
+    },
+    async assertMemberActive(userId) { requireThat(Object.hasOwn(users, userId), 'MEMBER_NOT_ACTIVE'); return { userId, email: users[userId].email ?? null }; },
     async readSnapshot(id) {
       requireThat(users[id], 'SYNTHETIC_USER_UNAVAILABLE');
       if (fault?.type === 'read' && fault.userId === id) { fault = null; throw Object.assign(new Error('SIMULATED_READ_FAILURE'), {code:'SIMULATED_READ_FAILURE'}); }

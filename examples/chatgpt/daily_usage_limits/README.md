@@ -75,13 +75,13 @@ For ongoing workspace credit management, run the program on **organization-manag
 | Run on a managed macOS or Linux computer or server | [Set up a managed host](https://github.com/openai/openai-cookbook/blob/codex/daily-usage-limits/examples/chatgpt/daily_usage_limits/docs/local.md) |
 | Deploy using your AWS account | [Deploy on AWS](https://github.com/openai/openai-cookbook/blob/codex/daily-usage-limits/examples/chatgpt/daily_usage_limits/docs/aws.md) |
 
-The AWS guide includes a deployment template and setup instructions. Your technical team can adapt the program to other infrastructure your organization operates.
+The AWS guide includes a deployment template, queued processing for larger enrollments, and progress tracking. Start with a small group, then increase the enrollment as you verify completion and API throughput. Your technical team can adapt the program to other infrastructure your organization operates.
 
 For Windows admins, the AWS guide provides a browser-based setup path through AWS CloudShell. Live local scheduling uses the included macOS or Linux service setup.
 
 ## Prepare a reviewed enrollment
 
-Choose the people included, confirm their current settings and monthly period, and review the proposed changes. The [configuration and enrollment guide](https://github.com/openai/openai-cookbook/blob/codex/daily-usage-limits/examples/chatgpt/daily_usage_limits/docs/operations.md#prepare-a-reviewed-enrollment) takes you through each step. A preview shows the proposed limits before you apply them.
+Choose a workspace, then select people by user ID, email address, workspace group ID, or all current members. Review the resolved list, current settings, monthly period, and proposed changes. The [configuration and enrollment guide](https://github.com/openai/openai-cookbook/blob/codex/daily-usage-limits/examples/chatgpt/daily_usage_limits/docs/operations.md#prepare-a-reviewed-enrollment) takes you through each step. A preview shows the proposed limits before you apply them.
 
 ## Stop, restore, and renew
 

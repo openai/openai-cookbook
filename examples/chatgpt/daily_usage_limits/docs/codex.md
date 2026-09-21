@@ -41,7 +41,7 @@ node src/cli.mjs run --config .private/codex-rehearsal/config.json --enrollment 
 node src/cli.mjs inspect --state .private/codex-rehearsal/state
 ```
 
-The first `run` previews the targets. The next applies them to the simulator. Expect the repeat to report `duplicate_slot` for both users and leave their caps unchanged. Verify scheduled execution separately in step 3. If the first apply is more than 15 minutes after the snapshot, or crosses an interval boundary, capture and review a fresh snapshot before applying.
+The first `run` previews the targets. The next applies them to the simulator. Expect the repeat to report `duplicate_slot` for both users and leave their caps unchanged. Verify scheduled execution separately in step 3. This rehearsal uses the default 15-minute review window. If the first apply is more than 15 minutes after capture starts, or crosses an interval boundary, capture and review a fresh snapshot before applying. For a live setup, choose `initialReviewMaxAgeMinutes` before capture to cover the reviewed workflow.
 
 ## 2. Try the task prompt
 

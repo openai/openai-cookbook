@@ -27,7 +27,7 @@ node src/cli.mjs run --config .private/local-rehearsal/config.json --enrollment 
 node src/cli.mjs inspect --state .private/local-rehearsal/state
 ```
 
-Expect preview receipts, then simulator changes, then `duplicate_slot` for all three members. The configured increment is per week in this rehearsal. The first apply must use a snapshot captured within 15 minutes and in the same interval slot.
+Expect preview receipts, then simulator changes, then `duplicate_slot` for all three members. The configured increment is per week in this rehearsal. This rehearsal uses the default 15-minute review window, measured from capture start. The first apply must also stay in the same interval slot. Set `initialReviewMaxAgeMinutes` before a live capture to cover the reviewed workflow.
 
 To rehearse observed headroom, initialize a separate directory using `--pattern observed_headroom --cohort selected --unit usd --interval-hours 24 --synthetic`, then repeat the snapshot, approval, preview, apply, duplicate, and restore steps with that directory. Review `lookbackDays`, `coverageHours`, and `multiplierBps` in its configuration. Native USD calculations use USD throughout.
 
@@ -252,9 +252,10 @@ Expect no scheduled timer and `not-found` from the final command. Revoke the ded
 | Condition | Action |
 | --- | --- |
 | Duplicate slot | No additional budget was released. Keep the same state directory. |
+| Email or group selection changed | Pause new grants. Review the resolved membership and prepare a new enrollment after reconciling or restoring the existing one. Restoration uses the original enrolled IDs. |
 | Conflicting manual edit or policy/enrollment mismatch | Pause the scheduler. Compare live settings, enrollment, and journal before approving another action. |
 | Pending or ambiguous write | Rerun the same operation only after inspecting the saved absolute target and current state. Use readback to check whether the saved target was applied. |
-| Initial reduction review expired | A reduction cannot be retried after its 15-minute review window or interval slot ends. Inspect whether the saved target took effect; reconcile an applied change, or cancel an untouched initial operation using the procedure below. |
+| Initial reduction review expired | A reduction cannot be retried after its configured review window or interval slot ends. Inspect whether the saved target took effect; reconcile an applied change, or cancel an untouched initial operation using the procedure below. |
 | Authentication or authorization failure | Repair the dedicated credential or permissions through the approved process. Use `resume-auth` below to read current state and clear the halt, then preview the same pending operation. |
 | Rate limit | Respect the recorded retry time. Do not shorten it by changing the scheduler. |
 | Stale lock, incomplete journal, or corrupted journal | Stop all writers and reconcile saved intent against the API. Preserve evidence; deleting state can lose the original settings or repeat an operation. |
@@ -268,7 +269,7 @@ After repairing authentication, clear an authorization halt with a read-only rec
 node src/cli.mjs resume-auth --config .private/pilot/config.json --enrollment .private/pilot/enrollment.json --state .private/pilot/state
 ```
 
-The command checks the saved pending operation against current API state and clears the halt only when they agree. It preserves the cap and updates the local recovery record. For Keychain or systemd, use `src/credential-runner.mjs resume-auth` with the same provider and path flags shown above. Preview before retrying an authorized apply; keep the existing journal. The original 15-minute review deadline and policy slot still apply after authentication recovery.
+The command checks the saved pending operation against current API state and clears the halt only when they agree. It preserves the cap and updates the local recovery record. For Keychain or systemd, use `src/credential-runner.mjs resume-auth` with the same provider and path flags shown above. Preview before retrying an authorized apply; keep the existing journal. Initial reductions retain their original configured review deadline and policy slot after authentication recovery. A previously saved exact increase can be retried after that window; its target is preserved.
 
 ### Cancel an unapplied initial operation
 

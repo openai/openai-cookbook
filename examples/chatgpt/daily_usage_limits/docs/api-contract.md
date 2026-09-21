@@ -10,7 +10,9 @@ The request and response mappings were checked against the [public OpenAPI speci
 | Original override and inherited source | `GET /manage/workspaces/{workspace_id}/usage_limits/users/{user_id}` | Same read permission |
 | Current usage and billing unit | Same user route plus `/monthly-usage` | Same read permission |
 | Set or restore a user override | `PATCH /manage/workspaces/{workspace_id}/usage_limits/users/{user_id}` | `chatgpt.enterprise.usage_limit.write` |
-| Capture current members | `GET /manage/workspaces/{workspace_id}/users` | `chatgpt.enterprise.user.read` |
+| Capture current members or resolve an exact email | `GET /manage/workspaces/{workspace_id}/users` | `chatgpt.enterprise.user.read` |
+| Verify an enrolled member | `GET /manage/workspaces/{workspace_id}/users/{user_id}`, followed by an active-member lookup | Same user read permission |
+| Resolve a workspace group | `GET /manage/workspaces/{workspace_id}/groups/{group_id}` and the same route plus `/users` | `chatgpt.enterprise.directory.read` |
 | Observed daily history | `GET /analytics/workspaces/{workspace_id}/usage` | `enterprise.analytics.usage.read` |
 
 Use only the permissions needed by the chosen pattern. Fixed budget release uses the usage-limit and membership routes. Obtain approval before creating a key or enabling writes through the live walkthrough.
@@ -33,11 +35,15 @@ Timeouts, unreadable successful write responses, and write-side server errors re
 
 ## Review membership and usage history
 
-Member capture follows `after=last_id` until `has_more` is false and returns sorted IDs. The endpoint excludes service accounts and is eventually consistent. A reviewed capture includes the members observed during that capture. Later arrivals require a new reviewed enrollment.
+Member capture follows `after=last_id` until `has_more` is false and returns sorted IDs. The endpoint excludes service accounts and is eventually consistent. Email selectors use the exact email filter and require one matching active member. Group selectors verify workspace ownership, follow the group-user cursor through every page, and include active users. Explicit IDs, resolved emails, and group members form one deduplicated list. Missing or ambiguous matches stop capture.
+
+The reviewed enrollment saves the resolved IDs and their email/group matches. Later arrivals require a new enrollment. Each run checks those matches before processing; a changed match stops new grants. Restoration uses the saved IDs. Before a write, the adapter verifies the individual workspace member and active status. A member without an email requires an active-directory lookup.
+
+`apiLimits.maxPages` and `apiLimits.maxRows` set optional bounds for paginated reads. Reaching either bound stops processing; the adapter never treats a partial page set as the complete cohort.
 
 Every captured member must have an explicit effective rule and source in the usage-limit response. The public schema permits a null effective cap with no defined unlimited interpretation or source. That response stops the entire capture with `CAP_SOURCE_UNAVAILABLE`. Review and use an explicitly selected supported cohort, or establish the member's intended effective setting through your normal admin process before capturing everyone again.
 
-History uses UTC-midnight bounds, fetches every page, and selects the enrolled user locally. It reads native `credits` or `cost_usd` and excludes `estimated_cost_usd` from calculations. A second billing unit, missing or duplicate day, unavailable amount, or wrong actor stops the usage-based pattern. Reported zero is accepted. A missing row stops the pattern, including when the API omits an inactive day. Choose fixed budget release when complete daily observations are unavailable.
+History uses UTC-midnight bounds, fetches every page, and selects the enrolled user locally. The public endpoint has no user filter. One adapter instance shares a range read across members for up to 60 seconds, measured from the first page; pagination that exceeds that freshness stops the calculation. Separate AWS workers have separate caches. It reads native `credits` or `cost_usd` and excludes `estimated_cost_usd` from calculations. A second billing unit, missing or duplicate day, unavailable amount, or wrong actor stops the usage-based pattern. Reported zero is accepted. A missing row stops the pattern, including when the API omits an inactive day. Choose fixed budget release when complete daily observations are unavailable.
 
 Returned history is labeled `semantics: "observed"`. Later corrections can change it after all pages have been fetched. The data has no finalization watermark, and the example cannot guarantee exact daily spending.
 

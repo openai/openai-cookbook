@@ -11,5 +11,15 @@
   { "ParameterKey": "ScheduleState", "ParameterValue": "DISABLED" },
   { "ParameterKey": "ScheduledAction", "ParameterValue": "preview" },
   { "ParameterKey": "ApplyEnabled", "ParameterValue": "false" },
+  { "ParameterKey": "AllowedWriteAction", "ParameterValue": "none" },
+  { "ParameterKey": "RunEventsNotBefore", "ParameterValue": "1970-01-01T00:00:00Z" },
+  { "ParameterKey": "WorkProcessingEnabled", "ParameterValue": "false" },
+  { "ParameterKey": "WorkBatchSize", "ParameterValue": "1" },
+  { "ParameterKey": "RecordConcurrency", "ParameterValue": "1" },
+  { "ParameterKey": "WorkerConcurrency", "ParameterValue": "2" },
+  { "ParameterKey": "DispatchBatchSize", "ParameterValue": "100" },
+  { "ParameterKey": "WorkerMemorySize", "ParameterValue": "1024" },
+  { "ParameterKey": "WorkerTimeoutSeconds", "ParameterValue": "120" },
+  { "ParameterKey": "MaxReceiveCount", "ParameterValue": "10" },
   { "ParameterKey": "ReceiptRetentionDays", "ParameterValue": "30" }
 ]

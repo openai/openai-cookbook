@@ -18,6 +18,19 @@ function user({ unit = 'credit', override = null, source, fallback } = {}) {
       source ?? (override?.length ? { kind: 'individual_override' } : undefined)),
     inherited_monthly_usage_limit: fallback ?? inherited(unit) };
 }
+const directoryUser = (id = userId, email = 'synthetic@example.com') => ({
+  object: 'workspace.user', id, email, name: 'Fictional User', role: 'member',
+  seat_type: 'chatgpt', is_scim_managed: false,
+});
+const memberPage = (data = [], hasMore = false) => ({ object: 'list', data,
+  first_id: data[0]?.id ?? null, last_id: data.at(-1)?.id ?? null, has_more: hasMore });
+const groupId = 'group-example';
+const groupUser = (id = userId, status = 'active') => ({ object: 'compliance.workspace.user', id,
+  email: null, name: null, created_at: 0, role: 'standard-user', status, is_scim_managed: false });
+const groupPage = (data = [], cursor = null, hasMore = false) => ({ object: 'list', data,
+  last_id: data.at(-1)?.id ?? null, cursor, has_more: hasMore });
+const groupResource = () => ({ object: 'directory.workspace.group', id: groupId, workspace_id: workspaceId,
+  name: 'Fictional Group', created_at: 0, member_count: 1, source: 'manual' });
 function harness({ unit = 'credit', usage = 25, original = user({ unit }), allowWrites = false,
   intercept, options = {} } = {}) {
   const requests = [];
@@ -372,11 +385,232 @@ test('member duplicate pages, missing cursors, and bounded pagination fail close
   for (const mode of ['duplicate', 'cursor', 'bound']) {
     const h = harness({ options: { maxPages: mode === 'bound' ? 1 : 1000 },
       intercept: ({ url, response }) => url.pathname.endsWith('/users') ? response({
-        object: 'list', data: [{ object: 'workspace.user', id: 'user-alpha' }],
+        object: 'list', data: [directoryUser('user-alpha')], first_id: 'user-alpha',
         last_id: mode === 'cursor' ? null : 'user-alpha', has_more: true,
       }) : null });
-    await rejectsCode(h.api.listMembers(), { duplicate: 'MEMBER_PAGE_INCONSISTENT', cursor: 'MEMBER_CURSOR_INVALID',
+    await rejectsCode(h.api.listMembers(), { duplicate: 'MEMBER_PAGE_INCONSISTENT', cursor: 'MEMBER_PAGE_INVALID',
       bound: 'MEMBER_PAGE_BOUND_EXCEEDED' }[mode]);
+  }
+});
+
+test('member directory paginates IDs and nullable emails and discards other personal fields', async () => {
+  const h = harness({ intercept: ({ url, response }) => {
+    if (url.pathname.endsWith('/users')) {
+      assert.equal(url.searchParams.get('limit'), '1000');
+      const second = url.searchParams.has('after');
+      if (second) assert.equal(url.searchParams.get('after'), 'user-alpha');
+      return response(memberPage([second ? directoryUser('user-beta', 'Beta@Example.com') :
+        directoryUser('user-alpha', null)], !second));
+    }
+  }, options: { userIds: [] } });
+  assert.deepEqual(await h.api.listMemberDirectory(), [
+    { userId: 'user-alpha', email: null }, { userId: 'user-beta', email: 'Beta@Example.com' },
+  ]);
+  assert.equal(h.patches, 0);
+  await rejectsCode(h.api.readSnapshot('user-alpha'), 'IDENTITY_NOT_ALLOWLISTED');
+});
+
+test('member directory bounds, required email fields and page identities fail closed', async () => {
+  for (const { page, options, code } of [
+    { page: memberPage([directoryUser('user-alpha'), directoryUser('user-beta')]),
+      options: { maxRows: 1 }, code: 'MEMBER_ROW_BOUND_EXCEEDED' },
+    { page: memberPage([directoryUser('user-alpha')], true), options: { maxPages: 1 }, code: 'MEMBER_PAGE_BOUND_EXCEEDED' },
+    { page: memberPage([{ object: 'workspace.user', id: userId }]), code: 'MEMBER_PAGE_INCONSISTENT' },
+    { page: { ...memberPage([directoryUser()]), first_id: 'other' }, code: 'MEMBER_PAGE_INVALID' },
+    { page: null, code: 'MEMBER_PAGE_INVALID' },
+  ]) {
+    const h = harness({ options, intercept: ({ url, response }) =>
+      url.pathname.endsWith('/users') ? response(page) : null });
+    await rejectsCode(h.api.listMemberDirectory(), code);
+    assert.equal(h.patches, 0);
+  }
+});
+
+test('email lookup trims, lowercases and URL-encodes exact addresses without a cursor', async () => {
+  const h = harness({ intercept: ({ url, response }) => {
+    if (url.pathname.endsWith('/users')) {
+      assert.equal(url.searchParams.get('email'), 'alex+qa@example.com');
+      assert.equal(url.searchParams.has('after'), false);
+      assert.equal(url.searchParams.get('limit'), '1');
+      assert.ok(url.search.includes('%2B'));
+      return response(memberPage([directoryUser(userId, 'Alex+QA@example.com')]));
+    }
+  }, options: { userIds: [] } });
+  assert.deepEqual(await h.api.resolveEmail('  ALEX+QA@Example.COM  '),
+    { userId, email: 'Alex+QA@example.com' });
+  assert.equal(h.requests.length, 2);
+  assert.equal(h.patches, 0);
+  await rejectsCode(h.api.readSnapshot(userId), 'IDENTITY_NOT_ALLOWLISTED');
+});
+
+test('invalid email selectors stop before requests', async () => {
+  for (const email of [null, '', '   ', 'not-an-email', 'two@@example.com', 'two words@example.com']) {
+    const h = harness();
+    await rejectsCode(h.api.resolveEmail(email), 'EMAIL_INVALID');
+    assert.equal(h.requests.length, 0);
+  }
+});
+
+test('email lookup rejects missing, ambiguous and conflicting results', async () => {
+  for (const { page, code } of [
+    { page: memberPage(), code: 'EMAIL_MEMBER_NOT_FOUND' },
+    { page: memberPage([directoryUser(), directoryUser('user-other')]), code: 'EMAIL_MEMBER_AMBIGUOUS' },
+    { page: memberPage([directoryUser(userId, 'other@example.com')]), code: 'EMAIL_MEMBER_MISMATCH' },
+    { page: memberPage([directoryUser(userId, null)]), code: 'EMAIL_MEMBER_MISMATCH' },
+    { page: memberPage([directoryUser()], true), code: 'EMAIL_LOOKUP_INVALID' },
+    { page: { ...memberPage([directoryUser()]), last_id: 'user-other' }, code: 'EMAIL_LOOKUP_INVALID' },
+    { page: null, code: 'EMAIL_LOOKUP_INVALID' },
+  ]) {
+    const h = harness({ intercept: ({ url, response }) =>
+      url.pathname.endsWith('/users') ? response(page) : null });
+    await rejectsCode(h.api.resolveEmail('synthetic@example.com'), code);
+    assert.equal(h.patches, 0);
+  }
+});
+
+test('active-member assertion requires an explicit allowlist before any request', async () => {
+  const h = harness();
+  await rejectsCode(h.api.assertMemberActive('user-other'), 'IDENTITY_NOT_ALLOWLISTED');
+  assert.equal(h.requests.length, 0);
+});
+
+test('point member GET is confirmed by the active collection email lookup', async () => {
+  const h = harness({ intercept: ({ url, response }) => {
+    if (url.pathname === `/v1/manage/workspaces/${workspaceId}/users/${userId}`) return response(directoryUser());
+    if (url.pathname.endsWith('/users')) {
+      assert.equal(url.searchParams.get('email'), 'synthetic@example.com');
+      assert.equal(url.searchParams.has('after'), false);
+      return response(memberPage([directoryUser()]));
+    }
+  } });
+  assert.deepEqual(await h.api.assertMemberActive(userId), { userId, email: 'synthetic@example.com' });
+  assert.equal(h.requests.length, 3);
+  assert.equal(h.patches, 0);
+});
+
+test('active-member assertion rejects inactive, reassigned and mismatched email identities', async () => {
+  for (const page of [memberPage(), memberPage([directoryUser('user-other')])]) {
+    const h = harness({ intercept: ({ url, response }) => {
+      if (url.pathname === `/v1/manage/workspaces/${workspaceId}/users/${userId}`) return response(directoryUser());
+      if (url.pathname.endsWith('/users')) return response(page);
+    } });
+    await rejectsCode(h.api.assertMemberActive(userId), 'MEMBER_NOT_ACTIVE');
+    assert.equal(h.patches, 0);
+  }
+  const h = harness({ intercept: ({ url, response }) =>
+    url.pathname === `/v1/manage/workspaces/${workspaceId}/users/${userId}` ? response(directoryUser('user-other')) : null });
+  await rejectsCode(h.api.assertMemberActive(userId), 'USER_READBACK_MISMATCH');
+});
+
+test('null-email active-member assertion falls back to the bounded active directory', async () => {
+  for (const present of [true, false]) {
+    const h = harness({ intercept: ({ url, response }) => {
+      if (url.pathname === `/v1/manage/workspaces/${workspaceId}/users/${userId}`) return response(directoryUser(userId, null));
+      if (url.pathname.endsWith('/users')) {
+        assert.equal(url.searchParams.has('email'), false);
+        return response(memberPage(present ? [directoryUser(userId, null)] : []));
+      }
+    } });
+    if (present) assert.deepEqual(await h.api.assertMemberActive(userId), { userId, email: null });
+    else await rejectsCode(h.api.assertMemberActive(userId), 'MEMBER_NOT_ACTIVE');
+    assert.equal(h.requests.length, 4);
+    assert.equal(h.patches, 0);
+  }
+});
+
+test('active-member assertion preserves point-GET permission and missing-member errors', async () => {
+  for (const status of [403, 404]) {
+    const h = harness({ intercept: ({ url }) =>
+      url.pathname === `/v1/manage/workspaces/${workspaceId}/users/${userId}` ?
+        { ok: false, status, headers: new Headers() } : null });
+    await rejectsCode(h.api.assertMemberActive(userId), `ADMIN_HTTP_${status}`);
+    assert.equal(h.requests.length, 2);
+  }
+});
+
+test('group members use opaque cursors, skip deactivated users and return sorted auth-user IDs', async () => {
+  const h = harness({ options: { userIds: [] }, intercept: ({ url, response }) => {
+    if (url.pathname.endsWith(`/groups/${groupId}`)) return response(groupResource());
+    if (url.pathname.endsWith(`/groups/${groupId}/users`)) {
+      assert.equal(url.searchParams.get('limit'), '100');
+      assert.equal(url.searchParams.get('order'), 'asc');
+      assert.equal(url.searchParams.has('after'), false);
+      const second = url.searchParams.has('cursor');
+      if (second) assert.equal(url.searchParams.get('cursor'), 'opaque+/=cursor');
+      return response(second ? groupPage([groupUser('user-alpha')]) :
+        groupPage([groupUser('user-beta'), groupUser('user-disabled', 'deactivated')], 'opaque+/=cursor', true));
+    }
+  } });
+  assert.deepEqual(await h.api.listGroupMembers(groupId), ['user-alpha', 'user-beta']);
+  assert.equal(h.requests.length, 4);
+  assert.equal(h.patches, 0);
+  await rejectsCode(h.api.readSnapshot('user-alpha'), 'IDENTITY_NOT_ALLOWLISTED');
+});
+
+test('directory group, page and member object tags may be omitted when the schema defaults them', async () => {
+  const group = groupResource(); delete group.object;
+  const member = groupUser(); delete member.object;
+  const page = groupPage([member]); delete page.object;
+  const h = harness({ intercept: ({ url, response }) => {
+    if (url.pathname.endsWith(`/groups/${groupId}`)) return response(group);
+    if (url.pathname.endsWith(`/groups/${groupId}/users`)) return response(page);
+  } });
+  assert.deepEqual(await h.api.listGroupMembers(groupId), [userId]);
+});
+
+test('group ID and returned workspace/group identities are checked before listing users', async () => {
+  const invalid = harness();
+  await rejectsCode(invalid.api.listGroupMembers('../other'), 'GROUP_ID_INVALID');
+  assert.equal(invalid.requests.length, 0);
+  for (const extra of [{ id: 'group-other' }, { workspace_id: 'workspace-other' }, { object: 'wrong' }]) {
+    const h = harness({ intercept: ({ url, response }) =>
+      url.pathname.endsWith(`/groups/${groupId}`) ? response({ ...groupResource(), ...extra }) : null });
+    await rejectsCode(h.api.listGroupMembers(groupId), 'GROUP_READBACK_MISMATCH');
+    assert.equal(h.requests.length, 2);
+  }
+});
+
+test('group pages reject unknown status, duplicate identities, wrong tags and invalid cursors', async () => {
+  for (const { pages, code } of [
+    { pages: [groupPage([groupUser(userId, 'inactive')])], code: 'GROUP_MEMBER_STATUS_INVALID' },
+    { pages: [groupPage([groupUser(), groupUser()])], code: 'GROUP_MEMBER_PAGE_INCONSISTENT' },
+    { pages: [groupPage([{ ...groupUser(), object: 'workspace.user' }])], code: 'GROUP_MEMBER_PAGE_INCONSISTENT' },
+    { pages: [groupPage([groupUser()], null, true)], code: 'GROUP_MEMBER_CURSOR_INVALID' },
+    { pages: [groupPage([groupUser()], 'repeat', true), groupPage([groupUser('user-other')], 'repeat', true)],
+      code: 'GROUP_MEMBER_CURSOR_INVALID' },
+    { pages: [{ ...groupPage([groupUser()]), last_id: 'user-other' }], code: 'GROUP_MEMBER_PAGE_INVALID' },
+    { pages: [null], code: 'GROUP_MEMBER_PAGE_INVALID' },
+  ]) {
+    let pageIndex = 0;
+    const h = harness({ intercept: ({ url, response }) => {
+      if (url.pathname.endsWith(`/groups/${groupId}`)) return response(groupResource());
+      if (url.pathname.endsWith(`/groups/${groupId}/users`)) return response(pages[pageIndex++]);
+    } });
+    await rejectsCode(h.api.listGroupMembers(groupId), code);
+    assert.equal(h.patches, 0);
+  }
+});
+
+test('group pagination bounds count deactivated users and prevent unbounded scans', async () => {
+  for (const { options, page, code } of [
+    { options: { maxRows: 1 }, page: groupPage([groupUser(), groupUser('user-disabled', 'deactivated')]),
+      code: 'GROUP_MEMBER_ROW_BOUND_EXCEEDED' },
+    { options: { maxPages: 1 }, page: groupPage([groupUser()], 'next', true), code: 'GROUP_MEMBER_PAGE_BOUND_EXCEEDED' },
+  ]) {
+    const h = harness({ options, intercept: ({ url, response }) => {
+      if (url.pathname.endsWith(`/groups/${groupId}`)) return response(groupResource());
+      if (url.pathname.endsWith(`/groups/${groupId}/users`)) return response(page);
+    } });
+    await rejectsCode(h.api.listGroupMembers(groupId), code);
+  }
+});
+
+test('group permission and missing-group errors remain explicit without partial results', async () => {
+  for (const status of [403, 404]) {
+    const h = harness({ intercept: ({ url }) => url.pathname.endsWith(`/groups/${groupId}`) ?
+      { ok: false, status, headers: new Headers() } : null });
+    await rejectsCode(h.api.listGroupMembers(groupId), `ADMIN_HTTP_${status}`);
+    assert.equal(h.requests.length, 2);
   }
 });
 
@@ -385,6 +619,7 @@ test('history fetches every page, filters target ID, preserves zero, and labels 
     if (url.pathname.includes('/analytics/')) {
       assert.equal(url.searchParams.get('start_time'), String(Date.parse(query.start) / 1000));
       assert.equal(url.searchParams.get('end_time'), String(Date.parse(query.end) / 1000));
+      assert.equal(url.searchParams.get('limit'), '30000');
       assert.equal(url.searchParams.has('group'), false);
       const second = url.searchParams.has('page');
       if (second) assert.equal(url.searchParams.get('page'), 'cursor-example');
@@ -432,4 +667,182 @@ test('history bounds require completed UTC days and pagination cannot loop indef
   await rejectsCode(h.api.readHistory(userId, { ...query, start: '2030-06-10T01:00:00Z' }), 'HISTORY_WINDOW_INVALID');
   await rejectsCode(h.api.readHistory(userId, { ...query, end: '2030-06-16T00:00:00Z' }), 'HISTORY_WINDOW_INVALID');
   await rejectsCode(h.api.readHistory(userId, query), 'HISTORY_CURSOR_INVALID');
+});
+
+test('concurrent and sequential users share one paginated history index', async () => {
+  const otherId = 'user-other';
+  const firstPageStarted = Promise.withResolvers();
+  const releaseFirstPage = Promise.withResolvers();
+  let pages = 0;
+  let currentTime = Date.parse(NOW);
+  const h = harness({ options: { userIds: [userId, otherId], clock: () => new Date(currentTime).toISOString() },
+    intercept: async ({ url, response }) => {
+      if (!url.pathname.includes('/analytics/')) return;
+      pages += 1;
+      const second = url.searchParams.has('page');
+      if (!second) {
+        firstPageStarted.resolve();
+        await releaseFirstPage.promise;
+      }
+      currentTime += 10000;
+      const date = second ? '2030-06-11' : '2030-06-10';
+      return response({ object: 'page', data: [historyRow(date, { credits: second ? 0 : 4 }),
+        historyRow(date, { id: otherId, credits: null, usd: second ? 0 : 1.5 })],
+      has_more: !second, next_page: second ? null : 'history-next' });
+    } });
+  const first = h.api.readHistory(userId, query);
+  await firstPageStarted.promise;
+  const other = h.api.readHistory(otherId, { ...query, unit: 'usd' });
+  releaseFirstPage.resolve();
+  const [credits, dollars] = await Promise.all([first, other]);
+  assert.equal(pages, 2);
+  assert.deepEqual(credits.days.map(day => day.amount), ['4', '0']);
+  assert.deepEqual(dollars.days.map(day => day.amount), ['1.5', '0']);
+  assert.equal(credits.observedAt, NOW);
+  assert.equal(dollars.observedAt, NOW);
+  credits.days[0].amount = '999';
+  const reused = await h.api.readHistory(userId, query);
+  assert.equal(reused.days[0].amount, '4');
+  assert.equal(reused.observedAt, NOW);
+  assert.equal(pages, 2);
+});
+
+test('history cache expires after sixty seconds and refetches after clock rollback', async () => {
+  let currentTime = Date.parse(NOW);
+  let pages = 0;
+  const h = harness({ options: { clock: () => new Date(currentTime).toISOString() },
+    intercept: ({ url, response }) => {
+      if (!url.pathname.includes('/analytics/')) return;
+      pages += 1;
+      return response({ object: 'page', data: ['2030-06-10', '2030-06-11'].map(date =>
+        historyRow(date, { credits: pages })), has_more: false, next_page: null });
+    } });
+  const original = await h.api.readHistory(userId, query);
+  currentTime += 60000;
+  assert.deepEqual(await h.api.readHistory(userId, query), original);
+  assert.equal(pages, 1);
+  currentTime += 1;
+  const refreshed = await h.api.readHistory(userId, query);
+  assert.equal(pages, 2);
+  assert.equal(refreshed.observedAt, new Date(currentTime).toISOString());
+  assert.equal(refreshed.days[0].amount, '2');
+  currentTime -= 1;
+  const afterRollback = await h.api.readHistory(userId, query);
+  assert.equal(pages, 3);
+  assert.equal(afterRollback.observedAt, new Date(currentTime).toISOString());
+  assert.equal(afterRollback.days[0].amount, '3');
+});
+
+test('failed shared history pagination is discarded and can be retried', async () => {
+  let failSecondPage = true;
+  let pages = 0;
+  const h = harness({ intercept: ({ url, response }) => {
+    if (!url.pathname.includes('/analytics/')) return;
+    pages += 1;
+    const second = url.searchParams.has('page');
+    if (second && failSecondPage) return { ok: false, status: 503, headers: new Headers() };
+    return response({ object: 'page', data: [historyRow(second ? '2030-06-11' : '2030-06-10')],
+      has_more: !second, next_page: second ? null : 'next' });
+  } });
+  await Promise.all([rejectsCode(h.api.readHistory(userId, query), 'ADMIN_HTTP_503'),
+    rejectsCode(h.api.readHistory(userId, query), 'ADMIN_HTTP_503')]);
+  assert.equal(pages, 2);
+  failSecondPage = false;
+  assert.deepEqual((await h.api.readHistory(userId, query)).days.map(day => day.amount), ['4', '4']);
+  assert.equal(pages, 4);
+});
+
+test('concurrent history ranges never mix and only the current range remains cached', async () => {
+  const laterQuery = { ...query, start: '2030-06-12T00:00:00Z', end: '2030-06-14T00:00:00Z' };
+  const earlierStarted = Promise.withResolvers();
+  const releaseEarlier = Promise.withResolvers();
+  const pages = { earlier: 0, later: 0 };
+  const h = harness({ intercept: async ({ url, response }) => {
+    if (!url.pathname.includes('/analytics/')) return;
+    const earlier = url.searchParams.get('start_time') === String(Date.parse(query.start) / 1000);
+    pages[earlier ? 'earlier' : 'later'] += 1;
+    if (earlier && pages.earlier === 1) {
+      earlierStarted.resolve();
+      await releaseEarlier.promise;
+    }
+    const dates = earlier ? ['2030-06-10', '2030-06-11'] : ['2030-06-12', '2030-06-13'];
+    return response({ object: 'page', data: dates.map(date => historyRow(date, { credits: earlier ? 1 : 9 })),
+      has_more: false, next_page: null });
+  } });
+  const earlierRead = h.api.readHistory(userId, query);
+  await earlierStarted.promise;
+  const later = await h.api.readHistory(userId, laterQuery);
+  releaseEarlier.resolve();
+  const earlier = await earlierRead;
+  assert.deepEqual(earlier.days, [{ date: '2030-06-10', amount: '1' }, { date: '2030-06-11', amount: '1' }]);
+  assert.deepEqual(later.days, [{ date: '2030-06-12', amount: '9' }, { date: '2030-06-13', amount: '9' }]);
+  assert.deepEqual(await h.api.readHistory(userId, laterQuery), later);
+  assert.deepEqual(pages, { earlier: 1, later: 1 });
+  assert.deepEqual(await h.api.readHistory(userId, query), earlier);
+  assert.deepEqual(pages, { earlier: 2, later: 1 });
+  await h.api.readHistory(userId, laterQuery);
+  assert.deepEqual(pages, { earlier: 2, later: 2 });
+});
+
+test('slow pagination and a clock rollback during fetch cannot make history fresh', async () => {
+  for (const delay of [60001, -1]) {
+    let currentTime = Date.parse(NOW);
+    let changeClock = true;
+    let pages = 0;
+    const h = harness({ options: { clock: () => new Date(currentTime).toISOString() },
+      intercept: ({ url, response }) => {
+        if (!url.pathname.includes('/analytics/')) return;
+        pages += 1;
+        const second = url.searchParams.has('page');
+        if (second && changeClock) currentTime += delay;
+        return response({ object: 'page', data: [historyRow(second ? '2030-06-11' : '2030-06-10')],
+          has_more: !second, next_page: second ? null : 'next' });
+      } });
+    await rejectsCode(h.api.readHistory(userId, query), 'HISTORY_STALE');
+    changeClock = false;
+    const history = await h.api.readHistory(userId, query);
+    assert.equal(history.observedAt, new Date(currentTime).toISOString());
+    assert.equal(pages, 4);
+  }
+});
+
+test('cached history still enforces allowlist, units, windows and each target user row', async () => {
+  const otherId = 'user-other';
+  const h = harness({ options: { userIds: [userId, otherId] }, intercept: ({ url, response }) =>
+    url.pathname.includes('/analytics/') ? response({ object: 'page',
+      data: [historyRow('2030-06-10'), historyRow('2030-06-11'),
+        historyRow('2030-06-10', { id: otherId, actorId: userId })],
+      has_more: false, next_page: null }) : null });
+  await h.api.readHistory(userId, query);
+  const requests = h.requests.length;
+  await rejectsCode(h.api.readHistory('user-unlisted', query), 'IDENTITY_NOT_ALLOWLISTED');
+  await rejectsCode(h.api.readHistory(userId, { ...query, unit: 'other' }), 'UNIT_UNAVAILABLE');
+  await rejectsCode(h.api.readHistory(userId, { ...query, end: query.start }), 'HISTORY_WINDOW_INVALID');
+  await rejectsCode(h.api.readHistory(otherId, query), 'HISTORY_ACTOR_MISMATCH');
+  await rejectsCode(h.api.readHistory(userId, { ...query, unit: 'usd' }), 'HISTORY_UNIT_TRANSITION');
+  assert.equal(h.requests.length, requests);
+});
+
+test('shared history preserves row and page bounds and retries malformed pages', async () => {
+  for (const { options, code } of [
+    { options: { maxRows: 1 }, code: 'HISTORY_ROW_BOUND_EXCEEDED' },
+    { options: { maxPages: 1 }, code: 'HISTORY_PAGE_BOUND_EXCEEDED' },
+  ]) {
+    const h = harness({ options, intercept: ({ url, response }) => url.pathname.includes('/analytics/') ?
+      response({ object: 'page', data: [historyRow('2030-06-10'), historyRow('2030-06-11')],
+        has_more: true, next_page: 'next' }) : null });
+    await rejectsCode(h.api.readHistory(userId, query), code);
+  }
+  let malformed = true;
+  let pages = 0;
+  const h = harness({ intercept: ({ url, response }) => {
+    if (!url.pathname.includes('/analytics/')) return;
+    pages += 1;
+    return response(malformed ? null : { object: 'page', data: [historyRow('2030-06-10'), historyRow('2030-06-11')],
+      has_more: false, next_page: null });
+  } });
+  await rejectsCode(h.api.readHistory(userId, query), 'HISTORY_PAGE_INVALID');
+  malformed = false;
+  await h.api.readHistory(userId, query);
+  assert.equal(pages, 2);
 });

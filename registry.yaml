@@ -17,10 +17,27 @@
     - tools
     - api
 
-- title: Agents API applications and sandbox integrations
-  path: examples/agents_api/README.md
-  slug: agents-api-examples
-  description: Explore complete Agents API applications and application-managed or webhook-managed sandbox integrations.
+- title: Build a prior authorization review assistant with the OpenAI Agents SDK and Amazon Bedrock AgentCore
+  path: examples/partners/AWS/policy_to_review_prior_authorization_agents_sdk_agentcore.ipynb
+  slug: prior-authorization-review-agentcore
+  description: Build and deploy a prior authorization review assistant that retrieves public CMS policy documents with a Bedrock Managed Knowledge Base, maps submitted evidence to policy criteria with the OpenAI Agents SDK, validates citations and review routing in code, and runs on Amazon Bedrock AgentCore.
+  date: 2026-08-10
+  authors:
+    - sks-oai
+  tags:
+    - partners
+    - agents-sdk
+    - agents
+    - bedrock
+    - agentcore
+    - healthcare
+    - retrieval
+    - structured-outputs
+
+- title: Build an SRE agent for incident response
+  path: examples/agents_api/apps/sev_bot/README.md
+  slug: agents-api-sev-bot
+  description: Investigate incidents in Slack using service telemetry, GitHub, AWS, and past incident reports, with human review before recovery.
   date: 2026-09-10
   authors:
     - alfozan
@@ -28,6 +45,29 @@
     - agents-api
     - agents
     - sandbox
+
+- title: Build a Slack bot with the Agents API
+  path: examples/agents_api/apps/slack_bot/README.md
+  slug: agents-api-slack-bot
+  description: Connect Slack threads to persistent agent sessions, workplace tools, and isolated sandboxes.
+  date: 2026-09-10
+  authors:
+    - alfozan
+  tags:
+    - agents-api
+    - agents
+    - sandbox
+
+- title: Build a data analyst with the Agents API
+  path: examples/agents_api/apps/data_analyst/README.md
+  slug: agents-api-data-analyst
+  description: Investigate warehouse questions with read-only SQL, business context, and saved analyst corrections.
+  date: 2026-09-10
+  authors:
+    - alfozan
+  tags:
+    - agents-api
+    - agents
 
 - title: Combining security scanners with the Agents SDK
   path: examples/agents_sdk/security_scanners_with_agents_sdk.ipynb
@@ -142,6 +182,27 @@
     - bedrock
     - security
     - payments
+
+- title: Build a ChatGPT plugin with the OpenAI Agents SDK and Amazon Bedrock AgentCore
+  path: examples/partners/AWS/chatgpt_agents_sdk_aws_agentcore_cookbook/notebooks/chatgpt_agents_sdk_aws_agentcore_cookbook.ipynb
+  slug: chatgpt-agents-sdk-amazon-bedrock-agentcore
+  description: Build a private ChatGPT flight-assistant plugin with the OpenAI Agents SDK on Amazon Bedrock, connect it through Secure MCP Tunnel, and validate tracing and Promptfoo evaluations.
+  date: 2026-09-03
+  authors:
+    - rohan-eliza
+    - chuck-eliza
+    - syedahmed-oai
+    - smcateer-eliza
+  tags:
+    - partners
+    - chatgpt
+    - agents-sdk
+    - agents
+    - bedrock
+    - mcp
+    - tracing
+    - evals
+
 - title: Enabling Long-Term Agent Memory with Oracle AI Agent Memory
   path: examples/vector_databases/oracle_db/deep_research_openai_agents.ipynb
   slug: deep-research-openai-agents
@@ -3654,7 +3715,6 @@
 - title: Skills in OpenAI API
   path: examples/skills_in_api.ipynb
   slug: skills-in-api
-  archived: true
   description: Cookbook for building skills with the OpenAI API.
   date: 2026-02-10
   authors:
@@ -3681,6 +3741,7 @@
 - title: GPT Image Generation Models Prompting Guide
   path: examples/multimodal/image-gen-models-prompting-guide.ipynb
   slug: image-gen-models-prompting-guide
+  archived: true
   description: Cookbook to prompt gpt-image models for reliable image generation results.
   date: 2026-04-21
   authors:
@@ -3754,6 +3815,18 @@
   tags:
     - evals
     - promptfoo
+
+- title: Optimizing Customer Support Agents for Cost and Quality
+  path: examples/agent_optimization/optimizing_agents_for_cost_and_quality.ipynb
+  slug: optimizing_agents_for_cost_and_quality
+  description: Optimize agents on cost, latency and performance.
+  date: 2026-09-14
+  authors:
+    - emreokcular
+    - lara-openai
+  tags:
+    - evals
+    - agents
 
 - title: GPT-Live evaluation guide
   path: examples/audio/voice_agent_evaluation.md

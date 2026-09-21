@@ -58,6 +58,8 @@ jobs:
         run: node --test test/*.test.mjs
       - name: Run fictional demonstration
         run: node src/demo.mjs
+      - name: Run dollar demonstration
+        run: node src/demo.mjs --unit usd
       - name: Verify starter contents
         run: python scripts/package_starter.py --check
       - name: Extract starter download
@@ -68,6 +70,9 @@ jobs:
       - name: Run downloaded demonstration
         working-directory: examples/chatgpt/daily_usage_limits/.private/download-check/chatgpt-usage-budget-starter
         run: node src/demo.mjs
+      - name: Run downloaded dollar demonstration
+        working-directory: examples/chatgpt/daily_usage_limits/.private/download-check/chatgpt-usage-budget-starter
+        run: node src/demo.mjs --unit usd
       - name: Build downloaded AWS package
         working-directory: examples/chatgpt/daily_usage_limits/.private/download-check/chatgpt-usage-budget-starter
         run: npm run package --prefix aws

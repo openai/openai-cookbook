@@ -3,7 +3,7 @@
 <head>
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1">
-  <title>Explore monthly credit releases</title>
+  <title>Explore monthly budget releases</title>
   <style>
     :root { color-scheme: light; font-family: system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif; color: #202123; background: #fff; --used: #a34731; --available: #0b7468; --later: #e6effa; --used-soft: #fbefea; --available-soft: #e9f5f1; }
     * { box-sizing: border-box; }
@@ -17,6 +17,20 @@
     .eyebrow { font-size: .875rem; color: #626262; margin-bottom: 12px; }
     .budget-input { display: grid; grid-template-columns: minmax(0, 1fr) 180px; column-gap: 24px; align-items: center; border-block: 1px solid #e3e3e3; padding: 16px 0; margin-bottom: 28px; }
     .budget-input label { margin: 0; }
+    .unit-choice { display: grid; grid-template-columns: minmax(0, 1fr) 200px; gap: 24px; align-items: center; margin-bottom: 16px; }
+    .unit-choice label { margin: 0; }
+    .unit-choice .hint { margin: 5px 0 0; }
+    .comparison-grid { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 28px; }
+    .comparison-grid > section { min-width: 0; }
+    .comparison-grid > section + section { border-left: 1px solid #dedede; padding-left: 28px; }
+    .example-title { font-size: 1.15rem; margin: 10px 0 16px; }
+    .comparison-grid .grid, .comparison-grid .budget-input { grid-template-columns: 1fr; }
+    .comparison-grid .weeks { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+    .comparison-grid .week:nth-child(2) { border-right: 0; }
+    .comparison-grid .week:nth-child(-n+2) { border-bottom: 1px solid #dedede; }
+    .week .number { overflow-wrap: anywhere; }
+    .week .number.long-amount { font-size: 1rem; white-space: nowrap; }
+    .budget-input { row-gap: 16px; }
     .budget-input .hint { margin: 5px 0 0; }
     .budget-input .error { grid-column: 1 / -1; margin: 8px 0 0; }
     .allocation { font-size: .9rem; color: #626262; margin: 0 0 20px; }
@@ -68,27 +82,33 @@
     .footer { font-size: .85rem; color: #626262; margin-top: 24px; padding-top: 16px; border-top: 1px solid #e3e3e3; }
     a { color: var(--available); text-underline-offset: 3px; }
     .footer a { display: inline-block; white-space: nowrap; min-height: 44px; padding-block: 12px; }
+    @media (max-width: 900px) { .comparison-grid { grid-template-columns: 1fr; } .comparison-grid > section + section { border-left: 0; border-top: 1px solid #dedede; padding: 24px 0 0; } }
     @media (max-width: 700px) { .grid { grid-template-columns: 1fr; } .weeks { grid-template-columns: repeat(2, minmax(0, 1fr)); } .week:nth-child(2) { border-right: 0; } .week:nth-child(-n+2) { border-bottom: 1px solid #dedede; } body { padding: 20px 16px; } }
-    @media (max-width: 440px) { .budget-input { grid-template-columns: 1fr; gap: 12px; } .week { padding: 16px 12px; } .figures { grid-template-columns: 1fr; } .figure.available { border-left: 0; border-top: 1px solid #dedede; } }
+    @media (max-width: 440px) { .unit-choice { grid-template-columns: 1fr; gap: 12px; } .budget-input { grid-template-columns: 1fr; gap: 12px; } .week { padding: 16px 12px; } .figures { grid-template-columns: 1fr; } .figure.available { border-left: 0; border-top: 1px solid #dedede; } }
   </style>
 </head>
 <body>
   <main>
+    <div class="unit-choice">
+      <div><label for="unit">Budget unit</label><p id="unit-hint" class="hint">Choose the unit in your workspace's billing agreement, or compare two separate examples.</p></div>
+      <select id="unit" aria-describedby="unit-hint"><option value="credit" selected>Credits</option><option value="usd">US dollars (USD)</option><option value="both">Both examples</option></select>
+    </div>
+    <div id="single-explorer">
     <div class="budget-input">
-      <div><label for="monthly">Example monthly budget per person (credits)</label><p id="monthly-hint" class="hint">Start with this 2,000-credit example, or enter a budget your organization would use.</p></div>
+      <div><label id="monthly-label" for="monthly">Example monthly budget per person (credits)</label><p id="monthly-hint" class="hint">Start with this 2,000-credit example, or enter a budget your organization would use.</p></div>
       <input id="monthly" type="number" min="1" max="1000000" step="1" value="2000" aria-describedby="monthly-hint monthly-error" required>
       <p id="monthly-error" class="error" role="status" aria-live="polite" hidden></p>
     </div>
     <section id="problem" aria-labelledby="problem-title">
       <div class="eyebrow">1 of 2 · The problem</div>
       <h1 id="problem-title" tabindex="-1">A monthly allocation can run out in week one.</h1>
-      <p class="intro">One person gets <span id="problem-budget">2,000 credits</span> for the month and uses the full amount in the first week. That leaves no credits for the rest of the month.</p>
+      <p class="intro">One person gets <span id="problem-budget">2,000 credits</span> for the month and uses the full amount in the first week. That leaves no budget for the rest of the month.</p>
       <div class="allocation">One person · one illustrative month</div>
       <div class="weeks" aria-label="Example: the entire monthly budget is used in week one">
-        <div class="week problem"><h2>Week 1</h2><span id="problem-used" class="number">2,000</span><span class="label">credits used</span><div class="track" aria-hidden="true"><div class="spent"></div></div></div>
-        <div class="week"><h2>Week 2</h2><span class="number">0</span><span class="label">credits available</span><div class="track" aria-hidden="true"></div></div>
-        <div class="week"><h2>Week 3</h2><span class="number">0</span><span class="label">credits available</span><div class="track" aria-hidden="true"></div></div>
-        <div class="week"><h2>Week 4</h2><span class="number">0</span><span class="label">credits available</span><div class="track" aria-hidden="true"></div></div>
+        <div class="week problem"><h2>Week 1</h2><span id="problem-used" class="number">2,000</span><span id="problem-used-label" class="label">credits used</span><div class="track" aria-hidden="true"><div class="spent"></div></div></div>
+        <div class="week"><h2>Week 2</h2><span id="problem-zero-2" class="number">0</span><span class="label">available</span><div class="track" aria-hidden="true"></div></div>
+        <div class="week"><h2>Week 3</h2><span id="problem-zero-3" class="number">0</span><span class="label">available</span><div class="track" aria-hidden="true"></div></div>
+        <div class="week"><h2>Week 4</h2><span id="problem-zero-4" class="number">0</span><span class="label">available</span><div class="track" aria-hidden="true"></div></div>
       </div>
       <p class="question">Spread this budget across the month.</p>
       <button id="show-plan" type="button" disabled>Next: choose a release plan →</button>
@@ -96,8 +116,8 @@
     </section>
     <section id="solution" aria-labelledby="solution-title" hidden>
       <div class="eyebrow">2 of 2 · Set the release schedule</div>
-      <h1 id="solution-title" tabindex="-1">Choose when credits become available.</h1>
-      <p class="intro">Release credits each week, every two weeks, each day, or on your own schedule.</p>
+      <h1 id="solution-title" tabindex="-1">Choose when the budget becomes available.</h1>
+      <p class="intro">Release part of the budget each week, every two weeks, each day, or on your own schedule.</p>
       <div class="allocation">One person · 30-day example month</div>
       <div class="grid">
         <section class="panel" aria-labelledby="plan-title">
@@ -111,11 +131,11 @@
           </select>
           <div id="custom-controls" hidden>
             <label for="interval">Hours between releases</label>
-            <input id="interval" type="number" min="1" max="744" step="1" value="168" required>
-            <label for="start">Initial release in credits</label>
-            <input id="start" type="number" min="1" max="2000" step="1" value="500" required>
-            <label for="increment">Credits per later release</label>
-            <input id="increment" type="number" min="1" max="2000" step="1" value="500" required>
+            <input id="interval" type="number" min="1" max="744" step="1" value="168" aria-describedby="equation" required>
+            <label id="start-label" for="start">Initial release in credits</label>
+            <input id="start" type="number" min="1" max="2000" step="1" value="500" aria-describedby="equation" required>
+            <label id="increment-label" for="increment">Credits per later release</label>
+            <input id="increment" type="number" min="1" max="2000" step="1" value="500" aria-describedby="equation" required>
           </div>
           <p id="plan-summary" class="hint">500 on days 1, 8, 15, and 22. Total: 2,000 credits.</p>
           <label for="elapsed">Move through the month: <output id="day" for="elapsed">Day 1</output></label>
@@ -126,48 +146,79 @@
           <h2 id="budget-title">This person's budget today</h2>
           <div class="figures">
             <div class="figure"><span class="label">Released so far</span><span id="released" class="number">500</span><span id="budget-total" class="label">of 2,000 credits</span></div>
-            <div class="figure available"><span class="label">Available now</span><span id="available" class="number">500</span><span class="label">credits after usage</span></div>
+            <div class="figure available"><span class="label">Available now</span><span id="available" class="number">500</span><span id="available-label" class="label">credits after usage</span></div>
           </div>
-          <label for="used">Credits used so far this month</label>
-          <input id="used" type="number" min="0" max="500" step="1" value="0" required>
+          <label id="used-label" for="used">Credits used so far this month</label>
+          <input id="used" type="number" min="0" max="500" step="1" value="0" aria-describedby="equation" required>
           <div class="meter" aria-hidden="true"><span id="used-bar" class="used-color"></span><span id="available-bar" class="available-color"></span></div>
           <div class="legend" aria-hidden="true"><span><span class="dot used-color"></span>Used</span><span><span class="dot available-color"></span>Available now</span><span><span class="dot later-color"></span>For later release</span></div>
           <div role="status" aria-live="polite" aria-atomic="true"><p id="equation" class="equation">500 released − 0 used = 500 available</p><p id="next" class="hint">The next 500 credits become available on day 8.</p></div>
         </section>
       </div>
-      <p class="callout"><strong>Unused credits stay available during the month.</strong> Each release adds to the amount this person can use.</p>
+      <p class="callout"><strong>Unused budget stays available during the month.</strong> Each release adds to the amount this person can use.</p>
       <details>
         <summary>See every release in this plan</summary>
         <div class="table-wrap"><table><caption id="schedule-caption" class="hint">One person's illustrative 2,000-credit monthly budget</caption><thead><tr><th scope="col">When</th><th scope="col">Newly released</th><th scope="col">Released so far</th></tr></thead><tbody id="schedule"></tbody></table></div>
       </details>
       <div class="actions"><button id="show-problem" type="button" class="secondary">← Back to the problem</button></div>
     </section>
-    <p class="footer">Illustrative credit example · <a id="cookbook-link" href="../README.md">Read the Cookbook</a> · <a href="release-timeline.svg">View the weekly plan</a></p>
+    <p class="footer">Illustrative budget examples · <a id="cookbook-link" href="../README.md">Read the Cookbook</a> · <a href="release-timeline.svg">View the weekly credit example</a></p>
+    </div>
+    <section id="comparison" aria-label="Separate credit and USD examples" hidden>
+      <p class="intro">Two independent budgets. Adjust each example to explore its own release plan.</p>
+      <div class="comparison-grid">
+        <section aria-labelledby="credit-example-title"><h2 id="credit-example-title" class="example-title">Credit example</h2><div id="credit-explorer"></div></section>
+        <section aria-labelledby="usd-example-title"><h2 id="usd-example-title" class="example-title">USD example</h2><div id="usd-explorer"></div></section>
+      </div>
+    </section>
   </main>
   <script>
     'use strict';
+    function createExplorer(scope, initialUnit = 'credit', prefix = '') {
     const MONTH_HOURS = 720;
-    const element = id => document.getElementById(id);
+    const MAX_BUDGET = 1000000;
+    const element = id => scope.querySelector(`#${prefix}${id}`);
     if (window.location.pathname.startsWith('/cookbook/assets/')) {
       element('cookbook-link').href = '/cookbook/examples/chatgpt/daily_usage_limits/readme';
     }
     const number = value => value.toLocaleString('en-US');
-    const credits = value => `${number(value)} ${value === 1 ? 'credit' : 'credits'}`;
+    const dollarFormatter = new Intl.NumberFormat('en-US', { style: 'currency', currency: 'USD' });
+    let unit = initialUnit;
+    const fields = ['monthly', 'preset', 'interval', 'start', 'increment', 'elapsed', 'used'];
+    // Amounts are whole credits or integer cents throughout the calculation.
+    function parseAmount(value, selectedUnit = unit) {
+      if (selectedUnit === 'credit') return /^\d+$/.test(value) && Number.isSafeInteger(Number(value)) ? Number(value) : null;
+      if (!/^(?:\d+(?:\.\d{0,2})?|\.\d{1,2})$/.test(value)) return null;
+      const [whole, fraction = ''] = value.split('.');
+      const cents = Number(whole || '0') * 100 + Number(fraction.padEnd(2, '0'));
+      return Number.isSafeInteger(cents) ? cents : null;
+    }
+    const inputAmount = value => unit === 'usd' ? `${Math.floor(value / 100)}.${String(value % 100).padStart(2, '0')}` : String(value);
+    const amount = value => unit === 'usd' ? dollarFormatter.format(value / 100) : number(value);
+    const withUnit = value => unit === 'usd' ? amount(value) : `${number(value)} ${value === 1 ? 'credit' : 'credits'}`;
+    const precision = () => unit === 'usd' ? 'US dollars with no more than two decimal places' : 'whole credits';
     const atHour = hour => `day ${Math.floor(hour / 24) + 1}${hour % 24 ? ` at ${String(hour % 24).padStart(2, '0')}:00` : ''}`;
-    const validInteger = id => element(id).checkValidity() && Number.isInteger(Number(element(id).value));
-    function readBudget() { return validInteger('monthly') ? Number(element('monthly').value) : null; }
+    const validInteger = id => /^\d+$/.test(element(id).value) && element(id).checkValidity() && Number.isSafeInteger(Number(element(id).value));
+    function readAmount(id) {
+      const value = parseAmount(element(id).value);
+      const min = parseAmount(element(id).min);
+      const max = parseAmount(element(id).max);
+      return value !== null && value >= min && value <= max ? value : null;
+    }
+    function readBudget() { return readAmount('monthly'); }
     function presetPlan(budget) {
       const settings = { weekly: [168, 4], fortnightly: [336, 2], daily: [24, 30] }[element('preset').value];
       if (!settings) return null;
       const [interval, portions] = settings;
-      const amount = Math.ceil(budget / portions);
-      return { interval, start: amount, increment: amount, budget };
+      const release = Math.ceil(budget / portions);
+      return { interval, start: release, increment: release, budget };
     }
     function readPlan(budget = readBudget()) {
       if (budget === null) return null;
       if (element('preset').value !== 'custom') return presetPlan(budget);
-      if (!['interval', 'start', 'increment'].every(validInteger)) return null;
-      return { ...Object.fromEntries(['interval', 'start', 'increment'].map(id => [id, Number(element(id).value)])), budget };
+      const start = readAmount('start'), increment = readAmount('increment');
+      if (!validInteger('interval') || start === null || increment === null) return null;
+      return { interval: Number(element('interval').value), start, increment, budget };
     }
     function releases(plan) {
       const rows = [];
@@ -180,6 +231,24 @@
       }
       return rows;
     }
+    function updateUnitLabels() {
+      const usd = unit === 'usd';
+      const suffix = usd ? 'US dollars (USD)' : 'credits';
+      element('monthly-label').textContent = `Example monthly budget per person (${suffix})`;
+      element('monthly-hint').textContent = usd ? 'Start with this $200.00 example, or enter a budget your organization would use.' : 'Start with this 2,000-credit example, or enter a budget your organization would use.';
+      element('start-label').textContent = `Initial release in ${suffix}`;
+      element('increment-label').textContent = `Amount per later release (${suffix})`;
+      element('used-label').textContent = `Used so far this month (${suffix})`;
+      element('available-label').textContent = usd ? 'USD after usage' : 'credits after usage';
+      element('problem-used-label').textContent = usd ? 'USD used' : 'credits used';
+      for (const id of ['monthly', 'start', 'increment', 'used']) {
+        element(id).step = usd ? '0.01' : '1';
+        element(id).min = id === 'used' ? '0' : usd ? '0.01' : '1';
+        element(id).inputMode = usd ? 'decimal' : 'numeric';
+      }
+      element('monthly').max = String(MAX_BUDGET);
+      for (const week of [2, 3, 4]) element(`problem-zero-${week}`).textContent = amount(0);
+    }
     function showFrame(solution) {
       element('problem').hidden = solution;
       element('solution').hidden = !solution;
@@ -189,24 +258,30 @@
       const budget = readBudget();
       const validBudget = budget !== null;
       element('monthly-error').hidden = validBudget;
-      element('monthly-error').textContent = validBudget ? '' : 'Enter a whole-credit monthly budget from 1 to 1,000,000.';
+      element('monthly-error').textContent = validBudget ? '' : `Enter a monthly budget from ${withUnit(1)} to ${withUnit(MAX_BUDGET * (unit === 'usd' ? 100 : 1))}, in ${precision()}.`;
       element('monthly').setAttribute('aria-invalid', String(!validBudget));
       element('show-plan').disabled = !validBudget;
-      element('problem-budget').textContent = validBudget ? credits(budget) : 'N/A';
-      element('problem-used').textContent = validBudget ? number(budget) : 'N/A';
-      element('budget-total').textContent = validBudget ? `of ${credits(budget)}` : 'Monthly budget needed';
-      element('schedule-caption').textContent = validBudget ? `One person's illustrative ${number(budget)}-credit monthly budget` : 'Choose a monthly budget to see its releases';
+      element('problem-budget').textContent = validBudget ? withUnit(budget) : 'N/A';
+      element('problem-used').textContent = validBudget ? amount(budget) : 'N/A';
+      element('problem-used').classList.toggle('long-amount', validBudget && amount(budget).length > 10);
+      element('budget-total').textContent = validBudget ? `of ${withUnit(budget)}${unit === 'usd' ? ' USD' : ''}` : 'Monthly budget needed';
+      element('schedule-caption').textContent = validBudget ? `One person's illustrative monthly budget: ${withUnit(budget)}${unit === 'usd' ? ' USD' : ''}` : 'Choose a monthly budget to see its releases';
       if (validBudget) {
-        for (const id of ['start', 'increment']) element(id).max = String(budget);
+        for (const id of ['start', 'increment']) element(id).max = inputAmount(budget);
         const preset = presetPlan(budget);
-        if (preset) for (const id of ['interval', 'start', 'increment']) element(id).value = String(preset[id]);
+        if (preset) for (const id of ['interval', 'start', 'increment']) element(id).value = id === 'interval' ? String(preset[id]) : inputAmount(preset[id]);
       }
       const plan = readPlan(budget);
       const elapsed = Number(element('elapsed').value);
       element('day').textContent = atHour(elapsed).replace('day', 'Day');
+      element('elapsed').setAttribute('aria-valuetext', element('day').textContent);
+      for (const id of ['interval', 'start', 'increment']) {
+        const valid = element('preset').value !== 'custom' || (id === 'interval' ? validInteger(id) : readAmount(id) !== null);
+        element(id).setAttribute('aria-invalid', String(!valid));
+      }
       if (!plan) {
         element('released').textContent = 'N/A'; element('available').textContent = 'N/A';
-        element('equation').textContent = validBudget ? 'Enter whole credits within this budget and an interval from 1 to 744 hours.' : 'Choose a valid monthly budget above.';
+        element('equation').textContent = validBudget ? `Enter release amounts in ${precision()}, from ${withUnit(1)} to ${withUnit(budget)}, and a whole-hour interval from 1 to 744.` : 'Choose a valid monthly budget above.';
         element('equation').classList.add('error'); element('next').textContent = '';
         element('plan-summary').textContent = '';
         element('schedule').replaceChildren(); element('advance').disabled = true;
@@ -216,29 +291,29 @@
       const rows = releases(plan);
       const released = Math.min(budget, plan.start + Math.floor(elapsed / plan.interval) * plan.increment);
       const nextRelease = rows.find(row => row.hour > elapsed);
-      element('released').textContent = number(released);
-      element('used').max = String(released);
+      element('released').textContent = amount(released);
+      element('used').max = inputAmount(released);
       element('advance').disabled = !nextRelease;
-      element('next').textContent = nextRelease ? `The next ${credits(nextRelease.amount)} ${nextRelease.amount === 1 ? 'becomes' : 'become'} available on ${atHour(nextRelease.hour)}.` : released === budget ? `The monthly budget of ${credits(budget)} has now been released.` : `${credits(budget - released)} ${budget - released === 1 ? 'remains' : 'remain'} unassigned by this month's release plan.`;
+      element('next').textContent = nextRelease ? `Next release: ${withUnit(nextRelease.amount)} on ${atHour(nextRelease.hour)}.` : released === budget ? `The monthly budget of ${withUnit(budget)} has now been released.` : `Unassigned by this month's release plan: ${withUnit(budget - released)}.`;
       const cadence = { 1: 'hour', 24: 'day', 168: 'week', 336: 'two weeks' }[plan.interval] ?? `${plan.interval} hours`;
       const last = rows[rows.length - 1];
-      element('plan-summary').textContent = `${credits(plan.start)} on day 1, then ${credits(plan.increment)} every ${cadence}, up to ${credits(budget)} for the month.` + (last.amount < plan.increment ? ` The final release is ${credits(last.amount)}.` : '');
-      const used = Number(element('used').value);
-      if (!validInteger('used')) {
-        element('available').textContent = 'N/A'; element('equation').textContent = `Enter used credits from 0 to ${number(released)}.`;
+      element('plan-summary').textContent = `${withUnit(plan.start)} on day 1, then ${withUnit(plan.increment)} every ${cadence}, up to ${withUnit(budget)} for the month.` + (rows.length > 1 && last.amount < plan.increment ? ` The final release is ${withUnit(last.amount)}.` : '');
+      const used = readAmount('used');
+      if (used === null) {
+        element('available').textContent = 'N/A'; element('equation').textContent = `Enter usage from ${withUnit(0)} to ${withUnit(released)}, in ${precision()}.`;
         element('equation').classList.add('error'); element('used').setAttribute('aria-invalid', 'true');
         element('used-bar').style.width = '0%'; element('available-bar').style.width = '0%';
       } else {
         const available = released - used;
-        element('available').textContent = number(available);
-        element('equation').textContent = `${number(released)} released − ${number(used)} used = ${number(available)} available`;
+        element('available').textContent = amount(available);
+        element('equation').textContent = `${withUnit(released)} released − ${withUnit(used)} used = ${withUnit(available)} available`;
         element('equation').classList.remove('error'); element('used').setAttribute('aria-invalid', 'false');
         element('used-bar').style.width = `${used / budget * 100}%`;
         element('available-bar').style.width = `${available / budget * 100}%`;
       }
       element('schedule').replaceChildren(...rows.map(row => {
         const tr = document.createElement('tr');
-        for (const text of [atHour(row.hour).replace('day', 'Day'), number(row.amount), number(row.total)]) {
+        for (const text of [atHour(row.hour).replace('day', 'Day'), withUnit(row.amount), withUnit(row.total)]) {
           const td = document.createElement('td'); td.textContent = text; tr.append(td);
         }
         return tr;
@@ -248,10 +323,10 @@
     element('show-problem').addEventListener('click', () => showFrame(false));
     element('preset').addEventListener('change', () => {
       element('custom-controls').hidden = element('preset').value !== 'custom';
-      element('elapsed').value = '0'; element('used').value = '0'; render();
+      element('elapsed').value = '0'; element('used').value = inputAmount(0); render();
     });
     element('monthly').addEventListener('input', () => {
-      element('elapsed').value = '0'; element('used').value = '0'; render();
+      element('elapsed').value = '0'; element('used').value = inputAmount(0); render();
     });
     ['interval', 'start', 'increment', 'elapsed', 'used'].forEach(id => element(id).addEventListener('input', render));
     element('advance').addEventListener('click', () => {
@@ -260,8 +335,53 @@
       if (next) element('elapsed').value = String(next.hour);
       render();
     });
-    element('reset').addEventListener('click', () => { element('elapsed').value = '0'; element('used').value = '0'; render(); });
-    render();
+    element('reset').addEventListener('click', () => { element('elapsed').value = '0'; element('used').value = inputAmount(0); render(); });
+    return {
+      save: () => Object.fromEntries(fields.map(id => [id, element(id).value])),
+      load: (nextUnit, values) => {
+        unit = nextUnit;
+        updateUnitLabels();
+        for (const id of fields) element(id).value = values[id];
+        element('custom-controls').hidden = element('preset').value !== 'custom';
+        render();
+      }
+    };
+    }
+    const savedInputs = {
+      credit: { monthly: '2000', preset: 'weekly', interval: '168', start: '500', increment: '500', elapsed: '0', used: '0' },
+      usd: { monthly: '200.00', preset: 'weekly', interval: '168', start: '50.00', increment: '50.00', elapsed: '0', used: '0.00' }
+    };
+    const singleScope = document.getElementById('single-explorer');
+    // Clone the original markup before rendering. Unique IDs keep labels and
+    // assistive-technology relationships local to each independent example.
+    function comparisonScope(unit) {
+      const scope = document.getElementById(`${unit}-explorer`);
+      const template = singleScope.cloneNode(true);
+      const prefix = `${unit}-`;
+      template.removeAttribute('id');
+      for (const node of template.querySelectorAll('[id]')) node.id = prefix + node.id;
+      for (const name of ['for', 'aria-labelledby', 'aria-describedby']) {
+        for (const node of template.querySelectorAll(`[${name}]`)) {
+          node.setAttribute(name, node.getAttribute(name).split(' ').map(id => prefix + id).join(' '));
+        }
+      }
+      scope.append(template);
+      return createExplorer(scope, unit, prefix);
+    }
+    const comparisons = { credit: comparisonScope('credit'), usd: comparisonScope('usd') };
+    const single = createExplorer(singleScope);
+    let mode = 'credit';
+    single.load(mode, savedInputs[mode]);
+    const selector = document.getElementById('unit');
+    selector.addEventListener('change', () => {
+      if (mode === 'both') for (const unit of ['credit', 'usd']) savedInputs[unit] = comparisons[unit].save();
+      else savedInputs[mode] = single.save();
+      mode = selector.value;
+      singleScope.hidden = mode === 'both';
+      document.getElementById('comparison').hidden = mode !== 'both';
+      if (mode === 'both') for (const unit of ['credit', 'usd']) comparisons[unit].load(unit, savedInputs[unit]);
+      else single.load(mode, savedInputs[mode]);
+    });
   </script>
 </body>
 </html>

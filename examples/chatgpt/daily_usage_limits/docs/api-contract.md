@@ -2,7 +2,7 @@
 
 The [adapter](../src/admin-api.mjs) uses the public ChatGPT Admin API at `https://api.chatgpt.com/v1`. Supply a workspace-scoped ChatGPT Admin key through the caller. The adapter keeps the key out of saved state and logs. API Platform inference keys cannot authenticate these requests.
 
-The request and response mappings were checked against the [public OpenAPI specification](https://chatgpt.com/public/admin/api-reference/openapi.json) on September 20, 2026. For access setup, see [Managing Admin keys](https://help.openai.com/en/articles/20001407-managing-admin-keys-in-admin-console/).
+The request and response mappings were checked against the [public OpenAPI specification](https://chatgpt.com/public/admin/api-reference/openapi.json) on September 21, 2026. For access setup, see [Managing Admin keys](https://help.openai.com/en/articles/20001407-managing-admin-keys-in-admin-console/).
 
 | Operation | Public route after `/v1` | Key permission |
 | --- | --- | --- |
@@ -24,6 +24,16 @@ The AWS `check_connection` action tests the deployed runtime's secret and read a
 `ADMIN_HTTP_401` means the credential was rejected; `ADMIN_HTTP_403` means access was denied. Check the selected workspace, key status and expiry, and required permissions. These status codes alone do not establish the cause. The check excludes response error bodies and secrets from its result and does not retry authentication failures. Group permissions, usage-history access, individual cap handling, and write access are verified by the later operations that need them.
 
 ## Review snapshots and restoration
+
+### Native credits and USD
+
+The user's monthly-usage response identifies its unit with `current_month_usage_unit`. The adapter uses `credit` or `usd` from that response and checks it against the plan's `unit`. The connection check reports the same unit so an admin can choose the matching configuration before enrollment.
+
+Writes carry an explicit unit tag in `limit_amount`. A $50.00 cap uses `{"unit":"usd","amount":"50.00"}`; a 500-credit cap uses `{"unit":"credit","amount":"500"}`. USD caps have cent precision and credit caps use whole credits. Usage arithmetic retains up to six decimal places, rounding finer usage upward; proposed limits round to the next cent or whole credit. The adapter uses native `cost_usd` for USD history and `credits` for credit history. It does not use estimated dollar values from credit usage or apply a conversion rate.
+
+Capture, recurring runs, restoration, and period renewal verify unit consistency. A changed or conflicting unit stops processing for review before a limit update.
+
+### Saved settings
 
 `readSnapshot(userId)` returns `workspaceId`, `userId`, `unit`, decimal-string `usage`, a normalized `cap`, the raw `settings`, and `observedAt`. Settings include the original override, effective rule and source, and inherited rule and source. Keep these private in the durable journal. The adapter checks workspace and account-user identity and compares settings across reads.
 

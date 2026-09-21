@@ -31,7 +31,11 @@ node src/cli.mjs init --dir .private/codex-rehearsal --pattern fixed_release --c
 node src/cli.mjs snapshot --config .private/codex-rehearsal/config.json --out .private/codex-rehearsal/enrollment.json --synthetic
 ```
 
-This rehearsal gives each person a 2,000-credit monthly target, released in 500-credit weekly portions. `--allow-initial-reduction` lets the first reviewed change move the fictional users from their original 2,000-credit limit to the first 500-credit portion. Inspect both members and their proposed limits in `enrollment.json`. Replace `REVIEWED_SHA256` below with the snapshot command's printed hash:
+This rehearsal gives each person a 2,000-credit monthly target, released in 500-credit weekly portions. `--allow-initial-reduction` lets the first reviewed change move the fictional users from their original 2,000-credit limit to the first 500-credit portion. Inspect both members and their proposed limits in `enrollment.json`.
+
+To rehearse in dollars, initialize a separate directory with `--unit usd` and follow the same steps using that directory. Its example target is $200.00 per month, released in $50.00 weekly portions. [Choose the unit shown in your workspace's usage settings](operations.md#choose-the-billing-unit) when preparing a live plan.
+
+Replace `REVIEWED_SHA256` below with the snapshot command's printed hash:
 
 ```bash
 node src/cli.mjs approve --enrollment .private/codex-rehearsal/enrollment.json --hash REVIEWED_SHA256

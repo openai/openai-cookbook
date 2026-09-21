@@ -1,6 +1,6 @@
 import test from 'node:test';
 import assert from 'node:assert/strict';
-import { mkdtemp, readFile, writeFile, mkdir, rm, stat } from 'node:fs/promises';
+import { mkdtemp, readFile, writeFile, mkdir, rm, stat, access } from 'node:fs/promises';
 import { tmpdir } from 'node:os';
 import { join } from 'node:path';
 import { execFile } from 'node:child_process';
@@ -73,6 +73,48 @@ test('exact CLI offline path captures reviews previews applies replays inspects 
   assert.equal(restored.results[0].after.cap.amount,'2000');
   await run(['render-local','--dir',dir,'--node',process.execPath,'--synthetic']);
   const preview=JSON.parse((await exec('/bin/sh',[join(dir,'run-preview.sh')])).stdout);assert.equal(preview.results[0].status,'restored_stopped');
+});
+
+test('USD CLI setup preserves cents through capture, approval, apply, replay and restore',localOnly,async t=>{
+  const dir=await temporary(t);
+  const cli=fileURLToPath(new URL('../src/cli.mjs',import.meta.url));
+  const run=async args=>JSON.parse((await exec(process.execPath,[cli,...args],{env:{...process.env,CHATGPT_ADMIN_API_KEY:''}})).stdout);
+  await run(['init','--dir',dir,'--synthetic','--unit','usd','--cohort','all','--interval-hours','168','--allow-initial-reduction']);
+  const configPath=join(dir,'config.json'),enrollment=join(dir,'enrollment.json'),state=join(dir,'state');
+  const config=JSON.parse(await readFile(configPath,'utf8'));
+  assert.equal(config.unit,'usd');
+  assert.equal(config.policy.startCap,'50');
+  assert.equal(config.policy.ceiling,'200');
+  Object.assign(config.policy,{startCap:'1.01',increment:'0.10',ceiling:'20.55'});
+  await writeFile(configPath,JSON.stringify(config),{mode:0o600});
+  const snapshot=await run(['snapshot','--config',configPath,'--out',enrollment,'--synthetic']);
+  assert.ok(snapshot.members.every(member=>member.before.unit==='usd'&&member.plan.unit==='usd'&&member.plan.amount==='1.01'));
+  await run(['approve','--enrollment',enrollment,'--hash',snapshot.hash]);
+  const args=['--config',configPath,'--enrollment',enrollment,'--state',state,'--synthetic'];
+  const applied=await run(['run',...args,'--apply']);
+  assert.ok(applied.results.every(row=>row.after.cap.unit==='usd'&&row.after.cap.amount==='1.01'));
+  assert.ok((await run(['run',...args,'--apply'])).results.every(row=>row.status==='duplicate_slot'));
+  assert.ok((await run(['restore',...args,'--apply'])).results.every(row=>row.after.unit==='usd'&&row.after.cap.amount==='200'));
+});
+
+test('CLI rejects invalid, missing or repeated units before creating config and rejects a later unit override',localOnly,async t=>{
+  const dir=await temporary(t);
+  const cli=fileURLToPath(new URL('../src/cli.mjs',import.meta.url));
+  for(const flags of [['--unit','dollars'],['--unit','USD'],['--unit',''],['--unit'],
+    ['--unit','usd','--unit','credit'],['--unit','dollars','--unit','usd']]) {
+    const destination=join(dir,`absent-${flags.join('-').replaceAll('/','_')}`);
+    await assert.rejects(exec(process.execPath,[cli,'init','--dir',destination,'--synthetic',...flags]),error=>{
+      assert.equal(error.code,2);
+      assert.match(error.stderr,/UNIT_INVALID|UNIT_OPTION_REPEATED|ERR_PARSE_ARGS_INVALID_OPTION_VALUE/);
+      return true;
+    });
+    await assert.rejects(access(destination),{code:'ENOENT'});
+  }
+  for(const command of ['snapshot','run','restore']) {
+    await assert.rejects(exec(process.execPath,[cli,command,'--config',join(dir,'absent.json'),'--unit','usd']),error=>{
+      assert.equal(JSON.parse(error.stderr).code,'CONFIGURATION_OPTIONS_ARE_INIT_ONLY');return true;
+    });
+  }
 });
 
 test('Windows operational guards reject before filesystem access or API calls; CLI help remains available',async t=>{

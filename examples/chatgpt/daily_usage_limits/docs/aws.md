@@ -133,6 +133,8 @@ cat .private/aws-connection-result.json
 
 Expect `ok: true`, `action: check_connection`, the intended `workspaceId`, `unit: credit` or `unit: usd`, `usersRead: true`, `capWrites: 0`, and `receiptRecorded: true`. Save the `checkId` with the result. Check the invocation metadata for `FunctionError` as well as the result's `ok` field.
 
+Use that reported unit when you configure the budget: `--unit credit` for credit limits or `--unit usd` for dollar limits. Review every amount in the selected unit, including the monthly ceiling, release increment, and any headroom settings. Both units use the same AWS deployment and renewal procedure. See [billing-unit configuration](operations.md#choose-the-billing-unit).
+
 The runtime reads its configured secret, verifies the workspace, reads at most one member, and checks that member's monthly-usage response for the billing unit. It returns no member details. This establishes credential and read access for those routes. Group selection, usage history, individual cap responses, and approved writes are checked later in their respective workflows.
 
 If `ok` is false, use the returned code:

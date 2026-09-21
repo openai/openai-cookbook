@@ -40,9 +40,9 @@ test('Lambda connection check uses the real adapter for exactly three fixed-base
   }
 });
 
-async function fixture({ count = 3, pilotExpiresAt = '2030-04-30T00:00:00Z', configure = () => {} } = {}) {
+async function fixture({ count = 3, unit = 'credit', pilotExpiresAt = '2030-04-30T00:00:00Z', configure = () => {} } = {}) {
   let now = '2030-04-02T00:00:00Z';
-  const config = { ...exampleConfig({ now, cohort: 'all' }), liveWrites: true };
+  const config = { ...exampleConfig({ now, cohort: 'all', unit }), liveWrites: true };
   Object.assign(config.policy, { startCap: '20', increment: '20', ceiling: '200' });
   const api = createSyntheticApi({ config, clock: () => now, initialCap: '10' });
   const original = structuredClone(api.users['synthetic-user-a']);
@@ -232,6 +232,79 @@ test('individual queued restoration preserves unset, inherited and explicit orig
   h.setNow('2030-04-04T00:00:00Z');
   await h.handle(h.event('apply')); await h.drain();
   assert.equal(h.api.writes.length, 9, 'closed enrollment cannot restart its allocations after restoration');
+});
+
+test('native USD queues preserve individual cent targets through preview, replay, delayed retry and exact restoration', async () => {
+  const h = await fixture({ unit: 'usd', configure(config, api) {
+    config.allowInitialReduction = true;
+    config.policy = { pattern: 'individual_staircase', anchor: config.policy.anchor,
+      initialHeadroom: '50.25', minimumInitialHeadroom: '10.01', increment: '50.25', intervalHours: 24, ceiling: '200.00' };
+    ['0.001', '2.015', '149.999'].forEach((usage, index) => { api.users[`synthetic-user-${index}`].usage = usage; });
+    Object.assign(api.users['synthetic-user-0'], { cap: { type: 'unset', unit: 'usd' },
+      settings: { override: null, effective: null, inherited: null } });
+    const inherited = { limit: { type: 'limited', limit_amount: { amount: '300.35', unit: 'usd' } },
+      source: { kind: 'group_default', group_id: 'synthetic-usd-group' } };
+    Object.assign(api.users['synthetic-user-1'], { cap: { type: 'limited', amount: '300.35', unit: 'usd', source: 'group_default' },
+      settings: { override: null, effective: inherited, inherited } });
+    const original = { type: 'limited', limit_amount: { amount: '250.75', unit: 'usd' } };
+    Object.assign(api.users['synthetic-user-2'], { cap: { type: 'limited', amount: '250.75', unit: 'usd', source: 'individual_override' },
+      settings: { ...api.users['synthetic-user-2'].settings, override: [original],
+        effective: { limit: original, source: { kind: 'individual_override' } } } });
+  } });
+  assert.deepEqual(h.enrollment.members.map(member => member.startCap), ['50.26', '52.27', '200']);
+  const preview = await h.handle(h.event('preview')); await h.drain();
+  assert.equal(h.runs.get(preview.runId).succeeded, 3);
+  assert.equal(h.api.writes.length, 0); assert.equal(h.store.states.size, 0);
+  const proposals = h.store.receipts.filter(receipt => receipt.status === 'preview');
+  assert.deepEqual(proposals.map(receipt => receipt.plan.amount), ['50.26', '52.27', '200']);
+  assert.ok(proposals.every(receipt => receipt.plan.unit === 'usd'));
+
+  const initialEvent = h.event('apply');
+  const initial = await h.handle(initialEvent); await h.drain();
+  assert.deepEqual(currentCaps(h), ['50.26', '52.27', '200']);
+  assert.equal(h.api.writes.length, 3);
+  const coldWorker = createHandler(h.options);
+  assert.deepEqual(await coldWorker(h.records(memberMessages(initial.runId))), { batchItemFailures: [] });
+  assert.equal((await coldWorker(initialEvent)).runId, initial.runId); await h.drain(coldWorker);
+  assert.equal(h.api.writes.length, 3); assert.equal(h.runs.get(initial.runId).completed, 3);
+
+  h.setNow('2030-04-03T00:00:00Z');
+  const next = await coldWorker(h.event('apply'));
+  assert.deepEqual(await coldWorker(h.records([h.pending.shift()])), { batchItemFailures: [] });
+  h.api.injectFault({ type: 'before', userId: 'synthetic-user-1', status: 503, retryAfterMs: 60_000 });
+  const first = h.records(h.pending.splice(0));
+  assert.deepEqual(await coldWorker(first), { batchItemFailures: [{ itemIdentifier: first.Records[1].messageId }] });
+  const key = `${h.config.workspaceId}:synthetic-user-1`;
+  assert.equal((await h.store.getState(key)).pending.amount, '102.52');
+  assert.equal(h.runs.get(next.runId).completed, 2); assert.equal(h.api.writes.length, 4);
+  h.setNow('2030-04-03T00:00:30Z');
+  assert.equal((await coldWorker(h.records(memberMessages(next.runId, [1]), 2))).batchItemFailures.length, 1);
+  assert.equal(h.deferred.at(-1).seconds, 30); assert.equal(h.api.writes.length, 4);
+  // Offline time advances to a later real slot; retry must still use its saved USD target.
+  h.setNow('2030-04-05T00:00:00Z');
+  assert.deepEqual(await coldWorker(h.records(memberMessages(next.runId, [1]), 3)), { batchItemFailures: [] });
+  assert.equal(h.api.users['synthetic-user-1'].cap.amount, '102.52');
+  assert.equal((await h.store.getState(key)).lastSlot, 1);
+  assert.equal(h.runs.get(next.runId).succeeded, 3);
+  await coldWorker(h.event('apply')); await h.drain(coldWorker);
+  assert.deepEqual(currentCaps(h), ['200', '200', '200']);
+  assert.equal(h.api.writes.length, 7);
+  assert.ok(h.api.writes.every(write => write.unit === 'usd' && Number(write.amount) <= 200 &&
+    /^\d+(?:\.\d{1,2})?$/.test(write.amount) && write.periodEnd === h.config.period.end));
+  assert.deepEqual(h.api.writes.filter(write => write.userId === 'synthetic-user-1').map(write => write.amount),
+    ['52.27', '102.52', '200']);
+  assert.ok(Object.values(h.api.users).every(user => user.settings.override[0].limit_amount.unit === 'usd'));
+
+  const restore = createHandler({ ...h.options, allowedWriteAction: 'restore' });
+  const restored = await restore(h.event('restore')); await h.drain(restore);
+  assert.equal(h.runs.get(restored.runId).succeeded, 3);
+  for (const member of h.enrollment.members) {
+    assert.deepEqual(h.api.users[member.userId].settings, member.before.settings);
+    const state = await h.store.getState(`${h.config.workspaceId}:${member.userId}`);
+    assert.deepEqual(state.original, member.before); assert.equal(state.restored, true); assert.equal(state.pending, null);
+  }
+  assert.deepEqual(await restore(h.records(memberMessages(restored.runId))), { batchItemFailures: [] });
+  assert.equal(h.api.writes.length, 10, 'duplicate restoration cannot write again');
 });
 
 test('AWS queue runs the real core for 1,001 members, duplicate delivery, next slot, and exact restoration', async () => {

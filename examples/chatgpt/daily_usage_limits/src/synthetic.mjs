@@ -1,4 +1,4 @@
-import { DAY, HOUR, digest, amount, format, time, requireThat } from './policy.mjs';
+import { DAY, HOUR, digest, amount, format, time, requireThat, ceilDiv } from './policy.mjs';
 
 export function creditReleaseForInterval(intervalHours) {
   requireThat(Number.isInteger(intervalHours) && intervalHours >= 1 && intervalHours <= 744, 'INTERVAL_INVALID');
@@ -8,25 +8,34 @@ export function creditReleaseForInterval(intervalHours) {
   return String(presets[intervalHours] ?? Math.min(2000, Math.ceil(2000 * intervalHours / 720)));
 }
 
+export function usdReleaseForInterval(intervalHours) {
+  requireThat(Number.isInteger(intervalHours) && intervalHours >= 1 && intervalHours <= 744, 'INTERVAL_INVALID');
+  // Separate USD illustration: $200 per month, with cap amounts rounded to cents.
+  const presets = { 24: '6.67', 168: '50', 336: '100' };
+  const cents = ceilDiv(20_000n * BigInt(intervalHours), 720n);
+  return presets[intervalHours] ?? format((cents > 20_000n ? 20_000n : cents) * 10_000n);
+}
+
 export function exampleConfig({ now = new Date().toISOString(), pattern = 'fixed_release', cohort = 'selected', unit = 'credit', intervalHours = 24, synthetic = true } = {}) {
+  requireThat(['credit', 'usd'].includes(unit), 'UNIT_INVALID');
   const date = new Date(now);
-  const creditRelease = unit === 'credit' ? creditReleaseForInterval(intervalHours) : null;
+  const release = unit === 'credit' ? creditReleaseForInterval(intervalHours) : usdReleaseForInterval(intervalHours);
   return { version: 1, workspaceId: synthetic ? 'synthetic-workspace' : 'REPLACE_WORKSPACE_ID', unit,
     period: { kind: 'calendar_month', start: new Date(Date.UTC(date.getUTCFullYear(), date.getUTCMonth(), 1)).toISOString(),
       end: new Date(Date.UTC(date.getUTCFullYear(), date.getUTCMonth() + 1, 1)).toISOString(), verifiedAt: now,
       evidence: synthetic ? 'Synthetic fixture; no live counter evidence.' : '', counterScopeConfirmed: synthetic },
     policy: { pattern, anchor: new Date(Math.floor(time(now) / HOUR) * HOUR).toISOString(),
       ...(pattern === 'individual_staircase'
-        ? { initialHeadroom: unit === 'credit' ? creditRelease : '2', minimumInitialHeadroom: unit === 'credit' ? '1' : '0.01' }
-        : { startCap: unit === 'credit' ? creditRelease : '2' }),
-      increment: unit === 'credit' ? creditRelease : '2', intervalHours, ceiling: unit === 'credit' ? '2000' : '20',
+        ? { initialHeadroom: release, minimumInitialHeadroom: unit === 'credit' ? '1' : '0.01' }
+        : { startCap: release }),
+      increment: release, intervalHours, ceiling: unit === 'credit' ? '2000' : '200',
       lookbackDays: 7, coverageHours: 24, multiplierBps: 15_000 },
     cohort: { mode: cohort, userIds: cohort === 'all' ? [] : synthetic ? ['synthetic-user-a', 'synthetic-user-b'] : ['REPLACE_USER_ID'], emails: [], groupIds: [] },
     maxMembers: null, concurrency: 1, captureConcurrency: 1, initialReviewMaxAgeMinutes: 15,
     allowInitialReduction: false, liveWrites: false };
 }
 export function createSyntheticApi({ config, clock = () => new Date().toISOString(), saved, persist = async () => {},
-  initialCap = config.unit === 'credit' ? '2000' : '1' }) {
+  initialCap = config.unit === 'credit' ? '2000' : '200' }) {
   requireThat(config.workspaceId === 'synthetic-workspace', 'SYNTHETIC_WORKSPACE_REQUIRED');
   const users = saved ? structuredClone(saved) : Object.fromEntries(['synthetic-user-a', 'synthetic-user-b', 'synthetic-user-c'].map(userId => {
     // Tests may pin a smaller fake before-state without changing the public example.

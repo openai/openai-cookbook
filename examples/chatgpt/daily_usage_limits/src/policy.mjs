@@ -23,7 +23,10 @@ export function format(value) {
 }
 export const min = (a, b) => a < b ? a : b;
 export const max = (a, b) => a > b ? a : b;
-export const quantum = unit => unit === 'credit' ? SCALE : 10_000n;
+export function quantum(unit) {
+  requireThat(['credit', 'usd'].includes(unit), 'UNIT_INVALID');
+  return unit === 'credit' ? SCALE : 10_000n;
+}
 export const ceilDiv = (a, b) => (a + b - 1n) / b;
 export function capAmount(value, unit) {
   const result = amount(value);

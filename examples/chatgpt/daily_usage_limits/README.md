@@ -2,7 +2,7 @@
 
 Usage limits in **ChatGPT Enterprise and Edu are monthly**. A user who spends their allocation in the first week reaches the limit with most of the month still ahead.
 
-The [usage-limit endpoints in the ChatGPT Admin API](https://chatgpt.com/public/admin/api-reference) give you more control over when that budget becomes available. Release credits **hourly, daily, weekly, or on a custom schedule** to keep capacity available for later work. Choose amounts and schedules for individual users, a department, or your workspace.
+The [usage-limit endpoints in the ChatGPT Admin API](https://chatgpt.com/public/admin/api-reference) give you more control over when that budget becomes available. Release portions of a budget in **credits or US dollars (USD)** hourly, daily, weekly, or on a custom schedule to keep capacity available for later work. Choose amounts and schedules for individual users, a department, or your workspace.
 
 For your most active users, increase the available amount based on recent consumption, up to a monthly maximum you set. Pair these adjustments with regular usage updates so people understand what remains, when more will be available, and how their model choices affect consumption.
 
@@ -23,7 +23,7 @@ Usage limits reset on the first day of each month in UTC by default. A workspace
 
 ## Try a release plan in your browser
 
-Open the [interactive example](assets/release-explorer.html). Change the monthly budget, compare release schedules, and see how usage affects the amount available. Start immediately with the example data in your browser.
+Open the [interactive example](assets/release-explorer.html). Choose **Credits**, **US dollars (USD)**, or **Both** to compare two separate example plans. Change the budgets and release schedules, and see how usage affects the amount available.
 
 | Release date | New credits available | Monthly limit after release |
 | --- | ---: | ---: |
@@ -35,6 +35,17 @@ Open the [interactive example](assets/release-explorer.html). Change the monthly
 ![Four releases of 500 credits increase the monthly limit to 2,000.](assets/release-timeline.svg)
 
 Unused released credits remain available within the month. You choose the total monthly budget and when each portion becomes available.
+
+## Choose dollars or credits
+
+Use the billing unit shown in your workspace's usage settings for your customer agreement. Choose **Credits** for a credit-based workspace or **US dollars (USD)** for a workspace with dollar-denominated usage and limits. The controller checks the API's reported unit before applying a plan.
+
+| Example plan | Monthly budget per person | Weekly release | Configuration |
+| --- | ---: | ---: | --- |
+| Credits | 2,000 credits | 500 credits | `"unit": "credit"` |
+| US dollars | $200.00 | $50.00 | `"unit": "usd"` |
+
+These are separate illustrative budgets. Choose amounts for your organization in its billing unit. Credit limits use whole credits; dollar limits use cents. All three release approaches support both units. [Configure the unit and amounts](https://github.com/openai/openai-cookbook/blob/codex/daily-usage-limits/examples/chatgpt/daily_usage_limits/docs/operations.md#choose-the-billing-unit).
 
 ## Get started
 
@@ -65,7 +76,7 @@ See [policy configuration and examples](https://github.com/openai/openai-cookboo
 
 Use a local run or Codex automation to try the approach with a small group. Review the proposed limits, observe how the release schedule fits their work, and adjust the plan.
 
-For ongoing workspace credit management, run the program on **organization-managed infrastructure**, such as a managed virtual machine or cloud service. Assign a team to monitor it and keep it running independently of an individual's computer.
+For ongoing workspace budget management, run the program on **organization-managed infrastructure**, such as a managed virtual machine or cloud service. Assign a team to monitor it and keep it running independently of an individual's computer.
 
 ![Test locally or with Codex, then run ongoing releases on organization-managed infrastructure.](assets/control-flow.svg)
 

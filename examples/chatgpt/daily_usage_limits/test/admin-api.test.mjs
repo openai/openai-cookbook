@@ -219,6 +219,45 @@ test('USD requires tagged native amount and matching unit', async () => {
   await rejectsCode(mismatch.api.readSnapshot(userId), 'CAP_UNIT_MISMATCH');
 });
 
+test('USD cent targets are tagged without conversion and restore the exact stored decimal representation', async () => {
+  const h = harness({ unit: 'usd', usage: 0.071, allowWrites: true,
+    original: user({ unit: 'usd', override: [rule('12.30', 'usd')] }) });
+  const original = await h.api.readSnapshot(userId);
+  await h.api.setCap(userId, { amount: '0.10', unit: 'usd', periodEnd: END,
+    expectedSettings: original.settings, expectedUsage: '0.071' });
+  assert.deepEqual(JSON.parse(h.requests.find(request => request.method === 'PATCH').body), {
+    override_monthly_usage_limit: { type: 'limited', limit_amount: { amount: '0.1', unit: 'usd' }, temporary: true },
+  });
+  const changed = await h.api.readSnapshot(userId);
+  assert.equal(changed.cap.amount, '0.1');
+  await h.api.restore(userId, { settings: original.settings, unit: 'usd', periodEnd: END, expectedSettings: changed.settings });
+  assert.deepEqual(JSON.parse(h.requests.filter(request => request.method === 'PATCH').at(-1).body), {
+    override_monthly_usage_limit: { type: 'limited', limit_amount: { amount: '12.30', unit: 'usd' } },
+  });
+  assert.ok(settingsEquivalent(original.settings, (await h.api.readSnapshot(userId)).settings, 'usd'));
+});
+
+test('final adapter reread rejects either unit transition before set or restore even for unset limits', async () => {
+  const settings = { override: null, effective: null, inherited: null };
+  for (const unit of ['credit', 'usd']) for (const command of ['setCap', 'restore']) {
+    const currentUnit = unit === 'usd' ? 'credit' : 'usd';
+    const original = { ...user({ unit: currentUnit }), override_monthly_usage_limit: null,
+      effective_monthly_usage_limit: null, inherited_monthly_usage_limit: null };
+    const h = harness({ unit: currentUnit, original, allowWrites: true });
+    await rejectsCode(h.api[command](userId, { amount: '2', unit, periodEnd: END, settings, expectedSettings: settings }),
+      'WRITE_UNIT_MISMATCH');
+    assert.equal(h.requests.filter(request => request.method === 'GET').length, 4);
+    assert.equal(h.patches, 0);
+  }
+});
+
+test('native USD sub-cent usage changes stop the final reviewed write', async () => {
+  const h = harness({ unit: 'usd', usage: 0.071001, allowWrites: true });
+  await rejectsCode(h.api.setCap(userId, { amount: '0.10', unit: 'usd', periodEnd: END, expectedUsage: '0.071' }),
+    'USAGE_CHANGED_BEFORE_WRITE');
+  assert.equal(h.patches, 0);
+});
+
 test('unsupported multiple original rules and missing original state fail closed', async () => {
   const h = harness({ original: user({ override: [rule(), rule('200')] }) });
   await rejectsCode(h.api.readSnapshot(userId), 'OVERRIDE_NOT_RESTORABLE');

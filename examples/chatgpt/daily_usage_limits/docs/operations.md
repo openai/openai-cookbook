@@ -4,6 +4,37 @@ Use this guide after choosing a budget, release schedule, and initial group. The
 
 Start with [the browser example or Codex setup](get-started.md) if you have not run the fictional demonstration yet.
 
+## Choose the billing unit
+
+Set `unit` to the unit shown in your workspace's usage settings for its customer agreement. The same controller supports both:
+
+| Workspace unit | Initialize with | Example monthly ceiling | Example weekly increment |
+| --- | --- | --- | --- |
+| Credits | `--unit credit` | `"2000"` | `"500"` |
+| US dollars (USD) | `--unit usd` | `"200.00"` | `"50.00"` |
+
+Amounts are decimal strings in `config.json`. Credit caps use whole credits; USD caps use cents. Usage arithmetic retains up to six decimal places, rounding finer usage upward. A proposed limit rounds upward to the next whole credit or cent, within the monthly ceiling.
+
+For example, this policy releases $50.00 each week up to $200.00 per month:
+
+```json
+{
+  "unit": "usd",
+  "policy": {
+    "pattern": "fixed_release",
+    "anchor": "2026-09-01T00:00:00Z",
+    "intervalHours": 168,
+    "startCap": "50.00",
+    "increment": "50.00",
+    "ceiling": "200.00"
+  }
+}
+```
+
+Replace the example anchor with the start of your plan and include these fields in the complete configuration created by `init`. Use the chosen unit for every amount, including initial headroom and minimum headroom. Fixed releases, individual starting limits, and observed usage headroom all support credits and USD.
+
+The controller reads the workspace's reported billing unit and stops when it differs from the configuration. It uses native USD usage for dollar plans and performs no credit-to-dollar conversion. If your agreement changes the workspace's billing unit, prepare a new reviewed plan with amounts in the new unit.
+
 ## Choose a policy
 
 | Pattern | Use it when | How the cap changes |
@@ -98,7 +129,7 @@ Confirm each person's current limit before including them. The [API contract](ap
 
    | Setting | What to review |
    | --- | --- |
-   | `workspaceId`, `unit` | The intended workspace and its native `credit` or `usd` unit. Amounts are decimal strings. Credit caps use whole credits; USD caps use cents. Never convert between units. |
+   | `workspaceId`, `unit` | The intended workspace and its native `credit` or `usd` unit. Use the [billing-unit examples](#choose-the-billing-unit) to choose and review amounts. |
    | `cohort` | Choose `selected` with `userIds`, `emails`, and/or `groupIds`, or `all` with empty selector arrays. Review the resolved user IDs and saved email/group matches. |
    | `period` | Copy the current UTC start and end shown in Admin Console, confirm whether it is `calendar_month` or `billing_cycle`, and record the verification time and source in `verifiedAt` and `evidence`. Set `counterScopeConfirmed: true` only after confirming the counter covers that range. The API response omits period boundaries. |
    | `policy` | Pattern, its amount settings, UTC anchor, interval, and finite ceiling. Use the settings described for your chosen policy above. For a mid-period start, review consumption already recorded and the capacity each proposed limit leaves available. |

@@ -13,6 +13,7 @@ async function setup(options = {}, alter) {
   // Failure/recovery fixtures intentionally keep their small amounts independent
   // of the customer-facing 2,000-credit example defaults.
   if (config.unit === 'credit') Object.assign(config.policy,{startCap:'20',increment:'20',ceiling:'200'});
+  else Object.assign(config.policy,{startCap:'2',increment:'2',ceiling:'20'});
   if(alter)alter(config);
   const api=createSyntheticApi({config,clock:()=>now,initialCap:config.unit==='credit'?'10':'1'});
   const captured=await captureEnrollment({config,api,now});
@@ -42,7 +43,7 @@ test('credit example uses a 2,000 monthly ceiling and deliberate cadence presets
   assert.equal(result.results[0].code,'INITIAL_REDUCTION_REQUIRES_REVIEWED_OPT_IN');
   assert.equal(api.writes.length,0);
   const usd=exampleConfig({now:START,unit:'usd',intervalHours:168});
-  assert.equal(usd.policy.startCap,'2');assert.equal(usd.policy.increment,'2');assert.equal(usd.policy.ceiling,'20');
+  assert.equal(usd.policy.startCap,'50');assert.equal(usd.policy.increment,'50');assert.equal(usd.policy.ceiling,'200');
 });
 test('reviewed weekly example releases 500 through 2,000 and never exceeds the monthly ceiling',async()=>{
   let now=START;

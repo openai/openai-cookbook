@@ -1,6 +1,6 @@
 # Run the controller on a computer or server
 
-Use your computer to rehearse the approach or test it with a small group. For ongoing workspace credit management, use a virtual machine or server operated by your organization, with monitoring and a team responsible for keeping it available. Choose the macOS or Linux scheduler procedure below.
+Use your computer to rehearse the approach or test it with a small group. For ongoing workspace budget management, use a virtual machine or server operated by your organization, with monitoring and a team responsible for keeping it available. Choose the macOS or Linux scheduler procedure below.
 
 This guide's commands run on macOS or Linux. From Windows, start with the [PowerShell demonstration](get-started.md#run-with-nodejs), then use your organization's managed Linux host or the [AWS setup path](aws.md#choose-your-setup-environment) for a live pilot.
 
@@ -16,6 +16,8 @@ node src/cli.mjs snapshot --config .private/local-rehearsal/config.json --out .p
 ```
 
 Review the three fictional members: each has a 2,000-credit monthly target and will receive 500 credits each week. `--allow-initial-reduction` permits the first reviewed change from the original 2,000-credit limit to the first 500-credit portion. The membership snapshot fixes the enrolled users. The controller reports new members; include them through a fresh enrollment review. Removed or ineligible members produce attention receipts.
+
+For the dollar rehearsal, use a new directory and replace `--unit credit` with `--unit usd` in the initialization command. The generated example uses a $200.00 monthly target and $50.00 weekly releases. Complete the same steps with that directory. For live use, [match the unit and amounts to your workspace](operations.md#choose-the-billing-unit).
 
 Replace `REVIEWED_SHA256` with the printed snapshot hash, then run:
 

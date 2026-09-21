@@ -7,7 +7,7 @@
 - title: Release ChatGPT usage budgets hourly, daily, or weekly
   path: examples/chatgpt/daily_usage_limits/README.md
   slug: chatgpt-interval-usage-limits
-  description: Release a monthly ChatGPT budget in hourly, daily, or weekly increments. Explore a plan in your browser, try a Codex-assisted pilot, and deploy on managed infrastructure.
+  description: Release a monthly ChatGPT budget in credits or US dollars in hourly, daily, or weekly increments. Explore a plan in your browser, try a Codex-assisted pilot, and deploy on managed infrastructure.
   date: 2026-09-19
   authors:
     - sperry-openai

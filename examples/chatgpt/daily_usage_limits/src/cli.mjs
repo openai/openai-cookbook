@@ -17,9 +17,9 @@ async function createPrivate(path, value) {
   await writeFile(path,JSON.stringify(value,null,2)+'\n',{flag:'wx',mode:0o600});
 }
 export async function main(args = process.argv.slice(2)) {
-  const {values:v,positionals} = parseArgs({args,allowPositionals:true,strict:true,options:{
+  const {values:v,positionals,tokens} = parseArgs({args,allowPositionals:true,strict:true,tokens:true,options:{
     dir:{type:'string'},config:{type:'string'},enrollment:{type:'string'},out:{type:'string'},hash:{type:'string'},state:{type:'string'},
-    pattern:{type:'string',default:'fixed_release'},cohort:{type:'string',default:'selected'},unit:{type:'string',default:'credit'},
+    pattern:{type:'string',default:'fixed_release'},cohort:{type:'string',default:'selected'},unit:{type:'string'},
     'interval-hours':{type:'string',default:'24'},'interval-minutes':{type:'string',default:'60'},node:{type:'string'},
     'credential-provider':{type:'string'},'keychain-service':{type:'string'},'keychain-account':{type:'string'},'encrypted-credential':{type:'string'},
     synthetic:{type:'boolean',default:false},apply:{type:'boolean',default:false},help:{type:'boolean',default:false},
@@ -29,9 +29,10 @@ export async function main(args = process.argv.slice(2)) {
     'initial-review-max-age-minutes':{type:'string'},'api-max-pages':{type:'string'},'api-max-rows':{type:'string'},
   }});
   const command = positionals[0];
+  requireThat(tokens.filter(token=>token.kind==='option'&&token.name==='unit').length<=1, 'UNIT_OPTION_REPEATED');
   requireThat(positionals.length <= 1, 'UNEXPECTED_ARGUMENT');
   requireThat(!v['allow-initial-reduction'] || command==='init', 'INITIAL_REDUCTION_OPTION_IS_INIT_ONLY');
-  const initOptions=['workspace-id','user-id','email','group-id','max-members','concurrency','capture-concurrency',
+  const initOptions=['unit','workspace-id','user-id','email','group-id','max-members','concurrency','capture-concurrency',
     'initial-review-max-age-minutes','api-max-pages','api-max-rows'];
   requireThat(command==='init' || initOptions.every(key=>v[key]===undefined), 'CONFIGURATION_OPTIONS_ARE_INIT_ONLY');
   if (v.help || !command) return {commands:['init','snapshot','approve','run','restore','resume-auth','cancel-initial','inspect','render-local'],

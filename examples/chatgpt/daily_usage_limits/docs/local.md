@@ -4,7 +4,7 @@ Use your computer to rehearse the approach or test it with a small group. For on
 
 Use a local scheduler to invoke the same controller without a model in the execution path. The host needs Node.js 24 or later, durable private storage on its local filesystem, and a credential provider that works under the scheduled service's identity. A sleeping or unavailable host can delay execution; the fixed policy catches up to the current interval when the host returns.
 
-The commands below create a synthetic rehearsal and **uninstalled preview templates**. They do not install a service or enable real changes. Run them from `examples/chatgpt/daily_usage_limits`.
+The commands below create a synthetic rehearsal and **uninstalled preview templates**. They do not install a service or enable real changes. Run them from the extracted starter folder, or from `examples/chatgpt/daily_usage_limits` in the full repository.
 
 ## 1. I rehearse the all-members workflow
 

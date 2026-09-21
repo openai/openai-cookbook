@@ -4,10 +4,10 @@
 # should build pages for, and indicates metadata such as tags, creation date and
 # authors for each page.
 
-- title: Release ChatGPT usage budgets daily, weekly, or on your own cadence
+- title: Release ChatGPT usage budgets hourly, daily, or weekly
   path: examples/chatgpt/daily_usage_limits/README.md
   slug: chatgpt-interval-usage-limits
-  description: Help users pace a 2,000-credit monthly allocation by releasing it in daily, weekly, or custom increments, for selected power users or a reviewed workspace roster.
+  description: Release a monthly ChatGPT budget in hourly, daily, or weekly increments. Explore a plan in your browser, try a Codex-assisted pilot, and deploy on managed infrastructure.
   date: 2026-09-19
   authors:
     - sperry-openai

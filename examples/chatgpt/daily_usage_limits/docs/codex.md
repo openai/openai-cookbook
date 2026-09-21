@@ -1,14 +1,28 @@
 # I test the approach with Codex
 
-Use a Codex automation for a supervised, time-limited pilot with a small group. Explore the release schedule and confirm its value before moving ongoing operation to organization-managed infrastructure.
+Start with [the starter kit and Codex request](get-started.md). Download the ZIP, open its extracted folder in Codex, and let Codex prepare a preview with fictional people. You can review the weekly release plan before choosing the amounts and schedule for your organization.
 
-Codex invokes a fixed controller command and explains the result. The controller calculates each limit from the configured policy. Complete [the policy and enrollment review](../README.md#prepare-a-reviewed-enrollment) before a live trial.
+If the folder is already open in Codex, paste:
 
-The local automation depends on the desktop app and its host being available. For ongoing workspace credit management, use a managed virtual machine or cloud service operated by your organization. This walkthrough prepares the pilot; step 3 covers setting up its optional schedule. See [scheduled-task documentation](https://learn.chatgpt.com/docs/automations?surface=app).
+```text
+Read docs/get-started.md and follow its preview request. If this is the full
+Cookbook repository, use examples/chatgpt/daily_usage_limits first. Check for
+an existing Node.js 24 or later runtime available in this environment.
+Honor stated restrictions and current execution controls; do not install software.
+Use fictional people and preview only, without --apply, workspace access,
+credentials, or a schedule. If no permitted runtime is available, prepare
+the managed-host handoff and show me how to open the browser illustration.
+```
+
+Use a supervised, time-limited pilot with a small group after reviewing the preview. Move ongoing operation to organization-managed infrastructure.
+
+Codex invokes a fixed controller command and explains the result. The controller calculates each limit from the configured policy. Complete [the policy and enrollment review](operations.md#prepare-a-reviewed-enrollment) before a live trial.
+
+The local automation depends on the desktop app and its host being available. For ongoing workspace credit management, use a managed virtual machine or cloud service operated by your organization. This walkthrough prepares the pilot; step 3 covers setting up its optional schedule. See [Codex scheduled tasks](https://learn.chatgpt.com/docs/automations?surface=app).
 
 ## 1. I rehearse without a key
 
-Open this repository as a project in the desktop app. Use its existing local folder so each run sees the same private state. From the example directory, run:
+The commands below are for readers who want to run the detailed rehearsal themselves. They include applying and restoring fictional limits; the starting request above stops at a preview. Use an approved Node.js 24 or later runtime and the same local folder across runs. Run from the starter kit's root, or from `examples/chatgpt/daily_usage_limits` in the full repository:
 
 ```bash
 node src/cli.mjs init --dir .private/codex-rehearsal --pattern fixed_release --cohort selected --unit credit --interval-hours 168 --synthetic --allow-initial-reduction
@@ -29,7 +43,7 @@ The first `run` previews the targets. The next applies them to the simulator. Th
 
 ## 2. I test the task prompt manually
 
-Paste this prompt into the project task, replacing `ABSOLUTE_EXAMPLE_DIRECTORY` with the absolute path to `examples/chatgpt/daily_usage_limits`:
+Paste this prompt into the project task, replacing `ABSOLUTE_EXAMPLE_DIRECTORY` with the absolute path to the starter kit's root or `examples/chatgpt/daily_usage_limits` in the full repository:
 
 ```text
 In ABSOLUTE_EXAMPLE_DIRECTORY, run exactly:
@@ -46,8 +60,8 @@ Confirm that Codex ran the exact command, identified it as synthetic, and report
 
 ## 3. I review a small pilot and its test schedule
 
-1. Use a separate private pilot directory and complete the README's live snapshot, review, approval, and preview. Have the runtime's approved secret store supply `CHATGPT_ADMIN_API_KEY`; verify that it is available in this execution context without printing it.
-2. Authorize a bounded first live change and its restoration. Set `liveWrites: true` and run the reviewed command with `--apply`. Inspect independent API readback, repeat the same command to verify duplicate handling, and follow the [restoration procedure](../README.md#stop-restore-and-renew). A successful receipt confirms the API setting, not exact enforcement of a daily allowance.
+1. Use a separate private pilot directory and complete the [live snapshot, review, approval, and preview](operations.md#prepare-a-reviewed-enrollment). Have the runtime's approved secret store supply `CHATGPT_ADMIN_API_KEY`; verify that it is available in this execution context without printing it.
+2. Authorize a bounded first live change and its restoration. Set `liveWrites: true` and run the reviewed command with `--apply`. Inspect independent API readback, repeat the same command to verify duplicate handling, and follow the [restoration procedure](operations.md#stop-restore-and-renew). A successful receipt confirms the API setting, not exact enforcement of a daily allowance.
 3. For a time-limited Codex pilot, enroll a small selected group in a new private directory. Decide the owner, cadence, pilot end date, and route for attention alerts. Run the live command manually and inspect its receipt. There must be only one writer for these users.
 4. When authorized, ask the desktop app to create a **paused** scheduled task in the existing local project. Use the proven command with the live pilot's paths, without `--synthetic`. If it is intended to apply changes, include `--apply` explicitly and retain the configuration gate. Tell the task to report failures or required action, remain quiet when unchanged, and stop at the pilot end date or confirmed period end, whichever comes first. Review the saved prompt, project folder, cadence, permissions, and paused state before enabling it.
 5. Enable the reviewed task, then verify a real scheduled run and its saved receipt. Do not substitute a manual “Run now” result for proof of a timed trigger. Review initial runs and separately verify that the chosen attention route reaches its operator.
@@ -56,7 +70,7 @@ The release interval belongs to the policy. A task that checks hourly can still 
 
 ## 4. I stop and verify cleanup
 
-Pause the scheduled task in the app and confirm its saved paused status. Set the pilot's `liveWrites` to `false`, wait for any active run to finish, and inspect receipts. Follow the README's reviewed restore procedure while the confirmed period is current. After readback matches the original settings and source, remove the pilot's scheduled task if it is no longer needed. Preserve the private journal and revoke a dedicated key according to your credential policy.
+Pause the scheduled task in the app and confirm its saved paused status. Set the pilot's `liveWrites` to `false`, wait for any active run to finish, and inspect receipts. Follow the [reviewed restore procedure](operations.md#stop-restore-and-renew) while the confirmed period is current. After readback matches the original settings and source, remove the pilot's scheduled task if it is no longer needed. Preserve the private journal and revoke a dedicated key according to your credential policy.
 
 For the synthetic rehearsal, the equivalent restore check is:
 

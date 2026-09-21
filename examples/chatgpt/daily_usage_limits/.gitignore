@@ -2,3 +2,4 @@
 node_modules/
 dist/
 *.zip
+!assets/chatgpt-usage-budget-starter.zip

@@ -2,7 +2,7 @@
 
 The local checks below were run on macOS with Node.js **24.13.0 and 26.5.1**. The complete suite passes **126 tests**, including 32 combinations of policy, interval, cohort, and unit and the full 2,000-credit weekly release sequence. They use fictional data, simulated API responses, and injected AWS or credential transports. They do not contact a ChatGPT workspace or deploy AWS resources.
 
-Run these commands from `examples/chatgpt/daily_usage_limits`:
+Run these commands from the extracted starter folder, or from `examples/chatgpt/daily_usage_limits` in the full repository:
 
 | Check | Reproduce it | What it establishes |
 | --- | --- | --- |
@@ -19,6 +19,21 @@ Run these commands from `examples/chatgpt/daily_usage_limits`:
 The generated ZIP was extracted, its shared modules and four AWS SDK packages imported under Node.js 24.13.0, and its handler probe run with injected dependencies. That smoke check made zero AWS requests and read no credential.
 
 The SVG assets have valid XML. The interactive illustration has valid JavaScript syntax, linked form labels, unique element IDs, and no remote assets. Local Markdown links and anchors were checked, and the repository's `docs-editor` checklist was applied to the guides.
+
+## Verify the starter download
+
+The starter ZIP contains this example's source, guides, illustrations, tests, and license, plus a file manifest. It excludes credentials, private state, installed dependencies, and cloud build output. Extract it and run the same tests and demonstration from its top-level folder.
+
+The extracted download also passed all 126 tests and the demonstration on macOS with Node.js 24.19.0. Its Codex setup sequence was exercised through a fictional snapshot, approval, and preview for two users, without credentials or live changes.
+
+For contribution maintainers, rebuild the download after editing included files, then check that it matches the current source:
+
+```bash
+python3 scripts/package_starter.py
+python3 scripts/package_starter.py --check
+```
+
+Run these packaging commands from `examples/chatgpt/daily_usage_limits` in the repository. Python is needed only to rebuild the ZIP, not to use the browser example or run the downloaded controller.
 
 ## Complete live acceptance for the chosen path
 

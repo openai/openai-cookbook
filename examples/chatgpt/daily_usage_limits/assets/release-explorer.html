@@ -3,95 +3,106 @@
 <head>
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1">
-  <title>Apportion a 2,000-credit monthly allocation</title>
+  <title>Explore monthly credit releases</title>
   <style>
-    :root { color-scheme: light; font-family: system-ui, sans-serif; color: #172b34; background: #f7f7f4; }
+    :root { color-scheme: light; font-family: system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif; color: #202123; background: #fff; }
     * { box-sizing: border-box; }
     [hidden] { display: none !important; }
-    body { margin: 0; padding: 28px 22px; }
-    main { max-width: 1040px; margin: auto; }
+    body { margin: 0; padding: 28px 24px; }
+    main { max-width: 960px; margin: auto; }
     h1, h2, p { margin-top: 0; }
-    h1 { font-size: clamp(1.75rem, 2.5vw, 2rem); font-weight: 600; line-height: 1.25; max-width: 36ch; margin-bottom: 16px; letter-spacing: -.02em; }
+    h1 { font-size: clamp(1.4rem, 2.5vw, 1.75rem); font-weight: 600; line-height: 1.3; margin-bottom: 12px; letter-spacing: -.025em; }
     p { line-height: 1.55; }
-    .intro { font-size: 1.12rem; max-width: 70ch; color: #43575e; }
-    .eyebrow { font-size: .8rem; font-weight: 750; text-transform: uppercase; letter-spacing: .09em; color: #526269; margin-bottom: 22px; }
-    .allocation { font-size: .92rem; font-weight: 650; color: #43575e; margin: 3px 0 24px; }
-    .weeks { display: grid; grid-template-columns: repeat(4, 1fr); gap: 14px; margin: 0 0 26px; }
-    .week, .panel { background: white; border: 1px solid #c8d3d4; border-radius: 16px; padding: 22px; }
-    .week.problem { background: #fcebe7; border-color: #d29a8f; }
-    .week h2 { font-size: 1.04rem; margin: 0 0 23px; }
-    .week .number { display: block; font-size: clamp(2rem, 4vw, 2.7rem); font-weight: 750; line-height: 1.1; }
-    .week .label { display: block; margin: 9px 0 19px; }
-    .week.problem .number { color: #9b382b; }
-    .track { background: #e5eaeb; height: 16px; border-radius: 4px; overflow: hidden; }
-    .track .spent { background: #ac4939; width: 100%; height: 100%; }
-    .question { font-size: 1.2rem; font-weight: 650; margin-bottom: 18px; }
-    button { border: 0; border-radius: 8px; padding: 12px 19px; background: #172b34; color: white; font: inherit; font-weight: 650; cursor: pointer; }
-    button.secondary { background: white; color: #172b34; border: 1px solid #9caeb2; }
+    .intro { font-size: 1rem; max-width: 74ch; color: #505050; }
+    .eyebrow { font-size: .875rem; color: #626262; margin-bottom: 12px; }
+    .budget-input { display: grid; grid-template-columns: minmax(0, 1fr) 180px; column-gap: 24px; align-items: center; border-block: 1px solid #e3e3e3; padding: 16px 0; margin-bottom: 28px; }
+    .budget-input label { margin: 0; }
+    .budget-input .hint { margin: 5px 0 0; }
+    .budget-input .error { grid-column: 1 / -1; margin: 8px 0 0; }
+    .allocation { font-size: .9rem; color: #626262; margin: 0 0 20px; }
+    .weeks { display: grid; grid-template-columns: repeat(4, minmax(0, 1fr)); margin: 0 0 24px; border-block: 1px solid #dedede; }
+    .week { min-width: 0; padding: 18px 16px; border-right: 1px solid #dedede; }
+    .week:last-child { border-right: 0; }
+    .week.problem { background: #f5f5f5; }
+    .week h2 { font-size: 1rem; font-weight: 600; margin: 0 0 20px; }
+    .week .number { display: block; font-size: clamp(1.25rem, 3vw, 2rem); font-weight: 600; line-height: 1.15; font-variant-numeric: tabular-nums; }
+    .week .label { display: block; font-size: .9rem; margin: 8px 0 18px; }
+    .track { background: #e7e7e7; height: 10px; overflow: hidden; }
+    .track .spent { background: #333; width: 100%; height: 100%; }
+    .question { font-size: 1rem; font-weight: 600; margin-bottom: 16px; }
+    button { border: 1px solid #202123; border-radius: 6px; padding: 11px 16px; background: #202123; color: #fff; font: inherit; font-weight: 500; cursor: pointer; }
+    button.secondary { background: #fff; color: #202123; border-color: #8c8c8c; }
     button:disabled { opacity: .45; cursor: default; }
-    :focus-visible { outline: 3px solid #1446b1; outline-offset: 4px; }
+    :focus-visible { outline: 3px solid #2456a6; outline-offset: 3px; }
     h1:focus { outline: none; }
-    .actions { display: flex; gap: 12px; flex-wrap: wrap; }
-    .grid { display: grid; grid-template-columns: 1fr 1.15fr; gap: 20px; margin: 0 0 20px; }
-    .panel h2 { font-size: 1.15rem; margin-bottom: 18px; }
-    label { display: block; font-weight: 650; margin: 20px 0 9px; }
-    select, input[type=number] { font: inherit; color: inherit; border: 1px solid #7d969e; border-radius: 7px; padding: 10px; background: white; width: 100%; }
-    input[type=range] { width: 100%; accent-color: #14805e; }
-    .hint { font-size: .9rem; color: #526269; margin: 10px 0 18px; }
-    .figures { display: grid; grid-template-columns: 1fr 1fr; gap: 14px; }
-    .figure { background: #edf5f0; border-radius: 10px; padding: 17px 14px; }
-    .figure .number { display: block; font-size: clamp(1.8rem, 3.2vw, 2.7rem); line-height: 1.15; font-weight: 750; margin: 8px 0; }
-    .figure .label { font-size: .88rem; }
-    .figure.available { background: #e2f3e9; }
-    .meter { display: flex; height: 26px; border-radius: 6px; overflow: hidden; background: #e5eaeb; margin: 24px 0 10px; }
-    .used-color { background: #365d6b; }.available-color { background: #14805e; }
-    .legend { display: flex; flex-wrap: wrap; gap: 13px; margin-bottom: 18px; font-size: .84rem; }
-    .dot { display: inline-block; width: 10px; height: 10px; border-radius: 2px; margin-right: 4px; }
-    .equation { font-size: 1rem; font-weight: 650; margin-bottom: 12px; }
-    .callout { border-left: 4px solid #14805e; padding: 12px 18px; background: #edf5f0; font-size: .95rem; }
-    .error { color: #9b382b; font-weight: 650; }
+    .actions { display: flex; gap: 10px; flex-wrap: wrap; }
+    .grid { display: grid; grid-template-columns: minmax(0, 1fr) minmax(0, 1.1fr); gap: 28px; margin-bottom: 20px; }
+    .panel { min-width: 0; border-top: 1px solid #dedede; padding-top: 20px; }
+    .panel h2 { font-size: 1.05rem; font-weight: 600; margin-bottom: 18px; }
+    label { display: block; font-size: .95rem; font-weight: 500; margin: 20px 0 8px; }
+    select, input[type=number] { font: inherit; color: inherit; border: 1px solid #8c8c8c; border-radius: 5px; padding: 10px; background: #fff; width: 100%; min-height: 44px; }
+    input[type=range] { width: 100%; min-height: 32px; accent-color: #333; }
+    .hint { font-size: .875rem; color: #626262; margin: 10px 0 18px; }
+    .figures { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); border: 1px solid #dedede; }
+    .figure { min-width: 0; padding: 16px 12px; }
+    .figure .number { display: block; font-size: clamp(1.35rem, 2.8vw, 2rem); line-height: 1.2; font-weight: 600; margin: 8px 0; font-variant-numeric: tabular-nums; overflow-wrap: anywhere; }
+    .figure .label { font-size: .85rem; }
+    .figure.available { background: #f5f5f5; border-left: 1px solid #dedede; }
+    .meter { display: flex; height: 20px; overflow: hidden; background: #e7e7e7; margin: 22px 0 10px; }
+    .used-color { background: #202123; }.available-color { background: #858585; }
+    .legend { display: flex; flex-wrap: wrap; gap: 13px; margin-bottom: 18px; font-size: .8rem; }
+    .dot { display: inline-block; width: 10px; height: 10px; margin-right: 5px; }
+    .equation { font-size: .95rem; font-weight: 600; margin-bottom: 12px; }
+    .callout { border-left: 2px solid #a6a6a6; padding: 8px 16px; font-size: .95rem; }
+    .error { color: #a12323; font-weight: 500; }
     details { margin: 20px 0; }
-    summary { font-weight: 650; cursor: pointer; padding: 8px 0; }
-    table { border-collapse: collapse; width: 100%; font-size: .95rem; }
-    th, td { text-align: left; padding: 10px 12px; border-bottom: 1px solid #cad5d1; }
-    th { background: #edf5f0; }
+    summary { font-weight: 500; cursor: pointer; padding: 10px 0; }
+    table { border-collapse: collapse; width: 100%; font-size: .9rem; }
+    th, td { text-align: left; padding: 10px 12px; border-bottom: 1px solid #dedede; }
+    th { background: #f5f5f5; font-weight: 500; }
     .table-wrap { overflow-x: auto; }
-    .footer { font-size: .86rem; color: #526269; margin-top: 24px; }
-    a { color: #1657a4; }
-    @media (max-width: 730px) { .grid { grid-template-columns: 1fr; } .weeks { grid-template-columns: repeat(2, 1fr); } body { padding: 22px 14px; } .week, .panel { padding: 19px; } }
-    @media (max-width: 380px) { .figures { grid-template-columns: 1fr; } }
+    .footer { font-size: .85rem; color: #626262; margin-top: 24px; padding-top: 16px; border-top: 1px solid #e3e3e3; }
+    a { color: inherit; text-underline-offset: 3px; }
+    .footer a { display: inline-block; white-space: nowrap; min-height: 44px; padding-block: 12px; }
+    @media (max-width: 700px) { .grid { grid-template-columns: 1fr; } .weeks { grid-template-columns: repeat(2, minmax(0, 1fr)); } .week:nth-child(2) { border-right: 0; } .week:nth-child(-n+2) { border-bottom: 1px solid #dedede; } body { padding: 20px 16px; } }
+    @media (max-width: 440px) { .budget-input { grid-template-columns: 1fr; gap: 12px; } .week { padding: 16px 12px; } .figures { grid-template-columns: 1fr; } .figure.available { border-left: 0; border-top: 1px solid #dedede; } }
   </style>
 </head>
 <body>
   <main>
+    <div class="budget-input">
+      <div><label for="monthly">Example monthly budget per person (credits)</label><p id="monthly-hint" class="hint">Your organization chooses this amount. The starting 2,000 credits are illustrative.</p></div>
+      <input id="monthly" type="number" min="1" max="1000000" step="1" value="2000" aria-describedby="monthly-hint monthly-error" required>
+      <p id="monthly-error" class="error" role="status" aria-live="polite" hidden></p>
+    </div>
     <section id="problem" aria-labelledby="problem-title">
       <div class="eyebrow">1 of 2 · The problem</div>
       <h1 id="problem-title" tabindex="-1">A monthly allocation can run out in week one.</h1>
-      <p class="intro">One person gets 2,000 credits for the month and uses them all in the first week. There is no capacity left for the rest of the month.</p>
-      <div class="allocation">One person · 2,000 credits per month</div>
-      <div class="weeks" aria-label="Example: all 2,000 credits are used in week one">
-        <div class="week problem"><h2>Week 1</h2><span class="number">2,000</span><span class="label">credits used</span><div class="track" aria-hidden="true"><div class="spent"></div></div></div>
+      <p class="intro">One person gets <span id="problem-budget">2,000</span> credits for the month and uses them all in the first week. There is no capacity left for the rest of the month.</p>
+      <div class="allocation">One person · one illustrative month</div>
+      <div class="weeks" aria-label="Example: the entire monthly budget is used in week one">
+        <div class="week problem"><h2>Week 1</h2><span id="problem-used" class="number">2,000</span><span class="label">credits used</span><div class="track" aria-hidden="true"><div class="spent"></div></div></div>
         <div class="week"><h2>Week 2</h2><span class="number">0</span><span class="label">credits available</span><div class="track" aria-hidden="true"></div></div>
         <div class="week"><h2>Week 3</h2><span class="number">0</span><span class="label">credits available</span><div class="track" aria-hidden="true"></div></div>
         <div class="week"><h2>Week 4</h2><span class="number">0</span><span class="label">credits available</span><div class="track" aria-hidden="true"></div></div>
       </div>
       <p class="question">What if the same allocation became available in smaller portions?</p>
       <button id="show-plan" type="button" disabled>Next: choose a release plan →</button>
-      <noscript><p><a href="release-timeline.svg">See how four weekly portions of 500 credits work.</a></p></noscript>
+      <noscript><p>For this 2,000-credit example, releasing 500 on days 1, 8, 15, and 22 spreads the same amount across the month. Enable JavaScript to explore other budgets.</p></noscript>
     </section>
     <section id="solution" aria-labelledby="solution-title" hidden>
       <div class="eyebrow">2 of 2 · Choose the amount and cadence</div>
-      <h1 id="solution-title" tabindex="-1">Apportion the same 2,000 credits.</h1>
-      <p class="intro">Release 500 each week, 1,000 every two weeks, or smaller amounts each day. Choose the pattern that fits how your organization works.</p>
-      <div class="allocation">One person · 2,000 credits per month · 30-day example</div>
+      <h1 id="solution-title" tabindex="-1">Apportion the same monthly budget.</h1>
+      <p class="intro">Choose weekly, fortnightly, daily, or custom releases. Each plan draws from the monthly amount above.</p>
+      <div class="allocation">One person · 30-day example month</div>
       <div class="grid">
         <section class="panel" aria-labelledby="plan-title">
           <h2 id="plan-title">Choose a release plan</h2>
           <label for="preset">Amount and cadence</label>
           <select id="preset">
-            <option value="weekly" selected>500 credits each week</option>
-            <option value="fortnightly">1,000 credits every two weeks</option>
-            <option value="daily">67 credits each day</option>
+            <option value="weekly" selected>Weekly · up to 4 releases</option>
+            <option value="fortnightly">Every two weeks · up to 2 releases</option>
+            <option value="daily">Daily · up to 30 portions</option>
             <option value="custom">Set my own increment</option>
           </select>
           <div id="custom-controls" hidden>
@@ -110,20 +121,20 @@
         <section class="panel" aria-labelledby="budget-title">
           <h2 id="budget-title">This person's budget today</h2>
           <div class="figures">
-            <div class="figure"><span class="label">Released so far</span><span id="released" class="number">500</span><span class="label">of 2,000 credits</span></div>
+            <div class="figure"><span class="label">Released so far</span><span id="released" class="number">500</span><span id="budget-total" class="label">of 2,000 credits</span></div>
             <div class="figure available"><span class="label">Available now</span><span id="available" class="number">500</span><span class="label">credits after usage</span></div>
           </div>
           <label for="used">Credits used so far this month</label>
           <input id="used" type="number" min="0" max="500" step="1" value="0" required>
           <div class="meter" aria-hidden="true"><span id="used-bar" class="used-color"></span><span id="available-bar" class="available-color"></span></div>
-          <div class="legend" aria-hidden="true"><span><span class="dot used-color"></span>Used</span><span><span class="dot available-color"></span>Available now</span><span><span class="dot" style="background:#e5eaeb"></span>For later release</span></div>
+          <div class="legend" aria-hidden="true"><span><span class="dot used-color"></span>Used</span><span><span class="dot available-color"></span>Available now</span><span><span class="dot" style="background:#e7e7e7"></span>For later release</span></div>
           <div role="status" aria-live="polite" aria-atomic="true"><p id="equation" class="equation">500 released − 0 used = 500 available</p><p id="next" class="hint">The next 500 credits become available on day 8.</p></div>
         </section>
       </div>
-      <p class="callout"><strong>Unused released credits remain available during the month.</strong> Each release adds to the amount this person can use from the same 2,000-credit allocation.</p>
+      <p class="callout"><strong>Unused released credits remain available during the month.</strong> Each release adds to the amount this person can use from the same monthly allocation.</p>
       <details>
         <summary>See every release in this plan</summary>
-        <div class="table-wrap"><table><caption class="hint">One person's 2,000-credit monthly allocation</caption><thead><tr><th scope="col">When</th><th scope="col">Newly released</th><th scope="col">Released so far</th></tr></thead><tbody id="schedule"></tbody></table></div>
+        <div class="table-wrap"><table><caption id="schedule-caption" class="hint">One person's illustrative 2,000-credit monthly budget</caption><thead><tr><th scope="col">When</th><th scope="col">Newly released</th><th scope="col">Released so far</th></tr></thead><tbody id="schedule"></tbody></table></div>
       </details>
       <div class="actions"><button id="show-problem" type="button" class="secondary">← Back to the problem</button></div>
     </section>
@@ -131,28 +142,36 @@
   </main>
   <script>
     'use strict';
-    const ALLOCATION = 2000;
     const MONTH_HOURS = 720;
     const element = id => document.getElementById(id);
     if (window.location.pathname.startsWith('/cookbook/assets/')) {
       element('cookbook-link').href = '/cookbook/examples/chatgpt/daily_usage_limits/readme';
     }
     const number = value => value.toLocaleString('en-US');
-    const presets = { weekly: { interval: 168, start: 500, increment: 500 }, fortnightly: { interval: 336, start: 1000, increment: 1000 }, daily: { interval: 24, start: 67, increment: 67 } };
     const atHour = hour => `day ${Math.floor(hour / 24) + 1}${hour % 24 ? ` at ${String(hour % 24).padStart(2, '0')}:00` : ''}`;
-    function readPlan() {
-      if (element('preset').value !== 'custom') return presets[element('preset').value];
-      if (!['interval', 'start', 'increment'].every(id => element(id).checkValidity() && Number.isInteger(Number(element(id).value)))) return null;
-      return Object.fromEntries(['interval', 'start', 'increment'].map(id => [id, Number(element(id).value)]));
+    const validInteger = id => element(id).checkValidity() && Number.isInteger(Number(element(id).value));
+    function readBudget() { return validInteger('monthly') ? Number(element('monthly').value) : null; }
+    function presetPlan(budget) {
+      const settings = { weekly: [168, 4], fortnightly: [336, 2], daily: [24, 30] }[element('preset').value];
+      if (!settings) return null;
+      const [interval, portions] = settings;
+      const amount = Math.ceil(budget / portions);
+      return { interval, start: amount, increment: amount, budget };
+    }
+    function readPlan(budget = readBudget()) {
+      if (budget === null) return null;
+      if (element('preset').value !== 'custom') return presetPlan(budget);
+      if (!['interval', 'start', 'increment'].every(validInteger)) return null;
+      return { ...Object.fromEntries(['interval', 'start', 'increment'].map(id => [id, Number(element(id).value)])), budget };
     }
     function releases(plan) {
       const rows = [];
       let previous = 0;
       for (let hour = 0; hour < MONTH_HOURS; hour += plan.interval) {
-        const total = Math.min(ALLOCATION, plan.start + Math.floor(hour / plan.interval) * plan.increment);
+        const total = Math.min(plan.budget, plan.start + Math.floor(hour / plan.interval) * plan.increment);
         if (total > previous) rows.push({ hour, amount: total - previous, total });
         previous = total;
-        if (total === ALLOCATION) break;
+        if (total === plan.budget) break;
       }
       return rows;
     }
@@ -162,37 +181,55 @@
       element(solution ? 'solution-title' : 'problem-title').focus();
     }
     function render() {
-      const plan = readPlan();
+      const budget = readBudget();
+      const validBudget = budget !== null;
+      element('monthly-error').hidden = validBudget;
+      element('monthly-error').textContent = validBudget ? '' : 'Enter a whole-credit monthly budget from 1 to 1,000,000.';
+      element('monthly').setAttribute('aria-invalid', String(!validBudget));
+      element('show-plan').disabled = !validBudget;
+      element('problem-budget').textContent = validBudget ? number(budget) : '—';
+      element('problem-used').textContent = validBudget ? number(budget) : '—';
+      element('budget-total').textContent = validBudget ? `of ${number(budget)} credits` : 'Monthly budget needed';
+      element('schedule-caption').textContent = validBudget ? `One person's illustrative ${number(budget)}-credit monthly budget` : 'Choose a monthly budget to see its releases';
+      if (validBudget) {
+        for (const id of ['start', 'increment']) element(id).max = String(budget);
+        const preset = presetPlan(budget);
+        if (preset) for (const id of ['interval', 'start', 'increment']) element(id).value = String(preset[id]);
+      }
+      const plan = readPlan(budget);
       const elapsed = Number(element('elapsed').value);
       element('day').textContent = atHour(elapsed).replace('day', 'Day');
       if (!plan) {
         element('released').textContent = '—'; element('available').textContent = '—';
-        element('equation').textContent = 'Enter whole credits and a whole-hour interval within the input bounds.';
+        element('equation').textContent = validBudget ? 'Enter whole credits within this budget and an interval from 1 to 744 hours.' : 'Choose a valid monthly budget above.';
         element('equation').classList.add('error'); element('next').textContent = '';
+        element('plan-summary').textContent = '';
         element('schedule').replaceChildren(); element('advance').disabled = true;
         element('used-bar').style.width = '0%'; element('available-bar').style.width = '0%';
         return;
       }
       const rows = releases(plan);
-      const released = Math.min(ALLOCATION, plan.start + Math.floor(elapsed / plan.interval) * plan.increment);
+      const released = Math.min(budget, plan.start + Math.floor(elapsed / plan.interval) * plan.increment);
       const nextRelease = rows.find(row => row.hour > elapsed);
       element('released').textContent = number(released);
       element('used').max = String(released);
       element('advance').disabled = !nextRelease;
-      element('next').textContent = nextRelease ? `The next ${number(nextRelease.amount)} credits become available on ${atHour(nextRelease.hour)}.` : released === ALLOCATION ? 'All 2,000 credits have now been released for this month.' : `${number(ALLOCATION - released)} credits remain unassigned by this month's release plan.`;
-      const selected = element('preset').value;
-      element('plan-summary').textContent = selected === 'weekly' ? '500 on days 1, 8, 15, and 22. Total: 2,000 credits.' : selected === 'fortnightly' ? '1,000 on day 1 and 1,000 on day 15. Total: 2,000 credits.' : selected === 'daily' ? '67 on days 1–29, then the final 57 on day 30. Total: 2,000 credits.' : `${number(plan.start)} initially, then ${number(plan.increment)} every ${plan.interval} ${plan.interval === 1 ? 'hour' : 'hours'}, up to 2,000 this month.`;
+      element('next').textContent = nextRelease ? `The next ${number(nextRelease.amount)} credits become available on ${atHour(nextRelease.hour)}.` : released === budget ? `All ${number(budget)} credits have now been released for this month.` : `${number(budget - released)} credits remain unassigned by this month's release plan.`;
+      const cadence = { 1: 'hour', 24: 'day', 168: 'week', 336: 'two weeks' }[plan.interval] ?? `${plan.interval} hours`;
+      const last = rows[rows.length - 1];
+      element('plan-summary').textContent = `${number(plan.start)} initially, then ${number(plan.increment)} every ${cadence}, up to ${number(budget)} this month.` + (last.amount < plan.increment ? ` The final release is ${number(last.amount)} credits.` : '');
       const used = Number(element('used').value);
-      if (!element('used').checkValidity() || !Number.isInteger(used)) {
+      if (!validInteger('used')) {
         element('available').textContent = '—'; element('equation').textContent = `Enter used credits from 0 to ${number(released)}.`;
-        element('equation').classList.add('error'); element('used-bar').style.width = '0%'; element('available-bar').style.width = '0%';
+        element('equation').classList.add('error'); element('used').setAttribute('aria-invalid', 'true');
+        element('used-bar').style.width = '0%'; element('available-bar').style.width = '0%';
       } else {
         const available = released - used;
         element('available').textContent = number(available);
         element('equation').textContent = `${number(released)} released − ${number(used)} used = ${number(available)} available`;
-        element('equation').classList.remove('error');
-        element('used-bar').style.width = `${used / ALLOCATION * 100}%`;
-        element('available-bar').style.width = `${available / ALLOCATION * 100}%`;
+        element('equation').classList.remove('error'); element('used').setAttribute('aria-invalid', 'false');
+        element('used-bar').style.width = `${used / budget * 100}%`;
+        element('available-bar').style.width = `${available / budget * 100}%`;
       }
       element('schedule').replaceChildren(...rows.map(row => {
         const tr = document.createElement('tr');
@@ -202,13 +239,13 @@
         return tr;
       }));
     }
-    element('show-plan').disabled = false;
     element('show-plan').addEventListener('click', () => showFrame(true));
     element('show-problem').addEventListener('click', () => showFrame(false));
     element('preset').addEventListener('change', () => {
-      const custom = element('preset').value === 'custom';
-      element('custom-controls').hidden = !custom;
-      if (!custom) for (const [key, value] of Object.entries(presets[element('preset').value])) element(key).value = String(value);
+      element('custom-controls').hidden = element('preset').value !== 'custom';
+      element('elapsed').value = '0'; element('used').value = '0'; render();
+    });
+    element('monthly').addEventListener('input', () => {
       element('elapsed').value = '0'; element('used').value = '0'; render();
     });
     ['interval', 'start', 'increment', 'elapsed', 'used'].forEach(id => element(id).addEventListener('input', render));

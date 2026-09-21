@@ -1,6 +1,18 @@
 # Deploy the controller on AWS
 
-Deploy the controller on AWS to run scheduled releases independently of an individual's computer. Amazon EventBridge Scheduler starts a run hourly. A resumable feeder places one work item per enrolled person on an Amazon SQS queue. Lambda workers process those items, and DynamoDB preserves progress, original settings, intended caps, and receipts.
+Deploy the controller on AWS to run scheduled releases independently of an individual's computer. This serverless design uses one Lambda function for dispatch and member processing:
+
+**EventBridge Scheduler → Lambda dispatcher → SQS → Lambda workers**
+
+The queue spreads an enrollment across invocations. Worker concurrency controls how much work reaches the Admin API at once. This fits AWS's guidance to [use direct EventBridge and SQS triggers for straightforward message processing](https://docs.aws.amazon.com/lambda/latest/dg/with-step-functions.html).
+
+| Service | Purpose |
+| --- | --- |
+| EventBridge Scheduler, Lambda, and SQS | Start hourly runs, queue each person's work, and resume unfinished processing. |
+| DynamoDB | Preserve original settings, intended changes, progress, and receipts across invocations. |
+| Secrets Manager | Supply the Admin key to the runtime. |
+| CloudWatch and SNS | Record operational signals and notify the operating owner. |
+| S3 | Store the exact version of the deployment package. |
 
 The template starts with the schedule and queue processing **disabled**, and live writes **off**. It processes larger enrollments across multiple invocations. Begin with one person, then try 5 to 25 people and measure completion time before expanding. Configure worker capacity and read concurrency around the Admin API throughput you observe.
 
@@ -17,10 +29,15 @@ Use Bash on macOS or Linux for this walkthrough. From Windows, use your organiza
 
 Use CloudShell for setup and inspection. The deployed AWS services run after your browser session ends. Preserve private enrollment and configuration records in your organization's approved storage.
 
-## 1. Check the AWS example locally
+## 1. Test the kit you will deploy
+
+Use a fresh extraction of the starter download for these checks. Record its SHA-256 and the matching source revision as described in [Verify the starter download](verification.md#verify-the-starter-download). Build the deployment package from that same folder.
 
 ```bash
-node --test test/aws*.test.mjs
+umask 077
+mkdir -p .private
+npm test
+node src/demo.mjs
 npm ci --prefix aws --ignore-scripts --no-audit --no-fund
 npm run package --prefix aws
 ```
@@ -34,23 +51,6 @@ python3 -m venv .private/cfn-validation
 .private/cfn-validation/bin/pip install cfn-lint==1.40.4
 .private/cfn-validation/bin/cfn-lint -t aws/template.yaml
 ```
-
-Rehearse preparing the private controls:
-
-```bash
-node src/cli.mjs init --dir .private/aws-rehearsal --pattern fixed_release --cohort all --unit credit --interval-hours 168 --synthetic --allow-initial-reduction
-node src/cli.mjs snapshot --config .private/aws-rehearsal/config.json --out .private/aws-rehearsal/enrollment.json --synthetic
-```
-
-Review the three fictional members and their proposed weekly releases. Replace `REVIEWED_SHA256` with the snapshot command's printed hash:
-
-```bash
-node src/cli.mjs approve --enrollment .private/aws-rehearsal/enrollment.json --hash REVIEWED_SHA256
-node aws/prepare-control.mjs .private/aws-rehearsal/config.json .private/aws-rehearsal/enrollment.json cookbook-usage-limits .private/aws-rehearsal/controls
-node aws/event.mjs probe .private/aws-rehearsal/probe.json
-```
-
-The preparation command creates a new private directory containing `part-00000000.json` and any additional numbered parts, plus `manifest.json`. The printed `ControlSha256` binds the manifest and its verified chain of parts to the complete configuration and approved enrollment. Each stored part stays below DynamoDB's item-size limit. Keep rehearsal controls separate from live controls.
 
 ## 2. Prepare a disabled deployment
 
@@ -100,7 +100,7 @@ The runtime role reads the reviewed controls and one secret. Its writes cover st
 
 These settings control processing capacity. `maxMembers` in the policy remains an optional enrollment guard; its default is `null`. Choose `captureConcurrency`, API read bounds, and `initialReviewMaxAgeMinutes` before capture. Measure the complete first rollout, including capture, review, upload, and queued work. It must fit the configured review window and the same release interval.
 
-## 3. Verify delivery and preview the limits
+## 3. Verify AWS delivery
 
 Run a manual probe. It records a receipt without accessing the Admin API:
 
@@ -109,7 +109,7 @@ node aws/event.mjs probe .private/aws-probe.json
 aws lambda invoke --function-name "$DAILY_LIMIT_FUNCTION" --cli-binary-format raw-in-base64-out --payload file://.private/aws-probe.json .private/aws-probe-result.json
 ```
 
-Expect `ok: true`, `action: probe`, and a private `aws_probe` receipt. Check the CLI metadata for `FunctionError`, including when the HTTP status is `200`.
+Expect `ok: true`, `action: probe`, `apiAccessed: false`, `capWrites: 0`, and a private `aws_probe` receipt. This verifies Lambda invocation and receipt storage. Check the CLI metadata for `FunctionError`, including when the HTTP status is `200`.
 
 To verify timed delivery, create one temporary one-time schedule in the stack's EventBridge Scheduler group, a few minutes ahead in UTC. Select the deployed Lambda, the existing scheduler execution role and delivery-failure queue, no flexible window, and automatic deletion after completion. Use this input:
 
@@ -118,6 +118,54 @@ To verify timed delivery, create one temporary one-time schedule in the stack's 
 ```
 
 Match the timed invocation to its private receipt and verify that the temporary schedule disappears. Keep the recurring `usage-limit-check` schedule disabled.
+
+## 4. Check the workspace connection
+
+Before configuring budgets or capturing members, verify access from the deployed Lambda. Keep the schedule, queue processing, and writes disabled. The all-zero bootstrap control hash can remain in place; this check needs no enrollment or uploaded controls.
+
+Set the nonsecret `DAILY_LIMIT_WORKSPACE` variable to the exact workspace ID. Confirm that `PilotExpiresAt` is still in the future, then generate and invoke a fresh event:
+
+```bash
+node aws/event.mjs check_connection .private/aws-connection.json "$DAILY_LIMIT_WORKSPACE"
+aws lambda invoke --function-name "$DAILY_LIMIT_FUNCTION" --cli-binary-format raw-in-base64-out --payload file://.private/aws-connection.json .private/aws-connection-result.json
+cat .private/aws-connection-result.json
+```
+
+Expect `ok: true`, `action: check_connection`, the intended `workspaceId`, `unit: credit` or `unit: usd`, `usersRead: true`, `capWrites: 0`, and `receiptRecorded: true`. Save the `checkId` with the result. Check the invocation metadata for `FunctionError` as well as the result's `ok` field.
+
+The runtime reads its configured secret, verifies the workspace, reads at most one member, and checks that member's monthly-usage response for the billing unit. It returns no member details. This establishes credential and read access for those routes. Group selection, usage history, individual cap responses, and approved writes are checked later in their respective workflows.
+
+If `ok` is false, use the returned code:
+
+| Code | What to check |
+| --- | --- |
+| `ADMIN_HTTP_401` | The API rejected the credential. Confirm that the secret contains a current ChatGPT Admin key for this workspace; check its status, expiry, and creator's access in Admin Console. |
+| `ADMIN_HTTP_403` | The API denied access. Confirm the workspace ID, workspace eligibility, and the key's `chatgpt.enterprise.usage_limit.read` and `chatgpt.enterprise.user.read` permissions. |
+| `CONNECTION_MEMBER_UNAVAILABLE` | No member was returned to establish the unit. Verify active workspace membership and retry after directory updates. |
+| `USAGE_UNIT_UNAVAILABLE` | No supported billing unit was confirmed. Review the workspace billing setup before selecting credit or USD policy amounts. |
+| `INVALID_SECRET_FORMAT` | The configured secret must contain valid JSON with a nonempty `apiKey` string. |
+| `CONNECTION_CHECK_FAILED` | Check the runtime role's access to the configured secret and optional KMS key, along with AWS connectivity. |
+
+The [Admin key access guide](https://help.openai.com/en/articles/20001407-managing-admin-keys-in-admin-console/) explains where to review workspace access and permissions. Keep secrets and raw service error bodies out of shared reports. Correct the identified issue, then generate a new event and rerun this check; authentication failures are not retried automatically. If `receiptRecorded` is false, resolve receipt storage before continuing.
+
+## 5. Prepare the budget and preview the limits
+
+Rehearse preparing the private controls:
+
+```bash
+node src/cli.mjs init --dir .private/aws-rehearsal --pattern fixed_release --cohort all --unit credit --interval-hours 168 --synthetic --allow-initial-reduction
+node src/cli.mjs snapshot --config .private/aws-rehearsal/config.json --out .private/aws-rehearsal/enrollment.json --synthetic
+```
+
+Review the three fictional members and their proposed weekly releases. Replace `REVIEWED_SHA256` with the snapshot command's printed hash:
+
+```bash
+node src/cli.mjs approve --enrollment .private/aws-rehearsal/enrollment.json --hash REVIEWED_SHA256
+node aws/prepare-control.mjs .private/aws-rehearsal/config.json .private/aws-rehearsal/enrollment.json cookbook-usage-limits .private/aws-rehearsal/controls
+node aws/event.mjs probe .private/aws-rehearsal/probe.json
+```
+
+The preparation command creates a new private directory containing `part-00000000.json` and any additional numbered parts, plus `manifest.json`. The printed `ControlSha256` binds the manifest and its verified chain of parts to the complete configuration and approved enrollment. Each stored part stays below DynamoDB's item-size limit. Keep rehearsal controls separate from live controls.
 
 Prepare a live read-only preview:
 
@@ -171,7 +219,7 @@ A clean run reaches `completed = total`, `outstanding = 0`, and `attention = 0`.
 
 Use the DynamoDB console's item explorer to query `PK = RECEIPT#<DeploymentId>` for detailed receipts. Run progress and per-member outcomes use `PK = RUN#<DeploymentId>#<runId>`. Keep identifiers and settings private. Record live cap enforcement separately during the approved apply trial.
 
-## 4. Review the first change and recurring schedule
+## 6. Review the first change and recurring schedule
 
 1. Obtain approval for the member caps, any initial reduction, the bounded trial, and restoration. Coordinate manual admin edits and disable other writers for these users. Separate stacks have separate lock tables, so assign disjoint users to them.
 2. Finish or cancel existing runs using the stop procedure below. Keep the schedule and work processing disabled while replacing controls. Set `liveWrites: true` in the reviewed configuration, then prepare a **new** output directory. The policy approval hash stays the same, but the AWS control hash changes:
@@ -186,15 +234,19 @@ Use the DynamoDB console's item explorer to query `PK = RECEIPT#<DeploymentId>` 
    node aws/upload-control.mjs .private/aws-live/controls-apply "$DAILY_LIMIT_TABLE" "$DAILY_LIMIT_CONTROL_SHA" "$DAILY_LIMIT_PREVIOUS_SHA"
    ```
 
-   Set the new `ControlSha256`, `ApplyEnabled=true`, `AllowedWriteAction=apply`, and `WorkProcessingEnabled=true` in the stack parameters, keeping `ScheduleState=DISABLED`. Set `RunEventsNotBefore` to the current UTC time so earlier start events remain excluded. Apply the stack update using the command under “Verify delivery and preview the limits,” and verify its settings. A replacement conflict requires reading and reviewing the current controls before another attempt.
+   Set the new `ControlSha256`, `ApplyEnabled=true`, `AllowedWriteAction=apply`, and `WorkProcessingEnabled=true` in the stack parameters, keeping `ScheduleState=DISABLED`. Set `RunEventsNotBefore` to the current UTC time so earlier start events remain excluded. Apply the stack update using the command under “Prepare the budget and preview the limits,” and verify its settings. A replacement conflict requires reading and reviewing the current controls before another attempt.
 4. Generate an `apply` event with `node aws/event.mjs apply .private/aws-apply.json`, invoke it as in the preview, and track its new `runId` to completion. Verify each absolute cap and temporary expiry by independent API readback. Repeat the current-slot run and confirm that no additional budget is released. Resolve attention results before expanding.
 5. With recurring delivery still disabled, complete the stop and restore procedure below. This closes the enrollment. Prepare a fresh enrollment in a new deployment and state table for continued operation, retaining the earlier records. Prove a bounded manual apply with its controls. Only then set `ScheduledAction=apply` and `ScheduleState=ENABLED` through a reviewed stack update. Keep `AllowedWriteAction=apply` and a current `RunEventsNotBefore` cutoff for this rollout. Verify a real hourly trigger and completed member outcomes.
 
-The policy's `intervalHours` determines release frequency. Keep the same state table throughout an enrollment; it contains reconciliation records and original settings. The confirmed period and pilot expiry stop new processing. Plan restoration while both remain current. For the next period, use a fresh reviewed enrollment and deployment with its own state table; retain the prior table according to your records policy.
+The policy's `intervalHours` determines release frequency. Keep the same state table throughout an enrollment; it contains reconciliation records and original settings.
 
-## 5. Verify failures and alerts
+### Prepare the next period
 
-SQS delivery can repeat a message. The handler returns individual failed records so successful records can finish, and the controller reconciles saved absolute targets before another write. See [Lambda's SQS processing behavior](https://docs.aws.amazon.com/lambda/latest/dg/with-sqs.html) and [partial batch responses](https://docs.aws.amazon.com/lambda/latest/dg/services-sqs-errorhandling.html).
+The confirmed period and pilot expiry stop new processing. Plan restoration while both remain current. For the next period, confirm the new boundaries, review a fresh enrollment, and create a new deployment with its own state table. Repeat the connection, preview, and bounded apply checks for that deployment. Retain the prior table according to your records policy.
+
+## 7. Verify failures and alerts
+
+SQS delivery can repeat a message. The template follows [AWS's SQS configuration guidance](https://docs.aws.amazon.com/lambda/latest/dg/services-sqs-configure.html): queue visibility is six times the worker timeout, the retry limit is at least five deliveries, and partial batch responses return only failed records. The controller reconciles saved absolute targets before another write. See [Lambda's SQS processing behavior](https://docs.aws.amazon.com/lambda/latest/dg/with-sqs.html) and [partial batch responses](https://docs.aws.amazon.com/lambda/latest/dg/services-sqs-errorhandling.html).
 
 | Signal | Action |
 | --- | --- |
@@ -215,7 +267,7 @@ For a repaired authentication failure, keep the recurring schedule off and start
 
 State, original settings, controls, and unresolved intents persist. Receipt and run records have a retention period; DynamoDB removes expired items asynchronously. Apply your retention policy to the table, backups, logs, artifact versions, and queues. See [DynamoDB TTL behavior](https://docs.aws.amazon.com/amazondynamodb/latest/developerguide/TTL.html).
 
-## 6. Stop, restore, and verify cleanup
+## 8. Stop, restore, and verify cleanup
 
 1. Set `ScheduleState=DISABLED`, `WorkProcessingEnabled=false`, `ApplyEnabled=false`, and `AllowedWriteAction=none`. Advance `RunEventsNotBefore` to the current UTC time; `date -u +%Y-%m-%dT%H:%M:%SZ` prints a suitable value. Apply the stack update and read back the schedule, event-source mapping, cutoff, and gates. Wait at least the configured worker timeout after the update completes for old in-flight workers to finish, and inspect their receipts. The cutoff rejects earlier asynchronous start events and stops older queued runs.
 2. Explicitly cancel each unfinished run you are closing before resuming processing for another action. Set `DAILY_LIMIT_RUN` to the run being stopped:

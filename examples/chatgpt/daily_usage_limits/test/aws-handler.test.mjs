@@ -63,6 +63,111 @@ test('probe needs no controls, credentials, queue or API', async () => {
   assert.equal(h.calls.controls, 0); assert.equal(h.calls.secrets, 0); assert.equal(h.pending.length, 0);
 });
 
+test('connection check runs before controls with a read-only bounded adapter and no member output', async () => {
+  const h = harness({ controlSha256: '0'.repeat(64) });
+  let adapterOptions;
+  const handle = createHandler({ ...h.options, apiFactory(options) {
+    adapterOptions = options;
+    return { async checkConnection() { return { workspaceId: options.workspaceId,
+      unit: 'usd', usersRead: true, members: [{ email: 'private@example.invalid' }], apiKey: options.apiKey }; } };
+  } });
+  const result = await handle({ ...h.event, action: 'check_connection', workspaceId: 'workspace-synthetic' });
+  assert.deepEqual(result, { ok: true, action: 'check_connection', workspaceId: 'workspace-synthetic',
+    unit: 'usd', usersRead: true, capWrites: 0, checkId: result.checkId, receiptRecorded: true });
+  assert.match(result.checkId, /^[a-f0-9]{64}$/);
+  assert.equal(adapterOptions.allowWrites, false); assert.deepEqual(adapterOptions.userIds, []);
+  assert.equal(adapterOptions.maxPages, 1); assert.equal(adapterOptions.maxRows, 1);
+  assert.equal(adapterOptions.timeoutMs, 10_000); assert.equal(adapterOptions.remainingTimeMs(), 0);
+  assert.equal(h.calls.secrets, 1); assert.equal(h.calls.controls, 0); assert.equal(h.calls.contexts, 0);
+  assert.equal(h.calls.cohortChecks, 0); assert.equal(h.calls.execute.length, 0);
+  assert.equal(h.pending.length, 0); assert.equal(h.runs.size, 0);
+  assert.equal(h.calls.receipts[0].kind, 'aws_connection_check');
+  assert.deepEqual(h.calls.metrics, [{ name: 'ConnectionCheckSucceeded', value: 1 }]);
+  assert.doesNotMatch(JSON.stringify([result, h.calls.receipts, h.calls.logs]), /private@example|synthetic-key/);
+});
+
+test('connection events reject unexpected fields and malformed workspace identities before secret access', async () => {
+  for (const change of [{ workspaceId: undefined }, { workspaceId: 123 }, { workspaceId: '../other' }, { workspaceId: '' },
+    { workspaceId: 'a'.repeat(161) }, { apiKey: 'injected' }, { allowWrites: true },
+    { baseUrl: 'https://example.invalid' }, { userIds: ['unreviewed'] }, { runId: 'a'.repeat(64) }]) {
+    const h = harness();
+    await assert.rejects(h.handle({ ...h.event, action: 'check_connection', workspaceId: 'workspace-synthetic', ...change }));
+    assert.equal(h.calls.secrets, 0); assert.equal(h.calls.controls, 0);
+  }
+  const h = harness();
+  await assert.rejects(h.handle({ ...h.event, workspaceId: 'workspace-synthetic' }));
+  assert.equal(h.calls.secrets, 0);
+});
+
+test('connection authentication failures return a safe result without triggering Lambda retries', async () => {
+  for (const code of ['ADMIN_HTTP_401', 'ADMIN_HTTP_403', 'ADMIN_HTTP_429', 'UNIT_UNAVAILABLE', 'PRIVATE_SECRET']) {
+    const h = harness(); let requests = 0;
+    const handle = createHandler({ ...h.options, apiFactory() {
+      return { async checkConnection() { requests++; throw Object.assign(new Error('private response and synthetic-key'), { code }); } };
+    } });
+    const result = await handle({ ...h.event, action: 'check_connection', workspaceId: 'workspace-synthetic' });
+    assert.equal(result.ok, false); assert.equal(result.capWrites, 0); assert.equal(requests, 1);
+    assert.equal(result.code, code === 'PRIVATE_SECRET' ? 'CONNECTION_CHECK_FAILED' : code);
+    assert.equal(result.receiptRecorded, true); assert.equal(h.pending.length, 0);
+    assert.doesNotMatch(JSON.stringify([result, h.calls.receipts, h.calls.logs]), /private response|synthetic-key|PRIVATE_SECRET/);
+  }
+});
+
+test('connection auth rejection stays handled when receipt or metric storage also fails', async () => {
+  const h = harness();
+  const handle = createHandler({ ...h.options, store: { ...h.store, async putReceipt() { throw new Error('private storage error'); } },
+    async putMetric() { throw new Error('private metric error'); },
+    apiFactory: () => ({ async checkConnection() { throw Object.assign(new Error('private response'), { code: 'ADMIN_HTTP_403' }); } }) });
+  const result = await handle({ ...h.event, action: 'check_connection', workspaceId: 'workspace-synthetic' });
+  assert.equal(result.code, 'ADMIN_HTTP_403'); assert.equal(result.receiptRecorded, false);
+  assert.equal(h.calls.secrets, 1); assert.equal(h.pending.length, 0);
+});
+
+test('connection result returns without auxiliary AWS calls when only the response reserve remains', async () => {
+  for (const authFailure of [false, true]) {
+    const h = harness(); let remaining = 45_000;
+    const handle = createHandler({ ...h.options, apiFactory: () => ({ async checkConnection() {
+      remaining = 5_000;
+      if (authFailure) throw Object.assign(new Error('private auth body'), { code: 'ADMIN_HTTP_401' });
+      return { workspaceId: 'workspace-synthetic', unit: 'credit', usersRead: true };
+    } }) });
+    const result = await handle({ ...h.event, action: 'check_connection', workspaceId: 'workspace-synthetic' },
+      { getRemainingTimeInMillis: () => remaining });
+    assert.equal(result.ok, !authFailure); assert.equal(result.receiptRecorded, false);
+    assert.equal(h.calls.receipts.length, 0); assert.equal(h.calls.metrics.length, 0);
+    assert.equal(h.calls.secrets, 1); assert.equal(h.pending.length, 0);
+  }
+});
+
+test('connection time, event-age, cutoff and expiry gates bound secret and API access', async () => {
+  const h = harness(); const event = { ...h.event, action: 'check_connection', workspaceId: 'workspace-synthetic' };
+  const result = await h.handle(event, { getRemainingTimeInMillis: () => 40_000 });
+  assert.equal(result.code, 'TIME_BUDGET_EXHAUSTED'); assert.equal(h.calls.secrets, 0);
+  for (const options of [{ pilotExpiresAt: h.event.scheduledAt }, { runEventsNotBefore: '2030-04-02T00:00:01Z' }]) {
+    const stopped = harness(options);
+    await assert.rejects(stopped.handle(event)); assert.equal(stopped.calls.secrets, 0);
+  }
+  await assert.rejects(h.handle({ ...event, scheduledAt: '2030-04-01T00:00:00Z' }));
+  let remaining = 45_000;
+  const deadline = createHandler({ ...h.options, async secretProvider() { remaining = 30_000; return 'synthetic-key'; } });
+  assert.equal((await deadline(event, { getRemainingTimeInMillis: () => remaining })).code, 'TIME_BUDGET_EXHAUSTED');
+  assert.equal(h.calls.api.length, 0);
+  const expired = createHandler({ ...h.options, apiFactory: () => ({ async checkConnection() {
+    h.advance(31 * 86400_000); return { workspaceId: event.workspaceId, unit: 'credit', usersRead: true };
+  } }) });
+  assert.equal((await expired(event)).code, 'PILOT_EXPIRED');
+});
+
+test('connection check rejects malformed adapter results without returning their contents', async () => {
+  for (const connection of [{ workspaceId: 'other', unit: 'credit', usersRead: true },
+    { workspaceId: 'workspace-synthetic', unit: 'unknown', usersRead: true },
+    { workspaceId: 'workspace-synthetic', unit: 'usd', usersRead: false }, null]) {
+    const h = harness({ apiFactory: () => ({ checkConnection: async () => connection }) });
+    const result = await h.handle({ ...h.event, action: 'check_connection', workspaceId: 'workspace-synthetic' });
+    assert.equal(result.code, 'CONNECTION_RESPONSE_INVALID'); assert.equal(result.capWrites, 0);
+  }
+});
+
 test('1,001 reviewed members progress through resumable batches with exact unique completion', async () => {
   const h = harness({ count: 1001 });
   const started = await h.handle(h.event);

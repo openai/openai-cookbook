@@ -81,6 +81,90 @@ const historyRow = (date, { id = userId, credits = 4, usd = null, actorId = id }
 };
 const query = { start: '2030-06-10T00:00:00Z', end: '2030-06-12T00:00:00Z', unit: 'credit' };
 
+test('connection check uses three bounded GETs and returns only workspace, unit and Users Read status', async () => {
+  for (const unit of ['credit', 'usd']) {
+    const h = harness({ unit, original: { effective_monthly_usage_limit: null },
+      options: { userIds: [], maxPages: 1, maxRows: 1 },
+      intercept: ({ url, response }) => url.pathname.endsWith('/users')
+        ? response(memberPage([directoryUser()], true)) : undefined });
+    assert.deepEqual(await h.api.checkConnection(), { workspaceId, unit, usersRead: true });
+    assert.deepEqual(h.requests.map(request => new URL(request.url).pathname + new URL(request.url).search), [
+      `/v1/manage/workspaces/${workspaceId}/usage_limits/workspace`,
+      `/v1/manage/workspaces/${workspaceId}/users?limit=1`,
+      `/v1/manage/workspaces/${workspaceId}/usage_limits/users/${userId}/monthly-usage`,
+    ]);
+    assert.ok(h.requests.every(request => request.method === 'GET' && request.redirect === 'error' &&
+      new URL(request.url).origin === 'https://api.chatgpt.com' && request.body === undefined));
+    assert.equal(h.patches, 0);
+    await rejectsCode(h.api.readSnapshot(userId), 'IDENTITY_NOT_ALLOWLISTED');
+    assert.equal(h.requests.length, 3, 'connection check must not expand the enrollment allowlist');
+  }
+});
+
+test('connection check rejects empty or malformed first-member pages without paging or monthly reads', async () => {
+  const rows = [
+    [memberPage(), 'CONNECTION_MEMBER_UNAVAILABLE'],
+    [memberPage([], true), 'MEMBER_PAGE_INVALID'],
+    [memberPage([directoryUser(), directoryUser('user-other')]), 'MEMBER_PAGE_INVALID'],
+    [{ ...memberPage([directoryUser()]), first_id: 'user-other' }, 'MEMBER_PAGE_INVALID'],
+    [{ ...memberPage([directoryUser()]), has_more: null }, 'MEMBER_PAGE_INVALID'],
+    [memberPage([{ ...directoryUser(), email: undefined }]), 'MEMBER_PAGE_INCONSISTENT'],
+    [memberPage([{ ...directoryUser(), id: '../other' }]), 'MEMBER_PAGE_INCONSISTENT'],
+  ];
+  for (const [page, code] of rows) {
+    const h = harness({ intercept: ({ url, response }) => url.pathname.endsWith('/users') ? response(page) : undefined });
+    await rejectsCode(h.api.checkConnection(), code);
+    assert.equal(h.requests.length, 2);
+    assert.equal(h.patches, 0);
+  }
+});
+
+test('connection check requires matching workspace and sampled account identity and a documented unit', async () => {
+  for (const [monthly, code] of [
+    [{ id: 'user-other', account_user_id: `${userId}__${workspaceId}`, current_month_usage_unit: 'credit' }, 'USER_READBACK_MISMATCH'],
+    [{ id: userId, account_user_id: `${userId}__other-workspace`, current_month_usage_unit: 'credit' }, 'USER_READBACK_MISMATCH'],
+    ...[undefined, null, 'eur'].map(unit => [
+      { id: userId, account_user_id: `${userId}__${workspaceId}`, current_month_usage_unit: unit }, 'USAGE_UNIT_UNAVAILABLE']),
+  ]) {
+    const h = harness({ intercept: ({ url, response }) => url.pathname.endsWith('/users')
+      ? response(memberPage([directoryUser()])) : url.pathname.endsWith('/monthly-usage') ? response(monthly) : undefined });
+    await rejectsCode(h.api.checkConnection(), code);
+    assert.equal(h.requests.length, 3);
+  }
+  for (const workspace of [null, { id: 'other-workspace' }]) {
+    const h = harness({ intercept: ({ response }) => response(workspace) });
+    await rejectsCode(h.api.checkConnection(), 'WORKSPACE_READBACK_MISMATCH');
+    assert.equal(h.requests.length, 1);
+  }
+});
+
+test('connection check preserves sanitized HTTP failures and never retries authentication', async () => {
+  for (const status of [401, 403, 429]) {
+    const h = harness({ intercept: ({ url }) => url.pathname.endsWith('/users') ? {
+      ok: false, status, headers: new Headers({ 'retry-after': '10' }),
+      json() { assert.fail('private error body must not be read'); },
+    } : undefined });
+    await assert.rejects(h.api.checkConnection(), error => error.code === `ADMIN_HTTP_${status}` &&
+      error.message === `ADMIN_HTTP_${status}` && error.retryable === (status === 429));
+    assert.equal(h.requests.length, 2);
+    assert.equal(h.patches, 0);
+  }
+});
+
+test('connection check honors the remaining invocation budget before each GET', async () => {
+  let remaining = 20_000;
+  const h = harness({ options: { remainingTimeMs: () => remaining },
+    intercept: ({ url, response }) => {
+      if (url.pathname.endsWith('/users')) {
+        remaining = 5_000;
+        return response(memberPage([directoryUser()]));
+      }
+    } });
+  await rejectsCode(h.api.checkConnection(), 'API_TIME_BUDGET_EXHAUSTED');
+  assert.equal(h.requests.length, 2);
+  assert.equal(h.patches, 0);
+});
+
 test('snapshot preserves original settings/source and rounds counters upward', async () => {
   const original = user({ source: { kind: 'group_default', group_id: 'group-example', group_name: 'Example' } });
   const h = harness({ original, usage: 25.1234567 });

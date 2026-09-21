@@ -6,6 +6,39 @@ import { execute, createExecutionContext } from '../src/controller.mjs';
 import { validateCurrentCohort } from '../src/selection.mjs';
 import { captureEnrollment, approveEnrollment } from '../src/enrollment.mjs';
 import { exampleConfig, createSyntheticApi, MemoryStore } from '../src/synthetic.mjs';
+import { createAdminApi } from '../src/admin-api.mjs';
+
+test('Lambda connection check uses the real adapter for exactly three fixed-base read requests before enrollment', async () => {
+  for (const unit of ['credit', 'usd']) {
+    const requests = [], receipts = [];
+    const workspaceId = 'workspace-synthetic', userId = 'member-synthetic';
+    const handle = createHandler({ deploymentId: 'synthetic-demo', controlSha256: '0'.repeat(64),
+      pilotExpiresAt: '2030-05-01T00:00:00Z', clock: () => new Date('2030-04-02T00:00:00Z'),
+      store: { putReceipt: async value => receipts.push(value) }, putMetric: async () => {}, log() {},
+      secretProvider: async () => 'synthetic-key-not-a-credential',
+      apiFactory: options => createAdminApi({ ...options, fetchImpl: async (url, init) => {
+        requests.push({ url, method: init.method });
+        assert.equal(init.redirect, 'error'); assert.equal(init.method, 'GET'); assert.equal(init.body, undefined);
+        assert.equal(init.headers.Authorization, 'Bearer synthetic-key-not-a-credential');
+        let body;
+        if (url.endsWith('/usage_limits/workspace')) body = { id: workspaceId };
+        else if (url.endsWith('/users?limit=1')) body = { object: 'list', has_more: true,
+          first_id: userId, last_id: userId, data: [{ object: 'workspace.user', id: userId, email: 'private@example.invalid' }] };
+        else if (url.endsWith(`/usage_limits/users/${userId}/monthly-usage`)) body = {
+          id: userId, account_user_id: `${userId}__${workspaceId}`, current_month_usage_unit: unit,
+          current_month_usage: 123.456, effective_monthly_usage_limit: null };
+        else throw new Error('Unexpected endpoint');
+        return { ok: true, status: 200, headers: new Headers(), json: async () => body };
+      } }),
+    });
+    const result = await handle({ version: 1, action: 'check_connection', workspaceId, scheduledAt: '2030-04-02T00:00:00Z' },
+      { getRemainingTimeInMillis: () => 120_000 });
+    assert.equal(result.ok, true); assert.equal(result.unit, unit); assert.equal(result.capWrites, 0);
+    assert.equal(requests.length, 3);
+    assert.ok(requests.every(request => request.url.startsWith(`https://api.chatgpt.com/v1/manage/workspaces/${workspaceId}/`)));
+    assert.doesNotMatch(JSON.stringify([result, receipts]), /member-synthetic|private@example|123\.456|synthetic-key/);
+  }
+});
 
 async function fixture({ count = 3, pilotExpiresAt = '2030-04-30T00:00:00Z' } = {}) {
   let now = '2030-04-02T00:00:00Z';

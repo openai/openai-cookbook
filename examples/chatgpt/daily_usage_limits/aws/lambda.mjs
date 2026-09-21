@@ -1,9 +1,17 @@
 import { createDynamoStore, hash } from './store.mjs';
 import { createControlLoader } from './control.mjs';
 
-const ACTIONS = new Set(['probe', 'preview', 'apply', 'restore', 'resume_auth', 'cancel_initial']);
+const ACTIONS = new Set(['probe', 'check_connection', 'preview', 'apply', 'restore', 'resume_auth', 'cancel_initial']);
 const MAX_EVENT_AGE_MS = 2 * 60 * 60 * 1000;
 const safeCode = value => /^[A-Z][A-Z0-9_]{0,99}$/.test(value ?? '') ? value : 'RUNTIME_OR_DEPENDENCY_FAILURE';
+const CONNECTION_CODES = new Set(['ADMIN_KEY_REQUIRED', 'INVALID_SECRET_FORMAT',
+  'API_TIME_BUDGET_EXHAUSTED', 'API_READ_TRANSPORT_FAILED', 'API_JSON_UNAVAILABLE',
+  'WORKSPACE_READBACK_MISMATCH', 'UNIT_UNAVAILABLE', 'MEMBER_PAGE_INVALID',
+  'MEMBER_PAGE_INCONSISTENT', 'USER_READBACK_MISMATCH', 'CONNECTION_RESPONSE_INVALID',
+  'CONNECTION_MEMBER_UNAVAILABLE', 'USAGE_UNIT_UNAVAILABLE', 'EMAIL_INVALID',
+  'TIME_BUDGET_EXHAUSTED', 'PILOT_EXPIRED']);
+const connectionCode = error => CONNECTION_CODES.has(error?.code ?? error?.message) ||
+  /^ADMIN_HTTP_[45][0-9]{2}$/.test(error?.code ?? '') ? error.code ?? error.message : 'CONNECTION_CHECK_FAILED';
 
 export function runProgress(run, now = new Date()) {
   return { runId: run.runId, total: run.total, queued: run.cursor, completed: run.completed,
@@ -63,6 +71,45 @@ export function createHandler({ store, execute, createExecutionContext, validate
     apiCache.set(apply, api);
     return api;
   }
+  async function checkConnection(event, context) {
+    const checkId = hash(`${deploymentId}:${event.workspaceId}:${event.scheduledAt}:check_connection`);
+    let result;
+    try {
+      // Three bounded reads and secret retrieval must fit without approaching timeout.
+      if (remaining(context) <= 40_000) throw new Error('TIME_BUDGET_EXHAUSTED');
+      const apiKey = await secretProvider();
+      checkExpiry();
+      if (remaining(context) <= 35_000) throw new Error('TIME_BUDGET_EXHAUSTED');
+      const api = apiFactory({ apiKey, workspaceId: event.workspaceId, userIds: [],
+        allowWrites: false, timeoutMs: 10_000, maxPages: 1, maxRows: 1,
+        clock: () => clock().toISOString(), remainingTimeMs: () => remaining(activeContext) });
+      const connection = await api.checkConnection();
+      checkExpiry();
+      if (connection?.workspaceId !== event.workspaceId || !['credit', 'usd'].includes(connection.unit) ||
+          connection.usersRead !== true) throw new Error('CONNECTION_RESPONSE_INVALID');
+      result = { ok: true, action: 'check_connection', workspaceId: event.workspaceId,
+        unit: connection.unit, usersRead: true, capWrites: 0 };
+    } catch (error) {
+      // A handled result prevents Lambda's async retry policy from retrying authentication.
+      result = { ok: false, action: 'check_connection', code: connectionCode(error), capWrites: 0 };
+    }
+    let receiptRecorded = false;
+    // Each SDK operation can make two bounded attempts. Leave time to return the
+    // handled result; a Lambda timeout here could otherwise retry authentication.
+    if (remaining(context) > 25_000) {
+      try {
+        await store.putReceipt({ kind: 'aws_connection_check', checkId, checkedAt: clock().toISOString(), ...result });
+        receiptRecorded = true;
+      } catch { /* Receipt storage failure must not cause another authentication attempt. */ }
+    }
+    if (remaining(context) > 25_000) {
+      try { await putMetric(result.ok && receiptRecorded ? 'ConnectionCheckSucceeded' : 'ControllerIssue', 1); }
+      catch { /* The explicit connection result remains available to the synchronous caller. */ }
+    }
+    try { log(JSON.stringify({ event: 'usage_controller_connection_check', ok: result.ok, receiptRecorded })); }
+    catch { /* Logging cannot turn a handled authentication result into a retry. */ }
+    return { ...result, checkId, receiptRecorded };
+  }
   async function start(event, context) {
     if (event?.version === 1 && event.action === 'cancel_run' && /^[a-f0-9]{64}$/.test(event.runId ?? '') &&
         Object.keys(event).every(key => ['version', 'action', 'runId', 'scheduledAt'].includes(key))) {
@@ -74,9 +121,14 @@ export function createHandler({ store, execute, createExecutionContext, validate
     }
     checkExpiry();
     const scheduled = Date.parse(event?.scheduledAt);
+    const eventKeys = event?.action === 'check_connection' ? ['version', 'action', 'scheduledAt', 'workspaceId'] :
+      ['version', 'action', 'scheduledAt'];
     if (event?.version !== 1 || !ACTIONS.has(event?.action) || !Number.isFinite(scheduled) ||
         scheduled < Date.parse(runEventsNotBefore) || scheduled > clock().getTime() + 60_000 || clock().getTime() - scheduled > MAX_EVENT_AGE_MS ||
-        Object.keys(event).some(key => !['version', 'action', 'scheduledAt'].includes(key))) throw new Error('INVALID_EVENT');
+        Object.keys(event).some(key => !eventKeys.includes(key)) ||
+        (event.action === 'check_connection' && (typeof event.workspaceId !== 'string' ||
+          !/^[A-Za-z0-9_-]{1,160}$/.test(event.workspaceId)))) throw new Error('INVALID_EVENT');
+    if (event.action === 'check_connection') return checkConnection(event, context);
     const runId = hash(`${deploymentId}:${controlSha256}:${event.scheduledAt}:${event.action}`);
     if (event.action === 'probe') {
       await store.putReceipt({ kind: 'aws_probe', runId, checkedAt: clock().toISOString(), ok: true });

@@ -17,6 +17,12 @@ The request and response mappings were checked against the [public OpenAPI speci
 
 Use only the permissions needed by the chosen pattern. Fixed budget release uses the usage-limit and membership routes. Obtain approval before creating a key or enabling writes through the live walkthrough.
 
+## Check the connection before enrollment
+
+The AWS `check_connection` action tests the deployed runtime's secret and read access before budget configuration or member capture. It uses `GET` requests to verify the workspace, fetch a single member with `users?limit=1`, and read that member's monthly usage to identify the native billing unit. It needs `chatgpt.enterprise.usage_limit.read` and `chatgpt.enterprise.user.read`. The adapter returns only `workspaceId`, `unit`, and `usersRead`; it does not set a cap or capture the roster. Follow [the AWS connection check](aws.md#4-check-the-workspace-connection).
+
+`ADMIN_HTTP_401` means the credential was rejected; `ADMIN_HTTP_403` means access was denied. Check the selected workspace, key status and expiry, and required permissions. These status codes alone do not establish the cause. The check excludes response error bodies and secrets from its result and does not retry authentication failures. Group permissions, usage-history access, individual cap handling, and write access are verified by the later operations that need them.
+
 ## Review snapshots and restoration
 
 `readSnapshot(userId)` returns `workspaceId`, `userId`, `unit`, decimal-string `usage`, a normalized `cap`, the raw `settings`, and `observedAt`. Settings include the original override, effective rule and source, and inherited rule and source. Keep these private in the durable journal. The adapter checks workspace and account-user identity and compares settings across reads.

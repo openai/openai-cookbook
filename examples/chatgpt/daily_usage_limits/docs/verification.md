@@ -10,7 +10,7 @@ Run these commands from the extracted starter folder, or from `examples/chatgpt/
 | --- | --- | --- |
 | Complete automated suite | `npm test` | Policy arithmetic, native credit/USD handling, cadence and period guards, ID/email/group selection, cohort review, API parsing, durable state, retries, recovery, and restore behavior against test inputs. |
 | Guided demonstration | `node src/demo.mjs` | Three fictional members with a 2,000-credit monthly target and 500-credit weekly releases: preview, partial success, reconciliation, the next slot, manual-edit conflict, and exact restoration. This simulation keeps its state in memory. |
-| AWS runtime tests | `node --test test/aws*.test.mjs` | Queued work, control-part integrity, progress records, lease fencing, and the shared controller work with injected service responses. |
+| AWS runtime tests | `node --test test/aws*.test.mjs` | Connection checks, queued work, control-part integrity, progress records, lease fencing, and the shared controller work with injected service responses. |
 | Credential runner tests | `node --test test/credential-runner.test.mjs` | Provider argument validation, scoped child execution, recovery-command forwarding, and secret-output handling with simulated credentials. |
 | Local walkthrough on macOS or Linux | Follow [the Codex rehearsal](codex.md#1-run-the-fictional-rehearsal) and [the local rehearsal](local.md#1-rehearse-the-all-members-workflow) in fresh private directories. | Separate CLI processes preserve state through snapshot, review, preview, synthetic apply, duplicate detection, and restore. The credit rehearsals use a 2,000-credit monthly target with 500-credit weekly releases; selected USD headroom uses native USD. |
 | Generated local scripts | After the local rehearsal, run `sh -n .private/local-rehearsal/run-preview.sh` and `sh .private/local-rehearsal/run-preview.sh`. | Shell syntax and manual invocation of the synthetic preview work. Scheduler installation is a separate step in the local walkthrough. |
@@ -24,7 +24,15 @@ The SVG assets have valid XML. The interactive illustration has valid JavaScript
 
 ## Verify the starter download
 
-The starter ZIP contains this example's source, guides, illustrations, tests, and license, plus a file manifest. It excludes credentials, private state, installed dependencies, and cloud build output. Extract it and run the same tests and demonstration from its top-level folder.
+The starter ZIP contains this example's source, guides, illustrations, tests, and license, plus a file manifest. It excludes credentials, private state, installed dependencies, and cloud build output.
+
+Record the source commit from the contribution or its workflow result. Before extraction, run this command in the folder containing the downloaded ZIP to record its SHA-256:
+
+```bash
+node -e 'console.log(require("node:crypto").createHash("sha256").update(require("node:fs").readFileSync(process.argv[1])).digest("hex"))' chatgpt-usage-budget-starter.zip
+```
+
+Extract that ZIP into a fresh directory. From the extracted starter's top-level folder, run `npm test` and `node src/demo.mjs`, then build the AWS package there. Keep the source commit, ZIP digest, Node.js version, and test results together. These identify the exact kit used for deployment.
 
 Use the workflow results for the source revision you plan to deploy. The portable demonstration runs on Windows, macOS, and Linux. Live local storage and scheduling use macOS or Linux; the AWS runtime uses Lambda and DynamoDB.
 
@@ -39,7 +47,19 @@ Run these packaging commands from `examples/chatgpt/daily_usage_limits` in the r
 
 ## Complete live acceptance for the chosen path
 
-Live acceptance remains unverified. Complete and record these checks for the chosen execution path:
+The automated results above use simulated services. Complete and record live checks against the exact kit and workspace you intend to operate.
+
+For AWS, keep these stages separate and perform them in order:
+
+| Stage | Evidence |
+| --- | --- |
+| AWS delivery | A `probe` invocation and stored receipt, followed by a timed probe. The Admin API is not accessed. |
+| Workspace connection | A successful `check_connection` from the deployed Lambda, with the intended workspace and unit, `usersRead: true`, and `capWrites: 0`. Complete this before configuring budgets or capturing enrollment. |
+| Limit behavior | A reviewed enrollment, completed preview, bounded approved apply, independent readback, and exact restoration. |
+
+Follow [the AWS walkthrough](aws.md) for these commands. A successful connection checks read access; a live change and restoration establish the write behavior for the reviewed members.
+
+Complete the remaining checks for the chosen execution path:
 
 - Verify the Admin key's workspace scope and access under the unattended service identity.
 - Match live API responses to the selected workspace's unit, effective-limit source, and confirmed usage period.

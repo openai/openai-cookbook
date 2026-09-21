@@ -216,7 +216,25 @@ export function createAdminApi({ apiKey, workspaceId, userIds = [], allowWrites 
 
   async function verifyWorkspace() {
     const workspace = await request(`${workspacePath}/usage_limits/workspace`);
-    if (workspace.id !== workspaceId) throw fail('WORKSPACE_READBACK_MISMATCH');
+    if (workspace?.id !== workspaceId) throw fail('WORKSPACE_READBACK_MISMATCH');
+  }
+
+  async function checkConnection() {
+    await verifyWorkspace();
+    const page = await request(`${workspacePath}/users?limit=1`);
+    if (!page || page.object !== 'list' || !Array.isArray(page.data) || page.data.length > 1 ||
+        typeof page.has_more !== 'boolean' ||
+        page.first_id !== (page.data[0]?.id ?? null) || page.last_id !== (page.data.at(-1)?.id ?? null) ||
+        (page.has_more && page.data.length === 0)) throw fail('MEMBER_PAGE_INVALID');
+    if (!page.data.length) throw fail('CONNECTION_MEMBER_UNAVAILABLE');
+    const member = directoryMember(page.data[0]);
+    // Workspace settings have no billing-unit field. Inspect only the first active
+    // member's documented unit. Enrollment and cap validation happen separately.
+    const monthly = await request(`${workspacePath}/usage_limits/users/${encodeURIComponent(member.userId)}/monthly-usage`);
+    verifyUser(monthly, member.userId);
+    const unit = monthly.current_month_usage_unit;
+    if (!validUnit(unit)) throw fail('USAGE_UNIT_UNAVAILABLE');
+    return { workspaceId, unit, usersRead: true };
   }
 
   function verifyUser(resource, userId) {
@@ -373,6 +391,7 @@ export function createAdminApi({ apiKey, workspaceId, userIds = [], allowWrites 
   }
 
   return {
+    checkConnection,
     readSnapshot,
     listMemberDirectory,
     async listMembers() {

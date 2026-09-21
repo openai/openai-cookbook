@@ -318,7 +318,9 @@ Resources:
       Name: usage-limit-check
       GroupName: !Ref ScheduleGroup
       State: !Ref ScheduleState
-      EndDate: !Ref PilotExpiresAt
+      # Scheduler's CloudFormation provider requires milliseconds. Keep the original
+      # seconds-only parameter for the runtime deadline and normalize only EndDate.
+      EndDate: {"Fn::Join":["",[{"Fn::Select":[0,{"Fn::Split":["Z",{"Ref":"PilotExpiresAt"}]}]},".000Z"]]}
       Description: Hourly wake-up; the shared policy independently determines the release interval.
       ScheduleExpression: 'rate(1 hour)'
       FlexibleTimeWindow: {Mode: 'OFF'}

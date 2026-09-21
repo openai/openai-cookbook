@@ -4,7 +4,7 @@ Try a weekly release plan with three fictional people, then choose the billing u
 
 ## Download the starter kit
 
-1. [Download the starter ZIP](https://raw.githubusercontent.com/openai/openai-cookbook/codex/daily-usage-limits/examples/chatgpt/daily_usage_limits/assets/chatgpt-usage-budget-starter.zip) and extract it.
+1. [Download the starter ZIP](https://raw.githubusercontent.com/openai/openai-cookbook/main/examples/chatgpt/daily_usage_limits/assets/chatgpt-usage-budget-starter.zip) and extract it.
 2. Open the `chatgpt-usage-budget-starter` folder. It contains `README.md`, `docs`, `src`, and `assets`.
 3. Choose one of the paths below.
 

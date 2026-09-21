@@ -45,19 +45,19 @@ Use the billing unit shown in your workspace's usage settings for your customer 
 | Credits | 2,000 credits | 500 credits | `"unit": "credit"` |
 | US dollars | $200.00 | $50.00 | `"unit": "usd"` |
 
-These are separate illustrative budgets. Choose amounts for your organization in its billing unit. Credit limits use whole credits; dollar limits use cents. All three release approaches support both units. [Configure the unit and amounts](https://github.com/openai/openai-cookbook/blob/codex/daily-usage-limits/examples/chatgpt/daily_usage_limits/docs/operations.md#choose-the-billing-unit).
+These are separate illustrative budgets. Choose amounts for your organization in its billing unit. Credit limits use whole credits; dollar limits use cents. All three release approaches support both units. [Configure the unit and amounts](https://github.com/openai/openai-cookbook/blob/main/examples/chatgpt/daily_usage_limits/docs/operations.md#choose-the-billing-unit).
 
 ## Get started
 
-[Download the starter kit](https://raw.githubusercontent.com/openai/openai-cookbook/codex/daily-usage-limits/examples/chatgpt/daily_usage_limits/assets/chatgpt-usage-budget-starter.zip) and extract the folder. Choose the path that fits the tools available to you.
+[Download the starter kit](https://raw.githubusercontent.com/openai/openai-cookbook/main/examples/chatgpt/daily_usage_limits/assets/chatgpt-usage-budget-starter.zip) and extract the folder. Choose the path that fits the tools available to you.
 
 The browser example and fictional demonstration work on **Windows, macOS, and Linux**. The starter kit includes the source, guides, tests, and illustrations from this GitHub example.
 
 | Your setup | Start here |
 | --- | --- |
-| You have Node.js 24 or later and use a terminal or PowerShell. | [Run the example](https://github.com/openai/openai-cookbook/blob/codex/daily-usage-limits/examples/chatgpt/daily_usage_limits/docs/get-started.md#run-with-nodejs) with one command. |
-| You use Codex and want help with setup. | [Open the folder in Codex](https://github.com/openai/openai-cookbook/blob/codex/daily-usage-limits/examples/chatgpt/daily_usage_limits/docs/get-started.md#let-codex-help) and ask it to run the example. |
-| Your team provides a managed computer, virtual machine, or cloud environment. | [Run in that environment](https://github.com/openai/openai-cookbook/blob/codex/daily-usage-limits/examples/chatgpt/daily_usage_limits/docs/get-started.md#use-a-managed-environment). This path also works when you cannot run the required software on your computer. |
+| You have Node.js 24 or later and use a terminal or PowerShell. | [Run the example](https://github.com/openai/openai-cookbook/blob/main/examples/chatgpt/daily_usage_limits/docs/get-started.md#run-with-nodejs) with one command. |
+| You use Codex and want help with setup. | [Open the folder in Codex](https://github.com/openai/openai-cookbook/blob/main/examples/chatgpt/daily_usage_limits/docs/get-started.md#let-codex-help) and ask it to run the example. |
+| Your team provides a managed computer, virtual machine, or cloud environment. | [Run in that environment](https://github.com/openai/openai-cookbook/blob/main/examples/chatgpt/daily_usage_limits/docs/get-started.md#use-a-managed-environment). This path also works when you cannot run the required software on your computer. |
 
 The example walks through a weekly release plan for three fictional people. Review each person's current limit, the next release, and the monthly maximum. Then choose the people, amounts, and schedule for your pilot.
 
@@ -70,7 +70,7 @@ The example walks through a weekly release plan for three fictional people. Revi
 
 Set different budgets and schedules for different populations. For example, give a project team weekly releases and use consumption-based increases for a small group of power users. Keep each person in one active configuration.
 
-See [policy configuration and examples](https://github.com/openai/openai-cookbook/blob/codex/daily-usage-limits/examples/chatgpt/daily_usage_limits/docs/operations.md#choose-a-policy) for the settings. Share the monthly allocation, usage so far, and next release date through your existing communication channels. Use those updates to help people choose models that fit their work and available budget.
+See [policy configuration and examples](https://github.com/openai/openai-cookbook/blob/main/examples/chatgpt/daily_usage_limits/docs/operations.md#choose-a-policy) for the settings. Share the monthly allocation, usage so far, and next release date through your existing communication channels. Use those updates to help people choose models that fit their work and available budget.
 
 ## Test with a small group
 
@@ -82,9 +82,9 @@ For ongoing workspace budget management, run the program on **organization-manag
 
 | Next step | Guide |
 | --- | --- |
-| Test a scheduled Codex pilot | [Set up a Codex pilot](https://github.com/openai/openai-cookbook/blob/codex/daily-usage-limits/examples/chatgpt/daily_usage_limits/docs/codex.md) |
-| Run on a managed macOS or Linux computer or server | [Set up a managed host](https://github.com/openai/openai-cookbook/blob/codex/daily-usage-limits/examples/chatgpt/daily_usage_limits/docs/local.md) |
-| Deploy using your AWS account | [Deploy on AWS](https://github.com/openai/openai-cookbook/blob/codex/daily-usage-limits/examples/chatgpt/daily_usage_limits/docs/aws.md) |
+| Test a scheduled Codex pilot | [Set up a Codex pilot](https://github.com/openai/openai-cookbook/blob/main/examples/chatgpt/daily_usage_limits/docs/codex.md) |
+| Run on a managed macOS or Linux computer or server | [Set up a managed host](https://github.com/openai/openai-cookbook/blob/main/examples/chatgpt/daily_usage_limits/docs/local.md) |
+| Deploy using your AWS account | [Deploy on AWS](https://github.com/openai/openai-cookbook/blob/main/examples/chatgpt/daily_usage_limits/docs/aws.md) |
 
 The AWS guide includes a deployment template, queued processing for larger enrollments, and progress tracking. Start with a small group, then increase the enrollment as you verify completion and API throughput. Your technical team can adapt the program to other infrastructure your organization operates.
 
@@ -92,10 +92,10 @@ For Windows admins, the AWS guide provides a browser-based setup path through AW
 
 ## Prepare a reviewed enrollment
 
-Choose a workspace, then select people by user ID, email address, workspace group ID, or all current members. Review the resolved list, current settings, monthly period, and proposed changes. The [configuration and enrollment guide](https://github.com/openai/openai-cookbook/blob/codex/daily-usage-limits/examples/chatgpt/daily_usage_limits/docs/operations.md#prepare-a-reviewed-enrollment) takes you through each step. A preview shows the proposed limits before you apply them.
+Choose a workspace, then select people by user ID, email address, workspace group ID, or all current members. Review the resolved list, current settings, monthly period, and proposed changes. The [configuration and enrollment guide](https://github.com/openai/openai-cookbook/blob/main/examples/chatgpt/daily_usage_limits/docs/operations.md#prepare-a-reviewed-enrollment) takes you through each step. A preview shows the proposed limits before you apply them.
 
 ## Stop, restore, and renew
 
-The program saves the original settings and records its changes. Follow the [stop and restore procedure](https://github.com/openai/openai-cookbook/blob/codex/daily-usage-limits/examples/chatgpt/daily_usage_limits/docs/operations.md#stop-restore-and-renew) when ending a pilot or changing its policy. For the next monthly period on AWS, [confirm its dates and review the opening limits](https://github.com/openai/openai-cookbook/blob/codex/daily-usage-limits/examples/chatgpt/daily_usage_limits/docs/aws.md#7-renew-the-next-period). The renewal helper carries forward your policy and people on the same deployment, with its existing records and credentials.
+The program saves the original settings and records its changes. Follow the [stop and restore procedure](https://github.com/openai/openai-cookbook/blob/main/examples/chatgpt/daily_usage_limits/docs/operations.md#stop-restore-and-renew) when ending a pilot or changing its policy. For the next monthly period on AWS, [confirm its dates and review the opening limits](https://github.com/openai/openai-cookbook/blob/main/examples/chatgpt/daily_usage_limits/docs/aws.md#7-renew-the-next-period). The renewal helper carries forward your policy and people on the same deployment, with its existing records and credentials.
 
-For implementation details, see the [verification guide](https://github.com/openai/openai-cookbook/blob/codex/daily-usage-limits/examples/chatgpt/daily_usage_limits/docs/verification.md) and [API contract](https://github.com/openai/openai-cookbook/blob/codex/daily-usage-limits/examples/chatgpt/daily_usage_limits/docs/api-contract.md).
+For implementation details, see the [verification guide](https://github.com/openai/openai-cookbook/blob/main/examples/chatgpt/daily_usage_limits/docs/verification.md) and [API contract](https://github.com/openai/openai-cookbook/blob/main/examples/chatgpt/daily_usage_limits/docs/api-contract.md).

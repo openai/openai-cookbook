@@ -85,6 +85,6 @@ Choose a workspace, then select people by user ID, email address, workspace grou
 
 ## Stop, restore, and renew
 
-The program saves the original settings and records its changes. Follow the [stop and restore procedure](https://github.com/openai/openai-cookbook/blob/codex/daily-usage-limits/examples/chatgpt/daily_usage_limits/docs/operations.md#stop-restore-and-renew) when ending a pilot or changing its policy. Review a fresh enrollment for the next monthly period.
+The program saves the original settings and records its changes. Follow the [stop and restore procedure](https://github.com/openai/openai-cookbook/blob/codex/daily-usage-limits/examples/chatgpt/daily_usage_limits/docs/operations.md#stop-restore-and-renew) when ending a pilot or changing its policy. For the next monthly period on AWS, [confirm its dates and review the opening limits](https://github.com/openai/openai-cookbook/blob/codex/daily-usage-limits/examples/chatgpt/daily_usage_limits/docs/aws.md#7-renew-the-next-period). The renewal helper carries forward your policy and people on the same deployment, with its existing records and credentials.
 
 For implementation details, see the [verification guide](https://github.com/openai/openai-cookbook/blob/codex/daily-usage-limits/examples/chatgpt/daily_usage_limits/docs/verification.md) and [API contract](https://github.com/openai/openai-cookbook/blob/codex/daily-usage-limits/examples/chatgpt/daily_usage_limits/docs/api-contract.md).

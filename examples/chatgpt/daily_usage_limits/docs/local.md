@@ -301,3 +301,5 @@ node src/cli.mjs inspect --state .private/local-rehearsal/state
 Expect `restored` for each fictional member. The rehearsal leaves scheduler templates uninstalled.
 
 For an installed live service, first disable and unload that exact job or timer, confirm no run is active, and set `liveWrites: false`. Follow the [reviewed restore procedure](operations.md#stop-restore-and-renew) while the period is current, verify the original cap and source by API readback, and turn the write gate off again. Verify that the job is absent or disabled in the host scheduler. Retain private receipts and remove only owned pilot files after the retention decision.
+
+For a plan running on AWS, use [guided renewal on the same deployment](aws.md#7-renew-the-next-period). The AWS helper preserves the cloud state and carries the policy forward for the next period review.

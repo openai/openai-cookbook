@@ -36,6 +36,14 @@ export async function uploadControl({ directory, tableName, controlSha256, previ
       ConditionExpression: 'attribute_not_exists(PK) OR #document = :same',
       ExpressionAttributeNames: { '#document': 'document' }, ExpressionAttributeValues: { ':same': Item.document } });
   }
+  // Preserve both manifest versions before changing the active pointer. Content
+  // hashes make repeated uploads idempotent without rewriting prior documents.
+  for (const version of new Set([previous, document].filter(value => value !== undefined))) {
+    await send('PutItem', { TableName: tableName,
+      Item: { PK: manifest.PK, SK: { S: `MANIFEST#${hash(version)}` }, document: { S: version } },
+      ConditionExpression: 'attribute_not_exists(PK) OR #document = :same',
+      ExpressionAttributeNames: { '#document': 'document' }, ExpressionAttributeValues: { ':same': { S: version } } });
+  }
   await send('PutItem', { TableName: tableName, Item: manifest,
     ConditionExpression: previous === undefined ? 'attribute_not_exists(PK)' : '#document = :previous',
     ...(previous === undefined ? {} : { ExpressionAttributeNames: { '#document': 'document' },

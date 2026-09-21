@@ -66,3 +66,5 @@ Choose the [managed host guide](local.md) for macOS or Linux, or the [AWS deploy
 Choose a workspace and a small group by user ID, email address, or workspace group ID, then confirm its monthly usage period. You can also enroll all current workspace members after proving the setup with a smaller group. Review each person's starting limit, the first release, and the monthly maximum using the [configuration and enrollment guide](operations.md#prepare-a-reviewed-enrollment).
 
 Use the [Codex pilot guide](codex.md) to try scheduled runs. For ongoing workspace credit management, use a managed host or cloud service with monitoring and an operating owner.
+
+For later periods on AWS, use [guided renewal](aws.md#7-renew-the-next-period). Confirm the new dates and opening limits; the existing cloud setup, policy, and people carry forward.

@@ -236,15 +236,63 @@ Use the DynamoDB console's item explorer to query `PK = RECEIPT#<DeploymentId>` 
 
    Set the new `ControlSha256`, `ApplyEnabled=true`, `AllowedWriteAction=apply`, and `WorkProcessingEnabled=true` in the stack parameters, keeping `ScheduleState=DISABLED`. Set `RunEventsNotBefore` to the current UTC time so earlier start events remain excluded. Apply the stack update using the command under “Prepare the budget and preview the limits,” and verify its settings. A replacement conflict requires reading and reviewing the current controls before another attempt.
 4. Generate an `apply` event with `node aws/event.mjs apply .private/aws-apply.json`, invoke it as in the preview, and track its new `runId` to completion. Verify each absolute cap and temporary expiry by independent API readback. Repeat the current-slot run and confirm that no additional budget is released. Resolve attention results before expanding.
-5. With recurring delivery still disabled, complete the stop and restore procedure below. This closes the enrollment. Prepare a fresh enrollment in a new deployment and state table for continued operation, retaining the earlier records. Prove a bounded manual apply with its controls. Only then set `ScheduledAction=apply` and `ScheduleState=ENABLED` through a reviewed stack update. Keep `AllowedWriteAction=apply` and a current `RunEventsNotBefore` cutoff for this rollout. Verify a real hourly trigger and completed member outcomes.
+5. With recurring delivery still disabled, complete a supervised restoration trial using the stop and restore procedure below. Restoration closes that pilot. For ongoing operation within the same period, use a separate reviewed enrollment and fresh state, retaining the trial records. Prove its bounded manual apply, then set `ScheduledAction=apply` and `ScheduleState=ENABLED` through a reviewed stack update. Keep `AllowedWriteAction=apply` and a current `RunEventsNotBefore` cutoff. Verify a real hourly trigger and completed member outcomes. Later monthly renewals use the same ongoing deployment, as described next.
 
 The policy's `intervalHours` determines release frequency. Keep the same state table throughout an enrollment; it contains reconciliation records and original settings.
 
-### Prepare the next period
+## 7. Renew the next period
 
-The confirmed period and pilot expiry stop new processing. Plan restoration while both remain current. For the next period, confirm the new boundaries, review a fresh enrollment, and create a new deployment with its own state table. Repeat the connection, preview, and bounded apply checks for that deployment. Retain the prior table according to your records policy.
+Keep the existing AWS stack, state table, code package, credentials, and operating policy. After the previous period ends, the renewal helper reads the saved records and current API settings, then prepares the same people's opening limits for review. You confirm the new dates because the Admin API does not report the next period boundaries.
 
-## 7. Verify failures and alerts
+1. Stop the schedule and queue processing, set `ApplyEnabled=false` and `AllowedWriteAction=none`, and advance `RunEventsNotBefore` using the first step under [Stop, restore, and verify cleanup](#9-stop-restore-and-verify-cleanup). Cancel unfinished runs. Preserve the stack and table. Every enrolled member needs a settled previous state; pending writes, authorization halts, changed membership, or conflicting settings must be resolved before renewal.
+2. Copy the `period` object from the previous configuration into `.private/aws-next-period.json`. Confirm the new current period in Admin Console, then replace `start`, `end`, `verifiedAt`, and `evidence`. The file contains only this object; the following dates are illustrative:
+
+   ```json
+   {
+     "kind": "calendar_month",
+     "start": "2030-05-01T00:00:00Z",
+     "end": "2030-06-01T00:00:00Z",
+     "verifiedAt": "2030-05-01T00:05:00Z",
+     "evidence": "Current period and counter scope confirmed in Admin Console",
+     "counterScopeConfirmed": true
+   }
+   ```
+
+   Keep `kind` consistent with the verified calendar-month or billing-cycle setting. The previous period must have ended, and the new period must already be current. Renewal retains the budget amounts, release interval, and frozen member list. Its release schedule starts at the new period boundary; a later renewal previews the cumulative release for the intervals already elapsed.
+3. With your AWS deployment identity and approved credential provider supplying `CHATGPT_ADMIN_API_KEY`, prepare the next review. Point `--config` and `--enrollment` to the prior period's installed controls and choose a new private output directory:
+
+   ```bash
+   node aws/renew-period.mjs prepare --stack "$DAILY_LIMIT_STACK" --config .private/aws-live/config.json --enrollment .private/aws-live/enrollment.json --period .private/aws-next-period.json --out .private/aws-renewal
+   ```
+
+   This command verifies the stopped stack and waits for old workers to finish before capturing current settings. It makes read-only AWS and Admin API requests, saves `config.json`, `enrollment.json`, and `activation.json` locally, and prints the review hash. Review the period, each person's current settings and opening limit, and any reductions. Replace `REVIEWED_SHA256` with that exact hash:
+
+   ```bash
+   node src/cli.mjs approve --enrollment .private/aws-renewal/enrollment.json --hash REVIEWED_SHA256
+   ```
+
+4. Activate the reviewed controls on the existing stack:
+
+   ```bash
+   node aws/renew-period.mjs activate --stack "$DAILY_LIMIT_STACK" --dir .private/aws-renewal
+   ```
+
+   Activation verifies that the deployed schedule, workers, and write gates remain off. It reuses the completed worker wait when the stopped configuration is unchanged, uploads the reviewed controls conditionally, and updates the same stack's control hash, expiry, and cutoff. The code package, resources, and saved history remain in place. Expect `activated: true`, `schedule: DISABLED`, `workers: Disabled`, `writes: false`, and `capWrites: 0`.
+
+   Keep `activation.json`. If a network interruption leaves the AWS update uncertain, rerun **the same activation command with the same directory**. The saved journal lets it inspect and resume that update.
+5. Use `.private/aws-renewal/config.json` and `.private/aws-renewal/enrollment.json` for the next preview and first apply, with the existing state table. Refresh your saved parameters before another stack update:
+
+   ```bash
+   aws cloudformation describe-stacks --stack-name "$DAILY_LIMIT_STACK" --query 'Stacks[0].Parameters' --output json > .private/aws-parameters.json
+   ```
+
+   Set `WorkProcessingEnabled=true`, keeping the schedule and writes off, then update the stack and start a preview using [the preview commands](#5-prepare-the-budget-and-preview-the-limits). For the renewed files, follow steps 1 through 4 under [Review the first change and recurring schedule](#6-review-the-first-change-and-recurring-schedule) to authorize and verify the first apply. After successful readback, enable `ScheduledAction=apply` and `ScheduleState=ENABLED` and verify a timed run. The existing review window covers capture, review, activation, and the first queued change.
+
+If that window expires before any member starts the new period, prepare another review in a new directory using the original previous-period files and the same confirmed next-period object. The helper verifies that every prior state is still settled and unchanged. Once any member has transitioned, keep the reviewed files and reconcile the partial run; recapture must not bypass a pending operation.
+
+Renewal begins a new period for the same policy and people. Use a separate policy review for a new billing unit, changed budget, or different membership. A restored pilot cannot be reopened within its original period through this command.
+
+## 8. Verify failures and alerts
 
 SQS delivery can repeat a message. The template follows [AWS's SQS configuration guidance](https://docs.aws.amazon.com/lambda/latest/dg/services-sqs-configure.html): queue visibility is six times the worker timeout, the retry limit is at least five deliveries, and partial batch responses return only failed records. The controller reconciles saved absolute targets before another write. See [Lambda's SQS processing behavior](https://docs.aws.amazon.com/lambda/latest/dg/with-sqs.html) and [partial batch responses](https://docs.aws.amazon.com/lambda/latest/dg/services-sqs-errorhandling.html).
 
@@ -267,7 +315,7 @@ For a repaired authentication failure, keep the recurring schedule off and start
 
 State, original settings, controls, and unresolved intents persist. Receipt and run records have a retention period; DynamoDB removes expired items asynchronously. Apply your retention policy to the table, backups, logs, artifact versions, and queues. See [DynamoDB TTL behavior](https://docs.aws.amazon.com/amazondynamodb/latest/developerguide/TTL.html).
 
-## 8. Stop, restore, and verify cleanup
+## 9. Stop, restore, and verify cleanup
 
 1. Set `ScheduleState=DISABLED`, `WorkProcessingEnabled=false`, `ApplyEnabled=false`, and `AllowedWriteAction=none`. Advance `RunEventsNotBefore` to the current UTC time; `date -u +%Y-%m-%dT%H:%M:%SZ` prints a suitable value. Apply the stack update and read back the schedule, event-source mapping, cutoff, and gates. Wait at least the configured worker timeout after the update completes for old in-flight workers to finish, and inspect their receipts. The cutoff rejects earlier asynchronous start events and stops older queued runs.
 2. Explicitly cancel each unfinished run you are closing before resuming processing for another action. Set `DAILY_LIMIT_RUN` to the run being stopped:

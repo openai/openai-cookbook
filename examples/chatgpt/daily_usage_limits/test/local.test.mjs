@@ -25,6 +25,19 @@ test('active and crash-left local locks cannot be stolen',localOnly,async t=>{
   await mkdir(store.paths(key).lock,{mode:0o700});
   await assert.rejects(store.withLock(key,async()=>{}),{code:'LOCAL_LOCK_HELD_RECONCILE_BEFORE_REMOVAL'});
 });
+test('period transition retains history across restart and rejects a stale prior state',localOnly,async t=>{
+  const directory=await temporary(t),store=new FileStore(directory),key='synthetic:person';
+  const previous={enrollmentHash:'old',original:{settings:{override:null}},lastSlot:29};
+  const next={enrollmentHash:'new',original:previous.original,pending:{amount:'500'}};
+  await store.withLock(key,async()=>{
+    await store.putState(key,previous);
+    await store.transitionState(key,{previous,next});
+    await assert.rejects(store.transitionState(key,{previous,next}),{code:'RENEWAL_PRIOR_STATE_CHANGED'});
+  });
+  const reopened=new FileStore(directory);
+  assert.deepEqual(await reopened.getState(key),next);
+  assert.deepEqual((await reopened.entries(key)).filter(entry=>entry.kind==='state').map(entry=>entry.value),[previous,next]);
+});
 test('partial journal blocks mutation instead of discarding crash evidence',localOnly,async t=>{
   const dir=await temporary(t),store=new FileStore(dir),key='synthetic:person';
   await writeFile(store.paths(key).journal,'{"partial":',{mode:0o600});

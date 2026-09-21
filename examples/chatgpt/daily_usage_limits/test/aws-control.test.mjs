@@ -91,6 +91,10 @@ test('control replacement requires the previous reviewed hash and uses compare-a
   assert.equal(h.calls.length, 1);
   await uploadControl({ ...h, previousSha256: hash(old) });
   assert.equal(h.calls.at(-1).input.ExpressionAttributeValues[':previous'].S, old);
+  assert.equal(h.items.get(`MANIFEST#${hash(old)}`).document.S, old);
+  assert.equal(h.items.get(`MANIFEST#${h.controlSha256}`).document.S, h.prepared.document);
+  await uploadControl({ ...h, previousSha256: hash(old) });
+  assert.equal(h.items.get(`MANIFEST#${hash(old)}`).document.S, old);
 });
 
 test('unreferenced prepared items are rejected before upload', async t => {

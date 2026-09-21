@@ -22,8 +22,14 @@ function harness() {
       const current = items.get(key(check.Key));
       if (current?.leaseOwner !== check.ExpressionAttributeValues[':owner'] ||
           current.leaseExpiresAt <= check.ExpressionAttributeValues[':now']) throw conditionalFailure();
-      const put = input.TransactItems[1].Put;
-      items.set(key(put.Item), structuredClone(put.Item));
+      const puts = input.TransactItems.slice(1).map(item => item.Put);
+      for (const put of puts) {
+        const previous = items.get(key(put.Item));
+        if (put.ConditionExpression === 'attribute_not_exists(PK)' && previous) throw conditionalFailure();
+        if (put.ConditionExpression === '#payload = :previous' &&
+          JSON.stringify(previous?.payload) !== JSON.stringify(put.ExpressionAttributeValues[':previous'])) throw conditionalFailure();
+      }
+      for (const put of puts) items.set(key(put.Item), structuredClone(put.Item));
     } else if (operation === 'Delete') {
       const current = items.get(key(input.Key));
       if (current?.leaseOwner !== input.ExpressionAttributeValues[':owner']) throw conditionalFailure();
@@ -95,6 +101,44 @@ test('receipts append immutable entries and controls are consistently read', asy
 test('a lease shorter than the Lambda timeout safety margin is rejected', () => {
   assert.throws(() => createDynamoStore({ send() {}, tableName: 'table', deploymentId: 'demo-one', leaseSeconds: 120 }),
     /INVALID_STORE_CONFIGURATION/);
+});
+
+test('period transition atomically archives exact prior state and preserves original under the same user lease', async () => {
+  const h = harness(); const store = h.create(); const key = 'workspace:user';
+  const original = { settings: { override: null, effective: { limit: '100' } } };
+  const previous = { enrollmentHash: 'a'.repeat(64), original, lastSlot: 30, lastUsage: '77', pending: null };
+  const next = { enrollmentHash: 'b'.repeat(64), original, pending: { kind: 'cap', amount: '10' } };
+  await assert.rejects(store.transitionState(key, { previous, next }), /LEASE_REQUIRED/);
+  await store.withLock(key, async () => {
+    await store.putState(key, previous);
+    await store.transitionState(key, { previous, next });
+    assert.deepEqual(await store.getState(key), next);
+    const archive = h.items.get(`STATE#${hash(key)}|ARCHIVE#${previous.enrollmentHash}`);
+    assert.deepEqual(archive.payload, previous); assert.equal(archive.expiresAt, undefined);
+    await assert.rejects(store.transitionState(key, { previous, next }));
+    assert.deepEqual(await store.getState(key), next); assert.deepEqual(archive.payload, previous);
+  });
+  const transaction = h.calls.find(call => call.operation === 'TransactWrite' && call.input.TransactItems.length === 3).input.TransactItems;
+  assert.equal(transaction[1].Put.ConditionExpression, '#payload = :previous');
+  assert.equal(transaction[2].Put.ConditionExpression, 'attribute_not_exists(PK)');
+});
+
+test('changed state, expired lease and existing archive cannot partially transition a period', async () => {
+  for (const conflict of ['state', 'lease', 'archive']) {
+    const h = harness(); const store = h.create(); const key = 'workspace:user';
+    const previous = { enrollmentHash: 'a'.repeat(64), pending: null };
+    const next = { enrollmentHash: 'b'.repeat(64), pending: { amount: '10' } };
+    await store.withLock(key, async () => {
+      await store.putState(key, previous);
+      if (conflict === 'state') await store.putState(key, { ...previous, pending: { amount: '20' } });
+      if (conflict === 'lease') h.advance(180);
+      const archiveKey = `STATE#${hash(key)}|ARCHIVE#${previous.enrollmentHash}`;
+      if (conflict === 'archive') h.items.set(archiveKey, { payload: { retained: true } });
+      const before = structuredClone([...h.items.entries()]);
+      await assert.rejects(store.transitionState(key, { previous, next }));
+      assert.deepEqual([...h.items.entries()], before);
+    });
+  }
 });
 
 test('member completion is a single conditional transaction and retains dedupe through the parent run TTL', async () => {

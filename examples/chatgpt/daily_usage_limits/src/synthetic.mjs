@@ -1,4 +1,4 @@
-import { DAY, HOUR, amount, format, time, requireThat } from './policy.mjs';
+import { DAY, HOUR, digest, amount, format, time, requireThat } from './policy.mjs';
 
 export function creditReleaseForInterval(intervalHours) {
   requireThat(Number.isInteger(intervalHours) && intervalHours >= 1 && intervalHours <= 744, 'INTERVAL_INVALID');
@@ -72,10 +72,10 @@ export function createSyntheticApi({ config, clock = () => new Date().toISOStrin
     },
     async restore(id, {settings}) {
       const savedSettings = structuredClone(settings);
-      const rule = savedSettings.effective.limit;
-      users[id] = { ...users[id], settings:savedSettings, cap: { type:rule.type, unit:config.unit,
+      const rule = savedSettings.effective?.limit;
+      users[id] = { ...users[id], settings:savedSettings, cap: rule ? { type:rule.type, unit:config.unit,
         ...(rule.type === 'limited' ? {amount:String(rule.limit_amount?.amount ?? rule.limit)} : {}),
-        source:savedSettings.effective.source.kind, ...(rule.limit_expires_at ? {expiresAt:rule.limit_expires_at} : {}) } };
+        source:savedSettings.effective.source.kind, ...(rule.limit_expires_at ? {expiresAt:rule.limit_expires_at} : {}) } : {type:'unset',unit:config.unit} };
       api.writes.push({userId:id,restore:true});
       await persist(users);
     },
@@ -84,10 +84,16 @@ export function createSyntheticApi({ config, clock = () => new Date().toISOStrin
 }
 
 export class MemoryStore {
-  states = new Map(); receipts = []; locks = new Set();
+  states = new Map(); archives = new Map(); receipts = []; locks = new Set();
   async withLock(key, fn) { requireThat(!this.locks.has(key), 'LEASE_BUSY'); this.locks.add(key); try {return await fn();} finally {this.locks.delete(key);} }
   async assertLock(key) {requireThat(this.locks.has(key), 'LOCK_REQUIRED');}
   async getState(key) {return structuredClone(this.states.get(key) ?? null);}
   async putState(key, value) {await this.assertLock(key); this.states.set(key,structuredClone(value));}
+  async transitionState(key, { previous, next }) {
+    await this.assertLock(key);
+    requireThat(digest(await this.getState(key)) === digest(previous), 'RENEWAL_PRIOR_STATE_CHANGED');
+    this.archives.set(`${key}:${previous.enrollmentHash}`, structuredClone(previous));
+    await this.putState(key, next);
+  }
   async putReceipt(value) {this.receipts.push(structuredClone(value));}
 }

@@ -29,7 +29,7 @@ The AWS `check_connection` action tests the deployed runtime's secret and read a
 
 Restoration preserves three distinct cases:
 
-- **Inheritance:** clear the override with `null` to preserve inheritance.
+- **Inheritance or no configured cap:** clear the override with `null` and verify the original inherited settings or explicit absence of a cap.
 - **Permanent override:** restore its original finite or unlimited rule, preserving the original tagged or legacy credit representation.
 - **Temporary override:** restore it only while its saved expiry equals the approved current period end. The API computes the expiry when it receives `temporary: true`. Caller-supplied expiry timestamps are unsupported.
 
@@ -47,7 +47,9 @@ The reviewed enrollment saves the resolved IDs and their email/group matches. La
 
 `apiLimits.maxPages` and `apiLimits.maxRows` set optional bounds for paginated reads. Reaching either bound stops processing; the adapter never treats a partial page set as the complete cohort.
 
-Every captured member must have an explicit effective rule and source in the usage-limit response. The public schema permits a null effective cap with no defined unlimited interpretation or source. That response stops the entire capture with `CAP_SOURCE_UNAVAILABLE`. Review and use an explicitly selected supported cohort, or establish the member's intended effective setting through your normal admin process before capturing everyone again.
+An explicitly absent cap is recorded as `type: "unset"`, with no amount or invented source. This requires a null or empty personal override, explicit null effective and inherited settings, a matching null monthly effective cap, and consistent repeated reads. Missing or contradictory fields stop capture. Imposing a finite cap on an unset setting requires the reviewed initial-reduction opt-in; restoration preserves the saved absence of a cap.
+
+An inherited workspace or group rule can appear as the effective setting before a personal override is installed and as the inherited setting afterward. The adapter compares its amount and full source identity across that change. A changed group ID, amount, or source still stops the write or restoration.
 
 History uses UTC-midnight bounds, fetches every page, and selects the enrolled user locally. The public endpoint has no user filter. One adapter instance shares a range read across members for up to 60 seconds, measured from the first page; pagination that exceeds that freshness stops the calculation. Separate AWS workers have separate caches. It reads native `credits` or `cost_usd` and excludes `estimated_cost_usd` from calculations. A second billing unit, missing or duplicate day, unavailable amount, or wrong actor stops the usage-based pattern. Reported zero is accepted. A missing row stops the pattern, including when the API omits an inactive day. Choose fixed budget release when complete daily observations are unavailable.
 
@@ -58,3 +60,9 @@ Returned history is labeled `semantics: "observed"`. Later corrections can chang
 These API responses omit configured usage-period bounds. Independently verify the current period and the counter's scope in Admin Console, including any billing-cycle alignment. See [usage-limit behavior](https://help.openai.com/en/articles/20001001-manage-usage-limits-and-overages-in-chatgpt-enterprise-and-edu). A low or decreasing counter is insufficient evidence of a reset.
 
 The adapter tests verify request shapes and error handling against synthetic responses. Workspace eligibility, cap enforcement, accepted writes, and cloud delivery require live checks. Use the live walkthrough to verify the intended identity, unit, counter scope, exact before-state, temporary expiry, and restoration in the approved test workspace.
+
+## Renew a confirmed period
+
+The [AWS renewal helper](aws.md#7-renew-the-next-period) reuses the approved policy and frozen member list after the previous period ends. It reads current membership, native billing units, cap settings, and durable prior state. Every prior member must have a settled state with no pending intent or authorization halt. Changed settings or inherited sources require review.
+
+An expired temporary override may return to its proven inherited setting. Renewal verifies that transition and preserves the historic settings. If the original restoration target itself expired, the verified current fallback becomes the restoration baseline for the new period. The original record remains archived. Confirm new period dates and counter scope explicitly; neither a lower usage counter nor an old override expiry establishes the next period boundaries.

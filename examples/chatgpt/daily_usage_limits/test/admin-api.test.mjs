@@ -1,6 +1,6 @@
 import test from 'node:test';
 import assert from 'node:assert/strict';
-import { createAdminApi, matchesTarget, settingsEquivalent } from '../src/admin-api.mjs';
+import { createAdminApi, inheritedSettingsEquivalent, matchesTarget, settingsEquivalent } from '../src/admin-api.mjs';
 
 const workspaceId = 'workspace-example';
 const userId = 'user-example';
@@ -227,12 +227,130 @@ test('unsupported multiple original rules and missing original state fail closed
   await rejectsCode(harness({ original }).api.readSnapshot(userId), 'BEFORE_STATE_UNAVAILABLE');
 });
 
-test('an unset effective rule is unsupported and is never inferred to be unlimited', async () => {
+test('a null effective rule cannot hide an inherited rule', async () => {
   const original = user();
   original.effective_monthly_usage_limit = null;
   const h = harness({ original });
-  await rejectsCode(h.api.readSnapshot(userId), 'CAP_SOURCE_UNAVAILABLE');
+  await rejectsCode(h.api.readSnapshot(userId), 'UNSET_CAP_CONFLICT');
   assert.equal(h.patches, 0);
+});
+
+const unsetUser = () => ({ ...user(), override_monthly_usage_limit: null,
+  effective_monthly_usage_limit: null, inherited_monthly_usage_limit: null });
+
+test('explicitly absent settings produce an unset cap without an invented source or unlimited rule', async () => {
+  const h = harness({ original: unsetUser() });
+  const snapshot = await h.api.readSnapshot(userId);
+  assert.deepEqual(snapshot.cap, { type: 'unset', unit: 'credit' });
+  assert.deepEqual(snapshot.settings, { override: null, effective: null, inherited: null });
+  assert.equal(snapshot.usage, '25');
+  assert.equal(matchesTarget(snapshot, { amount: '500', unit: 'credit', periodEnd: END }), false);
+  assert.equal(settingsEquivalent(snapshot.settings, { ...snapshot.settings, override: [] }, 'credit'), true);
+  const unlimited = { override: [{ type: 'unlimited' }], inherited: null,
+    effective: effective({ type: 'unlimited' }, { kind: 'individual_override' }) };
+  assert.equal(settingsEquivalent(snapshot.settings, unlimited, 'credit'), false);
+  assert.equal(h.requests.length, 4);
+  assert.equal(h.patches, 0);
+});
+
+test('every before-state field must be explicit on both user reads', async () => {
+  for (const field of ['override_monthly_usage_limit', 'effective_monthly_usage_limit', 'inherited_monthly_usage_limit']) {
+    for (const read of [1, 2]) {
+      let count = 0;
+      const h = harness({ original: unsetUser(), intercept: ({ url, response }) => {
+        if (url.pathname.endsWith(`/users/${userId}`) && ++count === read) {
+          const body = unsetUser(); delete body[field]; return response(body);
+        }
+      } });
+      await rejectsCode(h.api.readSnapshot(userId), 'BEFORE_STATE_UNAVAILABLE');
+      assert.equal(h.patches, 0);
+    }
+  }
+  assert.throws(() => settingsEquivalent({ override: null, effective: null },
+    { override: null, effective: null, inherited: null }, 'credit'), { code: 'BEFORE_STATE_UNAVAILABLE' });
+});
+
+test('unset caps reject conflicting overrides, missing monthly state and changed repeated reads', async () => {
+  await rejectsCode(harness({ original: { ...unsetUser(), override_monthly_usage_limit: [rule()] } })
+    .api.readSnapshot(userId), 'UNSET_CAP_CONFLICT');
+  await rejectsCode(harness({ original: { ...unsetUser(), effective_monthly_usage_limit: { limit: null, source: null } } })
+    .api.readSnapshot(userId), 'CAP_SOURCE_UNAVAILABLE');
+  for (const variant of ['missing', 'different', 'changed']) {
+    let count = 0;
+    const h = harness({ original: unsetUser(), intercept: ({ url, response }) => {
+      if (url.pathname.endsWith('/monthly-usage') && variant !== 'changed') {
+        return response({ id: userId, account_user_id: `${userId}__${workspaceId}`,
+          current_month_usage: 25, current_month_usage_unit: 'credit',
+          ...(variant === 'different' ? { effective_monthly_usage_limit: rule() } : {}) });
+      }
+      if (url.pathname.endsWith(`/users/${userId}`) && ++count === 2 && variant === 'changed') return response(user());
+    } });
+    await rejectsCode(h.api.readSnapshot(userId), { missing: 'CAP_UNAVAILABLE',
+      different: 'CAP_CHANGED_BETWEEN_READS', changed: 'SETTINGS_CHANGED_BETWEEN_READS' }[variant]);
+    assert.equal(h.patches, 0);
+  }
+});
+
+test('fallback comparison preserves the active rule across personal-override representation changes', () => {
+  for (const source of [{ kind: 'group_default', group_id: 'group-original', group_name: 'Fictional group' },
+    { kind: 'workspace_default', seat_type: 'default' }, { kind: 'role_based_personal_budget', role_id: 'role-original' }]) {
+    const fallback = effective(rule('40000'), source);
+    const before = { override: null, effective: fallback, inherited: null };
+    const limit = rule('500', 'credit', END);
+    const after = { override: [limit], effective: effective(limit, { kind: 'individual_override' }), inherited: fallback };
+    assert.equal(inheritedSettingsEquivalent(before, after, 'credit'), true);
+    assert.equal(inheritedSettingsEquivalent(after, before, 'credit'), true);
+    assert.equal(settingsEquivalent(before, after, 'credit'), false);
+    for (const inherited of [null, effective(rule('39999'), source),
+      effective(rule('40000'), { ...source, identity_revision: 'changed' })]) {
+      assert.equal(inheritedSettingsEquivalent(before, { ...after, inherited }, 'credit'), false);
+    }
+    const absent = { override: null, effective: null, inherited: null };
+    assert.equal(inheritedSettingsEquivalent(absent, after, 'credit'), false);
+    assert.equal(inheritedSettingsEquivalent(absent, { ...after, inherited: null }, 'credit'), true);
+  }
+});
+
+test('adapter writes and restores exact unset and group-default settings in either native unit', async () => {
+  for (const unit of ['credit', 'usd']) for (const hasGroup of [false, true]) {
+    const group = hasGroup ? effective(rule('40000', unit), { kind: 'group_default', group_id: 'group-original' }) : null;
+    const original = { override: null, effective: group, inherited: null };
+    let settings = structuredClone(original);
+    const patches = [];
+    const resource = () => ({ id: userId, account_user_id: `${userId}__${workspaceId}`,
+      override_monthly_usage_limit: settings.override, effective_monthly_usage_limit: settings.effective,
+      inherited_monthly_usage_limit: settings.inherited });
+    const api = createAdminApi({ apiKey: key, workspaceId, userIds: [userId], allowWrites: true, clock: () => NOW,
+      fetchImpl: async (url, init) => {
+        const path = new URL(url).pathname;
+        let value;
+        if (path.endsWith('/usage_limits/workspace')) value = { id: workspaceId };
+        else if (init.method === 'PATCH') {
+          const body = JSON.parse(init.body); patches.push(body);
+          const input = body.override_monthly_usage_limit;
+          if (input === null) settings = structuredClone(original);
+          else {
+            const limit = structuredClone(input); delete limit.temporary; limit.limit_expires_at = END;
+            settings = { override: [limit], effective: effective(limit, { kind: 'individual_override' }), inherited: group };
+          }
+          value = resource();
+        } else if (path.endsWith('/monthly-usage')) value = { id: userId, account_user_id: `${userId}__${workspaceId}`,
+          current_month_usage: 25, current_month_usage_unit: unit, effective_monthly_usage_limit: settings.effective?.limit ?? null };
+        else { assert.ok(path.endsWith(`/users/${userId}`)); value = resource(); }
+        return { ok: true, status: 200, headers: new Headers(), json: async () => structuredClone(value) };
+      } });
+    const before = await api.readSnapshot(userId);
+    await api.setCap(userId, { amount: '500', unit, periodEnd: END, expectedSettings: before.settings });
+    const after = await api.readSnapshot(userId);
+    assert.equal(matchesTarget(after, { amount: '500', unit, periodEnd: END }), true);
+    assert.equal(inheritedSettingsEquivalent(before.settings, after.settings, unit), true);
+    await api.restore(userId, { settings: before.settings, unit, periodEnd: END, expectedSettings: after.settings });
+    const restored = await api.readSnapshot(userId);
+    assert.deepEqual(restored.settings, original);
+    assert.equal(settingsEquivalent(restored.settings, before.settings, unit), true);
+    assert.deepEqual(patches.at(-1), { override_monthly_usage_limit: null });
+    assert.equal(patches.length, 2);
+  }
 });
 
 test('Lambda time budget stops reads and prevents PATCH without a readback reserve', async () => {

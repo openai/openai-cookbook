@@ -10,7 +10,7 @@ Run these commands from the extracted starter folder, or from `examples/chatgpt/
 | --- | --- | --- |
 | Complete automated suite | `npm test` | Policy arithmetic, native credit/USD handling, cadence and period guards, ID/email/group selection, cohort review, API parsing, durable state, retries, recovery, and restore behavior against test inputs. |
 | Guided demonstration | `node src/demo.mjs` | Three fictional members with a 2,000-credit monthly target and 500-credit weekly releases: preview, partial success, reconciliation, the next slot, manual-edit conflict, and exact restoration. This simulation keeps its state in memory. |
-| AWS runtime tests | `node --test test/aws*.test.mjs` | Connection checks, queued work, control-part integrity, progress records, lease fencing, and the shared controller work with injected service responses. |
+| AWS runtime tests | `node --test test/aws*.test.mjs` | Connection checks, queued work, control-part integrity, progress records, lease fencing, same-stack renewal, and the shared controller work with injected service responses. |
 | Credential runner tests | `node --test test/credential-runner.test.mjs` | Provider argument validation, scoped child execution, recovery-command forwarding, and secret-output handling with simulated credentials. |
 | Local walkthrough on macOS or Linux | Follow [the Codex rehearsal](codex.md#1-run-the-fictional-rehearsal) and [the local rehearsal](local.md#1-rehearse-the-all-members-workflow) in fresh private directories. | Separate CLI processes preserve state through snapshot, review, preview, synthetic apply, duplicate detection, and restore. The credit rehearsals use a 2,000-credit monthly target with 500-credit weekly releases; selected USD headroom uses native USD. |
 | Generated local scripts | After the local rehearsal, run `sh -n .private/local-rehearsal/run-preview.sh` and `sh .private/local-rehearsal/run-preview.sh`. | Shell syntax and manual invocation of the synthetic preview work. Scheduler installation is a separate step in the local walkthrough. |
@@ -66,7 +66,8 @@ Complete the remaining checks for the chosen execution path:
 - Apply a bounded, approved cap change, read it back independently, and restore the exact original settings.
 - Verify that the chosen scheduler fires at the intended time and recovers after a missed run.
 - For AWS, verify deployment, secret retrieval, queued-work completion, retries, and delivery to the configured alert recipient. Increase the enrollment gradually and measure completion time against the configured review window, API throughput, and period end.
-- Record how the intended workspace handles a real monthly boundary, billing-unit transition, or model-side limit.
+- At a real monthly boundary, complete the [guided renewal](aws.md#7-renew-the-next-period) on the same stack and table. Verify that the policy and people carry forward, original settings and history remain, old queued work cannot apply, and the new period starts with its reviewed opening limits.
+- Record how the intended workspace handles a billing-unit transition or model-side limit.
 - Remove or disable installed services, cloud resources, and credentials, then verify their final state.
 
 Use the [Codex](codex.md), [local](local.md), or [AWS](aws.md) walkthrough for the authorized live steps. Record the actual target, timed trigger, API readback, delivered alert, failure recovery, restoration, and cleanup. Record local tests and manual invocations separately so the evidence identifies exactly what ran.

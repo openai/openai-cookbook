@@ -1,6 +1,7 @@
 import { mkdir, open, readFile, rename, rm, stat } from 'node:fs/promises';
 import { createHash, randomUUID } from 'node:crypto';
 import { join, resolve, dirname } from 'node:path';
+import { digest as stateDigest } from './policy.mjs';
 
 const digest = value => createHash('sha256').update(value).digest('hex').slice(0, 24);
 const failure = code => Object.assign(new Error(code), { code });
@@ -106,6 +107,13 @@ export class FileStore {
     await this.append(key, 'state', state);
     await this.assertLock(key);
     await atomicJson(this.paths(key).state, state);
+  }
+  async transitionState(key, { previous, next }) {
+    await this.assertLock(key);
+    if (stateDigest(await this.getState(key)) !== stateDigest(previous)) throw failure('RENEWAL_PRIOR_STATE_CHANGED');
+    // The fsynced append-only journal already retains every prior period. One
+    // state entry commits the transition; the convenience snapshot is rebuilt.
+    await this.putState(key, next);
   }
   async putReceipt(receipt) {
     const key = [...this.active.keys()].find(key => digest(key) === receipt.controllerKey);

@@ -100,8 +100,8 @@ export function validateSnapshot(snapshot, config, userId, now) {
   requireThat(snapshot.workspaceId === config.workspaceId && snapshot.userId === userId, 'IDENTITY_MISMATCH');
   requireThat(snapshot.unit === config.unit && snapshot.cap.unit === config.unit, 'UNIT_TRANSITION_REQUIRES_REENROLLMENT');
   amount(snapshot.usage);
-  requireThat(snapshot.settings && Object.hasOwn(snapshot.settings, 'override') && snapshot.settings.effective, 'EXACT_BEFORE_STATE_REQUIRED');
-  requireThat(['limited', 'unlimited'].includes(snapshot.cap.type), 'CAP_TYPE_INVALID');
+  requireThat(snapshot.settings && Object.hasOwn(snapshot.settings, 'override') && (snapshot.settings.effective || (snapshot.cap.type === 'unset' && snapshot.settings.effective === null && snapshot.settings.inherited === null && (snapshot.settings.override === null || (Array.isArray(snapshot.settings.override) && snapshot.settings.override.length === 0)))), 'EXACT_BEFORE_STATE_REQUIRED');
+  requireThat(['limited', 'unlimited', 'unset'].includes(snapshot.cap.type), 'CAP_TYPE_INVALID');
   if (snapshot.cap.type === 'limited') capAmount(snapshot.cap.amount, config.unit);
   if (snapshot.cap.expiresAt) requireThat(time(snapshot.cap.expiresAt) === time(config.period.end), 'CAP_EXPIRY_PERIOD_MISMATCH');
   const age = time(now) - time(snapshot.observedAt);
@@ -145,7 +145,7 @@ export function planTarget(config, snapshot, now, history) {
     amount: format(target), unit: config.unit, ceiling: p.ceiling,
     headroom: format(max(0n, target - amount(snapshot.usage))),
     shortfall: format(max(0n, desired - target)), observedDailyAverage,
-    wouldRestrict: snapshot.cap.type === 'unlimited' || amount(snapshot.cap.amount) > target,
+    wouldRestrict: snapshot.cap.type !== 'limited' || amount(snapshot.cap.amount) > target,
     usageAtOrAboveTarget: amount(snapshot.usage) >= target,
     historySemantics: p.pattern === 'observed_headroom' ? 'observed, eventually consistent; not finalized' : 'not used' };
 }

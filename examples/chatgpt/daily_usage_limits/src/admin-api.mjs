@@ -106,9 +106,16 @@ function overrideRule(override) {
 }
 
 function normalizeSettings(settings, unit) {
-  if (!settings || !Object.hasOwn(settings, 'override')) throw fail('BEFORE_STATE_UNAVAILABLE');
+  if (!settings || ['override', 'effective', 'inherited'].some(field =>
+    !Object.hasOwn(settings, field) || settings[field] === undefined)) throw fail('BEFORE_STATE_UNAVAILABLE');
   const rule = overrideRule(settings.override);
   const effective = settings.effective;
+  // Preserve explicit absence separately from an unlimited rule. Every saved
+  // field must agree before an absent effective cap can be restored faithfully.
+  if (effective === null) {
+    if (rule !== null || settings.inherited !== null) throw fail('UNSET_CAP_CONFLICT');
+    return { override: null, effective: null, inherited: null };
+  }
   if (!SOURCES.has(effective?.source?.kind)) throw fail('CAP_SOURCE_UNAVAILABLE');
   if (Object.keys(effective).some(key => !['limit', 'source'].includes(key)) ||
       (settings.inherited && (Object.keys(settings.inherited).some(key => !['limit', 'source'].includes(key)) ||
@@ -142,6 +149,17 @@ function stable(value) {
 export function settingsEquivalent(left, right, unit) {
   return JSON.stringify(stable(normalizeSettings(left, unit))) ===
     JSON.stringify(stable(normalizeSettings(right, unit)));
+}
+
+// With no personal override, the active default can appear only as effective.
+// After an override is installed, that same rule appears as inherited. Compare
+// its amount and full source identity without changing saved restore settings.
+export function inheritedSettingsEquivalent(left, right, unit) {
+  const fallback = settings => {
+    const normalized = normalizeSettings(settings, unit);
+    return normalized.override === null ? normalized.effective : normalized.inherited;
+  };
+  return JSON.stringify(stable(fallback(left))) === JSON.stringify(stable(fallback(right)));
 }
 
 export function matchesTarget(snapshot, { amount, unit, periodEnd }) {
@@ -244,10 +262,11 @@ export function createAdminApi({ apiKey, workspaceId, userIds = [], allowWrites 
   }
 
   function settingsFrom(user) {
-    if (!Object.hasOwn(user, 'override_monthly_usage_limit')) throw fail('BEFORE_STATE_UNAVAILABLE');
+    if (['override_monthly_usage_limit', 'effective_monthly_usage_limit', 'inherited_monthly_usage_limit']
+      .some(field => !Object.hasOwn(user, field) || user[field] === undefined)) throw fail('BEFORE_STATE_UNAVAILABLE');
     return clone({ override: user.override_monthly_usage_limit,
       effective: user.effective_monthly_usage_limit,
-      inherited: user.inherited_monthly_usage_limit ?? null });
+      inherited: user.inherited_monthly_usage_limit });
   }
 
   async function readSnapshot(userId) {
@@ -261,8 +280,12 @@ export function createAdminApi({ apiKey, workspaceId, userIds = [], allowWrites 
     if (!validUnit(unit)) throw fail('USAGE_UNIT_UNAVAILABLE');
     const settings = settingsFrom(user);
     normalizeSettings(settings, unit);
-    const cap = normalizedRule(settings.effective.limit, unit, settings.effective.source.kind);
-    const currentCap = normalizedRule(monthly.effective_monthly_usage_limit, unit, cap.source);
+    if (!Object.hasOwn(monthly, 'effective_monthly_usage_limit') ||
+        monthly.effective_monthly_usage_limit === undefined) throw fail('CAP_UNAVAILABLE');
+    const cap = settings.effective === null ? { type: 'unset', unit } :
+      normalizedRule(settings.effective.limit, unit, settings.effective.source.kind);
+    const currentCap = monthly.effective_monthly_usage_limit === null ? { type: 'unset', unit } :
+      normalizedRule(monthly.effective_monthly_usage_limit, unit, cap.source);
     if (JSON.stringify(cap) !== JSON.stringify(currentCap)) throw fail('CAP_CHANGED_BETWEEN_READS');
     const latest = await request(path);
     verifyUser(latest, userId);

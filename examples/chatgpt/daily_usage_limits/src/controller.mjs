@@ -1,7 +1,8 @@
 import { createHash } from 'node:crypto';
-import { settingsEquivalent, matchesTarget as apiMatchesTarget } from './admin-api.mjs';
+import { settingsEquivalent, inheritedSettingsEquivalent, matchesTarget as apiMatchesTarget } from './admin-api.mjs';
 import { configDigest, validateConfig, validatePolicy, validateSnapshot, planTarget, historyRange, requireThat, amount, time, fail, HOUR, approvalWindowMs } from './policy.mjs';
 import { validateEnrollment, enrollmentHash } from './enrollment.mjs';
+import { validateRenewalProof } from './renewal.mjs';
 import { validateCurrentCohort } from './selection.mjs';
 
 const keyHash = key => createHash('sha256').update(key).digest('hex').slice(0, 24);
@@ -9,7 +10,7 @@ function matchesTarget(snapshot, pending, config) {
   return apiMatchesTarget(snapshot, {amount: pending.amount, unit: config.unit, periodEnd: config.period.end});
 }
 const sameSettings = (a, b, unit) => settingsEquivalent(a.settings, b.settings, unit);
-const sameInherited = (a, b, unit) => settingsEquivalent(a.settings, { ...a.settings, inherited: b.settings.inherited }, unit);
+const sameInherited = (a, b, unit) => inheritedSettingsEquivalent(a.settings, b.settings, unit);
 
 const preparedContexts = new WeakMap();
 function freezeTree(value) {
@@ -97,6 +98,15 @@ export async function execute({ config, enrollment, api, store, now: fixedNow, c
       mode, observedAt: now, slot: ctx.slot, unit: config.unit };
     return store.withLock(key, async () => {
       let state = await store.getState(key);
+      let previousState;
+      let renewalOriginal;
+      const saveState = async value => {
+        if (previousState) {
+          requireThat(typeof store.transitionState === 'function', 'RENEWAL_STORE_TRANSITION_REQUIRED');
+          await store.transitionState(key, { previous: previousState, next: value });
+          previousState = null;
+        } else await store.putState(key, value);
+      };
       const receipt = async details => {
         const value = { ...base, ...details };
         await store.putReceipt(value);
@@ -105,6 +115,12 @@ export async function execute({ config, enrollment, api, store, now: fixedNow, c
       try {
         if (roster && !roster.has(member.userId)) return receipt({ok:false,status:'attention',code:'MEMBER_REMOVED_OR_INELIGIBLE'});
         if (!roster) await api.assertMemberActive(member.userId);
+        if (enrollment.renewal) requireThat(state && member.renewal, 'RENEWAL_PRIOR_STATE_MISSING');
+        if (state && (state.configDigest !== configIdentity || state.enrollmentHash !== enrollmentIdentity) && enrollment.renewal) {
+          renewalOriginal = validateRenewalProof(config, enrollment, member, state);
+          previousState = state;
+          state = null;
+        }
         if (state) {
           requireThat(state.configDigest === configIdentity && state.enrollmentHash === enrollmentIdentity, 'POLICY_OR_ENROLLMENT_CHANGED_STOP_AND_RESTORE_FIRST');
           if(state.halted && !resumeAuth) throw fail('AUTH_FAILURE_HALTED_REVIEW_REQUIRED');
@@ -117,7 +133,7 @@ export async function execute({ config, enrollment, api, store, now: fixedNow, c
           if(!state?.pending || state.last)return receipt({ok:true,status:'no_unapplied_initial_intent'});
           requireThat(state.pending.kind==='cap' && sameSettings(current,state.pending.before,config.unit), 'CANCEL_REQUIRES_UNCHANGED_BEFORE_STATE');
           state={...state,pending:null,last:current,lastUsage:current.usage,lastSlot:ctx.slot,restored:true};
-          await store.putState(key,state);
+          await saveState(state);
           return receipt({ok:true,status:'initial_intent_cancelled',action:'No cap was changed. This member is closed for this enrollment; review a new pilot if needed.'});
         }
         if(resumeAuth) {
@@ -126,7 +142,7 @@ export async function execute({ config, enrollment, api, store, now: fixedNow, c
           requireThat(state.pending && (sameSettings(current,state.pending.before,config.unit) ||
             (state.pending.kind==='restore' ? settingsEquivalent(current.settings,state.original.settings,config.unit) : matchesTarget(current,state.pending,config))), 'RESUME_CURRENT_STATE_CONFLICT');
           state.halted=false;
-          await store.putState(key,state);
+          await saveState(state);
           return receipt({ok:true,status:'auth_resumed',action:'No cap was changed. Preview and rerun the saved operation explicitly.'});
         }
         if (state?.lastUsage !== undefined) requireThat(amount(current.usage) >= amount(state.lastUsage), 'COUNTER_DECREASE_REQUIRES_PERIOD_REVIEW');
@@ -137,7 +153,7 @@ export async function execute({ config, enrollment, api, store, now: fixedNow, c
             if (!apply) return receipt({ ok: true, status: 'pending_already_applied', action: 'Rerun with --apply to record reconciliation; no new target is calculated.' });
             state = { ...state, pending: null, last: current, lastUsage: current.usage, lastSlot: pending.slot,
               restored: pending.kind === 'restore' };
-            await store.putState(key, state);
+            await saveState(state);
             return receipt({ ok: true, status: 'reconciled', amount: current.cap.amount, restored: state.restored });
           }
           requireThat(sameSettings(current, pending.before, config.unit), 'PENDING_WRITE_CONFLICT');
@@ -151,17 +167,20 @@ export async function execute({ config, enrollment, api, store, now: fixedNow, c
           return await writePending(state, current);
         }
         if (state?.restored) return receipt({ ok: true, status: 'restored_stopped', action: 'This enrollment is closed; create and review a new enrollment for another period or policy.' });
-        if (restore && !state) return receipt({ ok: true, status: 'nothing_owned' });
+        if (restore && !state && !previousState) return receipt({ ok: true, status: 'nothing_owned' });
         if (state?.last) requireThat(sameSettings(current, state.last, config.unit), 'MANUAL_ADMIN_CHANGE_CONFLICT');
         else {
           requireThat(sameSettings(current, member.before, config.unit), 'ENROLLMENT_BEFORE_STATE_CHANGED');
-          requireThat(time(readNow()) - time(enrollment.capturedAt) <= reviewWindow, 'INITIAL_PREVIEW_EXPIRED_RECAPTURE');
-          requireThat(ctx.slot === member.plan.slot, 'INITIAL_PREVIEW_SLOT_CHANGED_RECAPTURE');
+          if (!restore) {
+            requireThat(time(readNow()) - time(enrollment.capturedAt) <= reviewWindow, 'INITIAL_PREVIEW_EXPIRED_RECAPTURE');
+            requireThat(ctx.slot === member.plan.slot, 'INITIAL_PREVIEW_SLOT_CHANGED_RECAPTURE');
+          }
         }
         if (restore) {
+          if (!state) state = {version:1, configDigest:configIdentity, enrollmentHash:enrollmentIdentity, original:renewalOriginal};
           requireThat(sameInherited(current,state.original,config.unit), 'ORIGINAL_INHERITED_SOURCE_CHANGED');
           if (!apply) return receipt({ ok: true, status: 'restore_preview', before: current, after: state.original });
-          state.pending = { kind: 'restore', before: current, slot: state.lastSlot };
+          state.pending = { kind: 'restore', before: current, slot: state.lastSlot ?? ctx.slot };
         } else {
           if (state?.lastSlot === ctx.slot) return receipt({ ok: true, status: 'duplicate_slot', amount: current.cap.amount });
           const history = config.policy.pattern === 'observed_headroom' ? await api.readHistory(member.userId, historyRange(config, now)) : undefined;
@@ -173,16 +192,16 @@ export async function execute({ config, enrollment, api, store, now: fixedNow, c
             requireThat(amount(current.usage) === amount(member.before.usage), 'RESTRICTION_USAGE_CHANGED_RECAPTURE');
           }
           if (!apply) return receipt({ ok: true, status: 'preview', before: current, plan });
-          if (!state) state = { version: 1, configDigest: configIdentity, enrollmentHash: enrollmentIdentity, original: member.before };
+          if (!state) state = { version: 1, configDigest: configIdentity, enrollmentHash: enrollmentIdentity, original: renewalOriginal ?? member.before };
           // A no-op still consumes the slot. Late history corrections cannot re-award it.
           if (current.cap.type === 'limited' && amount(current.cap.amount) === amount(plan.amount) && current.cap.source === 'individual_override' && current.cap.expiresAt === config.period.end) {
             state = { ...state, last: current, lastUsage: current.usage, lastSlot: ctx.slot };
-            await store.putState(key, state);
+            await saveState(state);
             return receipt({ ok: true, status: 'held', plan });
           }
           state.pending = { kind: 'cap', before: current, amount: plan.amount, slot: ctx.slot, plan };
         }
-        await store.putState(key, state); // Durable intent MUST precede any external mutation.
+        await saveState(state); // Durable intent MUST precede any external mutation.
         return await writePending(state, current, true);
 
         async function writePending(saved, before, newIntent = false) {
@@ -221,7 +240,7 @@ export async function execute({ config, enrollment, api, store, now: fixedNow, c
           const details = saved.pending;
           state = { ...saved, pending: null, last: after, lastUsage: after.usage, lastSlot: details.slot,
             restored: details.kind === 'restore', notBefore: null };
-          await store.putState(key, state);
+          await saveState(state);
           return receipt({ ok: true, status: details.kind === 'restore' ? 'restored' : 'applied', before, after, plan: details.plan });
         }
       } catch (error) {
@@ -231,7 +250,7 @@ export async function execute({ config, enrollment, api, store, now: fixedNow, c
           // A delay beyond this period stops this enrollment entirely; never shorten
           // Retry-After into an earlier eligible retry.
           if (Number.isFinite(error.retryAfterMs) && error.retryAfterMs > 0) state.notBefore = new Date(Math.min(time(readNow()) + error.retryAfterMs, time(config.period.end))).toISOString();
-          await store.putState(key, state);
+          await saveState(state);
         }
         return receipt({ ok: false, status: 'attention', code: error.code ?? 'CONTROLLER_ERROR',
           ...retryDetails(error, state, readNow()),

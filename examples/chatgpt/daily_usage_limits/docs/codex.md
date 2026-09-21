@@ -91,3 +91,5 @@ Expect a restore preview, then `restored` receipts for the fictional users. Rest
 Choose a managed virtual machine or cloud environment operated by your organization. The [host scheduler guide](local.md) provides macOS and Linux examples; the [AWS guide](aws.md) provides a cloud deployment example. Another managed environment can use the same controller with its own scheduling, credential storage, persistent records, and monitoring.
 
 Complete the pilot's stop and restore steps above, retaining its records. On the managed infrastructure, use the chosen policy settings to create a fresh enrollment and preview the intended limits. Verify a scheduled run and delivery of failure alerts before expanding the group. Keep the Codex pilot schedule disabled after the transition.
+
+Once the plan is running on AWS, use [guided renewal](aws.md#7-renew-the-next-period) for each new period. The helper reuses the cloud setup and policy and prepares the next review.

@@ -28,6 +28,10 @@ export function createDynamoStore({ send, tableName, deploymentId,
     async getControl() {
       return (await get({ PK: `CONTROL#${deploymentId}`, SK: 'REVIEWED' }))?.document;
     },
+    async getControlVersion(controlHash) {
+      if (!/^[a-f0-9]{64}$/.test(controlHash ?? '')) throw new Error('INVALID_CONTROL_HASH');
+      return (await get({ PK: `CONTROL#${deploymentId}`, SK: `MANIFEST#${controlHash}` }))?.document;
+    },
     async getControlPart(partHash) {
       if (!/^[a-f0-9]{64}$/.test(partHash)) throw new Error('INVALID_CONTROL_PART');
       return (await get({ PK: `CONTROL#${deploymentId}`, SK: `PART#${partHash}` }))?.document;
@@ -106,6 +110,20 @@ export function createDynamoStore({ send, tableName, deploymentId,
         { ConditionCheck: condition(key) },
         { Put: { TableName: tableName, Item: { ...stateKey(key), payload,
           updatedAt: clock().toISOString() } } },
+      ] });
+    },
+    async transitionState(key, { previous, next }) {
+      if (!previous || !next || !/^[a-f0-9]{64}$/.test(previous.enrollmentHash ?? '') ||
+          !/^[a-f0-9]{64}$/.test(next.enrollmentHash ?? '') || previous.enrollmentHash === next.enrollmentHash) {
+        throw new Error('INVALID_STATE_TRANSITION');
+      }
+      await send('TransactWrite', { TransactItems: [
+        { ConditionCheck: condition(key) },
+        { Put: { TableName: tableName, Item: { ...stateKey(key), payload: next,
+          updatedAt: clock().toISOString() }, ConditionExpression: '#payload = :previous',
+          ExpressionAttributeNames: { '#payload': 'payload' }, ExpressionAttributeValues: { ':previous': previous } } },
+        { Put: { TableName: tableName, Item: { PK: stateKey(key).PK, SK: `ARCHIVE#${previous.enrollmentHash}`,
+          payload: previous, archivedAt: clock().toISOString() }, ConditionExpression: 'attribute_not_exists(PK)' } },
       ] });
     },
     async putReceipt(receipt) {

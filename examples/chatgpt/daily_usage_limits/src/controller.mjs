@@ -195,7 +195,9 @@ export async function execute({ config, enrollment, api, store, now: fixedNow, c
           if (!state) validateInitialHeadroom(config, current, plan.amount);
           if (plan.wouldRestrict) {
             requireThat(!state && config.allowInitialReduction, 'INITIAL_REDUCTION_REQUIRES_REVIEWED_OPT_IN');
-            requireThat(amount(current.usage) === amount(member.before.usage), 'RESTRICTION_USAGE_CHANGED_RECAPTURE');
+            if (config.policy.pattern !== 'individual_staircase') {
+              requireThat(amount(current.usage) === amount(member.before.usage), 'RESTRICTION_USAGE_CHANGED_RECAPTURE');
+            }
           }
           if (!apply) return receipt({ ok: true, status: 'preview', before: current, plan });
           if (!state) state = { version: 1, configDigest: configIdentity, enrollmentHash: enrollmentIdentity, original: renewalOriginal ?? member.before };
@@ -226,7 +228,7 @@ export async function execute({ config, enrollment, api, store, now: fixedNow, c
           requireThat(contextAt(readNow()).slot === ctx.slot, 'SLOT_CHANGED_DURING_RUN');
           requireThat(sameSettings(fresh, before, config.unit), 'FINAL_READ_CONFLICT');
           requireThat(amount(fresh.usage) >= amount(before.usage), 'COUNTER_DECREASE_REQUIRES_PERIOD_REVIEW');
-          if (saved.pending.kind === 'cap' && saved.pending.plan?.wouldRestrict) requireThat(amount(fresh.usage) === amount(member.before.usage), 'RESTRICTION_USAGE_CHANGED_RECAPTURE');
+          if (saved.pending.kind === 'cap' && saved.pending.plan?.wouldRestrict && !individualInitial) requireThat(amount(fresh.usage) === amount(member.before.usage), 'RESTRICTION_USAGE_CHANGED_RECAPTURE');
           if(saved.pending.kind==='cap' && (saved.pending.plan?.wouldRestrict || individualInitial)) {
             requireThat(time(readNow())-time(enrollment.capturedAt)<=reviewWindow,'INITIAL_RESTRICTION_PREVIEW_EXPIRED_CANCEL_AND_REVIEW');
             requireThat(contextAt(readNow()).slot===saved.pending.slot,'INITIAL_RESTRICTION_SLOT_EXPIRED_CANCEL_AND_REVIEW');
@@ -239,7 +241,7 @@ export async function execute({ config, enrollment, api, store, now: fixedNow, c
             : config.period.end;
           const target = { amount: saved.pending.amount, unit: config.unit, periodEnd: config.period.end, expectedSettings: fresh.settings,
             notAfter,
-            ...(saved.pending.plan?.wouldRestrict ? {expectedUsage: member.before.usage} : individualInitial ? {expectedUsage: fresh.usage} : {}) };
+            ...(individualInitial ? {expectedUsage: fresh.usage} : saved.pending.plan?.wouldRestrict ? {expectedUsage: member.before.usage} : {}) };
           if (saved.pending.kind === 'restore') await api.restore(member.userId, { settings: saved.original.settings, unit: config.unit, periodEnd: config.period.end, expectedSettings: fresh.settings });
           else await api.setCap(member.userId, target);
           const after = await api.readSnapshot(member.userId);

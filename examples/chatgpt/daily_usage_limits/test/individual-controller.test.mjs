@@ -85,3 +85,32 @@ test('counter decreases before first apply or an initial retry require period re
     if (pending) assert.ok((await store.getState(`${config.workspaceId}:${id}`)).pending);
   }
 });
+
+test('initial individual reductions allow increasing usage within the reviewed headroom, including retry', async () => {
+  for (const pending of [false, true]) {
+    const now = '2030-01-02T00:00:00.000Z';
+    const config = exampleConfig({ now, pattern: 'individual_staircase', cohort: 'all' });
+    config.allowInitialReduction = true;
+    Object.assign(config.policy, { initialHeadroom: '500', minimumInitialHeadroom: '100', ceiling: '5000' });
+    const api = createSyntheticApi({ config, clock: () => now, initialCap: '40000' });
+    const ids = await api.listMembers();
+    api.users[ids[0]].settings = { override: null, effective: null, inherited: null };
+    api.users[ids[0]].cap = { type: 'unset', unit: 'credit' };
+    const captured = await captureEnrollment({ config, api, now });
+    const enrollment = approveEnrollment(captured.enrollment, captured.hash, now);
+    const store = new MemoryStore();
+    if (pending) {
+      api.injectFault({ type: 'before', userId: ids[0], status: 503 });
+      assert.equal((await execute({ config, enrollment, api, store, now, apply: true })).results[0].ok, false);
+    }
+    for (const id of ids) api.users[id].usage = '1';
+    const result = await execute({ config, enrollment, api, store, now, apply: true });
+    assert.equal(result.ok, true, JSON.stringify(result.results));
+    assert.deepEqual(ids.map(id => api.users[id].cap.amount), ['500', '500', '500']);
+    const write = api.writes.find(value => value.userId === ids[0]);
+    assert.equal(write.expectedUsage, '1');
+    const count = api.writes.length;
+    assert.equal((await execute({ config, enrollment, api, store, now, apply: true })).ok, true);
+    assert.equal(api.writes.length, count);
+  }
+});

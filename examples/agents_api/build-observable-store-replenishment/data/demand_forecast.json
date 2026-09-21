@@ -1,0 +1,8 @@
+{
+  "store_id": "store_101",
+  "sku": "water_24pk",
+  "horizon_hours": 24,
+  "baseline_units": 18,
+  "storm_units": 50,
+  "generated_at": "2026-09-18T08:00:00Z"
+}

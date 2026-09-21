@@ -1,0 +1,5 @@
+{
+  "schema_version": 1,
+  "synthetic": true,
+  "scenario": "storm_delayed_store_replenishment"
+}

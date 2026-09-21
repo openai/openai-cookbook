@@ -4,6 +4,19 @@
 # should build pages for, and indicates metadata such as tags, creation date and
 # authors for each page.
 
+- title: Build an observable store replenishment agent with the Agents API
+  path: examples/agents_api/build-observable-store-replenishment.md
+  slug: agents-api-observable-store-replenishment
+  description: Continue one storm-delayed replenishment incident across Agents API turns, application function tools, and traces.
+  date: 2026-09-18
+  authors:
+    - suryakari-ux
+  tags:
+    - agents-api
+    - agents
+    - tools
+    - api
+
 - title: Agents API applications and sandbox integrations
   path: examples/agents_api/README.md
   slug: agents-api-examples

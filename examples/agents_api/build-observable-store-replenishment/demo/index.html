@@ -1,0 +1,133 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <meta name="theme-color" content="#17231d" />
+    <title>Lakeside Market · Agent operations game</title>
+    <link rel="stylesheet" href="/assets/styles.css?v=retail-game-v4" />
+  </head>
+  <body>
+    <header class="topbar">
+      <div class="brand-lockup">
+        <span class="brand-mark" aria-hidden="true">LM</span>
+        <div><strong>Lakeside Market</strong><span>Store 101 · Manager shift</span></div>
+      </div>
+      <div class="topbar-actions">
+        <div class="mode-control" aria-label="Demo mode">
+          <button class="mode-option is-active" data-mode="guided" type="button">Guided</button>
+          <button class="mode-option" data-mode="live" type="button">Live agent</button>
+        </div>
+        <span class="connection-status" id="connection-status"><i></i> Ready</span>
+        <button class="secondary-button" id="reset-button" type="button" disabled>New shift</button>
+      </div>
+    </header>
+
+    <main>
+      <section class="shift-strip" aria-label="Store status">
+        <div class="shift-title"><span>09:00</span><strong>Morning replenishment</strong></div>
+        <div class="metric"><span>Shelf</span><strong id="shelf-metric">—</strong></div>
+        <div class="metric"><span>Back room</span><strong id="backroom-metric">—</strong></div>
+        <div class="metric"><span id="demand-label">24h demand</span><strong id="demand-metric">—</strong></div>
+        <div class="metric"><span>Truck</span><strong id="truck-metric">—</strong></div>
+        <div class="metric"><span>Nearby</span><strong id="nearby-metric">—</strong></div>
+      </section>
+
+      <section class="game-layout">
+        <div class="store-game">
+          <header class="panel-heading">
+            <div><span class="eyebrow">Live store floor</span><h1>Water aisle operations</h1></div>
+            <span class="stage-pill" id="stage-pill">Shift not started</span>
+          </header>
+
+          <div class="store-scene" id="store-scene" aria-label="Interactive top-down retail store">
+            <div class="weather-layer" aria-hidden="true"><span></span><span></span><span></span><span></span></div>
+            <div class="scene-sign scene-sign-back">BACK ROOM</div>
+            <div class="scene-sign scene-sign-floor">SALES FLOOR</div>
+            <div class="scene-sign scene-sign-dock">RECEIVING</div>
+
+            <div class="room backroom-room">
+              <div class="rack rack-a"><span></span><span></span><span></span></div>
+              <div class="rack rack-b"><span></span><span></span><span></span></div>
+              <div class="stock-stack" id="backroom-stack" aria-label="Back-room inventory"></div>
+            </div>
+
+            <div class="room sales-room">
+              <div class="aisle aisle-one"><span>SNACKS</span></div>
+              <div class="aisle water-aisle"><span>WATER</span><div id="scene-shelf"></div></div>
+              <div class="aisle aisle-three"><span>HOUSEHOLD</span></div>
+              <div class="checkout"><i></i><i></i><span>CHECKOUT</span></div>
+            </div>
+
+            <div class="room receiving-room">
+              <div class="dock-door"><span>DOCK 2</span></div>
+              <div class="transfer-load" id="transfer-load"><span>TRANSFER</span></div>
+            </div>
+
+            <div class="staff staff-maya" id="staff-maya"><span class="staff-head"></span><span class="staff-body">M</span><small>Maya · aisle</small></div>
+            <div class="staff staff-luis" id="staff-luis"><span class="staff-head"></span><span class="staff-body">L</span><small>Luis · receiving</small></div>
+            <div class="staff staff-manager"><span class="staff-head"></span><span class="staff-body">YOU</span><small>Store manager</small></div>
+            <div class="stock-cart" id="stock-cart"><span></span><span></span><i></i><i></i></div>
+            <div class="delivery-van" id="delivery-van"><b>205</b><i></i><i></i></div>
+
+            <div class="agent-alert" id="scene-alert" hidden>
+              <span>AGENTS API</span><strong id="scene-alert-title">Low shelf detected</strong><small id="scene-alert-copy">A recommendation is ready.</small>
+            </div>
+          </div>
+
+          <div class="game-footer">
+            <div class="staff-status"><span class="status-dot"></span><strong id="floor-status">Team is ready for the morning shift.</strong></div>
+            <button class="primary-button" id="start-button" type="button">Start store shift</button>
+          </div>
+        </div>
+
+        <aside class="agent-console">
+          <header class="console-header">
+            <div class="agent-identity"><span class="agent-mark">AI</span><div><strong>Replenishment agent</strong><small id="agent-state">Waiting for shift</small></div></div>
+            <span class="unread-badge" id="unread-badge" hidden>NEW</span>
+          </header>
+
+          <div class="conversation" id="conversation" aria-live="polite">
+            <div class="message agent-message">
+              <span>Agent</span>
+              <p>Start the shift and I will watch inventory, demand, shipments, weather, and store policy.</p>
+            </div>
+          </div>
+
+          <div class="suggestions" id="suggestions"></div>
+          <form class="command-box" id="command-form">
+            <label for="command-input">Manager command</label>
+            <div><input id="command-input" type="text" placeholder="Start the shift first" autocomplete="off" disabled /><button type="submit" disabled>Send</button></div>
+          </form>
+        </aside>
+      </section>
+
+      <section class="disruption-panel" id="disruption-panel" hidden>
+        <div class="disruption-copy"><span class="weather-icon" aria-hidden="true">!</span><div><span class="eyebrow">Incoming disruption</span><h2>Severe storm may delay the next truck</h2><p>Tune the conditions, then tell the agent to reassess the store.</p></div></div>
+        <div class="scenario-controls">
+          <label><span>Truck delay <b id="delay-value">48h</b></span><input id="delay-control" type="range" min="0" max="72" step="12" value="48" /></label>
+          <label><span>Expected demand <b id="demand-value">50</b></span><input id="demand-control" type="range" min="10" max="80" step="2" value="50" /></label>
+          <label><span>Nearby units <b id="nearby-value">40</b></span><input id="nearby-control" type="range" min="0" max="100" step="5" value="40" /></label>
+        </div>
+      </section>
+
+      <section class="operations-log">
+        <div class="activity-panel">
+          <header class="panel-heading compact"><div><span class="eyebrow">Business outcome</span><h2>Shift activity</h2></div></header>
+          <ol class="timeline" id="manager-timeline"><li class="muted-row">No incident activity yet.</li></ol>
+        </div>
+        <div class="activity-panel">
+          <header class="panel-heading compact">
+            <div><span class="eyebrow">Agents API observability</span><h2>Tools, turns, and trace</h2></div>
+            <button class="text-button" id="trace-button" type="button" disabled>Open trace</button>
+          </header>
+          <div class="tool-list" id="tool-list"><p class="muted-row">Agent tool calls will appear here.</p></div>
+          <div class="trace-identifiers" id="trace-identifiers" hidden></div>
+        </div>
+      </section>
+    </main>
+
+    <div class="toast" id="toast" role="status" aria-live="polite" hidden></div>
+    <script src="/assets/app.js?v=retail-game-v4" defer></script>
+  </body>
+</html>

@@ -1,0 +1,22 @@
+[
+  {
+    "store_id": "store_101",
+    "store_name": "Lakeside Market",
+    "sku": "water_24pk",
+    "product_name": "Bottled water, 24 pack",
+    "shelf_units": 4,
+    "shelf_capacity": 24,
+    "backroom_units": 20,
+    "updated_at": "2026-09-18T08:00:00Z"
+  },
+  {
+    "store_id": "store_205",
+    "store_name": "Hilltop Market",
+    "sku": "water_24pk",
+    "product_name": "Bottled water, 24 pack",
+    "shelf_units": 18,
+    "shelf_capacity": 24,
+    "backroom_units": 70,
+    "updated_at": "2026-09-18T08:00:00Z"
+  }
+]

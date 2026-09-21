@@ -4,11 +4,16 @@ import { join, resolve, dirname } from 'node:path';
 
 const digest = value => createHash('sha256').update(value).digest('hex').slice(0, 24);
 const failure = code => Object.assign(new Error(code), { code });
+function requireLocalFilesystem() {
+  // Windows needs ACL validation and its own durable metadata-write strategy.
+  if (process.platform === 'win32') throw failure('LOCAL_STORAGE_REQUIRES_MACOS_OR_LINUX');
+}
 async function syncDirectory(path) {
   const handle = await open(path, 'r');
   try { await handle.sync(); } finally { await handle.close(); }
 }
 export async function atomicJson(path, value) {
+  requireLocalFilesystem();
   const temporary = `${path}.${randomUUID()}.tmp`;
   const handle = await open(temporary, 'wx', 0o600);
   try {
@@ -30,6 +35,7 @@ export class FileStore {
     this.active = new Map();
   }
   async init() {
+    requireLocalFilesystem();
     await mkdir(this.directory, { recursive: true, mode: 0o700 });
     if ((await stat(this.directory)).mode & 0o077) throw failure('STATE_DIRECTORY_NOT_PRIVATE');
     return this;

@@ -5,30 +5,32 @@ import { tmpdir } from 'node:os';
 import { join } from 'node:path';
 import { execFile } from 'node:child_process';
 import { promisify } from 'node:util';
+import { fileURLToPath } from 'node:url';
 import { FileStore } from '../src/file-store.mjs';
 import { renderLocal } from '../src/local-templates.mjs';
 
 const exec=promisify(execFile);
+const localOnly={skip:process.platform==='win32'?'Live local storage and schedulers require macOS or Linux':false};
 async function temporary(t){const dir=await mkdtemp(join(tmpdir(),'usage-limits-test-'));t.after(()=>rm(dir,{recursive:true,force:true}));return dir;}
-test('fsynced journal is authoritative across process restart and state-cache corruption',async t=>{
+test('fsynced journal is authoritative across process restart and state-cache corruption',localOnly,async t=>{
   const dir=await temporary(t),store=new FileStore(dir),key='synthetic:person';
   await store.withLock(key,()=>store.putState(key,{pending:{amount:'20'}}));
   await writeFile(store.paths(key).state,'broken cache');
   assert.equal((await new FileStore(dir).getState(key)).pending.amount,'20');
   assert.equal((await stat(store.paths(key).journal)).mode&0o077,0);
 });
-test('active and crash-left local locks cannot be stolen',async t=>{
+test('active and crash-left local locks cannot be stolen',localOnly,async t=>{
   const dir=await temporary(t),store=new FileStore(dir),key='synthetic:person';
   await store.withLock(key,()=>assert.rejects(new FileStore(dir).withLock(key,async()=>{}),{code:'LOCAL_LOCK_HELD_RECONCILE_BEFORE_REMOVAL'}));
   await mkdir(store.paths(key).lock,{mode:0o700});
   await assert.rejects(store.withLock(key,async()=>{}),{code:'LOCAL_LOCK_HELD_RECONCILE_BEFORE_REMOVAL'});
 });
-test('partial journal blocks mutation instead of discarding crash evidence',async t=>{
+test('partial journal blocks mutation instead of discarding crash evidence',localOnly,async t=>{
   const dir=await temporary(t),store=new FileStore(dir),key='synthetic:person';
   await writeFile(store.paths(key).journal,'{"partial":',{mode:0o600});
   await assert.rejects(store.withLock(key,()=>store.putState(key,{})),{code:'LOCAL_JOURNAL_INCOMPLETE_REVIEW_REQUIRED'});
 });
-test('local templates use escaped paths and contain preview only, no installation',async t=>{
+test('local templates use escaped paths and contain preview only, no installation',localOnly,async t=>{
   const dir=join(await temporary(t),"folder's space");
   const files=await renderLocal({directory:dir,nodePath:process.execPath,synthetic:true});
   assert.equal(files.length,4);
@@ -37,10 +39,10 @@ test('local templates use escaped paths and contain preview only, no installatio
   if(process.platform==='darwin')await exec('/usr/bin/plutil',['-lint',join(dir,'launchd.plist.disabled')]);
   await assert.rejects(renderLocal({directory:dir,nodePath:process.execPath}),{code:'EEXIST'});
 });
-test('exact CLI offline path captures reviews previews applies replays inspects and restores',async t=>{
+test('exact CLI offline path captures reviews previews applies replays inspects and restores',localOnly,async t=>{
   const dir=await temporary(t);
-  const cli=new URL('../src/cli.mjs',import.meta.url).pathname;
-  const run=async args=>JSON.parse((await exec(process.execPath,[decodeURIComponent(cli),...args],{env:{...process.env,CHATGPT_ADMIN_API_KEY:''}})).stdout);
+  const cli=fileURLToPath(new URL('../src/cli.mjs',import.meta.url));
+  const run=async args=>JSON.parse((await exec(process.execPath,[cli,...args],{env:{...process.env,CHATGPT_ADMIN_API_KEY:''}})).stdout);
   await run(['init','--dir',dir,'--synthetic','--cohort','all','--interval-hours','168','--allow-initial-reduction']);
   const config=join(dir,'config.json'),enrollment=join(dir,'enrollment.json'),state=join(dir,'state');
   const snapshot=await run(['snapshot','--config',config,'--out',enrollment,'--synthetic']);
@@ -58,4 +60,34 @@ test('exact CLI offline path captures reviews previews applies replays inspects 
   assert.equal(restored.results[0].after.cap.amount,'2000');
   await run(['render-local','--dir',dir,'--node',process.execPath,'--synthetic']);
   const preview=JSON.parse((await exec('/bin/sh',[join(dir,'run-preview.sh')])).stdout);assert.equal(preview.results[0].status,'restored_stopped');
+});
+
+test('Windows operational guards reject before filesystem access or API calls; CLI help remains available',async t=>{
+  const directory=join(await temporary(t),'must-stay-absent');
+  const script=`
+    import assert from 'node:assert/strict';
+    import { access } from 'node:fs/promises';
+    import { join } from 'node:path';
+    import { FileStore, atomicJson } from ${JSON.stringify(new URL('../src/file-store.mjs',import.meta.url).href)};
+    import { renderLocal } from ${JSON.stringify(new URL('../src/local-templates.mjs',import.meta.url).href)};
+    import { main } from ${JSON.stringify(new URL('../src/cli.mjs',import.meta.url).href)};
+    Object.defineProperty(process,'platform',{value:'win32'});
+    globalThis.fetch=()=>{throw new Error('API_CALL_FORBIDDEN');};
+    const directory=${JSON.stringify(directory)};
+    assert.ok((await main(['--help'])).commands.includes('run'));
+    await assert.rejects(main(['init','--dir',directory,'--synthetic']),
+      {code:'MACOS_OR_LINUX_REQUIRED_FOR_PRIVATE_STATE'});
+    await assert.rejects(main(['snapshot','--config',join(directory,'config.json'),'--out',join(directory,'enrollment.json')]),
+      {code:'MACOS_OR_LINUX_REQUIRED_FOR_PRIVATE_STATE'});
+    await assert.rejects(import(${JSON.stringify(new URL('../aws/prepare-control.mjs',import.meta.url).href)}),
+      {code:'MACOS_OR_LINUX_REQUIRED_FOR_PRIVATE_STATE'});
+    await assert.rejects(new FileStore(directory).withLock('fictional:user',()=>assert.fail('callback ran')),
+      {code:'LOCAL_STORAGE_REQUIRES_MACOS_OR_LINUX'});
+    await assert.rejects(atomicJson(join(directory,'state.json'),{fictional:true}),
+      {code:'LOCAL_STORAGE_REQUIRES_MACOS_OR_LINUX'});
+    await assert.rejects(renderLocal({directory,nodePath:process.execPath}),
+      {code:'LOCAL_SCHEDULER_REQUIRES_MACOS_OR_LINUX'});
+    await assert.rejects(access(directory),{code:'ENOENT'});
+  `;
+  await exec(process.execPath,['--input-type=module','--eval',script]);
 });

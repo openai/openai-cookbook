@@ -29,6 +29,7 @@ export async function main(args = process.argv.slice(2)) {
   requireThat(!v['allow-initial-reduction'] || command==='init', 'INITIAL_REDUCTION_OPTION_IS_INIT_ONLY');
   if (v.help || !command) return {commands:['init','snapshot','approve','run','restore','resume-auth','cancel-initial','inspect','render-local'],
     help:'See README.md. --synthetic never contacts OpenAI. Live mutations require --apply, config.liveWrites=true and a reviewed enrollment hash.'};
+  requireThat(process.platform !== 'win32', 'MACOS_OR_LINUX_REQUIRED_FOR_PRIVATE_STATE');
   if (command === 'init') {
     requireThat(v.dir,'DIR_REQUIRED');
     const config = exampleConfig({pattern:v.pattern,cohort:v.cohort,unit:v.unit,intervalHours:Number(v['interval-hours']),synthetic:v.synthetic});

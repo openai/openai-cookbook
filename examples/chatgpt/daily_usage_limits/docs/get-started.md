@@ -10,6 +10,14 @@ Try a weekly release plan with three fictional people, then choose the amounts a
 
 You can explore the amounts and schedules immediately by opening `assets/release-explorer.html` in your browser.
 
+| What you want to do | Windows | macOS | Linux |
+| --- | --- | --- | --- |
+| Explore budgets in a browser | Open the HTML file | Open the HTML file | Open the HTML file |
+| Run the fictional example with Node.js 24 or later | PowerShell or Terminal | Terminal | Terminal |
+| Run scheduled changes for your workspace | AWS or a managed Linux host | Managed host or AWS | Managed host or AWS |
+
+The included local service uses macOS or Linux. Windows admins can use their organization's managed Linux environment or [AWS CloudShell](aws.md#choose-your-setup-environment) in a browser to prepare the AWS deployment.
+
 ## Run with Node.js
 
 With Node.js 24 or later installed, open a terminal or PowerShell in the extracted folder and run:
@@ -18,7 +26,9 @@ With Node.js 24 or later installed, open a terminal or PowerShell in the extract
 node src/demo.mjs
 ```
 
-The command uses the files in the starter kit. It previews the first release, applies it to fictional users, advances to the next release, and restores the starting settings. It also simulates an interrupted update and a conflicting admin edit, then shows recovery and restoration.
+On Windows, open the extracted folder in File Explorer, right-click its background, and choose **Open in Terminal**. On macOS or Linux, open Terminal, type `cd `, drag the extracted folder into the window, and press Enter. Paste the command above.
+
+The command uses the files in the starter kit and keeps its example data in memory. It previews the first release, applies it to fictional users, advances to the next release, and restores the starting settings. It also simulates an interrupted update and a conflicting admin edit, then shows recovery and restoration.
 
 Look for each person's 2,000-credit monthly limit changing to a first release of 500, then increasing to 1,000 at the next release. All changes in this example stay in the local simulator.
 

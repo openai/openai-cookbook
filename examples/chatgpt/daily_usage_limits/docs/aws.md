@@ -8,6 +8,17 @@ The template starts with the schedule **disabled** and live writes **off**. It u
 
 Run commands from the extracted starter folder, or from `examples/chatgpt/daily_usage_limits` in the full repository. AWS steps require an approved account and region, AWS CLI v2, deployment permissions, and existing private resources: a versioned S3 artifact bucket, an operations SNS topic with a reachable subscriber, and a Secrets Manager secret. The secret must contain `{"apiKey":"..."}` using a workspace-scoped ChatGPT Admin key with the [required permissions](api-contract.md). Supply the secret through your organization's approved process; do not put its value in source, parameters, command arguments, logs, or this walkthrough. Provision the secret, subscription, and bucket separately. The deployment has no public endpoint.
 
+## Choose your setup environment
+
+Use Bash on macOS or Linux for this walkthrough. From a Windows computer, use your organization's managed Linux host or [AWS CloudShell](https://docs.aws.amazon.com/cloudshell/latest/userguide/welcome.html) in the AWS console. CloudShell provides a Linux terminal in your browser and uses your signed-in AWS identity.
+
+1. Open CloudShell in the approved account and region, then select Bash.
+2. Run `node --version`, `npm --version`, and `aws --version`. Use Node.js 24 or later and AWS CLI v2. Your technology team can provide the approved Node.js runtime when the environment has an older version.
+3. Upload the starter ZIP using **Actions > Upload file**, then run `unzip chatgpt-usage-budget-starter.zip` followed by `cd chatgpt-usage-budget-starter`.
+4. Run `node src/demo.mjs`. You should see the fictional limits move from 2,000 to 500, then 1,000, before restoration to 2,000.
+
+Use CloudShell for setup and inspection. EventBridge Scheduler and Lambda run the deployed controller after the browser session ends. Preserve the private enrollment and configuration records in your organization's approved storage.
+
 ## 1. Check the AWS example locally
 
 ```bash
@@ -17,7 +28,7 @@ npm run package --prefix aws
 
 The tests inject AWS transports and a synthetic Admin API. They exercise the real handler and controller through apply, duplicate delivery, the next interval, and exact restoration. Store tests check that an expired lease holder cannot overwrite state or release a newer holder's lock. Complete the AWS service checks in steps 2 through 6 before enabling recurring changes.
 
-Packaging installs the pinned SDK dependencies with install scripts disabled and writes `aws/dist/controller.zip`, its SHA-256, and `source-manifest.json`. The ZIP contains the runtime's source import graph and dependencies. Review the manifest and exclude private configuration, enrollment, credentials, fixtures, and receipts. Upload is a separate step below.
+Packaging works in PowerShell or a terminal on Windows, macOS, and Linux. It installs the pinned SDK dependencies with install scripts disabled and writes `aws/dist/controller.zip`, its SHA-256, and `source-manifest.json`. Node.js creates the archive directly. The ZIP contains the runtime's source import graph and dependencies. Review the manifest and exclude private configuration, enrollment, credentials, fixtures, and receipts. Continue the preparation and deployment commands below in Bash on macOS or Linux.
 
 For an optional local CloudFormation syntax and schema check, install `cfn-lint` in an isolated environment and run:
 
@@ -48,7 +59,7 @@ The preparation command prints a `ControlSha256` that binds the complete configu
 
 ## 2. Prepare a disabled cloud pilot
 
-The following steps upload code and create billable AWS resources. Perform them only after the account owner approves the account, region, resource ownership, cost, expiry, and deployment role. Set `AWS_PROFILE` and `AWS_REGION` to the approved CLI profile and region. Use a deployment role; do not paste AWS access keys into files.
+The following steps upload code and create billable AWS resources. Perform them only after the account owner approves the account, region, resource ownership, cost, expiry, and deployment role. Set `AWS_REGION` to the approved region. Set `AWS_PROFILE` when using a named local CLI profile; CloudShell uses your signed-in AWS identity. Use a deployment role; do not paste AWS access keys into files.
 
 1. Run `aws sts get-caller-identity`. Confirm the returned account and role. Check that the existing artifact bucket is private and versioned, and that the secret and SNS topic are in the intended account and region. If a customer-managed KMS key protects the secret, obtain its ARN and confirm its key policy permits the generated runtime role.
 2. Set the nonsecret shell variables `DAILY_LIMIT_STACK`, `DAILY_LIMIT_CODE_BUCKET`, and `DAILY_LIMIT_CODE_KEY` to the reviewed stack name, artifact bucket, and a unique object key. Upload the ZIP:

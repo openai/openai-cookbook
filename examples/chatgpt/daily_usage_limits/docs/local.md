@@ -2,6 +2,8 @@
 
 Use your computer to rehearse the approach or test it with a small group. For ongoing workspace credit management, use a virtual machine or server operated by your organization, with monitoring and a team responsible for keeping it available. Choose the macOS or Linux scheduler procedure below.
 
+This guide's commands run on macOS or Linux. From Windows, start with the [PowerShell demonstration](get-started.md#run-with-nodejs), then use your organization's managed Linux host or the [AWS setup path](aws.md#choose-your-setup-environment) for a live pilot.
+
 Use a local scheduler to invoke the same controller without a model in the execution path. The host needs Node.js 24 or later, durable private storage on its local filesystem, and a credential provider that works under the scheduled service's identity. A sleeping or unavailable host can delay execution; the fixed policy catches up to the current interval when the host returns.
 
 Prepare a fictional rehearsal and **uninstalled preview templates**. Review service installation and real changes in step 3. Run them from the extracted starter folder, or from `examples/chatgpt/daily_usage_limits` in the full repository.
@@ -154,6 +156,8 @@ Confirm that the final command reports the service as absent. Revoke the dedicat
 ### Linux: an encrypted credential and a user systemd timer
 
 This path requires systemd 256 or later with working user-scoped encrypted credentials. Confirm `systemd-creds --version` and the host's supported credential configuration. User credentials use `--user`, and `LoadCredentialEncrypted` makes the decrypted value available only to the service at runtime. See the [systemd credential tool reference](https://github.com/systemd/systemd/blob/main/man/systemd-creds.xml). Do not fall back to null-key encryption or a plaintext environment file if the host cannot decrypt the credential.
+
+The service also uses `PrivateTmp`, which requires user-namespace support for a user service. Verify both features under the service identity with the manual preview in step 4 before enabling its timer.
 
 1. After credential storage is authorized, run this in Bash as the intended service user. Enter the dedicated key at the hidden prompt. The pipeline writes an encrypted credential file:
 

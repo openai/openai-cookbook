@@ -40,6 +40,8 @@ Unused released credits remain available within the month. You choose the total 
 
 [Download the starter kit](https://raw.githubusercontent.com/openai/openai-cookbook/codex/daily-usage-limits/examples/chatgpt/daily_usage_limits/assets/chatgpt-usage-budget-starter.zip) and extract the folder. Choose the path that fits the tools available to you.
 
+The browser example and fictional demonstration work on **Windows, macOS, and Linux**. The starter kit includes the source, guides, tests, and illustrations from this GitHub example.
+
 | Your setup | Start here |
 | --- | --- |
 | You have Node.js 24 or later and use a terminal or PowerShell. | [Run the example](https://github.com/openai/openai-cookbook/blob/codex/daily-usage-limits/examples/chatgpt/daily_usage_limits/docs/get-started.md#run-with-nodejs) with one command. |
@@ -70,10 +72,12 @@ For ongoing workspace credit management, run the program on **organization-manag
 | Next step | Guide |
 | --- | --- |
 | Test a scheduled Codex pilot | [Set up a Codex pilot](https://github.com/openai/openai-cookbook/blob/codex/daily-usage-limits/examples/chatgpt/daily_usage_limits/docs/codex.md) |
-| Run on a managed computer or server | [Set up a managed host](https://github.com/openai/openai-cookbook/blob/codex/daily-usage-limits/examples/chatgpt/daily_usage_limits/docs/local.md) |
+| Run on a managed macOS or Linux computer or server | [Set up a managed host](https://github.com/openai/openai-cookbook/blob/codex/daily-usage-limits/examples/chatgpt/daily_usage_limits/docs/local.md) |
 | Deploy using your AWS account | [Deploy on AWS](https://github.com/openai/openai-cookbook/blob/codex/daily-usage-limits/examples/chatgpt/daily_usage_limits/docs/aws.md) |
 
 The AWS guide includes a deployment template and setup instructions. Your technical team can adapt the program to other infrastructure your organization operates.
+
+For Windows admins, the AWS guide provides a browser-based setup path through AWS CloudShell. Live local scheduling uses the included macOS or Linux service setup.
 
 ## Prepare a reviewed enrollment
 

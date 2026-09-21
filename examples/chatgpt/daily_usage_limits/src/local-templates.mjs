@@ -5,6 +5,9 @@ import { requireThat } from './policy.mjs';
 
 export async function renderLocal({ directory, nodePath, intervalMinutes = 60, synthetic = false,
   credentialProvider, keychainService, keychainAccount, encryptedCredential }) {
+  // Templates embed this checkout's native paths; Windows-to-POSIX path mapping
+  // is not supported. Generate them on the macOS or Linux host that will run them.
+  requireThat(process.platform !== 'win32', 'LOCAL_SCHEDULER_REQUIRES_MACOS_OR_LINUX');
   const dir = resolve(directory);
   const root = fileURLToPath(new URL('../', import.meta.url)).replace(/\/$/, '');
   requireThat(isAbsolute(nodePath) && !/[\r\n]/.test(nodePath + dir + root), 'ABSOLUTE_NODE_PATH_REQUIRED');

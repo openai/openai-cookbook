@@ -2,14 +2,21 @@ import test from 'node:test';
 import assert from 'node:assert/strict';
 import { EventEmitter } from 'node:events';
 import { constants as fsConstants } from 'node:fs';
+import { join, resolve } from 'node:path';
+import { fileURLToPath } from 'node:url';
 import { parseCredentialArgs, runWithCredentials } from '../src/credential-runner.mjs';
 
 const SECRET = 'synthetic-secret-for-launcher-tests';
+const FIXTURE_DIR = resolve('credential-runner-fixtures');
+const CONFIG_PATH = join(FIXTURE_DIR, 'config.json');
+const ENROLLMENT_PATH = join(FIXTURE_DIR, 'enrollment.json');
+const STATE_PATH = join(FIXTURE_DIR, 'state');
+const CREDENTIALS_DIRECTORY = join(FIXTURE_DIR, 'credentials', 'example.service');
+const CLI_PATH = fileURLToPath(new URL('../src/cli.mjs', import.meta.url));
 const base = ['run', '--provider', 'keychain', '--service', 'usage-limit-example', '--account', 'automation',
-  '--config', '/private/example/config.json', '--enrollment', '/private/example/enrollment.json',
-  '--state', '/private/example/state'];
-const systemd = ['run', '--provider', 'systemd', '--config', '/private/example/config.json',
-  '--enrollment', '/private/example/enrollment.json', '--state', '/private/example/state'];
+  '--config', CONFIG_PATH, '--enrollment', ENROLLMENT_PATH, '--state', STATE_PATH];
+const systemd = ['run', '--provider', 'systemd', '--config', CONFIG_PATH,
+  '--enrollment', ENROLLMENT_PATH, '--state', STATE_PATH];
 const rejectsCode = (promise, code) => assert.rejects(promise, error => error.code === code && error.message === code);
 
 function harness({ code = 0, signal = null, onSpawn, onExec, onOpen, platform = 'darwin', env,
@@ -23,7 +30,7 @@ function harness({ code = 0, signal = null, onSpawn, onExec, onOpen, platform = 
   const buffer = Buffer.from(secret);
   const dependencies = {
     platform, uid: 1000, env: env ?? { PATH: '/usr/bin', NODE_OPTIONS: '--import=untrusted.mjs',
-      NODE_PATH: '/untrusted', CREDENTIALS_DIRECTORY: '/run/credentials/example.service' },
+      NODE_PATH: '/untrusted', CREDENTIALS_DIRECTORY },
     signalSource,
     stdout: { write: value => { calls.stdout += value; } },
     stderr: { write: value => { calls.stderr += value; } },
@@ -59,9 +66,9 @@ test('Keychain retrieval uses fixed executable and argument vector; child enviro
   assert.equal(h.calls.exec[0].path, '/usr/bin/security');
   assert.equal(h.calls.exec[0].options.shell, false);
   assert.equal(h.calls.spawn[0].path, process.execPath);
-  assert.ok(h.calls.spawn[0].args[0].endsWith('/src/cli.mjs'));
-  assert.deepEqual(h.calls.spawn[0].args.slice(1), ['run', '--config', '/private/example/config.json',
-    '--enrollment', '/private/example/enrollment.json', '--state', '/private/example/state']);
+  assert.equal(h.calls.spawn[0].args[0], CLI_PATH);
+  assert.deepEqual(h.calls.spawn[0].args.slice(1), ['run', '--config', CONFIG_PATH,
+    '--enrollment', ENROLLMENT_PATH, '--state', STATE_PATH]);
   assert.equal(h.calls.spawn[0].options.env.CHATGPT_ADMIN_API_KEY, SECRET);
   assert.equal(h.calls.spawn[0].options.env.NODE_OPTIONS, undefined);
   assert.equal(h.calls.spawn[0].options.env.NODE_PATH, undefined);
@@ -82,8 +89,8 @@ test('service and account shell characters remain literal arguments', async () =
 
 test('snapshot and restore are allowlisted; --apply is explicit for writes', () => {
   const snapshot = parseCredentialArgs(['snapshot', '--provider', 'keychain', '--service', 'example',
-    '--account', 'operator', '--config', '/config.json', '--out', '/enrollment.json']);
-  assert.deepEqual(snapshot.cliArgs, ['snapshot', '--config', '/config.json', '--out', '/enrollment.json']);
+    '--account', 'operator', '--config', CONFIG_PATH, '--out', ENROLLMENT_PATH]);
+  assert.deepEqual(snapshot.cliArgs, ['snapshot', '--config', CONFIG_PATH, '--out', ENROLLMENT_PATH]);
   const restore = parseCredentialArgs(['restore', ...base.slice(1), '--apply']);
   assert.equal(restore.cliArgs[0], 'restore');
   assert.equal(restore.cliArgs.at(-1), '--apply');
@@ -99,8 +106,8 @@ test('unknown flags, synthetic mode, unexpected commands and incompatible provid
   for (const args of [
     [...base, '--synthetic'], [...base, '--command', 'sh'], ['inspect', ...base.slice(1)],
     [...base, 'restore'], [...systemd, '--service', 'example'],
-    ['snapshot', '--provider', 'systemd', '--config', '/config.json', '--out', '/enrollment.json', '--apply'],
-    ['snapshot', '--provider', 'systemd', '--config', '/config.json'],
+    ['snapshot', '--provider', 'systemd', '--config', CONFIG_PATH, '--out', ENROLLMENT_PATH, '--apply'],
+    ['snapshot', '--provider', 'systemd', '--config', CONFIG_PATH],
   ]) {
     const h = harness();
     await assert.rejects(runWithCredentials(args, h.dependencies));
@@ -113,8 +120,8 @@ test('unknown flags, synthetic mode, unexpected commands and incompatible provid
 test('provider platform mismatch and missing identities stop before retrieval', async () => {
   await rejectsCode(runWithCredentials(base, harness({ platform: 'linux' }).dependencies), 'KEYCHAIN_REQUIRES_MACOS');
   await rejectsCode(runWithCredentials(systemd, harness().dependencies), 'SYSTEMD_REQUIRES_LINUX');
-  assert.throws(() => parseCredentialArgs(['run', '--provider', 'keychain', '--config', '/config.json',
-    '--enrollment', '/enrollment.json', '--state', '/state']), /KEYCHAIN_IDENTITY_REQUIRED/);
+  assert.throws(() => parseCredentialArgs(['run', '--provider', 'keychain', '--config', CONFIG_PATH,
+    '--enrollment', ENROLLMENT_PATH, '--state', STATE_PATH]), /KEYCHAIN_IDENTITY_REQUIRED/);
 });
 
 test('Keychain errors and invalid secret values never become logs or child arguments', async () => {
@@ -134,7 +141,7 @@ test('Keychain errors and invalid secret values never become logs or child argum
 test('systemd opens only the fixed credential name with no-follow and checks descriptor permissions', async () => {
   const h = harness({ platform: 'linux' });
   await runWithCredentials(systemd, h.dependencies);
-  assert.deepEqual(h.calls.open, [{ path: '/run/credentials/example.service/chatgpt-admin-key',
+  assert.deepEqual(h.calls.open, [{ path: join(CREDENTIALS_DIRECTORY, 'chatgpt-admin-key'),
     flags: fsConstants.O_RDONLY | fsConstants.O_NOFOLLOW | fsConstants.O_NONBLOCK }]);
   assert.equal(h.calls.exec.length, 0);
   assert.equal(h.calls.closed, 1);

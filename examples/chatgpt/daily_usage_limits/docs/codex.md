@@ -2,6 +2,8 @@
 
 Start with [the Codex setup request](get-started.md#let-codex-help). Open the extracted starter folder in Codex and run the demonstration with fictional people. Review the release plan, then choose the amounts and schedule for your organization.
 
+The demonstration runs on Windows, macOS, and Linux. The commands below for saved enrollments and live pilots require a macOS or Linux runtime. On Windows, use Codex to explore the example and prepare your [managed environment setup](get-started.md#use-a-managed-environment).
+
 If the folder is already open in Codex, paste:
 
 ```text

@@ -1,6 +1,6 @@
 # Configure and operate the usage-budget controller
 
-Use this guide after choosing a budget, release schedule, and initial group. The controller is the program that calculates and applies each person's limit. Run the commands from the downloaded starter folder, or from `examples/chatgpt/daily_usage_limits` in the repository. This implementation requires Node.js 24 or later.
+Use this guide after choosing a budget, release schedule, and initial group. The controller is the program that calculates and applies each person's limit. Run the commands on macOS or Linux with Node.js 24 or later, from the downloaded starter folder or `examples/chatgpt/daily_usage_limits` in the repository. Windows admins can use a managed Linux host or the [AWS CloudShell setup path](aws.md#choose-your-setup-environment).
 
 Start with [the browser example or Codex setup](get-started.md) if you have not run the fictional demonstration yet.
 

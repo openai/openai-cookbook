@@ -1,23 +1,20 @@
 import assert from 'node:assert/strict';
-import { mkdtemp, rm } from 'node:fs/promises';
-import { tmpdir } from 'node:os';
-import { join } from 'node:path';
-import { exampleConfig, createSyntheticApi } from './synthetic.mjs';
-import { FileStore } from './file-store.mjs';
+import { exampleConfig, createSyntheticApi, MemoryStore } from './synthetic.mjs';
 import { captureEnrollment, approveEnrollment } from './enrollment.mjs';
 import { execute } from './controller.mjs';
 
 // All dates, identities, usage, responses and failures here are fictional.
 let now='2030-01-02T00:00:00.000Z';
-const directory=await mkdtemp(join(tmpdir(),'chatgpt-usage-limit-demo-'));
-try {
+{
   const config=exampleConfig({now,cohort:'all',intervalHours:168});
   // The fictional operator approves restricting the original monthly cap before capture.
   config.allowInitialReduction=true;
   const api=createSyntheticApi({config,clock:()=>now});
   const {enrollment:captured,hash}=await captureEnrollment({config,api,now});
   const enrollment=approveEnrollment(captured,hash,now);
-  const run=(options={})=>execute({config,enrollment,api,store:new FileStore(directory),now,...options});
+  // This store lasts only for this fictional run. Live runners require durable storage.
+  const store=new MemoryStore();
+  const run=(options={})=>execute({config,enrollment,api,store,now,...options});
   const preview=await run();
   console.log('Demo: 2,000 credits per person per month; release 500 weekly.');
   console.log('Simulated workspace: a full monthly allowance can be used early. This reviewed policy releases it in steps.');
@@ -41,8 +38,6 @@ try {
   delete api.users['synthetic-user-a'].settings.effective.source.changedBy;
   assert.equal((await run({apply:true,restore:true})).ok,true);
   assert.ok(Object.values(api.users).every(user=>user.cap.amount==='2000'&&user.cap.source==='workspace_default'));
-  console.log('Restored the original inherited 2,000-credit cap for every fictional user. Durable local journals exercised.');
-} finally {
-  await rm(directory,{recursive:true,force:true});
-  console.log('Temporary demo files removed.');
+  console.log('Restored the original inherited 2,000-credit cap for every fictional user.');
+  console.log('Demo complete. All simulated state stayed in memory.');
 }

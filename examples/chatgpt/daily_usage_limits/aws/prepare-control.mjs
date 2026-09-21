@@ -2,8 +2,11 @@ import { readFileSync, writeFileSync } from 'node:fs';
 import { resolve } from 'node:path';
 import { hash } from './store.mjs';
 import { validateEnrollment } from '../src/enrollment.mjs';
+import { requireThat } from '../src/policy.mjs';
 
 // Only creates a private local item. Upload is a separate, explicit AWS CLI operation.
+// Windows requires an ACL-aware writer for the private enrollment document.
+requireThat(process.platform !== 'win32', 'MACOS_OR_LINUX_REQUIRED_FOR_PRIVATE_STATE');
 const [configPath, enrollmentPath, deploymentId, outputPath] = process.argv.slice(2);
 if (!configPath || !enrollmentPath || !outputPath ||
     !/^[a-z][a-z0-9-]{2,39}$/.test(deploymentId ?? '')) {

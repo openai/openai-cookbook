@@ -31,6 +31,14 @@ Expect preview receipts, then simulator changes, then `duplicate_slot` for all t
 
 To rehearse observed headroom, initialize a separate directory using `--pattern observed_headroom --cohort selected --unit usd --interval-hours 24 --synthetic`, then repeat the snapshot, approval, preview, apply, duplicate, and restore steps with that directory. Review `lookbackDays`, `coverageHours`, and `multiplierBps` in its configuration. Native USD calculations use USD throughout.
 
+To try [individual starting limits](operations.md#individual-starting-limits) for a midmonth rollout, initialize another private rehearsal:
+
+```bash
+node src/cli.mjs init --dir .private/individual-rehearsal --pattern individual_staircase --cohort all --unit credit --interval-hours 24 --synthetic --allow-initial-reduction
+```
+
+Review `initialHeadroom`, `minimumInitialHeadroom`, `increment`, and `ceiling` in its configuration, then repeat the snapshot, approval, preview, apply, duplicate, and restore steps with `.private/individual-rehearsal`. The snapshot records a separate starting cap for each fictional person based on their observed monthly usage.
+
 ## 2. Generate and inspect the scheduler files
 
 Find the runtime's absolute path with `command -v node`. Substitute that path for `/ABSOLUTE/PATH/TO/node`:
@@ -255,7 +263,8 @@ Expect no scheduled timer and `not-found` from the final command. Revoke the ded
 | Email or group selection changed | Pause new grants. Review the resolved membership and prepare a new enrollment after reconciling or restoring the existing one. Restoration uses the original enrolled IDs. |
 | Conflicting manual edit or policy/enrollment mismatch | Pause the scheduler. Compare live settings, enrollment, and journal before approving another action. |
 | Pending or ambiguous write | Rerun the same operation only after inspecting the saved absolute target and current state. Use readback to check whether the saved target was applied. |
-| Initial reduction review expired | A reduction cannot be retried after its configured review window or interval slot ends. Inspect whether the saved target took effect; reconcile an applied change, or cancel an untouched initial operation using the procedure below. |
+| Initial review expired | Initial reductions and first writes for individual starting limits cannot be retried after their configured review window or interval slot ends. Inspect whether the saved target took effect; reconcile an applied change, or cancel an untouched initial operation using the procedure below. |
+| Insufficient initial headroom | Compare current usage, the reviewed starting cap, and the ceiling. If an initial intent was saved, reconcile or cancel it before preparing a new review. |
 | Authentication or authorization failure | Repair the dedicated credential or permissions through the approved process. Use `resume-auth` below to read current state and clear the halt, then preview the same pending operation. |
 | Rate limit | Respect the recorded retry time. Do not shorten it by changing the scheduler. |
 | Stale lock, incomplete journal, or corrupted journal | Stop all writers and reconcile saved intent against the API. Preserve evidence; deleting state can lose the original settings or repeat an operation. |
@@ -269,11 +278,11 @@ After repairing authentication, clear an authorization halt with a read-only rec
 node src/cli.mjs resume-auth --config .private/pilot/config.json --enrollment .private/pilot/enrollment.json --state .private/pilot/state
 ```
 
-The command checks the saved pending operation against current API state and clears the halt only when they agree. It preserves the cap and updates the local recovery record. For Keychain or systemd, use `src/credential-runner.mjs resume-auth` with the same provider and path flags shown above. Preview before retrying an authorized apply; keep the existing journal. Initial reductions retain their original configured review deadline and policy slot after authentication recovery. A previously saved exact increase can be retried after that window; its target is preserved.
+The command checks the saved pending operation against current API state and clears the halt only when they agree. It preserves the cap and updates the local recovery record. For Keychain or systemd, use `src/credential-runner.mjs resume-auth` with the same provider and path flags shown above. Preview before retrying an authorized apply; keep the existing journal. Initial reductions and first writes for individual starting limits retain their original configured review deadline and policy slot after authentication recovery. A previously saved exact increase for fixed releases or observed headroom can be retried after that window; its target is preserved.
 
 ### Cancel an unapplied initial operation
 
-A failed API request can leave a saved initial reduction. The controller blocks retries when the review expires before that target is applied. Use `cancel-initial` to close that member's untouched initial operation while preserving the cohort's journal.
+A failed API request can leave a saved initial operation. Initial reductions and first writes for individual starting limits cannot be retried after their review expires. Use `cancel-initial` to close that member's untouched initial operation while preserving the cohort's journal.
 
 1. Pause the scheduler, confirm no run is active, and set `liveWrites: false`. Inspect receipts and the saved pending target. Complete any required authentication recovery first. These commands require the same confirmed, still-current usage period.
 2. Run the following with the approved credential provider supplying the key. Do not add `--apply`:

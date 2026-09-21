@@ -1,4 +1,4 @@
-import { digest, configDigest, validateConfig, validateSnapshot, planTarget, historyRange, requireThat, time, approvalWindowMs } from './policy.mjs';
+import { digest, configDigest, validateConfig, validateSnapshot, planTarget, historyRange, requireThat, time, approvalWindowMs, deriveStartingCap } from './policy.mjs';
 import { resolveCohort, validateSavedSelection } from './selection.mjs';
 
 export function enrollmentHash(enrollment) {
@@ -20,6 +20,15 @@ export function validateEnrollment(config, enrollment, now, approved = false) {
   const ids = enrollment.members.map(member => member.userId);
   requireThat(ids.every(id => typeof id === 'string' && id.length > 0) && new Set(ids).size === ids.length, 'COHORT_DUPLICATES');
   validateSavedSelection(config, enrollment);
+  if (config.policy.pattern === 'individual_staircase') {
+    for (const member of enrollment.members) {
+      requireThat(member.before?.workspaceId === config.workspaceId && member.before.userId === member.userId,
+        'ENROLLMENT_IDENTITY_MISMATCH');
+      requireThat(member.startCap === deriveStartingCap(config, member.before), 'INDIVIDUAL_START_CAP_MISMATCH');
+      const plan = planTarget(config, member.before, enrollment.capturedAt, undefined, { startCap: member.startCap });
+      requireThat(digest(member.plan) === digest(plan), 'INDIVIDUAL_PLAN_MISMATCH');
+    }
+  }
   if (enrollment.completedAt) requireThat(time(enrollment.completedAt) >= time(enrollment.capturedAt) &&
     time(enrollment.completedAt) <= time(now), 'ENROLLMENT_CAPTURE_TIME_INVALID');
   if (approved) requireThat(enrollment.approval?.hash === enrollmentHash(enrollment) && time(enrollment.approval.reviewedAt) <= time(now), 'ENROLLMENT_APPROVAL_REQUIRED');
@@ -40,9 +49,11 @@ export async function captureEnrollment({ config, api, now: fixedNow, clock = ()
         const before = await api.readSnapshot(userId);
         validateSnapshot(before, config, userId, readNow());
         const history = config.policy.pattern === 'observed_headroom' ? await api.readHistory(userId, historyRange(config, now)) : undefined;
-        const plan = planTarget(config, before, readNow(), history);
+        const individual = config.policy.pattern === 'individual_staircase';
+        const startCap = individual ? deriveStartingCap(config, before) : undefined;
+        const plan = planTarget(config, before, readNow(), history, { startCap });
         requireThat(plan.slot === context.slot, 'CAPTURE_SLOT_CHANGED_RECAPTURE');
-        members[index] = { userId, before, plan };
+        members[index] = { userId, before, plan, ...(individual ? { startCap } : {}) };
       } catch (caught) { error ??= caught; }
     }
   }));

@@ -42,9 +42,12 @@ function applySettings(user, settings) {
 }
 
 async function fixture({ original = 'group', cohort = 'selected', selectors,
-  intervalHours = 168, initialReviewMaxAgeMinutes = 15 } = {}) {
+  intervalHours = 168, initialReviewMaxAgeMinutes = 15, pattern = 'fixed_release' } = {}) {
   let now = FIRST_NOW;
-  const config = exampleConfig({ now, intervalHours, cohort });
+  const config = exampleConfig({ now, intervalHours, cohort, pattern });
+  if (pattern === 'individual_staircase') {
+    Object.assign(config.policy, { initialHeadroom: '500', minimumInitialHeadroom: '100', increment: '500', ceiling: '5000' });
+  }
   config.allowInitialReduction = true;
   config.initialReviewMaxAgeMinutes = initialReviewMaxAgeMinutes;
   if (selectors) config.cohort = clone(selectors);
@@ -500,5 +503,27 @@ test('slow prior-state reads cannot extend the review window or cross a release 
       return getState(key);
     };
     await assertCaptureBlocked(s, { now: undefined, clock: () => s.now });
+  }
+});
+
+test('individual releases recapture each new-period starting limit and retain restoration originals', async () => {
+  const s = await fixture({ pattern: 'individual_staircase', intervalHours: 24 });
+  assert.deepEqual(s.enrollment.members.map(member => member.startCap), ['623', '623']);
+  const oldStates = await Promise.all(s.ids.map(id => s.store.getState(s.key(id))));
+  s.enterNextPeriod();
+  s.api.users[s.ids[1]].usage = '10';
+  const renewed = approve(await s.capture());
+  assert.deepEqual(renewed.enrollment.members.map(member => member.startCap), ['502', '510']);
+  assert.equal((await s.run(renewed)).ok, true);
+  assert.equal(s.store.archives.length, 2);
+  for (let i = 0; i < s.ids.length; i += 1) {
+    assert.deepEqual((await s.store.getState(s.key(s.ids[i]))).original, oldStates[i].original);
+  }
+  s.setTime('2030-02-02T00:00:00.000Z');
+  assert.equal((await s.run(renewed)).ok, true);
+  assert.deepEqual(s.ids.map(id => s.api.users[id].cap.amount), ['1002', '1010']);
+  assert.equal((await s.run(renewed, { restore: true })).ok, true);
+  for (let i = 0; i < s.ids.length; i += 1) {
+    assert.ok(settingsEquivalent(s.api.users[s.ids[i]].settings, oldStates[i].original.settings, s.config.unit));
   }
 });

@@ -66,14 +66,19 @@ export function validatePolicy(config, now) {
     requireThat(date.getUTCDate() === 1 && end === Date.UTC(date.getUTCFullYear(), date.getUTCMonth() + 1, 1), 'CALENDAR_PERIOD_INVALID');
   }
   const p = config.policy;
-  requireThat(['fixed_release', 'observed_headroom'].includes(p?.pattern), 'PATTERN_INVALID');
+  requireThat(['fixed_release', 'observed_headroom', 'individual_staircase'].includes(p?.pattern), 'PATTERN_INVALID');
   requireThat(Number.isInteger(p.intervalHours) && p.intervalHours >= 1 && p.intervalHours <= 744, 'INTERVAL_INVALID');
   const anchor = time(p.anchor);
   requireThat(anchor >= start && anchor < end, 'ANCHOR_OUTSIDE_PERIOD');
   requireThat(current >= anchor, 'BEFORE_POLICY_ANCHOR');
   const ceiling = capAmount(p.ceiling, config.unit);
-  const seed = capAmount(p.startCap, config.unit);
-  requireThat(seed <= ceiling && capAmount(p.increment, config.unit) > 0n, 'RELEASE_BOUNDS_INVALID');
+  requireThat(capAmount(p.increment, config.unit) > 0n, 'RELEASE_BOUNDS_INVALID');
+  if (p.pattern === 'individual_staircase') {
+    requireThat(!Object.hasOwn(p, 'startCap') && !Object.hasOwn(p, 'startCaps'), 'AMBIGUOUS_START_CAP');
+    const initial = capAmount(p.initialHeadroom, config.unit);
+    const minimum = capAmount(p.minimumInitialHeadroom, config.unit);
+    requireThat(initial > 0n && minimum > 0n && minimum <= initial && minimum <= ceiling, 'INITIAL_HEADROOM_INVALID');
+  } else requireThat(capAmount(p.startCap, config.unit) <= ceiling, 'RELEASE_BOUNDS_INVALID');
   if (p.pattern === 'observed_headroom') {
     requireThat(Number.isInteger(p.lookbackDays) && p.lookbackDays >= 1 && p.lookbackDays <= 30, 'LOOKBACK_INVALID');
     requireThat(Number.isInteger(p.coverageHours) && p.coverageHours >= 1 && p.coverageHours <= 744, 'COVERAGE_HOURS_INVALID');
@@ -112,12 +117,34 @@ export function historyRange(config, now) {
   const end = Math.floor(time(now) / DAY) * DAY;
   return { start: new Date(end - config.policy.lookbackDays * DAY).toISOString(), end: new Date(end).toISOString(), unit: config.unit };
 }
-export function planTarget(config, snapshot, now, history) {
+
+export function validateInitialHeadroom(config, snapshot, target) {
+  if (config.policy.pattern !== 'individual_staircase') return;
+  requireThat(snapshot.unit === config.unit, 'UNIT_TRANSITION_REQUIRES_REENROLLMENT');
+  requireThat(capAmount(target, config.unit) >= amount(snapshot.usage) + capAmount(config.policy.minimumInitialHeadroom, config.unit),
+    'INITIAL_HEADROOM_TOO_LOW_RECAPTURE');
+}
+
+// Enrollment freezes this value for the period. Later usage never rebases it.
+export function deriveStartingCap(config, snapshot) {
+  requireThat(config.policy.pattern === 'individual_staircase', 'INDIVIDUAL_PATTERN_REQUIRED');
+  const rounded = ceilDiv(amount(snapshot.usage) + capAmount(config.policy.initialHeadroom, config.unit), quantum(config.unit)) * quantum(config.unit);
+  const startCap = format(min(rounded, capAmount(config.policy.ceiling, config.unit)));
+  validateInitialHeadroom(config, snapshot, startCap);
+  return startCap;
+}
+
+export function planTarget(config, snapshot, now, history, { startCap } = {}) {
   const { slot, ceiling } = validatePolicy(config, now);
   const p = config.policy;
   let desired;
   let observedDailyAverage;
-  if (p.pattern === 'fixed_release') {
+  if (p.pattern === 'individual_staircase') {
+    requireThat(typeof startCap === 'string', 'INDIVIDUAL_START_CAP_REQUIRED');
+    const seed = capAmount(startCap, config.unit);
+    requireThat(seed <= ceiling, 'RELEASE_BOUNDS_INVALID');
+    desired = seed + BigInt(slot) * amount(p.increment);
+  } else if (p.pattern === 'fixed_release') {
     desired = amount(p.startCap) + BigInt(slot) * amount(p.increment);
   } else {
     const range = historyRange(config, now);
@@ -142,6 +169,7 @@ export function planTarget(config, snapshot, now, history) {
   }
   const target = min(desired, ceiling);
   return { pattern: p.pattern, slot, slotId: `${config.period.start}/${p.anchor}/${p.intervalHours}/${slot}`,
+    ...(p.pattern === 'individual_staircase' ? { startCap, minimumInitialHeadroom: p.minimumInitialHeadroom } : {}),
     amount: format(target), unit: config.unit, ceiling: p.ceiling,
     headroom: format(max(0n, target - amount(snapshot.usage))),
     shortfall: format(max(0n, desired - target)), observedDailyAverage,

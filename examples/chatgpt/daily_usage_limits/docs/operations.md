@@ -9,6 +9,7 @@ Start with [the browser example or Codex setup](get-started.md) if you have not 
 | Pattern | Use it when | How the cap changes |
 | --- | --- | --- |
 | **Fixed budget release** (`fixed_release`) | Start here for a predictable release plan for selected people or a broad cohort. | Release a configured increment each elapsed interval, up to the monthly ceiling, using the schedule and amount you choose. |
+| **Individual starting limits** (`individual_staircase`) | Introduce scheduled limits during a month when people have already used different amounts. | Give each person initial headroom above their recorded usage, then add the configured increment each interval, up to the monthly ceiling. |
 | **Observed usage headroom** (`observed_headroom`) | You want a reviewed power-user cohort to receive headroom based on recent observed usage. | Use recent consumption to estimate the next cap, within the monthly ceiling. |
 
 ### Fixed budget release
@@ -21,6 +22,30 @@ target cap = min(ceiling, start cap + slot × increment)
 For a start cap of 500 credits, a weekly increment of 500, and a 2,000-credit ceiling, the targets are 500, 1,000, 1,500, and 2,000. The controller sets that cumulative monthly limit through the [ChatGPT Admin API](https://chatgpt.com/public/admin/api-reference). A repeated run in the same week keeps the same target. If a scheduled run is missed, the next run sets the target for the current week.
 
 Choose `intervalHours: 24` for daily releases, `168` for weekly, `336` for every two weeks, or another whole-hour interval from 1 through 744. Set the increment alongside the interval: for this example, 500 weekly or 1,000 every two weeks. The controller measures intervals in elapsed UTC hours. The scheduler can check more frequently than the release interval.
+
+### Individual starting limits
+
+Use `individual_staircase` when you want to begin a release plan partway through the month. Capture reads each person's current monthly usage and calculates a starting limit with the headroom you choose:
+
+```text
+reviewed starting cap = min(ceiling, round up(observed period usage + initialHeadroom))
+target cap = min(ceiling, reviewed starting cap + slot × increment)
+```
+
+The slot counts complete intervals since the UTC anchor. Round up to whole credits or USD cents, using the workspace's native unit. Capture saves each starting cap as `member.startCap` in the enrollment for review. Later usage does not recalculate that value during the period. Repeated runs in a slot keep the same target, and a missed run catches up to the current slot.
+
+Initialize this policy with `--pattern individual_staircase`. Its configuration uses the headroom settings below; the enrollment supplies the individual starting caps. Omit `startCap` and `startCaps` from the policy configuration.
+
+For a daily plan, choose `initialHeadroom: "500"`, `minimumInitialHeadroom: "100"`, `increment: "500"`, `ceiling: "2000"`, and `intervalHours: 24`. With the anchor set to the start of the plan, two people's limits would look like this:
+
+| Monthly usage at capture | Starting limit | Limit after one day | Monthly maximum |
+| --- | ---: | ---: | ---: |
+| 800 credits | 1,300 | 1,800 | 2,000 |
+| 1,200 credits | 1,700 | 2,000 | 2,000 |
+
+`minimumInitialHeadroom` is the least capacity the starting limit must leave above observed usage. In this example, someone who has already used 1,950 credits cannot receive 100 more within the 2,000-credit ceiling, so capture stops for review. Both headroom settings must be positive, and the minimum cannot exceed `initialHeadroom` or the ceiling. The controller checks the remaining headroom again before the first write.
+
+Review any reduction from an existing limit and use the same initial-reduction approval as other policies. This pattern uses current monthly usage and does not need daily usage history. At the next confirmed period, guided renewal calculates new starting caps from fresh snapshots and includes them in the new review.
 
 ### Observed usage headroom
 
@@ -76,7 +101,7 @@ Confirm each person's current limit before including them. The [API contract](ap
    | `workspaceId`, `unit` | The intended workspace and its native `credit` or `usd` unit. Amounts are decimal strings. Credit caps use whole credits; USD caps use cents. Never convert between units. |
    | `cohort` | Choose `selected` with `userIds`, `emails`, and/or `groupIds`, or `all` with empty selector arrays. Review the resolved user IDs and saved email/group matches. |
    | `period` | Copy the current UTC start and end shown in Admin Console, confirm whether it is `calendar_month` or `billing_cycle`, and record the verification time and source in `verifiedAt` and `evidence`. Set `counterScopeConfirmed: true` only after confirming the counter covers that range. The API response omits period boundaries. |
-   | `policy` | Pattern, UTC anchor, interval, starting cap, increment, and finite ceiling. For a mid-period start, review consumption already recorded: a starting cap at or below that usage can block additional eligible work. |
+   | `policy` | Pattern, its amount settings, UTC anchor, interval, and finite ceiling. Use the settings described for your chosen policy above. For a mid-period start, review consumption already recorded and the capacity each proposed limit leaves available. |
    | `allowInitialReduction` | Leave `false` unless the reviewed first target may lower a current cap or impose a finite cap on an unlimited or explicitly unset setting. Inspect every affected user before authorizing a reduction. |
    | `maxMembers` | An optional positive member-count guard. The default `null` adds no cohort-size ceiling. |
    | `concurrency`, `captureConcurrency` | Simultaneous member operations and snapshot reads, respectively. Both start at `1`; increase gradually against observed API throughput. |
@@ -101,7 +126,7 @@ Confirm each person's current limit before including them. The [API contract](ap
    node src/cli.mjs run --config .private/pilot/config.json --enrollment .private/pilot/enrollment.json --state .private/pilot/state
    ```
 
-   `approve` records the review locally. `run` without `--apply` previews targets. Review its before and after values before proceeding. The first apply must occur within `initialReviewMaxAgeMinutes` of capture start and in the same interval slot. The default is 15 minutes. Capture records both its start and completion times; a slow capture does not extend the review deadline. A new initial operation checks freshness through its first write attempt. Recovery can retry an already saved exact increase after that window, while an initial reduction remains bound to both the review age and its original slot. If it expires before any operation was saved, capture and review a new snapshot. A saved, unapplied initial reduction also expires: use the [read-only cancellation procedure](local.md#cancel-an-unapplied-initial-operation) before a new review. Reconcile any already-committed change. After a controller has applied changes, stop and restore before changing its budget policy or membership. Retain that state and use a new private pilot directory for a replacement local pilot. To continue the same policy into the next period on AWS, use [guided renewal](aws.md#7-renew-the-next-period).
+   `approve` records the review locally. `run` without `--apply` previews targets. Review its before and after values before proceeding. The first apply must occur within `initialReviewMaxAgeMinutes` of capture start and in the same interval slot. The default is 15 minutes. Capture records both its start and completion times; a slow capture does not extend the review deadline. A new initial operation checks freshness through its first write attempt. Recovery can retry an already saved exact increase after that window for fixed releases or observed headroom. Initial reductions and all first writes for individual starting limits remain bound to both the review age and their original slot. If a review expires before any operation was saved, capture and review a new snapshot. For a saved, unapplied initial operation that has expired, use the [read-only cancellation procedure](local.md#cancel-an-unapplied-initial-operation) before a new review. Reconcile any already-committed change. After a controller has applied changes, stop and restore before changing its budget policy or membership. Retain that state and use a new private pilot directory for a replacement local pilot. To continue the same policy into the next period on AWS, use [guided renewal](aws.md#7-renew-the-next-period).
 
 ## Stop, restore, and renew
 

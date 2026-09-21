@@ -67,3 +67,19 @@ test('capture cannot mix policy slots even when its review window is long enough
   await assert.rejects(captureEnrollment({config,api,clock}),{code:'CAPTURE_SLOT_CHANGED_RECAPTURE'});
   assert.equal(api.writes.length,0);
 });
+
+test('individual starting limits capture an entire 2,001-person workspace without an authored ID map',async()=>{
+  const {config,api}=largeFixture(2001);
+  config.policy={pattern:'individual_staircase',anchor:START,intervalHours:24,
+    initialHeadroom:'500',minimumInitialHeadroom:'100',increment:'500',ceiling:'5000'};
+  let index=0;
+  for(const user of Object.values(api.users))user.usage=String(index++%4000);
+  const captured=await captureEnrollment({config,api,now:START});
+  assert.equal(captured.enrollment.members.length,2001);
+  for(const member of captured.enrollment.members) {
+    assert.equal(member.startCap,String(Number(member.before.usage)+500));
+    assert.equal(member.plan.startCap,member.startCap);
+  }
+  validateEnrollment(config,approveEnrollment(captured.enrollment,captured.hash,START),START,true);
+  assert.equal(api.writes.length,0);
+});

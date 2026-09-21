@@ -1,6 +1,6 @@
 import { createHash } from 'node:crypto';
 import { settingsEquivalent, inheritedSettingsEquivalent, matchesTarget as apiMatchesTarget } from './admin-api.mjs';
-import { configDigest, validateConfig, validatePolicy, validateSnapshot, planTarget, historyRange, requireThat, amount, time, fail, HOUR, approvalWindowMs } from './policy.mjs';
+import { configDigest, validateConfig, validatePolicy, validateSnapshot, validateInitialHeadroom, planTarget, historyRange, requireThat, amount, time, fail, HOUR, approvalWindowMs } from './policy.mjs';
 import { validateEnrollment, enrollmentHash } from './enrollment.mjs';
 import { validateRenewalProof } from './renewal.mjs';
 import { validateCurrentCohort } from './selection.mjs';
@@ -128,6 +128,11 @@ export async function execute({ config, enrollment, api, store, now: fixedNow, c
         }
         let current = await api.readSnapshot(member.userId);
         validateSnapshot(current, config, member.userId, readNow());
+        if (!restore && !resumeAuth && !cancelInitial && !state?.last && config.policy.pattern === 'individual_staircase') {
+          requireThat(amount(current.usage) >= amount(member.before.usage) &&
+            (!state?.pending || amount(current.usage) >= amount(state.pending.before.usage)),
+          'COUNTER_DECREASE_REQUIRES_PERIOD_REVIEW');
+        }
         if(cancelInitial) {
           requireThat(!apply && !restore, 'CANCEL_IS_READ_ONLY');
           if(!state?.pending || state.last)return receipt({ok:true,status:'no_unapplied_initial_intent'});
@@ -157,7 +162,7 @@ export async function execute({ config, enrollment, api, store, now: fixedNow, c
             return receipt({ ok: true, status: 'reconciled', amount: current.cap.amount, restored: state.restored });
           }
           requireThat(sameSettings(current, pending.before, config.unit), 'PENDING_WRITE_CONFLICT');
-          if(pending.kind==='cap' && pending.plan?.wouldRestrict) {
+          if(pending.kind==='cap' && (pending.plan?.wouldRestrict || (!state.last && config.policy.pattern === 'individual_staircase'))) {
             requireThat(time(readNow())-time(enrollment.capturedAt)<=reviewWindow,'INITIAL_RESTRICTION_PREVIEW_EXPIRED_CANCEL_AND_REVIEW');
             requireThat(contextAt(readNow()).slot===pending.slot,'INITIAL_RESTRICTION_SLOT_EXPIRED_CANCEL_AND_REVIEW');
           }
@@ -184,9 +189,10 @@ export async function execute({ config, enrollment, api, store, now: fixedNow, c
         } else {
           if (state?.lastSlot === ctx.slot) return receipt({ ok: true, status: 'duplicate_slot', amount: current.cap.amount });
           const history = config.policy.pattern === 'observed_headroom' ? await api.readHistory(member.userId, historyRange(config, now)) : undefined;
-          const plan = state ? planTarget(config, current, readNow(), history) : member.plan;
+          const plan = state ? planTarget(config, current, readNow(), history, { startCap: member.startCap }) : member.plan;
           requireThat(plan.slot === ctx.slot, 'SLOT_CHANGED_DURING_RUN');
           requireThat(amount(plan.amount) <= amount(config.policy.ceiling), 'TARGET_ABOVE_CEILING');
+          if (!state) validateInitialHeadroom(config, current, plan.amount);
           if (plan.wouldRestrict) {
             requireThat(!state && config.allowInitialReduction, 'INITIAL_REDUCTION_REQUIRES_REVIEWED_OPT_IN');
             requireThat(amount(current.usage) === amount(member.before.usage), 'RESTRICTION_USAGE_CHANGED_RECAPTURE');
@@ -212,6 +218,8 @@ export async function execute({ config, enrollment, api, store, now: fixedNow, c
           else requireThat((await api.listMembers()).includes(member.userId), 'MEMBER_REMOVED_BEFORE_WRITE');
           const fresh = await api.readSnapshot(member.userId);
           validateSnapshot(fresh, config, member.userId, readNow());
+          const individualInitial = saved.pending.kind === 'cap' && !saved.last && config.policy.pattern === 'individual_staircase';
+          if (individualInitial) validateInitialHeadroom(config, fresh, saved.pending.amount);
           if (newIntent && !saved.last && saved.pending.kind === 'cap') {
             requireThat(time(readNow()) - time(enrollment.capturedAt) <= reviewWindow, 'INITIAL_PREVIEW_EXPIRED_RECAPTURE');
           }
@@ -219,19 +227,19 @@ export async function execute({ config, enrollment, api, store, now: fixedNow, c
           requireThat(sameSettings(fresh, before, config.unit), 'FINAL_READ_CONFLICT');
           requireThat(amount(fresh.usage) >= amount(before.usage), 'COUNTER_DECREASE_REQUIRES_PERIOD_REVIEW');
           if (saved.pending.kind === 'cap' && saved.pending.plan?.wouldRestrict) requireThat(amount(fresh.usage) === amount(member.before.usage), 'RESTRICTION_USAGE_CHANGED_RECAPTURE');
-          if(saved.pending.kind==='cap' && saved.pending.plan?.wouldRestrict) {
+          if(saved.pending.kind==='cap' && (saved.pending.plan?.wouldRestrict || individualInitial)) {
             requireThat(time(readNow())-time(enrollment.capturedAt)<=reviewWindow,'INITIAL_RESTRICTION_PREVIEW_EXPIRED_CANCEL_AND_REVIEW');
             requireThat(contextAt(readNow()).slot===saved.pending.slot,'INITIAL_RESTRICTION_SLOT_EXPIRED_CANCEL_AND_REVIEW');
           }
           await store.assertLock(key);
           requireThat(time(config.period.end) - time(fresh.observedAt) >= 30_000, 'TOO_CLOSE_TO_PERIOD_END');
-          const notAfter = saved.pending.kind==='cap' && (saved.pending.plan?.wouldRestrict || (newIntent && !saved.last))
+          const notAfter = saved.pending.kind==='cap' && (saved.pending.plan?.wouldRestrict || individualInitial || (newIntent && !saved.last))
             ? new Date(Math.min(time(enrollment.capturedAt)+reviewWindow,
               time(config.policy.anchor)+(saved.pending.slot+1)*config.policy.intervalHours*HOUR,time(config.period.end))).toISOString()
             : config.period.end;
           const target = { amount: saved.pending.amount, unit: config.unit, periodEnd: config.period.end, expectedSettings: fresh.settings,
             notAfter,
-            ...(saved.pending.plan?.wouldRestrict ? {expectedUsage: member.before.usage} : {}) };
+            ...(saved.pending.plan?.wouldRestrict ? {expectedUsage: member.before.usage} : individualInitial ? {expectedUsage: fresh.usage} : {}) };
           if (saved.pending.kind === 'restore') await api.restore(member.userId, { settings: saved.original.settings, unit: config.unit, periodEnd: config.period.end, expectedSettings: fresh.settings });
           else await api.setCap(member.userId, target);
           const after = await api.readSnapshot(member.userId);

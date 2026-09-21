@@ -15,7 +15,7 @@ The request and response mappings were checked against the [public OpenAPI speci
 | Resolve a workspace group | `GET /manage/workspaces/{workspace_id}/groups/{group_id}` and the same route plus `/users` | `chatgpt.enterprise.directory.read` |
 | Observed daily history | `GET /analytics/workspaces/{workspace_id}/usage` | `enterprise.analytics.usage.read` |
 
-Use only the permissions needed by the chosen pattern. Fixed budget release uses the usage-limit and membership routes. Obtain approval before creating a key or enabling writes through the live walkthrough.
+Use only the permissions needed by the chosen pattern. Fixed budget release and individual starting limits use the usage-limit and membership routes. Individual starting limits use current monthly usage and need no analytics history permission. Obtain approval before creating a key or enabling writes through the live walkthrough.
 
 ## Check the connection before enrollment
 
@@ -35,7 +35,7 @@ Restoration preserves three distinct cases:
 
 Multiple override rules, unknown rule fields, inconsistent source information, or a billing-unit change stop the example. Readback compares amount, expiry, override status, and source identifiers. It treats equivalent decimal formatting and `null` or an empty override array as unchanged.
 
-`setCap` sends one absolute tagged amount. The engine supplies the expected settings to detect newly observed edits; initial reductions also supply expected usage. Mutations stop within 30 seconds of the approved period end. The API exposes no conditional-write token, so another administrator can edit between the last read and PATCH. Coordinate one writer and stop on conflicting readback.
+`setCap` sends one absolute tagged amount. The engine supplies the expected settings to detect newly observed edits. Initial reductions and first writes for individual starting limits also supply expected usage. Mutations stop within 30 seconds of the approved period end. The API exposes no conditional-write token, so another administrator can edit between the last read and PATCH. Coordinate one writer and stop on conflicting readback.
 
 Timeouts, unreadable successful write responses, and write-side server errors require reconciliation. The adapter leaves PATCH retries to the controller. It surfaces HTTP status and `Retry-After` and excludes error bodies from saved state.
 
@@ -64,5 +64,7 @@ The adapter tests verify request shapes and error handling against synthetic res
 ## Renew a confirmed period
 
 The [AWS renewal helper](aws.md#7-renew-the-next-period) reuses the approved policy and frozen member list after the previous period ends. It reads current membership, native billing units, cap settings, and durable prior state. Every prior member must have a settled state with no pending intent or authorization halt. Changed settings or inherited sources require review.
+
+For `individual_staircase`, renewal derives each new `member.startCap` from the fresh monthly usage snapshot, configured initial headroom, and ceiling. The new enrollment binds those values for review; previous-period starting caps do not carry forward.
 
 An expired temporary override may return to its proven inherited setting. Renewal verifies that transition and preserves the historic settings. If the original restoration target itself expired, the verified current fallback becomes the restoration baseline for the new period. The original record remains archived. Confirm new period dates and counter scope explicitly; neither a lower usage counter nor an old override expiry establishes the next period boundaries.

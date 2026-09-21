@@ -15,7 +15,10 @@ export function exampleConfig({ now = new Date().toISOString(), pattern = 'fixed
     period: { kind: 'calendar_month', start: new Date(Date.UTC(date.getUTCFullYear(), date.getUTCMonth(), 1)).toISOString(),
       end: new Date(Date.UTC(date.getUTCFullYear(), date.getUTCMonth() + 1, 1)).toISOString(), verifiedAt: now,
       evidence: synthetic ? 'Synthetic fixture; no live counter evidence.' : '', counterScopeConfirmed: synthetic },
-    policy: { pattern, anchor: new Date(Math.floor(time(now) / HOUR) * HOUR).toISOString(), startCap: unit === 'credit' ? creditRelease : '2',
+    policy: { pattern, anchor: new Date(Math.floor(time(now) / HOUR) * HOUR).toISOString(),
+      ...(pattern === 'individual_staircase'
+        ? { initialHeadroom: unit === 'credit' ? creditRelease : '2', minimumInitialHeadroom: unit === 'credit' ? '1' : '0.01' }
+        : { startCap: unit === 'credit' ? creditRelease : '2' }),
       increment: unit === 'credit' ? creditRelease : '2', intervalHours, ceiling: unit === 'credit' ? '2000' : '20',
       lookbackDays: 7, coverageHours: 24, multiplierBps: 15_000 },
     cohort: { mode: cohort, userIds: cohort === 'all' ? [] : synthetic ? ['synthetic-user-a', 'synthetic-user-b'] : ['REPLACE_USER_ID'], emails: [], groupIds: [] },

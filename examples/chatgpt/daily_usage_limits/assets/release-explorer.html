@@ -78,7 +78,7 @@
     <section id="problem" aria-labelledby="problem-title">
       <div class="eyebrow">1 of 2 · The problem</div>
       <h1 id="problem-title" tabindex="-1">A monthly allocation can run out in week one.</h1>
-      <p class="intro">One person gets <span id="problem-budget">2,000</span> credits for the month and uses them all in the first week. There is no capacity left for the rest of the month.</p>
+      <p class="intro">One person gets <span id="problem-budget">2,000 credits</span> for the month and uses the full amount in the first week. There is no capacity left for the rest of the month.</p>
       <div class="allocation">One person · one illustrative month</div>
       <div class="weeks" aria-label="Example: the entire monthly budget is used in week one">
         <div class="week problem"><h2>Week 1</h2><span id="problem-used" class="number">2,000</span><span class="label">credits used</span><div class="track" aria-hidden="true"><div class="spent"></div></div></div>
@@ -148,6 +148,7 @@
       element('cookbook-link').href = '/cookbook/examples/chatgpt/daily_usage_limits/readme';
     }
     const number = value => value.toLocaleString('en-US');
+    const credits = value => `${number(value)} ${value === 1 ? 'credit' : 'credits'}`;
     const atHour = hour => `day ${Math.floor(hour / 24) + 1}${hour % 24 ? ` at ${String(hour % 24).padStart(2, '0')}:00` : ''}`;
     const validInteger = id => element(id).checkValidity() && Number.isInteger(Number(element(id).value));
     function readBudget() { return validInteger('monthly') ? Number(element('monthly').value) : null; }
@@ -187,9 +188,9 @@
       element('monthly-error').textContent = validBudget ? '' : 'Enter a whole-credit monthly budget from 1 to 1,000,000.';
       element('monthly').setAttribute('aria-invalid', String(!validBudget));
       element('show-plan').disabled = !validBudget;
-      element('problem-budget').textContent = validBudget ? number(budget) : '—';
+      element('problem-budget').textContent = validBudget ? credits(budget) : '—';
       element('problem-used').textContent = validBudget ? number(budget) : '—';
-      element('budget-total').textContent = validBudget ? `of ${number(budget)} credits` : 'Monthly budget needed';
+      element('budget-total').textContent = validBudget ? `of ${credits(budget)}` : 'Monthly budget needed';
       element('schedule-caption').textContent = validBudget ? `One person's illustrative ${number(budget)}-credit monthly budget` : 'Choose a monthly budget to see its releases';
       if (validBudget) {
         for (const id of ['start', 'increment']) element(id).max = String(budget);
@@ -214,10 +215,10 @@
       element('released').textContent = number(released);
       element('used').max = String(released);
       element('advance').disabled = !nextRelease;
-      element('next').textContent = nextRelease ? `The next ${number(nextRelease.amount)} credits become available on ${atHour(nextRelease.hour)}.` : released === budget ? `All ${number(budget)} credits have now been released for this month.` : `${number(budget - released)} credits remain unassigned by this month's release plan.`;
+      element('next').textContent = nextRelease ? `The next ${credits(nextRelease.amount)} ${nextRelease.amount === 1 ? 'becomes' : 'become'} available on ${atHour(nextRelease.hour)}.` : released === budget ? `The monthly budget of ${credits(budget)} has now been released.` : `${credits(budget - released)} ${budget - released === 1 ? 'remains' : 'remain'} unassigned by this month's release plan.`;
       const cadence = { 1: 'hour', 24: 'day', 168: 'week', 336: 'two weeks' }[plan.interval] ?? `${plan.interval} hours`;
       const last = rows[rows.length - 1];
-      element('plan-summary').textContent = `${number(plan.start)} initially, then ${number(plan.increment)} every ${cadence}, up to ${number(budget)} this month.` + (last.amount < plan.increment ? ` The final release is ${number(last.amount)} credits.` : '');
+      element('plan-summary').textContent = `${number(plan.start)} initially, then ${number(plan.increment)} every ${cadence}, up to ${number(budget)} this month.` + (last.amount < plan.increment ? ` The final release is ${credits(last.amount)}.` : '');
       const used = Number(element('used').value);
       if (!validInteger('used')) {
         element('available').textContent = '—'; element('equation').textContent = `Enter used credits from 0 to ${number(released)}.`;

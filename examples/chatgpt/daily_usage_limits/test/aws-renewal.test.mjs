@@ -77,7 +77,9 @@ async function fixture(t) {
     getState: async key => states.get(key) };
   const options = { stackName: 'same-stack', previousConfig, previousEnrollment, period: config.period, directory,
     aws, store, api: {}, capture: async () => ({ config, enrollment, hash: enrollmentHash(enrollment) }),
-    clock: () => now, sleep: async ms => { waits.push(ms); now = new Date(now.getTime() + ms); }, sendDynamo };
+    clock: () => now, sleep: async ms => { waits.push(ms); now = new Date(now.getTime() + ms); }, sendDynamo,
+    // Exercise orchestration on every CI OS; production retains its durable local writer.
+    saveJournal: (path, value) => writeFile(path, JSON.stringify(value, null, 2) + '\n') };
   const prepare = () => prepareRenewal(options);
   async function approve() {
     const path = join(directory, 'enrollment.json');
@@ -133,6 +135,18 @@ test('renewal activation drains old workers, archives controls, and updates only
   assert.notEqual(h.parameters.ControlSha256, before.ControlSha256);
   assert.equal(h.items.get(`MANIFEST#${before.ControlSha256}`).document.S.length > 0, true);
   assert.equal(JSON.parse(await readFile(join(h.directory, 'activation.json'), 'utf8')).stage, 'activated');
+});
+
+test('injected journal storage permits Windows orchestration while the production storage guard remains active', async t => {
+  const h = await fixture(t); await h.prepare(); await h.approve();
+  const descriptor = Object.getOwnPropertyDescriptor(process, 'platform');
+  Object.defineProperty(process, 'platform', { ...descriptor, value: 'win32' });
+  try {
+    const result = await activateRenewal(h.options);
+    assert.equal(result.activated, true); assert.equal(result.writes, false);
+    await assert.rejects(activateRenewal({ ...h.options, saveJournal: undefined }),
+      error => error.code === 'LOCAL_STORAGE_REQUIRES_MACOS_OR_LINUX');
+  } finally { Object.defineProperty(process, 'platform', descriptor); }
 });
 
 test('activation rejects live, changing, replaced or unreviewed inputs before uploading controls', async t => {

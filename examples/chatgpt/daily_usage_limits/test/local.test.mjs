@@ -84,6 +84,7 @@ test('Windows operational guards reject before filesystem access or API calls; C
     import { FileStore, atomicJson } from ${JSON.stringify(new URL('../src/file-store.mjs',import.meta.url).href)};
     import { renderLocal } from ${JSON.stringify(new URL('../src/local-templates.mjs',import.meta.url).href)};
     import { main } from ${JSON.stringify(new URL('../src/cli.mjs',import.meta.url).href)};
+    import { main as renewMain } from ${JSON.stringify(new URL('../aws/renew-period.mjs',import.meta.url).href)};
     Object.defineProperty(process,'platform',{value:'win32'});
     globalThis.fetch=()=>{throw new Error('API_CALL_FORBIDDEN');};
     const directory=${JSON.stringify(directory)};
@@ -91,6 +92,8 @@ test('Windows operational guards reject before filesystem access or API calls; C
     await assert.rejects(main(['init','--dir',directory,'--synthetic']),
       {code:'MACOS_OR_LINUX_REQUIRED_FOR_PRIVATE_STATE'});
     await assert.rejects(main(['snapshot','--config',join(directory,'config.json'),'--out',join(directory,'enrollment.json')]),
+      {code:'MACOS_OR_LINUX_REQUIRED_FOR_PRIVATE_STATE'});
+    await assert.rejects(renewMain(['activate','--stack','fictional-stack','--dir',directory]),
       {code:'MACOS_OR_LINUX_REQUIRED_FOR_PRIVATE_STATE'});
     await assert.rejects(import(${JSON.stringify(new URL('../aws/prepare-control.mjs',import.meta.url).href)}),
       {code:'MACOS_OR_LINUX_REQUIRED_FOR_PRIVATE_STATE'});

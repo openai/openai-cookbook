@@ -146,13 +146,13 @@ async function waitStable(aws, stackName, clock, sleep) {
 
 /** Update only the existing stack's period/control parameters. Every gate stays off. */
 export async function activateRenewal({ stackName, directory, aws, store, sendDynamo, upload = uploadControl,
-  clock = () => new Date(), sleep = sleepDefault }) {
+  clock = () => new Date(), sleep = sleepDefault, saveJournal = atomicJson }) {
   const [config, enrollment, journal] = await Promise.all(['config.json', 'enrollment.json', 'activation.json'].map(name => json(join(directory, name))));
   requireThat(journal.version === 1 && typeof journal.requestToken === 'string' && config.liveWrites === false &&
     journal.configDigest === configDigest(config) && journal.enrollmentHash === enrollmentHash(enrollment) &&
     enrollment.renewal?.version === 1 && enrollment.members.every(member => member.renewal?.priorStateDigest), 'RENEWAL_FILES_CHANGED');
   validateEnrollment(config, enrollment, clock().toISOString(), true);
-  const save = () => atomicJson(join(directory, 'activation.json'), journal);
+  const save = () => saveJournal(join(directory, 'activation.json'), journal);
   const finish = async () => {
     let reviewRequired = false;
     try { reviewFresh(config, enrollment, clock()); } catch { reviewRequired = true; }

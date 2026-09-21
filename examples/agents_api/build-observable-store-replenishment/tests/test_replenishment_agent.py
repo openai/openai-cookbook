@@ -32,6 +32,60 @@ from replenishment_agent import (
 DATA_DIR = EXAMPLE_DIR / "data"
 
 
+@pytest.mark.parametrize("quantity", [True, False])
+def test_boolean_quantity_rejected(quantity):
+    with pytest.raises(TypeError, match="integer"):
+        parse_decision(decision_text("restock_from_backroom", quantity, False))
+
+
+def test_unknown_record_returns_failed_tool_result():
+    from replenishment_agent import _submit_function_results
+
+    sessions = FakeSessions()
+    client = SimpleNamespace(
+        beta=SimpleNamespace(agents=SimpleNamespace(sessions=sessions))
+    )
+    calls = []
+    _submit_function_results(
+        client,
+        "sess_test",
+        [
+            PendingAction(
+                "get_inventory_position", {"store_id": "unknown", "sku": "unknown"}
+            )
+        ],
+        ScenarioData(DATA_DIR),
+        calls,
+        set(),
+        lambda _: None,
+    )
+    result = sessions.events.submissions[0][1][0]
+    assert result["success"] is False
+    assert result["error"]
+    assert calls == []
+
+
+def test_failed_start_deletes_partial_session():
+    import httpx
+    from openai import APIConnectionError
+
+    deleted = []
+
+    def failed_events():
+        yield event("agent.session.created", session=SimpleNamespace(id="sess_partial"))
+        raise APIConnectionError(request=httpx.Request("POST", "https://example.test"))
+
+    sessions = SimpleNamespace(
+        create=lambda **kw: nullcontext(failed_events()), delete=deleted.append
+    )
+    client = SimpleNamespace(
+        beta=SimpleNamespace(agents=SimpleNamespace(sessions=sessions))
+    )
+    with pytest.raises(APIConnectionError):
+        start_incident(client, ScenarioData(DATA_DIR), progress=lambda _: None)
+    assert deleted == ["sess_partial"]
+
+
 def test_initial_input_anchors_the_synthetic_incident_clock():
     assert SCENARIO_VERSION == "store-replenishment-derived-time-v3"
     assert INCIDENT_TIME in INITIAL_INPUT
@@ -257,9 +311,12 @@ def test_received_transfer_restores_back_room_and_storm_depleted_shelf():
 
     assert inventory["shelf_units"] == 20
     assert inventory["backroom_units"] == 10
-    assert scenario.get_nearby_inventory("store_101", "water_24pk")[
-        "available_transfer_units"
-    ] == 14
+    assert (
+        scenario.get_nearby_inventory("store_101", "water_24pk")[
+            "available_transfer_units"
+        ]
+        == 14
+    )
 
 
 def test_playground_overrides_storm_values():

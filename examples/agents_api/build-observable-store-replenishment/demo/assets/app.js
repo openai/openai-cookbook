@@ -178,7 +178,9 @@ function renderSuggestions(stage) {
   const commands = {
     initial_review: ['Approve the shelf restock'],
     restock_approved: ['Check the weather event'],
-    storm_review: ['Approve this transfer', 'Escalate to regional operations'],
+    storm_review: state.incident?.storm_turn?.decision.decision === 'request_store_transfer'
+      ? ['Approve this transfer', 'Escalate to regional operations']
+      : ['Escalate to regional operations'],
     resolved: [],
   }[stage] || [];
   commands.forEach((command) => {
@@ -191,7 +193,7 @@ function renderSuggestions(stage) {
   const enabled = Boolean(state.incident) && stage !== 'resolved';
   input.disabled = !enabled || state.busy;
   $('#command-form button').disabled = !enabled || state.busy;
-  input.placeholder = enabled ? 'Type an instruction, for example: approve this transfer' : 'Start a new shift to issue commands';
+  input.placeholder = enabled ? (commands[0] || 'Choose a suggested action') : 'Start a new shift to issue commands';
 }
 
 function renderStage(incident) {

@@ -12,7 +12,7 @@ from datetime import datetime, timedelta, timezone
 from pathlib import Path
 from typing import Any
 
-from openai import OpenAI
+from openai import APIError, OpenAI
 
 MODEL = "gpt-6-astra"
 STORE_ID = "store_101"
@@ -430,7 +430,7 @@ def parse_decision(text: str) -> Decision:
         )
     if payload["decision"] not in DECISIONS:
         raise ValueError(f"Unsupported decision: {payload['decision']}")
-    if not isinstance(payload["quantity"], int):
+    if type(payload["quantity"]) is not int:
         raise TypeError("Decision quantity must be an integer.")
     if payload["quantity"] < 0:
         raise ValueError("Decision quantity must be a non-negative integer.")
@@ -464,10 +464,7 @@ def _submit_function_results(
     submitted = 0
     for pending in required_actions:
         action = pending.to_dict()
-        if (
-            action["type"] != "function_call"
-            or action["call_id"] in handled_call_ids
-        ):
+        if action["type"] != "function_call" or action["call_id"] in handled_call_ids:
             continue
         handled_call_ids.add(action["call_id"])
         progress(f"Tool requested: {action['name']}")
@@ -481,13 +478,14 @@ def _submit_function_results(
                 "output": json.dumps(output),
             }
             tool_calls.append(ToolCall(action["name"], action["arguments"], output))
-        except (KeyError, TypeError, ValueError) as error:
+        except (KeyError, TypeError, ValueError, StopIteration) as error:
             tool_result = {
                 "type": "agent.session.input.tool_result",
                 "turn_id": action["turn_id"],
                 "call_id": action["call_id"],
                 "success": False,
-                "error": str(error),
+                "error": str(error)
+                or "No matching record for the supplied tool arguments.",
             }
         client.beta.agents.sessions.events.create(
             session_id,
@@ -516,9 +514,7 @@ def collect_turn(
     text_parts = _text_parts if _text_parts is not None else []
     event_types = _event_types if _event_types is not None else []
     tool_calls = _tool_calls if _tool_calls is not None else []
-    handled_call_ids = (
-        _handled_call_ids if _handled_call_ids is not None else set()
-    )
+    handled_call_ids = _handled_call_ids if _handled_call_ids is not None else set()
     reported_progress = _reported_progress if _reported_progress is not None else set()
 
     for event in events:
@@ -632,7 +628,26 @@ def start_incident(
         input=INITIAL_INPUT,
         stream=True,
     ) as events:
-        return collect_turn(client, events, scenario, progress=progress)
+        created_session_id = None
+
+        def track_session():
+            nonlocal created_session_id
+            for event in events:
+                if event.type == "agent.session.created":
+                    created_session_id = event.session.id
+                yield event
+
+        try:
+            return collect_turn(client, track_session(), scenario, progress=progress)
+        except Exception:
+            if created_session_id:
+                try:
+                    client.beta.agents.sessions.delete(created_session_id)
+                except APIError:
+                    progress(
+                        f"Cleanup failed; delete session {created_session_id} manually."
+                    )
+            raise
 
 
 def continue_after_storm(

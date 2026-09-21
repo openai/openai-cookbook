@@ -15,7 +15,9 @@ from __future__ import annotations
 import argparse
 import itertools
 import os
+import re
 import sys
+from copy import deepcopy
 from dataclasses import asdict, dataclass, field
 from pathlib import Path
 from threading import Lock
@@ -161,7 +163,7 @@ def guided_storm_turn(incident: Incident) -> TurnResult:
     nearby = scenario.get_nearby_inventory("store_101", "water_24pk")
     local_units = inventory["shelf_units"] + inventory["backroom_units"]
     shortfall = max(0, forecast["forecast_units"] - local_units)
-    arrival_within_horizon = 12 + shipment["delay_hours"] <= 24
+    arrival_within_horizon = shipment["arrives_within_24h_demand_horizon"]
 
     if shortfall == 0:
         decision = Decision(
@@ -241,7 +243,9 @@ def serialize_turn(result: TurnResult) -> dict[str, Any]:
         "decision": asdict(result.decision),
         "events": list(dict.fromkeys(result.event_types)),
         "tool_calls": [asdict(call) for call in result.tool_calls],
-        "trace_url": PLATFORM_LOGS_URL if result.session_id.startswith("sess_") else None,
+        "trace_url": PLATFORM_LOGS_URL
+        if result.session_id.startswith("sess_")
+        else None,
     }
 
 
@@ -294,8 +298,23 @@ def api_error(error: APIError) -> HTTPException:
 def interpret_manager_command(stage: str, command: str) -> str | None:
     """Map plain-language manager input to the actions allowed at this stage."""
 
-    words = set(command.lower().replace("-", " ").split())
-    approval = bool(words & {"approve", "approved", "accept", "yes", "proceed"})
+    normalized = " ".join(re.findall(r"[a-z]+", command.lower()))
+    words = set(normalized.split())
+    # Only exact, affirmative commands authorize inventory writes. Free-form
+    # text (including negation, questions, and mixed instructions) never does.
+    confirmations = {
+        "approve",
+        "approved",
+        "accept",
+        "yes",
+        "proceed",
+    }
+    confirmations.update(
+        {"approve the shelf restock"}
+        if stage == "initial_review"
+        else {"approve this transfer", "approve the transfer"}
+    )
+    approval = "?" not in command and normalized in confirmations
     if stage == "initial_review" and approval:
         return "approve_restock"
     if stage == "restock_approved" and words & {
@@ -387,7 +406,9 @@ def approve_restock(incident_id: str, request: ApprovalRequest) -> dict[str, Any
     incident = get_incident(incident_id)
     expected = incident.first.decision.quantity
     if incident.approved_restock is not None:
-        raise HTTPException(status_code=409, detail="The shelf move is already recorded.")
+        raise HTTPException(
+            status_code=409, detail="The shelf move is already recorded."
+        )
     if request.quantity != expected:
         raise HTTPException(
             status_code=400,
@@ -409,6 +430,9 @@ def storm(incident_id: str, request: StormRequest) -> dict[str, Any]:
     if incident.revised is not None:
         raise HTTPException(status_code=409, detail="The storm was already reviewed.")
 
+    # Stage changes on a copy so a failed live turn cannot mutate local stock.
+    original_incident = incident
+    incident = deepcopy(incident)
     incident.scenario.storm_delay_hours = request.delay_hours
     incident.scenario.storm_demand_units = request.demand_units
     incident.scenario.nearby_inventory[0]["available_transfer_units"] = (
@@ -425,10 +449,13 @@ def storm(incident_id: str, request: StormRequest) -> dict[str, Any]:
 
     try:
         if incident.mode == "live":
-            with OpenAI() as client, client.beta.agents.sessions.stream(
-                incident.first.session_id,
-                input=FOLLOW_UP_INPUT,
-            ) as events:
+            with (
+                OpenAI() as client,
+                client.beta.agents.sessions.stream(
+                    incident.first.session_id,
+                    input=FOLLOW_UP_INPUT,
+                ) as events,
+            ):
                 revised = collect_turn(
                     client,
                     events,
@@ -447,7 +474,8 @@ def storm(incident_id: str, request: StormRequest) -> dict[str, Any]:
             {"actor": "agent", "action": "Replenishment plan reassessed"},
         ]
     )
-    return serialize_incident(incident)
+    original_incident.__dict__.update(incident.__dict__)
+    return serialize_incident(original_incident)
 
 
 @app.post("/api/incidents/{incident_id}/resolve")
@@ -455,6 +483,18 @@ def resolve(incident_id: str, request: ResolutionRequest) -> dict[str, Any]:
     incident = get_incident(incident_id)
     if incident.revised is None:
         raise HTTPException(status_code=409, detail="Review the storm event first.")
+    if incident.resolution is not None:
+        raise HTTPException(
+            status_code=409, detail="This incident is already resolved."
+        )
+    if (
+        request.resolution == "approved"
+        and incident.revised.decision.decision != "request_store_transfer"
+    ):
+        raise HTTPException(
+            status_code=409,
+            detail="No transfer was recommended. Escalate to regional operations instead.",
+        )
     if (
         request.resolution == "approved"
         and incident.revised.decision.decision == "request_store_transfer"
@@ -491,9 +531,7 @@ def resolve(incident_id: str, request: ResolutionRequest) -> dict[str, Any]:
 
 
 @app.post("/api/incidents/{incident_id}/manager-command")
-def manager_command(
-    incident_id: str, request: ManagerCommandRequest
-) -> dict[str, Any]:
+def manager_command(incident_id: str, request: ManagerCommandRequest) -> dict[str, Any]:
     """Apply a manager's typed instruction to the active store incident."""
 
     incident = get_incident(incident_id)
@@ -503,7 +541,12 @@ def manager_command(
         hints = {
             "initial_review": "Try: approve the shelf restock.",
             "restock_approved": "Try: report the storm delay.",
-            "storm_review": "Try: approve the transfer, or escalate it.",
+            "storm_review": (
+                "Try: approve the transfer, or escalate it."
+                if incident.revised is not None
+                and incident.revised.decision.decision == "request_store_transfer"
+                else "No transfer was recommended. Try: escalate to regional operations."
+            ),
             "resolved": "This incident is resolved. Start a new shift to play again.",
         }
         return {
@@ -534,9 +577,11 @@ def manager_command(
         reply = "Storm recorded. The agent reassessed the same incident."
     elif intent == "approve_transfer":
         updated = resolve(incident_id, ResolutionRequest(resolution="approved"))
+        inventory = updated["snapshot"]["inventory"]
         reply = (
-            "Approved. The Store 205 truck will unload into the back room, "
-            "then Maya will place 20 on the shelf and leave 10 in reserve."
+            f"Approved. The Store 205 truck delivered {updated['transfer_received']} units. "
+            f"Maya moved {updated['follow_up_restock']} to the shelf, "
+            f"leaving {inventory['backroom_units']} in reserve."
         )
     else:
         updated = resolve(incident_id, ResolutionRequest(resolution="escalated"))

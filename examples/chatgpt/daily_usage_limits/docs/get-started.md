@@ -1,61 +1,58 @@
-# Try a usage-budget plan with Codex
+# Get started
 
-Download the starter kit and let Codex prepare a preview with fictional people. The preview uses a 2,000-credit monthly allocation released in 500-credit weekly portions. Then choose the amounts and schedule that fit your organization.
+Try a weekly release plan with three fictional people, then choose the amounts and schedule for your organization. The example uses a 2,000-credit monthly allocation released in 500-credit weekly portions.
 
-## 1. Download and open the starter kit
+## Download the starter kit
 
-1. [Download the starter ZIP](https://raw.githubusercontent.com/openai/openai-cookbook/codex/daily-usage-limits/examples/chatgpt/daily_usage_limits/assets/chatgpt-usage-budget-starter.zip) and extract it. You should see a folder named `chatgpt-usage-budget-starter` containing `README.md`, `docs`, `src`, and `assets`.
-2. Open **that folder** as a local project in Codex. Keep the files together.
-3. Paste the request below into a new conversation in that project. Codex will check the available software before running the preview.
+1. [Download the starter ZIP](https://raw.githubusercontent.com/openai/openai-cookbook/codex/daily-usage-limits/examples/chatgpt/daily_usage_limits/assets/chatgpt-usage-budget-starter.zip) and extract it.
+2. Open the `chatgpt-usage-budget-starter` folder. It contains `README.md`, `docs`, `src`, and `assets`.
+3. Choose one of the paths below.
 
-## 2. Ask Codex to prepare the preview
+You can explore the amounts and schedules immediately by opening `assets/release-explorer.html` in your browser.
 
-```text
-Help me preview a ChatGPT usage-budget plan using this starter kit.
+## Run with Node.js
 
-Read README.md and docs/get-started.md. If I opened the full Cookbook
-repository instead, locate examples/chatgpt/daily_usage_limits first.
+With Node.js 24 or later installed, open a terminal or PowerShell in the extracted folder and run:
 
-Check for an existing Node.js 24 or later runtime available to this Codex
-environment. Verify its path and version. Use a bundled runtime when exposed
-through a supported tool and permitted by the current execution controls.
-Honor stated organization restrictions. Do not install or download software,
-change device policy, elevate access, or bypass a blocked command. If no
-runtime is available or host restrictions prevent the preview, explain the
-actual obstacle, prepare the managed-host handoff below, and give me the
-browser illustration's path.
-
-With a permitted runtime, use src/cli.mjs in a new private rehearsal folder.
-Do not overwrite existing configuration, enrollment, or state. Initialize
-fixed_release for selected fictional users, credit units, and a 168-hour
-interval, using --synthetic and --allow-initial-reduction. Capture the
-fictional snapshot with --synthetic, inspect it, and record approval of its
-actual hash only for this fictional rehearsal. Run the preview with
---synthetic and without --apply. Keep liveWrites false.
-
-Show me each fictional person's current limit, proposed first limit, and
-monthly ceiling. Explain a full four-release plan: 500, 1,000, 1,500, then 2,000.
-After the preview, ask me about my monthly allocation, release amount and
-frequency, and whether I want selected people or a reviewed workspace roster.
-Keep any proposed changes as a preview for my review.
-
-Do not retrieve credentials, contact a ChatGPT workspace, apply changes,
-create an automation or service, deploy infrastructure, or upload files.
-Do not modify the controller source. A live pilot is a separate decision.
+```bash
+node src/demo.mjs
 ```
 
-Expect a preview showing the fictional users' current 2,000-credit limits and proposed first limits of 500. It creates local rehearsal files without changing a real workspace. A full four-release plan reaches 1,000, 1,500, and 2,000; unused released credits remain available within the month. A live plan must fit the confirmed usage period, including any mid-month start.
+The command uses the files in the starter kit. It previews the first release, applies it to fictional users, advances to the next release, and restores the starting settings. It also simulates an interrupted update and a conflicting admin edit, then shows recovery and restoration.
 
-## If the required software is unavailable
+Look for each person's 2,000-credit monthly limit changing to a first release of 500, then increasing to 1,000 at the next release. All changes in this example stay in the local simulator.
 
-You can still explore the release plan. In the extracted folder, open `assets/release-explorer.html` in your browser. It works without Node.js, an Admin key, or a connection to your workspace.
+## Let Codex help
 
-Ask Codex to prepare this handoff for your technology team, including the actual missing prerequisite or device restriction it found:
+Open the extracted **chatgpt-usage-budget-starter** folder as a project in the Codex app. Paste this request:
 
-> Please provide an approved environment for a small ChatGPT usage-budget preview. This starter kit's controller needs Node.js 24 or later. Its fictional preview needs no credentials or package installation. An organization-managed virtual machine or cloud environment is suitable if this computer cannot run it. Before a live pilot, we will separately review the workspace, participants, monthly allocation, release schedule, credential storage, and the team responsible for operation.
+```text
+Run this starter kit's fictional example with node src/demo.mjs, using an
+available Node.js 24 or later runtime. Show me each person's starting limit,
+first release, next release, and monthly maximum. Keep this session local
+and use the example data.
 
-Node.js 24 or later runs the controller included here. The ChatGPT Admin API can be used from other programming languages. Codex still needs a permitted runtime to execute this controller. The provided setup guides cover macOS, Linux, and AWS; this kit does not include a PowerShell controller or a packaged Windows application.
+If the required software is unavailable, help me prepare the managed
+environment setup described in docs/get-started.md.
 
-## When you are ready for a pilot
+After the example, help me choose a monthly budget, release amount,
+schedule, and group of people for a pilot.
+```
 
-Use the [Codex pilot guide](codex.md#3-i-review-a-small-pilot-and-its-test-schedule) to review a small, time-limited trial. For ongoing workspace credit management, choose [an organization-managed host](local.md) or the [AWS deployment example](aws.md). Confirm the current usage period, review the exact participants and proposed changes, and verify restoration before enabling recurring changes.
+Codex checks the available software and runs the example. Review the release amounts it shows, then describe the plan you want to try.
+
+## Use a managed environment
+
+Run the starter kit on a managed computer, virtual machine, or cloud environment your organization provides. This is also a path for admins whose computers cannot run the required software.
+
+Give your technology team the starter kit and this setup request:
+
+> Set up a ChatGPT usage-budget pilot with Node.js 24 or later. Run `node src/demo.mjs` to walk through the weekly plan with example data. For the pilot, we will choose the participants, monthly budgets, release schedule, credential storage, and operating owner together.
+
+Choose the [managed host guide](local.md) for macOS or Linux, or the [AWS deployment guide](aws.md) for the included cloud template. Your team can adapt the program to other managed infrastructure.
+
+## Set up a pilot
+
+Choose a small group and confirm its monthly usage period. Review each person's starting limit, the first release, and the monthly maximum using the [configuration and enrollment guide](operations.md#prepare-a-reviewed-enrollment).
+
+Use the [Codex pilot guide](codex.md) to try scheduled runs. For ongoing workspace credit management, use a managed host or cloud service with monitoring and an operating owner.

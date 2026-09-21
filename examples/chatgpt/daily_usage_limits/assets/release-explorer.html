@@ -5,7 +5,7 @@
   <meta name="viewport" content="width=device-width, initial-scale=1">
   <title>Explore monthly credit releases</title>
   <style>
-    :root { color-scheme: light; font-family: system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif; color: #202123; background: #fff; }
+    :root { color-scheme: light; font-family: system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif; color: #202123; background: #fff; --used: #a34731; --available: #0b7468; --later: #e6effa; --used-soft: #fbefea; --available-soft: #e9f5f1; }
     * { box-sizing: border-box; }
     [hidden] { display: none !important; }
     body { margin: 0; padding: 28px 24px; }
@@ -23,14 +23,15 @@
     .weeks { display: grid; grid-template-columns: repeat(4, minmax(0, 1fr)); margin: 0 0 24px; border-block: 1px solid #dedede; }
     .week { min-width: 0; padding: 18px 16px; border-right: 1px solid #dedede; }
     .week:last-child { border-right: 0; }
-    .week.problem { background: #f5f5f5; }
+    .week.problem { background: var(--used-soft); }
+    .week.problem .number { color: var(--used); }
     .week h2 { font-size: 1rem; font-weight: 600; margin: 0 0 20px; }
     .week .number { display: block; font-size: clamp(1.25rem, 3vw, 2rem); font-weight: 600; line-height: 1.15; font-variant-numeric: tabular-nums; }
     .week .label { display: block; font-size: .9rem; margin: 8px 0 18px; }
     .track { background: #e7e7e7; height: 10px; overflow: hidden; }
-    .track .spent { background: #333; width: 100%; height: 100%; }
+    .track .spent { background: var(--used); width: 100%; height: 100%; }
     .question { font-size: 1rem; font-weight: 600; margin-bottom: 16px; }
-    button { border: 1px solid #202123; border-radius: 6px; padding: 11px 16px; background: #202123; color: #fff; font: inherit; font-weight: 500; cursor: pointer; }
+    button { border: 1px solid var(--available); border-radius: 6px; padding: 11px 16px; background: var(--available); color: #fff; font: inherit; font-weight: 500; cursor: pointer; }
     button.secondary { background: #fff; color: #202123; border-color: #8c8c8c; }
     button:disabled { opacity: .45; cursor: default; }
     :focus-visible { outline: 3px solid #2456a6; outline-offset: 3px; }
@@ -41,28 +42,31 @@
     .panel h2 { font-size: 1.05rem; font-weight: 600; margin-bottom: 18px; }
     label { display: block; font-size: .95rem; font-weight: 500; margin: 20px 0 8px; }
     select, input[type=number] { font: inherit; color: inherit; border: 1px solid #8c8c8c; border-radius: 5px; padding: 10px; background: #fff; width: 100%; min-height: 44px; }
-    input[type=range] { width: 100%; min-height: 32px; accent-color: #333; }
+    input[type=range] { width: 100%; min-height: 32px; accent-color: var(--available); }
     .hint { font-size: .875rem; color: #626262; margin: 10px 0 18px; }
     .figures { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); border: 1px solid #dedede; }
     .figure { min-width: 0; padding: 16px 12px; }
     .figure .number { display: block; font-size: clamp(1.35rem, 2.8vw, 2rem); line-height: 1.2; font-weight: 600; margin: 8px 0; font-variant-numeric: tabular-nums; overflow-wrap: anywhere; }
     .figure .label { font-size: .85rem; }
-    .figure.available { background: #f5f5f5; border-left: 1px solid #dedede; }
-    .meter { display: flex; height: 20px; overflow: hidden; background: #e7e7e7; margin: 22px 0 10px; }
-    .used-color { background: #202123; }.available-color { background: #858585; }
+    .figure .number { color: var(--available); }
+    .figure.available { background: var(--available-soft); border-left: 1px solid #dedede; }
+    .meter { display: flex; height: 20px; overflow: hidden; background: var(--later); margin: 22px 0 10px; }
+    .used-color { background: var(--used); }.available-color { background: var(--available); }
+    .meter .used-color { box-shadow: inset -2px 0 #fff; }
+    .later-color { background: var(--later); border: 1px solid #7f9aba; }
     .legend { display: flex; flex-wrap: wrap; gap: 13px; margin-bottom: 18px; font-size: .8rem; }
     .dot { display: inline-block; width: 10px; height: 10px; margin-right: 5px; }
     .equation { font-size: .95rem; font-weight: 600; margin-bottom: 12px; }
-    .callout { border-left: 2px solid #a6a6a6; padding: 8px 16px; font-size: .95rem; }
+    .callout { border-left: 3px solid var(--available); background: var(--available-soft); padding: 12px 16px; font-size: .95rem; }
     .error { color: #a12323; font-weight: 500; }
     details { margin: 20px 0; }
     summary { font-weight: 500; cursor: pointer; padding: 10px 0; }
     table { border-collapse: collapse; width: 100%; font-size: .9rem; }
     th, td { text-align: left; padding: 10px 12px; border-bottom: 1px solid #dedede; }
-    th { background: #f5f5f5; font-weight: 500; }
+    th { background: #eff4fb; font-weight: 500; }
     .table-wrap { overflow-x: auto; }
     .footer { font-size: .85rem; color: #626262; margin-top: 24px; padding-top: 16px; border-top: 1px solid #e3e3e3; }
-    a { color: inherit; text-underline-offset: 3px; }
+    a { color: var(--available); text-underline-offset: 3px; }
     .footer a { display: inline-block; white-space: nowrap; min-height: 44px; padding-block: 12px; }
     @media (max-width: 700px) { .grid { grid-template-columns: 1fr; } .weeks { grid-template-columns: repeat(2, minmax(0, 1fr)); } .week:nth-child(2) { border-right: 0; } .week:nth-child(-n+2) { border-bottom: 1px solid #dedede; } body { padding: 20px 16px; } }
     @media (max-width: 440px) { .budget-input { grid-template-columns: 1fr; gap: 12px; } .week { padding: 16px 12px; } .figures { grid-template-columns: 1fr; } .figure.available { border-left: 0; border-top: 1px solid #dedede; } }
@@ -71,14 +75,14 @@
 <body>
   <main>
     <div class="budget-input">
-      <div><label for="monthly">Example monthly budget per person (credits)</label><p id="monthly-hint" class="hint">Your organization chooses this amount. The starting 2,000 credits are illustrative.</p></div>
+      <div><label for="monthly">Example monthly budget per person (credits)</label><p id="monthly-hint" class="hint">Start with this 2,000-credit example, or enter a budget your organization would use.</p></div>
       <input id="monthly" type="number" min="1" max="1000000" step="1" value="2000" aria-describedby="monthly-hint monthly-error" required>
       <p id="monthly-error" class="error" role="status" aria-live="polite" hidden></p>
     </div>
     <section id="problem" aria-labelledby="problem-title">
       <div class="eyebrow">1 of 2 · The problem</div>
       <h1 id="problem-title" tabindex="-1">A monthly allocation can run out in week one.</h1>
-      <p class="intro">One person gets <span id="problem-budget">2,000 credits</span> for the month and uses the full amount in the first week. There is no capacity left for the rest of the month.</p>
+      <p class="intro">One person gets <span id="problem-budget">2,000 credits</span> for the month and uses the full amount in the first week. That leaves no credits for the rest of the month.</p>
       <div class="allocation">One person · one illustrative month</div>
       <div class="weeks" aria-label="Example: the entire monthly budget is used in week one">
         <div class="week problem"><h2>Week 1</h2><span id="problem-used" class="number">2,000</span><span class="label">credits used</span><div class="track" aria-hidden="true"><div class="spent"></div></div></div>
@@ -86,24 +90,24 @@
         <div class="week"><h2>Week 3</h2><span class="number">0</span><span class="label">credits available</span><div class="track" aria-hidden="true"></div></div>
         <div class="week"><h2>Week 4</h2><span class="number">0</span><span class="label">credits available</span><div class="track" aria-hidden="true"></div></div>
       </div>
-      <p class="question">What if the same allocation became available in smaller portions?</p>
+      <p class="question">Spread this budget across the month.</p>
       <button id="show-plan" type="button" disabled>Next: choose a release plan →</button>
       <noscript><p>For this 2,000-credit example, releasing 500 on days 1, 8, 15, and 22 spreads the same amount across the month. Enable JavaScript to explore other budgets.</p></noscript>
     </section>
     <section id="solution" aria-labelledby="solution-title" hidden>
-      <div class="eyebrow">2 of 2 · Choose the amount and cadence</div>
-      <h1 id="solution-title" tabindex="-1">Apportion the same monthly budget.</h1>
-      <p class="intro">Choose weekly, fortnightly, daily, or custom releases. Each plan draws from the monthly amount above.</p>
+      <div class="eyebrow">2 of 2 · Set the release schedule</div>
+      <h1 id="solution-title" tabindex="-1">Choose when credits become available.</h1>
+      <p class="intro">Release credits each week, every two weeks, each day, or on your own schedule.</p>
       <div class="allocation">One person · 30-day example month</div>
       <div class="grid">
         <section class="panel" aria-labelledby="plan-title">
           <h2 id="plan-title">Choose a release plan</h2>
-          <label for="preset">Amount and cadence</label>
+          <label for="preset">Release schedule</label>
           <select id="preset">
             <option value="weekly" selected>Weekly · up to 4 releases</option>
             <option value="fortnightly">Every two weeks · up to 2 releases</option>
-            <option value="daily">Daily · up to 30 portions</option>
-            <option value="custom">Set my own increment</option>
+            <option value="daily">Daily · up to 30 releases</option>
+            <option value="custom">Custom amount and schedule</option>
           </select>
           <div id="custom-controls" hidden>
             <label for="interval">Hours between releases</label>
@@ -127,11 +131,11 @@
           <label for="used">Credits used so far this month</label>
           <input id="used" type="number" min="0" max="500" step="1" value="0" required>
           <div class="meter" aria-hidden="true"><span id="used-bar" class="used-color"></span><span id="available-bar" class="available-color"></span></div>
-          <div class="legend" aria-hidden="true"><span><span class="dot used-color"></span>Used</span><span><span class="dot available-color"></span>Available now</span><span><span class="dot" style="background:#e7e7e7"></span>For later release</span></div>
+          <div class="legend" aria-hidden="true"><span><span class="dot used-color"></span>Used</span><span><span class="dot available-color"></span>Available now</span><span><span class="dot later-color"></span>For later release</span></div>
           <div role="status" aria-live="polite" aria-atomic="true"><p id="equation" class="equation">500 released − 0 used = 500 available</p><p id="next" class="hint">The next 500 credits become available on day 8.</p></div>
         </section>
       </div>
-      <p class="callout"><strong>Unused released credits remain available during the month.</strong> Each release adds to the amount this person can use from the same monthly allocation.</p>
+      <p class="callout"><strong>Unused credits stay available during the month.</strong> Each release adds to the amount this person can use.</p>
       <details>
         <summary>See every release in this plan</summary>
         <div class="table-wrap"><table><caption id="schedule-caption" class="hint">One person's illustrative 2,000-credit monthly budget</caption><thead><tr><th scope="col">When</th><th scope="col">Newly released</th><th scope="col">Released so far</th></tr></thead><tbody id="schedule"></tbody></table></div>
@@ -188,8 +192,8 @@
       element('monthly-error').textContent = validBudget ? '' : 'Enter a whole-credit monthly budget from 1 to 1,000,000.';
       element('monthly').setAttribute('aria-invalid', String(!validBudget));
       element('show-plan').disabled = !validBudget;
-      element('problem-budget').textContent = validBudget ? credits(budget) : '—';
-      element('problem-used').textContent = validBudget ? number(budget) : '—';
+      element('problem-budget').textContent = validBudget ? credits(budget) : 'N/A';
+      element('problem-used').textContent = validBudget ? number(budget) : 'N/A';
       element('budget-total').textContent = validBudget ? `of ${credits(budget)}` : 'Monthly budget needed';
       element('schedule-caption').textContent = validBudget ? `One person's illustrative ${number(budget)}-credit monthly budget` : 'Choose a monthly budget to see its releases';
       if (validBudget) {
@@ -201,7 +205,7 @@
       const elapsed = Number(element('elapsed').value);
       element('day').textContent = atHour(elapsed).replace('day', 'Day');
       if (!plan) {
-        element('released').textContent = '—'; element('available').textContent = '—';
+        element('released').textContent = 'N/A'; element('available').textContent = 'N/A';
         element('equation').textContent = validBudget ? 'Enter whole credits within this budget and an interval from 1 to 744 hours.' : 'Choose a valid monthly budget above.';
         element('equation').classList.add('error'); element('next').textContent = '';
         element('plan-summary').textContent = '';
@@ -218,10 +222,10 @@
       element('next').textContent = nextRelease ? `The next ${credits(nextRelease.amount)} ${nextRelease.amount === 1 ? 'becomes' : 'become'} available on ${atHour(nextRelease.hour)}.` : released === budget ? `The monthly budget of ${credits(budget)} has now been released.` : `${credits(budget - released)} ${budget - released === 1 ? 'remains' : 'remain'} unassigned by this month's release plan.`;
       const cadence = { 1: 'hour', 24: 'day', 168: 'week', 336: 'two weeks' }[plan.interval] ?? `${plan.interval} hours`;
       const last = rows[rows.length - 1];
-      element('plan-summary').textContent = `${number(plan.start)} initially, then ${number(plan.increment)} every ${cadence}, up to ${number(budget)} this month.` + (last.amount < plan.increment ? ` The final release is ${credits(last.amount)}.` : '');
+      element('plan-summary').textContent = `${credits(plan.start)} on day 1, then ${credits(plan.increment)} every ${cadence}, up to ${credits(budget)} for the month.` + (last.amount < plan.increment ? ` The final release is ${credits(last.amount)}.` : '');
       const used = Number(element('used').value);
       if (!validInteger('used')) {
-        element('available').textContent = '—'; element('equation').textContent = `Enter used credits from 0 to ${number(released)}.`;
+        element('available').textContent = 'N/A'; element('equation').textContent = `Enter used credits from 0 to ${number(released)}.`;
         element('equation').classList.add('error'); element('used').setAttribute('aria-invalid', 'true');
         element('used-bar').style.width = '0%'; element('available-bar').style.width = '0%';
       } else {

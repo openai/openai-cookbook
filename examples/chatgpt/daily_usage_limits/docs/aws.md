@@ -1,23 +1,23 @@
-# I run the controller with AWS
+# Deploy the controller on AWS
 
-This guide shows how to deploy the controller on AWS so scheduled releases run independently of an individual's computer. Use it after testing the release policy with a small group. Your organization can also adapt the controller to a managed virtual machine or another cloud environment with scheduled execution, secure credential storage, persistent records, and monitoring.
+Deploy the controller on AWS to run scheduled releases independently of an individual's computer. Test the release policy with a small group first. Adapting it to another managed environment requires scheduled execution, secure credential storage, persistent records, and monitoring.
 
-Use Amazon EventBridge Scheduler to wake a Lambda function hourly. The shared controller decides whether a daily, weekly, or other configured interval is due. DynamoDB preserves the intended absolute cap, original settings, and receipts across invocations. This adjusts cumulative monthly hard caps; it does not reset a daily usage counter.
+Use Amazon EventBridge Scheduler to wake a Lambda function hourly. The shared controller decides whether a daily, weekly, or other configured interval is due. DynamoDB preserves the intended absolute cap, original settings, and receipts across invocations. The controller updates cumulative monthly hard caps. Usage continues accumulating within the confirmed period.
 
-The template starts with the schedule **disabled** and live writes **off**. It uses Node.js 24, a 120-second Lambda timeout, reserved concurrency of one, and 180-second per-user leases. This Lambda path accepts at most **25 enrolled members**. Begin with one member and measure completion time before increasing the cohort. A larger all-members deployment needs a separately reviewed batching design; this example does not demonstrate enterprise-scale throughput.
+The template starts with the schedule **disabled** and live writes **off**. It uses Node.js 24, a 120-second Lambda timeout, reserved concurrency of one, and 180-second per-user leases. This Lambda path accepts at most **25 enrolled members**. Begin with one member and measure completion time before increasing the cohort. Cohorts above 25 members require a separately reviewed batching design and throughput validation.
 
-Run commands from the extracted starter folder, or from `examples/chatgpt/daily_usage_limits` in the full repository. AWS steps require an approved account and region, AWS CLI v2, deployment permissions, and existing private resources: a versioned S3 artifact bucket, an operations SNS topic with a reachable subscriber, and a Secrets Manager secret. The secret must contain `{"apiKey":"..."}` using a workspace-scoped ChatGPT Admin key with the [required permissions](api-contract.md). Supply the secret through your organization's approved process; do not put its value in source, parameters, command arguments, logs, or this walkthrough. The template creates no secret, subscription, public endpoint, or bucket.
+Run commands from the extracted starter folder, or from `examples/chatgpt/daily_usage_limits` in the full repository. AWS steps require an approved account and region, AWS CLI v2, deployment permissions, and existing private resources: a versioned S3 artifact bucket, an operations SNS topic with a reachable subscriber, and a Secrets Manager secret. The secret must contain `{"apiKey":"..."}` using a workspace-scoped ChatGPT Admin key with the [required permissions](api-contract.md). Supply the secret through your organization's approved process; do not put its value in source, parameters, command arguments, logs, or this walkthrough. Provision the secret, subscription, and bucket separately. The deployment has no public endpoint.
 
-## 1. I verify the code without AWS credentials
+## 1. Check the AWS example locally
 
 ```bash
 node --test test/aws*.test.mjs
 npm run package --prefix aws
 ```
 
-The tests inject AWS transports and a synthetic Admin API. They exercise the real handler and controller through apply, duplicate delivery, the next interval, and exact restoration. Store tests check that an expired lease holder cannot overwrite state or release a newer holder's lock. **These are local tests, not AWS service acceptance.**
+The tests inject AWS transports and a synthetic Admin API. They exercise the real handler and controller through apply, duplicate delivery, the next interval, and exact restoration. Store tests check that an expired lease holder cannot overwrite state or release a newer holder's lock. Complete the AWS service checks in steps 2 through 6 before enabling recurring changes.
 
-Packaging installs the pinned SDK dependencies with install scripts disabled and writes `aws/dist/controller.zip`, its SHA-256, and `source-manifest.json`. Only the runtime's source import graph and dependencies enter the ZIP. No upload occurs. Review the manifest; it must contain neither a private configuration nor an enrollment, credential, fixture, or receipt.
+Packaging installs the pinned SDK dependencies with install scripts disabled and writes `aws/dist/controller.zip`, its SHA-256, and `source-manifest.json`. The ZIP contains the runtime's source import graph and dependencies. Review the manifest and exclude private configuration, enrollment, credentials, fixtures, and receipts. Upload is a separate step below.
 
 For an optional local CloudFormation syntax and schema check, install `cfn-lint` in an isolated environment and run:
 
@@ -27,9 +27,9 @@ python3 -m venv .private/cfn-validation
 .private/cfn-validation/bin/cfn-lint -t aws/template.yaml
 ```
 
-This check does not prove that the deployment identity has permissions or that AWS will accept the stack in your account.
+Check deployment permissions and AWS stack acceptance during step 2.
 
-I can also rehearse preparation of the protected control item without sending anything to AWS:
+Prepare a protected control item locally:
 
 ```bash
 node src/cli.mjs init --dir .private/aws-rehearsal --pattern fixed_release --cohort all --unit credit --interval-hours 168 --synthetic --allow-initial-reduction
@@ -44,9 +44,9 @@ node aws/prepare-control.mjs .private/aws-rehearsal/config.json .private/aws-reh
 node aws/event.mjs probe .private/aws-rehearsal/probe.json
 ```
 
-The preparation command prints a `ControlSha256` that binds the complete configuration and enrollment. Its private output is a DynamoDB item, not a deployment request. Keep rehearsal controls separate from live controls.
+The preparation command prints a `ControlSha256` that binds the complete configuration and enrollment. It saves a private DynamoDB item for review. Keep rehearsal controls separate from live controls.
 
-## 2. I prepare a disabled cloud pilot for review
+## 2. Prepare a disabled cloud pilot
 
 The following steps upload code and create billable AWS resources. Perform them only after the account owner approves the account, region, resource ownership, cost, expiry, and deployment role. Set `AWS_PROFILE` and `AWS_REGION` to the approved CLI profile and region. Use a deployment role; do not paste AWS access keys into files.
 
@@ -67,7 +67,7 @@ The following steps upload code and create billable AWS resources. Perform them 
    aws cloudformation describe-stacks --stack-name "$DAILY_LIMIT_STACK" --query 'Stacks[0].Outputs'
    ```
 
-   Set `DAILY_LIMIT_FUNCTION`, `DAILY_LIMIT_TABLE`, and `DAILY_LIMIT_GROUP` from the returned function, table, and schedule-group outputs. These variables hold names, never credentials.
+   Set `DAILY_LIMIT_FUNCTION`, `DAILY_LIMIT_TABLE`, and `DAILY_LIMIT_GROUP` from the returned function, table, and schedule-group outputs. Use these variables for resource names. Keep credentials in the approved credential provider.
 5. Read back the deployed controls:
 
    ```bash
@@ -78,18 +78,18 @@ The following steps upload code and create billable AWS resources. Perform them 
 
    Expect `nodejs24.x`, timeout `120`, concurrency `1`, `APPLY_ENABLED=false`, and schedule state `DISABLED`. Check the expiry, fixed control hash, exact secret ARN, target role, retry policies, and both failure queues. Keep the returned configuration private.
 
-The runtime role can read one secret and the reviewed control partition. It can update only controller state, locks, and its own receipts; it cannot update the control document, secret, schedule, or its own permissions. The external deployment role and the operator who provisions controls remain privileged. The hash detects changed controls; it is not a substitute for IAM access control or review.
+The runtime role has read access to one secret and the reviewed control partition. Its write permissions cover controller state, locks, and its own receipts. The deployment role and the operator who provisions controls retain privileged access. Protect the control document, secret, schedule, and role permissions through IAM access control and review. The hash detects changes to the reviewed control document.
 
-## 3. I prove AWS delivery, then make a read-only preview
+## 3. Verify delivery and preview the limits
 
-First prove manual Lambda invocation without touching the Admin API:
+Run a manual Lambda probe. The probe makes zero Admin API calls:
 
 ```bash
 node aws/event.mjs probe .private/aws-probe.json
 aws lambda invoke --function-name "$DAILY_LIMIT_FUNCTION" --cli-binary-format raw-in-base64-out --payload file://.private/aws-probe.json .private/aws-probe-result.json
 ```
 
-Inspect `.private/aws-probe-result.json`. Expect `ok: true` and `action: probe`. Also verify a new `aws_invocation` receipt in the private DynamoDB table. An HTTP `200` alone is insufficient: a synchronous Lambda invocation can return a `FunctionError` in the CLI metadata.
+Inspect `.private/aws-probe-result.json`. Expect `ok: true` and `action: probe`. Also verify a new `aws_invocation` receipt in the private DynamoDB table. Check the CLI metadata for `FunctionError`, including when the HTTP status is `200`.
 
 To prove **timed delivery**, open EventBridge Scheduler in the approved AWS account. In the stack's schedule group, create one temporary one-time schedule a few minutes ahead in UTC. Select the deployed Lambda and the stack's existing scheduler execution role; use the existing delivery-failure queue, turn the flexible window off, and choose automatic deletion after completion. Use this target input:
 
@@ -97,11 +97,11 @@ To prove **timed delivery**, open EventBridge Scheduler in the approved AWS acco
 {"version":1,"action":"probe","scheduledAt":"<aws.scheduler.scheduled-time>"}
 ```
 
-Wait for the scheduled time. Match the Scheduler invocation metric and Lambda log entry to a new private invocation receipt; verify the one-time schedule disappears. A manual invocation or local test does not satisfy this step. Keep the recurring `usage-limit-check` schedule disabled.
+Wait for the scheduled time. Match the Scheduler invocation metric and Lambda log entry to a new private invocation receipt; verify the one-time schedule disappears. Use a receipt produced by the timed trigger to complete this check. Keep the recurring `usage-limit-check` schedule disabled.
 
 Now prepare the live preview:
 
-1. Complete the [README's live enrollment steps](../README.md#prepare-a-reviewed-enrollment) in `.private/aws-live`, with no local writer running. Confirm the real workspace, unit, period boundaries, counter scope, selected members, and original cap/source. Use at most 25 members. Keep `liveWrites: false`. Snapshot, review, and approve the enrollment **after cloud setup**; the first apply requires a snapshot no older than 15 minutes and the same policy interval.
+1. Complete the [live enrollment steps](operations.md#prepare-a-reviewed-enrollment) in `.private/aws-live`, with no local writer running. Confirm the real workspace, unit, period boundaries, counter scope, selected members, and original cap/source. Use at most 25 members. Keep `liveWrites: false`. Snapshot, review, and approve the enrollment **after cloud setup**; the first apply requires a snapshot no older than 15 minutes and the same policy interval.
 2. Prepare its protected item:
 
    ```bash
@@ -119,15 +119,15 @@ Now prepare the live preview:
    aws lambda invoke --function-name "$DAILY_LIMIT_FUNCTION" --cli-binary-format raw-in-base64-out --payload file://.private/aws-preview.json .private/aws-preview-result.json
    ```
 
-4. Inspect every private member receipt and the invocation result. Confirm `mode: preview`, the correct identities/unit, original settings, intended cap, ceiling, and no PATCH. This validates real secret retrieval, network access, Admin API reads, and private durable receipts. It still does not prove a live cap change or model enforcement.
+4. Inspect every private member receipt and the invocation result. Confirm `mode: preview`, the correct identities/unit, original settings, intended cap, ceiling, and no PATCH. This validates real secret retrieval, network access, Admin API reads, and private durable receipts. Verify a cap change, its API readback, and its effect on eligible usage during the approved live trial.
 
 To inspect receipts, use the DynamoDB console's item explorer on the output table and query `PK = RECEIPT#<DeploymentId>`. Receipts contain private identifiers and settings; do not paste them into public issues. The Lambda response and logs contain only a short run summary.
 
-## 4. I review the first live change and ongoing schedule
+## 4. Review the first change and recurring schedule
 
-1. Obtain explicit approval for the proposed member caps, any initial reduction, the bounded trial, and restoration. Coordinate all manual admin edits and disable any local or Codex writer for the same users. Separate stacks have separate lock tables and cannot protect against overlapping owners.
-2. Set `liveWrites: true` in the same reviewed configuration. This gate does not change the policy approval hash, but it does change the AWS control-document hash. Regenerate the item to a **new** private output path and review both hashes. Replace the old control item only while the schedule is disabled, using a conditional write that checks its previous `documentSha256`; do not blindly overwrite another operator's update. Update `ControlSha256` and `ApplyEnabled=true` in the stack parameters, keeping `ScheduleState=DISABLED`. Apply and verify that stack update. If setup consumed the 15-minute first-apply window, recapture and reapprove the untouched enrollment before proceeding.
-3. Generate a fresh `apply` event and invoke it as in the preceding preview command. Expect `ok: true`, private `applied` receipts, and independent readback of each absolute cap with its temporary expiry. Repeat the same current-slot invocation and expect no additional writes. A delayed invocation uses the current policy slot, not the event's old time. Inspect all members: the handler fails if any member needs attention or could not start within the time budget.
+1. Obtain explicit approval for the proposed member caps, any initial reduction, the bounded trial, and restoration. Coordinate all manual admin edits and disable any local or Codex writer for the same users. Separate stacks use separate lock tables. Assign disjoint users to each controller.
+2. Set `liveWrites: true` in the same reviewed configuration. The policy approval hash stays the same. The AWS control-document hash changes. Regenerate the item to a **new** private output path and review both hashes. Replace the old control item only while the schedule is disabled, using a conditional write that checks its previous `documentSha256`; do not blindly overwrite another operator's update. Update `ControlSha256` and `ApplyEnabled=true` in the stack parameters, keeping `ScheduleState=DISABLED`. Apply and verify that stack update. If setup consumed the 15-minute first-apply window, recapture and reapprove the untouched enrollment before proceeding.
+3. Generate a fresh `apply` event and invoke it as in the preceding preview command. Expect `ok: true`, private `applied` receipts, and independent readback of each absolute cap with its temporary expiry. Repeat the same current-slot invocation and expect no additional writes. A delayed invocation calculates the target from the current policy slot. Inspect all members: the handler fails if any member needs attention or could not start within the time budget.
 4. With recurring delivery still disabled, generate a `restore` event and invoke it. Verify that the API's settings and source match the saved original state exactly for each member. Turn `ApplyEnabled` off again. This closes that enrollment; use a fresh, reviewed enrollment and a new private state table for a continuing pilot.
 5. For the continuing pilot, first prove a bounded manual apply with fresh reviewed controls. Only then set `ScheduledAction=apply` and `ScheduleState=ENABLED` through a reviewed stack update. Verify a real hourly trigger and its receipt. The policy's `intervalHours` controls release frequency. Keep the same state table throughout this enrollment; changing tables loses reconciliation and original-state records.
 
@@ -137,13 +137,13 @@ For a conditional control replacement, write `.private/expected-control-hash.jso
 aws dynamodb put-item --table-name "$DAILY_LIMIT_TABLE" --item file://.private/aws-live/NEW_CONTROL_ITEM.json --condition-expression 'documentSha256 = :expected' --expression-attribute-values file://.private/expected-control-hash.json
 ```
 
-`NEW_CONTROL_ITEM.json` is the new reviewed item produced by `prepare-control.mjs`. A conditional failure means the previous control changed; stop and read it back. Never weaken the condition to force an update. The first installation uses `attribute_not_exists(PK)` instead.
+`NEW_CONTROL_ITEM.json` is the new reviewed item produced by `prepare-control.mjs`. A conditional failure means the previous control changed; stop and read it back. Never weaken the condition to force an update. Use `attribute_not_exists(PK)` for the first installation.
 
-The handler checks the finite pilot expiry before secrets and refuses any run outside the reviewed period. It does not enroll the next month automatically. Set expiry with enough time to restore while the confirmed period remains current. At a unit transition or a different billing-cycle boundary, stop and review new evidence; no implicit conversion or period inference occurs.
+The handler checks the finite pilot expiry before secrets and refuses any run outside the reviewed period. Review a fresh enrollment before starting the next period. Set expiry with enough time to restore while the confirmed period remains current. At a unit transition or a different billing-cycle boundary, stop and confirm the unit and exact period before reviewing new controls.
 
-## 5. I verify failures and alerts
+## 5. Verify failures and alerts
 
-Scheduler invokes Lambda asynchronously. Scheduler delivery retries and Lambda execution retries are separate; the template provides an SQS queue for each. Lambda can deliver duplicates even after a successful run, so correctness depends on durable absolute targets and readback, not delivery uniqueness. [Scheduler invocation behavior](https://docs.aws.amazon.com/lambda/latest/dg/with-eventbridge-scheduler.html), [Lambda retry behavior](https://docs.aws.amazon.com/lambda/latest/dg/invocation-async-error-handling.html).
+Scheduler invokes Lambda asynchronously. Scheduler delivery retries and Lambda execution retries are separate; the template provides an SQS queue for each. Lambda can deliver duplicates after a successful run. The controller uses durable absolute targets and readback to reconcile repeated delivery. [Scheduler invocation behavior](https://docs.aws.amazon.com/lambda/latest/dg/with-eventbridge-scheduler.html), [Lambda retry behavior](https://docs.aws.amazon.com/lambda/latest/dg/invocation-async-error-handling.html).
 
 | Signal | Meaning and action |
 | --- | --- |
@@ -155,18 +155,18 @@ Scheduler invokes Lambda asynchronously. Scheduler delivery retries and Lambda e
 | `InvocationsFailedToBeSentToDeadLetterCount` | Scheduler could not send its failed event to the delivery queue. |
 | Missing-run alarm | No successful hourly invocation for about three hours while recurring delivery is enabled. Check the schedule and expiry. |
 
-Verify actual alert delivery to the owner, then test a controlled failed invocation and recovery while writes are off. For example, invoke an event with an invalid action asynchronously and confirm retries, the execution queue, alarm receipt, and recovery. Use a separate approved test if you need to exercise Scheduler delivery failure; do not modify a production target or permission to manufacture an outage. A defined alarm or a nonempty queue is not proof that a person received a notification.
+Verify actual alert delivery to the owner, then test a controlled failed invocation and recovery while writes are off. For example, invoke an event with an invalid action asynchronously and confirm retries, the execution queue, alarm receipt, and recovery. Use a separate approved test if you need to exercise Scheduler delivery failure; do not modify a production target or permission to manufacture an outage. Confirm that the intended recipient received the alert.
 
-The code stops starting users as time runs low and reserves time before a PATCH for readback. A timeout can still leave a pending intent. Rerun the same operation after reconciliation; do not delete state or grant a different target. Measure your cohort's worst-case time before enabling recurring delivery. If repeated invocations cannot complete all 25 or fewer members, reduce the approved cohort or design durable batching; do not claim unprocessed members are covered. API rate-limit delays can outlast Lambda's retries; the saved retry time is honored on a later invocation.
+The code stops starting users as time runs low and reserves time before a PATCH for readback. A timeout can still leave a pending intent. Rerun the same operation after reconciliation; do not delete state or grant a different target. Measure your cohort's worst-case time before enabling recurring delivery. If repeated invocations cannot complete all 25 or fewer members, reduce the approved cohort or design durable batching. Track unprocessed members as outstanding work. API rate-limit delays can outlast Lambda's retries; the saved retry time is honored on a later invocation.
 
-For a repaired authentication failure, keep recurring delivery disabled, inspect the halted receipt, then generate and manually invoke a `resume_auth` event. It clears the halt only after current state is verified; it does not change caps or discard the pending target. Preview and explicitly rerun the original operation afterward. If a first attempted write never took effect and its initial review expired, inspect the before-state and use `cancel_initial` to close that untouched enrollment, then capture a fresh pilot. Neither recovery action is available as a recurring schedule action. Both use the same reviewed controls and state table; never reset the table as a recovery shortcut.
+For a repaired authentication failure, keep recurring delivery disabled, inspect the halted receipt, then generate and manually invoke a `resume_auth` event. It verifies current state, then clears the halt while preserving caps and the pending target. Preview and explicitly rerun the original operation afterward. If a first attempted write never took effect and its initial review expired, inspect the before-state and use `cancel_initial` to close that untouched enrollment, then capture a fresh pilot. Invoke recovery actions manually. Both use the same reviewed controls and state table; never reset the table as a recovery shortcut.
 
-The table encrypts stored data and enables point-in-time recovery. Only receipt items have a TTL; state, before-settings, controls, and unresolved intents do not expire automatically. DynamoDB TTL deletion is asynchronous, so it is not a precise retention deadline. Apply your organization's retention and access policy to the private table, logs, backups, artifact versions, and queues. [DynamoDB TTL behavior](https://docs.aws.amazon.com/amazondynamodb/latest/developerguide/TTL.html).
+The table encrypts stored data and enables point-in-time recovery. Receipt items have a time to live (TTL). State, before-settings, controls, and unresolved intents persist until explicitly removed. DynamoDB processes TTL deletions asynchronously after expiry. Apply your organization's retention and access policy to the private table, logs, backups, artifact versions, and queues. [DynamoDB TTL behavior](https://docs.aws.amazon.com/amazondynamodb/latest/developerguide/TTL.html).
 
-## 6. I stop, restore, and verify cleanup
+## 6. Stop, restore, and verify cleanup
 
 1. Set `ScheduleState=DISABLED` and `ApplyEnabled=false` through a stack update. Read back the disabled schedule and gate. Wait for any in-flight invocation to finish; inspect both failure queues and private pending state. Do not delete the table to stop writes.
-2. While the pilot and reviewed period are still current, review a restore. Keep the schedule disabled and temporarily enable only the write gates needed for a manual `restore` invocation. Resolve an existing pending apply first using its saved target. Verify every member's exact original settings and source by independent API readback, then turn the write gate off. If the period has ended, the controller intentionally refuses restoration: have the workspace admin inspect the current inherited/override state and approve any required manual correction instead of replaying an old period's settings.
+2. While the pilot and reviewed period are still current, review a restore. Keep the schedule disabled and temporarily enable only the write gates needed for a manual `restore` invocation. Resolve an existing pending apply first using its saved target. Verify every member's exact original settings and source by independent API readback, then turn the write gate off. If the period has ended, the controller refuses restoration. Have the workspace admin inspect the current inherited/override state and approve any required manual correction.
 3. Record the stack outputs and owned artifact version. Archive required private receipts and restore evidence. Delete the stack only after reconciliation and restoration are complete:
 
    ```bash
@@ -174,7 +174,7 @@ The table encrypts stored data and enables point-in-time recovery. Only receipt 
    aws cloudformation wait stack-delete-complete --stack-name "$DAILY_LIMIT_STACK"
    ```
 
-4. Verify the Lambda, recurring schedule/group, queues, roles, and alarms are gone. The table and log group deliberately remain under `DeletionPolicy: Retain` so deletion cannot silently destroy recovery evidence. Review their contents and retention obligations, then explicitly delete only those owned retained resources if authorized. Also delete the precise uploaded S3 object version if no longer required; never empty a shared bucket.
+4. Verify the Lambda, recurring schedule/group, queues, roles, and alarms are gone. The table and log group remain under `DeletionPolicy: Retain` to preserve recovery evidence. Review their contents and retention obligations, then explicitly delete only those owned retained resources if authorized. Also delete the precise uploaded S3 object version if no longer required; never empty a shared bucket.
 5. Verify the retained-resource inventory and any temporary probe schedule. Revoke a dedicated ChatGPT key through your approved credential process if the pilot no longer needs it. The pre-existing secret, bucket, SNS topic/subscriptions, and optional KMS key are outside this stack and must not be deleted as incidental cleanup.
 
-Pilot expiry stops runtime work and scheduled invocation; it does not restore caps, remove resources, stop all AWS charges, or guarantee deletion. The final acceptance record should distinguish local tests, cloud delivery, live read-only preview, approved change/readback/restore, timed recurring execution, delivered alerts, and verified cleanup.
+Pilot expiry stops runtime work and scheduled invocation. Complete restoration and cleanup separately; retained resources continue to incur applicable charges. Record the results of local tests, cloud delivery, live read-only preview, approved change/readback/restore, timed recurring execution, alert delivery, and cleanup.

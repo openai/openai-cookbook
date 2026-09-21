@@ -1,19 +1,19 @@
-# I run the controller on my computer or server
+# Run the controller on a computer or server
 
-Use your computer to rehearse the approach or test it with a small group. For ongoing workspace credit management, use a virtual machine or server operated by your organization, with monitoring and a team responsible for keeping it available. This guide provides macOS and Linux scheduler examples.
+Use your computer to rehearse the approach or test it with a small group. For ongoing workspace credit management, use a virtual machine or server operated by your organization, with monitoring and a team responsible for keeping it available. Choose the macOS or Linux scheduler procedure below.
 
 Use a local scheduler to invoke the same controller without a model in the execution path. The host needs Node.js 24 or later, durable private storage on its local filesystem, and a credential provider that works under the scheduled service's identity. A sleeping or unavailable host can delay execution; the fixed policy catches up to the current interval when the host returns.
 
-The commands below create a synthetic rehearsal and **uninstalled preview templates**. They do not install a service or enable real changes. Run them from the extracted starter folder, or from `examples/chatgpt/daily_usage_limits` in the full repository.
+Prepare a fictional rehearsal and **uninstalled preview templates**. Review service installation and real changes in step 3. Run them from the extracted starter folder, or from `examples/chatgpt/daily_usage_limits` in the full repository.
 
-## 1. I rehearse the all-members workflow
+## 1. Rehearse the all-members workflow
 
 ```bash
 node src/cli.mjs init --dir .private/local-rehearsal --pattern fixed_release --cohort all --unit credit --interval-hours 168 --synthetic --allow-initial-reduction
 node src/cli.mjs snapshot --config .private/local-rehearsal/config.json --out .private/local-rehearsal/enrollment.json --synthetic
 ```
 
-Review the three fictional members: each has a 2,000-credit monthly target and will receive 500 credits each week. `--allow-initial-reduction` permits the first reviewed change from the original 2,000-credit limit to the first 500-credit portion. The membership snapshot is fixed: newly added members will be reported but will not receive changes until a new enrollment is reviewed. Removed or ineligible members produce attention receipts.
+Review the three fictional members: each has a 2,000-credit monthly target and will receive 500 credits each week. `--allow-initial-reduction` permits the first reviewed change from the original 2,000-credit limit to the first 500-credit portion. The membership snapshot fixes the enrolled users. The controller reports new members; include them through a fresh enrollment review. Removed or ineligible members produce attention receipts.
 
 Replace `REVIEWED_SHA256` with the printed snapshot hash, then run:
 
@@ -27,9 +27,9 @@ node src/cli.mjs inspect --state .private/local-rehearsal/state
 
 Expect preview receipts, then simulator changes, then `duplicate_slot` for all three members. The configured increment is per week in this rehearsal. The first apply must use a snapshot captured within 15 minutes and in the same interval slot.
 
-To rehearse observed headroom instead, initialize a separate directory using `--pattern observed_headroom --cohort selected --unit usd --interval-hours 24 --synthetic`, then repeat the snapshot, approval, preview, apply, duplicate, and restore steps with that directory. Review `lookbackDays`, `coverageHours`, and `multiplierBps` in its configuration. Native USD calculations use USD throughout.
+To rehearse observed headroom, initialize a separate directory using `--pattern observed_headroom --cohort selected --unit usd --interval-hours 24 --synthetic`, then repeat the snapshot, approval, preview, apply, duplicate, and restore steps with that directory. Review `lookbackDays`, `coverageHours`, and `multiplierBps` in its configuration. Native USD calculations use USD throughout.
 
-## 2. I generate and inspect the scheduler files
+## 2. Generate and inspect the scheduler files
 
 Find the runtime's absolute path with `command -v node`. Substitute that path for `/ABSOLUTE/PATH/TO/node`:
 
@@ -46,7 +46,7 @@ The generated files are:
 | `usage-limit.service` | Linux systemd service definition. |
 | `usage-limit.timer.disabled` | Linux systemd timer definition, left uninstalled. |
 
-The check interval in these templates is 60 minutes. The policy's release interval remains 168 hours. A frequent check does not grant a frequent increment.
+The check interval in these templates is 60 minutes. The policy's release interval remains 168 hours. Cap targets advance on the 168-hour policy interval.
 
 For the credential-free rehearsal, confirm the generated runner contains `--synthetic` and omits `--apply`. Run the preview script and inspect its receipt:
 
@@ -55,24 +55,24 @@ sh .private/local-rehearsal/run-preview.sh
 node src/cli.mjs inspect --state .private/local-rehearsal/state
 ```
 
-Check the macOS syntax with `plutil -lint .private/local-rehearsal/launchd.plist.disabled`. On Linux, review the generated service and timer with your installed systemd tooling. Syntax validation and manual script execution do not prove that the scheduler fired.
+Check the macOS syntax with `plutil -lint .private/local-rehearsal/launchd.plist.disabled`. On Linux, review the generated service and timer with your installed systemd tooling. After installation, verify a receipt produced by a timed trigger.
 
-## 3. I prepare a live service for review
+## 3. Prepare a live service for review
 
-1. Create a separate live pilot directory and complete the [README's enrollment steps](../README.md#prepare-a-reviewed-enrollment). Use a local disk, not a shared or synchronized filesystem. Keep its state available across runs and restrict access to the service account. Do not reuse synthetic state for live calls.
-2. Integrate your organization's protected credential provider so the scheduled process receives `CHATGPT_ADMIN_API_KEY`. An interactive shell's environment does not establish that the scheduler can read a secret. Verify secret access as the scheduled identity with a read-only snapshot, without logging the credential. Do not store the key in a plist, service file, script, or plaintext environment file.
+1. Create a separate live pilot directory and complete the [enrollment steps](operations.md#prepare-a-reviewed-enrollment). Use a disk local to the host. Keep the state directory outside shared or synchronized filesystems. Keep its state available across runs and restrict access to the service account. Do not reuse synthetic state for live calls.
+2. Integrate your organization's protected credential provider so the scheduled process receives `CHATGPT_ADMIN_API_KEY`. Verify secret access under the scheduled identity with a read-only snapshot. Keep the credential out of logs. Do not store the key in a plist, service file, script, or plaintext environment file.
 3. Generate templates for the live directory. Review absolute paths, runtime, service identity, cadence, logs, and attention handling. Run the preview script under that identity. Expect preview receipts with the approved workspace and members.
-4. Authorize and complete one bounded live apply/readback/restore trial before recurring writes. Live application requires both `liveWrites: true` and `--apply`. The renderer does not enable either. After restoring, create a new reviewed enrollment in a new private directory for continuing operation.
-5. Choose one of the host-specific procedures below. The credential setup and service installation are separate, explicitly authorized steps. Verify a timed invocation, not only a manually started process; also test reboot or sleep recovery, private-state access, and credential access in the intended unattended environment.
+4. Authorize and complete one bounded live apply/readback/restore trial before recurring writes. Live application requires both `liveWrites: true` and `--apply`. Generated commands omit `--apply`. After restoring, create a new reviewed enrollment in a new private directory for continuing operation.
+5. Choose one of the host-specific procedures below. The credential setup and service installation are separate, explicitly authorized steps. Verify a receipt from a timed invocation. Test reboot or sleep recovery, private-state access, and credential access in the intended unattended environment.
 
-The preview templates are a starting point for host-specific service installation. They do not include a universal secret provider or install themselves. Complete those environment checks before describing a host as ready for unattended live changes.
+Complete the credential, scheduler, and recovery checks for the chosen host before enabling unattended live changes.
 
 ### macOS: Keychain and a user launchd job
 
-These steps use the live configuration in `.private/pilot/config.json`. Complete its workspace, period, and policy review first. Run the commands from the example directory. The service and account names below identify a dedicated pilot credential; they are not secrets.
+These steps use the live configuration in `.private/pilot/config.json`. Complete its workspace, period, and policy review first. Run the commands from the example directory. The service and account names below select a dedicated pilot credential.
 
 1. After credential storage is authorized, open **Keychain Access**, select the intended user's login keychain, and create a new password item with **Command-N**. Use `chatgpt-usage-limits` as the item name and `daily-limit` as the account. Enter the dedicated Admin key in the password field and save. Search for the saved item and confirm its name and account without revealing its password. [Apple's Keychain Access shortcuts](https://support.apple.com/en-ca/guide/keychain-access/kyca699a9058/mac) document the new-item shortcut.
-2. Read the live enrollment through the credential runner. It reads the Keychain item into memory and passes it only to the controller process. It does not put the key in the command arguments or output:
+2. Read the live enrollment through the credential runner. It reads the Keychain item into memory and passes it to the controller through a temporary environment variable. Command arguments and output exclude the key:
 
    ```bash
    pilot_dir="$PWD/.private/pilot"
@@ -80,7 +80,7 @@ These steps use the live configuration in `.private/pilot/config.json`. Complete
    node src/credential-runner.mjs snapshot --provider keychain --service chatgpt-usage-limits --account daily-limit --config "$pilot_dir/config.json" --out "$pilot_dir/enrollment.json"
    ```
 
-   Review the snapshot and approve its printed hash with `node src/cli.mjs approve --enrollment "$pilot_dir/enrollment.json" --hash REVIEWED_SHA256`. If Keychain requests access, review the exact program and item. A successful interactive read does not prove access while the login keychain is locked; include that condition in the host acceptance test. Do not broaden Keychain access for all applications.
+   Review the snapshot and approve its printed hash with `node src/cli.mjs approve --enrollment "$pilot_dir/enrollment.json" --hash REVIEWED_SHA256`. If Keychain requests access, review the exact program and item. Test credential access while the login keychain is locked. Do not broaden Keychain access for all applications.
 3. Generate and manually run the Keychain-backed preview. The renderer refuses to overwrite existing files; use a fresh pilot directory if templates were already created there:
 
    ```bash
@@ -149,13 +149,13 @@ mv "$agent_file" "$pilot_dir/retired-launchd.plist"
 launchctl print "$agent_domain/$agent_label"
 ```
 
-The final command should report that the service cannot be found. Revoke the dedicated Admin key and remove its Keychain item only after confirming nothing else uses it. The `launchctl` commands above follow the host's `man launchctl`; check that manual for your macOS version.
+Confirm that the final command reports the service as absent. Revoke the dedicated Admin key and remove its Keychain item only after confirming nothing else uses it. The `launchctl` commands above follow the host's `man launchctl`; check that manual for your macOS version.
 
 ### Linux: an encrypted credential and a user systemd timer
 
 This path requires systemd 256 or later with working user-scoped encrypted credentials. Confirm `systemd-creds --version` and the host's supported credential configuration. User credentials use `--user`, and `LoadCredentialEncrypted` makes the decrypted value available only to the service at runtime. See the [systemd credential tool reference](https://github.com/systemd/systemd/blob/main/man/systemd-creds.xml). Do not fall back to null-key encryption or a plaintext environment file if the host cannot decrypt the credential.
 
-1. After credential storage is authorized, run this in Bash as the intended service user. Enter the dedicated key at the hidden prompt. The pipeline writes ciphertext, never a plaintext file:
+1. After credential storage is authorized, run this in Bash as the intended service user. Enter the dedicated key at the hidden prompt. The pipeline writes an encrypted credential file:
 
    ```bash
    set -eu
@@ -173,14 +173,14 @@ This path requires systemd 256 or later with working user-scoped encrypted crede
    systemd-run --user --wait --pipe --collect -p "LoadCredentialEncrypted=chatgpt-admin-key:$pilot_dir/chatgpt-admin-key.cred" "$node_path" "$PWD/src/credential-runner.mjs" snapshot --provider systemd --config "$pilot_dir/config.json" --out "$pilot_dir/enrollment.json"
    ```
 
-   Review the snapshot and approve its printed hash using the same local `approve` command as above. This step creates a temporary read-only process, not a recurring timer or cap change.
+   Review the snapshot and approve its printed hash using the same local `approve` command as above. This temporary process reads the enrollment and exits.
 3. Generate the preview service with its encrypted credential reference, then inspect the files:
 
    ```bash
    node src/cli.mjs render-local --dir "$pilot_dir" --node "$node_path" --interval-minutes 60 --credential-provider systemd --encrypted-credential "$pilot_dir/chatgpt-admin-key.cred"
    ```
 
-   Confirm `LoadCredentialEncrypted=chatgpt-admin-key:…` names the intended encrypted file. The runner reads the fixed `chatgpt-admin-key` file from systemd's `CREDENTIALS_DIRECTORY`. It does not read a plaintext credential path from the policy.
+   Confirm `LoadCredentialEncrypted=chatgpt-admin-key:…` names the intended encrypted file. The runner reads the fixed `chatgpt-admin-key` file from systemd's `CREDENTIALS_DIRECTORY`. Keep the credential path in the service definition.
 4. After approving installation, confirm `usage-limit.service` and `usage-limit.timer` are absent from the user's service manager and unit directory. Install this pilot only; these fixed names must not replace another service:
 
    ```bash
@@ -210,7 +210,7 @@ This path requires systemd 256 or later with working user-scoped encrypted crede
    systemctl --user list-timers usage-limit.timer --all
    ```
 
-   Verify a timed receipt. A user timer may stop when the user's session ends; ask the host administrator to review unattended service ownership before changing login persistence. This guide does not enable lingering automatically.
+   Verify a timed receipt. A user timer can stop when the user's session ends. Have the host administrator review unattended service ownership and any login-persistence change. Lingering requires a separate configuration decision.
 5. Before applying changes on schedule, stop the timer, complete the bounded live trial, and create a fresh reviewed pilot after restoration. Only then add `--apply` to its generated controller invocation and enable `liveWrites`. Review the updated unit paths and reload them before resuming. Keep a single scheduler for the enrolled users.
 
 To stop, disable the timer and inspect the running service:
@@ -243,20 +243,20 @@ systemctl --user is-enabled usage-limit.timer
 
 Expect no scheduled timer and `not-found` from the final command. Revoke the dedicated key and remove its encrypted credential only when no retained process or other service needs it.
 
-## 4. I handle attention receipts
+## 4. Handle attention receipts
 
 | Condition | Action |
 | --- | --- |
 | Duplicate slot | No additional budget was released. Keep the same state directory. |
 | Conflicting manual edit or policy/enrollment mismatch | Pause the scheduler. Compare live settings, enrollment, and journal before approving another action. |
-| Pending or ambiguous write | Rerun the same operation only after inspecting the saved absolute target and current state. Readback may reconcile an already-applied change. |
+| Pending or ambiguous write | Rerun the same operation only after inspecting the saved absolute target and current state. Use readback to check whether the saved target was applied. |
 | Initial reduction review expired | A reduction cannot be retried after its 15-minute review window or interval slot ends. Inspect whether the saved target took effect; reconcile an applied change, or cancel an untouched initial operation using the procedure below. |
 | Authentication or authorization failure | Repair the dedicated credential or permissions through the approved process. Use `resume-auth` below to read current state and clear the halt, then preview the same pending operation. |
 | Rate limit | Respect the recorded retry time. Do not shorten it by changing the scheduler. |
 | Stale lock, incomplete journal, or corrupted journal | Stop all writers and reconcile saved intent against the API. Preserve evidence; deleting state can lose the original settings or repeat an operation. |
 | Period ended, counter decreased, or unit changed | Stop and review the actual period and billing unit. Do not infer a new month or convert values. |
 
-Keep the operator's attention route separate from the policy. Test delivery and agree what counts as a missed receipt; a generated service file does not provide monitoring by itself.
+Configure the operator's attention route separately. Test delivery and agree what counts as a missed receipt.
 
 After repairing authentication, clear an authorization halt with a read-only reconciliation. With the approved secret provider supplying the key, run:
 
@@ -264,11 +264,11 @@ After repairing authentication, clear an authorization halt with a read-only rec
 node src/cli.mjs resume-auth --config .private/pilot/config.json --enrollment .private/pilot/enrollment.json --state .private/pilot/state
 ```
 
-The command checks the saved pending operation against current API state and clears the halt only when they agree. It makes no cap changes, but does update the local recovery record. For Keychain or systemd, use `src/credential-runner.mjs resume-auth` with the same provider and path flags shown above. Preview before retrying an authorized apply; keep the existing journal. If the initial reduction's review has expired, clearing an authentication halt does not extend that review.
+The command checks the saved pending operation against current API state and clears the halt only when they agree. It preserves the cap and updates the local recovery record. For Keychain or systemd, use `src/credential-runner.mjs resume-auth` with the same provider and path flags shown above. Preview before retrying an authorized apply; keep the existing journal. The original 15-minute review deadline and policy slot still apply after authentication recovery.
 
 ### Cancel an unapplied initial operation
 
-An initial reduction can be saved before the API request fails. If it remains unapplied when the review expires, repeatedly running `--apply` must not revive the old authorization. Use `cancel-initial` to close that member's untouched initial operation while preserving the cohort's journal.
+A failed API request can leave a saved initial reduction. The controller blocks retries when the review expires before that target is applied. Use `cancel-initial` to close that member's untouched initial operation while preserving the cohort's journal.
 
 1. Pause the scheduler, confirm no run is active, and set `liveWrites: false`. Inspect receipts and the saved pending target. Complete any required authentication recovery first. These commands require the same confirmed, still-current usage period.
 2. Run the following with the approved credential provider supplying the key. Do not add `--apply`:
@@ -279,11 +279,11 @@ An initial reduction can be saved before the API request fails. If it remains un
    ```
 
    The command reads the current cap and source, and checks that they still match the saved before-state. It sends no cap changes. A matching untouched member receives `initial_intent_cancelled`, and its enrollment is closed locally. Other members receive `no_unapplied_initial_intent` when there is nothing eligible to cancel. Keychain and systemd users can invoke `src/credential-runner.mjs cancel-initial` with their usual provider and path flags.
-3. Review every member's result. Cancellation does **not** undo successful changes for the rest of the cohort. Preserve their original settings and pending records. Complete their reviewed reconciliation or restoration separately before creating a replacement pilot. Do not delete the state directory or overwrite the enrollment to bypass this review.
+3. Review every member's result. Successful changes for the rest of the cohort remain in place. Preserve their original settings and pending records. Complete their reviewed reconciliation or restoration separately before creating a replacement pilot. Do not delete the state directory or overwrite the enrollment to bypass this review.
 
-If the current cap differs from the saved before-state, cancellation stops with `CANCEL_REQUIRES_UNCHANGED_BEFORE_STATE`. The request might already have committed, or another administrator might have edited the cap. Inspect that state and use the matching reconciliation procedure; do not classify a timeout as proof that nothing changed. A new pilot needs a new snapshot, approval, and state directory.
+If the current cap differs from the saved before-state, cancellation stops with `CANCEL_REQUIRES_UNCHANGED_BEFORE_STATE`. Inspect whether the saved request committed or another administrator edited the cap, then use the matching reconciliation procedure. A timeout leaves the write outcome unresolved until readback. A new pilot needs a new snapshot, approval, and state directory.
 
-## 5. I stop and restore
+## 5. Stop and restore
 
 For the synthetic rehearsal:
 
@@ -293,6 +293,6 @@ node src/cli.mjs restore --config .private/local-rehearsal/config.json --enrollm
 node src/cli.mjs inspect --state .private/local-rehearsal/state
 ```
 
-Expect `restored` for each fictional member. No scheduler was installed by this walkthrough, so no service removal is needed for the rehearsal.
+Expect `restored` for each fictional member. The rehearsal leaves scheduler templates uninstalled.
 
-For an installed live service, first disable and unload that exact job or timer, confirm no run is active, and set `liveWrites: false`. Follow the [reviewed restore procedure](../README.md#stop-restore-and-renew) while the period is current, verify the original cap and source by API readback, and turn the write gate off again. Verify that the job is absent or disabled in the host scheduler. Retain private receipts and remove only owned pilot files after the retention decision.
+For an installed live service, first disable and unload that exact job or timer, confirm no run is active, and set `liveWrites: false`. Follow the [reviewed restore procedure](operations.md#stop-restore-and-renew) while the period is current, verify the original cap and source by API readback, and turn the write gate off again. Verify that the job is absent or disabled in the host scheduler. Retain private receipts and remove only owned pilot files after the retention decision.

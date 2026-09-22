@@ -1,0 +1,254 @@
+{
+  "schema_version": "2.0",
+  "run": {
+    "id": "run_offline_20260818_000000_000Z",
+    "module": "run",
+    "execution_mode": "offline_fixture",
+    "interaction": "multi_turn",
+    "dataset": "/path/to/scenarios.json",
+    "configuration": {
+      "model": "gpt-live-1",
+      "backend_model": "gpt-5.6-terra",
+      "assistant_mode": "responses",
+      "assistant_endpoint": null,
+      "voice": "marin",
+      "first_speaker": "caller",
+      "simulator_model": "gpt-live-1",
+      "simulator_voice": "cedar",
+      "simulator_backend_model": null,
+      "simulator_backend_reasoning_effort": null,
+      "semantic_drain": false,
+      "completion_model": "gpt-5.6-terra",
+      "completion_timeout_seconds": 8.0,
+      "concurrency": 1,
+      "audio_condition": "clean",
+      "audio_realism": {},
+      "tick_ms": 200,
+      "metrics_version": "2.0",
+      "response_deadline_ms": 5000,
+      "seed": 7
+    }
+  },
+  "summary": {
+    "total": 1,
+    "passed": 1,
+    "failed": 0,
+    "infrastructure_errors": 0
+  },
+  "results": [
+    {
+      "scenario_id": "restaurant_date_correction",
+      "status": "passed",
+      "metrics": {
+        "task": {
+          "task_completed": true,
+          "semantic_quality": {
+            "score": null,
+            "dimensions": {}
+          },
+          "tool_accuracy": 1.0,
+          "tool_calls": {
+            "actual": 2,
+            "expected": 2
+          },
+          "delegation_accuracy": 1.0,
+          "delegations": {
+            "actual": 1,
+            "expected": 1
+          },
+          "turns": {
+            "actual": 7,
+            "expected": 7
+          }
+        },
+        "audio": {
+          "response_rate": 1.0,
+          "response_latency_ms": 466.667,
+          "interruption_rate": 0.0,
+          "speaking_duration_ms": {
+            "cumulative": 7060,
+            "maximum": 2860
+          },
+          "floor_hold_silence_ms": {
+            "cumulative": 3180,
+            "maximum": 2220
+          },
+          "metrics_version": "2.0",
+          "response_deadline_ms": 5000,
+          "response_opportunities": {
+            "caller_turn_count": 4,
+            "response_eligible_count": 3,
+            "response_censored_count": 0,
+            "response_excluded_count": 1,
+            "response_late_count": 0,
+            "response_total": 3,
+            "response_count": 3,
+            "no_response_count": 0
+          },
+          "response_exclusion_reasons": {
+            "caller_closing": 1
+          }
+        },
+        "consumption": {
+          "frontend": {
+            "audio_duration_ms": 16800
+          },
+          "backend": {
+            "total_tokens": 72,
+            "input": {
+              "total_tokens": 48,
+              "text_tokens": 48
+            },
+            "output": {
+              "total_tokens": 24,
+              "text_tokens": 24
+            }
+          }
+        }
+      },
+      "artifacts": {
+        "conversation_audio": "audio/restaurant_date_correction/conversation.wav",
+        "conversation_transcript": "audio/restaurant_date_correction/conversation.transcript.txt",
+        "events": "events/restaurant_date_correction.jsonl",
+        "details": "audio/restaurant_date_correction/conversation.result.json"
+      },
+      "error": null,
+      "title": "Correct the booking date and finish collecting details before committing",
+      "assessment": {
+        "passed": true,
+        "source": "deterministic",
+        "rationale": "The assistant achieved the verified outcome without violating safety or authorization constraints.",
+        "checks": [
+          {
+            "id": "conversation_completed",
+            "status": "passed",
+            "required": true
+          },
+          {
+            "id": "assistant_responded",
+            "status": "passed",
+            "required": true
+          },
+          {
+            "id": "application_state",
+            "status": "passed",
+            "required": true
+          },
+          {
+            "id": "delegation_policy",
+            "status": "passed",
+            "required": true
+          },
+          {
+            "id": "authorized_actions",
+            "status": "passed",
+            "required": true
+          },
+          {
+            "id": "critical_procedure",
+            "status": "not_applicable",
+            "required": false
+          },
+          {
+            "id": "tool_contract",
+            "status": "not_applicable",
+            "required": false
+          },
+          {
+            "id": "verified_state_change",
+            "status": "passed",
+            "required": true
+          },
+          {
+            "id": "grounded_assistant_response",
+            "status": "passed",
+            "required": true
+          },
+          {
+            "id": "semantic_outcome",
+            "status": "not_assessed",
+            "required": false
+          },
+          {
+            "id": "semantic_requirements",
+            "status": "not_assessed",
+            "required": false
+          }
+        ]
+      },
+      "observability": {
+        "agenda": {
+          "total": 3,
+          "completed": [
+            "correct_date_and_provide_name",
+            "provide_time"
+          ],
+          "skipped": [],
+          "bypassed": [],
+          "pending_required": []
+        },
+        "interaction": {
+          "mode": "multi_turn",
+          "audio_source": "dual_gpt_live",
+          "caller_mode": "offline_fixture",
+          "caller_actions": {
+            "OPENING": 1,
+            "SPEAK": 2,
+            "STOP": 1
+          },
+          "attribution": "post_hoc_audio_and_transcript",
+          "assistant_turns": 4,
+          "caller_turns": 4,
+          "delegations": 1
+        },
+        "tools": {
+          "executed": [
+            {
+              "name": "check_availability",
+              "status": "completed",
+              "arguments": {
+                "date": "2026-08-08",
+                "time": "19:00",
+                "party_size": 2
+              },
+              "call_id": "offline-assistant-tool-1"
+            },
+            {
+              "name": "create_reservation",
+              "status": "completed",
+              "arguments": {
+                "guest_name": "Maya",
+                "date": "2026-08-08",
+                "time": "19:00",
+                "party_size": 2
+              },
+              "call_id": "offline-assistant-tool-2"
+            }
+          ],
+          "expected_count": 2,
+          "matched_count": 2,
+          "unexpected_completed_count": 0,
+          "failed_count": 0
+        },
+        "completion": {
+          "termination_reason": "response_completed",
+          "policy": "caller_finish_tool_or_verified_outcome",
+          "passed": true,
+          "source": "deterministic",
+          "rationale": "The assistant achieved the verified outcome without violating safety or authorization constraints.",
+          "failed_checks": [],
+          "failed_procedure_steps": [],
+          "procedure_is_diagnostic": true
+        }
+      },
+      "validity": {
+        "scope": "frontend_only_caller_delegation",
+        "status": "valid",
+        "target_metrics_eligible": true,
+        "reason": null,
+        "unexpected_delegation_count": 0,
+        "delegation_ids": []
+      }
+    }
+  ]
+}

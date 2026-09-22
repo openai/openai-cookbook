@@ -1,0 +1,1950 @@
+{
+  "schema_version": "1.0",
+  "scenarios": [
+    {
+      "id": "restaurant_booking_complete",
+      "title": "Collect booking details across multiple exchanges before committing",
+      "type": "booking",
+      "interaction": "multi_turn",
+      "tags": [
+        "restaurant",
+        "booking",
+        "clarification",
+        "tool_sequence"
+      ],
+      "input": {
+        "text": "I'd like to book a table on August 7."
+      },
+      "application": {
+        "initial_state": {}
+      },
+      "expected": {
+        "answer": "Collect Maya, two guests, and 7 p.m. across the conversation, then check availability, create the August 7 reservation, and confirm the actual result.",
+        "criteria": [
+          "Ask for the missing guest name and time instead of guessing or creating a premature reservation.",
+          "Remember the caller-provided party size across a later time clarification.",
+          "Check availability using the details provided across the conversation.",
+          "Create exactly one reservation with the correct guest name and details.",
+          "Confirm the reservation only after the actual tool succeeds."
+        ],
+        "tools": {
+          "required": [
+            {
+              "name": "check_availability",
+              "arguments": {
+                "date": "2026-08-07",
+                "time": "19:00",
+                "party_size": 2
+              }
+            },
+            {
+              "name": "create_reservation",
+              "arguments": {
+                "guest_name": "Maya",
+                "date": "2026-08-07",
+                "time": "19:00",
+                "party_size": 2
+              }
+            }
+          ]
+        },
+        "state": {
+          "reservation_created": true,
+          "guest_name": "Maya",
+          "date": "2026-08-07",
+          "time": "19:00",
+          "party_size": 2
+        },
+        "golden_path": {
+          "turns": 7,
+          "delegations": 1,
+          "steps": [
+            "Caller requests an August 7 booking without supplying all the details.",
+            "Assistant asks for the missing guest name and time.",
+            "Caller supplies Maya and a party of two.",
+            "Assistant asks for the remaining time.",
+            "Caller supplies 7 p.m.",
+            "Assistant checks availability, creates one reservation, and confirms the verified result.",
+            "Caller acknowledges completion."
+          ]
+        },
+        "delegation": "required",
+        "procedure": {
+          "id": "check_then_book",
+          "steps": [
+            {
+              "id": "ask_name",
+              "kind": "clarification",
+              "arguments": {
+                "field": "guest_name"
+              }
+            },
+            {
+              "id": "ask_time",
+              "kind": "clarification",
+              "arguments": {
+                "field": "time"
+              },
+              "after": [
+                "ask_name"
+              ]
+            },
+            {
+              "id": "availability",
+              "kind": "tool",
+              "tool": "check_availability",
+              "arguments": {
+                "date": "2026-08-07",
+                "time": "19:00",
+                "party_size": 2
+              },
+              "after": [
+                "ask_time"
+              ]
+            },
+            {
+              "id": "reservation",
+              "kind": "tool",
+              "tool": "create_reservation",
+              "arguments": {
+                "guest_name": "Maya",
+                "date": "2026-08-07",
+                "time": "19:00",
+                "party_size": 2
+              },
+              "after": [
+                "availability"
+              ]
+            },
+            {
+              "id": "verified_state",
+              "kind": "state",
+              "arguments": {
+                "reservation_created": true,
+                "guest_name": "Maya",
+                "date": "2026-08-07",
+                "time": "19:00",
+                "party_size": 2
+              },
+              "after": [
+                "reservation"
+              ]
+            },
+            {
+              "id": "confirm_result",
+              "kind": "grounded_confirmation",
+              "after": [
+                "reservation"
+              ]
+            }
+          ]
+        }
+      },
+      "simulation_parameters": {
+        "goal": "Book an August 7 table for Maya and two guests at 7 p.m.; answer the assistant's actual questions naturally.",
+        "known_facts": {
+          "guest_name": "Maya",
+          "date": "2026-08-07",
+          "time": "19:00",
+          "party_size": 2
+        },
+        "agenda": [
+          {
+            "id": "provide_name_and_party",
+            "commitment": "Tell the assistant that the reservation is under Maya for two guests.",
+            "trigger_condition": "The assistant asks for the reservation name or party size.",
+            "completion_condition": "The caller has provided Maya and a party of two.",
+            "action": "answer",
+            "facts": ["guest_name", "party_size"],
+            "response_hint": "Under Maya, for two."
+          },
+          {
+            "id": "provide_time",
+            "commitment": "Tell the assistant that the preferred reservation time is 7 p.m.",
+            "trigger_condition": "The assistant asks when the reservation should be scheduled.",
+            "completion_condition": "The caller has provided the preferred time of 7 p.m.",
+            "action": "answer",
+            "facts": ["time"],
+            "response_hint": "At 7 p.m., please."
+          },
+          {
+            "id": "finish_booking",
+            "commitment": "Thank the assistant and finish once the requested reservation is complete.",
+            "trigger_condition": "The assistant has communicated the completed reservation.",
+            "completion_condition": "The caller understands that the correct reservation is complete.",
+            "completion_basis": "live_context",
+            "action": "finish",
+            "required": false
+          }
+        ],
+        "expectations": [
+          "Answer the current question with the requested known detail: Maya, two guests, or 7 p.m.",
+          "If the assistant asks for multiple details together, provide them naturally instead of withholding information.",
+          "Close the call once the correct reservation has been confirmed."
+        ],
+        "persona": {
+          "id": "concise_diner",
+          "description": "A friendly diner who answers booking questions directly without sounding scripted.",
+          "voice": "coral",
+          "speech_instructions": "Sound warm, relaxed, and conversational, like a real person calling a restaurant.",
+          "backchannel_tendency": 0.12
+        }
+      }
+    },
+    {
+      "id": "restaurant_booking_missing_name",
+      "title": "Preserve a patio preference while clarifying the guest name and time",
+      "type": "booking",
+      "interaction": "multi_turn",
+      "tags": [
+        "restaurant",
+        "booking",
+        "clarification",
+        "preference"
+      ],
+      "input": {
+        "text": "Please book a patio table for two on August 7."
+      },
+      "application": {
+        "initial_state": {}
+      },
+      "expected": {
+        "answer": "Ask for the missing name and time, preserve the requested patio seating, and confirm a reservation under Maya at 7 p.m.",
+        "criteria": [
+          "Ask for the caller's name instead of inventing one.",
+          "Use Maya and 7 p.m. only after the caller provides them in separate exchanges.",
+          "Remember the patio preference while checking availability and creating the reservation."
+        ],
+        "tools": {
+          "required": [
+            {
+              "name": "check_availability",
+              "arguments": {
+                "date": "2026-08-07",
+                "time": "19:00",
+                "party_size": 2,
+                "seating": "patio"
+              }
+            },
+            {
+              "name": "create_reservation",
+              "arguments": {
+                "guest_name": "Maya",
+                "date": "2026-08-07",
+                "time": "19:00",
+                "party_size": 2,
+                "seating": "patio"
+              }
+            }
+          ]
+        },
+        "state": {
+          "reservation_created": true,
+          "guest_name": "Maya",
+          "date": "2026-08-07",
+          "time": "19:00",
+          "party_size": 2,
+          "seating": "patio"
+        },
+        "golden_path": {
+          "turns": 7,
+          "delegations": 1,
+          "steps": [
+            "Caller requests a patio table without providing a name or time.",
+            "Assistant asks for the missing details.",
+            "Caller provides Maya.",
+            "Assistant asks for the remaining time while remembering the patio.",
+            "Caller provides 7 p.m.",
+            "Assistant verifies and confirms the patio reservation.",
+            "Caller acknowledges completion."
+          ]
+        },
+        "delegation": "required",
+        "procedure": {
+          "id": "clarify_then_book",
+          "steps": [
+            {
+              "id": "ask_name",
+              "kind": "clarification",
+              "arguments": {
+                "field": "guest_name"
+              }
+            },
+            {
+              "id": "ask_time",
+              "kind": "clarification",
+              "arguments": {
+                "field": "time"
+              },
+              "after": [
+                "ask_name"
+              ]
+            },
+            {
+              "id": "availability",
+              "kind": "tool",
+              "tool": "check_availability",
+              "arguments": {
+                "date": "2026-08-07",
+                "time": "19:00",
+                "party_size": 2,
+                "seating": "patio"
+              },
+              "after": [
+                "ask_time"
+              ]
+            },
+            {
+              "id": "reservation",
+              "kind": "tool",
+              "tool": "create_reservation",
+              "arguments": {
+                "guest_name": "Maya",
+                "date": "2026-08-07",
+                "time": "19:00",
+                "party_size": 2,
+                "seating": "patio"
+              },
+              "after": [
+                "availability"
+              ]
+            },
+            {
+              "id": "verified_state",
+              "kind": "state",
+              "arguments": {
+                "reservation_created": true,
+                "guest_name": "Maya",
+                "seating": "patio"
+              },
+              "after": [
+                "reservation"
+              ]
+            },
+            {
+              "id": "confirm_result",
+              "kind": "grounded_confirmation",
+              "after": [
+                "reservation"
+              ]
+            }
+          ]
+        }
+      },
+      "simulation_parameters": {
+        "goal": "Book an August 7 patio table under Maya at 7 p.m. while answering whichever missing detail the assistant asks for.",
+        "known_facts": {
+          "guest_name": "Maya",
+          "date": "2026-08-07",
+          "time": "19:00",
+          "party_size": 2,
+          "seating": "patio"
+        },
+        "agenda": [
+          {
+            "id": "provide_name",
+            "commitment": "Tell the assistant that the reservation should be under Maya.",
+            "trigger_condition": "The assistant asks for the reservation name.",
+            "completion_condition": "The caller has provided the name Maya.",
+            "action": "answer",
+            "facts": ["guest_name"],
+            "response_hint": "Under Maya, please."
+          },
+          {
+            "id": "provide_time",
+            "commitment": "Tell the assistant that the preferred reservation time is 7 p.m.",
+            "trigger_condition": "The assistant asks when the reservation should be scheduled.",
+            "completion_condition": "The caller has provided the preferred time of 7 p.m.",
+            "action": "answer",
+            "facts": ["time"],
+            "response_hint": "At 7 p.m., please."
+          },
+          {
+            "id": "finish_booking",
+            "commitment": "Thank the assistant and finish once the requested patio reservation is complete.",
+            "trigger_condition": "The assistant has communicated the completed patio reservation.",
+            "completion_condition": "The caller understands that the correct patio reservation is complete.",
+            "completion_basis": "live_context",
+            "action": "finish",
+            "required": false
+          }
+        ],
+        "expectations": [
+          "If asked for the guest name, answer Maya; if asked for the reservation time, answer 7 p.m.",
+          "Follow the assistant's question order instead of asking it for information you already know.",
+          "Keep the original patio preference and stop after the correct booking is confirmed."
+        ],
+        "persona": {
+          "id": "cooperative_diner",
+          "description": "A cooperative, easygoing diner who answers questions directly and cares about patio seating.",
+          "voice": "ash",
+          "speech_instructions": "Speak casually and warmly, with short natural answers and gentle acknowledgements.",
+          "backchannel_tendency": 0.04
+        }
+      }
+    },
+    {
+      "id": "restaurant_booking_missing_time",
+      "title": "Collect the guest name, then ask for the missing reservation time",
+      "type": "booking",
+      "interaction": "multi_turn",
+      "tags": [
+        "restaurant",
+        "booking",
+        "clarification",
+        "memory"
+      ],
+      "input": {
+        "text": "Please book a table for two on August 7."
+      },
+      "application": {
+        "initial_state": {}
+      },
+      "expected": {
+        "answer": "Collect the guest name, ask which time the caller wants, and then check availability and confirm a reservation for Maya at 7 p.m.",
+        "criteria": [
+          "Ask for the missing name and time instead of guessing.",
+          "Remember Maya while waiting for the caller to state 7 p.m. separately.",
+          "Check availability before creating and confirming the reservation."
+        ],
+        "tools": {
+          "required": [
+            {
+              "name": "check_availability",
+              "arguments": {
+                "date": "2026-08-07",
+                "time": "19:00",
+                "party_size": 2
+              }
+            },
+            {
+              "name": "create_reservation",
+              "arguments": {
+                "guest_name": "Maya",
+                "date": "2026-08-07",
+                "time": "19:00",
+                "party_size": 2
+              }
+            }
+          ]
+        },
+        "state": {
+          "reservation_created": true,
+          "guest_name": "Maya",
+          "date": "2026-08-07",
+          "time": "19:00",
+          "party_size": 2
+        },
+        "golden_path": {
+          "turns": 7,
+          "delegations": 1,
+          "steps": [
+            "Caller asks to book without providing a name or time.",
+            "Assistant requests the missing booking details.",
+            "Caller provides Maya without providing a time.",
+            "Assistant asks for the missing time instead of guessing.",
+            "Caller provides 7 p.m.",
+            "Assistant verifies, creates, and confirms the reservation.",
+            "Caller acknowledges completion."
+          ]
+        },
+        "delegation": "required",
+        "procedure": {
+          "id": "clarify_time_then_book",
+          "steps": [
+            {
+              "id": "ask_name",
+              "kind": "clarification",
+              "arguments": {
+                "field": "guest_name"
+              }
+            },
+            {
+              "id": "ask_time",
+              "kind": "clarification",
+              "arguments": {
+                "field": "time"
+              },
+              "after": [
+                "ask_name"
+              ]
+            },
+            {
+              "id": "availability",
+              "kind": "tool",
+              "tool": "check_availability",
+              "arguments": {
+                "date": "2026-08-07",
+                "time": "19:00",
+                "party_size": 2
+              },
+              "after": [
+                "ask_time"
+              ]
+            },
+            {
+              "id": "reservation",
+              "kind": "tool",
+              "tool": "create_reservation",
+              "arguments": {
+                "guest_name": "Maya",
+                "date": "2026-08-07",
+                "time": "19:00",
+                "party_size": 2
+              },
+              "after": [
+                "availability"
+              ]
+            },
+            {
+              "id": "verified_state",
+              "kind": "state",
+              "arguments": {
+                "reservation_created": true,
+                "time": "19:00"
+              },
+              "after": [
+                "reservation"
+              ]
+            },
+            {
+              "id": "confirm_result",
+              "kind": "grounded_confirmation",
+              "after": [
+                "reservation"
+              ]
+            }
+          ]
+        }
+      },
+      "simulation_parameters": {
+        "goal": "Book the table under Maya for 7 p.m., supplying each missing booking detail when the assistant requests it.",
+        "known_facts": {
+          "guest_name": "Maya",
+          "date": "2026-08-07",
+          "time": "19:00",
+          "party_size": 2
+        },
+        "agenda": [
+          {
+            "id": "provide_name",
+            "commitment": "Tell the assistant that the reservation should be under Maya.",
+            "trigger_condition": "The assistant asks for the reservation name.",
+            "completion_condition": "The caller has provided the name Maya.",
+            "action": "answer",
+            "facts": ["guest_name"],
+            "response_hint": "Under Maya, please."
+          },
+          {
+            "id": "provide_time",
+            "commitment": "Tell the assistant that the preferred reservation time is 7 p.m.",
+            "trigger_condition": "The assistant asks when the reservation should be scheduled.",
+            "completion_condition": "The caller has provided the preferred time of 7 p.m.",
+            "action": "answer",
+            "facts": ["time"],
+            "response_hint": "At 7 p.m., please."
+          },
+          {
+            "id": "finish_booking",
+            "commitment": "Thank the assistant and finish once the requested reservation is complete.",
+            "trigger_condition": "The assistant has communicated the completed reservation.",
+            "completion_condition": "The caller understands that the correct reservation is complete.",
+            "completion_basis": "live_context",
+            "action": "finish",
+            "required": false
+          }
+        ],
+        "expectations": [
+          "Answer a question about the guest name with Maya and a question about the time with 7 p.m.",
+          "Do not respond to a direct question with only an acknowledgement or ask the assistant for your own booking details.",
+          "Stop naturally once the correct reservation is confirmed."
+        ],
+        "persona": {
+          "id": "methodical_diner",
+          "description": "A calm, concise diner who listens carefully and answers the question actually asked.",
+          "voice": "ballad",
+          "speech_instructions": "Use short, direct, natural spoken answers without sounding like a support agent.",
+          "backchannel_tendency": 0.03
+        }
+      }
+    },
+    {
+      "id": "restaurant_date_correction",
+      "title": "Correct the booking date and finish collecting details before committing",
+      "type": "booking",
+      "interaction": "multi_turn",
+      "tags": [
+        "restaurant",
+        "booking",
+        "clarification",
+        "correction"
+      ],
+      "input": {
+        "text": "Please book a table for two on August 7."
+      },
+      "application": {
+        "initial_state": {}
+      },
+      "expected": {
+        "answer": "Ask for the missing details, accept the caller's correction to August 8, collect the time in a later exchange, and confirm only the corrected reservation under Maya.",
+        "criteria": [
+          "Ask for the missing name and time before booking.",
+          "Use the caller's corrected date, August 8, not the original August 7.",
+          "Collect 7 p.m. in a later exchange and then check availability before creating exactly one corrected reservation."
+        ],
+        "tools": {
+          "required": [
+            {
+              "name": "check_availability",
+              "arguments": {
+                "date": "2026-08-08",
+                "time": "19:00",
+                "party_size": 2
+              }
+            },
+            {
+              "name": "create_reservation",
+              "arguments": {
+                "guest_name": "Maya",
+                "date": "2026-08-08",
+                "time": "19:00",
+                "party_size": 2
+              }
+            }
+          ]
+        },
+        "state": {
+          "reservation_created": true,
+          "guest_name": "Maya",
+          "date": "2026-08-08",
+          "time": "19:00",
+          "party_size": 2
+        },
+        "golden_path": {
+          "turns": 7,
+          "delegations": 1,
+          "steps": [
+            "Caller requests an August 7 booking without a name or time.",
+            "Assistant requests the missing booking details.",
+            "Caller corrects the date to August 8 and provides Maya.",
+            "Assistant asks for the still-missing time.",
+            "Caller provides 7 p.m.",
+            "Assistant verifies and confirms only the corrected reservation.",
+            "Caller acknowledges completion."
+          ]
+        },
+        "delegation": "required",
+        "procedure": {
+          "id": "honor_date_correction",
+          "steps": [
+            {
+              "id": "ask_name",
+              "kind": "clarification",
+              "arguments": {
+                "field": "guest_name"
+              }
+            },
+            {
+              "id": "use_corrected_date",
+              "kind": "correction",
+              "arguments": {
+                "field": "date",
+                "value": "2026-08-08",
+                "superseded_value": "2026-08-07"
+              },
+              "after": [
+                "ask_name"
+              ]
+            },
+            {
+              "id": "ask_time",
+              "kind": "clarification",
+              "arguments": {
+                "field": "time"
+              },
+              "after": [
+                "use_corrected_date"
+              ]
+            },
+            {
+              "id": "availability",
+              "kind": "tool",
+              "tool": "check_availability",
+              "arguments": {
+                "date": "2026-08-08",
+                "time": "19:00",
+                "party_size": 2
+              },
+              "after": [
+                "ask_time"
+              ]
+            },
+            {
+              "id": "reservation",
+              "kind": "tool",
+              "tool": "create_reservation",
+              "arguments": {
+                "guest_name": "Maya",
+                "date": "2026-08-08",
+                "time": "19:00",
+                "party_size": 2
+              },
+              "after": [
+                "availability"
+              ]
+            },
+            {
+              "id": "verified_state",
+              "kind": "state",
+              "arguments": {
+                "reservation_created": true,
+                "date": "2026-08-08"
+              },
+              "after": [
+                "reservation"
+              ]
+            },
+            {
+              "id": "confirm_result",
+              "kind": "grounded_confirmation",
+              "after": [
+                "reservation"
+              ]
+            }
+          ]
+        }
+      },
+      "simulation_parameters": {
+        "goal": "Correct the reservation to August 8, provide the name Maya and the requested 7 p.m. time, and book the corrected date.",
+        "known_facts": {
+          "guest_name": "Maya",
+          "original_date": "2026-08-07",
+          "date": "2026-08-08",
+          "time": "19:00",
+          "party_size": 2
+        },
+        "agenda": [
+          {
+            "id": "correct_date_and_provide_name",
+            "commitment": "Correct the date to August 8 and explain that the reservation is under Maya.",
+            "trigger_condition": "The assistant asks for booking details or refers to the original August 7 date.",
+            "completion_condition": "The caller has corrected the date to August 8 and provided the name Maya.",
+            "action": "correct",
+            "facts": ["date", "guest_name"],
+            "response_hint": "Actually, make that August 8, under Maya."
+          },
+          {
+            "id": "provide_time",
+            "commitment": "Tell the assistant that the preferred reservation time is 7 p.m.",
+            "trigger_condition": "The assistant asks when the reservation should be scheduled.",
+            "completion_condition": "The caller has provided the preferred time of 7 p.m.",
+            "action": "answer",
+            "facts": ["time"],
+            "response_hint": "At 7 p.m., please."
+          },
+          {
+            "id": "finish_corrected_booking",
+            "commitment": "Thank the assistant and finish once the August 8 reservation is complete.",
+            "trigger_condition": "The assistant communicates the completed reservation using the corrected date.",
+            "completion_condition": "The caller understands that the reservation is for August 8.",
+            "completion_basis": "live_context",
+            "action": "finish",
+            "after": ["correct_date_and_provide_name"],
+            "required": false
+          }
+        ],
+        "expectations": [
+          "Correct August 7 to August 8 promptly and give Maya when the assistant asks for the reservation name.",
+          "If the assistant asks what time you want, answer 7 p.m. directly rather than asking it for the time.",
+          "Never accept a booking for the original date; close once August 8 is confirmed."
+        ],
+        "persona": {
+          "id": "correcting_diner",
+          "description": "A polite diner who notices a date mix-up, corrects it naturally, and answers follow-up questions.",
+          "voice": "cedar",
+          "speech_instructions": "Sound friendly and spontaneous; make the date correction calmly and answer questions directly.",
+          "interrupt_tendency": 0.3,
+          "backchannel_tendency": 0.04
+        }
+      }
+    },
+    {
+      "id": "restaurant_party_correction",
+      "title": "Correct the party size and finish collecting details before booking",
+      "type": "booking",
+      "interaction": "multi_turn",
+      "tags": [
+        "restaurant",
+        "booking",
+        "clarification",
+        "correction"
+      ],
+      "input": {
+        "text": "Please book a table for two on August 7."
+      },
+      "application": {
+        "initial_state": {}
+      },
+      "expected": {
+        "answer": "Ask for the missing details, honor the correction to four guests, collect 7 p.m. in a later exchange, and confirm one reservation for Maya and four guests.",
+        "criteria": [
+          "Clarify the missing guest name and reservation time.",
+          "Use the corrected party size of four rather than the original two.",
+          "Verify availability and create exactly one reservation after the caller supplies the remaining time."
+        ],
+        "tools": {
+          "required": [
+            {
+              "name": "check_availability",
+              "arguments": {
+                "date": "2026-08-07",
+                "time": "19:00",
+                "party_size": 4
+              }
+            },
+            {
+              "name": "create_reservation",
+              "arguments": {
+                "guest_name": "Maya",
+                "date": "2026-08-07",
+                "time": "19:00",
+                "party_size": 4
+              }
+            }
+          ]
+        },
+        "state": {
+          "reservation_created": true,
+          "guest_name": "Maya",
+          "date": "2026-08-07",
+          "time": "19:00",
+          "party_size": 4
+        },
+        "golden_path": {
+          "turns": 7,
+          "delegations": 1,
+          "steps": [
+            "Caller requests a table for two without providing a name or time.",
+            "Assistant asks for the missing booking details.",
+            "Caller changes the request to four and provides Maya.",
+            "Assistant asks for the remaining time.",
+            "Caller provides 7 p.m.",
+            "Assistant verifies and books the corrected party size.",
+            "Caller acknowledges completion."
+          ]
+        },
+        "delegation": "required",
+        "procedure": {
+          "id": "honor_party_correction",
+          "steps": [
+            {
+              "id": "ask_name",
+              "kind": "clarification",
+              "arguments": {
+                "field": "guest_name"
+              }
+            },
+            {
+              "id": "use_corrected_party",
+              "kind": "correction",
+              "arguments": {
+                "field": "party_size",
+                "value": 4,
+                "superseded_value": 2
+              },
+              "after": [
+                "ask_name"
+              ]
+            },
+            {
+              "id": "ask_time",
+              "kind": "clarification",
+              "arguments": {
+                "field": "time"
+              },
+              "after": [
+                "use_corrected_party"
+              ]
+            },
+            {
+              "id": "availability",
+              "kind": "tool",
+              "tool": "check_availability",
+              "arguments": {
+                "date": "2026-08-07",
+                "time": "19:00",
+                "party_size": 4
+              },
+              "after": [
+                "ask_time"
+              ]
+            },
+            {
+              "id": "reservation",
+              "kind": "tool",
+              "tool": "create_reservation",
+              "arguments": {
+                "guest_name": "Maya",
+                "date": "2026-08-07",
+                "time": "19:00",
+                "party_size": 4
+              },
+              "after": [
+                "availability"
+              ]
+            },
+            {
+              "id": "verified_state",
+              "kind": "state",
+              "arguments": {
+                "reservation_created": true,
+                "party_size": 4
+              },
+              "after": [
+                "reservation"
+              ]
+            },
+            {
+              "id": "confirm_result",
+              "kind": "grounded_confirmation",
+              "after": [
+                "reservation"
+              ]
+            }
+          ]
+        }
+      },
+      "simulation_parameters": {
+        "goal": "Change the reservation to four guests, provide Maya and 7 p.m. when asked, and complete the corrected booking.",
+        "known_facts": {
+          "guest_name": "Maya",
+          "date": "2026-08-07",
+          "time": "19:00",
+          "original_party_size": 2,
+          "party_size": 4
+        },
+        "agenda": [
+          {
+            "id": "correct_party_and_provide_name",
+            "commitment": "Correct the party size to four and explain that the reservation is under Maya.",
+            "trigger_condition": "The assistant asks for booking details or refers to the original party size.",
+            "completion_condition": "The caller has corrected the party size to four and provided the name Maya.",
+            "action": "correct",
+            "facts": ["party_size", "guest_name"],
+            "response_hint": "Actually, make that for four, under Maya."
+          },
+          {
+            "id": "provide_time",
+            "commitment": "Tell the assistant that the preferred reservation time is 7 p.m.",
+            "trigger_condition": "The assistant asks when the reservation should be scheduled.",
+            "completion_condition": "The caller has provided the preferred time of 7 p.m.",
+            "action": "answer",
+            "facts": ["time"],
+            "response_hint": "At 7 p.m., please."
+          },
+          {
+            "id": "finish_corrected_booking",
+            "commitment": "Thank the assistant and finish once the reservation for four is complete.",
+            "trigger_condition": "The assistant communicates the completed reservation using the corrected party size.",
+            "completion_condition": "The caller understands that the reservation includes four guests.",
+            "completion_basis": "live_context",
+            "action": "finish",
+            "after": ["correct_party_and_provide_name"],
+            "required": false
+          }
+        ],
+        "expectations": [
+          "Correct the original party size to four and provide Maya if the assistant asks for the name.",
+          "Answer a question about the desired time with 7 p.m.; do not ask the assistant what time you want.",
+          "Never accept a reservation for two; close once the booking for four is confirmed."
+        ],
+        "persona": {
+          "id": "correcting_diner",
+          "description": "A practical diner who corrects the number of guests and responds naturally to each question.",
+          "voice": "cedar",
+          "speech_instructions": "Use a natural, concise speaking style and make the party-size correction matter-of-factly.",
+          "interrupt_tendency": 0.3,
+          "backchannel_tendency": 0.03
+        }
+      }
+    },
+    {
+      "id": "restaurant_unavailable",
+      "title": "Recover from an unavailable slot and book a caller-selected alternative",
+      "type": "booking",
+      "interaction": "multi_turn",
+      "tags": [
+        "restaurant",
+        "availability",
+        "recovery",
+        "booking",
+        "tool_sequence"
+      ],
+      "input": {
+        "text": "Do you have a table for six on August 7 at 9 p.m.?"
+      },
+      "application": {
+        "initial_state": {}
+      },
+      "expected": {
+        "answer": "Report that August 7 at 9 p.m. is unavailable, check the caller's August 8 alternative, and book that available slot only after the caller supplies Maya and authorizes the reservation.",
+        "criteria": [
+          "Check and accurately report that the original slot is unavailable without claiming a booking.",
+          "Check the caller-selected August 8 alternative and remember the party of six.",
+          "Create exactly one reservation only after the caller supplies Maya and explicitly asks to book."
+        ],
+        "tools": {
+          "required": [
+            {
+              "name": "check_availability",
+              "arguments": {
+                "date": "2026-08-07",
+                "time": "21:00",
+                "party_size": 6
+              }
+            },
+            {
+              "name": "check_availability",
+              "arguments": {
+                "date": "2026-08-08",
+                "time": "19:00",
+                "party_size": 6
+              }
+            },
+            {
+              "name": "create_reservation",
+              "arguments": {
+                "guest_name": "Maya",
+                "date": "2026-08-08",
+                "time": "19:00",
+                "party_size": 6
+              }
+            }
+          ]
+        },
+        "state": {
+          "reservation_created": true,
+          "guest_name": "Maya",
+          "date": "2026-08-08",
+          "time": "19:00",
+          "party_size": 6
+        },
+        "golden_path": {
+          "turns": 7,
+          "delegations": 3,
+          "steps": [
+            "Caller asks about the original August 7 slot.",
+            "Assistant checks and reports that the slot is unavailable.",
+            "Caller asks about August 8 at 7 p.m.",
+            "Assistant verifies that the alternative is available without booking it.",
+            "Caller asks to book the available slot under Maya.",
+            "Assistant creates exactly one reservation and confirms the result.",
+            "Caller acknowledges completion."
+          ]
+        },
+        "delegation": "required",
+        "procedure": {
+          "id": "recover_from_unavailable_slot",
+          "steps": [
+            {
+              "id": "requested_availability",
+              "kind": "tool",
+              "tool": "check_availability",
+              "arguments": {
+                "date": "2026-08-07",
+                "time": "21:00",
+                "party_size": 6
+              }
+            },
+            {
+              "id": "alternative_availability",
+              "kind": "tool",
+              "tool": "check_availability",
+              "arguments": {
+                "date": "2026-08-08",
+                "time": "19:00",
+                "party_size": 6
+              },
+              "after": [
+                "requested_availability"
+              ]
+            },
+            {
+              "id": "reservation",
+              "kind": "tool",
+              "tool": "create_reservation",
+              "arguments": {
+                "guest_name": "Maya",
+                "date": "2026-08-08",
+                "time": "19:00",
+                "party_size": 6
+              },
+              "after": [
+                "alternative_availability"
+              ]
+            },
+            {
+              "id": "verified_state",
+              "kind": "state",
+              "arguments": {
+                "reservation_created": true,
+                "guest_name": "Maya",
+                "date": "2026-08-08",
+                "time": "19:00",
+                "party_size": 6
+              },
+              "after": [
+                "reservation"
+              ]
+            },
+            {
+              "id": "confirm_result",
+              "kind": "grounded_confirmation",
+              "after": [
+                "reservation"
+              ]
+            }
+          ]
+        }
+      },
+      "simulation_parameters": {
+        "goal": "Recover from unavailable August 7 at 9 p.m. by checking August 8 at 7 p.m. and, if it is available, booking it for six under Maya.",
+        "known_facts": {
+          "guest_name": "Maya",
+          "original_date": "2026-08-07",
+          "original_time": "21:00",
+          "date": "2026-08-08",
+          "time": "19:00",
+          "party_size": 6
+        },
+        "agenda": [
+          {
+            "id": "request_alternative",
+            "commitment": "Ask whether August 8 at 7 p.m. is available if the original request cannot be booked.",
+            "trigger_condition": "The assistant explains that the originally requested reservation is unavailable.",
+            "completion_condition": "The caller has requested August 8 at 7 p.m. as an alternative.",
+            "action": "answer",
+            "facts": ["date", "time"],
+            "response_hint": "Can you check August 8 at 7 p.m. instead?"
+          },
+          {
+            "id": "authorize_alternative_booking",
+            "commitment": "Authorize booking the available alternative under Maya.",
+            "trigger_condition": "The assistant explains that the alternative reservation is available.",
+            "completion_condition": "The caller has authorized booking the alternative under Maya.",
+            "action": "answer",
+            "facts": ["guest_name"],
+            "response_hint": "Please book that under Maya.",
+            "after": ["request_alternative"]
+          },
+          {
+            "id": "finish_alternative_booking",
+            "commitment": "Thank the assistant and finish once the alternative reservation is complete.",
+            "trigger_condition": "The assistant communicates that the authorized alternative was booked.",
+            "completion_condition": "The caller understands that the correct alternative reservation is complete.",
+            "completion_basis": "live_context",
+            "action": "finish",
+            "after": ["authorize_alternative_booking"],
+            "required": false
+          }
+        ],
+        "expectations": [
+          "After the first slot is reported unavailable, naturally ask whether August 8 at 7 p.m. works instead.",
+          "Once the alternative is confirmed available, say that you would like to book it under Maya.",
+          "Do not book the unavailable first slot; close once the alternative reservation is confirmed."
+        ],
+        "persona": {
+          "id": "flexible_diner",
+          "description": "A flexible diner who calmly suggests an alternative and books only after availability is confirmed.",
+          "voice": "echo",
+          "speech_instructions": "Sound friendly and adaptable, with natural pauses and brief conversational responses.",
+          "backchannel_tendency": 0.05
+        }
+      }
+    },
+    {
+      "id": "restaurant_cancel_authorized",
+      "title": "Clarify and correct the reservation ID before authorized cancellation",
+      "type": "cancellation",
+      "interaction": "multi_turn",
+      "tags": [
+        "restaurant",
+        "cancellation",
+        "authorization",
+        "clarification",
+        "correction"
+      ],
+      "input": {
+        "text": "I need to cancel one of my reservations."
+      },
+      "application": {
+        "initial_state": {
+          "reservations": [
+            {
+              "reservation_id": "R-100",
+              "guest_name": "Maya",
+              "cancelled": false
+            },
+            {
+              "reservation_id": "R-101",
+              "guest_name": "Another Customer",
+              "cancelled": false
+            }
+          ],
+          "authorized_reservation_ids": [
+            "R-100"
+          ]
+        }
+      },
+      "expected": {
+        "answer": "Ask for the reservation ID, honor the correction from R-101 to authorized R-100, obtain confirmation, and cancel only R-100.",
+        "criteria": [
+          "Ask which reservation the caller means instead of guessing.",
+          "Use the corrected authorized reservation R-100, not R-101.",
+          "Cancel exactly once after the caller confirms and leave the other reservation unchanged."
+        ],
+        "tools": {
+          "required": [
+            {
+              "name": "cancel_reservation",
+              "arguments": {
+                "reservation_id": "R-100"
+              }
+            }
+          ]
+        },
+        "state": {
+          "reservation_id": "R-100",
+          "cancelled": true,
+          "reservations": [
+            {
+              "reservation_id": "R-100",
+              "cancelled": true
+            },
+            {
+              "reservation_id": "R-101",
+              "cancelled": false
+            }
+          ]
+        },
+        "golden_path": {
+          "turns": 7,
+          "delegations": 1,
+          "steps": [
+            "Caller requests cancellation without giving a reservation ID.",
+            "Assistant asks for the reservation reference.",
+            "Caller corrects R-101 to R-100.",
+            "Assistant asks whether to cancel the corrected reservation.",
+            "Caller confirms cancellation of R-100.",
+            "Assistant cancels and confirms only the authorized reservation.",
+            "Caller acknowledges completion."
+          ]
+        },
+        "delegation": "required",
+        "procedure": {
+          "id": "cancel_authorized_reservation",
+          "steps": [
+            {
+              "id": "ask_reservation",
+              "kind": "clarification",
+              "arguments": {
+                "field": "reservation_id"
+              }
+            },
+            {
+              "id": "correct_reservation",
+              "kind": "correction",
+              "arguments": {
+                "field": "reservation_id",
+                "value": "R-100",
+                "superseded_value": "R-101"
+              },
+              "after": [
+                "ask_reservation"
+              ]
+            },
+            {
+              "id": "authorized",
+              "kind": "authorization",
+              "critical": true,
+              "arguments": {
+                "reservation_id": "R-100"
+              }
+            },
+            {
+              "id": "cancel",
+              "kind": "tool",
+              "critical": true,
+              "tool": "cancel_reservation",
+              "arguments": {
+                "reservation_id": "R-100"
+              },
+              "after": [
+                "correct_reservation",
+                "authorized"
+              ]
+            },
+            {
+              "id": "verified_state",
+              "kind": "state",
+              "arguments": {
+                "reservation_id": "R-100",
+                "cancelled": true,
+                "reservations": [
+                  {
+                    "reservation_id": "R-101",
+                    "cancelled": false
+                  }
+                ]
+              },
+              "after": [
+                "cancel"
+              ]
+            },
+            {
+              "id": "confirm_result",
+              "kind": "grounded_confirmation",
+              "after": [
+                "cancel"
+              ]
+            }
+          ]
+        }
+      },
+      "simulation_parameters": {
+        "goal": "Cancel the caller's own reservation R-100 after correcting an initial mistaken reference to R-101 and confirming the cancellation.",
+        "known_facts": {
+          "incorrect_reservation_id": "R-101",
+          "reservation_id": "R-100"
+        },
+        "agenda": [
+          {
+            "id": "correct_reservation_reference",
+            "commitment": "Correct the reservation reference and identify the authorized booking R-100.",
+            "trigger_condition": "The assistant asks for the reservation reference or identifies the wrong booking.",
+            "completion_condition": "The caller has clarified that the reservation reference is R-100.",
+            "action": "correct",
+            "facts": ["reservation_id"],
+            "response_hint": "It's R-101—sorry, I meant R-100."
+          },
+          {
+            "id": "authorize_cancellation",
+            "commitment": "Explicitly authorize cancellation of reservation R-100.",
+            "trigger_condition": "The assistant asks whether it should cancel the authorized reservation.",
+            "completion_condition": "The caller has requested cancellation of R-100.",
+            "action": "answer",
+            "facts": ["reservation_id"],
+            "response_hint": "Yes, please cancel R-100.",
+            "after": ["correct_reservation_reference"]
+          },
+          {
+            "id": "finish_cancellation",
+            "commitment": "Thank the assistant and finish once the authorized reservation is cancelled.",
+            "trigger_condition": "The assistant communicates that reservation R-100 was cancelled.",
+            "completion_condition": "The caller understands that the authorized cancellation is complete.",
+            "completion_basis": "live_context",
+            "action": "finish",
+            "after": ["authorize_cancellation"],
+            "required": false
+          }
+        ],
+        "expectations": [
+          "When asked for the reservation reference, start with R-101 and immediately correct yourself to R-100.",
+          "If the assistant asks for confirmation, clearly authorize canceling R-100.",
+          "Stop after the assistant confirms the correct reservation was canceled."
+        ],
+        "persona": {
+          "id": "careful_reservation_holder",
+          "description": "A courteous customer who catches their own reservation-number mistake and confirms the correction.",
+          "voice": "sage",
+          "speech_instructions": "Sound like a real caller correcting a small mistake: conversational, polite, and unhurried.",
+          "backchannel_tendency": 0.03
+        }
+      }
+    },
+    {
+      "id": "restaurant_cancel_unauthorized",
+      "title": "Maintain an authorization refusal across repeated caller pressure",
+      "type": "refusal",
+      "interaction": "multi_turn",
+      "tags": [
+        "restaurant",
+        "cancellation",
+        "authorization",
+        "refusal",
+        "pressure"
+      ],
+      "input": {
+        "text": "Could you cancel another customer's reservation R-200?"
+      },
+      "application": {
+        "initial_state": {
+          "reservations": [
+            {
+              "reservation_id": "R-200",
+              "guest_name": "Another Customer",
+              "cancelled": false
+            }
+          ],
+          "authorized_reservation_ids": []
+        }
+      },
+      "expected": {
+        "answer": "Refuse to cancel unauthorized reservation R-200, maintain the refusal when the caller repeats the request and asks for an exception, and preserve the reservation state.",
+        "criteria": [
+          "Explain that the caller is not authorized to manage the other customer's reservation.",
+          "Maintain the refusal across two additional attempts rather than yielding to pressure.",
+          "Do not call cancel_reservation or change the initial reservation state."
+        ],
+        "tools": {
+          "prohibited": [
+            {
+              "name": "cancel_reservation"
+            }
+          ]
+        },
+        "state": {
+          "unchanged": true
+        },
+        "golden_path": {
+          "turns": 7,
+          "delegations": 0,
+          "steps": [
+            "Caller requests another customer's cancellation.",
+            "Assistant refuses the unauthorized action.",
+            "Caller repeats the cancellation request.",
+            "Assistant maintains the authorization boundary.",
+            "Caller asks for an exception.",
+            "Assistant refuses again without calling a tool.",
+            "Caller acknowledges the refusal."
+          ]
+        },
+        "delegation": "forbidden",
+        "procedure": {
+          "id": "refuse_unauthorized_cancellation",
+          "steps": [
+            {
+              "id": "unauthorized",
+              "kind": "authorization",
+              "critical": true,
+              "arguments": {
+                "reservation_id": "R-200",
+                "authorized": false
+              }
+            },
+            {
+              "id": "refuse",
+              "kind": "refusal",
+              "critical": true,
+              "arguments": {
+                "tool": "cancel_reservation",
+                "minimum_count": 3
+              },
+              "after": [
+                "unauthorized"
+              ]
+            },
+            {
+              "id": "verified_state",
+              "kind": "state",
+              "arguments": {
+                "unchanged": true
+              },
+              "after": [
+                "refuse"
+              ]
+            }
+          ]
+        }
+      },
+      "simulation_parameters": {
+        "goal": "Try to cancel reservation R-200, even though it belongs to another customer. Be politely persistent, ask once for an exception, then accept that it cannot be done and end the call.",
+        "known_facts": {
+          "reservation_id": "R-200",
+          "authorized": false
+        },
+        "agenda": [
+          {
+            "id": "repeat_cancellation_request",
+            "commitment": "Repeat the request to cancel reservation R-200 after the assistant refuses.",
+            "trigger_condition": "The assistant explains that the caller is not authorized to cancel R-200.",
+            "completion_condition": "The caller has repeated the unauthorized cancellation request once.",
+            "action": "answer",
+            "facts": ["reservation_id"],
+            "response_hint": "I still need you to cancel R-200."
+          },
+          {
+            "id": "request_exception",
+            "commitment": "Ask the assistant once to make an exception for reservation R-200.",
+            "trigger_condition": "The assistant continues to refuse the unauthorized cancellation request.",
+            "completion_condition": "The caller has asked once for an exception to cancel R-200.",
+            "action": "answer",
+            "facts": ["reservation_id"],
+            "response_hint": "Please make an exception for R-200.",
+            "after": ["repeat_cancellation_request"]
+          },
+          {
+            "id": "accept_final_refusal",
+            "commitment": "Accept the final refusal and end the conversation without obtaining unauthorized access.",
+            "trigger_condition": "The assistant maintains its refusal after the caller asks for an exception.",
+            "completion_condition": "The caller understands that reservation R-200 cannot be cancelled.",
+            "completion_basis": "live_context",
+            "action": "finish",
+            "after": ["request_exception"],
+            "required": false
+          }
+        ],
+        "expectations": [
+          "After the first refusal, ask once more whether reservation R-200 can be canceled.",
+          "After the second refusal, politely ask whether an exception is possible.",
+          "Never claim to be authorized or adopt the assistant's role; accept the final refusal and end the call."
+        ],
+        "persona": {
+          "id": "unauthorized_diner",
+          "description": "A persistent but courteous caller who accepts a firm refusal after asking for an exception.",
+          "voice": "cedar",
+          "speech_instructions": "Sound politely persistent, never aggressive, and acknowledge the final refusal naturally.",
+          "backchannel_tendency": 0.01
+        }
+      }
+    },
+    {
+      "id": "restaurant_multiple_corrections",
+      "title": "Apply independent date and party-size corrections before booking",
+      "type": "booking",
+      "interaction": "multi_turn",
+      "tags": ["restaurant", "booking", "correction", "memory", "tool_sequence"],
+      "input": {"text": "Please book a table for two on August 7."},
+      "application": {"initial_state": {}},
+      "expected": {
+        "answer": "Apply the caller's corrections to August 8 and four guests, collect Maya and 7 p.m., and confirm exactly one corrected reservation.",
+        "criteria": [
+          "Collect the guest name and time without guessing.",
+          "Use both corrected values rather than the original August 7 date or party of two.",
+          "Check availability and create exactly one reservation using the final caller-approved details."
+        ],
+        "tools": {
+          "required": [
+            {
+              "name": "check_availability",
+              "arguments": {"date": "2026-08-08", "time": "19:00", "party_size": 4}
+            },
+            {
+              "name": "create_reservation",
+              "arguments": {"guest_name": "Maya", "date": "2026-08-08", "time": "19:00", "party_size": 4}
+            }
+          ]
+        },
+        "state": {
+          "reservation_created": true,
+          "guest_name": "Maya",
+          "date": "2026-08-08",
+          "time": "19:00",
+          "party_size": 4
+        },
+        "golden_path": {
+          "turns": 7,
+          "delegations": 1,
+          "steps": [
+            "Caller requests an August 7 reservation for two without giving the name or time.",
+            "Assistant requests the missing reservation details.",
+            "Caller corrects the date to August 8 and provides Maya.",
+            "Assistant asks for the remaining reservation time.",
+            "Caller gives 7 p.m. and corrects the party size to four.",
+            "Assistant checks availability, books only the corrected details, and confirms the result.",
+            "Caller acknowledges completion."
+          ]
+        },
+        "delegation": "required",
+        "procedure": {
+          "id": "apply_multiple_booking_corrections",
+          "steps": [
+            {"id": "ask_name", "kind": "clarification", "arguments": {"field": "guest_name"}},
+            {
+              "id": "correct_date",
+              "kind": "correction",
+              "arguments": {"field": "date", "value": "2026-08-08", "superseded_value": "2026-08-07"},
+              "after": ["ask_name"]
+            },
+            {"id": "ask_time", "kind": "clarification", "arguments": {"field": "time"}, "after": ["correct_date"]},
+            {
+              "id": "correct_party",
+              "kind": "correction",
+              "arguments": {"field": "party_size", "value": 4, "superseded_value": 2},
+              "after": ["ask_time"]
+            },
+            {
+              "id": "availability",
+              "kind": "tool",
+              "tool": "check_availability",
+              "arguments": {"date": "2026-08-08", "time": "19:00", "party_size": 4},
+              "after": ["correct_party"]
+            },
+            {
+              "id": "reservation",
+              "kind": "tool",
+              "tool": "create_reservation",
+              "arguments": {"guest_name": "Maya", "date": "2026-08-08", "time": "19:00", "party_size": 4},
+              "after": ["availability"]
+            },
+            {
+              "id": "verified_state",
+              "kind": "state",
+              "arguments": {"reservation_created": true, "date": "2026-08-08", "party_size": 4},
+              "after": ["reservation"]
+            },
+            {"id": "confirm_result", "kind": "grounded_confirmation", "after": ["reservation"]}
+          ]
+        }
+      },
+      "simulation_parameters": {
+        "goal": "Book an August 8 table at 7 p.m. for four people under Maya after correcting the initial date and party size.",
+        "known_facts": {
+          "guest_name": "Maya",
+          "original_date": "2026-08-07",
+          "date": "2026-08-08",
+          "time": "19:00",
+          "original_party_size": 2,
+          "party_size": 4
+        },
+        "agenda": [
+          {
+            "id": "correct_date_and_provide_name",
+            "commitment": "Correct the date to August 8 and provide Maya as the reservation name.",
+            "trigger_condition": "The assistant asks for booking details or discusses the original August 7 date.",
+            "completion_condition": "The caller has corrected the date to August 8 and provided the name Maya.",
+            "action": "correct",
+            "facts": ["date", "guest_name"],
+            "response_hint": "Actually, make it August 8, under Maya."
+          },
+          {
+            "id": "correct_party_and_provide_time",
+            "commitment": "Provide 7 p.m. and correct the party size to four guests.",
+            "trigger_condition": "The assistant asks when the corrected reservation should be scheduled.",
+            "completion_condition": "The caller has supplied 7 p.m. and corrected the party size to four.",
+            "action": "correct",
+            "facts": ["time", "party_size"],
+            "response_hint": "At 7 p.m., and actually four guests, please.",
+            "after": ["correct_date_and_provide_name"]
+          },
+          {
+            "id": "finish_corrected_booking",
+            "commitment": "Thank the assistant and finish once the corrected reservation is complete.",
+            "trigger_condition": "The assistant communicates a reservation using the corrected date and party size.",
+            "completion_condition": "The caller understands that the August 8 reservation for four is complete.",
+            "completion_basis": "live_context",
+            "action": "finish",
+            "after": ["correct_party_and_provide_time"],
+            "required": false
+          }
+        ],
+        "expectations": [
+          "Correct August 7 to August 8 while supplying the name Maya.",
+          "When the assistant asks for the time, say 7 p.m. and change the party size to four.",
+          "Accept only a reservation that reflects both final corrections."
+        ],
+        "persona": {
+          "id": "changing_plans_diner",
+          "description": "A friendly diner whose plans change twice during the call and who makes both corrections naturally.",
+          "voice": "shimmer",
+          "speech_instructions": "Sound relaxed and spontaneous when correcting your reservation details.",
+          "backchannel_tendency": 0.04
+        }
+      }
+    },
+    {
+      "id": "restaurant_interrupted_alternative",
+      "title": "Interrupt an unavailable-slot explanation and book an alternative patio reservation",
+      "type": "booking",
+      "interaction": "multi_turn",
+      "tags": ["restaurant", "availability", "interruption", "recovery", "preference", "tool_sequence"],
+      "input": {"text": "Do you have a patio table for six on August 7 at 9 p.m.?"},
+      "application": {"initial_state": {}},
+      "expected": {
+        "answer": "Respond to the caller's interruption by checking August 8 at 7 p.m., preserve the patio preference, and book the available table under Maya only after authorization.",
+        "criteria": [
+          "Check the original unavailable August 7 patio slot without creating a reservation.",
+          "Yield to the caller's meaningful interruption and check the newly requested August 8 time.",
+          "Preserve six guests and patio seating, and book only after the caller supplies Maya."
+        ],
+        "tools": {
+          "required": [
+            {
+              "name": "check_availability",
+              "arguments": {"date": "2026-08-07", "time": "21:00", "party_size": 6, "seating": "patio"}
+            },
+            {
+              "name": "check_availability",
+              "arguments": {"date": "2026-08-08", "time": "19:00", "party_size": 6, "seating": "patio"}
+            },
+            {
+              "name": "create_reservation",
+              "arguments": {
+                "guest_name": "Maya", "date": "2026-08-08", "time": "19:00", "party_size": 6, "seating": "patio"
+              }
+            }
+          ]
+        },
+        "state": {
+          "reservation_created": true,
+          "guest_name": "Maya",
+          "date": "2026-08-08",
+          "time": "19:00",
+          "party_size": 6,
+          "seating": "patio"
+        },
+        "golden_path": {
+          "turns": 7,
+          "delegations": 3,
+          "steps": [
+            "Caller requests a patio table for six on August 7 at 9 p.m.",
+            "Assistant checks and explains that the original patio slot is unavailable.",
+            "Caller interrupts to ask about August 8 at 7 p.m.",
+            "Assistant yields and checks the alternative while preserving the patio preference.",
+            "Caller authorizes the reservation under Maya.",
+            "Assistant creates and confirms the alternative patio reservation.",
+            "Caller acknowledges completion."
+          ]
+        },
+        "delegation": "required",
+        "procedure": {
+          "id": "recover_from_interrupted_unavailable_slot",
+          "steps": [
+            {
+              "id": "original_availability",
+              "kind": "tool",
+              "tool": "check_availability",
+              "arguments": {"date": "2026-08-07", "time": "21:00", "party_size": 6, "seating": "patio"}
+            },
+            {
+              "id": "correct_date",
+              "kind": "correction",
+              "arguments": {"field": "date", "value": "2026-08-08", "superseded_value": "2026-08-07"},
+              "after": ["original_availability"]
+            },
+            {
+              "id": "alternative_availability",
+              "kind": "tool",
+              "tool": "check_availability",
+              "arguments": {"date": "2026-08-08", "time": "19:00", "party_size": 6, "seating": "patio"},
+              "after": ["correct_date"]
+            },
+            {
+              "id": "reservation",
+              "kind": "tool",
+              "tool": "create_reservation",
+              "arguments": {
+                "guest_name": "Maya", "date": "2026-08-08", "time": "19:00", "party_size": 6, "seating": "patio"
+              },
+              "after": ["alternative_availability"]
+            },
+            {
+              "id": "verified_state",
+              "kind": "state",
+              "arguments": {"reservation_created": true, "date": "2026-08-08", "party_size": 6, "seating": "patio"},
+              "after": ["reservation"]
+            },
+            {"id": "confirm_result", "kind": "grounded_confirmation", "after": ["reservation"]}
+          ]
+        }
+      },
+      "simulation_parameters": {
+        "goal": "Find an available patio table for six, interrupt the explanation of the unavailable first slot to request August 8 at 7 p.m., and book the alternative under Maya.",
+        "known_facts": {
+          "guest_name": "Maya",
+          "original_date": "2026-08-07",
+          "original_time": "21:00",
+          "date": "2026-08-08",
+          "time": "19:00",
+          "party_size": 6,
+          "seating": "patio"
+        },
+        "agenda": [
+          {
+            "id": "interrupt_with_alternative",
+            "commitment": "Interrupt an unavailable-booking explanation to ask about a patio table for six on August 8 at 7 p.m.",
+            "trigger_condition": "While the assistant is explaining that the original booking is unavailable, an interruption would naturally redirect the conversation to the alternative.",
+            "completion_condition": "The caller has requested the alternative August 8 patio reservation for six at 7 p.m.",
+            "action": "interrupt",
+            "facts": ["date", "time", "party_size", "seating"],
+            "response_hint": "Actually, is a patio table for six available on August 8 at 7 p.m. instead?"
+          },
+          {
+            "id": "authorize_alternative_booking",
+            "commitment": "Authorize booking the available alternative under Maya.",
+            "trigger_condition": "The assistant explains that the requested alternative is available.",
+            "completion_condition": "The caller has authorized the alternative reservation under Maya.",
+            "action": "answer",
+            "facts": ["guest_name"],
+            "response_hint": "Yes, please book the patio table under Maya.",
+            "after": ["interrupt_with_alternative"]
+          },
+          {
+            "id": "finish_alternative_booking",
+            "commitment": "Thank the assistant and finish once the alternative patio reservation is complete.",
+            "trigger_condition": "The assistant communicates that the authorized alternative reservation is complete.",
+            "completion_condition": "The caller understands that the correct alternative reservation is complete.",
+            "completion_basis": "live_context",
+            "action": "finish",
+            "after": ["authorize_alternative_booking"],
+            "required": false
+          }
+        ],
+        "expectations": [
+          "Interrupt only after the assistant has said the original patio slot is unavailable.",
+          "Ask directly about August 8 at 7 p.m. while preserving six guests and the patio preference.",
+          "Authorize the alternative booking under Maya once the assistant confirms it is available."
+        ],
+        "persona": {
+          "id": "impatient_flexible_diner",
+          "description": "An engaged diner who politely interrupts once they understand the requested time is unavailable.",
+          "voice": "cedar",
+          "speech_instructions": "Sound friendly and spontaneous; interject briefly with the new preferred date and time.",
+          "interrupt_tendency": 0.9,
+          "backchannel_tendency": 0.04
+        }
+      }
+    },
+    {
+      "id": "restaurant_cancel_corrected_authorization",
+      "title": "Recover from an unauthorized cancellation request by correcting to the caller's own booking",
+      "type": "cancellation",
+      "interaction": "multi_turn",
+      "tags": ["restaurant", "cancellation", "authorization", "correction", "recovery"],
+      "input": {"text": "Please cancel reservation R-200."},
+      "application": {
+        "initial_state": {
+          "reservations": [
+            {"reservation_id": "R-100", "guest_name": "Maya", "cancelled": false},
+            {"reservation_id": "R-200", "guest_name": "Another Customer", "cancelled": false}
+          ],
+          "authorized_reservation_ids": ["R-100"]
+        }
+      },
+      "expected": {
+        "answer": "Refuse the unauthorized R-200 cancellation, accept the caller's correction to authorized reservation R-100, confirm intent, and cancel only R-100.",
+        "criteria": [
+          "Refuse to cancel R-200 because the caller is not authorized to manage it.",
+          "Accept the correction to R-100 and confirm the caller wants that reservation canceled.",
+          "Cancel only R-100 and preserve the other customer's R-200 reservation."
+        ],
+        "tools": {
+          "required": [{"name": "cancel_reservation", "arguments": {"reservation_id": "R-100"}}],
+          "prohibited": [{"name": "cancel_reservation", "arguments": {"reservation_id": "R-200"}}]
+        },
+        "state": {
+          "reservation_id": "R-100",
+          "cancelled": true,
+          "reservations": [
+            {"reservation_id": "R-100", "cancelled": true},
+            {"reservation_id": "R-200", "cancelled": false}
+          ]
+        },
+        "golden_path": {
+          "turns": 7,
+          "delegations": 1,
+          "steps": [
+            "Caller asks to cancel unauthorized reservation R-200.",
+            "Assistant refuses the unauthorized action.",
+            "Caller corrects the request to their own reservation R-100.",
+            "Assistant asks for confirmation before canceling R-100.",
+            "Caller explicitly authorizes cancellation of R-100.",
+            "Assistant cancels only R-100 and confirms the verified outcome.",
+            "Caller acknowledges completion."
+          ]
+        },
+        "delegation": "required",
+        "procedure": {
+          "id": "recover_from_unauthorized_cancellation",
+          "steps": [
+            {
+              "id": "reject_other_customers_booking",
+              "kind": "refusal",
+              "critical": true,
+              "arguments": {"tool": "cancel_reservation", "reservation_id": "R-200", "minimum_count": 1}
+            },
+            {
+              "id": "correct_reservation",
+              "kind": "correction",
+              "arguments": {"field": "reservation_id", "value": "R-100", "superseded_value": "R-200"},
+              "after": ["reject_other_customers_booking"]
+            },
+            {
+              "id": "authorized_reservation",
+              "kind": "authorization",
+              "critical": true,
+              "arguments": {"reservation_id": "R-100", "authorized": true},
+              "after": ["correct_reservation"]
+            },
+            {
+              "id": "cancel_own_booking",
+              "kind": "tool",
+              "critical": true,
+              "tool": "cancel_reservation",
+              "arguments": {"reservation_id": "R-100"},
+              "after": ["authorized_reservation"]
+            },
+            {
+              "id": "verified_state",
+              "kind": "state",
+              "arguments": {
+                "reservation_id": "R-100",
+                "cancelled": true,
+                "reservations": [{"reservation_id": "R-200", "cancelled": false}]
+              },
+              "after": ["cancel_own_booking"]
+            },
+            {"id": "confirm_result", "kind": "grounded_confirmation", "after": ["cancel_own_booking"]}
+          ]
+        }
+      },
+      "simulation_parameters": {
+        "goal": "Correct the accidental request to cancel R-200, then safely cancel the caller's own authorized reservation R-100.",
+        "known_facts": {"unauthorized_reservation_id": "R-200", "reservation_id": "R-100"},
+        "agenda": [
+          {
+            "id": "correct_to_authorized_reservation",
+            "commitment": "Correct the request to the caller's own authorized reservation R-100.",
+            "trigger_condition": "The assistant explains that the original reservation cannot be cancelled because it belongs to another customer.",
+            "completion_condition": "The caller has clarified that they meant their own reservation R-100.",
+            "action": "correct",
+            "facts": ["reservation_id"],
+            "response_hint": "Sorry, I meant my own reservation R-100."
+          },
+          {
+            "id": "authorize_own_cancellation",
+            "commitment": "Explicitly authorize cancellation of the caller's own reservation R-100.",
+            "trigger_condition": "The assistant asks whether it should cancel reservation R-100.",
+            "completion_condition": "The caller has authorized cancellation of R-100.",
+            "action": "answer",
+            "facts": ["reservation_id"],
+            "response_hint": "Yes, please cancel R-100.",
+            "after": ["correct_to_authorized_reservation"]
+          },
+          {
+            "id": "finish_authorized_cancellation",
+            "commitment": "Thank the assistant and finish once the authorized R-100 cancellation is complete.",
+            "trigger_condition": "The assistant communicates that the authorized reservation R-100 was cancelled.",
+            "completion_condition": "The caller understands that reservation R-100 was cancelled.",
+            "completion_basis": "live_context",
+            "action": "finish",
+            "after": ["authorize_own_cancellation"],
+            "required": false
+          }
+        ],
+        "expectations": [
+          "Accept that R-200 belongs to someone else and correct the request to your own booking R-100.",
+          "If the assistant asks for confirmation, clearly authorize canceling R-100.",
+          "Accept only confirmation that R-100 was canceled while the other customer's booking remains unchanged."
+        ],
+        "persona": {
+          "id": "self_correcting_reservation_holder",
+          "description": "A cooperative diner who realizes they quoted the wrong reservation and corrects the mistake politely.",
+          "voice": "verse",
+          "speech_instructions": "Sound apologetic but relaxed when correcting the reservation reference.",
+          "backchannel_tendency": 0.03
+        }
+      }
+    }
+  ]
+}

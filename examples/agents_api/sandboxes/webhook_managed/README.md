@@ -20,6 +20,7 @@ provider account start and reconnect its sandbox.
 | Blaxel | [handler.py](blaxel/handler.py) | [Deploy](blaxel/README.md) |
 | Daytona | [handler.py](daytona/handler.py) | [Deploy](daytona/README.md) |
 | E2B | [handler.py](e2b/handler.py) | [Deploy](e2b/README.md) |
+| Runloop | [handler.py](runloop/handler.py) | [Deploy](runloop/README.md) |
 | DigitalOcean | [handler.py](digitalocean/handler.py) | [Deploy](digitalocean/README.md) |
 
 Complete the setup below, deploy one provider's handler, then run the shared
@@ -63,7 +64,7 @@ client. For direct provisioning from your application, use
 | Variable | Where it is used |
 | --- | --- |
 | `OPENAI_API_KEY` | Application and controller. The application creates sessions; the controller reads their current state. |
-| `OPENAI_EXECUTOR_API_KEY` | Passed to each worker as `CODEX_API_KEY`. Grant **List models → Read** and set other permissions to **None**. |
+| `OPENAI_EXECUTOR_API_KEY` | An [environment key](https://developers.openai.com/api/docs/guides/agents-api/environments/self-hosted#authentication), passed to each worker as `CODEX_API_KEY`. |
 | `OPENAI_WEBHOOK_SECRET` | Controller only. Verifies deliveries from your OpenAI project. |
 
 The two API keys must have the same organization, project, and user or service-account

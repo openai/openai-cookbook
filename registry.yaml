@@ -4,6 +4,23 @@
 # should build pages for, and indicates metadata such as tags, creation date and
 # authors for each page.
 
+- title: Harness-Aware Evaluation of Plugins
+  path: examples/partners/harness_aware_plugin_evals/harness_aware_plugin_evals.ipynb
+  slug: harness-aware-plugin-evals
+  description: Evaluate an MCP-backed plugin through direct tool tests, a controlled model loop, and the Codex harness, then use shared test cases and traces to diagnose and improve its behavior.
+  date: 2026-09-23
+  authors:
+    - maciej-domagala-deepsense
+    - lukasz-dragan-deepsense
+    - michal-rdzany-deepsense
+    - dwigg-openai
+  tags:
+    - partners
+    - evals
+    - plugins
+    - mcp
+    - codex
+
 - title: Release ChatGPT usage budgets hourly, daily, or weekly
   path: examples/chatgpt/daily_usage_limits/README.md
   slug: chatgpt-interval-usage-limits

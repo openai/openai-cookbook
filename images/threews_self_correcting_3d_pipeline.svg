@@ -1,0 +1,90 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 980 420" font-family="Helvetica, Arial, sans-serif">
+  <defs>
+    <marker id="arrow" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse">
+      <path d="M 0 0 L 10 5 L 0 10 z" fill="#6b7280"/>
+    </marker>
+    <marker id="arrowFail" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse">
+      <path d="M 0 0 L 10 5 L 0 10 z" fill="#dc2626"/>
+    </marker>
+    <marker id="arrowPass" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse">
+      <path d="M 0 0 L 10 5 L 0 10 z" fill="#16a34a"/>
+    </marker>
+  </defs>
+
+  <rect width="980" height="420" fill="#ffffff"/>
+
+  <!-- Brief -->
+  <rect x="20" y="60" width="150" height="64" rx="10" fill="#f3f4f6" stroke="#9ca3af" stroke-width="1.5"/>
+  <text x="95" y="87" text-anchor="middle" font-size="14" font-weight="bold" fill="#111827">One-line brief</text>
+  <text x="95" y="107" text-anchor="middle" font-size="11" fill="#4b5563">"a wizard's study"</text>
+
+  <!-- Art director -->
+  <rect x="220" y="48" width="190" height="88" rx="10" fill="#eef2ff" stroke="#6366f1" stroke-width="1.5"/>
+  <text x="315" y="76" text-anchor="middle" font-size="14" font-weight="bold" fill="#111827">Art director</text>
+  <text x="315" y="94" text-anchor="middle" font-size="11" fill="#4b5563">gpt-5-mini, Responses API</text>
+  <text x="315" y="112" text-anchor="middle" font-size="11" fill="#4b5563">designs 4-6 props, emits</text>
+  <text x="315" y="126" text-anchor="middle" font-size="11" fill="#4b5563">parallel function calls</text>
+
+  <!-- Generator -->
+  <rect x="470" y="48" width="200" height="88" rx="10" fill="#ecfdf5" stroke="#10b981" stroke-width="1.5"/>
+  <text x="570" y="76" text-anchor="middle" font-size="14" font-weight="bold" fill="#111827">Text-to-3D generation</text>
+  <text x="570" y="94" text-anchor="middle" font-size="11" fill="#4b5563">three.ws /api/3d/generate</text>
+  <text x="570" y="112" text-anchor="middle" font-size="11" fill="#4b5563">free and keyless, one call</text>
+  <text x="570" y="126" text-anchor="middle" font-size="11" fill="#4b5563">per prop, in parallel</text>
+
+  <!-- Renderer -->
+  <rect x="730" y="48" width="200" height="88" rx="10" fill="#ecfdf5" stroke="#10b981" stroke-width="1.5"/>
+  <text x="830" y="76" text-anchor="middle" font-size="14" font-weight="bold" fill="#111827">Snapshot render</text>
+  <text x="830" y="94" text-anchor="middle" font-size="11" fill="#4b5563">three.ws /api/render/glb</text>
+  <text x="830" y="112" text-anchor="middle" font-size="11" fill="#4b5563">GLB in, PNG out</text>
+
+  <!-- Critic -->
+  <rect x="610" y="220" width="230" height="96" rx="10" fill="#eef2ff" stroke="#6366f1" stroke-width="1.5"/>
+  <text x="725" y="248" text-anchor="middle" font-size="14" font-weight="bold" fill="#111827">Vision critic</text>
+  <text x="725" y="266" text-anchor="middle" font-size="11" fill="#4b5563">gpt-5-mini sees the render plus</text>
+  <text x="725" y="280" text-anchor="middle" font-size="11" fill="#4b5563">the brief, returns a strict JSON</text>
+  <text x="725" y="294" text-anchor="middle" font-size="11" fill="#4b5563">verdict: passed, critique,</text>
+  <text x="725" y="308" text-anchor="middle" font-size="11" fill="#4b5563">revised_prompt</text>
+
+  <!-- Repair -->
+  <rect x="280" y="220" width="210" height="96" rx="10" fill="#fef2f2" stroke="#dc2626" stroke-width="1.5"/>
+  <text x="385" y="248" text-anchor="middle" font-size="14" font-weight="bold" fill="#111827">Repair, once</text>
+  <text x="385" y="266" text-anchor="middle" font-size="11" fill="#4b5563">failed prop regenerated from</text>
+  <text x="385" y="280" text-anchor="middle" font-size="11" fill="#4b5563">the critic's revised prompt,</text>
+  <text x="385" y="294" text-anchor="middle" font-size="11" fill="#4b5563">then re-inspected;</text>
+  <text x="385" y="308" text-anchor="middle" font-size="11" fill="#4b5563">hard budget of one retry</text>
+
+  <!-- Gallery -->
+  <rect x="40" y="220" width="180" height="96" rx="10" fill="#f3f4f6" stroke="#9ca3af" stroke-width="1.5"/>
+  <text x="130" y="252" text-anchor="middle" font-size="14" font-weight="bold" fill="#111827">3D gallery</text>
+  <text x="130" y="270" text-anchor="middle" font-size="11" fill="#4b5563">interactive model-viewer</text>
+  <text x="130" y="284" text-anchor="middle" font-size="11" fill="#4b5563">grid in the notebook:</text>
+  <text x="130" y="298" text-anchor="middle" font-size="11" fill="#4b5563">orbit, zoom, AR</text>
+
+  <!-- Arrows: top row -->
+  <line x1="170" y1="92" x2="212" y2="92" stroke="#6b7280" stroke-width="1.5" marker-end="url(#arrow)"/>
+  <line x1="410" y1="92" x2="462" y2="92" stroke="#6b7280" stroke-width="1.5" marker-end="url(#arrow)"/>
+  <text x="436" y="82" text-anchor="middle" font-size="10" fill="#6b7280">N calls</text>
+  <line x1="670" y1="92" x2="722" y2="92" stroke="#6b7280" stroke-width="1.5" marker-end="url(#arrow)"/>
+  <text x="696" y="82" text-anchor="middle" font-size="10" fill="#6b7280">GLB</text>
+
+  <!-- Renderer down to critic -->
+  <line x1="830" y1="136" x2="830" y2="200" stroke="#6b7280" stroke-width="1.5"/>
+  <line x1="830" y1="200" x2="800" y2="214" stroke="#6b7280" stroke-width="1.5" marker-end="url(#arrow)"/>
+  <text x="845" y="180" font-size="10" fill="#6b7280">PNG</text>
+
+  <!-- Critic fail to repair -->
+  <line x1="610" y1="268" x2="498" y2="268" stroke="#dc2626" stroke-width="1.5" marker-end="url(#arrowFail)"/>
+  <text x="554" y="258" text-anchor="middle" font-size="10" fill="#dc2626">fail</text>
+
+  <!-- Repair back up to generator -->
+  <path d="M 385 220 L 385 168 L 540 168 L 540 142" fill="none" stroke="#dc2626" stroke-width="1.5" marker-end="url(#arrowFail)"/>
+  <text x="452" y="160" text-anchor="middle" font-size="10" fill="#dc2626">revised prompt</text>
+
+  <!-- Critic pass to gallery -->
+  <path d="M 725 316 L 725 360 L 130 360 L 130 324" fill="none" stroke="#16a34a" stroke-width="1.5" marker-end="url(#arrowPass)"/>
+  <text x="430" y="352" text-anchor="middle" font-size="10" fill="#16a34a">pass</text>
+
+  <!-- Loop label -->
+  <text x="490" y="30" text-anchor="middle" font-size="15" font-weight="bold" fill="#111827">Generate, render, inspect, repair: a self-correcting 3D asset pipeline</text>
+</svg>

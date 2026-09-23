@@ -24,14 +24,22 @@ def get_assert(output: str, context: dict) -> dict:
     if raw is None:
         return {"pass": False, "score": 0.0, "reason": "could not read the Codex item trace"}
 
+    mcp_items = [item for item in raw.get("items", []) if item.get("type") == "mcp_tool_call"]
+    for item in mcp_items:
+        if item.get("error") or item.get("status") == "failed":
+            return {
+                "pass": False,
+                "score": 0.0,
+                "reason": f"MCP tool call failed: {item.get('tool')}",
+            }
+
     calls = [
         {
             "name": item.get("tool"),
             "arguments": _arguments(item),
             "result": (item.get("result") or {}).get("structured_content"),
         }
-        for item in raw.get("items", [])
-        if item.get("type") == "mcp_tool_call"
+        for item in mcp_items
     ]
     errored = (context.get("providerResponse") or {}).get("error")
     completed = not errored and bool((raw.get("finalResponse") or "").strip())

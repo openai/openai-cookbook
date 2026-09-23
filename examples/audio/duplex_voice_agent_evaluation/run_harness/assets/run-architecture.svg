@@ -1,0 +1,156 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="1320" height="1280" viewBox="0 0 1320 1280" role="img" aria-labelledby="run-title run-description">
+  <title id="run-title">RUN continuous multi-turn voice-agent evaluation</title>
+  <desc id="run-description">A scenario gives its private goal, persona, and agenda to a GPT Live caller with independent managed Responses reasoning and no tools, and gives agent context to a separate GPT Live agent. Both Live frontends use Marble and continuously exchange audio. The caller backend uses Luna at low effort; only the evaluated agent owns application tools and state. An independent semantic completion observer receives evaluator-owned expected state and constraints and recognizes the end of the conversation. The full expected outcome remains evaluator-only.</desc>
+  <defs>
+    <marker id="arrow-orange" markerWidth="10" markerHeight="10" refX="8" refY="5" orient="auto" markerUnits="userSpaceOnUse"><path d="M1.5 1.5 8 5 1.5 8.5" fill="none" stroke="#c48a47" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"/></marker>
+    <marker id="arrow-orange-start" markerWidth="10" markerHeight="10" refX="2" refY="5" orient="auto" markerUnits="userSpaceOnUse"><path d="M8 1.5 2 5 8 8.5" fill="none" stroke="#c48a47" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"/></marker>
+    <marker id="arrow-blue" markerWidth="10" markerHeight="10" refX="8" refY="5" orient="auto" markerUnits="userSpaceOnUse"><path d="M1.5 1.5 8 5 1.5 8.5" fill="none" stroke="#7290bd" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"/></marker>
+    <marker id="arrow-blue-start" markerWidth="10" markerHeight="10" refX="2" refY="5" orient="auto" markerUnits="userSpaceOnUse"><path d="M8 1.5 2 5 8 8.5" fill="none" stroke="#7290bd" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"/></marker>
+    <marker id="arrow-green" markerWidth="10" markerHeight="10" refX="8" refY="5" orient="auto" markerUnits="userSpaceOnUse"><path d="M1.5 1.5 8 5 1.5 8.5" fill="none" stroke="#739b79" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"/></marker>
+    <filter id="soft-shadow" x="-15%" y="-35%" width="130%" height="185%"><feDropShadow dx="0" dy="5" stdDeviation="9" flood-color="#182b38" flood-opacity="0.045"/></filter>
+  </defs>
+  <style>
+    svg { background: #fff; font-family: "OpenAI Sans", "SF Pro Display", "Inter", -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif; }
+    .canvas { fill: #fff; }
+    .simulation-boundary rect { fill: #fcfcfb; stroke: #dfe3de; stroke-width: 1.4; }
+    .simulation-caption { fill: #747b76; font-size: 13px; font-weight: 560; letter-spacing: .34px; }
+    .agent-boundary rect { fill: #f7f9fd; stroke: #d5deeb; stroke-width: 1.4; }
+    .flow { fill: none; stroke-width: 1.7; stroke-linecap: round; stroke-linejoin: round; }
+    .flow--orange { stroke: #c48a47; }
+    .flow--optional { stroke: #c48a47; stroke-dasharray: 5 7; }
+    .flow--blue, .flow--context, .flow--response { stroke: #7290bd; }
+    .flow--green { stroke: #739b79; }
+    .flow--expected { stroke: #739b79; stroke-dasharray: 5 7; }
+    .card-surface { stroke-width: 1.25; filter: url(#soft-shadow); }
+    .card--orange .card-surface { fill: #fffbf6; stroke: #e9d7bd; }
+    .card--orange .icon-surface { fill: #fff1dc; }
+    .card--orange .node-icon { stroke: #a86d31; }
+    .card--optional .card-surface { fill: #fffdfa; stroke: #e5d5bd; stroke-dasharray: 5 5; }
+    .card--assistant .card-surface { fill: #eef4fe; stroke: #b8cbed; }
+    .card--assistant .icon-surface { fill: #dae7fc; }
+    .card--assistant .node-icon { stroke: #37659d; }
+    .card--backend .card-surface { fill: #fff; stroke: #d1dceb; }
+    .card--backend .icon-surface { fill: #eef2f8; }
+    .card--backend .node-icon { stroke: #516983; }
+    .card--green .card-surface { fill: #f1f8f1; stroke: #c6ddc8; }
+    .card--green .icon-surface { fill: #e0f0e1; }
+    .card--green .node-icon { stroke: #4c7952; }
+    .node-icon { fill: none; stroke-width: 1.65; stroke-linecap: round; stroke-linejoin: round; }
+    .node-title { fill: #202520; font-size: 25px; font-weight: 590; letter-spacing: -0.52px; }
+    .card--assistant .node-title { font-size: 27px; }
+    .card--optional .node-title { font-size: 21px; }
+    .card--observer .node-title { font-size: 22px; }
+    .node-detail { fill: #676f70; font-family: "SF Mono", "SFMono-Regular", ui-monospace, monospace; font-size: 15.6px; letter-spacing: -0.24px; }
+    .edge-label rect { fill: #fff; stroke: #edf0ee; stroke-width: .9; }
+    .edge-label text { font-size: 15px; font-weight: 530; text-anchor: middle; letter-spacing: -.08px; }
+    .edge-label--orange text { fill: #8e6538; }
+    .edge-label--blue text { fill: #506b91; }
+    .edge-label--green text { fill: #537758; }
+  </style>
+  <rect class="canvas" width="1320" height="1280"/>
+  <g class="simulation-boundary" data-node-id="simulation-boundary">
+      <rect x="80" y="345" width="1150" height="425" rx="29"/>
+      <text class="simulation-caption" x="655" y="375" text-anchor="middle">Continuous multi-turn simulation</text>
+    </g>
+  <g class="agent-boundary" data-node-id="assistant-boundary">
+      <rect x="710" y="393" width="500" height="316" rx="29"/>
+
+    </g>
+  <g aria-hidden="true"><path class="flow flow--orange" d="M505 194 V236 Q505 253 488 253 H342 Q325 253 325 270 V425" marker-end="url(#arrow-orange)"/>
+    <path class="flow flow--blue" d="M815 194 V236 Q815 253 832 253 H943 Q960 253 960 270 V425" marker-end="url(#arrow-blue)"/>
+    <path class="flow flow--orange" d="M535 459 H740" marker-end="url(#arrow-orange)"/>
+    <path class="flow flow--blue" d="M740 502 H535" marker-end="url(#arrow-blue)"/>
+    <path class="flow flow--orange" d="M325 540 V571" marker-start="url(#arrow-orange-start)" marker-end="url(#arrow-orange)"/>
+    <path class="flow flow--blue" d="M960 540 V571" marker-start="url(#arrow-blue-start)" marker-end="url(#arrow-blue)"/>
+    <path class="flow flow--green" d="M660 770 V850" marker-end="url(#arrow-green)"/>
+    <path class="flow flow--green" d="M660 962 V1090" marker-end="url(#arrow-green)"/>
+    <path class="flow flow--expected" d="M405 140 H62 Q45 140 45 157 V889 Q45 906 62 906 H405" marker-end="url(#arrow-green)"/>
+    <path class="flow flow--green" d="M960 680 V1055 Q960 1072 943 1072 H867 Q850 1072 850 1089 V1090" marker-end="url(#arrow-green)"/>
+    <path class="flow flow--expected" d="M915 140 H1253 Q1270 140 1270 157 V1129 Q1270 1146 1253 1146 H915" marker-end="url(#arrow-green)"/></g>
+  <g><g class="card card--scenario card--orange" data-node-id="scenario" role="group" aria-label="Scenario: scenarios.json">
+      <rect class="card-surface" x="405" y="86" width="510" height="108" rx="19"/>
+      <rect class="icon-surface" x="431" y="117" width="46" height="46" rx="13"/>
+      <g class="node-icon" transform="translate(441, 127)"><path d="M4.5 7.4h6.1l2 2h7a1.7 1.7 0 0 1 1.7 1.7v8.1a1.7 1.7 0 0 1-1.7 1.7H4.5a1.7 1.7 0 0 1-1.7-1.7V9.1a1.7 1.7 0 0 1 1.7-1.7Z"/></g>
+      <text class="node-title" x="493" y="135">Scenario</text>
+      <text class="node-detail" x="493" y="163">scenarios.json</text>
+    </g>
+    <g class="card card--caller card--orange" data-node-id="caller" role="group" aria-label="GPT Live caller: gpt-live-1">
+      <rect class="card-surface" x="115" y="425" width="420" height="108" rx="19"/>
+      <rect class="icon-surface" x="141" y="456" width="46" height="46" rx="13"/>
+      <g class="node-icon" transform="translate(151, 466)"><path d="M5 10v5"/><path d="M9.5 6v13"/><path d="M14 3.5v18"/><path d="M18.5 7v11"/><path d="M23 10.5v4"/></g>
+      <text class="node-title" x="203" y="474">GPT Live caller</text>
+      <text class="node-detail" x="203" y="502">gpt-live-1</text>
+    </g>
+    <g class="card card--caller-backend card--orange" data-node-id="caller-backend" role="group" aria-label="Caller reasoning: gpt-5.6-luna, low effort, no tools">
+      <rect class="card-surface" x="115" y="578" width="420" height="102" rx="19"/>
+      <rect class="icon-surface" x="141" y="606" width="46" height="46" rx="13"/>
+      <g class="node-icon" transform="translate(151, 616)"><rect x="6" y="6" width="14" height="14" rx="2"/><rect x="10" y="10" width="6" height="6" rx="1"/><path d="M10 3v3m6-3v3m-6 14v3m6-3v3M3 10h3m-3 6h3m14-6h3m-3 6h3"/></g>
+      <text class="node-title" x="203" y="624">Caller reasoning</text>
+      <text class="node-detail" x="203" y="652">gpt-5.6-luna · low · no tools</text>
+    </g>
+    <g class="card card--assistant card--blue" data-node-id="assistant" role="group" aria-label="GPT Live agent: gpt-live-1">
+      <rect class="card-surface" x="740" y="425" width="440" height="108" rx="19"/>
+      <rect class="icon-surface" x="766" y="456" width="46" height="46" rx="13"/>
+      <g class="node-icon" transform="translate(776, 466)"><path d="m13 3 2.2 6.3L21.5 11l-6.3 2.2L13 19.5l-2.2-6.3L4.5 11l6.3-1.7L13 3Z"/><path d="m20 15.7.9 2.6 2.6.9-2.6.9-.9 2.6-.9-2.6-2.6-.9 2.6-.9.9-2.6Z"/></g>
+      <text class="node-title" x="828" y="474">GPT Live agent</text>
+      <text class="node-detail" x="828" y="502">gpt-live-1</text>
+    </g>
+    <g class="card card--backend card--blue" data-node-id="backend" role="group" aria-label="Backend and tools: gpt-5.6-terra · definitions.json">
+      <rect class="card-surface" x="740" y="578" width="440" height="102" rx="19"/>
+      <rect class="icon-surface" x="766" y="606" width="46" height="46" rx="13"/>
+      <g class="node-icon" transform="translate(776, 616)"><path d="M20.9 7.2a5.3 5.3 0 0 1-6.7 6.7l-6.4 6.4a2 2 0 0 1-2.8-2.8l6.4-6.4a5.3 5.3 0 0 1 6.7-6.7L15 7.5l2.6 2.6z"/></g>
+      <text class="node-title" x="828" y="624">Backend and tools</text>
+      <text class="node-detail" x="828" y="652">gpt-5.6-terra · definitions.json</text>
+    </g>
+    <g class="card card--observer card--green" data-node-id="observer" role="group" aria-label="Semantic completion observer: gpt-5.6-terra">
+      <rect class="card-surface" x="405" y="850" width="510" height="112" rx="19"/>
+      <rect class="icon-surface" x="431" y="883" width="46" height="46" rx="13"/>
+      <g class="node-icon" transform="translate(441, 893)"><rect x="6" y="6" width="14" height="14" rx="2"/><rect x="10" y="10" width="6" height="6" rx="1"/><path d="M10 3v3m6-3v3m-6 14v3m6-3v3M3 10h3m-3 6h3m14-6h3m-3 6h3"/></g>
+      <text class="node-title" x="493" y="901">Semantic completion observer</text>
+      <text class="node-detail" x="493" y="929">gpt-5.6-terra</text>
+    </g>
+    <g class="card card--grading card--green" data-node-id="grading" role="group" aria-label="Grading and results: gpt-5.6-terra · results.json">
+      <rect class="card-surface" x="405" y="1090" width="510" height="112" rx="19"/>
+      <rect class="icon-surface" x="431" y="1123" width="46" height="46" rx="13"/>
+      <g class="node-icon" transform="translate(441, 1133)"><path d="M13 3.5 21 6.7v5.6c0 4.3-2.9 7.8-8 9.7-5.1-1.9-8-5.4-8-9.7V6.7z"/><path d="m9.3 12.6 2.4 2.4 5-5"/></g>
+      <text class="node-title" x="493" y="1141">Grading and results</text>
+      <text class="node-detail" x="493" y="1169">gpt-5.6-terra · results.json</text>
+    </g></g>
+  <g aria-hidden="true"><g class="edge-label edge-label--orange" data-edge-label="Goal · persona · agenda">
+      <rect x="213.5" y="286" width="223" height="32" rx="16"/>
+      <text x="325" y="307">Goal · persona · agenda</text>
+    </g>
+    <g class="edge-label edge-label--blue" data-edge-label="Agent context">
+      <rect x="883.5" y="286" width="153" height="32" rx="16"/>
+      <text x="960" y="307">Agent context</text>
+    </g>
+    <g class="edge-label edge-label--orange" data-edge-label="Caller audio">
+      <rect x="570.5" y="441" width="133" height="32" rx="16"/>
+      <text x="637" y="462">Caller audio</text>
+    </g>
+    <g class="edge-label edge-label--blue" data-edge-label="Agent audio">
+      <rect x="572" y="490" width="130" height="32" rx="16"/>
+      <text x="637" y="511">Agent audio</text>
+    </g>
+    <g class="edge-label edge-label--green" data-edge-label="Conversation">
+      <rect x="587.5" y="793" width="145" height="32" rx="16"/>
+      <text x="660" y="814">Conversation</text>
+    </g>
+    <g class="edge-label edge-label--green" data-edge-label="Expected state + constraints">
+      <rect x="96" y="890" width="252" height="32" rx="16"/>
+      <text x="222" y="911">Expected state + constraints</text>
+    </g>
+    <g class="edge-label edge-label--green" data-edge-label="End of conversation">
+      <rect x="558" y="1011" width="204" height="32" rx="16"/>
+      <text x="660" y="1032">End of conversation</text>
+    </g>
+    <g class="edge-label edge-label--green" data-edge-label="Agent response + tools and state">
+      <rect x="929" y="966" width="182" height="52" rx="26"/>
+      <text x="1020" y="988">Agent response +</text>
+      <text x="1020" y="1007">tools and state</text>
+    </g>
+    <g class="edge-label edge-label--green" data-edge-label="Expected outcome">
+      <rect x="1082.5" y="897" width="191" height="32" rx="16"/>
+      <text x="1178" y="918">Expected outcome</text>
+    </g></g>
+</svg>

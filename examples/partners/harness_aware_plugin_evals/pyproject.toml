@@ -1,0 +1,23 @@
+[project]
+name = "standalone-bls-mcp-eval"
+version = "0.1.0"
+requires-python = ">=3.11"
+dependencies = [
+    "fastmcp>=3.4.7,<4",
+    "openai>=2.53.0,<3",
+    "pydantic>=2.13.4,<3",
+    "python-dotenv>=1.2.2,<2",
+    "pyyaml>=6.0.3,<7",
+]
+
+[dependency-groups]
+dev = [
+    "pytest>=9.0.2,<10",
+    "jupytext>=1.17,<2",
+    "nbconvert>=7.16,<8",
+    "ipykernel>=6.29,<8",
+    "jupyterlab>=4.4,<5",
+]
+
+[tool.pytest.ini_options]
+pythonpath = ["."]

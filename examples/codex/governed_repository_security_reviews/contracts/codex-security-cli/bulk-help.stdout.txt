@@ -1,0 +1,40 @@
+codex-security bulk-scan — Discover repositories and run resumable bulk security scans.
+
+Usage: codex-security bulk-scan [input] [options]
+
+Arguments:
+  input  CSV repository list; omit to discover repositories interactively.
+
+Options:
+  --output-dir <string>                                    Resumable results directory; required with a repository CSV.
+  --knowledge-base <array>                                 Read shared security docs for every repository.
+  --workers <number>                                       Concurrent repository scans. Per-scan Codex workers are separate. (default: 4)
+  --mode <standard|deep>                                   Default scan mode for repositories without a CSV mode. (default: standard)
+  --scan-prompt-file <string>                              Append instructions from FILE to every scan.
+  --validation-prompt-file <string>                        Replace final validation with FILE for every standard scan.
+  --post-scan-prompt-file <string>                         Run FILE after each scan, including failures.
+  --model <string>                                         OpenAI model for each repository (default: gpt-5.6-sol).
+  --effort <minimal|low|medium|high|xhigh|max>             Model reasoning effort (default: xhigh).
+  --provider <openai|openrouter|fireworks|amazon-bedrock>  Inference provider for scans. (default: openai)
+  --max-attempts <number>                                  Maximum scan attempts per repository. (default: 1)
+  --max-cost <number>                                      Stop each repository attempt if estimated USD cost exceeds AMOUNT.
+  --plugin-path <string>                                   Codex Security plugin directory or ZIP (default: bundled plugin).
+  --python <string>                                        Python interpreter (default: PYTHON or automatic discovery).
+  --codex <array>                                          Repeat TOML KEY=VALUE; e.g. model_reasoning_effort="high" or features.multi_agent_v2.max_concurrent_threads_per_session=4.
+
+Examples:
+  codex-security bulk-scan --model gpt-5.6-terra --effort high
+
+CSV example:
+  codex-security bulk-scan repositories.csv --output-dir /path/outside/repositories/results --workers 4 --max-attempts 3
+
+Global Options:
+  --filter-output <keys>              Filter output by key paths (e.g. foo,bar.baz,a[0,3])
+  --format <toon|json|yaml|md|jsonl>  Output format
+  --full-output                       Show full output envelope
+  --help                              Show help
+  --llms, --llms-full                 Print LLM-readable manifest
+  --schema                            Show JSON Schema for command
+  --token-count                       Print token count of output (instead of output)
+  --token-limit <n>                   Limit output to n tokens
+  --token-offset <n>                  Skip first n tokens of output

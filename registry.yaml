@@ -1,3 +1,18 @@
+- title: Govern repository security reviews with versioned context
+  path: examples/codex/governed_repository_security_reviews/governed_repository_security_reviews.ipynb
+  slug: governed-repository-security-reviews
+  description: Bind repository revisions and threat context to human approval, bounded work and repeat-safe review evidence in an offline security workflow.
+  date: "2026-08-26"
+  authors:
+    - rory-opanai
+  tags:
+    - codex
+    - security
+    - agents
+    - automation
+    - evals
+    - human-in-the-loop
+
 # yaml-language-server: $schema=./.github/registry_schema.json
 
 # This file is used to generate cookbook.openai.com. It specifies which paths we

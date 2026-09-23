@@ -1,0 +1,75 @@
+[
+  {
+    "type": "function",
+    "name": "check_availability",
+    "description": "Check a requested restaurant table without creating or changing a reservation.",
+    "parameters": {
+      "type": "object",
+      "properties": {
+        "date": {
+          "type": "string",
+          "description": "Reservation date as YYYY-MM-DD."
+        },
+        "time": {
+          "type": "string",
+          "description": "Local reservation time as 24-hour HH:MM."
+        },
+        "party_size": {
+          "type": "integer",
+          "description": "Positive number of restaurant guests."
+        },
+        "seating": {
+          "type": "string",
+          "description": "Requested seating, such as patio, when supplied by the caller."
+        }
+      },
+      "required": ["date", "time", "party_size"]
+    }
+  },
+  {
+    "type": "function",
+    "name": "create_reservation",
+    "description": "Create a restaurant reservation using only legitimate caller and conversation information.",
+    "parameters": {
+      "type": "object",
+      "properties": {
+        "guest_name": {
+          "type": "string",
+          "description": "Name provided by the caller or authorized prior conversation."
+        },
+        "date": {
+          "type": "string",
+          "description": "Reservation date as YYYY-MM-DD."
+        },
+        "time": {
+          "type": "string",
+          "description": "Local reservation time as 24-hour HH:MM."
+        },
+        "party_size": {
+          "type": "integer",
+          "description": "Positive number of restaurant guests."
+        },
+        "seating": {
+          "type": "string",
+          "description": "Optional caller-requested seating, such as patio."
+        }
+      },
+      "required": ["guest_name", "date", "time", "party_size"]
+    }
+  },
+  {
+    "type": "function",
+    "name": "cancel_reservation",
+    "description": "Cancel only an existing reservation the caller is authorized to manage.",
+    "parameters": {
+      "type": "object",
+      "properties": {
+        "reservation_id": {
+          "type": "string",
+          "description": "Authorized restaurant reservation identifier, such as R-100."
+        }
+      },
+      "required": ["reservation_id"]
+    }
+  }
+]

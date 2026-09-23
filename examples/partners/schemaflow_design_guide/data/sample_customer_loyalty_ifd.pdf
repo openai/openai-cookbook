@@ -1,0 +1,197 @@
+%PDF-1.4
+1 0 obj
+<< /Type /Catalog /Pages 2 0 R >>
+endobj
+2 0 obj
+<< /Type /Pages /Kids [4 0 R 6 0 R] /Count 2 >>
+endobj
+3 0 obj
+<< /Type /Font /Subtype /Type1 /BaseFont /Helvetica >>
+endobj
+4 0 obj
+<< /Type /Page /Parent 2 0 R /MediaBox [0 0 612 792] /Resources << /Font << /F1 3 0 R >> >> /Contents 5 0 R >>
+endobj
+5 0 obj
+<< /Length 2196 >>
+stream
+BT
+/F1 10 Tf
+72 750 Td
+14 TL
+(IFD: Customer Loyalty Tier Mapping) Tj
+T*
+(SchemaFlow cookbook sample document) Tj
+T*
+() Tj
+T*
+(Purpose) Tj
+T*
+(This publishable sample specification supports a database change request to add a) Tj
+T*
+(customer loyalty tier attribute to the operational customer profile table.) Tj
+T*
+() Tj
+T*
+(Change request covered by this document) Tj
+T*
+(- Add LOYALTY_TIER VARCHAR\(20\) to ODS.ODS_CUSTOMER_PROFILE as a nullable column.) Tj
+T*
+(- Backfill ODS.ODS_CUSTOMER_PROFILE.LOYALTY_TIER from CORE.DIM_CUSTOMER.LOYALTY_TIER.) Tj
+T*
+(- Join target and source rows on CUSTOMER_ID.) Tj
+T*
+(- Use only CORE.DIM_CUSTOMER records where IS_CURRENT = true.) Tj
+T*
+(- Add a non-unique index on ODS.ODS_CUSTOMER_PROFILE\(CUSTOMER_ID, LOYALTY_TIER\).) Tj
+T*
+() Tj
+T*
+(Data flow) Tj
+T*
+(CORE.DIM_CUSTOMER -> ODS.ODS_CUSTOMER_PROFILE -> CORE.VW_CUSTOMER_PROFILE ->) Tj
+T*
+(MARTS.CUSTOMER_LOYALTY_SUMMARY) Tj
+T*
+() Tj
+T*
+(Target object) Tj
+T*
+(Schema: ODS) Tj
+T*
+(Table: ODS_CUSTOMER_PROFILE) Tj
+T*
+(Column to add: LOYALTY_TIER) Tj
+T*
+(Data type: VARCHAR\(20\)) Tj
+T*
+(Nullability: nullable) Tj
+T*
+(Business key: CUSTOMER_ID) Tj
+T*
+() Tj
+T*
+(Source object) Tj
+T*
+(Schema: CORE) Tj
+T*
+(Table: DIM_CUSTOMER) Tj
+T*
+(Source column: LOYALTY_TIER) Tj
+T*
+(Join column: CUSTOMER_ID) Tj
+T*
+(Current row filter: IS_CURRENT = true) Tj
+T*
+() Tj
+T*
+(Relevant column mapping) Tj
+T*
+(CORE.DIM_CUSTOMER.CUSTOMER_ID -> ODS.ODS_CUSTOMER_PROFILE.CUSTOMER_ID) Tj
+T*
+(CORE.DIM_CUSTOMER.LOYALTY_TIER -> ODS.ODS_CUSTOMER_PROFILE.LOYALTY_TIER) Tj
+T*
+(CORE.DIM_CUSTOMER.IS_CURRENT -> source filter for current customer dimension rows) Tj
+T*
+() Tj
+T*
+(Implementation notes) Tj
+T*
+(- The new target column remains nullable so unmatched customers can remain NULL.) Tj
+T*
+(- The backfill should not insert or delete customer profile rows.) Tj
+T*
+(- If multiple source rows are marked current for the same CUSTOMER_ID, stop and remediate) Tj
+T*
+(before backfill.) Tj
+T*
+(- Validate that LOYALTY_TIER values do not exceed 20 characters before deployment.) Tj
+T*
+(- Existing downstream consumers should be checked for SELECT * or fixed column ordering) Tj
+T*
+(assumptions.) Tj
+T*
+() Tj
+T*
+(Index requirement) Tj
+T*
+ET
+endstream
+endobj
+6 0 obj
+<< /Type /Page /Parent 2 0 R /MediaBox [0 0 612 792] /Resources << /Font << /F1 3 0 R >> >> /Contents 7 0 R >>
+endobj
+7 0 obj
+<< /Length 1442 >>
+stream
+BT
+/F1 10 Tf
+72 750 Td
+14 TL
+(Create a non-unique index to support lookups and filters using CUSTOMER_ID and LOYALTY_TIER.) Tj
+T*
+(Recommended index columns: CUSTOMER_ID, LOYALTY_TIER.) Tj
+T*
+() Tj
+T*
+(Prechecks) Tj
+T*
+(- Confirm ODS.ODS_CUSTOMER_PROFILE exists and does not already contain LOYALTY_TIER.) Tj
+T*
+(- Confirm CORE.DIM_CUSTOMER exists and contains CUSTOMER_ID, LOYALTY_TIER, and IS_CURRENT.) Tj
+T*
+(- Count duplicate current source rows by CUSTOMER_ID where IS_CURRENT = true.) Tj
+T*
+(- Check maximum length of CORE.DIM_CUSTOMER.LOYALTY_TIER.) Tj
+T*
+(- Record target row count before the backfill.) Tj
+T*
+() Tj
+T*
+(Postchecks) Tj
+T*
+(- Confirm ODS.ODS_CUSTOMER_PROFILE.LOYALTY_TIER exists as nullable VARCHAR\(20\).) Tj
+T*
+(- Confirm target row count is unchanged after the backfill.) Tj
+T*
+(- Compare a sample of CUSTOMER_ID records between ODS and CORE.) Tj
+T*
+(- Report the count of NULL LOYALTY_TIER values after the backfill.) Tj
+T*
+(- Confirm the non-unique index exists on CUSTOMER_ID and LOYALTY_TIER.) Tj
+T*
+() Tj
+T*
+(Rollback) Tj
+T*
+(- Drop the new non-unique index if created.) Tj
+T*
+(- Set ODS.ODS_CUSTOMER_PROFILE.LOYALTY_TIER back to NULL if only the backfill needs) Tj
+T*
+(rollback.) Tj
+T*
+(- Drop ODS.ODS_CUSTOMER_PROFILE.LOYALTY_TIER if a full schema rollback is required.) Tj
+T*
+() Tj
+T*
+(This sample contains no client names, employee names, internal URLs, credentials, or) Tj
+T*
+(production values.) Tj
+T*
+ET
+endstream
+endobj
+xref
+0 8
+0000000000 65535 f 
+0000000009 00000 n 
+0000000058 00000 n 
+0000000121 00000 n 
+0000000191 00000 n 
+0000000317 00000 n 
+0000002564 00000 n 
+0000002690 00000 n 
+trailer
+<< /Size 8 /Root 1 0 R >>
+startxref
+4183
+%%EOF

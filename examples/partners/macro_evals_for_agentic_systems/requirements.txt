@@ -1,0 +1,12 @@
+llvmlite==0.45.1
+numba==0.62.1
+pandas>=2.2,<3.1
+numpy>=1.26,<2.4
+plotly>=5.24,<7
+scikit-learn>=1.5,<1.9
+umap-learn>=0.5.7,<0.6
+hdbscan>=0.8.33,<0.9
+networkx>=3.3,<4
+ipykernel>=6.29,<8
+nbformat>=5.10,<6
+nbconvert>=7.16,<8

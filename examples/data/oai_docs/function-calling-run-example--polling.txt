@@ -1,0 +1,122 @@
+
+Runs are asynchronous, which means you'll want to monitor their `status` by polling the Run object until a
+[terminal status](https://platform.openai.com/docs/assistants/how-it-works/runs-and-run-steps) is reached. For convenience, the 'create and poll' SDK helpers assist both in
+creating the run and then polling for its completion. Once the Run completes, you can list the
+Messages added to the Thread by the Assistant. Finally, you would retrieve all the `tool_outputs` from
+`required_action` and submit them at the same time to the 'submit tool outputs and poll' helper.
+
+<CodeSample
+    defaultLanguage="python"
+    code={{
+        python: `
+run = client.beta.threads.runs.create_and_poll(
+  thread_id=thread.id,
+  assistant_id=assistant.id,
+)
+ 
+if run.status == 'completed':
+  messages = client.beta.threads.messages.list(
+    thread_id=thread.id
+  )
+  print(messages)
+else:
+  print(run.status)
+ 
+# Define the list to store tool outputs
+tool_outputs = []
+ 
+# Loop through each tool in the required action section
+for tool in run.required_action.submit_tool_outputs.tool_calls:
+  if tool.function.name == "get_current_temperature":
+    tool_outputs.append({
+      "tool_call_id": tool.id,
+      "output": "57"
+    })
+  elif tool.function.name == "get_rain_probability":
+    tool_outputs.append({
+      "tool_call_id": tool.id,
+      "output": "0.06"
+    })
+ 
+# Submit all tool outputs at once after collecting them in a list
+if tool_outputs:
+  try:
+    run = client.beta.threads.runs.submit_tool_outputs_and_poll(
+      thread_id=thread.id,
+      run_id=run.id,
+      tool_outputs=tool_outputs
+    )
+    print("Tool outputs submitted successfully.")
+  except Exception as e:
+    print("Failed to submit tool outputs:", e)
+else:
+  print("No tool outputs to submit.")
+ 
+if run.status == 'completed':
+  messages = client.beta.threads.messages.list(
+    thread_id=thread.id
+  )
+  print(messages)
+else:
+  print(run.status)
+        `.trim(),
+        "node.js": `
+const handleRequiresAction = async (run) => {
+  // Check if there are tools that require outputs
+  if (
+    run.required_action &&
+    run.required_action.submit_tool_outputs &&
+    run.required_action.submit_tool_outputs.tool_calls
+  ) {
+    // Loop through each tool in the required action section
+    const toolOutputs = run.required_action.submit_tool_outputs.tool_calls.map(
+      (tool) => {
+        if (tool.function.name === "getCurrentTemperature") {
+          return {
+            tool_call_id: tool.id,
+            output: "57",
+          };
+        } else if (tool.function.name === "getRainProbability") {
+          return {
+            tool_call_id: tool.id,
+            output: "0.06",
+          };
+        }
+      },
+    );\n
+    // Submit all tool outputs at once after collecting them in a list
+    if (toolOutputs.length > 0) {
+      run = await client.beta.threads.runs.submitToolOutputsAndPoll(
+        thread.id,
+        run.id,
+        { tool_outputs: toolOutputs },
+      );
+      console.log("Tool outputs submitted successfully.");
+    } else {
+      console.log("No tool outputs to submit.");
+    }\n
+    // Check status after submitting tool outputs
+    return handleRunStatus(run);
+  }
+};\n
+const handleRunStatus = async (run) => {
+  // Check if the run is completed
+  if (run.status === "completed") {
+    let messages = await client.beta.threads.messages.list(thread.id);
+    console.log(messages.data);
+    return messages.data;
+  } else if (run.status === "requires_action") {
+    console.log(run.status);
+    return await handleRequiresAction(run);
+  } else {
+    console.error("Run did not complete:", run);
+  }
+};\n
+// Create and poll run
+let run = await client.beta.threads.runs.createAndPoll(thread.id, {
+  assistant_id: assistant.id,
+});\n
+handleRunStatus(run);
+`.trim(),
+    }}
+/>

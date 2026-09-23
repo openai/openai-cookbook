@@ -1,0 +1,604 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>SynthDataConf 2026 — Registration</title>
+<style>
+  *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+  body {
+    font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+    background: #f0f2f5;
+    color: #1a1a2e;
+    line-height: 1.5;
+    padding: 24px 16px 64px;
+  }
+
+  .container { max-width: 720px; margin: 0 auto; }
+
+  header {
+    text-align: center;
+    margin-bottom: 32px;
+  }
+  header h1 {
+    font-size: 28px;
+    font-weight: 700;
+    color: #1a1a2e;
+  }
+  header p {
+    color: #555;
+    font-size: 15px;
+    margin-top: 4px;
+  }
+
+  fieldset {
+    border: 1px solid #d0d5dd;
+    border-radius: 10px;
+    padding: 20px 24px 24px;
+    margin-bottom: 20px;
+    background: #fff;
+  }
+  legend {
+    font-size: 16px;
+    font-weight: 600;
+    color: #2d4a7a;
+    padding: 0 8px;
+  }
+
+  .field {
+    margin-top: 14px;
+  }
+  .field label {
+    display: block;
+    font-size: 14px;
+    font-weight: 500;
+    margin-bottom: 4px;
+  }
+  .field input[type="text"],
+  .field input[type="email"],
+  .field input[type="tel"],
+  .field select,
+  .field textarea {
+    width: 100%;
+    padding: 8px 10px;
+    font-size: 14px;
+    border: 1px solid #c4c9d4;
+    border-radius: 6px;
+    background: #fafbfc;
+    color: #1a1a2e;
+  }
+  .field textarea {
+    resize: vertical;
+    min-height: 70px;
+  }
+  .field select { cursor: pointer; }
+  .field input:focus, .field select:focus, .field textarea:focus {
+    outline: none;
+    border-color: #4a7adb;
+    box-shadow: 0 0 0 2px rgba(74,122,219,0.15);
+  }
+
+  .row {
+    display: flex;
+    gap: 16px;
+  }
+  .row > .field { flex: 1; }
+
+  .radio-group, .checkbox-group {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 6px 18px;
+    margin-top: 6px;
+  }
+  .radio-group label, .checkbox-group label {
+    font-weight: 400;
+    font-size: 14px;
+    display: flex;
+    align-items: center;
+    gap: 5px;
+    cursor: pointer;
+  }
+  .radio-group input, .checkbox-group input {
+    margin: 0;
+    cursor: pointer;
+  }
+
+  .hint {
+    font-size: 12px;
+    color: #777;
+    margin-top: 2px;
+  }
+
+  .field .error, .terms-field .error {
+    color: #d93025;
+    font-size: 12px;
+    margin-top: 2px;
+    display: none;
+  }
+  .field input.invalid,
+  .field select.invalid,
+  .field textarea.invalid {
+    border-color: #d93025;
+  }
+
+  .terms-field {
+    margin-top: 18px;
+  }
+  .terms-field label {
+    font-weight: 400;
+    display: flex;
+    align-items: flex-start;
+    gap: 6px;
+    cursor: pointer;
+  }
+  .terms-field input { margin-top: 3px; cursor: pointer; }
+
+  button[type="submit"] {
+    display: block;
+    width: 100%;
+    padding: 12px;
+    font-size: 16px;
+    font-weight: 600;
+    color: #fff;
+    background: #2d4a7a;
+    border: none;
+    border-radius: 8px;
+    cursor: pointer;
+    margin-top: 8px;
+    transition: background 0.15s;
+  }
+  button[type="submit"]:hover { background: #1e3560; }
+
+  /* Success view */
+  #success {
+    display: none;
+    background: #fff;
+    border: 2px solid #34a853;
+    border-radius: 10px;
+    padding: 28px 32px;
+  }
+  #success h2 {
+    color: #1e7e34;
+    font-size: 22px;
+    margin-bottom: 4px;
+  }
+  #success .subtitle {
+    color: #555;
+    font-size: 14px;
+    margin-bottom: 20px;
+  }
+  #summary-table {
+    width: 100%;
+    border-collapse: collapse;
+    font-size: 14px;
+  }
+  #summary-table th, #summary-table td {
+    text-align: left;
+    padding: 6px 10px;
+    border-bottom: 1px solid #e8e8e8;
+    vertical-align: top;
+  }
+  #summary-table th {
+    width: 38%;
+    color: #555;
+    font-weight: 500;
+  }
+  #summary-table td {
+    color: #1a1a2e;
+  }
+</style>
+</head>
+<body>
+<div class="container">
+
+<header>
+  <h1>SynthDataConf 2026</h1>
+  <p>Conference Registration Form</p>
+</header>
+
+<form id="registration-form" novalidate>
+
+  <!-- ── Personal Information ── -->
+  <fieldset>
+    <legend>Personal Information</legend>
+    <div class="row">
+      <div class="field">
+        <label for="first-name">First Name *</label>
+        <input type="text" id="first-name" name="first_name" required>
+      </div>
+      <div class="field">
+        <label for="last-name">Last Name *</label>
+        <input type="text" id="last-name" name="last_name" required>
+      </div>
+    </div>
+    <div class="field">
+      <label for="email">Email Address *</label>
+      <input type="email" id="email" name="email" required>
+    </div>
+    <div class="row">
+      <div class="field">
+        <label for="phone">Phone Number</label>
+        <input type="tel" id="phone" name="phone" placeholder="+1 (555) 000-0000" required>
+      </div>
+      <div class="field">
+        <label for="dob">Date of Birth</label>
+        <input type="text" id="dob" name="date_of_birth" placeholder="YYYY-MM-DD" data-validate-date required>
+        <span class="error">Please enter a valid date (YYYY-MM-DD).</span>
+      </div>
+    </div>
+  </fieldset>
+
+  <!-- ── Professional Details ── -->
+  <fieldset>
+    <legend>Professional Details</legend>
+    <div class="row">
+      <div class="field">
+        <label for="company">Company / Organization</label>
+        <input type="text" id="company" name="company" required>
+      </div>
+      <div class="field">
+        <label for="job-title">Job Title</label>
+        <input type="text" id="job-title" name="job_title" required>
+      </div>
+    </div>
+    <div class="row">
+      <div class="field">
+        <label for="department">Department</label>
+        <select id="department" name="department" required>
+          <option value="">— Select —</option>
+          <option value="Engineering">Engineering</option>
+          <option value="Data Science">Data Science</option>
+          <option value="Product">Product</option>
+          <option value="Design">Design</option>
+          <option value="Marketing">Marketing</option>
+          <option value="Sales">Sales</option>
+          <option value="Operations">Operations</option>
+          <option value="Executive">Executive</option>
+          <option value="Other">Other</option>
+        </select>
+      </div>
+      <div class="field">
+        <label for="experience">Years of Experience</label>
+        <select id="experience" name="experience" required>
+          <option value="">— Select —</option>
+          <option value="0-2">0 – 2</option>
+          <option value="3-5">3 – 5</option>
+          <option value="6-10">6 – 10</option>
+          <option value="11-15">11 – 15</option>
+          <option value="16+">16+</option>
+        </select>
+      </div>
+    </div>
+  </fieldset>
+
+  <!-- ── Conference Preferences ── -->
+  <fieldset>
+    <legend>Conference Preferences</legend>
+    <div class="field">
+      <label>Ticket Type *</label>
+      <div class="radio-group">
+        <label><input type="radio" name="ticket_type" value="Standard" required> Standard — $299</label>
+        <label><input type="radio" name="ticket_type" value="Premium"> Premium — $599</label>
+        <label><input type="radio" name="ticket_type" value="VIP"> VIP — $999</label>
+      </div>
+    </div>
+    <div class="field">
+      <label for="tshirt">T-Shirt Size</label>
+      <select id="tshirt" name="tshirt_size" required>
+        <option value="">— Select —</option>
+        <option value="XS">XS</option>
+        <option value="S">S</option>
+        <option value="M">M</option>
+        <option value="L">L</option>
+        <option value="XL">XL</option>
+        <option value="XXL">XXL</option>
+      </select>
+    </div>
+    <div class="field">
+      <label>Dietary Requirements</label>
+      <div class="checkbox-group">
+        <label><input type="checkbox" name="dietary" value="None"> No restrictions</label>
+        <label><input type="checkbox" name="dietary" value="Vegetarian"> Vegetarian</label>
+        <label><input type="checkbox" name="dietary" value="Vegan"> Vegan</label>
+        <label><input type="checkbox" name="dietary" value="Gluten-free"> Gluten-free</label>
+        <label><input type="checkbox" name="dietary" value="Nut allergy"> Nut allergy</label>
+        <label><input type="checkbox" name="dietary" value="Halal"> Halal</label>
+        <label><input type="checkbox" name="dietary" value="Kosher"> Kosher</label>
+      </div>
+    </div>
+    <div class="field">
+      <label>Workshop Selections <span class="hint">(pick up to 2)</span></label>
+      <div class="checkbox-group">
+        <label><input type="checkbox" name="workshops" value="Intro to AI Agents"> Intro to AI Agents</label>
+        <label><input type="checkbox" name="workshops" value="Advanced Prompt Engineering"> Advanced Prompt Engineering</label>
+        <label><input type="checkbox" name="workshops" value="Building with LLMs"> Building with LLMs</label>
+        <label><input type="checkbox" name="workshops" value="Computer Use & Automation"> Computer Use &amp; Automation</label>
+      </div>
+    </div>
+  </fieldset>
+
+  <!-- ── Travel & Accommodation ── -->
+  <fieldset>
+    <legend>Travel &amp; Accommodation</legend>
+    <div class="field">
+      <label for="arriving-from">Arriving From (City, Country)</label>
+      <input type="text" id="arriving-from" name="arriving_from" placeholder="e.g. London, United Kingdom" required>
+    </div>
+    <div class="field">
+      <label>Do you need hotel accommodation?</label>
+      <div class="radio-group">
+        <label><input type="radio" name="hotel_needed" value="Yes" required> Yes</label>
+        <label><input type="radio" name="hotel_needed" value="No"> No</label>
+      </div>
+    </div>
+    <div id="hotel-details">
+      <div class="row">
+        <div class="field">
+          <label for="checkin">Check-in Date</label>
+          <input type="text" id="checkin" name="checkin_date" placeholder="YYYY-MM-DD" data-validate-date required>
+          <span class="error">Please enter a valid date (YYYY-MM-DD).</span>
+        </div>
+        <div class="field">
+          <label for="checkout">Check-out Date</label>
+          <input type="text" id="checkout" name="checkout_date" placeholder="YYYY-MM-DD" data-validate-date required>
+          <span class="error">Please enter a valid date (YYYY-MM-DD).</span>
+        </div>
+      </div>
+      <div class="field">
+        <label for="room-type">Room Type</label>
+        <select id="room-type" name="room_type" required>
+          <option value="">— Select —</option>
+          <option value="Standard Single">Standard Single</option>
+          <option value="Standard Double">Standard Double</option>
+          <option value="Deluxe Suite">Deluxe Suite</option>
+        </select>
+      </div>
+    </div>
+  </fieldset>
+
+  <!-- ── Additional Information ── -->
+  <fieldset>
+    <legend>Additional Information</legend>
+    <div class="field">
+      <label for="referral">How did you hear about SynthDataConf?</label>
+      <select id="referral" name="referral_source" required>
+        <option value="">— Select —</option>
+        <option value="Social Media">Social Media</option>
+        <option value="Colleague">Colleague / Word of Mouth</option>
+        <option value="Email Newsletter">Email Newsletter</option>
+        <option value="Tech Blog">Tech Blog / Article</option>
+        <option value="Previous Attendee">Previous Attendee</option>
+        <option value="Other">Other</option>
+      </select>
+    </div>
+    <div class="field">
+      <label for="additional-requests">Additional Requests</label>
+      <textarea id="additional-requests" name="additional_requests" placeholder="Let us know if you have any additional requests." required></textarea>
+    </div>
+    <div class="terms-field">
+      <label>
+        <input type="checkbox" id="terms" name="terms_accepted" value="Yes" required>
+        I agree to the <strong>Terms and Conditions</strong> and <strong>Code of Conduct</strong>. *
+      </label>
+    </div>
+  </fieldset>
+
+  <button type="submit">Complete Registration</button>
+</form>
+
+<!-- ── Success view ── -->
+<div id="success">
+  <h2>Registration Complete!</h2>
+  <p class="subtitle">Thank you for registering. Here is a summary of your submission:</p>
+  <table id="summary-table"><tbody></tbody></table>
+</div>
+
+</div><!-- .container -->
+
+<script>
+(function () {
+  const LABELS = {
+    first_name: "First Name",
+    last_name: "Last Name",
+    email: "Email",
+    phone: "Phone",
+    date_of_birth: "Date of Birth",
+    company: "Company",
+    job_title: "Job Title",
+    department: "Department",
+    experience: "Years of Experience",
+    ticket_type: "Ticket Type",
+    tshirt_size: "T-Shirt Size",
+    dietary: "Dietary Requirements",
+    workshops: "Workshops",
+    arriving_from: "Arriving From",
+    hotel_needed: "Hotel Needed",
+    checkin_date: "Check-in Date",
+    checkout_date: "Check-out Date",
+    room_type: "Room Type",
+    referral_source: "Referral Source",
+    additional_requests: "Additional Requests",
+    terms_accepted: "Terms Accepted",
+  };
+
+  // Date validation: YYYY-MM-DD, must be a real calendar date.
+  function isValidDate(s) {
+    if (!/^\d{4}-\d{2}-\d{2}$/.test(s)) return false;
+    var parts = s.split("-");
+    var y = parseInt(parts[0], 10);
+    var m = parseInt(parts[1], 10);
+    var d = parseInt(parts[2], 10);
+    var dt = new Date(y, m - 1, d);
+    return dt.getFullYear() === y && dt.getMonth() === m - 1 && dt.getDate() === d;
+  }
+
+  var dateInputs = document.querySelectorAll("[data-validate-date]");
+  dateInputs.forEach(function (input) {
+    input.addEventListener("blur", function () {
+      var err = input.nextElementSibling;
+      if (input.value && !isValidDate(input.value)) {
+        input.classList.add("invalid");
+        err.style.display = "block";
+      } else {
+        input.classList.remove("invalid");
+        err.style.display = "none";
+      }
+    });
+  });
+
+  // Toggle hotel detail fields based on the hotel_needed radio.
+  var hotelDetails = document.getElementById("hotel-details");
+  var hotelRadios = document.querySelectorAll('input[name="hotel_needed"]');
+  function toggleHotelDetails() {
+    var checked = document.querySelector('input[name="hotel_needed"]:checked');
+    var show = !checked || checked.value === "Yes";
+    hotelDetails.style.display = show ? "" : "none";
+    hotelDetails.querySelectorAll("input, select").forEach(function (el) {
+      if (show) el.setAttribute("required", "");
+      else { el.removeAttribute("required"); el.value = ""; }
+    });
+  }
+  hotelRadios.forEach(function (r) { r.addEventListener("change", toggleHotelDetails); });
+  toggleHotelDetails();
+
+  // Helper: find or create an error span right after an element.
+  function getOrCreateError(el, msg) {
+    var next = el.nextElementSibling;
+    if (next && next.classList.contains("error")) return next;
+    var span = document.createElement("span");
+    span.className = "error";
+    span.textContent = msg;
+    el.parentNode.insertBefore(span, el.nextSibling);
+    return span;
+  }
+
+  // Clear error styling when the user interacts with a field.
+  var form = document.getElementById("registration-form");
+  form.addEventListener("input", function (ev) {
+    var t = ev.target;
+    t.classList.remove("invalid");
+    var next = t.nextElementSibling;
+    if (next && next.classList.contains("error")) next.style.display = "none";
+  });
+  form.addEventListener("change", function (ev) {
+    var t = ev.target;
+    t.classList.remove("invalid");
+    var next = t.nextElementSibling;
+    if (next && next.classList.contains("error")) next.style.display = "none";
+  });
+
+  document.getElementById("registration-form").addEventListener("submit", function (e) {
+    e.preventDefault();
+    var errors = [];
+
+    // Validate required text / email / tel / select / textarea fields.
+    var required = form.querySelectorAll("input[required], select[required], textarea[required]");
+    required.forEach(function (el) {
+      // Skip radios here — handled separately below.
+      if (el.type === "radio") return;
+      if (!el.value.trim()) {
+        el.classList.add("invalid");
+        var err = getOrCreateError(el, "This field is required.");
+        err.style.display = "block";
+        errors.push(el);
+      }
+    });
+
+    // Validate required radio groups (ticket_type, hotel_needed).
+    ["ticket_type", "hotel_needed"].forEach(function (name) {
+      var radios = form.querySelectorAll('input[name="' + name + '"]');
+      var checked = form.querySelector('input[name="' + name + '"]:checked');
+      if (!checked && radios.length) {
+        var group = radios[0].closest(".radio-group");
+        var err = getOrCreateError(group, "Please select an option.");
+        err.style.display = "block";
+        errors.push(group);
+      }
+    });
+
+    // Validate required checkbox groups (dietary, workshops).
+    var checkboxMaximums = { workshops: 2 };
+    ["dietary", "workshops"].forEach(function (name) {
+      var checked = form.querySelectorAll('input[name="' + name + '"]:checked');
+      var all = form.querySelectorAll('input[name="' + name + '"]');
+      if (!checked.length) {
+        if (all.length) {
+          var group = all[0].closest(".checkbox-group");
+          var err = getOrCreateError(group, "Please select at least one option.");
+          err.style.display = "block";
+          errors.push(group);
+        }
+      } else if (checkboxMaximums[name] && checked.length > checkboxMaximums[name]) {
+        var group = all[0].closest(".checkbox-group");
+        var err = getOrCreateError(group, "Please select at most " + checkboxMaximums[name] + ".");
+        err.style.display = "block";
+        errors.push(group);
+      }
+    });
+
+    // Validate terms checkbox.
+    var terms = form.querySelector("#terms");
+    if (!terms.checked) {
+      var termsField = terms.closest(".terms-field");
+      var err = getOrCreateError(termsField, "You must accept the terms to register.");
+      err.style.display = "block";
+      errors.push(termsField);
+    }
+
+    // Validate date fields.
+    var hasDateError = false;
+    dateInputs.forEach(function (input) {
+      var err = input.nextElementSibling;
+      if (input.required && input.value && !isValidDate(input.value)) {
+        input.classList.add("invalid");
+        err.style.display = "block";
+        hasDateError = true;
+        errors.push(input);
+      }
+    });
+
+    // Scroll to first error and stop.
+    if (errors.length) {
+      errors[0].scrollIntoView({ behavior: "smooth", block: "center" });
+      return;
+    }
+
+    var fd = new FormData(this);
+    var tbody = document.querySelector("#summary-table tbody");
+    tbody.innerHTML = "";
+
+    // Collect multi-value fields.
+    var dietary = fd.getAll("dietary");
+    var workshops = fd.getAll("workshops");
+
+    // Build summary rows in label order.
+    var keys = Object.keys(LABELS);
+    for (var i = 0; i < keys.length; i++) {
+      var key = keys[i];
+      var value;
+      if (key === "dietary") {
+        value = dietary.length ? dietary.join(", ") : "—";
+      } else if (key === "workshops") {
+        value = workshops.length ? workshops.join(", ") : "—";
+      } else {
+        value = fd.get(key) || "—";
+      }
+      var tr = document.createElement("tr");
+      var th = document.createElement("th");
+      th.textContent = LABELS[key];
+      var td = document.createElement("td");
+      td.textContent = value;
+      tr.appendChild(th);
+      tr.appendChild(td);
+      tbody.appendChild(tr);
+    }
+
+    this.style.display = "none";
+    document.getElementById("success").style.display = "block";
+    window.scrollTo(0, 0);
+  });
+})();
+</script>
+</body>
+</html>

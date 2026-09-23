@@ -10,6 +10,12 @@
       "path": {
         "type": "string"
       },
+      "slug": {
+        "type": "string"
+      },
+      "description": {
+        "type": "string"
+      },
       "redirects": {
         "type": "array",
         "items": {
@@ -31,9 +37,12 @@
       "date": {
         "type": "string",
         "format": "date"
+      },
+      "archived": {
+        "type": "boolean"
       }
     },
-    "required": ["title", "path", "tags", "authors"],
+    "required": ["title", "path", "slug", "tags", "authors"],
     "additionalProperties": false
   }
 }

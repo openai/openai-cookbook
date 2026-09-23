@@ -1,0 +1,40 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="1200" height="760" viewBox="0 0 1200 760">
+<rect x="0" y="0" width="100%" height="100%" fill="#ffffff"/>
+<text x="90" y="32" font-family="Arial" font-size="24" fill="#1f2937">Potential impact of retention_ratio on session cost</text>
+<line x1="164.12" y1="64" x2="164.12" y2="668" stroke="#e5e7eb" stroke-width="1"/>
+<text x="164.12" y="690" text-anchor="middle" font-family="Arial" font-size="11" fill="#6b7280">250</text>
+<line x1="287.65" y1="64" x2="287.65" y2="668" stroke="#e5e7eb" stroke-width="1"/>
+<text x="287.65" y="690" text-anchor="middle" font-family="Arial" font-size="11" fill="#6b7280">500</text>
+<line x1="411.18" y1="64" x2="411.18" y2="668" stroke="#e5e7eb" stroke-width="1"/>
+<text x="411.18" y="690" text-anchor="middle" font-family="Arial" font-size="11" fill="#6b7280">750</text>
+<line x1="534.71" y1="64" x2="534.71" y2="668" stroke="#e5e7eb" stroke-width="1"/>
+<text x="534.71" y="690" text-anchor="middle" font-family="Arial" font-size="11" fill="#6b7280">1000</text>
+<line x1="658.24" y1="64" x2="658.24" y2="668" stroke="#e5e7eb" stroke-width="1"/>
+<text x="658.24" y="690" text-anchor="middle" font-family="Arial" font-size="11" fill="#6b7280">1250</text>
+<line x1="781.76" y1="64" x2="781.76" y2="668" stroke="#e5e7eb" stroke-width="1"/>
+<text x="781.76" y="690" text-anchor="middle" font-family="Arial" font-size="11" fill="#6b7280">1500</text>
+<line x1="905.29" y1="64" x2="905.29" y2="668" stroke="#e5e7eb" stroke-width="1"/>
+<text x="905.29" y="690" text-anchor="middle" font-family="Arial" font-size="11" fill="#6b7280">1750</text>
+<line x1="90" y1="668.00" x2="930" y2="668.00" stroke="#e5e7eb" stroke-width="1"/>
+<text x="78" y="672.00" text-anchor="end" font-family="Arial" font-size="11" fill="#6b7280">$0.00</text>
+<line x1="90" y1="547.20" x2="930" y2="547.20" stroke="#e5e7eb" stroke-width="1"/>
+<text x="78" y="551.20" text-anchor="end" font-family="Arial" font-size="11" fill="#6b7280">$5.00</text>
+<line x1="90" y1="426.40" x2="930" y2="426.40" stroke="#e5e7eb" stroke-width="1"/>
+<text x="78" y="430.40" text-anchor="end" font-family="Arial" font-size="11" fill="#6b7280">$10.00</text>
+<line x1="90" y1="305.60" x2="930" y2="305.60" stroke="#e5e7eb" stroke-width="1"/>
+<text x="78" y="309.60" text-anchor="end" font-family="Arial" font-size="11" fill="#6b7280">$15.00</text>
+<line x1="90" y1="184.80" x2="930" y2="184.80" stroke="#e5e7eb" stroke-width="1"/>
+<text x="78" y="188.80" text-anchor="end" font-family="Arial" font-size="11" fill="#6b7280">$20.00</text>
+<line x1="90" y1="64.00" x2="930" y2="64.00" stroke="#e5e7eb" stroke-width="1"/>
+<text x="78" y="68.00" text-anchor="end" font-family="Arial" font-size="11" fill="#6b7280">$25.00</text>
+<line x1="90" y1="668" x2="930" y2="668" stroke="#111827" stroke-width="1.6"/>
+<line x1="90" y1="64" x2="90" y2="668" stroke="#111827" stroke-width="1.6"/>
+<text x="510.00" y="732" text-anchor="middle" font-family="Arial" font-size="14" fill="#111827">Session Length (seconds)</text>
+<text x="24" y="366.00" transform="rotate(-90 24 366.00)" text-anchor="middle" font-family="Arial" font-size="14" fill="#111827">Cumulative Cost</text>
+<polyline points="90.00,666.07 164.12,659.54 287.65,646.26 386.47,636.59 406.24,632.97 416.12,623.30 426.00,622.10 485.29,614.85 524.82,608.81 544.59,596.73 633.53,585.86 648.35,583.44 663.18,572.57 781.76,559.28 801.53,556.86 816.35,552.03 831.18,543.58 905.29,533.91 930.00,530.29" fill="none" stroke="#3b82f6" stroke-width="3" stroke-linecap="round"/>
+<polyline points="90.00,666.07 164.12,658.82 287.65,646.26 386.47,636.59 406.24,632.97 416.12,630.55 426.00,620.89 435.88,611.22 534.71,530.29 658.24,423.98 781.76,317.68 905.29,208.96 930.00,179.97" fill="none" stroke="#ef4444" stroke-width="3" stroke-linecap="round"/>
+<line x1="958" y1="68" x2="974" y2="68" stroke="#3b82f6" stroke-width="4"/>
+<text x="984" y="72" font-family="Arial" font-size="12" fill="#111827">0.7 Retention Ratio</text>
+<line x1="958" y1="94" x2="974" y2="94" stroke="#ef4444" stroke-width="4"/>
+<text x="984" y="98" font-family="Arial" font-size="12" fill="#111827">1.0 Retention Ratio</text>
+</svg>

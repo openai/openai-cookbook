@@ -1,0 +1,24 @@
+{
+  "name": "twilio-realtime-translation-demo",
+  "version": "0.1.0",
+  "private": true,
+  "type": "module",
+  "engines": {
+    "node": ">=20"
+  },
+  "scripts": {
+    "start": "node src/server.js",
+    "dev": "node --watch src/server.js",
+    "test": "vitest run"
+  },
+  "dependencies": {
+    "@fastify/formbody": "^8.0.2",
+    "@fastify/websocket": "^11.0.2",
+    "dotenv": "^16.4.7",
+    "fastify": "^5.2.1",
+    "ws": "^8.18.0"
+  },
+  "devDependencies": {
+    "vitest": "^4.1.5"
+  }
+}

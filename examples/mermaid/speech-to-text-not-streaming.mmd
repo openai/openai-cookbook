@@ -1,0 +1,7 @@
+```mermaid
+flowchart LR
+    AudioFile["Audio file<br/>(WAV • MP3 • FLAC)"] --> Upload["Binary upload"]
+    Upload --> API["/v1/audio/transcriptions"]
+    API --> JSONOutput["JSON transcription<br/>+ metadata"]
+    JSONOutput --> App["Your application"]
+```

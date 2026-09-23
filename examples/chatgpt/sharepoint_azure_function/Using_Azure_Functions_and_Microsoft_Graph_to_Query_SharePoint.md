@@ -578,7 +578,6 @@ paths:
           description: Payload too large if the response exceeds the size limit.
         '500':
           description: Server error when there are issues executing the query or encoding the results.
-
 ```
 
 ## Solution 2 Detailed Walkthrough: Converting the file to text in the Azure Function

@@ -1,0 +1,27 @@
+{
+  "merchant": "Costco #124",
+  "location": {
+    "city": "Vista",
+    "state": "CA",
+    "zipcode": "92083"
+  },
+  "time": "2024-04-09T12:52:00",
+  "items": [
+    {
+      "description": "Regular",
+      "product_code": null,
+      "category": "Fuel",
+      "item_price": "4.959",
+      "sale_price": "4.959",
+      "quantity": "10.005",
+      "total": "49.61"
+    }
+  ],
+  "subtotal": "49.61",
+  "tax": null,
+  "total": "49.61",
+  "handwritten_notes": [
+    "vista",
+    "219948"
+  ]
+}

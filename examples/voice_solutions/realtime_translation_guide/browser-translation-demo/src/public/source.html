@@ -1,0 +1,75 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>Translation Source Audio</title>
+    <link rel="stylesheet" href="/styles.css" />
+    <style>
+      .source-shell {
+        width: min(760px, calc(100vw - 32px));
+        margin: 0 auto;
+        padding: 48px 0;
+      }
+
+      .source-card {
+        padding: 20px;
+        border: 1px solid var(--line);
+        border-radius: 8px;
+        background: var(--panel);
+      }
+
+      .source-actions {
+        display: flex;
+        gap: 12px;
+        flex-wrap: wrap;
+      }
+
+      audio {
+        width: 100%;
+        margin: 18px 0 8px;
+      }
+    </style>
+  </head>
+  <body>
+    <main class="source-shell">
+      <section class="source-card">
+        <p class="eyebrow">Test source tab</p>
+        <h1>English source audio</h1>
+        <p class="summary">
+          Press Play, leave this tab speaking, then share this Chrome tab from
+          the translation app with tab audio enabled. This page uses a real
+          audio element so Chrome tab capture receives media audio.
+        </p>
+        <audio id="sourceAudio" src="/source-speech.wav" controls loop preload="auto"></audio>
+        <div class="source-actions">
+          <button id="playButton" type="button">Play looping audio file</button>
+          <button id="stopSourceButton" type="button" class="secondary">Stop</button>
+        </div>
+        <p id="lineText" class="note" aria-live="polite"></p>
+      </section>
+    </main>
+
+    <script>
+      const sourceAudio = document.querySelector("#sourceAudio");
+      const playButton = document.querySelector("#playButton");
+      const stopSourceButton = document.querySelector("#stopSourceButton");
+      const lineText = document.querySelector("#lineText");
+
+      playButton.addEventListener("click", async () => {
+        await sourceAudio.play();
+        lineText.textContent = "Playing the looping source audio file.";
+      });
+
+      stopSourceButton.addEventListener("click", () => {
+        sourceAudio.pause();
+        sourceAudio.currentTime = 0;
+        lineText.textContent = "Stopped.";
+      });
+
+      sourceAudio.addEventListener("play", () => {
+        lineText.textContent = "Playing. Share this tab and enable tab audio.";
+      });
+    </script>
+  </body>
+</html>

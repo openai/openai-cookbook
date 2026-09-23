@@ -1,0 +1,28 @@
+{
+  "merchant": "Sam's Club #4704",
+  "location": {
+    "city": "Fresno",
+    "state": "CA",
+    "zipcode": "93720"
+  },
+  "time": "2024-07-15T18:46:00",
+  "items": [
+    {
+      "description": "UNLEAD (11)",
+      "product_code": null,
+      "category": "Fuel",
+      "item_price": "3.859",
+      "sale_price": null,
+      "quantity": "12.195",
+      "total": "47.06"
+    }
+  ],
+  "subtotal": null,
+  "tax": null,
+  "total": "47.06",
+  "handwritten_notes": [
+    "yos -> Home",
+    "234523",
+    "Sequoia"
+  ]
+}

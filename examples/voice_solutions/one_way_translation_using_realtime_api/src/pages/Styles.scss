@@ -1,0 +1,206 @@
+// Global styles
+body {
+  background-color: #ffffff;
+  font-family: 'Roboto Mono', sans-serif;
+  margin: 0;
+  padding: 0;
+}
+
+// Card component styles
+.card {
+  background: #1e1e1e;
+  border-radius: 16px;
+  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
+  color: #ffffff;
+  max-width: 400px;
+  margin: 40px auto;
+  padding: 20px;
+  text-align: center;
+  position: relative;
+
+  .card-header {
+    font-weight: bold;
+  }
+
+  .card-image {
+    width: 100%;
+    border-radius: 12px;
+    overflow: hidden;
+
+    img {
+      width: 100%;
+      border-radius: 12px;
+    }
+  }
+
+  .card-content {
+    font-weight: 600;
+    margin: 15px 0;
+  }
+
+  .card-footer {
+    display: flex;
+    justify-content: space-around;
+    margin-top: 20px;
+
+    button {
+      background-color: #007bff;
+      border: none;
+      border-radius: 8px;
+      color: #ffffff;
+      padding: 10px 20px;
+      cursor: pointer;
+      font-size: 1rem;
+      transition: background-color 0.3s ease;
+
+      &:hover {
+        background-color: #0056b3;
+      }
+    }
+  }
+}
+
+// Page specific styles
+.speaker-page, .listener-page {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  padding: 20px;
+  position: relative;
+
+  h1 {
+    font-size: 2rem;
+    font-weight: bold;
+    font-family: 'Roboto Mono', sans-serif;
+    color: #424242;
+    margin-bottom: 10px;
+    width: 100%;
+    text-align: center;
+  }
+
+  &::after {
+    content: '';
+    display: block;
+    width: 100vw;
+    height: 140px;
+    background-color: #dcdcdc;
+    position: absolute;
+    top: 20px;
+    left: 0;
+    z-index: -1;
+  }
+
+  .dropdown-container {
+    display: flex;
+    justify-content: center;
+    width: 100%;
+    margin-top: 10px;
+
+    select {
+      font-family: 'Roboto Mono', monospace;
+      font-size: 1rem;
+      font-weight: 600;
+      padding: 10px 20px;
+      border-radius: 8px;
+      border: 1px solid #ccc;
+      cursor: pointer;
+      text-align: center;
+      width: 100%;
+      max-width: 300px;
+    }
+  }
+
+  .connect-button {
+    background-color: #6c757d;
+    color: #ffffff;
+    padding: 12px 24px;
+    border-radius: 8px;
+    border: none;
+    font-size: 1.1rem;
+    cursor: pointer;
+    margin-top: 20px;
+
+    &:hover {
+      background-color: #5a6268;
+    }
+  }
+}
+
+// Instructions styling
+.speaker-page .instructions {
+  font-family: 'Roboto Mono', monospace;
+  font-size: 12pt;
+}
+
+// Tooltip styles
+.tooltip-container {
+  position: relative;
+  display: inline-block;
+  cursor: pointer;
+}
+
+.tooltip-content {
+  visibility: hidden;
+  width: 650px;
+  background-color: #2d4b51;
+  color: #fff;
+  text-align: center;
+  border-radius: 6px;
+  padding: 5px 0;
+  position: absolute;
+  z-index: 1;
+  bottom: 125%;
+  left: 50%;
+  margin-left: -325px;
+  opacity: 0;
+  transition: opacity 0.3s;
+}
+
+.tooltip-container:hover .tooltip-content {
+  visibility: visible;
+  opacity: 1;
+}
+
+// Style the tooltip trigger button
+.tooltip-trigger {
+  font-family: 'Roboto Mono', monospace;
+  background-color: #2d4b51;
+  color: #ffffff;
+  border: none;
+  border-radius: 8px;
+  padding: 8px 16px;
+  cursor: pointer;
+  font-size: 1rem;
+  transition: background-color 0.3s ease;
+}
+
+.toggle-container {
+  // transform: scale(1.2);
+  margin-top: 20px;
+}
+
+.toggle-container label {
+  font-size: 1.1rem;
+}
+
+.toggle-container select {
+  font-size: 1.1rem;
+}
+
+.transcript-list {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  flex-direction: column;
+  width: 70%;
+}
+
+
+.transcript-box {
+  width: 100%;
+  background-color: #f0f0f0;
+  border-radius: 8px;
+  padding: 8px;
+  margin: 4px 0;
+}
+

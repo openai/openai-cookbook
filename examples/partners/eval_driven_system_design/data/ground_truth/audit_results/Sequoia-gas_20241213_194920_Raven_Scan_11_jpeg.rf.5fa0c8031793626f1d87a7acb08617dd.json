@@ -1,0 +1,8 @@
+{
+  "not_travel_related": false,
+  "amount_over_limit": true,
+  "math_error": false,
+  "handwritten_x": false,
+  "reasoning": "The receipt is for 'Unleaded' fuel from a gas station, which is a travel-related expense, thus the NOT_TRAVEL_RELATED criterion is FALSE. The total amount of the receipt is $62.68, exceeding the $50 limit, making AMOUNT_OVER_LIMIT TRUE. There are no discrepancies in the math calculations presented, hence MATH_ERROR is FALSE. There is no 'X' noted in the handwritten notes, so HANDWRITTEN_X is FALSE. Since the AMOUNT_OVER_LIMIT criteria is violated, the receipt needs auditing.",
+  "needs_audit": true
+}

@@ -1,0 +1,230 @@
+
+
+# Image generation
+
+Learn how to generate or manipulate images with DALL·E in the API.
+
+
+    Looking to generate images in ChatGPT? Head to{" "}
+    chatgpt.com.
+
+
+## Introduction
+
+The Images API provides three methods for interacting with images:
+
+1. Creating images from scratch based on a text prompt (DALL·E 3 and DALL·E 2)
+2. Creating edited versions of images by having the model replace some areas of a pre-existing image, based on a new text prompt (DALL·E 2 only)
+3. Creating variations of an existing image (DALL·E 2 only)
+
+This guide covers the basics of using these three API endpoints with useful code samples. To try DALL·E 3, head to [ChatGPT](https://chatgpt.com/).
+
+## Usage
+
+### Generations
+
+The [image generations](/docs/api-reference/images/create) endpoint allows you to create an original image given a text prompt. When using DALL·E 3, images can have a size of 1024x1024, 1024x1792 or 1792x1024 pixels.
+
+By default, images are generated at `standard` quality, but when using DALL·E 3 you can set `quality: "hd"` for enhanced detail. Square, standard quality images are the fastest to generate.
+
+You can request 1 image at a time with DALL·E 3 (request more by making parallel requests) or up to 10 images at a time using DALL·E 2 with the [n parameter](/docs/api-reference/images/create#images/create-n).
+
+<CodeSample
+    title="Generate an image"
+    defaultLanguage="python"
+    code={{
+        python: `
+from openai import OpenAI
+client = OpenAI()\n
+response = client.images.generate(
+  model="dall-e-3",
+  prompt="a white siamese cat",
+  size="1024x1024",
+  quality="standard",
+  n=1,
+)\n
+image_url = response.data[0].url
+`.trim(),
+        "node.js": `
+const response = await openai.images.generate({
+  model: "dall-e-3",
+  prompt: "a white siamese cat",
+  n: 1,
+  size: "1024x1024",
+});
+image_url = response.data[0].url;
+`.trim(),
+        curl: `
+curl https://api.openai.com/v1/images/generations \\
+  -H "Content-Type: application/json" \\
+  -H "Authorization: Bearer $OPENAI_API_KEY" \\
+  -d '{
+    "model": "dall-e-3",
+    "prompt": "a white siamese cat",
+    "n": 1,
+    "size": "1024x1024"
+  }'
+`.trim(),
+    }}
+/>
+
+
+    <IconItem
+        icon={}
+        color="red"
+        title="What is new with DALL·E 3"
+        className="mt-6"
+    >
+        Explore what is new with DALL·E 3 in the OpenAI Cookbook
+    
+
+
+## Prompting
+
+With the release of DALL·E 3, the model now takes in the default prompt provided and automatically re-write it for safety reasons, and to add more detail (more detailed prompts generally result in higher quality images).
+
+While it is not currently possible to disable this feature, you can use prompting to get outputs closer to your requested image by adding the following to your prompt: `I NEED to test how the tool works with extremely simple prompts. DO NOT add any detail, just use it AS-IS:`.
+
+The updated prompt is visible in the `revised_prompt` field of the data response object.
+
+## Example DALL·E 3 generations
+
+
+
+| Prompt                               | Generation                                                                                                             |
+| ------------------------------------ | ---------------------------------------------------------------------------------------------------------------------- |
+| A photograph of a white Siamese cat. |  |
+
+
+
+Each image can be returned as either a URL or Base64 data, using the [response_format](/docs/api-reference/images/create#images/create-response_format) parameter. URLs will expire after an hour.
+
+### Edits (DALL·E 2 only)
+
+Also known as "inpainting", the [image edits](/docs/api-reference/images/create-edit) endpoint allows you to edit or extend an image by uploading an image and mask indicating which areas should be replaced. The transparent areas of the mask indicate where the image should be edited, and the prompt should describe the full new image, **not just the erased area**. This endpoint can enable experiences like DALL·E image editing in ChatGPT Plus.
+
+<CodeSample
+    title="Edit an image"
+    defaultLanguage="python"
+    code={{
+        python: `
+from openai import OpenAI
+client = OpenAI()\n
+response = client.images.edit((
+  model="dall-e-2",
+  image=open("sunlit_lounge.png", "rb"),
+  mask=open("mask.png", "rb"),
+  prompt="A sunlit indoor lounge area with a pool containing a flamingo",
+  n=1,
+  size="1024x1024"
+)
+image_url = response.data[0].url
+`.trim(),
+        "node.js": `
+const response = await openai.images.edit({
+  model: "dall-e-2",
+  image: fs.createReadStream("sunlit_lounge.png"),
+  mask: fs.createReadStream("mask.png"),
+  prompt: "A sunlit indoor lounge area with a pool containing a flamingo",
+  n: 1,
+  size: "1024x1024"
+});
+image_url = response.data[0].url;
+`.trim(),
+        curl: `
+curl https://api.openai.com/v1/images/edits \\
+  -H "Authorization: Bearer $OPENAI_API_KEY" \\
+  -F model="dall-e-2" \\
+  -F image="@sunlit_lounge.png" \\
+  -F mask="@mask.png" \\
+  -F prompt="A sunlit indoor lounge area with a pool containing a flamingo" \\
+  -F n=1 \\
+  -F size="1024x1024"
+`.trim(),
+    }}
+/>
+
+
+
+| Image                                                                                                            | Mask                                                                                                         | Output                                                                                                         |
+| ---------------------------------------------------------------------------------------------------------------- | ------------------------------------------------------------------------------------------------------------ | -------------------------------------------------------------------------------------------------------------- |
+|  |  |  |
+
+
+
+
+    Prompt: a sunlit indoor lounge area with a pool containing a flamingo
+
+
+The uploaded image and mask must both be square PNG images less than 4MB in size, and also must have the same dimensions as each other. The non-transparent areas of the mask are not used when generating the output, so they don’t necessarily need to match the original image like the example above.
+
+### Variations (DALL·E 2 only)
+
+The [image variations](/docs/api-reference/images/create-variation) endpoint allows you to generate a variation of a given image.
+
+<CodeSample
+    title="Generate an image variation"
+    defaultLanguage="python"
+    code={{
+        python: `
+from openai import OpenAI
+client = OpenAI()\n
+response = client.images.create_variation(
+  model="dall-e-2",
+  image=open("corgi_and_cat_paw.png", "rb"),
+  n=1,
+  size="1024x1024"
+)\n
+image_url = response.data[0].url
+`.trim(),
+        "node.js": `
+const response = await openai.images.createVariation({
+  model: "dall-e-2",
+  image: fs.createReadStream("corgi_and_cat_paw.png"),
+  n: 1,
+  size: "1024x1024"
+});
+image_url = response.data[0].url;
+`.trim(),
+        curl: `
+curl https://api.openai.com/v1/images/variations \\
+  -H "Authorization: Bearer $OPENAI_API_KEY" \\
+  -F model="dall-e-2" \\
+  -F image="@corgi_and_cat_paw.png" \\
+  -F n=1 \\
+  -F size="1024x1024"
+`.trim(),
+    }}
+/>
+
+
+
+| Image                                                                                                                 | Output                                                                                                              |
+| --------------------------------------------------------------------------------------------------------------------- | ------------------------------------------------------------------------------------------------------------------- |
+|  |  |
+
+
+
+Similar to the edits endpoint, the input image must be a square PNG image less than 4MB in size.
+
+### Content moderation
+
+Prompts and images are filtered based on our [content policy](https://labs.openai.com/policies/content-policy), returning an error when a prompt or image is flagged.
+
+## Language-specific tips
+
+<ContentSwitcher
+    options={[
+        {
+            value: "node",
+            label: "Node.js",
+            content: ,
+        },
+        {
+            value: "python",
+            label: "Python",
+            content: ,
+        },
+    ]}
+    initialValue="node"
+/>

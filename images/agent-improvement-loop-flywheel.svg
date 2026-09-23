@@ -1,0 +1,83 @@
+<svg width="1400" height="760" viewBox="0 0 1400 760" fill="none" xmlns="http://www.w3.org/2000/svg">
+  <defs>
+    <linearGradient id="bg" x1="0" y1="0" x2="1400" y2="760" gradientUnits="userSpaceOnUse">
+      <stop stop-color="#F8FBFF"/>
+      <stop offset="1" stop-color="#F5F7FB"/>
+    </linearGradient>
+    <filter id="shadow" x="-20%" y="-20%" width="140%" height="140%">
+      <feDropShadow dx="0" dy="10" stdDeviation="18" flood-color="#16324F" flood-opacity="0.12"/>
+    </filter>
+    <marker id="arrow-blue" markerWidth="12" markerHeight="12" refX="10" refY="6" orient="auto">
+      <path d="M0 0L12 6L0 12V0Z" fill="#2563EB"/>
+    </marker>
+    <marker id="arrow-green" markerWidth="12" markerHeight="12" refX="10" refY="6" orient="auto">
+      <path d="M0 0L12 6L0 12V0Z" fill="#16A34A"/>
+    </marker>
+    <marker id="arrow-slate" markerWidth="12" markerHeight="12" refX="10" refY="6" orient="auto">
+      <path d="M0 0L12 6L0 12V0Z" fill="#475569"/>
+    </marker>
+  </defs>
+
+  <rect width="1400" height="760" rx="32" fill="url(#bg)"/>
+
+  <text x="700" y="62" text-anchor="middle" fill="#0F172A" font-family="Inter, Arial, sans-serif" font-size="30" font-weight="700">
+    An agent improvement loop can connect feedback to code
+  </text>
+
+  <circle cx="700" cy="388" r="226" stroke="#CBD5E1" stroke-width="28"/>
+  <path d="M700 162A226 226 0 0 1 895.7 275" stroke="#2563EB" stroke-width="28" stroke-linecap="round"/>
+  <path d="M895.7 275A226 226 0 0 1 895.7 501" stroke="#2563EB" stroke-width="28" stroke-linecap="round"/>
+  <path d="M895.7 501A226 226 0 0 1 700 614" stroke="#16A34A" stroke-width="28" stroke-linecap="round"/>
+  <path d="M700 614A226 226 0 0 1 504.3 501" stroke="#16A34A" stroke-width="28" stroke-linecap="round"/>
+  <path d="M504.3 501A226 226 0 0 1 504.3 275" stroke="#16A34A" stroke-width="28" stroke-linecap="round"/>
+  <path d="M504.3 275A226 226 0 0 1 700 162" stroke="#2563EB" stroke-width="28" stroke-linecap="round"/>
+
+  <g filter="url(#shadow)" font-family="Inter, Arial, sans-serif">
+    <rect x="594" y="118" width="212" height="88" rx="22" fill="white"/>
+    <text x="700" y="153" text-anchor="middle" fill="#0F172A" font-size="19" font-weight="700">SDK traces</text>
+    <text x="700" y="179" text-anchor="middle" fill="#475569" font-size="14">Observed behavior</text>
+
+    <rect x="847" y="231" width="228" height="88" rx="22" fill="white"/>
+    <text x="961" y="266" text-anchor="middle" fill="#0F172A" font-size="19" font-weight="700">Human + LLM feedback</text>
+    <text x="961" y="292" text-anchor="middle" fill="#475569" font-size="14">Interpret traces</text>
+
+    <rect x="847" y="457" width="228" height="88" rx="22" fill="white"/>
+    <text x="961" y="492" text-anchor="middle" fill="#0F172A" font-size="19" font-weight="700">Promptfoo evals</text>
+    <text x="961" y="518" text-anchor="middle" fill="#475569" font-size="14">Generate + validate</text>
+
+    <rect x="594" y="570" width="212" height="88" rx="22" fill="white"/>
+    <text x="700" y="605" text-anchor="middle" fill="#0F172A" font-size="19" font-weight="700">HALO diagnosis</text>
+    <text x="700" y="631" text-anchor="middle" fill="#475569" font-size="14">Rank changes</text>
+
+    <rect x="325" y="457" width="228" height="88" rx="22" fill="white"/>
+    <text x="439" y="492" text-anchor="middle" fill="#0F172A" font-size="19" font-weight="700">Codex handoff</text>
+    <text x="439" y="518" text-anchor="middle" fill="#475569" font-size="14">Evidence to code</text>
+
+    <rect x="325" y="231" width="228" height="88" rx="22" fill="white"/>
+    <text x="439" y="266" text-anchor="middle" fill="#0F172A" font-size="19" font-weight="700">Harness update</text>
+    <text x="439" y="292" text-anchor="middle" fill="#475569" font-size="14">PR + validation</text>
+  </g>
+
+  <path d="M804 178C840 190 867 209 892 236" stroke="#2563EB" stroke-width="4" marker-end="url(#arrow-blue)"/>
+  <path d="M1006 319C1020 358 1020 418 1006 454" stroke="#2563EB" stroke-width="4" marker-end="url(#arrow-blue)"/>
+  <path d="M894 545C866 572 838 588 804 600" stroke="#16A34A" stroke-width="4" marker-end="url(#arrow-green)"/>
+  <path d="M596 600C560 588 532 572 504 545" stroke="#16A34A" stroke-width="4" marker-end="url(#arrow-green)"/>
+  <path d="M394 454C380 418 380 358 394 319" stroke="#16A34A" stroke-width="4" marker-end="url(#arrow-green)"/>
+  <path d="M508 236C533 209 560 190 596 178" stroke="#2563EB" stroke-width="4" marker-end="url(#arrow-blue)"/>
+
+  <rect x="66" y="580" width="266" height="108" rx="22" fill="#EEF2FF" stroke="#A5B4FC" stroke-width="2"/>
+  <text x="199" y="618" text-anchor="middle" fill="#3730A3" font-family="Inter, Arial, sans-serif" font-size="19" font-weight="700">
+    Automation + heartbeat
+  </text>
+  <text x="199" y="646" text-anchor="middle" fill="#3730A3" font-family="Inter, Arial, sans-serif" font-size="15">
+    Detect new handoffs
+  </text>
+  <text x="199" y="670" text-anchor="middle" fill="#3730A3" font-family="Inter, Arial, sans-serif" font-size="15">
+    and trigger Codex
+  </text>
+  <path d="M332 634C362 620 388 589 418 548" stroke="#6366F1" stroke-width="4" stroke-dasharray="8 8" marker-end="url(#arrow-slate)"/>
+
+  <text x="700" y="714" text-anchor="middle" fill="#334155" font-family="Inter, Arial, sans-serif" font-size="18">
+    Human judgment enters through feedback, then keeps compounding through every later optimization cycle.
+  </text>
+</svg>

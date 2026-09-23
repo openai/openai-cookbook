@@ -1,0 +1,69 @@
+### Using in-memory image data
+
+The Python examples in the guide above use the `open` function to read image data from disk. In some cases, you may have your image data in memory instead. Here's an example API call that uses image data stored in a `BytesIO` object:
+
+```python
+from io import BytesIO
+from openai import OpenAI
+client = OpenAI()
+
+# This is the BytesIO object that contains your image data
+byte_stream: BytesIO = [your image data]
+byte_array = byte_stream.getvalue()
+response = client.images.create_variation(
+  image=byte_array,
+  n=1,
+  model="dall-e-2",
+  size="1024x1024"
+)
+```
+
+### Operating on image data
+
+It may be useful to perform operations on images before passing them to the API. Here's an example that uses `PIL` to resize an image:
+
+```python
+from io import BytesIO
+from PIL import Image
+from openai import OpenAI
+client = OpenAI()
+
+# Read the image file from disk and resize it
+image = Image.open("image.png")
+width, height = 256, 256
+image = image.resize((width, height))
+
+# Convert the image to a BytesIO object
+byte_stream = BytesIO()
+image.save(byte_stream, format='PNG')
+byte_array = byte_stream.getvalue()
+
+response = client.images.create_variation(
+  image=byte_array,
+  n=1,
+  model="dall-e-2",
+  size="1024x1024"
+)
+```
+
+### Error handling
+
+API requests can potentially return errors due to invalid inputs, rate limits, or other issues. These errors can be handled with a `try...except` statement, and the error details can be found in `e.error`:
+
+```python
+import openai
+from openai import OpenAI
+client = OpenAI()
+
+try:
+  response = client.images.create_variation(
+    image=open("image_edit_mask.png", "rb"),
+    n=1,
+    model="dall-e-2",
+    size="1024x1024"
+  )
+  print(response.data[0].url)
+except openai.OpenAIError as e:
+  print(e.http_status)
+  print(e.error)
+```

@@ -1,0 +1,14 @@
+#### Free tier rate limits
+
+This is a high level summary and there are per-model exceptions to these limits (e.g. some legacy models or models with larger context windows have different rate limits). To view the exact rate limits per model for your account, visit the [limits](/account/rate-limits) section of your account settings.
+
+| Model                    | RPM       | RPD | TPM       | Batch Queue Limit |
+| ------------------------ | --------- | --- | --------- | ----------------- |
+| `gpt-3.5-turbo`          | 3         | 200 | 40,000    | 200,000           |
+| `text-embedding-3-large` | 3,000     | 200 | 1,000,000 | 3,000,000         |
+| `text-embedding-3-small` | 3,000     | 200 | 1,000,000 | 3,000,000         |
+| `text-embedding-ada-002` | 3,000     | 200 | 1,000,000 | 3,000,000         |
+| `whisper-1`              | 3         | 200 | -         | -                 |
+| `tts-1`                  | 3         | 200 | -         | -                 |
+| `dall-e-2`               | 5 img/min | -   | -         | -                 |
+| `dall-e-3`               | 1 img/min | -   | -         | -                 |

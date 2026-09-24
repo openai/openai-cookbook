@@ -90,7 +90,7 @@ Given the large ecosystem around Redis, there are most likely client libraries i
 
 ### Deployment Options
 
-There are many ways to deploy Redis with RediSearch. The easiest way to get started is to use Docker, but there are are many potential options for deployment such as
+There are many ways to deploy Redis with RediSearch. The easiest way to get started is to use Docker, but there are many potential options for deployment such as
 
 - [Redis Cloud](https://redis.com/redis-enterprise-cloud/overview/)
 - Cloud marketplaces: [AWS Marketplace](https://aws.amazon.com/marketplace/pp/prodview-e6y7ork67pjwg?sr=0-2&ref_=beagle&applicationId=AWSMPContessa), [Google Marketplace](https://console.cloud.google.com/marketplace/details/redislabs-public/redis-enterprise?pli=1), or [Azure Marketplace](https://azuremarketplace.microsoft.com/en-us/marketplace/apps/garantiadata.redis_enterprise_1sp_public_preview?tab=Overview)

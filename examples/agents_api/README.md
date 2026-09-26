@@ -15,10 +15,10 @@ README walks through the implementation and explains how to run it.
 
 ## Sandbox integrations
 
-- [Application-managed](https://github.com/openai/openai-cookbook/tree/main/examples/agents_api/sandboxes/application_managed): your application
+- [Application-managed](sandboxes/README.md): your application
   starts and stops the sandbox directly.
-- [Webhook-managed](https://github.com/openai/openai-cookbook/tree/main/examples/agents_api/sandboxes/webhook_managed): a deployed handler
-  provisions the sandbox while a shared client calls the Agents API.
+- [Webhook-managed](sandboxes/webhook_managed.md): a deployed handler
+  provisions the sandbox while the provider's `client.py` calls the Agents API.
 
 See the [sandbox overview](https://github.com/openai/openai-cookbook/tree/main/examples/agents_api/sandboxes) to choose a provisioning mode.
 

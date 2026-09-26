@@ -1,0 +1,9 @@
+[
+  {
+    "source_store_id": "store_205",
+    "destination_store_id": "store_101",
+    "sku": "water_24pk",
+    "available_transfer_units": 40,
+    "travel_minutes": 35
+  }
+]

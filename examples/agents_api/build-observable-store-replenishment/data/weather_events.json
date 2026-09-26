@@ -1,0 +1,12 @@
+[
+  {
+    "event_id": "weather_7001",
+    "store_id": "store_101",
+    "type": "severe_storm",
+    "severity": "severe",
+    "starts_at": "2026-09-18T12:00:00Z",
+    "shipment_delay_hours": 48,
+    "revised_demand_units": 50,
+    "message": "A severe storm delays the replenishment truck by 48 hours."
+  }
+]

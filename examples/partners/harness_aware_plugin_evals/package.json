@@ -1,0 +1,9 @@
+{
+  "name": "standalone-bls-mcp-eval",
+  "private": true,
+  "devDependencies": {
+    "@openai/codex": "^0.144.0",
+    "@openai/codex-sdk": "^0.144.0",
+    "promptfoo": "^0.121.17"
+  }
+}

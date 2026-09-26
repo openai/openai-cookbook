@@ -31,6 +31,10 @@ if str(ROOT_DIR) not in sys.path:
 
 from shared.graders import compute_tool_call_grade
 from shared.metrics_utils import add_numeric_summaries, order_columns
+from shared.path_utils import (
+    resolve_safe_path,
+    validate_safe_path_component,
+)
 from shared.plotting_utils import build_realtime_eval_plots
 from shared.realtime_harness_utils import (
     RealtimeResponseError,
@@ -128,6 +132,9 @@ def load_dataset(path: Path) -> pd.DataFrame:
     missing = required_columns.difference(data.columns)
     if missing:
         raise ValueError(f"Missing required columns: {sorted(missing)}")
+    # Validate all example_ids upfront to fail fast on bad data
+    for _, row in data.iterrows():
+        validate_safe_path_component(str(row["example_id"]), "example_id")
     return data
 
 
@@ -199,10 +206,8 @@ def read_ulaw_wav(audio_path: Path, expected_sample_rate_hz: int) -> bytes:
 def resolve_audio_path(audio_path_value: str, dataset_path: Path) -> Path:
     if not audio_path_value:
         raise ValueError("audio_path is empty")
-    audio_path = Path(audio_path_value)
-    if not audio_path.is_absolute():
-        audio_path = dataset_path.parent / audio_path
-    return audio_path
+    # Relative paths must resolve within the dataset directory (blocks ../ traversal)
+    return resolve_safe_path(audio_path_value, dataset_path.parent, "audio_path")
 
 
 def build_error_info(exc: Exception, default_stage: str) -> EvalErrorInfo:
@@ -223,7 +228,7 @@ def build_failed_result(
     events_dir: Path,
     error_info: EvalErrorInfo,
 ) -> WalkEvalResult:
-    example_id = str(row["example_id"])
+    example_id = validate_safe_path_component(str(row["example_id"]), "example_id")
     user_text = str(row["user_text"])
     expected_tool_call = (
         "" if bool(pd.isna(row["gt_tool_call"])) else str(row["gt_tool_call"])
@@ -233,9 +238,7 @@ def build_failed_result(
     )
     audio_path_value = str(row.get("audio_path", "")).strip()
     if audio_path_value:
-        audio_path = Path(audio_path_value)
-        if not audio_path.is_absolute():
-            audio_path = dataset_path.parent / audio_path
+        audio_path = resolve_safe_path(audio_path_value, dataset_path.parent, "audio_path")
     else:
         audio_path = dataset_path.parent / "missing_audio.wav"
     event_log_path = events_dir / f"{example_id}.jsonl"
@@ -267,7 +270,7 @@ async def run_single_eval(
     config: Dict[str, Any],
     dataset_path: Path,
 ) -> WalkEvalResult:
-    example_id = str(row["example_id"])
+    example_id = validate_safe_path_component(str(row["example_id"]), "example_id")
     user_text = str(row["user_text"])
     expected_tool_call = (
         "" if bool(pd.isna(row["gt_tool_call"])) else str(row["gt_tool_call"])

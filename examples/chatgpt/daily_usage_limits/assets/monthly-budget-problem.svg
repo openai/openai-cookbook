@@ -1,0 +1,51 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="1040" height="472" viewBox="0 0 1040 472" role="img" aria-labelledby="title description">
+  <title id="title">An illustrative 2,000-credit budget runs out in week one</title>
+  <desc id="description">Illustrative scenario for one person, using an organization-chosen monthly budget of 2,000 credits. All credits are available at the start and used in week one, leaving zero available in weeks two through four. The organization chooses the monthly budget.</desc>
+  <defs><style>text{font-family:Arial,Helvetica,sans-serif;fill:#202123}.eyebrow{font-size:19px;fill:#626262}.heading{font-size:29px;font-weight:600}.label{font-size:21px}.small{font-size:19px}.value{font-size:42px;font-weight:600}.muted{fill:#626262}.spent{fill:#a34731}</style></defs>
+  <rect width="1040" height="472" fill="#fff"/>
+  <text x="32" y="37" class="eyebrow">Illustrative budget · 2,000 credits per person per month</text>
+  <text x="32" y="83" class="heading">A month's budget can be used in week one.</text>
+  <text x="32" y="118" class="label muted">One person uses all 2,000 credits in the first week.</text>
+  <g transform="translate(32 152)">
+    <rect width="244" height="218" fill="#fbefea"/>
+    <path d="M0 0h244M0 218h244" stroke="#d9d9d9"/>
+    <path d="M244 0v218" stroke="#d9d9d9"/>
+    <text x="18" y="35" class="label" font-weight="600">Week 1</text>
+    <text x="18" y="97" class="value spent">2,000</text>
+    <text x="18" y="130" class="label">credits used</text>
+    <rect x="18" y="160" width="208" height="14" fill="#a34731"/>
+    <text x="18" y="204" class="small muted">Full budget used</text>
+  </g>
+  <g transform="translate(276 152)">
+    <rect width="244" height="218" fill="#fff"/>
+    <path d="M0 0h244M0 218h244" stroke="#d9d9d9"/>
+    <path d="M244 0v218" stroke="#d9d9d9"/>
+    <text x="18" y="35" class="label" font-weight="600">Week 2</text>
+    <text x="18" y="97" class="value">0</text>
+    <text x="18" y="130" class="label">credits available</text>
+    <rect x="18" y="160" width="208" height="14" fill="#e7e7e7"/>
+    <text x="18" y="204" class="small muted">No budget left</text>
+  </g>
+  <g transform="translate(520 152)">
+    <rect width="244" height="218" fill="#fff"/>
+    <path d="M0 0h244M0 218h244" stroke="#d9d9d9"/>
+    <path d="M244 0v218" stroke="#d9d9d9"/>
+    <text x="18" y="35" class="label" font-weight="600">Week 3</text>
+    <text x="18" y="97" class="value">0</text>
+    <text x="18" y="130" class="label">credits available</text>
+    <rect x="18" y="160" width="208" height="14" fill="#e7e7e7"/>
+    <text x="18" y="204" class="small muted">No budget left</text>
+  </g>
+  <g transform="translate(764 152)">
+    <rect width="244" height="218" fill="#fff"/>
+    <path d="M0 0h244M0 218h244" stroke="#d9d9d9"/>
+
+    <text x="18" y="35" class="label" font-weight="600">Week 4</text>
+    <text x="18" y="97" class="value">0</text>
+    <text x="18" y="130" class="label">credits available</text>
+    <rect x="18" y="160" width="208" height="14" fill="#e7e7e7"/>
+    <text x="18" y="204" class="small muted">No budget left</text>
+  </g>
+  <text x="32" y="415" class="label">Release portions of the budget throughout the month.</text>
+  <text x="32" y="448" class="small muted">This example uses 2,000 credits. Your organization sets the budget.</text>
+</svg>

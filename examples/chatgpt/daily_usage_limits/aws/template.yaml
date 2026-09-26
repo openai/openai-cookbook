@@ -1,0 +1,487 @@
+AWSTemplateFormatVersion: '2010-09-09'
+Description: Resumable ChatGPT usage-cap controller. Schedule, workers, and live writes start disabled.
+
+Parameters:
+  DeploymentId:
+    Type: String
+    Default: cookbook-usage-limits
+    AllowedPattern: '[a-z][a-z0-9-]{2,39}'
+  PilotExpiresAt:
+    Type: String
+    AllowedPattern: '[0-9]{4}-[0-9]{2}-[0-9]{2}T[0-9]{2}:[0-9]{2}:[0-9]{2}Z'
+    Description: Required UTC stop time. Set no later than the approved usage-period end. Does not delete resources.
+  CodeBucket:
+    Type: String
+    Description: Existing private versioned S3 artifact bucket in this region.
+  CodeKey:
+    Type: String
+    Description: Key of the approved controller.zip upload.
+  CodeObjectVersion:
+    Type: String
+    Description: Exact S3 version ID of the approved upload.
+  ControlSha256:
+    Type: String
+    AllowedPattern: '[a-f0-9]{64}'
+    Description: SHA-256 of the chunked control manifest printed by prepare-control.mjs.
+  AdminSecretArn:
+    Type: String
+    AllowedPattern: 'arn:[^:]+:secretsmanager:[^:]+:[0-9]{12}:secret:.+'
+    Description: Existing same-region Secrets Manager secret containing a JSON apiKey field. Never paste the key here.
+  SecretKmsKeyArn:
+    Type: String
+    Default: ''
+    Description: Optional customer-managed KMS key ARN for this secret; its key policy must allow this role.
+  AlarmTopicArn:
+    Type: String
+    AllowedPattern: 'arn:[^:]+:sns:[^:]+:[0-9]{12}:.+'
+    Description: Existing operations SNS topic. Verify a subscribed owner receives test alarms before enabling.
+  ScheduleState:
+    Type: String
+    Default: DISABLED
+    AllowedValues: [DISABLED, ENABLED]
+  ScheduledAction:
+    Type: String
+    Default: preview
+    AllowedValues: [preview, apply]
+  ApplyEnabled:
+    Type: String
+    Default: 'false'
+    AllowedValues: ['false', 'true']
+    Description: Live writes also require config.liveWrites and the matching AllowedWriteAction.
+  AllowedWriteAction:
+    Type: String
+    Default: none
+    AllowedValues: [none, apply, restore]
+    Description: Choose apply for allocations or restore for restoration; old apply events cannot write during restoration.
+  RunEventsNotBefore:
+    Type: String
+    Default: '1970-01-01T00:00:00Z'
+    AllowedPattern: '[0-9]{4}-[0-9]{2}-[0-9]{2}T[0-9]{2}:[0-9]{2}:[0-9]{2}Z'
+    Description: Reject starts and queued runs scheduled before this UTC time. Advance this cutoff when stopping a rollout.
+  WorkProcessingEnabled:
+    Type: String
+    Default: 'false'
+    AllowedValues: ['false', 'true']
+    Description: Enable SQS workers only after uploading all reviewed control chunks and the manifest.
+  WorkBatchSize:
+    Type: Number
+    Default: 1
+    MinValue: 1
+    MaxValue: 10
+    Description: Maximum SQS records per Lambda invocation; total enrollment size is independent.
+  RecordConcurrency:
+    Type: Number
+    Default: 1
+    MinValue: 1
+    MaxValue: 10
+    Description: Concurrent records within one invocation; effective value is capped by WorkBatchSize.
+  WorkerConcurrency:
+    Type: Number
+    Default: 2
+    MinValue: 2
+    MaxValue: 1000
+    Description: SQS maximum concurrent Lambda invocations, subject to account quotas and measured API capacity.
+  DispatchBatchSize:
+    Type: Number
+    Default: 100
+    MinValue: 1
+    Description: Members queued per feeder invocation before writing a continuation; no total member limit.
+  WorkerMemorySize:
+    Type: Number
+    Default: 1024
+    MinValue: 128
+    MaxValue: 10240
+    Description: Lambda memory in MB; size for the full approved enrollment and SDK during cold load.
+  WorkerTimeoutSeconds:
+    Type: Number
+    Default: 120
+    AllowedValues: [120, 300, 600, 900]
+    Description: Lambda timeout; the template derives a longer lease and six-times queue visibility.
+  MaxReceiveCount:
+    Type: Number
+    Default: 10
+    MinValue: 5
+    MaxValue: 1000
+    Description: Delivery attempts before queue redrive or a durable retry-exhausted member outcome.
+  ReceiptRetentionDays:
+    Type: Number
+    Default: 30
+    AllowedValues: [7, 14, 30, 60, 90]
+
+Mappings:
+  TimeoutSettings:
+    '120': {LeaseSeconds: 180, VisibilitySeconds: 720}
+    '300': {LeaseSeconds: 360, VisibilitySeconds: 1800}
+    '600': {LeaseSeconds: 660, VisibilitySeconds: 3600}
+    '900': {LeaseSeconds: 960, VisibilitySeconds: 5400}
+
+Conditions:
+  HasSecretKmsKey: !Not [!Equals [!Ref SecretKmsKeyArn, '']]
+  ScheduleEnabled: !Equals [!Ref ScheduleState, ENABLED]
+
+Resources:
+  StateTable:
+    Type: AWS::DynamoDB::Table
+    DeletionPolicy: Retain
+    UpdateReplacePolicy: Retain
+    Properties:
+      BillingMode: PAY_PER_REQUEST
+      AttributeDefinitions:
+        - {AttributeName: PK, AttributeType: S}
+        - {AttributeName: SK, AttributeType: S}
+      KeySchema:
+        - {AttributeName: PK, KeyType: HASH}
+        - {AttributeName: SK, KeyType: RANGE}
+      SSESpecification: {SSEEnabled: true}
+      PointInTimeRecoverySpecification: {PointInTimeRecoveryEnabled: true}
+      TimeToLiveSpecification: {AttributeName: expiresAt, Enabled: true}
+      Tags:
+        - {Key: Project, Value: cookbook-usage-limits}
+        - {Key: DeploymentId, Value: !Ref DeploymentId}
+        - {Key: ExpiresAt, Value: !Ref PilotExpiresAt}
+  DeliveryFailures:
+    Type: AWS::SQS::Queue
+    Properties:
+      MessageRetentionPeriod: 1209600
+      SqsManagedSseEnabled: true
+  ExecutionFailures:
+    Type: AWS::SQS::Queue
+    Properties:
+      MessageRetentionPeriod: 1209600
+      SqsManagedSseEnabled: true
+  WorkFailures:
+    Type: AWS::SQS::Queue
+    Properties:
+      MessageRetentionPeriod: 1209600
+      SqsManagedSseEnabled: true
+  WorkQueue:
+    Type: AWS::SQS::Queue
+    Properties:
+      MessageRetentionPeriod: 1209600
+      VisibilityTimeout: !FindInMap [TimeoutSettings, !Ref WorkerTimeoutSeconds, VisibilitySeconds]
+      SqsManagedSseEnabled: true
+      RedrivePolicy:
+        deadLetterTargetArn: !GetAtt WorkFailures.Arn
+        maxReceiveCount: !Ref MaxReceiveCount
+  ControllerLogs:
+    Type: AWS::Logs::LogGroup
+    DeletionPolicy: Retain
+    UpdateReplacePolicy: Retain
+    Properties:
+      LogGroupName: !Sub '/aws/lambda/${DeploymentId}'
+      RetentionInDays: 30
+  ControllerRole:
+    Type: AWS::IAM::Role
+    Properties:
+      AssumeRolePolicyDocument:
+        Version: '2012-10-17'
+        Statement:
+          - Effect: Allow
+            Principal: {Service: lambda.amazonaws.com}
+            Action: sts:AssumeRole
+      Policies:
+        - PolicyName: ScopedControllerAccess
+          PolicyDocument:
+            Version: '2012-10-17'
+            Statement:
+              - Effect: Allow
+                Action: [logs:CreateLogStream, logs:PutLogEvents]
+                Resource: !GetAtt ControllerLogs.Arn
+              - Effect: Allow
+                Action: dynamodb:GetItem
+                Resource: !GetAtt StateTable.Arn
+                Condition:
+                  ForAllValues:StringLike:
+                    dynamodb:LeadingKeys: [!Sub 'CONTROL#${DeploymentId}', !Sub 'RUN#${DeploymentId}#*', 'STATE#*', 'LOCK#*']
+              - Effect: Allow
+                Action: [dynamodb:PutItem, dynamodb:UpdateItem, dynamodb:ConditionCheckItem]
+                Resource: !GetAtt StateTable.Arn
+                Condition:
+                  ForAllValues:StringLike:
+                    dynamodb:LeadingKeys: ['STATE#*', 'LOCK#*', !Sub 'RECEIPT#${DeploymentId}', !Sub 'RUN#${DeploymentId}#*']
+              - Effect: Allow
+                Action: dynamodb:DeleteItem
+                Resource: !GetAtt StateTable.Arn
+                Condition:
+                  ForAllValues:StringLike:
+                    dynamodb:LeadingKeys: ['LOCK#*']
+              - Effect: Allow
+                Action: secretsmanager:GetSecretValue
+                Resource: !Ref AdminSecretArn
+              - !If
+                - HasSecretKmsKey
+                - Effect: Allow
+                  Action: kms:Decrypt
+                  Resource: !Ref SecretKmsKeyArn
+                  Condition:
+                    StringEquals:
+                      kms:ViaService: !Sub 'secretsmanager.${AWS::Region}.${AWS::URLSuffix}'
+                      'kms:EncryptionContext:SecretARN': !Ref AdminSecretArn
+                - !Ref AWS::NoValue
+              - Effect: Allow
+                Action: cloudwatch:PutMetricData
+                Resource: '*'
+                Condition:
+                  StringEquals: {cloudwatch:namespace: CookbookUsageLimits}
+              - Effect: Allow
+                Action: sqs:SendMessage
+                Resource: !GetAtt ExecutionFailures.Arn
+              - Effect: Allow
+                Action: [sqs:SendMessage, sqs:ReceiveMessage, sqs:DeleteMessage, sqs:GetQueueAttributes, sqs:ChangeMessageVisibility]
+                Resource: !GetAtt WorkQueue.Arn
+  Controller:
+    Type: AWS::Lambda::Function
+    DependsOn: ControllerLogs
+    Properties:
+      FunctionName: !Ref DeploymentId
+      Runtime: nodejs24.x
+      Handler: aws/lambda.handler
+      Architectures: [arm64]
+      Timeout: !Ref WorkerTimeoutSeconds
+      MemorySize: !Ref WorkerMemorySize
+      Role: !GetAtt ControllerRole.Arn
+      Code:
+        S3Bucket: !Ref CodeBucket
+        S3Key: !Ref CodeKey
+        S3ObjectVersion: !Ref CodeObjectVersion
+      Environment:
+        Variables:
+          DEPLOYMENT_ID: !Ref DeploymentId
+          STATE_TABLE: !Ref StateTable
+          CONTROL_SHA256: !Ref ControlSha256
+          ADMIN_SECRET_ARN: !Ref AdminSecretArn
+          APPLY_ENABLED: !Ref ApplyEnabled
+          ALLOWED_WRITE_ACTION: !Ref AllowedWriteAction
+          RUN_EVENTS_NOT_BEFORE: !Ref RunEventsNotBefore
+          PILOT_EXPIRES_AT: !Ref PilotExpiresAt
+          RECEIPT_RETENTION_DAYS: !Ref ReceiptRetentionDays
+          WORK_QUEUE_URL: !Ref WorkQueue
+          WORK_QUEUE_ARN: !GetAtt WorkQueue.Arn
+          DISPATCH_BATCH_SIZE: !Ref DispatchBatchSize
+          RECORD_CONCURRENCY: !Ref RecordConcurrency
+          MAX_RECEIVE_COUNT: !Ref MaxReceiveCount
+          LEASE_SECONDS: !FindInMap [TimeoutSettings, !Ref WorkerTimeoutSeconds, LeaseSeconds]
+      Tags:
+        - {Key: Project, Value: cookbook-usage-limits}
+        - {Key: DeploymentId, Value: !Ref DeploymentId}
+        - {Key: ExpiresAt, Value: !Ref PilotExpiresAt}
+  WorkMapping:
+    Type: AWS::Lambda::EventSourceMapping
+    Properties:
+      FunctionName: !Ref Controller
+      EventSourceArn: !GetAtt WorkQueue.Arn
+      Enabled: !Ref WorkProcessingEnabled
+      BatchSize: !Ref WorkBatchSize
+      FunctionResponseTypes: [ReportBatchItemFailures]
+      ScalingConfig:
+        MaximumConcurrency: !Ref WorkerConcurrency
+  AsyncRetryPolicy:
+    Type: AWS::Lambda::EventInvokeConfig
+    Properties:
+      FunctionName: !Ref Controller
+      Qualifier: '$LATEST'
+      MaximumEventAgeInSeconds: 3600
+      MaximumRetryAttempts: 2
+      DestinationConfig:
+        OnFailure: {Destination: !GetAtt ExecutionFailures.Arn}
+  ScheduleGroup:
+    Type: AWS::Scheduler::ScheduleGroup
+    Properties:
+      Name: !Sub '${DeploymentId}-schedules'
+  SchedulerRole:
+    Type: AWS::IAM::Role
+    Properties:
+      AssumeRolePolicyDocument:
+        Version: '2012-10-17'
+        Statement:
+          - Effect: Allow
+            Principal: {Service: scheduler.amazonaws.com}
+            Action: sts:AssumeRole
+            Condition:
+              StringEquals:
+                aws:SourceAccount: !Ref AWS::AccountId
+                aws:SourceArn: !GetAtt ScheduleGroup.Arn
+      Policies:
+        - PolicyName: InvokeOneController
+          PolicyDocument:
+            Version: '2012-10-17'
+            Statement:
+              - Effect: Allow
+                Action: lambda:InvokeFunction
+                Resource: !GetAtt Controller.Arn
+              - Effect: Allow
+                Action: sqs:SendMessage
+                Resource: !GetAtt DeliveryFailures.Arn
+  HourlyCheck:
+    Type: AWS::Scheduler::Schedule
+    Properties:
+      Name: usage-limit-check
+      GroupName: !Ref ScheduleGroup
+      State: !Ref ScheduleState
+      # Scheduler's CloudFormation provider requires milliseconds. Keep the original
+      # seconds-only parameter for the runtime deadline and normalize only EndDate.
+      EndDate: {"Fn::Join":["",[{"Fn::Select":[0,{"Fn::Split":["Z",{"Ref":"PilotExpiresAt"}]}]},".000Z"]]}
+      Description: Hourly wake-up; the shared policy independently determines the release interval.
+      ScheduleExpression: 'rate(1 hour)'
+      FlexibleTimeWindow: {Mode: 'OFF'}
+      Target:
+        Arn: !GetAtt Controller.Arn
+        RoleArn: !GetAtt SchedulerRole.Arn
+        Input: !Sub '{"version":1,"action":"${ScheduledAction}","scheduledAt":"<aws.scheduler.scheduled-time>"}'
+        RetryPolicy: {MaximumEventAgeInSeconds: 1800, MaximumRetryAttempts: 3}
+        DeadLetterConfig: {Arn: !GetAtt DeliveryFailures.Arn}
+  ControllerIssueAlarm:
+    Type: AWS::CloudWatch::Alarm
+    Properties:
+      AlarmDescription: Controller needs attention. Inspect private DynamoDB receipts.
+      Namespace: CookbookUsageLimits
+      MetricName: ControllerIssue
+      Dimensions: [{Name: Deployment, Value: !Ref DeploymentId}]
+      Statistic: Maximum
+      Period: 300
+      EvaluationPeriods: 1
+      Threshold: 0
+      ComparisonOperator: GreaterThanThreshold
+      TreatMissingData: ignore
+      AlarmActions: [!Ref AlarmTopicArn]
+  MissingRunAlarm:
+    Type: AWS::CloudWatch::Alarm
+    Condition: ScheduleEnabled
+    Properties:
+      AlarmDescription: No successfully started hourly run for about three hours. Inspect schedule and runtime; queue alarms track processing.
+      Namespace: CookbookUsageLimits
+      MetricName: SuccessfulInvocation
+      Dimensions: [{Name: Deployment, Value: !Ref DeploymentId}]
+      Statistic: Sum
+      Period: 3600
+      EvaluationPeriods: 3
+      DatapointsToAlarm: 3
+      Threshold: 1
+      ComparisonOperator: LessThanThreshold
+      TreatMissingData: breaching
+      AlarmActions: [!Ref AlarmTopicArn]
+  RuntimeErrorAlarm:
+    Type: AWS::CloudWatch::Alarm
+    Properties:
+      AlarmDescription: Lambda execution failed, possibly before a receipt could be persisted.
+      Namespace: AWS/Lambda
+      MetricName: Errors
+      Dimensions: [{Name: FunctionName, Value: !Ref Controller}]
+      Statistic: Sum
+      Period: 300
+      EvaluationPeriods: 1
+      Threshold: 0
+      ComparisonOperator: GreaterThanThreshold
+      TreatMissingData: notBreaching
+      AlarmActions: [!Ref AlarmTopicArn]
+  ThrottleAlarm:
+    Type: AWS::CloudWatch::Alarm
+    Properties:
+      AlarmDescription: Lambda concurrency was exhausted. Inspect callers and queued duplicates.
+      Namespace: AWS/Lambda
+      MetricName: Throttles
+      Dimensions: [{Name: FunctionName, Value: !Ref Controller}]
+      Statistic: Sum
+      Period: 300
+      EvaluationPeriods: 1
+      Threshold: 0
+      ComparisonOperator: GreaterThanThreshold
+      TreatMissingData: notBreaching
+      AlarmActions: [!Ref AlarmTopicArn]
+  DestinationFailureAlarm:
+    Type: AWS::CloudWatch::Alarm
+    Properties:
+      AlarmDescription: Lambda could not send its failure record to the execution queue.
+      Namespace: AWS/Lambda
+      MetricName: DestinationDeliveryFailures
+      Dimensions: [{Name: FunctionName, Value: !Ref Controller}]
+      Statistic: Sum
+      Period: 300
+      EvaluationPeriods: 1
+      Threshold: 0
+      ComparisonOperator: GreaterThanThreshold
+      TreatMissingData: notBreaching
+      AlarmActions: [!Ref AlarmTopicArn]
+  DeliveryFailureAlarm:
+    Type: AWS::CloudWatch::Alarm
+    Properties:
+      AlarmDescription: Scheduler exhausted delivery retries. Inspect the delivery queue.
+      Namespace: AWS/SQS
+      MetricName: ApproximateNumberOfMessagesVisible
+      Dimensions: [{Name: QueueName, Value: !GetAtt DeliveryFailures.QueueName}]
+      Statistic: Maximum
+      Period: 300
+      EvaluationPeriods: 1
+      Threshold: 0
+      ComparisonOperator: GreaterThanThreshold
+      TreatMissingData: notBreaching
+      AlarmActions: [!Ref AlarmTopicArn]
+  SchedulerDestinationFailureAlarm:
+    Type: AWS::CloudWatch::Alarm
+    Properties:
+      AlarmDescription: Scheduler could not send its failed event to the delivery queue.
+      Namespace: AWS/Scheduler
+      MetricName: InvocationsFailedToBeSentToDeadLetterCount
+      Dimensions: [{Name: ScheduleGroup, Value: !Ref ScheduleGroup}]
+      Statistic: Sum
+      Period: 300
+      EvaluationPeriods: 1
+      Threshold: 0
+      ComparisonOperator: GreaterThanThreshold
+      TreatMissingData: notBreaching
+      AlarmActions: [!Ref AlarmTopicArn]
+  ExecutionFailureAlarm:
+    Type: AWS::CloudWatch::Alarm
+    Properties:
+      AlarmDescription: Lambda exhausted execution retries. Inspect the execution queue and private receipts.
+      Namespace: AWS/SQS
+      MetricName: ApproximateNumberOfMessagesVisible
+      Dimensions: [{Name: QueueName, Value: !GetAtt ExecutionFailures.QueueName}]
+      Statistic: Maximum
+      Period: 300
+      EvaluationPeriods: 1
+      Threshold: 0
+      ComparisonOperator: GreaterThanThreshold
+      TreatMissingData: notBreaching
+      AlarmActions: [!Ref AlarmTopicArn]
+  WorkFailureAlarm:
+    Type: AWS::CloudWatch::Alarm
+    Properties:
+      AlarmDescription: Member or feeder messages exhausted delivery attempts. Run progress remains outstanding until reviewed and resumed.
+      Namespace: AWS/SQS
+      MetricName: ApproximateNumberOfMessagesVisible
+      Dimensions: [{Name: QueueName, Value: !GetAtt WorkFailures.QueueName}]
+      Statistic: Maximum
+      Period: 300
+      EvaluationPeriods: 1
+      Threshold: 0
+      ComparisonOperator: GreaterThanThreshold
+      TreatMissingData: notBreaching
+      AlarmActions: [!Ref AlarmTopicArn]
+  WorkBacklogAlarm:
+    Type: AWS::CloudWatch::Alarm
+    Properties:
+      AlarmDescription: Work has waited over an hour. Inspect throughput, throttling, run progress, and the approved rollout window.
+      Namespace: AWS/SQS
+      MetricName: ApproximateAgeOfOldestMessage
+      Dimensions: [{Name: QueueName, Value: !GetAtt WorkQueue.QueueName}]
+      Statistic: Maximum
+      Period: 300
+      EvaluationPeriods: 2
+      Threshold: 3600
+      ComparisonOperator: GreaterThanThreshold
+      TreatMissingData: notBreaching
+      AlarmActions: [!Ref AlarmTopicArn]
+
+Outputs:
+  FunctionName: {Value: !Ref Controller}
+  StateTableName: {Value: !Ref StateTable}
+  ScheduleGroupName: {Value: !Ref ScheduleGroup}
+  ScheduleName: {Value: !Ref HourlyCheck}
+  DeliveryQueueUrl: {Value: !Ref DeliveryFailures}
+  ExecutionQueueUrl: {Value: !Ref ExecutionFailures}
+  WorkQueueUrl: {Value: !Ref WorkQueue}
+  WorkFailureQueueUrl: {Value: !Ref WorkFailures}
+  WorkMappingId: {Value: !Ref WorkMapping}
+  WorkerTimeoutSeconds: {Value: !Ref WorkerTimeoutSeconds}
+  LogGroupName: {Value: !Ref ControllerLogs}

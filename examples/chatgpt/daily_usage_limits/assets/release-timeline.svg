@@ -1,0 +1,53 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="1040" height="508" viewBox="0 0 1040 508" role="img" aria-labelledby="title description">
+  <title id="title">Release an illustrative monthly budget in weekly portions</title>
+  <desc id="description">Using an illustrative 2,000-credit monthly budget for one person, release 500 on days 1, 8, 15, and 22. Cumulative releases reach 500, 1,000, 1,500, and 2,000. On day 8, 1,000 released minus 300 used leaves 700 available. Your organization chooses the budget and release cadence.</desc>
+  <defs><style>text{font-family:Arial,Helvetica,sans-serif;fill:#202123}.eyebrow{font-size:19px;fill:#626262}.heading{font-size:29px;font-weight:600}.label{font-size:21px}.small{font-size:19px}.value{font-size:42px;font-weight:600;fill:#0b7468}.muted{fill:#626262}</style></defs>
+  <rect width="1040" height="508" fill="#fff"/>
+  <text x="32" y="37" class="eyebrow">Same example budget · 2,000 credits per person per month</text>
+  <text x="32" y="83" class="heading">Release 500 credits each week.</text>
+  <text x="32" y="118" class="label muted">The same 2,000-credit budget becomes available over four releases.</text>
+  <g transform="translate(32 152)">
+    <path d="M0 0h244M0 218h244" stroke="#d9d9d9"/>
+    <path d="M244 0v218" stroke="#d9d9d9"/>
+    <text x="18" y="35" class="label" font-weight="600">Day 1</text>
+    <text x="18" y="67" class="small muted">Release 500</text>
+    <text x="18" y="127" class="value">500</text>
+    <text x="18" y="159" class="label">released so far</text>
+    <rect x="18" y="186" width="208" height="14" fill="#e6effa"/>
+    <rect x="18" y="186" width="52" height="14" fill="#0b7468"/>
+  </g>
+  <g transform="translate(276 152)">
+    <path d="M0 0h244M0 218h244" stroke="#d9d9d9"/>
+    <path d="M244 0v218" stroke="#d9d9d9"/>
+    <text x="18" y="35" class="label" font-weight="600">Day 8</text>
+    <text x="18" y="67" class="small muted">Release 500</text>
+    <text x="18" y="127" class="value">1,000</text>
+    <text x="18" y="159" class="label">released so far</text>
+    <rect x="18" y="186" width="208" height="14" fill="#e6effa"/>
+    <rect x="18" y="186" width="104" height="14" fill="#0b7468"/>
+  </g>
+  <g transform="translate(520 152)">
+    <path d="M0 0h244M0 218h244" stroke="#d9d9d9"/>
+    <path d="M244 0v218" stroke="#d9d9d9"/>
+    <text x="18" y="35" class="label" font-weight="600">Day 15</text>
+    <text x="18" y="67" class="small muted">Release 500</text>
+    <text x="18" y="127" class="value">1,500</text>
+    <text x="18" y="159" class="label">released so far</text>
+    <rect x="18" y="186" width="208" height="14" fill="#e6effa"/>
+    <rect x="18" y="186" width="156" height="14" fill="#0b7468"/>
+  </g>
+  <g transform="translate(764 152)">
+    <path d="M0 0h244M0 218h244" stroke="#d9d9d9"/>
+
+    <text x="18" y="35" class="label" font-weight="600">Day 22</text>
+    <text x="18" y="67" class="small muted">Release 500</text>
+    <text x="18" y="127" class="value">2,000</text>
+    <text x="18" y="159" class="label">released so far</text>
+    <rect x="18" y="186" width="208" height="14" fill="#e6effa"/>
+    <rect x="18" y="186" width="208" height="14" fill="#0b7468"/>
+  </g>
+  <rect x="16" y="389" width="1008" height="76" rx="4" fill="#e9f5f1"/>
+  <text x="32" y="414" class="label" font-weight="600">Available now = credits released − credits used.</text>
+  <text x="32" y="449" class="label">Day 8 example: 1,000 released − 300 used = 700 available.</text>
+  <text x="32" y="484" class="small muted">Unused released credits remain available during the month.</text>
+</svg>

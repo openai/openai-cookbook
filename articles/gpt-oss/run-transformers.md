@@ -2,11 +2,11 @@
 
 The Transformers library by Hugging Face provides a flexible way to load and run large language models locally or on a server. This guide will walk you through running [OpenAI gpt-oss-20b](https://huggingface.co/openai/gpt-oss-20b) or [OpenAI gpt-oss-120b](https://huggingface.co/openai/gpt-oss-120b) using Transformers, either with a high-level pipeline or via low-level `generate` calls with raw token IDs.
 
-We'll cover the use of [OpenAI gpt-oss-20b](https://huggingface.co/openai/gpt-oss-20b) or [OpenAI gpt-oss-120b](https://huggingface.co/openai/gpt-oss-120b) with the high-level pipeline abstraction, low-level \`generate\` calls, and serving models locally with \`transformers serve\`, with in a way compatible with the Responses API.
+We'll cover the use of [OpenAI gpt-oss-20b](https://huggingface.co/openai/gpt-oss-20b) or [OpenAI gpt-oss-120b](https://huggingface.co/openai/gpt-oss-120b) with the high-level pipeline abstraction, low-level `generate` calls, and serving models locally with `transformers serve`, in a way compatible with the Responses API.
 
 In this guide we’ll run through various optimised ways to run the **gpt-oss models via Transformers.**
 
-Bonus: You can also fine-tune models via transformers, [check out our fine-tuning guide here](https://cookbook.openai.com/articles/gpt-oss/fine-tune-transformers).
+Bonus: You can also fine-tune models via transformers, [check out our fine-tuning guide here](https://cookbook.openai.com/articles/gpt-oss/fine-tune-transfomers).
 
 ## Pick your model
 
@@ -122,7 +122,7 @@ print(tokenizer.decode(outputs[0]))
 
 ## Chat template and tool calling
 
-OpenAI gpt-oss models use the [harmony response format](https://cookbook.openai.com/article/harmony) for structuring messages, including reasoning and tool calls.
+OpenAI gpt-oss models use the [harmony response format](https://cookbook.openai.com/articles/openai-harmony) for structuring messages, including reasoning and tool calls.
 
 To construct prompts you can use the built-in chat template of Transformers. Alternatively, you can install and use the [openai-harmony library](https://github.com/openai/harmony) for more control.
 

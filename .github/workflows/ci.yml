@@ -1,0 +1,29 @@
+name: ci
+on:
+  push:
+    branches: [main]
+  pull_request:
+    branches: [main]
+
+jobs:
+  test:
+    strategy:
+      fail-fast: false
+      matrix:
+        os: [ubuntu-latest, macos-latest]
+        python-version: ["3.10", "3.11", "3.12"]
+    runs-on: ${{ matrix.os }}
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: ${{ matrix.python-version }}
+          cache: pip
+      - run: pip install -e ".[dev]"
+      - run: ruff check .
+      - run: ruff format --check .
+      - run: mypy topoattack
+      - run: pytest -q
+      - run: python -m topoattack analyze --prompts tests/data/small.txt --out /tmp/topoattack-ci
+      - run: jupyter nbconvert --to notebook --execute examples/topology/jailbreak_topology.ipynb --output jailbreak_topology.executed.ipynb
+      - run: jupyter nbconvert --to notebook --clear-output --inplace examples/topology/jailbreak_topology.ipynb

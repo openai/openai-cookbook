@@ -1,0 +1,19 @@
+line-length = 100
+target-version = "py310"
+exclude = ["*.ipynb"]
+
+[lint]
+select = ["E", "F", "I", "B", "UP", "SIM", "PL", "RUF"]
+ignore = ["PLR0913", "PLR2004"]
+
+[lint.per-file-ignores]
+"tests/*" = ["PLR0913", "PLR2004", "S101", "PLW0108"]
+"examples/*" = ["ALL"]
+"scripts/*" = ["E501"]
+"topoattack/guard.py" = ["PLC0415"]
+"topoattack/embed.py" = ["PLC0415"]
+"topoattack/evaluator.py" = ["PLC0415"]
+"topoattack/cli.py" = ["PLC0415", "B008"]
+
+[format]
+quote-style = "double"

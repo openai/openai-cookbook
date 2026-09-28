@@ -24,7 +24,7 @@ From the repository root:
 
 ```bash
 cp examples/agents_api/apps/document_review/.env.example examples/agents_api/apps/document_review/.env
-docker build -t agent-api-sandbox:latest examples/agents_api/sandboxes/application_managed/docker
+docker build -t agent-api-sandbox:latest examples/agents_api/sandboxes/docker/application_managed
 ```
 
 Set `OPENAI_API_KEY` and `OPENAI_EXECUTOR_API_KEY` in `examples/agents_api/apps/document_review/.env`. Use keys with the same owner, organization, and project. Only the executor key enters the sandbox. It needs `api.agents.environments.connect` and IP restrictions that allow the sandbox's outbound network. The application loads this file automatically.

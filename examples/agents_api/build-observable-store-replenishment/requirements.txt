@@ -1,0 +1,7 @@
+openai>=3.13.0
+ipywidgets>=8.1.0
+python-dotenv>=1.0.0
+pytest>=8.0.0
+fastapi>=0.116.0
+uvicorn>=0.35.0
+httpx>=0.28.0

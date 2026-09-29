@@ -1,0 +1,11 @@
+[
+  {
+    "shipment_id": "shipment_9001",
+    "store_id": "store_101",
+    "sku": "water_24pk",
+    "units": 60,
+    "baseline_arrival": "2026-09-18T20:00:00Z",
+    "storm_delay_hours": 48,
+    "carrier_status": "in_transit"
+  }
+]

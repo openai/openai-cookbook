@@ -3,6 +3,12 @@
 Complete applications and sandbox integrations for the Agents API. Each application
 README walks through the implementation and explains how to run it.
 
+## Guided cookbooks
+
+| Example | What it teaches |
+| --- | --- |
+| [Observable store replenishment](build-observable-store-replenishment.md) | Continue one supply-chain incident across turns, serve operational data through function tools, and inspect the trace. |
+
 ## Applications
 
 | Example | What it does |

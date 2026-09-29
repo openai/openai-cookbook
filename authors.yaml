@@ -3,6 +3,11 @@
 # You can optionally customize how your information shows up cookbook.openai.com over here.
 # If your information is not present here, it will be pulled from your GitHub profile.
 
+suryakari-ux:
+  name: "Surya Kari"
+  website: "https://github.com/suryakari-ux"
+  avatar: "https://avatars.githubusercontent.com/u/312695916?v=4"
+
 sks-oai:
   name: "Sonu Kumar Singh"
   website: "https://github.com/sks-oai"

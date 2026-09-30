@@ -60,6 +60,17 @@ The following offline lexical evaluation uses the 56 answerable development quer
 
 These scores describe this fictional fixture only. They are not estimates of general Turkish retrieval quality. The evaluator supports multiple relevant documents in recall calculations, but it does not score unanswerable queries or false positives.
 
+## Inspect missed relevant documents
+
+Save development rankings, then generate an offline Markdown report:
+
+```powershell
+python examples/turkish_retrieval/search.py --split development --output ../work/development-results.json
+python examples/turkish_retrieval/report_failures.py --input ../work/development-results.json --output ../work/development-failures.md
+```
+
+The report lists queries where a method missed one or more labeled relevant documents, including the retrieved and missing IDs. For queries with multiple relevant documents, this makes partial misses distinguishable from cases where all relevant documents were missed. The report reads the saved `search.py` JSON and the bundled development fixtures; it makes no API calls. Treat it as a diagnostic for this fictional fixture, not as a general retrieval-quality claim.
+
 ## Optional: compare OpenAI embeddings
 
 This command sends every document and every query in the selected split to the OpenAI API and incurs API usage charges. It embeds the original text without lexical normalization. Set `OPENAI_API_KEY` in your local environment; do not put the key in source files or commit it.

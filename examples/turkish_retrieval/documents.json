@@ -1,0 +1,202 @@
+[
+  {
+    "id": "doc-01",
+    "title": "Kargo gönderi durumu",
+    "text": "Sipariş kargoya teslim edildiğinde takip numarası müşterinin e-posta adresine gönderilir. Gönderinin son hareketi takip bağlantısında görüntülenir."
+  },
+  {
+    "id": "doc-02",
+    "title": "Teslimat adresini değiştirme",
+    "text": "Paket henüz hazırlanmadıysa teslimat adresi hesap içindeki sipariş ayrıntılarından güncellenebilir. Kargoya verilen siparişlerde adres değişikliği için taşıyıcıyla görüşülmelidir."
+  },
+  {
+    "id": "doc-03",
+    "title": "Ürün iade talebi",
+    "text": "Teslim alınan ürün için on dört gün içinde hesap sayfasından iade talebi açılabilir. Ürün kullanılmamış ve kutusuyla birlikte gönderilmelidir."
+  },
+  {
+    "id": "doc-04",
+    "title": "Kusurlu ürün değişimi",
+    "text": "Üretim kusuru bulunan ürünün değişimi için destek formuna sipariş numarası ve kusurun fotoğrafı eklenir. İnceleme tamamlandığında değişim süreci e-postayla bildirilir."
+  },
+  {
+    "id": "doc-05",
+    "title": "Yıllık izin isteği",
+    "text": "Çalışanlar yıllık izin talebini çalışan portalındaki izinler ekranından yöneticilerine iletir. Onaylanan günler ortak takvime işlenir."
+  },
+  {
+    "id": "doc-06",
+    "title": "Hastalık izni bildirimi",
+    "text": "Sağlık nedeniyle işe gelemeyecek çalışan aynı gün yöneticisine haber verir ve sağlık raporunu personel sistemine yükler."
+  },
+  {
+    "id": "doc-07",
+    "title": "Hesap parolası yenileme",
+    "text": "Parolasını unutan kullanıcı giriş sayfasındaki parola yenileme bağlantısını seçer. E-posta ile gelen doğrulama kodu yeni parola oluşturmak için kullanılır."
+  },
+  {
+    "id": "doc-08",
+    "title": "İki aşamalı doğrulama",
+    "text": "Hesap güvenliği için iki aşamalı doğrulama güvenlik ayarlarından açılır. Giriş sırasında kayıtlı telefona tek kullanımlık kod gönderilir."
+  },
+  {
+    "id": "doc-09",
+    "title": "Aylık faturaya ulaşma",
+    "text": "Ödemesi tamamlanan siparişlerin faturası hesap panelindeki Belgeler bölümünde PDF olarak indirilir. Fatura genellikle ödeme onayından sonra görünür."
+  },
+  {
+    "id": "doc-10",
+    "title": "Fatura bilgisi düzeltme",
+    "text": "Henüz kesilmemiş faturanın unvan veya vergi dairesi bilgileri destek ekibine sipariş numarasıyla iletilerek düzeltilir."
+  },
+  {
+    "id": "doc-11",
+    "title": "İstanbul merkez şube saatleri",
+    "text": "İstanbul merkez şubesi hafta içi 09.00–18.00 saatleri arasında hizmet verir. Şube cumartesi ve pazar günleri kapalıdır."
+  },
+  {
+    "id": "doc-12",
+    "title": "Ankara şubesi ulaşım",
+    "text": "Ankara şubesi Kızılay metro durağına yürüme mesafesindedir. Ziyaret öncesinde randevu alınması önerilir."
+  },
+  {
+    "id": "doc-13",
+    "title": "Cihaz ekran ışığı",
+    "text": "Ekran parlaklığı cihazın Ayarlar menüsündeki Görüntü seçeneğinden azaltılıp artırılabilir. Otomatik parlaklık ortam ışığına göre düzey belirler."
+  },
+  {
+    "id": "doc-14",
+    "title": "Gece ışığı zamanlaması",
+    "text": "Gece ışığı özelliği akşam saatlerinde mavi ışığı azaltır. Başlangıç ve bitiş saatleri ekran ayarlarından belirlenebilir."
+  },
+  {
+    "id": "doc-15",
+    "title": "Zorunlu güvenlik eğitimi",
+    "text": "Yeni başlayan çalışanlar iş sağlığı ve güvenliği eğitimini ilk çalışma haftasında tamamlar. Eğitim materyalleri personel portalında yer alır."
+  },
+  {
+    "id": "doc-16",
+    "title": "Eğitim katılım belgesi",
+    "text": "Tamamlanan çevrim içi eğitimlerin katılım belgesi Öğrenim geçmişim sayfasından PDF olarak alınabilir."
+  },
+  {
+    "id": "doc-17",
+    "title": "Kartla ödeme",
+    "text": "Sipariş bedeli Visa veya Mastercard kredi kartıyla ödeme ekranında tahsil edilebilir. Kart bilgileri güvenli ödeme sağlayıcısı tarafından işlenir."
+  },
+  {
+    "id": "doc-18",
+    "title": "Banka havalesi açıklaması",
+    "text": "Havale ile ödemede açıklama alanına sipariş numarası yazılmalıdır. Ödeme hesaba ulaştığında sipariş hazırlığı başlar."
+  },
+  {
+    "id": "doc-19",
+    "title": "Teknik arıza kaydı",
+    "text": "Arızalı cihaz için teknik destek sayfasından kayıt açılır. Seri numarası, arıza belirtileri ve iletişim bilgileri forma eklenmelidir."
+  },
+  {
+    "id": "doc-20",
+    "title": "Cihazı servise gönderme",
+    "text": "Onaylanan servis başvurusundan sonra kullanıcıya kargo etiketi gönderilir. Cihaz, aksesuarlarıyla ve kayıt numarası belirtilerek paketlenir."
+  },
+  {
+    "id": "doc-21",
+    "title": "Toplantı odası ayırma",
+    "text": "Ofis toplantı odaları takvim uygulamasında uygun saat seçilerek rezerve edilir. Davetliler takvim davetiyle bilgilendirilir."
+  },
+  {
+    "id": "doc-22",
+    "title": "Misafir kablosuz ağı",
+    "text": "Ofis misafir ağına bağlanmak için resepsiyondan günlük erişim kodu alınır. Kod gece yarısında geçerliliğini yitirir."
+  },
+  {
+    "id": "doc-23",
+    "title": "Kütüphane kitap süresi",
+    "text": "Kütüphane kitapları yirmi bir gün ödünç alınabilir. Süre dolmadan katalog üzerinden bir kez uzatma yapılabilir."
+  },
+  {
+    "id": "doc-24",
+    "title": "Kitap gecikme bildirimi",
+    "text": "Ödünç alınan kitap gecikirse kullanıcıya e-posta hatırlatması gider. İade kutusu ana girişin yanındadır."
+  },
+  {
+    "id": "doc-25",
+    "title": "Park aboneliği başvurusu",
+    "text": "Aylık otopark aboneliği için plaka ve araç ruhsatı tesis portalındaki başvuru formuna yüklenir. Kontenjan doluysa bekleme listesi uygulanır."
+  },
+  {
+    "id": "doc-26",
+    "title": "Bisiklet park alanı",
+    "text": "Bisiklet park yerleri B blok girişindeki kilitli alandadır. Alanı kullanmak için güvenlik biriminden erişim kartı istenir."
+  },
+  {
+    "id": "doc-27",
+    "title": "Su kesintisi duyuruları",
+    "text": "Planlı su kesintileri başlamadan en az bir gün önce bina sakinlerine kısa mesaj gönderilir. Güncel duyurular yönetim panosunda da yayımlanır."
+  },
+  {
+    "id": "doc-28",
+    "title": "Asansör arıza bildirimi",
+    "text": "Asansör arızasında kabin içindeki acil çağrı düğmesine basılmalı ve bina yönetimine kat numarası bildirilmelidir."
+  },
+  {
+    "id": "doc-29",
+    "title": "Etkinlik kaydı iptali",
+    "text": "Ücretsiz etkinlik kaydı etkinlik sayfasındaki Kaydımı iptal et bağlantısından silinebilir. Kontenjan bekleyen kişiye açılır."
+  },
+  {
+    "id": "doc-30",
+    "title": "Etkinlik salonu erişimi",
+    "text": "Atölye etkinlikleri zemin kattaki çok amaçlı salonda yapılır. Katılımcı listesi girişte görevli tarafından kontrol edilir."
+  },
+  {
+    "id": "doc-31",
+    "title": "Maaş bordrosu görüntüleme",
+    "text": "Aylık maaş bordrosu, ödeme gününde özlük portalının Bordrolarım alanında görüntülenebilir ve indirilebilir."
+  },
+  {
+    "id": "doc-32",
+    "title": "Bordro itirazı",
+    "text": "Bordroda fazla mesai veya kesinti hatası olduğunu düşünen çalışan, ilgili ayı belirterek insan kaynaklarına kayıt açar."
+  },
+  {
+    "id": "doc-33",
+    "title": "Yemek kartı bakiye yükleme",
+    "text": "Yemek kartı bakiyesi her ayın ilk iş gününde tanımlanır. Güncel tutar kart sağlayıcısının mobil uygulamasında görülür."
+  },
+  {
+    "id": "doc-34",
+    "title": "Yemek alerjisi bildirimi",
+    "text": "Toplu yemek siparişinde alerjen bilgisi etkinlik koordinatörüne en geç iki iş günü önce yazılı olarak iletilmelidir."
+  },
+  {
+    "id": "doc-35",
+    "title": "Yeni tedarikçi kaydı",
+    "text": "Yeni tedarikçi başvurusu için şirket unvanı, vergi bilgileri ve banka hesabı satın alma portalına yüklenir."
+  },
+  {
+    "id": "doc-36",
+    "title": "Satın alma talep onayı",
+    "text": "Ofis malzemesi alım talepleri birim yöneticisinin onayından sonra satın alma ekibine düşer. Talep numarasıyla durum izlenebilir."
+  },
+  {
+    "id": "doc-37",
+    "title": "Çevrim içi randevu değiştirme",
+    "text": "Danışmanlık randevusu başlangıçtan en az dört saat önce bağlantı üzerinden başka bir uygun saate alınabilir."
+  },
+  {
+    "id": "doc-38",
+    "title": "Randevuya katılamama",
+    "text": "Randevuya katılamayacak kişi iptal bağlantısını kullanmalı; yeni görüşme gerekiyorsa takvimden boş saat seçmelidir."
+  },
+  {
+    "id": "doc-39",
+    "title": "Geri dönüşüm kutuları",
+    "text": "Kâğıt ve karton atıklar mavi kutuya, plastik ambalajlar sarı kutuya bırakılır. Pil atıkları danışma masasındaki ayrı kutuda toplanır."
+  },
+  {
+    "id": "doc-40",
+    "title": "Arşiv belge talebi",
+    "text": "Eski sözleşme kopyaları arşiv biriminden belge numarası ve yaklaşık tarih belirtilerek istenir. Yanıt üç iş günü içinde gönderilir."
+  }
+]

@@ -1,0 +1,890 @@
+[
+  {
+    "id": "q-001",
+    "category": "exact",
+    "text": "Kargo gönderi durumu",
+    "relevant_ids": [
+      "doc-01"
+    ],
+    "group_id": "shipment",
+    "split": "development"
+  },
+  {
+    "id": "q-002",
+    "category": "case",
+    "text": "KARGO GÖNDERİ DURUMU",
+    "relevant_ids": [
+      "doc-01"
+    ],
+    "group_id": "shipment",
+    "split": "development"
+  },
+  {
+    "id": "q-003",
+    "category": "paraphrase",
+    "text": "Kargoya çıkan siparişin nereden takip edildiğini öğrenmek istiyorum.",
+    "relevant_ids": [
+      "doc-01"
+    ],
+    "group_id": "shipment",
+    "split": "development"
+  },
+  {
+    "id": "q-004",
+    "category": "suffix",
+    "text": "Kargoya verilen siparişimin hareketlerini nereden görebilirim?",
+    "relevant_ids": [
+      "doc-01"
+    ],
+    "group_id": "shipment",
+    "split": "development"
+  },
+  {
+    "id": "q-005",
+    "category": "exact",
+    "text": "Teslimat adresini değiştirme",
+    "relevant_ids": [
+      "doc-02"
+    ],
+    "group_id": "address",
+    "split": "development"
+  },
+  {
+    "id": "q-006",
+    "category": "ascii",
+    "text": "Teslimat adresini degistirme",
+    "relevant_ids": [
+      "doc-02"
+    ],
+    "group_id": "address",
+    "split": "development"
+  },
+  {
+    "id": "q-007",
+    "category": "paraphrase",
+    "text": "Paket çıkmadan teslimat yerini güncelleyebilir miyim?",
+    "relevant_ids": [
+      "doc-02"
+    ],
+    "group_id": "address",
+    "split": "development"
+  },
+  {
+    "id": "q-008",
+    "category": "suffix",
+    "text": "Sipariş kargoya çıkmadan adresimi nasıl değiştiririm?",
+    "relevant_ids": [
+      "doc-02"
+    ],
+    "group_id": "address",
+    "split": "development"
+  },
+  {
+    "id": "q-009",
+    "category": "exact",
+    "text": "Ürün iade talebi",
+    "relevant_ids": [
+      "doc-03"
+    ],
+    "group_id": "return",
+    "split": "development"
+  },
+  {
+    "id": "q-010",
+    "category": "case",
+    "text": "ÜRÜN İADE TALEBİ",
+    "relevant_ids": [
+      "doc-03"
+    ],
+    "group_id": "return",
+    "split": "development"
+  },
+  {
+    "id": "q-011",
+    "category": "paraphrase",
+    "text": "Aldığım ürünü geri göndermek istiyorum; kusurluysa değişim de ilgili.",
+    "relevant_ids": [
+      "doc-03"
+    ],
+    "group_id": "return",
+    "split": "development"
+  },
+  {
+    "id": "q-012",
+    "category": "suffix",
+    "text": "Ürünü iade etmek için kaç günüm var?",
+    "relevant_ids": [
+      "doc-03"
+    ],
+    "group_id": "return",
+    "split": "development"
+  },
+  {
+    "id": "q-013",
+    "category": "exact",
+    "text": "Yıllık izin isteği",
+    "relevant_ids": [
+      "doc-05"
+    ],
+    "group_id": "leave",
+    "split": "development"
+  },
+  {
+    "id": "q-014",
+    "category": "case",
+    "text": "YILLIK İZİN İSTEĞİ",
+    "relevant_ids": [
+      "doc-05"
+    ],
+    "group_id": "leave",
+    "split": "development"
+  },
+  {
+    "id": "q-015",
+    "category": "paraphrase",
+    "text": "İzin talebimi müdürüme sistemden nasıl iletirim?",
+    "relevant_ids": [
+      "doc-05"
+    ],
+    "group_id": "leave",
+    "split": "development"
+  },
+  {
+    "id": "q-016",
+    "category": "suffix",
+    "text": "Yıllık iznimi portalda hangi bölümden talep edebilirim?",
+    "relevant_ids": [
+      "doc-05"
+    ],
+    "group_id": "leave",
+    "split": "development"
+  },
+  {
+    "id": "q-017",
+    "category": "exact",
+    "text": "Hesap parolası yenileme",
+    "relevant_ids": [
+      "doc-07"
+    ],
+    "group_id": "password",
+    "split": "development"
+  },
+  {
+    "id": "q-018",
+    "category": "ascii",
+    "text": "Hesap parolasi yenileme",
+    "relevant_ids": [
+      "doc-07"
+    ],
+    "group_id": "password",
+    "split": "development"
+  },
+  {
+    "id": "q-019",
+    "category": "paraphrase",
+    "text": "Hesabıma giremiyorum, eski parolam aklımda değil.",
+    "relevant_ids": [
+      "doc-07"
+    ],
+    "group_id": "password",
+    "split": "development"
+  },
+  {
+    "id": "q-020",
+    "category": "suffix",
+    "text": "Parolamı unuttum, giriş erişimini nasıl geri alırım?",
+    "relevant_ids": [
+      "doc-07"
+    ],
+    "group_id": "password",
+    "split": "development"
+  },
+  {
+    "id": "q-021",
+    "category": "exact",
+    "text": "İki aşamalı doğrulama",
+    "relevant_ids": [
+      "doc-08"
+    ],
+    "group_id": "security",
+    "split": "development"
+  },
+  {
+    "id": "q-022",
+    "category": "case",
+    "text": "İKİ AŞAMALI DOĞRULAMA",
+    "relevant_ids": [
+      "doc-08"
+    ],
+    "group_id": "security",
+    "split": "development"
+  },
+  {
+    "id": "q-023",
+    "category": "paraphrase",
+    "text": "Hesaba girişte telefona kod gelsin diye neyi açmalıyım?",
+    "relevant_ids": [
+      "doc-08"
+    ],
+    "group_id": "security",
+    "split": "development"
+  },
+  {
+    "id": "q-024",
+    "category": "suffix",
+    "text": "Ek giriş güvenliğini nasıl etkinleştiririm?",
+    "relevant_ids": [
+      "doc-08"
+    ],
+    "group_id": "security",
+    "split": "development"
+  },
+  {
+    "id": "q-025",
+    "category": "exact",
+    "text": "Aylık faturaya ulaşma",
+    "relevant_ids": [
+      "doc-09"
+    ],
+    "group_id": "invoice",
+    "split": "development"
+  },
+  {
+    "id": "q-026",
+    "category": "case",
+    "text": "AYLIK FATURAYA ULAŞMA",
+    "relevant_ids": [
+      "doc-09"
+    ],
+    "group_id": "invoice",
+    "split": "development"
+  },
+  {
+    "id": "q-027",
+    "category": "paraphrase",
+    "text": "Ödemesi alınan siparişimin PDF makbuzu nerede?",
+    "relevant_ids": [
+      "doc-09"
+    ],
+    "group_id": "invoice",
+    "split": "development"
+  },
+  {
+    "id": "q-028",
+    "category": "suffix",
+    "text": "Faturamı hangi ekrandan indirebilirim?",
+    "relevant_ids": [
+      "doc-09"
+    ],
+    "group_id": "invoice",
+    "split": "development"
+  },
+  {
+    "id": "q-029",
+    "category": "exact",
+    "text": "İstanbul merkez şube saatleri",
+    "relevant_ids": [
+      "doc-11"
+    ],
+    "group_id": "branch_hours",
+    "split": "development"
+  },
+  {
+    "id": "q-030",
+    "category": "ascii",
+    "text": "Istanbul merkez sube saatleri",
+    "relevant_ids": [
+      "doc-11"
+    ],
+    "group_id": "branch_hours",
+    "split": "development"
+  },
+  {
+    "id": "q-031",
+    "category": "paraphrase",
+    "text": "İstanbul’daki merkez hafta sonu açık oluyor mu?",
+    "relevant_ids": [
+      "doc-11"
+    ],
+    "group_id": "branch_hours",
+    "split": "development"
+  },
+  {
+    "id": "q-032",
+    "category": "suffix",
+    "text": "İstanbul şubesi saat kaçta kapanıyor?",
+    "relevant_ids": [
+      "doc-11"
+    ],
+    "group_id": "branch_hours",
+    "split": "development"
+  },
+  {
+    "id": "q-033",
+    "category": "exact",
+    "text": "Cihaz ekran ışığı",
+    "relevant_ids": [
+      "doc-13"
+    ],
+    "group_id": "brightness",
+    "split": "development"
+  },
+  {
+    "id": "q-034",
+    "category": "case",
+    "text": "CİHAZ EKRAN IŞIĞI",
+    "relevant_ids": [
+      "doc-13"
+    ],
+    "group_id": "brightness",
+    "split": "development"
+  },
+  {
+    "id": "q-035",
+    "category": "paraphrase",
+    "text": "Ekran çok parlak, seviyeyi nereden düşürürüm?",
+    "relevant_ids": [
+      "doc-13"
+    ],
+    "group_id": "brightness",
+    "split": "development"
+  },
+  {
+    "id": "q-036",
+    "category": "suffix",
+    "text": "Telefon ekranının parlaklığını nereden kısabilirim?",
+    "relevant_ids": [
+      "doc-13"
+    ],
+    "group_id": "brightness",
+    "split": "development"
+  },
+  {
+    "id": "q-037",
+    "category": "exact",
+    "text": "Zorunlu güvenlik eğitimi",
+    "relevant_ids": [
+      "doc-15"
+    ],
+    "group_id": "training",
+    "split": "development"
+  },
+  {
+    "id": "q-038",
+    "category": "ascii",
+    "text": "Zorunlu guvenlik egitimi",
+    "relevant_ids": [
+      "doc-15"
+    ],
+    "group_id": "training",
+    "split": "development"
+  },
+  {
+    "id": "q-039",
+    "category": "paraphrase",
+    "text": "İşe yeni başladım, güvenlik derslerini nerede tamamlayacağım?",
+    "relevant_ids": [
+      "doc-15"
+    ],
+    "group_id": "training",
+    "split": "development"
+  },
+  {
+    "id": "q-040",
+    "category": "suffix",
+    "text": "Zorunlu iş güvenliği eğitimine hangi portalda ulaşırım?",
+    "relevant_ids": [
+      "doc-15"
+    ],
+    "group_id": "training",
+    "split": "development"
+  },
+  {
+    "id": "q-041",
+    "category": "exact",
+    "text": "Kartla ödeme",
+    "relevant_ids": [
+      "doc-17"
+    ],
+    "group_id": "card",
+    "split": "development"
+  },
+  {
+    "id": "q-042",
+    "category": "case",
+    "text": "KARTLA ÖDEME",
+    "relevant_ids": [
+      "doc-17"
+    ],
+    "group_id": "card",
+    "split": "development"
+  },
+  {
+    "id": "q-043",
+    "category": "paraphrase",
+    "text": "Sipariş tutarını kredi kartıyla ödeyebiliyor muyum?",
+    "relevant_ids": [
+      "doc-17"
+    ],
+    "group_id": "card",
+    "split": "development"
+  },
+  {
+    "id": "q-044",
+    "category": "suffix",
+    "text": "Kart bilgilerimi ödeme sırasında kullanabilir miyim?",
+    "relevant_ids": [
+      "doc-17"
+    ],
+    "group_id": "card",
+    "split": "development"
+  },
+  {
+    "id": "q-045",
+    "category": "exact",
+    "text": "Teknik arıza kaydı",
+    "relevant_ids": [
+      "doc-19"
+    ],
+    "group_id": "repair",
+    "split": "development"
+  },
+  {
+    "id": "q-046",
+    "category": "ascii",
+    "text": "Teknik ariza kaydi",
+    "relevant_ids": [
+      "doc-19"
+    ],
+    "group_id": "repair",
+    "split": "development"
+  },
+  {
+    "id": "q-047",
+    "category": "paraphrase",
+    "text": "Bozulan cihaz için servis talebini nereye açayım?",
+    "relevant_ids": [
+      "doc-19"
+    ],
+    "group_id": "repair",
+    "split": "development"
+  },
+  {
+    "id": "q-048",
+    "category": "suffix",
+    "text": "Cihazdaki arızayı teknik ekibe nasıl bildiririm?",
+    "relevant_ids": [
+      "doc-19"
+    ],
+    "group_id": "repair",
+    "split": "development"
+  },
+  {
+    "id": "q-049",
+    "category": "exact",
+    "text": "Toplantı odası ayırma",
+    "relevant_ids": [
+      "doc-21"
+    ],
+    "group_id": "meeting",
+    "split": "held-out"
+  },
+  {
+    "id": "q-050",
+    "category": "case",
+    "text": "TOPLANTI ODASI AYIRMA",
+    "relevant_ids": [
+      "doc-21"
+    ],
+    "group_id": "meeting",
+    "split": "held-out"
+  },
+  {
+    "id": "q-051",
+    "category": "paraphrase",
+    "text": "Ofiste yarınki görüşme için boş oda ayırmam gerekiyor.",
+    "relevant_ids": [
+      "doc-21"
+    ],
+    "group_id": "meeting",
+    "split": "held-out"
+  },
+  {
+    "id": "q-052",
+    "category": "suffix",
+    "text": "Toplantı odası rezervasyonunu hangi takvimden yapıyoruz?",
+    "relevant_ids": [
+      "doc-21"
+    ],
+    "group_id": "meeting",
+    "split": "held-out"
+  },
+  {
+    "id": "q-053",
+    "category": "exact",
+    "text": "Kütüphane kitap süresi",
+    "relevant_ids": [
+      "doc-23"
+    ],
+    "group_id": "library",
+    "split": "held-out"
+  },
+  {
+    "id": "q-054",
+    "category": "case",
+    "text": "KÜTÜPHANE KİTAP SÜRESİ",
+    "relevant_ids": [
+      "doc-23"
+    ],
+    "group_id": "library",
+    "split": "held-out"
+  },
+  {
+    "id": "q-055",
+    "category": "paraphrase",
+    "text": "Kütüphaneden aldığım kitabı ne zaman geri vermeliyim?",
+    "relevant_ids": [
+      "doc-23"
+    ],
+    "group_id": "library",
+    "split": "held-out"
+  },
+  {
+    "id": "q-056",
+    "category": "suffix",
+    "text": "Ödünç kitap süresini uzatma seçeneği var mı?",
+    "relevant_ids": [
+      "doc-23"
+    ],
+    "group_id": "library",
+    "split": "held-out"
+  },
+  {
+    "id": "q-057",
+    "category": "exact",
+    "text": "Park aboneliği başvurusu",
+    "relevant_ids": [
+      "doc-25"
+    ],
+    "group_id": "parking",
+    "split": "held-out"
+  },
+  {
+    "id": "q-058",
+    "category": "ascii",
+    "text": "Park aboneligi basvurusu",
+    "relevant_ids": [
+      "doc-25"
+    ],
+    "group_id": "parking",
+    "split": "held-out"
+  },
+  {
+    "id": "q-059",
+    "category": "paraphrase",
+    "text": "Aracım için aylık park yeri başvurusu yapmak istiyorum.",
+    "relevant_ids": [
+      "doc-25"
+    ],
+    "group_id": "parking",
+    "split": "held-out"
+  },
+  {
+    "id": "q-060",
+    "category": "suffix",
+    "text": "Otopark kartı almak için hangi bilgileri göndermeliyim?",
+    "relevant_ids": [
+      "doc-25"
+    ],
+    "group_id": "parking",
+    "split": "held-out"
+  },
+  {
+    "id": "q-061",
+    "category": "exact",
+    "text": "Su kesintisi duyuruları",
+    "relevant_ids": [
+      "doc-27"
+    ],
+    "group_id": "water",
+    "split": "held-out"
+  },
+  {
+    "id": "q-062",
+    "category": "case",
+    "text": "SU KESİNTİSİ DUYURULARI",
+    "relevant_ids": [
+      "doc-27"
+    ],
+    "group_id": "water",
+    "split": "held-out"
+  },
+  {
+    "id": "q-063",
+    "category": "paraphrase",
+    "text": "Yarın su kesilecek mi, bina yönetimi nasıl haber veriyor?",
+    "relevant_ids": [
+      "doc-27"
+    ],
+    "group_id": "water",
+    "split": "held-out"
+  },
+  {
+    "id": "q-064",
+    "category": "suffix",
+    "text": "Planlı kesinti duyurusunu nerede görebilirim?",
+    "relevant_ids": [
+      "doc-27"
+    ],
+    "group_id": "water",
+    "split": "held-out"
+  },
+  {
+    "id": "q-065",
+    "category": "exact",
+    "text": "Etkinlik kaydı iptali",
+    "relevant_ids": [
+      "doc-29"
+    ],
+    "group_id": "event",
+    "split": "held-out"
+  },
+  {
+    "id": "q-066",
+    "category": "ascii",
+    "text": "Etkinlik kaydi iptali",
+    "relevant_ids": [
+      "doc-29"
+    ],
+    "group_id": "event",
+    "split": "held-out"
+  },
+  {
+    "id": "q-067",
+    "category": "paraphrase",
+    "text": "Ücretsiz atölyeye gelemeyeceğim, kaydımı nasıl sileyim?",
+    "relevant_ids": [
+      "doc-29"
+    ],
+    "group_id": "event",
+    "split": "held-out"
+  },
+  {
+    "id": "q-068",
+    "category": "suffix",
+    "text": "Etkinlik biletimi iptal edip yerimi başkasına bırakabilir miyim?",
+    "relevant_ids": [
+      "doc-29"
+    ],
+    "group_id": "event",
+    "split": "held-out"
+  },
+  {
+    "id": "q-069",
+    "category": "exact",
+    "text": "Maaş bordrosu görüntüleme",
+    "relevant_ids": [
+      "doc-31"
+    ],
+    "group_id": "payroll",
+    "split": "held-out"
+  },
+  {
+    "id": "q-070",
+    "category": "case",
+    "text": "MAAŞ BORDROSU GÖRÜNTÜLEME",
+    "relevant_ids": [
+      "doc-31"
+    ],
+    "group_id": "payroll",
+    "split": "held-out"
+  },
+  {
+    "id": "q-071",
+    "category": "paraphrase",
+    "text": "Son ödeme dönemine ait bordromu görmek istiyorum.",
+    "relevant_ids": [
+      "doc-31"
+    ],
+    "group_id": "payroll",
+    "split": "held-out"
+  },
+  {
+    "id": "q-072",
+    "category": "suffix",
+    "text": "Maaş pusulam portalda nerede yayımlanıyor?",
+    "relevant_ids": [
+      "doc-31"
+    ],
+    "group_id": "payroll",
+    "split": "held-out"
+  },
+  {
+    "id": "q-073",
+    "category": "exact",
+    "text": "Yemek kartı bakiye yükleme",
+    "relevant_ids": [
+      "doc-33"
+    ],
+    "group_id": "meal",
+    "split": "held-out"
+  },
+  {
+    "id": "q-074",
+    "category": "ascii",
+    "text": "Yemek karti bakiye yukleme",
+    "relevant_ids": [
+      "doc-33"
+    ],
+    "group_id": "meal",
+    "split": "held-out"
+  },
+  {
+    "id": "q-075",
+    "category": "paraphrase",
+    "text": "Kartıma bu ay ne kadar yemek parası yatmış?",
+    "relevant_ids": [
+      "doc-33"
+    ],
+    "group_id": "meal",
+    "split": "held-out"
+  },
+  {
+    "id": "q-076",
+    "category": "suffix",
+    "text": "Yemek kartımda kalan tutarı telefondan nereden kontrol ederim?",
+    "relevant_ids": [
+      "doc-33"
+    ],
+    "group_id": "meal",
+    "split": "held-out"
+  },
+  {
+    "id": "q-077",
+    "category": "exact",
+    "text": "Çevrim içi randevu değiştirme",
+    "relevant_ids": [
+      "doc-37"
+    ],
+    "group_id": "appointment",
+    "split": "held-out"
+  },
+  {
+    "id": "q-078",
+    "category": "case",
+    "text": "ÇEVRİM İÇİ RANDEVU DEĞİŞTİRME",
+    "relevant_ids": [
+      "doc-37"
+    ],
+    "group_id": "appointment",
+    "split": "held-out"
+  },
+  {
+    "id": "q-079",
+    "category": "paraphrase",
+    "text": "Görüşme saatim uymuyor, başka saate alabilir miyim?",
+    "relevant_ids": [
+      "doc-37"
+    ],
+    "group_id": "appointment",
+    "split": "held-out"
+  },
+  {
+    "id": "q-080",
+    "category": "suffix",
+    "text": "Randevuma katılamayacağım; yeni zaman seçme işlemi nasıl yapılır?",
+    "relevant_ids": [
+      "doc-37"
+    ],
+    "group_id": "appointment",
+    "split": "held-out"
+  },
+  {
+    "id": "q-081",
+    "category": "exact",
+    "text": "Kartla ödeme ve Banka havalesi açıklaması",
+    "relevant_ids": [
+      "doc-17",
+      "doc-18"
+    ],
+    "group_id": "payment_methods",
+    "split": "development"
+  },
+  {
+    "id": "q-082",
+    "category": "case",
+    "text": "KARTLA ÖDEME VE BANKA HAVALESİ AÇIKLAMASI",
+    "relevant_ids": [
+      "doc-17",
+      "doc-18"
+    ],
+    "group_id": "payment_methods",
+    "split": "development"
+  },
+  {
+    "id": "q-083",
+    "category": "paraphrase",
+    "text": "Kartla ve havaleyle ödeme yolları neler?",
+    "relevant_ids": [
+      "doc-17",
+      "doc-18"
+    ],
+    "group_id": "payment_methods",
+    "split": "development"
+  },
+  {
+    "id": "q-084",
+    "category": "suffix",
+    "text": "Kredi kartı ya da banka havalesiyle sipariş ödemesi nasıl yapılır?",
+    "relevant_ids": [
+      "doc-17",
+      "doc-18"
+    ],
+    "group_id": "payment_methods",
+    "split": "development"
+  },
+  {
+    "id": "q-085",
+    "category": "exact",
+    "text": "Yıllık izin isteği ve Hastalık izni bildirimi",
+    "relevant_ids": [
+      "doc-05",
+      "doc-06"
+    ],
+    "group_id": "leave_types",
+    "split": "development"
+  },
+  {
+    "id": "q-086",
+    "category": "case",
+    "text": "YILLIK İZİN İSTEĞİ VE HASTALIK İZNİ BİLDİRİMİ",
+    "relevant_ids": [
+      "doc-05",
+      "doc-06"
+    ],
+    "group_id": "leave_types",
+    "split": "development"
+  },
+  {
+    "id": "q-087",
+    "category": "paraphrase",
+    "text": "Yıllık izin talebini ve hastalık izni bildirimini nasıl yaparım?",
+    "relevant_ids": [
+      "doc-05",
+      "doc-06"
+    ],
+    "group_id": "leave_types",
+    "split": "development"
+  },
+  {
+    "id": "q-088",
+    "category": "suffix",
+    "text": "Hem yıllık izin başvurusu hem hastalık raporu bildirimi hangi sistemden yapılır?",
+    "relevant_ids": [
+      "doc-05",
+      "doc-06"
+    ],
+    "group_id": "leave_types",
+    "split": "development"
+  }
+]

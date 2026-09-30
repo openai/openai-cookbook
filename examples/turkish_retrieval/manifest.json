@@ -1,0 +1,30 @@
+{
+  "title": "Fictional Turkish document retrieval dataset",
+  "fictional_data": true,
+  "quality_claim": "This small fictional fixture makes no claim about general Turkish retrieval quality; the labels were not independently adjudicated.",
+  "source_schema": "documents.json keeps id/title/text. Answerable queries keep id/category/text/relevant_ids and add group_id/split. Unanswerable queries are in a separate file with empty relevant_ids.",
+  "counts": {
+    "documents": 40,
+    "answerable_queries": 88,
+    "unanswerable_queries": 20,
+    "query_families": 22
+  },
+  "split": {
+    "development": "14 answerable families (56 queries) and 11 unanswerable queries",
+    "default": "The evaluator uses development queries by default. The full 40-document corpus remains searchable for every split.",
+    "leakage_control": "All query records use group_id and split. Close unanswerable intents share the corresponding answerable family group and split: shipment (ua-03/ua-04), address (ua-05), return (ua-06), branch_hours (ua-07/ua-10), leave (ua-08), password (ua-09), and library (ua-12). Keep each group intact when splitting. The remaining unanswerable intents have unique group IDs.",
+    "held-out": "8 answerable families (32 queries) and 9 unanswerable queries"
+  },
+  "categories": "Answerable labels include exact phrase, uppercase/Turkish casing, ASCII spelling (where marked), paraphrase, and suffix/inflection changes. Some intents intentionally have multiple relevant documents.",
+  "limitations": [
+    "Unanswerable queries are in a separate file because the current evaluator requires nonempty relevant_ids.",
+    "Labels were authored alongside the documents for this draft, not independently adjudicated.",
+    "This fixture is for workflow exploration and does not support a general quality claim."
+  ],
+  "files": [
+    "documents.json",
+    "queries.json",
+    "unanswerable_queries.json"
+  ],
+  "held_out_policy": "Reserved for a final untouched evaluation. No held-out benchmark is included in the development results."
+}

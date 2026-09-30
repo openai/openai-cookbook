@@ -1,0 +1,162 @@
+[
+  {
+    "id": "ua-01",
+    "category": "unanswerable",
+    "text": "Şirketin Mars ofisinde kahvaltı servisi saat kaçta başlıyor?",
+    "group_id": "noanswer-01",
+    "split": "development",
+    "relevant_ids": []
+  },
+  {
+    "id": "ua-02",
+    "category": "unanswerable",
+    "text": "Evcil hayvanım için uzaktan veteriner görüşmesini nereden ayarlarım?",
+    "group_id": "noanswer-02",
+    "split": "development",
+    "relevant_ids": []
+  },
+  {
+    "id": "ua-03",
+    "category": "unanswerable",
+    "text": "Kargo gönderim ücreti sipariş tutarına göre ne kadar değişiyor?",
+    "group_id": "shipment",
+    "split": "development",
+    "relevant_ids": []
+  },
+  {
+    "id": "ua-04",
+    "category": "unanswerable",
+    "text": "Kargomun takip numarasını SMS ile de alabilir miyim?",
+    "group_id": "shipment",
+    "split": "development",
+    "relevant_ids": []
+  },
+  {
+    "id": "ua-05",
+    "category": "unanswerable",
+    "text": "Taşıyıcı adres değişikliği için kaç lira ücret alır?",
+    "group_id": "address",
+    "split": "development",
+    "relevant_ids": []
+  },
+  {
+    "id": "ua-06",
+    "category": "unanswerable",
+    "text": "Kusurlu ürün değişiminde kargo ücretini kim karşılıyor?",
+    "group_id": "return",
+    "split": "development",
+    "relevant_ids": []
+  },
+  {
+    "id": "ua-07",
+    "category": "unanswerable",
+    "text": "İstanbul şubesinde resmî tatil günlerinde çalışma saati nedir?",
+    "group_id": "branch_hours",
+    "split": "development",
+    "relevant_ids": []
+  },
+  {
+    "id": "ua-08",
+    "category": "unanswerable",
+    "text": "Yıllık izin talebini kaç gün önceden girmek gerekiyor?",
+    "group_id": "leave",
+    "split": "development",
+    "relevant_ids": []
+  },
+  {
+    "id": "ua-09",
+    "category": "unanswerable",
+    "text": "Parola yenileme e-postası gelmezse ne kadar beklemeliyim?",
+    "group_id": "password",
+    "split": "development",
+    "relevant_ids": []
+  },
+  {
+    "id": "ua-10",
+    "category": "unanswerable",
+    "text": "İstanbul merkez şubesi resmî tatilde hizmet veriyor mu?",
+    "group_id": "branch_hours",
+    "split": "development",
+    "relevant_ids": []
+  },
+  {
+    "id": "ua-11",
+    "category": "unanswerable",
+    "text": "İş seyahatinde taksi masrafı için kilometre başı ödeme ne kadar?",
+    "group_id": "noanswer-11",
+    "split": "development",
+    "relevant_ids": []
+  },
+  {
+    "id": "ua-12",
+    "category": "unanswerable",
+    "text": "Kütüphanede geciken kitap için günlük ceza uygulanıyor mu?",
+    "group_id": "library",
+    "split": "held-out",
+    "relevant_ids": []
+  },
+  {
+    "id": "ua-13",
+    "category": "unanswerable",
+    "text": "Hafta sonu çocuklar için robotik kodlama kursu var mı?",
+    "group_id": "noanswer-13",
+    "split": "held-out",
+    "relevant_ids": []
+  },
+  {
+    "id": "ua-14",
+    "category": "unanswerable",
+    "text": "Dağ evine giden servis aracının kalkış noktası neresi?",
+    "group_id": "noanswer-14",
+    "split": "held-out",
+    "relevant_ids": []
+  },
+  {
+    "id": "ua-15",
+    "category": "unanswerable",
+    "text": "Hangi restoranda vegan doğum günü pastası sipariş edebilirim?",
+    "group_id": "noanswer-15",
+    "split": "held-out",
+    "relevant_ids": []
+  },
+  {
+    "id": "ua-16",
+    "category": "unanswerable",
+    "text": "Şirketin yayımladığı son sürdürülebilirlik raporunu gönderir misiniz?",
+    "group_id": "noanswer-16",
+    "split": "held-out",
+    "relevant_ids": []
+  },
+  {
+    "id": "ua-17",
+    "category": "unanswerable",
+    "text": "Yaz kampında çadır ve uyku tulumu veriliyor mu?",
+    "group_id": "noanswer-17",
+    "split": "held-out",
+    "relevant_ids": []
+  },
+  {
+    "id": "ua-18",
+    "category": "unanswerable",
+    "text": "Uzaktan çalışma için internet faturası desteği ne kadar?",
+    "group_id": "noanswer-18",
+    "split": "held-out",
+    "relevant_ids": []
+  },
+  {
+    "id": "ua-19",
+    "category": "unanswerable",
+    "text": "Kayıp pasaport başvurusu için konsoloslukta hangi sıra numarası alınır?",
+    "group_id": "noanswer-19",
+    "split": "held-out",
+    "relevant_ids": []
+  },
+  {
+    "id": "ua-20",
+    "category": "unanswerable",
+    "text": "Drone uçurmak için tesisin hangi bölümünden izin almalıyım?",
+    "group_id": "noanswer-20",
+    "split": "held-out",
+    "relevant_ids": []
+  }
+]

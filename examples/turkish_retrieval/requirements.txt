@@ -1,0 +1,2 @@
+# Optional: only needed for --method embeddings.
+openai>=1.0.0

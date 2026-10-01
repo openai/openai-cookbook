@@ -1,0 +1,45 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="1440" height="964" viewBox="0 0 1440 964" role="img" aria-labelledby="title description">
+<title id="title">Bulk document review workflow</title>
+<desc id="description">User to Review command: Submit document folder. Review command to Agents API: Create multi-agent session. Review command to Input / output folders: Mount input + policy read-only; output writable. Agents API to Specialist subagents: Delegate each document. Specialist subagents to Mounted review skill: Discover and apply policy. Specialist subagents to Input / output folders: Write individual JSON reports. Agents API to Input / output folders: Write consolidated summary. Review command to User: Return findings for review.</desc>
+<defs><marker id="arrow" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="8" markerHeight="8" orient="auto-start-reverse" markerUnits="userSpaceOnUse"><path d="M 0 0 L 10 5 L 0 10 Z" fill="#253443"/></marker></defs>
+<rect width="1440" height="964" fill="#FFFFFF"/>
+<g font-family="Arial, Helvetica, sans-serif">
+<text x="24" y="46" text-anchor="start" font-size="26" font-weight="600" fill="#162231"><tspan x="24" dy="0">Bulk document review</tspan></text>
+<rect x="24" y="80" width="220.33333333333334" height="805.8000000000002" fill="#F4F5F6"/>
+<rect x="24" y="80" width="220.33333333333334" height="78" fill="#E4E6E9"/>
+<text x="134.16666666666669" y="125.05" text-anchor="middle" font-size="23" font-weight="600" fill="#162231"><tspan x="134.16666666666669" dy="0">User</tspan></text>
+<path d="M 134.16666666666669 158 V 885.8000000000002" fill="none" stroke="#A8B3BC" stroke-width="1" stroke-dasharray="6 6"/>
+<rect x="258.33333333333337" y="80" width="220.33333333333334" height="805.8000000000002" fill="#EDF7FE"/>
+<rect x="258.33333333333337" y="80" width="220.33333333333334" height="78" fill="#CCE6FA"/>
+<text x="368.5" y="125.05" text-anchor="middle" font-size="23" font-weight="600" fill="#162231"><tspan x="368.5" dy="0">Review command</tspan></text>
+<path d="M 368.5 158 V 885.8000000000002" fill="none" stroke="#A8B3BC" stroke-width="1" stroke-dasharray="6 6"/>
+<rect x="492.6666666666667" y="80" width="220.33333333333334" height="805.8000000000002" fill="#EEFBF3"/>
+<rect x="492.6666666666667" y="80" width="220.33333333333334" height="78" fill="#CDF2DB"/>
+<text x="602.8333333333334" y="125.05" text-anchor="middle" font-size="23" font-weight="600" fill="#162231"><tspan x="602.8333333333334" dy="0">Agents API</tspan></text>
+<path d="M 602.8333333333334 158 V 885.8000000000002" fill="none" stroke="#A8B3BC" stroke-width="1" stroke-dasharray="6 6"/>
+<rect x="727" y="80" width="220.33333333333334" height="805.8000000000002" fill="#EEFBF3"/>
+<rect x="727" y="80" width="220.33333333333334" height="78" fill="#CDF2DB"/>
+<text x="837.1666666666667" y="110.1" text-anchor="middle" font-size="23" font-weight="600" fill="#162231"><tspan x="837.1666666666667" dy="0">Specialist</tspan><tspan x="837.1666666666667" dy="29.900000000000002">subagents</tspan></text>
+<path d="M 837.1666666666667 158 V 378.4" fill="none" stroke="#A8B3BC" stroke-width="1" stroke-dasharray="6 6"/>
+<path d="M 837.1666666666667 411 V 710.0000000000001" fill="none" stroke="#A8B3BC" stroke-width="1" stroke-dasharray="6 6"/>
+<path d="M 837.1666666666667 742.6000000000001 V 885.8000000000002" fill="none" stroke="#A8B3BC" stroke-width="1" stroke-dasharray="6 6"/>
+<rect x="961.3333333333334" y="80" width="220.33333333333334" height="805.8000000000002" fill="#EDF7FE"/>
+<rect x="961.3333333333334" y="80" width="220.33333333333334" height="78" fill="#CCE6FA"/>
+<text x="1071.5" y="110.1" text-anchor="middle" font-size="23" font-weight="600" fill="#162231"><tspan x="1071.5" dy="0">Mounted review</tspan><tspan x="1071.5" dy="29.900000000000002">skill</tspan></text>
+<path d="M 1071.5 158 V 641.4000000000001" fill="none" stroke="#A8B3BC" stroke-width="1" stroke-dasharray="6 6"/>
+<path d="M 1071.5 674.0000000000001 V 710.0000000000001" fill="none" stroke="#A8B3BC" stroke-width="1" stroke-dasharray="6 6"/>
+<path d="M 1071.5 742.6000000000001 V 885.8000000000002" fill="none" stroke="#A8B3BC" stroke-width="1" stroke-dasharray="6 6"/>
+<rect x="1195.6666666666667" y="80" width="220.33333333333334" height="805.8000000000002" fill="#FFFCED"/>
+<rect x="1195.6666666666667" y="80" width="220.33333333333334" height="78" fill="#FFF0B3"/>
+<text x="1305.8333333333335" y="110.1" text-anchor="middle" font-size="23" font-weight="600" fill="#162231"><tspan x="1305.8333333333335" dy="0">Input / output</tspan><tspan x="1305.8333333333335" dy="29.900000000000002">folders</tspan></text>
+<path d="M 1305.8333333333335 158 V 885.8000000000002" fill="none" stroke="#A8B3BC" stroke-width="1" stroke-dasharray="6 6"/>
+<g data-from="0" data-to="1"><path d="M 134.16666666666669 251.2 H 368.5" fill="none" stroke="#253443" stroke-width="1.6"  marker-end="url(#arrow)"/><text x="251.33333333333334" y="208" text-anchor="middle" font-size="22" font-weight="400" fill="#162231"><tspan x="251.33333333333334" dy="0">Submit document</tspan><tspan x="251.33333333333334" dy="28.6">folder</tspan></text></g>
+<g data-from="1" data-to="2"><path d="M 368.5 348.4 H 602.8333333333334" fill="none" stroke="#253443" stroke-width="1.6"  marker-end="url(#arrow)"/><text x="485.6666666666667" y="305.2" text-anchor="middle" font-size="22" font-weight="400" fill="#162231"><tspan x="485.6666666666667" dy="0">Create multi-agent</tspan><tspan x="485.6666666666667" dy="28.6">session</tspan></text></g>
+<g data-from="1" data-to="5"><path d="M 368.5 417 H 1305.8333333333335" fill="none" stroke="#253443" stroke-width="1.6"  marker-end="url(#arrow)"/><text x="837.1666666666667" y="402.4" text-anchor="middle" font-size="22" font-weight="400" fill="#162231"><tspan x="837.1666666666667" dy="0">Mount input + policy read-only; output writable</tspan></text></g>
+<g data-from="2" data-to="3"><path d="M 602.8333333333334 514.2 H 837.1666666666667" fill="none" stroke="#253443" stroke-width="1.6"  marker-end="url(#arrow)"/><text x="720" y="471" text-anchor="middle" font-size="22" font-weight="400" fill="#162231"><tspan x="720" dy="0">Delegate each</tspan><tspan x="720" dy="28.6">document</tspan></text></g>
+<g data-from="3" data-to="4"><path d="M 837.1666666666667 611.4000000000001 H 1071.5" fill="none" stroke="#253443" stroke-width="1.6"  marker-end="url(#arrow)"/><text x="954.3333333333334" y="568.2" text-anchor="middle" font-size="22" font-weight="400" fill="#162231"><tspan x="954.3333333333334" dy="0">Discover and apply</tspan><tspan x="954.3333333333334" dy="28.6">policy</tspan></text></g>
+<g data-from="3" data-to="5"><path d="M 837.1666666666667 680.0000000000001 H 1305.8333333333335" fill="none" stroke="#253443" stroke-width="1.6"  marker-end="url(#arrow)"/><text x="1071.5" y="665.4000000000001" text-anchor="middle" font-size="22" font-weight="400" fill="#162231"><tspan x="1071.5" dy="0">Write individual JSON reports</tspan></text></g>
+<g data-from="2" data-to="5"><path d="M 602.8333333333334 748.6000000000001 H 1305.8333333333335" fill="none" stroke="#253443" stroke-width="1.6"  marker-end="url(#arrow)"/><text x="954.3333333333335" y="734.0000000000001" text-anchor="middle" font-size="22" font-weight="400" fill="#162231"><tspan x="954.3333333333335" dy="0">Write consolidated summary</tspan></text></g>
+<g data-from="1" data-to="0"><path d="M 368.5 845.8000000000002 H 134.16666666666669" fill="none" stroke="#253443" stroke-width="1.6" stroke-dasharray="7 5" marker-end="url(#arrow)"/><text x="251.33333333333334" y="802.6000000000001" text-anchor="middle" font-size="22" font-weight="400" fill="#162231"><tspan x="251.33333333333334" dy="0">Return findings for</tspan><tspan x="251.33333333333334" dy="28.6">review</tspan></text></g>
+<text x="24" y="930.8000000000002" text-anchor="start" font-size="17" font-weight="400" fill="#4D5B6A"><tspan x="24" dy="0">Specialists share one sandbox; findings still require human review.</tspan></text>
+</g></svg>

@@ -1,0 +1,3 @@
+openai>=3.19.0
+boto3>=1.43.34
+httpx[socks]>=0.27

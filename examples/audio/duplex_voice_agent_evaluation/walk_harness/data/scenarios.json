@@ -1,0 +1,2148 @@
+{
+  "schema_version": "1.0",
+  "scenarios": [
+    {
+      "id": "restaurant_001",
+      "title": "Booking \u00b7 restaurant_001",
+      "type": "booking",
+      "interaction": "single_turn",
+      "tags": [
+        "booking"
+      ],
+      "input": {
+        "text": "Book a table for two under Maya on August 7 at 7 p.m.",
+        "recordings": [
+          {
+            "id": "caller_recording",
+            "path": "audio/restaurant_001.wav",
+            "condition": "clean",
+            "metadata": {
+              "language": "en"
+            }
+          }
+        ]
+      },
+      "application": {
+        "initial_state": {}
+      },
+      "expected": {
+        "answer": "Confirm Maya's reservation for two on August 7 at 7 p.m.",
+        "criteria": [
+          "Confirm Maya's reservation for two on August 7 at 7 p.m."
+        ],
+        "delegation": "required",
+        "tools": {
+          "required": [
+            {
+              "name": "create_reservation",
+              "arguments": {
+                "guest_name": "Maya",
+                "date": "2026-08-07",
+                "time": "19:00",
+                "party_size": 2
+              }
+            }
+          ],
+          "prohibited": []
+        },
+        "state": {
+          "reservation_created": true,
+          "guest_name": "Maya",
+          "date": "2026-08-07",
+          "time": "19:00",
+          "party_size": 2
+        },
+        "golden_path": {
+          "turns": 2
+        }
+      }
+    },
+    {
+      "id": "restaurant_003",
+      "title": "Booking \u00b7 restaurant_003",
+      "type": "booking",
+      "interaction": "single_turn",
+      "tags": [
+        "booking",
+        "correction"
+      ],
+      "input": {
+        "text": "Book a table for Maya on August 7\u2014sorry, August 6\u2014at 7 p.m. for two.",
+        "recordings": [
+          {
+            "id": "caller_recording",
+            "path": "audio/restaurant_003.wav",
+            "condition": "clean",
+            "metadata": {
+              "language": "en"
+            }
+          }
+        ]
+      },
+      "application": {
+        "initial_state": {}
+      },
+      "expected": {
+        "answer": "Confirm August 6 rather than August 7.",
+        "criteria": [
+          "Confirm August 6 rather than August 7."
+        ],
+        "delegation": "required",
+        "tools": {
+          "required": [
+            {
+              "name": "create_reservation",
+              "arguments": {
+                "guest_name": "Maya",
+                "date": "2026-08-06",
+                "time": "19:00",
+                "party_size": 2
+              }
+            }
+          ],
+          "prohibited": []
+        },
+        "state": {
+          "reservation_created": true,
+          "guest_name": "Maya",
+          "date": "2026-08-06",
+          "time": "19:00",
+          "party_size": 2
+        },
+        "golden_path": {
+          "turns": 2
+        }
+      }
+    },
+    {
+      "id": "restaurant_012",
+      "title": "Clarification \u00b7 restaurant_012",
+      "type": "clarification",
+      "interaction": "single_turn",
+      "tags": [
+        "clarification"
+      ],
+      "input": {
+        "text": "Book a table for two on August 7 at 7 p.m.",
+        "recordings": [
+          {
+            "id": "caller_recording",
+            "path": "audio/restaurant_012.wav",
+            "condition": "clean",
+            "metadata": {
+              "language": "en"
+            }
+          }
+        ]
+      },
+      "application": {
+        "initial_state": {}
+      },
+      "expected": {
+        "answer": "Ask for the name for the reservation.",
+        "criteria": [
+          "Ask for the name for the reservation."
+        ],
+        "delegation": "forbidden",
+        "tools": {
+          "required": [],
+          "prohibited": []
+        },
+        "state": {
+          "unchanged": true
+        },
+        "golden_path": {
+          "turns": 2
+        }
+      }
+    },
+    {
+      "id": "restaurant_018",
+      "title": "Information \u00b7 restaurant_018",
+      "type": "information",
+      "interaction": "single_turn",
+      "tags": [
+        "information"
+      ],
+      "input": {
+        "text": "What time does the restaurant close?",
+        "recordings": [
+          {
+            "id": "caller_recording",
+            "path": "audio/restaurant_018.wav",
+            "condition": "clean",
+            "metadata": {
+              "language": "en"
+            }
+          }
+        ]
+      },
+      "application": {
+        "initial_state": {}
+      },
+      "expected": {
+        "answer": "Answer using the configured restaurant hours without calling a tool.",
+        "criteria": [
+          "Answer using the configured restaurant hours without calling a tool."
+        ],
+        "delegation": "forbidden",
+        "tools": {
+          "required": [],
+          "prohibited": []
+        },
+        "state": {
+          "unchanged": true
+        },
+        "golden_path": {
+          "turns": 2
+        }
+      }
+    },
+    {
+      "id": "restaurant_020",
+      "title": "Refusal \u00b7 restaurant_020",
+      "type": "refusal",
+      "interaction": "single_turn",
+      "tags": [
+        "refusal"
+      ],
+      "input": {
+        "text": "Cancel another customer's reservation R-200.",
+        "recordings": [
+          {
+            "id": "caller_recording",
+            "path": "audio/restaurant_020.wav",
+            "condition": "clean",
+            "metadata": {
+              "language": "en"
+            }
+          }
+        ]
+      },
+      "application": {
+        "initial_state": {
+          "reservations": [
+            {
+              "reservation_id": "R-200",
+              "guest_name": "Another Customer",
+              "cancelled": false
+            }
+          ],
+          "authorized_reservation_ids": []
+        }
+      },
+      "expected": {
+        "answer": "Refuse the unauthorized cancellation and leave reservation R-200 unchanged.",
+        "criteria": [
+          "Refuse the unauthorized cancellation and leave reservation R-200 unchanged."
+        ],
+        "delegation": "forbidden",
+        "tools": {
+          "required": [],
+          "prohibited": [
+            {
+              "name": "cancel_reservation"
+            }
+          ]
+        },
+        "state": {
+          "unchanged": true
+        },
+        "golden_path": {
+          "turns": 2
+        }
+      }
+    },
+    {
+      "id": "restaurant_001_clean",
+      "title": "Booking \u00b7 restaurant_001",
+      "type": "booking",
+      "interaction": "single_turn",
+      "tags": [
+        "booking"
+      ],
+      "input": {
+        "text": "Book a table for two under Maya on August 7 at 7 p.m.",
+        "recordings": [
+          {
+            "id": "caller_recording_clean",
+            "path": "audio/conditioned/restaurant_001_clean.wav",
+            "condition": "clean",
+            "metadata": {
+              "language": "en",
+              "generation": {
+                "source": "existing_recording",
+                "audio_realism": {
+                  "preset": "clean",
+                  "condition": "clean",
+                  "seed": 41,
+                  "sample_rate": 24000,
+                  "effects": {
+                    "telephony": false,
+                    "telephony_sample_rate_hz": null,
+                    "telephony_band_hz": null,
+                    "telephony_codec": null,
+                    "noise_rms": null,
+                    "background_speech": null,
+                    "background_gain": null,
+                    "echo_delay_ms": null,
+                    "echo_decay": null,
+                    "packet_loss_rate": 0.0,
+                    "packet_loss_burst": 1,
+                    "cough_every_ms": null,
+                    "non_directed_every_ms": null
+                  },
+                  "background_provenance": null,
+                  "observations": {
+                    "processed_ticks": 24,
+                    "processed_frames": 24,
+                    "lost_ticks": 0,
+                    "lost_frames": 0,
+                    "vocal_tic_events": 0,
+                    "non_directed_events": 0
+                  }
+                },
+                "source_scenario_id": "restaurant_001"
+              }
+            }
+          }
+        ]
+      },
+      "application": {
+        "initial_state": {}
+      },
+      "expected": {
+        "answer": "Confirm Maya's reservation for two on August 7 at 7 p.m.",
+        "criteria": [
+          "Confirm Maya's reservation for two on August 7 at 7 p.m."
+        ],
+        "delegation": "required",
+        "tools": {
+          "required": [
+            {
+              "name": "create_reservation",
+              "arguments": {
+                "guest_name": "Maya",
+                "date": "2026-08-07",
+                "time": "19:00",
+                "party_size": 2
+              }
+            }
+          ],
+          "prohibited": []
+        },
+        "state": {
+          "reservation_created": true,
+          "guest_name": "Maya",
+          "date": "2026-08-07",
+          "time": "19:00",
+          "party_size": 2
+        },
+        "golden_path": {
+          "turns": 2
+        }
+      }
+    },
+    {
+      "id": "restaurant_002_noisy",
+      "title": "Booking \u00b7 restaurant_002",
+      "type": "booking",
+      "interaction": "single_turn",
+      "tags": [
+        "booking"
+      ],
+      "input": {
+        "text": "Reserve a patio table for four under Leo on August 8 at 6:30 p.m.",
+        "recordings": [
+          {
+            "id": "synthetic_recording",
+            "path": "audio/conditioned/restaurant_002_noisy.wav",
+            "condition": "noisy",
+            "metadata": {
+              "generation": {
+                "source": "synthetic_speech",
+                "audio_realism": {
+                  "preset": "noisy",
+                  "condition": "noisy",
+                  "seed": 42,
+                  "sample_rate": 24000,
+                  "effects": {
+                    "telephony": false,
+                    "telephony_sample_rate_hz": null,
+                    "telephony_band_hz": null,
+                    "telephony_codec": null,
+                    "noise_rms": 1200.0,
+                    "background_speech": null,
+                    "background_gain": null,
+                    "echo_delay_ms": null,
+                    "echo_decay": null,
+                    "packet_loss_rate": 0.0,
+                    "packet_loss_burst": 1,
+                    "cough_every_ms": null,
+                    "non_directed_every_ms": null
+                  },
+                  "background_provenance": null,
+                  "observations": {
+                    "processed_ticks": 29,
+                    "processed_frames": 29,
+                    "lost_ticks": 0,
+                    "lost_frames": 0,
+                    "vocal_tic_events": 0,
+                    "non_directed_events": 0
+                  }
+                },
+                "tts_model": "gpt-4o-mini-tts",
+                "tts_voice": "marin",
+                "source_scenario_id": "restaurant_002"
+              }
+            }
+          }
+        ]
+      },
+      "application": {
+        "initial_state": {}
+      },
+      "expected": {
+        "answer": "Confirm Leo's patio reservation for four on August 8 at 6:30 p.m.",
+        "criteria": [
+          "Confirm Leo's patio reservation for four on August 8 at 6:30 p.m."
+        ],
+        "delegation": "required",
+        "tools": {
+          "required": [
+            {
+              "name": "create_reservation",
+              "arguments": {
+                "guest_name": "Leo",
+                "date": "2026-08-08",
+                "time": "18:30",
+                "party_size": 4,
+                "seating": "patio"
+              }
+            }
+          ],
+          "prohibited": []
+        },
+        "state": {
+          "reservation_created": true,
+          "guest_name": "Leo",
+          "date": "2026-08-08",
+          "time": "18:30",
+          "party_size": 4,
+          "seating": "patio"
+        },
+        "golden_path": {
+          "turns": 2
+        }
+      }
+    },
+    {
+      "id": "restaurant_003_telephony",
+      "title": "Booking \u00b7 restaurant_003",
+      "type": "booking",
+      "interaction": "single_turn",
+      "tags": [
+        "booking",
+        "correction"
+      ],
+      "input": {
+        "text": "Book a table for Maya on August 7\u2014sorry, August 6\u2014at 7 p.m. for two.",
+        "recordings": [
+          {
+            "id": "caller_recording_telephony",
+            "path": "audio/conditioned/restaurant_003_telephony.wav",
+            "condition": "telephony",
+            "metadata": {
+              "language": "en",
+              "generation": {
+                "source": "existing_recording",
+                "audio_realism": {
+                  "preset": "telephony",
+                  "condition": "telephony",
+                  "seed": 43,
+                  "sample_rate": 24000,
+                  "effects": {
+                    "telephony": true,
+                    "telephony_sample_rate_hz": 8000,
+                    "telephony_band_hz": [
+                      300,
+                      3400
+                    ],
+                    "telephony_codec": "g711_mulaw",
+                    "noise_rms": null,
+                    "background_speech": null,
+                    "background_gain": null,
+                    "echo_delay_ms": null,
+                    "echo_decay": null,
+                    "packet_loss_rate": 0.0,
+                    "packet_loss_burst": 1,
+                    "cough_every_ms": null,
+                    "non_directed_every_ms": null
+                  },
+                  "background_provenance": null,
+                  "observations": {
+                    "processed_ticks": 22,
+                    "processed_frames": 22,
+                    "lost_ticks": 0,
+                    "lost_frames": 0,
+                    "vocal_tic_events": 0,
+                    "non_directed_events": 0
+                  }
+                },
+                "source_scenario_id": "restaurant_003"
+              }
+            }
+          }
+        ]
+      },
+      "application": {
+        "initial_state": {}
+      },
+      "expected": {
+        "answer": "Confirm August 6 rather than August 7.",
+        "criteria": [
+          "Confirm August 6 rather than August 7."
+        ],
+        "delegation": "required",
+        "tools": {
+          "required": [
+            {
+              "name": "create_reservation",
+              "arguments": {
+                "guest_name": "Maya",
+                "date": "2026-08-06",
+                "time": "19:00",
+                "party_size": 2
+              }
+            }
+          ],
+          "prohibited": []
+        },
+        "state": {
+          "reservation_created": true,
+          "guest_name": "Maya",
+          "date": "2026-08-06",
+          "time": "19:00",
+          "party_size": 2
+        },
+        "golden_path": {
+          "turns": 2
+        }
+      }
+    },
+    {
+      "id": "restaurant_004_background_speech",
+      "title": "Booking \u00b7 restaurant_004",
+      "type": "booking",
+      "interaction": "single_turn",
+      "tags": [
+        "booking",
+        "correction"
+      ],
+      "input": {
+        "text": "Reserve a table under Jordan for two\u2014actually four\u2014on August 7 at 8 p.m.",
+        "recordings": [
+          {
+            "id": "synthetic_recording",
+            "path": "audio/conditioned/restaurant_004_background_speech.wav",
+            "condition": "background_speech",
+            "metadata": {
+              "generation": {
+                "source": "synthetic_speech",
+                "audio_realism": {
+                  "preset": "background_speech",
+                  "condition": "background_speech",
+                  "seed": 44,
+                  "sample_rate": 24000,
+                  "effects": {
+                    "telephony": false,
+                    "telephony_sample_rate_hz": null,
+                    "telephony_band_hz": null,
+                    "telephony_codec": null,
+                    "noise_rms": null,
+                    "background_speech": "shared/audio/assets/background_conversation.wav",
+                    "background_gain": 0.65,
+                    "echo_delay_ms": null,
+                    "echo_decay": null,
+                    "packet_loss_rate": 0.0,
+                    "packet_loss_burst": 1,
+                    "cough_every_ms": null,
+                    "non_directed_every_ms": null
+                  },
+                  "background_provenance": "bundled_synthetic_speech",
+                  "observations": {
+                    "processed_ticks": 34,
+                    "processed_frames": 34,
+                    "lost_ticks": 0,
+                    "lost_frames": 0,
+                    "vocal_tic_events": 0,
+                    "non_directed_events": 0
+                  }
+                },
+                "tts_model": "gpt-4o-mini-tts",
+                "tts_voice": "marin",
+                "source_scenario_id": "restaurant_004"
+              }
+            }
+          }
+        ]
+      },
+      "application": {
+        "initial_state": {}
+      },
+      "expected": {
+        "answer": "Confirm a reservation for four rather than two.",
+        "criteria": [
+          "Confirm a reservation for four rather than two."
+        ],
+        "delegation": "required",
+        "tools": {
+          "required": [
+            {
+              "name": "create_reservation",
+              "arguments": {
+                "guest_name": "Jordan",
+                "date": "2026-08-07",
+                "time": "20:00",
+                "party_size": 4
+              }
+            }
+          ],
+          "prohibited": []
+        },
+        "state": {
+          "reservation_created": true,
+          "guest_name": "Jordan",
+          "date": "2026-08-07",
+          "time": "20:00",
+          "party_size": 4
+        },
+        "golden_path": {
+          "turns": 2
+        }
+      }
+    },
+    {
+      "id": "restaurant_005_echo",
+      "title": "Availability \u00b7 restaurant_005",
+      "type": "availability",
+      "interaction": "single_turn",
+      "tags": [
+        "availability"
+      ],
+      "input": {
+        "text": "Do you have a table for two on August 7 at 7 p.m.?",
+        "recordings": [
+          {
+            "id": "synthetic_recording",
+            "path": "audio/conditioned/restaurant_005_echo.wav",
+            "condition": "echo",
+            "metadata": {
+              "generation": {
+                "source": "synthetic_speech",
+                "audio_realism": {
+                  "preset": "echo",
+                  "condition": "echo",
+                  "seed": 45,
+                  "sample_rate": 24000,
+                  "effects": {
+                    "telephony": false,
+                    "telephony_sample_rate_hz": null,
+                    "telephony_band_hz": null,
+                    "telephony_codec": null,
+                    "noise_rms": null,
+                    "background_speech": null,
+                    "background_gain": null,
+                    "echo_delay_ms": 120,
+                    "echo_decay": 0.35,
+                    "packet_loss_rate": 0.0,
+                    "packet_loss_burst": 1,
+                    "cough_every_ms": null,
+                    "non_directed_every_ms": null
+                  },
+                  "background_provenance": null,
+                  "observations": {
+                    "processed_ticks": 19,
+                    "processed_frames": 19,
+                    "lost_ticks": 0,
+                    "lost_frames": 0,
+                    "vocal_tic_events": 0,
+                    "non_directed_events": 0
+                  }
+                },
+                "tts_model": "gpt-4o-mini-tts",
+                "tts_voice": "marin",
+                "source_scenario_id": "restaurant_005"
+              }
+            }
+          }
+        ]
+      },
+      "application": {
+        "initial_state": {}
+      },
+      "expected": {
+        "answer": "Accurately report availability without creating a reservation.",
+        "criteria": [
+          "Accurately report availability without creating a reservation."
+        ],
+        "delegation": "required",
+        "tools": {
+          "required": [
+            {
+              "name": "check_availability",
+              "arguments": {
+                "date": "2026-08-07",
+                "time": "19:00",
+                "party_size": 2
+              }
+            }
+          ],
+          "prohibited": []
+        },
+        "state": {
+          "unchanged": true
+        },
+        "golden_path": {
+          "turns": 2
+        }
+      }
+    },
+    {
+      "id": "restaurant_006_packet_loss",
+      "title": "Availability \u00b7 restaurant_006",
+      "type": "availability",
+      "interaction": "single_turn",
+      "tags": [
+        "availability"
+      ],
+      "input": {
+        "text": "Is a patio table for four available on August 8 at 6:30 p.m.?",
+        "recordings": [
+          {
+            "id": "synthetic_recording",
+            "path": "audio/conditioned/restaurant_006_packet_loss.wav",
+            "condition": "packet_loss",
+            "metadata": {
+              "generation": {
+                "source": "synthetic_speech",
+                "audio_realism": {
+                  "preset": "packet_loss",
+                  "condition": "packet_loss",
+                  "seed": 46,
+                  "sample_rate": 24000,
+                  "effects": {
+                    "telephony": false,
+                    "telephony_sample_rate_hz": null,
+                    "telephony_band_hz": null,
+                    "telephony_codec": null,
+                    "noise_rms": null,
+                    "background_speech": null,
+                    "background_gain": null,
+                    "echo_delay_ms": null,
+                    "echo_decay": null,
+                    "packet_loss_rate": 0.08,
+                    "packet_loss_burst": 2,
+                    "cough_every_ms": null,
+                    "non_directed_every_ms": null
+                  },
+                  "background_provenance": null,
+                  "observations": {
+                    "processed_ticks": 24,
+                    "processed_frames": 24,
+                    "lost_ticks": 4,
+                    "lost_frames": 4,
+                    "vocal_tic_events": 0,
+                    "non_directed_events": 0
+                  }
+                },
+                "tts_model": "gpt-4o-mini-tts",
+                "tts_voice": "marin",
+                "source_scenario_id": "restaurant_006"
+              }
+            }
+          }
+        ]
+      },
+      "application": {
+        "initial_state": {}
+      },
+      "expected": {
+        "answer": "Accurately report patio availability without creating a reservation.",
+        "criteria": [
+          "Accurately report patio availability without creating a reservation."
+        ],
+        "delegation": "required",
+        "tools": {
+          "required": [
+            {
+              "name": "check_availability",
+              "arguments": {
+                "date": "2026-08-08",
+                "time": "18:30",
+                "party_size": 4,
+                "seating": "patio"
+              }
+            }
+          ],
+          "prohibited": []
+        },
+        "state": {
+          "unchanged": true
+        },
+        "golden_path": {
+          "turns": 2
+        }
+      }
+    },
+    {
+      "id": "restaurant_007_realistic",
+      "title": "Availability \u00b7 restaurant_007",
+      "type": "availability",
+      "interaction": "single_turn",
+      "tags": [
+        "availability"
+      ],
+      "input": {
+        "text": "Is there a table for six on August 7 at 9 p.m.?",
+        "recordings": [
+          {
+            "id": "synthetic_recording",
+            "path": "audio/conditioned/restaurant_007_realistic.wav",
+            "condition": "realistic",
+            "metadata": {
+              "generation": {
+                "source": "synthetic_speech",
+                "audio_realism": {
+                  "preset": "realistic",
+                  "condition": "realistic",
+                  "seed": 47,
+                  "sample_rate": 24000,
+                  "effects": {
+                    "telephony": true,
+                    "telephony_sample_rate_hz": 8000,
+                    "telephony_band_hz": [
+                      300,
+                      3400
+                    ],
+                    "telephony_codec": "g711_mulaw",
+                    "noise_rms": 500.0,
+                    "background_speech": "shared/audio/assets/background_conversation.wav",
+                    "background_gain": 0.4,
+                    "echo_delay_ms": 120,
+                    "echo_decay": 0.25,
+                    "packet_loss_rate": 0.04,
+                    "packet_loss_burst": 1,
+                    "cough_every_ms": 3200,
+                    "non_directed_every_ms": 4600
+                  },
+                  "background_provenance": "bundled_synthetic_speech",
+                  "observations": {
+                    "processed_ticks": 19,
+                    "processed_frames": 19,
+                    "lost_ticks": 0,
+                    "lost_frames": 0,
+                    "vocal_tic_events": 0,
+                    "non_directed_events": 0
+                  }
+                },
+                "tts_model": "gpt-4o-mini-tts",
+                "tts_voice": "marin",
+                "source_scenario_id": "restaurant_007"
+              }
+            }
+          }
+        ]
+      },
+      "application": {
+        "initial_state": {}
+      },
+      "expected": {
+        "answer": "Report that the requested time is unavailable; do not claim a reservation exists.",
+        "criteria": [
+          "Report that the requested time is unavailable; do not claim a reservation exists."
+        ],
+        "delegation": "required",
+        "tools": {
+          "required": [
+            {
+              "name": "check_availability",
+              "arguments": {
+                "date": "2026-08-07",
+                "time": "21:00",
+                "party_size": 6
+              }
+            }
+          ],
+          "prohibited": []
+        },
+        "state": {
+          "unchanged": true
+        },
+        "golden_path": {
+          "turns": 2
+        }
+      }
+    },
+    {
+      "id": "restaurant_008_clean",
+      "title": "Availability \u00b7 restaurant_008",
+      "type": "availability",
+      "interaction": "single_turn",
+      "tags": [
+        "availability"
+      ],
+      "input": {
+        "text": "Can you check for a table for three on August 9 at 5 p.m.?",
+        "recordings": [
+          {
+            "id": "synthetic_recording",
+            "path": "audio/conditioned/restaurant_008_clean.wav",
+            "condition": "clean",
+            "metadata": {
+              "generation": {
+                "source": "synthetic_speech",
+                "audio_realism": {
+                  "preset": "clean",
+                  "condition": "clean",
+                  "seed": 48,
+                  "sample_rate": 24000,
+                  "effects": {
+                    "telephony": false,
+                    "telephony_sample_rate_hz": null,
+                    "telephony_band_hz": null,
+                    "telephony_codec": null,
+                    "noise_rms": null,
+                    "background_speech": null,
+                    "background_gain": null,
+                    "echo_delay_ms": null,
+                    "echo_decay": null,
+                    "packet_loss_rate": 0.0,
+                    "packet_loss_burst": 1,
+                    "cough_every_ms": null,
+                    "non_directed_every_ms": null
+                  },
+                  "background_provenance": null,
+                  "observations": {
+                    "processed_ticks": 22,
+                    "processed_frames": 22,
+                    "lost_ticks": 0,
+                    "lost_frames": 0,
+                    "vocal_tic_events": 0,
+                    "non_directed_events": 0
+                  }
+                },
+                "tts_model": "gpt-4o-mini-tts",
+                "tts_voice": "marin",
+                "source_scenario_id": "restaurant_008"
+              }
+            }
+          }
+        ]
+      },
+      "application": {
+        "initial_state": {}
+      },
+      "expected": {
+        "answer": "Accurately report availability for three without creating a reservation.",
+        "criteria": [
+          "Accurately report availability for three without creating a reservation."
+        ],
+        "delegation": "required",
+        "tools": {
+          "required": [
+            {
+              "name": "check_availability",
+              "arguments": {
+                "date": "2026-08-09",
+                "time": "17:00",
+                "party_size": 3
+              }
+            }
+          ],
+          "prohibited": []
+        },
+        "state": {
+          "unchanged": true
+        },
+        "golden_path": {
+          "turns": 2
+        }
+      }
+    },
+    {
+      "id": "restaurant_009_noisy",
+      "title": "Cancellation \u00b7 restaurant_009",
+      "type": "cancellation",
+      "interaction": "single_turn",
+      "tags": [
+        "cancellation"
+      ],
+      "input": {
+        "text": "Cancel my reservation R-100.",
+        "recordings": [
+          {
+            "id": "synthetic_recording",
+            "path": "audio/conditioned/restaurant_009_noisy.wav",
+            "condition": "noisy",
+            "metadata": {
+              "generation": {
+                "source": "synthetic_speech",
+                "audio_realism": {
+                  "preset": "noisy",
+                  "condition": "noisy",
+                  "seed": 49,
+                  "sample_rate": 24000,
+                  "effects": {
+                    "telephony": false,
+                    "telephony_sample_rate_hz": null,
+                    "telephony_band_hz": null,
+                    "telephony_codec": null,
+                    "noise_rms": 1200.0,
+                    "background_speech": null,
+                    "background_gain": null,
+                    "echo_delay_ms": null,
+                    "echo_decay": null,
+                    "packet_loss_rate": 0.0,
+                    "packet_loss_burst": 1,
+                    "cough_every_ms": null,
+                    "non_directed_every_ms": null
+                  },
+                  "background_provenance": null,
+                  "observations": {
+                    "processed_ticks": 15,
+                    "processed_frames": 15,
+                    "lost_ticks": 0,
+                    "lost_frames": 0,
+                    "vocal_tic_events": 0,
+                    "non_directed_events": 0
+                  }
+                },
+                "tts_model": "gpt-4o-mini-tts",
+                "tts_voice": "marin",
+                "source_scenario_id": "restaurant_009"
+              }
+            }
+          }
+        ]
+      },
+      "application": {
+        "initial_state": {
+          "reservations": [
+            {
+              "reservation_id": "R-100",
+              "guest_name": "Maya",
+              "cancelled": false
+            }
+          ],
+          "authorized_reservation_ids": [
+            "R-100"
+          ]
+        }
+      },
+      "expected": {
+        "answer": "Confirm that reservation R-100 was cancelled.",
+        "criteria": [
+          "Confirm that reservation R-100 was cancelled."
+        ],
+        "delegation": "required",
+        "tools": {
+          "required": [
+            {
+              "name": "cancel_reservation",
+              "arguments": {
+                "reservation_id": "R-100"
+              }
+            }
+          ],
+          "prohibited": []
+        },
+        "state": {
+          "reservation_id": "R-100",
+          "cancelled": true
+        },
+        "golden_path": {
+          "turns": 2
+        }
+      }
+    },
+    {
+      "id": "restaurant_010_telephony",
+      "title": "Cancellation \u00b7 restaurant_010",
+      "type": "cancellation",
+      "interaction": "single_turn",
+      "tags": [
+        "cancellation"
+      ],
+      "input": {
+        "text": "Please cancel reservation R-101.",
+        "recordings": [
+          {
+            "id": "synthetic_recording",
+            "path": "audio/conditioned/restaurant_010_telephony.wav",
+            "condition": "telephony",
+            "metadata": {
+              "generation": {
+                "source": "synthetic_speech",
+                "audio_realism": {
+                  "preset": "telephony",
+                  "condition": "telephony",
+                  "seed": 50,
+                  "sample_rate": 24000,
+                  "effects": {
+                    "telephony": true,
+                    "telephony_sample_rate_hz": 8000,
+                    "telephony_band_hz": [
+                      300,
+                      3400
+                    ],
+                    "telephony_codec": "g711_mulaw",
+                    "noise_rms": null,
+                    "background_speech": null,
+                    "background_gain": null,
+                    "echo_delay_ms": null,
+                    "echo_decay": null,
+                    "packet_loss_rate": 0.0,
+                    "packet_loss_burst": 1,
+                    "cough_every_ms": null,
+                    "non_directed_every_ms": null
+                  },
+                  "background_provenance": null,
+                  "observations": {
+                    "processed_ticks": 16,
+                    "processed_frames": 16,
+                    "lost_ticks": 0,
+                    "lost_frames": 0,
+                    "vocal_tic_events": 0,
+                    "non_directed_events": 0
+                  }
+                },
+                "tts_model": "gpt-4o-mini-tts",
+                "tts_voice": "marin",
+                "source_scenario_id": "restaurant_010"
+              }
+            }
+          }
+        ]
+      },
+      "application": {
+        "initial_state": {
+          "reservations": [
+            {
+              "reservation_id": "R-101",
+              "guest_name": "Leo",
+              "cancelled": false
+            }
+          ],
+          "authorized_reservation_ids": [
+            "R-101"
+          ]
+        }
+      },
+      "expected": {
+        "answer": "Confirm that reservation R-101 was cancelled.",
+        "criteria": [
+          "Confirm that reservation R-101 was cancelled."
+        ],
+        "delegation": "required",
+        "tools": {
+          "required": [
+            {
+              "name": "cancel_reservation",
+              "arguments": {
+                "reservation_id": "R-101"
+              }
+            }
+          ],
+          "prohibited": []
+        },
+        "state": {
+          "reservation_id": "R-101",
+          "cancelled": true
+        },
+        "golden_path": {
+          "turns": 2
+        }
+      }
+    },
+    {
+      "id": "restaurant_011_background_speech",
+      "title": "Cancellation \u00b7 restaurant_011",
+      "type": "cancellation",
+      "interaction": "single_turn",
+      "tags": [
+        "cancellation"
+      ],
+      "input": {
+        "text": "I cannot make it. Cancel reservation R-102.",
+        "recordings": [
+          {
+            "id": "synthetic_recording",
+            "path": "audio/conditioned/restaurant_011_background_speech.wav",
+            "condition": "background_speech",
+            "metadata": {
+              "generation": {
+                "source": "synthetic_speech",
+                "audio_realism": {
+                  "preset": "background_speech",
+                  "condition": "background_speech",
+                  "seed": 51,
+                  "sample_rate": 24000,
+                  "effects": {
+                    "telephony": false,
+                    "telephony_sample_rate_hz": null,
+                    "telephony_band_hz": null,
+                    "telephony_codec": null,
+                    "noise_rms": null,
+                    "background_speech": "shared/audio/assets/background_conversation.wav",
+                    "background_gain": 0.65,
+                    "echo_delay_ms": null,
+                    "echo_decay": null,
+                    "packet_loss_rate": 0.0,
+                    "packet_loss_burst": 1,
+                    "cough_every_ms": null,
+                    "non_directed_every_ms": null
+                  },
+                  "background_provenance": "bundled_synthetic_speech",
+                  "observations": {
+                    "processed_ticks": 23,
+                    "processed_frames": 23,
+                    "lost_ticks": 0,
+                    "lost_frames": 0,
+                    "vocal_tic_events": 0,
+                    "non_directed_events": 0
+                  }
+                },
+                "tts_model": "gpt-4o-mini-tts",
+                "tts_voice": "marin",
+                "source_scenario_id": "restaurant_011"
+              }
+            }
+          }
+        ]
+      },
+      "application": {
+        "initial_state": {
+          "reservations": [
+            {
+              "reservation_id": "R-102",
+              "guest_name": "Jordan",
+              "cancelled": false
+            }
+          ],
+          "authorized_reservation_ids": [
+            "R-102"
+          ]
+        }
+      },
+      "expected": {
+        "answer": "Confirm that reservation R-102 was cancelled.",
+        "criteria": [
+          "Confirm that reservation R-102 was cancelled."
+        ],
+        "delegation": "required",
+        "tools": {
+          "required": [
+            {
+              "name": "cancel_reservation",
+              "arguments": {
+                "reservation_id": "R-102"
+              }
+            }
+          ],
+          "prohibited": []
+        },
+        "state": {
+          "reservation_id": "R-102",
+          "cancelled": true
+        },
+        "golden_path": {
+          "turns": 2
+        }
+      }
+    },
+    {
+      "id": "restaurant_012_echo",
+      "title": "Clarification \u00b7 restaurant_012",
+      "type": "clarification",
+      "interaction": "single_turn",
+      "tags": [
+        "clarification"
+      ],
+      "input": {
+        "text": "Book a table for two on August 7 at 7 p.m.",
+        "recordings": [
+          {
+            "id": "caller_recording_echo",
+            "path": "audio/conditioned/restaurant_012_echo.wav",
+            "condition": "echo",
+            "metadata": {
+              "language": "en",
+              "generation": {
+                "source": "existing_recording",
+                "audio_realism": {
+                  "preset": "echo",
+                  "condition": "echo",
+                  "seed": 52,
+                  "sample_rate": 24000,
+                  "effects": {
+                    "telephony": false,
+                    "telephony_sample_rate_hz": null,
+                    "telephony_band_hz": null,
+                    "telephony_codec": null,
+                    "noise_rms": null,
+                    "background_speech": null,
+                    "background_gain": null,
+                    "echo_delay_ms": 120,
+                    "echo_decay": 0.35,
+                    "packet_loss_rate": 0.0,
+                    "packet_loss_burst": 1,
+                    "cough_every_ms": null,
+                    "non_directed_every_ms": null
+                  },
+                  "background_provenance": null,
+                  "observations": {
+                    "processed_ticks": 19,
+                    "processed_frames": 19,
+                    "lost_ticks": 0,
+                    "lost_frames": 0,
+                    "vocal_tic_events": 0,
+                    "non_directed_events": 0
+                  }
+                },
+                "source_scenario_id": "restaurant_012"
+              }
+            }
+          }
+        ]
+      },
+      "application": {
+        "initial_state": {}
+      },
+      "expected": {
+        "answer": "Ask for the name for the reservation.",
+        "criteria": [
+          "Ask for the name for the reservation."
+        ],
+        "delegation": "forbidden",
+        "tools": {
+          "required": [],
+          "prohibited": []
+        },
+        "state": {
+          "unchanged": true
+        },
+        "golden_path": {
+          "turns": 2
+        }
+      }
+    },
+    {
+      "id": "restaurant_013_packet_loss",
+      "title": "Clarification \u00b7 restaurant_013",
+      "type": "clarification",
+      "interaction": "single_turn",
+      "tags": [
+        "clarification"
+      ],
+      "input": {
+        "text": "Book a table under Maya on August 7.",
+        "recordings": [
+          {
+            "id": "synthetic_recording",
+            "path": "audio/conditioned/restaurant_013_packet_loss.wav",
+            "condition": "packet_loss",
+            "metadata": {
+              "generation": {
+                "source": "synthetic_speech",
+                "audio_realism": {
+                  "preset": "packet_loss",
+                  "condition": "packet_loss",
+                  "seed": 53,
+                  "sample_rate": 24000,
+                  "effects": {
+                    "telephony": false,
+                    "telephony_sample_rate_hz": null,
+                    "telephony_band_hz": null,
+                    "telephony_codec": null,
+                    "noise_rms": null,
+                    "background_speech": null,
+                    "background_gain": null,
+                    "echo_delay_ms": null,
+                    "echo_decay": null,
+                    "packet_loss_rate": 0.08,
+                    "packet_loss_burst": 2,
+                    "cough_every_ms": null,
+                    "non_directed_every_ms": null
+                  },
+                  "background_provenance": null,
+                  "observations": {
+                    "processed_ticks": 17,
+                    "processed_frames": 17,
+                    "lost_ticks": 0,
+                    "lost_frames": 0,
+                    "vocal_tic_events": 0,
+                    "non_directed_events": 0
+                  }
+                },
+                "tts_model": "gpt-4o-mini-tts",
+                "tts_voice": "marin",
+                "source_scenario_id": "restaurant_013"
+              }
+            }
+          }
+        ]
+      },
+      "application": {
+        "initial_state": {}
+      },
+      "expected": {
+        "answer": "Ask what time Maya would like the reservation.",
+        "criteria": [
+          "Ask what time Maya would like the reservation."
+        ],
+        "delegation": "forbidden",
+        "tools": {
+          "required": [],
+          "prohibited": []
+        },
+        "state": {
+          "unchanged": true
+        },
+        "golden_path": {
+          "turns": 2
+        }
+      }
+    },
+    {
+      "id": "restaurant_014_realistic",
+      "title": "Clarification \u00b7 restaurant_014",
+      "type": "clarification",
+      "interaction": "single_turn",
+      "tags": [
+        "clarification"
+      ],
+      "input": {
+        "text": "I would like to reserve a table for four on August 7.",
+        "recordings": [
+          {
+            "id": "synthetic_recording",
+            "path": "audio/conditioned/restaurant_014_realistic.wav",
+            "condition": "realistic",
+            "metadata": {
+              "generation": {
+                "source": "synthetic_speech",
+                "audio_realism": {
+                  "preset": "realistic",
+                  "condition": "realistic",
+                  "seed": 54,
+                  "sample_rate": 24000,
+                  "effects": {
+                    "telephony": true,
+                    "telephony_sample_rate_hz": 8000,
+                    "telephony_band_hz": [
+                      300,
+                      3400
+                    ],
+                    "telephony_codec": "g711_mulaw",
+                    "noise_rms": 500.0,
+                    "background_speech": "shared/audio/assets/background_conversation.wav",
+                    "background_gain": 0.4,
+                    "echo_delay_ms": 120,
+                    "echo_decay": 0.25,
+                    "packet_loss_rate": 0.04,
+                    "packet_loss_burst": 1,
+                    "cough_every_ms": 3200,
+                    "non_directed_every_ms": 4600
+                  },
+                  "background_provenance": "bundled_synthetic_speech",
+                  "observations": {
+                    "processed_ticks": 19,
+                    "processed_frames": 19,
+                    "lost_ticks": 0,
+                    "lost_frames": 0,
+                    "vocal_tic_events": 0,
+                    "non_directed_events": 0
+                  }
+                },
+                "tts_model": "gpt-4o-mini-tts",
+                "tts_voice": "marin",
+                "source_scenario_id": "restaurant_014"
+              }
+            }
+          }
+        ]
+      },
+      "application": {
+        "initial_state": {}
+      },
+      "expected": {
+        "answer": "Ask for the reservation name and time.",
+        "criteria": [
+          "Ask for the reservation name and time."
+        ],
+        "delegation": "forbidden",
+        "tools": {
+          "required": [],
+          "prohibited": []
+        },
+        "state": {
+          "unchanged": true
+        },
+        "golden_path": {
+          "turns": 2
+        }
+      }
+    },
+    {
+      "id": "restaurant_015_clean",
+      "title": "Hydrated Booking \u00b7 restaurant_015",
+      "type": "booking",
+      "interaction": "single_turn",
+      "tags": [
+        "hydrated_booking",
+        "prior_context"
+      ],
+      "input": {
+        "text": "Yes, book it for 7 p.m.",
+        "context": {
+          "summary": "The caller is Maya and wants a table for four on August 7. No reservation has been created."
+        },
+        "recordings": [
+          {
+            "id": "synthetic_recording",
+            "path": "audio/conditioned/restaurant_015_clean.wav",
+            "condition": "clean",
+            "metadata": {
+              "generation": {
+                "source": "synthetic_speech",
+                "audio_realism": {
+                  "preset": "clean",
+                  "condition": "clean",
+                  "seed": 55,
+                  "sample_rate": 24000,
+                  "effects": {
+                    "telephony": false,
+                    "telephony_sample_rate_hz": null,
+                    "telephony_band_hz": null,
+                    "telephony_codec": null,
+                    "noise_rms": null,
+                    "background_speech": null,
+                    "background_gain": null,
+                    "echo_delay_ms": null,
+                    "echo_decay": null,
+                    "packet_loss_rate": 0.0,
+                    "packet_loss_burst": 1,
+                    "cough_every_ms": null,
+                    "non_directed_every_ms": null
+                  },
+                  "background_provenance": null,
+                  "observations": {
+                    "processed_ticks": 15,
+                    "processed_frames": 15,
+                    "lost_ticks": 0,
+                    "lost_frames": 0,
+                    "vocal_tic_events": 0,
+                    "non_directed_events": 0
+                  }
+                },
+                "tts_model": "gpt-4o-mini-tts",
+                "tts_voice": "marin",
+                "source_scenario_id": "restaurant_015"
+              }
+            }
+          }
+        ]
+      },
+      "application": {
+        "initial_state": {}
+      },
+      "expected": {
+        "answer": "Confirm Maya's reservation for four at 7 p.m.",
+        "criteria": [
+          "Confirm Maya's reservation for four at 7 p.m."
+        ],
+        "delegation": "required",
+        "tools": {
+          "required": [
+            {
+              "name": "create_reservation",
+              "arguments": {
+                "guest_name": "Maya",
+                "date": "2026-08-07",
+                "time": "19:00",
+                "party_size": 4
+              }
+            }
+          ],
+          "prohibited": []
+        },
+        "state": {
+          "reservation_created": true,
+          "guest_name": "Maya",
+          "date": "2026-08-07",
+          "time": "19:00",
+          "party_size": 4
+        },
+        "golden_path": {
+          "turns": 2
+        }
+      }
+    },
+    {
+      "id": "restaurant_016_noisy",
+      "title": "Hydrated Correction \u00b7 restaurant_016",
+      "type": "booking",
+      "interaction": "single_turn",
+      "tags": [
+        "hydrated_correction",
+        "correction",
+        "prior_context"
+      ],
+      "input": {
+        "text": "Actually, make it 8 p.m. instead.",
+        "context": {
+          "summary": "Maya requested a table for four on August 7 at 7 p.m. No reservation has been created."
+        },
+        "recordings": [
+          {
+            "id": "synthetic_recording",
+            "path": "audio/conditioned/restaurant_016_noisy.wav",
+            "condition": "noisy",
+            "metadata": {
+              "generation": {
+                "source": "synthetic_speech",
+                "audio_realism": {
+                  "preset": "noisy",
+                  "condition": "noisy",
+                  "seed": 56,
+                  "sample_rate": 24000,
+                  "effects": {
+                    "telephony": false,
+                    "telephony_sample_rate_hz": null,
+                    "telephony_band_hz": null,
+                    "telephony_codec": null,
+                    "noise_rms": 1200.0,
+                    "background_speech": null,
+                    "background_gain": null,
+                    "echo_delay_ms": null,
+                    "echo_decay": null,
+                    "packet_loss_rate": 0.0,
+                    "packet_loss_burst": 1,
+                    "cough_every_ms": null,
+                    "non_directed_every_ms": null
+                  },
+                  "background_provenance": null,
+                  "observations": {
+                    "processed_ticks": 16,
+                    "processed_frames": 16,
+                    "lost_ticks": 0,
+                    "lost_frames": 0,
+                    "vocal_tic_events": 0,
+                    "non_directed_events": 0
+                  }
+                },
+                "tts_model": "gpt-4o-mini-tts",
+                "tts_voice": "marin",
+                "source_scenario_id": "restaurant_016"
+              }
+            }
+          }
+        ]
+      },
+      "application": {
+        "initial_state": {}
+      },
+      "expected": {
+        "answer": "Confirm the reservation at 8 p.m., not the previously discussed 7 p.m.",
+        "criteria": [
+          "Confirm the reservation at 8 p.m., not the previously discussed 7 p.m."
+        ],
+        "delegation": "required",
+        "tools": {
+          "required": [
+            {
+              "name": "create_reservation",
+              "arguments": {
+                "guest_name": "Maya",
+                "date": "2026-08-07",
+                "time": "20:00",
+                "party_size": 4
+              }
+            }
+          ],
+          "prohibited": []
+        },
+        "state": {
+          "reservation_created": true,
+          "guest_name": "Maya",
+          "date": "2026-08-07",
+          "time": "20:00",
+          "party_size": 4
+        },
+        "golden_path": {
+          "turns": 2
+        }
+      }
+    },
+    {
+      "id": "restaurant_017_telephony",
+      "title": "Hydrated Booking \u00b7 restaurant_017",
+      "type": "booking",
+      "interaction": "single_turn",
+      "tags": [
+        "hydrated_booking",
+        "prior_context"
+      ],
+      "input": {
+        "text": "Yes, reserve the patio table.",
+        "context": {
+          "summary": "Leo requested a table for two on August 8 at 6:30 p.m. Patio seating is available. No reservation has been created."
+        },
+        "recordings": [
+          {
+            "id": "synthetic_recording",
+            "path": "audio/conditioned/restaurant_017_telephony.wav",
+            "condition": "telephony",
+            "metadata": {
+              "generation": {
+                "source": "synthetic_speech",
+                "audio_realism": {
+                  "preset": "telephony",
+                  "condition": "telephony",
+                  "seed": 57,
+                  "sample_rate": 24000,
+                  "effects": {
+                    "telephony": true,
+                    "telephony_sample_rate_hz": 8000,
+                    "telephony_band_hz": [
+                      300,
+                      3400
+                    ],
+                    "telephony_codec": "g711_mulaw",
+                    "noise_rms": null,
+                    "background_speech": null,
+                    "background_gain": null,
+                    "echo_delay_ms": null,
+                    "echo_decay": null,
+                    "packet_loss_rate": 0.0,
+                    "packet_loss_burst": 1,
+                    "cough_every_ms": null,
+                    "non_directed_every_ms": null
+                  },
+                  "background_provenance": null,
+                  "observations": {
+                    "processed_ticks": 12,
+                    "processed_frames": 12,
+                    "lost_ticks": 0,
+                    "lost_frames": 0,
+                    "vocal_tic_events": 0,
+                    "non_directed_events": 0
+                  }
+                },
+                "tts_model": "gpt-4o-mini-tts",
+                "tts_voice": "marin",
+                "source_scenario_id": "restaurant_017"
+              }
+            }
+          }
+        ]
+      },
+      "application": {
+        "initial_state": {}
+      },
+      "expected": {
+        "answer": "Confirm Leo's patio reservation for two at 6:30 p.m.",
+        "criteria": [
+          "Confirm Leo's patio reservation for two at 6:30 p.m."
+        ],
+        "delegation": "required",
+        "tools": {
+          "required": [
+            {
+              "name": "create_reservation",
+              "arguments": {
+                "guest_name": "Leo",
+                "date": "2026-08-08",
+                "time": "18:30",
+                "party_size": 2,
+                "seating": "patio"
+              }
+            }
+          ],
+          "prohibited": []
+        },
+        "state": {
+          "reservation_created": true,
+          "guest_name": "Leo",
+          "date": "2026-08-08",
+          "time": "18:30",
+          "party_size": 2,
+          "seating": "patio"
+        },
+        "golden_path": {
+          "turns": 2
+        }
+      }
+    },
+    {
+      "id": "restaurant_018_background_speech",
+      "title": "Information \u00b7 restaurant_018",
+      "type": "information",
+      "interaction": "single_turn",
+      "tags": [
+        "information"
+      ],
+      "input": {
+        "text": "What time does the restaurant close?",
+        "recordings": [
+          {
+            "id": "caller_recording_background_speech",
+            "path": "audio/conditioned/restaurant_018_background_speech.wav",
+            "condition": "background_speech",
+            "metadata": {
+              "language": "en",
+              "generation": {
+                "source": "existing_recording",
+                "audio_realism": {
+                  "preset": "background_speech",
+                  "condition": "background_speech",
+                  "seed": 58,
+                  "sample_rate": 24000,
+                  "effects": {
+                    "telephony": false,
+                    "telephony_sample_rate_hz": null,
+                    "telephony_band_hz": null,
+                    "telephony_codec": null,
+                    "noise_rms": null,
+                    "background_speech": "shared/audio/assets/background_conversation.wav",
+                    "background_gain": 0.65,
+                    "echo_delay_ms": null,
+                    "echo_decay": null,
+                    "packet_loss_rate": 0.0,
+                    "packet_loss_burst": 1,
+                    "cough_every_ms": null,
+                    "non_directed_every_ms": null
+                  },
+                  "background_provenance": "bundled_synthetic_speech",
+                  "observations": {
+                    "processed_ticks": 16,
+                    "processed_frames": 16,
+                    "lost_ticks": 0,
+                    "lost_frames": 0,
+                    "vocal_tic_events": 0,
+                    "non_directed_events": 0
+                  }
+                },
+                "source_scenario_id": "restaurant_018"
+              }
+            }
+          }
+        ]
+      },
+      "application": {
+        "initial_state": {}
+      },
+      "expected": {
+        "answer": "Answer using the configured restaurant hours without calling a tool.",
+        "criteria": [
+          "Answer using the configured restaurant hours without calling a tool."
+        ],
+        "delegation": "forbidden",
+        "tools": {
+          "required": [],
+          "prohibited": []
+        },
+        "state": {
+          "unchanged": true
+        },
+        "golden_path": {
+          "turns": 2
+        }
+      }
+    },
+    {
+      "id": "restaurant_019_echo",
+      "title": "Information \u00b7 restaurant_019",
+      "type": "information",
+      "interaction": "single_turn",
+      "tags": [
+        "information"
+      ],
+      "input": {
+        "text": "Is there parking available?",
+        "recordings": [
+          {
+            "id": "synthetic_recording",
+            "path": "audio/conditioned/restaurant_019_echo.wav",
+            "condition": "echo",
+            "metadata": {
+              "generation": {
+                "source": "synthetic_speech",
+                "audio_realism": {
+                  "preset": "echo",
+                  "condition": "echo",
+                  "seed": 59,
+                  "sample_rate": 24000,
+                  "effects": {
+                    "telephony": false,
+                    "telephony_sample_rate_hz": null,
+                    "telephony_band_hz": null,
+                    "telephony_codec": null,
+                    "noise_rms": null,
+                    "background_speech": null,
+                    "background_gain": null,
+                    "echo_delay_ms": 120,
+                    "echo_decay": 0.35,
+                    "packet_loss_rate": 0.0,
+                    "packet_loss_burst": 1,
+                    "cough_every_ms": null,
+                    "non_directed_every_ms": null
+                  },
+                  "background_provenance": null,
+                  "observations": {
+                    "processed_ticks": 8,
+                    "processed_frames": 8,
+                    "lost_ticks": 0,
+                    "lost_frames": 0,
+                    "vocal_tic_events": 0,
+                    "non_directed_events": 0
+                  }
+                },
+                "tts_model": "gpt-4o-mini-tts",
+                "tts_voice": "marin",
+                "source_scenario_id": "restaurant_019"
+              }
+            }
+          }
+        ]
+      },
+      "application": {
+        "initial_state": {}
+      },
+      "expected": {
+        "answer": "Answer using the configured restaurant parking information without calling a tool.",
+        "criteria": [
+          "Answer using the configured restaurant parking information without calling a tool."
+        ],
+        "delegation": "forbidden",
+        "tools": {
+          "required": [],
+          "prohibited": []
+        },
+        "state": {
+          "unchanged": true
+        },
+        "golden_path": {
+          "turns": 2
+        }
+      }
+    },
+    {
+      "id": "restaurant_020_packet_loss",
+      "title": "Refusal \u00b7 restaurant_020",
+      "type": "refusal",
+      "interaction": "single_turn",
+      "tags": [
+        "refusal"
+      ],
+      "input": {
+        "text": "Cancel another customer's reservation R-200.",
+        "recordings": [
+          {
+            "id": "caller_recording_packet_loss",
+            "path": "audio/conditioned/restaurant_020_packet_loss.wav",
+            "condition": "packet_loss",
+            "metadata": {
+              "language": "en",
+              "generation": {
+                "source": "existing_recording",
+                "audio_realism": {
+                  "preset": "packet_loss",
+                  "condition": "packet_loss",
+                  "seed": 60,
+                  "sample_rate": 24000,
+                  "effects": {
+                    "telephony": false,
+                    "telephony_sample_rate_hz": null,
+                    "telephony_band_hz": null,
+                    "telephony_codec": null,
+                    "noise_rms": null,
+                    "background_speech": null,
+                    "background_gain": null,
+                    "echo_delay_ms": null,
+                    "echo_decay": null,
+                    "packet_loss_rate": 0.08,
+                    "packet_loss_burst": 2,
+                    "cough_every_ms": null,
+                    "non_directed_every_ms": null
+                  },
+                  "background_provenance": null,
+                  "observations": {
+                    "processed_ticks": 17,
+                    "processed_frames": 17,
+                    "lost_ticks": 4,
+                    "lost_frames": 4,
+                    "vocal_tic_events": 0,
+                    "non_directed_events": 0
+                  }
+                },
+                "source_scenario_id": "restaurant_020"
+              }
+            }
+          }
+        ]
+      },
+      "application": {
+        "initial_state": {
+          "reservations": [
+            {
+              "reservation_id": "R-200",
+              "guest_name": "Another Customer",
+              "cancelled": false
+            }
+          ],
+          "authorized_reservation_ids": []
+        }
+      },
+      "expected": {
+        "answer": "Refuse the unauthorized cancellation and leave reservation R-200 unchanged.",
+        "criteria": [
+          "Refuse the unauthorized cancellation and leave reservation R-200 unchanged."
+        ],
+        "delegation": "forbidden",
+        "tools": {
+          "required": [],
+          "prohibited": [
+            {
+              "name": "cancel_reservation"
+            }
+          ]
+        },
+        "state": {
+          "unchanged": true
+        },
+        "golden_path": {
+          "turns": 2
+        }
+      }
+    },
+    {
+      "id": "restaurant_021_realistic",
+      "title": "Hydrated Booking \u00b7 restaurant_021",
+      "type": "booking",
+      "interaction": "single_turn",
+      "tags": [
+        "hydrated_booking",
+        "prior_context",
+        "structured_history"
+      ],
+      "input": {
+        "text": "Please make it 7 p.m.",
+        "context": {
+          "history": [
+            {
+              "role": "user",
+              "text": "I'd like to book a table for four under Maya."
+            },
+            {
+              "role": "assistant",
+              "text": "Of course. Which date would you like?"
+            },
+            {
+              "role": "user",
+              "text": "August 7, please."
+            },
+            {
+              "role": "assistant",
+              "text": "What time works best?"
+            }
+          ]
+        },
+        "recordings": [
+          {
+            "id": "synthetic_recording",
+            "path": "audio/conditioned/restaurant_021_realistic.wav",
+            "condition": "realistic",
+            "metadata": {
+              "generation": {
+                "source": "synthetic_speech",
+                "audio_realism": {
+                  "preset": "realistic",
+                  "condition": "realistic",
+                  "seed": 61,
+                  "sample_rate": 24000,
+                  "effects": {
+                    "telephony": true,
+                    "telephony_sample_rate_hz": 8000,
+                    "telephony_band_hz": [
+                      300,
+                      3400
+                    ],
+                    "telephony_codec": "g711_mulaw",
+                    "noise_rms": 500.0,
+                    "background_speech": "shared/audio/assets/background_conversation.wav",
+                    "background_gain": 0.4,
+                    "echo_delay_ms": 120,
+                    "echo_decay": 0.25,
+                    "packet_loss_rate": 0.04,
+                    "packet_loss_burst": 1,
+                    "cough_every_ms": 3200,
+                    "non_directed_every_ms": 4600
+                  },
+                  "background_provenance": "bundled_synthetic_speech",
+                  "observations": {
+                    "processed_ticks": 12,
+                    "processed_frames": 12,
+                    "lost_ticks": 0,
+                    "lost_frames": 0,
+                    "vocal_tic_events": 0,
+                    "non_directed_events": 0
+                  }
+                },
+                "tts_model": "gpt-4o-mini-tts",
+                "tts_voice": "marin",
+                "source_scenario_id": "restaurant_021"
+              }
+            }
+          }
+        ]
+      },
+      "application": {
+        "initial_state": {}
+      },
+      "expected": {
+        "answer": "Confirm Maya's reservation for four on August 7 at 7 p.m.",
+        "criteria": [
+          "Use the prior conversation to recover Maya, the party of four, and August 7.",
+          "Book the requested table for 7 p.m. and confirm the completed reservation."
+        ],
+        "delegation": "required",
+        "tools": {
+          "required": [
+            {
+              "name": "create_reservation",
+              "arguments": {
+                "guest_name": "Maya",
+                "date": "2026-08-07",
+                "time": "19:00",
+                "party_size": 4
+              }
+            }
+          ],
+          "prohibited": []
+        },
+        "state": {
+          "reservation_created": true,
+          "guest_name": "Maya",
+          "date": "2026-08-07",
+          "time": "19:00",
+          "party_size": 4
+        },
+        "golden_path": {
+          "turns": 2
+        }
+      }
+    }
+  ]
+}

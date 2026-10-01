@@ -1,0 +1,14 @@
+{
+  "business_name": "Juniper Table",
+  "reference_year": 2026,
+  "hours": "11:00 a.m. to 10:00 p.m. daily",
+  "parking": "Complimentary parking is available in the adjacent restaurant lot.",
+  "availability_overrides": [
+    {
+      "date": "2026-08-07",
+      "time": "21:00",
+      "party_size": 6,
+      "available": false
+    }
+  ]
+}

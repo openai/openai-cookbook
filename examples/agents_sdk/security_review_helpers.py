@@ -1165,37 +1165,66 @@ def _text(value: Any, limit: int | None = 170) -> str:
     # Model text stays literal; it cannot create Markdown links or images.
     return "".join("\\" + char if char in "\\`*_{}[]()#+-.!|~$" else char for char in value)
 
-def show_table(title: str, rows: Sequence[Mapping[str, Any]], columns: Sequence[str]):
+def show_table(title: str, rows: Sequence[Mapping[str, Any]], columns: Sequence[str], *,
+               scrollable: bool = False):
     rows = list(rows)
     lines = [f"**{_text(title)}**", "",
              "| " + " | ".join(map(_text, columns)) + " |",
              "| " + " | ".join("---" for _ in columns) + " |"]
     body = ["| " + " | ".join(_text(row.get(column, "")) for column in columns)
             + " |" for row in rows]
-    display(Markdown("\n".join((*lines, *body))))
-
-def show_review_details(reviews: Mapping[str, Any]):
-    pending = [
-        (target, finding)
-        for target, bundle in reviews.items()
-        for finding in (bundle.provenance.findings if bundle.provenance else ())
-        if finding.disposition == "needs_review"
-    ]
-    if not pending:
-        return
-    lines = ["**Findings that need more evidence**", ""]
-    for target, finding in pending:
-        location = f"{finding.source_path}:{finding.line}"
-        lines.extend([
-            f"**{_text(target)} — {_text(location, None)}**", "",
-            f"Candidate: {_text(finding.candidate_id, None)}", "",
-            _text(finding.reason, None), "",
-            *(f"- Proof gap: {_text(gap, None)}" for gap in finding.proof_gaps), "",
-        ])
+    if scrollable:
+        label = html.escape(f"{title} review results", quote=True)
+        opening = (f'<div role="region" aria-label="{label}" tabindex="0" '
+                   'style="overflow-x: auto;">')
+        lines = [*lines[:2], opening, "", *lines[2:], *body, "", "</div>"]
+    else:
+        lines.extend(body)
     display(Markdown("\n".join(lines)))
 
-def result_rows(target: str, bundle: Any):
-    label = f"{target} / {', '.join(bundle.selected_scanners) or 'none'}"
+def _finding_label(finding: Any) -> str:
+    words = finding.category.split("_")
+    category = " ".join(word.upper() if word in {"sql", "jwt", "tls"} else word for word in words)
+    return f"{finding.priority} / {category}"
+
+def _source_link(snapshot: SourceSnapshot, finding: Any) -> Markdown:
+    path = _safe_path(finding.source_path)
+    source = snapshot.file(path)
+    repository = snapshot.source_url.rstrip("/")
+    revision = snapshot.source_revision
+    if (not re.fullmatch(r"https://github\.com/[A-Za-z0-9_.-]+/[A-Za-z0-9_.-]+", repository)
+            or not re.fullmatch(r"[0-9a-f]{40}", revision)
+            or finding.source_revision != revision or finding.source_sha256 != source.sha256
+            or type(finding.line) is not int or finding.line < 1):
+        raise EvidenceError("Display link does not match a pinned GitHub source record.")
+    file = PurePosixPath(path)
+    label = "/".join(file.parts[-2:])
+    if len(label) > 28:
+        label = file.name
+    if len(label) > 28:
+        label = f"{file.stem[:27 - len(file.suffix)]}…{file.suffix}"
+    url = f"{repository}/blob/{revision}/{quote(path, safe='/')}#L{finding.line}"
+    return Markdown(f"[{_text(label, None)}:{finding.line}]({url})")
+
+def show_review_details(reviews: Mapping[str, Any]):
+    lines = ["**Decision notes**", ""]
+    for target, bundle in reviews.items():
+        repository = bundle.snapshot.source_url.rstrip("/").rsplit("/", 1)[-1] if bundle.snapshot else target
+        for finding in (bundle.provenance.findings if bundle.provenance else ()):
+            location = _source_link(bundle.snapshot, finding).data
+            lines.extend([
+                f"**{_text(repository)} / {_text(_finding_label(finding))} — {location}**", "",
+                f"Candidate: {_text(finding.candidate_id, None)} · {_text(finding.disposition)}", "",
+                _text(finding.reason, None), "",
+                *(f"- Proof gap: {_text(gap, None)}" for gap in finding.proof_gaps), "",
+            ])
+        if not bundle.provenance and bundle.error:
+            lines.extend([f"**{_text(target)} — {_text(bundle.status)}**", "",
+                          _text(bundle.error, None), ""])
+    if len(lines) > 2:
+        display(Markdown("\n".join(lines)))
+
+def result_rows(bundle: Any):
     role_by_candidate = {
         assessment.candidate_id: review.role
         for review in bundle.specialist_reviews
@@ -1209,20 +1238,15 @@ def result_rows(target: str, bundle: Any):
     for candidate in bundle.candidates:
         model_finding = proposed.get(candidate.candidate_id)
         final_finding = final.get(candidate.candidate_id)
-        reason = getattr(final_finding, "reason", None) or getattr(model_finding, "reason", "not reviewed")
-        gaps = getattr(final_finding, "proof_gaps", ()) or getattr(model_finding, "proof_gaps", ())
         rows.append({
-            "target / scanners": label,
-            "signal": f"{candidate.priority} / {candidate.category}",
-            "source": f"{candidate.source_path}:{candidate.line}",
+            "finding": _finding_label(candidate),
+            "source": _source_link(bundle.snapshot, candidate),
             "specialist": role_by_candidate.get(candidate.candidate_id, "not run"),
             "validator": getattr(model_finding, "disposition", "not run"),
             "final": getattr(final_finding, "disposition", "not adjudicated"),
-            "reason or gap": f"{reason} Proof gap: {', '.join(gaps)}" if gaps else reason,
         })
     if not rows:
-        rows.append({"target / scanners": label, "signal": bundle.status,
+        rows.append({"finding": bundle.status,
             "source": "none", "specialist": "not run", "validator": "not run",
-            "final": "not adjudicated",
-            "reason or gap": bundle.error or "No candidates were reviewed."})
+            "final": "not adjudicated"})
     return rows

@@ -1,0 +1,200 @@
+{
+  "schema_version": "1.0",
+  "scenarios": [
+    {
+      "id": "restaurant_booking_complete",
+      "title": "Collect booking details across multiple exchanges before committing",
+      "type": "booking",
+      "interaction": "multi_turn",
+      "tags": [
+        "restaurant",
+        "booking",
+        "clarification",
+        "tool_sequence"
+      ],
+      "input": {
+        "text": "I'd like to book a table on August 7."
+      },
+      "application": {
+        "initial_state": {}
+      },
+      "expected": {
+        "answer": "Collect Maya, two guests, and 7 p.m. across the conversation, then check availability, create the August 7 reservation, and confirm the actual result.",
+        "criteria": [
+          "Ask for the missing guest name and time instead of guessing or creating a premature reservation.",
+          "Remember the caller-provided party size across a later time clarification.",
+          "Check availability using the details provided across the conversation.",
+          "Create exactly one reservation with the correct guest name and details.",
+          "Confirm the reservation only after the actual tool succeeds."
+        ],
+        "tools": {
+          "required": [
+            {
+              "name": "check_availability",
+              "arguments": {
+                "date": "2026-08-07",
+                "time": "19:00",
+                "party_size": 2
+              }
+            },
+            {
+              "name": "create_reservation",
+              "arguments": {
+                "guest_name": "Maya",
+                "date": "2026-08-07",
+                "time": "19:00",
+                "party_size": 2
+              }
+            }
+          ]
+        },
+        "state": {
+          "reservation_created": true,
+          "guest_name": "Maya",
+          "date": "2026-08-07",
+          "time": "19:00",
+          "party_size": 2
+        },
+        "golden_path": {
+          "turns": 7,
+          "delegations": 1,
+          "steps": [
+            "Caller requests an August 7 booking without supplying all the details.",
+            "Assistant asks for the missing guest name and time.",
+            "Caller supplies Maya and a party of two.",
+            "Assistant asks for the remaining time.",
+            "Caller supplies 7 p.m.",
+            "Assistant checks availability, creates one reservation, and confirms the verified result.",
+            "Caller acknowledges completion."
+          ]
+        },
+        "delegation": "required",
+        "procedure": {
+          "id": "check_then_book",
+          "steps": [
+            {
+              "id": "ask_name",
+              "kind": "clarification",
+              "arguments": {
+                "field": "guest_name"
+              }
+            },
+            {
+              "id": "ask_time",
+              "kind": "clarification",
+              "arguments": {
+                "field": "time"
+              },
+              "after": [
+                "ask_name"
+              ]
+            },
+            {
+              "id": "availability",
+              "kind": "tool",
+              "tool": "check_availability",
+              "arguments": {
+                "date": "2026-08-07",
+                "time": "19:00",
+                "party_size": 2
+              },
+              "after": [
+                "ask_time"
+              ]
+            },
+            {
+              "id": "reservation",
+              "kind": "tool",
+              "tool": "create_reservation",
+              "arguments": {
+                "guest_name": "Maya",
+                "date": "2026-08-07",
+                "time": "19:00",
+                "party_size": 2
+              },
+              "after": [
+                "availability"
+              ]
+            },
+            {
+              "id": "verified_state",
+              "kind": "state",
+              "arguments": {
+                "reservation_created": true,
+                "guest_name": "Maya",
+                "date": "2026-08-07",
+                "time": "19:00",
+                "party_size": 2
+              },
+              "after": [
+                "reservation"
+              ]
+            },
+            {
+              "id": "confirm_result",
+              "kind": "grounded_confirmation",
+              "after": [
+                "reservation"
+              ]
+            }
+          ]
+        }
+      },
+      "simulation_parameters": {
+        "goal": "Book an August 7 table for Maya and two guests at 7 p.m.; answer the assistant's actual questions naturally.",
+        "known_facts": {
+          "guest_name": "Maya",
+          "date": "2026-08-07",
+          "time": "19:00",
+          "party_size": 2
+        },
+        "agenda": [
+          {
+            "id": "provide_name_and_party",
+            "commitment": "Tell the assistant that the reservation is under Maya for two guests.",
+            "trigger_condition": "The assistant asks for the reservation name or party size.",
+            "completion_condition": "The caller has provided Maya and a party of two.",
+            "action": "answer",
+            "facts": [
+              "guest_name",
+              "party_size"
+            ],
+            "response_hint": "Under Maya, for two."
+          },
+          {
+            "id": "provide_time",
+            "commitment": "Tell the assistant that the preferred reservation time is 7 p.m.",
+            "trigger_condition": "The assistant asks when the reservation should be scheduled.",
+            "completion_condition": "The caller has provided the preferred time of 7 p.m.",
+            "action": "answer",
+            "facts": [
+              "time"
+            ],
+            "response_hint": "At 7 p.m., please."
+          },
+          {
+            "id": "finish_booking",
+            "commitment": "Thank the assistant and finish once the requested reservation is complete.",
+            "trigger_condition": "The assistant has communicated the completed reservation.",
+            "completion_condition": "The caller understands that the correct reservation is complete.",
+            "completion_basis": "live_context",
+            "action": "finish",
+            "required": false
+          }
+        ],
+        "expectations": [
+          "Answer the current question with the requested known detail: Maya, two guests, or 7 p.m.",
+          "If the assistant asks for multiple details together, provide them naturally instead of withholding information.",
+          "Close the call once the correct reservation has been confirmed."
+        ],
+        "persona": {
+          "id": "concise_diner",
+          "description": "A friendly diner who answers booking questions directly without sounding scripted.",
+          "voice": "coral",
+          "speech_instructions": "Sound warm, relaxed, and conversational, like a real person calling a restaurant.",
+          "backchannel_tendency": 0.12
+        }
+      }
+    }
+  ]
+}

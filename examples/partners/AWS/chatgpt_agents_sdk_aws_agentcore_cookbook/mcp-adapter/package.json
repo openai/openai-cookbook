@@ -1,0 +1,34 @@
+{
+  "name": "chatgpt-agents-sdk-aws-agentcore-mcp-adapter",
+  "version": "0.1.0",
+  "private": true,
+  "license": "MIT",
+  "engines": {
+    "node": ">=24"
+  },
+  "type": "module",
+  "description": "Typed MCP server backed by a local Agents SDK workflow with AWS-default tracing",
+  "overrides": {
+    "@hono/node-server": "2.0.11"
+  },
+  "scripts": {
+    "build": "tsc -p tsconfig.build.json",
+    "smoke:agent": "node --env-file=../.env dist/live-smoke.js",
+    "smoke:live": "node --env-file=../.env dist/live-smoke.js",
+    "start": "node --env-file=../.env dist/server.js",
+    "trace:run": "node --env-file=../.env dist/trace-smoke.js",
+    "typecheck": "tsc --noEmit",
+    "test": "vitest run"
+  },
+  "dependencies": {
+    "@aws-sdk/client-bedrock-agentcore": "3.1109.0",
+    "@modelcontextprotocol/ext-apps": "1.7.5",
+    "@modelcontextprotocol/sdk": "1.30.0",
+    "zod": "3.25.76"
+  },
+  "devDependencies": {
+    "@types/node": "^22.15.0",
+    "typescript": "^5.8.0",
+    "vitest": "4.1.9"
+  }
+}

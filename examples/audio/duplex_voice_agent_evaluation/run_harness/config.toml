@@ -1,0 +1,29 @@
+[dataset]
+path = "data/scenarios.json"
+
+[execution]
+concurrency = 1
+max_examples = 0
+verbose = false
+
+[simulation]
+# Caller reasoning is independent of the evaluated assistant's backend settings.
+simulator_backend_model = "gpt-5.6-luna"
+simulator_backend_reasoning_effort = "low"
+tick_ms = 200
+# First post-request audio deadline for metric v2; evaluation policy, not an SLA.
+response_deadline_ms = 5000
+max_duration_seconds = 90.0
+semantic_drain = true
+completion_model = "gpt-5.6-terra"
+completion_timeout_seconds = 8.0
+condition = "clean"
+seed = 7
+
+[grading]
+enabled = true
+repetitions = 1
+
+[assistant]
+mode = "responses"
+endpoint = ""

@@ -1,0 +1,7 @@
+{
+  "action": "get_live_status",
+  "flight_number": "ELZ1628",
+  "origin": "DAL",
+  "destination": "MDW",
+  "travel_date": "{{COOKBOOK_DEMO_TRAVEL_DATE}}"
+}

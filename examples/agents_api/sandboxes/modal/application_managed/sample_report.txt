@@ -1,0 +1,8 @@
+Quarterly product review
+
+The team reduced median task latency by 18 percent while holding the error rate
+below 1 percent. The largest remaining constraint is cold-start time for newly
+provisioned environments. The next milestone is to cut cold starts by half and
+add automated regression checks for the three most common workflows.
+
+This file contains synthetic example content only.

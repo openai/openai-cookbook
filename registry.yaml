@@ -200,6 +200,17 @@
     - bedrock
     - mcp
     - tracing
+
+- title: Check citation faithfulness in RAG with a zero-token gate
+  path: examples/citation_faithfulness_check.ipynb
+  slug: citation-faithfulness-check
+  description: Catch fabricated, franken-, and misattributed RAG citations with a deterministic verbatim gate plus an optional burden-of-proof judge, using Structured Outputs.
+  date: 2026-07-24
+  authors:
+    - tonydzi
+  tags:
+    - RAG
+    - structured-outputs
     - evals
 
 - title: Enabling Long-Term Agent Memory with Oracle AI Agent Memory

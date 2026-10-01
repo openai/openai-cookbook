@@ -1,0 +1,67 @@
+[project]
+name = "gpt-live-evals"
+version = "0.1.0"
+description = "Modular single-turn and full-duplex voice-agent evaluation toolkit"
+readme = "README.md"
+requires-python = ">=3.12"
+dependencies = [
+  "aiohttp>=3.14.3",
+  "openai>=2.52.0",
+  "pydantic>=2.10",
+  "python-dotenv>=1.0",
+]
+
+[project.optional-dependencies]
+playback = ["sounddevice>=0.5"]
+
+[dependency-groups]
+dev = ["pytest>=8.3", "pytest-asyncio>=0.25", "ruff>=0.9"]
+
+[project.scripts]
+crawl-eval = "crawl_harness.evaluate:main"
+walk-eval = "walk_harness.evaluate:main"
+walk-generate-audio = "walk_harness.generate_audio:main"
+run-eval = "run_harness.evaluate:main"
+run-view = "run_harness.visualization.export_viewer:main"
+client-assistant = "assistants.client.service:main"
+
+[build-system]
+requires = ["hatchling"]
+build-backend = "hatchling.build"
+
+[tool.hatch.build]
+exclude = [
+  "**/.gitignore",
+  "**/__pycache__",
+  "**/__pycache__/**",
+  "**/*.py[cod]",
+  "**/.audio_cache",
+  "**/.audio_cache/**",
+  "**/results",
+  "**/results/**",
+  "**/tests",
+  "**/tests/**",
+  # Keep local work and review material out of customer distributions.
+  "temporary_skills",
+  "temporary_skills/**",
+  # Local editor/agent files are not package resources.
+  "**/.agents/**",
+  "**/.codex/**",
+  "**/AGENTS.md",
+  "**/SKILL.md",
+]
+
+[tool.hatch.build.targets.wheel]
+packages = ["assistants", "crawl_harness", "walk_harness", "run_harness", "shared"]
+
+[tool.pytest.ini_options]
+testpaths = ["assistants/tests", "crawl_harness/tests", "walk_harness/tests", "run_harness/tests"]
+pythonpath = ["."]
+asyncio_mode = "auto"
+
+[tool.ruff]
+line-length = 120
+target-version = "py312"
+
+[tool.ruff.lint]
+select = ["E", "F", "I", "UP", "B", "SIM", "ASYNC"]

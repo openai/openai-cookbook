@@ -1,10 +1,10 @@
-OpenAI is winding down the Evals product and recommends [Promptfoo](https://www.promptfoo.dev/) for continuing and extending your evaluation workflows. OpenAI Evals lets you export supported evaluations as runnable Promptfoo configs and separately preserve results from past runs.
+OpenAI is winding down the Evals product and recommends [Promptfoo](https://www.promptfoo.dev/) for continuing and extending your evaluation workflows.
 
 Promptfoo is an open-source CLI and library for evaluating and red-teaming AI apps and agents. It gives you a more flexible way to run, maintain, and extend your evals locally or in CI.
 
 ## What Changes When You Move to Promptfoo
 
-OpenAI Evals and Promptfoo share the same core building blocks: test data, prompts, providers/models, and criteria for scoring outputs. For supported evals, the exported Promptfoo configuration carries these pieces into a runnable evaluation, so you can continue testing the same behavior in Promptfoo.
+OpenAI Evals and Promptfoo share the same core building blocks: test data, prompts, providers/models, and criteria for scoring outputs. When you recreate an evaluation in Promptfoo, map these pieces into a portable configuration so you can continue testing the same behavior.
 
 The main difference is the workflow. OpenAI Evals is managed in the OpenAI Platform, where evaluations, runs, results, and related dataset workflows are available in the dashboard. Promptfoo is centered on a portable configuration file and CLI workflow. You can keep evaluations alongside your application code, run them locally or in CI, and adapt them as your testing needs evolve.
 
@@ -19,7 +19,7 @@ Promptfoo does not simply reproduce the OpenAI Evals interface in another tool. 
 
 ## Migrate an Evaluation to Promptfoo
 
-OpenAI Evals lets you export supported evaluations as runnable Promptfoo configurations, so you can continue running and extending your evals in Promptfoo. Historical result exports are separate: you can import them when you want previous OpenAI Evals runs available in Promptfoo.
+This guide covers manually recreating an evaluation in Promptfoo. It does not require an OpenAI Evals export feature.
 
 ### Before You Start
 
@@ -27,50 +27,34 @@ OpenAI Evals lets you export supported evaluations as runnable Promptfoo configu
 - An existing OpenAI Evals evaluation.
 - An API key for the model provider used in your eval, such as `OPENAI_API_KEY`.
 
-### Export a Runnable Promptfoo Configuration
+### Create a Promptfoo Configuration
 
-1. Open the evaluation in the [OpenAI Platform dashboard](https://platform.openai.com/evaluation?tab=evals).
-2. Select a completed run to use as the basis for the exported configuration. If your evaluation does not have a completed run yet, run it once before exporting.
-3. Open the **Export** menu and select **Download runnable Promptfoo config**.
-4. Download the Promptfoo configuration file and review any migration warnings before running it.
+Recreate your evaluation's prompts, provider, test cases, and assertions in a `promptfooconfig.yaml` file. See [Configure evaluations in Promptfoo](https://www.promptfoo.dev/docs/configuration/guide/) for the configuration format.
 
-> Screenshot placeholder: OpenAI Evals export menu with **Download runnable Promptfoo config** visible.
-
-### Run the Exported Evaluation in Promptfoo
+### Run a Manually Recreated Evaluation in Promptfoo
 
 Run a fresh evaluation and open the results viewer:
 
 ```bash
-promptfoo eval -c <downloaded-config-file> --no-cache
+promptfoo eval -c promptfooconfig.yaml --no-cache
 promptfoo view
 ```
 
 `eval` creates a new Promptfoo evaluation run, while `view` opens its results locally. This new run is separate from any previously completed OpenAI Evals runs.
 
-If you modify the exported configuration or encounter a configuration error, validate it before retrying:
+If you modify the configuration or encounter a configuration error, validate it before retrying:
 
 ```bash
-promptfoo validate config -c <downloaded-config-file>
+promptfoo validate config -c promptfooconfig.yaml
 ```
 
-![Promptfoo results view after running the exported evaluation](/images/promptfoo-custom-example-view.png)
+![Promptfoo results view after running the recreated evaluation](/images/promptfoo-custom-example-view.png)
 
 ### Verify the Migrated Evaluation
 
-After your first Promptfoo run, review the results to confirm that the evaluation behaves as expected. If the export included warnings or you manually changed the configuration, compare the affected prompts, assertions, and outputs before using the eval in an ongoing workflow.
+After your first Promptfoo run, review the results to confirm that the evaluation behaves as expected. Compare the recreated prompts, assertions, and outputs before using the eval in an ongoing workflow.
 
 Similarity-based scoring may not produce identical numerical results across systems. Any manually recreated grader, especially an LLM-as-a-judge grader, should be validated before you rely on it for regression decisions.
-
-### Preserve Historical Results
-
-If you want past OpenAI Evals runs visible in Promptfoo, download your results from the export menu and import the downloaded file:
-
-```bash
-promptfoo import <downloaded-results-file>
-promptfoo view
-```
-
-This preserves past run results for reference. It does not create the runnable Promptfoo configuration used for future evaluation runs.
 
 ### Cases That Require Manual Setup
 
@@ -78,9 +62,8 @@ Some evaluations may require additional setup in Promptfoo.
 
 | Situation | What to do |
 | --- | --- |
-| A runnable configuration cannot be exported. | Recreate the evaluation in Promptfoo. Import historical results separately, if needed. |
-| A grader is not included in the exported configuration. | Recreate it as a Promptfoo assertion and verify its behavior before relying on it. |
-| A tool, agent, or custom provider workflow is not reproduced. | Configure that workflow in Promptfoo and test it before using the migrated eval. |
+| A grader needs to be recreated. | Recreate it as a Promptfoo assertion and verify its behavior before relying on it. |
+| A tool, agent, or custom provider workflow is not represented in your Promptfoo configuration. | Configure that workflow in Promptfoo and test it before using the migrated eval. |
 
 ### Customize Your Workflow in Promptfoo
 
@@ -93,5 +76,4 @@ If you use Codex, see [Add evals to your AI application](/codex/use-cases/ai-app
 - [Install Promptfoo](https://www.promptfoo.dev/docs/installation/)
 - [Configure evaluations in Promptfoo](https://www.promptfoo.dev/docs/configuration/guide/)
 - [Configure assertions and expected outputs](https://www.promptfoo.dev/docs/configuration/expected-outputs/)
-- [Import historical results](https://www.promptfoo.dev/docs/usage/command-line/#promptfoo-import-filepath)
 - [Run Promptfoo in CI/CD](https://www.promptfoo.dev/docs/integrations/ci-cd/)

@@ -5,6 +5,12 @@ description = "Offline finite routing and local MCP support lookup example"
 requires-python = ">=3.12"
 dependencies = ["mcp==2.2.0"]
 
+[project.optional-dependencies]
+live = ["gpt-live-evals", "openai==3.24.0", "socksio==1.0.0"]
+
+[tool.uv.sources]
+gpt-live-evals = { path = "../duplex_voice_agent_evaluation", editable = true }
+
 [dependency-groups]
 dev = ["pytest==9.1.1", "pytest-asyncio==1.4.0", "ruff==0.16.8"]
 

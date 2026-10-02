@@ -4,7 +4,7 @@
 
 Build a small application backend that selects a read-only support lookup, calls a local Model Context Protocol (MCP) server, and returns a verified synthetic fact. The example separates route selection, tool authorization and result delivery so you can test them independently.
 
-This preparation example runs offline. Its router is a scripted fixture, not a model. It does not open a GPT-Live session, call a paid provider or measure voice latency. The application backend exposes the same `run(handoff, emit)` and `close()` shape used by the existing voice evaluator. Connecting it to a voice session and replacing the fixture with a provider are subsequent integration steps.
+Start with an offline scripted router and a real local MCP lookup. Then run an optional client-delegation service with a GPT-6 Luna Structured Outputs router. The service uses the existing voice evaluator's application boundary, reconstructs the current transcript and rejects stale work. Starting the service alone does not open a GPT-Live session; a frontend supplies the audio connection.
 
 This builds on the [GPT-Live evaluation guide](https://developers.openai.com/cookbook/examples/audio/voice_agent_evaluation) by Kait Healy, Karsten Schroer, and Erika Kettleson. That guide supplies the CRAWL, WALK and RUN evaluation strategy; this example focuses on the application backend for a small, inspectable task. Attribution does not imply review or endorsement of this example.
 
@@ -72,7 +72,7 @@ Run the offline tests from the same directory:
 env -u VIRTUAL_ENV uv run pytest -q
 ```
 
-The test suite exercises the real local MCP boundary and checks routing and lifecycle failures: ambiguity, unsupported requests, incorrect or invalid routes, unavailable tools and interruption. A cancelled or superseded request must not publish a late answer. Follow-up handoffs deliberately ask for clarification because this small example does not reconstruct durable multi-turn state.
+The test suite exercises the real local MCP boundary and checks routing and lifecycle failures: ambiguity, unsupported requests, incorrect or invalid routes, unavailable tools and interruption. A cancelled or superseded request must not publish a late answer. The standalone router clarifies incremental follow-ups; the optional voice service supplies full current-session transcript snapshots. It does not persist state across sessions.
 
 The scripted router is useful for testing these application invariants. Its behavior is authored into the fixture, so test pass counts are not estimates of model accuracy. The wrong-route test deliberately returns the policy when asked about an order: that choice is allowed by the schema but still produces a semantically wrong answer. The application does not secretly correct it with an answer key. Keep evaluator expectations separate from the information supplied to a real router.
 
@@ -88,15 +88,30 @@ class ApplicationBackend(Protocol):
 
 `DelegationHandoff` carries generic work instructions, a timestamped transcript and a follow-up indicator. Use the user's conversation and verified state to establish intent; do not route on generic `handoff.task` instructions. In a production backend, retain the relevant earlier state when each handoff contains only an incremental transcript.
 
-The evaluator's [client service](duplex_voice_agent_evaluation/assistants/client/service.py) accepts a backend factory. That is the integration seam for using a custom backend without copying the voice transport or harness. The current command-line runner does not expose a custom backend parameter directly. This example therefore tests the application boundary locally; it does not provide a completed voice-service deployment or a live evaluation command.
+The evaluator's [client service](duplex_voice_agent_evaluation/assistants/client/service.py) accepts backend and controller factories. [voice_service.py](decisions_voice_agent/voice_service.py) uses these hooks to provide a bounded support service. Each connection owns its router, transcript and synthetic tool executor. This service calls the same fixture functions directly; it does not measure MCP transport latency.
 
-Before connecting that service, supply matching application resources, authentication, explicit session and work limits, and a current documented GPT-Live configuration. Preserve the delegation ID when returning results, and test closure and interruption through the actual transport. A local cancellation test does not establish remote cancellation or playback behavior.
+From the sample directory, install the optional dependencies and set a dedicated local service token:
+
+```bash
+export OPENAI_CLIENT_ASSISTANT_TOKEN="$(python -c 'import secrets; print(secrets.token_urlsafe(36))')"
+env -u VIRTUAL_ENV uv run --extra live python serve.py
+```
+
+This starts the scripted service at `ws://127.0.0.1:8795/ws/assistant`. Keep the token private and use it in the frontend's client-service configuration. It must be separate from your API key. To use a model router, configure `OPENAI_API_KEY` securely and explicitly select Luna:
+
+```bash
+env -u VIRTUAL_ENV uv run --extra live python serve.py --router luna
+```
+
+The service permits one connection, one pending delegation and at most two delegations per session, with finite session, work and cleanup deadlines. It reconstructs full transcript snapshots and preserves delegation IDs. New user text invalidates pending answers. If a provider request is cancelled, the service stops admitting work because local cancellation cannot establish provider completion or usage. Offline fixtures can demonstrate replacement work without that uncertainty.
+
+Run the optional service tests with `uv run --extra live pytest -q`. The default tests skip service integration when those dependencies are absent. For an actual voice connection, supply the support frontend instructions, matching application resources and documented [client-delegation session configuration](https://developers.openai.com/api/docs/guides/live-delegation). The existing evaluator's restaurant resources are not interchangeable with this support example. A local service test does not establish spoken output or device playback.
 
 ## 5. Replace the fixture and compare fairly
 
 A model router should receive the same bounded user request, application context and ordered option catalog. It should return only a declared option. Preserve the original selection and any effective route after validation so that a fallback does not hide a routing failure.
 
-For a generative baseline, [GPT-6 Luna](https://developers.openai.com/api/docs/models/gpt-6-luna) publicly documents Responses and Structured Outputs support. [Structured Outputs](https://developers.openai.com/api/docs/guides/structured-outputs) can restrict the output to an enumerated route. Handle refusal, incomplete output and provider errors before executing a tool. Provider implementation and access checks are outside this offline slice.
+The [Luna adapter](decisions_voice_agent/luna_router.py) uses [GPT-6 Luna](https://developers.openai.com/api/docs/models/gpt-6-luna) with reasoning disabled, Standard service tier and a strict [Structured Outputs](https://developers.openai.com/api/docs/guides/structured-outputs) enum. It includes option descriptions, bounds input and output, disables SDK retries, and rejects refusal, incomplete output or malformed responses before tool execution. Other providers can implement the same `RoutingBackend.choose()` interface using their documented contracts.
 
 Evaluate three questions separately:
 
@@ -108,7 +123,7 @@ Evaluate three questions separately:
 
 Include ambiguous requests, wrong-entity requests, tool outages and corrections. Freeze held-out cases before prompt tuning. Repeat paired trials with balanced execution order. Record the actual model identifiers, effort, service tier, caching, transport and retry settings; disclose settings that cannot be matched. The same mutable model alias does not establish identical frozen weights across endpoints.
 
-Report correctness and coverage alongside latency, including errors and timeouts in the attempt count. Do not compare a finite classification request with a reasoning agent's complete tool workflow and attribute the entire difference to the routing interface. There are no provider or voice performance results in this example.
+Report correctness and coverage alongside latency, including errors and timeouts in the attempt count. Match the option descriptions as well as their names: an enum-only schema and a described choice catalog provide different information. Do not compare a finite classification request with a reasoning agent's complete tool workflow and attribute the entire difference to the routing interface. This public example does not publish provider or voice performance results.
 
 ## Next steps
 

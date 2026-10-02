@@ -34,7 +34,7 @@ For data applications, separate context or catalog retrieval, query planning, qu
 
 **Recommendation.** Assign each request a revision. On a correction or cancellation, invalidate the old revision and stop pending work where supported. Check the revision again before publishing results. A late successful lookup is still stale if it answers a superseded request. Record whether cancellation reached the tool; do not imply that cancelling a local coroutine reverses a remote side effect.
 
-Set explicit session, delegation, tool and output limits. Audit retry defaults before testing a paid backend. If a request might have executed but its outcome is unknown, reconcile that attempt before retrying a consequential action.
+Set explicit session, delegation, tool and output limits. Audit retry defaults before testing a paid backend. If a request might have executed but its outcome is unknown, reconcile that attempt before retrying a consequential action. The sample service stops new provider work after interrupted routing; a completed cancellation of a Python task does not settle the upstream request.
 
 ## Measure the answer the user needed
 
@@ -42,7 +42,9 @@ Set explicit session, delegation, tool and output limits. Audit retry defaults b
 
 **Recommendation.** Report routing latency, tool latency and time to a verified useful answer separately. For audio, measure from the end of audible user speech to first audible response and to the useful answer. Label filler speech as first response, not completion. Preserve failed, unanswered and censored attempts in the denominator. Document whether percentiles describe individual turns or per-run aggregates.
 
-Compare backends with the same tasks, model identity where applicable, context, ordered action catalog, tools and input audio. Record effort, service tier, caching and transport conditions. If a setting is not exposed on one endpoint, disclose that difference. Use repeated paired trials and uncertainty estimates; an offline fixture test is not a model or audio benchmark.
+Compare backends with the same tasks, model identity where applicable, context, ordered action catalog including descriptions, tools and input audio. Record effort, service tier, caching and transport conditions. If a setting is not exposed on one endpoint, disclose that difference. Preserve initial connection failures and slow first calls; do not infer caching or warm-up from timing alone. Use repeated paired trials and uncertainty estimates; an offline fixture test is not a model or audio benchmark.
+
+Use the configured network route when adding instrumentation or disabling retries. A custom HTTP transport can change proxy handling. Check the installed client's behavior before the first request and distinguish failures before HTTP transmission from requests whose outcome is unknown.
 
 ## Close sessions and retain usage evidence
 

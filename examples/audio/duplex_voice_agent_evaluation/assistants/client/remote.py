@@ -136,6 +136,15 @@ class RemoteClientDelegationController:
         if observed.get("type") == "error":
             await self._fail("client_assistant_error", "Client assistant backend work failed")
             return True
+        if observed.get("type") == "client_delegation.superseded":
+            identifier = observed.get("delegation_id")
+            if not isinstance(identifier, str) or identifier not in self._seen:
+                raise ValueError("Client assistant superseded an unknown delegation")
+            if self._work.contains(identifier):
+                await self.emit(observed)
+                self._injected.discard(identifier)
+                self._work.finish(identifier)
+            return False
         if observed.get("type") == "client_delegation.completed":
             identifier = observed.get("delegation_id")
             if not isinstance(identifier, str) or identifier not in self._seen:

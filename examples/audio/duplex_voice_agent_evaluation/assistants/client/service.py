@@ -27,8 +27,10 @@ from shared.environment import load_environment
 
 BackendFactory = Callable[[dict[str, Any], ToolCallback], ApplicationBackend]
 ToolFactory = Callable[[dict[str, Any]], ToolExecutor]
+ControllerFactory = Callable[..., ClientDelegationController]
 BACKEND_FACTORY = web.AppKey("client_backend_factory")
 TOOL_FACTORY = web.AppKey("client_tool_factory")
+CONTROLLER_FACTORY = web.AppKey("client_controller_factory")
 LOGGER = logging.getLogger(__name__)
 
 
@@ -189,7 +191,8 @@ async def _serve_connection(request: web.Request, limits: ServiceLimits) -> web.
                 async def send_live(item: dict[str, Any]) -> None:
                     await send({"type": "live.send", "event": item})
 
-                controller = ClientDelegationController(
+                controller_factory: ControllerFactory = request.app[CONTROLLER_FACTORY]
+                controller = controller_factory(
                     backend=backend,
                     send_live=send_live,
                     emit=emit,
@@ -241,6 +244,7 @@ def create_app(
     *,
     backend_factory: BackendFactory = openai_backend,
     tool_factory: ToolFactory = application_tools,
+    controller_factory: ControllerFactory = ClientDelegationController,
     token: str | None = None,
     allowed_origins: tuple[str, ...] = (),
     limits: ServiceLimits | None = None,
@@ -253,6 +257,7 @@ def create_app(
     )
     app[BACKEND_FACTORY] = backend_factory
     app[TOOL_FACTORY] = tool_factory
+    app[CONTROLLER_FACTORY] = controller_factory
     app.router.add_get("/health", health)
     app.router.add_get("/ws/assistant", assistant_connection)
     return app

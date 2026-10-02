@@ -17,6 +17,8 @@ def _run_rag(query: str) -> str:
         query=query,
         rewrite_query=True,  # Query rewriting generally improves results
     )
+    if not results.data or not results.data[0].content:
+        return "No relevant documents found."
     return results.data[0].content[0].text
 
 

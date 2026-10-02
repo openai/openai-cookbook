@@ -1,0 +1,21 @@
+[project]
+name = "decisions-voice-agent-example"
+version = "0.1.0"
+description = "Offline finite routing and local MCP support lookup example"
+requires-python = ">=3.12"
+dependencies = ["mcp==2.2.0"]
+
+[dependency-groups]
+dev = ["pytest==9.1.1", "pytest-asyncio==1.4.0", "ruff==0.16.8"]
+
+[tool.pytest.ini_options]
+testpaths = ["tests"]
+pythonpath = ["."]
+asyncio_mode = "auto"
+
+[tool.ruff]
+line-length = 100
+target-version = "py312"
+
+[tool.ruff.lint]
+select = ["E", "F", "I", "UP", "B", "SIM", "ASYNC"]

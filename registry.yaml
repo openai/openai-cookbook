@@ -1283,6 +1283,7 @@
 - title: Fine tuning classification example
   path: examples/Fine-tuned_classification.ipynb
   slug: fine-tuned-classification
+  archived: true
   date: 2022-03-10
   authors:
     - BorisPower
@@ -1375,6 +1376,7 @@
 - title: How to format inputs to ChatGPT models
   path: examples/How_to_format_inputs_to_ChatGPT_models.ipynb
   slug: how-to-format-inputs-to-chatgpt-models
+  archived: true
   date: 2023-03-01
   authors:
     - ted-at-openai
@@ -1505,6 +1507,7 @@
   path: >-
     examples/Unit_test_writing_using_a_multi-step_prompt_with_older_completions_API.ipynb
   slug: unit-test-writing-using-a-multi-step-prompt-with-older-completions-api
+  archived: true
   date: 2023-05-19
   authors:
     - ted-at-openai
@@ -2021,6 +2024,7 @@
 - title: Retrieval augmented generative question answering with Pinecone
   path: examples/vector_databases/pinecone/Gen_QA.ipynb
   slug: gen-qa
+  archived: true
   date: 2023-02-07
   authors:
     - jamescalam
@@ -2244,6 +2248,7 @@
   path: >-
     examples/vector_databases/weaviate/question-answering-with-weaviate-and-openai.ipynb
   slug: question-answering-with-weaviate-and-openai
+  archived: true
   date: 2023-02-13
   authors:
     - colin-openai

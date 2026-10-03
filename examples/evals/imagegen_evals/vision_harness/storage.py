@@ -1,6 +1,7 @@
 from __future__ import annotations
 
 import time
+import uuid
 from dataclasses import dataclass
 from pathlib import Path
 
@@ -22,7 +23,8 @@ class OutputStore:
 
     def new_basename(self, prefix: str) -> str:
         created_ms = int(time.time() * 1000)
-        return f"{prefix}_{created_ms}"
+        unique_suffix = uuid.uuid4().hex[:8]
+        return f"{prefix}_{created_ms}_{unique_suffix}"
 
     def save_png(self, run_dir: Path, basename: str, idx: int, png_bytes: bytes) -> Path:
         out = run_dir / f"{basename}_{idx}.png"

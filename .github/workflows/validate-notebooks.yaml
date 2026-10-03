@@ -21,5 +21,8 @@ jobs:
       - name: Install dependencies
         run: pip install nbformat
 
+      - name: Test notebook validation
+        run: python -m unittest discover -s .github/scripts/tests -v
+
       - name: Validate changed .ipynb files
         run: python .github/scripts/check_notebooks.py

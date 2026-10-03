@@ -4,3 +4,6 @@ __pycache__/
 .ruff_cache/
 # Local package registries can embed private endpoints in generated lockfiles.
 uv.lock
+# Supplied recordings and the documented run's private evidence stay local.
+*.wav
+/result/

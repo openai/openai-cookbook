@@ -404,3 +404,15 @@ async def test_complete_provider_request_stays_inside_byte_reserve():
 def test_model_cannot_be_overridden_at_construction():
     with pytest.raises(TypeError):
         LunaRouter(RecordingClient(), model="some-other-model")
+
+
+async def test_observation_retains_response_before_decode_failure():
+    observed, dispatched = [], []
+    returned = response("invalid JSON")
+    router = LunaRouter(
+        RecordingClient(returned), on_response=observed.append,
+        on_request=lambda: dispatched.append(True),
+    )
+    with pytest.raises(RoutingError):
+        await router.choose(request())
+    assert dispatched == [True] and observed == [returned]

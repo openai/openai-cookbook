@@ -8,6 +8,8 @@ GPT-Live can continue a spoken conversation while an application performs delega
 
 **Recommendation.** Use client delegation when your application needs to select among backends or enforce its own execution policy. Keep the interface small: a bounded request and context go in; a verified fact, clarification or failure comes out. Give the frontend conversational instructions and the backend precise task and tool instructions. Avoid repeating long tool descriptions in the voice prompt. Follow the [Live prompting guide](https://developers.openai.com/api/docs/guides/live-prompting) when tuning conversational behavior.
 
+Start with one complete path before adding an evaluation campaign. The [supplied-WAV lookup example](../examples/audio/decisions_voice_agent.md#4-run-one-spoken-lookup) checks its input locally by default and requires `--run` for provider calls. It connects a support frontend to the Luna router and local MCP lookup through one command. If you deploy the backend separately, configure client delegation, a dedicated service token and the service endpoint explicitly; the example documents the additional loopback setting for local development.
+
 ## Reconstruct intent from the conversation
 
 **Documented behavior.** A `session.delegation.created` event identifies the delegation and target; it does not supply a complete task description. Client applications consume transcript events and application context. Results can be appended as commentary, silent thinking context or instructions, with the appropriate delegation ID. The [delegation guide](https://developers.openai.com/api/docs/guides/live-delegation) documents these event forms and the 500-token append limit.
@@ -34,7 +36,7 @@ For data applications, separate context or catalog retrieval, query planning, qu
 
 **Recommendation.** Assign each request a revision. On a correction or cancellation, invalidate the old revision and stop pending work where supported. Check the revision again before publishing results. A late successful lookup is still stale if it answers a superseded request. Record whether cancellation reached the tool; do not imply that cancelling a local coroutine reverses a remote side effect.
 
-Set explicit session, delegation, tool and output limits. Audit retry defaults before testing a paid backend. If a request might have executed but its outcome is unknown, reconcile that attempt before retrying a consequential action. The sample service stops new provider work after interrupted routing; a completed cancellation of a Python task does not settle the upstream request.
+Set explicit session, delegation, tool and output limits. Audit retry defaults before testing a paid backend. If a request might have executed but its outcome is unknown, reconcile that attempt before retrying a consequential action. The sample backend stops new provider work in the current session after interrupted routing. A new connection creates fresh state; it does not settle the previous request's outcome or usage. Avoid automatic reconnect-and-replay behavior.
 
 ## Measure the answer the user needed
 

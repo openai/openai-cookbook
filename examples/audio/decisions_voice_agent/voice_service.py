@@ -315,6 +315,13 @@ class SupersedingController(ClientDelegationController):
         else:
             super()._finished(identifier, task)
 
+    async def close(self) -> None:
+        # Invalidate before the first await: a router that returns despite
+        # cancellation cannot proceed to a tool or publish stale commentary.
+        self._revision += 1
+        self._work.seal()
+        await super().close()
+
 
 def support_backend(router: RoutingBackend, execute_tool: ToolCallback) -> SupportBackend:
     """Consume a session-owned router; close it when this backend closes."""

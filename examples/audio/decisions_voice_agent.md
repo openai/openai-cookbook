@@ -4,7 +4,7 @@
 
 Build a small application backend that selects a read-only support lookup, calls a local Model Context Protocol (MCP) server, and returns a verified synthetic fact. The example separates route selection, tool authorization and result delivery so you can test them independently.
 
-Start with an offline scripted router and a real local MCP lookup. Then run an optional client-delegation service with a GPT-6 Luna Structured Outputs router. The service uses the existing voice evaluator's application boundary, reconstructs the current transcript and rejects stale work. Starting the service alone does not open a GPT-Live session; a frontend supplies the audio connection.
+Start with an offline scripted router and a real local MCP lookup. Then supply a short WAV recording to an optional voice example: GPT-Live delegates the request to a GPT-6 Luna Structured Outputs router, the application performs the lookup over MCP, and the frontend saves GPT-Live's spoken reply. The example reuses the existing voice evaluator's interfaces, reconstructs the current transcript and rejects stale work.
 
 This builds on the [GPT-Live evaluation guide](https://developers.openai.com/cookbook/examples/audio/voice_agent_evaluation) by Kait Healy, Karsten Schroer, and Erika Kettleson. That guide supplies the CRAWL, WALK and RUN evaluation strategy; this example focuses on the application backend for a small, inspectable task. Attribution does not imply review or endorsement of this example.
 
@@ -15,6 +15,8 @@ This builds on the [GPT-Live evaluation guide](https://developers.openai.com/coo
 - Access to the package index for the initial dependency install. Subsequent runs can use the installed environment offline.
 
 The default example needs no API key, microphone, database or customer data. MCP runs as a local subprocess using synthetic records. The dependency declaration is in [pyproject.toml](decisions_voice_agent/pyproject.toml).
+
+The optional voice run also needs access to `gpt-live-1` and `gpt-6-luna`, an `OPENAI_API_KEY` supplied through your environment, and a short caller recording. It makes paid Live and Responses requests. Keep the full Cookbook checkout: the `live` dependency extra imports the sibling evaluation package by relative path.
 
 ## 1. Keep the responsibilities small
 
@@ -34,7 +36,7 @@ Timestamped user transcript + application context
           Verified result text
 ```
 
-In a complete voice application, GPT-Live sits before and after this flow. It handles the spoken interaction and delegates work to the application. [Client delegation](https://developers.openai.com/api/docs/guides/live-delegation) is the documented boundary for a custom router or backend. It does not make an arbitrary routing service a managed Responses backend.
+GPT-Live sits before and after this flow in the voice example. It handles the spoken interaction and delegates work to the application. [Client delegation](https://developers.openai.com/api/docs/guides/live-delegation) is the documented boundary for a custom router or backend. It does not make an arbitrary routing service a managed Responses backend.
 
 The synthetic task has two lookup options: the status of order `DEMO-1001` and the return policy. Application code owns the tool names and arguments. The router can select an option, ask for clarification or declare the request unsupported. It cannot create a new tool or grant access to another order.
 
@@ -76,7 +78,41 @@ The test suite exercises the real local MCP boundary and checks routing and life
 
 The scripted router is useful for testing these application invariants. Its behavior is authored into the fixture, so test pass counts are not estimates of model accuracy. The wrong-route test deliberately returns the policy when asked about an order: that choice is allowed by the schema but still produces a semantically wrong answer. The application does not secretly correct it with an answer key. Keep evaluator expectations separate from the information supplied to a real router.
 
-## 4. Reuse the voice evaluation boundary
+## 4. Run one spoken lookup
+
+Prepare `request.wav` in the sample directory. For example, record yourself asking, “Where is my order?” Use an uncompressed, mono, signed 16-bit PCM WAV at 24,000 Hz, no longer than 20 seconds. The file must contain audio frames. The example reads an existing recording; it does not open a microphone or generate caller speech.
+
+Validate the input and configuration first:
+
+```bash
+env -u VIRTUAL_ENV uv run --extra live python wav_demo.py \
+  --input request.wav --output-dir result --check
+```
+
+The default is check mode, so omitting `--check` also makes no provider request. Choose a new output directory for each attempt; the command refuses to overwrite an existing result. Check mode validates local inputs and dependencies, not endpoint access or provider behavior.
+
+Set `OPENAI_API_KEY` securely in the process environment. The command does not load `.env` files. To make the paid requests, explicitly select `--run`:
+
+```bash
+env -u VIRTUAL_ENV uv run --extra live python wav_demo.py \
+  --input request.wav --output-dir result --run
+```
+
+[wav_demo.py](decisions_voice_agent/wav_demo.py) composes the support backend directly with the existing GPT-Live frontend. It supplies support-specific instructions and uses the real local MCP executor. You do not need to start `serve.py`, configure a service endpoint, or create a service token for this command.
+
+Inspect the files in `result`:
+
+| File | What to check |
+| --- | --- |
+| `result.json` | Functional outcome, finalization, provider usage and cleanup status. Unknown usage remains explicit. |
+| `events.jsonl` | The attempt's recorded events, including routing and tool evidence. |
+| `output.wav` | Received reply audio, when any audio was returned. A failed attempt can still contain partial audio. |
+
+For the order-status request, the synthetic lookup says that order `DEMO-1001` has shipped and its estimated delivery is Friday. Play the saved audio with your usual audio player and check that the spoken answer matches those facts. A saved WAV or completed provider response does not by itself prove semantic correctness or device playback.
+
+The command permits one Live attempt, at most one Luna route and one MCP call, with a 45-second work deadline and a 10-second cleanup budget. It does not reconnect, retry, synthesize input, transcribe output or invoke a judge. Failures and unknown outcomes exit nonzero; inspect their evidence before deciding whether to start another attempt. Local deadlines trigger cooperative shutdown; they do not guarantee termination of a dependency that ignores cancellation or establish a provider billing cap. The standalone service below is useful when your own frontend needs a separate backend process.
+
+## 5. Reuse the voice evaluation boundary
 
 The existing evaluator defines [ApplicationBackend](duplex_voice_agent_evaluation/assistants/client/backend.py):
 
@@ -97,17 +133,28 @@ export OPENAI_CLIENT_ASSISTANT_TOKEN="$(python -c 'import secrets; print(secrets
 env -u VIRTUAL_ENV uv run --extra live python serve.py
 ```
 
-This starts the scripted service at `ws://127.0.0.1:8795/ws/assistant`. Keep the token private and use it in the frontend's client-service configuration. It must be separate from your API key. To use a model router, configure `OPENAI_API_KEY` securely and explicitly select Luna:
+This starts the scripted service at `ws://127.0.0.1:8795/ws/assistant`. Keep the token private and supply the same token to the frontend process. It must be separate from your API key. `serve.py` reads process environment variables; it does not load a `.env` file. To use a model router, configure `OPENAI_API_KEY` securely in that environment and explicitly select Luna:
 
 ```bash
 env -u VIRTUAL_ENV uv run --extra live python serve.py --router luna --mcp
 ```
 
-The service permits one connection, one pending delegation and at most two delegations per session, with finite session, work and cleanup deadlines. It reconstructs full transcript snapshots and preserves delegation IDs. New user text invalidates pending answers. If a provider request is cancelled, the service stops admitting work because local cancellation cannot establish provider completion or usage. Offline fixtures can demonstrate replacement work without that uncertainty.
+The separate frontend also needs client delegation and the service address. The shared evaluator rejects plaintext service connections unless you explicitly allow local loopback:
 
-Run the optional service tests with `uv run --extra live pytest -q`. The default tests skip service integration when those dependencies are absent. For an actual voice connection, supply the support frontend instructions, matching application resources and documented [client-delegation session configuration](https://developers.openai.com/api/docs/guides/live-delegation). The existing evaluator's restaurant resources are not interchangeable with this support example. A local service test does not establish spoken output or device playback.
+```bash
+export OPENAI_ASSISTANT_MODE=client
+export OPENAI_CLIENT_ASSISTANT_ENDPOINT=ws://127.0.0.1:8795/ws/assistant
+export OPENAI_CLIENT_ASSISTANT_ALLOW_INSECURE_LOOPBACK=true
+# Supply the same OPENAI_CLIENT_ASSISTANT_TOKEN to this frontend process.
+```
 
-## 5. Replace the fixture and compare fairly
+For evaluator command-line options, use `--assistant client --assistant-endpoint ws://127.0.0.1:8795/ws/assistant`. Its `--endpoint` option identifies the GPT-Live provider, not this service. These settings connect a backend; the evaluator's bundled restaurant prompts and resources still need a support-specific frontend.
+
+The service permits one connection, one pending delegation and at most two delegations per session, with finite session, work and cleanup deadlines. It reconstructs full transcript snapshots and preserves delegation IDs. New user text invalidates pending answers. If a provider request is cancelled, the backend stops admitting work in the current session because local cancellation cannot establish provider completion or usage. A new connection creates fresh state; it does not reconcile an earlier unknown request. Do not automatically reconnect and replay that request. Offline fixtures can demonstrate replacement work without that uncertainty.
+
+Run the optional frontend and service tests with `env -u VIRTUAL_ENV uv run --extra live pytest -q`. The default tests skip optional integration tests when their dependencies are absent. When connecting your own frontend, supply support instructions, matching application resources and the documented [client-delegation session configuration](https://developers.openai.com/api/docs/guides/live-delegation). The existing evaluator's restaurant resources are not interchangeable with this support example. A local service test does not establish spoken output or device playback.
+
+## 6. Replace the fixture and compare fairly
 
 A model router should receive the same bounded user request, application context and ordered option catalog. It should return only a declared option. Preserve the original selection and any effective route after validation so that a fallback does not hide a routing failure.
 

@@ -7,7 +7,9 @@
 - title: Build a read-only lookup backend for a GPT-Live voice agent
   path: examples/audio/decisions_voice_agent.md
   slug: gpt-live-read-only-lookup-backend
-  description: Test a small application-owned routing and MCP lookup backend with synthetic data before connecting a voice frontend.
+  redirects:
+    - gpt-live-read-only-lookup-backend
+  description: Build synthetic support lookups with local MCP, then optionally route a supplied WAV through GPT-Live and Luna.
   date: '2026-10-02'
   authors:
     - theo-oai
@@ -20,6 +22,8 @@
 - title: Build reliable GPT-Live application backends
   path: articles/decisions_voice_agent_best_practices.md
   slug: gpt-live-application-backend-practices
+  redirects:
+    - gpt-live-application-backend-practices
   description: Apply documented GPT-Live behavior to context, tool authorization, cancellation, observability and evaluation.
   date: '2026-10-02'
   authors:

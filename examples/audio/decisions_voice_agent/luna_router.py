@@ -18,6 +18,7 @@ tool arguments, authorization, cancellation, and verification of tool results.
 import asyncio
 import json
 import math
+from collections.abc import Callable
 from typing import Any, Protocol
 
 from agent import AUTHORIZED_ORDER_ID, Choice, RoutingRequest
@@ -133,6 +134,8 @@ class LunaRouter:
         timeout_seconds: float = 5.0,
         max_output_tokens: int = 64,
         complete_history: bool = False,
+        on_response: Callable[[Any], None] | None = None,
+        on_request: Callable[[], None] | None = None,
     ):
         if (
             isinstance(timeout_seconds, bool)
@@ -148,6 +151,8 @@ class LunaRouter:
         self.timeout_seconds = timeout_seconds
         self.max_output_tokens = max_output_tokens
         self.complete_history = complete_history
+        self.on_response = on_response
+        self.on_request = on_request
         self.client = client.with_options(max_retries=0, timeout=timeout_seconds)
 
     async def choose(self, request: RoutingRequest) -> Choice:
@@ -188,7 +193,11 @@ class LunaRouter:
         )
         validate_request_size(arguments)
         async with asyncio.timeout(self.timeout_seconds) as deadline:
+            if self.on_request is not None:
+                self.on_request()
             response = await self.client.responses.create(**arguments)
+        if self.on_response is not None:
+            self.on_response(response)
         # Reject a late response even if a client suppresses the cancellation.
         if deadline.expired():
             raise TimeoutError("Routing request deadline expired")

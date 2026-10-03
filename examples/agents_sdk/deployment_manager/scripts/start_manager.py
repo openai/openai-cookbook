@@ -6,10 +6,20 @@ import subprocess
 from pathlib import Path
 
 
+def _valid_port(value: str) -> int:
+    try:
+        port = int(value)
+    except ValueError as exc:
+        raise argparse.ArgumentTypeError("port must be an integer") from exc
+    if not 1 <= port <= 65535:
+        raise argparse.ArgumentTypeError("port must be between 1 and 65535")
+    return port
+
+
 def main() -> None:
     parser = argparse.ArgumentParser()
     parser.add_argument("--host", default="127.0.0.1")
-    parser.add_argument("--port", default="8732")
+    parser.add_argument("--port", type=_valid_port, default=8732)
     parser.add_argument("--log-file", required=True)
     parser.add_argument("--pid-file", required=True)
     args = parser.parse_args()

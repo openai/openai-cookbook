@@ -4,6 +4,7 @@ from __future__ import annotations
 
 import asyncio
 import os
+from collections.abc import Callable
 from typing import Any
 
 from assistants.client.backend import ApplicationBackend
@@ -27,6 +28,12 @@ class ClientDelegatedAssistant(LiveFrontend):
         config: LiveAgentSettings | None = None,
         tool_executor: ToolExecutor | None = None,
         backend: ApplicationBackend | None = None,
+        controller_factory: Callable[..., ClientDelegationController] = ClientDelegationController,
+        max_pending: int | None = None,
+        max_delegations: int | None = None,
+        work_timeout: float | None = None,
+        bounded: bool = False,
+        raw_observer: Callable[[dict[str, Any], str], None] | None = None,
     ) -> None:
         selected_config = config or (
             LiveAgentSettings(
@@ -46,6 +53,8 @@ class ClientDelegatedAssistant(LiveFrontend):
             api_key=api_key,
             config=selected_config,
             tool_executor=tool_executor,
+            bounded=bounded,
+            raw_observer=raw_observer,
         )
         initial_context = getattr(getattr(scenario, "input", None), "context", None)
         initial_items = build_initial_items(initial_context.history) if initial_context is not None else []
@@ -66,12 +75,22 @@ class ClientDelegatedAssistant(LiveFrontend):
                 max_output_tokens=self.config.backend_max_output_tokens,
                 execute_tool=self._execute_tool,
             )
-            self.controller = ClientDelegationController(
+            self.controller = controller_factory(
                 backend=self.backend,
                 send_live=self._send_live,
-                emit=self.events.put,
+                emit=self._emit_backend_event,
                 initial_items=initial_items,
+                max_pending=max_pending,
+                max_delegations=max_delegations,
+                work_timeout=work_timeout,
             )
+
+    async def _emit_backend_event(self, event: dict[str, Any]) -> None:
+        # Seal immediately when frontend teardown begins, before a scheduled
+        # controller close can run. Routing publication precedes tool admission.
+        if self.bounded and (self._closing or self._bounded_failed):
+            raise asyncio.CancelledError
+        await self.events.put(event)
 
     async def _execute_tool(self, name: str, arguments: dict[str, Any], call_id: str) -> dict[str, Any]:
         if self.tool_executor is None:

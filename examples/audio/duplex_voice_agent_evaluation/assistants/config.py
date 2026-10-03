@@ -7,7 +7,7 @@ import os
 from collections.abc import Mapping, Sequence
 from typing import Any, Literal
 
-from pydantic import BaseModel, Field, model_validator
+from pydantic import BaseModel, Field, ValidationInfo, model_validator
 
 from assistants.frontend.transport import build_live_websocket_url
 from assistants.resources import assistant_resources
@@ -65,8 +65,9 @@ class LiveAgentSettings(BaseModel):
 
     @model_validator(mode="before")
     @classmethod
-    def load_local_environment(cls, value: Any) -> Any:
-        load_environment()
+    def load_local_environment(cls, value: Any, info: ValidationInfo) -> Any:
+        if not (isinstance(info.context, dict) and info.context.get("load_environment") is False):
+            load_environment()
         return value
 
     endpoint: str = Field(default_factory=lambda: assistant_env("OPENAI_LIVE_ENDPOINT"))

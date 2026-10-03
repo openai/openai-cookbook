@@ -6,7 +6,7 @@ import base64
 import copy
 import json
 import time
-from typing import TYPE_CHECKING, Any
+from typing import TYPE_CHECKING, Any, Literal
 
 from assistants.errors import LiveResponseError
 from assistants.runtime import ToolExecutor
@@ -18,6 +18,8 @@ from shared.observability.timeline import Timeline, Turn
 
 if TYPE_CHECKING:
     from shared.single_turn.runtime import CallerAudioCompletion
+
+CompletionPolicy = Literal["projected_turn", "returned_audio"]
 
 
 def _decode_arguments(value: Any) -> tuple[dict[str, Any], str]:
@@ -45,7 +47,12 @@ class ResponseCollector:
         recorder: ConversationRecorder | None = None,
         audio_monitor: LiveMonitor | None = None,
         caller_audio_completion: CallerAudioCompletion | None = None,
+        completion_policy: CompletionPolicy = "projected_turn",
     ) -> None:
+        if completion_policy not in {"projected_turn", "returned_audio"}:
+            raise ValueError(f"Unknown completion policy: {completion_policy}")
+        self.completion_policy = completion_policy
+        self.completion_basis: str | None = None
         self.sample_rate_hz = sample_rate_hz
         self.tool_observer = tool_observer
         self.recorder = recorder
@@ -83,6 +90,9 @@ class ResponseCollector:
         self._message_response_ids: dict[str, str] = {}
         self._tool_response_ids: set[str] = set()
         self._reply_markers: dict[tuple[str, str], tuple[int, set[str]] | None] = {}
+        self._published_client_replies: set[str] = set()
+        self._completed_client_replies: set[str] = set()
+        self._latest_speech_episode_received_ms = -1
         self.last_meaningful_event_at = self.response_started_at
         self.settle_seconds = max(0.6, chunk_ms / 1000 * 2)
 
@@ -92,6 +102,7 @@ class ResponseCollector:
         return max(0, round((time.monotonic() - self.response_started_at) * 1_000))
 
     def is_complete(self, *, pending_tools: bool) -> bool:
+        self.completion_basis = None
         now_ms = self.timeline_clock_ms()
         for role in ("user", "assistant"):
             for turn in self.event_timeline.transcript_projection.project(
@@ -121,20 +132,76 @@ class ResponseCollector:
         ]
         assistant = self.event_timeline.latest_turn("assistant")
         has_spoken_turn = bool(assistant and not self.event_timeline.transcript_projection.pending("assistant"))
-        return (
+        drained = (
             (self.caller_audio_completion is None or self.caller_audio_completion.completed.is_set())
-            and has_spoken_turn
             and not self.active_response_ids
             and not self.active_client_delegations
             and not pending_tools
             and not self.event_timeline.delegation_active
-            and self._has_returned_reply(assistant)
-            and assistant.end_ms >= self.event_timeline.last_assistant_speech_ms
             # Output can contain an unending silent tail. Queued speech already
             # contributes its future playout endpoint to last_assistant_speech_ms.
             and now_ms >= self.event_timeline.last_assistant_speech_ms + round(self.settle_seconds * 1_000)
             and (not self.tool_calls or bool(self.post_tool_assistant_fragments))
             and time.monotonic() - self.last_meaningful_event_at >= self.settle_seconds
+        )
+        if not drained:
+            return False
+        if self.completion_policy == "returned_audio" and not (
+            self._has_published_client_reply() and self._has_returned_audio(now_ms)
+        ):
+            return False
+        if (
+            has_spoken_turn
+            and self._has_returned_reply(assistant)
+            and assistant.end_ms >= self.event_timeline.last_assistant_speech_ms
+        ):
+            self.completion_basis = "projected_turn"
+            return True
+        if self.completion_policy == "returned_audio":
+            self.completion_basis = "returned_audio_with_unaligned_captions"
+            return True
+        return False
+
+    def _has_published_client_reply(self) -> bool:
+        """The WAV policy requires actual correlated publication and completion."""
+        return bool(self._reply_markers) and all(
+            kind == "client"
+            and marker is not None
+            and identifier in self._published_client_replies
+            and identifier in self._completed_client_replies
+            for (kind, identifier), marker in self._reply_markers.items()
+        )
+
+    def _post_return_caption_groups(self) -> list[dict[str, Any]]:
+        markers = list(self._reply_markers.values())
+        if not markers or any(marker is None for marker in markers):
+            return []
+        return [
+            group
+            for group in self.event_timeline.transcript_projection.groups["assistant"]
+            if any(part[2].strip() for part in group["parts"])
+            and all(group["id"] not in marker[1] and group["first_received_ms"] > marker[0] for marker in markers)
+        ]
+
+    def _has_returned_audio(self, now_ms: int) -> bool:
+        # Caption groups need not align one-to-one with speech episodes. This
+        # operational drain policy never invents turns or clears projection work.
+        groups = self._post_return_caption_groups()
+        if not groups:
+            return False
+        latest_caption = max(
+            group["received_ms"] for group in self.event_timeline.transcript_projection.groups["assistant"]
+        )
+        return (
+            now_ms >= latest_caption + round(self.settle_seconds * 1_000)
+            # Timeline merges speech gaps <=500 ms. The tail of an earlier
+            # acknowledgment cannot count as a distinct post-result episode.
+            and all(
+                self.event_timeline.assistant_speech_started_ms > marker[0]
+                and self._latest_speech_episode_received_ms > marker[0]
+                for marker in self._reply_markers.values()
+                if marker is not None
+            )
         )
 
     def _has_returned_reply(self, assistant: Turn | None) -> bool:
@@ -244,7 +311,8 @@ class ResponseCollector:
             raise LiveResponseError("GPT Live returned invalid base64 audio", failure_stage="output_audio") from exc
         if len(pcm) % 2:
             raise LiveResponseError("GPT Live returned incomplete PCM16 samples", failure_stage="output_audio")
-        start_sample = max(self._output_end_sample, self.timeline_clock_ms() * self.sample_rate_hz // 1_000)
+        received_ms = self.timeline_clock_ms()
+        start_sample = max(self._output_end_sample, received_ms * self.sample_rate_hz // 1_000)
         gap_samples = start_sample - self._output_end_sample if self.output_audio else 0
         audio_start_ms = start_sample * 1_000 // self.sample_rate_hz
         contiguous = bool(self.output_audio) and gap_samples == 0
@@ -263,9 +331,12 @@ class ResponseCollector:
         speech_intervals = speech_intervals_pcm16(pcm, audio_start_ms, self.sample_rate_hz, 220.0)
         if speech_intervals:
             self.last_meaningful_event_at = time.monotonic()
+        previous_episode_start = self.event_timeline.assistant_speech_started_ms
         self.event_timeline.apply_event(
             local_event, assistant_speaking=bool(speech_intervals), speech_intervals=speech_intervals
         )
+        if self.event_timeline.assistant_speech_started_ms != previous_episode_start:
+            self._latest_speech_episode_received_ms = received_ms
         if self.first_speech_offset is None:
             self.first_speech_offset = first_speech_offset_ms(
                 pcm, start_ms=audio_start_ms, sample_rate_hz=self.sample_rate_hz
@@ -379,6 +450,8 @@ class ResponseCollector:
     def _on_client_delegation_completed(self, event: dict[str, Any], elapsed: float) -> bool | None:
         identifier = event.get("delegation_id")
         if isinstance(identifier, str):
+            if ("client", identifier) in self._reply_markers:
+                self._completed_client_replies.add(identifier)
             text = event.get("text")
             if ("client", identifier) in self._reply_markers and isinstance(text, str) and text.strip():
                 self._mark_returned_content(("client", identifier))
@@ -391,6 +464,10 @@ class ResponseCollector:
             and isinstance(identifier, str)
             and ("client", identifier) in self._reply_markers
         ):
+            # Completion before publication cannot establish the opt-in policy's
+            # return boundary. Later duplicate events must not rehabilitate it.
+            if self.completion_policy != "returned_audio" or identifier not in self._completed_client_replies:
+                self._published_client_replies.add(identifier)
             self._mark_returned_content(("client", identifier))
 
     def _on_response_completed(self, event: dict[str, Any], elapsed: float) -> bool | None:
@@ -455,6 +532,12 @@ class ResponseCollector:
         assistant_turn_transcript = " ".join(
             str(item.get("transcript", "")).strip() for item in assistant_turns
         ).strip()
+        raw_assistant_text = fragment_text(self.assistant_fragments)
+        post_return_text = " ".join(
+            "".join(part[2] for part in sorted(group["parts"], key=lambda part: part[:2])).strip()
+            for group in self._post_return_caption_groups()
+        ).strip()
+        unaligned = self.completion_basis == "returned_audio_with_unaligned_captions"
         input_transcript = " ".join(str(item.get("transcript", "")).strip() for item in user_turns).strip()
         projected_user_ends = [turn["end_ms"] for turn in user_turns if isinstance(turn.get("end_ms"), int)]
         user_turn_end_ms = max(projected_user_ends) if projected_user_ends else None
@@ -480,7 +563,13 @@ class ResponseCollector:
             self.first_tool_completed_ms = from_caller_completion(self.first_tool_completed_ms)
             self.backend_completed_ms = from_caller_completion(self.backend_completed_ms)
         return {
-            "assistant_text": assistant_turn_transcript or fragment_text(self.assistant_fragments),
+            "assistant_text": post_return_text if unaligned else assistant_turn_transcript or raw_assistant_text,
+            "completion_basis": self.completion_basis,
+            "projection_complete": bool(assistant_turns)
+            and not self.event_timeline.transcript_projection.pending("assistant")
+            and max(turn["end_ms"] for turn in assistant_turns) >= self.event_timeline.last_assistant_speech_ms,
+            "raw_assistant_text": raw_assistant_text,
+            "post_return_assistant_text": post_return_text,
             "assistant_turn_transcript": assistant_turn_transcript,
             "input_transcript": input_transcript or fragment_text(self.input_fragments),
             "input_fragments": self.input_fragments,

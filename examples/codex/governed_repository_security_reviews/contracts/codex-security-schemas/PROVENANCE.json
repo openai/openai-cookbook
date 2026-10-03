@@ -1,0 +1,16 @@
+{
+  "format": "public-official-codex-security-schema-snapshot/v1",
+  "source_repository": "https://github.com/openai/codex-security",
+  "source_commit": "59d026a0579af084b419cd7f33b8e1b867338ee8",
+  "source_directory": "sdk/typescript/_bundled_plugin/schemas",
+  "license": "Apache-2.0",
+  "copyright": "Copyright 2025 OpenAI",
+  "license_file": "UPSTREAM-LICENSE-APACHE-2.0.txt",
+  "license_sha256": "d17f227e4df5da1600391338865ce0f3055211760a36688f816941d58232d8dc",
+  "schemas": {
+    "coverage.schema.json": "7964b132998ca4dcdd19c75f5d92483e1d44cb71462237709b968ec548c10652",
+    "findings.schema.json": "a480337cc0fa4c48c44fc7be17c6c4348767815570775cda80f2aaf797b8e56c",
+    "scan-manifest.schema.json": "265a48629113f77cd65a3127f1f7e95d3c39ae60e868685837a6aa31d4133310"
+  },
+  "redistribution_notice": "Official public schemas are redistributed unmodified with their upstream Apache-2.0 licence and immutable source-commit attribution."
+}

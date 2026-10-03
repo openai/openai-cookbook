@@ -1,0 +1,277 @@
+{
+  "schema_version": 1,
+  "name": "Explicit synthetic threat-context expectations",
+  "label_provenance": {
+    "method": "Explicit scenario labels authored for this tutorial, independently of catalogue outputs",
+    "derived_from_assign_or_compare_strategies": false,
+    "independent_domain_review": "not_performed",
+    "limitation": "Checks context retention and illustrative policy gates, not vulnerability discovery, exploitability, or completeness for a real repository."
+  },
+  "catalogue": {
+    "version": "labelled-org-v1",
+    "organisation_controls": [
+      "audit_logging",
+      "encryption_at_rest",
+      "identity_governance",
+      "network_segmentation"
+    ]
+  },
+  "repository_defaults": {
+    "commit_sha": "1111111111111111111111111111111111111111",
+    "owner": "example-reviewer",
+    "language": "python",
+    "framework": "stdlib",
+    "topology": "library",
+    "data_class": "public",
+    "exposure": "offline",
+    "authentication": "none",
+    "dependencies": [],
+    "criticality": "low",
+    "controls": ["audit_logging"],
+    "changed_paths": [],
+    "material_divergence": false
+  },
+  "cases": [
+    {
+      "id": "offline-library",
+      "description": "An offline public-data Python library needs the organisation baseline, with no network or sensitive-data scenario.",
+      "repository": {"repo_id": "synthetic/offline-library"},
+      "expected": {
+        "archetype": "python:stdlib:library:offline",
+        "risk_tier": "standard",
+        "human_acceptance_required": false,
+        "bespoke_model_required": false,
+        "scenarios": ["audit_tampering", "dependency_supply_chain", "identity_abuse"]
+      }
+    },
+    {
+      "id": "private-api",
+      "description": "An internal FastAPI container has service identity and requires runtime and framework authorisation context.",
+      "repository": {
+        "repo_id": "synthetic/private-api",
+        "framework": "fastapi",
+        "topology": "container",
+        "data_class": "internal",
+        "exposure": "private",
+        "authentication": "service_identity",
+        "criticality": "medium"
+      },
+      "expected": {
+        "archetype": "python:fastapi:container:private",
+        "risk_tier": "standard",
+        "human_acceptance_required": false,
+        "bespoke_model_required": false,
+        "scenarios": ["audit_tampering", "dependency_supply_chain", "framework_authorisation_bypass", "identity_abuse", "runtime_identity_escape"]
+      }
+    },
+    {
+      "id": "public-api",
+      "description": "An internet-facing Express container with OIDC also needs remote-input and authentication-bypass context.",
+      "repository": {
+        "repo_id": "synthetic/public-api",
+        "language": "typescript",
+        "framework": "express",
+        "topology": "container",
+        "data_class": "internal",
+        "exposure": "internet",
+        "authentication": "oidc",
+        "criticality": "medium"
+      },
+      "expected": {
+        "archetype": "typescript:express:container:internet",
+        "risk_tier": "standard",
+        "human_acceptance_required": false,
+        "bespoke_model_required": false,
+        "scenarios": ["audit_tampering", "authentication_bypass", "dependency_supply_chain", "framework_authorisation_bypass", "identity_abuse", "remote_input_injection", "runtime_identity_escape"]
+      }
+    },
+    {
+      "id": "restricted-public-api",
+      "description": "An internet-facing Django serverless service handles restricted data: retain regulated-data context and require a bespoke model plus human acceptance.",
+      "repository": {
+        "repo_id": "synthetic/restricted-public-api",
+        "framework": "django",
+        "topology": "serverless",
+        "data_class": "restricted",
+        "exposure": "internet",
+        "authentication": "oidc",
+        "criticality": "high"
+      },
+      "expected": {
+        "archetype": "python:django:serverless:internet",
+        "risk_tier": "high",
+        "human_acceptance_required": true,
+        "bespoke_model_required": true,
+        "scenarios": ["audit_tampering", "authentication_bypass", "dependency_supply_chain", "framework_authorisation_bypass", "identity_abuse", "regulated_data_boundary", "remote_input_injection", "runtime_identity_escape", "sensitive_data_exfiltration"]
+      }
+    },
+    {
+      "id": "unauthenticated-public-service",
+      "description": "An unauthenticated public Go container requires the public-entrypoint scenario and a bespoke human gate even though its data is public.",
+      "repository": {
+        "repo_id": "synthetic/unauthenticated-public-service",
+        "language": "go",
+        "topology": "container",
+        "exposure": "internet",
+        "criticality": "medium"
+      },
+      "expected": {
+        "archetype": "go:stdlib:container:internet",
+        "risk_tier": "high",
+        "human_acceptance_required": true,
+        "bespoke_model_required": true,
+        "scenarios": ["audit_tampering", "authentication_bypass", "dependency_supply_chain", "identity_abuse", "remote_input_injection", "runtime_identity_escape", "unauthenticated_public_entrypoint"]
+      }
+    },
+    {
+      "id": "confidential-worker",
+      "description": "A private Python worker handles confidential data: retain queue-tampering and exfiltration context. This illustrative policy does not escalate high criticality alone to the critical tier.",
+      "repository": {
+        "repo_id": "synthetic/confidential-worker",
+        "topology": "worker",
+        "data_class": "confidential",
+        "exposure": "private",
+        "authentication": "service_identity",
+        "criticality": "high"
+      },
+      "expected": {
+        "archetype": "python:stdlib:worker:private",
+        "risk_tier": "standard",
+        "human_acceptance_required": false,
+        "bespoke_model_required": false,
+        "scenarios": ["audit_tampering", "dependency_supply_chain", "identity_abuse", "queue_message_tampering", "sensitive_data_exfiltration"]
+      }
+    },
+    {
+      "id": "critical-private-service",
+      "description": "A critical private Spring container uses mTLS but still requires explicit human acceptance and a bespoke repository model.",
+      "repository": {
+        "repo_id": "synthetic/critical-private-service",
+        "language": "java",
+        "framework": "spring",
+        "topology": "container",
+        "data_class": "internal",
+        "exposure": "private",
+        "authentication": "mtls",
+        "criticality": "critical"
+      },
+      "expected": {
+        "archetype": "java:spring:container:private",
+        "risk_tier": "high",
+        "human_acceptance_required": true,
+        "bespoke_model_required": true,
+        "scenarios": ["audit_tampering", "dependency_supply_chain", "framework_authorisation_bypass", "identity_abuse", "runtime_identity_escape"]
+      }
+    },
+    {
+      "id": "bespoke-library",
+      "description": "An offline Go library crosses a materially unique trust boundary, so absence of internet exposure must not suppress its bespoke model or human gate.",
+      "repository": {
+        "repo_id": "synthetic/bespoke-library",
+        "language": "go",
+        "data_class": "internal",
+        "criticality": "medium",
+        "material_divergence": true
+      },
+      "expected": {
+        "archetype": "go:stdlib:library:offline",
+        "risk_tier": "high",
+        "human_acceptance_required": true,
+        "bespoke_model_required": true,
+        "scenarios": ["audit_tampering", "bespoke_trust_boundary", "dependency_supply_chain", "identity_abuse"]
+      }
+    }
+  ],
+  "drift_cases": [
+    {
+      "id": "organisation-control-change",
+      "description": "Adding an organisation control requires context revalidation for every case, without changing repository boundaries.",
+      "catalogue_changes": {
+        "organisation_controls": ["audit_logging", "encryption_at_rest", "identity_governance", "network_segmentation", "outbound_policy"]
+      },
+      "repository_changes": {},
+      "expected_revalidation_case_ids": ["offline-library", "private-api", "public-api", "restricted-public-api", "unauthenticated-public-service", "confidential-worker", "critical-private-service", "bespoke-library"],
+      "expected_boundary_change_case_ids": [],
+      "expected_after": {}
+    },
+    {
+      "id": "archetype-scenario-change",
+      "description": "The private FastAPI container archetype adds tenant isolation; only its matching repository needs this new scenario and context revalidation.",
+      "catalogue_changes": {
+        "archetype_overrides": {"python:fastapi:container:private": ["tenant_isolation_violation"]}
+      },
+      "repository_changes": {},
+      "expected_revalidation_case_ids": ["private-api"],
+      "expected_boundary_change_case_ids": [],
+      "expected_after": {
+        "private-api": {
+          "archetype": "python:fastapi:container:private",
+          "risk_tier": "standard",
+          "human_acceptance_required": false,
+          "bespoke_model_required": false,
+          "scenarios": ["audit_tampering", "dependency_supply_chain", "framework_authorisation_bypass", "identity_abuse", "runtime_identity_escape", "tenant_isolation_violation"]
+        }
+      }
+    },
+    {
+      "id": "repository-data-change",
+      "description": "Only the private API begins handling confidential data; add exfiltration context and invalidate its prior boundary/context.",
+      "catalogue_changes": {},
+      "repository_changes": {"private-api": {"data_class": "confidential"}},
+      "expected_revalidation_case_ids": ["private-api"],
+      "expected_boundary_change_case_ids": ["private-api"],
+      "expected_after": {
+        "private-api": {
+          "archetype": "python:fastapi:container:private",
+          "risk_tier": "standard",
+          "human_acceptance_required": false,
+          "bespoke_model_required": false,
+          "scenarios": ["audit_tampering", "dependency_supply_chain", "framework_authorisation_bypass", "identity_abuse", "runtime_identity_escape", "sensitive_data_exfiltration"]
+        }
+      }
+    },
+    {
+      "id": "repository-authentication-change",
+      "description": "Removing authentication from the public API adds an unauthenticated-entrypoint scenario and escalates its human and bespoke gates.",
+      "catalogue_changes": {},
+      "repository_changes": {"public-api": {"authentication": "none"}},
+      "expected_revalidation_case_ids": ["public-api"],
+      "expected_boundary_change_case_ids": ["public-api"],
+      "expected_after": {
+        "public-api": {
+          "archetype": "typescript:express:container:internet",
+          "risk_tier": "high",
+          "human_acceptance_required": true,
+          "bespoke_model_required": true,
+          "scenarios": ["audit_tampering", "authentication_bypass", "dependency_supply_chain", "framework_authorisation_bypass", "identity_abuse", "remote_input_injection", "runtime_identity_escape", "unauthenticated_public_entrypoint"]
+        }
+      }
+    },
+    {
+      "id": "repository-topology-change",
+      "description": "Moving the private API from a container to serverless changes its boundary even when its required scenario names remain the same.",
+      "catalogue_changes": {},
+      "repository_changes": {"private-api": {"topology": "serverless"}},
+      "expected_revalidation_case_ids": ["private-api"],
+      "expected_boundary_change_case_ids": ["private-api"],
+      "expected_after": {
+        "private-api": {
+          "archetype": "python:fastapi:serverless:private",
+          "risk_tier": "standard",
+          "human_acceptance_required": false,
+          "bespoke_model_required": false,
+          "scenarios": ["audit_tampering", "dependency_supply_chain", "framework_authorisation_bypass", "identity_abuse", "runtime_identity_escape"]
+        }
+      }
+    },
+    {
+      "id": "unchanged-repeat",
+      "description": "Re-reading identical repository metadata and context must not create context drift.",
+      "catalogue_changes": {},
+      "repository_changes": {},
+      "expected_revalidation_case_ids": [],
+      "expected_boundary_change_case_ids": [],
+      "expected_after": {}
+    }
+  ]
+}

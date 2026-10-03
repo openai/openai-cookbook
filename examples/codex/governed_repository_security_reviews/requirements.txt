@@ -1,0 +1,7 @@
+# Optional notebook/editorial validation only. The core example is stdlib-only.
+nbformat==5.10.4
+nbclient==0.10.2
+ipykernel==6.30.1
+PyYAML==6.0.2
+jsonschema==4.25.1
+nbconvert==7.16.6

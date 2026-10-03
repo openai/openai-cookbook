@@ -242,6 +242,129 @@ class Router:
         self.closed = True
 
 
+class CaptionMismatchSocket(Socket):
+    """Caption coordinates differ from the locally observed PCM episode count."""
+
+    def __init__(self, *, final_usage=1.25, malformed_audio=False):
+        super().__init__()
+        self.final_usage = final_usage
+        self.malformed_audio = malformed_audio
+        speech = (1000).to_bytes(2, "little", signed=True) * (24 * 400)
+        self.pcm = speech + bytes(24 * 600 * 2) + speech
+
+    async def send_json(self, event):
+        if event["type"] == "session.commentary.append":
+            self.sent.append(event)
+
+            async def reply():
+                await asyncio.sleep(0.05)
+                for index, text in enumerate(
+                    ["Order DEMO-1001 ", "has shipped. ", "Its estimated delivery is Friday."]
+                ):
+                    await self.messages.put(
+                        {
+                            "type": "session.output_transcript.delta",
+                            "event_id": f"caption-{index}",
+                            "start_ms": 50_000 + index * 2000,
+                            "end_ms": 50_100 + index * 2000,
+                            "delta": text,
+                        }
+                    )
+                await self.messages.put(
+                    {
+                        "type": "session.output_audio.delta",
+                        "delta": (
+                            "invalid!"
+                            if self.malformed_audio
+                            else base64.b64encode(self.pcm).decode()
+                        ),
+                    }
+                )
+
+            self.reply_task = asyncio.create_task(reply())
+        elif event["type"] == "session.close":
+            self.sent.append(event)
+            await self.messages.put(
+                {
+                    "type": "session.closed",
+                    "session": {"id": "offline", "model": "gpt-live-1"},
+                    "usage": {"seconds": self.final_usage},
+                    "reason": "close_requested",
+                }
+            )
+        else:
+            await super().send_json(event)
+
+
+@pytest.mark.parametrize("final_usage", [1.25, None, True])
+async def test_unaligned_captions_drain_real_collector_without_fabricating_finalization(
+    tmp_path, monkeypatch, final_usage
+):
+    socket = CaptionMismatchSocket(final_usage=final_usage)
+    session = Session(socket)
+    monkeypatch.setattr(frontend.aiohttp, "ClientSession", lambda **kwargs: session)
+    monkeypatch.setattr(frontend, "configured_proxy", lambda url: None)
+    monkeypatch.setattr(wav_demo, "WORK_SECONDS", 5)
+    routers = []
+
+    def router_factory(key, receipt):
+        router = Router(receipt)
+        routers.append(router)
+        return router
+
+    output = tmp_path / "result"
+    result = await wav_demo.run_once(
+        bytes(960), output, "offline-not-a-key", router_factory=router_factory
+    )
+    assert result["response_completion"] == {
+        "basis": "returned_audio_with_unaligned_captions",
+        "projection_complete": False,
+        "projected_turns": [],
+    }
+    assert result["assistant_text"] == (
+        "Order DEMO-1001 has shipped. Its estimated delivery is Friday."
+    )
+    assert result["raw_assistant_text"] == result["assistant_text"]
+    assert len(routers[0].requests) == len(result["tool_executions"]) == session.connects == 1
+    assert result["tool_executions"][0]["mcp"]["transport_closed"]
+    assert session.closed and routers[0].closed
+    assert len([event for event in socket.sent if event["type"] == "session.close"]) == 1
+    assert (
+        len([event for event in socket.sent if event["type"] == "session.commentary.append"]) == 1
+    )
+    with wave.open(str(output / "output.wav")) as saved:
+        assert saved.readframes(saved.getnframes()) == socket.pcm
+    assert result["output_audio_bytes"] == len(socket.pcm)
+    assert result["route"]["usage_known"]
+    if type(final_usage) is float:
+        assert result["status"] == "completed" and result["live"]["usage_known"]
+        assert result["errors"] == []
+    else:
+        assert result["status"] == "unknown" and not result["live"]["usage_known"]
+        assert any(error["stage"] == "finalization" for error in result["cleanup"]["errors"])
+    persisted = json.loads((output / "result.json").read_text())
+    assert persisted["response_completion"] == result["response_completion"]
+
+
+async def test_malformed_reply_audio_cannot_use_operational_completion(tmp_path, monkeypatch):
+    socket = CaptionMismatchSocket(malformed_audio=True)
+    session = Session(socket)
+    monkeypatch.setattr(frontend.aiohttp, "ClientSession", lambda **kwargs: session)
+    monkeypatch.setattr(frontend, "configured_proxy", lambda url: None)
+    monkeypatch.setattr(wav_demo, "WORK_SECONDS", 5)
+    result = await wav_demo.run_once(
+        bytes(960),
+        tmp_path / "result",
+        "offline-not-a-key",
+        router_factory=lambda key, receipt: Router(receipt),
+    )
+    assert result["status"] == "failed"
+    assert result["response_completion"]["basis"] is None
+    assert result["live"]["usage_known"] and result["cleanup"]["transport_closed"]
+    assert "NoCompletedResponse" in result["errors"]
+    assert len(result["tool_executions"]) == 1
+
+
 async def test_supplied_audio_delegates_once_through_real_mcp_and_returns_wav(
     tmp_path, monkeypatch
 ):

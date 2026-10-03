@@ -282,6 +282,7 @@ async def run_once(
                             tool_observer=executor,
                             caller_audio_completion=completion,
                             tool_source="mcp_stdio",
+                            completion_policy="returned_audio",
                         )
                     )
                 response = collected.result()
@@ -340,6 +341,12 @@ async def run_once(
         "tool_executions": executor.executions,
         "application_state": executor.snapshot(),
         "assistant_text": response.get("assistant_text", ""),
+        "raw_assistant_text": response.get("raw_assistant_text", ""),
+        "response_completion": {
+            "basis": response.get("completion_basis"),
+            "projection_complete": response.get("projection_complete", False),
+            "projected_turns": response.get("turns", []),
+        },
         "cleanup": {
             "errors": cleanup_errors,
             "warnings": getattr(assistant, "cleanup_warnings", []),

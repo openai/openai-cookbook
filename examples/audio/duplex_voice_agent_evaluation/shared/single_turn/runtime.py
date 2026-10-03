@@ -19,7 +19,7 @@ from shared.audio.pcm import AudioQueue, speech_intervals_pcm16
 from shared.metrics.latency import elapsed_ms
 from shared.observability.timeline import Timeline, project_agent_event
 from shared.observability.trace import record_event
-from shared.single_turn.response import ResponseCollector
+from shared.single_turn.response import CompletionPolicy, ResponseCollector
 from shared.testing.live import OfflineLiveConnection
 
 
@@ -247,6 +247,7 @@ async def collect_live_response(
     audio_monitor: LiveMonitor | None = None,
     tool_source: str = "application",
     caller_audio_completion: CallerAudioCompletion | None = None,
+    completion_policy: CompletionPolicy = "projected_turn",
 ) -> dict[str, Any]:
     """Receive one response; protocol state stays independent of transport ownership."""
     collector = ResponseCollector(
@@ -257,6 +258,7 @@ async def collect_live_response(
         recorder=recorder,
         audio_monitor=audio_monitor,
         caller_audio_completion=caller_audio_completion,
+        completion_policy=completion_policy,
     )
     deadline = collector.response_started_at + timeout_seconds
     caller_deadline_set = caller_audio_completion is None

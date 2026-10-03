@@ -14,7 +14,7 @@ This builds on the [GPT-Live evaluation guide](https://developers.openai.com/coo
 - A checkout of [OpenAI Cookbook](https://github.com/openai/openai-cookbook).
 - Access to the package index for the initial dependency install. Subsequent runs can use the installed environment offline.
 
-The default example needs no API key, microphone, database or customer data. MCP runs as a local subprocess using synthetic records. The dependency declaration is in [pyproject.toml](decisions_voice_agent/pyproject.toml).
+The default example needs no API key, microphone, database or customer data. MCP runs as a local subprocess using synthetic records. The dependency declaration is in [pyproject.toml](https://github.com/openai/openai-cookbook/blob/f88a633b536a2dcdc65915af7db394089142191f/examples/audio/decisions_voice_agent/pyproject.toml).
 
 The optional voice run also needs access to `gpt-live-1` and `gpt-6-luna`, an `OPENAI_API_KEY` supplied through your environment, and a short caller recording. It makes paid Live and Responses requests. Keep the full Cookbook checkout: the `live` dependency extra imports the sibling evaluation package by relative path.
 
@@ -59,10 +59,10 @@ A successful local lookup verifies the protocol and application path. It does no
 
 Read the implementation in this order:
 
-1. [agent.py](decisions_voice_agent/agent.py): the finite choices, application-owned mapping and backend lifecycle.
-2. [support_server.py](decisions_voice_agent/support_server.py): the synthetic read-only tools.
-3. [mcp_tools.py](decisions_voice_agent/mcp_tools.py): the local MCP connection and tool-result handling.
-4. [demo.py](decisions_voice_agent/demo.py): the offline composition.
+1. [agent.py](https://github.com/openai/openai-cookbook/blob/f88a633b536a2dcdc65915af7db394089142191f/examples/audio/decisions_voice_agent/agent.py): the finite choices, application-owned mapping and backend lifecycle.
+2. [support_server.py](https://github.com/openai/openai-cookbook/blob/f88a633b536a2dcdc65915af7db394089142191f/examples/audio/decisions_voice_agent/support_server.py): the synthetic read-only tools.
+3. [mcp_tools.py](https://github.com/openai/openai-cookbook/blob/f88a633b536a2dcdc65915af7db394089142191f/examples/audio/decisions_voice_agent/mcp_tools.py): the local MCP connection and tool-result handling.
+4. [demo.py](https://github.com/openai/openai-cookbook/blob/f88a633b536a2dcdc65915af7db394089142191f/examples/audio/decisions_voice_agent/demo.py): the offline composition.
 
 The MCP client and server use the [official Python SDK](https://github.com/modelcontextprotocol/python-sdk). They do not use a model to generate or execute tool arguments.
 
@@ -98,7 +98,7 @@ env -u VIRTUAL_ENV uv run --extra live python wav_demo.py \
   --input request.wav --output-dir result --run
 ```
 
-[wav_demo.py](decisions_voice_agent/wav_demo.py) composes the support backend directly with the existing GPT-Live frontend. It supplies support-specific instructions and uses the real local MCP executor. You do not need to start `serve.py`, configure a service endpoint, or create a service token for this command.
+[wav_demo.py](https://github.com/openai/openai-cookbook/blob/f88a633b536a2dcdc65915af7db394089142191f/examples/audio/decisions_voice_agent/wav_demo.py) composes the support backend directly with the existing GPT-Live frontend. It supplies support-specific instructions and uses the real local MCP executor. You do not need to start `serve.py`, configure a service endpoint, or create a service token for this command.
 
 Inspect the files in `result`:
 
@@ -116,7 +116,7 @@ The command permits one Live attempt, at most one Luna route and one MCP call, w
 
 ## 5. Reuse the voice evaluation boundary
 
-The existing evaluator defines [ApplicationBackend](duplex_voice_agent_evaluation/assistants/client/backend.py):
+The existing evaluator defines [ApplicationBackend](https://github.com/openai/openai-cookbook/blob/f88a633b536a2dcdc65915af7db394089142191f/examples/audio/duplex_voice_agent_evaluation/assistants/client/backend.py):
 
 ```python
 class ApplicationBackend(Protocol):
@@ -126,7 +126,7 @@ class ApplicationBackend(Protocol):
 
 `DelegationHandoff` carries generic work instructions, a timestamped transcript and a follow-up indicator. Use the user's conversation and verified state to establish intent; do not route on generic `handoff.task` instructions. In a production backend, retain the relevant earlier state when each handoff contains only an incremental transcript.
 
-The evaluator's [client service](duplex_voice_agent_evaluation/assistants/client/service.py) accepts backend and controller factories. [voice_service.py](decisions_voice_agent/voice_service.py) uses these hooks to provide a bounded support service. Each connection owns its router, transcript and synthetic tool executor. Add `--mcp` to execute lookups through the local MCP client and server, including protocol, request, result and closure evidence. Without this flag, the service calls the fixture directly.
+The evaluator's [client service](https://github.com/openai/openai-cookbook/blob/f88a633b536a2dcdc65915af7db394089142191f/examples/audio/duplex_voice_agent_evaluation/assistants/client/service.py) accepts backend and controller factories. [voice_service.py](https://github.com/openai/openai-cookbook/blob/f88a633b536a2dcdc65915af7db394089142191f/examples/audio/decisions_voice_agent/voice_service.py) uses these hooks to provide a bounded support service. Each connection owns its router, transcript and synthetic tool executor. Add `--mcp` to execute lookups through the local MCP client and server, including protocol, request, result and closure evidence. Without this flag, the service calls the fixture directly.
 
 From the sample directory, install the optional dependencies and set a dedicated local service token:
 
@@ -160,7 +160,7 @@ Run the optional frontend and service tests with `env -u VIRTUAL_ENV uv run --ex
 
 A model router should receive the same bounded user request, application context and ordered option catalog. It should return only a declared option. Preserve the original selection and any effective route after validation so that a fallback does not hide a routing failure.
 
-The [Luna adapter](decisions_voice_agent/luna_router.py) uses [GPT-6 Luna](https://developers.openai.com/api/docs/models/gpt-6-luna) with reasoning disabled, Standard service tier and a strict [Structured Outputs](https://developers.openai.com/api/docs/guides/structured-outputs) enum. It includes option descriptions, bounds input and output, disables SDK retries, and rejects refusal, incomplete output or malformed responses before tool execution. Other providers can implement the same `RoutingBackend.choose()` interface using their documented contracts.
+The [Luna adapter](https://github.com/openai/openai-cookbook/blob/f88a633b536a2dcdc65915af7db394089142191f/examples/audio/decisions_voice_agent/luna_router.py) uses [GPT-6 Luna](https://developers.openai.com/api/docs/models/gpt-6-luna) with reasoning disabled, Standard service tier and a strict [Structured Outputs](https://developers.openai.com/api/docs/guides/structured-outputs) enum. It includes option descriptions, bounds input and output, disables SDK retries, and rejects refusal, incomplete output or malformed responses before tool execution. Other providers can implement the same `RoutingBackend.choose()` interface using their documented contracts.
 
 Evaluate three questions separately:
 
@@ -176,4 +176,4 @@ Report correctness and coverage alongside latency, including errors and timeouts
 
 ## Next steps
 
-Use the [backend best-practices guide](../../articles/decisions_voice_agent_best_practices.md) for context, authorization, cancellation, observability and session closure. Extend this lookup only after verifying the real provider and voice boundaries. Computer use and text-to-SQL require their own supported execution and authorization designs; this example does not implement them.
+Use the [backend best-practices guide](https://developers.openai.com/cookbook/articles/decisions_voice_agent_best_practices) for context, authorization, cancellation, observability and session closure. Extend this lookup only after verifying the real provider and voice boundaries. Computer use and text-to-SQL require their own supported execution and authorization designs; this example does not implement them.

@@ -8,7 +8,7 @@ GPT-Live can continue a spoken conversation while an application performs delega
 
 **Recommendation.** Use client delegation when your application needs to select among backends or enforce its own execution policy. Keep the interface small: a bounded request and context go in; a verified fact, clarification or failure comes out. Give the frontend conversational instructions and the backend precise task and tool instructions. Avoid repeating long tool descriptions in the voice prompt. Follow the [Live prompting guide](https://developers.openai.com/api/docs/guides/live-prompting) when tuning conversational behavior.
 
-Start with one complete path before adding an evaluation campaign. The [supplied-WAV lookup example](../examples/audio/decisions_voice_agent.md#4-run-one-spoken-lookup) checks its input locally by default and requires `--run` for provider calls. It connects a support frontend to the Luna router and local MCP lookup through one command. If you deploy the backend separately, configure client delegation, a dedicated service token and the service endpoint explicitly; the example documents the additional loopback setting for local development.
+Start with one complete path before adding an evaluation campaign. The [supplied-WAV lookup example](https://developers.openai.com/cookbook/examples/audio/decisions_voice_agent#4-run-one-spoken-lookup) checks its input locally by default and requires `--run` for provider calls. It connects a support frontend to the Luna router and local MCP lookup through one command. If you deploy the backend separately, configure client delegation, a dedicated service token and the service endpoint explicitly; the example documents the additional loopback setting for local development.
 
 ## Reconstruct intent from the conversation
 
@@ -20,7 +20,7 @@ Start with one complete path before adding an evaluation campaign. The [supplied
 
 **Recommendation.** A finite router should select an option from an application-owned list. An option can reference a fixed tool and validated arguments. Validate the selected option again before execution, then enforce the user's authorization at the tool boundary. A probability or a schema-valid answer does not grant permission.
 
-Use a reasoning backend when the task requires interpretation or argument construction beyond that finite catalog. Apply the same authorization and result checks to its tool calls. Put confirmations before consequential actions and verify the resulting application state before claiming success. The read-only [lookup example](../examples/audio/decisions_voice_agent.md) demonstrates the smaller execution boundary.
+Use a reasoning backend when the task requires interpretation or argument construction beyond that finite catalog. Apply the same authorization and result checks to its tool calls. Put confirmations before consequential actions and verify the resulting application state before claiming success. The read-only [lookup example](https://developers.openai.com/cookbook/examples/audio/decisions_voice_agent) demonstrates the smaller execution boundary.
 
 **Documented behavior.** [Structured Outputs](https://developers.openai.com/api/docs/guides/structured-outputs) can constrain a Responses result to a JSON schema. Applications must still handle refusals and incomplete responses. Schema compliance does not establish semantic correctness.
 

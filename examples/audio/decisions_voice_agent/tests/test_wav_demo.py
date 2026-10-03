@@ -2,6 +2,7 @@
 
 import asyncio
 import base64
+import hashlib
 import io
 import json
 import math
@@ -294,6 +295,61 @@ class CaptionMismatchSocket(Socket):
             )
         else:
             await super().send_json(event)
+
+
+@pytest.mark.parametrize("final_usage", [1.25, None])
+async def test_wav_retains_nonzero_audio_received_during_finalization(
+    tmp_path, monkeypatch, final_usage
+):
+    from shared.single_turn import runtime
+
+    class LateAudioSocket(CaptionMismatchSocket):
+        tail = (1000).to_bytes(2, "little", signed=True) * 2400
+
+        async def send_json(self, event):
+            if event["type"] == "session.close":
+                # These bytes arrive strictly after the real collector returns.
+                assert collected_audio
+                for index in range(2):
+                    await asyncio.sleep(0.02)
+                    await self.messages.put(
+                        {
+                            "type": "session.output_audio.delta",
+                            "event_id": f"late-audio-{index}",
+                            "delta": base64.b64encode(self.tail).decode(),
+                        }
+                    )
+            await super().send_json(event)
+
+    socket = LateAudioSocket(final_usage=final_usage)
+    session = Session(socket)
+    collected_audio = []
+    collect = runtime.collect_live_response
+
+    async def record_collector_result(*args, **kwargs):
+        result = await collect(*args, **kwargs)
+        collected_audio.append(result["output_audio_bytes"])
+        return result
+
+    monkeypatch.setattr(frontend.aiohttp, "ClientSession", lambda **kwargs: session)
+    monkeypatch.setattr(frontend, "configured_proxy", lambda url: None)
+    monkeypatch.setattr(runtime, "collect_live_response", record_collector_result)
+    monkeypatch.setattr(wav_demo, "WORK_SECONDS", 5)
+    output = tmp_path / "result"
+    result = await wav_demo.run_once(
+        bytes(960), output, "offline-not-a-key", router_factory=lambda key, receipt: Router(receipt)
+    )
+
+    assert collected_audio == [socket.pcm]
+    expected = socket.pcm + socket.tail * 2
+    with wave.open(str(output / "output.wav")) as saved:
+        assert saved.readframes(saved.getnframes()) == expected
+    assert result["output_audio_bytes"] == len(expected)
+    assert result["output_pcm_sha256"] == hashlib.sha256(expected).hexdigest()
+    assert json.loads((output / "result.json").read_text()) == result
+    assert result["cleanup"]["transport_closed"] and session.closed
+    assert result["status"] == ("completed" if final_usage is not None else "unknown")
+    assert result["live"]["usage_known"] is (final_usage is not None)
 
 
 @pytest.mark.parametrize("final_usage", [1.25, None, True])

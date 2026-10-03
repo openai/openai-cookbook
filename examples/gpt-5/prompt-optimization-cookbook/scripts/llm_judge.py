@@ -136,7 +136,7 @@ def judge_folder(
                     model=model,
                     input=messages,
                     text={"format": {"type": "text"}, "verbosity": "medium"},
-                    reasoning={"effort": "medium", "summary": "auto"},
+                    reasoning={"effort": "medium"},
                     tools=[],
                 )
                 raw = _to_text(resp)
@@ -279,7 +279,7 @@ def judge_one(
                 model=model,
                 input=messages,
                 text={"format": {"type": "text"}, "verbosity": "medium"},
-                reasoning={"effort": "medium", "summary": "auto"},
+                reasoning={"effort": "medium"},
                 tools=[],
             )
             raw = _to_text(resp)

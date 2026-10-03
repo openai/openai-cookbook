@@ -188,7 +188,6 @@ class ThresholdAdjuster:
 
         # Update state
         state.threshold_history.append(state.current_threshold)
-        state.metrics_history.append(metrics)
         state.adjustments.append(adjustment)
         state.current_threshold = new_threshold
         state.last_direction = direction

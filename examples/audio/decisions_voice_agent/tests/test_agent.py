@@ -3,7 +3,7 @@ import asyncio
 import pytest
 from cookbook_evaluation_backend import ApplicationBackend, DelegationHandoff
 
-from agent import Choice, ExampleBackend, ScriptedRouter, SupportAgent
+from agent import AUTHORIZED_ORDER_ID, Choice, ExampleBackend, ScriptedRouter, SupportAgent
 
 
 def handoff(text="Where is my order?", *, follow_up=False):
@@ -116,6 +116,22 @@ async def test_valid_but_wrong_route_is_a_semantic_failure():
     assert events[0]["choice"] != expected_choice
     assert answer != expected_answer
     assert tools.calls == [("return_policy", {})]
+    await backend.close()
+
+
+async def test_wrong_entity_route_keeps_trusted_arguments_and_observable_semantic_failure():
+    # Deliberately wrong model selection remains visible to the evaluator. The
+    # application never lets transcript text select a different resource ID.
+    tools, events = RecordingTools(), Events()
+    backend = ExampleBackend(SupportAgent(FixedRouter(Choice.ORDER_STATUS), tools))
+    await backend.run(handoff("Look up order DEMO-9999."), events.emit)
+    assert events[0]["choice"] == "order_status"
+    assert tools.calls == [("order_status", {"order_id": AUTHORIZED_ORDER_ID})]
+    assert AUTHORIZED_ORDER_ID == "DEMO-1001"
+    assert events[-1]["type"] == "tool.completed"
+    # For this unsupported entity request, any lookup is a scenario failure;
+    # schema validity and a successful authorized lookup are insufficient.
+    assert events[0]["choice"] != Choice.UNSUPPORTED
     await backend.close()
 
 

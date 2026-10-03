@@ -13,6 +13,7 @@ from enum import StrEnum
 from typing import Any, Protocol
 
 EventCallback = Callable[[dict[str, Any]], Awaitable[None]]
+AUTHORIZED_ORDER_ID = "DEMO-1001"
 
 
 class Choice(StrEnum):
@@ -89,7 +90,7 @@ class SupportAgent:
         # This demo is pre-authorized for one fictional order. A real application
         # must bind verified identity and resource permissions before this point.
         if choice == Choice.ORDER_STATUS:
-            name, arguments = "order_status", {"order_id": "DEMO-1001"}
+            name, arguments = "order_status", {"order_id": AUTHORIZED_ORDER_ID}
         else:
             name, arguments = "return_policy", {}
         await emit({"type": "tool.called", "name": name, "arguments": arguments.copy()})

@@ -88,7 +88,7 @@ class ApplicationBackend(Protocol):
 
 `DelegationHandoff` carries generic work instructions, a timestamped transcript and a follow-up indicator. Use the user's conversation and verified state to establish intent; do not route on generic `handoff.task` instructions. In a production backend, retain the relevant earlier state when each handoff contains only an incremental transcript.
 
-The evaluator's [client service](duplex_voice_agent_evaluation/assistants/client/service.py) accepts backend and controller factories. [voice_service.py](decisions_voice_agent/voice_service.py) uses these hooks to provide a bounded support service. Each connection owns its router, transcript and synthetic tool executor. This service calls the same fixture functions directly; it does not measure MCP transport latency.
+The evaluator's [client service](duplex_voice_agent_evaluation/assistants/client/service.py) accepts backend and controller factories. [voice_service.py](decisions_voice_agent/voice_service.py) uses these hooks to provide a bounded support service. Each connection owns its router, transcript and synthetic tool executor. Add `--mcp` to execute lookups through the local MCP client and server, including protocol, request, result and closure evidence. Without this flag, the service calls the fixture directly.
 
 From the sample directory, install the optional dependencies and set a dedicated local service token:
 
@@ -100,7 +100,7 @@ env -u VIRTUAL_ENV uv run --extra live python serve.py
 This starts the scripted service at `ws://127.0.0.1:8795/ws/assistant`. Keep the token private and use it in the frontend's client-service configuration. It must be separate from your API key. To use a model router, configure `OPENAI_API_KEY` securely and explicitly select Luna:
 
 ```bash
-env -u VIRTUAL_ENV uv run --extra live python serve.py --router luna
+env -u VIRTUAL_ENV uv run --extra live python serve.py --router luna --mcp
 ```
 
 The service permits one connection, one pending delegation and at most two delegations per session, with finite session, work and cleanup deadlines. It reconstructs full transcript snapshots and preserves delegation IDs. New user text invalidates pending answers. If a provider request is cancelled, the service stops admitting work because local cancellation cannot establish provider completion or usage. Offline fixtures can demonstrate replacement work without that uncertainty.
@@ -118,7 +118,7 @@ Evaluate three questions separately:
 | Question | Controlled comparison |
 | --- | --- |
 | Can a backend select the right finite option? | Identical request, context, ordered choices and model identity where supported; no fallback hiding wrong choices. |
-| Does the workflow produce the correct fact? | Same tool catalog and reasoning fallback; report selected routes, executed routes, abstentions and verified results. |
+| Does the workflow produce the correct fact? | Same tool catalog, authorized state and error behavior; report selected routes, executed routes, abstentions and verified results. |
 | Does the voice agent help the user promptly? | Same audio, frontend instructions and tools; measure first audible response and useful verified answer separately. |
 
 Include ambiguous requests, wrong-entity requests, tool outages and corrections. Freeze held-out cases before prompt tuning. Repeat paired trials with balanced execution order. Record the actual model identifiers, effort, service tier, caching, transport and retry settings; disclose settings that cannot be matched. The same mutable model alias does not establish identical frozen weights across endpoints.

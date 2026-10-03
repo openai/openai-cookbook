@@ -3,8 +3,9 @@
 Install the sibling duplex_voice_agent_evaluation package to use this module.
 create_support_app accepts a per-connection router factory; constructing it does
 not open a provider session. Provider clients and admission belong to the caller.
-The read-only executor calls the same fixture functions as the MCP server. It
-does not measure MCP transport latency. This is a single-user example.
+The default executor calls fixture functions directly. An injected MCPExecutor
+uses real stdio transport and contributes protocol evidence to tool events.
+This is a single-user example; executor configuration is application-owned.
 """
 
 from __future__ import annotations
@@ -77,26 +78,45 @@ class CallbackTools:
         self.execute = execute
         self.call_id = ""
         self.calls = 0
+        self.expected_failure: dict | None = None
 
     async def call(self, name: str, arguments: dict[str, str]) -> str:
         if self.calls >= SUPPORT_LIMITS.max_delegations:
             raise RuntimeError("Support tool allowance exhausted")
         self.calls += 1
-        async with asyncio.timeout(2):
+        self.expected_failure = None
+        async with asyncio.timeout(6):
             output = await self.execute(name, arguments, self.call_id)
         if len(json.dumps(output).encode("utf-8")) > 16 * 1024:
             raise ValueError("Support tool output exceeds the bound")
         answer = output.get("answer")
+        if output.get("ok") is False and output.get("error") == {
+            "code": "lookup_unavailable",
+            "expected": True,
+        }:
+            self.expected_failure = output["error"]
+            raise ExpectedToolError("The configured lookup is unavailable")
         if output.get("ok") is not True or not isinstance(answer, str) or not answer.strip():
             raise ValueError("Support lookup returned no verified answer")
         return answer
 
 
+class ExpectedToolError(RuntimeError):
+    """A trusted, explicitly configured business error, not a transport failure."""
+
+
 class SupportBackend(ExampleBackend):
     """Use the same SupportAgent while surfacing failed/uncertain work as failure."""
 
-    def __init__(self, router: RoutingBackend, execute_tool: ToolCallback) -> None:
+    def __init__(
+        self,
+        router: RoutingBackend,
+        execute_tool: ToolCallback,
+        *,
+        owned_executor: Any | None = None,
+    ) -> None:
         self.tools = CallbackTools(execute_tool)
+        self.owned_executor = owned_executor
         self.admission_error: str | None = None
         self._routing_pending = False
         super().__init__(SupportAgent(router, self.tools), timeout=14, shutdown_timeout=4)
@@ -112,7 +132,18 @@ class SupportBackend(ExampleBackend):
 
         async def observed(event: dict[str, Any]) -> None:
             nonlocal failed
-            if event.get("type") in {"routing.failed", "tool.failed"}:
+            expected_failure = (
+                event.get("type") == "tool.failed"
+                and event.get("error") == "ExpectedToolError"
+                and self.tools.expected_failure is not None
+            )
+            if expected_failure:
+                event = {
+                    **event,
+                    "expected": True,
+                    "error_code": self.tools.expected_failure["code"],
+                }
+            if event.get("type") in {"routing.failed", "tool.failed"} and not expected_failure:
                 failed = True
                 # Latch before any await: interruption during failure publication
                 # must not turn unknown/failed work into settled supersession.
@@ -153,15 +184,31 @@ class SupportBackend(ExampleBackend):
             self._routing_pending = False
 
     async def close(self) -> None:
+        errors = []
         try:
             await super().close()
-        finally:
-            close = getattr(self.agent.router, "close", None)
+        except BaseException as error:
+            errors.append(error)
+
+        async def close_owner(owner):
+            close = getattr(owner, "close", None)
             if close is not None:
-                async with asyncio.timeout(4):
-                    result = close()
-                    if inspect.isawaitable(result):
-                        await result
+                result = close()
+                if inspect.isawaitable(result):
+                    await result
+
+        # Independent attempts: one owner's failure must not skip the other.
+        # Keep cleanup in the owning task rather than detach new cleanup tasks.
+        for owner in (self.owned_executor, self.agent.router):
+            try:
+                async with asyncio.timeout(2):
+                    await close_owner(owner)
+            except BaseException as error:
+                errors.append(error)
+        if len(errors) == 1:
+            raise errors[0]
+        if errors:
+            raise BaseExceptionGroup("Support backend cleanup failed", errors)
 
 
 class ConversationSnapshot:
@@ -279,8 +326,14 @@ def create_support_app(
     *,
     token: str,
     limits: ServiceLimits = SUPPORT_LIMITS,
+    executor_factory: Callable[[], Any] | None = None,
 ):
-    """Serve the synthetic support fixture with one independently owned router/session."""
+    """Serve one independently owned router/session and optional async executor.
+
+    For real stdio MCP pass ``executor_factory=MCPExecutor``. Trusted per-case
+    state can use ``lambda: MCPExecutor(MCPFixtureConfig.from_case(case))``.
+    Without a factory, lookups use direct fixture functions, not MCP transport.
+    """
     if (
         limits.max_connections != 1
         or limits.max_pending_delegations != 1
@@ -289,10 +342,32 @@ def create_support_app(
         raise ValueError(
             "Support example permits one connection, one pending request, two delegations"
         )
+    # The shared service's execute callback uses to_thread for synchronous tools.
+    # Pair its observer with an async executor here so cancellation reaches MCP.
+    pending_executor: ContextVar[Any] = ContextVar("support_executor", default=None)
+
+    def tools(_configuration):
+        executor = executor_factory() if executor_factory else SyntheticSupportExecutor()
+        pending_executor.set(executor)
+        return executor
+
+    def backend(_configuration, synchronous_execute):
+        executor = pending_executor.get()
+        pending_executor.set(None)
+        if executor_factory is None:
+            return support_backend(router_factory(), synchronous_execute)
+        if not inspect.iscoroutinefunction(executor.execute):
+            raise TypeError("Injected executor must expose asynchronous execute")
+
+        async def execute(name, arguments, call_id):
+            return await executor.execute(name, arguments, call_id=call_id)
+
+        return SupportBackend(router_factory(), execute, owned_executor=executor)
+
     return create_app(
         token=token,
         limits=limits,
-        tool_factory=lambda _configuration: SyntheticSupportExecutor(),
-        backend_factory=lambda _configuration, execute: support_backend(router_factory(), execute),
+        tool_factory=tools,
+        backend_factory=backend,
         controller_factory=SupersedingController,
     )

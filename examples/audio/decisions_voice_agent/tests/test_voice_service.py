@@ -360,7 +360,7 @@ def test_service_entry_point_defaults_and_loopback_binding(monkeypatch):
         serve.parse_args(["--host", "0.0.0.0"])
     calls = []
     app = object()
-    monkeypatch.setattr(serve, "create_local_app", lambda router: app)
+    monkeypatch.setattr(serve, "create_local_app", lambda router, **kwargs: app)
     monkeypatch.setattr(web, "run_app", lambda value, **kwargs: calls.append((value, kwargs)))
     serve.main(["--port", "0"])
     assert calls == [(app, {"host": "127.0.0.1", "port": 0, "access_log": None})]
@@ -411,3 +411,142 @@ async def test_luna_service_factory_is_lazy_and_owns_client(monkeypatch):
     clients[0].responses.create.assert_not_awaited()
     await backend.close()
     clients[0].close.assert_awaited_once()
+
+
+@pytest.mark.parametrize(
+    "text,error_tool,expected",
+    [
+        ("Where is my order?", None, "is delayed"),
+        ("What is the return policy?", None, "14 days"),
+        ("Where is my order?", "order_status", "lookup is unavailable"),
+        ("What is the return policy?", "return_policy", "lookup is unavailable"),
+        ("Can you help?", None, "restate one request"),
+        ("Cancel my order.", None, "cannot change orders"),
+    ],
+)
+async def test_service_real_mcp_injection_and_expected_error_response(text, error_tool, expected):
+    from mcp_tools import MCPExecutor, MCPFixtureConfig
+
+    executors = []
+
+    def factory():
+        executor = MCPExecutor(
+            MCPFixtureConfig(
+                order_status="delayed",
+                estimated_delivery="Monday",
+                return_window_days=14,
+                error_tool=error_tool,
+                error_code="lookup_unavailable" if error_tool else None,
+            )
+        )
+        executors.append(executor)
+        return executor
+
+    app = create_support_app(token=TOKEN, executor_factory=factory)
+    assert not executors  # No process or executor at app construction.
+    events = []
+    async with (
+        TestClient(TestServer(app)) as client,
+        client.ws_connect("/ws/assistant", headers={"Authorization": f"Bearer {TOKEN}"}) as socket,
+    ):
+        # Peer configuration cannot alter the trusted executor fixture.
+        await socket.send_json({"type": "session.configure", "tools": []})
+        assert (await socket.receive_json(timeout=1))["type"] == "session.ready"
+        for event in (transcript(text), delegation()):
+            await socket.send_json({"type": "live.event", "event": event})
+        async with asyncio.timeout(5):
+            while True:
+                event = await socket.receive_json()
+                events.append(event)
+                if event.get("event", {}).get("type") == "client_delegation.completed":
+                    break
+        commentary = "".join(
+            item["event"]["content"] for item in events if item["type"] == "live.send"
+        )
+        assert expected in commentary
+        terminal_tools = [
+            item["event"]
+            for item in events
+            if item.get("event", {}).get("type") in {"tool.completed", "tool.failed"}
+        ]
+        if text in {"Can you help?", "Cancel my order."}:
+            assert not terminal_tools and not executors[0].executions
+        else:
+            observed = terminal_tools[0]
+            execution = observed["tool_execution"]
+            assert execution["call_id"] == observed["call_id"]
+            assert execution["mcp"]["transport_closed"] is True
+            assert execution["mcp"]["server_info"]["name"] == "Synthetic support"
+            assert (
+                observed["application_state"]["observed_backend_state"]["return_window_days"] == 14
+            )
+            if error_tool:
+                assert observed["type"] == "tool.failed" and observed["expected"] is True
+                assert observed["error_code"] == "lookup_unavailable"
+                assert execution["status"] == "failed" and execution["output"]["ok"] is False
+                assert execution["mcp"]["raw_result"]["isError"] is True
+            else:
+                assert observed["type"] == "tool.completed"
+                assert execution["mcp"]["raw_result"]["isError"] is False
+    assert executors[0]._closed
+
+
+async def test_unexpected_mcp_infrastructure_error_is_session_fatal(monkeypatch):
+    import mcp_tools
+
+    executor = mcp_tools.MCPExecutor()
+
+    async def unavailable(*args, **kwargs):
+        raise ConnectionError("Synthetic MCP transport outage")
+
+    monkeypatch.setattr(mcp_tools, "_exchange", unavailable)
+
+    async def execute(name, arguments, call_id):
+        return await executor.execute(name, arguments, call_id=call_id)
+
+    backend = support_backend(Router(), execute)
+    events = Events()
+    from assistants.client.backend import DelegationHandoff
+
+    try:
+        with pytest.raises(RuntimeError, match="failed"):
+            await backend.run(DelegationHandoff("Resolve request", "USER: order"), events.emit)
+        assert backend.admission_error
+        assert any(event["type"] == "tool.failed" and not event.get("expected") for event in events)
+        assert executor.executions[0]["output"]["error"]["expected"] is False
+    finally:
+        await backend.close()
+        await executor.close()
+
+
+async def test_executor_cleanup_failure_does_not_skip_router_cleanup():
+    from voice_service import SupportBackend
+
+    class FailedClose:
+        async def close(self):
+            raise RuntimeError("executor cleanup failed")
+
+    router = Router()
+    backend = SupportBackend(router, AsyncMock(), owned_executor=FailedClose())
+    with pytest.raises(RuntimeError, match="executor cleanup failed"):
+        await backend.close()
+    assert router.closed
+
+
+async def test_mcp_flag_selects_real_executor_without_opening_a_session(monkeypatch):
+    from assistants.client.service import BACKEND_FACTORY, TOOL_FACTORY
+
+    import serve
+    from mcp_tools import MCPExecutor
+
+    monkeypatch.setenv("OPENAI_CLIENT_ASSISTANT_TOKEN", TOKEN)
+    assert serve.parse_args(["--mcp"]).mcp is True
+    assert serve.parse_args([]).mcp is False
+    app = serve.create_local_app(mcp=True)
+    configuration = {"type": "session.configure"}
+    executor = app[TOOL_FACTORY](configuration)
+    backend = app[BACKEND_FACTORY](configuration, AsyncMock())
+    assert isinstance(executor, MCPExecutor)
+    assert backend.owned_executor is executor and not executor.executions
+    await backend.close()
+    assert executor._closed

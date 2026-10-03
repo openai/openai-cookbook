@@ -106,6 +106,10 @@ Examples:
         print(f"Error: Dataset file not found: {args.dataset}", file=sys.stderr)
         sys.exit(1)
 
+    if args.step_size <= 0:
+        print("Error: --step-size must be greater than 0.", file=sys.stderr)
+        sys.exit(1)
+
     # Setup logging
     log_level = logging.DEBUG if args.verbose else logging.INFO
     logging.basicConfig(

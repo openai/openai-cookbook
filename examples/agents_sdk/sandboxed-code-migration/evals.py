@@ -40,7 +40,7 @@ def read_jsonl(path: Path) -> list[dict[str, Any]]:
 
 
 def require_output(path: Path) -> None:
-    if not path.exists():
+    if not path.is_file():
         raise FileNotFoundError(
             f"Missing {path}. Run the full migration agent before running artifact evals."
         )

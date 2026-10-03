@@ -18,6 +18,12 @@ jobs:
         with:
           python-version: '3.12'
 
+      - name: Check path portability
+        run: python .github/scripts/check_path_portability.py
+
+      - name: Test path portability guard
+        run: python .github/scripts/test_path_portability.py
+
       - name: Install dependencies
         run: pip install nbformat
 

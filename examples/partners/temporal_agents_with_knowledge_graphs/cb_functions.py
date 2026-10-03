@@ -80,14 +80,9 @@ def _load_entity_maps(conn: sqlite3.Connection) -> tuple[dict[bytes, bytes], dic
         name = row[1]
         resolved_id = row[2]
 
-        if resolved_id:
-            # If entity has a resolved_id, map to that
-            entity_to_canonical[entity_id] = resolved_id
-            # Store name of the canonical entity
-            canonical_names[resolved_id] = name
-        else:
-            # If no resolved_id, entity is its own canonical version
-            entity_to_canonical[entity_id] = entity_id
+        canonical_id = resolved_id or entity_id
+        entity_to_canonical[entity_id] = canonical_id
+        if canonical_id == entity_id:
             canonical_names[entity_id] = name
 
     return entity_to_canonical, canonical_names

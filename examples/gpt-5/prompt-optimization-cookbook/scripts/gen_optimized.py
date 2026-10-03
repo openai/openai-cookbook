@@ -42,6 +42,9 @@ def _call_model_with_retry(*, model: str, dev_prompt: str, user_prompt: str, max
 
 
 def generate_optimized_topk(*, model: str = "gpt-5", n_runs: int = 30, concurrency: int = 10, output_dir: str = "results_topk_optimized", dev_prompt: str, user_prompt: str) -> Path:
+    if concurrency < 1:
+        raise ValueError("concurrency must be at least 1")
+
     out = Path(output_dir)
     out.mkdir(parents=True, exist_ok=True)
 

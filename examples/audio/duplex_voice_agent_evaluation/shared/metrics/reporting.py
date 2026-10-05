@@ -5,7 +5,8 @@ from __future__ import annotations
 from collections.abc import Mapping
 from typing import Any
 
-from shared.metrics.evidence import evidence_scores
+from shared.metrics.evidence import evidence_scores, expected_tool_count, optional_count
+from shared.reporting.validation import require_task_completed
 
 METRIC_COLUMNS = (
     "task_completed",
@@ -56,6 +57,10 @@ def _response_policy_fields(interaction: dict[str, Any]) -> dict[str, Any]:
     }
 
 
+def _count_pair(actual: int | None, expected: int | None) -> str | None:
+    return None if actual is None or expected is None else f"{actual}/{expected}"
+
+
 def build_metric_row(
     *,
     task: dict[str, Any],
@@ -66,25 +71,28 @@ def build_metric_row(
     usage: Mapping[str, Any] | None = None,
 ) -> dict[str, Any]:
     """Project measured evidence into one small, phase-independent result row."""
+    task_completed = require_task_completed(task)
     scores = evidence_scores(task, efficiency, golden)
     if evidence is not None:
-        scores.update(evidence)
-    actual_turns = max(0, int(efficiency.get("total_turns", 0)))
-    golden_turns = max(0, int(golden.get("total_turns", 0)))
-    actual_tools = max(0, int(efficiency.get("unique_tool_invocation_count", 0)))
-    golden_tools = sum(max(0, int(item.get("count", 1))) for item in golden.get("tool_calls", []))
-    actual_delegations = max(0, int(efficiency.get("delegation_count", int(bool(task.get("delegation_observed"))))))
-    golden_delegations = max(0, int(golden.get("delegations", int(bool(task.get("delegation_required"))))))
+        # A supplied score may refine or withhold an assessable measurement,
+        # but cannot fill in observations that were never made.
+        scores.update({key: value for key, value in evidence.items() if scores.get(key) is not None})
+    actual_turns = optional_count(efficiency.get("total_turns"))
+    golden_turns = optional_count(golden.get("total_turns"))
+    actual_tools = optional_count(efficiency.get("unique_tool_invocation_count"))
+    golden_tools = expected_tool_count(golden)
+    actual_delegations = optional_count(efficiency.get("delegation_count"))
+    golden_delegations = optional_count(golden.get("delegations"))
     tokens = usage or {}
     return {
         **_response_policy_fields(interaction),
-        "task_completed": bool(task.get("task_completed", False)),
+        "task_completed": task_completed,
         "semantic_quality": task.get("semantic_quality"),
         "tool_accuracy": scores.get("tool_accuracy"),
-        "tool_calls": f"{actual_tools}/{golden_tools}",
+        "tool_calls": _count_pair(actual_tools, golden_tools),
         "delegation_accuracy": scores.get("delegation_accuracy"),
-        "delegations": f"{actual_delegations}/{golden_delegations}",
-        "turns": f"{actual_turns}/{golden_turns}",
+        "delegations": _count_pair(actual_delegations, golden_delegations),
+        "turns": _count_pair(actual_turns, golden_turns),
         "response_rate": interaction.get("response_rate"),
         "response_latency_ms": interaction.get("response_latency_ms"),
         "interruption_rate": interaction.get("interruption_rate", interaction.get("agent_interruption_rate")),

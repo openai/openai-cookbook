@@ -72,6 +72,11 @@ strongly preferred; synthetic WALK fixtures are a fallback.
 
 The delegation mode is fixed for each session; switching implementations
 starts a new session.
+Only `responses` and `client` are implemented. The assistant factory rejects
+unsupported effective `assistant_mode` values, including `null` and non-string
+values, before constructing either assistant. Explicit configuration takes
+precedence over settings; legacy settings that omit the mode retain the
+`responses` default.
 
 Both implementations use the same authorized instructions and application
 tools. Private scenario expectations, grading criteria, and caller agenda never
@@ -800,6 +805,19 @@ saved transcript, audio, protocol events, tool calls, and application state.
 | Audio | `floor_hold_silence_ms` | Cumulative silent time and longest uninterrupted silent episode in milliseconds while an agent delegation is active, reported as `{ "cumulative": 360, "maximum": 210 }`; caller and agent speech are excluded. | All scenarios, including zero for both values when no delegation holds the floor. |
 | Consumption | `frontend.audio_duration_ms` | Final cumulative GPT Live `usage.seconds`, converted to milliseconds. Legacy results may also contain frontend token fields. | All modules. |
 | Consumption | `backend.total_tokens`, `backend.input`, `backend.output` | Delegated reasoning usage including available cached, text, and reasoning token breakdowns; a `models` breakdown appears only for multiple backend models. | Delegated scenarios. |
+
+Result producers must supply `task_completed` as a native Python boolean
+(`true` or `false` in JSON). Strings, numbers, `null`, and missing values are
+invalid. Invalid completion evidence becomes a per-record
+`infrastructure_error`, so other records can still be reported. These errors
+are excluded from the target pass/fail denominator. A valid
+`task_completed: true` can remain as diagnostic evidence on an infrastructure-error record;
+use its `status`, not that diagnostic value, when counting valid outcomes.
+
+Count comparisons (`turns`, `tool_calls`, and `delegations`) and tool/delegation
+accuracy scores are `null` when required evidence is unavailable. An explicit
+observed zero remains a valid measurement; absent evidence does not establish
+that no turns, tool calls, or delegations occurred.
 
 For valid attempts, task completion determines pass/fail: the assistant must achieve the
 caller’s goal, reach the correct application state, avoid unauthorized

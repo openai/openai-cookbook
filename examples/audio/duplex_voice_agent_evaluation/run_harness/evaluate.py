@@ -7,6 +7,7 @@ import asyncio
 import json
 import os
 from collections.abc import Sequence
+from dataclasses import replace
 from math import isfinite
 from pathlib import Path
 from typing import Any
@@ -41,6 +42,7 @@ from shared.paths import default_results_dir, package_path, require_external_out
 from shared.private_files import private_directory
 from shared.reporting.compat import is_live_frontend_usage
 from shared.reporting.results import build_results_report, build_timestamped_run_name, write_json
+from shared.reporting.validation import ResultValidationError, require_task_completed
 
 HARNESS_DIR = package_path("run_harness")
 DEFAULT_CONFIG_PATH = HARNESS_DIR / "config.toml"
@@ -328,13 +330,17 @@ def result_row(scenario: Scenario, result: EvalResult, *, offline: bool) -> dict
     golden = _golden(scenario)
     artifacts = result.artifacts or {}
     tokens = _token_counts(result)
-    metrics = build_metric_row(
-        task=result.task_metrics,
-        efficiency=result.efficiency_metrics,
-        interaction=result.interaction_metrics,
-        golden=golden,
-        usage=tokens,
-    )
+    try:
+        metrics = build_metric_row(
+            task=result.task_metrics,
+            efficiency=result.efficiency_metrics,
+            interaction=result.interaction_metrics,
+            golden=golden,
+            usage=tokens,
+        )
+    except ResultValidationError as exc:
+        exc.partial_result = result
+        raise
     assessment = result.task_metrics.get("outcome_assessment", {})
     validity = (result.run_metadata or {}).get("simulator_validity", {})
     invalid_simulator = validity.get("status") == "invalid"
@@ -387,14 +393,39 @@ def result_row(scenario: Scenario, result: EvalResult, *, offline: bool) -> dict
 
 def failed_row(scenario: Scenario, exc: Exception, *, offline: bool, args: argparse.Namespace) -> dict[str, Any]:
     """Exclude infrastructure and judge failures from target-model grading."""
-    golden = _golden(scenario)
     partial = getattr(exc, "partial_result", None)
+    failure_stage = getattr(exc, "failure_stage", None) or "run_or_judge"
+    error_message = str(exc)
+    invalid_partial = isinstance(exc, ResultValidationError)
+    if partial is not None:
+        if invalid_partial:
+            previous_failure = (partial.run_metadata or {}).get("failure", {})
+            if isinstance(previous_failure, dict) and previous_failure.get("stage"):
+                failure_stage = previous_failure["stage"]
+                error_message = previous_failure.get("message") or error_message
+        try:
+            require_task_completed(partial.task_metrics)
+        except ResultValidationError:
+            invalid_partial = True
+    if partial is not None and invalid_partial:
+        partial = replace(
+            partial,
+            task_status="error",
+            task_metrics={**partial.task_metrics, "task_completed": False},
+            termination_reason=failure_stage,
+            run_metadata={
+                **(partial.run_metadata or {}),
+                "failure": {"stage": failure_stage, "message": error_message},
+            },
+        )
+        if (partial.artifacts or {}).get("result"):
+            write_json(Path(partial.artifacts["result"]), partial.model_dump())
     observed = (
         result_row(scenario, partial, offline=offline)
         if partial is not None
         else {
-            "turns": f"0/{golden['total_turns']}",
-            "tool_calls": f"0/{len(golden['tool_calls'])}",
+            "turns": None,
+            "tool_calls": None,
         }
     )
     return {
@@ -408,8 +439,8 @@ def failed_row(scenario: Scenario, exc: Exception, *, offline: bool, args: argpa
         "audio_condition": args.condition,
         "agent_model": args.model,
         "backend_model": args.backend_model,
-        "failure_stage": getattr(exc, "failure_stage", "run_or_judge"),
-        "error_message": str(exc),
+        "failure_stage": failure_stage,
+        "error_message": error_message,
     }
 
 
@@ -557,6 +588,11 @@ async def run_evals(args: argparse.Namespace | None = None) -> Path:
                         else None
                     ),
                 )
+                try:
+                    require_task_completed(result.task_metrics)
+                except ResultValidationError as exc:
+                    exc.partial_result = result
+                    raise
                 procedure = grade_procedure(
                     scenario,
                     result,

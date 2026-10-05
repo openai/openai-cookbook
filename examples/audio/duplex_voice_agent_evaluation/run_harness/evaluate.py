@@ -7,6 +7,7 @@ import asyncio
 import json
 import os
 from collections.abc import Sequence
+from math import isfinite
 from pathlib import Path
 from typing import Any
 
@@ -102,6 +103,18 @@ def parse_args(argv: Sequence[str] | None = None) -> argparse.Namespace:
         type=float,
         default=config.get("simulation", "completion_timeout_seconds", 8.0),
         help="Maximum time for one asynchronous semantic completion decision.",
+    )
+    parser.add_argument(
+        "--work-grace-seconds",
+        type=float,
+        default=config.get("simulation", "work_grace_seconds", 5.0),
+        help="Wall-clock limit for pending work after conversation capture ends.",
+    )
+    parser.add_argument(
+        "--cleanup-timeout-seconds",
+        type=float,
+        default=config.get("simulation", "cleanup_timeout_seconds", 10.0),
+        help="Total wall-clock budget for participant close and background-task cleanup.",
     )
     parser.add_argument("--simulator-model", default=assistant.model, help="GPT Live model for the simulated caller.")
     parser.add_argument(
@@ -375,15 +388,23 @@ def result_row(scenario: Scenario, result: EvalResult, *, offline: bool) -> dict
 def failed_row(scenario: Scenario, exc: Exception, *, offline: bool, args: argparse.Namespace) -> dict[str, Any]:
     """Exclude infrastructure and judge failures from target-model grading."""
     golden = _golden(scenario)
+    partial = getattr(exc, "partial_result", None)
+    observed = (
+        result_row(scenario, partial, offline=offline)
+        if partial is not None
+        else {
+            "turns": f"0/{golden['total_turns']}",
+            "tool_calls": f"0/{len(golden['tool_calls'])}",
+        }
+    )
     return {
+        **observed,
         "scenario_id": scenario.id,
         "scenario_title": scenario.title,
         "status": "infrastructure_error",
         "execution_mode": "offline_fixture" if offline else "live",
         "semantic_evaluation_status": "not_assessed",
         "task_completed": False,
-        "turns": f"0/{golden['total_turns']}",
-        "tool_calls": f"0/{len(golden['tool_calls'])}",
         "audio_condition": args.condition,
         "agent_model": args.model,
         "backend_model": args.backend_model,
@@ -423,6 +444,8 @@ def _settings(
         completion_model=args.completion_model,
         semantic_drain=args.semantic_drain,
         completion_timeout_seconds=args.completion_timeout_seconds,
+        work_grace_seconds=args.work_grace_seconds,
+        cleanup_timeout_seconds=args.cleanup_timeout_seconds,
         agent_endpoint=args.endpoint,
         agent_model=args.model,
         agent_voice=args.voice,
@@ -457,6 +480,10 @@ def _validate_run_args(args: argparse.Namespace) -> None:
         raise ValueError("--concurrency must be between 1 and 8")
     if args.completion_timeout_seconds <= 0:
         raise ValueError("--completion-timeout-seconds must be positive")
+    for name in ("work_grace_seconds", "cleanup_timeout_seconds"):
+        value = getattr(args, name)
+        if isinstance(value, bool) or not isinstance(value, int | float) or not isfinite(value) or value <= 0:
+            raise ValueError(f"--{name.replace('_', '-')} must be finite and positive")
     if args.response_deadline_ms <= 0:
         raise ValueError("--response-deadline-ms must be positive")
     if args.listen and args.concurrency != 1:
@@ -602,6 +629,8 @@ async def run_evals(args: argparse.Namespace | None = None) -> Path:
             "semantic_drain": args.semantic_drain and not args.offline,
             "completion_model": args.completion_model,
             "completion_timeout_seconds": args.completion_timeout_seconds,
+            "work_grace_seconds": args.work_grace_seconds,
+            "cleanup_timeout_seconds": args.cleanup_timeout_seconds,
             "concurrency": args.concurrency,
             "audio_condition": args.condition,
             "audio_realism": audio_realism_from_args(args).model_dump(mode="json", exclude_none=True),

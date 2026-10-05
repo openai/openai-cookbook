@@ -824,6 +824,12 @@ diagnostic task evidence
 but are excluded from target pass/fail counts as `infrastructure_error` with
 `error.stage: "caller_simulation"` and an explicit `validity` object.
 Supported caller Responses delegation is valid and never counts as target-assistant work.
+RUN also bounds outstanding work after capture and total asynchronous cleanup
+with `--work-grace-seconds` (5 seconds) and `--cleanup-timeout-seconds`
+(10 seconds). A timeout is an infrastructure error, retains available
+diagnostics, and cannot be promoted to a target pass by late work or grading.
+See [conversation and shutdown limits](run_harness/README.md#conversation-and-shutdown-limits)
+for the scope of these deadlines and the limits of in-process cancellation.
 The run summary contains only execution counts. Offline
 evaluations report `null`, because no judge was called. RUN treats preferred
 procedures and tool order as diagnostics; CRAWL and WALK enforce the expected

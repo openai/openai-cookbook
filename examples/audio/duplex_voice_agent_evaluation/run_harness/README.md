@@ -269,6 +269,9 @@ Common options:
   when a GPT Live conversation has actually ended.
 - `--no-semantic-drain` disables that observer and restores the deterministic
   verified-state-plus-closing fallback.
+- `--work-grace-seconds 5` bounds the wait for outstanding participant work
+  after audio capture ends.
+- `--cleanup-timeout-seconds 10` bounds the total asynchronous cleanup phase.
 - `--assistant-opening-prompt PATH` sends the selected file through
   `session.commentary.append` so the evaluated assistant speaks before the caller.
   Without this flag, RUN remains caller-first.
@@ -280,6 +283,38 @@ Common options:
 Each concurrent worker receives an independent GPT Live session, caller,
 application executor, state, and result directory. Concurrency is limited to
 1–8. Do not combine `--listen` with concurrency greater than one.
+
+### Conversation and shutdown limits
+
+`--max-duration-seconds` limits conversation capture. After capture ends, RUN
+waits up to `--work-grace-seconds` (default 5 seconds) for outstanding caller
+and assistant work to settle. This grace period does not extend the captured
+conversation: a late tool result does not prove that its spoken answer reached
+the caller.
+
+Cleanup has a separate total budget, `--cleanup-timeout-seconds` (default
+10 seconds). Caller and assistant close independently and concurrently; one
+stalled participant must not prevent the other from closing. Completion-task
+cancellation, participant close, and event-pump shutdown share this deadline,
+rather than each receiving another full timeout. These limits do not bound
+session startup or subsequent grading.
+
+Both settings must be finite positive numbers. Their effective values are
+saved with the run configuration and scenario diagnostics. A work-grace or
+cleanup timeout is an infrastructure error. When it is the primary failure,
+its stage is `pending_work_timeout` or `cleanup_timeout`; an earlier failure
+keeps its original stage, with cleanup details retained in scenario diagnostics.
+It cannot become a successful
+task through a late result or semantic grade, and is excluded from target
+pass/fail counts. Inspect the reported error and available partial artifacts;
+an existing event log or recording does not establish successful finalization
+or complete usage.
+
+These are cooperative in-process deadlines. Python cannot forcibly stop a
+blocking callback, a running worker thread, or a coroutine that continually
+suppresses cancellation. When the event loop remains responsive, cleanup
+timeout diagnostics report unfinished asynchronous work. Use process isolation
+when hard termination is required.
 
 ### Verify offline
 
@@ -421,10 +456,12 @@ Tool and delegation accuracy are deterministic, not LLM-judged: tools are
 matched one-to-one by name, recursively normalized arguments, and execution
 status; delegation accuracy checks the binary decision to delegate or not
 against the scenario's required, forbidden, or optional policy.
-The runner waits for both Live sessions to finalize. The agent's final
+The runner attempts to finalize both Live sessions within its
+[cleanup budget](#conversation-and-shutdown-limits). The agent's final
 `session.closed.usage.seconds` becomes frontend `audio_duration_ms`; backend
 tokens come from Responses completions (nested in managed mode), deduplicated
-by response ID.
+by response ID. Missing finalization remains an error; transport closure or a
+timeout does not supply final usage.
 Caller, semantic-completion observer, and judge tokens never enter frontend or
 backend product totals. Cached and cache-write tokens are subsets of input
 tokens rather than additional billable-token totals.
@@ -452,6 +489,8 @@ simulator_backend_reasoning_effort = "low"
 tick_ms = 200
 response_deadline_ms = 5000
 max_duration_seconds = 90.0
+work_grace_seconds = 5.0
+cleanup_timeout_seconds = 10.0
 semantic_drain = true
 completion_model = "gpt-5.6-terra"
 completion_timeout_seconds = 8.0

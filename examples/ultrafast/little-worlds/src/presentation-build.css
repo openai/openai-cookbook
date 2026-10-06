@@ -1,0 +1,401 @@
+/* Keep the two live workspaces larger than their transcripts. All display
+   dimensions share the shell's unit so a 4K TV retains the same hierarchy. */
+.build-activity-panel {
+  --activity-unit: 1px;
+  --activity-body-size: 14px;
+  --activity-meta-size: 12px;
+  --activity-number-size: 26px;
+}
+
+.build-activity-panel .build-live-status,
+.build-activity-panel .build-model,
+.build-activity-panel .build-model small,
+.build-activity-panel .build-metrics span,
+.build-activity-panel .build-phases li,
+.build-activity-panel .build-progress-heading,
+.build-activity-panel .build-entry-heading time,
+.build-activity-panel .build-tool-status,
+.build-activity-panel .build-code-title strong,
+.build-activity-panel .build-code-title > span,
+.build-activity-panel .build-code-line > i,
+.build-activity-panel .build-entry-output > span,
+.build-activity-panel .build-truncated,
+.build-activity-panel .build-activity-footer > span,
+.build-activity-panel .build-return-live {
+  font-size: var(--activity-meta-size);
+}
+
+.build-activity-panel .build-entry-heading strong,
+.build-activity-panel .build-entry-text,
+.build-activity-panel .build-empty,
+.build-activity-panel .build-history-unavailable,
+.build-activity-panel .build-turn-selection {
+  font-size: var(--activity-body-size);
+  line-height: 1.5;
+}
+
+.build-activity-panel .build-code-window pre,
+.build-activity-panel .build-entry-output pre,
+.build-activity-panel.is-embedded .build-code-window pre,
+.build-activity-panel.is-embedded .build-entry-output pre {
+  font-size: var(--activity-body-size);
+  line-height: 1.5;
+}
+
+.build-activity-panel .build-metrics strong,
+.build-activity-panel.is-embedded .build-metrics strong,
+.build-activity-panel.is-embedded .build-speedometer strong {
+  font-size: var(--activity-number-size);
+  line-height: 1.15;
+  letter-spacing: -.04em;
+}
+
+.build-activity-panel .build-metrics .build-tps-unit {
+  line-height: 1.3;
+}
+
+.build-activity-panel .build-speedometer {
+  width: calc(104 * var(--activity-unit));
+  height: calc(78 * var(--activity-unit));
+  max-width: 100%;
+}
+
+.build-activity-panel .build-speedometer svg {
+  width: 100%;
+  height: calc(44 * var(--activity-unit));
+}
+
+.build-activity-panel .build-speedometer strong {
+  line-height: 1.1;
+}
+
+.build-activity-panel .build-speedometer strong small {
+  font-size: .55em;
+}
+
+.build-activity-panel .build-progress-track {
+  height: max(5px, calc(6 * var(--activity-unit)));
+  border-radius: calc(3 * var(--activity-unit));
+}
+
+.build-activity-panel .build-progress-heading {
+  margin-bottom: calc(6 * var(--activity-unit));
+  color: var(--ink);
+  font-size: max(11px, calc(13 * var(--activity-unit)));
+}
+
+.build-activity-panel .build-activity-footer {
+  flex-wrap: wrap;
+  row-gap: calc(6 * var(--activity-unit));
+}
+
+@media (min-width: 1100px) {
+  .build-comparison { --comparison-column-gap: calc(20 * var(--presentation-unit)); }
+
+  .build-comparison[data-comparing="true"] .build-comparison-lane {
+    --comparison-heading-height: max(52px, calc(64 * var(--presentation-unit)));
+    height: max(420px, calc(100dvh - var(--presentation-header-height) - var(--presentation-composer-height) - 20 * var(--presentation-unit)));
+    border-radius: calc(8 * var(--presentation-unit));
+  }
+
+  .build-comparison[data-comparing="true"] .build-comparison-lane-layout {
+    --comparison-panel-width: min(35%, calc(360 * var(--presentation-unit)));
+  }
+
+  .build-comparison-heading {
+    gap: calc(16 * var(--presentation-unit));
+    padding: calc(6 * var(--presentation-unit)) calc(18 * var(--presentation-unit));
+  }
+
+  .build-comparison-identity h2 {
+    font-size: calc(26 * var(--presentation-unit));
+    font-weight: 550;
+    letter-spacing: -.025em;
+  }
+
+  .build-comparison-identity > span {
+    max-width: none;
+    margin-top: calc(2 * var(--presentation-unit));
+    font-size: max(10px, calc(12 * var(--presentation-unit)));
+  }
+
+  .build-comparison-status {
+    gap: calc(5 * var(--presentation-unit));
+    font-size: max(11px, calc(14 * var(--presentation-unit)));
+    line-height: 1.4;
+  }
+
+  .build-comparison-status-label {
+    max-width: calc(260 * var(--presentation-unit));
+    gap: calc(8 * var(--presentation-unit));
+  }
+
+  .build-comparison-spinner {
+    width: calc(16 * var(--presentation-unit));
+    height: calc(16 * var(--presentation-unit));
+  }
+
+  .build-comparison-status time {
+    font-size: max(11px, calc(14 * var(--presentation-unit)));
+  }
+
+  .build-comparison-preview-empty {
+    padding: calc(30 * var(--presentation-unit));
+    font-size: max(15px, calc(20 * var(--presentation-unit)));
+    line-height: 1.5;
+  }
+
+  .build-comparison[data-comparing="true"] .build-comparison-preview .empty-canvas h1 {
+    font-size: calc(32 * var(--presentation-unit));
+  }
+
+  .comparison-activity-toggle,
+  .build-activity-toggle {
+    width: calc(34 * var(--presentation-unit));
+    min-height: calc(136 * var(--presentation-unit));
+    padding: calc(14 * var(--presentation-unit)) calc(5 * var(--presentation-unit));
+    gap: calc(10 * var(--presentation-unit));
+  }
+
+  .comparison-activity-toggle > span,
+  .build-activity-toggle > span {
+    font-size: max(12px, calc(16 * var(--presentation-unit)));
+    letter-spacing: .02em;
+  }
+
+  .comparison-activity-toggle > svg,
+  .build-activity-toggle > svg {
+    width: calc(22 * var(--presentation-unit));
+    height: calc(22 * var(--presentation-unit));
+  }
+
+  .build-activity-panel {
+    --activity-unit: var(--presentation-unit);
+    --activity-body-size: max(13px, calc(16 * var(--presentation-unit)));
+    --activity-meta-size: max(11px, calc(13 * var(--presentation-unit)));
+    --activity-number-size: calc(30 * var(--presentation-unit));
+  }
+
+  .build-activity-panel:not(.is-embedded) {
+    top: var(--presentation-header-height);
+    width: min(calc(480 * var(--presentation-unit)), calc(100vw - 60px));
+  }
+
+  .build-activity-toggle[aria-expanded="true"] {
+    right: min(calc(480 * var(--presentation-unit)), calc(100vw - 60px));
+  }
+
+  .build-activity-panel .build-activity-overview,
+  .build-activity-panel.is-embedded .build-activity-overview {
+    padding: calc(6 * var(--activity-unit)) calc(12 * var(--activity-unit)) 0;
+  }
+
+  .build-activity-panel .build-metrics,
+  .build-activity-panel.is-embedded .build-metrics {
+    display: grid;
+    grid-template-columns: minmax(0, 1fr) minmax(0, 1.05fr) minmax(0, 1.15fr);
+    align-items: end;
+    gap: calc(6 * var(--activity-unit));
+    padding-block: calc(4 * var(--activity-unit)) calc(12 * var(--activity-unit));
+  }
+
+  .build-activity-panel .build-metrics > div {
+    min-width: 0;
+    gap: calc(6 * var(--activity-unit));
+  }
+
+  .build-activity-panel.is-embedded .build-metrics .build-tps-metric { grid-column: auto; }
+
+  .build-activity-panel .build-metrics span {
+    min-height: 0;
+    line-height: 1.2;
+    font-size: clamp(9px, 3.8cqi, calc(12 * var(--activity-unit)));
+    white-space: nowrap;
+  }
+
+  .build-activity-panel .build-metrics .build-tps-unit {
+    white-space: nowrap;
+    text-align: center;
+  }
+
+  .build-activity-panel .build-phases,
+  .build-activity-panel.is-embedded .build-phases {
+    grid-template-columns: repeat(4, minmax(0, 1fr));
+    gap: calc(5 * var(--activity-unit));
+    margin-bottom: calc(10 * var(--activity-unit));
+  }
+
+  .build-activity-panel .build-phases li {
+    gap: calc(4 * var(--activity-unit));
+    padding-top: calc(5 * var(--activity-unit));
+  }
+
+  .build-activity-panel .build-phases li > span {
+    height: auto;
+    font-size: var(--activity-meta-size);
+  }
+
+  .build-activity-panel .build-progress { padding-bottom: calc(12 * var(--activity-unit)); }
+
+  .build-activity-panel .build-feed,
+  .build-activity-panel.is-embedded .build-feed {
+    padding: calc(12 * var(--activity-unit)) calc(12 * var(--activity-unit));
+  }
+
+  .build-activity-panel .build-entry {
+    display: block;
+    padding-bottom: calc(20 * var(--activity-unit));
+  }
+
+  .build-activity-panel .build-entry::before { display: none; }
+
+  .build-activity-panel .build-entry-marker {
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: calc(26 * var(--activity-unit));
+    height: calc(26 * var(--activity-unit));
+  }
+
+  .build-activity-panel .build-entry-heading {
+    min-height: calc(28 * var(--activity-unit));
+    margin-left: calc(36 * var(--activity-unit));
+    gap: calc(8 * var(--activity-unit));
+  }
+
+  .build-activity-panel .build-entry-content { padding-top: 0; }
+
+  .build-activity-panel .build-entry-text { margin-top: calc(10 * var(--activity-unit)); }
+
+  .build-activity-panel .build-tool-status {
+    gap: calc(8 * var(--activity-unit));
+    margin-block: calc(8 * var(--activity-unit)) calc(12 * var(--activity-unit));
+  }
+
+  .build-activity-panel .build-code-window { margin-top: calc(10 * var(--activity-unit)); }
+
+  .build-activity-panel .build-code-title {
+    flex-wrap: wrap;
+    gap: calc(6 * var(--activity-unit));
+    padding: calc(10 * var(--activity-unit));
+  }
+
+  .build-activity-panel .build-entry-output { margin-top: calc(14 * var(--activity-unit)); }
+
+  .build-activity-panel .build-entry-output pre,
+  .build-activity-panel.is-embedded .build-entry-output pre {
+    padding: calc(8 * var(--activity-unit));
+  }
+
+  .build-activity-panel .build-code-window pre,
+  .build-activity-panel.is-embedded .build-code-window pre {
+    padding: calc(10 * var(--activity-unit)) calc(8 * var(--activity-unit)) calc(10 * var(--activity-unit)) 0;
+  }
+
+  .build-activity-panel .build-code-line > i,
+  .build-activity-panel.is-embedded .build-code-line > i {
+    flex-basis: calc(40 * var(--activity-unit));
+    padding-right: calc(10 * var(--activity-unit));
+  }
+
+  .build-activity-panel .build-activity-footer,
+  .build-activity-panel.is-embedded .build-activity-footer {
+    padding: calc(7 * var(--activity-unit)) calc(12 * var(--activity-unit));
+    gap: calc(8 * var(--activity-unit));
+  }
+
+  .build-activity-panel .build-turn-selection {
+    padding: calc(14 * var(--activity-unit)) calc(18 * var(--activity-unit));
+  }
+
+  .build-activity-panel .build-return-live {
+    padding: calc(6 * var(--activity-unit)) calc(9 * var(--activity-unit));
+  }
+
+  .build-activity-panel :is(.build-entry-marker, .build-code-title, .build-auto-scroll, .build-return-live, .build-phases) svg {
+    width: calc(16 * var(--activity-unit));
+    height: calc(16 * var(--activity-unit));
+    flex-shrink: 0;
+  }
+}
+
+/* Keep the three readings on one baseline even in narrow split panes. The
+   labels scale with the actual sidebar width rather than wrapping to rows. */
+.build-activity-panel.is-embedded .build-metrics {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) minmax(0, 1.05fr) minmax(0, 1.15fr);
+  align-items: end;
+  gap: calc(6 * var(--activity-unit));
+}
+
+.build-activity-panel.is-embedded .build-metrics > div { min-width: 0; }
+
+.build-activity-panel.is-embedded .build-metrics .build-tps-metric {
+  grid-column: auto;
+  flex-direction: column;
+}
+
+.build-activity-panel.is-embedded .build-metrics span {
+  min-height: 0;
+  font-size: clamp(9px, 3.8cqi, calc(12 * var(--activity-unit)));
+  line-height: 1.2;
+  white-space: nowrap;
+}
+
+@container comparison-activity (max-width: 260px) {
+  .build-activity-panel.is-embedded .build-metrics strong {
+    font-size: clamp(16px, 9cqi, 24px);
+  }
+
+  .build-activity-panel.is-embedded .build-speedometer {
+    height: 61px;
+  }
+
+  .build-activity-panel.is-embedded .build-speedometer svg {
+    height: 34px;
+  }
+
+  .build-activity-panel.is-embedded .build-phases {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+}
+
+@container comparison-activity (max-width: 210px) {
+  .build-activity-panel.is-embedded .build-activity-overview {
+    padding-inline: 7px;
+  }
+
+  .build-activity-panel.is-embedded .build-metrics {
+    /* Reserve the complete label's width before dividing the remaining room.
+       This keeps narrow laptop panes readable without reducing the type. */
+    grid-template-columns: minmax(0, 1fr) max-content minmax(0, 1.15fr);
+    gap: 4px;
+  }
+}
+
+/* A phone's stacked comparison still reserves most of each lane for the world.
+   Give the dial its own compact row rather than shrinking labels further. */
+@container comparison-activity (max-width: 165px) {
+  .build-activity-panel.is-embedded .build-metrics {
+    grid-template-columns: minmax(0, 1fr) max-content;
+    row-gap: 5px;
+  }
+
+  .build-activity-panel.is-embedded .build-metrics strong {
+    font-size: clamp(14px, 10cqi, 16px);
+  }
+
+  .build-activity-panel.is-embedded .build-metrics .build-tps-metric {
+    display: grid;
+    grid-column: 1 / -1;
+    grid-template-columns: minmax(0, 1fr) max-content;
+    align-items: end;
+    justify-items: center;
+    gap: 5px;
+  }
+
+  .build-activity-panel.is-embedded .build-speedometer {
+    width: min(80px, 100%);
+    height: 56px;
+  }
+}

@@ -1,0 +1,43 @@
+:root {
+  color-scheme: light;
+  --devday-background: #f7f8fa;
+  --devday-surface: #ffffff;
+  --devday-text: #202630;
+  --devday-muted: #596273;
+  --devday-line: #d9dee7;
+  --devday-green: #007e35;
+  --devday-purple: #7741c6;
+}
+html, body { background: #f7f8fa; color: #202630; color-scheme: light; }
+.notebook.notebook {
+  --ink: #202630;
+  --muted: #596273;
+  --line: #d9dee7;
+  background: #f7f8fa;
+  color: #202630;
+  color-scheme: light;
+}
+.notebook.notebook header { background: #ffffff; border-color: #d9dee7; }
+.notebook.notebook .dot { background: #008c42; }
+.notebook.notebook h1 em { color: #7741c6; }
+.notebook.notebook .explorer { background: #f1eef8; border-color: #ddd5e9; }
+.notebook.notebook .thread { stroke: #8450d1; opacity: .48; }
+.notebook.notebook .signal { stroke: #007e35; }
+.notebook.notebook .orbit { stroke: #857297; opacity: .45; }
+.notebook.notebook .lit { color: #007e35; }
+.notebook.notebook .quiet { color: #8450b3; }
+.notebook.notebook .svg-label { fill: #596273; }
+.notebook.notebook svg [fill="#04b84c"] { fill: #008c42; }
+.notebook.notebook svg [stroke="#924ff7"] { stroke: #8450d1; }
+.notebook.notebook svg stop[stop-color="#924ff7"] { stop-color: #ad88df; }
+.notebook.notebook svg stop[stop-color="#111111"] { stop-color: #f1eef8; }
+.notebook.notebook button { background: #ffffff; color: #202630; border-color: #c8bdd7; transition: transform .2s; }
+.notebook.notebook button:hover { background: #e8e0f3; border-color: #ab94c4; }
+.notebook.notebook button[aria-pressed=true] { background: #007e35; border-color: #007e35; color: #ffffff; }
+.notebook.notebook button[aria-pressed=true]:hover { background: #08682f; border-color: #08682f; }
+.notebook.notebook button:disabled { background: #e8ecf0; border-color: #d9dee7; color: #687381; }
+.notebook.notebook button:focus-visible { outline-color: #7741c6; }
+.notebook.notebook .fact { background: #ffffff; border-color: #ddd5e9; }
+.notebook.notebook .number { color: #7741c6; }
+.notebook.notebook .signature { color: #202630; }
+.notebook.notebook .project { border-color: #d9dee7; }

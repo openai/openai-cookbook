@@ -1,0 +1,55 @@
+:root {
+  color-scheme: light;
+  --devday-background: #f7f8fa;
+  --devday-surface: #ffffff;
+  --devday-text: #202630;
+  --devday-muted: #596273;
+  --devday-line: #d9dee7;
+  --devday-green: #007e35;
+  --devday-purple: #7741c6;
+}
+html, body { background: #f7f8fa; color: #202630; color-scheme: light; }
+.care {
+  --ink: #202630;
+  --muted: #596273;
+  --line: #d9dee7;
+  background: #f2f7f4;
+  color: #202630;
+  color-scheme: light;
+}
+.care .brand-dot { background: #008c42; }
+.care .edition { color: #596273; }
+.care .eyebrow { color: #007e35; }
+.care .chat,
+.care .chat-head,
+.care .catalog article { background: #ffffff; border-color: #d9dee7; }
+.care [data-service-messages] article { background: #f4f1fa; color: #202630; border-color: #dfd7ed; border-left-color: #8450d1; }
+.care [data-service-role="user"] { background: #edf6f0!important; border-color: #d5e6da; border-left: 2px solid #008c42!important; }
+.care [data-field="role"] { color: #7741c6; }
+.care [data-service-role="user"] [data-field="role"] { color: #007e35; }
+.care .sample { background: #ffffff; border-color: #c7d0d9; color: #202630; }
+.care textarea { background: #f7f8fa; border-color: #bcc7d0; color: #202630; caret-color: #007e35; }
+.care textarea::placeholder { color: #596273; }
+.care .send { background: #007e35; color: #ffffff; }
+.care button, .care a { transition: none; }
+.care .sample:hover,
+.care .quiet:hover { background: #eaf3ed; border-color: #8ca997; color: #135c30; }
+.care .send:hover { background: #08682f; }
+.care .prep-toggle:hover { color: #007e35; }
+.care button:focus-visible,
+.care textarea:focus-visible,
+.care a:focus-visible { outline-color: #7741c6; }
+.care button:disabled { background: #e8ecf0; border-color: #d9dee7; color: #687381; }
+.care .pulse { background: #8450d1; }
+.care [data-service-status="loading"] { color: #7741c6; }
+.care [data-service-error]:not(:empty) { background: #fff1e9; color: #a63f24; border-color: #efd6c7; border-left-color: #bd582d; }
+.care [data-service-status="error"] { color: #a63f24; }
+.care [data-service-sources] a { background: #ffffff; border-color: #d9dee7; color: #007e35; }
+.care [data-service-sources] a:hover { background: #eaf3ed; }
+.care .safety { background: #eaf3ed; border-color: #d5e3d9; color: #596273; }
+.care .prep { border-color: #d5e3d9; }
+.care .catalog p { color: #596273; }
+.care .breath [stroke="#04b84c"] { stroke: #008c42; }
+.care .breath [stroke="#924ff7"] { stroke: #8450d1; }
+.care .breath [fill="#111111"] { fill: #ffffff; }
+.care .breath [stroke="#57dc8c"] { stroke: #007e35; }

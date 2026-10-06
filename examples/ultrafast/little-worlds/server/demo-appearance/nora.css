@@ -1,0 +1,62 @@
+:root {
+  color-scheme: light;
+  --devday-background: #f7f8fa;
+  --devday-surface: #ffffff;
+  --devday-text: #202630;
+  --devday-muted: #596273;
+  --devday-line: #d9dee7;
+  --devday-green: #008537;
+  --devday-purple: #7131c8;
+  --devday-blue: #0058cf;
+  --devday-orange: #b04419;
+}
+html, body { background: #f7f8fa; color: #202630; color-scheme: light; }
+.square.square {
+  --ink: #202630;
+  --muted: #596273;
+  --paper: #f7f8fa;
+  --surface: #ffffff;
+  --line: #d9dee7;
+  --green: #008537;
+  --violet: #7131c8;
+  background: #f7f8fa;
+  color: #202630;
+  border-color: #d9dee7;
+  color-scheme: light;
+}
+.square .square-header, .square .message footer { border-color: #d9dee7; }
+.square .eyebrow { color: #008537; }
+.square .eyebrow::after, .square .intro, .square .newest, .square .topic-count,
+.square .message-number, .square .you, .square .compose-intro, .square .public-note,
+.square .empty-board p, .square .board-note { color: #596273; }
+.square .square-mark { color: #008537; }
+.square .square-mark rect:nth-of-type(2) { fill: #ffffff; stroke: #7131c8; }
+.square .square-mark path { stroke: #7131c8; }
+.square .topic { background: #ffffff; border-color: #d9dee7; color: #596273; }
+.square .topic:hover { background: #edf5ef; border-color: #008537; color: #202630; }
+.square .topic.selected { background: #e8f4ec; border-color: #008537; color: #006d2c; box-shadow: inset 0 -2px #008537; }
+.square .message { background: #ffffff; border-color: #d9dee7; }
+.square .message-topic { color: #596273 !important; }
+/* Handle both the saved inline labels and the bundled board's topic tokens. */
+.square .message-topic[style*="#57dc8c"], .square .message-topic[style*="#04b84c"] { color: #007b32 !important; }
+.square .message-topic[style*="#b58cff"], .square .message-topic[style*="#924ff7"] { color: #7131c8 !important; }
+.square .message-topic[style*="#ff8549"] { color: #b04419 !important; }
+.square .message-topic[style*="#006aff"] { color: #0058cf !important; }
+.square .message-topic[style*="#ffffff"] { color: #596273 !important; }
+.square .topic-dot[style*="#57dc8c"], .square .topic-dot[style*="#04b84c"] { background: #008537 !important; }
+.square .topic-dot[style*="#b58cff"], .square .topic-dot[style*="#924ff7"] { background: #7131c8 !important; }
+.square .topic-dot[style*="#ff8549"] { background: #c75522 !important; }
+.square .topic-dot[style*="#006aff"] { background: #0058cf !important; }
+.square .topic-dot[style*="#ffffff"] { background: #596273 !important; }
+.square .author-initial { background: #eee8f7; border-color: #d9d0e8; color: #7131c8; }
+.square .remove-message { color: #596273; }
+.square .remove-message:hover { color: #b04419; }
+.square .compose { background: #f0ebf8; border-color: #d9d0e8; border-top-color: #7131c8; }
+.square .compose select, .square .compose textarea { background: #ffffff; border-color: #c7ccd8; color: #202630; }
+.square .compose textarea::placeholder { color: #596273; }
+.square .post-button { background: #008537; border-color: #008537; color: #ffffff; }
+.square .post-button:hover { background: #006d2c; border-color: #006d2c; }
+.square .post-button:disabled { background: #e3e7ed; border-color: #d9dee7; color: #7b8493; }
+.square .empty-board { background: #ffffff; border-color: #c7ccd8; }
+.square .note-dot { background: #7131c8; }
+.square button:focus-visible, .square select:focus-visible, .square textarea:focus-visible { outline-color: #7131c8; }

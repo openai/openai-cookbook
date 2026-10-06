@@ -1,0 +1,4 @@
+Use case: lighting-weather.
+Asset type: square profile icon for the light theme of Little Worlds.
+Input image: edit target, the existing Jake nursing icon.
+Primary request: create the light-mode companion of this exact icon. Preserve the glossy emerald-green heart, white ECG waveform, purple stethoscope wrapping around it, round silver/purple chestpiece at the upper right, exact perspective and centered silhouette. Replace the black backdrop with a clean warm-white/light-gray studio backdrop (#f7f8fa). Relight the same objects for a bright premium 3D render with soft contact shadows, crisp edges, deep emerald shadow tones, rich saturated green and purple, and the same readable small-icon shape. Keep the object scale and generous padding from the reference. No new objects, no text, no border, no watermark. Do not fade, wash out, invert, or pastel-filter the object. Square composition.

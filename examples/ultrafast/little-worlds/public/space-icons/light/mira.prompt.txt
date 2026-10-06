@@ -1,0 +1,7 @@
+Use case: lighting-weather
+Asset type: square profile icon for Mira in the Little Worlds app, displayed small at 256 by 256 pixels
+Input image: edit target, Mira's existing glossy 3D botanical icon
+Primary request: create a polished light-mode version of this exact icon. Change the black background to clean warm white, very slightly light gray near a soft contact shadow, and relight the object as a studio product render against that light backdrop.
+Subject and composition: preserve this same green and purple curved planter, same green leaves, curled climbing stem, purple upper flower bud, and purple side leaves. Keep the recognizable silhouette, centered scale, camera angle, and proportions. All artwork must fit comfortably inside a circle crop.
+Color and materials: retain saturated emerald green and vivid purple, glossy dimensional materials, crisp edges, realistic soft shading and specular highlights. Ensure rich contrast on light background; do not wash out or fade the colors.
+Constraints: only reinterpret the background and lighting for light mode. No additional plants, no new props, no text, no border, no watermark. Output one square icon.

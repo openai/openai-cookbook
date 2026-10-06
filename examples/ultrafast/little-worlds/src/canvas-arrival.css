@@ -1,0 +1,32 @@
+.canvas-arrival {
+  position: absolute;
+  inset: 0;
+  z-index: 3;
+  display: grid;
+  place-items: center;
+  overflow: hidden;
+  isolation: isolate;
+  pointer-events: none;
+  user-select: none;
+  opacity: 0;
+  visibility: hidden;
+}
+
+.canvas-arrival-art {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 28px;
+  position: relative;
+  width: min(460px, 88%);
+}
+.canvas-arrival .canvas-arrival-world { font-size: clamp(110px, 14vw, 180px); gap: 35px; }
+.canvas-arrival .world-brackets-center { gap: 12px; }
+.canvas-arrival .world-brackets-center i { width: 7px; height: 7px; }
+.canvas-arrival .world-brackets-center i:nth-child(2) { height: 22px; }
+.canvas-arrival .world-bracket { display: block; will-change: transform, opacity; }
+.canvas-arrival-signature { will-change: transform, opacity; }
+
+@media (prefers-reduced-motion: reduce) {
+  .canvas-arrival { display: none; }
+}

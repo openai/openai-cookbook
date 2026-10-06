@@ -1,0 +1,65 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <meta name="robots" content="noindex" />
+    <title>Voice surface browser checks</title>
+    <style>
+      :root { color-scheme: light; font: 15px/1.5 system-ui, sans-serif; color: #243a31; background: #f5f7f2; }
+      * { box-sizing: border-box; }
+      body { margin: 0; padding: 36px 22px 64px; }
+      main, #fixture-panel { max-width: 980px; margin: 0 auto; }
+      header { display: flex; align-items: end; justify-content: space-between; gap: 24px; margin-bottom: 26px; }
+      .eyebrow { margin: 0 0 8px; color: #617569; font-size: 11px; letter-spacing: .16em; text-transform: uppercase; }
+      h1 { margin: 0 0 8px; font-size: clamp(25px, 4vw, 34px); letter-spacing: -.035em; font-weight: 550; }
+      p { margin: 0; }
+      .description { color: #607267; max-width: 640px; }
+      button { border: 1px solid #c6d3c7; border-radius: 8px; padding: 10px 17px; background: white; color: inherit; font: inherit; cursor: pointer; }
+      button:disabled { opacity: .55; cursor: default; }
+      #run-checks { white-space: nowrap; background: #244b3a; border-color: #244b3a; color: white; }
+      button:focus-visible, input:focus-visible, textarea:focus-visible, select:focus-visible, [tabindex]:focus-visible { outline: 3px solid #85b7a0; outline-offset: 3px; }
+      #summary { background: #e7eee4; padding: 15px 18px; border-radius: 10px; margin-bottom: 17px; font-weight: 600; }
+      #results { list-style: none; margin: 0; padding: 0; border: 1px solid #dbe3d8; border-radius: 12px; overflow: hidden; background: white; }
+      .result-row { display: grid; grid-template-columns: 80px minmax(0, 1fr); gap: 14px; padding: 12px 17px; border-bottom: 1px solid #e7ece5; }
+      .result-row:last-child { border-bottom: 0; }
+      .result-state { font-size: 11px; font-weight: 700; letter-spacing: .05em; align-self: center; }
+      .result-row[data-status="pass"] .result-state { color: #237145; }
+      .result-row[data-status="fail"] { background: #fff6f0; }
+      .result-row[data-status="fail"] .result-state { color: #a04428; }
+      .result-row[data-status="running"] { background: #edf3ec; }
+      .result-detail { display: block; margin-top: 3px; font-size: 12px; color: #617066; overflow-wrap: anywhere; }
+      #fixture-panel { margin-top: 28px; }
+      .fixture-heading { margin: 0 0 12px; font-size: 13px; font-weight: 600; }
+      #fixture-root { min-height: 120px; background: white; border: 1px dashed #bdcdbd; border-radius: 12px; padding: 22px; }
+      #fixture-root form, #fixture-root section, #fixture-root [role="group"] { display: flex; gap: 14px; align-items: center; flex-wrap: wrap; margin: 8px 0; }
+      #fixture-root label { display: inline-flex; gap: 8px; align-items: center; }
+      #fixture-root input:not([type="checkbox"]), #fixture-root textarea, #fixture-root select { border: 1px solid #bdcdbd; border-radius: 6px; padding: 9px; font: inherit; max-width: 100%; }
+      #fixture-root dialog { border: 1px solid #bdcdbd; border-radius: 12px; padding: 28px; }
+      #fixture-root dialog::backdrop { background: rgb(34 49 38 / .2); }
+      #fixture-root [role="button"] { padding: 15px; border: 1px solid #bdcdbd; border-radius: 8px; }
+      #final-note { margin-top: 14px; color: #617066; font-size: 12px; }
+      @media (max-width: 650px) { header { display: block; } #run-checks { margin-top: 18px; } body { padding: 24px 14px; } }
+    </style>
+  </head>
+  <body>
+    <main data-voice-ignore>
+      <header>
+        <div>
+          <p class="eyebrow">Little Worlds · local regression fixture</p>
+          <h1>Voice surface browser checks</h1>
+          <p class="description">Real React controls, native browser validation, and the app’s voice action adapter. No microphone, models, saved spaces, or API requests.</p>
+        </div>
+        <button id="run-checks" type="button">Run checks</button>
+      </header>
+      <p id="summary" role="status" aria-live="polite">Ready to run browser checks.</p>
+      <ol id="results" aria-label="Browser check results"></ol>
+      <p id="final-note">Each check creates a fresh fixture below. Failed rows include the observed assertion; rerunning starts from clean fixture state.</p>
+    </main>
+    <section id="fixture-panel" aria-label="Isolated test fixture">
+      <h2 class="fixture-heading" data-voice-ignore>Current fixture</h2>
+      <div id="fixture-root"></div>
+    </section>
+    <script type="module" src="./voice-surface.tsx"></script>
+  </body>
+</html>

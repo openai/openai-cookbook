@@ -1,0 +1,62 @@
+:root {
+  color-scheme: light;
+  --devday-background: #f7f8fa;
+  --devday-surface: #ffffff;
+  --devday-text: #202630;
+  --devday-muted: #596273;
+  --devday-line: #d9dee7;
+  --devday-green: #008537;
+  --devday-purple: #7131c8;
+  --devday-blue: #0058cf;
+  --devday-orange: #b04419;
+}
+html, body { background: #f7f8fa; color: #202630; color-scheme: light; }
+.lb.lb { --blue: #202630; --red: #7131c8; background: #f7f8fa; color: #202630; color-scheme: light; }
+.lb.lb header { color: #596273; border-bottom-color: #d9dee7; }
+.lb.lb header::after { color: #008537; }
+.lb.lb .brand, .lb.lb h1, .lb.lb h2, .lb.lb h3 { color: #202630; }
+.lb.lb .eyebrow, .lb.lb .intro, .lb.lb .small, .lb.lb footer,
+.lb.lb .answer span, .lb.lb .catalog p { color: #596273; }
+.lb.lb .route::before { border-top-color: #c7ccd8; }
+.lb.lb .dot { background: #ffffff; border-color: #c7ccd8; color: #596273; }
+.lb.lb .active .dot { background: #7131c8; border-color: #7131c8; color: #ffffff; box-shadow: 0 0 0 5px #f7f8fa; }
+.lb.lb .visited .dot { background: #008537; border-color: #008537; color: #ffffff; }
+.lb.lb .card { background: #ffffff; border-color: #d9dee7; }
+.lb.lb .chat { background: #f0ebf8; border-color: #d9d0e8; border-top-color: #7131c8; }
+.lb.lb .chat .eyebrow { color: #7131c8; }
+.lb.lb .xp { background: #e8f4ec; border-color: #c5e1ce; color: #007b32; }
+.lb.lb progress { accent-color: #008537; background: #e3e7ed; }
+.lb.lb progress::-webkit-progress-bar { background: #e3e7ed; }
+.lb.lb progress::-webkit-progress-value { background: #008537; }
+.lb.lb progress::-moz-progress-bar { background: #008537; }
+.lb.lb .answer { background: #ffffff; color: #202630; border-color: #c7ccd8; }
+.lb.lb button:hover:not(:disabled) { background: #eee8f7; }
+.lb.lb .answer.chosen { border-color: #b04419; }
+.lb.lb .answer.right { background: #e8f4ec; border-color: #008537; color: #006d2c; }
+.lb.lb .answer:disabled:not(.right) { color: #707b8b; }
+.lb.lb .primary { background: #008537; color: #ffffff; }
+.lb.lb .primary:hover:not(:disabled) { background: #006d2c; color: #ffffff; }
+.lb.lb .quiet { background: transparent; color: #596273; }
+.lb.lb .primary:disabled, .lb.lb .quiet:disabled { background: #e3e7ed; color: #707b8b; }
+.lb.lb button:focus-visible, .lb.lb textarea:focus-visible { outline-color: #7131c8; }
+.lb.lb textarea { background: #ffffff; border-color: #c7ccd8; color: #202630; }
+.lb.lb textarea::placeholder { color: #596273; }
+.lb.lb [data-service-messages] article { background: #ffffff; border-color: #d9d0e8; }
+.lb.lb [data-service-role="user"] { border-left-color: #7131c8; }
+.lb.lb [data-field="role"], .lb.lb [data-service-status="loading"] { color: #7131c8; }
+.lb.lb [data-service-error] { color: #b04419; }
+.lb.lb .complete { color: #008537; }
+.lb.lb footer, .lb.lb .catalog article { border-color: #d9dee7; }
+/* Daylight café: pale neighboring façades, saturated blue and violet details. */
+.lb.lb svg [fill="#dfcda8"], .lb.lb svg [fill="#e5aa7b"] { fill: #e5e8ef; stroke: #c7ccd8; }
+.lb.lb svg [stroke="#dfcda8"] { stroke: #d9dee7; }
+.lb.lb svg [fill="#efc956"] { fill: #ffb65b; }
+.lb.lb svg [fill="#214f85"] { fill: #006aff; }
+.lb.lb svg [fill="#f6e7bd"] { fill: #e9f0ff; }
+.lb.lb svg [fill="#f8edcd"], .lb.lb svg [fill="#fff8e6"], .lb.lb svg [fill="#fff3d2"] { fill: #ffffff; }
+.lb.lb svg [fill="#c94e36"] { fill: #7131c8; }
+.lb.lb svg [fill="#123f73"] { fill: #164292; }
+.lb.lb svg [fill="#7c9f9c"] { fill: #b8d9f5; }
+.lb.lb svg [stroke="#163f70"] { stroke: #596273; }
+.lb.lb svg [stroke="#fff8e6"] { stroke: #ffffff; }
+.lb.lb svg [fill="#778c60"] { fill: #008537; stroke: #008537; }

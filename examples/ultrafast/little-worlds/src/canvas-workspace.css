@@ -1,0 +1,194 @@
+/* Keep the canvas and the next thought in focus. */
+.canvas-workspace .space-main {
+  padding-bottom: 24px;
+}
+
+.canvas-workspace .projects-section {
+  position: relative;
+}
+
+.canvas-workspace .blank-space .projects-section {
+  display: flex;
+  flex-direction: column;
+}
+
+.canvas-workspace .empty-canvas {
+  position: relative;
+  flex: 1;
+  min-height: clamp(240px, 42dvh, 540px);
+  padding: 0;
+}
+
+.canvas-workspace .blank-space .living-extension {
+  margin-top: 0;
+}
+
+.canvas-workspace .composer-area {
+  --composer-line-height: 22px;
+  --composer-inset: 14px;
+  width: 100%;
+  max-width: 840px;
+  margin: auto auto 0;
+  padding-top: 22px;
+  padding-bottom: 0;
+}
+
+.composer-slot {
+  /* Reserve three lines so expansion moves upward, even below a long canvas. */
+  height: calc(3 * var(--composer-line-height) + 12px + 2 * var(--composer-inset) + 2px + 30px);
+  display: flex;
+  flex-direction: column;
+  justify-content: flex-end;
+}
+
+.canvas-workspace .composer {
+  min-height: 64px;
+  flex-shrink: 0;
+  align-items: flex-end;
+  padding-block: var(--composer-inset);
+  background: #111;
+  border-color: #454545;
+  border-radius: 4px;
+  box-shadow: none;
+  transition: border-color .2s, box-shadow .2s;
+}
+
+.canvas-workspace .composer:focus-within {
+  border-color: var(--green);
+  box-shadow: 0 0 0 1px var(--green);
+}
+
+.canvas-workspace .composer textarea {
+  color: var(--ink);
+  field-sizing: content;
+  height: auto;
+  min-width: 0;
+  min-height: calc(var(--composer-line-height) + 12px);
+  max-height: calc(3 * var(--composer-line-height) + 12px);
+  padding: 6px 0;
+  line-height: var(--composer-line-height);
+  overflow-y: auto;
+  overflow-x: hidden;
+  scrollbar-width: thin;
+  resize: none;
+  outline: none;
+}
+
+.canvas-workspace .composer textarea:placeholder-shown {
+  max-height: calc(var(--composer-line-height) + 12px);
+  overflow-y: hidden;
+}
+
+.composer-feedback {
+  min-height: 22px;
+  flex-shrink: 0;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  color: var(--muted);
+  font-size: 11px;
+  margin-bottom: 8px;
+}
+
+@media (max-width: 600px) {
+  .canvas-workspace .space-main { padding-bottom: 18px; }
+  .canvas-workspace .composer-area { --composer-inset: 11px; }
+  .canvas-workspace .composer { min-height: 58px; }
+  .canvas-workspace .empty-canvas { min-height: 310px; }
+}
+
+/* DevDay stays in the host chrome; each authored canvas keeps its own style. */
+.canvas-workspace .topbar { min-height: 72px; height: auto; padding-block: 12px; background: var(--paper); }
+.canvas-workspace .brand { gap: 22px; letter-spacing: -.025em; }
+.canvas-workspace .app-wordmark { padding-left: 22px; border-left: 1px solid var(--line); font-size: 14px; font-weight: 400; white-space: nowrap; }
+.canvas-workspace .topbar .devday-brand { font-size: 17px; }
+.canvas-workspace .topbar .devday-brand-name { color: var(--accent-text, var(--green)); }
+.canvas-workspace .topbar .devday-brand-year { color: var(--violet-text, var(--violet)); }
+.canvas-workspace .composer.is-building { border-color: var(--violet); }
+.canvas-workspace .composer textarea::placeholder { color: var(--muted); }
+.canvas-workspace .send-button { background: var(--green); color: #000; border-radius: 2px; }
+.canvas-workspace .send-button:hover:not(:disabled) { background: #57dc8c; }
+.canvas-workspace .send-button:disabled { background: #262626; color: #777; }
+.empty-canvas-copy { padding: 36px 20px; transition: opacity .3s; }
+.canvas-workspace .is-arriving .empty-canvas-copy { opacity: 0; }
+.canvas-workspace .empty-canvas .world-brackets { font-size: 59px; gap: 13px; margin-bottom: 24px; }
+.canvas-workspace .empty-canvas .canvas-edition { margin: 0 0 17px; font-size: 9px; letter-spacing: .12em; color: var(--muted); }
+.canvas-workspace .empty-canvas .canvas-edition-name { color: var(--green); }
+.canvas-workspace .empty-canvas h1 { font-family: var(--sans); font-size: clamp(26px, 3vw, 38px); letter-spacing: -.045em; font-weight: 400; line-height: 1.2; }
+.workspace-edition { display: flex; justify-content: space-between; align-items: center; gap: 16px; margin-top: 28px; border-top: 1px solid var(--line); padding-top: 15px; color: var(--muted); font-size: 10px; }
+.workspace-edition > span:last-child { font-size: 8px; color: var(--violet-text, var(--violet)); letter-spacing: .08em; }
+.canvas-workspace .modal[open] { animation: devday-dialog-in .22s ease-out; }
+.canvas-workspace .account-modal .modal-header h2 { margin-top: 22px; }
+.canvas-workspace .account-modal { border-top-color: var(--violet); }
+@keyframes devday-dialog-in { from { opacity: 0; transform: translateY(8px); } to { opacity: 1; transform: translateY(0); } }
+@media (max-width: 900px) {
+  .canvas-workspace .brand { gap: 14px; }
+  .canvas-workspace .app-wordmark { padding-left: 14px; font-size: 12px; }
+  .canvas-workspace .topbar .devday-brand { font-size: 15px; }
+  .canvas-workspace .topbar .devday-brand-openai { display: none; }
+}
+@media (max-width: 600px) {
+  .canvas-workspace .topbar { min-height: 64px; padding-block: 10px; }
+  .canvas-workspace .topbar .devday-brand { font-size: 14px; }
+  .canvas-workspace .topbar .app-wordmark { display: none; }
+  .canvas-workspace .composer textarea { font-size: 16px; }
+  .canvas-workspace .empty-canvas .canvas-edition { font-size: 8px; }
+  .empty-canvas-copy { padding: 32px 8px; }
+  .workspace-edition { margin-top: 24px; }
+  .workspace-edition > span:last-child { font-size: 7px; }
+}
+@media (prefers-reduced-motion: reduce) {
+  .canvas-workspace .is-arriving .empty-canvas-copy { opacity: 1; }
+  .empty-canvas-copy, .canvas-workspace .composer { transition: none; }
+  .canvas-workspace .modal[open] { animation: none; }
+}
+
+/* Keep the outer shell stable while the comparison animates its own grid. */
+.canvas-workspace .space-main { max-width: none; padding-inline: clamp(16px, 3vw, 40px); }
+.canvas-workspace .space-toolbar,
+.canvas-workspace .studio-intro,
+.canvas-workspace .workspace-edition { width: 100%; max-width: 1100px; margin-inline: auto; }
+.comparison-composer-row { display: flex; align-items: stretch; gap: 12px; }
+.comparison-composer-row > .composer { flex: 1; min-width: 0; }
+.finish-build-button { display: flex; flex-shrink: 0; align-items: center; justify-content: center; gap: 9px; padding: 14px 22px; border: 1px solid #57dc8c66; border-radius: 4px; background: var(--green); color: #001b09; font-size: 13px; font-weight: 500; animation: finish-build-enter .32s ease-out both; }
+.finish-build-button > svg { display: none; }
+.finish-build-button:hover:not(:disabled) { background: #57dc8c; }
+.finish-build-button:disabled { opacity: .65; }
+.comparison-connection,.comparison-error { margin: 10px 0 0; font-size: 11px; line-height: 1.5; color: var(--muted); }
+.comparison-error { color: #ffb08a; }
+.with-build-comparison .composer-area { position: sticky; bottom: 0; z-index: 12; max-width: 1100px; margin-top: 0; padding: 16px 0 20px; background: linear-gradient(transparent, #000 12px); }
+.with-build-comparison .composer-slot { height: auto; min-height: 64px; }
+.with-build-comparison .composer-feedback { display: none; }
+.workspace-chrome { display: grid; grid-template-rows: 1fr; flex-shrink: 0; opacity: 1; }
+.workspace-chrome-content { min-height: 0; overflow: hidden; }
+.workspace-chrome[data-collapsed="true"] { grid-template-rows: 0fr; opacity: 0; visibility: hidden; }
+.canvas-workspace .space-toolbar { justify-content: flex-end; }
+@media (prefers-reduced-motion: reduce) { .workspace-chrome { transition: none; } }
+.with-build-comparison .workspace-edition { display: none; }
+.with-build-comparison { overflow-anchor: none; }
+.with-build-comparison .space-main { padding-bottom: 0; }
+.with-build-comparison .empty-canvas .world-brackets { margin-bottom: 12px; font-size: 36px; }
+@keyframes finish-build-enter { from { opacity: 0; transform: translateY(5px); } to { opacity: 1; transform: none; } }
+@media (max-width: 600px) {
+  .comparison-composer-row { flex-wrap: wrap; gap: 8px; }
+  .comparison-composer-row > .composer { flex-basis: 100%; }
+  .finish-build-button { margin-left: auto; padding: 12px 18px; }
+  .with-build-comparison .composer-area { padding-bottom: 10px; }
+}
+@media (prefers-reduced-motion: reduce) { .finish-build-button { animation: none; } }
+
+/* The layout is committed under a single captured world transition. */
+html[data-world-transition] .workspace-chrome,
+html[data-world-transition] .generated-frame { transition: none !important; }
+html[data-world-transition] .finish-build-button { animation: none; }
+html[data-world-transition] .build-comparison-primary { view-transition-name: comparison-world; }
+html[data-world-transition] .composer-area { view-transition-name: comparison-composer; }
+html[data-world-transition]::view-transition { pointer-events: none; }
+html[data-world-transition]::view-transition-group(*) { animation-duration: .42s; animation-timing-function: cubic-bezier(.22, 1, .36, 1); }
+html[data-world-transition]::view-transition-group(root) { animation-duration: .18s; }
+html[data-world-transition]::view-transition-image-pair(comparison-world) { overflow: clip; isolation: isolate; }
+html[data-world-transition]::view-transition-old(comparison-world),
+html[data-world-transition]::view-transition-new(comparison-world) { height: 100%; object-fit: none; object-position: left top; }
+html[data-world-transition]::view-transition-old(comparison-world) { animation-duration: .18s; }
+@media (prefers-reduced-motion: reduce) { html[data-world-transition]::view-transition-group(*) { animation-duration: 0s; } }

@@ -1,0 +1,149 @@
+/* Mira: lead with the plants and the choices, without repeated exhibition labels.
+   The original season selectors also change ink/muted. Reassert the neutral
+   dark palette at equal specificity; the subsequent light stylesheet replaces
+   these same tokens when light mode is active. Season accent colors remain. */
+.herbarium.herbarium {
+  --paper: #000000;
+  --ink: #ffffff;
+  --muted: #a0a0a0;
+  padding: clamp(22px, 3vw, 64px);
+}
+.herbarium.herbarium .hero { gap: var(--world-gap); min-height: 0; padding-block: var(--world-gap); }
+.herbarium.herbarium .hero h1 { font-size: clamp(40px, 4.8vw, 192px); }
+.herbarium.herbarium .hero .kicker,
+.herbarium.herbarium .illustration > span,
+.herbarium.herbarium footer > span:last-child { display: none; }
+.herbarium.herbarium .hero-art::after,
+.herbarium.herbarium footer::after { content: none; }
+.herbarium.herbarium .intro { font-size: var(--world-body); max-width: 36ch; line-height: 1.5; margin-block: 18px; }
+.herbarium.herbarium :is(.kicker, .remaining, .tally, .tally span, footer) { font-size: var(--world-small); line-height: 1.5; letter-spacing: .025em; }
+.herbarium.herbarium .collection-head { align-items: center; padding-block: var(--world-gap); }
+.herbarium.herbarium .collection-head h2 { font-size: var(--world-heading); }
+.herbarium.herbarium .specimen h3 { font-size: clamp(26px, 2.2vw, 92px); }
+.herbarium.herbarium .description { font-size: var(--world-body); line-height: 1.5; }
+.herbarium.herbarium :is(.lights, .grow) { flex-wrap: wrap; gap: 8px; }
+.herbarium.herbarium :is(.lights, .grow) button { min-height: 44px; font-size: var(--world-small); }
+.herbarium.herbarium .grow .remove { font-size: var(--world-body); min-width: 44px; }
+.herbarium.herbarium .specimens { grid-template-columns: repeat(auto-fit, minmax(min(100%, 15em), 1fr)); gap: var(--world-gap); }
+.herbarium.herbarium .illustration svg { height: clamp(220px, 18vw, 420px); }
+.herbarium.herbarium .hero-art svg { height: clamp(220px, 20vw, 440px); max-height: none; }
+.herbarium.herbarium footer { flex-wrap: wrap; margin-top: var(--world-gap); }
+
+/* James: keep the calculator, source freshness and financial context prominent. */
+.observatory.observatory :is(.obs-hero, .obs-content) { padding-inline: clamp(22px, 3vw, 64px); }
+.observatory.observatory .obs-hero { padding-block: var(--world-gap); }
+.observatory.observatory :is(.obs-devday, .obs-byline, .obs-footer) { display: none; }
+.observatory.observatory .obs-hero h1 { max-width: 64%; font-size: clamp(40px, 4.8vw, 192px); margin-block: 18px; }
+.observatory.observatory .obs-hero p { width: 58%; max-width: 42ch; font-size: var(--world-body); line-height: 1.5; }
+.observatory.observatory .obs-orbit { width: auto; height: calc(100% - 2 * var(--world-gap)); max-height: 32vw; max-width: none; aspect-ratio: 1; top: 50%; right: 3%; transform: translateY(-50%); }
+.observatory.observatory .obs-content { padding-block: var(--world-gap); }
+.observatory.observatory h2 { font-size: var(--world-heading); }
+.observatory.observatory .obs-article h3 { font-size: clamp(26px, 2.2vw, 92px); }
+.observatory.observatory :is(.obs-article p, .obs-projects p, button, input) { font-size: var(--world-body); }
+.observatory.observatory :is(.obs-kicker, .obs-caption, .obs-tag, .obs-legend, .obs-form label, .obs-assumptions, .obs-meta, .obs-status, .obs-article a) {
+  font-size: var(--world-small);
+  line-height: 1.5;
+}
+.observatory.observatory .obs-kicker { letter-spacing: .045em; }
+.observatory.observatory .obs-desk .obs-kicker { display: none; }
+.observatory.observatory .obs-value { font-size: clamp(44px, 5.5vw, 224px); }
+.observatory.observatory .obs-console { grid-template-columns: minmax(0, 1.4fr) minmax(0, 1fr); gap: var(--world-gap); }
+.observatory.observatory .obs-heading { flex-wrap: wrap; margin-bottom: var(--world-gap); }
+.observatory.observatory .obs-assumptions { max-width: 78ch; }
+.observatory.observatory :is(button, input) { min-height: 44px; }
+.observatory.observatory .obs-chart { overflow: visible; margin-bottom: 1.6em; }
+.observatory.observatory .obs-chart text { font-size: 18px; }
+.observatory.observatory .obs-chart > text:last-child { transform: translateY(22px); }
+.observatory.observatory .obs-form { gap: clamp(14px, 1.4vw, 28px); }
+.observatory.observatory .obs-form label { gap: 8px; }
+.observatory.observatory .obs-feed { gap: var(--world-gap); }
+
+/* Jake: the question field and safety guidance are the essential reading. */
+.care.care { padding: clamp(22px, 3vw, 64px); }
+.care.care .room { max-width: 70em; }
+.care.care .room > header { margin-bottom: var(--world-gap); }
+.care.care .room > header > .small,
+.care.care .chat-head .small { display: none; }
+.care.care h1 { font-size: clamp(40px, 4.8vw, 192px); }
+.care.care h2,
+.care.care .welcome strong { font-size: clamp(25px, 2.1vw, 88px); }
+.care.care :is(.intro p, [data-field="content"], .sample, textarea, .send, .prep-toggle, .steps p, .catalog p) {
+  font-size: var(--world-body);
+  line-height: 1.5;
+}
+.care.care .intro p { max-width: 50ch; }
+.care.care :is(.eyebrow, .small, .quiet, label, .status, [data-field="role"], [data-service-note], [data-service-error], .safety, [data-service-sources] a) {
+  font-size: var(--world-small);
+  line-height: 1.5;
+}
+.care.care .eyebrow { letter-spacing: .045em; }
+.care.care :is(button, textarea) { min-height: 44px; }
+.care.care textarea { min-height: 5.5em; }
+.care.care [data-service-messages] { max-height: 22em; }
+.care.care [data-service-messages] article { min-width: 0; }
+.care.care :is(.send-row, .chat-head) { flex-wrap: wrap; }
+.care.care .chat-head,
+.care.care .body,
+.care.care .safety { padding: var(--world-gap); }
+.care.care .breath { width: clamp(100px, 12vw, 240px); height: auto; aspect-ratio: 1; flex-shrink: 0; }
+.care.care .intro { grid-template-columns: minmax(0, 1fr) auto; margin-bottom: var(--world-gap); }
+.care.care .steps { gap: var(--world-gap); }
+
+/* Erica: pair the network with its explanation, not a long column of captions. */
+.notebook.notebook header { padding: var(--world-gap) clamp(22px, 3vw, 64px); }
+.notebook.notebook :is(header .edition, .intro .eyebrow),
+.notebook.notebook .stage-head > span:first-child,
+.notebook.notebook .svg-label,
+.notebook.notebook footer > div:first-child { display: none; }
+.notebook.notebook .hero { gap: var(--world-gap); padding: var(--world-gap) clamp(22px, 3vw, 64px); }
+.notebook.notebook h1 { font-size: clamp(40px, 4.8vw, 192px); }
+.notebook.notebook h2,
+.notebook.notebook .project h2 { font-size: var(--world-heading); }
+.notebook.notebook :is(.intro, .fact p, footer p, .project p, button) { font-size: var(--world-body); line-height: 1.5; }
+.notebook.notebook .intro { max-width: 36ch; }
+.notebook.notebook :is(.eyebrow, .stage-head, .saved, cite) { font-size: var(--world-small); line-height: 1.5; letter-spacing: .025em; }
+.notebook.notebook .explorer { display: grid; grid-template-columns: minmax(0, 1.4fr) minmax(0, 1fr); }
+.notebook.notebook .stage-head { grid-column: 1 / -1; justify-content: flex-start; padding: var(--world-gap); }
+.notebook.notebook .stage { grid-column: 1; grid-row: 2; width: 100%; max-width: none; align-self: center; }
+.notebook.notebook .controls { grid-column: 1; grid-row: 3; padding: 0 var(--world-gap) 12px; gap: 10px; }
+.notebook.notebook .saved { grid-column: 1; grid-row: 4; padding: 0 var(--world-gap) var(--world-gap); }
+.notebook.notebook .fact { grid-column: 2; grid-row: 2 / 5; display: flex; flex-direction: column; justify-content: center; gap: var(--world-gap); padding: var(--world-gap); border-top: 0; border-left: 1px solid var(--line); }
+.notebook.notebook .number { display: none; }
+.notebook.notebook button { min-height: 44px; }
+.notebook.notebook footer { display: block; padding: var(--world-gap) clamp(22px, 3vw, 64px); }
+.notebook.notebook footer p { max-width: 78ch; }
+.notebook.notebook footer .eyebrow { display: none; }
+.notebook.notebook footer p[style*="font-size"] { font-size: var(--world-small) !important; }
+
+/* Reflow each tool at narrow widths; do not scale down its entire document. */
+@media (max-width: 900px) {
+  .notebook.notebook .hero { grid-template-columns: minmax(0, 1fr); }
+  .notebook.notebook .intro { max-width: none; }
+  .notebook.notebook .explorer { display: block; }
+  .notebook.notebook .fact { display: grid; grid-template-columns: minmax(0, 1fr) minmax(0, 1fr); border-left: 0; border-top: 1px solid var(--line); }
+  .notebook.notebook .explanation { grid-column: auto; }
+}
+@media (max-width: 800px) {
+  .herbarium.herbarium .hero { grid-template-columns: minmax(0, 1fr) minmax(0, .65fr); }
+  .herbarium.herbarium .hero-art { margin: 0; }
+  .observatory.observatory .obs-hero h1 { max-width: none; }
+  .observatory.observatory .obs-hero p { width: 65%; }
+  .observatory.observatory .obs-orbit { max-height: 28vw; right: 0; }
+  .observatory.observatory .obs-console { grid-template-columns: minmax(0, 1fr); }
+  .observatory.observatory .obs-form { border-left: 0; padding-left: 0; grid-template-columns: repeat(2, minmax(0, 1fr)); }
+  .observatory.observatory .obs-form :is(button, .obs-caption) { grid-column: 1 / -1; }
+  .observatory.observatory .obs-chart text { font-size: 22px; }
+  .care.care .steps { grid-template-columns: minmax(0, 1fr); }
+}
+@media (max-width: 480px) {
+  .herbarium.herbarium .hero { grid-template-columns: minmax(0, 1fr); }
+  .herbarium.herbarium .hero-art { display: none; }
+  .observatory.observatory .obs-hero p { width: 100%; }
+  .observatory.observatory .obs-orbit { display: none; }
+  .observatory.observatory .obs-form { grid-template-columns: minmax(0, 1fr); }
+  .observatory.observatory .obs-chart text { font-size: 32px; }
+  .notebook.notebook .fact { grid-template-columns: minmax(0, 1fr); }
+  .notebook.notebook header { flex-wrap: wrap; }
+  .care.care .intro { grid-template-columns: minmax(0, 1fr); }
+  .care.care .breath { display: none; }
+}

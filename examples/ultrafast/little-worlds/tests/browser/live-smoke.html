@@ -1,0 +1,58 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <meta name="robots" content="noindex" />
+    <title>Little Worlds · synthetic microphone smoke test</title>
+    <style>
+      #live-smoke-panel { position: fixed; right: 14px; bottom: 14px; z-index: 100000; width: min(390px, calc(100vw - 28px)); color: #213d32; background: #fafcf7; border: 1px solid #b6c8b8; border-radius: 13px; box-shadow: 0 12px 42px #0b2b242b; font: 12px/1.45 system-ui, sans-serif; }
+      #live-smoke-panel * { box-sizing: border-box; }
+      #live-smoke-panel summary { cursor: pointer; padding: 12px 15px; font-weight: 650; letter-spacing: .01em; }
+      #live-smoke-panel .smoke-body { padding: 0 15px 14px; max-height: min(72vh, 650px); overflow: auto; }
+      #live-smoke-panel p { margin: 0 0 9px; }
+      #live-smoke-panel .smoke-note { color: #5c7065; font-size: 11px; }
+      #live-smoke-panel .smoke-status { background: #e8f0e4; border-radius: 6px; padding: 7px 9px; margin-bottom: 10px; }
+      #live-smoke-panel label { display: block; margin: 9px 0 5px; font-weight: 600; }
+      #live-smoke-panel input[type="file"], #live-smoke-panel input[type="text"] { width: 100%; font: inherit; color: inherit; border: 1px solid #bacabc; border-radius: 5px; padding: 7px; background: white; }
+      #live-smoke-panel input[type="checkbox"] { accent-color: #335c47; margin: 0 6px 0 0; }
+      #live-smoke-panel .smoke-toggle { display: flex; align-items: center; font-weight: 450; }
+      #live-smoke-panel .smoke-row { display: flex; align-items: center; gap: 7px; margin: 8px 0; }
+      #live-smoke-panel button { cursor: pointer; font: inherit; color: #244733; background: #fff; border: 1px solid #aabdac; border-radius: 5px; padding: 7px 10px; }
+      #live-smoke-panel button:disabled { cursor: default; opacity: .45; }
+      #live-smoke-panel #smoke-play { background: #335c47; border-color: #335c47; color: white; flex: 1; }
+      #live-smoke-panel #smoke-audio-label { overflow-wrap: anywhere; font-size: 11px; color: #51665a; }
+      #live-smoke-panel #smoke-log { background: #eff3eb; border: 1px solid #d5dfcf; border-radius: 5px; height: 160px; overflow: auto; padding: 8px; margin: 8px 0 0; white-space: pre-wrap; overflow-wrap: anywhere; font: 10px/1.45 ui-monospace, monospace; color: #284536; }
+    </style>
+  </head>
+  <body>
+    <div id="root"></div>
+    <aside id="live-smoke-panel" data-voice-ignore aria-label="Synthetic microphone smoke-test controls">
+      <details open>
+        <summary>Voice smoke test · no hardware microphone</summary>
+        <div class="smoke-body">
+          <p class="smoke-note">This page runs the real app and real API calls. Its microphone is a silent WebAudio stream. Start Live in the app, then play a selected phrase.</p>
+          <div class="smoke-status" role="status">
+            <div id="smoke-mic-status">Installing synthetic microphone…</div>
+            <div id="smoke-connection-status">No WebRTC connection yet.</div>
+          </div>
+          <label for="smoke-file">Choose a local spoken phrase</label>
+          <input id="smoke-file" type="file" accept=".wav,audio/wav,audio/x-wav,audio/*" />
+          <label for="smoke-path">Or load a WAV from public/test-results</label>
+          <input id="smoke-path" type="text" value="/test-results/voice-open-explore.wav" spellcheck="false" autocomplete="off" />
+          <div class="smoke-row"><button id="smoke-load-path" type="button">Load server WAV</button></div>
+          <p id="smoke-audio-label">No phrase loaded.</p>
+          <div class="smoke-row">
+            <button id="smoke-play" type="button" disabled>Play phrase into microphone</button>
+            <button id="smoke-stop" type="button" disabled>Stop phrase</button>
+          </div>
+          <label class="smoke-toggle"><input id="smoke-mute" type="checkbox" checked />Mute test speakers (audio analysis stays active)</label>
+          <div class="smoke-row"><button id="smoke-clear-log" type="button">Clear log</button></div>
+          <pre id="smoke-log" role="log" aria-label="Live smoke-test event log"></pre>
+          <p class="smoke-note" style="margin-top:9px">App navigation can change the address without unloading this test. To reload the test, reopen <code>/tests/browser/live-smoke.html</code>.</p>
+        </div>
+      </details>
+    </aside>
+    <script type="module" src="./live-smoke.tsx"></script>
+  </body>
+</html>

@@ -1,0 +1,13 @@
+.page-header-leading{display:flex;align-items:center;gap:16px;min-width:0}
+.page-navigation{display:flex;align-items:center;flex-shrink:0;gap:0;margin-left:-6px;color:inherit}
+.page-navigation .page-home-button{position:relative;display:inline-flex;align-items:center;justify-content:center;flex-shrink:0;width:44px;height:44px;min-height:44px;margin:0;padding:0;border:0;border-radius:4px;background:transparent;color:inherit;cursor:pointer;opacity:.72;transition:opacity .18s ease,transform .18s ease}
+.page-home-button:before{content:'';position:absolute;inset:5px;border:1px solid currentColor;border-radius:4px;opacity:.17;transition:opacity .18s ease,background .18s ease}
+.page-navigation .page-home-button svg{position:relative;width:17px;height:17px;stroke:currentColor;stroke-width:1.5;stroke-linecap:round;stroke-linejoin:round}
+.page-navigation .page-home-button:hover:not(:disabled){opacity:1}
+.page-home-button:hover:not(:disabled):before{opacity:.28;background:color-mix(in srgb,var(--green) 16%,transparent)}
+.page-navigation .page-home-button:active:not(:disabled){transform:scale(.94)}
+.page-navigation .page-home-button:disabled{cursor:default;opacity:.23}
+.page-navigation .page-home-button:focus-visible{outline:2px solid var(--accent-text);outline-offset:-3px;opacity:1}
+@media(max-width:600px){.page-header-leading{gap:8px}}
+@media(max-width:420px){.topbar{gap:8px}.topbar .brand{gap:0}.topbar .brand>span:last-child{display:none}}
+@media(prefers-reduced-motion:reduce){.page-navigation .page-home-button,.page-home-button:before{transition:none}.page-navigation .page-home-button:active:not(:disabled){transform:none}}

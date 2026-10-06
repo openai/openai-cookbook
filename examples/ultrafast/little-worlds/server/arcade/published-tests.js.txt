@@ -1,0 +1,49 @@
+export function runTests(api) {
+  const actor = {id:'arcade-verification',name:'Player'};
+  const other = {id:'arcade-other',name:'Other player'};
+  const checks = [];
+  const before = JSON.stringify(api.initialState);
+  const html = api.render(api.initialState,actor);
+  let state = JSON.parse(before);
+  state.extras.arcade_notes = {[other.id]:{actorId:other.id,text:'Keep this'}};
+  for (const id of ['pacman','space-invaders','snake','tetris']) {
+    const game = api.games[id];
+    const fresh = game.init(null,actor);
+    const original = JSON.stringify(fresh);
+    let progress = fresh;
+    for (const control of game.actions) {
+      progress = game.step(progress,control.action,actor);
+      if (control.release) progress = game.step(progress,control.release,actor);
+    }
+    for (let tick=0;tick<10;tick++) progress=game.step(progress,{type:'tick',deltaMs:50},actor);
+    const scene=game.view(progress,actor);
+    const previous=JSON.parse(JSON.stringify(state));
+    state=api.reduce(state,{type:game.config.saveAction,game:progress},actor);
+    checks.push({name:id+' has a playable scene and readable score',ok:scene.objects.length>0&&Number.isFinite(scene.values.score)&&html.includes('data-game="'+id+'"')});
+    checks.push({name:id+' preserves its participant checkpoint',ok:JSON.stringify(state.extras[id][actor.id])===JSON.stringify(progress)&&game.init(progress,actor).score===progress.score});
+    checks.push({name:id+' preserves every other game and participant',ok:Object.keys(previous.extras).every(key=>key===id||JSON.stringify(previous.extras[key])===JSON.stringify(state.extras[key]))});
+    checks.push({name:id+' keeps caller simulation state immutable',ok:JSON.stringify(fresh)===original});
+    let rejected=false;
+    try {api.reduce(state,{type:game.config.saveAction,game:{...progress,actorId:other.id}},actor);}catch{rejected=true;}
+    checks.push({name:id+' rejects another participant checkpoint',ok:rejected});
+  }
+  const maze = api.games.pacman;
+  let runner = maze.step(maze.init(null, actor), {type:'direction',direction:'left'}, actor);
+  let previous = maze.view(runner, actor).objects.find(object => object.id === 'pacman');
+  const distances = [];
+  for (let tick=0;tick<6;tick++) {
+    runner = maze.step(runner, {type:'tick',deltaMs:50}, actor);
+    const current = maze.view(runner, actor).objects.find(object => object.id === 'pacman');
+    distances.push(Math.hypot(current.x-previous.x,current.y-previous.y));
+    previous = current;
+  }
+  checks.push({name:'PacMan travels continuously at a uniform corridor speed',ok:distances[0]>0&&distances.every(distance=>Math.abs(distance-distances[0])<0.000001)});
+  runner = maze.step(runner, {type:'tick',deltaMs:50}, actor);
+  const beforeTurn = maze.view(runner, actor).objects.find(object => object.id === 'pacman');
+  runner = maze.step(runner, {type:'direction',direction:'right'}, actor);
+  const afterTurn = maze.view(runner, actor).objects.find(object => object.id === 'pacman');
+  checks.push({name:'PacMan reverses direction without snapping to a cell',ok:Math.abs(beforeTurn.x-afterTurn.x)<0.000001&&Math.abs(beforeTurn.y-afterTurn.y)<0.000001});
+  checks.push({name:'Viewing the arcade preserves live state',ok:JSON.stringify(api.initialState)===before});
+  checks.push({name:'All four games have independent controls',ok:(html.match(/data-game-command="start"/g)||[]).length===4});
+  return checks;
+}

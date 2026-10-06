@@ -4,6 +4,19 @@
 # should build pages for, and indicates metadata such as tags, creation date and
 # authors for each page.
 
+- title: Build interactive worlds with Ultrafast
+  path: examples/ultrafast/little-worlds/README.md
+  slug: ultrafast-little-worlds
+  description: Build interactive personal pages with a local Responses agent, verify generated code, and compare independent Ultrafast and Standard builds.
+  date: 2026-10-05
+  authors:
+    - jmiano-oai
+  tags:
+    - ultrafast
+    - responses
+    - agents
+    - code-generation
+
 - title: Release ChatGPT usage budgets hourly, daily, or weekly
   path: examples/chatgpt/daily_usage_limits/README.md
   slug: chatgpt-interval-usage-limits

@@ -1,0 +1,53 @@
+:root {
+  color-scheme: light;
+  --devday-background: #f7f8fa;
+  --devday-surface: #ffffff;
+  --devday-text: #202630;
+  --devday-muted: #596273;
+  --devday-line: #d9dee7;
+  --devday-green: #007e35;
+  --devday-purple: #7741c6;
+}
+html, body { background: #f7f8fa; color: #202630; color-scheme: light; }
+.herbarium.herbarium {
+  --paper: #f7f8fa;
+  --ink: #202630;
+  --wash: #eaf3ed;
+  --muted: #596273;
+  --light: #007e35;
+  background: var(--paper);
+  color: var(--ink);
+  color-scheme: light;
+  transition: none;
+}
+.herbarium.herbarium.summer { --paper: #fbf8f2; --wash: #f2eddf; --light: #99602a; }
+.herbarium.herbarium.evening { --paper: #f8f7fc; --wash: #eee9f6; --light: #7741c6; }
+.herbarium.herbarium .lights { background: #ffffff; border-color: #d9dee7; }
+.herbarium.herbarium button { color: #202630; transition: transform .18s; }
+.herbarium.herbarium .lights button[aria-pressed=true],
+.herbarium.herbarium .grow button { background: #007e35; color: #ffffff; }
+.herbarium.herbarium button:hover:not(:disabled) { background: #e0eee4; color: #135c30; }
+.herbarium.herbarium .lights button[aria-pressed=true]:hover,
+.herbarium.herbarium .grow button:hover:not(:disabled) { background: #08682f; color: #ffffff; }
+.herbarium.herbarium .grow .remove { background: #ffffff; color: #596273; }
+.herbarium.herbarium .grow .remove:hover:not(:disabled) { background: #e0eee4; color: #135c30; }
+.herbarium.herbarium button:disabled,
+.herbarium.herbarium .grow button:disabled { background: #e8ecf0; color: #687381; }
+.herbarium.herbarium button:focus-visible { outline-color: #7741c6; }
+.herbarium.herbarium .collection-head,
+.herbarium.herbarium footer { border-color: #d9dee7; }
+.herbarium.herbarium footer:after,
+.herbarium.herbarium .illustration span,
+.herbarium.herbarium .empty { color: #596273; }
+.herbarium.herbarium .illustration { background: var(--wash); border-color: #d3e1d7; color: var(--light); }
+.herbarium.herbarium.evening .illustration { border-color: #ded5ec; }
+.herbarium.herbarium.summer .illustration { border-color: #e3dcc9; }
+.herbarium.herbarium svg path[fill="#7e9863"],
+.herbarium.herbarium svg path[fill="#547a50"] { fill: #008c42; }
+.herbarium.herbarium svg path[fill="#476c48"] { fill: #176c3c; }
+.herbarium.herbarium svg path[fill="#9cab71"] { fill: #46b875; }
+.herbarium.herbarium svg path[stroke="#dce1b1"] { stroke: #c3ebce; }
+.herbarium.herbarium svg path[stroke="#547148"] { stroke: #176c3c; }
+.herbarium.herbarium svg g[fill="#eee3a1"] { fill: #8a50d7; }
+.herbarium.herbarium.summer svg g[fill="#eee3a1"] { fill: #ce8743; }
+.herbarium.herbarium.evening svg path[fill="#9cab71"] { fill: #a277d4; }

@@ -1,0 +1,31 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <meta name="robots" content="noindex" />
+    <title>Live navigation regression checks</title>
+    <style>
+      #navigation-checks { position: fixed; right: 14px; bottom: 14px; z-index: 10000; width: min(460px, calc(100vw - 28px)); max-height: 42vh; overflow: auto; padding: 18px; border: 1px solid #99ab9a; border-radius: 14px; color: #203829; background: #f7fbf4; box-shadow: 0 8px 35px #20382922; font: 13px/1.45 system-ui, sans-serif; }
+      #navigation-checks h1 { font-size: 17px; margin: 0 0 8px; }
+      #navigation-checks p { margin: 0 0 9px; }
+      #navigation-checks button { border: 1px solid #385e44; border-radius: 7px; background: #385e44; color: white; padding: 8px 13px; font: inherit; }
+      #navigation-checks button:disabled { opacity: .6; }
+      #navigation-results { padding-left: 20px; margin-bottom: 0; }
+      #navigation-results li { margin-top: 5px; }
+      #navigation-results [data-status="fail"] { color: #a03622; }
+      #navigation-summary { font-weight: 650; }
+    </style>
+  </head>
+  <body>
+    <div id="root"></div>
+    <aside id="navigation-checks" data-voice-ignore aria-label="Live navigation regression checks">
+      <h1>Live navigation regression checks</h1>
+      <p>The real React app, voice controller, and route handlers with isolated HTTP, WebRTC, and microphone fixtures. No real microphone, models, or saved-space requests.</p>
+      <button id="run-navigation-checks">Run navigation checks</button>
+      <p id="navigation-summary" role="status">Ready.</p>
+      <ol id="navigation-results" aria-label="Navigation check results"></ol>
+    </aside>
+    <script type="module" src="./voice-navigation.tsx"></script>
+  </body>
+</html>

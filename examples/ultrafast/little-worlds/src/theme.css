@@ -1,0 +1,200 @@
+/* Host appearance only. Generated worlds keep the palette authored in their iframe. */
+:root {
+  --surface: #111;
+  --surface-raised: #181818;
+  --surface-hover: #222;
+  --border-strong: #454545;
+  --inspection-surface: #151921;
+  --inspection-header: #1c202b;
+  --inspection-line: #343c4d;
+  --danger-text: #ffaf85;
+}
+
+:root[data-theme='light'] {
+  color-scheme: light;
+  color: #202630;
+  background: #f7f8fa;
+  --paper: #f7f8fa;
+  --ink: #202630;
+  --muted: #626a76;
+  --line: #dce0e6;
+  --panel: #fff;
+  --surface: #fff;
+  --surface-raised: #f2f3f5;
+  --surface-hover: #e9ecf0;
+  --border-strong: #b7bec8;
+  --green: #008239;
+  --lime: #008239;
+  --accent-text: #007f36;
+  --violet: #7940cf;
+  --violet-text: #7140b8;
+  --inspection-surface: #edf0f7;
+  --inspection-header: #e6eaf3;
+  --inspection-line: #c9d1df;
+  --danger-text: #a44520;
+}
+
+body { color: var(--ink); background: var(--paper); }
+
+/* The complete page shares one fade, including gradients, SVG and portals.
+   Suppression lasts only for the palette commit, not the 180 ms animation. */
+html[data-theme-commit],
+html[data-theme-commit] *,
+html[data-theme-commit] *::before,
+html[data-theme-commit] *::after,
+html[data-theme-commit] *::backdrop {
+  transition: none !important;
+}
+html[data-theme-transition]::view-transition { pointer-events: none; }
+html[data-theme-transition]::view-transition-group(root) { animation: none; }
+html[data-theme-transition]::view-transition-old(root) {
+  animation: none;
+  opacity: 1;
+  mix-blend-mode: normal;
+}
+html[data-theme-transition]::view-transition-new(root) {
+  animation: theme-palette-in 180ms ease-in-out both;
+  mix-blend-mode: normal;
+}
+@keyframes theme-palette-in { from { opacity: 0; } to { opacity: 1; } }
+@media (prefers-reduced-motion: reduce) {
+  html[data-theme-transition]::view-transition-new(root) { animation-duration: 0s; }
+}
+
+.demo-utilities {
+  position: fixed;
+  z-index: 75;
+  left: max(16px, env(safe-area-inset-left));
+  bottom: max(8px, env(safe-area-inset-bottom));
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+.demo-utilities .reset-demo-trigger {
+  position: static;
+  height: 36px;
+  min-height: 36px;
+  border: 1px solid var(--line);
+  border-radius: 6px;
+  background: color-mix(in srgb, var(--surface) 94%, transparent);
+  box-shadow: 0 3px 14px #0000000a;
+  backdrop-filter: blur(12px);
+  color: var(--muted);
+}
+.demo-utilities .reset-demo-trigger:hover { background: var(--surface-hover); color: var(--ink); }
+.theme-toggle {
+  display: grid;
+  place-items: center;
+  width: 36px;
+  height: 36px;
+  min-height: 36px;
+  flex: 0 0 36px;
+  padding: 0;
+  border: 1px solid var(--line);
+  border-radius: 50%;
+  background: color-mix(in srgb, var(--surface) 94%, transparent);
+  color: var(--accent-text);
+  box-shadow: 0 3px 14px #0000000a;
+  transition: background .16s ease, border-color .16s ease, color .16s ease, transform .12s ease;
+}
+.theme-toggle[data-theme='light'] { color: var(--violet-text); }
+.theme-toggle:hover { border-color: var(--border-strong); background: var(--surface-hover); }
+.theme-toggle:active { transform: scale(.94); }
+.theme-toggle:focus-visible { outline: 2px solid var(--accent-text); outline-offset: 3px; }
+
+/* Existing surfaces predate theme tokens. Keep these scoped to host classes. */
+html[data-theme='light'] .account-gate::before { background-image: linear-gradient(#20263005 1px, transparent 1px), linear-gradient(90deg, #20263005 1px, transparent 1px); }
+html[data-theme='light'] :is(.account-person, .account-name-row, .composer, .canvas-workspace .composer, .inspiration-prompt) { background: var(--surface); border-color: var(--line); color: var(--ink); }
+html[data-theme='light'] :is(.account-person:hover:not(:disabled), .inspiration-prompt:hover:not(:disabled)) { background: var(--surface-raised); border-color: var(--green); color: var(--ink); }
+html[data-theme='light'] .account-name-row:focus-within { border-color: var(--green); background: var(--surface); }
+html[data-theme='light'] .account-name-row button { background: var(--surface-hover); color: var(--muted); }
+html[data-theme='light'] .account-name-row:focus-within button { background: var(--green); color: #fff; }
+html[data-theme='light'] :is(.composer:focus-within, .canvas-workspace .composer:focus-within) { border-color: var(--green); }
+html[data-theme='light'] :is(.composer.is-building, .canvas-workspace .composer.is-building) { border-color: var(--violet); }
+html[data-theme='light'] :is(.send-button, .canvas-workspace .send-button, .finish-build-button, .account-actions button, .continue-thread) { color: #fff; }
+html[data-theme='light'] :is(.send-button:hover:not(:disabled), .canvas-workspace .send-button:hover:not(:disabled), .finish-build-button:hover:not(:disabled)) { background: #007f36; }
+html[data-theme='light'] :is(.send-button:disabled, .canvas-workspace .send-button:disabled) { background: var(--surface-hover); color: #88909c; }
+html[data-theme='light'] :is(.icon-button:hover, .thread-activity-link:hover) { background: var(--surface-hover); }
+html[data-theme='light'] :is(.help-button, .key-note, .location, .thread-empty, .guide-steps p, .guide-bottom p, .guide-bottom > a, .loading-space, .visitor-note p, .cancel-button, .section-label h2, .section-label > span, .empty-canvas p) { color: var(--muted); }
+html[data-theme='light'] :is(.revision-list > div, .guide-bottom, .section-label, .location) { border-color: var(--line); }
+html[data-theme='light'] .with-build-comparison .composer-area { background: linear-gradient(transparent, var(--paper) 12px); }
+html[data-theme='light'] .comparison-error { color: var(--danger-text); }
+
+/* Native dialogs, toasts, and identity tools. */
+html[data-theme='light'] :is(.modal, .reset-demo-dialog, .space-icon-dialog, .toast) { color-scheme: light; color: var(--ink); background: var(--surface); border-color: var(--line); box-shadow: 0 24px 80px #20263026; }
+html[data-theme='light'] .modal { border-top-color: var(--violet); }
+html[data-theme='light'] :is(.modal, .reset-demo-dialog, .space-icon-dialog)::backdrop { background: #20263055; }
+html[data-theme='light'] :is(.reset-demo-symbol, .reset-demo-actions .reset-demo-cancel, .space-icon-generate) { border-color: var(--line); }
+html[data-theme='light'] :is(.reset-demo-actions .reset-demo-cancel, .space-icon-generate, .space-icon-dialog-close, .account-actions button + button) { background: var(--surface); color: var(--ink); }
+html[data-theme='light'] :is(.reset-demo-actions .reset-demo-cancel:hover:not(:disabled), .space-icon-generate:hover:not(:disabled), .space-icon-dialog-close:hover, .account-actions button + button:hover) { background: var(--surface-hover); }
+html[data-theme='light'] :is(.reset-demo-dialog p, .space-icon-dialog > p, .space-icon-file-hint, .space-icon-editor-status p) { color: var(--muted); }
+html[data-theme='light'] :is(.reset-demo-dialog p.reset-demo-error, .space-icon-editor-status .space-icon-editor-error) { color: var(--danger-text); }
+html[data-theme='light'] :is(.account-error, .history-error, .friendship-error, .community-error) { color: var(--danger-text); background: #fff1e9; border-color: #e9c8b8; }
+html[data-theme='light'] .space-icon-edit-mark { background: var(--surface); color: var(--ink); box-shadow: 0 0 0 1px var(--line); }
+
+/* Community map and its controls; artwork thumbnails keep their authored colors. */
+html[data-theme='light'] .community-overlay { --community-muted: var(--muted); --community-line: var(--line); background: var(--paper); color-scheme: light; }
+html[data-theme='light'] :is(.constellation-shell, .constellation-shell.galaxy-shell, .community-discover-card, .community-person-card, .community-requests) { background: var(--surface); border-color: var(--line); }
+html[data-theme='light'] .community-person-card { border-top-color: color-mix(in srgb, var(--person-color) 55%, var(--ink)); }
+html[data-theme='light'] .community-person-top > .community-eyebrow { color: var(--muted); }
+html[data-theme='light'] .community-requests { box-shadow: 0 20px 70px #20263020; }
+html[data-theme='light'] .galaxy-vignette { box-shadow: inset 0 0 80px 15px var(--surface); }
+html[data-theme='light'] :is(.constellation-node-name, .galaxy-node .constellation-node-name) { color: var(--ink); text-shadow: 0 1px 8px var(--surface); }
+html[data-theme='light'] .constellation-node-orbit { border-color: var(--border-strong); }
+html[data-theme='light'] .constellation-person.selected .constellation-node-name { color: var(--ink); }
+html[data-theme='light'] :is(.constellation-person:hover, .constellation-person.selected, .galaxy-node .constellation-person.is-held) .constellation-node-orbit { border-color: color-mix(in srgb, var(--node-color) 55%, var(--ink)); }
+html[data-theme='light'] .constellation-node-portrait > i { border-color: var(--surface); }
+html[data-theme='light'] .constellation-edge > path { stroke: #626a76; }
+html[data-theme='light'] .constellation-edge.highlighted > path { stroke: var(--green); }
+html[data-theme='light'] .constellation-tools { background: #fffffff0; border-color: var(--line); }
+html[data-theme='light'] .constellation-tools > div { border-color: var(--line); }
+html[data-theme='light'] :is(.constellation-tools button, .constellation-tools > div > span, .constellation-hint, .constellation-node-name > span, .community-icon, .community-subtle, .community-intro > p, .community-discover-card p, .community-person-identity > div > span, .community-section-label, .community-section-label > span, .community-person-row strong small, .community-person-row > span:not(.space-icon) > span, .community-person-row > svg, .community-request-row > div > span, .community-request-group h3, .community-requests-empty > span, .community-outgoing-action, .community-incoming-action > span, .community-loading) { color: var(--muted); }
+html[data-theme='light'] :is(.community-requests-toggle, .community-person-row, .community-discover-card h2, .community-person-identity h2, .community-person-tagline, .community-requests-heading h2, .community-requests-empty p, .community-request-name) { color: var(--ink); }
+html[data-theme='light'] :is(.community-icon:hover, .community-requests-toggle:hover, .community-requests-toggle.selected, .community-person-row:hover, .community-person-row.selected) { color: var(--ink); background: var(--surface-hover); }
+html[data-theme='light'] :is(.constellation-tools button:hover, .constellation-tools button.selected) { background: #008c3c12; color: var(--green); }
+html[data-theme='light'] :is(.community-section-label, .community-requests-empty, .community-request-group) { border-color: var(--line); }
+html[data-theme='light'] .community-connect { background: var(--surface); color: var(--ink); border-color: var(--border-strong); }
+html[data-theme='light'] .community-connect:hover { background: var(--surface-hover); }
+html[data-theme='light'] .community-subtle:hover { color: var(--ink); }
+html[data-theme='light'] :is(.community-visit, .community-request-accept, .community-requests-toggle b, .community-announcement) { color: #fff; }
+html[data-theme='light'] :is(.community-visit:hover, .community-request-accept:hover) { background: #007333; }
+
+/* Live can be portalled into any dialog, so appearance follows the root theme. */
+html[data-theme='light'] :is(.voice-controls, .community-overlay .voice-controls) { --voice-surface: #fffffff5; --voice-ink: var(--ink); --voice-muted: var(--muted); --voice-line: var(--line); --voice-hover: #20263009; }
+html[data-theme='light'] :is(.voice-pill, .community-overlay .voice-pill) { box-shadow: 0 4px 18px #20263012; }
+html[data-theme='light'] :is(.voice-panel, .community-overlay .voice-panel) { box-shadow: 0 16px 50px #20263026; scrollbar-color: var(--border-strong) transparent; }
+html[data-theme='light'] :is(.voice-dock::before, .community-overlay .voice-dock::before) { background: #f7f8faf5; border-bottom-color: var(--line); }
+html[data-theme='light'] :is(.voice-end-button, .community-overlay .voice-end-button) { color: var(--muted) !important; background: var(--surface-raised); }
+html[data-theme='light'] :is(.voice-mute-button.is-selected, .community-overlay .voice-mute-button.is-selected, .voice-enable-sound, .community-overlay .voice-enable-sound, .voice-end-button:hover:not(:disabled), .community-overlay .voice-end-button:hover:not(:disabled)) { color: var(--danger-text) !important; }
+
+/* Activity uses a distinct slate surface in both themes. */
+.build-activity-panel:not(.is-embedded) { background: color-mix(in srgb, var(--inspection-surface) 94%, transparent); backdrop-filter: blur(12px); border-color: var(--inspection-line); }
+.build-activity-panel { color: var(--ink); }
+.build-activity-overview, .build-activity-footer { background: var(--inspection-header); border-color: var(--inspection-line); }
+.build-activity-toggle { background: var(--inspection-surface); border-color: var(--inspection-line); color: var(--muted); }
+.build-activity-toggle:hover { background: var(--inspection-header); color: var(--ink); }
+.build-activity-toggle[aria-expanded='true'] { color: var(--ink); }
+.build-feed { scrollbar-color: var(--inspection-line) transparent; }
+.build-entry:before { background: var(--inspection-line); }
+.build-code-window, .build-code-title { border-color: var(--inspection-line); }
+.build-code-title { background: var(--inspection-header); }
+.build-entry-marker { background: var(--inspection-header); border-color: var(--inspection-line); color: var(--muted); }
+.build-turn-selection { background: var(--inspection-header); border-color: var(--inspection-line); }
+.build-return-live { background: var(--inspection-surface); border-color: var(--inspection-line); }
+html[data-theme='light'] :is(.build-model, .build-live-status, .build-metrics span, .build-phases li, .build-history-unavailable, .build-entry-heading time, .build-tool-status, .build-code-title > span, .build-code-line > i, .build-entry-output > span, .build-empty, .build-activity-footer > span, .thread-activity-link > svg) { color: var(--muted); }
+html[data-theme='light'] :is(.build-model small, .build-entry-text, .build-entry-request .build-entry-text, .build-entry-message .build-entry-text, .build-code-title, .build-code-window pre, .build-entry-output pre, .build-speedometer) { color: var(--ink); }
+html[data-theme='light'] :is(.build-model small, .build-phases li) { border-color: var(--inspection-line); }
+html[data-theme='light'] .build-speed-track { stroke: var(--inspection-line); }
+html[data-theme='light'] .build-speed-fill { stroke: var(--green); }
+html[data-theme='light'] .build-speed-needle { fill: var(--ink); }
+html[data-theme='light'] .build-phases li.is-current { color: var(--accent-text); border-color: var(--green); }
+html[data-theme='light'] .build-phases li.is-done { color: var(--violet-text); border-color: var(--violet); }
+html[data-theme='light'] .build-live-status.is-live { color: var(--accent-text); }
+html[data-theme='light'] .build-entry.is-active .build-entry-marker { background: #e0f3e7; color: var(--accent-text); }
+html[data-theme='light'] .build-entry.is-selected .build-entry-marker { background: #ede4fa; color: var(--violet-text); }
+html[data-theme='light'] .build-entry.is-failed .build-entry-marker { background: #fff1e9; color: var(--danger-text); }
+html[data-theme='light'] :is(.build-entry.is-failed .build-entry-text, .build-truncated) { color: var(--danger-text); }
+
+@media (max-width: 600px) { .demo-utilities { left: max(12px, env(safe-area-inset-left)); bottom: max(6px, env(safe-area-inset-bottom)); } }
+@media (prefers-reduced-motion: reduce) { .theme-toggle { transition: none; } .theme-toggle:active { transform: none; } }
+@media (forced-colors: active) { .theme-toggle { border-color: ButtonText; } .theme-toggle svg { color: ButtonText; } }

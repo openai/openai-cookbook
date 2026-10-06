@@ -4,6 +4,7 @@ Requires ffmpeg: `brew install ffmpeg`
 """
 
 import argparse
+import os
 import subprocess
 from pathlib import Path
 
@@ -122,7 +123,7 @@ def main() -> None:
             raise ValueError("example_id is empty")
 
         output_wav_path = args.output_dir / f"{example_id}.wav"
-        audio_paths.append(str(output_wav_path.relative_to(args.output_csv.parent)))
+        audio_paths.append(os.path.relpath(output_wav_path, args.output_csv.parent))
 
         if output_wav_path.exists() and not args.overwrite:
             continue

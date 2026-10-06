@@ -1,0 +1,52 @@
+{
+  "name": "little-worlds",
+  "version": "0.1.0",
+  "private": true,
+  "license": "MIT AND Apache-2.0",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/openai/openai-cookbook.git",
+    "directory": "examples/ultrafast/little-worlds"
+  },
+  "engines": {
+    "node": ">=22"
+  },
+  "type": "module",
+  "scripts": {
+    "dev": "concurrently -k -n api,web -c yellow,cyan \"node server/index.mjs\" \"vite --host 127.0.0.1\"",
+    "build": "tsc -b && vite build",
+    "start": "node server/index.mjs",
+    "prepare-demo": "node scripts/prepare-demo.mjs",
+    "test": "node --test --test-concurrency=2 tests/*.test.mjs",
+    "check": "npm run build && npm test",
+    "prepare-arcade": "node scripts/prepare-arcade.mjs",
+    "test:live": "node scripts/smoke-live.mjs"
+  },
+  "dependencies": {
+    "@babel/parser": "^7.29.8",
+    "@babel/traverse": "^7.29.8",
+    "@gsap/react": "^2.1.2",
+    "dotenv": "^16.6.1",
+    "esbuild": "^0.25.9",
+    "express": "^5.1.0",
+    "gsap": "^3.15.0",
+    "https-proxy-agent": "^9.1.0",
+    "js-tiktoken": "^1.0.21",
+    "lucide-react": "^0.468.0",
+    "quickjs-emscripten": "^0.31.0",
+    "react": "^19.1.1",
+    "react-dom": "^19.1.1",
+    "sharp": "^0.35.4",
+    "three": "^0.186.0",
+    "ws": "^8.21.3"
+  },
+  "devDependencies": {
+    "@types/react": "^19.1.13",
+    "@types/react-dom": "^19.1.9",
+    "@types/three": "^0.185.4",
+    "@vitejs/plugin-react": "^4.7.0",
+    "concurrently": "^9.2.0",
+    "typescript": "~5.8.3",
+    "vite": "^6.3.6"
+  }
+}

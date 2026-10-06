@@ -1,0 +1,38 @@
+:root {
+  color-scheme: light;
+  --devday-background: #f7f8fa;
+  --devday-surface: #ffffff;
+  --devday-text: #202630;
+  --devday-muted: #596273;
+  --devday-line: #d9dee7;
+  --devday-green: #008537;
+  --devday-purple: #7131c8;
+  --devday-blue: #0058cf;
+  --devday-orange: #b04419;
+}
+html, body { background: #f7f8fa; color: #202630; color-scheme: light; }
+.studio.studio { background: #f7f8fa; color: #202630; }
+.studio .heading h1, .studio .chat h2, .studio .projects h2 { color: #202630; }
+.studio .heading small, .studio .caption, .studio .projects p, .studio [data-service-text] { color: #596273; }
+.studio .heading small::after { color: #008537; }
+/* The painting's pixels and palette fills remain exactly as authored. */
+.studio .grid { border-color: #c7ccd8; box-shadow: 0 5px 18px #2026300d; }
+.studio .swatch { border-color: #9da5b5; }
+.studio .swatch[aria-pressed="true"] { outline-color: #008537; }
+.studio .swatch:hover { outline-color: #7131c8; }
+.studio button:focus-visible, .studio input:focus-visible { outline-color: #7131c8; }
+.studio .grid button:focus-visible { outline-color: #0060d0; }
+.studio .clear { color: #596273; border-bottom-color: #d9dee7; }
+.studio .clear:hover:not(:disabled) { color: #202630; }
+.studio .clear:disabled { color: #7b8493; }
+.studio .chat { border-top-color: #d9dee7; }
+.studio .chat h2 small, .studio [data-service-status] { color: #7131c8; }
+.studio .chat input { background: #ffffff; border-color: #c7ccd8; color: #202630; }
+.studio .chat input::placeholder { color: #596273; }
+.studio .submit { background: #008537; border-color: #008537; color: #ffffff; }
+.studio .submit:hover { background: #006d2c; border-color: #006d2c; }
+.studio .stop { background: #ffffff; border-color: #c7ccd8; color: #202630; }
+.studio .stop:hover { background: #eee8f7; border-color: #9b7bbf; }
+.studio .commands button:disabled { background: #eceff4; border-color: #d9dee7; color: #7b8493; }
+.studio [data-service-error] { color: #b04419; }
+.studio .projects article { background: #ffffff; border-color: #d9dee7; }

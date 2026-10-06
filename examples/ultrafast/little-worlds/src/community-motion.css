@@ -1,0 +1,22 @@
+/* GSAP owns these entrances so CSS cannot compete for the same transforms. */
+.community-overlay,
+.community-overlay .community-person-card,
+.community-overlay .community-requests {
+  animation: none;
+}
+
+.community-overlay .community-announcement {
+  transition: none;
+}
+
+.community-person-card,
+.community-discover-card {
+  transform-origin: 50% 24%;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .community-overlay .community-announcement.visible {
+    opacity: 1;
+    transform: translate(-50%, 0);
+  }
+}

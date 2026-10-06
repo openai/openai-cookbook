@@ -1,0 +1,20 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="256" height="256" viewBox="0 0 256 256">
+  <defs>
+    <radialGradient id="bg" cx="35%" cy="22%" r="95%"><stop stop-color="#faf4e5"/><stop offset="1" stop-color="#d9c7ac"/></radialGradient>
+    <linearGradient id="sage" x2=".8" y2="1"><stop stop-color="#b9c9a1"/><stop offset=".52" stop-color="#8eaa7b"/><stop offset="1" stop-color="#587957"/></linearGradient>
+    <linearGradient id="paper" x2=".9" y2="1"><stop stop-color="#fffdf0"/><stop offset="1" stop-color="#dfd6b9"/></linearGradient>
+    <filter id="shadow" x="-40%" y="-40%" width="190%" height="200%"><feDropShadow dx="0" dy="9" stdDeviation="7" flood-color="#394f37" flood-opacity=".22"/></filter>
+    <filter id="ground"><feGaussianBlur stdDeviation="8"/></filter>
+  </defs>
+  <path fill="url(#bg)" d="M0 0h256v256H0z"/>
+  <ellipse cx="131" cy="211" rx="64" ry="10" fill="#726c50" opacity=".22" filter="url(#ground)"/>
+  <g filter="url(#shadow)" transform="rotate(-8 108 106)">
+    <path d="M64 51h95a21 21 0 0 1 21 21v62a21 21 0 0 1-21 21h-57l-23 22v-23H64a21 21 0 0 1-21-21V72a21 21 0 0 1 21-21z" fill="url(#sage)" stroke="#d5dfc3" stroke-width="1.5"/>
+    <path d="M66 57h89a18 18 0 0 1 18 15" fill="none" stroke="#e1e8cd" opacity=".6" stroke-width="2" stroke-linecap="round"/>
+    <path d="M69 81h68M69 94h83M69 107h49" stroke="#eaf0db" stroke-width="7" stroke-linecap="round" opacity=".8"/>
+  </g>
+  <g filter="url(#shadow)" transform="rotate(8 158 151)">
+    <path d="M116 114h77a18 18 0 0 1 18 18v45a18 18 0 0 1-18 18h-12v18l-22-18h-43a18 18 0 0 1-18-18v-45a18 18 0 0 1 18-18z" fill="url(#paper)" stroke="#fffbed" stroke-width="1.5"/>
+    <circle cx="127" cy="155" r="6" fill="#a57a4e"/><circle cx="155" cy="155" r="6" fill="#a57a4e"/><circle cx="183" cy="155" r="6" fill="#a57a4e"/>
+  </g>
+</svg>

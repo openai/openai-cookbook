@@ -1,0 +1,38 @@
+.devday-brand {
+  display: inline-flex;
+  align-items: baseline;
+  gap: .32em;
+  white-space: nowrap;
+  font-family: var(--sans);
+  font-size: 20px;
+  font-weight: 500;
+  line-height: 1.2;
+  letter-spacing: -.055em;
+  color: var(--ink);
+}
+
+.devday-brand-name { color: var(--green); }
+.devday-brand-year { color: var(--violet); font-variant-numeric: tabular-nums; }
+.devday-brand-compact { font-size: 14px; }
+
+.world-brackets {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 17px;
+  color: var(--violet);
+  font-family: var(--sans);
+  font-size: 72px;
+  font-weight: 300;
+  line-height: 1;
+  letter-spacing: -.06em;
+}
+
+.world-brackets-center { display: flex; align-items: center; gap: 7px; }
+.world-brackets-center i { width: 5px; height: 5px; background: var(--green); }
+.world-brackets-center i:nth-child(2) { height: 13px; }
+
+@media (max-width: 600px) {
+  .devday-brand { font-size: 18px; }
+  .devday-brand-compact { font-size: 12px; }
+}

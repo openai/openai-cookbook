@@ -1,0 +1,38 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <meta name="robots" content="noindex" />
+    <title>Live voice real-reload check</title>
+    <style>
+      body { margin: 0; padding: 105px 24px 40px; background: #f5f7f0; color: #25402f; font: 16px/1.5 system-ui, sans-serif; }
+      main { max-width: 820px; margin: 0 auto; }
+      h1 { font-size: 28px; letter-spacing: -.025em; margin: 0 0 16px; }
+      p { max-width: 720px; }
+      .check-card { margin-top: 24px; padding: 24px; border: 1px solid #c4d0be; border-radius: 14px; background: #fff; }
+      #refresh-summary { font-weight: 650; }
+      #refresh-summary[data-status="pass"] { color: #267246; }
+      #refresh-summary[data-status="fail"] { color: #a33d24; }
+      #refresh-checks button { padding: 11px 16px; border: 0; border-radius: 8px; font: inherit; color: white; background: #345e44; cursor: pointer; }
+      #refresh-checks button:disabled { opacity: .5; cursor: default; }
+      #refresh-results { padding-left: 24px; }
+      #refresh-results li { margin-top: 8px; }
+    </style>
+  </head>
+  <body>
+    <main id="refresh-checks" data-voice-ignore>
+      <h1>Live voice real-reload check</h1>
+      <p>This fixture uses the production voice layer, authentication helper, and reload handoff. Its microphone, WebRTC connection, permission query, and HTTP calls are local fakes. No hardware microphone or server requests are used.</p>
+      <p id="auth-summary">Restoring the fixture account…</p>
+      <section class="check-card">
+        <p id="refresh-summary" role="status">Click Prepare muted Live, then reload this tab through Chrome.</p>
+        <button id="prepare-refresh">Prepare muted Live</button>
+        <button id="clean-refresh" hidden>Finish and clean up</button>
+        <ol id="refresh-results"></ol>
+      </section>
+    </main>
+    <div id="root"></div>
+    <script type="module" src="./voice-refresh.tsx"></script>
+  </body>
+</html>

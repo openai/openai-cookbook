@@ -1,0 +1,771 @@
+/* Presentation layer for the fingerprinted demo worlds. Keep functional copy,
+   source/state, paint cells, and game geometry intact; remove duplicate chrome. */
+.studio,
+.lb.lb,
+.arcade-world,
+.square {
+  --world-title: clamp(36px, 3.8vw, 144px);
+  --world-heading: clamp(26px, 2.3vw, 88px);
+}
+
+.studio .heading small,
+.lb.lb > header,
+.lb.lb .hero .eyebrow,
+.lb.lb > footer,
+.arcade-world > .arcade-top,
+.arcade-world > .arcade-edition,
+.arcade-world > .arcade-intro,
+.arcade-world .arcade-marquee,
+.arcade-world .arcade-copy,
+.arcade-world .arcade-token,
+.arcade-world .arcade-footer strong,
+.arcade-world .arcade-footer > p:last-child,
+.square .square-header .eyebrow,
+.square .compose-intro,
+.square .board-note,
+.square .message-number {
+  display: none;
+}
+
+.studio {
+  padding: var(--world-gap);
+  font-size: var(--world-body);
+  line-height: 1.5;
+}
+
+.studio .heading {
+  align-items: center;
+  gap: var(--world-gap);
+  margin-bottom: var(--world-gap);
+}
+
+.studio .heading h1 {
+  font-size: var(--world-title);
+  max-width: none;
+}
+
+.studio .heading small,
+.studio .heading small::after,
+.studio .caption,
+.studio .chat h2 small,
+.studio [data-service-status],
+.studio [data-service-text],
+.studio [data-service-error] {
+  font-size: var(--world-small);
+}
+
+.studio .heading small {
+  white-space: normal;
+  text-align: right;
+}
+
+.studio .layout {
+  grid-template-columns: minmax(0, 1fr) minmax(280px, 28%);
+  gap: var(--world-gap);
+}
+
+.studio .swatches {
+  gap: 14px;
+}
+
+.studio .swatch {
+  width: clamp(36px, 3vw, 56px);
+  height: clamp(36px, 3vw, 56px);
+  min-width: 0;
+  max-width: none;
+  flex: 0 0 clamp(36px, 3vw, 56px);
+  aspect-ratio: 1;
+}
+
+.studio .clear,
+.studio .chat input,
+.studio .commands button,
+.studio .projects article {
+  font-size: var(--world-body);
+}
+
+.studio .clear {
+  padding-block: 10px;
+}
+
+.studio .chat input {
+  padding: 12px;
+}
+
+.studio .chat h2,
+.studio .projects h2 {
+  font-size: var(--world-heading);
+  line-height: 1.2;
+}
+
+.studio .chat h2 small {
+  display: inline;
+  margin-left: 6px;
+}
+
+.studio .commands {
+  flex-wrap: wrap;
+}
+
+.studio .commands button {
+  padding: 10px 16px;
+  min-height: 44px;
+}
+
+.studio .chat {
+  margin-top: var(--world-gap);
+  padding-top: var(--world-gap);
+}
+
+.studio .projects {
+  gap: var(--world-gap);
+}
+
+.studio .projects article {
+  flex: 1 1 260px;
+  max-width: none;
+  padding: var(--world-gap);
+}
+
+.studio .projects h2 {
+  margin-block: 0 12px;
+}
+
+.studio .projects p {
+  margin-block: 0;
+}
+
+.lb.lb {
+  padding: var(--world-gap) clamp(20px, 4vw, 72px);
+  font-size: var(--world-body);
+  line-height: 1.5;
+}
+
+.lb.lb header,
+.lb.lb header::after,
+.lb.lb .eyebrow,
+.lb.lb .stop,
+.lb.lb .topline,
+.lb.lb .answer span,
+.lb.lb .small,
+.lb.lb .quiet,
+.lb.lb [data-field="role"],
+.lb.lb footer {
+  font-size: var(--world-small);
+}
+
+.lb.lb h1 {
+  font-size: var(--world-title);
+  max-width: 20ch;
+  margin: 0 0 12px;
+}
+
+.lb.lb h2 {
+  font-size: var(--world-heading);
+}
+
+.lb.lb h3 {
+  font-size: var(--world-body);
+}
+
+.lb.lb .intro,
+.lb.lb .answer,
+.lb.lb .feedback,
+.lb.lb .chat p,
+.lb.lb .catalog p,
+.lb.lb [data-service-error],
+.lb.lb [data-service-status],
+.lb.lb .primary,
+.lb.lb textarea {
+  font-size: var(--world-body);
+}
+
+.lb.lb .intro {
+  max-width: 38ch;
+  margin: 0;
+}
+
+.lb.lb .hero {
+  padding: 0 0 var(--world-gap);
+  grid-template-columns: minmax(0, 1.5fr) minmax(0, 1fr);
+}
+
+.lb.lb .art {
+  width: 100%;
+  max-width: 420px;
+  justify-self: center;
+}
+
+.lb.lb .art svg {
+  display: block;
+  width: 100%;
+  height: auto;
+}
+
+.lb.lb .hero,
+.lb.lb .workspace {
+  gap: var(--world-gap);
+}
+
+.lb.lb .route {
+  --lesson-step-size: clamp(48px, 2.9vw, 96px);
+  --lesson-route-padding: clamp(12px, .73vw, 24px);
+  max-width: 100%;
+  gap: 12px;
+  margin: 0 auto var(--world-gap);
+  padding: var(--lesson-route-padding) 0;
+}
+
+.lb.lb .route::before {
+  top: calc(var(--lesson-route-padding) + var(--lesson-step-size) / 2);
+}
+
+.lb.lb .dot {
+  width: var(--lesson-step-size);
+  height: var(--lesson-step-size);
+  min-width: var(--lesson-step-size);
+  min-height: var(--lesson-step-size);
+  aspect-ratio: 1;
+  font-size: var(--world-body);
+}
+
+.lb.lb .workspace {
+  align-items: stretch;
+}
+
+.lb.lb .card {
+  padding: var(--world-gap);
+}
+
+.lb.lb .topline,
+.lb.lb .chatbuttons,
+.lb.lb footer {
+  flex-wrap: wrap;
+}
+
+.lb.lb .answer {
+  flex-wrap: wrap;
+  padding: 16px;
+}
+
+.lb.lb textarea {
+  min-height: 120px;
+  margin-block: 12px;
+}
+
+.lb.lb .primary,
+.lb.lb .quiet {
+  min-height: 44px;
+}
+
+.lb.lb [data-service-messages] {
+  max-height: 420px;
+}
+
+.arcade-world {
+  --arcade-small: clamp(13px, .9vw, 30px);
+  --arcade-control: clamp(15px, 1.05vw, 36px);
+  --arcade-title: clamp(22px, 1.6vw, 54px);
+  --arcade-space: clamp(10px, .8vw, 28px);
+  --arcade-target: clamp(40px, 2.5vw, 84px);
+  padding: var(--arcade-space) clamp(12px, 1.2vw, 40px);
+  font-size: var(--arcade-control);
+  line-height: 1.5;
+}
+
+.arcade-world .arcade-top,
+.arcade-world .arcade-intro,
+.arcade-world .arcade-marquee,
+.arcade-world .arcade-score span,
+.arcade-world .arcade-play-status,
+.arcade-world .arcade-runtime,
+.arcade-world .arcade-key-guide,
+.arcade-world .arcade-footer,
+.arcade-world .arcade-footer strong,
+.arcade-world .arcade-edition {
+  font-size: var(--arcade-small);
+}
+
+.arcade-world .arcade-top,
+.arcade-world .arcade-intro,
+.arcade-world .arcade-marquee,
+.arcade-world .arcade-score,
+.arcade-world .arcade-footer {
+  flex-wrap: wrap;
+}
+
+.arcade-world .arcade-hero h1 {
+  font-size: clamp(30px, 2.5vw, 84px);
+}
+
+.arcade-world .arcade-hero {
+  padding: 0 0 var(--arcade-space);
+}
+
+.arcade-world .arcade-emblem {
+  width: clamp(52px, 4.5vw, 150px);
+  height: auto;
+  aspect-ratio: 1;
+  flex-shrink: 0;
+}
+
+.arcade-world .arcade-divider {
+  margin-bottom: var(--arcade-space);
+}
+
+.arcade-world .arcade-hero p,
+.arcade-world .arcade-copy {
+  font-size: var(--arcade-small);
+}
+
+.arcade-world .arcade-hero p {
+  max-width: 50ch;
+  margin-top: 6px;
+  line-height: 1.35;
+}
+
+.arcade-world .arcade-copy {
+  margin-block: 6px 14px;
+  line-height: 1.45;
+}
+
+.arcade-world .arcade-grid {
+  gap: clamp(16px, 1.5vw, 50px);
+  align-items: start;
+}
+
+/* Preserve the original game coordinates; size the playfield from its width,
+   rather than letterboxing a portrait board inside a short landscape box. */
+@media (min-width: 861px) {
+  .arcade-world .arcade-hero h1 br {
+    display: none;
+  }
+
+  .arcade-world .arcade-hero h1 span {
+    margin-inline-start: .22em;
+  }
+
+}
+
+.arcade-world .arcade-cabinet {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  align-content: flex-start;
+  gap: var(--arcade-space);
+  padding: var(--arcade-space);
+}
+
+.arcade-world .arcade-title h2,
+.arcade-world .arcade-score strong {
+  font-size: var(--arcade-title);
+  line-height: 1.15;
+}
+
+.arcade-world .arcade-title {
+  flex: 1 1 auto;
+  margin: 0;
+  min-width: 0;
+}
+
+.arcade-world .arcade-cabinet .arcade-score {
+  flex: 0 1 auto;
+  justify-content: flex-end;
+  gap: 6px var(--arcade-space);
+  padding: 0;
+  border: 0;
+  border-radius: 0;
+  background: transparent;
+}
+
+.arcade-world .arcade-score > div {
+  flex-wrap: nowrap;
+  gap: .4em;
+}
+
+.arcade-world .arcade-screen {
+  order: 1;
+  flex: 0 0 100%;
+  width: 100%;
+  height: auto;
+  aspect-ratio: 320 / 360;
+  border-radius: 3px;
+}
+
+.arcade-world .arcade-screen canvas,
+.arcade-world .arcade-preview {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  object-fit: contain;
+}
+
+.arcade-world .arcade-command-row {
+  order: 2;
+  flex: 1 1 140px;
+  justify-content: flex-start;
+  gap: calc(var(--arcade-space) / 2);
+  min-height: 0;
+}
+
+.arcade-world .arcade-command,
+.arcade-world .arcade-key,
+.arcade-world .arcade-tetris-buttons .arcade-key {
+  font-size: var(--arcade-control) !important;
+  line-height: 1.2;
+  height: auto;
+  min-height: var(--arcade-target);
+  padding: .45em .75em;
+}
+
+.arcade-world .arcade-key,
+.arcade-world .arcade-tetris-buttons .arcade-key {
+  min-width: var(--arcade-target);
+}
+
+.arcade-world .arcade-buttons,
+.arcade-world .arcade-dpad {
+  order: 3;
+  flex: 0 1 auto;
+  flex-wrap: wrap;
+  justify-content: flex-end;
+  gap: calc(var(--arcade-space) / 2);
+  margin: 0;
+  min-height: 0;
+}
+
+.arcade-world .arcade-play-status,
+.arcade-world .arcade-key-guide {
+  order: 4;
+  flex: 1 1 100%;
+  margin: 0;
+  min-height: 0;
+  text-align: left;
+  line-height: 1.35;
+  letter-spacing: 0;
+}
+
+.arcade-world .arcade-key-guide {
+  order: 5;
+}
+
+.arcade-world .arcade-runtime {
+  min-height: 0;
+  text-align: left;
+  line-height: 1.35;
+  letter-spacing: 0;
+}
+
+/* Remove idle promotion and duplicate routine status, retaining game outcomes,
+   pause/save confirmations, loading and errors in the normal document flow. */
+.arcade-world .arcade-cabinet:not([data-game-ready="true"]) .arcade-play-status {
+  display: none;
+}
+
+.arcade-world [data-game-status="idle"] .arcade-runtime,
+.arcade-world [data-game-status="running"] .arcade-runtime {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  overflow: hidden;
+  clip-path: inset(50%);
+}
+
+/* Desktop cabinets use the former side margins for controls, so the complete
+   board can grow without pushing its play/pause buttons a screen below it. */
+@media (min-width: 1200px) {
+  .arcade-world .arcade-cabinet {
+    display: grid;
+    aspect-ratio: 1;
+    grid-template-columns: minmax(0, 1fr) clamp(140px, 9vw, 300px);
+    grid-template-rows: auto auto auto auto auto minmax(0, 1fr);
+    align-items: start;
+  }
+
+  .arcade-world .arcade-title {
+    grid-area: 1 / 1 / 2 / 3;
+    max-width: 60%;
+    justify-self: start;
+    align-self: center;
+  }
+
+  .arcade-world .arcade-score {
+    grid-area: 1 / 1 / 2 / 3;
+    max-width: 40%;
+    justify-self: end;
+    align-self: center;
+    flex-wrap: nowrap;
+    font-size: var(--arcade-small);
+  }
+
+  .arcade-world .arcade-screen {
+    grid-area: 2 / 1 / 7 / 2;
+    height: 100%;
+    min-height: 0;
+    aspect-ratio: auto;
+  }
+
+  .arcade-world .arcade-command-row {
+    grid-area: 2 / 2;
+  }
+
+  .arcade-world .arcade-command {
+    width: 100%;
+  }
+
+  .arcade-world .arcade-buttons,
+  .arcade-world .arcade-dpad {
+    grid-area: 3 / 2;
+    justify-content: flex-start;
+  }
+
+  .arcade-world .arcade-dpad {
+    display: grid;
+    grid-template-columns: repeat(3, minmax(0, 1fr));
+  }
+
+  .arcade-world .arcade-dpad .arcade-key {
+    padding-inline: 0;
+  }
+
+  .arcade-world .arcade-dpad .arcade-key:first-child { grid-area: 1 / 2; }
+  .arcade-world .arcade-dpad .arcade-key:nth-child(2) { grid-area: 2 / 1; }
+  .arcade-world .arcade-dpad .arcade-key:nth-child(3) { grid-area: 2 / 2; }
+  .arcade-world .arcade-dpad .arcade-key:nth-child(4) { grid-area: 2 / 3; }
+
+  .arcade-world [data-game="space-invaders"] .arcade-buttons {
+    display: grid;
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+
+  .arcade-world [data-game="space-invaders"] .arcade-buttons .arcade-key:nth-child(2) {
+    grid-area: 2 / 1 / 3 / 3;
+  }
+
+  .arcade-world .arcade-play-status { grid-area: 4 / 2; }
+  .arcade-world .arcade-key-guide { grid-area: 5 / 2; }
+}
+
+.arcade-world .arcade-footer p {
+  max-width: none;
+}
+
+.arcade-world .arcade-footer {
+  margin-top: var(--arcade-space);
+  padding-top: var(--arcade-space);
+}
+
+.square {
+  max-width: none;
+  padding: var(--world-gap) clamp(18px, 3vw, 58px);
+  font-size: var(--world-body);
+  line-height: 1.5;
+}
+
+.square .eyebrow,
+.square .eyebrow::after,
+.square .topic-count,
+.square .newest,
+.square .message-topic,
+.square .message-number,
+.square .author,
+.square .you,
+.square .remove-message,
+.square .compose label,
+.square .public-note,
+.square .board-note {
+  font-size: var(--world-small);
+}
+
+.square h1 {
+  font-size: var(--world-title);
+  margin-bottom: 12px;
+}
+
+.square .square-header {
+  align-items: center;
+  padding-bottom: var(--world-gap);
+}
+
+.square .square-mark {
+  width: clamp(64px, 7vw, 112px);
+  height: auto;
+  aspect-ratio: 1;
+  flex-shrink: 0;
+}
+
+.square .board-heading h2,
+.square .compose h2,
+.square .empty-board h3 {
+  font-size: var(--world-heading);
+}
+
+.square .intro,
+.square .topic,
+.square .message-body,
+.square .compose-intro,
+.square .compose select,
+.square .compose textarea,
+.square .post-button,
+.square .empty-board p {
+  font-size: var(--world-body);
+}
+
+.square .intro {
+  max-width: 45ch;
+}
+
+.square .board-layout {
+  grid-template-columns: minmax(0, 1fr) minmax(300px, 31%);
+  gap: var(--world-gap);
+  padding-top: var(--world-gap);
+}
+
+.square .messages {
+  gap: var(--world-gap);
+  align-items: stretch;
+}
+
+.square .message {
+  padding: var(--world-gap);
+  display: flex;
+  flex-direction: column;
+}
+
+.square .message-body {
+  margin-block: 16px;
+}
+
+.square .message footer {
+  margin-top: auto;
+}
+
+.square .message-top,
+.square .message footer,
+.square .board-heading {
+  flex-wrap: wrap;
+}
+
+.square .author-initial {
+  --initial-size: clamp(32px, 2.5vw, 96px);
+  width: var(--initial-size);
+  height: var(--initial-size);
+  flex: 0 0 var(--initial-size);
+  aspect-ratio: 1;
+}
+
+.square .topic-dot {
+  width: 8px;
+  height: 8px;
+  flex: 0 0 8px;
+  aspect-ratio: 1;
+}
+
+.square .topic {
+  padding: 10px 14px;
+  min-height: 44px;
+}
+
+.square .compose {
+  padding: var(--world-gap);
+}
+
+.square .compose textarea {
+  min-height: 140px;
+}
+
+.square .compose select,
+.square .post-button {
+  min-height: 48px;
+}
+
+.square .compose label {
+  margin-block: 12px 6px;
+}
+
+.square .empty-board p {
+  max-width: 44ch;
+}
+
+@media (max-width: 1000px) {
+  .square .messages {
+    grid-template-columns: minmax(0, 1fr);
+  }
+}
+
+@media (max-width: 860px) {
+  .studio .layout,
+  .lb.lb .hero,
+  .lb.lb .workspace,
+  .arcade-world .arcade-grid {
+    grid-template-columns: minmax(0, 1fr);
+  }
+
+  .studio .tools {
+    grid-row: 1;
+    display: grid;
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    gap: var(--world-gap);
+  }
+
+  .studio .chat {
+    margin: 0;
+    padding-top: 0;
+    border-top: 0;
+  }
+
+  .lb.lb .art {
+    max-width: 420px;
+    margin-inline: auto;
+  }
+}
+
+@media (max-width: 700px) {
+  .square .board-layout {
+    display: flex;
+    flex-direction: column;
+  }
+
+  .square .compose {
+    order: -1;
+    width: 100%;
+  }
+
+  .square .compose textarea {
+    min-height: 120px;
+  }
+}
+
+@media (max-width: 500px) {
+  .studio .heading {
+    flex-direction: column;
+  }
+
+  .studio .heading small {
+    text-align: left;
+  }
+
+  .studio .tools {
+    grid-template-columns: minmax(0, 1fr);
+  }
+
+  .lb.lb .route {
+    gap: 6px;
+  }
+
+  .lb.lb .stop {
+    min-width: 0;
+    flex: 1;
+    overflow-wrap: anywhere;
+  }
+
+  .arcade-world .arcade-intro span:last-child,
+  .arcade-world .arcade-footer p:last-child {
+    text-align: left;
+  }
+
+  .arcade-world .arcade-footer p {
+    max-width: 100%;
+  }
+}

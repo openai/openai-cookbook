@@ -1,0 +1,250 @@
+/* Large-screen typography uses the same display unit as the workspace. */
+@media (min-width: 1100px) {
+  .account-gate .account-layout {
+    width: calc(100% - 128 * var(--presentation-unit));
+    max-width: calc(1700 * var(--presentation-unit));
+    grid-template-columns: minmax(0, 1.15fr) minmax(0, 1fr);
+    gap: calc(112 * var(--presentation-unit));
+    padding: calc(40 * var(--presentation-unit)) 0;
+  }
+  .account-gate .account-introduction h1 {
+    font-size: calc(92 * var(--presentation-unit));
+    line-height: 1.04;
+    letter-spacing: -.05em;
+  }
+  .account-gate .account-intro-copy {
+    margin-top: calc(28 * var(--presentation-unit));
+    font-size: calc(24 * var(--presentation-unit));
+    line-height: 1.5;
+  }
+  .account-gate .account-world-frame {
+    max-width: calc(550 * var(--presentation-unit));
+    margin-top: calc(32 * var(--presentation-unit));
+  }
+  .account-gate .account-corner {
+    width: calc(20 * var(--presentation-unit));
+    height: calc(20 * var(--presentation-unit));
+  }
+  .account-gate .account-entry {
+    max-width: none;
+    padding: calc(24 * var(--presentation-unit)) 0;
+  }
+  .account-gate .account-entry-heading { margin-bottom: calc(32 * var(--presentation-unit)); }
+  .account-gate .account-entry-index {
+    font-size: calc(22 * var(--presentation-unit));
+    margin-bottom: calc(24 * var(--presentation-unit));
+  }
+  .account-gate .account-entry h2 {
+    font-size: calc(48 * var(--presentation-unit));
+    margin-bottom: calc(20 * var(--presentation-unit));
+  }
+  .account-gate .account-entry.account-flow-create h2 {
+    font-size: min(calc(48 * var(--presentation-unit)), 9cqi);
+  }
+  .account-gate .account-entry-heading p {
+    font-size: calc(24 * var(--presentation-unit));
+    line-height: 1.5;
+    max-width: none;
+  }
+  .account-gate .account-flow-back {
+    font-size: calc(20 * var(--presentation-unit));
+    gap: calc(10 * var(--presentation-unit));
+    margin-bottom: calc(18 * var(--presentation-unit));
+    padding: calc(10 * var(--presentation-unit)) 0;
+  }
+  .account-gate .account-flow-back svg { width: calc(22 * var(--presentation-unit)); height: calc(22 * var(--presentation-unit)); }
+  .account-gate .account-empty { font-size: calc(22 * var(--presentation-unit)); }
+  .account-gate .account-name-row {
+    gap: calc(10 * var(--presentation-unit));
+    padding: calc(10 * var(--presentation-unit));
+  }
+  .account-gate .account-name-row input {
+    font-size: calc(24 * var(--presentation-unit));
+    height: calc(60 * var(--presentation-unit));
+    padding: calc(14 * var(--presentation-unit)) calc(16 * var(--presentation-unit));
+  }
+  .account-gate .account-name-row button { width: calc(60 * var(--presentation-unit)); height: calc(60 * var(--presentation-unit)); }
+  .account-gate .account-name-row button svg { width: calc(28 * var(--presentation-unit)); height: calc(28 * var(--presentation-unit)); }
+  .account-gate .account-people {
+    gap: calc(10 * var(--presentation-unit));
+    max-height: min(calc(460 * var(--presentation-unit)), 48dvh);
+    padding: calc(4 * var(--presentation-unit));
+    margin: calc(-4 * var(--presentation-unit));
+  }
+  .account-gate .account-people .account-person {
+    padding: calc(16 * var(--presentation-unit));
+    gap: calc(14 * var(--presentation-unit));
+    min-height: calc(98 * var(--presentation-unit));
+  }
+  .account-gate .account-person > .space-icon {
+    --space-icon-size: calc(54 * var(--presentation-unit));
+  }
+  .account-gate .account-person-copy strong { font-size: calc(24 * var(--presentation-unit)); }
+  .account-gate .account-people .account-person-copy > span {
+    font-size: calc(17 * var(--presentation-unit));
+    line-height: 1.4;
+    margin-top: calc(6 * var(--presentation-unit));
+  }
+  .account-gate .account-error {
+    font-size: calc(20 * var(--presentation-unit));
+    padding: calc(16 * var(--presentation-unit));
+    margin-top: calc(18 * var(--presentation-unit));
+  }
+  .account-gate .account-loading {
+    font-size: calc(18 * var(--presentation-unit));
+    min-height: calc(28 * var(--presentation-unit));
+    margin-top: calc(14 * var(--presentation-unit));
+  }
+  .account-gate .account-footer {
+    margin-inline: calc(48 * var(--presentation-unit));
+    padding: calc(22 * var(--presentation-unit)) 0;
+  }
+  .account-gate .account-footer-title { font-size: calc(20 * var(--presentation-unit)); }
+  .account-gate .account-footer-edition { font-size: calc(16 * var(--presentation-unit)); }
+
+  .community-overlay .community-main {
+    width: calc(100% - 112 * var(--presentation-unit));
+    max-width: calc(1700 * var(--presentation-unit));
+    padding: calc(32 * var(--presentation-unit)) 0 calc(36 * var(--presentation-unit));
+  }
+  .community-overlay .community-intro { gap: calc(32 * var(--presentation-unit)); margin-bottom: calc(28 * var(--presentation-unit)); }
+  .community-overlay .community-eyebrow { font-size: calc(17 * var(--presentation-unit)); letter-spacing: .09em; }
+  .community-overlay .community-intro h1 {
+    font-size: calc(64 * var(--presentation-unit));
+    letter-spacing: -.04em;
+    margin-top: calc(12 * var(--presentation-unit));
+  }
+  .community-overlay .community-intro > p > span {
+    gap: calc(12 * var(--presentation-unit));
+    font-size: calc(20 * var(--presentation-unit));
+    white-space: nowrap;
+  }
+  .community-overlay .community-explore {
+    grid-template-columns: minmax(0, 1fr) calc(400 * var(--presentation-unit));
+    gap: calc(28 * var(--presentation-unit));
+  }
+  .community-overlay .constellation-scene { height: max(calc(590 * var(--presentation-unit)), calc(100dvh - 290 * var(--presentation-unit))); }
+  /* Keep each portrait center at the projected connection point at every scale. */
+  .community-overlay { --community-node-unit: max(1px, var(--presentation-unit)); }
+  .community-overlay .constellation-person {
+    width: calc(194 * var(--presentation-unit));
+    height: auto;
+    min-height: calc(112 * var(--community-node-unit));
+    transform: translate(-50%, calc(-34 * var(--community-node-unit))) scale(var(--node-scale, .94));
+    transform-origin: 50% calc(34 * var(--community-node-unit));
+  }
+  .community-overlay .galaxy-person-content { transform-origin: 50% calc(34 * var(--community-node-unit)); }
+  .community-overlay .constellation-node-orbit {
+    top: calc(-10 * var(--community-node-unit));
+    width: calc(88 * var(--community-node-unit));
+    height: calc(88 * var(--community-node-unit));
+    border-width: var(--community-node-unit);
+  }
+  .community-overlay .constellation-node-portrait {
+    width: calc(68 * var(--community-node-unit));
+    height: calc(68 * var(--community-node-unit));
+  }
+  .community-overlay .constellation-node-portrait > .space-icon { --space-icon-size: calc(68 * var(--community-node-unit)); }
+  .community-overlay .constellation-node-portrait > i {
+    bottom: var(--community-node-unit);
+    right: calc(3 * var(--community-node-unit));
+    width: calc(10 * var(--community-node-unit));
+    height: calc(10 * var(--community-node-unit));
+    border-width: calc(2 * var(--community-node-unit));
+  }
+  .community-overlay .constellation-node-name {
+    font-size: calc(22 * var(--presentation-unit));
+    line-height: 1.2;
+    margin-top: calc(14 * var(--presentation-unit));
+  }
+  .community-overlay .constellation-node-name > span {
+    font-size: calc(16 * var(--presentation-unit));
+    line-height: 1.3;
+    max-width: calc(190 * var(--presentation-unit));
+    margin-top: calc(6 * var(--presentation-unit));
+  }
+  .community-overlay .constellation-bottomline { bottom: calc(18 * var(--presentation-unit)); left: calc(22 * var(--presentation-unit)); right: calc(22 * var(--presentation-unit)); gap: calc(16 * var(--presentation-unit)); }
+  .community-overlay .constellation-hint { font-size: calc(16 * var(--presentation-unit)); gap: calc(8 * var(--presentation-unit)); }
+  .community-overlay .constellation-tools { gap: calc(7 * var(--presentation-unit)); padding: calc(4 * var(--presentation-unit)); }
+  .community-overlay .constellation-tools button { width: calc(42 * var(--presentation-unit)); height: calc(42 * var(--presentation-unit)); }
+  .community-overlay .constellation-tools button svg { width: calc(22 * var(--presentation-unit)); height: calc(22 * var(--presentation-unit)); }
+  .community-overlay .constellation-tools > div > span { font-size: calc(16 * var(--presentation-unit)); width: calc(48 * var(--presentation-unit)); }
+  .community-overlay .community-sidebar { gap: calc(24 * var(--presentation-unit)); }
+  .community-overlay .community-discover-card {
+    min-height: 0;
+    padding: calc(28 * var(--presentation-unit));
+  }
+  .community-overlay .community-discover-card .community-discover-mark { font-size: calc(48 * var(--presentation-unit)); width: calc(84 * var(--presentation-unit)); }
+  .community-overlay .community-discover-card > .community-eyebrow { font-size: calc(16 * var(--presentation-unit)); margin-top: calc(20 * var(--presentation-unit)); letter-spacing: .07em; }
+  .community-overlay .community-discover-card h2 { font-size: calc(36 * var(--presentation-unit)); line-height: 1.15; letter-spacing: -.035em; margin-top: calc(16 * var(--presentation-unit)); }
+  .community-overlay .community-discover-card p { font-size: calc(22 * var(--presentation-unit)); line-height: 1.5; max-width: none; margin-top: calc(20 * var(--presentation-unit)); }
+  .community-overlay .community-person-card { padding: calc(20 * var(--presentation-unit)) calc(24 * var(--presentation-unit)); }
+  .community-overlay .community-person-top { margin-bottom: calc(18 * var(--presentation-unit)); }
+  .community-overlay .community-person-top > .community-eyebrow { font-size: calc(15 * var(--presentation-unit)); letter-spacing: .06em; }
+  .community-overlay .community-person-top > .community-icon { width: calc(34 * var(--presentation-unit)); height: calc(34 * var(--presentation-unit)); }
+  .community-overlay .community-person-top > .community-icon svg { width: calc(22 * var(--presentation-unit)); height: calc(22 * var(--presentation-unit)); }
+  .community-overlay .community-person-identity { gap: calc(18 * var(--presentation-unit)); }
+  .community-overlay .community-person-identity > .space-icon { --space-icon-size: calc(76 * var(--presentation-unit)); }
+  .community-overlay .community-person-identity h2 { font-size: calc(40 * var(--presentation-unit)); overflow-wrap: anywhere; }
+  .community-overlay .community-person-identity > div > span { font-size: calc(18 * var(--presentation-unit)); }
+  .community-overlay .community-person-tagline { font-size: calc(26 * var(--presentation-unit)); line-height: 1.4; min-height: 0; max-width: none; margin: calc(24 * var(--presentation-unit)) 0; }
+  .community-overlay .community-visit { font-size: calc(22 * var(--presentation-unit)); padding: calc(16 * var(--presentation-unit)); gap: calc(10 * var(--presentation-unit)); }
+  .community-overlay .community-visit svg { width: calc(24 * var(--presentation-unit)); height: calc(24 * var(--presentation-unit)); flex-shrink: 0; }
+  .community-overlay .community-friend-action { margin-top: calc(14 * var(--presentation-unit)); min-height: calc(42 * var(--presentation-unit)); }
+  .community-overlay .community-connect { font-size: calc(20 * var(--presentation-unit)); min-height: calc(50 * var(--presentation-unit)); padding: calc(10 * var(--presentation-unit)) calc(14 * var(--presentation-unit)); gap: calc(10 * var(--presentation-unit)); }
+  .community-overlay :is(.community-connected, .community-own-count, .community-subtle, .community-outgoing-action, .community-incoming-action > span) { font-size: calc(17 * var(--presentation-unit)); }
+  .community-overlay :is(.community-connect, .community-connected, .community-own-count, .community-outgoing-action) svg { width: calc(20 * var(--presentation-unit)); height: calc(20 * var(--presentation-unit)); flex-shrink: 0; }
+  .community-overlay .community-section-label { padding: 0 calc(8 * var(--presentation-unit)) calc(14 * var(--presentation-unit)); }
+  .community-overlay .community-section-label h2 { font-size: calc(20 * var(--presentation-unit)); }
+  .community-overlay .community-section-label > span { font-size: calc(18 * var(--presentation-unit)); }
+  .community-overlay .community-people-list { max-height: calc(350 * var(--presentation-unit)); padding-top: calc(8 * var(--presentation-unit)); }
+  .community-overlay .community-person-row { gap: calc(14 * var(--presentation-unit)); padding: calc(12 * var(--presentation-unit)) calc(8 * var(--presentation-unit)); }
+  .community-overlay .community-person-row > .space-icon { --space-icon-size: calc(46 * var(--presentation-unit)); }
+  .community-overlay .community-person-row strong { font-size: calc(22 * var(--presentation-unit)); }
+  .community-overlay .community-person-row strong small { font-size: calc(16 * var(--presentation-unit)); }
+  .community-overlay .community-person-row > span:not(.space-icon) > span { font-size: calc(17 * var(--presentation-unit)); margin-top: calc(5 * var(--presentation-unit)); white-space: normal; line-height: 1.3; }
+  .community-overlay .community-person-row > svg { width: calc(20 * var(--presentation-unit)); height: calc(20 * var(--presentation-unit)); flex-shrink: 0; }
+  .community-overlay .community-requests {
+    top: calc(94 * var(--presentation-unit));
+    right: calc(48 * var(--presentation-unit));
+    width: calc(500 * var(--presentation-unit));
+    max-height: calc(100dvh - 126 * var(--presentation-unit));
+    padding: calc(28 * var(--presentation-unit));
+  }
+  .community-overlay .community-requests-heading h2 { font-size: calc(36 * var(--presentation-unit)); margin-top: calc(12 * var(--presentation-unit)); }
+  .community-overlay .community-requests-heading .community-eyebrow { font-size: calc(16 * var(--presentation-unit)); }
+  .community-overlay .community-requests-empty { padding: calc(30 * var(--presentation-unit)) calc(12 * var(--presentation-unit)); }
+  .community-overlay .community-requests-empty p { font-size: calc(24 * var(--presentation-unit)); }
+  .community-overlay .community-requests-empty > span { font-size: calc(20 * var(--presentation-unit)); }
+  .community-overlay .community-request-group { padding-top: calc(18 * var(--presentation-unit)); }
+  .community-overlay .community-request-group h3 { font-size: calc(18 * var(--presentation-unit)); margin-bottom: calc(12 * var(--presentation-unit)); }
+  .community-overlay .community-request-row { gap: calc(12 * var(--presentation-unit)); padding: calc(12 * var(--presentation-unit)) 0; }
+  .community-overlay .community-request-row > .space-icon { --space-icon-size: calc(48 * var(--presentation-unit)); }
+  .community-overlay .community-request-name { font-size: calc(22 * var(--presentation-unit)); text-align: left; overflow-wrap: anywhere; }
+  .community-overlay .community-request-row > div > span { font-size: calc(17 * var(--presentation-unit)); }
+  .community-overlay .community-request-row > .community-icon,
+  .community-overlay .community-request-accept { width: calc(42 * var(--presentation-unit)); height: calc(42 * var(--presentation-unit)); flex-shrink: 0; }
+  .community-overlay :is(.community-error, .community-announcement, .community-loading) { font-size: calc(20 * var(--presentation-unit)); gap: calc(12 * var(--presentation-unit)); }
+  .community-overlay :is(.community-error, .community-announcement) { bottom: calc(28 * var(--presentation-unit)); padding: calc(16 * var(--presentation-unit)) calc(22 * var(--presentation-unit)); }
+}
+
+/* Nearby, hands-on visitors still get comfortable text on the laptop layout. */
+@media (max-width: 1099px) {
+  .account-gate .account-intro-copy,
+  .account-gate .account-entry-heading p,
+  .account-gate .account-name-row input { font-size: 18px; }
+  .account-gate .account-person-copy strong { font-size: 18px; }
+  .account-gate .account-people .account-person-copy > span { font-size: 14px; }
+  .account-gate :is(.account-loading, .account-flow-back, .account-error) { font-size: 15px; }
+  .community-overlay .community-discover-card p { font-size: 16px; }
+  .community-overlay .community-person-row strong { font-size: 16px; }
+  .community-overlay .community-person-row > span:not(.space-icon) > span { font-size: 13px; }
+  .community-overlay .community-person-identity > div > span { font-size: 14px; }
+  .community-overlay :is(.community-visit, .community-connect, .community-request-name) { font-size: 16px; }
+  .community-overlay :is(.community-subtle, .community-connected, .community-own-count, .community-outgoing-action, .community-incoming-action > span) { font-size: 13px; }
+  .community-overlay .community-section-label h2 { font-size: 15px; }
+  .community-overlay .community-section-label > span { font-size: 14px; }
+  .community-overlay .community-requests-empty p { font-size: 18px; }
+  .community-overlay .community-requests-empty > span { font-size: 15px; }
+  .community-overlay .community-request-row > div > span { font-size: 13px; }
+}

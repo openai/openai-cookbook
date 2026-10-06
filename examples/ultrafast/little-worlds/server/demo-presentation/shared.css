@@ -1,0 +1,16 @@
+/* Supplied only for the reviewed, hash-matched demo sources. These tokens use
+   the frame's own width, so a split preview stays readable without zooming it. */
+:is(.herbarium, .observatory, .care, .notebook, .studio, .lb, .arcade-world, .square) {
+  --world-body: clamp(18px, 1.5vw, 64px);
+  --world-small: clamp(15px, 1.15vw, 48px);
+  --world-heading: clamp(28px, 2.8vw, 116px);
+  --world-title: clamp(42px, 5.5vw, 224px);
+  --world-gap: clamp(18px, 2vw, 88px);
+  font-size: var(--world-body);
+  line-height: 1.55;
+}
+
+/* Text can reflow; SVG view boxes, game geometry and paint cells are untouched. */
+:is(.herbarium, .observatory, .care, .notebook, .studio, .lb, .arcade-world, .square) :is(p, h1, h2, h3, label) {
+  overflow-wrap: break-word;
+}

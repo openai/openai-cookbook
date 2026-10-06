@@ -1,0 +1,13 @@
+Little Worlds
+
+The original application code is covered by the OpenAI Cookbook MIT license.
+
+The patch grammar and patch-processing adapters in server/codex-patch.mjs,
+server/codex-patch-preview.mjs, and the corresponding test fixtures derive from
+OpenAI Codex (https://github.com/openai/codex).
+Copyright 2025 OpenAI
+These portions remain available under the Apache License, Version 2.0,
+reproduced in licenses/Codex-Apache-2.0.txt.
+
+The adapters were modified for an in-memory, two-file workspace with bounded
+execution and host-controlled verification and publication.

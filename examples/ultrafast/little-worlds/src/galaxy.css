@@ -1,0 +1,30 @@
+/* Camera placement and entrance choreography have separate transform layers. */
+.constellation-shell.galaxy-shell { background: #101010; box-shadow: none; }
+.galaxy-scene { perspective: none; contain: layout paint; user-select: none; -webkit-user-select: none; }
+.galaxy-stardust, .galaxy-vignette, .galaxy-lines { position: absolute; inset: 0; width: 100%; height: 100%; pointer-events: none; }
+.galaxy-stardust { z-index: 0; }
+.galaxy-vignette { z-index: 1; box-shadow: inset 0 0 80px 15px #101010; }
+.galaxy-lines { z-index: 2; overflow: visible; }
+.galaxy-node { position: absolute; top: 0; left: 0; width: 0; height: 0; pointer-events: none; will-change: transform; }
+.galaxy-node:focus-within { z-index: 38 !important; }
+.galaxy-node .constellation-person { left: 0; top: 0; pointer-events: auto; touch-action: none; cursor: grab; transform: translate(-50%, -34px) scale(var(--node-scale, .94)); height: 110px; transition: opacity .3s; }
+.galaxy-person-content { display: flex; position: relative; flex-direction: column; align-items: center; width: 100%; transform-origin: 50% 34px; }
+.galaxy-node .constellation-person.is-held { cursor: grabbing; }
+.galaxy-node .constellation-person.is-held .constellation-node-orbit { border-color: var(--node-color); transform: scale(1.13); box-shadow: 0 0 0 6px color-mix(in srgb, var(--node-color) 8%, transparent); }
+.galaxy-node .constellation-person.is-held .constellation-node-portrait { transform: scale(1.04); box-shadow: 0 12px 30px #0009; }
+.galaxy-node .constellation-node-name { margin-top: 13px; text-shadow: 0 1px 12px #101010, 0 2px 5px #101010; }
+.galaxy-lines .constellation-edge > path { stroke-width: 1; }
+.galaxy-lines .constellation-edge .constellation-edge-light { animation: none; stroke-dasharray: 2 110; stroke-width: 1.8; }
+.galaxy-accessible-help { position: absolute; width: 1px; height: 1px; padding: 0; margin: -1px; overflow: hidden; clip-path: inset(50%); white-space: nowrap; border: 0; }
+.galaxy-shell .constellation-bottomline { z-index: 45; }
+@media (max-width: 760px) {
+  .galaxy-node .constellation-node-name > span { font-size: 9px; }
+  .galaxy-node .constellation-person { width: 122px; }
+  .galaxy-shell .constellation-hint { gap: 1px; }
+  .galaxy-shell .constellation-hint i { display: none; }
+  .galaxy-shell .constellation-bottomline { left: 17px; right: 13px; }
+}
+@media (prefers-reduced-motion: reduce) {
+  .galaxy-node { will-change: auto; }
+  .galaxy-lines .constellation-edge-light { display: none; }
+}

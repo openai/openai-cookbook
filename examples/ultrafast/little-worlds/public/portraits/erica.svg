@@ -1,0 +1,32 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 200 200" fill="none">
+  <title>Erica, a neuroscientist, with a constellation of neurons</title>
+  <defs>
+    <linearGradient id="bg" x1="23" y1="15" x2="178" y2="193" gradientUnits="userSpaceOnUse"><stop stop-color="#EAE4EE"/><stop offset="1" stop-color="#C8B8D5"/></linearGradient>
+    <linearGradient id="skin" x1="78" y1="55" x2="124" y2="137" gradientUnits="userSpaceOnUse"><stop stop-color="#E5B792"/><stop offset="1" stop-color="#C58F70"/></linearGradient>
+    <clipPath id="clip"><circle cx="100" cy="100" r="100"/></clipPath>
+  </defs>
+  <g clip-path="url(#clip)">
+    <path fill="url(#bg)" d="M0 0h200v200H0z"/>
+    <circle cx="93" cy="77" r="65" fill="#F8F1E9" opacity=".38"/>
+    <g stroke="#9A80AD" stroke-opacity=".5" stroke-width="1.3" stroke-linecap="round"><path d="m22 77 23 22-16 34 24 21m-8-55 20-10M22 77l11-24m130 6-11 29 21 22-12 34m12-34 21-7m-31-44 19-20"/><circle cx="45" cy="99" r="5" fill="#D8C6E1"/><circle cx="29" cy="133" r="3" fill="#D8C6E1"/><circle cx="22" cy="77" r="3" fill="#D8C6E1"/><circle cx="152" cy="88" r="4" fill="#D8C6E1"/><circle cx="173" cy="110" r="5" fill="#D8C6E1"/><circle cx="163" cy="59" r="3" fill="#D8C6E1"/></g>
+    <ellipse cx="102" cy="33" rx="24" ry="20" fill="#393231"/>
+    <path d="M86 26c8-8 18-9 25-4" stroke="#57423E" stroke-width="2" stroke-linecap="round"/>
+    <path d="M62 99c-8-26-5-52 12-64 15-13 39-11 53 1 16 16 16 42 10 64l-10 20H76L62 99Z" fill="#393231"/>
+    <path d="M31 204c3-41 23-64 54-69h29c32 4 52 32 56 69" fill="#66506E"/>
+    <path d="m87 140 13 24 16-25-5-10H90l-3 11Z" fill="#E4D6CF"/>
+    <path d="M90 114h23v28c-5 7-16 7-23 0v-28Z" fill="#C99071"/>
+    <path d="M73 71c0-22 11-37 29-37 19 0 31 16 31 39l-4 28c-2 20-14 35-27 35-16 0-27-16-29-36V71Z" fill="url(#skin)"/>
+    <ellipse cx="72" cy="91" rx="6" ry="9" fill="#D5A17E"/><ellipse cx="131" cy="91" rx="6" ry="9" fill="#C28B6C"/>
+    <path d="M70 83c-9-19-3-40 13-49 13-9 35-3 45 10 9 11 10 25 4 41l-5-20c-10-7-18-16-22-24-5 14-17 24-29 28l-6 14Z" fill="#393231"/>
+    <path d="M78 58c10-8 17-15 20-23m15 4c6 10 13 15 18 18" stroke="#57423E" stroke-width="2" stroke-linecap="round"/>
+    <path d="M80 81c4-2 8-2 12 0m17 0c4-2 9-2 12 1" stroke="#73513E" stroke-width="2.2" stroke-linecap="round"/>
+    <path d="M83 91c3-3 6-3 9 0m19 0c3-3 6-3 9 0" stroke="#443B33" stroke-width="2" stroke-linecap="round"/>
+    <circle cx="86" cy="91" r="12" stroke="#6F6359" stroke-width="1.7"/><circle cx="116" cy="91" r="12" stroke="#6F6359" stroke-width="1.7"/><path d="M98 89h6m-32-1 2 1m54 0 5-2" stroke="#6F6359" stroke-width="1.7"/>
+    <path d="m102 95-3 10 6 1" stroke="#AB7459" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/>
+    <path d="M92 115c5 4 12 4 18-1" stroke="#A35F54" stroke-width="2" stroke-linecap="round"/>
+    <circle cx="72" cy="103" r="2.2" fill="#DDC99D"/><circle cx="131" cy="103" r="2.2" fill="#DDC99D"/>
+    <path d="m85 137 15 27-17 8-10-31 12-4Zm31 0-16 27 16 8 12-30-12-5Z" fill="#80698A"/>
+    <path d="m100 164 2 40" stroke="#4F3E58" stroke-width="1.5"/><circle cx="103" cy="179" r="1.5" fill="#B8A3BB"/><circle cx="103" cy="194" r="1.5" fill="#B8A3BB"/>
+    <g stroke="#C9BAD6" stroke-width="1.2"><path d="m138 166-4 7 6 7m-6-7-8 1m8-1 8-2"/><circle cx="134" cy="173" r="2.5" fill="#C9BAD6"/><circle cx="138" cy="166" r="1" fill="#C9BAD6"/><circle cx="140" cy="180" r="1" fill="#C9BAD6"/></g>
+  </g>
+</svg>

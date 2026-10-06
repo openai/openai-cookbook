@@ -1,0 +1,13 @@
+.build-progress { --progress-accent: var(--accent-text, #04b84c); padding: 0 0 14px; }
+.build-progress[data-tier="standard"] { --progress-accent: var(--violet-text, #924ff7); }
+.build-progress-heading { margin-bottom: 9px; color: var(--muted, #a9a9af); font-size: 11px; line-height: 1.4; font-weight: 500; }
+.build-progress-track { position: relative; height: 5px; overflow: hidden; border-radius: 3px; background: color-mix(in srgb, var(--progress-accent) 13%, transparent); }
+.build-progress-fill { position: absolute; inset: 0; border-radius: inherit; background: var(--progress-accent); transform-origin: left center; transition: transform 250ms ease-out; }
+.build-progress-highlight { position: absolute; inset-block: 0; left: 0; width: 30%; border-radius: inherit; background: linear-gradient(90deg, transparent, var(--progress-accent), transparent); animation: build-progress-travel 1.6s ease-in-out infinite; }
+.build-progress[data-progress-state="completed"] .build-progress-fill { box-shadow: 0 0 8px color-mix(in srgb, var(--progress-accent) 35%, transparent); }
+.build-progress:is([data-progress-state="failed"], [data-progress-state="cancelled"]) .build-progress-fill { opacity: .5; transition: none; }
+@keyframes build-progress-travel { from { transform: translateX(-110%); } to { transform: translateX(350%); } }
+@media (prefers-reduced-motion: reduce) {
+  .build-progress-fill { transition: none; }
+  .build-progress-highlight { animation: none; transform: translateX(115%); opacity: .6; }
+}

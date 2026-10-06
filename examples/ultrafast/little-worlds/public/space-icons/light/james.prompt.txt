@@ -1,0 +1,7 @@
+Use case: lighting-weather
+Asset type: square profile icon for James in the Little Worlds app, displayed small at 256 by 256 pixels
+Input image: edit target, James's existing glossy 3D finance chart icon
+Primary request: create a polished light-mode version of this exact icon. Change the near-black background to clean warm white, very slightly light gray near a soft contact shadow, and relight the object as a studio product render against that light backdrop.
+Subject and composition: preserve this same five rising 3D bar columns with emerald green upper sections and vivid purple bases, same upward curved purple arrow from a small orange start dot, and same dark rounded platform with purple edge. Keep the recognizable silhouette, centered scale, three-quarter camera angle, and proportions. All artwork must fit comfortably inside a circle crop.
+Color and materials: retain saturated emerald green, vivid purple and orange accents, glossy dimensional materials, crisp edges, realistic soft shading and specular highlights. Ensure rich contrast on light background; do not wash out or fade the colors.
+Constraints: only reinterpret the background and lighting for light mode. No additional bars, no numbers, no letters, no labels, no text, no border, no watermark. Output one square icon.

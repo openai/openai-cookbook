@@ -1,0 +1,61 @@
+:root {
+  color-scheme: light;
+  --devday-background: #f7f8fa;
+  --devday-surface: #ffffff;
+  --devday-text: #202630;
+  --devday-muted: #596273;
+  --devday-line: #d9dee7;
+  --devday-green: #007e35;
+  --devday-purple: #7741c6;
+}
+html, body { background: #f7f8fa; color: #202630; color-scheme: light; }
+.observatory {
+  --navy: #202630;
+  --ivory: #ffffff;
+  --brass: #007e35;
+  background: #f7f8fa;
+  color: #202630;
+  color-scheme: light;
+}
+.observatory .obs-hero { background: #eef5f1; color: #202630; border-color: #d4e1d8; }
+.observatory .obs-hero .obs-kicker { color: #007e35; }
+.observatory .obs-content { background: #ffffff; }
+.observatory .obs-hero p,
+.observatory .obs-byline,
+.observatory .obs-caption,
+.observatory .obs-legend,
+.observatory .obs-form label,
+.observatory .obs-assumptions,
+.observatory .obs-article p,
+.observatory .obs-meta,
+.observatory .obs-status,
+.observatory .obs-footer,
+.observatory .obs-devday { color: #596273; }
+.observatory .obs-byline,
+.observatory .obs-form,
+.observatory .obs-desk,
+.observatory .obs-article,
+.observatory .obs-footer { border-color: #d9dee7; }
+.observatory .obs-tag { background: #f1ecf9; border-color: #ddd1ef; color: #7741c6; }
+.observatory .obs-chart text { fill: #596273; }
+.observatory .obs-chart line { stroke: #d9dee7; }
+.observatory .obs-chart [fill="#04b84c"],
+.observatory .obs-orbit [fill="#04b84c"] { fill: #008c42; }
+.observatory .obs-chart [fill="#924ff7"] { fill: #8450d1; }
+.observatory .obs-legend i { background: #008c42; }
+.observatory .obs-legend span:last-child i { background: #8450d1; }
+.observatory .obs-orbit [stroke="#924ff7"] { stroke: #8450d1; }
+.observatory .obs-form input { background: #f7f8fa; color: #202630; border-color: #bcc7d0; transition: none; }
+.observatory .obs-form input:hover { border-color: #7b8995; }
+.observatory button { background: #007e35; border-color: #007e35; color: #ffffff; transition: transform .18s; }
+.observatory button:hover { background: #08682f; border-color: #08682f; }
+.observatory .obs-desk button { background: #ffffff; border-color: #c7d0d9; color: #202630; }
+.observatory .obs-desk button:hover { background: #edf4ef; border-color: #8ca997; color: #135c30; }
+.observatory button:disabled { background: #e8ecf0; border-color: #d9dee7; color: #687381; }
+.observatory button:focus-visible,
+.observatory input:focus-visible,
+.observatory a:focus-visible { outline-color: #7741c6; }
+.observatory .obs-article a { color: #007e35; transition: none; }
+.observatory .obs-article a:hover { color: #08682f; }
+.observatory .obs-loading { border-color: #8450d1; }
+.observatory [data-service-error] { color: #a63f24; }

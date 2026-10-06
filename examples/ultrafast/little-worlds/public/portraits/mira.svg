@@ -1,0 +1,34 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 200 200" fill="none">
+  <title>Mira, a botanist, among green leaves</title>
+  <defs>
+    <linearGradient id="bg" x1="17" y1="15" x2="169" y2="201" gradientUnits="userSpaceOnUse"><stop stop-color="#E8EDD9"/><stop offset="1" stop-color="#B7C9A4"/></linearGradient>
+    <linearGradient id="skin" x1="76" y1="53" x2="128" y2="133" gradientUnits="userSpaceOnUse"><stop stop-color="#C58B68"/><stop offset="1" stop-color="#AB7153"/></linearGradient>
+    <clipPath id="clip"><circle cx="100" cy="100" r="100"/></clipPath>
+  </defs>
+  <g clip-path="url(#clip)">
+    <path fill="url(#bg)" d="M0 0h200v200H0z"/>
+    <circle cx="85" cy="73" r="65" fill="#FAF8E7" opacity=".35"/>
+    <path d="M167 178c-22-42-14-93 15-135" stroke="#789662" stroke-width="2" stroke-linecap="round"/>
+    <path d="M159 126c-2-24 9-38 28-43 2 20-8 34-28 43ZM157 110c-23-7-30-21-26-39 20 7 28 20 26 39ZM171 77c0-19 7-29 23-34 1 17-8 29-23 34ZM165 153c9-18 20-22 37-18-9 15-20 21-37 18Z" fill="#91AA75"/>
+    <path d="M34 201c-9-37-10-74-4-110" stroke="#9BAD85" stroke-width="2"/>
+    <path d="M29 144c-17-6-24-16-21-32 16 7 23 17 21 32ZM29 132c13-7 19-18 17-32-16 6-21 17-17 32Z" fill="#A6BA90"/>
+    <path d="M49 155c-5-17-9-25-2-40-13-16-3-31 3-38-5-17 7-29 18-31 3-20 25-23 36-15 17-9 32 0 35 13 18 2 25 21 17 34 10 12 10 27-1 36 10 22-8 37-21 39Z" fill="#3D352D"/>
+    <path d="M37 205c0-41 18-64 46-66h34c30 3 47 28 48 66" fill="#F6F0DB"/>
+    <path d="m76 139 7 40h34l8-39 17 8-2 57H58l-1-56Z" fill="#718659"/>
+    <path d="M91 111h22v33c-5 10-17 11-24 0l2-33Z" fill="#AE7253"/>
+    <path d="M88 128c7 8 17 8 25 1v9c-6 10-16 10-25 1Z" fill="#9E6348" opacity=".4"/>
+    <path d="M72 76c0-24 13-39 30-39 20 0 34 16 34 39l-5 29c-3 20-17 33-30 33-14 0-26-14-28-32l-1-30Z" fill="url(#skin)"/>
+    <ellipse cx="71" cy="92" rx="7" ry="10" fill="#BA805E"/><ellipse cx="134" cy="92" rx="6" ry="10" fill="#AC7252"/>
+    <path d="M66 80c-8-19 3-45 25-49 20-6 43 3 48 26 4 10 1 24-4 28-8-9-12-23-12-29-7 10-23 13-39 8-2 6-8 13-18 16Z" fill="#3D352D"/>
+    <path d="M75 56c8-12 20-16 32-13" stroke="#60503D" stroke-width="3" stroke-linecap="round"/>
+    <path d="M80 84c4-2 8-2 12-1m18-1c4-2 8-1 11 1" stroke="#65402E" stroke-width="2.5" stroke-linecap="round"/>
+    <ellipse cx="87" cy="91" rx="2.2" ry="2.6" fill="#3E3029"/><ellipse cx="116" cy="91" rx="2.2" ry="2.6" fill="#3E3029"/>
+    <path d="m103 94-3 10 5 1" stroke="#95593E" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/>
+    <path d="M91 115c6 6 15 6 22-1" stroke="#7D4436" stroke-width="2" stroke-linecap="round"/>
+    <path d="M94 115h15c-4 4-11 4-15 0Z" fill="#F6E7D2"/>
+    <circle cx="72" cy="106" r="3" stroke="#CDA75F" stroke-width="2"/><circle cx="132" cy="106" r="3" stroke="#CDA75F" stroke-width="2"/>
+    <path d="M84 170h33v32H84z" stroke="#536C43" stroke-width="1.5"/>
+    <circle cx="81" cy="159" r="3" fill="#CECA9C"/><circle cx="121" cy="159" r="3" fill="#CECA9C"/>
+    <path d="M97 202c-2-10 0-20 5-29m-3 16c-10-2-13-8-12-15 9 2 13 7 12 15Zm1-3c1-9 6-13 13-14-1 9-5 13-13 14Z" stroke="#BDCDA5" stroke-width="1.5" stroke-linecap="round"/>
+  </g>
+</svg>

@@ -1,0 +1,277 @@
+/* The host moves this dock into an active dialog so voice remains accessible. */
+.voice-dock {
+  --voice-dock-top: max(12px, env(safe-area-inset-top));
+  position: fixed;
+  z-index: 100;
+  top: var(--voice-dock-top);
+  left: 50%;
+  transform: translateX(-50%);
+  width: max-content;
+  max-width: calc(100vw - 24px);
+  pointer-events: none;
+  isolation: isolate;
+}
+
+.voice-controls {
+  --voice-surface: #111111f2;
+  --voice-ink: #f5f5f5;
+  --voice-muted: #b3b3b3;
+  --voice-line: #ffffff26;
+  --voice-hover: #ffffff0f;
+  --voice-glow: #04b84c;
+  position: relative;
+  color: var(--voice-ink);
+  font-family: var(--sans, Arial, sans-serif);
+  font-size: 11px;
+  line-height: 1.5;
+  text-align: left;
+  pointer-events: auto;
+  isolation: isolate;
+}
+
+.voice-pill {
+  display: flex;
+  align-items: center;
+  gap: 2px;
+  width: max-content;
+  max-width: 100%;
+  min-height: 40px;
+  padding: 3px;
+  border: 1px solid var(--voice-line);
+  border-radius: 6px;
+  background: var(--voice-surface);
+  box-shadow: 0 4px 20px #00000038, inset 0 1px 0 #ffffff0a;
+  backdrop-filter: blur(18px);
+  transition: box-shadow .18s, border-color .18s, background .18s;
+}
+
+.voice-controls.is-live .voice-pill {
+  border-color: #04b84c80;
+  box-shadow: 0 0 0 3px #04b84c0d, 0 4px 22px #00000040, inset 0 1px 0 #ffffff0a;
+}
+
+.voice-controls button {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
+  border: 0;
+  margin: 0;
+  color: inherit;
+  font: inherit;
+  cursor: pointer;
+  touch-action: manipulation;
+  -webkit-tap-highlight-color: transparent;
+}
+
+.voice-controls button:focus-visible { outline: 2px solid var(--accent-text); outline-offset: 3px; }
+.voice-controls button:disabled { cursor: default; opacity: .55; }
+.voice-primary { min-height: 32px; gap: 8px; padding: 0 9px 0 1px; border-radius: 4px; background: transparent; }
+.voice-primary:hover:not(:disabled) { background: var(--voice-hover); }
+.voice-label { font-size: 11px; font-weight: 500; letter-spacing: -.1px; white-space: nowrap; }
+.voice-live-mark { margin: 0 0 0 -3px; color: var(--voice-muted); font-size: 8px; font-weight: 600; letter-spacing: 1px; }
+.voice-chevron { color: var(--voice-muted); transition: transform .18s; }
+.voice-controls.is-expanded .voice-chevron { transform: rotate(180deg); }
+.voice-icon-button { width: 32px; min-height: 32px; padding: 0; border-radius: 4px; background: transparent; transition: background .18s, color .18s; }
+.voice-icon-button:hover:not(:disabled) { background: var(--voice-hover); }
+.voice-details-button { width: 26px; }
+.voice-mute-button { color: var(--voice-muted) !important; }
+.voice-mute-button.is-selected { color: #ffaf85 !important; background: #ff854920; }
+.voice-end-button { background: #ffffff08; color: #b3b3b3 !important; }
+.voice-end-button:hover:not(:disabled) { color: #ffaf85 !important; background: #ff854920; }
+.voice-enable-sound { background: #ff854926; color: #ffaf85 !important; }
+
+.voice-orb-shell { width: 29px; height: 29px; display: block; position: relative; flex: 0 0 auto; }
+.voice-orb-shell::before {
+  content: '';
+  position: absolute;
+  inset: -3px;
+  border-radius: 50%;
+  background: var(--voice-glow);
+  filter: blur(5px);
+  opacity: 0;
+  transform: scale(calc(1 + var(--voice-level, 0) * .4));
+  transition: opacity .18s, transform .12s;
+}
+.voice-orb {
+  position: absolute;
+  inset: 2px;
+  border-radius: 50%;
+  overflow: hidden;
+  isolation: isolate;
+  background: radial-gradient(circle at 29% 21%, #c5ffe0 0%, #04b84c 24%, transparent 62%), radial-gradient(circle at 69% 76%, #452178, #924ff7 48%, #006aff 100%);
+  box-shadow: inset 0 0 0 1px #ffffff38, inset -3px -4px 6px #00000038, 0 2px 6px #04b84c26;
+  transform: scale(calc(1 + var(--voice-level, 0) * .11));
+  transition: transform .12s, filter .2s;
+}
+.voice-orb::before {
+  content: '';
+  position: absolute;
+  inset: -40%;
+  border-radius: 40%;
+  background: conic-gradient(from 80deg, transparent 9%, #ffffff80 17%, #04b84c26 36%, #924ff7b3 53%, transparent 69%, #04b84c99 84%, transparent);
+  filter: blur(2px);
+  opacity: .62;
+  transform: rotate(-30deg);
+}
+.voice-orb > span { position: absolute; inset: 0; border-radius: inherit; background: radial-gradient(ellipse at 31% 23%, #ffffffb3, transparent 31%); box-shadow: inset 0 0 4px #ffffff26; z-index: 1; }
+.voice-controls.is-live .voice-orb-shell::before { opacity: calc(.16 + var(--voice-level, 0) * .7); }
+.voice-controls.is-live .voice-orb { filter: saturate(calc(1 + var(--voice-level, 0) * .55)) brightness(calc(1 + var(--voice-level, 0) * .12)); }
+.voice-controls.is-live .voice-orb::before { animation: voice-turn 15s linear infinite; }
+.voice-controls[data-status='working'] .voice-orb::before { animation-duration: 5s; }
+.voice-controls:is([data-status='connecting'], [data-status='reconnecting']) .voice-orb-shell::before { animation: voice-connect 1.8s ease-in-out infinite; }
+.voice-controls:is([data-status='connecting'], [data-status='reconnecting']) .voice-orb::before { animation: voice-turn 7s linear infinite; }
+.voice-controls.is-muted:not([data-status='speaking']) .voice-orb { filter: saturate(.3); }
+.voice-controls.is-muted:not([data-status='speaking']) .voice-orb-shell::before { opacity: .08; }
+.voice-controls[data-status='error'] .voice-orb { filter: saturate(.3); }
+
+.voice-panel {
+  position: absolute;
+  top: calc(100% + 12px);
+  left: 50%;
+  transform: translateX(-50%);
+  width: 342px;
+  max-width: calc(100vw - 28px);
+  max-height: min(530px, calc(100dvh - var(--voice-dock-top, 12px) - 68px - env(safe-area-inset-bottom)));
+  overflow: auto;
+  overscroll-behavior: contain;
+  border: 1px solid var(--voice-line);
+  border-radius: 6px;
+  background: var(--voice-surface);
+  backdrop-filter: blur(24px);
+  padding: 22px 21px 0;
+  box-shadow: 0 16px 50px #00000070, 0 3px 10px #00000026;
+  scrollbar-width: thin;
+  scrollbar-color: #ffffff38 transparent;
+  animation: voice-panel-appear .18s ease-out;
+}
+.voice-panel-heading { display: flex; align-items: flex-start; justify-content: space-between; gap: 7px; }
+.voice-panel-heading > .voice-icon-button { width: 27px; min-height: 27px; margin-top: -6px; margin-right: -8px; color: var(--voice-muted); }
+.voice-eyebrow { display: block; margin-bottom: 7px; color: var(--voice-muted); font-size: 9px; font-weight: 500; letter-spacing: 1.3px; }
+.voice-controls .voice-panel h2 { color: var(--voice-ink); font-family: var(--sans, Arial, sans-serif); font-size: 28px; line-height: 1.08; font-weight: 400; letter-spacing: -.45px; margin: 0; }
+.voice-controls .voice-panel p { margin: 0; color: inherit; }
+.voice-welcome { padding: 16px 0 20px; }
+.voice-controls .voice-welcome > p { color: var(--voice-muted); font-size: 11px; line-height: 1.7; max-width: 260px; margin: 0; }
+.voice-examples { display: flex; align-items: flex-start; flex-direction: column; gap: 7px; margin-top: 15px; }
+.voice-examples > span { border: 1px solid var(--voice-line); border-radius: 4px; background: #ffffff05; padding: 6px 9px; font-size: 11px; line-height: 1.5; }
+.voice-captions { display: flex; flex-direction: column; gap: 18px; padding: 22px 0; }
+.voice-caption > span { display: block; color: var(--voice-muted); font-size: 10px; margin-bottom: 5px; }
+.voice-controls .voice-caption > p { white-space: pre-wrap; overflow-wrap: anywhere; font-size: 12px; line-height: 1.65; margin: 0; }
+.voice-caption-assistant { padding-left: 12px; border-left: 2px solid #924ff7; }
+.voice-panel-footer { display: flex; align-items: flex-start; gap: 8px; border-top: 1px solid var(--voice-line); padding: 14px 0 17px; color: var(--voice-muted); }
+.voice-panel-footer > svg { flex: 0 0 auto; margin-top: 2px; }
+.voice-controls .voice-panel-footer > p { font-size: 10px; line-height: 1.6; margin: 0; }
+.voice-notice { border: 1px solid #ff854950; border-radius: 4px; background: #ff854910; padding: 11px 12px; margin-top: 17px; }
+.voice-controls .voice-notice > p { font-size: 11px; line-height: 1.65; overflow-wrap: anywhere; margin: 0; }
+.voice-notice > button { gap: 6px; border-radius: 4px; padding: 5px 8px; background: #ff85491f; margin-top: 8px; font-size: 10px; }
+.voice-notice > button:hover { background: #ff854934; }
+.voice-error { border-color: #ff854950; background: #ff854910; }
+.voice-sr-only { position: absolute; width: 1px; height: 1px; padding: 0; margin: -1px; overflow: hidden; clip-path: inset(50%); white-space: nowrap; border: 0; }
+
+.community-overlay .voice-controls {
+  --voice-surface: #111111f5;
+  --voice-ink: #f5f5f5;
+  --voice-muted: #b3b3b3;
+  --voice-line: #ffffff26;
+  --voice-hover: #ffffff0f;
+  --voice-glow: #04b84c;
+}
+.community-overlay .voice-pill { box-shadow: 0 3px 18px #00000038, inset 0 1px 0 #ffffff08; }
+.community-overlay .voice-controls.is-live .voice-pill { border-color: #04b84c80; box-shadow: 0 0 0 3px #04b84c0d, 0 4px 22px #00000040; }
+.community-overlay .voice-end-button { color: #b3b3b3 !important; background: #ffffff08; }
+.community-overlay .voice-mute-button.is-selected { color: #ffaf85 !important; }
+.community-overlay .voice-enable-sound { color: #ffaf85 !important; background: #ff854926; }
+.community-overlay .voice-end-button:hover:not(:disabled) { color: #ffaf85 !important; background: #ff854920; }
+.community-overlay .voice-panel { box-shadow: 0 16px 50px #00000070, 0 3px 10px #00000026; }
+/* Native dialogs share the same viewport dock. Keep even a tall history or
+   reset dialog below it instead of covering the dialog's heading and close. */
+.with-live-voice dialog[open]:has(> .voice-dock) {
+  inset-block: calc(max(12px, env(safe-area-inset-top)) + 60px) max(20px, env(safe-area-inset-bottom));
+  height: fit-content;
+  max-height: calc(100dvh - max(12px, env(safe-area-inset-top)) - 80px - env(safe-area-inset-bottom));
+  margin-block: auto;
+}
+
+@keyframes voice-turn { to { transform: rotate(330deg); } }
+@keyframes voice-connect { 0%, 100% { opacity: .12; } 50% { opacity: .4; } }
+@keyframes voice-panel-appear { from { opacity: 0; translate: 0 -4px; } to { opacity: 1; translate: 0 0; } }
+
+@media (min-width: 961px) {
+  .with-live-voice .topbar .account-button { min-width: 0; }
+  .with-live-voice .topbar .account-button > span:last-child { max-width: 120px; overflow: hidden; white-space: nowrap; text-overflow: ellipsis; }
+}
+
+/* Narrow headers cannot hold navigation, identity, and an expanded live pill.
+   Give voice its own quiet strip and move every app surface below that strip. */
+@media (max-width: 960px) {
+  body.with-live-voice {
+    --voice-strip-height: calc(60px + env(safe-area-inset-top));
+    --voice-header-height: 72px;
+    --voice-workspace-top: calc(var(--voice-strip-height) + var(--voice-header-height));
+  }
+  html:has(body.with-live-voice) { scroll-padding-top: calc(72px + env(safe-area-inset-top)); }
+  .with-live-voice #root { padding-top: var(--voice-strip-height); }
+  .with-live-voice .account-gate { min-height: calc(100dvh - var(--voice-strip-height)); }
+  .with-live-voice .workspace { min-height: calc(100dvh - var(--voice-workspace-top)); }
+  .with-live-voice .community-overlay { top: var(--voice-strip-height); }
+  .with-live-voice .community-overlay::before { top: var(--voice-strip-height); }
+  .with-live-voice .community-requests { top: calc(var(--voice-strip-height) + 67px); max-height: calc(100dvh - var(--voice-strip-height) - 90px); }
+  .with-live-voice .runtime-panel,
+  .with-live-voice .canvas-workspace :is(.workspace-files-panel, .build-activity-panel:not(.is-embedded)) { top: var(--voice-workspace-top); }
+  .with-live-voice .canvas-workspace .build-activity-toggle[aria-expanded="true"] { top: calc(var(--voice-workspace-top) + (100dvh - var(--voice-workspace-top)) / 2); }
+  .voice-dock { --voice-dock-top: calc(10px + env(safe-area-inset-top)); }
+  .voice-dock::before {
+    content: '';
+    position: absolute;
+    top: calc(-1 * var(--voice-dock-top));
+    left: 50%;
+    width: 100vw;
+    height: var(--voice-strip-height, 60px);
+    transform: translateX(-50%);
+    z-index: -1;
+    background: #000000f5;
+    border-bottom: 1px solid #ffffff1a;
+    backdrop-filter: blur(18px);
+    pointer-events: none;
+  }
+  .community-overlay .voice-dock::before { background: #000000f5; border-bottom-color: #ffffff1a; }
+  .voice-in-dialog.voice-dock::before { display: none; }
+}
+
+/* With voice in its own strip, the two inspections split the space below
+   both headers. Their controls stay centered on their respective panels. */
+@media (max-width: 799px) {
+  .with-live-voice .canvas-workspace.with-build-activity.with-workspace-files {
+    --inspection-half-height: calc((100dvh - var(--voice-workspace-top)) / 2);
+  }
+  .with-live-voice .canvas-workspace.with-build-activity.with-workspace-files .workspace-files-panel { top: var(--voice-workspace-top); }
+  .with-live-voice .canvas-workspace.with-build-activity.with-workspace-files .build-activity-panel:not(.is-embedded) { top: calc(var(--voice-workspace-top) + var(--inspection-half-height)); }
+  .with-live-voice .canvas-workspace.with-build-activity.with-workspace-files .workspace-files-toggle { top: calc(var(--voice-workspace-top) + var(--inspection-half-height) / 2); }
+  .with-live-voice .canvas-workspace.with-build-activity.with-workspace-files .build-activity-toggle:not(.workspace-files-toggle) { top: calc(var(--voice-workspace-top) + var(--inspection-half-height) * 1.5); }
+}
+
+@media (max-width: 760px) {
+  .voice-pill { min-height: 41px; }
+  .voice-primary { min-height: 33px; }
+  .voice-icon-button { width: 34px; min-height: 33px; }
+  .voice-details-button { width: 27px; }
+  .voice-live-mark { display: none; }
+  .voice-label { font-size: 10px; }
+  .with-live-voice .community-requests { top: calc(var(--voice-strip-height) + 60px); }
+}
+
+@media (max-width: 600px) {
+  body.with-live-voice { --voice-header-height: 64px; }
+}
+
+@media (max-width: 380px) {
+  .voice-panel { padding: 19px 18px 0; }
+  .voice-controls .voice-panel h2 { font-size: 26px; }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .voice-controls *, .voice-controls *::before, .voice-controls *::after { animation: none !important; transition: none !important; }
+  .voice-orb, .voice-orb-shell::before { transform: none; }
+  .voice-controls.is-live .voice-orb-shell::before { opacity: .24; }
+  .voice-controls[data-status='connecting'] .voice-orb-shell::before { opacity: .2; }
+}

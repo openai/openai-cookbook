@@ -1,0 +1,117 @@
+@import './presentation-social.css';
+@import './presentation-build.css';
+
+/* One screen-relative scale, shared by type and its surrounding geometry.
+   Comparison previews separately fit this full canvas into their lanes. */
+:root {
+  --presentation-unit: .75px;
+  --presentation-header-height: 72px;
+  --presentation-composer-height: 156px;
+}
+
+@media (min-width: 1100px) {
+  :root {
+    --presentation-unit: clamp(.75px, .0520833333vw, 2px);
+    --presentation-header-height: calc(88 * var(--presentation-unit));
+    --presentation-composer-height: calc(96 * var(--presentation-unit));
+  }
+
+  .account-header, .canvas-workspace .topbar, .community-overlay .community-header {
+    height: var(--presentation-header-height);
+    min-height: var(--presentation-header-height);
+    padding: 0 calc(36 * var(--presentation-unit));
+  }
+  .page-header-leading { gap: calc(20 * var(--presentation-unit)); }
+  .page-navigation .page-home-button { width: calc(56 * var(--presentation-unit)); height: calc(56 * var(--presentation-unit)); min-height: 44px; opacity: 1; }
+  .page-navigation .page-home-button svg { width: calc(24 * var(--presentation-unit)); height: calc(24 * var(--presentation-unit)); }
+  .account-header .devday-brand, .canvas-workspace .topbar .devday-brand, .community-header .devday-brand { font-size: calc(26 * var(--presentation-unit)); }
+  .canvas-workspace .app-wordmark, .community-header .community-place-name { font-size: calc(22 * var(--presentation-unit)); }
+  .account-header > button, .text-button, .community-requests-toggle { font-size: calc(22 * var(--presentation-unit)); min-height: 44px; }
+  .topbar-actions { gap: calc(28 * var(--presentation-unit)); }
+  .text-button > svg { width: calc(24 * var(--presentation-unit)); height: calc(24 * var(--presentation-unit)); }
+  .account-button > .space-icon { --space-icon-size: calc(42 * var(--presentation-unit)); }
+  .canvas-workspace .workspace { min-height: calc(100dvh - var(--presentation-header-height)); }
+  .canvas-workspace .space-main { padding-inline: calc(32 * var(--presentation-unit)); }
+  .canvas-workspace .space-toolbar, .canvas-workspace .studio-intro, .canvas-workspace .workspace-edition { max-width: calc(1640 * var(--presentation-unit)); }
+  .build-comparison { --comparison-canvas-max: calc(1640 * var(--presentation-unit)); }
+  .canvas-workspace .space-toolbar { height: calc(72 * var(--presentation-unit)); }
+  .toolbar-right { gap: calc(24 * var(--presentation-unit)); }
+  .subtle-button, .help-button { font-size: calc(18 * var(--presentation-unit)); min-height: 44px; }
+  .subtle-button svg, .help-button svg { width: calc(22 * var(--presentation-unit)); height: calc(22 * var(--presentation-unit)); }
+  .personal-canvas .studio-intro { padding-top: calc(12 * var(--presentation-unit)); padding-bottom: calc(22 * var(--presentation-unit)); }
+  .profile-kicker { font-size: calc(18 * var(--presentation-unit)); gap: calc(14 * var(--presentation-unit)); }
+  .profile-kicker .location { font-size: calc(16 * var(--presentation-unit)); }
+  .profile-kicker .space-icon { --space-icon-size: calc(52 * var(--presentation-unit)); }
+  .canvas-workspace .blank-space .empty-canvas { min-height: clamp(260px, 43dvh, calc(600 * var(--presentation-unit))); }
+  .canvas-workspace .empty-canvas .world-brackets { font-size: calc(80 * var(--presentation-unit)); gap: calc(18 * var(--presentation-unit)); margin-bottom: calc(28 * var(--presentation-unit)); }
+  .canvas-workspace .empty-canvas .canvas-edition { font-size: calc(17 * var(--presentation-unit)); margin-bottom: calc(26 * var(--presentation-unit)); }
+  .canvas-workspace .empty-canvas h1 { font-size: calc(56 * var(--presentation-unit)); max-width: 25em; text-wrap: balance; }
+  .canvas-workspace .composer-area { --composer-line-height: calc(34 * var(--presentation-unit)); --composer-inset: calc(18 * var(--presentation-unit)); max-width: calc(1320 * var(--presentation-unit)); padding-top: calc(12 * var(--presentation-unit)); }
+  .canvas-workspace .composer { min-height: calc(84 * var(--presentation-unit)); padding-inline: calc(24 * var(--presentation-unit)) calc(14 * var(--presentation-unit)); gap: calc(18 * var(--presentation-unit)); }
+  .canvas-workspace .composer textarea { font-size: calc(24 * var(--presentation-unit)); }
+  .canvas-workspace .send-button { width: calc(48 * var(--presentation-unit)); height: calc(48 * var(--presentation-unit)); flex-basis: calc(48 * var(--presentation-unit)); }
+  .canvas-workspace .send-button svg { width: calc(28 * var(--presentation-unit)); height: calc(28 * var(--presentation-unit)); }
+  .composer-feedback, .comparison-connection, .comparison-error { font-size: calc(18 * var(--presentation-unit)); }
+  .inspiration-prompts { gap: calc(14 * var(--presentation-unit)); margin-top: calc(14 * var(--presentation-unit)); }
+  .inspiration-prompt { font-size: calc(22 * var(--presentation-unit)); min-height: calc(68 * var(--presentation-unit)); padding: calc(16 * var(--presentation-unit)) calc(20 * var(--presentation-unit)); gap: calc(14 * var(--presentation-unit)); }
+  .inspiration-prompt svg { width: calc(24 * var(--presentation-unit)); height: calc(24 * var(--presentation-unit)); }
+  .comparison-composer-row { gap: calc(16 * var(--presentation-unit)); }
+  .finish-build-button { font-size: calc(24 * var(--presentation-unit)); padding: calc(18 * var(--presentation-unit)) calc(28 * var(--presentation-unit)); }
+  .with-build-comparison .composer-area { --composer-line-height: calc(30 * var(--presentation-unit)); --composer-inset: calc(10 * var(--presentation-unit)); max-width: min(calc(1320 * var(--presentation-unit)), calc(100vw - 560 * var(--presentation-unit))); padding: calc(10 * var(--presentation-unit)) 0 calc(12 * var(--presentation-unit)); }
+  .with-build-comparison .composer-slot, .with-build-comparison .composer { min-height: calc(68 * var(--presentation-unit)); }
+  .with-build-comparison .send-button { width: calc(44 * var(--presentation-unit)); height: calc(44 * var(--presentation-unit)); flex-basis: calc(44 * var(--presentation-unit)); }
+  .with-build-comparison .finish-build-button { padding-block: calc(10 * var(--presentation-unit)); }
+  .workspace-edition { font-size: calc(17 * var(--presentation-unit)); margin-top: calc(30 * var(--presentation-unit)); padding-top: calc(20 * var(--presentation-unit)); }
+  .workspace-edition > span:last-child { font-size: calc(14 * var(--presentation-unit)); }
+  .visitor-note strong { font-size: calc(24 * var(--presentation-unit)); }
+  .visitor-note p, .visitor-note button { font-size: calc(20 * var(--presentation-unit)); }
+
+  /* The control dock remains secondary, but is usable without precise aim. */
+  .demo-utilities { left: calc(24 * var(--presentation-unit)); bottom: calc(12 * var(--presentation-unit)); gap: calc(12 * var(--presentation-unit)); }
+  .demo-utilities .reset-demo-trigger { height: calc(44 * var(--presentation-unit)); min-height: 36px; font-size: calc(17 * var(--presentation-unit)); padding-inline: calc(14 * var(--presentation-unit)); gap: calc(10 * var(--presentation-unit)); }
+  .demo-utilities .theme-toggle { width: max(36px, calc(44 * var(--presentation-unit))); height: max(36px, calc(44 * var(--presentation-unit))); flex-basis: max(36px, calc(44 * var(--presentation-unit))); min-width: 36px; min-height: 36px; aspect-ratio: 1; }
+  .demo-utilities svg { width: calc(20 * var(--presentation-unit)); height: calc(20 * var(--presentation-unit)); }
+  body:has(.reset-demo-trigger) .canvas-workspace .space-main { padding-bottom: calc(76 * var(--presentation-unit)); }
+  body:has(.reset-demo-trigger) .with-build-comparison .space-main { padding-bottom: 0; }
+
+  /* Modals use the same type hierarchy as the page, not a miniature UI. */
+  .modal, .reset-demo-dialog, .space-icon-dialog { width: min(calc(760 * var(--presentation-unit)), calc(100vw - 64px)); padding: calc(40 * var(--presentation-unit)); font-size: calc(22 * var(--presentation-unit)); }
+  .modal-header h2, .reset-demo-dialog h2, .space-icon-dialog h2 { font-size: calc(48 * var(--presentation-unit)); }
+  .modal-note, .saved-thread p, .revision-list strong, .guide-steps strong, .reset-demo-dialog p, .space-icon-dialog p { font-size: calc(22 * var(--presentation-unit)); line-height: 1.5; }
+  .saved-thread small, .revision-list p, .guide-steps p, .guide-bottom p, .modal .eyebrow { font-size: calc(18 * var(--presentation-unit)); }
+  .saved-thread li, .revision-list > div { padding-block: calc(22 * var(--presentation-unit)); }
+  .saved-thread li > span, .revision-number, .guide-steps li > span { font-size: calc(34 * var(--presentation-unit)); }
+  .saved-thread .thread-turn-message { font-size: calc(22 * var(--presentation-unit)); line-height: 1.45; }
+  .saved-thread .thread-turn-number { font-size: calc(34 * var(--presentation-unit)); }
+  .saved-thread .thread-activity-link { font-size: calc(18 * var(--presentation-unit)); }
+  .account-actions button, .continue-thread, .reset-demo-actions button, .space-icon-dialog button { font-size: calc(22 * var(--presentation-unit)); min-height: calc(52 * var(--presentation-unit)); }
+  .icon-button { width: calc(44 * var(--presentation-unit)); height: calc(44 * var(--presentation-unit)); min-width: 36px; min-height: 36px; }
+  .icon-button svg { width: calc(24 * var(--presentation-unit)); height: calc(24 * var(--presentation-unit)); }
+  .toast { font-size: calc(22 * var(--presentation-unit)); max-width: min(calc(760 * var(--presentation-unit)), calc(100vw - 64px)); }
+
+  /* Voice remains centered, with enough room around all three header groups. */
+  .voice-dock { --voice-dock-top: calc(14 * var(--presentation-unit)); }
+  .voice-pill { min-height: calc(60 * var(--presentation-unit)); padding: calc(4 * var(--presentation-unit)); }
+  .voice-primary { min-height: calc(48 * var(--presentation-unit)); gap: calc(12 * var(--presentation-unit)); padding-right: calc(14 * var(--presentation-unit)); }
+  .voice-label { font-size: calc(21 * var(--presentation-unit)); }
+  .voice-orb-shell { width: calc(44 * var(--presentation-unit)); height: calc(44 * var(--presentation-unit)); }
+  .voice-icon-button, .voice-details-button { width: calc(40 * var(--presentation-unit)); min-height: calc(44 * var(--presentation-unit)); }
+  .voice-icon-button svg { width: calc(22 * var(--presentation-unit)); height: calc(22 * var(--presentation-unit)); }
+  .voice-live-mark { font-size: calc(14 * var(--presentation-unit)); }
+  .voice-panel { width: calc(480 * var(--presentation-unit)); max-height: min(calc(700 * var(--presentation-unit)), 75dvh); padding: calc(28 * var(--presentation-unit)) calc(28 * var(--presentation-unit)) 0; }
+  .voice-controls .voice-panel h2 { font-size: calc(40 * var(--presentation-unit)); }
+  .voice-controls .voice-welcome > p, .voice-examples > span, .voice-controls .voice-caption > p, .voice-controls .voice-notice > p { font-size: calc(20 * var(--presentation-unit)); max-width: none; }
+  .voice-eyebrow, .voice-caption > span, .voice-controls .voice-panel-footer > p { font-size: calc(16 * var(--presentation-unit)); }
+}
+
+@media (max-width: 1099px) {
+  .canvas-workspace .composer textarea, .account-name-row input { font-size: 16px; }
+  .inspiration-prompt { font-size: 14px; }
+  .canvas-workspace .empty-canvas .canvas-edition { font-size: 11px; }
+}
+
+/* A working voice session adds microphone and stop controls. On compact
+   desktop headers, retain the event signature and give the centered pill room. */
+@media (min-width: 1100px) and (max-width: 1279px) {
+  .with-live-voice .canvas-workspace .app-wordmark { display: none; }
+}

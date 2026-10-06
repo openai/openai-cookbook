@@ -1,0 +1,13 @@
+.living-world { position: relative; aspect-ratio: 500 / 420; isolation: isolate; pointer-events: none; }
+.living-world-renderer { position: absolute; inset: 0; opacity: 0; transition: opacity .85s ease; }
+.living-world-canvas { display: block; width: 100%; height: 100%; }
+.living-world-shadow { position: absolute; width: 42%; height: 5%; left: 29%; bottom: 6%; background: #04b84c; filter: blur(24px); opacity: 0; border-radius: 50%; transition: opacity .85s ease; }
+.living-world.is-ready .living-world-renderer { opacity: 1; }
+.living-world.is-ready .living-world-shadow { opacity: .1; }
+.living-world-interaction { position: absolute; border-radius: 50%; touch-action: none; user-select: none; -webkit-user-select: none; -webkit-tap-highlight-color: transparent; outline: none; pointer-events: none; }
+.living-world.is-ready .living-world-interaction { pointer-events: auto; cursor: grab; }
+.living-world.is-ready .living-world-interaction[data-dragging] { cursor: grabbing; }
+.living-world-interaction:focus-visible:not([data-pointer-focus]) { outline: 1px solid var(--green, #04b84c); outline-offset: 9px; box-shadow: 0 0 0 5px #04b84c12; }
+@media (prefers-reduced-motion: reduce) {
+  .living-world-renderer, .living-world-shadow { transition: none; }
+}

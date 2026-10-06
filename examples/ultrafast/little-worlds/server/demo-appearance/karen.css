@@ -1,0 +1,45 @@
+:root {
+  color-scheme: light;
+  --devday-background: #f7f8fa;
+  --devday-surface: #ffffff;
+  --devday-text: #202630;
+  --devday-muted: #596273;
+  --devday-line: #d9dee7;
+  --devday-green: #008537;
+  --devday-purple: #7131c8;
+  --devday-blue: #0058cf;
+  --devday-orange: #b04419;
+}
+html, body { background: #f7f8fa; color: #202630; color-scheme: light; }
+.arcade-world.arcade-world { --ink: #202630; background: #f7f8fa; color: #202630; color-scheme: light; }
+.arcade-world .arcade-hero h1, .arcade-world .arcade-title h2 { color: #202630; }
+.arcade-world .arcade-hero h1 span { color: #7131c8; }
+.arcade-world .arcade-hero p, .arcade-world .arcade-copy, .arcade-world .arcade-intro,
+.arcade-world .arcade-footer, .arcade-world .arcade-runtime, .arcade-world .arcade-key-guide,
+.arcade-world .arcade-score span, .arcade-world .arcade-edition { color: #596273; }
+.arcade-world .arcade-open, .arcade-world .arcade-footer strong { color: #008537; }
+.arcade-world .arcade-brand i { background: #008537; box-shadow: 4px -4px 0 #7131c8; }
+.arcade-world .arcade-divider { background: #d9dee7; }
+.arcade-world.arcade-world .arcade-cabinet {
+  --game-color: #008537 !important;
+  background: #ffffff;
+  border-color: #d9dee7;
+  border-top-color: #008537;
+  box-shadow: 0 5px 0 #e3e7ed;
+}
+.arcade-world.arcade-world .arcade-cabinet:nth-child(even) { --game-color: #7131c8 !important; border-top-color: #7131c8; }
+.arcade-world.arcade-world .arcade-cabinet:focus-within { border-color: var(--game-color); }
+.arcade-world .arcade-score { background: #f0f3f7; border-color: #c7ccd8; }
+/* Keep the actual game art luminous on its original dark playfield. */
+.arcade-world .arcade-screen { background: #000000; border-color: #c7ccd8; }
+.arcade-world .arcade-command { background: #008537; border-color: #008537; color: #ffffff; }
+.arcade-world .arcade-secondary, .arcade-world .arcade-key { background: #f0f3f7; border-color: #c7ccd8; color: #202630; }
+.arcade-world button:hover:not(:disabled) { background: #006d2c; border-color: #006d2c; color: #ffffff; }
+.arcade-world .arcade-secondary:hover:not(:disabled), .arcade-world .arcade-key:hover:not(:disabled) { background: #eee8f7; border-color: #9b7bbf; color: #202630; }
+.arcade-world button:disabled { background: #eceff4; border-color: #d9dee7; color: #7b8493; }
+.arcade-world button:focus-visible, .arcade-world .arcade-cabinet:focus-visible { outline-color: #7131c8; }
+.arcade-world .arcade-footer { border-color: #d9dee7; }
+.arcade-world .arcade-emblem > path:first-child { fill: #eee8f7; }
+.arcade-world .arcade-emblem circle { stroke: #7131c8; }
+.arcade-world .arcade-emblem > path:nth-of-type(2), .arcade-world .arcade-emblem text { fill: #7131c8; }
+.arcade-world .arcade-emblem > path:nth-of-type(3) { fill: #ffffff; }

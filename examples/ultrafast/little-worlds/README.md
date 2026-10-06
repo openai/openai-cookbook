@@ -149,7 +149,7 @@ node tests/browser/build-activity-server.mjs --natural-seeds
 
 Open the [comparison fixture on port 5190](http://127.0.0.1:5190), sign in as Mira, and submit `quick`. Try `standard first quick` to reverse completion order or `standard fail` to exercise an independent error. The fixture does not call model APIs or edit your saved worlds. Stop it to remove its temporary data.
 
-With Vite running, the [voice surface fixture](http://127.0.0.1:5173/tests/browser/voice-surface.html) checks UI control discovery without a microphone or API calls. The [comparison layout fixture](http://127.0.0.1:5173/tests/browser/build-comparison-layout.html) checks transitions, responsive layout, and reduced motion.
+The [browser testing guide](tests/browser/README.md) lists the retained layout, game, painting, and voice fixtures with their startup commands and expected interactions. These checks are separate from `npm run check`; run the relevant pages and inspect their results when changing browser behavior.
 
 To run the opt-in smoke test against the real API:
 

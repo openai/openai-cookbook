@@ -57,7 +57,7 @@ export function createResponsesAdapter({
         const connectionKey = JSON.stringify([cacheKey, requestTier]);
         if (!websocket || websocketKey !== connectionKey) {
           websocket?.close();
-          websocket = createResponsesWebSocket({ ...websocketOptions, apiKey, tier: requestTier, ...(WebSocketImpl ? { WebSocketImpl } : {}) });
+          websocket = createResponsesWebSocket({ ...websocketOptions, apiKey, ...(WebSocketImpl ? { WebSocketImpl } : {}) });
           websocketKey = connectionKey;
         }
         websocketBusy = true;

@@ -231,13 +231,3 @@ export function activityCode(entry: ActivityEntry): Array<{ path: string; code: 
   });
   return [];
 }
-
-export function prettyActivityJson(value: string | undefined, limit = 16_000): string {
-  if (typeof value !== 'string') return '';
-  let formatted = value;
-  if (value.length <= ACTIVITY_MAX_FIELD) {
-    try { formatted = JSON.stringify(JSON.parse(value), null, 2); } catch { /* Streaming arguments may still be incomplete. */ }
-  }
-  const bound = Number.isFinite(limit) ? Math.max(0, Math.min(ACTIVITY_MAX_FIELD, Math.floor(limit))) : 16_000;
-  return formatted.length > bound ? `${safeSlice(formatted, bound)}\n…` : formatted;
-}

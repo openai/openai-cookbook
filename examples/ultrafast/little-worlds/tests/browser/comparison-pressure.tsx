@@ -10,7 +10,6 @@ import BuildComparison from '../../src/BuildComparison';
 import GeneratedFrame from '../../src/GeneratedFrame';
 import { BuildActivityPanel } from '../../src/BuildActivityPanel';
 import type { ActivityEntry } from '../../src/build-activity';
-import '../../src/fonts.css';
 import '../../src/styles.css';
 import '../../src/canvas-workspace.css';
 import '../../src/theme.css';

@@ -241,10 +241,6 @@ export async function createApp(options = {}) {
     const space = await directory.metadata(request.spaceId, data.revision.source);
     response.json(scopedSnapshot(data, space, request.canEdit));
   };
-  app.get('/api/spaces/:spaceId/preview', scope, async (request, response) => {
-    const preview = await request.spaceService.preview(request.principal.user.id);
-    response.json({ spaceId: request.spaceId, ...preview });
-  });
   const events = (request, response) => {
     response.status(200).set({ 'Content-Type': 'text/event-stream', Connection: 'keep-alive', 'Cache-Control': 'no-cache, no-transform', 'X-Accel-Buffering': 'no' });
     response.flushHeaders();
@@ -348,35 +344,6 @@ export async function createApp(options = {}) {
     send(replay);
     stream.startHeartbeat(() => { if (!waitingForDrain) waitingForDrain = !response.write(': keepalive\n\n'); });
   };
-  const files = (request, response) => {
-    if (!request.principal.active()) throw httpError(401, 'Your session has ended. Sign in again.');
-    response.status(200).set({ 'Content-Type': 'text/event-stream', Connection: 'keep-alive', 'Cache-Control': 'no-store, no-transform', 'X-Accel-Buffering': 'no' });
-    response.flushHeaders();
-    const stream = createEventStreamLifecycle(response, request.principal);
-    const end = stream.end;
-    let pending;
-    let waitingForDrain = false;
-    const drain = () => {
-      waitingForDrain = false;
-      if (!stream.writable() || !pending) return;
-      const block = pending; pending = undefined;
-      waitingForDrain = !response.write(block);
-    };
-    const send = event => {
-      if (!stream.writable()) return;
-      // One full replacement snapshot is enough even for a slow client. No
-      // file diff can be lost, and generation never awaits the network.
-      pending = `id: ${event.id}\ndata: ${JSON.stringify(event)}\n\n`;
-      if (!waitingForDrain) drain();
-    };
-    response.on('drain', drain);
-    stream.onCleanup(() => { pending = undefined; response.off('drain', drain); });
-    const replay = request.spaceService.files.read();
-    const unsubscribe = request.spaceService.files.subscribe(send, end);
-    stream.onCleanup(unsubscribe);
-    send(replay);
-    stream.startHeartbeat(() => { if (!waitingForDrain) waitingForDrain = !response.write(': keepalive\n\n'); });
-  };
   const registerSpaceRoutes = (base) => {
     const path = (suffix) => base ? `${base}${suffix}` : (suffix || '/api/space');
     app.get(path(''), scope, snapshot);
@@ -387,7 +354,6 @@ export async function createApp(options = {}) {
     app.get(base ? path('/comparison/events') : '/api/comparison/events', scope, ownerOnly, comparisonEvents);
     app.get(base ? path('/comparison/:comparisonId/activity') : '/api/comparison/:comparisonId/activity', scope, ownerOnly, activity);
     app.post(base ? path('/comparison/:comparisonId/finish') : '/api/comparison/:comparisonId/finish', scope, ownerOnly, async (request, response) => response.json(await request.spaceService.finishComparison(request.params.comparisonId)));
-    app.get(base ? path('/files') : '/api/files', scope, ownerOnly, files);
     app.get(base ? path('/revisions') : '/api/revisions', scope, ownerOnly, async (request, response) => response.json(await request.spaceService.revisions()));
     app.post(base ? path('/turn') : '/api/turn', scope, ownerOnly, async (request, response) => {
       if (request.body?.compare !== undefined && typeof request.body.compare !== 'boolean') throw httpError(400, 'compare must be true or false.');

@@ -4,7 +4,6 @@ import { createRoot } from 'react-dom/client';
 import { flushSync } from 'react-dom';
 import BuildComparison from '../../src/BuildComparison';
 import { BuildActivityPanel } from '../../src/BuildActivityPanel';
-import '../../src/fonts.css';
 import '../../src/styles.css';
 import '../../src/canvas-workspace.css';
 import '../../src/theme.css';

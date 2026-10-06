@@ -150,7 +150,7 @@
   }
 
   .comparison-activity-toggle,
-  .build-activity-toggle:not(.workspace-files-toggle) {
+  .build-activity-toggle {
     width: calc(34 * var(--presentation-unit));
     min-height: calc(136 * var(--presentation-unit));
     padding: calc(14 * var(--presentation-unit)) calc(5 * var(--presentation-unit));
@@ -158,13 +158,13 @@
   }
 
   .comparison-activity-toggle > span,
-  .build-activity-toggle:not(.workspace-files-toggle) > span {
+  .build-activity-toggle > span {
     font-size: max(12px, calc(16 * var(--presentation-unit)));
     letter-spacing: .02em;
   }
 
   .comparison-activity-toggle > svg,
-  .build-activity-toggle:not(.workspace-files-toggle) > svg {
+  .build-activity-toggle > svg {
     width: calc(22 * var(--presentation-unit));
     height: calc(22 * var(--presentation-unit));
   }
@@ -181,7 +181,7 @@
     width: min(calc(480 * var(--presentation-unit)), calc(100vw - 60px));
   }
 
-  .build-activity-toggle:not(.workspace-files-toggle)[aria-expanded="true"] {
+  .build-activity-toggle[aria-expanded="true"] {
     right: min(calc(480 * var(--presentation-unit)), calc(100vw - 60px));
   }
 

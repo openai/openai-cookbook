@@ -29,13 +29,13 @@ export function runTests(api){
 }`;
 let callId = 0;
 const tool = (name, args) => ({ model: 'test-model', service_tier: 'ultrafast', output: [
-  { type: 'function_call', call_id: `preview-call-${++callId}`, name, arguments: JSON.stringify(args) },
+  { type: 'function_call', call_id: `snapshot-call-${++callId}`, name, arguments: JSON.stringify(args) },
 ], metrics: { durationMs: 5, ttftMs: 1, outputTokens: 10, servedTier: 'ultrafast' } });
 const published = () => tool('apply_change', { source, tests: checks, summary: 'A shared garden' });
 const gate = () => { let resolve; const promise = new Promise(done => { resolve = done; }); return { promise, resolve }; };
 
 async function fixture(t, respond = async () => published()) {
-  const dataDir = await mkdtemp(join(tmpdir(), 'little-worlds-preview-'));
+  const dataDir = await mkdtemp(join(tmpdir(), 'little-worlds-snapshot-'));
   let modelCalls = 0;
   const instance = await createApp({ dataDir, adapter: { keyAvailable: true, model: 'test-model', tier: 'ultrafast',
     respond: async (request) => { modelCalls++; return respond(request); } } });
@@ -48,8 +48,8 @@ async function fixture(t, respond = async () => published()) {
     ...(json === undefined ? {} : { body: JSON.stringify(json) }),
   });
   const signIn = async userId => (await request('/api/auth/sign-in', { json: { userId } })).json();
-  const preview = async (token, spaceId = 'mira') => {
-    const response = await request(`/api/spaces/${spaceId}/preview`, { token });
+  const snapshot = async (token, spaceId = 'mira') => {
+    const response = await request(`/api/spaces/${spaceId}`, { token });
     assert.equal(response.status, 200);
     return response.json();
   };
@@ -60,50 +60,10 @@ async function fixture(t, respond = async () => published()) {
     await instance.close();
     await rm(dataDir, { recursive: true, force: true });
   });
-  return { ...instance, dataDir, request, signIn, preview, publish, modelCalls: () => modelCalls };
+  return { ...instance, dataDir, request, signIn, snapshot, publish, modelCalls: () => modelCalls };
 }
 
-test('space previews require authentication, scope the space, and represent blank canvases without side effects', async t => {
-  const app = await fixture(t);
-  assert.equal((await app.request('/api/spaces/mira/preview')).status, 401);
-  assert.equal((await app.request('/api/spaces/mira/preview', { token: 'a'.repeat(43) })).status, 401);
-  const leo = await app.signIn('leo');
-  assert.equal((await app.request('/api/spaces/not-a-space/preview', { token: leo.token })).status, 404);
-  const before = app.service.store.read();
-  const response = await app.request('/api/spaces/mira/preview', { token: leo.token });
-  assert.equal(response.headers.get('cache-control'), 'no-store');
-  const preview = await response.json();
-  assert.deepEqual(preview, { spaceId: 'mira', version: (await app.directory.metadata('mira')).previewVersion, html: '', hasBuilt: false });
-  assert.match(preview.version, /^[a-f0-9]{24}$/);
-  assert.deepEqual(app.service.store.read(), before);
-  assert.equal(app.modelCalls(), 0);
-});
-
-test('space previews render for the authenticated viewer and expose no builder data even to owners', async t => {
-  const app = await fixture(t);
-  const mira = await app.signIn('mira');
-  const leo = await app.signIn('leo');
-  await app.publish();
-  await app.service.store.emit({ type: 'draft.preview', title: 'Private title', data: { html: '<p>Secret draft</p>', source: 'Secret code' } });
-  const before = app.service.store.read();
-  const owner = await app.preview(mira.token);
-  const visitor = await app.preview(leo.token);
-  const ownerAgain = await app.preview(mira.token);
-  assert.deepEqual(Object.keys(visitor).sort(), ['hasBuilt', 'html', 'spaceId', 'version']);
-  assert.deepEqual(ownerAgain, owner);
-  assert.equal(owner.version, visitor.version);
-  assert.equal(visitor.hasBuilt, true);
-  assert.match(owner.html, /Hello Mira/);
-  assert.match(visitor.html, /Hello Leo/);
-  assert.equal(visitor.html, (await app.service.snapshot('leo')).html);
-  const forged = await (await app.request('/api/spaces/mira/preview?actor=mira', { token: leo.token })).json();
-  assert.match(forged.html, /Hello Leo/);
-  assert.doesNotMatch(JSON.stringify([owner, visitor]), /Private|Secret|source|tests|session|turns|events|checks/);
-  assert.deepEqual(app.service.store.read(), before);
-  assert.equal(app.modelCalls(), 1, 'previews never call the model');
-});
-
-test('unrenderable saved revisions keep owner recovery controls and safe visitor previews available', async t => {
+test('unrenderable saved revisions keep owner recovery controls and safe visitor snapshots available', async t => {
   const failures = {
     compile: value => `${value}\nexport const PRIVATE_RENDER_DETAILS = ;`,
     render: value => value.replace("return '<section>", "throw Error('PRIVATE_RENDER_DETAILS');return '<section>"),
@@ -138,12 +98,8 @@ test('unrenderable saved revisions keep owner recovery controls and safe visitor
     assert.deepEqual(visiting.state, before.state);
     assert.match(visiting.html, /The owner can restore a version or repair this design/);
     assert.doesNotMatch(JSON.stringify(visiting), /PRIVATE_RENDER_DETAILS/);
-    for (const [token, expected] of [[owner.token, own], [visitor.token, visiting]]) {
-      const preview = await app.preview(token);
-      assert.equal(preview.html, expected.html);
-      assert.equal(preview.hasBuilt, true);
-      assert.equal(preview.version, (await app.directory.metadata('mira')).previewVersion);
-      assert.doesNotMatch(preview.html, /PRIVATE_RENDER_DETAILS|<(?:button|input|form|a|style)\b|data-action/);
+    for (const snapshot of [own, visiting]) {
+      assert.doesNotMatch(snapshot.html, /PRIVATE_RENDER_DETAILS|<(?:button|input|form|a|style)\b|data-action/);
     }
     const history = await app.request('/api/spaces/mira/revisions', { token: owner.token });
     assert.equal(history.status, 200);
@@ -160,7 +116,7 @@ test('unrenderable saved revisions keep owner recovery controls and safe visitor
   });
 });
 
-test('working files, streaming drafts, and private log pruning cannot replace or invalidate a published preview', async t => {
+test('working files, streaming drafts, and private log pruning cannot expose unpublished content to visitors', async t => {
   const draftEntered = gate();
   const release = gate();
   // Register before fixture teardown so failures cannot leave its model waiting.
@@ -177,7 +133,7 @@ test('working files, streaming drafts, and private log pruning cannot replace or
   });
   const leo = await app.signIn('leo');
   await app.publish();
-  const before = await app.preview(leo.token);
+  const before = await app.snapshot(leo.token);
   await app.service.submit('Private unpublished request');
   await draftEntered.promise;
   const turnId = app.service.store.read().session.turns.at(-1).id;
@@ -187,48 +143,32 @@ test('working files, streaming drafts, and private log pruning cannot replace or
     addEvent(data, { type: 'draft.preview', data: { html: '<p>Unpublished secret garden</p>' } });
   });
   assert.equal(app.service.store.read().events.some(event => event.type === 'revision.published'), false);
-  assert.deepEqual(await app.preview(leo.token), before);
-  assert.equal((await app.directory.metadata('mira')).previewVersion, before.version);
+  const during = await app.snapshot(leo.token);
+  assert.equal(during.html, before.html);
+  assert.deepEqual(during.revision, before.revision);
+  assert.deepEqual(during.state, before.state);
+  assert.doesNotMatch(JSON.stringify(during), /Private|Unpublished|source|tests|turns/);
   await app.service.cancel();
   release.resolve();
   await app.service.waitForIdle();
-  assert.deepEqual(await app.preview(leo.token), before);
+  const after = await app.snapshot(leo.token);
+  assert.equal(after.html, before.html);
+  assert.deepEqual(after.revision, before.revision);
+  assert.deepEqual(after.state, before.state);
 });
 
-test('preview versions follow public state, publication, restoration and reset', async t => {
-  const app = await fixture(t);
-  const leo = await app.signIn('leo');
-  const blank = await app.preview(leo.token);
-  await app.publish();
-  const built = await app.preview(leo.token);
-  assert.notEqual(built.version, blank.version);
-  await app.service.action({ actor: 'leo', revisionId: 2, action: { type: 'leave', text: 'Hello garden' } });
-  const joined = await app.preview(leo.token);
-  assert.notEqual(joined.version, built.version);
-  assert.match(joined.html, /1 shared thoughts/);
-  assert.equal((await app.directory.metadata('mira')).previewVersion, joined.version);
-  await app.publish();
-  const republished = await app.preview(leo.token);
-  assert.notEqual(republished.version, joined.version, 'a new published revision has its own version');
-  await app.service.restore(2);
-  const restored = await app.preview(leo.token);
-  assert.notEqual(restored.version, republished.version);
-  assert.equal(restored.html, joined.html);
-  await app.service.reset();
-  const reset = await app.preview(leo.token);
-  assert.notEqual(reset.version, restored.version);
-  assert.deepEqual(reset, blank, 'an identical blank canvas can reuse its original content identity');
-});
-
-test('a preview keeps its captured HTML and version consistent through concurrent public changes', async t => {
+test('a snapshot keeps its captured HTML and state consistent through concurrent public changes', async t => {
   const app = await fixture(t);
   const leo = await app.signIn('leo');
   await app.publish();
-  const before = await app.preview(leo.token);
-  const rendering = app.service.preview('leo');
-  await app.service.action({ actor: 'leo', revisionId: 2, action: { type: 'leave', text: 'Changed during preview' } });
-  assert.deepEqual(await rendering, { version: before.version, html: before.html, hasBuilt: true });
-  const after = await app.preview(leo.token);
-  assert.notEqual(after.version, before.version);
+  const before = await app.snapshot(leo.token);
+  const rendering = app.service.snapshot('leo');
+  await app.service.action({ actor: 'leo', revisionId: 2, action: { type: 'leave', text: 'Changed during render' } });
+  const captured = await rendering;
+  assert.equal(captured.html, before.html);
+  assert.deepEqual(captured.state, before.state);
+  assert.equal(captured.revision.id, before.revision.id);
+  const after = await app.snapshot(leo.token);
+  assert.notDeepEqual(after.state, before.state);
   assert.match(after.html, /1 shared thoughts/);
 });

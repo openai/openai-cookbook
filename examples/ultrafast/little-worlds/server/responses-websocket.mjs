@@ -10,7 +10,7 @@ const safeMessage = value => String(value || 'The model request failed.').replac
 // One connection belongs to one adapter/space. Every call sends full input, so
 // reconnects never rely on connection-local conversation state.
 export function createResponsesWebSocket({
-  apiKey, tier, WebSocketImpl = WebSocket,
+  apiKey, WebSocketImpl = WebSocket,
   proxyUrl = process.env.HTTPS_PROXY || process.env.https_proxy || process.env.HTTP_PROXY || process.env.http_proxy,
   handshakeTimeoutMs = 5000, responseTimeoutMs = 120_000, idleTimeoutMs = 30_000,
 } = {}) {

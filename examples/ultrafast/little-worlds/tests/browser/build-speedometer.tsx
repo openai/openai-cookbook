@@ -1,4 +1,3 @@
-import '../../src/fonts.css';
 // Isolated UI fixture: synthetic activity only, with no auth, API, or model calls.
 // Run with node tests/browser/build-activity-server.mjs and open
 // http://127.0.0.1:5190/tests/browser/build-speedometer.html.

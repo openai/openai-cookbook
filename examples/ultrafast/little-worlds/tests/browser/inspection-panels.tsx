@@ -1,4 +1,3 @@
-import '../../src/fonts.css';
 // Run on the isolated build-activity-server fixture (port 5190), sign in as
 // Mira, then run at desktop and narrow widths. Real UI/API, mocked models,
 // no microphone. Also run with browser reduced motion enabled.
@@ -91,7 +90,6 @@ function Checks() {
       }
       assert(!document.querySelector('.space-address,.space-breadcrumb'), 'The redundant space address must be removed.');
       assert(visible(document.querySelector('.space-toolbar')), 'Thread, History and help must start visible in the single-world view.');
-      assert(!document.querySelector('.workspace-files-toggle,#workspace-files-panel'), 'Files must be removed from the workspace.');
       if (document.querySelector('.build-activity-toggle[aria-expanded="true"]')) await click('Close build activity');
       await click('Open build activity');
       assert(document.querySelector('#build-activity-panel'), 'Standalone Activity still opens.');

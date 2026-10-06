@@ -1,7 +1,6 @@
 import type { GameShape, GameView } from '../shared/game-schema.mjs';
 
 export type FrameGameStatus = 'idle' | 'loading' | 'running' | 'paused' | 'finished' | 'error';
-export type FrameGameEvent = { type: 'frame'; view: GameView; intervalMs?: number; kind?: 'tick' | 'action' | 'reset' } | { type: 'status'; status: FrameGameStatus; message?: string };
 
 /** Trusted canvas rendering and native controls. Serialized into the opaque frame. */
 export function installFrameGame(options: {

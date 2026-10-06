@@ -1,10 +1,10 @@
-export interface PersonaProfile { role: string; tagline: string; theme: string; avatar?: string }
+export interface PersonaProfile { role: string; tagline: string; theme: string }
 export interface Actor { id: string; name: string; profile?: PersonaProfile }
 export interface SignedIn { user: Actor; ownSpaceId: string; simulated?: boolean }
 export interface SpaceIcon { status: 'empty' | 'generating' | 'ready' | 'error'; source?: 'generated' | 'upload'; version?: string; dataUrl?: string; lightDataUrl?: string; error?: string }
 export interface SpaceAppearance { lightCss: string; presentationCss?: string }
 export interface AccountPerson extends Actor { ownSpaceId: string; icon?: SpaceIcon }
-export interface SpaceSummary { id: string; owner: Actor; kind: 'studio' | 'blank'; revisionId: number; hasBuilt: boolean; previewVersion?: string; profile?: PersonaProfile; icon?: SpaceIcon; appearance?: SpaceAppearance }
+export interface SpaceSummary { id: string; owner: Actor; kind: 'studio' | 'blank'; revisionId: number; hasBuilt: boolean; profile?: PersonaProfile; icon?: SpaceIcon; appearance?: SpaceAppearance }
 export interface SavedTurn { id: string; message: string; status: string; startedAt: string; revisionId?: number }
 export interface Project { id: string; title: string; description: string; color: string }
 export interface Contribution { id: string; actorId: string; projectId: string; points: number }

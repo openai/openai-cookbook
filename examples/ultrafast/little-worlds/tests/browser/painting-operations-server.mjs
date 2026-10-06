@@ -13,7 +13,7 @@ import { setTimeout as delay } from 'node:timers/promises';
 import { randomUUID } from 'node:crypto';
 import { createServer } from 'vite';
 import { createApp } from '../../server/index.mjs';
-import { paintingProposal } from '../../server/painting/index.mjs';
+import { paintingProposal } from '../fixtures/painting/index.mjs';
 
 const root = fileURLToPath(new URL('../../', import.meta.url));
 const noNetwork = async () => { throw new Error('External services are disabled in the painting browser fixture.'); };

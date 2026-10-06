@@ -1,6 +1,6 @@
 import { readFile } from 'node:fs/promises';
 
-/** Offline, reviewed source. Dimensions are substituted once; every contract derives from them. */
+/** Regression fixture. Dimensions are substituted once; every contract derives from them. */
 export async function paintingProposal({ columns = 48, rows = 32 } = {}) {
   if (!Number.isInteger(columns) || !Number.isInteger(rows) || columns < 1 || rows < 1 || columns > 256 || rows > 256) {
     throw new Error('Painting dimensions must be integers from 1 to 256.');

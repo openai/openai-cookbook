@@ -4,7 +4,7 @@ import { readFile } from 'node:fs/promises';
 import { transform } from 'esbuild';
 
 const { code } = await transform(await readFile(new URL('../src/build-activity.ts', import.meta.url), 'utf8'), { loader: 'ts', format: 'esm' });
-const { mergeActivityEvents, parseActivityArguments, activityCode, prettyActivityJson, ACTIVITY_MAX_ENTRIES, ACTIVITY_MAX_FIELD, ACTIVITY_MAX_CONTENT } = await import(`data:text/javascript;base64,${Buffer.from(code).toString('base64')}`);
+const { mergeActivityEvents, parseActivityArguments, activityCode, ACTIVITY_MAX_ENTRIES, ACTIVITY_MAX_FIELD, ACTIVITY_MAX_CONTENT } = await import(`data:text/javascript;base64,${Buffer.from(code).toString('base64')}`);
 
 const time = '2026-09-21T12:00:00.000Z';
 const event = (entryId, properties = {}, overrides = {}) => ({ id: '1', type: 'activity.entry', time, turnId: 'turn-1', title: 'Writing the page', data: { entryId, kind: 'tool', tool: 'apply_change', status: 'running', ...properties }, ...overrides });
@@ -128,7 +128,6 @@ test('custom patches remain raw text while legacy function patches retain their 
   assert.equal(row.arguments, patch);
   assert.equal(row.inputFormat, 'patch');
   assert.deepEqual(activityCode(row), [], 'The panel shows the raw patch once, not a second generated-source view');
-  assert.equal(prettyActivityJson(row.arguments), patch);
   assert.deepEqual(activityCode(entry('apply_patch', '{"edits":[{"path":"space.js","search":"old","replace":"new"}]}')), [{ path: 'space.js · edit 1', code: 'new' }]);
   const [unrecognized] = mergeActivityEvents([], [event('unknown', { inputFormat: 'untrusted' })]);
   assert.equal(unrecognized.inputFormat, undefined);
@@ -141,12 +140,4 @@ test('JSON parsing is depth and size bounded and does not modify object prototyp
   assert.equal(Object.getPrototypeOf(parsed), null);
   assert.equal({}.polluted, undefined);
   assert.equal(parsed.source, 'safe');
-});
-
-test('JSON formatting remains readable and bounded for complete and partial payloads', () => {
-  assert.equal(prettyActivityJson('{"ok":true}'), '{\n  "ok": true\n}');
-  assert.equal(prettyActivityJson('{"unfinished":"'), '{"unfinished":"');
-  assert.equal(prettyActivityJson('a'.repeat(20), 5), 'aaaaa\n…');
-  assert.equal(prettyActivityJson(undefined), '');
-  assert.equal(prettyActivityJson('🌱', 1), '\n…');
 });

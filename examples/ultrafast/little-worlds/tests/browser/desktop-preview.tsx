@@ -8,7 +8,6 @@ import { BuildActivityPanel } from '../../src/BuildActivityPanel';
 import GeneratedFrame from '../../src/GeneratedFrame';
 import { getVoiceFrame } from '../../src/voice-frame-registry';
 import type { FrameVoiceSurface } from '../../src/voice-frame-registry';
-import '../../src/fonts.css';
 import '../../src/styles.css';
 import '../../src/canvas-workspace.css';
 import '../../src/theme.css';

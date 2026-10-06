@@ -114,10 +114,3 @@ test('server configuration is loaded once rather than re-reading credentials for
     assert.equal(await loadApiKey(), 'fixture-first-key');
   `);
 });
-
-test('latency benchmark requires an explicit input before loading credentials or making requests', () => {
-  const result = spawnSync(process.execPath, [join(project, 'scripts', 'benchmark-latency.mjs')], { encoding: 'utf8' });
-  assert.notEqual(result.status, 0);
-  assert.match(result.stderr, /Supply --seed PATH or --space-file PATH/);
-  assert.equal(result.stdout, '');
-});

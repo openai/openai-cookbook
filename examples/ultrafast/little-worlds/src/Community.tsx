@@ -16,7 +16,7 @@ gsap.registerPlugin(useGSAP);
 
 // Old bookmarked routes still lead into the real community.
 export type CommunityPlace = 'map' | 'noor' | 'jules' | 'sol';
-export type CommunitySpace = SpaceSummary & { profile?: { role?: string; tagline?: string; theme?: string; avatar?: string } };
+export type CommunitySpace = SpaceSummary & { profile?: { role?: string; tagline?: string; theme?: string } };
 export type FriendConnection = { id: string; source: string; target: string };
 type FriendRequest = { id: string; fromId: string; toId: string; status: string; createdAt: string };
 type CommunityData = { spaces: CommunitySpace[]; connections: FriendConnection[]; requests: { incoming: FriendRequest[]; outgoing: FriendRequest[] } };

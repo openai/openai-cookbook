@@ -115,10 +115,10 @@ html[data-theme='light'] :is(.send-button, .canvas-workspace .send-button, .fini
 html[data-theme='light'] :is(.send-button:hover:not(:disabled), .canvas-workspace .send-button:hover:not(:disabled), .finish-build-button:hover:not(:disabled)) { background: #007f36; }
 html[data-theme='light'] :is(.send-button:disabled, .canvas-workspace .send-button:disabled) { background: var(--surface-hover); color: #88909c; }
 html[data-theme='light'] :is(.icon-button:hover, .thread-activity-link:hover) { background: var(--surface-hover); }
-html[data-theme='light'] :is(.help-button, .key-note, .thread-kept, .location, .thread-empty, .guide-steps p, .guide-bottom p, .guide-bottom > a, .loading-space, .visitor-note p, .cancel-button, .section-label h2, .section-label > span, .empty-canvas p, .streaming-status > span:last-child) { color: var(--muted); }
-html[data-theme='light'] :is(.revision-list > div, .guide-bottom, .section-label, .location, .streaming-status) { border-color: var(--line); }
+html[data-theme='light'] :is(.help-button, .key-note, .location, .thread-empty, .guide-steps p, .guide-bottom p, .guide-bottom > a, .loading-space, .visitor-note p, .cancel-button, .section-label h2, .section-label > span, .empty-canvas p) { color: var(--muted); }
+html[data-theme='light'] :is(.revision-list > div, .guide-bottom, .section-label, .location) { border-color: var(--line); }
 html[data-theme='light'] .with-build-comparison .composer-area { background: linear-gradient(transparent, var(--paper) 12px); }
-html[data-theme='light'] :is(.comparison-error, .runtime-error) { color: var(--danger-text); }
+html[data-theme='light'] .comparison-error { color: var(--danger-text); }
 
 /* Native dialogs, toasts, and identity tools. */
 html[data-theme='light'] :is(.modal, .reset-demo-dialog, .space-icon-dialog, .toast) { color-scheme: light; color: var(--ink); background: var(--surface); border-color: var(--line); box-shadow: 0 24px 80px #20263026; }

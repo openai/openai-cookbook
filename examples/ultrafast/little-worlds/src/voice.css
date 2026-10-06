@@ -216,8 +216,7 @@
   .with-live-voice .community-overlay { top: var(--voice-strip-height); }
   .with-live-voice .community-overlay::before { top: var(--voice-strip-height); }
   .with-live-voice .community-requests { top: calc(var(--voice-strip-height) + 67px); max-height: calc(100dvh - var(--voice-strip-height) - 90px); }
-  .with-live-voice .runtime-panel,
-  .with-live-voice .canvas-workspace :is(.workspace-files-panel, .build-activity-panel:not(.is-embedded)) { top: var(--voice-workspace-top); }
+  .with-live-voice .canvas-workspace .build-activity-panel:not(.is-embedded) { top: var(--voice-workspace-top); }
   .with-live-voice .canvas-workspace .build-activity-toggle[aria-expanded="true"] { top: calc(var(--voice-workspace-top) + (100dvh - var(--voice-workspace-top)) / 2); }
   .voice-dock { --voice-dock-top: calc(10px + env(safe-area-inset-top)); }
   .voice-dock::before {
@@ -236,18 +235,6 @@
   }
   .community-overlay .voice-dock::before { background: #000000f5; border-bottom-color: #ffffff1a; }
   .voice-in-dialog.voice-dock::before { display: none; }
-}
-
-/* With voice in its own strip, the two inspections split the space below
-   both headers. Their controls stay centered on their respective panels. */
-@media (max-width: 799px) {
-  .with-live-voice .canvas-workspace.with-build-activity.with-workspace-files {
-    --inspection-half-height: calc((100dvh - var(--voice-workspace-top)) / 2);
-  }
-  .with-live-voice .canvas-workspace.with-build-activity.with-workspace-files .workspace-files-panel { top: var(--voice-workspace-top); }
-  .with-live-voice .canvas-workspace.with-build-activity.with-workspace-files .build-activity-panel:not(.is-embedded) { top: calc(var(--voice-workspace-top) + var(--inspection-half-height)); }
-  .with-live-voice .canvas-workspace.with-build-activity.with-workspace-files .workspace-files-toggle { top: calc(var(--voice-workspace-top) + var(--inspection-half-height) / 2); }
-  .with-live-voice .canvas-workspace.with-build-activity.with-workspace-files .build-activity-toggle:not(.workspace-files-toggle) { top: calc(var(--voice-workspace-top) + var(--inspection-half-height) * 1.5); }
 }
 
 @media (max-width: 760px) {

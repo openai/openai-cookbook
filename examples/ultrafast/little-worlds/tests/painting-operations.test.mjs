@@ -1,6 +1,6 @@
 import test from 'node:test';
 import assert from 'node:assert/strict';
-import { paintingProposal } from '../server/painting/index.mjs';
+import { paintingProposal } from './fixtures/painting/index.mjs';
 import { compileModule, reduceModule, renderModule, verifyModule } from '../server/runtime.mjs';
 import { validateAgentAction } from '../server/space-agent-schema.mjs';
 

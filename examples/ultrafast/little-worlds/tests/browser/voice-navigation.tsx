@@ -1,4 +1,3 @@
-import '../../src/fonts.css';
 import { StrictMode } from 'react';
 import { createRoot } from 'react-dom/client';
 import type { Root } from 'react-dom/client';
@@ -442,7 +441,6 @@ async function run() {
       await voiceBuild('Add a tile showing the first idea.', 1);
       await until(() => document.querySelector('.composer.is-building'), 'first build in progress');
       await until(() => document.querySelectorAll('.build-activity-panel.is-embedded').length === 2, 'both automatic activity panels');
-      assert(!document.querySelector('.workspace-files-toggle,#workspace-files-panel'), 'The removed Files panel is still available.');
       assert(!document.querySelector('.finish-build-button'), 'Finish was exposed before ultrafast completed.');
     });
     await check('A running comparison survives navigating away and returns with both streams', async () => {

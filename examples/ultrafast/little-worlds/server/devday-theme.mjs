@@ -2,18 +2,6 @@
 // These instructions guide model output; they do not grant runtime privileges.
 export const DEV_DAY_THEME_VERSION = 'openai-devday-2026-v1';
 
-export const DEV_DAY_COLORS = Object.freeze({
-  background: '#000000',
-  surface: '#111111',
-  text: '#ffffff',
-  muted: '#a3a3a3',
-  line: '#2a2a2a',
-  green: '#04b84c',
-  purple: '#924ff7',
-  blue: '#006aff',
-  orange: '#ff8549',
-});
-
 export const devDayDesignInstructions = `OPENAI DEVDAY 2026 CREATIVE CONTRACT
 Every new world, tile, control, illustration and later edit belongs to the same Little Worlds at OpenAI DevDay experience. Apply this contract to the generated canvas itself, not just the surrounding host. Keep each person's subject, personality, useful content and spatial composition distinctive; do not give every world the same dashboard or replace its artwork with generic event logos.
 

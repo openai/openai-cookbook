@@ -11,13 +11,11 @@ import { createDraftPreviewer } from './draft-preview.mjs';
 import { createBuildActivity } from './build-activity.mjs';
 import { createBuildComparison, createComparisonActivity } from './build-comparison.mjs';
 import { buildProgressContext, createBuildProgressEstimator, estimateBuildProgress, BUILD_ESTIMATE_TIMEOUT_MS } from './build-progress-estimate.mjs';
-import { createWorkspaceFiles } from './workspace-files.mjs';
 import { applySourceEdits } from './source-edits.mjs';
 import { applyCodexPatch, CODEX_PATCH_GRAMMAR } from './codex-patch.mjs';
 import { projectCodexPatch } from './codex-patch-preview.mjs';
 import { gameConfigs, validateGameState } from '../shared/game-schema.mjs';
 import { devDayDesignInstructions, buildAppearanceInstructions } from './devday-theme.mjs';
-import { demoAppearanceFor } from './demo-appearance.mjs';
 
 const hash = (value) => createHash('sha256').update(typeof value === 'string' ? value : JSON.stringify(value)).digest('hex');
 const definition = (name, description, properties = {}) => ({ type: 'function', name, description, strict: true, parameters: { type: 'object', properties, required: Object.keys(properties), additionalProperties: false } });
@@ -99,20 +97,10 @@ tests.js exports synchronous runTests(api) => [{name,ok,message?}] and nothing e
 
 Keep source concise, but include the complete requested behavior and tests; games may need more code than simple pages. The current source/tests/data appear in input, so do not inspect redundantly. Use the Codex patch grammar: Add File for full writes; Update File with @@ context and lines prefixed by space, -, or + for targeted edits; Delete File and Move to are allowed only within the two workspace filenames and only if both required files exist at the end. Preserve unrelated code, including working motion, timing, and controls during unrelated edits. When refining animation, improve the requested feel and address discontinuities or rendering cost without discarding the intended style or behavior. Do not claim a measured frame rate or visual smoothness from code checks alone. Prefer readable source with line breaks so future edits can use small hunks. Combine every related source and test edit into ONE apply_patch call so they are verified and published together. Reuse tests for visual-only changes; update tests when behavior or an explicitly tested expectation changes. Never wrap the patch in JSON or Markdown fences. Every complete patch runs the same full verification and atomic publication. Stop after successful publication. If verification fails, correct the working workspace using tool feedback and another apply_patch. A malformed patch leaves the workspace unchanged. Publication is app-owned and blocked if checks fail, cancellation arrives, or new owner instructions need incorporation. Never claim publication without a successful tool result. Avoid commentary before tool calls; the app shows progress. No need to narrate reasoning.`;
 }
-export const agentInstructions = instructionsForSpace();
 
 class HttpError extends Error { constructor(status, message) { super(message); this.status = status; } }
 class Cancelled extends Error { constructor() { super('The change was stopped. Your published space is unchanged.'); this.name = 'AbortError'; } }
 const currentRevision = (data) => data.revisions.find((revision) => revision.id === data.currentRevisionId);
-
-// Preview identity follows only the inputs to the published render. Private
-// builder events and draft files cannot invalidate it, even after log pruning.
-// The viewer is intentionally separate: callers must scope any HTML cache to
-// their authenticated session because render() also receives that actor.
-export function spacePreviewVersion(data) {
-  const revision = currentRevision(data);
-  return hash([revision.id, revision.source, data.state]).slice(0, 24);
-}
 
 async function seedData(seed, verificationActors, sequence = 0) {
   const result = await verifyModule(seed.source, seed.tests, clone(seed.state), verificationActors);
@@ -220,15 +208,6 @@ export async function createSpaceService({ dataDir, adapter, comparisonAdapter, 
 
   const activity = createBuildActivity();
   const stopActivity = store.subscribe(event => activity.lifecycle(event));
-  const files = createWorkspaceFiles({ getPublished: () => {
-    const data = store.read();
-    const revision = currentRevision(data);
-    return { sessionId: data.session.id, revisionId: revision.id, source: revision.source, tests: revision.tests };
-  } });
-  const stopFiles = store.subscribe(event => {
-    if (['revision.published', 'turn.completed', 'turn.failed', 'turn.cancelled', 'space.reset'].includes(event.type)
-      || event.type === 'space.updated' && event.data?.reset) files.published();
-  });
 
   async function bundleFor(revision) {
     const key = hash(revision.source);
@@ -271,7 +250,6 @@ export async function createSpaceService({ dataDir, adapter, comparisonAdapter, 
     await writeFile(join(turn.directory, 'tests.js'), tests, { mode: 0o600 });
     guard(turn);
     turn.source = source; turn.tests = tests; turn.verified = null;
-    files.working(turn);
     await emit(turn, { type: 'tool.completed', stage: 'build', title: 'Wrote the working change', detail: 'space.js + tests.js', data: { tool: 'write_file', files: ['space.js', 'tests.js'], sourceCharacters: source.length, testCharacters: tests.length } });
     return { ok: true, files: ['space.js', 'tests.js'] };
   }
@@ -335,7 +313,6 @@ export async function createSpaceService({ dataDir, adapter, comparisonAdapter, 
           await writeFile(join(turn.directory, args.path), args.content, { mode: 0o600 });
           guard(turn);
           turn[args.path === 'space.js' ? 'source' : 'tests'] = args.content; turn.verified = null;
-          files.working(turn);
           await emit(turn, { type: 'tool.completed', stage: 'build', title: `Wrote ${args.path}`, data: { tool: call.name, file: args.path, characters: args.content.length } });
           result = { ok: true, path: args.path }; break;
         case 'verify_workspace': result = await verify(turn); break;
@@ -357,7 +334,6 @@ export async function createSpaceService({ dataDir, adapter, comparisonAdapter, 
       }
     } catch (error) {
       if (turn.controller.signal.aborted) throw new Cancelled();
-      files.working(turn);
       result = { ok: false, error: publicError(error) };
       await emit(turn, { type: 'tool.failed', stage: call.name.includes('publish') ? 'publish' : 'build', title: 'Adjusting the change', detail: result.error, data: { tool: call.name } });
     }
@@ -395,7 +371,6 @@ export async function createSpaceService({ dataDir, adapter, comparisonAdapter, 
       await emit(turn, { type: 'tool.completed', stage: 'inspect', title: 'Read the current space', detail: 'Source, tests and live data are in context.', data: { tool: 'inspect_space', revisionId: currentRevision(store.read()).id } });
       for (let loop = 0; loop < 8; loop++) {
         draftPreview.discard();
-        files.beginResponse();
         if (turn.controller.signal.aborted) throw new Cancelled();
         await flushSteering(turn);
         await emit(turn, { type: 'model.started', stage: 'build', title: loop === 0 ? 'Shaping your next possibility' : 'Refining the working change', detail: `${provider.model || model} · ${turn.requestedTier}`, data: { model: provider.model || model, requestedTier: turn.requestedTier, iteration: loop + 1 } });
@@ -407,7 +382,6 @@ export async function createSpaceService({ dataDir, adapter, comparisonAdapter, 
           // model's input, encrypted reasoning, or provider transport details.
           if (active === turn && !turn.controller.signal.aborted) {
             activity.providerEvent(turn.id, loop, event);
-            if (previewActive()) files.providerEvent(event);
           }
           if (event.type === 'response.output_item.added' && isToolCall(event.item)) {
             streamingCalls.set(event.output_index, { type: event.item.type, name: event.item.name, arguments: event.item.arguments || '', input: event.item.input || '' });
@@ -455,7 +429,6 @@ export async function createSpaceService({ dataDir, adapter, comparisonAdapter, 
         if (turn.controller.signal.aborted) throw new Cancelled();
         const output = response.output || [];
         activity.providerOutput(turn.id, loop, output);
-        if (previewActive()) files.providerOutput(output);
         // Keep native item types, including custom calls and encrypted reasoning,
         // so Responses replay receives the matching custom/function output type.
         await store.transact((data) => { data.session.items.push(...clone(output)); });
@@ -505,10 +478,10 @@ export async function createSpaceService({ dataDir, adapter, comparisonAdapter, 
     const stopEvents = target.store.subscribe(event => {
       comparison.lifecycle(record.id, lane, event);
       if (event.turnId === turnId && /^turn\.(completed|failed|cancelled)$/.test(event.type)) {
-        // preview() captures its revision/data before rendering. A later turn
+        // snapshot() captures its revision/data before rendering. A later turn
         // cannot change this result, and the comparison ID rejects stale work.
         const preview = event.type === 'turn.completed'
-          ? target.preview(owner.id).then(result => comparison.html(record.id, lane, turnId, result.html)).catch(() => {})
+          ? target.snapshot(owner.id).then(result => comparison.html(record.id, lane, turnId, result.html)).catch(() => {})
           : Promise.resolve();
         if (lane === 'standard') void preview.then(() => releaseCompanion(target)).catch(() => {});
       }
@@ -641,7 +614,6 @@ export async function createSpaceService({ dataDir, adapter, comparisonAdapter, 
   const service = {
     store,
     activity,
-    files,
     comparison,
     owner,
     kind,
@@ -651,17 +623,6 @@ export async function createSpaceService({ dataDir, adapter, comparisonAdapter, 
       const data = store.read(); const revision = currentRevision(data);
       const html = await publishedHtml(revision, data.state, actor);
       return { owner, kind, state: data.state, revision, html, actor, session: { id: data.session.id, status: data.session.status, lastOutcome: data.session.lastOutcome, turnCount: data.session.turns.length, lastMessage: data.session.turns.at(-1)?.message, turns: data.session.turns.map(({ id, message, status, startedAt, revisionId }) => ({ id, message, status, startedAt, revisionId })) }, config: { model: provider.model || model, requestedTier: provider.tier || tier, reasoningEffort: provider.reasoningEffort || 'unknown', keyAvailable: provider.keyAvailable !== false, adapter: 'local' }, events: data.events };
-    },
-    async preview(actorId = owner.id) {
-      const actor = actorFor(actorId); if (!actor) throw new HttpError(400, 'Unknown participant.');
-      // Capture all inputs together, before awaiting the isolated renderer, so
-      // a concurrent publication cannot pair old HTML with a newer version.
-      const data = store.read(); const revision = currentRevision(data);
-      const hasBuilt = revision.source.trim() !== blankSeedSource.trim();
-      const version = spacePreviewVersion(data);
-      const html = hasBuilt ? await publishedHtml(revision, data.state, actor) : '';
-      const appearance = demoAppearanceFor(owner.id, revision.source);
-      return { version, html, hasBuilt, ...(appearance ? { appearance } : {}) };
     },
     async game(actorId, gameId) {
       const actor = actorFor(actorId); if (!actor) throw new HttpError(400, 'Unknown participant.');
@@ -735,7 +696,6 @@ export async function createSpaceService({ dataDir, adapter, comparisonAdapter, 
         });
       })();
       try { await turn.preparation; } catch (error) { active = null; throw error; }
-      files.begin(turn.id);
       turn.promise = run(turn);
       return { turnId: turn.id };
     },
@@ -746,7 +706,6 @@ export async function createSpaceService({ dataDir, adapter, comparisonAdapter, 
       const turn = active;
       turn?.controller.abort();
       const standard = await companion?.service?.cancel();
-      if (turn) files.published();
       return { cancelled: Boolean(turn || standard?.cancelled || wasPreparing), ...(turn ? { turnId: turn.id } : {}) };
     },
     getComparisonActivity(id) {
@@ -840,7 +799,7 @@ export async function createSpaceService({ dataDir, adapter, comparisonAdapter, 
         await disposeComparisonWork();
         await stopping?.preparation?.catch(() => {}); await stopping?.promise; await store.flush();
       }
-      finally { stopProgressObserver(); comparison.close(); stopActivity(); activity.close(); stopFiles(); files.close(); await provider.close?.(); }
+      finally { stopProgressObserver(); comparison.close(); stopActivity(); activity.close(); await provider.close?.(); }
     },
   };
   return service;

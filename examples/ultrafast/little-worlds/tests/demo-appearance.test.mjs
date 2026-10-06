@@ -10,7 +10,7 @@ import { createApp } from '../server/index.mjs';
 import { communityBoardSource, communityBoardSeed } from '../server/community-board.mjs';
 import { demoAppearanceFor, withDemoIconAppearance } from '../server/demo-appearance.mjs';
 import { normalizeSpaceIcon } from '../server/space-icon-image.mjs';
-import { paintingProposal } from '../server/painting/index.mjs';
+import { paintingProposal } from './fixtures/painting/index.mjs';
 import { arcadeProposal } from '../server/arcade/index.mjs';
 
 const originalIcon = {
@@ -108,7 +108,7 @@ test('all prepared worlds have independent local light styles', async () => {
   }
 });
 
-test('owner, visitor, community, sign-in, and preview surfaces share light assets without store writes', async t => {
+test('owner, visitor, community, and sign-in surfaces share light assets without store writes', async t => {
   const app = await fixture(t);
   const nora = await app.signIn('nora');
   const leo = await app.signIn('leo');
@@ -120,11 +120,6 @@ test('owner, visitor, community, sign-in, and preview surfaces share light asset
     const snapshot = await app.request('/api/spaces/nora', { token });
     assert.deepEqual(snapshot.space.appearance, expected);
     assert.equal(snapshot.space.icon.lightDataUrl, lightIcon);
-    const preview = await app.request('/api/spaces/nora/preview', { token });
-    assert.deepEqual(preview.appearance, expected);
-    assert.equal(preview.html, snapshot.html);
-    assert.equal(preview.version, snapshot.space.previewVersion);
-    assert.deepEqual(Object.keys(preview).sort(), ['appearance', 'hasBuilt', 'html', 'spaceId', 'version']);
     const community = await app.request('/api/community', { token });
     assert.deepEqual(community.spaces.find(space => space.id === 'nora').appearance, expected);
   }
@@ -146,7 +141,7 @@ test('participation preserves appearance while source edits and replacement artw
   } });
   const participated = service.store.read();
   assert.ok((await app.directory.metadata('nora')).appearance);
-  assert.match((await service.preview('leo')).html, /Keep my shared message/);
+  assert.match((await service.snapshot('leo')).html, /Keep my shared message/);
   const replacement = await normalizeSpaceIcon(await sharp({ create: { width: 32, height: 32, channels: 3, background: '#336699' } }).png().toBuffer());
   const uploaded = await app.directory.uploadIcon('nora', replacement);
   assert.equal(uploaded.lightDataUrl, undefined);
@@ -155,7 +150,6 @@ test('participation preserves appearance while source edits and replacement artw
   assert.deepEqual(service.store.read().state, participated.state);
   await service.store.transact(data => { data.revisions.find(item => item.id === data.currentRevisionId).source += '\n// Owner customized the page'; });
   assert.equal((await app.directory.metadata('nora')).appearance, undefined);
-  assert.equal((await service.preview('leo')).appearance, undefined);
   assert.equal((await app.request('/api/spaces/nora', { token: nora.token })).space.appearance, undefined);
   assert.deepEqual(service.store.read().state, participated.state);
 });

@@ -1,7 +1,7 @@
 import { createHash, randomBytes, randomUUID } from 'node:crypto';
 import { mkdir, readFile, rename, unlink, writeFile } from 'node:fs/promises';
 import { join } from 'node:path';
-import { createSpaceService, spacePreviewVersion } from './harness.mjs';
+import { createSpaceService } from './harness.mjs';
 import { blankSeedSource } from './seed.mjs';
 import { createSocialGraph } from './social.mjs';
 import { createSpaceIconManager } from './space-icons.mjs';
@@ -26,10 +26,10 @@ export const demoUsers = [
   { id: 'nora', name: 'Nora', ownSpaceId: 'nora', kind: 'blank' },
 ];
 export const personaProfiles = {
-  mira: { role: 'Botany enthusiast', tagline: 'Growing a little wonder.', theme: 'botany', avatar: '/portraits/mira.jpg' },
-  james: { role: 'Finance professional', tagline: 'A clearer view of what comes next.', theme: 'finance', avatar: '/portraits/james.jpg' },
-  jake: { role: 'Nurse', tagline: 'A little knowledge. A little care.', theme: 'care', avatar: '/portraits/jake.jpg' },
-  erica: { role: 'Neuroscientist', tagline: 'Curious minds, connected.', theme: 'neuroscience', avatar: '/portraits/erica.jpg' },
+  mira: { role: 'Botany enthusiast', tagline: 'Growing a little wonder.', theme: 'botany' },
+  james: { role: 'Finance professional', tagline: 'A clearer view of what comes next.', theme: 'finance' },
+  jake: { role: 'Nurse', tagline: 'A little knowledge. A little care.', theme: 'care' },
+  erica: { role: 'Neuroscientist', tagline: 'Curious minds, connected.', theme: 'neuroscience' },
   iris: { role: 'Painter', tagline: 'One canvas. Everyone’s mark.', theme: 'painting' },
   luca: { role: 'Language teacher', tagline: 'A little Spanish, a new adventure.', theme: 'language-learning' },
   karen: { role: 'Arcade enthusiast', tagline: 'One more game. Four little adventures.', theme: 'retro-arcade' },
@@ -114,7 +114,6 @@ export async function createSpaceDirectory({ dataDir, sessionTtlMs = sessionDura
     const appearance = demoAppearanceFor(owner.id, renderedSource ?? revision?.source);
     return { id, owner: { id: owner.id, name: owner.name }, kind: owner.kind === 'studio' ? 'studio' : 'blank',
       revisionId: saved.currentRevisionId, hasBuilt: Boolean(revision && revision.source.trim() !== blankSeedSource.trim()),
-      previewVersion: spacePreviewVersion(saved),
       icon: withDemoIconAppearance(owner.id, iconControllers.get(id).metadata()),
       ...(appearance ? { appearance } : {}),
       ...(profileFor(owner.id) ? { profile: profileFor(owner.id) } : {}) };

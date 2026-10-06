@@ -104,9 +104,7 @@ export function reduce(state, action, actor) {
   const reopened = await state.directory.serviceFor('leo');
   assert.equal(current(reopened.store.read()).source, historicalBlank);
   assert.equal((await state.directory.metadata('leo')).hasBuilt, false);
-  const preview = await reopened.preview();
-  assert.equal(preview.hasBuilt, false);
-  assert.equal(preview.html, '');
+  assert.equal((await reopened.snapshot()).html, '');
 });
 
 test('accounts begin with empty code and state except for the explicitly preloaded shared board', async t => {

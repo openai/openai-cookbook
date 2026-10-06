@@ -6,8 +6,6 @@
 .build-activity-toggle:hover { background: #202020; color: #f5f5f5; }
 .build-activity-toggle[aria-expanded="true"] { right: var(--build-panel-width); color: #f5f5f5; }
 .build-activity-toggle:focus-visible { outline: 2px solid var(--accent-text); outline-offset: -3px; }
-.workspace-files-toggle { right: auto; left: 0; border: 1px solid #ffffff26; border-left: 0; border-radius: 0 4px 4px 0; box-shadow: 4px 3px 20px #00000038; }
-.workspace-files-toggle[aria-expanded="true"] { right: auto; left: var(--build-panel-width); }
 .build-activity-toggle.is-active>svg { color: #57dc8c; filter: drop-shadow(0 0 3px #04b84c) drop-shadow(0 0 7px #04b84c80); animation: build-activity-arrow-glow 1.8s ease-in-out infinite; }
 @keyframes build-activity-arrow-glow { 0%, 100% { opacity: .38; } 50% { opacity: 1; } }
 .build-activity-panel { position: fixed; z-index: 80; inset: 72px 0 0 auto; width: var(--build-panel-width, 440px); display: flex; flex-direction: column; min-height: 0; border: 1px solid #ffffff26; border-right: 0; border-bottom: 0; border-radius: 4px 0 0 0; color: #f5f5f5; background: rgb(0 0 0 / 50%); backdrop-filter: blur(12px) brightness(.45) saturate(.8); box-shadow: -8px 0 40px #00000040, inset 0 1px 0 #ffffff0a; overflow: hidden; animation: build-panel-in .18s ease-out both; }
@@ -92,24 +90,8 @@
 /* The wide canvas is 1100px. Reserve the 34px tab plus a 16px gap in
    each gutter, keeping a readable overlay when the window is narrower. */
 @media(min-width:1280px) { .canvas-workspace { --build-panel-width: clamp(280px, calc((100% - 1100px) / 2 - 50px), 400px); } }
-@media(min-width:800px) and (max-width:1279px) {
-  .with-build-activity.with-workspace-files { --build-panel-width: 32vw; }
-}
 @media(max-width:1099px) {
   .canvas-workspace { --build-panel-width: min(380px, calc(100% - 50px)); }
-  .with-build-activity .workspace-files-toggle[aria-expanded="false"],
-  .with-workspace-files .build-activity-toggle:not(.workspace-files-toggle)[aria-expanded="false"] { top: min(calc(50% + 114px), calc(100% - 60px)); }
-}
-/* Keep both inspections open on small screens. Each keeps its own scroll area
-   and close control; resizing never changes the user's disclosure state. */
-@media(max-width:799px) {
-  .with-build-activity.with-workspace-files { --build-panel-width: calc(100% - 50px); --inspection-half-height: calc((100dvh - 72px) / 2); }
-  .with-build-activity.with-workspace-files .workspace-files-panel { bottom: auto; height: var(--inspection-half-height); }
-  .with-build-activity.with-workspace-files .build-activity-panel { top: calc(72px + var(--inspection-half-height)); }
-  .with-build-activity.with-workspace-files .workspace-files-toggle { top: calc(72px + var(--inspection-half-height) / 2); }
-  .with-build-activity.with-workspace-files .build-activity-toggle:not(.workspace-files-toggle) { top: calc(72px + var(--inspection-half-height) * 1.5); }
-  .with-build-activity.with-workspace-files :is(.workspace-files-panel,.build-activity-panel) { overflow-y: auto; }
-  .with-build-activity.with-workspace-files :is(.workspace-file-content,.build-feed) { flex-shrink: 0; min-height: 120px; }
 }
 @media(max-width:600px) { .build-activity-overview { padding: 17px 16px 0; } .build-feed { padding: 17px 14px 10px; } .build-metrics { gap: 16px; padding-block: 16px; } .build-phases { margin-bottom: 15px; } .build-activity-footer { padding-inline: 15px; } }
 @media(prefers-reduced-motion:reduce) { .build-activity-panel,.build-live-status.is-live i { animation: none; } }

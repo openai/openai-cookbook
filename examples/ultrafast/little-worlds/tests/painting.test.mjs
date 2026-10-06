@@ -1,6 +1,6 @@
 import test from 'node:test';
 import assert from 'node:assert/strict';
-import { paintingProposal } from '../server/painting/index.mjs';
+import { paintingProposal } from './fixtures/painting/index.mjs';
 import { compileModule, renderModule, reduceModule, verifyModule, projectStateForPublication } from '../server/runtime.mjs';
 
 const a={id:'painter-a',name:'A'},b={id:'painter-b',name:'B'};

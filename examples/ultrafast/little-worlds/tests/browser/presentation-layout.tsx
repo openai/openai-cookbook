@@ -14,7 +14,6 @@ import ThemeToggle from '../../src/ThemeToggle';
 import VoiceControls from '../../src/VoiceControls';
 import SpaceIcon from '../../src/SpaceIcon';
 import type { ActivityEntry } from '../../src/build-activity';
-import '../../src/fonts.css';
 import '../../src/styles.css';
 import '../../src/canvas-workspace.css';
 import '../../src/account.css';

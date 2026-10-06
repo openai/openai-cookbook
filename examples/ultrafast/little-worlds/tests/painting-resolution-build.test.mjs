@@ -4,7 +4,7 @@ import { mkdtemp, readFile, rm } from 'node:fs/promises';
 import { tmpdir } from 'node:os';
 import { join } from 'node:path';
 import { createSpaceService } from '../server/harness.mjs';
-import { paintingProposal } from '../server/painting/index.mjs';
+import { paintingProposal } from './fixtures/painting/index.mjs';
 
 const owner = { id: 'iris', name: 'Iris' };
 const visitor = { id: 'leo', name: 'Leo' };

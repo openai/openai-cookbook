@@ -8,7 +8,7 @@ L2_OUTPUT := outputs/l2-results.json
 L3_OUTPUT := outputs/l3-results.json
 
 .DEFAULT_GOAL := help
-.PHONY: help setup python-deps node-deps env config server plugin-install test level-1 level-2 level-3 l1 l2 l3
+.PHONY: help setup python-deps node-deps env config server plugin-install test replay level-1 level-2 level-3 l1 l2 l3
 
 help:
 	@echo "Harness-aware eval example"
@@ -17,17 +17,18 @@ help:
 	@echo "  make setup            Install Python and Node deps, write .env and Codex config"
 	@echo
 	@echo "Run"
-	@echo "  make level-1          Direct tool check (no model, no server)"
-	@echo "  make level-2          Controlled MCP loop via promptfoo"
-	@echo "  make level-3          Full Codex harness via promptfoo"
+	@echo "  make level-1          Direct tool tests (no model, no server)"
+	@echo "  make level-2          Standalone function-calling loop via promptfoo"
+	@echo "  make level-3          Codex product harness via promptfoo"
 	@echo
 	@echo "Helpers"
-	@echo "  make test             Unit tests for the grader and the Level Two provider"
+	@echo "  make test             Unit tests for the grader and the standalone loop provider"
+	@echo "  make replay           Regrade the recorded runs under data/"
 	@echo "  make server           Start the MCP server in the foreground (separate terminal)"
 	@echo "  make plugin-install   Install the example plugin into CODEX_HOME"
 	@echo
-	@echo "Levels Two and Three need the MCP server already running: make server"
-	@echo "After setup, set OPENAI_API_KEY in .env before Levels Two and Three."
+	@echo "The level-2 and level-3 targets need the MCP server already running: make server"
+	@echo "After setup, set OPENAI_API_KEY in .env before running level-2 or level-3."
 	@echo "Exact commands for every target live in this Makefile."
 
 setup: python-deps node-deps env config
@@ -36,7 +37,7 @@ setup: python-deps node-deps env config
 	@set -a && . ./.env && set +a; \
 	key="$${OPENAI_API_KEY:-}"; \
 	if [ -z "$$key" ] || [ "$$key" = "your-api-key" ]; then \
-	  echo "OPENAI_API_KEY is not set in .env. Levels Two and Three need it. Change it manually."; \
+	  echo "OPENAI_API_KEY is not set in .env. The level-2 and level-3 targets need it. Change it manually."; \
 	fi
 
 python-deps:
@@ -66,6 +67,9 @@ config:
 
 test: python-deps
 	uv run pytest -q
+
+replay: python-deps
+	RUN_LIVE= uv run replay.py
 
 server:
 	uv run server.py

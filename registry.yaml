@@ -3590,10 +3590,10 @@
     - evals
     - datasets
 
-- title: "Two eval patterns for enterprise LLM apps: trajectory FSM + paired refusal calibration"
-  path: examples/evaluation/Enterprise_eval_patterns.md
+- title: "Two evaluation patterns for enterprise LLM apps: trajectory FSM and paired refusal calibration"
+  path: examples/evaluation/Enterprise_eval_patterns.ipynb
   slug: enterprise-eval-patterns-trajectory-fsm-paired-refusal
-  description: Two deterministic eval patterns that catch failure modes general benchmarks miss. Trajectory FSM grading for multi-step tool chains; paired refusal + overrefusal calibration for policy-sensitive flows. Each with runnable Python, honest tradeoffs, and headline numbers from a 4-model matrix.
+  description: Two deterministic evaluation patterns for production LLM systems. Trajectory FSM grading for multi-step tool chains with enforced re-plan budget; paired refusal and overrefusal calibration for policy-sensitive flows. Runnable notebook with real tool schemas, Mermaid state diagrams, and honest tradeoffs.
   date: 2026-10-06
   authors:
     - JayDS22

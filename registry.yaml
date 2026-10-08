@@ -3663,7 +3663,6 @@
   path: examples/chatgpt/compliance_api/logs_platform.ipynb
   slug: logs-platform
   date: 2025-12-11
-  archived: true
   authors:
     - kevinv-openai
   tags:

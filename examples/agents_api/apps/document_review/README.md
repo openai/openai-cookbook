@@ -174,9 +174,12 @@ for document in sorted(input_directory.iterdir()):
 summary = json.loads((output_directory / "summary.json").read_text())
 ```
 
-For invoices, validation recomputes the total from extracted line items and
-shipping. It cannot establish that extraction matched the original document;
-that still needs review. The included invoice should flag a $900 overcharge,
+For invoices, validation recomputes the subtotal from extracted line items,
+checks it against the printed subtotal, and then adds shipping. The
+printed-subtotal check catches extraction drift (line items that no longer add
+up to what the invoice states). Confirming the printed figures themselves
+match the original document still needs review. The included invoice should
+flag a $900 overcharge,
 a missing purchase order, and changed bank details.
 
 ### 5. Keep the artifacts and release compute

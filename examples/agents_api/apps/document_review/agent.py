@@ -89,15 +89,29 @@ def validate_review(report: dict[str, Any], document: str) -> None:
             for item in line_items
         ]
         shipping = Decimal(str(calculation["shipping"]))
+        stated_subtotal = Decimal(str(calculation["stated_subtotal"]))
         stated = Decimal(str(report["amount"]))
         calculated = Decimal(str(calculation["calculated_total"]))
         difference = Decimal(str(calculation["difference"]))
+        extracted_subtotal = sum(amounts)
         if not all(
             value.is_finite()
-            for value in [*amounts, shipping, stated, calculated, difference]
+            for value in [
+                *amounts,
+                shipping,
+                stated_subtotal,
+                stated,
+                calculated,
+                difference,
+            ]
         ):
             raise ValueError("Invoice amounts must be finite")
-        if sum(amounts) + shipping != calculated or stated - calculated != difference:
+        if extracted_subtotal != stated_subtotal:
+            raise ValueError("Invoice line items do not match the printed subtotal")
+        if (
+            stated_subtotal + shipping != calculated
+            or stated - calculated != difference
+        ):
             raise ValueError("Invoice totals do not match the extracted line items")
     except (KeyError, TypeError, ValueError, InvalidOperation) as error:
         raise ValueError(f"{document}: invalid invoice calculation: {error}") from error

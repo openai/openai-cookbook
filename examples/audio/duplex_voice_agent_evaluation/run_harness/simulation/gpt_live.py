@@ -89,6 +89,8 @@ async def run_gpt_live_conversation(
         sample_rate=settings.sample_rate,
         speech_rms_threshold=settings.speech_rms_threshold,
         max_duration_s=settings.max_duration_s,
+        work_grace_seconds=settings.work_grace_seconds,
+        cleanup_timeout_seconds=settings.cleanup_timeout_seconds,
         drain_ms=drain_ms,
         real_time=not offline,
         verbose=settings.verbose,

@@ -7,6 +7,8 @@ import asyncio
 import json
 import os
 from collections.abc import Sequence
+from dataclasses import replace
+from math import isfinite
 from pathlib import Path
 from typing import Any
 
@@ -40,6 +42,7 @@ from shared.paths import default_results_dir, package_path, require_external_out
 from shared.private_files import private_directory
 from shared.reporting.compat import is_live_frontend_usage
 from shared.reporting.results import build_results_report, build_timestamped_run_name, write_json
+from shared.reporting.validation import ResultValidationError, require_task_completed
 
 HARNESS_DIR = package_path("run_harness")
 DEFAULT_CONFIG_PATH = HARNESS_DIR / "config.toml"
@@ -102,6 +105,18 @@ def parse_args(argv: Sequence[str] | None = None) -> argparse.Namespace:
         type=float,
         default=config.get("simulation", "completion_timeout_seconds", 8.0),
         help="Maximum time for one asynchronous semantic completion decision.",
+    )
+    parser.add_argument(
+        "--work-grace-seconds",
+        type=float,
+        default=config.get("simulation", "work_grace_seconds", 5.0),
+        help="Wall-clock limit for pending work after conversation capture ends.",
+    )
+    parser.add_argument(
+        "--cleanup-timeout-seconds",
+        type=float,
+        default=config.get("simulation", "cleanup_timeout_seconds", 10.0),
+        help="Total wall-clock budget for participant close and background-task cleanup.",
     )
     parser.add_argument("--simulator-model", default=assistant.model, help="GPT Live model for the simulated caller.")
     parser.add_argument(
@@ -315,13 +330,17 @@ def result_row(scenario: Scenario, result: EvalResult, *, offline: bool) -> dict
     golden = _golden(scenario)
     artifacts = result.artifacts or {}
     tokens = _token_counts(result)
-    metrics = build_metric_row(
-        task=result.task_metrics,
-        efficiency=result.efficiency_metrics,
-        interaction=result.interaction_metrics,
-        golden=golden,
-        usage=tokens,
-    )
+    try:
+        metrics = build_metric_row(
+            task=result.task_metrics,
+            efficiency=result.efficiency_metrics,
+            interaction=result.interaction_metrics,
+            golden=golden,
+            usage=tokens,
+        )
+    except ResultValidationError as exc:
+        exc.partial_result = result
+        raise
     assessment = result.task_metrics.get("outcome_assessment", {})
     validity = (result.run_metadata or {}).get("simulator_validity", {})
     invalid_simulator = validity.get("status") == "invalid"
@@ -374,21 +393,54 @@ def result_row(scenario: Scenario, result: EvalResult, *, offline: bool) -> dict
 
 def failed_row(scenario: Scenario, exc: Exception, *, offline: bool, args: argparse.Namespace) -> dict[str, Any]:
     """Exclude infrastructure and judge failures from target-model grading."""
-    golden = _golden(scenario)
+    partial = getattr(exc, "partial_result", None)
+    failure_stage = getattr(exc, "failure_stage", None) or "run_or_judge"
+    error_message = str(exc)
+    invalid_partial = isinstance(exc, ResultValidationError)
+    if partial is not None:
+        if invalid_partial:
+            previous_failure = (partial.run_metadata or {}).get("failure", {})
+            if isinstance(previous_failure, dict) and previous_failure.get("stage"):
+                failure_stage = previous_failure["stage"]
+                error_message = previous_failure.get("message") or error_message
+        try:
+            require_task_completed(partial.task_metrics)
+        except ResultValidationError:
+            invalid_partial = True
+    if partial is not None and invalid_partial:
+        partial = replace(
+            partial,
+            task_status="error",
+            task_metrics={**partial.task_metrics, "task_completed": False},
+            termination_reason=failure_stage,
+            run_metadata={
+                **(partial.run_metadata or {}),
+                "failure": {"stage": failure_stage, "message": error_message},
+            },
+        )
+        if (partial.artifacts or {}).get("result"):
+            write_json(Path(partial.artifacts["result"]), partial.model_dump())
+    observed = (
+        result_row(scenario, partial, offline=offline)
+        if partial is not None
+        else {
+            "turns": None,
+            "tool_calls": None,
+        }
+    )
     return {
+        **observed,
         "scenario_id": scenario.id,
         "scenario_title": scenario.title,
         "status": "infrastructure_error",
         "execution_mode": "offline_fixture" if offline else "live",
         "semantic_evaluation_status": "not_assessed",
         "task_completed": False,
-        "turns": f"0/{golden['total_turns']}",
-        "tool_calls": f"0/{len(golden['tool_calls'])}",
         "audio_condition": args.condition,
         "agent_model": args.model,
         "backend_model": args.backend_model,
-        "failure_stage": getattr(exc, "failure_stage", "run_or_judge"),
-        "error_message": str(exc),
+        "failure_stage": failure_stage,
+        "error_message": error_message,
     }
 
 
@@ -423,6 +475,8 @@ def _settings(
         completion_model=args.completion_model,
         semantic_drain=args.semantic_drain,
         completion_timeout_seconds=args.completion_timeout_seconds,
+        work_grace_seconds=args.work_grace_seconds,
+        cleanup_timeout_seconds=args.cleanup_timeout_seconds,
         agent_endpoint=args.endpoint,
         agent_model=args.model,
         agent_voice=args.voice,
@@ -457,6 +511,10 @@ def _validate_run_args(args: argparse.Namespace) -> None:
         raise ValueError("--concurrency must be between 1 and 8")
     if args.completion_timeout_seconds <= 0:
         raise ValueError("--completion-timeout-seconds must be positive")
+    for name in ("work_grace_seconds", "cleanup_timeout_seconds"):
+        value = getattr(args, name)
+        if isinstance(value, bool) or not isinstance(value, int | float) or not isfinite(value) or value <= 0:
+            raise ValueError(f"--{name.replace('_', '-')} must be finite and positive")
     if args.response_deadline_ms <= 0:
         raise ValueError("--response-deadline-ms must be positive")
     if args.listen and args.concurrency != 1:
@@ -530,6 +588,11 @@ async def run_evals(args: argparse.Namespace | None = None) -> Path:
                         else None
                     ),
                 )
+                try:
+                    require_task_completed(result.task_metrics)
+                except ResultValidationError as exc:
+                    exc.partial_result = result
+                    raise
                 procedure = grade_procedure(
                     scenario,
                     result,
@@ -602,6 +665,8 @@ async def run_evals(args: argparse.Namespace | None = None) -> Path:
             "semantic_drain": args.semantic_drain and not args.offline,
             "completion_model": args.completion_model,
             "completion_timeout_seconds": args.completion_timeout_seconds,
+            "work_grace_seconds": args.work_grace_seconds,
+            "cleanup_timeout_seconds": args.cleanup_timeout_seconds,
             "concurrency": args.concurrency,
             "audio_condition": args.condition,
             "audio_realism": audio_realism_from_args(args).model_dump(mode="json", exclude_none=True),

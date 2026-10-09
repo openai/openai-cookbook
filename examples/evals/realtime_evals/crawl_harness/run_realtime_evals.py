@@ -39,6 +39,7 @@ if str(ROOT_DIR) not in sys.path:
 
 from shared.graders import compute_tool_call_grade
 from shared.metrics_utils import add_numeric_summaries, order_columns
+from shared.path_utils import validate_safe_path_component
 from shared.plotting_utils import build_realtime_eval_plots
 from shared.realtime_harness_utils import (
     RealtimeResponseError,
@@ -136,6 +137,9 @@ def load_dataset(path: Path) -> pd.DataFrame:
     missing = required_columns.difference(data.columns)
     if missing:
         raise ValueError(f"Missing required columns: {sorted(missing)}")
+    # Validate all example_ids upfront to fail fast on bad data
+    for _, row in data.iterrows():
+        validate_safe_path_component(str(row["example_id"]), "example_id")
     return data
 
 
@@ -168,7 +172,7 @@ def build_failed_result(
     run_events_dir: Path,
     error_info: EvalErrorInfo,
 ) -> CrawlEvalResult:
-    example_id = str(row["example_id"])
+    example_id = validate_safe_path_component(str(row["example_id"]), "example_id")
     user_text = str(row["user_text"])
     expected_tool_call = (
         "" if bool(pd.isna(row["gt_tool_call"])) else str(row["gt_tool_call"])
@@ -209,7 +213,7 @@ async def run_single_eval(
     run_events_dir: Path,
     config: Dict[str, Any],
 ) -> CrawlEvalResult:
-    example_id = str(row["example_id"])
+    example_id = validate_safe_path_component(str(row["example_id"]), "example_id")
     user_text = str(row["user_text"])
     expected_tool_call = (
         "" if bool(pd.isna(row["gt_tool_call"])) else str(row["gt_tool_call"])

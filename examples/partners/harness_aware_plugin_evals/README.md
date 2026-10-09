@@ -1,6 +1,6 @@
 # Harness-aware eval example
 
-Companion to the [Harness-Aware Evaluation of Plugins](harness_aware_plugin_evals.ipynb) cookbook.
+Companion to the [Harness-aware evaluation of plugins](harness_aware_plugin_evals.ipynb) cookbook.
 Refer to the cookbook for the purpose and tradeoffs of each evaluation approach.
 This README walks through the steps required to run the example.
 

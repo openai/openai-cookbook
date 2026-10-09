@@ -3607,6 +3607,18 @@
     - evals
     - datasets
 
+- title: "Two evaluation patterns for enterprise LLM apps: trajectory FSM and paired refusal calibration"
+  path: examples/evaluation/Enterprise_eval_patterns.ipynb
+  slug: enterprise-eval-patterns-trajectory-fsm-paired-refusal
+  description: Two deterministic evaluation patterns for production LLM systems. Trajectory FSM grading for multi-step tool chains with enforced re-plan budget; paired refusal and overrefusal calibration for policy-sensitive flows. Runnable notebook with real tool schemas, Mermaid state diagrams, and honest tradeoffs.
+  date: 2026-10-06
+  authors:
+    - JayDS22
+  tags:
+    - evals
+    - agents
+    - tool-use
+
 - title: Build Code Review with the Codex SDK
   path: examples/codex/build_code_review_with_codex_sdk.md
   slug: build-code-review-with-codex-sdk

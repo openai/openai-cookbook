@@ -4,6 +4,18 @@
 # should build pages for, and indicates metadata such as tags, creation date and
 # authors for each page.
 
+- title: Approve paid MCP tool calls in the Agents SDK
+  path: examples/agents_sdk/approve_paid_mcp_tool_calls/approve_paid_mcp_tool_calls.ipynb
+  slug: approve-paid-mcp-tool-calls
+  description: Pause an Agents SDK run before an MCP tool call that spends money, show a person the exact order, and continue only after approval, using a remote MCP server for paid expert calls in a free test mode.
+  date: 2026-10-08
+  authors:
+    - maxko87
+  tags:
+    - agents-sdk
+    - mcp
+    - agents
+
 - title: Harness-aware evaluation of plugins
   path: examples/partners/harness_aware_plugin_evals/harness_aware_plugin_evals.ipynb
   slug: harness-aware-plugin-evals

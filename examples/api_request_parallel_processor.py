@@ -429,13 +429,22 @@ def num_tokens_consumed_from_request(
         if isinstance(input, str):  # single input
             num_tokens = len(encoding.encode(input))
             return num_tokens
-        elif isinstance(input, list):  # multiple inputs
-            num_tokens = sum([len(encoding.encode(i)) for i in input])
-            return num_tokens
-        else:
-            raise TypeError(
-                'Expecting either string or list of strings for "inputs" field in embedding request'
-            )
+        elif isinstance(input, list):
+            if all(isinstance(item, str) for item in input):
+                return sum(len(encoding.encode(item)) for item in input)
+            # Token IDs are already encoded; booleans are not token IDs.
+            if all(type(item) is int for item in input):
+                return len(input)
+            if all(
+                isinstance(item, list)
+                and all(type(token) is int for token in item)
+                for item in input
+            ):
+                return sum(len(item) for item in input)
+        raise TypeError(
+            'Expecting a string, list of strings, list of integers, or list of lists '
+            'of integers for "input" field in embedding request'
+        )
     # more logic needed to support other API calls (e.g., edits, inserts, DALL-E)
     else:
         raise NotImplementedError(

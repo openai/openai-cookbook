@@ -1,0 +1,69 @@
+description: Standalone BLS MCP function-calling evaluation
+
+providers:
+  - id: file://provider.py
+    label: standalone-mcp
+    config:
+      model: "{{ env.EVAL_MODEL }}"
+      model_reasoning_effort: "{{ env.EVAL_REASONING_EFFORT | default('medium', true) }}"
+      mcp_url: "{{ env.MCP_URL }}"
+
+prompts:
+  - "{{query}}"
+
+defaultTest:
+  assert:
+    - type: python
+      value: file://assert_result.py
+
+tests:
+  - description: unemployment-rate
+    vars:
+      indicator: unemployment rate
+      query: What is the U.S. unemployment rate?
+      expected_tools: "resolve,fetch_bls_data"
+      expected_series_ids: "LNS14000000"
+    metadata:
+      mechanism: ambiguous_default
+      expected_type: exact
+
+  - description: labor-force-participation
+    vars:
+      indicator: labor force participation rate
+      query: What is the value of the labor force participation rate?
+      expected_tools: "resolve,fetch_bls_data"
+      expected_series_ids: "LNS11300000"
+    metadata:
+      mechanism: headline
+      expected_type: exact
+
+  - description: nonfarm-payroll
+    vars:
+      indicator: nonfarm payroll employment
+      query: What is seasonally adjusted monthly U.S. total nonfarm payroll employment?
+      expected_tools: "resolve,fetch_bls_data"
+      expected_series_ids: "CES0000000001"
+    metadata:
+      mechanism: headline
+      expected_type: exact
+
+  - description: consumer-price-index
+    vars:
+      indicator: consumer price index
+      query: What is the current consumer price index?
+      expected_tools: "resolve"
+      expected_series_ids: ""
+    metadata:
+      mechanism: coverage_gap
+      expected_type: gap
+
+  - description: employment-ambiguous
+    vars:
+      indicator: employment
+      query: What is U.S. employment?
+      expected_tools: "resolve"
+      expected_series_ids: ""
+      expected_top_ids: "LNS12000000,CES0000000001"
+    metadata:
+      mechanism: ambiguous_concept
+      expected_type: clarify

@@ -1,0 +1,762 @@
+{
+  "evalId": "eval-9yO-2026-09-04T09:52:11",
+  "results": {
+    "version": 3,
+    "timestamp": "2026-09-04T09:52:11.524Z",
+    "prompts": [
+      {
+        "id": "8868fc514e5f7bd1a350480c5a825cd0f5b47b6c0c8da0ca62be71158f638c23",
+        "raw": "{{query}}",
+        "label": "{{query}}",
+        "provider": "standalone-mcp",
+        "metrics": {
+          "score": 5,
+          "testPassCount": 5,
+          "testFailCount": 0,
+          "testErrorCount": 0,
+          "assertPassCount": 5,
+          "assertFailCount": 0,
+          "totalLatencyMs": 125087,
+          "tokenUsage": {
+            "prompt": 0,
+            "completion": 0,
+            "cached": 0,
+            "total": 0,
+            "numRequests": 5,
+            "completionDetails": {
+              "reasoning": 0,
+              "acceptedPrediction": 0,
+              "rejectedPrediction": 0,
+              "cacheReadInputTokens": 0,
+              "cacheCreationInputTokens": 0
+            },
+            "assertions": {
+              "total": 0,
+              "prompt": 0,
+              "completion": 0,
+              "cached": 0,
+              "numRequests": 0,
+              "completionDetails": {
+                "reasoning": 0,
+                "acceptedPrediction": 0,
+                "rejectedPrediction": 0,
+                "cacheReadInputTokens": 0,
+                "cacheCreationInputTokens": 0
+              }
+            }
+          },
+          "namedScores": {},
+          "namedScoresCount": {},
+          "namedScoreWeights": {},
+          "cost": 0
+        }
+      }
+    ],
+    "results": [
+      {
+        "cost": 0,
+        "gradingResult": {
+          "pass": true,
+          "score": 1,
+          "reason": "All assertions passed",
+          "namedScores": {},
+          "tokensUsed": {
+            "total": 0,
+            "prompt": 0,
+            "completion": 0,
+            "cached": 0,
+            "numRequests": 0
+          },
+          "componentResults": [
+            {
+              "pass": true,
+              "score": 1,
+              "reason": "expected tools called and BLS series fetched",
+              "assertion": {
+                "type": "python",
+                "value": "file://assert_result.py"
+              }
+            }
+          ]
+        },
+        "id": "60e8d33f-3388-482a-9556-fc4639016850",
+        "latencyMs": 21350,
+        "namedScores": {},
+        "prompt": {
+          "raw": "What is the U.S. unemployment rate?",
+          "label": "{{query}}",
+          "config": {}
+        },
+        "promptId": "8868fc514e5f7bd1a350480c5a825cd0f5b47b6c0c8da0ca62be71158f638c23",
+        "promptIdx": 0,
+        "provider": {
+          "id": "file://provider.py",
+          "label": "standalone-mcp"
+        },
+        "response": {
+          "output": "{\"answer\": \"The U.S. unemployment rate was **4.1% in February 2026** (seasonally adjusted), according to the BLS.\", \"tool_calls\": [{\"name\": \"resolve\", \"arguments\": {\"indicators\": [{\"indicator\": \"U.S. unemployment rate\"}]}, \"result\": {\"results\": [{\"indicator\": \"U.S. unemployment rate\", \"candidates\": [{\"series_id\": \"LNS14000000\", \"title\": \"Unemployment Rate - Seasonally Adjusted\", \"confidence\": 1.0}, {\"series_id\": \"LNU04000000\", \"title\": \"Unemployment Rate - Not Seasonally Adjusted\", \"confidence\": 0.6}]}]}}, {\"name\": \"fetch_bls_data\", \"arguments\": {\"series_ids\": [\"LNS14000000\"]}, \"result\": {\"data\": [{\"series_id\": \"LNS14000000\", \"title\": \"Unemployment Rate - Seasonally Adjusted\", \"data\": [{\"year\": \"2026\", \"period\": \"M01\", \"value\": \"4.0\"}, {\"year\": \"2026\", \"period\": \"M02\", \"value\": \"4.1\"}]}]}}], \"completed\": true}",
+          "cached": false
+        },
+        "score": 1,
+        "success": true,
+        "testCase": {
+          "description": "unemployment-rate",
+          "vars": {
+            "indicator": "unemployment rate",
+            "query": "What is the U.S. unemployment rate?",
+            "expected_tools": "resolve,fetch_bls_data",
+            "expected_series_ids": "LNS14000000"
+          },
+          "metadata": {
+            "mechanism": "ambiguous_default",
+            "expected_type": "exact"
+          },
+          "assert": [
+            {
+              "type": "python",
+              "value": "file://assert_result.py"
+            }
+          ],
+          "options": {}
+        },
+        "testIdx": 0,
+        "tokenUsage": {
+          "prompt": 0,
+          "completion": 0,
+          "cached": 0,
+          "total": 0,
+          "numRequests": 1,
+          "completionDetails": {
+            "reasoning": 0,
+            "acceptedPrediction": 0,
+            "rejectedPrediction": 0,
+            "cacheReadInputTokens": 0,
+            "cacheCreationInputTokens": 0
+          },
+          "assertions": {
+            "total": 0,
+            "prompt": 0,
+            "completion": 0,
+            "cached": 0,
+            "numRequests": 1,
+            "completionDetails": {
+              "reasoning": 0,
+              "acceptedPrediction": 0,
+              "rejectedPrediction": 0,
+              "cacheReadInputTokens": 0,
+              "cacheCreationInputTokens": 0
+            }
+          }
+        },
+        "vars": {
+          "indicator": "unemployment rate",
+          "query": "What is the U.S. unemployment rate?",
+          "expected_tools": "resolve,fetch_bls_data",
+          "expected_series_ids": "LNS14000000"
+        },
+        "metadata": {
+          "mechanism": "ambiguous_default",
+          "expected_type": "exact",
+          "_promptfooFileMetadata": {}
+        },
+        "failureReason": 0
+      },
+      {
+        "cost": 0,
+        "gradingResult": {
+          "pass": true,
+          "score": 1,
+          "reason": "All assertions passed",
+          "namedScores": {},
+          "tokensUsed": {
+            "total": 0,
+            "prompt": 0,
+            "completion": 0,
+            "cached": 0,
+            "numRequests": 0
+          },
+          "componentResults": [
+            {
+              "pass": true,
+              "score": 1,
+              "reason": "expected tools called and BLS series fetched",
+              "assertion": {
+                "type": "python",
+                "value": "file://assert_result.py"
+              }
+            }
+          ]
+        },
+        "id": "d9825648-bc0e-4a20-a157-a311433e1df4",
+        "latencyMs": 29098,
+        "namedScores": {},
+        "prompt": {
+          "raw": "What is the value of the labor force participation rate?",
+          "label": "{{query}}",
+          "config": {}
+        },
+        "promptId": "8868fc514e5f7bd1a350480c5a825cd0f5b47b6c0c8da0ca62be71158f638c23",
+        "promptIdx": 0,
+        "provider": {
+          "id": "file://provider.py",
+          "label": "standalone-mcp"
+        },
+        "response": {
+          "output": "{\"answer\": \"The labor force participation rate was **62.6% in February 2026** (seasonally adjusted).\", \"tool_calls\": [{\"name\": \"resolve\", \"arguments\": {\"indicators\": [{\"indicator\": \"labor force participation rate\"}]}, \"result\": {\"results\": [{\"indicator\": \"labor force participation rate\", \"candidates\": [{\"series_id\": \"LNS11300000\", \"title\": \"Labor Force Participation Rate - Seasonally Adjusted\", \"confidence\": 1.0}]}]}}, {\"name\": \"fetch_bls_data\", \"arguments\": {\"series_ids\": [\"LNS11300000\"]}, \"result\": {\"data\": [{\"series_id\": \"LNS11300000\", \"title\": \"Labor Force Participation Rate - Seasonally Adjusted\", \"data\": [{\"year\": \"2026\", \"period\": \"M01\", \"value\": \"62.5\"}, {\"year\": \"2026\", \"period\": \"M02\", \"value\": \"62.6\"}]}]}}], \"completed\": true}",
+          "cached": false
+        },
+        "score": 1,
+        "success": true,
+        "testCase": {
+          "description": "labor-force-participation",
+          "vars": {
+            "indicator": "labor force participation rate",
+            "query": "What is the value of the labor force participation rate?",
+            "expected_tools": "resolve,fetch_bls_data",
+            "expected_series_ids": "LNS11300000"
+          },
+          "metadata": {
+            "mechanism": "headline",
+            "expected_type": "exact"
+          },
+          "assert": [
+            {
+              "type": "python",
+              "value": "file://assert_result.py"
+            }
+          ],
+          "options": {}
+        },
+        "testIdx": 1,
+        "tokenUsage": {
+          "prompt": 0,
+          "completion": 0,
+          "cached": 0,
+          "total": 0,
+          "numRequests": 1,
+          "completionDetails": {
+            "reasoning": 0,
+            "acceptedPrediction": 0,
+            "rejectedPrediction": 0,
+            "cacheReadInputTokens": 0,
+            "cacheCreationInputTokens": 0
+          },
+          "assertions": {
+            "total": 0,
+            "prompt": 0,
+            "completion": 0,
+            "cached": 0,
+            "numRequests": 1,
+            "completionDetails": {
+              "reasoning": 0,
+              "acceptedPrediction": 0,
+              "rejectedPrediction": 0,
+              "cacheReadInputTokens": 0,
+              "cacheCreationInputTokens": 0
+            }
+          }
+        },
+        "vars": {
+          "indicator": "labor force participation rate",
+          "query": "What is the value of the labor force participation rate?",
+          "expected_tools": "resolve,fetch_bls_data",
+          "expected_series_ids": "LNS11300000"
+        },
+        "metadata": {
+          "mechanism": "headline",
+          "expected_type": "exact",
+          "_promptfooFileMetadata": {}
+        },
+        "failureReason": 0
+      },
+      {
+        "cost": 0,
+        "gradingResult": {
+          "pass": true,
+          "score": 1,
+          "reason": "All assertions passed",
+          "namedScores": {},
+          "tokensUsed": {
+            "total": 0,
+            "prompt": 0,
+            "completion": 0,
+            "cached": 0,
+            "numRequests": 0
+          },
+          "componentResults": [
+            {
+              "pass": true,
+              "score": 1,
+              "reason": "expected tools called and BLS series fetched",
+              "assertion": {
+                "type": "python",
+                "value": "file://assert_result.py"
+              }
+            }
+          ]
+        },
+        "id": "04441681-f3a8-4793-8b94-f1297ea05c2e",
+        "latencyMs": 33593,
+        "namedScores": {},
+        "prompt": {
+          "raw": "What is seasonally adjusted monthly U.S. total nonfarm payroll employment?",
+          "label": "{{query}}",
+          "config": {}
+        },
+        "promptId": "8868fc514e5f7bd1a350480c5a825cd0f5b47b6c0c8da0ca62be71158f638c23",
+        "promptIdx": 0,
+        "provider": {
+          "id": "file://provider.py",
+          "label": "standalone-mcp"
+        },
+        "response": {
+          "output": "{\"answer\": \"Seasonally adjusted U.S. total nonfarm payroll employment was **159.25 million** in **February 2026** (**159,250 thousand**), according to BLS series **CES0000000001**.  \\nJanuary 2026: **159.10 million**.\", \"tool_calls\": [{\"name\": \"resolve\", \"arguments\": {\"indicators\": [{\"indicator\": \"seasonally adjusted monthly U.S. total nonfarm payroll employment\"}]}, \"result\": {\"results\": [{\"indicator\": \"seasonally adjusted monthly U.S. total nonfarm payroll employment\", \"candidates\": [{\"series_id\": \"CES0000000001\", \"title\": \"All Employees, Total Nonfarm - Seasonally Adjusted\", \"confidence\": 1.0}]}]}}, {\"name\": \"fetch_bls_data\", \"arguments\": {\"series_ids\": [\"CES0000000001\"]}, \"result\": {\"data\": [{\"series_id\": \"CES0000000001\", \"title\": \"All Employees, Total Nonfarm - Seasonally Adjusted\", \"data\": [{\"year\": \"2026\", \"period\": \"M01\", \"value\": \"159100\"}, {\"year\": \"2026\", \"period\": \"M02\", \"value\": \"159250\"}]}]}}], \"completed\": true}",
+          "cached": false
+        },
+        "score": 1,
+        "success": true,
+        "testCase": {
+          "description": "nonfarm-payroll",
+          "vars": {
+            "indicator": "nonfarm payroll employment",
+            "query": "What is seasonally adjusted monthly U.S. total nonfarm payroll employment?",
+            "expected_tools": "resolve,fetch_bls_data",
+            "expected_series_ids": "CES0000000001"
+          },
+          "metadata": {
+            "mechanism": "headline",
+            "expected_type": "exact"
+          },
+          "assert": [
+            {
+              "type": "python",
+              "value": "file://assert_result.py"
+            }
+          ],
+          "options": {}
+        },
+        "testIdx": 2,
+        "tokenUsage": {
+          "prompt": 0,
+          "completion": 0,
+          "cached": 0,
+          "total": 0,
+          "numRequests": 1,
+          "completionDetails": {
+            "reasoning": 0,
+            "acceptedPrediction": 0,
+            "rejectedPrediction": 0,
+            "cacheReadInputTokens": 0,
+            "cacheCreationInputTokens": 0
+          },
+          "assertions": {
+            "total": 0,
+            "prompt": 0,
+            "completion": 0,
+            "cached": 0,
+            "numRequests": 1,
+            "completionDetails": {
+              "reasoning": 0,
+              "acceptedPrediction": 0,
+              "rejectedPrediction": 0,
+              "cacheReadInputTokens": 0,
+              "cacheCreationInputTokens": 0
+            }
+          }
+        },
+        "vars": {
+          "indicator": "nonfarm payroll employment",
+          "query": "What is seasonally adjusted monthly U.S. total nonfarm payroll employment?",
+          "expected_tools": "resolve,fetch_bls_data",
+          "expected_series_ids": "CES0000000001"
+        },
+        "metadata": {
+          "mechanism": "headline",
+          "expected_type": "exact",
+          "_promptfooFileMetadata": {}
+        },
+        "failureReason": 0
+      },
+      {
+        "cost": 0,
+        "gradingResult": {
+          "pass": true,
+          "score": 1,
+          "reason": "All assertions passed",
+          "namedScores": {},
+          "tokensUsed": {
+            "total": 0,
+            "prompt": 0,
+            "completion": 0,
+            "cached": 0,
+            "numRequests": 0
+          },
+          "componentResults": [
+            {
+              "pass": true,
+              "score": 1,
+              "reason": "expected tools called and BLS series fetched",
+              "assertion": {
+                "type": "python",
+                "value": "file://assert_result.py"
+              }
+            }
+          ]
+        },
+        "id": "08ec0293-a6a6-42ad-9289-bc7f3957ce84",
+        "latencyMs": 25482,
+        "namedScores": {},
+        "prompt": {
+          "raw": "What is the current consumer price index?",
+          "label": "{{query}}",
+          "config": {}
+        },
+        "promptId": "8868fc514e5f7bd1a350480c5a825cd0f5b47b6c0c8da0ca62be71158f638c23",
+        "promptIdx": 0,
+        "provider": {
+          "id": "file://provider.py",
+          "label": "standalone-mcp"
+        },
+        "response": {
+          "output": "{\"answer\": \"I\\u2019m unable to retrieve the current Consumer Price Index because the available BLS data catalog does not contain a matching CPI series.\", \"tool_calls\": [{\"name\": \"resolve\", \"arguments\": {\"indicators\": [{\"indicator\": \"current U.S. Consumer Price Index (CPI), all urban consumers, all items, U.S. city average, not seasonally adjusted\"}]}, \"result\": {\"results\": [{\"indicator\": \"current U.S. Consumer Price Index (CPI), all urban consumers, all items, U.S. city average, not seasonally adjusted\", \"candidates\": [], \"note\": \"No series in this catalog covers that indicator. This is a definitive answer, not a transient failure.\"}]}}, {\"name\": \"resolve\", \"arguments\": {\"indicators\": [{\"indicator\": \"Consumer Price Index CPI all items\"}, {\"indicator\": \"CPI-U all items U.S. city average\"}]}, \"result\": {\"results\": [{\"indicator\": \"Consumer Price Index CPI all items\", \"candidates\": [], \"note\": \"No series in this catalog covers that indicator. This is a definitive answer, not a transient failure.\"}, {\"indicator\": \"CPI-U all items U.S. city average\", \"candidates\": [], \"note\": \"No series in this catalog covers that indicator. This is a definitive answer, not a transient failure.\"}]}}], \"completed\": true}",
+          "cached": false
+        },
+        "score": 1,
+        "success": true,
+        "testCase": {
+          "description": "consumer-price-index",
+          "vars": {
+            "indicator": "consumer price index",
+            "query": "What is the current consumer price index?",
+            "expected_tools": "resolve",
+            "expected_series_ids": ""
+          },
+          "metadata": {
+            "mechanism": "coverage_gap",
+            "expected_type": "gap"
+          },
+          "assert": [
+            {
+              "type": "python",
+              "value": "file://assert_result.py"
+            }
+          ],
+          "options": {}
+        },
+        "testIdx": 3,
+        "tokenUsage": {
+          "prompt": 0,
+          "completion": 0,
+          "cached": 0,
+          "total": 0,
+          "numRequests": 1,
+          "completionDetails": {
+            "reasoning": 0,
+            "acceptedPrediction": 0,
+            "rejectedPrediction": 0,
+            "cacheReadInputTokens": 0,
+            "cacheCreationInputTokens": 0
+          },
+          "assertions": {
+            "total": 0,
+            "prompt": 0,
+            "completion": 0,
+            "cached": 0,
+            "numRequests": 1,
+            "completionDetails": {
+              "reasoning": 0,
+              "acceptedPrediction": 0,
+              "rejectedPrediction": 0,
+              "cacheReadInputTokens": 0,
+              "cacheCreationInputTokens": 0
+            }
+          }
+        },
+        "vars": {
+          "indicator": "consumer price index",
+          "query": "What is the current consumer price index?",
+          "expected_tools": "resolve",
+          "expected_series_ids": ""
+        },
+        "metadata": {
+          "mechanism": "coverage_gap",
+          "expected_type": "gap",
+          "_promptfooFileMetadata": {}
+        },
+        "failureReason": 0
+      },
+      {
+        "cost": 0,
+        "gradingResult": {
+          "pass": true,
+          "score": 1,
+          "reason": "All assertions passed",
+          "namedScores": {},
+          "tokensUsed": {
+            "total": 0,
+            "prompt": 0,
+            "completion": 0,
+            "cached": 0,
+            "numRequests": 0
+          },
+          "componentResults": [
+            {
+              "pass": true,
+              "score": 1,
+              "reason": "expected tools called and BLS series fetched",
+              "assertion": {
+                "type": "python",
+                "value": "file://assert_result.py"
+              }
+            }
+          ]
+        },
+        "id": "10474040-03c6-4a50-8026-cb09280f65bf",
+        "latencyMs": 15564,
+        "namedScores": {},
+        "prompt": {
+          "raw": "What is U.S. employment?",
+          "label": "{{query}}",
+          "config": {}
+        },
+        "promptId": "8868fc514e5f7bd1a350480c5a825cd0f5b47b6c0c8da0ca62be71158f638c23",
+        "promptIdx": 0,
+        "provider": {
+          "id": "file://provider.py",
+          "label": "standalone-mcp"
+        },
+        "response": {
+          "output": "{\"answer\": \"\\u201cU.S. employment\\u201d could refer to either:\\n\\n- **Employment level (household survey):** `LNS12000000`\\n- **Total nonfarm payroll employment (establishment survey):** `CES0000000001`\\n\\nWhich measure would you like?\", \"tool_calls\": [{\"name\": \"resolve\", \"arguments\": {\"indicators\": [{\"indicator\": \"U.S. employment\"}]}, \"result\": {\"results\": [{\"indicator\": \"U.S. employment\", \"candidates\": [{\"series_id\": \"LNS12000000\", \"title\": \"Employment Level - Seasonally Adjusted\", \"confidence\": 0.5}, {\"series_id\": \"CES0000000001\", \"title\": \"All Employees, Total Nonfarm - Seasonally Adjusted\", \"confidence\": 0.5}]}]}}], \"completed\": true}",
+          "cached": false
+        },
+        "score": 1,
+        "success": true,
+        "testCase": {
+          "description": "employment-ambiguous",
+          "vars": {
+            "indicator": "employment",
+            "query": "What is U.S. employment?",
+            "expected_tools": "resolve",
+            "expected_series_ids": "",
+            "expected_top_ids": "LNS12000000,CES0000000001"
+          },
+          "metadata": {
+            "mechanism": "ambiguous_concept",
+            "expected_type": "clarify"
+          },
+          "assert": [
+            {
+              "type": "python",
+              "value": "file://assert_result.py"
+            }
+          ],
+          "options": {}
+        },
+        "testIdx": 4,
+        "tokenUsage": {
+          "prompt": 0,
+          "completion": 0,
+          "cached": 0,
+          "total": 0,
+          "numRequests": 1,
+          "completionDetails": {
+            "reasoning": 0,
+            "acceptedPrediction": 0,
+            "rejectedPrediction": 0,
+            "cacheReadInputTokens": 0,
+            "cacheCreationInputTokens": 0
+          },
+          "assertions": {
+            "total": 0,
+            "prompt": 0,
+            "completion": 0,
+            "cached": 0,
+            "numRequests": 1,
+            "completionDetails": {
+              "reasoning": 0,
+              "acceptedPrediction": 0,
+              "rejectedPrediction": 0,
+              "cacheReadInputTokens": 0,
+              "cacheCreationInputTokens": 0
+            }
+          }
+        },
+        "vars": {
+          "indicator": "employment",
+          "query": "What is U.S. employment?",
+          "expected_tools": "resolve",
+          "expected_series_ids": "",
+          "expected_top_ids": "LNS12000000,CES0000000001"
+        },
+        "metadata": {
+          "mechanism": "ambiguous_concept",
+          "expected_type": "clarify",
+          "_promptfooFileMetadata": {}
+        },
+        "failureReason": 0
+      }
+    ],
+    "stats": {
+      "successes": 5,
+      "failures": 0,
+      "errors": 0,
+      "tokenUsage": {
+        "prompt": 0,
+        "completion": 0,
+        "cached": 0,
+        "total": 0,
+        "numRequests": 5,
+        "completionDetails": {
+          "reasoning": 0,
+          "acceptedPrediction": 0,
+          "rejectedPrediction": 0,
+          "cacheReadInputTokens": 0,
+          "cacheCreationInputTokens": 0
+        },
+        "assertions": {
+          "total": 0,
+          "prompt": 0,
+          "completion": 0,
+          "cached": 0,
+          "numRequests": 0,
+          "completionDetails": {
+            "reasoning": 0,
+            "acceptedPrediction": 0,
+            "rejectedPrediction": 0,
+            "cacheReadInputTokens": 0,
+            "cacheCreationInputTokens": 0
+          }
+        }
+      },
+      "durationMs": 37112,
+      "evaluationDurationMs": 37112
+    }
+  },
+  "config": {
+    "tags": {},
+    "description": "Standalone BLS MCP function-calling evaluation",
+    "prompts": [
+      "{{query}}"
+    ],
+    "providers": [
+      {
+        "id": "file://provider.py",
+        "label": "standalone-mcp",
+        "config": {
+          "model": "gpt-5.6-luna",
+          "model_reasoning_effort": "medium",
+          "mcp_url": "http://127.0.0.1:8000/mcp"
+        }
+      }
+    ],
+    "tests": [
+      {
+        "description": "unemployment-rate",
+        "vars": {
+          "indicator": "unemployment rate",
+          "query": "What is the U.S. unemployment rate?",
+          "expected_tools": "resolve,fetch_bls_data",
+          "expected_series_ids": "LNS14000000"
+        },
+        "metadata": {
+          "mechanism": "ambiguous_default",
+          "expected_type": "exact"
+        }
+      },
+      {
+        "description": "labor-force-participation",
+        "vars": {
+          "indicator": "labor force participation rate",
+          "query": "What is the value of the labor force participation rate?",
+          "expected_tools": "resolve,fetch_bls_data",
+          "expected_series_ids": "LNS11300000"
+        },
+        "metadata": {
+          "mechanism": "headline",
+          "expected_type": "exact"
+        }
+      },
+      {
+        "description": "nonfarm-payroll",
+        "vars": {
+          "indicator": "nonfarm payroll employment",
+          "query": "What is seasonally adjusted monthly U.S. total nonfarm payroll employment?",
+          "expected_tools": "resolve,fetch_bls_data",
+          "expected_series_ids": "CES0000000001"
+        },
+        "metadata": {
+          "mechanism": "headline",
+          "expected_type": "exact"
+        }
+      },
+      {
+        "description": "consumer-price-index",
+        "vars": {
+          "indicator": "consumer price index",
+          "query": "What is the current consumer price index?",
+          "expected_tools": "resolve",
+          "expected_series_ids": ""
+        },
+        "metadata": {
+          "mechanism": "coverage_gap",
+          "expected_type": "gap"
+        }
+      },
+      {
+        "description": "employment-ambiguous",
+        "vars": {
+          "indicator": "employment",
+          "query": "What is U.S. employment?",
+          "expected_tools": "resolve",
+          "expected_series_ids": "",
+          "expected_top_ids": "LNS12000000,CES0000000001"
+        },
+        "metadata": {
+          "mechanism": "ambiguous_concept",
+          "expected_type": "clarify"
+        }
+      }
+    ],
+    "env": {},
+    "defaultTest": {
+      "assert": [
+        {
+          "type": "python",
+          "value": "file://assert_result.py"
+        }
+      ],
+      "vars": {},
+      "options": {},
+      "metadata": {}
+    },
+    "outputPath": [
+      "outputs/l2-results.json"
+    ],
+    "extensions": [],
+    "metadata": {},
+    "evaluateOptions": {}
+  },
+  "shareableUrl": null,
+  "metadata": {
+    "promptfooVersion": "0.121.20",
+    "nodeVersion": "v26.6.0",
+    "platform": "darwin",
+    "arch": "arm64",
+    "exportedAt": "2026-09-04T09:52:48.998Z",
+    "evaluationCreatedAt": "2026-09-04T09:52:11.524Z"
+  },
+  "vars": [
+    "indicator",
+    "query",
+    "expected_tools",
+    "expected_series_ids",
+    "expected_top_ids"
+  ],
+  "runtimeOptions": {
+    "eventSource": "cli",
+    "showProgressBar": true,
+    "repeat": 1,
+    "maxConcurrency": 4,
+    "cache": false
+  }
+}

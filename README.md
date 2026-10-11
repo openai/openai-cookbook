@@ -15,6 +15,11 @@ Most code examples are written in Python, though the concepts can be applied in 
 
 For other useful tools, guides and courses, check out these [related resources from around the web](https://cookbook.openai.com/related_resources).
 
+## RAG troubleshooting
+
+If you're shipping retrieval systems, see the quick
+[RAG troubleshooting checklist](./articles/rag_troubleshooting_checklist.md).
+
 ## License
 
 MIT License

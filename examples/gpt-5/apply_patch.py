@@ -48,9 +48,6 @@ def assemble_changes(orig: dict[str, Optional[str]], dest: dict[str, Optional[st
     return commit
 
 
-from pydantic import BaseModel, Field
-
-
 class Chunk(BaseModel):
     orig_index: int = -1  # line index of the first line in the original file
     del_lines: list[str] = Field(default_factory=list)
@@ -66,9 +63,6 @@ class PatchAction(BaseModel):
 
 class Patch(BaseModel):
     actions: dict[str, PatchAction] = Field(default_factory=dict)
-
-
-from pydantic import BaseModel, Field
 
 
 class Parser(BaseModel):

@@ -3842,3 +3842,15 @@
     - evals
     - agents
     - responses
+
+- title: Offline tool-calling eval harness
+  path: examples/agent_optimization/offline_tool_eval/README.md
+  slug: offline-tool-eval-harness
+  description: Evaluate tool-calling agents offline with deterministic mock tools, task fixtures, and a policy-based agent loop. Measures sequence accuracy, argument correctness, and step efficiency without any API calls.
+  date: '2026-10-12'
+  authors:
+    - Shehab-Hegab
+  tags:
+    - evals
+    - agents
+    - tool-calling

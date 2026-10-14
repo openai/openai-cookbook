@@ -1,0 +1,16 @@
+{
+  "extends": "./tsconfig.json",
+  "compilerOptions": {
+    "outDir": "dist",
+    "rootDir": ".",
+    "types": ["node"]
+  },
+  "include": [
+    "live-smoke.ts",
+    "trace-smoke.ts",
+    "server.ts",
+    "providers/**/*.ts",
+    "schemas/**/*.ts"
+  ],
+  "exclude": ["tests/**/*.ts"]
+}

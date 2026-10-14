@@ -1,0 +1,205 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>Data agent</title>
+    <style>
+      * { box-sizing: border-box; }
+      body { margin: 0; background: #f6f8f7; color: #18241f; font: 14px/1.55 system-ui, sans-serif; }
+      main { max-width: 1040px; margin: 72px auto; padding: 0 24px; }
+      header { display: flex; align-items: center; justify-content: space-between; gap: 16px; }
+      h1 { margin: 0; font-size: 32px; font-weight: 650; }
+      h2 { margin: 0 0 16px; font-size: 16px; font-weight: 600; }
+      .badge { display: inline-flex; align-items: center; gap: 8px; padding: 7px 11px; border: 1px solid #d6e8dd; border-radius: 6px; background: #eef7f1; color: #206c43; font-size: 12px; white-space: nowrap; }
+      .badge::before { width: 7px; height: 7px; border-radius: 50%; background: #268651; content: ""; }
+      .intro { max-width: 620px; margin: 8px 0 32px; color: #68746f; }
+      .metrics { display: grid; grid-template-columns: repeat(4, minmax(0, 1fr)); gap: 12px; margin-bottom: 18px; }
+      .metric, .panel { background: #fff; border: 1px solid #e2e8e4; border-radius: 8px; }
+      .metric { min-width: 0; padding: 17px 18px; }
+      .metric span { display: block; margin-bottom: 5px; color: #718078; font-size: 12px; }
+      .metric strong { display: block; overflow-wrap: anywhere; font-size: 21px; font-weight: 620; }
+      .panel { padding: 22px; }
+      form { display: flex; gap: 10px; }
+      input { min-width: 0; flex: 1; padding: 11px 13px; border: 1px solid #d7dfda; border-radius: 6px; outline: none; color: inherit; font: inherit; }
+      input:focus { border-color: #27945d; box-shadow: 0 0 0 3px #e6f3eb; }
+      button { padding: 10px 16px; border: 1px solid transparent; border-radius: 6px; background: #167449; color: white; font: inherit; cursor: pointer; }
+      button:hover { background: #115f3b; }
+      button:disabled { cursor: wait; opacity: 0.65; }
+      .ideas { display: flex; flex-wrap: wrap; gap: 8px; margin-top: 13px; }
+      .idea { padding: 6px 9px; border-color: #e1e7e3; background: #fff; color: #52625a; font-size: 12px; }
+      .idea:hover { border-color: #cbded2; background: #f3f8f5; }
+      #answer:not(:empty) { margin-top: 22px; padding-top: 20px; border-top: 1px solid #edf0ee; white-space: pre-wrap; }
+      #sql:not(:empty) { margin-top: 14px; padding: 12px; border-radius: 6px; background: #f5f7f6; color: #52625a; white-space: pre-wrap; overflow-wrap: anywhere; font: 12px/1.55 ui-monospace, monospace; }
+      .memory { margin-top: 18px; }
+      #memories { margin-bottom: 16px; }
+      .memory-empty { margin: 0; color: #76827b; }
+      .memory-item { display: flex; align-items: flex-start; justify-content: space-between; gap: 12px; padding: 11px 0; border-bottom: 1px solid #edf0ee; }
+      .memory-item:first-child { padding-top: 0; }
+      .memory-note { min-width: 0; overflow-wrap: anywhere; }
+      .memory-scope { display: block; margin-top: 2px; color: #76827b; font-size: 11px; text-transform: capitalize; }
+      .remove-memory { flex-shrink: 0; width: 28px; height: 28px; padding: 0; border-color: transparent; background: transparent; color: #76827b; font-size: 20px; line-height: 1; }
+      .remove-memory:hover { border-color: #f0d9d7; background: #fff5f4; color: #ad3430; }
+      @media (max-width: 640px) { main { margin: 36px auto; padding: 0 18px; } header { align-items: flex-start; flex-direction: column; } .metrics { grid-template-columns: repeat(2, minmax(0, 1fr)); } .panel { padding: 17px; } form { flex-direction: column; } }
+    </style>
+  </head>
+  <body>
+    <main>
+      <header><h1>Data agent</h1><span class="badge">Read-only warehouse access</span></header>
+      <p class="intro">Ask about your business. Your agent finds relevant data, checks definitions, and shows the SQL behind every answer.</p>
+      <section class="metrics">
+        <div class="metric"><span>Data source</span><strong id="engine">Loading...</strong></div>
+        <div class="metric"><span>Connected tables</span><strong id="tables">Loading...</strong></div>
+        <div class="metric"><span>Business definitions</span><strong id="metrics">Loading...</strong></div>
+        <div class="metric"><span>Saved memories</span><strong id="memory-count">Loading...</strong></div>
+      </section>
+      <section class="panel">
+        <h2>Ask your data</h2>
+        <form id="question-form"><input id="question" aria-label="Question about your data" placeholder="Why did paid conversions drop last week?" autocomplete="off" required /><button type="submit">Ask the agent</button></form>
+        <div class="ideas"><button class="idea" type="button">Why did conversions drop last week?</button><button class="idea" type="button">Compare conversion by acquisition channel.</button><button class="idea" type="button">Only include enterprise customers.</button></div>
+        <div id="answer" role="status"></div><div id="sql"></div>
+      </section>
+      <section class="panel memory">
+        <h2>Analyst memory</h2>
+        <div id="memories"><p class="memory-empty">No corrections saved yet.</p></div>
+        <form id="memory-form"><input id="memory" aria-label="Correction to remember" placeholder="Enterprise conversion excludes manually provisioned accounts." autocomplete="off" required /><button type="submit">Save for the team</button></form>
+        <p id="memory-status" role="status"></p>
+      </section>
+    </main>
+    <script>
+      let conversationId;
+      let busy = false;
+      const form = document.querySelector('#question-form');
+      const question = document.querySelector('#question');
+      const memoryStatus = document.querySelector('#memory-status');
+
+      async function requestJSON(url, options) {
+        const response = await fetch(url, options);
+        if (!response.ok) throw new Error('The request failed. Please try again.');
+        return response.json();
+      }
+
+      function showMemories(memories) {
+        document.querySelector('#memory-count').textContent = memories.length.toLocaleString();
+        const container = document.querySelector('#memories');
+        container.replaceChildren();
+
+        if (!memories.length) {
+          const empty = document.createElement('p');
+          empty.className = 'memory-empty';
+          empty.textContent = 'No corrections saved yet.';
+          container.append(empty);
+          return;
+        }
+
+        memories.forEach((memory) => {
+          const row = document.createElement('div');
+          row.className = 'memory-item';
+
+          const note = document.createElement('div');
+          note.className = 'memory-note';
+          note.textContent = memory.note;
+
+          const scope = document.createElement('span');
+          scope.className = 'memory-scope';
+          scope.textContent = memory.scope;
+          note.append(scope);
+
+          const remove = document.createElement('button');
+          remove.className = 'remove-memory';
+          remove.type = 'button';
+          remove.title = 'Remove memory';
+          remove.setAttribute('aria-label', 'Remove memory');
+          remove.innerHTML = '&times;';
+          remove.addEventListener('click', async () => {
+            remove.disabled = true;
+            memoryStatus.textContent = '';
+            try {
+              const result = await requestJSON(`/api/memories/${encodeURIComponent(memory.id)}`, {
+                method: 'DELETE',
+              });
+              showMemories(result.memories);
+            } catch {
+              memoryStatus.textContent = 'Could not remove that memory. Please try again.';
+              remove.disabled = false;
+            }
+          });
+
+          row.append(note, remove);
+          container.append(row);
+        });
+      }
+
+      requestJSON('/api/warehouse').then((warehouse) => {
+        document.querySelector('#engine').textContent = warehouse.engine;
+        document.querySelector('#tables').textContent = warehouse.tables.toLocaleString();
+        document.querySelector('#metrics').textContent = warehouse.metrics.toLocaleString();
+        document.querySelector('#memory-count').textContent = warehouse.memories.toLocaleString();
+      }).catch(() => {
+        document.querySelector('#engine').textContent = 'Unavailable';
+        for (const id of ['tables', 'metrics', 'memory-count']) document.getElementById(id).textContent = '-';
+      });
+      requestJSON('/api/memories').then((result) => showMemories(result.memories)).catch(() => {
+        memoryStatus.textContent = 'Could not load saved memories. Refresh to try again.';
+      });
+
+      document.querySelectorAll('.idea').forEach((button) => button.addEventListener('click', () => {
+        question.value = button.textContent;
+        form.requestSubmit();
+      }));
+
+      form.addEventListener('submit', async (event) => {
+        event.preventDefault();
+        if (busy) return;
+        busy = true;
+        const submit = form.querySelector('button[type="submit"]');
+        const answer = document.querySelector('#answer');
+        submit.disabled = true;
+        document.querySelectorAll('.idea').forEach((button) => { button.disabled = true; });
+        answer.textContent = 'Finding relevant tables and checking the numbers...';
+        document.querySelector('#sql').textContent = '';
+
+        try {
+          const result = await requestJSON('/api/ask', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ question: question.value, conversation_id: conversationId }),
+          });
+          conversationId = result.conversation_id;
+          answer.textContent = result.answer || result.detail || 'Something went wrong.';
+          const queries = result.queries || [];
+          document.querySelector('#sql').textContent = queries.length ? `Verified SQL:\n${queries.join('\n\n')}` : '';
+          if (result.memories) showMemories(result.memories);
+        } catch {
+          answer.textContent = 'Could not reach the data agent. Please try again.';
+        } finally {
+          busy = false;
+          submit.disabled = false;
+          document.querySelectorAll('.idea').forEach((button) => { button.disabled = false; });
+        }
+      });
+
+      document.querySelector('#memory-form').addEventListener('submit', async (event) => {
+        event.preventDefault();
+        const input = document.querySelector('#memory');
+        const submit = event.currentTarget.querySelector('button');
+        submit.disabled = true;
+        memoryStatus.textContent = '';
+        try {
+          await requestJSON('/api/memories', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ note: input.value, scope: 'team' }),
+          });
+          input.value = '';
+          const result = await requestJSON('/api/memories');
+          showMemories(result.memories);
+        } catch {
+          memoryStatus.textContent = 'Could not save or refresh memories. Check the list before retrying.';
+        } finally {
+          submit.disabled = false;
+        }
+      });
+    </script>
+  </body>
+</html>

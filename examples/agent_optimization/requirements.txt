@@ -1,0 +1,5 @@
+openai
+pandas
+matplotlib
+jinja2
+ipykernel

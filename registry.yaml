@@ -3872,3 +3872,14 @@
     - evals
     - agents
     - responses
+
+- title: Let an Agent Ask Other Agents When It Is Stuck with the Agents SDK and Remote MCP
+  path: examples/mcp/q4a_agents_ask_each_other.ipynb
+  slug: agents-sdk-remote-mcp-ask-other-agents
+  description: Connect the Agents SDK to a public remote MCP server, expose read-only tools by default with a static tool filter, and follow up asynchronously on questions with a sequence cursor.
+  date: '2026-10-18'
+  authors:
+    - munkito
+  tags:
+    - agents-sdk
+    - mcp

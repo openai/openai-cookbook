@@ -1,0 +1,105 @@
+{
+  "checkout-api": {
+    "team": "Payments SRE",
+    "repository": "acme/checkout-api",
+    "metrics": {
+      "baseline": {
+        "error_rate_percent": 0.4,
+        "p95_latency_ms": 240,
+        "requests_per_minute": 4200
+      },
+      "current": {
+        "error_rate_percent": 18.7,
+        "p95_latency_ms": 1960,
+        "requests_per_minute": 4180,
+        "affected_checkouts_per_minute": 782
+      }
+    },
+    "logs": [
+      {
+        "time": "10:07:14 UTC",
+        "level": "error",
+        "message": "Redis connection pool exhausted: max_connections=8, waiting=143"
+      },
+      {
+        "time": "10:07:19 UTC",
+        "level": "error",
+        "message": "Checkout request timed out while waiting for a Redis connection"
+      },
+      {
+        "time": "10:08:03 UTC",
+        "level": "warning",
+        "message": "Payment retries increased after checkout-api deployment 2026.08.26.4"
+      },
+      {
+        "time": "10:08:27 UTC",
+        "level": "error",
+        "message": "Redis pool wait exceeded 1800ms; checkout request aborted"
+      }
+    ],
+    "deployments": [
+      {
+        "version": "2026.08.26.4",
+        "time": "10:06 UTC",
+        "status": "active",
+        "change": "Reduced Redis max_connections from 64 to 8."
+      },
+      {
+        "version": "2026.08.26.3",
+        "time": "09:12 UTC",
+        "status": "previous_healthy",
+        "change": "Routine dependency updates; error rate remained below 0.5%."
+      }
+    ],
+    "pull_requests": [
+      {
+        "number": 418,
+        "title": "Reduce checkout Redis connection footprint",
+        "merged_at": "10:05 UTC",
+        "commit": "8c41f2e",
+        "url": "https://github.com/acme/checkout-api/pull/418",
+        "files": [
+          {
+            "filename": "config/redis.yaml",
+            "patch": "- max_connections: 64\n+ max_connections: 8"
+          }
+        ]
+      }
+    ],
+    "commits": [
+      {
+        "sha": "8c41f2e",
+        "message": "Reduce checkout Redis connection footprint",
+        "time": "10:05 UTC",
+        "files": ["config/redis.yaml"]
+      },
+      {
+        "sha": "b792d10",
+        "message": "Update checkout service dependencies",
+        "time": "09:12 UTC",
+        "files": ["pyproject.toml"]
+      }
+    ],
+    "aws": {
+      "region": "us-east-1",
+      "cloudwatch": {
+        "alarm": "checkout-api-5xx-rate",
+        "state": "ALARM",
+        "error_rate_percent": 18.7,
+        "p95_latency_ms": 1960
+      },
+      "ecs": {
+        "cluster": "checkout-production",
+        "service": "checkout-api",
+        "deployment": "2026.08.26.4",
+        "running_tasks": 6,
+        "desired_tasks": 6
+      },
+      "elasticache": {
+        "cluster": "checkout-redis",
+        "connection_limit": 8,
+        "waiting_requests": 143
+      }
+    }
+  }
+}

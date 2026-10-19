@@ -1,0 +1,42 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="1440" height="947" viewBox="0 0 1440 947" role="img" aria-labelledby="title description">
+<title id="title">Data analyst workflow</title>
+<desc id="description">User to Your application: Ask a business question. Your application to Agents API: Start or resume session. Agents API to Read-only warehouse: Discover tables and schemas. Agents API to Your application: Check business context. Agents API to Analyst memory: Find saved corrections. Agents API to Read-only warehouse: Run and verify read-only SQL. Agents API to User: Explain findings and sources. User to Agents API: Ask to remember a correction. Agents API to Analyst memory: Save for future analyses.</desc>
+<defs><marker id="arrow" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="8" markerHeight="8" orient="auto-start-reverse" markerUnits="userSpaceOnUse"><path d="M 0 0 L 10 5 L 0 10 Z" fill="#253443"/></marker></defs>
+<rect width="1440" height="947" fill="#FFFFFF"/>
+<g font-family="Arial, Helvetica, sans-serif">
+<text x="24" y="46" text-anchor="start" font-size="26" font-weight="600" fill="#162231"><tspan x="24" dy="0">Data analyst</tspan></text>
+<rect x="24" y="80" width="267.2" height="788.6000000000001" fill="#F4F5F6"/>
+<rect x="24" y="80" width="267.2" height="78" fill="#E4E6E9"/>
+<text x="157.6" y="125.05" text-anchor="middle" font-size="23" font-weight="600" fill="#162231"><tspan x="157.6" dy="0">User</tspan></text>
+<path d="M 157.6 158 V 868.6000000000001" fill="none" stroke="#A8B3BC" stroke-width="1" stroke-dasharray="6 6"/>
+<rect x="305.2" y="80" width="267.2" height="788.6000000000001" fill="#EDF7FE"/>
+<rect x="305.2" y="80" width="267.2" height="78" fill="#CCE6FA"/>
+<text x="438.79999999999995" y="125.05" text-anchor="middle" font-size="23" font-weight="600" fill="#162231"><tspan x="438.79999999999995" dy="0">Your application</tspan></text>
+<path d="M 438.79999999999995 158 V 652.8000000000001" fill="none" stroke="#A8B3BC" stroke-width="1" stroke-dasharray="6 6"/>
+<path d="M 438.79999999999995 685.4000000000001 V 721.4000000000001" fill="none" stroke="#A8B3BC" stroke-width="1" stroke-dasharray="6 6"/>
+<path d="M 438.79999999999995 754.0000000000001 V 868.6000000000001" fill="none" stroke="#A8B3BC" stroke-width="1" stroke-dasharray="6 6"/>
+<rect x="586.4" y="80" width="267.2" height="788.6000000000001" fill="#EEFBF3"/>
+<rect x="586.4" y="80" width="267.2" height="78" fill="#CDF2DB"/>
+<text x="720" y="125.05" text-anchor="middle" font-size="23" font-weight="600" fill="#162231"><tspan x="720" dy="0">Agents API</tspan></text>
+<path d="M 720 158 V 868.6000000000001" fill="none" stroke="#A8B3BC" stroke-width="1" stroke-dasharray="6 6"/>
+<rect x="867.5999999999999" y="80" width="267.2" height="788.6000000000001" fill="#EDF7FE"/>
+<rect x="867.5999999999999" y="80" width="267.2" height="78" fill="#CCE6FA"/>
+<text x="1001.1999999999999" y="125.05" text-anchor="middle" font-size="23" font-weight="600" fill="#162231"><tspan x="1001.1999999999999" dy="0">Read-only warehouse</tspan></text>
+<path d="M 1001.1999999999999 158 V 487" fill="none" stroke="#A8B3BC" stroke-width="1" stroke-dasharray="6 6"/>
+<path d="M 1001.1999999999999 519.6 V 790.0000000000001" fill="none" stroke="#A8B3BC" stroke-width="1" stroke-dasharray="6 6"/>
+<path d="M 1001.1999999999999 822.6000000000001 V 868.6000000000001" fill="none" stroke="#A8B3BC" stroke-width="1" stroke-dasharray="6 6"/>
+<rect x="1148.8" y="80" width="267.2" height="788.6000000000001" fill="#FFFCED"/>
+<rect x="1148.8" y="80" width="267.2" height="78" fill="#FFF0B3"/>
+<text x="1282.3999999999999" y="125.05" text-anchor="middle" font-size="23" font-weight="600" fill="#162231"><tspan x="1282.3999999999999" dy="0">Analyst memory</tspan></text>
+<path d="M 1282.3999999999999 158 V 868.6000000000001" fill="none" stroke="#A8B3BC" stroke-width="1" stroke-dasharray="6 6"/>
+<g data-from="0" data-to="1"><path d="M 157.6 222.6 H 438.79999999999995" fill="none" stroke="#253443" stroke-width="1.6"  marker-end="url(#arrow)"/><text x="298.2" y="208" text-anchor="middle" font-size="22" font-weight="400" fill="#162231"><tspan x="298.2" dy="0">Ask a business question</tspan></text></g>
+<g data-from="1" data-to="2"><path d="M 438.79999999999995 291.2 H 720" fill="none" stroke="#253443" stroke-width="1.6"  marker-end="url(#arrow)"/><text x="579.4" y="276.6" text-anchor="middle" font-size="22" font-weight="400" fill="#162231"><tspan x="579.4" dy="0">Start or resume session</tspan></text></g>
+<g data-from="2" data-to="3"><path d="M 720 388.4 H 1001.1999999999999" fill="none" stroke="#253443" stroke-width="1.6"  marker-end="url(#arrow)"/><text x="860.5999999999999" y="345.2" text-anchor="middle" font-size="22" font-weight="400" fill="#162231"><tspan x="860.5999999999999" dy="0">Discover tables and</tspan><tspan x="860.5999999999999" dy="28.6">schemas</tspan></text></g>
+<g data-from="2" data-to="1"><path d="M 720 457 H 438.79999999999995" fill="none" stroke="#253443" stroke-width="1.6"  marker-end="url(#arrow)"/><text x="579.4" y="442.4" text-anchor="middle" font-size="22" font-weight="400" fill="#162231"><tspan x="579.4" dy="0">Check business context</tspan></text></g>
+<g data-from="2" data-to="4"><path d="M 720 525.6 H 1282.3999999999999" fill="none" stroke="#253443" stroke-width="1.6"  marker-end="url(#arrow)"/><text x="1001.1999999999999" y="511" text-anchor="middle" font-size="22" font-weight="400" fill="#162231"><tspan x="1001.1999999999999" dy="0">Find saved corrections</tspan></text></g>
+<g data-from="2" data-to="3"><path d="M 720 622.8000000000001 H 1001.1999999999999" fill="none" stroke="#253443" stroke-width="1.6"  marker-end="url(#arrow)"/><text x="860.5999999999999" y="579.6" text-anchor="middle" font-size="22" font-weight="400" fill="#162231"><tspan x="860.5999999999999" dy="0">Run and verify read-only</tspan><tspan x="860.5999999999999" dy="28.6">SQL</tspan></text></g>
+<g data-from="2" data-to="0"><path d="M 720 691.4000000000001 H 157.6" fill="none" stroke="#253443" stroke-width="1.6" stroke-dasharray="7 5" marker-end="url(#arrow)"/><text x="438.8" y="676.8000000000001" text-anchor="middle" font-size="22" font-weight="400" fill="#162231"><tspan x="438.8" dy="0">Explain findings and sources</tspan></text></g>
+<g data-from="0" data-to="2"><path d="M 157.6 760.0000000000001 H 720" fill="none" stroke="#253443" stroke-width="1.6"  marker-end="url(#arrow)"/><text x="438.8" y="745.4000000000001" text-anchor="middle" font-size="22" font-weight="400" fill="#162231"><tspan x="438.8" dy="0">Ask to remember a correction</tspan></text></g>
+<g data-from="2" data-to="4"><path d="M 720 828.6000000000001 H 1282.3999999999999" fill="none" stroke="#253443" stroke-width="1.6"  marker-end="url(#arrow)"/><text x="1001.1999999999999" y="814.0000000000001" text-anchor="middle" font-size="22" font-weight="400" fill="#162231"><tspan x="1001.1999999999999" dy="0">Save for future analyses</tspan></text></g>
+<text x="24" y="913.6000000000001" text-anchor="start" font-size="17" font-weight="400" fill="#4D5B6A"><tspan x="24" dy="0">Your application handles warehouse queries and saved memory.</tspan></text>
+</g></svg>

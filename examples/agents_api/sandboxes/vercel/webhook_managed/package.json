@@ -1,0 +1,18 @@
+{
+  "name": "agents-api-webhook-vercel",
+  "private": true,
+  "type": "module",
+  "scripts": {
+    "check": "tsc --noEmit",
+    "deploy": "vercel --prod"
+  },
+  "dependencies": {
+    "@vercel/sandbox": ">=3.1.0-beta.1",
+    "@vercel/queue": ">=0.5.0",
+    "openai": ">=7.5.0"
+  },
+  "devDependencies": {
+    "@types/node": "^24",
+    "typescript": "^5.9"
+  }
+}

@@ -1,0 +1,29 @@
+{
+  "name": "BLS",
+  "version": "0.0.1",
+  "description": "BLS - Bureau of Labor Statistics plugin.",
+  "author": {
+    "name": "Cookbook Example"
+  },
+  "license": "MIT",
+  "keywords": [
+    "bls",
+    "economics",
+    "mcp",
+    "bureau-of-labor-statistics"
+  ],
+  "mcpServers": "./.mcp.json",
+  "interface": {
+    "displayName": "BLS",
+    "shortDescription": "Query BLS data through MCP.",
+    "longDescription": "Connects Codex to the BLS evaluation MCP server.",
+    "developerName": "Cookbook Example",
+    "category": "Data",
+    "capabilities": [
+      "MCP"
+    ],
+    "defaultPrompt": [
+      "What is the current U.S. unemployment rate?"
+    ]
+  }
+}

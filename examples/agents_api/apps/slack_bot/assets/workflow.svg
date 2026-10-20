@@ -1,0 +1,37 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="1440" height="839" viewBox="0 0 1440 839" role="img" aria-labelledby="title description">
+<title id="title">Slack bot workflow</title>
+<desc id="description">User to Slack: Tag the bot to investigate. Slack to Agents API: Start or resume thread session. Agents API to Connected tools: Search Slack and shared apps. Agents API to Thread sandbox: Analyze data or prepare changes. Agents API to Slack: Stream progress and reply. User to Slack: Ask to open a pull request. Slack to Agents API: Continue the same session.</desc>
+<defs><marker id="arrow" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="8" markerHeight="8" orient="auto-start-reverse" markerUnits="userSpaceOnUse"><path d="M 0 0 L 10 5 L 0 10 Z" fill="#253443"/></marker></defs>
+<rect width="1440" height="839" fill="#FFFFFF"/>
+<g font-family="Arial, Helvetica, sans-serif">
+<text x="24" y="46" text-anchor="start" font-size="26" font-weight="600" fill="#162231"><tspan x="24" dy="0">Slack bot</tspan></text>
+<rect x="24" y="80" width="267.2" height="680.0000000000001" fill="#F4F5F6"/>
+<rect x="24" y="80" width="267.2" height="78" fill="#E4E6E9"/>
+<text x="157.6" y="125.05" text-anchor="middle" font-size="23" font-weight="600" fill="#162231"><tspan x="157.6" dy="0">User</tspan></text>
+<path d="M 157.6 158 V 760.0000000000001" fill="none" stroke="#A8B3BC" stroke-width="1" stroke-dasharray="6 6"/>
+<rect x="305.2" y="80" width="267.2" height="680.0000000000001" fill="#EDF7FE"/>
+<rect x="305.2" y="80" width="267.2" height="78" fill="#CCE6FA"/>
+<text x="438.79999999999995" y="125.05" text-anchor="middle" font-size="23" font-weight="600" fill="#162231"><tspan x="438.79999999999995" dy="0">Slack</tspan></text>
+<path d="M 438.79999999999995 158 V 760.0000000000001" fill="none" stroke="#A8B3BC" stroke-width="1" stroke-dasharray="6 6"/>
+<rect x="586.4" y="80" width="267.2" height="680.0000000000001" fill="#EEFBF3"/>
+<rect x="586.4" y="80" width="267.2" height="78" fill="#CDF2DB"/>
+<text x="720" y="125.05" text-anchor="middle" font-size="23" font-weight="600" fill="#162231"><tspan x="720" dy="0">Agents API</tspan></text>
+<path d="M 720 158 V 760.0000000000001" fill="none" stroke="#A8B3BC" stroke-width="1" stroke-dasharray="6 6"/>
+<rect x="867.5999999999999" y="80" width="267.2" height="680.0000000000001" fill="#EDF7FE"/>
+<rect x="867.5999999999999" y="80" width="267.2" height="78" fill="#CCE6FA"/>
+<text x="1001.1999999999999" y="125.05" text-anchor="middle" font-size="23" font-weight="600" fill="#162231"><tspan x="1001.1999999999999" dy="0">Connected tools</tspan></text>
+<path d="M 1001.1999999999999 158 V 447" fill="none" stroke="#A8B3BC" stroke-width="1" stroke-dasharray="6 6"/>
+<path d="M 1001.1999999999999 479.6 V 760.0000000000001" fill="none" stroke="#A8B3BC" stroke-width="1" stroke-dasharray="6 6"/>
+<rect x="1148.8" y="80" width="267.2" height="680.0000000000001" fill="#FFFCED"/>
+<rect x="1148.8" y="80" width="267.2" height="78" fill="#FFF0B3"/>
+<text x="1282.3999999999999" y="125.05" text-anchor="middle" font-size="23" font-weight="600" fill="#162231"><tspan x="1282.3999999999999" dy="0">Thread sandbox</tspan></text>
+<path d="M 1282.3999999999999 158 V 760.0000000000001" fill="none" stroke="#A8B3BC" stroke-width="1" stroke-dasharray="6 6"/>
+<g data-from="0" data-to="1"><path d="M 157.6 222.6 H 438.79999999999995" fill="none" stroke="#253443" stroke-width="1.6"  marker-end="url(#arrow)"/><text x="298.2" y="208" text-anchor="middle" font-size="22" font-weight="400" fill="#162231"><tspan x="298.2" dy="0">Tag the bot to investigate</tspan></text></g>
+<g data-from="1" data-to="2"><path d="M 438.79999999999995 319.8 H 720" fill="none" stroke="#253443" stroke-width="1.6"  marker-end="url(#arrow)"/><text x="579.4" y="276.6" text-anchor="middle" font-size="22" font-weight="400" fill="#162231"><tspan x="579.4" dy="0">Start or resume thread</tspan><tspan x="579.4" dy="28.6">session</tspan></text></g>
+<g data-from="2" data-to="3"><path d="M 720 417 H 1001.1999999999999" fill="none" stroke="#253443" stroke-width="1.6"  marker-end="url(#arrow)"/><text x="860.5999999999999" y="373.8" text-anchor="middle" font-size="22" font-weight="400" fill="#162231"><tspan x="860.5999999999999" dy="0">Search Slack and shared</tspan><tspan x="860.5999999999999" dy="28.6">apps</tspan></text></g>
+<g data-from="2" data-to="4"><path d="M 720 485.6 H 1282.3999999999999" fill="none" stroke="#253443" stroke-width="1.6"  marker-end="url(#arrow)"/><text x="1001.1999999999999" y="471" text-anchor="middle" font-size="22" font-weight="400" fill="#162231"><tspan x="1001.1999999999999" dy="0">Analyze data or prepare changes</tspan></text></g>
+<g data-from="2" data-to="1"><path d="M 720 554.2 H 438.79999999999995" fill="none" stroke="#253443" stroke-width="1.6" stroke-dasharray="7 5" marker-end="url(#arrow)"/><text x="579.4" y="539.6" text-anchor="middle" font-size="22" font-weight="400" fill="#162231"><tspan x="579.4" dy="0">Stream progress and reply</tspan></text></g>
+<g data-from="0" data-to="1"><path d="M 157.6 622.8000000000001 H 438.79999999999995" fill="none" stroke="#253443" stroke-width="1.6"  marker-end="url(#arrow)"/><text x="298.2" y="608.2" text-anchor="middle" font-size="22" font-weight="400" fill="#162231"><tspan x="298.2" dy="0">Ask to open a pull request</tspan></text></g>
+<g data-from="1" data-to="2"><path d="M 438.79999999999995 720.0000000000001 H 720" fill="none" stroke="#253443" stroke-width="1.6"  marker-end="url(#arrow)"/><text x="579.4" y="676.8000000000001" text-anchor="middle" font-size="22" font-weight="400" fill="#162231"><tspan x="579.4" dy="0">Continue the same</tspan><tspan x="579.4" dy="28.6">session</tspan></text></g>
+<text x="24" y="805.0000000000001" text-anchor="start" font-size="17" font-weight="400" fill="#4D5B6A"><tspan x="24" dy="0">The bot application relays Slack messages and manages one session per thread.</tspan></text>
+</g></svg>

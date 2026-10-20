@@ -1,0 +1,3 @@
+# Keep source manifests and starter downloads identical across Git clients.
+* text=auto eol=lf
+*.zip binary

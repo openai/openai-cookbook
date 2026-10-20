@@ -20,7 +20,6 @@ provider account start and reconnect its sandbox.
 | Blaxel | [handler.py](blaxel/webhook_managed/handler.py) | [Deploy](blaxel/webhook_managed/README.md) |
 | Daytona | [handler.py](daytona/webhook_managed/handler.py) | [Deploy](daytona/webhook_managed/README.md) |
 | E2B | [handler.py](e2b/webhook_managed/handler.py) | [Deploy](e2b/webhook_managed/README.md) |
-| Runloop | [handler.py](runloop/webhook_managed/handler.py) | [Deploy](runloop/webhook_managed/README.md) |
 | DigitalOcean | [handler.py](digitalocean/webhook_managed/handler.py) | [Deploy](digitalocean/webhook_managed/README.md) |
 
 Complete the setup below, deploy one provider's handler, then run its

@@ -24,7 +24,6 @@ provider compute; each example documents cleanup of both.
 | [Modal](modal/README.md) | [Run](modal/application_managed/README.md) | [Deploy](modal/webhook_managed/README.md) |
 | [AWS Lambda MicroVMs](aws/README.md) | [Run](aws/application_managed/README.md) | [Deploy](aws/webhook_managed/README.md) |
 | [OCI](oci/README.md) | [Run](oci/application_managed/README.md) | Not included |
-| [Runloop](runloop/README.md) | [Run](runloop/application_managed/README.md) | [Deploy](runloop/webhook_managed/README.md) |
 | [Vercel](vercel/README.md) | [Run](vercel/application_managed/README.md) | [Deploy](vercel/webhook_managed/README.md) |
 
 Each provider folder contains its examples and shared sandbox setup. Webhook

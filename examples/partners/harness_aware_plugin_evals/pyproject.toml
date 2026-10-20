@@ -16,7 +16,7 @@ dev = [
     "jupytext>=1.17,<2",
     "nbconvert>=7.16,<8",
     "ipykernel>=6.29,<8",
-    "jupyterlab>=4.4,<5",
+    "jupyterlab>=4.6.4,<5",
 ]
 
 [tool.pytest.ini_options]

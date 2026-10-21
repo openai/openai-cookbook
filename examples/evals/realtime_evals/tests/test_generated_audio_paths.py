@@ -16,7 +16,17 @@ from walk_harness import generate_audio
 
 
 @pytest.mark.parametrize("layout", ["nested", "sibling", "parent", "same_directory"])
-@pytest.mark.parametrize("path_mode", ["relative", "absolute", "mixed", "csv_absolute"])
+@pytest.mark.parametrize(
+    "path_mode",
+    [
+        "relative",
+        "absolute",
+        "mixed",
+        "csv_absolute",
+        "csv_symlinked",
+        "audio_symlinked",
+    ],
+)
 @pytest.mark.parametrize("existing", [False, True])
 def test_generated_manifest_resolves_to_requested_audio(
     tmp_path, monkeypatch, layout, path_mode, existing
@@ -46,6 +56,16 @@ def test_generated_manifest_resolves_to_requested_audio(
         audio_dir = tmp_path / audio_dir
     if path_mode in ("absolute", "csv_absolute"):
         output_csv = tmp_path / output_csv
+    if path_mode in ("csv_symlinked", "audio_symlinked"):
+        linked_root = tmp_path / "linked_root"
+        try:
+            linked_root.symlink_to(tmp_path, target_is_directory=True)
+        except (OSError, NotImplementedError):
+            pytest.skip("directory symlinks are unavailable")
+        if path_mode == "csv_symlinked":
+            output_csv = linked_root / output_csv
+        else:
+            audio_dir = linked_root / audio_dir
     target = (audio_dir / "synthetic.wav").resolve()
     target.parent.mkdir(parents=True, exist_ok=True)
     if existing:

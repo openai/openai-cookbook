@@ -123,7 +123,9 @@ def main() -> None:
             raise ValueError("example_id is empty")
 
         output_wav_path = args.output_dir / f"{example_id}.wav"
-        audio_paths.append(os.path.relpath(output_wav_path, args.output_csv.parent))
+        audio_paths.append(
+            os.path.relpath(output_wav_path.resolve(), args.output_csv.parent.resolve())
+        )
 
         if output_wav_path.exists() and not args.overwrite:
             continue

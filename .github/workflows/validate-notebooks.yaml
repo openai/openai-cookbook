@@ -46,3 +46,6 @@ jobs:
 
       - name: Validate changed .ipynb files
         run: python .github/scripts/check_notebooks.py
+
+      - name: Validate invoice data and notebook workflow offline
+        run: python -m unittest discover -s .github/scripts -p 'test_invoice_data.py' -v

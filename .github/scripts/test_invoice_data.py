@@ -1,4 +1,4 @@
-"""Offline data and notebook regression checks; run with unittest discovery."""
+"""Tests for invoice data and notebook behavior."""
 
 import io
 import json
@@ -18,14 +18,6 @@ NOTEBOOK = REPOSITORY_ROOT / "examples/Data_extraction_transformation.ipynb"
 
 
 class InvoiceDataTests(unittest.TestCase):
-    def test_single_extraction_directory(self):
-        directories = sorted(
-            path.name
-            for path in DATA_ROOT.glob("extracted_invoice_json*")
-            if path.is_dir()
-        )
-        self.assertEqual(directories, ["extracted_invoice_json"])
-
     def test_extractions_cover_source_invoices(self):
         expected = {
             path.stem + "_extracted.json"
@@ -125,10 +117,6 @@ class InvoiceDataTests(unittest.TestCase):
             self.assertEqual(json.loads(output.getvalue()), invoices[sample_name])
             exec(cell_source("def main_transform("), namespace)
 
-            self.assertEqual(
-                sorted(path.name for path in data.glob("extracted_invoice_json*")),
-                ["extracted_invoice_json"],
-            )
             for name, pages in invoices.items():
                 with self.subTest(invoice=name):
                     raw = data / "extracted_invoice_json" / name

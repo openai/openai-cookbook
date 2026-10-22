@@ -56,9 +56,10 @@ def audio_format_config(audio_format: str, sample_rate_hz: int) -> Dict[str, Any
 def compute_bytes_per_chunk(
     sample_rate_hz: int, chunk_ms: int, bytes_per_sample: int
 ) -> int:
-    # Ensure we always send at least one byte even for tiny chunk sizes.
-    computed = int(sample_rate_hz * (chunk_ms / 1000.0) * bytes_per_sample)
-    return max(1, computed)
+    # Keep chunk boundaries on complete samples so multi-byte formats such as
+    # PCM16 are never split between append events.
+    samples_per_chunk = max(1, int(sample_rate_hz * (chunk_ms / 1000.0)))
+    return samples_per_chunk * bytes_per_sample
 
 
 def chunk_audio_bytes(audio_bytes: bytes, bytes_per_chunk: int) -> List[bytes]:

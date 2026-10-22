@@ -338,7 +338,7 @@ async def collect_realtime_response(
                 awaiting_followup = False
             break
 
-    if response_done_time_ms is None:
+    if response_done_time_ms is None or awaiting_followup:
         raise RealtimeResponseError(
             "Realtime connection closed before a terminal response.done event arrived.",
             failure_stage="response_missing_done",

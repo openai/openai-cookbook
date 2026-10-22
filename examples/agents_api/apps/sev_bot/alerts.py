@@ -117,6 +117,18 @@ def queue_alerts(
     bot: IncidentBot, payload: dict[str, Any], tasks: BackgroundTasks
 ) -> dict[str, Any]:
     alerts = normalize_alerts(payload)
+    # Reject unknown services before registering incidents or changing retry state.
+    known_fingerprints = set(bot.fingerprints)
+    for alert in alerts:
+        fingerprint = str(alert.get("fingerprint", ""))
+        if alert.get("status") == "resolved" or fingerprint in known_fingerprints:
+            continue
+        try:
+            bot.service(str(alert.get("labels", {}).get("service", "")))
+        except ValueError as error:
+            raise HTTPException(status_code=400, detail=str(error)) from error
+        known_fingerprints.add(fingerprint)
+
     incident_tasks = BackgroundTasks()
 
     accepted: list[str] = []

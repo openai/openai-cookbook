@@ -1,7 +1,7 @@
 """Models used when interacting with the database interface."""
 import json
 import uuid
-from datetime import datetime
+from datetime import UTC, datetime
 from enum import StrEnum
 
 from pydantic import BaseModel, Field, model_validator
@@ -69,7 +69,7 @@ class TemporalEvent(BaseModel):
     invalid_at: datetime | None = None
     temporal_type: TemporalType
     statement_type: StatementType
-    created_at: datetime = Field(default_factory=datetime.now)
+    created_at: datetime = Field(default_factory=lambda: datetime.now(UTC))
     expired_at: datetime | None = None
     invalidated_by: uuid.UUID | None = None
 

@@ -48,6 +48,7 @@ Write `/workspace/output/<document-stem>.json` with the following fields:
   "calculation": {
     "line_items": [{"quantity": 2, "unit_price": 100}],
     "shipping": 20,
+    "stated_subtotal": 200,
     "calculated_total": 220,
     "difference": 6200
   }
@@ -56,7 +57,10 @@ Write `/workspace/output/<document-stem>.json` with the following fields:
 
 Every `issues` entry must be a plain-English string, not a nested object.
 Use the actual document values, not the illustrative numbers above. Include every
-invoice line item in `calculation`; `amount` is the stated total. For contracts,
+invoice line item in `calculation`; `amount` is the stated total and
+`stated_subtotal` is the subtotal printed on the invoice. The application
+verifies the extracted line items add up to the printed subtotal, so copy it
+exactly. For contracts,
 set `document_type` to `contract` and `calculation` to `null`.
 
 Only the coordinator writes `summary.json`. A specialist writes its assigned report.

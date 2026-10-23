@@ -4,6 +4,18 @@
 # should build pages for, and indicates metadata such as tags, creation date and
 # authors for each page.
 
+- title: "Diagnose MCP OAuth configuration drift without credentials"
+  path: examples/oauth_diagnostics/mcp_connection_doctor.ipynb
+  slug: mcp-oauth-configuration-diagnostics
+  description: "Compare configured intent, public discovery values, and public observations with an offline diagnostic that reports drift without echoing supplied values or claiming authentication."
+  date: 2026-10-23
+  authors:
+    - QueenFi703
+  tags:
+    - mcp
+    - oauth
+    - security
+
 - title: Harness-aware evaluation of plugins
   path: examples/partners/harness_aware_plugin_evals/harness_aware_plugin_evals.ipynb
   slug: harness-aware-plugin-evals

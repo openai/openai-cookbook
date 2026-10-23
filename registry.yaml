@@ -56,8 +56,7 @@
   slug: agents-api-aws-lambda-microvms
   description: Run agent tools in AWS Lambda MicroVMs with application-managed or webhook-managed provisioning, file transfers, and suspend/resume.
   date: 2026-09-29
-  authors:
-    - alfozan
+  authors: []
   tags:
     - agents-api
     - agents
@@ -80,8 +79,7 @@
   slug: agents-api-sev-bot
   description: Investigate incidents in Slack using service telemetry, GitHub, AWS, and past incident reports, with human review before recovery.
   date: 2026-09-10
-  authors:
-    - alfozan
+  authors: []
   tags:
     - agents-api
     - agents
@@ -92,8 +90,7 @@
   slug: agents-api-slack-bot
   description: Connect Slack threads to persistent agent sessions, workplace tools, and isolated sandboxes.
   date: 2026-09-10
-  authors:
-    - alfozan
+  authors: []
   tags:
     - agents-api
     - agents
@@ -104,8 +101,7 @@
   slug: agents-api-data-analyst
   description: Investigate warehouse questions with read-only SQL, business context, and saved analyst corrections.
   date: 2026-09-10
-  authors:
-    - alfozan
+  authors: []
   tags:
     - agents-api
     - agents
@@ -428,8 +424,7 @@
   slug: agents-sdk-deployment-manager
   description: Run, inspect, and trace local Agents SDK demo apps from a browser-based deployment manager.
   date: 2026-05-05
-  authors:
-    - alfozan
+  authors: []
   tags:
     - agents-sdk
     - agents

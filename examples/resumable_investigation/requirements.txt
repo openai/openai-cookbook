@@ -1,0 +1,3 @@
+# Runtime and unittest suite use only Python 3.11+ standard library.
+# Used only for notebook schema validation; install ahead of offline execution.
+nbformat>=5.10,<6

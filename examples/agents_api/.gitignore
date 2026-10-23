@@ -1,0 +1,6 @@
+node_modules/
+.ruff_cache/
+*.py.lock
+/apps/data_analyst/memories.json
+/apps/sev_bot/incident_memory.json
+/apps/sev_bot/incident_memory.json.tmp

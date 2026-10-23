@@ -1,0 +1,17 @@
+Metric,Result
+Task completion,Passed
+Semantic quality,90%
+Tool accuracy,50%
+Tool calls,1 of 2 expected
+Delegation accuracy,100%
+Delegations,2 versus 1 expected
+Scored conversation turns,7 versus 7 expected
+Response latency,1.513333 seconds
+Response rate,75% (3 of 4 scored opportunities)
+Assistant interruption rate,0%
+Floor-hold silence (cumulative / maximum),4.62 / 1.7 seconds
+Frontend audio usage,42 seconds
+Backend model,gpt-5.6-terra
+Backend input tokens,2374
+Backend output tokens,105
+Backend total tokens,2479

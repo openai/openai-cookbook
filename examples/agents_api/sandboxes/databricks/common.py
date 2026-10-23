@@ -50,13 +50,13 @@ class SandboxCommandError(RuntimeError):
     """A command run in the sandbox did not complete successfully."""
 
 
-def run_command(w, name, script, *, envs=None, timeout_s=120, check=True):
+def run_command(workspace_client, name, script, *, envs=None, timeout_s=120, check=True):
     """Run a bash script in the sandbox via the unary ``execute_command_sync`` API.
 
     ``execute_command_sync`` is direct-exec (no shell, no login profile), so every
     command goes through ``/bin/bash -lc`` to get a login shell and a PATH.
     """
-    response = w.sandbox.execute_command_sync(
+    response = workspace_client.sandbox.execute_command_sync(
         name,
         "/bin/bash",
         args=["-lc", script],
@@ -72,22 +72,22 @@ def run_command(w, name, script, *, envs=None, timeout_s=120, check=True):
     return response
 
 
-def _wait_for_state(w, name, target, *, timeout_s=180, poll_s=3):
+def _wait_for_state(workspace_client, name, target, *, timeout_s=180, poll_s=3):
     deadline = time.monotonic() + timeout_s
     while time.monotonic() < deadline:
-        if w.sandbox.get_sandbox(name).status.state == target:
+        if workspace_client.sandbox.get_sandbox(name).status.state == target:
             return
         time.sleep(poll_s)
     raise TimeoutError(f"sandbox {name} did not reach {target} within {timeout_s}s")
 
 
-def provision_sandbox(w, sandbox_id, *, inactivity_timeout_s=900):
+def provision_sandbox(workspace_client, sandbox_id, *, inactivity_timeout_s=900):
     """Create the sandbox (or reuse and start an existing one) and wait until RUNNING."""
     name = f"sandboxes/{sandbox_id}"
     try:
-        sandbox = w.sandbox.get_sandbox(name)
+        sandbox = workspace_client.sandbox.get_sandbox(name)
     except NotFound:
-        sandbox = w.sandbox.create_sandbox(
+        sandbox = workspace_client.sandbox.create_sandbox(
             Sandbox(
                 spec=SandboxSpec(
                     compute=ComputeSpec(
@@ -101,14 +101,22 @@ def provision_sandbox(w, sandbox_id, *, inactivity_timeout_s=900):
         SandboxState.SANDBOX_STATE_STOPPED,
         SandboxState.SANDBOX_STATE_STOPPING,
     ):
-        w.sandbox.start_sandbox(name)
-    _wait_for_state(w, name, SandboxState.SANDBOX_STATE_RUNNING)
+        workspace_client.sandbox.start_sandbox(name)
+    _wait_for_state(workspace_client, name, SandboxState.SANDBOX_STATE_RUNNING)
     return name
 
 
-def prepare_workspace(w, name, *, work_dir=WORK_DIR):
-    """Create the agent's workspace directory. The executor chdir's here per tool call."""
-    run_command(w, name, f"mkdir -p {shlex.quote(work_dir)}")
+def prepare_workspace(workspace_client, name, *, work_dir=WORK_DIR):
+    """Create the agent's workspace directory and clear output from a prior run.
+
+    The executor changes directory to this path for each tool call. Removing a stale
+    output file first keeps verification from passing on a previous run's greeting when
+    the sandbox is reused (for example with --keep-sandbox).
+    """
+    output = f"{work_dir}/{OUTPUT_PATH}"
+    run_command(
+        workspace_client, name, f"mkdir -p {shlex.quote(work_dir)}; rm -f {shlex.quote(output)}"
+    )
 
 
 def _parse_pid(stdout):
@@ -118,7 +126,7 @@ def _parse_pid(stdout):
     raise SandboxCommandError(f"could not read exec-server pid from: {stdout!r}")
 
 
-def start_executor(w, name, *, environment_id, remote_url, executor_api_key):
+def start_executor(workspace_client, name, *, environment_id, remote_url, executor_api_key):
     """Start codex exec-server detached so the sync RPC returns while it stays connected.
 
     exec-server holds a long-lived outbound connection to OpenAI for the whole session,
@@ -135,16 +143,16 @@ def start_executor(w, name, *, environment_id, remote_url, executor_api_key):
         f"</dev/null >{EXECUTOR_LOG} 2>&1 & echo pid=$!"
     )
     response = run_command(
-        w, name, script, envs={"CODEX_API_KEY": executor_api_key, "RUST_LOG": "info"}
+        workspace_client, name, script, envs={"CODEX_API_KEY": executor_api_key, "RUST_LOG": "info"}
     )
     return _parse_pid(response.stdout)
 
 
-def confirm_executor(w, name, pid, *, settle_s=8):
+def confirm_executor(workspace_client, name, pid, *, settle_s=8):
     """Give the executor a moment to register, then confirm it is still running."""
     time.sleep(settle_s)
     out = run_command(
-        w,
+        workspace_client,
         name,
         f"if ps -p {pid} >/dev/null; then echo ALIVE; else echo DEAD; fi; "
         f"tail -n 20 {EXECUTOR_LOG}",
@@ -154,24 +162,24 @@ def confirm_executor(w, name, pid, *, settle_s=8):
     return out
 
 
-def stop_executor(w, name, pid):
+def stop_executor(workspace_client, name, pid):
     run_command(
-        w,
+        workspace_client,
         name,
         f"kill -TERM -{pid} 2>/dev/null; kill -TERM {pid} 2>/dev/null; true",
         check=False,
     )
 
 
-def verify_output(w, name, expected=GREETING, *, work_dir=WORK_DIR):
-    content = run_command(w, name, f"cat {shlex.quote(work_dir)}/{OUTPUT_PATH}").stdout
+def verify_output(workspace_client, name, expected=GREETING, *, work_dir=WORK_DIR):
+    content = run_command(workspace_client, name, f"cat {shlex.quote(work_dir)}/{OUTPUT_PATH}").stdout
     if expected.strip() not in content:
         raise RuntimeError(f"sandbox output did not contain expected text: {content!r}")
     return content
 
 
-def delete_sandbox(w, name):
-    w.sandbox.delete_sandbox(name)
+def delete_sandbox(workspace_client, name):
+    workspace_client.sandbox.delete_sandbox(name)
 
 
 async def run_turn(client, session_id, prompt=PROMPT):
@@ -207,9 +215,10 @@ async def delete_session(client, session_id):
             await client.beta.agents.sessions.delete(session_id)
             break
         except APIStatusError as error:
-            # 409 means a turn is still in progress; wait for it to settle and retry.
+            # 409 means a turn is still in progress; cancel it, let it settle, and retry.
             if error.status_code != 409 or attempt == 9:
                 raise
+            await client.beta.agents.sessions.cancel(session_id)
             await asyncio.sleep(2)
     try:
         await client.beta.agents.sessions.retrieve(session_id)

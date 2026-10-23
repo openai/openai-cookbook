@@ -48,7 +48,7 @@ async def main(args):
             "'missing required scope api.agents.environments.connect'"
         )
 
-    w = WorkspaceClient(profile=args.profile)
+    workspace_client = WorkspaceClient(profile=args.profile)
     name = None
     pid = None
     session = None
@@ -61,30 +61,35 @@ async def main(args):
             print(f"Session: {session.id}", flush=True)
 
             name = provision_sandbox(
-                w, args.sandbox_id, inactivity_timeout_s=args.inactivity_timeout
+                workspace_client, args.sandbox_id, inactivity_timeout_s=args.inactivity_timeout
             )
             print(f"Sandbox: {name}", flush=True)
-            prepare_workspace(w, name)
+            prepare_workspace(workspace_client, name)
 
             pid = start_executor(
-                w,
+                workspace_client,
                 name,
                 environment_id=session.environment.id,
                 remote_url=session.environment.remote_url,
                 executor_api_key=executor_key,
             )
-            confirm_executor(w, name, pid)
+            confirm_executor(workspace_client, name, pid)
 
             await run_turn(client, session.id, PROMPT)
-            verify_output(w, name, GREETING)
+            verify_output(workspace_client, name, GREETING)
             print("\nVerified the agent's file write.", flush=True)
         finally:
-            if pid is not None:
-                stop_executor(w, name, pid)
-            if session is not None:
-                await delete_session(client, session.id)
-            if name is not None and not args.keep_sandbox:
-                delete_sandbox(w, name)
+            # Nested finally so a failure in one teardown step still attempts the rest.
+            try:
+                if pid is not None:
+                    stop_executor(workspace_client, name, pid)
+            finally:
+                try:
+                    if session is not None:
+                        await delete_session(client, session.id)
+                finally:
+                    if name is not None and not args.keep_sandbox:
+                        delete_sandbox(workspace_client, name)
 
 
 if __name__ == "__main__":

@@ -11,18 +11,20 @@ from collections.abc import AsyncIterator
 from dataclasses import dataclass, field
 from datetime import UTC, datetime
 from pathlib import Path
-from typing import Any
+from typing import TYPE_CHECKING, Any
 
 import docker
 from docker.models.containers import Container
 from openai import AsyncOpenAI, NotFoundError
-from openai.lib.streaming.agents import AsyncToolHandler
 from openai.types.beta import AgentSessionEvent
 from openai.types.beta.agents.session_create_params import Agent
 
 from .memory import load_history, recall_incidents, save_history
 from .slack import SLACK_CHANNEL, SlackChannel, approval_blocks
 from .tools import PROGRESS, configured_tools, get_service, get_service_evidence
+
+if TYPE_CHECKING:
+    from openai.lib.streaming.agents import AsyncToolHandler
 
 EXAMPLE_DIR = Path(__file__).resolve().parent
 DOCKER_IMAGE = "agent-api-sev-sandbox:latest"

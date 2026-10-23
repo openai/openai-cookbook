@@ -63,6 +63,18 @@
     - agents
     - sandbox
 
+- title: Run OpenAI agents on a Databricks Sandbox
+  path: examples/agents_api/sandboxes/databricks/README.md
+  slug: agents-api-databricks-sandbox
+  description: Run agent tools in a Databricks serverless sandbox with application-managed provisioning.
+  date: 2026-10-23
+  authors:
+    - HsingTang
+  tags:
+    - agents-api
+    - agents
+    - sandbox
+
 - title: Build an SRE agent for incident response
   path: examples/agents_api/apps/sev_bot/README.md
   slug: agents-api-sev-bot

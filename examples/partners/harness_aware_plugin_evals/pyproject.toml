@@ -14,7 +14,7 @@ dependencies = [
 dev = [
     "pytest>=9.0.2,<10",
     "jupytext>=1.17,<2",
-    "nbconvert>=7.16,<8",
+    "nbconvert>=7.17.2,<8",
     "ipykernel>=6.29,<8",
     "jupyterlab>=4.4,<5",
 ]

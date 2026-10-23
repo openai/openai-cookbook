@@ -4,6 +4,18 @@
 # should build pages for, and indicates metadata such as tags, creation date and
 # authors for each page.
 
+- title: "Build evidence-driven agent teams"
+  path: examples/evidence_branching/evidence_driven_agent_teams.ipynb
+  slug: evidence-driven-agent-teams
+  description: "Create bounded specialist tasks when evidence conflicts, retire unproductive branches, and retain dissent with an offline scheduler and regression tests."
+  date: 2026-10-23
+  authors:
+    - QueenFi703
+  tags:
+    - agents
+    - responses
+    - evals
+
 - title: Harness-aware evaluation of plugins
   path: examples/partners/harness_aware_plugin_evals/harness_aware_plugin_evals.ipynb
   slug: harness-aware-plugin-evals

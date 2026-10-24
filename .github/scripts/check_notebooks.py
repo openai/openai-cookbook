@@ -11,12 +11,12 @@ def get_changed_notebooks(base_ref: str = "origin/main") -> list[Path]:
     compared to the specified base reference.
     """
     result = subprocess.run(
-        ["git", "diff", "--name-only", base_ref, "--", "*.ipynb"],
+        ["git", "diff", "--name-only", "-z", base_ref, "--", "*.ipynb"],
         capture_output=True,
         text=True,
         check=True,
     )
-    return [Path(line.strip()) for line in result.stdout.splitlines() if line.strip()]
+    return [Path(path) for path in result.stdout.split("\0") if path]
 
 
 def is_valid_notebook(path: Path) -> bool:

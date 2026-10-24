@@ -36,9 +36,9 @@ To connect ChatGPT with Workday, use OAuth:
 
 *The redirection URI is retrieved from the GPT setup once OAuth has been selected as authentication, on the GPT set-up screen.* 
 
-![workday-cgpt-oauth.png](../../../../images/workday-cgpt-oauth.png)
+![workday-cgpt-oauth.png](../../../images/workday-cgpt-oauth.png)
 
-![workday-api-client.png](../../../../images/workday-api-client.png)
+![workday-api-client.png](../../../images/workday-api-client.png)
 
 The [Workday Community page on API client]((https://doc.workday.com/admin-guide/en-us/authentication-and-security/authentication/oauth/dan1370797831010.html)) can be a good resource to go deeper *(this requires a community account)*.
 
@@ -75,9 +75,9 @@ Use the following instructions to cover PTO Submission use-cases, Worker details
 As employee ID is required to take actions on Workday onto the employee, this information will need to be retrieved before doing any queries. We have accomplished this by calling a RAAS report in workday after authentication that provides the user who is logging in. There may be another way to do this via just a REST API call itself. Once the ID has been returned it will be used in all other actions.
 
 Sample RAAS Report: Using the field Current User will return the worker who has authenticated via OAuth.    
-![custom-report-workday-01.png](../../../../images/custom-report-workday-01.png)
+![custom-report-workday-01.png](../../../images/custom-report-workday-01.png)
 
-![custom-report-workday-02.png](../../../../images/custom-report-workday-02.png)
+![custom-report-workday-02.png](../../../images/custom-report-workday-02.png)
 
 ### OpenAPI Schema
 
@@ -394,6 +394,6 @@ Congratulations on setting up a GPT for Workday with capabilities such as PTO su
 
 This integration can streamline HR processes, provide quick access to personal details, and make it easy for employees to request PTO. This guide provides a customizable framework for implementing ChatGPT with Workday, allowing you to easily add more actions and enhance GPT capabilities further.
 
-![workday-gpt.png](../../../../images/workday-gpt.png)
+![workday-gpt.png](../../../images/workday-gpt.png)
 
-![pto-request.png](../../../../images/pto-request.png)
+![pto-request.png](../../../images/pto-request.png)

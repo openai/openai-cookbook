@@ -84,6 +84,16 @@ def _research_runs(project: Project, deployment: Deployment) -> list[dict[str, A
 def list_sessions(
     project: Project, deployment: Deployment, trace_store: TraceStore | None = None
 ) -> list[SessionInfo]:
+    """List all recorded agent and research sessions for a project deployment.
+
+    Args:
+        project: The target Project instance.
+        deployment: The Deployment instance associated with the project.
+        trace_store: Optional TraceStore instance containing captured agent traces.
+
+    Returns:
+        A list of SessionInfo objects sorted by updated_at timestamp in descending order.
+    """
     results: list[SessionInfo] = []
     captured_sessions = _captured_trace_sessions(trace_store, project, deployment)
     used_captured_sessions: set[str] = set()
@@ -189,6 +199,17 @@ def timeline_for_session(
     expense_id: str,
     trace_store: TraceStore | None = None,
 ) -> list[TimelineEvent]:
+    """Retrieve a chronological timeline of events for a specific session or run.
+
+    Args:
+        project: Target Project instance.
+        deployment: Deployment instance associated with the session.
+        expense_id: The unique session or run identifier.
+        trace_store: Optional TraceStore instance.
+
+    Returns:
+        A list of TimelineEvent instances representing agent, tool, and system actions.
+    """
     events: list[TimelineEvent] = _captured_timeline_for_session(
         trace_store, project, deployment, expense_id
     )
@@ -461,6 +482,15 @@ def _span_source(span_type: str, span_data: dict[str, Any]) -> str:
 
 
 def _duration_ms(started_at: Any, ended_at: Any) -> int | None:
+    """Calculate duration in milliseconds between two ISO 8601 timestamp inputs.
+
+    Args:
+        started_at: Start timestamp string or ISO datetime representation.
+        ended_at: End timestamp string or ISO datetime representation.
+
+    Returns:
+        Non-negative duration in milliseconds, or None if parsing fails.
+    """
     if not started_at or not ended_at:
         return None
     try:
@@ -621,6 +651,15 @@ def _merge_tool_action(
 def docker_containers(
     limit: int = 30, deployment_id: str | None = None
 ) -> list[ContainerInfo]:
+    """Fetch running and stopped Docker containers filtered by deployment ID.
+
+    Args:
+        limit: Maximum number of containers to return (default: 30).
+        deployment_id: Optional deployment ID to filter Docker labels.
+
+    Returns:
+        List of ContainerInfo objects describing matching Docker containers.
+    """
     command = [
         "docker",
         "ps",
@@ -675,6 +714,15 @@ def docker_containers(
 
 
 def docker_logs(container_id: str, limit: int = 200) -> str:
+    """Retrieve recent stdout and stderr logs for a specified Docker container.
+
+    Args:
+        container_id: Unique Docker container ID or name.
+        limit: Maximum number of trailing log lines to retrieve (default: 200).
+
+    Returns:
+        Combined stdout and stderr log string from the Docker process.
+    """
     try:
         completed = subprocess.run(
             ["docker", "logs", "--tail", str(limit), container_id],

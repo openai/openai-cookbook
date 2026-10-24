@@ -21,7 +21,7 @@ def grade(calls: list[dict], variables: dict, answer: str, completed: bool) -> d
         for call in calls
         if call["name"] == "fetch_bls_data"
         for record in ((call.get("result") or {}).get("data") or [])
-        if not record.get("error")
+        if record.get("data") and not record.get("error")
     }
     expected_series = csv_values(variables.get("expected_series_ids"))
     missing_series = sorted(expected_series - returned_series)

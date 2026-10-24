@@ -64,6 +64,15 @@ class PurchaseRequest(FrozenModel):
 
 
 class ApprovalGrant(FrozenModel):
+    """Application-level approval scoped to one purchase request.
+
+    This model records the approval data that the policy engine can validate:
+    request scope, maximum amount, currency, and expiry. It does not
+    authenticate ``approved_by`` or provide a cryptographic signature. A
+    production application must obtain and authenticate this grant through its
+    own identity or approval service before constructing the model.
+    """
+
     approval_id: str = Field(min_length=1)
     request_id: str = Field(min_length=1)
     resource_url: HttpUrl

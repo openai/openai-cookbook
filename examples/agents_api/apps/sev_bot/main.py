@@ -138,6 +138,14 @@ async def slack_actions(request: Request, tasks: BackgroundTasks) -> dict[str, A
 
     payload = json.loads(encoded[0])
     action = payload["actions"][0]
+    container = payload.get("container")
+    if not isinstance(container, dict) or not isinstance(
+        container.get("message_ts"), str
+    ):
+        raise HTTPException(
+            status_code=400, detail="Missing approval message timestamp."
+        )
+    approval_ts = container["message_ts"]
     bot: IncidentBot = app.state.bot
     incident_id = str(action["value"])
     try:
@@ -151,6 +159,7 @@ async def slack_actions(request: Request, tasks: BackgroundTasks) -> dict[str, A
         bot.submit_slack_decision,
         incident_id,
         action["action_id"] == "approve_rollback",
+        approval_ts=approval_ts,
     )
     return {"text": "Submitting your decision to the agent."}
 

@@ -7,8 +7,6 @@ import { WavRecorder } from '../lib/wavtools/index.js';
 import './Styles.scss';
 import { io, Socket } from 'socket.io-client';
 
-export const OPENAI_API_KEY = process.env.REACT_APP_OPENAI_API_KEY;
-
 export const DEFAULT_REALTIME_MODEL = "gpt-4o-realtime-preview-2024-12-17";
 export const DEFAULT_REALTIME_VOICE = "coral";
 interface RealtimeEvent {
@@ -56,8 +54,7 @@ export function SpeakerPage() {
   const clientRefs = useRef(
     languageConfigs.reduce((acc, { code }) => {
       acc[code] = new RealtimeClient({
-        apiKey: OPENAI_API_KEY,
-        dangerouslyAllowAPIKeyInBrowser: true,
+        url: 'ws://localhost:8081',
       });
       return acc;
     }, {} as Record<string, RealtimeClient>)

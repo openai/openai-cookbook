@@ -1,54 +1,14 @@
 # Translation Demo
 
+> **Archived beta demo.** The preview model and `@openai/realtime-api-beta` protocol used by this app are retired. Do not run this as a GA sample, and do not put a project API key in a browser, a frontend build, or any `REACT_APP_` variable. Use the [Realtime translation guide](https://developers.openai.com/api/docs/guides/realtime-translation) and [browser WebRTC guide](https://developers.openai.com/api/docs/guides/voice-webrtc?api=realtime) for a current implementation with server-issued short-lived credentials.
+
 This project demonstrates how to use the [OpenAI Realtime API](https://platform.openai.com/docs/guides/realtime) to build a one-way translation application with WebSockets. It is implemented using the [Realtime + Websockets integration](https://platform.openai.com/docs/guides/realtime-websocket). A real-world use case for this demo is multilingual, conversational translation—where a speaker talks into the speaker app and listeners hear translations in their selected native languages via the listener app. Imagine a conference room with multiple participants with headphones, listening live to a speaker in their own languages. Due to the current turn-based nature of audio models, the speaker must pause briefly to allow the model to process and translate speech. However, as models become faster and more efficient, this latency will decrease significantly and the translation will become more seamless.
 
-## How to Use
+## Migration
 
-### Running the Application
-
-1. **Set up the OpenAI API:**
-
-   - If you're new to the OpenAI API, [sign up for an account](https://platform.openai.com/signup).
-   - Follow the [Quickstart](https://platform.openai.com/docs/quickstart) to retrieve your API key.
-
-2. **Clone the Repository:**
-
-   ```bash
-   git clone <repository-url>
-   ```
-
-3. **Set your API key:**
-
-   - Create a `.env` file at the root of the project and add the following line:
-     ```bash
-     REACT_APP_OPENAI_API_KEY=<your_api_key>
-     ```
-
-4. **Install dependencies:**
-
-   Navigate to the project directory and run:
-
-   ```bash
-   npm install
-   ```
-
-5. **Run the Speaker & Listener Apps:**
-
-   ```bash
-   npm start
-   ```
-
-   The speaker and listener apps will be available at:
-   - [http://localhost:3000/speaker](http://localhost:3000/speaker)
-   - [http://localhost:3000/listener](http://localhost:3000/listener)
-
-6. **Start the Mirror Server:**
-
-   In another terminal window, navigate to the project directory and run:
-
-   ```bash
-   node mirror-server/mirror-server.mjs
-   ```
+1. Build the server-side credential endpoint shown in the WebRTC guide. Only the server reads `OPENAI_API_KEY`; the browser receives a short-lived credential.
+2. Use the current translation model and session fields from the translation guide. Changing the old preview model name alone will not update beta client events or session formats.
+3. Retain the language selection and audio-mirroring architecture below if useful. The archived `SpeakerPage` points only to the local legacy relay at `ws://localhost:8081`; the relay still uses the retired beta protocol and is not a GA connection implementation.
 
 ### Adding a New Language
 
@@ -125,4 +85,4 @@ To add a new language to the codebase, follow these steps:
 2. **Select Language in the Listener App:**
 
    - Select the language from the dropdown menu.
-   - The listener app will play the translated audio. The app translates all audio streams simultaneously, but only the selected language is played. You can switch languages at any time. 
+   - The listener app will play the translated audio. The app translates all audio streams simultaneously, but only the selected language is played. You can switch languages at any time.

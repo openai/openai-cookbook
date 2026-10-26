@@ -1,5 +1,7 @@
 # Multi-Language Conversational Translation with the Realtime API
 
+> **Archived example.** This article and its accompanying app describe the retired Realtime beta client and preview models. They are preserved for architecture reference and do not run against the current GA API. Start new translation applications with the [Realtime translation guide](https://developers.openai.com/api/docs/guides/realtime-translation). For browser audio, follow the [WebRTC guide](https://developers.openai.com/api/docs/guides/voice-webrtc?api=realtime), which shows how a server issues short-lived credentials. Never send a project API key to a browser, including for a demo.
+
 One of the most exciting things about the Realtime API is that the emotion, tone and pace of speech are all passed to the model for inference. Traditional cascaded voice systems (involving STT and TTS) introduce an intermediate transcription step, relying on SSML or prompting to approximate prosody, which inherently loses fidelity. The speaker's expressiveness is literally lost in translation. Because it can process raw audio, the Realtime API preserves those audio attributes through inference, minimizing latency and enriching responses with tonal and inflectional cues. Because of this, the Realtime API makes LLM-powered speech translation closer to a live interpreter than ever before. 
 
 This cookbook demonstrates how to use OpenAI's [ Realtime API](https://platform.openai.com/docs/guides/realtime) to build a multi-lingual, one-way translation workflow with WebSockets. It is implemented using the [Realtime + WebSockets integration](https://platform.openai.com/docs/guides/realtime-websocket) in a speaker application and a WebSocket server to mirror the translated audio to a listener application. 
@@ -7,7 +9,7 @@ This cookbook demonstrates how to use OpenAI's [ Realtime API](https://platform.
 A real-world use case for this demo is a multilingual, conversational translation where a speaker talks into the speaker app and listeners hear translations in their selected native language via the listener app. Imagine a conference room with a speaker talking in English and a participant with headphones in choosing to listen to a Tagalog translation. Due to the current turn-based nature of audio models, the speaker must pause briefly to allow the model to process and translate speech. However, as models become faster and more efficient, this latency will decrease significantly and the translation will become more seamless.
 
 
-Let's explore the main functionalities and code snippets that illustrate how the app works. You can find the code in the [accompanying repo](https://github.com/openai/openai-cookbook/tree/main/examples/voice_solutions/one_way_translation_using_realtime_api) if you want to run the app locally.
+The snippets below explain the historical workflow. The [accompanying source](https://github.com/openai/openai-cookbook/tree/main/examples/voice_solutions/one_way_translation_using_realtime_api) is also archived; it is not a GA starter app.
 
 ## High Level Architecture Overview
 
@@ -20,7 +22,7 @@ This project has two applications - a speaker and listener app. The speaker app 
 
 We need a unique stream for each language - each language requires a unique prompt and session with the Realtime API. We define these prompts in  `translation_prompts.js`.
 
-The Realtime API is powered by [GPT-4o Realtime](https://platform.openai.com/docs/models/gpt-4o-realtime-preview) or [GPT-4o mini Realtime](https://platform.openai.com/docs/models/gpt-4o-mini-realtime-preview) which are turn-based and trained for conversational speech use cases. In order to ensure the model returns translated audio (i.e. instead of answering a question, we want a direct translation of that question), we want to steer the model with few-shot examples of questions in the prompts. If you're translating for a specific reason or context, or have specialized vocabulary that will help the model understand context of the translation, include that in the prompt as well. If you want the model to speak with a specific accent or otherwise steer the voice, you can follpow tips from our cookbook on [Steering Text-to-Speech for more dynamic audio generation](https://cookbook.openai.com/examples/voice_solutions/steering_tts).
+The historical app used retired GPT-4o Realtime preview models. The current [Realtime translation guide](https://developers.openai.com/api/docs/guides/realtime-translation) lists the supported translation model and session format. The original prompting idea can still be useful for conversational translation: include specialized vocabulary or context when it helps the model interpret the speech.
 
 We can dynamically input speech in any language.
 
@@ -42,12 +44,11 @@ const languageConfigs = [
 
 We need to handle the setup and management of client instances that connect to the Realtime API, allowing the application to process and stream audio in different languages. `clientRefs` holds a map of `RealtimeClient` instances, each associated with a language code (e.g., 'fr' for French, 'es' for Spanish) representing each unique client connection to the Realtime API. 
 
-```js
+```tsx
 const clientRefs = useRef(
     languageConfigs.reduce((acc, { code }) => {
       acc[code] = new RealtimeClient({
-        apiKey: OPENAI_API_KEY,
-        dangerouslyAllowAPIKeyInBrowser: true,
+        url: 'ws://localhost:8081',
       });
       return acc;
     }, {} as Record<string, RealtimeClient>)
@@ -60,7 +61,7 @@ const clientRefs = useRef(
   }));
   ```
 
-Note: The `dangerouslyAllowAPIKeyInBrowser` option is set to true because we are using our OpenAI API key in the browser for demo purposes but in production you should use an [ephemeral API key](https://platform.openai.com/docs/api-reference/realtime-sessions) generated via the OpenAI REST API. 
+This archived beta-client snippet points at the app's local relay and never receives a project key. It does not make the beta protocol compatible with GA. For a current browser implementation, use the server-issued credentials and client connection from the [WebRTC guide](https://developers.openai.com/api/docs/guides/voice-webrtc?api=realtime).
 
 We need to actually initiate the connection to the Realtime API and send audio data to the server. When a user clicks 'Connect' on the speaker page, we start that process. 
  
@@ -82,7 +83,7 @@ const connectConversation = useCallback(async () => {
 }, []);
 ```
 
- `connectAndSetupClients` ensures we are using the right model and voice. For this demo, we are using gpt-4o-realtime-preview-2024-12-17 and coral. 
+The original `connectAndSetupClients` used the retired gpt-4o-realtime-preview-2024-12-17 model and coral. Replacing only the model name is insufficient: the beta client also sends incompatible session and event formats.
 
 ```js
    // Function to connect and set up all clients
@@ -120,7 +121,7 @@ const startRecording = async () => {
 ## Step 4: Showing Transcripts
 
 
-We listen for `response.audio_transcript.done` events to update the transcripts of the audio. These input transcripts are generated by the Whisper model in parallel to the GPT-4o Realtime inference that is doing the translations on raw audio. 
+The archived beta app listens for `response.audio_transcript.done` to update output transcripts. In GA conversations, the corresponding event is `response.output_audio_transcript.done`; input transcription has separate `conversation.item.input_audio_transcription.*` events. See [Realtime conversations](https://developers.openai.com/api/docs/guides/realtime-conversations).
 
 We have a Realtime session running simultaneously for every selectable language and so we get transcriptions for every language (regardless of what language is selected in the listener application). Those can be shown by toggling the 'Show Transcripts' button. 
 
@@ -156,10 +157,10 @@ The key function here is `connectServer` that connects to the server and sets up
 
 ### POC to Production
 
-This is a demo and meant for inspiration. We are using WebSockets here for easy local development. However, in a production environment we’d suggest using WebRTC (which is much better for streaming audio quality and lower latency) and connecting to the Realtime API with an [ephemeral API key](https://platform.openai.com/docs/api-reference/realtime-sessions) generated via the OpenAI REST API. 
+Use the [current WebRTC connection guide](https://developers.openai.com/api/docs/guides/voice-webrtc?api=realtime) for browser implementations. Keep `OPENAI_API_KEY` on your server and issue short-lived client credentials there. The beta client in this archive is not the client for that flow.
 
 Current Realtime models are turn based - this is best for conversational use cases as opposed to the uninterrupted, UN-style live translation that we really want for a one-directional streaming use case. For this demo, we can capture additional audio from the speaker app as soon as the model returns translated audio (i.e. capturing more input audio while the translated audio played from the listener app), but there is a limit to the length of audio we can capture at a time. The speaker needs to pause to let the translation catch up. 
 
 ## Conclusion
 
-In summary, this POC is a demonstration of a one-way translation use of the Realtime API but the idea of forking audio for multiple uses can expand beyond translation. Other workflows might be simultaneous sentiment analysis, live guardrails or generating subtitles. 
+In summary, this POC is a demonstration of a one-way translation use of the Realtime API but the idea of forking audio for multiple uses can expand beyond translation. Other workflows might be simultaneous sentiment analysis, live guardrails or generating subtitles.

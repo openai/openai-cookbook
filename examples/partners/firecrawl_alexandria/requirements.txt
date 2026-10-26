@@ -1,0 +1,4 @@
+openai>=3.39.0
+openai-agents>=0.24.0
+firecrawl-py>=4.54.0
+pydantic>=2.11

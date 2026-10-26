@@ -3,7 +3,7 @@ name = "standalone-bls-mcp-eval"
 version = "0.1.0"
 requires-python = ">=3.11"
 dependencies = [
-    "fastmcp>=3.4.7,<4",
+    "fastmcp>=3.4.10,<4",
     "openai>=2.53.0,<3",
     "pydantic>=2.13.4,<3",
     "python-dotenv>=1.2.2,<2",

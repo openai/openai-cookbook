@@ -17,6 +17,7 @@ provider compute; each example documents cleanup of both.
 | --- | --- | --- |
 | [Blaxel](blaxel/README.md) | [Run](blaxel/application_managed/README.md) | [Deploy](blaxel/webhook_managed/README.md) |
 | [Cloudflare](cloudflare/README.md) | [Run](cloudflare/application_managed/README.md) | [Deploy](cloudflare/webhook_managed/README.md) |
+| [Databricks](databricks/README.md) | [Run](databricks/application_managed/README.md) | Not included |
 | [Daytona](daytona/README.md) | [Run](daytona/application_managed/README.md) | [Deploy](daytona/webhook_managed/README.md) |
 | [DigitalOcean](digitalocean/README.md) | [Run](digitalocean/application_managed/README.md) | [Deploy](digitalocean/webhook_managed/README.md) |
 | [Docker](docker/README.md) | [Run](docker/application_managed/README.md) | Not included |

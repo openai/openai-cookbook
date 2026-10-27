@@ -3,6 +3,7 @@ from __future__ import annotations
 import argparse
 import json
 import sys
+from numbers import Integral
 from pathlib import Path
 from typing import Mapping
 
@@ -58,10 +59,23 @@ def _string_value(
     return value
 
 
+def _integer_value(value: object) -> int:
+    if isinstance(value, bool):
+        raise ValueError("boolean is not an integer field value")
+    if isinstance(value, Integral):
+        return int(value)
+    if isinstance(value, str) and value.strip():
+        try:
+            return int(value.strip())
+        except ValueError as exc:
+            raise ValueError("string does not contain an integer") from exc
+    raise ValueError("value is not an integer")
+
+
 def _required_intish(summary: Mapping[str, object], key: str, summary_path: Path) -> int:
     try:
-        return int(summary.get(key, 0))
-    except (TypeError, ValueError) as exc:
+        return _integer_value(summary.get(key))
+    except ValueError as exc:
         raise ValueError(f"`{key}` must be an integer in {summary_path}.") from exc
 
 
@@ -229,8 +243,8 @@ def _validate_run_results(results: pd.DataFrame, results_path: Path) -> None:
         row_number = row_index + 2
         row_status = str(row.get("status", "")).strip()
         try:
-            int(row.get("turn_index", ""))
-        except (TypeError, ValueError) as exc:
+            _integer_value(row.get("turn_index", ""))
+        except ValueError as exc:
             raise ValueError(
                 f"`turn_index` in results row {row_number} must be an integer."
             ) from exc

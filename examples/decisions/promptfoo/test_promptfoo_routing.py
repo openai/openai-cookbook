@@ -2,9 +2,12 @@
 
 import copy
 import json
+from pathlib import Path
+import tempfile
 import unittest
+from unittest.mock import patch
 
-from routing_eval import build_config, config_matches, notebook_definitions, result_rows
+from routing_eval import build_config, clean, config_matches, notebook_definitions, result_rows
 
 
 class PromptfooRoutingTests(unittest.TestCase):
@@ -26,6 +29,23 @@ class PromptfooRoutingTests(unittest.TestCase):
         self.assertEqual(self.config["providers"][0]["id"], "openai:decisions:gpt-6-luna")
         self.assertEqual(self.config["providers"][0]["config"]["maxRetries"], 0)
         self.assertFalse(self.config["sharing"])
+
+    def test_cleanup_preserves_source_and_rejects_symlink(self):
+        with tempfile.TemporaryDirectory() as temporary:
+            root = Path(temporary)
+            generated = root / ".generated"
+            generated.mkdir()
+            (generated / "results.json").write_text("old result")
+            source = root / "source.py"
+            source.write_text("preserve")
+            with patch("routing_eval.GENERATED", generated):
+                clean()
+                self.assertFalse(generated.exists())
+                self.assertEqual(source.read_text(), "preserve")
+                generated.symlink_to(root, target_is_directory=True)
+                with self.assertRaisesRegex(ValueError, "symlink"):
+                    clean()
+                self.assertTrue(source.exists())
 
     def test_fixture_grades_match_notebook(self):
         rows = result_rows(self.export, self.config, self.scope)

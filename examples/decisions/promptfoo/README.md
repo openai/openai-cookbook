@@ -54,11 +54,16 @@ If the default npm cache is not writable, use
 `npm ci --cache "$PWD/.npm-cache"`. Do not change system ownership to work around
 a sandbox write restriction.
 
-## Run once
+## Clean and run end to end
 
 ```bash
 bash run_eval.sh
 ```
+
+Each invocation clears the previous `.generated/` configuration, results, and
+reports, then starts a fresh run. No manual cleanup or archive directory is
+required. Source code, installed dependencies, and local Promptfoo storage are
+retained. Requests are uncached, so each invocation makes new paid requests.
 
 The script prepares and validates the configuration before asking for a key
 with hidden input. Alternatively, export `OPENAI_API_KEY` in that Terminal first.
@@ -88,8 +93,8 @@ The illustrative operational loss weights are 5 per accepted misroute and 1 per
 review; they are not API prices. HTTP/provider errors or incomplete exports stop
 summary generation rather than becoming model-quality scores.
 
-The script refuses to overwrite an existing result. Inspect failures before
-retrying: a request may already have been processed. To analyze an existing run
+The script overwrites the generated results on each invocation. Inspect failures
+before retrying: a request may already have been processed. To analyze an existing run
 without making requests:
 
 ```bash

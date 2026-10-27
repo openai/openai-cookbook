@@ -1,5 +1,5 @@
 #!/usr/bin/env bash
-# Run once with visible output. No installation, retries, cloud login, or sharing.
+# Clean generated outputs and run with visible output. No automatic retries.
 set +x
 set -euo pipefail
 umask 077
@@ -8,15 +8,11 @@ export PROMPTFOO_DISABLE_TELEMETRY=1
 export PROMPTFOO_DISABLE_UPDATE=1
 export PROMPTFOO_CONFIG_DIR="$PWD/.local"
 
-if [[ -f .generated/results.json ]]; then
-  echo "An exported run already exists. Inspect it before starting another paid run."
-  echo "To summarize without API calls: python3 routing_eval.py summarize"
-  exit 1
-fi
 if [[ ! -x node_modules/.bin/promptfoo ]]; then
   echo "Install the pinned dependency first: npm ci"
   exit 1
 fi
+python3 routing_eval.py clean
 python3 routing_eval.py prepare
 npm run validate
 if [[ -z "${OPENAI_API_KEY:-}" ]]; then

@@ -14,6 +14,7 @@ import math
 import os
 from pathlib import Path
 import statistics
+import shutil
 from unittest.mock import patch
 
 
@@ -61,6 +62,15 @@ return a.type === 'choice' && a.name === 'route'
                      "case_id": case_id, "split": split},
         } for case_id, split, expected, message in cases],
     }
+
+
+def clean():
+    """Remove only this companion's generated config and evaluation outputs."""
+    if GENERATED.is_symlink():
+        raise ValueError("Refusing to clean a symlink at .generated")
+    if GENERATED.exists():
+        shutil.rmtree(GENERATED)
+    print("Cleared previous generated configuration, results, and reports.")
 
 
 def prepare():
@@ -180,10 +190,12 @@ def summarize(results_path):
 
 def main():
     parser = argparse.ArgumentParser(description=__doc__)
-    parser.add_argument("command", choices=["prepare", "summarize"])
+    parser.add_argument("command", choices=["clean", "prepare", "summarize"])
     parser.add_argument("--results", type=Path, default=GENERATED / "results.json")
     args = parser.parse_args()
-    if args.command == "prepare":
+    if args.command == "clean":
+        clean()
+    elif args.command == "prepare":
         prepare()
     else:
         summarize(args.results)

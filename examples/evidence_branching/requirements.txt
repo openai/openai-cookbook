@@ -1,0 +1,3 @@
+# Execution and unit tests use only the Python 3.10+ standard library.
+# For notebook schema validation; a kernel is not needed by validate_notebook.py.
+nbformat>=5.10.4,<6

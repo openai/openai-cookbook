@@ -1,0 +1,7 @@
+# Tested versions; offline utility tests require only the Python standard library.
+nbformat==5.11.1
+nbclient==0.11.0
+ipykernel==7.4.0
+# Needed only for opt-in live extraction (live calls were not run).
+openai==3.37.0
+pydantic==2.14.1

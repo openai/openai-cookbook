@@ -18,7 +18,7 @@ class CreateDeploymentRequest(BaseModel):
     project_id: str
     name: str | None = None
     target: Literal["local-process", "local-docker"] = "local-docker"
-    port: int | None = None
+    port: int | None = Field(default=None, ge=1, le=65535)
     sandbox_backend: str = "docker"
 
 
@@ -31,7 +31,7 @@ class Project(BaseModel):
     executor_entrypoint: str | None = None
     run_command: list[str] = Field(default_factory=list)
     app_url: str | None = None
-    port: int = 8421
+    port: int = Field(default=8421, ge=1, le=65535)
     package_manager: str = "uv"
     dependencies: list[str] = Field(default_factory=list)
     required_env: list[str] = Field(default_factory=list)
@@ -49,7 +49,7 @@ class Deployment(BaseModel):
     name: str
     target: Literal["local-process", "local-docker"]
     status: Literal["draft", "starting", "running", "stopped", "failed"] = "draft"
-    port: int = 8421
+    port: int = Field(default=8421, ge=1, le=65535)
     sandbox_backend: str = "docker"
     requires_docker_socket: bool = False
     process_pid: int | None = None

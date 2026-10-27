@@ -32,6 +32,8 @@ class Settings(BaseModel):
     )
     semantic_drain: bool = True
     completion_timeout_seconds: float = Field(default=8.0, gt=0, le=60)
+    work_grace_seconds: float = Field(default=5.0, gt=0, allow_inf_nan=False, strict=True)
+    cleanup_timeout_seconds: float = Field(default=10.0, gt=0, allow_inf_nan=False, strict=True)
     agent_instructions: str = Field(default_factory=lambda: assistant_prompt("frontend"))
     agent_endpoint: str = Field(default_factory=lambda: assistant_env("OPENAI_LIVE_ENDPOINT"))
     agent_model: str = Field(default_factory=lambda: assistant_env("OPENAI_LIVE_MODEL"))

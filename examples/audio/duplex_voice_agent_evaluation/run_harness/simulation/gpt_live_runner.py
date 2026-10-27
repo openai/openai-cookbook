@@ -10,6 +10,7 @@ import time
 import uuid
 from collections import Counter, deque
 from datetime import UTC, datetime
+from math import isfinite
 from pathlib import Path
 from typing import Any, TextIO
 
@@ -66,6 +67,8 @@ class DualGptLiveRunner:
         sample_rate: int = 24_000,
         speech_rms_threshold: float = 220,
         max_duration_s: float = 90,
+        work_grace_seconds: float = 5.0,
+        cleanup_timeout_seconds: float = 10.0,
         drain_ms: int = 1_500,
         real_time: bool = True,
         verbose: bool = False,
@@ -88,6 +91,12 @@ class DualGptLiveRunner:
     ) -> None:
         if tick_ms <= 0 or sample_rate <= 0:
             raise ValueError("tick_ms and sample_rate must be positive")
+        for name, value in (
+            ("work_grace_seconds", work_grace_seconds),
+            ("cleanup_timeout_seconds", cleanup_timeout_seconds),
+        ):
+            if isinstance(value, bool) or not isinstance(value, int | float) or not isfinite(value) or value <= 0:
+                raise ValueError(f"{name} must be finite and positive")
         if (
             isinstance(response_deadline_ms, bool)
             or not isinstance(response_deadline_ms, int)
@@ -105,6 +114,8 @@ class DualGptLiveRunner:
         self.sample_rate = sample_rate
         self.speech_rms_threshold = speech_rms_threshold
         self.max_duration_s = max_duration_s
+        self.work_grace_seconds = work_grace_seconds
+        self.cleanup_timeout_seconds = cleanup_timeout_seconds
         self.drain_ms = drain_ms
         self.real_time = real_time
         self.verbose = verbose
@@ -159,6 +170,9 @@ class DualGptLiveRunner:
         self.event_log: TextIO | None = None
         self.event_index = {"value": 0}
         self._pumps: list[asyncio.Task[None]] = []
+        self._work_waits: dict[str, asyncio.Task[None]] = {}
+        self._work_settlement: dict[str, Any] = {"status": "not_started"}
+        self._sealed = False
         self._completion_task: asyncio.Task[SemanticCompletionDecision] | None = None
         self._completion_signature = ""
         self._completion_revision = 0
@@ -186,7 +200,7 @@ class DualGptLiveRunner:
             print(f"{(time.monotonic() - self.started):7.3f}s  {text}", flush=True)
 
     def trace(self, event: dict[str, Any], *, source: str, direction: str) -> None:
-        if self.event_log is not None:
+        if self.event_log is not None and not self.event_log.closed:
             record_event(
                 self.event_log,
                 event,
@@ -199,6 +213,8 @@ class DualGptLiveRunner:
     async def _pump(self, label: str, participant: VoiceParticipant) -> None:
         try:
             async for event in participant.incoming():
+                if self._sealed:
+                    return
                 event = unwrap_response_event(event)
                 # Receipt and media position are different clocks. In particular,
                 # startup and a stalled send advance wall time without advancing PCM.
@@ -213,11 +229,15 @@ class DualGptLiveRunner:
         except asyncio.CancelledError:
             raise
         except asyncio.QueueFull:
+            if self._sealed:
+                return
             self.failure = LiveResponseError(
                 f"{label} GPT Live event buffer capacity exceeded (event_queue_overflow)",
                 failure_stage=f"{label}_connection",
             )
         except Exception as exc:  # noqa: BLE001 - convert participant failures at the runtime boundary.
+            if self._sealed:
+                return
             self.failure = LiveResponseError(
                 f"{label} GPT Live connection failed: {type(exc).__name__}: {exc}",
                 failure_stage=f"{label}_connection",
@@ -809,6 +829,117 @@ class DualGptLiveRunner:
             direction="bidirectional",
         )
 
+    @staticmethod
+    def _consume_task(task: asyncio.Task[Any]) -> None:
+        # A callback may suppress cancellation and finish after this run returns.
+        # Retrieve its eventual exception without waiting or touching the result.
+        if not task.cancelled():
+            task.exception()
+
+    async def _settle_work(self) -> None:
+        self._work_waits = {
+            label: asyncio.create_task(peer.wait_for_tools(), name=f"{label}_pending_work")
+            for label, peer in (("caller", self.caller), ("assistant", self.assistant))
+        }
+        done, pending = await asyncio.wait(
+            self._work_waits.values(), timeout=self.work_grace_seconds, return_when=asyncio.FIRST_EXCEPTION
+        )
+        self._work_settlement = {
+            "status": "timed_out" if pending else "completed",
+            "pending_participants": [label for label, task in self._work_waits.items() if task in pending],
+        }
+        for task in done:
+            if task.cancelled():
+                raise LiveResponseError("Pending work was cancelled", failure_stage="pending_work")
+            if error := task.exception():
+                self._work_settlement["status"] = "error"
+                if isinstance(error, LiveResponseError):
+                    raise error
+                raise LiveResponseError(f"Pending work failed: {error}", failure_stage="pending_work") from error
+        if pending:
+            raise LiveResponseError(
+                f"Pending work exceeded {self.work_grace_seconds:g}s after capture ended",
+                failure_stage="pending_work_timeout",
+            )
+
+    async def _cleanup(self) -> dict[str, Any]:
+        """One deadline; never rely on a callback cooperating with cancellation."""
+        self._shutting_down = True
+        loop = asyncio.get_running_loop()
+        started = loop.time()
+        deadline = started + self.cleanup_timeout_seconds
+        # Reserve part of the same budget to observe cancellation, including
+        # cancellation-resistant callbacks. asyncio.wait_for would join forever.
+        join_grace = min(0.1, self.cleanup_timeout_seconds / 5)
+        closes = {
+            f"{label}_close": asyncio.create_task(peer.close(), name=f"{label}_close")
+            for label, peer in (("caller", self.caller), ("assistant", self.assistant))
+        }
+        owned = {**closes, **{f"{label}_pending_work": task for label, task in self._work_waits.items()}}
+        if self._completion_task is not None:
+            owned["completion_observer"] = self._completion_task
+        for name, task in owned.items():
+            task.add_done_callback(self._consume_task)
+            if name not in closes and not task.done():
+                task.cancel()
+        pump_tasks = {
+            f"{label}_receiver": task for label, task in zip(("caller", "assistant"), self._pumps, strict=False)
+        }
+        for task in pump_tasks.values():
+            task.add_done_callback(self._consume_task)
+        details: dict[str, Any] = {"status": "completed", "timed_out": [], "unfinished_tasks": [], "errors": []}
+        try:
+            await asyncio.wait(owned.values(), timeout=max(0, deadline - loop.time() - join_grace))
+            details["timed_out"] = [name for name, task in closes.items() if not task.done()]
+            if pump_tasks:
+                await asyncio.wait(pump_tasks.values(), timeout=min(1.0, max(0, deadline - loop.time() - join_grace)))
+            owned.update(pump_tasks)
+            pending = {task for task in owned.values() if not task.done()}
+            for task in pending:
+                task.cancel()
+            if pending:
+                await asyncio.wait(pending, timeout=max(0, deadline - loop.time()))
+            details["unfinished_tasks"] = [name for name, task in owned.items() if not task.done()]
+            for name, task in closes.items():
+                if task.done() and not task.cancelled() and (error := task.exception()) is not None:
+                    details["errors"].append({"component": name, "message": f"{type(error).__name__}: {error}"})
+            await self._drain_events()
+        except Exception as exc:
+            details["errors"].append({"component": "event_drain", "message": f"{type(exc).__name__}: {exc}"})
+        finally:
+            self._sealed = True
+            # Also protect against a second external cancellation during cleanup.
+            for task in (*owned.values(), *pump_tasks.values()):
+                if not task.done():
+                    task.cancel()
+            for name, resource in (("event_log", self.event_log), ("monitor", self.monitor)):
+                if resource is not None:
+                    try:
+                        resource.close()
+                    except Exception as exc:
+                        details["errors"].append({"component": name, "message": f"{type(exc).__name__}: {exc}"})
+        details["elapsed_seconds"] = round(loop.time() - started, 6)
+        details["finalized_participants"] = sorted(self._finalized)
+        if details["timed_out"] or details["unfinished_tasks"]:
+            details["status"] = "timed_out"
+        elif details["errors"] or self._finalized != {"caller", "assistant"}:
+            details["status"] = "error"
+        return details
+
+    async def _finish_cleanup(self) -> dict[str, Any]:
+        # Repeated cancellation of the scenario must not cancel healthy closes.
+        # _cleanup owns its deadline; shielding never adds a fresh timeout.
+        task = asyncio.create_task(self._cleanup(), name="dual-gpt-live-cleanup")
+        cancelled: asyncio.CancelledError | None = None
+        while not task.done():
+            try:
+                await asyncio.shield(task)
+            except asyncio.CancelledError as exc:
+                cancelled = exc
+        if cancelled is not None:
+            raise cancelled
+        return task.result()
+
     async def run(self) -> EvalResult:
         self.started = time.monotonic()
         self.started_at = datetime.now(UTC).isoformat()
@@ -827,6 +958,7 @@ class DualGptLiveRunner:
         caller_opening_speech_observed = False
         opening_deadline: float | None = None
         conversation_start_ms: int | None = None if assistant_first else 0
+        run_error: LiveResponseError | None = None
         try:
             if self.monitor is not None:
                 self.monitor.start()
@@ -983,28 +1115,23 @@ class DualGptLiveRunner:
                     "Caller opening finished without producing speech",
                     failure_stage="caller_opening",
                 )
-            await asyncio.gather(self.caller.wait_for_tools(), self.assistant.wait_for_tools())
+            await self._settle_work()
             await self._drain_events()
             self._project_completed_turns("caller")
             self._project_completed_turns("assistant")
             if analysis_start_ms < self.input_ms:
                 self._trace_analysis_tick(analysis_start_ms, self.input_ms)
+        except LiveResponseError as exc:
+            run_error = exc
         finally:
-            if self._completion_task is not None:
-                self._completion_task.cancel()
-                await asyncio.gather(self._completion_task, return_exceptions=True)
-            self._shutting_down = True
-            close_results = await asyncio.gather(self.caller.close(), self.assistant.close(), return_exceptions=True)
-            if self._pumps:
-                _, pending = await asyncio.wait(self._pumps, timeout=1.0)
-                for task in pending:
-                    task.cancel()
-                await asyncio.gather(*self._pumps, return_exceptions=True)
-            await self._drain_events()
-            if self.event_log is not None:
-                self.event_log.close()
-            if self.monitor is not None:
-                self.monitor.close()
+            cleanup = await self._finish_cleanup()
+
+        run_error = run_error or self.failure
+        if run_error is None and cleanup["status"] != "completed":
+            run_error = LiveResponseError(
+                "GPT Live session cleanup failed; captured artifacts were retained",
+                failure_stage="cleanup_timeout" if cleanup["status"] == "timed_out" else "session_close",
+            )
 
         ticks = build_ticks(
             self.timeline,
@@ -1061,6 +1188,10 @@ class DualGptLiveRunner:
                 "turn_derivation": "local_audio_and_transcript",
                 "audio_timing_source": "local_relay_playout",
                 "response_deadline_ms": self.response_deadline_ms,
+                "work_grace_seconds": self.work_grace_seconds,
+                "cleanup_timeout_seconds": self.cleanup_timeout_seconds,
+                "work_settlement": self._work_settlement,
+                "cleanup": cleanup,
                 "caller_action_attribution": "inferred_from_audio_and_transcript",
                 "voice_metrics_limitations": [
                     "Caller interruption and backchannel intent are inferred after the conversation.",
@@ -1127,13 +1258,15 @@ class DualGptLiveRunner:
                 "offline": self.offline,
             },
         )
-        if any(isinstance(outcome, Exception) for outcome in close_results) or self._finalized != {
-            "caller",
-            "assistant",
-        }:
+        # Detach mutable backend evidence before relinquishing this scenario.
+        result.run_metadata = copy.deepcopy(result.run_metadata)
+        if run_error is not None:
             result.task_status = "error"
             result.task_metrics["task_completed"] = False
-            result.termination_reason = "session_close_failed"
+            result.termination_reason = (
+                "session_close_failed" if run_error.failure_stage == "session_close" else run_error.failure_stage
+            )
+            result.run_metadata["failure"] = {"stage": run_error.failure_stage, "message": str(run_error)}
         if self.save_conversations is not None:
             audio_path, transcript_path = self.recorder.save(
                 self.save_conversations / "conversation.wav", result.transcript
@@ -1151,13 +1284,9 @@ class DualGptLiveRunner:
                     write_ticks(audio_path.with_suffix(".turns.jsonl"), result.turn_metrics)
                 )
             write_json(Path(result.artifacts["result"]), result.model_dump())
-        if any(isinstance(outcome, Exception) for outcome in close_results) or self._finalized != {
-            "caller",
-            "assistant",
-        }:
-            raise LiveResponseError(
-                "GPT Live session finalization failed; captured artifacts were retained", failure_stage="session_close"
-            )
+        if run_error is not None:
+            run_error.partial_result = result
+            raise run_error
         return result
 
 

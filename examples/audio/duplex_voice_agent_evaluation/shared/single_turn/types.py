@@ -9,6 +9,12 @@ from typing import Any
 
 from shared.metrics.reporting import build_metric_row
 from shared.metrics.tokens import TokenUsage
+from shared.reporting.validation import (
+    ResultValidationError,
+    require_task_completed,
+    result_status,
+    validation_failure_row,
+)
 
 
 @dataclass(slots=True)
@@ -118,7 +124,7 @@ class SingleTurnEvalResult:
     delegation_target: str = ""
     delegation_response_id: str = ""
     delegation_item_id: str = ""
-    delegation_count: int = 0
+    delegation_count: int | None = 0
     tool_executions: list[dict[str, Any]] = field(default_factory=list)
     final_state: dict[str, Any] = field(default_factory=dict)
     task_metrics: dict[str, Any] = field(default_factory=dict)
@@ -143,6 +149,17 @@ class SingleTurnEvalResult:
 
     def to_result_row(self) -> dict[str, Any]:
         """Project detailed evidence into the shared result-report fields."""
+        validation_error = None
+        try:
+            completed = require_task_completed(self.task_metrics)
+            result_status(
+                {"status": self.error_info.status, "failure_stage": self.error_info.failure_stage},
+                completed=completed,
+            )
+            task = self.task_metrics
+        except ResultValidationError as exc:
+            validation_error = exc
+            task = {**self.task_metrics, "task_completed": False}
         delegation_required = (
             self.expected_delegation if self.expected_delegation is not None else bool(self.expected_tool_call.name)
         )
@@ -154,13 +171,17 @@ class SingleTurnEvalResult:
             if self.task_metrics.get("delegation_prohibited")
             else "optional"
         )
-        delegation_observed = self.delegation_count > 0
+        delegation_observed = self.delegation_count > 0 if self.delegation_count is not None else None
         delegation_correct = (
-            delegation_policy == "optional"
-            or delegation_policy == "required"
-            and delegation_observed
-            or delegation_policy == "forbidden"
-            and not delegation_observed
+            (
+                delegation_policy == "optional"
+                or delegation_policy == "required"
+                and delegation_observed
+                or delegation_policy == "forbidden"
+                and not delegation_observed
+            )
+            if delegation_observed is not None
+            else None
         )
         observed_semantic = [
             grade for grade in self.semantic_grades.values() if grade.get("status") in {"passed", "failed"}
@@ -188,7 +209,7 @@ class SingleTurnEvalResult:
             "delegation_policy": delegation_policy,
         }
         metrics = build_metric_row(
-            task=self.task_metrics,
+            task=task,
             efficiency={**self.efficiency_metrics, "delegation_count": self.delegation_count},
             interaction=self.interaction_metrics,
             golden=golden,
@@ -256,8 +277,8 @@ class SingleTurnEvalResult:
             "delegation_response_id": self.delegation_response_id,
             "delegation_policy": delegation_policy,
             "delegation_required": int(delegation_required),
-            "delegation_observed": int(delegation_observed),
-            "delegation_correctness": int(delegation_correct),
+            "delegation_observed": int(delegation_observed) if delegation_observed is not None else None,
+            "delegation_correctness": int(delegation_correct) if delegation_correct is not None else None,
             "tool_executions": json.dumps(self.tool_executions, ensure_ascii=False),
             "tool_execution_count": len(self.tool_executions),
             "tool_execution_correctness": int(
@@ -339,7 +360,7 @@ class SingleTurnEvalResult:
             row["assessment"] = self.assessment
         if self.observability:
             row["observability"] = self.observability
-        return row
+        return validation_failure_row(row, validation_error) if validation_error is not None else row
 
 
 CrawlEvalResult = SingleTurnEvalResult

@@ -5,6 +5,10 @@ Promptfoo's native `openai:decisions:gpt-6-luna` provider. It calls
 `POST https://api.openai.com/v1/decisions` and uses exact-match JavaScript assertions.
 No model judge is needed.
 
+Read the [security review](SECURITY_REVIEW.md) before installing this optional
+companion. Its dependency audit has unresolved advisories. The standard-library
+notebook runner does not require these npm dependencies.
+
 ## Data and scope
 
 The public dataset is BANKING77 by Iñigo Casanueva, Tadas Temcinas, Daniela Gerz,

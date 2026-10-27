@@ -1,6 +1,8 @@
 #!/usr/bin/env bash
 # Run once with visible output. No installation, retries, cloud login, or sharing.
+set +x
 set -euo pipefail
+umask 077
 cd "$(dirname "$0")"
 export PROMPTFOO_DISABLE_TELEMETRY=1
 export PROMPTFOO_DISABLE_UPDATE=1

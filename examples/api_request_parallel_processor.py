@@ -129,6 +129,13 @@ async def process_api_requests_from_file(
     logging.basicConfig(level=logging_level)
     logging.debug(f"Logging initialized at level {logging_level}")
 
+    if max_requests_per_minute <= 0:
+        raise ValueError("max_requests_per_minute must be > 0, otherwise the scheduler stalls.")
+    if max_tokens_per_minute <= 0:
+        raise ValueError("max_tokens_per_minute must be > 0, otherwise token capacity never refills.")
+    if max_attempts < 1:
+        raise ValueError("max_attempts must be >= 1, otherwise attempts_left stays truthy and retries loop.")
+
     # infer API endpoint and construct request header
     api_endpoint = api_endpoint_from_url(request_url)
     request_header = {"Authorization": f"Bearer {api_key}"}

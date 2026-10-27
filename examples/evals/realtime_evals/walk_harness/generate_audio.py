@@ -79,10 +79,12 @@ def encode_pcm_to_ulaw_wav(
     output_wav_path: Path,
     input_sample_rate_hz: int,
     target_sample_rate_hz: int,
+    overwrite: bool = False,
 ) -> None:
     ensure_dir(output_wav_path.parent)
     command = [
         "ffmpeg",
+        "-y" if overwrite else "-n",
         "-hide_banner",
         "-loglevel",
         "error",
@@ -135,6 +137,7 @@ def main() -> None:
             output_wav_path,
             input_sample_rate_hz=args.tts_sample_rate_hz,
             target_sample_rate_hz=args.target_sample_rate_hz,
+            overwrite=args.overwrite,
         )
 
         temp_pcm_path.unlink(missing_ok=True)

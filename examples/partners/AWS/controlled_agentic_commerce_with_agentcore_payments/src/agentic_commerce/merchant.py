@@ -22,6 +22,16 @@ PAYMENT_SIGNATURE_HEADER = "PAYMENT-SIGNATURE"
 PAYMENT_RESPONSE_HEADER = "PAYMENT-RESPONSE"
 
 RESOURCE_URL = "https://merchant.invalid/reports/SYNTH-SUPPLIER-RISK-001"
+USDC_ATOMIC_UNITS = Decimal(1_000_000)
+
+
+def _atomic_usdc_amount(price: Decimal) -> str:
+    if price <= 0:
+        raise ValueError("price must be positive")
+    atomic_amount = price * USDC_ATOMIC_UNITS
+    if atomic_amount != atomic_amount.to_integral_value():
+        raise ValueError("price must use at most 6 decimal places")
+    return str(int(atomic_amount))
 
 
 class SyntheticMerchant:
@@ -42,7 +52,7 @@ class SyntheticMerchant:
         self.malformed_challenge = malformed_challenge
         issued_at = now or datetime.now(UTC)
         expires_at = issued_at + timedelta(minutes=5)
-        amount = str(int(price * Decimal(1_000_000)))
+        amount = _atomic_usdc_amount(price)
 
         self.requirement = PaymentRequirement(
             amount=amount,

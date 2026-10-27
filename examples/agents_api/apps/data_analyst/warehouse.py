@@ -105,17 +105,19 @@ class Warehouse:
         records = self.records("tables")
         for record in records:
             if record.get("name") == name:
-                return record
+                return {**record, "name": name}
 
         table_name = name.rsplit(".", maxsplit=1)[-1]
-        return next(
-            (
-                record
-                for record in records
-                if str(record.get("name", "")).rsplit(".", maxsplit=1)[-1] == table_name
-            ),
-            {"name": name},
-        )
+        for record in records:
+            record_name = record.get("name")
+            if (
+                isinstance(record_name, str)
+                and "." not in record_name
+                and record_name == table_name
+            ):
+                return {**record, "name": name}
+
+        return {"name": name}
 
     def search_tables(self, arguments: dict[str, Any]) -> dict[str, Any]:
         query = str(arguments.get("query", ""))

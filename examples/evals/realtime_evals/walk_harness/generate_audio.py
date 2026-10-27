@@ -58,6 +58,10 @@ def load_dataset(path: Path) -> pd.DataFrame:
     missing = required_columns.difference(dataset.columns)
     if missing:
         raise ValueError(f"Missing required columns: {sorted(missing)}")
+    normalized_ids = dataset["example_id"].map(lambda value: str(value).strip())
+    duplicate_ids = sorted(set(normalized_ids[normalized_ids.duplicated(keep=False)]))
+    if duplicate_ids:
+        raise ValueError(f"Duplicate example_id values: {duplicate_ids}")
     return dataset
 
 

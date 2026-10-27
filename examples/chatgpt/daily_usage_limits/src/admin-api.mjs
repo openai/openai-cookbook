@@ -271,6 +271,8 @@ export function createAdminApi({ apiKey, workspaceId, userIds = [], allowWrites 
 
   async function readSnapshot(userId) {
     const path = userPath(userId);
+    // Later readbacks must not refresh earlier settings or usage observations.
+    const observedAt = now();
     await verifyWorkspace();
     const user = await request(path);
     const monthly = await request(`${path}/monthly-usage`);
@@ -291,7 +293,7 @@ export function createAdminApi({ apiKey, workspaceId, userIds = [], allowWrites 
     verifyUser(latest, userId);
     if (!settingsEquivalent(settings, settingsFrom(latest), unit)) throw fail('SETTINGS_CHANGED_BETWEEN_READS');
     return { workspaceId, userId, unit, usage: decimal(monthly.current_month_usage, { usage: true }),
-      cap, settings, observedAt: now() };
+      cap, settings, observedAt };
   }
 
   function writeBoundary(unit, periodEnd, notAfter) {

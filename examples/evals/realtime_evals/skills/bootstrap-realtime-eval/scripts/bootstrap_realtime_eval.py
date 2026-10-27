@@ -176,8 +176,9 @@ def parse_json_array(json_text: str) -> list[dict[str, Any]]:
         raise ValueError("Expected a JSON array.")
     normalized: list[dict[str, Any]] = []
     for item in parsed:
-        if isinstance(item, dict):
-            normalized.append(item)
+        if not isinstance(item, dict):
+            raise ValueError("Expected a JSON array of objects.")
+        normalized.append(item)
     return normalized
 
 

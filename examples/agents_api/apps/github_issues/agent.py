@@ -39,6 +39,11 @@ def start_executor(workspace: Path, environment_id: str, remote_url: str) -> Con
 
 
 async def investigate_issue(issue: dict[str, Any], workspace: Path) -> dict[str, Any]:
+    report = workspace / "investigation.md"
+    if report.exists():
+        raise RuntimeError(
+            "Refusing to use pre-existing /workspace/investigation.md."
+        )
     container: Container | None = None
     async with AsyncOpenAI() as client:
         session = await client.beta.agents.sessions.create(
@@ -87,8 +92,6 @@ Inspect /workspace, run relevant tests, identify the root cause, and write
                         )
                     if event.type == "agent.session.turn.cancelled":
                         raise RuntimeError("Issue investigation was cancelled.")
-
-            report = workspace / "investigation.md"
             if not report.exists():
                 raise RuntimeError(
                     "The agent did not create /workspace/investigation.md."

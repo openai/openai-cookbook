@@ -31,7 +31,37 @@ The shell launcher clears its copy of the key on exit. If you exported a key
 in your parent Terminal, unset it there when finished. Never paste a key into a
 source file or share it in logs.
 
-## Full evaluation: 120 requests
+## Small notebook evaluation: 20 requests by default
+
+To execute every notebook code cell against the live API, first securely export
+`OPENAI_API_KEY` in your Terminal, then run from the repository root:
+
+```bash
+.venv/bin/python -u examples/decisions/run_customer_request_routing.py --live
+```
+
+The default is **20 billable requests**: 2 calibration and 3 test examples for
+each of four routes (8 calibration + 12 test). Control the size explicitly:
+
+```bash
+# 4 * (1 + 2) = 12 requests
+.venv/bin/python -u examples/decisions/run_customer_request_routing.py --live \
+  --calibration-per-route 1 --test-per-route 2
+
+# 4 * (10 + 20) = 120 requests, matching the recorded extended evaluation
+.venv/bin/python -u examples/decisions/run_customer_request_routing.py --live \
+  --calibration-per-route 10 --test-per-route 20
+```
+
+The runner prints the configured request budget before execution. Counts must be
+positive and cannot exceed the available unique examples in the source dataset.
+The small default illustrates the workflow; it is too small to establish reliable
+production thresholds or accuracy. Offline mode remains 24 invented fixtures with
+zero network calls. The notebook itself uses the same small live defaults; set
+`DECISIONS_CALIBRATION_PER_ROUTE` and `DECISIONS_TEST_PER_ROUTE` before starting a
+Jupyter kernel to change them there.
+
+## Extended Promptfoo evaluation: 120 requests
 
 The optional Promptfoo companion prepares the pinned public dataset, validates
 the configuration, calls Decisions, grades the answers locally, and creates a

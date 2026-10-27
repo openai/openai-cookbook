@@ -130,10 +130,13 @@ class RoutingTests(unittest.TestCase):
 
         with patch.dict(self.scope, {"DATASET_HASHES": hashes}):
             with patch("urllib.request.urlopen", side_effect=download):
-                first = self.scope["load_public_cases"]()
-                second = self.scope["load_public_cases"]()
+                first = self.scope["load_public_cases"](10, 20)
+                second = self.scope["load_public_cases"](10, 20)
+                small = self.scope["load_public_cases"](2, 3)
         self.assertEqual(first, second)
         self.assertEqual(len(first), 120)
+        self.assertEqual(len(small), 20)
+        self.assertTrue({case[0] for case in small}.issubset({case[0] for case in first}))
         train_texts = {case[3] for case in first if case[1] == "calibration"}
         test_texts = {case[3] for case in first if case[1] == "test"}
         self.assertTrue(train_texts.isdisjoint(test_texts))
@@ -141,6 +144,47 @@ class RoutingTests(unittest.TestCase):
         for route in self.scope["ROUTES"]:
             self.assertEqual(sum(case[1] == "calibration" and case[2] == route for case in first), 10)
             self.assertEqual(sum(case[1] == "test" and case[2] == route for case in first), 20)
+
+    def test_invalid_sample_counts_fail_before_network(self):
+        for counts in [(0, 3), (2, -1), (True, 3), (1.5, 3)]:
+            with self.subTest(counts=counts), patch("urllib.request.urlopen") as network:
+                with self.assertRaisesRegex(ValueError, "positive integers"):
+                    self.scope["load_public_cases"](*counts)
+                network.assert_not_called()
+
+    def test_live_cli_obeys_default_and_configured_request_budgets(self):
+        runner = Path(__file__).with_name("run_customer_request_routing.py")
+        content = {name: self.dataset_bytes(name) for name in ("train.csv", "test.csv")}
+        notebook = json.loads(runner.with_name("customer_request_routing.ipynb").read_text())
+        data_source = cell_source(notebook["cells"][4])
+        for name, value in content.items():
+            data_source = data_source.replace(self.scope["DATASET_HASHES"][name],
+                                              hashlib.sha256(value).hexdigest())
+        notebook["cells"][4]["source"] = data_source
+        variants = [([], 20), (["--calibration-per-route", "1", "--test-per-route", "2"], 12),
+                    (["--calibration-per-route", "10", "--test-per-route", "20"], 120)]
+        for options, expected_calls in variants:
+            calls = []
+
+            def network(request, timeout):
+                if isinstance(request, str):
+                    return io.BytesIO(content[request.rsplit("/", 1)[-1]])
+                payload = json.loads(request.data)
+                calls.append(payload)
+                route = next(route for label, route in self.scope["SOURCE_TO_ROUTE"].items()
+                             if label in payload["input"])
+                return io.BytesIO(json.dumps({"answers": [{"type": "choice", "name": "route",
+                    "choice": route, "confidence": 0.9}], "usage": {"input_tokens": 1}}).encode())
+
+            with self.subTest(options=options):
+                with patch.dict(os.environ, {"OPENAI_API_KEY": "test-only-placeholder"}):
+                    with patch.object(sys, "argv", [str(runner), "--live", *options]):
+                        with patch.object(Path, "read_text", return_value=json.dumps(notebook)):
+                            with patch("urllib.request.urlopen", side_effect=network):
+                                with contextlib.redirect_stdout(io.StringIO()):
+                                    runpy.run_path(str(runner), run_name="__main__")
+                self.assertEqual(len(calls), expected_calls)
+                self.assertTrue(all(set(call) == {"model", "input", "questions"} for call in calls))
 
     def test_dataset_checksum_mismatch_stops_before_classification(self):
         with patch("urllib.request.urlopen", return_value=io.BytesIO(b"unexpected")) as network:

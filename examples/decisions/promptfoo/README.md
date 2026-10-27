@@ -1,6 +1,7 @@
 # Evaluate Decisions routing with Promptfoo
 
-This optional companion runs the notebook's four-intent BANKING77 subset through
+This optional companion explicitly runs the extended 120-example four-intent
+BANKING77 subset through
 Promptfoo's native `openai:decisions:gpt-6-luna` provider. It calls
 `POST https://api.openai.com/v1/decisions` and uses exact-match JavaScript assertions.
 No model judge is needed.
@@ -30,7 +31,7 @@ Generated tests and results stay in the ignored `.generated/` directory.
 Only the rendered `{{message}}` prompt is sent as API input; expected labels,
 case IDs, and split names are local evaluation variables.
 
-These are the **same cases evaluated in the notebook**, so this run tests
+These are the **same cases in the notebook's recorded extended evaluation**, so this run tests
 reproducibility across harnesses. It is not another unseen holdout. BANKING77 is
 a public benchmark that may have been encountered during model training; no
 training-data exclusion is claimed. The four selected intents do not measure
@@ -54,7 +55,7 @@ If the default npm cache is not writable, use
 `npm ci --cache "$PWD/.npm-cache"`. Do not change system ownership to work around
 a sandbox write restriction.
 
-## Clean and run end to end
+## Clean and run the extended evaluation end to end
 
 ```bash
 bash run_eval.sh
@@ -68,6 +69,10 @@ retained. Requests are uncached, so each invocation makes new paid requests.
 The script prepares and validates the configuration before asking for a key
 with hidden input. Alternatively, export `OPENAI_API_KEY` in that Terminal first.
 Never put the key in a source file or pass it as a command-line argument.
+
+The notebook runner defaults to 20 requests and supports configurable per-route
+sizes; see the [main README](../README.md). This companion deliberately retains
+the explicit extended size of 10 calibration and 20 test examples per route.
 
 The live eval makes **120 sequential billable requests** with caching disabled
 and `maxRetries: 0`. It keeps terminal output visible, disables usage telemetry

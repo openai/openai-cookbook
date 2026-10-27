@@ -77,7 +77,8 @@ def prepare():
     if (GENERATED / "results.json").exists():
         raise ValueError("A run already exists; inspect it before replacing its config")
     scope = notebook_definitions()
-    cases = scope["load_public_cases"]()
+    # This optional companion explicitly reproduces the recorded extended run.
+    cases = scope["load_public_cases"](10, 20)
     config = build_config(cases, scope["QUESTION"], scope["MODEL"])
     GENERATED.mkdir(exist_ok=True)
     (GENERATED / "promptfooconfig.json").write_text(

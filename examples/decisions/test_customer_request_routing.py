@@ -6,6 +6,8 @@ import hashlib
 import io
 import json
 import os
+import runpy
+import sys
 from pathlib import Path
 import unittest
 from unittest.mock import patch
@@ -29,6 +31,24 @@ class RoutingTests(unittest.TestCase):
                     for cell in cls.cells:
                         if cell["cell_type"] == "code":
                             exec(cell_source(cell), cls.scope)
+
+    def test_preview_makes_one_request_and_displays_response(self):
+        response = {"answers": [{"type": "choice", "name": "route",
+                                  "choice": "card_delivery", "confidence": 0.92}]}
+        output = io.StringIO()
+        runner = Path(__file__).with_name("run_customer_request_routing.py")
+        with patch.dict(os.environ, {"OPENAI_API_KEY": "test-only-placeholder"}):
+            with patch.object(sys, "argv", [str(runner), "--preview"]):
+                with patch("urllib.request.urlopen") as send:
+                    send.return_value.__enter__.return_value = io.StringIO(json.dumps(response))
+                    with contextlib.redirect_stdout(output):
+                        runpy.run_path(str(runner), run_name="__main__")
+        send.assert_called_once()
+        request = send.call_args.args[0]
+        self.assertEqual(request.full_url, "https://api.openai.com/v1/decisions")
+        self.assertEqual(json.loads(request.data)["model"], "gpt-6-luna")
+        self.assertIn("LIVE API RESPONSE", output.getvalue())
+        self.assertIn('"confidence": 0.92', output.getvalue())
 
     def test_fixture_accounting_and_no_test_leakage_in_selection(self):
         self.assertEqual(self.scope["SELECTED_THRESHOLD"], 0.8)

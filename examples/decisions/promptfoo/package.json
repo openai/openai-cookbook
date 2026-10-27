@@ -1,0 +1,13 @@
+{
+  "name": "decisions-routing-eval",
+  "version": "1.0.0",
+  "private": true,
+  "description": "Optional Promptfoo companion to the Decisions routing notebook",
+  "engines": {"node": ">=22.22.0"},
+  "scripts": {
+    "validate": "promptfoo validate config -c .generated/promptfooconfig.json",
+    "eval": "promptfoo eval -c .generated/promptfooconfig.json --no-cache --max-concurrency 1 -o .generated/results.json -o .generated/report.html",
+    "view": "promptfoo view --host 127.0.0.1"
+  },
+  "devDependencies": {"promptfoo": "0.124.1"}
+}

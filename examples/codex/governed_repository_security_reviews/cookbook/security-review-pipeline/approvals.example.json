@@ -1,0 +1,46 @@
+{
+  "approvals": [
+    {
+      "gate": "scope",
+      "repository_id": "synthetic/payments-api",
+      "revision": "fa25cd5b093da9dca857ecd83cb29f5a0c25bef0",
+      "service_owner": "payments-service-owner",
+      "actor": "security-owner"
+    },
+    {
+      "gate": "scope",
+      "repository_id": "synthetic/catalog-service",
+      "revision": "3cc08896425babb8cc621458d2814d5ec37f0475",
+      "service_owner": "catalog-service-owner",
+      "actor": "security-owner"
+    },
+    {
+      "gate": "scope",
+      "repository_id": "synthetic/edge-auth",
+      "revision": "fa625bbe069300ef924f13bf043fb0deb179aa5b",
+      "service_owner": "edge-service-owner",
+      "actor": "security-owner"
+    },
+    {
+      "gate": "threat_model",
+      "repository_id": "synthetic/edge-auth",
+      "revision": "fa625bbe069300ef924f13bf043fb0deb179aa5b",
+      "context_sha256": "6ffdbb54b0940a36fea30acfc6e346d23dcba80f916277e3f469f88323762cf2",
+      "actor": "threat-owner"
+    },
+    {
+      "gate": "scope",
+      "repository_id": "synthetic/adversarial-docs",
+      "revision": "ac5f00ef96e3e4180cacb3040b717207f4619578",
+      "service_owner": "docs-service-owner",
+      "actor": "security-owner"
+    },
+    {
+      "gate": "scope",
+      "repository_id": "synthetic/restricted-worker",
+      "revision": "460bd935f4d6327c2ffebed2e302bde511e39e9e",
+      "service_owner": "regulated-service-owner",
+      "actor": "security-owner"
+    }
+  ]
+}

@@ -1,0 +1,18 @@
+{
+  "approvals": [
+    {
+      "gate": "scope",
+      "repository_id": "example-company/payments-api",
+      "revision": "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa",
+      "service_owner": "payments-service-owner",
+      "actor": "security-owner"
+    },
+    {
+      "gate": "scope",
+      "repository_id": "example-company/edge-auth",
+      "revision": "bbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbb",
+      "service_owner": "edge-service-owner",
+      "actor": "security-owner"
+    }
+  ]
+}

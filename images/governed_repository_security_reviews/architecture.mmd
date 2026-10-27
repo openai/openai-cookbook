@@ -1,0 +1,24 @@
+flowchart LR
+    accTitle: Governed security review architecture
+    accDescr: Solid arrows show synthetic fixture execution with optional separate Docker workers. Dashed arrows show a future unexecuted product adapter. Scope binds repository, revision and current owner. Named humans retain disposition, patch, merge and deploy authority.
+    subgraph host_in[Trusted host: authority and admission]
+        scope[Trusted inventory and policy<br/>Named scope approval<br/>Repo ID + full SHA + current owner]
+        admit[Host admission<br/>Scope and risk-context checks<br/>Rate, budget, workers and idempotency]
+        scope --> admit
+    end
+    subgraph worker[Separate optional Docker workers]
+        fixture[Read synthetic fixtures<br/>No network, non-root, read-only source<br/>No secrets or Docker socket]
+    end
+    subgraph host_out[Trusted host: evidence and review]
+        evidence[Findings, coverage and manifest<br/>Hashes, HMAC state and audit<br/>Invalid evidence stops dispatch]
+        human[Named finding disposition<br/>Private review packet<br/>Patch approval; human-only merge/deploy]
+        evidence --> human
+    end
+    admit --> fixture --> evidence
+    future[Future Codex Security CLI / SDK adapter<br/>NOT EXECUTED<br/>Separate approved identity, model egress and spend]
+    admit -. proposed live path .-> future -. verified output contract .-> evidence
+    note[Daemon-free Compose confines one service;<br/>it does not create a separate inner worker.]
+    classDef muted fill:#fafbf9,stroke:#65786d,color:#19211f,stroke-dasharray:9 7;
+    classDef safe fill:#edf4ef,stroke:#296348,color:#19211f;
+    class future,note muted;
+    class fixture safe;

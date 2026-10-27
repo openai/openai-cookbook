@@ -1,0 +1,42 @@
+{
+  "organisation_id": "example-company",
+  "organisation_model_version": "example-security-baseline-v1",
+  "organisation_controls": [
+    "audit_logging",
+    "encryption_at_rest",
+    "identity_governance",
+    "network_segmentation"
+  ],
+  "owners": {
+    "scope_authorizer": ["security-owner"],
+    "model_reviewer": ["threat-owner"],
+    "security_reviewer": ["finding-owner"],
+    "patch_reviewer": ["patch-owner"],
+    "merge_owner": ["repository-owner"],
+    "deploy_owner": ["release-owner"],
+    "exception_owner": ["risk-owner"],
+    "policy_owner": ["policy-owner"]
+  },
+  "policy": {
+    "max_concurrent": 3,
+    "max_attempts": 2,
+    "max_scans_per_run": 12,
+    "max_campaign_units": 250,
+    "estimated_scan_units": 5,
+    "max_inflight_overshoot_units": 2,
+    "scanner_version": "synthetic-security-adapter/1.0",
+    "policy_version": "example-governance-v1",
+    "allow_draft_pr": false,
+    "provider_write_authorised": false,
+    "allow_untrusted_network": false,
+    "require_human_merge": true,
+    "require_human_deploy": true
+  },
+  "periodic_revalidation_hours": 168,
+  "model_selection": {
+    "model": "gpt-5.6-terra",
+    "effort": "high",
+    "approved": false,
+    "owner": "customer-finops-owner"
+  }
+}

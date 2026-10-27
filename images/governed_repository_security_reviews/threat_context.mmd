@@ -1,0 +1,19 @@
+flowchart TD
+    accTitle: Versioned threat context and human acceptance
+    accDescr: Organisation baseline, archetype, repository delta and bespoke high-risk context form an effective hash. Named humans must approve the exact hash for high-risk repositories. A baseline edit can invalidate all repository hashes despite changing a single shared artefact.
+    org[Organisation baseline<br/>Version and shared controls]
+    archetype[Workload archetype<br/>Topology, exposure and framework]
+    delta[Repository delta<br/>Data, auth, dependencies, criticality,<br/>additional controls and divergence]
+    bespoke[Bespoke high-risk context<br/>Trusted repository-specific model]
+    digest[Effective context hash<br/>Versioned composition of trusted inputs]
+    approval[High risk: named human accepts exact hash<br/>Missing or stale approval holds work]
+    admit[Admission rechecks approvals<br/>Queue work or reuse current evidence]
+    org --> digest
+    archetype --> digest
+    delta --> digest
+    bespoke --> digest
+    digest -->|high risk| approval -->|accepted| admit
+    digest -->|other repositories| admit
+    note[Baseline change can invalidate every repository.<br/>One edited artefact can require many new reviews.]
+    classDef safe fill:#edf4ef,stroke:#296348,color:#19211f;
+    class digest,note safe;

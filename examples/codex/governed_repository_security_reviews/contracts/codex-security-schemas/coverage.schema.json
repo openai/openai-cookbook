@@ -1,0 +1,228 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://openai.com/codex-security/schemas/coverage.schema.json",
+  "title": "Codex Security scan coverage",
+  "type": "object",
+  "required": [
+    "documentType",
+    "schemaVersion",
+    "scanId",
+    "mode",
+    "completeness",
+    "inventoryStrategy",
+    "includePaths",
+    "excludePaths",
+    "surfaces",
+    "explicitExclusions",
+    "deferred"
+  ],
+  "properties": {
+    "documentType": {
+      "const": "codex-security.coverage"
+    },
+    "schemaVersion": {
+      "const": "1.0"
+    },
+    "scanId": {
+      "type": "string",
+      "minLength": 1
+    },
+    "mode": {
+      "enum": [
+        "repository",
+        "scoped_path",
+        "diff",
+        "commit",
+        "branch_diff",
+        "working_tree",
+        "deep_repository"
+      ]
+    },
+    "completeness": {
+      "enum": [
+        "complete",
+        "partial",
+        "unknown"
+      ]
+    },
+    "inventoryStrategy": {
+      "enum": [
+        "repository",
+        "scoped_path",
+        "diff",
+        "directory",
+        "custom"
+      ]
+    },
+    "includePaths": {
+      "type": "array",
+      "items": {
+        "type": "string"
+      }
+    },
+    "excludePaths": {
+      "type": "array",
+      "items": {
+        "type": "string"
+      }
+    },
+    "surfaces": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "required": [
+          "id",
+          "label",
+          "disposition",
+          "receiptRefs"
+        ],
+        "properties": {
+          "id": {
+            "type": "string",
+            "minLength": 1
+          },
+          "label": {
+            "type": "string",
+            "minLength": 1
+          },
+          "disposition": {
+            "enum": [
+              "reported",
+              "no_issue_found",
+              "rejected",
+              "not_applicable",
+              "needs_follow_up"
+            ]
+          },
+          "receiptRefs": {
+            "type": "array",
+            "items": {
+              "type": "string",
+              "minLength": 1,
+              "pattern": "^(?!.*(?:^|/)\\.\\.(?:/|$))(?!.*\\\\)artifacts/.+$"
+            }
+          },
+          "riskArea": {
+            "type": "string",
+            "minLength": 1
+          },
+          "notes": {
+            "type": "string",
+            "minLength": 1
+          }
+        }
+      }
+    },
+    "explicitExclusions": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "required": [
+          "pattern",
+          "reason"
+        ],
+        "properties": {
+          "pattern": {
+            "type": "string",
+            "minLength": 1
+          },
+          "reason": {
+            "type": "string",
+            "minLength": 1
+          }
+        }
+      }
+    },
+    "deferred": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "required": [
+          "id",
+          "reason"
+        ],
+        "properties": {
+          "id": {
+            "type": "string",
+            "minLength": 1
+          },
+          "reason": {
+            "type": "string",
+            "minLength": 1
+          },
+          "paths": {
+            "type": "array",
+            "items": {
+              "type": "string",
+              "minLength": 1
+            }
+          },
+          "surfaceIds": {
+            "type": "array",
+            "items": {
+              "type": "string",
+              "minLength": 1
+            }
+          }
+        }
+      }
+    },
+    "openQuestions": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "required": [
+          "question"
+        ],
+        "properties": {
+          "question": {
+            "type": "string",
+            "minLength": 1
+          },
+          "followUpPrompt": {
+            "type": "string",
+            "minLength": 1
+          }
+        }
+      }
+    }
+  },
+  "allOf": [
+    {
+      "if": {
+        "properties": {
+          "completeness": {
+            "const": "complete"
+          }
+        },
+        "required": [
+          "completeness"
+        ]
+      },
+      "then": {
+        "properties": {
+          "deferred": {
+            "contains": {},
+            "minContains": 0,
+            "maxContains": 0
+          },
+          "surfaces": {
+            "contains": {
+              "type": "object",
+              "required": [
+                "disposition"
+              ],
+              "properties": {
+                "disposition": {
+                  "const": "needs_follow_up"
+                }
+              }
+            },
+            "minContains": 0,
+            "maxContains": 0
+          }
+        }
+      }
+    }
+  ]
+}

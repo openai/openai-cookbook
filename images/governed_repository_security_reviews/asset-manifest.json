@@ -1,0 +1,71 @@
+{
+  "asset_discovery": "no approved redistributable font or logo selected; system-font fallback",
+  "asset_sha256": {
+    "DIAGRAMS.md": "bd97241b6c37013dbe8a72d50ce343c1c4a2df484dd9d20acc465d8c872ad0d3",
+    "architecture.mmd": "b5f716ccc123ce31cb3cbdad5ad70a56774011ae533a294342a93f709fa81012",
+    "architecture.svg": "37a62f904549577f76c56a039d3061033a7262e69c4814bf2b08ed60bf253acb",
+    "threat_context.mmd": "832d80caeb938e2525c50db896cfe6640a71361eab0985f0ace9d2fe69367121",
+    "threat_context.svg": "bd2f31de29b4cb0c2b568e5dc1ee0b1bf54a92d48ca7a26251018e2418fbdd9f"
+  },
+  "brand_source": "https://openai.com/brand/",
+  "embedded_fonts": false,
+  "exact_brand_certification": false,
+  "font_stack": [
+    "Arial",
+    "Helvetica",
+    "sans-serif"
+  ],
+  "format": "governed-security-cookbook-diagrams/v1",
+  "idempotency_fields": [
+    "repository_id",
+    "commit_sha",
+    "effective_threat_model_hash",
+    "scanner_version",
+    "policy_version"
+  ],
+  "image_generation_model": null,
+  "limitations": [
+    "synthetic control path only",
+    "future product adapter is not executed",
+    "Compose outer containment is distinct from separately launched Docker workers",
+    "one baseline change may invalidate every repository",
+    "no exact brand certification"
+  ],
+  "logos": false,
+  "method": "deterministic_code_native_svg_and_mermaid",
+  "paid_generation_calls": 0,
+  "scope_approval_fields": [
+    "repository_id",
+    "commit_sha",
+    "owner"
+  ],
+  "sharing_status": "publication_candidate_not_published",
+  "source_sha256": {
+    "src/field_autonomy/sandbox.py": "645455a5e2d49bb782386d1c74a32f6458fe263c9ad444128ac1394b32f03481",
+    "src/fleet_security/pipeline.py": "e1ba8972eef23504ac778e87d1c5fa609521fd671474568bcf5d3fe90fb5abd9",
+    "src/fleet_security/recipe.py": "dd42b4910982a22a83231e1342d757579bdc0b3274ab5714ed3f63251b4f3750",
+    "src/fleet_security/scanner.py": "abf8027a02ac7fe01e867c51b4d6d1217d2ad53a0624186fdaeca8ce137dd12f",
+    "src/fleet_security/threats.py": "d2da718cc6997b15c0c9945a61aa93280f93f2a1d2e4469089df9a8bfa27a978"
+  },
+  "verification": {
+    "architecture.svg": {
+      "accessible_title_and_description": true,
+      "external_resources": false,
+      "text_elements": 43,
+      "xml_parsed": true
+    },
+    "threat_context.svg": {
+      "accessible_title_and_description": true,
+      "external_resources": false,
+      "text_elements": 27,
+      "xml_parsed": true
+    }
+  },
+  "viewbox": [
+    0,
+    0,
+    1600,
+    900
+  ],
+  "visual_review": "inspect rendered previews separately; structural checks are not visual QA"
+}

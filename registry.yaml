@@ -3884,3 +3884,14 @@
     - evals
     - agents
     - responses
+- title: Evaluate customer-request routing with the Decisions API
+  path: examples/decisions/customer_request_routing.ipynb
+  slug: decisions-customer-request-routing
+  description: Select a review threshold on calibration data and evaluate customer-request routing on a held-out, pinned public-data subset using the Decisions API.
+  date: '2026-10-27'
+  authors:
+    - neusebius
+  tags:
+    - decisions
+    - classification
+    - evals

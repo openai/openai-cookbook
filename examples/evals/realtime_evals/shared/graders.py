@@ -292,10 +292,25 @@ def expected_args_subset(
         if isinstance(expected_value, bool) or isinstance(actual_value, bool):
             return expected_value is actual_value
 
-        if isinstance(expected_value, (int, float)) and isinstance(
+        if isinstance(expected_value, (int, float)) or isinstance(
             actual_value, (int, float)
         ):
-            return expected_value == actual_value
+            # Numeric strings retain compatibility, but text normalization must
+            # not erase a sign or turn punctuation into an equivalent number.
+            try:
+                if isinstance(expected_value, str):
+                    expected_value = json.loads(expected_value)
+                if isinstance(actual_value, str):
+                    actual_value = json.loads(actual_value)
+            except json.JSONDecodeError:
+                return False
+            if isinstance(expected_value, bool) or isinstance(actual_value, bool):
+                return False
+            return (
+                isinstance(expected_value, (int, float))
+                and isinstance(actual_value, (int, float))
+                and expected_value == actual_value
+            )
 
         expected_text = str(expected_value)
         actual_text = str(actual_value)

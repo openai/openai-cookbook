@@ -12,6 +12,7 @@ Each provider has their own named directory, with a standard notebook to introdu
 - [Azure AI Search](https://learn.microsoft.com/azure/search/search-get-started-vector)
 - [Azure SQL Database](https://learn.microsoft.com/azure/azure-sql/database/ai-artificial-intelligence-intelligent-applications?view=azuresql)
 - [Chroma](https://docs.trychroma.com/getting-started)
+- [Dragonfly](https://www.dragonflydb.io/docs/)
 - [Elasticsearch](https://www.elastic.co/guide/en/elasticsearch/reference/current/knn-search.html)
 - [Hologres](https://www.alibabacloud.com/help/en/hologres/latest/procedure-to-use-hologres)
 - [Kusto](https://learn.microsoft.com/en-us/azure/data-explorer/web-query-data)

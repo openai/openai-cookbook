@@ -7,6 +7,7 @@ import os
 from pathlib import Path
 import runpy
 import sys
+import subprocess
 import unittest
 from unittest.mock import patch
 import urllib.error
@@ -21,6 +22,15 @@ ANSWER = {"answers": [{"type": "choice", "name": "route",
 
 
 class RoutingTests(unittest.TestCase):
+    @unittest.skipIf(sys.version_info < (3, 11), "Isolated safe-path check requires Python 3.11+")
+    def test_cli_imports_adjacent_helper_in_isolated_mode(self):
+        result = subprocess.run(
+            [sys.executable, "-I", str(EXAMPLE / "run_customer_request_routing.py"), "--help"],
+            cwd="/", capture_output=True, text=True, check=False,
+        )
+        self.assertEqual(result.returncode, 0, result.stderr)
+        self.assertIn("--message", result.stdout)
+
     def test_request_contract_and_no_key_in_body(self):
         with patch.dict(os.environ, {"OPENAI_API_KEY": "test-only-placeholder"}):
             with patch("urllib.request.urlopen", return_value=io.BytesIO(json.dumps(ANSWER).encode())) as send:

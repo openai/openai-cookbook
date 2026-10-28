@@ -3,6 +3,13 @@
 import argparse
 import json
 import os
+from pathlib import Path
+import sys
+
+# Locate the adjacent helper even when Python safe-path mode is enabled.
+example_dir = str(Path(__file__).resolve().parent)
+if example_dir not in sys.path:
+    sys.path.insert(0, example_dir)
 
 from routing import (API_URL, build_request, parse_prediction,
                      request_prediction, load_demo_messages)

@@ -1,15 +1,20 @@
 # Route customer-support messages with the Decisions API
 
-Learn what the Decisions API returns and use it to route a small batch of public
-banking-support messages. This example includes an interactive notebook and a
-Terminal demo that share the same Python helpers.
+Build a customer-support router that reads a message and selects the queue
+responsible for it. This example sends ten public banking-support messages to
+the Decisions API and displays each actual response, selected queue, and confidence.
+
+Start with the [notebook](customer_request_routing.ipynb) for a guided walkthrough,
+or use the [Terminal demo](#1-run-ten-customer-support-examples). Both run the
+same ten examples through shared Python helpers.
 
 ## What is the Decisions API?
 
 The [OpenAI Decisions API](https://developers.openai.com/api/docs/guides/decisions)
-evaluates input against questions you define and returns typed answers. Use it
-when an application needs a bounded judgment, such as a category, a condition,
-or a rating. Your application decides what to do with the answer.
+evaluates evidence against questions you define and returns typed answers your
+application can use. For example, supply a customer message and ask which of four
+support queues owns it. The API returns a selected queue; your application decides
+how to use that answer.
 
 You choose the question type:
 
@@ -19,10 +24,16 @@ You choose the question type:
 | `predicate` | Estimate whether a condition holds | Does the message describe a duplicate charge? |
 | `score` | Rate input against ordered levels | How severe is the reported issue? |
 
-A request contains `model`, `input`, and `questions`. Responses contain an
-`answers` array, with the question's `name` echoed in its answer. A `choice`
-answer includes the selected `choice`, per-choice `probabilities`, and a
-`confidence` value. A question can also return a refusal.
+Each request has three parts:
+
+- `model`: the model evaluating the request, `gpt-6-luna` in this demo.
+- `input`: the customer message to evaluate.
+- `questions`: the routing instructions and allowed queue choices.
+
+The response contains an `answers` array. A question's `name` links it to its
+answer. For a `choice` question, the answer includes the selected `choice`,
+per-choice `probabilities`, and a separate `confidence` value. A question can also
+return a refusal.
 
 This example uses **`choice`**, model **`gpt-6-luna`**, and
 **`POST https://api.openai.com/v1/decisions`**. It sends JSON directly using
@@ -34,20 +45,25 @@ for the exact schema, and
 [pricing and availability](https://developers.openai.com/api/docs/guides/decisions#pricing-and-availability)
 before running paid requests.
 
-## What does this demo do?
+## Use case: route incoming banking-support messages
 
-A support application needs to determine which queue should handle a customer's
-message. The demo defines four choices with descriptions explaining their scope.
-These example messages illustrate the intended mapping:
+A banking support team receives messages about fees, account access, transfers,
+and card delivery. Before a specialist can help, each message needs an owner.
+This demo models that triage step: one message goes in, and a queue selection
+comes back.
+
+The routing question defines four choices with descriptions explaining their
+scope. These messages are included in the ten-example batch:
 
 | Example message | Intended queue |
 | --- | --- |
-| "Why was a fee added to my card purchase?" | `card_payment_fees` |
-| "I forgot the passcode for the app." | `account_access` |
-| "Can I cancel a transfer I just made?" | `transfer_cancellation` |
-| "My new card has not arrived." | `card_delivery` |
+| "I was charged a fee for a card payment. Why?" | `card_payment_fees` |
+| "Tell me how to reset the passcode." | `account_access` |
+| "I need to cancel an incorrect transaction." | `transfer_cancellation` |
+| "How long should my new card take to arrive?" | `card_delivery` |
 
-The runnable demo uses public BANKING77 messages. It runs **ten bundled messages covering all four queues**. For each message, it:
+The demo runs **ten bundled BANKING77 messages covering all four queues**.
+For each message, it:
 
 1. Builds a named routing question and sends the message to Decisions.
 2. Displays the actual response, including choice probabilities and confidence.
@@ -56,9 +72,38 @@ The runnable demo uses public BANKING77 messages. It runs **ten bundled messages
    a refusal or unusable answer.
 
 Only the message and question go to the model. The dataset's source label is
-printed as local context. The code does not reply to customers, create tickets,
-modify accounts, or execute transactions. This is a routing demonstration with
-no calibration/test split, threshold selection, or model-quality grading.
+printed as local context. The demo displays routing decisions. Connecting them
+to a ticketing system or customer workflow is a separate application step.
+
+## Architecture and flow
+
+The notebook and Terminal runner use the same local helpers. The following flow
+repeats once per message, for **ten API requests** in a complete run.
+
+```mermaid
+flowchart TD
+    A["Ten public customer messages<br/>customer_requests.json"] --> B["Take one message"]
+    B --> C["Build routing question<br/>Four allowed queues"]
+    C --> D["Decisions API<br/>POST /v1/decisions · gpt-6-luna"]
+    D --> E["Display actual response<br/>Validate typed answer"]
+    E --> F{"Usable choice answer?"}
+    F -->|Yes| G["Print selected queue<br/>and confidence"]
+    F -->|No| H["Print human_review<br/>with null confidence"]
+```
+
+1. **Load messages:** `load_demo_messages()` reads the ten bundled examples.
+2. **Build the request:** `build_request()` combines one message with the named
+   `route` question and its four queue descriptions. The API key is sent separately
+   in the Authorization header.
+3. **Call Decisions:** `request_prediction()` sends the request and returns the
+   actual response JSON and elapsed request time.
+4. **Validate and display:** `parse_prediction()` checks the answer type, question
+   name, allowed queue, and confidence range. A refusal or unusable answer becomes
+   `human_review`; a valid answer becomes a printed queue selection.
+
+The source labels stay local. HTTP, network, and invalid-JSON errors stop the run;
+they do not follow the diagram's human-review branch. The demo makes no changes
+to customer accounts or tickets.
 
 ## Before you start
 
@@ -75,9 +120,10 @@ Run the following commands from the **root of the openai-cookbook repository**.
 bash examples/decisions/run_demo.sh
 ```
 
-Paste your API key at the hidden prompt. The launcher loads ten bundled public messages and makes
-**ten billable Decisions requests**. It
-prints each input, actual response JSON, parsed route/confidence, and latency.
+Paste your API key at the hidden prompt. The launcher loads ten bundled public
+messages and makes **ten billable Decisions requests**. It prints each input,
+actual response JSON, parsed route/confidence, and latency. A successful full run
+ends after the result for `Example 10/10` and returns to your shell prompt.
 
 The key can also come from an existing `OPENAI_API_KEY` environment variable.
 The launcher disables shell tracing before handling it and clears its copy on

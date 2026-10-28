@@ -105,10 +105,11 @@ def parse_prediction(response):
     return answer["choice"], float(confidence)
 
 
-def request_prediction(message):
+def request_prediction(message, *, api_key=None):
     """Make one authenticated request, without automatic retries."""
     payload = build_request(message)
-    api_key = os.environ.get("OPENAI_API_KEY")
+    if api_key is None:
+        api_key = os.environ.get("OPENAI_API_KEY")
     if not api_key:
         raise RuntimeError("Set OPENAI_API_KEY securely before making a live request")
     request = urllib.request.Request(

@@ -140,7 +140,7 @@ class RoutingTests(unittest.TestCase):
 
     def test_notebook_runs_top_to_bottom_offline(self):
         notebook = json.loads((EXAMPLE / "customer_request_routing.ipynb").read_text())
-        with patch.dict(os.environ, {"RUN_DECISIONS_API": "0"}):
+        with patch.dict(os.environ, {"OPENAI_API_KEY": ""}):
             with patch.object(Path, "cwd", return_value=EXAMPLE):
                 with patch("urllib.request.urlopen") as send:
                     with contextlib.redirect_stdout(io.StringIO()):
@@ -151,6 +151,39 @@ class RoutingTests(unittest.TestCase):
         send.assert_not_called()
         self.assertEqual(scope["outputs"], [])
         self.assertEqual(len(ROUTES), 4)
+
+    def test_notebook_hidden_key_is_not_printed_and_cleared_after_requests(self):
+        notebook = json.loads((EXAMPLE / "customer_request_routing.ipynb").read_text())
+        cases = [{"id": str(i), "message": f"public sample {i}", "source_label": "card_arrival"}
+                 for i in range(4)]
+        for fail in [False, True]:
+            scope = {}
+            output = io.StringIO()
+            network_result = (urllib.error.URLError("offline") if fail else
+                              lambda *a, **k: io.BytesIO(json.dumps(ANSWER).encode()))
+            with self.subTest(fail=fail):
+                with patch.dict(os.environ, {"OPENAI_API_KEY": ""}):
+                    with patch.object(Path, "cwd", return_value=EXAMPLE):
+                        with patch("getpass.getpass", return_value="hidden-test-placeholder") as prompt:
+                            with patch("routing.sample_public_messages", return_value=cases):
+                                with patch("urllib.request.urlopen", side_effect=network_result) as send:
+                                    with contextlib.redirect_stdout(output):
+                                        try:
+                                            for cell in notebook["cells"]:
+                                                if cell["cell_type"] == "code":
+                                                    source = "".join(cell["source"]).replace(
+                                                        "RUN_LIVE = False", "RUN_LIVE = True")
+                                                    exec(compile(source, "routing-notebook", "exec"), scope)
+                                        except RuntimeError:
+                                            if not fail:
+                                                raise
+            prompt.assert_called_once()
+            self.assertEqual(send.call_count, 1 if fail else 4)
+            self.assertIsNone(scope["api_key"])
+            self.assertNotIn("hidden-test-placeholder", output.getvalue())
+            if not fail:
+                self.assertEqual(send.call_args.args[0].get_header("Authorization"),
+                                 "Bearer hidden-test-placeholder")
 
 
 if __name__ == "__main__":

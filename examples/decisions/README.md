@@ -142,15 +142,33 @@ establish production performance.
 
 ## Run the notebook instead
 
-Open [customer_request_routing.ipynb](customer_request_routing.ipynb) in VS Code
-or Jupyter. Start the kernel in the repository root or `examples/decisions/` and
-run the cells from top to bottom. The default previews requests without network
-calls.
+1. Open [customer_request_routing.ipynb](customer_request_routing.ipynb) in VS Code
+   or Jupyter and select a Python 3.10+ kernel. Start the kernel in the repository
+   root or `examples/decisions/`.
+2. Find these settings in the first code cell:
 
-For live mode, securely configure `OPENAI_API_KEY` and `RUN_DECISIONS_API=1`
-before starting the kernel, then restart it. The default makes four API calls.
-Set `DECISIONS_SAMPLES_PER_ROUTE=2` for eight. The notebook and CLI use the same
-question, sampler, and response validation from `routing.py`.
+   ```python
+   RUN_LIVE = False
+   SAMPLES_PER_ROUTE = 1
+   ```
+
+3. Choose the mode, then select **Run All**:
+
+   | Settings | Behavior | API calls |
+   | --- | --- | ---: |
+   | `RUN_LIVE = False` | Preview hand-written requests without network calls | 0 |
+   | `RUN_LIVE = True`, `SAMPLES_PER_ROUTE = 1` | Route one public message per queue | 4 |
+   | `RUN_LIVE = True`, `SAMPLES_PER_ROUTE = 2` | Route two public messages per queue | 8 |
+
+4. In live mode, enter your key in the hidden prompt if requested. An existing
+   `OPENAI_API_KEY` environment variable is also supported. Do not put a real key
+   in a code cell. The notebook clears its key variable after the request loop;
+   an existing environment variable remains in the kernel environment.
+
+Changing these two settings needs no kernel restart or run-mode environment
+variables. Use **Run All** again after editing them. Each live run makes new paid
+requests. The notebook and CLI share the same question, sampler, and response
+validation from `routing.py`.
 
 ## Find the code
 

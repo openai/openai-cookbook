@@ -78,7 +78,7 @@ class RoutingTests(unittest.TestCase):
     def test_cli_custom_message_makes_one_request_and_displays_response(self):
         output = io.StringIO()
         with patch.dict(os.environ, {"OPENAI_API_KEY": "test-only-placeholder"}):
-            with patch.object(sys, "argv", ["demo", "--live", "--message", "My card is late."]):
+            with patch.object(sys, "argv", ["demo", "--message", "My card is late."]):
                 with patch("urllib.request.urlopen", return_value=io.BytesIO(json.dumps(ANSWER).encode())) as send:
                     with contextlib.redirect_stdout(output):
                         runpy.run_path(str(EXAMPLE / "run_customer_request_routing.py"), run_name="__main__")
@@ -120,7 +120,7 @@ class RoutingTests(unittest.TestCase):
             cases = [{"id": str(i), "message": f"public message {i}", "source_label": "local label"}
                      for i in range(count)]
             with patch.dict(os.environ, {"OPENAI_API_KEY": "test-only-placeholder"}):
-                with patch.object(sys, "argv", ["demo", "--live", *options]):
+                with patch.object(sys, "argv", ["demo", *options]):
                     with patch("routing.sample_public_messages", return_value=cases) as sample:
                         with patch("urllib.request.urlopen", side_effect=lambda *a, **k: io.BytesIO(json.dumps(ANSWER).encode())) as send:
                             with contextlib.redirect_stdout(io.StringIO()):
@@ -130,26 +130,34 @@ class RoutingTests(unittest.TestCase):
             for call in send.call_args_list:
                 self.assertEqual(set(json.loads(call.args[0].data)), {"model", "input", "questions"})
 
-    def test_cli_default_is_no_network_request_preview(self):
-        with patch.object(sys, "argv", ["demo"]):
-            with patch("urllib.request.urlopen") as send:
-                with contextlib.redirect_stdout(io.StringIO()) as output:
-                    runpy.run_path(str(EXAMPLE / "run_customer_request_routing.py"), run_name="__main__")
+    def test_cli_missing_key_stops_before_network(self):
+        with patch.dict(os.environ, {"OPENAI_API_KEY": ""}):
+            with patch.object(sys, "argv", ["demo"]):
+                with patch("urllib.request.urlopen") as send:
+                    with contextlib.redirect_stderr(io.StringIO()):
+                        with self.assertRaises(SystemExit) as stopped:
+                            runpy.run_path(str(EXAMPLE / "run_customer_request_routing.py"), run_name="__main__")
+        self.assertEqual(stopped.exception.code, 2)
         send.assert_not_called()
-        self.assertIn("REQUEST PREVIEW ONLY", output.getvalue())
 
-    def test_notebook_runs_top_to_bottom_offline(self):
+    def test_notebook_empty_key_stops_before_model_requests(self):
         notebook = json.loads((EXAMPLE / "customer_request_routing.ipynb").read_text())
+        cases = [{"id": str(i), "message": f"public sample {i}", "source_label": "card_arrival"}
+                 for i in range(4)]
+        scope = {}
         with patch.dict(os.environ, {"OPENAI_API_KEY": ""}):
             with patch.object(Path, "cwd", return_value=EXAMPLE):
-                with patch("urllib.request.urlopen") as send:
-                    with contextlib.redirect_stdout(io.StringIO()):
-                        scope = {}
-                        for cell in notebook["cells"]:
-                            if cell["cell_type"] == "code":
-                                exec(compile("".join(cell["source"]), "routing-notebook", "exec"), scope)
+                with patch("routing.sample_public_messages", return_value=cases):
+                    with patch("getpass.getpass", return_value=""):
+                        with patch("urllib.request.urlopen") as send:
+                            with contextlib.redirect_stdout(io.StringIO()):
+                                with self.assertRaisesRegex(RuntimeError, "No key supplied"):
+                                    for cell in notebook["cells"]:
+                                        if cell["cell_type"] == "code":
+                                            exec(compile("".join(cell["source"]), "routing-notebook", "exec"), scope)
         send.assert_not_called()
         self.assertEqual(scope["outputs"], [])
+        self.assertIsNone(scope["api_key"])
         self.assertEqual(len(ROUTES), 4)
 
     def test_notebook_hidden_key_is_not_printed_and_cleared_after_requests(self):
@@ -171,8 +179,7 @@ class RoutingTests(unittest.TestCase):
                                         try:
                                             for cell in notebook["cells"]:
                                                 if cell["cell_type"] == "code":
-                                                    source = "".join(cell["source"]).replace(
-                                                        "RUN_LIVE = False", "RUN_LIVE = True")
+                                                    source = "".join(cell["source"])
                                                     exec(compile(source, "routing-notebook", "exec"), scope)
                                         except RuntimeError:
                                             if not fail:

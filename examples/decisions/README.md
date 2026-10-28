@@ -38,7 +38,7 @@ before running paid requests.
 
 A support application needs to determine which queue should handle a customer's
 message. The demo defines four choices with descriptions explaining their scope.
-These hand-written examples illustrate the intended mapping:
+These example messages illustrate the intended mapping:
 
 | Example message | Intended queue |
 | --- | --- |
@@ -47,8 +47,7 @@ These hand-written examples illustrate the intended mapping:
 | "Can I cancel a transfer I just made?" | `transfer_cancellation` |
 | "My new card has not arrived." | `card_delivery` |
 
-The live batch uses public BANKING77 messages instead of these hand-written
-previews. Its default is **four messages: one per queue**. For each message, it:
+The runnable demo uses public BANKING77 messages. Its default is **four messages: one per queue**. For each message, it:
 
 1. Builds a named routing question and sends the message to Decisions.
 2. Displays the actual response, including choice probabilities and confidence.
@@ -70,17 +69,7 @@ no calibration/test split, threshold selection, or model-quality grading.
 The demo requires no third-party Python packages, npm packages, or Promptfoo.
 Run the following commands from the **root of the openai-cookbook repository**.
 
-## 1. Preview the requests without an API key
-
-```bash
-python3 examples/decisions/run_customer_request_routing.py
-```
-
-This displays four hand-written messages and their request bodies. It makes
-**zero network calls**, does not download the dataset, and does not invent API
-responses. Use this mode to inspect the question and allowed choices first.
-
-## 2. Run four public messages through the live API
+## 1. Run the demo on four public messages
 
 ```bash
 bash examples/decisions/run_demo.sh
@@ -96,7 +85,7 @@ exit. A key exported in the parent shell remains there until you unset it.
 Never put a real key in source, notebook cells, or CLI arguments, or share it in
 logs. Each live invocation makes new paid requests.
 
-## 3. Change the batch size or try your own message
+## 2. Change the batch size or try your own message
 
 ```bash
 # Two public messages per queue: 4 * 2 = 8 API requests
@@ -114,8 +103,8 @@ With `OPENAI_API_KEY` securely configured, the Python runner can also be used
 directly:
 
 ```bash
-python3 examples/decisions/run_customer_request_routing.py --live
-python3 examples/decisions/run_customer_request_routing.py --live --samples-per-route 2
+python3 examples/decisions/run_customer_request_routing.py
+python3 examples/decisions/run_customer_request_routing.py --samples-per-route 2
 ```
 
 Results are printed to Terminal; there are no generated reports to clean or
@@ -145,30 +134,25 @@ establish production performance.
 1. Open [customer_request_routing.ipynb](customer_request_routing.ipynb) in VS Code
    or Jupyter and select a Python 3.10+ kernel. Start the kernel in the repository
    root or `examples/decisions/`.
-2. Find these settings in the first code cell:
+2. Set the batch size in the first code cell:
 
    ```python
-   RUN_LIVE = False
-   SAMPLES_PER_ROUTE = 1
+   SAMPLES_PER_ROUTE = 1  # 4 API calls; set to 2 for 8 calls.
    ```
 
-3. Choose the mode, then select **Run All**:
+3. Select **Run All**. The notebook loads the public messages and displays the
+   request body, then asks for your API key with hidden input if needed.
+4. Enter the key to send the requests and see the actual model responses and
+   parsed routing decisions. Do not paste a real key into a code cell.
 
-   | Settings | Behavior | API calls |
-   | --- | --- | ---: |
-   | `RUN_LIVE = False` | Preview hand-written requests without network calls | 0 |
-   | `RUN_LIVE = True`, `SAMPLES_PER_ROUTE = 1` | Route one public message per queue | 4 |
-   | `RUN_LIVE = True`, `SAMPLES_PER_ROUTE = 2` | Route two public messages per queue | 8 |
+Every full run makes four new billable requests by default. An existing
+`OPENAI_API_KEY` environment variable is also supported. The notebook clears its
+key variable after the request loop; an existing environment variable remains
+in the kernel environment.
 
-4. In live mode, enter your key in the hidden prompt if requested. An existing
-   `OPENAI_API_KEY` environment variable is also supported. Do not put a real key
-   in a code cell. The notebook clears its key variable after the request loop;
-   an existing environment variable remains in the kernel environment.
-
-Changing these two settings needs no kernel restart or run-mode environment
-variables. Use **Run All** again after editing them. Each live run makes new paid
-requests. The notebook and CLI share the same question, sampler, and response
-validation from `routing.py`.
+The notebook and CLI share the same question, sampler, and response validation
+from `routing.py`. Change `SAMPLES_PER_ROUTE` and select **Run All** again to try
+a larger batch; no kernel restart is needed.
 
 ## Find the code
 
@@ -176,7 +160,7 @@ validation from `routing.py`.
 | --- | --- |
 | [customer_request_routing.ipynb](customer_request_routing.ipynb) | Explains and executes the routing workflow step by step |
 | [routing.py](routing.py) | Samples public data, builds requests, sends API calls, and validates answers |
-| [run_customer_request_routing.py](run_customer_request_routing.py) | Handles CLI options and displays requests and responses |
+| [run_customer_request_routing.py](run_customer_request_routing.py) | Runs the public batch or a custom message and displays actual responses |
 | [run_demo.sh](run_demo.sh) | Collects the key with hidden input and starts the live demo |
 | [test_customer_request_routing.py](test_customer_request_routing.py) | Runs offline application checks with mocked network calls |
 | `README.md` | Introduces the API, use case, commands, outputs, and data source |
@@ -185,13 +169,14 @@ The main helpers are `sample_public_messages()`, `build_request()`,
 `request_prediction()`, and `parse_prediction()`. Change `QUESTION` in `routing.py`
 to adapt the queue choices and descriptions to your application.
 
-## Check the application code
+## Optional developer checks
 
 ```bash
 python3 -m unittest discover -s examples/decisions -p 'test_*.py'
 ```
 
-These checks cover request budgets, sampling/checksum validation, credentials,
+You do not need to run these tests to use the demo. They are developer checks
+for request budgets, sampling/checksum validation, credentials,
 refusals, invalid answers, and error handling. They make no paid requests and do
 not evaluate model quality.
 

@@ -13,13 +13,6 @@ import urllib.request
 
 MODEL = "gpt-6-luna"
 API_URL = "https://api.openai.com/v1/decisions"
-DEMO_MESSAGE = "My new card has not arrived. Can you help me track its delivery?"
-DEMO_MESSAGES = (
-    "Why was a fee added to my card purchase?",
-    "I forgot the passcode for the app.",
-    "Can I cancel a transfer I just made?",
-    DEMO_MESSAGE,
-)
 ROUTES = ("card_payment_fees", "account_access", "transfer_cancellation", "card_delivery")
 DATASET_COMMIT = "57ec275d8078af65b7731c2a98be812d844a6d6b"
 DATASET_URL = ("https://raw.githubusercontent.com/PolyAI-LDN/task-specific-datasets/"

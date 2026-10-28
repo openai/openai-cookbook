@@ -16,5 +16,5 @@ if [[ -z "$OPENAI_API_KEY" ]]; then
   exit 1
 fi
 export OPENAI_API_KEY
-echo "Starting live routing demo: 4 public examples by default, or one with --message. No automatic retries."
+echo "Starting live routing demo: 10 public customer-support examples, or one with --message. No automatic retries."
 python3 "$script_dir/run_customer_request_routing.py" "$@"

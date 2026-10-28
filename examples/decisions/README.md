@@ -47,7 +47,7 @@ These example messages illustrate the intended mapping:
 | "Can I cancel a transfer I just made?" | `transfer_cancellation` |
 | "My new card has not arrived." | `card_delivery` |
 
-The runnable demo uses public BANKING77 messages. Its default is **four messages: one per queue**. For each message, it:
+The runnable demo uses public BANKING77 messages. It runs **ten bundled messages covering all four queues**. For each message, it:
 
 1. Builds a named routing question and sends the message to Decisions.
 2. Displays the actual response, including choice probabilities and confidence.
@@ -69,14 +69,14 @@ no calibration/test split, threshold selection, or model-quality grading.
 The demo requires no third-party Python packages, npm packages, or Promptfoo.
 Run the following commands from the **root of the openai-cookbook repository**.
 
-## 1. Run the demo on four public messages
+## 1. Run ten customer-support examples
 
 ```bash
 bash examples/decisions/run_demo.sh
 ```
 
-Paste your API key at the hidden prompt. The launcher downloads one public CSV,
-verifies its SHA-256 hash, and makes **four billable Decisions requests**. It
+Paste your API key at the hidden prompt. The launcher loads ten bundled public messages and makes
+**ten billable Decisions requests**. It
 prints each input, actual response JSON, parsed route/confidence, and latency.
 
 The key can also come from an existing `OPENAI_API_KEY` environment variable.
@@ -85,26 +85,19 @@ exit. A key exported in the parent shell remains there until you unset it.
 Never put a real key in source, notebook cells, or CLI arguments, or share it in
 logs. Each live invocation makes new paid requests.
 
-## 2. Change the batch size or try your own message
+## 2. Try your own message (optional)
 
 ```bash
-# Two public messages per queue: 4 * 2 = 8 API requests
-bash examples/decisions/run_demo.sh --samples-per-route 2
-
-# One custom message: exactly 1 API request, no dataset download
 bash examples/decisions/run_demo.sh --message "I forgot my app passcode."
 ```
 
-`--samples-per-route` and `--message` are mutually exclusive. Public batch size is
-**four routes × samples per route**. Counts must be positive and cannot exceed
-the available unique messages in the source CSV.
+This sends exactly one request. To rerun the ten examples, run the original
+command again. There are no sample-count settings to configure.
 
-With `OPENAI_API_KEY` securely configured, the Python runner can also be used
-directly:
+With `OPENAI_API_KEY` securely configured, you can also run Python directly:
 
 ```bash
 python3 examples/decisions/run_customer_request_routing.py
-python3 examples/decisions/run_customer_request_routing.py --samples-per-route 2
 ```
 
 Results are printed to Terminal; there are no generated reports to clean or
@@ -134,38 +127,31 @@ establish production performance.
 1. Open [customer_request_routing.ipynb](customer_request_routing.ipynb) in VS Code
    or Jupyter and select a Python 3.10+ kernel. Start the kernel in the repository
    root or `examples/decisions/`.
-2. Set the batch size in the first code cell:
+2. Select **Run All**. The notebook loads the ten bundled messages and displays
+   the request body, then asks for your API key with hidden input if needed.
+3. Enter the key to see ten actual model responses and parsed routing decisions.
+   Do not paste a real key into a code cell.
 
-   ```python
-   SAMPLES_PER_ROUTE = 1  # 4 API calls; set to 2 for 8 calls.
-   ```
+Every full run makes ten new billable requests. An existing `OPENAI_API_KEY`
+environment variable is also supported. The notebook clears its key variable
+after the request loop; an existing environment variable remains in the kernel.
 
-3. Select **Run All**. The notebook loads the public messages and displays the
-   request body, then asks for your API key with hidden input if needed.
-4. Enter the key to send the requests and see the actual model responses and
-   parsed routing decisions. Do not paste a real key into a code cell.
-
-Every full run makes four new billable requests by default. An existing
-`OPENAI_API_KEY` environment variable is also supported. The notebook clears its
-key variable after the request loop; an existing environment variable remains
-in the kernel environment.
-
-The notebook and CLI share the same question, sampler, and response validation
-from `routing.py`. Change `SAMPLES_PER_ROUTE` and select **Run All** again to try
-a larger batch; no kernel restart is needed.
+The notebook and CLI share the same messages, question, and response validation
+from `routing.py`.
 
 ## Find the code
 
 | File | Purpose |
 | --- | --- |
 | [customer_request_routing.ipynb](customer_request_routing.ipynb) | Explains and executes the routing workflow step by step |
-| [routing.py](routing.py) | Samples public data, builds requests, sends API calls, and validates answers |
+| [customer_requests.json](customer_requests.json) | Ten public messages and source/license attribution |
+| [routing.py](routing.py) | Loads the ten messages, builds requests, sends API calls, and validates answers |
 | [run_customer_request_routing.py](run_customer_request_routing.py) | Runs the public batch or a custom message and displays actual responses |
 | [run_demo.sh](run_demo.sh) | Collects the key with hidden input and starts the live demo |
 | [test_customer_request_routing.py](test_customer_request_routing.py) | Runs offline application checks with mocked network calls |
 | `README.md` | Introduces the API, use case, commands, outputs, and data source |
 
-The main helpers are `sample_public_messages()`, `build_request()`,
+The main helpers are `load_demo_messages()`, `build_request()`,
 `request_prediction()`, and `parse_prediction()`. Change `QUESTION` in `routing.py`
 to adapt the queue choices and descriptions to your application.
 
@@ -176,7 +162,7 @@ python3 -m unittest discover -s examples/decisions -p 'test_*.py'
 ```
 
 You do not need to run these tests to use the demo. They are developer checks
-for request budgets, sampling/checksum validation, credentials,
+for request budgets, bundled-data validation, credentials,
 refusals, invalid answers, and error handling. They make no paid requests and do
 not evaluate model quality.
 
@@ -189,9 +175,11 @@ The publisher distributes it under [CC BY 4.0](https://creativecommons.org/licen
 see the [source repository](https://github.com/PolyAI-LDN/task-specific-datasets/tree/57ec275d8078af65b7731c2a98be812d844a6d6b)
 and [license text](https://github.com/PolyAI-LDN/task-specific-datasets/blob/57ec275d8078af65b7731c2a98be812d844a6d6b/LICENSE).
 
-The sampler pins commit `57ec275d8078af65b7731c2a98be812d844a6d6b`, verifies the test
-CSV's hash, selects four source intents, removes normalized duplicates and
-conflicting labels, and samples deterministically. Original wording and source
-labels are retained. CSVs are not committed, and no author endorsement is implied.
+The ten messages in `customer_requests.json` are selected from four intents in
+the test CSV at commit `57ec275d8078af65b7731c2a98be812d844a6d6b`.
+The source CSV's SHA-256 was verified when preparing the selection:
+`d12d6e3bc4c3103966ae786dc435913c0c563dfa328f5a3646d0e62cfeeb474d`.
+Original wording and source labels are retained. The full CSV is not bundled;
+no dataset download is needed to run the demo. No author endorsement is implied.
 These are public benchmark messages, not private customer records; model exposure
 to this public dataset during training is unknown.

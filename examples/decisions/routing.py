@@ -1,11 +1,9 @@
 """Shared data, request, and response helpers for the Decisions routing demo."""
 
-import csv
-import hashlib
-import io
 import json
 import math
 import os
+from pathlib import Path
 import time
 import urllib.error
 import urllib.request
@@ -14,10 +12,6 @@ import urllib.request
 MODEL = "gpt-6-luna"
 API_URL = "https://api.openai.com/v1/decisions"
 ROUTES = ("card_payment_fees", "account_access", "transfer_cancellation", "card_delivery")
-DATASET_COMMIT = "57ec275d8078af65b7731c2a98be812d844a6d6b"
-DATASET_URL = ("https://raw.githubusercontent.com/PolyAI-LDN/task-specific-datasets/"
-               f"{DATASET_COMMIT}/banking_data/test.csv")
-DATASET_SHA256 = "d12d6e3bc4c3103966ae786dc435913c0c563dfa328f5a3646d0e62cfeeb474d"
 SOURCE_TO_ROUTE = {
     "card_payment_fee_charged": "card_payment_fees",
     "passcode_forgotten": "account_access",
@@ -41,33 +35,18 @@ QUESTION = {
 }
 
 
-def sample_public_messages(samples_per_route=1):
-    """Select a small deterministic batch from the pinned public BANKING77 CSV."""
-    if isinstance(samples_per_route, bool) or not isinstance(samples_per_route, int) or samples_per_route < 1:
-        raise ValueError("Samples per route must be a positive integer")
-    with urllib.request.urlopen(DATASET_URL, timeout=30) as response:
-        content = response.read()
-    if hashlib.sha256(content).hexdigest() != DATASET_SHA256:
-        raise ValueError("BANKING77 checksum mismatch; no model requests were made")
-    reader = csv.DictReader(io.StringIO(content.decode("utf-8-sig")))
-    if set(reader.fieldnames or []) != {"text", "category"}:
-        raise ValueError("Unexpected BANKING77 schema")
-    labels = {}
-    messages = {}
-    for row in reader:
-        text = row["text"].strip()
-        normalized = " ".join(text.casefold().split())
-        labels.setdefault(normalized, set()).add(row["category"])
-        messages.setdefault(normalized, text)
-    cases = []
-    for category, route in SOURCE_TO_ROUTE.items():
-        candidates = [text for text, categories in labels.items() if categories == {category}]
-        candidates.sort(key=lambda text: hashlib.sha256(("decisions-routing-v1:" + text).encode()).hexdigest())
-        if len(candidates) < samples_per_route:
-            raise ValueError(f"Only {len(candidates)} unique public examples available for {route}")
-        for text in candidates[:samples_per_route]:
-            cases.append({"id": "banking77-" + hashlib.sha256(text.encode()).hexdigest()[:16],
-                          "message": messages[text], "source_label": category})
+def load_demo_messages():
+    """Load the fixed ten public customer-support examples bundled with this demo."""
+    path = Path(__file__).with_name("customer_requests.json")
+    cases = json.loads(path.read_text(encoding="utf-8"))["messages"]
+    if not isinstance(cases, list) or len(cases) != 10:
+        raise ValueError("The demo requires exactly ten customer-support examples")
+    if any(not isinstance(case, dict) or not isinstance(case.get("message"), str)
+           or not case["message"].strip() or case.get("source_label") not in SOURCE_TO_ROUTE
+           for case in cases):
+        raise ValueError("Invalid bundled customer-support example")
+    if len({case.get("id") for case in cases}) != 10:
+        raise ValueError("Customer-support example IDs must be unique")
     return cases
 
 

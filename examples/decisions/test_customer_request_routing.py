@@ -1,8 +1,6 @@
-"""Offline application checks for the one-request routing demo."""
+"""Offline application checks for the ten-message routing demo."""
 
 import contextlib
-import csv
-import hashlib
 import io
 import json
 import os
@@ -14,7 +12,7 @@ from unittest.mock import patch
 import urllib.error
 
 from routing import (API_URL, MODEL, ROUTES, SOURCE_TO_ROUTE, build_request,
-                     parse_prediction, request_prediction, sample_public_messages)
+                     parse_prediction, request_prediction, load_demo_messages)
 
 
 EXAMPLE = Path(__file__).resolve().parent
@@ -87,48 +85,24 @@ class RoutingTests(unittest.TestCase):
         self.assertIn('"route": "card_delivery"', output.getvalue())
         self.assertNotIn("test-only-placeholder", output.getvalue())
 
-    def test_public_sampler_is_balanced_deterministic_and_checksum_verified(self):
-        stream = io.StringIO()
-        writer = csv.writer(stream)
-        writer.writerow(["text", "category"])
-        for label in SOURCE_TO_ROUTE:
-            for index in range(3):
-                writer.writerow([f"synthetic {label} {index}", label])
-        writer.writerow(["conflicting", "card_arrival"])
-        writer.writerow(["conflicting", "cancel_transfer"])
-        content = stream.getvalue().encode()
-        with patch("routing.DATASET_SHA256", hashlib.sha256(content).hexdigest()):
-            def download(*args, **kwargs):
-                return io.BytesIO(content)
-            with patch("urllib.request.urlopen", side_effect=download):
-                first = sample_public_messages(2)
-                second = sample_public_messages(2)
-                self.assertEqual(first, second)
-                self.assertEqual(len(first), 8)
-                self.assertEqual(len({case["id"] for case in first}), 8)
-                self.assertFalse(any(case["message"] == "conflicting" for case in first))
-                for label in SOURCE_TO_ROUTE:
-                    self.assertEqual(sum(case["source_label"] == label for case in first), 2)
-                with self.assertRaisesRegex(ValueError, "Only 3"):
-                    sample_public_messages(4)
-        with patch("urllib.request.urlopen", return_value=io.BytesIO(b"unexpected")):
-            with self.assertRaisesRegex(ValueError, "checksum mismatch"):
-                sample_public_messages()
+    def test_bundled_messages_cover_four_queues(self):
+        cases = load_demo_messages()
+        self.assertEqual(len(cases), 10)
+        self.assertEqual(len({case["id"] for case in cases}), 10)
+        self.assertEqual({case["source_label"] for case in cases}, set(SOURCE_TO_ROUTE))
+        self.assertTrue(all(case["message"].strip() for case in cases))
 
-    def test_cli_batch_sizes_control_model_call_count(self):
-        for options, count in [([], 4), (["--samples-per-route", "2"], 8)]:
-            cases = [{"id": str(i), "message": f"public message {i}", "source_label": "local label"}
-                     for i in range(count)]
-            with patch.dict(os.environ, {"OPENAI_API_KEY": "test-only-placeholder"}):
-                with patch.object(sys, "argv", ["demo", *options]):
-                    with patch("routing.sample_public_messages", return_value=cases) as sample:
-                        with patch("urllib.request.urlopen", side_effect=lambda *a, **k: io.BytesIO(json.dumps(ANSWER).encode())) as send:
-                            with contextlib.redirect_stdout(io.StringIO()):
-                                runpy.run_path(str(EXAMPLE / "run_customer_request_routing.py"), run_name="__main__")
-            sample.assert_called_once_with(count // 4)
-            self.assertEqual(send.call_count, count)
-            for call in send.call_args_list:
-                self.assertEqual(set(json.loads(call.args[0].data)), {"model", "input", "questions"})
+    def test_default_cli_makes_ten_model_requests(self):
+        with patch.dict(os.environ, {"OPENAI_API_KEY": "test-only-placeholder"}):
+            with patch.object(sys, "argv", ["demo"]):
+                with patch("urllib.request.urlopen", side_effect=lambda *a, **k: io.BytesIO(json.dumps(ANSWER).encode())) as send:
+                    with contextlib.redirect_stdout(io.StringIO()):
+                        runpy.run_path(str(EXAMPLE / "run_customer_request_routing.py"), run_name="__main__")
+        self.assertEqual(send.call_count, 10)
+        for call, case in zip(send.call_args_list, load_demo_messages()):
+            body = json.loads(call.args[0].data)
+            self.assertEqual(set(body), {"model", "input", "questions"})
+            self.assertEqual(body["input"], case["message"])
 
     def test_cli_missing_key_stops_before_network(self):
         with patch.dict(os.environ, {"OPENAI_API_KEY": ""}):
@@ -143,11 +117,11 @@ class RoutingTests(unittest.TestCase):
     def test_notebook_empty_key_stops_before_model_requests(self):
         notebook = json.loads((EXAMPLE / "customer_request_routing.ipynb").read_text())
         cases = [{"id": str(i), "message": f"public sample {i}", "source_label": "card_arrival"}
-                 for i in range(4)]
+                 for i in range(10)]
         scope = {}
         with patch.dict(os.environ, {"OPENAI_API_KEY": ""}):
             with patch.object(Path, "cwd", return_value=EXAMPLE):
-                with patch("routing.sample_public_messages", return_value=cases):
+                with patch("routing.load_demo_messages", return_value=cases):
                     with patch("getpass.getpass", return_value=""):
                         with patch("urllib.request.urlopen") as send:
                             with contextlib.redirect_stdout(io.StringIO()):
@@ -163,7 +137,7 @@ class RoutingTests(unittest.TestCase):
     def test_notebook_hidden_key_is_not_printed_and_cleared_after_requests(self):
         notebook = json.loads((EXAMPLE / "customer_request_routing.ipynb").read_text())
         cases = [{"id": str(i), "message": f"public sample {i}", "source_label": "card_arrival"}
-                 for i in range(4)]
+                 for i in range(10)]
         for fail in [False, True]:
             scope = {}
             output = io.StringIO()
@@ -173,7 +147,7 @@ class RoutingTests(unittest.TestCase):
                 with patch.dict(os.environ, {"OPENAI_API_KEY": ""}):
                     with patch.object(Path, "cwd", return_value=EXAMPLE):
                         with patch("getpass.getpass", return_value="hidden-test-placeholder") as prompt:
-                            with patch("routing.sample_public_messages", return_value=cases):
+                            with patch("routing.load_demo_messages", return_value=cases):
                                 with patch("urllib.request.urlopen", side_effect=network_result) as send:
                                     with contextlib.redirect_stdout(output):
                                         try:
@@ -185,7 +159,7 @@ class RoutingTests(unittest.TestCase):
                                             if not fail:
                                                 raise
             prompt.assert_called_once()
-            self.assertEqual(send.call_count, 1 if fail else 4)
+            self.assertEqual(send.call_count, 1 if fail else 10)
             self.assertIsNone(scope["api_key"])
             self.assertNotIn("hidden-test-placeholder", output.getvalue())
             if not fail:

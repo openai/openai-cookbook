@@ -1,34 +1,24 @@
-"""Route four public messages through Decisions by default; requires OPENAI_API_KEY."""
+"""Route ten public customer-support messages through Decisions; requires OPENAI_API_KEY."""
 
 import argparse
 import json
 import os
 
 from routing import (API_URL, build_request, parse_prediction,
-                     request_prediction, sample_public_messages)
-
-
-def positive_count(value):
-    count = int(value)
-    if count < 1:
-        raise argparse.ArgumentTypeError("Samples per route must be positive")
-    return count
+                     request_prediction, load_demo_messages)
 
 
 def main():
     parser = argparse.ArgumentParser(description=__doc__)
-    source = parser.add_mutually_exclusive_group()
-    source.add_argument("--message", help="Route one custom message instead of loading BANKING77.")
-    source.add_argument("--samples-per-route", type=positive_count, default=1,
-                        help="Public examples per route: default 1 means 4 API calls; 2 means 8.")
+    parser.add_argument("--message", help="Optionally route one custom message instead of the ten examples.")
     args = parser.parse_args()
     if not os.environ.get("OPENAI_API_KEY"):
         parser.error("Set OPENAI_API_KEY securely, or use bash examples/decisions/run_demo.sh for hidden input")
     if args.message is not None:
         cases = [{"id": "custom", "message": args.message}]
     else:
-        print(f"Configured {4 * args.samples_per_route} billable requests from public BANKING77.", flush=True)
-        cases = sample_public_messages(args.samples_per_route)
+        cases = load_demo_messages()
+        print("Running ten public customer-support examples: ten billable API requests.", flush=True)
     for index, case in enumerate(cases, start=1):
         print(f"Example {index}/{len(cases)}: {case['message']}")
         if "source_label" in case:

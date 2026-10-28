@@ -80,16 +80,7 @@ to a ticketing system or customer workflow is a separate application step.
 The notebook and Terminal runner use the same local helpers. The following flow
 repeats once per message, for **ten API requests** in a complete run.
 
-```mermaid
-flowchart TD
-    A["Ten public customer messages<br/>customer_requests.json"] --> B["Take one message"]
-    B --> C["Build routing question<br/>Four allowed queues"]
-    C --> D["Decisions API<br/>POST /v1/decisions · gpt-6-luna"]
-    D --> E["Display actual response<br/>Validate typed answer"]
-    E --> F{"Usable choice answer?"}
-    F -->|Yes| G["Print selected queue<br/>and confidence"]
-    F -->|No| H["Print human_review<br/>with null confidence"]
-```
+![Architecture of the ten-message Decisions demo: customer messages flow through request construction, the Decisions API, answer validation, and either a printed queue with confidence or human review.](../../images/decisions-customer-support-routing.png)
 
 1. **Load messages:** `load_demo_messages()` reads the ten bundled examples.
 2. **Build the request:** `build_request()` combines one message with the named

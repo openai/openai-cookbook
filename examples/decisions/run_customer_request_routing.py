@@ -1,70 +1,55 @@
-"""Execute the companion notebook without Jupyter; offline unless --live is set."""
+"""Preview routing requests; --live routes four public messages by default."""
 
 import argparse
 import json
 import os
-from pathlib import Path
+
+from routing import (API_URL, DEMO_MESSAGES, build_request, parse_prediction,
+                     request_prediction, sample_public_messages)
 
 
 def positive_count(value):
     count = int(value)
     if count < 1:
-        raise argparse.ArgumentTypeError("Sample counts must be positive integers")
+        raise argparse.ArgumentTypeError("Samples per route must be positive")
     return count
 
 
 def main():
     parser = argparse.ArgumentParser(description=__doc__)
-    mode = parser.add_mutually_exclusive_group()
-    mode.add_argument(
-        "--live", action="store_true",
-        help="Run a live evaluation (20 requests by default); requires OPENAI_API_KEY.",
-    )
-    mode.add_argument(
-        "--preview", action="store_true",
-        help="Make one billable Decisions request and print its request and response; requires OPENAI_API_KEY.",
-    )
-    parser.add_argument("--calibration-per-route", type=positive_count,
-                        help="Calibration examples per route (default: 2).")
-    parser.add_argument("--test-per-route", type=positive_count,
-                        help="Test examples per route (default: 3).")
+    parser.add_argument("--live", action="store_true",
+                        help="Send billable requests; requires OPENAI_API_KEY.")
+    source = parser.add_mutually_exclusive_group()
+    source.add_argument("--message", help="Route one custom message instead of loading BANKING77.")
+    source.add_argument("--samples-per-route", type=positive_count, default=1,
+                        help="Public examples per route: default 1 means 4 API calls; 2 means 8.")
     args = parser.parse_args()
-    if not args.live and (args.calibration_per_route is not None or args.test_per_route is not None):
-        parser.error("Sample-size options require --live")
-    if args.live:
-        calibration_count = args.calibration_per_route or 2
-        test_count = args.test_per_route or 3
-        os.environ["DECISIONS_CALIBRATION_PER_ROUTE"] = str(calibration_count)
-        os.environ["DECISIONS_TEST_PER_ROUTE"] = str(test_count)
-        print(f"Configured {4 * (calibration_count + test_count)} billable requests: "
-              f"{4 * calibration_count} calibration + {4 * test_count} test.", flush=True)
-    os.environ["RUN_DECISIONS_API"] = "1" if args.live or args.preview else "0"
-    path = Path(__file__).with_name("customer_request_routing.ipynb")
-    notebook = json.loads(path.read_text(encoding="utf-8"))
-    namespace = {"__name__": "__main__"}
-    if args.preview:
-        # Load imports/configuration and the request functions without loading data.
-        for index in (2, 6):
-            source = notebook["cells"][index]["source"]
-            source = source if isinstance(source, str) else "".join(source)
-            exec(compile(source, f"{path.name}:cell-{index}", "exec"), namespace)
-        message = "My new card has not arrived. Can you help me track its delivery?"
-        print("ONE-REQUEST LIVE PREVIEW: demonstration input, not evaluation evidence")
-        print("POST", namespace["API_URL"])
-        print(json.dumps({"model": namespace["MODEL"], "input": message,
-                          "questions": [namespace["QUESTION"]]}, indent=2))
-        response, latency_ms = namespace["request_prediction"](message)
-        print("LIVE API RESPONSE")
-        print(json.dumps(response, indent=2))
-        route, confidence = namespace["parse_prediction"](response)
-        print(json.dumps({"route": route, "confidence": confidence,
-                          "latency_ms": latency_ms}, indent=2))
-        return
-    for index, cell in enumerate(notebook["cells"]):
-        if cell["cell_type"] == "code":
-            source = cell["source"]
-            source = source if isinstance(source, str) else "".join(source)
-            exec(compile(source, f"{path.name}:cell-{index}", "exec"), namespace)
+    if args.live and not os.environ.get("OPENAI_API_KEY"):
+        parser.error("Set OPENAI_API_KEY securely before live mode")
+    if args.message is not None:
+        cases = [{"id": "custom", "message": args.message}]
+    elif args.live:
+        print(f"Configured {4 * args.samples_per_route} billable requests from public BANKING77.", flush=True)
+        cases = sample_public_messages(args.samples_per_route)
+    else:
+        cases = [{"id": f"preview-{index}", "message": message}
+                 for index, message in enumerate(DEMO_MESSAGES, start=1)]
+        print("Offline preview: four hand-written examples; no dataset or model requests.")
+    for index, case in enumerate(cases, start=1):
+        print(f"Example {index}/{len(cases)}: {case['message']}")
+        if "source_label" in case:
+            print("Public dataset label (local context only):", case["source_label"])
+        print("POST", API_URL)
+        print(json.dumps(build_request(case["message"]), indent=2))
+        if args.live:
+            response, latency_ms = request_prediction(case["message"])
+            print("LIVE API RESPONSE")
+            print(json.dumps(response, indent=2))
+            route, confidence = parse_prediction(response)
+            print(json.dumps({"route": route or "human_review", "confidence": confidence,
+                              "latency_ms": latency_ms}, indent=2))
+    if not args.live:
+        print("REQUEST PREVIEW ONLY: no API call made. Add --live for public-data examples.")
 
 
 if __name__ == "__main__":

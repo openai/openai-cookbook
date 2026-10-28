@@ -1,18 +1,18 @@
-# Decisions API routing demo and evaluation
+# Route customer-support messages with the Decisions API
 
-Route a customer-support message into one of four queues using the native
-Decisions API, then measure routing quality against labeled public examples.
-This example includes a Terminal demo, a walkthrough notebook, and an optional
-Promptfoo evaluation with a local HTML report.
+Route a small batch of public BANKING77 messages into four support queues using
+`gpt-6-luna` and `POST https://api.openai.com/v1/decisions`. Display each actual
+response, selected route, confidence, and request latency. Refusals or unusable
+answers are marked `human_review`; the demo does not execute customer actions.
 
-The model is `gpt-6-luna`, and requests go to
-`POST https://api.openai.com/v1/decisions`. The API key is supplied through
-`OPENAI_API_KEY` or hidden Terminal input. No real key is included in source.
+## Requirements
 
-## Quick demo: one request
+Python 3.10+, Bash for the hidden-input launcher, and an OpenAI project API key
+with Decisions access. Jupyter is needed only for the interactive notebook.
+The example uses the Python standard library. There are no npm, Promptfoo, or
+other runtime package dependencies.
 
-Requirements: Python 3.10+, Bash, and a project API key with Decisions access.
-No SDK, Node.js, Promptfoo, or Jupyter installation is required for this demo.
+## Run a small live batch
 
 From the repository root:
 
@@ -20,120 +20,92 @@ From the repository root:
 bash examples/decisions/run_demo.sh
 ```
 
-Paste your API key at the hidden prompt. The demo makes **one billable request**
-using the fixed message, "My new card has not arrived. Can you help me track its
-delivery?" It prints the request body, actual JSON response, extracted queue,
-confidence, and request latency. A correct route for this message is
-`card_delivery`; confidence and timing may vary. The request has no automatic
-retries. This demonstration is separate from the labeled evaluation dataset.
+Enter your key at the hidden prompt, or supply `OPENAI_API_KEY` through the
+Terminal environment. The launcher downloads one public CSV, verifies its hash,
+and makes **four billable API requests**, one message per support queue. It
+prints the real responses and parsed routes. It has no automatic retries;
+inspect failures before repeating a paid run.
 
-The shell launcher clears its copy of the key on exit. If you exported a key
-in your parent Terminal, unset it there when finished. Never paste a key into a
-source file or share it in logs.
-
-## Small notebook evaluation: 20 requests by default
-
-To execute every notebook code cell against the live API, first securely export
-`OPENAI_API_KEY` in your Terminal, then run from the repository root:
+Control the batch size:
 
 ```bash
-.venv/bin/python -u examples/decisions/run_customer_request_routing.py --live
+# Two public messages per queue: 4 * 2 = 8 API requests
+bash examples/decisions/run_demo.sh --samples-per-route 2
+
+# One custom message: exactly 1 API request, no dataset download
+bash examples/decisions/run_demo.sh --message "I forgot my app passcode."
 ```
 
-The default is **20 billable requests**: 2 calibration and 3 test examples for
-each of four routes (8 calibration + 12 test). Control the size explicitly:
+The options are mutually exclusive. Counts must be positive and cannot exceed
+available unique examples in the source CSV. The launcher disables shell tracing
+before key handling and clears its key on exit. A key exported in the parent
+shell remains there until you unset it. Do not put keys in source, cells, or CLI
+arguments. Each live run makes new paid requests and prints its results directly;
+there are no generated reports to clean or archive.
 
-```bash
-# 4 * (1 + 2) = 12 requests
-.venv/bin/python -u examples/decisions/run_customer_request_routing.py --live \
-  --calibration-per-route 1 --test-per-route 2
-
-# 4 * (10 + 20) = 120 requests, matching the recorded extended evaluation
-.venv/bin/python -u examples/decisions/run_customer_request_routing.py --live \
-  --calibration-per-route 10 --test-per-route 20
-```
-
-The runner prints the configured request budget before execution. Counts must be
-positive and cannot exceed the available unique examples in the source dataset.
-The small default illustrates the workflow; it is too small to establish reliable
-production thresholds or accuracy. Offline mode remains 24 invented fixtures with
-zero network calls. The notebook itself uses the same small live defaults; set
-`DECISIONS_CALIBRATION_PER_ROUTE` and `DECISIONS_TEST_PER_ROUTE` before starting a
-Jupyter kernel to change them there.
-
-## Extended Promptfoo evaluation: 120 requests
-
-The optional Promptfoo companion prepares the pinned public dataset, validates
-the configuration, calls Decisions, grades the answers locally, and creates a
-local HTML report. Read its [setup instructions](promptfoo/README.md) and
-[security review](promptfoo/SECURITY_REVIEW.md) first: its npm dependency audit
-currently has unresolved advisories.
-
-After installing the pinned companion dependency:
-
-```bash
-bash examples/decisions/promptfoo/run_eval.sh
-```
-
-Each invocation clears the previous generated configuration and reports and
-makes **120 new billable requests**, with no automatic retries. No manual
-cleanup, temporary directory, or archive step is required. The fixed split is
-40 calibration examples and 80 test examples. Repeating it checks
-reproducibility, not performance on a new unseen holdout.
-
-Expected labels stay local. An exact-match grader compares the returned queue
-with the dataset label; no AI judge or separate grading API is used. Calibration
-selects a confidence threshold before the test split is scored. Refusals and
-unusable answers go to human review in the policy metrics.
-
-Outputs are in `examples/decisions/promptfoo/.generated/`:
-
-- `report.html`: messages, model answers, expected routes, grades, and latency.
-- `results.json`: detailed Promptfoo results and responses.
-- `summary.json`: separate test metrics, selected threshold, and per-route results.
-- `manifest.json`: dataset commit/hashes, question hash, and selected case IDs.
-
-To summarize the latest saved run without more API calls:
-
-```bash
-python3 examples/decisions/promptfoo/routing_eval.py summarize
-```
-
-## Read the code and run offline
-
-- [Walkthrough notebook](customer_request_routing.ipynb): request schema, public
-  data sampling, response validation, calibration, metrics, and observed results.
-- [Python runner](run_customer_request_routing.py): executes notebook code without
-  Jupyter; offline by default, with explicit `--preview` and `--live` modes.
-- [Promptfoo preparation and summary](promptfoo/routing_eval.py): creates the
-  config, cleans generated outputs, and checks completed result files.
-- [End-to-end shell runner](promptfoo/run_eval.sh): handles clean execution and
-  hidden key input with visible output.
-
-From the repository root, run the notebook in its no-network fixture mode:
+## Preview without network calls
 
 ```bash
 python3 examples/decisions/run_customer_request_routing.py
-python3 -m unittest discover -s examples/decisions -p 'test_*.py'
-python3 -m unittest discover -s examples/decisions/promptfoo -p 'test_*.py'
 ```
 
-Offline fixtures are hand-authored examples with invented predictions. They test
-the evaluation code and are not evidence of model performance.
+This previews four hand-written messages and their request bodies. It does not
+fetch BANKING77 or invent API responses. With `OPENAI_API_KEY` securely configured,
+add `--live` for the public-data batch:
 
-## Data, results, and limits
+```bash
+python3 examples/decisions/run_customer_request_routing.py --live
+python3 examples/decisions/run_customer_request_routing.py --live --samples-per-route 2
+```
 
-Live evaluation uses four intents from public BANKING77, attributed to Casanueva
-et al. (2020). Source CSVs are pinned and checksum-verified. The
-[companion README](promptfoo/README.md#data-and-scope) documents the
-[CC BY 4.0 license](promptfoo/DATA_LICENSE.txt), source citation, and our sampling
-and label changes. No private customer records are included.
+The source dataset label is displayed as local context. Only message text and
+the routing question are sent to the model. The demo has no calibration/test
+split, confidence optimization, automated grading, or benchmark accuracy claim.
 
-The observed runs correctly routed all 80 test cases, with one calibration
-refusal sent to review. This small four-intent result does not establish
-production accuracy or out-of-scope detection. The selected threshold was zero;
-the runs do not show a benefit from confidence filtering. Model exposure to the
-public dataset during training is unknown.
+## Open the notebook
 
-See the [official Decisions guide](https://developers.openai.com/api/docs/guides/decisions)
-for API details and current availability.
+Open [customer_request_routing.ipynb](customer_request_routing.ipynb) in VS Code
+or Jupyter, with its kernel started in the repository root or this directory.
+It previews requests without network calls by default. Set `OPENAI_API_KEY`
+securely and `RUN_DECISIONS_API=1` before starting the kernel for four live
+requests. Set `DECISIONS_SAMPLES_PER_ROUTE=2` for eight, then restart the kernel.
+The notebook and CLI import the same [routing helpers](routing.py).
+
+A valid choice answer includes its selected queue, confidence, and per-choice
+probabilities. Confidence is not a guarantee of correctness. The four queues
+assume an in-scope message; a production router also needs unsupported/ambiguous
+request handling and representative evaluation before enabling downstream actions.
+A few displayed examples do not establish production performance.
+
+## Data and attribution
+
+BANKING77 is published by PolyAI and attributed to Iñigo Casanueva, Tadas Temcinas,
+Daniela Gerz, Matthew Henderson, and Ivan Vulić (2020),
+[Efficient Intent Detection with Dual Sentence Encoders](https://arxiv.org/abs/2003.04807).
+The publisher distributes it under [CC BY 4.0](https://creativecommons.org/licenses/by/4.0/);
+see the [source repository](https://github.com/PolyAI-LDN/task-specific-datasets/tree/57ec275d8078af65b7731c2a98be812d844a6d6b)
+and [license text](https://github.com/PolyAI-LDN/task-specific-datasets/blob/57ec275d8078af65b7731c2a98be812d844a6d6b/LICENSE).
+
+The demo pins commit `57ec275d8078af65b7731c2a98be812d844a6d6b`, verifies the test
+CSV's SHA-256 hash, filters to four source intents, removes normalized duplicates
+and conflicting labels, and samples deterministically. Original message wording
+and source labels are retained. These are public benchmark messages, not private
+customer records. CSVs are not committed, and no author endorsement is implied.
+Model exposure to the public benchmark during training is unknown.
+
+## Check the application code
+
+```bash
+python3 -m unittest discover -s examples/decisions -p 'test_*.py'
+```
+
+These tests mock the network. They check request budgets, sampling and checksum
+validation, credentials, refusal/invalid-answer handling, and error behavior.
+They make no paid requests and do not evaluate model quality.
+
+Files: the walkthrough notebook; `routing.py` for shared helpers;
+`run_customer_request_routing.py` for the CLI; `run_demo.sh` for hidden key input;
+and `test_customer_request_routing.py` for offline application checks.
+
+See the [Decisions guide](https://developers.openai.com/api/docs/guides/decisions)
+for current availability, pricing, and API details.

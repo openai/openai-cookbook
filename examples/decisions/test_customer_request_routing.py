@@ -1,4 +1,4 @@
-"""Offline regression tests. Run with unittest discovery from the repository root."""
+"""Offline application checks for the one-request routing demo."""
 
 import contextlib
 import csv
@@ -6,191 +6,151 @@ import hashlib
 import io
 import json
 import os
+from pathlib import Path
 import runpy
 import sys
-from pathlib import Path
 import unittest
 from unittest.mock import patch
 import urllib.error
 
+from routing import (API_URL, MODEL, ROUTES, SOURCE_TO_ROUTE, build_request,
+                     parse_prediction, request_prediction, sample_public_messages)
 
-def cell_source(cell):
-    source = cell["source"]
-    return source if isinstance(source, str) else "".join(source)
+
+EXAMPLE = Path(__file__).resolve().parent
+ANSWER = {"answers": [{"type": "choice", "name": "route",
+                       "choice": "card_delivery", "confidence": 0.92}]}
 
 
 class RoutingTests(unittest.TestCase):
-    @classmethod
-    def setUpClass(cls):
-        path = Path(__file__).with_name("customer_request_routing.ipynb")
-        cls.cells = json.loads(path.read_text(encoding="utf-8"))["cells"]
-        cls.scope = {"__name__": "__main__"}
-        with patch.dict(os.environ, {"RUN_DECISIONS_API": "0"}):
-            with patch("urllib.request.urlopen", side_effect=AssertionError("Offline mode used the network")):
-                with contextlib.redirect_stdout(io.StringIO()):
-                    for cell in cls.cells:
-                        if cell["cell_type"] == "code":
-                            exec(cell_source(cell), cls.scope)
-
-    def test_preview_makes_one_request_and_displays_response(self):
-        response = {"answers": [{"type": "choice", "name": "route",
-                                  "choice": "card_delivery", "confidence": 0.92}]}
-        output = io.StringIO()
-        runner = Path(__file__).with_name("run_customer_request_routing.py")
+    def test_request_contract_and_no_key_in_body(self):
         with patch.dict(os.environ, {"OPENAI_API_KEY": "test-only-placeholder"}):
-            with patch.object(sys, "argv", [str(runner), "--preview"]):
-                with patch("urllib.request.urlopen") as send:
-                    send.return_value.__enter__.return_value = io.StringIO(json.dumps(response))
-                    with contextlib.redirect_stdout(output):
-                        runpy.run_path(str(runner), run_name="__main__")
+            with patch("urllib.request.urlopen", return_value=io.BytesIO(json.dumps(ANSWER).encode())) as send:
+                response, latency = request_prediction("My new card is late.")
         send.assert_called_once()
         request = send.call_args.args[0]
-        self.assertEqual(request.full_url, "https://api.openai.com/v1/decisions")
-        self.assertEqual(json.loads(request.data)["model"], "gpt-6-luna")
-        self.assertIn("LIVE API RESPONSE", output.getvalue())
-        self.assertIn('"confidence": 0.92', output.getvalue())
+        body = json.loads(request.data)
+        self.assertEqual(set(body), {"model", "input", "questions"})
+        self.assertEqual((request.full_url, request.method, body["model"]), (API_URL, "POST", MODEL))
+        self.assertEqual(body["input"], "My new card is late.")
+        self.assertEqual(request.get_header("Authorization"), "Bearer test-only-placeholder")
+        self.assertNotIn("test-only-placeholder", request.data.decode())
+        self.assertEqual(parse_prediction(response), ("card_delivery", 0.92))
+        self.assertGreaterEqual(latency, 0)
 
-    def test_fixture_accounting_and_no_test_leakage_in_selection(self):
-        self.assertEqual(self.scope["SELECTED_THRESHOLD"], 0.8)
-        result = self.scope["evaluate"](self.scope["test_rows"], 0.8)
-        self.assertEqual((result["accepted"], result["reviewed"], result["misroutes"]), (9, 3, 1))
-        selected = min(self.scope["calibration_results"], key=lambda row: (
-            row["average_loss"], -row["coverage"], row["threshold"]))
-        self.assertEqual(selected["threshold"], 0.8)
-
-    def test_refusals_and_malformed_answers_go_to_review(self):
-        parse = self.scope["parse_prediction"]
-        for response in [None, {}, {"answers": []}, {"answers": [None]},
-                         {"answers": [{"type": "refusal", "name": "route"}]}]:
-            with self.subTest(response=response):
-                self.assertEqual(parse(response), (None, None))
-        for confidence in [True, None, "0.9", -1, 2, float("nan"), float("inf")]:
-            answer = {"type": "choice", "name": "route", "choice": "card_delivery", "confidence": confidence}
-            self.assertEqual(parse({"answers": [answer]}), (None, None))
-
-    def test_review_only_and_empty_evaluation(self):
-        result = self.scope["evaluate"]([
-            {"predicted": None, "confidence": None, "expected": "card_delivery"}], 0.8)
-        self.assertEqual(result["coverage"], 0)
-        self.assertIsNone(result["accepted_accuracy"])
-        self.assertEqual(result["average_loss"], self.scope["REVIEW_COST"])
-        with self.assertRaises(ValueError):
-            self.scope["evaluate"]([], 0.8)
-
-    def test_live_request_contract_and_no_label_transmission(self):
-        body = {"answers": [{"type": "choice", "name": "route",
-                              "choice": "card_delivery", "confidence": 0.9}]}
-        with patch.dict(self.scope, {"API_KEY": "unit-test-sentinel"}):
-            with patch("urllib.request.urlopen", return_value=io.BytesIO(json.dumps(body).encode())) as network:
-                response, elapsed = self.scope["request_prediction"]("synthetic message")
-        request = network.call_args.args[0]
-        payload = json.loads(request.data)
-        self.assertEqual(set(payload), {"model", "input", "questions"})
-        self.assertEqual(payload["input"], "synthetic message")
-        self.assertEqual(payload["model"], "gpt-6-luna")
-        self.assertEqual(request.full_url, "https://api.openai.com/v1/decisions")
-        self.assertEqual(request.method, "POST")
-        self.assertEqual(request.get_header("Authorization"), "Bearer unit-test-sentinel")
-        self.assertEqual(self.scope["parse_prediction"](response), ("card_delivery", 0.9))
-        self.assertGreaterEqual(elapsed, 0)
-
-    def test_service_errors_are_not_retried(self):
-        for error in [urllib.error.HTTPError("https://api.openai.com/v1/decisions", 429, "limited", {}, None),
-                      urllib.error.URLError("offline")]:
-            with patch("urllib.request.urlopen", side_effect=error) as network:
-                with self.assertRaisesRegex(RuntimeError, "no automatic retry"):
-                    self.scope["request_prediction"]("synthetic message")
-                self.assertEqual(network.call_count, 1)
-
-    def test_live_mode_needs_a_key_before_network(self):
-        config = next(cell_source(cell) for cell in self.cells
-                      if cell["cell_type"] == "code" and "MODE_FLAG =" in cell_source(cell))
-        with patch.dict(os.environ, {"RUN_DECISIONS_API": "1"}, clear=True):
-            with patch("urllib.request.urlopen") as network:
+    def test_missing_key_and_empty_message_stop_before_network(self):
+        with patch.dict(os.environ, {"OPENAI_API_KEY": ""}):
+            with patch("urllib.request.urlopen") as send:
                 with self.assertRaisesRegex(RuntimeError, "OPENAI_API_KEY"):
-                    exec(config, {})
-                network.assert_not_called()
+                    request_prediction("My card is late.")
+                send.assert_not_called()
+        for message in [None, "", "  "]:
+            with self.assertRaises(ValueError):
+                build_request(message)
 
-    def dataset_bytes(self, split):
+    def test_refusals_and_invalid_answers_go_to_review(self):
+        for answer in [None, {}, {"answers": []}, {"answers": [None]},
+                       {"answers": [{"type": "refusal", "name": "route"}]}]:
+            self.assertEqual(parse_prediction(answer), (None, None))
+        for confidence in [True, None, "0.9", -1, 2, float("nan"), float("inf")]:
+            answer = {"answers": [{"type": "choice", "name": "route",
+                                    "choice": "card_delivery", "confidence": confidence}]}
+            self.assertEqual(parse_prediction(answer), (None, None))
+        for field, value in [("name", "wrong_question"), ("choice", "unknown")]:
+            answer = json.loads(json.dumps(ANSWER))
+            answer["answers"][0][field] = value
+            self.assertEqual(parse_prediction(answer), (None, None))
+
+    def test_http_network_and_invalid_json_errors_are_not_retried(self):
+        errors = [urllib.error.HTTPError(API_URL, 429, "limited", {}, None),
+                  urllib.error.URLError("offline")]
+        with patch.dict(os.environ, {"OPENAI_API_KEY": "test-only-placeholder"}):
+            for error in errors:
+                with patch("urllib.request.urlopen", side_effect=error) as send:
+                    with self.assertRaisesRegex(RuntimeError, "no automatic retry"):
+                        request_prediction("My card is late.")
+                    send.assert_called_once()
+            with patch("urllib.request.urlopen", return_value=io.BytesIO(b"invalid JSON")) as send:
+                with self.assertRaisesRegex(RuntimeError, "invalid JSON"):
+                    request_prediction("My card is late.")
+                send.assert_called_once()
+
+    def test_cli_custom_message_makes_one_request_and_displays_response(self):
         output = io.StringIO()
-        writer = csv.writer(output)
+        with patch.dict(os.environ, {"OPENAI_API_KEY": "test-only-placeholder"}):
+            with patch.object(sys, "argv", ["demo", "--live", "--message", "My card is late."]):
+                with patch("urllib.request.urlopen", return_value=io.BytesIO(json.dumps(ANSWER).encode())) as send:
+                    with contextlib.redirect_stdout(output):
+                        runpy.run_path(str(EXAMPLE / "run_customer_request_routing.py"), run_name="__main__")
+        send.assert_called_once()
+        self.assertIn("LIVE API RESPONSE", output.getvalue())
+        self.assertIn('"route": "card_delivery"', output.getvalue())
+        self.assertNotIn("test-only-placeholder", output.getvalue())
+
+    def test_public_sampler_is_balanced_deterministic_and_checksum_verified(self):
+        stream = io.StringIO()
+        writer = csv.writer(stream)
         writer.writerow(["text", "category"])
-        for category in self.scope["SOURCE_TO_ROUTE"]:
-            for index in range(30):
-                writer.writerow([f"{split} {category} example {index}", category])
-            writer.writerow([f"shared {category}", category])
-        return output.getvalue().encode()
-
-    def test_dataset_sampling_is_deterministic_and_disjoint(self):
-        content = {name: self.dataset_bytes(name) for name in ("train.csv", "test.csv")}
-        hashes = {name: hashlib.sha256(value).hexdigest() for name, value in content.items()}
-
-        def download(url, timeout):
-            return io.BytesIO(content[url.rsplit("/", 1)[-1]])
-
-        with patch.dict(self.scope, {"DATASET_HASHES": hashes}):
+        for label in SOURCE_TO_ROUTE:
+            for index in range(3):
+                writer.writerow([f"synthetic {label} {index}", label])
+        writer.writerow(["conflicting", "card_arrival"])
+        writer.writerow(["conflicting", "cancel_transfer"])
+        content = stream.getvalue().encode()
+        with patch("routing.DATASET_SHA256", hashlib.sha256(content).hexdigest()):
+            def download(*args, **kwargs):
+                return io.BytesIO(content)
             with patch("urllib.request.urlopen", side_effect=download):
-                first = self.scope["load_public_cases"](10, 20)
-                second = self.scope["load_public_cases"](10, 20)
-                small = self.scope["load_public_cases"](2, 3)
-        self.assertEqual(first, second)
-        self.assertEqual(len(first), 120)
-        self.assertEqual(len(small), 20)
-        self.assertTrue({case[0] for case in small}.issubset({case[0] for case in first}))
-        train_texts = {case[3] for case in first if case[1] == "calibration"}
-        test_texts = {case[3] for case in first if case[1] == "test"}
-        self.assertTrue(train_texts.isdisjoint(test_texts))
-        self.assertFalse(any(text.startswith("shared ") for text in train_texts))
-        for route in self.scope["ROUTES"]:
-            self.assertEqual(sum(case[1] == "calibration" and case[2] == route for case in first), 10)
-            self.assertEqual(sum(case[1] == "test" and case[2] == route for case in first), 20)
-
-    def test_invalid_sample_counts_fail_before_network(self):
-        for counts in [(0, 3), (2, -1), (True, 3), (1.5, 3)]:
-            with self.subTest(counts=counts), patch("urllib.request.urlopen") as network:
-                with self.assertRaisesRegex(ValueError, "positive integers"):
-                    self.scope["load_public_cases"](*counts)
-                network.assert_not_called()
-
-    def test_live_cli_obeys_default_and_configured_request_budgets(self):
-        runner = Path(__file__).with_name("run_customer_request_routing.py")
-        content = {name: self.dataset_bytes(name) for name in ("train.csv", "test.csv")}
-        notebook = json.loads(runner.with_name("customer_request_routing.ipynb").read_text())
-        data_source = cell_source(notebook["cells"][4])
-        for name, value in content.items():
-            data_source = data_source.replace(self.scope["DATASET_HASHES"][name],
-                                              hashlib.sha256(value).hexdigest())
-        notebook["cells"][4]["source"] = data_source
-        variants = [([], 20), (["--calibration-per-route", "1", "--test-per-route", "2"], 12),
-                    (["--calibration-per-route", "10", "--test-per-route", "20"], 120)]
-        for options, expected_calls in variants:
-            calls = []
-
-            def network(request, timeout):
-                if isinstance(request, str):
-                    return io.BytesIO(content[request.rsplit("/", 1)[-1]])
-                payload = json.loads(request.data)
-                calls.append(payload)
-                route = next(route for label, route in self.scope["SOURCE_TO_ROUTE"].items()
-                             if label in payload["input"])
-                return io.BytesIO(json.dumps({"answers": [{"type": "choice", "name": "route",
-                    "choice": route, "confidence": 0.9}], "usage": {"input_tokens": 1}}).encode())
-
-            with self.subTest(options=options):
-                with patch.dict(os.environ, {"OPENAI_API_KEY": "test-only-placeholder"}):
-                    with patch.object(sys, "argv", [str(runner), "--live", *options]):
-                        with patch.object(Path, "read_text", return_value=json.dumps(notebook)):
-                            with patch("urllib.request.urlopen", side_effect=network):
-                                with contextlib.redirect_stdout(io.StringIO()):
-                                    runpy.run_path(str(runner), run_name="__main__")
-                self.assertEqual(len(calls), expected_calls)
-                self.assertTrue(all(set(call) == {"model", "input", "questions"} for call in calls))
-
-    def test_dataset_checksum_mismatch_stops_before_classification(self):
-        with patch("urllib.request.urlopen", return_value=io.BytesIO(b"unexpected")) as network:
+                first = sample_public_messages(2)
+                second = sample_public_messages(2)
+                self.assertEqual(first, second)
+                self.assertEqual(len(first), 8)
+                self.assertEqual(len({case["id"] for case in first}), 8)
+                self.assertFalse(any(case["message"] == "conflicting" for case in first))
+                for label in SOURCE_TO_ROUTE:
+                    self.assertEqual(sum(case["source_label"] == label for case in first), 2)
+                with self.assertRaisesRegex(ValueError, "Only 3"):
+                    sample_public_messages(4)
+        with patch("urllib.request.urlopen", return_value=io.BytesIO(b"unexpected")):
             with self.assertRaisesRegex(ValueError, "checksum mismatch"):
-                self.scope["load_public_cases"]()
-            self.assertEqual(network.call_count, 1)
+                sample_public_messages()
+
+    def test_cli_batch_sizes_control_model_call_count(self):
+        for options, count in [([], 4), (["--samples-per-route", "2"], 8)]:
+            cases = [{"id": str(i), "message": f"public message {i}", "source_label": "local label"}
+                     for i in range(count)]
+            with patch.dict(os.environ, {"OPENAI_API_KEY": "test-only-placeholder"}):
+                with patch.object(sys, "argv", ["demo", "--live", *options]):
+                    with patch("routing.sample_public_messages", return_value=cases) as sample:
+                        with patch("urllib.request.urlopen", side_effect=lambda *a, **k: io.BytesIO(json.dumps(ANSWER).encode())) as send:
+                            with contextlib.redirect_stdout(io.StringIO()):
+                                runpy.run_path(str(EXAMPLE / "run_customer_request_routing.py"), run_name="__main__")
+            sample.assert_called_once_with(count // 4)
+            self.assertEqual(send.call_count, count)
+            for call in send.call_args_list:
+                self.assertEqual(set(json.loads(call.args[0].data)), {"model", "input", "questions"})
+
+    def test_cli_default_is_no_network_request_preview(self):
+        with patch.object(sys, "argv", ["demo"]):
+            with patch("urllib.request.urlopen") as send:
+                with contextlib.redirect_stdout(io.StringIO()) as output:
+                    runpy.run_path(str(EXAMPLE / "run_customer_request_routing.py"), run_name="__main__")
+        send.assert_not_called()
+        self.assertIn("REQUEST PREVIEW ONLY", output.getvalue())
+
+    def test_notebook_runs_top_to_bottom_offline(self):
+        notebook = json.loads((EXAMPLE / "customer_request_routing.ipynb").read_text())
+        with patch.dict(os.environ, {"RUN_DECISIONS_API": "0"}):
+            with patch.object(Path, "cwd", return_value=EXAMPLE):
+                with patch("urllib.request.urlopen") as send:
+                    with contextlib.redirect_stdout(io.StringIO()):
+                        scope = {}
+                        for cell in notebook["cells"]:
+                            if cell["cell_type"] == "code":
+                                exec(compile("".join(cell["source"]), "routing-notebook", "exec"), scope)
+        send.assert_not_called()
+        self.assertEqual(scope["outputs"], [])
+        self.assertEqual(len(ROUTES), 4)
 
 
 if __name__ == "__main__":

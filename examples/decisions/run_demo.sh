@@ -1,5 +1,5 @@
 #!/usr/bin/env bash
-# Display one real Decisions request and response; no evaluation or installation.
+# Display a small live routing batch; no evaluation framework or installation.
 set +x
 set -euo pipefail
 script_dir="$(cd "$(dirname "$0")" && pwd)"
@@ -16,5 +16,5 @@ if [[ -z "$OPENAI_API_KEY" ]]; then
   exit 1
 fi
 export OPENAI_API_KEY
-echo "Making one billable Decisions request. No automatic retries."
-python3 "$script_dir/run_customer_request_routing.py" --preview
+echo "Starting live routing demo: 4 public examples by default, or one with --message. No automatic retries."
+python3 "$script_dir/run_customer_request_routing.py" --live "$@"

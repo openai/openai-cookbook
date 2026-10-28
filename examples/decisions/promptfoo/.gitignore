@@ -1,6 +1,0 @@
-node_modules/
-.generated/
-.local/
-.npm-cache/
-.env
-__pycache__/

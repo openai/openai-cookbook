@@ -75,26 +75,23 @@ Only the message and question go to the model. The dataset's source label is
 printed as local context. The demo displays routing decisions. Connecting them
 to a ticketing system or customer workflow is a separate application step.
 
-## Architecture and flow
+## Customer-support flow
 
-The notebook and Terminal runner use the same local helpers. The following flow
-repeats once per message, for **ten API requests** in a complete run.
+Customers describe their problem in their own words. Decisions selects the
+support queue that best fits the main request: payment fees, account access,
+transfer cancellation, or card delivery.
 
-![Architecture of the ten-message Decisions demo: customer messages flow through request construction, the Decisions API, answer validation, and either a printed queue with confidence or human review.](../../images/decisions-customer-support-routing.png)
+![Customer messages are routed through Decisions to the card-payment fees, account access, transfer cancellation, or card delivery support team, with human review when a routing decision is unavailable.](../../images/decisions-customer-support-use-case.png)
 
-1. **Load messages:** `load_demo_messages()` reads the ten bundled examples.
-2. **Build the request:** `build_request()` combines one message with the named
-   `route` question and its four queue descriptions. The API key is sent separately
-   in the Authorization header.
-3. **Call Decisions:** `request_prediction()` sends the request and returns the
-   actual response JSON and elapsed request time.
-4. **Validate and display:** `parse_prediction()` checks the answer type, question
-   name, allowed queue, and confidence range. A refusal or unusable answer becomes
-   `human_review`; a valid answer becomes a printed queue selection.
+In this demo, a queue selection is printed alongside the actual API response and
+confidence. A refusal or unusable answer is printed as `human_review`. In a
+support application, the next step would be assigning a ticket to that team;
+the team would handle the customer's request. The demo stops at recommending
+the queue and does not modify accounts or tickets.
 
-The source labels stay local. HTTP, network, and invalid-JSON errors stop the run;
-they do not follow the diagram's human-review branch. The demo makes no changes
-to customer accounts or tickets.
+HTTP, network, and invalid-JSON errors stop the run. Confidence is not a guarantee
+of correctness; see [Understand the result](#understand-the-result) for the limits
+of this example.
 
 ## Before you start
 

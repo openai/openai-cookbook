@@ -171,6 +171,88 @@ async def before_task_start():
     assert [e["item_id"] for e in sent if e["type"] == "conversation.item.delete"] == ["user1"]
     print("PASS before-task-start")
 
+async def response_end(status):
+    namespace = dict(globals())
+    namespace.update(SAMPLE_RATE_HZ=24000, BYTES_PER_SAMPLE=2,
+                     openai=SimpleNamespace(api_key="synthetic"))
+    definitions(namespace, {"Turn", "ConversationState", "realtime_session"})
+    states, played = [], []
+    original = namespace["ConversationState"]
+
+    def new_state():
+        state = original()
+        states.append(state)
+        return state
+
+    async def mic(queue):
+        await asyncio.Future()
+
+    async def upload(queue, ws):
+        while await queue.get() is not None:
+            pass
+
+    def audio(response_id, pcm):
+        return {"type": "response.output_audio.delta", "response_id": response_id,
+                "delta": base64.b64encode(pcm).decode()}
+
+    events = [
+        audio("interrupted", b"old!"),
+        # The next response may already be buffered when the first one ends.
+        audio("next", b"next"),
+        {"type": "response.done", "response": {"id": "interrupted", "status": status}},
+        audio("next", b"part"),
+        {"type": "response.done", "response": {
+            "id": "next", "status": "completed", "usage": {"total_tokens": 4},
+            "output": [{"id": "a2", "role": "assistant",
+                        "content": [{"transcript": "next answer"}]}]}},
+    ]
+
+    class Socket:
+        async def __aenter__(self):
+            return self
+
+        async def __aexit__(self, *args):
+            pass
+
+        async def send(self, payload):
+            pass
+
+        async def recv(self):
+            return json.dumps({"type": "session.created"})
+
+        def __aiter__(self):
+            return self
+
+        async def __anext__(self):
+            if not events:
+                raise StopAsyncIteration
+            return json.dumps(events.pop(0))
+
+    namespace.update(ConversationState=new_state, print_history=lambda state: None,
+                     maybe_summarise=lambda ws, state: None, mic_to_queue=mic,
+                     queue_to_websocket=upload, websockets=SimpleNamespace(
+                         connect=lambda *args, **kwargs: Socket()),
+                     simpleaudio=SimpleNamespace(
+                         play_buffer=lambda pcm, *format: played.append(pcm)))
+    error = None
+    with redirect_stdout(StringIO()):
+        try:
+            await namespace["realtime_session"]()
+        except RuntimeError as exc:
+            error = exc
+    if status == "cancelled":
+        assert error is None, error
+        assert played == [b"nextpart"], played
+        assert [(turn.item_id, turn.text) for turn in states[0].history] == [
+            ("a2", "next answer")]
+        assert states[0].latest_tokens == 4
+    else:
+        assert error is not None, f"{status} must still raise"
+        assert not played, played
+        assert not states[0].history, states[0].history
+    print("PASS response-end", status)
+
+
 async def main():
     failures = []
     for outcome in ("completed", "failed", "missing", "during-summary"):
@@ -184,6 +266,11 @@ async def main():
         await before_task_start()
     except Exception as error:
         failures.append(f"before-task-start: {type(error).__name__}: {error}")
+    for status in ("cancelled", "failed", "incomplete"):
+        try:
+            await response_end(status)
+        except Exception as error:
+            failures.append(f"response-{status}: {type(error).__name__}: {error}")
     if failures:
         raise AssertionError("; ".join(failures))
 

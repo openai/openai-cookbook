@@ -81,7 +81,7 @@ Customers describe their problem in their own words. Decisions selects the
 support queue that best fits the main request: payment fees, account access,
 transfer cancellation, or card delivery.
 
-![Customer messages are routed through Decisions to the card-payment fees, account access, transfer cancellation, or card delivery support team, with human review when a routing decision is unavailable.](../../images/decisions-customer-support-use-case.png)
+![Customer messages are routed through Decisions to the card-payment fees, account access, transfer cancellation, or card delivery support team, with human review when a routing decision is unavailable.](images/decisions-customer-support-use-case.png)
 
 In this demo, a queue selection is printed alongside the actual API response and
 confidence. A refusal or unusable answer is printed as `human_review`. In a

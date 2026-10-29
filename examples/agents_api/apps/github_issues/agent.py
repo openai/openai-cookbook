@@ -15,7 +15,7 @@ from openai import AsyncOpenAI, NotFoundError
 INSTRUCTIONS = """\
 Investigate GitHub issues by inspecting the repository and reproducing problems when practical.
 Identify the likely cause and recommend the smallest fix.
-Write your findings to /workspace/investigation.md.
+Create or overwrite /workspace/investigation.md with your fresh findings.
 Do not edit source files or contact external services.
 """
 
@@ -40,6 +40,8 @@ def start_executor(workspace: Path, environment_id: str, remote_url: str) -> Con
 
 async def investigate_issue(issue: dict[str, Any], workspace: Path) -> dict[str, Any]:
     container: Container | None = None
+    report = workspace / "investigation.md"
+    previous_report = report.read_bytes() if report.exists() else None
     async with AsyncOpenAI() as client:
         session = await client.beta.agents.sessions.create(
             agent={
@@ -88,10 +90,13 @@ Inspect /workspace, run relevant tests, identify the root cause, and write
                     if event.type == "agent.session.turn.cancelled":
                         raise RuntimeError("Issue investigation was cancelled.")
 
-            report = workspace / "investigation.md"
             if not report.exists():
                 raise RuntimeError(
                     "The agent did not create /workspace/investigation.md."
+                )
+            if previous_report is not None and report.read_bytes() == previous_report:
+                raise RuntimeError(
+                    "The agent did not create a new /workspace/investigation.md."
                 )
             return {
                 "issue_number": issue.get("number"),

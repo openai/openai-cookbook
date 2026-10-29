@@ -135,8 +135,8 @@ python3 examples/decisions/run_customer_request_routing.py
 ```
 
 Results are printed to Terminal; there are no generated reports to clean or
-archive. Requests have a 30-second timeout and **no automatic retries**. Inspect
-errors before rerunning: an interrupted request may already have been processed.
+archive. Requests have a 30-second timeout, reject redirects, and make **no automatic
+retries**. Inspect errors before rerunning: an interrupted request may already have been processed.
 
 ## Understand the result
 
@@ -187,7 +187,9 @@ from `routing.py`.
 
 The main helpers are `load_demo_messages()`, `build_request()`,
 `request_prediction()`, and `parse_prediction()`. Change `QUESTION` in `routing.py`
-to adapt the queue choices and descriptions to your application.
+to adapt the queue choices and descriptions to your application. The response
+parser reads its allowed queues from the same question, so those choices stay
+in sync.
 
 ## Optional developer checks
 

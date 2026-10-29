@@ -1,6 +1,7 @@
 """Offline application checks for the ten-message routing demo."""
 
 import contextlib
+from email.message import Message
 import io
 import json
 import os
@@ -11,8 +12,11 @@ import subprocess
 import unittest
 from unittest.mock import patch
 import urllib.error
+import urllib.request
+import urllib.response
 
-from routing import (API_URL, MODEL, ROUTES, SOURCE_TO_ROUTE, build_request,
+import routing
+from routing import (API_URL, MODEL, QUESTION, SOURCE_TO_ROUTE, build_request,
                      parse_prediction, request_prediction, load_demo_messages)
 
 
@@ -33,7 +37,7 @@ class RoutingTests(unittest.TestCase):
 
     def test_request_contract_and_no_key_in_body(self):
         with patch.dict(os.environ, {"OPENAI_API_KEY": "test-only-placeholder"}):
-            with patch("urllib.request.urlopen", return_value=io.BytesIO(json.dumps(ANSWER).encode())) as send:
+            with patch("routing._OPENER.open", return_value=io.BytesIO(json.dumps(ANSWER).encode())) as send:
                 response, latency = request_prediction("My new card is late.")
         send.assert_called_once()
         request = send.call_args.args[0]
@@ -46,9 +50,44 @@ class RoutingTests(unittest.TestCase):
         self.assertEqual(parse_prediction(response), ("card_delivery", 0.92))
         self.assertGreaterEqual(latency, 0)
 
+    def test_redirects_do_not_forward_authenticated_requests(self):
+        # Feed redirects through the real urllib opener without using a network.
+        for code in (301, 302, 303, 307, 308):
+            requests = []
+
+            class RedirectingHTTPSHandler(urllib.request.HTTPSHandler):
+                def https_open(self, request):
+                    requests.append(request)
+                    headers = Message()
+                    headers["Location"] = "https://example.org/redirect-target"
+                    response = urllib.response.addinfourl(
+                        io.BytesIO(b""), headers, request.full_url, code,
+                    )
+                    response.msg = "Redirect"
+                    return response
+
+            opener = urllib.request.build_opener(
+                routing._RejectRedirects(), RedirectingHTTPSHandler(),
+            )
+            with self.subTest(code=code), patch("routing._OPENER", opener):
+                with self.assertRaisesRegex(RuntimeError, f"HTTP {code}"):
+                    request_prediction("My card is late.", api_key="test-only-placeholder")
+            self.assertEqual(len(requests), 1)
+            self.assertEqual(requests[0].full_url, API_URL)
+
+    def test_custom_queue_is_accepted_from_the_same_question(self):
+        question = json.loads(json.dumps(QUESTION))
+        question["choices"][0]["value"] = "billing"
+        response = {"answers": [{"type": "choice", "name": "route",
+                                 "choice": "billing", "confidence": 0.92}]}
+        with patch("routing.QUESTION", question):
+            choices = build_request("Why was I charged a fee?")["questions"][0]["choices"]
+            self.assertEqual(choices[0]["value"], "billing")
+            self.assertEqual(parse_prediction(response), ("billing", 0.92))
+
     def test_missing_key_and_empty_message_stop_before_network(self):
         with patch.dict(os.environ, {"OPENAI_API_KEY": ""}):
-            with patch("urllib.request.urlopen") as send:
+            with patch("routing._OPENER.open") as send:
                 with self.assertRaisesRegex(RuntimeError, "OPENAI_API_KEY"):
                     request_prediction("My card is late.")
                 send.assert_not_called()
@@ -60,7 +99,8 @@ class RoutingTests(unittest.TestCase):
         for answer in [None, {}, {"answers": []}, {"answers": [None]},
                        {"answers": [{"type": "refusal", "name": "route"}]}]:
             self.assertEqual(parse_prediction(answer), (None, None))
-        for confidence in [True, None, "0.9", -1, 2, float("nan"), float("inf")]:
+        for confidence in [True, None, "0.9", -1, 2, float("nan"), float("inf"),
+                           -float("inf"), 10**400, -(10**400)]:
             answer = {"answers": [{"type": "choice", "name": "route",
                                     "choice": "card_delivery", "confidence": confidence}]}
             self.assertEqual(parse_prediction(answer), (None, None))
@@ -74,11 +114,11 @@ class RoutingTests(unittest.TestCase):
                   urllib.error.URLError("offline")]
         with patch.dict(os.environ, {"OPENAI_API_KEY": "test-only-placeholder"}):
             for error in errors:
-                with patch("urllib.request.urlopen", side_effect=error) as send:
+                with patch("routing._OPENER.open", side_effect=error) as send:
                     with self.assertRaisesRegex(RuntimeError, "no automatic retry"):
                         request_prediction("My card is late.")
                     send.assert_called_once()
-            with patch("urllib.request.urlopen", return_value=io.BytesIO(b"invalid JSON")) as send:
+            with patch("routing._OPENER.open", return_value=io.BytesIO(b"invalid JSON")) as send:
                 with self.assertRaisesRegex(RuntimeError, "invalid JSON"):
                     request_prediction("My card is late.")
                 send.assert_called_once()
@@ -87,7 +127,7 @@ class RoutingTests(unittest.TestCase):
         output = io.StringIO()
         with patch.dict(os.environ, {"OPENAI_API_KEY": "test-only-placeholder"}):
             with patch.object(sys, "argv", ["demo", "--message", "My card is late."]):
-                with patch("urllib.request.urlopen", return_value=io.BytesIO(json.dumps(ANSWER).encode())) as send:
+                with patch("routing._OPENER.open", return_value=io.BytesIO(json.dumps(ANSWER).encode())) as send:
                     with contextlib.redirect_stdout(output):
                         runpy.run_path(str(EXAMPLE / "run_customer_request_routing.py"), run_name="__main__")
         send.assert_called_once()
@@ -105,7 +145,7 @@ class RoutingTests(unittest.TestCase):
     def test_default_cli_makes_ten_model_requests(self):
         with patch.dict(os.environ, {"OPENAI_API_KEY": "test-only-placeholder"}):
             with patch.object(sys, "argv", ["demo"]):
-                with patch("urllib.request.urlopen", side_effect=lambda *a, **k: io.BytesIO(json.dumps(ANSWER).encode())) as send:
+                with patch("routing._OPENER.open", side_effect=lambda *a, **k: io.BytesIO(json.dumps(ANSWER).encode())) as send:
                     with contextlib.redirect_stdout(io.StringIO()):
                         runpy.run_path(str(EXAMPLE / "run_customer_request_routing.py"), run_name="__main__")
         self.assertEqual(send.call_count, 10)
@@ -117,7 +157,7 @@ class RoutingTests(unittest.TestCase):
     def test_cli_missing_key_stops_before_network(self):
         with patch.dict(os.environ, {"OPENAI_API_KEY": ""}):
             with patch.object(sys, "argv", ["demo"]):
-                with patch("urllib.request.urlopen") as send:
+                with patch("routing._OPENER.open") as send:
                     with contextlib.redirect_stderr(io.StringIO()):
                         with self.assertRaises(SystemExit) as stopped:
                             runpy.run_path(str(EXAMPLE / "run_customer_request_routing.py"), run_name="__main__")
@@ -133,7 +173,7 @@ class RoutingTests(unittest.TestCase):
             with patch.object(Path, "cwd", return_value=EXAMPLE):
                 with patch("routing.load_demo_messages", return_value=cases):
                     with patch("getpass.getpass", return_value=""):
-                        with patch("urllib.request.urlopen") as send:
+                        with patch("routing._OPENER.open") as send:
                             with contextlib.redirect_stdout(io.StringIO()):
                                 with self.assertRaisesRegex(RuntimeError, "No key supplied"):
                                     for cell in notebook["cells"]:
@@ -142,7 +182,7 @@ class RoutingTests(unittest.TestCase):
         send.assert_not_called()
         self.assertEqual(scope["outputs"], [])
         self.assertIsNone(scope["api_key"])
-        self.assertEqual(len(ROUTES), 4)
+        self.assertEqual(len(QUESTION["choices"]), 4)
 
     def test_notebook_hidden_key_is_not_printed_and_cleared_after_requests(self):
         notebook = json.loads((EXAMPLE / "customer_request_routing.ipynb").read_text())
@@ -158,7 +198,7 @@ class RoutingTests(unittest.TestCase):
                     with patch.object(Path, "cwd", return_value=EXAMPLE):
                         with patch("getpass.getpass", return_value="hidden-test-placeholder") as prompt:
                             with patch("routing.load_demo_messages", return_value=cases):
-                                with patch("urllib.request.urlopen", side_effect=network_result) as send:
+                                with patch("routing._OPENER.open", side_effect=network_result) as send:
                                     with contextlib.redirect_stdout(output):
                                         try:
                                             for cell in notebook["cells"]:

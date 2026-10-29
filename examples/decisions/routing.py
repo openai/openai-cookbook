@@ -1,7 +1,6 @@
 """Shared data, request, and response helpers for the Decisions routing demo."""
 
 import json
-import math
 import os
 from pathlib import Path
 import time
@@ -11,7 +10,6 @@ import urllib.request
 
 MODEL = "gpt-6-luna"
 API_URL = "https://api.openai.com/v1/decisions"
-ROUTES = ("card_payment_fees", "account_access", "transfer_cancellation", "card_delivery")
 SOURCE_TO_ROUTE = {
     "card_payment_fee_charged": "card_payment_fees",
     "passcode_forgotten": "account_access",
@@ -33,6 +31,16 @@ QUESTION = {
         {"value": "card_delivery", "description": "A new or replacement card has not arrived, or asking where it is."},
     ],
 }
+
+
+class _RejectRedirects(urllib.request.HTTPRedirectHandler):
+    """Keep authenticated requests on the fixed Decisions endpoint."""
+
+    def redirect_request(self, request, fp, code, msg, headers, newurl):
+        return None
+
+
+_OPENER = urllib.request.build_opener(_RejectRedirects())
 
 
 def load_demo_messages():
@@ -67,18 +75,19 @@ def parse_prediction(response):
     answer = answers[0]
     if not isinstance(answer, dict) or answer.get("type") != "choice":
         return None, None
-    if answer.get("name") != "route" or answer.get("choice") not in ROUTES:
+    allowed_routes = tuple(choice["value"] for choice in QUESTION["choices"])
+    if answer.get("name") != QUESTION["name"] or answer.get("choice") not in allowed_routes:
         return None, None
     confidence = answer.get("confidence")
     if isinstance(confidence, bool) or not isinstance(confidence, (int, float)):
         return None, None
-    if not math.isfinite(confidence) or not 0 <= confidence <= 1:
+    if not 0 <= confidence <= 1:
         return None, None
     return answer["choice"], float(confidence)
 
 
 def request_prediction(message, *, api_key=None):
-    """Make one authenticated request, without automatic retries."""
+    """Make one authenticated request, without redirects or automatic retries."""
     payload = build_request(message)
     if api_key is None:
         api_key = os.environ.get("OPENAI_API_KEY")
@@ -92,7 +101,7 @@ def request_prediction(message, *, api_key=None):
     )
     start = time.perf_counter()
     try:
-        with urllib.request.urlopen(request, timeout=30) as response:
+        with _OPENER.open(request, timeout=30) as response:
             result = json.load(response)
     except urllib.error.HTTPError as error:
         raise RuntimeError(f"Decisions request failed with HTTP {error.code}; no automatic retry") from None

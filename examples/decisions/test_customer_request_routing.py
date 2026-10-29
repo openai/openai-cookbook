@@ -26,6 +26,21 @@ ANSWER = {"answers": [{"type": "choice", "name": "route",
 
 
 class RoutingTests(unittest.TestCase):
+    def test_launcher_help_does_not_require_a_key(self):
+        environment = dict(os.environ)
+        environment.pop("OPENAI_API_KEY", None)
+        for flag in ("--help", "-h"):
+            with self.subTest(flag=flag):
+                result = subprocess.run(
+                    ["bash", str(EXAMPLE / "run_demo.sh"), flag],
+                    env=environment, input="", capture_output=True, text=True,
+                    check=False,
+                )
+                self.assertEqual(result.returncode, 0, result.stderr)
+                self.assertIn("--message", result.stdout)
+                self.assertNotIn("Paste API key", result.stdout + result.stderr)
+                self.assertNotIn("Starting live routing", result.stdout)
+
     @unittest.skipIf(sys.version_info < (3, 11), "Isolated safe-path check requires Python 3.11+")
     def test_cli_imports_adjacent_helper_in_isolated_mode(self):
         result = subprocess.run(

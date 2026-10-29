@@ -1,221 +1,148 @@
 # Route customer-support messages with the Decisions API
 
-Build a customer-support router that reads a message and selects the queue
-responsible for it. This example sends ten public banking-support messages to
-the Decisions API and displays each actual response, selected queue, and confidence.
+The [Decisions API](https://developers.openai.com/api/docs/guides/decisions)
+turns text and images into decisions your application can use, about **10× faster
+than the Responses API**. It also accepts JSON input. Use it to classify content,
+route requests, or score inputs against a rubric.
 
-Start with the [notebook](customer_request_routing.ipynb) for a guided walkthrough,
-or use the [Terminal demo](#1-run-ten-customer-support-examples). Both run the
-same ten examples through shared Python helpers.
+In this example, you'll route ten banking-support messages to four specialist
+queues. You'll define a `choice` question, inspect the API's answers, and extract
+a queue and confidence for each message. The example uses **`gpt-6-luna`, the only
+currently supported Decisions model**, with `POST /v1/decisions`.
 
-## What is the Decisions API?
+Open the [notebook](customer_request_routing.ipynb) for the walkthrough, or
+[run the terminal demo](#run-the-demo) to try it immediately. The 10× comparison
+comes from the API guide; this example does not benchmark it.
 
-The [OpenAI Decisions API](https://developers.openai.com/api/docs/guides/decisions)
-evaluates evidence against questions you define and returns typed answers your
-application can use. For example, supply a customer message and ask which of four
-support queues owns it. The API returns a selected queue; your application decides
-how to use that answer.
+## What you'll build
 
-You choose the question type:
+A support router turns a customer's description into a queue your application can
+assign. The question defines each queue's scope so the model can distinguish, for
+example, a forgotten app passcode from a blocked card PIN.
 
-| Type | Purpose | Example |
-| --- | --- | --- |
-| `choice` | Select one of your allowed options | Which support queue owns this message? |
-| `predicate` | Estimate whether a condition holds | Does the message describe a duplicate charge? |
-| `score` | Rate input against ordered levels | How severe is the reported issue? |
-
-Each request has three parts:
-
-- `model`: the model evaluating the request, `gpt-6-luna` in this demo.
-- `input`: the customer message to evaluate.
-- `questions`: the routing instructions and allowed queue choices.
-
-The response contains an `answers` array. A question's `name` links it to its
-answer. For a `choice` question, the answer includes the selected `choice`,
-per-choice `probabilities`, and a separate `confidence` value. A question can also
-return a refusal.
-
-This example uses **`choice`**, model **`gpt-6-luna`**, and
-**`POST https://api.openai.com/v1/decisions`**. It sends JSON directly using
-Python's standard HTTP library; no SDK installation is needed. See the
-[Decisions guide](https://developers.openai.com/api/docs/guides/decisions) for
-concepts and current availability, the
-[create-decision reference](https://developers.openai.com/api/reference/resources/decisions/methods/create)
-for the exact schema, and
-[pricing and availability](https://developers.openai.com/api/docs/guides/decisions#pricing-and-availability)
-before running paid requests.
-
-## Use case: route incoming banking-support messages
-
-A banking support team receives messages about fees, account access, transfers,
-and card delivery. Before a specialist can help, each message needs an owner.
-This demo models that triage step: one message goes in, and a queue selection
-comes back.
-
-The routing question defines four choices with descriptions explaining their
-scope. These messages are included in the ten-example batch:
-
-| Example message | Intended queue |
+| Customer message | Intended queue |
 | --- | --- |
 | "I was charged a fee for a card payment. Why?" | `card_payment_fees` |
 | "Tell me how to reset the passcode." | `account_access` |
 | "I need to cancel an incorrect transaction." | `transfer_cancellation` |
 | "How long should my new card take to arrive?" | `card_delivery` |
 
-The demo runs **ten bundled BANKING77 messages covering all four queues**.
-For each message, it:
+![Customer messages pass through Decisions to four support queues, with human review when no usable answer is available.](images/decisions-customer-support-use-case.png)
 
-1. Builds a named routing question and sends the message to Decisions.
-2. Displays the actual response, including choice probabilities and confidence.
-3. Validates the answer's type, name, allowed route, and confidence range.
-4. Prints the route, confidence, and elapsed request time, or `human_review` for
-   a refusal or unusable answer.
+The demo prints a recommendation; your application handles ticket assignment.
+Only the message and question go to the model. Dataset labels stay local.
 
-Only the message and question go to the model. The dataset's source label is
-printed as local context. The demo displays routing decisions. Connecting them
-to a ticketing system or customer workflow is a separate application step.
+## Run the demo
 
-## Customer-support flow
+You'll need Python 3.10+, Bash, and an OpenAI project API key with Decisions
+access. The Python helpers use only the standard library. For the notebook,
+use Jupyter or VS Code with a Python kernel.
 
-Customers describe their problem in their own words. Decisions selects the
-support queue that best fits the main request: payment fees, account access,
-transfer cancellation, or card delivery.
-
-![Customer messages are routed through Decisions to the card-payment fees, account access, transfer cancellation, or card delivery support team, with human review when a routing decision is unavailable.](images/decisions-customer-support-use-case.png)
-
-In this demo, a queue selection is printed alongside the actual API response and
-confidence. A refusal or unusable answer is printed as `human_review`. In a
-support application, the next step would be assigning a ticket to that team;
-the team would handle the customer's request. The demo stops at recommending
-the queue and does not modify accounts or tickets.
-
-HTTP, network, and invalid-JSON errors stop the run. Confidence is not a guarantee
-of correctness; see [Understand the result](#understand-the-result) for the limits
-of this example.
-
-## Before you start
-
-- Use Python 3.10 or later. The Terminal launcher also uses Bash.
-- For live requests, use an OpenAI project API key with Decisions access.
-- To run the notebook interactively, use Jupyter or VS Code with a Python kernel.
-
-The demo requires no third-party Python packages, npm packages, or Promptfoo.
-Run the following commands from the **root of the openai-cookbook repository**.
-
-## 1. Run ten customer-support examples
+From the repository root, run:
 
 ```bash
 bash examples/decisions/run_demo.sh
 ```
 
-Paste your API key at the hidden prompt. The launcher loads ten bundled public
-messages and makes **ten billable Decisions requests**. It prints each input,
-actual response JSON, parsed route/confidence, and latency. A successful full run
-ends after the result for `Example 10/10` and returns to your shell prompt.
+Enter your API key at the hidden prompt, or use an existing `OPENAI_API_KEY`
+environment variable. Keep keys out of source files, notebook cells, and shared
+output. Each full run makes **ten billable API requests**; check
+[current pricing](https://developers.openai.com/api/docs/guides/decisions#pricing-and-availability).
 
-The key can also come from an existing `OPENAI_API_KEY` environment variable.
-The launcher disables shell tracing before handling it and clears its copy on
-exit. A key exported in the parent shell remains there until you unset it.
-Never put a real key in source, notebook cells, or CLI arguments, or share it in
-logs. Each live invocation makes new paid requests.
+For each message, the demo prints the request, response JSON, selected queue,
+confidence, and elapsed time. A full run finishes at `Example 10/10`.
 
-## 2. Try your own message (optional)
+To route one message instead:
 
 ```bash
 bash examples/decisions/run_demo.sh --message "I forgot my app passcode."
 ```
 
-This sends exactly one request. To rerun the ten examples, run the original
-command again. There are no sample-count settings to configure.
+With `OPENAI_API_KEY` already set, you can also run
+`python3 examples/decisions/run_customer_request_routing.py` directly.
 
-With `OPENAI_API_KEY` securely configured, you can also run Python directly:
+### Use the notebook
 
-```bash
-python3 examples/decisions/run_customer_request_routing.py
+Open [customer_request_routing.ipynb](customer_request_routing.ipynb), select a
+Python 3.10+ kernel, and choose **Run All**. Start the kernel in the repository
+root or `examples/decisions/`. It displays the request and prompts for a key if
+`OPENAI_API_KEY` is unset, then makes the same ten requests as the terminal demo.
+
+## How the request works
+
+Each request contains a `model`, an `input` message, and a `questions` array.
+The shared [routing helper](routing.py) supplies one question named `route` with
+four choices and descriptions. The API echoes the question name in its answer.
+
+| Question type | Use it for |
+| --- | --- |
+| `choice` | Selecting a category, such as a support queue |
+| `predicate` | Estimating whether a condition holds |
+| `score` | Rating input against ordered levels |
+
+This example uses `choice` because queues are categories without an order.
+For custom JSON objects such as extracted fields, use
+[Structured Outputs](https://developers.openai.com/api/docs/guides/structured-outputs)
+with the Responses API instead. See the
+[Decisions reference](https://developers.openai.com/api/reference/resources/decisions/methods/create)
+for the full request and response schema.
+
+## Read the result
+
+A choice answer contains `choice`, per-choice `probabilities`, and a separate
+`confidence` value. The parser checks the answer's type, question name, allowed
+queue, and confidence range before returning a route.
+
+For a card-delivery message, a terminal summary could look like this
+(illustrative values, not a recorded API response):
+
+```json
+{
+  "route": "card_delivery",
+  "confidence": 0.92,
+  "latency_ms": 180.0
+}
 ```
 
-Results are printed to Terminal; there are no generated reports to clean or
-archive. Requests have a 30-second timeout, reject redirects, and make **no automatic
-retries**. Inspect errors before rerunning: an interrupted request may already have been processed.
+A refusal or unusable answer produces `"route": "human_review"` and
+`"confidence": null`. HTTP, network, and invalid-JSON errors stop the run.
+Requests reject redirects, use a 30-second timeout, and have no automatic retries.
+Check failures before rerunning: the API may already have processed a request.
+Latency includes connection setup and network time.
 
-## Understand the result
+## Adapt it to your application
 
-The full response shows what the API returned. The final summary reads
-`answers[0].choice` and `answers[0].confidence` after validating them. For a
-card-delivery message, the intended route is `card_delivery`; actual choices,
-confidence, and timing can vary.
+Edit `QUESTION` in [routing.py](routing.py) to change the queues and their
+descriptions. The parser reads the allowed values from that same question.
+Try your own inputs with `--message` while refining queue ownership.
 
-A refusal can arrive with a successful HTTP response. Refused or unusable answers
-produce `human_review` with null confidence. HTTP, network, and invalid-JSON errors
-stop the run. Request latency includes network and connection setup and is not
-an inference-only benchmark.
+The four queues assume an in-scope request. For broader traffic, add an `other`
+choice or a separate scope check before assigning a ticket. Confidence does not
+guarantee correctness: evaluate representative labeled messages before choosing
+review thresholds or enabling actions. The ten public examples demonstrate the
+workflow, not production accuracy.
 
-Confidence is not a correctness guarantee. This demo assumes each message belongs
-to one of four queues and imposes no unvalidated confidence cutoff. Production
-routing also needs an unsupported/ambiguous-message policy and representative
-evaluation before enabling downstream actions. A few displayed examples do not
-establish production performance.
-
-## Run the notebook instead
-
-1. Open [customer_request_routing.ipynb](customer_request_routing.ipynb) in VS Code
-   or Jupyter and select a Python 3.10+ kernel. Start the kernel in the repository
-   root or `examples/decisions/`.
-2. Select **Run All**. The notebook loads the ten bundled messages and displays
-   the request body, then asks for your API key with hidden input if needed.
-3. Enter the key to see ten actual model responses and parsed routing decisions.
-   Do not paste a real key into a code cell.
-
-Every full run makes ten new billable requests. An existing `OPENAI_API_KEY`
-environment variable is also supported. The notebook clears its key variable
-after the request loop; an existing environment variable remains in the kernel.
-
-The notebook and CLI share the same messages, question, and response validation
-from `routing.py`.
-
-## Find the code
+## Files and tests
 
 | File | Purpose |
 | --- | --- |
-| [customer_request_routing.ipynb](customer_request_routing.ipynb) | Explains and executes the routing workflow step by step |
-| [customer_requests.json](customer_requests.json) | Ten public messages and source/license attribution |
-| [routing.py](routing.py) | Loads the ten messages, builds requests, sends API calls, and validates answers |
-| [run_customer_request_routing.py](run_customer_request_routing.py) | Runs the public batch or a custom message and displays actual responses |
-| [run_demo.sh](run_demo.sh) | Collects the key with hidden input and starts the live demo |
-| [test_customer_request_routing.py](test_customer_request_routing.py) | Runs offline application checks with mocked network calls |
-| `README.md` | Introduces the API, use case, commands, outputs, and data source |
+| [customer_request_routing.ipynb](customer_request_routing.ipynb) | Guided walkthrough |
+| [routing.py](routing.py) | Question, HTTP request, and response validation |
+| [customer_requests.json](customer_requests.json) | Ten messages and source metadata |
+| [run_customer_request_routing.py](run_customer_request_routing.py) | Terminal runner |
+| [run_demo.sh](run_demo.sh) | Launcher with hidden key input |
+| [test_customer_request_routing.py](test_customer_request_routing.py) | Offline application tests |
 
-The main helpers are `load_demo_messages()`, `build_request()`,
-`request_prediction()`, and `parse_prediction()`. Change `QUESTION` in `routing.py`
-to adapt the queue choices and descriptions to your application. The response
-parser reads its allowed queues from the same question, so those choices stay
-in sync.
-
-## Optional developer checks
+Run the tests without making API calls:
 
 ```bash
 python3 -m unittest discover -s examples/decisions -p 'test_*.py'
 ```
 
-You do not need to run these tests to use the demo. They are developer checks
-for request budgets, bundled-data validation, credentials,
-refusals, invalid answers, and error handling. They make no paid requests and do
-not evaluate model quality.
-
 ## Data and attribution
 
-BANKING77 is published by PolyAI and attributed to Iñigo Casanueva, Tadas Temcinas,
-Daniela Gerz, Matthew Henderson, and Ivan Vulić (2020),
-[Efficient Intent Detection with Dual Sentence Encoders](https://arxiv.org/abs/2003.04807).
-The publisher distributes it under [CC BY 4.0](https://creativecommons.org/licenses/by/4.0/);
-see the [source repository](https://github.com/PolyAI-LDN/task-specific-datasets/tree/57ec275d8078af65b7731c2a98be812d844a6d6b)
-and [license text](https://github.com/PolyAI-LDN/task-specific-datasets/blob/57ec275d8078af65b7731c2a98be812d844a6d6b/LICENSE).
-
-The ten messages in `customer_requests.json` are selected from four intents in
-the test CSV at commit `57ec275d8078af65b7731c2a98be812d844a6d6b`.
-The source CSV's SHA-256 was verified when preparing the selection:
-`d12d6e3bc4c3103966ae786dc435913c0c563dfa328f5a3646d0e62cfeeb474d`.
-Original wording and source labels are retained. The full CSV is not bundled;
-no dataset download is needed to run the demo. No author endorsement is implied.
-These are public benchmark messages, not private customer records; model exposure
-to this public dataset during training is unknown.
+The ten messages come from [BANKING77](https://github.com/PolyAI-LDN/task-specific-datasets/tree/57ec275d8078af65b7731c2a98be812d844a6d6b/banking_data),
+published by PolyAI under [CC BY 4.0](https://creativecommons.org/licenses/by/4.0/)
+(Casanueva et al., 2020, [paper](https://arxiv.org/abs/2003.04807)). Original wording
+and labels are retained. [customer_requests.json](customer_requests.json) records
+the authors, pinned source, and checksum. No dataset download is needed.

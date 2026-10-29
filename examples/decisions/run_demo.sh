@@ -3,6 +3,9 @@
 set +x
 set -euo pipefail
 script_dir="$(cd "$(dirname "$0")" && pwd)"
+if [[ "${1:-}" == "--help" || "${1:-}" == "-h" ]]; then
+  exec python3 "$script_dir/run_customer_request_routing.py" "$@"
+fi
 trap 'unset OPENAI_API_KEY' EXIT
 if [[ -z "${OPENAI_API_KEY:-}" ]]; then
   if ! read -r -s -p "Paste API key (hidden): " OPENAI_API_KEY; then

@@ -3885,10 +3885,10 @@
     - agents
     - responses
 
-- title: Route customer-support requests with the Decisions API
+- title: Route customer-support messages with the Decisions API
   path: examples/decisions/customer_request_routing.ipynb
   slug: decisions-customer-request-routing
-  description: Route a small batch of public banking-support messages with the Decisions API, inspect typed answers and confidence, and handle refusals with a human-review fallback.
+  description: Build a customer-support router with the Decisions API and GPT-6 Luna. Define queues, route ten banking-support messages, and validate choices and confidence before assigning tickets.
   date: '2026-10-27'
   authors:
     - neusebius

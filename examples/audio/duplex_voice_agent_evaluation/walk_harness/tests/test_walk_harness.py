@@ -62,6 +62,30 @@ def test_recorded_wav_reader_returns_exact_original_pcm() -> None:
     assert read_recorded_pcm(path) == expected
 
 
+def test_recorded_wav_reader_accepts_valid_nondefault_sample_rate(tmp_path: Path) -> None:
+    path = tmp_path / "recording.wav"
+    pcm = bytes(200)
+    write_mono_wav(path, pcm, 16_000)
+
+    assert read_recorded_pcm(path, sample_rate_hz=16_000) == pcm
+
+
+def test_recorded_wav_reader_rejects_sample_aligned_truncation(tmp_path: Path) -> None:
+    path = tmp_path / "truncated.wav"
+    with wave.open(str(path), "wb") as recording:
+        recording.setnchannels(1)
+        recording.setsampwidth(2)
+        recording.setframerate(24_000)
+        recording.writeframes(bytes(200))
+    path.write_bytes(path.read_bytes()[:-2])
+
+    with wave.open(str(path), "rb") as recording:
+        assert recording.getnframes() == 100
+        assert len(recording.readframes(recording.getnframes())) == 198
+    with pytest.raises(ValueError, match="truncated"):
+        read_recorded_pcm(path)
+
+
 @pytest.mark.parametrize(
     ("channels", "width", "sample_rate", "message"),
     [

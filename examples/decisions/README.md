@@ -7,12 +7,10 @@ route requests, or score inputs against a rubric.
 
 In this example, you'll route ten banking-support messages to four specialist
 queues. You'll define a `choice` question, inspect the API's answers, and extract
-a queue and confidence for each message. The example uses **`gpt-6-luna`, the only
-currently supported Decisions model**, with `POST /v1/decisions`.
+a queue and confidence for each message. The example uses **`gpt-6-luna`**.
 
 Open the [notebook](customer_request_routing.ipynb) for the walkthrough, or
-[run the terminal demo](#run-the-demo) to try it immediately. The 10× comparison
-comes from the API guide; this example does not benchmark it.
+[run the terminal demo](#run-the-demo) to try it immediately.
 
 ## What you'll build
 

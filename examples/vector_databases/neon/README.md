@@ -37,6 +37,6 @@ Neon enables you to scale your AI applications with the following features:
 
 - [Building AI applications with Neon](https://neon.tech/ai)
 - [Neon AI & embeddings documentation](https://neon.tech/docs/ai/ai-intro)
-- [Building an AI-powered Chatbot using Vercel, OpenAI, and Postgres](neon.tech/blog/building-an-ai-powered-chatbot-using-vercel-openai-and-postgres)
+- [Building an AI-powered Chatbot using Vercel, OpenAI, and Postgres](https://neon.tech/blog/building-an-ai-powered-chatbot-using-vercel-openai-and-postgres)
 - [Web-based AI SQL Playground and connecting to Postgres from the browser](https://neon.tech/blog/postgres-ai-playground)
 - [pgvector GitHub repository](https://github.com/pgvector/pgvector)

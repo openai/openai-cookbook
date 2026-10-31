@@ -1,0 +1,15 @@
+# Generated reports from local runs
+/outputs/
+
+# Python and notebook caches
+__pycache__/
+*.py[cod]
+.ipynb_checkpoints/
+.pytest_cache/
+.ruff_cache/
+
+# Local environment and credentials
+.venv/
+.env
+.env.*
+!.env.example

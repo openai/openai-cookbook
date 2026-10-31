@@ -3895,3 +3895,15 @@
   tags:
     - decisions
     - classification
+
+- title: Evaluate product-return evidence with the Decisions API
+  path: examples/decisions/product_returns/product_return_evidence.ipynb
+  slug: decisions-product-return-evidence
+  description: Combine customer messages, product photos, and order JSON with the Decisions API to assess return evidence, prepare human review handoffs, and check expected outcomes.
+  date: '2026-10-30'
+  authors:
+    - neusebius-oai
+  tags:
+    - decisions
+    - images
+    - evals

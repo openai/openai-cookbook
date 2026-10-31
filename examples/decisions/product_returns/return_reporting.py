@@ -76,7 +76,14 @@ def write_report(rows, destination, directory):
         )
     # Summarize the same saved responses; grading makes no extra model calls.
     passed = sum(row["grade"]["passed"] for row in rows)
-    tokens = sum(row["response"].get("usage", {}).get("total_tokens", 0) for row in rows)
+    # Preserve unusable responses even when their usage metadata is malformed.
+    tokens = 0
+    for row in rows:
+        response = row["response"]
+        usage = response.get("usage") if isinstance(response, dict) else None
+        count = usage.get("total_tokens") if isinstance(usage, dict) else None
+        if type(count) is int and count >= 0:
+            tokens += count
     unusable = sum(parse_answers(row["response"]) is None for row in rows)
     missed = sum(row["grade"]["missed_escalation"] for row in rows)
     unnecessary = sum(row["grade"]["unnecessary_escalation"] for row in rows)

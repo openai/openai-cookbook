@@ -213,8 +213,10 @@ key before these calls. The Python runner iterates over the cases and prints res
 The notebook adds cell-by-cell explanation, inline photos, and a summary table.
 Both save the same report structure.
 
-The `reported_issue` choice classifies what the customer says. Its probability
-and confidence do not verify physical damage. The separate `photo_usable` and
+The `reported_issue` choice classifies what the customer says. The application
+uses its selected `choice` and `confidence`, which do not verify physical damage.
+The API also returns per-option `probabilities`; this example does not use them
+in its handoff rules. The separate `photo_usable` and
 `visible_damage` predicates assess the latest photo. A customer can therefore
 report a damaged item with high classification confidence while still needing
 to supply a usable product photo.

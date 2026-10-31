@@ -246,6 +246,43 @@ class ReturnEvidenceTests(unittest.TestCase):
             self.assertIn("Unusable API answers sent for specialist review: 1", text)
             self.assertIn("Request preview was not recorded", text)
 
+    def test_reports_preserve_unusable_response_shapes(self):
+        for body in [None, [], "invalid", 7, {"usage": None}]:
+            with self.subTest(body=body), tempfile.TemporaryDirectory() as tmp:
+                handoff = demo.recommend_next_step(self.case, demo.parse_answers(body))
+                rows = [{"case": self.case, "response": body, "handoff": handoff,
+                         "grade": demo.grade_result(self.case["id"], handoff,
+                                                   {self.case["id"]: "specialist_review"}),
+                         "latency_ms": 10}]
+                path = Path(tmp) / "report.html"
+                write_report(rows, path, Path(demo.__file__).parent)
+                self.assertEqual(json.loads(path.with_suffix(".json").read_text()), rows)
+                text = path.read_text()
+                self.assertIn("Unusable API answers sent for specialist review: 1", text)
+                self.assertIn("Total tokens: 0", text)
+
+    def test_reports_tolerate_missing_or_malformed_usage(self):
+        usages = [None, [], "invalid", 7, {}, {"total_tokens": None},
+                  {"total_tokens": "10"}, {"total_tokens": True},
+                  {"total_tokens": -1}, {"total_tokens": 1.5},
+                  {"total_tokens": 12}]
+        for usage in usages:
+            with self.subTest(usage=usage), tempfile.TemporaryDirectory() as tmp:
+                body = response()
+                body["usage"] = usage
+                handoff = demo.recommend_next_step(self.case, demo.parse_answers(body))
+                rows = [{"case": self.case, "response": body, "handoff": handoff,
+                         "grade": demo.grade_result(self.case["id"], handoff,
+                                                   {self.case["id"]: "prepare_for_review"}),
+                         "latency_ms": 10}]
+                path = Path(tmp) / "report.html"
+                write_report(rows, path, Path(demo.__file__).parent)
+                self.assertEqual(json.loads(path.with_suffix(".json").read_text()), rows)
+                text = path.read_text()
+                expected_tokens = 12 if usage == {"total_tokens": 12} else 0
+                self.assertIn(f"Total tokens: {expected_tokens}", text)
+                self.assertIn("Unusable API answers sent for specialist review: 0", text)
+
     def test_invalid_output_stops_cli_before_credentials_or_api_calls(self):
         source = Path(demo.__file__).with_name("return_cases.json")
         with patch.object(sys, "argv", ["runner", "--output", str(source)]), \

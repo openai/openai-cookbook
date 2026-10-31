@@ -201,6 +201,34 @@ class ReturnEvidenceTests(unittest.TestCase):
         finally:
             os.chdir(previous)
 
+    def test_notebook_summary_tolerates_malformed_responses_and_usage(self):
+        notebook = Path(demo.__file__).with_name("product_return_evidence.ipynb")
+        cells = json.loads(notebook.read_text())["cells"]
+        summary = next("".join(cell["source"]) for cell in cells
+                       if cell["cell_type"] == "code"
+                       and "Completed API requests:" in "".join(cell["source"]))
+        bodies = [None, [], "invalid", 7, {"usage": None},
+                  {"usage": {"total_tokens": "10"}},
+                  {"usage": {"total_tokens": True}},
+                  {"usage": {"total_tokens": -1}},
+                  {"usage": {"total_tokens": 1.5}},
+                  {"usage": {"total_tokens": 12}}]
+        rows = []
+        for case, body in zip(self.cases, bodies):
+            handoff = demo.recommend_next_step(case, demo.parse_answers(body))
+            rows.append({"case": case, "response": body, "latency_ms": 10,
+                         "grade": demo.grade_result(case["id"], handoff,
+                                                   {case["id"]: "specialist_review"})})
+        namespace = {"rows": rows, "cases": self.cases,
+                     "parse_answers": demo.parse_answers,
+                     "total_tokens": reporting.total_tokens,
+                     "Markdown": lambda text: text, "display": lambda *args: None}
+        with contextlib.redirect_stdout(io.StringIO()) as output:
+            exec(compile(summary, str(notebook), "exec"), namespace)
+        self.assertIn("Completed API requests: 10/10", output.getvalue())
+        self.assertIn("Total tokens: 12", output.getvalue())
+        self.assertIn("Unusable API answers: 10", output.getvalue())
+
     def test_report_output_cannot_overwrite_bundled_data(self):
         directory = Path(demo.__file__).parent
         source = directory / "return_cases.json"

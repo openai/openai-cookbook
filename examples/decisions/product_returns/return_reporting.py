@@ -33,6 +33,18 @@ def validate_report_path(destination, directory):
         raise ValueError("Report output would overwrite bundled JSON data")
 
 
+def total_tokens(rows):
+    """Sum valid reported token counts without discarding unusable responses."""
+    tokens = 0
+    for row in rows:
+        response = row["response"]
+        usage = response.get("usage") if isinstance(response, dict) else None
+        count = usage.get("total_tokens") if isinstance(usage, dict) else None
+        if type(count) is int and count >= 0:
+            tokens += count
+    return tokens
+
+
 def write_report(rows, destination, directory):
     validate_report_path(destination, directory)
     # Escape customer and model content before inserting it into the HTML report.
@@ -76,14 +88,7 @@ def write_report(rows, destination, directory):
         )
     # Summarize the same saved responses; grading makes no extra model calls.
     passed = sum(row["grade"]["passed"] for row in rows)
-    # Preserve unusable responses even when their usage metadata is malformed.
-    tokens = 0
-    for row in rows:
-        response = row["response"]
-        usage = response.get("usage") if isinstance(response, dict) else None
-        count = usage.get("total_tokens") if isinstance(usage, dict) else None
-        if type(count) is int and count >= 0:
-            tokens += count
+    tokens = total_tokens(rows)
     unusable = sum(parse_answers(row["response"]) is None for row in rows)
     missed = sum(row["grade"]["missed_escalation"] for row in rows)
     unnecessary = sum(row["grade"]["unnecessary_escalation"] for row in rows)

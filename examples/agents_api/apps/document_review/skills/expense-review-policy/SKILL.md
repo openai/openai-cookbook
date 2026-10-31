@@ -47,6 +47,7 @@ Write `/workspace/output/<document-stem>.json` with the following fields:
   "recommendation": "Escalate for human review.",
   "calculation": {
     "line_items": [{"quantity": 2, "unit_price": 100}],
+    "stated_subtotal": 200,
     "shipping": 20,
     "calculated_total": 220,
     "difference": 6200
@@ -56,8 +57,10 @@ Write `/workspace/output/<document-stem>.json` with the following fields:
 
 Every `issues` entry must be a plain-English string, not a nested object.
 Use the actual document values, not the illustrative numbers above. Include every
-invoice line item in `calculation`; `amount` is the stated total. For contracts,
-set `document_type` to `contract` and `calculation` to `null`.
+invoice line item in `calculation`; `stated_subtotal` is the printed subtotal,
+`amount` is the stated total, and `calculated_total` must equal
+`stated_subtotal + shipping`. For contracts, set `document_type` to `contract`
+and `calculation` to `null`.
 
 Only the coordinator writes `summary.json`. A specialist writes its assigned report.
 

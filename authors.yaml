@@ -3,6 +3,11 @@
 # You can optionally customize how your information shows up cookbook.openai.com over here.
 # If your information is not present here, it will be pulled from your GitHub profile.
 
+opencolin:
+  name: "Colin Lowenberg (Tenki)"
+  website: "https://tenki.cloud"
+  avatar: "https://avatars.githubusercontent.com/opencolin"
+
 HsingTang:
   name: "Hsing-chih Tang (Databricks)"
   website: "https://linkedin.com/in/hsingchih-tang"

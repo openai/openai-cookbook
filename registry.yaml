@@ -63,6 +63,18 @@
     - agents
     - sandbox
 
+- title: Run Agents API sandboxes on Tenki
+  path: examples/agents_api/sandboxes/tenki/README.md
+  slug: agents-api-tenki-sandbox
+  description: Run agent tools in Tenki microVM sandboxes restored from a golden image, paused between turns, with application-managed or webhook-managed provisioning.
+  date: 2026-11-01
+  authors:
+    - opencolin
+  tags:
+    - agents-api
+    - agents
+    - sandbox
+
 - title: Run OpenAI agents on a Databricks Sandbox
   path: examples/agents_api/sandboxes/databricks/README.md
   slug: agents-api-databricks-sandbox

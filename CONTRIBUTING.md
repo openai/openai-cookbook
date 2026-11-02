@@ -4,14 +4,18 @@ The OpenAI Cookbook is a community resource for practical patterns, runnable exa
 
 > Contributions are reviewed on a best-effort basis. We cannot guarantee when or whether a contribution will be reviewed or merged.
 
+## Who should contribute a recipe
+
+We welcome recipes from independent developers, OpenAI employees, and people who build third-party tools. Teach readers how to solve one concrete problem with an OpenAI capability. Give them the prerequisites to reproduce the example and explain the choices they'll need to make when they adapt it to their own projects.
+
+For example, a search provider could show how to use OpenAI embeddings to retrieve support articles and test the results against sample queries. A walkthrough that only shows where to paste an OpenAI API key in the provider's dashboard belongs in the provider's own docs. We decline submissions whose main purpose is to promote a product.
+
 ## Choose an issue or a pull request
 
 - For a problem with an existing example or the Cookbook site, open a [problem report](https://github.com/openai/openai-cookbook/issues/new/choose). Name the affected file or page, describe the problem and the expected behavior, and include a small reproduction or screenshot when useful.
 - For a new example or guide, follow the [new Cookbook submission steps](#before-opening-a-pr-for-a-new-cookbook), even if you already have a draft.
 - For other ideas, open a [feature request](https://github.com/openai/openai-cookbook/issues/new/choose).
 - For a focused correction to existing content, you can open a pull request directly. Search existing issues and pull requests first, and link a related issue if there is one.
-
-Keep examples relevant to building with OpenAI technologies. Explain the task they solve, the prerequisites, and the choices a reader needs to understand or adapt them. Prefer a focused, reproducible contribution over a large collection of unrelated examples.
 
 ## Before opening a PR for a new Cookbook
 
@@ -79,7 +83,7 @@ Use the [pull request template](.github/pull_request_template.md) to explain wha
 
 Check the submission against each criterion.
 
-- **Relevance:** Useful to people building with OpenAI technologies.
+- **Relevance:** The recipe [teaches readers how to use an OpenAI capability](#who-should-contribute-a-recipe) in their own projects.
 - **Uniqueness:** Adds information beyond related Cookbook examples and documentation.
 - **Spelling and grammar:** Free of distracting errors.
 - **Clarity:** Organized and understandable.

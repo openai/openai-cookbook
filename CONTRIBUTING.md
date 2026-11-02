@@ -7,16 +7,24 @@ The OpenAI Cookbook is a community resource for practical patterns, runnable exa
 ## Choose an issue or a pull request
 
 - For a problem with an existing example or the Cookbook site, open a [problem report](https://github.com/openai/openai-cookbook/issues/new/choose). Name the affected file or page, describe the problem and the expected behavior, and include a small reproduction or screenshot when useful.
-- For an idea that needs discussion, open a [feature request](https://github.com/openai/openai-cookbook/issues/new/choose) describing the use case and proposed example.
-- For a focused correction or a ready-to-review example, you can open a pull request directly. Search existing issues and pull requests first, and link a related issue if there is one.
+- For a new example or guide, follow the [new Cookbook submission steps](#before-opening-a-pr-for-a-new-cookbook), even if you already have a draft.
+- For other ideas, open a [feature request](https://github.com/openai/openai-cookbook/issues/new/choose).
+- For a focused correction to existing content, you can open a pull request directly. Search existing issues and pull requests first, and link a related issue if there is one.
 
 Keep examples relevant to building with OpenAI technologies. Explain the task they solve, the prerequisites, and the choices a reader needs to understand or adapt them. Prefer a focused, reproducible contribution over a large collection of unrelated examples.
+
+## Before opening a PR for a new Cookbook
+
+1. Share the proposal in the Cookbook maintainers' review channel on Slack. Describe the use case and what readers will learn beyond existing examples. If you lack access, open or reuse a [feature request](https://github.com/openai/openai-cookbook/issues/new/choose) and wait for a maintainer to confirm they shared the proposal.
+2. List each credited author's Cookbook ID under `authors` in [`registry.yaml`](registry.yaml) and verify that their profile picture loads. To register an author or fix a picture, include their `name`, `website`, and a working `avatar` URL under the same ID in [`authors.yaml`](authors.yaml) in your change, or ask a maintainer to update the site profile.
+3. Confirm with each author whether the OpenAI employee badge should appear. Ask a maintainer to verify and handle any badge changes. Keep private review links and verification details out of public issues and PRs.
+
+Ask the relevant product or partner team to review the draft when applicable. The finished Cookbook requires Developer Experience approval before publication.
 
 ## Place and publish content
 
 - Put notebooks, Python scripts, and their related assets in `examples/<topic>/`. Put long-form guides in `articles/` and shared diagrams or screenshots in `images/`.
 - Add an entry to [`registry.yaml`](registry.yaml) for new or relocated content that should appear on [cookbook.openai.com](https://cookbook.openai.com/). Match its `path` to the file. The registry schema requires `title`, `path`, `slug`, `tags`, and `authors`; also provide an accurate description and publication date.
-- [`authors.yaml`](authors.yaml) is optional for custom author information. Without an entry there, the site uses the author's GitHub profile. Use the same author slug in both files if you add custom attribution.
 - Keep large datasets outside the repository and explain how readers can obtain them.
 
 ## Prepare and validate your change
@@ -35,7 +43,7 @@ Read credentials from environment variables such as `OPENAI_API_KEY`; never comm
 
 ## Open a pull request
 
-Use the [pull request template](.github/pull_request_template.md) to explain what changed and why. Include the validation you ran, link related issues, and add screenshots or output snippets when they help reviewers check the result. For new published content, complete the template's `registry.yaml` and optional `authors.yaml` checklist and review the submission against the rubric below.
+Use the [pull request template](.github/pull_request_template.md) to explain what changed and why. Include the validation you ran, link related issues, and add screenshots or output snippets when they help reviewers check the result. For new content, complete the submission checklist and review the Cookbook against the rubric below.
 
 ### Rubric
 

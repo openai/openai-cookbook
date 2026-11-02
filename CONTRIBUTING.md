@@ -16,8 +16,8 @@ Keep examples relevant to building with OpenAI technologies. Explain the task th
 ## Before opening a PR for a new Cookbook
 
 1. Share the proposal in the Cookbook maintainers' review channel on Slack. Describe the use case and what readers will learn beyond existing examples. If you lack access, open or reuse a [feature request](https://github.com/openai/openai-cookbook/issues/new/choose) and wait for a maintainer to confirm they shared the proposal.
-2. List each credited author's Cookbook ID under `authors` in [`registry.yaml`](registry.yaml) and verify that their profile picture loads. To register an author or fix a picture, include their `name`, `website`, and a working `avatar` URL under the same ID in [`authors.yaml`](authors.yaml) in your change, or ask a maintainer to update the site profile.
-3. Confirm with each author whether the OpenAI employee badge should appear. Ask a maintainer to verify and handle any badge changes. Keep private review links and verification details out of public issues and PRs.
+2. List each credited author's Cookbook ID under `authors` in [`registry.yaml`](registry.yaml). Check that each author has a profile with a working picture. To add or update a Cookbook profile, set `name`, `website`, and `avatar` under the same ID in [`authors.yaml`](authors.yaml). If the site manages that profile, ask a site maintainer to update it.
+3. Confirm with each author whether the OpenAI employee badge should appear. If a badge needs to be added or corrected, ask a site maintainer to verify eligibility and update it on the site. Keep private review links and verification details out of public issues and PRs.
 
 Ask the relevant product or partner team to review the draft when applicable. The finished Cookbook requires Developer Experience approval before publication.
 

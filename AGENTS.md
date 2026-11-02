@@ -23,7 +23,7 @@ Execute notebooks top-to-bottom after installing dependencies and clear lingerin
 
 ## Commit & Pull Request Guidelines
 
-Before opening a PR for a new example or guide, follow the [new Cookbook submission steps](CONTRIBUTING.md#before-opening-a-pr-for-a-new-cookbook). Confirm the proposal was shared for review, check each existing or proposed author profile and picture, and confirm whether each author should have the employee badge. If any check is pending, keep working locally and ask the author or a maintainer for confirmation.
+Before opening a PR for a new example or guide, follow the [new Cookbook submission steps](CONTRIBUTING.md#before-opening-a-pr-for-a-new-cookbook). Confirm the proposal was shared for review. Check each author's credit and profile picture, confirm with the author whether the OpenAI employee badge applies, and refer any badge changes to a site maintainer. If you lack confirmation, keep working locally and ask the author or a maintainer.
 
 Use concise, imperative commit messages that describe the change scope (e.g., "Add agent portfolio collaboration demo"). Every PR should provide a summary, motivation, and self-review. Complete the submission checklist in `.github/pull_request_template.md` for new content. Link issues when applicable and attach screenshots or output snippets for UI-heavy content. Confirm CI notebook validation passes locally before requesting review.
 

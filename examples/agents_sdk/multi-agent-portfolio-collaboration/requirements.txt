@@ -14,3 +14,4 @@ tabulate
 requests
 pydantic
 logging
+mcp<2

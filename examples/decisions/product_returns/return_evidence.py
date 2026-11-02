@@ -102,8 +102,15 @@ def build_request(case, directory=None):
     """Include only evidence. Expected labels never enter the API request."""
     directory = Path(directory) if directory else Path(__file__).parent
     messages = []
+    last_user_content = None
+    conversation = case.get("conversation")
+    if not isinstance(conversation, list):
+        raise ValueError("Conversation must be a list of user and assistant turns")
     # Preserve turn order so newer evidence can clarify an earlier request.
-    for turn in case["conversation"]:
+    for turn in conversation:
+        if (not isinstance(turn, dict) or turn.get("role") not in ("user", "assistant")
+                or not isinstance(turn.get("text"), str)):
+            raise ValueError("Each conversation turn needs a user or assistant role and text")
         if turn["role"] == "assistant":
             messages.append({"role": "assistant", "content": turn["text"]})
             continue
@@ -117,8 +124,11 @@ def build_request(case, directory=None):
                 "image_url": "data:image/png;base64," + base64.b64encode(image).decode("ascii"),
             })
         messages.append({"role": "user", "content": content})
-    # Add order details as structured JSON; reference labels are excluded.
-    messages[-1]["content"].append({"type": "input_json", "data": {"order": case["order"]}})
+        last_user_content = content
+    if last_user_content is None:
+        raise ValueError("Conversation must contain at least one user turn")
+    # JSON evidence belongs on a user message, even after an assistant reply.
+    last_user_content.append({"type": "input_json", "data": copy.deepcopy({"order": case["order"]})})
     return {"model": MODEL, "input": messages, "questions": copy.deepcopy(QUESTIONS)}
 
 

@@ -178,7 +178,8 @@ run_product_return_evidence.py   product_return_evidence.ipynb
    case coverage and labels before any paid request.
 2. **Build the request.** `build_request(case)` preserves conversation order,
    encodes local photos into `input_image` parts, and adds order details as
-   `input_json`. It attaches the shared `QUESTIONS` definition. Expected outcomes
+   `input_json` on the last user message, even if an assistant reply follows.
+   It attaches the shared `QUESTIONS` definition. Expected outcomes
    are not included in the request.
 3. **Show what will be sent.** `display_request(payload)` makes a copy with image
    bytes omitted for readability. The original payload still contains the photos.
@@ -208,10 +209,7 @@ handoff = recommend_next_step(case, answers)
 grade = grade_result(case["id"], handoff, expectations)
 ```
 
-The entry points load each case and its reference outcome and obtain the API
-key before these calls. The Python runner iterates over the cases and prints results.
-The notebook adds cell-by-cell explanation, inline photos, and a summary table.
-Both save the same report structure.
+Load the cases, reference outcomes, and API key before running this sequence.
 
 The `reported_issue` choice classifies what the customer says. The application
 uses its selected `choice` and `confidence`, which do not verify physical damage.
@@ -234,14 +232,9 @@ when constructing development and held-out evaluation splits.
 
 ![Synthetic dented stainless steel kettle](images/dented_kettle.png)
 
-All seven photos were generated for this example with OpenAI image generation.
-They illustrate a cracked mug, an intact mug, a dented bottle, a dented kettle, damaged
-packaging beside an intact mug, an unusably blurred mug, and a closed shipping box. They are synthetic
-illustrations, not customer photographs or evidence about actual products.
-Generation prompts and SHA-256 checksums are recorded in
-[provenance.json](images/provenance.json). Reference outcomes
-were authored after visually inspecting the generated images. No BANKING77
-data or external customer records are used in this tutorial.
+The seven photos are synthetic illustrations generated with OpenAI image
+generation. See [provenance.json](images/provenance.json) for the generation
+prompts and SHA-256 checksums.
 
 ## Developer checks
 

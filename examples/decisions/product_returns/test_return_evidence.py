@@ -119,6 +119,41 @@ class ReturnEvidenceTests(unittest.TestCase):
         self.assertEqual([m["role"] for m in conversation], ["user", "assistant", "user"])
         self.assertIn("input_json", [p["type"] for p in conversation[-1]["content"]])
 
+    def test_order_json_stays_on_last_user_turn_after_assistant_replies(self):
+        for template in [self.cases[0], self.cases[-1]]:
+            for reply_count in [1, 2]:
+                with self.subTest(case=template["id"], reply_count=reply_count):
+                    case = copy.deepcopy(template)
+                    case["conversation"].extend(
+                        {"role": "assistant", "text": "Thanks, we will review the evidence."}
+                        for _ in range(reply_count))
+                    original = copy.deepcopy(case)
+                    payload = demo.build_request(case)
+                    messages = payload["input"]
+                    self.assertEqual([m["role"] for m in messages],
+                                     [t["role"] for t in case["conversation"]])
+                    last_user = next(m for m in reversed(messages) if m["role"] == "user")
+                    json_parts = [p for m in messages if m["role"] == "user"
+                                  for p in m["content"] if p["type"] == "input_json"]
+                    self.assertEqual(json_parts, [{"type": "input_json", "data": {"order": case["order"]}}])
+                    self.assertEqual(last_user["content"][-1], json_parts[0])
+                    self.assertTrue(all(isinstance(m["content"], str) for m in messages
+                                        if m["role"] == "assistant"))
+                    self.assertEqual(case, original)
+                    json_parts[0]["data"]["order"]["id"] = "changed in payload"
+                    self.assertEqual(case, original)
+
+    def test_unsupported_conversations_are_rejected_before_requesting(self):
+        histories = [None, {}, [], [{"role": "assistant", "text": "Thanks"}],
+                     [None], [{"role": "tool", "text": "Not supported by this helper"}],
+                     [{"role": "user", "text": []}]]
+        for history in histories:
+            with self.subTest(history=history):
+                case = copy.deepcopy(self.case)
+                case["conversation"] = history
+                with self.assertRaisesRegex(ValueError, "[Cc]onversation"):
+                    demo.build_request(case)
+
     def test_payload_preview_does_not_mutate_the_sent_image(self):
         payload = demo.build_request(self.case)
         original = payload["input"][0]["content"][1]["image_url"]

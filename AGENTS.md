@@ -23,9 +23,9 @@ Execute notebooks top-to-bottom after installing dependencies and clear lingerin
 
 ## Commit & Pull Request Guidelines
 
-Before opening a PR for a new example or guide, follow the [new Cookbook submission steps](CONTRIBUTING.md#before-opening-a-pr-for-a-new-cookbook). Confirm the proposal was shared for review. Check each author's credit and profile picture, confirm with the author whether the OpenAI employee badge applies, and refer any badge changes to a site maintainer. If you lack confirmation, keep working locally and ask the author or a maintainer.
+Before opening a PR for a new example or guide, complete the [Cookbook submission checklist](CONTRIBUTING.md#before-opening-a-pr-for-a-new-cookbook), including [tag selection](CONTRIBUTING.md#choose-cookbook-tags).
 
-Use concise, imperative commit messages that describe the change scope (e.g., "Add agent portfolio collaboration demo"). Every PR should provide a summary, motivation, and self-review. Complete the submission checklist in `.github/pull_request_template.md` for new content. Link issues when applicable and attach screenshots or output snippets for UI-heavy content. Confirm CI notebook validation passes locally before requesting review.
+Use concise, imperative commit messages that describe the change scope (e.g., "Add agent portfolio collaboration demo"). Every PR should provide a summary, motivation, and self-review. Link issues when applicable and attach screenshots or output snippets for UI-heavy content. Confirm CI notebook validation passes locally before requesting review.
 
 Before a pull request is merged, run the repository's `docs-editor` skill on every changed article, Markdown or MDX file, and notebook Markdown cell. For editorial notebook changes, preserve code cells, outputs, execution counts, attachments, cell order, and metadata. Fix safe issues, rerun the relevant checks, and resolve or explicitly document all remaining P0 and P1 findings in the pull request.
 

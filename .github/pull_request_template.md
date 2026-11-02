@@ -10,18 +10,5 @@ Why are these changes necessary? How do they improve the cookbook?
 
 ## For new content
 
-When contributing new content, read through our [contribution guidelines](https://github.com/openai/openai-cookbook/blob/main/CONTRIBUTING.md), and mark the following action items as completed:
-
-- [ ] The proposal was shared for maintainer review before I opened this PR.
-- [ ] The new [registry.yaml](https://github.com/openai/openai-cookbook/blob/main/registry.yaml) entry lists each credited author's Cookbook ID.
-- [ ] I verified that every credited author has a working profile picture, including any authors added in this PR.
-- [ ] I confirmed with each author whether the OpenAI employee badge should appear and asked a site maintainer to handle any badge changes.
-- [ ] I have conducted a self-review of my content based on the [contribution guidelines](https://github.com/openai/openai-cookbook/blob/main/CONTRIBUTING.md#rubric):
-  - [ ] Relevance: This content is related to building with OpenAI technologies and is useful to others.
-  - [ ] Uniqueness: I have searched for related examples in the OpenAI Cookbook, and verified that my content offers new insights or unique information compared to existing documentation.
-  - [ ] Spelling and Grammar: I have checked for spelling or grammatical mistakes.
-  - [ ] Clarity: I have done a final read-through and verified that my submission is well-organized and easy to understand.
-  - [ ] Correctness: The information I include is correct and all of my code executes successfully.
-  - [ ] Completeness: I have explained everything fully, including all necessary references and citations.
-
-We will rate each of these areas on a scale from 1 to 4, and will only accept contributions that score 3 or higher on all areas. Refer to our [contribution guidelines](https://github.com/openai/openai-cookbook/blob/main/CONTRIBUTING.md) for more details.
+- [ ] I completed the [new Cookbook submission steps](https://github.com/openai/openai-cookbook/blob/main/CONTRIBUTING.md#before-opening-a-pr-for-a-new-cookbook) before opening this PR.
+- [ ] I reviewed the recipe against the [Cookbook rubric](https://github.com/openai/openai-cookbook/blob/main/CONTRIBUTING.md#rubric).

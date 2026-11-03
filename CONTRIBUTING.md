@@ -4,12 +4,6 @@ The OpenAI Cookbook is a community resource for practical patterns, runnable exa
 
 > Contributions are reviewed on a best-effort basis. We cannot guarantee when or whether a contribution will be reviewed or merged.
 
-## Who should contribute a recipe
-
-We welcome recipes from independent developers, OpenAI employees, and people who build third-party tools. Teach readers how to solve one concrete problem with an OpenAI capability. Explain the choices readers can adapt to their own projects.
-
-A search provider could teach readers how to retrieve support articles with OpenAI embeddings and evaluate the results. A dashboard walkthrough that ends at entering an API key belongs in the provider's docs. We decline product pitches.
-
 ## Choose an issue or a pull request
 
 - For a problem with an existing example or the Cookbook site, open a [problem report](https://github.com/openai/openai-cookbook/issues/new/choose). Name the affected file or page, describe the problem and the expected behavior, and include a small reproduction or screenshot when useful.
@@ -79,7 +73,7 @@ Use the [pull request template](.github/pull_request_template.md) to explain wha
 
 ### Rubric
 
-- **Relevance:** The recipe [teaches readers how to use an OpenAI capability](#who-should-contribute-a-recipe) in their own projects.
+- **Relevance:** The recipe teaches readers how to use an OpenAI capability in their own projects.
 - **Uniqueness:** Search related Cookbook examples and documentation to verify that the recipe teaches something new.
 - **Spelling and grammar:** Free of distracting errors.
 - **Clarity:** Organized and understandable.

@@ -6,14 +6,14 @@ The OpenAI Cookbook is a community resource for practical patterns, runnable exa
 
 ## Who should contribute a recipe
 
-We welcome recipes from independent developers, OpenAI employees, and people who build third-party tools. Teach readers how to solve one concrete problem with an OpenAI capability. Give them the prerequisites to reproduce the example and explain the choices they'll need to make when they adapt it to their own projects.
+We welcome recipes from independent developers, OpenAI employees, and people who build third-party tools. Teach readers how to solve one concrete problem with an OpenAI capability. Explain the choices readers can adapt to their own projects.
 
-For example, a search provider could show how to use OpenAI embeddings to retrieve support articles and test the results against sample queries. A walkthrough that only shows where to paste an OpenAI API key in the provider's dashboard belongs in the provider's own docs. We decline submissions whose main purpose is to promote a product.
+A search provider could teach readers how to retrieve support articles with OpenAI embeddings and evaluate the results. A dashboard walkthrough that ends at entering an API key belongs in the provider's docs. We decline product pitches.
 
 ## Choose an issue or a pull request
 
 - For a problem with an existing example or the Cookbook site, open a [problem report](https://github.com/openai/openai-cookbook/issues/new/choose). Name the affected file or page, describe the problem and the expected behavior, and include a small reproduction or screenshot when useful.
-- For a new example or guide, follow the [new Cookbook submission steps](#before-opening-a-pr-for-a-new-cookbook), even if you already have a draft.
+- For a new example or guide, follow the [new Cookbook submission steps](#before-opening-a-pr-for-a-new-cookbook).
 - For other ideas, open a [feature request](https://github.com/openai/openai-cookbook/issues/new/choose).
 - For a focused correction to existing content, you can open a pull request directly. Search existing issues and pull requests first, and link a related issue if there is one.
 
@@ -21,10 +21,10 @@ For example, a search provider could show how to use OpenAI embeddings to retrie
 
 1. Share the proposal in the Cookbook maintainers' review channel on Slack. Describe the use case and what readers will learn beyond existing examples. If you lack access, open or reuse a [feature request](https://github.com/openai/openai-cookbook/issues/new/choose) and wait for a maintainer to confirm they shared the proposal.
 2. List each credited author's Cookbook ID under `authors` in [`registry.yaml`](registry.yaml). Check that each author has a profile with a working picture. To add or update a Cookbook profile, set `name`, `website`, and `avatar` under the same ID in [`authors.yaml`](authors.yaml). If the site manages that profile, ask a site maintainer to update it.
-3. Confirm with each author whether the OpenAI employee badge should appear. If a badge needs to be added or corrected, ask a site maintainer to verify eligibility and update it on the site. Keep private review links and verification details out of public issues and PRs.
+3. Confirm with each author whether the OpenAI employee badge should appear. Ask a site maintainer to verify eligibility and make any badge changes. Keep private review links and verification details out of public issues and PRs.
 4. [Choose a tag](#choose-cookbook-tags) for the OpenAI capability the recipe teaches.
 
-If you still need confirmation about the proposal or an author, ask the author or a maintainer before opening the PR. Ask the relevant product or partner team to review the draft when applicable. The finished Cookbook requires Developer Experience approval before publication.
+Ask the relevant product or partner team to review the draft when applicable. The finished Cookbook requires Developer Experience approval before publication.
 
 ## Place and publish content
 
@@ -34,9 +34,7 @@ If you still need confirmation about the proposal or an author, ask the author o
 
 ### Choose Cookbook tags
 
-For a new recipe, choose at least one `registry.yaml` tag below that matches what readers will learn. Mention relevant libraries in the title or description. For example, use `embeddings` for a recipe that uses `tiktoken` to prepare long inputs for embeddings.
-
-These are the tags grouped under each topic on the [Cookbook homepage](https://developers.openai.com/cookbook).
+Choose at least one registry tag for the capability the recipe teaches. The table groups tags by [Cookbook homepage topic](https://developers.openai.com/cookbook). For a recipe about embedding long inputs with `tiktoken`, use the `embeddings` tag and mention the library in the title or description.
 
 | Homepage topic | Registry tags |
 | --- | --- |
@@ -77,20 +75,18 @@ Read credentials from environment variables such as `OPENAI_API_KEY`; never comm
 
 ## Open a pull request
 
-Use the [pull request template](.github/pull_request_template.md) to explain what changed and why. Include the validation you ran, link related issues, and add screenshots or output snippets when they help reviewers check the result. For new content, complete the submission checklist and review the Cookbook against the rubric below.
+Use the [pull request template](.github/pull_request_template.md) to explain what changed and why. Include the validation you ran, link related issues, and add screenshots or output snippets when they help reviewers check the result.
 
 ### Rubric
 
-Check the submission against each criterion.
-
 - **Relevance:** The recipe [teaches readers how to use an OpenAI capability](#who-should-contribute-a-recipe) in their own projects.
-- **Uniqueness:** Search for related Cookbook examples and documentation. Check what readers will learn from your recipe that those sources don't already cover.
+- **Uniqueness:** Search related Cookbook examples and documentation to verify that the recipe teaches something new.
 - **Spelling and grammar:** Free of distracting errors.
 - **Clarity:** Organized and understandable.
 - **Correctness:** Claims and code have been checked; code runs as described.
 - **Completeness:** Includes the context, references, and citations readers need.
 
-Reviewers rate each area from 1 to 4. A submission needs at least 3 in every area to be accepted. Maintainers review contributions on a best-effort basis and may ask for revisions.
+Reviewers rate each area from 1 to 4. A submission needs at least 3 in every area to be accepted. Maintainers may ask for revisions.
 
 ## Find the right place for help
 

@@ -23,7 +23,7 @@ Execute notebooks top-to-bottom after installing dependencies and clear lingerin
 
 ## Commit & Pull Request Guidelines
 
-Before opening a PR for a new example or guide, complete the [Cookbook submission checklist](CONTRIBUTING.md#before-opening-a-pr-for-a-new-cookbook), including [tag selection](CONTRIBUTING.md#choose-cookbook-tags).
+Before opening a PR for a new example or guide, complete the [Cookbook submission checklist](CONTRIBUTING.md#before-opening-a-pr-for-a-new-cookbook).
 
 Before a pull request is merged, run the repository's `docs-editor` skill on every changed article, Markdown or MDX file, and notebook Markdown cell. For editorial notebook changes, preserve code cells, outputs, execution counts, attachments, cell order, and metadata. Fix safe issues, rerun the relevant checks, and resolve or explicitly document all remaining P0 and P1 findings in the pull request.
 

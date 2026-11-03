@@ -84,7 +84,7 @@ Use the [pull request template](.github/pull_request_template.md) to explain wha
 Check the submission against each criterion.
 
 - **Relevance:** The recipe [teaches readers how to use an OpenAI capability](#who-should-contribute-a-recipe) in their own projects.
-- **Uniqueness:** Adds information beyond related Cookbook examples and documentation.
+- **Uniqueness:** Search for related Cookbook examples and documentation. Check what readers will learn from your recipe that those sources don't already cover.
 - **Spelling and grammar:** Free of distracting errors.
 - **Clarity:** Organized and understandable.
 - **Correctness:** Claims and code have been checked; code runs as described.

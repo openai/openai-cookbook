@@ -19,7 +19,7 @@ In a [GPT-Live session](https://developers.openai.com/api/docs/guides/live-conve
 
 ## Prerequisites and setup
 
-You can listen to either example on this page. To run the examples, use Python 3.12 and the [companion package](https://github.com/openai/openai-cookbook/blob/b71327cc3713b87229eab2407c07ff8b95c9a00d/examples/audio/sop_voice_workflows/README.md). Run the following commands from the root of your OpenAI Cookbook clone. Use a fresh output directory for each run.
+Play the recordings inline on the Cookbook site, or use the MP3 links when reading on GitHub. To run the examples, use Python 3.12 and the [companion package](https://github.com/openai/openai-cookbook/blob/b71327cc3713b87229eab2407c07ff8b95c9a00d/examples/audio/sop_voice_workflows/README.md). Run the following commands from the root of your OpenAI Cookbook clone. Use a fresh output directory for each run.
 
 ```sh
 cd examples/audio/sop_voice_workflows
@@ -88,7 +88,9 @@ Trace the late tracking handoff and the replacement in the [full-size Blossom St
 
 In this call, the customer starts with “Where’s my order?” and ends with a confirmed replacement for a broken desk lamp.
 
-<audio controls preload="metadata" aria-label="Blossom Store. A customer reports a broken lamp and accepts a replacement." src="../examples/audio/sop_voice_workflows/recordings/blossom-late-handoff.mp3"></audio>
+<audio controls preload="metadata" aria-label="Blossom Store. A customer reports a broken lamp and accepts a replacement." src="../examples/audio/sop_voice_workflows/recordings/blossom-late-handoff.mp3">
+  <a href="../examples/audio/sop_voice_workflows/recordings/blossom-late-handoff.mp3?raw=true">Download the broken-lamp call (MP3)</a>
+</audio>
 
 <details id="blossom-tool-calls" style="border: 1px solid #84848455; border-radius: 8px; padding: 0.75rem 1rem">
 <summary style="cursor: pointer"><strong>Show tool calls</strong></summary>
@@ -146,7 +148,9 @@ Python checks facts the store can verify. The offered quote must still belong to
 
 **The caller asks for $35.** GPT-Live explains that the store can offer $20 and asks whether the caller wants it. The store issues no credit.
 
-<audio controls preload="metadata" aria-label="Blossom Store. The caller asks for $35 after a $20 offer." src="../examples/audio/sop_voice_workflows/recordings/blossom-consent-counteroffer.mp3"></audio>
+<audio controls preload="metadata" aria-label="Blossom Store. The caller asks for $35 after a $20 offer." src="../examples/audio/sop_voice_workflows/recordings/blossom-consent-counteroffer.mp3">
+  <a href="../examples/audio/sop_voice_workflows/recordings/blossom-consent-counteroffer.mp3?raw=true">Download the $35 counteroffer (MP3)</a>
+</audio>
 
 <details><summary><strong>Inspect the counteroffer tool calls</strong></summary>
 
@@ -158,7 +162,9 @@ We also [tested a mistaken write request](../examples/audio/sop_voice_workflows/
 
 **The caller accepts.** This caller says, “That works for me. Let’s do that.” Listen for the offer before the reply and the confirmation after the store issues the credit.
 
-<audio controls preload="metadata" aria-label="Blossom Store. The caller accepts the $20 credit in their own words." src="../examples/audio/sop_voice_workflows/recordings/blossom-consent-acceptance.mp3"></audio>
+<audio controls preload="metadata" aria-label="Blossom Store. The caller accepts the $20 credit in their own words." src="../examples/audio/sop_voice_workflows/recordings/blossom-consent-acceptance.mp3">
+  <a href="../examples/audio/sop_voice_workflows/recordings/blossom-consent-acceptance.mp3?raw=true">Download the accepted $20 credit (MP3)</a>
+</audio>
 
 <details><summary><strong>Inspect the accepted credit and its consent check</strong></summary>
 
@@ -179,7 +185,9 @@ The store retrieved the order at 0:05.84 and checked eligibility at 0:06.88. Aft
 
 <details><summary><strong>Hear what happens when the caller interrupts the offer</strong></summary>
 
-<audio controls preload="none" aria-label="Blossom Store. The caller interrupts the credit offer and asks GPT-Live to repeat it." src="../examples/audio/sop_voice_workflows/recordings/blossom-interruption.mp3"></audio>
+<audio controls preload="none" aria-label="Blossom Store. The caller interrupts the credit offer and asks GPT-Live to repeat it." src="../examples/audio/sop_voice_workflows/recordings/blossom-interruption.mp3">
+  <a href="../examples/audio/sop_voice_workflows/recordings/blossom-interruption.mp3?raw=true">Download the interrupted offer (MP3)</a>
+</audio>
 
 In this earlier recording, the caller spoke over GPT-Live at 0:10.82 before it had asked permission. GPT-Live repeated the $20 amount, named the original payment method, and asked again. The caller’s new “Yes” began at 0:20.92. The store registered the credit once at 0:23.74.
 
@@ -241,13 +249,33 @@ GPT-Live asks which day the candidate can start. “Yeah, I could work any shift
 
 At **0:13.26**, the app saves Monday and asks the ATS what comes next. The ATS returns the shift question and lists `either` as an allowed answer. Since the candidate already said any shift works, the app saves `either` and asks the ATS again. Only the confirmation goes back to GPT-Live. Listen for the interviewer to read back both choices and ask the candidate to confirm them.
 
-<iframe src="../examples/audio/sop_voice_workflows/recordings/interview-multi-answer.html" title="Hear the Monday answer and inspect both ATS saves and lookups" width="100%" height="410" style="display: block; width: 100%; border: 1px solid #84848455; border-radius: 8px;" loading="lazy" sandbox="allow-scripts"></iframe>
+<audio controls preload="metadata" aria-label="Availability interview. The candidate can work any shift on Monday." src="../examples/audio/sop_voice_workflows/recordings/interview-multi-answer.mp3">
+  <a href="../examples/audio/sop_voice_workflows/recordings/interview-multi-answer.mp3?raw=true">Download the Monday interview (MP3)</a>
+</audio>
 
-Open the [recording and tool timeline](../examples/audio/sop_voice_workflows/recordings/interview-multi-answer.html) to inspect each lookup.
+<details>
+<summary>Inspect the Monday tool calls</summary>
+
+The timeline groups four calls at **0:13.26**, in the order the app ran them.
+
+| ATS call | Result |
+| --- | --- |
+| `record_answer({"question_id": "day", "value": "Monday"})` | Saved Monday at revision 1. |
+| `get_next_question({})` | Returned the shift question with `either` among the allowed answers. |
+| `record_answer({"question_id": "shift", "value": "either"})` | Saved the shift at revision 2. |
+| `get_next_question({})` | Returned the confirmation question. |
+
+At **0:29.00**, after the candidate confirmed both choices, `complete_interview({"day": "Monday", "shift": "either"})` recorded completion at revision 3.
+
+</details>
+
+Open the [full Monday timeline](../examples/audio/sop_voice_workflows/recordings/interview-multi-answer.html) to jump to a handoff or tool call in the recording.
 
 **When an answer has a condition.** The candidate says, “Tuesday, if the shift ends before five.” GPT-Live hands the answer to the app. The app keeps Tuesday and the candidate’s condition together. The ATS has no shift hours to check, so GPT-Live explains that and asks whether to leave Tuesday unconfirmed. Listen for the follow-up. The ATS still had no confirmed start day when the call ended.
 
-<audio controls preload="metadata" aria-label="Interview call with tentative Tuesday availability and a five o'clock finish condition" src="../examples/audio/sop_voice_workflows/recordings/interview-conditional-clarification.mp3"></audio>
+<audio controls preload="metadata" aria-label="Interview call with tentative Tuesday availability and a five o'clock finish condition" src="../examples/audio/sop_voice_workflows/recordings/interview-conditional-clarification.mp3">
+  <a href="../examples/audio/sop_voice_workflows/recordings/interview-conditional-clarification.mp3?raw=true">Download the conditional Tuesday answer (MP3)</a>
+</audio>
 
 <details>
 <summary>What happened in the two test calls?</summary>
@@ -264,7 +292,9 @@ Once the ATS has a day and shift, it returns both as a summary. GPT-Live reads t
 
 In the [recorded Tuesday call](../examples/audio/sop_voice_workflows/recordings/interview-handoff.html), Decisions flagged the answer at **0:09.32**. GPT-Live delegated at **0:09.68**, but the test deliberately held that handoff. At **0:10.96**, the controller logged `decisions_recovery` and asked Luna to interpret the answer. At **0:12.66**, the ATS saved Tuesday once and returned the shift question. The late handoff reached the same answer and produced no second save.
 
-<audio controls preload="metadata" aria-label="Tuesday answer with a deliberately delayed handoff" src="../examples/audio/sop_voice_workflows/recordings/interview-handoff.mp3"></audio>
+<audio controls preload="metadata" aria-label="Tuesday answer with a deliberately delayed handoff" src="../examples/audio/sop_voice_workflows/recordings/interview-handoff.mp3">
+  <a href="../examples/audio/sop_voice_workflows/recordings/interview-handoff.mp3?raw=true">Download the late Tuesday handoff (MP3)</a>
+</audio>
 
 Read the `reason` on the controller’s `app.route` event to see what started interpretation. The app records one reason for each transcript update it processes.
 
@@ -300,7 +330,9 @@ self.start(self.process(t, scope, labels))
 
 <details><summary><strong>Hear the two cancellation requests and inspect the result</strong></summary>
 
-<audio controls preload="none" aria-label="A candidate considers cancelling, then clearly asks to stop." src="../examples/audio/sop_voice_workflows/recordings/interview-cancel.mp3"></audio>
+<audio controls preload="none" aria-label="A candidate considers cancelling, then clearly asks to stop." src="../examples/audio/sop_voice_workflows/recordings/interview-cancel.mp3">
+  <a href="../examples/audio/sop_voice_workflows/recordings/interview-cancel.mp3?raw=true">Download the cancellation call (MP3)</a>
+</audio>
 
 Decisions marked “Maybe cancel” as `incomplete`. The app left the record open. After the second reply, Decisions returned `unconditional` and the backend requested cancellation. The ATS ran `cancel_interview({})` once.
 
@@ -308,7 +340,9 @@ Decisions marked “Maybe cancel” as `incomplete`. The app left the record ope
 
 **A failed lookup.** The ATS saved Tuesday, but it could not supply the next question. The app paused the session with the record still open. On the receiver recording, GPT-Live says, “I saved Tuesday. I couldn’t retrieve the next question, so we’ll pause here.” This workflow has no recruiting follow-up queue.
 
-<audio controls preload="metadata" aria-label="Availability interview. Tuesday is saved and the interviewer pauses when the next question is unavailable." src="../examples/audio/sop_voice_workflows/recordings/interview-lookup-pause.mp3"></audio>
+<audio controls preload="metadata" aria-label="Availability interview. Tuesday is saved and the interviewer pauses when the next question is unavailable." src="../examples/audio/sop_voice_workflows/recordings/interview-lookup-pause.mp3">
+  <a href="../examples/audio/sop_voice_workflows/recordings/interview-lookup-pause.mp3?raw=true">Download the failed lookup (MP3)</a>
+</audio>
 
 <details id="failed-lookup-tool-calls" style="border: 1px solid #84848455; border-radius: 8px; padding: 0.75rem 1rem">
 <summary style="cursor: pointer"><strong>Show tool calls</strong></summary>

@@ -4,6 +4,20 @@
 # should build pages for, and indicates metadata such as tags, creation date and
 # authors for each page.
 
+- title: Build a voice agent that follows an SOP
+  path: articles/sop_to_voice_agent_builder.md
+  slug: sop-to-voice-agent-builder
+  description: Turn a written SOP into prompts, tools, and application checks that keep a voice agent on the right procedure when a caller changes their request or corrects an answer.
+  date: '2026-11-03'
+  authors:
+    - erikakettleson-openai
+  tags:
+    - audio
+    - speech
+    - agents
+    - prompting
+    - evals
+
 - title: Harness-aware evaluation of plugins
   path: examples/partners/harness_aware_plugin_evals/harness_aware_plugin_evals.ipynb
   slug: harness-aware-plugin-evals

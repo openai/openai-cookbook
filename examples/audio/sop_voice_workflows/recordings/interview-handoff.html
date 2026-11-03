@@ -1,0 +1,557 @@
+<!doctype html>
+<html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Getting the next interview question</title><style>
+:root{color-scheme:light dark;font:16px/1.5 system-ui,sans-serif}body{max-width:48rem;margin:0 auto;padding:1rem}
+h1{font-size:1.65rem;margin:.45rem 0}h2{font-size:1.15rem;margin:1.1rem 0 .2rem}
+audio{width:100%;margin:.25rem 0}ol{list-style:none;padding:0}li{display:grid;grid-template-columns:3.6rem minmax(0,1fr);gap:.6rem;border-top:1px solid color-mix(in srgb, currentColor 25%, transparent);padding:.5rem 0}
+button{font:inherit;font-variant-numeric:tabular-nums;color:inherit;cursor:pointer;text-decoration:underline;align-self:start;border:0;background:none;padding:0}summary{cursor:pointer}.role{font-size:.82rem;font-weight:bold}pre{white-space:pre-wrap;overflow-wrap:anywhere;font-size:.84rem}button:focus-visible,summary:focus-visible{outline:2px solid currentColor;outline-offset:2px}
+</style></head><body><main><h1>Getting the next interview question</h1><p>The candidate answers “Tuesday.” The applicant tracking system records the day once and returns the next question.</p>
+<audio controls preload="metadata" aria-label="Getting the next interview question" src="interview-handoff.mp3"></audio>
+<h2>Call timeline</h2><p>The test deliberately delays delivery of GPT-Live’s handoff. Decisions flags the transcript and starts the work first. Select a timestamp to hear the call from that point. Expand an event to inspect its details.</p>
+<ol><li><button type="button" data-ms="0" aria-label="Play from 0:00.00">0:00.00</button><div><details><summary><span class="role">Tool result</span> get_next_question({}) → ok</summary><pre>{
+  &quot;name&quot;: &quot;get_next_question&quot;,
+  &quot;arguments&quot;: {},
+  &quot;operation_id&quot;: &quot;session_01/open/initial&quot;,
+  &quot;result&quot;: {
+    &quot;status&quot;: &quot;ok&quot;,
+    &quot;step&quot;: &quot;day&quot;,
+    &quot;question&quot;: &quot;Which start day works for you, Monday or Tuesday?&quot;,
+    &quot;choices&quot;: [
+      &quot;Monday&quot;,
+      &quot;Tuesday&quot;
+    ],
+    &quot;operation_id&quot;: &quot;session_01/open/initial&quot;,
+    &quot;state&quot;: {
+      &quot;answers&quot;: {
+        &quot;day&quot;: &quot;&quot;,
+        &quot;shift&quot;: &quot;&quot;
+      },
+      &quot;status&quot;: &quot;active&quot;,
+      &quot;revision&quot;: 0,
+      &quot;completed&quot;: false,
+      &quot;cancelled&quot;: false
+    }
+  },
+  &quot;expected_revision&quot;: 0,
+  &quot;turn&quot;: 0,
+  &quot;source_event_id&quot;: &quot;session_01/open&quot;,
+  &quot;receipt_elapsed_ms&quot;: 152.505,
+  &quot;receiver_media_ms&quot;: 0,
+  &quot;wire_type&quot;: &quot;app.tool&quot;
+}</pre></details></div></li>
+<li><button type="button" data-ms="0" aria-label="Play from 0:00.00">0:00.00</button><div><details><summary><span class="role">Native captions</span> Hi, this is Alex from Acme Logistics for your availability check. Which start day works for you, Monday or Tuesday? Mm-hmm.</summary><pre>{
+  &quot;phase&quot;: &quot;opening&quot;,
+  &quot;source_fragments&quot;: [
+    {
+      &quot;event_id&quot;: &quot;event_02&quot;,
+      &quot;delta&quot;: &quot; Hi,&quot;,
+      &quot;start_ms&quot;: 0,
+      &quot;end_ms&quot;: 200,
+      &quot;receipt_ms&quot;: 1404.14,
+      &quot;clock&quot;: &quot;native_session_frame&quot;
+    },
+    {
+      &quot;event_id&quot;: &quot;event_03&quot;,
+      &quot;delta&quot;: &quot; this is&quot;,
+      &quot;start_ms&quot;: 200,
+      &quot;end_ms&quot;: 400,
+      &quot;receipt_ms&quot;: 1552.853,
+      &quot;clock&quot;: &quot;native_session_frame&quot;
+    },
+    {
+      &quot;event_id&quot;: &quot;event_04&quot;,
+      &quot;delta&quot;: &quot; Alex&quot;,
+      &quot;start_ms&quot;: 400,
+      &quot;end_ms&quot;: 600,
+      &quot;receipt_ms&quot;: 1735.154,
+      &quot;clock&quot;: &quot;native_session_frame&quot;
+    },
+    {
+      &quot;event_id&quot;: &quot;event_05&quot;,
+      &quot;delta&quot;: &quot; from&quot;,
+      &quot;start_ms&quot;: 600,
+      &quot;end_ms&quot;: 800,
+      &quot;receipt_ms&quot;: 1943.24,
+      &quot;clock&quot;: &quot;native_session_frame&quot;
+    },
+    {
+      &quot;event_id&quot;: &quot;event_06&quot;,
+      &quot;delta&quot;: &quot; Acme&quot;,
+      &quot;start_ms&quot;: 800,
+      &quot;end_ms&quot;: 1000,
+      &quot;receipt_ms&quot;: 2117.591,
+      &quot;clock&quot;: &quot;native_session_frame&quot;
+    },
+    {
+      &quot;event_id&quot;: &quot;event_07&quot;,
+      &quot;delta&quot;: &quot; Logistics&quot;,
+      &quot;start_ms&quot;: 1200,
+      &quot;end_ms&quot;: 1400,
+      &quot;receipt_ms&quot;: 2586.316,
+      &quot;clock&quot;: &quot;native_session_frame&quot;
+    },
+    {
+      &quot;event_id&quot;: &quot;event_08&quot;,
+      &quot;delta&quot;: &quot; for your&quot;,
+      &quot;start_ms&quot;: 1800,
+      &quot;end_ms&quot;: 2000,
+      &quot;receipt_ms&quot;: 3198.05,
+      &quot;clock&quot;: &quot;native_session_frame&quot;
+    },
+    {
+      &quot;event_id&quot;: &quot;event_09&quot;,
+      &quot;delta&quot;: &quot; availability&quot;,
+      &quot;start_ms&quot;: 2000,
+      &quot;end_ms&quot;: 2200,
+      &quot;receipt_ms&quot;: 3364.429,
+      &quot;clock&quot;: &quot;native_session_frame&quot;
+    },
+    {
+      &quot;event_id&quot;: &quot;event_10&quot;,
+      &quot;delta&quot;: &quot; check.&quot;,
+      &quot;start_ms&quot;: 2600,
+      &quot;end_ms&quot;: 2800,
+      &quot;receipt_ms&quot;: 3982.859,
+      &quot;clock&quot;: &quot;native_session_frame&quot;
+    },
+    {
+      &quot;event_id&quot;: &quot;event_11&quot;,
+      &quot;delta&quot;: &quot; Which&quot;,
+      &quot;start_ms&quot;: 3200,
+      &quot;end_ms&quot;: 3400,
+      &quot;receipt_ms&quot;: 4528.202,
+      &quot;clock&quot;: &quot;native_session_frame&quot;
+    },
+    {
+      &quot;event_id&quot;: &quot;event_12&quot;,
+      &quot;delta&quot;: &quot; start&quot;,
+      &quot;start_ms&quot;: 3600,
+      &quot;end_ms&quot;: 3800,
+      &quot;receipt_ms&quot;: 4976.228,
+      &quot;clock&quot;: &quot;native_session_frame&quot;
+    },
+    {
+      &quot;event_id&quot;: &quot;event_13&quot;,
+      &quot;delta&quot;: &quot; day&quot;,
+      &quot;start_ms&quot;: 3800,
+      &quot;end_ms&quot;: 4000,
+      &quot;receipt_ms&quot;: 5157.165,
+      &quot;clock&quot;: &quot;native_session_frame&quot;
+    },
+    {
+      &quot;event_id&quot;: &quot;event_14&quot;,
+      &quot;delta&quot;: &quot; works&quot;,
+      &quot;start_ms&quot;: 4000,
+      &quot;end_ms&quot;: 4200,
+      &quot;receipt_ms&quot;: 5327.365,
+      &quot;clock&quot;: &quot;native_session_frame&quot;
+    },
+    {
+      &quot;event_id&quot;: &quot;event_15&quot;,
+      &quot;delta&quot;: &quot; for&quot;,
+      &quot;start_ms&quot;: 4400,
+      &quot;end_ms&quot;: 4600,
+      &quot;receipt_ms&quot;: 5747.482,
+      &quot;clock&quot;: &quot;native_session_frame&quot;
+    },
+    {
+      &quot;event_id&quot;: &quot;event_16&quot;,
+      &quot;delta&quot;: &quot; you,&quot;,
+      &quot;start_ms&quot;: 4600,
+      &quot;end_ms&quot;: 4800,
+      &quot;receipt_ms&quot;: 5978.368,
+      &quot;clock&quot;: &quot;native_session_frame&quot;
+    },
+    {
+      &quot;event_id&quot;: &quot;event_17&quot;,
+      &quot;delta&quot;: &quot; Monday&quot;,
+      &quot;start_ms&quot;: 4800,
+      &quot;end_ms&quot;: 5000,
+      &quot;receipt_ms&quot;: 6133.041,
+      &quot;clock&quot;: &quot;native_session_frame&quot;
+    },
+    {
+      &quot;event_id&quot;: &quot;event_18&quot;,
+      &quot;delta&quot;: &quot; or Tuesday&quot;,
+      &quot;start_ms&quot;: 5200,
+      &quot;end_ms&quot;: 5400,
+      &quot;receipt_ms&quot;: 6553.667,
+      &quot;clock&quot;: &quot;native_session_frame&quot;
+    },
+    {
+      &quot;event_id&quot;: &quot;event_19&quot;,
+      &quot;delta&quot;: &quot;?&quot;,
+      &quot;start_ms&quot;: 5400,
+      &quot;end_ms&quot;: 5600,
+      &quot;receipt_ms&quot;: 6770.114,
+      &quot;clock&quot;: &quot;native_session_frame&quot;
+    },
+    {
+      &quot;event_id&quot;: &quot;event_20&quot;,
+      &quot;delta&quot;: &quot; Mm-h&quot;,
+      &quot;start_ms&quot;: 8200,
+      &quot;end_ms&quot;: 8400,
+      &quot;receipt_ms&quot;: 9546.376,
+      &quot;clock&quot;: &quot;native_session_frame&quot;
+    },
+    {
+      &quot;event_id&quot;: &quot;event_21&quot;,
+      &quot;delta&quot;: &quot;mm.&quot;,
+      &quot;start_ms&quot;: 8400,
+      &quot;end_ms&quot;: 8600,
+      &quot;receipt_ms&quot;: 9738.133,
+      &quot;clock&quot;: &quot;native_session_frame&quot;
+    }
+  ],
+  &quot;allowed_question&quot;: &quot;Which start day works for you, Monday or Tuesday?&quot;,
+  &quot;operation_id&quot;: &quot;session_01/open/initial&quot;,
+  &quot;timing_basis&quot;: &quot;native_session_frames&quot;
+}</pre></details></div></li>
+<li><button type="button" data-ms="0" aria-label="Play from 0:00.00">0:00.00</button><div><details><summary><span class="role">Offline audio</span> Hi, this is Alex from Acme Logistics for your availability check. Which start day works for you, Monday or Tuesday?</summary><pre>{
+  &quot;source&quot;: &quot;Isolated native receiver WAV&quot;,
+  &quot;phase&quot;: &quot;opening&quot;,
+  &quot;uncertain&quot;: false,
+  &quot;limitations&quot;: [],
+  &quot;end_ms&quot;: 7880.0
+}</pre></details></div></li>
+<li><button type="button" data-ms="80" aria-label="Play from 0:00.08">0:00.08</button><div><details><summary><span class="role">Released to Live</span> day</summary><pre>{
+  &quot;step_id&quot;: &quot;step_1&quot;,
+  &quot;kind&quot;: &quot;day&quot;,
+  &quot;revision&quot;: 0,
+  &quot;turn&quot;: 0,
+  &quot;source_event_id&quot;: &quot;live_u7_EddcNp3oMI1HWxmzOiKFcbjfEB4ZPfvy/open&quot;,
+  &quot;release_elapsed_ms&quot;: 749.956,
+  &quot;release_media_ms&quot;: 80,
+  &quot;delegation_id&quot;: null,
+  &quot;seed_lookup_operation_id&quot;: &quot;session_01/open/initial&quot;,
+  &quot;receipt_elapsed_ms&quot;: 762.872,
+  &quot;receiver_media_ms&quot;: 80,
+  &quot;wire_type&quot;: &quot;app.guidance&quot;,
+  &quot;guidance&quot;: &quot;Hi, this is Alex from Acme Logistics for your availability check. Which start day works for you, Monday or Tuesday?&quot;
+}</pre></details></div></li>
+<li><button type="button" data-ms="7620" aria-label="Play from 0:07.62">0:07.62</button><div><details><summary><span class="role">Caller input</span> Tuesday.</summary><pre>{
+  &quot;turn&quot;: 1,
+  &quot;line&quot;: &quot;tuesday&quot;,
+  &quot;after&quot;: &quot;day_question&quot;,
+  &quot;start_ms&quot;: 7620,
+  &quot;last_native_voiced_ms&quot;: 6860,
+  &quot;trigger_mark_ms&quot;: 80,
+  &quot;receipt_elapsed_ms&quot;: 8309.631,
+  &quot;receiver_media_ms&quot;: 7620,
+  &quot;wire_type&quot;: &quot;fixture.clip_started&quot;
+}</pre></details></div></li>
+<li><button type="button" data-ms="7880" aria-label="Play from 0:07.88">0:07.88</button><div><details><summary><span class="role">Native captions</span> Thanks. Checking that now.</summary><pre>{
+  &quot;phase&quot;: &quot;awaiting_backend&quot;,
+  &quot;source_fragments&quot;: [
+    {
+      &quot;event_id&quot;: &quot;event_22&quot;,
+      &quot;delta&quot;: &quot; Thanks.&quot;,
+      &quot;start_ms&quot;: 9200,
+      &quot;end_ms&quot;: 9400,
+      &quot;receipt_ms&quot;: 10611.131,
+      &quot;clock&quot;: &quot;native_session_frame&quot;
+    },
+    {
+      &quot;event_id&quot;: &quot;event_23&quot;,
+      &quot;delta&quot;: &quot; Checking&quot;,
+      &quot;start_ms&quot;: 9400,
+      &quot;end_ms&quot;: 9600,
+      &quot;receipt_ms&quot;: 10790.001,
+      &quot;clock&quot;: &quot;native_session_frame&quot;
+    },
+    {
+      &quot;event_id&quot;: &quot;event_24&quot;,
+      &quot;delta&quot;: &quot; that&quot;,
+      &quot;start_ms&quot;: 9600,
+      &quot;end_ms&quot;: 9800,
+      &quot;receipt_ms&quot;: 10990.123,
+      &quot;clock&quot;: &quot;native_session_frame&quot;
+    },
+    {
+      &quot;event_id&quot;: &quot;event_25&quot;,
+      &quot;delta&quot;: &quot; now.&quot;,
+      &quot;start_ms&quot;: 9800,
+      &quot;end_ms&quot;: 10000,
+      &quot;receipt_ms&quot;: 11152.623,
+      &quot;clock&quot;: &quot;native_session_frame&quot;
+    }
+  ],
+  &quot;allowed_question&quot;: null,
+  &quot;operation_id&quot;: null,
+  &quot;timing_basis&quot;: &quot;native_session_frames&quot;
+}</pre></details></div></li>
+<li><button type="button" data-ms="7880" aria-label="Play from 0:07.88">0:07.88</button><div><details><summary><span class="role">Offline audio</span> Mm-hmm. [Brief silence.] Thanks, checking that now.</summary><pre>{
+  &quot;source&quot;: &quot;Isolated native receiver WAV&quot;,
+  &quot;phase&quot;: &quot;awaiting_backend&quot;,
+  &quot;uncertain&quot;: false,
+  &quot;limitations&quot;: [],
+  &quot;end_ms&quot;: 12660.0
+}</pre></details></div></li>
+<li><button type="button" data-ms="9320" aria-label="Play from 0:09.32">0:09.32</button><div><details><summary><span class="role">Native Decisions</span> needs_backend_v1=yes, condition_v1=unconditional</summary><pre>{
+  &quot;event_id&quot;: &quot;event_26&quot;,
+  &quot;delegation_id&quot;: null,
+  &quot;source_event_id&quot;: &quot;event_27&quot;,
+  &quot;source_event_type&quot;: &quot;session.input_transcript.delta&quot;,
+  &quot;trigger_id&quot;: &quot;trg_EddcX5yspcz0SGf8Sxci6&quot;,
+  &quot;receipt_elapsed_ms&quot;: 10002.065,
+  &quot;receiver_media_ms&quot;: 9320,
+  &quot;wire_type&quot;: &quot;decision.event&quot;,
+  &quot;answers&quot;: [
+    {
+      &quot;type&quot;: &quot;choice&quot;,
+      &quot;name&quot;: &quot;needs_backend_v1&quot;,
+      &quot;choice&quot;: &quot;yes&quot;,
+      &quot;probabilities&quot;: [
+        {
+          &quot;value&quot;: &quot;yes&quot;,
+          &quot;probability&quot;: 0.93
+        },
+        {
+          &quot;value&quot;: &quot;no&quot;,
+          &quot;probability&quot;: 0.04
+        },
+        {
+          &quot;value&quot;: &quot;incomplete&quot;,
+          &quot;probability&quot;: 0.03
+        }
+      ],
+      &quot;confidence&quot;: 0.89
+    },
+    {
+      &quot;type&quot;: &quot;choice&quot;,
+      &quot;name&quot;: &quot;condition_v1&quot;,
+      &quot;choice&quot;: &quot;unconditional&quot;,
+      &quot;probabilities&quot;: [
+        {
+          &quot;value&quot;: &quot;conditional&quot;,
+          &quot;probability&quot;: 0.01
+        },
+        {
+          &quot;value&quot;: &quot;unconditional&quot;,
+          &quot;probability&quot;: 0.98
+        },
+        {
+          &quot;value&quot;: &quot;incomplete&quot;,
+          &quot;probability&quot;: 0.01
+        }
+      ],
+      &quot;confidence&quot;: 0.97
+    }
+  ],
+  &quot;decision_id&quot;: null
+}</pre></details></div></li>
+<li><button type="button" data-ms="9680" aria-label="Play from 0:09.68">0:09.68</button><div><details><summary><span class="role">Native handoff</span> Live delegated to the client</summary><pre>{
+  &quot;offset_ms&quot;: 9000,
+  &quot;delegation&quot;: {
+    &quot;id&quot;: &quot;item_EddcXZ9lXKuuYVIqWHvKO&quot;,
+    &quot;type&quot;: &quot;delegation&quot;,
+    &quot;target&quot;: &quot;client&quot;
+  },
+  &quot;event_id&quot;: &quot;event_28&quot;,
+  &quot;receipt_elapsed_ms&quot;: 10354.21,
+  &quot;receiver_media_ms&quot;: 9680,
+  &quot;wire_type&quot;: &quot;session.delegation.created&quot;
+}</pre></details></div></li>
+<li><button type="button" data-ms="9680" aria-label="Play from 0:09.68">0:09.68</button><div><details><summary><span class="role">Injected condition</span> native held</summary><pre>{
+  &quot;native_event_id&quot;: &quot;event_28&quot;,
+  &quot;delegation_id&quot;: &quot;item_EddcXZ9lXKuuYVIqWHvKO&quot;,
+  &quot;turn&quot;: 1,
+  &quot;delivery&quot;: &quot;intentionally delayed until answer save&quot;,
+  &quot;receipt_elapsed_ms&quot;: 10354.328,
+  &quot;receiver_media_ms&quot;: 9680,
+  &quot;wire_type&quot;: &quot;fixture.native_held&quot;
+}</pre></details></div></li>
+<li><button type="button" data-ms="10960" aria-label="Play from 0:10.96">0:10.96</button><div><details><summary><span class="role">Application</span> Claimed turn 1 through decisions recovery</summary><pre>{
+  &quot;reason&quot;: &quot;decisions_recovery&quot;,
+  &quot;labels&quot;: {
+    &quot;needs_backend_v1&quot;: &quot;yes&quot;,
+    &quot;condition_v1&quot;: &quot;unconditional&quot;
+  },
+  &quot;delegation_id&quot;: null,
+  &quot;turn&quot;: 1,
+  &quot;source_event_id&quot;: &quot;event_27&quot;,
+  &quot;revision&quot;: 0,
+  &quot;receipt_elapsed_ms&quot;: 11649.626,
+  &quot;receiver_media_ms&quot;: 10960,
+  &quot;wire_type&quot;: &quot;app.route&quot;
+}</pre></details></div></li>
+<li><button type="button" data-ms="12660" aria-label="Play from 0:12.66">0:12.66</button><div><details><summary><span class="role">Tool result</span> record_answer({&quot;question_id&quot;:&quot;day&quot;,&quot;value&quot;:&quot;Tuesday&quot;}) → ok</summary><pre>{
+  &quot;name&quot;: &quot;record_answer&quot;,
+  &quot;arguments&quot;: {
+    &quot;question_id&quot;: &quot;day&quot;,
+    &quot;value&quot;: &quot;Tuesday&quot;
+  },
+  &quot;operation_id&quot;: &quot;event_27/save_day&quot;,
+  &quot;result&quot;: {
+    &quot;status&quot;: &quot;ok&quot;,
+    &quot;changed&quot;: true,
+    &quot;operation_id&quot;: &quot;event_27/save_day&quot;,
+    &quot;state&quot;: {
+      &quot;answers&quot;: {
+        &quot;day&quot;: &quot;Tuesday&quot;,
+        &quot;shift&quot;: &quot;&quot;
+      },
+      &quot;status&quot;: &quot;active&quot;,
+      &quot;revision&quot;: 1,
+      &quot;completed&quot;: false,
+      &quot;cancelled&quot;: false
+    }
+  },
+  &quot;expected_revision&quot;: 0,
+  &quot;turn&quot;: 1,
+  &quot;source_event_id&quot;: &quot;event_27&quot;,
+  &quot;receipt_elapsed_ms&quot;: 13361.305,
+  &quot;receiver_media_ms&quot;: 12660,
+  &quot;wire_type&quot;: &quot;app.tool&quot;
+}</pre></details></div></li>
+<li><button type="button" data-ms="12660" aria-label="Play from 0:12.66">0:12.66</button><div><details><summary><span class="role">Tool result</span> get_next_question({}) → ok</summary><pre>{
+  &quot;name&quot;: &quot;get_next_question&quot;,
+  &quot;arguments&quot;: {},
+  &quot;operation_id&quot;: &quot;event_27/after_day&quot;,
+  &quot;result&quot;: {
+    &quot;status&quot;: &quot;ok&quot;,
+    &quot;step&quot;: &quot;shift&quot;,
+    &quot;question&quot;: &quot;Which shift do you prefer, morning or afternoon?&quot;,
+    &quot;choices&quot;: [
+      &quot;morning&quot;,
+      &quot;afternoon&quot;
+    ],
+    &quot;operation_id&quot;: &quot;event_27/after_day&quot;,
+    &quot;state&quot;: {
+      &quot;answers&quot;: {
+        &quot;day&quot;: &quot;Tuesday&quot;,
+        &quot;shift&quot;: &quot;&quot;
+      },
+      &quot;status&quot;: &quot;active&quot;,
+      &quot;revision&quot;: 1,
+      &quot;completed&quot;: false,
+      &quot;cancelled&quot;: false
+    }
+  },
+  &quot;expected_revision&quot;: 1,
+  &quot;turn&quot;: 1,
+  &quot;source_event_id&quot;: &quot;event_27&quot;,
+  &quot;receipt_elapsed_ms&quot;: 13379.003,
+  &quot;receiver_media_ms&quot;: 12660,
+  &quot;wire_type&quot;: &quot;app.tool&quot;
+}</pre></details></div></li>
+<li><button type="button" data-ms="12660" aria-label="Play from 0:12.66">0:12.66</button><div><details><summary><span class="role">Released to Live</span> shift</summary><pre>{
+  &quot;step_id&quot;: &quot;step_2&quot;,
+  &quot;kind&quot;: &quot;shift&quot;,
+  &quot;revision&quot;: 1,
+  &quot;turn&quot;: 1,
+  &quot;source_event_id&quot;: &quot;event_27&quot;,
+  &quot;release_elapsed_ms&quot;: 13329.416,
+  &quot;release_media_ms&quot;: 12660,
+  &quot;delegation_id&quot;: null,
+  &quot;receipt_elapsed_ms&quot;: 13379.118,
+  &quot;receiver_media_ms&quot;: 12660,
+  &quot;wire_type&quot;: &quot;app.guidance&quot;,
+  &quot;guidance&quot;: &quot;Which shift do you prefer, morning or afternoon?&quot;
+}</pre></details></div></li>
+<li><button type="button" data-ms="12660" aria-label="Play from 0:12.66">0:12.66</button><div><details><summary><span class="role">Injected condition</span> native released</summary><pre>{
+  &quot;native_event_id&quot;: &quot;event_28&quot;,
+  &quot;delegation_id&quot;: &quot;item_EddcXZ9lXKuuYVIqWHvKO&quot;,
+  &quot;turn&quot;: 1,
+  &quot;receipt_elapsed_ms&quot;: 13379.256,
+  &quot;receiver_media_ms&quot;: 12660,
+  &quot;wire_type&quot;: &quot;fixture.native_released&quot;
+}</pre></details></div></li>
+<li><button type="button" data-ms="12660" aria-label="Play from 0:12.66">0:12.66</button><div><details><summary><span class="role">Application</span> turn already owned</summary><pre>{
+  &quot;delegation_id&quot;: &quot;item_EddcXZ9lXKuuYVIqWHvKO&quot;,
+  &quot;turn&quot;: 1,
+  &quot;source_event_id&quot;: &quot;event_27&quot;,
+  &quot;disposition&quot;: &quot;turn_already_owned&quot;,
+  &quot;receipt_elapsed_ms&quot;: 13379.296,
+  &quot;receiver_media_ms&quot;: 12660,
+  &quot;wire_type&quot;: &quot;app.delegation_received&quot;
+}</pre></details></div></li>
+<li><button type="button" data-ms="12660" aria-label="Play from 0:12.66">0:12.66</button><div><details><summary><span class="role">Application</span> turn already owned</summary><pre>{
+  &quot;reason&quot;: &quot;turn_already_owned&quot;,
+  &quot;delegation_id&quot;: &quot;item_EddcXZ9lXKuuYVIqWHvKO&quot;,
+  &quot;turn&quot;: 1,
+  &quot;receipt_elapsed_ms&quot;: 13379.312,
+  &quot;receiver_media_ms&quot;: 12660,
+  &quot;wire_type&quot;: &quot;app.duplicate&quot;
+}</pre></details></div></li>
+<li><button type="button" data-ms="12660" aria-label="Play from 0:12.66">0:12.66</button><div><details><summary><span class="role">Native captions</span> Which shift do you prefer, morning or afternoon?</summary><pre>{
+  &quot;phase&quot;: &quot;next_question&quot;,
+  &quot;source_fragments&quot;: [
+    {
+      &quot;event_id&quot;: &quot;event_29&quot;,
+      &quot;delta&quot;: &quot; Which shift&quot;,
+      &quot;start_ms&quot;: 12600,
+      &quot;end_ms&quot;: 12800,
+      &quot;receipt_ms&quot;: 13932.452,
+      &quot;clock&quot;: &quot;native_session_frame&quot;
+    },
+    {
+      &quot;event_id&quot;: &quot;event_30&quot;,
+      &quot;delta&quot;: &quot; do&quot;,
+      &quot;start_ms&quot;: 12800,
+      &quot;end_ms&quot;: 13000,
+      &quot;receipt_ms&quot;: 14179.687,
+      &quot;clock&quot;: &quot;native_session_frame&quot;
+    },
+    {
+      &quot;event_id&quot;: &quot;event_31&quot;,
+      &quot;delta&quot;: &quot; you prefer&quot;,
+      &quot;start_ms&quot;: 13000,
+      &quot;end_ms&quot;: 13200,
+      &quot;receipt_ms&quot;: 14359.659,
+      &quot;clock&quot;: &quot;native_session_frame&quot;
+    },
+    {
+      &quot;event_id&quot;: &quot;event_32&quot;,
+      &quot;delta&quot;: &quot;,&quot;,
+      &quot;start_ms&quot;: 13200,
+      &quot;end_ms&quot;: 13400,
+      &quot;receipt_ms&quot;: 14552.224,
+      &quot;clock&quot;: &quot;native_session_frame&quot;
+    },
+    {
+      &quot;event_id&quot;: &quot;event_33&quot;,
+      &quot;delta&quot;: &quot; morning&quot;,
+      &quot;start_ms&quot;: 13600,
+      &quot;end_ms&quot;: 13800,
+      &quot;receipt_ms&quot;: 14937.386,
+      &quot;clock&quot;: &quot;native_session_frame&quot;
+    },
+    {
+      &quot;event_id&quot;: &quot;event_34&quot;,
+      &quot;delta&quot;: &quot; or afternoon&quot;,
+      &quot;start_ms&quot;: 14200,
+      &quot;end_ms&quot;: 14400,
+      &quot;receipt_ms&quot;: 15541.176,
+      &quot;clock&quot;: &quot;native_session_frame&quot;
+    },
+    {
+      &quot;event_id&quot;: &quot;event_35&quot;,
+      &quot;delta&quot;: &quot;?&quot;,
+      &quot;start_ms&quot;: 14400,
+      &quot;end_ms&quot;: 14600,
+      &quot;receipt_ms&quot;: 15742.695,
+      &quot;clock&quot;: &quot;native_session_frame&quot;
+    }
+  ],
+  &quot;allowed_question&quot;: &quot;Which shift do you prefer, morning or afternoon?&quot;,
+  &quot;operation_id&quot;: &quot;event_27/after_day&quot;,
+  &quot;timing_basis&quot;: &quot;native_session_frames&quot;
+}</pre></details></div></li>
+<li><button type="button" data-ms="12660" aria-label="Play from 0:12.66">0:12.66</button><div><details><summary><span class="role">Offline audio</span> Which shift do you prefer, morning or afternoon?</summary><pre>{
+  &quot;source&quot;: &quot;Isolated native receiver WAV&quot;,
+  &quot;phase&quot;: &quot;next_question&quot;,
+  &quot;uncertain&quot;: false,
+  &quot;limitations&quot;: [],
+  &quot;end_ms&quot;: 20920.0
+}</pre></details></div></li></ol><p role="status" id="status"></p></main><script>
+const audio = document.querySelector('audio');
+document.querySelector('ol').addEventListener('click', async (event) => {
+  const button = event.target.closest('button[data-ms]');
+  if (!button) return;
+  audio.currentTime = Number(button.dataset.ms) / 1000;
+  try { await audio.play(); } catch (error) {
+    if (error.name !== 'AbortError') document.querySelector('#status').textContent = 'Use the audio controls to start playback.';
+  }
+});
+</script></body></html>

@@ -1,0 +1,410 @@
+{
+  "case": "interview-conditional",
+  "date": "2026-11-02",
+  "caller": "Synthetic prerecorded Cedar caller, “Tuesday, if the shift ends before five.” The same verified input was used in all four calls.",
+  "featured_trial": "final-1",
+  "featured_mp3_sha256": "8e8dc2a4bd5c77bb2ab2c78578e26059c578b25e9953ba2bed260fbbbbe8caf8",
+  "procedure": "The ATS has no shift-hours lookup. These calls stop after the first clarification; later resolution was checked separately.",
+  "evidence": "Elapsed timestamps use the application clock. Receiver timestamps use recorded 24 kHz PCM. Voice activity uses 20 ms blocks with RMS above 120. Native caption frames use a separate session clock. Audio Perception assessed isolated receiver windows. No human listening was performed.",
+  "rubric_history": "The initial and resolution-guard grades are their original grades. The two final calls add an explicit check for echoing the day or requirement before guidance. The frontend asked for silence; both final trials included a generic checking acknowledgement. The waiting check allowed that acknowledgement.",
+  "trials": [
+    {
+      "trial": "initial",
+      "ats": {
+        "initial_lookups": 1,
+        "answer_save_attempts": 0,
+        "completion_attempts": 0,
+        "final": {
+          "answers": {
+            "day": "",
+            "shift": ""
+          },
+          "status": "active",
+          "revision": 0,
+          "completed": false,
+          "cancelled": false
+        },
+        "held": {
+          "field": "day",
+          "choice": "Tuesday",
+          "caller_excerpt": "if the shift ends before five",
+          "source_turn": 1,
+          "routed_transcript_id_sha256": "e0d77ab20ff10afce07137d4e3044ce7f5be918529f258e61f9e0d07f274306f"
+        }
+      },
+      "timing_ms": {
+        "route": "native_delegation",
+        "settled_quiet": 1015.18,
+        "route_elapsed": 13045.161,
+        "route_receiver_clock": 12400,
+        "guidance_release_elapsed": 15524.734,
+        "guidance_release_receiver_clock": 14900,
+        "agent_playout_already_active_at_release": false,
+        "last_voiced_block_end_before_release": 13620,
+        "first_voiced_block_start_at_or_after_release": 15740,
+        "receiver_window_boundaries": [
+          0.0,
+          8240.0,
+          14900.0,
+          28320.0
+        ],
+        "ambiguous_native_caption_frames": [
+          {
+            "words": "You mentioned",
+            "start": 14800,
+            "end": 15000
+          }
+        ]
+      },
+      "speech": {
+        "native_clarification_caption": "You mentioned, \"if the shift ends before five\". I can't verify that, though. Would you like to leave Tuesday unconfirmed for now?",
+        "blind_receiver_windows": {
+          "opening": "Hi, this is Alex from Acme Logistics for your availability check. Which start day works for you, Monday or Tuesday?",
+          "awaiting_backend": "Understood, checking that.",
+          "clarification": "You mentioned if the shift ends before 5. I can't verify that, though. Would you like to leave Tuesday unconfirmed for now?"
+        },
+        "caption_meaning": "pass",
+        "receiver_meaning": "pass",
+        "caption_alignment": "review",
+        "receiver_quality": "pass",
+        "overall_speech": "review",
+        "caller_agent_overlap_ms": 0.0
+      },
+      "transport": {
+        "action": "pass",
+        "exposure": "pass",
+        "pcm_verification": "pass",
+        "actual_transport": "webrtc",
+        "receiver_queued_samples_at_close": 0,
+        "stereo_wav_sha256": "8532d168eab3d5981d9bd9d4d3091346c8d0dfc60c6b65cea4a19d500f669dad"
+      },
+      "metering": {
+        "live_session_seconds": 27.0,
+        "interpreter_requests": 1,
+        "interpreter_tokens": {
+          "input_tokens": 820,
+          "output_tokens": 107,
+          "total_tokens": 927
+        },
+        "offline_review_requests": 5,
+        "offline_review_tokens": {
+          "input_tokens": 3400,
+          "output_tokens": 1540,
+          "total_tokens": 4940
+        },
+        "offline_review_estimated_usd": 0.0444
+      }
+    },
+    {
+      "trial": "resolution-guard",
+      "ats": {
+        "initial_lookups": 1,
+        "answer_save_attempts": 0,
+        "completion_attempts": 0,
+        "final": {
+          "answers": {
+            "day": "",
+            "shift": ""
+          },
+          "status": "active",
+          "revision": 0,
+          "completed": false,
+          "cancelled": false
+        },
+        "held": {
+          "field": "day",
+          "choice": "Tuesday",
+          "caller_excerpt": "if the shift ends before five",
+          "source_turn": 1,
+          "routed_transcript_id_sha256": "daeadcdf5dae71e0adffc6417cf76778a3557047ef740c3463b68ed01178f17b"
+        }
+      },
+      "timing_ms": {
+        "route": "native_delegation",
+        "settled_quiet": 1019.73,
+        "route_elapsed": 12993.157,
+        "route_receiver_clock": 12380,
+        "guidance_release_elapsed": 14793.041,
+        "guidance_release_receiver_clock": 14200,
+        "agent_playout_already_active_at_release": true,
+        "last_voiced_block_end_before_release": 14200,
+        "first_voiced_block_start_at_or_after_release": 14200,
+        "receiver_window_boundaries": [
+          0.0,
+          8260.0,
+          14200.0,
+          25000.0
+        ],
+        "ambiguous_native_caption_frames": [
+          {
+            "words": "five.",
+            "start": 14000,
+            "end": 14200
+          }
+        ]
+      },
+      "speech": {
+        "native_clarification_caption": "five. I can't verify that here. Would you like to leave Tuesday unconfirmed for now?",
+        "blind_receiver_windows": {
+          "opening": "Hi, this is Alex from Acme Logistics for your availability check. Which start day works for you, Monday or Tuesday?",
+          "awaiting_backend": "Okay, Tuesday, if the sh—",
+          "clarification": "Shift ends before 5. I can't verify that here. Would you like to leave Tuesday unconfirmed for now? Silence follows."
+        },
+        "caption_meaning": "fail",
+        "receiver_meaning": "fail",
+        "caption_alignment": "review",
+        "receiver_quality": "review",
+        "overall_speech": "fail",
+        "caller_agent_overlap_ms": 0.0
+      },
+      "transport": {
+        "action": "pass",
+        "exposure": "pass",
+        "pcm_verification": "pass",
+        "actual_transport": "webrtc",
+        "receiver_queued_samples_at_close": 16,
+        "stereo_wav_sha256": "3dd8e1229a194575525b068dfed1ede22214361e8049aa44d0b788c6a7f6482b"
+      },
+      "metering": {
+        "live_session_seconds": 24.0,
+        "interpreter_requests": 1,
+        "interpreter_tokens": {
+          "input_tokens": 835,
+          "output_tokens": 101,
+          "total_tokens": 936
+        },
+        "offline_review_requests": 5,
+        "offline_review_tokens": {
+          "input_tokens": 3359,
+          "output_tokens": 2955,
+          "total_tokens": 6314
+        },
+        "offline_review_estimated_usd": 0.072536
+      }
+    },
+    {
+      "trial": "final-1",
+      "ats": {
+        "initial_lookups": 1,
+        "answer_save_attempts": 0,
+        "completion_attempts": 0,
+        "final": {
+          "answers": {
+            "day": "",
+            "shift": ""
+          },
+          "status": "active",
+          "revision": 0,
+          "completed": false,
+          "cancelled": false
+        },
+        "held": {
+          "field": "day",
+          "choice": "Tuesday",
+          "caller_excerpt": "if the shift ends before five",
+          "source_turn": 1,
+          "routed_transcript_id_sha256": "ddcad17729405adda65f722f3eb62c916bcdc18eec3451be093b79f6a9ed2522"
+        }
+      },
+      "timing_ms": {
+        "route": "native_delegation",
+        "settled_quiet": 1015.95,
+        "route_elapsed": 13665.632,
+        "route_receiver_clock": 12920,
+        "guidance_release_elapsed": 16164.998,
+        "guidance_release_receiver_clock": 15440,
+        "agent_playout_already_active_at_release": false,
+        "last_voiced_block_end_before_release": 14240,
+        "first_voiced_block_start_at_or_after_release": 16420,
+        "receiver_window_boundaries": [
+          0.0,
+          8700.0,
+          15440.0,
+          28880.0
+        ],
+        "ambiguous_native_caption_frames": []
+      },
+      "speech": {
+        "native_clarification_caption": "You mentioned, \"if the shift ends before five.\" I can't verify that requirement here. Would you like to leave Tuesday unconfirmed for now?",
+        "blind_receiver_windows": {
+          "opening": "Hi, this is Alex from Acme Logistics for your availability check. Which start day works for you, Monday or Tuesday?",
+          "awaiting_backend": "Okay, let me check that.",
+          "clarification": "You mentioned if the shift ends before 5. I can't verify that requirement here. Would you like to leave Tuesday unconfirmed for now?"
+        },
+        "caption_meaning": "pass",
+        "receiver_meaning": "pass",
+        "caption_alignment": "pass",
+        "receiver_quality": "pass",
+        "overall_speech": "pass",
+        "caller_agent_overlap_ms": 0.0
+      },
+      "transport": {
+        "action": "pass",
+        "exposure": "pass",
+        "pcm_verification": "pass",
+        "actual_transport": "webrtc",
+        "receiver_queued_samples_at_close": 16,
+        "stereo_wav_sha256": "9351c61dd5b827cdf00ae06a14bc8986273100a61049710fe767292c6661b6d1"
+      },
+      "metering": {
+        "live_session_seconds": 27.0,
+        "interpreter_requests": 1,
+        "interpreter_tokens": {
+          "input_tokens": 833,
+          "output_tokens": 126,
+          "total_tokens": 959
+        },
+        "offline_review_requests": 5,
+        "offline_review_tokens": {
+          "input_tokens": 3405,
+          "output_tokens": 1504,
+          "total_tokens": 4909
+        },
+        "offline_review_estimated_usd": 0.0437
+      }
+    },
+    {
+      "trial": "final-2",
+      "ats": {
+        "initial_lookups": 1,
+        "answer_save_attempts": 0,
+        "completion_attempts": 0,
+        "final": {
+          "answers": {
+            "day": "",
+            "shift": ""
+          },
+          "status": "active",
+          "revision": 0,
+          "completed": false,
+          "cancelled": false
+        },
+        "held": {
+          "field": "day",
+          "choice": "Tuesday",
+          "caller_excerpt": "if the shift ends before 5",
+          "source_turn": 1,
+          "routed_transcript_id_sha256": "e535699e15d6cc1687cdd490fcb60d1cb1939e6524c6653dccad293048b77c00"
+        }
+      },
+      "timing_ms": {
+        "route": "native_delegation",
+        "settled_quiet": 1003.7,
+        "route_elapsed": 13179.255,
+        "route_receiver_clock": 12520,
+        "guidance_release_elapsed": 15679.673,
+        "guidance_release_receiver_clock": 15040,
+        "agent_playout_already_active_at_release": false,
+        "last_voiced_block_end_before_release": 13980,
+        "first_voiced_block_start_at_or_after_release": 16000,
+        "receiver_window_boundaries": [
+          0.0,
+          8580.0,
+          15040.0,
+          28260.0
+        ],
+        "ambiguous_native_caption_frames": [
+          {
+            "words": "You mentioned",
+            "start": 15000,
+            "end": 15200
+          }
+        ]
+      },
+      "speech": {
+        "native_clarification_caption": "You mentioned, \"If the shift ends before 5.\" I can't verify that here. Would you like to leave Tuesday unconfirmed for now?",
+        "blind_receiver_windows": {
+          "opening": "Hi, this is Alex from Acme Logistics for your availability check. Which start day works for you, Monday or Tuesday?",
+          "awaiting_backend": "Okay. Checking that.",
+          "clarification": "You mentioned, if the shift ends before 5, I can't verify that here. Would you like to leave Tuesday unconfirmed for now?"
+        },
+        "caption_meaning": "pass",
+        "receiver_meaning": "pass",
+        "caption_alignment": "review",
+        "receiver_quality": "pass",
+        "overall_speech": "review",
+        "caller_agent_overlap_ms": 0.0
+      },
+      "transport": {
+        "action": "pass",
+        "exposure": "pass",
+        "pcm_verification": "pass",
+        "actual_transport": "webrtc",
+        "receiver_queued_samples_at_close": 16,
+        "stereo_wav_sha256": "56aa97702a3380685f5df604140529f5b1502a62d74028552d6904a797acf332"
+      },
+      "metering": {
+        "live_session_seconds": 27.0,
+        "interpreter_requests": 1,
+        "interpreter_tokens": {
+          "input_tokens": 833,
+          "output_tokens": 95,
+          "total_tokens": 928
+        },
+        "offline_review_requests": 5,
+        "offline_review_tokens": {
+          "input_tokens": 3395,
+          "output_tokens": 1918,
+          "total_tokens": 5313
+        },
+        "offline_review_estimated_usd": 0.05194
+      }
+    }
+  ],
+  "interpreter_controls": [
+    {
+      "case": "bare",
+      "grade": "pass",
+      "proposal": "resolve",
+      "source_excerpt": "Tuesday.",
+      "held_choice": "Tuesday",
+      "saved_day": ""
+    },
+    {
+      "case": "resolved",
+      "grade": "pass",
+      "proposal": "resolve",
+      "source_excerpt": "I found childcare",
+      "held_choice": null,
+      "saved_day": "Tuesday"
+    },
+    {
+      "case": "alternative",
+      "grade": "pass",
+      "proposal": "answer",
+      "source_excerpt": "I can definitely do Monday instead.",
+      "held_choice": null,
+      "saved_day": "Monday"
+    },
+    {
+      "case": "defer",
+      "grade": "pass",
+      "proposal": "defer",
+      "source_excerpt": "",
+      "held_choice": "Tuesday",
+      "saved_day": ""
+    },
+    {
+      "case": "changed",
+      "grade": "pass",
+      "proposal": "conditional",
+      "source_excerpt": "whether my neighbor can drive me",
+      "held_choice": "Tuesday",
+      "saved_day": ""
+    }
+  ],
+  "metering_all_four_calls_and_five_text_controls": {
+    "live_sessions": 4,
+    "live_seconds": 105.0,
+    "in_call_interpreter_requests": 4,
+    "standalone_interpreter_requests": 5,
+    "standalone_interpreter_tokens": {
+      "input_tokens": 4411,
+      "output_tokens": 452,
+      "total_tokens": 4863
+    },
+    "offline_review_requests": 20,
+    "offline_review_estimated_usd": 0.212576,
+    "scope": "Review dollar figures use the historical reviewer rate estimates. Live calls and interpreter usage are reported in metered units. No new caller generation or invoice verification."
+  }
+}

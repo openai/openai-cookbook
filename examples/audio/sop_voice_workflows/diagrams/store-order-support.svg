@@ -1,0 +1,176 @@
+<?xml version='1.0' encoding='utf-8'?>
+<svg xmlns="http://www.w3.org/2000/svg" width="840" role="img" aria-labelledby="chart-title-seq-store-order-support" font-family="Arial, Helvetica, sans-serif" fill="#1b2c23" height="852" viewBox="0 0 840 852" id="seq-store-order-support" style="max-width:100%;height:auto;background:white" aria-describedby="chart-desc-seq-store-order-support">
+  <title id="chart-title-seq-store-order-support">From order tracking to a replacement</title>
+  <desc id="chart-desc-seq-store-order-support">GPT-Live hands off the tracking request, then the damage report. The app sends the updated conversation to Terra. Terra follows the damaged-item procedure, and the app creates a replacement after the caller accepts.</desc>
+  <rect width="840" fill="white" height="852"/>
+  <text x="12" y="26" font-size="21" font-weight="bold">From order tracking to a replacement</text>
+  <g transform="translate(3 0)" data-panel="1">
+    <g>
+      <line x1="57.0" x2="57.0" y1="67" y2="845" stroke="#b1c7b9" stroke-width="1"/>
+      <line x1="281.66666666666663" x2="281.66666666666663" y1="67" y2="845" stroke="#b1c7b9" stroke-width="1"/>
+      <line x1="512.3333333333333" x2="512.3333333333333" y1="67" y2="845" stroke="#b1c7b9" stroke-width="1"/>
+      <line x1="761.0" x2="761.0" y1="67" y2="845" stroke="#b1c7b9" stroke-width="1"/>
+    </g>
+    <rect x="14.0" y="40" width="86" height="27" rx="4" fill="#eef5f0" stroke="#bbcec1"/>
+    <text x="57.0" y="58" font-size="15" font-weight="bold" text-anchor="middle" data-participant="C">Customer</text>
+    <rect x="240.66666666666663" y="40" width="82" height="27" rx="4" fill="#eef5f0" stroke="#bbcec1"/>
+    <text x="281.67" y="58" font-size="15" font-weight="bold" text-anchor="middle" data-participant="L">GPT-Live</text>
+    <rect x="463.33333333333326" y="40" width="98" height="27" rx="4" fill="#eef5f0" stroke="#bbcec1"/>
+    <text x="512.33" y="58" font-size="15" font-weight="bold" text-anchor="middle" data-participant="A">Application</text>
+    <rect x="702.0" y="40" width="118" height="27" rx="4" fill="#eef5f0" stroke="#bbcec1"/>
+    <text x="761.0" y="58" font-size="15" font-weight="bold" text-anchor="middle" data-participant="B">Terra backend</text>
+    <g data-step="1" data-from="C" data-to="L" data-type="-&gt;&gt;" data-copy="Where’s my order?">
+      <line x1="57.0" x2="280.66666666666663" y1="87.0" y2="87.0" stroke="#345b46" stroke-width="1.7"/>
+      <circle cx="57.0" cy="87.0" r="2.5" fill="#345b46"/>
+      <path d="M274.66666666666663,83.2 L281.66666666666663,87.0 L274.66666666666663,90.8Z" fill="#345b46" stroke="#345b46" stroke-width="1.4" stroke-linejoin="round"/>
+      <rect x="96.58528645833331" y="78.5" width="145.49609375" height="17" rx="2" fill="white"/>
+      <text x="169.33" y="92.3" font-size="16" text-anchor="middle">Where’s my order?</text>
+    </g>
+    <g data-step="2" data-from="L" data-to="A" data-type="-)" data-copy="Start the tracking handoff">
+      <line x1="281.66666666666663" x2="511.33333333333326" y1="113.0" y2="113.0" stroke="#345b46" stroke-width="1.7"/>
+      <circle cx="281.66666666666663" cy="113.0" r="2.5" fill="#345b46"/>
+      <path d="M505.33333333333326,109.2 L512.3333333333333,113.0 L505.33333333333326,116.8" fill="none" stroke="#345b46" stroke-width="1.4" stroke-linejoin="round"/>
+      <rect x="301.87695312499994" y="104.5" width="190.24609375" height="17" rx="2" fill="white"/>
+      <text x="397.0" y="118.3" font-size="16" text-anchor="middle">Start the tracking handoff</text>
+    </g>
+    <g data-step="3" data-from="C" data-to="L" data-type="-&gt;&gt;" data-copy="It arrived. The lamp is broken.">
+      <line x1="57.0" x2="280.66666666666663" y1="147.5" y2="147.5" stroke="#345b46" stroke-width="1.7"/>
+      <circle cx="57.0" cy="147.5" r="2.5" fill="#345b46"/>
+      <path d="M274.66666666666663,143.7 L281.66666666666663,147.5 L274.66666666666663,151.3Z" fill="#345b46" stroke="#345b46" stroke-width="1.4" stroke-linejoin="round"/>
+      <rect x="87.08528645833331" y="130.5" width="164.49609375" height="34" rx="2" fill="white"/>
+      <text x="169.33" y="144.3" font-size="16" text-anchor="middle">It arrived. The lamp is</text>
+      <text x="169.33" y="161.3" font-size="16" text-anchor="middle">broken.</text>
+    </g>
+    <g data-step="4" data-from="L" data-to="A" data-type="-&gt;&gt;" data-copy="Hand off the damage report">
+      <line x1="281.66666666666663" x2="511.33333333333326" y1="182.0" y2="182.0" stroke="#345b46" stroke-width="1.7"/>
+      <circle cx="281.66666666666663" cy="182.0" r="2.5" fill="#345b46"/>
+      <path d="M505.33333333333326,178.2 L512.3333333333333,182.0 L505.33333333333326,185.8Z" fill="#345b46" stroke="#345b46" stroke-width="1.4" stroke-linejoin="round"/>
+      <rect x="293.37695312499994" y="173.5" width="207.24609375" height="17" rx="2" fill="white"/>
+      <text x="397.0" y="187.3" font-size="16" text-anchor="middle">Hand off the damage report</text>
+    </g>
+    <g data-step="5" data-from="A" data-to="B" data-type="-&gt;&gt;" data-copy="Send the updated conversation">
+      <line x1="512.3333333333333" x2="760.0" y1="216.5" y2="216.5" stroke="#345b46" stroke-width="1.7"/>
+      <circle cx="512.3333333333333" cy="216.5" r="2.5" fill="#345b46"/>
+      <path d="M754.0,212.7 L761.0,216.5 L754.0,220.3Z" fill="#345b46" stroke="#345b46" stroke-width="1.4" stroke-linejoin="round"/>
+      <rect x="567.7916666666666" y="199.5" width="137.75" height="34" rx="2" fill="white"/>
+      <text x="636.67" y="213.3" font-size="16" text-anchor="middle">Send the updated</text>
+      <text x="636.67" y="230.3" font-size="16" text-anchor="middle">conversation</text>
+    </g>
+    <g data-step="6" data-from="B" data-to="A" data-type="-&gt;&gt;" data-copy="Request get_order for the damaged item">
+      <line x1="761.0" x2="513.3333333333333" y1="259.5" y2="259.5" stroke="#345b46" stroke-width="1.7"/>
+      <circle cx="761.0" cy="259.5" r="2.5" fill="#345b46"/>
+      <path d="M519.3333333333333,255.7 L512.3333333333333,259.5 L519.3333333333333,263.3Z" fill="#345b46" stroke="#345b46" stroke-width="1.4" stroke-linejoin="round"/>
+      <rect x="539.7916666666666" y="242.5" width="193.75" height="34" rx="2" fill="white"/>
+      <text x="636.67" y="256.3" font-size="16" text-anchor="middle">Request get_order for the</text>
+      <text x="636.67" y="273.3" font-size="16" text-anchor="middle">damaged item</text>
+    </g>
+    <g data-step="7" data-from="A" data-to="B" data-type="--&gt;&gt;" data-copy="Delivered order, desk lamp">
+      <line x1="512.3333333333333" x2="760.0" y1="294.0" y2="294.0" stroke="#345b46" stroke-width="1.7" stroke-dasharray="5 3"/>
+      <circle cx="512.3333333333333" cy="294.0" r="2.5" fill="#345b46"/>
+      <path d="M754.0,290.2 L761.0,294.0 L754.0,297.8Z" fill="#345b46" stroke="#345b46" stroke-width="1.4" stroke-linejoin="round"/>
+      <rect x="535.6744791666666" y="285.5" width="201.984375" height="17" rx="2" fill="white"/>
+      <text x="636.67" y="299.3" font-size="16" text-anchor="middle">Delivered order, desk lamp</text>
+    </g>
+    <g data-step="8" data-from="B" data-to="A" data-type="--&gt;&gt;" data-copy="Ask which part broke">
+      <line x1="761.0" x2="513.3333333333333" y1="320.0" y2="320.0" stroke="#345b46" stroke-width="1.7" stroke-dasharray="5 3"/>
+      <circle cx="761.0" cy="320.0" r="2.5" fill="#345b46"/>
+      <path d="M519.3333333333333,316.2 L512.3333333333333,320.0 L519.3333333333333,323.8Z" fill="#345b46" stroke="#345b46" stroke-width="1.4" stroke-linejoin="round"/>
+      <rect x="557.0416666666666" y="311.5" width="159.25" height="17" rx="2" fill="white"/>
+      <text x="636.67" y="325.3" font-size="16" text-anchor="middle">Ask which part broke</text>
+    </g>
+    <g data-step="9" data-from="A" data-to="L" data-type="--&gt;&gt;" data-copy="Ask what broke">
+      <line x1="512.3333333333333" x2="282.66666666666663" y1="346.0" y2="346.0" stroke="#345b46" stroke-width="1.7" stroke-dasharray="5 3"/>
+      <circle cx="512.3333333333333" cy="346.0" r="2.5" fill="#345b46"/>
+      <path d="M288.66666666666663,342.2 L281.66666666666663,346.0 L288.66666666666663,349.8Z" fill="#345b46" stroke="#345b46" stroke-width="1.4" stroke-linejoin="round"/>
+      <rect x="336.99999999999994" y="337.5" width="120.0" height="17" rx="2" fill="white"/>
+      <text x="397.0" y="351.3" font-size="16" text-anchor="middle">Ask what broke</text>
+    </g>
+    <g data-step="10" data-from="C" data-to="L" data-type="-&gt;&gt;" data-copy="The base is cracked.">
+      <line x1="57.0" x2="280.66666666666663" y1="372.0" y2="372.0" stroke="#345b46" stroke-width="1.7"/>
+      <circle cx="57.0" cy="372.0" r="2.5" fill="#345b46"/>
+      <path d="M274.66666666666663,368.2 L281.66666666666663,372.0 L274.66666666666663,375.8Z" fill="#345b46" stroke="#345b46" stroke-width="1.4" stroke-linejoin="round"/>
+      <rect x="90.08333333333331" y="363.5" width="158.5" height="17" rx="2" fill="white"/>
+      <text x="169.33" y="377.3" font-size="16" text-anchor="middle">The base is cracked.</text>
+    </g>
+    <g data-step="11" data-from="L" data-to="A" data-type="-&gt;&gt;" data-copy="Hand off the damage description">
+      <line x1="281.66666666666663" x2="511.33333333333326" y1="406.5" y2="406.5" stroke="#345b46" stroke-width="1.7"/>
+      <circle cx="281.66666666666663" cy="406.5" r="2.5" fill="#345b46"/>
+      <path d="M505.33333333333326,402.7 L512.3333333333333,406.5 L505.33333333333326,410.3Z" fill="#345b46" stroke="#345b46" stroke-width="1.4" stroke-linejoin="round"/>
+      <rect x="316.62695312499994" y="389.5" width="160.74609375" height="34" rx="2" fill="white"/>
+      <text x="397.0" y="403.3" font-size="16" text-anchor="middle">Hand off the damage</text>
+      <text x="397.0" y="420.3" font-size="16" text-anchor="middle">description</text>
+    </g>
+    <g data-step="12" data-from="A" data-to="B" data-type="note" data-copy="Terra checks availability. The store returns a replacement offer.">
+      <rect x="417.33333333333326" y="430" width="413.66666666666674" height="46" rx="4" fill="#faf5e7" stroke="#cabe9e"/>
+      <text x="624.17" y="447" font-size="16" text-anchor="middle">Terra checks availability. The store returns a</text>
+      <text x="624.17" y="464" font-size="16" text-anchor="middle">replacement offer.</text>
+    </g>
+    <g data-step="13" data-from="A" data-to="L" data-type="--&gt;&gt;" data-copy="Return the verified offer">
+      <line x1="512.3333333333333" x2="282.66666666666663" y1="493.0" y2="493.0" stroke="#345b46" stroke-width="1.7" stroke-dasharray="5 3"/>
+      <circle cx="512.3333333333333" cy="493.0" r="2.5" fill="#345b46"/>
+      <path d="M288.66666666666663,489.2 L281.66666666666663,493.0 L288.66666666666663,496.8Z" fill="#345b46" stroke="#345b46" stroke-width="1.4" stroke-linejoin="round"/>
+      <rect x="307.87695312499994" y="484.5" width="178.24609375" height="17" rx="2" fill="white"/>
+      <text x="397.0" y="498.3" font-size="16" text-anchor="middle">Return the verified offer</text>
+    </g>
+    <g data-step="14" data-from="L" data-to="C" data-type="--&gt;&gt;" data-copy="Same lamp, no charge, original address. Would you like it?">
+      <line x1="281.66666666666663" x2="58.0" y1="536.0" y2="536.0" stroke="#345b46" stroke-width="1.7" stroke-dasharray="5 3"/>
+      <circle cx="281.66666666666663" cy="536.0" r="2.5" fill="#345b46"/>
+      <path d="M64.0,532.2 L57.0,536.0 L64.0,539.8Z" fill="#345b46" stroke="#345b46" stroke-width="1.4" stroke-linejoin="round"/>
+      <rect x="80.33528645833331" y="510.5" width="177.99609375" height="51" rx="2" fill="white"/>
+      <text x="169.33" y="524.3" font-size="16" text-anchor="middle">Same lamp, no charge,</text>
+      <text x="169.33" y="541.3" font-size="16" text-anchor="middle">original address. Would</text>
+      <text x="169.33" y="558.3" font-size="16" text-anchor="middle">you like it?</text>
+    </g>
+    <g data-step="15" data-from="C" data-to="L" data-type="-&gt;&gt;" data-copy="Yes, send the replacement.">
+      <line x1="57.0" x2="280.66666666666663" y1="587.5" y2="587.5" stroke="#345b46" stroke-width="1.7"/>
+      <circle cx="57.0" cy="587.5" r="2.5" fill="#345b46"/>
+      <path d="M274.66666666666663,583.7 L281.66666666666663,587.5 L274.66666666666663,591.3Z" fill="#345b46" stroke="#345b46" stroke-width="1.4" stroke-linejoin="round"/>
+      <rect x="114.97005208333331" y="570.5" width="108.7265625" height="34" rx="2" fill="white"/>
+      <text x="169.33" y="584.3" font-size="16" text-anchor="middle">Yes, send the</text>
+      <text x="169.33" y="601.3" font-size="16" text-anchor="middle">replacement.</text>
+    </g>
+    <g data-step="16" data-from="L" data-to="A" data-type="-&gt;&gt;" data-copy="Hand off the caller’s answer">
+      <line x1="281.66666666666663" x2="511.33333333333326" y1="622.0" y2="622.0" stroke="#345b46" stroke-width="1.7"/>
+      <circle cx="281.66666666666663" cy="622.0" r="2.5" fill="#345b46"/>
+      <path d="M505.33333333333326,618.2 L512.3333333333333,622.0 L505.33333333333326,625.8Z" fill="#345b46" stroke="#345b46" stroke-width="1.4" stroke-linejoin="round"/>
+      <rect x="292.74999999999994" y="613.5" width="208.5" height="17" rx="2" fill="white"/>
+      <text x="397.0" y="627.3" font-size="16" text-anchor="middle">Hand off the caller’s answer</text>
+    </g>
+    <g data-step="17" data-from="B" data-to="A" data-type="-&gt;&gt;" data-copy="Request create_replacement">
+      <line x1="761.0" x2="513.3333333333333" y1="648.0" y2="648.0" stroke="#345b46" stroke-width="1.7"/>
+      <circle cx="761.0" cy="648.0" r="2.5" fill="#345b46"/>
+      <path d="M519.3333333333333,644.2 L512.3333333333333,648.0 L519.3333333333333,651.8Z" fill="#345b46" stroke="#345b46" stroke-width="1.4" stroke-linejoin="round"/>
+      <rect x="528.2916666666666" y="639.5" width="216.75" height="17" rx="2" fill="white"/>
+      <text x="636.67" y="653.3" font-size="16" text-anchor="middle">Request create_replacement</text>
+    </g>
+    <g data-step="18" data-from="A" data-to="B" data-type="note" data-copy="A separate Terra check reviews the spoken terms and the caller’s reply.">
+      <rect x="417.33333333333326" y="663" width="413.66666666666674" height="46" rx="4" fill="#faf5e7" stroke="#cabe9e"/>
+      <text x="624.17" y="680" font-size="16" text-anchor="middle">A separate Terra check reviews the spoken terms and</text>
+      <text x="624.17" y="697" font-size="16" text-anchor="middle">the caller’s reply.</text>
+    </g>
+    <g data-step="19" data-from="A" data-to="B" data-type="--&gt;&gt;" data-copy="Offer and reply still current. One replacement, RP001.">
+      <line x1="512.3333333333333" x2="760.0" y1="734.5" y2="734.5" stroke="#345b46" stroke-width="1.7" stroke-dasharray="5 3"/>
+      <circle cx="512.3333333333333" cy="734.5" r="2.5" fill="#345b46"/>
+      <path d="M754.0,730.7 L761.0,734.5 L754.0,738.3Z" fill="#345b46" stroke="#345b46" stroke-width="1.4" stroke-linejoin="round"/>
+      <rect x="535.1686197916666" y="717.5" width="202.99609375" height="34" rx="2" fill="white"/>
+      <text x="636.67" y="731.3" font-size="16" text-anchor="middle">Offer and reply still current.</text>
+      <text x="636.67" y="748.3" font-size="16" text-anchor="middle">One replacement, RP001.</text>
+    </g>
+    <g data-step="20" data-from="A" data-to="L" data-type="--&gt;&gt;" data-copy="Confirm the replacement with RP001">
+      <line x1="512.3333333333333" x2="282.66666666666663" y1="777.5" y2="777.5" stroke="#345b46" stroke-width="1.7" stroke-dasharray="5 3"/>
+      <circle cx="512.3333333333333" cy="777.5" r="2.5" fill="#345b46"/>
+      <path d="M288.66666666666663,773.7 L281.66666666666663,777.5 L288.66666666666663,781.3Z" fill="#345b46" stroke="#345b46" stroke-width="1.4" stroke-linejoin="round"/>
+      <rect x="303.99999999999994" y="760.5" width="186.0" height="34" rx="2" fill="white"/>
+      <text x="397.0" y="774.3" font-size="16" text-anchor="middle">Confirm the replacement</text>
+      <text x="397.0" y="791.3" font-size="16" text-anchor="middle">with RP001</text>
+    </g>
+    <g data-step="21" data-from="L" data-to="C" data-type="--&gt;&gt;" data-copy="Your replacement reference is RP001.">
+      <line x1="281.66666666666663" x2="58.0" y1="820.5" y2="820.5" stroke="#345b46" stroke-width="1.7" stroke-dasharray="5 3"/>
+      <circle cx="281.66666666666663" cy="820.5" r="2.5" fill="#345b46"/>
+      <path d="M64.0,816.7 L57.0,820.5 L64.0,824.3Z" fill="#345b46" stroke="#345b46" stroke-width="1.4" stroke-linejoin="round"/>
+      <rect x="93.20833333333331" y="803.5" width="152.25" height="34" rx="2" fill="white"/>
+      <text x="169.33" y="817.3" font-size="16" text-anchor="middle">Your replacement</text>
+      <text x="169.33" y="834.3" font-size="16" text-anchor="middle">reference is RP001.</text>
+    </g>
+  </g>
+</svg>

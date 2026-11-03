@@ -21,6 +21,7 @@ provider account start and reconnect its sandbox.
 | Daytona | [handler.py](daytona/webhook_managed/handler.py) | [Deploy](daytona/webhook_managed/README.md) |
 | E2B | [handler.py](e2b/webhook_managed/handler.py) | [Deploy](e2b/webhook_managed/README.md) |
 | DigitalOcean | [handler.py](digitalocean/webhook_managed/handler.py) | [Deploy](digitalocean/webhook_managed/README.md) |
+| Tenki | [handler.py](tenki/webhook_managed/handler.py) | [Deploy](tenki/webhook_managed/README.md) |
 
 Complete the setup below, deploy one provider's handler, then run its
 client. For direct provisioning from your application, use

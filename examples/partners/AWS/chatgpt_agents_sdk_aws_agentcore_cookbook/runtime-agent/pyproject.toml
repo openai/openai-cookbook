@@ -16,7 +16,7 @@ dependencies = [
 [project.optional-dependencies]
 dev = [
   "ipykernel==7.3.0",
-  "jupyterlab==4.6.2",
+  "jupyterlab==4.6.4",
   "nbconvert==7.17.1",
   "nbformat==5.10.4",
   "pip-audit==2.10.1",

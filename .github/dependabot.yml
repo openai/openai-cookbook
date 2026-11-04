@@ -1,0 +1,13 @@
+version: 2
+updates:
+  # Workflows pin actions to commit SHAs with a version comment. Dependabot
+  # keeps both in sync, so the pins do not go stale.
+  - package-ecosystem: github-actions
+    directory: /
+    schedule:
+      interval: monthly
+    groups:
+      github-actions:
+        patterns:
+          - "*"
+    open-pull-requests-limit: 2

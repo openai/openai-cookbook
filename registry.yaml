@@ -4,6 +4,19 @@
 # should build pages for, and indicates metadata such as tags, creation date and
 # authors for each page.
 
+- title: A voice research assistant you can correct mid-search
+  path: articles/voice-research-with-parallel.md
+  slug: voice-research-with-parallel
+  description: Build a voice research assistant with independent tasks, live corrections, sourced findings, and an evaluation workflow using Parallel Search and Extract.
+  date: "2026-11-02"
+  authors:
+    - georgeatparallel
+  tags:
+    - partners
+    - audio
+    - evals
+    - responses
+
 - title: Harness-aware evaluation of plugins
   path: examples/partners/harness_aware_plugin_evals/harness_aware_plugin_evals.ipynb
   slug: harness-aware-plugin-evals

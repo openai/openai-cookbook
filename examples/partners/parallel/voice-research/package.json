@@ -1,0 +1,16 @@
+{
+  "name": "voice-research-cookbook",
+  "version": "0.1.0",
+  "private": true,
+  "type": "module",
+  "engines": { "node": ">=24" },
+  "scripts": {
+    "start": "node --env-file-if-exists=.env.local src/server.ts",
+    "test": "node --test tests/*.test.ts tests/*.test.mjs",
+    "typecheck": "tsc --noEmit",
+    "eval": "node --env-file-if-exists=.env.local scripts/evaluate.ts",
+    "eval:summary": "node scripts/summarize.ts"
+  },
+  "dependencies": { "ws": "8.21.3" },
+  "devDependencies": { "@types/node": "24.10.0", "@types/ws": "8.18.1", "typescript": "7.0.2", "playwright": "1.62.1" }
+}

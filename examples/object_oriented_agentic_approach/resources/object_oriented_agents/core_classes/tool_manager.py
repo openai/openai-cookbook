@@ -50,46 +50,52 @@ class ToolManager:
         reasoning_effort: Optional[str] = None
     ) -> str:
         """
-        If the model wants to call a tool, parse the function arguments, invoke the tool,
-        then optionally return the tool's raw output or feed it back to the model for a final answer.
+        Execute all tool calls and send their results back for a final answer.
+        Raw-return mode executes only the first call and returns its output.
         """
-        # We take the first tool call from the model’s response
-        first_tool_call = response.choices[0].message.tool_calls[0]
-        tool_name = first_tool_call.function.name
-        self.logger.info(f"Handling tool call: {tool_name}")
+        function_call_result_messages = []
+        for tool_call in response.choices[0].message.tool_calls:
+            tool_name = tool_call.function.name
+            self.logger.info(f"Handling tool call: {tool_name}")
 
-        args = json.loads(first_tool_call.function.arguments)
-        self.logger.info(f"Tool arguments: {args}")
+            args = json.loads(tool_call.function.arguments)
+            self.logger.info(f"Tool arguments: {args}")
 
-        if tool_name not in self.tools:
-            error_message = f"Error: The requested tool '{tool_name}' is not registered."
-            self.logger.error(error_message)
-            raise ValueError(error_message)
+            if tool_name not in self.tools:
+                error_message = (
+                    f"Error: The requested tool '{tool_name}' "
+                    "is not registered."
+                )
+                self.logger.error(error_message)
+                raise ValueError(error_message)
 
-        # 1. Invoke the tool
-        self.logger.debug(f"Invoking tool '{tool_name}'")
-        tool_response = self.tools[tool_name].run(args)
-        self.logger.info(f"Tool '{tool_name}' response: {tool_response}")
+            self.logger.debug(f"Invoking tool '{tool_name}'")
+            tool_response = self.tools[tool_name].run(args)
+            self.logger.info(f"Tool '{tool_name}' response: {tool_response}")
 
-        # If returning the tool response "as is," just store and return it
-        if return_tool_response_as_is:
-            self.logger.debug("Returning tool response as-is without further LLM calls.")
-            messages.add_assistant_message(tool_response)
-            return tool_response
+            # Preserve the first-call-only behavior in raw-return mode.
+            if return_tool_response_as_is:
+                self.logger.debug(
+                    "Returning tool response as-is without further LLM calls."
+                )
+                messages.add_assistant_message(tool_response)
+                return tool_response
 
-        self.logger.debug(f"Tool call: {first_tool_call}")
-        # Otherwise, feed the tool's response back to the LLM for a final answer
-        function_call_result_message = {
-            "role": "tool",
-            "content": tool_response,
-            "tool_call_id": first_tool_call.id
-        }
+            self.logger.debug(f"Tool call: {tool_call}")
+            function_call_result_messages.append({
+                "role": "tool",
+                "content": tool_response,
+                "tool_call_id": tool_call.id
+            })
 
         complete_payload = messages.get_messages()
         complete_payload.append(response.choices[0].message)
-        complete_payload.append(function_call_result_message)
+        complete_payload.extend(function_call_result_messages)
 
-        self.logger.debug("Calling the model again with the tool response to get the final answer.")
+        self.logger.debug(
+            "Calling the model again with the tool response "
+            "to get the final answer."
+        )
         # Build parameter dict and only include reasoning_effort if not None
         params = {
             "model": model_name,

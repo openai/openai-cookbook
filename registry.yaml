@@ -4,6 +4,18 @@
 # should build pages for, and indicates metadata such as tags, creation date and
 # authors for each page.
 
+- title: Reject stale evidence after source revisions
+  path: examples/evidence_revision_gate/evidence_revision_gate.ipynb
+  slug: evidence-revision-gate
+  description: Bind extracted citations to application-owned source snapshots and invalidate evidence when source bytes change, with offline regression tests and opt-in Responses API extraction.
+  date: 2026-10-23
+  authors:
+    - QueenFi703
+  tags:
+    - RAG
+    - responses
+    - structured-outputs
+
 - title: Harness-aware evaluation of plugins
   path: examples/partners/harness_aware_plugin_evals/harness_aware_plugin_evals.ipynb
   slug: harness-aware-plugin-evals

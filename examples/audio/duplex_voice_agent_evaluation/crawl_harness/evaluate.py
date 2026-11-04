@@ -48,6 +48,7 @@ from shared.paths import default_audio_cache_dir, default_results_dir, package_p
 from shared.private_files import private_open
 from shared.reporting.results import build_results_report, build_timestamped_run_name, ensure_dir, write_json
 from shared.reporting.schema import SCHEMA_VERSION
+from shared.reporting.validation import result_status
 from shared.scenarios import Scenario, load_scenario_dataset
 from shared.single_turn.console import SingleTurnConsoleEventLog as CrawlConsoleEventLog
 from shared.single_turn.observability import (
@@ -303,6 +304,8 @@ def build_failed_result(
         ),
         latencies=ResultLatencies(),
         error_info=error_info,
+        task_metrics={"task_completed": False},
+        delegation_count=None,
         scenario_type=scenario.scenario_type,
         context_mode=scenario.context_mode,
         expected_delegation=scenario.expected.requires_delegation,
@@ -850,14 +853,12 @@ async def run_single_eval(
 def format_example_result(result: CrawlEvalResult) -> str:
     """Render the actual conversation, executed tools, grades, and audio timing."""
 
-    semantic_failed = any(grade.get("status") == "failed" for grade in result.semantic_grades.values())
-    task_completed = bool(result.task_metrics.get("task_completed", result.tool_call_grade.grade))
-    if result.error_info.status != "ok":
-        status = "ERROR"
-    elif task_completed and result.tool_call_grade.grade and not semantic_failed:
-        status = "PASS"
-    else:
-        status = "FAIL"
+    metric_row = result.to_result_row()
+    status = {
+        "infrastructure_error": "ERROR",
+        "passed": "PASS",
+        "failed": "FAIL",
+    }[result_status(metric_row, completed=metric_row["task_completed"])]
 
     assistant_text = result.assistant_turn_transcript or result.assistant_text or "[no assistant response]"
     lines = [f"  USER       {result.user_text}", f"  ASSISTANT  {assistant_text}"]
@@ -875,7 +876,6 @@ def format_example_result(result: CrawlEvalResult) -> str:
     else:
         lines.append("  TOOL       none")
 
-    metric_row = result.to_result_row()
     metrics = [status]
     for label, key in (("tool", "tool_accuracy"), ("response_rate", "response_rate")):
         value = metric_row.get(key)
@@ -905,8 +905,8 @@ def format_example_result(result: CrawlEvalResult) -> str:
     elif result.semantic_grades:
         lines.append("  JUDGE      not assessed (offline fixture)")
 
-    if result.error_info.error_message:
-        lines.append(f"  ERROR      {result.error_info.failure_stage}: {result.error_info.error_message}")
+    if metric_row.get("error_message"):
+        lines.append(f"  ERROR      {metric_row['failure_stage']}: {metric_row['error_message']}")
     return "\n".join(lines)
 
 

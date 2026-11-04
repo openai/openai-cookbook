@@ -20,6 +20,8 @@
       "semantic_drain": false,
       "completion_model": "gpt-5.6-terra",
       "completion_timeout_seconds": 8.0,
+      "work_grace_seconds": 5.0,
+      "cleanup_timeout_seconds": 10.0,
       "concurrency": 1,
       "audio_condition": "clean",
       "audio_realism": {},

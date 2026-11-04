@@ -177,6 +177,7 @@ async def test_run_relay_overflow_is_attributed_to_the_participant() -> None:
             yield {"type": "two"}
 
     runner = object.__new__(DualGptLiveRunner)
+    runner._sealed = False
     runner.events = LimitedQueue(maxsize=1)
     runner.failure = None
     runner.started = time.monotonic()

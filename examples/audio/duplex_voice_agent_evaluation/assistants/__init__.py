@@ -22,6 +22,8 @@ def create_assistant(
 ) -> EvaluatedAssistant:
     """Select delegation while keeping the GPT Live frontend identical."""
     mode = config.assistant_mode if config is not None else getattr(settings, "assistant_mode", "responses")
+    if not isinstance(mode, str) or mode not in ("responses", "client"):
+        raise ValueError("assistant_mode must be 'responses' or 'client'")
     selected = ClientDelegatedAssistant if mode == "client" else ResponsesManagedAssistant
     return selected(
         scenario=scenario,

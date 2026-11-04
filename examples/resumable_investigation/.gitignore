@@ -1,0 +1,6 @@
+__pycache__/
+*.py[cod]
+.venv/
+*.sqlite3
+*.sqlite3-journal
+.ipynb_checkpoints/

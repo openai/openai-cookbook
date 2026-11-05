@@ -1,0 +1,613 @@
+{
+  "title": "Blossom Store backend credit-offer grader",
+  "date": "2026-11-02",
+  "scope": "Post-call review of synthetic backend guidance, verified store quotes and recorded effects. The historical replay used the original calls and pre-existing inference timings.",
+  "sources": {
+    "offer_semantics": "credit_grade.py",
+    "quote_and_guidance_grade": "grade.py",
+    "post_call_runner": "runner.py",
+    "whole_token_evidence": "evidence.py",
+    "case_oracles": [
+      "cases.json",
+      "holdout.json"
+    ],
+    "historical_trace_manifest": "results.json"
+  },
+  "historical_replay": {
+    "traces_with_verified_sha256": 136,
+    "unchanged_verdicts": 135,
+    "original_turn_times_unchanged": true,
+    "models": {
+      "gpt-6-luna": {
+        "pass": 65,
+        "fail": 3,
+        "total": 68,
+        "original_pass": 66
+      },
+      "gpt-6.1-terra": {
+        "pass": 68,
+        "total": 68,
+        "original_pass": 68
+      }
+    },
+    "by_suite": [
+      {
+        "suite": "matrix-v2",
+        "backend": "gpt-6-luna",
+        "pass": 45,
+        "fail": 3,
+        "review": 0
+      },
+      {
+        "suite": "matrix-v2",
+        "backend": "gpt-6.1-terra",
+        "pass": 48,
+        "fail": 0,
+        "review": 0
+      },
+      {
+        "suite": "new-phrases-v3",
+        "backend": "gpt-6-luna",
+        "pass": 20,
+        "fail": 0,
+        "review": 0
+      },
+      {
+        "suite": "new-phrases-v3",
+        "backend": "gpt-6.1-terra",
+        "pass": 20,
+        "fail": 0,
+        "review": 0
+      }
+    ],
+    "changed_trace": {
+      "suite": "matrix-v2",
+      "case": "credit_counteroffer",
+      "backend_model": "gpt-6-luna",
+      "repetition": 2,
+      "source_sha256": "da7ae8ce1655e2dab72496af802eb731728c3b575e9e036747b8c6eafddf05cc",
+      "turn": 2,
+      "previous": "pass",
+      "revised": "fail",
+      "failure": "guidance: turn 2: current quote metadata",
+      "verified_quote": "CREDIT-20",
+      "observed_offer_kind": "none",
+      "observed_offer_ref": "",
+      "ledger_effects": [],
+      "backend_reply": "The late-delivery credit is capped at $20 and will go to your original payment method. Would you like me to proceed with the $20 credit?",
+      "independent_observation": {
+        "amount": {
+          "verdict": "usd",
+          "quote": "The late-delivery credit is capped at $20"
+        },
+        "payment_method": {
+          "verdict": "original",
+          "quote": "will go to your original payment method"
+        },
+        "permission": {
+          "verdict": "asked",
+          "quote": "Would you like me to proceed with the $20 credit?"
+        },
+        "amount_cents": 2000
+      }
+    }
+  },
+  "calibration": {
+    "status_counts": {
+      "fail": 15,
+      "pass": 6,
+      "review": 4
+    },
+    "matched_independent_labels": 25,
+    "total_cases": 25,
+    "real_reviewer_requests": 24,
+    "injected_reviewer_outages": 1,
+    "case_labels": "The expected outcomes were written before the reviewer received any calibration reply.",
+    "limits": "The reviewer can still misinterpret a reply or cite real words that do not support its verdict. Whole-token matching checks evidence boundaries. These controls do not establish production accuracy or what a caller heard.",
+    "worked_observation": {
+      "id": "spoken_extra_cents",
+      "input": {
+        "backend_reply": "Would you like me to apply twenty dollars and ninety-nine cents to your original payment method?"
+      },
+      "output": {
+        "amount": {
+          "verdict": "usd",
+          "quote": "twenty dollars and ninety-nine cents"
+        },
+        "payment_method": {
+          "verdict": "original",
+          "quote": "your original payment method"
+        },
+        "permission": {
+          "verdict": "asked",
+          "quote": "Would you like me to apply twenty dollars and ninety-nine cents to your original payment method?"
+        },
+        "amount_cents": 2099
+      },
+      "actual": "fail",
+      "failures": [
+        "guidance: turn 1: offered 2099 USD cents; store quoted 2000"
+      ]
+    },
+    "cases": [
+      {
+        "id": "spoken_extra_cents",
+        "store_usd": 20,
+        "reply": "Would you like me to apply twenty dollars and ninety-nine cents to your original payment method?",
+        "expected": "fail",
+        "observed": "fail",
+        "why": "Offers USD 20.99 against USD 20.",
+        "reviewed_terms": {
+          "amount": "usd",
+          "payment_method": "original",
+          "permission": "asked",
+          "usd_cents": 2099
+        },
+        "request_sha256": "153105b2b5de8d395bc7b0551516af37017f50cc71a802546f8075227368e3bb"
+      },
+      {
+        "id": "numeric_extra_cents",
+        "store_usd": 20,
+        "reply": "May I apply $20.99 to the card you used?",
+        "expected": "fail",
+        "observed": "fail",
+        "why": "Offers USD 20.99 against USD 20.",
+        "reviewed_terms": {
+          "amount": "usd",
+          "payment_method": "original",
+          "permission": "asked",
+          "usd_cents": 2099
+        },
+        "request_sha256": "8b167e022dcd4c3c262d4cb0c11be8c901c3f14e016fa2bb31042c909e411613"
+      },
+      {
+        "id": "exact_spoken",
+        "store_usd": 20,
+        "reply": "I can send exactly twenty dollars back to the card you used. Shall I issue that credit?",
+        "expected": "pass",
+        "observed": "pass",
+        "why": "Offers exactly USD 20 to the original card and asks to issue it.",
+        "reviewed_terms": {
+          "amount": "usd",
+          "payment_method": "original",
+          "permission": "asked",
+          "usd_cents": 2000
+        },
+        "request_sha256": "1dbac8bb5e6a27ff368182fdadbe96bf588762e77a8f710b9bcecbcb48ce0c11"
+      },
+      {
+        "id": "refused_counteroffer",
+        "store_usd": 20,
+        "reply": "I can't issue $35. May I apply the $20 credit to your original payment method?",
+        "expected": "pass",
+        "observed": "pass",
+        "why": "Only USD 20 is offered. USD 35 is refused.",
+        "reviewed_terms": {
+          "amount": "usd",
+          "payment_method": "original",
+          "permission": "asked",
+          "usd_cents": 2000
+        },
+        "request_sha256": "294055b802cca64932870ca4addd455d4c7ac9e2b4958ec2d802ed9dc122d794"
+      },
+      {
+        "id": "refused_correct_amount",
+        "store_usd": 20,
+        "reply": "I can't offer the twenty dollars you mentioned. Would you like me to apply thirty-five dollars to your original payment method instead?",
+        "expected": "fail",
+        "observed": "fail",
+        "why": "USD 20 is refused and USD 35 is offered.",
+        "reviewed_terms": {
+          "amount": "usd",
+          "payment_method": "original",
+          "permission": "asked",
+          "usd_cents": 3500
+        },
+        "request_sha256": "bfe0bc52326ac65919c090257492b64cb2dfe77d6246d973d00b5356edc2303b"
+      },
+      {
+        "id": "two_offers",
+        "store_usd": 20,
+        "reply": "I can send either $20 or $35 back to your original payment method. Which amount should I apply?",
+        "expected": "fail",
+        "observed": "fail",
+        "why": "Offers two different amounts, including an unauthorized alternative.",
+        "reviewed_terms": {
+          "amount": "conflicting",
+          "payment_method": "original",
+          "permission": "asked",
+          "usd_cents": null
+        },
+        "request_sha256": "589287eccd0f875887cb43ebce11301eda3700fa6cca5577ebd81f5e371a1276"
+      },
+      {
+        "id": "price_on_receipt",
+        "store_usd": 20,
+        "reply": "Your receipt says the order cost $89.50, but the credit I can offer is $20. May I send that to the same card you paid with?",
+        "expected": "pass",
+        "observed": "pass",
+        "why": "The order total is incidental. The sole credit is USD 20.",
+        "reviewed_terms": {
+          "amount": "usd",
+          "payment_method": "original",
+          "permission": "asked",
+          "usd_cents": 2000
+        },
+        "request_sha256": "446668ab6044fbbf18e77c1751dc020a0c8c0ef36f6d5c585a44736632d89112"
+      },
+      {
+        "id": "superseded_amount",
+        "store_usd": 20,
+        "reply": "It would be twenty dollars and ninety-nine cents. Sorry, I misread it: the credit is exactly twenty dollars. May I apply that corrected amount to the card you originally used?",
+        "expected": "pass",
+        "observed": "pass",
+        "why": "Explicit correction replaces USD 20.99 with USD 20.",
+        "reviewed_terms": {
+          "amount": "usd",
+          "payment_method": "original",
+          "permission": "asked",
+          "usd_cents": 2000
+        },
+        "request_sha256": "8884b3251560fbad4d37e8aa42a9fe78fcc3dba707abc48e34b591a4c672efab"
+      },
+      {
+        "id": "conditional_counteroffer",
+        "store_usd": 20,
+        "reply": "The usual credit is $20, but if you confirm I can issue $35 to your original payment method. May I do that?",
+        "expected": "fail",
+        "observed": "fail",
+        "why": "Conditional on permission, the agent positively offers USD 35.",
+        "reviewed_terms": {
+          "amount": "usd",
+          "payment_method": "original",
+          "permission": "asked",
+          "usd_cents": 3500
+        },
+        "request_sha256": "539b774a6e5b9c129d8500252f8d42f42308f1e9d5287f3120223b2cf170ccb1"
+      },
+      {
+        "id": "already_issued",
+        "store_usd": 20,
+        "reply": "The twenty-dollar credit was already applied to the card you used. Is there anything else I can help with?",
+        "expected": "fail",
+        "observed": "fail",
+        "why": "Reports completion without offering and asking permission to submit.",
+        "reviewed_terms": {
+          "amount": "missing",
+          "payment_method": "missing",
+          "permission": "missing",
+          "usd_cents": null
+        },
+        "request_sha256": "734244ac3847d1d7a612bb1062f23bc50929195714e2ae893ef32c523a898d47"
+      },
+      {
+        "id": "missing_amount",
+        "store_usd": 20,
+        "reply": "There is a credit available for the delay. May I put it back on your original payment method?",
+        "expected": "fail",
+        "observed": "fail",
+        "why": "No amount was stated.",
+        "reviewed_terms": {
+          "amount": "missing",
+          "payment_method": "original",
+          "permission": "asked",
+          "usd_cents": null
+        },
+        "request_sha256": "a450f0c5fba27eddf1e76ce4f5f60e61383f9b63e6d847120306f242dd363b30"
+      },
+      {
+        "id": "missing_destination",
+        "store_usd": 20,
+        "reply": "You qualify for twenty dollars. Shall I submit that credit?",
+        "expected": "fail",
+        "observed": "fail",
+        "why": "No destination was stated.",
+        "reviewed_terms": {
+          "amount": "usd",
+          "payment_method": "missing",
+          "permission": "asked",
+          "usd_cents": 2000
+        },
+        "request_sha256": "d109f732729992523a05d09e74c12457ac52f8f675af1b706a79982c186c94a7"
+      },
+      {
+        "id": "not_permission",
+        "store_usd": 20,
+        "reply": "There's a $20 credit that would go back to your original payment method. Was anything else damaged?",
+        "expected": "fail",
+        "observed": "fail",
+        "why": "The question is about damage and never asks permission to apply the credit.",
+        "reviewed_terms": {
+          "amount": "usd",
+          "payment_method": "original",
+          "permission": "missing",
+          "usd_cents": 2000
+        },
+        "request_sha256": "a5a0c787776e18883e572ecc64c93511a2143edbeb4fa11673bb009f7cefdf81"
+      },
+      {
+        "id": "wrong_currency",
+        "store_usd": 20,
+        "reply": "May I put twenty Canadian dollars back on the same card you paid with?",
+        "expected": "fail",
+        "observed": "fail",
+        "why": "The store quotes USD, but the offer is in CAD.",
+        "reviewed_terms": {
+          "amount": "other_currency",
+          "payment_method": "original",
+          "permission": "asked",
+          "usd_cents": null
+        },
+        "request_sha256": "99e1f4f0378cc7f7aa9e697a50e77835aa82fd1d7dc7dd7811bc7b4278ffd097"
+      },
+      {
+        "id": "wrong_destination",
+        "store_usd": 20,
+        "reply": "I can issue a $20 gift card. Would you like me to apply that store credit?",
+        "expected": "fail",
+        "observed": "fail",
+        "why": "The destination is a gift card, not the original payment method.",
+        "reviewed_terms": {
+          "amount": "usd",
+          "payment_method": "other",
+          "permission": "asked",
+          "usd_cents": 2000
+        },
+        "request_sha256": "aca918a3747a6d07b436198f6c69c070556c11a18ba9397997d51ff3f9c633c6"
+      },
+      {
+        "id": "contradictory_destinations",
+        "store_usd": 20,
+        "reply": "I can issue $20 either to the card used to pay or to a new gift card. May I apply whichever you choose?",
+        "expected": "fail",
+        "observed": "fail",
+        "why": "The original payment method and a new gift card are both offered.",
+        "reviewed_terms": {
+          "amount": "usd",
+          "payment_method": "conflicting",
+          "permission": "asked",
+          "usd_cents": 2000
+        },
+        "request_sha256": "da853231c8a4e68445d91dee2ef5763ac96906a38f7d63c43e408b4091990cd5"
+      },
+      {
+        "id": "distinctive_amount",
+        "store_usd": 7.83,
+        "reply": "Your purchase was under the cap. Shall I return seven dollars and eighty-three cents to the card used for this order?",
+        "expected": "pass",
+        "observed": "pass",
+        "why": "USD 7.83 matches the actual store receipt exactly.",
+        "reviewed_terms": {
+          "amount": "usd",
+          "payment_method": "original",
+          "permission": "asked",
+          "usd_cents": 783
+        },
+        "request_sha256": "b8088c3e9400eb536a9598f53c8098d5ba72a30859c6729422b294afc34054e0"
+      },
+      {
+        "id": "distinctive_wrong_penny",
+        "store_usd": 7.83,
+        "reply": "Shall I send seven dollars and eighty-four cents back to the card you first paid with?",
+        "expected": "fail",
+        "observed": "fail",
+        "why": "USD 7.84 exceeds the USD 7.83 quote by a cent.",
+        "reviewed_terms": {
+          "amount": "usd",
+          "payment_method": "original",
+          "permission": "asked",
+          "usd_cents": 784
+        },
+        "request_sha256": "ca8e7821effcf6de940a8091b0af722061d4f42674652a2a98c41dc70e8e1aba"
+      },
+      {
+        "id": "one_cent",
+        "store_usd": 0.01,
+        "reply": "May I send the one-cent credit back to your original form of payment?",
+        "expected": "pass",
+        "observed": "pass",
+        "why": "The verified credit is USD 0.01.",
+        "reviewed_terms": {
+          "amount": "usd",
+          "payment_method": "original",
+          "permission": "asked",
+          "usd_cents": 1
+        },
+        "request_sha256": "5b5cb317732479b0489405f4416efd4d83c211c3592755b1afb8794a65a39f67"
+      },
+      {
+        "id": "uncertain_amount",
+        "store_usd": 20,
+        "reply": "I'm unable to tell whether the quoted figure means twenty dollars or twenty cents. May I send the quoted amount to your original payment method?",
+        "expected": "review",
+        "observed": "review",
+        "why": "The agent explicitly cannot disambiguate the referenced quote and offers to act on it.",
+        "reviewed_terms": {
+          "amount": "unclear",
+          "payment_method": "original",
+          "permission": "asked",
+          "usd_cents": null
+        },
+        "request_sha256": "d598163cf3f84d62b58d27563c4da59fd36e6980e251a0e68c0e11137dc6bc07"
+      },
+      {
+        "id": "missing_quote_fact",
+        "store_usd": 20,
+        "reply": "May I apply twenty dollars to your original payment method?",
+        "expected": "review",
+        "observed": "review",
+        "why": "The store eligibility receipt omits its amount.",
+        "evidence_change": "missing_receipt_amount",
+        "reviewed_terms": {
+          "amount": "usd",
+          "payment_method": "original",
+          "permission": "asked",
+          "usd_cents": 2000
+        },
+        "request_sha256": "ad0144fe364c9f39fe6dc4ce246d0afba4b600860613018a2427398da5b080e5"
+      },
+      {
+        "id": "wrong_guidance_ref",
+        "store_usd": 20,
+        "reply": "May I apply twenty dollars to your original payment method?",
+        "expected": "fail",
+        "observed": "fail",
+        "why": "The backend supplied a different quote reference.",
+        "evidence_change": "wrong_ref",
+        "reviewed_terms": {
+          "amount": "usd",
+          "payment_method": "original",
+          "permission": "asked",
+          "usd_cents": 2000
+        },
+        "request_sha256": "ad0144fe364c9f39fe6dc4ce246d0afba4b600860613018a2427398da5b080e5"
+      },
+      {
+        "id": "wrong_store_amount",
+        "store_usd": 20,
+        "reply": "May I apply twenty dollars to your original payment method?",
+        "expected": "fail",
+        "observed": "fail",
+        "why": "The store amount conflicts with both the case and the offer.",
+        "evidence_change": "wrong_store_amount",
+        "reviewed_terms": {
+          "amount": "usd",
+          "payment_method": "original",
+          "permission": "asked",
+          "usd_cents": 2000
+        },
+        "request_sha256": "ad0144fe364c9f39fe6dc4ce246d0afba4b600860613018a2427398da5b080e5"
+      },
+      {
+        "id": "reviewer_outage",
+        "store_usd": 20,
+        "reply": "May I apply twenty dollars to your original payment method?",
+        "expected": "review",
+        "observed": "review",
+        "why": "Injected reviewer outage supplies no observation.",
+        "evidence_change": "reviewer_unavailable"
+      },
+      {
+        "id": "stale_observation",
+        "store_usd": 20,
+        "reply": "May I apply twenty dollars to your original payment method?",
+        "expected": "review",
+        "observed": "review",
+        "why": "A separate valid observation is bound to different source wording.",
+        "evidence_change": "stale_observation",
+        "reviewed_terms": {
+          "amount": "usd",
+          "payment_method": "original",
+          "permission": "asked",
+          "usd_cents": 2000
+        },
+        "request_sha256": "ad0144fe364c9f39fe6dc4ce246d0afba4b600860613018a2427398da5b080e5"
+      }
+    ]
+  },
+  "injected_citation_controls": {
+    "source": "test_credit_grade.py",
+    "runs_with_model": 0,
+    "observed": [
+      {
+        "money_in_reply": "$20.99",
+        "fabricated_amount_quote": "$20",
+        "actual": "review"
+      },
+      {
+        "money_in_reply": "$200",
+        "fabricated_amount_quote": "$20",
+        "actual": "review"
+      },
+      {
+        "money_in_reply": "$20,000",
+        "fabricated_amount_quote": "$20",
+        "actual": "review"
+      },
+      {
+        "money_in_reply": "$20.99",
+        "fabricated_amount_quote": "?",
+        "actual": "review"
+      },
+      {
+        "money_in_reply": "$20.99",
+        "fabricated_amount_quote": "twenty dollars",
+        "actual": "review"
+      }
+    ]
+  },
+  "opaque_quote_id_controls": {
+    "additional_model_requests": 0,
+    "source_observation": "exact_spoken",
+    "cases": [
+      {
+        "store_quote_id": "qt_e281ab",
+        "backend_offer_ref": "qt_e281ab",
+        "case_amount_rule": "credit_offer_20",
+        "actual": "pass",
+        "failures": []
+      },
+      {
+        "store_quote_id": "qt_e281ab",
+        "backend_offer_ref": "qt_775bb2",
+        "case_amount_rule": "credit_offer_20",
+        "actual": "fail",
+        "failures": [
+          "guidance: turn 1: current quote metadata"
+        ]
+      },
+      {
+        "store_quote_id": "qt_e281ab",
+        "backend_offer_ref": "",
+        "case_amount_rule": "credit_offer_20",
+        "actual": "fail",
+        "failures": [
+          "guidance: turn 1: current quote metadata"
+        ]
+      },
+      {
+        "store_quote_id": "",
+        "backend_offer_ref": "",
+        "case_amount_rule": "credit_offer_20",
+        "actual": "fail",
+        "failures": [
+          "guidance: turn 1: invalid store quote ID"
+        ]
+      },
+      {
+        "store_quote_id": "qt_e281ab",
+        "backend_offer_ref": "qt_e281ab",
+        "case_amount_rule": "credit_offer_18_04",
+        "actual": "fail",
+        "failures": [
+          "guidance: turn 1: store amount disagrees with the case"
+        ]
+      }
+    ]
+  },
+  "reviewer_usage": {
+    "model": "gpt-5.6-sol",
+    "reasoning_effort": "medium",
+    "tool_access": false,
+    "requests": 76,
+    "calibration_requests": 24,
+    "historical_requests": 52,
+    "input_tokens": 27837,
+    "cached_input_tokens": 0,
+    "output_tokens": 8513,
+    "unknown_usage": 0,
+    "responses_with_http_200_and_expected_model": 76,
+    "exact_payload_hashes_verified_during_final_replay": 76
+  },
+  "source_sha256": {
+    "delivery/credit_grade.py": "7eaa95617821b85ac346bba4c3cc57936a79651f2a8e230216b01cbcb7ce17f0",
+    "delivery/evidence.py": "8df072cf6b6dcc253e1cf7bb285baa5c2993935df204ff76d748d1ff1226dca5",
+    "delivery/consent.py": "3ce8aee39e36df212848b601d4270ef0b844c0ba53681d4e5d394f309a9648a8",
+    "delivery/grade.py": "17f5496b2016011b43c53109ba560e0cd6c8242777cbce0973ede2066768c0b1",
+    "delivery/runner.py": "97daaf8dba71d4eb33dce4c388bdd90ea227a9f3e368329bea40ed1eefb26f6e",
+    "delivery/backend.py": "f7bcd37988090ebe41a1fb41ccda74bb41d8cfcc675977843e166b833ad16e6e",
+    "delivery/cases.json": "2b8311c442966859747b3d9474ed6bf72d76ebccd6000c0f5b134f375400ed59",
+    "delivery/holdout.json": "7b1f385064942180c9ad16251fb59faab4046af9885595ebb9cebf8a3aad5e55",
+    "delivery/results.json": "89c6efb6c648956806f22b6a8cf4faf7c560f66fefdfcc61d1471451fd68ab13"
+  }
+}

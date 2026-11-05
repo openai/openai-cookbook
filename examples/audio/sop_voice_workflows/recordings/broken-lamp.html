@@ -1,0 +1,210 @@
+<!doctype html>
+<html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1">
+<title>A replacement for a broken lamp</title><style>
+:root{color-scheme:light dark;font:16px/1.5 system-ui,sans-serif}body{max-width:48rem;margin:0 auto;padding:1rem}
+h1{font-size:1.65rem;margin:.45rem 0}h2{font-size:1.15rem;margin:1.1rem 0 .2rem}
+audio{width:100%;margin:.25rem 0}ol{list-style:none;padding:0}li{display:grid;grid-template-columns:3.6rem minmax(0,1fr);gap:.6rem;border-top:1px solid color-mix(in srgb, currentColor 25%, transparent);padding:.5rem 0}
+button{font:inherit;font-variant-numeric:tabular-nums;color:inherit;cursor:pointer;text-decoration:underline;align-self:start;border:0;background:none;padding:0}summary{cursor:pointer}.role{font-size:.82rem;font-weight:bold}pre{white-space:pre-wrap;overflow-wrap:anywhere;font-size:.84rem}button:focus-visible,summary:focus-visible{outline:2px solid currentColor;outline-offset:2px}
+</style></head><body><main><h1>A replacement for a broken lamp</h1><p>A Blossom Store customer asks about tracking, reports a cracked lamp, and accepts a replacement.</p>
+<audio controls preload="metadata" aria-label="A replacement for a broken lamp" src="blossom-late-handoff.mp3"></audio>
+<h2>Call timeline</h2><p>The test deliberately holds the first tracking handoff until the caller reports the damage. Select a timestamp to hear the call from that point. Expand an event to inspect its details.</p>
+<ol><li><button type="button" data-ms="800" aria-label="Play from 0:00.80">0:00.80</button><div><details><summary><span class="role">Caller</span> Where&#x27;s my order</summary><pre>{
+  &quot;turn&quot;: 1,
+  &quot;source&quot;: &quot;GPT-Live input transcript&quot;,
+  &quot;time_basis&quot;: &quot;First voiced caller audio&quot;
+}</pre></details></div></li>
+<li><button type="button" data-ms="3180" aria-label="Play from 0:03.18">0:03.18</button><div><details><summary><span class="role">Test delay</span> Hold the tracking handoff before it reaches the application</summary><pre>{
+  &quot;delegation_id&quot;: &quot;item_Ee0g1AaOVwTfOtJWaHH1w&quot;,
+  &quot;original_event_id&quot;: &quot;event_01&quot;,
+  &quot;original_audio_offset_ms&quot;: 2400,
+  &quot;turn&quot;: 1
+}</pre></details></div></li>
+<li><button type="button" data-ms="3720" aria-label="Play from 0:03.72">0:03.72</button><div><details><summary><span class="role">Live caption</span> Checking it.</summary><pre>{
+  &quot;source&quot;: &quot;GPT-Live output transcript&quot;,
+  &quot;first_observed_ms&quot;: 3720,
+  &quot;last_observed_ms&quot;: 3860
+}</pre></details></div></li>
+<li><button type="button" data-ms="3780" aria-label="Play from 0:03.78">0:03.78</button><div><details><summary><span class="role">Caller</span> Actually my roommate just brought it in. The lamp is broken</summary><pre>{
+  &quot;turn&quot;: 2,
+  &quot;source&quot;: &quot;GPT-Live input transcript&quot;,
+  &quot;time_basis&quot;: &quot;First voiced caller audio&quot;
+}</pre></details></div></li>
+<li><button type="button" data-ms="3780" aria-label="Play from 0:03.78">0:03.78</button><div><details><summary><span class="role">Test delay</span> Release the original tracking handoff</summary><pre>{
+  &quot;delegation_id&quot;: &quot;item_Ee0g1AaOVwTfOtJWaHH1w&quot;,
+  &quot;original_event_id&quot;: &quot;event_01&quot;,
+  &quot;original_audio_offset_ms&quot;: 2400,
+  &quot;turn&quot;: 1
+}</pre></details></div></li>
+<li><button type="button" data-ms="3780" aria-label="Play from 0:03.78">0:03.78</button><div><details><summary><span class="role">App check</span> Ignore the tracking handoff for the earlier reply</summary><pre>{
+  &quot;delegation_id&quot;: &quot;item_Ee0g1AaOVwTfOtJWaHH1w&quot;,
+  &quot;turn&quot;: 1,
+  &quot;reason&quot;: &quot;old_or_unknown_turn&quot;
+}</pre></details></div></li>
+<li><button type="button" data-ms="7520" aria-label="Play from 0:07.52">0:07.52</button><div><details><summary><span class="role">Handoff</span> Handle the damaged-item request</summary><pre>{
+  &quot;turn&quot;: 2,
+  &quot;delegation_id&quot;: &quot;item_Ee0g5e2tEs9h0uOJMrIIe&quot;
+}</pre></details></div></li>
+<li><button type="button" data-ms="8060" aria-label="Play from 0:08.06">0:08.06</button><div><details><summary><span class="role">Live caption</span> Okay, let&#x27;s take care of that.</summary><pre>{
+  &quot;source&quot;: &quot;GPT-Live output transcript&quot;,
+  &quot;first_observed_ms&quot;: 8060,
+  &quot;last_observed_ms&quot;: 9400
+}</pre></details></div></li>
+<li><button type="button" data-ms="9420" aria-label="Play from 0:09.42">0:09.42</button><div><details><summary><span class="role">Store tool</span> get_order · ok</summary><pre>{
+  &quot;tool&quot;: &quot;get_order&quot;,
+  &quot;arguments&quot;: {},
+  &quot;result&quot;: {
+    &quot;status&quot;: &quot;ok&quot;,
+    &quot;order_id&quot;: &quot;ORD-100101&quot;,
+    &quot;item_id&quot;: &quot;LAMP-1&quot;,
+    &quot;item&quot;: &quot;Desk lamp&quot;,
+    &quot;shipping_status&quot;: &quot;delivered&quot;,
+    &quot;tracking_update&quot;: &quot;Carrier marked the parcel delivered.&quot;,
+    &quot;estimated_delivery&quot;: null,
+    &quot;late_hours&quot;: 49,
+    &quot;total&quot;: 124.7,
+    &quot;currency&quot;: &quot;USD&quot;
+  },
+  &quot;call_id&quot;: &quot;call_02&quot;,
+  &quot;turn&quot;: 2
+}</pre></details></div></li>
+<li><button type="button" data-ms="10960" aria-label="Play from 0:10.96">0:10.96</button><div><details><summary><span class="role">Backend reply</span> Instructions for GPT-Live</summary><pre>{
+  &quot;reply&quot;: &quot;I&#x27;m sorry your desk lamp arrived broken. What part is damaged, or what happened to it?&quot;,
+  &quot;turn&quot;: 2
+}</pre></details></div></li>
+<li><button type="button" data-ms="11620" aria-label="Play from 0:11.62">0:11.62</button><div><details><summary><span class="role">Live caption</span> I&#x27;m sorry it arrived broken.</summary><pre>{
+  &quot;source&quot;: &quot;GPT-Live output transcript&quot;,
+  &quot;first_observed_ms&quot;: 11620,
+  &quot;last_observed_ms&quot;: 12440
+}</pre></details></div></li>
+<li><button type="button" data-ms="13480" aria-label="Play from 0:13.48">0:13.48</button><div><details><summary><span class="role">Live caption</span> What part of the desk lamp is damaged, or what happened to it?</summary><pre>{
+  &quot;source&quot;: &quot;GPT-Live output transcript&quot;,
+  &quot;first_observed_ms&quot;: 13480,
+  &quot;last_observed_ms&quot;: 16460
+}</pre></details></div></li>
+<li><button type="button" data-ms="18320" aria-label="Play from 0:18.32">0:18.32</button><div><details><summary><span class="role">Caller</span> The base is cracked</summary><pre>{
+  &quot;turn&quot;: 3,
+  &quot;source&quot;: &quot;GPT-Live input transcript&quot;,
+  &quot;time_basis&quot;: &quot;First voiced caller audio&quot;
+}</pre></details></div></li>
+<li><button type="button" data-ms="21300" aria-label="Play from 0:21.30">0:21.30</button><div><details><summary><span class="role">Handoff</span> Check the reported damage</summary><pre>{
+  &quot;turn&quot;: 3,
+  &quot;delegation_id&quot;: &quot;item_Ee0gJ3vw0yyZUFCL7CtMn&quot;
+}</pre></details></div></li>
+<li><button type="button" data-ms="21800" aria-label="Play from 0:21.80">0:21.80</button><div><details><summary><span class="role">Live caption</span> Thanks.</summary><pre>{
+  &quot;source&quot;: &quot;GPT-Live output transcript&quot;,
+  &quot;first_observed_ms&quot;: 21800,
+  &quot;last_observed_ms&quot;: 21800
+}</pre></details></div></li>
+<li><button type="button" data-ms="22440" aria-label="Play from 0:22.44">0:22.44</button><div><details><summary><span class="role">Live caption</span> One sec.</summary><pre>{
+  &quot;source&quot;: &quot;GPT-Live output transcript&quot;,
+  &quot;first_observed_ms&quot;: 22440,
+  &quot;last_observed_ms&quot;: 22620
+}</pre></details></div></li>
+<li><button type="button" data-ms="22520" aria-label="Play from 0:22.52">0:22.52</button><div><details><summary><span class="role">Store tool</span> check_replacement_availability · ok</summary><pre>{
+  &quot;tool&quot;: &quot;check_replacement_availability&quot;,
+  &quot;arguments&quot;: {
+    &quot;item_id&quot;: &quot;LAMP-1&quot;,
+    &quot;damage_description&quot;: &quot;The base is cracked&quot;
+  },
+  &quot;result&quot;: {
+    &quot;status&quot;: &quot;ok&quot;,
+    &quot;order_id&quot;: &quot;ORD-100101&quot;,
+    &quot;available&quot;: true,
+    &quot;offer_id&quot;: &quot;REPL-LAMP-1&quot;,
+    &quot;item_id&quot;: &quot;LAMP-1&quot;,
+    &quot;item&quot;: &quot;Desk lamp&quot;,
+    &quot;damage_description&quot;: &quot;The base is cracked&quot;,
+    &quot;cost&quot;: 0,
+    &quot;currency&quot;: &quot;USD&quot;,
+    &quot;destination&quot;: &quot;original order address&quot;,
+    &quot;reason&quot;: &quot;The same item is in stock.&quot;
+  },
+  &quot;call_id&quot;: &quot;call_03&quot;,
+  &quot;turn&quot;: 3
+}</pre></details></div></li>
+<li><button type="button" data-ms="23200" aria-label="Play from 0:23.20">0:23.20</button><div><details><summary><span class="role">Live caption</span> I&#x27;ll take it from here.</summary><pre>{
+  &quot;source&quot;: &quot;GPT-Live output transcript&quot;,
+  &quot;first_observed_ms&quot;: 23200,
+  &quot;last_observed_ms&quot;: 24080
+}</pre></details></div></li>
+<li><button type="button" data-ms="24340" aria-label="Play from 0:24.34">0:24.34</button><div><details><summary><span class="role">Backend reply</span> Instructions for GPT-Live</summary><pre>{
+  &quot;reply&quot;: &quot;I’m sorry the base is cracked. We can replace the desk lamp at no cost and send it to your original order address. Would you like that replacement?&quot;,
+  &quot;turn&quot;: 3
+}</pre></details></div></li>
+<li><button type="button" data-ms="25080" aria-label="Play from 0:25.08">0:25.08</button><div><details><summary><span class="role">Live caption</span> I&#x27;m sorry the base is cracked.</summary><pre>{
+  &quot;source&quot;: &quot;GPT-Live output transcript&quot;,
+  &quot;first_observed_ms&quot;: 25080,
+  &quot;last_observed_ms&quot;: 26040
+}</pre></details></div></li>
+<li><button type="button" data-ms="26660" aria-label="Play from 0:26.66">0:26.66</button><div><details><summary><span class="role">Live caption</span> We can replace the desk lamp at no cost and send it to your original order address.</summary><pre>{
+  &quot;source&quot;: &quot;GPT-Live output transcript&quot;,
+  &quot;first_observed_ms&quot;: 26660,
+  &quot;last_observed_ms&quot;: 31180
+}</pre></details></div></li>
+<li><button type="button" data-ms="32020" aria-label="Play from 0:32.02">0:32.02</button><div><details><summary><span class="role">Live caption</span> Would you like that replacement?</summary><pre>{
+  &quot;source&quot;: &quot;GPT-Live output transcript&quot;,
+  &quot;first_observed_ms&quot;: 32020,
+  &quot;last_observed_ms&quot;: 32840
+}</pre></details></div></li>
+<li><button type="button" data-ms="34300" aria-label="Play from 0:34.30">0:34.30</button><div><details><summary><span class="role">App check</span> Recognize the current replacement offer</summary><pre>{
+  &quot;offer_id&quot;: &quot;REPL-LAMP-1&quot;,
+  &quot;matched_output_captions&quot;: &quot;the base is cracked. We can replace the desk lamp at no cost and send it to your original order address. Would you like that replacement?&quot;,
+  &quot;turn&quot;: 3,
+  &quot;remaining_receiver_samples&quot;: 0
+}</pre></details></div></li>
+<li><button type="button" data-ms="34840" aria-label="Play from 0:34.84">0:34.84</button><div><details><summary><span class="role">Caller</span> Yes, send the replacement</summary><pre>{
+  &quot;turn&quot;: 4,
+  &quot;source&quot;: &quot;GPT-Live input transcript&quot;,
+  &quot;time_basis&quot;: &quot;First voiced caller audio&quot;
+}</pre></details></div></li>
+<li><button type="button" data-ms="37900" aria-label="Play from 0:37.90">0:37.90</button><div><details><summary><span class="role">Handoff</span> Handle the caller’s answer to the offer</summary><pre>{
+  &quot;turn&quot;: 4,
+  &quot;delegation_id&quot;: &quot;item_Ee0gZnt830WuCEFFciNsa&quot;
+}</pre></details></div></li>
+<li><button type="button" data-ms="38440" aria-label="Play from 0:38.44">0:38.44</button><div><details><summary><span class="role">Live caption</span> Got it.</summary><pre>{
+  &quot;source&quot;: &quot;GPT-Live output transcript&quot;,
+  &quot;first_observed_ms&quot;: 38440,
+  &quot;last_observed_ms&quot;: 38600
+}</pre></details></div></li>
+<li><button type="button" data-ms="39140" aria-label="Play from 0:39.14">0:39.14</button><div><details><summary><span class="role">Store tool</span> create_replacement · created</summary><pre>{
+  &quot;tool&quot;: &quot;create_replacement&quot;,
+  &quot;arguments&quot;: {
+    &quot;offer_id&quot;: &quot;REPL-LAMP-1&quot;
+  },
+  &quot;result&quot;: {
+    &quot;status&quot;: &quot;created&quot;,
+    &quot;order_id&quot;: &quot;ORD-100101&quot;,
+    &quot;offer_id&quot;: &quot;REPL-LAMP-1&quot;,
+    &quot;replacement_id&quot;: &quot;RP001&quot;,
+    &quot;item&quot;: &quot;Desk lamp&quot;,
+    &quot;cost&quot;: 0,
+    &quot;currency&quot;: &quot;USD&quot;,
+    &quot;destination&quot;: &quot;original order address&quot;
+  },
+  &quot;call_id&quot;: &quot;call_04&quot;,
+  &quot;turn&quot;: 4
+}</pre></details></div></li>
+<li><button type="button" data-ms="41080" aria-label="Play from 0:41.08">0:41.08</button><div><details><summary><span class="role">Backend reply</span> Instructions for GPT-Live</summary><pre>{
+  &quot;reply&quot;: &quot;Your desk lamp replacement has been arranged at no cost to your original order address. Your replacement reference is RP001.&quot;,
+  &quot;turn&quot;: 4
+}</pre></details></div></li>
+<li><button type="button" data-ms="41800" aria-label="Play from 0:41.80">0:41.80</button><div><details><summary><span class="role">Live caption</span> Your replacement has been arranged at no cost to your original order address.</summary><pre>{
+  &quot;source&quot;: &quot;GPT-Live output transcript&quot;,
+  &quot;first_observed_ms&quot;: 41800,
+  &quot;last_observed_ms&quot;: 45400
+}</pre></details></div></li>
+<li><button type="button" data-ms="46600" aria-label="Play from 0:46.60">0:46.60</button><div><details><summary><span class="role">Live caption</span> Your replacement reference is RP zero zero one.</summary><pre>{
+  &quot;source&quot;: &quot;GPT-Live output transcript&quot;,
+  &quot;first_observed_ms&quot;: 46600,
+  &quot;last_observed_ms&quot;: 49800
+}</pre></details></div></li></ol><p role="status" id="status"></p></main><script>
+const audio = document.querySelector('audio');
+document.querySelector('ol').addEventListener('click', async (event) => {
+  const button = event.target.closest('button[data-ms]');
+  if (!button) return;
+  audio.currentTime = Number(button.dataset.ms) / 1000;
+  try { await audio.play(); } catch (error) {
+    if (error.name !== 'AbortError') document.querySelector('#status').textContent = 'Use the audio controls to start playback.';
+  }
+});
+</script></body></html>

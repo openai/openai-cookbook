@@ -1,0 +1,850 @@
+[
+  {
+    "id": "status_to_damage",
+    "scenario": {
+      "shipping_status": "delivered"
+    },
+    "turns": [
+      "Where’s my order?",
+      "Actually, my roommate just brought it in. The lamp is broken.",
+      "The base is cracked.",
+      "Yes, send the replacement."
+    ],
+    "expect": {
+      "tools": [
+        {
+          "name": "get_order",
+          "turns": [
+            2,
+            3
+          ],
+          "fields": {},
+          "words": {},
+          "status": "ok",
+          "optional": false
+        },
+        {
+          "name": "check_replacement_availability",
+          "turns": [
+            3
+          ],
+          "fields": {
+            "item_id": "LAMP-1"
+          },
+          "words": {
+            "damage_description": [
+              "base",
+              "crack"
+            ]
+          },
+          "status": "ok",
+          "optional": false
+        },
+        {
+          "name": "create_replacement",
+          "turns": [
+            4
+          ],
+          "fields": {
+            "offer_id": "REPL-LAMP-1"
+          },
+          "words": {},
+          "status": "created",
+          "optional": false
+        }
+      ],
+      "guidance": {
+        "2": [
+          "ask_damage"
+        ],
+        "3": [
+          "replacement_offer"
+        ],
+        "4": [
+          "replacement_confirmed"
+        ]
+      },
+      "effects": [
+        {
+          "kind": "replacement",
+          "ref": "REPL-LAMP-1"
+        }
+      ]
+    },
+    "delay_first_read": true
+  },
+  {
+    "id": "tracking_in_transit",
+    "scenario": {
+      "shipping_status": "in_transit",
+      "late_hours": 0
+    },
+    "turns": [
+      "Where is my lamp? When will it arrive?"
+    ],
+    "expect": {
+      "tools": [
+        {
+          "name": "get_order",
+          "turns": [
+            1
+          ],
+          "fields": {},
+          "words": {},
+          "status": "ok",
+          "optional": false
+        }
+      ],
+      "guidance": {
+        "1": [
+          "in_transit",
+          "no_invented_eta"
+        ]
+      },
+      "effects": []
+    }
+  },
+  {
+    "id": "credit_accept",
+    "scenario": {
+      "late_hours": 48
+    },
+    "turns": [
+      "My package came late. Can I get the late-delivery credit?",
+      "Yes, please issue that credit."
+    ],
+    "expect": {
+      "tools": [
+        {
+          "name": "get_order",
+          "turns": [
+            1
+          ],
+          "fields": {},
+          "words": {},
+          "status": "ok",
+          "optional": false
+        },
+        {
+          "name": "check_credit_eligibility",
+          "turns": [
+            1
+          ],
+          "fields": {},
+          "words": {},
+          "status": "ok",
+          "optional": false
+        },
+        {
+          "name": "register_credit",
+          "turns": [
+            2
+          ],
+          "fields": {
+            "quote_id": "CREDIT-20"
+          },
+          "words": {},
+          "status": "registered",
+          "optional": false
+        }
+      ],
+      "guidance": {
+        "1": [
+          "credit_offer_20"
+        ],
+        "2": [
+          "credit_confirmed"
+        ]
+      },
+      "effects": [
+        {
+          "kind": "credit",
+          "ref": "CREDIT-20"
+        }
+      ]
+    }
+  },
+  {
+    "id": "credit_at_24_hours",
+    "scenario": {
+      "late_hours": 24
+    },
+    "turns": [
+      "My package came late. Can I get the late-delivery credit?"
+    ],
+    "expect": {
+      "tools": [
+        {
+          "name": "get_order",
+          "turns": [
+            1
+          ],
+          "fields": {},
+          "words": {},
+          "status": "ok",
+          "optional": false
+        },
+        {
+          "name": "check_credit_eligibility",
+          "turns": [
+            1
+          ],
+          "fields": {},
+          "words": {},
+          "status": "ok",
+          "optional": false
+        }
+      ],
+      "guidance": {
+        "1": [
+          "credit_ineligible"
+        ]
+      },
+      "effects": []
+    }
+  },
+  {
+    "id": "credit_order_total",
+    "scenario": {
+      "late_hours": 25,
+      "total": 12.5
+    },
+    "turns": [
+      "My package came late. Can I get the late-delivery credit?",
+      "Yes, go ahead."
+    ],
+    "expect": {
+      "tools": [
+        {
+          "name": "get_order",
+          "turns": [
+            1
+          ],
+          "fields": {},
+          "words": {},
+          "status": "ok",
+          "optional": false
+        },
+        {
+          "name": "check_credit_eligibility",
+          "turns": [
+            1
+          ],
+          "fields": {},
+          "words": {},
+          "status": "ok",
+          "optional": false
+        },
+        {
+          "name": "register_credit",
+          "turns": [
+            2
+          ],
+          "fields": {
+            "quote_id": "CREDIT-12.50"
+          },
+          "words": {},
+          "status": "registered",
+          "optional": false
+        }
+      ],
+      "guidance": {
+        "1": [
+          "credit_offer_12_50"
+        ],
+        "2": [
+          "credit_confirmed"
+        ]
+      },
+      "effects": [
+        {
+          "kind": "credit",
+          "ref": "CREDIT-12.50"
+        }
+      ]
+    }
+  },
+  {
+    "id": "credit_counteroffer",
+    "scenario": {
+      "late_hours": 49
+    },
+    "turns": [
+      "My package came late. Can I get the late-delivery credit?",
+      "Yes, but can you make it $35?"
+    ],
+    "expect": {
+      "tools": [
+        {
+          "name": "get_order",
+          "turns": [
+            1
+          ],
+          "fields": {},
+          "words": {},
+          "status": "ok",
+          "optional": false
+        },
+        {
+          "name": "check_credit_eligibility",
+          "turns": [
+            1
+          ],
+          "fields": {},
+          "words": {},
+          "status": "ok",
+          "optional": false
+        }
+      ],
+      "guidance": {
+        "1": [
+          "credit_offer_20"
+        ],
+        "2": [
+          "credit_offer_20",
+          "no_credit_claim"
+        ]
+      },
+      "effects": []
+    }
+  },
+  {
+    "id": "credit_to_damage",
+    "scenario": {
+      "late_hours": 30,
+      "shipping_status": "delivered"
+    },
+    "turns": [
+      "My package came late. Can I get the late-delivery credit?",
+      "Hold off on that credit. I just opened the box and the lamp shade is torn. Can you replace the lamp instead?",
+      "Yes, send the replacement."
+    ],
+    "expect": {
+      "tools": [
+        {
+          "name": "get_order",
+          "turns": [
+            1
+          ],
+          "fields": {},
+          "words": {},
+          "status": "ok",
+          "optional": false
+        },
+        {
+          "name": "check_credit_eligibility",
+          "turns": [
+            1
+          ],
+          "fields": {},
+          "words": {},
+          "status": "ok",
+          "optional": false
+        },
+        {
+          "name": "check_replacement_availability",
+          "turns": [
+            2
+          ],
+          "fields": {
+            "item_id": "LAMP-1"
+          },
+          "words": {
+            "damage_description": [
+              "shade",
+              "tear|torn|rip"
+            ]
+          },
+          "status": "ok",
+          "optional": false
+        },
+        {
+          "name": "create_replacement",
+          "turns": [
+            3
+          ],
+          "fields": {
+            "offer_id": "REPL-LAMP-1"
+          },
+          "words": {},
+          "status": "created",
+          "optional": false
+        }
+      ],
+      "guidance": {
+        "1": [
+          "credit_offer_20"
+        ],
+        "2": [
+          "replacement_offer"
+        ],
+        "3": [
+          "replacement_confirmed"
+        ]
+      },
+      "effects": [
+        {
+          "kind": "replacement",
+          "ref": "REPL-LAMP-1"
+        }
+      ]
+    }
+  },
+  {
+    "id": "damage_accept",
+    "scenario": {},
+    "turns": [
+      "My desk lamp arrived with a cracked base. Could I get a replacement?",
+      "Yes, send it to the original address."
+    ],
+    "expect": {
+      "tools": [
+        {
+          "name": "get_order",
+          "turns": [
+            1
+          ],
+          "fields": {},
+          "words": {},
+          "status": "ok",
+          "optional": false
+        },
+        {
+          "name": "check_replacement_availability",
+          "turns": [
+            1
+          ],
+          "fields": {
+            "item_id": "LAMP-1"
+          },
+          "words": {
+            "damage_description": [
+              "base",
+              "crack"
+            ]
+          },
+          "status": "ok",
+          "optional": false
+        },
+        {
+          "name": "create_replacement",
+          "turns": [
+            2
+          ],
+          "fields": {
+            "offer_id": "REPL-LAMP-1"
+          },
+          "words": {},
+          "status": "created",
+          "optional": false
+        }
+      ],
+      "guidance": {
+        "1": [
+          "replacement_offer"
+        ],
+        "2": [
+          "replacement_confirmed"
+        ]
+      },
+      "effects": [
+        {
+          "kind": "replacement",
+          "ref": "REPL-LAMP-1"
+        }
+      ]
+    }
+  },
+  {
+    "id": "damage_out_of_stock",
+    "scenario": {
+      "in_stock": false
+    },
+    "turns": [
+      "My desk lamp arrived with a cracked base. Could I get a replacement?"
+    ],
+    "expect": {
+      "tools": [
+        {
+          "name": "get_order",
+          "turns": [
+            1
+          ],
+          "fields": {},
+          "words": {},
+          "status": "ok",
+          "optional": false
+        },
+        {
+          "name": "check_replacement_availability",
+          "turns": [
+            1
+          ],
+          "fields": {
+            "item_id": "LAMP-1"
+          },
+          "words": {
+            "damage_description": [
+              "base",
+              "crack"
+            ]
+          },
+          "status": "ok",
+          "optional": false
+        }
+      ],
+      "guidance": {
+        "1": [
+          "out_of_stock",
+          "support",
+          "no_replacement_claim"
+        ]
+      },
+      "effects": []
+    }
+  },
+  {
+    "id": "damage_decline",
+    "scenario": {},
+    "turns": [
+      "My desk lamp arrived with a cracked base. Could I get a replacement?",
+      "No, leave it for now. Please don't send anything."
+    ],
+    "expect": {
+      "tools": [
+        {
+          "name": "get_order",
+          "turns": [
+            1
+          ],
+          "fields": {},
+          "words": {},
+          "status": "ok",
+          "optional": false
+        },
+        {
+          "name": "check_replacement_availability",
+          "turns": [
+            1
+          ],
+          "fields": {
+            "item_id": "LAMP-1"
+          },
+          "words": {
+            "damage_description": [
+              "base",
+              "crack"
+            ]
+          },
+          "status": "ok",
+          "optional": false
+        }
+      ],
+      "guidance": {
+        "1": [
+          "replacement_offer"
+        ],
+        "2": [
+          "no_replacement_claim"
+        ]
+      },
+      "effects": []
+    }
+  },
+  {
+    "id": "tracking_delivery_conflict",
+    "scenario": {
+      "shipping_status": "in_transit"
+    },
+    "turns": [
+      "My lamp arrived with the base cracked. Could you replace it?"
+    ],
+    "expect": {
+      "tools": [
+        {
+          "name": "get_order",
+          "turns": [
+            1
+          ],
+          "fields": {},
+          "words": {},
+          "status": "ok",
+          "optional": false
+        },
+        {
+          "name": "check_replacement_availability",
+          "turns": [
+            1
+          ],
+          "fields": {
+            "item_id": "LAMP-1"
+          },
+          "words": {
+            "damage_description": [
+              "base",
+              "crack"
+            ]
+          },
+          "status": "ok",
+          "optional": true
+        }
+      ],
+      "guidance": {
+        "1": [
+          "delivery_conflict",
+          "support",
+          "no_replacement_claim"
+        ]
+      },
+      "effects": []
+    }
+  },
+  {
+    "id": "order_lookup_failure",
+    "scenario": {
+      "fail_tool": "get_order"
+    },
+    "turns": [
+      "Where is my order?"
+    ],
+    "expect": {
+      "tools": [
+        {
+          "name": "get_order",
+          "turns": [
+            1
+          ],
+          "fields": {},
+          "words": {},
+          "status": "failed",
+          "optional": false
+        }
+      ],
+      "guidance": {
+        "1": [
+          "read_failure",
+          "support",
+          "no_tracking_claim"
+        ]
+      },
+      "effects": []
+    }
+  },
+  {
+    "id": "credit_lookup_failure",
+    "scenario": {
+      "fail_tool": "check_credit_eligibility"
+    },
+    "turns": [
+      "My package came late. Can I get the late-delivery credit?"
+    ],
+    "expect": {
+      "tools": [
+        {
+          "name": "get_order",
+          "turns": [
+            1
+          ],
+          "fields": {},
+          "words": {},
+          "status": "ok",
+          "optional": false
+        },
+        {
+          "name": "check_credit_eligibility",
+          "turns": [
+            1
+          ],
+          "fields": {},
+          "words": {},
+          "status": "failed",
+          "optional": false
+        }
+      ],
+      "guidance": {
+        "1": [
+          "read_failure",
+          "support",
+          "no_credit_claim"
+        ]
+      },
+      "effects": []
+    }
+  },
+  {
+    "id": "replacement_unconfirmed",
+    "scenario": {
+      "unknown_tool": "create_replacement"
+    },
+    "turns": [
+      "My desk lamp arrived with a cracked base. Could I get a replacement?",
+      "Yes, send it to the original address."
+    ],
+    "expect": {
+      "tools": [
+        {
+          "name": "get_order",
+          "turns": [
+            1
+          ],
+          "fields": {},
+          "words": {},
+          "status": "ok",
+          "optional": false
+        },
+        {
+          "name": "check_replacement_availability",
+          "turns": [
+            1
+          ],
+          "fields": {
+            "item_id": "LAMP-1"
+          },
+          "words": {
+            "damage_description": [
+              "base",
+              "crack"
+            ]
+          },
+          "status": "ok",
+          "optional": false
+        },
+        {
+          "name": "create_replacement",
+          "turns": [
+            2
+          ],
+          "fields": {
+            "offer_id": "REPL-LAMP-1"
+          },
+          "words": {},
+          "status": "unconfirmed",
+          "optional": false
+        }
+      ],
+      "guidance": {
+        "1": [
+          "replacement_offer"
+        ],
+        "2": [
+          "uncertain",
+          "support",
+          "no_replacement_claim"
+        ]
+      },
+      "effects": [
+        {
+          "kind": "replacement",
+          "ref": "REPL-LAMP-1"
+        }
+      ]
+    }
+  },
+  {
+    "id": "credit_write_failure",
+    "scenario": {
+      "fail_tool": "register_credit"
+    },
+    "turns": [
+      "My package came late. Can I get the late-delivery credit?",
+      "Yes, please submit it."
+    ],
+    "expect": {
+      "tools": [
+        {
+          "name": "get_order",
+          "turns": [
+            1
+          ],
+          "fields": {},
+          "words": {},
+          "status": "ok",
+          "optional": false
+        },
+        {
+          "name": "check_credit_eligibility",
+          "turns": [
+            1
+          ],
+          "fields": {},
+          "words": {},
+          "status": "ok",
+          "optional": false
+        },
+        {
+          "name": "register_credit",
+          "turns": [
+            2
+          ],
+          "fields": {
+            "quote_id": "CREDIT-20"
+          },
+          "words": {},
+          "status": "failed",
+          "optional": false
+        }
+      ],
+      "guidance": {
+        "1": [
+          "credit_offer_20"
+        ],
+        "2": [
+          "read_failure",
+          "support",
+          "no_credit_claim"
+        ]
+      },
+      "effects": []
+    }
+  },
+  {
+    "id": "replacement_address_change",
+    "scenario": {},
+    "turns": [
+      "My desk lamp arrived with a cracked base. Could I get a replacement?",
+      "Only if you send it to my office instead. Can you change the address?"
+    ],
+    "expect": {
+      "tools": [
+        {
+          "name": "get_order",
+          "turns": [
+            1
+          ],
+          "fields": {},
+          "words": {},
+          "status": "ok",
+          "optional": false
+        },
+        {
+          "name": "check_replacement_availability",
+          "turns": [
+            1
+          ],
+          "fields": {
+            "item_id": "LAMP-1"
+          },
+          "words": {
+            "damage_description": [
+              "base",
+              "crack"
+            ]
+          },
+          "status": "ok",
+          "optional": false
+        }
+      ],
+      "guidance": {
+        "1": [
+          "replacement_offer"
+        ],
+        "2": [
+          "address_limit",
+          "no_replacement_claim",
+          "support"
+        ]
+      },
+      "effects": []
+    }
+  }
+]

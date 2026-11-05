@@ -1,0 +1,43 @@
+{
+  "measurement": "Median elapsed backend seconds for one scripted caller turn including tool round trips.",
+  "source": "../../delivery/results.json",
+  "method": "Selected the 136 reviewed traces by SHA-256. Pooled turn_ms within each model, excluding the pilot. Counted only events of type tool.",
+  "suites": [
+    "matrix-v2",
+    "new-phrases-v3"
+  ],
+  "models": [
+    {
+      "label": "Terra",
+      "model": "gpt-6.1-terra",
+      "seconds": 2.882576685049571,
+      "turns": 129,
+      "runs": 68,
+      "passed": 68,
+      "tool_calls": 157,
+      "by_tool": {
+        "get_order": 68,
+        "check_credit_eligibility": 27,
+        "register_credit": 11,
+        "check_replacement_availability": 33,
+        "create_replacement": 18
+      }
+    },
+    {
+      "label": "Luna",
+      "model": "gpt-6-luna",
+      "seconds": 3.182167283957824,
+      "turns": 129,
+      "runs": 68,
+      "passed": 66,
+      "tool_calls": 172,
+      "by_tool": {
+        "get_order": 80,
+        "check_credit_eligibility": 29,
+        "register_credit": 12,
+        "check_replacement_availability": 33,
+        "create_replacement": 18
+      }
+    }
+  ]
+}

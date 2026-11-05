@@ -15,7 +15,8 @@ HsingTang:
 
 provecart:
   name: Arash
-  url: https://provecart.com
+  website: https://provecart.com
+  avatar: https://github.com/provecart.png
 sperry-openai:
   name: "David Sperry"
   website: "https://www.linkedin.com/in/davidrsperry"

@@ -105,6 +105,24 @@ def unique_tool_invocations(events: list[AgentEvent]) -> list[AgentEvent]:
     return sorted(unique.values(), key=lambda event: event.timestamp_ms)
 
 
+def _matched_required_tool_indices(
+    expected_tools: list[ExpectedToolCall], observed_tools: list[AgentEvent]
+) -> set[int]:
+    """Match each invocation once while retaining every projection's status and arguments."""
+    invocations: dict[tuple[str, str | int], list[AgentEvent]] = {}
+    for event in observed_tools:
+        key = (event.name, event.call_id or event.timestamp_ms)
+        invocations.setdefault(key, []).append(event)
+    return {
+        index
+        for index, _ in unique_expected_matches(
+            expected_tools,
+            list(invocations.values()),
+            lambda expected, events: any(_matches_expected_tool(event, expected) for event in events),
+        )
+    }
+
+
 def _task_progress(
     scenario: Scenario,
     timeline: Timeline,
@@ -124,11 +142,7 @@ def _task_progress(
         matched, missing = _evidence_progress(scenario, assistant_text)
         observed_events = [event for event in timeline.agent_events if event.timestamp_ms <= end_ms]
         observed_tools = [event for event in observed_events if event.kind == "tool"]
-        matched_tools = {
-            index
-            for index, expected in enumerate(scenario.expected.tools.required)
-            if any(_matches_expected_tool(event, expected) for event in observed_tools)
-        }
+        matched_tools = _matched_required_tool_indices(scenario.expected.tools.required, observed_tools)
         delegation_observed = any(event.kind == "delegation" for event in observed_events)
         requirements_satisfied = (
             not missing
@@ -313,15 +327,11 @@ def build_result(
         scenario.expected.forbids_delegation and delegation_observed
     )
     observed_tools = [event for event in timeline.agent_events if event.kind == "tool"]
-    matched_tools = [
-        expectation
-        for expectation in scenario.expected.tools.required
-        if any(_matches_expected_tool(event, expectation) for event in observed_tools)
-    ]
+    matched_tools = _matched_required_tool_indices(scenario.expected.tools.required, observed_tools)
     missing_tools = [
         expectation.name
-        for expectation in scenario.expected.tools.required
-        if not any(_matches_expected_tool(event, expectation) for event in observed_tools)
+        for index, expectation in enumerate(scenario.expected.tools.required)
+        if index not in matched_tools
     ]
     prohibited_tools = [
         expectation.name

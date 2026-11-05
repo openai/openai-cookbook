@@ -139,18 +139,21 @@ async def slack_actions(request: Request, tasks: BackgroundTasks) -> dict[str, A
     payload = json.loads(encoded[0])
     action = payload["actions"][0]
     bot: IncidentBot = app.state.bot
-    incident_id = str(action["value"])
     try:
         if action["action_id"] not in {"approve_rollback", "reject_rollback"}:
             raise ValueError("Unknown Slack approval action.")
+        approval = json.loads(str(action["value"]))
+        incident_id = str(approval["incident_id"])
+        call_id = str(approval["call_id"])
         bot.incident(incident_id)
-    except ValueError as error:
+    except (KeyError, TypeError, ValueError) as error:
         raise HTTPException(status_code=400, detail=str(error)) from error
 
     tasks.add_task(
         bot.submit_slack_decision,
         incident_id,
         action["action_id"] == "approve_rollback",
+        call_id,
     )
     return {"text": "Submitting your decision to the agent."}
 

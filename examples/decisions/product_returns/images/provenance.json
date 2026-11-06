@@ -1,0 +1,44 @@
+[
+  {
+    "file": "cracked_mug.png",
+    "prompt": "Create one square, realistic smartphone customer-support photograph for a fictional product-return tutorial. A plain off-white ceramic mug on a light wooden kitchen table, natural daylight, no brand, no words, no labels, no people, no watermark, no collage. Entire mug visible with breathing room. The mug has an unmistakable large jagged crack through the front wall and a small missing shard along the rim. Sharp focus. Clearly visible product damage.",
+    "provenance": "Generated with the built-in OpenAI image generation tool on 2026-10-30. Synthetic illustration, not a real customer photo.",
+    "sha256": "b2501d3ba2d6f86373137be55d02b476bf318a268787a943e6731d7578babd85"
+  },
+  {
+    "file": "intact_mug.png",
+    "prompt": "Create one square, realistic smartphone customer-support photograph for a fictional product-return tutorial. A plain off-white ceramic mug on a light wooden kitchen table, natural daylight, no brand, no words, no labels, no people, no watermark, no collage. Entire mug visible with breathing room. The mug is intact, clean and smooth, unbroken handle and rim, no cracks or chips, sharply focused.",
+    "provenance": "Generated with the built-in OpenAI image generation tool on 2026-10-30. Synthetic illustration, not a real customer photo.",
+    "sha256": "0e948741ff42eff733893f60c428ac3e7fe51dce0ef9b4785aa058b223b3b6bb"
+  },
+  {
+    "file": "damaged_box_intact_mug.png",
+    "prompt": "Create one square, realistic smartphone customer-support photograph for a fictional product-return tutorial. A plain off-white ceramic mug on a light wooden kitchen table, natural daylight, no brand, no words, no labels, no people, no watermark, no collage. Entire mug visible with breathing room. An intact unbroken mug sits beside a badly crushed, torn empty cardboard shipping box. Mug fully visible, sharp focus, no cracks or chips on the mug. Only the box is damaged.",
+    "provenance": "Generated with the built-in OpenAI image generation tool on 2026-10-30. Synthetic illustration, not a real customer photo.",
+    "sha256": "0b644a70c5c84d3109d9ac20f251b556ac160cb3e40efd55eadde56e9b90cc68"
+  },
+  {
+    "file": "blurry_mug.png",
+    "prompt": "Create one square, realistic smartphone customer-support photograph for a fictional product-return tutorial. A plain off-white ceramic mug on a light wooden kitchen table, natural daylight, no brand, no words, no labels, no people, no watermark, no collage. Entire mug visible with breathing room. A severely out-of-focus closeup of the mug, strong optical defocus blur throughout. You can recognize a vague mug silhouette but cannot inspect its surface, rim or handle for damage. No sharp details anywhere.",
+    "provenance": "Generated with the built-in OpenAI image generation tool on 2026-10-30. Synthetic illustration, not a real customer photo.",
+    "sha256": "533fb2f4af52f83cb27c7520cebb5d9a8e97a02335f8e3c707510cbdf5b691d9"
+  },
+  {
+    "file": "closed_box.png",
+    "prompt": "Create one square, realistic smartphone customer-support photograph for a fictional product-return tutorial. A plain off-white ceramic mug on a light wooden kitchen table, natural daylight, no brand, no words, no labels, no people, no watermark, no collage. Entire mug visible with breathing room. Only a sealed opaque plain cardboard shipping box on the wooden table. No mug or product is visible at all. Box undamaged, sharp focus.",
+    "provenance": "Generated with the built-in OpenAI image generation tool on 2026-10-30. Synthetic illustration, not a real customer photo.",
+    "sha256": "3fd79a3c60e2fd9670da763c4f3ebb05f6b897e55982c96ff45d028c415727fc"
+  },
+  {
+    "file": "dented_bottle.png",
+    "prompt": "Generate one square photorealistic smartphone customer-support photo of a plain unbranded blue metal reusable water bottle standing on a light wooden kitchen table. Entire bottle and cap visible. A large unmistakable concave dent crushes the middle of the bottle, with buckled blue painted metal edges and a small scrape at the dent. Bottle itself visibly damaged, no cardboard packaging. Sharp focus, natural window daylight, ordinary home kitchen background. No words, logo, text, watermark, collage or people. Synthetic illustrative photograph for a fictional product-return tutorial.",
+    "provenance": "Generated with the built-in OpenAI image generation tool on 2026-10-30. Synthetic illustration, not a real customer photo.",
+    "sha256": "33509fc6e39803aaf9b54c7fd84acbe487c1b6d6e0efe31f4c1cb3cfbfbdd460"
+  },
+  {
+    "file": "dented_kettle.png",
+    "prompt": "Generate one square photorealistic smartphone customer-support photo of a plain unbranded stainless-steel stovetop kettle on a light wooden kitchen table. Entire kettle, black handle, spout and lid visible. A very large unmistakable concave dent with buckled metal surface is visible in the center of the kettle body facing camera, clearly damaged product. Sharp focus and natural window daylight, ordinary home kitchen background. No packaging, no logos, words, watermark, collage, people or stove fire. Synthetic illustrative photograph for a fictional product-return tutorial.",
+    "provenance": "Generated with the built-in OpenAI image generation tool on 2026-10-30. Synthetic illustration, not a real customer photo.",
+    "sha256": "902d4b64ecfbc823893b211b7d7782bbdefb8bb7c56af52db7d48421c3a75297"
+  }
+]

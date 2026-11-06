@@ -1,0 +1,12 @@
+{
+  "return-01": "prepare_for_review",
+  "return-02": "specialist_review",
+  "return-03": "specialist_review",
+  "return-04": "request_information",
+  "return-05": "request_information",
+  "return-06": "request_information",
+  "return-07": "specialist_review",
+  "return-08": "specialist_review",
+  "return-09": "request_information",
+  "return-10": "prepare_for_review"
+}

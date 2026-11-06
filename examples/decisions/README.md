@@ -144,3 +144,9 @@ published by PolyAI under [CC BY 4.0](https://creativecommons.org/licenses/by/4.
 (Casanueva et al., 2020, [paper](https://arxiv.org/abs/2003.04807)). Original wording
 and labels are retained. [customer_requests.json](customer_requests.json) records
 the authors, pinned source, and checksum. No dataset download is needed.
+
+## Product return evidence tutorial
+
+For text, image, and JSON inputs together, see
+[Evaluate product-return evidence with the Decisions API](product_returns/README.md).
+It covers ten fictional cases, human review recommendations, and local outcome checks.

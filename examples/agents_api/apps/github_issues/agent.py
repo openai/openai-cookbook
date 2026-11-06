@@ -15,7 +15,7 @@ from openai import AsyncOpenAI, NotFoundError
 INSTRUCTIONS = """\
 Investigate GitHub issues by inspecting the repository and reproducing problems when practical.
 Identify the likely cause and recommend the smallest fix.
-Write your findings to /workspace/investigation.md.
+Create or overwrite /workspace/investigation.md with your fresh findings.
 Do not edit source files or contact external services.
 """
 
@@ -40,6 +40,8 @@ def start_executor(workspace: Path, environment_id: str, remote_url: str) -> Con
 
 async def investigate_issue(issue: dict[str, Any], workspace: Path) -> dict[str, Any]:
     container: Container | None = None
+    report = workspace / "investigation.md"
+    previous_report: bytes | None = None
     async with AsyncOpenAI() as client:
         session = await client.beta.agents.sessions.create(
             agent={
@@ -51,6 +53,9 @@ async def investigate_issue(issue: dict[str, Any], workspace: Path) -> dict[str,
         )
 
         try:
+            if report.exists():
+                previous_report = report.read_bytes()
+                report.unlink()
             environment = session.environment
             if environment.type != "self_hosted":
                 raise RuntimeError("Expected a self-hosted execution environment.")
@@ -88,7 +93,6 @@ Inspect /workspace, run relevant tests, identify the root cause, and write
                     if event.type == "agent.session.turn.cancelled":
                         raise RuntimeError("Issue investigation was cancelled.")
 
-            report = workspace / "investigation.md"
             if not report.exists():
                 raise RuntimeError(
                     "The agent did not create /workspace/investigation.md."
@@ -101,6 +105,11 @@ Inspect /workspace, run relevant tests, identify the root cause, and write
             }
         finally:
             original_error = sys.exception()
+            if original_error is not None and previous_report is not None:
+                try:
+                    report.write_bytes(previous_report)
+                except Exception:
+                    pass
             cleanup_errors: list[Exception] = []
             try:
                 if container is not None:

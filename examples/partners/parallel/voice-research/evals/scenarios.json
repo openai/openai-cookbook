@@ -1,0 +1,149 @@
+[
+  {
+    "id": "normal",
+    "steps": [
+      {
+        "fixture": "request"
+      }
+    ],
+    "task_count": 1,
+    "cancelled_count": 0,
+    "correction": false,
+    "required": "Find two source-supported events in San Francisco this Saturday, resolved using the session's local date and time zone.",
+    "forbidden": "Invent details, substitute another date or city, or imply that fewer than two qualifying recommendations fulfill the request.",
+    "evidence": "Caller and assistant audio, interpreted task, search arguments, retrieved excerpts, displayed answer and citations. Honest insufficient evidence can pass quality but fails task completion."
+  },
+  {
+    "id": "correction",
+    "steps": [
+      {
+        "fixture": "request"
+      },
+      {
+        "fixture": "correction",
+        "after_task_count": 1,
+        "state": "researching",
+        "target_location": "San Francisco"
+      }
+    ],
+    "task_count": 1,
+    "cancelled_count": 0,
+    "correction": true,
+    "correct_during_research": true,
+    "required": "Find two supported Sunday indoor events, preserve San Francisco, and publish only the revised answer after recognizing the correction.",
+    "forbidden": "Publish superseded Saturday results, drop the indoor constraint, repeat an update, or execute a tool call ID twice.",
+    "evidence": "Correction audio, research revisions, search arguments and counts, Sunday date and indoor evidence, displayed sources and final speech. Grade correction handling separately from finding two qualifying events."
+  },
+  {
+    "id": "acknowledgment",
+    "steps": [
+      {
+        "fixture": "request"
+      },
+      {
+        "fixture": "acknowledgment",
+        "after_task_count": 1,
+        "state": "researching",
+        "target_location": "San Francisco"
+      }
+    ],
+    "task_count": 1,
+    "cancelled_count": 0,
+    "correction": false,
+    "required": "Keep the original task running after Mm-hmm and deliver two supported San Francisco Saturday recommendations.",
+    "forbidden": "Restart research, change the request, or replay an answer because of the acknowledgment.",
+    "evidence": "Caller acknowledgment, task and search counts, unchanged request, source excerpts, displayed answer and final speech. Honest insufficient evidence can pass quality but fails task completion."
+  },
+  {
+    "id": "missing-city",
+    "steps": [
+      {
+        "fixture": "missing-city"
+      }
+    ],
+    "task_count": 0,
+    "cancelled_count": 0,
+    "correction": false,
+    "required": "Ask which city before researching. A useful spoken clarification fulfills this scenario.",
+    "forbidden": "Guess a city or dispatch a Parallel search before the caller provides one.",
+    "evidence": "Caller request, audible clarification, and absence of a Parallel search."
+  },
+  {
+    "id": "multi-task-correction",
+    "steps": [
+      {
+        "fixture": "two-tasks"
+      },
+      {
+        "fixture": "target-correction",
+        "after_task_count": 2,
+        "state": "researching",
+        "target_location": "San Francisco"
+      }
+    ],
+    "task_count": 2,
+    "cancelled_count": 0,
+    "correction": true,
+    "correct_during_research": true,
+    "required": "Apply Sunday and indoors only to the San Francisco events, keep San Francisco, and finish both tasks with the Node.js/Deno comparison unchanged.",
+    "forbidden": "Overwrite or restart the comparison, publish Saturday event results after the correction, or treat a partial update as all tasks complete.",
+    "evidence": "Task cards, original call IDs, source excerpts, revision transitions and recorded speech."
+  },
+  {
+    "id": "cancellation",
+    "steps": [
+      {
+        "fixture": "two-tasks"
+      },
+      {
+        "fixture": "cancel",
+        "after_task_count": 2,
+        "state": "researching",
+        "target_location": "San Francisco"
+      }
+    ],
+    "task_count": 2,
+    "cancelled_count": 1,
+    "correction": false,
+    "required": "Cancel only the San Francisco events, say they were cancelled only after the card shows cancelled, and complete and speak the Node.js/Deno comparison.",
+    "forbidden": "Announce the cancellation before the card shows cancelled, speak event results after the cancellation, or cancel, overwrite or restart the comparison.",
+    "evidence": "Task cards, original call IDs, source excerpts, revision transitions and recorded speech."
+  },
+  {
+    "id": "ambiguous-target",
+    "steps": [
+      {
+        "fixture": "two-tasks"
+      },
+      {
+        "fixture": "ambiguous",
+        "after_task_count": 2,
+        "state": "researching",
+        "target_location": "San Francisco"
+      },
+      {
+        "fixture": "target-correction"
+      }
+    ],
+    "task_count": 2,
+    "cancelled_count": 0,
+    "correction": true,
+    "required": "After 'Actually change that one', change neither task and do not guess a target. If the assistant replies before the follow-up, it asks which request is meant. After the follow-up, apply Sunday and indoors only to the San Francisco events and finish both tasks.",
+    "forbidden": "Guess a target from 'that one', revise or restart the comparison, or publish Saturday event results after the follow-up.",
+    "evidence": "Task cards, original call IDs, source excerpts, revision transitions and recorded speech."
+  },
+  {
+    "id": "general",
+    "steps": [
+      {
+        "fixture": "general"
+      }
+    ],
+    "task_count": 1,
+    "cancelled_count": 0,
+    "correction": false,
+    "required": "Compare current software releases using public documentation without requesting a city.",
+    "forbidden": "Invent source claims or require event fields.",
+    "evidence": "Task, sources, card and recorded speech."
+  }
+]

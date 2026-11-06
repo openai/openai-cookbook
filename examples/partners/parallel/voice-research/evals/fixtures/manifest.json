@@ -1,0 +1,65 @@
+[
+  {
+    "id": "general",
+    "text": "Compare the current Node.js and Deno releases using their official documentation.",
+    "file": "general.wav",
+    "sha256": "c60c4dde795c487a6c3ed06fe2bdce29c876ff0937a6a10cf4ede00f6beb6919",
+    "synthetic": true
+  },
+  {
+    "id": "two-tasks",
+    "text": "Find two events in San Francisco this Saturday. Separately, compare the current Node.js and Deno releases.",
+    "file": "two-tasks.wav",
+    "sha256": "02274bf9db0dbc2f347f2c5173a5dc2ff0feb86d570e05c2939cbd26d0b8435a",
+    "synthetic": true
+  },
+  {
+    "id": "target-correction",
+    "text": "For the events, Sunday and indoors.",
+    "file": "target-correction.wav",
+    "sha256": "9ba72b6574abf9fdcf2e637e5871b84b74b0dea819462a468c69fc5bdd094a2c",
+    "synthetic": true
+  },
+  {
+    "id": "cancel",
+    "text": "Cancel the San Francisco events. Keep the software comparison running.",
+    "file": "cancel.wav",
+    "sha256": "9e681ea67b67950d1a71df453a0eb9fc9ac1df621ebdb9198b4ee944a6852f24",
+    "synthetic": true
+  },
+  {
+    "id": "ambiguous",
+    "text": "Actually change that one.",
+    "file": "ambiguous.wav",
+    "sha256": "ca721b88fef66c7e234e7c107d6f137a7213d0dad9e424259d44bbf0efbc0623",
+    "synthetic": true
+  },
+  {
+    "id": "request",
+    "text": "Find two events in San Francisco this Saturday.",
+    "file": "request.wav",
+    "sha256": "ae9ad454037acedebe039de5f4a57c26362cfbb7c1cd663bdf54e3315ae43b33",
+    "synthetic": true
+  },
+  {
+    "id": "correction",
+    "text": "Actually, Sunday, and indoors.",
+    "file": "correction.wav",
+    "sha256": "f57c79a615f556c96162be020cffd8daa49cafadc2ace1400672058d95603bc7",
+    "synthetic": true
+  },
+  {
+    "id": "acknowledgment",
+    "text": "Mm-hmm.",
+    "file": "acknowledgment.wav",
+    "sha256": "3c2dd0f14ec999ae59a61ffb39648a3ed985008c0caf3701d867f54fda3ba23a",
+    "synthetic": true
+  },
+  {
+    "id": "missing-city",
+    "text": "Find events this Saturday.",
+    "file": "missing-city.wav",
+    "sha256": "e95f5a3f1ca57fcbbebf43b97bf4de3b167fc8af122e1376382f35b0f1400a03",
+    "synthetic": true
+  }
+]

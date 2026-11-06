@@ -1,0 +1,29 @@
+{
+  "checked_at": "2026-11-02",
+  "source_urls": [
+    "https://developers.openai.com/api/docs/pricing",
+    "https://developers.openai.com/api/docs/models/gpt-live-1",
+    "https://docs.parallel.ai/resources/pricing",
+    "https://developers.openai.com/api/docs/models/gpt-6-luna"
+  ],
+  "responses": {
+    "gpt-6-luna": {
+      "input_per_million": 0.1,
+      "cached_input_per_million": 0.01,
+      "cache_write_per_million": 0.125,
+      "output_per_million": 0.5
+    }
+  },
+  "parallel_search_per_call_usd": 0.001,
+  "gpt_live_per_minute_usd": 0.05,
+  "parallel_extract_per_url_usd": 0.001,
+  "responses_fast": {
+    "gpt-6-luna": {
+      "input_per_million": 0.2,
+      "cached_input_per_million": 0.02,
+      "cache_write_per_million": 0.25,
+      "output_per_million": 1.0
+    }
+  },
+  "fast_checked_at": "2026-11-02"
+}

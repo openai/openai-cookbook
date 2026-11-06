@@ -1,0 +1,6 @@
+{
+  "voice_model": "gpt-live-1",
+  "interpretation_model": "gpt-6-luna",
+  "research_model": "gpt-6-luna",
+  "research_effort": "none"
+}

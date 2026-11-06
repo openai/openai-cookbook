@@ -136,3 +136,43 @@ async def test_investigate_issue_restores_on_failure(tmp_path: Path, mock_openai
     # Previous report must be restored
     assert report_file.exists()
     assert report_file.read_text() == initial_content
+
+
+@pytest.mark.asyncio
+@pytest.mark.parametrize("stage", ["client_init", "client_enter", "session_create"])
+async def test_investigate_issue_preserves_report_on_setup_failure(
+    tmp_path: Path, mock_openai, stage: str
+):
+    report_file = tmp_path / "investigation.md"
+    previous_report = b"Previous investigation.\r\n"
+    report_file.write_bytes(previous_report)
+    failure = RuntimeError("Investigation setup failed")
+
+    with patch("examples.agents_api.apps.github_issues.agent.AsyncOpenAI") as mock_cls:
+        mock_cls.return_value.__aenter__.return_value = mock_openai
+        if stage == "client_init":
+            mock_cls.side_effect = failure
+        elif stage == "client_enter":
+            mock_cls.return_value.__aenter__.side_effect = failure
+        else:
+            mock_openai.beta.agents.sessions.create.side_effect = failure
+
+        with pytest.raises(RuntimeError, match="Investigation setup failed") as caught:
+            await investigate_issue({"number": 1, "title": "Crash"}, tmp_path)
+
+    assert caught.value is failure
+    assert report_file.read_bytes() == previous_report
+
+
+@pytest.mark.asyncio
+async def test_investigate_issue_preserves_report_on_setup_cancellation(
+    tmp_path: Path, mock_openai
+):
+    report_file = tmp_path / "investigation.md"
+    report_file.write_bytes(b"Previous investigation.")
+    mock_openai.beta.agents.sessions.create.side_effect = asyncio.CancelledError()
+
+    with pytest.raises(asyncio.CancelledError):
+        await investigate_issue({"number": 1, "title": "Crash"}, tmp_path)
+
+    assert report_file.read_bytes() == b"Previous investigation."

@@ -42,9 +42,6 @@ async def investigate_issue(issue: dict[str, Any], workspace: Path) -> dict[str,
     container: Container | None = None
     report = workspace / "investigation.md"
     previous_report: bytes | None = None
-    if report.exists():
-        previous_report = report.read_bytes()
-        report.unlink()
     async with AsyncOpenAI() as client:
         session = await client.beta.agents.sessions.create(
             agent={
@@ -56,6 +53,9 @@ async def investigate_issue(issue: dict[str, Any], workspace: Path) -> dict[str,
         )
 
         try:
+            if report.exists():
+                previous_report = report.read_bytes()
+                report.unlink()
             environment = session.environment
             if environment.type != "self_hosted":
                 raise RuntimeError("Expected a self-hosted execution environment.")

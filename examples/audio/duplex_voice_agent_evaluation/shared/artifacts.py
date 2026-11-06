@@ -3,7 +3,7 @@
 from __future__ import annotations
 
 import re
-from pathlib import Path, PureWindowsPath
+from pathlib import Path, PurePath, PureWindowsPath
 
 from shared.private_files import private_directory
 
@@ -22,7 +22,7 @@ def validate_artifact_id(value: str) -> str:
     return value
 
 
-def artifact_path(root: Path, *parts: str | Path) -> Path:
+def artifact_path(root: Path, *parts: str | PurePath) -> Path:
     """Resolve a relative destination under a trusted root, refusing existing links.
 
     The root is chosen by the operator. Descendant symlinks (including links
@@ -33,8 +33,11 @@ def artifact_path(root: Path, *parts: str | Path) -> Path:
     base = root.expanduser().resolve()
     candidate = base
     for part in parts:
-        location = Path(part)
-        if location.is_absolute() or PureWindowsPath(str(part)).drive or "\\" in str(part) or ".." in location.parts:
+        # Path objects already split on the native separator; compare their portable
+        # form so Windows paths are not mistaken for names containing backslashes.
+        text = part.as_posix() if isinstance(part, PurePath) else part
+        location = Path(text)
+        if location.is_absolute() or PureWindowsPath(text).drive or "\\" in text or ".." in location.parts:
             raise ValueError(f"Artifact destination must be relative to {base}: {part}")
         candidate /= location
     if candidate == base:

@@ -4,8 +4,9 @@ from __future__ import annotations
 
 import importlib
 import json
+import sys
 from copy import deepcopy
-from pathlib import Path
+from pathlib import Path, PurePath, PurePosixPath, PureWindowsPath
 from types import SimpleNamespace
 from unittest.mock import AsyncMock
 
@@ -142,10 +143,15 @@ def test_destinations_reject_existing_links(tmp_path: Path, kind: str) -> None:
     assert victim.read_bytes() == b"untouched"
 
 
-@pytest.mark.parametrize("part", ["../escape", "/tmp/escape", "C:\\escape", "a\\b"])
-def test_destination_rejects_nonrelative_paths(tmp_path: Path, part: str) -> None:
+@pytest.mark.parametrize("part", ["../escape", "/tmp/escape", "C:\\escape", "a\\b", PurePosixPath("a\\b")])
+def test_destination_rejects_nonrelative_paths(tmp_path: Path, part: str | PurePath) -> None:
     with pytest.raises(ValueError):
         artifact_path(tmp_path, part)
+
+
+@pytest.mark.parametrize("part", [PurePosixPath("audio", "sample.wav"), PureWindowsPath("audio", "sample.wav")])
+def test_destination_accepts_relative_path_objects_on_any_platform(tmp_path: Path, part: PurePath) -> None:
+    assert artifact_path(tmp_path, part) == tmp_path.resolve() / "audio" / "sample.wav"
 
 
 def test_run_directory_is_never_reused(tmp_path: Path) -> None:
@@ -196,7 +202,10 @@ def test_cache_checks_destination_before_synthesis(tmp_path: Path) -> None:
         "../victim.wav",
         "/tmp/victim.wav",
         "audio/../victim.wav",
-        "audio\\victim.wav",
+        pytest.param(
+            "audio\\victim.wav",
+            marks=pytest.mark.skipif(sys.platform == "win32", reason="backslash is the Windows path separator"),
+        ),
         "audio/NUL.wav",
         "audio/dir./victim.wav",
         "audio/victim:stream.wav",

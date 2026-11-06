@@ -10,7 +10,7 @@ ChatGPT workspace agents are shared agents that can run repeatable workflows acr
 
 In this cookbook, we'll build a workspace agent that supports a sales team. Sales teams often spend time manually pulling account notes, recent customer feedback, product usage metrics, and company news to prepare for upcoming customer meetings.
 
-We'll build a workspace agent that checks tomorrow's customer meetings, gathers recent account context from SharePoint, and searches the web for company news. We'll test it in ChatGPT, then set up a weekday schedule to prepare briefs. With the required app actions and approvals, it can save briefs in SharePoint and email a summary.
+We'll build a workspace agent that checks the next weekday's customer meetings, gathers recent account context from SharePoint, and searches the web for company news. We'll test it in ChatGPT, then set up a weekday schedule to prepare briefs. With the required app actions and approvals, it can save briefs in SharePoint and email a summary.
 
 ## Prerequisites and setup
 
@@ -39,9 +39,9 @@ To start from an existing example, choose **Browse templates** from the **Create
 We'll enter the following text into the agent builder:
 
 ```text
-Create an agent to help with sales meeting prep. The agent should check my Google Calendar for tomorrow's customer meetings. Exclude internal-only meetings and skip events with no external attendees.
+Create an agent to help with sales meeting prep. Check my Google Calendar for customer meetings on the next weekday. On Friday, prepare briefs for Monday. Exclude internal-only meetings and skip events with no external attendees.
 
-For each customer meeting, pull recent notes and feedback from SharePoint, then search the web for any relevant company news from the last 30 days. Then write a 2-3 page meeting brief. Save the meeting brief as a SharePoint doc.
+For each customer meeting, pull recent notes and feedback from SharePoint, then search the web for any relevant company news from the last 30 days. Then write a 2-3 page meeting brief. Save it as a file in the team's SharePoint folder.
 
 Then, send me an email with a daily summary of my upcoming meetings, with a link to the full brief.
 ```
@@ -58,7 +58,7 @@ Workspace admins control which app actions are available. For this example, the 
 
 We can click into each app to view and change its permissions.
 
-For the **Google Calendar** connection, we'll use *End-user account*. Each person who runs the agent in ChatGPT connects their own Google Calendar account so the agent can read their meetings.
+For **Google Calendar**, use each person's own connection. Leave **Use for everyone** off, or choose **End-user account** if the builder shows account options. Each person who runs the agent in ChatGPT connects their own Google Calendar account so the agent can read their meetings.
 
 <p align="center">
   <img src="https://cdn.openai.com/cookbook/chatgpt-agents-sales-meeting-prep/img2.png" alt="End-user auth for Google Calendar" width="60%" />
@@ -70,9 +70,9 @@ For Google Calendar, we just need to view upcoming meetings and attendees, so we
   <img src="https://cdn.openai.com/cookbook/chatgpt-agents-sales-meeting-prep/img3.png" alt="Read access for Google Calendar" width="60%" />
 </p>
 
-For **Gmail**, choose *End-user account* as well. During a ChatGPT run, the agent uses the Gmail connection of the person running it. To deliver the summary, it needs permission to send an email to that person.
+For **Gmail**, use each person's own connection as well. During a ChatGPT run, the agent uses the Gmail connection of the person running it. To deliver the summary, it needs permission to send an email to that person.
 
-For the **Microsoft SharePoint** connection, we'll use an *Agent-owned account* linked to a sales team service account. Give that account access to the customer documents the agent needs and the folder where it will save briefs. The agent uses that same account for every run.
+For **Microsoft SharePoint**, turn on **Use for everyone**, or choose **Agent-owned account** if the builder shows account options. Connect a sales team service account with access to the customer documents the agent needs and the folder where it will save briefs. The agent uses that same account for every run.
 
 Enable the SharePoint actions needed to find and read the source documents and create a brief in the destination folder. Confirm that the intended recipients can open files in that folder. Leave sharing, deletion, and unrelated write actions disabled.
 
@@ -114,7 +114,7 @@ Note that our agent builder has automatically created some sample starter prompt
   <img src="https://cdn.openai.com/cookbook/chatgpt-agents-sales-meeting-prep/img9.png" alt="Updating starter prompts" width="336" />
 </p>
 
-We'll ask our agent to prepare briefs for tomorrow's meetings. In the run, we can review the app actions it takes, such as reading calendar events and creating a SharePoint document.
+We'll ask our agent to prepare briefs for the next weekday's meetings. In the run, we can review the app actions it takes, such as reading calendar events and saving a brief in SharePoint.
 
 Verify that the expected files exist, the email arrived, and its links open for the recipient. The screenshots below illustrate an email and brief from a separate run for same-day meetings.
 
@@ -130,7 +130,7 @@ You can run additional tests with different input data - for example, you might 
 
 ## Deploying your agent
 
-After publishing the agent, open **Automations** in Agent Studio. Choose the ChatGPT channel and set the schedule to weekdays at 4 p.m. Eastern. Enter the instructions for tomorrow's meetings and select **Add automation**. The schedule runs the published version as the person who created the schedule. Check the first run for any approvals or failed actions before relying on the email.
+Open the published agent in ChatGPT and select **Automations**. Choose the ChatGPT channel and set the schedule to weekdays at 4 p.m. Eastern. Enter the instructions for the next weekday's meetings and select **Add automation**. The schedule runs the published version as the person who created the schedule. Check the first run for any approvals or failed actions before relying on the email.
 
 The image below shows the same weekday settings in an earlier version of the schedule editor. For a weekly brief instead, choose Sunday evening and ask the agent to cover the coming week.
 

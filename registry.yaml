@@ -4,6 +4,21 @@
 # should build pages for, and indicates metadata such as tags, creation date and
 # authors for each page.
 
+- title: Let an agent pick its own data source with Firecrawl Alexandria
+  path: examples/partners/firecrawl_alexandria/firecrawl_alexandria_agent.ipynb
+  slug: firecrawl-alexandria-agent
+  description: Build an Agents SDK agent that finds a structured data provider in the Firecrawl Alexandria catalogue, reads its contract, and pulls typed records, such as the Risk Factors from two companies' latest 10-K filings on SEC EDGAR. It falls back to Firecrawl web search and scrape, returns Structured Outputs with a checked source on every claim, and keeps follow-up questions grounded with a vector store and File Search.
+  date: 2026-10-27
+  authors:
+    - erikengervall
+  tags:
+    - partners
+    - agents-sdk
+    - agents
+    - structured-outputs
+    - retrieval
+    - web-search
+
 - title: Harness-aware evaluation of plugins
   path: examples/partners/harness_aware_plugin_evals/harness_aware_plugin_evals.ipynb
   slug: harness-aware-plugin-evals

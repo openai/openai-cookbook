@@ -16,14 +16,15 @@ Once our agent is deployed, it will run automatically each day, and we can also 
 
 ## Prerequisites and setup
 
-For this cookbook, you will need a ChatGPT Business, Enterprise, or Edu workspace with access to workspace agents, and a set of apps that enable your agent to access your calendar and account information. We'll use Google Calendar and Microsoft SharePoint to show a workflow that uses both Google Workspace and Microsoft 365 apps, but you can switch out any supported apps. Our agent will send notifications in Slack, but you can also use email or another notification surface.
+For this cookbook, you will need a ChatGPT Business, Enterprise, or Edu workspace with access to workspace agents. Our agent will read upcoming meetings from Google Calendar, save meeting briefs in Microsoft SharePoint, and email a summary through Gmail.
 
-Before you build, ask your workspace admin to confirm four settings:
+Before you build, confirm these three settings with your workspace admin.
 
 1. **Agents are enabled for your workspace.** Workspace owners can enable agents for the workspace and assign access to specific roles with RBAC.
 2. **You have permission to build and share agents.** An admin will need to enable you (or the appropriate RBAC group) to create agents. If you plan to share the agent, an admin may also need to enable publishing.
 3. **The apps you need are enabled.** For this cookbook, an admin would need to enable Google Calendar, Gmail, and SharePoint in workspace app settings.
-4. **[optional] Slack is approved for the workspace.** Only required if you want to interact with your agent through Slack. Enterprise admins need to enable the "workspace agents for Slack" app and grant access to users or groups with RBAC. Your Slack workspace must also allow the ChatGPT Agents app for Slack.
+
+If you want to run a version of this agent from Slack, follow the [Workspace Agents in Slack setup instructions](https://help.openai.com/en/articles/20001143-chatgpt-workspace-agents-for-enterprise-and-business). A Slack deployment requires shared authentication for every app connection. This example runs in ChatGPT so each teammate can use their own calendar and email account.
 
 ## Building your agent
 
@@ -53,17 +54,17 @@ You'll see the assistant create a plan for building the agent, then starting to 
   <img src="https://cdn.openai.com/cookbook/chatgpt-agents-sales-meeting-prep/img1-v2.png" alt="Agent builder in progress" width="80%" />
 </p>
 
-If you don't have the required apps already configured, the agent builder will walk you through the configuration steps. If an app is unavailable, you can adjust scope - for example if you don't have Slack enabled, you can instruct your agent to send you an email with your sales meeting doc instead.
+If you don't have the required apps already configured, the agent builder will walk you through the configuration steps. If Gmail is unavailable, you can ask the agent to return the link to the SharePoint brief in ChatGPT.
 
 ### 2. Review and configure your apps
 
 Now we'll review the configurations of our apps. Because our agent can access external tools, it's important to understand the permissions it has to take actions on these tools, and how those permissions change as we share our agent for other teammates to use.
 
-Note that app actions can be enforced at the workspace level by admins. For example, an admin can enforce that workspace agents can only take read actions, but not write actions, for the SharePoint app.
+Workspace admins control which app actions are available. For this example, the SharePoint app needs permission to search for customer documents and create meeting briefs. If your workspace limits SharePoint to read-only actions, have the agent return the brief in ChatGPT.
 
 We can click into each app to view and change its permissions.
 
-For the **Google Calendar** connection, we'll use *End-user account*. What this means is that each person who is using the agent will need to authenticate with their own google calendar, and the agent will access their individual meetings.
+For the **Google Calendar** connection, we'll use *End-user account*. Each person who runs the agent in ChatGPT connects their own Google Calendar account so the agent can read their meetings.
 
 <p align="center">
   <img src="https://cdn.openai.com/cookbook/chatgpt-agents-sales-meeting-prep/img2.png" alt="End-user auth for Google Calendar" width="60%" />
@@ -77,7 +78,7 @@ For Google Calendar, we just need to view upcoming meetings and attendees, so we
 
 We'll also use the same *End-user account* configuration for the **Gmail** app, since each agent user will get their own email briefing for their upcoming meetings.
 
-For the **Microsoft SharePoint** connection, we'll use an *Agent-owned account* linked to a service account associated with a sales team. What this means is that regardless of who is using the agent, the agent will have access to the full set of SharePoint folders, files, and sites that are accessible to the team service account.
+For the **Microsoft SharePoint** connection, we'll use an *Agent-owned account* linked to a sales team service account. Give that account access to the customer documents the agent needs and the folder where it will save briefs. The agent uses that same account for every run.
 
 In this case, we want to be able to search through SharePoint for any documents relevant to a customer account, then create a new meeting prep document. So we'll scope the SharePoint app permissions accordingly, to allow a broad set of read actions but prevent bulk write actions and prevent deletes.
 
@@ -85,7 +86,7 @@ In this case, we want to be able to search through SharePoint for any documents 
   <img src="https://cdn.openai.com/cookbook/chatgpt-agents-sales-meeting-prep/img4.png" alt="Scoped permissions for SharePoint" width="60%" />
 </p>
 
-Aside from the connectors we've already enabled, the agent has access to **Web search** that it will use to enrich the meeting briefs with recent public company news from the last 30 days.
+Alongside these apps, the agent uses **Web search** to find public company news from the last 30 days.
 
 ### 3. Enabling skills and memories for consistent, customized outputs
 
@@ -121,7 +122,7 @@ Note that our agent builder has automatically created some sample starter prompt
   <img src="https://cdn.openai.com/cookbook/chatgpt-agents-sales-meeting-prep/img9.png" alt="Updating starter prompts" width="336" />
 </p>
 
-We'll ask our agent to prepare briefs for the meetings on our calendar for tomorrow, and we can view the traces of actions the agent is taking - accessing connectors, referencing skills and memories - as well as the agent's chain-of-thought reasoning as it completes its task.
+We'll ask our agent to prepare briefs for tomorrow's meetings. In the run, we can review the app actions it takes, such as reading calendar events and creating a SharePoint document.
 
 When our agent completes, we see that it has generated polished SharePoint documents for each of our upcoming customer meetings and sent us an email summary.
 
@@ -133,7 +134,7 @@ When our agent completes, we see that it has generated polished SharePoint docum
   <img src="https://cdn.openai.com/cookbook/chatgpt-agents-sales-meeting-prep/img12.png" alt="Output meeting brief" width="80%" />
 </p>
 
-You can run additional tests with different input data - for example, you might ask the agent to prepare a brief for a meeting that you already had last week, to compare its output with a human-generated prep doc. You can also add that prep doc to the skill's files as an example. You can update agent instructions, provide it additional connectors and permissions, or update its skill to refine the output it produces.
+You can run additional tests with different input data - for example, you might ask the agent to prepare a brief for a meeting that you already had last week, to compare its output with a human-generated prep doc. You can also add that prep doc to the skill's files as an example. You can update the agent's instructions, configure its apps and permissions, or update its skill to refine the output it produces.
 
 ## Deploying your agent
 
@@ -145,10 +146,10 @@ For example, in addition to our daily weekday schedule, we might want to create 
   <img src="https://cdn.openai.com/cookbook/chatgpt-agents-sales-meeting-prep/img10.png" alt="Creating a schedule" width="336" />
 </p>
 
-Now, we'll share our agent with our team. In the "Channels" section of the agent builder, we can select **ChatGPT** and then **Enable sharing**. (Note that your workspace admin will need to grant you permission to share agents you've created.)
+To share the agent, open it in the builder and select **Share**. Your workspace admin controls whether you can share agents.
 
-We can turn on sharing to generate a shareable link for our agent, which lets anyone in your workspace either chat directly with your agent, or duplicate your agent to create their own forked version which they can edit individually. (You won't be able to access their duplicated agent, unless they choose to share it with you. Currently, multiple users cannot edit the same agent.)
+Invite sales teammates with **Can chat** so they can run the agent. To let a teammate maintain it with you, grant **Can edit**. Editors can update the shared draft and publish new versions. A teammate who wants a separate version can duplicate the agent. See the [workspace agent sharing guide](https://help.openai.com/en/articles/20001143-chatgpt-workspace-agents-for-enterprise-and-business).
 
-Because we've selected *End-user account* for our Google Calendar and Gmail apps, each person using our agent will need to log into these apps, and the agent will be able to access their specific meetings and email. However, because we've selected *Agent-owned account* for the SharePoint app, **anyone we share the agent with will be able to access the SharePoint resources**.
+Each teammate runs the agent with their own Google Calendar and Gmail connections. **Anyone who can run the agent can also use its enabled SharePoint actions through the sales team service account.** Before sharing, check which content the service account can access and which SharePoint actions the agent can take.
 
 In addition to providing our teammates with a link to our agent, we can also choose to list our agent in our company directory, allowing anyone in your workspace to view the agent. You can access your company directory of employee-built agents by selecting **Agents** from ChatGPT, and then selecting the agent directory tab.

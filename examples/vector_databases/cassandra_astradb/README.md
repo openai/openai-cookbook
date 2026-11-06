@@ -14,7 +14,7 @@ is the Python client to interact with the database).
 If you prefer CQL access to the database (either with
 [Astra DB](https://docs.datastax.com/en/astra-serverless/docs/vector-search/overview.html)
 or a Cassandra cluster
-[supporting vector search](https://cassandra.apache.org/doc/trunk/cassandra/vector-search/overview.html)),
+[supporting vector search](https://cassandra.apache.org/doc/latest/cassandra/vector-search/overview.html)),
 check the "CQL" or "CassIO" notebooks -- they differ in the level of abstraction you get to work at.
 
 If you want to know more about Astra DB and its Vector Search capabilities,

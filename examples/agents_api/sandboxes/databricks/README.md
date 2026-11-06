@@ -113,5 +113,5 @@ You can examine the state of a sandbox with `w.sandbox.get_sandbox(name).status.
 
 - [Databricks Sandbox documentation](https://docs.databricks.com/aws/en/compute/serverless/sandbox)
 - [Sandbox SDK on databricks-sdk for Python](https://databricks-sdk-py.readthedocs.io/en/latest/workspace/sandbox/sandbox.html)
-- [Running commands in sandboxes](https://databricks-sdk-py.readthedocs.io/en/latest/sandbox-command-execution.html)
+- [Running commands in sandboxes](https://databricks-sdk-py.readthedocs.io/en/latest/workspace/sandbox/sandbox.html)
 - [OpenAI Agents API, self-hosted sandboxes](https://developers.openai.com/api/docs/guides/agents-api/environments/self-hosted)

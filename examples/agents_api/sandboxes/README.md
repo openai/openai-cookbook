@@ -17,6 +17,7 @@ provider compute; each example documents cleanup of both.
 | --- | --- | --- |
 | [Blaxel](blaxel/README.md) | [Run](blaxel/application_managed/README.md) | [Deploy](blaxel/webhook_managed/README.md) |
 | [Cloudflare](cloudflare/README.md) | [Run](cloudflare/application_managed/README.md) | [Deploy](cloudflare/webhook_managed/README.md) |
+| [Databricks](databricks/README.md) | [Run](databricks/application_managed/README.md) | Not included |
 | [Daytona](daytona/README.md) | [Run](daytona/application_managed/README.md) | [Deploy](daytona/webhook_managed/README.md) |
 | [DigitalOcean](digitalocean/README.md) | [Run](digitalocean/application_managed/README.md) | [Deploy](digitalocean/webhook_managed/README.md) |
 | [Docker](docker/README.md) | [Run](docker/application_managed/README.md) | Not included |
@@ -24,7 +25,6 @@ provider compute; each example documents cleanup of both.
 | [Modal](modal/README.md) | [Run](modal/application_managed/README.md) | [Deploy](modal/webhook_managed/README.md) |
 | [AWS Lambda MicroVMs](aws/README.md) | [Run](aws/application_managed/README.md) | [Deploy](aws/webhook_managed/README.md) |
 | [OCI](oci/README.md) | [Run](oci/application_managed/README.md) | Not included |
-| [Runloop](runloop/README.md) | [Run](runloop/application_managed/README.md) | [Deploy](runloop/webhook_managed/README.md) |
 | [Vercel](vercel/README.md) | [Run](vercel/application_managed/README.md) | [Deploy](vercel/webhook_managed/README.md) |
 
 Each provider folder contains its examples and shared sandbox setup. Webhook

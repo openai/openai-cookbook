@@ -57,7 +57,19 @@
   description: Run agent tools in AWS Lambda MicroVMs with application-managed or webhook-managed provisioning, file transfers, and suspend/resume.
   date: 2026-09-29
   authors:
-    - alfozan
+    - openai
+  tags:
+    - agents-api
+    - agents
+    - sandbox
+
+- title: Run OpenAI agents on a Databricks Sandbox
+  path: examples/agents_api/sandboxes/databricks/README.md
+  slug: agents-api-databricks-sandbox
+  description: Run agent tools in a Databricks serverless sandbox with application-managed provisioning.
+  date: 2026-10-23
+  authors:
+    - HsingTang
   tags:
     - agents-api
     - agents
@@ -69,7 +81,7 @@
   description: Investigate incidents in Slack using service telemetry, GitHub, AWS, and past incident reports, with human review before recovery.
   date: 2026-09-10
   authors:
-    - alfozan
+    - openai
   tags:
     - agents-api
     - agents
@@ -81,7 +93,7 @@
   description: Connect Slack threads to persistent agent sessions, workplace tools, and isolated sandboxes.
   date: 2026-09-10
   authors:
-    - alfozan
+    - openai
   tags:
     - agents-api
     - agents
@@ -93,7 +105,7 @@
   description: Investigate warehouse questions with read-only SQL, business context, and saved analyst corrections.
   date: 2026-09-10
   authors:
-    - alfozan
+    - openai
   tags:
     - agents-api
     - agents
@@ -417,7 +429,7 @@
   description: Run, inspect, and trace local Agents SDK demo apps from a browser-based deployment manager.
   date: 2026-05-05
   authors:
-    - alfozan
+    - openai
   tags:
     - agents-sdk
     - agents

@@ -81,7 +81,7 @@ deploy:
 		echo "PROJECT_PATH is required. Example: make deploy PROJECT_PATH=/path/to/agents-sdk-app"; \
 		exit 2; \
 	fi
-	$(PYTHON) scripts/local_deploy.py $(PROJECT_PATH) --manager-port $(PORT) $(if $(APP_PORT),--app-port $(APP_PORT),) $(if $(NAME),--name "$(NAME)",) $(if $(SANDBOX_BACKEND),--sandbox-backend $(SANDBOX_BACKEND),) $(if $(TARGET),--target $(TARGET),) $(if $(NO_START),--no-start,)
+	$(PYTHON) scripts/local_deploy.py "$(PROJECT_PATH)" --manager-port $(PORT) $(if $(APP_PORT),--app-port $(APP_PORT),) $(if $(NAME),--name "$(NAME)",) $(if $(SANDBOX_BACKEND),--sandbox-backend $(SANDBOX_BACKEND),) $(if $(TARGET),--target $(TARGET),) $(if $(NO_START),--no-start,)
 
 clean:
 	rm -rf dist node_modules

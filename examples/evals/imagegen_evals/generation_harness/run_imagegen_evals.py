@@ -256,9 +256,9 @@ MARKETING_SCHEMA = {
 REQUIRED_TEXT = {
     "WINTER LATTE WEEK",
     "Try our Cinnamon Oat Latte",
-    "20% OFF • Mon–Thu",
+    "20% OFF - Mon-Thu",
     "Order Ahead",
-    "123 Market St • 7am–6pm",
+    "123 Market St - 7am-6pm",
 }
 
 

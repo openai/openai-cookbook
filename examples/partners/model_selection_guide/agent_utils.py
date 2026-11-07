@@ -168,7 +168,7 @@ def _parse_json(text: str) -> Dict[str, Any]:
         return json.loads(text)
     except json.JSONDecodeError:
         # try to rescue JSON from a ```json ...``` block
-        m = re.search(r"```(?:json)?\\s*(.*?)```", text, re.S)
+        m = re.search(r"```(?:json)?\s*(.*?)```", text, re.S)
         if m:
             try:
                 return json.loads(m.group(1))

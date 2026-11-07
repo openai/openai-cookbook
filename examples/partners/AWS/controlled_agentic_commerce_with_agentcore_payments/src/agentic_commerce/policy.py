@@ -92,6 +92,7 @@ class PolicyEngine:
             currency=requirement.currency,
             amount=amount,
             approval=approval,
+            issued_at=requirement.extra.issued_at,
             expires_at=requirement.expires_at,
             now=now,
         )
@@ -105,6 +106,7 @@ class PolicyEngine:
         currency: str,
         amount: Decimal,
         approval: ApprovalGrant | None,
+        issued_at: datetime | None = None,
         expires_at: datetime | None = None,
         now: datetime | None = None,
     ) -> AuthorizationDecision:
@@ -129,6 +131,11 @@ class PolicyEngine:
             return self._deny(
                 "currency_not_allowed",
                 "The payment currency is outside the configured policy.",
+            )
+        if issued_at is not None and now < issued_at:
+            return self._deny(
+                "challenge_not_yet_valid",
+                "The merchant payment challenge is not yet valid.",
             )
         if expires_at is not None and now >= expires_at:
             return self._deny(

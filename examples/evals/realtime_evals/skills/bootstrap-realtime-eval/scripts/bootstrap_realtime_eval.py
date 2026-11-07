@@ -737,6 +737,10 @@ def main() -> None:
     except ValueError as exc:
         raise ValueError(f"Output directory must live under {HARNESS_ROOT}") from exc
 
+    # Validate user-supplied mocks before --force can remove an existing eval.
+    if args.harness == "run" and args.tool_mocks_json.strip():
+        parse_json_array(args.tool_mocks_json.strip())
+
     if output_dir.exists():
         if not args.force:
             raise FileExistsError(

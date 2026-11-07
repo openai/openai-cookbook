@@ -198,6 +198,6 @@ def call_api(prompt: str, options: dict, context: dict) -> dict:
                 "output": f"[BLOCKED] Guardrail triggered: {exc.guardrail_result.guardrail.name}"
             }
         except Exception as e:
-            return {"output": f"[ERROR] {str(e)}"}
+            return {"output": "", "error": str(e)}
 
     return asyncio.run(_run())

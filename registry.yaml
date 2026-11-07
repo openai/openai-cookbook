@@ -4,6 +4,18 @@
 # should build pages for, and indicates metadata such as tags, creation date and
 # authors for each page.
 
+- title: "Resume a voice investigation without starting twice"
+  path: examples/resumable_investigation/resume_voice_investigation.ipynb
+  slug: resume-voice-investigation
+  description: "Keep application investigation identity and progress across voice-session boundaries, with local SQLite leases and explicit uncertainty about interrupted delivery."
+  date: 2026-10-23
+  authors:
+    - QueenFi703
+  tags:
+    - realtime
+    - agents
+    - state-management
+
 - title: Harness-aware evaluation of plugins
   path: examples/partners/harness_aware_plugin_evals/harness_aware_plugin_evals.ipynb
   slug: harness-aware-plugin-evals

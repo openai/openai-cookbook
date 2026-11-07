@@ -227,6 +227,8 @@ def start_local_process(
                 or "process exited before listening"
             )
         time.sleep(0.25)
+    if _port_is_open(deployment.port):
+        return deployment
     try:
         os.killpg(process.pid, signal.SIGTERM)
     except ProcessLookupError:
@@ -371,6 +373,8 @@ def start_local_docker(
                 or "container exited before listening"
             )
         time.sleep(0.25)
+    if _port_is_open(deployment.port):
+        return deployment
     failure_log = read_deployment_log(deployment, limit=12000)
     _remove_managed_container(deployment.container_id, deployment.id)
     raise RuntimeError(

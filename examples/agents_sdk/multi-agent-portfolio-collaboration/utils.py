@@ -75,23 +75,24 @@ class FileSpanExporter(TracingExporter):
 
 
 def output_file(name: str | Path, *, make_parents: bool = True) -> Path:
-    """Return an absolute Path under the shared outputs/ directory.
+    """Return an absolute Path confined to the shared outputs/ directory.
 
     If *name* already starts with the string "outputs/", that prefix is removed
     to avoid accidentally nesting a second outputs folder (e.g.
-    `outputs/outputs/foo.png`).  Absolute paths are returned unchanged.
+    `outputs/outputs/foo.png`). Absolute paths are accepted only when they
+    resolve inside the shared outputs directory.
     """
 
     path = Path(name)
-
-    if path.is_absolute():
-        return path
+    base = outputs_dir().resolve()
 
     # Strip leading "outputs/" if present
-    if path.parts and path.parts[0] == "outputs":
+    if not path.is_absolute() and path.parts and path.parts[0] == "outputs":
         path = Path(*path.parts[1:])
 
-    final = outputs_dir() / path
+    final = path.resolve() if path.is_absolute() else (base / path).resolve()
+    if not final.is_relative_to(base):
+        raise ValueError("output path must stay within the shared outputs directory")
 
     if make_parents:
         final.parent.mkdir(parents=True, exist_ok=True)

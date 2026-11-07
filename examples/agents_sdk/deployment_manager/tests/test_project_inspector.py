@@ -22,3 +22,21 @@ class ProjectInspectorTests(TestCase):
             project.required_env,
             ["SERVICE_REGION", "SERVICE_TOKEN"],
         )
+
+def test_does_not_treat_environment_assignments_as_required(self) -> None:
+        with TemporaryDirectory() as temp_dir:
+            project_path = Path(temp_dir)
+            (project_path / "main.py").write_text(
+                "import os\n"
+                "if 'DEFAULT_MODE' not in os.environ:\n"
+                "    os.environ['DEFAULT_MODE'] = 'safe'\n"
+                "required = os.environ['SERVICE_TOKEN']\n"
+                "assert os.environ['SERVICE_REGION'] == 'eu'\n",
+                encoding="utf-8",
+            )
+            project = inspect_project(str(project_path))
+
+        self.assertEqual(
+            project.required_env,
+            ["SERVICE_REGION", "SERVICE_TOKEN"],
+        )

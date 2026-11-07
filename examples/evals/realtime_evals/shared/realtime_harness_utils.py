@@ -93,7 +93,12 @@ async def stream_audio_to_connection(
     if minimum_audio_bytes > 0 and len(audio_bytes) < minimum_audio_bytes:
         # Very short turns can be ignored by the model; pad with silence when requested.
         padding_bytes = minimum_audio_bytes - len(audio_bytes)
-        audio_bytes = audio_bytes + (b"\x00" * padding_bytes)
+        silence_byte = {
+            "pcm16": b"\x00",
+            "g711_ulaw": b"\xff",
+            "g711_alaw": b"\xd5",
+        }[input_audio_format]
+        audio_bytes = audio_bytes + (silence_byte * padding_bytes)
 
     bytes_per_chunk = compute_bytes_per_chunk(
         sample_rate_hz, chunk_ms, bytes_per_sample

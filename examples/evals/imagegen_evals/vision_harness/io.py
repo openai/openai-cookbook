@@ -12,6 +12,9 @@ _MIME_BY_SUFFIX = {
 
 
 def image_to_data_url(path: Path) -> str:
-    mime = _MIME_BY_SUFFIX.get(path.suffix.lower(), "image/png")
+    suffix = path.suffix.lower()
+    if suffix not in _MIME_BY_SUFFIX:
+        raise ValueError(f"Unsupported image extension: {suffix or '<none>'}")
+    mime = _MIME_BY_SUFFIX[suffix]
     b64 = base64.b64encode(path.read_bytes()).decode("utf-8")
     return f"data:{mime};base64,{b64}"

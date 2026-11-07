@@ -10,6 +10,7 @@ Design notes:
   core named graders in `DEFAULT_GRADER_FUNCTIONS`.
 """
 
+from collections import Counter
 import json
 import re
 import tempfile
@@ -324,7 +325,7 @@ def check_tool_call_names_correct(
     tool_calls: Sequence[ToolCallRecord | Mapping[str, Any]],
     expected_tool_names: Sequence[str],
 ) -> tuple[bool, str]:
-    """Deterministically verify that the set of called tool names matches."""
+    """Deterministically verify that the called tool-name multiset matches."""
 
     expected_names = [name.strip() for name in expected_tool_names if name.strip()]
     actual_names = [_tool_call_name(tool_call) for tool_call in tool_calls]
@@ -333,7 +334,7 @@ def check_tool_call_names_correct(
         return True, ""
     if not actual_names:
         return False, f"No tool calls found. Expected {expected_names}."
-    if set(actual_names) != set(expected_names):
+    if Counter(actual_names) != Counter(expected_names):
         return (
             False,
             f"Tool calls do not match. Expected {expected_names}, got {actual_names}.",
@@ -346,20 +347,24 @@ def check_tool_args_correct(
     expected_tool_name: str,
     expected_args: Mapping[str, Any],
 ) -> tuple[bool, str]:
-    """Deterministically verify that a named tool call includes expected args."""
+    """Verify that at least one named tool call includes the expected args."""
 
+    first_actual_args: Dict[str, Any] | None = None
     for tool_call in tool_calls:
         if _tool_call_name(tool_call) != expected_tool_name:
             continue
         actual_args = _tool_call_arguments(tool_call)
+        if first_actual_args is None:
+            first_actual_args = actual_args
         if expected_args_subset(dict(expected_args), actual_args):
             return True, ""
+
+    if first_actual_args is not None:
         return (
             False,
             f"Arguments for {expected_tool_name} did not match. "
-            f"Expected subset {dict(expected_args)}, got {actual_args}.",
+            f"Expected subset {dict(expected_args)}, got {first_actual_args}.",
         )
-
     return False, f"Expected tool call {expected_tool_name} was not found."
 
 
@@ -699,10 +704,17 @@ def compute_tool_call_grade(
     )
 
     matching_call = None
+    first_named_call = None
     for tool_call in tool_calls:
-        if _tool_call_name(tool_call) == expected_tool_name:
+        if _tool_call_name(tool_call) != expected_tool_name:
+            continue
+        if first_named_call is None:
+            first_named_call = tool_call
+        if expected_args_subset(expected_args, _tool_call_arguments(tool_call)):
             matching_call = tool_call
             break
+    if matching_call is None:
+        matching_call = first_named_call
 
     if matching_call is None:
         first_call = tool_calls[0] if tool_calls else {}

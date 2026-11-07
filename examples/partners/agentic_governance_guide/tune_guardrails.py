@@ -15,6 +15,7 @@ Example:
 import argparse
 import asyncio
 import logging
+import math
 import sys
 from pathlib import Path
 
@@ -106,7 +107,7 @@ Examples:
         print(f"Error: Dataset file not found: {args.dataset}", file=sys.stderr)
         sys.exit(1)
 
-    if args.step_size <= 0:
+    if not math.isfinite(args.step_size) or args.step_size <= 0:
         print("Error: --step-size must be greater than 0.", file=sys.stderr)
         sys.exit(1)
 

@@ -1,0 +1,30 @@
+name: Validate Registry
+
+on: [pull_request]
+
+permissions:
+  contents: read
+
+jobs:
+  validate-registry:
+    name: Validate registry.yaml and authors.yaml
+    runs-on: ubuntu-latest
+    timeout-minutes: 5
+
+    steps:
+      - uses: actions/checkout@11d5960a326750d5838078e36cf38b85af677262 # v4
+        with:
+          persist-credentials: false
+
+      - uses: actions/setup-python@a26af69be951a213d495a4c3e4e4022e16d87065 # v5
+        with:
+          python-version: '3.12'
+
+      - name: Install dependencies
+        run: pip install pyyaml "jsonschema[format-nongpl]"
+
+      - name: Run registry checker tests
+        run: python -m unittest discover -s .github/scripts/tests -p 'test_check_registry.py' -v
+
+      - name: Validate registry and authors
+        run: python .github/scripts/check_registry.py

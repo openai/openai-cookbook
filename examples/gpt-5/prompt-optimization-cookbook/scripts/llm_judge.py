@@ -104,6 +104,9 @@ def judge_folder(
     Evaluate each .py code file in results_dir with an LLM-as-judge and write per-file JSON judgments.
     Returns the output directory path.
     """
+    if concurrency < 1:
+        raise ValueError("concurrency must be at least 1")
+
     in_dir = Path(results_dir)
     assert in_dir.exists(), f"Results folder not found: {in_dir}"
 

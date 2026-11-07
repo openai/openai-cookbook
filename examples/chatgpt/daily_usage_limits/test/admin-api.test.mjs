@@ -1,6 +1,7 @@
 import test from 'node:test';
 import assert from 'node:assert/strict';
 import { createAdminApi, inheritedSettingsEquivalent, matchesTarget, settingsEquivalent } from '../src/admin-api.mjs';
+import { validateSnapshot } from '../src/policy.mjs';
 
 const workspaceId = 'workspace-example';
 const userId = 'user-example';
@@ -178,6 +179,24 @@ test('snapshot preserves original settings/source and rounds counters upward', a
   assert.ok(h.requests.every(request => request.url.startsWith('https://api.chatgpt.com/v1/')));
   assert.ok(h.requests.every(request => request.redirect === 'error'));
 });
+
+for (const delay of [0, 60000, 60001, -1]) {
+  test(`snapshot freshness includes a ${delay}ms clock change during reads`, async () => {
+    const config = { workspaceId, unit: 'credit', period: { start: '2030-06-01T00:00:00.000Z', end: END } };
+    let currentTime = Date.parse(NOW);
+    const h = harness({ options: { clock: () => new Date(currentTime).toISOString() },
+      intercept: ({ requests }) => {
+        if (requests.length === 4) currentTime += delay;
+      } });
+
+    const snapshot = await h.api.readSnapshot(userId);
+    const validate = () => validateSnapshot(snapshot, config, userId, new Date(currentTime).toISOString());
+    if (delay < 0 || delay > 60000) assert.throws(validate, { code: 'SNAPSHOT_NOT_FRESH' });
+    else assert.doesNotThrow(validate);
+    assert.equal(snapshot.observedAt, NOW);
+    assert.equal(h.patches, 0);
+  });
+}
 
 test('identity allowlist cannot be expanded by a method argument', async () => {
   const h = harness();

@@ -3,7 +3,7 @@
 from __future__ import annotations
 
 from datetime import UTC, datetime, timedelta
-from decimal import Decimal
+from decimal import Decimal, localcontext
 
 import httpx
 
@@ -26,12 +26,15 @@ USDC_ATOMIC_UNITS = Decimal(1_000_000)
 
 
 def _atomic_usdc_amount(price: Decimal) -> str:
-    if price <= 0:
-        raise ValueError("price must be positive")
-    atomic_amount = price * USDC_ATOMIC_UNITS
-    if atomic_amount != atomic_amount.to_integral_value():
-        raise ValueError("price must use at most 6 decimal places")
-    return str(int(atomic_amount))
+    if not price.is_finite() or price <= 0:
+        raise ValueError("price must be positive and finite")
+    with localcontext() as context:
+        # Prevent the default decimal precision from rounding fractional atoms.
+        context.prec = max(context.prec, len(price.as_tuple().digits) + 6)
+        atomic_amount = price * USDC_ATOMIC_UNITS
+        if atomic_amount != atomic_amount.to_integral_value():
+            raise ValueError("price must use at most 6 decimal places")
+        return str(int(atomic_amount))
 
 
 class SyntheticMerchant:

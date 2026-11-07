@@ -30,6 +30,23 @@ def _extract_b64_items(images_response) -> list[str]:
     return b64_items
 
 
+def _positive_int_param(value: object, *, name: str) -> int:
+    if isinstance(value, bool):
+        raise ValueError(f"{name} must be a positive integer")
+    if isinstance(value, int):
+        parsed = value
+    elif isinstance(value, str):
+        text = value.strip()
+        if not text or not text.isdigit():
+            raise ValueError(f"{name} must be a positive integer")
+        parsed = int(text)
+    else:
+        raise ValueError(f"{name} must be a positive integer")
+    if parsed < 1:
+        raise ValueError(f"{name} must be a positive integer")
+    return parsed
+
+
 class ImageGenerationRunner:
     """Text-to-image runner."""
 
@@ -42,7 +59,7 @@ class ImageGenerationRunner:
 
         params = dict(run_cfg.params)
         model = params.pop("model")
-        n = int(params.pop("n", 1))
+        n = _positive_int_param(params.pop("n", 1), name="n")
 
         run_dir = store.run_dir(case.id, run_cfg.label)
         basename = store.new_basename(f"gen_{case.id}_{run_cfg.label}")
@@ -76,7 +93,7 @@ class ImageEditRunner:
 
         params = dict(run_cfg.params)
         model = params.pop("model")
-        n = int(params.pop("n", 1))
+        n = _positive_int_param(params.pop("n", 1), name="n")
 
         run_dir = store.run_dir(case.id, run_cfg.label)
         basename = store.new_basename(f"edit_{case.id}_{run_cfg.label}")

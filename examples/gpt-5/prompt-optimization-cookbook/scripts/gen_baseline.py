@@ -31,7 +31,7 @@ def _call_model_with_retry(
             {"role": "user", "content": [{"type": "input_text", "text": user_prompt}]},
         ],
         "text": {"format": {"type": "text"}, "verbosity": "medium"},
-        "reasoning": {"effort": "medium", "summary": "auto"},
+        "reasoning": {"effort": "medium"},
         "tools": [],
     }
     for attempt in range(max_retries):

@@ -58,7 +58,7 @@ def compute_bytes_per_chunk(
 ) -> int:
     # Keep chunk boundaries on complete samples so multi-byte formats such as
     # PCM16 are never split between append events.
-    samples_per_chunk = max(1, int(sample_rate_hz * (chunk_ms / 1000.0)))
+    samples_per_chunk = max(1, (sample_rate_hz * chunk_ms) // 1000)
     return samples_per_chunk * bytes_per_sample
 
 

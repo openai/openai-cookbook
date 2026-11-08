@@ -4,6 +4,19 @@
 # should build pages for, and indicates metadata such as tags, creation date and
 # authors for each page.
 
+- title: Record and replay Responses API tool-calling loops
+  path: examples/responses_api/record_and_replay_tool_loops/record_and_replay_tool_loops.ipynb
+  slug: record-and-replay-tool-loops
+  description: Capture a real Responses API function-calling loop to a cassette, replay it offline with zero API calls, detect drift between recordings, and turn the cassette into a deterministic test.
+  date: 2026-10-13
+  authors:
+    - nirholas
+  tags:
+    - responses
+    - agents
+    - evals
+    - functions
+
 - title: Harness-aware evaluation of plugins
   path: examples/partners/harness_aware_plugin_evals/harness_aware_plugin_evals.ipynb
   slug: harness-aware-plugin-evals

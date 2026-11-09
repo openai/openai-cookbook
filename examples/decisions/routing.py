@@ -105,7 +105,7 @@ def request_prediction(message, *, api_key=None):
             result = json.load(response)
     except urllib.error.HTTPError as error:
         raise RuntimeError(f"Decisions request failed with HTTP {error.code}; no automatic retry") from None
-    except urllib.error.URLError:
+    except (urllib.error.URLError, TimeoutError):
         raise RuntimeError("Decisions network request failed; no automatic retry") from None
     except json.JSONDecodeError:
         raise RuntimeError("Decisions returned invalid JSON; no automatic retry") from None

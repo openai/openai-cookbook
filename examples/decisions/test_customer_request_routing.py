@@ -138,6 +138,16 @@ class RoutingTests(unittest.TestCase):
                     request_prediction("My card is late.")
                 send.assert_called_once()
 
+    def test_response_body_timeout_is_reported_without_retry(self):
+        response = io.BytesIO()
+        with (
+            patch("routing._OPENER.open", return_value=response) as send,
+            patch.object(response, "read", side_effect=TimeoutError),
+        ):
+            with self.assertRaisesRegex(RuntimeError, "no automatic retry"):
+                request_prediction("My card is late.", api_key="test-only-placeholder")
+        send.assert_called_once()
+
     def test_cli_custom_message_makes_one_request_and_displays_response(self):
         output = io.StringIO()
         with patch.dict(os.environ, {"OPENAI_API_KEY": "test-only-placeholder"}):

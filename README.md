@@ -1,9 +1,5 @@
-<a href="https://cookbook.openai.com" target="_blank">
-  <picture>
-    <source media="(prefers-color-scheme: dark)" srcset="/images/openai-cookbook-white.png" style="max-width: 100%; width: 400px; margin-bottom: 20px">
-    <img alt="OpenAI Cookbook Logo" src="/images/openai-cookbook.png" width="400px">
-  </picture>
-</a>
+<a href="https://cookbook.openai.com/#gh-dark-mode-only"><img alt="OpenAI Cookbook Logo" src="/images/openai-cookbook-white.png" width="400"></a>
+<a href="https://cookbook.openai.com/#gh-light-mode-only"><img alt="OpenAI Cookbook Logo" src="/images/openai-cookbook.png" width="400"></a>
 
 <h3></h3>
  

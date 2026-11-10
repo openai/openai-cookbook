@@ -1,0 +1,470 @@
+[
+  {
+    "name": "get_order",
+    "description": "Retrieve the authenticated customer's already-selected order and verified carrier update. Use for a status request or before checking any remedy. No order number or account ID is accepted.",
+    "strict": true,
+    "parameters": {
+      "type": "object",
+      "properties": {},
+      "required": [],
+      "additionalProperties": false
+    },
+    "returns": {
+      "oneOf": [
+        {
+          "type": "object",
+          "properties": {
+            "status": {
+              "type": "string",
+              "enum": [
+                "ok"
+              ]
+            },
+            "order_id": {
+              "type": "string"
+            },
+            "item_id": {
+              "type": "string"
+            },
+            "item": {
+              "type": "string"
+            },
+            "shipping_status": {
+              "type": "string",
+              "enum": [
+                "delivered",
+                "in_transit"
+              ]
+            },
+            "tracking_update": {
+              "type": "string"
+            },
+            "estimated_delivery": {
+              "type": [
+                "string",
+                "null"
+              ]
+            },
+            "late_hours": {
+              "type": "number"
+            },
+            "total": {
+              "type": "number"
+            },
+            "currency": {
+              "type": "string",
+              "const": "USD"
+            }
+          },
+          "required": [
+            "status",
+            "order_id",
+            "item_id",
+            "item",
+            "shipping_status",
+            "tracking_update",
+            "estimated_delivery",
+            "late_hours",
+            "total",
+            "currency"
+          ],
+          "additionalProperties": false
+        },
+        {
+          "type": "object",
+          "properties": {
+            "status": {
+              "type": "string",
+              "enum": [
+                "rejected",
+                "stale",
+                "failed"
+              ]
+            },
+            "reason": {
+              "type": "string"
+            }
+          },
+          "required": [
+            "status",
+            "reason"
+          ],
+          "additionalProperties": false
+        }
+      ]
+    }
+  },
+  {
+    "name": "check_credit_eligibility",
+    "description": "After retrieving the order, check a requested late-delivery credit. Verified lateness must exceed 24 hours. The quote returns the exact amount, currency and original payment method to explain before asking for permission.",
+    "strict": true,
+    "parameters": {
+      "type": "object",
+      "properties": {},
+      "required": [],
+      "additionalProperties": false
+    },
+    "returns": {
+      "oneOf": [
+        {
+          "type": "object",
+          "properties": {
+            "status": {
+              "type": "string",
+              "enum": [
+                "ok"
+              ]
+            },
+            "order_id": {
+              "type": "string"
+            },
+            "eligible": {
+              "type": "boolean"
+            },
+            "quote_id": {
+              "type": [
+                "string",
+                "null"
+              ]
+            },
+            "amount": {
+              "type": [
+                "number",
+                "null"
+              ]
+            },
+            "currency": {
+              "type": "string",
+              "const": "USD"
+            },
+            "payment_method": {
+              "type": "string"
+            },
+            "reason": {
+              "type": "string"
+            }
+          },
+          "required": [
+            "status",
+            "order_id",
+            "eligible",
+            "quote_id",
+            "amount",
+            "currency",
+            "payment_method",
+            "reason"
+          ],
+          "additionalProperties": false
+        },
+        {
+          "type": "object",
+          "properties": {
+            "status": {
+              "type": "string",
+              "enum": [
+                "rejected",
+                "stale",
+                "failed"
+              ]
+            },
+            "reason": {
+              "type": "string"
+            }
+          },
+          "required": [
+            "status",
+            "reason"
+          ],
+          "additionalProperties": false
+        }
+      ]
+    }
+  },
+  {
+    "name": "register_credit",
+    "description": "Submit the current late-delivery credit quote after the customer has heard its terms and unconditionally accepted it on a later reply. A different amount, a question, a new issue or a refusal does not authorize a credit. An unconfirmed registration must not be resubmitted.",
+    "strict": true,
+    "parameters": {
+      "type": "object",
+      "properties": {
+        "quote_id": {
+          "type": "string",
+          "description": "Exact quote_id from the current eligibility result."
+        }
+      },
+      "required": [
+        "quote_id"
+      ],
+      "additionalProperties": false
+    },
+    "returns": {
+      "oneOf": [
+        {
+          "type": "object",
+          "properties": {
+            "status": {
+              "type": "string",
+              "enum": [
+                "registered",
+                "already_registered"
+              ]
+            },
+            "order_id": {
+              "type": "string"
+            },
+            "quote_id": {
+              "type": "string"
+            },
+            "refund_id": {
+              "type": "string"
+            },
+            "amount": {
+              "type": "number"
+            },
+            "currency": {
+              "type": "string",
+              "const": "USD"
+            },
+            "payment_method": {
+              "type": "string"
+            }
+          },
+          "required": [
+            "status",
+            "order_id",
+            "quote_id",
+            "refund_id",
+            "amount",
+            "currency",
+            "payment_method"
+          ],
+          "additionalProperties": false
+        },
+        {
+          "type": "object",
+          "properties": {
+            "status": {
+              "type": "string",
+              "enum": [
+                "rejected",
+                "stale",
+                "failed",
+                "unconfirmed"
+              ]
+            },
+            "reason": {
+              "type": "string"
+            }
+          },
+          "required": [
+            "status",
+            "reason"
+          ],
+          "additionalProperties": false
+        }
+      ]
+    }
+  },
+  {
+    "name": "check_replacement_availability",
+    "description": "After retrieving the order and identifying the damaged item, check for the same item at no cost, shipped to the original order address. A delivered order and stock are required. This lookup does not start a replacement.",
+    "strict": true,
+    "parameters": {
+      "type": "object",
+      "properties": {
+        "item_id": {
+          "type": "string",
+          "description": "The exact item_id returned for the selected order."
+        },
+        "damage_description": {
+          "type": "string",
+          "description": "What the customer reported was damaged or broken."
+        }
+      },
+      "required": [
+        "item_id",
+        "damage_description"
+      ],
+      "additionalProperties": false
+    },
+    "returns": {
+      "oneOf": [
+        {
+          "type": "object",
+          "properties": {
+            "status": {
+              "type": "string",
+              "enum": [
+                "ok"
+              ]
+            },
+            "order_id": {
+              "type": "string"
+            },
+            "available": {
+              "type": "boolean"
+            },
+            "offer_id": {
+              "type": [
+                "string",
+                "null"
+              ]
+            },
+            "item_id": {
+              "type": "string"
+            },
+            "item": {
+              "type": "string"
+            },
+            "damage_description": {
+              "type": "string"
+            },
+            "cost": {
+              "type": [
+                "number",
+                "null"
+              ]
+            },
+            "currency": {
+              "type": "string",
+              "const": "USD"
+            },
+            "destination": {
+              "type": [
+                "string",
+                "null"
+              ]
+            },
+            "reason": {
+              "type": "string"
+            }
+          },
+          "required": [
+            "status",
+            "order_id",
+            "available",
+            "offer_id",
+            "item_id",
+            "item",
+            "damage_description",
+            "cost",
+            "currency",
+            "destination",
+            "reason"
+          ],
+          "additionalProperties": false
+        },
+        {
+          "type": "object",
+          "properties": {
+            "status": {
+              "type": "string",
+              "enum": [
+                "rejected",
+                "stale",
+                "failed"
+              ]
+            },
+            "reason": {
+              "type": "string"
+            }
+          },
+          "required": [
+            "status",
+            "reason"
+          ],
+          "additionalProperties": false
+        }
+      ]
+    }
+  },
+  {
+    "name": "create_replacement",
+    "description": "Place the offered same-item replacement after the customer hears the item, zero cost and original order address and unconditionally accepts those terms on a later reply. A different item, address or remedy requires a new conversation. A lost acknowledgment must not cause a repeat submission.",
+    "strict": true,
+    "parameters": {
+      "type": "object",
+      "properties": {
+        "offer_id": {
+          "type": "string",
+          "description": "Exact offer_id from the current replacement availability result."
+        }
+      },
+      "required": [
+        "offer_id"
+      ],
+      "additionalProperties": false
+    },
+    "returns": {
+      "oneOf": [
+        {
+          "type": "object",
+          "properties": {
+            "status": {
+              "type": "string",
+              "enum": [
+                "created",
+                "already_created"
+              ]
+            },
+            "order_id": {
+              "type": "string"
+            },
+            "offer_id": {
+              "type": "string"
+            },
+            "replacement_id": {
+              "type": "string"
+            },
+            "item": {
+              "type": "string"
+            },
+            "cost": {
+              "type": "number"
+            },
+            "currency": {
+              "type": "string",
+              "const": "USD"
+            },
+            "destination": {
+              "type": "string"
+            }
+          },
+          "required": [
+            "status",
+            "order_id",
+            "offer_id",
+            "replacement_id",
+            "item",
+            "cost",
+            "currency",
+            "destination"
+          ],
+          "additionalProperties": false
+        },
+        {
+          "type": "object",
+          "properties": {
+            "status": {
+              "type": "string",
+              "enum": [
+                "rejected",
+                "stale",
+                "failed",
+                "unconfirmed"
+              ]
+            },
+            "reason": {
+              "type": "string"
+            }
+          },
+          "required": [
+            "status",
+            "reason"
+          ],
+          "additionalProperties": false
+        }
+      ]
+    }
+  }
+]

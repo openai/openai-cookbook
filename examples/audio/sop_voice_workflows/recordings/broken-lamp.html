@@ -1,0 +1,27 @@
+<!doctype html>
+<html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1">
+<title>A replacement for a broken lamp</title><style>
+:root{color-scheme:light dark;font:16px/1.5 system-ui,sans-serif}body{max-width:48rem;margin:0 auto;padding:1rem}
+h1{font-size:1.65rem;margin:.45rem 0}h2{font-size:1.15rem;margin:1.1rem 0 .2rem}
+audio{width:100%;margin:.25rem 0}ol{list-style:none;padding:0}li{display:grid;grid-template-columns:3.6rem minmax(0,1fr);gap:.6rem;border-top:1px solid color-mix(in srgb, currentColor 25%, transparent);padding:.5rem 0}
+button{font:inherit;font-variant-numeric:tabular-nums;color:inherit;cursor:pointer;text-decoration:underline;align-self:start;border:0;background:none;padding:0}summary{cursor:pointer}.role{font-size:.82rem;font-weight:bold}pre{white-space:pre-wrap;overflow-wrap:anywhere;font-size:.84rem}button:focus-visible,summary:focus-visible{outline:2px solid currentColor;outline-offset:2px}
+</style></head><body><main><h1>A replacement for a broken lamp</h1><p>A Blossom Store customer asks about tracking, reports a cracked lamp, and accepts a replacement.</p>
+<audio controls preload="metadata" aria-label="A replacement for a broken lamp" src="blossom-late-handoff.webm"></audio>
+<h2>Call timeline</h2><p>The test deliberately holds the first tracking handoff until the caller reports the damage. Select a timestamp to hear the call from that point. Expand an event to see what happened.</p>
+<ol>
+<li data-ms="3180"><button type="button" data-ms="3180" aria-label="Play from 0:03.18">0:03.18</button><details><summary>Hold the tracking handoff</summary><p>The test delays delivery of the initial request while the conversation continues.</p></details></li>
+<li data-ms="7520"><button type="button" data-ms="7520" aria-label="Play from 0:07.52">0:07.52</button><details><summary>GPT-Live hands off the damage report</summary><p>The new request takes priority over the outdated tracking lookup.</p></details></li>
+<li data-ms="9420"><button type="button" data-ms="9420" aria-label="Play from 0:09.42">0:09.42</button><details><summary>Read the order</summary><p>The store finds the item is a desk lamp. GPT-Live asks which part was damaged.</p></details></li>
+<li data-ms="22520"><button type="button" data-ms="22520" aria-label="Play from 0:22.52">0:22.52</button><details><summary>Check replacement availability</summary><p>The store can send another desk lamp, and GPT-Live asks if the caller wants it.</p></details></li>
+<li data-ms="39140"><button type="button" data-ms="39140" aria-label="Play from 0:39.14">0:39.14</button><details><summary>Create one replacement</summary><p>The store checks the current offer and records a replacement only after the caller accepts.</p></details></li>
+</ol><p role="status" id="status"></p></main><script>
+const audio = document.querySelector('audio');
+document.querySelector('ol').addEventListener('click', async (event) => {
+  const button = event.target.closest('button[data-ms]');
+  if (!button) return;
+  audio.currentTime = Number(button.dataset.ms) / 1000;
+  try { await audio.play(); } catch (error) {
+    if (error.name !== 'AbortError') document.querySelector('#status').textContent = 'Use the audio controls to start playback.';
+  }
+});
+</script></body></html>

@@ -1,0 +1,67 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>When one reply answers two questions</title>
+  <style>
+    :root { color-scheme: light dark; --ink: #202020; --paper: #fff; --muted: #565656; --line: #dedede; --tint: #f4f4f4; }
+    @media (prefers-color-scheme: dark) { :root { --ink: #eee; --paper: #171717; --muted: #b6b6b6; --line: #414141; --tint: #272727; } }
+    * { box-sizing: border-box; }
+    body { margin: 0; background: var(--paper); color: var(--ink); font: 1rem/1.4 system-ui, sans-serif; }
+    main { height: 100vh; display: flex; flex-direction: column; padding: .9rem 1rem .4rem; }
+    h1 { font-size: 1.1rem; margin: 0 0 .5rem; }
+    audio { width: 100%; display: block; flex: none; }
+    p { margin: .55rem 0; font-size: .86rem; color: var(--muted); }
+    ol { list-style: none; margin: 0; padding: 0; overflow: auto; min-height: 0; }
+    li { display: grid; grid-template-columns: 4rem minmax(0, 1fr); gap: .5rem; align-items: baseline; padding: .6rem .25rem; border-top: 1px solid var(--line); }
+    li[aria-current] { background: var(--tint); }
+    button { color: inherit; border: 0; background: none; padding: .12rem; cursor: pointer; font: .85rem/1.3 ui-monospace, monospace; text-decoration: underline; text-underline-offset: .18em; }
+    summary { font-size: .92rem; cursor: pointer; overflow-wrap: anywhere; }
+    summary::marker { color: var(--muted); }
+    .role { font-size: .8rem; color: var(--muted); margin-right: .35rem; }
+    pre { background: var(--tint); white-space: pre-wrap; overflow-wrap: anywhere; padding: .5rem .65rem; margin: .45rem 0 0; font: .8rem/1.45 ui-monospace, monospace; }
+    :focus-visible { outline: 2px solid currentColor; outline-offset: -1px; }
+    @media (max-width: 450px) { main { padding: .65rem .6rem .2rem; } li { gap: .4rem; grid-template-columns: 3.8rem minmax(0,1fr); } }
+  </style>
+</head>
+<body>
+  <main>
+    <h1>Call timeline</h1>
+
+    <audio id="audio" controls preload="metadata" aria-label="Interview recording, caller and GPT-Live"
+      src="interview-multi-answer.webm"></audio>
+    <p id="hint">Select a time to listen from that moment. Expand an event to see what happened.</p>
+    <p id="error" role="status" hidden></p>
+
+    <ol aria-label="Selected events in the call" aria-describedby="hint" tabindex="0">
+<li data-ms="10100"><button type="button" data-ms="10100" aria-label="Play from 0:10.10">0:10.10</button><details><summary>GPT-Live hands off the reply</summary><p>The candidate has already answered both the start-day and shift questions.</p></details></li>
+<li data-ms="13260"><button type="button" data-ms="13260" aria-label="Play from 0:13.26">0:13.26</button><details><summary>Save both answers</summary><p>The app saves Monday, asks the ATS which question comes next, then saves that either shift works.</p></details></li>
+<li data-ms="29000"><button type="button" data-ms="29000" aria-label="Play from 0:29.00">0:29.00</button><details><summary>Complete after confirmation</summary><p>The ATS records completion after the candidate confirms both choices.</p></details></li>
+</ol>
+  </main>
+  <script>
+    const audio = document.querySelector('audio');
+    const message = document.getElementById('error');
+    const rows = Array.from(document.querySelectorAll('li[data-ms]'));
+    for (const row of rows) {
+      row.querySelector('button').addEventListener('click', () => {
+        audio.currentTime = Number(row.dataset.ms) / 1000;
+        audio.play().catch(error => {
+          if (error.name === 'AbortError') return;
+          message.textContent = 'Use the audio controls to start the recording.';
+          message.hidden = false;
+        });
+      });
+    }
+    audio.addEventListener('playing', () => { message.hidden = true; });
+    audio.addEventListener('timeupdate', () => {
+      const active = rows.findLast(row => Number(row.dataset.ms) <= audio.currentTime * 1000);
+      for (const row of rows) {
+        if (row === active) row.setAttribute('aria-current', 'time');
+        else row.removeAttribute('aria-current');
+      }
+    });
+  </script>
+</body>
+</html>

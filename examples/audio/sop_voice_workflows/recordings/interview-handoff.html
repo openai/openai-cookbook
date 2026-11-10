@@ -1,0 +1,26 @@
+<!doctype html>
+<html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Getting the next interview question</title><style>
+:root{color-scheme:light dark;font:16px/1.5 system-ui,sans-serif}body{max-width:48rem;margin:0 auto;padding:1rem}
+h1{font-size:1.65rem;margin:.45rem 0}h2{font-size:1.15rem;margin:1.1rem 0 .2rem}
+audio{width:100%;margin:.25rem 0}ol{list-style:none;padding:0}li{display:grid;grid-template-columns:3.6rem minmax(0,1fr);gap:.6rem;border-top:1px solid color-mix(in srgb, currentColor 25%, transparent);padding:.5rem 0}
+button{font:inherit;font-variant-numeric:tabular-nums;color:inherit;cursor:pointer;text-decoration:underline;align-self:start;border:0;background:none;padding:0}summary{cursor:pointer}.role{font-size:.82rem;font-weight:bold}pre{white-space:pre-wrap;overflow-wrap:anywhere;font-size:.84rem}button:focus-visible,summary:focus-visible{outline:2px solid currentColor;outline-offset:2px}
+</style></head><body><main><h1>Getting the next interview question</h1><p>The candidate answers “Tuesday.” The applicant tracking system records the day once and returns the next question.</p>
+<audio controls preload="metadata" aria-label="Getting the next interview question" src="interview-handoff.webm"></audio>
+<h2>Call timeline</h2><p>The test deliberately delays delivery of GPT-Live’s handoff. Decisions flags the transcript and starts the work first. Select a timestamp to hear the call from that point. Expand an event to see what happened.</p>
+<ol>
+<li><button type="button" data-ms="9320" aria-label="Play from 0:09.32">0:09.32</button><div><details><summary>Decisions flags the answer</summary><p>The transcript trigger finds that the candidate’s answer needs backend work.</p></details></div></li>
+<li><button type="button" data-ms="9680" aria-label="Play from 0:09.68">0:09.68</button><div><details><summary>GPT-Live hands off</summary><p>The test deliberately holds delivery of this handoff.</p></details></div></li>
+<li><button type="button" data-ms="10960" aria-label="Play from 0:10.96">0:10.96</button><div><details><summary>The app starts interpretation</summary><p>The controller takes the Decisions recovery path and asks Luna to interpret the answer.</p></details></div></li>
+<li><button type="button" data-ms="12660" aria-label="Play from 0:12.66">0:12.66</button><div><details><summary>The ATS saves Tuesday once</summary><p>After saving the day, the app gets the shift question. The late handoff does not produce a second save.</p></details></div></li>
+</ol><p role="status" id="status"></p></main><script>
+const audio = document.querySelector('audio');
+document.querySelector('ol').addEventListener('click', async (event) => {
+  const button = event.target.closest('button[data-ms]');
+  if (!button) return;
+  audio.currentTime = Number(button.dataset.ms) / 1000;
+  try { await audio.play(); } catch (error) {
+    if (error.name !== 'AbortError') document.querySelector('#status').textContent = 'Use the audio controls to start playback.';
+  }
+});
+</script></body></html>

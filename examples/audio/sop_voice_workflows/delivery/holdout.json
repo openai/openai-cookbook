@@ -1,0 +1,546 @@
+[
+  {
+    "id": "new_status_to_damage",
+    "scenario": {
+      "shipping_status": "delivered"
+    },
+    "turns": [
+      "Could you check the tracking for me?",
+      "Scratch that. My neighbor dropped it off just now, but my lamp is broken.",
+      "It’s the base. It showed up cracked.",
+      "Go ahead with the replacement, please."
+    ],
+    "expect": {
+      "tools": [
+        {
+          "name": "get_order",
+          "turns": [
+            2,
+            3
+          ],
+          "fields": {},
+          "words": {},
+          "status": "ok",
+          "optional": false
+        },
+        {
+          "name": "check_replacement_availability",
+          "turns": [
+            3
+          ],
+          "fields": {
+            "item_id": "LAMP-1"
+          },
+          "words": {
+            "damage_description": [
+              "base",
+              "crack"
+            ]
+          },
+          "status": "ok",
+          "optional": false
+        },
+        {
+          "name": "create_replacement",
+          "turns": [
+            4
+          ],
+          "fields": {
+            "offer_id": "REPL-LAMP-1"
+          },
+          "words": {},
+          "status": "created",
+          "optional": false
+        }
+      ],
+      "guidance": {
+        "2": [
+          "ask_damage"
+        ],
+        "3": [
+          "replacement_offer"
+        ],
+        "4": [
+          "replacement_confirmed"
+        ]
+      },
+      "effects": [
+        {
+          "kind": "replacement",
+          "ref": "REPL-LAMP-1"
+        }
+      ]
+    },
+    "delay_first_read": true
+  },
+  {
+    "id": "new_credit_counteroffer",
+    "scenario": {
+      "late_hours": 49
+    },
+    "turns": [
+      "That delivery was really late. Is there compensation?",
+      "That works if you can do thirty dollars instead. Is that possible?"
+    ],
+    "expect": {
+      "tools": [
+        {
+          "name": "get_order",
+          "turns": [
+            1
+          ],
+          "fields": {},
+          "words": {},
+          "status": "ok",
+          "optional": false
+        },
+        {
+          "name": "check_credit_eligibility",
+          "turns": [
+            1
+          ],
+          "fields": {},
+          "words": {},
+          "status": "ok",
+          "optional": false
+        }
+      ],
+      "guidance": {
+        "1": [
+          "credit_offer_20"
+        ],
+        "2": [
+          "credit_offer_20",
+          "no_credit_claim"
+        ]
+      },
+      "effects": []
+    }
+  },
+  {
+    "id": "new_replacement_address_change",
+    "scenario": {},
+    "turns": [
+      "The base of the desk lamp was cracked when I opened the box. Can you replace it?",
+      "Sure, provided it goes to my office. I’m leaving home for a week."
+    ],
+    "expect": {
+      "tools": [
+        {
+          "name": "get_order",
+          "turns": [
+            1
+          ],
+          "fields": {},
+          "words": {},
+          "status": "ok",
+          "optional": false
+        },
+        {
+          "name": "check_replacement_availability",
+          "turns": [
+            1
+          ],
+          "fields": {
+            "item_id": "LAMP-1"
+          },
+          "words": {
+            "damage_description": [
+              "base",
+              "crack"
+            ]
+          },
+          "status": "ok",
+          "optional": false
+        }
+      ],
+      "guidance": {
+        "1": [
+          "replacement_offer"
+        ],
+        "2": [
+          "address_limit",
+          "no_replacement_claim",
+          "support"
+        ]
+      },
+      "effects": []
+    }
+  },
+  {
+    "id": "new_credit_to_damage",
+    "scenario": {
+      "late_hours": 30,
+      "shipping_status": "delivered"
+    },
+    "turns": [
+      "Can you see whether the delay qualifies for a credit?",
+      "Actually, forget the credit. The lamp shade is torn. Can you exchange the lamp?",
+      "That replacement works for me. Please send it."
+    ],
+    "expect": {
+      "tools": [
+        {
+          "name": "get_order",
+          "turns": [
+            1
+          ],
+          "fields": {},
+          "words": {},
+          "status": "ok",
+          "optional": false
+        },
+        {
+          "name": "check_credit_eligibility",
+          "turns": [
+            1
+          ],
+          "fields": {},
+          "words": {},
+          "status": "ok",
+          "optional": false
+        },
+        {
+          "name": "check_replacement_availability",
+          "turns": [
+            2
+          ],
+          "fields": {
+            "item_id": "LAMP-1"
+          },
+          "words": {
+            "damage_description": [
+              "shade",
+              "tear|torn|rip"
+            ]
+          },
+          "status": "ok",
+          "optional": false
+        },
+        {
+          "name": "create_replacement",
+          "turns": [
+            3
+          ],
+          "fields": {
+            "offer_id": "REPL-LAMP-1"
+          },
+          "words": {},
+          "status": "created",
+          "optional": false
+        }
+      ],
+      "guidance": {
+        "1": [
+          "credit_offer_20"
+        ],
+        "2": [
+          "replacement_offer"
+        ],
+        "3": [
+          "replacement_confirmed"
+        ]
+      },
+      "effects": [
+        {
+          "kind": "replacement",
+          "ref": "REPL-LAMP-1"
+        }
+      ]
+    }
+  },
+  {
+    "id": "new_damage_decline",
+    "scenario": {},
+    "turns": [
+      "I opened the box and the lamp base has a crack. Can I get another lamp?",
+      "Hold on before you send anything. I need to ask my roommate."
+    ],
+    "expect": {
+      "tools": [
+        {
+          "name": "get_order",
+          "turns": [
+            1
+          ],
+          "fields": {},
+          "words": {},
+          "status": "ok",
+          "optional": false
+        },
+        {
+          "name": "check_replacement_availability",
+          "turns": [
+            1
+          ],
+          "fields": {
+            "item_id": "LAMP-1"
+          },
+          "words": {
+            "damage_description": [
+              "base",
+              "crack"
+            ]
+          },
+          "status": "ok",
+          "optional": false
+        }
+      ],
+      "guidance": {
+        "1": [
+          "replacement_offer"
+        ],
+        "2": [
+          "no_replacement_claim"
+        ]
+      },
+      "effects": []
+    }
+  },
+  {
+    "id": "new_credit_order_total",
+    "scenario": {
+      "late_hours": 25,
+      "total": 12.5
+    },
+    "turns": [
+      "My delivery was late. Can you check what credit the order qualifies for?",
+      "Yes, please put that amount back on the card I used."
+    ],
+    "expect": {
+      "tools": [
+        {
+          "name": "get_order",
+          "turns": [
+            1
+          ],
+          "fields": {},
+          "words": {},
+          "status": "ok",
+          "optional": false
+        },
+        {
+          "name": "check_credit_eligibility",
+          "turns": [
+            1
+          ],
+          "fields": {},
+          "words": {},
+          "status": "ok",
+          "optional": false
+        },
+        {
+          "name": "register_credit",
+          "turns": [
+            2
+          ],
+          "fields": {
+            "quote_id": "CREDIT-12.50"
+          },
+          "words": {},
+          "status": "registered",
+          "optional": false
+        }
+      ],
+      "guidance": {
+        "1": [
+          "credit_offer_12_50"
+        ],
+        "2": [
+          "credit_confirmed"
+        ]
+      },
+      "effects": [
+        {
+          "kind": "credit",
+          "ref": "CREDIT-12.50"
+        }
+      ]
+    }
+  },
+  {
+    "id": "new_replacement_unconfirmed",
+    "scenario": {
+      "unknown_tool": "create_replacement"
+    },
+    "turns": [
+      "Could you replace my desk lamp? Its base came cracked.",
+      "Yes, send a replacement to the address on the order.",
+      "Can you just submit it again so we know it went through?"
+    ],
+    "expect": {
+      "tools": [
+        {
+          "name": "get_order",
+          "turns": [
+            1
+          ],
+          "fields": {},
+          "words": {},
+          "status": "ok",
+          "optional": false
+        },
+        {
+          "name": "check_replacement_availability",
+          "turns": [
+            1
+          ],
+          "fields": {
+            "item_id": "LAMP-1"
+          },
+          "words": {
+            "damage_description": [
+              "base",
+              "crack"
+            ]
+          },
+          "status": "ok",
+          "optional": false
+        },
+        {
+          "name": "create_replacement",
+          "turns": [
+            2
+          ],
+          "fields": {
+            "offer_id": "REPL-LAMP-1"
+          },
+          "words": {},
+          "status": "unconfirmed",
+          "optional": false
+        }
+      ],
+      "guidance": {
+        "1": [
+          "replacement_offer"
+        ],
+        "2": [
+          "uncertain",
+          "support",
+          "no_replacement_claim"
+        ],
+        "3": [
+          "uncertain",
+          "support",
+          "no_replacement_claim"
+        ]
+      },
+      "effects": [
+        {
+          "kind": "replacement",
+          "ref": "REPL-LAMP-1"
+        }
+      ]
+    }
+  },
+  {
+    "id": "new_order_lookup_failure",
+    "scenario": {
+      "fail_tool": "get_order"
+    },
+    "turns": [
+      "Can you check where the shipment is? I was hoping it would reach me today."
+    ],
+    "expect": {
+      "tools": [
+        {
+          "name": "get_order",
+          "turns": [
+            1
+          ],
+          "fields": {},
+          "words": {},
+          "status": "failed",
+          "optional": false
+        }
+      ],
+      "guidance": {
+        "1": [
+          "read_failure",
+          "support",
+          "no_tracking_claim"
+        ]
+      },
+      "effects": []
+    }
+  },
+  {
+    "id": "new_tracking_in_transit",
+    "scenario": {
+      "shipping_status": "in_transit",
+      "late_hours": 0
+    },
+    "turns": [
+      "The package isn’t here yet. Can you tell from tracking whether it will arrive Friday?"
+    ],
+    "expect": {
+      "tools": [
+        {
+          "name": "get_order",
+          "turns": [
+            1
+          ],
+          "fields": {},
+          "words": {},
+          "status": "ok",
+          "optional": false
+        }
+      ],
+      "guidance": {
+        "1": [
+          "in_transit",
+          "no_invented_eta"
+        ]
+      },
+      "effects": []
+    }
+  },
+  {
+    "id": "new_damage_out_of_stock",
+    "scenario": {
+      "in_stock": false
+    },
+    "turns": [
+      "My desk lamp arrived with the base cracked. Is there another one you can send?"
+    ],
+    "expect": {
+      "tools": [
+        {
+          "name": "get_order",
+          "turns": [
+            1
+          ],
+          "fields": {},
+          "words": {},
+          "status": "ok",
+          "optional": false
+        },
+        {
+          "name": "check_replacement_availability",
+          "turns": [
+            1
+          ],
+          "fields": {
+            "item_id": "LAMP-1"
+          },
+          "words": {
+            "damage_description": [
+              "base",
+              "crack"
+            ]
+          },
+          "status": "ok",
+          "optional": false
+        }
+      ],
+      "guidance": {
+        "1": [
+          "out_of_stock",
+          "support",
+          "no_replacement_claim"
+        ]
+      },
+      "effects": []
+    }
+  }
+]

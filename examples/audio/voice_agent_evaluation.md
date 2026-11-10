@@ -428,6 +428,25 @@ The following scenario types are useful starting points. Choose those most relev
 
 Give each scenario an ID, required behavior, forbidden behavior, expected evidence, and stable fixture. Expand the suite after the initial cases run reliably and failures can be traced to a root cause.
 
+### Validate graders before scaling runs
+
+Before scaling runs, check whether a reported pass means the outcome you intend. Delegation, tool execution, application effects, and spoken claims are different observations. Use a small set of labeled cases to establish what your graders detect and what still needs independent semantic or human review.
+
+A correct negative result should be among those cases. Suppose a caller's date of birth differs from the application's private record. The correct outcome is to complete the check, leave the caller unverified, and accurately report the mismatch. A completed verification call alone cannot establish that outcome.
+
+Keep the evidence needed to explain each verdict:
+
+- The delegation-created event records a request to delegate work.
+- Tool requests identify the operations and arguments.
+- Returned results and state snapshots show the observed execution and effects.
+- The spoken response needs review against those results to establish whether it is accurate.
+
+Then test wrong arguments, unwanted or duplicate actions, missing tool results, and spoken claims that contradict application state. Check which verdicts change and which dimensions remain unassessed.
+
+The reference implementation's offline checks exercise integration and deterministic grading with scripts and tone audio. They use the harness's existing scoring, with semantic grades left `not_assessed`. The post-tool speech check establishes that speech followed a result; it does not establish the statement's truth. These runs do not measure live model behavior or calibrate a semantic judge.
+
+For a runnable application of this approach, see the [offline verification and transfer example](https://github.com/openai/openai-cookbook/tree/main/examples/audio/duplex_voice_agent_evaluation/assistants/examples/verification).
+
 ### Diagnose failures before changing the system
 
 When a scenario fails, trace the request from the caller’s audio to the assistant’s final response. Determine whether the problem occurred during audio delivery, speech understanding, tool execution, application state changes, or communication of the result. Before treating a result as an assistant failure, check that the test ran correctly and captured enough evidence to judge the outcome.

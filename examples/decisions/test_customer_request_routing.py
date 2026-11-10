@@ -2,6 +2,7 @@
 
 import contextlib
 from email.message import Message
+import http.client
 import io
 import json
 import os
@@ -138,15 +139,24 @@ class RoutingTests(unittest.TestCase):
                     request_prediction("My card is late.")
                 send.assert_called_once()
 
-    def test_response_body_timeout_is_reported_without_retry(self):
-        response = io.BytesIO()
-        with (
-            patch("routing._OPENER.open", return_value=response) as send,
-            patch.object(response, "read", side_effect=TimeoutError),
-        ):
-            with self.assertRaisesRegex(RuntimeError, "no automatic retry"):
-                request_prediction("My card is late.", api_key="test-only-placeholder")
-        send.assert_called_once()
+    def test_response_body_errors_are_reported_without_retry(self):
+        errors = (
+            TimeoutError(),
+            ConnectionResetError(),
+            http.client.IncompleteRead(b'{"answers":', 5),
+        )
+        for error in errors:
+            response = io.BytesIO()
+            with (
+                self.subTest(error=type(error).__name__),
+                patch("routing._OPENER.open", return_value=response) as send,
+                patch.object(response, "read", side_effect=error),
+            ):
+                with self.assertRaisesRegex(
+                    RuntimeError, "Decisions network request failed; no automatic retry"
+                ):
+                    request_prediction("My card is late.", api_key="test-only-placeholder")
+                send.assert_called_once()
 
     def test_cli_custom_message_makes_one_request_and_displays_response(self):
         output = io.StringIO()

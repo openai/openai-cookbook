@@ -90,7 +90,7 @@ def evaluate_folder(
             out = []
             for it in obj:
                 if isinstance(it, (list, tuple)) and len(it) == 2 and isinstance(it[0], str) and isinstance(it[1], (int, float)):
-                    out.append((it[0], int(it[1])))
+                    out.append((it[0], it[1]))
                 else:
                     return None
             return out

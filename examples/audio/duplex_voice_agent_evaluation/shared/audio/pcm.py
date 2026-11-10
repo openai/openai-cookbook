@@ -195,9 +195,12 @@ def read_mono_wav(path: Path, *, sample_rate_hz: int) -> bytes:
                 raise ValueError(f"Recorded WAV must use {sample_rate_hz} Hz PCM: {path}")
             if recording.getcomptype() != "NONE":
                 raise ValueError(f"Recorded WAV must not be compressed: {path}")
-            pcm = recording.readframes(recording.getnframes())
+            frame_count = recording.getnframes()
+            pcm = recording.readframes(frame_count)
     except (OSError, wave.Error, EOFError) as exc:
         raise ValueError(f"Invalid recorded WAV: {path}") from exc
     if not pcm or len(pcm) % 2:
         raise ValueError(f"Recorded WAV must contain nonempty, complete PCM16 samples: {path}")
+    if len(pcm) != frame_count * 2:
+        raise ValueError(f"Recorded WAV frame data is truncated: {path}")
     return pcm

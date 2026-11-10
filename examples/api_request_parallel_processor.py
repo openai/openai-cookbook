@@ -315,14 +315,26 @@ class APIRequest:
             async with session.post(
                 url=request_url, headers=request_header, json=self.request_json
             ) as response:
+                response_status = response.status
                 response = await response.json()
-            if "error" in response:
+            if not 200 <= response_status < 300 or "error" in response:
+                error = (
+                    response
+                    if isinstance(response, dict) and "error" in response
+                    else {
+                        "error": {
+                            "message": f"HTTP {response_status}",
+                            "response": response,
+                        }
+                    }
+                )
                 logging.warning(
-                    f"Request {self.task_id} failed with error {response['error']}"
+                    f"Request {self.task_id} failed with error {error['error']}"
                 )
                 status_tracker.num_api_errors += 1
-                error = response
-                if "rate limit" in response["error"].get("message", "").lower():
+                if response_status == 429 or "rate limit" in error["error"].get(
+                    "message", ""
+                ).lower():
                     status_tracker.time_of_last_rate_limit_error = time.time()
                     status_tracker.num_rate_limit_errors += 1
                     status_tracker.num_api_errors -= (

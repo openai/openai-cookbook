@@ -55,7 +55,7 @@ python -m interview_app --mic --output runs/interview-01
 
 ## Inspect and test the examples
 
-The [recordings](recordings/) pair synthetic caller audio with GPT-Live replies. Open a timeline in a browser from your local clone to hear the exchange and inspect tool arguments, results, and timing. Provider identifiers in the public timelines are shortened. Output from a fresh microphone call contains the conversation you just had and stays in your chosen output directory.
+The [recordings](recordings/) are WebM audio files that pair synthetic callers with GPT-Live replies. Open a timeline from your local clone in a browser: the [broken-lamp replacement](recordings/broken-lamp.html) follows a tracking request that becomes a damage report, the [Monday interview](recordings/interview-multi-answer.html) shows one reply answering two questions, and the [Tuesday interview](recordings/interview-handoff.html) shows Decisions starting backend work when GPT-Live’s handoff is late. Select a timestamp to hear that part of the call and expand an event to see tool arguments and results. Provider identifiers in the public timelines are shortened. The conditional Tuesday [recording notes](recordings/interview-conditional-clarification.json) keep the checksum of the original MP3 used in the test; the published [WebM](recordings/interview-conditional-clarification.webm) is a conversion of that recording. Output from a fresh microphone call contains the conversation you just had and stays in your chosen output directory.
 
 Run the application tests locally with:
 

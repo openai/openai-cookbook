@@ -1,7 +1,7 @@
 {
   "source": "GPT-Live calls with a synthetic caller. Times are measured from the start of the recording.",
   "acceptance": {
-    "audio": "blossom-consent-acceptance.mp3",
+    "audio": "blossom-consent-acceptance.webm",
     "session_id": "live_u7_EePpDp3oM9LLQG72PlH8CZKkGseasrdO",
     "receiver_and_caller_review": {
       "receiver-before-reply": "Silence. Yeah, you can. Let me just check on that real quick. Silence. Yeah, it looks like your order qualifies for a $20 credit to your original payment method because it arrived 48 hours late. Would you like me to register it?",
@@ -102,7 +102,7 @@
     ]
   },
   "counteroffer": {
-    "audio": "blossom-consent-counteroffer.mp3",
+    "audio": "blossom-consent-counteroffer.webm",
     "session_id": "live_u7_EePpDp3oMC7aF0yxLIe2X5SRcvG7mbu1",
     "receiver_and_caller_review": {
       "receiver-before-reply": "Okay, let's check on that. Your order was 48 hours late, so it qualifies for a $20 credit back to your original payment method. Do you want me to register that for you?",

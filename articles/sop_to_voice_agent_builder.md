@@ -10,6 +10,12 @@ We’ll start with a written SOP and the tools an application can call. We’ll 
 
 We’ll follow a Blossom Store customer who calls about tracking and a broken lamp and tries to negotiate a credit against policy. Then we’ll build an availability interviewer that saves a candidate’s answers and gets each next question from the applicant tracking system (ATS). We’ll listen to the calls alongside the tool records and track what happens in the voice frontend, backend and application state.
 
+## What’s included
+
+- **Recordings:** Nine short calls with a synthetic caller and GPT-Live. Each example says what to listen for, such as a replacement offer, a late handoff, or a cancellation.
+- **Diagrams and tool timelines:** The diagrams show how the app, voice model, and backend divide the work. The timelines put handoffs, tool arguments, and results next to the recording so you can jump to the moment they happened.
+- **Runnable examples:** The [companion package](../examples/audio/sop_voice_workflows/README.md) contains the two apps, their prompts and tools, and instructions for replaying a case offline or trying a call with your microphone.
+
 ## Manage workflows during a live call
 
 In a [GPT-Live session](https://developers.openai.com/api/docs/guides/live-conversations), the voice model (`gpt-live-1`) speaks with the caller while your app runs the workflow. Give the model the instructions it needs for the conversation and tell it when to hand work to the backend.
@@ -19,7 +25,7 @@ In a [GPT-Live session](https://developers.openai.com/api/docs/guides/live-conve
 
 ## Prerequisites and setup
 
-Play the recordings inline on the Cookbook site, or use the MP3 links when reading on GitHub. To run the examples, use Python 3.12 and the [companion package](https://github.com/openai/openai-cookbook/blob/b71327cc3713b87229eab2407c07ff8b95c9a00d/examples/audio/sop_voice_workflows/README.md). Run the following commands from the root of your OpenAI Cookbook clone. Use a fresh output directory for each run.
+Play the recordings inline on the Cookbook site, or use the WebM download links when reading on GitHub. To run the examples, use Python 3.12 and the [companion package](https://github.com/openai/openai-cookbook/blob/b71327cc3713b87229eab2407c07ff8b95c9a00d/examples/audio/sop_voice_workflows/README.md). Run the following commands from the root of your OpenAI Cookbook clone. Use a fresh output directory for each run.
 
 ```sh
 cd examples/audio/sop_voice_workflows
@@ -88,8 +94,8 @@ Trace the late tracking handoff and the replacement in the [full-size Blossom St
 
 In this call, the customer starts with “Where’s my order?” and ends with a confirmed replacement for a broken desk lamp.
 
-<audio controls preload="metadata" aria-label="Blossom Store. A customer reports a broken lamp and accepts a replacement." src="../examples/audio/sop_voice_workflows/recordings/blossom-late-handoff.mp3">
-  <a href="../examples/audio/sop_voice_workflows/recordings/blossom-late-handoff.mp3?raw=true">Download the broken-lamp call (MP3)</a>
+<audio controls preload="metadata" aria-label="Blossom Store. A customer reports a broken lamp and accepts a replacement." src="../examples/audio/sop_voice_workflows/recordings/blossom-late-handoff.webm">
+  <a href="../examples/audio/sop_voice_workflows/recordings/blossom-late-handoff.webm?raw=true">Download the broken-lamp call (WebM)</a>
 </audio>
 
 <details id="blossom-tool-calls" style="border: 1px solid #84848455; border-radius: 8px; padding: 0.75rem 1rem">
@@ -148,8 +154,8 @@ Python checks facts the store can verify. The offered quote must still belong to
 
 **The caller asks for $35.** GPT-Live explains that the store can offer $20 and asks whether the caller wants it. The store issues no credit.
 
-<audio controls preload="metadata" aria-label="Blossom Store. The caller asks for $35 after a $20 offer." src="../examples/audio/sop_voice_workflows/recordings/blossom-consent-counteroffer.mp3">
-  <a href="../examples/audio/sop_voice_workflows/recordings/blossom-consent-counteroffer.mp3?raw=true">Download the $35 counteroffer (MP3)</a>
+<audio controls preload="metadata" aria-label="Blossom Store. The caller asks for $35 after a $20 offer." src="../examples/audio/sop_voice_workflows/recordings/blossom-consent-counteroffer.webm">
+  <a href="../examples/audio/sop_voice_workflows/recordings/blossom-consent-counteroffer.webm?raw=true">Download the $35 counteroffer (WebM)</a>
 </audio>
 
 <details><summary><strong>Inspect the counteroffer tool calls</strong></summary>
@@ -162,8 +168,8 @@ We also [tested a mistaken write request](../examples/audio/sop_voice_workflows/
 
 **The caller accepts.** This caller says, “That works for me. Let’s do that.” Listen for the offer before the reply and the confirmation after the store issues the credit.
 
-<audio controls preload="metadata" aria-label="Blossom Store. The caller accepts the $20 credit in their own words." src="../examples/audio/sop_voice_workflows/recordings/blossom-consent-acceptance.mp3">
-  <a href="../examples/audio/sop_voice_workflows/recordings/blossom-consent-acceptance.mp3?raw=true">Download the accepted $20 credit (MP3)</a>
+<audio controls preload="metadata" aria-label="Blossom Store. The caller accepts the $20 credit in their own words." src="../examples/audio/sop_voice_workflows/recordings/blossom-consent-acceptance.webm">
+  <a href="../examples/audio/sop_voice_workflows/recordings/blossom-consent-acceptance.webm?raw=true">Download the accepted $20 credit (WebM)</a>
 </audio>
 
 <details><summary><strong>Inspect the accepted credit and its consent check</strong></summary>
@@ -185,8 +191,10 @@ The store retrieved the order at 0:05.84 and checked eligibility at 0:06.88. Aft
 
 <details><summary><strong>Hear what happens when the caller interrupts the offer</strong></summary>
 
-<audio controls preload="none" aria-label="Blossom Store. The caller interrupts the credit offer and asks GPT-Live to repeat it." src="../examples/audio/sop_voice_workflows/recordings/blossom-interruption.mp3">
-  <a href="../examples/audio/sop_voice_workflows/recordings/blossom-interruption.mp3?raw=true">Download the interrupted offer (MP3)</a>
+Listen for GPT-Live to repeat the credit terms and ask permission again before the store issues the credit.
+
+<audio controls preload="none" aria-label="Blossom Store. The caller interrupts the credit offer and asks GPT-Live to repeat it." src="../examples/audio/sop_voice_workflows/recordings/blossom-interruption.webm">
+  <a href="../examples/audio/sop_voice_workflows/recordings/blossom-interruption.webm?raw=true">Download the interrupted offer (WebM)</a>
 </audio>
 
 In this earlier recording, the caller spoke over GPT-Live at 0:10.82 before it had asked permission. GPT-Live repeated the $20 amount, named the original payment method, and asked again. The caller’s new “Yes” began at 0:20.92. The store registered the credit once at 0:23.74.
@@ -249,8 +257,8 @@ GPT-Live asks which day the candidate can start. “Yeah, I could work any shift
 
 At **0:13.26**, the app saves Monday and asks the ATS what comes next. The ATS returns the shift question and lists `either` as an allowed answer. Since the candidate already said any shift works, the app saves `either` and asks the ATS again. Only the confirmation goes back to GPT-Live. Listen for the interviewer to read back both choices and ask the candidate to confirm them.
 
-<audio controls preload="metadata" aria-label="Availability interview. The candidate can work any shift on Monday." src="../examples/audio/sop_voice_workflows/recordings/interview-multi-answer.mp3">
-  <a href="../examples/audio/sop_voice_workflows/recordings/interview-multi-answer.mp3?raw=true">Download the Monday interview (MP3)</a>
+<audio controls preload="metadata" aria-label="Availability interview. The candidate can work any shift on Monday." src="../examples/audio/sop_voice_workflows/recordings/interview-multi-answer.webm">
+  <a href="../examples/audio/sop_voice_workflows/recordings/interview-multi-answer.webm?raw=true">Download the Monday interview (WebM)</a>
 </audio>
 
 <details>
@@ -273,8 +281,8 @@ Open the [full Monday timeline](../examples/audio/sop_voice_workflows/recordings
 
 **When an answer has a condition.** The candidate says, “Tuesday, if the shift ends before five.” GPT-Live hands the answer to the app. The app keeps Tuesday and the candidate’s condition together. The ATS has no shift hours to check, so GPT-Live explains that and asks whether to leave Tuesday unconfirmed. Listen for the follow-up. The ATS still had no confirmed start day when the call ended.
 
-<audio controls preload="metadata" aria-label="Interview call with tentative Tuesday availability and a five o'clock finish condition" src="../examples/audio/sop_voice_workflows/recordings/interview-conditional-clarification.mp3">
-  <a href="../examples/audio/sop_voice_workflows/recordings/interview-conditional-clarification.mp3?raw=true">Download the conditional Tuesday answer (MP3)</a>
+<audio controls preload="metadata" aria-label="Interview call with tentative Tuesday availability and a five o'clock finish condition" src="../examples/audio/sop_voice_workflows/recordings/interview-conditional-clarification.webm">
+  <a href="../examples/audio/sop_voice_workflows/recordings/interview-conditional-clarification.webm?raw=true">Download the conditional Tuesday answer (WebM)</a>
 </audio>
 
 <details>
@@ -292,8 +300,8 @@ Once the ATS has a day and shift, it returns both as a summary. GPT-Live reads t
 
 In the [recorded Tuesday call](../examples/audio/sop_voice_workflows/recordings/interview-handoff.html), Decisions flagged the answer at **0:09.32**. GPT-Live delegated at **0:09.68**, but the test deliberately held that handoff. At **0:10.96**, the controller logged `decisions_recovery` and asked Luna to interpret the answer. At **0:12.66**, the ATS saved Tuesday once and returned the shift question. The late handoff reached the same answer and produced no second save.
 
-<audio controls preload="metadata" aria-label="Tuesday answer with a deliberately delayed handoff" src="../examples/audio/sop_voice_workflows/recordings/interview-handoff.mp3">
-  <a href="../examples/audio/sop_voice_workflows/recordings/interview-handoff.mp3?raw=true">Download the late Tuesday handoff (MP3)</a>
+<audio controls preload="metadata" aria-label="Tuesday answer with a deliberately delayed handoff" src="../examples/audio/sop_voice_workflows/recordings/interview-handoff.webm">
+  <a href="../examples/audio/sop_voice_workflows/recordings/interview-handoff.webm?raw=true">Download the late Tuesday handoff (WebM)</a>
 </audio>
 
 Read the `reason` on the controller’s `app.route` event to see what started interpretation. The app records one reason for each transcript update it processes.
@@ -330,8 +338,8 @@ self.start(self.process(t, scope, labels))
 
 <details><summary><strong>Hear the two cancellation requests and inspect the result</strong></summary>
 
-<audio controls preload="none" aria-label="A candidate considers cancelling, then clearly asks to stop." src="../examples/audio/sop_voice_workflows/recordings/interview-cancel.mp3">
-  <a href="../examples/audio/sop_voice_workflows/recordings/interview-cancel.mp3?raw=true">Download the cancellation call (MP3)</a>
+<audio controls preload="none" aria-label="A candidate considers cancelling, then clearly asks to stop." src="../examples/audio/sop_voice_workflows/recordings/interview-cancel.webm">
+  <a href="../examples/audio/sop_voice_workflows/recordings/interview-cancel.webm?raw=true">Download the cancellation call (WebM)</a>
 </audio>
 
 Decisions marked “Maybe cancel” as `incomplete`. The app left the record open. After the second reply, Decisions returned `unconditional` and the backend requested cancellation. The ATS ran `cancel_interview({})` once.
@@ -340,8 +348,8 @@ Decisions marked “Maybe cancel” as `incomplete`. The app left the record ope
 
 **A failed lookup.** The ATS saved Tuesday, but it could not supply the next question. The app paused the session with the record still open. On the receiver recording, GPT-Live says, “I saved Tuesday. I couldn’t retrieve the next question, so we’ll pause here.” This workflow has no recruiting follow-up queue.
 
-<audio controls preload="metadata" aria-label="Availability interview. Tuesday is saved and the interviewer pauses when the next question is unavailable." src="../examples/audio/sop_voice_workflows/recordings/interview-lookup-pause.mp3">
-  <a href="../examples/audio/sop_voice_workflows/recordings/interview-lookup-pause.mp3?raw=true">Download the failed lookup (MP3)</a>
+<audio controls preload="metadata" aria-label="Availability interview. Tuesday is saved and the interviewer pauses when the next question is unavailable." src="../examples/audio/sop_voice_workflows/recordings/interview-lookup-pause.webm">
+  <a href="../examples/audio/sop_voice_workflows/recordings/interview-lookup-pause.webm?raw=true">Download the failed lookup (WebM)</a>
 </audio>
 
 <details id="failed-lookup-tool-calls" style="border: 1px solid #84848455; border-radius: 8px; padding: 0.75rem 1rem">

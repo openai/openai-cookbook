@@ -6,10 +6,6 @@ GPT-Live makes it possible to build voice agents that respond with low latency, 
 
 In a chained voice architecture, your application coordinates transcription, a model response, and speech playback, giving you control over when each utterance begins and what it contains. GPT-Live supports a continuous conversation in which listening, speaking, and backend work can overlap. A caller can correct an answer while a lookup is running or interrupt an explanation before hearing a required qualification. That flexibility makes the conversation more natural, but following the procedure requires more than putting the SOP in a prompt.
 
-We’ll start with a written SOP and the tools an application can call. We’ll decide what to ask GPT-Live to say and what the app must verify before it saves an answer, issues a credit, or creates a replacement.
-
-We’ll follow a Blossom Store customer who calls about tracking and a broken lamp and tries to negotiate a credit against policy. Then we’ll build an availability interviewer that saves a candidate’s answers and gets each next question from the applicant tracking system (ATS). We’ll listen to the calls alongside the tool records and track what happens in the voice frontend, backend and application state.
-
 ## What’s included
 
 - **Recordings:** Nine short calls with a synthetic caller and GPT-Live. Each example says what to listen for, such as a replacement offer, a late handoff, or a cancellation.
@@ -17,6 +13,10 @@ We’ll follow a Blossom Store customer who calls about tracking and a broken la
 - **Runnable examples:** The [companion package](../examples/audio/sop_voice_workflows/README.md) contains the two apps, their prompts and tools, and instructions for replaying a case offline or trying a call with your microphone.
 
 ## Manage workflows during a live call
+
+We’ll use two example workflows: an e-commerce customer service that must follow a return SOP and a scheduling assistant that needs to go question-by-question to determine user availability.
+
+First, we’ll follow a Blossom Store customer who calls about order tracking and tries to negotiate a store credit against policy. Then we’ll walk through an availability interviewer that saves a candidate’s answers and gets subsequent questions from the applicant tracking system (ATS). We’ll listen to the calls alongside the tool logs and track what happens in the voice frontend, backend and application state.
 
 In a [GPT-Live session](https://developers.openai.com/api/docs/guides/live-conversations), the voice model (`gpt-live-1`) speaks with the caller while your app runs the workflow. Give the model the instructions it needs for the conversation and tell it when to hand work to the backend.
 

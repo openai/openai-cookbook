@@ -4,6 +4,7 @@ from __future__ import annotations
 
 import hashlib
 import hmac
+import json
 import os
 import time
 from typing import TYPE_CHECKING, Any
@@ -43,6 +44,12 @@ class SlackChannel:
 def approval_blocks(incident: Incident) -> list[dict[str, Any]]:
     if incident.action is None:
         raise ValueError("No rollback has been proposed.")
+    # Bind the buttons to this proposal so an older message cannot decide a
+    # rollback that a replacement session proposed later.
+    approval = json.dumps(
+        {"incident_id": incident.id, "call_id": incident.action["call_id"]},
+        separators=(",", ":"),
+    )
     return [
         {
             "type": "section",
@@ -64,13 +71,13 @@ def approval_blocks(incident: Incident) -> list[dict[str, Any]]:
                     "text": {"type": "plain_text", "text": "Approve proposal"},
                     "style": "primary",
                     "action_id": "approve_rollback",
-                    "value": incident.id,
+                    "value": approval,
                 },
                 {
                     "type": "button",
                     "text": {"type": "plain_text", "text": "Reject"},
                     "action_id": "reject_rollback",
-                    "value": incident.id,
+                    "value": approval,
                 },
             ],
         },

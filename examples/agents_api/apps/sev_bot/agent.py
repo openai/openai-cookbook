@@ -218,6 +218,7 @@ class IncidentBot:
             except Exception as error:
                 incident.status = "failed"
                 incident.record(f"Investigation failed: {error}")
+                await self.expire_rollback_request(incident)
                 await self.close_runtime(incident)
                 raise
 
@@ -409,7 +410,27 @@ If a rollout caused the incident, propose a rollback to the previous healthy ver
                 )
                 incident.slack_approval_ts = str(approval["ts"])
 
-    async def decide_rollback(self, incident_id: str, approved: bool) -> dict[str, Any]:
+    async def expire_rollback_request(self, incident: Incident) -> None:
+        """Expire a rollback request whose session is being closed.
+
+        A retried investigation runs in a replacement session, where the old
+        call and turn IDs do not exist. Clearing the old request lets the new
+        session propose a rollback, and keeps a stale Slack button from
+        deciding a different proposal.
+        """
+        async with incident.approval_lock:
+            action = incident.action
+            if action is None:
+                return
+            incident.action = None
+            incident.slack_approval_ts = None
+            incident.record(
+                f"Expired the {action['status']} rollback request from the closed session."
+            )
+
+    async def decide_rollback(
+        self, incident_id: str, approved: bool, call_id: str | None = None
+    ) -> dict[str, Any]:
         incident = self.incident(incident_id)
         async with incident.approval_lock:
             if incident.status in {"resolved", "resolving", "failed"}:
@@ -417,6 +438,10 @@ If a rollout caused the incident, propose a rollback to the previous healthy ver
             action = incident.action
             if action is None or incident.session_id is None:
                 raise ValueError("No rollback is awaiting approval.")
+            if call_id is not None and action.get("call_id") != call_id:
+                raise ValueError(
+                    "This approval belongs to an earlier rollback request."
+                )
             decision = "approved" if approved else "rejected"
             if action["status"] == decision:
                 return action
@@ -456,10 +481,12 @@ If a rollout caused the incident, propose a rollback to the previous healthy ver
             incident.record(f"Rollback {decision}; returned the decision to the agent.")
             return action
 
-    async def submit_slack_decision(self, incident_id: str, approved: bool) -> None:
+    async def submit_slack_decision(
+        self, incident_id: str, approved: bool, call_id: str | None = None
+    ) -> None:
         incident = self.incident(incident_id)
         try:
-            decision = await self.decide_rollback(incident_id, approved)
+            decision = await self.decide_rollback(incident_id, approved, call_id)
         except Exception:
             logger.exception(
                 "Could not submit the rollback decision for %s", incident_id

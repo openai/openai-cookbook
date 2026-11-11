@@ -5,6 +5,7 @@ from __future__ import annotations
 import asyncio
 import os
 import sys
+import uuid
 from pathlib import Path
 from typing import Any
 
@@ -15,9 +16,21 @@ from openai import AsyncOpenAI, NotFoundError
 INSTRUCTIONS = """\
 Investigate GitHub issues by inspecting the repository and reproducing problems when practical.
 Identify the likely cause and recommend the smallest fix.
-Write your findings to /workspace/investigation.md.
+Write your findings to {report_path}.
 Do not edit source files or contact external services.
 """
+
+
+def new_report_path(workspace: Path) -> Path:
+    """Return a unique report path that will not collide with repository files."""
+    while True:
+        report = workspace / f"investigation-{uuid.uuid4().hex}.md"
+        if not report.exists():
+            return report
+
+
+def workspace_report_path(report: Path) -> str:
+    return f"/workspace/{report.name}"
 
 
 def start_executor(workspace: Path, environment_id: str, remote_url: str) -> Container:
@@ -40,11 +53,13 @@ def start_executor(workspace: Path, environment_id: str, remote_url: str) -> Con
 
 async def investigate_issue(issue: dict[str, Any], workspace: Path) -> dict[str, Any]:
     container: Container | None = None
+    report = new_report_path(workspace)
+    report_path = workspace_report_path(report)
     async with AsyncOpenAI() as client:
         session = await client.beta.agents.sessions.create(
             agent={
                 "model": os.environ.get("OPENAI_MODEL", "gpt-5.6-sol"),
-                "instructions": INSTRUCTIONS,
+                "instructions": INSTRUCTIONS.format(report_path=report_path),
                 "reasoning": {"effort": "high"},
             },
             environment={"type": "self_hosted", "workspace_directory": "/workspace"},
@@ -63,7 +78,7 @@ Investigate GitHub issue #{issue.get("number", "?")}: {issue["title"]}
 {issue.get("body", "")}
 
 Inspect /workspace, run relevant tests, identify the root cause, and write
-/workspace/investigation.md with your findings and a proposed fix.
+{report_path} with your findings and a proposed fix.
 """
             parts: list[str] = []
             async with client.beta.agents.sessions.stream(
@@ -88,10 +103,9 @@ Inspect /workspace, run relevant tests, identify the root cause, and write
                     if event.type == "agent.session.turn.cancelled":
                         raise RuntimeError("Issue investigation was cancelled.")
 
-            report = workspace / "investigation.md"
             if not report.exists():
                 raise RuntimeError(
-                    "The agent did not create /workspace/investigation.md."
+                    f"The agent did not create {report_path}."
                 )
             return {
                 "issue_number": issue.get("number"),

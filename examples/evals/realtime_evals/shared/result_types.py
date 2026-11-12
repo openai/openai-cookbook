@@ -2,6 +2,7 @@
 
 import json
 from dataclasses import dataclass, field
+from decimal import Decimal, InvalidOperation
 from pathlib import Path
 from typing import Any, Mapping
 
@@ -21,6 +22,16 @@ def _coerce_optional_float(value: Any) -> float | None:
 def _coerce_optional_int(value: Any) -> int | None:
     if value in (None, ""):
         return None
+    if isinstance(value, str):
+        # CSV columns with missing counts are promoted to floats by pandas,
+        # which writes integral counts as e.g. "42.0". Avoid a lossy float cast.
+        try:
+            number = Decimal(value)
+        except InvalidOperation as exc:
+            raise ValueError(f"Expected an integer count, got {value!r}") from exc
+        if not number.is_finite() or number != number.to_integral_value():
+            raise ValueError(f"Expected an integer count, got {value!r}")
+        return int(number)
     return int(value)
 
 

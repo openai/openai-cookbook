@@ -11,11 +11,13 @@ from typing import Any
 import docker
 from docker.models.containers import Container
 from openai import AsyncOpenAI, NotFoundError
+REPORT_NAME = "investigation.md"
+REPORT_PATH = f"/workspace/{REPORT_NAME}"
 
 INSTRUCTIONS = """\
 Investigate GitHub issues by inspecting the repository and reproducing problems when practical.
 Identify the likely cause and recommend the smallest fix.
-Write your findings to /workspace/investigation.md.
+Write your findings to {REPORT_PATH}.
 Do not edit source files or contact external services.
 """
 
@@ -39,6 +41,11 @@ def start_executor(workspace: Path, environment_id: str, remote_url: str) -> Con
 
 
 async def investigate_issue(issue: dict[str, Any], workspace: Path) -> dict[str, Any]:
+    report = workspace / REPORT_NAME
+    if report.exists():
+        raise RuntimeError(
+            f"Refusing to use pre-existing /workspace/{REPORT_NAME}."
+        )
     container: Container | None = None
     async with AsyncOpenAI() as client:
         session = await client.beta.agents.sessions.create(
@@ -63,7 +70,7 @@ Investigate GitHub issue #{issue.get("number", "?")}: {issue["title"]}
 {issue.get("body", "")}
 
 Inspect /workspace, run relevant tests, identify the root cause, and write
-/workspace/investigation.md with your findings and a proposed fix.
+{REPORT_PATH} with your findings and a proposed fix.
 """
             parts: list[str] = []
             async with client.beta.agents.sessions.stream(
@@ -87,8 +94,6 @@ Inspect /workspace, run relevant tests, identify the root cause, and write
                         )
                     if event.type == "agent.session.turn.cancelled":
                         raise RuntimeError("Issue investigation was cancelled.")
-
-            report = workspace / "investigation.md"
             if not report.exists():
                 raise RuntimeError(
                     "The agent did not create /workspace/investigation.md."

@@ -469,7 +469,8 @@ if __name__ == "__main__":
     args = parser.parse_args()
 
     if args.save_filepath is None:
-        args.save_filepath = args.requests_filepath.replace(".jsonl", "_results.jsonl")
+        requests_path_without_extension, _ = os.path.splitext(args.requests_filepath)
+        args.save_filepath = f"{requests_path_without_extension}_results.jsonl"
 
     # run script
     asyncio.run(

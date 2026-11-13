@@ -1,11 +1,13 @@
 version = 1
-revision = 3
+revision = 5
 requires-python = ">=3.11"
 resolution-markers = [
     "python_full_version >= '3.14' and sys_platform == 'win32'",
     "python_full_version >= '3.14' and sys_platform != 'win32'",
-    "python_full_version < '3.14' and sys_platform == 'win32'",
-    "python_full_version < '3.14' and sys_platform != 'win32'",
+    "python_full_version >= '3.11.5' and python_full_version < '3.14' and sys_platform == 'win32'",
+    "python_full_version < '3.11.5' and sys_platform == 'win32'",
+    "python_full_version >= '3.11.5' and python_full_version < '3.14' and sys_platform != 'win32'",
+    "python_full_version < '3.11.5' and sys_platform != 'win32'",
 ]
 
 [[package]]
@@ -192,8 +194,27 @@ wheels = [
 
 [[package]]
 name = "beautifulsoup4"
+version = "4.6.3"
+source = { registry = "https://pypi.org/simple" }
+resolution-markers = [
+    "python_full_version < '3.11.5' and sys_platform == 'win32'",
+    "python_full_version < '3.11.5' and sys_platform != 'win32'",
+]
+sdist = { url = "https://files.pythonhosted.org/packages/88/df/86bffad6309f74f3ff85ea69344a078fc30003270c8df6894fca7a3c72ff/beautifulsoup4-4.6.3.tar.gz", hash = "sha256:90f8e61121d6ae58362ce3bed8cd997efb00c914eae0ff3d363c32f9a9822d10", size = 167469, upload-time = "2018-08-12T16:39:49.655Z" }
+wheels = [
+    { url = "https://files.pythonhosted.org/packages/21/0a/47fdf541c97fd9b6a610cb5fd518175308a7cc60569962e776ac52420387/beautifulsoup4-4.6.3-py3-none-any.whl", hash = "sha256:194ec62a25438adcb3fdb06378b26559eda1ea8a747367d34c33cef9c7f48d57", size = 90375, upload-time = "2018-08-12T16:39:48.02Z" },
+]
+
+[[package]]
+name = "beautifulsoup4"
 version = "4.15.0"
 source = { registry = "https://pypi.org/simple" }
+resolution-markers = [
+    "python_full_version >= '3.14' and sys_platform == 'win32'",
+    "python_full_version >= '3.14' and sys_platform != 'win32'",
+    "python_full_version >= '3.11.5' and python_full_version < '3.14' and sys_platform == 'win32'",
+    "python_full_version >= '3.11.5' and python_full_version < '3.14' and sys_platform != 'win32'",
+]
 dependencies = [
     { name = "soupsieve" },
     { name = "typing-extensions" },
@@ -1593,7 +1614,8 @@ name = "nbconvert"
 version = "7.17.1"
 source = { registry = "https://pypi.org/simple" }
 dependencies = [
-    { name = "beautifulsoup4" },
+    { name = "beautifulsoup4", version = "4.6.3", source = { registry = "https://pypi.org/simple" }, marker = "python_full_version < '3.11.5'" },
+    { name = "beautifulsoup4", version = "4.15.0", source = { registry = "https://pypi.org/simple" }, marker = "python_full_version >= '3.11.5'" },
     { name = "bleach", extra = ["css"] },
     { name = "defusedxml" },
     { name = "jinja2" },
@@ -2514,11 +2536,11 @@ wheels = [
 
 [[package]]
 name = "soupsieve"
-version = "2.9.2"
+version = "4.0"
 source = { registry = "https://pypi.org/simple" }
-sdist = { url = "https://files.pythonhosted.org/packages/69/99/a6ca3beb3ccacb41fb3321d8a60e5566f9e6467601ef8eba6a17e1b89778/soupsieve-2.9.2.tar.gz", hash = "sha256:4a55d8cf158a9c2e587fa4922f1bbb91d68ac829e2d6f25403a85747c71daf74", size = 122445, upload-time = "2026-08-07T00:57:24.801Z" }
+sdist = { url = "https://files.pythonhosted.org/packages/7d/5e/19b7c5d20bc2f226c44f33a9d9aab9740efed7555b96e656231fd564e514/soupsieve-4.0.tar.gz", hash = "sha256:ccd6470b256394ac44b08b86fd94b30a17d335a5335c8a3d15565f7b03d3c8cf", size = 151929, upload-time = "2026-11-03T14:28:55.388Z" }
 wheels = [
-    { url = "https://files.pythonhosted.org/packages/eb/dc/ad025c1ee131eba60c69f4dd5779b18fcf1e6b21a343e2162a84d5d133c7/soupsieve-2.9.2-py3-none-any.whl", hash = "sha256:8089a26fd974ca7a1f30276d3d8492ab266ab15af581642dfe8aa162e0c1c823", size = 37370, upload-time = "2026-08-07T00:57:23.524Z" },
+    { url = "https://files.pythonhosted.org/packages/4f/18/d24df2f733ee0655c58717d51add4118a70e64692d0e47d403b9aac4cf98/soupsieve-4.0-py3-none-any.whl", hash = "sha256:5e7494bfce90e06676cfb4c5c2cf22243e98e5cf24646bb1ecdda46d318550a0", size = 50158, upload-time = "2026-11-03T14:28:53.988Z" },
 ]
 
 [[package]]

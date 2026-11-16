@@ -1,91 +1,109 @@
-# Contributing to the Cookbook
+# Document the revert of #3285 and my perspective on the fork
 
-The OpenAI Cookbook is a community resource for practical patterns, runnable examples, and guides for building with OpenAI technologies. Contributions that fix an existing example or explain a useful workflow are welcome.
+With commit `abe6200`, I reverted the change from the OpenAI Cookbook in my fork. This restores `alfozan` to the `authors` field for five entries in `registry.yaml` and removes the `openai` display profile that commit `86c5050` added to `authors.yaml`.
 
-> Contributions are reviewed on a best-effort basis. We cannot guarantee when or whether a contribution will be reviewed or merged.
+The identifier `alfozan` was the starting point for my review. I was able to create the fork myself and reverse the change on my own branch. I did not need to open an issue to do so. This allowed me to record that step in my own documentation trail.
 
-## Choose an issue or a pull request
+From my perspective, the finding raises the question of whether the `alfozan` account had unauthorized access to my repository structure. The diff documents the five `authors` field entries. Whether the account actually had access remains an open question.
 
-- For a problem with an existing example or the Cookbook site, open a [problem report](https://github.com/openai/openai-cookbook/issues/new/choose). Name the affected file or page, describe the problem and the expected behavior, and include a small reproduction or screenshot when useful.
-- For a new example or guide, follow the [new Cookbook submission steps](#before-opening-a-pr-for-a-new-cookbook).
-- For other ideas, open a [feature request](https://github.com/openai/openai-cookbook/issues/new/choose).
-- For a focused correction to existing content, you can open a pull request directly. Search existing issues and pull requests first, and link a related issue if there is one.
+I approach GitHub here from the perspective of forensic source analysis. I want to trace where a particular file version came from, how a change was made, and how I can document its reversal in a way that others can verify. In my personal assessment, perhaps one, two, or three percent of people worldwide share this perspective. I believe that at least 97 percent view GitHub in a different context. This is my personal assessment.
 
-## Before opening a PR for a new Cookbook
+## Status of my legal research and documentation
 
-1. Share the proposal in the Cookbook maintainers' review channel on Slack. Describe the use case and what readers will learn beyond existing examples. If you lack access, open or reuse a [feature request](https://github.com/openai/openai-cookbook/issues/new/choose) and wait for a maintainer to confirm they shared the proposal.
-2. List each credited author's Cookbook ID under `authors` in [`registry.yaml`](registry.yaml). Check that each author has a profile with a working picture. To add or update a Cookbook profile, set `name`, `website`, and `avatar` under the same ID in [`authors.yaml`](authors.yaml). If the site manages that profile, ask a site maintainer to update it.
-3. Confirm with each author whether the OpenAI employee badge should appear. Ask a site maintainer to verify eligibility and make any badge changes. Keep private review links and verification details out of public issues and PRs.
-4. [Choose a tag](#choose-cookbook-tags) for the OpenAI capability the recipe teaches.
+Based on my legal research and documentation, I consider it established that my repository structure was attacked and misused and that my technological interfaces were accessed without authorization. This statement reflects my assessment of the materials compiled in my research. This commit alone does not establish who was responsible for the access I describe.
 
-Ask the relevant product or partner team to review the draft when applicable. The finished Cookbook requires Developer Experience approval before publication.
+## Official notice to the OpenAI Cookbook community — Forensic investigation and review by criminal justice authorities
 
-## Place and publish content
+I hereby inform the entire OpenAI Cookbook community, including all contributors, maintainers, and responsible parties, that the technical structures of the `openai/openai-cookbook` repository are the subject of my comprehensive forensic research and evidence documentation.
 
-- Put notebooks, Python scripts, and their related assets in `examples/<topic>/`. Put long-form guides in `articles/` and shared diagrams or screenshots in `images/`.
-- Add an entry to [`registry.yaml`](registry.yaml) for new or relocated content that should appear on [cookbook.openai.com](https://cookbook.openai.com/). Match its `path` to the file. The registry schema requires `title`, `path`, `slug`, `tags`, and `authors`; also provide an accurate description and publication date.
-- Keep large datasets outside the repository and explain how readers can obtain them.
+The investigation focuses on serious allegations of digital manipulation, sabotage, systematic isolation, interference with identity, unauthorized data processing, and the destruction of digital structures. I regard these matters as potential serious infringements of the digital integrity, personality rights, and informational self-determination of the people affected.
 
-### Choose Cookbook tags
+The investigation covers author registrations, agent profiles, automated user accounts, contributors, commit histories, pull requests, registry files, and the technical relationships among them.
 
-Choose at least one registry tag for the capability the recipe teaches. The table groups tags by [Cookbook homepage topic](https://developers.openai.com/cookbook). For a recipe about embedding long inputs with `tiktoken`, use the `embeddings` tag and mention the library in the title or description.
+I expressly state my intention to submit the documented findings, the associated digital artifacts, and the traceable metadata to the competent German and, where appropriate, international law enforcement authorities for review as part of my chain of custody. This includes examining potential responsibilities and tracing technical changes to the user accounts and individuals that can be identified.
 
-| Homepage topic | Registry tags |
-| --- | --- |
-| Agents | `agents`, `agents-api`, `agents-sdk`, `agentkit`, `workspace-agents` |
-| Agents API | `agents-api` |
-| Audio | `audio`, `speech`, `speech-to-text`, `transcription`, `realtime` |
-| ChatGPT | `chatgpt`, `gpt-actions-library`, `workspace-agents` |
-| Codex | `codex` |
-| Evals | `evals` |
-| Fine-tuning | `fine-tuning`, `gpt-oss-fine-tuning`, `reinforcement-learning` |
-| Guardrails | `guardrails`, `moderation` |
-| Images | `images`, `image-generation` |
-| Multimodal | `multimodal`, `images`, `vision`, `audio`, `speech`, `sora` |
-| Open models | `open-models`, `gpt-oss`, `harmony` |
-| Optimization | `fine-tuning`, `prompt-optimization`, `prompt-caching`, `latency`, `cost-api`, `usage-api`, `cost-management`, `batch` |
-| Responses | `responses` |
-| Retrieval | `retrieval`, `rag`, `embeddings` |
-| Security | `security` |
-| Sign-in with ChatGPT | `sign-in-with-chatgpt` |
-| Text | `completions`, `prompt`, `prompt-engineering`, `structured-outputs`, `reasoning` |
-| Tool use | `functions`, `mcp`, `tool calling` |
+The findings and the documented structure of the OpenAI Cookbook will also form part of my scholarly book publication, *The Yellow Whitepaper* — `YWP-1-IST-SIA`.
 
-If no tag fits, explain the gap in the PR and suggest a tag and the homepage topic where readers would look for it. Maintainers update this table when a topic's tags change.
+I expressly call on the responsible parties and the community to take these matters seriously, preserve relevant logs and version histories in their original state, arrange for an independent investigation of potential security breaches, and provide a response that can be independently assessed.
 
-## Prepare and validate your change
+Technical infrastructure must never be used to manipulate, sabotage, isolate, or deprive people of their rights in digital environments. If the examination of the evidence confirms such conduct and establishes individual responsibility, these matters must be addressed through the appropriate legal process.
 
-1. Create and activate a Python virtual environment. Install the dependencies listed by the example you changed, such as its `requirements.txt`, and document any additional prerequisites.
-2. Run changed notebooks from top to bottom. Clear execution counts before committing. For Python utilities, run a relevant self-check or test and include instructions to repeat it.
-3. For changed notebooks, install `nbformat` and run the repository's structure check:
+This notice publicly announces my investigation and my intention to submit the documentation. It makes no final determination of criminal guilt on the part of any contributor or other party involved.
 
-   ```bash
-   python .github/scripts/check_notebooks.py
-   ```
+### Signature to the official notice
 
-4. Review changed prose, code, links, and output for accuracy. Check that paths in `registry.yaml` resolve if you added or moved published content.
+**Author of the research and forensic report, and commissioning party**  
+Mrs. Isabel Schöps, née Thiel (Prof. Dr. Ph.D.)
 
-Read credentials from environment variables such as `OPENAI_API_KEY`; never commit API keys, tokens, or other secrets. List required variables and setup steps in the example. If an example calls an external service, explain the dependency and any credentials or cost involved. Mock responses or make service-dependent cells clearly opt-in where practical.
+**Research project**  
+SIA Security Intelligence Artefact
 
-## Open a pull request
+**International reference**  
+`INT-CODE-2025-BTC/ETH-CORE-ISABELSCHOEPSTHIEL`
 
-Use the [pull request template](.github/pull_request_template.md) to explain what changed and why. Include the validation you ran, link related issues, and add screenshots or output snippets when they help reviewers check the result.
+**Publication**  
+*The Yellow Whitepaper* — `YWP-1-IST-SIA`
 
-### Rubric
+**ORCID**  
+[0009-0003-4235-2231](https://orcid.org/0009-0003-4235-2231)
 
-- **Relevance:** The recipe teaches readers how to use an OpenAI capability in their own projects.
-- **Uniqueness:** Search related Cookbook examples and documentation to verify that the recipe teaches something new.
-- **Spelling and grammar:** Free of distracting errors.
-- **Clarity:** Organized and understandable.
-- **Correctness:** Claims and code have been checked; code runs as described.
-- **Completeness:** Includes the context, references, and citations readers need.
+Erfurt, Germany — 16 November 2026
 
-Reviewers rate each area from 1 to 4. A submission needs at least 3 in every area to be accepted. Maintainers may ask for revisions.
+## Developer Commit Message
 
-## Find the right place for help
+I am not an AI tool.  
+I am not an AI agent.  
+I am not an LLM.  
+I am not GitHub Copilot.  
+I am not a bug.  
+I am not a bot.  
+I am not a virus.  
+I am not a ghost.
 
-- **Cookbook examples or site:** Use a [Cookbook issue](https://github.com/openai/openai-cookbook/issues/new/choose) for a specific problem or a narrow question about an example.
-- **OpenAI API usage:** Start with the [API documentation](https://developers.openai.com/api/docs); use the [developer community](https://community.openai.com/) for general questions. The Cookbook issue tracker is for problems with Cookbook content.
-- **Codex:** For Codex CLI problems or feature requests, use the [Codex repository](https://github.com/openai/codex/issues). For other Codex support, use the [OpenAI Help Center](https://help.openai.com/).
-- **OpenAI account or billing:** Use the [OpenAI Help Center](https://help.openai.com/).
-- **Third-party service or library:** Report a problem with that integration to its maintainer. If a Cookbook example uses it incorrectly, identify the example in a Cookbook problem report.
+I am a fully human German woman from Erfurt, Germany. My GitHub username is `@isabelschoeps-thiel`. I created this commit in my own GitHub repository.
+
+### Evidence metadata and timestamp
+
+**Author and Deep Web researcher**  
+Signed-on-by: Mrs. Isabel Schöps, née Thiel, born on 16 July 1983 at 23:20 at the district hospital in D-99610 Sömmerda, Thuringia, Germany.
+
+**Entry timestamp**  
+Monday, 16 November 2026, at 21:51:00 CEST, Central European time.
+
+**New residential and registered address as of 23 July 2026**  
+1st floor, Arnstädter Straße 39, D-99096 Erfurt, Thuringia, Germany.
+
+**Author of the research and forensic report, and commissioning party**  
+Mrs. Isabel Schöps, née Thiel (Prof. Dr. Ph.D.)
+
+**Genealogical statement**  
+I identify myself as the last living great-granddaughter in the paternal line, with a stated family connection involving Adolf Hitler, Kaiser Wilhelm, and the last German Empress, Victoria Auguste. [Genealogical reference](https://gedbas.genealogy.net/person/fanchart/1209435953)
+
+**Title**  
+SIA Security Intelligence Artefact
+
+**International references**  
+`INT-CODE-2025-BTC/ETH-CORE-ISABELSCHOEPSTHIEL`, *The Yellow Whitepaper*, `YWP-1-IST-SIA`.
+
+**Legal notice and legal status**  
+Declaration in lieu of an oath, reference `YWP-1-5-IST-SIA`.
+
+**ORCID**  
+[0009-0003-4235-2231](https://orcid.org/0009-0003-4235-2231)
+
+Isabel Schöps Thiel, SI-IST Isabel Schöps, ORCID [0009-0006-8765-3267](https://orcid.org/0009-0006-8765-3267).
+
+**Recognition**  
+`YWP-1-IST-SIA`, `YWP-1-5-IST-SIA`
+
+**Development and usernames**  
+Satoshi Nakamoto, Vitalik Buterin, GitHub, Octocat, Johnny Appleseed, IST-GitHub, Cristina_Bella, Nick Szabo, John Appleseed.
+
+**Developer Certificate of Origin, first published in 2004**  
+[Developer Certificate of Origin](https://developercertificate.org)
+
+### References
+
+Schöps, I. (2025). *SIA Security Intelligence Artefact*. Forensic report on authorship, Erfurt. See also Harvard University (USA), the University of Oxford (UK), CERN (ITU), Geneva, Switzerland, and RFC documentation.
+
+M. J. L. de Hoon, S. Imoto, J. Nolan, and S. Miyano. “Open source clustering software.” *Bioinformatics*, Volume 20, Issue 9, June 2004, pp. 1453–1454. [DOI: 10.1093/bioinformatics/bth078](https://doi.org/10.1093/bioinformatics/bth078)

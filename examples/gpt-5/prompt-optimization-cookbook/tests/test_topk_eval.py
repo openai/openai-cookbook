@@ -84,6 +84,52 @@ class TopKEvaluationTests(unittest.TestCase):
         self.assertEqual(summary["exact_matches"], 0)
         self.assertEqual(row["Exact Match"], "False")
 
+    def test_nonfinite_namespace_counts_are_rejected(self):
+        for value in ("nan", "inf", "-inf"):
+            with self.subTest(value=value):
+                summary, row = self.evaluate_submission(
+                    COUNT_TOKENS
+                    + f"top_k = [(token, float({value!r})) for token, count in pairs]\n"
+                )
+                self.assertEqual(row["Precision@K"], "0.000")
+                self.assertEqual(row["Sorted Correctly"], "False")
+                self.assertEqual(row["Exact Match"], "False")
+                self.assertEqual(row["Reported Top-K (first 5)"], "")
+                self.assertEqual(summary["sorted_correctly"], 0)
+                self.assertEqual(summary["exact_matches"], 0)
+
+    def test_nonfinite_stdout_counts_are_rejected(self):
+        for literal in ("1e309", "-1e309"):
+            with self.subTest(literal=literal):
+                summary, row = self.evaluate_submission(
+                    COUNT_TOKENS
+                    + 'print("[" + ", ".join('
+                    + f'f"({{token!r}}, {literal})" for token, count in pairs) + "]")\n'
+                )
+                self.assertEqual(row["Precision@K"], "0.000")
+                self.assertEqual(row["Sorted Correctly"], "False")
+                self.assertEqual(row["Exact Match"], "False")
+                self.assertEqual(row["Reported Top-K (first 5)"], "")
+                self.assertEqual(summary["sorted_correctly"], 0)
+                self.assertEqual(summary["exact_matches"], 0)
+
+    def test_one_nonfinite_count_rejects_the_result(self):
+        summary, row = self.evaluate_submission(
+            COUNT_TOKENS
+            + "top_k = pairs.copy()\ntop_k[-1] = (top_k[-1][0], float('inf'))\n"
+        )
+        self.assertEqual(row["Precision@K"], "0.000")
+        self.assertEqual(row["Reported Top-K (first 5)"], "")
+        self.assertEqual(summary["exact_matches"], 0)
+
+    def test_large_integer_counts_remain_reported(self):
+        summary, row = self.evaluate_submission(
+            COUNT_TOKENS + "top_k = [(token, 10**400) for token, count in pairs]\n"
+        )
+        self.assertIn(str(10**400), row["Reported Top-K (first 5)"])
+        self.assertEqual(row["Precision@K"], "1.000")
+        self.assertEqual(summary["exact_matches"], 0)
+
 
 if __name__ == "__main__":
     unittest.main()

@@ -4,6 +4,7 @@ import re
 import csv
 import json
 import ast
+import math
 import time
 import tracemalloc
 import runpy
@@ -90,6 +91,8 @@ def evaluate_folder(
             out = []
             for it in obj:
                 if isinstance(it, (list, tuple)) and len(it) == 2 and isinstance(it[0], str) and isinstance(it[1], (int, float)):
+                    if isinstance(it[1], float) and not math.isfinite(it[1]):
+                        return None
                     out.append((it[0], it[1]))
                 else:
                     return None

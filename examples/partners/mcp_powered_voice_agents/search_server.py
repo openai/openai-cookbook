@@ -1,3 +1,6 @@
+# /// script
+# dependencies = ["mcp<2", "openai", "openai-agents"]
+# ///
 import os
 from mcp.server.fastmcp import FastMCP
 from openai import OpenAI

@@ -884,6 +884,24 @@ assistants/
     memory.py                     conversation context and transcript history
 ```
 
+### Local application example
+
+When adding an application, first define the outcome a passing scenario should
+represent. A verification check can complete successfully while finding that a
+caller's date of birth does not match a private record. For that case, the caller
+should remain unverified and hear an accurate explanation of the mismatch.
+
+The verification example shows how to supply application records, tools and
+scenarios while reusing CRAWL's session handling, existing scoring and native
+results. Inspect the requested arguments, returned results, final state and
+spoken response separately. Its launcher always runs offline with scripts and
+tone audio. Semantic grades remain `not_assessed`; post-tool speech presence does
+not establish that the spoken claim is true. The run verifies integration and
+deterministic checks, not live model quality or calibration of a semantic judge.
+
+See the [offline verification and transfer example](assistants/examples/verification/README.md)
+for the application boundary, setup commands, tests and result inspection.
+
 ### Responses-managed delegation
 
 Edit the shared voice prompt and the files under `assistants/responses/`,

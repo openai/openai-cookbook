@@ -1,0 +1,36 @@
+[
+  {
+    "type": "function",
+    "name": "verify_date_of_birth",
+    "description": "Compare the complete caller-provided date of birth with the private application record. A completed check may return matched=false.",
+    "parameters": {
+      "type": "object",
+      "properties": {
+        "date_of_birth": {
+          "type": "string",
+          "description": "Complete caller-provided date of birth in YYYY-MM-DD format."
+        }
+      },
+      "required": ["date_of_birth"],
+      "additionalProperties": false
+    },
+    "strict": true
+  },
+  {
+    "type": "function",
+    "name": "transfer_to_human",
+    "description": "Simulate a transfer when the caller currently wants a human. Verification is not a prerequisite. Report the returned result accurately.",
+    "parameters": {
+      "type": "object",
+      "properties": {
+        "reason": {
+          "type": "string",
+          "description": "Nonempty reason based on the caller's current request."
+        }
+      },
+      "required": ["reason"],
+      "additionalProperties": false
+    },
+    "strict": true
+  }
+]

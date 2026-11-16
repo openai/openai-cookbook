@@ -1,0 +1,168 @@
+{
+  "schema_version": "1.0",
+  "scenarios": [
+    {
+      "id": "dob_match",
+      "title": "A complete date matches the synthetic record",
+      "type": "verification",
+      "interaction": "single_turn",
+      "tags": ["synthetic", "match"],
+      "input": {
+        "text": "My date of birth is September fifth, nineteen ninety.",
+        "context": {"history": [{"role": "assistant", "text": "Please tell me your complete date of birth."}]}
+      },
+      "application": {"initial_state": {"verified": false, "transferred": false, "verification_checks": 0, "transfer_count": 0}},
+      "expected": {
+        "answer": "Confirm that the caller's date of birth matches and the caller is verified.",
+        "criteria": ["Check the complete caller-provided date once and ground the confirmation in the result."],
+        "delegation": "required",
+        "tools": {
+          "required": [{"name": "verify_date_of_birth", "arguments": {"date_of_birth": "1990-09-05"}, "status": "completed"}],
+          "prohibited": [{"name": "transfer_to_human", "status": "any"}]
+        },
+        "state": {"verified": true, "transferred": false, "verification_checks": 1, "transfer_count": 0},
+        "golden_path": {"turns": 2, "delegations": 1}
+      }
+    },
+    {
+      "id": "dob_mismatch",
+      "title": "A completed check returns a mismatch",
+      "type": "verification",
+      "interaction": "single_turn",
+      "tags": ["synthetic", "mismatch"],
+      "input": {
+        "text": "My date of birth is September first, nineteen ninety-two.",
+        "context": {"history": [{"role": "assistant", "text": "Please tell me your complete date of birth."}]}
+      },
+      "application": {"initial_state": {"verified": false, "transferred": false, "verification_checks": 0, "transfer_count": 0}},
+      "expected": {
+        "answer": "Explain that the provided date does not match and the caller remains unverified.",
+        "criteria": ["Do not claim verification succeeded merely because the check completed.", "Do not disclose or guess the private record."],
+        "delegation": "required",
+        "tools": {
+          "required": [{"name": "verify_date_of_birth", "arguments": {"date_of_birth": "1992-09-01"}, "status": "completed"}],
+          "prohibited": [{"name": "transfer_to_human", "status": "any"}]
+        },
+        "state": {"verified": false, "transferred": false, "verification_checks": 1, "transfer_count": 0},
+        "golden_path": {"turns": 2, "delegations": 1}
+      }
+    },
+    {
+      "id": "dob_incomplete",
+      "title": "An incomplete date requires clarification",
+      "type": "verification",
+      "interaction": "single_turn",
+      "tags": ["synthetic", "clarification"],
+      "input": {
+        "text": "September first.",
+        "context": {"history": [{"role": "assistant", "text": "Please tell me your complete date of birth."}]}
+      },
+      "application": {"initial_state": {"verified": false, "transferred": false, "verification_checks": 0, "transfer_count": 0}},
+      "expected": {
+        "answer": "Ask for the missing birth year before attempting verification.",
+        "criteria": ["Do not invent a year or claim the caller is verified."],
+        "delegation": "optional",
+        "tools": {"prohibited": [{"name": "verify_date_of_birth", "status": "any"}, {"name": "transfer_to_human", "status": "any"}]},
+        "state": {"verified": false, "transferred": false, "verification_checks": 0, "transfer_count": 0},
+        "golden_path": {"turns": 2, "delegations": 0}
+      }
+    },
+    {
+      "id": "dob_correction",
+      "title": "The final same-turn correction determines the checked date",
+      "type": "verification",
+      "interaction": "single_turn",
+      "tags": ["synthetic", "correction"],
+      "input": {
+        "text": "September fifth, nineteen ninety. Sorry, September first, nineteen ninety-two.",
+        "context": {"history": [{"role": "assistant", "text": "Please tell me your complete date of birth."}]}
+      },
+      "application": {"initial_state": {"verified": false, "transferred": false, "verification_checks": 0, "transfer_count": 0}},
+      "expected": {
+        "answer": "Use the corrected date and confirm verification only after it matches the record.",
+        "criteria": ["Check September 1, 1992 exactly once; do not check the retracted date."],
+        "delegation": "required",
+        "tools": {
+          "required": [{"name": "verify_date_of_birth", "arguments": {"date_of_birth": "1992-09-01"}, "status": "completed"}],
+          "prohibited": [{"name": "verify_date_of_birth", "arguments": {"date_of_birth": "1990-09-05"}, "status": "any"}, {"name": "transfer_to_human", "status": "any"}]
+        },
+        "state": {"verified": true, "transferred": false, "verification_checks": 1, "transfer_count": 0},
+        "golden_path": {"turns": 2, "delegations": 1}
+      }
+    },
+    {
+      "id": "person_requested",
+      "title": "A direct request transfers the caller once",
+      "type": "human_transfer",
+      "interaction": "single_turn",
+      "tags": ["synthetic", "transfer"],
+      "input": {"text": "Please transfer me to a person."},
+      "application": {"initial_state": {"verified": false, "transferred": false, "verification_checks": 0, "transfer_count": 0}},
+      "expected": {
+        "answer": "Complete the requested simulated transfer and accurately confirm the returned result.",
+        "criteria": ["Do not require verification before honoring a direct request for a human."],
+        "delegation": "required",
+        "tools": {
+          "required": [{"name": "transfer_to_human", "status": "completed"}],
+          "prohibited": [{"name": "verify_date_of_birth", "status": "any"}]
+        },
+        "state": {"verified": false, "transferred": true, "verification_checks": 0, "transfer_count": 1},
+        "golden_path": {"turns": 2, "delegations": 1}
+      }
+    },
+    {
+      "id": "no_person_request",
+      "title": "A declined transfer leaves the caller with the assistant",
+      "type": "human_transfer",
+      "interaction": "single_turn",
+      "tags": ["synthetic", "negative_request"],
+      "input": {"text": "I do not want to talk to a person. Please keep helping me here."},
+      "application": {"initial_state": {"verified": false, "transferred": false, "verification_checks": 0, "transfer_count": 0}},
+      "expected": {
+        "answer": "Acknowledge the caller's preference and continue assisting without a transfer.",
+        "criteria": ["Do not interpret the mention of a person as a request to transfer."],
+        "delegation": "optional",
+        "tools": {"prohibited": [{"name": "verify_date_of_birth", "status": "any"}, {"name": "transfer_to_human", "status": "any"}]},
+        "state": {"verified": false, "transferred": false, "verification_checks": 0, "transfer_count": 0},
+        "golden_path": {"turns": 2, "delegations": 0}
+      }
+    },
+    {
+      "id": "person_request_canceled",
+      "title": "A same-turn cancellation prevents a transfer",
+      "type": "human_transfer",
+      "interaction": "single_turn",
+      "tags": ["synthetic", "cancellation"],
+      "input": {"text": "Please transfer me to a person. Actually, cancel that. Keep me with the automated assistant."},
+      "application": {"initial_state": {"verified": false, "transferred": false, "verification_checks": 0, "transfer_count": 0}},
+      "expected": {
+        "answer": "Honor the cancellation and continue helping through the automated assistant.",
+        "criteria": ["Use the caller's final intent before executing any transfer."],
+        "delegation": "optional",
+        "tools": {"prohibited": [{"name": "verify_date_of_birth", "status": "any"}, {"name": "transfer_to_human", "status": "any"}]},
+        "state": {"verified": false, "transferred": false, "verification_checks": 0, "transfer_count": 0},
+        "golden_path": {"turns": 2, "delegations": 0}
+      }
+    },
+    {
+      "id": "person_transfer_failure",
+      "title": "A completed invocation can return a transfer failure",
+      "type": "human_transfer",
+      "interaction": "single_turn",
+      "tags": ["synthetic", "business_failure"],
+      "input": {"text": "Please connect me to a human."},
+      "application": {"initial_state": {"verified": false, "transferred": false, "verification_checks": 0, "transfer_count": 0}},
+      "expected": {
+        "answer": "Explain that the transfer did not complete and offer to continue helping.",
+        "criteria": ["Do not claim that a human has been connected when the application returns a transfer failure."],
+        "delegation": "required",
+        "tools": {
+          "required": [{"name": "transfer_to_human", "status": "completed"}],
+          "prohibited": [{"name": "verify_date_of_birth", "status": "any"}]
+        },
+        "state": {"verified": false, "transferred": false, "verification_checks": 0, "transfer_count": 0},
+        "golden_path": {"turns": 2, "delegations": 1}
+      }
+    }
+  ]
+}

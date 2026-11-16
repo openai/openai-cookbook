@@ -1,0 +1,12 @@
+{
+  "regions": ["iad1"],
+  "functions": {
+    "api/webhook.ts": { "maxDuration": 30 },
+    "api/provision.ts": {
+      "maxDuration": 180,
+      "experimentalTriggers": [
+        { "type": "queue/v2beta", "topic": "sandbox-wakeup" }
+      ]
+    }
+  }
+}

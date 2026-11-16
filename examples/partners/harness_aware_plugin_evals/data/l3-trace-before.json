@@ -1,0 +1,859 @@
+{
+  "evalId": "eval-ida-2026-09-04T09:52:51",
+  "results": {
+    "version": 3,
+    "timestamp": "2026-09-04T09:52:51.832Z",
+    "prompts": [
+      {
+        "id": "8868fc514e5f7bd1a350480c5a825cd0f5b47b6c0c8da0ca62be71158f638c23",
+        "raw": "{{query}}",
+        "label": "{{query}}",
+        "provider": "openai:codex-sdk",
+        "metrics": {
+          "score": 3,
+          "testPassCount": 3,
+          "testFailCount": 2,
+          "testErrorCount": 0,
+          "assertPassCount": 3,
+          "assertFailCount": 2,
+          "totalLatencyMs": 48543,
+          "tokenUsage": {
+            "prompt": 207999,
+            "completion": 1886,
+            "cached": 158786,
+            "total": 209885,
+            "numRequests": 5,
+            "completionDetails": {
+              "reasoning": 667,
+              "acceptedPrediction": 0,
+              "rejectedPrediction": 0,
+              "cacheReadInputTokens": 0,
+              "cacheCreationInputTokens": 0
+            },
+            "assertions": {
+              "total": 0,
+              "prompt": 0,
+              "completion": 0,
+              "cached": 0,
+              "numRequests": 0,
+              "completionDetails": {
+                "reasoning": 0,
+                "acceptedPrediction": 0,
+                "rejectedPrediction": 0,
+                "cacheReadInputTokens": 0,
+                "cacheCreationInputTokens": 0
+              }
+            }
+          },
+          "namedScores": {},
+          "namedScoresCount": {},
+          "namedScoreWeights": {},
+          "cost": 0
+        }
+      }
+    ],
+    "results": [
+      {
+        "cost": 0,
+        "gradingResult": {
+          "pass": true,
+          "score": 1,
+          "reason": "All assertions passed",
+          "namedScores": {},
+          "tokensUsed": {
+            "total": 0,
+            "prompt": 0,
+            "completion": 0,
+            "cached": 0,
+            "numRequests": 0
+          },
+          "componentResults": [
+            {
+              "pass": true,
+              "score": 1,
+              "reason": "expected tools called and BLS series fetched",
+              "assertion": {
+                "type": "python",
+                "value": "file://assert_codex_result.py"
+              }
+            }
+          ]
+        },
+        "id": "0ac594c2-3c36-4ea1-bb82-da6cbad94418",
+        "latencyMs": 8656,
+        "namedScores": {},
+        "prompt": {
+          "raw": "[@BLS](plugin://BLS@cookbook-plugins) What is the U.S. unemployment rate?",
+          "label": "{{query}}",
+          "config": {
+            "prefix": "[@BLS](plugin://BLS@cookbook-plugins) "
+          }
+        },
+        "promptId": "8868fc514e5f7bd1a350480c5a825cd0f5b47b6c0c8da0ca62be71158f638c23",
+        "promptIdx": 0,
+        "provider": {
+          "id": "openai:codex-sdk",
+          "label": ""
+        },
+        "response": {
+          "output": "The latest available U.S. unemployment rate is **4.1%**, seasonally adjusted, for **February 2026**.",
+          "tokenUsage": {
+            "prompt": 34239,
+            "completion": 252,
+            "total": 34491,
+            "cached": 25252,
+            "completionDetails": {
+              "reasoning": 60
+            }
+          },
+          "raw": "{\"finalResponse\":\"The latest available U.S. unemployment rate is **4.1%**, seasonally adjusted, for **February 2026**.\",\"items\":[{\"id\":\"item_0\",\"type\":\"agent_message\",\"text\":\"I’m checking the latest official BLS release and will report the headline U.S. unemployment rate with its reference month.\"},{\"id\":\"item_1\",\"type\":\"mcp_tool_call\",\"server\":\"bls-mcp\",\"tool\":\"resolve\",\"arguments\":{\"indicators\":[{\"indicator\":\"U.S. unemployment rate, seasonally adjusted, monthly\"}]},\"result\":{\"content\":[{\"type\":\"text\",\"text\":\"{\\\"results\\\":[{\\\"indicator\\\":\\\"U.S. unemployment rate, seasonally adjusted, monthly\\\",\\\"candidates\\\":[{\\\"series_id\\\":\\\"LNS14000000\\\",\\\"title\\\":\\\"Unemployment Rate - Seasonally Adjusted\\\",\\\"confidence\\\":1.0},{\\\"series_id\\\":\\\"LNU04000000\\\",\\\"title\\\":\\\"Unemployment Rate - Not Seasonally Adjusted\\\",\\\"confidence\\\":0.6}]}]}\"}],\"structured_content\":{\"results\":[{\"indicator\":\"U.S. unemployment rate, seasonally adjusted, monthly\",\"candidates\":[{\"series_id\":\"LNS14000000\",\"title\":\"Unemployment Rate - Seasonally Adjusted\",\"confidence\":1},{\"series_id\":\"LNU04000000\",\"title\":\"Unemployment Rate - Not Seasonally Adjusted\",\"confidence\":0.6}]}]}},\"error\":null,\"status\":\"completed\"},{\"id\":\"item_2\",\"type\":\"mcp_tool_call\",\"server\":\"bls-mcp\",\"tool\":\"fetch_bls_data\",\"arguments\":{\"series_ids\":[\"LNS14000000\"]},\"result\":{\"content\":[{\"type\":\"text\",\"text\":\"{\\\"data\\\":[{\\\"series_id\\\":\\\"LNS14000000\\\",\\\"title\\\":\\\"Unemployment Rate - Seasonally Adjusted\\\",\\\"data\\\":[{\\\"year\\\":\\\"2026\\\",\\\"period\\\":\\\"M01\\\",\\\"value\\\":\\\"4.0\\\"},{\\\"year\\\":\\\"2026\\\",\\\"period\\\":\\\"M02\\\",\\\"value\\\":\\\"4.1\\\"}]}]}\"}],\"structured_content\":{\"data\":[{\"series_id\":\"LNS14000000\",\"title\":\"Unemployment Rate - Seasonally Adjusted\",\"data\":[{\"year\":\"2026\",\"period\":\"M01\",\"value\":\"4.0\"},{\"year\":\"2026\",\"period\":\"M02\",\"value\":\"4.1\"}]}]}},\"error\":null,\"status\":\"completed\"},{\"id\":\"item_3\",\"type\":\"agent_message\",\"text\":\"The latest available U.S. unemployment rate is **4.1%**, seasonally adjusted, for **February 2026**.\"}],\"usage\":{\"input_tokens\":34239,\"cached_input_tokens\":25252,\"output_tokens\":252,\"reasoning_output_tokens\":60},\"reasoningTexts\":[],\"conversationMessages\":[{\"role\":\"user\",\"content\":\"[@BLS](plugin://BLS@cookbook-plugins) What is the U.S. unemployment rate?\"},{\"role\":\"assistant\",\"content\":\"I’m checking the latest official BLS release and will report the headline U.S. unemployment rate with its reference month.\"},{\"role\":\"assistant\",\"content\":\"The latest available U.S. unemployment rate is **4.1%**, seasonally adjusted, for **February 2026**.\"}]}",
+          "sessionId": "01a06bd5-e084-7af0-a567-7e528800b887"
+        },
+        "score": 1,
+        "success": true,
+        "testCase": {
+          "description": "unemployment-rate",
+          "vars": {
+            "indicator": "unemployment rate",
+            "query": "What is the U.S. unemployment rate?",
+            "expected_tools": "resolve,fetch_bls_data",
+            "expected_series_ids": "LNS14000000",
+            "sessionId": "01a06bd5-e084-7af0-a567-7e528800b887"
+          },
+          "metadata": {
+            "mechanism": "ambiguous_default",
+            "expected_type": "exact"
+          },
+          "assert": [
+            {
+              "type": "python",
+              "value": "file://assert_codex_result.py"
+            }
+          ],
+          "options": {
+            "prefix": "[@BLS](plugin://BLS@cookbook-plugins) "
+          }
+        },
+        "testIdx": 0,
+        "tokenUsage": {
+          "prompt": 34239,
+          "completion": 252,
+          "cached": 25252,
+          "total": 34491,
+          "numRequests": 1,
+          "completionDetails": {
+            "reasoning": 60,
+            "acceptedPrediction": 0,
+            "rejectedPrediction": 0,
+            "cacheReadInputTokens": 0,
+            "cacheCreationInputTokens": 0
+          },
+          "assertions": {
+            "total": 0,
+            "prompt": 0,
+            "completion": 0,
+            "cached": 0,
+            "numRequests": 1,
+            "completionDetails": {
+              "reasoning": 0,
+              "acceptedPrediction": 0,
+              "rejectedPrediction": 0,
+              "cacheReadInputTokens": 0,
+              "cacheCreationInputTokens": 0
+            }
+          }
+        },
+        "vars": {
+          "indicator": "unemployment rate",
+          "query": "What is the U.S. unemployment rate?",
+          "expected_tools": "resolve,fetch_bls_data",
+          "expected_series_ids": "LNS14000000",
+          "sessionId": "01a06bd5-e084-7af0-a567-7e528800b887"
+        },
+        "metadata": {
+          "mechanism": "ambiguous_default",
+          "expected_type": "exact",
+          "_promptfooFileMetadata": {},
+          "sessionId": "01a06bd5-e084-7af0-a567-7e528800b887"
+        },
+        "failureReason": 0
+      },
+      {
+        "cost": 0,
+        "gradingResult": {
+          "pass": true,
+          "score": 1,
+          "reason": "All assertions passed",
+          "namedScores": {},
+          "tokensUsed": {
+            "total": 0,
+            "prompt": 0,
+            "completion": 0,
+            "cached": 0,
+            "numRequests": 0
+          },
+          "componentResults": [
+            {
+              "pass": true,
+              "score": 1,
+              "reason": "expected tools called and BLS series fetched",
+              "assertion": {
+                "type": "python",
+                "value": "file://assert_codex_result.py"
+              }
+            }
+          ]
+        },
+        "id": "6937c374-4981-409a-8de8-2adba18ab7d4",
+        "latencyMs": 8893,
+        "namedScores": {},
+        "prompt": {
+          "raw": "[@BLS](plugin://BLS@cookbook-plugins) What is the value of the labor force participation rate?",
+          "label": "{{query}}",
+          "config": {
+            "prefix": "[@BLS](plugin://BLS@cookbook-plugins) "
+          }
+        },
+        "promptId": "8868fc514e5f7bd1a350480c5a825cd0f5b47b6c0c8da0ca62be71158f638c23",
+        "promptIdx": 0,
+        "provider": {
+          "id": "openai:codex-sdk",
+          "label": ""
+        },
+        "response": {
+          "output": "The latest available U.S. labor force participation rate is 62.6% (February 2026, seasonally adjusted).",
+          "tokenUsage": {
+            "prompt": 34032,
+            "completion": 267,
+            "total": 34299,
+            "cached": 25139,
+            "completionDetails": {
+              "reasoning": 85
+            }
+          },
+          "raw": "{\"finalResponse\":\"The latest available U.S. labor force participation rate is 62.6% (February 2026, seasonally adjusted).\",\"items\":[{\"id\":\"item_0\",\"type\":\"agent_message\",\"text\":\"I’m using the BLS plugin to look up the current labor force participation rate from the Bureau of Labor Statistics.\"},{\"id\":\"item_1\",\"type\":\"mcp_tool_call\",\"server\":\"bls-mcp\",\"tool\":\"resolve\",\"arguments\":{\"indicators\":[{\"indicator\":\"labor force participation rate\"}]},\"result\":{\"content\":[{\"type\":\"text\",\"text\":\"{\\\"results\\\":[{\\\"indicator\\\":\\\"labor force participation rate\\\",\\\"candidates\\\":[{\\\"series_id\\\":\\\"LNS11300000\\\",\\\"title\\\":\\\"Labor Force Participation Rate - Seasonally Adjusted\\\",\\\"confidence\\\":1.0}]}]}\"}],\"structured_content\":{\"results\":[{\"indicator\":\"labor force participation rate\",\"candidates\":[{\"series_id\":\"LNS11300000\",\"title\":\"Labor Force Participation Rate - Seasonally Adjusted\",\"confidence\":1}]}]}},\"error\":null,\"status\":\"completed\"},{\"id\":\"item_2\",\"type\":\"mcp_tool_call\",\"server\":\"bls-mcp\",\"tool\":\"fetch_bls_data\",\"arguments\":{\"series_ids\":[\"LNS11300000\"]},\"result\":{\"content\":[{\"type\":\"text\",\"text\":\"{\\\"data\\\":[{\\\"series_id\\\":\\\"LNS11300000\\\",\\\"title\\\":\\\"Labor Force Participation Rate - Seasonally Adjusted\\\",\\\"data\\\":[{\\\"year\\\":\\\"2026\\\",\\\"period\\\":\\\"M01\\\",\\\"value\\\":\\\"62.5\\\"},{\\\"year\\\":\\\"2026\\\",\\\"period\\\":\\\"M02\\\",\\\"value\\\":\\\"62.6\\\"}]}]}\"}],\"structured_content\":{\"data\":[{\"series_id\":\"LNS11300000\",\"title\":\"Labor Force Participation Rate - Seasonally Adjusted\",\"data\":[{\"year\":\"2026\",\"period\":\"M01\",\"value\":\"62.5\"},{\"year\":\"2026\",\"period\":\"M02\",\"value\":\"62.6\"}]}]}},\"error\":null,\"status\":\"completed\"},{\"id\":\"item_3\",\"type\":\"agent_message\",\"text\":\"The latest available U.S. labor force participation rate is 62.6% (February 2026, seasonally adjusted).\"}],\"usage\":{\"input_tokens\":34032,\"cached_input_tokens\":25139,\"output_tokens\":267,\"reasoning_output_tokens\":85},\"reasoningTexts\":[],\"conversationMessages\":[{\"role\":\"user\",\"content\":\"[@BLS](plugin://BLS@cookbook-plugins) What is the value of the labor force participation rate?\"},{\"role\":\"assistant\",\"content\":\"I’m using the BLS plugin to look up the current labor force participation rate from the Bureau of Labor Statistics.\"},{\"role\":\"assistant\",\"content\":\"The latest available U.S. labor force participation rate is 62.6% (February 2026, seasonally adjusted).\"}]}",
+          "sessionId": "01a06bd5-e060-7452-949b-0f483db26a82"
+        },
+        "score": 1,
+        "success": true,
+        "testCase": {
+          "description": "labor-force-participation",
+          "vars": {
+            "indicator": "labor force participation rate",
+            "query": "What is the value of the labor force participation rate?",
+            "expected_tools": "resolve,fetch_bls_data",
+            "expected_series_ids": "LNS11300000",
+            "sessionId": "01a06bd5-e060-7452-949b-0f483db26a82"
+          },
+          "metadata": {
+            "mechanism": "headline",
+            "expected_type": "exact"
+          },
+          "assert": [
+            {
+              "type": "python",
+              "value": "file://assert_codex_result.py"
+            }
+          ],
+          "options": {
+            "prefix": "[@BLS](plugin://BLS@cookbook-plugins) "
+          }
+        },
+        "testIdx": 1,
+        "tokenUsage": {
+          "prompt": 34032,
+          "completion": 267,
+          "cached": 25139,
+          "total": 34299,
+          "numRequests": 1,
+          "completionDetails": {
+            "reasoning": 85,
+            "acceptedPrediction": 0,
+            "rejectedPrediction": 0,
+            "cacheReadInputTokens": 0,
+            "cacheCreationInputTokens": 0
+          },
+          "assertions": {
+            "total": 0,
+            "prompt": 0,
+            "completion": 0,
+            "cached": 0,
+            "numRequests": 1,
+            "completionDetails": {
+              "reasoning": 0,
+              "acceptedPrediction": 0,
+              "rejectedPrediction": 0,
+              "cacheReadInputTokens": 0,
+              "cacheCreationInputTokens": 0
+            }
+          }
+        },
+        "vars": {
+          "indicator": "labor force participation rate",
+          "query": "What is the value of the labor force participation rate?",
+          "expected_tools": "resolve,fetch_bls_data",
+          "expected_series_ids": "LNS11300000",
+          "sessionId": "01a06bd5-e060-7452-949b-0f483db26a82"
+        },
+        "metadata": {
+          "mechanism": "headline",
+          "expected_type": "exact",
+          "_promptfooFileMetadata": {},
+          "sessionId": "01a06bd5-e060-7452-949b-0f483db26a82"
+        },
+        "failureReason": 0
+      },
+      {
+        "cost": 0,
+        "gradingResult": {
+          "pass": true,
+          "score": 1,
+          "reason": "All assertions passed",
+          "namedScores": {},
+          "tokensUsed": {
+            "total": 0,
+            "prompt": 0,
+            "completion": 0,
+            "cached": 0,
+            "numRequests": 0
+          },
+          "componentResults": [
+            {
+              "pass": true,
+              "score": 1,
+              "reason": "expected tools called and BLS series fetched",
+              "assertion": {
+                "type": "python",
+                "value": "file://assert_codex_result.py"
+              }
+            }
+          ]
+        },
+        "id": "69aca0f7-bb5c-4a52-9f92-aa966c056087",
+        "latencyMs": 10463,
+        "namedScores": {},
+        "prompt": {
+          "raw": "[@BLS](plugin://BLS@cookbook-plugins) What is seasonally adjusted monthly U.S. total nonfarm payroll employment?",
+          "label": "{{query}}",
+          "config": {
+            "prefix": "[@BLS](plugin://BLS@cookbook-plugins) "
+          }
+        },
+        "promptId": "8868fc514e5f7bd1a350480c5a825cd0f5b47b6c0c8da0ca62be71158f638c23",
+        "promptIdx": 0,
+        "provider": {
+          "id": "openai:codex-sdk",
+          "label": ""
+        },
+        "response": {
+          "output": "Seasonally adjusted U.S. total nonfarm payroll employment was **159.25 million in February 2026** (BLS series **CES0000000001**), up from **159.10 million in January**.",
+          "tokenUsage": {
+            "prompt": 36430,
+            "completion": 348,
+            "total": 36778,
+            "cached": 26918,
+            "completionDetails": {
+              "reasoning": 130
+            }
+          },
+          "raw": "{\"finalResponse\":\"Seasonally adjusted U.S. total nonfarm payroll employment was **159.25 million in February 2026** (BLS series **CES0000000001**), up from **159.10 million in January**.\",\"items\":[{\"id\":\"item_0\",\"type\":\"agent_message\",\"text\":\"I’m using the BLS plugin to retrieve the official seasonally adjusted total nonfarm payroll series and its latest monthly value.\"},{\"id\":\"item_1\",\"type\":\"mcp_tool_call\",\"server\":\"bls-mcp\",\"tool\":\"resolve\",\"arguments\":{\"indicators\":[{\"indicator\":\"seasonally adjusted monthly U.S. total nonfarm payroll employment\"}]},\"result\":{\"content\":[{\"type\":\"text\",\"text\":\"{\\\"results\\\":[{\\\"indicator\\\":\\\"seasonally adjusted monthly U.S. total nonfarm payroll employment\\\",\\\"candidates\\\":[{\\\"series_id\\\":\\\"CES0000000001\\\",\\\"title\\\":\\\"All Employees, Total Nonfarm - Seasonally Adjusted\\\",\\\"confidence\\\":1.0}]}]}\"}],\"structured_content\":{\"results\":[{\"indicator\":\"seasonally adjusted monthly U.S. total nonfarm payroll employment\",\"candidates\":[{\"series_id\":\"CES0000000001\",\"title\":\"All Employees, Total Nonfarm - Seasonally Adjusted\",\"confidence\":1}]}]}},\"error\":null,\"status\":\"completed\"},{\"id\":\"item_2\",\"type\":\"mcp_tool_call\",\"server\":\"bls-mcp\",\"tool\":\"fetch_bls_data\",\"arguments\":{\"series_ids\":[\"CES0000000001\"]},\"result\":{\"content\":[{\"type\":\"text\",\"text\":\"{\\\"data\\\":[{\\\"series_id\\\":\\\"CES0000000001\\\",\\\"title\\\":\\\"All Employees, Total Nonfarm - Seasonally Adjusted\\\",\\\"data\\\":[{\\\"year\\\":\\\"2026\\\",\\\"period\\\":\\\"M01\\\",\\\"value\\\":\\\"159100\\\"},{\\\"year\\\":\\\"2026\\\",\\\"period\\\":\\\"M02\\\",\\\"value\\\":\\\"159250\\\"}]}]}\"}],\"structured_content\":{\"data\":[{\"series_id\":\"CES0000000001\",\"title\":\"All Employees, Total Nonfarm - Seasonally Adjusted\",\"data\":[{\"year\":\"2026\",\"period\":\"M01\",\"value\":\"159100\"},{\"year\":\"2026\",\"period\":\"M02\",\"value\":\"159250\"}]}]}},\"error\":null,\"status\":\"completed\"},{\"id\":\"item_3\",\"type\":\"agent_message\",\"text\":\"Seasonally adjusted U.S. total nonfarm payroll employment was **159.25 million in February 2026** (BLS series **CES0000000001**), up from **159.10 million in January**.\"}],\"usage\":{\"input_tokens\":36430,\"cached_input_tokens\":26918,\"output_tokens\":348,\"reasoning_output_tokens\":130},\"reasoningTexts\":[],\"conversationMessages\":[{\"role\":\"user\",\"content\":\"[@BLS](plugin://BLS@cookbook-plugins) What is seasonally adjusted monthly U.S. total nonfarm payroll employment?\"},{\"role\":\"assistant\",\"content\":\"I’m using the BLS plugin to retrieve the official seasonally adjusted total nonfarm payroll series and its latest monthly value.\"},{\"role\":\"assistant\",\"content\":\"Seasonally adjusted U.S. total nonfarm payroll employment was **159.25 million in February 2026** (BLS series **CES0000000001**), up from **159.10 million in January**.\"}]}",
+          "sessionId": "01a06bd5-e068-7f90-9da1-c70b9fe533c2"
+        },
+        "score": 1,
+        "success": true,
+        "testCase": {
+          "description": "nonfarm-payroll",
+          "vars": {
+            "indicator": "nonfarm payroll employment",
+            "query": "What is seasonally adjusted monthly U.S. total nonfarm payroll employment?",
+            "expected_tools": "resolve,fetch_bls_data",
+            "expected_series_ids": "CES0000000001",
+            "sessionId": "01a06bd5-e068-7f90-9da1-c70b9fe533c2"
+          },
+          "metadata": {
+            "mechanism": "headline",
+            "expected_type": "exact"
+          },
+          "assert": [
+            {
+              "type": "python",
+              "value": "file://assert_codex_result.py"
+            }
+          ],
+          "options": {
+            "prefix": "[@BLS](plugin://BLS@cookbook-plugins) "
+          }
+        },
+        "testIdx": 2,
+        "tokenUsage": {
+          "prompt": 36430,
+          "completion": 348,
+          "cached": 26918,
+          "total": 36778,
+          "numRequests": 1,
+          "completionDetails": {
+            "reasoning": 130,
+            "acceptedPrediction": 0,
+            "rejectedPrediction": 0,
+            "cacheReadInputTokens": 0,
+            "cacheCreationInputTokens": 0
+          },
+          "assertions": {
+            "total": 0,
+            "prompt": 0,
+            "completion": 0,
+            "cached": 0,
+            "numRequests": 1,
+            "completionDetails": {
+              "reasoning": 0,
+              "acceptedPrediction": 0,
+              "rejectedPrediction": 0,
+              "cacheReadInputTokens": 0,
+              "cacheCreationInputTokens": 0
+            }
+          }
+        },
+        "vars": {
+          "indicator": "nonfarm payroll employment",
+          "query": "What is seasonally adjusted monthly U.S. total nonfarm payroll employment?",
+          "expected_tools": "resolve,fetch_bls_data",
+          "expected_series_ids": "CES0000000001",
+          "sessionId": "01a06bd5-e068-7f90-9da1-c70b9fe533c2"
+        },
+        "metadata": {
+          "mechanism": "headline",
+          "expected_type": "exact",
+          "_promptfooFileMetadata": {},
+          "sessionId": "01a06bd5-e068-7f90-9da1-c70b9fe533c2"
+        },
+        "failureReason": 0
+      },
+      {
+        "cost": 0,
+        "error": "fetched series outside the expectation: ['CUUR0000SA0']",
+        "gradingResult": {
+          "pass": false,
+          "score": 0,
+          "reason": "fetched series outside the expectation: ['CUUR0000SA0']",
+          "namedScores": {},
+          "tokensUsed": {
+            "total": 0,
+            "prompt": 0,
+            "completion": 0,
+            "cached": 0,
+            "numRequests": 0
+          },
+          "componentResults": [
+            {
+              "pass": false,
+              "score": 0,
+              "reason": "fetched series outside the expectation: ['CUUR0000SA0']",
+              "assertion": {
+                "type": "python",
+                "value": "file://assert_codex_result.py"
+              }
+            }
+          ]
+        },
+        "id": "23491c93-576c-492f-9206-5632f33e215f",
+        "latencyMs": 12891,
+        "namedScores": {},
+        "prompt": {
+          "raw": "[@BLS](plugin://BLS@cookbook-plugins) What is the current consumer price index?",
+          "label": "{{query}}",
+          "config": {
+            "prefix": "[@BLS](plugin://BLS@cookbook-plugins) "
+          }
+        },
+        "promptId": "8868fc514e5f7bd1a350480c5a825cd0f5b47b6c0c8da0ca62be71158f638c23",
+        "promptIdx": 0,
+        "provider": {
+          "id": "openai:codex-sdk",
+          "label": ""
+        },
+        "response": {
+          "output": "The BLS plugin’s current catalog does not include CPI series, so I can’t retrieve a current CPI value through it.",
+          "tokenUsage": {
+            "prompt": 66673,
+            "completion": 586,
+            "total": 67259,
+            "cached": 54541,
+            "completionDetails": {
+              "reasoning": 214
+            }
+          },
+          "raw": "{\"finalResponse\":\"The BLS plugin’s current catalog does not include CPI series, so I can’t retrieve a current CPI value through it.\",\"items\":[{\"id\":\"item_0\",\"type\":\"agent_message\",\"text\":\"I’m checking the latest BLS CPI release and will report the headline index, monthly change, and annual inflation rate.\"},{\"id\":\"item_1\",\"type\":\"mcp_tool_call\",\"server\":\"bls-mcp\",\"tool\":\"resolve\",\"arguments\":{\"indicators\":[{\"indicator\":\"U.S. Consumer Price Index for All Urban Consumers, all items, not seasonally adjusted\"}]},\"result\":{\"content\":[{\"type\":\"text\",\"text\":\"{\\\"results\\\":[{\\\"indicator\\\":\\\"U.S. Consumer Price Index for All Urban Consumers, all items, not seasonally adjusted\\\",\\\"candidates\\\":[],\\\"note\\\":\\\"No series in this catalog covers that indicator. This is a definitive answer, not a transient failure.\\\"}]}\"}],\"structured_content\":{\"results\":[{\"indicator\":\"U.S. Consumer Price Index for All Urban Consumers, all items, not seasonally adjusted\",\"candidates\":[],\"note\":\"No series in this catalog covers that indicator. This is a definitive answer, not a transient failure.\"}]}},\"error\":null,\"status\":\"completed\"},{\"id\":\"item_2\",\"type\":\"mcp_tool_call\",\"server\":\"bls-mcp\",\"tool\":\"resolve\",\"arguments\":{\"indicators\":[{\"indicator\":\"CPI-U all items US city average\"}]},\"result\":{\"content\":[{\"type\":\"text\",\"text\":\"{\\\"results\\\":[{\\\"indicator\\\":\\\"CPI-U all items US city average\\\",\\\"candidates\\\":[],\\\"note\\\":\\\"No series in this catalog covers that indicator. This is a definitive answer, not a transient failure.\\\"}]}\"}],\"structured_content\":{\"results\":[{\"indicator\":\"CPI-U all items US city average\",\"candidates\":[],\"note\":\"No series in this catalog covers that indicator. This is a definitive answer, not a transient failure.\"}]}},\"error\":null,\"status\":\"completed\"},{\"id\":\"item_3\",\"type\":\"mcp_tool_call\",\"server\":\"bls-mcp\",\"tool\":\"fetch_bls_data\",\"arguments\":{\"series_ids\":[\"CUUR0000SA0\"]},\"result\":{\"content\":[{\"type\":\"text\",\"text\":\"{\\\"data\\\":[{\\\"series_id\\\":\\\"CUUR0000SA0\\\",\\\"error\\\":\\\"unknown series\\\"}]}\"}],\"structured_content\":{\"data\":[{\"series_id\":\"CUUR0000SA0\",\"error\":\"unknown series\"}]}},\"error\":null,\"status\":\"completed\"},{\"id\":\"item_4\",\"type\":\"mcp_tool_call\",\"server\":\"bls-mcp\",\"tool\":\"resolve\",\"arguments\":{\"indicators\":[{\"indicator\":\"consumer price index\"}]},\"result\":{\"content\":[{\"type\":\"text\",\"text\":\"{\\\"results\\\":[{\\\"indicator\\\":\\\"consumer price index\\\",\\\"candidates\\\":[],\\\"note\\\":\\\"No series in this catalog covers that indicator. This is a definitive answer, not a transient failure.\\\"}]}\"}],\"structured_content\":{\"results\":[{\"indicator\":\"consumer price index\",\"candidates\":[],\"note\":\"No series in this catalog covers that indicator. This is a definitive answer, not a transient failure.\"}]}},\"error\":null,\"status\":\"completed\"},{\"id\":\"item_5\",\"type\":\"mcp_tool_call\",\"server\":\"bls-mcp\",\"tool\":\"resolve\",\"arguments\":{\"indicators\":[{\"indicator\":\"CPI all items\"}]},\"result\":{\"content\":[{\"type\":\"text\",\"text\":\"{\\\"results\\\":[{\\\"indicator\\\":\\\"CPI all items\\\",\\\"candidates\\\":[],\\\"note\\\":\\\"No series in this catalog covers that indicator. This is a definitive answer, not a transient failure.\\\"}]}\"}],\"structured_content\":{\"results\":[{\"indicator\":\"CPI all items\",\"candidates\":[],\"note\":\"No series in this catalog covers that indicator. This is a definitive answer, not a transient failure.\"}]}},\"error\":null,\"status\":\"completed\"},{\"id\":\"item_6\",\"type\":\"mcp_tool_call\",\"server\":\"bls-mcp\",\"tool\":\"resolve\",\"arguments\":{\"indicators\":[{\"indicator\":\"CPI\"}]},\"result\":{\"content\":[{\"type\":\"text\",\"text\":\"{\\\"results\\\":[{\\\"indicator\\\":\\\"CPI\\\",\\\"candidates\\\":[],\\\"note\\\":\\\"No series in this catalog covers that indicator. This is a definitive answer, not a transient failure.\\\"}]}\"}],\"structured_content\":{\"results\":[{\"indicator\":\"CPI\",\"candidates\":[],\"note\":\"No series in this catalog covers that indicator. This is a definitive answer, not a transient failure.\"}]}},\"error\":null,\"status\":\"completed\"},{\"id\":\"item_7\",\"type\":\"mcp_tool_call\",\"server\":\"bls-mcp\",\"tool\":\"resolve\",\"arguments\":{\"indicators\":[{\"indicator\":\"inflation\"}]},\"result\":{\"content\":[{\"type\":\"text\",\"text\":\"{\\\"results\\\":[{\\\"indicator\\\":\\\"inflation\\\",\\\"candidates\\\":[],\\\"note\\\":\\\"No series in this catalog covers that indicator. This is a definitive answer, not a transient failure.\\\"}]}\"}],\"structured_content\":{\"results\":[{\"indicator\":\"inflation\",\"candidates\":[],\"note\":\"No series in this catalog covers that indicator. This is a definitive answer, not a transient failure.\"}]}},\"error\":null,\"status\":\"completed\"},{\"id\":\"item_8\",\"type\":\"agent_message\",\"text\":\"The BLS plugin’s current catalog does not include CPI series, so I can’t retrieve a current CPI value through it.\"}],\"usage\":{\"input_tokens\":66673,\"cached_input_tokens\":54541,\"output_tokens\":586,\"reasoning_output_tokens\":214},\"reasoningTexts\":[],\"conversationMessages\":[{\"role\":\"user\",\"content\":\"[@BLS](plugin://BLS@cookbook-plugins) What is the current consumer price index?\"},{\"role\":\"assistant\",\"content\":\"I’m checking the latest BLS CPI release and will report the headline index, monthly change, and annual inflation rate.\"},{\"role\":\"assistant\",\"content\":\"The BLS plugin’s current catalog does not include CPI series, so I can’t retrieve a current CPI value through it.\"}]}",
+          "sessionId": "01a06bd5-e060-77f3-b16b-4193ad91e8df"
+        },
+        "score": 0,
+        "success": false,
+        "testCase": {
+          "description": "consumer-price-index",
+          "vars": {
+            "indicator": "consumer price index",
+            "query": "What is the current consumer price index?",
+            "expected_tools": "resolve",
+            "expected_series_ids": "",
+            "sessionId": "01a06bd5-e060-77f3-b16b-4193ad91e8df"
+          },
+          "metadata": {
+            "mechanism": "coverage_gap",
+            "expected_type": "gap"
+          },
+          "assert": [
+            {
+              "type": "python",
+              "value": "file://assert_codex_result.py"
+            }
+          ],
+          "options": {
+            "prefix": "[@BLS](plugin://BLS@cookbook-plugins) "
+          }
+        },
+        "testIdx": 3,
+        "tokenUsage": {
+          "prompt": 66673,
+          "completion": 586,
+          "cached": 54541,
+          "total": 67259,
+          "numRequests": 1,
+          "completionDetails": {
+            "reasoning": 214,
+            "acceptedPrediction": 0,
+            "rejectedPrediction": 0,
+            "cacheReadInputTokens": 0,
+            "cacheCreationInputTokens": 0
+          },
+          "assertions": {
+            "total": 0,
+            "prompt": 0,
+            "completion": 0,
+            "cached": 0,
+            "numRequests": 1,
+            "completionDetails": {
+              "reasoning": 0,
+              "acceptedPrediction": 0,
+              "rejectedPrediction": 0,
+              "cacheReadInputTokens": 0,
+              "cacheCreationInputTokens": 0
+            }
+          }
+        },
+        "vars": {
+          "indicator": "consumer price index",
+          "query": "What is the current consumer price index?",
+          "expected_tools": "resolve",
+          "expected_series_ids": "",
+          "sessionId": "01a06bd5-e060-77f3-b16b-4193ad91e8df"
+        },
+        "metadata": {
+          "mechanism": "coverage_gap",
+          "expected_type": "gap",
+          "_promptfooFileMetadata": {},
+          "sessionId": "01a06bd5-e060-77f3-b16b-4193ad91e8df"
+        },
+        "failureReason": 1
+      },
+      {
+        "cost": 0,
+        "error": "fetched series outside the expectation: ['CES0000000001', 'LNS12000000']",
+        "gradingResult": {
+          "pass": false,
+          "score": 0,
+          "reason": "fetched series outside the expectation: ['CES0000000001', 'LNS12000000']",
+          "namedScores": {},
+          "tokensUsed": {
+            "total": 0,
+            "prompt": 0,
+            "completion": 0,
+            "cached": 0,
+            "numRequests": 0
+          },
+          "componentResults": [
+            {
+              "pass": false,
+              "score": 0,
+              "reason": "fetched series outside the expectation: ['CES0000000001', 'LNS12000000']",
+              "assertion": {
+                "type": "python",
+                "value": "file://assert_codex_result.py"
+              }
+            }
+          ]
+        },
+        "id": "850afe34-4a1f-4060-9e0f-2212a49b7c08",
+        "latencyMs": 7640,
+        "namedScores": {},
+        "prompt": {
+          "raw": "[@BLS](plugin://BLS@cookbook-plugins) What is U.S. employment?",
+          "label": "{{query}}",
+          "config": {
+            "prefix": "[@BLS](plugin://BLS@cookbook-plugins) "
+          }
+        },
+        "promptId": "8868fc514e5f7bd1a350480c5a825cd0f5b47b6c0c8da0ca62be71158f638c23",
+        "promptIdx": 0,
+        "provider": {
+          "id": "openai:codex-sdk",
+          "label": ""
+        },
+        "response": {
+          "output": "According to the latest BLS data available for February 2026:\n\n- Civilian employment: 163.2 million people (seasonally adjusted)\n- Nonfarm payroll employment: 159.25 million jobs (seasonally adjusted)\n\nThe first measures employed people from the household survey; the second measures jobs at nonfarm establishments. They differ because one person can hold multiple jobs, while payroll data excludes agriculture, private household workers, and some self-employed workers.",
+          "tokenUsage": {
+            "prompt": 36625,
+            "completion": 433,
+            "total": 37058,
+            "cached": 26936,
+            "completionDetails": {
+              "reasoning": 178
+            }
+          },
+          "raw": "{\"finalResponse\":\"According to the latest BLS data available for February 2026:\\n\\n- Civilian employment: 163.2 million people (seasonally adjusted)\\n- Nonfarm payroll employment: 159.25 million jobs (seasonally adjusted)\\n\\nThe first measures employed people from the household survey; the second measures jobs at nonfarm establishments. They differ because one person can hold multiple jobs, while payroll data excludes agriculture, private household workers, and some self-employed workers.\",\"items\":[{\"id\":\"item_0\",\"type\":\"agent_message\",\"text\":\"I’m using the BLS data service to give you a precise definition rather than a generic labor-market description.\"},{\"id\":\"item_1\",\"type\":\"mcp_tool_call\",\"server\":\"bls-mcp\",\"tool\":\"resolve\",\"arguments\":{\"indicators\":[{\"indicator\":\"U.S. employment\"}]},\"result\":{\"content\":[{\"type\":\"text\",\"text\":\"{\\\"results\\\":[{\\\"indicator\\\":\\\"U.S. employment\\\",\\\"candidates\\\":[{\\\"series_id\\\":\\\"LNS12000000\\\",\\\"title\\\":\\\"Employment Level - Seasonally Adjusted\\\",\\\"confidence\\\":0.5},{\\\"series_id\\\":\\\"CES0000000001\\\",\\\"title\\\":\\\"All Employees, Total Nonfarm - Seasonally Adjusted\\\",\\\"confidence\\\":0.5}]}]}\"}],\"structured_content\":{\"results\":[{\"indicator\":\"U.S. employment\",\"candidates\":[{\"series_id\":\"LNS12000000\",\"title\":\"Employment Level - Seasonally Adjusted\",\"confidence\":0.5},{\"series_id\":\"CES0000000001\",\"title\":\"All Employees, Total Nonfarm - Seasonally Adjusted\",\"confidence\":0.5}]}]}},\"error\":null,\"status\":\"completed\"},{\"id\":\"item_2\",\"type\":\"mcp_tool_call\",\"server\":\"bls-mcp\",\"tool\":\"fetch_bls_data\",\"arguments\":{\"series_ids\":[\"LNS12000000\",\"CES0000000001\"]},\"result\":{\"content\":[{\"type\":\"text\",\"text\":\"{\\\"data\\\":[{\\\"series_id\\\":\\\"LNS12000000\\\",\\\"title\\\":\\\"Employment Level - Seasonally Adjusted\\\",\\\"data\\\":[{\\\"year\\\":\\\"2026\\\",\\\"period\\\":\\\"M01\\\",\\\"value\\\":\\\"163000\\\"},{\\\"year\\\":\\\"2026\\\",\\\"period\\\":\\\"M02\\\",\\\"value\\\":\\\"163200\\\"}]},{\\\"series_id\\\":\\\"CES0000000001\\\",\\\"title\\\":\\\"All Employees, Total Nonfarm - Seasonally Adjusted\\\",\\\"data\\\":[{\\\"year\\\":\\\"2026\\\",\\\"period\\\":\\\"M01\\\",\\\"value\\\":\\\"159100\\\"},{\\\"year\\\":\\\"2026\\\",\\\"period\\\":\\\"M02\\\",\\\"value\\\":\\\"159250\\\"}]}]}\"}],\"structured_content\":{\"data\":[{\"series_id\":\"LNS12000000\",\"title\":\"Employment Level - Seasonally Adjusted\",\"data\":[{\"year\":\"2026\",\"period\":\"M01\",\"value\":\"163000\"},{\"year\":\"2026\",\"period\":\"M02\",\"value\":\"163200\"}]},{\"series_id\":\"CES0000000001\",\"title\":\"All Employees, Total Nonfarm - Seasonally Adjusted\",\"data\":[{\"year\":\"2026\",\"period\":\"M01\",\"value\":\"159100\"},{\"year\":\"2026\",\"period\":\"M02\",\"value\":\"159250\"}]}]}},\"error\":null,\"status\":\"completed\"},{\"id\":\"item_3\",\"type\":\"agent_message\",\"text\":\"According to the latest BLS data available for February 2026:\\n\\n- Civilian employment: 163.2 million people (seasonally adjusted)\\n- Nonfarm payroll employment: 159.25 million jobs (seasonally adjusted)\\n\\nThe first measures employed people from the household survey; the second measures jobs at nonfarm establishments. They differ because one person can hold multiple jobs, while payroll data excludes agriculture, private household workers, and some self-employed workers.\"}],\"usage\":{\"input_tokens\":36625,\"cached_input_tokens\":26936,\"output_tokens\":433,\"reasoning_output_tokens\":178},\"reasoningTexts\":[],\"conversationMessages\":[{\"role\":\"user\",\"content\":\"[@BLS](plugin://BLS@cookbook-plugins) What is U.S. employment?\"},{\"role\":\"assistant\",\"content\":\"I’m using the BLS data service to give you a precise definition rather than a generic labor-market description.\"},{\"role\":\"assistant\",\"content\":\"According to the latest BLS data available for February 2026:\\n\\n- Civilian employment: 163.2 million people (seasonally adjusted)\\n- Nonfarm payroll employment: 159.25 million jobs (seasonally adjusted)\\n\\nThe first measures employed people from the household survey; the second measures jobs at nonfarm establishments. They differ because one person can hold multiple jobs, while payroll data excludes agriculture, private household workers, and some self-employed workers.\"}]}",
+          "sessionId": "01a06bd5-fae4-7a53-b1fd-a31a01dec50e"
+        },
+        "score": 0,
+        "success": false,
+        "testCase": {
+          "description": "employment-ambiguous",
+          "vars": {
+            "indicator": "employment",
+            "query": "What is U.S. employment?",
+            "expected_tools": "resolve",
+            "expected_series_ids": "",
+            "expected_top_ids": "LNS12000000,CES0000000001",
+            "sessionId": "01a06bd5-fae4-7a53-b1fd-a31a01dec50e"
+          },
+          "metadata": {
+            "mechanism": "ambiguous_concept",
+            "expected_type": "clarify"
+          },
+          "assert": [
+            {
+              "type": "python",
+              "value": "file://assert_codex_result.py"
+            }
+          ],
+          "options": {
+            "prefix": "[@BLS](plugin://BLS@cookbook-plugins) "
+          }
+        },
+        "testIdx": 4,
+        "tokenUsage": {
+          "prompt": 36625,
+          "completion": 433,
+          "cached": 26936,
+          "total": 37058,
+          "numRequests": 1,
+          "completionDetails": {
+            "reasoning": 178,
+            "acceptedPrediction": 0,
+            "rejectedPrediction": 0,
+            "cacheReadInputTokens": 0,
+            "cacheCreationInputTokens": 0
+          },
+          "assertions": {
+            "total": 0,
+            "prompt": 0,
+            "completion": 0,
+            "cached": 0,
+            "numRequests": 1,
+            "completionDetails": {
+              "reasoning": 0,
+              "acceptedPrediction": 0,
+              "rejectedPrediction": 0,
+              "cacheReadInputTokens": 0,
+              "cacheCreationInputTokens": 0
+            }
+          }
+        },
+        "vars": {
+          "indicator": "employment",
+          "query": "What is U.S. employment?",
+          "expected_tools": "resolve",
+          "expected_series_ids": "",
+          "expected_top_ids": "LNS12000000,CES0000000001",
+          "sessionId": "01a06bd5-fae4-7a53-b1fd-a31a01dec50e"
+        },
+        "metadata": {
+          "mechanism": "ambiguous_concept",
+          "expected_type": "clarify",
+          "_promptfooFileMetadata": {},
+          "sessionId": "01a06bd5-fae4-7a53-b1fd-a31a01dec50e"
+        },
+        "failureReason": 1
+      }
+    ],
+    "stats": {
+      "successes": 3,
+      "failures": 2,
+      "errors": 0,
+      "tokenUsage": {
+        "prompt": 207999,
+        "completion": 1886,
+        "cached": 158786,
+        "total": 209885,
+        "numRequests": 5,
+        "completionDetails": {
+          "reasoning": 667,
+          "acceptedPrediction": 0,
+          "rejectedPrediction": 0,
+          "cacheReadInputTokens": 0,
+          "cacheCreationInputTokens": 0
+        },
+        "assertions": {
+          "total": 0,
+          "prompt": 0,
+          "completion": 0,
+          "cached": 0,
+          "numRequests": 0,
+          "completionDetails": {
+            "reasoning": 0,
+            "acceptedPrediction": 0,
+            "rejectedPrediction": 0,
+            "cacheReadInputTokens": 0,
+            "cacheCreationInputTokens": 0
+          }
+        }
+      },
+      "durationMs": 16474,
+      "evaluationDurationMs": 16474
+    }
+  },
+  "config": {
+    "tags": {},
+    "description": "BLS MCP evaluation through the production-shaped Codex runtime",
+    "prompts": [
+      "{{query}}"
+    ],
+    "providers": [
+      {
+        "id": "openai:codex-sdk",
+        "config": {
+          "model": "gpt-5.6-luna",
+          "model_provider": "openai",
+          "model_reasoning_effort": "medium",
+          "working_dir": ".",
+          "network_access_enabled": false,
+          "web_search_mode": "disabled",
+          "approval_policy": "never",
+          "skip_git_repo_check": true,
+          "enable_streaming": true,
+          "cli_env": {
+            "CODEX_HOME": "/path/to/harness_aware_plugin_evals/.codex-home"
+          }
+        }
+      }
+    ],
+    "tests": [
+      {
+        "description": "unemployment-rate",
+        "vars": {
+          "indicator": "unemployment rate",
+          "query": "What is the U.S. unemployment rate?",
+          "expected_tools": "resolve,fetch_bls_data",
+          "expected_series_ids": "LNS14000000"
+        },
+        "metadata": {
+          "mechanism": "ambiguous_default",
+          "expected_type": "exact"
+        }
+      },
+      {
+        "description": "labor-force-participation",
+        "vars": {
+          "indicator": "labor force participation rate",
+          "query": "What is the value of the labor force participation rate?",
+          "expected_tools": "resolve,fetch_bls_data",
+          "expected_series_ids": "LNS11300000"
+        },
+        "metadata": {
+          "mechanism": "headline",
+          "expected_type": "exact"
+        }
+      },
+      {
+        "description": "nonfarm-payroll",
+        "vars": {
+          "indicator": "nonfarm payroll employment",
+          "query": "What is seasonally adjusted monthly U.S. total nonfarm payroll employment?",
+          "expected_tools": "resolve,fetch_bls_data",
+          "expected_series_ids": "CES0000000001"
+        },
+        "metadata": {
+          "mechanism": "headline",
+          "expected_type": "exact"
+        }
+      },
+      {
+        "description": "consumer-price-index",
+        "vars": {
+          "indicator": "consumer price index",
+          "query": "What is the current consumer price index?",
+          "expected_tools": "resolve",
+          "expected_series_ids": ""
+        },
+        "metadata": {
+          "mechanism": "coverage_gap",
+          "expected_type": "gap"
+        }
+      },
+      {
+        "description": "employment-ambiguous",
+        "vars": {
+          "indicator": "employment",
+          "query": "What is U.S. employment?",
+          "expected_tools": "resolve",
+          "expected_series_ids": "",
+          "expected_top_ids": "LNS12000000,CES0000000001"
+        },
+        "metadata": {
+          "mechanism": "ambiguous_concept",
+          "expected_type": "clarify"
+        }
+      }
+    ],
+    "env": {},
+    "defaultTest": {
+      "options": {
+        "prefix": "[@BLS](plugin://BLS@cookbook-plugins) "
+      },
+      "assert": [
+        {
+          "type": "python",
+          "value": "file://assert_codex_result.py"
+        }
+      ],
+      "vars": {},
+      "metadata": {}
+    },
+    "outputPath": [
+      "outputs/l3-before.json"
+    ],
+    "extensions": [],
+    "metadata": {},
+    "evaluateOptions": {}
+  },
+  "shareableUrl": null,
+  "metadata": {
+    "promptfooVersion": "0.121.20",
+    "nodeVersion": "v26.6.0",
+    "platform": "darwin",
+    "arch": "arm64",
+    "exportedAt": "2026-09-04T09:53:08.346Z",
+    "evaluationCreatedAt": "2026-09-04T09:52:51.832Z"
+  },
+  "vars": [
+    "indicator",
+    "query",
+    "expected_tools",
+    "expected_series_ids",
+    "expected_top_ids"
+  ],
+  "runtimeOptions": {
+    "eventSource": "cli",
+    "showProgressBar": true,
+    "repeat": 1,
+    "maxConcurrency": 4,
+    "cache": false
+  }
+}

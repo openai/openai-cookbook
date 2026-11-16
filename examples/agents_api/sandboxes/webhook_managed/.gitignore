@@ -1,0 +1,6 @@
+.env*
+!.env.example
+.wrangler/
+.vercel/
+node_modules/
+.controller.json

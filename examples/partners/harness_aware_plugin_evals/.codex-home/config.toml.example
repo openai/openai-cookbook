@@ -1,0 +1,11 @@
+default_permissions = "eval"
+
+[permissions.eval.filesystem]
+":workspace_roots" = "deny"
+
+[marketplaces.cookbook-plugins]
+source_type = "local"
+source = "/absolute/path/to/this/folder/.codex-home/marketplaces/cookbook-plugins"
+
+[plugins."BLS@cookbook-plugins"]
+enabled = true

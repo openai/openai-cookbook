@@ -427,7 +427,7 @@ def apply_commit(commit: Commit, write_fn: Callable, remove_fn: Callable) -> Non
         elif change.type == ActionType.ADD:
             write_fn(path, change.new_content)
         elif change.type == ActionType.UPDATE:
-            if change.move_path:
+            if change.move_path and change.move_path != path:
                 write_fn(change.move_path, change.new_content)
                 remove_fn(path)
             else:

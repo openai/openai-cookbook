@@ -1,0 +1,12 @@
+{
+  "name": "chatgpt-interval-usage-limits",
+  "version": "1.0.0",
+  "private": true,
+  "type": "module",
+  "engines": { "node": ">=24" },
+  "scripts": {
+    "test": "node --test test/*.test.mjs",
+    "demo": "node src/demo.mjs"
+  },
+  "license": "MIT"
+}

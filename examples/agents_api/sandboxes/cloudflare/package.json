@@ -1,0 +1,19 @@
+{
+  "name": "agents-api-cloudflare",
+  "private": true,
+  "type": "module",
+  "scripts": {
+    "check": "tsc --noEmit",
+    "deploy:application": "wrangler deploy --config application_managed/wrangler.jsonc",
+    "deploy:webhook": "wrangler deploy --config webhook_managed/wrangler.jsonc"
+  },
+  "dependencies": {
+    "@cloudflare/sandbox": "0.12.9",
+    "openai": ">=7.15.0 <8"
+  },
+  "devDependencies": {
+    "@cloudflare/workers-types": ">=4.20260702.1",
+    "typescript": ">=5.9 <6",
+    "wrangler": ">=4.90.0 <5"
+  }
+}

@@ -3,6 +3,29 @@ name: Validate Changed Notebooks
 on: [pull_request]
 
 jobs:
+  validate-windows-checkout:
+    name: Validate Windows Checkout
+    runs-on: windows-latest
+    timeout-minutes: 10
+    permissions:
+      contents: read
+
+    steps:
+      - name: Enable Windows path protections
+        run: git config --global core.protectNTFS true
+
+      - name: Checkout code
+        uses: actions/checkout@f43a0e5ff2bd294095638e18286ca9a3d1956744 # v3
+        with:
+          persist-credentials: false
+
+      - name: Verify clean checkout
+        shell: pwsh
+        run: |
+          $status = git status --porcelain
+          if ($LASTEXITCODE -ne 0) { throw "git status failed" }
+          if ($status) { throw "Checkout is not clean: $status" }
+
   validate-notebooks:
     name: Validate Notebooks
     runs-on: ubuntu-latest

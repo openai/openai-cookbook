@@ -1,0 +1,29 @@
+# yaml-language-server: $schema=https://promptfoo.dev/config-schema.json
+description: BLS MCP evaluation through the production-shaped Codex runtime
+
+providers:
+  - id: openai:codex-sdk
+    config:
+      model: "{{ env.EVAL_MODEL }}"
+      model_provider: openai
+      model_reasoning_effort: "{{ env.EVAL_REASONING_EFFORT | default('medium', true) }}"
+      working_dir: .
+      network_access_enabled: false
+      web_search_mode: disabled
+      approval_policy: never
+      skip_git_repo_check: true
+      enable_streaming: true
+      cli_env:
+        CODEX_HOME: "{{ env.CODEX_HOME }}"
+
+prompts:
+  - "{{query}}"
+
+tests: file://level_3_tests.py:generate_tests
+
+defaultTest:
+  options:
+    prefix: "[@BLS](plugin://BLS@cookbook-plugins) "
+  assert:
+    - type: python
+      value: file://assert_codex_result.py

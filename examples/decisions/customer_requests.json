@@ -1,0 +1,72 @@
+{
+  "source": {
+    "dataset": "BANKING77",
+    "publisher": "PolyAI",
+    "authors": [
+      "Iñigo Casanueva",
+      "Tadas Temcinas",
+      "Daniela Gerz",
+      "Matthew Henderson",
+      "Ivan Vulić"
+    ],
+    "paper": "https://arxiv.org/abs/2003.04807",
+    "commit": "57ec275d8078af65b7731c2a98be812d844a6d6b",
+    "csv_sha256": "d12d6e3bc4c3103966ae786dc435913c0c563dfa328f5a3646d0e62cfeeb474d",
+    "url": "https://github.com/PolyAI-LDN/task-specific-datasets/tree/57ec275d8078af65b7731c2a98be812d844a6d6b/banking_data",
+    "license": "CC BY 4.0",
+    "license_url": "https://creativecommons.org/licenses/by/4.0/",
+    "selection": "Ten public test-set messages selected to illustrate four support queues. Message wording and original labels are retained. No endorsement by the dataset authors is implied."
+  },
+  "messages": [
+    {
+      "id": "banking77-fcfa018a99b204b7",
+      "message": "I was charged a fee for a card payment. Why?",
+      "source_label": "card_payment_fee_charged"
+    },
+    {
+      "id": "banking77-d4e4bc04bd680495",
+      "message": "Tell me how to reset the passcode.",
+      "source_label": "passcode_forgotten"
+    },
+    {
+      "id": "banking77-d2d0dd9b8e1b225f",
+      "message": "I need to cancel an incorrect transaction.",
+      "source_label": "cancel_transfer"
+    },
+    {
+      "id": "banking77-eb9d64f904f27c59",
+      "message": "How long should my new card take to arrive?",
+      "source_label": "card_arrival"
+    },
+    {
+      "id": "banking77-fb86202a8d440ed1",
+      "message": "Why did I have to pay extra because I paid with card?",
+      "source_label": "card_payment_fee_charged"
+    },
+    {
+      "id": "banking77-a95c0624033749fc",
+      "message": "I have forgotten my password.",
+      "source_label": "passcode_forgotten"
+    },
+    {
+      "id": "banking77-9bbb532cb93e85b7",
+      "message": "I need to make an immediate cancellation related to a transfer. This was a mistake. Please assist quickly so this does not actually go through.",
+      "source_label": "cancel_transfer"
+    },
+    {
+      "id": "banking77-42571d78b7078520",
+      "message": "i have not received my card",
+      "source_label": "card_arrival"
+    },
+    {
+      "id": "banking77-cf32e355851c4a9b",
+      "message": "I have been charged with a fee for paying with my card.",
+      "source_label": "card_payment_fee_charged"
+    },
+    {
+      "id": "banking77-48c9f4b4ccfb63a2",
+      "message": "Can I be given a new passcode?",
+      "source_label": "passcode_forgotten"
+    }
+  ]
+}

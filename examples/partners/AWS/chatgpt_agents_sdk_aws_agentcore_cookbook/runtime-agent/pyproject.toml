@@ -1,0 +1,47 @@
+[project]
+name = "chatgpt-agents-sdk-aws-agentcore-runtime"
+version = "0.1.0"
+description = "OpenAI Agents SDK sample using Amazon Bedrock with AWS-default tracing"
+license = "MIT"
+requires-python = ">=3.10"
+dependencies = [
+  "aws-opentelemetry-distro==0.18.0",
+  "bedrock-agentcore==1.21.0",
+  "boto3==1.43.70",
+  "botocore[crt]==1.43.70",
+  "openai-agents==0.17.4",
+  "pydantic==2.13.4",
+]
+
+[project.optional-dependencies]
+dev = [
+  "ipykernel==7.3.0",
+  "jupyterlab==4.6.2",
+  "nbconvert==7.17.1",
+  "nbformat==5.10.4",
+  "pip-audit==2.10.1",
+  "pyright==1.1.409",
+  "pytest==9.0.3",
+  "ruff==0.15.14",
+]
+
+[tool.uv]
+package = false
+
+[tool.pytest.ini_options]
+testpaths = ["tests"]
+pythonpath = ["."]
+
+[tool.ruff]
+line-length = 99
+target-version = "py310"
+
+[tool.ruff.lint]
+select = ["B", "E", "F", "I", "UP"]
+
+[tool.pyright]
+include = ["agent.py", "aws_evaluation.py", "demo_date.py", "local_invoke.py", "runtime.py", "schemas.py", "tools.py", "trace_smoke.py", "verify_traces.py", "tests"]
+pythonVersion = "3.10"
+typeCheckingMode = "basic"
+reportMissingImports = false
+reportMissingTypeStubs = false

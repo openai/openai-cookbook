@@ -1,0 +1,38 @@
+{
+  "tables": [
+    {
+      "name": "analytics.signups",
+      "description": "One row per customer signup and acquisition channel.",
+      "owner": "Growth Analytics",
+      "freshness": "Updated hourly."
+    },
+    {
+      "name": "analytics.subscriptions",
+      "description": "Paid subscriptions used for customer conversion analysis.",
+      "owner": "Revenue Analytics",
+      "freshness": "Updated hourly."
+    }
+  ],
+  "metrics": [
+    {
+      "name": "paid_conversion_rate",
+      "definition": "Paid subscriptions divided by eligible signups.",
+      "filters": [
+        "Exclude employees and test accounts.",
+        "Exclude the current incomplete day."
+      ]
+    }
+  ],
+  "query_history": [
+    {
+      "description": "All-time paid conversion by acquisition channel; add a signup date range for weekly comparisons.",
+      "sql": "SELECT s.channel, COUNT(DISTINCT p.customer_id) * 1.0 / COUNT(DISTINCT s.customer_id) AS conversion_rate FROM analytics.signups s LEFT JOIN analytics.subscriptions p ON s.customer_id = p.customer_id WHERE s.is_internal = false AND s.is_test_account = false AND s.created_at < CURRENT_DATE GROUP BY s.channel"
+    }
+  ],
+  "documents": [
+    {
+      "title": "Checkout tracking migration",
+      "text": "Mobile checkout tracking changed on August 18. Exclude the current incomplete day from weekly conversion comparisons."
+    }
+  ]
+}

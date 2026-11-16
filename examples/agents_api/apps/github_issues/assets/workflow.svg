@@ -1,0 +1,37 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="1440" height="867" viewBox="0 0 1440 867" role="img" aria-labelledby="title description">
+<title id="title">GitHub issue investigator workflow</title>
+<desc id="description">User to GitHub: Open an issue. GitHub to Webhook receiver: Signed issues.opened webhook. Webhook receiver to Agents API: Create self-hosted session. Webhook receiver to Sandbox: Clone repository and start executor. Agents API to Sandbox: Inspect code and reproduce bug. Agents API to Webhook receiver: Root cause and suggested fix. Webhook receiver to GitHub: Post investigation comment.</desc>
+<defs><marker id="arrow" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="8" markerHeight="8" orient="auto-start-reverse" markerUnits="userSpaceOnUse"><path d="M 0 0 L 10 5 L 0 10 Z" fill="#253443"/></marker></defs>
+<rect width="1440" height="867" fill="#FFFFFF"/>
+<g font-family="Arial, Helvetica, sans-serif">
+<text x="24" y="46" text-anchor="start" font-size="26" font-weight="600" fill="#162231"><tspan x="24" dy="0">GitHub issue investigator</tspan></text>
+<rect x="24" y="80" width="267.2" height="708.6000000000001" fill="#F4F5F6"/>
+<rect x="24" y="80" width="267.2" height="78" fill="#E4E6E9"/>
+<text x="157.6" y="125.05" text-anchor="middle" font-size="23" font-weight="600" fill="#162231"><tspan x="157.6" dy="0">User</tspan></text>
+<path d="M 157.6 158 V 788.6000000000001" fill="none" stroke="#A8B3BC" stroke-width="1" stroke-dasharray="6 6"/>
+<rect x="305.2" y="80" width="267.2" height="708.6000000000001" fill="#EDF7FE"/>
+<rect x="305.2" y="80" width="267.2" height="78" fill="#CCE6FA"/>
+<text x="438.79999999999995" y="125.05" text-anchor="middle" font-size="23" font-weight="600" fill="#162231"><tspan x="438.79999999999995" dy="0">GitHub</tspan></text>
+<path d="M 438.79999999999995 158 V 788.6000000000001" fill="none" stroke="#A8B3BC" stroke-width="1" stroke-dasharray="6 6"/>
+<rect x="586.4" y="80" width="267.2" height="708.6000000000001" fill="#EDF7FE"/>
+<rect x="586.4" y="80" width="267.2" height="78" fill="#CCE6FA"/>
+<text x="720" y="125.05" text-anchor="middle" font-size="23" font-weight="600" fill="#162231"><tspan x="720" dy="0">Webhook receiver</tspan></text>
+<path d="M 720 158 V 788.6000000000001" fill="none" stroke="#A8B3BC" stroke-width="1" stroke-dasharray="6 6"/>
+<rect x="867.5999999999999" y="80" width="267.2" height="708.6000000000001" fill="#EEFBF3"/>
+<rect x="867.5999999999999" y="80" width="267.2" height="78" fill="#CDF2DB"/>
+<text x="1001.1999999999999" y="125.05" text-anchor="middle" font-size="23" font-weight="600" fill="#162231"><tspan x="1001.1999999999999" dy="0">Agents API</tspan></text>
+<path d="M 1001.1999999999999 158 V 418.40000000000003" fill="none" stroke="#A8B3BC" stroke-width="1" stroke-dasharray="6 6"/>
+<path d="M 1001.1999999999999 451.00000000000006 V 788.6000000000001" fill="none" stroke="#A8B3BC" stroke-width="1" stroke-dasharray="6 6"/>
+<rect x="1148.8" y="80" width="267.2" height="708.6000000000001" fill="#FFFCED"/>
+<rect x="1148.8" y="80" width="267.2" height="78" fill="#FFF0B3"/>
+<text x="1282.3999999999999" y="125.05" text-anchor="middle" font-size="23" font-weight="600" fill="#162231"><tspan x="1282.3999999999999" dy="0">Sandbox</tspan></text>
+<path d="M 1282.3999999999999 158 V 788.6000000000001" fill="none" stroke="#A8B3BC" stroke-width="1" stroke-dasharray="6 6"/>
+<g data-from="0" data-to="1"><path d="M 157.6 222.6 H 438.79999999999995" fill="none" stroke="#253443" stroke-width="1.6"  marker-end="url(#arrow)"/><text x="298.2" y="208" text-anchor="middle" font-size="22" font-weight="400" fill="#162231"><tspan x="298.2" dy="0">Open an issue</tspan></text></g>
+<g data-from="1" data-to="2"><path d="M 438.79999999999995 319.8 H 720" fill="none" stroke="#253443" stroke-width="1.6"  marker-end="url(#arrow)"/><text x="579.4" y="276.6" text-anchor="middle" font-size="22" font-weight="400" fill="#162231"><tspan x="579.4" dy="0">Signed issues.opened</tspan><tspan x="579.4" dy="28.6">webhook</tspan></text></g>
+<g data-from="2" data-to="3"><path d="M 720 388.40000000000003 H 1001.1999999999999" fill="none" stroke="#253443" stroke-width="1.6"  marker-end="url(#arrow)"/><text x="860.5999999999999" y="373.8" text-anchor="middle" font-size="22" font-weight="400" fill="#162231"><tspan x="860.5999999999999" dy="0">Create self-hosted session</tspan></text></g>
+<g data-from="2" data-to="4"><path d="M 720 457.00000000000006 H 1282.3999999999999" fill="none" stroke="#253443" stroke-width="1.6"  marker-end="url(#arrow)"/><text x="1001.1999999999999" y="442.40000000000003" text-anchor="middle" font-size="22" font-weight="400" fill="#162231"><tspan x="1001.1999999999999" dy="0">Clone repository and start executor</tspan></text></g>
+<g data-from="3" data-to="4"><path d="M 1001.1999999999999 554.2 H 1282.3999999999999" fill="none" stroke="#253443" stroke-width="1.6"  marker-end="url(#arrow)"/><text x="1141.8" y="511.00000000000006" text-anchor="middle" font-size="22" font-weight="400" fill="#162231"><tspan x="1141.8" dy="0">Inspect code and</tspan><tspan x="1141.8" dy="28.6">reproduce bug</tspan></text></g>
+<g data-from="3" data-to="2"><path d="M 1001.1999999999999 651.4000000000001 H 720" fill="none" stroke="#253443" stroke-width="1.6" stroke-dasharray="7 5" marker-end="url(#arrow)"/><text x="860.5999999999999" y="608.2" text-anchor="middle" font-size="22" font-weight="400" fill="#162231"><tspan x="860.5999999999999" dy="0">Root cause and</tspan><tspan x="860.5999999999999" dy="28.6">suggested fix</tspan></text></g>
+<g data-from="2" data-to="1"><path d="M 720 748.6000000000001 H 438.79999999999995" fill="none" stroke="#253443" stroke-width="1.6" stroke-dasharray="7 5" marker-end="url(#arrow)"/><text x="579.4" y="705.4000000000001" text-anchor="middle" font-size="22" font-weight="400" fill="#162231"><tspan x="579.4" dy="0">Post investigation</tspan><tspan x="579.4" dy="28.6">comment</tspan></text></g>
+<text x="24" y="833.6000000000001" text-anchor="start" font-size="17" font-weight="400" fill="#4D5B6A"><tspan x="24" dy="0">The application posts the findings; the agent does not merge or deploy changes.</tspan></text>
+</g></svg>

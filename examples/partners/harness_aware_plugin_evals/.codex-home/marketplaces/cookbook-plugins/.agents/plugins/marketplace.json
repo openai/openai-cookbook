@@ -1,0 +1,20 @@
+{
+  "name": "cookbook-plugins",
+  "interface": {
+    "displayName": "Example Codex plugins"
+  },
+  "plugins": [
+    {
+      "name": "BLS",
+      "source": {
+        "source": "local",
+        "path": "./plugins/bls"
+      },
+      "policy": {
+        "installation": "AVAILABLE",
+        "authentication": "ON_INSTALL"
+      },
+      "category": "Data"
+    }
+  ]
+}

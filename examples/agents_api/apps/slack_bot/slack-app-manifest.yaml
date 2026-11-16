@@ -1,0 +1,26 @@
+display_information:
+  name: Agent Teammate
+features:
+  bot_user:
+    display_name: Agent Teammate
+    always_online: false
+oauth_config:
+  scopes:
+    bot:
+      - app_mentions:read
+      - channels:history
+      - chat:write
+      - files:read
+      - groups:history
+      - im:history
+      - users:read
+settings:
+  event_subscriptions:
+    bot_events:
+      - app_mention
+      - message.channels
+      - message.groups
+      - message.im
+  interactivity:
+    is_enabled: true
+  socket_mode_enabled: true

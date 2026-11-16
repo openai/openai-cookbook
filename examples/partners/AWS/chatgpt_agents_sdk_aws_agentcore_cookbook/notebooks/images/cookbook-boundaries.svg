@@ -1,0 +1,66 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="960" height="790" viewBox="0 0 960 790" role="img" aria-labelledby="title desc">
+  <title id="title">Default local flight assistant architecture</title>
+  <desc id="desc">ChatGPT sends a tool request through the OpenAI-hosted Secure MCP Tunnel endpoint to the tunnel-client on the developer workstation. The tunnel-client opens the outbound HTTPS connection. It forwards the request to a loopback MCP adapter, which runs the local OpenAI Agents SDK agent. The agent calls an Amazon Bedrock model and exports traces to AWS AgentCore Observability. The validated result returns to the widget in ChatGPT. An existing AgentCore Runtime and dual-mode OpenAI tracing are optional paths described in the accompanying text.</desc>
+  <style>
+    text { font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Helvetica, Arial, sans-serif; fill: #172b3a; }
+    .title { font-size: 26px; font-weight: 700; }
+    .label { font-size: 20px; font-weight: 600; }
+    .detail { font-size: 18px; fill: #405466; }
+    .region { fill: #f4f7fa; stroke: #b8c8d5; stroke-width: 1.5; }
+    .box { fill: #fff; stroke: #37576e; stroke-width: 2; }
+    .flow { fill: none; stroke: #37576e; stroke-width: 2.5; marker-end: url(#arrow); }
+    .trace { fill: none; stroke: #37576e; stroke-width: 2.5; stroke-dasharray: 7 5; marker-end: url(#arrow); }
+  </style>
+  <defs>
+    <marker id="arrow" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="8" markerHeight="8" orient="auto-start-reverse">
+      <path d="M0 0 10 5 0 10Z" fill="#37576e"/>
+    </marker>
+  </defs>
+  <rect width="960" height="790" fill="#fff"/>
+  <rect x="30" y="70" width="900" height="160" rx="12" class="region"/>
+  <rect x="30" y="302" width="900" height="183" rx="12" class="region"/>
+  <rect x="30" y="557" width="900" height="156" rx="12" class="region"/>
+  <text x="30" y="42" class="title">From a ChatGPT tool call to a local agent</text>
+
+  <text x="50" y="103" class="label">OpenAI</text>
+  <rect x="60" y="122" width="250" height="82" rx="8" class="box"/>
+  <text x="185" y="153" text-anchor="middle" class="label">ChatGPT</text>
+  <text x="185" y="183" text-anchor="middle" class="detail">Tool call + result widget</text>
+  <path d="M310 163H430" class="flow"/>
+  <rect x="430" y="122" width="470" height="82" rx="8" class="box"/>
+  <text x="665" y="153" text-anchor="middle" class="label">Secure MCP Tunnel</text>
+  <text x="665" y="183" text-anchor="middle" class="detail">OpenAI-hosted endpoint</text>
+
+  <path d="M780 204V252H285V352" class="flow"/>
+  <text x="330" y="282" class="detail">tunnel-client opens the outbound HTTPS connection</text>
+
+  <text x="50" y="331" class="label">Your workstation</text>
+  <rect x="60" y="352" width="240" height="90" rx="8" class="box"/>
+  <text x="180" y="389" text-anchor="middle" class="label">tunnel-client</text>
+  <text x="180" y="420" text-anchor="middle" class="detail">Forwards tool requests</text>
+  <path d="M300 397H360" class="flow"/>
+  <rect x="360" y="352" width="240" height="90" rx="8" class="box"/>
+  <text x="480" y="389" text-anchor="middle" class="label">MCP adapter</text>
+  <text x="480" y="420" text-anchor="middle" class="detail">127.0.0.1:8787/mcp</text>
+  <path d="M600 397H660" class="flow"/>
+  <rect x="660" y="352" width="240" height="90" rx="8" class="box"/>
+  <text x="780" y="389" text-anchor="middle" class="label">Agents SDK agent</text>
+  <text x="780" y="420" text-anchor="middle" class="detail">Read-only Python tools</text>
+  <text x="50" y="469" class="detail">The MCP server stays on loopback. No public MCP URL or inbound firewall rule.</text>
+
+  <path d="M780 442V615" class="flow"/>
+  <text x="795" y="526" class="detail">Model call</text>
+  <path d="M700 442V515H260V615" class="trace"/>
+  <text x="355" y="505" class="detail">Trace export</text>
+
+  <text x="50" y="589" class="label">AWS</text>
+  <rect x="60" y="615" width="440" height="72" rx="8" class="box"/>
+  <text x="280" y="645" text-anchor="middle" class="label">AgentCore Observability</text>
+  <text x="280" y="673" text-anchor="middle" class="detail">Traces sent through ADOT</text>
+  <rect x="580" y="615" width="320" height="72" rx="8" class="box"/>
+  <text x="740" y="645" text-anchor="middle" class="label">Amazon Bedrock model</text>
+  <text x="740" y="673" text-anchor="middle" class="detail">OpenAI-compatible endpoint</text>
+
+  <text x="30" y="748" class="detail">The validated result returns to ChatGPT along the same path.</text>
+  <text x="30" y="778" class="detail">Optional: existing AgentCore Runtime hosting and dual-mode OpenAI tracing (see text).</text>
+</svg>

@@ -1,0 +1,22 @@
+[
+  {
+    "id": "INC-0931",
+    "source": "bundled_sample",
+    "service": "checkout-api",
+    "date": "2026-07-14",
+    "summary": "Checkout requests timed out after a Redis pool-size change.",
+    "root_cause": "A deployment reduced max_connections below peak concurrent checkout requests.",
+    "resolution": "Rolled back the deployment and restored the previous Redis pool size.",
+    "follow_up": "Add a deployment check for Redis connection capacity."
+  },
+  {
+    "id": "INC-0874",
+    "source": "bundled_sample",
+    "service": "checkout-api",
+    "date": "2026-06-18",
+    "summary": "Checkout latency increased while an upstream payment gateway was degraded.",
+    "root_cause": "The payment gateway exceeded its response timeout.",
+    "resolution": "Enabled the gateway circuit breaker until the upstream service recovered.",
+    "follow_up": "Track gateway latency independently from Redis pool saturation."
+  }
+]

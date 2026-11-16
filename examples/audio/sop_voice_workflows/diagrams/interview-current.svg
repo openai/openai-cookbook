@@ -1,0 +1,151 @@
+<?xml version='1.0' encoding='utf-8'?>
+<svg xmlns="http://www.w3.org/2000/svg" width="840" role="img" aria-labelledby="chart-title-seq-interview-current" font-family="Arial, Helvetica, sans-serif" fill="#1b2c23" height="740" viewBox="0 0 840 740" id="seq-interview-current" style="max-width:100%;height:auto;background:white" aria-describedby="chart-desc-seq-interview-current">
+  <title id="chart-title-seq-interview-current">How Decisions recovered the delayed Tuesday handoff</title>
+  <desc id="chart-desc-seq-interview-current">In the recorded call, Decisions flagged Tuesday before the test released the GPT-Live handoff. The app saved the answer once, looked up the next ATS question and skipped the late handoff.</desc>
+  <rect width="840" fill="white" height="740"/>
+  <text x="12" y="26" font-size="21" font-weight="bold">How Decisions recovered the delayed Tuesday handoff</text>
+  <g transform="translate(3 0)" data-panel="1">
+    <g>
+      <line x1="58.0" x2="58.0" y1="67" y2="733" stroke="#b1c7b9" stroke-width="1"/>
+      <line x1="240.75" x2="240.75" y1="67" y2="733" stroke="#b1c7b9" stroke-width="1"/>
+      <line x1="423.0" x2="423.0" y1="67" y2="733" stroke="#b1c7b9" stroke-width="1"/>
+      <line x1="620.25" x2="620.25" y1="67" y2="733" stroke="#b1c7b9" stroke-width="1"/>
+      <line x1="797.0" x2="797.0" y1="67" y2="733" stroke="#b1c7b9" stroke-width="1"/>
+    </g>
+    <rect x="14.0" y="40" width="88" height="27" rx="4" fill="#eef5f0" stroke="#bbcec1"/>
+    <text x="58.0" y="58" font-size="15" font-weight="bold" text-anchor="middle" data-participant="C">Candidate</text>
+    <rect x="199.75" y="40" width="82" height="27" rx="4" fill="#eef5f0" stroke="#bbcec1"/>
+    <text x="240.75" y="58" font-size="15" font-weight="bold" text-anchor="middle" data-participant="L">GPT-Live</text>
+    <rect x="379.5" y="40" width="87" height="27" rx="4" fill="#eef5f0" stroke="#bbcec1"/>
+    <text x="423.0" y="58" font-size="15" font-weight="bold" text-anchor="middle" data-participant="D">Decisions</text>
+    <rect x="564.25" y="40" width="112" height="27" rx="4" fill="#eef5f0" stroke="#bbcec1"/>
+    <text x="620.25" y="58" font-size="15" font-weight="bold" text-anchor="middle" data-participant="A">Interview app</text>
+    <rect x="774.0" y="40" width="46" height="27" rx="4" fill="#eef5f0" stroke="#bbcec1"/>
+    <text x="797.0" y="58" font-size="15" font-weight="bold" text-anchor="middle" data-participant="S">ATS</text>
+    <g data-step="1" data-from="A" data-to="S" data-type="-&gt;&gt;" data-copy="Look up the opening question">
+      <line x1="620.25" x2="796.0" y1="95.5" y2="95.5" stroke="#345b46" stroke-width="1.7"/>
+      <circle cx="620.25" cy="95.5" r="2.5" fill="#345b46"/>
+      <path d="M790.0,91.7 L797.0,95.5 L790.0,99.3Z" fill="#345b46" stroke="#345b46" stroke-width="1.4" stroke-linejoin="round"/>
+      <rect x="642.125" y="78.5" width="133.0" height="34" rx="2" fill="white"/>
+      <text x="708.62" y="92.3" font-size="16" text-anchor="middle">Look up the</text>
+      <text x="708.62" y="109.3" font-size="16" text-anchor="middle">opening question</text>
+    </g>
+    <g data-step="2" data-from="S" data-to="A" data-type="--&gt;&gt;" data-copy="Which start day works for you?">
+      <line x1="797.0" x2="621.25" y1="138.5" y2="138.5" stroke="#345b46" stroke-width="1.7" stroke-dasharray="5 3"/>
+      <circle cx="797.0" cy="138.5" r="2.5" fill="#345b46"/>
+      <path d="M627.25,134.7 L620.25,138.5 L627.25,142.3Z" fill="#345b46" stroke="#345b46" stroke-width="1.4" stroke-linejoin="round"/>
+      <rect x="648.25" y="121.5" width="120.75" height="34" rx="2" fill="white"/>
+      <text x="708.62" y="135.3" font-size="16" text-anchor="middle">Which start day</text>
+      <text x="708.62" y="152.3" font-size="16" text-anchor="middle">works for you?</text>
+    </g>
+    <g data-step="3" data-from="A" data-to="L" data-type="--&gt;&gt;" data-copy="Include the official question in the voice prompt">
+      <line x1="620.25" x2="241.75" y1="173.0" y2="173.0" stroke="#345b46" stroke-width="1.7" stroke-dasharray="5 3"/>
+      <circle cx="620.25" cy="173.0" r="2.5" fill="#345b46"/>
+      <path d="M247.75,169.2 L240.75,173.0 L247.75,176.8Z" fill="#345b46" stroke="#345b46" stroke-width="1.4" stroke-linejoin="round"/>
+      <rect x="258.001953125" y="164.5" width="344.99609375" height="17" rx="2" fill="white"/>
+      <text x="430.5" y="178.3" font-size="16" text-anchor="middle">Include the official question in the voice prompt</text>
+    </g>
+    <g data-step="4" data-from="L" data-to="C" data-type="-&gt;&gt;" data-copy="Ask about the start day">
+      <line x1="240.75" x2="59.0" y1="207.5" y2="207.5" stroke="#345b46" stroke-width="1.7"/>
+      <circle cx="240.75" cy="207.5" r="2.5" fill="#345b46"/>
+      <path d="M65.0,203.7 L58.0,207.5 L65.0,211.3Z" fill="#345b46" stroke="#345b46" stroke-width="1.4" stroke-linejoin="round"/>
+      <rect x="77.125" y="190.5" width="144.5" height="34" rx="2" fill="white"/>
+      <text x="149.38" y="204.3" font-size="16" text-anchor="middle">Ask about the start</text>
+      <text x="149.38" y="221.3" font-size="16" text-anchor="middle">day</text>
+    </g>
+    <g data-step="5" data-from="C" data-to="L" data-type="-&gt;&gt;" data-copy="Tuesday">
+      <line x1="58.0" x2="239.75" y1="242.0" y2="242.0" stroke="#345b46" stroke-width="1.7"/>
+      <circle cx="58.0" cy="242.0" r="2.5" fill="#345b46"/>
+      <path d="M233.75,238.2 L240.75,242.0 L233.75,245.8Z" fill="#345b46" stroke="#345b46" stroke-width="1.4" stroke-linejoin="round"/>
+      <rect x="113.50390625" y="233.5" width="71.7421875" height="17" rx="2" fill="white"/>
+      <text x="149.38" y="247.3" font-size="16" text-anchor="middle">Tuesday</text>
+    </g>
+    <g data-step="6" data-from="L" data-to="D" data-type="--&gt;&gt;" data-copy="New caller transcript">
+      <line x1="240.75" x2="422.0" y1="268.0" y2="268.0" stroke="#345b46" stroke-width="1.7" stroke-dasharray="5 3"/>
+      <circle cx="240.75" cy="268.0" r="2.5" fill="#345b46"/>
+      <path d="M416.0,264.2 L423.0,268.0 L416.0,271.8Z" fill="#345b46" stroke="#345b46" stroke-width="1.4" stroke-linejoin="round"/>
+      <rect x="254.25" y="259.5" width="155.25" height="17" rx="2" fill="white"/>
+      <text x="331.88" y="273.3" font-size="16" text-anchor="middle">New caller transcript</text>
+    </g>
+    <g data-step="7" data-from="D" data-to="A" data-type="--&gt;&gt;" data-copy="9.32 s · latest answer needs backend work">
+      <line x1="423.0" x2="619.25" y1="302.5" y2="302.5" stroke="#345b46" stroke-width="1.7" stroke-dasharray="5 3"/>
+      <circle cx="423.0" cy="302.5" r="2.5" fill="#345b46"/>
+      <path d="M613.25,298.7 L620.25,302.5 L613.25,306.3Z" fill="#345b46" stroke="#345b46" stroke-width="1.4" stroke-linejoin="round"/>
+      <rect x="440.125" y="285.5" width="163.0" height="34" rx="2" fill="white"/>
+      <text x="521.62" y="299.3" font-size="16" text-anchor="middle">9.32 s · latest answer</text>
+      <text x="521.62" y="316.3" font-size="16" text-anchor="middle">needs backend work</text>
+    </g>
+    <g data-step="8" data-from="L" data-to="A" data-type="note" data-copy="At 9.68 s the test holds GPT-Live's handoff">
+      <rect x="145.75" y="326" width="550.5" height="29" rx="4" fill="#faf5e7" stroke="#cabe9e"/>
+      <text x="421.0" y="343" font-size="16" text-anchor="middle">At 9.68 s the test holds GPT-Live's handoff</text>
+    </g>
+    <g data-step="9" data-from="A" data-to="A" data-type="-&gt;&gt;" data-copy="10.96 s · start interpretation from Decisions">
+      <path d="M620.25,411 H783.0 v8 H621.25" fill="none" stroke="#345b46" stroke-width="1.6"/>
+      <circle cx="620.25" cy="411" r="2.4" fill="#345b46"/>
+      <path d="M627.25,415.4 L620.25,419 L627.25,422.6Z" fill="#345b46"/>
+      <text x="701.62" y="372" font-size="16" text-anchor="middle" stroke="white" stroke-width="4" stroke-linejoin="round" paint-order="stroke fill">10.96 s · start</text>
+      <text x="701.62" y="389" font-size="16" text-anchor="middle" stroke="white" stroke-width="4" stroke-linejoin="round" paint-order="stroke fill">interpretation from</text>
+      <text x="701.62" y="406" font-size="16" text-anchor="middle" stroke="white" stroke-width="4" stroke-linejoin="round" paint-order="stroke fill">Decisions</text>
+    </g>
+    <g data-step="10" data-from="A" data-to="S" data-type="-&gt;&gt;" data-copy="Save Tuesday for this answer">
+      <line x1="620.25" x2="796.0" y1="449.5" y2="449.5" stroke="#345b46" stroke-width="1.7"/>
+      <circle cx="620.25" cy="449.5" r="2.5" fill="#345b46"/>
+      <path d="M790.0,445.7 L797.0,449.5 L790.0,453.3Z" fill="#345b46" stroke="#345b46" stroke-width="1.4" stroke-linejoin="round"/>
+      <rect x="640.505859375" y="432.5" width="136.23828125" height="34" rx="2" fill="white"/>
+      <text x="708.62" y="446.3" font-size="16" text-anchor="middle">Save Tuesday for</text>
+      <text x="708.62" y="463.3" font-size="16" text-anchor="middle">this answer</text>
+    </g>
+    <g data-step="11" data-from="S" data-to="A" data-type="--&gt;&gt;" data-copy="Saved at revision 1">
+      <line x1="797.0" x2="621.25" y1="484.0" y2="484.0" stroke="#345b46" stroke-width="1.7" stroke-dasharray="5 3"/>
+      <circle cx="797.0" cy="484.0" r="2.5" fill="#345b46"/>
+      <path d="M627.25,480.2 L620.25,484.0 L627.25,487.8Z" fill="#345b46" stroke="#345b46" stroke-width="1.4" stroke-linejoin="round"/>
+      <rect x="635.125" y="475.5" width="147.0" height="17" rx="2" fill="white"/>
+      <text x="708.62" y="489.3" font-size="16" text-anchor="middle">Saved at revision 1</text>
+    </g>
+    <g data-step="12" data-from="A" data-to="S" data-type="-&gt;&gt;" data-copy="Get next question at revision 1">
+      <line x1="620.25" x2="796.0" y1="518.5" y2="518.5" stroke="#345b46" stroke-width="1.7"/>
+      <circle cx="620.25" cy="518.5" r="2.5" fill="#345b46"/>
+      <path d="M790.0,514.7 L797.0,518.5 L790.0,522.3Z" fill="#345b46" stroke="#345b46" stroke-width="1.4" stroke-linejoin="round"/>
+      <rect x="631.375" y="501.5" width="154.5" height="34" rx="2" fill="white"/>
+      <text x="708.62" y="515.3" font-size="16" text-anchor="middle">Get next question at</text>
+      <text x="708.62" y="532.3" font-size="16" text-anchor="middle">revision 1</text>
+    </g>
+    <g data-step="13" data-from="S" data-to="A" data-type="--&gt;&gt;" data-copy="Official shift question">
+      <line x1="797.0" x2="621.25" y1="561.5" y2="561.5" stroke="#345b46" stroke-width="1.7" stroke-dasharray="5 3"/>
+      <circle cx="797.0" cy="561.5" r="2.5" fill="#345b46"/>
+      <path d="M627.25,557.7 L620.25,561.5 L627.25,565.3Z" fill="#345b46" stroke="#345b46" stroke-width="1.4" stroke-linejoin="round"/>
+      <rect x="662.126953125" y="544.5" width="92.99609375" height="34" rx="2" fill="white"/>
+      <text x="708.62" y="558.3" font-size="16" text-anchor="middle">Official shift</text>
+      <text x="708.62" y="575.3" font-size="16" text-anchor="middle">question</text>
+    </g>
+    <g data-step="14" data-from="A" data-to="L" data-type="--&gt;&gt;" data-copy="Send the shift question as guidance">
+      <line x1="620.25" x2="241.75" y1="596.0" y2="596.0" stroke="#345b46" stroke-width="1.7" stroke-dasharray="5 3"/>
+      <circle cx="620.25" cy="596.0" r="2.5" fill="#345b46"/>
+      <path d="M247.75,592.2 L240.75,596.0 L247.75,599.8Z" fill="#345b46" stroke="#345b46" stroke-width="1.4" stroke-linejoin="round"/>
+      <rect x="297.625" y="587.5" width="265.75" height="17" rx="2" fill="white"/>
+      <text x="430.5" y="601.3" font-size="16" text-anchor="middle">Send the shift question as guidance</text>
+    </g>
+    <g data-step="15" data-from="L" data-to="A" data-type="-&gt;&gt;" data-copy="Test delivers the held handoff">
+      <line x1="240.75" x2="619.25" y1="622.0" y2="622.0" stroke="#345b46" stroke-width="1.7"/>
+      <circle cx="240.75" cy="622.0" r="2.5" fill="#345b46"/>
+      <path d="M613.25,618.2 L620.25,622.0 L613.25,625.8Z" fill="#345b46" stroke="#345b46" stroke-width="1.4" stroke-linejoin="round"/>
+      <rect x="319.765625" y="613.5" width="221.46875" height="17" rx="2" fill="white"/>
+      <text x="430.5" y="627.3" font-size="16" text-anchor="middle">Test delivers the held handoff</text>
+    </g>
+    <g data-step="16" data-from="A" data-to="A" data-type="-&gt;&gt;" data-copy="Same answer already handled · no second save">
+      <path d="M620.25,687 H783.0 v8 H621.25" fill="none" stroke="#345b46" stroke-width="1.6"/>
+      <circle cx="620.25" cy="687" r="2.4" fill="#345b46"/>
+      <path d="M627.25,691.4 L620.25,695 L627.25,698.6Z" fill="#345b46"/>
+      <text x="701.62" y="648" font-size="16" text-anchor="middle" stroke="white" stroke-width="4" stroke-linejoin="round" paint-order="stroke fill">Same answer</text>
+      <text x="701.62" y="665" font-size="16" text-anchor="middle" stroke="white" stroke-width="4" stroke-linejoin="round" paint-order="stroke fill">already handled ·</text>
+      <text x="701.62" y="682" font-size="16" text-anchor="middle" stroke="white" stroke-width="4" stroke-linejoin="round" paint-order="stroke fill">no second save</text>
+    </g>
+    <g data-step="17" data-from="L" data-to="C" data-type="-&gt;&gt;" data-copy="Ask about the shift">
+      <line x1="240.75" x2="59.0" y1="717.0" y2="717.0" stroke="#345b46" stroke-width="1.7"/>
+      <circle cx="240.75" cy="717.0" r="2.5" fill="#345b46"/>
+      <path d="M65.0,713.2 L58.0,717.0 L65.0,720.8Z" fill="#345b46" stroke="#345b46" stroke-width="1.4" stroke-linejoin="round"/>
+      <rect x="78.0" y="708.5" width="142.75" height="17" rx="2" fill="white"/>
+      <text x="149.38" y="722.3" font-size="16" text-anchor="middle">Ask about the shift</text>
+    </g>
+  </g>
+</svg>

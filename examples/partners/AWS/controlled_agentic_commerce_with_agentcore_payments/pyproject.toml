@@ -1,0 +1,41 @@
+[project]
+name = "agentic-commerce-openai-agentcore-payments"
+version = "0.1.0"
+description = "Synthetic agentic-commerce Cookbook using the OpenAI Agents SDK and AgentCore Payments"
+requires-python = ">=3.11,<3.14"
+dependencies = [
+  "botocore[crt]>=1.40.0",
+  "httpx>=0.28.0,<1",
+  "openai[bedrock]>=2.46.0,<3",
+  "openai-agents>=0.18.2,<0.19",
+  "pydantic>=2.13.0,<3",
+]
+
+[project.scripts]
+agentic-commerce-agentcore-e2e = "agentic_commerce.agentcore_e2e:main"
+agentic-commerce-agentcore-infrastructure = "agentic_commerce.agentcore_infrastructure:main"
+agentic-commerce-agentcore-session = "agentic_commerce.agentcore_session:main"
+
+[project.optional-dependencies]
+agentcore = [
+  "bedrock-agentcore==1.18.1",
+]
+
+[build-system]
+requires = ["hatchling"]
+build-backend = "hatchling.build"
+
+[dependency-groups]
+dev = [
+  "pytest>=8.4.0,<9",
+  "ruff>=0.16.0,<0.17",
+]
+
+[tool.uv]
+package = true
+
+[tool.hatch.build.targets.wheel]
+packages = ["src/agentic_commerce"]
+
+[tool.pytest.ini_options]
+testpaths = ["tests"]

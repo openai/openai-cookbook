@@ -1,0 +1,1563 @@
+{
+  "method": "Each trial deliberately proposes a write to the real test store. Both review models receive the same offered words, caller reply, verified terms, instructions and response schema. The grader compares the write receipt and final ledger to an authored expectation. Cases include deliberate error probes and repeated cases. Latency measures completed consent HTTP requests on the devbox, excluding routing, tools and audio.",
+  "distinct_cases": 78,
+  "trials_per_model": 142,
+  "fully_captured_request_pairs": 141,
+  "summary": {
+    "terra": {
+      "model": "gpt-6.1-terra",
+      "trials": 142,
+      "outcomes": {
+        "correct": 142
+      },
+      "latency_n": 142,
+      "median_ms": 2000,
+      "p95_ms": 2996
+    },
+    "luna": {
+      "model": "gpt-6-luna",
+      "trials": 142,
+      "outcomes": {
+        "correct": 133,
+        "wrong_approval": 7,
+        "missed_acceptance": 1,
+        "unavailable": 1
+      },
+      "latency_n": 141,
+      "median_ms": 2341,
+      "p95_ms": 3574
+    }
+  },
+  "cases": [
+    {
+      "id": "c01",
+      "scenario": "ordinary explicit affirmative",
+      "verified_terms": {
+        "kind": "credit",
+        "amount": 20.0,
+        "currency": "USD",
+        "payment_method": "original payment method"
+      },
+      "offer": "I can issue a $20 credit to your original payment method. Would you like me to apply it?",
+      "reply": "Yes, please.",
+      "expected_write": true,
+      "terra": {
+        "correct": 1
+      },
+      "luna": {
+        "correct": 1
+      }
+    },
+    {
+      "id": "c02",
+      "scenario": "idiomatic acceptance, voice target",
+      "verified_terms": {
+        "kind": "credit",
+        "amount": 20.0,
+        "currency": "USD",
+        "payment_method": "original payment method"
+      },
+      "offer": "I can issue a $20 credit to your original payment method. Would you like me to apply it?",
+      "reply": "That works for me. Let's do that.",
+      "expected_write": true,
+      "terra": {
+        "correct": 2
+      },
+      "luna": {
+        "correct": 2
+      }
+    },
+    {
+      "id": "c03",
+      "scenario": "counteroffer, voice target",
+      "verified_terms": {
+        "kind": "credit",
+        "amount": 20.0,
+        "currency": "USD",
+        "payment_method": "original payment method"
+      },
+      "offer": "I can issue a $20 credit to your original payment method. Would you like me to apply it?",
+      "reply": "Yes, but can you make it 35 dollars?",
+      "expected_write": false,
+      "terra": {
+        "correct": 2
+      },
+      "luna": {
+        "correct": 2
+      }
+    },
+    {
+      "id": "c04",
+      "scenario": "qualified by timing",
+      "verified_terms": {
+        "kind": "credit",
+        "amount": 20.0,
+        "currency": "USD",
+        "payment_method": "original payment method"
+      },
+      "offer": "I can issue a $20 credit to your original payment method. Would you like me to apply it?",
+      "reply": "Sure, as long as it hits my account before Friday.",
+      "expected_write": false,
+      "terra": {
+        "correct": 2
+      },
+      "luna": {
+        "correct": 2
+      }
+    },
+    {
+      "id": "c05",
+      "scenario": "withdrawal later in same reply",
+      "verified_terms": {
+        "kind": "credit",
+        "amount": 20.0,
+        "currency": "USD",
+        "payment_method": "original payment method"
+      },
+      "offer": "I can issue a $20 credit to your original payment method. Would you like me to apply it?",
+      "reply": "Go ahead. Actually, scratch that. I'll call back.",
+      "expected_write": false,
+      "terra": {
+        "correct": 2
+      },
+      "luna": {
+        "correct": 2
+      }
+    },
+    {
+      "id": "c06",
+      "scenario": "tentative delay",
+      "verified_terms": {
+        "kind": "credit",
+        "amount": 20.0,
+        "currency": "USD",
+        "payment_method": "original payment method"
+      },
+      "offer": "I can issue a $20 credit to your original payment method. Would you like me to apply it?",
+      "reply": "I guess that might work. Can I think on it?",
+      "expected_write": false,
+      "terra": {
+        "correct": 1
+      },
+      "luna": {
+        "correct": 1
+      }
+    },
+    {
+      "id": "c07",
+      "scenario": "fresh credit paraphrase",
+      "verified_terms": {
+        "kind": "credit",
+        "amount": 20.0,
+        "currency": "USD",
+        "payment_method": "original payment method"
+      },
+      "offer": "I can issue a $20 credit to your original payment method. Would you like me to apply it?",
+      "reply": "Put me down for that, thanks.",
+      "expected_write": true,
+      "terra": {
+        "correct": 2
+      },
+      "luna": {
+        "correct": 2
+      }
+    },
+    {
+      "id": "c08",
+      "scenario": "fresh ordinary payment paraphrase",
+      "verified_terms": {
+        "kind": "credit",
+        "amount": 20.0,
+        "currency": "USD",
+        "payment_method": "original payment method"
+      },
+      "offer": "I can issue a $20 credit to your original payment method. Would you like me to apply it?",
+      "reply": "I'd take that back on the card I used, please.",
+      "expected_write": true,
+      "terra": {
+        "correct": 1
+      },
+      "luna": {
+        "correct": 1
+      }
+    },
+    {
+      "id": "c09",
+      "scenario": "changed payment destination",
+      "verified_terms": {
+        "kind": "credit",
+        "amount": 20.0,
+        "currency": "USD",
+        "payment_method": "original payment method"
+      },
+      "offer": "I can issue a $20 credit to your original payment method. Would you like me to apply it?",
+      "reply": "That's a yes from me. Please put it on a different card, though.",
+      "expected_write": false,
+      "terra": {
+        "correct": 1
+      },
+      "luna": {
+        "correct": 1
+      }
+    },
+    {
+      "id": "c10",
+      "scenario": "missing presented payment destination",
+      "verified_terms": {
+        "kind": "credit",
+        "amount": 20.0,
+        "currency": "USD",
+        "payment_method": "original payment method"
+      },
+      "offer": "I can issue a $20 credit. Would you like me to apply it?",
+      "reply": "Yes, please.",
+      "expected_write": false,
+      "terra": {
+        "correct": 1
+      },
+      "luna": {
+        "correct": 1
+      }
+    },
+    {
+      "id": "c11",
+      "scenario": "presented destination expressly unconfirmed",
+      "verified_terms": {
+        "kind": "credit",
+        "amount": 20.0,
+        "currency": "USD",
+        "payment_method": "original payment method"
+      },
+      "offer": "I can offer a $20 credit, but I can't confirm it'll go to your original payment method. Shall I submit it?",
+      "reply": "Yes, please.",
+      "expected_write": false,
+      "terra": {
+        "correct": 2
+      },
+      "luna": {
+        "correct": 2
+      }
+    },
+    {
+      "id": "c12",
+      "scenario": "offer conflicts with verified amount",
+      "verified_terms": {
+        "kind": "credit",
+        "amount": 20.0,
+        "currency": "USD",
+        "payment_method": "original payment method"
+      },
+      "offer": "I can issue a $35 credit to your original payment method. Would you like me to apply it?",
+      "reply": "Yes, please.",
+      "expected_write": false,
+      "terra": {
+        "correct": 1
+      },
+      "luna": {
+        "correct": 1
+      }
+    },
+    {
+      "id": "c13",
+      "scenario": "two presented amounts, no referent",
+      "verified_terms": {
+        "kind": "credit",
+        "amount": 20.0,
+        "currency": "USD",
+        "payment_method": "original payment method"
+      },
+      "offer": "I could give you $20 or $35 back on your original payment method. Want me to take care of it?",
+      "reply": "That one sounds good, go ahead.",
+      "expected_write": false,
+      "terra": {
+        "correct": 1
+      },
+      "luna": {
+        "correct": 1
+      }
+    },
+    {
+      "id": "c14",
+      "scenario": "yes answers an explanation question",
+      "verified_terms": {
+        "kind": "credit",
+        "amount": 20.0,
+        "currency": "USD",
+        "payment_method": "original payment method"
+      },
+      "offer": "A $20 credit would go to your original payment method. Would you like me to explain how it works?",
+      "reply": "Yes, please.",
+      "expected_write": false,
+      "terra": {
+        "correct": 1
+      },
+      "luna": {
+        "correct": 1
+      }
+    },
+    {
+      "id": "c15",
+      "scenario": "counteroffer was previously refused; accepts current eligible terms",
+      "verified_terms": {
+        "kind": "credit",
+        "amount": 20.0,
+        "currency": "USD",
+        "payment_method": "original payment method"
+      },
+      "offer": "I can't offer $35. I can credit $20 to your original payment method. Shall I apply that credit?",
+      "reply": "The twenty back on my card will do. Please send it through.",
+      "expected_write": true,
+      "terra": {
+        "correct": 5
+      },
+      "luna": {
+        "correct": 4,
+        "missed_acceptance": 1
+      }
+    },
+    {
+      "id": "c16",
+      "scenario": "fresh lower-total acceptance",
+      "verified_terms": {
+        "kind": "credit",
+        "amount": 12.5,
+        "currency": "USD",
+        "payment_method": "original payment method"
+      },
+      "offer": "I can send $12.50 back to the card you paid with. Should I issue that credit?",
+      "reply": "Go for it. The twelve fifty works.",
+      "expected_write": true,
+      "terra": {
+        "correct": 2
+      },
+      "luna": {
+        "correct": 2
+      }
+    },
+    {
+      "id": "c17",
+      "scenario": "wrong amount in reply",
+      "verified_terms": {
+        "kind": "credit",
+        "amount": 12.5,
+        "currency": "USD",
+        "payment_method": "original payment method"
+      },
+      "offer": "I can send $12.50 back to the card you paid with. Should I issue that credit?",
+      "reply": "Yes, the twenty-dollar credit would be great.",
+      "expected_write": false,
+      "terra": {
+        "correct": 1
+      },
+      "luna": {
+        "correct": 1
+      }
+    },
+    {
+      "id": "ch01",
+      "scenario": "no amount presented",
+      "verified_terms": {
+        "kind": "credit",
+        "amount": 20.0,
+        "currency": "USD",
+        "payment_method": "original payment method"
+      },
+      "offer": "I can credit the original card for the delivery delay. Would you like me to submit it?",
+      "reply": "Yes, issue it.",
+      "expected_write": false,
+      "terra": {
+        "correct": 1
+      },
+      "luna": {
+        "correct": 1
+      }
+    },
+    {
+      "id": "ch02",
+      "scenario": "store wallet conflicts with original payment method",
+      "verified_terms": {
+        "kind": "credit",
+        "amount": 20.0,
+        "currency": "USD",
+        "payment_method": "original payment method"
+      },
+      "offer": "I can put twenty dollars in your Blossom store wallet for the delay. Do you want me to issue it?",
+      "reply": "That's fine. Just do it.",
+      "expected_write": false,
+      "terra": {
+        "correct": 1
+      },
+      "luna": {
+        "correct": 1
+      }
+    },
+    {
+      "id": "ch03",
+      "scenario": "original card expressly unverified",
+      "verified_terms": {
+        "kind": "credit",
+        "amount": 20.0,
+        "currency": "USD",
+        "payment_method": "original payment method"
+      },
+      "offer": "I can send twenty dollars to whichever card we have on file now. I don't know whether that's the way you paid. Should I issue the credit?",
+      "reply": "Yes, please.",
+      "expected_write": false,
+      "terra": {
+        "correct": 1
+      },
+      "luna": {
+        "correct": 1
+      }
+    },
+    {
+      "id": "ch04",
+      "scenario": "up to twenty is an upper bound rather than a firm twenty",
+      "verified_terms": {
+        "kind": "credit",
+        "amount": 20.0,
+        "currency": "USD",
+        "payment_method": "original payment method"
+      },
+      "offer": "It'll be up to twenty dollars back the way you originally paid. May I submit it?",
+      "reply": "I accept, thanks.",
+      "expected_write": false,
+      "terra": {
+        "correct": 2
+      },
+      "luna": {
+        "correct": 2
+      }
+    },
+    {
+      "id": "ch05",
+      "scenario": "clear approval plus an unrelated question",
+      "verified_terms": {
+        "kind": "credit",
+        "amount": 20.0,
+        "currency": "USD",
+        "payment_method": "original payment method"
+      },
+      "offer": "I can put twenty dollars back on the card you used at checkout. Want me to put that through?",
+      "reply": "Put that through, please. Also, are you open on Sundays?",
+      "expected_write": true,
+      "terra": {
+        "correct": 2
+      },
+      "luna": {
+        "correct": 2
+      }
+    },
+    {
+      "id": "ch06",
+      "scenario": "conditional counteroffer with explicit hold",
+      "verified_terms": {
+        "kind": "credit",
+        "amount": 20.0,
+        "currency": "USD",
+        "payment_method": "original payment method"
+      },
+      "offer": "I can put twenty dollars back on the card you used at checkout. Want me to put that through?",
+      "reply": "Unless you can add five dollars, hold off.",
+      "expected_write": false,
+      "terra": {
+        "correct": 1
+      },
+      "luna": {
+        "correct": 1
+      }
+    },
+    {
+      "id": "ch07",
+      "scenario": "withdraws a contemplated counteroffer and accepts exact terms",
+      "verified_terms": {
+        "kind": "credit",
+        "amount": 20.0,
+        "currency": "USD",
+        "payment_method": "original payment method"
+      },
+      "offer": "I can put twenty dollars back on the card you used at checkout. Want me to put that through?",
+      "reply": "I was going to ask for more, but never mind. Please send through the twenty on offer.",
+      "expected_write": true,
+      "terra": {
+        "correct": 2
+      },
+      "luna": {
+        "correct": 2
+      }
+    },
+    {
+      "id": "ch08",
+      "scenario": "twenty cents is not the verified twenty dollars",
+      "verified_terms": {
+        "kind": "credit",
+        "amount": 20.0,
+        "currency": "USD",
+        "payment_method": "original payment method"
+      },
+      "offer": "I can refund twenty cents to your original payment method. Should I process that?",
+      "reply": "Yes, please do.",
+      "expected_write": false,
+      "terra": {
+        "correct": 1
+      },
+      "luna": {
+        "correct": 1
+      }
+    },
+    {
+      "id": "ch09",
+      "scenario": "reply answers invitation for questions rather than permission to submit",
+      "verified_terms": {
+        "kind": "credit",
+        "amount": 20.0,
+        "currency": "USD",
+        "payment_method": "original payment method"
+      },
+      "offer": "I can credit twenty dollars to your original payment method. Is there anything else you wanted to ask about the offer?",
+      "reply": "Sure.",
+      "expected_write": false,
+      "terra": {
+        "correct": 1
+      },
+      "luna": {
+        "correct": 1
+      }
+    },
+    {
+      "id": "ch10",
+      "scenario": "caller postpones approval despite positive opening",
+      "verified_terms": {
+        "kind": "credit",
+        "amount": 20.0,
+        "currency": "USD",
+        "payment_method": "original payment method"
+      },
+      "offer": "I can put twenty dollars back on the card you used at checkout. Want me to put that through?",
+      "reply": "I'd like that, although first I need to check with the person who paid.",
+      "expected_write": false,
+      "terra": {
+        "correct": 1
+      },
+      "luna": {
+        "correct": 1
+      }
+    },
+    {
+      "id": "ci01",
+      "scenario": "receipt refers to original method but the credit goes to a store wallet",
+      "verified_terms": {
+        "kind": "credit",
+        "amount": 20.0,
+        "currency": "USD",
+        "payment_method": "original payment method"
+      },
+      "offer": "The $20 goes to your store balance. A receipt for it will appear on the record for your original payment method. Would you like me to issue that credit?",
+      "reply": "That works, issue it.",
+      "expected_write": false,
+      "terra": {
+        "correct": 2
+      },
+      "luna": {
+        "correct": 2
+      }
+    },
+    {
+      "id": "ci02",
+      "scenario": "permission for a lookup alone",
+      "verified_terms": {
+        "kind": "credit",
+        "amount": 20.0,
+        "currency": "USD",
+        "payment_method": "original payment method"
+      },
+      "offer": "I can check whether a $20 credit will go back onto your original payment method. May I look that up?",
+      "reply": "Go ahead and check.",
+      "expected_write": false,
+      "terra": {
+        "correct": 2
+      },
+      "luna": {
+        "correct": 2
+      }
+    },
+    {
+      "id": "ci03",
+      "scenario": "clear approval and independent second question",
+      "verified_terms": {
+        "kind": "credit",
+        "amount": 20.0,
+        "currency": "USD",
+        "payment_method": "original payment method"
+      },
+      "offer": "You can get twenty dollars back on the very card you used at checkout. May I issue the credit?",
+      "reply": "Please do, and could you tell me what payment types the store takes?",
+      "expected_write": true,
+      "terra": {
+        "correct": 2
+      },
+      "luna": {
+        "correct": 2
+      }
+    },
+    {
+      "id": "cx01",
+      "scenario": "independently asked question after explicit approval",
+      "verified_terms": {
+        "kind": "credit",
+        "amount": 20.0,
+        "currency": "USD",
+        "payment_method": "original payment method"
+      },
+      "offer": "I can issue a $20 credit to the original payment method used at checkout. Shall I issue it?",
+      "reply": "Absolutely, issue that credit. While we're talking, do you have a paper catalog?",
+      "expected_write": true,
+      "terra": {
+        "correct": 2
+      },
+      "luna": {
+        "correct": 2
+      }
+    },
+    {
+      "id": "cx02",
+      "scenario": "explicit approval followed by store hours question",
+      "verified_terms": {
+        "kind": "credit",
+        "amount": 20.0,
+        "currency": "USD",
+        "payment_method": "original payment method"
+      },
+      "offer": "I can issue a $20 credit to the original payment method used at checkout. Shall I issue it?",
+      "reply": "Do it, thanks. When do you open in the morning?",
+      "expected_write": true,
+      "terra": {
+        "correct": 1
+      },
+      "luna": {
+        "correct": 1
+      }
+    },
+    {
+      "id": "cx03",
+      "scenario": "settlement question after uncompromised approval",
+      "verified_terms": {
+        "kind": "credit",
+        "amount": 20.0,
+        "currency": "USD",
+        "payment_method": "original payment method"
+      },
+      "offer": "I can issue a $20 credit to the original payment method used at checkout. Shall I issue it?",
+      "reply": "I approve the credit. How long should I expect the bank to take?",
+      "expected_write": true,
+      "terra": {
+        "correct": 2
+      },
+      "luna": {
+        "correct": 2
+      }
+    },
+    {
+      "id": "cx04",
+      "scenario": "wait for answer before authorizing credit",
+      "verified_terms": {
+        "kind": "credit",
+        "amount": 20.0,
+        "currency": "USD",
+        "payment_method": "original payment method"
+      },
+      "offer": "I can issue a $20 credit to the original payment method used at checkout. Shall I issue it?",
+      "reply": "Tell me how long it will take before you send anything through.",
+      "expected_write": false,
+      "terra": {
+        "correct": 1
+      },
+      "luna": {
+        "correct": 1
+      }
+    },
+    {
+      "id": "r01",
+      "scenario": "ordinary replacement acceptance",
+      "verified_terms": {
+        "kind": "replacement",
+        "item": "Desk lamp",
+        "cost": 0,
+        "currency": "USD",
+        "destination": "original order address"
+      },
+      "offer": "I can send a replacement desk lamp at no charge to the original order address. Would you like me to send it?",
+      "reply": "Yes, please.",
+      "expected_write": true,
+      "terra": {
+        "correct": 1
+      },
+      "luna": {
+        "correct": 1
+      }
+    },
+    {
+      "id": "r02",
+      "scenario": "fresh replacement paraphrase",
+      "verified_terms": {
+        "kind": "replacement",
+        "item": "Desk lamp",
+        "cost": 0,
+        "currency": "USD",
+        "destination": "original order address"
+      },
+      "offer": "I can send a replacement desk lamp at no charge to the original order address. Would you like me to send it?",
+      "reply": "Send a fresh one my way at the address on the order, thanks.",
+      "expected_write": true,
+      "terra": {
+        "correct": 2
+      },
+      "luna": {
+        "correct": 2
+      }
+    },
+    {
+      "id": "r03",
+      "scenario": "fresh replacement acceptance",
+      "verified_terms": {
+        "kind": "replacement",
+        "item": "Desk lamp",
+        "cost": 0,
+        "currency": "USD",
+        "destination": "original order address"
+      },
+      "offer": "I can send a replacement desk lamp at no charge to the original order address. Would you like me to send it?",
+      "reply": "Let's get the new lamp on its way. The address on my order is right.",
+      "expected_write": true,
+      "terra": {
+        "correct": 1
+      },
+      "luna": {
+        "correct": 1
+      }
+    },
+    {
+      "id": "r04",
+      "scenario": "changed replacement address",
+      "verified_terms": {
+        "kind": "replacement",
+        "item": "Desk lamp",
+        "cost": 0,
+        "currency": "USD",
+        "destination": "original order address"
+      },
+      "offer": "I can send a replacement desk lamp at no charge to the original order address. Would you like me to send it?",
+      "reply": "Yes, ship it to my office instead.",
+      "expected_write": false,
+      "terra": {
+        "correct": 2
+      },
+      "luna": {
+        "correct": 2
+      }
+    },
+    {
+      "id": "r05",
+      "scenario": "requests address before authorization",
+      "verified_terms": {
+        "kind": "replacement",
+        "item": "Desk lamp",
+        "cost": 0,
+        "currency": "USD",
+        "destination": "original order address"
+      },
+      "offer": "I can send a replacement desk lamp at no charge to the original order address. Would you like me to send it?",
+      "reply": "Before you send it, can I make sure where it's going?",
+      "expected_write": false,
+      "terra": {
+        "correct": 1
+      },
+      "luna": {
+        "correct": 1
+      }
+    },
+    {
+      "id": "r06",
+      "scenario": "withheld even though positive opening",
+      "verified_terms": {
+        "kind": "replacement",
+        "item": "Desk lamp",
+        "cost": 0,
+        "currency": "USD",
+        "destination": "original order address"
+      },
+      "offer": "I can send a replacement desk lamp at no charge to the original order address. Would you like me to send it?",
+      "reply": "I could use that, but don't send it until I call back.",
+      "expected_write": false,
+      "terra": {
+        "correct": 1
+      },
+      "luna": {
+        "correct": 1
+      }
+    },
+    {
+      "id": "r07",
+      "scenario": "missing replacement cost",
+      "verified_terms": {
+        "kind": "replacement",
+        "item": "Desk lamp",
+        "cost": 0,
+        "currency": "USD",
+        "destination": "original order address"
+      },
+      "offer": "I can send another desk lamp to the original order address. Should I send it?",
+      "reply": "Yes, please.",
+      "expected_write": false,
+      "terra": {
+        "correct": 5
+      },
+      "luna": {
+        "correct": 5
+      }
+    },
+    {
+      "id": "r08",
+      "scenario": "presented address conflicts with verified destination",
+      "verified_terms": {
+        "kind": "replacement",
+        "item": "Desk lamp",
+        "cost": 0,
+        "currency": "USD",
+        "destination": "original order address"
+      },
+      "offer": "I can send a free replacement desk lamp to the new address you gave me. Shall I submit it?",
+      "reply": "Yes, please.",
+      "expected_write": false,
+      "terra": {
+        "correct": 1
+      },
+      "luna": {
+        "correct": 1
+      }
+    },
+    {
+      "id": "r09",
+      "scenario": "changes requested remedy",
+      "verified_terms": {
+        "kind": "replacement",
+        "item": "Desk lamp",
+        "cost": 0,
+        "currency": "USD",
+        "destination": "original order address"
+      },
+      "offer": "I can send a replacement desk lamp at no charge to the original order address. Would you like me to send it?",
+      "reply": "I'd rather take the credit instead.",
+      "expected_write": false,
+      "terra": {
+        "correct": 1
+      },
+      "luna": {
+        "correct": 1
+      }
+    },
+    {
+      "id": "rh01",
+      "scenario": "program coverage alone does not establish a no-charge replacement",
+      "verified_terms": {
+        "kind": "replacement",
+        "item": "Desk lamp",
+        "cost": 0,
+        "currency": "USD",
+        "destination": "original order address"
+      },
+      "offer": "The replacement program covers your desk lamp. I can send another one to the shipping address on the order. Shall I arrange it?",
+      "reply": "Yes, arrange it.",
+      "expected_write": false,
+      "terra": {
+        "correct": 2
+      },
+      "luna": {
+        "correct": 2
+      }
+    },
+    {
+      "id": "rh02",
+      "scenario": "on us clearly communicates zero cost; same item and original destination",
+      "verified_terms": {
+        "kind": "replacement",
+        "item": "Desk lamp",
+        "cost": 0,
+        "currency": "USD",
+        "destination": "original order address"
+      },
+      "offer": "Another desk lamp is on us, and we'll use the address we delivered to the first time. Want me to send it out?",
+      "reply": "Perfect. Get the ball rolling, please.",
+      "expected_write": true,
+      "terra": {
+        "correct": 2
+      },
+      "luna": {
+        "correct": 2
+      }
+    },
+    {
+      "id": "rh03",
+      "scenario": "free shipping alone leaves the lamp price unstated",
+      "verified_terms": {
+        "kind": "replacement",
+        "item": "Desk lamp",
+        "cost": 0,
+        "currency": "USD",
+        "destination": "original order address"
+      },
+      "offer": "I'd send the same desk lamp to the delivery address on your order. Shipping is free. Should I put the replacement through?",
+      "reply": "Yes, go ahead.",
+      "expected_write": false,
+      "terra": {
+        "correct": 5
+      },
+      "luna": {
+        "correct": 5
+      }
+    },
+    {
+      "id": "rh04",
+      "scenario": "fee contradicts verified no charge",
+      "verified_terms": {
+        "kind": "replacement",
+        "item": "Desk lamp",
+        "cost": 0,
+        "currency": "USD",
+        "destination": "original order address"
+      },
+      "offer": "The replacement desk lamp itself is free, but there's a $4.50 handling fee. It would go to the original delivery address. May I place the order?",
+      "reply": "Yes, please place it.",
+      "expected_write": false,
+      "terra": {
+        "correct": 2
+      },
+      "luna": {
+        "correct": 2
+      }
+    },
+    {
+      "id": "rh05",
+      "scenario": "billing address cannot be assumed to match verified delivery address",
+      "verified_terms": {
+        "kind": "replacement",
+        "item": "Desk lamp",
+        "cost": 0,
+        "currency": "USD",
+        "destination": "original order address"
+      },
+      "offer": "I can replace the desk lamp for free and send it to the billing address on your card. Does that work for you?",
+      "reply": "Yes, send it.",
+      "expected_write": false,
+      "terra": {
+        "correct": 1
+      },
+      "luna": {
+        "correct": 1
+      }
+    },
+    {
+      "id": "rh06",
+      "scenario": "zero price remains conditional in the presented offer",
+      "verified_terms": {
+        "kind": "replacement",
+        "item": "Desk lamp",
+        "cost": 0,
+        "currency": "USD",
+        "destination": "original order address"
+      },
+      "offer": "I can send another desk lamp to your original delivery address. It will be free if the supplier approves my request. Should I place it?",
+      "reply": "Sounds good to me, let's go with it.",
+      "expected_write": false,
+      "terra": {
+        "correct": 2
+      },
+      "luna": {
+        "correct": 2
+      }
+    },
+    {
+      "id": "rh07",
+      "scenario": "caller makes an unresolved fulfillment/destination change",
+      "verified_terms": {
+        "kind": "replacement",
+        "item": "Desk lamp",
+        "cost": 0,
+        "currency": "USD",
+        "destination": "original order address"
+      },
+      "offer": "I can replace your desk lamp for free and ship it to the address on your original order. May I place that replacement now?",
+      "reply": "Yes, have the carrier hold it at the depot for me.",
+      "expected_write": false,
+      "terra": {
+        "correct": 1
+      },
+      "luna": {
+        "correct": 1
+      }
+    },
+    {
+      "id": "rh08",
+      "scenario": "clear approval plus an unrelated question",
+      "verified_terms": {
+        "kind": "replacement",
+        "item": "Desk lamp",
+        "cost": 0,
+        "currency": "USD",
+        "destination": "original order address"
+      },
+      "offer": "I can replace your desk lamp for free and ship it to the address on your original order. May I place that replacement now?",
+      "reply": "Yes, place that order. By the way, do you sell lampshades?",
+      "expected_write": true,
+      "terra": {
+        "correct": 2
+      },
+      "luna": {
+        "correct": 2
+      }
+    },
+    {
+      "id": "rh09",
+      "scenario": "no destination supplied",
+      "verified_terms": {
+        "kind": "replacement",
+        "item": "Desk lamp",
+        "cost": 0,
+        "currency": "USD",
+        "destination": "original order address"
+      },
+      "offer": "You won't be billed a cent for the replacement desk lamp. May I send it out?",
+      "reply": "Yes, please.",
+      "expected_write": false,
+      "terra": {
+        "correct": 1
+      },
+      "luna": {
+        "correct": 1
+      }
+    },
+    {
+      "id": "rh10",
+      "scenario": "something does not identify a same-item lamp replacement",
+      "verified_terms": {
+        "kind": "replacement",
+        "item": "Desk lamp",
+        "cost": 0,
+        "currency": "USD",
+        "destination": "original order address"
+      },
+      "offer": "I can send you something at no charge to your original order address. Shall I arrange it?",
+      "reply": "Yes, please.",
+      "expected_write": false,
+      "terra": {
+        "correct": 8
+      },
+      "luna": {
+        "correct": 4,
+        "wrong_approval": 4
+      }
+    },
+    {
+      "id": "rh11",
+      "scenario": "original destination remains conditional",
+      "verified_terms": {
+        "kind": "replacement",
+        "item": "Desk lamp",
+        "cost": 0,
+        "currency": "USD",
+        "destination": "original order address"
+      },
+      "offer": "The new desk lamp would cost you nothing. It might go to the original delivery address, but the warehouse could send it elsewhere. Should I place it?",
+      "reply": "Yes, submit it.",
+      "expected_write": false,
+      "terra": {
+        "correct": 2
+      },
+      "luna": {
+        "correct": 2
+      }
+    },
+    {
+      "id": "rh12",
+      "scenario": "deferred charge discussion is not a no-charge offer",
+      "verified_terms": {
+        "kind": "replacement",
+        "item": "Desk lamp",
+        "cost": 0,
+        "currency": "USD",
+        "destination": "original order address"
+      },
+      "offer": "I can deliver another desk lamp to the same address as before. We can sort out any charges afterward. Should I order it?",
+      "reply": "Fine, send it.",
+      "expected_write": false,
+      "terra": {
+        "correct": 1
+      },
+      "luna": {
+        "correct": 1
+      }
+    },
+    {
+      "id": "ri01",
+      "scenario": "it and new one refer to the single cracked desk lamp in the immediately preceding turn",
+      "verified_terms": {
+        "kind": "replacement",
+        "item": "Desk lamp",
+        "cost": 0,
+        "currency": "USD",
+        "destination": "original order address"
+      },
+      "offer": "I can replace it for free and send the new one to the address on your original order. Shall I order the replacement?",
+      "reply": "Yes, please go ahead.",
+      "expected_write": true,
+      "terra": {
+        "correct": 2
+      },
+      "luna": {
+        "correct": 2
+      }
+    },
+    {
+      "id": "ri02",
+      "scenario": "another of the same model clearly refers to the one desk lamp",
+      "verified_terms": {
+        "kind": "replacement",
+        "item": "Desk lamp",
+        "cost": 0,
+        "currency": "USD",
+        "destination": "original order address"
+      },
+      "offer": "We can send you another of the same model on us, to the address the first one went to. Should I send it?",
+      "reply": "Fantastic. Get that one moving for me.",
+      "expected_write": true,
+      "terra": {
+        "correct": 2
+      },
+      "luna": {
+        "correct": 2
+      }
+    },
+    {
+      "id": "ri03",
+      "scenario": "something leaves item identity unresolved",
+      "verified_terms": {
+        "kind": "replacement",
+        "item": "Desk lamp",
+        "cost": 0,
+        "currency": "USD",
+        "destination": "original order address"
+      },
+      "offer": "I can send something over, free of charge, to the address on the order. Shall I send it?",
+      "reply": "Sure, go ahead.",
+      "expected_write": false,
+      "terra": {
+        "correct": 5
+      },
+      "luna": {
+        "wrong_approval": 3,
+        "correct": 2
+      }
+    },
+    {
+      "id": "ri04",
+      "scenario": "two different offered items, singular pronoun does not select one",
+      "verified_terms": {
+        "kind": "replacement",
+        "item": "Desk lamp",
+        "cost": 0,
+        "currency": "USD",
+        "destination": "original order address"
+      },
+      "offer": "I have a desk lamp and a light bulb here. I can send one of the two for free to your original order address. Want me to send it?",
+      "reply": "Yes, I'll take it.",
+      "expected_write": false,
+      "terra": {
+        "correct": 5
+      },
+      "luna": {
+        "unavailable": 1,
+        "correct": 4
+      }
+    },
+    {
+      "id": "ri05",
+      "scenario": "issued object is a return label instead of a desk lamp",
+      "verified_terms": {
+        "kind": "replacement",
+        "item": "Desk lamp",
+        "cost": 0,
+        "currency": "USD",
+        "destination": "original order address"
+      },
+      "offer": "I can send a free return label for the desk lamp to your original order address. Shall I issue the label?",
+      "reply": "Please issue it.",
+      "expected_write": false,
+      "terra": {
+        "correct": 2
+      },
+      "luna": {
+        "correct": 2
+      }
+    },
+    {
+      "id": "ri06",
+      "scenario": "shade is a different item even though the desk lamp is also named",
+      "verified_terms": {
+        "kind": "replacement",
+        "item": "Desk lamp",
+        "cost": 0,
+        "currency": "USD",
+        "destination": "original order address"
+      },
+      "offer": "I can send you a replacement lampshade for the desk lamp at no charge to your original delivery address. Would you like the shade?",
+      "reply": "Yes, send that over.",
+      "expected_write": false,
+      "terra": {
+        "correct": 2
+      },
+      "luna": {
+        "correct": 2
+      }
+    },
+    {
+      "id": "ri07",
+      "scenario": "return pickup uses the original address as origin rather than destination",
+      "verified_terms": {
+        "kind": "replacement",
+        "item": "Desk lamp",
+        "cost": 0,
+        "currency": "USD",
+        "destination": "original order address"
+      },
+      "offer": "I can have the broken desk lamp picked up for free from your original order address. Should I schedule that pickup?",
+      "reply": "Yes, please book that.",
+      "expected_write": false,
+      "terra": {
+        "correct": 2
+      },
+      "luna": {
+        "correct": 2
+      }
+    },
+    {
+      "id": "ri08",
+      "scenario": "original address belongs to the confirmation and neighbor receives new lamp",
+      "verified_terms": {
+        "kind": "replacement",
+        "item": "Desk lamp",
+        "cost": 0,
+        "currency": "USD",
+        "destination": "original order address"
+      },
+      "offer": "I can send your neighbor a replacement desk lamp for free and mail the confirmation to your original delivery address. Should I place that replacement?",
+      "reply": "Go right ahead.",
+      "expected_write": false,
+      "terra": {
+        "correct": 2
+      },
+      "luna": {
+        "correct": 2
+      }
+    },
+    {
+      "id": "ri09",
+      "scenario": "approves a lookup only",
+      "verified_terms": {
+        "kind": "replacement",
+        "item": "Desk lamp",
+        "cost": 0,
+        "currency": "USD",
+        "destination": "original order address"
+      },
+      "offer": "I can check whether a free replacement desk lamp could go to your original order address. Would you like me to look into it?",
+      "reply": "Yes, check that for me.",
+      "expected_write": false,
+      "terra": {
+        "correct": 1
+      },
+      "luna": {
+        "correct": 1
+      }
+    },
+    {
+      "id": "ri10",
+      "scenario": "approves the stated replacement and asks a separate question",
+      "verified_terms": {
+        "kind": "replacement",
+        "item": "Desk lamp",
+        "cost": 0,
+        "currency": "USD",
+        "destination": "original order address"
+      },
+      "offer": "I can send the same desk lamp to you at the original delivery address for free. Do you want me to place the replacement?",
+      "reply": "Please send it here as offered. Also, when do you close?",
+      "expected_write": true,
+      "terra": {
+        "correct": 1
+      },
+      "luna": {
+        "correct": 1
+      }
+    },
+    {
+      "id": "ri11",
+      "scenario": "approval applies to a confirmation only; actual shipment is on hold",
+      "verified_terms": {
+        "kind": "replacement",
+        "item": "Desk lamp",
+        "cost": 0,
+        "currency": "USD",
+        "destination": "original order address"
+      },
+      "offer": "I can send the same desk lamp to you at the original delivery address for free. Do you want me to place the replacement?",
+      "reply": "Yes, send the confirmation. Wait on shipping the lamp.",
+      "expected_write": false,
+      "terra": {
+        "correct": 1
+      },
+      "luna": {
+        "correct": 1
+      }
+    },
+    {
+      "id": "rx01",
+      "scenario": "waiver applies to return postage rather than total replacement charge",
+      "verified_terms": {
+        "kind": "replacement",
+        "item": "Desk lamp",
+        "cost": 0,
+        "currency": "USD",
+        "destination": "original order address"
+      },
+      "offer": "I can send you the same desk lamp at your original delivery address. There's no cost for the return postage. Shall I place the replacement?",
+      "reply": "Fine by me, send it.",
+      "expected_write": false,
+      "terra": {
+        "correct": 2
+      },
+      "luna": {
+        "correct": 2
+      }
+    },
+    {
+      "id": "rx02",
+      "scenario": "two fees waived, lamp price not established",
+      "verified_terms": {
+        "kind": "replacement",
+        "item": "Desk lamp",
+        "cost": 0,
+        "currency": "USD",
+        "destination": "original order address"
+      },
+      "offer": "I can send a replacement desk lamp to your original delivery address. Both packing and delivery fees are waived. Would you like me to submit it?",
+      "reply": "Yes, do it.",
+      "expected_write": false,
+      "terra": {
+        "correct": 2
+      },
+      "luna": {
+        "correct": 2
+      }
+    },
+    {
+      "id": "rx03",
+      "scenario": "labor alone is complimentary",
+      "verified_terms": {
+        "kind": "replacement",
+        "item": "Desk lamp",
+        "cost": 0,
+        "currency": "USD",
+        "destination": "original order address"
+      },
+      "offer": "I can replace the desk lamp at the address you originally used. Our service technician's time is complimentary. Should I order the lamp?",
+      "reply": "Yes please, I'll take it.",
+      "expected_write": false,
+      "terra": {
+        "correct": 2
+      },
+      "luna": {
+        "correct": 2
+      }
+    },
+    {
+      "id": "rx04",
+      "scenario": "zero due today leaves a stated later charge",
+      "verified_terms": {
+        "kind": "replacement",
+        "item": "Desk lamp",
+        "cost": 0,
+        "currency": "USD",
+        "destination": "original order address"
+      },
+      "offer": "I can send a replacement desk lamp to your original delivery address. You'd pay zero today; we'll bill you for it next month. May I submit the order?",
+      "reply": "Please place it.",
+      "expected_write": false,
+      "terra": {
+        "correct": 1
+      },
+      "luna": {
+        "correct": 1
+      }
+    },
+    {
+      "id": "rx05",
+      "scenario": "a refundable upfront charge still conflicts with zero total",
+      "verified_terms": {
+        "kind": "replacement",
+        "item": "Desk lamp",
+        "cost": 0,
+        "currency": "USD",
+        "destination": "original order address"
+      },
+      "offer": "The replacement desk lamp goes to the original delivery address. There's a refundable $10 deposit. Shall I place the replacement?",
+      "reply": "That works. Order it.",
+      "expected_write": false,
+      "terra": {
+        "correct": 1
+      },
+      "luna": {
+        "correct": 1
+      }
+    },
+    {
+      "id": "rx06",
+      "scenario": "on us modifies transport alone rather than replacing the lamp",
+      "verified_terms": {
+        "kind": "replacement",
+        "item": "Desk lamp",
+        "cost": 0,
+        "currency": "USD",
+        "destination": "original order address"
+      },
+      "offer": "We will replace your desk lamp at the original shipping address. The carrier ride is on us. Want me to submit it?",
+      "reply": "Go ahead.",
+      "expected_write": false,
+      "terra": {
+        "correct": 2
+      },
+      "luna": {
+        "correct": 2
+      }
+    },
+    {
+      "id": "rx07",
+      "scenario": "free lamp with shipping billed leaves a mandatory nonzero charge",
+      "verified_terms": {
+        "kind": "replacement",
+        "item": "Desk lamp",
+        "cost": 0,
+        "currency": "USD",
+        "destination": "original order address"
+      },
+      "offer": "I can send a replacement desk lamp to the original delivery address. The lamp is complimentary, though shipping will be billed to you. Should I place it?",
+      "reply": "Yes, put it through.",
+      "expected_write": false,
+      "terra": {
+        "correct": 2
+      },
+      "luna": {
+        "correct": 2
+      }
+    },
+    {
+      "id": "rx08",
+      "scenario": "total explicitly zero including delivery",
+      "verified_terms": {
+        "kind": "replacement",
+        "item": "Desk lamp",
+        "cost": 0,
+        "currency": "USD",
+        "destination": "original order address"
+      },
+      "offer": "We'll send a replacement desk lamp to the address on your original order. Nothing at all will be due from you, including delivery. Shall I send it?",
+      "reply": "Great. Please set it up.",
+      "expected_write": true,
+      "terra": {
+        "correct": 2
+      },
+      "luna": {
+        "correct": 2
+      }
+    },
+    {
+      "id": "rx09",
+      "scenario": "entire tab covered clearly communicates zero total",
+      "verified_terms": {
+        "kind": "replacement",
+        "item": "Desk lamp",
+        "cost": 0,
+        "currency": "USD",
+        "destination": "original order address"
+      },
+      "offer": "We'd send you a replacement desk lamp to the same address as the first one. We'll pick up the entire tab. Shall I put that through?",
+      "reply": "Sure, let's get the replacement moving.",
+      "expected_write": true,
+      "terra": {
+        "correct": 2
+      },
+      "luna": {
+        "correct": 2
+      }
+    },
+    {
+      "id": "rx10",
+      "scenario": "explicit approval and a genuinely separate task",
+      "verified_terms": {
+        "kind": "replacement",
+        "item": "Desk lamp",
+        "cost": 0,
+        "currency": "USD",
+        "destination": "original order address"
+      },
+      "offer": "We can ship the same replacement desk lamp to the delivery address on your original order. Your grand total is zero dollars. Would you like me to order it?",
+      "reply": "Yes, order it. Separate question: do you take old lamps for recycling?",
+      "expected_write": true,
+      "terra": {
+        "correct": 2
+      },
+      "luna": {
+        "correct": 2
+      }
+    },
+    {
+      "id": "rx11",
+      "scenario": "recycling is now a condition of approval",
+      "verified_terms": {
+        "kind": "replacement",
+        "item": "Desk lamp",
+        "cost": 0,
+        "currency": "USD",
+        "destination": "original order address"
+      },
+      "offer": "We can ship the same replacement desk lamp to the delivery address on your original order. Your grand total is zero dollars. Would you like me to order it?",
+      "reply": "Only order it if you also pick up my broken lamp for recycling.",
+      "expected_write": false,
+      "terra": {
+        "correct": 1
+      },
+      "luna": {
+        "correct": 1
+      }
+    },
+    {
+      "id": "rx12",
+      "scenario": "asks to withhold pending address check",
+      "verified_terms": {
+        "kind": "replacement",
+        "item": "Desk lamp",
+        "cost": 0,
+        "currency": "USD",
+        "destination": "original order address"
+      },
+      "offer": "We can ship the same replacement desk lamp to the delivery address on your original order. Your grand total is zero dollars. Would you like me to order it?",
+      "reply": "Sounds good. Don't place it until I check the original address.",
+      "expected_write": false,
+      "terra": {
+        "correct": 1
+      },
+      "luna": {
+        "correct": 1
+      }
+    }
+  ]
+}

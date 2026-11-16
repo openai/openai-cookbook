@@ -1,0 +1,21 @@
+"""Application-owned policy definitions."""
+
+from .models import PolicyDefinition, PolicyReference
+
+_TRUSTED_POLICY_PAYLOADS = __TRUSTED_POLICY_PAYLOADS__
+_TRUSTED_POLICIES = {
+    key: PolicyDefinition.model_validate(value)
+    for key, value in _TRUSTED_POLICY_PAYLOADS.items()
+}
+
+
+def load_trusted_policy(
+    reference: PolicyReference,
+) -> PolicyDefinition:
+    key = f"{reference.policyId}:{reference.version}"
+    policy = _TRUSTED_POLICIES.get(key)
+    if policy is None:
+        raise ValueError(
+            f"No application-owned policy is registered for {key}."
+        )
+    return policy.model_copy(deep=True)

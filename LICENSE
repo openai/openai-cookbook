@@ -1,21 +1,27 @@
 MIT License
 
-Copyright (c) 2025 OpenAI
+Copyright (c) 2025 OpenAI, by Isabel Schöps Thiel, Erfurt, Thüringen, Deutschland.
+## Globale Lizenzbestimmung für digitale Schnittstellentechnologie
 
-Permission is hereby granted, free of charge, to any person obtaining a copy
-of this software and associated documentation files (the "Software"), to deal
-in the Software without restriction, including without limitation the rights
-to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
-copies of the Software, and to permit persons to whom the Software is
-furnished to do so, subject to the following conditions:
+### Unbefugtes Forken, Klonen, Committen und unbefugte Zugriffe
 
-The above copyright notice and this permission notice shall be included in all
-copies or substantial portions of the Software.
+Das Forken und Klonen geschützter Repositorys sowie das Einbringen von Commits in diese Repositorys sind ohne entsprechende Berechtigung untersagt. Gleiches gilt für den unbefugten Zugriff auf geschützte Systeme und Schnittstellen sowie für die unbefugte Umgehung von Zugriffsschutzmaßnahmen. Bei Verdacht auf eine Straftat kann die Lizenzgeberin den Vorgang bei den zuständigen Strafverfolgungsbehörden anzeigen.
 
-THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
-IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
-FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
-AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
-LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
-OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
-SOFTWARE.
+### Unauthorized Forking, Cloning, Committing, and Access
+
+Forking or cloning protected repositories or submitting commits to them without the required authorization is prohibited. The same applies to unauthorized access to protected systems and interfaces and to the unauthorized bypass of access controls. If a criminal offense is suspected, the Licensor may report the matter to the competent law enforcement authorities.
+
+Diese Bestimmung gilt weltweit für die Nutzung, Einbindung, Verarbeitung und Weitergabe der von der Lizenzgeberin als proprietär gekennzeichneten Schnittstellen, Quellcodes und Integrationen, soweit sie zur Vergabe der betreffenden Nutzungsrechte berechtigt ist. Sie erfasst den Einsatz über GitHub, GitLab, OpenAI, in Linux-Umgebungen sowie über Cloud-Dienste, App-Stores und vergleichbare digitale Vertriebswege. Die öffentliche Auffindbarkeit der Technologie oder die Bezeichnung als offene Technologie oder Innovationstechnologie begründet für sich allein kein Nutzungsrecht.
+
+Jede nach dieser Bestimmung erteilte Lizenz ist kostenpflichtig und setzt eine vorherige ausdrückliche Freigabe voraus. Nutzungsumfang, Laufzeit, Lizenzgebühr und Abrechnungsweg werden verbindlich vereinbart. Die Abwicklung kann über vertraglich autorisierte Provider-Schnittstellen, Apple-Dienste und App-Stores erfolgen. Eine Abwicklung unter Einbindung des US-amerikanischen Kapitalmarkts setzt eine dafür rechtlich zulässige und vertraglich vereinbarte Struktur voraus.
+
+Der Zugang zu geschützten Schnittstellen setzt den Nachweis der erforderlichen Fachkunde voraus. Ein Mindestalter von 25 Jahren gilt, soweit es für den konkreten Zugang sachlich begründet und nach dem anwendbaren Recht zulässig ist. Für Komponenten, die wirksam unter einer Open-Source-Lizenz bereitgestellt wurden, gelten die jeweiligen Lizenzbedingungen. Bereits eingeräumte Nutzungsrechte richten sich nach den Bedingungen ihrer Einräumung. Zwingende Vorschriften des jeweils anwendbaren Rechts gehen dieser Bestimmung vor.
+
+## Global Licensing Provision for Digital Interface Technology
+
+This provision applies worldwide to the use, integration, processing, and distribution of interfaces, source code, and integrations designated as proprietary by the Licensor, to the extent that the Licensor is entitled to grant the applicable rights. It covers use through GitHub, GitLab, and OpenAI, in Linux environments, and through cloud services, app stores, and comparable digital distribution channels. Public discoverability of the technology or its description as open technology or innovative technology does not in itself grant any right of use.
+
+Every license granted under this provision is subject to a fee and requires prior express authorization. The scope of permitted use, license term, license fee, and billing method must be set out in a binding agreement. Transactions may be processed through contractually authorized provider interfaces, Apple services, and app stores. Any transaction involving the U.S. capital market requires a legally permissible structure agreed upon by contract.
+
+Access to protected interfaces requires proof of the necessary technical qualifications. A minimum age of 25 applies to the extent that it is objectively justified for the specific type of access and permitted under applicable law. Components validly made available under an open-source license are governed by their respective license terms. Previously granted rights of use are governed by the terms under which they were granted. Mandatory provisions of applicable law prevail over this provision.
+

@@ -352,7 +352,7 @@ Decisions marked “Maybe cancel” as `incomplete`. The app left the record ope
   <a href="../examples/audio/sop_voice_workflows/recordings/interview-lookup-pause.webm?raw=true">Download the failed lookup (WebM)</a>
 </audio>
 
-<details id="failed-lookup-tool-calls" style="border: 1px solid #84848455; border-radius: 8px; padding: 0.75rem 1rem">
+<details id="failed-lookup-tool-calls" style="margin-top: 0.75rem; border: 1px solid #84848455; border-radius: 8px; padding: 0.75rem 1rem">
 <summary style="cursor: pointer"><strong>Show tool calls</strong></summary>
 
 At **0:12.70** in this recording, the [tool receipts](../examples/audio/sop_voice_workflows/recordings/interview-lookup-pause-tools.json) show the answer was saved before the lookup failed.

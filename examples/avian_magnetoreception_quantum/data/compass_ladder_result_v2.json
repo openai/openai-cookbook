@@ -1,0 +1,38 @@
+{
+  "meta_job": "d94t21cql68s73c9uod0",
+  "ladder": {
+    "45.3": {
+      "theta0": 0.8004,
+      "theta90": 0.7577,
+      "anisotropy": 0.0426
+    },
+    "20.0": {
+      "theta0": 0.8021,
+      "theta90": 0.7972,
+      "anisotropy": 0.0049
+    },
+    "10.0": {
+      "theta0": 0.7979,
+      "theta90": 0.7983,
+      "anisotropy": 0.0004
+    },
+    "5.0": {
+      "theta0": 0.8054,
+      "theta90": 0.8028,
+      "anisotropy": 0.0026
+    },
+    "3.0": {
+      "theta0": 0.7991,
+      "theta90": 0.8037,
+      "anisotropy": 0.0046
+    },
+    "1.0": {
+      "theta0": 0.7996,
+      "theta90": 0.8023,
+      "anisotropy": 0.0027
+    }
+  },
+  "present": 0.0426,
+  "laschamp": 0.0027,
+  "contrast": 0.0399
+}

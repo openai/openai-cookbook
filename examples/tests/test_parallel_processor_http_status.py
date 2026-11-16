@@ -11,6 +11,7 @@ import sys
 import tempfile
 import unittest
 from pathlib import Path
+from types import SimpleNamespace
 from unittest.mock import patch
 
 SPEC = importlib.util.spec_from_file_location(
@@ -128,6 +129,74 @@ class HTTPStatusTests(unittest.IsolatedAsyncioTestCase):
         await self.call(503, ValueError("Synthetic non-JSON body"))
         self.assertIs(self.queue.get_nowait(), self.request)
         self.assertEqual(self.tracker.num_other_errors, 1)
+        self.assertEqual(self.tracker.num_tasks_succeeded, 0)
+        self.assertFalse(self.output.exists())
+
+    async def test_non_json_429_retries_and_sets_cooldown(self):
+        errors = [
+            json.JSONDecodeError(
+                "Expecting value", "<html>Too many requests</html>", 0
+            ),
+            processor.aiohttp.ContentTypeError(
+                SimpleNamespace(real_url="https://example.invalid/v1/embeddings"),
+                (),
+                message="Attempt to decode JSON with unexpected mimetype: text/html",
+            ),
+        ]
+        self.request.attempts_left = 1
+        for error in errors:
+            with self.subTest(error=type(error).__name__):
+                with patch.object(processor.time, "time", return_value=12345):
+                    await self.call(429, error)
+                self.assertEqual(self.tracker.time_of_last_rate_limit_error, 12345)
+                self.assertIs(self.queue.get_nowait(), self.request)
+                self.assertIs(self.request.result[-1], error)
+        self.assertEqual(self.tracker.num_rate_limit_errors, 2)
+        self.assertEqual(self.tracker.num_api_errors, 0)
+        self.assertEqual(self.tracker.num_other_errors, 0)
+        self.assertEqual(self.tracker.num_tasks_in_progress, 1)
+        self.assertEqual(self.tracker.num_tasks_failed, 0)
+        self.assertEqual(self.tracker.num_tasks_succeeded, 0)
+        self.assertFalse(self.output.exists())
+
+    async def test_non_json_429_exhaustion_saves_decode_error(self):
+        error = json.JSONDecodeError(
+            "Expecting value", "<html>Too many requests</html>", 0
+        )
+        with patch.object(processor.time, "time", return_value=12345):
+            await self.call(429, error)
+        self.assertEqual(self.tracker.time_of_last_rate_limit_error, 12345)
+        self.assertEqual(self.tracker.num_rate_limit_errors, 1)
+        self.assertEqual(self.tracker.num_api_errors, 0)
+        self.assertEqual(self.tracker.num_other_errors, 0)
+        self.assertEqual(self.tracker.num_tasks_failed, 1)
+        self.assertEqual(self.tracker.num_tasks_in_progress, 0)
+        self.assertEqual(self.tracker.num_tasks_succeeded, 0)
+        self.assertTrue(self.queue.empty())
+        self.assertEqual(self.record(), [str(error)])
+
+    async def test_non_json_2xx_still_uses_exception_retry_path(self):
+        self.request.attempts_left = 1
+        await self.call(
+            200, json.JSONDecodeError("Expecting value", "<html></html>", 0)
+        )
+        self.assertIs(self.queue.get_nowait(), self.request)
+        self.assertEqual(self.tracker.num_other_errors, 1)
+        self.assertEqual(self.tracker.num_rate_limit_errors, 0)
+        self.assertEqual(self.tracker.time_of_last_rate_limit_error, 0)
+        self.assertEqual(self.tracker.num_tasks_succeeded, 0)
+        self.assertFalse(self.output.exists())
+
+    async def test_transport_failure_before_response_is_other_error(self):
+        self.request.attempts_left = 1
+        with patch.object(
+            Session, "post", side_effect=OSError("Synthetic connection failure")
+        ):
+            await self.call(429, {})
+        self.assertIs(self.queue.get_nowait(), self.request)
+        self.assertEqual(self.tracker.num_other_errors, 1)
+        self.assertEqual(self.tracker.num_rate_limit_errors, 0)
+        self.assertEqual(self.tracker.time_of_last_rate_limit_error, 0)
         self.assertEqual(self.tracker.num_tasks_succeeded, 0)
         self.assertFalse(self.output.exists())
 

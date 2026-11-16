@@ -311,6 +311,7 @@ class APIRequest:
         """Calls the OpenAI API and saves results."""
         logging.info(f"Starting request #{self.task_id}")
         error = None
+        response_status = None
         try:
             async with session.post(
                 url=request_url, headers=request_header, json=self.request_json
@@ -345,7 +346,11 @@ class APIRequest:
             Exception
         ) as e:  # catching naked exceptions is bad practice, but in this case we'll log & save them
             logging.warning(f"Request {self.task_id} failed with Exception {e}")
-            status_tracker.num_other_errors += 1
+            if response_status == 429:
+                status_tracker.time_of_last_rate_limit_error = time.time()
+                status_tracker.num_rate_limit_errors += 1
+            else:
+                status_tracker.num_other_errors += 1
             error = e
         if error:
             self.result.append(error)

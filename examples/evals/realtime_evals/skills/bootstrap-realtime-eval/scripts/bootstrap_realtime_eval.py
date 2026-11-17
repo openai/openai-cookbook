@@ -176,8 +176,9 @@ def parse_json_array(json_text: str) -> list[dict[str, Any]]:
         raise ValueError("Expected a JSON array.")
     normalized: list[dict[str, Any]] = []
     for item in parsed:
-        if isinstance(item, dict):
-            normalized.append(item)
+        if not isinstance(item, dict):
+            raise ValueError("Expected a JSON array of objects.")
+        normalized.append(item)
     return normalized
 
 
@@ -735,6 +736,10 @@ def main() -> None:
         output_dir.relative_to(HARNESS_ROOT)
     except ValueError as exc:
         raise ValueError(f"Output directory must live under {HARNESS_ROOT}") from exc
+
+    # Validate user-supplied mocks before --force can remove an existing eval.
+    if args.harness == "run" and args.tool_mocks_json.strip():
+        parse_json_array(args.tool_mocks_json.strip())
 
     if output_dir.exists():
         if not args.force:

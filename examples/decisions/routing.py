@@ -1,5 +1,6 @@
 """Shared data, request, and response helpers for the Decisions routing demo."""
 
+import http.client
 import json
 import os
 from pathlib import Path
@@ -105,7 +106,7 @@ def request_prediction(message, *, api_key=None):
             result = json.load(response)
     except urllib.error.HTTPError as error:
         raise RuntimeError(f"Decisions request failed with HTTP {error.code}; no automatic retry") from None
-    except urllib.error.URLError:
+    except (OSError, http.client.HTTPException):
         raise RuntimeError("Decisions network request failed; no automatic retry") from None
     except json.JSONDecodeError:
         raise RuntimeError("Decisions returned invalid JSON; no automatic retry") from None

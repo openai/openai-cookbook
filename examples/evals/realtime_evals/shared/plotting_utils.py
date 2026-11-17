@@ -518,14 +518,18 @@ def _plot_status_donut(axis: plt.Axes, results: pd.DataFrame) -> None:
             )
         return
 
-    pie_result = axis.pie(
-        values,
-        colors=colors,
-        startangle=92,
-        counterclock=False,
-        wedgeprops={"edgecolor": EDGE, "linewidth": 1.2, "width": 0.42},
-        autopct=lambda pct: f"{pct:.0f}%" if pct >= 5 else "",
-        textprops={"color": TEXT, "fontsize": 11},
+    # matplotlib 3.11 returns a PieContainer (no __len__) instead of a tuple;
+    # materialize to a tuple so len()/indexing work on both 3.10 and 3.11+.
+    pie_result = tuple(
+        axis.pie(
+            values,
+            colors=colors,
+            startangle=92,
+            counterclock=False,
+            wedgeprops={"edgecolor": EDGE, "linewidth": 1.2, "width": 0.42},
+            autopct=lambda pct: f"{pct:.0f}%" if pct >= 5 else "",
+            textprops={"color": TEXT, "fontsize": 11},
+        )
     )
     wedges = pie_result[0]
     autotexts = pie_result[2] if len(pie_result) == 3 else []

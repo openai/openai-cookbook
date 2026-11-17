@@ -1,0 +1,50 @@
+{
+  "case_01": {
+    "listing_color": "match",
+    "listing_detail": "match",
+    "campaign_product": "match",
+    "campaign_disclosure": "match"
+  },
+  "case_02": {
+    "listing_color": "mismatch",
+    "listing_detail": "mismatch",
+    "campaign_product": "match",
+    "campaign_disclosure": "match"
+  },
+  "case_03": {
+    "listing_color": "insufficient_evidence",
+    "listing_detail": "insufficient_evidence",
+    "campaign_product": "match",
+    "campaign_disclosure": "match"
+  },
+  "case_04": {
+    "listing_color": "match",
+    "listing_detail": "match",
+    "campaign_product": "mismatch",
+    "campaign_disclosure": "match"
+  },
+  "case_05": {
+    "listing_color": "match",
+    "listing_detail": "match",
+    "campaign_product": "match",
+    "campaign_disclosure": "match"
+  },
+  "case_06": {
+    "listing_color": "match",
+    "listing_detail": "insufficient_evidence",
+    "campaign_product": "match",
+    "campaign_disclosure": "match"
+  },
+  "case_07": {
+    "listing_color": "match",
+    "listing_detail": "match",
+    "campaign_product": "match",
+    "campaign_disclosure": "mismatch"
+  },
+  "case_08": {
+    "listing_color": "mismatch",
+    "listing_detail": "mismatch",
+    "campaign_product": "mismatch",
+    "campaign_disclosure": "match"
+  }
+}

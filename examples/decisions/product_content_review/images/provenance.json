@@ -1,0 +1,14 @@
+{
+  "created": "2026-11-16",
+  "source": "Original images generated with OpenAI image generation",
+  "products": "Fictional. No retailer images or customer records.",
+  "labels": "Author-reviewed illustrative labels, not a production benchmark.",
+  "files": {
+    "backpack_reference.png": "1e031aa2d111a58040b5e00f774cabce494896e51f76f4c993029c49fe8db6a7",
+    "backpack_campaign.png": "9f0b36e98ba422fa89b14bd5a11886ad1c84b9965bad9b9c70aab056a36d3cca",
+    "tote_reference.png": "196fa53522b4ac1fc20f5e125d91b1aed9abdbfabdc2129aa1a478803e157f6b",
+    "tote_campaign.png": "d388c734ef1ef0a1f3dbb6aba83681c245c26a74960566f62a3034f730e68d1e",
+    "closed_package.png": "d8d9666251d93c2dcf087ddb8444ee4b112d08963815c1d06022d68a0841a8dc",
+    "tote_rear.png": "8e6f941aca75e93eb83c5bdd5534f33bf210c4c731d5b4d15cfc1d279a82d03f"
+  }
+}

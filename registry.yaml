@@ -3898,3 +3898,14 @@
     - evals
     - agents
     - responses
+
+- title: Catch catalog and campaign mismatches with the Decisions API
+  path: examples/decisions/product_content_review/product_content_review.ipynb
+  slug: decisions_product_content_review
+  description: Review product photos and campaign assets against catalog JSON and approved references, preserve insufficient evidence, and measure review errors against local labels.
+  date: "2026-11-16"
+  authors:
+    - neusebius-oai
+  tags:
+    - vision
+    - evals

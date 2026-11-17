@@ -1,0 +1,96 @@
+{
+  "products": {
+    "daypack": {
+      "reference_image": "images/backpack_reference.png",
+      "catalog": {
+        "product_name": "Weekend daypack",
+        "bag_color": "navy blue",
+        "visible_front_detail": "one large rectangular zippered front pocket",
+        "required_disclosure": "Illustrative product image"
+      }
+    },
+    "tote": {
+      "reference_image": "images/tote_reference.png",
+      "catalog": {
+        "product_name": "Everyday tote",
+        "bag_color": "cream off-white",
+        "visible_front_detail": "one large round orange patch on the front",
+        "required_disclosure": "Illustrative product image"
+      }
+    }
+  },
+  "cases": [
+    {
+      "id": "case_01",
+      "title": "Consistent daypack content",
+      "product_id": "daypack",
+      "group": "daypack",
+      "listing_image": "images/backpack_reference.png",
+      "listing_view": "front",
+      "campaign_image": "images/backpack_campaign.png"
+    },
+    {
+      "id": "case_02",
+      "title": "Listing photo from a different product",
+      "product_id": "daypack",
+      "group": "daypack",
+      "listing_image": "images/tote_reference.png",
+      "listing_view": "front",
+      "campaign_image": "images/backpack_campaign.png"
+    },
+    {
+      "id": "case_03",
+      "title": "Product hidden inside its package",
+      "product_id": "daypack",
+      "group": "daypack",
+      "listing_image": "images/closed_package.png",
+      "listing_view": "packaged",
+      "campaign_image": "images/backpack_campaign.png"
+    },
+    {
+      "id": "case_04",
+      "title": "Campaign uses an unapproved product",
+      "product_id": "daypack",
+      "group": "daypack",
+      "listing_image": "images/backpack_reference.png",
+      "listing_view": "front",
+      "campaign_image": "images/tote_campaign.png"
+    },
+    {
+      "id": "case_05",
+      "title": "Consistent tote content",
+      "product_id": "tote",
+      "group": "tote",
+      "listing_image": "images/tote_reference.png",
+      "listing_view": "front",
+      "campaign_image": "images/tote_campaign.png"
+    },
+    {
+      "id": "case_06",
+      "title": "Rear view cannot establish a front detail",
+      "product_id": "tote",
+      "group": "tote",
+      "listing_image": "images/tote_rear.png",
+      "listing_view": "rear",
+      "campaign_image": "images/tote_campaign.png"
+    },
+    {
+      "id": "case_07",
+      "title": "Campaign photo is missing required copy",
+      "product_id": "tote",
+      "group": "tote",
+      "listing_image": "images/tote_reference.png",
+      "listing_view": "front",
+      "campaign_image": "images/tote_reference.png"
+    },
+    {
+      "id": "case_08",
+      "title": "Listing and campaign both use a different product",
+      "product_id": "tote",
+      "group": "tote",
+      "listing_image": "images/backpack_reference.png",
+      "listing_view": "front",
+      "campaign_image": "images/backpack_campaign.png"
+    }
+  ]
+}

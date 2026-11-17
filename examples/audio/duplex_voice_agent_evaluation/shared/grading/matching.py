@@ -17,11 +17,18 @@ def expected_arguments_match(expected: Mapping[str, Any], actual: Mapping[str, A
     """Match required argument subsets recursively without confusing booleans and numbers."""
 
     def matches(wanted: Any, observed: Any) -> bool:
-        if isinstance(wanted, Mapping):
-            return isinstance(observed, Mapping) and expected_arguments_match(wanted, observed)
-        if isinstance(wanted, list):
+        if wanted is None or observed is None:
+            return wanted is observed
+        if isinstance(wanted, Mapping) or isinstance(observed, Mapping):
             return (
-                isinstance(observed, list)
+                isinstance(wanted, Mapping)
+                and isinstance(observed, Mapping)
+                and expected_arguments_match(wanted, observed)
+            )
+        if isinstance(wanted, list) or isinstance(observed, list):
+            return (
+                isinstance(wanted, list)
+                and isinstance(observed, list)
                 and len(wanted) <= len(observed)
                 and all(matches(left, right) for left, right in zip(wanted, observed, strict=False))
             )

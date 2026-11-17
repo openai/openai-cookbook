@@ -4,9 +4,9 @@ People are writing great tools and papers for improving outputs from GPT. Here a
 
 ## Prompting libraries & tools (in alphabetical order)
 
-- [Arthur Shield](https://www.arthur.ai/get-started): A paid product for detecting toxicity, hallucination, prompt injection, etc.
+- [Arthur Shield](https://www.arthur.ai/product/shield): A paid product for detecting toxicity, hallucination, prompt injection, etc.
 - [Baserun](https://baserun.ai/): A paid product for testing, debugging, and monitoring LLM-based apps
-- [Chainlit](https://docs.chainlit.io/overview): A Python library for making chatbot interfaces.
+- [Chainlit](https://docs.chainlit.io/get-started/overview): A Python library for making chatbot interfaces.
 - [ElatoAI](https://github.com/akdeb/ElatoAI): A platform for running OpenAI Realtime API Speech on ESP32 on Arduino using Deno Edge Runtime and Supabase.
 - [Embedchain](https://github.com/embedchain/embedchain): A Python library for managing and syncing unstructured data with LLMs.
 - [FLAML (A Fast Library for Automated Machine Learning & Tuning)](https://microsoft.github.io/FLAML/docs/Getting-Started/): A Python library for automating selection of models, hyperparameters, and other tunable choices.

@@ -3898,3 +3898,9 @@
     - evals
     - agents
     - responses
+- title: "Before Your Agent Pays: Run a Conformity Check and Get Certified"
+  path: examples/agents_sdk/conformity_check_before_payment.ipynb
+  slug: conformity-check-before-payment
+  tags: [agents, function-calling, evaluation, commerce]
+  authors: [provecart]
+  date: "2026-11-04"

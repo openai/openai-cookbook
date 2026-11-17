@@ -4,9 +4,23 @@ import json
 import tempfile
 import threading
 from pathlib import Path
-from typing import Any
+from typing import Any, TypeVar
 
-from .models import Deployment, Project
+from .models import TCP_PORT_MAX, TCP_PORT_MIN, Deployment, Project
+
+
+ModelT = TypeVar("ModelT", Project, Deployment)
+
+
+def _load_persisted_record(model: type[ModelT], value: Any) -> ModelT:
+    if isinstance(value, dict):
+        legacy_port = value.get("port")
+        if type(legacy_port) is int and not (TCP_PORT_MIN <= legacy_port <= TCP_PORT_MAX):
+            # Keep old records available for inspection or deletion while new writes
+            # continue to use the model's strict TCP-port validation.
+            parsed = model.model_validate({**value, "port": TCP_PORT_MIN})
+            return parsed.model_copy(update={"port": legacy_port})
+    return model.model_validate(value)
 
 
 class Store:
@@ -44,12 +58,12 @@ class Store:
 
     def list_projects(self) -> list[Project]:
         data = self._read()
-        return [Project.model_validate(value) for value in data["projects"].values()]
+        return [_load_persisted_record(Project, value) for value in data["projects"].values()]
 
     def get_project(self, project_id: str) -> Project | None:
         data = self._read()
         value = data["projects"].get(project_id)
-        return Project.model_validate(value) if value else None
+        return _load_persisted_record(Project, value) if value else None
 
     def upsert_project(self, project: Project) -> Project:
         with self._lock:
@@ -61,14 +75,14 @@ class Store:
     def list_deployments(self) -> list[Deployment]:
         data = self._read()
         return [
-            Deployment.model_validate(value)
+            _load_persisted_record(Deployment, value)
             for value in data["deployments"].values()
         ]
 
     def get_deployment(self, deployment_id: str) -> Deployment | None:
         data = self._read()
         value = data["deployments"].get(deployment_id)
-        return Deployment.model_validate(value) if value else None
+        return _load_persisted_record(Deployment, value) if value else None
 
     def upsert_deployment(self, deployment: Deployment) -> Deployment:
         with self._lock:

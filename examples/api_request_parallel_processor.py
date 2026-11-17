@@ -311,18 +311,31 @@ class APIRequest:
         """Calls the OpenAI API and saves results."""
         logging.info(f"Starting request #{self.task_id}")
         error = None
+        response_status = None
         try:
             async with session.post(
                 url=request_url, headers=request_header, json=self.request_json
             ) as response:
+                response_status = response.status
                 response = await response.json()
-            if "error" in response:
+            if not 200 <= response_status < 300 or "error" in response:
+                error = (
+                    response
+                    if isinstance(response, dict) and "error" in response
+                    else {
+                        "error": {
+                            "message": f"HTTP {response_status}",
+                            "response": response,
+                        }
+                    }
+                )
                 logging.warning(
-                    f"Request {self.task_id} failed with error {response['error']}"
+                    f"Request {self.task_id} failed with error {error['error']}"
                 )
                 status_tracker.num_api_errors += 1
-                error = response
-                if "rate limit" in response["error"].get("message", "").lower():
+                if response_status == 429 or "rate limit" in error["error"].get(
+                    "message", ""
+                ).lower():
                     status_tracker.time_of_last_rate_limit_error = time.time()
                     status_tracker.num_rate_limit_errors += 1
                     status_tracker.num_api_errors -= (
@@ -333,7 +346,11 @@ class APIRequest:
             Exception
         ) as e:  # catching naked exceptions is bad practice, but in this case we'll log & save them
             logging.warning(f"Request {self.task_id} failed with Exception {e}")
-            status_tracker.num_other_errors += 1
+            if response_status == 429:
+                status_tracker.time_of_last_rate_limit_error = time.time()
+                status_tracker.num_rate_limit_errors += 1
+            else:
+                status_tracker.num_other_errors += 1
             error = e
         if error:
             self.result.append(error)

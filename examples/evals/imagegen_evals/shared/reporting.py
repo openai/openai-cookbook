@@ -1,6 +1,7 @@
 from __future__ import annotations
 
 import json
+import uuid
 from collections import Counter
 from datetime import datetime, timezone
 from pathlib import Path
@@ -16,7 +17,8 @@ def ensure_dir(path: Path) -> None:
 def default_run_id(run_name: str) -> str:
     if run_name:
         return run_name
-    return datetime.now(timezone.utc).strftime("%Y%m%d_%H%M%S")
+    timestamp = datetime.now(timezone.utc).strftime("%Y%m%d_%H%M%S")
+    return f"{timestamp}_{uuid.uuid4().hex[:8]}"
 
 
 def summarize_results(results: list[dict[str, Any]]) -> dict[str, Any]:

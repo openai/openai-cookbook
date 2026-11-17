@@ -187,7 +187,7 @@ def _add_triplet_edge(
         # Handle self-loops for null objects
         graph.add_edge(
             subj_node, subj_node,
-            key=t["predicate"],
+            key=t["id"],
             **edge_attrs,
             literal_object=t["object_name"],
         )
@@ -199,6 +199,6 @@ def _add_triplet_edge(
         )
         graph.add_edge(
             subj_node, obj_node,
-            key=t["predicate"],
+            key=t["id"],
             **edge_attrs,
         )

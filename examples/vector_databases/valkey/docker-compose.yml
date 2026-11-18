@@ -1,0 +1,14 @@
+version: '3.8'
+services:
+
+  valkey-vector-db:
+    image: valkey/valkey-bundle:latest
+    ports:
+      - "6379:6379"
+      - "8001:8001"
+    healthcheck:
+      test: ["CMD", "valkey-cli", "-h", "localhost", "-p", "6379", "ping"]
+      interval: 2s
+      timeout: 1m30s
+      retries: 5
+      start_period: 5s

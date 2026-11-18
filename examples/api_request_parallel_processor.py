@@ -101,10 +101,23 @@ import os  # for reading API key
 import re  # for matching endpoint from request URL
 import tiktoken  # for counting tokens
 import time  # for sleeping after rate limit is hit
+from contextlib import asynccontextmanager
 from dataclasses import (
     dataclass,
     field,
 )  # for storing API inputs, outputs, and metadata
+
+
+@asynccontextmanager
+async def managed_api_tasks():
+    """Observe request failures and finish cleanup before closing the HTTP session."""
+    tasks = set()
+    try:
+        yield tasks
+    finally:
+        for task in tasks:
+            task.cancel()
+        await asyncio.gather(*tasks, return_exceptions=True)
 
 
 async def process_api_requests_from_file(
@@ -160,8 +173,14 @@ async def process_api_requests_from_file(
         # `requests` will provide requests one at a time
         requests = file.__iter__()
         logging.debug(f"File opened. Entering main loop")
-        async with aiohttp.ClientSession() as session:  # Initialize ClientSession here
+        async with aiohttp.ClientSession() as session, managed_api_tasks() as tasks:
             while True:
+                # Surface failures outside the request's HTTP retry handling.
+                for task in tuple(tasks):
+                    if task.done():
+                        tasks.remove(task)
+                        task.result()
+
                 # get next request (if one is not already waiting for capacity)
                 if next_request is None:
                     if not queue_of_requests_to_retry.empty():
@@ -220,14 +239,16 @@ async def process_api_requests_from_file(
                         next_request.attempts_left -= 1
 
                         # call API
-                        asyncio.create_task(
-                            next_request.call_api(
-                                session=session,
-                                request_url=request_url,
-                                request_header=request_header,
-                                retry_queue=queue_of_requests_to_retry,
-                                save_filepath=save_filepath,
-                                status_tracker=status_tracker,
+                        tasks.add(
+                            asyncio.create_task(
+                                next_request.call_api(
+                                    session=session,
+                                    request_url=request_url,
+                                    request_header=request_header,
+                                    retry_queue=queue_of_requests_to_retry,
+                                    save_filepath=save_filepath,
+                                    status_tracker=status_tracker,
+                                )
                             )
                         )
                         next_request = None  # reset next_request to empty

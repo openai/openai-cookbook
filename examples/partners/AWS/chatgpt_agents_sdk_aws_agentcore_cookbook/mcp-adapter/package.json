@@ -23,7 +23,7 @@
   "dependencies": {
     "@aws-sdk/client-bedrock-agentcore": "3.1109.0",
     "@modelcontextprotocol/ext-apps": "1.7.5",
-    "@modelcontextprotocol/sdk": "1.30.0",
+    "@modelcontextprotocol/sdk": "1.32.1",
     "zod": "3.25.76"
   },
   "devDependencies": {

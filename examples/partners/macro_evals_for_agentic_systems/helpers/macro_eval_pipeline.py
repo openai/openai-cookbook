@@ -479,19 +479,21 @@ def compute_topic_keywords(
     min_df: int = 2,
     ngram_range: tuple[int, int] = (1, 2),
 ) -> pd.DataFrame:
+    columns = [topic_column, "keywords", "weights", "document_count"]
     if documents_df.empty:
-        return pd.DataFrame(
-            columns=[topic_column, "keywords", "weights", "document_count"]
-        )
+        return pd.DataFrame(columns=columns)
 
-    working = documents_df[[topic_column, document_column]].copy()
+    working = documents_df[[topic_column, document_column]].reset_index(drop=True)
     working[document_column] = working[document_column].fillna("").astype(str)
     if CountVectorizer is None:
         raise RuntimeError("scikit-learn is required for keyword extraction.")
     vectorizer = CountVectorizer(
         stop_words="english", min_df=min_df, ngram_range=ngram_range
     )
-    dtm = vectorizer.fit_transform(working[document_column])
+    try:
+        dtm = vectorizer.fit_transform(working[document_column])
+    except ValueError:
+        return pd.DataFrame(columns=columns)
     terms = vectorizer.get_feature_names_out()
     rows = []
     for topic_id, topic_docs in working.groupby(topic_column, sort=False):
@@ -520,7 +522,7 @@ def compute_topic_keywords(
                 "document_count": int(topic_counts),
             }
         )
-    return pd.DataFrame(rows)
+    return pd.DataFrame(rows, columns=columns)
 
 
 def build_topic_labels(

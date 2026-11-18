@@ -1000,6 +1000,17 @@ def _normalize_finding_events(
     return rows
 
 
+def _event_sort_timestamp(value: Any) -> datetime | None:
+    if value is None or value == "":
+        return None
+    if isinstance(value, str):
+        return _parse_timestamp(value)
+    parsed = pd.to_datetime(value, utc=True, errors="coerce")
+    if pd.isna(parsed):
+        return None
+    return parsed.to_pydatetime()
+
+
 def _finalize_trace_events(
     trace_id: str | None,
     trace_events: list[dict[str, Any]],
@@ -1008,15 +1019,21 @@ def _finalize_trace_events(
     if not trace_events:
         return []
 
+    max_utc = datetime.max.replace(tzinfo=timezone.utc)
     trace_events = sorted(
         trace_events,
         key=lambda row: (
-            pd.Timestamp(row["ts"]) if row.get("ts") else pd.Timestamp.max,
+            (ts := _event_sort_timestamp(row.get("ts"))) is None,
+            ts or max_utc,
             row.get("sort_priority", 9),
             row.get("event_id") or "",
         ),
     )
 
+    last_timed_event = next(
+        (event for event in reversed(trace_events) if event.get("ts")),
+        None,
+    )
     total = len(trace_events)
     for sequence_index, row in enumerate(trace_events):
         row["sequence_index"] = sequence_index
@@ -1028,9 +1045,15 @@ def _finalize_trace_events(
         row["stage_label"] = STAGE_LABELS[stage_index]
         row["trace_outcome_hint"] = summary.get("terminal_state")
         row.pop("sort_priority", None)
-        if row["node_kind"] == "finding" and not row.get("ts"):
-            row["ts"] = trace_events[-1].get("ts")
-            row["ended_at"] = trace_events[-1].get("ended_at")
+        if (
+            row["node_kind"] == "finding"
+            and not row.get("ts")
+            and last_timed_event is not None
+        ):
+            row["ts"] = last_timed_event.get("ts")
+            row["ended_at"] = last_timed_event.get("ended_at") or last_timed_event.get(
+                "ts"
+            )
         if not row.get("event_id"):
             row["event_id"] = f"{trace_id}::event::{sequence_index}"
     return trace_events

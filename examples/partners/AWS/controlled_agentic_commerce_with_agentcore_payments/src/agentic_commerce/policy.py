@@ -192,6 +192,12 @@ class PolicyEngine:
                 "A human approval grant is required above the threshold.",
                 requires_human_approval=True,
             )
+        if now < approval.approved_at:
+            return self._deny(
+                "approval_not_yet_valid",
+                "The human approval grant is not yet valid.",
+                requires_human_approval=True,
+            )
         if now >= approval.expires_at:
             return self._deny(
                 "approval_expired",

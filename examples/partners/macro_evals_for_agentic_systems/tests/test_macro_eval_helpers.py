@@ -4,6 +4,7 @@ import sys
 from pathlib import Path
 
 import pandas as pd
+import pytest
 
 HELPERS_DIR = Path(__file__).resolve().parents[1] / "helpers"
 if str(HELPERS_DIR) not in sys.path:
@@ -74,6 +75,18 @@ def test_compute_topic_keywords_returns_schema_when_vocabulary_is_empty() -> Non
     assert result.empty
     labels = macro_eval_pipeline.build_topic_labels(result)
     assert labels.empty
+
+
+def test_compute_topic_keywords_propagates_invalid_vectorizer_config() -> None:
+    df = pd.DataFrame(
+        {
+            "topic_id": [0, 0],
+            "document_text": ["pricing drift msrp", "pricing drift quote"],
+        }
+    )
+
+    with pytest.raises(ValueError, match="Invalid value for ngram_range"):
+        macro_eval_pipeline.compute_topic_keywords(df, ngram_range=(2, 1))
 
 
 def test_normalize_bundle_sorts_untimed_findings_after_utc_spans_and_backfills_ts() -> None:

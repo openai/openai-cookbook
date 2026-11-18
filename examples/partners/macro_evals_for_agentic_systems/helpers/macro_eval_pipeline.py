@@ -492,8 +492,17 @@ def compute_topic_keywords(
     )
     try:
         dtm = vectorizer.fit_transform(working[document_column])
-    except ValueError:
-        return pd.DataFrame(columns=columns)
+    except ValueError as exc:
+        if any(
+            marker in str(exc)
+            for marker in (
+                "empty vocabulary",
+                "After pruning, no terms remain",
+                "max_df corresponds to < documents than min_df",
+            )
+        ):
+            return pd.DataFrame(columns=columns)
+        raise
     terms = vectorizer.get_feature_names_out()
     rows = []
     for topic_id, topic_docs in working.groupby(topic_column, sort=False):

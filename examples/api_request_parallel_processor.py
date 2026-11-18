@@ -403,6 +403,14 @@ def num_tokens_consumed_from_request(
             for message in request_json["messages"]:
                 num_tokens += 4  # every message follows <im_start>{role/name}\n{content}<im_end>\n
                 for key, value in message.items():
+                    if isinstance(value, list):  # content parts, e.g. text + images
+                        value = " ".join(
+                            part.get("text", "")
+                            for part in value
+                            if isinstance(part, dict)
+                        )
+                    if not isinstance(value, str):  # e.g. None or tool_calls
+                        continue
                     num_tokens += len(encoding.encode(value))
                     if key == "name":  # if there's a name, the role is omitted
                         num_tokens -= 1  # role is always required and always 1 token

@@ -45,6 +45,8 @@ def main() -> None:
 
     results = pd.read_csv(results_csv_path)
     summary = json.loads(summary_json_path.read_text(encoding="utf-8"))
+    if not isinstance(summary, dict):
+        raise ValueError(f"{summary_json_path} must contain a JSON object.")
     harness_label = args.harness_label or infer_harness_label(run_dir)
     run_label = args.run_label or run_dir.name
 

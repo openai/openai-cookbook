@@ -150,6 +150,7 @@ class CommerceApplication:
         if (
             not settlement.success
             or settlement.transaction != authorization.receipt.transaction
+            or settlement.network != authorization.receipt.network
         ):
             raise ProtocolError(
                 "settlement_receipt_mismatch",

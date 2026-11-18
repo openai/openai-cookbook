@@ -44,6 +44,8 @@ def evaluate(
             for grader in graders:
                 scored = grader.grade(response, case)
                 for score in _as_score_list(scored):
+                    if score.key in score_map:
+                        raise ValueError(f"Duplicate score key: {score.key}")
                     score_map[score.key] = score.value
                     reason_map[score.key] = score.reason
 

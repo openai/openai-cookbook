@@ -21,12 +21,13 @@ def get_changed_notebooks(base_ref: str = "origin/main") -> list[Path]:
 
 def is_valid_notebook(path: Path) -> bool:
     """
-    Checks if the notebook at the given path is valid by attempting to read it
-    with nbformat.
+    Checks if the notebook at the given path can be read and passes nbformat
+    schema validation.
     """
     try:
         with open(path, "r", encoding="utf-8") as f:
-            nbformat.read(f, as_version=4)
+            notebook = nbformat.read(f, as_version=4)
+        nbformat.validate(notebook)
         return True
     except Exception as e:
         print(f"{path}: INVALID - {e}")

@@ -1,0 +1,107 @@
+[
+    {
+        "hotel_information": {
+            "name": "Motel One Stuttgart-Bad Cannstatt",
+            "address": "Badstraße 20, 70372 Stuttgart"
+        },
+        "guest_information": {
+            "name": "Apimeister consulting GmbH",
+            "address": "Friedrichstrasse 123, 10117 Berlin, Germany"
+        },
+        "invoice_information": {
+            "date": "11.11.2019",
+            "invoice_number": "548113542",
+            "reservation_number": "548098589/1",
+            "room": "330",
+            "arrival": "11.11.2019",
+            "departure": "12.11.2019"
+        },
+        "charges": [
+            {
+                "guest": "Apimeister consulting GmbH",
+                "service": "Deposit 548113520/02 vom 11.11.19",
+                "VAT": "null",
+                "num": "-1",
+                "price_EUR": "90,50",
+                "amount_EUR": "-90,50"
+            },
+            {
+                "guest": "Apimeister consulting GmbH",
+                "service": "Frühstück",
+                "VAT": "19,00%",
+                "num": "1",
+                "price_EUR": "11,50",
+                "amount_EUR": "11,50"
+            },
+            {
+                "guest": "Apimeister consulting GmbH",
+                "service": "Lodging",
+                "VAT": "7,00%",
+                "num": "1",
+                "price_EUR": "79,00",
+                "amount_EUR": "79,00"
+            },
+            {
+                "guest": "Walter, Jens",
+                "room": "330",
+                "date_range": "11.11.2019 to 12.11.2019",
+                "service": "Best Price including Breakfast",
+                "VAT": "null",
+                "num": "1",
+                "price_EUR": "90,50",
+                "amount_EUR": "90,50"
+            },
+            {
+                "guest": "Walter, Jens",
+                "room": "330",
+                "date_range": "11.11.2019 to 12.11.2019",
+                "service": "Frühstück",
+                "VAT": "19,00%",
+                "num": "1",
+                "price_EUR": "11,50",
+                "amount_EUR": "11,50"
+            },
+            {
+                "guest": "Walter, Jens",
+                "room": "330",
+                "date_range": "11.11.2019 to 12.11.2019",
+                "service": "Lodging",
+                "VAT": "7,00%",
+                "num": "1",
+                "price_EUR": "79,00",
+                "amount_EUR": "79,00"
+            }
+        ],
+        "total_amount": {
+            "currency": "EUR",
+            "amount": "0,00"
+        },
+        "payment_information": {
+            "date": "null",
+            "payment": "null",
+            "card_number": "null",
+            "amount_currency": "null",
+            "payment_EUR": "null"
+        },
+        "balance_to_pay": {
+            "currency": "EUR",
+            "amount": "0,00"
+        },
+        "VAT_information": {
+            "19,00%": {
+                "net_amount_EUR": "0,00",
+                "VAT_amount_EUR": "0,00",
+                "VAT_gross_EUR": "0,00"
+            },
+            "7,00%": {
+                "net_amount_EUR": "0,00",
+                "VAT_amount_EUR": "0,00",
+                "VAT_gross_EUR": "0,00"
+            }
+        },
+        "staff_information": {
+            "name": "Sarah Golombiewski",
+            "position": "Front Office Agent"
+        }
+    }
+]

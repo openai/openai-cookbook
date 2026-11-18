@@ -170,3 +170,60 @@ def test_normalize_bundle_sorts_mixed_naive_and_utc_timestamps() -> None:
         "span-early-utc",
         "span-late-naive",
     ]
+
+
+def test_normalize_bundle_preserves_nanosecond_timestamp_order_with_untimed_finding() -> None:
+    bundle = {
+        "run": {
+            "run_id": "run-3",
+            "status": "failed",
+            "updated_at": None,
+            "summary": {
+                "terminal_state": "failed",
+                "findings": [
+                    {
+                        "code": "WHEEL_TRIM_CONFLICT",
+                        "severity": "error",
+                        "agent_name": "validation_agent",
+                        "message": "Wheel and trim conflict.",
+                    }
+                ],
+            },
+        },
+        "trace": {
+            "trace_id": "trace-3",
+            "started_at": "2026-03-01T10:00:00Z",
+            "ended_at": None,
+        },
+        "spans": [
+            {
+                "span_id": "a-later-ns",
+                "span_type": "handoff",
+                "agent_name": "router",
+                "started_at": "2026-03-01T10:00:00.000000200Z",
+                "ended_at": "2026-03-01T10:00:00.000000300Z",
+                "span_data": {"from_agent": "router", "to_agent": "validation_agent"},
+            },
+            {
+                "span_id": "z-earlier-ns",
+                "span_type": "function",
+                "agent_name": "router",
+                "started_at": "2026-03-01T10:00:00.000000100Z",
+                "ended_at": "2026-03-01T10:00:00.000000150Z",
+                "span_data": {"name": "lookup_trim"},
+            },
+        ],
+        "events": [],
+    }
+
+    _, events = data_prep.normalize_bundle(
+        bundle, {"status": "failed"}, 1, "bundle.json"
+    )
+
+    assert [event["event_id"] for event in events] == [
+        "z-earlier-ns",
+        "a-later-ns",
+        "finding::1",
+    ]
+    assert events[-1]["ts"] == "2026-03-01T10:00:00.000000200Z"
+    assert events[-1]["ended_at"] == "2026-03-01T10:00:00.000000300Z"

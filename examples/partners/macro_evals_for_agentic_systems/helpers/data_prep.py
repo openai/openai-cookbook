@@ -1000,15 +1000,40 @@ def _normalize_finding_events(
     return rows
 
 
-def _event_sort_timestamp(value: Any) -> datetime | None:
+_EPOCH_UTC = pd.Timestamp(0, tz="UTC")
+
+
+@lru_cache(maxsize=32768)
+def _parse_utc_pd_timestamp(value: str) -> pd.Timestamp | None:
+    try:
+        parsed = pd.Timestamp(value)
+    except ValueError:
+        parsed = pd.to_datetime(value, utc=True, errors="coerce")
+    if pd.isna(parsed):
+        return None
+    return (
+        parsed.tz_localize("UTC")
+        if parsed.tzinfo is None
+        else parsed.tz_convert("UTC")
+    )
+
+
+def _event_sort_timestamp(value: Any) -> pd.Timestamp | None:
     if value is None or value == "":
         return None
     if isinstance(value, str):
-        return _parse_timestamp(value)
-    parsed = pd.to_datetime(value, utc=True, errors="coerce")
+        return _parse_utc_pd_timestamp(value)
+    try:
+        parsed = pd.Timestamp(value)
+    except (TypeError, ValueError):
+        parsed = pd.to_datetime(value, utc=True, errors="coerce")
     if pd.isna(parsed):
         return None
-    return parsed.to_pydatetime()
+    return (
+        parsed.tz_localize("UTC")
+        if parsed.tzinfo is None
+        else parsed.tz_convert("UTC")
+    )
 
 
 def _finalize_trace_events(
@@ -1019,12 +1044,11 @@ def _finalize_trace_events(
     if not trace_events:
         return []
 
-    max_utc = datetime.max.replace(tzinfo=timezone.utc)
     trace_events = sorted(
         trace_events,
         key=lambda row: (
             (ts := _event_sort_timestamp(row.get("ts"))) is None,
-            ts or max_utc,
+            _EPOCH_UTC if ts is None else ts,
             row.get("sort_priority", 9),
             row.get("event_id") or "",
         ),

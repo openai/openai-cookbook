@@ -53,6 +53,9 @@ def generate_baseline_topk(
     dev_prompt: str,
     user_prompt: str,
 ) -> Path:
+    if concurrency < 1:
+        raise ValueError("concurrency must be at least 1")
+
     out = Path(output_dir)
     out.mkdir(parents=True, exist_ok=True)
 

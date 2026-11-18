@@ -15,7 +15,7 @@ def parse_date_str(value: str | datetime | None) -> datetime | None:
         return None
 
     if isinstance(value, datetime):
-        return value
+        return value if value.tzinfo is not None else value.replace(tzinfo=UTC)
 
     try:
         # Year Handling

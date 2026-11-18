@@ -90,7 +90,7 @@ export function buildApp(env = process.env, logger = console) {
   app.register(async (scopedApp) => {
     scopedApp.get("/media-stream", { websocket: true }, (connection, request) => {
       const socket = connection.socket ?? connection;
-      let callSid = null;
+      let activeCaller = null;
 
       if (!validateTwilioRequest(request, env, { protocol: "wss" })) {
         logger.warn?.("[twilio] rejected media stream with invalid signature");
@@ -106,7 +106,7 @@ export function buildApp(env = process.env, logger = console) {
 
         if (message.event === "start") {
           const custom = message.start?.customParameters ?? {};
-          callSid = custom.callSid ?? message.start?.callSid;
+          const callSid = custom.callSid ?? message.start?.callSid;
           const language = custom.language ?? "es";
           const languageLabel =
             custom.languageLabel ?? languageLabelForCode(language);
@@ -117,32 +117,47 @@ export function buildApp(env = process.env, logger = console) {
             return;
           }
 
-          room.addCaller(
-            createCaller({
-              callSid,
-              language,
-              languageLabel,
-              logger,
-              socket,
-              streamSid,
-            }),
-          );
+          if (activeCaller) {
+            room.removeCaller(activeCaller.callSid, activeCaller);
+          }
+
+          const nextCaller = createCaller({
+            callSid,
+            language,
+            languageLabel,
+            logger,
+            socket,
+            streamSid,
+          });
+          activeCaller = nextCaller;
+          try {
+            room.addCaller(nextCaller);
+          } catch (error) {
+            if (activeCaller === nextCaller) {
+              activeCaller = null;
+            }
+            logger.error?.(`[twilio:${callSid}] failed to add caller`, error);
+          }
           return;
         }
 
-        if (message.event === "media" && callSid && message.media?.payload) {
-          room.handleMedia(callSid, message.media.payload);
+        if (message.event === "media" && activeCaller && message.media?.payload) {
+          if (room.callers.get(activeCaller.callSid) === activeCaller) {
+            room.handleMedia(activeCaller.callSid, message.media.payload);
+          }
           return;
         }
 
-        if (message.event === "stop" && callSid) {
-          room.removeCaller(callSid);
+        if (message.event === "stop" && activeCaller) {
+          room.removeCaller(activeCaller.callSid, activeCaller);
+          activeCaller = null;
         }
       });
 
       socket.on("close", () => {
-        if (callSid) {
-          room.removeCaller(callSid);
+        if (activeCaller) {
+          room.removeCaller(activeCaller.callSid, activeCaller);
+          activeCaller = null;
         }
       });
     });

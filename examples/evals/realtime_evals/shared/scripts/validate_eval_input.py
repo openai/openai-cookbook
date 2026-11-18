@@ -105,8 +105,8 @@ def validate_walk_input(data_path: Path) -> None:
                 f"`audio_path` in row {row_index + 2} of {data_path} must be non-empty."
             )
         audio_path = resolve_path(audio_path_value, data_path.parent)
-        if not audio_path.exists():
-            raise ValueError(f"Audio file does not exist: {audio_path}")
+        if not audio_path.is_file():
+            raise ValueError(f"Audio path is not a file: {audio_path}")
         read_ulaw_wav(audio_path, EXPECTED_WALK_SAMPLE_RATE_HZ)
 
 
@@ -145,8 +145,8 @@ def _validate_run_simulation_file(
         ),
         ROOT_DIR,
     )
-    if not prompt_path.exists():
-        raise ValueError(f"Assistant system prompt file does not exist: {prompt_path}")
+    if not prompt_path.is_file():
+        raise ValueError(f"Assistant system prompt path is not a file: {prompt_path}")
 
     tools_path = resolve_path(
         _require_non_empty_string(
@@ -156,8 +156,8 @@ def _validate_run_simulation_file(
         ),
         ROOT_DIR,
     )
-    if not tools_path.exists():
-        raise ValueError(f"Assistant tools file does not exist: {tools_path}")
+    if not tools_path.is_file():
+        raise ValueError(f"Assistant tools path is not a file: {tools_path}")
 
     simulator_config = _coerce_mapping(
         simulation.get("simulator", {}),
@@ -258,9 +258,9 @@ def validate_run_input(data_path: Path) -> None:
     for row_index, row in simulation_index.iterrows():
         simulation_id = str(row["simulation_id"]).strip()
         simulation_path = resolve_path(str(row["simulation_path"]), data_path.parent)
-        if not simulation_path.exists():
+        if not simulation_path.is_file():
             raise ValueError(
-                f"`simulation_path` in row {row_index + 2} of {data_path} does not exist: "
+                f"`simulation_path` in row {row_index + 2} of {data_path} is not a file: "
                 f"{simulation_path}"
             )
         _validate_run_simulation_file(

@@ -21,15 +21,12 @@ Both models are **MXFP4 quantized** out of the box.
 ## Quick Setup
 
 1. **Install vLLM**  
-   vLLM recommends using [uv](https://docs.astral.sh/uv/) to manage your Python environment. This will help with picking the right implementation based on your environment. [Learn more in their quickstart](https://docs.vllm.ai/en/latest/getting_started/quickstart.html#installation). To create a new virtual environment and install vLLM run:
+   vLLM recommends using [uv](https://docs.astral.sh/uv/) to manage your Python environment. This will help with picking the right implementation based on your environment. [Learn more in their quickstart](https://docs.vllm.ai/en/latest/getting_started/quickstart.html#installation) or follow the [vLLM GPT-OSS recipe](https://docs.vllm.ai/projects/recipes/en/latest/OpenAI/GPT-OSS.html). To create a new virtual environment and install vLLM run:
 
 ```shell
 uv venv --python 3.12 --seed
 source .venv/bin/activate
-uv pip install --pre vllm==0.10.1+gptoss \
-    --extra-index-url https://wheels.vllm.ai/gpt-oss/ \
-    --extra-index-url https://download.pytorch.org/whl/nightly/cu128 \
-    --index-strategy unsafe-best-match
+uv pip install vllm --torch-backend=auto
 ```
 
 2. **Start up a server and download the model**  

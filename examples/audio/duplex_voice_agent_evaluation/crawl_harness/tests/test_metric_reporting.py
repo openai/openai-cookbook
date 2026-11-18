@@ -252,7 +252,7 @@ def test_tool_accuracy_matches_each_execution_to_at_most_one_expectation() -> No
         ),
     )
     metrics = build_metric_row(
-        task={},
+        task={"task_completed": False},
         efficiency={"unique_tool_invocation_count": 2, "matched_tool_call_count": len(matched)},
         interaction={},
         golden={"tool_calls": [{"count": 2}]},
@@ -282,7 +282,11 @@ def test_delegation_accuracy_measures_the_binary_delegation_decision(
     accuracy: float,
 ) -> None:
     metrics = build_metric_row(
-        task={"delegation_required": policy == "required", "delegation_prohibited": policy == "forbidden"},
+        task={
+            "task_completed": False,
+            "delegation_required": policy == "required",
+            "delegation_prohibited": policy == "forbidden",
+        },
         efficiency={"delegation_count": actual},
         interaction={},
         golden={"delegations": expected, "delegation_policy": policy},

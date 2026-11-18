@@ -38,6 +38,7 @@ from shared.paths import default_results_dir, package_path, require_external_out
 from shared.private_files import private_open
 from shared.reporting.results import build_results_report, build_timestamped_run_name, ensure_dir, write_json
 from shared.reporting.schema import SCHEMA_VERSION
+from shared.reporting.validation import result_status
 from shared.scenarios import Recording, Scenario, load_scenario_dataset, resolve_recording_path
 from shared.single_turn.console import SingleTurnConsoleEventLog
 from shared.single_turn.observability import (
@@ -754,14 +755,19 @@ def _failed_result(
             error_type=type(exc).__name__,
             error_message=str(exc),
         ),
+        task_metrics={"task_completed": False},
+        delegation_count=None,
         delegation_policy=scenario.expected.delegation,
     )
 
 
 def format_example_result(result: SingleTurnEvalResult) -> str:
-    status = (
-        "ERROR" if result.error_info.status != "ok" else "PASS" if result.task_metrics.get("task_completed") else "FAIL"
-    )
+    metric_row = result.to_result_row()
+    status = {
+        "infrastructure_error": "ERROR",
+        "passed": "PASS",
+        "failed": "FAIL",
+    }[result_status(metric_row, completed=metric_row["task_completed"])]
     assistant = result.assistant_turn_transcript or result.assistant_text or "[no assistant response]"
     lines = [f"  USER       {result.user_text}", f"  ASSISTANT  {assistant}"]
     if result.tool_executions:
@@ -770,7 +776,6 @@ def format_example_result(result: SingleTurnEvalResult) -> str:
             lines.append(f"  TOOL       {execution.get('name', 'unknown')} {arguments} [{execution.get('status')}]")
     else:
         lines.append("  TOOL       none")
-    metric_row = result.to_result_row()
     metrics = [status]
     for label, key in (("tool", "tool_accuracy"), ("response_rate", "response_rate")):
         value = metric_row.get(key)
@@ -797,8 +802,8 @@ def format_example_result(result: SingleTurnEvalResult) -> str:
         lines.append(f"  JUDGE      {' | '.join(semantic)}")
     elif result.semantic_grades:
         lines.append("  JUDGE      not assessed (offline fixture)")
-    if result.error_info.error_message:
-        lines.append(f"  ERROR      {result.error_info.failure_stage}: {result.error_info.error_message}")
+    if metric_row.get("error_message"):
+        lines.append(f"  ERROR      {metric_row['failure_stage']}: {metric_row['error_message']}")
     return "\n".join(lines)
 
 

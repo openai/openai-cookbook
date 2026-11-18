@@ -13,6 +13,12 @@ from typing import Any
 
 from shared.private_files import private_directory, private_write_text
 from shared.reporting.schema import SCHEMA_VERSION
+from shared.reporting.validation import (
+    ResultValidationError,
+    require_task_completed,
+    result_status,
+    validation_failure_row,
+)
 
 TASK_METRICS = (
     "task_completed",
@@ -46,14 +52,16 @@ def _count_pair(value: Any) -> dict[str, int] | None:
     if isinstance(value, Mapping):
         actual = value.get("actual")
         expected = value.get("expected")
-        if isinstance(actual, int) and isinstance(expected, int):
-            return {"actual": actual, "expected": expected}
-    if isinstance(value, str) and "/" in value:
+    elif isinstance(value, str) and "/" in value:
         actual, expected = value.split("/", maxsplit=1)
         try:
-            return {"actual": int(actual), "expected": int(expected)}
+            actual, expected = int(actual), int(expected)
         except ValueError:
             return None
+    else:
+        return None
+    if type(actual) is int and type(expected) is int and actual >= 0 and expected >= 0:
+        return {"actual": actual, "expected": expected}
     return None
 
 
@@ -112,13 +120,6 @@ def _artifact_path(value: Any, run_dir: Path) -> str | None:
         return str(path)
 
 
-def _status(row: Mapping[str, Any]) -> str:
-    raw_status = str(row.get("status", ""))
-    if raw_status in {"infrastructure_error", "failed"} and row.get("failure_stage"):
-        return "infrastructure_error"
-    return "passed" if bool(row.get("task_completed")) else "failed"
-
-
 def _semantic_quality(row: Mapping[str, Any]) -> dict[str, Any]:
     """Attach assessed semantic dimensions to task metrics without inventing offline grades."""
     raw = row.get("semantic_dimension_scores")
@@ -146,7 +147,8 @@ def build_result_item(
 ) -> dict[str, Any]:
     """Project one internal result row into the stable customer-facing schema."""
     task = {key: row.get(key) for key in TASK_METRICS}
-    task["task_completed"] = bool(task["task_completed"])
+    task["task_completed"] = require_task_completed(row)
+    status = result_status(row, completed=task["task_completed"])
     task["semantic_quality"] = _semantic_quality(row)
     task["tool_calls"] = _count_pair(task["tool_calls"])
     task["delegations"] = _count_pair(task["delegations"])
@@ -157,12 +159,16 @@ def build_result_item(
         if path := _artifact_path(row.get(source), run_dir):
             artifacts[target] = path
 
-    failure_stage = str(row.get("failure_stage", ""))
-    error_message = str(row.get("error_message", ""))
-    error = {"stage": failure_stage or "unknown", "message": error_message} if failure_stage or error_message else None
+    failure_stage = str(row.get("failure_stage") or "")
+    error_message = str(row.get("error_message") or "")
+    error = (
+        {"stage": failure_stage or "unknown", "message": error_message}
+        if status == "infrastructure_error" or failure_stage or error_message
+        else None
+    )
     item: dict[str, Any] = {
         "scenario_id": str(row.get(scenario_id_key, "")),
-        "status": _status(row),
+        "status": status,
         "metrics": {
             "task": task,
             "audio": {key: row.get(key) for key in AUDIO_METRICS},
@@ -212,15 +218,15 @@ def build_results_report(
     title_key: str | None = None,
 ) -> dict[str, Any]:
     """Build one run-level JSON document without derived percentiles."""
-    results = [
-        build_result_item(
-            row,
-            run_dir=run_dir,
-            scenario_id_key=scenario_id_key,
-            title_key=title_key,
-        )
-        for row in rows
-    ]
+    results = []
+    for row in rows:
+        try:
+            item = build_result_item(row, run_dir=run_dir, scenario_id_key=scenario_id_key, title_key=title_key)
+        except ResultValidationError as exc:
+            item = build_result_item(
+                validation_failure_row(row, exc), run_dir=run_dir, scenario_id_key=scenario_id_key, title_key=title_key
+            )
+        results.append(item)
     return {
         "schema_version": SCHEMA_VERSION,
         "run": {

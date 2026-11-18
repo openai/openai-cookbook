@@ -10,6 +10,7 @@ node_modules
 __pycache__
 .ruff_cache
 .DS_Store
+.git
 .env
 data
 uploads

@@ -274,13 +274,20 @@ def expected_args_subset(
     expected_args: Dict[str, Any], actual_args: Dict[str, Any]
 ) -> bool:
     def values_match(expected_value: Any, actual_value: Any) -> bool:
-        if isinstance(expected_value, dict):
-            if not isinstance(actual_value, dict):
+        if expected_value is None or actual_value is None:
+            return expected_value is actual_value
+
+        if isinstance(expected_value, dict) or isinstance(actual_value, dict):
+            if not isinstance(expected_value, dict) or not isinstance(
+                actual_value, dict
+            ):
                 return False
             return expected_args_subset(expected_value, actual_value)
 
-        if isinstance(expected_value, list):
-            if not isinstance(actual_value, list):
+        if isinstance(expected_value, list) or isinstance(actual_value, list):
+            if not isinstance(expected_value, list) or not isinstance(
+                actual_value, list
+            ):
                 return False
             if len(expected_value) > len(actual_value):
                 return False
@@ -305,12 +312,20 @@ def expected_args_subset(
         if key not in actual_args:
             return False
         actual_value = actual_args.get(key)
-        if key == "new_address":
+        if (
+            key == "new_address"
+            and isinstance(expected_value, str)
+            and isinstance(actual_value, str)
+        ):
             if normalize_address(str(expected_value)) != normalize_address(
                 str(actual_value)
             ):
                 return False
-        elif key == "order_id":
+        elif (
+            key == "order_id"
+            and isinstance(expected_value, str)
+            and isinstance(actual_value, str)
+        ):
             if normalize_order_id(str(expected_value)) != normalize_order_id(
                 str(actual_value)
             ):

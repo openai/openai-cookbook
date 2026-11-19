@@ -21,12 +21,13 @@ def _run_rag(query: str) -> str:
 
 
 def _summarize_rag_response(rag_output: str) -> str:
-    """Summarize the RAG response using GPT-4
+    """Summarize the RAG response using the configured model
     Args:
         rag_output: The RAG response
     """
     response = client.responses.create(
-        model="gpt-4.1-mini",
+        model="gpt-6-luna",
+        reasoning={"effort": "none"},
         tools=[{"type": "web_search_preview"}],
         input="Summarize the following text concisely: \n\n" + rag_output,
     )
@@ -52,7 +53,8 @@ def run_web_search(query: str) -> str:
     """
     print("[debug-server] run_web_search:", query)
     response = client.responses.create(
-        model="gpt-4.1-mini",
+        model="gpt-6-luna",
+        reasoning={"effort": "none"},
         tools=[{"type": "web_search_preview"}],
         input=query,
     )

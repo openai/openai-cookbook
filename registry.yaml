@@ -4,6 +4,19 @@
 # should build pages for, and indicates metadata such as tags, creation date and
 # authors for each page.
 
+- title: Record and replay Responses API tool-calling loops
+  path: examples/responses_api/record_and_replay_tool_loops/record_and_replay_tool_loops.ipynb
+  slug: record-and-replay-tool-loops
+  description: Record a Responses API function-calling loop to a cassette file, replay it offline without an API key, explain request mismatches with a diff, compare tool calls across recordings, and turn the cassette into a deterministic test.
+  date: '2026-11-19'
+  authors:
+    - nirholas
+  tags:
+    - responses
+    - functions
+    - agents
+    - evals
+
 - title: Build a voice agent that follows an SOP
   path: articles/sop_to_voice_agent_builder.md
   slug: sop-to-voice-agent-builder

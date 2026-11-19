@@ -97,6 +97,7 @@ import argparse  # for running script from command line
 import asyncio  # for running API calls concurrently
 import json  # for saving results to a jsonl file
 import logging  # for logging rate limit warnings and other messages
+import math  # for validating finite rate limits
 import os  # for reading API key
 import re  # for matching endpoint from request URL
 import tiktoken  # for counting tokens
@@ -119,10 +120,14 @@ async def process_api_requests_from_file(
     logging_level: int,
 ):
     """Processes API requests in parallel, throttling to stay under rate limits."""
-    if max_requests_per_minute <= 0:
-        raise ValueError("max_requests_per_minute must be greater than 0.")
-    if max_tokens_per_minute <= 0:
-        raise ValueError("max_tokens_per_minute must be greater than 0.")
+    if not math.isfinite(max_requests_per_minute) or max_requests_per_minute <= 0:
+        raise ValueError(
+            "max_requests_per_minute must be a finite number greater than 0."
+        )
+    if not math.isfinite(max_tokens_per_minute) or max_tokens_per_minute <= 0:
+        raise ValueError(
+            "max_tokens_per_minute must be a finite number greater than 0."
+        )
     if max_attempts < 1:
         raise ValueError("max_attempts must be at least 1.")
 

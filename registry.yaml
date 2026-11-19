@@ -4,6 +4,19 @@
 # should build pages for, and indicates metadata such as tags, creation date and
 # authors for each page.
 
+- title: Build a self-correcting text-to-3D pipeline with function calling and vision QA
+  path: examples/third_party/text_to_3d_with_function_calling.ipynb
+  slug: self-correcting-text-to-3d-function-calling-vision
+  description: Have a model plan a set of 3D props and generate each one with parallel function calls to the keyless three.ws text-to-3D API, then render every model, grade the render with vision into a strict structured-output verdict, and regenerate failures once from the critic's revised prompt.
+  date: 2026-11-19
+  authors:
+    - nirholas
+  tags:
+    - functions
+    - vision
+    - structured-outputs
+    - responses
+
 - title: Build a voice agent that follows an SOP
   path: articles/sop_to_voice_agent_builder.md
   slug: sop-to-voice-agent-builder

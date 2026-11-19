@@ -1,0 +1,20 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="500" height="185" viewBox="0 0 400 148" role="img" aria-labelledby="title desc">
+  <title id="title">Median backend time per caller turn</title>
+  <desc id="desc">Two horizontal bars start at zero on the same four-second scale. Terra took 2.88 seconds and Luna took 3.18 seconds. Each median includes tool round trips across 129 scripted caller turns.</desc>
+  <rect width="400" height="148" fill="white"/>
+  <g font-family="system-ui, sans-serif" fill="#202b29">
+    <text x="6" y="22" font-size="16.5" font-weight="600">Median backend time per caller turn</text>
+    <line x1="64" x2="64" y1="35" y2="111" stroke="#66736e"/>
+    <line x1="141.5" x2="141.5" y1="35" y2="111" stroke="#dee4e1"/>
+    <line x1="219" x2="219" y1="35" y2="111" stroke="#dee4e1"/>
+    <line x1="296.5" x2="296.5" y1="35" y2="111" stroke="#dee4e1"/>
+    <line x1="374" x2="374" y1="35" y2="111" stroke="#dee4e1"/>
+    <g><text x="7" y="59" font-size="17">Terra</text><rect data-model="Terra" x="64" y="42" width="223.40" height="20" fill="#477366"/><text x="295.39969309134176" y="59" font-size="16" font-weight="600">2.88 s</text></g>
+    <g><text x="7" y="95" font-size="17">Luna</text><rect data-model="Luna" x="64" y="78" width="246.62" height="20" fill="#477366"/><text x="318.61796450673137" y="95" font-size="16" font-weight="600">3.18 s</text></g>
+    <text x="64" y="130" text-anchor="middle" font-size="15" fill="#485650">0 s</text>
+    <text x="141.5" y="130" text-anchor="middle" font-size="15" fill="#485650">1 s</text>
+    <text x="219" y="130" text-anchor="middle" font-size="15" fill="#485650">2 s</text>
+    <text x="296.5" y="130" text-anchor="middle" font-size="15" fill="#485650">3 s</text>
+    <text x="374" y="130" text-anchor="middle" font-size="15" fill="#485650">4 s</text>
+  </g>
+</svg>

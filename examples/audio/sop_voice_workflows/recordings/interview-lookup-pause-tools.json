@@ -1,0 +1,146 @@
+[
+  {
+    "elapsed_ms": 108.274,
+    "media_ms": 0,
+    "direction": "application",
+    "event": {
+      "type": "app.tool",
+      "name": "get_next_question",
+      "arguments": {},
+      "operation_id": "session_01/open/initial",
+      "before": {
+        "answers": {
+          "day": "",
+          "shift": ""
+        },
+        "status": "active",
+        "revision": 0,
+        "completed": false,
+        "cancelled": false
+      },
+      "after": {
+        "answers": {
+          "day": "",
+          "shift": ""
+        },
+        "status": "active",
+        "revision": 0,
+        "completed": false,
+        "cancelled": false
+      },
+      "result": {
+        "status": "ok",
+        "step": "day",
+        "question": "Which start day works for you, Monday or Tuesday?",
+        "choices": [
+          "Monday",
+          "Tuesday"
+        ],
+        "operation_id": "session_01/open/initial",
+        "state": {
+          "answers": {
+            "day": "",
+            "shift": ""
+          },
+          "status": "active",
+          "revision": 0,
+          "completed": false,
+          "cancelled": false
+        }
+      },
+      "expected_revision": 0,
+      "turn": 0,
+      "source_event_id": "session_01/open"
+    }
+  },
+  {
+    "elapsed_ms": 14112.109,
+    "media_ms": 12700,
+    "direction": "application",
+    "event": {
+      "type": "app.tool",
+      "name": "record_answer",
+      "arguments": {
+        "question_id": "day",
+        "value": "Tuesday"
+      },
+      "operation_id": "event_02/save_day",
+      "before": {
+        "answers": {
+          "day": "",
+          "shift": ""
+        },
+        "status": "active",
+        "revision": 0,
+        "completed": false,
+        "cancelled": false
+      },
+      "after": {
+        "answers": {
+          "day": "Tuesday",
+          "shift": ""
+        },
+        "status": "active",
+        "revision": 1,
+        "completed": false,
+        "cancelled": false
+      },
+      "result": {
+        "status": "ok",
+        "changed": true,
+        "operation_id": "event_02/save_day",
+        "state": {
+          "answers": {
+            "day": "Tuesday",
+            "shift": ""
+          },
+          "status": "active",
+          "revision": 1,
+          "completed": false,
+          "cancelled": false
+        }
+      },
+      "expected_revision": 0,
+      "turn": 1,
+      "source_event_id": "event_02"
+    }
+  },
+  {
+    "elapsed_ms": 14112.557,
+    "media_ms": 12700,
+    "direction": "application",
+    "event": {
+      "type": "app.tool",
+      "name": "get_next_question",
+      "arguments": {},
+      "operation_id": "event_02/after_day",
+      "before": {
+        "answers": {
+          "day": "Tuesday",
+          "shift": ""
+        },
+        "status": "active",
+        "revision": 1,
+        "completed": false,
+        "cancelled": false
+      },
+      "after": {
+        "answers": {
+          "day": "Tuesday",
+          "shift": ""
+        },
+        "status": "active",
+        "revision": 1,
+        "completed": false,
+        "cancelled": false
+      },
+      "result": {
+        "status": "unavailable",
+        "operation_id": "event_02/after_day"
+      },
+      "expected_revision": 1,
+      "turn": 1,
+      "source_event_id": "event_02"
+    }
+  }
+]

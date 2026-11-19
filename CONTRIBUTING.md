@@ -7,17 +7,51 @@ The OpenAI Cookbook is a community resource for practical patterns, runnable exa
 ## Choose an issue or a pull request
 
 - For a problem with an existing example or the Cookbook site, open a [problem report](https://github.com/openai/openai-cookbook/issues/new/choose). Name the affected file or page, describe the problem and the expected behavior, and include a small reproduction or screenshot when useful.
-- For an idea that needs discussion, open a [feature request](https://github.com/openai/openai-cookbook/issues/new/choose) describing the use case and proposed example.
-- For a focused correction or a ready-to-review example, you can open a pull request directly. Search existing issues and pull requests first, and link a related issue if there is one.
+- For a new example or guide, follow the [new Cookbook submission steps](#before-opening-a-pr-for-a-new-cookbook).
+- For other ideas, open a [feature request](https://github.com/openai/openai-cookbook/issues/new/choose).
+- For a focused correction to existing content, you can open a pull request directly. Search existing issues and pull requests first, and link a related issue if there is one.
 
-Keep examples relevant to building with OpenAI technologies. Explain the task they solve, the prerequisites, and the choices a reader needs to understand or adapt them. Prefer a focused, reproducible contribution over a large collection of unrelated examples.
+## Before opening a PR for a new Cookbook
+
+1. Share the proposal in the Cookbook maintainers' review channel on Slack. Describe the use case and what readers will learn beyond existing examples. If you lack access, open or reuse a [feature request](https://github.com/openai/openai-cookbook/issues/new/choose) and wait for a maintainer to confirm they shared the proposal.
+2. List each credited author's Cookbook ID under `authors` in [`registry.yaml`](registry.yaml). Check that each author has a profile with a working picture. To add or update a Cookbook profile, set `name`, `website`, and `avatar` under the same ID in [`authors.yaml`](authors.yaml). If the site manages that profile, ask a site maintainer to update it.
+3. Confirm with each author whether the OpenAI employee badge should appear. Ask a site maintainer to verify eligibility and make any badge changes. Keep private review links and verification details out of public issues and PRs.
+4. [Choose a tag](#choose-cookbook-tags) for the OpenAI capability the recipe teaches.
+
+Ask the relevant product or partner team to review the draft when applicable. The finished Cookbook requires Developer Experience approval before publication.
 
 ## Place and publish content
 
 - Put notebooks, Python scripts, and their related assets in `examples/<topic>/`. Put long-form guides in `articles/` and shared diagrams or screenshots in `images/`.
 - Add an entry to [`registry.yaml`](registry.yaml) for new or relocated content that should appear on [cookbook.openai.com](https://cookbook.openai.com/). Match its `path` to the file. The registry schema requires `title`, `path`, `slug`, `tags`, and `authors`; also provide an accurate description and publication date.
-- [`authors.yaml`](authors.yaml) is optional for custom author information. Without an entry there, the site uses the author's GitHub profile. Use the same author slug in both files if you add custom attribution.
 - Keep large datasets outside the repository and explain how readers can obtain them.
+
+### Choose Cookbook tags
+
+Choose at least one registry tag for the capability the recipe teaches. The table groups tags by [Cookbook homepage topic](https://developers.openai.com/cookbook). For a recipe about embedding long inputs with `tiktoken`, use the `embeddings` tag and mention the library in the title or description.
+
+| Homepage topic | Registry tags |
+| --- | --- |
+| Agents | `agents`, `agents-api`, `agents-sdk`, `agentkit`, `workspace-agents` |
+| Agents API | `agents-api` |
+| Audio | `audio`, `speech`, `speech-to-text`, `transcription`, `realtime` |
+| ChatGPT | `chatgpt`, `gpt-actions-library`, `workspace-agents` |
+| Codex | `codex` |
+| Evals | `evals` |
+| Fine-tuning | `fine-tuning`, `gpt-oss-fine-tuning`, `reinforcement-learning` |
+| Guardrails | `guardrails`, `moderation` |
+| Images | `images`, `image-generation` |
+| Multimodal | `multimodal`, `images`, `vision`, `audio`, `speech`, `sora` |
+| Open models | `open-models`, `gpt-oss`, `harmony` |
+| Optimization | `fine-tuning`, `prompt-optimization`, `prompt-caching`, `latency`, `cost-api`, `usage-api`, `cost-management`, `batch` |
+| Responses | `responses` |
+| Retrieval | `retrieval`, `rag`, `embeddings` |
+| Security | `security` |
+| Sign-in with ChatGPT | `sign-in-with-chatgpt` |
+| Text | `completions`, `prompt`, `prompt-engineering`, `structured-outputs`, `reasoning` |
+| Tool use | `functions`, `mcp`, `tool calling` |
+
+If no tag fits, explain the gap in the PR and suggest a tag and the homepage topic where readers would look for it. Maintainers update this table when a topic's tags change.
 
 ## Prepare and validate your change
 
@@ -35,20 +69,18 @@ Read credentials from environment variables such as `OPENAI_API_KEY`; never comm
 
 ## Open a pull request
 
-Use the [pull request template](.github/pull_request_template.md) to explain what changed and why. Include the validation you ran, link related issues, and add screenshots or output snippets when they help reviewers check the result. For new published content, complete the template's `registry.yaml` and optional `authors.yaml` checklist and review the submission against the rubric below.
+Use the [pull request template](.github/pull_request_template.md) to explain what changed and why. Include the validation you ran, link related issues, and add screenshots or output snippets when they help reviewers check the result.
 
 ### Rubric
 
-The pull request template asks contributors to self-review these areas:
-
-- **Relevance:** Useful to people building with OpenAI technologies.
-- **Uniqueness:** Adds information beyond related Cookbook examples and documentation.
+- **Relevance:** The recipe teaches readers how to use an OpenAI capability in their own projects.
+- **Uniqueness:** Search related Cookbook examples and documentation to verify that the recipe teaches something new.
 - **Spelling and grammar:** Free of distracting errors.
 - **Clarity:** Organized and understandable.
 - **Correctness:** Claims and code have been checked; code runs as described.
 - **Completeness:** Includes the context, references, and citations readers need.
 
-The template says reviewers rate each area from 1 to 4 and accept content scoring at least 3 in every area. Maintainers review contributions on a best-effort basis and may ask for revisions.
+Reviewers rate each area from 1 to 4. A submission needs at least 3 in every area to be accepted. Maintainers may ask for revisions.
 
 ## Find the right place for help
 

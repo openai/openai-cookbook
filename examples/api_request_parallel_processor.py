@@ -55,6 +55,7 @@ Inputs:
 - max_tokens_per_minute : float, optional
     - target number of tokens to use per minute (will use less if limited by requests)
     - leave headroom by setting this to 50% or 75% of your limit
+    - requests that exceed this limit are recorded as failures without being sent
     - if omitted, will default to 125,000
 - token_encoding_name : str, optional
     - name of the token encoding used, as defined in the `tiktoken` package
@@ -207,10 +208,20 @@ async def process_api_requests_from_file(
                 )
                 last_update_time = current_time
 
-                # if enough capacity available, call API
+                # reject requests that cannot fit, even when the bucket is full
                 if next_request:
                     next_request_tokens = next_request.token_consumption
-                    if (
+                    if next_request_tokens > max_tokens_per_minute:
+                        error = (
+                            f"Request {next_request.task_id} requires "
+                            f"{next_request_tokens} tokens, exceeding "
+                            f"max_tokens_per_minute ({max_tokens_per_minute})."
+                        )
+                        logging.error(error)
+                        next_request.result.append(error)
+                        next_request.save_failure(save_filepath, status_tracker)
+                        next_request = None
+                    elif (
                         available_request_capacity >= 1
                         and available_token_capacity >= next_request_tokens
                     ):
@@ -232,8 +243,8 @@ async def process_api_requests_from_file(
                         )
                         next_request = None  # reset next_request to empty
 
-                # if all tasks are finished, break
-                if status_tracker.num_tasks_in_progress == 0:
+                # stop only when the input is exhausted and all tasks are finished
+                if not file_not_finished and status_tracker.num_tasks_in_progress == 0:
                     break
 
                 # main loop sleeps briefly so concurrent tasks can run
@@ -343,14 +354,7 @@ class APIRequest:
                 logging.error(
                     f"Request {self.request_json} failed after all attempts. Saving errors: {self.result}"
                 )
-                data = (
-                    [self.request_json, [str(e) for e in self.result], self.metadata]
-                    if self.metadata
-                    else [self.request_json, [str(e) for e in self.result]]
-                )
-                append_to_jsonl(data, save_filepath)
-                status_tracker.num_tasks_in_progress -= 1
-                status_tracker.num_tasks_failed += 1
+                self.save_failure(save_filepath, status_tracker)
         else:
             data = (
                 [self.request_json, response, self.metadata]
@@ -361,6 +365,14 @@ class APIRequest:
             status_tracker.num_tasks_in_progress -= 1
             status_tracker.num_tasks_succeeded += 1
             logging.debug(f"Request {self.task_id} saved to {save_filepath}")
+
+    def save_failure(self, save_filepath: str, status_tracker: StatusTracker) -> None:
+        data = [self.request_json, [str(e) for e in self.result]]
+        if self.metadata:
+            data.append(self.metadata)
+        append_to_jsonl(data, save_filepath)
+        status_tracker.num_tasks_in_progress -= 1
+        status_tracker.num_tasks_failed += 1
 
 
 # functions

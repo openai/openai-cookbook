@@ -114,9 +114,9 @@ def evaluate_folder(
     def precision_at_k(pred, truth):
         pred_tokens = {t for t, _ in (pred[:k] if isinstance(pred, list) else [])}
         truth_tokens = {t for t, _ in truth[:k]}
-        if not pred_tokens:
+        if not pred_tokens or not truth_tokens:
             return 0.0
-        return len(pred_tokens & truth_tokens) / min(len(pred_tokens), k)
+        return len(pred_tokens & truth_tokens) / min(k, len(truth))
 
     def scan_constraints(src: str) -> Optional[str]:
         # Imports

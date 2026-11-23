@@ -1,0 +1,27 @@
+version: 1
+filesystem_policy:
+  include_workdir: false
+  read_only:
+    - /usr
+    - /lib
+    - /lib64
+    - /etc
+    - /opt/codex/bin
+  read_write:
+    - /workspace
+landlock:
+  compatibility: hard_requirement
+process:
+  run_as_user: "1000"
+  run_as_group: "1000"
+network_policies:
+  agents_executor:
+    endpoints:
+      - host: api.openai.com
+        port: 443
+        tls: skip
+      - host: codex-cloud-environments.chatgpt.com
+        port: 443
+        tls: skip
+    binaries:
+      - path: /opt/codex/bin/codex

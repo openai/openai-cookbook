@@ -89,6 +89,18 @@
     - agents
     - sandbox
 
+- title: Sandboxing Codex with NVIDIA OpenShell
+  path: examples/agents-api-openshell/README.md
+  slug: agents-api-openshell
+  description: Build a terminal chat that runs shell commands in an OpenShell sandbox and downloads artifacts through OpenShell.
+  date: 2026-11-22
+  authors:
+    - openai
+  tags:
+    - agents-api
+    - agents
+    - sandbox
+
 - title: Build an SRE agent for incident response
   path: examples/agents_api/apps/sev_bot/README.md
   slug: agents-api-sev-bot

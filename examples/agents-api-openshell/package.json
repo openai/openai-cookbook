@@ -1,0 +1,16 @@
+{
+  "name": "agents-api-openshell",
+  "version": "1.0.0",
+  "private": true,
+  "type": "module",
+  "engines": { "node": ">=24" },
+  "scripts": {
+    "build": "tsc",
+    "start": "node dist/src/cli.js",
+    "typecheck": "tsc --noEmit",
+    "test": "npm run build && node --test dist/test/unit.test.js",
+    "test:integration": "npm run build && node --test dist/test/integration.test.js"
+  },
+  "dependencies": { "openai": "7.57.0" },
+  "devDependencies": { "@types/node": "24.10.1", "typescript": "5.9.3" }
+}

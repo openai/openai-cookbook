@@ -3899,13 +3899,12 @@
     - agents
     - responses
 
-- title: Catch catalog and campaign mismatches with the Decisions API
+- title: Catch product and campaign mistakes with the Decisions API
   path: examples/decisions/product_content_review/product_content_review.ipynb
   slug: decisions_product_content_review
-  description: Review product photos and campaign assets against catalog JSON and approved references, preserve insufficient evidence, and measure review errors against local labels.
-  date: "2026-11-16"
+  description: Implement notebook-only listing and campaign reviews with catalog JSON, approved reference images, and named Decisions API checks.
+  date: "2026-11-18"
   authors:
     - neusebius-oai
   tags:
     - vision
-    - evals

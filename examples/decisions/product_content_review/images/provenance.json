@@ -1,14 +1,36 @@
 {
-  "created": "2026-11-16",
-  "source": "Original images generated with OpenAI image generation",
-  "products": "Fictional. No retailer images or customer records.",
-  "labels": "Author-reviewed illustrative labels, not a production benchmark.",
+  "version": "notebook-only-review-2026-11-24",
+  "source": "Original images generated with OpenAI image generation for one fictional backpack.",
+  "references": "Approved product photo and campaign reused from the original November 16 fixtures.",
+  "variants": "Seven controlled variants generated and visually inspected on November 18, 2026.",
   "files": {
-    "backpack_reference.png": "1e031aa2d111a58040b5e00f774cabce494896e51f76f4c993029c49fe8db6a7",
     "backpack_campaign.png": "9f0b36e98ba422fa89b14bd5a11886ad1c84b9965bad9b9c70aab056a36d3cca",
-    "tote_reference.png": "196fa53522b4ac1fc20f5e125d91b1aed9abdbfabdc2129aa1a478803e157f6b",
-    "tote_campaign.png": "d388c734ef1ef0a1f3dbb6aba83681c245c26a74960566f62a3034f730e68d1e",
-    "closed_package.png": "d8d9666251d93c2dcf087ddb8444ee4b112d08963815c1d06022d68a0841a8dc",
-    "tote_rear.png": "8e6f941aca75e93eb83c5bdd5534f33bf210c4c731d5b4d15cfc1d279a82d03f"
+    "backpack_reference.png": "1e031aa2d111a58040b5e00f774cabce494896e51f76f4c993029c49fe8db6a7",
+    "campaign_burgundy.png": "e391cdbb19d588cb82e49a671100c1f0ee3a5b26fdfec1564948145a1933ac50",
+    "campaign_layout.png": "0ebfefe1efb2f5955c41def40949088567a4a652765947b6710fce2731e997df",
+    "campaign_missing_disclosure.png": "79d3d6f61a19fad4670271a1e3514c8d531be20bff0d3cb1572b43091393d8e8",
+    "campaign_unreadable_disclosure.png": "d127f0bcb7261dbe96cc770ca12f918a84b13ad202ac54398be45f390b7de3d7",
+    "listing_burgundy.png": "f5f84072ba3d0474c4038d75e0eab1dca6e121818a12f81ed70b4da97c8b68ec",
+    "listing_cropped.png": "5326632dd0714c78878ba5055979c954df8a051f67220e4c8862d2e34d74d174",
+    "listing_two_pockets.png": "5131d5ccd6c9682c123dc6d567129f3a4451e7891fbe13647a51ff61061b1fde",
+    "campaign_two_pockets_changed_disclosure.png": "9a26c7f02e7c4f356da70fcd0d48cedfc37ebc4c88671ce688b5d5a53b6ac0f6"
+  },
+  "documentation_assets": {
+    "architecture.png": {
+      "purpose": "Two-stage workflow diagram; not sent to the API",
+      "sha256": "9c3b679cf21ee63098063a4a5064c08e997adc651bd36f5704093299b6c657c4"
+    }
+  },
+  "additional_assets": {
+    "campaign_two_pockets_changed_disclosure.png": {
+      "date": "2026-11-24",
+      "tool": "OpenAI built-in image generation",
+      "reference": "backpack_campaign.png",
+      "changes": [
+        "Two stacked front pockets; navy color retained",
+        "Disclosure changed to Actual product photograph"
+      ],
+      "prompt": "Use case: precise-object-edit. Edit the supplied approved fictional backpack campaign to create ONE controlled comparison asset for a developer tutorial. Keep the same navy blue backpack, same fabric color, body shape, size, straps, handle, metal hardware style, position, green background, steel bottle, lighting, headline 'READY FOR THE WEEKEND', and subheading 'Your everyday carry'. Make ONLY these two intentional changes: (1) replace the single large rectangular front zippered pocket with TWO clearly separate smaller rectangular navy zippered pockets, stacked vertically on the front panel; make the two pockets unmistakably countable and both fully visible. Keep the rest of the backpack unchanged. (2) Replace the bottom disclosure 'Illustrative product image' with the different exact text 'Actual product photograph'. Render this new disclosure sharply, plainly and fully readable in the same bottom placement and dark sans serif style. No blur. Do not change the navy color or redesign anything else. Maintain the original landscape 1536x1024 framing if possible. No extra text, logos, annotations, highlights or watermarks. This is a deliberately noncompliant campaign variant, not a claim about the image's origin."
+    }
   }
 }

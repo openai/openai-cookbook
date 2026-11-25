@@ -1,6 +1,25 @@
+# Generated responses, reports, and executed notebooks
 results/
+*.executed.ipynb
+
+# Python and notebook caches
 __pycache__/
 *.py[cod]
 .ipynb_checkpoints/
+.pytest_cache/
+.coverage
+.coverage.*
+htmlcov/
+
+# Local credentials and virtual environments
 .env
 .env.*
+!.env.example
+.venv/
+venv/
+
+# Local logs and editor files
+*.log
+.DS_Store
+.vscode/
+.idea/

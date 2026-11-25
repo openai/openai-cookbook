@@ -65,7 +65,7 @@ class Warehouse:
             self.engine = "SQLite"
             path = Path(unquote(parsed.path)).resolve()
             self.connection = sqlite3.connect(
-                f"file:{path}?mode=ro", uri=True, check_same_thread=False
+                f"{path.as_uri()}?mode=ro", uri=True, check_same_thread=False
             )
             self.connection.row_factory = sqlite3.Row
         else:

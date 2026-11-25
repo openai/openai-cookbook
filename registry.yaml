@@ -3898,3 +3898,13 @@
     - evals
     - agents
     - responses
+
+- title: Catch product and campaign mistakes with the Decisions API
+  path: examples/decisions/product_content_review/product_content_review.ipynb
+  slug: decisions_product_content_review
+  description: Implement notebook-only listing and campaign reviews with catalog JSON, approved reference images, and named Decisions API checks.
+  date: "2026-11-18"
+  authors:
+    - neusebius-oai
+  tags:
+    - vision

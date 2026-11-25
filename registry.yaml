@@ -4,6 +4,20 @@
 # should build pages for, and indicates metadata such as tags, creation date and
 # authors for each page.
 
+- title: Build a voice agent that follows an SOP
+  path: articles/sop_to_voice_agent_builder.md
+  slug: sop-to-voice-agent-builder
+  description: Turn a written SOP into prompts, tools, and application checks that keep a voice agent on the right procedure when a caller changes their request or corrects an answer.
+  date: '2026-11-03'
+  authors:
+    - erikakettleson-openai
+  tags:
+    - audio
+    - speech
+    - agents
+    - prompting
+    - evals
+
 - title: Harness-aware evaluation of plugins
   path: examples/partners/harness_aware_plugin_evals/harness_aware_plugin_evals.ipynb
   slug: harness-aware-plugin-evals
@@ -57,7 +71,7 @@
   description: Run agent tools in AWS Lambda MicroVMs with application-managed or webhook-managed provisioning, file transfers, and suspend/resume.
   date: 2026-09-29
   authors:
-    - alfozan
+    - openai
   tags:
     - agents-api
     - agents
@@ -81,7 +95,7 @@
   description: Investigate incidents in Slack using service telemetry, GitHub, AWS, and past incident reports, with human review before recovery.
   date: 2026-09-10
   authors:
-    - alfozan
+    - openai
   tags:
     - agents-api
     - agents
@@ -93,7 +107,7 @@
   description: Connect Slack threads to persistent agent sessions, workplace tools, and isolated sandboxes.
   date: 2026-09-10
   authors:
-    - alfozan
+    - openai
   tags:
     - agents-api
     - agents
@@ -105,7 +119,7 @@
   description: Investigate warehouse questions with read-only SQL, business context, and saved analyst corrections.
   date: 2026-09-10
   authors:
-    - alfozan
+    - openai
   tags:
     - agents-api
     - agents
@@ -429,7 +443,7 @@
   description: Run, inspect, and trace local Agents SDK demo apps from a browser-based deployment manager.
   date: 2026-05-05
   authors:
-    - alfozan
+    - openai
   tags:
     - agents-sdk
     - agents

@@ -23,7 +23,7 @@ Execute notebooks top-to-bottom after installing dependencies and clear lingerin
 
 ## Commit & Pull Request Guidelines
 
-Use concise, imperative commit messages that describe the change scope (e.g., "Add agent portfolio collaboration demo"). Every PR should provide a summary, motivation, and self-review, and must tick the registry and authors checklist from `.github/pull_request_template.md`. Link issues when applicable and attach screenshots or output snippets for UI-heavy content. Confirm CI notebook validation passes locally before requesting review.
+Before opening a PR for a new example or guide, complete the [Cookbook submission checklist](CONTRIBUTING.md#before-opening-a-pr-for-a-new-cookbook).
 
 Before a pull request is merged, run the repository's `docs-editor` skill on every changed article, Markdown or MDX file, and notebook Markdown cell. For editorial notebook changes, preserve code cells, outputs, execution counts, attachments, cell order, and metadata. Fix safe issues, rerun the relevant checks, and resolve or explicitly document all remaining P0 and P1 findings in the pull request.
 

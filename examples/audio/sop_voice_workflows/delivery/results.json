@@ -1,0 +1,2452 @@
+{
+  "date": "2026-10-27",
+  "measurement": "Scripted backend runs. Separate WebRTC recordings are linked in the Cookbook.",
+  "reviewed": [
+    {
+      "suite": "matrix-v2",
+      "case": "credit_accept",
+      "model": "gpt-6-luna",
+      "repetition": 1,
+      "frozen_pass": true,
+      "reviewed_pass": true,
+      "trace_sha256": "23bafc0c6d9ae53c5b8845b597380a2415d091d795878f47ecdb43264e187814"
+    },
+    {
+      "suite": "matrix-v2",
+      "case": "credit_accept",
+      "model": "gpt-6-luna",
+      "repetition": 2,
+      "frozen_pass": true,
+      "reviewed_pass": true,
+      "trace_sha256": "920fd8d02476adf828a9fcc1046a619b4591b5beaf03f8730e81952b6f2457c7"
+    },
+    {
+      "suite": "matrix-v2",
+      "case": "credit_accept",
+      "model": "gpt-6-luna",
+      "repetition": 3,
+      "frozen_pass": true,
+      "reviewed_pass": true,
+      "trace_sha256": "a871153c0b2f4ff6907383b11e94ac2a5731402dab0025ea922ca0307b018495"
+    },
+    {
+      "suite": "matrix-v2",
+      "case": "credit_accept",
+      "model": "gpt-6.1-terra",
+      "repetition": 1,
+      "frozen_pass": true,
+      "reviewed_pass": true,
+      "trace_sha256": "7eb9369d6a45f52e7b9e84defde5aff772e53de045fed00cd11018b44e37bc74"
+    },
+    {
+      "suite": "matrix-v2",
+      "case": "credit_accept",
+      "model": "gpt-6.1-terra",
+      "repetition": 2,
+      "frozen_pass": true,
+      "reviewed_pass": true,
+      "trace_sha256": "804c92d19299f41be23101a13f08c7f9e82358e023503502b8e3bacd50bcc9cc"
+    },
+    {
+      "suite": "matrix-v2",
+      "case": "credit_accept",
+      "model": "gpt-6.1-terra",
+      "repetition": 3,
+      "frozen_pass": true,
+      "reviewed_pass": true,
+      "trace_sha256": "2918ac403e15d59ddeb35574c15d0be294e3f62314b86e3574f84cc3f233df7b"
+    },
+    {
+      "suite": "matrix-v2",
+      "case": "credit_at_24_hours",
+      "model": "gpt-6-luna",
+      "repetition": 1,
+      "frozen_pass": true,
+      "reviewed_pass": true,
+      "trace_sha256": "b58fa5d369b21f1f61e09fe57dc3dbaf9f8642e74949a0b88cde9600b9fb820c"
+    },
+    {
+      "suite": "matrix-v2",
+      "case": "credit_at_24_hours",
+      "model": "gpt-6-luna",
+      "repetition": 2,
+      "frozen_pass": true,
+      "reviewed_pass": true,
+      "trace_sha256": "8e79a48e67799a0d18652270e55657d9445dda6bd9e4d7a6d46e5d1d1731f65d"
+    },
+    {
+      "suite": "matrix-v2",
+      "case": "credit_at_24_hours",
+      "model": "gpt-6-luna",
+      "repetition": 3,
+      "frozen_pass": true,
+      "reviewed_pass": true,
+      "trace_sha256": "6ed176f28effa7fd27c1072c0e830bb7ca9a637f4dcb3fd22bc805905e5a54de"
+    },
+    {
+      "suite": "matrix-v2",
+      "case": "credit_at_24_hours",
+      "model": "gpt-6.1-terra",
+      "repetition": 1,
+      "frozen_pass": true,
+      "reviewed_pass": true,
+      "trace_sha256": "986fbf6900774e4783d6c80d399c7ca93293c99fbb57221692f5fd446cea1a38"
+    },
+    {
+      "suite": "matrix-v2",
+      "case": "credit_at_24_hours",
+      "model": "gpt-6.1-terra",
+      "repetition": 2,
+      "frozen_pass": true,
+      "reviewed_pass": true,
+      "trace_sha256": "d1aec72df6b08d1303ec1a13a691eb78d0f1f8a1dd0eaec8673c9e73dadf5443"
+    },
+    {
+      "suite": "matrix-v2",
+      "case": "credit_at_24_hours",
+      "model": "gpt-6.1-terra",
+      "repetition": 3,
+      "frozen_pass": true,
+      "reviewed_pass": true,
+      "trace_sha256": "32bea6f37d097f98de6a0b05a923844c7375e6df9e9a5b7e842ea2f4432b204f"
+    },
+    {
+      "suite": "matrix-v2",
+      "case": "credit_counteroffer",
+      "model": "gpt-6-luna",
+      "repetition": 1,
+      "frozen_pass": false,
+      "reviewed_pass": false,
+      "trace_sha256": "d7702f5abf4720545d2b28f0d9c2c9e554f7beaeaa24dd76c4a3c8cd75896bb3"
+    },
+    {
+      "suite": "matrix-v2",
+      "case": "credit_counteroffer",
+      "model": "gpt-6-luna",
+      "repetition": 2,
+      "frozen_pass": true,
+      "reviewed_pass": true,
+      "trace_sha256": "da7ae8ce1655e2dab72496af802eb731728c3b575e9e036747b8c6eafddf05cc"
+    },
+    {
+      "suite": "matrix-v2",
+      "case": "credit_counteroffer",
+      "model": "gpt-6-luna",
+      "repetition": 3,
+      "frozen_pass": true,
+      "reviewed_pass": true,
+      "trace_sha256": "89d859d7d252900e93cb5407b0c11556d3e4d0da6995661cf7ecaad955e6b415"
+    },
+    {
+      "suite": "matrix-v2",
+      "case": "credit_counteroffer",
+      "model": "gpt-6.1-terra",
+      "repetition": 1,
+      "frozen_pass": false,
+      "reviewed_pass": true,
+      "trace_sha256": "ba50a56fdf55735d310f05a4a7c2fd4e0131f6d79ea972cb5bb3b334bea97aab"
+    },
+    {
+      "suite": "matrix-v2",
+      "case": "credit_counteroffer",
+      "model": "gpt-6.1-terra",
+      "repetition": 2,
+      "frozen_pass": true,
+      "reviewed_pass": true,
+      "trace_sha256": "2a11d7752a7eb443aacd93704224e506a0328dfd6d843112fd914d7c57addc2e"
+    },
+    {
+      "suite": "matrix-v2",
+      "case": "credit_counteroffer",
+      "model": "gpt-6.1-terra",
+      "repetition": 3,
+      "frozen_pass": true,
+      "reviewed_pass": true,
+      "trace_sha256": "89590d0336e78b97897a3ec131589b839501b23c415d2e4cb64ff377112364e4"
+    },
+    {
+      "suite": "matrix-v2",
+      "case": "credit_lookup_failure",
+      "model": "gpt-6-luna",
+      "repetition": 1,
+      "frozen_pass": true,
+      "reviewed_pass": true,
+      "trace_sha256": "26649521056aae084a76520059e94d923e2c9d510b1b6f7fc7e9f313a56a98b3"
+    },
+    {
+      "suite": "matrix-v2",
+      "case": "credit_lookup_failure",
+      "model": "gpt-6-luna",
+      "repetition": 2,
+      "frozen_pass": true,
+      "reviewed_pass": true,
+      "trace_sha256": "949ca98ac7acc2b946920b214afc74ff7c05e73bc691f8ffdc755d8f56e857e5"
+    },
+    {
+      "suite": "matrix-v2",
+      "case": "credit_lookup_failure",
+      "model": "gpt-6-luna",
+      "repetition": 3,
+      "frozen_pass": true,
+      "reviewed_pass": true,
+      "trace_sha256": "748feaba47f23caf441be3558e908e0c673ff82929147cc455fe4ef83d762045"
+    },
+    {
+      "suite": "matrix-v2",
+      "case": "credit_lookup_failure",
+      "model": "gpt-6.1-terra",
+      "repetition": 1,
+      "frozen_pass": true,
+      "reviewed_pass": true,
+      "trace_sha256": "708e987c2f5cb2d5ef09bc8295867fd5d8166064cbd0dd2641aba4351a2c92dc"
+    },
+    {
+      "suite": "matrix-v2",
+      "case": "credit_lookup_failure",
+      "model": "gpt-6.1-terra",
+      "repetition": 2,
+      "frozen_pass": true,
+      "reviewed_pass": true,
+      "trace_sha256": "51b86a2091b447a5fd9c88247f265e57653f8150aca80ace6f67aa584d8cce62"
+    },
+    {
+      "suite": "matrix-v2",
+      "case": "credit_lookup_failure",
+      "model": "gpt-6.1-terra",
+      "repetition": 3,
+      "frozen_pass": true,
+      "reviewed_pass": true,
+      "trace_sha256": "e4cdc341aed48e834b5d5661091409cf31bf6381c564bc7570fd421793760e69"
+    },
+    {
+      "suite": "matrix-v2",
+      "case": "credit_order_total",
+      "model": "gpt-6-luna",
+      "repetition": 1,
+      "frozen_pass": true,
+      "reviewed_pass": true,
+      "trace_sha256": "182c43a483fb20c15aaf0432458256d8c3731031c96575cf9f5e51d3d723d6aa"
+    },
+    {
+      "suite": "matrix-v2",
+      "case": "credit_order_total",
+      "model": "gpt-6-luna",
+      "repetition": 2,
+      "frozen_pass": true,
+      "reviewed_pass": true,
+      "trace_sha256": "11b35e4db15f045201690fbd7d05f32609549cacbbb929ad024c196b5192e29c"
+    },
+    {
+      "suite": "matrix-v2",
+      "case": "credit_order_total",
+      "model": "gpt-6-luna",
+      "repetition": 3,
+      "frozen_pass": true,
+      "reviewed_pass": true,
+      "trace_sha256": "47afd62eb32b18699a1a7772144e8614bb97ab47a41631ac2d3e268848847322"
+    },
+    {
+      "suite": "matrix-v2",
+      "case": "credit_order_total",
+      "model": "gpt-6.1-terra",
+      "repetition": 1,
+      "frozen_pass": true,
+      "reviewed_pass": true,
+      "trace_sha256": "32ddc26891eacd7dad76767908a9a750e46f5980171c2aad72d7ecadf7c13f33"
+    },
+    {
+      "suite": "matrix-v2",
+      "case": "credit_order_total",
+      "model": "gpt-6.1-terra",
+      "repetition": 2,
+      "frozen_pass": true,
+      "reviewed_pass": true,
+      "trace_sha256": "84b858383279724b89bb3ae81457f4d0ba9e4562b23ea3a60f9b80d3abf17e32"
+    },
+    {
+      "suite": "matrix-v2",
+      "case": "credit_order_total",
+      "model": "gpt-6.1-terra",
+      "repetition": 3,
+      "frozen_pass": true,
+      "reviewed_pass": true,
+      "trace_sha256": "23aced79f32744fa92f8f0a09b39ad7e2c9259b9e08700e2beec88003fd218e8"
+    },
+    {
+      "suite": "matrix-v2",
+      "case": "credit_to_damage",
+      "model": "gpt-6-luna",
+      "repetition": 1,
+      "frozen_pass": true,
+      "reviewed_pass": true,
+      "trace_sha256": "2ca906861127edbb1be9d9534ca24d743bc4da62638527ff981dc6db29d46bf6"
+    },
+    {
+      "suite": "matrix-v2",
+      "case": "credit_to_damage",
+      "model": "gpt-6-luna",
+      "repetition": 2,
+      "frozen_pass": true,
+      "reviewed_pass": true,
+      "trace_sha256": "55b6d843b7462cd1df4f5840f4a0f208a5de9e624b43e978ae6c58930599f799"
+    },
+    {
+      "suite": "matrix-v2",
+      "case": "credit_to_damage",
+      "model": "gpt-6-luna",
+      "repetition": 3,
+      "frozen_pass": true,
+      "reviewed_pass": true,
+      "trace_sha256": "7e3c0a25bf9c7cd63a196899cdf1fbfff2e631d1d03ef03a98ca4c6a25823ab2"
+    },
+    {
+      "suite": "matrix-v2",
+      "case": "credit_to_damage",
+      "model": "gpt-6.1-terra",
+      "repetition": 1,
+      "frozen_pass": true,
+      "reviewed_pass": true,
+      "trace_sha256": "55198f7ddc894ef77d06a135bf90f9da84027731ce90a61f1b7ec8284220922d"
+    },
+    {
+      "suite": "matrix-v2",
+      "case": "credit_to_damage",
+      "model": "gpt-6.1-terra",
+      "repetition": 2,
+      "frozen_pass": true,
+      "reviewed_pass": true,
+      "trace_sha256": "26582d9011eb970f876b6931bb42e5bf827b85ce3346a949ab9a7a7481594de5"
+    },
+    {
+      "suite": "matrix-v2",
+      "case": "credit_to_damage",
+      "model": "gpt-6.1-terra",
+      "repetition": 3,
+      "frozen_pass": true,
+      "reviewed_pass": true,
+      "trace_sha256": "21d34d8c285e8c5c237fb4a842813d5f32fbef22584e463edc29c828ff3891af"
+    },
+    {
+      "suite": "matrix-v2",
+      "case": "credit_write_failure",
+      "model": "gpt-6-luna",
+      "repetition": 1,
+      "frozen_pass": true,
+      "reviewed_pass": true,
+      "trace_sha256": "246e98d053047c0dcd3a6c6c2809163ff3d5acd9ada9108c7c59bf478f45e166"
+    },
+    {
+      "suite": "matrix-v2",
+      "case": "credit_write_failure",
+      "model": "gpt-6-luna",
+      "repetition": 2,
+      "frozen_pass": true,
+      "reviewed_pass": true,
+      "trace_sha256": "23d72267dcf365a50a8a15f4ee79f05771500962fad8b01d32497e8de8ead35c"
+    },
+    {
+      "suite": "matrix-v2",
+      "case": "credit_write_failure",
+      "model": "gpt-6-luna",
+      "repetition": 3,
+      "frozen_pass": true,
+      "reviewed_pass": true,
+      "trace_sha256": "904b09fbf626702fc74d46f130a16176c2ad9d149d19047edf19860ae42f64ff"
+    },
+    {
+      "suite": "matrix-v2",
+      "case": "credit_write_failure",
+      "model": "gpt-6.1-terra",
+      "repetition": 1,
+      "frozen_pass": true,
+      "reviewed_pass": true,
+      "trace_sha256": "1073e3b28aa0f9a4e4abe776ce1e73b1865b887ae747e02ff0ee949894ed3024"
+    },
+    {
+      "suite": "matrix-v2",
+      "case": "credit_write_failure",
+      "model": "gpt-6.1-terra",
+      "repetition": 2,
+      "frozen_pass": true,
+      "reviewed_pass": true,
+      "trace_sha256": "129fbf7db76e8232eedefe4e50bcd3770e397adfc5256978ee32196c83e8df1d"
+    },
+    {
+      "suite": "matrix-v2",
+      "case": "credit_write_failure",
+      "model": "gpt-6.1-terra",
+      "repetition": 3,
+      "frozen_pass": true,
+      "reviewed_pass": true,
+      "trace_sha256": "83488ff75a7f01d25169c2067e3d9aa401715190b891bf2b058c25bcbccfff9d"
+    },
+    {
+      "suite": "matrix-v2",
+      "case": "damage_accept",
+      "model": "gpt-6-luna",
+      "repetition": 1,
+      "frozen_pass": true,
+      "reviewed_pass": true,
+      "trace_sha256": "b4dd24348fbe0c90e5f9dc05dec8ae39f7c2667072afb06eeb5e63102c249252"
+    },
+    {
+      "suite": "matrix-v2",
+      "case": "damage_accept",
+      "model": "gpt-6-luna",
+      "repetition": 2,
+      "frozen_pass": true,
+      "reviewed_pass": true,
+      "trace_sha256": "2fd6f9559b7bc8438c297cc261faf38bf28361add13b858f27240f85981e5581"
+    },
+    {
+      "suite": "matrix-v2",
+      "case": "damage_accept",
+      "model": "gpt-6-luna",
+      "repetition": 3,
+      "frozen_pass": true,
+      "reviewed_pass": true,
+      "trace_sha256": "8fe2e1f8f61824e6cf7a7b84ea7446d52171e7985e5f88973ebf6be799277457"
+    },
+    {
+      "suite": "matrix-v2",
+      "case": "damage_accept",
+      "model": "gpt-6.1-terra",
+      "repetition": 1,
+      "frozen_pass": true,
+      "reviewed_pass": true,
+      "trace_sha256": "b01aa2ff0a485936d3854d4e8d0b2d53a62ed6fedddcc796450980d9fed39723"
+    },
+    {
+      "suite": "matrix-v2",
+      "case": "damage_accept",
+      "model": "gpt-6.1-terra",
+      "repetition": 2,
+      "frozen_pass": true,
+      "reviewed_pass": true,
+      "trace_sha256": "0ca597cb44c39ad78ad82e369ce18171dca7946f4bae747a4b9e16c835ddcbd3"
+    },
+    {
+      "suite": "matrix-v2",
+      "case": "damage_accept",
+      "model": "gpt-6.1-terra",
+      "repetition": 3,
+      "frozen_pass": true,
+      "reviewed_pass": true,
+      "trace_sha256": "a974a5ef320bd6a03a706d47710bc10083b91fb9defa70319ea1097f8c89fb05"
+    },
+    {
+      "suite": "matrix-v2",
+      "case": "damage_decline",
+      "model": "gpt-6-luna",
+      "repetition": 1,
+      "frozen_pass": true,
+      "reviewed_pass": true,
+      "trace_sha256": "714bd79b009837e6a0fc704ec315e6338d1be288a3c4020d9e579ce2285bc37f"
+    },
+    {
+      "suite": "matrix-v2",
+      "case": "damage_decline",
+      "model": "gpt-6-luna",
+      "repetition": 2,
+      "frozen_pass": true,
+      "reviewed_pass": true,
+      "trace_sha256": "93aace407765c7f2d959389e34015f3d0adf24098d7be30d4ba8ccc5ebe95a6a"
+    },
+    {
+      "suite": "matrix-v2",
+      "case": "damage_decline",
+      "model": "gpt-6-luna",
+      "repetition": 3,
+      "frozen_pass": true,
+      "reviewed_pass": true,
+      "trace_sha256": "9a7eaf6c631d1cea87269b4608f4e80240d5b6124909a251090a74a0c50118b2"
+    },
+    {
+      "suite": "matrix-v2",
+      "case": "damage_decline",
+      "model": "gpt-6.1-terra",
+      "repetition": 1,
+      "frozen_pass": true,
+      "reviewed_pass": true,
+      "trace_sha256": "52858f27356b486dbe339baba7ec3d45cf23d4e40fd46c069ca3302a68cecbec"
+    },
+    {
+      "suite": "matrix-v2",
+      "case": "damage_decline",
+      "model": "gpt-6.1-terra",
+      "repetition": 2,
+      "frozen_pass": true,
+      "reviewed_pass": true,
+      "trace_sha256": "06b3a2320610b8ca2dccde4726824938f7388c452aab1b0f6f09ca8339dcc66b"
+    },
+    {
+      "suite": "matrix-v2",
+      "case": "damage_decline",
+      "model": "gpt-6.1-terra",
+      "repetition": 3,
+      "frozen_pass": true,
+      "reviewed_pass": true,
+      "trace_sha256": "02064d2681672d38f29a28a9972d9ef9b34574fbeeefeb9f7523a93f98d78145"
+    },
+    {
+      "suite": "matrix-v2",
+      "case": "damage_out_of_stock",
+      "model": "gpt-6-luna",
+      "repetition": 1,
+      "frozen_pass": true,
+      "reviewed_pass": true,
+      "trace_sha256": "cb349ef47f373161cd7f29a681ee6a5fbe6e3111f3cac256b2d78d633e15cfe8"
+    },
+    {
+      "suite": "matrix-v2",
+      "case": "damage_out_of_stock",
+      "model": "gpt-6-luna",
+      "repetition": 2,
+      "frozen_pass": true,
+      "reviewed_pass": true,
+      "trace_sha256": "04ab528ca3577788c92c4906d162c9c8b44c35c80181c7bf80350409f80b32a5"
+    },
+    {
+      "suite": "matrix-v2",
+      "case": "damage_out_of_stock",
+      "model": "gpt-6-luna",
+      "repetition": 3,
+      "frozen_pass": true,
+      "reviewed_pass": true,
+      "trace_sha256": "332c693351d57d211178193b4f3201689ddd00a9b979073c0670a3daa886743d"
+    },
+    {
+      "suite": "matrix-v2",
+      "case": "damage_out_of_stock",
+      "model": "gpt-6.1-terra",
+      "repetition": 1,
+      "frozen_pass": true,
+      "reviewed_pass": true,
+      "trace_sha256": "c3b1ccac2cf1aec944702bc90b7f4d2afa2ee2834c1e1822312d17a69d5f9d34"
+    },
+    {
+      "suite": "matrix-v2",
+      "case": "damage_out_of_stock",
+      "model": "gpt-6.1-terra",
+      "repetition": 2,
+      "frozen_pass": true,
+      "reviewed_pass": true,
+      "trace_sha256": "44f2c8dc02a39c07d9b7d70715cd6bee207a6f5b0093a084cc4bdcfb277a5490"
+    },
+    {
+      "suite": "matrix-v2",
+      "case": "damage_out_of_stock",
+      "model": "gpt-6.1-terra",
+      "repetition": 3,
+      "frozen_pass": true,
+      "reviewed_pass": true,
+      "trace_sha256": "34934263fbac505d5edf131ca2a794bd0c7a3365155dbced6d907d9bfaa5fc9c"
+    },
+    {
+      "suite": "matrix-v2",
+      "case": "order_lookup_failure",
+      "model": "gpt-6-luna",
+      "repetition": 1,
+      "frozen_pass": true,
+      "reviewed_pass": true,
+      "trace_sha256": "9b2d34b3e04dbdc39ac35167a11c9a5804cb5358e4e727afefe164c1c3dff372"
+    },
+    {
+      "suite": "matrix-v2",
+      "case": "order_lookup_failure",
+      "model": "gpt-6-luna",
+      "repetition": 2,
+      "frozen_pass": true,
+      "reviewed_pass": true,
+      "trace_sha256": "178973079693a706ea37ac02ea289cd4f6a7624704c3713dfd7126099c68808e"
+    },
+    {
+      "suite": "matrix-v2",
+      "case": "order_lookup_failure",
+      "model": "gpt-6-luna",
+      "repetition": 3,
+      "frozen_pass": true,
+      "reviewed_pass": true,
+      "trace_sha256": "fd423c5c9fd87ae7bea2cbd65224e9b88d94c322891e8109fb1c638259b146c9"
+    },
+    {
+      "suite": "matrix-v2",
+      "case": "order_lookup_failure",
+      "model": "gpt-6.1-terra",
+      "repetition": 1,
+      "frozen_pass": true,
+      "reviewed_pass": true,
+      "trace_sha256": "f9b945f55ba23aa4ed6e6d6445bc36af0e5754eee21fa6fd4b1d450cfa266551"
+    },
+    {
+      "suite": "matrix-v2",
+      "case": "order_lookup_failure",
+      "model": "gpt-6.1-terra",
+      "repetition": 2,
+      "frozen_pass": true,
+      "reviewed_pass": true,
+      "trace_sha256": "3a4ce1aa0b346eca5d7612ffd3e32897de6ba4de976ce25de426f9cd40a97e04"
+    },
+    {
+      "suite": "matrix-v2",
+      "case": "order_lookup_failure",
+      "model": "gpt-6.1-terra",
+      "repetition": 3,
+      "frozen_pass": true,
+      "reviewed_pass": true,
+      "trace_sha256": "3df4b354455e08d932e9fa2ade0375617ea503d0ca578eae7aca11932b3547ae"
+    },
+    {
+      "suite": "matrix-v2",
+      "case": "replacement_address_change",
+      "model": "gpt-6-luna",
+      "repetition": 1,
+      "frozen_pass": true,
+      "reviewed_pass": true,
+      "trace_sha256": "3be944acb7eb956288335d932bb3fdca9657a2bfc43d6694be2bdc2215c99bf9"
+    },
+    {
+      "suite": "matrix-v2",
+      "case": "replacement_address_change",
+      "model": "gpt-6-luna",
+      "repetition": 2,
+      "frozen_pass": true,
+      "reviewed_pass": true,
+      "trace_sha256": "b0338495470be2877533349ae946641782078bb44324100502a480fa024d26f6"
+    },
+    {
+      "suite": "matrix-v2",
+      "case": "replacement_address_change",
+      "model": "gpt-6-luna",
+      "repetition": 3,
+      "frozen_pass": false,
+      "reviewed_pass": false,
+      "trace_sha256": "322247352c38010aaa796f618d4a1a04363d3e63b969cc7b9194c432bf997a8f"
+    },
+    {
+      "suite": "matrix-v2",
+      "case": "replacement_address_change",
+      "model": "gpt-6.1-terra",
+      "repetition": 1,
+      "frozen_pass": true,
+      "reviewed_pass": true,
+      "trace_sha256": "3bab027a57aa0b17ff71b7b8534bbc9b57a440a7d4524bcee51a6c014c9791f8"
+    },
+    {
+      "suite": "matrix-v2",
+      "case": "replacement_address_change",
+      "model": "gpt-6.1-terra",
+      "repetition": 2,
+      "frozen_pass": true,
+      "reviewed_pass": true,
+      "trace_sha256": "e6e48d106558efbe6a0aed6ee3795f27cd3d125dcbd1afab0b7ece0c51591112"
+    },
+    {
+      "suite": "matrix-v2",
+      "case": "replacement_address_change",
+      "model": "gpt-6.1-terra",
+      "repetition": 3,
+      "frozen_pass": true,
+      "reviewed_pass": true,
+      "trace_sha256": "f0cf7f0ce3c585cfd2223949a0abfc67ca75dcf56cb90c7046d0ad0b264e9252"
+    },
+    {
+      "suite": "matrix-v2",
+      "case": "replacement_unconfirmed",
+      "model": "gpt-6-luna",
+      "repetition": 1,
+      "frozen_pass": true,
+      "reviewed_pass": true,
+      "trace_sha256": "c3b4fff3f9c883de486e716a81fc21a646f476d1837cc4097f43a690c7d46f4d"
+    },
+    {
+      "suite": "matrix-v2",
+      "case": "replacement_unconfirmed",
+      "model": "gpt-6-luna",
+      "repetition": 2,
+      "frozen_pass": true,
+      "reviewed_pass": true,
+      "trace_sha256": "29e783a321dea074257558f3f8ac34c23a3bea000c27896b8ed1a75ca6774d3e"
+    },
+    {
+      "suite": "matrix-v2",
+      "case": "replacement_unconfirmed",
+      "model": "gpt-6-luna",
+      "repetition": 3,
+      "frozen_pass": true,
+      "reviewed_pass": true,
+      "trace_sha256": "f2bc7aa251ef149bfe09a8512d72b64154ae43d1575e1c290b3dd9977a4bad32"
+    },
+    {
+      "suite": "matrix-v2",
+      "case": "replacement_unconfirmed",
+      "model": "gpt-6.1-terra",
+      "repetition": 1,
+      "frozen_pass": true,
+      "reviewed_pass": true,
+      "trace_sha256": "a025b4b5e5aa90723ab6736b91487ab8ad52eb877df1bbd3884acdd4d84922eb"
+    },
+    {
+      "suite": "matrix-v2",
+      "case": "replacement_unconfirmed",
+      "model": "gpt-6.1-terra",
+      "repetition": 2,
+      "frozen_pass": true,
+      "reviewed_pass": true,
+      "trace_sha256": "0258d76639e96e01c13df9cfddb3a7f55432ed0b255ce350985afaaa2c6d17fa"
+    },
+    {
+      "suite": "matrix-v2",
+      "case": "replacement_unconfirmed",
+      "model": "gpt-6.1-terra",
+      "repetition": 3,
+      "frozen_pass": true,
+      "reviewed_pass": true,
+      "trace_sha256": "8811a74703d12e28dea035309d3194e8d881a674ac40de0f263da8bf1855f12c"
+    },
+    {
+      "suite": "matrix-v2",
+      "case": "status_to_damage",
+      "model": "gpt-6-luna",
+      "repetition": 1,
+      "frozen_pass": true,
+      "reviewed_pass": true,
+      "trace_sha256": "285852b65ea9fedecb83297c1931fecebb0428e9491a017f933881dca8b073fa"
+    },
+    {
+      "suite": "matrix-v2",
+      "case": "status_to_damage",
+      "model": "gpt-6-luna",
+      "repetition": 2,
+      "frozen_pass": true,
+      "reviewed_pass": true,
+      "trace_sha256": "c23f9c5dc195ceb2ebc5413c01e712722d8ab99d84166009ff5b422698eef3e7"
+    },
+    {
+      "suite": "matrix-v2",
+      "case": "status_to_damage",
+      "model": "gpt-6-luna",
+      "repetition": 3,
+      "frozen_pass": true,
+      "reviewed_pass": true,
+      "trace_sha256": "b5cf0b3695df1e55e0e7d69cb27803508d272eaede81a27bcac9298f46509b95"
+    },
+    {
+      "suite": "matrix-v2",
+      "case": "status_to_damage",
+      "model": "gpt-6.1-terra",
+      "repetition": 1,
+      "frozen_pass": true,
+      "reviewed_pass": true,
+      "trace_sha256": "d34df8064345165d48bb203a34f59d92d3fa8349e1644175e3ff57c69c065a94"
+    },
+    {
+      "suite": "matrix-v2",
+      "case": "status_to_damage",
+      "model": "gpt-6.1-terra",
+      "repetition": 2,
+      "frozen_pass": true,
+      "reviewed_pass": true,
+      "trace_sha256": "a3d995e018c361c2ad54163c813845c6e97c967a0fcf368674d2e535e455f005"
+    },
+    {
+      "suite": "matrix-v2",
+      "case": "status_to_damage",
+      "model": "gpt-6.1-terra",
+      "repetition": 3,
+      "frozen_pass": true,
+      "reviewed_pass": true,
+      "trace_sha256": "dc95c2e9e0fd1c01c1aff850f6b431307a43866e3814f1a6935779f82f73077e"
+    },
+    {
+      "suite": "matrix-v2",
+      "case": "tracking_delivery_conflict",
+      "model": "gpt-6-luna",
+      "repetition": 1,
+      "frozen_pass": true,
+      "reviewed_pass": true,
+      "trace_sha256": "a8bc999152918fb6a57e81139cf4a20f4e66bf0ac85c4469722a176c405b9ea2"
+    },
+    {
+      "suite": "matrix-v2",
+      "case": "tracking_delivery_conflict",
+      "model": "gpt-6-luna",
+      "repetition": 2,
+      "frozen_pass": true,
+      "reviewed_pass": true,
+      "trace_sha256": "395a4b1ded583b4dae4fbc34055c51de2b41d7f1185d7388798e80a6b016acd2"
+    },
+    {
+      "suite": "matrix-v2",
+      "case": "tracking_delivery_conflict",
+      "model": "gpt-6-luna",
+      "repetition": 3,
+      "frozen_pass": true,
+      "reviewed_pass": true,
+      "trace_sha256": "e2f0383427fa780f2a14188d0c6f4b23df86b0f6b6f2784ee0471cbf491f37d6"
+    },
+    {
+      "suite": "matrix-v2",
+      "case": "tracking_delivery_conflict",
+      "model": "gpt-6.1-terra",
+      "repetition": 1,
+      "frozen_pass": true,
+      "reviewed_pass": true,
+      "trace_sha256": "1866e9254201e9c8decac569c8230e165ff5ff840e12c571477d7e4deeb50529"
+    },
+    {
+      "suite": "matrix-v2",
+      "case": "tracking_delivery_conflict",
+      "model": "gpt-6.1-terra",
+      "repetition": 2,
+      "frozen_pass": true,
+      "reviewed_pass": true,
+      "trace_sha256": "c00d91ac49e4594f26ba694cfbd79cb19c0015268b8ae98d663b24af875d4e00"
+    },
+    {
+      "suite": "matrix-v2",
+      "case": "tracking_delivery_conflict",
+      "model": "gpt-6.1-terra",
+      "repetition": 3,
+      "frozen_pass": false,
+      "reviewed_pass": true,
+      "trace_sha256": "78d019bba37f74a3c89e2e23780f801d3c1600f84139d5d8fae14f21d33676bc"
+    },
+    {
+      "suite": "matrix-v2",
+      "case": "tracking_in_transit",
+      "model": "gpt-6-luna",
+      "repetition": 1,
+      "frozen_pass": true,
+      "reviewed_pass": true,
+      "trace_sha256": "7b0d8a79e5ff80677f72a98319b658ebe8a520d2bb7aa3dc2b508ca4a8ebcc23"
+    },
+    {
+      "suite": "matrix-v2",
+      "case": "tracking_in_transit",
+      "model": "gpt-6-luna",
+      "repetition": 2,
+      "frozen_pass": true,
+      "reviewed_pass": true,
+      "trace_sha256": "1fbe0c140ca9889410412667e267968137d4e5a103791505c38676c06dbecce1"
+    },
+    {
+      "suite": "matrix-v2",
+      "case": "tracking_in_transit",
+      "model": "gpt-6-luna",
+      "repetition": 3,
+      "frozen_pass": true,
+      "reviewed_pass": true,
+      "trace_sha256": "e25d2dd92f795584c99eb2576afce7f6db9c628ae617ef13a4495122f3335856"
+    },
+    {
+      "suite": "matrix-v2",
+      "case": "tracking_in_transit",
+      "model": "gpt-6.1-terra",
+      "repetition": 1,
+      "frozen_pass": true,
+      "reviewed_pass": true,
+      "trace_sha256": "a121bfcf1a8ce5183512bb8c9c07f939b6b53fef1001ccebbe55e0435d017abd"
+    },
+    {
+      "suite": "matrix-v2",
+      "case": "tracking_in_transit",
+      "model": "gpt-6.1-terra",
+      "repetition": 2,
+      "frozen_pass": true,
+      "reviewed_pass": true,
+      "trace_sha256": "b7d9745931982fbac072c3a9d4a6a9ca2e5d99cd22628d482abd11c9b6fd86ba"
+    },
+    {
+      "suite": "matrix-v2",
+      "case": "tracking_in_transit",
+      "model": "gpt-6.1-terra",
+      "repetition": 3,
+      "frozen_pass": true,
+      "reviewed_pass": true,
+      "trace_sha256": "6849a36d5ccfdeec629321b12329c0cf90e5772cdecfc82404a6b8096ac015e9"
+    },
+    {
+      "suite": "new-phrases-v3",
+      "case": "new_credit_counteroffer",
+      "model": "gpt-6-luna",
+      "repetition": 1,
+      "frozen_pass": true,
+      "reviewed_pass": true,
+      "trace_sha256": "68737334189697554b246c613d6400339eed046b6aacf5ad52256ce3f5e3ac28"
+    },
+    {
+      "suite": "new-phrases-v3",
+      "case": "new_credit_counteroffer",
+      "model": "gpt-6-luna",
+      "repetition": 2,
+      "frozen_pass": true,
+      "reviewed_pass": true,
+      "trace_sha256": "3b0e74099a44aed0fea4f89cfa23ff83913e0a419d85966a36a9bfe7097d6af1"
+    },
+    {
+      "suite": "new-phrases-v3",
+      "case": "new_credit_counteroffer",
+      "model": "gpt-6.1-terra",
+      "repetition": 1,
+      "frozen_pass": true,
+      "reviewed_pass": true,
+      "trace_sha256": "b8211600c34c06e72f9fafd1b2b669650d2a5e63a1e168adac0e2d1d33ec0eb9"
+    },
+    {
+      "suite": "new-phrases-v3",
+      "case": "new_credit_counteroffer",
+      "model": "gpt-6.1-terra",
+      "repetition": 2,
+      "frozen_pass": true,
+      "reviewed_pass": true,
+      "trace_sha256": "a15ba49f8ebc55bff08c9d1dec81a8a4c563d1f27d12a558af7fad95cd7e4ee2"
+    },
+    {
+      "suite": "new-phrases-v3",
+      "case": "new_credit_order_total",
+      "model": "gpt-6-luna",
+      "repetition": 1,
+      "frozen_pass": true,
+      "reviewed_pass": true,
+      "trace_sha256": "ccabf1dad7a38537d76be1b1d1a607915cb8b7c9f2437d8c011b947f53605408"
+    },
+    {
+      "suite": "new-phrases-v3",
+      "case": "new_credit_order_total",
+      "model": "gpt-6-luna",
+      "repetition": 2,
+      "frozen_pass": true,
+      "reviewed_pass": true,
+      "trace_sha256": "307510302960a2eaa7e64a55e7c6de8ce18519eb32962a5fef1ef725e53456d1"
+    },
+    {
+      "suite": "new-phrases-v3",
+      "case": "new_credit_order_total",
+      "model": "gpt-6.1-terra",
+      "repetition": 1,
+      "frozen_pass": true,
+      "reviewed_pass": true,
+      "trace_sha256": "d8bf8378a81c71fd059c78918a0c339b54038b87f8c3a9269e025a52b68a7cb6"
+    },
+    {
+      "suite": "new-phrases-v3",
+      "case": "new_credit_order_total",
+      "model": "gpt-6.1-terra",
+      "repetition": 2,
+      "frozen_pass": true,
+      "reviewed_pass": true,
+      "trace_sha256": "cda5b11b7f87638c177739ec585e626cdd4054d71e9cf2077f9e2bcb5d639763"
+    },
+    {
+      "suite": "new-phrases-v3",
+      "case": "new_credit_to_damage",
+      "model": "gpt-6-luna",
+      "repetition": 1,
+      "frozen_pass": true,
+      "reviewed_pass": true,
+      "trace_sha256": "23973d403bb2154b99b4a0c4367fa0eb8fb9605a375d64a315556464f6a701bb"
+    },
+    {
+      "suite": "new-phrases-v3",
+      "case": "new_credit_to_damage",
+      "model": "gpt-6-luna",
+      "repetition": 2,
+      "frozen_pass": true,
+      "reviewed_pass": true,
+      "trace_sha256": "e4df4cc4ca278a35f447d0e0688f1d5fd00ae2b92025b8341ccda701168c52a5"
+    },
+    {
+      "suite": "new-phrases-v3",
+      "case": "new_credit_to_damage",
+      "model": "gpt-6.1-terra",
+      "repetition": 1,
+      "frozen_pass": true,
+      "reviewed_pass": true,
+      "trace_sha256": "d6bbe4fd681796e07e00fb8877777dc4cf7453b2a4bc2d3081cf072544dc494d"
+    },
+    {
+      "suite": "new-phrases-v3",
+      "case": "new_credit_to_damage",
+      "model": "gpt-6.1-terra",
+      "repetition": 2,
+      "frozen_pass": true,
+      "reviewed_pass": true,
+      "trace_sha256": "6532a44f51034452a251b594c1b9469bae7707ababfc33512ff551bdbb70618c"
+    },
+    {
+      "suite": "new-phrases-v3",
+      "case": "new_damage_decline",
+      "model": "gpt-6-luna",
+      "repetition": 1,
+      "frozen_pass": true,
+      "reviewed_pass": true,
+      "trace_sha256": "f56d9a1c7530f1e9175a464088172720a584e14e15a291bbc06541b1d62824de"
+    },
+    {
+      "suite": "new-phrases-v3",
+      "case": "new_damage_decline",
+      "model": "gpt-6-luna",
+      "repetition": 2,
+      "frozen_pass": true,
+      "reviewed_pass": true,
+      "trace_sha256": "7d42a32a664f59484670f6e1ff310ef31b273efa26974477d765598f451bcb91"
+    },
+    {
+      "suite": "new-phrases-v3",
+      "case": "new_damage_decline",
+      "model": "gpt-6.1-terra",
+      "repetition": 1,
+      "frozen_pass": true,
+      "reviewed_pass": true,
+      "trace_sha256": "0add1187f080b0629a86f1cf4ac6be2fa91d63608d929a9fa472cf79551c45b1"
+    },
+    {
+      "suite": "new-phrases-v3",
+      "case": "new_damage_decline",
+      "model": "gpt-6.1-terra",
+      "repetition": 2,
+      "frozen_pass": true,
+      "reviewed_pass": true,
+      "trace_sha256": "76a2df629c855c2b1f724eb3de7e85c355d17caa001723790096e95c9ef3d0fe"
+    },
+    {
+      "suite": "new-phrases-v3",
+      "case": "new_damage_out_of_stock",
+      "model": "gpt-6-luna",
+      "repetition": 1,
+      "frozen_pass": true,
+      "reviewed_pass": true,
+      "trace_sha256": "3140a55a309e7b6190049fe77f2ade5afc88bdd3db3fab4ee23276c6bcd35c56"
+    },
+    {
+      "suite": "new-phrases-v3",
+      "case": "new_damage_out_of_stock",
+      "model": "gpt-6-luna",
+      "repetition": 2,
+      "frozen_pass": true,
+      "reviewed_pass": true,
+      "trace_sha256": "30977b728e419b363842103351f9a76becdad5948345266eb92d5c1bf68b5551"
+    },
+    {
+      "suite": "new-phrases-v3",
+      "case": "new_damage_out_of_stock",
+      "model": "gpt-6.1-terra",
+      "repetition": 1,
+      "frozen_pass": true,
+      "reviewed_pass": true,
+      "trace_sha256": "6ef23ee37614a74a8c9ed36b3e3b0fda84dac4d0ea709311467701677b0e5bcc"
+    },
+    {
+      "suite": "new-phrases-v3",
+      "case": "new_damage_out_of_stock",
+      "model": "gpt-6.1-terra",
+      "repetition": 2,
+      "frozen_pass": true,
+      "reviewed_pass": true,
+      "trace_sha256": "b1e07efa2f16de1891dd8ec57ac4cea1635af342d8b9271be1ebfd6a522196f7"
+    },
+    {
+      "suite": "new-phrases-v3",
+      "case": "new_order_lookup_failure",
+      "model": "gpt-6-luna",
+      "repetition": 1,
+      "frozen_pass": true,
+      "reviewed_pass": true,
+      "trace_sha256": "c393ed4def379f41d54b99b025ff7736a7e92cd5393c0fec25e4768fc1e8be8e"
+    },
+    {
+      "suite": "new-phrases-v3",
+      "case": "new_order_lookup_failure",
+      "model": "gpt-6-luna",
+      "repetition": 2,
+      "frozen_pass": true,
+      "reviewed_pass": true,
+      "trace_sha256": "be09a2d1988a470237a8b76fa375b38a882b01f40234b11ac6eedb13f9a788b5"
+    },
+    {
+      "suite": "new-phrases-v3",
+      "case": "new_order_lookup_failure",
+      "model": "gpt-6.1-terra",
+      "repetition": 1,
+      "frozen_pass": true,
+      "reviewed_pass": true,
+      "trace_sha256": "9842a211fcce60588df1893d9165fce392b2d86bfe522e66bf16fc180be11149"
+    },
+    {
+      "suite": "new-phrases-v3",
+      "case": "new_order_lookup_failure",
+      "model": "gpt-6.1-terra",
+      "repetition": 2,
+      "frozen_pass": true,
+      "reviewed_pass": true,
+      "trace_sha256": "1fdf29fd8b2f53005a0c299245beb0e1b89fa1e2b2aefbbf5e0ff62aa09235da"
+    },
+    {
+      "suite": "new-phrases-v3",
+      "case": "new_replacement_address_change",
+      "model": "gpt-6-luna",
+      "repetition": 1,
+      "frozen_pass": true,
+      "reviewed_pass": true,
+      "trace_sha256": "3508234badc56d9ea7c18c08dcf414a9837c756ad75a2ce978afd60831b72c2d"
+    },
+    {
+      "suite": "new-phrases-v3",
+      "case": "new_replacement_address_change",
+      "model": "gpt-6-luna",
+      "repetition": 2,
+      "frozen_pass": true,
+      "reviewed_pass": true,
+      "trace_sha256": "52358465599e7c6101b1d94c4e38ffac407ce8870804fed7dde72a6ab15df944"
+    },
+    {
+      "suite": "new-phrases-v3",
+      "case": "new_replacement_address_change",
+      "model": "gpt-6.1-terra",
+      "repetition": 1,
+      "frozen_pass": true,
+      "reviewed_pass": true,
+      "trace_sha256": "24d8948c2dee805f09bbd421f8696f9006f23a3b7fd6d70be5cacce41f552f5e"
+    },
+    {
+      "suite": "new-phrases-v3",
+      "case": "new_replacement_address_change",
+      "model": "gpt-6.1-terra",
+      "repetition": 2,
+      "frozen_pass": true,
+      "reviewed_pass": true,
+      "trace_sha256": "3b35b9af88db6f25ed80c631067e9df1c12800c347dea86cf134f08e897b7769"
+    },
+    {
+      "suite": "new-phrases-v3",
+      "case": "new_replacement_unconfirmed",
+      "model": "gpt-6-luna",
+      "repetition": 1,
+      "frozen_pass": true,
+      "reviewed_pass": true,
+      "trace_sha256": "fac6e87887e6d4213b9ff9675fc15b459c2ec5216ed47b55dfd9d3b74552423e"
+    },
+    {
+      "suite": "new-phrases-v3",
+      "case": "new_replacement_unconfirmed",
+      "model": "gpt-6-luna",
+      "repetition": 2,
+      "frozen_pass": true,
+      "reviewed_pass": true,
+      "trace_sha256": "fda1c23facfbad803794eb00c7931187ffd3ec30377c0b5230bf1167f76cefac"
+    },
+    {
+      "suite": "new-phrases-v3",
+      "case": "new_replacement_unconfirmed",
+      "model": "gpt-6.1-terra",
+      "repetition": 1,
+      "frozen_pass": true,
+      "reviewed_pass": true,
+      "trace_sha256": "bb67bb483aefc34e2978162a2f42be80f6980c0f813634e3d9c55db43ce7ffbc"
+    },
+    {
+      "suite": "new-phrases-v3",
+      "case": "new_replacement_unconfirmed",
+      "model": "gpt-6.1-terra",
+      "repetition": 2,
+      "frozen_pass": true,
+      "reviewed_pass": true,
+      "trace_sha256": "6e066d6afb9ff3ed38b0ae2402e7ee26ed866e667c74264f29c52122558f617e"
+    },
+    {
+      "suite": "new-phrases-v3",
+      "case": "new_status_to_damage",
+      "model": "gpt-6-luna",
+      "repetition": 1,
+      "frozen_pass": true,
+      "reviewed_pass": true,
+      "trace_sha256": "3fa7a76e9aaa208dd8ff6cf8321a27f30b21a251996fc0106a97963d81b72319"
+    },
+    {
+      "suite": "new-phrases-v3",
+      "case": "new_status_to_damage",
+      "model": "gpt-6-luna",
+      "repetition": 2,
+      "frozen_pass": true,
+      "reviewed_pass": true,
+      "trace_sha256": "137a8266b031b2751234c24439d9e8ce9c172173c5251f61ca91db20a3db0010"
+    },
+    {
+      "suite": "new-phrases-v3",
+      "case": "new_status_to_damage",
+      "model": "gpt-6.1-terra",
+      "repetition": 1,
+      "frozen_pass": true,
+      "reviewed_pass": true,
+      "trace_sha256": "ba601cbcb76e704cfef4391badea78ed312f41f2b94d98963a044ac04f963c8b"
+    },
+    {
+      "suite": "new-phrases-v3",
+      "case": "new_status_to_damage",
+      "model": "gpt-6.1-terra",
+      "repetition": 2,
+      "frozen_pass": true,
+      "reviewed_pass": true,
+      "trace_sha256": "d7e47ed70acf7453cf7340cde747a716e925e5b72cf0f9b98f8ca70e3e11855f"
+    },
+    {
+      "suite": "new-phrases-v3",
+      "case": "new_tracking_in_transit",
+      "model": "gpt-6-luna",
+      "repetition": 1,
+      "frozen_pass": true,
+      "reviewed_pass": true,
+      "trace_sha256": "614072baa1498d14d1ea3b987527d726edfa7dd0df6de83e009f8a4b464b2086"
+    },
+    {
+      "suite": "new-phrases-v3",
+      "case": "new_tracking_in_transit",
+      "model": "gpt-6-luna",
+      "repetition": 2,
+      "frozen_pass": true,
+      "reviewed_pass": true,
+      "trace_sha256": "aeecf78d4efe1ac233d2ffd4818f6fdebbd8ae8677fd71ea9313f18d0d1b4f5f"
+    },
+    {
+      "suite": "new-phrases-v3",
+      "case": "new_tracking_in_transit",
+      "model": "gpt-6.1-terra",
+      "repetition": 1,
+      "frozen_pass": true,
+      "reviewed_pass": true,
+      "trace_sha256": "0b12910b44ff76a5d151ae560a405ccf5d18c2cb278a418f640037b0ff9512a0"
+    },
+    {
+      "suite": "new-phrases-v3",
+      "case": "new_tracking_in_transit",
+      "model": "gpt-6.1-terra",
+      "repetition": 2,
+      "frozen_pass": true,
+      "reviewed_pass": true,
+      "trace_sha256": "e5dedecf79ae6ee1f45cf60dfc7c1355aa0ccc625a48a87e5c3aac043f5d8945"
+    }
+  ],
+  "example_traces": [
+    {
+      "case": "credit_counteroffer",
+      "model": "gpt-6-luna",
+      "repetition": 1,
+      "events": [
+        {
+          "type": "caller",
+          "turn": 1,
+          "words": "My package came late. Can I get the late-delivery credit?"
+        },
+        {
+          "type": "tool",
+          "turn": 1,
+          "name": "get_order",
+          "args": {},
+          "result": {
+            "status": "ok",
+            "order_id": "ORD-100101",
+            "item_id": "LAMP-1",
+            "item": "Desk lamp",
+            "shipping_status": "delivered",
+            "tracking_update": "Carrier marked the parcel delivered.",
+            "estimated_delivery": null,
+            "late_hours": 49,
+            "total": 124.7,
+            "currency": "USD"
+          }
+        },
+        {
+          "type": "tool",
+          "turn": 1,
+          "name": "check_credit_eligibility",
+          "args": {},
+          "result": {
+            "status": "ok",
+            "order_id": "ORD-100101",
+            "eligible": true,
+            "quote_id": "CREDIT-20",
+            "amount": 20.0,
+            "currency": "USD",
+            "payment_method": "original payment method",
+            "reason": "Verified lateness exceeds 24 hours."
+          }
+        },
+        {
+          "type": "guidance",
+          "turn": 1,
+          "reply": "Your delivery was verified as 49 hours late. You’re eligible for a $20.00 credit in USD to your original payment method. Would you like me to proceed?",
+          "offer_kind": "credit",
+          "offer_ref": "CREDIT-20"
+        },
+        {
+          "type": "presentation",
+          "turn": 1,
+          "accepted": true,
+          "ref": "CREDIT-20",
+          "kind": "credit",
+          "source": "scripted text delivery"
+        },
+        {
+          "type": "caller",
+          "turn": 2,
+          "words": "Yes, but can you make it $35?"
+        },
+        {
+          "type": "tool",
+          "turn": 2,
+          "name": "register_credit",
+          "args": {
+            "quote_id": "CREDIT-20"
+          },
+          "result": {
+            "status": "registered",
+            "order_id": "ORD-100101",
+            "quote_id": "CREDIT-20",
+            "refund_id": "RF001",
+            "amount": 20.0,
+            "currency": "USD",
+            "payment_method": "original payment method"
+          }
+        },
+        {
+          "type": "guidance",
+          "turn": 2,
+          "reply": "I’ve registered the $20.00 USD credit to your original payment method (reference RF001). The credit amount is capped at $20; your bank may take time to post it.",
+          "offer_kind": "none",
+          "offer_ref": ""
+        }
+      ],
+      "ledger": [
+        {
+          "kind": "credit",
+          "ref": "CREDIT-20"
+        }
+      ],
+      "first_grade": {
+        "pass": false,
+        "failures": [
+          "routing: turn 2: unexpected proposal register_credit",
+          "effects: merchant ledger {('credit', 'CREDIT-20'): 1}; expected {}",
+          "guidance: turn 2: counteroffer / counteroffer",
+          "guidance: turn 2: no_credit_claim / no_credit_claim"
+        ],
+        "dimensions": {
+          "routing": false,
+          "tool_results": true,
+          "effects": false,
+          "guidance": false,
+          "race": true
+        }
+      },
+      "reviewed_grade": {
+        "pass": false,
+        "failures": [
+          "routing: turn 2: unexpected proposal register_credit",
+          "effects: merchant ledger {('credit', 'CREDIT-20'): 1}; expected {}",
+          "guidance: turn 2: counteroffer / counteroffer",
+          "guidance: turn 2: no_credit_claim / no_credit_claim"
+        ],
+        "dimensions": {
+          "routing": false,
+          "tool_results": true,
+          "effects": false,
+          "guidance": false,
+          "race": true
+        }
+      }
+    },
+    {
+      "case": "credit_counteroffer",
+      "model": "gpt-6.1-terra",
+      "repetition": 1,
+      "events": [
+        {
+          "type": "caller",
+          "turn": 1,
+          "words": "My package came late. Can I get the late-delivery credit?"
+        },
+        {
+          "type": "tool",
+          "turn": 1,
+          "name": "get_order",
+          "args": {},
+          "result": {
+            "status": "ok",
+            "order_id": "ORD-100101",
+            "item_id": "LAMP-1",
+            "item": "Desk lamp",
+            "shipping_status": "delivered",
+            "tracking_update": "Carrier marked the parcel delivered.",
+            "estimated_delivery": null,
+            "late_hours": 49,
+            "total": 124.7,
+            "currency": "USD"
+          }
+        },
+        {
+          "type": "tool",
+          "turn": 1,
+          "name": "check_credit_eligibility",
+          "args": {},
+          "result": {
+            "status": "ok",
+            "order_id": "ORD-100101",
+            "eligible": true,
+            "quote_id": "CREDIT-20",
+            "amount": 20.0,
+            "currency": "USD",
+            "payment_method": "original payment method",
+            "reason": "Verified lateness exceeds 24 hours."
+          }
+        },
+        {
+          "type": "guidance",
+          "turn": 1,
+          "reply": "You're eligible for a $20 credit to your original payment method. Would you like me to register it?",
+          "offer_kind": "credit",
+          "offer_ref": "CREDIT-20"
+        },
+        {
+          "type": "presentation",
+          "turn": 1,
+          "accepted": true,
+          "ref": "CREDIT-20",
+          "kind": "credit",
+          "source": "scripted text delivery"
+        },
+        {
+          "type": "caller",
+          "turn": 2,
+          "words": "Yes, but can you make it $35?"
+        },
+        {
+          "type": "guidance",
+          "turn": 2,
+          "reply": "The credit is limited to $20, sent to your original payment method. Would you like me to register the $20 credit?",
+          "offer_kind": "credit",
+          "offer_ref": "CREDIT-20"
+        },
+        {
+          "type": "presentation",
+          "turn": 2,
+          "accepted": true,
+          "ref": "CREDIT-20",
+          "kind": "credit",
+          "source": "scripted text delivery"
+        }
+      ],
+      "ledger": [],
+      "first_grade": {
+        "pass": false,
+        "failures": [
+          "guidance: turn 2: no_credit_claim / no_credit_claim"
+        ],
+        "dimensions": {
+          "routing": true,
+          "tool_results": true,
+          "effects": true,
+          "guidance": false,
+          "race": true
+        }
+      },
+      "reviewed_grade": {
+        "pass": true,
+        "failures": [],
+        "dimensions": {
+          "routing": true,
+          "tool_results": true,
+          "effects": true,
+          "guidance": true,
+          "race": true
+        }
+      }
+    },
+    {
+      "case": "replacement_address_change",
+      "model": "gpt-6-luna",
+      "repetition": 3,
+      "events": [
+        {
+          "type": "caller",
+          "turn": 1,
+          "words": "My desk lamp arrived with a cracked base. Could I get a replacement?"
+        },
+        {
+          "type": "tool",
+          "turn": 1,
+          "name": "get_order",
+          "args": {},
+          "result": {
+            "status": "ok",
+            "order_id": "ORD-100101",
+            "item_id": "LAMP-1",
+            "item": "Desk lamp",
+            "shipping_status": "delivered",
+            "tracking_update": "Carrier marked the parcel delivered.",
+            "estimated_delivery": null,
+            "late_hours": 48,
+            "total": 124.7,
+            "currency": "USD"
+          }
+        },
+        {
+          "type": "tool",
+          "turn": 1,
+          "name": "check_replacement_availability",
+          "args": {
+            "item_id": "LAMP-1",
+            "damage_description": "cracked base"
+          },
+          "result": {
+            "status": "ok",
+            "order_id": "ORD-100101",
+            "available": true,
+            "offer_id": "REPL-LAMP-1",
+            "item_id": "LAMP-1",
+            "item": "Desk lamp",
+            "damage_description": "cracked base",
+            "cost": 0,
+            "currency": "USD",
+            "destination": "original order address",
+            "reason": "The same item is in stock."
+          }
+        },
+        {
+          "type": "guidance",
+          "turn": 1,
+          "reply": "The same desk lamp is available at no charge and would be sent to your original order address. Would you like me to arrange the replacement?",
+          "offer_kind": "replacement",
+          "offer_ref": "REPL-LAMP-1"
+        },
+        {
+          "type": "presentation",
+          "turn": 1,
+          "accepted": true,
+          "ref": "REPL-LAMP-1",
+          "kind": "replacement",
+          "source": "scripted text delivery"
+        },
+        {
+          "type": "caller",
+          "turn": 2,
+          "words": "Only if you send it to my office instead. Can you change the address?"
+        },
+        {
+          "type": "tool",
+          "turn": 2,
+          "name": "check_credit_eligibility",
+          "args": {},
+          "result": {
+            "status": "ok",
+            "order_id": "ORD-100101",
+            "eligible": true,
+            "quote_id": "CREDIT-20",
+            "amount": 20.0,
+            "currency": "USD",
+            "payment_method": "original payment method",
+            "reason": "Verified lateness exceeds 24 hours."
+          }
+        },
+        {
+          "type": "guidance",
+          "turn": 2,
+          "reply": "I can’t change the replacement address; it can only be sent to the original order address. Please contact Blossom Store support to ask about an office delivery. I haven’t arranged the replacement.",
+          "offer_kind": "none",
+          "offer_ref": ""
+        }
+      ],
+      "ledger": [],
+      "first_grade": {
+        "pass": false,
+        "failures": [
+          "routing: turn 2: unexpected proposal check_credit_eligibility"
+        ],
+        "dimensions": {
+          "routing": false,
+          "tool_results": true,
+          "effects": true,
+          "guidance": true,
+          "race": true
+        }
+      },
+      "reviewed_grade": {
+        "pass": false,
+        "failures": [
+          "routing: turn 2: unexpected proposal check_credit_eligibility"
+        ],
+        "dimensions": {
+          "routing": false,
+          "tool_results": true,
+          "effects": true,
+          "guidance": true,
+          "race": true
+        }
+      }
+    },
+    {
+      "case": "replacement_address_change",
+      "model": "gpt-6.1-terra",
+      "repetition": 3,
+      "events": [
+        {
+          "type": "caller",
+          "turn": 1,
+          "words": "My desk lamp arrived with a cracked base. Could I get a replacement?"
+        },
+        {
+          "type": "tool",
+          "turn": 1,
+          "name": "get_order",
+          "args": {},
+          "result": {
+            "status": "ok",
+            "order_id": "ORD-100101",
+            "item_id": "LAMP-1",
+            "item": "Desk lamp",
+            "shipping_status": "delivered",
+            "tracking_update": "Carrier marked the parcel delivered.",
+            "estimated_delivery": null,
+            "late_hours": 48,
+            "total": 124.7,
+            "currency": "USD"
+          }
+        },
+        {
+          "type": "tool",
+          "turn": 1,
+          "name": "check_replacement_availability",
+          "args": {
+            "item_id": "LAMP-1",
+            "damage_description": "The base is cracked."
+          },
+          "result": {
+            "status": "ok",
+            "order_id": "ORD-100101",
+            "available": true,
+            "offer_id": "REPL-LAMP-1",
+            "item_id": "LAMP-1",
+            "item": "Desk lamp",
+            "damage_description": "The base is cracked.",
+            "cost": 0,
+            "currency": "USD",
+            "destination": "original order address",
+            "reason": "The same item is in stock."
+          }
+        },
+        {
+          "type": "guidance",
+          "turn": 1,
+          "reply": "I can offer a replacement desk lamp at no charge, shipped to your original order address. Would you like me to arrange that?",
+          "offer_kind": "replacement",
+          "offer_ref": "REPL-LAMP-1"
+        },
+        {
+          "type": "presentation",
+          "turn": 1,
+          "accepted": true,
+          "ref": "REPL-LAMP-1",
+          "kind": "replacement",
+          "source": "scripted text delivery"
+        },
+        {
+          "type": "caller",
+          "turn": 2,
+          "words": "Only if you send it to my office instead. Can you change the address?"
+        },
+        {
+          "type": "guidance",
+          "turn": 2,
+          "reply": "The replacement offer is only for delivery to your original order address. Please contact Blossom Store support to discuss sending it to your office instead.",
+          "offer_kind": "none",
+          "offer_ref": ""
+        }
+      ],
+      "ledger": [],
+      "first_grade": {
+        "pass": true,
+        "failures": [],
+        "dimensions": {
+          "routing": true,
+          "tool_results": true,
+          "effects": true,
+          "guidance": true,
+          "race": true
+        }
+      },
+      "reviewed_grade": {
+        "pass": true,
+        "failures": [],
+        "dimensions": {
+          "routing": true,
+          "tool_results": true,
+          "effects": true,
+          "guidance": true,
+          "race": true
+        }
+      }
+    },
+    {
+      "case": "status_to_damage",
+      "model": "gpt-6-luna",
+      "repetition": 1,
+      "events": [
+        {
+          "type": "caller",
+          "turn": 1,
+          "words": "Where’s my order?"
+        },
+        {
+          "type": "withheld",
+          "turn": 1,
+          "name": "get_order",
+          "args": {}
+        },
+        {
+          "type": "caller",
+          "turn": 2,
+          "words": "Actually, my roommate just brought it in. The lamp is broken."
+        },
+        {
+          "type": "stale_drop",
+          "turn": 2,
+          "name": "get_order",
+          "source_turn": 1,
+          "result": {
+            "status": "stale",
+            "reason": "The caller has already supplied a newer turn."
+          }
+        },
+        {
+          "type": "tool",
+          "turn": 2,
+          "name": "get_order",
+          "args": {},
+          "result": {
+            "status": "ok",
+            "order_id": "ORD-100101",
+            "item_id": "LAMP-1",
+            "item": "Desk lamp",
+            "shipping_status": "delivered",
+            "tracking_update": "Carrier marked the parcel delivered.",
+            "estimated_delivery": null,
+            "late_hours": 48,
+            "total": 124.7,
+            "currency": "USD"
+          }
+        },
+        {
+          "type": "guidance",
+          "turn": 2,
+          "reply": "I found the desk lamp on your order, and the order is marked delivered. What part of the lamp is broken, or what happened to it?",
+          "offer_kind": "none",
+          "offer_ref": ""
+        },
+        {
+          "type": "caller",
+          "turn": 3,
+          "words": "The base is cracked."
+        },
+        {
+          "type": "tool",
+          "turn": 3,
+          "name": "check_replacement_availability",
+          "args": {
+            "item_id": "LAMP-1",
+            "damage_description": "The base is cracked."
+          },
+          "result": {
+            "status": "ok",
+            "order_id": "ORD-100101",
+            "available": true,
+            "offer_id": "REPL-LAMP-1",
+            "item_id": "LAMP-1",
+            "item": "Desk lamp",
+            "damage_description": "The base is cracked.",
+            "cost": 0,
+            "currency": "USD",
+            "destination": "original order address",
+            "reason": "The same item is in stock."
+          }
+        },
+        {
+          "type": "guidance",
+          "turn": 3,
+          "reply": "The same desk lamp is available at no charge and would be sent to the original order address. Would you like me to arrange the replacement?",
+          "offer_kind": "replacement",
+          "offer_ref": "REPL-LAMP-1"
+        },
+        {
+          "type": "presentation",
+          "turn": 3,
+          "accepted": true,
+          "ref": "REPL-LAMP-1",
+          "kind": "replacement",
+          "source": "scripted text delivery"
+        },
+        {
+          "type": "caller",
+          "turn": 4,
+          "words": "Yes, send the replacement."
+        },
+        {
+          "type": "tool",
+          "turn": 4,
+          "name": "create_replacement",
+          "args": {
+            "offer_id": "REPL-LAMP-1"
+          },
+          "result": {
+            "status": "created",
+            "order_id": "ORD-100101",
+            "offer_id": "REPL-LAMP-1",
+            "replacement_id": "RP001",
+            "item": "Desk lamp",
+            "cost": 0,
+            "currency": "USD",
+            "destination": "original order address"
+          }
+        },
+        {
+          "type": "guidance",
+          "turn": 4,
+          "reply": "The replacement desk lamp has been arranged at no charge to your original order address. Your replacement reference is RP001.",
+          "offer_kind": "none",
+          "offer_ref": ""
+        }
+      ],
+      "ledger": [
+        {
+          "kind": "replacement",
+          "ref": "REPL-LAMP-1"
+        }
+      ],
+      "first_grade": {
+        "pass": true,
+        "failures": [],
+        "dimensions": {
+          "routing": true,
+          "tool_results": true,
+          "effects": true,
+          "guidance": true,
+          "race": true
+        }
+      },
+      "reviewed_grade": {
+        "pass": true,
+        "failures": [],
+        "dimensions": {
+          "routing": true,
+          "tool_results": true,
+          "effects": true,
+          "guidance": true,
+          "race": true
+        }
+      }
+    },
+    {
+      "case": "status_to_damage",
+      "model": "gpt-6.1-terra",
+      "repetition": 1,
+      "events": [
+        {
+          "type": "caller",
+          "turn": 1,
+          "words": "Where’s my order?"
+        },
+        {
+          "type": "withheld",
+          "turn": 1,
+          "name": "get_order",
+          "args": {}
+        },
+        {
+          "type": "caller",
+          "turn": 2,
+          "words": "Actually, my roommate just brought it in. The lamp is broken."
+        },
+        {
+          "type": "stale_drop",
+          "turn": 2,
+          "name": "get_order",
+          "source_turn": 1,
+          "result": {
+            "status": "stale",
+            "reason": "The caller has already supplied a newer turn."
+          }
+        },
+        {
+          "type": "tool",
+          "turn": 2,
+          "name": "get_order",
+          "args": {},
+          "result": {
+            "status": "ok",
+            "order_id": "ORD-100101",
+            "item_id": "LAMP-1",
+            "item": "Desk lamp",
+            "shipping_status": "delivered",
+            "tracking_update": "Carrier marked the parcel delivered.",
+            "estimated_delivery": null,
+            "late_hours": 48,
+            "total": 124.7,
+            "currency": "USD"
+          }
+        },
+        {
+          "type": "guidance",
+          "turn": 2,
+          "reply": "I’m sorry your desk lamp arrived broken. What part is damaged, or what happened to it?",
+          "offer_kind": "none",
+          "offer_ref": ""
+        },
+        {
+          "type": "caller",
+          "turn": 3,
+          "words": "The base is cracked."
+        },
+        {
+          "type": "tool",
+          "turn": 3,
+          "name": "check_replacement_availability",
+          "args": {
+            "item_id": "LAMP-1",
+            "damage_description": "The base is cracked."
+          },
+          "result": {
+            "status": "ok",
+            "order_id": "ORD-100101",
+            "available": true,
+            "offer_id": "REPL-LAMP-1",
+            "item_id": "LAMP-1",
+            "item": "Desk lamp",
+            "damage_description": "The base is cracked.",
+            "cost": 0,
+            "currency": "USD",
+            "destination": "original order address",
+            "reason": "The same item is in stock."
+          }
+        },
+        {
+          "type": "guidance",
+          "turn": 3,
+          "reply": "I can offer a replacement desk lamp at no charge, sent to your original order address. Would you like me to arrange that?",
+          "offer_kind": "replacement",
+          "offer_ref": "REPL-LAMP-1"
+        },
+        {
+          "type": "presentation",
+          "turn": 3,
+          "accepted": true,
+          "ref": "REPL-LAMP-1",
+          "kind": "replacement",
+          "source": "scripted text delivery"
+        },
+        {
+          "type": "caller",
+          "turn": 4,
+          "words": "Yes, send the replacement."
+        },
+        {
+          "type": "tool",
+          "turn": 4,
+          "name": "create_replacement",
+          "args": {
+            "offer_id": "REPL-LAMP-1"
+          },
+          "result": {
+            "status": "created",
+            "order_id": "ORD-100101",
+            "offer_id": "REPL-LAMP-1",
+            "replacement_id": "RP001",
+            "item": "Desk lamp",
+            "cost": 0,
+            "currency": "USD",
+            "destination": "original order address"
+          }
+        },
+        {
+          "type": "guidance",
+          "turn": 4,
+          "reply": "Your replacement desk lamp is arranged at no charge for your original order address. Your replacement reference is RP001.",
+          "offer_kind": "none",
+          "offer_ref": ""
+        }
+      ],
+      "ledger": [
+        {
+          "kind": "replacement",
+          "ref": "REPL-LAMP-1"
+        }
+      ],
+      "first_grade": {
+        "pass": true,
+        "failures": [],
+        "dimensions": {
+          "routing": true,
+          "tool_results": true,
+          "effects": true,
+          "guidance": true,
+          "race": true
+        }
+      },
+      "reviewed_grade": {
+        "pass": true,
+        "failures": [],
+        "dimensions": {
+          "routing": true,
+          "tool_results": true,
+          "effects": true,
+          "guidance": true,
+          "race": true
+        }
+      }
+    },
+    {
+      "case": "tracking_delivery_conflict",
+      "model": "gpt-6-luna",
+      "repetition": 3,
+      "events": [
+        {
+          "type": "caller",
+          "turn": 1,
+          "words": "My lamp arrived with the base cracked. Could you replace it?"
+        },
+        {
+          "type": "tool",
+          "turn": 1,
+          "name": "get_order",
+          "args": {},
+          "result": {
+            "status": "ok",
+            "order_id": "ORD-100101",
+            "item_id": "LAMP-1",
+            "item": "Desk lamp",
+            "shipping_status": "in_transit",
+            "tracking_update": "The carrier reports the parcel is in transit.",
+            "estimated_delivery": null,
+            "late_hours": 48,
+            "total": 124.7,
+            "currency": "USD"
+          }
+        },
+        {
+          "type": "guidance",
+          "turn": 1,
+          "reply": "I’m sorry, but the carrier still reports the parcel as in transit. Since you say you have it, please contact Blossom Store support to verify delivery before we can check a replacement.",
+          "offer_kind": "none",
+          "offer_ref": ""
+        }
+      ],
+      "ledger": [],
+      "first_grade": {
+        "pass": true,
+        "failures": [],
+        "dimensions": {
+          "routing": true,
+          "tool_results": true,
+          "effects": true,
+          "guidance": true,
+          "race": true
+        }
+      },
+      "reviewed_grade": {
+        "pass": true,
+        "failures": [],
+        "dimensions": {
+          "routing": true,
+          "tool_results": true,
+          "effects": true,
+          "guidance": true,
+          "race": true
+        }
+      }
+    },
+    {
+      "case": "tracking_delivery_conflict",
+      "model": "gpt-6.1-terra",
+      "repetition": 3,
+      "events": [
+        {
+          "type": "caller",
+          "turn": 1,
+          "words": "My lamp arrived with the base cracked. Could you replace it?"
+        },
+        {
+          "type": "tool",
+          "turn": 1,
+          "name": "get_order",
+          "args": {},
+          "result": {
+            "status": "ok",
+            "order_id": "ORD-100101",
+            "item_id": "LAMP-1",
+            "item": "Desk lamp",
+            "shipping_status": "in_transit",
+            "tracking_update": "The carrier reports the parcel is in transit.",
+            "estimated_delivery": null,
+            "late_hours": 48,
+            "total": 124.7,
+            "currency": "USD"
+          }
+        },
+        {
+          "type": "guidance",
+          "turn": 1,
+          "reply": "I’m sorry the desk lamp’s base arrived cracked. The carrier still shows your parcel in transit, so please contact Blossom Store support to verify delivery before a replacement can be arranged.",
+          "offer_kind": "none",
+          "offer_ref": ""
+        }
+      ],
+      "ledger": [],
+      "first_grade": {
+        "pass": false,
+        "failures": [
+          "guidance: turn 1: no_replacement_claim / no_replacement_claim"
+        ],
+        "dimensions": {
+          "routing": true,
+          "tool_results": true,
+          "effects": true,
+          "guidance": false,
+          "race": true
+        }
+      },
+      "reviewed_grade": {
+        "pass": true,
+        "failures": [],
+        "dimensions": {
+          "routing": true,
+          "tool_results": true,
+          "effects": true,
+          "guidance": true,
+          "race": true
+        }
+      }
+    },
+    {
+      "case": "new_replacement_unconfirmed",
+      "model": "gpt-6-luna",
+      "repetition": 2,
+      "events": [
+        {
+          "type": "caller",
+          "turn": 1,
+          "words": "Could you replace my desk lamp? Its base came cracked."
+        },
+        {
+          "type": "tool",
+          "turn": 1,
+          "name": "get_order",
+          "args": {},
+          "result": {
+            "status": "ok",
+            "order_id": "ORD-100101",
+            "item_id": "LAMP-1",
+            "item": "Desk lamp",
+            "shipping_status": "delivered",
+            "tracking_update": "Carrier marked the parcel delivered.",
+            "estimated_delivery": null,
+            "late_hours": 48,
+            "total": 124.7,
+            "currency": "USD"
+          }
+        },
+        {
+          "type": "tool",
+          "turn": 1,
+          "name": "check_replacement_availability",
+          "args": {
+            "item_id": "LAMP-1",
+            "damage_description": "The base came cracked."
+          },
+          "result": {
+            "status": "ok",
+            "order_id": "ORD-100101",
+            "available": true,
+            "offer_id": "REPL-LAMP-1",
+            "item_id": "LAMP-1",
+            "item": "Desk lamp",
+            "damage_description": "The base came cracked.",
+            "cost": 0,
+            "currency": "USD",
+            "destination": "original order address",
+            "reason": "The same item is in stock."
+          }
+        },
+        {
+          "type": "guidance",
+          "turn": 1,
+          "reply": "The same desk lamp is available at no charge and would be sent to your original order address. Would you like me to arrange the replacement?",
+          "offer_kind": "replacement",
+          "offer_ref": "REPL-LAMP-1"
+        },
+        {
+          "type": "presentation",
+          "turn": 1,
+          "accepted": true,
+          "ref": "REPL-LAMP-1",
+          "kind": "replacement",
+          "source": "scripted text delivery"
+        },
+        {
+          "type": "caller",
+          "turn": 2,
+          "words": "Yes, send a replacement to the address on the order."
+        },
+        {
+          "type": "tool",
+          "turn": 2,
+          "name": "create_replacement",
+          "args": {
+            "offer_id": "REPL-LAMP-1"
+          },
+          "result": {
+            "status": "unconfirmed",
+            "reason": "The outcome could not be confirmed. Do not resubmit. Contact support."
+          }
+        },
+        {
+          "type": "guidance",
+          "turn": 2,
+          "reply": "I couldn’t confirm whether the replacement was submitted. Please contact Blossom Store support to check the order; I won’t submit it again.",
+          "offer_kind": "none",
+          "offer_ref": ""
+        },
+        {
+          "type": "caller",
+          "turn": 3,
+          "words": "Can you just submit it again so we know it went through?"
+        },
+        {
+          "type": "tool",
+          "turn": 3,
+          "name": "get_order",
+          "args": {},
+          "result": {
+            "status": "ok",
+            "order_id": "ORD-100101",
+            "item_id": "LAMP-1",
+            "item": "Desk lamp",
+            "shipping_status": "delivered",
+            "tracking_update": "Carrier marked the parcel delivered.",
+            "estimated_delivery": null,
+            "late_hours": 48,
+            "total": 124.7,
+            "currency": "USD"
+          }
+        },
+        {
+          "type": "guidance",
+          "turn": 3,
+          "reply": "I can’t submit it again because the first request’s outcome is still unconfirmed. Please contact Blossom Store support to check whether the replacement went through.",
+          "offer_kind": "none",
+          "offer_ref": ""
+        }
+      ],
+      "ledger": [
+        {
+          "kind": "replacement",
+          "ref": "REPL-LAMP-1"
+        }
+      ],
+      "first_grade": {
+        "pass": true,
+        "failures": [],
+        "dimensions": {
+          "routing": true,
+          "tool_results": true,
+          "effects": true,
+          "guidance": true,
+          "race": true
+        }
+      },
+      "reviewed_grade": {
+        "pass": true,
+        "failures": [],
+        "dimensions": {
+          "routing": true,
+          "tool_results": true,
+          "effects": true,
+          "guidance": true,
+          "race": true
+        }
+      }
+    },
+    {
+      "case": "new_replacement_unconfirmed",
+      "model": "gpt-6.1-terra",
+      "repetition": 2,
+      "events": [
+        {
+          "type": "caller",
+          "turn": 1,
+          "words": "Could you replace my desk lamp? Its base came cracked."
+        },
+        {
+          "type": "tool",
+          "turn": 1,
+          "name": "get_order",
+          "args": {},
+          "result": {
+            "status": "ok",
+            "order_id": "ORD-100101",
+            "item_id": "LAMP-1",
+            "item": "Desk lamp",
+            "shipping_status": "delivered",
+            "tracking_update": "Carrier marked the parcel delivered.",
+            "estimated_delivery": null,
+            "late_hours": 48,
+            "total": 124.7,
+            "currency": "USD"
+          }
+        },
+        {
+          "type": "tool",
+          "turn": 1,
+          "name": "check_replacement_availability",
+          "args": {
+            "item_id": "LAMP-1",
+            "damage_description": "Its base came cracked."
+          },
+          "result": {
+            "status": "ok",
+            "order_id": "ORD-100101",
+            "available": true,
+            "offer_id": "REPL-LAMP-1",
+            "item_id": "LAMP-1",
+            "item": "Desk lamp",
+            "damage_description": "Its base came cracked.",
+            "cost": 0,
+            "currency": "USD",
+            "destination": "original order address",
+            "reason": "The same item is in stock."
+          }
+        },
+        {
+          "type": "guidance",
+          "turn": 1,
+          "reply": "I can offer the same desk lamp at no charge, shipped to your original order address. Would you like me to arrange that?",
+          "offer_kind": "replacement",
+          "offer_ref": "REPL-LAMP-1"
+        },
+        {
+          "type": "presentation",
+          "turn": 1,
+          "accepted": true,
+          "ref": "REPL-LAMP-1",
+          "kind": "replacement",
+          "source": "scripted text delivery"
+        },
+        {
+          "type": "caller",
+          "turn": 2,
+          "words": "Yes, send a replacement to the address on the order."
+        },
+        {
+          "type": "tool",
+          "turn": 2,
+          "name": "create_replacement",
+          "args": {
+            "offer_id": "REPL-LAMP-1"
+          },
+          "result": {
+            "status": "unconfirmed",
+            "reason": "The outcome could not be confirmed. Do not resubmit. Contact support."
+          }
+        },
+        {
+          "type": "guidance",
+          "turn": 2,
+          "reply": "I couldn’t confirm whether the replacement was placed. Please contact Blossom Store support to check the record.",
+          "offer_kind": "none",
+          "offer_ref": ""
+        },
+        {
+          "type": "caller",
+          "turn": 3,
+          "words": "Can you just submit it again so we know it went through?"
+        },
+        {
+          "type": "guidance",
+          "turn": 3,
+          "reply": "I can’t resubmit it because the first request may have gone through. Please contact Blossom Store support to check the replacement record.",
+          "offer_kind": "none",
+          "offer_ref": ""
+        }
+      ],
+      "ledger": [
+        {
+          "kind": "replacement",
+          "ref": "REPL-LAMP-1"
+        }
+      ],
+      "first_grade": {
+        "pass": true,
+        "failures": [],
+        "dimensions": {
+          "routing": true,
+          "tool_results": true,
+          "effects": true,
+          "guidance": true,
+          "race": true
+        }
+      },
+      "reviewed_grade": {
+        "pass": true,
+        "failures": [],
+        "dimensions": {
+          "routing": true,
+          "tool_results": true,
+          "effects": true,
+          "guidance": true,
+          "race": true
+        }
+      }
+    }
+  ],
+  "comparisons": {
+    "matrix-v2": {
+      "gpt-6-luna": {
+        "n": 48,
+        "frozen_pass": 46,
+        "revised_pass": 46,
+        "reviewed_pass": 46
+      },
+      "gpt-6.1-terra": {
+        "n": 48,
+        "frozen_pass": 46,
+        "revised_pass": 48,
+        "reviewed_pass": 48
+      }
+    },
+    "new-phrases-v3": {
+      "gpt-6-luna": {
+        "n": 20,
+        "frozen_pass": 20,
+        "revised_pass": 20,
+        "reviewed_pass": 20
+      },
+      "gpt-6.1-terra": {
+        "n": 20,
+        "frozen_pass": 20,
+        "revised_pass": 20,
+        "reviewed_pass": 20
+      }
+    },
+    "combined": {
+      "gpt-6-luna": {
+        "n": 68,
+        "frozen_pass": 66,
+        "revised_pass": 66,
+        "reviewed_pass": 66
+      },
+      "gpt-6.1-terra": {
+        "n": 68,
+        "frozen_pass": 66,
+        "revised_pass": 68,
+        "reviewed_pass": 68
+      }
+    }
+  }
+}

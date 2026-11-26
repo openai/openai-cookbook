@@ -110,9 +110,9 @@ class Warehouse:
         table_name = name.rsplit(".", maxsplit=1)[-1]
         return next(
             (
-                record
+                {**record, "name": name}
                 for record in records
-                if str(record.get("name", "")).rsplit(".", maxsplit=1)[-1] == table_name
+                if record.get("name") == table_name
             ),
             {"name": name},
         )

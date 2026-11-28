@@ -30,7 +30,7 @@ def download_wikipedia_data(
             zip_ref.extractall(data_path)
 
         # Remove the zip file
-        os.remove('vector_database_wikipedia_articles_embedded.zip')
+        os.remove(zip_file_path)
         print(f"File downloaded to {data_path}")
 
 

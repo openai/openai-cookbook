@@ -158,7 +158,7 @@ async def process_api_requests_from_file(
     # initialize file reading
     with open(requests_filepath) as file:
         # `requests` will provide requests one at a time
-        requests = file.__iter__()
+        requests = enumerate(file, start=1)
         logging.debug(f"File opened. Entering main loop")
         async with aiohttp.ClientSession() as session:  # Initialize ClientSession here
             while True:
@@ -172,7 +172,14 @@ async def process_api_requests_from_file(
                     elif file_not_finished:
                         try:
                             # get new request
-                            request_json = json.loads(next(requests))
+                            line_number, line = next(requests)
+                            try:
+                                request_json = json.loads(line)
+                            except json.JSONDecodeError as exc:
+                                raise json.JSONDecodeError(
+                                    f"Invalid request at JSONL line {line_number}, "
+                                    f"column {exc.colno}: {exc.msg}", exc.doc, exc.pos
+                                ) from exc
                             next_request = APIRequest(
                                 task_id=next(task_id_generator),
                                 request_json=request_json,

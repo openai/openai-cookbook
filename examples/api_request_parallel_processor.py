@@ -508,4 +508,3 @@ with open(filename, "w") as f:
 
 As with all jsonl files, take care that newlines in the content are properly escaped (json.dumps does this automatically).
 """
-
